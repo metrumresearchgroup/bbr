@@ -1,0 +1,15 @@
+Package: rbabylon
+Type: Package
+Title: r package for babylon.
+Version: 0.0.1
+Description: r package for babylon.
+Encoding: UTF-8
+LazyData: true
+Authors@R: 
+    person(given = "Devin",
+           family = "Pastoor",
+           role = c("aut", "cre"),
+           email = "devin.pastoor@gmail.com")
+RoxygenNote: 6.1.1
+Imports: 
+    magrittr
