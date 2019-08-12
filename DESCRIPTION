@@ -12,4 +12,5 @@ Authors@R:
            email = "devin.pastoor@gmail.com")
 RoxygenNote: 6.1.1
 Imports: 
-    magrittr
+    magrittr,
+    jsonlite

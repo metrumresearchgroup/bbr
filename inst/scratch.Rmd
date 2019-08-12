@@ -1,0 +1,73 @@
+---
+title: "scratch"
+output: html_document
+---
+
+
+
+```{r}
+run_results <- read_model_results("examples/example1.json")
+```
+
+
+```{r}
+names(run_results)
+```
+
+```{r}
+## dataframe
+# TYPE INDEX NAME VALUE TRANSFORMATION STDERR 
+```
+
+```{r}
+calculate_cv(results)
+```
+
+
+## initial results
+
+```{r}
+map(c("1040", "2040"), ~ read_results(.x, transform = TRUE)) %>%
+  keep() %>%
+  map_df(~ .x %>% get_thetas)
+```
+
+```{r}
+get_thetas_across_run()
+```
+
+
+## interacting with params
+
+potential option 1
+
+```{r}
+omega_table <- get_parameter_values(results) %>% 
+  get_omegas() %>% # pluck a particular element
+  calculate_cv()
+  # other transformations
+get_parameter_values(results) %>%
+  get_thetas()
+```
+
+potential option 2
+
+```{r}
+omega_table <- get_parameter_values(results) %>% 
+  calculate_cv() # it should just know to target omegas
+
+get_parameter_values(results) %>%
+  transform_params(scale = "normal") # find all non-normal (eg log) params and transform the values
+```
+
+
+```{r}
+str(run_results$final_parameter_estimates)
+```
+* should be really easy to interact with a single run
+
+
+## outstanding questions
+
+* what types of cross run questions to you find yourself wanting to ask?
+
