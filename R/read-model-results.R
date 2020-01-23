@@ -1,33 +1,26 @@
-exec_summary <- function(.path) {
-  model_dir <- dirname(.path)
-  model <- basename(.path)
-  output <- withr::with_dir(model_dir, {
-    processx::run("bbi", c("nonmem", "summary", model, "--json"))
-  })
-
-  parse_model_results(output$stdout)
-}
-
-bbi_exec <- function(.path, cmd_args, ...) {
-  model_dir <- dirname(.path)
-  model <- basename(.path)
-  if (model_dir == ".") {
-  # given a path that is just the model name
-    model_dir <- getwd()
-  }
-  output <- processx::run(getOption("rbabylon.bbi_exe_path"), c(cmd_args, model), wd = model_dir, ...)
-  return(output)
-}
-model_summary <- function(.path) {
-
-}
-#' read the model results
-#' @param .x model string
-#' @param ... params to pass to jsonlite::read_json
+#' Execute `bbi summary` to generate json output of model results
+#' @param .path Full path to a model that has been run that user wants to summarize
+#' @param .model_type Type of model to summarize. Currently only supports "nonmem"
 #' @export
+model_summary <- function(.path, .model_type = c("nonmem")) {
+  .model_type <- match.arg(.model_type)
+
+  # execute summary command
+  cmd_args <- c(.model_type, "summary", "--json")
+  output <- bbi_exec(.path, cmd_args)
+
+  # parse json output
+  return(parse_model_results(output$stdout))
+}
+
+#' Reads model results to a list by parsing json output from bbi summary
+#' @param .x summary output string
+#' @param ... params to pass to jsonlite::fromJSON
+#' @export
+#' @import jsonlite
 parse_model_results <- function(.x, ..., file = NULL) {
   if (!is.null(file)) {
     return(jsonlite::read_json(file = file, simplifyDataFrame = FALSE))
   }
-  jsonlite::fromJSON(.x, ..., simplifyDataFrame = FALSE)
+  return(jsonlite::fromJSON(.x, ..., simplifyDataFrame = FALSE))
 }
