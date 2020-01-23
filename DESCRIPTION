@@ -10,7 +10,7 @@ Authors@R:
            family = "Pastoor",
            role = c("aut", "cre"),
            email = "devin.pastoor@gmail.com")
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 Imports: 
     magrittr,
     jsonlite,
