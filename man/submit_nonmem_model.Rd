@@ -4,7 +4,13 @@
 \alias{submit_nonmem_model}
 \title{Submit a NONMEM model via babylon}
 \usage{
-submit_nonmem_model(.path, .type = c("sge", "local"), .args, ..., .config_path)
+submit_nonmem_model(
+  .path,
+  .type = c("sge", "local"),
+  .args,
+  ...,
+  .config_path = NULL
+)
 }
 \arguments{
 \item{.path}{Full path to a model file(s) that should be run}

@@ -1,7 +1,7 @@
 #' Submit a NONMEM model via babylon
 #' @param .path Full path to a model file(s) that should be run
 #' @param .type Either "local" for local execution or "sge" to submit model(s) to the grid
-#' @param .args A named list specifying arguments to pass to babylon. All available arguments is in `options("rbabylon.nonmen_args")`
+#' @param .args A named list specifying arguments to pass to babylon. All available arguments are `options("rbabylon.nonmen_args")`
 #' @param ... args passed through to `bbi_exec()`
 #' @param .config_path Optionally specify a path to a babylon.yml config. If not specified, the config in the model directory will be used by default. (?)
 #' @return output from the model run (?)
@@ -10,7 +10,7 @@ submit_nonmem_model <- function(.path,
                                 .type = c("sge", "local"),
                                 .args,
                                 ...,
-                                .config_path) {
+                                .config_path=NULL) {
   .type <- match.arg(.type)
 
   # build command line args

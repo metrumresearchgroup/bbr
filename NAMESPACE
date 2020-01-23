@@ -2,6 +2,9 @@
 
 export("%>%")
 export(bbi_exec)
+export(bbi_help)
+export(check_status_code)
+export(format_nonmem_args)
 export(model_summary)
 export(parse_model_results)
 export(submit_nonmem_model)

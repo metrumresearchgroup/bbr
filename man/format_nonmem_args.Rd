@@ -9,9 +9,6 @@ format_nonmem_args(.args)
 \arguments{
 \item{.args}{A named list of .args to check}
 }
-\value{
-
-}
 \description{
 Checks that all passed NONMEM command line args are valid and formats
 }

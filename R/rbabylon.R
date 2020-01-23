@@ -33,3 +33,14 @@ bbi_exec <- function(.path, .cmd_args, ...) {
 
   return(output)
 }
+
+#' Executes (`bbi --help`) with processx::run and prints the output string
+#' @importFrom processx run
+#' @export
+bbi_help <- function() {
+  output <- processx::run(getOption("rbabylon.bbi_exe_path"), "--help", error_on_status = FALSE)
+  # check output status code
+  check_status_code(output)
+  cat(output$stdout)
+}
+
