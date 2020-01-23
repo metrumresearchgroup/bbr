@@ -16,6 +16,11 @@ submit_nonmem_model <- function(.path,
   # build command line args
   cmd_args <- c("run", "nonmem", .type)
 
+  # if (!is.null(.args)) {
+  #   args_vec <- format_nonmem_args(.args)
+  #   cmd_args <- c(cmd_args, args_vec)
+  # }
+
   # add config path
   if (!is.null(.config_path)) {
     cmd_args <- c(cmd_args, sprintf("--config=%s", .config_path))

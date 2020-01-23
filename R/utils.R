@@ -10,5 +10,11 @@ check_status_code <- function(.output) {
     )
     stop(err_msg)
   }
+}
 
+#' Checks that all passed NONMEM command line args are valid and formats
+#' @param .args A named list of .args to check
+#' @return
+format_nonmem_args <- function(.args) {
+  print(options("rbabylon.nonmen_args"))
 }
