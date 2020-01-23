@@ -105,13 +105,7 @@ format_cmd_args <- function(.args) {
 ##.args3 <- list("json" = T, "threads" = 4, "debug" = "naw")
 ##.args4 <- list("json" = T, "threads" = 4, "debug" = F)
 ##check_nonmem_args(.args1) # "--json --threads=4"
-##check_nonmem_args(.args2) #
-##check_nonmem_args(.args3)
-##check_nonmem_args(.args4)
-
-type_res <- checkmate::check_class(naw, "character")
-print(type_res)
-if (rlang::is_bare_character(type_res)) {
-  print("yea")
-}
+##check_nonmem_args(.args2) # naw is not a valid argument for the `.args`
+##check_nonmem_args(.args3) # `naw` passed for arg `debug` -- Must inherit from class 'logical'
+##check_nonmem_args(.args4) # "--json --threads=4"
 
