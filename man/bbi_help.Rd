@@ -4,7 +4,10 @@
 \alias{bbi_help}
 \title{Executes (`bbi --help`) with processx::run and prints the output string}
 \usage{
-bbi_help()
+bbi_help(.cmd_args = NULL)
+}
+\arguments{
+\item{.cmd_args}{You can optionally pass a vector of args to get help about a specific call}
 }
 \description{
 Executes (`bbi --help`) with processx::run and prints the output string

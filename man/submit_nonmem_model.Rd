@@ -7,7 +7,7 @@
 submit_nonmem_model(
   .path,
   .type = c("local", "sge"),
-  .args,
+  .args = NULL,
   ...,
   .config_path = NULL
 )

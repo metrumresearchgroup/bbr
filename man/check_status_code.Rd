@@ -4,11 +4,9 @@
 \alias{check_status_code}
 \title{Checks status code from processx::run output}
 \usage{
-check_status_code(.output, .path, .cmd_args)
+check_status_code(.output, .cmd_args)
 }
 \arguments{
-\item{.path}{Full path to a model that has been run that user wants to summarize}
-
 \item{.model_type}{Type of model to summarize. Currently only supports "nonmem"}
 }
 \description{
