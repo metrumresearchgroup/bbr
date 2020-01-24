@@ -6,7 +6,7 @@
 \usage{
 submit_nonmem_model(
   .path,
-  .type = c("sge", "local"),
+  .type = c("local", "sge"),
   .args,
   ...,
   .config_path = NULL

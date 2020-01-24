@@ -29,9 +29,24 @@ bbi_exec <- function(.path, .cmd_args, ...) {
   output <- processx::run(getOption("rbabylon.bbi_exe_path"), c(.cmd_args, model), wd = model_dir, ..., error_on_status = FALSE)
 
   # check output status code
-  check_status_code(output)
+  check_status_code(output, .path, .cmd_args)
 
   return(output)
+}
+
+#' Checks status code from processx::run output
+#' @param .path Full path to a model that has been run that user wants to summarize
+#' @param .model_type Type of model to summarize. Currently only supports "nonmem"
+#' @export
+check_status_code <- function(.output, .path, .cmd_args) {
+  if (.output$status != 0) {
+    err_msg <- paste0(
+      "`bbi ", paste(.cmd_args, collapse=" "), " ", .path, "` returned status code ", .output$status,
+      " -- STDOUT: ", .output$stdout,
+      " -- STDERR: ", .output$stderr
+    )
+    stop(err_msg)
+  }
 }
 
 #' Executes (`bbi --help`) with processx::run and prints the output string
@@ -53,3 +68,5 @@ bbi_init <- function(.dir) {
   check_status_code(output)
   cat(output$stdout)
 }
+
+

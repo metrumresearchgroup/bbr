@@ -14,7 +14,7 @@ submit_nonmem_model <- function(.path,
   .type <- match.arg(.type)
 
   # build command line args
-  cmd_args <- c("run", "nonmem", .type)
+  cmd_args <- c("nonmem", "run", .type)
 
   if (!is.null(.args)) {
     args_vec <- check_nonmem_args(.args)
@@ -29,3 +29,6 @@ submit_nonmem_model <- function(.path,
   # execute
   return(bbi_exec(.path, cmd_args, ...)$stdout)
 }
+
+#
+#submit_nonmem_model("/data/MetworxTraining2020/model/nonmem/pk/2.ctl", .args = list("threads" = 4))
