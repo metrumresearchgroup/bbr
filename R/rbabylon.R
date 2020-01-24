@@ -20,7 +20,10 @@ NULL
 #' @export
 bbi_exec <- function(.cmd_args, ...) {
 
-  output <- processx::run(getOption("rbabylon.bbi_exe_path"), .cmd_args, ..., error_on_status = FALSE)
+  output <- processx::run(getOption("rbabylon.bbi_exe_path"), .cmd_args, ...,
+                          error_on_status = FALSE,
+                          stdout_line_callback = stdout_cb,
+                          stderr_line_callback = stderr_cb)
 
   # check output status code
   check_status_code(output, .cmd_args)
@@ -28,6 +31,14 @@ bbi_exec <- function(.cmd_args, ...) {
   return(output)
 }
 
+stdout_cb <- function(line, proc) {
+  cat("STDOUT:", line, "\n")
+}
+
+stderr_cb <- function(line, proc) {
+  cat("STDERR:", line, "\n")
+  #if (line == "done") proc$kill()
+}
 
 #' Checks status code from processx::run output
 #' @param .model_type Type of model to summarize. Currently only supports "nonmem"

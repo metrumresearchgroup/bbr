@@ -20,6 +20,7 @@
     options("rbabylon.nonmen_args" = list(
       nonmem_version = list(type = "character", flag="--nmVersion"),
       threads = list(type = "numeric", flag="--threads"),
+      overwrite = list(type = "logical", flag="--overwrite"),
       debug = list(type = "logical", flag="--debug"),
       json = list(type = "logical", flag="--json"),
       no_cor_file = list(type = "logical", flag="--no-cor-file"),

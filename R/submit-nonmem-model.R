@@ -35,8 +35,6 @@ submit_nonmem_model <- function(.path,
   }
 
   # execute
-  return(bbi_exec(cmd_args, wd = model_dir, ...)$stdout)
-  #print(paste("wd:", model_dir))
-  #print(paste(cmd_args, collapse=" "))
+  return(bbi_exec(cmd_args, wd = model_dir, ...)$status)
 }
 
