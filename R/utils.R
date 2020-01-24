@@ -16,9 +16,9 @@ check_status_code <- function(.output) {
 
 #' Checks that all passed NONMEM command line args are valid and formats
 #' @param .args A named list of .args to check
-#' @import checkmate
-#' @import rlang
-#' @import purrr
+#' @importFrom checkmate assert_list assert_class
+#' @importFrom rlang is_bare_character
+#' @importFrom purrr imap
 #' @return character string, output from format_cmd_args()
 #' @export
 check_nonmem_args <- function(.args) {
@@ -66,12 +66,13 @@ check_nonmem_args <- function(.args) {
 
 #' Formats command line args from a named list to a string as it would be passed on the command line
 #' @param .args A named list of .args to check
-#' @import rlang
-#' @import checkmate
-#' @import purrr
-#' @return character string
+#' @param .collapse Boolean for whether to collapse return vector to a single string (FALSE by default)
+#' @importFrom checkmate assert_list
+#' @importFrom rlang is_bare_logical
+#' @importFrom purrr imap
+#' @return character vector of
 #' @export
-format_cmd_args <- function(.args) {
+format_cmd_args <- function(.args, .collapse = FALSE) {
   # check that unique named list was passed
   tryCatch(
     checkmate::assert_list(.args, names="named", unique=TRUE),
@@ -82,7 +83,7 @@ format_cmd_args <- function(.args) {
   )
 
   # build string from list
-  purrr::imap(.args, function(.v, .n) {
+  arg_vec <- purrr::imap(.args, function(.v, .n) {
     # if logical and TRUE add flag
     if (rlang::is_bare_logical(.v)) {
       if (.v) {
@@ -94,8 +95,14 @@ format_cmd_args <- function(.args) {
     }
     # otherwise add flag with value
     return(sprintf("--%s=%s", .n, .v))
-  }) %>% unlist() %>%
-    paste0(collapse = " ")
+  }) %>% unlist()
+
+  # return parsed args
+  if (.collapse) {
+    return(paste0(arg_vec, collapse = " "))
+  } else {
+    return(arg_vec)
+  }
 }
 
 

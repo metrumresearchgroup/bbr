@@ -17,7 +17,7 @@ model_summary <- function(.path, .model_type = c("nonmem")) {
 #' @param .x summary output string
 #' @param ... params to pass to jsonlite::fromJSON
 #' @export
-#' @import jsonlite
+#' @importFrom jsonlite fromJSON read_json
 parse_model_results <- function(.x, ..., file = NULL) {
   if (!is.null(file)) {
     return(jsonlite::read_json(file = file, simplifyDataFrame = FALSE))

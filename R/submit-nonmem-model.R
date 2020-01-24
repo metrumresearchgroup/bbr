@@ -7,7 +7,7 @@
 #' @return output from the model run (?)
 #' @export
 submit_nonmem_model <- function(.path,
-                                .type = c("sge", "local"),
+                                .type = c("local", "sge"),
                                 .args,
                                 ...,
                                 .config_path=NULL) {
@@ -16,10 +16,10 @@ submit_nonmem_model <- function(.path,
   # build command line args
   cmd_args <- c("run", "nonmem", .type)
 
-  # if (!is.null(.args)) {
-  #   args_vec <- format_nonmem_args(.args)
-  #   cmd_args <- c(cmd_args, args_vec)
-  # }
+  if (!is.null(.args)) {
+    args_vec <- check_nonmem_args(.args)
+    cmd_args <- c(cmd_args, args_vec)
+  }
 
   # add config path
   if (!is.null(.config_path)) {

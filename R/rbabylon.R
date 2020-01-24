@@ -44,3 +44,12 @@ bbi_help <- function() {
   cat(output$stdout)
 }
 
+#' Executes (`bbi init`) with processx::run in specified directory
+#' @importFrom processx run
+#' @export
+bbi_init <- function(.dir) {
+  output <- processx::run(getOption("rbabylon.bbi_exe_path"), "init", wd = .dir, error_on_status = FALSE)
+  # check output status code
+  check_status_code(output)
+  cat(output$stdout)
+}
