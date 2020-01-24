@@ -6,8 +6,8 @@ model_summary <- function(.path, .model_type = c("nonmem")) {
   .model_type <- match.arg(.model_type)
 
   # execute summary command
-  cmd_args <- c(.model_type, "summary", "--json")
-  output <- bbi_exec(.path, cmd_args)
+  cmd_args <- c(.model_type, "summary", "--json", .path)
+  output <- bbi_exec(cmd_args)
 
   # parse json output
   return(parse_model_results(output$stdout))

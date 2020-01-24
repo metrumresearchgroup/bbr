@@ -4,12 +4,12 @@
 \alias{bbi_exec}
 \title{Executes a babylon call (`bbi ...`) with processx::run}
 \usage{
-bbi_exec(.cmd_args, ...)
+bbi_exec(.cmd_args, .verbose = FALSE, ...)
 }
 \arguments{
 \item{.cmd_args}{A character vector of command line arguments for the execution call}
 
-\item{.path}{Full path to model file that will be run}
+\item{.verbose}{Print stdout and stderr as process runs}
 }
 \value{
 output from executed process, as a list with components status, stdout, stderr, and timeout (see ?processx::run for more details)

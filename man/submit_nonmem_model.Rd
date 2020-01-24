@@ -6,14 +6,14 @@
 \usage{
 submit_nonmem_model(
   .path,
-  .type = c("local", "sge"),
+  .type = c("sge", "local"),
   .args = NULL,
   ...,
   .config_path = NULL
 )
 }
 \arguments{
-\item{.path}{Full path to a model file(s) that should be run}
+\item{.path}{Full path to a model file(s) that should be run. Path MUST be either an absolute path or relative to the R working directory.}
 
 \item{.type}{Either "local" for local execution or "sge" to submit model(s) to the grid}
 
@@ -21,7 +21,7 @@ submit_nonmem_model(
 
 \item{...}{args passed through to `bbi_exec()`}
 
-\item{.config_path}{Optionally specify a path to a babylon.yml config. If not specified, the config in the model directory will be used by default. (?)}
+\item{.config_path}{Optionally specify a path to a babylon.yml config. If not specified, the config in the model directory will be used by default. Path MUST be either an absolute path or relative to the model directory.}
 }
 \value{
 output from the model run (?)
