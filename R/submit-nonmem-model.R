@@ -8,27 +8,35 @@
 #' @export
 submit_nonmem_model <- function(.path,
                                 .type = c("local", "sge"),
-                                .args,
+                                .args = NULL,
                                 ...,
                                 .config_path=NULL) {
+
+  # check for valid type arg
   .type <- match.arg(.type)
 
-  # build command line args
-  cmd_args <- c("nonmem", "run", .type)
-
-  if (!is.null(.args)) {
-    args_vec <- check_nonmem_args(.args)
-    cmd_args <- c(cmd_args, args_vec)
+  # parse model directory and model filename
+  model_dir <- dirname(.path)
+  model <- basename(.path)
+  if (model_dir == ".") {
+    # given a path that is just the model name, set directory to getwd()
+    model_dir <- getwd()
   }
 
+  # build command line args
+  args_vec <- check_nonmem_args(.args)
+  cmd_args <- c("nonmem", "run", .type, model, args_vec)
+
   # add config path
-  if (!is.null(.config_path)) {
+  if (is.null(.config_path)) {
+    bbi_init(model_dir)
+  } else {
     cmd_args <- c(cmd_args, sprintf("--config=%s", .config_path))
   }
 
   # execute
-  return(bbi_exec(.path, cmd_args, ...)$stdout)
+  return(bbi_exec(cmd_args, wd = model_dir, ...)$stdout)
+  #print(paste("wd:", model_dir))
+  #print(paste(cmd_args, collapse=" "))
 }
 
-#
-#submit_nonmem_model("/data/MetworxTraining2020/model/nonmem/pk/2.ctl", .args = list("threads" = 4))
