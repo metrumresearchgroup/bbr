@@ -1,5 +1,4 @@
-
-
+#' These are dev test cases that will eventually be turned into real tests
 
 ########
 # # utils test cases
@@ -14,8 +13,12 @@
 
 ########
 # # submit-nonmem-model test cases
-# submit_nonmem_model("/data/240/001.mod")
-# submit_nonmem_model("/data/240/001.mod", .args = list("overwrite" = TRUE))
-# submit_nonmem_model("/data/240/001.mod", .args = .args1)
+# submit_nonmem_model("/data/240/001.mod", .type="local")
+# submit_nonmem_model("/data/240/001.mod", .args = list("overwrite" = TRUE), .type="local")
+# submit_nonmem_model("/data/240/001.mod", .args = .args1, .type="local")
 # submit_nonmem_model("/data/240/[001:004].mod", .args = list("overwrite" = TRUE))
+# submit_nonmem_model("/data/240/[001:004].mod", .args = list("overwrite" = TRUE), .type="local")
 
+########
+# # read-model-results test cases
+# res <- model_summary("/data/240/001/001.mod"); names(res)

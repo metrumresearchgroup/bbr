@@ -17,7 +17,7 @@ submit_nonmem_model(
 
 \item{.type}{Either "local" for local execution or "sge" to submit model(s) to the grid}
 
-\item{.args}{A named list specifying arguments to pass to babylon. All available arguments are `options("rbabylon.nonmen_args")`}
+\item{.args}{A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)` All available arguments are in `NONMEM_ARGS`.}
 
 \item{...}{args passed through to `bbi_exec()`}
 

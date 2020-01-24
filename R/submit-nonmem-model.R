@@ -1,7 +1,7 @@
 #' Submit a NONMEM model via babylon
 #' @param .path Full path to a model file(s) that should be run. Path MUST be either an absolute path or relative to the R working directory.
 #' @param .type Either "local" for local execution or "sge" to submit model(s) to the grid
-#' @param .args A named list specifying arguments to pass to babylon. All available arguments are `options("rbabylon.nonmen_args")`
+#' @param .args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)` All available arguments are in `NONMEM_ARGS`.
 #' @param ... args passed through to `bbi_exec()`
 #' @param .config_path Optionally specify a path to a babylon.yml config. If not specified, the config in the model directory will be used by default. Path MUST be either an absolute path or relative to the model directory.
 #' @return output from the model run (?)

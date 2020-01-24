@@ -6,6 +6,11 @@
 #' @return character string, output from format_cmd_args()
 #' @export
 check_nonmem_args <- function(.args) {
+  # if NULL, return NULL back
+  if (is.null(.args)) {
+    return(NULL)
+  }
+
   # check that unique named list was passed
   tryCatch(
     checkmate::assert_list(.args, names="named", unique=TRUE),

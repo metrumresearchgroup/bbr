@@ -9,9 +9,4 @@
   if (is.null(getOption("rbabylon.nonmem_dir"))) {
     options("rbabylon.nonmem_dir" = "/opt/NONMEM")
   }
-
-  # set default NONMEM version
-  if (is.null(getOption("rbabylon.nonmem_default_version"))) {
-    options("rbabylon.nonmem_default_version" = "nm74gf_nmfe")
-  }
 }
