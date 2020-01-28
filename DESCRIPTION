@@ -16,3 +16,5 @@ Imports:
     jsonlite,
     processx,
     withr
+Suggests: 
+    testthat (>= 2.1.0)

@@ -30,7 +30,8 @@ bbi_exec <- function(.cmd_args, .verbose = FALSE, ...) {
 
 
 #' Checks status code from processx::run output
-#' @param .model_type Type of model to summarize. Currently only supports "nonmem"
+#' @param .output named list output from processx::run()
+#' @param .cmd_args character vector of args passed to processx::run(). Used for error printing.
 #' @export
 check_status_code <- function(.output, .cmd_args) {
   if (.output$status != 0) {

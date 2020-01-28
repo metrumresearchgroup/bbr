@@ -4,13 +4,15 @@
 #' @param .args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)` All available arguments are in `NONMEM_ARGS`.
 #' @param ... args passed through to `bbi_exec()`
 #' @param .config_path Optionally specify a path to a babylon.yml config. If not specified, the config in the model directory will be used by default. Path MUST be either an absolute path or relative to the model directory.
+#' @param .dry_run Returns character string of command that would be run, insted of running it. This is primarily for testing but also a debugging tool.
 #' @return output from the model run (?)
 #' @export
 submit_nonmem_model <- function(.path,
                                 .type = c("sge", "local"),
                                 .args = NULL,
                                 ...,
-                                .config_path=NULL) {
+                                .config_path=NULL,
+                                .dry_run=FALSE) {
 
   # check for valid type arg
   .type <- match.arg(.type)
@@ -33,6 +35,14 @@ submit_nonmem_model <- function(.path,
   }
 
   # execute
-  return(bbi_exec(cmd_args, wd = model_dir, ...))
+  if (.dry_run) {
+    return(paste(
+      "cd", model_dir, ";",
+      getOption("rbabylon.bbi_exe_path"),
+      paste(cmd_args, collapse = " ")
+    ))
+  } else {
+    return(bbi_exec(cmd_args, wd = model_dir, ...))
+  }
 }
 

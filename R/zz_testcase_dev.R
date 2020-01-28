@@ -13,11 +13,11 @@
 
 ########
 # # submit-nonmem-model test cases
-# submit_nonmem_model("/data/240/001.mod", .type="local")
-# submit_nonmem_model("/data/240/001.mod", .args = list("overwrite" = TRUE), .type="local")
-# submit_nonmem_model("/data/240/001.mod", .args = .args1, .type="local")
-# submit_nonmem_model("/data/240/[001:004].mod", .args = list("overwrite" = TRUE))
-# submit_nonmem_model("/data/240/[001:004].mod", .args = list("overwrite" = TRUE), .type="local")
+# submit_nonmem_model("/data/240/001.mod", .type="local", .dry_run=TRUE)
+# submit_nonmem_model("/data/240/001.mod", .args = list("overwrite" = TRUE), .type="local", .dry_run=TRUE)
+# submit_nonmem_model("/data/240/001.mod", .args = .args1, .type="local", .dry_run=TRUE)
+# submit_nonmem_model("/data/240/[001:004].mod", .args = list("overwrite" = TRUE), .dry_run=TRUE)
+# submit_nonmem_model("/data/240/[001:004].mod", .args = list("overwrite" = TRUE), .type="local", .dry_run=TRUE)
 
 ########
 # # read-model-results test cases

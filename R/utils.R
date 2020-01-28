@@ -13,7 +13,7 @@ check_nonmem_args <- function(.args) {
 
   # check that unique named list was passed
   tryCatch(
-    checkmate::assert_list(.args, names="named", unique=TRUE),
+    checkmate::assert_list(.args, names="unique"),
     error = function(e) {
       err_msg <- paste("check_nonmem_args() takes a unique, named list:", e) ##### change check_nonmem_args()
       stop(err_msg)
@@ -68,7 +68,7 @@ check_nonmem_args <- function(.args) {
 format_cmd_args <- function(.args, .collapse = FALSE) {
   # check that unique named list was passed
   tryCatch(
-    checkmate::assert_list(.args, names="named", unique=TRUE),
+    checkmate::assert_list(.args, names="unique"),
     error = function(e) {
       err_msg <- paste("format_cmd_args() takes a unique, named list:", e)
       stop(err_msg)
