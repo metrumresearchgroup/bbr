@@ -10,6 +10,8 @@ parse_model_results(.x, ..., file = NULL)
 \item{.x}{summary output string}
 
 \item{...}{params to pass to jsonlite::fromJSON}
+
+\item{file}{model json summary output file path}
 }
 \description{
 Reads model results to a list by parsing json output from bbi summary

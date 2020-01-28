@@ -1,6 +1,6 @@
 Package: rbabylon
 Type: Package
-Title: r package for babylon.
+Title: r package for babylon
 Version: 0.0.1
 Description: r package for babylon.
 Encoding: UTF-8
@@ -12,9 +12,12 @@ Authors@R:
            email = "devin.pastoor@gmail.com")
 RoxygenNote: 7.0.2
 Imports: 
+    checkmate,
     magrittr,
     jsonlite,
     processx,
+    purrr,
+    rlang,
     withr
 Suggests: 
     testthat (>= 2.1.0)

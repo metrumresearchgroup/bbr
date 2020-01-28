@@ -10,6 +10,8 @@ bbi_exec(.cmd_args, .verbose = FALSE, ...)
 \item{.cmd_args}{A character vector of command line arguments for the execution call}
 
 \item{.verbose}{Print stdout and stderr as process runs}
+
+\item{...}{arguments to pass to processx::run}
 }
 \value{
 output from executed process, as a list with components status, stdout, stderr, and timeout (see ?processx::run for more details)

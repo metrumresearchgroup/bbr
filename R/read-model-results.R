@@ -16,6 +16,7 @@ model_summary <- function(.path, .model_type = c("nonmem")) {
 #' Reads model results to a list by parsing json output from bbi summary
 #' @param .x summary output string
 #' @param ... params to pass to jsonlite::fromJSON
+#' @param file model json summary output file path
 #' @export
 #' @importFrom jsonlite fromJSON read_json
 parse_model_results <- function(.x, ..., file = NULL) {

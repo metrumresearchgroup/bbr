@@ -15,6 +15,7 @@ NULL
 #' Executes a babylon call (`bbi ...`) with processx::run
 #' @param .cmd_args A character vector of command line arguments for the execution call
 #' @param .verbose Print stdout and stderr as process runs
+#' @param ... arguments to pass to processx::run
 #' @return output from executed process, as a list with components status, stdout, stderr, and timeout (see ?processx::run for more details)
 #' @importFrom processx run
 #' @export

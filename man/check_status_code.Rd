@@ -7,7 +7,9 @@
 check_status_code(.output, .cmd_args)
 }
 \arguments{
-\item{.model_type}{Type of model to summarize. Currently only supports "nonmem"}
+\item{.output}{named list output from processx::run()}
+
+\item{.cmd_args}{character vector of args passed to processx::run(). Used for error printing.}
 }
 \description{
 Checks status code from processx::run output
