@@ -18,3 +18,4 @@ Imports:
     withr
 Suggests: 
     testthat (>= 2.1.0)
+License: MIT + file LICENSE
