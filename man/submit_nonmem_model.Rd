@@ -9,7 +9,8 @@ submit_nonmem_model(
   .type = c("sge", "local"),
   .args = NULL,
   ...,
-  .config_path = NULL
+  .config_path = NULL,
+  .dry_run = FALSE
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ submit_nonmem_model(
 \item{...}{args passed through to `bbi_exec()`}
 
 \item{.config_path}{Optionally specify a path to a babylon.yml config. If not specified, the config in the model directory will be used by default. Path MUST be either an absolute path or relative to the model directory.}
+
+\item{.dry_run}{Returns character string of command that would be run, insted of running it. This is primarily for testing but also a debugging tool.}
 }
 \value{
 output from the model run (?)
