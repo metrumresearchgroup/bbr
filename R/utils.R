@@ -63,7 +63,7 @@ check_nonmem_args <- function(.args) {
 #' @importFrom checkmate assert_list
 #' @importFrom rlang is_bare_logical
 #' @importFrom purrr imap set_names
-#' @return character vector of
+#' @return character vector of command args
 #' @export
 format_cmd_args <- function(.args, .collapse = FALSE) {
   # check that unique named list was passed
@@ -98,3 +98,48 @@ format_cmd_args <- function(.args, .collapse = FALSE) {
   }
 }
 
+
+#' Parses a model yaml file into a list object that contains correctly formatted information from the yaml
+#' Output list will have:
+#'   $model_path -- the path the model file that should be run
+#'   $args_list -- any babylon arguments that should be passed though. The keys must be the same as would be passed to check_nonmem_args()
+#'   $user_data -- any other data the user included, such as metadata about the model, that is NOT a babylon argument
+#' @param .path Path to the yaml file to parse.
+#' @importFrom yaml read_yaml
+#' @return Output list as specified above.
+#' @export
+parse_mod_yaml <- function(.path) {
+
+  stop("parse_mod_yaml() is NOT YET IMPLEMENTED")
+  ## vim /data/modtest.yaml
+  ## model_path: /data/240/001.mod
+  ## overwrite: true
+  ## threads: 4
+  ## nmversion: nm74gf
+  ## user_tag_thing: Seth
+
+  # load from file
+  raw_yaml <- read_yaml(.path)
+
+  # parse model path
+  if (YAML_MOD_PATH %in% names(raw_yaml)) {
+    yaml_list <- list(model_path = raw_yaml[[YAML_MOD_PATH]])
+  } else {
+    stop(paste0(
+      "Model yaml must have a `", YAML_MOD_PATH, "` specified in it. ",
+      .path, " has the following keys: ", names(raw_yaml)
+      ))
+  }
+
+  # parse NONMEM args
+  args_keys <- names(raw_yaml)[names(raw_yaml) %in% names(NONMEM_ARGS)]
+  ##### SOME LOGGING OF args_keys?
+  #yaml_list$args_list <- raw_yaml[[args_keys]] #### doesn't work
+
+  # parse user data
+  user_keys <- names(raw_yaml)[!(names(raw_yaml) %in% c("model_path", args_keys))]
+  ##### SOME LOGGING OF user_keys?
+  #yaml_list$user_data <- raw_yaml[[user_keys]] #### doesn't work
+
+  return(yaml_list)
+}

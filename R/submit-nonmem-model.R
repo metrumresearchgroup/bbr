@@ -5,6 +5,8 @@
 #' @param ... args passed through to `bbi_exec()`
 #' @param .config_path Optionally specify a path to a babylon.yml config. If not specified, the config in the model directory will be used by default. Path MUST be either an absolute path or relative to the model directory.
 #' @param .dry_run Returns character string of command that would be run, insted of running it. This is primarily for testing but also a debugging tool.
+#' @importFrom stringr str_detect
+#' @importFrom purrr list_modify
 #' @return output from the model run (?)
 #' @export
 submit_nonmem_model <- function(.path,
@@ -13,6 +15,13 @@ submit_nonmem_model <- function(.path,
                                 ...,
                                 .config_path=NULL,
                                 .dry_run=FALSE) {
+
+  # parse yaml, if passed
+  if ((str_detect(.path, "\\.yaml$")) || (str_detect(.path, "\\.yml$"))) {
+    yaml_list <- parse_mod_yaml(.path)
+    .path <- yaml_list$model_path
+    .args <- list_modify(.args, yaml_list$args_list)
+  }
 
   # check for valid type arg
   .type <- match.arg(.type)
