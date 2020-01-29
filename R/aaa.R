@@ -1,3 +1,6 @@
+CACHE_ENV <- new.env(parent = emptyenv())
+CACHE_ENV$bbi_exe_paths <- list()
+
 NONMEM_ARGS = list(
   cache_dir = list(type = "character", flag="--cacheDir"),
   cache_exe = list(type = "character", flag="--cacheExe"),

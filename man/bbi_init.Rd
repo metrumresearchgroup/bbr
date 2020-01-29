@@ -4,12 +4,12 @@
 \alias{bbi_init}
 \title{Executes (`bbi init`) with processx::run in specified directory}
 \usage{
-bbi_init(.dir, .nonmem_dir = NULL)
+bbi_init(.dir, .nonmem_dir)
 }
 \arguments{
 \item{.dir}{Path to directory to run `init` in (and put the resulting `babylon.yml` file)}
 
-\item{.nonmem_dir}{Path to directory with the NONMEM installation. Defaults to `getOption("rbabylon.nonmem_dir")`}
+\item{.nonmem_dir}{Path to directory with the NONMEM installation.}
 }
 \description{
 Executes (`bbi init`) with processx::run in specified directory

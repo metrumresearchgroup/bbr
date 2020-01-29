@@ -1,15 +1,9 @@
-#globalVariables(c("board", "column", "created_at", "issue", "merged_at", "project", "title"))
-
 #' @name rbabylon
 #' @title RBabylon
 #' @description RBabylon is a library written in R that facilitates modeling and simulation by exposing functionality from the https://github.com/metrumresearchgroup/babylon project in R
 #' From Babylon's docs: Babylon is (will be) a complete solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences.
 #' This is a fork of the `nonmemutils`` project that is broader in scope.
 #' Initial support encompasses NONMEM however the api is designed in a way to be flexible to handle other software.
-## #' @param org Name of organization to query
-## #' @param repo Name of repository to query
-## #' @param .api_url Optional API url to query. Defaults to "https://api.github.com/graphql"
-## #' @param pagination_limit Upper limit on number of rows to return. Function will paginate through results as long as this limit is not exceeded. Generally defaults to NULL for no limit.
 NULL
 
 #' Executes a babylon call (`bbi ...`) with processx::run
@@ -20,13 +14,39 @@ NULL
 #' @importFrom processx run
 #' @export
 bbi_exec <- function(.cmd_args, .verbose = FALSE, ...) {
-
-  output <- processx::run(getOption("rbabylon.bbi_exe_path"), .cmd_args, ..., error_on_status = FALSE)
+  bbi_exe_path <- getOption("rbabylon.bbi_exe_path")
+  check_bbi_exe(bbi_exe_path)
+  output <- processx::run(bbi_exe_path, .cmd_args, ..., error_on_status = FALSE)
 
   # check output status code
   check_status_code(output, .cmd_args)
 
   return(output)
+}
+
+
+#' Checks that a bbi binary is present at the path passed to .bbi_exe_path
+#' @param .bbi_exe_path Path to bbi exe file that will be checked
+#' @export
+check_bbi_exe <- function(.bbi_exe_path) {
+  # check if this path is in the already checked paths
+  if (!is.null(CACHE_ENV$bbi_exe_paths[[.bbi_exe_path]])) {
+    invisible()
+  # if not try to find it
+  } else {
+    which_path <- Sys.which(.bbi_exe_path)
+    # if missing, reject it
+    if (which_path == "") {
+      stop(paste0(
+            "`", .bbi_exe_path, "`",
+            " was not found on system. Please assign a path to a working version of babylon with `options('rbabylon.bbi_exe_path' = '/path/to/bbi')`")
+           )
+    # if found, add it
+    } else {
+      CACHE_ENV$bbi_exe_paths[[.bbi_exe_path]] <- TRUE
+      invisible()
+    }
+  }
 }
 
 
@@ -63,18 +83,18 @@ bbi_help <- function(.cmd_args=NULL) {
 
 #' Executes (`bbi init`) with processx::run in specified directory
 #' @param .dir Path to directory to run `init` in (and put the resulting `babylon.yml` file)
-#' @param .nonmem_dir Path to directory with the NONMEM installation. Defaults to `getOption("rbabylon.nonmem_dir")`
+#' @param .nonmem_dir Path to directory with the NONMEM installation.
 #' @importFrom processx run
 #' @export
-bbi_init <- function(.dir, .nonmem_dir=NULL) {
-  # define NONMEM directory
-  if (is.null(.nonmem_dir)) {
-    .nonmem_dir <- getOption("rbabylon.nonmem_dir")
+bbi_init <- function(.dir, .nonmem_dir) {
+  # check for files in NONMEM directory
+  nm_files <- list.files(.nonmem_dir)
+  if (length(nm_files) == 0) {
+    stop(paste0("Nothing was found in ", .nonmem_dir, ". Please pass a path to a working installation of NONMEM to `.nonmem_dir`"))
   }
-  nonmem_arg <- paste0("--dir=", .nonmem_dir)
 
   # execute init
-  output <- bbi_exec(c("init", nonmem_arg), wd = .dir)
+  output <- bbi_exec(c("init",  paste0("--dir=", .nonmem_dir)), wd = .dir)
   cat(output$stdout)
 }
 
