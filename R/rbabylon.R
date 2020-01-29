@@ -53,9 +53,13 @@ check_bbi_exe <- function(.bbi_exe_path) {
 #' Checks status code from processx::run output
 #' @param .output named list output from processx::run()
 #' @param .cmd_args character vector of args passed to processx::run(). Used for error printing.
+#' @importFrom stringr str_detect
 #' @export
 check_status_code <- function(.output, .cmd_args) {
   if (.output$status != 0) {
+    if (str_detect(.output$stderr, NO_NONMEM_ERR_MSG)) {
+      cat("No version of NONMEM is specified. Either open the relevant `babylon.yml` and set a version of NONMEM to `default: true`, or pass a version of NONMEM to `.args=list(nm_version='some_version')`")
+    }
     err_msg <- paste0(
       "`bbi ", paste(.cmd_args, collapse=" "), "` returned status code ", .output$status,
       " -- STDOUT: ", .output$stdout,
@@ -90,7 +94,7 @@ bbi_init <- function(.dir, .nonmem_dir) {
   # check for files in NONMEM directory
   nm_files <- list.files(.nonmem_dir)
   if (length(nm_files) == 0) {
-    stop(paste0("Nothing was found in ", .nonmem_dir, ". Please pass a path to a working installation of NONMEM to `.nonmem_dir`"))
+    stop(paste0("Nothing was found in ", .nonmem_dir, ". Please pass a path to a working installation of NONMEM to `.nonmem_dir`, for example `.nonmem_dir='/opt/NONMEM'`"))
   }
 
   # execute init

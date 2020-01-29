@@ -31,3 +31,5 @@ NONMEM_ARGS = list(
   timeout = list(type = "numeric", flag="--timeout"),
   verbose = list(type = "logical", flag="--verbose")
 )
+
+NO_NONMEM_ERR_MSG <- "No version was supplied and no default value exists in the configset"
