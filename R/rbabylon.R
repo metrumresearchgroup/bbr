@@ -13,23 +13,69 @@
 NULL
 
 #' Executes a babylon call (`bbi ...`) with processx::run
-#' @param .path Full path to model file that will be run
 #' @param .cmd_args A character vector of command line arguments for the execution call
+#' @param .verbose Print stdout and stderr as process runs
+#' @param ... arguments to pass to processx::run
 #' @return output from executed process, as a list with components status, stdout, stderr, and timeout (see ?processx::run for more details)
 #' @importFrom processx run
 #' @export
-bbi_exec <- function(.path, .cmd_args, ...) {
-  # parse model directory and model filename
-  model_dir <- dirname(.path)
-  model <- basename(.path)
-  if (model_dir == ".") {
-    # given a path that is just the model name, set directory to getwd()
-    model_dir <- getwd()
-  }
-  output <- processx::run(getOption("rbabylon.bbi_exe_path"), c(.cmd_args, model), wd = model_dir, ..., error_on_status = FALSE)
+bbi_exec <- function(.cmd_args, .verbose = FALSE, ...) {
+
+  output <- processx::run(getOption("rbabylon.bbi_exe_path"), .cmd_args, ..., error_on_status = FALSE)
 
   # check output status code
-  check_status_code(output)
+  check_status_code(output, .cmd_args)
 
   return(output)
 }
+
+
+#' Checks status code from processx::run output
+#' @param .output named list output from processx::run()
+#' @param .cmd_args character vector of args passed to processx::run(). Used for error printing.
+#' @export
+check_status_code <- function(.output, .cmd_args) {
+  if (.output$status != 0) {
+    err_msg <- paste0(
+      "`bbi ", paste(.cmd_args, collapse=" "), "` returned status code ", .output$status,
+      " -- STDOUT: ", .output$stdout,
+      " -- STDERR: ", .output$stderr
+    )
+    stop(err_msg)
+  }
+}
+
+
+#' Executes (`bbi --help`) with processx::run and prints the output string
+#' @param .cmd_args You can optionally pass a vector of args to get help about a specific call
+#' @importFrom processx run
+#' @export
+bbi_help <- function(.cmd_args=NULL) {
+  if (is.null(.cmd_args)) {
+    .cmd_args <- "--help"
+  } else {
+    .cmd_args <- c(.cmd_args, "--help")
+  }
+  output <- bbi_exec(.cmd_args)
+  cat(output$stdout)
+}
+
+
+#' Executes (`bbi init`) with processx::run in specified directory
+#' @param .dir Path to directory to run `init` in (and put the resulting `babylon.yml` file)
+#' @param .nonmem_dir Path to directory with the NONMEM installation. Defaults to `getOption("rbabylon.nonmem_dir")`
+#' @importFrom processx run
+#' @export
+bbi_init <- function(.dir, .nonmem_dir=NULL) {
+  # define NONMEM directory
+  if (is.null(.nonmem_dir)) {
+    .nonmem_dir <- getOption("rbabylon.nonmem_dir")
+  }
+  nonmem_arg <- paste0("--dir=", .nonmem_dir)
+
+  # execute init
+  output <- bbi_exec(c("init", nonmem_arg), wd = .dir)
+  cat(output$stdout)
+}
+
+

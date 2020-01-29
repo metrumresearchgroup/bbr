@@ -6,8 +6,8 @@ model_summary <- function(.path, .model_type = c("nonmem")) {
   .model_type <- match.arg(.model_type)
 
   # execute summary command
-  cmd_args <- c(.model_type, "summary", "--json")
-  output <- bbi_exec(.path, cmd_args)
+  cmd_args <- c(.model_type, "summary", "--json", .path)
+  output <- bbi_exec(cmd_args)
 
   # parse json output
   return(parse_model_results(output$stdout))
@@ -16,8 +16,9 @@ model_summary <- function(.path, .model_type = c("nonmem")) {
 #' Reads model results to a list by parsing json output from bbi summary
 #' @param .x summary output string
 #' @param ... params to pass to jsonlite::fromJSON
+#' @param file model json summary output file path
 #' @export
-#' @import jsonlite
+#' @importFrom jsonlite fromJSON read_json
 parse_model_results <- function(.x, ..., file = NULL) {
   if (!is.null(file)) {
     return(jsonlite::read_json(file = file, simplifyDataFrame = FALSE))
