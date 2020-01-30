@@ -1,7 +1,13 @@
 #' Submit a NONMEM model via babylon
-#' @param .path Full path to a model file(s) that should be run. Path MUST be either an absolute path or relative to the R working directory.
+#' @param .path Full path to one of the following:
+#'     1) path to a model file(s) that should be run OR
+#'     2) path to a model YAML file that must contain:
+#'         a) a path to a model file with the key `model_path`,
+#'         b) any NONMEM args that would like to pass through, with keys that match the arguments in `print_nonmem_args()`,
+#'         c) any extra user data that will be passed through to `bbi_config.json` with whatever keys are specified in the yaml.
+#'     (Path must be either an absolute path or relative to the R working directory)
 #' @param .type Either "local" for local execution or "sge" to submit model(s) to the grid
-#' @param .args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)` All available arguments are in `NONMEM_ARGS`.
+#' @param .args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.
 #' @param ... args passed through to `bbi_exec()`
 #' @param .config_path Optionally specify a path to a babylon.yml config. If not specified, the config in the model directory will be used by default. Path MUST be either an absolute path or relative to the model directory.
 #' @param .dry_run Returns character string of command that would be run, insted of running it. This is primarily for testing but also a debugging tool.

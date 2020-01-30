@@ -29,11 +29,8 @@ bbi_exec <- function(.cmd_args, .verbose = FALSE, ...) {
 #' @param .bbi_exe_path Path to bbi exe file that will be checked
 #' @export
 check_bbi_exe <- function(.bbi_exe_path) {
-  # check if this path is in the already checked paths
-  if (!is.null(CACHE_ENV$bbi_exe_paths[[.bbi_exe_path]])) {
-    invisible()
-  # if not try to find it
-  } else {
+  # check if this path is not in the already checked paths
+  if (is.null(CACHE_ENV$bbi_exe_paths[[.bbi_exe_path]])) {
     which_path <- Sys.which(.bbi_exe_path)
     # if missing, reject it
     if (which_path == "") {
@@ -44,9 +41,9 @@ check_bbi_exe <- function(.bbi_exe_path) {
     # if found, add it
     } else {
       CACHE_ENV$bbi_exe_paths[[.bbi_exe_path]] <- TRUE
-      invisible()
     }
   }
+  invisible()
 }
 
 

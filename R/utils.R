@@ -1,7 +1,7 @@
 #' Checks that all passed NONMEM command line args are valid and formats
 #' @param .args A named list of .args to check
-#' @importFrom checkmate assert_list assert_class
-#' @importFrom rlang is_bare_character
+#' @importFrom checkmate assert_list
+#' @importFrom rlang is_bare_character is_bare_numeric is_bare_logical
 #' @importFrom purrr imap set_names
 #' @return character string, output from format_cmd_args()
 #' @export
@@ -25,18 +25,26 @@ check_nonmem_args <- function(.args) {
     # check that arg is valid
     ref <- NONMEM_ARGS[[.n]]
     if (is.null(ref)) {
-      err_msg <- paste(.n, "is not a valid argument for the `.args` list in submit_nonmem_model(). Valid arguments are:",
-                       paste(names(NONMEM_ARGS), collapse=", "))
+      err_msg <- paste(.n, "is not a valid argument for the `.args` list in submit_nonmem_model(). Run `print_nonmem_args()` to see valid arguments.")
       return(err_msg)
     }
 
     # check type
-    type_res <- checkmate::check_class(.v, ref$type)
-    if (rlang::is_bare_character(type_res)) {
-      err_msg <- paste0("`", .v, "` passed for arg `", .n, "` -- ", type_res)
+    if (ref$type == "character") {
+      type_pass_bool <- is_bare_character(.v)
+    } else if (ref$type == "logical") {
+      type_pass_bool <- is_bare_logical(.v)
+    } else if (ref$type == "numeric") {
+      type_pass_bool <- is_bare_numeric(.v)
+    } else {
+      # This feels weird to put an intentional bug catch in here, but I don't like having to rely on raw string matching
+      # from our aaa.R file to trigger functionality, so this feels like the safest option.
+      stop(paste0("BUG!!! NONMEM_ARGS[['", .n, "']][['type']] is `", ref$type, "` which is invalid. Must be either 'character', 'logical', or 'numeric'"))
+    }
+    if (!type_pass_bool) {
+      err_msg <- paste0("`", .v, "` passed for arg `", .n, "`. Expected '", ref$type, "' type.")
       return(err_msg)
     }
-
     # if no errors return NULL
     return(NULL)
   }) %>% unlist()
@@ -136,7 +144,7 @@ parse_mod_yaml <- function(.path) {
 }
 
 
-#' DOES SOMETHING WITH USER DATA FROM YAML. NOT SURE WHAT THIS WILL BE YET.
+#' Combines NONMEM args that were passed into the function call with args that were parsed from a model yaml
 #' @param .func_args A named list of arguments for bbi, passed into submit model function call
 #' @param .yaml_args A named list of arguments for bbi, parsed from user input yaml
 #' @importFrom purrr list_modify
@@ -157,6 +165,7 @@ parse_args_list <- function(.func_args, .yaml_args) {
       }
     )
     # overwrite anything from .args list that's specified in yaml
+    stop("list_modify doesn't work how I thought it did. Need to fix this.")
     .args <- list_modify(.func_args, .yaml_args)
   }
   return(.args)
@@ -187,4 +196,14 @@ parse_user_data <- function(.user_data) {
 
   # do something with the json
   cat(paste("parse_user_data() NOT FULLY IMPLEMENTED. Parsed json from .user_data:", json_string))
+}
+
+#' Prints all valid arguments to pass in submit_nonmem_model(.args=list())
+#' @importFrom purrr imap
+#' @export
+print_nonmem_args <- function() {
+  doc_list <- imap(NONMEM_ARGS, function(.v, .n) {
+    paste0(.n, " (", .v$type, ") -- ", .v$description, " (sets CLI flag `", .v$flag, "`)")
+  })
+  cat(paste(doc_list, collapse = "\n"))
 }
