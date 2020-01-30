@@ -15,7 +15,7 @@ check_nonmem_args <- function(.args) {
   tryCatch(
     checkmate::assert_list(.args, names="unique"),
     error = function(e) {
-      err_msg <- paste("check_nonmem_args() takes a unique, named list:", e) ##### change check_nonmem_args()
+      err_msg <- paste("`.args` must be a unique, named list:", e)
       stop(err_msg)
     }
   )
@@ -70,7 +70,7 @@ format_cmd_args <- function(.args, .collapse = FALSE) {
   tryCatch(
     checkmate::assert_list(.args, names="unique"),
     error = function(e) {
-      err_msg <- paste("format_cmd_args() takes a unique, named list:", e)
+      err_msg <- paste("`.args` must be a unique, named list:", e)
       stop(err_msg)
     }
   )
@@ -109,15 +109,6 @@ format_cmd_args <- function(.args, .collapse = FALSE) {
 #' @return Output list as specified above.
 #' @export
 parse_mod_yaml <- function(.path) {
-
-  stop("parse_mod_yaml() is NOT YET IMPLEMENTED")
-  ## vim /data/modtest.yaml
-  ## model_path: /data/240/001.mod
-  ## overwrite: true
-  ## threads: 4
-  ## nmversion: nm74gf
-  ## user_tag_thing: Seth
-
   # load from file
   raw_yaml <- read_yaml(.path)
 
@@ -127,19 +118,73 @@ parse_mod_yaml <- function(.path) {
   } else {
     stop(paste0(
       "Model yaml must have a `", YAML_MOD_PATH, "` specified in it. ",
-      .path, " has the following keys: ", names(raw_yaml)
+      .path, " has the following keys: ", paste(names(raw_yaml), collapse=", ")
       ))
   }
 
   # parse NONMEM args
   args_keys <- names(raw_yaml)[names(raw_yaml) %in% names(NONMEM_ARGS)]
   ##### SOME LOGGING OF args_keys?
-  #yaml_list$args_list <- raw_yaml[[args_keys]] #### doesn't work
+  yaml_list$args_list <- raw_yaml[args_keys]
 
   # parse user data
   user_keys <- names(raw_yaml)[!(names(raw_yaml) %in% c("model_path", args_keys))]
   ##### SOME LOGGING OF user_keys?
-  #yaml_list$user_data <- raw_yaml[[user_keys]] #### doesn't work
+  yaml_list$user_data <- raw_yaml[user_keys]
 
   return(yaml_list)
+}
+
+
+#' DOES SOMETHING WITH USER DATA FROM YAML. NOT SURE WHAT THIS WILL BE YET.
+#' @param .func_args A named list of arguments for bbi, passed into submit model function call
+#' @param .yaml_args A named list of arguments for bbi, parsed from user input yaml
+#' @importFrom purrr list_modify
+#' @importFrom checkmate assert_list
+#' @return The combination of the two lists, with .yaml_args overriding any keys that are shared
+#' @export
+parse_args_list <- function(.func_args, .yaml_args) {
+  # if no .args passed to function, pass through yaml args
+  if (is.null(.func_args)) {
+    .args <- .yaml_args
+  } else {
+    # check that unique named list was passed
+    tryCatch(
+      checkmate::assert_list(.func_args, names="unique"),
+      error = function(e) {
+        err_msg <- paste("`.args` must be a unique, named list:", e)
+        stop(err_msg)
+      }
+    )
+    # overwrite anything from .args list that's specified in yaml
+    .args <- list_modify(.func_args, .yaml_args)
+  }
+  return(.args)
+}
+
+
+#' DOES SOMETHING WITH USER DATA FROM YAML. NOT SURE WHAT THIS WILL BE YET.
+#' @param .user_data A list, parsed from user input yaml, that will be persisted
+#' @importFrom jsonlite toJSON
+#' @importFrom checkmate assert_list
+#' @export
+parse_user_data <- function(.user_data) {
+  if (is.null(.user_data)) {
+    invisible()
+  } else {
+    # check that unique named list was passed
+    tryCatch(
+      checkmate::assert_list(.user_data, names="unique"),
+      error = function(e) {
+        err_msg <- paste("`.user_data` must be a unique, named list:", e)
+        stop(err_msg)
+      }
+    )
+  }
+
+  # parse to json
+  json_string <- toJSON(.user_data)
+
+  # do something with the json
+  cat(paste("parse_user_data() NOT FULLY IMPLEMENTED. Parsed json from .user_data:", json_string))
 }
