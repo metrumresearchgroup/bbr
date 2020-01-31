@@ -147,7 +147,6 @@ parse_mod_yaml <- function(.path) {
 #' Combines NONMEM args that were passed into the function call with args that were parsed from a model yaml
 #' @param .func_args A named list of arguments for bbi, passed into submit model function call
 #' @param .yaml_args A named list of arguments for bbi, parsed from user input yaml
-#' @importFrom purrr list_modify
 #' @importFrom checkmate assert_list
 #' @return The combination of the two lists, with .yaml_args overriding any keys that are shared
 #' @export
