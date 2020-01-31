@@ -164,9 +164,11 @@ parse_args_list <- function(.func_args, .yaml_args) {
         stop(err_msg)
       }
     )
-    # overwrite anything from .args list that's specified in yaml
-    stop("list_modify doesn't work how I thought it did. Need to fix this.")
-    .args <- list_modify(.func_args, .yaml_args)
+    # add .yaml_args and overwrite anything from .func_args list that's in .yaml_args
+    .args <- .func_args
+    for (.n in names(.yaml_args)) {
+      .args[[.n]] <- .yaml_args[[.n]]
+    }
   }
   return(.args)
 }

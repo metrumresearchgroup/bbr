@@ -48,9 +48,16 @@ test_that("submit-nonmem-model(.dry_run=T) returns correct command string",
 test_that("submit-nonmem-model(.dry_run=T) for yaml input parses correctly",
           {
             withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
+              # correctly parsing yaml
               expect_identical(
                 submit_nonmem_model("data/modtest.yaml", .dry_run = T)$call,
                 "cd /data/240 ; bbi nonmem run sge 001.mod --overwrite --threads=4 --nmVersion=nm74gf"
+              )
+
+              # over-riding passed arg with yaml arg
+              expect_identical(
+                submit_nonmem_model("data/modtest.yaml", .args=list(threads=2), .dry_run = T)$call,
+                "cd /data/240 ; bbi nonmem run sge 001.mod --threads=4 --overwrite --nmVersion=nm74gf"
               )
             })
           })
