@@ -1,0 +1,31 @@
+nmVersion: ""
+overwrite: true
+cleanLvl: 1
+copyLvl: 0
+git: true
+babylonbinary: /Users/devinp/go/bin/bbi
+saveConfig: true
+outputDir: '{{ .Name }}'
+threads: 16
+debug: false
+local:
+  create_child_dirs: true
+nonmem:
+  nm73gf_nmfe:
+    home: /opt/NONMEM/nm73gf_nmfe
+    executable: nmfe73
+    nmqual: false
+    default: false
+  nm74gf_nmfe:
+    home: /opt/NONMEM/nm74gf_nmfe
+    executable: nmfe74
+    nmqual: false
+    default: true
+parallel:
+  parallel: false
+  nodes: 8
+  mpiExecPath: /usr/local/mpich3/bin/mpiexec
+  timeout: 2147483647
+  parafile: ""
+delay: 0
+nmqual: false

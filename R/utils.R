@@ -1,3 +1,7 @@
+`%||%` <- function(x, y) {
+  if (is.null(x)) return(y)
+  return(x)
+}
 #' Checks that all passed NONMEM command line args are valid and formats
 #' @param .args A named list of .args to check
 #' @importFrom checkmate assert_list

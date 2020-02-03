@@ -1,0 +1,20 @@
+babylon_binary: bbi
+clean_lvl: 2
+git: true
+local:
+  create_child_dirs: true
+nonmem:
+  nm73gf_nmfe:
+    executable: nmfe73
+    home: /opt/NONMEM/nm73gf_nmfe
+  nm74gf_nmfe:
+    executable: nmfe74
+    home: /opt/NONMEM/nm74gf_nmfe
+    default: true
+output_dir: '{{ .Name }}'
+parallel:
+  mpiExecPath: /usr/local/mpich3/bin/mpiexec
+  nodes: 8
+  timeout: 2147483647
+save_config: true
+threads: 16
