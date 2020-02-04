@@ -23,13 +23,24 @@ bbi_exec <- function(.cmd_args, .verbose = FALSE, .wait = FALSE, ...) {
 
   if (.wait) {
     # wait for process and capture stdout and stderr
-    output <- p$read_all_output()
+    output <- p$read_all_output_lines()
 
     # check output status code
     check_status_code(p$get_exit_status(), output, .cmd_args)
+  } else {
+    output <- NULL
   }
 
-  return(p)
+  # build result object
+  res <- list(
+    process = p,
+    output = output,
+    bbi = bbi_exe_path,
+    cmd_args = .cmd_args
+  )
+
+  attr(res, "class") <- "babylon_result"
+  return(res)
 }
 
 
@@ -85,8 +96,8 @@ bbi_help <- function(.cmd_args=NULL) {
   } else {
     .cmd_args <- c(.cmd_args, "--help")
   }
-  output <- bbi_exec(.cmd_args)
-  cat(output$stdout)
+  res <- bbi_exec(.cmd_args, .wait=TRUE)
+  cat(res$output)
 }
 
 
@@ -103,8 +114,8 @@ bbi_init <- function(.dir, .nonmem_dir) {
   }
 
   # execute init
-  output <- bbi_exec(c("init",  paste0("--dir=", .nonmem_dir)), wd = .dir)
-  cat(output$stdout)
+  res <- bbi_exec(c("init",  paste0("--dir=", .nonmem_dir)), wd = .dir, .wait=TRUE)
+  cat(res$output)
 }
 
 

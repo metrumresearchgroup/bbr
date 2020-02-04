@@ -13,15 +13,12 @@ check_lst_file <- function(.x) {
 #' @param .args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.
 #' @param ... args passed through to `bbi_exec()`
 #' @param .json return output as json
-#' @param .parse parse the output and return the json rather than the stderr/stdout
 #' @param .dry_run show what the command would be without actually running it
-#' @return output from the model run (?)
+#' @return List of S3 Class "bbi_nonmem_summary" with all summary information
 #' @export
 nonmem_output <- function(.path,
                                 .args = NULL,
                                 ...,
-                                .json = TRUE,
-                                .parse = TRUE,
                                 .dry_run = FALSE
                                 ) {
 
@@ -35,32 +32,37 @@ nonmem_output <- function(.path,
   lst_file_path <- check_lst_file(.path)
 
   # build command line args
-  if (.json) {
-    if (is.null(.args)) {
-      .args <- list()
-    }
-    .args <- purrr::list_modify(.args, json = TRUE)
+  if (is.null(.args)) {
+    .args <- list()
   }
+  .args <- purrr::list_modify(.args, json = TRUE)
+
   args_vec <- check_nonmem_args(.args)
   cmd_args <- c("nonmem", "summary", basename(tools::file_path_sans_ext(lst_file_path)), args_vec)
 
-  # execute
+  # if .dry_run return output call
   if (.dry_run) {
     return(list(
       cmd_args = cmd_args,
       wd = .path,
       call = paste(
-        "cd", model_dir, ";",
+        "cd", .path, ";",
         getOption("rbabylon.bbi_exe_path"),
         paste(cmd_args, collapse = " ")
       )
     ))
   }
-  res <- bbi_exec(cmd_args, wd = .path, ...)
 
-  if (res$status == 0 && .parse) {
-    return(jsonlite::fromJSON(res$stdout, simplifyDataFrame = FALSE))
-  }
+  # otherwise, execute
+  res <- bbi_exec(cmd_args, wd = .path, ..., .wait = TRUE)
+  get_exit_status(res, .check = TRUE)
 
-  return(res)
+  res_list <- get_stdout(res)$output %>%
+    paste(collapse="") %>%
+    jsonlite::fromJSON(simplifyDataFrame = FALSE)
+
+  attr(res_list, "class") <- "bbi_nonmem_summary"
+
+  return(res_list)
 }
+
