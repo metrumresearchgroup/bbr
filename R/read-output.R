@@ -20,15 +20,90 @@ check_nonmem_output_file <- function(.path, .plot = FALSE, .iter_floor = 0) {
   }
 }
 
-
 # grd <- "inst/nonmem/acop/acop.grd"
 # check_nonmem_output_file(grd)
 # check_nonmem_output_file(grd, .plot=T)
 #
-#
 # ext <- "inst/nonmem/acop/acop.ext"
 # check_nonmem_output_file(ext)
 # check_nonmem_output_file(ext, .plot=T)
+
+
+##### make a read_nonmem_table_file() for the .tab and par.tab ?
+
+
+
+check_file <- function(.file, .head = 3, .tail = 5) {
+  l <- read_lines(.file)
+
+  l_len <- length(l)
+
+  if (.head >= l_len) {
+    .head <- l_len
+    .tail <- 0
+  }
+
+  if (.tail <= 0) {
+    tail_start <- NULL
+  } else {
+    tail_start <- 1 + l_len - .tail
+
+    if(tail_start <= .head) {
+      tail_start <- .head + 1
+    }
+  }
+
+  if (!is.null(tail_start)) {
+    tail_vec <- l[tail_start:l_len]
+
+    if (tail_start > .head + 1) {
+      tail_vec <- c("...", tail_vec)
+    }
+  } else {
+    tail_vec <- ""
+  }
+
+  cat(paste(c(l[1:.head], tail_vec), collapse="\n"))
+  invisible()
+}
+
+# check_file(ext)
+# check_file(ext, .tail=2)
+# check_file(ext, .tail=10)
+# check_file(ext, .tail=20)
+
+tail_OUTPUT <- function(.x, ...) {
+  UseMethod("tail_OUTPUT", .x)
+}
+
+tail_OUTPUT.babylon_result <- function(.x) {
+  check_file(paste0(.x$output_dir, "OUTPUT", sep="/"))
+}
+
+tail_OUTPUT.character <- function(.x) {
+  check_file(paste0(.x, "OUTPUT", sep="/"))
+}
+
+tail_OUTPUT.numeric <- function(.x) {
+  check_file(paste0(as.character(.x), "OUTPUT", sep="/"))
+}
+
+
+# tail_lst <- function(.x, ...) {
+#   UseMethod("tail_lst", .x)
+# }
+#
+# tail_lst.babylon_result <- function(.x) {
+#   check_file(paste0(.x$output_dir, "lst", sep="/"))
+# }
+#
+# tail_lst.character <- function(.x) {
+#   check_file(paste0(.x, "lst", sep="/"))
+# }
+#
+# tail_lst.numeric <- function(.x) {
+#   check_file(paste0(as.character(.x), "lst", sep="/"))
+# }
 
 
 
