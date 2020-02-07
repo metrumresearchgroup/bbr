@@ -30,13 +30,11 @@ submit_nonmem_model <- function(.path,
   if ((str_detect(.path, "\\.yaml$")) || (str_detect(.path, "\\.yml$"))) {
     yaml_list <- parse_mod_yaml(.path)
     # reset model path
-    .path <- yaml_list$model_path
+    .path <- yaml_list[[YAML_MOD_PATH]]
 
     # update .args from yaml
-    .args <- parse_args_list(.args, yaml_list$args_list)
+    .args <- parse_args_list(.args, yaml_list[[YAML_BBI_ARGS]])
 
-    # pass through user data
-    parse_user_data(yaml_list$user_data)
   }
 
   # check for valid type arg

@@ -118,31 +118,25 @@ format_cmd_args <- function(.args, .collapse = FALSE) {
 #'   $user_data -- any other data the user included, such as metadata about the model, that is NOT a babylon argument
 #' @param .path Path to the yaml file to parse.
 #' @importFrom yaml read_yaml
+#' @importFrom fs file_exists
 #' @return Output list as specified above.
 #' @export
 parse_mod_yaml <- function(.path) {
+  if (!fs::file_exists(.path)) {
+    stop(glue("Cannot find yaml file at path {.path}"))
+  }
+
   # load from file
-  raw_yaml <- read_yaml(.path)
+  yaml_list <- read_yaml(.path)
 
   # parse model path
-  if (YAML_MOD_PATH %in% names(raw_yaml)) {
-    yaml_list <- list(model_path = raw_yaml[[YAML_MOD_PATH]])
-  } else {
+  if (!all(YAML_REQ_KEYS %in% names(raw_yaml))) {
     stop(paste0(
-      "Model yaml must have a `", YAML_MOD_PATH, "` specified in it. ",
+      "Model yaml must have keys `", paste(YAML_REQ_KEYS, collapse=", "), "` specified in it. ",
+      "But `", paste(YAML_REQ_KEYS[!(YAML_REQ_KEYS %in% names(raw_yaml))], collapse=", "), "` are missing. ",
       .path, " has the following keys: ", paste(names(raw_yaml), collapse=", ")
       ))
   }
-
-  # parse NONMEM args
-  args_keys <- names(raw_yaml)[names(raw_yaml) %in% names(NONMEM_ARGS)]
-  ##### SOME LOGGING OF args_keys?
-  yaml_list$args_list <- raw_yaml[args_keys]
-
-  # parse user data
-  user_keys <- names(raw_yaml)[!(names(raw_yaml) %in% c("model_path", args_keys))]
-  ##### SOME LOGGING OF user_keys?
-  yaml_list$user_data <- raw_yaml[user_keys]
 
   return(yaml_list)
 }
@@ -177,32 +171,6 @@ parse_args_list <- function(.func_args, .yaml_args) {
 }
 
 
-#' DOES SOMETHING WITH USER DATA FROM YAML. NOT SURE WHAT THIS WILL BE YET.
-#' @param .user_data A list, parsed from user input yaml, that will be persisted
-#' @importFrom jsonlite toJSON
-#' @importFrom checkmate assert_list
-#' @export
-parse_user_data <- function(.user_data) {
-  if (is.null(.user_data)) {
-    invisible()
-  } else {
-    # check that unique named list was passed
-    tryCatch(
-      checkmate::assert_list(.user_data, names="unique"),
-      error = function(e) {
-        err_msg <- paste("`.user_data` must be a unique, named list:", e)
-        stop(err_msg)
-      }
-    )
-  }
-
-  # parse to json
-  json_string <- toJSON(.user_data)
-
-  # do something with the json
-  cat(paste("parse_user_data() NOT FULLY IMPLEMENTED. Parsed json from .user_data:", json_string))
-}
-
 #' Prints all valid arguments to pass in submit_nonmem_model(.args=list())
 #' @importFrom purrr imap
 #' @export
@@ -212,3 +180,14 @@ print_nonmem_args <- function() {
   })
   cat(paste(doc_list, collapse = "\n"))
 }
+
+
+#' Helper to strip path and extension from model file to get only model identifier
+#' @param .mod_path model path to strip
+#' @importFrom tools file_path_sans_ext
+#' @returns Character scaler with only model identifier
+#' @export
+get_mod_id <- function(.mod_path) {
+  return(basename(tools::file_path_sans_ext(.mod_path)))
+}
+

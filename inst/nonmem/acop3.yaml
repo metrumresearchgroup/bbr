@@ -1,0 +1,10 @@
+model_path: acop3.mod
+description: new description
+based_on: acop2
+tags:
+- acop tag
+- other tag
+bbi_args:
+  overwrite: yes
+  threads: 4
+  nm_version: nm74gf

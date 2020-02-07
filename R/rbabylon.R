@@ -4,6 +4,7 @@
 #' From Babylon's docs: Babylon is (will be) a complete solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences.
 #' This is a fork of the `nonmemutils`` project that is broader in scope.
 #' Initial support encompasses NONMEM however the api is designed in a way to be flexible to handle other software.
+#' @importFrom glue glue
 NULL
 
 #' Executes a babylon call (`bbi ...`) with processx::run
