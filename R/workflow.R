@@ -51,11 +51,38 @@ copy_model_from <- function(
 
 
 #' Parses model outputs into a
-#'
+#' @importFrom stringr str_subset
+#' @importFrom fs dir_ls
+#' @importFrom purrr map
+#' @importFrom yaml read_yaml
 #' @return tibble with information on each run
 #' @export
 create_run_log <- function(
-  .base_dir
+  .base_dir,
+  .recurse = TRUE
 ) {
-  return(NULL)
+  # get yaml files
+  yaml_files <- str_subset(dir_ls(.base_dir, recurse = .recurse), "\\.ya?ml$")
+
+  # read in all candidate yaml's
+  all_yaml <- map(yaml_files, function(.x) {read_yaml(.x)})
+
+  # filter to only model yaml's
+  mod_yaml_bool <- map_lgl(all_yaml, function(.x) {check_mod_yaml_keys(.x)})
+  not_mod <- yaml_files[!mod_yaml_bool]
+  if (length(not_mod) > 0) {
+    warning(glue("Found {length(not_mod)} YAML files that do not contain required keys for a model YAML. Ignoring the following files: `{paste(not_mod, collapse='`, `')}`"))
+  }
+  mod_yaml <- all_yaml[which(mod_yaml_bool)]
+
+  ## I want this, but it won't quite work
+  #names(mod_yaml) <- yaml_files[mod_yaml_bool]
+  #mod_yaml %>% transpose %>% lapply(unlist, recursive = T) %>% as_tibble
+  df <- mod_yaml %>% transpose %>% as_tibble() # this is not quite right. They're all lists
+  df$yaml_path <- yaml_files[mod_yaml_bool]
+
+  return(df)
 }
+
+
+

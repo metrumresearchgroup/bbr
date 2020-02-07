@@ -130,7 +130,7 @@ parse_mod_yaml <- function(.path) {
   yaml_list <- read_yaml(.path)
 
   # parse model path
-  if (!all(YAML_REQ_KEYS %in% names(raw_yaml))) {
+  if (!check_mod_yaml_keys(raw_yaml)) {
     stop(paste0(
       "Model yaml must have keys `", paste(YAML_REQ_KEYS, collapse=", "), "` specified in it. ",
       "But `", paste(YAML_REQ_KEYS[!(YAML_REQ_KEYS %in% names(raw_yaml))], collapse=", "), "` are missing. ",
@@ -191,3 +191,7 @@ get_mod_id <- function(.mod_path) {
   return(basename(tools::file_path_sans_ext(.mod_path)))
 }
 
+
+check_mod_yaml_keys <- function(.list) {
+  all(YAML_REQ_KEYS %in% names(.list))
+}
