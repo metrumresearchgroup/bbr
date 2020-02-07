@@ -33,8 +33,5 @@ NONMEM_ARGS = list(
   verbose = list(type = "logical", flag="--verbose", description = "verbose output")
 )
 
-# YAML keys that are hard-coded
-YAML_MOD_PATH <- "model_path"
-
 # error messages that we grep for
 NO_NONMEM_ERR_MSG <- "No version was supplied and no default value exists in the configset"
