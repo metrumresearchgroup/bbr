@@ -4,14 +4,7 @@
 \alias{nonmem_output}
 \title{get a model summary}
 \usage{
-nonmem_output(
-  .path,
-  .args = NULL,
-  ...,
-  .json = TRUE,
-  .parse = TRUE,
-  .dry_run = FALSE
-)
+nonmem_output(.path, .args = NULL, ..., .dry_run = FALSE)
 }
 \arguments{
 \item{.path}{Full path to one of the following:
@@ -22,14 +15,12 @@ nonmem_output(
 
 \item{...}{args passed through to `bbi_exec()`}
 
-\item{.json}{return output as json}
-
-\item{.parse}{parse the output and return the json rather than the stderr/stdout}
-
 \item{.dry_run}{show what the command would be without actually running it}
+
+\item{.json}{return output as json}
 }
 \value{
-output from the model run (?)
+List of S3 Class "bbi_nonmem_summary" with all summary information
 }
 \description{
 get a model summary

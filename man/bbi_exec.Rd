@@ -4,12 +4,14 @@
 \alias{bbi_exec}
 \title{Executes a babylon call (`bbi ...`) with processx::run}
 \usage{
-bbi_exec(.cmd_args, .verbose = FALSE, ...)
+bbi_exec(.cmd_args, .verbose = FALSE, .wait = FALSE, ...)
 }
 \arguments{
 \item{.cmd_args}{A character vector of command line arguments for the execution call}
 
-\item{.verbose}{Print stdout and stderr as process runs}
+\item{.verbose}{Print stdout and stderr as process runs #### NOT IMPLEMENTED?}
+
+\item{.wait}{If true, don't return until process has exited.}
 
 \item{...}{arguments to pass to processx::run}
 }

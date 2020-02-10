@@ -130,11 +130,11 @@ parse_mod_yaml <- function(.path) {
   yaml_list <- read_yaml(.path)
 
   # parse model path
-  if (!check_mod_yaml_keys(raw_yaml)) {
+  if (!check_mod_yaml_keys(yaml_list)) {
     stop(paste0(
       "Model yaml must have keys `", paste(YAML_REQ_KEYS, collapse=", "), "` specified in it. ",
-      "But `", paste(YAML_REQ_KEYS[!(YAML_REQ_KEYS %in% names(raw_yaml))], collapse=", "), "` are missing. ",
-      .path, " has the following keys: ", paste(names(raw_yaml), collapse=", ")
+      "But `", paste(YAML_REQ_KEYS[!(YAML_REQ_KEYS %in% names(yaml_list))], collapse=", "), "` are missing. ",
+      .path, " has the following keys: ", paste(names(yaml_list), collapse=", ")
       ))
   }
 

@@ -1,5 +1,12 @@
-model_path: /data/240/001.mod
-overwrite: true
-threads: 4
-nm_version: nm74gf
-user_tag_thing: Seth
+# path to model
+model_path: inst/nonmem/acop.mod
+
+# model metadata
+description: acop model for testing
+based_on:
+tags: ["acop tag", "other tag"]
+
+bbi_args:
+    overwrite: true
+    threads: 4
+    nm_version: nm74gf

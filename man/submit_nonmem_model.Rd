@@ -10,6 +10,8 @@ submit_nonmem_model(
   .args = NULL,
   ...,
   .config_path = NULL,
+  .output_dir = NULL,
+  .wait = TRUE,
   .dry_run = FALSE
 )
 }
@@ -29,6 +31,10 @@ submit_nonmem_model(
 \item{...}{args passed through to `bbi_exec()`}
 
 \item{.config_path}{Optionally specify a path to a babylon.yml config. If not specified, the config in the model directory will be used by default. Path MUST be either an absolute path or relative to the model directory.}
+
+\item{.output_dir}{Name of directory that output will be written to. If NULL is passed (default) then it assumed to be the name of the model file (with the extension stripped).}
+
+\item{.wait}{Boolean for whether to wait for the bbi process to return before this function call returns.}
 
 \item{.dry_run}{Returns character string of command that would be run, insted of running it. This is primarily for testing but also a debugging tool.}
 }

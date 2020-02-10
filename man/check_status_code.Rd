@@ -4,10 +4,12 @@
 \alias{check_status_code}
 \title{Checks status code from processx::run output}
 \usage{
-check_status_code(.output, .cmd_args)
+check_status_code(.status_code, .output, .cmd_args)
 }
 \arguments{
-\item{.output}{named list output from processx::run()}
+\item{.status_code}{numerical status code from the process}
+
+\item{.output}{character scalar of output from the process}
 
 \item{.cmd_args}{character vector of args passed to processx::run(). Used for error printing.}
 }
