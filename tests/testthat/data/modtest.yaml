@@ -1,5 +1,5 @@
 # path to model
-model_path: inst/nonmem/acop.mod
+model_path: data/acop.mod
 
 # model metadata
 description: acop model for testing

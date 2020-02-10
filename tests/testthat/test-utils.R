@@ -63,7 +63,7 @@ test_that("format_cmd_args parses correctly", {
 test_that("parse_mod_yaml() returns expected list", {
   expect_identical(parse_mod_yaml("data/modtest.yaml"),
                    list(
-                     model_path = "inst/nonmem/acop.mod",
+                     model_path = "data/acop.mod",
                      description = "acop model for testing",
                      based_on = NULL,
                      tags = c("acop tag", "other tag"),

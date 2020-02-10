@@ -1,7 +1,15 @@
 
 #' Create new .mod/ctl and new .yaml files based on a previous model. Used for iterating on model development.
 #' Also fills in necessary YAML fields for using `create_run_log()` later.
+#' @param .parent_model
+#' @param .new_model
+#' @param .description
+#' @param .based_on_additional
+#' @param .inherit_tags
+#' @param .add_tags
+#' @param .update_mod_file
 #' @importFrom fs file_copy
+#' @importFrom readr read_lines write_lines
 #' @importFrom yaml write_yaml
 #' @return Character scaler with the name of the model .yaml file that can be passed to `submit_nonmem_model()`
 #' @export
@@ -10,8 +18,9 @@ copy_model_from <- function(
   .new_model,
   .description,
   .based_on_additional = NULL,
-  .inherit_tags = T,
-  .add_tags = NULL
+  .inherit_tags = TRUE,
+  .add_tags = NULL,
+  .update_mod_file = TRUE
 ) {
   # parse yaml of original and copy it
   parent_yaml <- parse_mod_yaml(glue("{.parent_model}.yaml"))
@@ -23,7 +32,20 @@ copy_model_from <- function(
   new_yaml[[YAML_MOD_PATH]] <- new_mod_path
 
   # copy control steam to new path
-  fs::file_copy(parent_yaml[[YAML_MOD_PATH]], new_mod_path)
+  if (.update_mod_file) {
+    # read parent control stream
+    mod_str <- read_file(parent_yaml[[YAML_MOD_PATH]])
+
+    # replace the $PROBLEM line(s)
+    mod_str <- str_replace(mod_str,
+                "\\$PROB(.|\n)*?\\$",
+                glue("$PROBLEM {get_mod_id(.new_model)} {.description}\n\n$"))
+
+    # read parent control stream
+    write_file(mod_str, new_mod_path)
+  } else {
+    fs::file_copy(parent_yaml[[YAML_MOD_PATH]], new_mod_path)
+  }
 
   # fill based_on
   new_yaml[[YAML_BASED_ON]] <- c(get_mod_id(parent_yaml[[YAML_MOD_PATH]]), .based_on_additional)
@@ -42,12 +64,6 @@ copy_model_from <- function(
   write_yaml(new_yaml, glue("{.new_model}.yaml"))
   return(.new_model)
 }
-
-
-#copy_model_from("inst/nonmem/acop", "inst/nonmem/acop2", "new description")
-# !!! manually changed model_path from inst/nonmem/acop2.mod to acop2.mod
-#setwd("inst/nonmem"); copy_model_from("acop2", "acop3", "new description"); setwd("../..")
-#setwd("inst/nonmem"); copy_model_from("acop2", "naw/acop4", "new description", .based_on_additional="acop", .add_tags="naw2"); setwd("../..")
 
 
 #' Parses model outputs into a

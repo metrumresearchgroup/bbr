@@ -51,13 +51,13 @@ test_that("submit-nonmem-model(.dry_run=T) for yaml input parses correctly",
               # correctly parsing yaml
               expect_identical(
                 submit_nonmem_model("data/modtest.yaml", .dry_run = T)$call,
-                "cd inst/nonmem ; bbi nonmem run sge acop.mod --overwrite --threads=4 --nmVersion=nm74gf"
+                "cd data ; bbi nonmem run sge acop.mod --overwrite --threads=4 --nmVersion=nm74gf"
               )
 
               # over-riding passed arg with yaml arg
               expect_identical(
                 submit_nonmem_model("data/modtest.yaml", .args=list(threads=2), .dry_run = T)$call,
-                "cd inst/nonmem ; bbi nonmem run sge acop.mod --threads=4 --overwrite --nmVersion=nm74gf"
+                "cd data ; bbi nonmem run sge acop.mod --threads=4 --overwrite --nmVersion=nm74gf"
               )
             })
           })
