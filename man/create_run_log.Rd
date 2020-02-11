@@ -2,13 +2,18 @@
 % Please edit documentation in R/workflow.R
 \name{create_run_log}
 \alias{create_run_log}
-\title{Parses model outputs into a}
+\title{Parses model yaml and outputs into a tibble that serves as a run log. Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.}
 \usage{
 create_run_log(.base_dir, .recurse = TRUE)
+}
+\arguments{
+\item{.base_dir}{Directory to search for model yaml files. Only runs with a corresponding yaml will be included.}
+
+\item{.recurse}{Boolean for whether to search subdirectories recursively for additional yaml files. Defaults to TRUE.}
 }
 \value{
 tibble with information on each run
 }
 \description{
-Parses model outputs into a
+Parses model yaml and outputs into a tibble that serves as a run log. Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
 }

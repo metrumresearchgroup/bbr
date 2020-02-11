@@ -1,13 +1,13 @@
 
 #' Create new .mod/ctl and new .yaml files based on a previous model. Used for iterating on model development.
 #' Also fills in necessary YAML fields for using `create_run_log()` later.
-#' @param .parent_model
-#' @param .new_model
-#' @param .description
-#' @param .based_on_additional
-#' @param .inherit_tags
-#' @param .add_tags
-#' @param .update_mod_file
+#' @param .parent_model Path to model that will be copied WITHOUT FILE EXTENSION. Function will expect to find `{.parent_model}.yaml`` to begin the copy process.
+#' @param .new_model Path to write new model files to WITHOUT FILE EXTENSION. Function will create both `{.new_model}.yaml` and `{.new_model}.[mod|ctl]` based on this path.
+#' @param .description Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.
+#' @param .based_on_additional The run id for the `.parent_model` will automatically be added to the `based_on` field but this argument can contain a character scaler or vector of additional run id's (model names) that this model was "based on." These are used to reconstuct model developement and ancestry.
+#' @param .add_tags A character scaler or vector with any new tags to be added to `{.new_model}.yaml`
+#' @param .inherit_tags Boolean for whether to inherit any tags from `.parent_model.yaml`
+#' @param .update_mod_file Boolean for whether to update the `$PROBLEM` line in the new control stream. By default it is TRUE, but if FALSE is passed `{.new_model}.[mod|ctl]` will be an exact copy of it's parent control stream.
 #' @importFrom fs file_copy
 #' @importFrom readr read_file write_file
 #' @importFrom stringr str_replace
@@ -19,8 +19,8 @@ copy_model_from <- function(
   .new_model,
   .description,
   .based_on_additional = NULL,
-  .inherit_tags = TRUE,
   .add_tags = NULL,
+  .inherit_tags = TRUE,
   .update_mod_file = TRUE
 ) {
   # parse yaml of original and copy it
@@ -67,7 +67,9 @@ copy_model_from <- function(
 }
 
 
-#' Parses model outputs into a
+#' Parses model yaml and outputs into a tibble that serves as a run log. Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
+#' @param .base_dir Directory to search for model yaml files. Only runs with a corresponding yaml will be included.
+#' @param .recurse Boolean for whether to search subdirectories recursively for additional yaml files. Defaults to TRUE.
 #' @importFrom stringr str_subset
 #' @importFrom fs dir_ls
 #' @importFrom purrr map map_lgl transpose
@@ -97,7 +99,7 @@ create_run_log <- function(
   df <- mod_yaml %>% transpose() %>% as_tibble() %>%
     mutate_at(c(YAML_MOD_PATH, YAML_DESCRIPTION), unlist) %>%
     mutate(run_id = get_mod_id(.data[[YAML_MOD_PATH]])) %>%
-    select(run_id, everything())
+    select(.data$run_id, everything())
 
   # add yaml path
   df$yaml_path <- yaml_files[mod_yaml_bool]
