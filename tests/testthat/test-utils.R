@@ -61,7 +61,7 @@ test_that("format_cmd_args parses correctly", {
 
 
 test_that("parse_mod_yaml() returns expected list", {
-  expect_identical(parse_mod_yaml("data/modtest.yaml"),
+  expect_identical(parse_mod_yaml("data/acop.yaml"),
                    list(
                      model_path = "data/acop.mod",
                      description = "acop model for testing",
@@ -95,7 +95,3 @@ test_that("parse_args_list() merges lists as expected", {
 
 })
 
-
-test_that("print_nonmem_args() doesn't error", {
-  expect_invisible(print_nonmem_args())
-})

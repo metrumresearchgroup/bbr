@@ -10,8 +10,9 @@ copy_model_from(
   .new_model,
   .description,
   .based_on_additional = NULL,
-  .inherit_tags = T,
-  .add_tags = NULL
+  .inherit_tags = TRUE,
+  .add_tags = NULL,
+  .update_mod_file = TRUE
 )
 }
 \value{

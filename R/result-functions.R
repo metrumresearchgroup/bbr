@@ -58,24 +58,3 @@ parse_model_output.character <- function(.res) {
   return(res_list)
 }
 
-
-######################################
-# format NONMEM output to tables
-######################################
-
-# parameter estimates
-param_estimates <- function(.x, ...) {
-  UseMethod("param_estimates", .x)
-}
-
-param_estimates.bbi_nonmem_summary <- function(.x) {
-  num_methods <- length(.x$parameters_data)
-  param_names <- .x$parameter_names
-  param_estimates <- .x$parameters_data[[num_methods]]$estimates
-  tibble::tibble(
-    names = unlist(param_names),
-    estimate = unlist(param_estimates),
-    stderr = unlist(.x$parameters_data[[num_methods]]$std_err) %||% NA_real_,
-    fixed = unlist(.x$parameters_data[[num_methods]]$fixed),
-  )
-}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/summary.R
 \name{nonmem_output}
 \alias{nonmem_output}
-\title{get a model summary}
+\title{Run `bbi summary` and parse the output to a list}
 \usage{
 nonmem_output(.path, .args = NULL, ..., .dry_run = FALSE)
 }
@@ -16,12 +16,10 @@ nonmem_output(.path, .args = NULL, ..., .dry_run = FALSE)
 \item{...}{args passed through to `bbi_exec()`}
 
 \item{.dry_run}{show what the command would be without actually running it}
-
-\item{.json}{return output as json}
 }
 \value{
 List of S3 Class "bbi_nonmem_summary" with all summary information
 }
 \description{
-get a model summary
+Run `bbi summary` and parse the output to a list
 }

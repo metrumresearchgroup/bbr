@@ -7,19 +7,22 @@
 #' @importFrom glue glue
 NULL
 
-#' Executes a babylon call (`bbi ...`) with processx::run
+#' Executes a babylon call (`bbi ...`) with processx::process$new()
 #' @param .cmd_args A character vector of command line arguments for the execution call
 #' @param .verbose Print stdout and stderr as process runs #### NOT IMPLEMENTED?
 #' @param .wait If true, don't return until process has exited.
-#' @param ... arguments to pass to processx::run
-#' @return output from executed process, as a list with components status, stdout, stderr, and timeout (see ?processx::run for more details)
-#' @importFrom processx run process
+#' @param ... arguments to pass to processx::process$new()
+#' @return A named list with process object and some metadata
+#'         process -- The process object (see ?processx::process$new for more details on what you can do with this)
+#'         output -- the stdout and stderr from the process, if `.wait = TRUE`. If `.wait = FALSE` this will be NULL.
+#'         bbi -- character scaler with the execution path used for bbi
+#'         cmd_args -- character vector of all command arguments passed to the process
+#' @importFrom processx process
 #' @export
 bbi_exec <- function(.cmd_args, .verbose = FALSE, .wait = FALSE, ...) {
   bbi_exe_path <- getOption("rbabylon.bbi_exe_path")
   check_bbi_exe(bbi_exe_path)
 
-  #output <- processx::run(bbi_exe_path, .cmd_args, ..., error_on_status = FALSE)
   p <- processx::process$new(bbi_exe_path, .cmd_args, ..., stdout = "|", stderr = "2>&1")
 
   if (.wait) {
@@ -67,10 +70,10 @@ check_bbi_exe <- function(.bbi_exe_path) {
 }
 
 
-#' Checks status code from processx::run output
+#' Checks status code from processx process
 #' @param .status_code numerical status code from the process
-#' @param .output character scalar of output from the process
-#' @param .cmd_args character vector of args passed to processx::run(). Used for error printing.
+#' @param .output character scalar of output from the process. Used only for error printing.
+#' @param .cmd_args character vector of args passed to process. Used only for error printing.
 #' @importFrom stringr str_detect
 #' @export
 check_status_code <- function(.status_code, .output, .cmd_args) {
@@ -87,9 +90,8 @@ check_status_code <- function(.status_code, .output, .cmd_args) {
 }
 
 
-#' Executes (`bbi --help`) with processx::run and prints the output string
+#' Executes (`bbi --help`) with bbi_exec and prints the output string
 #' @param .cmd_args You can optionally pass a vector of args to get help about a specific call
-#' @importFrom processx run
 #' @export
 bbi_help <- function(.cmd_args=NULL) {
   if (is.null(.cmd_args)) {
@@ -102,10 +104,9 @@ bbi_help <- function(.cmd_args=NULL) {
 }
 
 
-#' Executes (`bbi init`) with processx::run in specified directory
+#' Executes (`bbi init`) with bbi_exec() in specified directory
 #' @param .dir Path to directory to run `init` in (and put the resulting `babylon.yml` file)
 #' @param .nonmem_dir Path to directory with the NONMEM installation.
-#' @importFrom processx run
 #' @export
 bbi_init <- function(.dir, .nonmem_dir) {
   # check for files in NONMEM directory

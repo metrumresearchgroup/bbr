@@ -2,7 +2,7 @@
 #' @param .path Character scalar path to the gradient file
 #' @param .plot Boolean for whether to return a plot instead of a tibble
 #' @param .iter_floor Filters gradient file to only iterations GREATER THAN this value. Default is 0.
-#' @importFrom readr read_table2
+#' @importFrom readr read_table2 cols
 #' @importFrom tidyr gather
 #' @importFrom dplyr filter
 #' @importFrom ggplot2 ggplot geom_line

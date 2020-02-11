@@ -9,7 +9,8 @@
 #' @param .add_tags
 #' @param .update_mod_file
 #' @importFrom fs file_copy
-#' @importFrom readr read_lines write_lines
+#' @importFrom readr read_file write_file
+#' @importFrom stringr str_replace
 #' @importFrom yaml write_yaml
 #' @return Character scaler with the name of the model .yaml file that can be passed to `submit_nonmem_model()`
 #' @export
@@ -69,7 +70,8 @@ copy_model_from <- function(
 #' Parses model outputs into a
 #' @importFrom stringr str_subset
 #' @importFrom fs dir_ls
-#' @importFrom purrr map
+#' @importFrom purrr map map_lgl transpose
+#' @importFrom dplyr as_tibble mutate_at mutate select everything
 #' @importFrom yaml read_yaml
 #' @return tibble with information on each run
 #' @export
@@ -91,11 +93,16 @@ create_run_log <- function(
   }
   mod_yaml <- all_yaml[which(mod_yaml_bool)]
 
-  ## I want this, but it won't quite work
-  #names(mod_yaml) <- yaml_files[mod_yaml_bool]
-  #mod_yaml %>% transpose %>% lapply(unlist, recursive = T) %>% as_tibble
-  df <- mod_yaml %>% transpose %>% as_tibble() # this is not quite right. They're all lists
+  # transpose yaml list to tibble
+  df <- mod_yaml %>% transpose() %>% as_tibble() %>%
+    mutate_at(c(YAML_MOD_PATH, YAML_DESCRIPTION), unlist) %>%
+    mutate(run_id = get_mod_id(.data[[YAML_MOD_PATH]])) %>%
+    select(run_id, everything())
+
+  # add yaml path
   df$yaml_path <- yaml_files[mod_yaml_bool]
+
+  # potentially add other stuff (optionally?) from bbi summary, etc.
 
   return(df)
 }

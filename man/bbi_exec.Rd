@@ -2,7 +2,7 @@
 % Please edit documentation in R/rbabylon.R
 \name{bbi_exec}
 \alias{bbi_exec}
-\title{Executes a babylon call (`bbi ...`) with processx::run}
+\title{Executes a babylon call (`bbi ...`) with processx::process$new()}
 \usage{
 bbi_exec(.cmd_args, .verbose = FALSE, .wait = FALSE, ...)
 }
@@ -13,11 +13,15 @@ bbi_exec(.cmd_args, .verbose = FALSE, .wait = FALSE, ...)
 
 \item{.wait}{If true, don't return until process has exited.}
 
-\item{...}{arguments to pass to processx::run}
+\item{...}{arguments to pass to processx::process$new()}
 }
 \value{
-output from executed process, as a list with components status, stdout, stderr, and timeout (see ?processx::run for more details)
+A named list with process object and some metadata
+        process -- The process object (see ?processx::process$new for more details on what you can do with this)
+        output -- the stdout and stderr from the process, if `.wait = TRUE`. If `.wait = FALSE` this will be NULL.
+        bbi -- character scaler with the execution path used for bbi
+        cmd_args -- character vector of all command arguments passed to the process
 }
 \description{
-Executes a babylon call (`bbi ...`) with processx::run
+Executes a babylon call (`bbi ...`) with processx::process$new()
 }
