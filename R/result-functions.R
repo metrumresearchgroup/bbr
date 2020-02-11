@@ -42,19 +42,3 @@ get_stdout.babylon_result <- function(.res) {
   }
 }
 
-
-# parse NONMEM output to list
-parse_model_output <- function(.res, ...) {
-  UseMethod("parse_model_output", .res)
-}
-
-parse_model_output.babylon_result <- function(.res) {
-  res_list <- nonmem_output(.res$output_dir)
-  return(res_list)
-}
-
-parse_model_output.character <- function(.res) {
-  res_list <- nonmem_output(.res)
-  return(res_list)
-}
-
