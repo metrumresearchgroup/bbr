@@ -78,7 +78,7 @@ submit_nonmem_model <- function(.path,
     res <- bbi_exec(cmd_args, .wait = .wait, wd = model_dir, ...)
 
     # add to result object
-    res$output_dir <- paste(model_dir, .output_dir, sep="/")
+    res$output_dir <- file.path(model_dir, .output_dir)
 
     return(res)
   }

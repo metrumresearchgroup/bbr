@@ -58,3 +58,20 @@ parse_model_output.character <- function(.res) {
   return(res_list)
 }
 
+
+# parse NONMEM output to list
+model_summary <- function(.res, ...) {
+  UseMethod("nonmem_output", .res, ...)
+}
+
+nonmem_output.babylon_result <- function(.res, ...) {
+  some_arg <- .res$that_arg
+  res_list <- nonmem_output_impl(.res$output_dir, some_arg, ...)
+  return(res_list)
+}
+
+nonmem_output.character <- function(.res, model_type, ...) {
+  res_list <- nonmem_output_impl(.res, ...)
+  return(res_list)
+}
+
