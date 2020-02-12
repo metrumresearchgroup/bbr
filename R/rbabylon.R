@@ -27,11 +27,14 @@ bbi_exec <- function(.cmd_args, .verbose = FALSE, .wait = FALSE, ...) {
   p <- processx::process$new(bbi_exe_path, .cmd_args, ..., stdout = "|", stderr = "2>&1")
 
   if (.wait) {
+    cat("WAIT!")
     # wait for process and capture stdout and stderr
     output <- p$read_all_output_lines()
-
+    cat(glue("got output: {output}")) ####### this fixes it?!!!??!!!
     # check output status code
-    check_status_code(p$get_exit_status(), output, .cmd_args)
+    .status_code <- p$get_exit_status()
+    cat(glue("got status code: {.status_code}"))
+    check_status_code(.status_code, output, .cmd_args)
   } else {
     output <- NULL
   }
