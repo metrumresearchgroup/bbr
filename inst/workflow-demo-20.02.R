@@ -5,23 +5,19 @@ print(glue::glue("switched working directory to `{getwd()}` for demo."))
 
 # cleanup function
 cleanup_demo <- function() {
-  demo_files <- c(
-    "acop2.mod",
-    "acop2.yaml",
-    "acop3.mod",
-    "acop3.yaml"
-    )
-  for (f in demo_files) {
-    if (fs::file_exists(f)) fs::file_delete(f)
-  }
+  # delete original acop output
+  if (fs::dir_exists("acop")) fs::dir_delete("acop")
 
-  demo_dirs <- c(
-    "acop",
+  # delete demo models
+  demo_mods <- c(
     "acop2",
-    "acop3"
+    "acop3",
+    "acop4"
   )
-  for (d in demo_dirs) {
-    if (fs::dir_exists(d)) fs::dir_delete(d)
+  for (m in demo_mods) {
+    if (fs::file_exists(glue("{m}.mod"))) fs::file_delete(glue("{m}.mod"))
+    if (fs::file_exists(glue("{m}.yaml"))) fs::file_delete(glue("{m}.yaml"))
+    if (fs::dir_exists(m)) fs::dir_delete(m)
   }
 }
 cleanup_demo()
@@ -66,7 +62,7 @@ spec2 <- copy_model_from(spec1, "acop2", "model 2 description")
 class(spec2)
 # [1] "bbi_nonmem_spec" "list"
 str(spec2)
-cat(paste(readr::read_lines(spec2$model_path, n_max = 10), collapse = "\n" ))
+cat(paste(readr::read_lines(spec2$model_path, n_max = 10), collapse = "\n" )) # notice the $PROBLEM line is changed
 
 # submit new model
 res2 <- submit_model(spec2)
@@ -80,42 +76,39 @@ print(names(sum2))
 par_df2 <- param_estimates(sum2)
 head(par_df2)
 
+# delete temp demo files
+cleanup_demo()
+
 
 ########################
 # composable workflow
 ########################
 
-cleanup_demo()
-
-res2 <- copy_model_from(orig_mod, new_mod_path2, "model 2 description") %>%
+# iterate on original and run it
+res2 <- copy_model_from(spec1, "acop2", "model 2 description") %>%
   submit_model()
 
-new_mod_path3 <- "somepath"
-copy_model_from(orig_mod_path, new_mod_path3,
-                .add_tags = c("Assdfd")) %>%
-  add_tags() %>%
-  submit_nonmem_model()
+# another iteration
+res3 <- copy_model_from(res2, "acop3",
+                        "model 2 with some changes",
+                        .add_tags = c("new tag")) %>% submit_model()
+
+# another iteration based on acop2
+res4 <- copy_model_from(res2, "acop4",
+                        "model 2 with different changes",
+                        .add_tags = c("new tag"),
+                        .based_on_additional = c("acop3")) %>% submit_model()
 
 
-new_mod_path4 <- "somepath"
-copy_model_from(orig_mod_path, new_mod_path2) %>%
-  submit_nonmem_model()
+# construct run log and view it
+log_df <- run_log(".")
+View(log_df)
+
+# compare some outputs from two of the runs
+model_summary(res3) %>% param_estimates() %>% head()
+model_summary(res4) %>% param_estimates() %>% head()
+
+# delete temp demo files
+cleanup_demo()
 
 
-run_log(".")
-
-
-model_summary(new_mod_path2)
-model_summary(res2)
-
-
-
-# # orig idea
-# copy_model_from() %>%
-#   add_tags() %>%
-#   modify_data_set() %>%
-#   update_params() %>%
-#   submit_nonmem_model() %>%
-#   nonmem_output()
-#
-#

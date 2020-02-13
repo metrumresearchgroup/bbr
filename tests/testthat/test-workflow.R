@@ -64,8 +64,8 @@ test_that("copy_from_model options work", {
 })
 
 
-test_that("create_run_log matches reference tibble", {
-  df <- suppressWarnings(create_run_log("data"))
+test_that("run_log matches reference tibble", {
+  df <- suppressWarnings(run_log("data"))
   ref_df <- readRDS("data/run_log_basic_200211.rds")
   expect_identical(df, ref_df)
 })

@@ -36,6 +36,7 @@ submit_model.character <- function(.path, .model_type = c("nonmem"), ...) {
 #' @param .dry_run Returns character string of command that would be run, insted of running it. This is primarily for testing but also a debugging tool.
 #' @importFrom stringr str_detect
 #' @importFrom tools file_path_sans_ext
+#' @importFrom purrr list_modify
 #' @return output from the model run (?)
 #' @export
 submit_nonmem_model <- function(.path,
@@ -51,11 +52,14 @@ submit_nonmem_model <- function(.path,
   if ((str_detect(.path, "\\.yaml$")) || (str_detect(.path, "\\.yml$"))) {
     yaml_list <- parse_mod_yaml(.path)
     # reset model path
+    .yaml_path <- .path
     .path <- yaml_list[[YAML_MOD_PATH]]
 
     # update .args from yaml
     .args <- parse_args_list(.args, yaml_list[[YAML_BBI_ARGS]])
 
+  } else {
+    .yaml_path <- NULL
   }
 
   # check for valid type arg
@@ -99,7 +103,12 @@ submit_nonmem_model <- function(.path,
     res <- bbi_exec(cmd_args, .wait = .wait, wd = model_dir, ...)
 
     # add to result object
-    res$output_dir <- file.path(model_dir, .output_dir)
+    res <- list_modify(
+      res,
+      output_dir = file.path(model_dir, .output_dir),
+      model_path = .path,
+      yaml_path = .yaml_path
+    )
     class(res) <- c("bbi_nonmem_result", class(res))
 
     return(res)

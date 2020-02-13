@@ -63,6 +63,15 @@ copy_model_from.bbi_nonmem_spec <- function(.parent_spec, .new_model, .descripti
   return(.spec)
 }
 
+copy_model_from.bbi_nonmem_result <- function(.parent_res, .new_model, .description,...) {
+  .spec <- copy_nonmem_model_from(
+    .parent_res$yaml_path,
+    .new_model,
+    .description,
+    ...)
+  return(.spec)
+}
+
 copy_model_from.character <- function(.parent_path, .new_model, .description, .model_type = c("nonmem"), ...) {
   .model_type <- match.arg(.model_type)
 
@@ -170,7 +179,7 @@ copy_nonmem_model_from <- function(
 #' @importFrom yaml read_yaml
 #' @return tibble with information on each run
 #' @export
-create_run_log <- function(
+run_log <- function(
   .base_dir,
   .recurse = TRUE
 ) {

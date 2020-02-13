@@ -13,13 +13,19 @@ Authors@R:
 RoxygenNote: 7.0.2
 Imports: 
     checkmate,
+    dplyr,
+    fs,
+    glue,
+    ggplot2,
     magrittr,
     jsonlite,
     processx,
     purrr,
+    readr,
     rlang,
     withr,
     stringr,
+    tidyr,
     yaml
 Suggests: 
     testthat (>= 2.1.0)
