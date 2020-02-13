@@ -13,10 +13,14 @@ Authors@R:
 RoxygenNote: 7.0.2
 Imports: 
     checkmate,
+    dplyr,
+    fs,
+    glue,
     magrittr,
     jsonlite,
     processx,
     purrr,
+    readr,
     rlang,
     withr,
     stringr,

@@ -1,0 +1,9 @@
+# model metadata
+description: acop model for testing
+based_on:
+tags: ["acop tag", "other tag"]
+
+bbi_args:
+    overwrite: true
+    threads: 4
+    nm_version: nm74gf

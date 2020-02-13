@@ -1,3 +1,7 @@
+`%||%` <- function(x, y) {
+  if (is.null(x)) return(y)
+  return(x)
+}
 #' Checks that all passed NONMEM command line args are valid and formats
 #' @param .args A named list of .args to check
 #' @importFrom checkmate assert_list
@@ -107,6 +111,66 @@ format_cmd_args <- function(.args, .collapse = FALSE) {
 }
 
 
+#' Parses a model yaml file into a list object that contains correctly formatted information from the yaml
+#' Output list will have:
+#'   $model_path -- the path the model file that should be run
+#'   $args_list -- any babylon arguments that should be passed though. The keys must be the same as would be passed to check_nonmem_args()
+#'   $user_data -- any other data the user included, such as metadata about the model, that is NOT a babylon argument
+#' @param .path Path to the yaml file to parse.
+#' @importFrom yaml read_yaml
+#' @importFrom fs file_exists
+#' @return Output list as specified above.
+#' @export
+parse_mod_yaml <- function(.path) {
+  if (!fs::file_exists(.path)) {
+    stop(glue("Cannot find yaml file at path {.path}"))
+  }
+
+  # load from file
+  yaml_list <- read_yaml(.path)
+
+  # parse model path
+  if (!check_mod_yaml_keys(yaml_list)) {
+    stop(paste0(
+      "Model yaml must have keys `", paste(YAML_REQ_KEYS, collapse=", "), "` specified in it. ",
+      "But `", paste(YAML_REQ_KEYS[!(YAML_REQ_KEYS %in% names(yaml_list))], collapse=", "), "` are missing. ",
+      .path, " has the following keys: ", paste(names(yaml_list), collapse=", ")
+      ))
+  }
+
+  return(yaml_list)
+}
+
+
+#' Combines NONMEM args that were passed into the function call with args that were parsed from a model yaml
+#' @param .func_args A named list of arguments for bbi, passed into submit model function call
+#' @param .yaml_args A named list of arguments for bbi, parsed from user input yaml
+#' @importFrom checkmate assert_list
+#' @return The combination of the two lists, with .yaml_args overriding any keys that are shared
+#' @export
+parse_args_list <- function(.func_args, .yaml_args) {
+  # if no .args passed to function, pass through yaml args
+  if (is.null(.func_args)) {
+    .args <- .yaml_args
+  } else {
+    # check that unique named list was passed
+    tryCatch(
+      checkmate::assert_list(.func_args, names="unique"),
+      error = function(e) {
+        err_msg <- paste("`.args` must be a unique, named list:", e)
+        stop(err_msg)
+      }
+    )
+    # add .yaml_args and overwrite anything from .func_args list that's in .yaml_args
+    .args <- .func_args
+    for (.n in names(.yaml_args)) {
+      .args[[.n]] <- .yaml_args[[.n]]
+    }
+  }
+  return(.args)
+}
+
+
 #' Prints all valid arguments to pass in submit_nonmem_model(.args=list())
 #' @importFrom purrr imap
 #' @export
@@ -115,4 +179,19 @@ print_nonmem_args <- function() {
     paste0(.n, " (", .v$type, ") -- ", .v$description, " (sets CLI flag `", .v$flag, "`)")
   })
   cat(paste(doc_list, collapse = "\n"))
+}
+
+
+#' Helper to strip path and extension from model file to get only model identifier
+#' @param .mod_path model path to strip
+#' @importFrom tools file_path_sans_ext
+#' @returns Character scaler with only model identifier
+#' @export
+get_mod_id <- function(.mod_path) {
+  return(basename(tools::file_path_sans_ext(.mod_path)))
+}
+
+
+check_mod_yaml_keys <- function(.list) {
+  all(YAML_REQ_KEYS %in% names(.list))
 }

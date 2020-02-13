@@ -10,11 +10,19 @@ submit_nonmem_model(
   .args = NULL,
   ...,
   .config_path = NULL,
+  .output_dir = NULL,
+  .wait = TRUE,
   .dry_run = FALSE
 )
 }
 \arguments{
-\item{.path}{Full path to a model file(s) that should be run. Path MUST be either an absolute path or relative to the R working directory.}
+\item{.path}{Full path to one of the following:
+1) path to a model file(s) that should be run OR
+2) path to a model YAML file that must contain:
+    a) a path to a model file with the key `model_path`,
+    b) any NONMEM args that would like to pass through, with keys that match the arguments in `print_nonmem_args()`,
+    c) any extra user data that will be passed through to `bbi_config.json` with whatever keys are specified in the yaml.
+(Path must be either an absolute path or relative to the R working directory)}
 
 \item{.type}{Either "local" for local execution or "sge" to submit model(s) to the grid}
 
@@ -23,6 +31,10 @@ submit_nonmem_model(
 \item{...}{args passed through to `bbi_exec()`}
 
 \item{.config_path}{Optionally specify a path to a babylon.yml config. If not specified, the config in the model directory will be used by default. Path MUST be either an absolute path or relative to the model directory.}
+
+\item{.output_dir}{Name of directory that output will be written to. If NULL is passed (default) then it assumed to be the name of the model file (with the extension stripped).}
+
+\item{.wait}{Boolean for whether to wait for the bbi process to return before this function call returns.}
 
 \item{.dry_run}{Returns character string of command that would be run, insted of running it. This is primarily for testing but also a debugging tool.}
 }

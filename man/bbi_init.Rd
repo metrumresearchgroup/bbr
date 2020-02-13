@@ -2,7 +2,7 @@
 % Please edit documentation in R/rbabylon.R
 \name{bbi_init}
 \alias{bbi_init}
-\title{Executes (`bbi init`) with processx::run in specified directory}
+\title{Executes (`bbi init`) with bbi_exec() in specified directory}
 \usage{
 bbi_init(.dir, .nonmem_dir)
 }
@@ -12,5 +12,5 @@ bbi_init(.dir, .nonmem_dir)
 \item{.nonmem_dir}{Path to directory with the NONMEM installation.}
 }
 \description{
-Executes (`bbi init`) with processx::run in specified directory
+Executes (`bbi init`) with bbi_exec() in specified directory
 }
