@@ -27,14 +27,11 @@ bbi_exec <- function(.cmd_args, .verbose = FALSE, .wait = FALSE, ...) {
   p <- processx::process$new(bbi_exe_path, .cmd_args, ..., stdout = "|", stderr = "2>&1")
 
   if (.wait) {
-    cat("WAIT!")
     # wait for process and capture stdout and stderr
     output <- p$read_all_output_lines()
-    cat(glue("got output: {output}")) ####### this fixes it?!!!??!!!
+
     # check output status code
-    .status_code <- p$get_exit_status()
-    cat(glue("got status code: {.status_code}"))
-    check_status_code(.status_code, output, .cmd_args)
+    check_status_code(p$get_exit_status(), output, .cmd_args)
   } else {
     output <- NULL
   }
@@ -104,7 +101,7 @@ bbi_help <- function(.cmd_args=NULL) {
     .cmd_args <- c(.cmd_args, "--help")
   }
   res <- bbi_exec(.cmd_args, .wait=TRUE)
-  cat(res$output)
+  cat(paste(res$output, collapse = "\n"))
 }
 
 
@@ -121,7 +118,7 @@ bbi_init <- function(.dir, .nonmem_dir) {
 
   # execute init
   res <- bbi_exec(c("init",  paste0("--dir=", .nonmem_dir)), wd = .dir, .wait=TRUE)
-  cat(res$output)
+  cat(paste(res$output, collapse = "\n"))
 }
 
 
