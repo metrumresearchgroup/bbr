@@ -1,7 +1,7 @@
 context("Workflow file manipulation")
 
 # define new mod vars
-orig_mod <- "data/acop"
+orig_mod_yaml_path <- "data/acop.yaml"
 new_mod2 <- "data/modtest2"
 new_mod3 <- "data/modtest3"
 new_desc <- "new description"
@@ -15,7 +15,7 @@ for (m in c(new_mod2, new_mod3)) {
 
 test_that("copy_from_model creates accurate copy", {
   # run copy_model_from
-  copy_model_from(orig_mod, new_mod2, new_desc)
+  copy_model_from(orig_mod_yaml_path, new_mod2, new_desc)
 
   # check that everything is copied through
   new_yaml <- yaml::read_yaml(paste0(new_mod2, ".yaml"))
@@ -36,7 +36,7 @@ test_that("copy_from_model creates accurate copy", {
 
 test_that("copy_from_model options work", {
   # run copy_model_from
-  copy_model_from(orig_mod,
+  copy_model_from(orig_mod_yaml_path,
                   new_mod3,
                   new_desc,
                   .based_on_additional = get_mod_id(new_mod2),
@@ -55,7 +55,7 @@ test_that("copy_from_model options work", {
 
   # check the control stream is not modified
   prob_pattern <- "\\$PROB(.|\n)*?\\$"
-  orig_mod_str <- readr::read_file(paste0(orig_mod, ".mod"))
+  orig_mod_str <- readr::read_file(paste0(tools::file_path_sans_ext(orig_mod_yaml_path), ".mod"))
   new_mod_str <- readr::read_file(paste0(new_mod3, ".mod"))
   expect_identical(
     stringr::str_extract(orig_mod_str, prob_pattern),
