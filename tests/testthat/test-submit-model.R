@@ -13,7 +13,7 @@ test_that("submit-nonmem-model(.dry_run=T) returns correct command string",
               expect_identical(
                 submit_nonmem_model(
                   "/data/240/001.mod",
-                  .type = "local",
+                  .mode = "local",
                   .dry_run = T
                 )$call,
                 "cd /data/240 ; bbi nonmem run local 001.mod"

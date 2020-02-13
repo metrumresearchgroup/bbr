@@ -1,3 +1,24 @@
+# S3 dispatch for submitting models
+submit_model <- function(.spec, ...) {
+  UseMethod("submit_model", .spec)
+}
+
+submit_model.bbi_nonmem_spec <- function(.spec, ...) {
+  res <- submit_nonmem_model(.spec$yaml_path, ...)
+  return(res)
+}
+
+submit_model.character <- function(.path, .model_type = c("nonmem"), ...) {
+  .model_type <- match.arg(.model_type)
+  if (.model_type == "nonmem") {
+    res <- submit_nonmem_model(.path, ...)
+  } else {
+    stop(glue("Passed `{.model_type}` to model_summary(.model_type). Valid options include: `'nonmem'`"))
+  }
+  return(res)
+}
+
+
 #' Submit a NONMEM model via babylon
 #' @param .path Full path to one of the following:
 #'     1) path to a model file(s) that should be run OR
@@ -6,7 +27,7 @@
 #'         b) any NONMEM args that would like to pass through, with keys that match the arguments in `print_nonmem_args()`,
 #'         c) any extra user data that will be passed through to `bbi_config.json` with whatever keys are specified in the yaml.
 #'     (Path must be either an absolute path or relative to the R working directory)
-#' @param .type Either "local" for local execution or "sge" to submit model(s) to the grid
+#' @param .mode Either "local" for local execution or "sge" to submit model(s) to the grid
 #' @param .args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.
 #' @param ... args passed through to `bbi_exec()`
 #' @param .config_path Optionally specify a path to a babylon.yml config. If not specified, the config in the model directory will be used by default. Path MUST be either an absolute path or relative to the model directory.
@@ -18,7 +39,7 @@
 #' @return output from the model run (?)
 #' @export
 submit_nonmem_model <- function(.path,
-                                .type = c("sge", "local"),
+                                .mode = c("sge", "local"),
                                 .args = NULL,
                                 ...,
                                 .config_path=NULL,
@@ -38,7 +59,7 @@ submit_nonmem_model <- function(.path,
   }
 
   # check for valid type arg
-  .type <- match.arg(.type)
+  .mode <- match.arg(.mode)
 
   # parse model directory and model filename
   model_dir <- dirname(.path)
@@ -50,7 +71,7 @@ submit_nonmem_model <- function(.path,
 
   # build command line args
   args_vec <- check_nonmem_args(.args)
-  cmd_args <- c("nonmem", "run", .type, model, args_vec)
+  cmd_args <- c("nonmem", "run", .mode, model, args_vec)
 
   # add config path
   if (!is.null(.config_path)) {
@@ -79,8 +100,8 @@ submit_nonmem_model <- function(.path,
 
     # add to result object
     res$output_dir <- file.path(model_dir, .output_dir)
+    class(res) <- c("bbi_nonmem_result", class(res))
 
     return(res)
   }
 }
-

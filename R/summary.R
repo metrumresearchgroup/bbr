@@ -7,7 +7,7 @@
 #' @param .dry_run show what the command would be without actually running it
 #' @return List of S3 Class "bbi_nonmem_summary" with all summary information
 #' @export
-nonmem_output <- function(.path,
+nonmem_summary <- function(.path,
                                 .args = NULL,
                                 ...,
                                 .dry_run = FALSE
@@ -53,7 +53,7 @@ nonmem_output <- function(.path,
     paste(collapse="") %>%
     jsonlite::fromJSON(simplifyDataFrame = FALSE)
 
-  attr(res_list, "class") <- "bbi_nonmem_summary"
+  class(res_list) <- c("bbi_nonmem_summary", class(res_list))
 
   return(res_list)
 }
@@ -65,6 +65,27 @@ check_lst_file <- function(.x) {
     stop("unable to locate lst file in dir: {.x}, cannot proceed...")
   }
   lst_file
+}
+
+
+# s3 dispatches to parse NONMEM output to list
+model_summary <- function(.res, ...) {
+  UseMethod("model_summary", .res)
+}
+
+model_summary.bbi_nonmem_result <- function(.res, ...) {
+  res_list <- nonmem_summary(.res$output_dir, ...)
+  return(res_list)
+}
+
+model_summary.character <- function(.res_dir, .model_type = c("nonmem"), ...) {
+  .model_type <- match.arg(.model_type)
+  if (.model_type == "nonmem") {
+    res_list <- nonmem_summary(.res_dir, ...)
+  } else {
+    stop(glue("Passed `{.model_type}` to model_summary(.model_type). Valid options include: `'nonmem'`"))
+  }
+  return(res_list)
 }
 
 
@@ -88,4 +109,6 @@ param_estimates.bbi_nonmem_summary <- function(.x) {
     fixed = unlist(.x$parameters_data[[num_methods]]$fixed),
   )
 }
+
+
 
