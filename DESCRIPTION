@@ -18,7 +18,9 @@ Imports:
     processx,
     purrr,
     rlang,
-    withr
+    withr,
+    stringr,
+    yaml
 Suggests: 
     testthat (>= 2.1.0)
 License: MIT + file LICENSE

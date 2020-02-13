@@ -1,7 +1,7 @@
 #' Checks that all passed NONMEM command line args are valid and formats
 #' @param .args A named list of .args to check
-#' @importFrom checkmate assert_list assert_class
-#' @importFrom rlang is_bare_character
+#' @importFrom checkmate assert_list
+#' @importFrom rlang is_bare_character is_bare_numeric is_bare_logical
 #' @importFrom purrr imap set_names
 #' @return character string, output from format_cmd_args()
 #' @export
@@ -15,7 +15,7 @@ check_nonmem_args <- function(.args) {
   tryCatch(
     checkmate::assert_list(.args, names="unique"),
     error = function(e) {
-      err_msg <- paste("check_nonmem_args() takes a unique, named list:", e) ##### change check_nonmem_args()
+      err_msg <- paste("`.args` must be a unique, named list:", e)
       stop(err_msg)
     }
   )
@@ -25,18 +25,26 @@ check_nonmem_args <- function(.args) {
     # check that arg is valid
     ref <- NONMEM_ARGS[[.n]]
     if (is.null(ref)) {
-      err_msg <- paste(.n, "is not a valid argument for the `.args` list in submit_nonmem_model(). Valid arguments are:",
-                       paste(names(NONMEM_ARGS), collapse=", "))
+      err_msg <- paste(.n, "is not a valid argument for the `.args` list in submit_nonmem_model(). Run `print_nonmem_args()` to see valid arguments.")
       return(err_msg)
     }
 
     # check type
-    type_res <- checkmate::check_class(.v, ref$type)
-    if (rlang::is_bare_character(type_res)) {
-      err_msg <- paste0("`", .v, "` passed for arg `", .n, "` -- ", type_res)
+    if (ref$type == "character") {
+      type_pass_bool <- is_bare_character(.v)
+    } else if (ref$type == "logical") {
+      type_pass_bool <- is_bare_logical(.v)
+    } else if (ref$type == "numeric") {
+      type_pass_bool <- is_bare_numeric(.v)
+    } else {
+      # This feels weird to put an intentional bug catch in here, but I don't like having to rely on raw string matching
+      # from our aaa.R file to trigger functionality, so this feels like the safest option.
+      stop(paste0("BUG!!! NONMEM_ARGS[['", .n, "']][['type']] is `", ref$type, "` which is invalid. Must be either 'character', 'logical', or 'numeric'"))
+    }
+    if (!type_pass_bool) {
+      err_msg <- paste0("`", .v, "` passed for arg `", .n, "`. Expected '", ref$type, "' type.")
       return(err_msg)
     }
-
     # if no errors return NULL
     return(NULL)
   }) %>% unlist()
@@ -63,14 +71,14 @@ check_nonmem_args <- function(.args) {
 #' @importFrom checkmate assert_list
 #' @importFrom rlang is_bare_logical
 #' @importFrom purrr imap set_names
-#' @return character vector of
+#' @return character vector of command args
 #' @export
 format_cmd_args <- function(.args, .collapse = FALSE) {
   # check that unique named list was passed
   tryCatch(
     checkmate::assert_list(.args, names="unique"),
     error = function(e) {
-      err_msg <- paste("format_cmd_args() takes a unique, named list:", e)
+      err_msg <- paste("`.args` must be a unique, named list:", e)
       stop(err_msg)
     }
   )
@@ -98,3 +106,13 @@ format_cmd_args <- function(.args, .collapse = FALSE) {
   }
 }
 
+
+#' Prints all valid arguments to pass in submit_nonmem_model(.args=list())
+#' @importFrom purrr imap
+#' @export
+print_nonmem_args <- function() {
+  doc_list <- imap(NONMEM_ARGS, function(.v, .n) {
+    paste0(.n, " (", .v$type, ") -- ", .v$description, " (sets CLI flag `", .v$flag, "`)")
+  })
+  cat(paste(doc_list, collapse = "\n"))
+}

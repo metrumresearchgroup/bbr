@@ -3,10 +3,10 @@ context("submit-nonmem-model(.dry_run=T)")
 test_that("submit-nonmem-model(.dry_run=T) returns correct command string",
           {
             # basic defaults
-            withr::with_options(list(rbabylon.bbi_exe_path = "/data/apps/bbi"), {
+            withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
               expect_identical(
-                submit_nonmem_model("/data/240/001.mod", .dry_run = T),
-                "cd /data/240 ; /data/apps/bbi nonmem run sge 001.mod"
+                submit_nonmem_model("/data/240/001.mod", .dry_run = T)$call,
+                "cd /data/240 ; bbi nonmem run sge 001.mod"
               )
 
               # basic defaults with local
@@ -15,8 +15,8 @@ test_that("submit-nonmem-model(.dry_run=T) returns correct command string",
                   "/data/240/001.mod",
                   .type = "local",
                   .dry_run = T
-                ),
-                "cd /data/240 ; /data/apps/bbi nonmem run local 001.mod"
+                )$call,
+                "cd /data/240 ; bbi nonmem run local 001.mod"
               )
 
               # add some args
@@ -29,8 +29,8 @@ test_that("submit-nonmem-model(.dry_run=T) returns correct command string",
                     "nm_version" = "nm74"
                   ),
                   .dry_run = TRUE
-                ),
-                "cd /data/240 ; /data/apps/bbi nonmem run sge 001.mod --json --threads=4 --nmVersion=nm74"
+                )$call,
+                "cd /data/240 ; bbi nonmem run sge 001.mod --json --threads=4 --nmVersion=nm74"
               )
 
               # multiple models
@@ -39,8 +39,8 @@ test_that("submit-nonmem-model(.dry_run=T) returns correct command string",
                   "/data/240/[001:004].mod",
                   .args = list("overwrite" = TRUE),
                   .dry_run = TRUE
-                ),
-                "cd /data/240 ; /data/apps/bbi nonmem run sge [001:004].mod --overwrite"
+                )$call,
+                "cd /data/240 ; bbi nonmem run sge [001:004].mod --overwrite"
               )
             })
           })

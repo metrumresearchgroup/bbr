@@ -12,7 +12,7 @@ format_cmd_args(.args, .collapse = FALSE)
 \item{.collapse}{Boolean for whether to collapse return vector to a single string (FALSE by default)}
 }
 \value{
-character vector of
+character vector of command args
 }
 \description{
 Formats command line args from a named list to a string as it would be passed on the command line
