@@ -1,14 +1,11 @@
-# path to model
+yaml_path: acop.yaml
 model_path: acop.mod
-
-# model metadata
-description: acop model for testing
-based_on:
-tags: ["acop tag", "other tag"]
-
+description: original acop model
+based_on: ''
+tags:
+- acop tag
+- other tag
 bbi_args:
-    overwrite: true
-    threads: 4
-    nm_version: nm74gf
-
-
+  overwrite: yes
+  threads: 4.0
+  nm_version: nm74gf

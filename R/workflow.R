@@ -180,7 +180,7 @@ copy_nonmem_model_from <- function(
 }
 
 
-#' Parses model outputs into a
+#' Parses model YAML files (and optionally model outputs) into a log tibble
 #' @importFrom stringr str_subset
 #' @importFrom fs dir_ls
 #' @importFrom purrr map map_lgl transpose
@@ -189,11 +189,11 @@ copy_nonmem_model_from <- function(
 #' @return tibble with information on each run
 #' @export
 run_log <- function(
-  .base_dir,
+  .base_dir = ".",
   .recurse = TRUE
 ) {
   # get yaml files
-  yaml_files <- str_subset(dir_ls(.base_dir, recurse = .recurse), "\\.ya?ml$")
+  yaml_files <- .base_dir %>% dir_ls(recurse = .recurse) %>% str_subset("\\.ya?ml$")
 
   # read in all candidate yaml's
   all_yaml <- map(yaml_files, function(.x) {read_yaml(.x)})
@@ -219,6 +219,4 @@ run_log <- function(
 
   return(df)
 }
-
-
 

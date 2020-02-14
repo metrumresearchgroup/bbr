@@ -33,8 +33,6 @@ bbi_init(".", "/opt/NONMEM")
 ################
 
 # create model spec
-spec1 <- create_model_from_yaml("acop.yaml")
-# OR
 spec1 <- create_model(
   .model_path = "acop.mod",
   .yaml_path = "acop.yaml",
