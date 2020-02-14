@@ -1,9 +1,48 @@
+#' Create new model spec by specifying relevant information as arguments
+#' Also creates necessary YAML file for using `create_run_log()` later.
+#' @param .model_path Path to control stream file for the model
+#' @param .yaml_path Path to save resulting model YAML file to
+#' @param .description Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.
+#' @param .based_on A character scaler or vector of run id's (model names) that this model was "based on." These are used to reconstuct model developement and ancestry.
+#' @param .tags A character scaler or vector with any user tags to be added to the YAML file
+#' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments. These will be written into YAML file.
+#' @param .model_type string to specify type of model being created (used for S3 class). Currently only `'nonmem'` is supported.
+#' @importFrom yaml write_yaml
+#' @return S3 object of class `bbi_{.model_type}_spec` that can be passed to `submit_model()`
+#' @export
+create_model <- function(
+  .model_path,
+  .yaml_path,
+  .description,
+  .based_on = "",
+  .tags = "",
+  .bbi_args = list(),
+  .model_type = c("nonmem")) {
+
+  # fill list from passed args
+  .spec <- list(yaml_path = .yaml_path)
+  .spec[[YAML_MOD_PATH]] <- .model_path
+  .spec[[YAML_DESCRIPTION]] <- .description
+  .spec[[YAML_BASED_ON]] <- .based_on
+  .spec[[YAML_TAGS]] <- .tags
+  .spec[[YAML_BBI_ARGS]] <- .bbi_args
+
+  # write YAML to disk
+  write_yaml(.spec, .yaml_path)
+
+  # make list S3 object
+  .model_type <- match.arg(.model_type)
+  class(.spec) <- c(as.character(glue("bbi_{.model_type}_spec")), class(.spec))
+
+  return(.spec)
+}
+
 
 #' Create new model spec from a model yaml
 #' @param .yaml_path
 #' @importFrom yaml read_yaml
 #' @importFrom purrr list_modify
-#' @return S3 object of class `bbi_nonmem_spec` that can be passed to `submit_nonmem_model()`
+#' @return S3 object of class `bbi_{.model_type}_spec` that can be passed to `submit_model()`
 #' @export
 create_model_from_yaml <- function(.yaml_path, .model_type = c("nonmem")) {
   # read in yaml
@@ -17,36 +56,6 @@ create_model_from_yaml <- function(.yaml_path, .model_type = c("nonmem")) {
 
   return(.spec)
 }
-
-
-
-# #' new model spec by specifying relevant information
-# #' Also creates necessary YAML file for using `create_run_log()` later.
-# #' @param .model_path Path to control stream file for the model
-# #' @param .yaml_path Path to save resulting model YAML file to
-# #' @param .description Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.
-# #' @param .based_on A character scaler or vector of run id's (model names) that this model was "based on." These are used to reconstuct model developement and ancestry.
-# #' @param .tags A character scaler or vector with any user tags to be added to the YAML file
-# #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments. These will be written into YAML file.
-# #' @param .update_mod_file Only valid for `.model_type = 'nonmem'`. Boolean for whether to update the `$PROBLEM` line in the specified control stream with text passed to `.description` argument. By default it is TRUE, but if FALSE control stream will be unmodified.
-# #' @importFrom fs file_copy
-# #' @importFrom readr read_file write_file
-# #' @importFrom stringr str_replace
-# #' @importFrom yaml write_yaml
-# #' @importFrom purrr list_modify
-# #' @return S3 object of class `bbi_nonmem_spec` that can be passed to `submit_nonmem_model()`
-# #' @export
-# create_nonmem_model <- function(
-#   .model_path,
-#   .yaml_path,
-#   .description,
-#   .based_on,
-#   .tags,
-#   .bbi_args,
-#   .update_mod_file) {
-#
-# }
-
 
 
 # S3 dispatch for submitting models
@@ -80,7 +89,7 @@ copy_model_from.character <- function(.parent_path, .new_model, .description, .m
     if (!((str_detect(.parent_path, "\\.yaml$")) || (str_detect(.parent_path, "\\.yml$")))) {
       warning(paste(glue("If passing a file path to `copy_model_from()`, path must be to a valid model YAML file."),
                     glue("(Got path `{.parent_path}`.)"),
-                    "Alternatively, pass a valid `'_spec'` S3 object from the output of `create_model()`"))
+                    "Alternatively, pass a valid `'_spec'` S3 object from the output of `create_model` or another `create_model_from` call."))
     }
 
     # create new model

@@ -34,6 +34,14 @@ bbi_init(".", "/opt/NONMEM")
 
 # create model spec
 spec1 <- create_model_from_yaml("acop.yaml")
+# OR
+spec1 <- create_model(
+  .model_path = "acop.mod",
+  .yaml_path = "acop.yaml",
+  .description = "original acop model",
+  .tags = c("acop tag", "other tag"),
+  .bbi_args = list(overwrite = TRUE, threads = 4, nm_version = "nm74gf")
+  )
 class(spec1)
 # [1] "bbi_nonmem_spec" "list"
 str(spec1)
