@@ -6,7 +6,7 @@
 #' @param .based_on A character scaler or vector of run id's (model names) that this model was "based on." These are used to reconstuct model developement and ancestry.
 #' @param .tags A character scaler or vector with any user tags to be added to the YAML file
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments. These will be written into YAML file.
-#' @param .model_type string to specify type of model being created (used for S3 class). Currently only `'nonmem'` is supported.
+#' @param .model_type Character scaler to specify type of model being created (used for S3 class). Currently only `'nonmem'` is supported.
 #' @importFrom yaml write_yaml
 #' @return S3 object of class `bbi_{.model_type}_spec` that can be passed to `submit_model()`
 #' @export
@@ -39,7 +39,8 @@ create_model <- function(
 
 
 #' Create new model spec from a model yaml
-#' @param .yaml_path
+#' @param .yaml_path Character scaler for the path to the YAML model file that will be used
+#' @param .model_type Character scaler to specify type of model being created (used for S3 class). Currently only `'nonmem'` is supported.
 #' @importFrom yaml read_yaml
 #' @importFrom purrr list_modify
 #' @return S3 object of class `bbi_{.model_type}_spec` that can be passed to `submit_model()`
@@ -181,6 +182,8 @@ copy_nonmem_model_from <- function(
 
 
 #' Parses model YAML files (and optionally model outputs) into a log tibble
+#' @param .base_dir Directory to look in for YAML model files
+#' @param .recurse Boolean for whether to search recursively in subdirectories
 #' @importFrom stringr str_subset
 #' @importFrom fs dir_ls
 #' @importFrom purrr map map_lgl transpose
@@ -210,7 +213,7 @@ run_log <- function(
   df <- mod_yaml %>% transpose() %>% as_tibble() %>%
     mutate_at(c(YAML_MOD_PATH, YAML_DESCRIPTION), unlist) %>%
     mutate(run_id = get_mod_id(.data[[YAML_MOD_PATH]])) %>%
-    select(run_id, everything())
+    select(.data$run_id, everything())
 
   # add yaml path
   df$yaml_path <- yaml_files[mod_yaml_bool]

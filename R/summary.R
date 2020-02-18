@@ -59,6 +59,7 @@ nonmem_summary <- function(.path,
 }
 
 #' Helper function to look for .lst function in a directory
+#' @param .x The directory path to look in for the lst file
 check_lst_file <- function(.x) {
   lst_file <- fs::dir_ls(.x, type = "file", glob = "*.lst")
   if (!length(lst_file)) {

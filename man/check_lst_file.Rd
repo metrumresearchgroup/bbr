@@ -6,6 +6,9 @@
 \usage{
 check_lst_file(.x)
 }
+\arguments{
+\item{.x}{The directory path to look in for the lst file}
+}
 \description{
 Helper function to look for .lst function in a directory
 }

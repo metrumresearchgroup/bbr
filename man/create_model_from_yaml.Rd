@@ -6,8 +6,13 @@
 \usage{
 create_model_from_yaml(.yaml_path, .model_type = c("nonmem"))
 }
+\arguments{
+\item{.yaml_path}{Character scaler for the path to the YAML model file that will be used}
+
+\item{.model_type}{Character scaler to specify type of model being created (used for S3 class). Currently only `'nonmem'` is supported.}
+}
 \value{
-S3 object of class `bbi_nonmem_spec` that can be passed to `submit_nonmem_model()`
+S3 object of class `bbi_{.model_type}_spec` that can be passed to `submit_model()`
 }
 \description{
 Create new model spec from a model yaml
