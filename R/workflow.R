@@ -218,7 +218,62 @@ run_log <- function(
   # add yaml path
   df$yaml_path <- yaml_files[mod_yaml_bool]
 
-  # potentially add other stuff (optionally?) from bbi summary, etc.
+  return(df)
+}
+
+
+#' Parses model config.json outputs into a log tibble
+#' @param .base_dir Base directory to look from model YAML files in
+#' @param .recurse Boolean for whether to search recursively in subdirectories
+#' @importFrom stringr str_subset
+#' @importFrom fs dir_ls
+#' @importFrom purrr map_df
+#' @importFrom dplyr mutate select everything
+#' @importFrom jsonlite fromJSON
+#' @return tibble with information on each run
+#' @export
+config_log <- function(
+  .base_dir = ".",
+  .recurse = TRUE
+) {
+  # define json keys to keep as constant
+  KEEPERS = c(
+    "model_name",
+    #"model_md5",
+    "data_path",
+    "data_md5",
+    "output_dir"
+  )
+
+  # get json files and parse to df
+  df <- .base_dir %>% dir_ls(recurse = .recurse) %>% str_subset("bbi_config.json$") %>%
+    map_df(function(.path) fromJSON(.path)[KEEPERS]) %>%
+    mutate(run_id = get_mod_id(.data$model_name)) %>%
+    select(.data$run_id, everything(), -.data$model_name)
+
+  return(df)
+}
+
+#' Joins config log tibble onto a matching run log tibble
+#' @param .log_df the output tibble from `run_log()`
+add_config <- function(.log_df, ...) {
+  # get config log
+  .conf_df <- config_log(...)
+
+  # check for missing rows
+  if (nrow(.log_df) != nrow(.conf_df)) {
+    warning(paste(glue("add_config() found {nrow(.log_df)} runs but found {nrow(.conf_df)} configs."),
+                  "Check for rows with `is.null('model_md5')` in tibble.",
+                  sep = "\n"))
+  }
+
+  # join to log df
+  df <- left_join(
+    .log_df,
+    .conf_df,
+    by = "run_id",
+    suffix = c(".log", ".config")
+  )
 
   return(df)
 }

@@ -107,8 +107,13 @@ res4 <- copy_model_from(res2, "acop4",
 
 
 # construct run log and view it
-log_df <- run_log(".")
+log_df <- run_log()
+print(names(log_df))
 View(log_df)
+
+# optionally add config columns (data hash, etc.)
+log_df <- run_log() %>% add_config()
+print(names(log_df))
 
 # compare some outputs from two of the runs
 model_summary(res3) %>% param_estimates() %>% head()

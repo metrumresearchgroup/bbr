@@ -1,3 +1,83 @@
+#' Reads the head and tail of specified file and prints it the console and/or returns it as a character vector.
+#' @param .file Character scaler of path to file to read
+#' @param .head Integer for number of lines to read from the top of the file
+#' @param .tail Integer for number of lines to read from the bottom of the file
+#' @importFrom readr read_lines
+check_file <- function(.file, .head = 3, .tail = 5, .print = TRUE, .return = FALSE) {
+  l <- read_lines(.file)
+
+  l_len <- length(l)
+
+  if (.head >= l_len) {
+    .head <- l_len
+    .tail <- 0
+  }
+
+  if (.tail <= 0) {
+    tail_start <- NULL
+  } else {
+    tail_start <- 1 + l_len - .tail
+
+    if(tail_start <= .head) {
+      tail_start <- .head + 1
+    }
+  }
+
+  if (!is.null(tail_start)) {
+    tail_vec <- l[tail_start:l_len]
+
+    if (tail_start > .head + 1) {
+      tail_vec <- c("...", tail_vec)
+    }
+  } else {
+    tail_vec <- ""
+  }
+
+  res_vec <- c(l[1:.head], tail_vec)
+  cat(paste(res_vec, collapse="\n"))
+  invisible()
+}
+
+
+# wrappers to interact easily with OUTPUT file
+tail_output <- function(.f, ...) {
+  UseMethod("tail_output", .f)
+}
+
+tail_output.character <- function(.file, .head = 3, .tail = 5, .print = TRUE, .return = FALSE) {
+  # if model id passed, construct path
+  if (get_mod_id(.file) == .file) {
+    .file = as.character(glue("{.file}/OUTPUT"))
+  }
+
+  check_file(.file, .head, .tail, .print, .return)
+}
+
+tail_output.bbi_nonmem_result <- function(.res, .head = 3, .tail = 5, .print = TRUE, .return = FALSE) {
+  .file <- file.path(.res$output_dir, "OUTPUT")
+  check_file(.file, .head, .tail, .print, .return)
+}
+
+
+# wrappers to interact easily with .lst file
+tail_lst <- function(.f, ...) {
+  UseMethod("tail_lst", .f)
+}
+
+tail_lst.character <- function(.file, .head = 3, .tail = 5, .print = TRUE, .return = FALSE) {
+  # if model id passed, construct path
+  if (get_mod_id(.file) == .file) {
+    .file = as.character(glue("{.file}/{.file}.lst"))
+  }
+
+  check_file(.file, .head, .tail, .print, .return)
+}
+
+tail_lst.bbi_nonmem_result <- function(.res, .head = 3, .tail = 5, .print = TRUE, .return = FALSE) {
+  .file <- file.path(.res$output_dir, paste0(get_mod_id(.res$model_path), ".lst"))
+  check_file(.file, .head, .tail, .print, .return)
+}
+
 #' Checks nonmem output file that's a whitespace-delimited file (for instance .grd or .ext)
 #' @param .path Character scalar path to the gradient file
 #' @param .x_var name of variable to filter with `.x_floor`
@@ -43,6 +123,11 @@ check_grd <- function(.x, ...) {
 }
 
 check_grd.character <- function(.path, .iter_floor = 0) {
+  # if model id passed, construct path
+  if (get_mod_id(.path) == .path) {
+    .path = as.character(glue("{.path}/{.path}.grd"))
+  }
+
   df <- check_nonmem_table_output(.path, .x_var = "ITERATION", .x_floor = .iter_floor)
   return(df)
 }
@@ -65,6 +150,11 @@ check_ext <- function(.x, ...) {
 }
 
 check_ext.character <- function(.path, .iter_floor = 0) {
+  # if model id passed, construct path
+  if (get_mod_id(.path) == .path) {
+    .path = as.character(glue("{.path}/{.path}.ext"))
+  }
+
   df <- check_nonmem_table_output(.path, .x_var = "ITERATION", .x_floor = .iter_floor)
   return(df)
 }
