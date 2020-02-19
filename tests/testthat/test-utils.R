@@ -65,7 +65,6 @@ test_that("parse_mod_yaml() returns expected list", {
                    list(
                      model_path = "data/acop.mod",
                      description = "acop model for testing",
-                     based_on = NULL,
                      tags = c("acop tag", "other tag"),
                      bbi_args = list(
                                     overwrite = TRUE,

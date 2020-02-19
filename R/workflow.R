@@ -1,6 +1,6 @@
 #' Create new model spec by specifying relevant information as arguments
 #' Also creates necessary YAML file for using `create_run_log()` later.
-#' @param .model_path Path to control stream file for the model
+#' @param .model_path Path to control stream file for the model. Must be an absolute path, or the model path relative to the location of the YAML file. It recommended for the control stream and YAML to be in the same directory.
 #' @param .yaml_path Path to save resulting model YAML file to
 #' @param .description Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.
 #' @param .based_on A character scaler or vector of run id's (model names) that this model was "based on." These are used to reconstuct model developement and ancestry.
@@ -14,18 +14,18 @@ create_model <- function(
   .model_path,
   .yaml_path,
   .description,
-  .based_on = "",
-  .tags = "",
-  .bbi_args = list(),
+  .based_on = NULL,
+  .tags = NULL,
+  .bbi_args = NULL,
   .model_type = c("nonmem")) {
 
   # fill list from passed args
   .spec <- list(yaml_path = .yaml_path)
   .spec[[YAML_MOD_PATH]] <- .model_path
   .spec[[YAML_DESCRIPTION]] <- .description
-  .spec[[YAML_BASED_ON]] <- .based_on
-  .spec[[YAML_TAGS]] <- .tags
-  .spec[[YAML_BBI_ARGS]] <- .bbi_args
+  if (!is.null(.based_on)) .spec[[YAML_BASED_ON]] <- scaler_to_list(.based_on)
+  if (!is.null(.tags)) .spec[[YAML_TAGS]] <- scaler_to_list(.tags)
+  if (!is.null(.bbi_args)) .spec[[YAML_BBI_ARGS]] <- .bbi_args
 
   # write YAML to disk
   write_yaml(.spec, .yaml_path)
@@ -163,10 +163,10 @@ copy_nonmem_model_from <- function(
   new_yaml[[YAML_DESCRIPTION]] <- .description
 
   # fill tags
-  if (.inherit_tags) {
-    new_yaml[[YAML_TAGS]] <- c(parent_yaml$tags, .add_tags)
+  if (.inherit_tags && !is.null(parent_yaml[[YAML_TAGS]])) {
+    new_yaml[[YAML_TAGS]] <- c(parent_yaml[[YAML_TAGS]], .add_tags)
   } else {
-    new_yaml[[YAML_TAGS]] <- .add_tags
+    new_yaml[[YAML_TAGS]] <- scaler_to_list(.add_tags)
   }
 
   # write new_yaml out
@@ -210,7 +210,8 @@ run_log <- function(
   mod_yaml <- all_yaml[which(mod_yaml_bool)]
 
   # transpose yaml list to tibble
-  df <- mod_yaml %>% transpose() %>% as_tibble() %>%
+  .col_names <- map(mod_yaml, function(.x) {return(names(.x))}) %>% unlist() %>% unique()
+  df <- mod_yaml %>% transpose(.names = .col_names) %>% as_tibble() %>%
     mutate_at(c(YAML_MOD_PATH, YAML_DESCRIPTION), unlist) %>%
     mutate(run_id = get_mod_id(.data[[YAML_MOD_PATH]])) %>%
     select(.data$run_id, everything())

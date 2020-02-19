@@ -195,3 +195,11 @@ get_mod_id <- function(.mod_path) {
 check_mod_yaml_keys <- function(.list) {
   all(YAML_REQ_KEYS %in% names(.list))
 }
+
+scaler_to_list <- function(.x) {
+  if (length(.x) == 1) {
+    .x <- (list(.x))
+  }
+  return(.x)
+}
+

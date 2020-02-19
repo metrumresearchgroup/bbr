@@ -9,14 +9,14 @@ create_model(
   .model_path,
   .yaml_path,
   .description,
-  .based_on = "",
-  .tags = "",
-  .bbi_args = list(),
+  .based_on = NULL,
+  .tags = NULL,
+  .bbi_args = NULL,
   .model_type = c("nonmem")
 )
 }
 \arguments{
-\item{.model_path}{Path to control stream file for the model}
+\item{.model_path}{Path to control stream file for the model. Must be an absolute path, or the model path relative to the location of the YAML file. It recommended for the control stream and YAML to be in the same directory.}
 
 \item{.yaml_path}{Path to save resulting model YAML file to}
 

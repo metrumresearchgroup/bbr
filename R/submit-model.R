@@ -56,7 +56,9 @@ submit_nonmem_model <- function(.path,
     .path <- yaml_list[[YAML_MOD_PATH]]
 
     # update .args from yaml
-    .args <- parse_args_list(.args, yaml_list[[YAML_BBI_ARGS]])
+    if (!is.null(yaml_list[[YAML_BBI_ARGS]])) {
+      .args <- parse_args_list(.args, yaml_list[[YAML_BBI_ARGS]])
+    }
 
   } else {
     .yaml_path <- NULL

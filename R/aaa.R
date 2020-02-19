@@ -41,10 +41,7 @@ YAML_TAGS <- "tags"
 YAML_BBI_ARGS <- "bbi_args"
 YAML_REQ_KEYS <- c(
   YAML_MOD_PATH,
-  YAML_DESCRIPTION,
-  YAML_BASED_ON,
-  YAML_TAGS,
-  YAML_BBI_ARGS
+  YAML_DESCRIPTION
 )
 
 # error messages that we grep for

@@ -15,7 +15,7 @@ for (m in c(new_mod2, new_mod3)) {
 
 test_that("copy_from_model creates accurate copy", {
   # run copy_model_from
-  copy_model_from(orig_mod_yaml_path, new_mod2, new_desc)
+  copy_model_from(orig_mod_yaml_path, new_mod2, new_desc, .add_tags = new_tags)
 
   # check that everything is copied through
   new_yaml <- yaml::read_yaml(paste0(new_mod2, ".yaml"))
@@ -23,7 +23,7 @@ test_that("copy_from_model creates accurate copy", {
   expect_identical(new_yaml[[YAML_MOD_PATH]], paste0(new_mod2, ".mod"))
   expect_identical(new_yaml[[YAML_DESCRIPTION]], new_desc)
   expect_identical(new_yaml[[YAML_BASED_ON]], "acop")
-  expect_identical(new_yaml[[YAML_TAGS]], c("acop tag", "other tag"))
+  expect_identical(new_yaml[[YAML_TAGS]], c("acop tag", "other tag", new_tags))
   expect_identical(new_yaml[[YAML_BBI_ARGS]], list(overwrite = TRUE, threads = 4L, nm_version = "nm74gf"))
 
   # check the control stream is modified
@@ -41,7 +41,6 @@ test_that("copy_from_model options work", {
                   new_desc,
                   .based_on_additional = get_mod_id(new_mod2),
                   .inherit_tags = FALSE,
-                  .add_tags = new_tags,
                   .update_mod_file = FALSE)
 
   # check that everything is copied through
@@ -50,7 +49,7 @@ test_that("copy_from_model options work", {
   expect_identical(new_yaml[[YAML_MOD_PATH]], paste0(new_mod3, ".mod"))
   expect_identical(new_yaml[[YAML_DESCRIPTION]], new_desc)
   expect_identical(new_yaml[[YAML_BASED_ON]], c("acop", get_mod_id(new_mod2)))
-  expect_identical(new_yaml[[YAML_TAGS]], new_tags)
+  expect_null(new_yaml[[YAML_TAGS]])
   expect_identical(new_yaml[[YAML_BBI_ARGS]], list(overwrite = TRUE, threads = 4L, nm_version = "nm74gf"))
 
   # check the control stream is not modified
@@ -66,7 +65,7 @@ test_that("copy_from_model options work", {
 
 test_that("run_log matches reference tibble", {
   df <- suppressWarnings(run_log("data"))
-  ref_df <- readRDS("data/run_log_basic_200211.rds")
+  ref_df <- readRDS("data/run_log_basic_200219.rds")
   expect_identical(df, ref_df)
 })
 
