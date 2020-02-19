@@ -188,18 +188,20 @@ check_nonmem_progress <- function(.res, .ext_wait = 30) {
   # look for ext file
   SLEEP = 1
   ext_path <- file.path(.res$output_dir, paste0(get_mod_id(.res$model_path), ".ext"))
-  while (.ext_wait > 0) {
-    if (fs::file_exists(ext_path)) {
-      break
-    } else {
-      cat(as.character(glue("Can't find {ext_path}. Waiting {.ext_wait} more seconds...")), sep = "\n")
-      Sys.sleep(SLEEP)
-      .ext_wait <- .ext_wait - SLEEP
+  if (!fs::file_exists(ext_path)) {
+    while (.ext_wait > 0) {
+      if (fs::file_exists(ext_path)) {
+        break
+      } else {
+        cat(as.character(glue("Can't find {ext_path}. Waiting {.ext_wait} more seconds...")), sep = "\n")
+        Sys.sleep(SLEEP)
+        .ext_wait <- .ext_wait - SLEEP
+      }
     }
-  }
-  if (.ext_wait <= 0) {
-    warning(glue("Can't find {ext_path}. Your run may still be queued or it may have failed. Try increasing `.wait_ext` if you want to continue checking."))
-    return(FALSE)
+    if (.ext_wait <= 0) {
+      warning(glue("Can't find {ext_path}. Your run may still be queued or it may have failed. Try increasing `.wait_ext` if you want to continue checking."))
+      return(FALSE)
+    }
   }
 
   # if found, check if ext file has rows with negative iterations (which means it finished)

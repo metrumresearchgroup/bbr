@@ -81,6 +81,14 @@ model_summary <- function(.res, ...) {
 #' @param ... arguments passed through to `nonmem_summary()`
 #' @export
 model_summary.bbi_nonmem_result <- function(.res, .wait = 30, .ext_wait = 30, ...) {
+  # if .wait=NULL just run once and don't wait for ext file
+  if (is.null(.wait)) {
+    .done <- check_nonmem_progress(.res, .ext_wait = 0)
+    if (!.done) {
+      stop(glue("Summary failed because {.res$model_path} is not finished. Check back later or set `.wait` to a positive non-zero value."))
+    }
+  }
+
   start <- Sys.time()
   .chill <- NULL
   # check if model run is finished

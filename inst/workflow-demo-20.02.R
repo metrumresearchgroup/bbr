@@ -50,6 +50,10 @@ class(res1)
 # [1] "bbi_nonmem_result" "babylon_result"    "list"
 res1
 
+# Try to get a summary but return immediately if model isn't finished
+sum1 <- model_summary(res1, .wait = NULL)
+
+# Try to get a summary and wait if not finished.
 sum1 <- model_summary(res1)
 class(sum1)
 # [1] "bbi_nonmem_summary" "list"
@@ -76,7 +80,6 @@ class(res2)
 res2
 
 # do all the same stuff you did with the first one
-sum2 <- NULL
 sum2 <- model_summary(res2)
 print(names(sum2))
 
@@ -92,19 +95,16 @@ cleanup_demo()
 ########################
 
 # iterate on original and run it
-res2 <- copy_model_from(spec1, "acop2", "model 2 description") %>%
-  submit_model()
-
-# another iteration
-res3 <- copy_model_from(res2, "acop3",
-                        "model 2 with some changes",
-                        .add_tags = c("new tag")) %>% submit_model()
-
-# another iteration based on acop2
-res4 <- copy_model_from(res2, "acop4",
-                        "model 2 with different changes",
-                        .add_tags = c("new tag"),
-                        .based_on_additional = c("acop3")) %>% submit_model()
+submit_model(spec1) %>%
+  copy_model_from("acop2",
+                  "model 2 description") %>% submit_model() %>%
+  copy_model_from("acop3",
+                  "model 2 with some changes",
+                  .add_tags = c("new tag")) %>% submit_model() %>%
+  copy_model_from("acop4",
+                  "model 2 with different changes",
+                  .add_tags = c("new tag"),
+                  .based_on_additional = c("acop2")) %>% submit_model()
 
 
 # construct run log and view it
@@ -112,13 +112,15 @@ log_df <- run_log()
 print(names(log_df))
 View(log_df)
 
-# optionally add config columns (data hash, etc.)
+# optionally add config columns (model hash, etc.)
 log_df <- run_log() %>% add_config()
 print(names(log_df))
+View(log_df)
 
 # compare some outputs from two of the runs
-model_summary(res3) %>% param_estimates() %>% head()
-model_summary(res4) %>% param_estimates() %>% head()
+model_summary("acop3") %>% param_estimates() %>% head()
+model_summary("acop4") %>% param_estimates() %>% head()
+
 
 # delete temp demo files
 cleanup_demo()

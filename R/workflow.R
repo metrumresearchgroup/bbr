@@ -196,7 +196,7 @@ run_log <- function(
   .recurse = TRUE
 ) {
   # get yaml files
-  yaml_files <- .base_dir %>% dir_ls(recurse = .recurse) %>% str_subset("\\.ya?ml$")
+  yaml_files <- .base_dir %>% dir_ls(recurse = .recurse) %>% str_subset("\\.ya?ml$") %>% str_subset("babylon\\.yaml$", negate = TRUE)
 
   # read in all candidate yaml's
   all_yaml <- map(yaml_files, function(.x) {read_yaml(.x)})
@@ -218,6 +218,7 @@ run_log <- function(
   # add yaml path
   df$yaml_path <- yaml_files[mod_yaml_bool]
 
+  class(df) <- c("bbi_nonmem_summary_df", class(df))
   return(df)
 }
 
@@ -246,12 +247,18 @@ config_log <- function(
   )
 
   # get json files and parse to df
-  df <- .base_dir %>% dir_ls(recurse = .recurse) %>% str_subset("bbi_config.json$") %>%
-    map_df(function(.path) fromJSON(.path)[KEEPERS]) %>%
-    mutate(run_id = get_mod_id(.data$model_name)) %>%
-    select(.data$run_id, everything(), -.data$model_name)
+  json_files <- .base_dir %>% dir_ls(recurse = .recurse) %>% str_subset("bbi_config.json$")
+  if (length(json_files) == 0) {
+    warning(glue("Found no bbi_config.json files in {.base_dir}"))
+    return(NULL)
+  } else {
+    df <- json_files %>%
+      map_df(function(.path) fromJSON(.path)[KEEPERS]) %>%
+      mutate(run_id = get_mod_id(.data$model_name)) %>%
+      select(.data$run_id, everything(), -.data$model_name)
 
-  return(df)
+    return(df)
+  }
 }
 
 #' Joins config log tibble onto a matching run log tibble
@@ -264,9 +271,14 @@ add_config <- function(.log_df, ...) {
   .conf_df <- config_log(...)
 
   # check for missing rows
-  if (nrow(.log_df) != nrow(.conf_df)) {
+  if (is.null(.conf_df)) {
     warning(paste(glue("add_config() found {nrow(.log_df)} runs but found {nrow(.conf_df)} configs."),
-                  "Check for rows with `is.null('model_md5')` in tibble.",
+                  "Check if your runs are still in progress.",
+                  sep = "\n"))
+    return(.log_df)
+  } else if (nrow(.log_df) != nrow(.conf_df)) {
+    warning(paste(glue("add_config() found {nrow(.log_df)} runs but found {nrow(.conf_df)} configs."),
+                  "Check for rows with `is.null('model_md5')` in tibble. Some runs may have failed or still be in progress.",
                   sep = "\n"))
   }
 
