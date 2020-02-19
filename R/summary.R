@@ -74,7 +74,31 @@ model_summary <- function(.res, ...) {
   UseMethod("model_summary", .res)
 }
 
-model_summary.bbi_nonmem_result <- function(.res, ...) {
+#' Get model summary from `bbi_nonmem_result` object and optionally check if model is done before erroring
+#' @param .res `bbi_nonmem_result` object for summary
+#' @param .wait Integer number of seconds to wait trying `check_nonmem_progress()` for the model to be done.
+#' @param .ext_wait Integer number of seconds to wait for an .ext file (i.e. for the model to start). Passed through to `check_nonmem_progress()`
+#' @param ... arguments passed through to `nonmem_summary()`
+#' @export
+model_summary.bbi_nonmem_result <- function(.res, .wait = 30, .ext_wait = 30, ...) {
+  start <- Sys.time()
+  .chill <- NULL
+  # check if model run is finished
+  .done <- check_nonmem_progress(.res, .ext_wait = .ext_wait)
+  while(!.done) {
+    .chill <- 3
+    if (as.numeric(Sys.time() - start) < .wait) {
+      .done <- check_nonmem_progress(.res, .ext_wait = .ext_wait)
+    } else {
+      stop(glue("{.res$model_path} is not finished and {.wait} second wait time has elapsed. Check back later or increase `.wait`."))
+    }
+  }
+  if (!is.null(.chill)) {
+    cat("\n\n---\nModel run finished. Preparing summary...", sep = "\n")
+    Sys.sleep(.chill)
+  }
+
+  # get summary
   res_list <- nonmem_summary(.res$output_dir, ...)
   return(res_list)
 }

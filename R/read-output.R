@@ -2,6 +2,8 @@
 #' @param .file Character scaler of path to file to read
 #' @param .head Integer for number of lines to read from the top of the file
 #' @param .tail Integer for number of lines to read from the bottom of the file
+#' @param .print Boolean for whether to print resulting head and tail to console. Defaults to TRUE.
+#' @param .return Boolean for whether to return resulting head and tail as a character vector. Defaults to FALSE.
 #' @importFrom readr read_lines
 check_file <- function(.file, .head = 3, .tail = 5, .print = TRUE, .return = FALSE) {
   l <- read_lines(.file)
@@ -33,9 +35,17 @@ check_file <- function(.file, .head = 3, .tail = 5, .print = TRUE, .return = FAL
     tail_vec <- ""
   }
 
+  # return and/or print
   res_vec <- c(l[1:.head], tail_vec)
-  cat(paste(res_vec, collapse="\n"))
-  invisible()
+
+  if (.print) {
+    cat(paste(res_vec, collapse="\n"))
+  }
+  if (.return) {
+    return(res_vec)
+  } else {
+    invisible()
+  }
 }
 
 
@@ -169,4 +179,46 @@ plot_ext <- function(.df, ...) {
   plot_nonmem_table_df(.df, .x_var = "ITERATION", .stat_name = "GRADIENT")
 }
 
+#' Check the progress of a NONMEM run from the bbi_nonmem_result object
+#' @param .res `bbi_nonmem_summary` object to check on
+#' @param .ext_wait Integer number of seconds to wait for an .ext file to be there before exiting with FALSE
+#' @importFrom fs file_exists
+#' @export
+check_nonmem_progress <- function(.res, .ext_wait = 30) {
+  # look for ext file
+  SLEEP = 1
+  ext_path <- file.path(.res$output_dir, paste0(get_mod_id(.res$model_path), ".ext"))
+  while (.ext_wait > 0) {
+    if (fs::file_exists(ext_path)) {
+      break
+    } else {
+      cat(as.character(glue("Can't find {ext_path}. Waiting {.ext_wait} more seconds...")), sep = "\n")
+      Sys.sleep(SLEEP)
+      .ext_wait <- .ext_wait - SLEEP
+    }
+  }
+  if (.ext_wait <= 0) {
+    warning(glue("Can't find {ext_path}. Your run may still be queued or it may have failed. Try increasing `.wait_ext` if you want to continue checking."))
+    return(FALSE)
+  }
 
+  # if found, check if ext file has rows with negative iterations (which means it finished)
+  done_rows <- check_ext(.res, .iter_floor = NULL) %>% filter(.data$ITERATION < 0) %>% nrow()
+  if (done_rows > 0) {
+    return(TRUE)
+  } else {
+    # try to get tail of OUTPUT file
+    out_tail <- tryCatch(
+      tail_output(.res, .tail = 10, .head = 0, .print = FALSE, .return = TRUE),
+      error = function(e) {
+        warning(glue("{ext_path} file does not look finished but there is also no `{.res$output_dir}/OUTPUT` file. Your run may have failed."))
+        return(FALSE)
+      }
+    )
+    cat(paste(
+      glue("\n\n---\nModel is still running. Tail of `{.res$output_dir}/OUTPUT` file:"), "\n---\n",
+      paste(out_tail, collapse = "\n")
+    ))
+    return(FALSE)
+  }
+}

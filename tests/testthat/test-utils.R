@@ -3,7 +3,7 @@ context("Utility functions for building args, etc.")
 test_that("check_nonmem_args parses correctly", {
   # check some that should parse correctly
   .arg_list <- list(
-    list(list("json" = T, "threads" = 4, "nm_version" = "nm74"), c("--json", "--threads=4", "--nmVersion=nm74")), # check `nm_version` converted to `--nmVersion`
+    list(list("json" = T, "threads" = 4, "nm_version" = "nm74"), c("--json", "--threads=4", "--nm_version=nm74")), # check flag conversion
     list(list("json" = T, "threads" = 4, debug=F), c("--json", "--threads=4")), # check bool=F not passed through
     list(list("json" = T, "threads" = 4, debug=T), c("--json", "--threads=4", "--debug"))  # check same bool=T is passed through
   )

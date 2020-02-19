@@ -239,7 +239,7 @@ config_log <- function(
   # define json keys to keep as constant
   KEEPERS = c(
     "model_name",
-    #"model_md5",
+    "model_md5",
     "data_path",
     "data_md5",
     "output_dir"
@@ -256,6 +256,9 @@ config_log <- function(
 
 #' Joins config log tibble onto a matching run log tibble
 #' @param .log_df the output tibble from `run_log()`
+#' @param ... arguments passed through to `config_log()`
+#' @importFrom dplyr left_join
+#' @export
 add_config <- function(.log_df, ...) {
   # get config log
   .conf_df <- config_log(...)

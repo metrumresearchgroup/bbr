@@ -76,6 +76,7 @@ class(res2)
 res2
 
 # do all the same stuff you did with the first one
+sum2 <- NULL
 sum2 <- model_summary(res2)
 print(names(sum2))
 

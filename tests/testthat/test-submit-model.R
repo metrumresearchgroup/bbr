@@ -30,7 +30,7 @@ test_that("submit-nonmem-model(.dry_run=T) returns correct command string",
                   ),
                   .dry_run = TRUE
                 )$call,
-                "cd /data/240 ; bbi nonmem run sge 001.mod --json --threads=4 --nmVersion=nm74"
+                "cd /data/240 ; bbi nonmem run sge 001.mod --json --threads=4 --nm_version=nm74"
               )
 
               # multiple models
@@ -51,13 +51,13 @@ test_that("submit-nonmem-model(.dry_run=T) for yaml input parses correctly",
               # correctly parsing yaml
               expect_identical(
                 submit_nonmem_model("data/acop.yaml", .dry_run = T)$call,
-                "cd data ; bbi nonmem run sge acop.mod --overwrite --threads=4 --nmVersion=nm74gf"
+                "cd data ; bbi nonmem run sge acop.mod --overwrite --threads=4 --nm_version=nm74gf"
               )
 
               # over-riding passed arg with yaml arg
               expect_identical(
                 submit_nonmem_model("data/acop.yaml", .args=list(threads=2), .dry_run = T)$call,
-                "cd data ; bbi nonmem run sge acop.mod --threads=4 --overwrite --nmVersion=nm74gf"
+                "cd data ; bbi nonmem run sge acop.mod --threads=4 --overwrite --nm_version=nm74gf"
               )
             })
           })
