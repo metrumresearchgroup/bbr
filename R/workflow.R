@@ -17,10 +17,10 @@ create_model <- function(
   .based_on = "",
   .tags = "",
   .bbi_args = list(),
-  .model_type = c("nonmem")) {
+  .model_type = c("nonmem", "stan")) {
 
   # fill list from passed args
-  .spec <- list(yaml_path = .yaml_path)
+  .spec <- list()
   .spec[[YAML_MOD_PATH]] <- .model_path
   .spec[[YAML_DESCRIPTION]] <- .description
   .spec[[YAML_BASED_ON]] <- .based_on
@@ -48,9 +48,6 @@ create_model_from_yaml <- function(.yaml_path, .model_type = c("nonmem")) {
   # read in yaml
   mod_yaml <- parse_mod_yaml(.yaml_path)
 
-  # create spec S3 object
-  .spec <- list_modify(mod_yaml, yaml_path = .yaml_path)
-
   .model_type <- match.arg(.model_type)
   class(.spec) <- c(as.character(glue("bbi_{.model_type}_spec")), class(.spec))
 
@@ -65,7 +62,7 @@ copy_model_from <- function(.spec, ...) {
 
 copy_model_from.bbi_nonmem_spec <- function(.parent_spec, .new_model, .description,...) {
   .spec <- copy_nonmem_model_from(
-    .parent_spec$yaml_path,
+    yaml_ext(.parent_spec$model_path),
     .new_model,
     .description,
     ...)
@@ -74,7 +71,7 @@ copy_model_from.bbi_nonmem_spec <- function(.parent_spec, .new_model, .descripti
 
 copy_model_from.bbi_nonmem_result <- function(.parent_res, .new_model, .description,...) {
   .spec <- copy_nonmem_model_from(
-    .parent_res$yaml_path,
+    sprintf("%s.yaml",tools::file_path_sans_ext(.parent_spec$model_path)),
     .new_model,
     .description,
     ...)
@@ -173,7 +170,6 @@ copy_nonmem_model_from <- function(
   write_yaml(new_yaml, new_yaml_path)
 
   # create spec S3 object
-  .spec <- list_modify(new_yaml, yaml_path = new_yaml_path)
   class(.spec) <- c("bbi_nonmem_spec", class(.spec))
 
   return(.spec)

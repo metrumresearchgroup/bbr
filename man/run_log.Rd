@@ -2,13 +2,13 @@
 % Please edit documentation in R/workflow.R
 \name{run_log}
 \alias{run_log}
-\title{Parses model outputs into a}
+\title{Parses model YAML files (and optionally model outputs) into a log tibble}
 \usage{
-run_log(.base_dir, .recurse = TRUE)
+run_log(.base_dir = ".", .recurse = TRUE)
 }
 \value{
 tibble with information on each run
 }
 \description{
-Parses model outputs into a
+Parses model YAML files (and optionally model outputs) into a log tibble
 }

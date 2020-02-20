@@ -1,6 +1,7 @@
-
+library(glue)
+library(rbabylon)
 # move to demo folder
-setwd(system.file(package="rbabylon", "nonmem"))
+#setwd(system.file(package="rbabylon", "nonmem"))
 print(glue::glue("switched working directory to `{getwd()}` for demo."))
 
 # cleanup function
@@ -23,10 +24,10 @@ cleanup_demo <- function() {
 cleanup_demo()
 
 # setup bbi path
-options('rbabylon.bbi_exe_path' = '/data/apps/bbi')
+#options('rbabylon.bbi_exe_path' = '/data/apps/bbi')
 
 # create babylon.yaml
-bbi_init(".", "/opt/NONMEM")
+#bbi_init(".", "/opt/NONMEM")
 
 ################
 # step by step
@@ -34,11 +35,11 @@ bbi_init(".", "/opt/NONMEM")
 
 # create model spec
 spec1 <- create_model(
-  .model_path = "acop.mod",
-  .yaml_path = "acop.yaml",
+  .model_path = "1.ctl",
+  .yaml_path = "1.yaml",
   .description = "original acop model",
   .tags = c("acop tag", "other tag"),
-  .bbi_args = list(overwrite = TRUE, threads = 4, nm_version = "nm74gf")
+  .bbi_args = list(overwrite = TRUE, threads = 4)
   )
 class(spec1)
 # [1] "bbi_nonmem_spec" "list"
@@ -46,6 +47,7 @@ str(spec1)
 
 # submit model
 res1 <- submit_model(spec1)
+res1 <- submit_model("path/to/acop.yaml")
 class(res1)
 # [1] "bbi_nonmem_result" "babylon_result"    "list"
 res1
@@ -58,8 +60,7 @@ print(names(sum1))
 # [7] "covariance_theta"  "correlation_theta"
 str(sum1)
 
-par_df1 <- param_estimates(sum1)
-options("crayon.enabled" = FALSE) # turn off annoying tibble color printing
+  par_df1 <- param_estimates(sum1) %>% mutate(val = ifelse(param == "THETA"))
 head(par_df1)
 
 #########
@@ -91,8 +92,7 @@ cleanup_demo()
 ########################
 
 # iterate on original and run it
-res2 <- copy_model_from(spec1, "acop2", "model 2 description") %>%
-  submit_model()
+res2 <- copy_model_from(spec1, "acop2", "add additive error to residual error model")
 
 # another iteration
 res3 <- copy_model_from(res2, "acop3",
@@ -100,7 +100,7 @@ res3 <- copy_model_from(res2, "acop3",
                         .add_tags = c("new tag")) %>% submit_model()
 
 # another iteration based on acop2
-res4 <- copy_model_from(res2, "acop4",
+res4 <- copy_model_from(res1, "acop4",
                         "model 2 with different changes",
                         .add_tags = c("new tag"),
                         .based_on_additional = c("acop3")) %>% submit_model()

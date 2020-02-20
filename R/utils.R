@@ -130,12 +130,18 @@ parse_mod_yaml <- function(.path) {
   yaml_list <- read_yaml(.path)
 
   # parse model path
-  if (!check_mod_yaml_keys(yaml_list)) {
+  if (isTRUE(getOption("rbabylon.strict")) && !check_mod_yaml_keys(yaml_list)) {
     stop(paste0(
       "Model yaml must have keys `", paste(YAML_REQ_KEYS, collapse=", "), "` specified in it. ",
       "But `", paste(YAML_REQ_KEYS[!(YAML_REQ_KEYS %in% names(yaml_list))], collapse=", "), "` are missing. ",
       .path, " has the following keys: ", paste(names(yaml_list), collapse=", ")
       ))
+  }
+  # by default, if no model defined, will set it to the yaml file name with extension ctl
+  if (is.null(yaml_list[[YAML_MOD_PATH]])) {
+    yaml_list[[YAML_MOD_PATH]] <- ctl_ext(basename(.path))
+  } else if (!is_valid_model_extension(yaml_list$model_path)) {
+    stop(glue::glue("model_path defined in yaml at {.path} must have either a .ctl or .mod extension, not {yaml_list[[YAML_MOD_PATH]]}"))
   }
 
   return(yaml_list)
@@ -194,4 +200,29 @@ get_mod_id <- function(.mod_path) {
 
 check_mod_yaml_keys <- function(.list) {
   all(YAML_REQ_KEYS %in% names(.list))
+}
+
+`%||%` <- function(x, y) {
+  if (is.null(x)) {
+    return(y)
+  }
+  return(x)
+}
+
+is_valid_model_extension <- function(.x) {
+  tools::file_ext(.path) %in% c("ctl", "mod")
+}
+
+# helpers that strip extension then add a diffent type
+
+ctl_ext <- function(.x) {
+  sprintf("%s.ctl", tools::file_path_sans_ext(.x))
+}
+
+mod_ext <- function(.x) {
+  sprintf("%s.mod", tools::file_path_sans_ext(.x))
+}
+
+yaml_ext <- function(.x) {
+  sprintf("%s.yaml", tools::file_path_sans_ext(.x))
 }

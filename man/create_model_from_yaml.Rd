@@ -7,7 +7,7 @@
 create_model_from_yaml(.yaml_path, .model_type = c("nonmem"))
 }
 \value{
-S3 object of class `bbi_nonmem_spec` that can be passed to `submit_nonmem_model()`
+S3 object of class `bbi_{.model_type}_spec` that can be passed to `submit_model()`
 }
 \description{
 Create new model spec from a model yaml

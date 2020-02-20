@@ -1,10 +1,15 @@
 # S3 dispatch for submitting models
+#' submit model
+#' @export
+#' @param .spec spec
+#' @param ... additions args to pass to specific implementatsion
+#' @rdname submit_model
 submit_model <- function(.spec, ...) {
   UseMethod("submit_model", .spec)
 }
 
-submit_model.bbi_nonmem_spec <- function(.spec, ...) {
-  res <- submit_nonmem_model(.spec$yaml_path, ...)
+submit_model.bbi_nonmem_spec <- function(.spec, .path = getwd(), ...) {
+  res <- submit_nonmem_model(file.path(getwd(), yaml_ext(.spec$yaml_path)), ...)
   return(res)
 }
 
@@ -31,7 +36,6 @@ submit_model.character <- function(.path, .model_type = c("nonmem"), ...) {
 #' @param .args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.
 #' @param ... args passed through to `bbi_exec()`
 #' @param .config_path Optionally specify a path to a babylon.yml config. If not specified, the config in the model directory will be used by default. Path MUST be either an absolute path or relative to the model directory.
-#' @param .output_dir Name of directory that output will be written to. If NULL is passed (default) then it assumed to be the name of the model file (with the extension stripped).
 #' @param .wait Boolean for whether to wait for the bbi process to return before this function call returns.
 #' @param .dry_run Returns character string of command that would be run, insted of running it. This is primarily for testing but also a debugging tool.
 #' @importFrom stringr str_detect
@@ -39,21 +43,23 @@ submit_model.character <- function(.path, .model_type = c("nonmem"), ...) {
 #' @importFrom purrr list_modify
 #' @return output from the model run (?)
 #' @export
+#' @rdname submit_model
 submit_nonmem_model <- function(.path,
                                 .mode = c("sge", "local"),
                                 .args = NULL,
                                 ...,
                                 .config_path=NULL,
-                                .output_dir=NULL,
                                 .wait = TRUE,
                                 .dry_run=FALSE) {
 
+  # TODO: seth fix with constant and lookup from yaml
+  .output_dir <- NULL
   # parse yaml, if passed
-  if ((str_detect(.path, "\\.yaml$")) || (str_detect(.path, "\\.yml$"))) {
+  if (tools::file_ext(.path) %in% c("yaml", "yml")) {
     yaml_list <- parse_mod_yaml(.path)
     # reset model path
     .yaml_path <- .path
-    .path <- yaml_list[[YAML_MOD_PATH]]
+
 
     # update .args from yaml
     .args <- parse_args_list(.args, yaml_list[[YAML_BBI_ARGS]])
@@ -67,7 +73,7 @@ submit_nonmem_model <- function(.path,
 
   # parse model directory and model filename
   model_dir <- dirname(.path)
-  model <- basename(.path)
+  model <- yaml_list[[YAML_MOD_PATH]]
   if (model_dir == ".") {
     # given a path that is just the model name, set directory to getwd()
     model_dir <- getwd()

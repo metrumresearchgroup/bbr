@@ -1,0 +1,12 @@
+model_path: 1.ctl
+description: original acop model
+decisions:
+ - some note
+ - something else
+based_on: ''
+tags:
+- acop tag
+- other tag
+bbi_args:
+  overwrite: yes
+  threads: 4.0
