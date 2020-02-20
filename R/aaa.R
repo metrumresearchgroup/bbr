@@ -34,6 +34,7 @@ NONMEM_ARGS = list(
 )
 
 # YAML keys that are hard-coded
+YAML_YAML_PATH <- "yaml_path"
 YAML_MOD_PATH <- "model_path"
 YAML_DESCRIPTION <- "description"
 YAML_BASED_ON <- "based_on"

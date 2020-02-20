@@ -126,3 +126,48 @@ model_summary("acop4") %>% param_estimates() %>% head()
 cleanup_demo()
 
 
+########################
+# more realistic workflow
+########################
+
+# iterate on original and run it
+res1 <- submit_model(spec1)
+
+# look at results in sum1
+sum1 <- model_summary(res1)
+
+# after it works, add some tags, etc
+res1 <- res1 %>% add_tags("base model")
+
+#
+spec2 <- res1 %>% copy_model_from("acop2",
+                                  "use proportional error model")
+
+spec3 <- res1 %>% copy_model_from("acop3",
+                                  "use mixed error model")
+
+#### change the ctl files manually
+
+# submit new models
+res_list <- submit_models(list(spec2, spec3))
+
+res2 <- submit_model(spec2, .args = list(threads = 6))
+res3 <- submit_model(spec3)
+
+# construct run log and view it
+log_df <- run_log()
+View(log_df)
+
+# add some tags and notes
+res2 <- "acop2" %>% add_tags("iterations round 1", "pretty good but whatever") %>% add_decisions("Made change x in prop error model")
+res3 <- res3 %>% add_tags("iterations round 1") %>% add_decisions(c("Added param z in mixed error model", "some other thing"))
+
+# look at updated run log view it
+log_df <- run_log()
+View(log_df)
+
+# filter it
+log_df %>% filter(tags == "iterations round 1") %>% View()
+
+# delete temp demo files
+cleanup_demo()

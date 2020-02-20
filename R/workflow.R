@@ -20,7 +20,8 @@ create_model <- function(
   .model_type = c("nonmem")) {
 
   # fill list from passed args
-  .spec <- list(yaml_path = .yaml_path)
+  .spec <- list()
+  .spec[[YAML_YAML_PATH]] <- .yaml_path
   .spec[[YAML_MOD_PATH]] <- .model_path
   .spec[[YAML_DESCRIPTION]] <- .description
   if (!is.null(.based_on)) .spec[[YAML_BASED_ON]] <- scaler_to_list(.based_on)
@@ -28,7 +29,7 @@ create_model <- function(
   if (!is.null(.bbi_args)) .spec[[YAML_BBI_ARGS]] <- .bbi_args
 
   # write YAML to disk
-  write_yaml(.spec, .yaml_path)
+  save_mod_yaml(.spec)
 
   # make list S3 object
   .model_type <- match.arg(.model_type)

@@ -203,3 +203,8 @@ scaler_to_list <- function(.x) {
   return(.x)
 }
 
+save_mod_yaml <- function(.spec) {
+  .out_path <- .spec[[YAML_YAML_PATH]]
+  .spec[[YAML_YAML_PATH]] <- NULL
+  yaml::write_yaml(.spec, .out_path)
+}

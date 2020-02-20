@@ -4,7 +4,7 @@ submit_model <- function(.spec, ...) {
 }
 
 submit_model.bbi_nonmem_spec <- function(.spec, ...) {
-  res <- submit_nonmem_model(.spec$yaml_path, ...)
+  res <- submit_nonmem_model(.spec[[YAML_YAML_PATH]], ...)
   return(res)
 }
 
@@ -109,8 +109,8 @@ submit_nonmem_model <- function(.path,
       res,
       output_dir = file.path(model_dir, .output_dir),
       model_path = .path,
-      yaml_path = .yaml_path
     )
+    res[[YAML_YAML_PATH]] <- .yaml_path
     class(res) <- c("bbi_nonmem_result", class(res))
 
     return(res)

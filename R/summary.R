@@ -102,8 +102,9 @@ model_summary.bbi_nonmem_result <- function(.res, .wait = 30, .ext_wait = 30, ..
     }
   }
   if (!is.null(.chill)) {
-    cat("\n\n---\nModel run finished. Preparing summary...", sep = "\n")
+    cat("\n\n---\nModel run finished. Preparing summary...")
     Sys.sleep(.chill)
+    cat(" done.", sep = "\n")
   }
 
   # get summary

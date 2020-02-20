@@ -1,7 +1,5 @@
-yaml_path: acop.yaml
 model_path: acop.mod
 description: original acop model
-based_on: ''
 tags:
 - acop tag
 - other tag
