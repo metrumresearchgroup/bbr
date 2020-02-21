@@ -2,12 +2,30 @@
 % Please edit documentation in R/read-output.R
 \name{check_file}
 \alias{check_file}
+\alias{tail_output}
+\alias{tail_output.character}
+\alias{tail_output.bbi_nonmem_result}
+\alias{tail_lst}
+\alias{tail_lst.character}
+\alias{tail_lst.bbi_nonmem_result}
 \title{Reads the head and tail of specified file and prints it the console and/or returns it as a character vector.}
 \usage{
 check_file(.file, .head = 3, .tail = 5, .print = TRUE, .return = FALSE)
+
+tail_output(.f, ...)
+
+\method{tail_output}{character}(.file, .head = 3, .tail = 5, .print = TRUE, .return = FALSE)
+
+\method{tail_output}{bbi_nonmem_result}(.res, .head = 3, .tail = 5, .print = TRUE, .return = FALSE)
+
+tail_lst(.f, ...)
+
+\method{tail_lst}{character}(.file, .head = 3, .tail = 5, .print = TRUE, .return = FALSE)
+
+\method{tail_lst}{bbi_nonmem_result}(.res, .head = 3, .tail = 5, .print = TRUE, .return = FALSE)
 }
 \arguments{
-\item{.file}{Character scaler of path to file to read}
+\item{.file}{Path to lst file}
 
 \item{.head}{Integer for number of lines to read from the top of the file}
 
@@ -16,7 +34,25 @@ check_file(.file, .head = 3, .tail = 5, .print = TRUE, .return = FALSE)
 \item{.print}{Boolean for whether to print resulting head and tail to console. Defaults to TRUE.}
 
 \item{.return}{Boolean for whether to return resulting head and tail as a character vector. Defaults to FALSE.}
+
+\item{.f}{generic .f}
+
+\item{...}{args passed through}
+
+\item{.res}{bbi_nonmem_result object}
 }
 \description{
 Reads the head and tail of specified file and prints it the console and/or returns it as a character vector.
+
+S3 generic for tailing the OUTPUT file
+
+S3 dispatch for tailing the OUTPUT file
+
+S3 dispatch for tailing the OUTPUT file
+
+S3 generic for tailing the lst file
+
+S3 dispatch for tailing the lst file
+
+S3 dispatch for tailing the lst file
 }

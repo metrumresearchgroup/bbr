@@ -1,9 +1,11 @@
-model_path: acop.mod
+model_type: nonmem
 description: original acop model
+decisions:
+ - some note
+ - something else
 tags:
 - acop tag
 - other tag
 bbi_args:
   overwrite: yes
   threads: 4.0
-  nm_version: nm74gf

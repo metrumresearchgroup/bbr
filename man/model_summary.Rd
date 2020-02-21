@@ -2,9 +2,18 @@
 % Please edit documentation in R/summary.R
 \name{nonmem_summary}
 \alias{nonmem_summary}
+\alias{model_summary}
+\alias{model_summary.bbi_nonmem_result}
+\alias{model_summary.character}
 \title{Run `bbi summary` and parse the output to a list}
 \usage{
 nonmem_summary(.path, .args = NULL, ..., .dry_run = FALSE)
+
+model_summary(.res, ...)
+
+\method{model_summary}{bbi_nonmem_result}(.res, .wait = 30, .ext_wait = 30, ...)
+
+\method{model_summary}{character}(.res_dir, .model_type = c("nonmem"), ...)
 }
 \arguments{
 \item{.path}{Full path to one of the following:
@@ -13,13 +22,25 @@ nonmem_summary(.path, .args = NULL, ..., .dry_run = FALSE)
 
 \item{.args}{A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.}
 
-\item{...}{args passed through to `bbi_exec()`}
+\item{...}{args passed through}
 
 \item{.dry_run}{show what the command would be without actually running it}
+
+\item{.res}{generic .res}
+
+\item{.wait}{Integer number of seconds to wait trying `check_nonmem_progress()` for the model to be done.}
+
+\item{.ext_wait}{Integer number of seconds to wait for an .ext file (i.e. for the model to start). Passed through to `check_nonmem_progress()`}
 }
 \value{
 List of S3 Class "bbi_nonmem_summary" with all summary information
 }
 \description{
 Run `bbi summary` and parse the output to a list
+
+S3 generic for getting model summary
+
+Get model summary from `bbi_nonmem_result` object and optionally check if model is done before erroring
+
+S3 dispatch for getting model summary from output directory path
 }

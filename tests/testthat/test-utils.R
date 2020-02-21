@@ -94,3 +94,11 @@ test_that("parse_args_list() merges lists as expected", {
 
 })
 
+
+test_that("yaml with no model path will return ctl", {
+
+})
+
+test_that("yaml with no model path will return ctl", {
+
+})

@@ -11,9 +11,9 @@
 #' @return S3 object of class `bbi_{.model_type}_spec` that can be passed to `submit_model()`
 #' @export
 create_model <- function(
-  .model_path,
   .yaml_path,
   .description,
+  .model_path = NULL,
   .based_on = NULL,
   .tags = NULL,
   .bbi_args = NULL,
@@ -21,19 +21,19 @@ create_model <- function(
 
   # fill list from passed args
   .spec <- list()
-  .spec[[YAML_YAML_PATH]] <- .yaml_path
-  .spec[[YAML_MOD_PATH]] <- .model_path
+  .spec[[WORKING_DIR]] <- dirname(.yaml_path)
   .spec[[YAML_DESCRIPTION]] <- .description
+  .spec[[YAML_MOD_PATH]] <- .model_path %||% get_model_file_path(.yaml_path)
+  .spec[[YAML_MOD_TYPE]] <- .model_type
   if (!is.null(.based_on)) .spec[[YAML_BASED_ON]] <- scaler_to_list(.based_on)
   if (!is.null(.tags)) .spec[[YAML_TAGS]] <- scaler_to_list(.tags)
   if (!is.null(.bbi_args)) .spec[[YAML_BBI_ARGS]] <- .bbi_args
 
-  # write YAML to disk
-  save_mod_yaml(.spec)
+  # make list into S3 object
+  .spec <- create_spec(.spec)
 
-  # make list S3 object
-  .model_type <- match.arg(.model_type)
-  class(.spec) <- c(as.character(glue("bbi_{.model_type}_spec")), class(.spec))
+  # write YAML to disk
+  save_mod_yaml(.spec, .out_path = .yaml_path)
 
   return(.spec)
 }
@@ -46,62 +46,144 @@ create_model <- function(
 #' @importFrom purrr list_modify
 #' @return S3 object of class `bbi_{.model_type}_spec` that can be passed to `submit_model()`
 #' @export
-create_model_from_yaml <- function(.yaml_path, .model_type = c("nonmem")) {
+create_model_from_yaml <- function(.yaml_path) {
   # read in yaml
   mod_yaml <- parse_mod_yaml(.yaml_path)
 
-  # create spec S3 object
-  .spec <- list_modify(mod_yaml, yaml_path = .yaml_path)
-
-  .model_type <- match.arg(.model_type)
-  class(.spec) <- c(as.character(glue("bbi_{.model_type}_spec")), class(.spec))
+  # create spec object
+  .spec <- create_spec(mod_yaml)
 
   return(.spec)
 }
 
 
-# S3 dispatch for submitting models
-copy_model_from <- function(.spec, ...) {
-  UseMethod("copy_model_from", .spec)
+#' Parses a model yaml file into a list object that contains correctly formatted information from the yaml
+#' @param .path Path to the yaml file to parse.
+#' @importFrom yaml read_yaml
+#' @importFrom fs file_exists
+#' @return Output list as specified above.
+#' @export
+parse_mod_yaml <- function(.path) {
+  if (!fs::file_exists(.path)) {
+    stop(glue("Cannot find yaml file at path {.path}"))
+  }
+
+  # load from file
+  yaml_list <- read_yaml(.path)
+  yaml_list[[WORKING_DIR]] <- dirname(.path)
+
+  # parse model path
+  if (isTRUE(getOption("rbabylon.strict")) && !check_required_keys(yaml_list, .req = YAML_REQ_KEYS)) {
+    stop(paste0(
+      "Model yaml must have keys `", paste(YAML_REQ_KEYS, collapse=", "), "` specified in it. ",
+      "But `", paste(YAML_REQ_KEYS[!(YAML_REQ_KEYS %in% names(yaml_list))], collapse=", "), "` are missing. ",
+      .path, " has the following keys: ", paste(names(yaml_list), collapse=", ")
+    ))
+  }
+
+  .spec <- create_spec(yaml_list)
+
+  return(.spec)
 }
 
-copy_model_from.bbi_nonmem_spec <- function(.parent_spec, .new_model, .description,...) {
+
+#' Creates S3 object of class `bbi_{.model_type}_spec` from list with `SPEC_REQ_KEYS`
+#' @param .mod_list List with the required information to create a spec object
+#' @return S3 object of class `bbi_{.model_type}_spec` that can be passed to `submit_model`
+#' @export
+create_spec <- function(.mod_list) {
+  # check that necessary keys are present
+  if (isTRUE(getOption("rbabylon.strict")) && !check_required_keys(.mod_list, .req = SPEC_REQ_KEYS)) {
+    stop(paste0(
+      "Model list must have keys `", paste(SPEC_REQ_KEYS, collapse=", "), "` specified in order to create spec. ",
+      "But `", paste(SPEC_REQ_KEYS[!(SPEC_REQ_KEYS %in% names(.mod_list))], collapse=", "), "` are missing. ",
+      "List has the following keys: ", paste(names(.mod_list), collapse=", ")
+    ))
+  }
+
+  # by default, if no model defined, will set it to the yaml file name with extension ctl
+  if (is.null(.mod_list[[YAML_MOD_PATH]])) {
+    .mod_list[[YAML_MOD_PATH]] <- ctl_ext(basename(.path))
+  } else if (.mod_list[[YAML_MOD_TYPE]] == "nonmem" && (!is_valid_nonmem_extension(.mod_list[[YAML_MOD_PATH]]))) {
+    stop(glue::glue("model_path defined in yaml at {.path} must have either a .ctl or .mod extension, not {.mod_list[[YAML_MOD_PATH]]}"))
+  }
+
+  # check babylon args and add an empty list if missing
+  if (is.null(.mod_list[[YAML_BBI_ARGS]])) {
+    .mod_list[[YAML_BBI_ARGS]] <- list()
+  } else {
+    # check that unique named list was passed
+    tryCatch(
+      checkmate::assert_list(.mod_list[[YAML_BBI_ARGS]], names="unique"),
+      error = function(e) { stop(glue("`{YAML_BBI_ARGS}` must be a unique, named list: {e}")) }
+    )
+  }
+
+  # add class and return
+  .model_type <- .mod_list[[YAML_MOD_TYPE]]
+  if (!(.model_type %in% SUPPORTED_MOD_TYPES)) {
+    stop(glue("Invalid {YAML_MOD_TYPE} `{.model_type}`. Valid options include: `{SUPPORTED_MOD_TYPES}`"))
+  }
+  class(.mod_list) <- c(as.character(glue("bbi_{.model_type}_spec")), class(.mod_list))
+
+  return(.mod_list)
+}
+
+
+# S3 dispatch for iterating on models
+
+#' Generic S3 method from iterating on models.
+#' @param .x Object to copy from
+#' @param ... arguments to pass through
+#' @export
+#' @rdname copy_model_from
+copy_model_from <- function(.x, ...) {
+  UseMethod("copy_model_from", .x)
+}
+
+#' S3 dispatch for passing `bbi_nonmem_spec` object to `copy_model_from()`
+#' @param ... arguments to pass through to `copy_nonmem_model_from()`
+#' @export
+#' @rdname copy_model_from
+copy_model_from.bbi_nonmem_spec <- function(.parent_spec, .new_model, .description, ...) {
   .spec <- copy_nonmem_model_from(
-    .parent_spec$yaml_path,
+    .parent_spec,
     .new_model,
     .description,
     ...)
+
   return(.spec)
 }
 
-copy_model_from.bbi_nonmem_result <- function(.parent_res, .new_model, .description,...) {
-  .spec <- copy_nonmem_model_from(
-    .parent_res$yaml_path,
-    .new_model,
-    .description,
-    ...)
-  return(.spec)
-}
+#' S3 dispatch for passing `bbi_nonmem_spec` object to copy_model_from()
+#' @param .parent_path Path to YAML file to copy model from
+#' @param ... arguments to pass through to implementation method
+#' @export
+#' @rdname copy_model_from
+copy_model_from.character <- function(.parent_path, .new_model, .description, ...) {
+  # check for erroneous file extension
+  if (!is_valid_yaml_extension(.parent_path)) {
+    warning(paste(glue("If passing a file path to `copy_model_from()`, path must be to a valid model YAML file."),
+                  glue("(Got path `{.parent_path}`.)"),
+                  "Alternatively, pass a valid `bbi{.model_type}_spec` S3 object from the output of `create_model` or another `create_model_from` call."))
+  }
 
-copy_model_from.character <- function(.parent_path, .new_model, .description, .model_type = c("nonmem"), ...) {
-  .model_type <- match.arg(.model_type)
+  # create spec from YAML path
+  .spec <- create_model_from_yaml(.parent_path)
+  .model_type <- .spec[[YAML_MOD_TYPE]]
 
+  # copy from spec
   if (.model_type == "nonmem") {
-    # check for erroneous file extension
-    if (!((str_detect(.parent_path, "\\.yaml$")) || (str_detect(.parent_path, "\\.yml$")))) {
-      warning(paste(glue("If passing a file path to `copy_model_from()`, path must be to a valid model YAML file."),
-                    glue("(Got path `{.parent_path}`.)"),
-                    "Alternatively, pass a valid `'_spec'` S3 object from the output of `create_model` or another `create_model_from` call."))
-    }
-
     # create new model
     .spec <- copy_nonmem_model_from(
-      .parent_path,
+      .parent_spec,
       .new_model,
       .description,
       ...)
+  } else if (.model_type == "stan") {
+    stop(NO_STAN_ERR_MSG)
   } else {
-    stop(glue("Passed `{.model_type}` to model_summary(.model_type). Valid options include: `'nonmem'`"))
+    stop(glue("Passed `{.model_type}`. Valid options: `{SUPPORTED_MOD_TYPES}`"))
   }
   return(.spec)
 }
@@ -109,7 +191,7 @@ copy_model_from.character <- function(.parent_path, .new_model, .description, .m
 
 #' Create new .mod/ctl and new .yaml files based on a previous model. Used for iterating on model development.
 #' Also fills in necessary YAML fields for using `create_run_log()` later.
-#' @param .parent_model Path to model YAML file that will be used as the basis for the copy.
+#' @param .parent_spec S3 object of class `bbi_nonmem_spec` to be used as the basis for copy.
 #' @param .new_model Path to write new model files to WITHOUT FILE EXTENSION. Function will create both `{.new_model}.yaml` and `{.new_model}.[mod|ctl]` based on this path.
 #' @param .description Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.
 #' @param .based_on_additional The run id for the `.parent_model` will automatically be added to the `based_on` field but this argument can contain a character scaler or vector of additional run id's (model names) that this model was "based on." These are used to reconstuct model developement and ancestry.
@@ -122,29 +204,42 @@ copy_model_from.character <- function(.parent_path, .new_model, .description, .m
 #' @importFrom yaml write_yaml
 #' @importFrom purrr list_modify
 #' @return S3 object of class `bbi_nonmem_spec` that can be passed to `submit_nonmem_model()`
+#' @rdname copy_model_from
 #' @export
 copy_nonmem_model_from <- function(
-  .parent_model,
+  .parent_spec,
   .new_model,
   .description,
   .based_on_additional = NULL,
   .add_tags = NULL,
-  .inherit_tags = TRUE,
+  .inherit_tags = FALSE,
   .update_mod_file = TRUE
 ) {
-  # parse yaml of original and copy it
-  parent_yaml <- parse_mod_yaml(.parent_model)
-  new_yaml <- parent_yaml
+  # Check spec for correct class and then copy it
+  if (!("bbi_nonmem_spec" %>% class(.parent_spec))) {
+    stop(paste(
+      "copy_nonmem_model_from() requires a spec object of class `bbi_nonmem_spec`. Passed object has the following classes:",
+      paste(class(.parent_spec), collapse = ", "),
+      "Consider creating a spec with `create_model()` or `create_model_from_yaml()`",
+      sep = "\n"))
+  }
+  .new_spec <- .parent_spec
 
   # build new model path
-  .file_ext <- tools::file_ext(parent_yaml[[YAML_MOD_PATH]])
-  new_mod_path <- as.character(glue("{.new_model}.{.file_ext}"))
-  new_yaml[[YAML_MOD_PATH]] <- new_mod_path
+  .file_ext <- tools::file_ext(.parent_spec[[YAML_MOD_PATH]])
+  if (.file_ext == "mod") {
+    new_mod_path <- mod_ext(.new_model)
+  } else if (.file_ext == "ctl") {
+    new_mod_path <- ctl_ext(.new_model)
+  } else {
+    stop(glue("copy_nonmem_model_from() requires a spec object with a `{YAML_MOD_PATH}` pointing to either a .ctl or .mod file. Got `{YAML_MOD_PATH} = {.parent_spec[[YAML_MOD_PATH]]}`"))
+  }
+  .new_spec[[YAML_MOD_PATH]] <- basename(new_mod_path) # path should be relative to YAML location
 
   # copy control steam to new path
   if (.update_mod_file) {
     # read parent control stream
-    mod_str <- read_file(parent_yaml[[YAML_MOD_PATH]])
+    mod_str <- read_file(.parent_spec[[YAML_MOD_PATH]])
 
     # replace the $PROBLEM line(s)
     mod_str <- str_replace(mod_str,
@@ -154,29 +249,25 @@ copy_nonmem_model_from <- function(
     # read parent control stream
     write_file(mod_str, new_mod_path)
   } else {
-    fs::file_copy(parent_yaml[[YAML_MOD_PATH]], new_mod_path)
+    fs::file_copy(.parent_spec[[YAML_MOD_PATH]], new_mod_path)
   }
 
   # fill based_on
-  new_yaml[[YAML_BASED_ON]] <- c(get_mod_id(parent_yaml[[YAML_MOD_PATH]]), .based_on_additional)
+  .new_spec[[YAML_BASED_ON]] <- c(get_mod_id(.parent_spec[[YAML_MOD_PATH]]), .based_on_additional)
 
   # fill description
-  new_yaml[[YAML_DESCRIPTION]] <- .description
+  .new_spec[[YAML_DESCRIPTION]] <- .description
 
   # fill tags
-  if (.inherit_tags && !is.null(parent_yaml[[YAML_TAGS]])) {
-    new_yaml[[YAML_TAGS]] <- c(parent_yaml[[YAML_TAGS]], .add_tags)
+  if (.inherit_tags && !is.null(.parent_spec[[YAML_TAGS]])) {
+    .new_spec[[YAML_TAGS]] <- c(.parent_spec[[YAML_TAGS]], .add_tags)
   } else {
-    new_yaml[[YAML_TAGS]] <- scaler_to_list(.add_tags)
+    .new_spec[[YAML_TAGS]] <- scaler_to_list(.add_tags)
   }
 
-  # write new_yaml out
-  new_yaml_path <- as.character(glue("{.new_model}.yaml"))
-  write_yaml(new_yaml, new_yaml_path)
-
-  # create spec S3 object
-  .spec <- list_modify(new_yaml, yaml_path = new_yaml_path)
-  class(.spec) <- c("bbi_nonmem_spec", class(.spec))
+  # write .new_spec out
+  new_yaml_path <- yaml_ext(.new_model)
+  save_mod_yaml(.new_spec, .out_path = new_yaml_path)
 
   return(.spec)
 }
@@ -203,7 +294,7 @@ run_log <- function(
   all_yaml <- map(yaml_files, function(.x) {read_yaml(.x)})
 
   # filter to only model yaml's
-  mod_yaml_bool <- map_lgl(all_yaml, function(.x) {check_mod_yaml_keys(.x)})
+  mod_yaml_bool <- map_lgl(all_yaml, function(.x) {check_required_keys(.x, .req = YAML_REQ_KEYS)})
   not_mod <- yaml_files[!mod_yaml_bool]
   if (length(not_mod) > 0) {
     warning(glue("Found {length(not_mod)} YAML files that do not contain required keys for a model YAML. Ignoring the following files: `{paste(not_mod, collapse='`, `')}`"))

@@ -39,7 +39,7 @@ bbi_exec <- function(.cmd_args, .verbose = FALSE, .wait = FALSE, ...) {
   # build result object
   res <- list(
     process = p,
-    output = output,
+    stdout = output,
     bbi = bbi_exe_path,
     cmd_args = .cmd_args
   )

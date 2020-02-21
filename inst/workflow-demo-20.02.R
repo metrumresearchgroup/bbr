@@ -1,18 +1,19 @@
-
+library(glue)
+library(rbabylon)
 # move to demo folder
-setwd(system.file(package="rbabylon", "nonmem"))
+#setwd(system.file(package="rbabylon", "nonmem"))
 print(glue::glue("switched working directory to `{getwd()}` for demo."))
 
 # cleanup function
 cleanup_demo <- function() {
   # delete original acop output
-  if (fs::dir_exists("acop")) fs::dir_delete("acop")
+  if (fs::dir_exists("1")) fs::dir_delete("1")
 
   # delete demo models
   demo_mods <- c(
-    "acop2",
-    "acop3",
-    "acop4"
+    "2",
+    "3",
+    "4"
   )
   for (m in demo_mods) {
     if (fs::file_exists(glue("{m}.mod"))) fs::file_delete(glue("{m}.mod"))
@@ -23,10 +24,10 @@ cleanup_demo <- function() {
 cleanup_demo()
 
 # setup bbi path
-options('rbabylon.bbi_exe_path' = '/data/apps/bbi')
+#options('rbabylon.bbi_exe_path' = '/data/apps/bbi')
 
 # create babylon.yaml
-bbi_init(".", "/opt/NONMEM")
+#bbi_init(".", "/opt/NONMEM")
 
 ################
 # step by step
@@ -34,11 +35,11 @@ bbi_init(".", "/opt/NONMEM")
 
 # create model spec
 spec1 <- create_model(
-  .model_path = "acop.mod",
-  .yaml_path = "acop.yaml",
+  .model_path = "1.ctl",
+  .yaml_path = "1.yaml",
   .description = "original acop model",
   .tags = c("acop tag", "other tag"),
-  .bbi_args = list(overwrite = TRUE, threads = 4, nm_version = "nm74gf")
+  .bbi_args = list(overwrite = TRUE, threads = 4)
   )
 class(spec1)
 # [1] "bbi_nonmem_spec" "list"
@@ -62,13 +63,12 @@ print(names(sum1))
 # [7] "covariance_theta"  "correlation_theta"
 str(sum1)
 
-par_df1 <- param_estimates(sum1)
-options("crayon.enabled" = FALSE) # turn off annoying tibble color printing
+  par_df1 <- param_estimates(sum1) %>% mutate(val = ifelse(param == "THETA"))
 head(par_df1)
 
 #########
 # copy model spec for iteration
-spec2 <- copy_model_from(spec1, "acop2", "model 2 description")
+spec2 <- copy_model_from(spec1, "2", "model 2 description")
 class(spec2)
 # [1] "bbi_nonmem_spec" "list"
 str(spec2)
@@ -96,16 +96,15 @@ cleanup_demo()
 
 # iterate on original and run it
 submit_model(spec1) %>%
-  copy_model_from("acop2",
+  copy_model_from("2",
                   "model 2 description") %>% submit_model() %>%
-  copy_model_from("acop3",
+  copy_model_from("3",
                   "model 2 with some changes",
                   .add_tags = c("new tag")) %>% submit_model() %>%
-  copy_model_from("acop4",
+  copy_model_from("4",
                   "model 2 with different changes",
                   .add_tags = c("new tag"),
-                  .based_on_additional = c("acop2")) %>% submit_model()
-
+                  .based_on_additional = c("2")) %>% submit_model()
 
 # construct run log and view it
 log_df <- run_log()
@@ -118,8 +117,8 @@ print(names(log_df))
 View(log_df)
 
 # compare some outputs from two of the runs
-model_summary("acop3") %>% param_estimates() %>% head()
-model_summary("acop4") %>% param_estimates() %>% head()
+model_summary("3") %>% param_estimates() %>% head()
+model_summary("4") %>% param_estimates() %>% head()
 
 
 # delete temp demo files
@@ -140,10 +139,10 @@ sum1 <- model_summary(res1)
 res1 <- res1 %>% add_tags("base model")
 
 #
-spec2 <- res1 %>% copy_model_from("acop2",
+spec2 <- res1 %>% copy_model_from("2",
                                   "use proportional error model")
 
-spec3 <- res1 %>% copy_model_from("acop3",
+spec3 <- res1 %>% copy_model_from("3",
                                   "use mixed error model")
 
 #### change the ctl files manually
@@ -159,7 +158,7 @@ log_df <- run_log()
 View(log_df)
 
 # add some tags and notes
-res2 <- "acop2" %>% add_tags("iterations round 1", "pretty good but whatever") %>% add_decisions("Made change x in prop error model")
+res2 <- "2" %>% add_tags("iterations round 1", "pretty good but whatever") %>% add_decisions("Made change x in prop error model")
 res3 <- res3 %>% add_tags("iterations round 1") %>% add_decisions(c("Added param z in mixed error model", "some other thing"))
 
 # look at updated run log view it

@@ -11,7 +11,7 @@
 #' @export
 check_nonmem_args <- function(.args) {
   # if NULL, return NULL back
-  if (is.null(.args)) {
+  if (length(.args) == 0) {
     return(NULL)
   }
 
@@ -111,63 +111,63 @@ format_cmd_args <- function(.args, .collapse = FALSE) {
 }
 
 
-#' Parses a model yaml file into a list object that contains correctly formatted information from the yaml
-#' Output list will have:
-#'   $model_path -- the path the model file that should be run
-#'   $args_list -- any babylon arguments that should be passed though. The keys must be the same as would be passed to check_nonmem_args()
-#'   $user_data -- any other data the user included, such as metadata about the model, that is NOT a babylon argument
-#' @param .path Path to the yaml file to parse.
-#' @importFrom yaml read_yaml
-#' @importFrom fs file_exists
-#' @return Output list as specified above.
-#' @export
-parse_mod_yaml <- function(.path) {
-  if (!fs::file_exists(.path)) {
-    stop(glue("Cannot find yaml file at path {.path}"))
-  }
-
-  # load from file
-  yaml_list <- read_yaml(.path)
-
-  # parse model path
-  if (!check_mod_yaml_keys(yaml_list)) {
-    stop(paste0(
-      "Model yaml must have keys `", paste(YAML_REQ_KEYS, collapse=", "), "` specified in it. ",
-      "But `", paste(YAML_REQ_KEYS[!(YAML_REQ_KEYS %in% names(yaml_list))], collapse=", "), "` are missing. ",
-      .path, " has the following keys: ", paste(names(yaml_list), collapse=", ")
-      ))
-  }
-
-  return(yaml_list)
-}
-
-
 #' Combines NONMEM args that were passed into the function call with args that were parsed from a model yaml
-#' @param .func_args A named list of arguments for bbi, passed into submit model function call
+#' @param .func_args A named list of arguments for bbi, passed into submit_model function call
 #' @param .yaml_args A named list of arguments for bbi, parsed from user input yaml
 #' @importFrom checkmate assert_list
-#' @return The combination of the two lists, with .yaml_args overriding any keys that are shared
+#' @return The combination of the two lists, with .func_args overwriting any keys that are shared
 #' @export
 parse_args_list <- function(.func_args, .yaml_args) {
-  # if no .args passed to function, pass through yaml args
-  if (is.null(.func_args)) {
-    .args <- .yaml_args
-  } else {
+  # start with .yaml_args
+  .args <- .yaml_args
+  if (!is.null(.func_args)) {
     # check that unique named list was passed
     tryCatch(
       checkmate::assert_list(.func_args, names="unique"),
-      error = function(e) {
-        err_msg <- paste("`.args` must be a unique, named list:", e)
-        stop(err_msg)
-      }
+      error = function(e) { stop(glue("`.args` must be a unique, named list: {e}")) }
     )
-    # add .yaml_args and overwrite anything from .func_args list that's in .yaml_args
-    .args <- .func_args
-    for (.n in names(.yaml_args)) {
-      .args[[.n]] <- .yaml_args[[.n]]
+    # add .func_args and overwrite anything from .yaml_args list that's in .func_args
+    for (.n in names(.func_args)) {
+      .args[[.n]] <- .func_args[[.n]]
     }
   }
   return(.args)
+}
+
+#' Combines two named lists. Shared keys will have their contents concatenated.
+#' Any S3 classes will be inherited with those from .new_list given precedence.
+#' @param .new_list A named list of arguments for bbi, passed into submit_model function call
+#' @param .old_list A named list of arguments for bbi, parsed from user input yaml
+#' @importFrom checkmate assert_list
+#' @return The combined list
+#' @export
+combine_list_objects <- function(.new_list, .old_list) {
+  # check that unique named lists were passed
+  tryCatch(
+    checkmate::assert_list(.new_list, names="unique"),
+    error = function(e) { stop(glue("`.new_list` must be a unique, named list: {e}")) }
+  )
+  tryCatch(
+    checkmate::assert_list(.old_list, names="unique"),
+    error = function(e) { stop(glue("`.old_list` must be a unique, named list: {e}")) }
+  )
+
+  # add .new_list and overwrite anything from .old_list list that's in .new_list
+  .out_list <- list()
+  for (.n in names(.new_list)) {
+    .out_list[[.n]] <- .new_list[[.n]]
+  }
+  for (.n in names(.old_list)) {
+    if (.n %in% names(.out_list)) {
+      .out_list[[.n]] <- c(.out_list[[.n]], .old_list[[.n]])
+    } else {
+      .out_list[[.n]] <- .old_list[[.n]]
+    }
+  }
+
+  # add classes and return
+  class(.out_list) <- unique(c(class(.new_list), class(.old_list)), fromLast = T)
+  return(.out_list)
 }
 
 
@@ -192,8 +192,8 @@ get_mod_id <- function(.mod_path) {
 }
 
 
-check_mod_yaml_keys <- function(.list) {
-  all(YAML_REQ_KEYS %in% names(.list))
+check_required_keys <- function(.list, .req) {
+  all(.req %in% names(.list))
 }
 
 scaler_to_list <- function(.x) {
@@ -203,8 +203,59 @@ scaler_to_list <- function(.x) {
   return(.x)
 }
 
-save_mod_yaml <- function(.spec) {
-  .out_path <- .spec[[YAML_YAML_PATH]]
-  .spec[[YAML_YAML_PATH]] <- NULL
+save_mod_yaml <- function(.spec, .out_path = NULL) {
+  if (is.null(.out_path)) {
+    .out_path <- file.path(.spec[[WORKING_DIR]], yaml_ext(.spec[[YAML_MOD_PATH]]))
+  }
+  .spec[[WORKING_DIR]] <- NULL
   yaml::write_yaml(.spec, .out_path)
+}
+
+is_valid_nonmem_extension <- function(.path) {
+  tools::file_ext(.path) %in% c("ctl", "mod")
+}
+
+is_valid_yaml_extension <- function(.path) {
+  tools::file_ext(.path) %in% c("yaml", "yml")
+}
+
+# helpers that strip extension then add a diffent type
+ctl_ext <- function(.x) {
+  sprintf("%s.ctl", tools::file_path_sans_ext(.x))
+}
+
+mod_ext <- function(.x) {
+  sprintf("%s.mod", tools::file_path_sans_ext(.x))
+}
+
+yaml_ext <- function(.x) {
+  if (tools::file_ext(.path) == "yml") {
+    return(.x)
+  }
+  sprintf("%s.yaml", tools::file_path_sans_ext(.x))
+}
+
+# helper to find valid model file and return ctl_ext(.path) by default if not found
+get_model_file_path <- function(.path) {
+  .ctl_path <- ctl_ext(.path)
+  .mod_path <- mod_ext(.path)
+  if(fs::file_exists(.ctl_path)) {
+    return(basename(.ctl_path))
+  } else if(fs::file_exists(.mod_path)) {
+    return(basename(.mod_path))
+  } else {
+    warning(glue("No model file found at {.ctl_path} but setting that path as default model path for {.path}. Please put relevant model file in that location."))
+    return(basename(.ctl_path))
+  }
+}
+
+build_yaml_path <- function(.spec, .check_exists = FALSE) {
+  yaml_file <- .spec[[YAML_MOD_PATH]] %>% get_mod_id() %>% yaml_ext()
+  yaml_path <- file.path(.spec[[WORKING_DIR]], yaml_file)
+  if (.check_exists) {
+    if (!fs::file_exists(yaml_path)) {
+      stop(glue("Parsed YAML path {yaml_path} from .spec but no file exists at that location."))
+    }
+  }
+  return(yaml_path)
 }

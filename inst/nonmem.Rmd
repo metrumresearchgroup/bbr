@@ -36,7 +36,7 @@ nonmem_output <- function(.x, ...) {
   UseMethod("nonmem_output")
 }
 
-nonmem_output.babylon_result <- function(.x, ...) {
+nonmem_output.babylon_result <- function(.x, output_dir = NULL) {
   # do something from result object
 }
 

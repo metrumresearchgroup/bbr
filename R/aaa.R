@@ -34,16 +34,29 @@ NONMEM_ARGS = list(
 )
 
 # YAML keys that are hard-coded
-YAML_YAML_PATH <- "yaml_path"
 YAML_MOD_PATH <- "model_path"
 YAML_DESCRIPTION <- "description"
 YAML_BASED_ON <- "based_on"
 YAML_TAGS <- "tags"
 YAML_BBI_ARGS <- "bbi_args"
+YAML_MOD_TYPE <- "model_type"
+YAML_OUT_DIR <- "output_dir"
+
 YAML_REQ_KEYS <- c(
-  YAML_MOD_PATH,
+  YAML_MOD_TYPE,
   YAML_DESCRIPTION
 )
 
+WORKING_DIR <- "orig_working_dir"
+
+SPEC_REQ_KEYS <- c(
+  WORKING_DIR,
+  YAML_MOD_TYPE,
+  YAML_DESCRIPTION
+)
+
+SUPPORTED_MOD_TYPES <- c("nonmem", "stan")
+
 # error messages that we grep for
 NO_NONMEM_ERR_MSG <- "No version was supplied and no default value exists in the configset"
+NO_STAN_ERR_MSG <- "stan support not yet implemented."

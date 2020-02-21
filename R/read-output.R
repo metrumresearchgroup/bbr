@@ -5,6 +5,8 @@
 #' @param .print Boolean for whether to print resulting head and tail to console. Defaults to TRUE.
 #' @param .return Boolean for whether to return resulting head and tail as a character vector. Defaults to FALSE.
 #' @importFrom readr read_lines
+#' @rdname check_file
+#' @export
 check_file <- function(.file, .head = 3, .tail = 5, .print = TRUE, .return = FALSE) {
   l <- read_lines(.file)
 
@@ -50,10 +52,20 @@ check_file <- function(.file, .head = 3, .tail = 5, .print = TRUE, .return = FAL
 
 
 # wrappers to interact easily with OUTPUT file
+
+#' S3 generic for tailing the OUTPUT file
+#' @param .f generic .f
+#' @param ... args passed through
+#' @export
+#' @rdname check_file
 tail_output <- function(.f, ...) {
   UseMethod("tail_output", .f)
 }
 
+#' S3 dispatch for tailing the OUTPUT file
+#' @param .file Path to OUTPUT file
+#' @export
+#' @rdname check_file
 tail_output.character <- function(.file, .head = 3, .tail = 5, .print = TRUE, .return = FALSE) {
   # if model id passed, construct path
   if (get_mod_id(.file) == .file) {
@@ -63,17 +75,31 @@ tail_output.character <- function(.file, .head = 3, .tail = 5, .print = TRUE, .r
   check_file(.file, .head, .tail, .print, .return)
 }
 
+#' S3 dispatch for tailing the OUTPUT file
+#' @param .res bbi_nonmem_result object
+#' @export
+#' @rdname check_file
 tail_output.bbi_nonmem_result <- function(.res, .head = 3, .tail = 5, .print = TRUE, .return = FALSE) {
-  .file <- file.path(.res$output_dir, "OUTPUT")
+  .file <- file.path(.res[[YAML_OUT_DIR]], "OUTPUT")
   check_file(.file, .head, .tail, .print, .return)
 }
 
 
 # wrappers to interact easily with .lst file
+
+#' S3 generic for tailing the lst file
+#' @param .f generic .f
+#' @param ... args passed through
+#' @export
+#' @rdname check_file
 tail_lst <- function(.f, ...) {
   UseMethod("tail_lst", .f)
 }
 
+#' S3 dispatch for tailing the lst file
+#' @param .file Path to lst file
+#' @export
+#' @rdname check_file
 tail_lst.character <- function(.file, .head = 3, .tail = 5, .print = TRUE, .return = FALSE) {
   # if model id passed, construct path
   if (get_mod_id(.file) == .file) {
@@ -83,8 +109,12 @@ tail_lst.character <- function(.file, .head = 3, .tail = 5, .print = TRUE, .retu
   check_file(.file, .head, .tail, .print, .return)
 }
 
+#' S3 dispatch for tailing the lst file
+#' @param .res bbi_nonmem_result object
+#' @export
+#' @rdname check_file
 tail_lst.bbi_nonmem_result <- function(.res, .head = 3, .tail = 5, .print = TRUE, .return = FALSE) {
-  .file <- file.path(.res$output_dir, paste0(get_mod_id(.res$model_path), ".lst"))
+  .file <- file.path(.res[[YAML_OUT_DIR]], paste0(get_mod_id(.res$model_path), ".lst"))
   check_file(.file, .head, .tail, .print, .return)
 }
 
@@ -94,6 +124,7 @@ tail_lst.bbi_nonmem_result <- function(.res, .head = 3, .tail = 5, .print = TRUE
 #' @param .x_floor Filters file to only rows with `.x_var` GREATER THAN this value.
 #' @importFrom readr read_table2 cols
 #' @importFrom dplyr filter
+#' @rdname check_nonmem_table_output
 #' @export
 check_nonmem_table_output <- function(
   .path,
@@ -118,6 +149,7 @@ check_nonmem_table_output <- function(
 #' @param .stat_name Character scaler for the name of the stat the other columns represents (like "gradient" or "theta").
 #' @importFrom tidyr gather
 #' @importFrom ggplot2 ggplot aes geom_line xlab ylab scale_colour_discrete ggtitle
+#' @rdname plot_nonmem_table_df
 #' @export
 plot_nonmem_table_df <- function(.df, .x_var, .stat_name) {
   p <- .df %>% gather("stat", "value", -.data[[.x_var]]) %>%
@@ -128,10 +160,21 @@ plot_nonmem_table_df <- function(.df, .x_var, .stat_name) {
 
 
 # wrappers to interact with .grd files easily
+
+#' S3 generic for checking grd file
+#' @param .x generic .x
+#' @param ... args passed through
+#' @export
+#' @rdname check_nonmem_table_output
 check_grd <- function(.x, ...) {
   UseMethod("check_grd", .x)
 }
 
+#' S3 dispatch for checking grd file
+#' @param .path Path to file
+#' @param .iter_floor Filters file to only rows with `ITERATION` GREATER THAN this value.
+#' @export
+#' @rdname check_nonmem_table_output
 check_grd.character <- function(.path, .iter_floor = 0) {
   # if model id passed, construct path
   if (get_mod_id(.path) == .path) {
@@ -142,23 +185,42 @@ check_grd.character <- function(.path, .iter_floor = 0) {
   return(df)
 }
 
+#' S3 dispatch for checking grd file
+#' @param .res `bbi_nonmem_result` object
+#' @param .iter_floor Filters file to only rows with `ITERATION` GREATER THAN this value.
+#' @export
+#' @rdname check_nonmem_table_output
 check_grd.bbi_nonmem_result <- function(.res, .iter_floor = 0) {
-  grd_path <- file.path(.res$output_dir, paste0(get_mod_id(.res$model_path), ".grd"))
+  grd_path <- file.path(.res[[YAML_OUT_DIR]], paste0(get_mod_id(.res$model_path), ".grd"))
   df <- check_nonmem_table_output(grd_path, .x_var = "ITERATION", .x_floor = .iter_floor)
   return(df)
 }
 
+#' S3 dispatch for plotting grd file
+#' @param .df tibble from from check_grd() output
+#' @export
+#' @rdname plot_nonmem_table_df
 plot_grd <- function(.df, ...) {
   plot_nonmem_table_df(.df, .x_var = "ITERATION", .stat_name = "GRADIENT")
 }
 
 
+# wrappers to interact with .ext files easily
 
-# wrappers to interact with .grd files easily
+#' S3 generic for checking ext file
+#' @param .x generic .x
+#' @param ... args passed through
+#' @export
+#' @rdname check_nonmem_table_output
 check_ext <- function(.x, ...) {
   UseMethod("check_ext", .x)
 }
 
+#' S3 dispatch for checking ext file
+#' @param .path path to ext file
+#' @param .iter_floor Filters file to only rows with `ITERATION` GREATER THAN this value.
+#' @export
+#' @rdname check_nonmem_table_output
 check_ext.character <- function(.path, .iter_floor = 0) {
   # if model id passed, construct path
   if (get_mod_id(.path) == .path) {
@@ -169,12 +231,21 @@ check_ext.character <- function(.path, .iter_floor = 0) {
   return(df)
 }
 
+#' S3 dispatch for checking ext file
+#' @param .res `bbi_nonmem_result` object
+#' @param .iter_floor Filters file to only rows with `ITERATION` GREATER THAN this value.
+#' @export
+#' @rdname check_nonmem_table_output
 check_ext.bbi_nonmem_result <- function(.res, .iter_floor = 0) {
-  ext_path <- file.path(.res$output_dir, paste0(get_mod_id(.res$model_path), ".ext"))
+  ext_path <- file.path(.res[[YAML_OUT_DIR]], paste0(get_mod_id(.res$model_path), ".ext"))
   df <- check_nonmem_table_output(ext_path, .x_var = "ITERATION", .x_floor = .iter_floor)
   return(df)
 }
 
+#' S3 dispatch for plotting ext file
+#' @param .df tibble from from check_ext() output
+#' @export
+#' @rdname plot_nonmem_table_df
 plot_ext <- function(.df, ...) {
   plot_nonmem_table_df(.df, .x_var = "ITERATION", .stat_name = "GRADIENT")
 }
@@ -187,7 +258,7 @@ plot_ext <- function(.df, ...) {
 check_nonmem_progress <- function(.res, .ext_wait = 30) {
   # look for ext file
   SLEEP = 1
-  ext_path <- file.path(.res$output_dir, paste0(get_mod_id(.res$model_path), ".ext"))
+  ext_path <- file.path(.res[[YAML_OUT_DIR]], paste0(get_mod_id(.res$model_path), ".ext"))
   if (!fs::file_exists(ext_path)) {
     while (.ext_wait > 0) {
       if (fs::file_exists(ext_path)) {
@@ -213,12 +284,12 @@ check_nonmem_progress <- function(.res, .ext_wait = 30) {
     out_tail <- tryCatch(
       tail_output(.res, .tail = 10, .head = 0, .print = FALSE, .return = TRUE),
       error = function(e) {
-        warning(glue("{ext_path} file does not look finished but there is also no `{.res$output_dir}/OUTPUT` file. Your run may have failed."))
+        warning(glue("{ext_path} file does not look finished but there is also no `{.res[[YAML_OUT_DIR]]}/OUTPUT` file. Your run may have failed."))
         return(FALSE)
       }
     )
     cat(paste(
-      glue("\n\n---\nModel is still running. Tail of `{.res$output_dir}/OUTPUT` file:"), "\n---\n",
+      glue("\n\n---\nModel is still running. Tail of `{.res[[YAML_OUT_DIR]]}/OUTPUT` file:"), "\n---\n",
       paste(out_tail, collapse = "\n")
     ))
     return(FALSE)

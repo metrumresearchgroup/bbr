@@ -4,7 +4,7 @@
 \alias{create_model_from_yaml}
 \title{Create new model spec from a model yaml}
 \usage{
-create_model_from_yaml(.yaml_path, .model_type = c("nonmem"))
+create_model_from_yaml(.yaml_path)
 }
 \arguments{
 \item{.yaml_path}{Character scaler for the path to the YAML model file that will be used}

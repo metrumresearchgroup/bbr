@@ -2,12 +2,18 @@
 % Please edit documentation in R/read-output.R
 \name{plot_nonmem_table_df}
 \alias{plot_nonmem_table_df}
+\alias{plot_grd}
+\alias{plot_ext}
 \title{Creates a line plot of the wide-format tibble output from check_nonmem_table_output}
 \usage{
 plot_nonmem_table_df(.df, .x_var, .stat_name)
+
+plot_grd(.df, ...)
+
+plot_ext(.df, ...)
 }
 \arguments{
-\item{.df}{the wide-format tibble output from check_nonmem_table_output}
+\item{.df}{tibble from from check_ext() output}
 
 \item{.x_var}{Character scaler for the variable name to use on the X-axis}
 
@@ -15,4 +21,8 @@ plot_nonmem_table_df(.df, .x_var, .stat_name)
 }
 \description{
 Creates a line plot of the wide-format tibble output from check_nonmem_table_output
+
+S3 dispatch for plotting grd file
+
+S3 dispatch for plotting ext file
 }
