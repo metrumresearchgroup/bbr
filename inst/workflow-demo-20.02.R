@@ -1,7 +1,7 @@
 library(glue)
 library(rbabylon)
 # move to demo folder
-#setwd(system.file(package="rbabylon", "nonmem"))
+setwd(system.file(package="rbabylon", "nonmem"))
 print(glue::glue("switched working directory to `{getwd()}` for demo."))
 
 # cleanup function

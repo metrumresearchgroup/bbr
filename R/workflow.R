@@ -21,8 +21,8 @@ create_model <- function(
 
   # fill list from passed args
   .spec <- list()
-  .spec[[WORKING_DIR]] <- dirname(.yaml_path)
-  .spec[[.YAML_YAML_NAME]] <- basename(.yaml_path)
+  .spec[[WORKING_DIR]] <- normalizePath(dirname(.yaml_path))
+  .spec[[YAML_YAML_NAME]] <- basename(.yaml_path)
   .spec[[YAML_DESCRIPTION]] <- .description
   .spec[[YAML_MOD_TYPE]] <- .model_type
   if (!is.null(.based_on)) .spec[[YAML_BASED_ON]] <- scaler_to_list(.based_on)
@@ -67,8 +67,8 @@ parse_mod_yaml <- function(.path) {
 
   # load from file
   yaml_list <- read_yaml(.path)
-  yaml_list[[WORKING_DIR]] <- dirname(.path)
-  yaml_list[[.YAML_YAML_NAME]] <- basename(.path)
+  yaml_list[[WORKING_DIR]] <- normalizePath(dirname(.path))
+  yaml_list[[YAML_YAML_NAME]] <- basename(.path)
 
   # parse model path
   if (!check_required_keys(yaml_list, .req = YAML_REQ_INPUT_KEYS)) {
@@ -296,6 +296,61 @@ copy_nonmem_model_from <- function(
   return(.spec)
 }
 
+#####################
+# Modifying models
+#####################
+
+
+reconcile_mod_yaml <- function(.spec, .yaml_path) {
+  # load spec from yaml on disk
+  .loaded_spec <- parse_mod_yaml(.yaml_path)
+
+  # overwrite values in memory from the ones on disk
+  .new_spec <- combine_list_objects(.loaded_spec, .spec) # this would overwrite the in-memory with the yaml. Is that right?
+  return(.new_spec)
+}
+
+
+modify_spec_field <- function(.spec, .field, .value, .append = TRUE) {
+  # extract path to yaml
+  .yaml_path <- get_yaml_path(.spec)
+
+  # update .spec with any changes from yaml on disk
+  .spec <- reconcile_mod_yaml(.spec, .yaml_path)
+
+  # Either append new value or overwrite with new value
+  if (.append) {
+    .spec[[.field]] <- c(.spec[[.field]], .value)
+  } else {
+    .spec[[.field]] <- .value
+  }
+
+  # overwrite the yaml on disk with modified spec
+  save_mod_yaml(.spec, .yaml_path)
+
+  return(.spec)
+}
+
+add_tags <- function(.spec, .tags) {
+  .spec <- modify_spec_field(.spec = .spec,
+                             .field = YAML_TAGS,
+                             .value = .tags,
+                             .append = TRUE)
+  return(.spec)
+}
+
+replace_tags <- function(.spec, .tags) {
+  .spec <- modify_spec_field(.spec = .spec,
+                             .field = YAML_TAGS,
+                             .value = .tags,
+                             .append = FALSE)
+  return(.spec)
+}
+
+
+
+
+##################### LOGS, maybe should go in a different file
 
 #' Parses model YAML files (and optionally model outputs) into a log tibble
 #' @param .base_dir Directory to look in for YAML model files

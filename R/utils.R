@@ -134,14 +134,15 @@ parse_args_list <- function(.func_args, .yaml_args) {
   return(.args)
 }
 
-#' Combines two named lists. Shared keys will have their contents concatenated.
+#' Combines two named lists. By default, shared keys are overwritten by that key in .new_list
 #' Any S3 classes will be inherited with those from .new_list given precedence.
 #' @param .new_list A named list of arguments for bbi, passed into submit_model function call
 #' @param .old_list A named list of arguments for bbi, parsed from user input yaml
+#' @param .append Shared keys will have their contents concatenated instead of overwriting from .new_list
 #' @importFrom checkmate assert_list
 #' @return The combined list
 #' @export
-combine_list_objects <- function(.new_list, .old_list) {
+combine_list_objects <- function(.new_list, .old_list, .append = FALSE) {
   # check that unique named lists were passed
   tryCatch(
     checkmate::assert_list(.new_list, names="unique"),
@@ -159,7 +160,9 @@ combine_list_objects <- function(.new_list, .old_list) {
   }
   for (.n in names(.old_list)) {
     if (.n %in% names(.out_list)) {
-      .out_list[[.n]] <- c(.out_list[[.n]], .old_list[[.n]])
+      if (.append) {
+        .out_list[[.n]] <- c(.out_list[[.n]], .old_list[[.n]])
+      }
     } else {
       .out_list[[.n]] <- .old_list[[.n]]
     }
@@ -241,7 +244,7 @@ get_model_file_path <- function(.path) {
   }
 }
 
-get_yaml_path <- function(.spec, .check_exists = FALSE) {
+get_yaml_path <- function(.spec, .check_exists = TRUE) {
   # check if file name was stored on load, otherwise infer from model file
   if (is.null(.spec[[YAML_YAML_NAME]])) {
     yaml_file <- .spec[[YAML_MOD_PATH]] %>% get_mod_id() %>% yaml_ext()

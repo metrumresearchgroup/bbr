@@ -1,11 +1,10 @@
-model_type: nonmem
+orig_yaml_file: 1.yaml
 description: original acop model
-decisions:
- - some note
- - something else
+model_type: nonmem
 tags:
 - acop tag
 - other tag
 bbi_args:
   overwrite: yes
   threads: 4.0
+

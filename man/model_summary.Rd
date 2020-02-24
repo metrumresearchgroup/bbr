@@ -5,20 +5,32 @@
 \alias{model_summary}
 \alias{model_summary.bbi_nonmem_result}
 \alias{model_summary.character}
+\alias{create_nonmem_res_from_path}
 \title{Run `bbi summary` and parse the output to a list}
 \usage{
-nonmem_summary(.path, .args = NULL, ..., .dry_run = FALSE)
+nonmem_summary(
+  .res,
+  .wait = 30,
+  .ext_wait = 30,
+  .args = NULL,
+  ...,
+  .dry_run = FALSE
+)
 
 model_summary(.res, ...)
 
-\method{model_summary}{bbi_nonmem_result}(.res, .wait = 30, .ext_wait = 30, ...)
+\method{model_summary}{bbi_nonmem_result}(.res, ...)
 
-\method{model_summary}{character}(.res_dir, .model_type = c("nonmem"), ...)
+\method{model_summary}{character}(.path, .model_type = c("nonmem", "stan"), ...)
+
+create_nonmem_res_from_path(.path)
 }
 \arguments{
-\item{.path}{Full path to one of the following:
-1) path to a model file in the output directory
-2) path to a nonmem output directory}
+\item{.res}{`bbi_nonmem_result` object for summary}
+
+\item{.wait}{Integer number of seconds to wait trying `check_nonmem_progress()` for the model to be done.}
+
+\item{.ext_wait}{Integer number of seconds to wait for an .ext file (i.e. for the model to start). Passed through to `check_nonmem_progress()`}
 
 \item{.args}{A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.}
 
@@ -26,11 +38,9 @@ model_summary(.res, ...)
 
 \item{.dry_run}{show what the command would be without actually running it}
 
-\item{.res}{generic .res}
+\item{.path}{Character scaler with the file path to use}
 
-\item{.wait}{Integer number of seconds to wait trying `check_nonmem_progress()` for the model to be done.}
-
-\item{.ext_wait}{Integer number of seconds to wait for an .ext file (i.e. for the model to start). Passed through to `check_nonmem_progress()`}
+\item{.model_type}{Character scaler specifying the type of model, either 'nonmem' or 'stan'}
 }
 \value{
 List of S3 Class "bbi_nonmem_summary" with all summary information
@@ -43,4 +53,6 @@ S3 generic for getting model summary
 Get model summary from `bbi_nonmem_result` object and optionally check if model is done before erroring
 
 S3 dispatch for getting model summary from output directory path
+
+Create a `bbi_nonmem_res` object from a file path (should work with either path to a model file, yaml file, and output folder)
 }

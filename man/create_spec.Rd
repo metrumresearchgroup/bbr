@@ -2,7 +2,7 @@
 % Please edit documentation in R/workflow.R
 \name{create_spec}
 \alias{create_spec}
-\title{Creates S3 object of class `bbi_{.model_type}_spec` from list with `SPEC_REQ_KEYS`}
+\title{Creates S3 object of class `bbi_{.model_type}_spec` from list with `SPEC_REQ_INPUT_KEYS`}
 \usage{
 create_spec(.mod_list)
 }
@@ -13,5 +13,5 @@ create_spec(.mod_list)
 S3 object of class `bbi_{.model_type}_spec` that can be passed to `submit_model`
 }
 \description{
-Creates S3 object of class `bbi_{.model_type}_spec` from list with `SPEC_REQ_KEYS`
+Creates S3 object of class `bbi_{.model_type}_spec` from list with `SPEC_REQ_INPUT_KEYS`
 }

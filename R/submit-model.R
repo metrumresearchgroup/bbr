@@ -114,7 +114,7 @@ submit_nonmem_model <- function(.spec,
   }
 
   # add to result object
-  res <- combine_list_objects(res, .spec)
+  res <- combine_list_objects(res, .spec, .append = TRUE)
 
   return(res)
 }
