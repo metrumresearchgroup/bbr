@@ -35,6 +35,7 @@ NONMEM_ARGS = list(
 
 # YAML keys that are hard-coded
 YAML_MOD_PATH <- "model_path"
+YAML_YAML_NAME <- "orig_yaml_file"
 YAML_DESCRIPTION <- "description"
 YAML_BASED_ON <- "based_on"
 YAML_TAGS <- "tags"
@@ -42,20 +43,43 @@ YAML_BBI_ARGS <- "bbi_args"
 YAML_MOD_TYPE <- "model_type"
 YAML_OUT_DIR <- "output_dir"
 
-YAML_REQ_KEYS <- c(
+YAML_REQ_INPUT_KEYS <- c(
   YAML_MOD_TYPE,
   YAML_DESCRIPTION
 )
 
 WORKING_DIR <- "orig_working_dir"
 
-SPEC_REQ_KEYS <- c(
+# keys required to create a model spec
+SPEC_REQ_INPUT_KEYS <- c(
   WORKING_DIR,
   YAML_MOD_TYPE,
   YAML_DESCRIPTION
 )
 
+# keys required for a model spec to have
+SPEC_REQ_KEYS <- c(
+  WORKING_DIR,
+  YAML_MOD_TYPE,
+  YAML_DESCRIPTION,
+  YAML_MOD_PATH,
+  YAML_BBI_ARGS
+)
+
+# keys that get erased when saving a model spec to YAML on disk
+YAML_ERASE_OUT_KEYS <- c(
+  WORKING_DIR,
+  YAML_YAML_NAME
+)
+
 SUPPORTED_MOD_TYPES <- c("nonmem", "stan")
+
+# keys required for model result to have
+RESULT_REQ_KEYS <- c(
+  "cmd_args", # will be empty string if object was recreated by pointing to output dir
+  SPEC_REQ_KEYS,
+  YAML_OUT_DIR
+)
 
 # error messages that we grep for
 NO_NONMEM_ERR_MSG <- "No version was supplied and no default value exists in the configset"

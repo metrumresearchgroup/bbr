@@ -22,8 +22,8 @@ create_model <- function(
   # fill list from passed args
   .spec <- list()
   .spec[[WORKING_DIR]] <- dirname(.yaml_path)
+  .spec[[.YAML_YAML_NAME]] <- basename(.yaml_path)
   .spec[[YAML_DESCRIPTION]] <- .description
-  .spec[[YAML_MOD_PATH]] <- .model_path %||% get_model_file_path(.yaml_path)
   .spec[[YAML_MOD_TYPE]] <- .model_type
   if (!is.null(.based_on)) .spec[[YAML_BASED_ON]] <- scaler_to_list(.based_on)
   if (!is.null(.tags)) .spec[[YAML_TAGS]] <- scaler_to_list(.tags)
@@ -47,11 +47,8 @@ create_model <- function(
 #' @return S3 object of class `bbi_{.model_type}_spec` that can be passed to `submit_model()`
 #' @export
 create_model_from_yaml <- function(.yaml_path) {
-  # read in yaml
-  mod_yaml <- parse_mod_yaml(.yaml_path)
-
-  # create spec object
-  .spec <- create_spec(mod_yaml)
+  # read in yaml and create spec object
+  .spec <- parse_mod_yaml(.yaml_path)
 
   return(.spec)
 }
@@ -71,14 +68,16 @@ parse_mod_yaml <- function(.path) {
   # load from file
   yaml_list <- read_yaml(.path)
   yaml_list[[WORKING_DIR]] <- dirname(.path)
+  yaml_list[[.YAML_YAML_NAME]] <- basename(.path)
 
   # parse model path
-  if (isTRUE(getOption("rbabylon.strict")) && !check_required_keys(yaml_list, .req = YAML_REQ_KEYS)) {
-    stop(paste0(
-      "Model yaml must have keys `", paste(YAML_REQ_KEYS, collapse=", "), "` specified in it. ",
-      "But `", paste(YAML_REQ_KEYS[!(YAML_REQ_KEYS %in% names(yaml_list))], collapse=", "), "` are missing. ",
+  if (!check_required_keys(yaml_list, .req = YAML_REQ_INPUT_KEYS)) {
+    paste0(
+      "Model yaml must have keys `", paste(YAML_REQ_INPUT_KEYS, collapse=", "), "` specified in it. ",
+      "But `", paste(YAML_REQ_INPUT_KEYS[!(YAML_REQ_INPUT_KEYS %in% names(yaml_list))], collapse=", "), "` are missing. ",
       .path, " has the following keys: ", paste(names(yaml_list), collapse=", ")
-    ))
+    )
+    strict_mode_error(err_msg)
   }
 
   .spec <- create_spec(yaml_list)
@@ -87,18 +86,42 @@ parse_mod_yaml <- function(.path) {
 }
 
 
-#' Creates S3 object of class `bbi_{.model_type}_spec` from list with `SPEC_REQ_KEYS`
+#' Saves a model spec object to a yaml file
+#' @param .spec S3 object of class `bbi_{.model_type}_spec`
+#' @param .out_path Character scaler with path to save out YAML file. By default, sets it to the model file name, with a yaml extension.
+#' @importFrom yaml write_yaml
+#' @importFrom fs file_exists
+#' @return Output list as specified above.
+#' @export
+save_mod_yaml <- function(.spec, .out_path = NULL) {
+  # fill path if null
+  if (is.null(.out_path)) {
+    .out_path <- file.path(.spec[[WORKING_DIR]], yaml_ext(.spec[[YAML_MOD_PATH]]))
+  }
+
+  # erase keys that don't need to be saved out
+  for (key in YAML_ERASE_OUT_KEYS) {
+    .spec[[key]] <- NULL
+  }
+
+  # write to disk
+  yaml::write_yaml(.spec, .out_path)
+}
+
+
+#' Creates S3 object of class `bbi_{.model_type}_spec` from list with `SPEC_REQ_INPUT_KEYS`
 #' @param .mod_list List with the required information to create a spec object
 #' @return S3 object of class `bbi_{.model_type}_spec` that can be passed to `submit_model`
 #' @export
 create_spec <- function(.mod_list) {
   # check that necessary keys are present
-  if (isTRUE(getOption("rbabylon.strict")) && !check_required_keys(.mod_list, .req = SPEC_REQ_KEYS)) {
-    stop(paste0(
-      "Model list must have keys `", paste(SPEC_REQ_KEYS, collapse=", "), "` specified in order to create spec. ",
-      "But `", paste(SPEC_REQ_KEYS[!(SPEC_REQ_KEYS %in% names(.mod_list))], collapse=", "), "` are missing. ",
+  if (!check_required_keys(.mod_list, .req = SPEC_REQ_INPUT_KEYS)) {
+    err_msg <- paste0(
+      "Model list must have keys `", paste(SPEC_REQ_INPUT_KEYS, collapse=", "), "` specified in order to create spec. ",
+      "But `", paste(SPEC_REQ_INPUT_KEYS[!(SPEC_REQ_INPUT_KEYS %in% names(.mod_list))], collapse=", "), "` are missing. ",
       "List has the following keys: ", paste(names(.mod_list), collapse=", ")
-    ))
+    )
+    strict_mode_error(err_msg)
   }
 
   # by default, if no model defined, will set it to the yaml file name with extension ctl
@@ -124,7 +147,8 @@ create_spec <- function(.mod_list) {
   if (!(.model_type %in% SUPPORTED_MOD_TYPES)) {
     stop(glue("Invalid {YAML_MOD_TYPE} `{.model_type}`. Valid options include: `{SUPPORTED_MOD_TYPES}`"))
   }
-  class(.mod_list) <- c(as.character(glue("bbi_{.model_type}_spec")), class(.mod_list))
+
+  .mod_list <- assign_spec_class(.mod_list, .model_type)
 
   return(.mod_list)
 }
@@ -294,7 +318,7 @@ run_log <- function(
   all_yaml <- map(yaml_files, function(.x) {read_yaml(.x)})
 
   # filter to only model yaml's
-  mod_yaml_bool <- map_lgl(all_yaml, function(.x) {check_required_keys(.x, .req = YAML_REQ_KEYS)})
+  mod_yaml_bool <- map_lgl(all_yaml, function(.x) {check_required_keys(.x, .req = YAML_REQ_INPUT_KEYS)})
   not_mod <- yaml_files[!mod_yaml_bool]
   if (length(not_mod) > 0) {
     warning(glue("Found {length(not_mod)} YAML files that do not contain required keys for a model YAML. Ignoring the following files: `{paste(not_mod, collapse='`, `')}`"))

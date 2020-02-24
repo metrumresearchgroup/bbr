@@ -203,14 +203,6 @@ scaler_to_list <- function(.x) {
   return(.x)
 }
 
-save_mod_yaml <- function(.spec, .out_path = NULL) {
-  if (is.null(.out_path)) {
-    .out_path <- file.path(.spec[[WORKING_DIR]], yaml_ext(.spec[[YAML_MOD_PATH]]))
-  }
-  .spec[[WORKING_DIR]] <- NULL
-  yaml::write_yaml(.spec, .out_path)
-}
-
 is_valid_nonmem_extension <- function(.path) {
   tools::file_ext(.path) %in% c("ctl", "mod")
 }
@@ -249,8 +241,14 @@ get_model_file_path <- function(.path) {
   }
 }
 
-build_yaml_path <- function(.spec, .check_exists = FALSE) {
-  yaml_file <- .spec[[YAML_MOD_PATH]] %>% get_mod_id() %>% yaml_ext()
+get_yaml_path <- function(.spec, .check_exists = FALSE) {
+  # check if file name was stored on load, otherwise infer from model file
+  if (is.null(.spec[[YAML_YAML_NAME]])) {
+    yaml_file <- .spec[[YAML_MOD_PATH]] %>% get_mod_id() %>% yaml_ext()
+  } else {
+    yaml_file <- .spec[[YAML_YAML_NAME]]
+  }
+
   yaml_path <- file.path(.spec[[WORKING_DIR]], yaml_file)
   if (.check_exists) {
     if (!fs::file_exists(yaml_path)) {
@@ -259,3 +257,61 @@ build_yaml_path <- function(.spec, .check_exists = FALSE) {
   }
   return(yaml_path)
 }
+
+
+strict_mode_error <- function(err_msg) {
+  if (isTRUE(getOption("rbabylon.strict"))) {
+    stop(err_msg)
+  } else {
+    warning(paste(
+      "The following error is being ignored because `options('rbabylon.strict')` is not set to TRUE.",
+      "Consider setting `options('rbabylon.strict' = TRUE)` if you experience issues.",
+      err_msg
+    ))
+  }
+}
+
+
+#' Checks that object (list) has all the required elements to become an S3 object of class `bbi_{.model_type}_spec` and then, if it does, assigns the class.
+#' @param .mod_list The candidate list to assign the class to
+#' @param .model_type The type of model
+assign_spec_class <- function(.mod_list, .model_type) {
+  # check for required keys
+  if (!check_required_keys(.mod_list, .req = SPEC_REQ_KEYS)) {
+    err_msg <- paste0(
+      "Model object must have the following named elements to be converted to an S3 object of class `bbi_{.model_type}_spec`: `", paste(SPEC_REQ_KEYS, collapse=", "),
+      "But `", paste(SPEC_REQ_KEYS[!(SPEC_REQ_KEYS %in% names(.mod_list))], collapse=", "), "` are missing. ",
+      "Object has the following keys: ", paste(names(.mod_list), collapse=", ")
+    )
+    strict_mode_error(err_msg)
+  }
+
+  # assign class
+  class(.mod_list) <- c(as.character(glue("bbi_{.model_type}_spec")), class(.mod_list))
+
+  return(.mod_list)
+}
+
+
+#' Checks that object (list) has all the required elements to become an S3 object of class `bbi_{.model_type}_result` and then, if it does, assigns the class.
+#' @param .mod_list The candidate list to assign the class to
+#' @param .model_type The type of model
+assign_result_class <- function(.mod_list, .model_type) {
+  # check for required keys
+  if (!check_required_keys(.mod_list, .req = RESULT_REQ_KEYS)) {
+    err_msg <- paste0(
+      "Model object must have the following named elements to be converted to an S3 object of class `bbi_{.model_type}_result`: `", paste(RESULT_REQ_KEYS, collapse=", "),
+      "But `", paste(RESULT_REQ_KEYS[!(RESULT_REQ_KEYS %in% names(.mod_list))], collapse=", "), "` are missing. ",
+      "Object has the following keys: ", paste(names(.mod_list), collapse=", ")
+    )
+    strict_mode_error(err_msg)
+  }
+
+  # assign class
+  class(.mod_list) <- c(as.character(glue("bbi_{.model_type}_result")), class(.mod_list))
+
+  return(.mod_list)
+}
+
+
+

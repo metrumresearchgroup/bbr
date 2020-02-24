@@ -92,7 +92,7 @@ model_summary.bbi_nonmem_result <- function(.res, .wait = 30, .ext_wait = 30, ..
   if (is.null(.wait)) {
     .done <- check_nonmem_progress(.res, .ext_wait = 0)
     if (!.done) {
-      stop(glue("Summary failed because {.res$model_path} is not finished. Check back later or set `.wait` to a positive non-zero value."))
+      stop(glue("Summary failed because {.res[[YAML_MOD_PATH]]} is not finished. Check back later or set `.wait` to a positive non-zero value."))
     }
   }
 
@@ -105,7 +105,7 @@ model_summary.bbi_nonmem_result <- function(.res, .wait = 30, .ext_wait = 30, ..
     if (as.numeric(Sys.time() - start) < .wait) {
       .done <- check_nonmem_progress(.res, .ext_wait = .ext_wait)
     } else {
-      stop(glue("{.res$model_path} is not finished and {.wait} second wait time has elapsed. Check back later or increase `.wait`."))
+      stop(glue("{.res[[YAML_MOD_PATH]]} is not finished and {.wait} second wait time has elapsed. Check back later or increase `.wait`."))
     }
   }
   if (!is.null(.chill)) {
@@ -115,7 +115,7 @@ model_summary.bbi_nonmem_result <- function(.res, .wait = 30, .ext_wait = 30, ..
   }
 
   # get summary
-  res_list <- nonmem_summary(.res$output_dir, ...)
+  res_list <- nonmem_summary(.res[[YAML_OUT_DIR]], ...)
   return(res_list)
 }
 
@@ -139,17 +139,40 @@ model_summary.character <- function(.res_dir, .model_type = c("nonmem"), ...) {
 #### not sure if this has any real point, but it feels more consistent with how the spec and result are done.
 #### also, consider a way to get to model_summary from run_log. Is this related/useful towards that goal?
 
-# #' Create a `bbi_nonmem_res` object from a file path
-# #' @export
-# create_res_from_path <- function(.path) {
-#   files_exist_bool <- fs::dir_exists(tools::file_path_sans_ext(.path)) &&
-#                       fs::file_exists(yaml_ext(.path)) &&
-#                       (fs::file_exists(ctl_ext(.path)) || fs::file_exists(mod_ext(.path)))
-#   if (!files_exist_bool) {
-#
-#   }
-#
-# }
+#' Create a `bbi_nonmem_res` object from a file path
+#' @param file path that must lead to (with the correct extensions applied) a model file, yaml file, and output folder
+create_nonmem_res_from_path <- function(.path) {
+  # check for the required files
+  .output_dir <- tools::file_path_sans_ext(.path)
+  .yaml_path <- yaml_ext(.path)
+  files_exist_bool <- fs::dir_exists(.output_dir) &&
+                      fs::file_exists(.yaml_path) &&
+                      (fs::file_exists(ctl_ext(.path)) || fs::file_exists(mod_ext(.path)))
+  if (!files_exist_bool) {
+    err_msg <- paste(
+      "To view results from a run you must provide a path that will lead to all of the following files:",
+      glue("An output directory at `{.output_dir}`"),
+      glue("A YAML file at `{.yaml_path}`"),
+      glue("A model file at `{ctl_ext(.path)}` OR `{mod_ext(.path)}`"),
+      "One of more of these is missing.",
+      sep = "\n"
+    )
+    strict_mode_error(err_msg)
+  }
+
+  # build object
+  .spec <- parse_mod_yaml(.yaml_path)
+
+  # fill with results info
+  .spec[[YAML_MOD_PATH]] <- get_model_file_path(.path)
+  .spec[[YAML_OUT_DIR]] <- .output_dir
+  .spec[["cmd_args"]] <- ""
+
+  # assign class and return
+  .res <- assign_result_class(.spec, .model_type = "nonmem")
+
+  return(.res)
+}
 
 
 ######################################
