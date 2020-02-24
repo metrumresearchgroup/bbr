@@ -112,7 +112,6 @@ save_mod_yaml <- function(.spec, .out_path = NULL) {
 #' Creates S3 object of class `bbi_{.model_type}_spec` from list with `SPEC_REQ_INPUT_KEYS`
 #' @param .mod_list List with the required information to create a spec object
 #' @return S3 object of class `bbi_{.model_type}_spec` that can be passed to `submit_model`
-#' @export
 create_spec <- function(.mod_list) {
   # check that necessary keys are present
   if (!check_required_keys(.mod_list, .req = SPEC_REQ_INPUT_KEYS)) {
@@ -126,7 +125,11 @@ create_spec <- function(.mod_list) {
 
   # by default, if no model defined, will set it to the yaml file name with extension ctl
   if (is.null(.mod_list[[YAML_MOD_PATH]])) {
-    .mod_list[[YAML_MOD_PATH]] <- ctl_ext(basename(.path))
+    if (!is.null(.mod_list[[YAML_YAML_NAME]])) {
+      .mod_list[[YAML_MOD_PATH]] <- ctl_ext(.mod_list[[YAML_YAML_NAME]])
+    } else {
+      stop("Must specify either a YAML_MOD_PATH or YAML_YAML_NAME to create a spec. User should never see this error.")
+    }
   } else if (.mod_list[[YAML_MOD_TYPE]] == "nonmem" && (!is_valid_nonmem_extension(.mod_list[[YAML_MOD_PATH]]))) {
     stop(glue::glue("model_path defined in yaml at {.path} must have either a .ctl or .mod extension, not {.mod_list[[YAML_MOD_PATH]]}"))
   }

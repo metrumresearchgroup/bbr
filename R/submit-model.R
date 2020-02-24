@@ -110,11 +110,11 @@ submit_nonmem_model <- function(.spec,
   } else {
     # launch model
     res <- bbi_exec(cmd_args, .wait = .wait, wd = model_dir, ...)
-    res <- assign_result_class(res, .model_type = "nonmem")
   }
 
   # add to result object
   res <- combine_list_objects(res, .spec, .append = TRUE)
+  res <- assign_result_class(res, .model_type = "nonmem")
 
   return(res)
 }

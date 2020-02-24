@@ -149,13 +149,13 @@ model_summary.character <- function(.path, .model_type = c("nonmem", "stan"), ..
 create_nonmem_res_from_path <- function(.path) {
   # check for the required files
   .output_dir <- tools::file_path_sans_ext(.path)
-  .working_dir <- normalizePath(dirname(.output_path))
+  .working_dir <- normalizePath(dirname(.output_dir))
   if (!fs::dir_exists(.output_dir)) {
     stop(glue("No directory exists at {.output_dir} -- Must pass path to a valid output directory."))
   }
   check_lst_file(.output_dir)
 
-  .potential_yaml_file <- .output_path %>% get_mod_id() %>% yaml_ext()
+  .potential_yaml_file <- .output_dir %>% get_mod_id() %>% yaml_ext()
   .yaml_path <- file.path(.working_dir, .potential_yaml_file)
   if (fs::file_exists(.yaml_path)) {
     .spec <- parse_mod_yaml(.yaml_path)

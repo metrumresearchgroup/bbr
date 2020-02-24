@@ -24,10 +24,10 @@ cleanup_demo <- function() {
 cleanup_demo()
 
 # setup bbi path
-#options('rbabylon.bbi_exe_path' = '/data/apps/bbi')
+options('rbabylon.bbi_exe_path' = '/data/apps/bbi')
 
 # create babylon.yaml
-#bbi_init(".", "/opt/NONMEM")
+bbi_init(".", "/opt/NONMEM")
 
 ################
 # step by step

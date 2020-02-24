@@ -80,7 +80,7 @@ tail_output.character <- function(.file, .head = 3, .tail = 5, .print = TRUE, .r
 #' @export
 #' @rdname check_file
 tail_output.bbi_nonmem_result <- function(.res, .head = 3, .tail = 5, .print = TRUE, .return = FALSE) {
-  .file <- file.path(.res[[YAML_OUT_DIR]], "OUTPUT")
+  .file <- file.path(.res[[WORKING_DIR]], .res[[YAML_OUT_DIR]], "OUTPUT")
   check_file(.file, .head, .tail, .print, .return)
 }
 
@@ -114,7 +114,7 @@ tail_lst.character <- function(.file, .head = 3, .tail = 5, .print = TRUE, .retu
 #' @export
 #' @rdname check_file
 tail_lst.bbi_nonmem_result <- function(.res, .head = 3, .tail = 5, .print = TRUE, .return = FALSE) {
-  .file <- file.path(.res[[YAML_OUT_DIR]], paste0(get_mod_id(.res[[YAML_MOD_PATH]]), ".lst"))
+  .file <- build_path_from_res(.res, "lst")
   check_file(.file, .head, .tail, .print, .return)
 }
 
@@ -191,7 +191,7 @@ check_grd.character <- function(.path, .iter_floor = 0) {
 #' @export
 #' @rdname check_nonmem_table_output
 check_grd.bbi_nonmem_result <- function(.res, .iter_floor = 0) {
-  grd_path <- file.path(.res[[YAML_OUT_DIR]], paste0(get_mod_id(.res[[YAML_MOD_PATH]]), ".grd"))
+  grd_path <- build_path_from_res(.res, "grd")
   df <- check_nonmem_table_output(grd_path, .x_var = "ITERATION", .x_floor = .iter_floor)
   return(df)
 }
@@ -237,7 +237,7 @@ check_ext.character <- function(.path, .iter_floor = 0) {
 #' @export
 #' @rdname check_nonmem_table_output
 check_ext.bbi_nonmem_result <- function(.res, .iter_floor = 0) {
-  ext_path <- file.path(.res[[YAML_OUT_DIR]], paste0(get_mod_id(.res[[YAML_MOD_PATH]]), ".ext"))
+  ext_path <- build_path_from_res(.res, "ext")
   df <- check_nonmem_table_output(ext_path, .x_var = "ITERATION", .x_floor = .iter_floor)
   return(df)
 }
@@ -258,7 +258,7 @@ plot_ext <- function(.df, ...) {
 check_nonmem_progress <- function(.res, .ext_wait = 30) {
   # look for ext file
   SLEEP = 1
-  ext_path <- file.path(.res[[YAML_OUT_DIR]], paste0(get_mod_id(.res[[YAML_MOD_PATH]]), ".ext"))
+  ext_path <- build_path_from_res(.res, "ext")
   if (!fs::file_exists(ext_path)) {
     while (.ext_wait > 0) {
       if (fs::file_exists(ext_path)) {

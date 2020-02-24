@@ -230,6 +230,16 @@ yaml_ext <- function(.x) {
   sprintf("%s.yaml", tools::file_path_sans_ext(.x))
 }
 
+#' Builds the absolute path to file in the output directory from components of the `bbi_{.model_type}_res` object
+#' @param .res `bbi_{.model_type}_res` object
+#' @param .extension file extension to append (for example `lst`, `ext`, `grd`, etc.)
+build_path_from_res <- function(.res, .extension) {
+  ext_path <- file.path(.res[[WORKING_DIR]],
+                        .res[[YAML_OUT_DIR]],
+                        paste0(get_mod_id(.res[[YAML_MOD_PATH]]), ".", .extension))
+  return(ext_path)
+}
+
 # helper to find valid model file and return ctl_ext(.path) by default if not found
 get_model_file_path <- function(.path) {
   .ctl_path <- ctl_ext(.path)
@@ -283,8 +293,8 @@ assign_spec_class <- function(.mod_list, .model_type) {
   if (!check_required_keys(.mod_list, .req = SPEC_REQ_KEYS)) {
     err_msg <- paste0(
       "Model object must have the following named elements to be converted to an S3 object of class `bbi_{.model_type}_spec`: `", paste(SPEC_REQ_KEYS, collapse=", "),
-      "But `", paste(SPEC_REQ_KEYS[!(SPEC_REQ_KEYS %in% names(.mod_list))], collapse=", "), "` are missing. ",
-      "Object has the following keys: ", paste(names(.mod_list), collapse=", ")
+      "` but the following keys are missing: `", paste(SPEC_REQ_KEYS[!(SPEC_REQ_KEYS %in% names(.mod_list))], collapse=", "),
+      "`\nObject has the following keys: ", paste(names(.mod_list), collapse=", ")
     )
     strict_mode_error(err_msg)
   }
@@ -304,8 +314,8 @@ assign_result_class <- function(.mod_list, .model_type) {
   if (!check_required_keys(.mod_list, .req = RESULT_REQ_KEYS)) {
     err_msg <- paste0(
       "Model object must have the following named elements to be converted to an S3 object of class `bbi_{.model_type}_result`: `", paste(RESULT_REQ_KEYS, collapse=", "),
-      "But `", paste(RESULT_REQ_KEYS[!(RESULT_REQ_KEYS %in% names(.mod_list))], collapse=", "), "` are missing. ",
-      "Object has the following keys: ", paste(names(.mod_list), collapse=", ")
+      "` but the following keys are missing: `", paste(RESULT_REQ_KEYS[!(RESULT_REQ_KEYS %in% names(.mod_list))], collapse=", "),
+      "`\nObject has the following keys: ", paste(names(.mod_list), collapse=", ")
     )
     strict_mode_error(err_msg)
   }
@@ -315,6 +325,7 @@ assign_result_class <- function(.mod_list, .model_type) {
 
   return(.mod_list)
 }
+
 
 
 
