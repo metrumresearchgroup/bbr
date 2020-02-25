@@ -1,9 +1,9 @@
 description: original acop model
 model_type: nonmem
+model_path: 1.ctl
 tags:
 - acop tag
 - other tag
 bbi_args:
   overwrite: yes
   threads: 4.0
-model_path: 1.ctl

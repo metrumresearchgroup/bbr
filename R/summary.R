@@ -164,7 +164,7 @@ create_nonmem_res_from_path <- function(.path) {
     .spec[[WORKING_DIR]] <- .working_dir
     .spec[[YAML_MOD_TYPE]] <- "nonmem"
     .spec[[YAML_DESCRIPTION]] <- as.character(glue("Results object created from {.output_dir} with `create_nonmem_res_from_path()`"))
-    .spec[[YAML_MOD_PATH]] <- get_model_file_path(.path)
+    .spec[[YAML_MOD_PATH]] <- find_model_file_path(.path)
     .spec[[YAML_BBI_ARGS]] <- list()
 
   }

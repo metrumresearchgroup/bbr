@@ -20,7 +20,7 @@ create_model(
 
 \item{.description}{Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.}
 
-\item{.model_path}{Path to control stream file for the model. Must be an absolute path, or the model path relative to the location of the YAML file. It recommended for the control stream and YAML to be in the same directory.}
+\item{.model_path}{Path to control stream file for the model. MUST be an absolute path, or the model path relative to the location of the YAML file. It recommended for the control stream and YAML to be in the same directory.}
 
 \item{.based_on}{A character scaler or vector of run id's (model names) that this model was "based on." These are used to reconstuct model developement and ancestry.}
 

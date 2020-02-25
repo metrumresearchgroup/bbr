@@ -8,9 +8,9 @@
 \usage{
 plot_nonmem_table_df(.df, .x_var, .stat_name)
 
-plot_grd(.df, ...)
+plot_grd(.df)
 
-plot_ext(.df, ...)
+plot_ext(.df)
 }
 \arguments{
 \item{.df}{tibble from from check_ext() output}

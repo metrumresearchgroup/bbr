@@ -111,9 +111,9 @@ for (.test_case in .TEST_CASES_WD) {
 
 test_that("compare two specs", {
   # create model spec
+  .test_path <- "model-examples/tmp.yaml"
   spec1a <- create_model(
-    .model_path = "model-examples/1.ctl",
-    .yaml_path = "model-examples/1.yaml",
+    .yaml_path = .test_path,
     .description = "original acop model",
     .tags = c("acop tag", "other tag"),
     .bbi_args = list(overwrite = TRUE, threads = 4)
@@ -131,7 +131,17 @@ test_that("compare two specs", {
   expect_true(all(SPEC_REQ_KEYS %in% names(spec1b)))
 
   # also check that some of the required keys have the same value
+  for (k in SPEC_REQ_KEYS) {
+    if (k == YAML_MOD_PATH) {
+      expect_identical(spec1a[[k]], basename(ctl_ext(.test_path)))
+      expect_identical(spec1b[[k]], "1.ctl")
+    } else {
+      expect_equal(spec1a[[k]], spec1b[[k]])
+    }
+  }
 
+  # clean up tmp file
+  fs::file_delete(.test_path)
 })
 
 # test some copying

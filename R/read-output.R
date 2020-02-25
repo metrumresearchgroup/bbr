@@ -200,7 +200,7 @@ check_grd.bbi_nonmem_result <- function(.res, .iter_floor = 0) {
 #' @param .df tibble from from check_grd() output
 #' @export
 #' @rdname plot_nonmem_table_df
-plot_grd <- function(.df, ...) {
+plot_grd <- function(.df) {
   plot_nonmem_table_df(.df, .x_var = "ITERATION", .stat_name = "GRADIENT")
 }
 
@@ -246,7 +246,7 @@ check_ext.bbi_nonmem_result <- function(.res, .iter_floor = 0) {
 #' @param .df tibble from from check_ext() output
 #' @export
 #' @rdname plot_nonmem_table_df
-plot_ext <- function(.df, ...) {
+plot_ext <- function(.df) {
   plot_nonmem_table_df(.df, .x_var = "ITERATION", .stat_name = "GRADIENT")
 }
 

@@ -1,8 +1,8 @@
 #' Create new model spec by specifying relevant information as arguments
 #' Also creates necessary YAML file for using `create_run_log()` later.
-#' @param .model_path Path to control stream file for the model. Must be an absolute path, or the model path relative to the location of the YAML file. It recommended for the control stream and YAML to be in the same directory.
 #' @param .yaml_path Path to save resulting model YAML file to
 #' @param .description Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.
+#' @param .model_path Path to control stream file for the model. MUST be an absolute path, or the model path relative to the location of the YAML file. It recommended for the control stream and YAML to be in the same directory.
 #' @param .based_on A character scaler or vector of run id's (model names) that this model was "based on." These are used to reconstuct model developement and ancestry.
 #' @param .tags A character scaler or vector with any user tags to be added to the YAML file
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments. These will be written into YAML file.
@@ -42,7 +42,6 @@ create_model <- function(
 
 #' Create new model spec from a model yaml
 #' @param .yaml_path Character scaler for the path to the YAML model file that will be used
-#' @param .model_type Character scaler to specify type of model being created (used for S3 class). Currently only `'nonmem'` is supported.
 #' @importFrom yaml read_yaml
 #' @importFrom purrr list_modify
 #' @return S3 object of class `bbi_{.model_type}_spec` that can be passed to `submit_model()`
@@ -197,8 +196,8 @@ copy_model_from.character <- function(.parent_path, .new_model, .description, ..
   }
 
   # create spec from YAML path
-  .spec <- create_model_from_yaml(.parent_path)
-  .model_type <- .spec[[YAML_MOD_TYPE]]
+  .parent_spec <- create_model_from_yaml(.parent_path)
+  .model_type <- .parent_spec[[YAML_MOD_TYPE]]
 
   # copy from spec
   if (.model_type == "nonmem") {
@@ -244,7 +243,7 @@ copy_nonmem_model_from <- function(
   .update_mod_file = TRUE
 ) {
   # Check spec for correct class and then copy it
-  if (!("bbi_nonmem_spec" %>% class(.parent_spec))) {
+  if (!("bbi_nonmem_spec" %in% class(.parent_spec))) {
     stop(paste(
       "copy_nonmem_model_from() requires a spec object of class `bbi_nonmem_spec`. Passed object has the following classes:",
       paste(class(.parent_spec), collapse = ", "),
@@ -252,6 +251,9 @@ copy_nonmem_model_from <- function(
       sep = "\n"))
   }
   .new_spec <- .parent_spec
+
+  # reset model working directory
+  .new_spec[[WORKING_DIR]] <- normalizePath(dirname(.new_model))
 
   # build new model path
   .file_ext <- tools::file_ext(.parent_spec[[YAML_MOD_PATH]])
@@ -267,7 +269,7 @@ copy_nonmem_model_from <- function(
   # copy control steam to new path
   if (.update_mod_file) {
     # read parent control stream
-    mod_str <- read_file(.parent_spec[[YAML_MOD_PATH]])
+    mod_str <- .parent_spec %>% get_model_path() %>% read_file()
 
     # replace the $PROBLEM line(s)
     mod_str <- str_replace(mod_str,
@@ -275,29 +277,29 @@ copy_nonmem_model_from <- function(
                 as.character(glue("$PROBLEM {get_mod_id(.new_model)} {.description}\n\n$")))
 
     # read parent control stream
-    write_file(mod_str, new_mod_path)
+    write_file(mod_str, get_model_path(.new_spec))
   } else {
-    fs::file_copy(.parent_spec[[YAML_MOD_PATH]], new_mod_path)
+    fs::file_copy(get_model_path(.parent_spec), get_model_path(.new_spec))
   }
 
   # fill based_on
-  .new_spec[[YAML_BASED_ON]] <- c(get_mod_id(.parent_spec[[YAML_MOD_PATH]]), .based_on_additional)
+  .new_spec[[YAML_BASED_ON]] <- get_mod_id(.parent_spec[[YAML_MOD_PATH]]) %>% c(.based_on_additional) %>% scaler_to_list()
 
   # fill description
   .new_spec[[YAML_DESCRIPTION]] <- .description
 
   # fill tags
   if (.inherit_tags && !is.null(.parent_spec[[YAML_TAGS]])) {
-    .new_spec[[YAML_TAGS]] <- c(.parent_spec[[YAML_TAGS]], .add_tags)
+    .new_spec[[YAML_TAGS]] <- .parent_spec[[YAML_TAGS]] %>% c(.add_tags) %>% scaler_to_list()
   } else {
-    .new_spec[[YAML_TAGS]] <- scaler_to_list(.add_tags)
+    .new_spec[[YAML_TAGS]] <- .add_tags %>% scaler_to_list()
   }
 
   # write .new_spec out
   new_yaml_path <- yaml_ext(.new_model)
   save_mod_yaml(.new_spec, .out_path = new_yaml_path)
 
-  return(.spec)
+  return(.new_spec)
 }
 
 #####################
@@ -387,7 +389,7 @@ run_log <- function(
   # transpose yaml list to tibble
   .col_names <- map(mod_yaml, function(.x) {return(names(.x))}) %>% unlist() %>% unique()
   df <- mod_yaml %>% transpose(.names = .col_names) %>% as_tibble() %>%
-    mutate_at(c(YAML_MOD_PATH, YAML_DESCRIPTION), unlist) %>%
+    mutate_at(c(YAML_MOD_PATH, YAML_DESCRIPTION, YAML_MOD_TYPE), unlist) %>%
     mutate(run_id = get_mod_id(.data[[YAML_MOD_PATH]])) %>%
     select(.data$run_id, everything())
 

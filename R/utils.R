@@ -119,7 +119,11 @@ format_cmd_args <- function(.args, .collapse = FALSE) {
 #' @export
 parse_args_list <- function(.func_args, .yaml_args) {
   # start with .yaml_args
+  if (is.null(.yaml_args)) {
+    .yaml_args <- list()
+  }
   .args <- .yaml_args
+
   if (!is.null(.func_args)) {
     # check that unique named list was passed
     tryCatch(
@@ -241,7 +245,7 @@ build_path_from_res <- function(.res, .extension) {
 }
 
 # helper to find valid model file and return ctl_ext(.path) by default if not found
-get_model_file_path <- function(.path) {
+find_model_file_path <- function(.path) {
   .ctl_path <- ctl_ext(.path)
   .mod_path <- mod_ext(.path)
   if(fs::file_exists(.ctl_path)) {
@@ -252,6 +256,10 @@ get_model_file_path <- function(.path) {
     warning(glue("No model file found at {.ctl_path} but setting that path as default model path for {.path}. Please put relevant model file in that location."))
     return(basename(.ctl_path))
   }
+}
+
+get_model_path <- function(.spec) {
+  return(file.path(.spec[[WORKING_DIR]], .spec[[YAML_MOD_PATH]]))
 }
 
 get_yaml_path <- function(.spec, .check_exists = TRUE) {

@@ -60,45 +60,20 @@ test_that("format_cmd_args parses correctly", {
 })
 
 
-test_that("parse_mod_yaml() returns expected list", {
-  expect_identical(parse_mod_yaml("data/acop.yaml"),
-                   list(
-                     model_path = "data/acop.mod",
-                     description = "acop model for testing",
-                     tags = c("acop tag", "other tag"),
-                     bbi_args = list(
-                                    overwrite = TRUE,
-                                    threads = 4L,
-                                    nm_version = "nm74gf")
-                    )
-                   )
-
-  expect_error(parse_mod_yaml("data/modtest_no_modpath.yaml"))
-})
-
-
 test_that("parse_args_list() merges lists as expected", {
   .func_args <- list(naw=4, paw=6)
   .yaml_args <- list(naw=T, saw="hey")
 
   # override `naw` from .func_args
-  expect_identical(parse_args_list(.func_args, .yaml_args), list(naw=T, paw=6, saw="hey"))
+  expect_identical(parse_args_list(.func_args, .yaml_args), list(naw=4, saw="hey", paw=6))
 
   # correctly handles nulls
   expect_identical(parse_args_list(NULL, .yaml_args), .yaml_args)
   expect_identical(parse_args_list(.func_args, NULL), .func_args)
-  expect_identical(parse_args_list(NULL, NULL), NULL)
+  expect_identical(parse_args_list(NULL, NULL), list())
 
   # correctly fails if .func_args isn't named
   expect_error(parse_args_list(list(4,5,6), .yaml_args))
 
 })
 
-
-test_that("yaml with no model path will return ctl", {
-
-})
-
-test_that("yaml with no model path will return ctl", {
-
-})
