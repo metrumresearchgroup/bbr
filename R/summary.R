@@ -78,7 +78,7 @@ nonmem_summary <- function(.res,
   # otherwise, execute
   res <- bbi_exec(cmd_args, wd = .path, ..., .wait = TRUE)
 
-  res_list <- get_stdout(res)$output %>%
+  res_list <- res$stdout %>%
     paste(collapse="") %>%
     jsonlite::fromJSON(simplifyDataFrame = FALSE)
 

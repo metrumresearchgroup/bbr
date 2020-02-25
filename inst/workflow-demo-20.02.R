@@ -6,8 +6,12 @@ print(glue::glue("switched working directory to `{getwd()}` for demo."))
 
 # cleanup function
 cleanup_demo <- function() {
-  # delete original acop output
+  # clear old babylon.yaml
+  if (fs::file_exists("babylon.yaml")) fs::file_delete("babylon.yaml")
+
+  # delete original acop output and yaml
   if (fs::dir_exists("1")) fs::dir_delete("1")
+  if (fs::file_exists("1.yaml")) fs::file_delete("1.yaml")
 
   # delete demo models
   demo_mods <- c(
@@ -27,7 +31,7 @@ cleanup_demo()
 options('rbabylon.bbi_exe_path' = '/data/apps/bbi')
 
 # create babylon.yaml
-bbi_init(".", "/opt/NONMEM")
+bbi_init(".", "/opt/NONMEM", "nm74gf")
 
 ################
 # step by step
@@ -35,8 +39,8 @@ bbi_init(".", "/opt/NONMEM")
 
 # create model spec
 spec1 <- create_model(
-  .model_path = "1.ctl",
   .yaml_path = "1.yaml",
+  .model_path = "1.mod",
   .description = "original acop model",
   .tags = c("acop tag", "other tag"),
   .bbi_args = list(overwrite = TRUE, threads = 4)
@@ -63,7 +67,7 @@ print(names(sum1))
 # [7] "covariance_theta"  "correlation_theta"
 str(sum1)
 
-  par_df1 <- param_estimates(sum1) %>% mutate(val = ifelse(param == "THETA"))
+par_df1 <- param_estimates(sum1)
 head(par_df1)
 
 #########

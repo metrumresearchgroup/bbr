@@ -25,6 +25,7 @@ create_model <- function(
   .spec[[YAML_YAML_NAME]] <- basename(.yaml_path)
   .spec[[YAML_DESCRIPTION]] <- .description
   .spec[[YAML_MOD_TYPE]] <- .model_type
+  if (!is.null(.model_path)) .spec[[YAML_MOD_PATH]] <- .model_path
   if (!is.null(.based_on)) .spec[[YAML_BASED_ON]] <- scaler_to_list(.based_on)
   if (!is.null(.tags)) .spec[[YAML_TAGS]] <- scaler_to_list(.tags)
   if (!is.null(.bbi_args)) .spec[[YAML_BBI_ARGS]] <- .bbi_args

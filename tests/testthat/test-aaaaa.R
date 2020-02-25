@@ -1,6 +1,6 @@
 
 # reference constants
-REF_SUMMARY_CALL <- "cd /data/home/sethg/rbabylon/tests/testthat/model-examples/1 ; /data/apps/bbi nonmem summary 1 --json"
+REF_SUMMARY_CALL <- as.character(glue("cd {getwd()}/model-examples/1 ; {getOption('rbabylon.bbi_exe_path')} nonmem summary 1 --json"))
 
 .TEST_CASES_WD <- list(
   list(test_wd = ".",               test_yaml_path = "model-examples/1.yaml"),

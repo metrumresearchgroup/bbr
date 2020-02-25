@@ -224,7 +224,7 @@ mod_ext <- function(.x) {
 }
 
 yaml_ext <- function(.x) {
-  if (tools::file_ext(.path) == "yml") {
+  if (tools::file_ext(.x) == "yml") {
     return(.x)
   }
   sprintf("%s.yaml", tools::file_path_sans_ext(.x))
