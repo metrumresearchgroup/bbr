@@ -172,5 +172,17 @@ View(log_df)
 # filter it
 log_df %>% filter(tags == "iterations round 1") %>% View()
 
+
+####### how to reconstruct from log_df or something if we don't have the objects
+spec3 <- new_mod2 %>% yaml_ext %>% create_model_from_yaml() ### need something better than this
+
+# also this sync with YAML issue
+spec3 <- spec3 %>% add_tags("naw dawg")
+spec3 %>% add_tags("naw dawg") # oops now it's there twice, but only on disk
+# since we didn't reassign the previous call, the object is behind the disk
+# implement hash checking to error/warn next time you try to use this spec that you need to call `reconcile_`
+
+
+
 # delete temp demo files
 cleanup_demo()

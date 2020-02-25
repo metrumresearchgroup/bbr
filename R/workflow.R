@@ -317,7 +317,15 @@ reconcile_mod_yaml <- function(.spec, .yaml_path) {
 }
 
 
-modify_spec_field <- function(.spec, .field, .value, .append = TRUE) {
+#' Implementation function for updating fields in a `bbi_{.model_type}_spec` object
+#' Also reconciles the object with the corresponding YAML before modifying and then writes the modified object back to the YAML
+#' @param .spec The `bbi_{.model_type}_spec` object to modify
+#' @param .field Character scaler of the name of the component to modify
+#' @param .value Whatever is to be added to `.spec[[.field]]`, typically a character scaler or vector
+#' @param .append Boolean for whether to concatenate new values with currently present values. TRUE by default. If FALSE, new values will overwrite old values.
+#' @param .unique Boolean for whether to de-duplicate `.spec[[.field]]` after adding new values. TRUE by default.
+#' @rdname modify_spec_field
+modify_spec_field <- function(.spec, .field, .value, .append = TRUE, .unique = TRUE) {
   # extract path to yaml
   .yaml_path <- get_yaml_path(.spec)
 
@@ -325,10 +333,15 @@ modify_spec_field <- function(.spec, .field, .value, .append = TRUE) {
   .spec <- reconcile_mod_yaml(.spec, .yaml_path)
 
   # Either append new value or overwrite with new value
-  if (.append) {
+  if (isTRUE(.append)) {
     .spec[[.field]] <- c(.spec[[.field]], .value)
   } else {
     .spec[[.field]] <- .value
+  }
+
+  # de-duplicate values
+  if (isTRUE(.unique)) {
+    .spec[[.field]] <- .spec[[.field]] %>% unique(fromLast = TRUE)
   }
 
   # overwrite the yaml on disk with modified spec
@@ -337,6 +350,11 @@ modify_spec_field <- function(.spec, .field, .value, .append = TRUE) {
   return(.spec)
 }
 
+#' Add tags to a spec object and corresponding YAML
+#' @param .spec The `bbi_{.model_type}_spec` object to modify
+#' @param .tags Character scaler or vector of tags to add
+#' @export
+#' @rdname modify_spec_field
 add_tags <- function(.spec, .tags) {
   .spec <- modify_spec_field(.spec = .spec,
                              .field = YAML_TAGS,
@@ -345,10 +363,93 @@ add_tags <- function(.spec, .tags) {
   return(.spec)
 }
 
+#' Replaces tags on a spec object and corresponding YAML with new tags
+#' @param .spec The `bbi_{.model_type}_spec` object to modify
+#' @param .tags Character scaler or vector of tags use as replacement
+#' @export
+#' @rdname modify_spec_field
 replace_tags <- function(.spec, .tags) {
   .spec <- modify_spec_field(.spec = .spec,
                              .field = YAML_TAGS,
                              .value = .tags,
+                             .append = FALSE)
+  return(.spec)
+}
+
+#' Append new decisions to the one(s) in a spec object and corresponding YAML
+#' @param .spec The `bbi_{.model_type}_spec` object to modify
+#' @param .decisions Character scaler or vector of text to add to `decisions` field
+#' @export
+#' @rdname modify_spec_field
+add_decisions <- function(.spec, .decisions) {
+  .spec <- modify_spec_field(.spec = .spec,
+                             .field = YAML_DECISIONS,
+                             .value = .decisions,
+                             .append = TRUE)
+  return(.spec)
+}
+
+#' Replaces `decisions` field in a spec object and corresponding YAML with new values
+#' @param .spec The `bbi_{.model_type}_spec` object to modify
+#' @param .decisions Character scaler or vector to use as replacement
+#' @export
+#' @rdname modify_spec_field
+replace_decisions <- function(.spec, .decisions) {
+  .spec <- modify_spec_field(.spec = .spec,
+                             .field = YAML_DECISIONS,
+                             .value = .decisions,
+                             .append = FALSE)
+  return(.spec)
+}
+
+#' Append new description to the one in a spec object and corresponding YAML
+#' @param .spec The `bbi_{.model_type}_spec` object to modify
+#' @param .description Character scaler or vector of tags to add
+#' @export
+#' @rdname modify_spec_field
+add_description <- function(.spec, .description) {
+  .spec <- modify_spec_field(.spec = .spec,
+                             .field = YAML_DESCRIPTION,
+                             .value = .description,
+                             .append = TRUE)
+  return(.spec)
+}
+
+#' Replaces description field in a spec object and corresponding YAML with new description
+#' @param .spec The `bbi_{.model_type}_spec` object to modify
+#' @param .description Character scaler to use as replacement
+#' @export
+#' @rdname modify_spec_field
+replace_description <- function(.spec, .description) {
+  .spec <- modify_spec_field(.spec = .spec,
+                             .field = YAML_DESCRIPTION,
+                             .value = .description,
+                             .append = FALSE)
+  return(.spec)
+}
+
+#' Append new `based_on` tag to the one in a spec object and corresponding YAML
+#' @param .spec The `bbi_{.model_type}_spec` object to modify
+#' @param .based_on Character scaler or vector of model id's to add to `based_on` field
+#' @export
+#' @rdname modify_spec_field
+add_based_on <- function(.spec, .based_on) {
+  .spec <- modify_spec_field(.spec = .spec,
+                             .field = YAML_BASED_ON,
+                             .value = .based_on,
+                             .append = TRUE)
+  return(.spec)
+}
+
+#' Replaces `based_on` field in a spec object and corresponding YAML with new values
+#' @param .spec The `bbi_{.model_type}_spec` object to modify
+#' @param .based_on Character scaler or vector to use as replacement
+#' @export
+#' @rdname modify_spec_field
+replace_based_on <- function(.spec, .based_on) {
+  .spec <- modify_spec_field(.spec = .spec,
+                             .field = YAML_BASED_ON,
+                             .value = .based_on,
                              .append = FALSE)
   return(.spec)
 }

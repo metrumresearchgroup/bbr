@@ -109,3 +109,8 @@ test_that("yaml with no model path will return ctl", {
   .spec <- parse_mod_yaml(yaml_ext(.test_path))
   expect_identical(.spec[[YAML_MOD_PATH]], basename(ctl_ext(.test_path)))
 })
+
+
+###### need tests for all the modify_spec_field wrappers
+
+
