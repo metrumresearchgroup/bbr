@@ -487,6 +487,12 @@ run_log <- function(
   }
   mod_yaml <- all_yaml[which(mod_yaml_bool)]
 
+  # stop if no valid model YAML found
+  if (length(mod_yaml) == 0) {
+    warning(glue("Found no valid model YAML files in {.base_dir}"))
+    return(NULL)
+  }
+
   # transpose yaml list to tibble
   .col_names <- map(mod_yaml, function(.x) {return(names(.x))}) %>% unlist() %>% unique()
   df <- mod_yaml %>% transpose(.names = .col_names) %>% as_tibble() %>%
