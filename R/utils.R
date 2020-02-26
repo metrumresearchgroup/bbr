@@ -190,12 +190,27 @@ print_nonmem_args <- function() {
 
 
 #' Helper to strip path and extension from model file to get only model identifier
-#' @param .mod_path model path to strip
+#' @param .mod_path Character scaler model path to strip
 #' @importFrom tools file_path_sans_ext
 #' @returns Character scaler with only model identifier
+#' @rdname get_mod_id
 #' @export
-get_mod_id <- function(.mod_path) {
+get_mod_id <- function(.mod_path, ...) {
+  UseMethod("get_mod_id", .mod_path)
+}
+
+# S3 dispatch to get model identifier from file path to model
+#' @rdname get_mod_id
+#' @export
+get_mod_id.character <- function(.mod_path) {
   return(basename(tools::file_path_sans_ext(.mod_path)))
+}
+
+#' S3 dispatch to get model identifier from
+#' @rdname get_mod_id
+#' @export
+get_mod_id.bbi_nonmem_spec <- function(.res) {
+  return(basename(tools::file_path_sans_ext(.res[[YAML_MOD_PATH]])))
 }
 
 
@@ -260,6 +275,10 @@ find_model_file_path <- function(.path) {
 
 get_model_path <- function(.spec) {
   return(file.path(.spec[[WORKING_DIR]], .spec[[YAML_MOD_PATH]]))
+}
+
+get_output_dir <- function(.spec) {
+  return(file.path(.spec[[WORKING_DIR]], .spec[[YAML_OUT_DIR]]))
 }
 
 get_yaml_path <- function(.spec, .check_exists = TRUE) {
