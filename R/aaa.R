@@ -51,6 +51,14 @@ YAML_REQ_INPUT_KEYS <- c(
 
 WORKING_DIR <- "orig_working_dir"
 
+# keys added when creating a result object
+RES_PROCESS <- "process"
+RES_STDOUT <- "stdout"
+RES_BBI <- "bbi"
+RES_CMD_ARGS <- "cmd_args"
+RES_CALL <- "call"
+RES_WD <- "wd"
+
 # keys required to create a model spec
 SPEC_REQ_INPUT_KEYS <- c(
   WORKING_DIR,
@@ -67,17 +75,23 @@ SPEC_REQ_KEYS <- c(
   YAML_BBI_ARGS
 )
 
-# keys that get erased when saving a model spec to YAML on disk
+# keys that get erased when saving a model YAML on disk
 YAML_ERASE_OUT_KEYS <- c(
   WORKING_DIR,
-  YAML_YAML_NAME
+  YAML_YAML_NAME,
+  RES_PROCESS,
+  RES_STDOUT,
+  RES_BBI,
+  RES_CMD_ARGS,
+  RES_CALL,
+  RES_WD
 )
 
 SUPPORTED_MOD_TYPES <- c("nonmem", "stan")
 
 # keys required for model result to have
 RESULT_REQ_KEYS <- c(
-  "cmd_args", # will be empty string if object was recreated by pointing to output dir
+  RES_CMD_ARGS, # will be empty string if object was recreated by pointing to output dir
   SPEC_REQ_KEYS,
   YAML_OUT_DIR
 )

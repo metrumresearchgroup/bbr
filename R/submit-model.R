@@ -106,7 +106,10 @@ submit_nonmem_model <- function(.spec,
       getOption("rbabylon.bbi_exe_path"),
       paste(cmd_args, collapse = " ")
     )
-    res <- list(cmd_args = cmd_args, call = call_str)
+    res <- list()
+    res[[RES_CMD_ARGS]] <- cmd_args
+    res[[RES_CALL]] <- call_str
+
   } else {
     # launch model
     res <- bbi_exec(cmd_args, .wait = .wait, wd = model_dir, ...)

@@ -38,12 +38,11 @@ bbi_exec <- function(.cmd_args, .verbose = FALSE, .wait = FALSE, ...) {
   }
 
   # build result object
-  res <- list(
-    process = p,
-    stdout = output,
-    bbi = bbi_exe_path,
-    cmd_args = .cmd_args
-  )
+  res <- list()
+  res[[RES_PROCESS]] <- p
+  res[[RES_STDOUT]] <- output
+  res[[RES_BBI]] <- bbi_exe_path
+  res[[RES_CMD_ARGS]] <- .cmd_args
 
   class(res) <- c("babylon_result", class(res))
   return(res)
@@ -162,7 +161,7 @@ get_exit_status.babylon_result <- function(.res, .check = FALSE) {
     exit_status <- .res$process$get_exit_status()
 
     if (.check) {
-      check_status_code(exit_status, .res$output, .res$cmd_args)
+      check_status_code(exit_status, .res[[RES_STDOUT]], .res[[RES_CMD_ARGS]])
     }
     return(exit_status)
   }

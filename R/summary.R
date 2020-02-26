@@ -64,15 +64,15 @@ nonmem_summary <- function(.res,
 
   # if .dry_run return output call
   if (.dry_run) {
-    return(list(
-      cmd_args = cmd_args,
-      wd = .path,
-      call = paste(
-        "cd", .path, ";",
-        getOption("rbabylon.bbi_exe_path"),
-        paste(cmd_args, collapse = " ")
-      )
-    ))
+    res <- list()
+    res[[RES_CMD_ARGS]] <- cmd_args
+    res[[RES_WD]] <- .path
+    res[[RES_CALL]] <- paste(
+      "cd", .path, ";",
+      getOption("rbabylon.bbi_exe_path"),
+      paste(cmd_args, collapse = " ")
+    )
+    return(res)
   }
 
   # otherwise, execute
@@ -171,7 +171,7 @@ create_nonmem_res_from_path <- function(.path) {
 
   # fill with results info
   .spec[[YAML_OUT_DIR]] <- basename(.output_dir)
-  .spec[["cmd_args"]] <- ""
+  .spec[[RES_CMD_ARGS]] <- ""
 
   # assign class and return
   .res <- assign_result_class(.spec, .model_type = "nonmem")

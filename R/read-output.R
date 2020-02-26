@@ -143,12 +143,12 @@ check_output_dir.character <- function(.output_dir, .filter = NULL) {
   return(.out_files)
 }
 
-#' S3 dispatch to list output directory files from a `bbi_{.model_type}_res` object
-#' @param .res The `bbi_{.model_type}_res` object
+#' S3 dispatch to list output directory files from a `bbi_{.model_type}_result` object
+#' @param .res The `bbi_{.model_type}_result` object
 #' @param .filter Optional Character scaler of regex to filter filenames on and only return matches
 #' @rdname check_output_dir
 #' @export
-check_output_dir <- function(.res, .filter = NULL) {
+check_output_dir.bbi_nonmem_result <- function(.res, .filter = NULL) {
   .output_dir <- .res %>% get_output_dir()
   .out_files <- check_output_dir(.output_dir, .filter)
   return(.out_files)

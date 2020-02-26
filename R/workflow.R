@@ -252,8 +252,9 @@ copy_nonmem_model_from <- function(
   }
   .new_spec <- .parent_spec
 
-  # reset model working directory
+  # reset model working directory and yaml path
   .new_spec[[WORKING_DIR]] <- normalizePath(dirname(.new_model))
+  .new_spec[[YAML_YAML_NAME]] <- basename(yaml_ext(.new_model))
 
   # build new model path
   .file_ext <- tools::file_ext(.parent_spec[[YAML_MOD_PATH]])
