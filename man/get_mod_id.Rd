@@ -2,16 +2,24 @@
 % Please edit documentation in R/utils.R
 \name{get_mod_id}
 \alias{get_mod_id}
+\alias{get_mod_id.character}
+\alias{get_mod_id.bbi_nonmem_spec}
 \title{Helper to strip path and extension from model file to get only model identifier}
 \usage{
-get_mod_id(.mod_path)
+get_mod_id(.mod_path, ...)
+
+\method{get_mod_id}{character}(.mod_path)
+
+\method{get_mod_id}{bbi_nonmem_spec}(.res)
 }
 \arguments{
-\item{.mod_path}{model path to strip}
+\item{.mod_path}{Character scaler model path to strip}
 }
 \value{
 Character scaler with only model identifier
 }
 \description{
 Helper to strip path and extension from model file to get only model identifier
+
+S3 dispatch to get model identifier from
 }
