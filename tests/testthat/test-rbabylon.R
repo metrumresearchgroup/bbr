@@ -2,12 +2,12 @@ context("rbabylon exec functions")
 
 test_that("check_status_code works as expected", {
   # nothing happens on status 0
-  expect_equal(check_status_code(list(status=0)), NULL)
+  expect_equal(check_status_code(0, "stdout...", c("arg1", "arg2")), NULL)
 
   # other codes error
-  expect_error(check_status_code(list(status=1)))
-  expect_error(check_status_code(list(status=-1)))
-  expect_error(check_status_code(list(status=225)))
+  expect_error(check_status_code(1, "stdout...", c("arg1", "arg2")))
+  expect_error(check_status_code(-1, "stdout...", c("arg1", "arg2")))
+  expect_error(check_status_code(225, "stdout...", c("arg1", "arg2")))
 })
 
 test_that("check_bbi_exe() correctly errors or finds paths", {
@@ -18,4 +18,27 @@ test_that("check_bbi_exe() correctly errors or finds paths", {
 
   # should pass because ping should exist
   expect_invisible(check_bbi_exe("ping"))
+})
+
+
+test_that("bbi_init creates babylon.yaml", {
+  # create yaml
+  bbi_init(".", ".", .no_default_version=TRUE)
+
+  # read in yaml and check that it has a babylon key
+  bbi_yaml <- yaml::read_yaml("babylon.yaml")
+  expect_true("babylonbinary" %in% names(bbi_yaml))
+
+  # delete yaml
+  fs::file_delete("babylon.yaml")
+
+})
+
+test_that("bbi_init errors with invalid .nonmem_version", {
+  # create yaml
+  expect_error(bbi_init(".", "."))
+  expect_error(bbi_init(".", ".", "naw"))
+
+  # delete yaml
+  fs::file_delete("babylon.yaml")
 })

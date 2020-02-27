@@ -456,13 +456,13 @@ replace_based_on <- function(.spec, .based_on) {
 }
 
 
+#######################
+# Generating run logs
+#######################
 
-
-##################### LOGS, maybe should go in a different file
-
-#' Parses model YAML files (and optionally model outputs) into a log tibble
-#' @param .base_dir Directory to look in for YAML model files
-#' @param .recurse Boolean for whether to search recursively in subdirectories
+#' Parses model yaml and outputs into a tibble that serves as a run log. Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
+#' @param .base_dir Directory to search for model yaml files. Only runs with a corresponding yaml will be included.
+#' @param .recurse Boolean for whether to search subdirectories recursively for additional yaml files. Defaults to TRUE.
 #' @importFrom stringr str_subset
 #' @importFrom fs dir_ls
 #' @importFrom purrr map map_lgl transpose

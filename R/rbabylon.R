@@ -101,7 +101,7 @@ bbi_help <- function(.cmd_args=NULL) {
     .cmd_args <- c(.cmd_args, "--help")
   }
   res <- bbi_exec(.cmd_args, .wait=TRUE)
-  cat(res$output)
+  cat(paste(res$output, collapse = "\n"))
 }
 
 
@@ -140,7 +140,7 @@ bbi_init <- function(.dir, .nonmem_dir, .nonmem_version = NULL, .no_default_vers
     write_yaml(bbi_yaml, bbi_yaml_path)
   }
 
-  cat(res$output)
+  cat(paste(res$output, collapse = "\n"))
 }
 
 
