@@ -1,4 +1,3 @@
-library(glue)
 library(rbabylon)
 # move to demo folder
 setwd(system.file(package="rbabylon", "nonmem"))
@@ -6,8 +5,6 @@ print(glue::glue("switched working directory to `{getwd()}` for demo."))
 
 # cleanup function
 cleanup_demo <- function() {
-  # clear old babylon.yaml
-  if (fs::file_exists("babylon.yaml")) fs::file_delete("babylon.yaml")
 
   # delete original acop output and yaml
   if (fs::dir_exists("1")) fs::dir_delete("1")
@@ -20,8 +17,8 @@ cleanup_demo <- function() {
     "4"
   )
   for (m in demo_mods) {
-    if (fs::file_exists(glue("{m}.mod"))) fs::file_delete(glue("{m}.mod"))
-    if (fs::file_exists(glue("{m}.yaml"))) fs::file_delete(glue("{m}.yaml"))
+    if (fs::file_exists(glue::glue("{m}.ctl"))) fs::file_delete(glue::glue("{m}.ctl"))
+    if (fs::file_exists(glue::glue("{m}.yaml"))) fs::file_delete(glue::glue("{m}.yaml"))
     if (fs::dir_exists(m)) fs::dir_delete(m)
   }
 }
@@ -30,7 +27,10 @@ cleanup_demo()
 # setup bbi path
 options('rbabylon.bbi_exe_path' = '/data/apps/bbi')
 
-# create babylon.yaml
+# clear old babylon.yaml
+if (fs::file_exists("babylon.yaml")) fs::file_delete("babylon.yaml")
+
+# create new babylon.yaml
 bbi_init(".", "/opt/NONMEM", "nm74gf")
 
 ################
@@ -40,7 +40,6 @@ bbi_init(".", "/opt/NONMEM", "nm74gf")
 # create model spec
 spec1 <- create_model(
   .yaml_path = "1.yaml",
-  .model_path = "1.mod",
   .description = "original acop model",
   .tags = c("acop tag", "other tag"),
   .bbi_args = list(overwrite = TRUE, threads = 4)
@@ -92,15 +91,18 @@ head(par_df2)
 
 # delete temp demo files
 cleanup_demo()
-# create new babylon.yaml
-bbi_init(".", "/opt/NONMEM", "nm74gf")
+
 
 ########################
 # composable workflow
 ########################
 
 # iterate on original and run it
-submit_model(spec1) %>%
+create_model(.yaml_path = "1.yaml",
+             .description = "original acop model",
+             .tags = c("acop tag", "other tag"),
+             .bbi_args = list(overwrite = TRUE, threads = 4)
+           ) %>% submit_model() %>%
   copy_model_from("2",
                   "model 2 description") %>% submit_model() %>%
   copy_model_from("3",
@@ -135,7 +137,12 @@ cleanup_demo()
 ########################
 
 # iterate on original and run it
-res1 <- submit_model(spec1)
+res1 <- create_model(
+  .yaml_path = "1.yaml",
+  .description = "original acop model",
+  .tags = c("acop tag", "other tag"),
+  .bbi_args = list(overwrite = TRUE, threads = 4)
+) %>% submit_model()
 
 # look at results in sum1
 sum1 <- model_summary(res1)
@@ -153,37 +160,29 @@ spec3 <- res1 %>% copy_model_from("3",
 #### change the ctl files manually
 
 # submit new models
-res_list <- submit_models(list(spec2, spec3))
-
-res2 <- submit_model(spec2, .args = list(threads = 6))
-res3 <- submit_model(spec3)
+res_list <- purrr::map(list(spec2, spec3),
+                       submit_model)
 
 # construct run log and view it
 log_df <- run_log()
 View(log_df)
 
 # add some tags and notes
-res2 <- "2" %>% add_tags("iterations round 1", "pretty good but whatever") %>% add_decisions("Made change x in prop error model")
-res3 <- res3 %>% add_tags("iterations round 1") %>% add_decisions(c("Added param z in mixed error model", "some other thing"))
+res_list[[1]] <- res_list[[1]] %>%
+  add_tags(c("iterations round 1", "discard")) %>%
+  add_decisions("Made change x in prop error model")
+
+res_list[[2]] <- res_list[[2]] %>%
+  add_tags("iterations round 1") %>%
+  add_decisions(c("Added param z in mixed error model", "did some other thing"))
 
 # look at updated run log view it
 log_df <- run_log()
 View(log_df)
 
-# filter it
-log_df %>% filter(tags == "iterations round 1") %>% View()
-
-
-####### how to reconstruct from log_df or something if we don't have the objects
-spec3 <- new_mod2 %>% yaml_ext %>% create_model_from_yaml() ### need something better than this
-
-# also this sync with YAML issue
-spec3 <- spec3 %>% add_tags("naw dawg")
-spec3 %>% add_tags("naw dawg") # oops now it's there twice, but only on disk
-# since we didn't reassign the previous call, the object is behind the disk
-# implement hash checking to error/warn next time you try to use this spec that you need to call `reconcile_`
-
-
 
 # delete temp demo files
 cleanup_demo()
+
+# clear old babylon.yaml
+if (fs::file_exists("babylon.yaml")) fs::file_delete("babylon.yaml")
