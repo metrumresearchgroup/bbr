@@ -1,3 +1,7 @@
+####################################################
+# testing a composable workflow
+# checking that paths and return calls are correct
+####################################################
 
 # reference constants
 REF_SUMMARY_CALL <- as.character(glue("cd {getwd()}/model-examples/1 ; {getOption('rbabylon.bbi_exe_path')} nonmem summary 1 --json"))
@@ -64,7 +68,6 @@ for (.test_case in .TEST_CASES_WD) {
         this_sum <- model_summary(this_res, .dry_run = TRUE)
       }
 
-
       # check the call looks right
       expect_identical(this_sum$call, REF_SUMMARY_CALL)
 
@@ -75,76 +78,36 @@ for (.test_case in .TEST_CASES_WD) {
 
 for (.test_case in .TEST_CASES_WD) {
   test_that(paste("Summary call is the same after changing directories", .test_case$test_wd, if(isTRUE(.test_case$change_midstream)) "change_midstream"), {
-  withr::with_dir(.test_case$test_wd, {
-    test_yaml_path <- .test_case$test_yaml_path
+    withr::with_dir(.test_case$test_wd, {
+      test_yaml_path <- .test_case$test_yaml_path
 
-    # load spec from yaml and dry run through to summary object
-    this_spec <- create_model_from_yaml(.yaml_path = test_yaml_path)
-    this_res <- submit_model(this_spec, .dry_run = TRUE)
-    this_sum <- model_summary(this_res, .dry_run = TRUE)
-    expect_identical(this_sum$call, REF_SUMMARY_CALL)
+      # load spec from yaml and dry run through to summary object
+      this_spec <- create_model_from_yaml(.yaml_path = test_yaml_path)
+      this_res <- submit_model(this_spec, .dry_run = TRUE)
+      this_sum <- model_summary(this_res, .dry_run = TRUE)
+      expect_identical(this_sum$call, REF_SUMMARY_CALL)
 
-    # check that summary call matches when generated with file path instead of object
-    if (isTRUE(.test_case$change_midstream)) {
-      .former_dir <- basename(getwd())
-      withr::with_dir("..", {
-        this_out_dir <- tools::file_path_sans_ext(file.path(.former_dir, test_yaml_path))
+      # check that summary call matches when generated with file path instead of object
+      if (isTRUE(.test_case$change_midstream)) {
+        .former_dir <- basename(getwd())
+        withr::with_dir("..", {
+          this_out_dir <- tools::file_path_sans_ext(file.path(.former_dir, test_yaml_path))
+          this_out_dir_sum <- model_summary(this_out_dir, .model_type = "nonmem", .dry_run = TRUE)
+
+          this_ctl_file <- ctl_ext(file.path(.former_dir, test_yaml_path))
+          this_ctl_file_sum <- model_summary(this_ctl_file, .model_type = "nonmem", .dry_run = TRUE)
+        })
+      } else {
+        this_out_dir <- tools::file_path_sans_ext(test_yaml_path)
         this_out_dir_sum <- model_summary(this_out_dir, .model_type = "nonmem", .dry_run = TRUE)
 
-        this_ctl_file <- ctl_ext(file.path(.former_dir, test_yaml_path))
+        this_ctl_file <- ctl_ext(test_yaml_path)
         this_ctl_file_sum <- model_summary(this_ctl_file, .model_type = "nonmem", .dry_run = TRUE)
-      })
-    } else {
-      this_out_dir <- tools::file_path_sans_ext(test_yaml_path)
-      this_out_dir_sum <- model_summary(this_out_dir, .model_type = "nonmem", .dry_run = TRUE)
+      }
+      expect_identical(this_out_dir_sum$call, REF_SUMMARY_CALL)
+      expect_identical(this_ctl_file_sum$call, REF_SUMMARY_CALL)
 
-      this_ctl_file <- ctl_ext(test_yaml_path)
-      this_ctl_file_sum <- model_summary(this_ctl_file, .model_type = "nonmem", .dry_run = TRUE)
-    }
-    expect_identical(this_out_dir_sum$call, REF_SUMMARY_CALL)
-    expect_identical(this_ctl_file_sum$call, REF_SUMMARY_CALL)
-
-  })
+    })
   })
 }
-
-
-test_that("compare two specs", {
-  # create model spec
-  .test_path <- "model-examples/tmp.yaml"
-  spec1a <- create_model(
-    .yaml_path = .test_path,
-    .description = "original acop model",
-    .tags = c("acop tag", "other tag"),
-    .bbi_args = list(overwrite = TRUE, threads = 4)
-  )
-
-  # create model spec
-  spec1b <- create_model_from_yaml(.yaml_path = "model-examples/1.yaml")
-
-  # check class and keys are right
-  .expected_class <- c("bbi_nonmem_spec", "list")
-  expect_identical(class(spec1a), .expected_class)
-  expect_identical(class(spec1b), .expected_class)
-
-  expect_true(all(SPEC_REQ_KEYS %in% names(spec1a)))
-  expect_true(all(SPEC_REQ_KEYS %in% names(spec1b)))
-
-  # also check that some of the required keys have the same value
-  for (k in SPEC_REQ_KEYS) {
-    if (k == YAML_MOD_PATH) {
-      expect_identical(spec1a[[k]], basename(ctl_ext(.test_path)))
-      expect_identical(spec1b[[k]], "1.ctl")
-    } else {
-      expect_equal(spec1a[[k]], spec1b[[k]])
-    }
-  }
-
-  # clean up tmp file
-  fs::file_delete(.test_path)
-})
-
-# test some copying
-# - copy_model_from (first with spec)
-# - also copy around the output directory to pretend we ran them (what to test here though? can't run summary...)
 
