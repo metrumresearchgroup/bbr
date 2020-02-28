@@ -92,8 +92,7 @@ head(par_df2)
 
 # delete temp demo files
 cleanup_demo()
-# create new babylon.yaml
-bbi_init(".", "/opt/NONMEM", "nm74gf")
+
 
 ########################
 # composable workflow
