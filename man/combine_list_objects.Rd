@@ -8,9 +8,9 @@ Any S3 classes will be inherited with those from .new_list given precedence.}
 combine_list_objects(.new_list, .old_list, .append = FALSE)
 }
 \arguments{
-\item{.new_list}{A named list of arguments for bbi, passed into submit_model function call}
+\item{.new_list}{A named list}
 
-\item{.old_list}{A named list of arguments for bbi, parsed from user input yaml}
+\item{.old_list}{A named list}
 
 \item{.append}{Shared keys will have their contents concatenated instead of overwriting from .new_list}
 }

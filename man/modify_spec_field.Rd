@@ -6,10 +6,9 @@
 \alias{replace_tags}
 \alias{add_decisions}
 \alias{replace_decisions}
-\alias{add_description}
-\alias{replace_description}
 \alias{add_based_on}
 \alias{replace_based_on}
+\alias{replace_description}
 \title{Implementation function for updating fields in a `bbi_{.model_type}_spec` object
 Also reconciles the object with the corresponding YAML before modifying and then writes the modified object back to the YAML}
 \usage{
@@ -23,13 +22,11 @@ add_decisions(.spec, .decisions)
 
 replace_decisions(.spec, .decisions)
 
-add_description(.spec, .description)
-
-replace_description(.spec, .description)
-
 add_based_on(.spec, .based_on)
 
 replace_based_on(.spec, .based_on)
+
+replace_description(.spec, .description)
 }
 \arguments{
 \item{.spec}{The `bbi_{.model_type}_spec` object to modify}
@@ -46,9 +43,9 @@ replace_based_on(.spec, .based_on)
 
 \item{.decisions}{Character scaler or vector to use as replacement}
 
-\item{.description}{Character scaler to use as replacement}
-
 \item{.based_on}{Character scaler or vector to use as replacement}
+
+\item{.description}{Character scaler to use as replacement}
 }
 \description{
 Implementation function for updating fields in a `bbi_{.model_type}_spec` object
@@ -62,11 +59,9 @@ Append new decisions to the one(s) in a spec object and corresponding YAML
 
 Replaces `decisions` field in a spec object and corresponding YAML with new values
 
-Append new description to the one in a spec object and corresponding YAML
-
-Replaces description field in a spec object and corresponding YAML with new description
-
 Append new `based_on` tag to the one in a spec object and corresponding YAML
 
 Replaces `based_on` field in a spec object and corresponding YAML with new values
+
+Replaces description field in a spec object and corresponding YAML with new description
 }

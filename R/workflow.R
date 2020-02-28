@@ -96,7 +96,7 @@ parse_mod_yaml <- function(.path) {
 save_mod_yaml <- function(.spec, .out_path = NULL) {
   # fill path if null
   if (is.null(.out_path)) {
-    .out_path <- file.path(.spec[[WORKING_DIR]], yaml_ext(.spec[[YAML_MOD_PATH]]))
+    .out_path <- get_yaml_path(.spec, .check_exists = FALSE)
   }
 
   # erase keys that don't need to be saved out
@@ -403,31 +403,6 @@ replace_decisions <- function(.spec, .decisions) {
   return(.spec)
 }
 
-#' Append new description to the one in a spec object and corresponding YAML
-#' @param .spec The `bbi_{.model_type}_spec` object to modify
-#' @param .description Character scaler or vector of tags to add
-#' @export
-#' @rdname modify_spec_field
-add_description <- function(.spec, .description) {
-  .spec <- modify_spec_field(.spec = .spec,
-                             .field = YAML_DESCRIPTION,
-                             .value = .description,
-                             .append = TRUE)
-  return(.spec)
-}
-
-#' Replaces description field in a spec object and corresponding YAML with new description
-#' @param .spec The `bbi_{.model_type}_spec` object to modify
-#' @param .description Character scaler to use as replacement
-#' @export
-#' @rdname modify_spec_field
-replace_description <- function(.spec, .description) {
-  .spec <- modify_spec_field(.spec = .spec,
-                             .field = YAML_DESCRIPTION,
-                             .value = .description,
-                             .append = FALSE)
-  return(.spec)
-}
 
 #' Append new `based_on` tag to the one in a spec object and corresponding YAML
 #' @param .spec The `bbi_{.model_type}_spec` object to modify
@@ -451,6 +426,20 @@ replace_based_on <- function(.spec, .based_on) {
   .spec <- modify_spec_field(.spec = .spec,
                              .field = YAML_BASED_ON,
                              .value = .based_on,
+                             .append = FALSE)
+  return(.spec)
+}
+
+
+#' Replaces description field in a spec object and corresponding YAML with new description
+#' @param .spec The `bbi_{.model_type}_spec` object to modify
+#' @param .description Character scaler to use as replacement
+#' @export
+#' @rdname modify_spec_field
+replace_description <- function(.spec, .description) {
+  .spec <- modify_spec_field(.spec = .spec,
+                             .field = YAML_DESCRIPTION,
+                             .value = .description,
                              .append = FALSE)
   return(.spec)
 }
