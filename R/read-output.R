@@ -12,34 +12,36 @@ check_file <- function(.file, .head = 3, .tail = 5, .print = TRUE, .return = FAL
 
   l_len <- length(l)
 
-  if (.head >= l_len) {
-    .head <- l_len
-    .tail <- 0
-  }
-
-  if (.tail <= 0) {
-    tail_start <- NULL
+  if (.head + .tail >= l_len) {
+    # return full file if head + tail >= total length
+    res_vec <- l
   } else {
-    tail_start <- 1 + l_len - .tail
-
-    if(tail_start <= .head) {
-      tail_start <- .head + 1
+    # fetch head vector
+    if (.head > 0) {
+      head_vec <- l[1:.head]
+    } else {
+      head_vec <- NULL
     }
-  }
 
-  if (!is.null(tail_start)) {
-    tail_vec <- l[tail_start:l_len]
-
-    if (tail_start > .head + 1) {
-      tail_vec <- c("...", tail_vec)
+    # fetch tail vector
+    if (.tail <= 0) {
+      tail_start <- NULL
+    } else {
+      tail_start <- 1 + l_len - .tail
     }
-  } else {
-    tail_vec <- ""
+
+    if (!is.null(tail_start)) {
+      tail_vec <- l[tail_start:l_len]
+    } else {
+      tail_vec <- NULL
+    }
+
+    # concatenate
+    dot_dot <- ifelse(tail_start > .head + 1, "...", NULL)
+    res_vec <- c(head_vec, dot_dot, tail_vec)
   }
 
   # return and/or print
-  res_vec <- c(l[1:.head], tail_vec)
-
   if (.print) {
     cat(paste(res_vec, collapse="\n"))
   }
