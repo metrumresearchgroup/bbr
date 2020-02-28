@@ -140,8 +140,8 @@ parse_args_list <- function(.func_args, .yaml_args) {
 
 #' Combines two named lists. By default, shared keys are overwritten by that key in .new_list
 #' Any S3 classes will be inherited with those from .new_list given precedence.
-#' @param .new_list A named list of arguments for bbi, passed into submit_model function call
-#' @param .old_list A named list of arguments for bbi, parsed from user input yaml
+#' @param .new_list A named list
+#' @param .old_list A named list
 #' @param .append Shared keys will have their contents concatenated instead of overwriting from .new_list
 #' @importFrom checkmate assert_list
 #' @return The combined list
@@ -277,8 +277,8 @@ get_model_path <- function(.spec) {
   return(file.path(.spec[[WORKING_DIR]], .spec[[YAML_MOD_PATH]]))
 }
 
-get_output_dir <- function(.spec) {
-  return(file.path(.spec[[WORKING_DIR]], .spec[[YAML_OUT_DIR]]))
+get_output_dir <- function(.res) {
+  return(file.path(.res[[WORKING_DIR]], .res[[YAML_OUT_DIR]]))
 }
 
 get_yaml_path <- function(.spec, .check_exists = TRUE) {

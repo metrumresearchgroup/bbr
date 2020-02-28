@@ -63,3 +63,23 @@ test_that("submit_model(.dry_run=T) for yaml input parses correctly",
 
             })
           })
+
+
+test_that("submit_model(.dry_run=T) with spec object parses correctly",
+          {
+            SPEC1 <- create_model_from_yaml(file.path(MODEL_DIR, yaml_ext(MODEL_FILE)))
+            withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
+              # correctly parsing yaml
+              expect_identical(
+                submit_model(SPEC1, .dry_run = T)$call,
+                as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {MODEL_FILE} --overwrite --threads=4"))
+              )
+
+              # over-riding yaml arg with passed arg
+              expect_identical(
+                submit_model(SPEC1, .bbi_args=list(threads=2), .dry_run = T)$call,
+                as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {MODEL_FILE} --overwrite --threads=2"))
+              )
+
+            })
+          })
