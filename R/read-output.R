@@ -37,7 +37,7 @@ check_file <- function(.file, .head = 3, .tail = 5, .print = TRUE, .return = FAL
     }
 
     # concatenate
-    dot_dot <- ifelse(tail_start > .head + 1, "...", NULL)
+    dot_dot <- ifelse((tail_start > .head + 1) || is.null(tail_start), "...", NULL)
     res_vec <- c(head_vec, dot_dot, tail_vec)
   }
 
@@ -69,9 +69,9 @@ tail_output <- function(.f, ...) {
 #' @export
 #' @rdname check_file
 tail_output.character <- function(.file, .head = 3, .tail = 5, .print = TRUE, .return = FALSE) {
-  # if model id passed, construct path
-  if (get_mod_id(.file) == .file) {
-    .file = as.character(glue("{.file}/OUTPUT"))
+  # if model path passed, construct path
+  if (basename(.file) != "OUTPUT") {
+    .file = as.character(file.path(.file, "OUTPUT"))
   }
 
   check_file(.file, .head, .tail, .print, .return)
@@ -103,9 +103,9 @@ tail_lst <- function(.f, ...) {
 #' @export
 #' @rdname check_file
 tail_lst.character <- function(.file, .head = 3, .tail = 5, .print = TRUE, .return = FALSE) {
-  # if model id passed, construct path
-  if (get_mod_id(.file) == .file) {
-    .file = as.character(glue("{.file}/{.file}.lst"))
+  # if model path passed, construct path
+  if (tools::file_ext(.file) != "lst") {
+    .file = as.character(file.path(.file, paste0(get_mod_id(.file), ".lst")))
   }
 
   check_file(.file, .head, .tail, .print, .return)
@@ -215,9 +215,9 @@ check_grd <- function(.x, ...) {
 #' @export
 #' @rdname check_nonmem_table_output
 check_grd.character <- function(.path, .iter_floor = 0) {
-  # if model id passed, construct path
-  if (get_mod_id(.path) == .path) {
-    .path = as.character(glue("{.path}/{.path}.grd"))
+  # if model path passed, construct path
+  if (tools::file_ext(.path) != "grd") {
+    .path = as.character(file.path(.path, paste0(get_mod_id(.file), ".grd")))
   }
 
   df <- check_nonmem_table_output(.path, .x_var = "ITERATION", .x_floor = .iter_floor)
@@ -261,9 +261,9 @@ check_ext <- function(.x, ...) {
 #' @export
 #' @rdname check_nonmem_table_output
 check_ext.character <- function(.path, .iter_floor = 0) {
-  # if model id passed, construct path
-  if (get_mod_id(.path) == .path) {
-    .path = as.character(glue("{.path}/{.path}.ext"))
+  # if model path passed, construct path
+  if (tools::file_ext(.path) != "ext") {
+    .path = as.character(file.path(.path, paste0(get_mod_id(.file), ".ext")))
   }
 
   df <- check_nonmem_table_output(.path, .x_var = "ITERATION", .x_floor = .iter_floor)
