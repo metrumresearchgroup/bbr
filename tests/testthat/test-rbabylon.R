@@ -27,7 +27,7 @@ test_that("bbi_init creates babylon.yaml", {
 
   # read in yaml and check that it has a babylon key
   bbi_yaml <- yaml::read_yaml("babylon.yaml")
-  expect_true("babylonbinary" %in% names(bbi_yaml))
+  expect_true("babylon_binary" %in% names(bbi_yaml))
 
   # delete yaml
   fs::file_delete("babylon.yaml")

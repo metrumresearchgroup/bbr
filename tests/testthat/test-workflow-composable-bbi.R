@@ -65,14 +65,16 @@ test_that("step by step create_model to submit_model to model_summary works", {
   expect_identical(class(spec1), SPEC_CLASS_REF)
 
   # submit model
-  res1 <- submit_model(spec1)
+  res1 <- submit_model(spec1, .mode = "local", .wait = FALSE)
   expect_identical(class(res1), RES_CLASS_REF)
 
   # expect error on submit with no wait
-  expect_error(model_summary(res1, .wait = NULL))
+  expect_error(suppressWarnings(model_summary(res1, .wait = NULL)))
 
   # Try to get a summary and wait if not finished.
-  sum1 <- model_summary(res1)
+  throwaway_msg <- capture.output(
+    sum1 <- model_summary(res1)
+  )
   expect_identical(class(sum1), SUM_CLASS_REF)
   expect_identical(names(sum1), SUM_NAMES_REF)
 
