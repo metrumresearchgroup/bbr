@@ -29,10 +29,11 @@ bbi_exec <- function(.cmd_args, .verbose = FALSE, .wait = FALSE, ...) {
 
   if (.wait) {
     # wait for process and capture stdout and stderr
-    output <- p$read_all_output_lines()
-
+    p$wait()
     # check output status code
     check_status_code(p$get_exit_status(), output, .cmd_args)
+    output <- p$read_all_output_lines()
+
   } else {
     output <- NULL
   }
