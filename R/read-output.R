@@ -217,7 +217,7 @@ check_grd <- function(.x, ...) {
 check_grd.character <- function(.path, .iter_floor = 0) {
   # if model path passed, construct path
   if (tools::file_ext(.path) != "grd") {
-    .path = as.character(file.path(.path, paste0(get_mod_id(.file), ".grd")))
+    .path = as.character(file.path(.path, paste0(get_mod_id(.path), ".grd")))
   }
 
   df <- check_nonmem_table_output(.path, .x_var = "ITERATION", .x_floor = .iter_floor)
@@ -263,7 +263,7 @@ check_ext <- function(.x, ...) {
 check_ext.character <- function(.path, .iter_floor = 0) {
   # if model path passed, construct path
   if (tools::file_ext(.path) != "ext") {
-    .path = as.character(file.path(.path, paste0(get_mod_id(.file), ".ext")))
+    .path = as.character(file.path(.path, paste0(get_mod_id(.path), ".ext")))
   }
 
   df <- check_nonmem_table_output(.path, .x_var = "ITERATION", .x_floor = .iter_floor)
