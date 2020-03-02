@@ -216,7 +216,7 @@ test_that("check_nonmem_progress returns FALSE", {
   readr::read_lines(new_ext, n_max = 5) %>% readr::write_lines(new_ext)
 
   # make a fake res
-  new_res <- create_nonmem_res_from_path(yaml_ext(NEW_OUT_DIR))
+  new_res <- import_result(yaml_ext(NEW_OUT_DIR))
 
   # it should return false because the ext isn't finished
   expect_false(suppressWarnings(check_nonmem_progress(new_res)))

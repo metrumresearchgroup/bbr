@@ -273,14 +273,42 @@ find_model_file_path <- function(.path) {
   }
 }
 
+#' Get path from bbi object
+#'
+#' Builds the full path to a file that is stored as part of a `bbi_...` S3 object
+#' All paths saved in the object or accompanying YAML will be relative **to the location of that YAML**
+#' When the object is loaded into memory, the absolute path to the YAML is stored in the object.
+#' These functions simply stitch together that path with the requested relative path.
+#' As long as the YAML has not moved since it was loaded, this will work.
+#' @param .bbi_object The object to query
+#' @param .key The key that contains the relative path
+#' @export
+#' @rdname get_path_from_object
+get_path_from_object <- function(.bbi_object, .key) {
+  return(file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[.key]]))
+}
+
+#' Returns the path to the model file from a `bbi_{.model_type}_spec` or `bbi_{.model_type}_result` object
+#' @param .spec The `bbi_...` S3 object
+#' @export
+#' @rdname get_path_from_object
 get_model_path <- function(.spec) {
-  return(file.path(.spec[[WORKING_DIR]], .spec[[YAML_MOD_PATH]]))
+  return(get_path_from_object(.spec, YAML_MOD_PATH))
 }
 
+#' Returns the path to the model output directory from a `bbi_{.model_type}_result` object
+#' @param .res The `bbi_...` S3 object
+#' @export
+#' @rdname get_path_from_object
 get_output_dir <- function(.res) {
-  return(file.path(.res[[WORKING_DIR]], .res[[YAML_OUT_DIR]]))
+  return(get_path_from_object(.res, YAML_OUT_DIR))
 }
 
+#' Returns the path to the model file from a `bbi_{.model_type}_spec` or `bbi_{.model_type}_result` object
+#' @param .spec The `bbi_...` S3 object
+#' @param .check_exists Boolean for whether it will check if the file exists and error if it does not. True by default.
+#' @export
+#' @rdname get_path_from_object
 get_yaml_path <- function(.spec, .check_exists = TRUE) {
   # check if file name was stored on load, otherwise infer from model file
   if (is.null(.spec[[YAML_YAML_NAME]])) {

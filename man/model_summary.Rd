@@ -5,7 +5,6 @@
 \alias{model_summary}
 \alias{model_summary.bbi_nonmem_result}
 \alias{model_summary.character}
-\alias{create_nonmem_res_from_path}
 \title{Run `bbi summary` and parse the output to a list}
 \usage{
 nonmem_summary(
@@ -22,8 +21,6 @@ model_summary(.res, ...)
 \method{model_summary}{bbi_nonmem_result}(.res, ...)
 
 \method{model_summary}{character}(.path, .model_type = c("nonmem", "stan"), ...)
-
-create_nonmem_res_from_path(.path)
 }
 \arguments{
 \item{.res}{`bbi_nonmem_result` object for summary}
@@ -38,7 +35,9 @@ create_nonmem_res_from_path(.path)
 
 \item{.dry_run}{show what the command would be without actually running it}
 
-\item{.path}{Character scaler with the file path to use}
+\item{.path}{Full path to one of the following:
+1) path to a model file in the output directory
+2) path to a nonmem output directory}
 
 \item{.model_type}{Character scaler specifying the type of model, either 'nonmem' or 'stan'}
 }
@@ -53,6 +52,4 @@ S3 generic for getting model summary
 Get model summary from `bbi_nonmem_result` object and optionally check if model is done before erroring
 
 S3 dispatch for getting model summary from output directory path
-
-Create a `bbi_nonmem_res` object from a file path (should work with either path to a model file, yaml file, and output folder)
 }

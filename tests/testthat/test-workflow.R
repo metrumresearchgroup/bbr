@@ -14,6 +14,9 @@ NEW_TAGS <- c("new tag 1", "new tag 2")
 NEW_TEXT1 <- c("naw", "paw")
 NEW_TEXT2 <- c("all", "done")
 
+SPEC_CLASS_LIST <- c("bbi_nonmem_spec", "list")
+RES_CLASS_LIST <- c("bbi_nonmem_result", "bbi_nonmem_spec", "list")
+
 #########################
 # copy_model_from tests
 #########################
@@ -128,9 +131,8 @@ test_that("compare two specs", {
   spec1b <- create_model_from_yaml(.yaml_path = "model-examples/1.yaml")
 
   # check class and keys are right
-  .expected_class <- c("bbi_nonmem_spec", "list")
-  expect_identical(class(spec1a), .expected_class)
-  expect_identical(class(spec1b), .expected_class)
+  expect_identical(class(spec1a), SPEC_CLASS_LIST)
+  expect_identical(class(spec1b), SPEC_CLASS_LIST)
 
   expect_true(all(SPEC_REQ_KEYS %in% names(spec1a)))
   expect_true(all(SPEC_REQ_KEYS %in% names(spec1b)))
@@ -166,7 +168,7 @@ test_that("parse_mod_yaml() returns expected list", {
     orig_working_dir = file.path(getwd(), "model-examples"),
     orig_yaml_file ="1.yaml"
   )
-  class(ref_list) <- c("bbi_nonmem_spec", "list")
+  class(ref_list) <- SPEC_CLASS_LIST
   expect_equal(parse_mod_yaml("model-examples/1.yaml"), ref_list)
 
 })
@@ -268,6 +270,22 @@ test_that("reconcile_mod_yaml() pulls in new tags", {
   fs::file_delete(new_yaml)
 })
 
+
+################################
+# reconstructing result object
+################################
+
+test_that("import_result() loads a valid `bbi_nonmem_result` object", {
+  # import result and check class
+  res1 <- import_result(YAML_TEST_FILE)
+  expect_identical(class(res1), RES_CLASS_LIST)
+
+  # compare shared keys with spec from same YAML file
+  spec1 <- create_model_from_yaml(YAML_TEST_FILE)
+  for (.key in SPEC_REQ_KEYS) {
+    expect_equal(res1[[.key]], spec1[[.key]])
+  }
+})
 
 
 ######################################

@@ -16,7 +16,7 @@ EXT_TEST_FILE <-  as.character(glue::glue("model-examples/{MOD_ID}/{MOD_ID}.ext"
 
 # fake result object
 SPEC1 <- create_model_from_yaml(YAML_TEST_FILE)
-RES1 <- create_nonmem_res_from_path(OUTPUT_DIR)
+RES1 <- import_result(OUTPUT_DIR)
 
 SPEC_CLASS <- "bbi_nonmem_spec"
 RES_CLASS <- "bbi_nonmem_result"

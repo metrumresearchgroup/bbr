@@ -208,6 +208,12 @@ test_that("find_model_file_path returns mod path when only path found", {
   })
 })
 
+
+test_that("get_path_from_object() builds the right path", {
+  expect_identical(get_path_from_object(SPEC1, YAML_MOD_PATH), normalizePath(CTL_TEST_FILE))
+  expect_identical(get_path_from_object(RES1 , YAML_MOD_PATH), normalizePath(CTL_TEST_FILE))
+})
+
 test_that("get_model_path() builds the right path", {
   expect_identical(get_model_path(SPEC1), normalizePath(CTL_TEST_FILE))
   expect_identical(get_model_path(RES1 ), normalizePath(CTL_TEST_FILE))

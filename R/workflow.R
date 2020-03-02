@@ -1,3 +1,9 @@
+# Functions to manage model iteration and workflow
+
+#####################
+# Spec ("specification") object
+#####################
+
 #' Create new model spec by specifying relevant information as arguments
 #' Also creates necessary YAML file for using `create_run_log()` later.
 #' @param .yaml_path Path to save resulting model YAML file to
@@ -215,7 +221,8 @@ copy_model_from.character <- function(.parent_path, .new_model, .description, ..
   return(.spec)
 }
 
-
+#' Copy model from an existing model
+#'
 #' Create new .mod/ctl and new .yaml files based on a previous model. Used for iterating on model development.
 #' Also fills in necessary YAML fields for using `create_run_log()` later.
 #' @param .parent_spec S3 object of class `bbi_nonmem_spec` to be used as the basis for copy.
@@ -303,6 +310,48 @@ copy_nonmem_model_from <- function(
   return(.new_spec)
 }
 
+
+#####################
+# Result object
+#####################
+
+#' Create a `bbi_nonmem_result` object from a file path (should work with either path to a model file, yaml file, and output folder)
+#' @param .path Character scaler with the file path to use
+#' @export
+import_result <- function(.path) {
+  # check for the required files
+  .output_dir <- tools::file_path_sans_ext(.path)
+  .working_dir <- normalizePath(dirname(.output_dir))
+  if (!fs::dir_exists(.output_dir)) {
+    stop(glue("No directory exists at {.output_dir} -- Must pass path to a valid output directory."))
+  }
+  check_lst_file(.output_dir)
+
+  .potential_yaml_file <- .output_dir %>% get_mod_id() %>% yaml_ext()
+  .yaml_path <- file.path(.working_dir, .potential_yaml_file)
+  if (fs::file_exists(.yaml_path)) {
+    .spec <- parse_mod_yaml(.yaml_path)
+  } else {
+    .spec <- list()
+    .spec[[WORKING_DIR]] <- .working_dir
+    .spec[[YAML_MOD_TYPE]] <- "nonmem"
+    .spec[[YAML_DESCRIPTION]] <- as.character(glue("Results object created from {.output_dir} with `import_result()`"))
+    .spec[[YAML_MOD_PATH]] <- find_model_file_path(.path)
+    .spec[[YAML_BBI_ARGS]] <- list()
+
+  }
+
+  # fill with results info
+  .spec[[YAML_OUT_DIR]] <- basename(.output_dir)
+  .spec[[RES_CMD_ARGS]] <- ""
+
+  # assign class and return
+  .res <- assign_result_class(.spec, .model_type = "nonmem")
+
+  return(.res)
+}
+
+
 #####################
 # Modifying models
 #####################
@@ -318,6 +367,8 @@ reconcile_mod_yaml <- function(.spec, .yaml_path) {
 }
 
 
+#' Modify field in spec object
+#'
 #' Implementation function for updating fields in a `bbi_{.model_type}_spec` object
 #' Also reconciles the object with the corresponding YAML before modifying and then writes the modified object back to the YAML
 #' @param .spec The `bbi_{.model_type}_spec` object to modify

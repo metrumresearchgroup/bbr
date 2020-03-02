@@ -132,7 +132,7 @@ model_summary.bbi_nonmem_result <- function(.res, ...) {
 model_summary.character <- function(.path, .model_type = c("nonmem", "stan"), ...) {
   .model_type <- match.arg(.model_type)
   if (.model_type == "nonmem") {
-    .res <- create_nonmem_res_from_path(.path)
+    .res <- import_result(.path)
     res_list <- nonmem_summary(.res, ...)
   } else if (.model_type == "stan") {
     stop(NO_STAN_ERR_MSG)
@@ -140,43 +140,6 @@ model_summary.character <- function(.path, .model_type = c("nonmem", "stan"), ..
     stop(glue("Passed `{.model_type}`. Valid options: `{SUPPORTED_MOD_TYPES}`"))
   }
   return(res_list)
-}
-
-
-#' Create a `bbi_nonmem_res` object from a file path (should work with either path to a model file, yaml file, and output folder)
-#' @param .path Character scaler with the file path to use
-#' @rdname model_summary
-create_nonmem_res_from_path <- function(.path) {
-  # check for the required files
-  .output_dir <- tools::file_path_sans_ext(.path)
-  .working_dir <- normalizePath(dirname(.output_dir))
-  if (!fs::dir_exists(.output_dir)) {
-    stop(glue("No directory exists at {.output_dir} -- Must pass path to a valid output directory."))
-  }
-  check_lst_file(.output_dir)
-
-  .potential_yaml_file <- .output_dir %>% get_mod_id() %>% yaml_ext()
-  .yaml_path <- file.path(.working_dir, .potential_yaml_file)
-  if (fs::file_exists(.yaml_path)) {
-    .spec <- parse_mod_yaml(.yaml_path)
-  } else {
-    .spec <- list()
-    .spec[[WORKING_DIR]] <- .working_dir
-    .spec[[YAML_MOD_TYPE]] <- "nonmem"
-    .spec[[YAML_DESCRIPTION]] <- as.character(glue("Results object created from {.output_dir} with `create_nonmem_res_from_path()`"))
-    .spec[[YAML_MOD_PATH]] <- find_model_file_path(.path)
-    .spec[[YAML_BBI_ARGS]] <- list()
-
-  }
-
-  # fill with results info
-  .spec[[YAML_OUT_DIR]] <- basename(.output_dir)
-  .spec[[RES_CMD_ARGS]] <- ""
-
-  # assign class and return
-  .res <- assign_result_class(.spec, .model_type = "nonmem")
-
-  return(.res)
 }
 
 
