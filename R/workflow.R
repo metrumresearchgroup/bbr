@@ -247,7 +247,8 @@ copy_nonmem_model_from <- function(
   .based_on_additional = NULL,
   .add_tags = NULL,
   .inherit_tags = FALSE,
-  .update_mod_file = TRUE
+  .update_mod_file = TRUE,
+  .open_mod_file = FALSE
 ) {
   # Check spec for correct class and then copy it
   if (!("bbi_nonmem_spec" %in% class(.parent_spec))) {
@@ -276,13 +277,26 @@ copy_nonmem_model_from <- function(
 
   # copy control steam to new path
   if (.update_mod_file) {
+    parent_mod_id <- .parent_spec %>% get_model_path() %>% get_mod_id()
+    new_mod_id <- .new_model %>% get_mod_id()
+
     # read parent control stream
     mod_str <- .parent_spec %>% get_model_path() %>% read_file()
 
     # replace the $PROBLEM line(s)
     mod_str <- str_replace(mod_str,
                 "\\$PROB(.|\n)*?\\$",
-                as.character(glue("$PROBLEM {get_mod_id(.new_model)} {.description}\n\n$")))
+                as.character(glue("$PROBLEM {new_mod_id} {.description}\n\n$")))
+
+    # boilerplate code from Sam to replace other occurances of model id #### !!!!!!
+    # need to test and refactor to use stringr
+    mod_str <- mod_str %>%
+      gsub(paste0('RUN# ', parent_mod_id), paste0('RUN# ', new_mod_id), .) %>%
+      gsub(paste0(parent_mod_id, '.MSF'), paste0(new_mod_id, '.MSF'), .) %>%
+      gsub(paste0(parent_mod_id, '.ext'), paste0(new_mod_id, '.ext'), .) %>%
+      gsub(paste0(parent_mod_id, '.tab'), paste0(new_mod_id, '.tab'), .) %>%
+      gsub(paste0(parent_mod_id, 'par.tab'), paste0(new_mod_id, 'par.tab'),.)
+    ###### !!!!!!
 
     # read parent control stream
     write_file(mod_str, get_model_path(.new_spec))
@@ -306,6 +320,11 @@ copy_nonmem_model_from <- function(
   # write .new_spec out
   new_yaml_path <- yaml_ext(.new_model)
   save_mod_yaml(.new_spec, .out_path = new_yaml_path)
+
+  # optionally open the control stream for editing
+  if (isTRUE(.open_mod_file)) {
+    file.edit(new_yaml_path)
+  }
 
   return(.new_spec)
 }
