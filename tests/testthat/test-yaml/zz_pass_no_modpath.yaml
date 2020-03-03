@@ -1,8 +1,6 @@
-# path to model
-model_path: data/acop.mod
-
 # model metadata
 description: acop model for testing
+model_type: nonmem
 based_on:
 tags: ["acop tag", "other tag"]
 

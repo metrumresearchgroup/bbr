@@ -4,12 +4,21 @@
 \alias{bbi_init}
 \title{Executes (`bbi init`) with bbi_exec() in specified directory}
 \usage{
-bbi_init(.dir, .nonmem_dir)
+bbi_init(
+  .dir,
+  .nonmem_dir,
+  .nonmem_version = NULL,
+  .no_default_version = FALSE
+)
 }
 \arguments{
 \item{.dir}{Path to directory to run `init` in (and put the resulting `babylon.yml` file)}
 
 \item{.nonmem_dir}{Path to directory with the NONMEM installation.}
+
+\item{.nonmem_version}{Character scaler for default version of NONMEM to use. If left NULL, function will exit and tell you which versions were found in `.nonmem_dir`}
+
+\item{.no_default_version}{Boolean to force creation of babylon.yaml with NO default NONMEM version. FALSE by default, and not encouraged.}
 }
 \description{
 Executes (`bbi init`) with bbi_exec() in specified directory

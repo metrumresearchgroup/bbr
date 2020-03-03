@@ -23,13 +23,22 @@ test_that("check_bbi_exe() correctly errors or finds paths", {
 
 test_that("bbi_init creates babylon.yaml", {
   # create yaml
-  bbi_init(".", ".")
+  bbi_init(".", ".", .no_default_version=TRUE)
 
   # read in yaml and check that it has a babylon key
   bbi_yaml <- yaml::read_yaml("babylon.yaml")
-  expect_true("babylonbinary" %in% names(bbi_yaml))
+  expect_true("babylon_binary" %in% names(bbi_yaml))
 
   # delete yaml
   fs::file_delete("babylon.yaml")
 
+})
+
+test_that("bbi_init errors with invalid .nonmem_version", {
+  # create yaml
+  expect_error(bbi_init(".", "."))
+  expect_error(bbi_init(".", ".", "naw"))
+
+  # delete yaml
+  fs::file_delete("babylon.yaml")
 })

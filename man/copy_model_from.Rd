@@ -2,25 +2,39 @@
 % Please edit documentation in R/workflow.R
 \name{copy_model_from}
 \alias{copy_model_from}
-\title{Create new .mod/ctl and new .yaml files based on a previous model. Used for iterating on model development.
-Also fills in necessary YAML fields for using `create_run_log()` later.}
+\alias{copy_model_from.bbi_nonmem_spec}
+\alias{copy_model_from.character}
+\alias{copy_nonmem_model_from}
+\title{Generic S3 method from iterating on models.}
 \usage{
-copy_model_from(
-  .parent_model,
+copy_model_from(.x, ...)
+
+\method{copy_model_from}{bbi_nonmem_spec}(.parent_spec, .new_model, .description, ...)
+
+\method{copy_model_from}{character}(.parent_path, .new_model, .description, ...)
+
+copy_nonmem_model_from(
+  .parent_spec,
   .new_model,
   .description,
   .based_on_additional = NULL,
   .add_tags = NULL,
-  .inherit_tags = TRUE,
+  .inherit_tags = FALSE,
   .update_mod_file = TRUE
 )
 }
 \arguments{
-\item{.parent_model}{Path to model that will be copied WITHOUT FILE EXTENSION. Function will expect to find `{.parent_model}.yaml`` to begin the copy process.}
+\item{.x}{Object to copy from}
+
+\item{...}{arguments to pass through to implementation method}
+
+\item{.parent_spec}{S3 object of class `bbi_nonmem_spec` to be used as the basis for copy.}
 
 \item{.new_model}{Path to write new model files to WITHOUT FILE EXTENSION. Function will create both `{.new_model}.yaml` and `{.new_model}.[mod|ctl]` based on this path.}
 
 \item{.description}{Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.}
+
+\item{.parent_path}{Path to YAML file to copy model from}
 
 \item{.based_on_additional}{The run id for the `.parent_model` will automatically be added to the `based_on` field but this argument can contain a character scaler or vector of additional run id's (model names) that this model was "based on." These are used to reconstuct model developement and ancestry.}
 
@@ -31,9 +45,15 @@ copy_model_from(
 \item{.update_mod_file}{Boolean for whether to update the `$PROBLEM` line in the new control stream. By default it is TRUE, but if FALSE is passed `{.new_model}.[mod|ctl]` will be an exact copy of it's parent control stream.}
 }
 \value{
-Character scaler with the name of the model .yaml file that can be passed to `submit_nonmem_model()`
+S3 object of class `bbi_nonmem_spec` that can be passed to `submit_nonmem_model()`
 }
 \description{
+Generic S3 method from iterating on models.
+
+S3 dispatch for passing `bbi_nonmem_spec` object to `copy_model_from()`
+
+S3 dispatch for passing `bbi_nonmem_spec` object to copy_model_from()
+
 Create new .mod/ctl and new .yaml files based on a previous model. Used for iterating on model development.
 Also fills in necessary YAML fields for using `create_run_log()` later.
 }
