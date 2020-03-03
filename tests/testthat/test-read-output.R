@@ -6,7 +6,9 @@ source("data/read-output-reference.R")
 
 test_that("check_file returns correctly", {
   # default is to print and return nothing
-  expect_invisible(check_file(LST_TEST_FILE))
+  null_output <- capture.output(
+    expect_invisible(check_file(LST_TEST_FILE))
+  )
 
   # check with .return=T
   res <- check_file(LST_TEST_FILE, .print = FALSE, .return = TRUE)
@@ -28,7 +30,6 @@ test_that("check_file returns correctly", {
   list(head_test = 100000, tail_test = 100000, ref = LST_FULL_VEC)
 )
 for (.tc in .test_cases) {
-  print(glue::glue("check_file head={.tc[['head_test']]} tail={.tc[['tail_test']]}"))
   test_that(glue::glue("check_file head={.tc[['head_test']]} tail={.tc[['tail_test']]}"), {
     res <- check_file(LST_TEST_FILE, .print = FALSE, .return = TRUE, .head = .tc[['head_test']], .tail = .tc[['tail_test']])
     expect_identical(res, .tc[['ref']])
@@ -202,7 +203,9 @@ for (.tc in .test_cases) {
 #######################################
 
 test_that("check_nonmem_progress returns TRUE", {
-  expect_true(check_nonmem_progress(RES1))
+  null_output <- capture.output(
+    expect_true(check_nonmem_progress(RES1))
+  )
 })
 
 test_that("check_nonmem_progress returns FALSE", {
@@ -219,7 +222,9 @@ test_that("check_nonmem_progress returns FALSE", {
   new_res <- import_result(yaml_ext(NEW_OUT_DIR))
 
   # it should return false because the ext isn't finished
-  expect_false(suppressWarnings(check_nonmem_progress(new_res)))
+  null_output <- capture.output(
+    expect_false(suppressWarnings(check_nonmem_progress(new_res)))
+  )
 
   # clean up
   fs::file_delete(yaml_ext(NEW_OUT_DIR))
