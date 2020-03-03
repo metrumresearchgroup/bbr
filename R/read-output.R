@@ -78,11 +78,11 @@ tail_output.character <- function(.file, .head = 3, .tail = 5, .print = TRUE, .r
 }
 
 #' S3 dispatch for tailing the OUTPUT file
-#' @param .res bbi_nonmem_result object
+#' @param .mod bbi_nonmem_model object
 #' @export
 #' @rdname check_file
-tail_output.bbi_nonmem_result <- function(.res, .head = 3, .tail = 5, .print = TRUE, .return = FALSE) {
-  .file <- file.path(.res[[WORKING_DIR]], .res[[YAML_OUT_DIR]], "OUTPUT")
+tail_output.bbi_nonmem_model <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE) {
+  .file <- file.path(.mod[[WORKING_DIR]], .mod[[YAML_OUT_DIR]], "OUTPUT")
   check_file(.file, .head, .tail, .print, .return)
 }
 
@@ -112,21 +112,21 @@ tail_lst.character <- function(.file, .head = 3, .tail = 5, .print = TRUE, .retu
 }
 
 #' S3 dispatch for tailing the lst file
-#' @param .res bbi_nonmem_result object
+#' @param .mod bbi_nonmem_model object
 #' @export
 #' @rdname check_file
-tail_lst.bbi_nonmem_result <- function(.res, .head = 3, .tail = 5, .print = TRUE, .return = FALSE) {
-  .file <- build_path_from_res(.res, "lst")
+tail_lst.bbi_nonmem_model <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE) {
+  .file <- build_path_from_mod_obj(.mod, "lst")
   check_file(.file, .head, .tail, .print, .return)
 }
 
 
 #' List files in the output directory to glance at where the process is
-#' @param .res generic res
+#' @param .mod generic res
 #' @rdname check_output_dir
 #' @export
-check_output_dir <- function(.res, ...) {
-  UseMethod("check_output_dir", .res)
+check_output_dir <- function(.mod, ...) {
+  UseMethod("check_output_dir", .mod)
 }
 
 #' S3 dispatch to list output directory files from a directory path
@@ -145,13 +145,13 @@ check_output_dir.character <- function(.output_dir, .filter = NULL) {
   return(.out_files)
 }
 
-#' S3 dispatch to list output directory files from a `bbi_{.model_type}_result` object
-#' @param .res The `bbi_{.model_type}_result` object
+#' S3 dispatch to list output directory files from a `bbi_{.model_type}_model` object
+#' @param .mod The `bbi_{.model_type}_model` object
 #' @param .filter Optional Character scaler of regex to filter filenames on and only return matches
 #' @rdname check_output_dir
 #' @export
-check_output_dir.bbi_nonmem_result <- function(.res, .filter = NULL) {
-  .output_dir <- .res %>% get_output_dir()
+check_output_dir.bbi_nonmem_model <- function(.mod, .filter = NULL) {
+  .output_dir <- .mod %>% get_output_dir()
   .out_files <- check_output_dir(.output_dir, .filter)
   return(.out_files)
 }
@@ -225,12 +225,12 @@ check_grd.character <- function(.path, .iter_floor = 0) {
 }
 
 #' S3 dispatch for checking grd file
-#' @param .res `bbi_nonmem_result` object
+#' @param .mod `bbi_nonmem_model` object
 #' @param .iter_floor Filters file to only rows with `ITERATION` GREATER THAN this value.
 #' @export
 #' @rdname check_nonmem_table_output
-check_grd.bbi_nonmem_result <- function(.res, .iter_floor = 0) {
-  grd_path <- build_path_from_res(.res, "grd")
+check_grd.bbi_nonmem_model <- function(.mod, .iter_floor = 0) {
+  grd_path <- build_path_from_mod_obj(.mod, "grd")
   df <- check_nonmem_table_output(grd_path, .x_var = "ITERATION", .x_floor = .iter_floor)
   return(df)
 }
@@ -271,12 +271,12 @@ check_ext.character <- function(.path, .iter_floor = 0) {
 }
 
 #' S3 dispatch for checking ext file
-#' @param .res `bbi_nonmem_result` object
+#' @param .mod `bbi_nonmem_model` object
 #' @param .iter_floor Filters file to only rows with `ITERATION` GREATER THAN this value.
 #' @export
 #' @rdname check_nonmem_table_output
-check_ext.bbi_nonmem_result <- function(.res, .iter_floor = 0) {
-  ext_path <- build_path_from_res(.res, "ext")
+check_ext.bbi_nonmem_model <- function(.mod, .iter_floor = 0) {
+  ext_path <- build_path_from_mod_obj(.mod, "ext")
   df <- check_nonmem_table_output(ext_path, .x_var = "ITERATION", .x_floor = .iter_floor)
   return(df)
 }
@@ -289,15 +289,15 @@ plot_ext <- function(.df) {
   plot_nonmem_table_df(.df, .x_var = "ITERATION", .stat_name = "GRADIENT")
 }
 
-#' Check the progress of a NONMEM run from the bbi_nonmem_result object
-#' @param .res `bbi_nonmem_summary` object to check on
+#' Check the progress of a NONMEM run from the bbi_nonmem_model object
+#' @param .mod `bbi_nonmem_summary` object to check on
 #' @param .ext_wait Integer number of seconds to wait for an .ext file to be there before exiting with FALSE
 #' @importFrom fs file_exists
 #' @export
-check_nonmem_progress <- function(.res, .ext_wait = 30) {
+check_nonmem_progress <- function(.mod, .ext_wait = 30) {
   # look for ext file
   SLEEP = 1
-  ext_path <- build_path_from_res(.res, "ext")
+  ext_path <- build_path_from_mod_obj(.mod, "ext")
   if (!fs::file_exists(ext_path)) {
     while (.ext_wait > 0) {
       if (fs::file_exists(ext_path)) {
@@ -315,20 +315,20 @@ check_nonmem_progress <- function(.res, .ext_wait = 30) {
   }
 
   # if found, check if ext file has rows with negative iterations (which means it finished)
-  done_rows <- check_ext(.res, .iter_floor = NULL) %>% filter(.data$ITERATION < 0) %>% nrow()
+  done_rows <- check_ext(.mod, .iter_floor = NULL) %>% filter(.data$ITERATION < 0) %>% nrow()
   if (done_rows > 0) {
     return(TRUE)
   } else {
     # try to get tail of OUTPUT file
     out_tail <- tryCatch(
-      tail_output(.res, .tail = 10, .head = 0, .print = FALSE, .return = TRUE),
+      tail_output(.mod, .tail = 10, .head = 0, .print = FALSE, .return = TRUE),
       error = function(e) {
-        warning(glue("{ext_path} file does not look finished but there is also no `{.res[[YAML_OUT_DIR]]}/OUTPUT` file. Your run may have failed."))
+        warning(glue("{ext_path} file does not look finished but there is also no `{.mod[[YAML_OUT_DIR]]}/OUTPUT` file. Your run may have failed."))
         return(FALSE)
       }
     )
     cat(paste(
-      glue("\n\n---\nModel is still running. Tail of `{.res[[YAML_OUT_DIR]]}/OUTPUT` file:"), "\n---\n",
+      glue("\n\n---\nModel is still running. Tail of `{.mod[[YAML_OUT_DIR]]}/OUTPUT` file:"), "\n---\n",
       paste(out_tail, collapse = "\n")
     ))
     return(FALSE)

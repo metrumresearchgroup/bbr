@@ -1,20 +1,20 @@
 # S3 dispatch for submitting models
 #' S3 generic method for submit_model
 #' @export
-#' @param .spec S3 object of class `bbi_{.model_type}_spec` to submit
+#' @param .mod S3 object of class `bbi_{.model_type}_model` to submit
 #' @param ... additional args to pass to specific implementation
 #' @rdname submit_model
-submit_model <- function(.spec, ...) {
-  UseMethod("submit_model", .spec)
+submit_model <- function(.mod, ...) {
+  UseMethod("submit_model", .mod)
 }
 
-#' S3 dispatch for submit_model from bbi_nonmem_spec
+#' S3 dispatch for submit_model from bbi_nonmem_model
 #' @export
-#' @param .spec S3 object of class `bbi_nonmem_spec` to submit
+#' @param .mod S3 object of class `bbi_nonmem_model` to submit
 #' @param ... additional args to pass to submit_nonmem_model()
 #' @rdname submit_model
-submit_model.bbi_nonmem_spec <- function(.spec, ...) {
-  res <- submit_nonmem_model(.spec, ...)
+submit_model.bbi_nonmem_model <- function(.mod, ...) {
+  res <- submit_nonmem_model(.mod, ...)
   return(res)
 }
 
@@ -29,27 +29,27 @@ submit_model.character <- function(.path, ...) {
   # if no extension, assume YAML
   if (tools::file_path_sans_ext(.path) == .path) {
     if (fs::file_exists(yaml_ext(.path))) {
-      .spec <- create_model_from_yaml(yaml_ext(.path))
+      .mod <- read_model(yaml_ext(.path))
     } else {
       stop(glue("Cannot find file {yaml_ext(.path)}. If passing a non-YAML file to submit_model you must include the file extension."))
     }
   } else if (is_valid_yaml_extension(.path)) {
-    .spec <- create_model_from_yaml(.path)
+    .mod <- read_model(.path)
   } else if (is_valid_nonmem_extension(.path)) {
     .mod_list <- list()
     .mod_list[[YAML_MOD_PATH]] <- basename(.path)
     .mod_list[[WORKING_DIR]] <- normalizePath(dirname(.path))
     .mod_list[[YAML_MOD_TYPE]] <- "nonmem"
     .mod_list[[YAML_DESCRIPTION]] <- as.character(glue("{.path} passed directly to submit_model()"))
-    .spec <- create_spec(.mod_list)
+    .mod <- create_model_object(.mod_list)
   } else {
     stop(glue("Unsupported file type passed to submit_model(): `{.path}`. Valid options are `.yaml`, `.mod`, and `.ctl`"))
   }
 
   # submit model
-  .model_type <- .spec[[YAML_MOD_TYPE]]
+  .model_type <- .mod[[YAML_MOD_TYPE]]
   if (.model_type == "nonmem") {
-    res <- submit_nonmem_model(.spec, ...)
+    res <- submit_nonmem_model(.mod, ...)
   } else if (.model_type == "stan") {
     stop(NO_STAN_ERR_MSG)
   } else {
@@ -60,7 +60,7 @@ submit_model.character <- function(.path, ...) {
 
 
 #' Submit a NONMEM model via babylon
-#' @param .spec An S3 object of class `bbi_nonmem_spec`, for example from `create_model()` or `copy_model_from()`, etc.
+#' @param .mod An S3 object of class `bbi_nonmem_model`, for example from `new_model()`, `read_model()` or `copy_model_from()`
 #' @param .mode Either "local" for local execution or "sge" to submit model(s) to the grid
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.
 #' @param ... args passed through to `bbi_exec()`
@@ -69,9 +69,9 @@ submit_model.character <- function(.path, ...) {
 #' @param .dry_run Returns an object detailing the command that would be run, insted of running it. This is primarily for testing but also a debugging tool.
 #' @importFrom stringr str_detect
 #' @importFrom tools file_path_sans_ext
-#' @return An S3 object of class `bbi_nonmem_result` (or `bbi_nonmem_spec` if .dry_run=T)
+#' @return An S3 object of class `bbi_nonmem_process` (or `bbi_nonmem_model` if .dry_run=T)
 #' @rdname submit_model
-submit_nonmem_model <- function(.spec,
+submit_nonmem_model <- function(.mod,
                                 .mode = c("sge", "local"),
                                 .bbi_args = NULL,
                                 ...,
@@ -83,12 +83,12 @@ submit_nonmem_model <- function(.spec,
   .mode <- match.arg(.mode)
 
   # parse output directory path
-  .spec[[YAML_OUT_DIR]] <- tools::file_path_sans_ext(.spec[[YAML_MOD_PATH]])
+  .mod[[YAML_OUT_DIR]] <- tools::file_path_sans_ext(.mod[[YAML_MOD_PATH]])
 
   # build command line args
-  .bbi_args <- parse_args_list(.bbi_args, .spec[[YAML_BBI_ARGS]])
+  .bbi_args <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])
   args_vec <- check_nonmem_args(.bbi_args)
-  cmd_args <- c("nonmem", "run", .mode, .spec[[YAML_MOD_PATH]], args_vec)
+  cmd_args <- c("nonmem", "run", .mode, .mod[[YAML_MOD_PATH]], args_vec)
 
   # add config path
   if (!is.null(.config_path)) {
@@ -96,7 +96,7 @@ submit_nonmem_model <- function(.spec,
   }
 
   # execute
-  model_dir <- .spec[[WORKING_DIR]]
+  model_dir <- .mod[[WORKING_DIR]]
 
   if (.dry_run) {
     # construct fake res object
@@ -115,8 +115,8 @@ submit_nonmem_model <- function(.spec,
   }
 
   # add to result object
-  res <- combine_list_objects(res, .spec, .append = TRUE)
-  res <- assign_result_class(res, .model_type = "nonmem")
+  res <- combine_list_objects(res, .mod, .append = TRUE)
+  res <- assign_process_class(res, .model_type = "nonmem")
 
   return(res)
 }
