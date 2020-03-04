@@ -69,6 +69,7 @@ test_that("step by step create_model to submit_model to model_summary works", {
   expect_identical(class(proc1), PROCESS_CLASS_REF)
 
   # get summary from model object
+  Sys.sleep(3)
   sum1 <- mod1 %>% model_summary()
   expect_identical(class(sum1), SUM_CLASS_REF)
   expect_identical(names(sum1), SUM_NAMES_REF)

@@ -84,9 +84,9 @@ nonmem_summary <- function(.mod,
 
   # otherwise, execute
   res <- tryCatch(
-    bbi_exec(cmd_args, wd = .path, ..., .wait = TRUE),
+    bbi_exec(cmd_args, .dir = .path, ..., .wait = TRUE),
     error = function(e) {
-      err_msg <- glue("nonmem_summary('{.path}') failed with the following error. This may be because the modeling run has not finished successfully. ERROR: \n", e)
+      err_msg <- glue("nonmem_summary('{.path}') failed with the following error. This may be because the modeling run has not finished successfully. ERROR: \n{e}")
       stop(err_msg)
     }
   )

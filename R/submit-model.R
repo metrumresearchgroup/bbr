@@ -104,7 +104,7 @@ submit_nonmem_model <- function(.mod,
     res <- bbi_dry_run(cmd_args, model_dir)
   } else {
     # launch model
-    res <- bbi_exec(cmd_args, .wait = .wait, wd = model_dir, ...)
+    res <- bbi_exec(cmd_args, .wait = .wait, .dir = model_dir, ...)
   }
 
   return(res)
