@@ -2,19 +2,19 @@
 % Please edit documentation in R/submit-model.R
 \name{submit_model}
 \alias{submit_model}
-\alias{submit_model.bbi_nonmem_spec}
+\alias{submit_model.bbi_nonmem_model}
 \alias{submit_model.character}
 \alias{submit_nonmem_model}
 \title{S3 generic method for submit_model}
 \usage{
-submit_model(.spec, ...)
+submit_model(.mod, ...)
 
-\method{submit_model}{bbi_nonmem_spec}(.spec, ...)
+\method{submit_model}{bbi_nonmem_model}(.mod, ...)
 
 \method{submit_model}{character}(.path, ...)
 
 submit_nonmem_model(
-  .spec,
+  .mod,
   .mode = c("sge", "local"),
   .bbi_args = NULL,
   ...,
@@ -24,7 +24,7 @@ submit_nonmem_model(
 )
 }
 \arguments{
-\item{.spec}{An S3 object of class `bbi_nonmem_spec`, for example from `create_model()` or `copy_model_from()`, etc.}
+\item{.mod}{An S3 object of class `bbi_nonmem_model`, for example from `new_model()`, `read_model()` or `copy_model_from()`}
 
 \item{...}{args passed through to `bbi_exec()`}
 
@@ -41,12 +41,12 @@ submit_nonmem_model(
 \item{.dry_run}{Returns an object detailing the command that would be run, insted of running it. This is primarily for testing but also a debugging tool.}
 }
 \value{
-An S3 object of class `bbi_nonmem_result` (or `bbi_nonmem_spec` if .dry_run=T)
+An S3 object of class `bbi_nonmem_process` (or `bbi_nonmem_model` if .dry_run=T)
 }
 \description{
 S3 generic method for submit_model
 
-S3 dispatch for submit_model from bbi_nonmem_spec
+S3 dispatch for submit_model from bbi_nonmem_model
 
 S3 dispatch for submit_model from character scaler
   Should be path to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).

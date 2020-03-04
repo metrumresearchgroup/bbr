@@ -4,7 +4,7 @@
 \alias{bbi_exec}
 \title{Executes a babylon call (`bbi ...`) with processx::process$new()}
 \usage{
-bbi_exec(.cmd_args, .verbose = FALSE, .wait = FALSE, ...)
+bbi_exec(.cmd_args, .verbose = FALSE, .wait = FALSE, .dir = ".", ...)
 }
 \arguments{
 \item{.cmd_args}{A character vector of command line arguments for the execution call}

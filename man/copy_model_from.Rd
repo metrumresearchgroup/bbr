@@ -2,19 +2,19 @@
 % Please edit documentation in R/workflow.R
 \name{copy_model_from}
 \alias{copy_model_from}
-\alias{copy_model_from.bbi_nonmem_spec}
+\alias{copy_model_from.bbi_nonmem_model}
 \alias{copy_model_from.character}
 \alias{copy_nonmem_model_from}
 \title{Generic S3 method from iterating on models.}
 \usage{
 copy_model_from(.x, ...)
 
-\method{copy_model_from}{bbi_nonmem_spec}(.parent_spec, .new_model, .description, ...)
+\method{copy_model_from}{bbi_nonmem_model}(.parent_mod, .new_model, .description, ...)
 
 \method{copy_model_from}{character}(.parent_path, .new_model, .description, ...)
 
 copy_nonmem_model_from(
-  .parent_spec,
+  .parent_mod,
   .new_model,
   .description,
   .based_on_additional = NULL,
@@ -28,7 +28,7 @@ copy_nonmem_model_from(
 
 \item{...}{arguments to pass through to implementation method}
 
-\item{.parent_spec}{S3 object of class `bbi_nonmem_spec` to be used as the basis for copy.}
+\item{.parent_mod}{S3 object of class `bbi_nonmem_model` to be used as the basis for copy.}
 
 \item{.new_model}{Path to write new model files to WITHOUT FILE EXTENSION. Function will create both `{.new_model}.yaml` and `{.new_model}.[mod|ctl]` based on this path.}
 
@@ -45,15 +45,9 @@ copy_nonmem_model_from(
 \item{.update_mod_file}{Boolean for whether to update the `$PROBLEM` line in the new control stream. By default it is TRUE, but if FALSE is passed `{.new_model}.[mod|ctl]` will be an exact copy of it's parent control stream.}
 }
 \value{
-S3 object of class `bbi_nonmem_spec` that can be passed to `submit_nonmem_model()`
+S3 object of class `bbi_nonmem_model` that can be passed to `submit_nonmem_model()`
 }
 \description{
-Generic S3 method from iterating on models.
-
-S3 dispatch for passing `bbi_nonmem_spec` object to `copy_model_from()`
-
-S3 dispatch for passing `bbi_nonmem_spec` object to copy_model_from()
-
 Create new .mod/ctl and new .yaml files based on a previous model. Used for iterating on model development.
 Also fills in necessary YAML fields for using `create_run_log()` later.
 }

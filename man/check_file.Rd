@@ -4,10 +4,10 @@
 \alias{check_file}
 \alias{tail_output}
 \alias{tail_output.character}
-\alias{tail_output.bbi_nonmem_result}
+\alias{tail_output.bbi_nonmem_model}
 \alias{tail_lst}
 \alias{tail_lst.character}
-\alias{tail_lst.bbi_nonmem_result}
+\alias{tail_lst.bbi_nonmem_model}
 \title{Reads the head and tail of specified file and prints it the console and/or returns it as a character vector.}
 \usage{
 check_file(.file, .head = 3, .tail = 5, .print = TRUE, .return = FALSE)
@@ -16,13 +16,13 @@ tail_output(.f, ...)
 
 \method{tail_output}{character}(.file, .head = 3, .tail = 5, .print = TRUE, .return = FALSE)
 
-\method{tail_output}{bbi_nonmem_result}(.res, .head = 3, .tail = 5, .print = TRUE, .return = FALSE)
+\method{tail_output}{bbi_nonmem_model}(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE)
 
 tail_lst(.f, ...)
 
 \method{tail_lst}{character}(.file, .head = 3, .tail = 5, .print = TRUE, .return = FALSE)
 
-\method{tail_lst}{bbi_nonmem_result}(.res, .head = 3, .tail = 5, .print = TRUE, .return = FALSE)
+\method{tail_lst}{bbi_nonmem_model}(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE)
 }
 \arguments{
 \item{.file}{Path to lst file}
@@ -39,7 +39,7 @@ tail_lst(.f, ...)
 
 \item{...}{args passed through}
 
-\item{.res}{bbi_nonmem_result object}
+\item{.mod}{bbi_nonmem_model object}
 }
 \description{
 Reads the head and tail of specified file and prints it the console and/or returns it as a character vector.

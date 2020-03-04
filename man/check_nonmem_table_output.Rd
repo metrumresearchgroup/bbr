@@ -4,10 +4,10 @@
 \alias{check_nonmem_table_output}
 \alias{check_grd}
 \alias{check_grd.character}
-\alias{check_grd.bbi_nonmem_result}
+\alias{check_grd.bbi_nonmem_model}
 \alias{check_ext}
 \alias{check_ext.character}
-\alias{check_ext.bbi_nonmem_result}
+\alias{check_ext.bbi_nonmem_model}
 \title{Checks nonmem output file that's a whitespace-delimited file (for instance .grd or .ext)}
 \usage{
 check_nonmem_table_output(.path, .x_var = NULL, .x_floor = NULL)
@@ -16,13 +16,13 @@ check_grd(.x, ...)
 
 \method{check_grd}{character}(.path, .iter_floor = 0)
 
-\method{check_grd}{bbi_nonmem_result}(.res, .iter_floor = 0)
+\method{check_grd}{bbi_nonmem_model}(.mod, .iter_floor = 0)
 
 check_ext(.x, ...)
 
 \method{check_ext}{character}(.path, .iter_floor = 0)
 
-\method{check_ext}{bbi_nonmem_result}(.res, .iter_floor = 0)
+\method{check_ext}{bbi_nonmem_model}(.mod, .iter_floor = 0)
 }
 \arguments{
 \item{.path}{path to ext file}
@@ -37,7 +37,7 @@ check_ext(.x, ...)
 
 \item{.iter_floor}{Filters file to only rows with `ITERATION` GREATER THAN this value.}
 
-\item{.res}{`bbi_nonmem_result` object}
+\item{.mod}{`bbi_nonmem_model` object}
 }
 \description{
 Checks nonmem output file that's a whitespace-delimited file (for instance .grd or .ext)

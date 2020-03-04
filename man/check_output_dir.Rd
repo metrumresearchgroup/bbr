@@ -3,17 +3,17 @@
 \name{check_output_dir}
 \alias{check_output_dir}
 \alias{check_output_dir.character}
-\alias{check_output_dir.bbi_nonmem_result}
+\alias{check_output_dir.bbi_nonmem_model}
 \title{List files in the output directory to glance at where the process is}
 \usage{
-check_output_dir(.res, ...)
+check_output_dir(.mod, ...)
 
 \method{check_output_dir}{character}(.output_dir, .filter = NULL)
 
-\method{check_output_dir}{bbi_nonmem_result}(.res, .filter = NULL)
+\method{check_output_dir}{bbi_nonmem_model}(.mod, .filter = NULL)
 }
 \arguments{
-\item{.res}{The `bbi_{.model_type}_result` object}
+\item{.mod}{The `bbi_{.model_type}_model` object}
 
 \item{.output_dir}{Character scaler of path to output directory}
 
@@ -24,5 +24,5 @@ List files in the output directory to glance at where the process is
 
 S3 dispatch to list output directory files from a directory path
 
-S3 dispatch to list output directory files from a `bbi_{.model_type}_result` object
+S3 dispatch to list output directory files from a `bbi_{.model_type}_model` object
 }

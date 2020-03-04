@@ -2,12 +2,12 @@
 % Please edit documentation in R/workflow.R
 \name{save_mod_yaml}
 \alias{save_mod_yaml}
-\title{Saves a model spec object to a yaml file}
+\title{Saves a model model object to a yaml file}
 \usage{
-save_mod_yaml(.spec, .out_path = NULL)
+save_mod_yaml(.mod, .out_path = NULL)
 }
 \arguments{
-\item{.spec}{S3 object of class `bbi_{.model_type}_spec`}
+\item{.mod}{S3 object of class `bbi_{.model_type}_model`}
 
 \item{.out_path}{Character scaler with path to save out YAML file. By default, sets it to the model file name, with a yaml extension.}
 }
@@ -15,5 +15,5 @@ save_mod_yaml(.spec, .out_path = NULL)
 Output list as specified above.
 }
 \description{
-Saves a model spec object to a yaml file
+Saves a model model object to a yaml file
 }

@@ -14,8 +14,7 @@ NEW_TAGS <- c("new tag 1", "new tag 2")
 NEW_TEXT1 <- c("naw", "paw")
 NEW_TEXT2 <- c("all", "done")
 
-SPEC_CLASS_LIST <- c("bbi_nonmem_spec", "list")
-RES_CLASS_LIST <- c("bbi_nonmem_result", "bbi_nonmem_spec", "list")
+MODEL_CLASS_LIST <- c("bbi_nonmem_model", "list")
 
 #########################
 # copy_model_from tests
@@ -88,14 +87,14 @@ for (m in c(NEW_MOD2, NEW_MOD3)) {
   if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
 }
 
-test_that("copy_from_model bbi_nonmem_spec", {
-  # run copy_model_from on a spec object
-  spec1 <- create_model_from_yaml(YAML_TEST_FILE)
+test_that("copy_from_model bbi_nonmem_model", {
+  # run copy_model_from on a model object
+  mod1 <- read_model(YAML_TEST_FILE)
   new_yaml_path <- yaml_ext(NEW_MOD2)
   new_ctl_path <- ctl_ext(NEW_MOD2)
   expect_false(fs::file_exists(new_yaml_path))
   expect_false(fs::file_exists(new_ctl_path))
-  copy_model_from(spec1, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
+  copy_model_from(mod1, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
 
   # check that everything is copied through
   new_yaml <- yaml::read_yaml(new_yaml_path)
@@ -117,33 +116,36 @@ test_that("copy_from_model bbi_nonmem_spec", {
 })
 
 
-test_that("compare two specs", {
-  # create model spec
+test_that("compare two model objects", {
+  # create new model with args
   .test_path <- "model-examples/tmp.yaml"
-  spec1a <- create_model(
+  mod1a <- new_model(
     .yaml_path = .test_path,
     .description = "original acop model",
     .tags = c("acop tag", "other tag"),
     .bbi_args = list(overwrite = TRUE, threads = 4)
   )
 
-  # create model spec
-  spec1b <- create_model_from_yaml(.yaml_path = "model-examples/1.yaml")
+  # read model from YAML
+  mod1b <- read_model(.path = "model-examples/1.yaml")
 
   # check class and keys are right
-  expect_identical(class(spec1a), SPEC_CLASS_LIST)
-  expect_identical(class(spec1b), SPEC_CLASS_LIST)
+  expect_identical(class(mod1a), MODEL_CLASS_LIST)
+  expect_identical(class(mod1b), MODEL_CLASS_LIST)
 
-  expect_true(all(SPEC_REQ_KEYS %in% names(spec1a)))
-  expect_true(all(SPEC_REQ_KEYS %in% names(spec1b)))
+  expect_true(all(MODEL_REQ_KEYS %in% names(mod1a)))
+  expect_true(all(MODEL_REQ_KEYS %in% names(mod1b)))
 
   # also check that some of the required keys have the same value
-  for (k in SPEC_REQ_KEYS) {
+  for (k in MODEL_REQ_KEYS) {
     if (k == YAML_MOD_PATH) {
-      expect_identical(spec1a[[k]], basename(ctl_ext(.test_path)))
-      expect_identical(spec1b[[k]], "1.ctl")
+      expect_identical(mod1a[[k]], basename(ctl_ext(.test_path)))
+      expect_identical(mod1b[[k]], "1.ctl")
+    } else if (k == YAML_OUT_DIR) {
+      expect_identical(mod1a[[k]], basename(tools::file_path_sans_ext(.test_path)))
+      expect_identical(mod1b[[k]], "1")
     } else {
-      expect_equal(spec1a[[k]], spec1b[[k]])
+      expect_equal(mod1a[[k]], mod1b[[k]])
     }
   }
 
@@ -156,7 +158,7 @@ test_that("compare two specs", {
 # interacting with YAML
 #########################
 
-test_that("parse_mod_yaml() returns expected list", {
+test_that("read_model() returns expected object", {
   ref_list <- list(
     description = ORIG_DESC,
     model_type = "nonmem",
@@ -166,25 +168,25 @@ test_that("parse_mod_yaml() returns expected list", {
       overwrite = TRUE,
       threads = 4L),
     orig_working_dir = file.path(getwd(), "model-examples"),
-    orig_yaml_file ="1.yaml"
+    orig_yaml_file ="1.yaml",
+    output_dir = "1"
   )
-  class(ref_list) <- SPEC_CLASS_LIST
-  expect_equal(parse_mod_yaml("model-examples/1.yaml"), ref_list)
-
+  class(ref_list) <- MODEL_CLASS_LIST
+  expect_equal(read_model("model-examples/1.yaml"), ref_list)
 })
 
 
 test_that("yaml with no model type will fail", {
-  expect_error(parse_mod_yaml("test-yaml/zz_fail_no_modtype.yaml"))
+  expect_error(read_model("test-yaml/zz_fail_no_modtype.yaml"))
 })
 
 test_that("yaml with bad model path will fail", {
-  expect_error(parse_mod_yaml("test-yaml/zz_fail_bad_modpath.yaml"))
+  expect_error(read_model("test-yaml/zz_fail_bad_modpath.yaml"))
 })
 
 test_that("yaml with no model path will return ctl", {
   .test_path <- "test-yaml/zz_pass_no_modpath"
-  .spec <- parse_mod_yaml(yaml_ext(.test_path))
+  .spec <- read_model(yaml_ext(.test_path))
   expect_identical(.spec[[YAML_MOD_PATH]], basename(ctl_ext(.test_path)))
 })
 
@@ -194,14 +196,14 @@ test_that("save_mod_yaml() saves to correct default path", {
   fs::file_copy(YAML_TEST_FILE, new_yaml)
 
   # make a spec from it
-  new_spec <- create_model_from_yaml(new_yaml)
+  new_mod <- read_model(new_yaml)
 
   # delete the underlying yaml
   fs::file_delete(new_yaml)
   expect_false(fs::file_exists(new_yaml))
 
   # re-save yaml
-  save_mod_yaml(new_spec)
+  save_mod_yaml(new_mod)
 
   # look for it
   expect_true(fs::file_exists(new_yaml))
@@ -216,10 +218,10 @@ test_that("save_mod_yaml() saves to user supplied path", {
   expect_false(fs::file_exists(fake_path))
 
   # make a spec
-  new_spec <- create_model_from_yaml(YAML_TEST_FILE)
+  new_mod <- read_model(YAML_TEST_FILE)
 
   # re-save yaml
-  save_mod_yaml(new_spec, fake_path)
+  save_mod_yaml(new_mod, fake_path)
 
   # look for it
   expect_true(fs::file_exists(fake_path))
@@ -234,10 +236,10 @@ test_that("save_mod_yaml() deletes the right keys", {
   expect_false(fs::file_exists(fake_path))
 
   # make a spec
-  new_spec <- create_model_from_yaml(YAML_TEST_FILE)
+  new_mod <- read_model(YAML_TEST_FILE)
 
   # re-save yaml
-  save_mod_yaml(new_spec, fake_path)
+  save_mod_yaml(new_mod, fake_path)
 
   # read it back in and check the keys
   loaded_yaml <- yaml::read_yaml(fake_path)
@@ -254,8 +256,8 @@ test_that("reconcile_mod_yaml() pulls in new tags", {
   fs::file_copy(YAML_TEST_FILE, new_yaml)
 
   # make a spec from it
-  new_spec <- create_model_from_yaml(new_yaml)
-  expect_identical(new_spec[[YAML_TAGS]], ORIG_TAGS)
+  new_mod <- read_model(new_yaml)
+  expect_identical(new_mod[[YAML_TAGS]], ORIG_TAGS)
 
   # add the tags to the yaml manually
   rogue_spec <- yaml::read_yaml(new_yaml)
@@ -263,47 +265,30 @@ test_that("reconcile_mod_yaml() pulls in new tags", {
   yaml::write_yaml(rogue_spec, new_yaml)
 
   # check the reconcile add the new tags
-  new_spec <- reconcile_mod_yaml(new_spec, new_yaml)
-  expect_identical(new_spec[[YAML_TAGS]], c(ORIG_TAGS, NEW_TAGS))
+  new_mod <- reconcile_mod_yaml(new_mod, new_yaml)
+  expect_identical(new_mod[[YAML_TAGS]], c(ORIG_TAGS, NEW_TAGS))
 
   # cleanup
   fs::file_delete(new_yaml)
 })
 
 
-################################
-# reconstructing result object
-################################
-
-test_that("import_result() loads a valid `bbi_nonmem_result` object", {
-  # import result and check class
-  res1 <- import_result(YAML_TEST_FILE)
-  expect_identical(class(res1), RES_CLASS_LIST)
-
-  # compare shared keys with spec from same YAML file
-  spec1 <- create_model_from_yaml(YAML_TEST_FILE)
-  for (.key in SPEC_REQ_KEYS) {
-    expect_equal(res1[[.key]], spec1[[.key]])
-  }
-})
-
-
 ######################################
-# modify_spec_field and its wrappers
+# modify_model_field and its wrappers
 ######################################
 
-test_that("modify_spec_field() works correctly", {
+test_that("modify_model_field() works correctly", {
   # make a new yaml
   new_yaml <- yaml_ext(NEW_MOD2)
   fs::file_copy(YAML_TEST_FILE, new_yaml)
 
   # make a spec from it
-  new_spec <- create_model_from_yaml(new_yaml)
-  expect_identical(new_spec[[YAML_TAGS]], ORIG_TAGS)
+  new_mod <- read_model(new_yaml)
+  expect_identical(new_mod[[YAML_TAGS]], ORIG_TAGS)
 
   # modify the tags field
-  new_spec <- modify_spec_field(new_spec, .field=YAML_TAGS, .value=NEW_TAGS)
-  expect_identical(new_spec[[YAML_TAGS]], c(ORIG_TAGS, NEW_TAGS))
+  new_mod <- modify_model_field(new_mod, .field=YAML_TAGS, .value=NEW_TAGS)
+  expect_identical(new_mod[[YAML_TAGS]], c(ORIG_TAGS, NEW_TAGS))
 
   # check that the yaml was also modified
   rogue_spec <- yaml::read_yaml(new_yaml)
@@ -313,8 +298,8 @@ test_that("modify_spec_field() works correctly", {
   fs::file_delete(new_yaml)
 })
 
-test_that("modify_spec_field() de-duplication works", {
-  dupe_tags <- c("ha", "hey", "hey")
+test_that("modify_model_field() de-duplication works", {
+  dupe_tags <- c("ha", "hey", "ha")
   uniq_tags <- c("ha", "hey")
 
   # make a new yaml
@@ -322,16 +307,16 @@ test_that("modify_spec_field() de-duplication works", {
   fs::file_copy(YAML_TEST_FILE, new_yaml)
 
   # make a spec from it
-  new_spec <- create_model_from_yaml(new_yaml)
-  expect_identical(new_spec[[YAML_TAGS]], ORIG_TAGS)
+  new_mod <- read_model(new_yaml)
+  expect_identical(new_mod[[YAML_TAGS]], ORIG_TAGS)
 
   # check that .unique = FALSE turns off de-duping
-  new_spec <- modify_spec_field(new_spec, .field=YAML_TAGS, .value=dupe_tags, .unique = FALSE)
-  expect_identical(new_spec[[YAML_TAGS]], c(ORIG_TAGS, dupe_tags))
+  new_mod <- modify_model_field(new_mod, .field=YAML_TAGS, .value=dupe_tags, .unique = FALSE)
+  expect_identical(new_mod[[YAML_TAGS]], c(ORIG_TAGS, dupe_tags))
 
   # check that .unique = TRUE (default) correctly de-dupes
-  new_spec <- modify_spec_field(new_spec, .field=YAML_TAGS, .value=dupe_tags)
-  expect_identical(new_spec[[YAML_TAGS]], c(ORIG_TAGS, uniq_tags))
+  new_mod <- modify_model_field(new_mod, .field=YAML_TAGS, .value=dupe_tags)
+  expect_identical(new_mod[[YAML_TAGS]], c(ORIG_TAGS, uniq_tags))
 
   # cleanup
   fs::file_delete(new_yaml)
@@ -343,16 +328,16 @@ test_that("add_tags() and replace_tags() work correctly", {
   fs::file_copy(YAML_TEST_FILE, new_yaml)
 
   # make a spec from it
-  new_spec <- create_model_from_yaml(new_yaml)
-  expect_identical(new_spec[[YAML_TAGS]], ORIG_TAGS)
+  new_mod <- read_model(new_yaml)
+  expect_identical(new_mod[[YAML_TAGS]], ORIG_TAGS)
 
   # test adding
-  new_spec <- add_tags(new_spec, NEW_TAGS)
-  expect_identical(new_spec[[YAML_TAGS]], c(ORIG_TAGS, NEW_TAGS))
+  new_mod <- add_tags(new_mod, NEW_TAGS)
+  expect_identical(new_mod[[YAML_TAGS]], c(ORIG_TAGS, NEW_TAGS))
 
   # test_replacing
-  new_spec <- replace_tags(new_spec, NEW_TAGS)
-  expect_identical(new_spec[[YAML_TAGS]], NEW_TAGS)
+  new_mod <- replace_tags(new_mod, NEW_TAGS)
+  expect_identical(new_mod[[YAML_TAGS]], NEW_TAGS)
 
   # cleanup
   fs::file_delete(new_yaml)
@@ -364,18 +349,18 @@ test_that("add_decisions() and replace_decisions() work correctly", {
   fs::file_copy(YAML_TEST_FILE, new_yaml)
 
   # make a spec from it
-  new_spec <- create_model_from_yaml(new_yaml)
-  expect_null(new_spec[[YAML_DECISIONS]])
+  new_mod <- read_model(new_yaml)
+  expect_null(new_mod[[YAML_DECISIONS]])
 
   # test adding
-  new_spec <- add_decisions(new_spec, NEW_TEXT1)
-  expect_identical(new_spec[[YAML_DECISIONS]], NEW_TEXT1)
-  new_spec <- add_decisions(new_spec, NEW_TEXT2)
-  expect_identical(new_spec[[YAML_DECISIONS]], c(NEW_TEXT1, NEW_TEXT2))
+  new_mod <- add_decisions(new_mod, NEW_TEXT1)
+  expect_identical(new_mod[[YAML_DECISIONS]], NEW_TEXT1)
+  new_mod <- add_decisions(new_mod, NEW_TEXT2)
+  expect_identical(new_mod[[YAML_DECISIONS]], c(NEW_TEXT1, NEW_TEXT2))
 
   # test_replacing
-  new_spec <- replace_decisions(new_spec, NEW_TEXT2)
-  expect_identical(new_spec[[YAML_DECISIONS]], NEW_TEXT2)
+  new_mod <- replace_decisions(new_mod, NEW_TEXT2)
+  expect_identical(new_mod[[YAML_DECISIONS]], NEW_TEXT2)
 
   # cleanup
   fs::file_delete(new_yaml)
@@ -387,12 +372,12 @@ test_that("replace_description() works correctly", {
   fs::file_copy(YAML_TEST_FILE, new_yaml)
 
   # make a spec from it
-  new_spec <- create_model_from_yaml(new_yaml)
-  expect_identical(new_spec[[YAML_DESCRIPTION]], ORIG_DESC)
+  new_mod <- read_model(new_yaml)
+  expect_identical(new_mod[[YAML_DESCRIPTION]], ORIG_DESC)
 
   # test_replacing
-  new_spec <- replace_description(new_spec, NEW_DESC)
-  expect_identical(new_spec[[YAML_DESCRIPTION]], NEW_DESC)
+  new_mod <- replace_description(new_mod, NEW_DESC)
+  expect_identical(new_mod[[YAML_DESCRIPTION]], NEW_DESC)
 
   # cleanup
   fs::file_delete(new_yaml)

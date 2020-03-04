@@ -36,6 +36,7 @@ submit_model.character <- function(.path, ...) {
   } else if (is_valid_yaml_extension(.path)) {
     .mod <- read_model(.path)
   } else if (is_valid_nonmem_extension(.path)) {
+    # if NONMEM file, build model object
     .mod_list <- list()
     .mod_list[[YAML_MOD_PATH]] <- basename(.path)
     .mod_list[[WORKING_DIR]] <- normalizePath(dirname(.path))

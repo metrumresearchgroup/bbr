@@ -183,14 +183,14 @@ get_exit_status <- function (.res, ...) {
 }
 
 get_exit_status.babylon_result <- function(.res, .check = FALSE) {
-  if (.res$process$is_alive()) {
-    warning(paste0("Process ", .res$process$get_pid(), " is still running. You cannot check the exit status until it is finished."))
+  if (.res[[PROC_PROCESS]]$is_alive()) {
+    warning(paste0("Process ", .res[[PROC_PROCESS]]$get_pid(), " is still running. You cannot check the exit status until it is finished."))
     invisible()
   } else {
-    exit_status <- .res$process$get_exit_status()
+    exit_status <- .res[[PROC_PROCESS]]$get_exit_status()
 
     if (.check) {
-      check_status_code(exit_status, .res[[RES_STDOUT]], .res[[RES_CMD_ARGS]])
+      check_status_code(exit_status, .res[[PROC_STDOUT]], .res[[PROC_CMD_ARGS]])
     }
     return(exit_status)
   }
@@ -204,13 +204,13 @@ get_stdout <- function(.res, ...) {
 
 get_stdout.babylon_result <- function(.res) {
   # check if process is still alive (as of now, can only get output from finished process)
-  if (.res$process$is_alive()) {
-    warning(paste0("Process ", .res$process$get_pid(), " is still running. You cannot read the output until it is finished."))
+  if (.res[[PROC_PROCESS]]$is_alive()) {
+    warning(paste0("Process ", .res[[PROC_PROCESS]]$get_pid(), " is still running. You cannot read the output until it is finished."))
     invisible()
   } else {
     # if output has not been read from buffer, read it
     if (is.null(.res$output)) {
-      .res$output <- .res$process$read_all_output_lines()
+      .res$output <- .res[[PROC_PROCESS]]$read_all_output_lines()
     }
     # return output
     return(.res)

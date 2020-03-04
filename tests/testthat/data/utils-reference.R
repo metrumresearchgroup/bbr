@@ -15,12 +15,8 @@ GRD_TEST_FILE <-  as.character(glue::glue("model-examples/{MOD_ID}/{MOD_ID}.grd"
 EXT_TEST_FILE <-  as.character(glue::glue("model-examples/{MOD_ID}/{MOD_ID}.ext"))
 
 # fake result object
-SPEC1 <- create_model_from_yaml(YAML_TEST_FILE)
-RES1 <- import_result(OUTPUT_DIR)
+MOD1 <- read_model(YAML_TEST_FILE)
 
-SPEC_CLASS <- "bbi_nonmem_spec"
-RES_CLASS <- "bbi_nonmem_result"
-
-
-
+MOD_CLASS <- "bbi_nonmem_model"
+PROC_CLASS <- "babylon_process"
 

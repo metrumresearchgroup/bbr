@@ -4,27 +4,20 @@
 \alias{get_path_from_object}
 \alias{get_model_path}
 \alias{get_output_dir}
-\alias{get_yaml_path}
 \title{Get path from bbi object}
 \usage{
 get_path_from_object(.bbi_object, .key)
 
-get_model_path(.spec)
+get_model_path(.mod)
 
-get_output_dir(.res)
-
-get_yaml_path(.spec, .check_exists = TRUE)
+get_output_dir(.mod)
 }
 \arguments{
 \item{.bbi_object}{The object to query}
 
 \item{.key}{The key that contains the relative path}
 
-\item{.spec}{The `bbi_...` S3 object}
-
-\item{.res}{The `bbi_...` S3 object}
-
-\item{.check_exists}{Boolean for whether it will check if the file exists and error if it does not. True by default.}
+\item{.mod}{The `bbi_...` S3 object}
 }
 \description{
 Builds the full path to a file that is stored as part of a `bbi_...` S3 object

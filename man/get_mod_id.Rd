@@ -3,14 +3,14 @@
 \name{get_mod_id}
 \alias{get_mod_id}
 \alias{get_mod_id.character}
-\alias{get_mod_id.bbi_nonmem_spec}
+\alias{get_mod_id.bbi_nonmem_model}
 \title{Helper to strip path and extension from model file to get only model identifier}
 \usage{
 get_mod_id(.mod_path, ...)
 
 \method{get_mod_id}{character}(.mod_path)
 
-\method{get_mod_id}{bbi_nonmem_spec}(.res)
+\method{get_mod_id}{bbi_nonmem_model}(.mod)
 }
 \arguments{
 \item{.mod_path}{Character scaler model path to strip}

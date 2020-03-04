@@ -225,6 +225,11 @@ scaler_to_list <- function(.x) {
   return(.x)
 }
 
+
+#####################
+# File path helpers
+#####################
+
 is_valid_nonmem_extension <- function(.path) {
   tools::file_ext(.path) %in% c("ctl", "mod")
 }
@@ -304,12 +309,22 @@ get_output_dir <- function(.mod) {
   return(get_path_from_object(.mod, YAML_OUT_DIR))
 }
 
-#' Returns the path to the model file from a `bbi_{.model_type}_model` object
-#' @param .mod The `bbi_...` S3 object
+
+#' S3 generic to return the path to the YAML file
+#' @param .path generic file path to check
+#' @export
+#' @rdname get_yaml_path
+get_yaml_path <- function(.path, ...) {
+  UseMethod("get_yaml_path", .path)
+}
+
+
+#' S3 dispatch to return the path to the YAML file from a `bbi_nonmem_model` object
+#' @param .mod The `bbi_nonmem_model` S3 object
 #' @param .check_exists Boolean for whether it will check if the file exists and error if it does not. True by default.
 #' @export
-#' @rdname get_path_from_object
-get_yaml_path <- function(.mod, .check_exists = TRUE) {
+#' @rdname get_yaml_path
+get_yaml_path.bbi_nonmem_model <- function(.mod, .check_exists = TRUE) {
   # check if file name was stored on load, otherwise infer from model file
   if (is.null(.mod[[YAML_YAML_NAME]])) {
     yaml_file <- .mod[[YAML_MOD_PATH]] %>% get_mod_id() %>% yaml_ext()
@@ -317,15 +332,34 @@ get_yaml_path <- function(.mod, .check_exists = TRUE) {
     yaml_file <- .mod[[YAML_YAML_NAME]]
   }
 
-  yaml_path <- file.path(.mod[[WORKING_DIR]], yaml_file)
-  if (.check_exists) {
-    if (!fs::file_exists(yaml_path)) {
-      stop(glue("Parsed YAML path {yaml_path} from .mod but no file exists at that location."))
-    }
-  }
+  yaml_path <- file.path(.mod[[WORKING_DIR]], yaml_file) %>% get_yaml_path(.check_exists = .check_exists)
   return(yaml_path)
 }
 
+
+#' S3 dispatch to return the path to the YAML file from a model path or output directory
+#' @param .path The file path to convert to a YAML
+#' @param .check_exists Boolean for whether it will check if the file exists and error if it does not. True by default.
+#' @export
+#' @rdname get_yaml_path
+get_yaml_path.character <- function(.path, .check_exists = TRUE) {
+  # convert to .yaml extension
+  yaml_path <- .path %>% yaml_ext()
+
+  # check that the YAML exists
+  if (isTRUE(.check_exists)) {
+    if (!fs::file_exists(yaml_path)) {
+      stop(glue("Inferred YAML path {yaml_path} but no file exists at that location. Use `read_model('path/to/yaml')` to explicitly create model object from YAML."))
+    }
+  }
+
+  return(yaml_path)
+}
+
+
+############################
+# Error handlers
+############################
 
 strict_mode_error <- function(err_msg) {
   if (isTRUE(getOption("rbabylon.strict"))) {
@@ -338,6 +372,11 @@ strict_mode_error <- function(err_msg) {
     ))
   }
 }
+
+
+############################
+# Class assignment helpers
+############################
 
 #' Assign `bbi_{.model_type}_model` class
 #'

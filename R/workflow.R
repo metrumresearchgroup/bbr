@@ -57,8 +57,9 @@ new_model <- function(
 #' @rdname read_model
 #' @export
 read_model <- function(.path) {
-  if (!fs::file_exists(.path)) {
-    stop(glue("Cannot find yaml file at path {.path}"))
+  # If not YAML extension, infer and look for file
+  if (!is_valid_yaml_extension(.path)) {
+    .path <- .path %>% get_yaml_path()
   }
 
   # load from file
@@ -157,8 +158,42 @@ create_model_object <- function(.mod_list) {
   return(.mod_list)
 }
 
+#' Convert object to `bbi_{.model_type}_model`
+#' @param .obj Object to convert to `bbi_{.model_type}_model`
+#' @param ... Pass-through arguments
+#' @rdname as_model
+#' @export
+as_model <- function(.obj, ...) {
+  UseMethod("as_model", .obj)
+}
 
-# S3 dispatch for iterating on models
+#' S3 dispatch for passing through `bbi_nonmem_model` object
+#' @param .mod `bbi_nonmem_model` object that will be passed through
+#' @rdname as_model
+#' @export
+as_model.bbi_nonmem_model <- function(.mod) {
+  return(.mod)
+}
+
+#' S3 dispatch for converting `babylon_process` to corresponding `bbi_nonmem_model` object.
+#' Only works if YAML and model file are in the same directory with the same name and different file extensions.
+#' @param .proc `babylon_process` object to convert
+#' @rdname as_model
+#' @export
+as_model.babylon_process <- function(.proc) {
+  # construct path to YAML
+  mod_file <- .proc[[PROC_CMD_ARGS]][4] # cmd_args will have c("run", "nonmem", .mode, .model_file)
+  yaml_path <- file.path(.proc[[PROC_WD]], mod_file) %>% get_yaml_path()
+
+  # read model from YAML
+  .mod <- read_model(yaml_path)
+  return(.mod)
+}
+
+
+#######################
+# Iterating on models
+#######################
 
 #' Generic S3 method from iterating on models.
 #' @param .x Object to copy from
@@ -189,12 +224,9 @@ copy_model_from.bbi_nonmem_model <- function(.parent_mod, .new_model, .descripti
 #' @export
 #' @rdname copy_model_from
 copy_model_from.character <- function(.parent_path, .new_model, .description, ...) {
-  # If no YAML extension, infer and look for file
+  # If not YAML extension, infer and look for file
   if (!is_valid_yaml_extension(.parent_path)) {
-    .parent_path <- yaml_ext(.parent_path)
-    if (!fs::file_exists(.parent_path)) {
-      stop(glue("copy_model_from inferred YAML path {.parent_path} but no file exists at that location."))
-    }
+    .parent_path <- .parent_path %>% get_yaml_path()
   }
 
   # create model from YAML path
@@ -308,47 +340,6 @@ copy_nonmem_model_from <- function(
 
   return(.new_mod)
 }
-
-
-#####################
-# Result object
-#####################
-
-#' #' Create a `bbi_nonmem_model` object from a file path (should work with either path to a model file, yaml file, and output folder)
-#' #' @param .path Character scaler with the file path to use
-#' #' @export
-#' import_result <- function(.path) {
-#'   # check for the required files
-#'   .output_dir <- tools::file_path_sans_ext(.path)
-#'   .working_dir <- normalizePath(dirname(.output_dir))
-#'   if (!fs::dir_exists(.output_dir)) {
-#'     stop(glue("No directory exists at {.output_dir} -- Must pass path to a valid output directory."))
-#'   }
-#'   check_lst_file(.output_dir)
-#'
-#'   .potential_yaml_file <- .output_dir %>% get_mod_id() %>% yaml_ext()
-#'   .yaml_path <- file.path(.working_dir, .potential_yaml_file)
-#'   if (fs::file_exists(.yaml_path)) {
-#'     .mod <- parse_mod_yaml(.yaml_path)
-#'   } else {
-#'     .mod <- list()
-#'     .mod[[WORKING_DIR]] <- .working_dir
-#'     .mod[[YAML_MOD_TYPE]] <- "nonmem"
-#'     .mod[[YAML_DESCRIPTION]] <- as.character(glue("Results object created from {.output_dir} with `import_result()`"))
-#'     .mod[[YAML_MOD_PATH]] <- find_model_file_path(.path)
-#'     .mod[[YAML_BBI_ARGS]] <- list()
-#'
-#'   }
-#'
-#'   # fill with results info
-#'   .mod[[YAML_OUT_DIR]] <- basename(.output_dir)
-#'   .mod[[RES_CMD_ARGS]] <- ""
-#'
-#'   # # assign class and return
-#'   # .res <- assign_result_class(.spec, .model_type = "nonmem")
-#'   #
-#'   # return(.res)
-#' }
 
 
 #####################
