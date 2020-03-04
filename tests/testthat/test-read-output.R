@@ -198,36 +198,3 @@ for (.tc in .test_cases) {
   })
 }
 
-#######################################
-# check nonmem progress
-#######################################
-
-test_that("check_nonmem_progress returns TRUE", {
-  null_output <- capture.output(
-    expect_true(check_nonmem_progress(RES1))
-  )
-})
-
-test_that("check_nonmem_progress returns FALSE", {
-  # set up fake non-finished run
-  NEW_OUT_DIR <- "model-examples/2"
-  fs::file_copy(yaml_ext(OUTPUT_DIR), yaml_ext(NEW_OUT_DIR)) # new yaml
-  fs::dir_copy(OUTPUT_DIR, NEW_OUT_DIR) # copy output directory
-
-  # cut new ext to only first 5 lines
-  new_ext <- file.path(NEW_OUT_DIR, "1.ext")
-  readr::read_lines(new_ext, n_max = 5) %>% readr::write_lines(new_ext)
-
-  # make a fake res
-  new_res <- import_result(yaml_ext(NEW_OUT_DIR))
-
-  # it should return false because the ext isn't finished
-  null_output <- capture.output(
-    expect_false(suppressWarnings(check_nonmem_progress(new_res)))
-  )
-
-  # clean up
-  fs::file_delete(yaml_ext(NEW_OUT_DIR))
-  fs::dir_delete(NEW_OUT_DIR)
-})
-

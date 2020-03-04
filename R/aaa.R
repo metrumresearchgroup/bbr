@@ -51,14 +51,6 @@ YAML_REQ_INPUT_KEYS <- c(
 
 WORKING_DIR <- "orig_working_dir"
 
-# keys added when creating a result object
-RES_PROCESS <- "process"
-RES_STDOUT <- "stdout"
-RES_BBI <- "bbi"
-RES_CMD_ARGS <- "cmd_args"
-RES_CALL <- "call"
-RES_WD <- "wd"
-
 # keys required to create a model object
 MODEL_REQ_INPUT_KEYS <- c(
   WORKING_DIR,
@@ -90,11 +82,22 @@ YAML_ERASE_OUT_KEYS <- c(
 
 SUPPORTED_MOD_TYPES <- c("nonmem", "stan")
 
-# keys required for model result to have
+# keys added when creating a process object
+PROC_PROCESS <- "process"
+PROC_STDOUT <- "stdout"
+PROC_BBI <- "bbi"
+PROC_CMD_ARGS <- "cmd_args"
+PROC_WD <- "working_dir"
+PROC_CALL <- "call"
+
+
+# keys required for process object to have
 PROCESS_REQ_KEYS <- c(
-  MODEL_REQ_KEYS, # might want to trim this down a bit
-  RES_CMD_ARGS,
-  YAML_OUT_DIR
+  PROC_PROCESS,
+  PROC_STDOUT,
+  PROC_BBI,
+  PROC_CMD_ARGS,
+  PROC_WD
 )
 
 # error messages that we grep for

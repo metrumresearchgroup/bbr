@@ -289,48 +289,4 @@ plot_ext <- function(.df) {
   plot_nonmem_table_df(.df, .x_var = "ITERATION", .stat_name = "GRADIENT")
 }
 
-#' Check the progress of a NONMEM run from the bbi_nonmem_model object
-#' @param .mod `bbi_nonmem_summary` object to check on
-#' @param .ext_wait Integer number of seconds to wait for an .ext file to be there before exiting with FALSE
-#' @importFrom fs file_exists
-#' @export
-check_nonmem_progress <- function(.mod, .ext_wait = 30) {
-  # look for ext file
-  SLEEP = 1
-  ext_path <- build_path_from_mod_obj(.mod, "ext")
-  if (!fs::file_exists(ext_path)) {
-    while (.ext_wait > 0) {
-      if (fs::file_exists(ext_path)) {
-        break
-      } else {
-        cat(as.character(glue("Can't find {ext_path}. Waiting {.ext_wait} more seconds...")), sep = "\n")
-        Sys.sleep(SLEEP)
-        .ext_wait <- .ext_wait - SLEEP
-      }
-    }
-    if (.ext_wait <= 0) {
-      warning(glue("Can't find {ext_path}. Your run may still be queued or it may have failed. Try increasing `.wait_ext` if you want to continue checking."))
-      return(FALSE)
-    }
-  }
 
-  # if found, check if ext file has rows with negative iterations (which means it finished)
-  done_rows <- check_ext(.mod, .iter_floor = NULL) %>% filter(.data$ITERATION < 0) %>% nrow()
-  if (done_rows > 0) {
-    return(TRUE)
-  } else {
-    # try to get tail of OUTPUT file
-    out_tail <- tryCatch(
-      tail_output(.mod, .tail = 10, .head = 0, .print = FALSE, .return = TRUE),
-      error = function(e) {
-        warning(glue("{ext_path} file does not look finished but there is also no `{.mod[[YAML_OUT_DIR]]}/OUTPUT` file. Your run may have failed."))
-        return(FALSE)
-      }
-    )
-    cat(paste(
-      glue("\n\n---\nModel is still running. Tail of `{.mod[[YAML_OUT_DIR]]}/OUTPUT` file:"), "\n---\n",
-      paste(out_tail, collapse = "\n")
-    ))
-    return(FALSE)
-  }
-}

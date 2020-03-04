@@ -21,11 +21,11 @@ NULL
 #'         cmd_args -- character vector of all command arguments passed to the process
 #' @importFrom processx process
 #' @export
-bbi_exec <- function(.cmd_args, .verbose = FALSE, .wait = FALSE, ...) {
+bbi_exec <- function(.cmd_args, .verbose = FALSE, .wait = FALSE, .dir = ".", ...) {
   bbi_exe_path <- getOption("rbabylon.bbi_exe_path")
   check_bbi_exe(bbi_exe_path)
 
-  p <- processx::process$new(bbi_exe_path, .cmd_args, ..., stdout = "|", stderr = "2>&1")
+  p <- processx::process$new(bbi_exe_path, .cmd_args, ..., wd = .dir,  stdout = "|", stderr = "2>&1")
 
   if (.wait) {
     # wait for process and capture stdout and stderr
@@ -40,15 +40,43 @@ bbi_exec <- function(.cmd_args, .verbose = FALSE, .wait = FALSE, ...) {
 
   # build result object
   res <- list()
-  res[[RES_PROCESS]] <- p
-  res[[RES_STDOUT]] <- output
-  res[[RES_BBI]] <- bbi_exe_path
-  res[[RES_CMD_ARGS]] <- .cmd_args
+  res[[PROC_PROCESS]] <- p
+  res[[PROC_STDOUT]] <- output
+  res[[PROC_BBI]] <- bbi_exe_path
+  res[[PROC_CMD_ARGS]] <- .cmd_args
+  res[[PROC_WD]] <- .dir
 
-  class(res) <- c("babylon_result", class(res))
+  # assign class and return
+  res <- assign_process_class(res)
   return(res)
 }
 
+#' Babylon dry_run
+#'
+#' Creates a `babylon_process` object with all the required keys, without actually running the command
+#'
+#' @export
+bbi_dry_run <- function(.cmd_args, .dir) {
+  # build result object
+  res <- list()
+  res[[PROC_PROCESS]] <- "DRY_RUN"
+  res[[PROC_STDOUT]] <- "DRY_RUN"
+  res[[PROC_BBI]] <- getOption("rbabylon.bbi_exe_path")
+  res[[PROC_CMD_ARGS]] <- .cmd_args
+  res[[PROC_WD]] <- .dir
+
+  # construct call string that _could_ be called on command line
+  call_str <- paste(
+    "cd", .dir, ";",
+    res[[PROC_BBI]],
+    paste(.cmd_args, collapse = " ")
+  )
+  res[[PROC_CALL]] <- call_str
+
+  # assign class and return
+  res <- assign_process_class(res)
+  return(res)
+}
 
 #' Checks that a bbi binary is present at the path passed to .bbi_exe_path
 #' @param .bbi_exe_path Path to bbi exe file that will be checked
@@ -123,7 +151,7 @@ bbi_init <- function(.dir, .nonmem_dir, .nonmem_version = NULL, .no_default_vers
   }
 
   # execute init
-  res <- bbi_exec(c("init",  paste0("--dir=", .nonmem_dir)), wd = .dir, .wait=TRUE)
+  res <- bbi_exec(c("init",  paste0("--dir=", .nonmem_dir)), .dir = .dir, .wait=TRUE)
 
   # set default NONMEM version
   if (!is.null(.nonmem_version)) {

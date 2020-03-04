@@ -100,23 +100,11 @@ submit_nonmem_model <- function(.mod,
 
   if (.dry_run) {
     # construct fake res object
-    call_str <- paste(
-      "cd", model_dir, ";",
-      getOption("rbabylon.bbi_exe_path"),
-      paste(cmd_args, collapse = " ")
-    )
-    res <- list()
-    res[[RES_CMD_ARGS]] <- cmd_args
-    res[[RES_CALL]] <- call_str
-
+    res <- bbi_dry_run(cmd_args, model_dir)
   } else {
     # launch model
     res <- bbi_exec(cmd_args, .wait = .wait, wd = model_dir, ...)
   }
-
-  # add to result object
-  res <- combine_list_objects(res, .mod, .append = TRUE)
-  res <- assign_process_class(res, .model_type = "nonmem")
 
   return(res)
 }

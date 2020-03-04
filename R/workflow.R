@@ -5,16 +5,16 @@
 #############################
 
 #' Create new model object by specifying relevant information as arguments
-#' Also creates necessary YAML file for using `create_run_log()` later.
+#' Also creates necessary YAML file for using functions like `add_tags()` and `create_run_log()` later.
 #' @param .yaml_path Path to save resulting model YAML file to
 #' @param .description Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.
-#' @param .model_path Path to control stream file for the model. MUST be an absolute path, or the model path relative to the location of the YAML file. It recommended for the control stream and YAML to be in the same directory.
+#' @param .model_path Path to model (control stream) file. MUST be an absolute path, or the model path relative to the location of the YAML file. It recommended for the control stream and YAML to be in the same directory. If nothing is passed, the function will look for a file with the same path/name as your YAML, but with either .ctl or .mod extension.
 #' @param .based_on A character scaler or vector of run id's (model names) that this model was "based on." These are used to reconstuct model developement and ancestry.
 #' @param .tags A character scaler or vector with any user tags to be added to the YAML file
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments. These will be written into YAML file.
 #' @param .model_type Character scaler to specify type of model being created (used for S3 class). Currently only `'nonmem'` is supported.
 #' @importFrom yaml write_yaml
-#' @return S3 object of class `bbi_{.model_type}_model` that can be passed to `submit_model()`
+#' @return S3 object of class `bbi_{.model_type}_model` that can be passed to `submit_model()`, `model_summary()`, etc.
 #' @export
 new_model <- function(
   .yaml_path,
@@ -48,9 +48,9 @@ new_model <- function(
 
 #' Creates a model object from a YAML model file
 #'
-#' Parses a model yaml file into a list object that contains correctly formatted information from the yaml
+#' Parses a model YAML file into a list object that contains correctly formatted information from the YAML
 #' and is an S3 object of class `bbi_{.model_type}_model` that can be passed to `submit_model()`, `model_summary()`, etc.
-#' @param .path Path to the yaml file to parse.
+#' @param .path Path to the YAML file to parse.
 #' @importFrom yaml read_yaml
 #' @importFrom fs file_exists
 #' @return S3 object of class `bbi_{.model_type}_model`
@@ -141,12 +141,17 @@ create_model_object <- function(.mod_list) {
     )
   }
 
-  # add class and return
-  .model_type <- .mod_list[[YAML_MOD_TYPE]]
-  if (!(.model_type %in% SUPPORTED_MOD_TYPES)) {
-    stop(glue("Invalid {YAML_MOD_TYPE} `{.model_type}`. Valid options include: `{SUPPORTED_MOD_TYPES}`"))
+  # add output_dir
+  if (!is.null(.mod_list[[YAML_BBI_ARGS]][["output_dir"]])) {
+    # if specified in bbi_args, overwrite anything that's in YAML or list
+    .mod_list[[YAML_OUT_DIR]] <- .mod_list[[YAML_BBI_ARGS]][["output_dir"]]
+  } else if (is.null(.mod_list[[YAML_OUT_DIR]])) {
+    # if null, infer from model path
+    .mod_list[[YAML_OUT_DIR]] <- .mod_list[[YAML_MOD_PATH]] %>% tools::file_path_sans_ext()
   }
 
+  # add class and return
+  .model_type <- .mod_list[[YAML_MOD_TYPE]]
   .mod_list <- assign_model_class(.mod_list, .model_type)
 
   return(.mod_list)
@@ -184,11 +189,12 @@ copy_model_from.bbi_nonmem_model <- function(.parent_mod, .new_model, .descripti
 #' @export
 #' @rdname copy_model_from
 copy_model_from.character <- function(.parent_path, .new_model, .description, ...) {
-  # check for erroneous file extension
+  # If no YAML extension, infer and look for file
   if (!is_valid_yaml_extension(.parent_path)) {
-    warning(paste(glue("If passing a file path to `copy_model_from()`, path must be to a valid model YAML file."),
-                  glue("(Got path `{.parent_path}`.)"),
-                  "Alternatively, pass a valid `bbi{.model_type}_model` S3 object from the output of `new_model()`, `read_model()` or another `copy_model_from()` call."))
+    .parent_path <- yaml_ext(.parent_path)
+    if (!fs::file_exists(.parent_path)) {
+      stop(glue("copy_model_from inferred YAML path {.parent_path} but no file exists at that location."))
+    }
   }
 
   # create model from YAML path
@@ -352,10 +358,10 @@ copy_nonmem_model_from <- function(
 
 reconcile_mod_yaml <- function(.mod, .yaml_path) {
   # load model from yaml on disk
-  .loaded_mod <- parse_mod_yaml(.yaml_path)
+  .loaded_mod <- read_model(.yaml_path)
 
   # overwrite values in memory from the ones on disk
-  .new_mod <- combine_list_objects(.loaded_mod, .mod) # this would overwrite the in-memory with the yaml. Is that right?
+  .new_mod <- combine_list_objects(.loaded_mod, .mod)
   return(.new_mod)
 }
 
@@ -386,7 +392,7 @@ modify_model_field <- function(.mod, .field, .value, .append = TRUE, .unique = T
 
   # de-duplicate values
   if (isTRUE(.unique)) {
-    .mod[[.field]] <- .mod[[.field]] %>% unique(fromLast = TRUE)
+    .mod[[.field]] <- .mod[[.field]] %>% unique()
   }
 
   # overwrite the yaml on disk with modified model
