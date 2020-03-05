@@ -1,9 +1,10 @@
 context("Workflow file manipulation")
 
 # define constants
-YAML_TEST_FILE <- "model-examples/1.yaml"
-NEW_MOD2 <- "model-examples/2"
-NEW_MOD3 <- "model-examples/3"
+MODEL_DIR <- "model-examples"
+YAML_TEST_FILE <- file.path(MODEL_DIR, "1.yaml")
+NEW_MOD2 <- file.path(MODEL_DIR, "2")
+NEW_MOD3 <- file.path(MODEL_DIR, "3")
 
 ORIG_DESC <- "original acop model"
 NEW_DESC <- "new description"
@@ -125,7 +126,7 @@ test_that("copy_from_model bbi_nonmem_model", {
 })
 
 
-test_that("compare two model objects", {
+test_that("compare read_model() and new_model() objects", {
   # create new model with args
   .test_path <- "model-examples/tmp.yaml"
   mod1a <- new_model(
@@ -281,6 +282,33 @@ test_that("reconcile_mod_yaml() pulls in new tags", {
   fs::file_delete(new_yaml)
 })
 
+test_that("as_model() returns the correct type from a model object", {
+  # read model from disk
+  mod1 <- read_model(YAML_TEST_FILE)
+
+  # pass through as_model() and expect the same thing
+  mod2 <- mod1 %>% as_model()
+  expect_equal(mod1, mod2)
+})
+
+
+test_that("as_model() returns the correct type from a process object", {
+  # build fake process object
+  .ctl_file <- basename(ctl_ext(YAML_TEST_FILE))
+  proc1 <- bbi_dry_run(.cmd_args = c("run", "nonmem", "sge", .ctl_file), .dir = MODEL_DIR)
+
+  # convert to model
+  mod1 <- proc1 %>% as_model()
+
+  # check class and model path
+  expect_identical(mod1[[YAML_MOD_PATH]], .ctl_file)
+  expect_identical(class(mod1), MODEL_CLASS_LIST)
+})
+
+test_that("as_model() errors with non-existent model", {
+  proc1 <- bbi_dry_run(c("naw", "dawg"), "yea")
+  expect_error(as_model(proc1), regexp = "Inferred YAML")
+})
 
 ######################################
 # modify_model_field and its wrappers

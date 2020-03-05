@@ -15,6 +15,8 @@ check_output_dir(.mod, ...)
 \arguments{
 \item{.mod}{The `bbi_{.model_type}_model` object}
 
+\item{...}{generic pass-through arguments}
+
 \item{.output_dir}{Character scaler of path to output directory}
 
 \item{.filter}{Optional Character scaler of regex to filter filenames on and only return matches}

@@ -15,6 +15,8 @@ get_yaml_path(.path, ...)
 \arguments{
 \item{.path}{The file path to convert to a YAML}
 
+\item{...}{generic pass-through arguments}
+
 \item{.mod}{The `bbi_nonmem_model` S3 object}
 
 \item{.check_exists}{Boolean for whether it will check if the file exists and error if it does not. True by default.}

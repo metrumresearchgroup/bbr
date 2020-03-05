@@ -191,6 +191,7 @@ print_nonmem_args <- function() {
 
 #' Helper to strip path and extension from model file to get only model identifier
 #' @param .mod_path Character scaler model path to strip
+#' @param ... generic pass-through arguments
 #' @importFrom tools file_path_sans_ext
 #' @returns Character scaler with only model identifier
 #' @rdname get_mod_id
@@ -206,7 +207,8 @@ get_mod_id.character <- function(.mod_path) {
   return(basename(tools::file_path_sans_ext(.mod_path)))
 }
 
-#' S3 dispatch to get model identifier from
+#' S3 dispatch to get model identifier from a `bbi_{.model_type}_model` object
+#' @param .mod The `bbi_{.model_type}_model` object
 #' @rdname get_mod_id
 #' @export
 get_mod_id.bbi_nonmem_model <- function(.mod) {
@@ -312,6 +314,7 @@ get_output_dir <- function(.mod) {
 
 #' S3 generic to return the path to the YAML file
 #' @param .path generic file path to check
+#' @param ... generic pass-through arguments
 #' @export
 #' @rdname get_yaml_path
 get_yaml_path <- function(.path, ...) {

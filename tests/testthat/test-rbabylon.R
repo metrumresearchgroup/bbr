@@ -41,10 +41,34 @@ test_that("bbi_init creates babylon.yaml", {
 })
 
 test_that("bbi_init errors with invalid .nonmem_version", {
-  # create yaml
-  expect_error(bbi_init(".", "."))
-  expect_error(bbi_init(".", ".", "naw"))
+  # fails if don't specify anything
+  expect_error(bbi_init(".", "."), regexp = "Must specify a `.nonmem_version`")
 
-  # delete yaml
-  fs::file_delete("babylon.yaml")
+  # fails if what you specify isn't in the babylon.yaml (i.e. isn't a valid NONMEM installation)
+  if (Sys.getenv("METWORX_VERSION") == "") {
+    skip("bbi_init only runs on Metworx")
+  } else {
+    withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi'), {
+      expect_error(bbi_init(".", ".", "naw"), regexp = "Must specify a valid `.nonmem_version`")
+      fs::file_delete("babylon.yaml")
+    })
+  }
+})
+
+
+test_that("bbi_dry_run() correctly returns object", {
+  PROC_CLASS_LIST <- c("babylon_process", "list")
+  cmd_args <- c("naw", "dawg")
+  dir <- "fake/dir"
+
+  # run dry run
+  res <- bbi_dry_run(cmd_args, dir)
+
+  # compare to expected
+  expect_identical(res[[PROC_PROCESS]], "DRY_RUN")
+  expect_identical(res[[PROC_STDOUT]], "DRY_RUN")
+  expect_identical(res[[PROC_BBI]], getOption("rbabylon.bbi_exe_path"))
+  expect_identical(res[[PROC_CMD_ARGS]], cmd_args)
+  expect_identical(res[[PROC_WD]], dir)
+  expect_identical(class(res), PROC_CLASS_LIST)
 })

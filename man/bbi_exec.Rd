@@ -4,10 +4,12 @@
 \alias{bbi_exec}
 \title{Executes a babylon call (`bbi ...`) with processx::process$new()}
 \usage{
-bbi_exec(.cmd_args, .verbose = FALSE, .wait = FALSE, .dir = ".", ...)
+bbi_exec(.cmd_args, .dir = ".", .verbose = FALSE, .wait = FALSE, ...)
 }
 \arguments{
 \item{.cmd_args}{A character vector of command line arguments for the execution call}
+
+\item{.dir}{The working directory to run command in. Defaults to "."}
 
 \item{.verbose}{Print stdout and stderr as process runs #### NOT IMPLEMENTED?}
 
@@ -16,11 +18,12 @@ bbi_exec(.cmd_args, .verbose = FALSE, .wait = FALSE, .dir = ".", ...)
 \item{...}{arguments to pass to processx::process$new()}
 }
 \value{
-A named list with process object and some metadata
-        process -- The process object (see ?processx::process$new for more details on what you can do with this)
-        output -- the stdout and stderr from the process, if `.wait = TRUE`. If `.wait = FALSE` this will be NULL.
-        bbi -- character scaler with the execution path used for bbi
-        cmd_args -- character vector of all command arguments passed to the process
+An S3 object of class `babylon_process`
+        process -- The process object (see ?processx::process$new for more details on what you can do with this).
+        stdout -- the stdout and stderr from the process, if `.wait = TRUE`. If `.wait = FALSE` this will be NULL.
+        bbi -- character scaler with the execution path used for bbi.
+        cmd_args -- character vector of all command arguments passed to the process.
+        working_dir -- the directory the command was run in, passed through from .dir argument.
 }
 \description{
 Executes a babylon call (`bbi ...`) with processx::process$new()

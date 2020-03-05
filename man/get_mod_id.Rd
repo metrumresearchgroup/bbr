@@ -14,6 +14,10 @@ get_mod_id(.mod_path, ...)
 }
 \arguments{
 \item{.mod_path}{Character scaler model path to strip}
+
+\item{...}{generic pass-through arguments}
+
+\item{.mod}{The `bbi_{.model_type}_model` object}
 }
 \value{
 Character scaler with only model identifier
@@ -21,5 +25,5 @@ Character scaler with only model identifier
 \description{
 Helper to strip path and extension from model file to get only model identifier
 
-S3 dispatch to get model identifier from
+S3 dispatch to get model identifier from a `bbi_{.model_type}_model` object
 }

@@ -123,6 +123,7 @@ tail_lst.bbi_nonmem_model <- function(.mod, .head = 3, .tail = 5, .print = TRUE,
 
 #' List files in the output directory to glance at where the process is
 #' @param .mod generic res
+#' @param ... generic pass-through arguments
 #' @rdname check_output_dir
 #' @export
 check_output_dir <- function(.mod, ...) {

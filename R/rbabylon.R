@@ -11,17 +11,19 @@ NULL
 
 #' Executes a babylon call (`bbi ...`) with processx::process$new()
 #' @param .cmd_args A character vector of command line arguments for the execution call
+#' @param .dir The working directory to run command in. Defaults to "."
 #' @param .verbose Print stdout and stderr as process runs #### NOT IMPLEMENTED?
 #' @param .wait If true, don't return until process has exited.
 #' @param ... arguments to pass to processx::process$new()
-#' @return A named list with process object and some metadata
-#'         process -- The process object (see ?processx::process$new for more details on what you can do with this)
-#'         output -- the stdout and stderr from the process, if `.wait = TRUE`. If `.wait = FALSE` this will be NULL.
-#'         bbi -- character scaler with the execution path used for bbi
-#'         cmd_args -- character vector of all command arguments passed to the process
+#' @return An S3 object of class `babylon_process`
+#'         process -- The process object (see ?processx::process$new for more details on what you can do with this).
+#'         stdout -- the stdout and stderr from the process, if `.wait = TRUE`. If `.wait = FALSE` this will be NULL.
+#'         bbi -- character scaler with the execution path used for bbi.
+#'         cmd_args -- character vector of all command arguments passed to the process.
+#'         working_dir -- the directory the command was run in, passed through from .dir argument.
 #' @importFrom processx process
 #' @export
-bbi_exec <- function(.cmd_args, .verbose = FALSE, .wait = FALSE, .dir = ".", ...) {
+bbi_exec <- function(.cmd_args, .dir = ".", .verbose = FALSE, .wait = FALSE, ...) {
   bbi_exe_path <- getOption("rbabylon.bbi_exe_path")
   check_bbi_exe(bbi_exe_path)
 
@@ -53,8 +55,11 @@ bbi_exec <- function(.cmd_args, .verbose = FALSE, .wait = FALSE, .dir = ".", ...
 
 #' Babylon dry_run
 #'
-#' Creates a `babylon_process` object with all the required keys, without actually running the command
-#'
+#' Creates a `babylon_process` object with all the required keys, without actually running the command.
+#' Returns an S3 object of class `babylon_process` but the `process` and `stdout` elements containing only the string "DRY_RUN".
+#' Also contains the element `call` with a string representing the command that could be called on the command line.
+#' @param .cmd_args A character vector of command line arguments for the execution call
+#' @param .dir The working directory to run command in. Defaults to "."
 #' @export
 bbi_dry_run <- function(.cmd_args, .dir) {
   # build result object

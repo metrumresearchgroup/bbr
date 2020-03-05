@@ -69,7 +69,7 @@ read_model <- function(.path) {
 
   # parse model path
   if (!check_required_keys(yaml_list, .req = YAML_REQ_INPUT_KEYS)) {
-    paste0(
+    err_msg <- paste0(
       "Model yaml must have keys `", paste(YAML_REQ_INPUT_KEYS, collapse=", "), "` specified in it. ",
       "But `", paste(YAML_REQ_INPUT_KEYS[!(YAML_REQ_INPUT_KEYS %in% names(yaml_list))], collapse=", "), "` are missing. ",
       .path, " has the following keys: ", paste(names(yaml_list), collapse=", ")
