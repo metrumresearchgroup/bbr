@@ -1,5 +1,9 @@
 context("creating S3 objects")
 
+# reference
+MOD_CLASS <- "bbi_nonmem_model"
+PROC_CLASS <- "babylon_process"
+
 test_that("create_model_object() correctly assigns class", {
   .mod <- list()
   .mod[[WORKING_DIR]] <- "naw"

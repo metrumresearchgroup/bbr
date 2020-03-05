@@ -5,7 +5,11 @@
 # Because of this, it is disabled unless on Metworx.
 ####################################################
 
-if (Sys.getenv("METWORX_VERSION") == "") skip("test-workflow-composable-bbi only runs on Metworx")
+if (Sys.getenv("METWORX_VERSION") == "") {
+  skip("test-workflow-composable-bbi only runs on Metworx")
+}
+
+withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi'), {
 
 # define constants
 STARTER_FILE <- file.path("model-examples/1.ctl")
@@ -92,3 +96,5 @@ test_that("step by step create_model to submit_model to model_summary works", {
 # cleanup
 Sys.sleep(3) # wait for some NONMEM mess to delete itself
 cleanup()
+
+})

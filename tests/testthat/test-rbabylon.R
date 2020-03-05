@@ -23,7 +23,13 @@ test_that("check_bbi_exe() correctly errors or finds paths", {
 
 test_that("bbi_init creates babylon.yaml", {
   # create yaml
-  bbi_init(".", ".", .no_default_version=TRUE)
+  if (Sys.getenv("METWORX_VERSION") == "") {
+    skip("bbi_init only runs on Metworx")
+  } else {
+    withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi'), {
+      bbi_init(".", ".", .no_default_version=TRUE)
+    })
+  }
 
   # read in yaml and check that it has a babylon key
   bbi_yaml <- yaml::read_yaml("babylon.yaml")

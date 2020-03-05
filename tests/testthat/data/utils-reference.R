@@ -17,6 +17,3 @@ EXT_TEST_FILE <-  as.character(glue::glue("model-examples/{MOD_ID}/{MOD_ID}.ext"
 # fake result object
 MOD1 <- read_model(YAML_TEST_FILE)
 
-MOD_CLASS <- "bbi_nonmem_model"
-PROC_CLASS <- "babylon_process"
-
