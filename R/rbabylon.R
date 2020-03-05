@@ -47,7 +47,7 @@ bbi_exec <- function(.cmd_args, .verbose = FALSE, .wait = FALSE, .dir = ".", ...
   res[[PROC_WD]] <- .dir
 
   # assign class and return
-  res <- assign_process_class(res)
+  res <- create_process_object(res)
   return(res)
 }
 
@@ -74,7 +74,7 @@ bbi_dry_run <- function(.cmd_args, .dir) {
   res[[PROC_CALL]] <- call_str
 
   # assign class and return
-  res <- assign_process_class(res)
+  res <- create_process_object(res)
   return(res)
 }
 

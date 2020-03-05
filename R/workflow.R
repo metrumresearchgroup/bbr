@@ -106,58 +106,6 @@ save_mod_yaml <- function(.mod, .out_path = NULL) {
 }
 
 
-#' Creates S3 object of class `bbi_{.model_type}_model` from list with `MODEL_REQ_INPUT_KEYS`
-#' @param .mod_list List with the required information to create a model object
-#' @return S3 object of class `bbi_{.model_type}_model` that can be passed to `submit_model()`, `model_summary()` etc.
-create_model_object <- function(.mod_list) {
-  # check that necessary keys are present
-  if (!check_required_keys(.mod_list, .req = MODEL_REQ_INPUT_KEYS)) {
-    err_msg <- paste0(
-      "Model list must have keys `", paste(MODEL_REQ_INPUT_KEYS, collapse=", "), "` specified in order to create model. ",
-      "But `", paste(MODEL_REQ_INPUT_KEYS[!(MODEL_REQ_INPUT_KEYS %in% names(.mod_list))], collapse=", "), "` are missing. ",
-      "List has the following keys: ", paste(names(.mod_list), collapse=", ")
-    )
-    strict_mode_error(err_msg)
-  }
-
-  # by default, if no model defined, will set it to the yaml file name with extension ctl
-  if (is.null(.mod_list[[YAML_MOD_PATH]])) {
-    if (!is.null(.mod_list[[YAML_YAML_NAME]])) {
-      .mod_list[[YAML_MOD_PATH]] <- ctl_ext(.mod_list[[YAML_YAML_NAME]])
-    } else {
-      stop("Must specify either a YAML_MOD_PATH or YAML_YAML_NAME to create a model. User should never see this error.")
-    }
-  } else if (.mod_list[[YAML_MOD_TYPE]] == "nonmem" && (!is_valid_nonmem_extension(.mod_list[[YAML_MOD_PATH]]))) {
-    stop(glue::glue("model_path defined in yaml at {.path} must have either a .ctl or .mod extension, not {.mod_list[[YAML_MOD_PATH]]}"))
-  }
-
-  # check babylon args and add an empty list if missing
-  if (is.null(.mod_list[[YAML_BBI_ARGS]])) {
-    .mod_list[[YAML_BBI_ARGS]] <- list()
-  } else {
-    # check that unique named list was passed
-    tryCatch(
-      checkmate::assert_list(.mod_list[[YAML_BBI_ARGS]], names="unique"),
-      error = function(e) { stop(glue("`{YAML_BBI_ARGS}` must be a unique, named list: {e}")) }
-    )
-  }
-
-  # add output_dir
-  if (!is.null(.mod_list[[YAML_BBI_ARGS]][["output_dir"]])) {
-    # if specified in bbi_args, overwrite anything that's in YAML or list
-    .mod_list[[YAML_OUT_DIR]] <- .mod_list[[YAML_BBI_ARGS]][["output_dir"]]
-  } else if (is.null(.mod_list[[YAML_OUT_DIR]])) {
-    # if null, infer from model path
-    .mod_list[[YAML_OUT_DIR]] <- .mod_list[[YAML_MOD_PATH]] %>% tools::file_path_sans_ext()
-  }
-
-  # add class and return
-  .model_type <- .mod_list[[YAML_MOD_TYPE]]
-  .mod_list <- assign_model_class(.mod_list, .model_type)
-
-  return(.mod_list)
-}
-
 #' Convert object to `bbi_{.model_type}_model`
 #' @param .obj Object to convert to `bbi_{.model_type}_model`
 #' @param ... Pass-through arguments
@@ -285,11 +233,31 @@ copy_nonmem_model_from <- function(
       "Consider creating a model with `new_model()` or `read_model()`",
       sep = "\n"))
   }
-  .new_mod <- .parent_mod
+
+  # build new model object
+  .new_mod <- list()
+  .new_mod[[YAML_DESCRIPTION]] <- .description
 
   # reset model working directory and yaml path
   .new_mod[[WORKING_DIR]] <- normalizePath(dirname(.new_model))
   .new_mod[[YAML_YAML_NAME]] <- basename(yaml_ext(.new_model))
+
+  # fill output directory
+  .new_mod[[YAML_OUT_DIR]] <- basename(tools::file_path_sans_ext(.new_model))
+
+  # fill based_on
+  .new_mod[[YAML_BASED_ON]] <- get_mod_id(.parent_mod[[YAML_MOD_PATH]]) %>% c(.based_on_additional) %>% scaler_to_list()
+
+  # pass through model type and bbi_args
+  .new_mod[[YAML_MOD_TYPE]] <- .parent_mod[[YAML_MOD_TYPE]]
+  .new_mod[[YAML_BBI_ARGS]] <- .parent_mod[[YAML_BBI_ARGS]]
+
+  # fill tags
+  if (.inherit_tags && !is.null(.parent_mod[[YAML_TAGS]])) {
+    .new_mod[[YAML_TAGS]] <- .parent_mod[[YAML_TAGS]] %>% c(.add_tags) %>% scaler_to_list()
+  } else {
+    .new_mod[[YAML_TAGS]] <- .add_tags %>% scaler_to_list()
+  }
 
   # build new model path
   .file_ext <- tools::file_ext(.parent_mod[[YAML_MOD_PATH]])
@@ -321,18 +289,8 @@ copy_nonmem_model_from <- function(
     fs::file_copy(get_model_path(.parent_mod), get_model_path(.new_mod))
   }
 
-  # fill based_on
-  .new_mod[[YAML_BASED_ON]] <- get_mod_id(.parent_mod[[YAML_MOD_PATH]]) %>% c(.based_on_additional) %>% scaler_to_list()
-
-  # fill description
-  .new_mod[[YAML_DESCRIPTION]] <- .description
-
-  # fill tags
-  if (.inherit_tags && !is.null(.parent_mod[[YAML_TAGS]])) {
-    .new_mod[[YAML_TAGS]] <- .parent_mod[[YAML_TAGS]] %>% c(.add_tags) %>% scaler_to_list()
-  } else {
-    .new_mod[[YAML_TAGS]] <- .add_tags %>% scaler_to_list()
-  }
+  # assign model class
+  .new_mod <- create_model_object(.new_mod)
 
   # write .new_mod out
   new_yaml_path <- yaml_ext(.new_model)

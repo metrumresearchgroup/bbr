@@ -249,57 +249,6 @@ test_that("get_yaml_path() builds the right path", {
 })
 
 
-########################
-# assigning S3 classes
-########################
-
-test_that("assign_model_class() correctly assigns class", {
-  .mod <- list()
-  .mod[[WORKING_DIR]] <- "naw"
-  .mod[[YAML_MOD_TYPE]] <- "naw"
-  .mod[[YAML_DESCRIPTION]] <- "naw"
-  .mod[[YAML_MOD_PATH]] <- "naw"
-  .mod[[YAML_BBI_ARGS]] <- "naw"
-  .mod[[YAML_OUT_DIR]] <- "naw"
-  expect_false(MOD_CLASS %in% class(.mod))
-  .mod <- assign_model_class(.mod, "nonmem")
-  expect_true(MOD_CLASS %in% class(.mod))
-})
-
-test_that("assign_model_class() errors if keys are missing", {
-  .mod <- list()
-  .mod[[WORKING_DIR]] <- "naw"
-  .mod[[YAML_MOD_TYPE]] <- "naw"
-  #.mod[[YAML_DESCRIPTION]] <- "naw"
-  .mod[[YAML_MOD_PATH]] <- "naw"
-  .mod[[YAML_BBI_ARGS]] <- "naw"
-  .mod[[YAML_OUT_DIR]] <- "naw"
-  expect_error(assign_model_class(.mod, "nonmem"))
-})
-
-test_that("assign_process_class() correctly assigns class", {
-  .proc <- list()
-  .proc[[PROC_PROCESS]] <- "naw"
-  .proc[[PROC_STDOUT]] <- "naw"
-  .proc[[PROC_BBI]] <- "naw"
-  .proc[[PROC_CMD_ARGS]] <- "naw"
-  .proc[[PROC_WD]] <- "naw"
-  expect_false(PROC_CLASS %in% class(.proc))
-  .proc <- assign_process_class(.proc)
-  expect_true(PROC_CLASS %in% class(.proc))
-})
-
-test_that("assign_process_class() errors if keys are missing", {
-  .proc <- list()
-  .proc[[PROC_PROCESS]] <- "naw"
-  .proc[[PROC_STDOUT]] <- "naw"
-  .proc[[PROC_BBI]] <- "naw"
-  #.proc[[PROC_CMD_ARGS]] <- "naw"
-  .proc[[PROC_WD]] <- "naw"
-  expect_error(assign_process_class(.proc))
-})
-
-
 ######################
 # assorted utilities
 ######################

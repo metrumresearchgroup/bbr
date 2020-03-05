@@ -28,9 +28,18 @@ for (m in c(NEW_MOD2, NEW_MOD3)) {
 
 test_that("copy_from_model creates accurate copy", {
   # run copy_model_from
-  copy_model_from(YAML_TEST_FILE, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
+  new_mod <- copy_model_from(YAML_TEST_FILE, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
 
-  # check that everything is copied through
+  # check that everything is copied through in the object
+  expect_identical(class(new_mod), MODEL_CLASS_LIST)
+  expect_identical(new_mod[[YAML_MOD_PATH]], basename(ctl_ext(NEW_MOD2)))
+  expect_identical(new_mod[[YAML_DESCRIPTION]], NEW_DESC)
+  expect_identical(new_mod[[YAML_BASED_ON]], list("1"))
+  expect_identical(new_mod[[YAML_TAGS]], NEW_TAGS)
+  expect_equal(new_mod[[YAML_BBI_ARGS]], list(overwrite = TRUE, threads = 4L))
+  expect_identical(new_mod[[YAML_OUT_DIR]], basename(NEW_MOD2))
+
+  # check that everything is copied through in the YAML
   new_yaml <- yaml::read_yaml(yaml_ext(NEW_MOD2))
 
   expect_identical(new_yaml[[YAML_MOD_PATH]], basename(ctl_ext(NEW_MOD2)))
