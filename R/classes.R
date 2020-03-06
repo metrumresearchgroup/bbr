@@ -29,7 +29,7 @@ create_model_object <- function(.mod_list) {
       stop("Must specify either a YAML_MOD_PATH or YAML_YAML_NAME to create a model. User should never see this error.")
     }
   } else if (.mod_list[[YAML_MOD_TYPE]] == "nonmem" && (!is_valid_nonmem_extension(.mod_list[[YAML_MOD_PATH]]))) {
-    stop(glue::glue("model_path defined in yaml at {.path} must have either a .ctl or .mod extension, not {.mod_list[[YAML_MOD_PATH]]}"))
+    stop(glue::glue("model_path defined in yaml at {.mod_list[[YAML_MOD_PATH]]} must have either a .ctl or .mod extension, but found {.mod_list[[YAML_MOD_PATH]]}"))
   }
 
   # check babylon args and add an empty list if missing

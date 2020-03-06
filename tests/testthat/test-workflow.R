@@ -187,11 +187,11 @@ test_that("read_model() returns expected object", {
 
 
 test_that("yaml with no model type will fail", {
-  expect_error(read_model("test-yaml/zz_fail_no_modtype.yaml"))
+  expect_error(read_model("test-yaml/zz_fail_no_modtype.yaml"), regexp = "Model yaml must have keys")
 })
 
 test_that("yaml with bad model path will fail", {
-  expect_error(read_model("test-yaml/zz_fail_bad_modpath.yaml"))
+  expect_error(read_model("test-yaml/zz_fail_bad_modpath.yaml"), regexp = "must have either a .ctl or .mod extension")
 })
 
 test_that("yaml with no model path will return ctl", {
