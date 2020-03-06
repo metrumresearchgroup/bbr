@@ -190,21 +190,21 @@ print_nonmem_args <- function() {
 
 
 #' Helper to strip path and extension from model file to get only model identifier
-#' @param .mod_path Character scaler model path to strip
-#' @param ... generic pass-through arguments
+#' @param .mod generic model
 #' @importFrom tools file_path_sans_ext
 #' @returns Character scaler with only model identifier
 #' @rdname get_mod_id
 #' @export
-get_mod_id <- function(.mod_path, ...) {
-  UseMethod("get_mod_id", .mod_path)
+get_mod_id <- function(.mod) {
+  UseMethod("get_mod_id")
 }
 
 # S3 dispatch to get model identifier from file path to model
+#' @param .mod Character scaler model path to strip
 #' @rdname get_mod_id
 #' @export
-get_mod_id.character <- function(.mod_path) {
-  return(basename(tools::file_path_sans_ext(.mod_path)))
+get_mod_id.character <- function(.mod) {
+  return(basename(tools::file_path_sans_ext(.mod)))
 }
 
 #' S3 dispatch to get model identifier from a `bbi_{.model_type}_model` object
@@ -313,18 +313,17 @@ get_output_dir <- function(.mod) {
 
 
 #' S3 generic to return the path to the YAML file
-#' @param .path generic file path to check
-#' @param ... generic pass-through arguments
+#' @param .mod generic file path to check
+#' @param .check_exists Boolean for whether it will check if the file exists and error if it does not. True by default.
 #' @export
 #' @rdname get_yaml_path
-get_yaml_path <- function(.path, ...) {
-  UseMethod("get_yaml_path", .path)
+get_yaml_path <- function(.mod, .check_exists = TRUE) {
+  UseMethod("get_yaml_path")
 }
 
 
 #' S3 dispatch to return the path to the YAML file from a `bbi_nonmem_model` object
 #' @param .mod The `bbi_nonmem_model` S3 object
-#' @param .check_exists Boolean for whether it will check if the file exists and error if it does not. True by default.
 #' @export
 #' @rdname get_yaml_path
 get_yaml_path.bbi_nonmem_model <- function(.mod, .check_exists = TRUE) {
@@ -341,13 +340,12 @@ get_yaml_path.bbi_nonmem_model <- function(.mod, .check_exists = TRUE) {
 
 
 #' S3 dispatch to return the path to the YAML file from a model path or output directory
-#' @param .path The file path to convert to a YAML
-#' @param .check_exists Boolean for whether it will check if the file exists and error if it does not. True by default.
+#' @param .mod The file path to convert to a YAML
 #' @export
 #' @rdname get_yaml_path
-get_yaml_path.character <- function(.path, .check_exists = TRUE) {
+get_yaml_path.character <- function(.mod, .check_exists = TRUE) {
   # convert to .yaml extension
-  yaml_path <- .path %>% yaml_ext()
+  yaml_path <- .mod %>% yaml_ext()
 
   # check that the YAML exists
   if (isTRUE(.check_exists)) {

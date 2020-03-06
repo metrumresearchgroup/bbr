@@ -1,17 +1,17 @@
 # S3 dispatch for submitting models
 #' S3 generic method for submit_model
-#' @export
-#' @param .mod S3 object of class `bbi_{.model_type}_model` to submit
+#' @param .mod generic model to submit
 #' @param ... additional args to pass to specific implementation
+#' @export
 #' @rdname submit_model
 submit_model <- function(.mod, ...) {
-  UseMethod("submit_model", .mod)
+  UseMethod("submit_model")
 }
 
 #' S3 dispatch for submit_model from bbi_nonmem_model
-#' @export
 #' @param .mod S3 object of class `bbi_nonmem_model` to submit
 #' @param ... additional args to pass to submit_nonmem_model()
+#' @export
 #' @rdname submit_model
 submit_model.bbi_nonmem_model <- function(.mod, ...) {
   res <- submit_nonmem_model(.mod, ...)
@@ -20,31 +20,31 @@ submit_model.bbi_nonmem_model <- function(.mod, ...) {
 
 #' S3 dispatch for submit_model from character scaler
 #'   Should be path to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
-#' @export
-#' @param .path Path to YAML or model file
+#' @param .mod Path to YAML or model file
 #' @param ... additional args to pass to specific implementation
+#' @export
 #' @rdname submit_model
-submit_model.character <- function(.path, ...) {
+submit_model.character <- function(.mod, ...) {
   ## parse type of file passed
   # if no extension, assume YAML
-  if (tools::file_path_sans_ext(.path) == .path) {
-    if (fs::file_exists(yaml_ext(.path))) {
-      .mod <- read_model(yaml_ext(.path))
+  if (tools::file_path_sans_ext(.mod) == .mod) {
+    if (fs::file_exists(yaml_ext(.mod))) {
+      .mod <- read_model(yaml_ext(.mod))
     } else {
-      stop(glue("Cannot find file {yaml_ext(.path)}. If passing a non-YAML file to submit_model you must include the file extension."))
+      stop(glue("Cannot find file {yaml_ext(.mod)}. If passing a non-YAML file to submit_model you must include the file extension."))
     }
-  } else if (is_valid_yaml_extension(.path)) {
-    .mod <- read_model(.path)
-  } else if (is_valid_nonmem_extension(.path)) {
+  } else if (is_valid_yaml_extension(.mod)) {
+    .mod <- read_model(.mod)
+  } else if (is_valid_nonmem_extension(.mod)) {
     # if NONMEM file, build model object
     .mod_list <- list()
-    .mod_list[[YAML_MOD_PATH]] <- basename(.path)
-    .mod_list[[WORKING_DIR]] <- normalizePath(dirname(.path))
+    .mod_list[[YAML_MOD_PATH]] <- basename(.mod)
+    .mod_list[[WORKING_DIR]] <- normalizePath(dirname(.mod))
     .mod_list[[YAML_MOD_TYPE]] <- "nonmem"
-    .mod_list[[YAML_DESCRIPTION]] <- as.character(glue("{.path} passed directly to submit_model()"))
+    .mod_list[[YAML_DESCRIPTION]] <- as.character(glue("{.mod} passed directly to submit_model()"))
     .mod <- create_model_object(.mod_list)
   } else {
-    stop(glue("Unsupported file type passed to submit_model(): `{.path}`. Valid options are `.yaml`, `.mod`, and `.ctl`"))
+    stop(glue("Unsupported file type passed to submit_model(): `{.mod}`. Valid options are `.yaml`, `.mod`, and `.ctl`"))
   }
 
   # submit model

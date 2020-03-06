@@ -6,18 +6,14 @@
 \alias{check_output_dir.bbi_nonmem_model}
 \title{List files in the output directory to glance at where the process is}
 \usage{
-check_output_dir(.mod, ...)
+check_output_dir(.mod, .filter = NULL)
 
-\method{check_output_dir}{character}(.output_dir, .filter = NULL)
+\method{check_output_dir}{character}(.mod, .filter = NULL)
 
 \method{check_output_dir}{bbi_nonmem_model}(.mod, .filter = NULL)
 }
 \arguments{
 \item{.mod}{The `bbi_{.model_type}_model` object}
-
-\item{...}{generic pass-through arguments}
-
-\item{.output_dir}{Character scaler of path to output directory}
 
 \item{.filter}{Optional Character scaler of regex to filter filenames on and only return matches}
 }

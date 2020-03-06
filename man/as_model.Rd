@@ -6,20 +6,14 @@
 \alias{as_model.babylon_process}
 \title{Convert object to `bbi_{.model_type}_model`}
 \usage{
-as_model(.obj, ...)
+as_model(.obj)
 
-\method{as_model}{bbi_nonmem_model}(.mod)
+\method{as_model}{bbi_nonmem_model}(.obj)
 
-\method{as_model}{babylon_process}(.proc)
+\method{as_model}{babylon_process}(.obj)
 }
 \arguments{
-\item{.obj}{Object to convert to `bbi_{.model_type}_model`}
-
-\item{...}{Pass-through arguments}
-
-\item{.mod}{`bbi_nonmem_model` object that will be passed through}
-
-\item{.proc}{`babylon_process` object to convert}
+\item{.obj}{`babylon_process` object to convert}
 }
 \description{
 Convert object to `bbi_{.model_type}_model`

@@ -7,11 +7,11 @@
 \alias{copy_nonmem_model_from}
 \title{Generic S3 method from iterating on models.}
 \usage{
-copy_model_from(.x, ...)
+copy_model_from(.parent_mod, .new_model, .description, ...)
 
 \method{copy_model_from}{bbi_nonmem_model}(.parent_mod, .new_model, .description, ...)
 
-\method{copy_model_from}{character}(.parent_path, .new_model, .description, ...)
+\method{copy_model_from}{character}(.parent_mod, .new_model, .description, ...)
 
 copy_nonmem_model_from(
   .parent_mod,
@@ -24,17 +24,13 @@ copy_nonmem_model_from(
 )
 }
 \arguments{
-\item{.x}{Object to copy from}
-
-\item{...}{arguments to pass through to implementation method}
-
 \item{.parent_mod}{S3 object of class `bbi_nonmem_model` to be used as the basis for copy.}
 
 \item{.new_model}{Path to write new model files to WITHOUT FILE EXTENSION. Function will create both `{.new_model}.yaml` and `{.new_model}.[mod|ctl]` based on this path.}
 
 \item{.description}{Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.}
 
-\item{.parent_path}{Path to YAML file to copy model from}
+\item{...}{arguments to pass through to implementation method}
 
 \item{.based_on_additional}{The run id for the `.parent_model` will automatically be added to the `based_on` field but this argument can contain a character scaler or vector of additional run id's (model names) that this model was "based on." These are used to reconstuct model developement and ancestry.}
 

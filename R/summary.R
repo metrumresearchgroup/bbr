@@ -10,7 +10,7 @@
 #' @export
 #' @rdname model_summary
 model_summary <- function(.mod, ...) {
-  UseMethod("model_summary", .mod)
+  UseMethod("model_summary")
 }
 
 #' Get model summary from `bbi_nonmem_model` object and optionally check if model is done before erroring
@@ -24,17 +24,17 @@ model_summary.bbi_nonmem_model <- function(.mod, ...) {
 }
 
 #' S3 dispatch for getting model summary from output directory path
-#' @param .path Full path to one of the following:
+#' @param .mod Full path to one of the following:
 #'     1) path to a model file in the output directory
 #'     2) path to a nonmem output directory
 #' @param .model_type Character scaler specifying the type of model, either 'nonmem' or 'stan'
 #' @param ... args passed through
 #' @export
 #' @rdname model_summary
-model_summary.character <- function(.path, .model_type = c("nonmem", "stan"), ...) {
+model_summary.character <- function(.mod, .model_type = c("nonmem", "stan"), ...) {
   .model_type <- match.arg(.model_type)
   if (.model_type == "nonmem") {
-    .mod <- read_model(.path)
+    .mod <- read_model(.mod)
     res_list <- nonmem_summary(.mod, ...)
   } else if (.model_type == "stan") {
     stop(NO_STAN_ERR_MSG)
@@ -116,28 +116,27 @@ check_lst_file <- function(.x) {
 ######################################
 
 #' S3 generic for parsing parameter estimate table
-#' @param .x generic .x
-#' @param ... args passed through
+#' @param .summary generic summary object
 #' @export
 #' @rdname param_estimates
-param_estimates <- function(.x, ...) {
-  UseMethod("param_estimates", .x)
+param_estimates <- function(.summary) {
+  UseMethod("param_estimates")
 }
 
 #' S3 dispatch for parsing `bbi_nonmem_summary` object into parameter estimate table
-#' @param .x `bbi_nonmem_summary` object
-#' @param ... args passed through
+#' @param .summary `bbi_nonmem_summary` object
+#' @importFrom tibble tibble
 #' @export
 #' @rdname param_estimates
-param_estimates.bbi_nonmem_summary <- function(.x) {
-  num_methods <- length(.x$parameters_data)
-  param_names <- .x$parameter_names
-  param_estimates <- .x$parameters_data[[num_methods]]$estimates
+param_estimates.bbi_nonmem_summary <- function(.summary) {
+  num_methods <- length(.summary$parameters_data)
+  param_names <- .summary$parameter_names
+  param_estimates <- .summary$parameters_data[[num_methods]]$estimates
   tibble::tibble(
     names = unlist(param_names),
     estimate = unlist(param_estimates),
-    stderr = unlist(.x$parameters_data[[num_methods]]$std_err) %||% NA_real_,
-    fixed = unlist(.x$parameters_data[[num_methods]]$fixed),
+    stderr = unlist(.summary$parameters_data[[num_methods]]$std_err) %||% NA_real_,
+    fixed = unlist(.summary$parameters_data[[num_methods]]$fixed),
   )
 }
 

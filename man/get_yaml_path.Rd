@@ -6,18 +6,14 @@
 \alias{get_yaml_path.character}
 \title{S3 generic to return the path to the YAML file}
 \usage{
-get_yaml_path(.path, ...)
+get_yaml_path(.mod, .check_exists = TRUE)
 
 \method{get_yaml_path}{bbi_nonmem_model}(.mod, .check_exists = TRUE)
 
-\method{get_yaml_path}{character}(.path, .check_exists = TRUE)
+\method{get_yaml_path}{character}(.mod, .check_exists = TRUE)
 }
 \arguments{
-\item{.path}{The file path to convert to a YAML}
-
-\item{...}{generic pass-through arguments}
-
-\item{.mod}{The `bbi_nonmem_model` S3 object}
+\item{.mod}{The file path to convert to a YAML}
 
 \item{.check_exists}{Boolean for whether it will check if the file exists and error if it does not. True by default.}
 }

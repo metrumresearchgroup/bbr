@@ -11,7 +11,7 @@ model_summary(.mod, ...)
 
 \method{model_summary}{bbi_nonmem_model}(.mod, ...)
 
-\method{model_summary}{character}(.path, .model_type = c("nonmem", "stan"), ...)
+\method{model_summary}{character}(.mod, .model_type = c("nonmem", "stan"), ...)
 
 nonmem_summary(.mod, .args = NULL, ..., .dry_run = FALSE)
 }
@@ -19,10 +19,6 @@ nonmem_summary(.mod, .args = NULL, ..., .dry_run = FALSE)
 \item{.mod}{`bbi_nonmem_model` object for summary}
 
 \item{...}{args passed through to `bbi_exec()`}
-
-\item{.path}{Full path to one of the following:
-1) path to a model file in the output directory
-2) path to a nonmem output directory}
 
 \item{.model_type}{Character scaler specifying the type of model, either 'nonmem' or 'stan'}
 

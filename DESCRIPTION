@@ -25,6 +25,7 @@ Imports:
     rlang,
     withr,
     stringr,
+    tibble,
     tidyr,
     yaml
 Suggests: 

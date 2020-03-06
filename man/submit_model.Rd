@@ -11,7 +11,7 @@ submit_model(.mod, ...)
 
 \method{submit_model}{bbi_nonmem_model}(.mod, ...)
 
-\method{submit_model}{character}(.path, ...)
+\method{submit_model}{character}(.mod, ...)
 
 submit_nonmem_model(
   .mod,
@@ -27,8 +27,6 @@ submit_nonmem_model(
 \item{.mod}{An S3 object of class `bbi_nonmem_model`, for example from `new_model()`, `read_model()` or `copy_model_from()`}
 
 \item{...}{args passed through to `bbi_exec()`}
-
-\item{.path}{Path to YAML or model file}
 
 \item{.mode}{Either "local" for local execution or "sge" to submit model(s) to the grid}
 

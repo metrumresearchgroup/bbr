@@ -184,7 +184,7 @@ bbi_init <- function(.dir, .nonmem_dir, .nonmem_version = NULL, .no_default_vers
 
 # get exit status of process
 get_exit_status <- function (.res, ...) {
-  UseMethod("get_exit_status", .res)
+  UseMethod("get_exit_status")
 }
 
 get_exit_status.babylon_result <- function(.res, .check = FALSE) {
@@ -204,7 +204,7 @@ get_exit_status.babylon_result <- function(.res, .check = FALSE) {
 
 # fetch output (stdout and stderr) of process
 get_stdout <- function(.res, ...) {
-  UseMethod("get_stdout", .res)
+  UseMethod("get_stdout")
 }
 
 get_stdout.babylon_result <- function(.res) {

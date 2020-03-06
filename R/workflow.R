@@ -108,30 +108,29 @@ save_mod_yaml <- function(.mod, .out_path = NULL) {
 
 #' Convert object to `bbi_{.model_type}_model`
 #' @param .obj Object to convert to `bbi_{.model_type}_model`
-#' @param ... Pass-through arguments
 #' @rdname as_model
 #' @export
-as_model <- function(.obj, ...) {
-  UseMethod("as_model", .obj)
+as_model <- function(.obj) {
+  UseMethod("as_model")
 }
 
 #' S3 dispatch for passing through `bbi_nonmem_model` object
-#' @param .mod `bbi_nonmem_model` object that will be passed through
+#' @param .obj `bbi_nonmem_model` object that will be passed through
 #' @rdname as_model
 #' @export
-as_model.bbi_nonmem_model <- function(.mod) {
-  return(.mod)
+as_model.bbi_nonmem_model <- function(.obj) {
+  return(.obj)
 }
 
 #' S3 dispatch for converting `babylon_process` to corresponding `bbi_nonmem_model` object.
 #' Only works if YAML and model file are in the same directory with the same name and different file extensions.
-#' @param .proc `babylon_process` object to convert
+#' @param .obj `babylon_process` object to convert
 #' @rdname as_model
 #' @export
-as_model.babylon_process <- function(.proc) {
+as_model.babylon_process <- function(.obj) {
   # construct path to YAML
-  mod_file <- .proc[[PROC_CMD_ARGS]][4] # cmd_args will have c("run", "nonmem", .mode, .model_file)
-  yaml_path <- file.path(.proc[[PROC_WD]], mod_file) %>% get_yaml_path()
+  mod_file <- .obj[[PROC_CMD_ARGS]][4] # cmd_args will have c("run", "nonmem", .mode, .model_file)
+  yaml_path <- file.path(.obj[[PROC_WD]], mod_file) %>% get_yaml_path()
 
   # read model from YAML
   .mod <- read_model(yaml_path)
@@ -144,12 +143,14 @@ as_model.babylon_process <- function(.proc) {
 #######################
 
 #' Generic S3 method from iterating on models.
-#' @param .x Object to copy from
+#' @param .parent_mod Model to copy from
+#' @param .new_model Path to write new model files to WITHOUT FILE EXTENSION. Function will create both `{.new_model}.yaml` and a new model file based on this path.
+#' @param .description Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`).
 #' @param ... arguments to pass through
 #' @export
 #' @rdname copy_model_from
-copy_model_from <- function(.x, ...) {
-  UseMethod("copy_model_from", .x)
+copy_model_from <- function(.parent_mod, .new_model, .description, ...) {
+  UseMethod("copy_model_from")
 }
 
 #' S3 dispatch for passing `bbi_nonmem_model` object to `copy_model_from()`
@@ -167,18 +168,17 @@ copy_model_from.bbi_nonmem_model <- function(.parent_mod, .new_model, .descripti
 }
 
 #' S3 dispatch for passing `bbi_nonmem_model` object to copy_model_from()
-#' @param .parent_path Path to YAML file to copy model from
 #' @param ... arguments to pass through to implementation method
 #' @export
 #' @rdname copy_model_from
-copy_model_from.character <- function(.parent_path, .new_model, .description, ...) {
+copy_model_from.character <- function(.parent_mod, .new_model, .description, ...) {
   # If not YAML extension, infer and look for file
-  if (!is_valid_yaml_extension(.parent_path)) {
-    .parent_path <- .parent_path %>% get_yaml_path()
+  if (!is_valid_yaml_extension(.parent_mod)) {
+    .parent_mod <- .parent_mod %>% get_yaml_path()
   }
 
   # create model from YAML path
-  .parent_mod <- read_model(.parent_path)
+  .parent_mod <- read_model(.parent_mod)
   .model_type <- .parent_mod[[YAML_MOD_TYPE]]
 
   # copy from model

@@ -6,17 +6,13 @@
 \alias{get_mod_id.bbi_nonmem_model}
 \title{Helper to strip path and extension from model file to get only model identifier}
 \usage{
-get_mod_id(.mod_path, ...)
+get_mod_id(.mod)
 
-\method{get_mod_id}{character}(.mod_path)
+\method{get_mod_id}{character}(.mod)
 
 \method{get_mod_id}{bbi_nonmem_model}(.mod)
 }
 \arguments{
-\item{.mod_path}{Character scaler model path to strip}
-
-\item{...}{generic pass-through arguments}
-
 \item{.mod}{The `bbi_{.model_type}_model` object}
 }
 \value{

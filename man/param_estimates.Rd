@@ -5,14 +5,12 @@
 \alias{param_estimates.bbi_nonmem_summary}
 \title{S3 generic for parsing parameter estimate table}
 \usage{
-param_estimates(.x, ...)
+param_estimates(.summary)
 
-\method{param_estimates}{bbi_nonmem_summary}(.x)
+\method{param_estimates}{bbi_nonmem_summary}(.summary)
 }
 \arguments{
-\item{.x}{`bbi_nonmem_summary` object}
-
-\item{...}{args passed through}
+\item{.summary}{`bbi_nonmem_summary` object}
 }
 \description{
 S3 generic for parsing parameter estimate table
