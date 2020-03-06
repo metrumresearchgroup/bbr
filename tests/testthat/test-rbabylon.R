@@ -16,8 +16,12 @@ test_that("check_bbi_exe() correctly errors or finds paths", {
   # should fail because path doesn't exist
   expect_error(check_bbi_exe(FAKE_BBI_PATH))
 
-  # should pass because ping should exist
-  expect_invisible(check_bbi_exe("ping"))
+  # should pass because ping should exist on Metworx (and most Linux/Unix)
+  if (Sys.getenv("METWORX_VERSION") == "") {
+    skip("only check for ping on Metworx")
+  } else {
+    expect_invisible(check_bbi_exe("ping"))
+  }
 })
 
 
