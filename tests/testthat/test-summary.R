@@ -4,7 +4,8 @@ if (Sys.getenv("METWORX_VERSION") == "") {
   skip("test-summary only runs on Metworx")
 }
 
-withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi'), {
+withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
+                         rbabylon.model_directory = NULL), {
 
 # constants
 MODEL_FILE <- "1.ctl"

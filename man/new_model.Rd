@@ -12,11 +12,12 @@ new_model(
   .based_on = NULL,
   .tags = NULL,
   .bbi_args = NULL,
-  .model_type = c("nonmem")
+  .model_type = c("nonmem"),
+  .directory = getOption("rbabylon.model_directory")
 )
 }
 \arguments{
-\item{.yaml_path}{Path to save resulting model YAML file to}
+\item{.yaml_path}{Path to save resulting model YAML file to. MUST be either an absolute path, or a path relative to the `.directory` argument.}
 
 \item{.description}{Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.}
 
@@ -29,6 +30,8 @@ new_model(
 \item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments. These will be written into YAML file.}
 
 \item{.model_type}{Character scaler to specify type of model being created (used for S3 class). Currently only `'nonmem'` is supported.}
+
+\item{.directory}{Model directory which `.yaml_path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
 }
 \value{
 S3 object of class `bbi_{.model_type}_model` that can be passed to `submit_model()`, `model_summary()`, etc.

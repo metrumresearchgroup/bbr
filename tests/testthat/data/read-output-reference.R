@@ -3,7 +3,8 @@
 OUTPUT_DIR <- "model-examples/1"
 
 # fake model object
-MOD1 <- read_model(OUTPUT_DIR)
+
+MOD1 <- read_model(OUTPUT_DIR, .directory = NULL)
 
 # .lst file
 LST_TEST_FILE <- "model-examples/1/1.lst"

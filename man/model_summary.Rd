@@ -7,24 +7,47 @@
 \alias{nonmem_summary}
 \title{S3 generic for getting model summary}
 \usage{
-model_summary(.mod, ...)
+model_summary(
+  .mod,
+  .model_type = NULL,
+  .bbi_args = NULL,
+  ...,
+  .dry_run = FALSE,
+  .directory = NULL
+)
 
-\method{model_summary}{bbi_nonmem_model}(.mod, ...)
+\method{model_summary}{bbi_nonmem_model}(
+  .mod,
+  .model_type = NULL,
+  .bbi_args = NULL,
+  ...,
+  .dry_run = FALSE,
+  .directory = NULL
+)
 
-\method{model_summary}{character}(.mod, .model_type = c("nonmem", "stan"), ...)
+\method{model_summary}{character}(
+  .mod,
+  .model_type = c("nonmem", "stan"),
+  .bbi_args = NULL,
+  ...,
+  .dry_run = FALSE,
+  .directory = getOption("rbabylon.model_directory")
+)
 
-nonmem_summary(.mod, .args = NULL, ..., .dry_run = FALSE)
+nonmem_summary(.mod, .bbi_args = NULL, ..., .dry_run = FALSE)
 }
 \arguments{
 \item{.mod}{`bbi_nonmem_model` object for summary}
 
-\item{...}{args passed through to `bbi_exec()`}
-
 \item{.model_type}{Character scaler specifying the type of model, either 'nonmem' or 'stan'}
 
-\item{.args}{A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.}
+\item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.}
+
+\item{...}{args passed through to `bbi_exec()`}
 
 \item{.dry_run}{show what the command would be without actually running it}
+
+\item{.directory}{Model directory which `.mod` path is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
 }
 \value{
 List of S3 Class "bbi_nonmem_summary" with all summary information

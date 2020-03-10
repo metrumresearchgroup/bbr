@@ -97,4 +97,4 @@ test_that("step by step create_model to submit_model to model_summary works", {
 Sys.sleep(3) # wait for some NONMEM mess to delete itself
 cleanup()
 
-})
+}) # closing withr::with_options

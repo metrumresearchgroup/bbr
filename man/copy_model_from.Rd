@@ -7,11 +7,38 @@
 \alias{copy_nonmem_model_from}
 \title{Generic S3 method from iterating on models.}
 \usage{
-copy_model_from(.parent_mod, .new_model, .description, ...)
+copy_model_from(
+  .parent_mod,
+  .new_model,
+  .description,
+  .based_on_additional = NULL,
+  .add_tags = NULL,
+  .inherit_tags = FALSE,
+  .update_mod_file = TRUE,
+  .directory = getOption("rbabylon.model_directory")
+)
 
-\method{copy_model_from}{bbi_nonmem_model}(.parent_mod, .new_model, .description, ...)
+\method{copy_model_from}{bbi_nonmem_model}(
+  .parent_mod,
+  .new_model,
+  .description,
+  .based_on_additional = NULL,
+  .add_tags = NULL,
+  .inherit_tags = FALSE,
+  .update_mod_file = TRUE,
+  .directory = getOption("rbabylon.model_directory")
+)
 
-\method{copy_model_from}{character}(.parent_mod, .new_model, .description, ...)
+\method{copy_model_from}{character}(
+  .parent_mod,
+  .new_model,
+  .description,
+  .based_on_additional = NULL,
+  .add_tags = NULL,
+  .inherit_tags = FALSE,
+  .update_mod_file = TRUE,
+  .directory = getOption("rbabylon.model_directory")
+)
 
 copy_nonmem_model_from(
   .parent_mod,
@@ -30,15 +57,15 @@ copy_nonmem_model_from(
 
 \item{.description}{Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.}
 
-\item{...}{arguments to pass through to implementation method}
-
 \item{.based_on_additional}{The run id for the `.parent_model` will automatically be added to the `based_on` field but this argument can contain a character scaler or vector of additional run id's (model names) that this model was "based on." These are used to reconstuct model developement and ancestry.}
 
 \item{.add_tags}{A character scaler or vector with any new tags to be added to `{.new_model}.yaml`}
 
 \item{.inherit_tags}{Boolean for whether to inherit any tags from `.parent_model.yaml`}
 
-\item{.update_mod_file}{Boolean for whether to update the `$PROBLEM` line in the new control stream. By default it is TRUE, but if FALSE is passed `{.new_model}.[mod|ctl]` will be an exact copy of it's parent control stream.}
+\item{.update_mod_file}{Boolean for whether to update the `$PROBLEM` line in the new control stream. By default it is TRUE, but if FALSE is passed `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.}
+
+\item{.directory}{Model directory which BOTH `.parent_model` and `.new_model` are relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
 }
 \value{
 S3 object of class `bbi_nonmem_model` that can be passed to `submit_nonmem_model()`

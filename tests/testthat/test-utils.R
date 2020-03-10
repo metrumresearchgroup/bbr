@@ -236,7 +236,7 @@ test_that("get_yaml_path() builds the right path", {
   full_new_yaml_path <- normalizePath(new_yaml) # store the full path
 
   # make a model from it
-  new_mod <- read_model(new_yaml)
+  new_mod <- read_model(new_yaml, .directory = NULL)
 
   # delete the underlying yaml
   fs::file_delete(new_yaml)

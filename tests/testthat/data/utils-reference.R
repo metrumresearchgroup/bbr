@@ -15,5 +15,5 @@ GRD_TEST_FILE <-  as.character(glue::glue("model-examples/{MOD_ID}/{MOD_ID}.grd"
 EXT_TEST_FILE <-  as.character(glue::glue("model-examples/{MOD_ID}/{MOD_ID}.ext"))
 
 # fake result object
-MOD1 <- read_model(YAML_TEST_FILE)
+MOD1 <- read_model(YAML_TEST_FILE, .directory = NULL)
 

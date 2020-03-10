@@ -1,30 +1,80 @@
 # S3 dispatch for submitting models
 #' S3 generic method for submit_model
 #' @param .mod generic model to submit
-#' @param ... additional args to pass to specific implementation
+#' @param .mode Either "local" for local execution or "sge" to submit model(s) to the grid
+#' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.
+#' @param ... args passed through to `bbi_exec()`
+#' @param .config_path Optionally specify a path to a babylon.yml config. If not specified, the config in the model directory will be used by default. Path MUST be either an absolute path or relative to the model directory.
+#' @param .wait Boolean for whether to wait for the bbi process to return before this function call returns.
+#' @param .dry_run Returns an object detailing the command that would be run, insted of running it. This is primarily for testing but also a debugging tool.
+#' @param .directory Model directory which `.mod` path is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`. Only used when passing a path for `.mod` instead of a `bbi_{.model_type}_model` object.
 #' @export
 #' @rdname submit_model
-submit_model <- function(.mod, ...) {
+submit_model <- function(
+  .mod,
+  .mode = c("sge", "local"),
+  .bbi_args = NULL,
+  ...,
+  .config_path=NULL,
+  .wait = TRUE,
+  .dry_run=FALSE,
+  .directory = NULL
+) {
   UseMethod("submit_model")
 }
 
 #' S3 dispatch for submit_model from bbi_nonmem_model
 #' @param .mod S3 object of class `bbi_nonmem_model` to submit
-#' @param ... additional args to pass to submit_nonmem_model()
+#' @param .directory This argument is only used when passing a path to `submit_model()`. When `bbi_nonmem_model` object is passed, `.directory` is inferred from the model object.
 #' @export
 #' @rdname submit_model
-submit_model.bbi_nonmem_model <- function(.mod, ...) {
-  res <- submit_nonmem_model(.mod, ...)
+submit_model.bbi_nonmem_model <- function(
+  .mod,
+  .mode = c("sge", "local"),
+  .bbi_args = NULL,
+  ...,
+  .config_path=NULL,
+  .wait = TRUE,
+  .dry_run=FALSE,
+  .directory = NULL
+) {
+
+  if (!is.null(.directory)) {
+    warning(paste(glue("Passed `.directory = {.directory}` to submit_model.bbi_nonmem_model().") ,
+                  "This argument is only valid when passing a path to `submit_model()`.",
+                  "`bbi_nonmem_model` object was passed, so `.directory` inferred from `.mod${WORKING_DIR}`"))
+  }
+
+  res <- submit_nonmem_model(.mod,
+                             .mode = .mode,
+                             .bbi_args = .bbi_args,
+                             ...,
+                             .config_path = .config_path,
+                             .wait = .wait,
+                             .dry_run = .dry_run)
   return(res)
 }
 
 #' S3 dispatch for submit_model from character scaler
 #'   Should be path to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
 #' @param .mod Path to YAML or model file
-#' @param ... additional args to pass to specific implementation
+#' @param .directory Model directory which `.mod` path is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
 #' @export
 #' @rdname submit_model
-submit_model.character <- function(.mod, ...) {
+submit_model.character <- function(
+  .mod,
+  .mode = c("sge", "local"),
+  .bbi_args = NULL,
+  ...,
+  .config_path=NULL,
+  .wait = TRUE,
+  .dry_run=FALSE,
+  .directory = getOption("rbabylon.model_directory")
+) {
+
+  # check for .directory and combine with .mod
+  .mod <- combine_directory_path(.directory, .mod)
+
   ## parse type of file passed
   # if no extension, assume YAML
   if (tools::file_path_sans_ext(.mod) == .mod) {
@@ -50,7 +100,13 @@ submit_model.character <- function(.mod, ...) {
   # submit model
   .model_type <- .mod[[YAML_MOD_TYPE]]
   if (.model_type == "nonmem") {
-    res <- submit_nonmem_model(.mod, ...)
+    res <- submit_nonmem_model(.mod,
+                               .mode = .mode,
+                               .bbi_args = .bbi_args,
+                               ...,
+                               .config_path = .config_path,
+                               .wait = .wait,
+                               .dry_run = .dry_run)
   } else if (.model_type == "stan") {
     stop(NO_STAN_ERR_MSG)
   } else {
@@ -62,16 +118,9 @@ submit_model.character <- function(.mod, ...) {
 
 #' Submit a NONMEM model via babylon
 #' @param .mod An S3 object of class `bbi_nonmem_model`, for example from `new_model()`, `read_model()` or `copy_model_from()`
-#' @param .mode Either "local" for local execution or "sge" to submit model(s) to the grid
-#' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.
-#' @param ... args passed through to `bbi_exec()`
-#' @param .config_path Optionally specify a path to a babylon.yml config. If not specified, the config in the model directory will be used by default. Path MUST be either an absolute path or relative to the model directory.
-#' @param .wait Boolean for whether to wait for the bbi process to return before this function call returns.
-#' @param .dry_run Returns an object detailing the command that would be run, insted of running it. This is primarily for testing but also a debugging tool.
 #' @importFrom stringr str_detect
 #' @importFrom tools file_path_sans_ext
 #' @return An S3 object of class `bbi_nonmem_process` (or `bbi_nonmem_model` if .dry_run=T)
-#' @export
 #' @rdname submit_model
 submit_nonmem_model <- function(.mod,
                                 .mode = c("sge", "local"),

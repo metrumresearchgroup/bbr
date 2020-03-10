@@ -249,6 +249,45 @@ yaml_ext <- function(.x) {
   sprintf("%s.yaml", tools::file_path_sans_ext(.x))
 }
 
+#' Combine a directory and path
+#'
+#' Concatenates a directory and path, with some specific rules:
+#' If .directory is NULL, set to working directory.
+#' If .path is an absolute path, ignore .directory and just return .path,
+#' otherwise return `file.path(.directory, .path)`
+#' @param .directory Character scaler for the directory
+#' @param .path Character scaler for the path to the file (could be just the file name, or could be in a subdirectory)
+combine_directory_path <- function(.directory, .path) {
+  if (is.null(.directory)) {
+    .directory <- getwd()
+  }
+
+  if (!fs::is_absolute_path(.path)) {
+    .path <- file.path(.directory, .path)
+  }
+
+  return(.path)
+}
+
+#' Set global model directory option
+#'
+#' Sets `options('rbabylon.model_directory')` to the absolute path of the directory passed to `.path`.
+#' Note that the directory must exist or this will error.
+#' This is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
+#' once this is set, those functions can take a path relative to this directory instead of the working/script directory.
+#' @param .path Path, either from working directory or absolute, that will be set as `options('rbabylon.model_directory')`
+#' @export
+set_model_directory <- function(.path) {
+  if (is.null(.path)) {
+    options('rbabylon.model_directory' = NULL)
+  } else {
+    options('rbabylon.model_directory' = normalizePath(.path, mustWork = TRUE))
+  }
+
+  cat(glue("options('rbabylon.model_directory') set to {options('rbabylon.model_directory')}"))
+}
+
+
 #' Builds the absolute path to file in the output directory from components of the `bbi_{.model_type}_model` object
 #' @param .mod `bbi_{.model_type}_model` object
 #' @param .extension file extension to append (for example `lst`, `ext`, `grd`, etc.)
