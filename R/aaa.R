@@ -75,6 +75,13 @@ YAML_ERASE_OUT_KEYS <- c(
   YAML_OUT_DIR
 )
 
+# keys that need to be coerced to arrays when saving a model YAML on disk
+YAML_SCALER_TO_LIST_KEYS <- c(
+  YAML_BASED_ON,
+  YAML_TAGS,
+  YAML_DECISIONS
+)
+
 SUPPORTED_MOD_TYPES <- c("nonmem", "stan")
 
 # keys added when creating a process object

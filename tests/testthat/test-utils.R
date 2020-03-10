@@ -259,15 +259,6 @@ test_that("check_required_keys() works correctly", {
   expect_false(check_required_keys(list(hey = 1, aww = 2), req_keys))
 })
 
-test_that("scaler_to_list() works correctly", {
-  expect_identical(scaler_to_list(1), list(1))
-  expect_identical(scaler_to_list("a"), list("a"))
-  expect_identical(scaler_to_list(T), list(T))
-  expect_identical(scaler_to_list(c(1,2)), c(1,2))
-  expect_identical(scaler_to_list(c("a","b")), c("a","b"))
-  expect_identical(scaler_to_list(c(T,F)), c(T,F))
-  expect_identical(scaler_to_list(list("a",F)), list("a",F))
-})
 
 test_that("strict_mode_error() works correctly", {
   withr::with_options(list(rbabylon.strict = TRUE), {

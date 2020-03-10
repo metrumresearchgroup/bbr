@@ -32,8 +32,8 @@ new_model <- function(
   .mod[[YAML_DESCRIPTION]] <- .description
   .mod[[YAML_MOD_TYPE]] <- .model_type
   if (!is.null(.model_path)) .mod[[YAML_MOD_PATH]] <- .model_path
-  if (!is.null(.based_on)) .mod[[YAML_BASED_ON]] <- scaler_to_list(.based_on)
-  if (!is.null(.tags)) .mod[[YAML_TAGS]] <- scaler_to_list(.tags)
+  if (!is.null(.based_on)) .mod[[YAML_BASED_ON]] <- .based_on
+  if (!is.null(.tags)) .mod[[YAML_TAGS]] <- .tags
   if (!is.null(.bbi_args)) .mod[[YAML_BBI_ARGS]] <- .bbi_args
 
   # make list into S3 object
@@ -88,6 +88,7 @@ read_model <- function(.path) {
 #' @param .out_path Character scaler with path to save out YAML file. By default, sets it to the model file name, with a yaml extension.
 #' @importFrom yaml write_yaml
 #' @importFrom fs file_exists
+#' @importFrom purrr compact
 #' @return Output list as specified above.
 #' @export
 save_mod_yaml <- function(.mod, .out_path = NULL) {
@@ -100,6 +101,16 @@ save_mod_yaml <- function(.mod, .out_path = NULL) {
   for (key in YAML_ERASE_OUT_KEYS) {
     .mod[[key]] <- NULL
   }
+
+  # convert keys that need to be coerced to arrays
+  for (.key in YAML_SCALER_TO_LIST_KEYS) {
+    if (length(.mod[[.key]]) == 1) {
+      .mod[[.key]] <- (list(.mod[[.key]]))
+    }
+  }
+
+  # throw out empty and null keys
+  .mod <- .mod %>% purrr::compact()
 
   # write to disk
   yaml::write_yaml(.mod, .out_path)
@@ -246,7 +257,7 @@ copy_nonmem_model_from <- function(
   .new_mod[[YAML_OUT_DIR]] <- basename(tools::file_path_sans_ext(.new_model))
 
   # fill based_on
-  .new_mod[[YAML_BASED_ON]] <- get_mod_id(.parent_mod[[YAML_MOD_PATH]]) %>% c(.based_on_additional) %>% scaler_to_list()
+  .new_mod[[YAML_BASED_ON]] <- get_mod_id(.parent_mod[[YAML_MOD_PATH]]) %>% c(.based_on_additional)
 
   # pass through model type and bbi_args
   .new_mod[[YAML_MOD_TYPE]] <- .parent_mod[[YAML_MOD_TYPE]]
@@ -254,9 +265,9 @@ copy_nonmem_model_from <- function(
 
   # fill tags
   if (.inherit_tags && !is.null(.parent_mod[[YAML_TAGS]])) {
-    .new_mod[[YAML_TAGS]] <- .parent_mod[[YAML_TAGS]] %>% c(.add_tags) %>% scaler_to_list()
+    .new_mod[[YAML_TAGS]] <- .parent_mod[[YAML_TAGS]] %>% c(.add_tags)
   } else {
-    .new_mod[[YAML_TAGS]] <- .add_tags %>% scaler_to_list()
+    .new_mod[[YAML_TAGS]] <- .add_tags
   }
 
   # build new model path
@@ -440,6 +451,7 @@ replace_description <- function(.mod, .description) {
                              .field = YAML_DESCRIPTION,
                              .value = .description,
                              .append = FALSE)
+
   return(.mod)
 }
 

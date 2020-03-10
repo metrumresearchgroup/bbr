@@ -71,6 +71,7 @@ submit_model.character <- function(.mod, ...) {
 #' @importFrom stringr str_detect
 #' @importFrom tools file_path_sans_ext
 #' @return An S3 object of class `bbi_nonmem_process` (or `bbi_nonmem_model` if .dry_run=T)
+#' @export
 #' @rdname submit_model
 submit_nonmem_model <- function(.mod,
                                 .mode = c("sge", "local"),

@@ -220,13 +220,6 @@ check_required_keys <- function(.list, .req) {
   all(.req %in% names(.list))
 }
 
-scaler_to_list <- function(.x) {
-  if (length(.x) == 1) {
-    .x <- (list(.x))
-  }
-  return(.x)
-}
-
 
 #####################
 # File path helpers
