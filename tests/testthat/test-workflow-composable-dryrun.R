@@ -137,7 +137,7 @@ test_yaml_path <- "1.yaml"
 withr::with_options(list(rbabylon.model_directory = normalizePath("model-examples")), {
 
   for (.test_case in .TEST_CASES_WD) {
-    test_that(paste("basic workflow is correct from different working directories", .test_case$test_wd, if(isTRUE(.test_case$change_midstream)) "change_midstream"), {
+    test_that(paste("Using rbabylon.model_directory, basic workflow is correct from different working directories", .test_case$test_wd, if(isTRUE(.test_case$change_midstream)) "change_midstream"), {
       withr::with_dir(.test_case$test_wd, {
 
         # load model from yaml
@@ -190,7 +190,7 @@ withr::with_options(list(rbabylon.model_directory = normalizePath("model-example
 
 
   for (.test_case in .TEST_CASES_WD) {
-    test_that(paste("Summary call is the same after changing directories", .test_case$test_wd), {
+    test_that(paste("Using rbabylon.model_directory, summary call is the same after changing directories", .test_case$test_wd), {
       withr::with_dir(.test_case$test_wd, {
 
         # load mod from yaml and dry run through to summary object
