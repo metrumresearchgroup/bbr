@@ -74,7 +74,7 @@ nonmem_summary <- function(.mod,
   .args <- purrr::list_modify(.args, json = TRUE)
 
   args_vec <- check_nonmem_args(.args)
-  cmd_args <- c("nonmem", "summary", get_mod_id(lst_file_path), args_vec)
+  cmd_args <- c("nonmem", "summary", get_model_id(lst_file_path), args_vec)
 
   # if .dry_run return output call
   if (.dry_run) {
