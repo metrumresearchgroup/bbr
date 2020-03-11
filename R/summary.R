@@ -125,7 +125,7 @@ nonmem_summary <- function(
   }
   .bbi_args <- purrr::list_modify(.bbi_args, json = TRUE)
 
-  args_vec <- check_nonmem_args(.args)
+  args_vec <- check_nonmem_args(.bbi_args)
   cmd_args <- c("nonmem", "summary", get_model_id(lst_file_path), args_vec)
 
   # if .dry_run return output call

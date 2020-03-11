@@ -127,6 +127,9 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     fs::file_delete(new_ctl_path)
   })
 
+  test_that("new_model() fails with invalid yaml path", {
+    expect_error(new_model(.yaml_path = "naw", .description = "naw dawg"), regexp = "Must pass a file with a valid YAML extension")
+  })
 
   test_that("compare read_model() and new_model() objects", {
     # create new model with args

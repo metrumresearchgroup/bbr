@@ -5,9 +5,9 @@
 #############################
 
 #' Create new model object by specifying relevant information as arguments
-#' Also creates necessary YAML file for using functions like `add_tags()` and `create_run_log()` later.
+#' Also creates necessary YAML file for using functions like `add_tags()` and `run_log()` later.
 #' @param .yaml_path Path to save resulting model YAML file to. MUST be either an absolute path, or a path relative to the `.directory` argument.
-#' @param .description Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.
+#' @param .description Description of new model run. This will be stored in the yaml (to be used later in `run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.
 #' @param .model_path Path to model (control stream) file. MUST be an absolute path, or the model path relative to the location of the YAML file. It recommended for the control stream and YAML to be in the same directory. If nothing is passed, the function will look for a file with the same path/name as your YAML, but with either .ctl or .mod extension.
 #' @param .based_on A character scaler or vector of run id's (model names) that this model was "based on." These are used to reconstuct model developement and ancestry.
 #' @param .tags A character scaler or vector with any user tags to be added to the YAML file
@@ -27,6 +27,10 @@ new_model <- function(
   .model_type = c("nonmem"),
   .directory = getOption("rbabylon.model_directory")
 ) {
+
+  if (!is_valid_yaml_extension(.yaml_path)) {
+    stop(glue("Must pass a file with a valid YAML extension to .yaml_path. Passed: {.yaml_path}"))
+  }
 
   # check for .directory and combine with .yaml_path
   .yaml_path <- combine_directory_path(.directory, .yaml_path)
@@ -530,9 +534,15 @@ replace_description <- function(.mod, .description) {
 #' @return tibble with information on each run
 #' @export
 run_log <- function(
-  .base_dir = ".",
+  .base_dir = getOption("rbabylon.model_directory"),
   .recurse = TRUE
 ) {
+
+  # if no directory defined, set to working directory
+  if (is.null(.base_dir)) {
+    .base_dir <- getwd()
+  }
+
   # get yaml files
   yaml_files <- .base_dir %>% dir_ls(recurse = .recurse) %>% str_subset("\\.ya?ml$") %>% str_subset("babylon\\.yaml$", negate = TRUE)
 
@@ -579,9 +589,15 @@ run_log <- function(
 #' @return tibble with information on each run
 #' @export
 config_log <- function(
-  .base_dir = ".",
+  .base_dir = getOption("rbabylon.model_directory"),
   .recurse = TRUE
 ) {
+
+  # if no directory defined, set to working directory
+  if (is.null(.base_dir)) {
+    .base_dir <- getwd()
+  }
+
   # define json keys to keep as constant
   KEEPERS = c(
     "model_name",
