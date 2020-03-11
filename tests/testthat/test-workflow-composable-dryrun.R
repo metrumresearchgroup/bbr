@@ -55,7 +55,7 @@ withr::with_options(list(rbabylon.model_directory = "model-examples"), {
       expect_identical(call_str, proc_str)
 
       # look for outputs
-      expect_identical(this_mod[[YAML_OUT_DIR]], get_mod_id(test_yaml_path))
+      expect_identical(this_mod[[YAML_OUT_DIR]], get_model_id(test_yaml_path))
       expect_true(fs::file_exists(build_path_from_mod_obj(this_mod, "lst")))
       expect_true(fs::file_exists(build_path_from_mod_obj(this_mod, "ext")))
       expect_true(fs::file_exists(build_path_from_mod_obj(this_mod, "grd")))

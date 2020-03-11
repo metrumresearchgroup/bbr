@@ -117,13 +117,13 @@ test_that("combine_list_objects() correctly fails if .func_args isn't named", {
   LST_TEST_FILE
 )
 for (.tc in .test_cases) {
-  test_that(glue::glue("get_mod_id parses {.tc}"), {
-    expect_identical(get_mod_id(.tc), MOD_ID)
+  test_that(glue::glue("get_model_id parses {.tc}"), {
+    expect_identical(get_model_id(.tc), MOD_ID)
   })
 }
 
-test_that(glue::glue("get_mod_id parses model object"), {
-  expect_identical(get_mod_id(MOD1), MOD_ID)
+test_that(glue::glue("get_model_id parses model object"), {
+  expect_identical(get_model_id(MOD1), MOD_ID)
 })
 
 test_that("is_valid_nonmem_extension() works", {

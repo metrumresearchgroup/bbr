@@ -53,7 +53,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
     # check the control stream is modified
     new_mod_str <- ctl_ext(NEW_MOD2) %>% readr::read_file()
-    new_desc_pattern <- paste0("\\$PROBLEM ", get_mod_id(NEW_MOD2), " ", NEW_DESC, "\n\n\\$INPUT")
+    new_desc_pattern <- paste0("\\$PROBLEM ", get_model_id(NEW_MOD2), " ", NEW_DESC, "\n\n\\$INPUT")
     expect_true(grepl(new_desc_pattern, new_mod_str))
 
   })
@@ -64,7 +64,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     copy_model_from(YAML_TEST_FILE,
                     NEW_MOD3,
                     NEW_DESC,
-                    .based_on_additional = get_mod_id(NEW_MOD2),
+                    .based_on_additional = get_model_id(NEW_MOD2),
                     .inherit_tags = TRUE,
                     .update_mod_file = FALSE)
 
@@ -73,7 +73,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
     expect_identical(new_yaml[[YAML_MOD_PATH]], basename(ctl_ext(NEW_MOD3)))
     expect_identical(new_yaml[[YAML_DESCRIPTION]], NEW_DESC)
-    expect_identical(new_yaml[[YAML_BASED_ON]], c("1", get_mod_id(NEW_MOD2)))
+    expect_identical(new_yaml[[YAML_BASED_ON]], c("1", get_model_id(NEW_MOD2)))
     expect_identical(new_yaml[[YAML_TAGS]], ORIG_TAGS)
     expect_equal(new_yaml[[YAML_BBI_ARGS]], list(overwrite = TRUE, threads = 4L))
 
@@ -119,7 +119,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
     # check the control stream is modified
     new_mod_str <- readr::read_file(new_ctl_path)
-    new_desc_pattern <- paste0("\\$PROBLEM ", get_mod_id(NEW_MOD2), " ", NEW_DESC, "\n\n\\$INPUT")
+    new_desc_pattern <- paste0("\\$PROBLEM ", get_model_id(NEW_MOD2), " ", NEW_DESC, "\n\n\\$INPUT")
     expect_true(grepl(new_desc_pattern, new_mod_str))
 
     # cleanup
@@ -202,7 +202,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_identical(.spec[[YAML_MOD_PATH]], basename(ctl_ext(.test_path)))
   })
 
-  test_that("save_mod_yaml() saves to correct default path", {
+  test_that("save_model_yaml() saves to correct default path", {
     # make a new yaml
     new_yaml <- yaml_ext(NEW_MOD2)
     fs::file_copy(YAML_TEST_FILE, new_yaml)
@@ -215,7 +215,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_false(fs::file_exists(new_yaml))
 
     # re-save yaml
-    save_mod_yaml(new_mod)
+    save_model_yaml(new_mod)
 
     # look for it
     expect_true(fs::file_exists(new_yaml))
@@ -224,7 +224,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     fs::file_delete(new_yaml)
   })
 
-  test_that("save_mod_yaml() saves to user supplied path", {
+  test_that("save_model_yaml() saves to user supplied path", {
     # give fake path
     fake_path <- "model-examples/fake.yaml"
     expect_false(fs::file_exists(fake_path))
@@ -233,7 +233,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     new_mod <- read_model(YAML_TEST_FILE)
 
     # re-save yaml
-    save_mod_yaml(new_mod, fake_path)
+    save_model_yaml(new_mod, fake_path)
 
     # look for it
     expect_true(fs::file_exists(fake_path))
@@ -242,7 +242,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     fs::file_delete(fake_path)
   })
 
-  test_that("save_mod_yaml() deletes the right keys", {
+  test_that("save_model_yaml() deletes the right keys", {
     # give fake path
     fake_path <- "model-examples/fake.yaml"
     expect_false(fs::file_exists(fake_path))
@@ -251,7 +251,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     new_mod <- read_model(YAML_TEST_FILE)
 
     # re-save yaml
-    save_mod_yaml(new_mod, fake_path)
+    save_model_yaml(new_mod, fake_path)
 
     # read it back in and check the keys
     loaded_yaml <- yaml::read_yaml(fake_path)
@@ -262,7 +262,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
 
-  test_that("save_mod_yaml() doesn't save an empty list", {
+  test_that("save_model_yaml() doesn't save an empty list", {
     # give fake path
     fake_path <- "model-examples/fake.yaml"
     expect_false(fs::file_exists(fake_path))
@@ -274,7 +274,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     new_mod[[YAML_BBI_ARGS]] <- list()
 
     # re-save yaml
-    save_mod_yaml(new_mod, fake_path)
+    save_model_yaml(new_mod, fake_path)
 
     # read it back in and check that bbi_args are gone
     loaded_yaml <- readr::read_lines(fake_path)
@@ -285,7 +285,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
 
-  test_that("save_mod_yaml() saves tags as an array", {
+  test_that("save_model_yaml() saves tags as an array", {
     # give fake path
     fake_path <- "model-examples/fake.yaml"
     expect_false(fs::file_exists(fake_path))
@@ -298,7 +298,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
     # erase tags and re-save
     new_mod[[YAML_TAGS]] <- NULL
-    save_mod_yaml(new_mod, fake_path)
+    save_model_yaml(new_mod, fake_path)
 
     # read it back in and check that tags are gone
     loaded_yaml <- readr::read_lines(fake_path)

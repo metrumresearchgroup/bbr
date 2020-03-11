@@ -193,25 +193,25 @@ print_nonmem_args <- function() {
 #' @param .mod generic model
 #' @importFrom tools file_path_sans_ext
 #' @returns Character scaler with only model identifier
-#' @rdname get_mod_id
+#' @rdname get_model_id
 #' @export
-get_mod_id <- function(.mod) {
-  UseMethod("get_mod_id")
+get_model_id <- function(.mod) {
+  UseMethod("get_model_id")
 }
 
 # S3 dispatch to get model identifier from file path to model
 #' @param .mod Character scaler model path to strip
-#' @rdname get_mod_id
+#' @rdname get_model_id
 #' @export
-get_mod_id.character <- function(.mod) {
+get_model_id.character <- function(.mod) {
   return(basename(tools::file_path_sans_ext(.mod)))
 }
 
 #' S3 dispatch to get model identifier from a `bbi_{.model_type}_model` object
 #' @param .mod The `bbi_{.model_type}_model` object
-#' @rdname get_mod_id
+#' @rdname get_model_id
 #' @export
-get_mod_id.bbi_nonmem_model <- function(.mod) {
+get_model_id.bbi_nonmem_model <- function(.mod) {
   return(basename(tools::file_path_sans_ext(.mod[[YAML_MOD_PATH]])))
 }
 
@@ -301,7 +301,7 @@ set_model_directory <- function(.path) {
 build_path_from_mod_obj <- function(.mod, .extension) {
   ext_path <- file.path(.mod[[WORKING_DIR]],
                         .mod[[YAML_OUT_DIR]],
-                        paste0(get_mod_id(.mod[[YAML_MOD_PATH]]), ".", .extension))
+                        paste0(get_model_id(.mod[[YAML_MOD_PATH]]), ".", .extension))
   return(ext_path)
 }
 
@@ -368,7 +368,7 @@ get_yaml_path <- function(.mod, .check_exists = TRUE) {
 get_yaml_path.bbi_nonmem_model <- function(.mod, .check_exists = TRUE) {
   # check if file name was stored on load, otherwise infer from model file
   if (is.null(.mod[[YAML_YAML_NAME]])) {
-    yaml_file <- .mod[[YAML_MOD_PATH]] %>% get_mod_id() %>% yaml_ext()
+    yaml_file <- .mod[[YAML_MOD_PATH]] %>% get_model_id() %>% yaml_ext()
   } else {
     yaml_file <- .mod[[YAML_YAML_NAME]]
   }

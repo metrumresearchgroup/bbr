@@ -46,7 +46,7 @@ new_model <- function(
   .mod <- create_model_object(.mod)
 
   # write YAML to disk
-  save_mod_yaml(.mod, .out_path = .yaml_path)
+  save_model_yaml(.mod, .out_path = .yaml_path)
 
   return(.mod)
 }
@@ -105,7 +105,7 @@ read_model <- function(
 #' @importFrom purrr compact
 #' @return Output list as specified above.
 #' @export
-save_mod_yaml <- function(.mod, .out_path = NULL) {
+save_model_yaml <- function(.mod, .out_path = NULL) {
   # fill path if null
   if (is.null(.out_path)) {
     .out_path <- get_yaml_path(.mod, .check_exists = FALSE)
@@ -316,7 +316,7 @@ copy_nonmem_model_from <- function(
   .new_mod[[YAML_OUT_DIR]] <- basename(tools::file_path_sans_ext(.new_model))
 
   # fill based_on
-  .new_mod[[YAML_BASED_ON]] <- get_mod_id(.parent_mod[[YAML_MOD_PATH]]) %>% c(.based_on_additional)
+  .new_mod[[YAML_BASED_ON]] <- get_model_id(.parent_mod[[YAML_MOD_PATH]]) %>% c(.based_on_additional)
 
   # pass through model type and bbi_args
   .new_mod[[YAML_MOD_TYPE]] <- .parent_mod[[YAML_MOD_TYPE]]
@@ -342,8 +342,8 @@ copy_nonmem_model_from <- function(
 
   # copy control steam to new path
   if (.update_mod_file) {
-    parent_mod_id <- .parent_mod %>% get_model_path() %>% get_mod_id()
-    new_mod_id <- .new_model %>% get_mod_id()
+    parent_mod_id <- .parent_mod %>% get_model_path() %>% get_model_id()
+    new_mod_id <- .new_model %>% get_model_id()
 
     # read parent control stream
     mod_str <- .parent_mod %>% get_model_path() %>% read_file()
@@ -364,7 +364,7 @@ copy_nonmem_model_from <- function(
 
   # write .new_mod out
   new_yaml_path <- yaml_ext(.new_model)
-  save_mod_yaml(.new_mod, .out_path = new_yaml_path)
+  save_model_yaml(.new_mod, .out_path = new_yaml_path)
 
   return(.new_mod)
 }
@@ -415,7 +415,7 @@ modify_model_field <- function(.mod, .field, .value, .append = TRUE, .unique = T
   }
 
   # overwrite the yaml on disk with modified model
-  save_mod_yaml(.mod, .yaml_path)
+  save_model_yaml(.mod, .yaml_path)
 
   return(.mod)
 }
@@ -557,7 +557,7 @@ run_log <- function(
   .col_names <- map(mod_yaml, function(.x) {return(names(.x))}) %>% unlist() %>% unique()
   df <- mod_yaml %>% transpose(.names = .col_names) %>% as_tibble() %>%
     mutate_at(c(YAML_MOD_PATH, YAML_DESCRIPTION, YAML_MOD_TYPE), unlist) %>%
-    mutate(run_id = get_mod_id(.data[[YAML_MOD_PATH]])) %>%
+    mutate(run_id = get_model_id(.data[[YAML_MOD_PATH]])) %>%
     select(.data$run_id, everything())
 
   # add yaml path
@@ -599,7 +599,7 @@ config_log <- function(
   } else {
     df <- json_files %>%
       map_df(function(.path) fromJSON(.path)[KEEPERS]) %>%
-      mutate(run_id = get_mod_id(.data$model_name)) %>%
+      mutate(run_id = get_model_id(.data$model_name)) %>%
       select(.data$run_id, everything(), -.data$model_name)
 
     return(df)
