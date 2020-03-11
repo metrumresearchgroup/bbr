@@ -127,12 +127,48 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     fs::file_delete(new_ctl_path)
   })
 
+  test_that("copy_from_model numeric", {
+    withr::with_options(list(rbabylon.model_directory = "model-examples"), {
+      # get integer input and check for related paths
+      mod1 <- stringr::str_replace_all(YAML_TEST_FILE, "[^\\d]", "") %>% as.numeric()
+      mod2 <- stringr::str_replace_all(NEW_MOD2, "[^\\d]", "") %>% as.numeric()
+      new_yaml_path <- yaml_ext(NEW_MOD2)
+      new_ctl_path <- ctl_ext(NEW_MOD2)
+      expect_false(fs::file_exists(new_yaml_path))
+      expect_false(fs::file_exists(new_ctl_path))
+
+      # run copy_model_from with the integer input
+      copy_model_from(mod1, mod2, NEW_DESC, .add_tags = NEW_TAGS)
+
+      # check that everything is copied through
+      new_yaml <- yaml::read_yaml(new_yaml_path)
+
+      expect_identical(new_yaml[[YAML_MOD_PATH]], basename(new_ctl_path))
+      expect_identical(new_yaml[[YAML_DESCRIPTION]], NEW_DESC)
+      expect_identical(new_yaml[[YAML_BASED_ON]], "1")
+      expect_identical(new_yaml[[YAML_TAGS]], NEW_TAGS)
+      expect_equal(new_yaml[[YAML_BBI_ARGS]], list(overwrite = TRUE, threads = 4L))
+
+      # check the control stream is modified
+      new_mod_str <- readr::read_file(new_ctl_path)
+      new_desc_pattern <- paste0("\\$PROBLEM ", get_model_id(NEW_MOD2), " ", NEW_DESC, "\n\n\\$INPUT")
+      expect_true(grepl(new_desc_pattern, new_mod_str))
+
+      # cleanup
+      fs::file_delete(new_yaml_path)
+      fs::file_delete(new_ctl_path)
+    })
+  })
+
   test_that("new_model() fails with invalid yaml path", {
-    expect_error(new_model(.yaml_path = "naw", .description = "naw dawg"), regexp = "Must pass a file with a valid YAML extension")
+    .test_path <- "naw"
+    expect_warning(new_model(.yaml_path = .test_path, .description = "naw dawg"), regexp = "Did not pass a YAML extension")
+    fs::file_delete(yaml_ext(.test_path))
   })
 
   test_that("compare read_model() and new_model() objects", {
     # create new model with args
+    .test_yaml <- "model-examples/1.yaml"
     .test_path <- "model-examples/tmp.yaml"
     mod1a <- new_model(
       .yaml_path = .test_path,
@@ -142,7 +178,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     )
 
     # read model from YAML
-    mod1b <- read_model(.path = "model-examples/1.yaml")
+    mod1b <- read_model(.path = .test_yaml)
 
     # check class and keys are right
     expect_identical(class(mod1a), MODEL_CLASS_LIST)
@@ -166,6 +202,48 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
     # clean up tmp file
     fs::file_delete(.test_path)
+  })
+
+  test_that("compare read_model() and new_model() objects with numeric input", {
+    # create new model with args
+    withr::with_options(list(rbabylon.model_directory = "model-examples"), {
+      .test_yaml <- 1
+      .test_path <- 2
+      .cleanup_path <- "model-examples/2.yaml"
+      expect_warning(mod1a <- new_model(
+        .yaml_path = .test_path,
+        .description = "original acop model",
+        .tags = c("acop tag", "other tag"),
+        .bbi_args = list(overwrite = TRUE, threads = 4)
+      ), regexp = "Did not pass a YAML extension")
+
+      # read model from YAML
+      mod1b <- read_model(.path = .test_yaml)
+
+      # check class and keys are right
+      expect_identical(class(mod1a), MODEL_CLASS_LIST)
+      expect_identical(class(mod1b), MODEL_CLASS_LIST)
+
+      expect_true(all(MODEL_REQ_KEYS %in% names(mod1a)))
+      expect_true(all(MODEL_REQ_KEYS %in% names(mod1b)))
+
+      # also check that some of the required keys have the same value
+      for (k in MODEL_REQ_KEYS) {
+        if (k == YAML_MOD_PATH) {
+          expect_identical(mod1a[[k]], basename(ctl_ext(.test_path)))
+          expect_identical(mod1b[[k]], "1.ctl")
+        } else if (k == YAML_OUT_DIR) {
+          expect_identical(mod1a[[k]], basename(tools::file_path_sans_ext(.test_path)))
+          expect_identical(mod1b[[k]], "1")
+        } else {
+          expect_equal(mod1a[[k]], mod1b[[k]])
+        }
+      }
+
+      # clean up tmp file
+      fs::file_delete(.cleanup_path)
+    })
+
   })
 
 

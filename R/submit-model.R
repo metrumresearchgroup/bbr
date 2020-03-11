@@ -116,6 +116,41 @@ submit_model.character <- function(
 }
 
 
+#' S3 dispatch for submit_model from numeric input
+#' This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`
+#' @param .mod Integer that corresponds to the name of a YAML and model file
+#' @param .directory Model directory containing the files referenced by `.mod`. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
+#' @export
+#' @rdname submit_model
+submit_model.numeric <- function(
+  .mod,
+  .mode = c("sge", "local"),
+  .bbi_args = NULL,
+  ...,
+  .config_path=NULL,
+  .wait = TRUE,
+  .dry_run=FALSE,
+  .directory = getOption("rbabylon.model_directory")
+) {
+  # convert to character
+  .mod <- as.character(.mod)
+
+  # call character dispatch
+  res <- submit_model(
+    .mod = .mod,
+    .mode = .mode,
+    .bbi_args = .bbi_args,
+    ...,
+    .config_path = .config_path,
+    .wait = .wait,
+    .dry_run = .dry_run,
+    .directory = .directory
+  )
+
+  return(res)
+}
+
+
 #' Submit a NONMEM model via babylon
 #' @param .mod An S3 object of class `bbi_nonmem_model`, for example from `new_model()`, `read_model()` or `copy_model_from()`
 #' @importFrom stringr str_detect

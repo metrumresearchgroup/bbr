@@ -4,6 +4,7 @@
 \alias{submit_model}
 \alias{submit_model.bbi_nonmem_model}
 \alias{submit_model.character}
+\alias{submit_model.numeric}
 \alias{submit_nonmem_model}
 \title{S3 generic method for submit_model}
 \usage{
@@ -40,6 +41,17 @@ submit_model(
   .directory = getOption("rbabylon.model_directory")
 )
 
+\method{submit_model}{numeric}(
+  .mod,
+  .mode = c("sge", "local"),
+  .bbi_args = NULL,
+  ...,
+  .config_path = NULL,
+  .wait = TRUE,
+  .dry_run = FALSE,
+  .directory = getOption("rbabylon.model_directory")
+)
+
 submit_nonmem_model(
   .mod,
   .mode = c("sge", "local"),
@@ -65,7 +77,7 @@ submit_nonmem_model(
 
 \item{.dry_run}{Returns an object detailing the command that would be run, insted of running it. This is primarily for testing but also a debugging tool.}
 
-\item{.directory}{Model directory which `.mod` path is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
+\item{.directory}{Model directory containing the files referenced by `.mod`. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
 }
 \value{
 An S3 object of class `bbi_nonmem_process` (or `bbi_nonmem_model` if .dry_run=T)
@@ -77,6 +89,9 @@ S3 dispatch for submit_model from bbi_nonmem_model
 
 S3 dispatch for submit_model from character scaler
   Should be path to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
+
+S3 dispatch for submit_model from numeric input
+This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`
 
 Submit a NONMEM model via babylon
 }

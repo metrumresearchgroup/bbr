@@ -16,7 +16,7 @@ GRD_TEST_FILE <-  as.character(glue::glue("{MODEL_DIR}/{MOD_ID}/{MOD_ID}.grd"))
 EXT_TEST_FILE <-  as.character(glue::glue("{MODEL_DIR}/{MOD_ID}/{MOD_ID}.ext"))
 
 # for combine_directory_path()
-ABS_CTL_PATH <- file.path(getwd(), MODEL_DIR, glue("{MOD_ID}.ctl"))
+ABS_CTL_PATH <- file.path(getwd(), MODEL_DIR, glue::glue("{MOD_ID}.ctl"))
 FAKE_CTL_PATH <- file.path(getwd(), MODEL_DIR, CTL_TEST_FILE)
 
 # fake result object

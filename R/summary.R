@@ -98,6 +98,40 @@ model_summary.character <- function(
   return(res_list)
 }
 
+
+#' S3 dispatch for getting model summary from numeric input
+#' This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`
+#' @param .mod Integer that corresponds to the name of a YAML, model file, and output directory
+#' @param .model_type Character scaler specifying the type of model, either 'nonmem' or 'stan'
+#' @param .directory Model directory containing the files referenced by `.mod`. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
+#' @export
+#' @rdname model_summary
+model_summary.numeric <- function(
+  .mod,
+  .model_type = c("nonmem", "stan"),
+  .bbi_args = NULL,
+  ...,
+  .dry_run = FALSE,
+  .directory = getOption("rbabylon.model_directory")
+) {
+
+  # convert to character
+  .mod <- as.character(.mod)
+
+  # call character dispatch
+  res_list <- model_summary(
+    .mod = .mod,
+    .model_type = .model_type,
+    .bbi_args = .bbi_args,
+    ...,
+    .dry_run = .dry_run,
+    .directory = .directory
+  )
+
+  return(res_list)
+}
+
+
 #' Run `bbi nonmem summary` and parse the output to a list
 #' @param .mod `bbi_nonmem_model` object for summary
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.

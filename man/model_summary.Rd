@@ -4,6 +4,7 @@
 \alias{model_summary}
 \alias{model_summary.bbi_nonmem_model}
 \alias{model_summary.character}
+\alias{model_summary.numeric}
 \alias{nonmem_summary}
 \title{S3 generic for getting model summary}
 \usage{
@@ -34,6 +35,15 @@ model_summary(
   .directory = getOption("rbabylon.model_directory")
 )
 
+\method{model_summary}{numeric}(
+  .mod,
+  .model_type = c("nonmem", "stan"),
+  .bbi_args = NULL,
+  ...,
+  .dry_run = FALSE,
+  .directory = getOption("rbabylon.model_directory")
+)
+
 nonmem_summary(.mod, .bbi_args = NULL, ..., .dry_run = FALSE)
 }
 \arguments{
@@ -47,7 +57,7 @@ nonmem_summary(.mod, .bbi_args = NULL, ..., .dry_run = FALSE)
 
 \item{.dry_run}{show what the command would be without actually running it}
 
-\item{.directory}{Model directory which `.mod` path is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
+\item{.directory}{Model directory containing the files referenced by `.mod`. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
 }
 \value{
 List of S3 Class "bbi_nonmem_summary" with all summary information
@@ -58,6 +68,9 @@ S3 generic for getting model summary
 Get model summary from `bbi_nonmem_model` object and optionally check if model is done before erroring
 
 S3 dispatch for getting model summary from output directory path
+
+S3 dispatch for getting model summary from numeric input
+This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`
 
 Run `bbi nonmem summary` and parse the output to a list
 }

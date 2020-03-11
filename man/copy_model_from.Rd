@@ -4,6 +4,7 @@
 \alias{copy_model_from}
 \alias{copy_model_from.bbi_nonmem_model}
 \alias{copy_model_from.character}
+\alias{copy_model_from.numeric}
 \alias{copy_nonmem_model_from}
 \title{Generic S3 method from iterating on models.}
 \usage{
@@ -30,6 +31,17 @@ copy_model_from(
 )
 
 \method{copy_model_from}{character}(
+  .parent_mod,
+  .new_model,
+  .description,
+  .based_on_additional = NULL,
+  .add_tags = NULL,
+  .inherit_tags = FALSE,
+  .update_mod_file = TRUE,
+  .directory = getOption("rbabylon.model_directory")
+)
+
+\method{copy_model_from}{numeric}(
   .parent_mod,
   .new_model,
   .description,

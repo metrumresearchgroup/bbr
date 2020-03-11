@@ -29,7 +29,8 @@ new_model <- function(
 ) {
 
   if (!is_valid_yaml_extension(.yaml_path)) {
-    stop(glue("Must pass a file with a valid YAML extension to .yaml_path. Passed: {.yaml_path}"))
+    warning(glue("Did not pass a YAML extension to .yaml_path. Inferred path `{yaml_ext(.yaml_path)}` from `{.yaml_path}`"))
+    .yaml_path <- yaml_ext(.yaml_path)
   }
 
   # check for .directory and combine with .yaml_path
@@ -226,7 +227,7 @@ copy_model_from.bbi_nonmem_model <- function(
   return(.mod)
 }
 
-#' S3 dispatch for passing `bbi_nonmem_model` object to copy_model_from()
+#' S3 dispatch for passing a file path to copy_model_from()
 #' @param .parent_mod Path to parent model to use as a basis for the copy. Ideally a YAML path, but can also pass control stream or output directory.
 #' @param .directory Model directory which BOTH `.parent_model` and `.new_model` are relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
 #' @export
@@ -272,6 +273,42 @@ copy_model_from.character <- function(
   } else {
     stop(glue("Passed `{.model_type}`. Valid options: `{SUPPORTED_MOD_TYPES}`"))
   }
+  return(.mod)
+}
+
+#' S3 dispatch for passing an integer model identifier to copy_model_from()
+#' This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`
+#' @param .parent_mod Integer that corresponds to parent model to use as a basis for the copy.
+#' @param .new_model Integer that corresponds to the new model name to create. Function will create both `{.new_model}.yaml` and a new model file based on this path.
+#' @param .directory Model directory which BOTH `.parent_model` and `.new_model` are relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
+#' @export
+#' @rdname copy_model_from
+copy_model_from.numeric <- function(
+  .parent_mod,
+  .new_model,
+  .description,
+  .based_on_additional = NULL,
+  .add_tags = NULL,
+  .inherit_tags = FALSE,
+  .update_mod_file = TRUE,
+  .directory = getOption("rbabylon.model_directory")
+) {
+
+  # convert to character
+  .parent_mod <- as.character(.parent_mod)
+  .new_model <- as.character(.new_model)
+
+  # call the character dispatch
+  .mod <- copy_model_from(
+    .parent_mod = .parent_mod,
+    .new_model = .new_model,
+    .description = .description,
+    .based_on_additional = .based_on_additional,
+    .add_tags = .add_tags,
+    .inherit_tags = .inherit_tags,
+    .update_mod_file = .update_mod_file,
+    .directory = .directory
+  )
   return(.mod)
 }
 

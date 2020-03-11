@@ -47,7 +47,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
   bbi_init(MODEL_DIR, "/opt/NONMEM", "nm74gf")
 
   # copy model file into new model dir
-  fs::file_copy(STARTER_FILE, file.path(MODEL_DIR, "1.ctl"))
+  fs::file_copy(STARTER_FILE, MODEL_DIR)
 
   #######################
   # create model from R
@@ -55,12 +55,12 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
 
   test_that("step by step create_model to submit_model to model_summary works", {
     # create model spec
-    mod1 <- new_model(
-      .yaml_path = "1.yaml",
+    mod1 <- suppressWarnings(new_model(
+      .yaml_path = 1,
       .description = ORIG_DESC,
       .tags = ORIG_TAGS,
       .bbi_args = list(overwrite = TRUE, threads = 4)
-    )
+    ))
     expect_identical(class(mod1), MODEL_CLASS_REF)
 
     # submit model
@@ -86,7 +86,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
 
   test_that("copying model works and new model runs correctly", {
     # copy model
-    mod2 <- copy_model_from("1", "2", NEW_DESC)
+    mod2 <- copy_model_from(1, 2, NEW_DESC)
 
     # run new model
     mod2 %>% submit_model(.mode = "local", .wait = TRUE)
