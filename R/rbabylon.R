@@ -11,21 +11,23 @@ NULL
 
 #' Executes a babylon call (`bbi ...`) with processx::process$new()
 #' @param .cmd_args A character vector of command line arguments for the execution call
+#' @param .dir The working directory to run command in. Defaults to "."
 #' @param .verbose Print stdout and stderr as process runs #### NOT IMPLEMENTED?
 #' @param .wait If true, don't return until process has exited.
 #' @param ... arguments to pass to processx::process$new()
-#' @return A named list with process object and some metadata
-#'         process -- The process object (see ?processx::process$new for more details on what you can do with this)
-#'         output -- the stdout and stderr from the process, if `.wait = TRUE`. If `.wait = FALSE` this will be NULL.
-#'         bbi -- character scaler with the execution path used for bbi
-#'         cmd_args -- character vector of all command arguments passed to the process
+#' @return An S3 object of class `babylon_process`
+#'         process -- The process object (see ?processx::process$new for more details on what you can do with this).
+#'         stdout -- the stdout and stderr from the process, if `.wait = TRUE`. If `.wait = FALSE` this will be NULL.
+#'         bbi -- character scaler with the execution path used for bbi.
+#'         cmd_args -- character vector of all command arguments passed to the process.
+#'         working_dir -- the directory the command was run in, passed through from .dir argument.
 #' @importFrom processx process
 #' @export
-bbi_exec <- function(.cmd_args, .verbose = FALSE, .wait = FALSE, ...) {
+bbi_exec <- function(.cmd_args, .dir = ".", .verbose = FALSE, .wait = FALSE, ...) {
   bbi_exe_path <- getOption("rbabylon.bbi_exe_path")
   check_bbi_exe(bbi_exe_path)
 
-  p <- processx::process$new(bbi_exe_path, .cmd_args, ..., stdout = "|", stderr = "2>&1")
+  p <- processx::process$new(bbi_exe_path, .cmd_args, ..., wd = .dir,  stdout = "|", stderr = "2>&1")
 
   if (.wait) {
     # wait for process and capture stdout and stderr
@@ -40,15 +42,46 @@ bbi_exec <- function(.cmd_args, .verbose = FALSE, .wait = FALSE, ...) {
 
   # build result object
   res <- list()
-  res[[RES_PROCESS]] <- p
-  res[[RES_STDOUT]] <- output
-  res[[RES_BBI]] <- bbi_exe_path
-  res[[RES_CMD_ARGS]] <- .cmd_args
+  res[[PROC_PROCESS]] <- p
+  res[[PROC_STDOUT]] <- output
+  res[[PROC_BBI]] <- bbi_exe_path
+  res[[PROC_CMD_ARGS]] <- .cmd_args
+  res[[PROC_WD]] <- .dir
 
-  class(res) <- c("babylon_result", class(res))
+  # assign class and return
+  res <- create_process_object(res)
   return(res)
 }
 
+#' Babylon dry_run
+#'
+#' Creates a `babylon_process` object with all the required keys, without actually running the command.
+#' Returns an S3 object of class `babylon_process` but the `process` and `stdout` elements containing only the string "DRY_RUN".
+#' Also contains the element `call` with a string representing the command that could be called on the command line.
+#' @param .cmd_args A character vector of command line arguments for the execution call
+#' @param .dir The working directory to run command in. Defaults to "."
+#' @export
+bbi_dry_run <- function(.cmd_args, .dir) {
+  # build result object
+  res <- list()
+  res[[PROC_PROCESS]] <- "DRY_RUN"
+  res[[PROC_STDOUT]] <- "DRY_RUN"
+  res[[PROC_BBI]] <- getOption("rbabylon.bbi_exe_path")
+  res[[PROC_CMD_ARGS]] <- .cmd_args
+  res[[PROC_WD]] <- .dir
+
+  # construct call string that _could_ be called on command line
+  call_str <- paste(
+    "cd", .dir, ";",
+    res[[PROC_BBI]],
+    paste(.cmd_args, collapse = " ")
+  )
+  res[[PROC_CALL]] <- call_str
+
+  # assign class and return
+  res <- create_process_object(res)
+  return(res)
+}
 
 #' Checks that a bbi binary is present at the path passed to .bbi_exe_path
 #' @param .bbi_exe_path Path to bbi exe file that will be checked
@@ -123,7 +156,7 @@ bbi_init <- function(.dir, .nonmem_dir, .nonmem_version = NULL, .no_default_vers
   }
 
   # execute init
-  res <- bbi_exec(c("init",  paste0("--dir=", .nonmem_dir)), wd = .dir, .wait=TRUE)
+  res <- bbi_exec(c("init",  paste0("--dir=", .nonmem_dir)), .dir = .dir, .wait=TRUE)
 
   # set default NONMEM version
   if (!is.null(.nonmem_version)) {
@@ -151,18 +184,18 @@ bbi_init <- function(.dir, .nonmem_dir, .nonmem_version = NULL, .no_default_vers
 
 # get exit status of process
 get_exit_status <- function (.res, ...) {
-  UseMethod("get_exit_status", .res)
+  UseMethod("get_exit_status")
 }
 
 get_exit_status.babylon_result <- function(.res, .check = FALSE) {
-  if (.res$process$is_alive()) {
-    warning(paste0("Process ", .res$process$get_pid(), " is still running. You cannot check the exit status until it is finished."))
+  if (.res[[PROC_PROCESS]]$is_alive()) {
+    warning(paste0("Process ", .res[[PROC_PROCESS]]$get_pid(), " is still running. You cannot check the exit status until it is finished."))
     invisible()
   } else {
-    exit_status <- .res$process$get_exit_status()
+    exit_status <- .res[[PROC_PROCESS]]$get_exit_status()
 
     if (.check) {
-      check_status_code(exit_status, .res[[RES_STDOUT]], .res[[RES_CMD_ARGS]])
+      check_status_code(exit_status, .res[[PROC_STDOUT]], .res[[PROC_CMD_ARGS]])
     }
     return(exit_status)
   }
@@ -171,18 +204,18 @@ get_exit_status.babylon_result <- function(.res, .check = FALSE) {
 
 # fetch output (stdout and stderr) of process
 get_stdout <- function(.res, ...) {
-  UseMethod("get_stdout", .res)
+  UseMethod("get_stdout")
 }
 
 get_stdout.babylon_result <- function(.res) {
   # check if process is still alive (as of now, can only get output from finished process)
-  if (.res$process$is_alive()) {
-    warning(paste0("Process ", .res$process$get_pid(), " is still running. You cannot read the output until it is finished."))
+  if (.res[[PROC_PROCESS]]$is_alive()) {
+    warning(paste0("Process ", .res[[PROC_PROCESS]]$get_pid(), " is still running. You cannot read the output until it is finished."))
     invisible()
   } else {
     # if output has not been read from buffer, read it
     if (is.null(.res$output)) {
-      .res$output <- .res$process$read_all_output_lines()
+      .res$output <- .res[[PROC_PROCESS]]$read_all_output_lines()
     }
     # return output
     return(.res)

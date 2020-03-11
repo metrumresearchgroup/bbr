@@ -51,49 +51,55 @@ YAML_REQ_INPUT_KEYS <- c(
 
 WORKING_DIR <- "orig_working_dir"
 
-# keys added when creating a result object
-RES_PROCESS <- "process"
-RES_STDOUT <- "stdout"
-RES_BBI <- "bbi"
-RES_CMD_ARGS <- "cmd_args"
-RES_CALL <- "call"
-RES_WD <- "wd"
-
-# keys required to create a model spec
-SPEC_REQ_INPUT_KEYS <- c(
+# keys required to create a model object
+MODEL_REQ_INPUT_KEYS <- c(
   WORKING_DIR,
   YAML_MOD_TYPE,
   YAML_DESCRIPTION
 )
 
-# keys required for a model spec to have
-SPEC_REQ_KEYS <- c(
+# keys required for a model object to have
+MODEL_REQ_KEYS <- c(
   WORKING_DIR,
   YAML_MOD_TYPE,
   YAML_DESCRIPTION,
   YAML_MOD_PATH,
-  YAML_BBI_ARGS
+  YAML_BBI_ARGS,
+  YAML_OUT_DIR
 )
 
 # keys that get erased when saving a model YAML on disk
 YAML_ERASE_OUT_KEYS <- c(
   WORKING_DIR,
   YAML_YAML_NAME,
-  RES_PROCESS,
-  RES_STDOUT,
-  RES_BBI,
-  RES_CMD_ARGS,
-  RES_CALL,
-  RES_WD
+  YAML_OUT_DIR
+)
+
+# keys that need to be coerced to arrays when saving a model YAML on disk
+YAML_SCALER_TO_LIST_KEYS <- c(
+  YAML_BASED_ON,
+  YAML_TAGS,
+  YAML_DECISIONS
 )
 
 SUPPORTED_MOD_TYPES <- c("nonmem", "stan")
 
-# keys required for model result to have
-RESULT_REQ_KEYS <- c(
-  RES_CMD_ARGS, # will be empty string if object was recreated by pointing to output dir
-  SPEC_REQ_KEYS,
-  YAML_OUT_DIR
+# keys added when creating a process object
+PROC_PROCESS <- "process"
+PROC_STDOUT <- "stdout"
+PROC_BBI <- "bbi"
+PROC_CMD_ARGS <- "cmd_args"
+PROC_WD <- "working_dir"
+PROC_CALL <- "call"
+
+
+# keys required for process object to have
+PROCESS_REQ_KEYS <- c(
+  PROC_PROCESS,
+  PROC_STDOUT,
+  PROC_BBI,
+  PROC_CMD_ARGS,
+  PROC_WD
 )
 
 # error messages that we grep for

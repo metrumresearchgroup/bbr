@@ -43,7 +43,7 @@ withr::with_file(OUTPUT_FILE, {
   .test_cases <- list(
     list(.test_arg = OUTPUT_DIR, .test_name = "tail_output() character dir"),
     list(.test_arg = OUTPUT_FILE, .test_name = "tail_output() character file"),
-    list(.test_arg = RES1, .test_name = "tail_output() res object")
+    list(.test_arg = MOD1, .test_name = "tail_output() model object")
   )
   for (.tc in .test_cases) {
     test_that(.tc[[".test_name"]], {
@@ -57,7 +57,7 @@ withr::with_file(OUTPUT_FILE, {
 .test_cases <- list(
   list(.test_arg = OUTPUT_DIR, .test_name = "tail_lst() character dir"),
   list(.test_arg = LST_TEST_FILE, .test_name = "tail_lst() character file"),
-  list(.test_arg = RES1, .test_name = "tail_lst() res object")
+  list(.test_arg = MOD1, .test_name = "tail_lst() model object")
 )
 for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
@@ -74,7 +74,7 @@ for (.tc in .test_cases) {
 # test regular output functionality
 .test_cases <- list(
   list(.test_arg = OUTPUT_DIR, .test_name = "check_output_dir() character dir"),
-  list(.test_arg = RES1, .test_name = "check_output_dir() res object")
+  list(.test_arg = MOD1, .test_name = "check_output_dir() model object")
 )
 for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
@@ -86,7 +86,7 @@ for (.tc in .test_cases) {
 # test output functionality with filter
 .test_cases <- list(
   list(.test_arg = OUTPUT_DIR, .test_name = "check_output_dir() character dir with filter"),
-  list(.test_arg = RES1, .test_name = "check_output_dir() res object with filter")
+  list(.test_arg = MOD1, .test_name = "check_output_dir() model object with filter")
 )
 for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
@@ -115,7 +115,7 @@ test_that("check_nonmem_table_output(.x_floor=0) works", {
 # test check_ext
 .test_cases <- list(
   list(.test_arg = OUTPUT_DIR, .test_name = "check_ext() character dir default .iter_floor"),
-  list(.test_arg = RES1, .test_name = "check_ext() res object default .iter_floor")
+  list(.test_arg = MOD1, .test_name = "check_ext() model object default .iter_floor")
 )
 for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
@@ -130,7 +130,7 @@ for (.tc in .test_cases) {
 
 .test_cases <- list(
   list(.test_arg = OUTPUT_DIR, .test_name = "check_ext() character dir default .iter_floor NULL"),
-  list(.test_arg = RES1, .test_name = "check_ext() res object .iter_floor NULL")
+  list(.test_arg = MOD1, .test_name = "check_ext() model object .iter_floor NULL")
 )
 for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
@@ -146,7 +146,7 @@ for (.tc in .test_cases) {
 # test check_grd
 .test_cases <- list(
   list(.test_arg = OUTPUT_DIR, .test_name = "check_grd() character dir default .iter_floor"),
-  list(.test_arg = RES1, .test_name = "check_grd() res object default .iter_floor")
+  list(.test_arg = MOD1, .test_name = "check_grd() model object default .iter_floor")
 )
 for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
@@ -164,7 +164,7 @@ for (.tc in .test_cases) {
 
 .test_cases <- list(
   list(.test_arg = OUTPUT_DIR, .test_name = "check_grd() character dir .iter_floor 10"),
-  list(.test_arg = RES1, .test_name = "check_grd() res object .iter_floor 10")
+  list(.test_arg = MOD1, .test_name = "check_grd() model object .iter_floor 10")
 )
 for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
@@ -182,7 +182,7 @@ for (.tc in .test_cases) {
 
 .test_cases <- list(
   list(.test_arg = OUTPUT_DIR, .test_name = "check_grd() character dir .iter_floor NULL"),
-  list(.test_arg = RES1, .test_name = "check_grd() res object .iter_floor NULL")
+  list(.test_arg = MOD1, .test_name = "check_grd() model object .iter_floor NULL")
 )
 for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
@@ -197,37 +197,4 @@ for (.tc in .test_cases) {
     expect_failure(expect_identical(df, ref_df))
   })
 }
-
-#######################################
-# check nonmem progress
-#######################################
-
-test_that("check_nonmem_progress returns TRUE", {
-  null_output <- capture.output(
-    expect_true(check_nonmem_progress(RES1))
-  )
-})
-
-test_that("check_nonmem_progress returns FALSE", {
-  # set up fake non-finished run
-  NEW_OUT_DIR <- "model-examples/2"
-  fs::file_copy(yaml_ext(OUTPUT_DIR), yaml_ext(NEW_OUT_DIR)) # new yaml
-  fs::dir_copy(OUTPUT_DIR, NEW_OUT_DIR) # copy output directory
-
-  # cut new ext to only first 5 lines
-  new_ext <- file.path(NEW_OUT_DIR, "1.ext")
-  readr::read_lines(new_ext, n_max = 5) %>% readr::write_lines(new_ext)
-
-  # make a fake res
-  new_res <- import_result(yaml_ext(NEW_OUT_DIR))
-
-  # it should return false because the ext isn't finished
-  null_output <- capture.output(
-    expect_false(suppressWarnings(check_nonmem_progress(new_res)))
-  )
-
-  # clean up
-  fs::file_delete(yaml_ext(NEW_OUT_DIR))
-  fs::dir_delete(NEW_OUT_DIR)
-})
 

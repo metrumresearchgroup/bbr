@@ -5,7 +5,11 @@
 # Because of this, it is disabled unless on Metworx.
 ####################################################
 
-if (Sys.getenv("METWORX_VERSION") == "") skip("test-workflow-composable-bbi only runs on Metworx")
+if (Sys.getenv("METWORX_VERSION") == "") {
+  skip("test-workflow-composable-bbi only runs on Metworx")
+}
+
+withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi'), {
 
 # define constants
 STARTER_FILE <- file.path("model-examples/1.ctl")
@@ -25,8 +29,8 @@ NEW_TEXT1 <- c("naw", "paw")
 NEW_TEXT2 <- c("all", "done")
 
 # reference
-SPEC_CLASS_REF <- c("bbi_nonmem_spec", "list")
-RES_CLASS_REF <- c("bbi_nonmem_result", "babylon_result", "bbi_nonmem_spec", "list")
+MODEL_CLASS_REF <- c("bbi_nonmem_model", "list")
+PROCESS_CLASS_REF <- c("babylon_process", "list")
 SUM_CLASS_REF <- c("bbi_nonmem_summary", "list")
 SUM_NAMES_REF <- c("run_details", "run_heuristics", "parameters_data", "parameter_names",
                    "ofv", "shrinkage_details", "covariance_theta", "correlation_theta")
@@ -56,32 +60,33 @@ fs::file_copy(STARTER_FILE, ctl_ext(NEW_MOD1))
 
 test_that("step by step create_model to submit_model to model_summary works", {
   # create model spec
-  spec1 <- create_model(
+  mod1 <- new_model(
     .yaml_path = yaml_ext(NEW_MOD1),
     .description = ORIG_DESC,
     .tags = ORIG_TAGS,
     .bbi_args = list(overwrite = TRUE, threads = 4)
   )
-  expect_identical(class(spec1), SPEC_CLASS_REF)
+  expect_identical(class(mod1), MODEL_CLASS_REF)
 
   # submit model
-  res1 <- submit_model(spec1, .mode = "local", .wait = FALSE)
-  expect_identical(class(res1), RES_CLASS_REF)
+  proc1 <- submit_model(mod1, .mode = "local", .wait = TRUE)
+  expect_identical(class(proc1), PROCESS_CLASS_REF)
 
-  # expect error on submit with no wait
-  expect_error(suppressWarnings(model_summary(res1, .wait = NULL)))
-
-  # Try to get a summary and wait if not finished.
-  throwaway_msg <- capture.output(
-    sum1 <- model_summary(res1)
-  )
+  # get summary from model object
+  Sys.sleep(3)
+  sum1 <- mod1 %>% model_summary()
   expect_identical(class(sum1), SUM_CLASS_REF)
   expect_identical(names(sum1), SUM_NAMES_REF)
 
+  # get summary from process object
+  sum2 <- proc1 %>% as_model %>% model_summary()
+  expect_identical(class(sum2), SUM_CLASS_REF)
+  expect_identical(names(sum2), SUM_NAMES_REF)
+
   # extract parameters table
-  par_df1 <- param_estimates(sum1)
   ref_df <- readRDS("data/acop_param_table_ref_200228.rds")
-  expect_identical(par_df1, ref_df)
+  par_df1 <- param_estimates(sum1); expect_identical(par_df1, ref_df) # from model object
+  par_df2 <- param_estimates(sum2); expect_identical(par_df2, ref_df) # from process object
 
 })
 
@@ -91,3 +96,5 @@ test_that("step by step create_model to submit_model to model_summary works", {
 # cleanup
 Sys.sleep(3) # wait for some NONMEM mess to delete itself
 cleanup()
+
+})

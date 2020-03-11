@@ -5,6 +5,8 @@
 
 # reference constants
 REF_SUMMARY_CALL <- as.character(glue("cd {getwd()}/model-examples/1 ; {getOption('rbabylon.bbi_exe_path')} nonmem summary 1 --json"))
+MOD_CLASS <- c("bbi_nonmem_model", "list")
+PROC_CLASS <- c("babylon_process", "list")
 
 .TEST_CASES_WD <- list(
   list(test_wd = ".",               test_yaml_path = "model-examples/1.yaml"),
@@ -23,49 +25,45 @@ for (.test_case in .TEST_CASES_WD) {
     withr::with_dir(.test_case$test_wd, {
       test_yaml_path <- .test_case$test_yaml_path
 
-      # load spec from yaml
-      this_spec <- create_model_from_yaml(.yaml_path = test_yaml_path)
+      # load model from yaml
+      this_mod <- read_model(.path = test_yaml_path)
 
       # check class and keys are right
-      expect_identical(class(this_spec), c("bbi_nonmem_spec", "list"))
-      expect_true(all(SPEC_REQ_KEYS %in% names(this_spec)))
+      expect_identical(class(this_mod), MOD_CLASS)
+      expect_true(all(MODEL_REQ_KEYS %in% names(this_mod)))
 
       # check the the model path parses correctly
-      this_mod_path <- file.path(this_spec[[WORKING_DIR]], this_spec[[YAML_MOD_PATH]])
+      this_mod_path <- file.path(this_mod[[WORKING_DIR]], this_mod[[YAML_MOD_PATH]])
       expect_true(fs::file_exists(this_mod_path))
 
       # dry run of model submission
       if (isTRUE(.test_case$change_midstream)) {
-        this_res <- withr::with_dir("..", { submit_model(this_spec, .dry_run = TRUE) })
+        this_proc <- withr::with_dir("..", { submit_model(this_mod, .dry_run = TRUE) })
       } else {
-        this_res <- submit_model(this_spec, .dry_run = TRUE)
+        this_proc <- submit_model(this_mod, .dry_run = TRUE)
       }
 
 
       # check class and keys are right
-      expect_identical(class(this_res), c("bbi_nonmem_result", "bbi_nonmem_spec", "list"))
-      expect_true(all(RESULT_REQ_KEYS %in% names(this_res)))
-
-      # check the the model path parses correctly
-      this_mod_path <- file.path(this_res[[WORKING_DIR]], this_res[[YAML_MOD_PATH]])
-      expect_true(fs::file_exists(this_mod_path))
+      expect_identical(class(this_proc), PROC_CLASS)
+      expect_true(all(PROCESS_REQ_KEYS %in% names(this_proc)))
 
       # check the call looks right
-      call_str <- unlist(stringr::str_split(this_res$call, " --"))[1]
-      res_str <- as.character(glue::glue("cd {this_res[[WORKING_DIR]]} ; {getOption('rbabylon.bbi_exe_path')} nonmem run sge {this_res[[YAML_MOD_PATH]]}"))
-      expect_identical(call_str, res_str)
+      call_str <- unlist(stringr::str_split(this_proc[[PROC_CALL]], " --"))[1]
+      proc_str <- as.character(glue::glue("cd {this_proc[[PROC_WD]]} ; {getOption('rbabylon.bbi_exe_path')} nonmem run sge {this_proc[[PROC_CMD_ARGS]][4]}"))
+      expect_identical(call_str, proc_str)
 
       # look for outputs
-      expect_identical(this_res[[YAML_OUT_DIR]], get_mod_id(test_yaml_path))
-      expect_true(fs::file_exists(build_path_from_res(this_res, "lst")))
-      expect_true(fs::file_exists(build_path_from_res(this_res, "ext")))
-      expect_true(fs::file_exists(build_path_from_res(this_res, "grd")))
+      expect_identical(this_mod[[YAML_OUT_DIR]], get_model_id(test_yaml_path))
+      expect_true(fs::file_exists(build_path_from_mod_obj(this_mod, "lst")))
+      expect_true(fs::file_exists(build_path_from_mod_obj(this_mod, "ext")))
+      expect_true(fs::file_exists(build_path_from_mod_obj(this_mod, "grd")))
 
       # dry run of summary call
       if (isTRUE(.test_case$change_midstream)) {
-        this_sum <- withr::with_dir("..", { model_summary(this_res, .dry_run = TRUE) })
+        this_sum <- withr::with_dir("..", { model_summary(this_mod, .dry_run = TRUE) })
       } else {
-        this_sum <- model_summary(this_res, .dry_run = TRUE)
+        this_sum <- model_summary(this_mod, .dry_run = TRUE)
       }
 
       # check the call looks right
@@ -81,11 +79,11 @@ for (.test_case in .TEST_CASES_WD) {
     withr::with_dir(.test_case$test_wd, {
       test_yaml_path <- .test_case$test_yaml_path
 
-      # load spec from yaml and dry run through to summary object
-      this_spec <- create_model_from_yaml(.yaml_path = test_yaml_path)
-      this_res <- submit_model(this_spec, .dry_run = TRUE)
-      this_sum <- model_summary(this_res, .dry_run = TRUE)
-      expect_identical(this_sum$call, REF_SUMMARY_CALL)
+      # load mod from yaml and dry run through to summary object
+      this_mod <- read_model(.path = test_yaml_path)
+      this_proc <- submit_model(this_mod, .dry_run = TRUE)
+      this_sum <- this_proc %>% as_model() %>% model_summary(.dry_run = TRUE)
+      expect_identical(this_sum[[PROC_CALL]], REF_SUMMARY_CALL)
 
       # check that summary call matches when generated with file path instead of object
       if (isTRUE(.test_case$change_midstream)) {

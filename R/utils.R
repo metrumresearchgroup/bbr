@@ -190,27 +190,29 @@ print_nonmem_args <- function() {
 
 
 #' Helper to strip path and extension from model file to get only model identifier
-#' @param .mod_path Character scaler model path to strip
+#' @param .mod generic model
 #' @importFrom tools file_path_sans_ext
 #' @returns Character scaler with only model identifier
-#' @rdname get_mod_id
+#' @rdname get_model_id
 #' @export
-get_mod_id <- function(.mod_path, ...) {
-  UseMethod("get_mod_id", .mod_path)
+get_model_id <- function(.mod) {
+  UseMethod("get_model_id")
 }
 
 # S3 dispatch to get model identifier from file path to model
-#' @rdname get_mod_id
+#' @param .mod Character scaler model path to strip
+#' @rdname get_model_id
 #' @export
-get_mod_id.character <- function(.mod_path) {
-  return(basename(tools::file_path_sans_ext(.mod_path)))
+get_model_id.character <- function(.mod) {
+  return(basename(tools::file_path_sans_ext(.mod)))
 }
 
-#' S3 dispatch to get model identifier from
-#' @rdname get_mod_id
+#' S3 dispatch to get model identifier from a `bbi_{.model_type}_model` object
+#' @param .mod The `bbi_{.model_type}_model` object
+#' @rdname get_model_id
 #' @export
-get_mod_id.bbi_nonmem_spec <- function(.res) {
-  return(basename(tools::file_path_sans_ext(.res[[YAML_MOD_PATH]])))
+get_model_id.bbi_nonmem_model <- function(.mod) {
+  return(basename(tools::file_path_sans_ext(.mod[[YAML_MOD_PATH]])))
 }
 
 
@@ -218,12 +220,10 @@ check_required_keys <- function(.list, .req) {
   all(.req %in% names(.list))
 }
 
-scaler_to_list <- function(.x) {
-  if (length(.x) == 1) {
-    .x <- (list(.x))
-  }
-  return(.x)
-}
+
+#####################
+# File path helpers
+#####################
 
 is_valid_nonmem_extension <- function(.path) {
   tools::file_ext(.path) %in% c("ctl", "mod")
@@ -249,13 +249,13 @@ yaml_ext <- function(.x) {
   sprintf("%s.yaml", tools::file_path_sans_ext(.x))
 }
 
-#' Builds the absolute path to file in the output directory from components of the `bbi_{.model_type}_res` object
-#' @param .res `bbi_{.model_type}_res` object
+#' Builds the absolute path to file in the output directory from components of the `bbi_{.model_type}_model` object
+#' @param .mod `bbi_{.model_type}_model` object
 #' @param .extension file extension to append (for example `lst`, `ext`, `grd`, etc.)
-build_path_from_res <- function(.res, .extension) {
-  ext_path <- file.path(.res[[WORKING_DIR]],
-                        .res[[YAML_OUT_DIR]],
-                        paste0(get_mod_id(.res[[YAML_MOD_PATH]]), ".", .extension))
+build_path_from_mod_obj <- function(.mod, .extension) {
+  ext_path <- file.path(.mod[[WORKING_DIR]],
+                        .mod[[YAML_OUT_DIR]],
+                        paste0(get_model_id(.mod[[YAML_MOD_PATH]]), ".", .extension))
   return(ext_path)
 }
 
@@ -288,44 +288,72 @@ get_path_from_object <- function(.bbi_object, .key) {
   return(file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[.key]]))
 }
 
-#' Returns the path to the model file from a `bbi_{.model_type}_spec` or `bbi_{.model_type}_result` object
-#' @param .spec The `bbi_...` S3 object
+#' Returns the path to the model file from a `bbi_{.model_type}_model` object
+#' @param .mod The `bbi_...` S3 object
 #' @export
 #' @rdname get_path_from_object
-get_model_path <- function(.spec) {
-  return(get_path_from_object(.spec, YAML_MOD_PATH))
+get_model_path <- function(.mod) {
+  return(get_path_from_object(.mod, YAML_MOD_PATH))
 }
 
-#' Returns the path to the model output directory from a `bbi_{.model_type}_result` object
-#' @param .res The `bbi_...` S3 object
+#' Returns the path to the model output directory from a `bbi_{.model_type}_model` object
+#' @param .mod The `bbi_...` S3 object
 #' @export
 #' @rdname get_path_from_object
-get_output_dir <- function(.res) {
-  return(get_path_from_object(.res, YAML_OUT_DIR))
+get_output_dir <- function(.mod) {
+  return(get_path_from_object(.mod, YAML_OUT_DIR))
 }
 
-#' Returns the path to the model file from a `bbi_{.model_type}_spec` or `bbi_{.model_type}_result` object
-#' @param .spec The `bbi_...` S3 object
+
+#' S3 generic to return the path to the YAML file
+#' @param .mod generic file path to check
 #' @param .check_exists Boolean for whether it will check if the file exists and error if it does not. True by default.
 #' @export
-#' @rdname get_path_from_object
-get_yaml_path <- function(.spec, .check_exists = TRUE) {
+#' @rdname get_yaml_path
+get_yaml_path <- function(.mod, .check_exists = TRUE) {
+  UseMethod("get_yaml_path")
+}
+
+
+#' S3 dispatch to return the path to the YAML file from a `bbi_nonmem_model` object
+#' @param .mod The `bbi_nonmem_model` S3 object
+#' @export
+#' @rdname get_yaml_path
+get_yaml_path.bbi_nonmem_model <- function(.mod, .check_exists = TRUE) {
   # check if file name was stored on load, otherwise infer from model file
-  if (is.null(.spec[[YAML_YAML_NAME]])) {
-    yaml_file <- .spec[[YAML_MOD_PATH]] %>% get_mod_id() %>% yaml_ext()
+  if (is.null(.mod[[YAML_YAML_NAME]])) {
+    yaml_file <- .mod[[YAML_MOD_PATH]] %>% get_model_id() %>% yaml_ext()
   } else {
-    yaml_file <- .spec[[YAML_YAML_NAME]]
+    yaml_file <- .mod[[YAML_YAML_NAME]]
   }
 
-  yaml_path <- file.path(.spec[[WORKING_DIR]], yaml_file)
-  if (.check_exists) {
-    if (!fs::file_exists(yaml_path)) {
-      stop(glue("Parsed YAML path {yaml_path} from .spec but no file exists at that location."))
-    }
-  }
+  yaml_path <- file.path(.mod[[WORKING_DIR]], yaml_file) %>% get_yaml_path(.check_exists = .check_exists)
   return(yaml_path)
 }
 
+
+#' S3 dispatch to return the path to the YAML file from a model path or output directory
+#' @param .mod The file path to convert to a YAML
+#' @export
+#' @rdname get_yaml_path
+get_yaml_path.character <- function(.mod, .check_exists = TRUE) {
+  # convert to .yaml extension
+  yaml_path <- .mod %>% yaml_ext()
+
+  # check that the YAML exists
+  if (isTRUE(.check_exists)) {
+    if (!fs::file_exists(yaml_path)) {
+      stop(glue("Inferred YAML path {yaml_path} but no file exists at that location. Use `read_model('path/to/yaml')` to explicitly create model object from YAML."))
+    }
+  }
+
+  return(yaml_path)
+}
+
+
+############################
+# Error handlers
+############################
 
 strict_mode_error <- function(err_msg) {
   if (isTRUE(getOption("rbabylon.strict"))) {
@@ -338,49 +366,3 @@ strict_mode_error <- function(err_msg) {
     ))
   }
 }
-
-
-#' Checks that object (list) has all the required elements to become an S3 object of class `bbi_{.model_type}_spec` and then, if it does, assigns the class.
-#' @param .mod_list The candidate list to assign the class to
-#' @param .model_type The type of model
-assign_spec_class <- function(.mod_list, .model_type) {
-  # check for required keys
-  if (!check_required_keys(.mod_list, .req = SPEC_REQ_KEYS)) {
-    err_msg <- paste0(
-      "Model object must have the following named elements to be converted to an S3 object of class `bbi_{.model_type}_spec`: `", paste(SPEC_REQ_KEYS, collapse=", "),
-      "` but the following keys are missing: `", paste(SPEC_REQ_KEYS[!(SPEC_REQ_KEYS %in% names(.mod_list))], collapse=", "),
-      "`\nObject has the following keys: ", paste(names(.mod_list), collapse=", ")
-    )
-    strict_mode_error(err_msg)
-  }
-
-  # assign class
-  class(.mod_list) <- c(as.character(glue("bbi_{.model_type}_spec")), class(.mod_list))
-
-  return(.mod_list)
-}
-
-
-#' Checks that object (list) has all the required elements to become an S3 object of class `bbi_{.model_type}_result` and then, if it does, assigns the class.
-#' @param .mod_list The candidate list to assign the class to
-#' @param .model_type The type of model
-assign_result_class <- function(.mod_list, .model_type) {
-  # check for required keys
-  if (!check_required_keys(.mod_list, .req = RESULT_REQ_KEYS)) {
-    err_msg <- paste0(
-      "Model object must have the following named elements to be converted to an S3 object of class `bbi_{.model_type}_result`: `", paste(RESULT_REQ_KEYS, collapse=", "),
-      "` but the following keys are missing: `", paste(RESULT_REQ_KEYS[!(RESULT_REQ_KEYS %in% names(.mod_list))], collapse=", "),
-      "`\nObject has the following keys: ", paste(names(.mod_list), collapse=", ")
-    )
-    strict_mode_error(err_msg)
-  }
-
-  # assign class
-  class(.mod_list) <- c(as.character(glue("bbi_{.model_type}_result")), class(.mod_list))
-
-  return(.mod_list)
-}
-
-
-
-

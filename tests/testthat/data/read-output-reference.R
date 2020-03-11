@@ -2,8 +2,8 @@
 
 OUTPUT_DIR <- "model-examples/1"
 
-# fake result object
-RES1 <- import_result(OUTPUT_DIR)
+# fake model object
+MOD1 <- read_model(OUTPUT_DIR)
 
 # .lst file
 LST_TEST_FILE <- "model-examples/1/1.lst"

@@ -117,17 +117,13 @@ test_that("combine_list_objects() correctly fails if .func_args isn't named", {
   LST_TEST_FILE
 )
 for (.tc in .test_cases) {
-  test_that(glue::glue("get_mod_id parses {.tc}"), {
-    expect_identical(get_mod_id(.tc), MOD_ID)
+  test_that(glue::glue("get_model_id parses {.tc}"), {
+    expect_identical(get_model_id(.tc), MOD_ID)
   })
 }
 
-test_that(glue::glue("get_mod_id parses spec object"), {
-  expect_identical(get_mod_id(SPEC1), MOD_ID)
-})
-
-test_that(glue::glue("get_mod_id parses res object"), {
-  expect_identical(get_mod_id(RES1), MOD_ID)
+test_that(glue::glue("get_model_id parses model object"), {
+  expect_identical(get_model_id(MOD1), MOD_ID)
 })
 
 test_that("is_valid_nonmem_extension() works", {
@@ -182,8 +178,8 @@ for (.tc in .test_cases) {
   EXT_TEST_FILE
 )
 for (.tc in .test_cases) {
-  test_that(glue::glue("build_path_from_res returns correct {tools::file_ext(.tc)}"), {
-    expect_identical(build_path_from_res(RES1, tools::file_ext(.tc)),
+  test_that(glue::glue("build_path_from_mod_obj returns correct {tools::file_ext(.tc)}"), {
+    expect_identical(build_path_from_mod_obj(MOD1, tools::file_ext(.tc)),
                      normalizePath(.tc))
   })
 }
@@ -210,22 +206,27 @@ test_that("find_model_file_path returns mod path when only path found", {
 
 
 test_that("get_path_from_object() builds the right path", {
-  expect_identical(get_path_from_object(SPEC1, YAML_MOD_PATH), normalizePath(CTL_TEST_FILE))
-  expect_identical(get_path_from_object(RES1 , YAML_MOD_PATH), normalizePath(CTL_TEST_FILE))
+  expect_identical(get_path_from_object(MOD1 , YAML_MOD_PATH), normalizePath(CTL_TEST_FILE))
 })
 
 test_that("get_model_path() builds the right path", {
-  expect_identical(get_model_path(SPEC1), normalizePath(CTL_TEST_FILE))
-  expect_identical(get_model_path(RES1 ), normalizePath(CTL_TEST_FILE))
+  expect_identical(get_model_path(MOD1), normalizePath(CTL_TEST_FILE))
 })
 
 test_that("get_output_dir() builds the right path", {
-  expect_identical(get_output_dir(RES1 ), normalizePath(OUTPUT_DIR))
+  expect_identical(get_output_dir(MOD1), normalizePath(OUTPUT_DIR))
 })
 
-test_that("get_yaml_path() builds the right path", {
-  expect_identical(get_yaml_path(SPEC1), normalizePath(YAML_TEST_FILE))
-  expect_identical(get_yaml_path(RES1 ), normalizePath(YAML_TEST_FILE))
+test_that("get_yaml_path() builds the right path from model object", {
+  expect_identical(get_yaml_path(MOD1), normalizePath(YAML_TEST_FILE))
+})
+
+test_that("get_yaml_path() builds the right path from model file", {
+  expect_identical(get_yaml_path(CTL_TEST_FILE), YAML_TEST_FILE)
+})
+
+test_that("get_yaml_path() builds the right path from output folder", {
+  expect_identical(get_yaml_path(OUTPUT_DIR), YAML_TEST_FILE)
 })
 
 test_that("get_yaml_path() builds the right path", {
@@ -234,70 +235,17 @@ test_that("get_yaml_path() builds the right path", {
   fs::file_copy(YAML_TEST_FILE, new_yaml)
   full_new_yaml_path <- normalizePath(new_yaml) # store the full path
 
-  # make a spec from it
-  new_spec <- create_model_from_yaml(new_yaml)
+  # make a model from it
+  new_mod <- read_model(new_yaml)
 
   # delete the underlying yaml
   fs::file_delete(new_yaml)
 
   # errors because it can't find the YAML
-  expect_error(get_yaml_path(new_spec))
+  expect_error(get_yaml_path(new_mod))
 
   # passes if you tell it not to look
-  expect_identical(get_yaml_path(new_spec, .check_exists = FALSE), full_new_yaml_path)
-})
-
-
-########################
-# assigning S3 classes
-########################
-
-test_that("assign_spec_class() correctly assigns class", {
-  .spec <- list()
-  .spec[[WORKING_DIR]] <- "naw"
-  .spec[[YAML_MOD_TYPE]] <- "naw"
-  .spec[[YAML_DESCRIPTION]] <- "naw"
-  .spec[[YAML_MOD_PATH]] <- "naw"
-  .spec[[YAML_BBI_ARGS]] <- "naw"
-  expect_false(SPEC_CLASS %in% class(.spec))
-  .spec <- assign_spec_class(.spec, "nonmem")
-  expect_true(SPEC_CLASS %in% class(.spec))
-})
-
-test_that("assign_spec_class() errors if keys are missing", {
-  .spec <- list()
-  .spec[[WORKING_DIR]] <- "naw"
-  .spec[[YAML_MOD_TYPE]] <- "naw"
-  #.spec[[YAML_DESCRIPTION]] <- "naw"
-  .spec[[YAML_MOD_PATH]] <- "naw"
-  .spec[[YAML_BBI_ARGS]] <- "naw"
-  expect_error(assign_spec_class(.spec, "nonmem"))
-})
-
-test_that("assign_result_class() correctly assigns class", {
-  .res <- list()
-  .res[[WORKING_DIR]] <- "naw"
-  .res[[YAML_MOD_TYPE]] <- "naw"
-  .res[[YAML_DESCRIPTION]] <- "naw"
-  .res[[YAML_MOD_PATH]] <- "naw"
-  .res[[YAML_BBI_ARGS]] <- "naw"
-  .res[[RES_CMD_ARGS]] <- "naw"
-  .res[[YAML_OUT_DIR]] <- "naw"
-  expect_false(RES_CLASS %in% class(.res))
-  .res <- assign_result_class(.res, "nonmem")
-  expect_true(RES_CLASS %in% class(.res))
-})
-
-test_that("assign_result_class() errors if keys are missing", {
-  .res <- list()
-  .res[[WORKING_DIR]] <- "naw"
-  .res[[YAML_MOD_TYPE]] <- "naw"
-  #.res[[YAML_DESCRIPTION]] <- "naw"
-  .res[[YAML_MOD_PATH]] <- "naw"
-  .res[[YAML_BBI_ARGS]] <- "naw"
-  .res[[RES_CMD_ARGS]] <- "naw"
-  .res[[YAML_OUT_DIR]] <- "naw"
-  expect_error(assign_result_class(.res, "nonmem"))
+  expect_identical(get_yaml_path(new_mod, .check_exists = FALSE), full_new_yaml_path)
 })
 
 
@@ -311,15 +259,6 @@ test_that("check_required_keys() works correctly", {
   expect_false(check_required_keys(list(hey = 1, aww = 2), req_keys))
 })
 
-test_that("scaler_to_list() works correctly", {
-  expect_identical(scaler_to_list(1), list(1))
-  expect_identical(scaler_to_list("a"), list("a"))
-  expect_identical(scaler_to_list(T), list(T))
-  expect_identical(scaler_to_list(c(1,2)), c(1,2))
-  expect_identical(scaler_to_list(c("a","b")), c("a","b"))
-  expect_identical(scaler_to_list(c(T,F)), c(T,F))
-  expect_identical(scaler_to_list(list("a",F)), list("a",F))
-})
 
 test_that("strict_mode_error() works correctly", {
   withr::with_options(list(rbabylon.strict = TRUE), {

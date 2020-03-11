@@ -4,40 +4,36 @@
 \alias{check_nonmem_table_output}
 \alias{check_grd}
 \alias{check_grd.character}
-\alias{check_grd.bbi_nonmem_result}
+\alias{check_grd.bbi_nonmem_model}
 \alias{check_ext}
 \alias{check_ext.character}
-\alias{check_ext.bbi_nonmem_result}
+\alias{check_ext.bbi_nonmem_model}
 \title{Checks nonmem output file that's a whitespace-delimited file (for instance .grd or .ext)}
 \usage{
 check_nonmem_table_output(.path, .x_var = NULL, .x_floor = NULL)
 
-check_grd(.x, ...)
+check_grd(.mod, .iter_floor = 0)
 
-\method{check_grd}{character}(.path, .iter_floor = 0)
+\method{check_grd}{character}(.mod, .iter_floor = 0)
 
-\method{check_grd}{bbi_nonmem_result}(.res, .iter_floor = 0)
+\method{check_grd}{bbi_nonmem_model}(.mod, .iter_floor = 0)
 
-check_ext(.x, ...)
+check_ext(.mod, .iter_floor = 0)
 
-\method{check_ext}{character}(.path, .iter_floor = 0)
+\method{check_ext}{character}(.mod, .iter_floor = 0)
 
-\method{check_ext}{bbi_nonmem_result}(.res, .iter_floor = 0)
+\method{check_ext}{bbi_nonmem_model}(.mod, .iter_floor = 0)
 }
 \arguments{
-\item{.path}{path to ext file}
+\item{.path}{Character scalar path to the gradient file}
 
 \item{.x_var}{name of variable to filter with `.x_floor`}
 
 \item{.x_floor}{Filters file to only rows with `.x_var` GREATER THAN this value.}
 
-\item{.x}{generic .x}
-
-\item{...}{args passed through}
+\item{.mod}{`bbi_nonmem_model` object}
 
 \item{.iter_floor}{Filters file to only rows with `ITERATION` GREATER THAN this value.}
-
-\item{.res}{`bbi_nonmem_result` object}
 }
 \description{
 Checks nonmem output file that's a whitespace-delimited file (for instance .grd or .ext)
