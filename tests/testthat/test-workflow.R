@@ -276,9 +276,52 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # re-save yaml
     save_mod_yaml(new_mod, fake_path)
 
-    # read it back in and check the keys
+    # read it back in and check that bbi_args are gone
     loaded_yaml <- readr::read_lines(fake_path)
-    expect_false(any(stringr::str_detect("bbi_args", loaded_yaml)))
+    expect_false(any(stringr::str_detect(YAML_BBI_ARGS, loaded_yaml)))
+
+    # cleanup
+    fs::file_delete(fake_path)
+  })
+
+
+  test_that("save_mod_yaml() saves tags as an array", {
+    # give fake path
+    fake_path <- "model-examples/fake.yaml"
+    expect_false(fs::file_exists(fake_path))
+
+    # make a spec
+    new_mod <- read_model(YAML_TEST_FILE)
+
+    # reset yaml path so that it's reconciles to fake path
+    new_mod[[YAML_YAML_NAME]] <- basename(fake_path)
+
+    # erase tags and re-save
+    new_mod[[YAML_TAGS]] <- NULL
+    save_mod_yaml(new_mod, fake_path)
+
+    # read it back in and check that tags are gone
+    loaded_yaml <- readr::read_lines(fake_path)
+    expect_false(any(stringr::str_detect(YAML_TAGS, loaded_yaml)))
+
+    # add a single tag
+    FAKE_TAG1 <- "naw1"
+    new_mod <- new_mod %>% add_tags(FAKE_TAG1)
+
+    # read it back in and check for new tag
+    loaded_yaml <- readr::read_lines(fake_path)
+    expect_true(any(stringr::str_detect(glue("{YAML_TAGS}:"), loaded_yaml)))
+    expect_true(any(stringr::str_detect(glue("- {FAKE_TAG1}"), loaded_yaml)))
+
+    # add a another tag
+    FAKE_TAG2 <- "naw2"
+    new_mod <- new_mod %>% add_tags(FAKE_TAG2)
+
+    # read it back in and check for new tags
+    loaded_yaml <- readr::read_lines(fake_path)
+    expect_true(any(stringr::str_detect(glue("{YAML_TAGS}:"), loaded_yaml)))
+    expect_true(any(stringr::str_detect(glue("- {FAKE_TAG1}"), loaded_yaml)))
+    expect_true(any(stringr::str_detect(glue("- {FAKE_TAG2}"), loaded_yaml)))
 
     # cleanup
     fs::file_delete(fake_path)

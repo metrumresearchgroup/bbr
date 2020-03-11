@@ -249,20 +249,27 @@ yaml_ext <- function(.x) {
   sprintf("%s.yaml", tools::file_path_sans_ext(.x))
 }
 
-#' Combine a directory and path
+#' Build absolute path from a directory and path
 #'
-#' Concatenates a directory and path, with some specific rules:
+#' Concatenates a directory and path, and uses normalizePath() to create an absolute path, with some specific rules:
 #' If .directory is NULL, set to working directory.
 #' If .path is an absolute path, ignore .directory and just return .path,
-#' otherwise return `file.path(.directory, .path)`
+#' otherwise return `file.path(.directory, .path)`.
+#' Also NOTE that `.directory` must point an already existing directory so that the absolute path can be reliably built.
 #' @param .directory Character scaler for the directory
 #' @param .path Character scaler for the path to the file (could be just the file name, or could be in a subdirectory)
 combine_directory_path <- function(.directory, .path) {
+  # If .directory is NULL, set to working directory
   if (is.null(.directory)) {
     .directory <- getwd()
   }
 
+  # If .path is an absolute path, ignore .directory
   if (!fs::is_absolute_path(.path)) {
+    # normalizePath and optionally check if it exists
+    .directory <- normalizePath(.directory, mustWork = TRUE)
+
+    # build file path
     .path <- file.path(.directory, .path)
   }
 
