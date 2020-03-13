@@ -8,6 +8,7 @@ test_that("create_model_object() correctly assigns class", {
   .mod <- list()
   .mod[[WORKING_DIR]] <- "naw"
   .mod[[YAML_YAML_NAME]] <- "naw"
+  .mod[[YAML_YAML_MD5]] <- "naw"
   .mod[[YAML_MOD_TYPE]] <- "nonmem"
   .mod[[YAML_DESCRIPTION]] <- "naw"
   .mod[[YAML_MOD_PATH]] <- "naw.ctl"
@@ -24,17 +25,19 @@ test_that("create_model_object() fails with non-valid model type", {
   .mod[[YAML_DESCRIPTION]] <- "naw"
   .mod[[YAML_MOD_PATH]] <- "naw.ctl"
   .mod[[YAML_OUT_DIR]] <- "naw"
-  expect_error(create_model_object(.mod))
+  expect_error(create_model_object(.mod), regexp = "Invalid model_type")
 })
 
 test_that("create_model_object() fails with non-valid model file extension", {
   .mod <- list()
   .mod[[WORKING_DIR]] <- "naw"
+  .mod[[YAML_YAML_NAME]] <- "naw"
+  .mod[[YAML_YAML_MD5]] <- "naw"
   .mod[[YAML_MOD_TYPE]] <- "nonmem"
   .mod[[YAML_DESCRIPTION]] <- "naw"
   .mod[[YAML_MOD_PATH]] <- "naw"
   .mod[[YAML_OUT_DIR]] <- "naw"
-  expect_error(create_model_object(.mod))
+  expect_error(create_model_object(.mod), regexp = "model_path defined in yaml at naw must have either a .ctl or .mod extension")
 })
 
 test_that("create_model_object() errors if keys are missing", {
@@ -42,9 +45,7 @@ test_that("create_model_object() errors if keys are missing", {
   .mod[[WORKING_DIR]] <- "naw"
   .mod[[YAML_MOD_TYPE]] <- "naw"
   #.mod[[YAML_DESCRIPTION]] <- "naw"
-  .mod[[YAML_MOD_PATH]] <- "naw"
-  .mod[[YAML_OUT_DIR]] <- "naw"
-  expect_error(create_model_object(.mod))
+  expect_error(create_model_object(.mod), regexp = "Model list must have keys")
 })
 
 test_that("create_process_object() correctly assigns class", {

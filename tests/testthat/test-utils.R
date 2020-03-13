@@ -236,7 +236,9 @@ test_that("get_yaml_path() builds the right path", {
   full_new_yaml_path <- normalizePath(new_yaml) # store the full path
 
   # make a model from it
-  new_mod <- read_model(new_yaml, .directory = NULL)
+  suppressSpecificWarning({
+    new_mod <- read_model(new_yaml, .directory = NULL)
+  }, .regexpr = "No model file found at.+\\.ctl")
 
   # delete the underlying yaml
   fs::file_delete(new_yaml)
@@ -292,3 +294,26 @@ test_that("strict_mode_error() works correctly", {
   })
 })
 
+
+test_that("suppressSpecificWarning() works", {
+  # make a new yaml
+  new_yaml <- "model-examples/2.yaml"
+  fs::file_copy(YAML_TEST_FILE, new_yaml)
+
+  # make a model from it and suppress the warning
+  suppressSpecificWarning({
+    new_mod <- read_model(new_yaml, .directory = NULL)
+  }, .regexpr = "No model file found at.+\\.ctl")
+  expect_true(check_required_keys(new_mod, .req = MODEL_REQ_INPUT_KEYS))
+
+  # make a model from it and expect the warning
+  expect_warning({
+    suppressSpecificWarning({
+      new_mod <- read_model(new_yaml, .directory = NULL)
+    }, .regexpr = "No model file found at.+\\.cl") # deleted the 't' so it won't catch it
+  }, .regexpr = "No model file found at.+\\.ctl")
+  expect_true(check_required_keys(new_mod, .req = MODEL_REQ_INPUT_KEYS))
+
+  # delete the underlying yaml
+  fs::file_delete(new_yaml)
+})

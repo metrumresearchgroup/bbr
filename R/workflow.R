@@ -410,12 +410,13 @@ copy_nonmem_model_from <- function(
     fs::file_copy(get_model_path(.parent_mod), get_model_path(.new_mod))
   }
 
-  # assign model class
-  .new_mod <- create_model_object(.new_mod)
-
   # write .new_mod out
   new_yaml_path <- yaml_ext(.new_model)
   save_model_yaml(.new_mod, .out_path = new_yaml_path)
+
+  # make list into S3 object
+  .new_mod[[YAML_YAML_MD5]] <- digest(file = new_yaml_path, algo = "md5")
+  .new_mod <- create_model_object(.new_mod)
 
   return(.new_mod)
 }

@@ -174,12 +174,15 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # create new model with args
     .test_yaml <- "model-examples/1.yaml"
     .test_path <- "model-examples/tmp.yaml"
-    mod1a <- new_model(
-      .yaml_path = .test_path,
-      .description = "original acop model",
-      .tags = c("acop tag", "other tag"),
-      .bbi_args = list(overwrite = TRUE, threads = 4)
-    )
+
+    suppressSpecificWarning({
+      mod1a <- new_model(
+        .yaml_path = .test_path,
+        .description = "original acop model",
+        .tags = c("acop tag", "other tag"),
+        .bbi_args = list(overwrite = TRUE, threads = 4)
+      )
+    }, "No model file found at.+\\.ctl")
 
     # read model from YAML
     mod1b <- read_model(.path = .test_yaml)
@@ -292,7 +295,9 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("yaml with no model path will return ctl", {
     .test_path <- "test-yaml/zz_pass_no_modpath"
-    .spec <- read_model(yaml_ext(.test_path))
+    suppressSpecificWarning({
+      .spec <- read_model(yaml_ext(.test_path))
+    }, .regexpr = "No model file found at.+\\.ctl")
     expect_identical(.spec[[YAML_MOD_PATH]], basename(ctl_ext(.test_path)))
   })
 
@@ -302,7 +307,9 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     fs::file_copy(YAML_TEST_FILE, new_yaml)
 
     # make a spec from it
-    new_mod <- read_model(new_yaml)
+    suppressSpecificWarning({
+      new_mod <- read_model(new_yaml)
+    }, .regexpr = "No model file found at.+\\.ctl")
 
     # delete the underlying yaml
     fs::file_delete(new_yaml)
@@ -424,11 +431,15 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("reconcile_yaml() pulls in new tags", {
     # make a new yaml
-    new_yaml <- yaml_ext(NEW_MOD2)
+    suppressSpecificWarning({
+      new_yaml <- yaml_ext(NEW_MOD2)
+    }, .regexpr = "No model file found at.+\\.ctl")
     fs::file_copy(YAML_TEST_FILE, new_yaml)
 
     # make a spec from it
-    new_mod <- read_model(new_yaml)
+    suppressSpecificWarning({
+      new_mod <- read_model(new_yaml)
+    }, .regexpr = "No model file found at.+\\.ctl")
     expect_identical(new_mod[[YAML_TAGS]], ORIG_TAGS)
 
     # add the tags to the yaml manually
@@ -438,7 +449,9 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     yaml::write_yaml(rogue_spec, new_yaml)
 
     # check the reconcile add the new tags
-    new_mod <- reconcile_yaml(new_mod)
+    suppressSpecificWarning({
+      new_mod <- reconcile_yaml(new_mod)
+    }, .regexpr = "No model file found at.+\\.ctl")
     expect_identical(new_mod[[YAML_TAGS]], c(ORIG_TAGS, NEW_TAGS))
 
     # cleanup
@@ -483,11 +496,15 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     fs::file_copy(YAML_TEST_FILE, new_yaml)
 
     # make a spec from it
-    new_mod <- read_model(new_yaml)
+    suppressSpecificWarning({
+      new_mod <- read_model(new_yaml)
+    }, .regexpr = "No model file found at.+\\.ctl")
     expect_identical(new_mod[[YAML_TAGS]], ORIG_TAGS)
 
     # modify the tags field
-    new_mod <- modify_model_field(new_mod, .field=YAML_TAGS, .value=NEW_TAGS)
+    suppressSpecificWarning({
+      new_mod <- modify_model_field(new_mod, .field=YAML_TAGS, .value=NEW_TAGS)
+    }, .regexpr = "No model file found at.+\\.ctl")
     expect_identical(new_mod[[YAML_TAGS]], c(ORIG_TAGS, NEW_TAGS))
 
     # check that the yaml was also modified
@@ -507,11 +524,15 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     fs::file_copy(YAML_TEST_FILE, new_yaml)
 
     # make a spec from it
-    new_mod <- read_model(new_yaml)
+    suppressSpecificWarning({
+      new_mod <- read_model(new_yaml)
+    }, .regexpr = "No model file found at.+\\.ctl")
     expect_identical(new_mod[[YAML_TAGS]], ORIG_TAGS)
 
     # check that .unique = FALSE turns off de-duping
-    new_mod <- modify_model_field(new_mod, .field=YAML_TAGS, .value=dupe_tags, .unique = FALSE)
+    suppressSpecificWarning({
+      new_mod <- modify_model_field(new_mod, .field=YAML_TAGS, .value=dupe_tags, .unique = FALSE)
+    }, .regexpr = "No model file found at.+\\.ctl")
     expect_identical(new_mod[[YAML_TAGS]], c(ORIG_TAGS, dupe_tags))
 
     # check that .unique = TRUE (default) correctly de-dupes
@@ -528,11 +549,15 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     fs::file_copy(YAML_TEST_FILE, new_yaml)
 
     # make a spec from it
-    new_mod <- read_model(new_yaml)
+    suppressSpecificWarning({
+      new_mod <- read_model(new_yaml)
+    }, .regexpr = "No model file found at.+\\.ctl")
     expect_identical(new_mod[[YAML_TAGS]], ORIG_TAGS)
 
     # test adding
-    new_mod <- add_tags(new_mod, NEW_TAGS)
+    suppressSpecificWarning({
+      new_mod <- add_tags(new_mod, NEW_TAGS)
+    }, .regexpr = "No model file found at.+\\.ctl")
     expect_identical(new_mod[[YAML_TAGS]], c(ORIG_TAGS, NEW_TAGS))
 
     # test_replacing
@@ -549,11 +574,15 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     fs::file_copy(YAML_TEST_FILE, new_yaml)
 
     # make a spec from it
-    new_mod <- read_model(new_yaml)
+    suppressSpecificWarning({
+      new_mod <- read_model(new_yaml)
+    }, .regexpr = "No model file found at.+\\.ctl")
     expect_null(new_mod[[YAML_DECISIONS]])
 
     # test adding
-    new_mod <- add_decisions(new_mod, NEW_TEXT1)
+    suppressSpecificWarning({
+      new_mod <- add_decisions(new_mod, NEW_TEXT1)
+    }, .regexpr = "No model file found at.+\\.ctl")
     expect_identical(new_mod[[YAML_DECISIONS]], NEW_TEXT1)
     new_mod <- add_decisions(new_mod, NEW_TEXT2)
     expect_identical(new_mod[[YAML_DECISIONS]], c(NEW_TEXT1, NEW_TEXT2))
@@ -572,11 +601,15 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     fs::file_copy(YAML_TEST_FILE, new_yaml)
 
     # make a spec from it
-    new_mod <- read_model(new_yaml)
+    suppressSpecificWarning({
+      new_mod <- read_model(new_yaml)
+    }, .regexpr = "No model file found at.+\\.ctl")
     expect_identical(new_mod[[YAML_DESCRIPTION]], ORIG_DESC)
 
     # test_replacing
-    new_mod <- replace_description(new_mod, NEW_DESC)
+    suppressSpecificWarning({
+      new_mod <- replace_description(new_mod, NEW_DESC)
+    }, .regexpr = "No model file found at.+\\.ctl")
     expect_identical(new_mod[[YAML_DESCRIPTION]], NEW_DESC)
 
     # cleanup

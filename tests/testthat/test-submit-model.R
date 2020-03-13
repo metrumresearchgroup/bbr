@@ -45,9 +45,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
               })
             })
 
+
   test_that("submit_model(.dry_run=T) with .ctl input parses correctly",
             {
-              # basic defaults
+              # error if YAML exists
               withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
                 expect_error(
                   submit_model(MODEL_PATH, .dry_run = T)[[PROC_CALL]],
@@ -56,6 +57,25 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
                 # copy to a different name and try it
                 new_mod_path <- stringr::str_replace(MODEL_PATH, "1", "2")
+                fs::file_copy(MODEL_PATH, new_mod_path)
+
+                expect_identical(
+                  submit_model(new_mod_path, .dry_run = T)[[PROC_CALL]],
+                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {basename(new_mod_path)}"))
+                )
+
+                # cleanup
+                fs::file_delete(new_mod_path)
+                fs::file_delete(yaml_ext(new_mod_path))
+              })
+            })
+
+
+  test_that("submit_model(.dry_run=T) with .mod input parses correctly",
+            {
+              withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
+                # copy to a .mod extensions
+                new_mod_path <- stringr::str_replace(MODEL_PATH, "1.ctl", "2.mod")
                 fs::file_copy(MODEL_PATH, new_mod_path)
 
                 expect_identical(
@@ -90,6 +110,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
             })
 
 }) # closing withr::with_options
+
 
 withr::with_options(list(rbabylon.model_directory = "model-examples"), {
   test_that("submit_model(.dry_run=T) with numeric input parses correctly",

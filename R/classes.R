@@ -21,10 +21,10 @@ create_model_object <- function(.mod_list) {
     stop(glue("Invalid {YAML_MOD_TYPE} `{.model_type}`. Valid options include: `{SUPPORTED_MOD_TYPES}`"))
   }
 
-  # by default, if no model defined, will set it to the yaml file name with extension ctl
+  # by default, if no model defined, will use the YAML path to look for a model and set to .ctl if none found
   if (is.null(.mod_list[[YAML_MOD_PATH]])) {
     if (!is.null(.mod_list[[YAML_YAML_NAME]])) {
-      .mod_list[[YAML_MOD_PATH]] <- ctl_ext(.mod_list[[YAML_YAML_NAME]])
+      .mod_list[[YAML_MOD_PATH]] <- file.path(.mod_list[[WORKING_DIR]], .mod_list[[YAML_YAML_NAME]]) %>% find_model_file_path()
     } else {
       stop("Must specify either a YAML_MOD_PATH or YAML_YAML_NAME to create a model. User should never see this error.")
     }
