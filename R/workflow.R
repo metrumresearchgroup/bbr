@@ -586,8 +586,13 @@ replace_description <- function(.mod, .description) {
 #'
 #' Helper function that tries to call `read_model()` on a yaml path and returns NULL, with no error, if the YAML is not a valid model file.
 #' @param .yaml_path Path to read model from
+#' @param .directory Model directory which `.yaml_path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
 #' @importFrom stringr str_detect
-safe_read_model <- function(.yaml_path) {
+safe_read_model <- function(.yaml_path, .directory = getOption("rbabylon.model_directory")) {
+  # check for .directory and combine with .yaml_path
+  .yaml_path <- combine_directory_path(.directory, .yaml_path)
+
+  # try to read in model
   .mod <- tryCatch(read_model(.yaml_path),
                    error = function(e) {
                      if (stringr::str_detect(e$message, "Model yaml must have keys")) {
@@ -624,7 +629,7 @@ run_log <- function(
   yaml_files <- .base_dir %>% dir_ls(recurse = .recurse) %>% str_subset("\\.ya?ml$") %>% str_subset("babylon\\.yaml$", negate = TRUE)
 
   # read in all candidate yaml's
-  all_yaml <- map(yaml_files, safe_read_model)
+  all_yaml <- map(yaml_files, safe_read_model, .directory = NULL)
 
   # filter to only model yaml's
   not_mod_bool <- map_lgl(all_yaml, is.null)

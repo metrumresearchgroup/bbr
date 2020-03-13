@@ -4,10 +4,12 @@
 \alias{safe_read_model}
 \title{Read in model YAML with error handling}
 \usage{
-safe_read_model(.yaml_path)
+safe_read_model(.yaml_path, .directory = getOption("rbabylon.model_directory"))
 }
 \arguments{
 \item{.yaml_path}{Path to read model from}
+
+\item{.directory}{Model directory which `.yaml_path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
 }
 \description{
 Helper function that tries to call `read_model()` on a yaml path and returns NULL, with no error, if the YAML is not a valid model file.

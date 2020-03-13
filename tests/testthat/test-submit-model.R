@@ -1,9 +1,9 @@
 context("submit_model(.dry_run=T)")
 
+MODEL_DIR <- "model-examples"
 MODEL_FILE <- "1.ctl"
 MODEL_YAML <- yaml_ext(MODEL_FILE)
 YAML_PATH <- file.path(MODEL_DIR, MODEL_YAML)
-MODEL_DIR <- "model-examples"
 MODEL_PATH <- file.path(MODEL_DIR, MODEL_FILE)
 MODEL_ABS_PATH <- file.path(getwd(), MODEL_DIR, MODEL_FILE)
 
