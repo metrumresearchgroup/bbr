@@ -15,6 +15,7 @@
 #' @param .model_type Character scaler to specify type of model being created (used for S3 class). Currently only `'nonmem'` is supported.
 #' @param .directory Model directory which `.yaml_path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
 #' @importFrom yaml write_yaml
+#' @importFrom fs file_exists
 #' @return S3 object of class `bbi_{.model_type}_model` that can be passed to `submit_model()`, `model_summary()`, etc.
 #' @export
 new_model <- function(
@@ -36,6 +37,12 @@ new_model <- function(
   # check for .directory and combine with .yaml_path
   .yaml_path <- combine_directory_path(.directory, .yaml_path)
 
+  # check if file already exists
+  if (fs::file_exists(.yaml_path)) {
+    stop(paste(glue("Passed {.yaml_path} to `new_model(.yaml_path)` but that file already exists."),
+               "Either call `read_model()` to load model from YAML or delete the YAML file and try `new_model()` call again."))
+  }
+
   # fill list from passed args
   .mod <- list()
   .mod[[WORKING_DIR]] <- normalizePath(dirname(.yaml_path))
@@ -47,11 +54,12 @@ new_model <- function(
   if (!is.null(.tags)) .mod[[YAML_TAGS]] <- .tags
   if (!is.null(.bbi_args)) .mod[[YAML_BBI_ARGS]] <- .bbi_args
 
-  # make list into S3 object
-  .mod <- create_model_object(.mod)
-
   # write YAML to disk
   save_model_yaml(.mod, .out_path = .yaml_path)
+
+  # make list into S3 object
+  .mod[[YAML_YAML_MD5]] <- digest(file = .yaml_path, algo = "md5")
+  .mod <- create_model_object(.mod)
 
   return(.mod)
 }
@@ -64,6 +72,7 @@ new_model <- function(
 #' @param .path Path to the YAML file to parse. MUST be either an absolute path, or a path relative to the `.directory` argument.
 #' @param .directory Model directory which `.path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
 #' @importFrom yaml read_yaml
+#' @importFrom digest digest
 #' @importFrom fs file_exists
 #' @return S3 object of class `bbi_{.model_type}_model`
 #' @rdname read_model
@@ -85,6 +94,7 @@ read_model <- function(
   yaml_list <- read_yaml(.path)
   yaml_list[[WORKING_DIR]] <- normalizePath(dirname(.path))
   yaml_list[[YAML_YAML_NAME]] <- basename(.path)
+  yaml_list[[YAML_YAML_MD5]] <- digest(file = .path, algo = "md5")
 
   # parse model path
   if (!check_required_keys(yaml_list, .req = YAML_REQ_INPUT_KEYS)) {
@@ -415,15 +425,29 @@ copy_nonmem_model_from <- function(
 # Modifying models
 #####################
 
+#' Reconcile model object with YAML file
+#'
+#' Extracts YAML path from model object and pulls in YAML file.
+#' Any shared keys are overwritten with the values from the YAML and new keys in YAML are added to the model object.
+#' @param .mod `bbi_{.model_type}_model` object
+#' @rdname reconcile_yaml
+#' @export
+reconcile_yaml <- function(.mod) {
 
-reconcile_mod_yaml <- function(.mod, .yaml_path) {
+  # extract path to yaml
+  .yaml_path <- get_yaml_path(.mod)
+
   # load model from yaml on disk
   .loaded_mod <- read_model(.yaml_path)
 
   # overwrite values in memory from the ones on disk
   .new_mod <- combine_list_objects(.loaded_mod, .mod)
+
   return(.new_mod)
 }
+
+
+#' Checks that model YAML file is the same as when it was last read into the model object
 
 
 #' Modify field in model object
@@ -437,11 +461,9 @@ reconcile_mod_yaml <- function(.mod, .yaml_path) {
 #' @param .unique Boolean for whether to de-duplicate `.mod[[.field]]` after adding new values. TRUE by default.
 #' @rdname modify_model_field
 modify_model_field <- function(.mod, .field, .value, .append = TRUE, .unique = TRUE) {
-  # extract path to yaml
-  .yaml_path <- get_yaml_path(.mod)
 
   # update .mod with any changes from yaml on disk
-  .mod <- reconcile_mod_yaml(.mod, .yaml_path)
+  .mod <- reconcile_yaml(.mod)
 
   # Either append new value or overwrite with new value
   if (isTRUE(.append)) {
@@ -456,7 +478,7 @@ modify_model_field <- function(.mod, .field, .value, .append = TRUE, .unique = T
   }
 
   # overwrite the yaml on disk with modified model
-  save_model_yaml(.mod, .yaml_path)
+  save_model_yaml(.mod)
 
   return(.mod)
 }

@@ -7,6 +7,7 @@ PROC_CLASS <- "babylon_process"
 test_that("create_model_object() correctly assigns class", {
   .mod <- list()
   .mod[[WORKING_DIR]] <- "naw"
+  .mod[[YAML_YAML_NAME]] <- "naw"
   .mod[[YAML_MOD_TYPE]] <- "nonmem"
   .mod[[YAML_DESCRIPTION]] <- "naw"
   .mod[[YAML_MOD_PATH]] <- "naw.ctl"

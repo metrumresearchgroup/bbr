@@ -36,6 +36,7 @@ NONMEM_ARGS = list(
 # YAML keys that are hard-coded
 YAML_MOD_PATH <- "model_path"
 YAML_YAML_NAME <- "orig_yaml_file"
+YAML_YAML_MD5 <- "yaml_md5"
 YAML_DESCRIPTION <- "description"
 YAML_BASED_ON <- "based_on"
 YAML_TAGS <- "tags"
@@ -61,6 +62,8 @@ MODEL_REQ_INPUT_KEYS <- c(
 # keys required for a model object to have
 MODEL_REQ_KEYS <- c(
   WORKING_DIR,
+  YAML_YAML_NAME,
+  #YAML_YAML_MD5,
   YAML_MOD_TYPE,
   YAML_DESCRIPTION,
   YAML_MOD_PATH,
@@ -72,6 +75,7 @@ MODEL_REQ_KEYS <- c(
 YAML_ERASE_OUT_KEYS <- c(
   WORKING_DIR,
   YAML_YAML_NAME,
+  YAML_YAML_MD5,
   YAML_OUT_DIR
 )
 

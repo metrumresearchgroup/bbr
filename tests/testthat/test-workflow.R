@@ -191,10 +191,13 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     for (k in MODEL_REQ_KEYS) {
       if (k == YAML_MOD_PATH) {
         expect_identical(mod1a[[k]], basename(ctl_ext(.test_path)))
-        expect_identical(mod1b[[k]], "1.ctl")
+        expect_identical(mod1b[[k]], basename(ctl_ext(.test_yaml)))
       } else if (k == YAML_OUT_DIR) {
         expect_identical(mod1a[[k]], basename(tools::file_path_sans_ext(.test_path)))
-        expect_identical(mod1b[[k]], "1")
+        expect_identical(mod1b[[k]], basename(tools::file_path_sans_ext(.test_yaml)))
+      } else if (k == YAML_YAML_NAME) {
+        expect_identical(mod1a[[k]], basename(yaml_ext(.test_path)))
+        expect_identical(mod1b[[k]], basename(yaml_ext(.test_yaml)))
       } else {
         expect_equal(mod1a[[k]], mod1b[[k]])
       }
@@ -231,10 +234,13 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
       for (k in MODEL_REQ_KEYS) {
         if (k == YAML_MOD_PATH) {
           expect_identical(mod1a[[k]], basename(ctl_ext(.test_path)))
-          expect_identical(mod1b[[k]], "1.ctl")
+          expect_identical(mod1b[[k]], basename(ctl_ext(.test_yaml)))
         } else if (k == YAML_OUT_DIR) {
           expect_identical(mod1a[[k]], basename(tools::file_path_sans_ext(.test_path)))
-          expect_identical(mod1b[[k]], "1")
+          expect_identical(mod1b[[k]], basename(tools::file_path_sans_ext(.test_yaml)))
+        } else if (k == YAML_YAML_NAME) {
+          expect_identical(mod1a[[k]], basename(yaml_ext(.test_path)))
+          expect_identical(mod1b[[k]], basename(yaml_ext(.test_yaml)))
         } else {
           expect_equal(mod1a[[k]], mod1b[[k]])
         }
@@ -262,9 +268,12 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
         threads = 4L),
       orig_working_dir = file.path(getwd(), "model-examples"),
       orig_yaml_file ="1.yaml",
+      yaml_md5 = "15a2315d8eff6383341ceac1e10d6b8d",
       output_dir = "1"
     )
     class(ref_list) <- MODEL_CLASS_LIST
+
+    # check against ref
     expect_equal(read_model("model-examples/1.yaml"), ref_list)
   })
 
@@ -409,7 +418,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
 
-  test_that("reconcile_mod_yaml() pulls in new tags", {
+  test_that("reconcile_yaml() pulls in new tags", {
     # make a new yaml
     new_yaml <- yaml_ext(NEW_MOD2)
     fs::file_copy(YAML_TEST_FILE, new_yaml)
@@ -421,10 +430,11 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # add the tags to the yaml manually
     rogue_spec <- yaml::read_yaml(new_yaml)
     rogue_spec[[YAML_TAGS]] <- c(rogue_spec[[YAML_TAGS]], NEW_TAGS)
+    rogue_spec[[YAML_YAML_NAME]] <- new_yaml
     yaml::write_yaml(rogue_spec, new_yaml)
 
     # check the reconcile add the new tags
-    new_mod <- reconcile_mod_yaml(new_mod, new_yaml)
+    new_mod <- reconcile_yaml(new_mod)
     expect_identical(new_mod[[YAML_TAGS]], c(ORIG_TAGS, NEW_TAGS))
 
     # cleanup

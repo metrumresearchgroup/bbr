@@ -115,6 +115,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
 
     # add config log
     log_df <- log_df %>% add_config()
+    View(log_df)
     expect_equal(nrow(log_df), 2)
     expect_equal(ncol(log_df), 12)
     expect_false(any(is.null(log_df$data_md5)))
