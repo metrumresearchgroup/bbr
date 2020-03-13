@@ -9,8 +9,7 @@
 \alias{add_based_on}
 \alias{replace_based_on}
 \alias{replace_description}
-\title{Checks that model YAML file is the same as when it was last read into the model object
-Modify field in model object}
+\title{Modify field in model object}
 \usage{
 modify_model_field(.mod, .field, .value, .append = TRUE, .unique = TRUE)
 

@@ -448,8 +448,29 @@ reconcile_yaml <- function(.mod) {
 }
 
 
-#' Checks that model YAML file is the same as when it was last read into the model object
+#' Check model against YAML
+#'
+#' Checks that model YAML file is the same as when it was last read into the model object.
+#' Errors if the md5 hashes are not identical.
+#' @importFrom digest digest
+#' @param .mod `bbi_{.model_type}_model` object
+#' @rdname reconcile_yaml
+#' @export
+check_yaml_in_sync <- function(.mod) {
+  # get md5 of current YAML on disk
+  .yaml_file <- get_yaml_path(.mod)
+  current_md5 <- digest(file = .yaml_file, algo = "md5")
 
+  # check against md5 stored on load
+  if (current_md5 != .mod[[YAML_YAML_MD5]]) {
+    check_yaml_err_msg <- paste(glue("Model NOT in sync with corresponding YAML file {.yaml_file}"),
+                                "User can call `mod <- reconcile_yaml(mod)` to pull in updates from the YAML on disk.",
+                                "NOTE: This can be caused by modifying the object without reassigning for instance calling `mod %>% add_tags(...)` instead of `mod <- mod %>% add_tags(...)`.",
+                                "Users should avoid this pattern or this error will be generated the next time this model object is passed to a function.",
+                                sep = "\n")
+    strict_mode_error(check_yaml_err_msg)
+  }
+}
 
 #' Modify field in model object
 #'
