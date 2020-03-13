@@ -582,6 +582,24 @@ replace_description <- function(.mod, .description) {
 # Generating run logs
 #######################
 
+#' Read in model YAML with error handling
+#'
+#' Helper function that tries to call `read_model()` on a yaml path and returns NULL, with no error, if the YAML is not a valid model file.
+#' @param .yaml_path Path to read model from
+#' @importFrom stringr str_detect
+safe_read_model <- function(.yaml_path) {
+  .mod <- tryCatch(read_model(.yaml_path),
+                   error = function(e) {
+                     if (stringr::str_detect(e$message, "Model yaml must have keys")) {
+                       return(NULL)
+                     } else {
+                       stop(glue("Unexpected error trying to read yaml `{.yaml_path}`: {e$message}"))
+                     }
+                   })
+  return(.mod)
+}
+
+
 #' Parses model yaml and outputs into a tibble that serves as a run log. Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
 #' @param .base_dir Directory to search for model yaml files. Only runs with a corresponding yaml will be included.
 #' @param .recurse Boolean for whether to search subdirectories recursively for additional yaml files. Defaults to TRUE.
@@ -606,15 +624,15 @@ run_log <- function(
   yaml_files <- .base_dir %>% dir_ls(recurse = .recurse) %>% str_subset("\\.ya?ml$") %>% str_subset("babylon\\.yaml$", negate = TRUE)
 
   # read in all candidate yaml's
-  all_yaml <- map(yaml_files, function(.x) {read_yaml(.x)})
+  all_yaml <- map(yaml_files, safe_read_model)
 
   # filter to only model yaml's
-  mod_yaml_bool <- map_lgl(all_yaml, function(.x) {check_required_keys(.x, .req = YAML_REQ_INPUT_KEYS)})
-  not_mod <- yaml_files[!mod_yaml_bool]
+  not_mod_bool <- map_lgl(all_yaml, is.null)
+  not_mod <- yaml_files[which(not_mod_bool)]
   if (length(not_mod) > 0) {
     warning(glue("Found {length(not_mod)} YAML files that do not contain required keys for a model YAML. Ignoring the following files: `{paste(not_mod, collapse='`, `')}`"))
   }
-  mod_yaml <- all_yaml[which(mod_yaml_bool)]
+  mod_yaml <- all_yaml[!not_mod_bool]
 
   # stop if no valid model YAML found
   if (length(mod_yaml) == 0) {
@@ -628,9 +646,6 @@ run_log <- function(
     mutate_at(c(YAML_MOD_PATH, YAML_DESCRIPTION, YAML_MOD_TYPE), unlist) %>%
     mutate(run_id = get_model_id(.data[[YAML_MOD_PATH]])) %>%
     select(.data$run_id, everything())
-
-  # add yaml path
-  df$yaml_path <- yaml_files[mod_yaml_bool]
 
   class(df) <- c("bbi_nonmem_summary_df", class(df))
   return(df)
