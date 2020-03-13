@@ -257,9 +257,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     new_mod[[YAML_TAGS]] <- NULL
     save_model_yaml(new_mod, fake_path)
 
-    # read it back in and check that tags are gone
+    # read it back in and check that tags are gone, then reconcile
     loaded_yaml <- readr::read_lines(fake_path)
     expect_false(any(stringr::str_detect(YAML_TAGS, loaded_yaml)))
+    new_mod <- reconcile_yaml(new_mod)
 
     # add a single tag
     FAKE_TAG1 <- "naw1"
@@ -283,7 +284,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # cleanup
     fs::file_delete(fake_path)
   })
-
 
   test_that("reconcile_yaml() pulls in new tags", {
     # make a new yaml
@@ -650,6 +650,126 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
       new_mod <- replace_description(new_mod, NEW_DESC)
     }, .regexpr = "No model file found at.+\\.ctl")
     expect_identical(new_mod[[YAML_DESCRIPTION]], NEW_DESC)
+
+    # cleanup
+    fs::file_delete(new_yaml)
+  })
+
+
+  test_that("add_tags etc. can be chained", {
+    # make a new yaml
+    new_yaml <- yaml_ext(NEW_MOD2)
+    fs::file_copy(YAML_TEST_FILE, new_yaml)
+
+    # make a spec from it
+    suppressSpecificWarning({
+      new_mod <- read_model(new_yaml)
+    }, .regexpr = "No model file found at.+\\.ctl")
+    expect_identical(new_mod[[YAML_DESCRIPTION]], ORIG_DESC)
+
+    # test adding and replacing
+    suppressSpecificWarning({
+      new_mod <- new_mod %>%
+                 add_tags(NEW_TAGS) %>%
+                 add_decisions(NEW_TEXT1) %>%
+                 replace_description(NEW_DESC)
+    }, .regexpr = "No model file found at.+\\.ctl")
+
+    expect_identical(new_mod[[YAML_TAGS]], c(ORIG_TAGS, NEW_TAGS))
+    expect_identical(new_mod[[YAML_DECISIONS]], NEW_TEXT1)
+    expect_identical(new_mod[[YAML_DESCRIPTION]], NEW_DESC)
+
+    # cleanup
+    fs::file_delete(new_yaml)
+  })
+
+
+  ####################################################
+  # check_yaml_in_sync gets triggered when it should
+  ####################################################
+
+  test_that("add_tags fails if it wasn't re-assigned previously (testing check_yaml_in_sync)", {
+    # make a new yaml
+    new_yaml <- yaml_ext(NEW_MOD2)
+    fs::file_copy(YAML_TEST_FILE, new_yaml)
+
+    # make a spec from it
+    suppressSpecificWarning({
+      new_mod <- read_model(new_yaml)
+    }, .regexpr = "No model file found at.+\\.ctl")
+
+    # test adding with assignment
+    suppressSpecificWarning({
+      new_mod <- new_mod %>% add_tags(NEW_TAGS)
+    }, .regexpr = "No model file found at.+\\.ctl")
+    expect_identical(new_mod[[YAML_TAGS]], c(ORIG_TAGS, NEW_TAGS))
+
+    # add without assignment (so YAML gets out of sync)
+    new_mod %>% add_decisions(NEW_TEXT1)
+    expect_null(new_mod[[YAML_DECISIONS]])
+
+    # try to add more and get error
+    expect_error(new_mod %>% replace_description(NEW_DESC), regexp = "Model NOT in sync with corresponding YAML file")
+
+    # cleanup
+    fs::file_delete(new_yaml)
+  })
+
+  test_that("submit_model() fails YAML out of sync (testing check_yaml_in_sync)", {
+    # make a new yaml
+    new_yaml <- yaml_ext(NEW_MOD2)
+    fs::file_copy(YAML_TEST_FILE, new_yaml)
+
+    # make a spec from it
+    suppressSpecificWarning({
+      new_mod <- read_model(new_yaml)
+    }, .regexpr = "No model file found at.+\\.ctl")
+
+    # add some garbage (so YAML gets out of sync)
+    readr::write_lines("naw: dawg", new_yaml, append = TRUE)
+
+    # try to submit_model and get error
+    expect_error(submit_model(new_mod, .dry_run = T), regexp = "Model NOT in sync with corresponding YAML file")
+
+    # cleanup
+    fs::file_delete(new_yaml)
+  })
+
+  test_that("model_summary() fails YAML out of sync (testing check_yaml_in_sync)", {
+    # make a new yaml
+    new_yaml <- yaml_ext(NEW_MOD2)
+    fs::file_copy(YAML_TEST_FILE, new_yaml)
+
+    # make a spec from it
+    suppressSpecificWarning({
+      new_mod <- read_model(new_yaml)
+    }, .regexpr = "No model file found at.+\\.ctl")
+
+    # add some garbage (so YAML gets out of sync)
+    readr::write_lines("naw: dawg", new_yaml, append = TRUE)
+
+    # try to submit_model and get error
+    expect_error(model_summary(new_mod, .dry_run = T), regexp = "Model NOT in sync with corresponding YAML file")
+
+    # cleanup
+    fs::file_delete(new_yaml)
+  })
+
+  test_that("copy_model_from() fails YAML out of sync (testing check_yaml_in_sync)", {
+    # make a new yaml
+    new_yaml <- yaml_ext(NEW_MOD2)
+    fs::file_copy(YAML_TEST_FILE, new_yaml)
+
+    # make a spec from it
+    suppressSpecificWarning({
+      new_mod <- read_model(new_yaml)
+    }, .regexpr = "No model file found at.+\\.ctl")
+
+    # add some garbage (so YAML gets out of sync)
+    readr::write_lines("naw: dawg", new_yaml, append = TRUE)
+
+    # try to submit_model and get error
+    expect_error(copy_model_from(new_mod, "naw", "dawg"), regexp = "Model NOT in sync with corresponding YAML file")
 
     # cleanup
     fs::file_delete(new_yaml)

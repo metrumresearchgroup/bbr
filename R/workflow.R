@@ -346,7 +346,7 @@ copy_nonmem_model_from <- function(
   .inherit_tags = FALSE,
   .update_mod_file = TRUE
 ) {
-  # Check model for correct class and then copy it
+  # Check model for correct class
   if (!("bbi_nonmem_model" %in% class(.parent_mod))) {
     stop(paste(
       "copy_nonmem_model_from() requires a model object of class `bbi_nonmem_model`. Passed object has the following classes:",
@@ -354,6 +354,9 @@ copy_nonmem_model_from <- function(
       "Consider creating a model with `new_model()` or `read_model()`",
       sep = "\n"))
   }
+
+  # check parent against YAML
+  check_yaml_in_sync(.parent_mod)
 
   # build new model object
   .new_mod <- list()
@@ -475,7 +478,7 @@ check_yaml_in_sync <- function(.mod) {
 #' Modify field in model object
 #'
 #' Implementation function for updating fields in a `bbi_{.model_type}_model` object
-#' Also reconciles the object with the corresponding YAML before modifying and then writes the modified object back to the YAML
+#' Also checks the object against the corresponding YAML before modifying (and errors if they are out of sync) and then writes the modified object back to the YAML.
 #' @param .mod The `bbi_{.model_type}_model` object to modify
 #' @param .field Character scaler of the name of the component to modify
 #' @param .value Whatever is to be added to `.mod[[.field]]`, typically a character scaler or vector
@@ -485,7 +488,7 @@ check_yaml_in_sync <- function(.mod) {
 modify_model_field <- function(.mod, .field, .value, .append = TRUE, .unique = TRUE) {
 
   # update .mod with any changes from yaml on disk
-  .mod <- reconcile_yaml(.mod)
+  check_yaml_in_sync(.mod)
 
   # Either append new value or overwrite with new value
   if (isTRUE(.append)) {
@@ -501,6 +504,9 @@ modify_model_field <- function(.mod, .field, .value, .append = TRUE, .unique = T
 
   # overwrite the yaml on disk with modified model
   save_model_yaml(.mod)
+
+  # refresh md5 hash in model object
+  .mod[[YAML_YAML_MD5]] <- digest(file = get_yaml_path(.mod), algo = "md5")
 
   return(.mod)
 }

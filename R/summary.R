@@ -144,6 +144,9 @@ nonmem_summary <- function(
   .dry_run = FALSE
 ) {
 
+  # check against YAML
+  check_yaml_in_sync(.mod)
+
   # extract output path
   .path <- file.path(.mod[[WORKING_DIR]], .mod[[YAML_OUT_DIR]])
 
