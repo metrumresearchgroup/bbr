@@ -1,6 +1,6 @@
 kind: pipeline
 type: docker
-name: pmplots
+name: rbabylon
 
 steps:
 - name: Pull mpn container from ECR
@@ -12,12 +12,30 @@ steps:
   - $(aws ecr get-login --no-include-email --region us-east-1)
   - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-01-29
 
+
+- name: Pull latest bbi
+  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-01-29"
+  pull: never
+  environment:
+    GITHUB_OAUTH_TOKEN:
+        from_secret: GITHUB_TOKEN
+  commands:
+  - wget https://github.com/gruntwork-io/fetch/releases/download/v0.3.7/fetch_linux_amd64 -O fetch
+  - chmod +x fetch
+  - ./fetch --repo="https://github.com/metrumresearchgroup/babylon" --tag=">2.1.0" --release-asset="releases/download/*/bbi*linux_amd64.tar.gz" bbi.tar.gz
+  - tar -xzf bbi.tar.gz
+  - chmod +x bbi
+
+
 - name: R36
   image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-01-29"
   pull: never
   environment:
     R_LIBS_USER: "/opt/rpkgs/3.6/2020-01-29"
+    PATH: "/data/apps":$PATH
   commands:
+  - mkdir -p /data/apps
+  - cp bbi /data/apps/bbi
   - /opt/R/3.6.2/bin/R -e "devtools::test()"
   - /opt/R/3.6.2/bin/R -e "devtools::check()"
 
@@ -27,7 +45,10 @@ steps:
   pull: never
   environment:
     R_LIBS_USER: "/opt/rpkgs/3.5/2020-01-29"
+    PATH: "/data/apps":$PATH
   commands:
+  - mkdir -p /data/apps
+  - cp bbi /data/apps/bbi
   - /opt/R/3.5.3/bin/R -e "devtools::test()"
   - /opt/R/3.5.3/bin/R -e "devtools::check()"
 
