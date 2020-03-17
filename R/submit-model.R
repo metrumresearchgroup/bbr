@@ -59,6 +59,7 @@ submit_model.bbi_nonmem_model <- function(
 #'   Should be path to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
 #' @param .mod Path to YAML or model file
 #' @param .directory Model directory which `.mod` path is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
+#' @importFrom fs file_exists
 #' @export
 #' @rdname submit_model
 submit_model.character <- function(
@@ -86,13 +87,16 @@ submit_model.character <- function(
   } else if (is_valid_yaml_extension(.mod)) {
     .mod <- read_model(.mod)
   } else if (is_valid_nonmem_extension(.mod)) {
-    # if NONMEM file, build model object
-    .mod_list <- list()
-    .mod_list[[YAML_MOD_PATH]] <- basename(.mod)
-    .mod_list[[WORKING_DIR]] <- normalizePath(dirname(.mod))
-    .mod_list[[YAML_MOD_TYPE]] <- "nonmem"
-    .mod_list[[YAML_DESCRIPTION]] <- as.character(glue("{.mod} passed directly to submit_model()"))
-    .mod <- create_model_object(.mod_list)
+    # if NONMEM file, first try to find YAML file, if it doesn't exist then build the model object
+    if (fs::file_exists(yaml_ext(.mod))) {
+        stop(paste(glue("`submit_model({.mod})` is trying to create {yaml_ext(.mod)} but that file already exists."),
+                   "Either call `submit_model({yaml_ext(.mod)})` or delete the YAML file if it does not correspond to this model."))
+    } else {
+      .mod <- new_model(
+        .yaml_path = yaml_ext(.mod),
+        .description = as.character(glue("{.mod} passed directly to submit_model()")),
+        .model_type = c("nonmem"))
+    }
   } else {
     stop(glue("Unsupported file type passed to submit_model(): `{.mod}`. Valid options are `.yaml`, `.mod`, and `.ctl`"))
   }
@@ -165,11 +169,11 @@ submit_nonmem_model <- function(.mod,
                                 .wait = TRUE,
                                 .dry_run=FALSE) {
 
+  # check against YAML
+  check_yaml_in_sync(.mod)
+
   # check for valid type arg
   .mode <- match.arg(.mode)
-
-  # parse output directory path
-  .mod[[YAML_OUT_DIR]] <- tools::file_path_sans_ext(.mod[[YAML_MOD_PATH]])
 
   # build command line args
   .bbi_args <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])

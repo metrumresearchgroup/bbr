@@ -15,6 +15,7 @@
 #' @param .model_type Character scaler to specify type of model being created (used for S3 class). Currently only `'nonmem'` is supported.
 #' @param .directory Model directory which `.yaml_path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
 #' @importFrom yaml write_yaml
+#' @importFrom fs file_exists
 #' @return S3 object of class `bbi_{.model_type}_model` that can be passed to `submit_model()`, `model_summary()`, etc.
 #' @export
 new_model <- function(
@@ -36,6 +37,12 @@ new_model <- function(
   # check for .directory and combine with .yaml_path
   .yaml_path <- combine_directory_path(.directory, .yaml_path)
 
+  # check if file already exists
+  if (fs::file_exists(.yaml_path)) {
+    stop(paste(glue("Passed {.yaml_path} to `new_model(.yaml_path)` but that file already exists."),
+               "Either call `read_model()` to load model from YAML or delete the YAML file and try `new_model()` call again."))
+  }
+
   # fill list from passed args
   .mod <- list()
   .mod[[WORKING_DIR]] <- normalizePath(dirname(.yaml_path))
@@ -47,11 +54,12 @@ new_model <- function(
   if (!is.null(.tags)) .mod[[YAML_TAGS]] <- .tags
   if (!is.null(.bbi_args)) .mod[[YAML_BBI_ARGS]] <- .bbi_args
 
-  # make list into S3 object
-  .mod <- create_model_object(.mod)
-
   # write YAML to disk
   save_model_yaml(.mod, .out_path = .yaml_path)
+
+  # make list into S3 object
+  .mod[[YAML_YAML_MD5]] <- digest(file = .yaml_path, algo = "md5")
+  .mod <- create_model_object(.mod)
 
   return(.mod)
 }
@@ -64,6 +72,7 @@ new_model <- function(
 #' @param .path Path to the YAML file to parse. MUST be either an absolute path, or a path relative to the `.directory` argument.
 #' @param .directory Model directory which `.path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
 #' @importFrom yaml read_yaml
+#' @importFrom digest digest
 #' @importFrom fs file_exists
 #' @return S3 object of class `bbi_{.model_type}_model`
 #' @rdname read_model
@@ -85,6 +94,7 @@ read_model <- function(
   yaml_list <- read_yaml(.path)
   yaml_list[[WORKING_DIR]] <- normalizePath(dirname(.path))
   yaml_list[[YAML_YAML_NAME]] <- basename(.path)
+  yaml_list[[YAML_YAML_MD5]] <- digest(file = .path, algo = "md5")
 
   # parse model path
   if (!check_required_keys(yaml_list, .req = YAML_REQ_INPUT_KEYS)) {
@@ -336,7 +346,7 @@ copy_nonmem_model_from <- function(
   .inherit_tags = FALSE,
   .update_mod_file = TRUE
 ) {
-  # Check model for correct class and then copy it
+  # Check model for correct class
   if (!("bbi_nonmem_model" %in% class(.parent_mod))) {
     stop(paste(
       "copy_nonmem_model_from() requires a model object of class `bbi_nonmem_model`. Passed object has the following classes:",
@@ -344,6 +354,9 @@ copy_nonmem_model_from <- function(
       "Consider creating a model with `new_model()` or `read_model()`",
       sep = "\n"))
   }
+
+  # check parent against YAML
+  check_yaml_in_sync(.parent_mod)
 
   # build new model object
   .new_mod <- list()
@@ -400,12 +413,13 @@ copy_nonmem_model_from <- function(
     fs::file_copy(get_model_path(.parent_mod), get_model_path(.new_mod))
   }
 
-  # assign model class
-  .new_mod <- create_model_object(.new_mod)
-
   # write .new_mod out
   new_yaml_path <- yaml_ext(.new_model)
   save_model_yaml(.new_mod, .out_path = new_yaml_path)
+
+  # make list into S3 object
+  .new_mod[[YAML_YAML_MD5]] <- digest(file = new_yaml_path, algo = "md5")
+  .new_mod <- create_model_object(.new_mod)
 
   return(.new_mod)
 }
@@ -415,21 +429,56 @@ copy_nonmem_model_from <- function(
 # Modifying models
 #####################
 
+#' Reconcile model object with YAML file
+#'
+#' Extracts YAML path from model object and pulls in YAML file.
+#' Any shared keys are overwritten with the values from the YAML and new keys in YAML are added to the model object.
+#' @param .mod `bbi_{.model_type}_model` object
+#' @rdname reconcile_yaml
+#' @export
+reconcile_yaml <- function(.mod) {
 
-reconcile_mod_yaml <- function(.mod, .yaml_path) {
+  # extract path to yaml
+  .yaml_path <- get_yaml_path(.mod)
+
   # load model from yaml on disk
   .loaded_mod <- read_model(.yaml_path)
 
   # overwrite values in memory from the ones on disk
   .new_mod <- combine_list_objects(.loaded_mod, .mod)
+
   return(.new_mod)
 }
 
 
+#' Check model against YAML
+#'
+#' Checks that model YAML file is the same as when it was last read into the model object.
+#' Errors if the md5 hashes are not identical.
+#' @importFrom digest digest
+#' @param .mod `bbi_{.model_type}_model` object
+#' @rdname reconcile_yaml
+#' @export
+check_yaml_in_sync <- function(.mod) {
+  # get md5 of current YAML on disk
+  .yaml_file <- get_yaml_path(.mod)
+  current_md5 <- digest(file = .yaml_file, algo = "md5")
+
+  # check against md5 stored on load
+  if (current_md5 != .mod[[YAML_YAML_MD5]]) {
+    check_yaml_err_msg <- paste(glue("Model NOT in sync with corresponding YAML file {.yaml_file}"),
+                                "User can call `mod <- reconcile_yaml(mod)` to pull in updates from the YAML on disk.",
+                                "NOTE: This can be caused by modifying the object without reassigning for instance calling `mod %>% add_tags(...)` instead of `mod <- mod %>% add_tags(...)`.",
+                                "Users should avoid this pattern or this error will be generated the next time this model object is passed to a function.",
+                                sep = "\n")
+    strict_mode_error(check_yaml_err_msg)
+  }
+}
+
 #' Modify field in model object
 #'
 #' Implementation function for updating fields in a `bbi_{.model_type}_model` object
-#' Also reconciles the object with the corresponding YAML before modifying and then writes the modified object back to the YAML
+#' Also checks the object against the corresponding YAML before modifying (and errors if they are out of sync) and then writes the modified object back to the YAML.
 #' @param .mod The `bbi_{.model_type}_model` object to modify
 #' @param .field Character scaler of the name of the component to modify
 #' @param .value Whatever is to be added to `.mod[[.field]]`, typically a character scaler or vector
@@ -437,11 +486,9 @@ reconcile_mod_yaml <- function(.mod, .yaml_path) {
 #' @param .unique Boolean for whether to de-duplicate `.mod[[.field]]` after adding new values. TRUE by default.
 #' @rdname modify_model_field
 modify_model_field <- function(.mod, .field, .value, .append = TRUE, .unique = TRUE) {
-  # extract path to yaml
-  .yaml_path <- get_yaml_path(.mod)
 
   # update .mod with any changes from yaml on disk
-  .mod <- reconcile_mod_yaml(.mod, .yaml_path)
+  check_yaml_in_sync(.mod)
 
   # Either append new value or overwrite with new value
   if (isTRUE(.append)) {
@@ -456,7 +503,10 @@ modify_model_field <- function(.mod, .field, .value, .append = TRUE, .unique = T
   }
 
   # overwrite the yaml on disk with modified model
-  save_model_yaml(.mod, .yaml_path)
+  save_model_yaml(.mod)
+
+  # refresh md5 hash in model object
+  .mod[[YAML_YAML_MD5]] <- digest(file = get_yaml_path(.mod), algo = "md5")
 
   return(.mod)
 }
@@ -560,6 +610,29 @@ replace_description <- function(.mod, .description) {
 # Generating run logs
 #######################
 
+#' Read in model YAML with error handling
+#'
+#' Helper function that tries to call `read_model()` on a yaml path and returns NULL, with no error, if the YAML is not a valid model file.
+#' @param .yaml_path Path to read model from
+#' @param .directory Model directory which `.yaml_path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
+#' @importFrom stringr str_detect
+safe_read_model <- function(.yaml_path, .directory = getOption("rbabylon.model_directory")) {
+  # check for .directory and combine with .yaml_path
+  .yaml_path <- combine_directory_path(.directory, .yaml_path)
+
+  # try to read in model
+  .mod <- tryCatch(read_model(.yaml_path),
+                   error = function(e) {
+                     if (stringr::str_detect(e$message, "Model yaml must have keys")) {
+                       return(NULL)
+                     } else {
+                       stop(glue("Unexpected error trying to read yaml `{.yaml_path}`: {e$message}"))
+                     }
+                   })
+  return(.mod)
+}
+
+
 #' Parses model yaml and outputs into a tibble that serves as a run log. Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
 #' @param .base_dir Directory to search for model yaml files. Only runs with a corresponding yaml will be included.
 #' @param .recurse Boolean for whether to search subdirectories recursively for additional yaml files. Defaults to TRUE.
@@ -584,15 +657,15 @@ run_log <- function(
   yaml_files <- .base_dir %>% dir_ls(recurse = .recurse) %>% str_subset("\\.ya?ml$") %>% str_subset("babylon\\.yaml$", negate = TRUE)
 
   # read in all candidate yaml's
-  all_yaml <- map(yaml_files, function(.x) {read_yaml(.x)})
+  all_yaml <- map(yaml_files, safe_read_model, .directory = NULL)
 
   # filter to only model yaml's
-  mod_yaml_bool <- map_lgl(all_yaml, function(.x) {check_required_keys(.x, .req = YAML_REQ_INPUT_KEYS)})
-  not_mod <- yaml_files[!mod_yaml_bool]
+  not_mod_bool <- map_lgl(all_yaml, is.null)
+  not_mod <- yaml_files[which(not_mod_bool)]
   if (length(not_mod) > 0) {
     warning(glue("Found {length(not_mod)} YAML files that do not contain required keys for a model YAML. Ignoring the following files: `{paste(not_mod, collapse='`, `')}`"))
   }
-  mod_yaml <- all_yaml[which(mod_yaml_bool)]
+  mod_yaml <- all_yaml[!not_mod_bool]
 
   # stop if no valid model YAML found
   if (length(mod_yaml) == 0) {
@@ -606,9 +679,6 @@ run_log <- function(
     mutate_at(c(YAML_MOD_PATH, YAML_DESCRIPTION, YAML_MOD_TYPE), unlist) %>%
     mutate(run_id = get_model_id(.data[[YAML_MOD_PATH]])) %>%
     select(.data$run_id, everything())
-
-  # add yaml path
-  df$yaml_path <- yaml_files[mod_yaml_bool]
 
   class(df) <- c("bbi_nonmem_summary_df", class(df))
   return(df)

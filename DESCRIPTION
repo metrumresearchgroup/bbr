@@ -13,6 +13,7 @@ Authors@R:
 RoxygenNote: 7.0.2
 Imports: 
     checkmate,
+    digest,
     dplyr,
     fs,
     glue,

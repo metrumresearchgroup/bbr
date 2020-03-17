@@ -48,5 +48,5 @@ replace_description(.mod, .description)
 }
 \description{
 Implementation function for updating fields in a `bbi_{.model_type}_model` object
-Also reconciles the object with the corresponding YAML before modifying and then writes the modified object back to the YAML
+Also checks the object against the corresponding YAML before modifying (and errors if they are out of sync) and then writes the modified object back to the YAML.
 }

@@ -5,6 +5,7 @@
 # Because of this, it is disabled unless on Metworx.
 ####################################################
 
+
 if (Sys.getenv("METWORX_VERSION") == "") {
   skip("test-workflow-composable-bbi only runs on Metworx")
 }
@@ -109,14 +110,14 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
     # check run log for both models
     log_df <- run_log()
     expect_equal(nrow(log_df), 2)
-    expect_equal(ncol(log_df), 8)
+    expect_equal(ncol(log_df), 11)
     expect_identical(log_df$run_id, c("1", "2"))
     expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS))
 
     # add config log
     log_df <- log_df %>% add_config()
     expect_equal(nrow(log_df), 2)
-    expect_equal(ncol(log_df), 12)
+    expect_equal(ncol(log_df), 15)
     expect_false(any(is.null(log_df$data_md5)))
   })
 

@@ -366,13 +366,7 @@ get_yaml_path <- function(.mod, .check_exists = TRUE) {
 #' @export
 #' @rdname get_yaml_path
 get_yaml_path.bbi_nonmem_model <- function(.mod, .check_exists = TRUE) {
-  # check if file name was stored on load, otherwise infer from model file
-  if (is.null(.mod[[YAML_YAML_NAME]])) {
-    yaml_file <- .mod[[YAML_MOD_PATH]] %>% get_model_id() %>% yaml_ext()
-  } else {
-    yaml_file <- .mod[[YAML_YAML_NAME]]
-  }
-
+  yaml_file <- .mod[[YAML_YAML_NAME]]
   yaml_path <- file.path(.mod[[WORKING_DIR]], yaml_file) %>% get_yaml_path(.check_exists = .check_exists)
   return(yaml_path)
 }
@@ -412,3 +406,17 @@ strict_mode_error <- function(err_msg) {
     ))
   }
 }
+
+#' Suppress a warning that matches `.regexpr`
+#' @importFrom stringr str_detect
+#' @param .expr Expression to run
+#' @param .regexpr Regex to match against any generated warning. Warning will be suppressed if this matches the warning message.
+suppressSpecificWarning <- function(.expr, .regexpr) {
+  withCallingHandlers({
+    .expr
+  }, warning=function(w) {
+    if (stringr::str_detect(w$message, .regexpr))
+      invokeRestart("muffleWarning")
+  })
+}
+
