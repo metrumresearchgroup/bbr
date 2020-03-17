@@ -22,7 +22,7 @@ steps:
   commands:
   - wget https://github.com/gruntwork-io/fetch/releases/download/v0.3.7/fetch_linux_amd64 -O fetch
   - chmod +x fetch
-  - ./fetch --repo="https://github.com/metrumresearchgroup/babylon" --tag=">2.1.0" --release-asset="releases/download/*/bbi*linux_amd64.tar.gz" bbi.tar.gz
+  - ./fetch --repo="https://github.com/metrumresearchgroup/babylon" --tag=">2.1.0" --release-asset="bbi*linux_amd64.tar.gz" bbi.tar.gz
   - tar -xzf bbi.tar.gz
   - chmod +x bbi
 
