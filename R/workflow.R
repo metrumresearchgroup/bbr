@@ -5,14 +5,15 @@
 #############################
 
 #' Create new model object by specifying relevant information as arguments
-#' Also creates necessary YAML file for using functions like `add_tags()` and `create_run_log()` later.
-#' @param .yaml_path Path to save resulting model YAML file to
-#' @param .description Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.
+#' Also creates necessary YAML file for using functions like `add_tags()` and `run_log()` later.
+#' @param .yaml_path Path to save resulting model YAML file to. MUST be either an absolute path, or a path relative to the `.directory` argument.
+#' @param .description Description of new model run. This will be stored in the yaml (to be used later in `run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.
 #' @param .model_path Path to model (control stream) file. MUST be an absolute path, or the model path relative to the location of the YAML file. It recommended for the control stream and YAML to be in the same directory. If nothing is passed, the function will look for a file with the same path/name as your YAML, but with either .ctl or .mod extension.
 #' @param .based_on A character scaler or vector of run id's (model names) that this model was "based on." These are used to reconstuct model developement and ancestry.
 #' @param .tags A character scaler or vector with any user tags to be added to the YAML file
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments. These will be written into YAML file.
 #' @param .model_type Character scaler to specify type of model being created (used for S3 class). Currently only `'nonmem'` is supported.
+#' @param .directory Model directory which `.yaml_path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
 #' @importFrom yaml write_yaml
 #' @return S3 object of class `bbi_{.model_type}_model` that can be passed to `submit_model()`, `model_summary()`, etc.
 #' @export
@@ -23,7 +24,17 @@ new_model <- function(
   .based_on = NULL,
   .tags = NULL,
   .bbi_args = NULL,
-  .model_type = c("nonmem")) {
+  .model_type = c("nonmem"),
+  .directory = getOption("rbabylon.model_directory")
+) {
+
+  if (!is_valid_yaml_extension(.yaml_path)) {
+    warning(glue("Did not pass a YAML extension to .yaml_path. Inferred path `{yaml_ext(.yaml_path)}` from `{.yaml_path}`"))
+    .yaml_path <- yaml_ext(.yaml_path)
+  }
+
+  # check for .directory and combine with .yaml_path
+  .yaml_path <- combine_directory_path(.directory, .yaml_path)
 
   # fill list from passed args
   .mod <- list()
@@ -50,13 +61,21 @@ new_model <- function(
 #'
 #' Parses a model YAML file into a list object that contains correctly formatted information from the YAML
 #' and is an S3 object of class `bbi_{.model_type}_model` that can be passed to `submit_model()`, `model_summary()`, etc.
-#' @param .path Path to the YAML file to parse.
+#' @param .path Path to the YAML file to parse. MUST be either an absolute path, or a path relative to the `.directory` argument.
+#' @param .directory Model directory which `.path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
 #' @importFrom yaml read_yaml
 #' @importFrom fs file_exists
 #' @return S3 object of class `bbi_{.model_type}_model`
 #' @rdname read_model
 #' @export
-read_model <- function(.path) {
+read_model <- function(
+  .path,
+  .directory = getOption("rbabylon.model_directory")
+) {
+
+  # check for .directory and combine with .path
+  .path <- combine_directory_path(.directory, .path)
+
   # If not YAML extension, infer and look for file
   if (!is_valid_yaml_extension(.path)) {
     .path <- .path %>% get_yaml_path()
@@ -157,32 +176,77 @@ as_model.babylon_process <- function(.obj) {
 #' @param .parent_mod Model to copy from
 #' @param .new_model Path to write new model files to WITHOUT FILE EXTENSION. Function will create both `{.new_model}.yaml` and a new model file based on this path.
 #' @param .description Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`).
-#' @param ... arguments to pass through
+#' @param .based_on_additional The run id for the `.parent_model` will automatically be added to the `based_on` field but this argument can contain a character scaler or vector of additional run id's (model names) that this model was "based on." These are used to reconstuct model developement and ancestry.
+#' @param .add_tags A character scaler or vector with any new tags to be added to `{.new_model}.yaml`
+#' @param .inherit_tags Boolean for whether to inherit any tags from `.parent_model.yaml`
+#' @param .update_mod_file Boolean for whether to update the newly created model file. By default it is TRUE, but if FALSE is passed new model file will be an exact copy of its parent.
+#' @param .directory Model directory which `.new_model` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
 #' @export
 #' @rdname copy_model_from
-copy_model_from <- function(.parent_mod, .new_model, .description, ...) {
+copy_model_from <- function(
+  .parent_mod,
+  .new_model,
+  .description,
+  .based_on_additional = NULL,
+  .add_tags = NULL,
+  .inherit_tags = FALSE,
+  .update_mod_file = TRUE,
+  .directory = getOption("rbabylon.model_directory")
+) {
   UseMethod("copy_model_from")
 }
 
 #' S3 dispatch for passing `bbi_nonmem_model` object to `copy_model_from()`
-#' @param ... arguments to pass through to `copy_nonmem_model_from()`
+#' @param .parent_mod `bbi_nonmem_model` object to use as a basis for the copy.
 #' @export
 #' @rdname copy_model_from
-copy_model_from.bbi_nonmem_model <- function(.parent_mod, .new_model, .description, ...) {
+copy_model_from.bbi_nonmem_model <- function(
+  .parent_mod,
+  .new_model,
+  .description,
+  .based_on_additional = NULL,
+  .add_tags = NULL,
+  .inherit_tags = FALSE,
+  .update_mod_file = TRUE,
+  .directory = getOption("rbabylon.model_directory")
+) {
+
+  # check for .directory and combine with .new_model
+  .new_model <- combine_directory_path(.directory, .new_model)
+
   .mod <- copy_nonmem_model_from(
-    .parent_mod,
-    .new_model,
-    .description,
-    ...)
+    .parent_mod = .parent_mod,
+    .new_model = .new_model,
+    .description = .description,
+    .based_on_additional = .based_on_additional,
+    .add_tags = .add_tags,
+    .inherit_tags = .inherit_tags,
+    .update_mod_file = .update_mod_file
+  )
 
   return(.mod)
 }
 
-#' S3 dispatch for passing `bbi_nonmem_model` object to copy_model_from()
-#' @param ... arguments to pass through to implementation method
+#' S3 dispatch for passing a file path to copy_model_from()
+#' @param .parent_mod Path to parent model to use as a basis for the copy. Ideally a YAML path, but can also pass control stream or output directory.
+#' @param .directory Model directory which BOTH `.parent_model` and `.new_model` are relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
 #' @export
 #' @rdname copy_model_from
-copy_model_from.character <- function(.parent_mod, .new_model, .description, ...) {
+copy_model_from.character <- function(
+  .parent_mod,
+  .new_model,
+  .description,
+  .based_on_additional = NULL,
+  .add_tags = NULL,
+  .inherit_tags = FALSE,
+  .update_mod_file = TRUE,
+  .directory = getOption("rbabylon.model_directory")
+) {
+
+  # check for .directory and combine with both .parent_mod and .new_model
+  .parent_mod <- combine_directory_path(.directory, .parent_mod)
+  .new_model <- combine_directory_path(.directory, .new_model)
+
   # If not YAML extension, infer and look for file
   if (!is_valid_yaml_extension(.parent_mod)) {
     .parent_mod <- .parent_mod %>% get_yaml_path()
@@ -196,15 +260,55 @@ copy_model_from.character <- function(.parent_mod, .new_model, .description, ...
   if (.model_type == "nonmem") {
     # create new model
     .mod <- copy_nonmem_model_from(
-      .parent_mod,
-      .new_model,
-      .description,
-      ...)
+      .parent_mod = .parent_mod,
+      .new_model = .new_model,
+      .description = .description,
+      .based_on_additional = .based_on_additional,
+      .add_tags = .add_tags,
+      .inherit_tags = .inherit_tags,
+      .update_mod_file = .update_mod_file
+      )
   } else if (.model_type == "stan") {
     stop(NO_STAN_ERR_MSG)
   } else {
     stop(glue("Passed `{.model_type}`. Valid options: `{SUPPORTED_MOD_TYPES}`"))
   }
+  return(.mod)
+}
+
+#' S3 dispatch for passing an integer model identifier to copy_model_from()
+#' This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`
+#' @param .parent_mod Integer that corresponds to parent model to use as a basis for the copy.
+#' @param .new_model Integer that corresponds to the new model name to create. Function will create both `{.new_model}.yaml` and a new model file based on this path.
+#' @param .directory Model directory which BOTH `.parent_model` and `.new_model` are relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
+#' @export
+#' @rdname copy_model_from
+copy_model_from.numeric <- function(
+  .parent_mod,
+  .new_model,
+  .description,
+  .based_on_additional = NULL,
+  .add_tags = NULL,
+  .inherit_tags = FALSE,
+  .update_mod_file = TRUE,
+  .directory = getOption("rbabylon.model_directory")
+) {
+
+  # convert to character
+  .parent_mod <- as.character(.parent_mod)
+  .new_model <- as.character(.new_model)
+
+  # call the character dispatch
+  .mod <- copy_model_from(
+    .parent_mod = .parent_mod,
+    .new_model = .new_model,
+    .description = .description,
+    .based_on_additional = .based_on_additional,
+    .add_tags = .add_tags,
+    .inherit_tags = .inherit_tags,
+    .update_mod_file = .update_mod_file,
+    .directory = .directory
+  )
   return(.mod)
 }
 
@@ -215,10 +319,7 @@ copy_model_from.character <- function(.parent_mod, .new_model, .description, ...
 #' @param .parent_mod S3 object of class `bbi_nonmem_model` to be used as the basis for copy.
 #' @param .new_model Path to write new model files to WITHOUT FILE EXTENSION. Function will create both `{.new_model}.yaml` and `{.new_model}.[mod|ctl]` based on this path.
 #' @param .description Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.
-#' @param .based_on_additional The run id for the `.parent_model` will automatically be added to the `based_on` field but this argument can contain a character scaler or vector of additional run id's (model names) that this model was "based on." These are used to reconstuct model developement and ancestry.
-#' @param .add_tags A character scaler or vector with any new tags to be added to `{.new_model}.yaml`
-#' @param .inherit_tags Boolean for whether to inherit any tags from `.parent_model.yaml`
-#' @param .update_mod_file Boolean for whether to update the `$PROBLEM` line in the new control stream. By default it is TRUE, but if FALSE is passed `{.new_model}.[mod|ctl]` will be an exact copy of it's parent control stream.
+#' @param .update_mod_file Boolean for whether to update the `$PROBLEM` line in the new control stream. By default it is TRUE, but if FALSE is passed `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.
 #' @importFrom fs file_copy
 #' @importFrom readr read_file write_file
 #' @importFrom stringr str_replace
@@ -226,7 +327,6 @@ copy_model_from.character <- function(.parent_mod, .new_model, .description, ...
 #' @importFrom purrr list_modify
 #' @return S3 object of class `bbi_nonmem_model` that can be passed to `submit_nonmem_model()`
 #' @rdname copy_model_from
-#' @export
 copy_nonmem_model_from <- function(
   .parent_mod,
   .new_model,
@@ -471,9 +571,15 @@ replace_description <- function(.mod, .description) {
 #' @return tibble with information on each run
 #' @export
 run_log <- function(
-  .base_dir = ".",
+  .base_dir = getOption("rbabylon.model_directory"),
   .recurse = TRUE
 ) {
+
+  # if no directory defined, set to working directory
+  if (is.null(.base_dir)) {
+    .base_dir <- getwd()
+  }
+
   # get yaml files
   yaml_files <- .base_dir %>% dir_ls(recurse = .recurse) %>% str_subset("\\.ya?ml$") %>% str_subset("babylon\\.yaml$", negate = TRUE)
 
@@ -520,9 +626,15 @@ run_log <- function(
 #' @return tibble with information on each run
 #' @export
 config_log <- function(
-  .base_dir = ".",
+  .base_dir = getOption("rbabylon.model_directory"),
   .recurse = TRUE
 ) {
+
+  # if no directory defined, set to working directory
+  if (is.null(.base_dir)) {
+    .base_dir <- getwd()
+  }
+
   # define json keys to keep as constant
   KEEPERS = c(
     "model_name",

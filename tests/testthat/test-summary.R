@@ -4,7 +4,8 @@ if (Sys.getenv("METWORX_VERSION") == "") {
   skip("test-summary only runs on Metworx")
 }
 
-withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi'), {
+withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
+                         rbabylon.model_directory = NULL), {
 
 # constants
 MODEL_FILE <- "1.ctl"
@@ -24,7 +25,7 @@ NO_LST_ERR_MSG <- "Unable to locate `.lst` file.*NONMEM output folder"
 # extracting things from summary object
 #########################################
 
-test_that("model_summary() produces expected list object", {
+test_that("model_summary.bbi_nonmem_model produces expected output", {
   # get summary
   sum1 <- MOD1 %>% model_summary()
 
@@ -34,6 +35,32 @@ test_that("model_summary() produces expected list object", {
   # compare to reference
   ref_sum <- readRDS("data/acop_summary_obj_ref_200305.rds")
   expect_equal(ref_sum, sum1)
+})
+
+withr::with_options(list(rbabylon.model_directory = "model-examples"), {
+  test_that("model_summary.character produces expected output", {
+    # get summary
+    sum1 <- "1" %>% model_summary()
+
+    # check class
+    expect_identical(class(sum1), SUM_CLASS_LIST)
+
+    # compare to reference
+    ref_sum <- readRDS("data/acop_summary_obj_ref_200305.rds")
+    expect_equal(ref_sum, sum1)
+  })
+
+  test_that("model_summary.numeric produces expected output", {
+    # get summary
+    sum1 <- 1 %>% model_summary()
+
+    # check class
+    expect_identical(class(sum1), SUM_CLASS_LIST)
+
+    # compare to reference
+    ref_sum <- readRDS("data/acop_summary_obj_ref_200305.rds")
+    expect_equal(ref_sum, sum1)
+  })
 })
 
 test_that("model_summary() fails predictably if it can't find some parts (i.e. model isn't finished)", {

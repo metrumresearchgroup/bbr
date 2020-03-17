@@ -4,10 +4,12 @@
 \alias{read_model}
 \title{Creates a model object from a YAML model file}
 \usage{
-read_model(.path)
+read_model(.path, .directory = getOption("rbabylon.model_directory"))
 }
 \arguments{
-\item{.path}{Path to the YAML file to parse.}
+\item{.path}{Path to the YAML file to parse. MUST be either an absolute path, or a path relative to the `.directory` argument.}
+
+\item{.directory}{Model directory which `.path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
 }
 \value{
 S3 object of class `bbi_{.model_type}_model`

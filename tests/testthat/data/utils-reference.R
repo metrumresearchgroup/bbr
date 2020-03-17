@@ -6,14 +6,19 @@ LIST2 <- list(naw=5, saw="hey")
 
 # file names and file paths
 MOD_ID <- "1"
-OUTPUT_DIR <-     as.character(glue::glue("model-examples/{MOD_ID}"))
-YAML_TEST_FILE <- as.character(glue::glue("model-examples/{MOD_ID}.yaml"))
-CTL_TEST_FILE <-  as.character(glue::glue("model-examples/{MOD_ID}.ctl"))
-MOD_TEST_FILE <-  as.character(glue::glue("model-examples/{MOD_ID}.mod"))
-LST_TEST_FILE <-  as.character(glue::glue("model-examples/{MOD_ID}/{MOD_ID}.lst"))
-GRD_TEST_FILE <-  as.character(glue::glue("model-examples/{MOD_ID}/{MOD_ID}.grd"))
-EXT_TEST_FILE <-  as.character(glue::glue("model-examples/{MOD_ID}/{MOD_ID}.ext"))
+MODEL_DIR <- "model-examples"
+OUTPUT_DIR <-     as.character(glue::glue("{MODEL_DIR}/{MOD_ID}"))
+YAML_TEST_FILE <- as.character(glue::glue("{MODEL_DIR}/{MOD_ID}.yaml"))
+CTL_TEST_FILE <-  as.character(glue::glue("{MODEL_DIR}/{MOD_ID}.ctl"))
+MOD_TEST_FILE <-  as.character(glue::glue("{MODEL_DIR}/{MOD_ID}.mod"))
+LST_TEST_FILE <-  as.character(glue::glue("{MODEL_DIR}/{MOD_ID}/{MOD_ID}.lst"))
+GRD_TEST_FILE <-  as.character(glue::glue("{MODEL_DIR}/{MOD_ID}/{MOD_ID}.grd"))
+EXT_TEST_FILE <-  as.character(glue::glue("{MODEL_DIR}/{MOD_ID}/{MOD_ID}.ext"))
+
+# for combine_directory_path()
+ABS_CTL_PATH <- file.path(getwd(), MODEL_DIR, glue::glue("{MOD_ID}.ctl"))
+FAKE_CTL_PATH <- file.path(getwd(), MODEL_DIR, CTL_TEST_FILE)
 
 # fake result object
-MOD1 <- read_model(YAML_TEST_FILE)
+MOD1 <- read_model(YAML_TEST_FILE, .directory = NULL)
 

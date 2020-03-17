@@ -236,7 +236,7 @@ test_that("get_yaml_path() builds the right path", {
   full_new_yaml_path <- normalizePath(new_yaml) # store the full path
 
   # make a model from it
-  new_mod <- read_model(new_yaml)
+  new_mod <- read_model(new_yaml, .directory = NULL)
 
   # delete the underlying yaml
   fs::file_delete(new_yaml)
@@ -246,6 +246,26 @@ test_that("get_yaml_path() builds the right path", {
 
   # passes if you tell it not to look
   expect_identical(get_yaml_path(new_mod, .check_exists = FALSE), full_new_yaml_path)
+})
+
+
+test_that("combine_directory_path() builds the expected path .directory", {
+  res_path <- combine_directory_path(MODEL_DIR, ctl_ext(MOD_ID))
+  expect_identical(res_path, ABS_CTL_PATH)
+})
+
+test_that("combine_directory_path() builds the expected path with NULL .directory", {
+  res_path <- combine_directory_path(.directory = NULL, CTL_TEST_FILE)
+  expect_identical(res_path, ABS_CTL_PATH)
+})
+
+test_that("combine_directory_path() builds fake .path in real .directory", {
+  res_path <- combine_directory_path(MODEL_DIR, CTL_TEST_FILE)
+  expect_identical(res_path, FAKE_CTL_PATH)
+})
+
+test_that("combine_directory_path() errors with fake .directory", {
+  expect_error(combine_directory_path("aaa", CTL_TEST_FILE), regexp = "No such file or directory")
 })
 
 
