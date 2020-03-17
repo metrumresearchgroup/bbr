@@ -32,7 +32,7 @@ steps:
   pull: never
   environment:
     R_LIBS_USER: "/opt/rpkgs/3.6/2020-01-29"
-    PATH: "/data/apps":$PATH
+    PATH: "/data/apps:$PATH"
   commands:
   - mkdir -p /data/apps
   - cp bbi /data/apps/bbi
@@ -45,7 +45,7 @@ steps:
   pull: never
   environment:
     R_LIBS_USER: "/opt/rpkgs/3.5/2020-01-29"
-    PATH: "/data/apps":$PATH
+    PATH: "/data/apps:$PATH"
   commands:
   - mkdir -p /data/apps
   - cp bbi /data/apps/bbi
