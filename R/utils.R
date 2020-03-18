@@ -411,6 +411,7 @@ strict_mode_error <- function(err_msg) {
 #' @importFrom stringr str_detect
 #' @param .expr Expression to run
 #' @param .regexpr Regex to match against any generated warning. Warning will be suppressed if this matches the warning message.
+#' @export
 suppressSpecificWarning <- function(.expr, .regexpr) {
   withCallingHandlers({
     .expr
