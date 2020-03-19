@@ -190,7 +190,7 @@ as_model.babylon_process <- function(.obj) {
 #' @param .add_tags A character scaler or vector with any new tags to be added to `{.new_model}.yaml`
 #' @param .inherit_tags Boolean for whether to inherit any tags from `.parent_model.yaml`
 #' @param .update_model_file Boolean for whether to update the newly created model file. By default it is TRUE, but if FALSE is passed new model file will be an exact copy of its parent.
-#' @param .overwrite_model_file Boolean for whether to overwrite model file if one already exists specified `.new_model` path
+#' @param .overwrite Boolean for whether to overwrite model file if one already exists specified `.new_model` path
 #' @param .directory Model directory which `.new_model` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
 #' @export
 #' @rdname copy_model_from
@@ -202,7 +202,7 @@ copy_model_from <- function(
   .add_tags = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
-  .overwrite_model_file = FALSE,
+  .overwrite = FALSE,
   .directory = getOption("rbabylon.model_directory")
 ) {
   UseMethod("copy_model_from")
@@ -220,7 +220,7 @@ copy_model_from.bbi_nonmem_model <- function(
   .add_tags = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
-  .overwrite_model_file = FALSE,
+  .overwrite = FALSE,
   .directory = getOption("rbabylon.model_directory")
 ) {
 
@@ -235,7 +235,7 @@ copy_model_from.bbi_nonmem_model <- function(
     .add_tags = .add_tags,
     .inherit_tags = .inherit_tags,
     .update_model_file = .update_model_file,
-    .overwrite_model_file = .overwrite_model_file
+    .overwrite = .overwrite
   )
 
   return(.mod)
@@ -254,7 +254,7 @@ copy_model_from.character <- function(
   .add_tags = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
-  .overwrite_model_file = FALSE,
+  .overwrite = FALSE,
   .directory = getOption("rbabylon.model_directory")
 ) {
 
@@ -282,7 +282,7 @@ copy_model_from.character <- function(
       .add_tags = .add_tags,
       .inherit_tags = .inherit_tags,
       .update_model_file = .update_model_file,
-      .overwrite_model_file = .overwrite_model_file
+      .overwrite = .overwrite
       )
   } else if (.model_type == "stan") {
     stop(NO_STAN_ERR_MSG)
@@ -307,7 +307,7 @@ copy_model_from.numeric <- function(
   .add_tags = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
-  .overwrite_model_file = FALSE,
+  .overwrite = FALSE,
   .directory = getOption("rbabylon.model_directory")
 ) {
 
@@ -324,7 +324,7 @@ copy_model_from.numeric <- function(
     .add_tags = .add_tags,
     .inherit_tags = .inherit_tags,
     .update_model_file = .update_model_file,
-    .overwrite_model_file = .overwrite_model_file,
+    .overwrite = .overwrite,
     .directory = .directory
   )
   return(.mod)
@@ -338,7 +338,7 @@ copy_model_from.numeric <- function(
 #' @param .new_model Path to write new model files to WITHOUT FILE EXTENSION. Function will create both `{.new_model}.yaml` and `{.new_model}.[mod|ctl]` based on this path.
 #' @param .description Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.
 #' @param .update_model_file Boolean for whether to update the `$PROBLEM` line in the new control stream. By default it is TRUE, but if FALSE is passed `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.
-#' @param .overwrite_model_file Boolean for whether to overwrite .ctl or .mod file if one already exists at `{.new_model}.[mod|ctl]`
+#' @param .overwrite Boolean for whether to overwrite .ctl or .mod file if one already exists at `{.new_model}.[mod|ctl]`
 #' @importFrom fs file_copy
 #' @importFrom readr read_file write_file
 #' @importFrom stringr str_replace
@@ -354,7 +354,7 @@ copy_nonmem_model_from <- function(
   .add_tags = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
-  .overwrite_model_file = FALSE
+  .overwrite = FALSE
 ) {
   # Check model for correct class
   if (!("bbi_nonmem_model" %in% class(.parent_mod))) {
@@ -408,13 +408,9 @@ copy_nonmem_model_from <- function(
   .new_model_path <- .new_mod %>% get_model_path()
   .parent_model_path <- .parent_mod %>% get_model_path()
 
-  if (fs::file_exists(.new_model_path)) {
-    if (isTRUE(.overwrite_model_file)) {
-      warning(glue("Overwriting file at {.new_model_path} because `.overwrite_model_file=TRUE`"))
-      copy_control_stream(.parent_model_path, .new_model_path, .update_model_file, .description)
-    } else {
-      warning(glue("File already exists at {.new_model_path} -- using existing file because `.overwrite_model_file=FALSE` (default)"))
-    }
+  if (fs::file_exists(.new_model_path) && !isTRUE(.overwrite)) {
+    # if .overwrite != TRUE, warn that file already exists
+    warning(glue("File already exists at {.new_model_path} -- using existing file because `.overwrite=FALSE` (default)"))
   } else {
     copy_control_stream(.parent_model_path, .new_model_path, .update_model_file, .description)
   }

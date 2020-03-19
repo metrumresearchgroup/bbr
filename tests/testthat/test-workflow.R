@@ -526,7 +526,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
 
-  test_that("copy_from_model .overwrite_model_file=TRUE works", {
+  test_that("copy_from_model .overwrite=TRUE works", {
     # set up model object
     mod1 <- read_model(YAML_TEST_FILE)
     new_yaml_path <- yaml_ext(NEW_MOD2)
@@ -537,11 +537,8 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # copy control stream
     fs::file_copy(ctl_ext(YAML_TEST_FILE), new_ctl_path)
 
-    # copy with .overwrite_model_file=TRUE
-    expect_warning(
-      copy_model_from(mod1, NEW_MOD2, NEW_DESC, .overwrite_model_file=TRUE),
-      regexp = ".overwrite_model_file=TRUE"
-    )
+    # copy with .overwrite=TRUE
+    copy_model_from(mod1, NEW_MOD2, NEW_DESC, .overwrite=TRUE)
 
     # check the control stream is modified by overwrite
     new_mod_str <- readr::read_file(new_ctl_path)
@@ -557,7 +554,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     fs::file_delete(new_ctl_path)
   })
 
-  test_that("copy_from_model .overwrite_model_file=FALSE works", {
+  test_that("copy_from_model .overwrite=FALSE works", {
     # set up model object
     mod1 <- read_model(YAML_TEST_FILE)
     new_yaml_path <- yaml_ext(NEW_MOD2)
@@ -568,10 +565,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # copy control stream
     fs::file_copy(ctl_ext(YAML_TEST_FILE), new_ctl_path)
 
-    # copy with .overwrite_model_file=FALSE
+    # copy with .overwrite=FALSE
     expect_warning(
-      copy_model_from(mod1, NEW_MOD2, NEW_DESC, .overwrite_model_file=FALSE),
-      regexp = ".overwrite_model_file=FALSE"
+      copy_model_from(mod1, NEW_MOD2, NEW_DESC, .overwrite=FALSE),
+      regexp = ".overwrite=FALSE"
     )
 
     # check the control stream is NOT modified (i.e. no overwrite)
