@@ -1,8 +1,8 @@
 context("Test bbi summary functions")
 
-# if (Sys.getenv("METWORX_VERSION") == "") {
-#   skip("test-summary only runs on Metworx")
-# }
+if (Sys.getenv("METWORX_VERSION") == "" && !isTRUE(Sys.getenv("DRONE"))) {
+  skip("test-summary only runs on Metworx or Drone")
+}
 
 # constants
 MODEL_FILE <- "1.ctl"
