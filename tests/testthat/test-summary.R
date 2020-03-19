@@ -1,6 +1,6 @@
 context("Test bbi summary functions")
 
-if (Sys.getenv("METWORX_VERSION") == "" && !isTRUE(Sys.getenv("DRONE"))) {
+if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
   skip("test-summary only runs on Metworx or Drone")
 }
 

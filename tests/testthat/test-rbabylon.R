@@ -32,7 +32,7 @@ test_that("bbi_dry_run() correctly returns object", {
 })
 
 
-if (Sys.getenv("METWORX_VERSION") == "" && !isTRUE(Sys.getenv("DRONE"))) {
+if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
   skip("bbi tests only run on Metworx or Drone")
 } else {
   test_that("check_bbi_exe() correctly errors or finds paths", {
