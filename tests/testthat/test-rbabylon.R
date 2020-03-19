@@ -1,5 +1,8 @@
 context("rbabylon exec functions")
 
+# constants
+BBI_EXE_PATH <- "/data/apps/bbi"
+
 test_that("check_status_code works as expected", {
   # nothing happens on status 0
   expect_equal(check_status_code(0, "stdout...", c("arg1", "arg2")), NULL)
@@ -17,23 +20,27 @@ test_that("check_bbi_exe() correctly errors or finds paths", {
   expect_error(check_bbi_exe(FAKE_BBI_PATH))
 
   # should pass because ping should exist on Metworx (and most Linux/Unix)
-  if (Sys.getenv("METWORX_VERSION") == "") {
-    skip("only check for ping on Metworx")
-  } else {
-    expect_invisible(check_bbi_exe("ping"))
-  }
+  # if (Sys.getenv("METWORX_VERSION") == "") {
+  #   skip("only check for ping on Metworx")
+  # } else {
+  #   expect_invisible(check_bbi_exe("ping"))
+  # }
+  expect_invisible(check_bbi_exe(BBI_EXE_PATH))
 })
 
 
 test_that("bbi_init creates babylon.yaml", {
   # create yaml
-  if (Sys.getenv("METWORX_VERSION") == "") {
-    skip("bbi_init only runs on Metworx")
-  } else {
-    withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi'), {
-      bbi_init(".", ".", .no_default_version=TRUE)
-    })
-  }
+  # if (Sys.getenv("METWORX_VERSION") == "") {
+  #   skip("bbi_init only runs on Metworx")
+  # } else {
+  #   withr::with_options(list(rbabylon.bbi_exe_path = BBI_EXE_PATH), {
+  #     bbi_init(".", ".", .no_default_version=TRUE)
+  #   })
+  # }
+  withr::with_options(list(rbabylon.bbi_exe_path = BBI_EXE_PATH), {
+    bbi_init(".", ".", .no_default_version=TRUE)
+  })
 
   # read in yaml and check that it has a babylon key
   bbi_yaml <- yaml::read_yaml("babylon.yaml")
@@ -49,14 +56,18 @@ test_that("bbi_init errors with invalid .nonmem_version", {
   expect_error(bbi_init(".", "."), regexp = "Must specify a `.nonmem_version`")
 
   # fails if what you specify isn't in the babylon.yaml (i.e. isn't a valid NONMEM installation)
-  if (Sys.getenv("METWORX_VERSION") == "") {
-    skip("bbi_init only runs on Metworx")
-  } else {
-    withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi'), {
-      expect_error(bbi_init(".", ".", "naw"), regexp = "Must specify a valid `.nonmem_version`")
-      fs::file_delete("babylon.yaml")
-    })
-  }
+  # if (Sys.getenv("METWORX_VERSION") == "") {
+  #   skip("bbi_init only runs on Metworx")
+  # } else {
+  #   withr::with_options(list(rbabylon.bbi_exe_path = BBI_EXE_PATH), {
+  #     expect_error(bbi_init(".", ".", "naw"), regexp = "Must specify a valid `.nonmem_version`")
+  #     fs::file_delete("babylon.yaml")
+  #   })
+  # }
+  withr::with_options(list(rbabylon.bbi_exe_path = BBI_EXE_PATH), {
+    expect_error(bbi_init(".", ".", "naw"), regexp = "Must specify a valid `.nonmem_version`")
+    fs::file_delete("babylon.yaml")
+  })
 })
 
 
