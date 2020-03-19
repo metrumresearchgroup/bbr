@@ -410,10 +410,10 @@ copy_nonmem_model_from <- function(
 
   if (fs::file_exists(.new_model_path) && !isTRUE(.overwrite)) {
     # if .overwrite != TRUE, warn that file already exists
-    warning(glue("File already exists at {.new_model_path} -- using existing file because `.overwrite=FALSE` (default)"))
-  } else {
-    copy_control_stream(.parent_model_path, .new_model_path, .update_model_file, .description)
+    stop(glue("File already exists at {.new_model_path} -- using existing file because `.overwrite=FALSE` (default)"))
   }
+
+  copy_control_stream(.parent_model_path, .new_model_path, .update_model_file, .description)
 
   # write .new_mod out
   new_yaml_path <- yaml_ext(.new_model)
