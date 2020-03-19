@@ -566,9 +566,9 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     fs::file_copy(ctl_ext(YAML_TEST_FILE), new_ctl_path)
 
     # copy with .overwrite=FALSE
-    expect_warning(
+    expect_error(
       copy_model_from(mod1, NEW_MOD2, NEW_DESC, .overwrite=FALSE),
-      regexp = ".overwrite=FALSE"
+      regexp = "File already exists at"
     )
 
     # check the control stream is NOT modified (i.e. no overwrite)
@@ -581,7 +581,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_false(grepl(new_desc_pattern, new_mod_str))
 
     # cleanup
-    fs::file_delete(new_yaml_path)
     fs::file_delete(new_ctl_path)
   })
 

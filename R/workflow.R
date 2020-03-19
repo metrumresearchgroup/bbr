@@ -410,7 +410,7 @@ copy_nonmem_model_from <- function(
 
   if (fs::file_exists(.new_model_path) && !isTRUE(.overwrite)) {
     # if .overwrite != TRUE, warn that file already exists
-    warning(glue("File already exists at {.new_model_path} -- using existing file because `.overwrite=FALSE` (default)"))
+    stop(glue("File already exists at {.new_model_path} -- cannot copy new control stream. Either delete old file or use `new_model({yaml_ext(.new_model_path)})`"))
   } else {
     copy_control_stream(.parent_model_path, .new_model_path, .update_model_file, .description)
   }
