@@ -83,14 +83,14 @@ for (.tc in .test_cases) {
   })
 }
 
-# test output functionality with filter
+# test output functionality with regexpr passed through to dir_ls
 .test_cases <- list(
   list(.test_arg = OUTPUT_DIR, .test_name = "check_output_dir() character dir with filter"),
   list(.test_arg = MOD1, .test_name = "check_output_dir() model object with filter")
 )
 for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
-    res <- check_output_dir(.tc[[".test_arg"]], .filter = CTL_FILTER)
+    res <- check_output_dir(.tc[[".test_arg"]], regexp = CTL_FILTER)
     expect_identical(basename(res), basename(CTL_FILTER_RES))
   })
 }
