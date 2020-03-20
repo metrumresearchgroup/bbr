@@ -89,7 +89,7 @@ param_df1
 
 Much of the benefit of `rbabylon` is leveraged in the model iteration workflow, and the run log summaries that can be created afterwards. For example, imagine you look at these model results and want to begin iterating on them with a new model. The code below creates a new model object, based on the original, copying and renaming the control stream in the process.
 
-```{r copy_model 1}
+```{r copy_model 2}
 mod2 <- mod1 %>% copy_model_from(.new_model = "2", .description = "two compartment base model")
 ```
 
@@ -102,14 +102,14 @@ mod2 %>% model_summary()
 
 After looking at these results, the user can add tags, which can later be used to organize your modeling runs.
 
-```{r add_tags}
+```{r add_tags 2}
 mod1 <- mod1 %>% add_tags("base model")
 mod2 <- mod2 %>% add_tags(c("base model", "2 compartment"))
 ```
 
 Now the iteration process continues. 
 
-```{r copy_model 1}
+```{r copy_model 3}
 mod3 <- mod2 %>% copy_model_from(.new_model = "3", .description = "two compartment with residual errors")
 ```
 
@@ -120,10 +120,26 @@ mod3 %>% submit_model()
 mod3 %>% model_summary()
 ```
 
-In addition to tags, the user can add 
+In addition to tags, the user can add decisions that can be referenced later.
 
-```{r add_tags}
-mod1 <- mod1 %>% add_tags("base model")
-mod2 <- mod2 %>% add_tags(c("base model", "2 compartment"))
+```{r add_tags 3}
+mod3 <- mod3 %>% 
+        add_tags("2 compartment") %>%
+        add_decisions("Added residual errors because it seemed like a good idea.")
 ```
 
+# Run Log
+
+At any point, the user can easily construct a run log tibble to summarize all models run up to this point.
+
+```{r run_log} 
+log_df <- run_log()
+log_df
+```
+
+
+```{r filtering}
+log_df %>% 
+  dplyr::filter(purrr::map_lgl(tags, ~ "2 compartment" %in% .x)) %>%
+  dplyr::select(run_id, description, tags, decisions)
+```
