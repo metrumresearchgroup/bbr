@@ -87,16 +87,18 @@ submit_model.character <- function(
   } else if (is_valid_yaml_extension(.mod)) {
     .mod <- read_model(.mod)
   } else if (is_valid_nonmem_extension(.mod)) {
-    # if NONMEM file, first try to find YAML file, if it doesn't exist then build the model object
+    # if NONMEM file, create new model
     if (fs::file_exists(yaml_ext(.mod))) {
         stop(paste(glue("`submit_model({.mod})` is trying to create {yaml_ext(.mod)} but that file already exists."),
                    "Either call `submit_model({yaml_ext(.mod)})` or delete the YAML file if it does not correspond to this model."))
-    } else {
-      .mod <- new_model(
-        .yaml_path = yaml_ext(.mod),
-        .description = as.character(glue("{.mod} passed directly to submit_model()")),
-        .model_type = c("nonmem"))
     }
+
+    # create new model from
+    .mod <- new_model(
+      .yaml_path = yaml_ext(.mod),
+      .description = as.character(glue("{.mod} passed directly to submit_model()")),
+      .model_type = c("nonmem"))
+
   } else {
     stop(glue("Unsupported file type passed to submit_model(): `{.mod}`. Valid options are `.yaml`, `.mod`, and `.ctl`"))
   }
@@ -185,16 +187,16 @@ submit_nonmem_model <- function(.mod,
     cmd_args <- c(cmd_args, sprintf("--config=%s", .config_path))
   }
 
-  # execute
+  # define working directory
   model_dir <- .mod[[WORKING_DIR]]
 
   if (.dry_run) {
     # construct fake res object
-    res <- bbi_dry_run(cmd_args, model_dir)
-  } else {
-    # launch model
-    res <- bbi_exec(cmd_args, .wait = .wait, .dir = model_dir, ...)
+    return(bbi_dry_run(cmd_args, model_dir))
   }
+
+  # launch model
+  res <- bbi_exec(cmd_args, .wait = .wait, .dir = model_dir, ...)
 
   return(res)
 }
