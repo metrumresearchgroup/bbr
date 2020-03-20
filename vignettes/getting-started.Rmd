@@ -53,7 +53,8 @@ bbi_init(.dir = "../inst/nonmem",     # the modeling directory, where your contr
 Finally, it is best to set the modeling directory. By doing this, you do not need to pass the full path to model files, but only the path relative to the specified modeling directory. Pass a path relative to your current working directory to `set_model_directory()`
 
 ```{r set_model_directory, echo = FALSE}
-set_model_directory("../inst/nonmem")
+#set_model_directory("../inst/nonmem")
+set_model_directory("../nonmem")
 ```
 
 # Initial Modeling Run
