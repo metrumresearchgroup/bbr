@@ -16,6 +16,17 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r cleanup, include=FALSE}
+# delete old files
+# if feels like I shouldn't need to do this, but R CMD CHECK fails without it
+if (fs::file_exists("../inst/nonmem/1.yaml")) fs::file_delete("../inst/nonmem/1.yaml")
+if (fs::file_exists("../inst/nonmem/2.yaml")) fs::file_delete("../inst/nonmem/2.yaml")
+if (fs::file_exists("../inst/nonmem/3.yaml")) fs::file_delete("../inst/nonmem/3.yaml")
+if (fs::file_exists("../inst/nonmem/2.ctl")) fs::file_delete("../inst/nonmem/2.ctl")
+if (fs::file_exists("../inst/nonmem/3.ctl")) fs::file_delete("../inst/nonmem/3.ctl")
+if (fs::file_exists("../inst/nonmem/babylon.yaml")) fs::file_delete("../inst/nonmem/babylon.yaml")
+```
+
 # Introduction
 
 `rbabylon` is an R interface for running `babylon` which, according to [its README](https://github.com/metrumresearchgroup/babylon/), "is (will be) a complete solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences." Currently, only NONMEM is supported, so this vignette will only address that. 
@@ -24,16 +35,16 @@ This "Getting Started with rbabylon" vignette takes the user through some basic 
 
 # Setup
 
-There is some initial setup to get `rbabylon` configured. First, you will need to make sure you have installed `babylon` (often aliased as `bbi`) and told `rbabylon` where to find it. **POINT TO BBI INSTALLATION INSTRUCTIONS, do these exist?**
+There is some initial setup to get `rbabylon` configured. First, load the library and make sure you have installed `babylon` (often aliased as `bbi`) and told `rbabylon` where to find it. **POINT TO BBI INSTALLATION INSTRUCTIONS, do these exist?**
 
 ```{r bbi_exe_path}
+library(rbabylon)
 options('rbabylon.bbi_exe_path' = '/data/apps/bbi')
 ```
 
-Next we load the library and then initialize `babylon` by pointing it to a working installation of NONMEM, and default version to use.
+Next, initialize `babylon` by pointing it to a working installation of NONMEM, and default version to use.
 
-```{r setup}
-library(rbabylon)
+```{r setup, eval=FALSE}
 bbi_init(.dir = "../inst/nonmem",     # the modeling directory, where your control streams will be
          .nonmem_dir = "/opt/NONMEM", # location of NONMEM installation
          .nonmem_version = "nm74gf")  # default NONMEM version to use

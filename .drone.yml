@@ -1,6 +1,6 @@
 kind: pipeline
 type: docker
-name: rbabylon
+name: pmplots
 
 steps:
 - name: Pull mpn container from ECR
@@ -12,22 +12,12 @@ steps:
   - $(aws ecr get-login --no-include-email --region us-east-1)
   - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-01-29
 
-
 - name: R36
   image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-01-29"
   pull: never
   environment:
     R_LIBS_USER: "/opt/rpkgs/3.6/2020-01-29"
   commands:
-  # download and setup bbi
-  - wget https://github.com/metrumresearchgroup/babylon/releases/download/v2.1.0-rc2/bbi_2.1.0-rc2_linux_amd64.tar.gz -O bbi.tar.gz
-  - tar -xzf bbi.tar.gz
-  - rm bbi.tar.gz
-  - chmod +x bbi
-  - mkdir -p /data/apps
-  - mv bbi /data/apps/bbi
-  - export PATH=/data/apps:$PATH
-  # run R tests
   - /opt/R/3.6.2/bin/R -e "devtools::test()"
   - /opt/R/3.6.2/bin/R -e "devtools::check()"
 
@@ -38,15 +28,6 @@ steps:
   environment:
     R_LIBS_USER: "/opt/rpkgs/3.5/2020-01-29"
   commands:
-  # download and setup bbi
-  - wget https://github.com/metrumresearchgroup/babylon/releases/download/v2.1.0-rc2/bbi_2.1.0-rc2_linux_amd64.tar.gz -O bbi.tar.gz
-  - tar -xzf bbi.tar.gz
-  - rm bbi.tar.gz
-  - chmod +x bbi
-  - mkdir -p /data/apps
-  - mv bbi /data/apps/bbi
-  - export PATH=/data/apps:$PATH
-  # run R tests
   - /opt/R/3.5.3/bin/R -e "devtools::test()"
   - /opt/R/3.5.3/bin/R -e "devtools::check()"
 
