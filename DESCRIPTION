@@ -30,5 +30,8 @@ Imports:
     tidyr,
     yaml
 Suggests: 
-    testthat (>= 2.1.0)
+    testthat (>= 2.1.0),
+    knitr,
+    rmarkdown
 License: MIT + file LICENSE
+VignetteBuilder: knitr

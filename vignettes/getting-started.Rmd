@@ -1,0 +1,129 @@
+---
+title: "Getting Started with rbabylon"
+author: "Seth Green"
+date: "2020-03-20"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{getting-started}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+`rbabylon` is an R interface for running `babylon` which, according to [its README](https://github.com/metrumresearchgroup/babylon/), "is (will be) a complete solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences." Currently, only NONMEM is supported, so this vignette will only address that. 
+
+This "Getting Started with rbabylon" vignette takes the user through some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its basic workflow and functionality. 
+
+# Setup
+
+There is some initial setup to get `rbabylon` configured. First, you will need to make sure you have installed `babylon` (often aliased as `bbi`) and told `rbabylon` where to find it. **POINT TO BBI INSTALLATION INSTRUCTIONS, do these exist?**
+
+```{r bbi_exe_path}
+options('rbabylon.bbi_exe_path' = '/data/apps/bbi')
+```
+
+Next we load the library and then initialize `babylon` by pointing it to a working installation of NONMEM, and default version to use.
+
+```{r setup}
+library(rbabylon)
+bbi_init(.dir = "../inst/nonmem",     # the modeling directory, where your control streams will be
+         .nonmem_dir = "/opt/NONMEM", # location of NONMEM installation
+         .nonmem_version = "nm74gf")  # default NONMEM version to use
+```
+
+Finally, it is best to set the modeling directory. By doing this, you do not need to pass the full path to model files, but only the path relative to the specified modeling directory. Pass a path relative to your current working directory to `set_model_directory()`
+
+```{r set_model_directory, echo = FALSE}
+set_model_directory("../inst/nonmem")
+```
+
+# Initial Modeling Run
+
+## Create Model Object
+To begin modeling, first create a model object. This is an S3 object with an accompanying YAML file, kept in your modeling directory. The YAML serves as the "record of truth" for the model, and will persist changes you make to the model as you go.
+
+The `.yaml_path` argument should have the same name (but with a `.yaml` extension) as your base model control stream. For instance, the command below assumes you have a control stream name `1.ctl` or `1.mod` in the model directory you just defined. The `.description` argument is required and corresponds to what would be in the `$PROB` definition in a control stream.
+
+```{r first model}
+mod1 <- new_model(.yaml_path = "1.yaml", .description = "our first model")
+```
+
+The model object you have just created can be passed to various functions which you will see in a minute. If you ever need to recreate it, just run `mod1 <- read_model("1.yaml")` to rebuild it from the YAML. The first thing we will do is submit the model to be run.
+
+## Submit Model
+
+```{r submit_model_real, include = FALSE}
+proc1 <- mod1 %>% submit_model(.dry_run = TRUE)
+```
+
+```{r submit_model_fake, eval = FALSE}
+proc1 <- mod1 %>% submit_model()
+```
+
+This will return a process object. We won't discuss this object in this vignette, but other documentation will show how it can be used to check on the model run in progress. Please note that, for this first release, **checking on a model run in progress is not fully implemented.** For now, users should check on their runs manually and only proceed to the next steps once it has successfully completed. 
+
+## Summarize Model
+Once the model run has completed, users can get a summary object containing much of the commonly used diagnostic information in a named list.
+
+```{r model_summary}
+sum1 <- mod1 %>% model_summary()
+print(names(sum1))
+```
+
+These elements can be accessed manually or extracted with built-in helper functions like so:
+
+```{r param_estimates}
+param_df1 <- sum1 %>% param_estimates()
+param_df1
+```
+
+# Iteration
+
+Much of the benefit of `rbabylon` is leveraged in the model iteration workflow, and the run log summaries that can be created afterwards. For example, imagine you look at these model results and want to begin iterating on them with a new model. The code below creates a new model object, based on the original, copying and renaming the control stream in the process.
+
+```{r copy_model 1}
+mod2 <- mod1 %>% copy_model_from(.new_model = "2", .description = "two compartment base model")
+```
+
+The new control stream file `2.ctl` can now be edited with the desired changes and then submitted and summarized exactly as above.
+
+```{r submit 2, eval = FALSE}
+mod2 %>% submit_model()
+mod2 %>% model_summary()
+```
+
+After looking at these results, the user can add tags, which can later be used to organize your modeling runs.
+
+```{r add_tags}
+mod1 <- mod1 %>% add_tags("base model")
+mod2 <- mod2 %>% add_tags(c("base model", "2 compartment"))
+```
+
+Now the iteration process continues. 
+
+```{r copy_model 1}
+mod3 <- mod2 %>% copy_model_from(.new_model = "3", .description = "two compartment with residual errors")
+```
+
+Submit and summarize as before.
+
+```{r submit 3, eval = FALSE}
+mod3 %>% submit_model()
+mod3 %>% model_summary()
+```
+
+In addition to tags, the user can add 
+
+```{r add_tags}
+mod1 <- mod1 %>% add_tags("base model")
+mod2 <- mod2 %>% add_tags(c("base model", "2 compartment"))
+```
+
