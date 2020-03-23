@@ -29,29 +29,25 @@ if (fs::file_exists("../inst/nonmem/babylon.yaml")) fs::file_delete("../inst/non
 
 # Introduction
 
-`rbabylon` is an R interface for running `babylon` which, according to 
-[its README](https://github.com/metrumresearchgroup/babylon/), "is (will be) a 
-complete solution for managing projects involving modeling and simulation with a 
-number of software solutions used in pharmaceutical sciences." Currently, only 
-NONMEM is supported, so this vignette will only address that. 
+`rbabylon` is an R interface for running `babylon`. `babylon` is (will be) a complete solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. Currently, only NONMEM is supported, so this vignette will only address that. 
 
-This "Getting Started with rbabylon" vignette takes the user through some basic 
-scenarios for modeling with NONMEM using `rbabylon`, introducing you to its 
-standard workflow and functionality. 
+This "Getting Started with rbabylon" vignette takes the user through some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its standard workflow and functionality. 
 
 # Setup
 
-There is some initial setup to get `rbabylon` configured. First, load the 
-library and make sure you have installed `babylon` (often aliased as `bbi`) and 
-told `rbabylon` where to find it. **POINT TO BBI INSTALLATION INSTRUCTIONS, do these exist?**
+## Installing babylon
+
+To use `rbabylon` you must first install `babylon`, often aliased as `bbi`, on your system. Check the [babylon documentation](https://github.com/metrumresearchgroup/babylon) for installation instructions.
+
+There is also some initial setup to get `rbabylon` configured. First, load the library and tell it where to find the `babylon` installation. For the purposes of this demo, assume the babylon executable is at `/data/apps/bbi`.
+
 
 ```{r bbi_exe_path}
 library(rbabylon)
 options('rbabylon.bbi_exe_path' = '/data/apps/bbi')
 ```
 
-Next, initialize `babylon` by pointing it to a working installation of NONMEM, 
-and default version to use.
+Next, initialize `babylon` by pointing it to a working installation of NONMEM, and default version to use.
 
 ```{r setup, eval=FALSE}
 bbi_init(.dir = "../inst/nonmem",     # the modeling directory, where your control streams are
@@ -59,10 +55,7 @@ bbi_init(.dir = "../inst/nonmem",     # the modeling directory, where your contr
          .nonmem_version = "nm74gf")  # default NONMEM version to use
 ```
 
-Finally, it is best to set the modeling directory. By doing this, you do not 
-need to pass the full path to model files, but only the path relative to the 
-specified modeling directory. Pass a path relative to your current working 
-directory to `set_model_directory()`
+Finally, it is best to set the modeling directory. By doing this, you do not need to pass the full path to model files, but only the path relative to the specified modeling directory. Pass a path relative to your current working directory to `set_model_directory()`
 
 ```{r set_model_directory, echo = TRUE}
 set_model_directory("../inst/nonmem")
@@ -71,63 +64,37 @@ set_model_directory("../inst/nonmem")
 # Initial Modeling Run
 
 ## Create Model Object
-To begin modeling, first create a model object. This is an S3 object with an 
-accompanying YAML file, kept in your modeling directory. The YAML serves as the 
-"record of truth" for the model, and will persist changes you make to the model 
-as you go.
+To begin modeling, first create a model object. This is an S3 object with an accompanying YAML file, kept in your modeling directory. The YAML serves as the "record of truth" for the model, and will persist changes you make to the model as you go.
 
-The `.yaml_path` argument should have the same name (but with a `.yaml` 
-extension) as your base model control stream. For instance, the command below 
-assumes you have a control stream name `1.ctl` or `1.mod` in the model directory 
-you just defined. The `.description` argument is required and corresponds to 
-what would be in the `$PROB` definition in a control stream.
+The `.yaml_path` argument should have the same name (but with a `.yaml` extension) as your base model control stream. For instance, the command below assumes you have a control stream name `1.ctl` or `1.mod` in the model directory you just defined. The `.description` argument is required and corresponds to what would be in the `$PROB` definition in a control stream.
 
 ```{r first model}
 mod1 <- new_model(.yaml_path = "1.yaml", .description = "our first model")
 ```
 
-The model object you have just created can be passed to various functions which 
-you will see in a minute. If you ever need to recreate it, just run 
-`mod1 <- read_model("1.yaml")` to rebuild it from the YAML. The first thing we 
-will do is submit the model to be run.
+The model object you have just created can be passed to various functions which you will see in a minute. If you ever need to recreate it, just run `mod1 <- read_model("1.yaml")` to rebuild it from the YAML. The first thing we will do is submit the model to be run.
 
 ## Submit Model
 
 ```{r submit_model_real, include = FALSE}
-proc1 <- mod1 %>% submit_model(.dry_run = TRUE)
+mod1 %>% submit_model(.dry_run = TRUE)
 ```
 
 ```{r submit_model_fake, eval = FALSE}
-proc1 <- mod1 %>% submit_model()
+mod1 %>% submit_model()
 ```
 
-This will return a process object. We won't discuss this object in this 
-vignette, but other documentation will show how it can be used to check on the 
-model run in progress. Please note that, for this first release, 
-**checking on a model run in progress is not fully implemented.** For now, users 
-should check on their runs manually and only proceed to the next steps once it 
-has successfully completed. 
+This will return a process object. We won't discuss this object in this vignette, but other documentation will show how it can be used to check on the model run in progress. Please note that, for this first release, **checking on a model run in progress is not fully implemented.** For now, users should check on their runs manually and only proceed to the next steps once it has successfully completed. 
 
 ## Summarize Model
-Once the model run has completed, users can get a summary object containing much 
-of the commonly used diagnostic information in a named list.
+Once the model run has completed, users can get a summary object containing much of the commonly used diagnostic information in a named list.
 
 ```{r model_summary}
 sum1 <- mod1 %>% model_summary()
 print(names(sum1))
 ```
 
-If you wish to examine the model results after clearing your R environment, 
-remember that you must reload the model object. Read model can take either a 
-character object, or a numeric object.
-
-```{r read_model, eval=F}
-mod1 <- read_model(1)
-sum1 <- mod1 %>% model_summary()
-```
-
-These elements can be accessed manually or extracted with built-in helper 
-functions like so:
+These elements can be accessed manually or extracted with built-in helper functions like so:
 
 ```{r param_estimates}
 param_df1 <- sum1 %>% param_estimates()
@@ -136,27 +103,29 @@ param_df1
 
 # Iteration
 
-Much of the benefit of `rbabylon` is leveraged in the model iteration workflow, 
-and the run log summaries that can be created afterwards. For example, imagine 
-you look at these model results and want to begin iterating on them with a new 
-model. The code below creates a new model object, based on the original, copying 
-and renaming the control stream in the process.
+Much of the benefit of `rbabylon` is leveraged in the model iteration workflow, and the run log summaries that can be created afterwards. For example, imagine you look at these model results and want to begin iterating on them with a new model. 
+
+Imagine you are now in a new R session and no longer have your `mod1` object. You can easily rebuild it from the YAML file on disk. *NOTE:* You can pass either a character or integer to `read_model()`, `submit_model()`, etc. to identify your model, assuming that you have set your model directory correctly.
+
+```{r read_model fake, eval=FALSE}
+mod1 <- read_model(1)
+```
+
+Now the user can create a new model object, based on the original, copying and renaming the control stream in the process.
 
 ```{r copy_model 2}
-mod2 <- mod1 %>% copy_model_from(.new_model = "2", 
+mod2 <- mod1 %>% copy_model_from(.new_model = 2, 
                                  .description = "two compartment base model")
 ```
 
-The new control stream file `2.ctl` can now be edited with the desired changes 
-and then submitted and summarized exactly as above.
+The new control stream file `2.ctl` can now be edited with the desired changes and then submitted and summarized exactly as above.
 
 ```{r submit 2, eval = FALSE}
 mod2 %>% submit_model()
 mod2 %>% model_summary()
 ```
 
-After looking at these results, the user can add tags, which can later be used 
-to organize your modeling runs.
+After looking at these results, the user can add tags, which can later be used to organize your modeling runs.
 
 ```{r add_tags 2}
 mod1 <- mod1 %>% add_tags("base model")
@@ -164,6 +133,7 @@ mod2 <- mod2 %>% add_tags(c("base model", "2 compartment"))
 ```
 
 In addition to tags, the user can add decisions that can be referenced later.
+
 ```{r}
 mod2 <- mod2 %>% 
   add_decisions("2 compartment model more appropriate than 1 compartment")
@@ -174,7 +144,7 @@ Now the iteration process continues.
 
 ```{r copy_model 3}
 mod3 <- mod2 %>% 
-  copy_model_from(.new_model = "3", 
+  copy_model_from(.new_model = 3, 
                   .description = "two compartment with residual errors")
 ```
 
@@ -203,23 +173,34 @@ log_df <- run_log()
 log_df
 ```
 
-The `log_df` object defaults to list objects in collumns. Example code is provided 
-below to illustrate one way users can clean up and display a more human-friendly
-version of the run log.
+The `run_log()` returns a tibble (called `log_df` in this example) which can be manipulated
+like any other tibble. However, several of the columns (`tags` and `based_on` for example) are
+list columns, which complicates how the user interacts with them. Future releases will have 
+helper functions to more seamlessly interact with `log_df`, but until then, we have provided
+some sample `dplyr` code below.
+
+## Viewing tags example
+
+This example code displays a more human-readable version of the run log, with the tags collapsed to a 
+character vector.
 
 ```{r run_log_cleanup} 
-log_df %>% 
-  dplyr::group_by(run_id) %>% 
-  dplyr::mutate_at(.vars = dplyr::vars(tags:decisions), 
-                   ~ paste(unlist(.x), collapse=", ")) %>% 
-  dplyr::ungroup() %>% 
-  dplyr::select(run_id, description, tags, decisions)
+suppressPackageStartupMessages(library(dplyr))
 
+log_df %>% 
+  group_by(run_id) %>% 
+  mutate_at(.vars = vars(tags:decisions), 
+                   ~ paste(unlist(.x), collapse=", ")) %>% 
+  ungroup() %>% 
+  select(run_id, tags, decisions)
 ```
 
+## Filtering tags example
+
+This code uses `purrr::map_lgl` to filter the run log to only rows containing a specific tag (`"2 compartment"`).
 
 ```{r filtering}
 log_df %>% 
-  dplyr::filter(purrr::map_lgl(tags, ~ "2 compartment" %in% .x)) %>%
-  dplyr::select(run_id, description, tags, decisions)
+  filter(purrr::map_lgl(tags, ~ "2 compartment" %in% .x)) %>%
+  select(run_id, description, tags, decisions)
 ```
