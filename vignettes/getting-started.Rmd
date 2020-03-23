@@ -203,6 +203,20 @@ log_df <- run_log()
 log_df
 ```
 
+The `log_df` object defaults to list objects in collumns. Example code is provided 
+below to illustrate one way users can clean up and display a more human-friendly
+version of the run log.
+
+```{r run_log_cleanup} 
+log_df %>% 
+  dplyr::group_by(run_id) %>% 
+  dplyr::mutate_at(.vars = dplyr::vars(tags:decisions), 
+                   ~ paste(unlist(.x), collapse=", ")) %>% 
+  dplyr::ungroup() %>% 
+  dplyr::select(run_id, description, tags, decisions)
+
+```
+
 
 ```{r filtering}
 log_df %>% 
