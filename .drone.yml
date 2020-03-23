@@ -1,6 +1,13 @@
 kind: pipeline
 type: docker
-name: pmplots
+name: pkgpub
+
+#Gobal variable definitions and anchors
+global-variables:
+    environment: &default_environment
+        BABYLON_URL: https://github.com/metrumresearchgroup/babylon/releases/download/v2.1.0-rc2/bbi_2.1.0-rc2_linux_amd64.tar.gz
+        #Not currently used
+        BABYLON_VERSION: 2.1.0-rc2
 
 steps:
 - name: Pull mpn container from ECR
@@ -10,28 +17,76 @@ steps:
     path: /var/run/docker.sock
   commands:
   - $(aws ecr get-login --no-include-email --region us-east-1)
-  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-01-29
+  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-07
 
 - name: R36
-  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-01-29"
+  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-07"
   pull: never
   environment:
-    R_LIBS_USER: "/opt/rpkgs/3.6/2020-01-29"
+    R_LIBS_USER: "/opt/rpkgs/3.6/2020-03-07"
+    # Reading in entire anchor
+    <<: *default_environment
   commands:
+  # download and setup bbi
+  - wget $BABYLON_URL -O bbi.tar.gz
+  - tar -xzf bbi.tar.gz
+  - rm bbi.tar.gz
+  - chmod +x bbi
+  - mkdir -p /data/apps
+  - mv bbi /data/apps/bbi
+  - export PATH=/data/apps:$PATH
+  - /opt/R/3.6.2/bin/R -e "devtools::install_deps(upgrade = 'never')"
   - /opt/R/3.6.2/bin/R -e "devtools::test()"
   - /opt/R/3.6.2/bin/R -e "devtools::check()"
 
 
 - name: R35
-  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-01-29"
+  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-07"
   pull: never
   environment:
-    R_LIBS_USER: "/opt/rpkgs/3.5/2020-01-29"
+    R_LIBS_USER: "/opt/rpkgs/3.5/2020-03-07"
+    <<: *default_environment
   commands:
+  # download and setup bbi
+  - wget $BABYLON_URL -O bbi.tar.gz
+  - tar -xzf bbi.tar.gz
+  - rm bbi.tar.gz
+  - chmod +x bbi
+  - mkdir -p /data/apps
+  - mv bbi /data/apps/bbi
+  - export PATH=/data/apps:$PATH
+  - /opt/R/3.5.3/bin/R -e "devtools::install_deps(upgrade = 'never')"
   - /opt/R/3.5.3/bin/R -e "devtools::test()"
   - /opt/R/3.5.3/bin/R -e "devtools::check()"
+
+- name: release
+  when:
+    event:
+    - tag
+    status:
+    - success
+  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-07"
+  pull: never
+  environment:
+    R_LIBS_USER: "/opt/rpkgs/3.6/2020-03-07"
+    <<: *default_environment
+  commands:
+  # download and setup bbi
+  - wget $BABYLON_URL -O bbi.tar.gz
+  - tar -xzf bbi.tar.gz
+  - rm bbi.tar.gz
+  - chmod +x bbi
+  - mkdir -p /data/apps
+  - mv bbi /data/apps/bbi
+  - export PATH=/data/apps:$PATH
+  - git config --global user.email "drone@metrumrg.com"
+  - git config --global user.name "Drony"
+  - git fetch --tags
+  - R -e "pkgpub::create_tagged_repo()"
+  - aws s3 sync /tmp/${DRONE_TAG} s3://mpn.metworx.dev/releases/${DRONE_REPO_NAME}/${DRONE_TAG}
 
 volumes:
 - name: docker.sock
   host:
     path: /var/run/docker.sock
+
