@@ -27,7 +27,7 @@ snapshots](https://mpn.metworx.com/docs/snapshots) from any date *after*
 
 You can also install development versions of `rbabylon` by downloading
 the source files for the latest version from
-`https://s3.amazonaws.com/mpn.metworx.dev/releases/rbabylon/` or get the
+`https://s3.amazonaws.com/mpn.metworx.dev/releases/rbabylon/<version>`. For example, to install the version 0.1.0.9002 you would use the url: `https://s3.amazonaws.com/mpn.metworx.dev/releases/rbabylon/0.1.0.9002`. You can also get the
 latest development version from [GitHub](https://github.com/) with:
 
 ``` r
