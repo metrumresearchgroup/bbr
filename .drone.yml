@@ -30,9 +30,9 @@ steps:
   - wget $BABYLON_URL -O bbi.tar.gz
   - tar -xzf bbi.tar.gz
   - rm bbi.tar.gz
-  - chmod +x bbi
+  - chmod +x bbi_linux_amd64/bbi
   - mkdir -p /data/apps
-  - mv bbi /data/apps/bbi
+  - mv bbi_linux_amd64/bbi /data/apps/bbi
   - export PATH=/data/apps:$PATH
   - /opt/R/3.6.2/bin/R -e "devtools::install_deps(upgrade = 'never')"
   - /opt/R/3.6.2/bin/R -e "devtools::test()"
@@ -50,9 +50,9 @@ steps:
   - wget $BABYLON_URL -O bbi.tar.gz
   - tar -xzf bbi.tar.gz
   - rm bbi.tar.gz
-  - chmod +x bbi
+  - chmod +x bbi_linux_amd64/bbi
   - mkdir -p /data/apps
-  - mv bbi /data/apps/bbi
+  - mv bbi_linux_amd64/bbi /data/apps/bbi
   - export PATH=/data/apps:$PATH
   - /opt/R/3.5.3/bin/R -e "devtools::install_deps(upgrade = 'never')"
   - /opt/R/3.5.3/bin/R -e "devtools::test()"
@@ -74,9 +74,9 @@ steps:
   - wget $BABYLON_URL -O bbi.tar.gz
   - tar -xzf bbi.tar.gz
   - rm bbi.tar.gz
-  - chmod +x bbi
+  - chmod +x bbi_linux_amd64/bbi
   - mkdir -p /data/apps
-  - mv bbi /data/apps/bbi
+  - mv bbi_linux_amd64/bbi /data/apps/bbi
   - export PATH=/data/apps:$PATH
   - git config --global user.email "drone@metrumrg.com"
   - git config --global user.name "Drony"
