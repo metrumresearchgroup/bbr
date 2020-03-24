@@ -15,7 +15,8 @@ copy_model_from(
   .based_on_additional = NULL,
   .add_tags = NULL,
   .inherit_tags = FALSE,
-  .update_mod_file = TRUE,
+  .update_model_file = TRUE,
+  .overwrite = FALSE,
   .directory = getOption("rbabylon.model_directory")
 )
 
@@ -26,7 +27,8 @@ copy_model_from(
   .based_on_additional = NULL,
   .add_tags = NULL,
   .inherit_tags = FALSE,
-  .update_mod_file = TRUE,
+  .update_model_file = TRUE,
+  .overwrite = FALSE,
   .directory = getOption("rbabylon.model_directory")
 )
 
@@ -37,7 +39,8 @@ copy_model_from(
   .based_on_additional = NULL,
   .add_tags = NULL,
   .inherit_tags = FALSE,
-  .update_mod_file = TRUE,
+  .update_model_file = TRUE,
+  .overwrite = FALSE,
   .directory = getOption("rbabylon.model_directory")
 )
 
@@ -48,7 +51,8 @@ copy_model_from(
   .based_on_additional = NULL,
   .add_tags = NULL,
   .inherit_tags = FALSE,
-  .update_mod_file = TRUE,
+  .update_model_file = TRUE,
+  .overwrite = FALSE,
   .directory = getOption("rbabylon.model_directory")
 )
 
@@ -59,7 +63,8 @@ copy_nonmem_model_from(
   .based_on_additional = NULL,
   .add_tags = NULL,
   .inherit_tags = FALSE,
-  .update_mod_file = TRUE
+  .update_model_file = TRUE,
+  .overwrite = FALSE
 )
 }
 \arguments{
@@ -75,7 +80,9 @@ copy_nonmem_model_from(
 
 \item{.inherit_tags}{Boolean for whether to inherit any tags from `.parent_model.yaml`}
 
-\item{.update_mod_file}{Boolean for whether to update the `$PROBLEM` line in the new control stream. By default it is TRUE, but if FALSE is passed `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.}
+\item{.update_model_file}{Boolean for whether to update the `$PROBLEM` line in the new control stream. By default it is TRUE, but if FALSE is passed `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.}
+
+\item{.overwrite}{Boolean for whether to overwrite .ctl or .mod file if one already exists at `{.new_model}.[mod|ctl]`}
 
 \item{.directory}{Model directory which BOTH `.parent_model` and `.new_model` are relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
 }

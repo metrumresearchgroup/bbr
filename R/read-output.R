@@ -141,10 +141,10 @@ tail_lst.bbi_nonmem_model <- function(.mod, .head = 3, .tail = 5, .print = TRUE,
 
 #' List files in the output directory to glance at where the process is
 #' @param .mod generic res
-#' @param .filter Optional Character scaler of regex to filter filenames on and only return matches
+#' @param ... values to pass to `fs::dir_ls`
 #' @rdname check_output_dir
 #' @export
-check_output_dir <- function(.mod, .filter = NULL) {
+check_output_dir <- function(.mod, ...) {
   UseMethod("check_output_dir")
 }
 
@@ -152,14 +152,8 @@ check_output_dir <- function(.mod, .filter = NULL) {
 #' @param .mod Character scaler of path to output directory
 #' @rdname check_output_dir
 #' @export
-check_output_dir.character <- function(.mod, .filter = NULL) {
-  .out_files <- fs::dir_ls(.mod)
-
-  # optionally filter results
-  if(!is.null(.filter)) {
-    .out_files <- str_subset(.out_files, .filter)
-  }
-
+check_output_dir.character <- function(.mod, ...) {
+  .out_files <- fs::dir_ls(.mod, ...)
   return(.out_files)
 }
 
@@ -167,9 +161,9 @@ check_output_dir.character <- function(.mod, .filter = NULL) {
 #' @param .mod The `bbi_{.model_type}_model` object
 #' @rdname check_output_dir
 #' @export
-check_output_dir.bbi_nonmem_model <- function(.mod, .filter = NULL) {
+check_output_dir.bbi_nonmem_model <- function(.mod, ...) {
   .output_dir <- .mod %>% get_output_dir()
-  .out_files <- check_output_dir(.output_dir, .filter)
+  .out_files <- check_output_dir(.output_dir, ...)
   return(.out_files)
 }
 
@@ -205,10 +199,12 @@ check_nonmem_table_output <- function(
 #' @param .stat_name Character scaler for the name of the stat the other columns represents (like "gradient" or "theta").
 #' @importFrom tidyr gather
 #' @importFrom ggplot2 ggplot aes geom_line xlab ylab scale_colour_discrete ggtitle
+#' @importFrom forcats fct_inorder
 #' @rdname plot_nonmem_table_df
 #' @export
 plot_nonmem_table_df <- function(.df, .x_var, .stat_name) {
   p <- .df %>% gather("stat", "value", -.data[[.x_var]]) %>%
+    mutate(stat = forcats::fct_inorder(stat)) %>%
     ggplot(aes(x=.data[[.x_var]], y=.data$value, colour=.data$stat)) + geom_line() +
     xlab(.x_var) + ylab(paste(.stat_name, "value")) + scale_colour_discrete(name = .stat_name) + ggtitle(paste(.x_var, "x", .stat_name))
   return(p)

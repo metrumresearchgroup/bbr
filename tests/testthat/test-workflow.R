@@ -8,6 +8,7 @@ NEW_MOD3 <- file.path(MODEL_DIR, "3")
 
 ORIG_DESC <- "original acop model"
 NEW_DESC <- "new description"
+DESC_IN_CTL <- "PK model 1 cmt base"
 
 ORIG_TAGS <- c("acop tag", "other tag")
 NEW_TAGS <- c("new tag 1", "new tag 2")
@@ -426,7 +427,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
                     NEW_DESC,
                     .based_on_additional = get_model_id(NEW_MOD2),
                     .inherit_tags = TRUE,
-                    .update_mod_file = FALSE)
+                    .update_model_file = FALSE)
 
     # check that everything is copied through
     new_yaml <- yaml::read_yaml(yaml_ext(NEW_MOD3))
@@ -522,6 +523,65 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
       fs::file_delete(new_yaml_path)
       fs::file_delete(new_ctl_path)
     })
+  })
+
+
+  test_that("copy_from_model .overwrite=TRUE works", {
+    # set up model object
+    mod1 <- read_model(YAML_TEST_FILE)
+    new_yaml_path <- yaml_ext(NEW_MOD2)
+    new_ctl_path <- ctl_ext(NEW_MOD2)
+    expect_false(fs::file_exists(new_yaml_path))
+    expect_false(fs::file_exists(new_ctl_path))
+
+    # copy control stream
+    fs::file_copy(ctl_ext(YAML_TEST_FILE), new_ctl_path)
+
+    # copy with .overwrite=TRUE
+    copy_model_from(mod1, NEW_MOD2, NEW_DESC, .overwrite=TRUE)
+
+    # check the control stream is modified by overwrite
+    new_mod_str <- readr::read_file(new_ctl_path)
+
+    orig_desc_pattern <- paste0("\\$PROBLEM ", DESC_IN_CTL, "\n\n\\$INPUT")
+    expect_false(grepl(orig_desc_pattern, new_mod_str))
+
+    new_desc_pattern <- paste0("\\$PROBLEM ", get_model_id(NEW_MOD2), " ", NEW_DESC, "\n\n\\$INPUT")
+    expect_true(grepl(new_desc_pattern, new_mod_str))
+
+    # cleanup
+    fs::file_delete(new_yaml_path)
+    fs::file_delete(new_ctl_path)
+  })
+
+  test_that("copy_from_model .overwrite=FALSE works", {
+    # set up model object
+    mod1 <- read_model(YAML_TEST_FILE)
+    new_yaml_path <- yaml_ext(NEW_MOD2)
+    new_ctl_path <- ctl_ext(NEW_MOD2)
+    expect_false(fs::file_exists(new_yaml_path))
+    expect_false(fs::file_exists(new_ctl_path))
+
+    # copy control stream
+    fs::file_copy(ctl_ext(YAML_TEST_FILE), new_ctl_path)
+
+    # copy with .overwrite=FALSE
+    expect_error(
+      copy_model_from(mod1, NEW_MOD2, NEW_DESC, .overwrite=FALSE),
+      regexp = "File already exists at"
+    )
+
+    # check the control stream is NOT modified (i.e. no overwrite)
+    new_mod_str <- readr::read_file(new_ctl_path)
+
+    orig_desc_pattern <- paste0("\\$PROBLEM ", DESC_IN_CTL, "\n\n\\$INPUT")
+    expect_true(grepl(orig_desc_pattern, new_mod_str))
+
+    new_desc_pattern <- paste0("\\$PROBLEM ", get_model_id(NEW_MOD2), " ", NEW_DESC, "\n\n\\$INPUT")
+    expect_false(grepl(new_desc_pattern, new_mod_str))
+
+    # cleanup
+    fs::file_delete(new_ctl_path)
   })
 
 
