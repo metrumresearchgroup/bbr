@@ -1,13 +1,12 @@
 kind: pipeline
 type: docker
-name: pkgpub
+name: rbabylon
 
 #Gobal variable definitions and anchors
 global-variables:
     environment: &default_environment
-        BABYLON_URL: https://github.com/metrumresearchgroup/babylon/releases/download/v2.1.0-rc2/bbi_2.1.0-rc2_linux_amd64.tar.gz
-        #Not currently used
-        BABYLON_VERSION: 2.1.0-rc2
+        BABYLON_URL: https://github.com/metrumresearchgroup/babylon/releases/download/latest/bbi_linux_amd64.tar.gz
+        BABYLON_VERSION: 2.1.0-rc3 # Not currently used
 
 steps:
 - name: Pull mpn container from ECR
