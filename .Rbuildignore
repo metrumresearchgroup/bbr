@@ -3,3 +3,7 @@
 ^LICENSE\.md$
 ^.drone.yml$
 ^README\.Rmd$
+^_pkgdown.yml$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
