@@ -28,7 +28,7 @@ steps:
   commands:
   # download and setup bbi
   - wget $BABYLON_URL -O bbi.tar.gz
-  - tar -xzvf bbi.tar.gz
+  - tar -xzf bbi.tar.gz
   - rm bbi.tar.gz
   - chmod +x bbi_linux_amd64/bbi
   - mkdir -p /data/apps
@@ -50,7 +50,7 @@ steps:
   commands:
   # download and setup bbi
   - wget $BABYLON_URL -O bbi.tar.gz
-  - tar -xzvf bbi.tar.gz
+  - tar -xzf bbi.tar.gz
   - rm bbi.tar.gz
   - ls -la bbi_linux_amd64
   - chmod +x bbi_linux_amd64/bbi
@@ -75,7 +75,7 @@ steps:
   commands:
   # download and setup bbi
   - wget $BABYLON_URL -O bbi.tar.gz
-  - tar -xzvf bbi.tar.gz
+  - tar -xzf bbi.tar.gz
   - rm bbi.tar.gz
   - chmod +x bbi_linux_amd64/bbi
   - mkdir -p /data/apps
@@ -91,5 +91,3 @@ volumes:
 - name: docker.sock
   host:
     path: /var/run/docker.sock
-
-# Thanks DJ!
