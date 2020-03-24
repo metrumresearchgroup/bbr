@@ -1,0 +1,8 @@
+description: original acop model
+model_type: nonmem
+tags:
+- acop tag
+- other tag
+bbi_args:
+  overwrite: yes
+  threads: 4.0

@@ -7,12 +7,12 @@
 parse_args_list(.func_args, .yaml_args)
 }
 \arguments{
-\item{.func_args}{A named list of arguments for bbi, passed into submit model function call}
+\item{.func_args}{A named list of arguments for bbi, passed into submit_model function call}
 
 \item{.yaml_args}{A named list of arguments for bbi, parsed from user input yaml}
 }
 \value{
-The combination of the two lists, with .yaml_args overriding any keys that are shared
+The combination of the two lists, with .func_args overwriting any keys that are shared
 }
 \description{
 Combines NONMEM args that were passed into the function call with args that were parsed from a model yaml

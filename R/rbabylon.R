@@ -6,48 +6,82 @@
 #' Initial support encompasses NONMEM however the api is designed in a way to be flexible to handle other software.
 #' @importFrom glue glue
 #' @importFrom rlang .data
+#' @import fs
 NULL
 
 #' Executes a babylon call (`bbi ...`) with processx::process$new()
 #' @param .cmd_args A character vector of command line arguments for the execution call
+#' @param .dir The working directory to run command in. Defaults to "."
 #' @param .verbose Print stdout and stderr as process runs #### NOT IMPLEMENTED?
 #' @param .wait If true, don't return until process has exited.
 #' @param ... arguments to pass to processx::process$new()
-#' @return A named list with process object and some metadata
-#'         process -- The process object (see ?processx::process$new for more details on what you can do with this)
-#'         output -- the stdout and stderr from the process, if `.wait = TRUE`. If `.wait = FALSE` this will be NULL.
-#'         bbi -- character scaler with the execution path used for bbi
-#'         cmd_args -- character vector of all command arguments passed to the process
+#' @return An S3 object of class `babylon_process`
+#'         process -- The process object (see ?processx::process$new for more details on what you can do with this).
+#'         stdout -- the stdout and stderr from the process, if `.wait = TRUE`. If `.wait = FALSE` this will be NULL.
+#'         bbi -- character scaler with the execution path used for bbi.
+#'         cmd_args -- character vector of all command arguments passed to the process.
+#'         working_dir -- the directory the command was run in, passed through from .dir argument.
 #' @importFrom processx process
 #' @export
-bbi_exec <- function(.cmd_args, .verbose = FALSE, .wait = FALSE, ...) {
+bbi_exec <- function(.cmd_args, .dir = ".", .verbose = FALSE, .wait = FALSE, ...) {
   bbi_exe_path <- getOption("rbabylon.bbi_exe_path")
   check_bbi_exe(bbi_exe_path)
 
-  p <- processx::process$new(bbi_exe_path, .cmd_args, ..., stdout = "|", stderr = "2>&1")
+  p <- processx::process$new(bbi_exe_path, .cmd_args, ..., wd = .dir,  stdout = "|", stderr = "2>&1")
 
   if (.wait) {
     # wait for process and capture stdout and stderr
-    output <- p$read_all_output_lines()
-
+    p$wait()
     # check output status code
     check_status_code(p$get_exit_status(), output, .cmd_args)
+    output <- p$read_all_output_lines()
+
   } else {
     output <- NULL
   }
 
   # build result object
-  res <- list(
-    process = p,
-    output = output,
-    bbi = bbi_exe_path,
-    cmd_args = .cmd_args
-  )
+  res <- list()
+  res[[PROC_PROCESS]] <- p
+  res[[PROC_STDOUT]] <- output
+  res[[PROC_BBI]] <- bbi_exe_path
+  res[[PROC_CMD_ARGS]] <- .cmd_args
+  res[[PROC_WD]] <- .dir
 
-  attr(res, "class") <- "babylon_result"
+  # assign class and return
+  res <- create_process_object(res)
   return(res)
 }
 
+#' Babylon dry_run
+#'
+#' Creates a `babylon_process` object with all the required keys, without actually running the command.
+#' Returns an S3 object of class `babylon_process` but the `process` and `stdout` elements containing only the string "DRY_RUN".
+#' Also contains the element `call` with a string representing the command that could be called on the command line.
+#' @param .cmd_args A character vector of command line arguments for the execution call
+#' @param .dir The working directory to run command in. Defaults to "."
+#' @export
+bbi_dry_run <- function(.cmd_args, .dir) {
+  # build result object
+  res <- list()
+  res[[PROC_PROCESS]] <- "DRY_RUN"
+  res[[PROC_STDOUT]] <- "DRY_RUN"
+  res[[PROC_BBI]] <- getOption("rbabylon.bbi_exe_path")
+  res[[PROC_CMD_ARGS]] <- .cmd_args
+  res[[PROC_WD]] <- .dir
+
+  # construct call string that _could_ be called on command line
+  call_str <- paste(
+    "cd", .dir, ";",
+    res[[PROC_BBI]],
+    paste(.cmd_args, collapse = " ")
+  )
+  res[[PROC_CALL]] <- call_str
+
+  # assign class and return
+  res <- create_process_object(res)
+  return(res)
+}
 
 #' Checks that a bbi binary is present at the path passed to .bbi_exe_path
 #' @param .bbi_exe_path Path to bbi exe file that will be checked
@@ -108,17 +142,85 @@ bbi_help <- function(.cmd_args=NULL) {
 #' Executes (`bbi init`) with bbi_exec() in specified directory
 #' @param .dir Path to directory to run `init` in (and put the resulting `babylon.yml` file)
 #' @param .nonmem_dir Path to directory with the NONMEM installation.
+#' @param .nonmem_version Character scaler for default version of NONMEM to use. If left NULL, function will exit and tell you which versions were found in `.nonmem_dir`
+#' @param .no_default_version Boolean to force creation of babylon.yaml with NO default NONMEM version. FALSE by default, and not encouraged.
+#' @importFrom yaml read_yaml write_yaml
 #' @export
-bbi_init <- function(.dir, .nonmem_dir) {
+bbi_init <- function(.dir, .nonmem_dir, .nonmem_version = NULL, .no_default_version = FALSE) {
   # check for files in NONMEM directory
   nm_files <- list.files(.nonmem_dir)
   if (length(nm_files) == 0) {
-    stop(paste0("Nothing was found in ", .nonmem_dir, ". Please pass a path to a working installation of NONMEM to `.nonmem_dir`, for example `.nonmem_dir='/opt/NONMEM'`"))
+    stop(glue("Nothing was found in {.nonmem_dir}. Please pass a path to a working installation of NONMEM to `.nonmem_dir`, for example `.nonmem_dir='/opt/NONMEM'`"))
+  } else if (is.null(.nonmem_version) && !.no_default_version) {
+    stop(glue("Must specify a `.nonmem_version` for bbi_init(). {.nonmem_dir} contains the following options: `{paste(nm_files, collapse='`, `')}`"))
   }
 
   # execute init
-  res <- bbi_exec(c("init",  paste0("--dir=", .nonmem_dir)), wd = .dir, .wait=TRUE)
+  res <- bbi_exec(c("init",  paste0("--dir=", .nonmem_dir)), .dir = .dir, .wait=TRUE)
+
+  # set default NONMEM version
+  if (!is.null(.nonmem_version)) {
+    # load babylon.yaml
+    bbi_yaml_path <- file.path(.dir, "babylon.yaml")
+    bbi_yaml <- read_yaml(bbi_yaml_path)
+
+    # check for valid version
+    if (!(.nonmem_version %in% names(bbi_yaml$nonmem))) {
+      stop(glue("Must specify a valid `.nonmem_version` for bbi_init(). {bbi_yaml_path} contains the following options: `{paste(names(bbi_yaml$nonmem), collapse='`, `')}`"))
+    }
+
+    # set default version and write to disk
+    bbi_yaml[['nonmem']][[.nonmem_version]]['default'] <- TRUE
+    write_yaml(bbi_yaml, bbi_yaml_path)
+  }
+
   cat(paste(res$output, collapse = "\n"))
 }
 
+
+######################################################
+# Helper functions for manipulating results objects
+######################################################
+
+# get exit status of process
+get_exit_status <- function (.res, ...) {
+  UseMethod("get_exit_status")
+}
+
+get_exit_status.babylon_result <- function(.res, .check = FALSE) {
+  if (.res[[PROC_PROCESS]]$is_alive()) {
+    warning(paste0("Process ", .res[[PROC_PROCESS]]$get_pid(), " is still running. You cannot check the exit status until it is finished."))
+    invisible()
+  } else {
+    exit_status <- .res[[PROC_PROCESS]]$get_exit_status()
+
+    if (.check) {
+      check_status_code(exit_status, .res[[PROC_STDOUT]], .res[[PROC_CMD_ARGS]])
+    }
+    return(exit_status)
+  }
+}
+
+
+# fetch output (stdout and stderr) of process
+get_stdout <- function(.res, ...) {
+  UseMethod("get_stdout")
+}
+
+get_stdout.babylon_result <- function(.res) {
+  # check if process is still alive (as of now, can only get output from finished process)
+  if (.res[[PROC_PROCESS]]$is_alive()) {
+    warning(paste0("Process ", .res[[PROC_PROCESS]]$get_pid(), " is still running. You cannot read the output until it is finished."))
+    invisible()
+  } else {
+    # if output has not been read from buffer, read it
+    if (is.null(.res$output)) {
+      .res$output <- .res[[PROC_PROCESS]]$read_all_output_lines()
+    }
+    # return output
+    return(.res)
+    # I don't like this buuuut...
+    # https://stackoverflow.com/questions/60062105/replacement-functions-in-r-that-dont-take-input
+  }
+}
 

@@ -1,7 +1,7 @@
 Package: rbabylon
 Type: Package
 Title: r package for babylon
-Version: 0.0.1
+Version: 0.1.0
 Description: r package for babylon.
 Encoding: UTF-8
 LazyData: true
@@ -13,9 +13,11 @@ Authors@R:
 RoxygenNote: 7.0.2
 Imports: 
     checkmate,
+    digest,
     dplyr,
     fs,
     glue,
+    ggplot2,
     magrittr,
     jsonlite,
     processx,
@@ -24,7 +26,13 @@ Imports:
     rlang,
     withr,
     stringr,
-    yaml
+    tibble,
+    tidyr,
+    yaml,
+    forcats
 Suggests: 
-    testthat (>= 2.1.0)
+    testthat (>= 2.1.0),
+    knitr,
+    rmarkdown
 License: MIT + file LICENSE
+VignetteBuilder: knitr
