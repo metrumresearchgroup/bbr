@@ -33,6 +33,8 @@ steps:
   - chmod +x bbi_linux_amd64/bbi
   - mkdir -p /data/apps
   - mv bbi_linux_amd64/bbi /data/apps
+  - ls -la /data/apps
+  - /data/apps/bbi -h
   - export PATH=/data/apps:$PATH
   - /opt/R/3.6.2/bin/R -e "devtools::install_deps(upgrade = 'never')"
   - /opt/R/3.6.2/bin/R -e "devtools::test()"
