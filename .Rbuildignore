@@ -2,3 +2,4 @@
 ^\.Rproj\.user$
 ^LICENSE\.md$
 ^.drone.yml$
+^README\.Rmd$
