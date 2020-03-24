@@ -52,6 +52,7 @@ steps:
   - wget $BABYLON_URL -O bbi.tar.gz
   - tar -xzvf bbi.tar.gz
   - rm bbi.tar.gz
+  - ls -la bbi_linux_amd64
   - chmod +x bbi_linux_amd64/bbi
   - mkdir -p /data/apps
   - mv bbi_linux_amd64/bbi /data/apps
