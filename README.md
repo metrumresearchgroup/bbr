@@ -40,8 +40,8 @@ devtools::install_github("metrumresearchgroup/rbabylon", ref = "develop")
 There is a “Getting Started” vignette that shows users how to set up
 `rbabylon` and demonstrates the basic modeling workflow.
 
-  - [Getting Started vignette](http://blank) **THIS SHOULD BE TO THE
-    WEBSITE WE PUT UP, RIGHT?**
+  - [Getting Started
+    vignette](https://github.com/metrumresearchgroup/rbabylon/blob/develop/vignettes/getting-started.Rmd)
 
 More vignettes, demonstrating different modeling scenarios, will be
 added soon.
