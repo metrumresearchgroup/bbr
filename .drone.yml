@@ -89,3 +89,4 @@ volumes:
   host:
     path: /var/run/docker.sock
 
+# Thanks DJ!
