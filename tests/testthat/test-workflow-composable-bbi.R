@@ -5,7 +5,6 @@
 # Because of this, it is disabled unless on Metworx.
 ####################################################
 
-
 if (Sys.getenv("METWORX_VERSION") == "") {
   skip("test-workflow-composable-bbi only runs on Metworx")
 }

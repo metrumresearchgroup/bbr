@@ -204,7 +204,7 @@ check_nonmem_table_output <- function(
 #' @export
 plot_nonmem_table_df <- function(.df, .x_var, .stat_name) {
   p <- .df %>% gather("stat", "value", -.data[[.x_var]]) %>%
-    mutate(stat = forcats::fct_inorder(stat)) %>%
+    mutate(stat = forcats::fct_inorder(.data$stat)) %>%
     ggplot(aes(x=.data[[.x_var]], y=.data$value, colour=.data$stat)) + geom_line() +
     xlab(.x_var) + ylab(paste(.stat_name, "value")) + scale_colour_discrete(name = .stat_name) + ggtitle(paste(.x_var, "x", .stat_name))
   return(p)
