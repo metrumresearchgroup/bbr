@@ -39,7 +39,7 @@ devtools::install_github("metrumresearchgroup/rbabylon", ref = "develop")
 
 You can find documentation and a “Getting Started” vignette that shows
 users how to set up `rbabylon` and demonstrates the basic modeling
-workflow [here](https://rbabylon.github.io/).
+workflow [here](http://metrumresearchgroup.github.io/rbabylon/).
 
 More vignettes, demonstrating different modeling scenarios, will be
 added soon.
