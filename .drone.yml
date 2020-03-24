@@ -5,7 +5,7 @@ name: rbabylon
 #Gobal variable definitions and anchors
 global-variables:
     environment: &default_environment
-        BABYLON_URL: https://github.com/metrumresearchgroup/babylon/releases/download/latest/bbi_linux_amd64.tar.gz
+        BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
         BABYLON_VERSION: 2.1.0-rc3 # Not currently used
 
 steps:
