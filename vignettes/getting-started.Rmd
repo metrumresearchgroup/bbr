@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r cleanup, include=FALSE}
+```{r cleanup top, include=FALSE}
 # delete old files
 # if feels like I shouldn't need to do this, but R CMD CHECK fails without it
 if (fs::file_exists("../inst/nonmem/1.yaml")) fs::file_delete("../inst/nonmem/1.yaml")
@@ -203,4 +203,15 @@ This code uses `purrr::map_lgl` to filter the run log to only rows containing a 
 log_df %>% 
   filter(purrr::map_lgl(tags, ~ "2 compartment" %in% .x)) %>%
   select(run_id, description, tags, decisions)
+```
+
+```{r cleanup bottom, include=FALSE}
+# delete old files
+# if feels like I shouldn't need to do this, but R CMD CHECK fails without it
+if (fs::file_exists("../inst/nonmem/1.yaml")) fs::file_delete("../inst/nonmem/1.yaml")
+if (fs::file_exists("../inst/nonmem/2.yaml")) fs::file_delete("../inst/nonmem/2.yaml")
+if (fs::file_exists("../inst/nonmem/3.yaml")) fs::file_delete("../inst/nonmem/3.yaml")
+if (fs::file_exists("../inst/nonmem/2.ctl")) fs::file_delete("../inst/nonmem/2.ctl")
+if (fs::file_exists("../inst/nonmem/3.ctl")) fs::file_delete("../inst/nonmem/3.ctl")
+if (fs::file_exists("../inst/nonmem/babylon.yaml")) fs::file_delete("../inst/nonmem/babylon.yaml")
 ```
