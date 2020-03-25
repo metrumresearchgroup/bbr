@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 
 ## Installation
 
-You can install the latests released version of `rbabylon` via [MPN snapshots](https://mpn.metworx.com/docs/snapshots) from any date _after_ 2020-03-07.
+You can install the latests released version of `rbabylon` via [MPN snapshots](https://mpn.metworx.com/docs/snapshots) from any snapshot date _after_ 2020-03-07.
 
 You can also install development versions of `rbabylon` by downloading the source files for the latest version from `https://s3.amazonaws.com/mpn.metworx.dev/releases/rbabylon/` or get the latest development version from [GitHub](https://github.com/) with:
 
@@ -32,10 +32,8 @@ You can also install development versions of `rbabylon` by downloading the sourc
 # install.packages("devtools")
 devtools::install_github("metrumresearchgroup/rbabylon", ref = "develop")
 ```
-## Vignettes
+## Documentation
 
-There is a "Getting Started" vignette that shows users how to set up `rbabylon` and demonstrates the basic modeling workflow.
-
-* [Getting Started vignette](https://github.com/metrumresearchgroup/rbabylon/blob/develop/vignettes/getting-started.Rmd)
+You can find documentation and a "Getting Started" vignette that shows users how to set up `rbabylon` and demonstrates the basic modeling workflow [here](http://metrumresearchgroup.github.io/rbabylon/).
 
 More vignettes, demonstrating different modeling scenarios, will be added soon.
