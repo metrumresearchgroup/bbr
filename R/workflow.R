@@ -670,6 +670,18 @@ safe_read_model <- function(.yaml_path, .directory = getOption("rbabylon.model_d
 }
 
 
+#' Create a run log row from a `bbi_{.model_type}_model` object
+#' @param .mod S3 object of class `bbi_{.model_type}_model`
+#' @importsFrom tibble tibble
+#' @export
+run_log_entry <- function(mod_sum) {
+  tibble::tibble(
+    tags = mod_sum$tags %||% list()
+    # ...
+  )
+}
+
+
 #' Parses model yaml and outputs into a tibble that serves as a run log. Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
 #' @param .base_dir Directory to search for model yaml files. Only runs with a corresponding yaml will be included.
 #' @param .recurse Boolean for whether to search subdirectories recursively for additional yaml files. Defaults to TRUE.
@@ -711,11 +723,14 @@ run_log <- function(
   }
 
   # transpose yaml list to tibble
-  .col_names <- map(mod_yaml, function(.x) {return(names(.x))}) %>% unlist() %>% unique()
-  df <- mod_yaml %>% transpose(.names = .col_names) %>% as_tibble() %>%
-    mutate_at(c(YAML_MOD_PATH, YAML_DESCRIPTION, YAML_MOD_TYPE), unlist) %>%
-    mutate(run_id = get_model_id(.data[[YAML_MOD_PATH]])) %>%
-    select(.data$run_id, everything())
+  # .col_names <- map(mod_yaml, function(.x) {return(names(.x))}) %>% unlist() %>% unique()
+  # df <- mod_yaml %>% transpose(.names = .col_names) %>% as_tibble() %>%
+  #   mutate_at(c(RUN_LOG_CHAR_COLS), unlist) %>%
+  #   mutate(run_id = get_model_id(.data[[YAML_MOD_PATH]])) %>%
+  #   select(.data$run_id, everything())
+  #
+
+  df <- mod_yaml %>% map_df(run_log_entry)
 
   class(df) <- c("bbi_nonmem_summary_df", class(df))
   return(df)
