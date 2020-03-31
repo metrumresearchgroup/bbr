@@ -102,7 +102,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
                 # over-riding yaml arg with passed arg
                 expect_identical(
-                  submit_model(MOD1, .bbi_args=list(threads=2), .dry_run = T)[[PROC_CALL]],
+                  submit_model(MOD1, list(threads=2), .dry_run = T)[[PROC_CALL]],
                   as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {MODEL_FILE} --overwrite --threads=2"))
                 )
 
