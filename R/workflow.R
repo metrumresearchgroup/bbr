@@ -673,10 +673,19 @@ safe_read_model <- function(.yaml_path, .directory = getOption("rbabylon.model_d
 #' Create a run log row from a `bbi_{.model_type}_model` object
 #' @param .mod S3 object of class `bbi_{.model_type}_model`
 #' @importsFrom tibble tibble
+#' do I have to import !! or := from anywhere? rlang?
 #' @export
 run_log_entry <- function(mod_sum) {
   tibble::tibble(
-    tags = mod_sum$tags %||% list()
+    #tags = mod_sum$tags %||% list()
+    !!(WORKING_DIR)       := .mod[[WORKING_DIR]],
+    !!(YAML_YAML_NAME)    := .mod[[YAML_YAML_NAME]],
+    !!(YAML_YAML_MD5)     := .mod[[YAML_YAML_MD5]],
+    !!(YAML_MOD_TYPE)     := .mod[[YAML_MOD_TYPE]],
+    !!(YAML_DESCRIPTION)  := .mod[[YAML_DESCRIPTION]],
+    !!(YAML_MOD_PATH)     := .mod[[YAML_MOD_PATH]],
+    !!(YAML_BBI_ARGS)     := .mod[[YAML_BBI_ARGS]],
+    !!(YAML_OUT_DIR)      := .mod[[YAML_OUT_DIR]]
     # ...
   )
 }
