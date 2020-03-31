@@ -675,18 +675,20 @@ safe_read_model <- function(.yaml_path, .directory = getOption("rbabylon.model_d
 #' @importsFrom tibble tibble
 #' do I have to import !! or := from anywhere? rlang?
 #' @export
-run_log_entry <- function(mod_sum) {
+run_log_entry <- function(.mod) {
   tibble::tibble(
-    #tags = mod_sum$tags %||% list()
-    !!(WORKING_DIR)       := .mod[[WORKING_DIR]],
-    !!(YAML_YAML_NAME)    := .mod[[YAML_YAML_NAME]],
-    !!(YAML_YAML_MD5)     := .mod[[YAML_YAML_MD5]],
-    !!(YAML_MOD_TYPE)     := .mod[[YAML_MOD_TYPE]],
-    !!(YAML_DESCRIPTION)  := .mod[[YAML_DESCRIPTION]],
-    !!(YAML_MOD_PATH)     := .mod[[YAML_MOD_PATH]],
-    !!(YAML_BBI_ARGS)     := .mod[[YAML_BBI_ARGS]],
-    !!(YAML_OUT_DIR)      := .mod[[YAML_OUT_DIR]]
-    # ...
+    run_id = .mod[[YAML_MOD_PATH]] %>% get_model_id(),
+    !!WORKING_DIR       := .mod[[WORKING_DIR]],
+    !!YAML_YAML_NAME    := .mod[[YAML_YAML_NAME]],
+    !!YAML_YAML_MD5     := .mod[[YAML_YAML_MD5]],
+    !!YAML_MOD_TYPE     := .mod[[YAML_MOD_TYPE]],
+    !!YAML_DESCRIPTION  := .mod[[YAML_DESCRIPTION]],
+    !!YAML_MOD_PATH     := .mod[[YAML_MOD_PATH]],
+    !!YAML_BBI_ARGS     := .mod[[YAML_BBI_ARGS]] %>% list(),
+    !!YAML_BASED_ON     := .mod[[YAML_BASED_ON]] %>% list(),
+    !!YAML_TAGS         := .mod[[YAML_TAGS]] %>% list(),
+    !!YAML_DECISIONS    := .mod[[YAML_DECISIONS]] %>% list(),
+    !!YAML_OUT_DIR      := .mod[[YAML_OUT_DIR]]
   )
 }
 
@@ -731,14 +733,7 @@ run_log <- function(
     return(NULL)
   }
 
-  # transpose yaml list to tibble
-  # .col_names <- map(mod_yaml, function(.x) {return(names(.x))}) %>% unlist() %>% unique()
-  # df <- mod_yaml %>% transpose(.names = .col_names) %>% as_tibble() %>%
-  #   mutate_at(c(RUN_LOG_CHAR_COLS), unlist) %>%
-  #   mutate(run_id = get_model_id(.data[[YAML_MOD_PATH]])) %>%
-  #   select(.data$run_id, everything())
-  #
-
+  # create run log tibble
   df <- mod_yaml %>% map_df(run_log_entry)
 
   class(df) <- c("bbi_nonmem_summary_df", class(df))
