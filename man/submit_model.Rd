@@ -10,8 +10,8 @@
 \usage{
 submit_model(
   .mod,
-  .mode = c("sge", "local"),
   .bbi_args = NULL,
+  .mode = c("sge", "local"),
   ...,
   .config_path = NULL,
   .wait = TRUE,
@@ -21,8 +21,8 @@ submit_model(
 
 \method{submit_model}{bbi_nonmem_model}(
   .mod,
-  .mode = c("sge", "local"),
   .bbi_args = NULL,
+  .mode = c("sge", "local"),
   ...,
   .config_path = NULL,
   .wait = TRUE,
@@ -32,8 +32,8 @@ submit_model(
 
 \method{submit_model}{character}(
   .mod,
-  .mode = c("sge", "local"),
   .bbi_args = NULL,
+  .mode = c("sge", "local"),
   ...,
   .config_path = NULL,
   .wait = TRUE,
@@ -43,8 +43,8 @@ submit_model(
 
 \method{submit_model}{numeric}(
   .mod,
-  .mode = c("sge", "local"),
   .bbi_args = NULL,
+  .mode = c("sge", "local"),
   ...,
   .config_path = NULL,
   .wait = TRUE,
@@ -54,8 +54,8 @@ submit_model(
 
 submit_nonmem_model(
   .mod,
-  .mode = c("sge", "local"),
   .bbi_args = NULL,
+  .mode = c("sge", "local"),
   ...,
   .config_path = NULL,
   .wait = TRUE,
@@ -65,9 +65,9 @@ submit_nonmem_model(
 \arguments{
 \item{.mod}{An S3 object of class `bbi_nonmem_model`, for example from `new_model()`, `read_model()` or `copy_model_from()`}
 
-\item{.mode}{Either "local" for local execution or "sge" to submit model(s) to the grid}
-
 \item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.}
+
+\item{.mode}{Either "local" for local execution or "sge" to submit model(s) to the grid}
 
 \item{...}{args passed through to `bbi_exec()`}
 
