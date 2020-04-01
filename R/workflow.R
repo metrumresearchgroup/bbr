@@ -707,7 +707,7 @@ run_log_entry <- function(.mod) {
 enforce_length <- function(.l, .k, .len = 1) {
   len_k <- length(.l[[.k]])
   if (len_k != .len) {
-    stop(glue("The `{.k}` key in {.mod[[YAML_YAML_NAME]]} is expected to have length of {.len} but it has length {len_k}. Please fix YAML."))
+    stop(glue("The `{.k}` key in file `{.l[[YAML_YAML_NAME]]}` is expected to have length of {.len} but it has length {len_k}. Please fix YAML."))
   }
   return(.l[[.k]])
 }

@@ -18,8 +18,6 @@ NEW_TEXT2 <- c("all", "done")
 
 MODEL_CLASS_LIST <- c("bbi_nonmem_model", "list")
 
-# load reference
-source("data/run_log_ref.R")
 
 withr::with_options(list(rbabylon.model_directory = NULL), {
 
@@ -461,6 +459,22 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
     # check class of each column
     log_classes <- log_df %>% dplyr::summarise_all(class) %>% as.list()
+
+    run_log_classes_ref <- tibble::tibble(
+      run_id = "character",
+      !!WORKING_DIR       := "character",
+      !!YAML_YAML_NAME    := "character",
+      !!YAML_YAML_MD5     := "character",
+      !!YAML_MOD_TYPE     := "character",
+      !!YAML_DESCRIPTION  := "character",
+      !!YAML_MOD_PATH     := "character",
+      !!YAML_BBI_ARGS     := "list",
+      !!YAML_BASED_ON     := "list",
+      !!YAML_TAGS         := "list",
+      !!YAML_DECISIONS    := "list",
+      !!YAML_OUT_DIR      := "character"
+    ) %>% as.list()
+
     for (.n in names(run_log_classes_ref)) {
       expect_identical(log_classes[[.n]], run_log_classes_ref[[.n]])
     }

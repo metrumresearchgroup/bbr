@@ -5,7 +5,7 @@
 #' This is a fork of the `nonmemutils`` project that is broader in scope.
 #' Initial support encompasses NONMEM however the api is designed in a way to be flexible to handle other software.
 #' @importFrom glue glue
-#' @importFrom rlang .data
+#' @importFrom rlang .data :=
 #' @import fs
 NULL
 
