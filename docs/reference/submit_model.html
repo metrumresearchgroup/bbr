@@ -75,7 +75,7 @@ Submit a NONMEM model via babylon" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -140,8 +140,8 @@ This will only work if you are calling from the same directory as the models, or
 
     <pre class="usage"><span class='fu'>submit_model</span>(
   <span class='no'>.mod</span>,
-  <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
   <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
   <span class='no'>...</span>,
   <span class='kw'>.config_path</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.wait</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
@@ -152,8 +152,8 @@ This will only work if you are calling from the same directory as the models, or
 <span class='co'># S3 method for bbi_nonmem_model</span>
 <span class='fu'>submit_model</span>(
   <span class='no'>.mod</span>,
-  <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
   <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
   <span class='no'>...</span>,
   <span class='kw'>.config_path</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.wait</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
@@ -164,8 +164,8 @@ This will only work if you are calling from the same directory as the models, or
 <span class='co'># S3 method for character</span>
 <span class='fu'>submit_model</span>(
   <span class='no'>.mod</span>,
-  <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
   <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
   <span class='no'>...</span>,
   <span class='kw'>.config_path</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.wait</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
@@ -176,8 +176,8 @@ This will only work if you are calling from the same directory as the models, or
 <span class='co'># S3 method for numeric</span>
 <span class='fu'>submit_model</span>(
   <span class='no'>.mod</span>,
-  <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
   <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
   <span class='no'>...</span>,
   <span class='kw'>.config_path</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.wait</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
@@ -187,8 +187,8 @@ This will only work if you are calling from the same directory as the models, or
 
 <span class='fu'>submit_nonmem_model</span>(
   <span class='no'>.mod</span>,
-  <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
   <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
   <span class='no'>...</span>,
   <span class='kw'>.config_path</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.wait</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
@@ -203,12 +203,12 @@ This will only work if you are calling from the same directory as the models, or
       <td><p>An S3 object of class `bbi_nonmem_model`, for example from `new_model()`, `read_model()` or `copy_model_from()`</p></td>
     </tr>
     <tr>
-      <th>.mode</th>
-      <td><p>Either "local" for local execution or "sge" to submit model(s) to the grid</p></td>
-    </tr>
-    <tr>
       <th>.bbi_args</th>
       <td><p>A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.</p></td>
+    </tr>
+    <tr>
+      <th>.mode</th>
+      <td><p>Either "local" for local execution or "sge" to submit model(s) to the grid</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -250,7 +250,7 @@ This will only work if you are calling from the same directory as the models, or
 
       <footer>
       <div class="copyright">
-  <p>Developed by Devin Pastoor.</p>
+  <p>Developed by Devin Pastoor, Seth Green.</p>
 </div>
 
 <div class="pkgdown">

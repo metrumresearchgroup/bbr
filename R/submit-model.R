@@ -1,8 +1,8 @@
 # S3 dispatch for submitting models
 #' S3 generic method for submit_model
 #' @param .mod generic model to submit
-#' @param .mode Either "local" for local execution or "sge" to submit model(s) to the grid
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.
+#' @param .mode Either "local" for local execution or "sge" to submit model(s) to the grid
 #' @param ... args passed through to `bbi_exec()`
 #' @param .config_path Optionally specify a path to a babylon.yml config. If not specified, the config in the model directory will be used by default. Path MUST be either an absolute path or relative to the model directory.
 #' @param .wait Boolean for whether to wait for the bbi process to return before this function call returns.
@@ -12,8 +12,8 @@
 #' @rdname submit_model
 submit_model <- function(
   .mod,
-  .mode = c("sge", "local"),
   .bbi_args = NULL,
+  .mode = c("sge", "local"),
   ...,
   .config_path=NULL,
   .wait = TRUE,
@@ -30,8 +30,8 @@ submit_model <- function(
 #' @rdname submit_model
 submit_model.bbi_nonmem_model <- function(
   .mod,
-  .mode = c("sge", "local"),
   .bbi_args = NULL,
+  .mode = c("sge", "local"),
   ...,
   .config_path=NULL,
   .wait = TRUE,
@@ -46,8 +46,8 @@ submit_model.bbi_nonmem_model <- function(
   }
 
   res <- submit_nonmem_model(.mod,
-                             .mode = .mode,
                              .bbi_args = .bbi_args,
+                             .mode = .mode,
                              ...,
                              .config_path = .config_path,
                              .wait = .wait,
@@ -64,8 +64,8 @@ submit_model.bbi_nonmem_model <- function(
 #' @rdname submit_model
 submit_model.character <- function(
   .mod,
-  .mode = c("sge", "local"),
   .bbi_args = NULL,
+  .mode = c("sge", "local"),
   ...,
   .config_path=NULL,
   .wait = TRUE,
@@ -107,8 +107,8 @@ submit_model.character <- function(
   .model_type <- .mod[[YAML_MOD_TYPE]]
   if (.model_type == "nonmem") {
     res <- submit_nonmem_model(.mod,
-                               .mode = .mode,
                                .bbi_args = .bbi_args,
+                               .mode = .mode,
                                ...,
                                .config_path = .config_path,
                                .wait = .wait,
@@ -130,8 +130,8 @@ submit_model.character <- function(
 #' @rdname submit_model
 submit_model.numeric <- function(
   .mod,
-  .mode = c("sge", "local"),
   .bbi_args = NULL,
+  .mode = c("sge", "local"),
   ...,
   .config_path=NULL,
   .wait = TRUE,
@@ -144,8 +144,8 @@ submit_model.numeric <- function(
   # call character dispatch
   res <- submit_model(
     .mod = .mod,
-    .mode = .mode,
     .bbi_args = .bbi_args,
+    .mode = .mode,
     ...,
     .config_path = .config_path,
     .wait = .wait,
@@ -164,8 +164,8 @@ submit_model.numeric <- function(
 #' @return An S3 object of class `bbi_nonmem_process` (or `bbi_nonmem_model` if .dry_run=T)
 #' @rdname submit_model
 submit_nonmem_model <- function(.mod,
-                                .mode = c("sge", "local"),
                                 .bbi_args = NULL,
+                                .mode = c("sge", "local"),
                                 ...,
                                 .config_path=NULL,
                                 .wait = TRUE,

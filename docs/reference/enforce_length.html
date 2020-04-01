@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Combines NONMEM args that were passed into the function call with args that were parsed from a model yaml — parse_args_list • rbabylon</title>
+<title>Helper to enforce length of a list element — enforce_length • rbabylon</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,8 @@
 
 
 
-<meta property="og:title" content="Combines NONMEM args that were passed into the function call with args that were parsed from a model yaml — parse_args_list" />
-<meta property="og:description" content="Combines NONMEM args that were passed into the function call with args that were parsed from a model yaml" />
+<meta property="og:title" content="Helper to enforce length of a list element — enforce_length" />
+<meta property="og:description" content="Helper to enforce length of a list element" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -117,40 +117,40 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Combines NONMEM args that were passed into the function call with args that were parsed from a model yaml</h1>
+    <h1>Helper to enforce length of a list element</h1>
     
-    <div class="hidden name"><code>parse_args_list.Rd</code></div>
+    <div class="hidden name"><code>enforce_length.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Combines NONMEM args that were passed into the function call with args that were parsed from a model yaml</p>
+    <p>Helper to enforce length of a list element</p>
     </div>
 
-    <pre class="usage"><span class='fu'>parse_args_list</span>(<span class='no'>.func_args</span>, <span class='no'>.yaml_args</span>)</pre>
+    <pre class="usage"><span class='fu'>enforce_length</span>(<span class='no'>.l</span>, <span class='no'>.k</span>, <span class='kw'>.len</span> <span class='kw'>=</span> <span class='fl'>1</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>.func_args</th>
-      <td><p>A named list of arguments for bbi, passed into submit_model function call</p></td>
+      <th>.l</th>
+      <td><p>list to check</p></td>
     </tr>
     <tr>
-      <th>.yaml_args</th>
-      <td><p>A named list of arguments for bbi, parsed from user input yaml</p></td>
+      <th>.k</th>
+      <td><p>key to check</p></td>
+    </tr>
+    <tr>
+      <th>.len</th>
+      <td><p>length to enforce. Defaults to 1. Throws an error if `length(.l[[.k]]) != .len`</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>The combination of the two lists, with .func_args overwriting any keys that are shared</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
     </ul>
 
   </div>
