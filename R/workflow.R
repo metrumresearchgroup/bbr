@@ -676,22 +676,41 @@ safe_read_model <- function(.yaml_path, .directory = getOption("rbabylon.model_d
 #' do I have to import !! or := from anywhere? rlang?
 #' @export
 run_log_entry <- function(.mod) {
-  tibble::tibble(
-    run_id = .mod[[YAML_MOD_PATH]] %>% get_model_id(),
-    !!WORKING_DIR       := .mod[[WORKING_DIR]],
-    !!YAML_YAML_NAME    := .mod[[YAML_YAML_NAME]],
-    !!YAML_YAML_MD5     := .mod[[YAML_YAML_MD5]],
-    !!YAML_MOD_TYPE     := .mod[[YAML_MOD_TYPE]],
-    !!YAML_DESCRIPTION  := .mod[[YAML_DESCRIPTION]],
-    !!YAML_MOD_PATH     := .mod[[YAML_MOD_PATH]],
+  # build row
+  entry_df <- tibble::tibble(
+    run_id = enforce_length(.mod, YAML_MOD_PATH) %>% get_model_id(),
+    !!WORKING_DIR       := enforce_length(.mod, WORKING_DIR),
+    !!YAML_YAML_NAME    := enforce_length(.mod, YAML_YAML_NAME),
+    !!YAML_YAML_MD5     := enforce_length(.mod, YAML_YAML_MD5),
+    !!YAML_MOD_TYPE     := enforce_length(.mod, YAML_MOD_TYPE),
+    !!YAML_DESCRIPTION  := enforce_length(.mod, YAML_DESCRIPTION),
+    !!YAML_MOD_PATH     := enforce_length(.mod, YAML_MOD_PATH),
     !!YAML_BBI_ARGS     := .mod[[YAML_BBI_ARGS]] %>% list(),
     !!YAML_BASED_ON     := .mod[[YAML_BASED_ON]] %>% list(),
     !!YAML_TAGS         := .mod[[YAML_TAGS]] %>% list(),
     !!YAML_DECISIONS    := .mod[[YAML_DECISIONS]] %>% list(),
-    !!YAML_OUT_DIR      := .mod[[YAML_OUT_DIR]]
+    !!YAML_OUT_DIR      := enforce_length(.mod, YAML_OUT_DIR)
   )
+
+  # check that it is only one row
+  if (nrow(entry_df) != 1) {
+    stop(glue("There is a problem with {.mod[[YAML_YAML_NAME]]} file. `run_log()` should be able to load it to 1 row but got {nrow(entry_df)} rows instead. User should not see this error; report to developers if encountered."))
+  }
+
+  return(entry_df)
 }
 
+#' Helper to enforce length of a list element
+#' @param .l list to check
+#' @param .k key to check
+#' @param .len length to enforce. Defaults to 1. Throws an error if `length(.l[[.k]]) != .len`
+enforce_length <- function(.l, .k, .len = 1) {
+  len_k <- length(.l[[.k]])
+  if (len_k != .len) {
+    stop(glue("The `{.k}` key in {.mod[[YAML_YAML_NAME]]} is expected to have length of {.len} but it has length {len_k}. Please fix YAML."))
+  }
+  return(.l[[.k]])
+}
 
 #' Parses model yaml and outputs into a tibble that serves as a run log. Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
 #' @param .base_dir Directory to search for model yaml files. Only runs with a corresponding yaml will be included.

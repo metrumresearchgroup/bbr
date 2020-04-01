@@ -113,7 +113,7 @@ check_bbi_exe <- function(.bbi_exe_path) {
 #' @export
 check_status_code <- function(.status_code, .output, .cmd_args) {
   if (.status_code != 0) {
-    if (str_detect(.output, NO_NONMEM_ERR_MSG)) {
+    if (any(str_detect(.output, NO_NONMEM_ERR_MSG))) {
       cat("No version of NONMEM is specified. Either open the relevant `babylon.yml` and set a version of NONMEM to `default: true`, or pass a version of NONMEM to `.args=list(nm_version='some_version')`")
     }
     err_msg <- paste0(

@@ -1,0 +1,14 @@
+run_log_classes_ref <- tibble::tibble(
+  run_id = "character",
+  !!WORKING_DIR       := "character",
+  !!YAML_YAML_NAME    := "character",
+  !!YAML_YAML_MD5     := "character",
+  !!YAML_MOD_TYPE     := "character",
+  !!YAML_DESCRIPTION  := "character",
+  !!YAML_MOD_PATH     := "character",
+  !!YAML_BBI_ARGS     := "list",
+  !!YAML_BASED_ON     := "list",
+  !!YAML_TAGS         := "list",
+  !!YAML_DECISIONS    := "list",
+  !!YAML_OUT_DIR      := "character"
+) %>% as.list()
