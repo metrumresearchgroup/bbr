@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -196,13 +196,13 @@
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">log_df &lt;-<span class="st"> </span><span class="kw"><a href="../reference/run_log.html">run_log</a></span>()</a>
 <a class="sourceLine" id="cb16-2" data-line-number="2">log_df</a>
 <a class="sourceLine" id="cb16-3" data-line-number="3"><span class="co">#&gt; # A tibble: 3 x 12</span></a>
-<a class="sourceLine" id="cb16-4" data-line-number="4"><span class="co">#&gt;   run_id description model_type model_path tags  orig_working_dir orig_yaml_file</span></a>
-<a class="sourceLine" id="cb16-5" data-line-number="5"><span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt;      &lt;lis&gt; &lt;list&gt;           &lt;list&gt;        </span></a>
-<a class="sourceLine" id="cb16-6" data-line-number="6"><span class="co">#&gt; 1 1      our first … nonmem     1.ctl      &lt;chr… &lt;chr [1]&gt;        &lt;chr [1]&gt;     </span></a>
-<a class="sourceLine" id="cb16-7" data-line-number="7"><span class="co">#&gt; 2 2      two compar… nonmem     2.ctl      &lt;chr… &lt;chr [1]&gt;        &lt;chr [1]&gt;     </span></a>
-<a class="sourceLine" id="cb16-8" data-line-number="8"><span class="co">#&gt; 3 3      two compar… nonmem     3.ctl      &lt;chr… &lt;chr [1]&gt;        &lt;chr [1]&gt;     </span></a>
-<a class="sourceLine" id="cb16-9" data-line-number="9"><span class="co">#&gt; # … with 5 more variables: yaml_md5 &lt;list&gt;, bbi_args &lt;list&gt;, output_dir &lt;list&gt;,</span></a>
-<a class="sourceLine" id="cb16-10" data-line-number="10"><span class="co">#&gt; #   based_on &lt;list&gt;, decisions &lt;list&gt;</span></a></code></pre></div>
+<a class="sourceLine" id="cb16-4" data-line-number="4"><span class="co">#&gt;   run_id orig_working_dir orig_yaml_file yaml_md5 model_type description</span></a>
+<a class="sourceLine" id="cb16-5" data-line-number="5"><span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;            &lt;chr&gt;          &lt;chr&gt;    &lt;chr&gt;      &lt;chr&gt;      </span></a>
+<a class="sourceLine" id="cb16-6" data-line-number="6"><span class="co">#&gt; 1 1      /data/home/seth… 1.yaml         8521b38… nonmem     our first …</span></a>
+<a class="sourceLine" id="cb16-7" data-line-number="7"><span class="co">#&gt; 2 2      /data/home/seth… 2.yaml         63ee952… nonmem     two compar…</span></a>
+<a class="sourceLine" id="cb16-8" data-line-number="8"><span class="co">#&gt; 3 3      /data/home/seth… 3.yaml         bfa56db… nonmem     two compar…</span></a>
+<a class="sourceLine" id="cb16-9" data-line-number="9"><span class="co">#&gt; # … with 6 more variables: model_path &lt;chr&gt;, bbi_args &lt;list&gt;, based_on &lt;list&gt;,</span></a>
+<a class="sourceLine" id="cb16-10" data-line-number="10"><span class="co">#&gt; #   tags &lt;list&gt;, decisions &lt;list&gt;, output_dir &lt;chr&gt;</span></a></code></pre></div>
 <p>The <code><a href="../reference/run_log.html">run_log()</a></code> returns a tibble (called <code>log_df</code> in this example) which can be manipulated like any other tibble. However, several of the columns (<code>tags</code> and <code>based_on</code> for example) are list columns, which complicates how the user interacts with them. Future releases will have helper functions to more seamlessly interact with <code>log_df</code>, but until then, we have provided some sample <code>dplyr</code> code below.</p>
 <div id="viewing-tags-example" class="section level2">
 <h2 class="hasAnchor">
@@ -274,7 +274,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Devin Pastoor.</p>
+  <p>Developed by Devin Pastoor, Seth Green.</p>
 </div>
 
 <div class="pkgdown">
