@@ -18,7 +18,6 @@ NEW_TEXT2 <- c("all", "done")
 
 MODEL_CLASS_LIST <- c("bbi_nonmem_model", "list")
 
-
 withr::with_options(list(rbabylon.model_directory = NULL), {
 
   #########################

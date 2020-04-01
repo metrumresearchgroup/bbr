@@ -672,8 +672,7 @@ safe_read_model <- function(.yaml_path, .directory = getOption("rbabylon.model_d
 
 #' Create a run log row from a `bbi_{.model_type}_model` object
 #' @param .mod S3 object of class `bbi_{.model_type}_model`
-#' @importsFrom tibble tibble
-#' do I have to import !! or := from anywhere? rlang?
+#' @importFrom tibble tibble
 #' @export
 run_log_entry <- function(.mod) {
   # build row
