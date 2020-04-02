@@ -107,6 +107,9 @@ bbi_version <- function(){
   if (is.null(bbi_path) || bbi_path == "") {
     return("")
   }
+  if (!fs::file_exists(bbi_path)) {
+    return("")
+  }
   system(sprintf('%s version', bbi_path),intern = TRUE)
 }
 
