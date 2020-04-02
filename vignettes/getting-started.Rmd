@@ -44,7 +44,10 @@ There is also some initial setup to get `rbabylon` configured. First, load the l
 
 ```{r bbi_exe_path}
 library(rbabylon)
-options('rbabylon.bbi_exe_path' = '/data/apps/bbi')
+if (Sys.which("bbi") == "") {
+  # fall back to default location of /data/apps/bbi
+  options('rbabylon.bbi_exe_path' = '/data/apps/bbi')
+}
 ```
 
 Next, initialize `babylon` by pointing it to a working installation of NONMEM, and default version to use.
