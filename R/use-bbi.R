@@ -25,10 +25,10 @@ use_bbi <- function(){
                   },
                   'linux' = {
                     c(glue::glue('wget {current_release(os = "linux")} -O /tmp/bbi.tar.gz'),
-                      'tar xzf /tmp/bbi.tar.gz',
+                      'tar -xzf /tmp/bbi.tar.gz',
                       'mkdir -p /data/apps',
                       'mv /tmp/bbi_linux_amd64/bbi /data/apps/bbi',
-                      'chmod +x /usr/local/bin/bbi')
+                      'chmod +x /data/apps/bbi')
                   },
                   {
                     c('browse to: https://github.com/metrumresearchgroup/babylon#getting-started')
