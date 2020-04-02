@@ -1,15 +1,19 @@
 Package: rbabylon
 Type: Package
 Title: r package for babylon
-Version: 0.1.2.8000
+Version: 0.2.0
 Description: r package for babylon.
 Encoding: UTF-8
 LazyData: true
 Authors@R: 
-    person(given = "Devin",
+    c(person(given = "Devin",
            family = "Pastoor",
            role = c("aut", "cre"),
-           email = "devin.pastoor@gmail.com")
+           email = "devin.pastoor@gmail.com"),
+    person(given = "Seth",
+           family = "Green",
+           role = c("aut"),
+           email = "seth127@gmail.com"))
 RoxygenNote: 7.0.2
 Imports: 
     checkmate,
