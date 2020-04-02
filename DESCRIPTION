@@ -33,7 +33,8 @@ Imports:
     tibble,
     tidyr,
     yaml,
-    forcats
+    forcats,
+    cli
 Suggests: 
     testthat (>= 2.1.0),
     knitr,
