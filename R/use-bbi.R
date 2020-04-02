@@ -104,6 +104,9 @@ install_menu <- function(body,this_os){
 #' @export
 bbi_version <- function(){
   bbi_path <- getOption('rbabylon.bbi_exe_path', Sys.which('bbi'))
+  if (is.null(bbi_path) || bbi_path == "") {
+    return("")
+  }
   system(sprintf('%s version', bbi_path),intern = TRUE)
 }
 
