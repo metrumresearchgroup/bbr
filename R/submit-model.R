@@ -1,4 +1,7 @@
-# S3 dispatch for submitting models
+###############################################
+# S3 dispatches for submitting a single model
+###############################################
+
 #' S3 generic method for submit_model
 #' @param .mod generic model to submit
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.
@@ -161,7 +164,7 @@ submit_model.numeric <- function(
 #' @param .mod An S3 object of class `bbi_nonmem_model`, for example from `new_model()`, `read_model()` or `copy_model_from()`
 #' @importFrom stringr str_detect
 #' @importFrom tools file_path_sans_ext
-#' @return An S3 object of class `bbi_nonmem_process` (or `bbi_nonmem_model` if .dry_run=T)
+#' @return An S3 object of class `babylon_process`
 #' @rdname submit_model
 submit_nonmem_model <- function(.mod,
                                 .bbi_args = NULL,
@@ -199,4 +202,123 @@ submit_nonmem_model <- function(.mod,
   res <- bbi_exec(cmd_args, .wait = .wait, .dir = model_dir, ...)
 
   return(res)
+}
+
+
+#########################################################
+# S3 dispatches for submitting multiple models in batch
+#########################################################
+
+#' S3 generic method for submit_models
+#' @param .mods generic list or vector of models to submit
+#' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.
+#' @param .mode Either "local" for local execution or "sge" to submit model(s) to the grid
+#' @param ... args passed through to `bbi_exec()`
+#' @param .config_path Optionally specify a path to a babylon.yml config. If not specified, the config in the model directory will be used by default. Path MUST be either an absolute path or relative to the model directory.
+#' @param .wait Boolean for whether to wait for the bbi process to return before this function call returns.
+#' @param .dry_run Returns an object detailing the command that would be run, insted of running it. This is primarily for testing but also a debugging tool.
+#' @param .directory Model directory which `.mod` path is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`. Only used when passing a path for `.mod` instead of a `bbi_{.model_type}_model` object.
+#' @export
+#' @rdname submit_models
+submit_models <- function(
+  .mods,
+  .bbi_args = NULL,
+  .mode = c("sge", "local"),
+  ...,
+  .config_path=NULL,
+  .wait = TRUE,
+  .dry_run=FALSE,
+  .directory = NULL
+) {
+  UseMethod("submit_models")
+}
+
+#' S3 dispatch for submit_model from bbi_nonmem_model
+#' @param .mods a list of S3 object of class `bbi_nonmem_model` to submit
+#' @param .directory This argument is only used when passing a path to `submit_model()`. When `bbi_nonmem_model` object is passed, `.directory` is inferred from the model object.
+#' @export
+#' @rdname submit_models
+submit_models.list <- function( ###### HAS TO CHECK FOR VALID MODEL TYPES and dispatch correctly
+  .mod,
+  .bbi_args = NULL,
+  .mode = c("sge", "local"),
+  ...,
+  .config_path=NULL,
+  .wait = TRUE,
+  .dry_run=FALSE,
+  .directory = NULL
+) {
+
+  if (!is.null(.directory)) {
+    warning(paste(glue("Passed `.directory = {.directory}` to submit_models.bbi_nonmem_model().") ,
+                  "This argument is only valid when passing a path to `submit_models()`.",
+                  "`bbi_nonmem_model` objects were passed, so `.directory` inferred from `.mod${WORKING_DIR}`"))
+  }
+
+  res_list <- submit_nonmem_models(.mods,
+                             .bbi_args = .bbi_args,
+                             .mode = .mode,
+                             ...,
+                             .config_path = .config_path,
+                             .wait = .wait,
+                             .dry_run = .dry_run)
+  return(res_list)
+}
+
+
+#' Submits multiple NONMEM models in batch via babylon
+#' @param .mods A list of S3 objects of class `bbi_nonmem_model`
+#' @importFrom stringr str_detect
+#' @importFrom tools file_path_sans_ext
+#' @importFrom purrr map
+#' @return A list of S3 objects of class `babylon_process`
+#' @rdname submit_models
+submit_nonmem_models <- function(.mods,
+                                .bbi_args = NULL,
+                                .mode = c("sge", "local"),
+                                ...,
+                                .config_path=NULL,
+                                .wait = TRUE,
+                                .dry_run=FALSE) {
+
+  # check against YAML
+  check_yaml_in_sync(.mod)
+
+  # check for valid type arg
+  .mode <- match.arg(.mode)
+
+  # build command line args
+  param_list <- build_bbi_param_list(.mods, .bbi_args)
+  ###### throw in a strict_mode_error if too many sets? !!!!!!
+
+  # build command line args
+  cmd_args_list <- map(param_list, function(.run) {
+    cmd_args <- c("nonmem", "run", .mode, .run[[YAML_MOD_PATH]], .run[[YAML_BBI_ARGS]])
+
+    # add config path
+    if (!is.null(.config_path)) {
+      cmd_args <- c(cmd_args, sprintf("--config=%s", .config_path))
+    }
+
+   list(
+        cmd_args = cmd_args,
+        model_dir = .run[[WORKING_DIR]]
+      )
+  })
+
+  if (.dry_run) {
+    # construct fake res object
+    return(map(
+      cmd_args_list,
+      function(.run) { bbi_dry_run(.run$cmd_args, .run$model_dir) }
+      ))
+  }
+
+  # launch models
+  res_list <- map(
+    cmd_args_list,
+    function(.run, ...) { bbi_exec(.run$cmd_args, .wait = .wait, .dir = .run$model_dir, ...) }
+  )
+
+  return(res_list)
 }
