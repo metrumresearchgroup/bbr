@@ -25,7 +25,7 @@ use_bbi <- function(){
                   },
                   'linux' = {
                     c(glue::glue('wget {current_release(os = "linux")} -O /tmp/bbi.tar.gz'),
-                      'tar -xzf /tmp/bbi.tar.gz',
+                      'tar -xzf /tmp/bbi.tar.gz -C /tmp --overwrite',
                       'mkdir -p /data/apps',
                       'mv /tmp/bbi_linux_amd64/bbi /data/apps/bbi',
                       'chmod +x /data/apps/bbi')
