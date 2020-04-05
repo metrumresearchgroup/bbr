@@ -1,12 +1,13 @@
 #' @title Installing bbi
 #' @description Identifies system running and return installation instructions
 #' @return character
-#' @rdname use_bbi
+#' @param .dir directory to install bbi to on linux
 #' @export
 #' @importFrom glue glue glue_collapse
 #' @importFrom cli rule
-use_bbi <- function(){
+use_bbi <- function(.dir = "/data/apps"){
 
+  bbi_loc <- normalizePath(file.path(.dir, "bbi"), mustWork = FALSE)
   os <- c('linux','darwin','mingw')
 
   header <- glue::glue(
@@ -26,9 +27,9 @@ use_bbi <- function(){
                   'linux' = {
                     c(glue::glue('wget {current_release(os = "linux")} -O /tmp/bbi.tar.gz'),
                       'tar -xzf /tmp/bbi.tar.gz -C /tmp --overwrite',
-                      'mkdir -p /data/apps',
-                      'mv /tmp/bbi_linux_amd64/bbi /data/apps/bbi',
-                      'chmod +x /data/apps/bbi')
+                      glue::glue('mkdir -p {.dir}'),
+                      glue::glue('mv /tmp/bbi_linux_amd64/bbi {bbi_loc}'),
+                      glue::glue('chmod +x {bbi_loc}'))
                   },
                   {
                     c('browse to: https://github.com/metrumresearchgroup/babylon#getting-started')

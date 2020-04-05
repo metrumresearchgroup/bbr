@@ -4,7 +4,10 @@
 \alias{use_bbi}
 \title{Installing bbi}
 \usage{
-use_bbi()
+use_bbi(.dir = "/data/apps")
+}
+\arguments{
+\item{.dir}{directory to install bbi to on linux}
 }
 \value{
 character
