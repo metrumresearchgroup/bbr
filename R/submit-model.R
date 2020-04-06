@@ -363,7 +363,7 @@ submit_models.character <- function(
   }
 
   # pass to submit_models.list
-  .model_type <- .mod[[YAML_MOD_TYPE]]
+  .model_type <- .mods[[1]][[YAML_MOD_TYPE]]
   if (.model_type == "nonmem") {
     res <- submit_models(.mods,
                                .bbi_args = .bbi_args,
