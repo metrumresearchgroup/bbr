@@ -236,10 +236,11 @@ submit_models <- function(
 #' S3 dispatch for submit_model from bbi_nonmem_model
 #' @param .mods a list of S3 object of class `bbi_nonmem_model` to submit
 #' @param .directory This argument is only used when passing a path to `submit_model()`. When `bbi_nonmem_model` object is passed, `.directory` is inferred from the model object.
+#' @importFrom purrr map map_lgl
 #' @export
 #' @rdname submit_models
 submit_models.list <- function( ###### HAS TO CHECK FOR VALID MODEL TYPES and dispatch correctly
-  .mod,
+  .mods,
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
@@ -255,15 +256,133 @@ submit_models.list <- function( ###### HAS TO CHECK FOR VALID MODEL TYPES and di
                   "`bbi_nonmem_model` objects were passed, so `.directory` inferred from `.mod${WORKING_DIR}`"))
   }
 
-  res_list <- submit_nonmem_models(.mods,
-                             .bbi_args = .bbi_args,
-                             .mode = .mode,
-                             ...,
-                             .config_path = .config_path,
-                             .wait = .wait,
-                             .dry_run = .dry_run)
+  # check that all elements are a model, and that all models are the same type
+  all_models_classes <- map(.mods, function(.x) { intersect(VALID_MOD_CLASSES, class(.x)) })
+
+  # each element is a model object
+  check_model_in_each <- map_lgl(all_models_classes, function(.x) { length(.x) == 1 })
+  if (isFALSE(all(check_model_in_each))) {
+    losers <- which(!check_model_in_each)
+    stop(paste(
+      glue("Passed list must contain only model objects, but found {length(losers)} invalid objects at indices:"),
+      paste(losers, collapse = ", ")
+    ))
+  }
+
+  # all are the same type of model object
+  uniq_model_types <- all_models_classes %>% unlist() %>% unique()
+  if (length(uniq_model_types) != 1) {
+    stop(paste(
+      glue("Passed list must contain all the same type of model objects, but found {length(uniq_model_types)} different classes of model:"),
+      paste(uniq_model_types, collapse = ", ")
+    ))
+  }
+
+  # submit models
+  .model_type <- .mods[[1]][[YAML_MOD_TYPE]]
+  if (.model_type == "nonmem") {
+    res_list <- submit_nonmem_models(.mods,
+                                     .bbi_args = .bbi_args,
+                                     .mode = .mode,
+                                     ...,
+                                     .config_path = .config_path,
+                                     .wait = .wait,
+                                     .dry_run = .dry_run)
+  } else if (.model_type == "stan") {
+    stop(NO_STAN_ERR_MSG)
+  } else {
+    stop(glue("Passed `{.model_type}`. Valid options: `{SUPPORTED_MOD_TYPES}`"))
+  }
   return(res_list)
 }
+
+
+#' S3 dispatch for submit_models from character vector
+#'   Should be a vector of paths to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
+#' @param .mods Character vector of paths to YAML or model file
+#' @param .directory Model directory which `.mods` paths are relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
+#' @importFrom fs file_exists
+#' @importFrom purrr map map_chr
+#' @export
+#' @rdname submit_models
+submit_models.character <- function(
+  .mods,
+  .bbi_args = NULL,
+  .mode = c("sge", "local"),
+  ...,
+  .config_path=NULL,
+  .wait = TRUE,
+  .dry_run=FALSE,
+  .directory = getOption("rbabylon.model_directory")
+) {
+
+  # check for .directory and combine with .mods
+  .mods <- map_chr(.mods, function(.mod) { combine_directory_path(.directory, .mod) })
+
+  ## parse type of file passed and create list of model objects
+
+  # check that all the same type of file was passed
+  all_ext <- tools::file_ext(.mods) %>% unique()
+
+  if (length(all_ext) != 1) {
+    stop(paste(
+          "If passing character vector to submit_models(), must pass all the same type of file.",
+          glue("Got files with {length(all_ext)} different extensions: {paste(all_ext, collapse=', ')}"),
+          sep = " "
+         ))
+  }
+
+  # infer type from first path in vector
+  .mod <- .mods[1]
+
+  # if no extension, assume YAML
+  if (is_valid_yaml_extension(.mod) || tools::file_path_sans_ext(.mod) == .mod) {
+    .mods <- map(.mods, function(.mod) {
+      if (!fs::file_exists(yaml_ext(.mod))) {
+        stop(glue("Cannot find file {yaml_ext(.mod)}. If passing a non-YAML file to submit_model you must include the file extension."))
+      }
+      read_model(yaml_ext(.mod))
+    })
+  } else if (is_valid_nonmem_extension(.mod)) {
+
+    .mods <- map(.mods, function(.mod) {
+      # if NONMEM file, create new model
+      if (fs::file_exists(yaml_ext(.mod))) {
+        stop(paste(glue("`submit_model({.mod})` is trying to create {yaml_ext(.mod)} but that file already exists."),
+                   "Either call `submit_model({yaml_ext(.mod)})` or delete the YAML file if it does not correspond to this model."))
+      }
+      # create new model from
+      new_model(
+        .yaml_path = yaml_ext(.mod),
+        .description = as.character(glue("{.mod} passed directly to submit_model()")),
+        .model_type = c("nonmem")
+      )
+    })
+  } else {
+    stop(glue("Unsupported file type passed to submit_model(): `{.mod}`. Valid options are `.yaml`, `.mod`, and `.ctl`"))
+  }
+
+  # pass to submit_models.list
+  .model_type <- .mod[[YAML_MOD_TYPE]]
+  if (.model_type == "nonmem") {
+    res <- submit_models(.mods,
+                               .bbi_args = .bbi_args,
+                               .mode = .mode,
+                               ...,
+                               .config_path = .config_path,
+                               .wait = .wait,
+                               .dry_run = .dry_run)
+  } else if (.model_type == "stan") {
+    stop(NO_STAN_ERR_MSG)
+  } else {
+    stop(glue("Passed `{.model_type}`. Valid options: `{SUPPORTED_MOD_TYPES}`"))
+  }
+  return(res)
+}
+
+
+
+
 
 
 #' Submits multiple NONMEM models in batch via babylon
@@ -282,7 +401,7 @@ submit_nonmem_models <- function(.mods,
                                 .dry_run=FALSE) {
 
   # check against YAML
-  check_yaml_in_sync(.mod)
+  for (.mod in .mods) { check_yaml_in_sync(.mod) }
 
   # check for valid type arg
   .mode <- match.arg(.mode)

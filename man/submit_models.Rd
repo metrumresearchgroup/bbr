@@ -3,6 +3,7 @@
 \name{submit_models}
 \alias{submit_models}
 \alias{submit_models.list}
+\alias{submit_models.character}
 \alias{submit_nonmem_models}
 \title{S3 generic method for submit_models}
 \usage{
@@ -18,7 +19,7 @@ submit_models(
 )
 
 \method{submit_models}{list}(
-  .mod,
+  .mods,
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
@@ -26,6 +27,17 @@ submit_models(
   .wait = TRUE,
   .dry_run = FALSE,
   .directory = NULL
+)
+
+\method{submit_models}{character}(
+  .mods,
+  .bbi_args = NULL,
+  .mode = c("sge", "local"),
+  ...,
+  .config_path = NULL,
+  .wait = TRUE,
+  .dry_run = FALSE,
+  .directory = getOption("rbabylon.model_directory")
 )
 
 submit_nonmem_models(
@@ -53,7 +65,7 @@ submit_nonmem_models(
 
 \item{.dry_run}{Returns an object detailing the command that would be run, insted of running it. This is primarily for testing but also a debugging tool.}
 
-\item{.directory}{This argument is only used when passing a path to `submit_model()`. When `bbi_nonmem_model` object is passed, `.directory` is inferred from the model object.}
+\item{.directory}{Model directory which `.mods` paths are relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
 }
 \value{
 A list of S3 objects of class `babylon_process`
@@ -62,6 +74,9 @@ A list of S3 objects of class `babylon_process`
 S3 generic method for submit_models
 
 S3 dispatch for submit_model from bbi_nonmem_model
+
+S3 dispatch for submit_models from character vector
+  Should be a vector of paths to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
 
 Submits multiple NONMEM models in batch via babylon
 }
