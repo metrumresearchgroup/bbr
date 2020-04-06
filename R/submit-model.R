@@ -365,7 +365,7 @@ submit_models.character <- function(
   # pass to submit_models.list
   .model_type <- .mods[[1]][[YAML_MOD_TYPE]]
   if (.model_type == "nonmem") {
-    res <- submit_models(.mods,
+    res_list <- submit_models(.mods,
                                .bbi_args = .bbi_args,
                                .mode = .mode,
                                ...,
@@ -377,12 +377,43 @@ submit_models.character <- function(
   } else {
     stop(glue("Passed `{.model_type}`. Valid options: `{SUPPORTED_MOD_TYPES}`"))
   }
-  return(res)
+  return(res_list)
 }
 
 
+#' S3 dispatch for submit_models from numeric input
+#' This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`
+#' @param .mods Integer vector that corresponds to the names of YAML and model files
+#' @param .directory Model directory containing the files referenced by `.mods`. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
+#' @export
+#' @rdname submit_models
+submit_models.numeric <- function(
+  .mods,
+  .bbi_args = NULL,
+  .mode = c("sge", "local"),
+  ...,
+  .config_path=NULL,
+  .wait = TRUE,
+  .dry_run=FALSE,
+  .directory = getOption("rbabylon.model_directory")
+) {
+  # convert to character
+  .mods <- as.character(.mods)
 
+  # call character dispatch
+  res_list <- submit_models(
+    .mod = .mods,
+    .bbi_args = .bbi_args,
+    .mode = .mode,
+    ...,
+    .config_path = .config_path,
+    .wait = .wait,
+    .dry_run = .dry_run,
+    .directory = .directory
+  )
 
+  return(res_list)
+}
 
 
 #' Submits multiple NONMEM models in batch via babylon
