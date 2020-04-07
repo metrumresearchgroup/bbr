@@ -459,7 +459,7 @@ submit_nonmem_models <- function(.mods,
 
     return(list(cmd_args = cmd_args, model_dir = .run[[WORKING_DIR]]))
   })
-  message(glue("Submitting {length(.mods)} models with {length(cmd_args_list)} unique configurations."))
+  message(glue("Submitting {length(.mods)} models with {length(cmd_args_list)} unique configurations. "))
 
   if (.dry_run) {
     # construct fake res object
