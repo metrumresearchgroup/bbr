@@ -445,9 +445,8 @@ submit_nonmem_models <- function(.mods,
   # check for valid type arg
   .mode <- match.arg(.mode)
 
-  # build command line args
+  # get unique sets of params
   param_list <- build_bbi_param_list(.mods, .bbi_args)
-  ###### throw in a strict_mode_error if too many sets? !!!!!!
 
   # build command line args
   cmd_args_list <- map(param_list, function(.run) {
@@ -458,11 +457,9 @@ submit_nonmem_models <- function(.mods,
       cmd_args <- c(cmd_args, sprintf("--config=%s", .config_path))
     }
 
-   list(
-        cmd_args = cmd_args,
-        model_dir = .run[[WORKING_DIR]]
-      )
+    return(list(cmd_args = cmd_args, model_dir = .run[[WORKING_DIR]]))
   })
+  message(glue("Submitting {length(.mods)} models with {length(cmd_args_list)} unique configurations."))
 
   if (.dry_run) {
     # construct fake res object
@@ -475,7 +472,8 @@ submit_nonmem_models <- function(.mods,
   # launch models
   res_list <- map(
     cmd_args_list,
-    function(.run, ...) { bbi_exec(.run$cmd_args, .wait = .wait, .dir = .run$model_dir, ...) }
+    function(.run) { bbi_exec(.run$cmd_args, .wait = .wait, .dir = .run$model_dir, ...) },
+    ...
   )
 
   return(res_list)
