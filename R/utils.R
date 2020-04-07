@@ -121,7 +121,7 @@ build_bbi_param_list <- function(.mods, .bbi_args = NULL) {
   if (isFALSE(all(all_models_bool))) {
     losers <- which(!all_models_bool)
     stop(paste(
-          glue("Passed list must contain only model objects, but found {length(losers)} invalid objects at indices:"),
+          glue("Passed list `.mods` must contain only model objects, but found {length(losers)} invalid objects at indices:"),
           paste(losers, collapse = ", ")
       ))
   }

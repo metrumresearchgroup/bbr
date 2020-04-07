@@ -119,7 +119,7 @@ submit_model.character <- function(
   } else if (.model_type == "stan") {
     stop(NO_STAN_ERR_MSG)
   } else {
-    stop(glue("Passed `{.model_type}`. Valid options: `{SUPPORTED_MOD_TYPES}`"))
+    stop(glue("Passed `{.model_type}`. Valid options: `{paste(SUPPORTED_MOD_TYPES, collapse = ', ')}`"))
   }
   return(res)
 }
@@ -267,17 +267,17 @@ submit_models.list <- function( ###### HAS TO CHECK FOR VALID MODEL TYPES and di
   }
 
   # check that all are the same type of model object
-  all_models_classes <- map(.mods, function(.x) { intersect(VALID_MOD_CLASSES, class(.x)) })
-  uniq_model_types <- all_models_classes %>% unlist() %>% unique()
+  all_model_types <- map(.mods, function(.x) { .x[[YAML_MOD_TYPE]] })
+  uniq_model_types <- all_model_types %>% unlist() %>% unique()
   if (length(uniq_model_types) != 1) {
     stop(paste(
-      glue("Passed list must contain all the same type of model objects, but found {length(uniq_model_types)} different classes of model:"),
+      glue("Passed vector `.mods` must contain all the same type of models, but found {length(uniq_model_types)} different classes of model:"),
       paste(uniq_model_types, collapse = ", ")
     ))
   }
+  .model_type <- uniq_model_types
 
   # submit models
-  .model_type <- .mods[[1]][[YAML_MOD_TYPE]]
   if (.model_type == "nonmem") {
     res_list <- submit_nonmem_models(.mods,
                                      .bbi_args = .bbi_args,
@@ -289,7 +289,7 @@ submit_models.list <- function( ###### HAS TO CHECK FOR VALID MODEL TYPES and di
   } else if (.model_type == "stan") {
     stop(NO_STAN_ERR_MSG)
   } else {
-    stop(glue("Passed `{.model_type}`. Valid options: `{SUPPORTED_MOD_TYPES}`"))
+    stop(glue("Passed `{.model_type}`. Valid options: `{paste(SUPPORTED_MOD_TYPES, collapse = ', ')}`"))
   }
   return(res_list)
 }
@@ -360,8 +360,18 @@ submit_models.character <- function(
     stop(glue("Unsupported file type passed to submit_model(): `{.mod}`. Valid options are `.yaml`, `.mod`, and `.ctl`"))
   }
 
+  # extract model type, and check that they are all the same type
+  all_model_types <- map(.mods, function(.x) { .x[[YAML_MOD_TYPE]] })
+  uniq_model_types <- all_model_types %>% unlist() %>% unique()
+  if (length(uniq_model_types) != 1) {
+    stop(paste(
+      glue("Passed vector `.mods` must contain all the same type of models, but found {length(uniq_model_types)} different classes of model:"),
+      paste(uniq_model_types, collapse = ", ")
+    ))
+  }
+  .model_type <- uniq_model_types
+
   # pass to submit_models.list
-  .model_type <- .mods[[1]][[YAML_MOD_TYPE]]
   if (.model_type == "nonmem") {
     res_list <- submit_models(.mods,
                                .bbi_args = .bbi_args,
@@ -373,7 +383,7 @@ submit_models.character <- function(
   } else if (.model_type == "stan") {
     stop(NO_STAN_ERR_MSG)
   } else {
-    stop(glue("Passed `{.model_type}`. Valid options: `{SUPPORTED_MOD_TYPES}`"))
+    stop(glue("Passed `{.model_type}`. Valid options: `{paste(SUPPORTED_MOD_TYPES, collapse = ', ')}`"))
   }
   return(res_list)
 }

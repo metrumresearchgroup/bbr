@@ -18,7 +18,7 @@ create_model_object <- function(.mod_list) {
 
   .model_type <- .mod_list[[YAML_MOD_TYPE]]
   if (!(.model_type %in% SUPPORTED_MOD_TYPES)) {
-    stop(glue("Invalid {YAML_MOD_TYPE} `{.model_type}`. Valid options include: `{SUPPORTED_MOD_TYPES}`"))
+    stop(glue("Invalid {YAML_MOD_TYPE} `{.model_type}`. Valid options include: `{paste(SUPPORTED_MOD_TYPES, collapse = ', ')}`"))
   }
 
   # by default, if no model defined, will use the YAML path to look for a model and set to .ctl if none found

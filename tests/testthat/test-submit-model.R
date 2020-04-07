@@ -221,13 +221,14 @@ withr::with_options(list(rbabylon.model_directory = MODEL_DIR, rbabylon.bbi_exe_
                 regexp = "must contain only model objects"
               )
 
-              #testing two different kinds
+              # testing two different kinds of models
               class(fake) <- c("bbi_stan_model", class(fake))
+              fake[[YAML_MOD_TYPE]] <- "stan"
               .mods <- list(mod1, mod2, mod3, fake)
 
               expect_error(
                 submit_models(.mods, .dry_run = T),
-                regexp = "must contain all the same type of model objects"
+                regexp = "must contain all the same type of models"
               )
 
               # cleanup after test
