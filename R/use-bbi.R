@@ -77,13 +77,20 @@ install_menu <- function(body,this_os){
 
   if(!identical(release_v,local_v)){
 
-    if(interactive()&this_os%in%c('linux','darwin')){
+    if(this_os%in%c('linux','darwin')){
 
-      print(glue::glue(cli::rule(left = cli::col_red('{local_v} is currently installed. Update to the {release_v}?'),line = 2)))
+      # suppressing interactivity will allow for suppression in unit tests. This may be more general to name
+      # like specifiying its a test environment, but a user could also want to generally suppress interactivity for
+      # automatted build pipelines etc.
+      if (interactive() && is.null(getOption('rbabylon.suppress_interactivity'))) {
+        print(glue::glue(cli::rule(left = cli::col_red('{local_v} is currently installed. Update to the {release_v}?'),line = 2)))
 
-      if(utils::menu(choices = c('Yes','No'))==1){
-        system(paste(body,collapse =' ; '))
-        local_v <- bbi_version()
+        if(utils::menu(choices = c('Yes','No'))==1){
+          system(paste(body,collapse =' ; '))
+          local_v <- bbi_version()
+        }
+      } else {
+          system(paste(body,collapse =' ; '))
       }
 
     }
