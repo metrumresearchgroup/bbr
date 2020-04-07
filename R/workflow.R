@@ -643,6 +643,56 @@ replace_description <- function(.mod, .description) {
 }
 
 
+#' Add new babylon args to model
+#'
+#' Modifies model object and corresponding YAML by adding new .bbi_args,
+#' overwriting any args that are already present with the new values.
+#' Use `print_nonmem_args()` to see a list list of valid babylon arguments.
+#' @param .mod A `bbi_{.model_type}_model` object
+#' @param .bbi_args named list of arguments to add to the model
+#' @export
+add_bbi_args <- function(.mod, .bbi_args) {
+
+  # update .mod with any changes from yaml on disk
+  check_yaml_in_sync(.mod)
+
+  # combine the two lists, with .bbi_args overwriting any keys that are shared
+  .mod[[YAML_BBI_ARGS]] <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])
+
+  # overwrite the yaml on disk with modified model
+  save_model_yaml(.mod)
+
+  # refresh md5 hash in model object
+  .mod[[YAML_YAML_MD5]] <- digest(file = get_yaml_path(.mod), algo = "md5")
+
+  return(.mod)
+}
+
+#' Replaces babylon args to model
+#'
+#' Modifies model object and corresponding YAML by replacing .bbi_args with new .bbi_args
+#' Use `print_nonmem_args()` to see a list list of valid babylon arguments.
+#' @param .mod A `bbi_{.model_type}_model` object
+#' @param .bbi_args named list of arguments to add to the model
+#' @export
+replace_bbi_args <- function(.mod, .bbi_args) {
+
+  # update .mod with any changes from yaml on disk
+  check_yaml_in_sync(.mod)
+
+  # combine the two lists, with .bbi_args overwriting any keys that are shared
+  .mod[[YAML_BBI_ARGS]] <- .bbi_args
+
+  # overwrite the yaml on disk with modified model
+  save_model_yaml(.mod)
+
+  # refresh md5 hash in model object
+  .mod[[YAML_YAML_MD5]] <- digest(file = get_yaml_path(.mod), algo = "md5")
+
+  return(.mod)
+}
+
+
 #######################
 # Generating run logs
 #######################

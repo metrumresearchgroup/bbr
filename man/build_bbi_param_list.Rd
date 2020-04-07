@@ -4,7 +4,7 @@
 \alias{build_bbi_param_list}
 \title{Builds list of unique parameter sets for multiple model bbi calls}
 \usage{
-build_bbi_param_list(.mods, .bbi_args)
+build_bbi_param_list(.mods, .bbi_args = NULL)
 }
 \arguments{
 \item{.mods}{a list containing only `bbi_{.model_type}_model` objects}

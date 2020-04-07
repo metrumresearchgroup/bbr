@@ -203,6 +203,42 @@ withr::with_options(list(rbabylon.model_directory = MODEL_DIR, rbabylon.bbi_exe_
 
             })
 
+  test_that("submit_models(.dry_run=T) errors with bad input",
+            {
+              # read first model
+              mod1 <- read_model(1)
+
+              # copy to two new models
+              mod2 <- copy_model_from(1, 2, "naw")
+              mod3 <- copy_model_from(1, 3, "naw")
+
+              # testing when one isn't a model
+              fake <- list(naw = 1)
+              .mods <- list(mod1, mod2, mod3, fake)
+
+              expect_error(
+                submit_models(.mods, .dry_run = T),
+                regexp = "must contain only model objects"
+              )
+
+              #testing two different kinds
+              class(fake) <- c("bbi_stan_model", class(fake))
+              .mods <- list(mod1, mod2, mod3, fake)
+
+              expect_error(
+                submit_models(.mods, .dry_run = T),
+                regexp = "must contain all the same type of model objects"
+              )
+
+              # cleanup after test
+              for (m in c("2", "3")) {
+                m <- file.path(MODEL_DIR, m)
+                if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
+                if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
+              }
+
+            })
+
   test_that("submit_models(.dry_run=T) with character and numeric input yaml",
             {
               # read first model
@@ -267,40 +303,5 @@ withr::with_options(list(rbabylon.model_directory = MODEL_DIR, rbabylon.bbi_exe_
 
             })
 
-  test_that("submit_models(.dry_run=T) errors with bad input",
-            {
-              # read first model
-              mod1 <- read_model(1)
-
-              # copy to two new models
-              mod2 <- copy_model_from(1, 2, "naw")
-              mod3 <- copy_model_from(1, 3, "naw")
-
-              # testing when one isn't a model
-              fake <- list(naw = 1)
-              .mods <- list(mod1, mod2, mod3, fake)
-
-              expect_error(
-                submit_models(.mods, .dry_run = T),
-                regexp = "must contain only model objects"
-              )
-
-              #testing two different kinds
-              class(fake) <- c("bbi_stan_model", class(fake))
-              .mods <- list(mod1, mod2, mod3, fake)
-
-              expect_error(
-                submit_models(.mods, .dry_run = T),
-                regexp = "must contain all the same type of model objects"
-              )
-
-              # cleanup after test
-              for (m in c("2", "3")) {
-                m <- file.path(MODEL_DIR, m)
-                if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
-                if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
-              }
-
-            })
 
 }) # closing withr::with_options

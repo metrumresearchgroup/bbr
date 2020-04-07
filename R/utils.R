@@ -114,7 +114,7 @@ format_cmd_args <- function(.args, .collapse = FALSE) {
 #' @importFrom purrr map_lgl
 #' @param .mods a list containing only `bbi_{.model_type}_model` objects
 #' @param .bbi_args A named list specifying arguments to pass to babylon. This will over-ride any shared arguments from the model objects.
-build_bbi_param_list <- function(.mods, .bbi_args) {
+build_bbi_param_list <- function(.mods, .bbi_args = NULL) {
 
   # check that everything in list is a model object
   all_models_bool <- map_lgl(.mods, function(.x) {
@@ -179,31 +179,6 @@ parse_args_list <- function(.func_args, .yaml_args) {
     }
   }
   return(.args)
-}
-
-#' Add new babylon args to model
-#'
-#' Modifies model object and corresponding YAML by adding new .bbi_args,
-#' overwriting any args that are already present with the new values.
-#' Use `print_nonmem_args()` to see a list list of valid babylon arguments.
-#' @param .mod A `bbi_{.model_type}_model` object
-#' @param .bbi_args named list of arguments to add to the model
-#' @export
-add_bbi_args <- function(.mod, .bbi_args) {
-
-  # update .mod with any changes from yaml on disk
-  check_yaml_in_sync(.mod)
-
-  # combine the two lists, with .bbi_args overwriting any keys that are shared
-  .mod[[YAML_BBI_ARGS]] <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])
-
-  # overwrite the yaml on disk with modified model
-  save_model_yaml(.mod)
-
-  # refresh md5 hash in model object
-  .mod[[YAML_YAML_MD5]] <- digest(file = get_yaml_path(.mod), algo = "md5")
-
-  return(.mod)
 }
 
 
