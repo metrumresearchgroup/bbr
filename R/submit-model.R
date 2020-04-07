@@ -256,20 +256,18 @@ submit_models.list <- function( ###### HAS TO CHECK FOR VALID MODEL TYPES and di
                   "`bbi_nonmem_model` objects were passed, so `.directory` inferred from `.mod${WORKING_DIR}`"))
   }
 
-  # check that all elements are a model, and that all models are the same type
-  all_models_classes <- map(.mods, function(.x) { intersect(VALID_MOD_CLASSES, class(.x)) })
-
-  # each element is a model object
-  check_model_in_each <- map_lgl(all_models_classes, function(.x) { length(.x) == 1 })
-  if (isFALSE(all(check_model_in_each))) {
-    losers <- which(!check_model_in_each)
+  # check that each element is a model object
+  all_models_bool <- map_lgl(.mods, function(.x) { inherits(.x, VALID_MOD_CLASSES) })
+  if (isFALSE(all(all_models_bool))) {
+    losers <- which(!all_models_bool)
     stop(paste(
       glue("Passed list must contain only model objects, but found {length(losers)} invalid objects at indices:"),
       paste(losers, collapse = ", ")
     ))
   }
 
-  # all are the same type of model object
+  # check that all are the same type of model object
+  all_models_classes <- map(.mods, function(.x) { intersect(VALID_MOD_CLASSES, class(.x)) })
   uniq_model_types <- all_models_classes %>% unlist() %>% unique()
   if (length(uniq_model_types) != 1) {
     stop(paste(

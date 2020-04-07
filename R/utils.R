@@ -117,10 +117,7 @@ format_cmd_args <- function(.args, .collapse = FALSE) {
 build_bbi_param_list <- function(.mods, .bbi_args = NULL) {
 
   # check that everything in list is a model object
-  all_models_bool <- map_lgl(.mods, function(.x) {
-      valid_model_types <- intersect(VALID_MOD_CLASSES, class(.x))
-      return(length(valid_model_types) == 1)
-    })
+  all_models_bool <- map_lgl(.mods, function(.x) { inherits(.x, VALID_MOD_CLASSES) })
   if (isFALSE(all(all_models_bool))) {
     losers <- which(!all_models_bool)
     stop(paste(
