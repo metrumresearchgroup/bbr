@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>S3 generic method for submit_model — submit_model • rbabylon</title>
+<title>S3 generic method for submit_models — submit_models • rbabylon</title>
 
 
 <!-- jquery -->
@@ -35,14 +35,14 @@
 
 
 
-<meta property="og:title" content="S3 generic method for submit_model — submit_model" />
-<meta property="og:description" content="S3 generic method for submit_model
+<meta property="og:title" content="S3 generic method for submit_models — submit_models" />
+<meta property="og:description" content="S3 generic method for submit_models
 S3 dispatch for submit_model from bbi_nonmem_model
-S3 dispatch for submit_model from character scaler
-  Should be path to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
-S3 dispatch for submit_model from numeric input
+S3 dispatch for submit_models from character vector
+  Should be a vector of paths to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
+S3 dispatch for submit_models from numeric input
 This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`
-Submit a NONMEM model via babylon" />
+Submits multiple NONMEM models in batch via babylon" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -123,23 +123,23 @@ Submit a NONMEM model via babylon" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>S3 generic method for submit_model</h1>
+    <h1>S3 generic method for submit_models</h1>
     
-    <div class="hidden name"><code>submit_model.Rd</code></div>
+    <div class="hidden name"><code>submit_models.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>S3 generic method for submit_model</p>
+    <p>S3 generic method for submit_models</p>
 <p>S3 dispatch for submit_model from bbi_nonmem_model</p>
-<p>S3 dispatch for submit_model from character scaler
-  Should be path to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).</p>
-<p>S3 dispatch for submit_model from numeric input
+<p>S3 dispatch for submit_models from character vector
+  Should be a vector of paths to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).</p>
+<p>S3 dispatch for submit_models from numeric input
 This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`</p>
-<p>Submit a NONMEM model via babylon</p>
+<p>Submits multiple NONMEM models in batch via babylon</p>
     </div>
 
-    <pre class="usage"><span class='fu'>submit_model</span>(
-  <span class='no'>.mod</span>,
+    <pre class="usage"><span class='fu'>submit_models</span>(
+  <span class='no'>.mods</span>,
   <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
   <span class='no'>...</span>,
@@ -149,9 +149,9 @@ This will only work if you are calling from the same directory as the models, or
   <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )
 
-<span class='co'># S3 method for bbi_nonmem_model</span>
-<span class='fu'>submit_model</span>(
-  <span class='no'>.mod</span>,
+<span class='co'># S3 method for list</span>
+<span class='fu'>submit_models</span>(
+  <span class='no'>.mods</span>,
   <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
   <span class='no'>...</span>,
@@ -162,8 +162,8 @@ This will only work if you are calling from the same directory as the models, or
 )
 
 <span class='co'># S3 method for character</span>
-<span class='fu'>submit_model</span>(
-  <span class='no'>.mod</span>,
+<span class='fu'>submit_models</span>(
+  <span class='no'>.mods</span>,
   <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
   <span class='no'>...</span>,
@@ -174,8 +174,8 @@ This will only work if you are calling from the same directory as the models, or
 )
 
 <span class='co'># S3 method for numeric</span>
-<span class='fu'>submit_model</span>(
-  <span class='no'>.mod</span>,
+<span class='fu'>submit_models</span>(
+  <span class='no'>.mods</span>,
   <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
   <span class='no'>...</span>,
@@ -185,8 +185,8 @@ This will only work if you are calling from the same directory as the models, or
   <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"rbabylon.model_directory"</span>)
 )
 
-<span class='fu'>submit_nonmem_model</span>(
-  <span class='no'>.mod</span>,
+<span class='fu'>submit_nonmem_models</span>(
+  <span class='no'>.mods</span>,
   <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
   <span class='no'>...</span>,
@@ -199,8 +199,8 @@ This will only work if you are calling from the same directory as the models, or
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>.mod</th>
-      <td><p>An S3 object of class `bbi_nonmem_model`, for example from `new_model()`, `read_model()` or `copy_model_from()`</p></td>
+      <th>.mods</th>
+      <td><p>A list of S3 objects of class `bbi_nonmem_model`</p></td>
     </tr>
     <tr>
       <th>.bbi_args</th>
@@ -228,13 +228,13 @@ This will only work if you are calling from the same directory as the models, or
     </tr>
     <tr>
       <th>.directory</th>
-      <td><p>Model directory containing the files referenced by `.mod`. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.</p></td>
+      <td><p>Model directory containing the files referenced by `.mods`. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An S3 object of class `babylon_process`</p>
+    <p>A list of S3 objects of class `babylon_process`</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

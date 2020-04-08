@@ -93,7 +93,7 @@ model_summary.character <- function(
   } else if (.model_type == "stan") {
     stop(NO_STAN_ERR_MSG)
   } else {
-    stop(glue("Passed `{.model_type}`. Valid options: `{SUPPORTED_MOD_TYPES}`"))
+    stop(glue("Passed `{.model_type}`. Valid options: `{paste(SUPPORTED_MOD_TYPES, collapse = ', ')}`"))
   }
   return(res_list)
 }

@@ -746,6 +746,34 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
 
+  test_that("add_bbi_args() and replace_bbi_args() work correctly", {
+    # make a new yaml
+    new_yaml <- yaml_ext(NEW_MOD2)
+    fs::file_copy(YAML_TEST_FILE, new_yaml)
+
+    # make a spec from it
+    suppressSpecificWarning({
+      new_mod <- read_model(new_yaml)
+    }, .regexpr = "No model file found at.+\\.ctl")
+    expect_null(new_mod[[YAML_BBI_ARGS]][["clean_lvl"]])
+
+    # test adding
+    suppressSpecificWarning({
+      new_mod <- add_bbi_args(new_mod, list(clean_lvl = 1))
+    }, .regexpr = "No model file found at.+\\.ctl")
+    expect_identical(new_mod[[YAML_BBI_ARGS]][["threads"]], 4)
+    expect_identical(new_mod[[YAML_BBI_ARGS]][["clean_lvl"]], 1)
+
+    # test_replacing
+    new_mod <- replace_bbi_args(new_mod, list(clean_lvl = 1))
+    expect_null(new_mod[[YAML_BBI_ARGS]][["threads"]])
+    expect_identical(new_mod[[YAML_BBI_ARGS]][["clean_lvl"]], 1)
+
+    # cleanup
+    fs::file_delete(new_yaml)
+  })
+
+
   test_that("add_tags etc. can be chained", {
     # make a new yaml
     new_yaml <- yaml_ext(NEW_MOD2)
