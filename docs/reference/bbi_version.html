@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Convert object to `bbi_.model_type_model` — as_model • rbabylon</title>
+<title>bbi version — bbi_version • rbabylon</title>
 
 
 <!-- jquery -->
@@ -35,11 +35,8 @@
 
 
 
-<meta property="og:title" content="Convert object to `bbi_.model_type_model` — as_model" />
-<meta property="og:description" content="Convert object to `bbi_.model_type_model`
-S3 dispatch for passing through `bbi_nonmem_model` object
-S3 dispatch for converting `babylon_process` to corresponding `bbi_nonmem_model` object.
-Only works if YAML and model file are in the same directory with the same name and different file extensions." />
+<meta property="og:title" content="bbi version — bbi_version" />
+<meta property="og:description" content="Returns string of installed bbi cli version" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -120,41 +117,32 @@ Only works if YAML and model file are in the same directory with the same name a
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Convert object to `bbi_.model_type_model`</h1>
+    <h1>bbi version</h1>
     
-    <div class="hidden name"><code>as_model.Rd</code></div>
+    <div class="hidden name"><code>bbi_version.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Convert object to `bbi_.model_type_model`</p>
-<p>S3 dispatch for passing through `bbi_nonmem_model` object</p>
-<p>S3 dispatch for converting `babylon_process` to corresponding `bbi_nonmem_model` object.
-Only works if YAML and model file are in the same directory with the same name and different file extensions.</p>
+    <p>Returns string of installed bbi cli version</p>
     </div>
 
-    <pre class="usage"><span class='fu'>as_model</span>(<span class='no'>.obj</span>)
-
-<span class='co'># S3 method for bbi_nonmem_model</span>
-<span class='fu'>as_model</span>(<span class='no'>.obj</span>)
-
-<span class='co'># S3 method for babylon_process</span>
-<span class='fu'>as_model</span>(<span class='no'>.obj</span>)</pre>
-
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>.obj</th>
-      <td><p>`babylon_process` object to convert</p></td>
-    </tr>
-    </table>
+    <pre class="usage"><span class='fu'>bbi_version</span>()</pre>
 
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>character</p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='fu'>bbi_version</span>()
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#value">Value</a></li>
+      <li><a href="#examples">Examples</a></li>
     </ul>
 
   </div>

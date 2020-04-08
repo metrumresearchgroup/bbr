@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0.8005</span>
       </span>
     </div>
 
@@ -103,10 +103,13 @@
 <div id="installing-babylon" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installing-babylon" class="anchor"></a>Installing babylon</h2>
-<p>To use <code>rbabylon</code> you must first install <code>babylon</code>, often aliased as <code>bbi</code>, on your system. Check the <a href="https://github.com/metrumresearchgroup/babylon">babylon documentation</a> for installation instructions.</p>
+<p>To use <code>rbabylon</code> you must first install <code>babylon</code>, often aliased as <code>bbi</code>, on your system. This can be done with the <code><a href="../reference/use_bbi.html">rbabylon::use_bbi('/path/to/install/dir/')</a></code> command. (Make sure that <code>'/path/to/install/dir/'</code> is included in your <code>$PATH</code> so that <code>bbi</code> will be found by the system.) You can also check the <a href="https://github.com/metrumresearchgroup/babylon">babylon documentation</a> for manual installation instructions.</p>
 <p>There is also some initial setup to get <code>rbabylon</code> configured. First, load the library and tell it where to find the <code>babylon</code> installation. For the purposes of this demo, assume the babylon executable is at <code>/data/apps/bbi</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(rbabylon)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/options.html">options</a></span>(<span class="st">'rbabylon.bbi_exe_path'</span> =<span class="st"> '/data/apps/bbi'</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="cf">if</span> (<span class="kw"><a href="https://rdrr.io/r/base/Sys.which.html">Sys.which</a></span>(<span class="st">"bbi"</span>) <span class="op">==</span><span class="st"> ""</span>) {</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3">  <span class="co"># fall back to default location of /data/apps/bbi</span></a>
+<a class="sourceLine" id="cb1-4" data-line-number="4">  <span class="kw"><a href="https://rdrr.io/r/base/options.html">options</a></span>(<span class="st">'rbabylon.bbi_exe_path'</span> =<span class="st"> '/data/apps/bbi'</span>)</a>
+<a class="sourceLine" id="cb1-5" data-line-number="5">}</a></code></pre></div>
 <p>Next, initialize <code>babylon</code> by pointing it to a working installation of NONMEM, and default version to use.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="../reference/bbi_init.html">bbi_init</a></span>(<span class="dt">.dir =</span> <span class="st">"../inst/nonmem"</span>,     <span class="co"># the modeling directory, where your control streams are</span></a>
 <a class="sourceLine" id="cb2-2" data-line-number="2">         <span class="dt">.nonmem_dir =</span> <span class="st">"/opt/NONMEM"</span>, <span class="co"># location of NONMEM installation</span></a>
