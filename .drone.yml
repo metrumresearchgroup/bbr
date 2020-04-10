@@ -6,7 +6,7 @@ name: rbabylon
 global-variables:
     environment: &default_environment
         BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
-        BABYLON_VERSION: 2.1.0-rc3 # Not currently used
+        BABYLON_VERSION: 2.1.1-rc1 # Not currently used
 
 steps:
 - name: Pull mpn container from ECR
@@ -16,13 +16,13 @@ steps:
     path: /var/run/docker.sock
   commands:
   - $(aws ecr get-login --no-include-email --region us-east-1)
-  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-07
+  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24
 
 - name: R36
-  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-07"
+  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24"
   pull: never
   environment:
-    R_LIBS_USER: "/opt/rpkgs/3.6/2020-03-07"
+    R_LIBS_USER: "/opt/rpkgs/3.6/2020-03-24"
     # Reading in entire anchor
     <<: *default_environment
   commands:
@@ -42,10 +42,10 @@ steps:
 
 
 - name: R35
-  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-07"
+  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24"
   pull: never
   environment:
-    R_LIBS_USER: "/opt/rpkgs/3.5/2020-03-07"
+    R_LIBS_USER: "/opt/rpkgs/3.5/2020-03-24"
     <<: *default_environment
   commands:
   # download and setup bbi
@@ -67,10 +67,10 @@ steps:
     - tag
     status:
     - success
-  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-07"
+  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24"
   pull: never
   environment:
-    R_LIBS_USER: "/opt/rpkgs/3.6/2020-03-07"
+    R_LIBS_USER: "/opt/rpkgs/3.6/2020-03-24"
     <<: *default_environment
   commands:
   # download and setup bbi
