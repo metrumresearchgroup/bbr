@@ -106,19 +106,24 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
 
   })
 
+  test_that(".wait = FALSE returns correctly", {
+    proc <- copy_model_from(1, 4, NEW_DESC, .inherit_tags = TRUE) %>% submit_model(.mode = "local", .wait = FALSE)
+    expect_true(stringr::str_detect(proc[[PROC_STDOUT]], ".wait = FALSE"))
+  })
+
   test_that("run_log() captures runs correctly", {
     # check run log for both models
     log_df <- run_log()
-    expect_equal(nrow(log_df), 3)
+    expect_equal(nrow(log_df), 4)
     expect_equal(ncol(log_df), 12)
-    expect_identical(log_df$run_id, c("1", "2", "3"))
-    expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS))
+    expect_identical(log_df$run_id, c("1", "2", "3", "4"))
+    expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS, ORIG_TAGS))
 
     # add config log
-    log_df <- log_df %>% add_config()
-    expect_equal(nrow(log_df), 3)
+    log_df <- expect_warning(log_df %>% add_config(), regexp = "in progress")
+    expect_equal(nrow(log_df), 4)
     expect_equal(ncol(log_df), 16)
-    expect_false(any(is.null(log_df$data_md5)))
+    expect_false(any(is.na(log_df$data_md5[1:3])))
   })
 
 }) # closing withr::with_options
