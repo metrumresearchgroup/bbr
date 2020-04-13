@@ -66,14 +66,10 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
     expect_error(bbi_init(".", "."), regexp = "Must specify a `.nonmem_version`")
 
     # fails if what you specify isn't in the babylon.yaml (i.e. isn't a valid NONMEM installation)
-    if (Sys.getenv("METWORX_VERSION") == "") {
-      skip("bbi_init only runs on Metworx")
-    } else {
-      withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi'), {
-        expect_error(bbi_init(".", ".", "naw"), regexp = "Must specify a valid `.nonmem_version`")
-        fs::file_delete("babylon.yaml")
-      })
-    }
+    withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi'), {
+      expect_error(bbi_init(".", ".", "naw"), regexp = "Must specify a valid `.nonmem_version`")
+      fs::file_delete("babylon.yaml")
+    })
   })
 
 }

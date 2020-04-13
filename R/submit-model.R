@@ -410,7 +410,7 @@ submit_models.numeric <- function(
 
   # call character dispatch
   res_list <- submit_models(
-    .mod = .mods,
+    .mods = .mods,
     .bbi_args = .bbi_args,
     .mode = .mode,
     ...,
