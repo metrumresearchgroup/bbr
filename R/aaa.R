@@ -71,6 +71,11 @@ MODEL_REQ_KEYS <- c(
   YAML_OUT_DIR
 )
 
+# optional keys when using a model template
+YAML_MOD_TEMPLATE <- "model_template"
+YAML_MOD_SPEC <- "model_spec"
+YAML_MOD_DATA_PATH <- "data_path"
+
 # keys that get erased when saving a model YAML on disk
 YAML_ERASE_OUT_KEYS <- c(
   WORKING_DIR,
