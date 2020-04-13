@@ -5,8 +5,9 @@
 # Because of this, it is disabled unless on Metworx.
 ####################################################
 
-if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
-  skip("test-summary only runs on Metworx or Drone")
+# can't run on Drone because there's no NONMEM
+if (Sys.getenv("METWORX_VERSION") == "") {
+  skip("test-summary only runs on Metworx")
 }
 
 # define constants
