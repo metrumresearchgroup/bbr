@@ -80,7 +80,7 @@ submit_nonmem_model(
 \item{.directory}{Model directory containing the files referenced by `.mod`. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
 }
 \value{
-An S3 object of class `bbi_nonmem_process` (or `bbi_nonmem_model` if .dry_run=T)
+An S3 object of class `babylon_process`
 }
 \description{
 S3 generic method for submit_model

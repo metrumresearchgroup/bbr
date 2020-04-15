@@ -86,7 +86,12 @@ YAML_SCALER_TO_LIST_KEYS <- c(
   YAML_DECISIONS
 )
 
+
 SUPPORTED_MOD_TYPES <- c("nonmem", "stan")
+VALID_MOD_CLASSES <- purrr::map_chr(SUPPORTED_MOD_TYPES,
+                                    function(.model_type) {
+                                      as.character(glue::glue("bbi_{.model_type}_model"))
+                                    })
 
 # keys added when creating a process object
 PROC_PROCESS <- "process"

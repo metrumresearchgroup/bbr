@@ -37,14 +37,17 @@ This "Getting Started with rbabylon" vignette takes the user through some basic 
 
 ## Installing babylon
 
-To use `rbabylon` you must first install `babylon`, often aliased as `bbi`, on your system. Check the [babylon documentation](https://github.com/metrumresearchgroup/babylon) for installation instructions.
+To use `rbabylon` you must first install `babylon`, often aliased as `bbi`, on your system. This can be done with the `rbabylon::use_bbi('/path/to/install/dir/')` command. (Make sure that `'/path/to/install/dir/'` is included in your `$PATH` so that `bbi` will be found by the system.) You can also check the [babylon documentation](https://github.com/metrumresearchgroup/babylon) for manual installation instructions.
 
 There is also some initial setup to get `rbabylon` configured. First, load the library and tell it where to find the `babylon` installation. For the purposes of this demo, assume the babylon executable is at `/data/apps/bbi`.
 
 
 ```{r bbi_exe_path}
 library(rbabylon)
-options('rbabylon.bbi_exe_path' = '/data/apps/bbi')
+if (Sys.which("bbi") == "") {
+  # fall back to default location of /data/apps/bbi
+  options('rbabylon.bbi_exe_path' = '/data/apps/bbi')
+}
 ```
 
 Next, initialize `babylon` by pointing it to a working installation of NONMEM, and default version to use.

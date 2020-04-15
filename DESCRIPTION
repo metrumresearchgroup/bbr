@@ -1,7 +1,7 @@
 Package: rbabylon
 Type: Package
 Title: r package for babylon
-Version: 0.2.0
+Version: 0.2.0.7101
 Description: r package for babylon.
 Encoding: UTF-8
 LazyData: true
@@ -33,7 +33,8 @@ Imports:
     tibble,
     tidyr,
     yaml,
-    forcats
+    forcats,
+    cli
 Suggests: 
     testthat (>= 2.1.0),
     knitr,

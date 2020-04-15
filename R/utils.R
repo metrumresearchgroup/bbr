@@ -110,6 +110,46 @@ format_cmd_args <- function(.args, .collapse = FALSE) {
   }
 }
 
+#' Builds list of unique parameter sets for multiple model bbi calls
+#' @importFrom purrr map_lgl
+#' @param .mods a list containing only `bbi_{.model_type}_model` objects
+#' @param .bbi_args A named list specifying arguments to pass to babylon. This will over-ride any shared arguments from the model objects.
+build_bbi_param_list <- function(.mods, .bbi_args = NULL) {
+
+  # check that everything in list is a model object
+  all_models_bool <- map_lgl(.mods, function(.x) { inherits(.x, VALID_MOD_CLASSES) })
+  if (isFALSE(all(all_models_bool))) {
+    losers <- which(!all_models_bool)
+    stop(paste(
+          glue("Passed list `.mods` must contain only model objects, but found {length(losers)} invalid objects at indices:"),
+          paste(losers, collapse = ", ")
+      ))
+  }
+
+  # build list of unique arg sets
+  param_list <- list()
+  for (.mod in .mods) {
+    # extract babylon args vector and working directory, then get md5 hash
+    args_vec <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]]) %>% check_nonmem_args() %>% sort()
+    model_dir <- .mod[[WORKING_DIR]]
+    arg_md5 <- c(args_vec, model_dir) %>% digest(algo = "md5")
+
+    if (is.null(param_list[[arg_md5]])) {
+      # create list for this arg set
+      param_list[[arg_md5]] <- list()
+
+      # add args vector and working directory
+      param_list[[arg_md5]][[YAML_BBI_ARGS]] <- args_vec
+      param_list[[arg_md5]][[WORKING_DIR]] <- model_dir
+    }
+
+    # append model path
+    param_list[[arg_md5]][[YAML_MOD_PATH]] <- c(param_list[[arg_md5]][[YAML_MOD_PATH]], .mod[[YAML_MOD_PATH]])
+  }
+
+  return(param_list)
+}
+
 
 #' Combines NONMEM args that were passed into the function call with args that were parsed from a model yaml
 #' @param .func_args A named list of arguments for bbi, passed into submit_model function call
@@ -137,6 +177,7 @@ parse_args_list <- function(.func_args, .yaml_args) {
   }
   return(.args)
 }
+
 
 #' Combines two named lists. By default, shared keys are overwritten by that key in .new_list
 #' Any S3 classes will be inherited with those from .new_list given precedence.
