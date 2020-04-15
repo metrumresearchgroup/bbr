@@ -37,7 +37,7 @@ bbi_exec <- function(.cmd_args, .dir = ".", .verbose = FALSE, .wait = FALSE, ...
     check_status_code(p$get_exit_status(), output, .cmd_args)
 
   } else {
-    output <- NULL
+    output <- "NO STDOUT BECAUSE `.wait = FALSE`"
   }
 
   # build result object
