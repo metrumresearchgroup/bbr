@@ -7,7 +7,7 @@
 
 # can't run on Drone because there's no NONMEM
 if (Sys.getenv("METWORX_VERSION") == "") {
-  skip("test-summary only runs on Metworx")
+  skip("test-workflow-composable-bbi only runs on Metworx")
 }
 
 # define constants
