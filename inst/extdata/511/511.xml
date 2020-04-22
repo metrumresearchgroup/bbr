@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="ASCII"?>
+<!DOCTYPE nm:output SYSTEM "output.dtd">
+<nm:output
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://namespaces.oreilly.com/xmlnut/address output.xsd"
+xmlns:nm="http://namespaces.oreilly.com/xmlnut/address"
+>
+<nm:start_datetime>2018-06-26T16:55:49.527</nm:start_datetime>
+<nm:control_stream><![CDATA[
+$PROBLEM RUN# 511 FULL COV MODEL
+$INPUT C ID DV AMT II ADDL TIME RATE HT WT CLCR SEX AGE
+$DATA  ../poppk_wcovs.csv IGNORE=C
+$SUB ADVAN3 TRANS4
+
+$PK
+TVCL=THETA(1)*(CLCR/80)**THETA(3)*(AGE/45)**THETA(4)
+CL=TVCL*EXP(ETA(1))
+TVV1=THETA(2)*(WT/70)**THETA(5)*(AGE/45)**THETA(6)
+V1=TVV1*EXP(ETA(2))
+TVV2=THETA(7)*(WT/70)
+V2=TVV2*EXP(ETA(3))
+TVQ=THETA(8)*(WT/70)
+Q=TVQ*EXP(ETA(4))
+S1=V1
+S2=V2
+$ERROR
+Y=F + F*ERR(1)
+IPRED=F
+
+$THETA
+ (0, 13) ;[L/day] CL
+ (0, 75) ;[L] V1
+ (0.001 );[L/day] CL_{CLCR}
+ (0.001) ;[L/day] CL_{AGE}
+ (0.001) ;[L] V_{WT}
+ (0.001) ;[L] V_{AGE}
+ (0, 100) ;[L] V2
+ (0, 10) ;[L/day] Q
+
+$OMEGA BLOCK(2)
+(0.04) ;[P] CL
+(0.02) ;[R] CL-V
+(0.04) ;[P] V
+
+$OMEGA BLOCK(2)
+(0.04) ;[P] V2
+(0.02) ;[R] V2-Q
+(0.04) ;[P] Q
+
+$SIGMA
+0.04 ;[P] Residual
+
+;$MSFI=./401.msf
+$ESTIMATION MAXEVAL=9999 PRINT=5 METH=1 INT MSF=./511.msf
+$COV
+$TABLE NOPRINT ONEHEADER FILE=./511.tab
+ ID TIME IPRED EVID ETA1 ETA2
+$TABLE NOPRINT ONEHEADER FILE=./511par.tab
+ ID TIME ETA1 ETA2 HT WT CLCR SEX AGE EVID
+
+]]></nm:control_stream>
+<nm:nmtran><![CDATA[
+
+ WARNINGS AND ERRORS (IF ANY) FOR PROBLEM    1
+
+ (WARNING  2) NM-TRAN INFERS THAT THE DATA ARE POPULATION.
+]]></nm:nmtran>
+<nm:nonmem nm:version='7.4.1'>
+<nm:license_information><![CDATA[
+License Registered to: Metrum Research Group
+Expiration Date:    14 JUL 2018
+Current Date:       26 JUN 2018
+  **** WARNING!!! Days until program expires :  18 ****
+  **** CONTACT idssoftware@iconplc.com FOR RENEWAL ****
+]]></nm:license_information>
+<nm:program_information><![CDATA[
+1NONLINEAR MIXED EFFECTS MODEL PROGRAM (NONMEM) VERSION 7.4.1
+ ORIGINALLY DEVELOPED BY STUART BEAL, LEWIS SHEINER, AND ALISON BOECKMANN
+ CURRENT DEVELOPERS ARE ROBERT BAUER, ICON DEVELOPMENT SOLUTIONS,
+ AND ALISON BOECKMANN. IMPLEMENTATION, EFFICIENCY, AND STANDARDIZATION
+ PERFORMED BY NOUS INFOSYSTEMS.
+]]></nm:program_information>
+<nm:problem nm:number='1' nm:subproblem='0' nm:superproblem1='0' nm:iteration1='0' nm:superproblem2='0' nm:iteration2='0'>
+<nm:problem_title>RUN# 511 FULL COV MODEL</nm:problem_title>
+<nm:problem_information><![CDATA[
+
+ PROBLEM NO.:         1
+ RUN# 511 FULL COV MODEL
+0DATA CHECKOUT RUN:              NO
+ DATA SET LOCATED ON UNIT NO.:    2
+ THIS UNIT TO BE REWOUND:        NO
+ NO. OF DATA RECS IN DATA SET:      600
+ NO. OF DATA ITEMS IN DATA SET:  15
+ ID DATA ITEM IS DATA ITEM NO.:   2
+ DEP VARIABLE IS DATA ITEM NO.:   3
+ MDV DATA ITEM IS DATA ITEM NO.: 15
+0INDICES PASSED TO SUBROUTINE PRED:
+  14   7   4   8   0   5   0   0   0   0   6
+0LABELS FOR DATA ITEMS:
+ C ID DV AMT II ADDL TIME RATE HT WT CLCR SEX AGE EVID MDV
+0(NONBLANK) LABELS FOR PRED-DEFINED ITEMS:
+ IPRED
+0FORMAT FOR DATA:
+ (E2.0,E3.0,E6.0,E4.0,E3.0,E2.0,E6.0,2E4.0,E3.0,E7.0,E2.0,E3.0,2F2.0)
+
+ TOT. NO. OF OBS RECS:      560
+ TOT. NO. OF INDIVIDUALS:       40
+0LENGTH OF THETA:   8
+0DEFAULT THETA BOUNDARY TEST OMITTED:    NO
+0OMEGA HAS BLOCK FORM:
+  1
+  1  1
+  0  0  2
+  0  0  2  2
+0DEFAULT OMEGA BOUNDARY TEST OMITTED:    NO
+0SIGMA HAS SIMPLE DIAGONAL FORM WITH DIMENSION:   1
+0DEFAULT SIGMA BOUNDARY TEST OMITTED:    NO
+0INITIAL ESTIMATE OF THETA:
+ LOWER BOUND    INITIAL EST    UPPER BOUND
+  0.0000E+00     0.1300E+02     0.1000E+07
+  0.0000E+00     0.7500E+02     0.1000E+07
+ -0.1000E+07     0.1000E-02     0.1000E+07
+ -0.1000E+07     0.1000E-02     0.1000E+07
+ -0.1000E+07     0.1000E-02     0.1000E+07
+ -0.1000E+07     0.1000E-02     0.1000E+07
+  0.0000E+00     0.1000E+03     0.1000E+07
+  0.0000E+00     0.1000E+02     0.1000E+07
+0INITIAL ESTIMATE OF OMEGA:
+ BLOCK SET NO.   BLOCK                                                                    FIXED
+        1                                                                                   NO
+                  0.4000E-01
+                  0.2000E-01   0.4000E-01
+        2                                                                                   NO
+                  0.4000E-01
+                  0.2000E-01   0.4000E-01
+0INITIAL ESTIMATE OF SIGMA:
+ 0.4000E-01
+0COVARIANCE STEP OMITTED:        NO
+ EIGENVLS. PRINTED:              NO
+ SPECIAL COMPUTATION:            NO
+ COMPRESSED FORMAT:              NO
+ GRADIENT METHOD USED:     NOSLOW
+ SIGDIGITS ETAHAT (SIGLO):                  -1
+ SIGDIGITS GRADIENTS (SIGL):                -1
+ EXCLUDE COV FOR FOCE (NOFCOV):              NO
+ TURN OFF Cholesky Transposition of R Matrix (CHOLROFF): NO
+ KNUTHSUMOFF:                                -1
+ RESUME COV ANALYSIS (RESUME):               NO
+ SIR SAMPLE SIZE (SIRSAMPLE):              -1
+ NON-LINEARLY TRANSFORM THETAS DURING COV (THBND): 1
+ PRECONDTIONING CYCLES (PRECOND):        0
+ PRECONDTIONING TYPES (PRECONDS):        TOS
+ FORCED PRECONDTIONING CYCLES (PFCOND):0
+ PRECONDTIONING TYPE (PRETYPE):        0
+ FORCED POS. DEFINITE SETTING: (FPOSDEF):0
+0TABLES STEP OMITTED:    NO
+ NO. OF TABLES:           2
+ SEED NUMBER (SEED):    11456
+ RANMETHOD:             3U
+ MC SAMPLES (ESAMPLE):    300
+ WRES SQUARE ROOT TYPE (WRESCHOL): EIGENVALUE
+0-- TABLE   1 --
+0RECORDS ONLY:    ALL
+04 COLUMNS APPENDED:    YES
+ PRINTED:                NO
+ HEADER:                YES
+ FILE TO BE FORWARDED:   NO
+ FORMAT:                S1PE11.4
+ LFORMAT:
+ RFORMAT:
+ FIXED_EFFECT_ETAS:
+0USER-CHOSEN ITEMS:
+ ID TIME IPRED EVID ETA1 ETA2
+0-- TABLE   2 --
+0RECORDS ONLY:    ALL
+04 COLUMNS APPENDED:    YES
+ PRINTED:                NO
+ HEADER:                YES
+ FILE TO BE FORWARDED:   NO
+ FORMAT:                S1PE11.4
+ LFORMAT:
+ RFORMAT:
+ FIXED_EFFECT_ETAS:
+0USER-CHOSEN ITEMS:
+ ID TIME ETA1 ETA2 HT WT CLCR SEX AGE EVID
+1DOUBLE PRECISION PREDPP VERSION 7.4.1
+
+ TWO COMPARTMENT MODEL (ADVAN3)
+0MAXIMUM NO. OF BASIC PK PARAMETERS:   4
+0BASIC PK PARAMETERS (AFTER TRANSLATION):
+   BASIC PK PARAMETER NO.  1: ELIMINATION RATE (K)
+   BASIC PK PARAMETER NO.  2: CENTRAL-TO-PERIPH. RATE (K12)
+   BASIC PK PARAMETER NO.  3: PERIPH.-TO-CENTRAL RATE (K21)
+ TRANSLATOR WILL CONVERT PARAMETERS
+ CL, V1, Q, V2 TO K, K12, K21 (TRANS4)
+0COMPARTMENT ATTRIBUTES
+ COMPT. NO.   FUNCTION   INITIAL    ON/OFF      DOSE      DEFAULT    DEFAULT
+                         STATUS     ALLOWED    ALLOWED    FOR DOSE   FOR OBS.
+    1         CENTRAL      ON         NO         YES        YES        YES
+    2         PERIPH.      ON         NO         YES        NO         NO
+    3         OUTPUT       OFF        YES        NO         NO         NO
+1
+ ADDITIONAL PK PARAMETERS - ASSIGNMENT OF ROWS IN GG
+ COMPT. NO.                             INDICES
+              SCALE      BIOAVAIL.   ZERO-ORDER  ZERO-ORDER  ABSORB
+                         FRACTION    RATE        DURATION    LAG
+    1            5           *           *           *           *
+    2            6           *           *           *           *
+    3            *           -           -           -           -
+             - PARAMETER IS NOT ALLOWED FOR THIS MODEL
+             * PARAMETER IS NOT SUPPLIED BY PK SUBROUTINE;
+               WILL DEFAULT TO ONE IF APPLICABLE
+0DATA ITEM INDICES USED BY PRED ARE:
+   EVENT ID DATA ITEM IS DATA ITEM NO.:     14
+   TIME DATA ITEM IS DATA ITEM NO.:          7
+   DOSE AMOUNT DATA ITEM IS DATA ITEM NO.:   4
+   DOSE RATE DATA ITEM IS DATA ITEM NO.:     8
+   INTERVAL DATA ITEM IS DATA ITEM NO.:      5
+   ADDL. DOSES DATA ITEM IS DATA ITEM NO.:   6
+
+0PK SUBROUTINE CALLED WITH EVERY EVENT RECORD.
+ PK SUBROUTINE NOT CALLED AT NONEVENT (ADDITIONAL OR LAGGED) DOSE TIMES.
+0ERROR SUBROUTINE CALLED WITH EVERY EVENT RECORD.
+]]></nm:problem_information>
+<nm:problem_options
+ nm:data_checkout_run='no' nm:data_unit='2' nm:data_rewind='no' nm:data_nrec='600' nm:data_nitems='15' nm:data_id='2'
+ nm:data_l2='0' nm:data_dv='3' nm:data_mdv='15' nm:data_mrg='0' nm:data_raw='0' nm:data_rpt='0' nm:data_sub_array1='0'
+ nm:data_sub_array2='0' nm:data_sub_array3='0' nm:data_pred_indices='14,7,4,8,0,5,0,0,0,0,6'
+ nm:data_format='(e2.0,e3.0,e6.0,e4.0,e3.0,e2.0,e6.0,2e4.0,e3.0,e7.0,e2.0,e3.0,2f2.0)' nm:data_nobs='560'
+ nm:data_nind='40' nm:data_mdv100='0' nm:nthetat='8' nm:theta_bound_test_omitted='no' nm:omega_blockdim='4'
+ nm:omega_bound_test_omitted='no' nm:sigma_diagdim='1' nm:sigma_bound_test_omitted='no' nm:cov_omitted='no'
+ nm:cov_matrix='rsr' nm:cov_eigen_print='no' nm:cov_special='no' nm:cov_compressed='no'
+ nm:cov_slow_gradient='noslow' nm:cov_siglocov='-1' nm:cov_siglcov='-1' nm:cov_tol='-1' nm:cov_atol='-1'
+ nm:cov_nofcov='no' nm:cov_cholroff='no' nm:cov_knuthsumoff='-1' nm:cov_resume='no' nm:cov_sirsample='-1'
+ nm:cov_thbnd='1' nm:cov_precond='0' nm:cov_preconds='tos' nm:cov_pfcond='0' nm:cov_pretype='0' nm:cov_fposdef='0'
+ nm:tab_omitted='no' nm:tab_number='2' nm:tab_seed='11456' nm:tab_ranmethod='3u' nm:tab_esample='300'
+ nm:tab_wres='eigenvalue' nm:tab_fixedetas_01='BLANK' nm:tab_fixedetas_02='BLANK' nm:pred_advan='3'
+ nm:pred_evid='14' nm:pred_time='7' nm:pred_amt='4' nm:pred_rate='8' nm:pred_ii='5' nm:pred_addl='6'
+/>
+<nm:estimation nm:number='1' nm:type='0'>
+<nm:table_series>1</nm:table_series>
+<nm:estimation_method>focei</nm:estimation_method>
+<nm:estimation_title>First Order Conditional Estimation with Interaction</nm:estimation_title>
+<nm:estimation_information><![CDATA[
+ ESTIMATION STEP OMITTED:                 NO
+ ANALYSIS TYPE:                           POPULATION
+ NUMBER OF SADDLE POINT RESET ITERATIONS:      0
+ GRADIENT METHOD USED:               NOSLOW
+ CONDITIONAL ESTIMATES USED:              YES
+ CENTERED ETA:                            NO
+ EPS-ETA INTERACTION:                     YES
+ LAPLACIAN OBJ. FUNC.:                    NO
+ NO. OF FUNCT. EVALS. ALLOWED:            9999
+ NO. OF SIG. FIGURES REQUIRED:            3
+ INTERMEDIATE PRINTOUT:                   YES
+ ESTIMATE OUTPUT TO MSF:                  YES
+ IND. OBJ. FUNC. VALUES SORTED:           NO
+ NUMERICAL DERIVATIVE
+       FILE REQUEST (NUMDER):               NONE
+ MAP (ETAHAT) ESTIMATION METHOD (OPTMAP):   0
+ ETA HESSIAN EVALUATION METHOD (ETADER):    0
+ INITIAL ETA FOR MAP ESTIMATION (MCETA):    0
+ SIGDIGITS FOR MAP ESTIMATION (SIGLO):      100
+ GRADIENT SIGDIGITS OF
+       FIXED EFFECTS PARAMETERS (SIGL):     100
+ NOPRIOR SETTING (NOPRIOR):                 OFF
+ NOCOV SETTING (NOCOV):                     OFF
+ DERCONT SETTING (DERCONT):                 OFF
+ FINAL ETA RE-EVALUATION (FNLETA):          ON
+ EXCLUDE NON-INFLUENTIAL (NON-INFL.) ETAS
+       IN SHRINKAGE (ETASTYPE):             NO
+ NON-INFL. ETA CORRECTION (NONINFETA):      OFF
+ RAW OUTPUT FILE (FILE): 511.ext
+ EXCLUDE TITLE (NOTITLE):                   NO
+ EXCLUDE COLUMN LABELS (NOLABEL):           NO
+ FORMAT FOR ADDITIONAL FILES (FORMAT):      S1PE12.5
+ PARAMETER ORDER FOR OUTPUTS (ORDER):       TSOL
+ WISHART PRIOR DF INTERPRETATION (WISHTYPE):0
+ KNUTHSUMOFF:                               0
+ INCLUDE LNTWOPI:                           NO
+ INCLUDE CONSTANT TERM TO PRIOR (PRIORC):   NO
+ INCLUDE CONSTANT TERM TO OMEGA (ETA) (OLNTWOPI):NO
+ ADDITIONAL CONVERGENCE TEST (CTYPE=4)?:    NO
+ EM OR BAYESIAN METHOD USED:                 NONE
+
+]]></nm:estimation_information>
+<nm:estimation_options
+ nm:estim_omitted='no' nm:analysis_type='pop' nm:saddle_reset='0' nm:saddle_hess='0' nm:slow_gradient='noslow'
+ nm:cond_estim='yes' nm:centered_eta='no' nm:epseta_interaction='yes' nm:laplace='no' nm:predflag='0' nm:maxfn='9999'
+ nm:nsig='3' nm:msfo='yes' nm:objsort='no' nm:numder='0' nm:optmap='0' nm:etader='0' nm:mceta='0' nm:siglo='100' nm:sigl='100'
+ nm:noprior='0' nm:nocov='0' nm:dercont='0' nm:atol='0' nm:fnleta='1' nm:etastype='0' nm:noninfeta='0' nm:file='511.ext'
+ nm:notitle='0' nm:nolabel='0' nm:format='s1pe12.5' nm:order='tsol' nm:wishtype='0' nm:knuthsumoff='0' nm:lntwopi='0'
+ nm:priorc='0' nm:olntwopi='0' nm:ctype='0'
+/>
+<nm:monitor>
+<nm:obj nm:iteration='0'>1583.21690391008</nm:obj>
+<nm:obj nm:iteration='5'>519.598490606110</nm:obj>
+<nm:obj nm:iteration='10'>392.440093296833</nm:obj>
+<nm:obj nm:iteration='15'>367.950857617323</nm:obj>
+<nm:obj nm:iteration='20'>362.736932063464</nm:obj>
+<nm:obj nm:iteration='25'>361.509120113009</nm:obj>
+<nm:obj nm:iteration='30'>360.249735265731</nm:obj>
+<nm:obj nm:iteration='35'>360.228550273183</nm:obj>
+<nm:obj nm:iteration='40'>359.603326577188</nm:obj>
+<nm:obj nm:iteration='42'>359.580117274038</nm:obj>
+</nm:monitor>
+<nm:termination_status>137</nm:termination_status>
+<nm:termination_nfuncevals>795</nm:termination_nfuncevals>
+<nm:termination_sigdigits>-1.02868477992090</nm:termination_sigdigits>
+<nm:termination_information><![CDATA[
+0MINIMIZATION TERMINATED
+ DUE TO PROXIMITY OF NEXT ITERATION EST. TO A VALUE
+ AT WHICH THE OBJ. FUNC. IS INFINITE
+0AT THE LAST COMPUTED INFINITE VALUE OF THE OBJ. FUNCT.:
+ ERROR IN NCONTR WITH INDIVIDUAL      35   ID= 3.50000000000000E+01
+ NUMERICAL HESSIAN OF OBJ. FUNC. FOR COMPUTING CONDITIONAL ESTIMATE
+ IS NON POSITIVE DEFINITE
+ THETA=
+  1.26E+01   8.88E+01   2.25E-01   3.42E-01   4.32E-01  -5.81E-01   3.64E+00   2.19E+04
+
+ NO. OF FUNCTION EVALUATIONS USED:      795
+ NO. OF SIG. DIGITS UNREPORTABLE
+0PARAMETER ESTIMATE IS NEAR ITS BOUNDARY
+]]></nm:termination_information>
+<nm:termination_txtmsg>
+<nm:val nm:name='1'>50</nm:val>
+<nm:val nm:name='2'>57</nm:val>
+<nm:val nm:name='3'>43</nm:val>
+<nm:val nm:name='4'>39</nm:val>
+<nm:val nm:name='5'>40</nm:val>
+</nm:termination_txtmsg>
+<nm:etabar>
+<nm:row nm:rname='SUBPOP1'>
+<nm:col nm:cname='ETA1'>-4.618260765754447E-003</nm:col>
+<nm:col nm:cname='ETA2'>-8.230795131379955E-003</nm:col>
+<nm:col nm:cname='ETA3'>2.186024470767271E-007</nm:col>
+<nm:col nm:cname='ETA4'>1.791915779714050E-003</nm:col>
+</nm:row>
+</nm:etabar>
+<nm:etabarse>
+<nm:row nm:rname='SUBPOP1'>
+<nm:col nm:cname='ETA1'>3.403153747790440E-002</nm:col>
+<nm:col nm:cname='ETA2'>3.435672731074112E-002</nm:col>
+<nm:col nm:cname='ETA3'>1.335819452144347E-007</nm:col>
+<nm:col nm:cname='ETA4'>1.094982041157811E-003</nm:col>
+</nm:row>
+</nm:etabarse>
+<nm:etabarn>
+<nm:row nm:rname='SUBPOP1'>
+<nm:col nm:cname='ETA1'>40</nm:col>
+<nm:col nm:cname='ETA2'>40</nm:col>
+<nm:col nm:cname='ETA3'>40</nm:col>
+<nm:col nm:cname='ETA4'>40</nm:col>
+</nm:row>
+</nm:etabarn>
+<nm:etabarpval>
+<nm:row nm:rname='SUBPOP1'>
+<nm:col nm:cname='ETA1'>0.892054174853545</nm:col>
+<nm:col nm:cname='ETA2'>0.810664754944311</nm:col>
+<nm:col nm:cname='ETA3'>0.101741857241810</nm:col>
+<nm:col nm:cname='ETA4'>0.101739223932507</nm:col>
+</nm:row>
+</nm:etabarpval>
+<nm:etashrinksd>
+<nm:row nm:rname='SUBPOP1'>
+<nm:col nm:cname='ETA1'>1.78306520645079</nm:col>
+<nm:col nm:cname='ETA2'>3.41163538251512</nm:col>
+<nm:col nm:cname='ETA3'>99.9572195394622</nm:col>
+<nm:col nm:cname='ETA4'>99.9572195335619</nm:col>
+</nm:row>
+</nm:etashrinksd>
+<nm:etashrinkvr>
+<nm:row nm:rname='SUBPOP1'>
+<nm:col nm:cname='ETA1'>3.53433719759701</nm:col>
+<nm:col nm:cname='ETA2'>6.70687820519795</nm:col>
+<nm:col nm:cname='ETA3'>99.9999816983220</nm:col>
+<nm:col nm:cname='ETA4'>99.9999816983169</nm:col>
+</nm:row>
+</nm:etashrinkvr>
+<nm:ebvshrinksd>
+<nm:row nm:rname='SUBPOP1'>
+<nm:col nm:cname='EBV1'>3.12889440235651</nm:col>
+<nm:col nm:cname='EBV2'>7.13072472077181</nm:col>
+<nm:col nm:cname='EBV3'>99.9442596171967</nm:col>
+<nm:col nm:cname='EBV4'>99.9442595825796</nm:col>
+</nm:row>
+</nm:ebvshrinksd>
+<nm:ebvshrinkvr>
+<nm:row nm:rname='SUBPOP1'>
+<nm:col nm:cname='EBV1'>6.15988900290204</nm:col>
+<nm:col nm:cname='EBV2'>13.7529770911094</nm:col>
+<nm:col nm:cname='EBV3'>99.9999689300973</nm:col>
+<nm:col nm:cname='EBV4'>99.9999689300587</nm:col>
+</nm:row>
+</nm:ebvshrinkvr>
+<nm:epsshrinksd>
+<nm:row nm:rname='SUBPOP1'>
+<nm:col nm:cname='EPS1'>6.32097386785876</nm:col>
+</nm:row>
+</nm:epsshrinksd>
+<nm:epsshrinkvr>
+<nm:row nm:rname='SUBPOP1'>
+<nm:col nm:cname='EPS1'>12.2424006293360</nm:col>
+</nm:row>
+</nm:epsshrinkvr>
+<nm:estimation_elapsed_time>16.46</nm:estimation_elapsed_time>
+<nm:final_objective_function_text>MINIMUM VALUE OF OBJECTIVE FUNCTION</nm:final_objective_function_text>
+<nm:final_objective_function>359.580117274038</nm:final_objective_function>
+<nm:theta>
+<nm:val nm:name='1'>12.5923594520866</nm:val>
+<nm:val nm:name='2'>88.9726766629934</nm:val>
+<nm:val nm:name='3'>0.224630464550522</nm:val>
+<nm:val nm:name='4'>0.328855714048694</nm:val>
+<nm:val nm:name='5'>0.440984665994300</nm:val>
+<nm:val nm:name='6'>-0.232434493861657</nm:val>
+<nm:val nm:name='7'>3.84695993560644</nm:val>
+<nm:val nm:name='8'>21787.8270297219</nm:val>
+</nm:theta>
+<nm:omega>
+<nm:row nm:rname='1'>
+<nm:col nm:cname='1'>4.925448281468071E-002</nm:col>
+</nm:row>
+<nm:row nm:rname='2'>
+<nm:col nm:cname='1'>3.386545410802177E-003</nm:col>
+<nm:col nm:cname='2'>5.190740594237644E-002</nm:col>
+</nm:row>
+<nm:row nm:rname='3'>
+<nm:col nm:cname='1'>0.000000000000000E+000</nm:col>
+<nm:col nm:cname='2'>0.000000000000000E+000</nm:col>
+<nm:col nm:cname='3'>4.000000000000000E-006</nm:col>
+</nm:row>
+<nm:row nm:rname='4'>
+<nm:col nm:cname='1'>0.000000000000000E+000</nm:col>
+<nm:col nm:cname='2'>0.000000000000000E+000</nm:col>
+<nm:col nm:cname='3'>3.278822390685675E-002</nm:col>
+<nm:col nm:cname='4'>268.768481446968</nm:col>
+</nm:row>
+</nm:omega>
+<nm:sigma>
+<nm:row nm:rname='1'>
+<nm:col nm:cname='1'>4.576979771159475E-002</nm:col>
+</nm:row>
+</nm:sigma>
+<nm:omegac>
+<nm:row nm:rname='1'>
+<nm:col nm:cname='1'>0.221933509895826</nm:col>
+</nm:row>
+<nm:row nm:rname='2'>
+<nm:col nm:cname='1'>6.697602350373305E-002</nm:col>
+<nm:col nm:cname='2'>0.227831968657554</nm:col>
+</nm:row>
+<nm:row nm:rname='3'>
+<nm:col nm:cname='1'>0.000000000000000E+000</nm:col>
+<nm:col nm:cname='2'>0.000000000000000E+000</nm:col>
+<nm:col nm:cname='3'>2.000000000000000E-003</nm:col>
+</nm:row>
+<nm:row nm:rname='4'>
+<nm:col nm:cname='1'>0.000000000000000E+000</nm:col>
+<nm:col nm:cname='2'>0.000000000000000E+000</nm:col>
+<nm:col nm:cname='3'>0.999997070512654</nm:col>
+<nm:col nm:cname='4'>16.3941599799126</nm:col>
+</nm:row>
+</nm:omegac>
+<nm:sigmac>
+<nm:row nm:rname='1'>
+<nm:col nm:cname='1'>0.213938770940647</nm:col>
+</nm:row>
+</nm:sigmac>
+</nm:estimation>
+<nm:post_process_times>
+<nm:post_elapsed_time>0.05</nm:post_elapsed_time>
+<nm:finaloutput_elapsed_time>0.09</nm:finaloutput_elapsed_time>
+</nm:post_process_times>
+</nm:problem>
+</nm:nonmem>
+<nm:stop_datetime>2018-06-26T16:56:06.143</nm:stop_datetime>
+<nm:total_cputime>16.526</nm:total_cputime>
+</nm:output>

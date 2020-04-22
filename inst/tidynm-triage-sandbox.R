@@ -5,13 +5,57 @@ library(dplyr)
 library(purrr)
 library(stringr)
 library(glue)
+#library(mrgtable)
 
-#library(tidynm) # I just sourced this stuff from disk instead (I think most of it is private anyway)
-source("~/tidynm/R/ctl_parse.R")
-#only needed for second option ("let tidynm parse all the way through")
-source("~/tidynm/R/parse_theta.R")
-source("~/tidynm/R/ctl_to_mat.R")
-source("~/tidynm/R/utils.R")
+
+################ get tidynm code
+# #library(tidynm) # I just sourced this stuff from disk instead (I think most of it is private anyway)
+# source("~/tidynm/R/ctl_parse.R")
+# #only needed for second option ("let tidynm parse all the way through")
+# source("~/tidynm/R/parse_theta.R")
+# source("~/tidynm/R/ctl_to_mat.R")
+# source("~/tidynm/R/utils.R")
+
+#' @importFrom purrr set_names
+clean_ctl <- function(x){
+  x0 <- ctl_rm_comments(x)
+  x1 <- gsub('(\n\n|\n|\n;|\n\n;)$','',strsplit(x0,'\\$')[[1]])
+  x2 <- sub('\n',' ',x1)
+  x3 <- as.list(gsub('^(.*?)\\s+','',x2))
+  names(x3) <- gsub('\\s+(.*?)$','',x2)
+
+  x3 <- x3[sapply(x3,nzchar)]
+
+  x3 <- split(x3,names(x3))
+
+  x3 <- lapply(x3,purrr::set_names,nm=NULL)
+
+  x4 <- lapply(x3,function(x){
+    if(is.list(x)){
+      out <- lapply(x,function(xx){
+        out <- gsub('^\\s+|\\s+$','',strsplit(xx,'\n')[[1]])
+        out[nzchar(out)]
+      })
+      list(out)
+    }else{
+      out <- gsub('^\\s+|\\s+$','',strsplit(x,'\n')[[1]])
+      out[nzchar(out)]
+    }
+
+  })
+
+  nc <- names(x4)[(!nzchar(gsub('[A-Z]','',names(x4))))]
+
+  x4 <- x4[nc[nchar(nc)>1]]
+
+  unlist(x4,recursive = FALSE)
+}
+
+ctl_rm_comments <- function(x){
+  x0 <- strsplit(x,'\n')[[1]]
+  paste0(x0[!grepl('^\\s*;',x0)],collapse = '\n')
+}
+
 
 ##################################################
 # trying to do it manually with their helper functions
@@ -23,7 +67,7 @@ bbi_init(MODEL_DIR, "/opt/NONMEM", "nm74gf")
 
 MODEL_PICK <- "510" ### 101 triggers fails because of this error https://github.com/metrumresearchgroup/babylon/issues/163
 
-ref_df <- readRDS(glue("../benchmark/{MODEL_PICK}_PARAMTBL.rds"))
+ref_df <- readRDS(glue("../benchmark/{MODEL_PICK}_PARAMTBL.rds"))[[1]]
 
 if (fs::file_exists(file.path(MODEL_DIR, glue("{MODEL_PICK}.yaml")))) fs::file_delete(file.path(MODEL_DIR, glue("{MODEL_PICK}.yaml")))
 .param_df <- rbabylon::new_model(glue("{MODEL_PICK}.yaml"), glue("the {MODEL_PICK} model")) %>%
@@ -43,7 +87,7 @@ parse_param_comment <- function(x, .theta = TRUE){
 
   full_label_text <- str_split(x,'\\;') %>% sapply('[',2)
 
-  label <- gsub('^(.*?)\\]','',full_label_text)
+  label <- gsub('^(.*?)\\]\\s?','',full_label_text)
 
   unit <- str_match(full_label_text, '\\[(.*?)\\]')
 
@@ -54,24 +98,6 @@ parse_param_comment <- function(x, .theta = TRUE){
   }
 
   return(out_tbl)
-}
-
-
-#' THIS IS FOR THE SECOND OPTION ONLY
-#' @param .ctl_list the list that's output from parse_ctl()
-unpack_params_mat <- function(.pick = c("SIGMA", "OMEGA"), .param_df, .ctl_list) {
-  .pick <- match.arg(.pick)
-  .pick_names <- .param_df$names %>% str_subset(.pick)
-
-  map_df(.pick_names, function(.name) {
-    # extract indices from row name
-    .ind = .name %>% str_replace_all(glue("{.pick}|\\(|\\)"), "") %>% str_split(",") %>% unlist() %>% as.numeric()
-
-    # extract comment from comment matrix
-    .comment <- .ctl_list[[glue("{.pick}_COMMENT")]][.ind[1], .ind[2]]
-
-    list(names = .name, comment = .comment)
-  })
 }
 
 
@@ -96,12 +122,37 @@ unpack_params_mat <- function(.pick = c("SIGMA", "OMEGA"), .param_df, .ctl_list)
 })
 #.label_df
 
-left_join(.param_df, .label_df)
+.new_df <- left_join(.param_df, .label_df) %>% tidyr::replace_na(list(unit="", type=""))
+names(.new_df) <- toupper(names(.new_df))
+.new_df
+
+# join against reference to see if they're the same
+ref_df %>% full_join(.new_df, by = c("LABEL", "UNIT", "TYPE")) %>% select(PARAM, NAMES, LABEL, UNIT, TYPE, value, ESTIMATE, se, STDERR)
+
+
 
 
 #########
 # let tidynm parse all the way through
+# THIS IS FOR THE SECOND OPTION ONLY, probably don't wanna go this way...
 
+#' @param .ctl_list the list that's output from parse_ctl()
+unpack_params_mat <- function(.pick = c("SIGMA", "OMEGA"), .param_df, .ctl_list) {
+  .pick <- match.arg(.pick)
+  .pick_names <- .param_df$names %>% str_subset(.pick)
+
+  map_df(.pick_names, function(.name) {
+    # extract indices from row name
+    .ind = .name %>% str_replace_all(glue("{.pick}|\\(|\\)"), "") %>% str_split(",") %>% unlist() %>% as.numeric()
+
+    # extract comment from comment matrix
+    .comment <- .ctl_list[[glue("{.pick}_COMMENT")]][.ind[1], .ind[2]]
+
+    list(names = .name, comment = .comment)
+  })
+}
+
+### the second option:
 .ctl_list <- ctl_parse(.ctl_raw)
 
 .label_df <- map_df(c("THETA", "OMEGA", "SIGMA"), function(.pick) {

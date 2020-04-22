@@ -1,0 +1,261 @@
+---
+title: "param_table"
+author: "Anna Nevison"
+date: "4/21/2020"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(mrggt)
+```
+
+# starting data
+
+```{r}
+df <- structure(list(PARAM = c("THETA", "THETA", "THETA", "THETA",
+"THETA", "THETA", "THETA", "THETA", "THETA", "THETA", "THETA",
+"THETA", "THETA", "THETA", "THETA", "THETA", "THETA", "THETA",
+"THETA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA",
+"SIGMA", "SIGMA"), FIXED = c(FALSE, TRUE, FALSE, FALSE, FALSE,
+FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+FALSE, FALSE, FALSE, FALSE), SAME = c(FALSE, FALSE, FALSE, FALSE,
+FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+FALSE, FALSE, FALSE, FALSE, FALSE), LABEL = c("KA_KTR", "F1",
+"CL", "V2", "V3", "Q", "F_Dose", "KA_Elderly", "KA_Tablet", "KA_Evening",
+"F_Age", "F_Weight", "CL_Itraconazole", "KA_Race_Korean", "CL_Korean",
+"F_PM", "CL_PM", "F_Smoke", "KA_Race_Asian", "KA or KTR", "F1",
+"CL", "IOV_{KA}", "IOV_{F1}", "IIVonEPS", "PROP RV", "ADD RV"
+), UNIT = c("1/h", "", "L/h", "L", "L", "L/h", "", "", "", "",
+"", "", "", "", "", "", "", "", "", "CV \\%", "CV \\%", "CV \\%",
+"CV \\%", "CV \\%", "CV \\%", "CV \\%", "SD"), TYPE = c("", "",
+"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+"", "[P]", "[P]", "[P]", "[P]", "[P]", "[P]", "[P]", "[A]"),
+    Var1 = c(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 12L,
+    13L, 14L, 15L, 16L, 17L, 18L, 19L, 1L, 2L, 3L, 4L, 8L, 12L,
+    1L, 2L), Var2 = c(1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L,
+    1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 2L, 3L, 4L, 8L, 12L,
+    1L, 2L), value = c(21.5321982713764, 1, 138.929034335545,
+    188.37717427445, 8.37463721117642, 1.78168710345766, 0.146283580591313,
+    0.381407727717408, -0.440584670840936, -0.237597605823231,
+    0.00919286129658148, -1.41149292718384, 0.00919948548031196,
+    -0.598521717890334, -0.182363661220387, 2.05820729638063,
+    0.660532147720718, -0.26822425291672, 0.431078003877679,
+    41.0453541571848, 40.8456996574155, 16.3948904987319, 57.5144511769106,
+    27.2819988128726, 41.28744177368, 33.5716849042964, 0.0534413779047547
+    ), c = c(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
+    NA, NA, NA, NA, NA, NA, NA, 0.394584599704723, 0.392806275842888,
+    0.162862955239842, 0.534578020174358, 0.267938393381417,
+    0.396738388728408, 0.335716849042964, 0.0534413779047547),
+    se = c(5.13696574655657, 1e+10, 7.13217942594393, 10.2660640970675,
+    0.493792916073456, 0.110473731369773, 0.0292873981694678,
+    0.136399418563959, 0.135257273630088, 0.122445991011905,
+    0.00239573401576193, 0.184889568120677, 0.069880591494306,
+    0.0606105830069274, 0.0420935143869694, 0.279006199027421,
+    0.0211364118597637, 0.0478846395445538, 22234.3751890597,
+    0.0404777245636768, 0.0224701811516844, 0.00263968942422956,
+    0.0371790593516767, 0.00926994024069092, 0.0175850710185622,
+    0.00743723179861214, 0.000235838179554059), cse = c(NA, NA,
+    NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
+    NA, NA, 0.0512915666171048, 0.0286021157674577, 0.00810402040274352,
+    0.0347742125083542, 0.0172986411609457, 0.0221620487431584,
+    0.0110766436355721, 0.00220651290068137), percent_rse = c("23.9",
+    "Fixed", "5.13", "5.45", "5.90", "6.20", "20.0", "35.8",
+    "30.7", "51.5", "26.1", "13.1", "760", "10.1", "23.1", "13.6",
+    "3.20", "17.9", "5.16e+06", "26.0", "14.6", "9.95", "13.0",
+    "12.9", "11.2", "6.60", "8.26"), LCI = c(11.4639304183096,
+    -19599639844.4005, 124.950219529417, 168.256058381218, 7.40682087985144,
+    1.56516256873515, 0.0888813349782719, 0.114069779819844,
+    -0.705684055802988, -0.47758733825788, 0.00449730890915059,
+    -1.77386982181753, -0.127763957066884, -0.717316277665887,
+    -0.264865433401566, 1.51136519482347, 0.619105541713176,
+    -0.362076421836728, -43578.1435113041, 0.0763621240031973,
+    0.110256024558167, 0.0213506459875935, 0.212904042345173,
+    0.0536222336372224, 0.122935243228852, 0.0981290962613802,
+    0.00239374653425336), UCI = c(31.6004661244432, 19599639846.4005,
+    152.907849141673, 208.498290167682, 9.3424535425014, 1.99821163818017,
+    0.203685826204354, 0.648745675614972, -0.175485285878884,
+    0.00239212661141791, 0.0138884136840124, -1.04911603255015,
+    0.146162928027508, -0.479727158114781, -0.0998618890392084,
+    2.60504939793779, 0.70195875372826, -0.174372083996712, 43579.0056673118,
+    0.235031888645075, 0.198337516124951, 0.0316980383913159,
+    0.358643276961899, 0.0899597316584079, 0.191867454952774,
+    0.127282509201292, 0.00331821521046425), corr = c(FALSE,
+    FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+    FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+    FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE),
+    CI = c("(11.5, 31.6)", "-", "(125, 153)", "(168, 208)", "(7.41, 9.34)",
+    "(1.57, 2.00)", "(0.0889, 0.204)", "(0.114, 0.649)", "(-0.706, -0.175)",
+    "(-0.478, 0.00239)", "(0.00450, 0.0139)", "(-1.77, -1.05)",
+    "(-0.128, 0.146)", "(-0.717, -0.480)", "(-0.265, -0.0999)",
+    "(1.51, 2.61)", "(0.619, 0.702)", "(-0.362, -0.174)", "(-43600, 43600)",
+    "(0.0764, 0.235)", "(0.110, 0.198)", "(0.0214, 0.0317)",
+    "(0.213, 0.359)", "(0.0536, 0.0900)", "(0.123, 0.192)", "(0.0981, 0.127)",
+    "(0.00239, 0.00332)")), class = "data.frame", row.names = c(NA,
+-27L))
+df
+```
+
+```{r ref_df}
+# this is my reference df, but it doesn't have a lot of the columns she's looking in the code below. Bummer.
+
+# df <- readRDS(glue("~/tidynm/tests/benchmark/{MODEL_PICK}_PARAMTBL.rds"))[[1]]
+# df
+```
+
+
+# helper functions I wrote to clean up the data so it doesn't screw up mrggt
+```{r}
+ResolveText <- function(exprn){
+
+ exprn.WordElements <- unlist(stringr::str_extract_all(exprn,'([a-zA-Z0-9]+)'))
+    
+ for(WE in exprn.WordElements){
+   
+      exprn <- gsub(WE, paste0('<', WE, '>'), exprn, fixed = TRUE)
+ }
+ 
+ exprn
+ 
+}
+
+# Function to clean up invalid double underscore notations
+DoubleScore <- function(exprn){
+  
+  exprn.text <- ResolveText(exprn)
+  
+  if(grepl('([a-zA-Z0-9]+\\_\\{[a-zA-Z0-9]+\\_\\{[a-zA-Z0-9]+\\}\\})', exprn)){
+    
+    exprn <- exprn.text
+    
+  } else {
+    
+    exprn <- paste0(gsub('_', '_{', exprn.text, fixed = TRUE), '}}')
+  }
+  
+  exprn
+  
+}
+
+# Function to clean up invalid underscore notations
+SingleScore <- function(exprn){
+  
+  exprn.text <- ResolveText(exprn)
+  
+  if(grepl('([a-zA-Z0-9]+\\_\\{[a-zA-Z0-9]+\\})', exprn)){
+    
+    exprn <- exprn.text
+    
+  } else {
+    
+    exprn <- paste0(gsub('_', '_{', exprn.text, fixed = TRUE), '}')
+    
+  }
+  
+  exprn
+  
+}
+
+# Detects invalid latex-gt underscore/double underscore notations and fixes
+UnderscoresToTex <- function(df.element){
+  
+  exprn.split <- unlist(str_split(df.element, ' '))
+  resolved <- c()
+  
+  for(exprn in exprn.split){
+    
+    if(grepl('([a-zA-Z0-9]+\\_\\{?[a-zA-Z0-9]+\\_\\{?[a-zA-Z0-9]+\\}?\\}?)', exprn)){
+      
+      exprn <- DoubleScore(exprn)
+      
+    } else {
+      
+      if(grepl('(\\_\\{?[a-zA-Z0-9]+\\}?)', exprn)){
+        
+        exprn <- SingleScore(exprn)
+      }
+      
+    }
+    
+    resolved <- append(resolved, exprn)
+  }
+  paste0('!@ ', paste(resolved, collapse = ' '))
+}
+
+
+RemoveMathIndicator <- function(df.element){
+  gsub('!@ ', '', df.element)
+}
+
+# detects invalid latex-gt percent notations and fixes
+ValidatePercents <- function(df.element){
+  if(grepl('(\\\\+%)', df.element)){
+    df.element <- gsub('(\\\\+%)', '%', df.element)
+  }
+  df.element
+}
+
+ParameterUnderscores <- function(element, parameter){
+  element <- RemoveMathIndicator(element)
+  if(grepl('\\_\\{', element)){
+    paste0('!@ *', parameter, '_{', element, '}')
+  } else {
+    paste0('!@ *', parameter, '_{<', element, '>}')
+  }
+}
+
+```
+
+# cleaning it up
+```{r}
+df$LABEL <- df$LABEL %>% purrr::map_chr(UnderscoresToTex)
+
+df[df$PARAM == 'OMEGA',]$LABEL <-
+  purrr::map_chr(df[df$PARAM == 'OMEGA',]$LABEL, ParameterUnderscores, 'omega')
+
+df[df$PARAM == 'SIGMA',]$LABEL <-
+  purrr::map_chr(df[df$PARAM == 'SIGMA',]$LABEL, ParameterUnderscores,'sigma')
+
+new_df <- data.frame(apply(df, c(1,2), ValidatePercents))
+#tbl_df <- new_df %>% select(LABEL, value, CI, UNIT) #select(LABEL, value, percent_rse, CI, UNIT)
+new_df
+```
+
+# convert to mrggt
+```{r}
+
+# helper function to set column labels easier
+rename.collabels <- function(df, labels){
+  new <- as.list(labels)
+  names(new) <- names(df)
+  new
+}
+
+tex <- tbl_df %>% 
+  gt(
+    rowname_col = 'LABEL'
+  )  %>%
+  tab_stubhead('Parameter') %>%
+  tab_row_group(
+    group = "Interindividual variability",
+    rows = contains('omega')
+  ) %>%
+  tab_row_group(
+    group = "Residual Error",
+    rows = contains('sigma')
+  ) %>%
+    row_group_order(
+      groups = c(NA, "Interindividual variability", "Residual Error")
+    ) %>%
+  cols_label(.list = rename.collabels(tbl_df, c('Parameter', 
+                                                'Estimate', 
+                                                '%RSE', 
+                                                'CI (95%)', 
+                                                'Units'))) %>%
+  as_latex()
+
+readr::write_file(tex, 'table.tex')
+```
+
