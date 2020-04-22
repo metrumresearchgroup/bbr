@@ -1,33 +1,11 @@
 
 ####### THIS WILL PROBABLY ALL GO IN SUMMARY INSTEAD. Or utils or something.
+library(readr)
+library(stringr)
+library(tidyr)
+library(purrr)
+library(dplyr)
 
-
-#### test outline
-
-# MODEL_DIR <- "../../inst/extdata"
-# options('rbabylon.bbi_exe_path' = '/data/apps/bbi')
-# set_model_directory(MODEL_DIR)
-# bbi_init(MODEL_DIR, "/opt/NONMEM", "nm74gf")
-#
-# MODEL_PICK <- "510" ### 101 triggers fails because of this error https://github.com/metrumresearchgroup/babylon/issues/163
-#
-# ref_df <- readRDS(glue("../benchmark/{MODEL_PICK}_PARAMTBL.rds"))[[1]]
-#
-# if (fs::file_exists(file.path(MODEL_DIR, glue("{MODEL_PICK}.yaml")))) fs::file_delete(file.path(MODEL_DIR, glue("{MODEL_PICK}.yaml")))
-# .param_df <- rbabylon::new_model(glue("{MODEL_PICK}.yaml"), glue("the {MODEL_PICK} model")) %>%
-#   rbabylon::model_summary() %>% param_estimates()
-#
-# .ctl_raw <- readr::read_lines(glue("../../inst/extdata/{MODEL_PICK}.ctl")) %>% paste(collapse = "\n")
-
-#
-# #.label_df
-#
-# .new_df <- left_join(.param_df, .label_df) %>% tidyr::replace_na(list(unit="", type=""))
-# names(.new_df) <- toupper(names(.new_df))
-# .new_df
-#
-# # join against reference to see if they're the same
-# ref_df %>% full_join(.new_df, by = c("LABEL", "UNIT", "TYPE")) %>% select(PARAM, NAMES, LABEL, UNIT, TYPE, value, ESTIMATE, se, STDERR)
 
 
 #######
@@ -63,12 +41,13 @@ parse_param_comment <- function(x, .theta = TRUE){
 #'
 #' Still not sure on the interface here. Should it be passed a model? a param_df?
 #' @importFrom readr read_lines
-#' @importFrom stringr str_subset
+#' @importFrom tidyr replace_na
+#' @importFrom dplyr select everything
+#' @importFrom purrr map_df
 #' @export
-add_labels <- function(.param_df, .ctl_path) {
+param_labels <- function(.mod) {
 
-  # # should this take a .mod instead???
-  # .ctl_path <- .mod %>% get_model_path()
+  .ctl_path <- .mod %>% get_model_path()
 
   .ctl_raw <- .ctl_path %>% read_lines() %>% paste(collapse = "\n")
 
@@ -79,15 +58,13 @@ add_labels <- function(.param_df, .ctl_path) {
       .ctl_clean[[.pick]],
       .theta = (.pick == "THETA")
     )
-    .pick_names <- .param_df$names %>% str_subset(.pick)
+    .pick_labels$names <- rep(.pick, nrow(.pick_labels))
 
-    if (length(.pick_names) != length(.pick_labels$label)) {
-      stop(glue("{length(.pick_names)} names and {length(.pick_labels$label)} labels. Must be the same length."))
-    }
-    .pick_labels$names <- .pick_names
+    #### try to parse the indices here
 
-    .pick_labels
-  })
+    .pick_labels %>% select(names, everything())
+  }) %>%
+    tidyr::replace_na(list(unit="", type=""))
 
   return(.label_df)
 }
@@ -140,5 +117,21 @@ ctl_rm_comments <- function(x){
   paste0(x0[!grepl('^\\s*;',x0)],collapse = '\n')
 }
 
+
+#############
+# dput(.pick_labels)
+#
+#
+# .pick_labels <- structure(list(label = c(" Ka", " CL", NA, " V2"), type = c("[P]",
+#                                                                             "[P]", NA, "[P]")), row.names = c(NA, -4L), class = c("tbl_df",
+#                                                                                                                                   "tbl", "data.frame"))
+#
+# .pick_labels %>%
+#   mutate(
+#     diag = case_when(type == "[P]" ~ 1, TRUE ~ 0),
+#     diag_num = cumsum(diag),
+#     offdiag = ifelse(diag, 0, 1),
+#     offdiag_num = cumsum(offdiag)
+#   )
 
 

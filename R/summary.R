@@ -221,13 +221,29 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
   num_methods <- length(.summary$parameters_data)
   param_names <- .summary$parameter_names
   param_estimates <- .summary$parameters_data[[num_methods]]$estimates
-  tibble::tibble(
+
+  param_df <- tibble::tibble(
     names = unlist(param_names),
     estimate = unlist(param_estimates),
     stderr = unlist(.summary$parameters_data[[num_methods]]$std_err) %||% NA_real_,
     fixed = unlist(.summary$parameters_data[[num_methods]]$fixed),
   )
+
+  # create boolean column for whether each row is a diagonal
+  param_df$diag <- map_lgl(param_df$names, is_diag)
+
+  return(param_df)
 }
 
+is_diag <- function(.name) {
+  .ind <- .name %>%
+    str_replace_all(glue("^.*\\(|\\)"), "") %>%
+    str_split(",") %>% unlist()
 
+  if (length(.ind) == 1) {
+    invisible()
+  }
+
+  return(.ind[1] == .ind[2])
+}
 

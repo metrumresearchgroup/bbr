@@ -17,6 +17,7 @@ $THETA
  (0, 13) ;[L/day] CL
  (0, 75) ;[L] V
  (0.001 );[L/day] CL_{CLCR}
+$THETA
  (0.001) ;[L/day] CL_{AGE}
  (0.001) ;[L] V_{WT}
  (0.001) ;[L] V_{AGE}
