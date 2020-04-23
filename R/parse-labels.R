@@ -39,7 +39,9 @@ parse_param_comment <- function(x, .theta = TRUE){
 
 #' The real function to parse the labels from the control stream
 #'
-#' Still not sure on the interface here. Should it be passed a model? a param_df?
+#' This is using the labeling scheme from "Census", as defined here: https://ghe.metrumrg.com/pages/software/mrgtable/reference/nm_tbl.html
+#' It will _not_ return indices for the parameters, though they can be added with `param_labels() %>% apply_indices()`
+#' @param .mod `bbi_{.model_type}_model` object
 #' @importFrom readr read_lines
 #' @importFrom tidyr replace_na
 #' @importFrom dplyr select everything
@@ -60,17 +62,18 @@ param_labels <- function(.mod) {
     )
     .pick_labels$names <- rep(.pick, nrow(.pick_labels))
 
-    #### try to parse the indices here
-
     .pick_labels %>% select(names, everything())
   }) %>%
-    tidyr::replace_na(list(unit="", type=""))
+    tidyr::replace_na(list(label="", unit="", type=""))
 
   return(.label_df)
 }
 
-
+#' Add parameter indices to a label tibble
+#'
+#' @param .label_df A tibble like the output of `param_labels()`, containing columns `names, label, unit, type`
 #' @importFrom dplyr filter mutate n
+#' @export
 apply_indices <- function(.label_df, .theta = NULL, .omega = NULL, .sigma = NULL) {
   .theta_df <- .label_df %>% filter(names == "THETA") %>% mutate(param_type = names)
   .omega_df <- .label_df %>% filter(names == "OMEGA") %>% mutate(param_type = names)
@@ -103,8 +106,9 @@ apply_indices <- function(.label_df, .theta = NULL, .omega = NULL, .sigma = NULL
   ))
 }
 
-
+#' Builds matrix indices labels
 #' @param is_diag Boolean vector denoting whether each element is a diagonal
+#' @export
 build_matrix_indices <- function(is_diag) {
   total_diag <- sum(is_diag)
   .x <- character(length(is_diag))
@@ -114,13 +118,13 @@ build_matrix_indices <- function(is_diag) {
   for (i in order(seq_along(is_diag), decreasing = TRUE)) {
     if (isTRUE(is_diag[i])) {
       last_diag <- last_diag - 1
-      x_ind <- last_diag
+      y_ind <- last_diag
       .x[i] <- last_diag
       .y[i] <- last_diag
     } else {
-      x_ind <- x_ind - 1
-      .x[i] <- x_ind
-      .y[i] <- last_diag
+      y_ind <- y_ind - 1
+      .x[i] <- last_diag
+      .y[i] <- y_ind
     }
   }
 
