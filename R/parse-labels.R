@@ -17,7 +17,7 @@ library(dplyr)
 #' modified parse_theta() to parse out the comments into the right columns
 #' @param x an object from the list that comes out of clean_ctl() (i.e. .ctl_clean$THETA, .ctl_clean$SIGMA, .ctl_clean$OMEGA)
 #' @param .theta Boolean for if it's a theta. If TRUE, parses `[{}]` to unit, otherwise parses to type
-#' @importFrom stringr str_match str_split
+#' @importFrom stringr str_match str_split str_trim
 parse_param_comment <- function(x, .theta = TRUE){
   if(inherits(x,'list'))
     x <- unlist(x)
@@ -29,9 +29,9 @@ parse_param_comment <- function(x, .theta = TRUE){
   unit <- str_match(full_label_text, '\\[(.*?)\\]')
 
   if (isTRUE(.theta)) {
-    out_tbl <- tibble(label = label, unit = unit[,ncol(unit)])
+    out_tbl <- tibble(label = str_trim(label), unit = unit[,ncol(unit)])
   } else {
-    out_tbl <- tibble(label = label, type = unit[,1])
+    out_tbl <- tibble(label = str_trim(label), type = unit[,1])
   }
 
   return(out_tbl)
@@ -69,6 +69,84 @@ param_labels <- function(.mod) {
   return(.label_df)
 }
 
+
+#' @importFrom dplyr filter mutate n
+apply_indices <- function(.label_df, .theta = NULL, .omega = NULL, .sigma = NULL) {
+  .theta_df <- .label_df %>% filter(names == "THETA") %>% mutate(param_type = names)
+  .omega_df <- .label_df %>% filter(names == "OMEGA") %>% mutate(param_type = names)
+  .sigma_df <- .label_df %>% filter(names == "SIGMA") %>% mutate(param_type = names)
+
+
+  if(is.null(.theta)) {
+    .theta <- .theta_df %>% nrow() %>% seq_len()
+  }
+  .theta_df <- .theta_df %>% mutate(names = paste0(names, .theta))
+
+  if (is.null(.omega)) {
+    is_diag <- ifelse(.omega_df$type == "[P]", T, F) # define boolean vector for diagonal
+    .omega <- build_matrix_indices(is_diag)
+
+  }
+  .omega_df <- .omega_df %>% mutate(names = paste0(names, .omega))
+
+  if (is.null(.sigma)) {
+    is_diag <- ifelse(.sigma_df$type == "[P]" | .sigma_df$type == "[A]", T, F) # define boolean vector for diagonal
+    .sigma <- build_matrix_indices(is_diag)
+
+  }
+  .sigma_df <- .sigma_df %>% mutate(names = paste0(names, .sigma))
+
+  return(bind_rows(
+    .theta_df,
+    .omega_df,
+    .sigma_df
+  ))
+}
+
+
+#' @param is_diag Boolean vector denoting whether each element is a diagonal
+build_matrix_indices <- function(is_diag) {
+  total_diag <- sum(is_diag)
+  .x <- character(length(is_diag))
+  .y <- character(length(is_diag))
+
+  last_diag <- total_diag + 1
+  for (i in order(seq_along(is_diag), decreasing = TRUE)) {
+    if (isTRUE(is_diag[i])) {
+      last_diag <- last_diag - 1
+      x_ind <- last_diag
+      .x[i] <- last_diag
+      .y[i] <- last_diag
+    } else {
+      x_ind <- x_ind - 1
+      .x[i] <- x_ind
+      .y[i] <- last_diag
+    }
+  }
+
+  return(paste0("(", .x, ",", .y, ")"))
+}
+
+#### live coding from Devin
+# ## refactor this block out into its own function
+# is_diag <- ifelse(.omega_df$type == "[P]", 1, 0)
+# total_diag <- sum(is_diag, na.rm = TRUE)
+# labels <- character(length(is_diag))
+# last_seen_diag <- total_diag + 1 # because in loop will decrement each time is_diag hits this
+# last_seen_off_diag <- 0
+# for (i in order(seq_along(is_diag), decreasing = TRUE)) {
+#   cur_label <- is_diag[i]
+#   if (cur_label == 1) {
+#     last_seen_diag <- last_seen_diag - 1
+#     last_seen_off_diag <- last_seen_diag
+#     labels[i] <- sprintf("%s,%s", last_seen_diag, last_seen_diag)
+#   } else {
+#     last_seen_off_diag <- last_seen_off_diag - 1
+#     labels[i] <- sprintf("%s,%s", last_seen_diag, last_seen_off_diag)
+#   }
+#
+# }
+# labels
 
 
 
