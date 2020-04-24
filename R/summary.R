@@ -226,6 +226,12 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
     names = unlist(param_names),
     estimate = unlist(param_estimates),
     stderr = unlist(.summary$parameters_data[[num_methods]]$std_err) %||% NA_real_,
+    random_effect_sd = c(
+      rep(NA, length(param_names$theta)),
+      unlist(.summary$parameters_data[[num_methods]]$random_effect_sd)),
+    random_effect_sdse = c(
+      rep(NA, length(param_names$theta)),
+      unlist(.summary$parameters_data[[num_methods]]$random_effect_sdse)),
     fixed = unlist(.summary$parameters_data[[num_methods]]$fixed)
   )
 

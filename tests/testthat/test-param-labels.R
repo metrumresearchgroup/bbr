@@ -62,14 +62,15 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
                                                    paste0(param, "(", var1, ",", var2, ")")))
 
         join_df <- ref_df %>%
-          full_join(.new_df, by = names(.label_df)) %>%
-          select(names, label, unit, type, value, estimate, se, stderr)
+          full_join(.new_df, by = names(.label_df))
 
         # tests
         expect_equal(nrow(join_df), nrow(ref_df))
         expect_equal(nrow(join_df), nrow(.new_df))
         expect_equal(join_df$value, join_df$estimate, tolerance = 0.01)
         expect_equal(join_df$se, join_df$stderr, tolerance = 0.01)
+        expect_equal(join_df$c, join_df$random_effect_sd, tolerance = 0.01)
+        expect_equal(join_df$cse, join_df$random_effect_sdse, tolerance = 0.01)
 
         # cleanup
         if (fs::file_exists(file.path(MODEL_DIR, glue("{MODEL_PICK}.yaml")))) fs::file_delete(file.path(MODEL_DIR, glue("{MODEL_PICK}.yaml")))
