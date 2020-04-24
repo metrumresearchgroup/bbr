@@ -68,93 +68,96 @@ test_that("format_cmd_args parses correctly", {
   }
 })
 
-test_that("build_bbi_param_list happy path single set", {
-  # read first model
-  mod1 <- read_model("model-examples/1")
 
-  # use three copies of the same thing
-  .mods <- list(mod1, mod1, mod1)
-  param_list <- build_bbi_param_list(.mods)
+withr::with_options(list(rbabylon.model_directory = NULL), {
 
-  # check that there is only one distinct arg set
-  expect_equal(length(param_list), 1)
+  test_that("build_bbi_param_list happy path single set", {
+    # read first model
+    mod1 <- read_model("model-examples/1")
 
-  # check args
-  expect_equal(
-    param_list[[1]][[YAML_BBI_ARGS]],
-    c("--overwrite", "--threads=4")
-  )
+    # use three copies of the same thing
+    .mods <- list(mod1, mod1, mod1)
+    param_list <- build_bbi_param_list(.mods)
 
-  # check paths
-  expect_equal(
-    param_list[[1]][[YAML_MOD_PATH]],
-    rep("1.ctl", 3)
-  )
-})
+    # check that there is only one distinct arg set
+    expect_equal(length(param_list), 1)
 
-test_that("build_bbi_param_list happy path two sets", {
-  # read first model
-  mod1 <- read_model("model-examples/1")
+    # check args
+    expect_equal(
+      param_list[[1]][[YAML_BBI_ARGS]],
+      c("--overwrite", "--threads=4")
+    )
 
-  # change one of the args
-  mod2 <- mod1
-  mod2[[YAML_BBI_ARGS]][["clean_lvl"]] <- 1
-  .mods <- list(mod1, mod1, mod2)
-  param_list <- build_bbi_param_list(.mods)
+    # check paths
+    expect_equal(
+      param_list[[1]][[YAML_MOD_PATH]],
+      rep("1.ctl", 3)
+    )
+  })
 
-  # check that there is only one distinct arg set
-  expect_equal(length(param_list), 2)
+  test_that("build_bbi_param_list happy path two sets", {
+    # read first model
+    mod1 <- read_model("model-examples/1")
 
-  # check args
-  expect_equal(
-    param_list[[1]][[YAML_BBI_ARGS]],
-    c("--overwrite", "--threads=4")
-  )
-  expect_equal(
-    param_list[[2]][[YAML_BBI_ARGS]],
-    c("--clean_lvl=1", "--overwrite", "--threads=4")
-  )
+    # change one of the args
+    mod2 <- mod1
+    mod2[[YAML_BBI_ARGS]][["clean_lvl"]] <- 1
+    .mods <- list(mod1, mod1, mod2)
+    param_list <- build_bbi_param_list(.mods)
 
-  # check paths
-  expect_equal(
-    param_list[[1]][[YAML_MOD_PATH]],
-    rep("1.ctl", 2)
-  )
-  expect_equal(
-    param_list[[2]][[YAML_MOD_PATH]],
-    "1.ctl"
-  )
-})
+    # check that there is only one distinct arg set
+    expect_equal(length(param_list), 2)
 
-test_that("build_bbi_param_list .bbi_args works", {
-  # read first model
-  mod1 <- read_model("model-examples/1")
+    # check args
+    expect_equal(
+      param_list[[1]][[YAML_BBI_ARGS]],
+      c("--overwrite", "--threads=4")
+    )
+    expect_equal(
+      param_list[[2]][[YAML_BBI_ARGS]],
+      c("--clean_lvl=1", "--overwrite", "--threads=4")
+    )
 
-  # use three copies of the same thing
-  .mods <- list(mod1, mod1, mod1)
-  param_list <- build_bbi_param_list(.mods, .bbi_args = list(clean_lvl=1))
+    # check paths
+    expect_equal(
+      param_list[[1]][[YAML_MOD_PATH]],
+      rep("1.ctl", 2)
+    )
+    expect_equal(
+      param_list[[2]][[YAML_MOD_PATH]],
+      "1.ctl"
+    )
+  })
 
-  # check args
-  expect_equal(
-    param_list[[1]][[YAML_BBI_ARGS]],
-    c("--clean_lvl=1", "--overwrite", "--threads=4")
-  )
-})
+  test_that("build_bbi_param_list .bbi_args works", {
+    # read first model
+    mod1 <- read_model("model-examples/1")
 
-test_that("build_bbi_param_list dies with a non model", {
-  # read first model
-  mod1 <- read_model("model-examples/1")
+    # use three copies of the same thing
+    .mods <- list(mod1, mod1, mod1)
+    param_list <- build_bbi_param_list(.mods, .bbi_args = list(clean_lvl=1))
 
-  # third object is not a model
-  .mods <- list(mod1, mod1, list(naw=1))
+    # check args
+    expect_equal(
+      param_list[[1]][[YAML_BBI_ARGS]],
+      c("--clean_lvl=1", "--overwrite", "--threads=4")
+    )
+  })
 
-  # check args
-  expect_error(
-    param_list <- build_bbi_param_list(.mods),
-    regexp = "must contain only model objects"
-  )
-})
+  test_that("build_bbi_param_list dies with a non model", {
+    # read first model
+    mod1 <- read_model("model-examples/1")
 
+    # third object is not a model
+    .mods <- list(mod1, mod1, list(naw=1))
+
+    # check args
+    expect_error(
+      param_list <- build_bbi_param_list(.mods),
+      regexp = "must contain only model objects"
+    )
+  })
+}) # closing withr::with_options
 
 #####################
 # list manipulation

@@ -226,7 +226,7 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
     names = unlist(param_names),
     estimate = unlist(param_estimates),
     stderr = unlist(.summary$parameters_data[[num_methods]]$std_err) %||% NA_real_,
-    fixed = unlist(.summary$parameters_data[[num_methods]]$fixed),
+    fixed = unlist(.summary$parameters_data[[num_methods]]$fixed)
   )
 
   # create boolean column for whether each row is a diagonal
@@ -235,6 +235,11 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
   return(param_df)
 }
 
+#' Check if diagonal index or not
+#'
+#' Private helper to unpack an matrix index string like '(3,3)' is for a diagonal (i.e. if the numbers are the same)
+#' @param .name A character scaler containing an index string
+#' @importFrom stringr str_replace_all str_split
 is_diag <- function(.name) {
   .ind <- .name %>%
     str_replace_all(glue("^.*\\(|\\)"), "") %>%

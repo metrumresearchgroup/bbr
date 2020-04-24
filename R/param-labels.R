@@ -1,6 +1,6 @@
 # Extract parameter labels for report tables, etc.
 
-#' Parse parameter labels from the control stream
+#' Parse parameter labels from the model object control stream comments
 #'
 #' This is using the labeling scheme from "Census", as defined here: https://ghe.metrumrg.com/pages/software/mrgtable/reference/nm_tbl.html
 #' It will _not_ return indices for the parameters, though they can be added with `param_labels() %>% apply_indices()`
@@ -47,13 +47,13 @@ apply_indices <- function(.label_df) {
   .theta_df <- .theta_df %>% mutate(names = paste0(names, .theta))
 
   # omega
-  is_diag <- ifelse(.omega_df$type == "[P]", T, F) # define boolean vector for diagonal
-  .omega <- build_matrix_indices(is_diag)
+  .is_diag <- ifelse(.omega_df$type == "[P]", T, F) # define boolean vector for diagonal
+  .omega <- build_matrix_indices(.is_diag)
   .omega_df <- .omega_df %>% mutate(names = paste0(names, .omega))
 
   # sigma
-  is_diag <- ifelse(.sigma_df$type == "[P]" | .sigma_df$type == "[A]", T, F) # define boolean vector for diagonal
-  .sigma <- build_matrix_indices(is_diag)
+  .is_diag <- ifelse(.sigma_df$type == "[P]" | .sigma_df$type == "[A]", T, F) # define boolean vector for diagonal
+  .sigma <- build_matrix_indices(.is_diag)
   .sigma_df <- .sigma_df %>% mutate(names = paste0(names, .sigma))
 
   return(bind_rows(
@@ -68,16 +68,17 @@ apply_indices <- function(.label_df) {
 # private helpers
 ###################
 
-#' extract labels from comments in ctl
-#' modified parse_theta() to parse out the comments into the right columns
+#' extract labels from comments in raw ctl string
+#'
+#' Modified tidynm::parse_theta() to parse out the comments into the right columns for all three params.
 #' @param x an object from the list that comes out of clean_ctl() (i.e. .ctl_clean$THETA, .ctl_clean$SIGMA, .ctl_clean$OMEGA)
 #' @param .theta Boolean for if it's a theta. If TRUE, parses `[{}]` to unit, otherwise parses to type
 #' @importFrom stringr str_match str_split str_trim
-parse_param_comment <- function(x, .theta = TRUE){
-  if(inherits(x,'list'))
-    x <- unlist(x)
+parse_param_comment <- function(.x, .theta = TRUE){
+  if(inherits(.x,'list'))
+    .x <- unlist(.x)
 
-  full_label_text <- str_split(x,'\\;') %>% sapply('[',2)
+  full_label_text <- str_split(.x,'\\;') %>% sapply('[',2)
 
   label <- gsub('^(.*?)\\]\\s?','',full_label_text)
 
@@ -94,16 +95,16 @@ parse_param_comment <- function(x, .theta = TRUE){
 
 
 #' Builds matrix indices labels
-#' @param is_diag Boolean vector denoting whether each element is a diagonal
+#' @param .is_diag Boolean vector denoting whether each element is a diagonal
 #' @export
-build_matrix_indices <- function(is_diag) {
-  total_diag <- sum(is_diag)
-  .x <- character(length(is_diag))
-  .y <- character(length(is_diag))
+build_matrix_indices <- function(.is_diag) {
+  total_diag <- sum(.is_diag)
+  .x <- character(length(.is_diag))
+  .y <- character(length(.is_diag))
 
   last_diag <- total_diag + 1
-  for (i in order(seq_along(is_diag), decreasing = TRUE)) {
-    if (isTRUE(is_diag[i])) {
+  for (i in order(seq_along(.is_diag), decreasing = TRUE)) {
+    if (isTRUE(.is_diag[i])) {
       last_diag <- last_diag - 1
       y_ind <- last_diag
       .x[i] <- last_diag
@@ -124,6 +125,8 @@ build_matrix_indices <- function(is_diag) {
 ########################################
 
 #' Parse control stream to a named list of the blocks
+#'
+#' Taken directly from tidynm package.
 #' @param x control stream as a character scaler with lines separated by `\n`
 #' @importFrom purrr set_names
 clean_ctl <- function(x){

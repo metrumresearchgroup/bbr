@@ -4,26 +4,26 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
   skip("test-summary only runs on Metworx or Drone")
 }
 
-# constants
-MODEL_FILE <- "1.ctl"
-MODEL_YAML <- yaml_ext(MODEL_FILE)
-MODEL_DIR <- "model-examples"
-MOD1_PATH <- file.path(MODEL_DIR, "1")
-MOD1 <- MOD1_PATH %>% read_model()
-MOD2_PATH <- file.path(MODEL_DIR, "2")
-
-# references
-SUM_CLASS_LIST <- c("bbi_nonmem_summary", "list")
-NOT_FINISHED_ERR_MSG <- "nonmem_summary.*modeling run has not finished"
-NO_LST_ERR_MSG <- "Unable to locate `.lst` file.*NONMEM output folder"
-
-
-#########################################
-# extracting things from summary object
-#########################################
-
 withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
                          rbabylon.model_directory = NULL), {
+
+  # constants
+  MODEL_FILE <- "1.ctl"
+  MODEL_YAML <- yaml_ext(MODEL_FILE)
+  MODEL_DIR <- "model-examples"
+  MOD1_PATH <- file.path(MODEL_DIR, "1")
+  MOD1 <- MOD1_PATH %>% read_model()
+  MOD2_PATH <- file.path(MODEL_DIR, "2")
+
+  # references
+  SUM_CLASS_LIST <- c("bbi_nonmem_summary", "list")
+  NOT_FINISHED_ERR_MSG <- "nonmem_summary.*modeling run has not finished"
+  NO_LST_ERR_MSG <- "Unable to locate `.lst` file.*NONMEM output folder"
+
+
+  #########################################
+  # extracting things from summary object
+  #########################################
 
   test_that("model_summary.bbi_nonmem_model produces expected output", {
     # get summary
