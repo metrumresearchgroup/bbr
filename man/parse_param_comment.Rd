@@ -7,9 +7,9 @@
 parse_param_comment(.x, .theta = TRUE)
 }
 \arguments{
-\item{.theta}{Boolean for if it's a theta. If TRUE, parses `[{}]` to unit, otherwise parses to type}
+\item{.x}{an object from the list that comes out of clean_ctl() (i.e. .ctl_clean$THETA, .ctl_clean$SIGMA, .ctl_clean$OMEGA)}
 
-\item{x}{an object from the list that comes out of clean_ctl() (i.e. .ctl_clean$THETA, .ctl_clean$SIGMA, .ctl_clean$OMEGA)}
+\item{.theta}{Boolean for if it's a theta. If TRUE, parses `[{}]` to unit, otherwise parses to type}
 }
 \description{
 Modified tidynm::parse_theta() to parse out the comments into the right columns for all three params.

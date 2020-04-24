@@ -6,16 +6,13 @@ library(dplyr)
 # constants
 source("data/test-matrix-indices-construction-ref.R")
 MODEL_DIR <- "data/tidynm_extdata"
-MODEL_PICKS <- c("510")
-#MODEL_PICKS <- c("101", "510", "510_fixed")
-# 101 fails because all the off diagonal OMEGAS have "[A]" in the ref df (it's NOT in the control stream)
-# 510_fixed fails because OMEGA(2,2) parses "CL" in the ref df but "CL-IOV" is in the control stream (and that's what we parse)
-# should I just change the ref df's? Are those mistakes or are they edge cases I don't understand?
+MODEL_PICKS <- c("101", "510", "510_fixed")
 
-# should we build up any tests cases for weird ways to make comments?
-# in order to do unit tests for `parse_param_comment()`
-# the functionality is tested as part of the `param_labels()` tests, but not explicitly as a unit test
 
+### should we build up any tests cases for weird ways to make comments?
+### in order to do unit tests for `parse_param_comment()`
+### the functionality is tested as part of the `param_labels()` tests, but not explicitly as a unit test
+# test_that("parse_param_comment() parses correctly ...", {...})
 
 for (.tc in names(MAT_REF)) {
   test_that(glue("build_matrix_indices() parses correctly for {.tc}"), {

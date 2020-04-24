@@ -71,9 +71,10 @@ apply_indices <- function(.label_df) {
 #' extract labels from comments in raw ctl string
 #'
 #' Modified tidynm::parse_theta() to parse out the comments into the right columns for all three params.
-#' @param x an object from the list that comes out of clean_ctl() (i.e. .ctl_clean$THETA, .ctl_clean$SIGMA, .ctl_clean$OMEGA)
+#' @param .x an object from the list that comes out of clean_ctl() (i.e. .ctl_clean$THETA, .ctl_clean$SIGMA, .ctl_clean$OMEGA)
 #' @param .theta Boolean for if it's a theta. If TRUE, parses `[{}]` to unit, otherwise parses to type
 #' @importFrom stringr str_match str_split str_trim
+#' @importFrom dplyr mutate
 parse_param_comment <- function(.x, .theta = TRUE){
   if(inherits(.x,'list'))
     .x <- unlist(.x)
@@ -87,7 +88,11 @@ parse_param_comment <- function(.x, .theta = TRUE){
   if (isTRUE(.theta)) {
     out_tbl <- tibble(label = str_trim(label), unit = unit[,ncol(unit)])
   } else {
-    out_tbl <- tibble(label = str_trim(label), type = unit[,1])
+    out_tbl <- tibble(label = str_trim(label), type = unit[,1]) %>%
+      mutate(
+        type = ifelse(is.na(.data$type)|!nzchar(.data$type), "[A]", .data$type)
+        # ^ from tidynm::param_tbl -- `TYPE = ifelse(is.na(!!(rlang::sym('TYPE')))|!nzchar(!!(rlang::sym('TYPE'))), "[A]", !!(rlang::sym('TYPE')))`
+      )
   }
 
   return(out_tbl)
@@ -96,7 +101,6 @@ parse_param_comment <- function(.x, .theta = TRUE){
 
 #' Builds matrix indices labels
 #' @param .is_diag Boolean vector denoting whether each element is a diagonal
-#' @export
 build_matrix_indices <- function(.is_diag) {
   total_diag <- sum(.is_diag)
   .x <- character(length(.is_diag))
@@ -127,7 +131,7 @@ build_matrix_indices <- function(.is_diag) {
 #' Parse control stream to a named list of the blocks
 #'
 #' Taken directly from tidynm package.
-#' @param x control stream as a character scaler with lines separated by `\n`
+#' @param x control stream as a character scaler with lines separated by newline characters
 #' @importFrom purrr set_names
 clean_ctl <- function(x){
 

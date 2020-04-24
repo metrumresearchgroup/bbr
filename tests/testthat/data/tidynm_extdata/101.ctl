@@ -10,54 +10,55 @@ $MODEL
  COMP=(COMP3)
 
 $PK
- 
+
 ;log transformed PK parms
- 
+
   V2WT  = LOG(WT/70)
   CLWT = LOG(WT/70)*0.75
   V3WT  = LOG(WT/70)
   QWT = LOG(WT/70)*0.75
 
-  
+
 ; CRCL effect on CL
   RFN=0
   IF(CRCL.LT.80) RFN=LOG(CRCL/80)*THETA(6) ; RF effect only wneh CRCL < 80 ml/min/1.73m^2
 
 ; Child-Pugh (CP) category on CL
   LIV=0
-  IF(CP.EQ.3)LIV=THETA(7) ; liver function only important for bad liver (CP=3) 
+  IF(CP.EQ.3)LIV=THETA(7) ; liver function only important for bad liver (CP=3)
 
   KA   = EXP(THETA(1)+ETA(1))
   V2   = EXP(THETA(2)+V2WT+ETA(2))
   CL   = EXP(THETA(3)+CLWT+RFN+LIV+ETA(3))
   V3   = EXP(THETA(4)+V3WT)
-  Q    = EXP(THETA(5)+QWT) 
+  Q    = EXP(THETA(5)+QWT)
 
   K=CL/V2
   K12=KA
   K23=Q/V2
   K32=Q/V3
   S2 = V2/1000 ; dose in mcg, conc in mcg/mL
-  
+
 $DES
  CONC=A(2)/V2
- DADT(1)=-KA*A(1) 
+ DADT(1)=-KA*A(1)
  DADT(2)= KA*A(1) - K23*A(2) + K32*A(3) - K*A(2)
  DADT(3)= K23*A(2) - K32*A(3)
- 
- 
+
+
 $ERROR
- IPRED = F 
+ IPRED = F
  Y=IPRED*(1+EPS(1))+EPS(2)
 
 $THETA
-(0.5)    ;  [1/hr] KA 
+(0.5)    ;  [1/hr] KA
 (3.5)    ;  [L]    V1
 (1)      ;  [L/hr] CL
 (4)      ;  [L] V2
 (2)      ;  [L/hr] Q
 (0.4)    ;  [f] Renal
-(0.01)   ;  [f] Child-Pugh
+(0.01)   ;  [f] Child-Pugh LOGD
+; dev comment - the LOGD ^ was added to test parsing, not by the real model
 
 $OMEGA BLOCK(3)
         0.2        ; [P]  Ka
@@ -66,7 +67,7 @@ $OMEGA BLOCK(3)
         0.002
         0.001
         0.05        ; [P]  V2
-     
+
 $SIGMA
 0.05     ; [P] Prop
 2        ; [A] Add
