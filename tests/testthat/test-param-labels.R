@@ -34,8 +34,6 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
   withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
                            rbabylon.model_directory = MODEL_DIR), {
 
-    bbi_init(MODEL_DIR, "/opt/NONMEM", "nm74gf")
-
     for (MODEL_PICK in MODEL_PICKS) {
       test_that(glue("param_labels matches tidynm reference for {MODEL_PICK}"), {
         # get reference df from tidynm test data
@@ -76,6 +74,5 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
         if (fs::file_exists(file.path(MODEL_DIR, glue("{MODEL_PICK}.yaml")))) fs::file_delete(file.path(MODEL_DIR, glue("{MODEL_PICK}.yaml")))
       })
     }
-    if (fs::file_exists(file.path(MODEL_DIR, "babylon.yaml"))) fs::file_delete(file.path(MODEL_DIR, "babylon.yaml"))
   })
 }
