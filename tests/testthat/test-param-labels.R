@@ -5,7 +5,7 @@ library(dplyr)
 
 # constants
 source("data/test-matrix-indices-construction-ref.R")
-MODEL_DIR <- "../../inst/extdata"
+MODEL_DIR <- "data/extdata"
 MODEL_PICKS <- c("510")
 #MODEL_PICKS <- c("101", "510", "510_fixed")
 # 101 fails because all the off diagonal OMEGAS have "[A]" in the ref df (it's NOT in the control stream)
