@@ -4,10 +4,14 @@
 \alias{apply_indices}
 \title{Add parameter indices to a label tibble}
 \usage{
-apply_indices(.label_df)
+apply_indices(.label_df, .omega = NULL, .sigma = NULL)
 }
 \arguments{
 \item{.label_df}{A tibble like the output of `param_labels()`, containing columns `names, label, unit, type`}
+
+\item{.omega}{A logical vector indicating whether each Omega parameter is a diagonal. If `NULL` function assumes all are diagonal. Alternatively you can pass `block(.n)` or pass a custom vector if control stream has both block and non-block.}
+
+\item{.sigma}{A logical vector indicating whether each Sigma parameter is a diagonal. If `NULL` function assumes all are diagonal. Alternatively you can pass `block(.n)` or pass a custom vector if control stream has both block and non-block.}
 }
 \description{
 Add parameter indices to a label tibble

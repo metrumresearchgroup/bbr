@@ -4,9 +4,13 @@ library(glue)
 library(dplyr)
 
 # constants
-source("data/test-matrix-indices-construction-ref.R")
+source("data/test-param-labels-ref.R")
 MODEL_DIR <- "data/tidynm_extdata"
-MODEL_PICKS <- c("101", "510", "510_fixed")
+MODEL_PICKS <- list(
+  list(mod_id = "101", omega = block(3), sigma = NULL),
+  list(mod_id = "510", omega = block(2), sigma = NULL),
+  list(mod_id = "510_fixed", omega = NULL, sigma = NULL)
+)
 
 
 ### should we build up any tests cases for weird ways to make comments?
@@ -24,6 +28,13 @@ for (.tc in names(MAT_REF)) {
 }
 
 
+for (i in length(BLOCK_REF)) {
+  test_that(glue("block() parses correctly {i}"), {
+    expect_equal(block(i), BLOCK_REF[[i]])
+  })
+}
+
+
 # test param_labels against tidynm reference tibbles
 if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
   skip("param_labels only runs on Metworx or Drone")
@@ -32,14 +43,16 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
                            rbabylon.model_directory = MODEL_DIR), {
 
     for (MODEL_PICK in MODEL_PICKS) {
-      test_that(glue("param_labels matches tidynm reference for {MODEL_PICK}"), {
+      .mod_id <- MODEL_PICK$mod_id
+
+      test_that(glue("param_labels() %>% apply_indices() matches tidynm reference for {.mod_id}"), {
         # get reference df from tidynm test data
-        ref_df <- readRDS(glue("data/{MODEL_PICK}_PARAMTBL.rds"))[[1]]
+        ref_df <- readRDS(glue("data/{.mod_id}_PARAMTBL.rds"))[[1]]
         names(ref_df) <- names(ref_df) %>% tolower()
 
         # get param df with rbabylon::model_summary()
-        if (fs::file_exists(file.path(MODEL_DIR, glue("{MODEL_PICK}.yaml")))) fs::file_delete(file.path(MODEL_DIR, glue("{MODEL_PICK}.yaml")))
-        .mod <-  rbabylon::new_model(glue("{MODEL_PICK}.yaml"), glue("the {MODEL_PICK} model"))
+        if (fs::file_exists(file.path(MODEL_DIR, glue("{.mod_id}.yaml")))) fs::file_delete(file.path(MODEL_DIR, glue("{.mod_id}.yaml")))
+        .mod <-  rbabylon::new_model(glue("{.mod_id}.yaml"), glue("the {.mod_id} model"))
         .param_df <- .mod %>% rbabylon::model_summary() %>% param_estimates()
         names(.param_df) <- names(.param_df) %>% tolower()
 
@@ -48,7 +61,7 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
 
         # join to constuct full parameter table
         .new_df <- inner_join(.param_df,
-                              .label_df %>% apply_indices() %>% select(-param_type),
+                              .label_df %>% apply_indices(.omega = MODEL_PICK$omega, .sigma = MODEL_PICK$sigma) %>% select(-param_type),
                               by = "names")
 
         # join against reference to make sure they're the same
@@ -68,7 +81,7 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
         expect_equal(join_df$cse, join_df$random_effect_sdse, tolerance = 0.01)
 
         # cleanup
-        if (fs::file_exists(file.path(MODEL_DIR, glue("{MODEL_PICK}.yaml")))) fs::file_delete(file.path(MODEL_DIR, glue("{MODEL_PICK}.yaml")))
+        if (fs::file_exists(file.path(MODEL_DIR, glue("{.mod_id}.yaml")))) fs::file_delete(file.path(MODEL_DIR, glue("{.mod_id}.yaml")))
       })
     }
   })

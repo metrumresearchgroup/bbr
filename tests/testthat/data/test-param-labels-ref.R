@@ -1,5 +1,19 @@
-# references for parsing omega and sigma matrices
 
+
+# testing block
+BLOCK_REF <- list(
+  c(TRUE),
+  c(TRUE, FALSE, TRUE),
+  c(TRUE, FALSE, TRUE, FALSE, FALSE, TRUE),
+  c(TRUE, FALSE, TRUE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, TRUE),
+  c(TRUE, FALSE, TRUE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, TRUE)
+)
+
+
+
+
+
+# references for parsing omega and sigma matrices
 MAT_REF <- list(
 
   # single omega block

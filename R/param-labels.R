@@ -35,32 +35,48 @@ param_labels <- function(.mod) {
 
 #' Add parameter indices to a label tibble
 #' @param .label_df A tibble like the output of `param_labels()`, containing columns `names, label, unit, type`
+#' @param .omega A logical vector indicating whether each Omega parameter is a diagonal. If `NULL` function assumes all are diagonal. Alternatively you can pass `block(.n)` or pass a custom vector if control stream has both block and non-block.
+#' @param .sigma A logical vector indicating whether each Sigma parameter is a diagonal. If `NULL` function assumes all are diagonal. Alternatively you can pass `block(.n)` or pass a custom vector if control stream has both block and non-block.
 #' @importFrom dplyr filter mutate n bind_rows
 #' @export
-apply_indices <- function(.label_df) {
+apply_indices <- function(.label_df, .omega = NULL, .sigma = NULL) {
   .theta_df <- .label_df %>% filter(names == "THETA") %>% mutate(param_type = names)
   .omega_df <- .label_df %>% filter(names == "OMEGA") %>% mutate(param_type = names)
   .sigma_df <- .label_df %>% filter(names == "SIGMA") %>% mutate(param_type = names)
 
   # theta
-  .theta <- .theta_df %>% nrow() %>% seq_len()
-  .theta_df <- .theta_df %>% mutate(names = paste0(names, .theta))
+  .theta_ind <- .theta_df %>% nrow() %>% seq_len()
+  .theta_df <- .theta_df %>% mutate(names = paste0(names, .theta_ind))
 
   # omega
-  .is_diag <- ifelse(.omega_df$type == "[P]", T, F) # define boolean vector for diagonal
-  .omega <- build_matrix_indices(.is_diag)
-  .omega_df <- .omega_df %>% mutate(names = paste0(names, .omega))
+  if(is.null(.omega)) {
+    .omega <- rep(TRUE, .omega_df %>% nrow()) # if null assume all are diagonals
+  }
+  .omega_ind <- build_matrix_indices(.omega)
+  .omega_df <- .omega_df %>% mutate(names = paste0(names, .omega_ind))
 
   # sigma
-  .is_diag <- ifelse(.sigma_df$type == "[P]" | .sigma_df$type == "[A]", T, F) # define boolean vector for diagonal
-  .sigma <- build_matrix_indices(.is_diag)
-  .sigma_df <- .sigma_df %>% mutate(names = paste0(names, .sigma))
+  if(is.null(.sigma)) {
+    .sigma <- rep(TRUE, .sigma_df %>% nrow()) # if null assume all are diagonals
+  }
+  .sigma_ind <- build_matrix_indices(.sigma)
+  .sigma_df <- .sigma_df %>% mutate(names = paste0(names, .sigma_ind))
+
 
   return(bind_rows(
     .theta_df,
     .omega_df,
     .sigma_df
   ))
+}
+
+
+block <- function(.n) {
+  .is_diag <- logical(0)
+  for (.d in seq_len(.n)) {
+    .is_diag <- c(.is_diag, rep(FALSE, .d-1), TRUE)
+  }
+  return(.is_diag)
 }
 
 
