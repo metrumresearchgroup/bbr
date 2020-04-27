@@ -1,0 +1,12 @@
+description: new description
+based_on:
+- '1'
+- '2'
+model_type: nonmem
+bbi_args:
+  overwrite: yes
+  threads: 4.0
+tags:
+- acop tag
+- other tag
+model_path: 3.ctl
