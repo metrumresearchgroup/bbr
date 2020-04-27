@@ -101,7 +101,7 @@ check_bbi_exe <- function(.bbi_exe_path) {
       CACHE_ENV$bbi_exe_paths[[.bbi_exe_path]] <- TRUE
     }
   }
-  invisible()
+  return(invisible())
 }
 
 
@@ -190,7 +190,7 @@ get_exit_status <- function (.res, ...) {
 get_exit_status.babylon_result <- function(.res, .check = FALSE) {
   if (.res[[PROC_PROCESS]]$is_alive()) {
     warning(paste0("Process ", .res[[PROC_PROCESS]]$get_pid(), " is still running. You cannot check the exit status until it is finished."))
-    invisible()
+    return(invisible())
   } else {
     exit_status <- .res[[PROC_PROCESS]]$get_exit_status()
 
@@ -211,7 +211,7 @@ get_stdout.babylon_result <- function(.res) {
   # check if process is still alive (as of now, can only get output from finished process)
   if (.res[[PROC_PROCESS]]$is_alive()) {
     warning(paste0("Process ", .res[[PROC_PROCESS]]$get_pid(), " is still running. You cannot read the output until it is finished."))
-    invisible()
+    return(invisible())
   } else {
     # if output has not been read from buffer, read it
     if (is.null(.res$output)) {

@@ -27,10 +27,10 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
     stderr = unlist(.summary$parameters_data[[num_methods]]$std_err) %||% NA_real_,
     random_effect_sd = c(
       rep(NA, length(param_names$theta)),
-      unlist(.summary$parameters_data[[num_methods]]$random_effect_sd)),
+      unlist(.summary$parameters_data[[num_methods]]$random_effect_sd)) %||% NA_real_,
     random_effect_sdse = c(
       rep(NA, length(param_names$theta)),
-      unlist(.summary$parameters_data[[num_methods]]$random_effect_sdse)),
+      unlist(.summary$parameters_data[[num_methods]]$random_effect_sdse)) %||% NA_real_,
     fixed = unlist(.summary$parameters_data[[num_methods]]$fixed)
   )
 
@@ -51,7 +51,7 @@ is_diag <- function(.name) {
     str_split(",") %>% unlist()
 
   if (length(.ind) == 1) {
-    invisible()
+    return(invisible(NA))
   }
 
   return(.ind[1] == .ind[2])
