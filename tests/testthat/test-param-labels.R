@@ -1,7 +1,7 @@
 context("test parsing labels for parameter table")
 
-library(glue)
-library(dplyr)
+suppressPackageStartupMessages(library(glue))
+suppressPackageStartupMessages(library(dplyr))
 
 # constants
 source("data/test-param-labels-ref.R")
