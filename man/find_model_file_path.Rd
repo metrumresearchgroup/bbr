@@ -6,6 +6,9 @@
 \usage{
 find_model_file_path(.path)
 }
+\arguments{
+\item{.path}{File path to a NONMEM model file (control stream) with either `.ctl` or `.mod` extension}
+}
 \description{
 helper to find valid model file and return ctl_ext(.path) by default if not found
 }

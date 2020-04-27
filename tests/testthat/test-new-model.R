@@ -1,29 +1,8 @@
 context("Testing function to create or read in model object")
 
-# define constants
-MODEL_DIR <- "model-examples"
-YAML_TEST_FILE <- file.path(MODEL_DIR, "1.yaml")
-NEW_MOD2 <- file.path(MODEL_DIR, "2")
-NEW_MOD3 <- file.path(MODEL_DIR, "3")
-
-ORIG_DESC <- "original acop model"
-NEW_DESC <- "new description"
-DESC_IN_CTL <- "PK model 1 cmt base"
-
-ORIG_TAGS <- c("acop tag", "other tag")
-NEW_TAGS <- c("new tag 1", "new tag 2")
-
-NEW_TEXT1 <- c("naw", "paw")
-NEW_TEXT2 <- c("all", "done")
-
-MODEL_CLASS_LIST <- c("bbi_nonmem_model", "list")
-
-
-
-
+source("data/test-workflow-ref.R")
 
 withr::with_options(list(rbabylon.model_directory = NULL), {
-
 
   test_that("read_model() returns expected object", {
     ref_list <- list(
@@ -111,51 +90,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
     # clean up tmp file
     fs::file_delete(.test_path)
-  })
-
-  test_that("compare read_model() and new_model() objects with numeric input", {
-    # create new model with args
-    withr::with_options(list(rbabylon.model_directory = "model-examples"), {
-      .test_yaml <- 1
-      .test_path <- 2
-      .cleanup_path <- "model-examples/2.yaml"
-      expect_warning(mod1a <- new_model(
-        .yaml_path = .test_path,
-        .description = "original acop model",
-        .tags = c("acop tag", "other tag"),
-        .bbi_args = list(overwrite = TRUE, threads = 4)
-      ), regexp = "Did not pass a YAML extension")
-
-      # read model from YAML
-      mod1b <- read_model(.path = .test_yaml)
-
-      # check class and keys are right
-      expect_identical(class(mod1a), MODEL_CLASS_LIST)
-      expect_identical(class(mod1b), MODEL_CLASS_LIST)
-
-      expect_true(all(MODEL_REQ_KEYS %in% names(mod1a)))
-      expect_true(all(MODEL_REQ_KEYS %in% names(mod1b)))
-
-      # also check that some of the required keys have the same value
-      for (k in MODEL_REQ_KEYS) {
-        if (k == YAML_MOD_PATH) {
-          expect_identical(mod1a[[k]], basename(ctl_ext(.test_path)))
-          expect_identical(mod1b[[k]], basename(ctl_ext(.test_yaml)))
-        } else if (k == YAML_OUT_DIR) {
-          expect_identical(mod1a[[k]], basename(tools::file_path_sans_ext(.test_path)))
-          expect_identical(mod1b[[k]], basename(tools::file_path_sans_ext(.test_yaml)))
-        } else if (k == YAML_YAML_NAME) {
-          expect_identical(mod1a[[k]], basename(yaml_ext(.test_path)))
-          expect_identical(mod1b[[k]], basename(yaml_ext(.test_yaml)))
-        } else {
-          expect_equal(mod1a[[k]], mod1b[[k]])
-        }
-      }
-
-      # clean up tmp file
-      fs::file_delete(.cleanup_path)
-    })
-
   })
 
 
@@ -315,5 +249,50 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_error(as_model(proc1), regexp = "Inferred YAML")
   })
 
+}) # closing withr::with_options
 
-})
+
+withr::with_options(list(rbabylon.model_directory = "model-examples"), {
+  test_that("compare read_model() and new_model() objects with numeric input", {
+  # create new model with args
+    .test_yaml <- 1
+    .test_path <- 2
+    .cleanup_path <- "model-examples/2.yaml"
+    expect_warning(mod1a <- new_model(
+      .yaml_path = .test_path,
+      .description = "original acop model",
+      .tags = c("acop tag", "other tag"),
+      .bbi_args = list(overwrite = TRUE, threads = 4)
+    ), regexp = "Did not pass a YAML extension")
+
+    # read model from YAML
+    mod1b <- read_model(.path = .test_yaml)
+
+    # check class and keys are right
+    expect_identical(class(mod1a), MODEL_CLASS_LIST)
+    expect_identical(class(mod1b), MODEL_CLASS_LIST)
+
+    expect_true(all(MODEL_REQ_KEYS %in% names(mod1a)))
+    expect_true(all(MODEL_REQ_KEYS %in% names(mod1b)))
+
+    # also check that some of the required keys have the same value
+    for (k in MODEL_REQ_KEYS) {
+      if (k == YAML_MOD_PATH) {
+        expect_identical(mod1a[[k]], basename(ctl_ext(.test_path)))
+        expect_identical(mod1b[[k]], basename(ctl_ext(.test_yaml)))
+      } else if (k == YAML_OUT_DIR) {
+        expect_identical(mod1a[[k]], basename(tools::file_path_sans_ext(.test_path)))
+        expect_identical(mod1b[[k]], basename(tools::file_path_sans_ext(.test_yaml)))
+      } else if (k == YAML_YAML_NAME) {
+        expect_identical(mod1a[[k]], basename(yaml_ext(.test_path)))
+        expect_identical(mod1b[[k]], basename(yaml_ext(.test_yaml)))
+      } else {
+        expect_equal(mod1a[[k]], mod1b[[k]])
+      }
+    }
+
+    # clean up tmp file
+    fs::file_delete(.cleanup_path)
+  })
+
+}) # closing withr::with_options

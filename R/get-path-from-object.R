@@ -96,22 +96,38 @@ is_valid_yaml_extension <- function(.path) {
   tools::file_ext(.path) %in% c("yaml", "yml")
 }
 
-# helpers that strip extension then add a diffent type
+#' helpers that strip extension then add a diffent type
+#' @param .x file path to modify
+#' @param .ext new file extension to apply
+#' @rdname new_ext
+#' @export
+new_ext <- function(.x, .ext) {
+  sprintf("%s.%s", tools::file_path_sans_ext(.x), .ext)
+}
+
+#' @param .x file path to modify
+#' @rdname new_ext
+#' @export
 ctl_ext <- function(.x) {
   sprintf("%s.ctl", tools::file_path_sans_ext(.x))
 }
 
+#' @param .x file path to modify
+#' @rdname new_ext
+#' @export
 mod_ext <- function(.x) {
   sprintf("%s.mod", tools::file_path_sans_ext(.x))
 }
 
+#' @param .x file path to modify
+#' @rdname new_ext
+#' @export
 yaml_ext <- function(.x) {
   if (tools::file_ext(.x) == "yml") {
     return(.x)
   }
   sprintf("%s.yaml", tools::file_path_sans_ext(.x))
 }
-
 
 
 #' Build absolute path from a directory and path
@@ -143,6 +159,7 @@ combine_directory_path <- function(.directory, .path) {
 
 
 #' helper to find valid model file and return ctl_ext(.path) by default if not found
+#' @param .path File path to a NONMEM model file (control stream) with either `.ctl` or `.mod` extension
 find_model_file_path <- function(.path) {
   .ctl_path <- ctl_ext(.path)
   .mod_path <- mod_ext(.path)

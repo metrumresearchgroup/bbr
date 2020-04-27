@@ -1,22 +1,6 @@
 context("Modify attributes of model object")
 
-# define constants
-MODEL_DIR <- "model-examples"
-YAML_TEST_FILE <- file.path(MODEL_DIR, "1.yaml")
-NEW_MOD2 <- file.path(MODEL_DIR, "2")
-NEW_MOD3 <- file.path(MODEL_DIR, "3")
-
-ORIG_DESC <- "original acop model"
-NEW_DESC <- "new description"
-DESC_IN_CTL <- "PK model 1 cmt base"
-
-ORIG_TAGS <- c("acop tag", "other tag")
-NEW_TAGS <- c("new tag 1", "new tag 2")
-
-NEW_TEXT1 <- c("naw", "paw")
-NEW_TEXT2 <- c("all", "done")
-
-MODEL_CLASS_LIST <- c("bbi_nonmem_model", "list")
+source("data/test-workflow-ref.R")
 
 withr::with_options(list(rbabylon.model_directory = NULL), {
 
@@ -45,8 +29,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     rogue_spec <- yaml::read_yaml(new_yaml)
     expect_identical(rogue_spec[[YAML_TAGS]], c(ORIG_TAGS, NEW_TAGS))
 
-    # cleanup
-    fs::file_delete(new_yaml)
+    cleanup()
   })
 
   test_that("modify_model_field() de-duplication works", {
@@ -73,8 +56,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     new_mod <- modify_model_field(new_mod, .field=YAML_TAGS, .value=dupe_tags)
     expect_identical(new_mod[[YAML_TAGS]], c(ORIG_TAGS, uniq_tags))
 
-    # cleanup
-    fs::file_delete(new_yaml)
+    cleanup()
   })
 
   test_that("add_tags() and replace_tags() work correctly", {
@@ -98,8 +80,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     new_mod <- replace_tags(new_mod, NEW_TAGS)
     expect_identical(new_mod[[YAML_TAGS]], NEW_TAGS)
 
-    # cleanup
-    fs::file_delete(new_yaml)
+    cleanup()
   })
 
   test_that("add_decisions() and replace_decisions() work correctly", {
@@ -125,8 +106,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     new_mod <- replace_decisions(new_mod, NEW_TEXT2)
     expect_identical(new_mod[[YAML_DECISIONS]], NEW_TEXT2)
 
-    # cleanup
-    fs::file_delete(new_yaml)
+    cleanup()
   })
 
   test_that("replace_description() works correctly", {
@@ -146,8 +126,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     }, .regexpr = "No model file found at.+\\.ctl")
     expect_identical(new_mod[[YAML_DESCRIPTION]], NEW_DESC)
 
-    # cleanup
-    fs::file_delete(new_yaml)
+    cleanup()
   })
 
 
@@ -174,8 +153,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_null(new_mod[[YAML_BBI_ARGS]][["threads"]])
     expect_identical(new_mod[[YAML_BBI_ARGS]][["clean_lvl"]], 1)
 
-    # cleanup
-    fs::file_delete(new_yaml)
+    cleanup()
   })
 
 
@@ -202,8 +180,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_identical(new_mod[[YAML_DECISIONS]], NEW_TEXT1)
     expect_identical(new_mod[[YAML_DESCRIPTION]], NEW_DESC)
 
-    # cleanup
-    fs::file_delete(new_yaml)
+    cleanup()
   })
 
   test_that("reconcile_yaml() pulls in new tags", {
@@ -229,8 +206,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     }, .regexpr = "No model file found at.+\\.ctl")
     expect_identical(new_mod[[YAML_TAGS]], c(ORIG_TAGS, NEW_TAGS))
 
-    # cleanup
-    fs::file_delete(new_yaml)
+    cleanup()
   })
 
 
@@ -266,8 +242,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     check_yaml_in_sync(new_mod) # this should pass this time
     expect_identical(new_mod[[YAML_TAGS]], c(ORIG_TAGS, NEW_TAGS))
 
-    # cleanup
-    fs::file_delete(new_yaml)
+    cleanup()
   })
 
 
@@ -298,8 +273,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # try to add more and get error
     expect_error(new_mod %>% replace_description(NEW_DESC), regexp = "Model NOT in sync with corresponding YAML file")
 
-    # cleanup
-    fs::file_delete(new_yaml)
+    cleanup()
   })
 
   test_that("submit_model() fails YAML out of sync (testing check_yaml_in_sync)", {
@@ -318,8 +292,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # try to submit_model and get error
     expect_error(submit_model(new_mod, .dry_run = T), regexp = "Model NOT in sync with corresponding YAML file")
 
-    # cleanup
-    fs::file_delete(new_yaml)
+    cleanup()
   })
 
   test_that("model_summary() fails YAML out of sync (testing check_yaml_in_sync)", {
@@ -338,8 +311,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # try to submit_model and get error
     expect_error(model_summary(new_mod, .dry_run = T), regexp = "Model NOT in sync with corresponding YAML file")
 
-    # cleanup
-    fs::file_delete(new_yaml)
+    cleanup()
   })
 
   test_that("copy_model_from() fails YAML out of sync (testing check_yaml_in_sync)", {
@@ -358,8 +330,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # try to submit_model and get error
     expect_error(copy_model_from(new_mod, "naw", "dawg"), regexp = "Model NOT in sync with corresponding YAML file")
 
-    # cleanup
-    fs::file_delete(new_yaml)
+    cleanup()
   })
 
 

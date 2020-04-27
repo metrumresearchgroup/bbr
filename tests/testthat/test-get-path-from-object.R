@@ -1,4 +1,4 @@
-context("Utility functions for building args, etc.")
+context("Build paths from model object")
 
 # source constants and reference objects
 source("data/utils-reference.R")

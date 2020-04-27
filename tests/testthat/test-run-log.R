@@ -1,28 +1,18 @@
-context("Workflow file manipulation")
+context("Constructing run log from model yaml")
 
-# define constants
-MODEL_DIR <- "model-examples"
-YAML_TEST_FILE <- file.path(MODEL_DIR, "1.yaml")
-NEW_MOD2 <- file.path(MODEL_DIR, "2")
-NEW_MOD3 <- file.path(MODEL_DIR, "3")
-
-ORIG_DESC <- "original acop model"
-NEW_DESC <- "new description"
-DESC_IN_CTL <- "PK model 1 cmt base"
-
-ORIG_TAGS <- c("acop tag", "other tag")
-NEW_TAGS <- c("new tag 1", "new tag 2")
-
-NEW_TEXT1 <- c("naw", "paw")
-NEW_TEXT2 <- c("all", "done")
-
-MODEL_CLASS_LIST <- c("bbi_nonmem_model", "list")
+source("data/test-workflow-ref.R")
 
 withr::with_options(list(rbabylon.model_directory = NULL), {
 
-
-
-
+  # copy models before creating run log
+  cleanup()
+  copy_model_from(YAML_TEST_FILE, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
+  copy_model_from(YAML_TEST_FILE,
+                  NEW_MOD3,
+                  NEW_DESC,
+                  .based_on_additional = get_model_id(NEW_MOD2),
+                  .inherit_tags = TRUE,
+                  .update_model_file = FALSE)
 
   test_that("run_log matches reference", {
     log_df <- suppressWarnings(run_log("model-examples"))
@@ -64,10 +54,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_error(log_df <- run_log("model-examples"), regexp = "expected to have length of")
   })
 
-  # cleanup temp files
-  for (m in c(NEW_MOD2, NEW_MOD3)) {
-    if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
-    if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
-  }
+  cleanup()
 
 }) # closing withr::with_options
