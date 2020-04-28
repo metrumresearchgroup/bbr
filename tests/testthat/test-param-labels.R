@@ -35,44 +35,42 @@ for (i in length(BLOCK_REF)) {
 }
 
 
-# # test param_labels against tidynm reference tibbles (testing character dispatch)
-# for (MODEL_PICK in MODEL_PICKS) {
-#   .mod_id <- MODEL_PICK$mod_id
-#
-#   test_that(glue("param_labels.character() %>% apply_indices() matches tidynm reference for {.mod_id}"), {
-#     # get reference df from tidynm test data
-#     ref_df <- readRDS(glue("data/{.mod_id}_PARAMTBL.rds"))[[1]]
-#     names(ref_df) <- names(ref_df) %>% tolower()
-#
-#     #
-#     .ctl_raw <-  file.path(MODEL_DIR, glue("{.mod_id}.ctl")) %>% readr::read_file()
-#
-#     # make label df
-#     .label_df <- .ctl_raw %>% param_labels() %>% apply_indices() %>% select(-param_type)
-#
-#     # join against reference to make sure they're the same
-#     ref_df <- ref_df %>% mutate(names = ifelse(param == "THETA",
-#                                                paste0(param, var1),
-#                                                paste0(param, "(", var1, ",", var2, ")")))
-#
-#     # join_df <- ref_df %>%
-#     #   full_join(.label_df, by = names(.label_df))
-#
-#     join_df <- ref_df %>% full_join(.label_df, by = "names")  %>% filter(is.na(label.x) | is.na(label.y)) #select(names, label, unit, type, param)
-#     join_df
-#
-#     # tests
-#     expect_equal(nrow(join_df), nrow(ref_df))
-#     expect_equal(nrow(join_df), nrow(.new_df))
-#     expect_equal(join_df$value, join_df$estimate, tolerance = 0.01)
-#     expect_equal(join_df$se, join_df$stderr, tolerance = 0.01)
-#     expect_equal(join_df$c, join_df$random_effect_sd, tolerance = 0.01)
-#     expect_equal(join_df$cse, join_df$random_effect_sdse, tolerance = 0.01)
-#
-#     # cleanup
-#     if (fs::file_exists(file.path(MODEL_DIR, glue("{.mod_id}.yaml")))) fs::file_delete(file.path(MODEL_DIR, glue("{.mod_id}.yaml")))
-#   })
-# }
+test_that("param_labels.character errors on vector", {
+  expect_error(param_labels(c("naw", "dawg")), regexp = "character scaler of the raw control stream")
+})
+
+
+# test param_labels against tidynm reference tibbles (testing character dispatch)
+for (MODEL_PICK in MODEL_PICKS) {
+  .mod_id <- MODEL_PICK$mod_id
+
+  test_that(glue("param_labels.character() %>% apply_indices() matches tidynm reference for {.mod_id}"), {
+    # get reference df from tidynm test data
+    ref_df <- readRDS(glue("data/{.mod_id}_PARAMTBL.rds"))[[1]]
+    names(ref_df) <- names(ref_df) %>% tolower()
+
+    #
+    .ctl_raw <-  file.path(MODEL_DIR, glue("{.mod_id}.ctl")) %>% readr::read_file()
+
+    # make label df
+    .label_df <- .ctl_raw %>%
+                   param_labels() %>%
+                   apply_indices(.omega = MODEL_PICK$omega, .sigma = MODEL_PICK$sigma) %>%
+                   select(-param_type)
+
+    # join against reference to make sure they're the same
+    ref_df <- ref_df %>% mutate(names = ifelse(param == "THETA",
+                                               paste0(param, var1),
+                                               paste0(param, "(", var1, ",", var2, ")")))
+
+    join_df <- ref_df %>%
+      full_join(.label_df, by = names(.label_df))
+
+    # test that the full join didn't add any rows (i.e. there are no mismatches)
+    expect_equal(nrow(join_df), nrow(ref_df))
+    expect_equal(nrow(join_df), nrow(.label_df))
+  })
+}
 
 
 # test param_labels against tidynm reference tibbles (testing bbi_nonmem_model dispatch)
