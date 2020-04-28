@@ -2,12 +2,20 @@
 % Please edit documentation in R/param-labels.R
 \name{param_labels}
 \alias{param_labels}
-\title{Parse parameter labels from the model object control stream comments}
+\alias{param_labels.bbi_nonmem_model}
+\alias{param_labels.character}
+\title{Generic s3 for parsing parameter labels from control stream}
 \usage{
-param_labels(.mod)
+param_labels(.mod, ...)
+
+\method{param_labels}{bbi_nonmem_model}(.mod, ...)
+
+\method{param_labels}{character}(.mod, ...)
 }
 \arguments{
-\item{.mod}{`bbi_{.model_type}_model` object}
+\item{.mod}{Character scaler of the raw control stream with newline character separating lines}
+
+\item{...}{arguments passed through}
 }
 \description{
 This is using the labeling scheme from "Census", as defined here: https://ghe.metrumrg.com/pages/software/mrgtable/reference/nm_tbl.html

@@ -1,23 +1,47 @@
 
 # Extract parameter labels for report tables, etc.
 
+#' Generic s3 for parsing parameter labels from control stream
+#' @param .mod generic model input
+#' @param ... arguments passed through
+#' @rdname param_labels
+#' @export
+param_labels <- function(.mod, ...) {
+  UseMethod("param_labels", .mod)
+}
+
 #' Parse parameter labels from the model object control stream comments
 #'
 #' This is using the labeling scheme from "Census", as defined here: https://ghe.metrumrg.com/pages/software/mrgtable/reference/nm_tbl.html
 #' It will _not_ return indices for the parameters, though they can be added with `param_labels() %>% apply_indices()`
 #' @param .mod `bbi_{.model_type}_model` object
-#' @importFrom readr read_lines
-#' @importFrom tidyr replace_na
-#' @importFrom dplyr select everything
-#' @importFrom purrr map_df
+#' @importFrom readr read_file
+#' @rdname param_labels
 #' @export
-param_labels <- function(.mod) {
+param_labels.bbi_nonmem_model <- function(.mod, ...) {
 
   .ctl_path <- .mod %>% get_model_path()
 
   .ctl_raw <- .ctl_path %>% read_file()
 
-  .ctl_clean <- clean_ctl(.ctl_raw)
+  .label_df <- param_labels(.ctl_raw)
+
+  return(.label_df)
+}
+
+#' Private implementation function for param_labels
+#' @importFrom tidyr replace_na
+#' @importFrom dplyr select everything
+#' @importFrom purrr map_df
+#' @rdname param_labels
+#' @param .mod Character scaler of the raw control stream with newline character separating lines
+#' @export
+param_labels.character <- function(.mod, ...) {
+  if(length(.mod) != 1) {
+    stop(glue("param_labels() takes a character scaler of the raw control stream with newline character separating lines. A vector of length {length(.mod)} was passed."))
+  }
+
+  .ctl_clean <- clean_ctl(.mod)
 
   .label_df <- map_df(c("THETA", "OMEGA", "SIGMA"), function(.pick) { # are there other options than these three?
     .pick_labels <- parse_param_comment(
@@ -32,7 +56,6 @@ param_labels <- function(.mod) {
 
   return(.label_df)
 }
-
 
 #' Add parameter indices to a label tibble
 #' @param .label_df A tibble like the output of `param_labels()`, containing columns `names, label, unit, type`
