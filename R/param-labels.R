@@ -62,6 +62,7 @@ param_labels.character <- function(.mod, ...) {
 #' @param .omega A logical vector indicating whether each Omega parameter is a diagonal. If `NULL` function assumes all are diagonal. Alternatively you can pass `block(.n)` or pass a custom vector if control stream has both block and non-block.
 #' @param .sigma A logical vector indicating whether each Sigma parameter is a diagonal. If `NULL` function assumes all are diagonal. Alternatively you can pass `block(.n)` or pass a custom vector if control stream has both block and non-block.
 #' @importFrom dplyr filter mutate n bind_rows
+#' @rdname apply_indices
 #' @export
 apply_indices <- function(.label_df, .omega = NULL, .sigma = NULL) {
   .theta_df <- .label_df %>% filter(names == "THETA") %>% mutate(param_type = names)
@@ -94,7 +95,10 @@ apply_indices <- function(.label_df, .omega = NULL, .sigma = NULL) {
   ))
 }
 
-
+#' Helper function for formatting blocks into .omega or .sigma logical vectors
+#' @param .n The size of the block
+#' @rdname apply_indices
+#' @export
 block <- function(.n) {
   .is_diag <- logical(0)
   for (.d in seq_len(.n)) {
@@ -115,11 +119,46 @@ block <- function(.n) {
 #' @param .theta Boolean for if it's a theta. If TRUE, parses `[{}]` to unit, otherwise parses to type
 #' @importFrom stringr str_match str_split str_trim
 #' @importFrom dplyr mutate
-parse_param_comment <- function(.x, .theta = TRUE){
+parse_param_comment <- function(.x, .theta = FALSE){
   if(inherits(.x,'list'))
     .x <- unlist(.x)
 
+  param_text <- str_split(.x,'\\;') %>% sapply('[',1)
+
+  param_text <- str_split(param_text, " +")
+  param_text <- map(param_text, function(.p) {
+    .p <- as.numeric(.p)
+    .p <- .p[!is.na(.p)]
+    return(.p)
+  })
+  param_text
+
+
   full_label_text <- str_split(.x,'\\;') %>% sapply('[',2)
+
+  ####
+  if(length(param_text) != length(full_label_text)) {
+    stop(glue("{length(param_text)} != {length(full_label_text)}"))
+  }
+
+  .out <- map_df(seq_len(length(param_text)), function(i) {
+
+    this_param <- param_text[[i]]
+      map_df(seq_len(length(this_param)), function(.p) {
+        if (.p == (length(this_param))) {
+          this_label <- full_label_text[[i]]
+        } else {
+          this_label <- ""
+        }
+      list(param = this_param[[.p]], label = this_label)
+    })
+  })
+
+  full_label_text <- .out$label
+
+
+  ####
+
 
   label <- gsub('^(.*?)\\]\\s?','',full_label_text)
 
@@ -130,7 +169,7 @@ parse_param_comment <- function(.x, .theta = TRUE){
   } else {
     out_tbl <- tibble(label = str_trim(label), type = unit[,1]) %>%
       mutate(
-        type = ifelse(is.na(.data$type)|!nzchar(.data$type), "[A]", .data$type)
+        type = ifelse(is.na(.data$type)|!nzchar(.data$type), "[A]", .data$type),
         # ^ from tidynm::param_tbl -- `TYPE = ifelse(is.na(!!(rlang::sym('TYPE')))|!nzchar(!!(rlang::sym('TYPE'))), "[A]", !!(rlang::sym('TYPE')))`
       )
   }
