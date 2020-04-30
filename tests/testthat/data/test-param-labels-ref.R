@@ -74,57 +74,24 @@ MAT_REF <- list(
 # label parsing
 
 
-############ Katherine stuff
-KAT_OLD_OMEGA_1 <- "
-$OMEGA
-;---------------------------------
-0.026    ; [P] CL
-0.25     ; [P] KA
-0.16     ; [P] F1
-$OMEGA BLOCK(1) 0.04                ; [P] IOV_{KA}
-$OMEGA BLOCK(1) SAME
-$OMEGA BLOCK(1) SAME
-$OMEGA BLOCK(1) 0.04                ; [P] IOV_{F1}
-$OMEGA BLOCK(1) SAME
-$OMEGA BLOCK(1) SAME
-$OMEGA
-0.04    ; [P] IIVonEPS
-"
-kold1 <- param_labels(KAT_OLD_OMEGA_1) %>% apply_indices() ##### SAME get discarded
-#kold1 <- param_labels(KAT_OLD_OMEGA_1) %>% apply_indices(.omega = )
-
-KAT_NEW_OMEGA_1 <- "
-$OMEGA BLOCK(1) 0.1383   ; [P] CL
-$OMEGA BLOCK(1) 0 FIX     ; [P] V2
-$OMEGA BLOCK(1) 0.2377   ; [P] KA_KTR
-$OMEGA BLOCK(1) 0 FIX    ; [P] Q3
-$OMEGA BLOCK(1) 0 FIX    ; [P] V3
-$OMEGA BLOCK(1) 0.0478   ; [P] F1
-$OMEGA BLOCK(1) 0.4702   ;   [P] IOV_{KA}
-$OMEGA BLOCK(1) SAME(2)
-$OMEGA BLOCK(1) 0.3651     ; [P] IOV_{F1}
-$OMEGA BLOCK(1) SAME (2)
-$OMEGA
-0.1972    ; [P] IIVonEPS
-"
-knew1 <- param_labels(KAT_NEW_OMEGA_1) %>% apply_indices()
-
-suppressPackageStartupMessages(library(dplyr))
-kpdf <- full_join(kold1, knew1, by = "names") %>% select(names, label.x, label.y, type.x, type.y, everything())
-kpdf
-
-
-
 # OMEGA BLOCK(3)
 PEX_BLOCK3 <- "
 $OMEGA BLOCK(3)
-.1          ;5 P1NPF
-.01 .1      ;6 CTFX
-.01 .01 .1  ;7 LSF
+.1          ; [P] 5 P1NPF
+.01 .1      ; [P] 6 CTFX
+.01 .01 .1  ; [P] 7 LSF
 "
 
-PEX_BLOCK3 %>% param_labels() %>% apply_indices(block(3))
-
+PEX_BLOCK3 %>% param_labels() %>% apply_indices(.omega = block(3))
+# # A tibble: 6 x 4
+# names      label   type  param_type
+# <chr>      <chr>   <chr> <chr>
+# 1 OMEGA(1,1) 5 P1NPF [P]   OMEGA
+# 2 OMEGA(2,1) ""      [A]   OMEGA
+# 3 OMEGA(2,2) 6 CTFX  [P]   OMEGA
+# 4 OMEGA(3,1) ""      [A]   OMEGA
+# 5 OMEGA(3,2) ""      [A]   OMEGA
+# 6 OMEGA(3,3) 7 LSF   [P]   OMEGA
 
 
 PEX_BLOCK32 <- "
@@ -136,13 +103,20 @@ $OMEGA BLOCK(2)
 .1          ;[P] 8 FAKE1
 .01 .1      ;[P] 9 FAKE2
 "
-
-PEX_BLOCK32 %>% param_labels() %>% apply_indices(c(block(3), block(2)))
-# Warning messages:
-#   1: Unknown or uninitialised column: 'label'.
-# 2: In .f(.x[[i]], ...) : NAs introduced by coercion
-# 3: In .f(.x[[i]], ...) : NAs introduced by coercion
-# 4: Unknown or uninitialised column: 'label'.
+diag_vec <- c(block(3), block(2))
+PEX_BLOCK32 %>% param_labels() %>% apply_indices(.omega = diag_vec)
+# # A tibble: 9 x 4
+# names      label   type  param_type
+# <chr>      <chr>   <chr> <chr>
+# 1 OMEGA(1,1) 5 P1NPF [P]   OMEGA
+# 2 OMEGA(2,1) ""      [A]   OMEGA
+# 3 OMEGA(2,2) 6 CTFX  [P]   OMEGA
+# 4 OMEGA(3,1) ""      [A]   OMEGA
+# 5 OMEGA(3,2) ""      [A]   OMEGA
+# 6 OMEGA(3,3) 7 LSF   [P]   OMEGA
+# 7 OMEGA(4,4) 8 FAKE1 [P]   OMEGA
+# 8 OMEGA(5,4) ""      [A]   OMEGA
+# 9 OMEGA(5,5) 9 FAKE2 [P]   OMEGA
 
 
 PEX_BLOCK32S <- "
@@ -156,18 +130,44 @@ $OMEGA BLOCK(2)
 $OMEGA BLOCK(1) 0.04                ; [P] IOV_{KA}
 $OMEGA BLOCK(1) SAME
 "
-PEX_BLOCK32S %>% param_labels() %>% apply_indices(c(block(3), block(2), T, T))
+diag_vec <- c(block(3), block(2), T, T)
+PEX_BLOCK32S %>% param_labels() %>% apply_indices(.omega = diag_vec)
+# # A tibble: 11 x 4
+# names      label    type  param_type
+# <chr>      <chr>    <chr> <chr>
+# 1 OMEGA(1,1) 5 P1NPF  [P]   OMEGA
+# 2 OMEGA(2,1) ""       [A]   OMEGA
+# 3 OMEGA(2,2) 6 CTFX   [P]   OMEGA
+# 4 OMEGA(3,1) ""       [A]   OMEGA
+# 5 OMEGA(3,2) ""       [A]   OMEGA
+# 6 OMEGA(3,3) 7 LSF    [P]   OMEGA
+# 7 OMEGA(4,4) 8 FAKE1  [P]   OMEGA
+# 8 OMEGA(5,4) ""       [A]   OMEGA
+# 9 OMEGA(5,5) 9 FAKE2  [P]   OMEGA
+# 10 OMEGA(6,6) IOV_{KA} [P]   OMEGA
+# 11 OMEGA(7,7) ""       [A]   OMEGA
 
 
-# ####
-# .ctl_clean <- clean_ctl(.mod)
-#
-# .pick <- "OMEGA"
-#   #.pick_labels <- parse_param_comment(
-#     .x = .ctl_clean[[.pick]]#,
-#     .theta = (.pick == "THETA")
-#   #)
-# ####
+PEX_KAT_DBL2 <- "
+$OMEGA BLOCK(2) 0.1 0.01 0.1
+$OMEGA BLOCK(2)
+0.1
+0.01  0.1
+"
+diag_vec <- c(
+  block(2),
+  block(2)
+)
+PEX_KAT_DBL2 %>% param_labels() %>% apply_indices(.omega = diag_vec)
+# # A tibble: 6 x 4
+# names      label type  param_type
+# <chr>      <chr> <chr> <chr>
+# 1 OMEGA(1,1) ""    [A]   OMEGA
+# 2 OMEGA(2,1) ""    [A]   OMEGA
+# 3 OMEGA(2,2) ""    [A]   OMEGA
+# 4 OMEGA(3,3) ""    [A]   OMEGA
+# 5 OMEGA(4,3) ""    [A]   OMEGA
+# 6 OMEGA(4,4) ""    [A]   OMEGA
 
 
 # from Katherine (slack?)
@@ -192,6 +192,38 @@ $OMEGA
 0.04    ; [P] IIVonEPS
 "
 
+diag_vec <- c(
+  block(3),
+  TRUE,
+  block(2),
+  block(2),
+  rep(T, 6)
+)
+PEX_KAT_ALL %>% param_labels() %>% apply_indices(.omega = diag_vec)
+# # A tibble: 19 x 4
+# names        label    type  param_type
+# <chr>        <chr>    <chr> <chr>
+# 1 OMEGA(1,1)   CL       [P]   OMEGA
+# 2 OMEGA(2,1)   ""       [A]   OMEGA
+# 3 OMEGA(2,2)   KA       [P]   OMEGA
+# 4 OMEGA(3,1)   ""       [A]   OMEGA
+# 5 OMEGA(3,2)   ""       [A]   OMEGA
+# 6 OMEGA(3,3)   F1       [P]   OMEGA
+# 7 OMEGA(4,4)   IC50     [A]   OMEGA
+# 8 OMEGA(5,5)   ""       [A]   OMEGA
+# 9 OMEGA(6,5)   ""       [A]   OMEGA
+# 10 OMEGA(6,6)   ""       [A]   OMEGA
+# 11 OMEGA(7,7)   ""       [A]   OMEGA
+# 12 OMEGA(8,7)   ""       [A]   OMEGA
+# 13 OMEGA(8,8)   ""       [A]   OMEGA
+# 14 OMEGA(9,9)   IOV_{KA} [P]   OMEGA
+# 15 OMEGA(10,10) ""       [A]   OMEGA
+# 16 OMEGA(11,11) ""       [A]   OMEGA
+# 17 OMEGA(12,12) IOV_{F1} [P]   OMEGA
+# 18 OMEGA(13,13) ""       [A]   OMEGA
+# 19 OMEGA(14,14) IIVonEPS [P]   OMEGA
+
+
 # from Katherine: PK-PD model where I has different sigma blocks - one for the PK data and one for the PD data
 PEX_KAT_PKPD <- "
 $OMEGA BLOCK(3)
@@ -213,6 +245,119 @@ $SIGMA BLOCK(2)
 5
 1 6
 "
+PEX_KAT_PKPD %>% param_labels() %>%
+  apply_indices(
+    .omega = c(block(3), TRUE),
+    .sigma = c(block(2), block(2))
+  )
+# # A tibble: 13 x 4
+# names      label   type  param_type
+# <chr>      <chr>   <chr> <chr>
+# 1 OMEGA(1,1) CL      [P]   OMEGA
+# 2 OMEGA(2,1) CL-V2   [R]   OMEGA
+# 3 OMEGA(2,2) V2      [P]   OMEGA
+# 4 OMEGA(3,1) CL-CLDX [R]   OMEGA
+# 5 OMEGA(3,2) CL-V2   [R]   OMEGA
+# 6 OMEGA(3,3) CLDX    [P]   OMEGA
+# 7 OMEGA(4,4) KA      [A]   OMEGA
+# 8 SIGMA(1,1) ""      [A]   SIGMA
+# 9 SIGMA(2,1) ""      [A]   SIGMA
+# 10 SIGMA(2,2) ""      [A]   SIGMA
+# 11 SIGMA(3,3) ""      [A]   SIGMA
+# 12 SIGMA(4,3) ""      [A]   SIGMA
+# 13 SIGMA(4,4) ""      [A]   SIGMA
+
+
+# ############ stuff Katherine slacked me a few days ago
+# # I have a few questions about this:
+# # 1. what is `$OMEGA BLOCK(1) SAME(2)`? Is it 2 params or 1?
+# # 2. are `SAME(2)` and `SAME (2)` (with the space) both valid?
+# # 3. are these two blocks supposed to parse to the same thing?
+# KAT_OLD_OMEGA_1 <- "
+# $OMEGA
+# ;---------------------------------
+# 0.026    ; [P] CL
+# 0.25     ; [P] KA
+# 0.16     ; [P] F1
+# $OMEGA BLOCK(1) 0.04                ; [P] IOV_{KA}
+# $OMEGA BLOCK(1) SAME
+# $OMEGA BLOCK(1) SAME
+# $OMEGA BLOCK(1) 0.04                ; [P] IOV_{F1}
+# $OMEGA BLOCK(1) SAME
+# $OMEGA BLOCK(1) SAME
+# $OMEGA
+# 0.04    ; [P] IIVonEPS
+# "
+# KAT_OLD_OMEGA_1 %>% param_labels() %>% apply_indices()
+# # # A tibble: 10 x 4
+# # names        label    type  param_type
+# # <chr>        <chr>    <chr> <chr>
+# # 1 OMEGA(1,1)   CL       [P]   OMEGA
+# # 2 OMEGA(2,2)   KA       [P]   OMEGA
+# # 3 OMEGA(3,3)   F1       [P]   OMEGA
+# # 4 OMEGA(4,4)   IOV_{KA} [P]   OMEGA
+# # 5 OMEGA(5,5)   ""       [A]   OMEGA
+# # 6 OMEGA(6,6)   ""       [A]   OMEGA
+# # 7 OMEGA(7,7)   IOV_{F1} [P]   OMEGA
+# # 8 OMEGA(8,8)   ""       [A]   OMEGA
+# # 9 OMEGA(9,9)   ""       [A]   OMEGA
+# # 10 OMEGA(10,10) IIVonEPS [P]   OMEGA
+#
+#
+# KAT_NEW_OMEGA_1 <- "
+# $OMEGA BLOCK(1) 0.1383   ; [P] CL
+# $OMEGA BLOCK(1) 0 FIX     ; [P] V2
+# $OMEGA BLOCK(1) 0.2377   ; [P] KA_KTR
+# $OMEGA BLOCK(1) 0 FIX    ; [P] Q3
+# $OMEGA BLOCK(1) 0 FIX    ; [P] V3
+# $OMEGA BLOCK(1) 0.0478   ; [P] F1
+# $OMEGA BLOCK(1) 0.4702   ;   [P] IOV_{KA}
+# $OMEGA BLOCK(1) SAME(2)
+# $OMEGA BLOCK(1) 0.3651     ; [P] IOV_{F1}
+# $OMEGA BLOCK(1) SAME (2)
+# $OMEGA
+# 0.1972    ; [P] IIVonEPS
+# "
+# KAT_NEW_OMEGA_1 %>% param_labels() %>% apply_indices()
+# # # A tibble: 10 x 4
+# # names        label    type  param_type
+# # <chr>        <chr>    <chr> <chr>
+# # 1 OMEGA(1,1)   CL       [P]   OMEGA
+# # 2 OMEGA(2,2)   V2       [P]   OMEGA
+# # 3 OMEGA(3,3)   KA_KTR   [P]   OMEGA
+# # 4 OMEGA(4,4)   Q3       [P]   OMEGA
+# # 5 OMEGA(5,5)   V3       [P]   OMEGA
+# # 6 OMEGA(6,6)   F1       [P]   OMEGA
+# # 7 OMEGA(7,7)   IOV_{KA} [P]   OMEGA
+# # 8 OMEGA(8,8)   IOV_{F1} [P]   OMEGA
+# # 9 OMEGA(9,9)   ""       [A]   OMEGA
+# # 10 OMEGA(10,10) IIVonEPS [P]   OMEGA
+#
+# suppressPackageStartupMessages(library(dplyr))
+# dplyr::full_join(
+#   KAT_OLD_OMEGA_1 %>% param_labels() %>% apply_indices(),
+#   KAT_NEW_OMEGA_1 %>% param_labels() %>% apply_indices(),
+#   by = "names"
+# ) %>%
+#   select(names, label.x, label.y, type.x, type.y)
+# # # A tibble: 10 x 5
+# # names        label.x  label.y  type.x type.y
+# # <chr>        <chr>    <chr>    <chr>  <chr>
+# # 1 OMEGA(1,1)   CL       CL       [P]    [P]
+# # 2 OMEGA(2,2)   KA       V2       [P]    [P]
+# # 3 OMEGA(3,3)   F1       KA_KTR   [P]    [P]
+# # 4 OMEGA(4,4)   IOV_{KA} Q3       [P]    [P]
+# # 5 OMEGA(5,5)   ""       V3       [A]    [P]
+# # 6 OMEGA(6,6)   ""       F1       [A]    [P]
+# # 7 OMEGA(7,7)   IOV_{F1} IOV_{KA} [P]    [P]
+# # 8 OMEGA(8,8)   ""       IOV_{F1} [A]    [P]
+# # 9 OMEGA(9,9)   ""       ""       [A]    [A]
+# # 10 OMEGA(10,10) IIVonEPS IIVonEPS [P]    [P]
+
+
+############ Katherine stuff ^
+
+
 
 # from Devin: Double comments
 PEX_DBL_CMT <- "
@@ -241,6 +386,31 @@ $OMEGA BLOCK(2)
 $OMEGA
 0.4 ; 0.4367 ; KA
 "
+PEX_DBL_CMT %>% param_labels() %>%
+  apply_indices(.omega = c(block(2), block(2), TRUE))
+# # A tibble: 17 x 5
+# names      label                                          unit  type  param_type
+# <chr>      <chr>                                          <chr> <chr> <chr>
+# 1 THETA1     31.5 1 CL                                      ""    ""    THETA
+# 2 THETA2     244.2                                          ""    ""    THETA
+# 3 THETA3     0.49                                           ""    ""    THETA
+# 4 THETA4     14.16                                          ""    ""    THETA
+# 5 THETA5     1.05                                           ""    ""    THETA
+# 6 THETA6     6 weight on CL                                 ""    ""    THETA
+# 7 THETA7     7 weight on V                                  ""    ""    THETA
+# 8 THETA8     8 prop res err LLOQ=0.02                       ""    ""    THETA
+# 9 THETA9     9  fractional change in prop res err LLOQ=0.25 ""    ""    THETA
+# 10 OMEGA(1,1) 0.0237                                         ""    [A]   OMEGA
+# 11 OMEGA(2,1) ""                                             ""    [A]   OMEGA
+# 12 OMEGA(2,2) V2                                             ""    [A]   OMEGA
+# 13 OMEGA(3,3) 0.0117                                         ""    [A]   OMEGA
+# 14 OMEGA(4,3) ""                                             ""    [A]   OMEGA
+# 15 OMEGA(4,4) 0.879                                          ""    [A]   OMEGA
+# 16 OMEGA(5,5) 0.4367                                         ""    [A]   OMEGA
+# 17 SIGMA(1,1) ""                                             ""    [A]   SIGMA
+
+## parses "correctly" but as expected only takes first label
+
 
 # Sam: from TAK_TAK0203F
 PEX_TAK1 <- "
@@ -270,5 +440,34 @@ $SIGMA
 2.00E-02  ;1 P1NP
 4.00E-02  ;2 CTX
 3.00E-02  ;3 BMDLS
-
 "
+diag_vec <- c(TRUE, TRUE, block(2), block(3), TRUE, TRUE, block(3))
+PEX_TAK1 %>% param_labels() %>%
+  apply_indices(.omega = diag_vec) %>%
+  select(names, label) %>% as.data.frame()
+
+# # A tibble: 22 x 2
+#           names      label
+#           <chr>      <chr>
+# 1    OMEGA(1,1)     1 LSCF
+# 2    OMEGA(2,2)      2 PLE
+# 3    OMEGA(3,3)     3 C501
+# 4    OMEGA(4,3)
+# 5    OMEGA(4,4)     4 C501
+# 6    OMEGA(5,5)    5 P1NPF
+# 7    OMEGA(6,5)
+# 8    OMEGA(6,6)     6 CTFX
+# 9    OMEGA(7,5)
+# 10   OMEGA(7,6)
+# 11   OMEGA(7,7)      7 LSF
+# 12   OMEGA(8,8)    8 AP1NP
+# 13   OMEGA(9,9)     9 ACTX
+# 14 OMEGA(10,10)    10 ISL0
+# 15 OMEGA(11,10)
+# 16 OMEGA(11,11)    11 ACTX
+# 17 OMEGA(12,10)
+# 18 OMEGA(12,11)
+# 19 OMEGA(12,12)    12 ISL0
+# 20   SIGMA(1,1)     1 P1NP
+# 21   SIGMA(2,2)      2 CTX
+# 22   SIGMA(3,3)    3 BMDLS

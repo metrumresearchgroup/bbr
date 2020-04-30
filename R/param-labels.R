@@ -43,14 +43,19 @@ param_labels.character <- function(.mod, ...) {
 
   .ctl_clean <- clean_ctl(.mod)
 
-  .label_df <- map_df(c("THETA", "OMEGA", "SIGMA"), function(.pick) { # are there other options than these three?
+  .label_df <- map_df(c("THETA", "OMEGA", "SIGMA"), function(.pick) {
+    .pick_vec <- .ctl_clean[[.pick]]
+
+    if (is.null(.pick_vec)) {
+      return(NULL)
+    }
+
     .pick_labels <- parse_param_comment(
-      .ctl_clean[[.pick]],
+      .pick_vec,
       .theta = (.pick == "THETA")
     )
     .pick_labels$names <- rep(.pick, nrow(.pick_labels))
-
-    .pick_labels %>% select(names, everything())
+     return(select(.pick_labels, names, everything()))
   }) %>%
     tidyr::replace_na(list(label="", unit="", type=""))
 
@@ -74,6 +79,9 @@ apply_indices <- function(.label_df, .omega = NULL, .sigma = NULL) {
   .theta_df <- .theta_df %>% mutate(names = paste0(names, .theta_ind))
 
   # omega
+  if(!is.null(.omega) && length(.omega) != nrow(.omega_df)) {
+    stop(glue("Found {nrow(.omega_df)} parameters for OMEGA but `.omega` argument specifies {length(.omega)}"))
+  }
   if(is.null(.omega)) {
     .omega <- rep(TRUE, .omega_df %>% nrow()) # if null assume all are diagonals
   }
@@ -81,6 +89,9 @@ apply_indices <- function(.label_df, .omega = NULL, .sigma = NULL) {
   .omega_df <- .omega_df %>% mutate(names = paste0(names, .omega_ind))
 
   # sigma
+  if(!is.null(.sigma) && length(.sigma) != nrow(.sigma_df)) {
+    stop(glue("Found {nrow(.sigma_df)} parameters for SIGMA but `.sigma` argument specifies {length(.sigma)}"))
+  }
   if(is.null(.sigma)) {
     .sigma <- rep(TRUE, .sigma_df %>% nrow()) # if null assume all are diagonals
   }
