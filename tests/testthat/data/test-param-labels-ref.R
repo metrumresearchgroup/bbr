@@ -120,14 +120,14 @@ PEX_BLOCK32 %>% param_labels() %>% apply_indices(.omega = diag_vec)
 
 
 PEX_BLOCK32S <- "
-$OMEGA BLOCK(3)
+$OMEGA BLOCK (3)
 .1          ;[P] 5 P1NPF
 .01 .1      ;[P] 6 CTFX
 .01 .01 .1  ;[P] 7 LSF
 $OMEGA BLOCK(2)
 .1          ;[P] 8 FAKE1
 .01 .1      ;[P] 9 FAKE2
-$OMEGA BLOCK(1) 0.04                ; [P] IOV_{KA}
+$OMEGA BLOCK (1) 0.04                ; [P] IOV_{KA}
 $OMEGA BLOCK(1) SAME
 "
 diag_vec <- c(block(3), block(2), T, T)
@@ -168,6 +168,18 @@ PEX_KAT_DBL2 %>% param_labels() %>% apply_indices(.omega = diag_vec)
 # 4 OMEGA(3,3) ""    [A]   OMEGA
 # 5 OMEGA(4,3) ""    [A]   OMEGA
 # 6 OMEGA(4,4) ""    [A]   OMEGA
+
+PEX_KAT_DBL2S <- "
+$OMEGA BLOCK(2)
+0.1
+0.01  0.1
+$OMEGA BLOCK(2) SAME
+"
+diag_vec <- c(
+  block(2),
+  block(2)
+)
+PEX_KAT_DBL2S %>% param_labels() %>% apply_indices(.omega = diag_vec)
 
 
 # from Katherine (slack?)
@@ -312,6 +324,11 @@ PEX_KAT_PKPD %>% param_labels() %>%
 # $OMEGA BLOCK(1) 0 FIX    ; [P] V3
 # $OMEGA BLOCK(1) 0.0478   ; [P] F1
 # $OMEGA BLOCK(1) 0.4702   ;   [P] IOV_{KA}
+# $OMEGA BLOCK(1) SAME(2)
+# $OMEGA BLOCK(1) 0.3651     ; [P] IOV_{F1}
+# $OMEGA BLOCK(1) SAME (2)
+# $OMEGA
+# 0.1972    ; [P] IIVonEPS$OMEGA BLOCK(1) 0.4702   ;   [P] IOV_{KA}
 # $OMEGA BLOCK(1) SAME(2)
 # $OMEGA BLOCK(1) 0.3651     ; [P] IOV_{F1}
 # $OMEGA BLOCK(1) SAME (2)

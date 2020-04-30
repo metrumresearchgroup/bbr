@@ -128,11 +128,51 @@ block <- function(.n) {
 #' Modified tidynm::parse_theta() to parse out the comments into the right columns for all three params.
 #' @param .x an object from the list that comes out of clean_ctl() (i.e. .ctl_clean$THETA, .ctl_clean$SIGMA, .ctl_clean$OMEGA)
 #' @param .theta Boolean for if it's a theta. If TRUE, parses `[{}]` to unit, otherwise parses to type
-#' @importFrom stringr str_match str_split str_trim str_replace regex
+#' @importFrom stringr str_match str_split str_trim str_replace str_replace_all regex
 #' @importFrom dplyr mutate
 #' @importFrom tidyr replace_na
+#' @importFrom purrr map map_df
 parse_param_comment <- function(.x, .theta = FALSE){
+
   if(inherits(.x,'list'))
+    # remove spaces between qualifier and parentheses
+    .x <- map(.x, function(.l) {
+      for (.s in c("DIAGONAL", "BLOCK", "SAME")) {
+        .l <- str_replace_all(.l, glue("{.s} +\\("), glue("{.s}\\(")) # remove spaces between qualifier and parentheses
+      }
+      .l
+    })
+
+    # copy SAME blocks
+
+
+    .new <- list()
+    for (.l in .x) {
+      # extract SAME if exists and get number
+      .l <- str_replace(.l, stringr::regex("SAME(?=\\s|$)", ignore_case=TRUE), "SAME(1)")
+      .same <- str_extract(.l, stringr::regex("SAME\\([0-9]+\\)", ignore_case=TRUE))
+      .same <- .same[!is.na(.same)]
+      if (length(.same) == 1) {
+        .same <- as.numeric(str_replace_all(.same, "[^0-9]", ""))
+        print(.same)
+      }
+
+
+      .ind <- length(.new) + 1
+      .new[[.ind]] <- .l
+    }
+
+
+    # for (.s in c("DIAGONAL", "BLOCK", "SAME")) {
+    #   .x <- imap(.x, function(.l, .i) {
+    #       #str_replace_all(.p, glue("{.s} +\\("), glue("{.s}\\("))
+    #       print(.l)
+    #       print(.i)
+    #       .l str_replace_all(.p, glue("{.s} +\\("), glue("{.s}\\("))
+    #     })
+    # }
+
+    # flatten
     .x <- unlist(.x)
 
   full_label_text <- str_split(.x,'\\;') %>% sapply('[',2) %>% tidyr::replace_na("")
@@ -143,7 +183,12 @@ parse_param_comment <- function(.x, .theta = FALSE){
     # pull out each param element
     # these are only used to parse _how many_ params there are, not for the actual values
     param_text <- str_split(.x,'\\;') %>% sapply('[',1)
-    param_text <- str_replace_all(param_text, "\\(|\\)", "")
+    #param_text <- str_replace_all(param_text, "\\(|\\)", "") # don't think I wanna delete the parens anymore
+    for (.s in c("DIAGONAL", "BLOCK", "SAME")) {
+      param_text <- str_replace_all(param_text, glue("{.s} +\\("), glue("{.s}\\(")) # remove spaces between qualifier and parentheses
+    }
+
+    ####
     param_text <- str_split(param_text, " +")
     param_text <- suppressSpecificWarning({
       map(param_text, function(.p) {
@@ -162,10 +207,10 @@ parse_param_comment <- function(.x, .theta = FALSE){
         sep = "\n"))
     }
 
-    .param_label_df <- map_df(seq_len(length(param_text)), function(i) {
+    .param_label_df <- map_df(seq_along(param_text), function(i) {
       this_param <- param_text[[i]]
       # if the rightmost param on this line, map the label to it, otherwise map empty string
-      map_df(seq_len(length(this_param)), function(.p) {
+      map_df(seq_along(this_param), function(.p) {
         if (.p == (length(this_param))) {
           this_label <- full_label_text[[i]]
         } else {
