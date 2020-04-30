@@ -191,13 +191,13 @@ $OMEGA BLOCK(1) SAME (2)
 $OMEGA
 0.04    ; [P] IIVonEPS
 "
-
+# note that is looks right, but it's by accident because `SAME (2)` gets parsed to two params `SAME` and `2`
 diag_vec <- c(
   block(3),
   TRUE,
   block(2),
   block(2),
-  rep(T, 6)
+  rep(T, 7)
 )
 PEX_KAT_ALL %>% param_labels() %>% apply_indices(.omega = diag_vec)
 # # A tibble: 19 x 4
