@@ -145,6 +145,29 @@ PEX_BLOCK32 %>% param_labels() %>% apply_indices(c(block(3), block(2)))
 # 4: Unknown or uninitialised column: 'label'.
 
 
+PEX_BLOCK32S <- "
+$OMEGA BLOCK(3)
+.1          ;[P] 5 P1NPF
+.01 .1      ;[P] 6 CTFX
+.01 .01 .1  ;[P] 7 LSF
+$OMEGA BLOCK(2)
+.1          ;[P] 8 FAKE1
+.01 .1      ;[P] 9 FAKE2
+$OMEGA BLOCK(1) 0.04                ; [P] IOV_{KA}
+$OMEGA BLOCK(1) SAME
+"
+PEX_BLOCK32S %>% param_labels() %>% apply_indices(c(block(3), block(2), T, T))
+
+
+# ####
+# .ctl_clean <- clean_ctl(.mod)
+#
+# .pick <- "OMEGA"
+#   #.pick_labels <- parse_param_comment(
+#     .x = .ctl_clean[[.pick]]#,
+#     .theta = (.pick == "THETA")
+#   #)
+# ####
 
 
 # from Katherine (slack?)

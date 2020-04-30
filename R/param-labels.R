@@ -117,52 +117,53 @@ block <- function(.n) {
 #' Modified tidynm::parse_theta() to parse out the comments into the right columns for all three params.
 #' @param .x an object from the list that comes out of clean_ctl() (i.e. .ctl_clean$THETA, .ctl_clean$SIGMA, .ctl_clean$OMEGA)
 #' @param .theta Boolean for if it's a theta. If TRUE, parses `[{}]` to unit, otherwise parses to type
-#' @importFrom stringr str_match str_split str_trim
+#' @importFrom stringr str_match str_split str_trim str_replace regex
 #' @importFrom dplyr mutate
+#' @importFrom tidyr replace_na
 parse_param_comment <- function(.x, .theta = FALSE){
   if(inherits(.x,'list'))
     .x <- unlist(.x)
 
+  full_label_text <- str_split(.x,'\\;') %>% sapply('[',2) %>% tidyr::replace_na("")
+
+  # pull out each param element
+  # these are only used to parse _how many_ params there are, not for the actual values
   param_text <- str_split(.x,'\\;') %>% sapply('[',1)
-
   param_text <- str_split(param_text, " +")
-  param_text <- map(param_text, function(.p) {
-    .p <- as.numeric(.p)
-    .p <- .p[!is.na(.p)]
-    return(.p)
-  })
-  param_text
+  param_text <- suppressSpecificWarning({
+    map(param_text, function(.p) {
+      .p <- str_replace(.p, stringr::regex("SAME", ignore_case=TRUE), "1") # replace 'SAME' with a numeric
+      .p <- as.numeric(.p)
+      .p <- .p[!is.na(.p)]
+      return(.p)
+    })
+  }, .regexpr = "NAs introduced by coercion")
 
-
-  full_label_text <- str_split(.x,'\\;') %>% sapply('[',2)
-
-  ####
+  # map labels to params, matching only the diagonals if block notation
   if(length(param_text) != length(full_label_text)) {
-    stop(glue("{length(param_text)} != {length(full_label_text)}"))
+    stop(paste(
+      "parse_param_comment() -- user shouldn't see this error!",
+      glue("`length(param_text) != length(full_label_text)` :: {length(param_text)} != {length(full_label_text)}"),
+      sep = "\n"))
   }
 
-  .out <- map_df(seq_len(length(param_text)), function(i) {
-
+  .param_label_df <- map_df(seq_len(length(param_text)), function(i) {
     this_param <- param_text[[i]]
-      map_df(seq_len(length(this_param)), function(.p) {
-        if (.p == (length(this_param))) {
-          this_label <- full_label_text[[i]]
-        } else {
-          this_label <- ""
-        }
+    # if the rightmost param on this line, map the label to it, otherwise map empty string
+    map_df(seq_len(length(this_param)), function(.p) {
+      if (.p == (length(this_param))) {
+        this_label <- full_label_text[[i]]
+      } else {
+        this_label <- ""
+      }
       list(param = this_param[[.p]], label = this_label)
     })
   })
 
-  full_label_text <- .out$label
-
-
-  ####
-
-
-  label <- gsub('^(.*?)\\]\\s?','',full_label_text)
-
-  unit <- str_match(full_label_text, '\\[(.*?)\\]')
+  # parse out label and unit/type
+  final_label_text <- .param_label_df$label
+  label <- gsub('^(.*?)\\]\\s?','',final_label_text)
+  unit <- str_match(final_label_text, '\\[(.*?)\\]')
 
   if (isTRUE(.theta)) {
     out_tbl <- tibble(label = str_trim(label), unit = unit[,ncol(unit)])
