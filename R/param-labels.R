@@ -134,7 +134,7 @@ block <- function(.n) {
 #' @importFrom purrr map map_df
 parse_param_comment <- function(.x, .theta = FALSE){
 
-  if(inherits(.x,'list'))
+  if(inherits(.x,'list')) { #### SHOULD THIS ALSO BE ONLY IF !isTRUE(.theta) ?
     # remove spaces between qualifier and parentheses
     .x <- map(.x, function(.l) {
       for (.s in c("DIAGONAL", "BLOCK", "SAME")) {
@@ -144,9 +144,7 @@ parse_param_comment <- function(.x, .theta = FALSE){
     })
 
     # copy SAME blocks
-
-
-    .new <- list()
+    .x1 <- list()
     for (.l in .x) {
       # extract SAME if exists and get number
       .l <- str_replace(.l, stringr::regex("SAME(?=\\s|$)", ignore_case=TRUE), "SAME(1)")
@@ -154,26 +152,20 @@ parse_param_comment <- function(.x, .theta = FALSE){
       .same <- .same[!is.na(.same)]
       if (length(.same) == 1) {
         .same <- as.numeric(str_replace_all(.same, "[^0-9]", ""))
-        print(.same)
+        for (.si in seq_len(.same)) {
+          .rep <- .x1[[length(.x1)]]
+          .ind <- length(.x1) + 1
+          .x1[[.ind]] <- .rep
+        }
+      } else {
+        .ind <- length(.x1) + 1
+        .x1[[.ind]] <- .l
       }
-
-
-      .ind <- length(.new) + 1
-      .new[[.ind]] <- .l
     }
 
-
-    # for (.s in c("DIAGONAL", "BLOCK", "SAME")) {
-    #   .x <- imap(.x, function(.l, .i) {
-    #       #str_replace_all(.p, glue("{.s} +\\("), glue("{.s}\\("))
-    #       print(.l)
-    #       print(.i)
-    #       .l str_replace_all(.p, glue("{.s} +\\("), glue("{.s}\\("))
-    #     })
-    # }
-
     # flatten
-    .x <- unlist(.x)
+    .x <- unlist(.x1)
+  }
 
   full_label_text <- str_split(.x,'\\;') %>% sapply('[',2) %>% tidyr::replace_na("")
 

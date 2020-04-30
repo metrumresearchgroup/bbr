@@ -212,7 +212,7 @@ diag_vec <- c(
   rep(T, 7)
 )
 PEX_KAT_ALL %>% param_labels() %>% apply_indices(.omega = diag_vec)
-# # A tibble: 19 x 4
+# # A tibble: 20 x 4
 # names        label    type  param_type
 # <chr>        <chr>    <chr> <chr>
 # 1 OMEGA(1,1)   CL       [P]   OMEGA
@@ -229,11 +229,73 @@ PEX_KAT_ALL %>% param_labels() %>% apply_indices(.omega = diag_vec)
 # 12 OMEGA(8,7)   ""       [A]   OMEGA
 # 13 OMEGA(8,8)   ""       [A]   OMEGA
 # 14 OMEGA(9,9)   IOV_{KA} [P]   OMEGA
-# 15 OMEGA(10,10) ""       [A]   OMEGA
-# 16 OMEGA(11,11) ""       [A]   OMEGA
+# 15 OMEGA(10,10) IOV_{KA} [P]   OMEGA
+# 16 OMEGA(11,11) IOV_{KA} [P]   OMEGA
 # 17 OMEGA(12,12) IOV_{F1} [P]   OMEGA
-# 18 OMEGA(13,13) ""       [A]   OMEGA
-# 19 OMEGA(14,14) IIVonEPS [P]   OMEGA
+# 18 OMEGA(13,13) IOV_{F1} [P]   OMEGA
+# 19 OMEGA(14,14) IOV_{F1} [P]   OMEGA
+# 20 OMEGA(15,15) IIVonEPS [P]   OMEGA
+
+
+PEX_KAT_ALL_MORE <- "
+$OMEGA BLOCK(3)
+;---------------------------------
+0.026                 ; [P] CL
+0.01   0.25           ; [P] KA
+0.01   0.01   0.16     ; [P] F1
+$OMEGA BLOCK(3) SAME
+
+$OMEGA
+0.04  ; IC50
+$OMEGA BLOCK(2) 0.1 0.01 0.1
+$OMEGA BLOCK(2)
+0.1
+0.01  0.1
+$OMEGA BLOCK(1) 0.04                ; [P] IOV_{KA}
+$OMEGA BLOCK(1) SAME
+$OMEGA BLOCK(1) SAME
+$OMEGA BLOCK(1) 0.04                ; [P] IOV_{F1}
+$OMEGA BLOCK(1) SAME (2)
+$OMEGA
+0.04    ; [P] IIVonEPS
+"
+diag_vec <- c(
+  block(3),
+  block(3),
+  TRUE,
+  block(2),
+  block(2),
+  rep(T, 7)
+)
+PEX_KAT_ALL_MORE %>% param_labels() %>% apply_indices(.omega = diag_vec) %>% as.data.frame()
+# names    label type param_type
+# 1    OMEGA(1,1)       CL  [P]      OMEGA
+# 2    OMEGA(2,1)           [A]      OMEGA
+# 3    OMEGA(2,2)       KA  [P]      OMEGA
+# 4    OMEGA(3,1)           [A]      OMEGA
+# 5    OMEGA(3,2)           [A]      OMEGA
+# 6    OMEGA(3,3)       F1  [P]      OMEGA
+# 7    OMEGA(4,4)       CL  [P]      OMEGA
+# 8    OMEGA(5,4)           [A]      OMEGA
+# 9    OMEGA(5,5)       KA  [P]      OMEGA
+# 10   OMEGA(6,4)           [A]      OMEGA
+# 11   OMEGA(6,5)           [A]      OMEGA
+# 12   OMEGA(6,6)       F1  [P]      OMEGA
+# 13   OMEGA(7,7)     IC50  [A]      OMEGA
+# 14   OMEGA(8,8)           [A]      OMEGA
+# 15   OMEGA(9,8)           [A]      OMEGA
+# 16   OMEGA(9,9)           [A]      OMEGA
+# 17 OMEGA(10,10)           [A]      OMEGA
+# 18 OMEGA(11,10)           [A]      OMEGA
+# 19 OMEGA(11,11)           [A]      OMEGA
+# 20 OMEGA(12,12) IOV_{KA}  [P]      OMEGA
+# 21 OMEGA(13,13) IOV_{KA}  [P]      OMEGA
+# 22 OMEGA(14,14) IOV_{KA}  [P]      OMEGA
+# 23 OMEGA(15,15) IOV_{F1}  [P]      OMEGA
+# 24 OMEGA(16,16) IOV_{F1}  [P]      OMEGA
+# 25 OMEGA(17,17) IOV_{F1}  [P]      OMEGA
+# 26 OMEGA(18,18) IIVonEPS  [P]      OMEGA
+
 
 
 # from Katherine: PK-PD model where I has different sigma blocks - one for the PK data and one for the PD data
