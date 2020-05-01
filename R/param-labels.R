@@ -125,46 +125,32 @@ block <- function(.n) {
 
 #' extract labels from comments in raw ctl string
 #'
-#' Modified tidynm::parse_theta() to parse out the comments into the right columns for all three params.
+#' Heavily modified from tidynm::parse_theta() to parse out the comments into the right columns for all three params.
 #' @param .x an object from the list that comes out of clean_ctl() (i.e. .ctl_clean$THETA, .ctl_clean$SIGMA, .ctl_clean$OMEGA)
 #' @param .theta Boolean for if it's a theta. If TRUE, parses `[{}]` to unit, otherwise parses to type
 #' @importFrom stringr str_match str_split str_trim str_replace str_replace_all regex
 #' @importFrom dplyr mutate
 #' @importFrom tidyr replace_na
 #' @importFrom purrr map map_df
+#' @rdname parse_param_comment
 parse_param_comment <- function(.x, .theta = FALSE){
 
-  if(inherits(.x,'list')) { #### SHOULD THIS ALSO BE ONLY IF !isTRUE(.theta) ?
-    # remove spaces between qualifier and parentheses
-    .x <- map(.x, function(.l) {
-      for (.s in c("DIAGONAL", "BLOCK", "SAME")) {
-        .l <- str_replace_all(.l, glue("{.s} +\\("), glue("{.s}\\(")) # remove spaces between qualifier and parentheses
-      }
-      .l
-    })
-
-    # copy SAME blocks
-    .x1 <- list()
-    for (.l in .x) {
-      # extract SAME if exists and get number
-      .l <- str_replace(.l, stringr::regex("SAME(?=\\s|$)", ignore_case=TRUE), "SAME(1)")
-      .same <- str_extract(.l, stringr::regex("SAME\\([0-9]+\\)", ignore_case=TRUE))
-      .same <- .same[!is.na(.same)]
-      if (length(.same) == 1) {
-        .same <- as.numeric(str_replace_all(.same, "[^0-9]", ""))
-        for (.si in seq_len(.same)) {
-          .rep <- .x1[[length(.x1)]]
-          .ind <- length(.x1) + 1
-          .x1[[.ind]] <- .rep
+  if(inherits(.x,'list')) {
+    if (!isTRUE(.theta)) {
+      # remove spaces between qualifier and parentheses
+      .x <- map(.x, function(.l) {
+        for (.s in c("DIAGONAL", "BLOCK", "SAME")) {
+          .l <- str_replace_all(.l, glue("{.s} +\\("), glue("{.s}\\(")) # remove spaces between qualifier and parentheses
         }
-      } else {
-        .ind <- length(.x1) + 1
-        .x1[[.ind]] <- .l
-      }
+        .l
+      })
+
+      # copy SAME blocks
+      .x <- parse_same_block(.x)
     }
 
-    # flatten
-    .x <- unlist(.x1)
+    # flatten to vector
+    .x <- unlist(.x)
   }
 
   full_label_text <- str_split(.x,'\\;') %>% sapply('[',2) %>% tidyr::replace_na("")
@@ -173,14 +159,8 @@ parse_param_comment <- function(.x, .theta = FALSE){
     final_label_text <- full_label_text
   } else {
     # pull out each param element
-    # these are only used to parse _how many_ params there are, not for the actual values
+    # these are only used to parse _how many_ params there are; the actual values are discarded
     param_text <- str_split(.x,'\\;') %>% sapply('[',1)
-    #param_text <- str_replace_all(param_text, "\\(|\\)", "") # don't think I wanna delete the parens anymore
-    for (.s in c("DIAGONAL", "BLOCK", "SAME")) {
-      param_text <- str_replace_all(param_text, glue("{.s} +\\("), glue("{.s}\\(")) # remove spaces between qualifier and parentheses
-    }
-
-    ####
     param_text <- str_split(param_text, " +")
     param_text <- suppressSpecificWarning({
       map(param_text, function(.p) {
@@ -212,10 +192,10 @@ parse_param_comment <- function(.x, .theta = FALSE){
       })
     })
 
-    # parse out label and unit/type
     final_label_text <- .param_label_df$label
   }
 
+  # parse out label and unit/type
   label <- gsub('^(.*?)\\]\\s?','',final_label_text)
   unit <- str_match(final_label_text, '\\[(.*?)\\]')
 
@@ -232,6 +212,41 @@ parse_param_comment <- function(.x, .theta = FALSE){
   return(out_tbl)
 }
 
+#' Parses out SAME blocks
+#'
+#' Iterates over a list of $OMEGA or $SIGMA blocks and replaces the SAME blocks with a copy of the block they are referring to.
+#' @param .x List of character vectors representing either $OMEGA or $SIGMA blocks, as parsed by `clean_ctl()`
+#' @importFrom stringr str_replace str_replace_all str_extract regex
+#' @rdname parse_param_comment
+parse_same_block <- function(.x) {
+  if(!inherits(.x,'list')) {
+    warning(paste(
+      "User shouldn't see this warning -- `parse_same_block()` only works for list input. Passed .x with class(es):",
+      paste(class(.x), collapse = ", ")
+      ))
+    return(.x)
+  }
+
+  .x1 <- list()
+  for (.l in .x) {
+    # extract SAME if exists and get number
+    .l <- str_replace(.l, stringr::regex("SAME(?=\\s|$)", ignore_case=TRUE), "SAME(1)")
+    .same <- str_extract(.l, stringr::regex("SAME\\([0-9]+\\)", ignore_case=TRUE))
+    .same <- .same[!is.na(.same)]
+    if (length(.same) == 1) {
+      .same <- as.numeric(str_replace_all(.same, "[^0-9]", ""))
+      for (.si in seq_len(.same)) {
+        .rep <- .x1[[length(.x1)]]
+        .ind <- length(.x1) + 1
+        .x1[[.ind]] <- .rep
+      }
+    } else {
+      .ind <- length(.x1) + 1
+      .x1[[.ind]] <- .l
+    }
+  }
+  return(.x1)
+}
 
 #' Builds matrix indices labels
 #' @param .is_diag Boolean vector denoting whether each element is a diagonal
