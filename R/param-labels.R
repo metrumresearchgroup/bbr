@@ -24,7 +24,7 @@ param_labels.bbi_nonmem_model <- function(.mod, ...) {
 
   .ctl_raw <- .ctl_path %>% read_file()
 
-  .label_df <- param_labels(.ctl_raw)
+  .label_df <- param_labels(.ctl_raw, ...)
 
   return(.label_df)
 }
@@ -44,14 +44,14 @@ param_labels.character <- function(.mod, ...) {
   .ctl_clean <- clean_ctl(.mod)
 
   .label_df <- map_df(c("THETA", "OMEGA", "SIGMA"), function(.pick) {
-    .pick_vec <- .ctl_clean[[.pick]]
+    .pick_list <- .ctl_clean[[.pick]]
 
-    if (is.null(.pick_vec)) {
+    if (is.null(.pick_list)) {
       return(NULL)
     }
 
     .pick_labels <- parse_param_comment(
-      .pick_vec,
+      .pick_list,
       .theta = (.pick == "THETA")
     )
     .pick_labels$names <- rep(.pick, nrow(.pick_labels))
@@ -164,7 +164,8 @@ parse_param_comment <- function(.x, .theta = FALSE){
     param_text <- str_split(param_text, " +")
     param_text <- suppressSpecificWarning({
       map(param_text, function(.p) {
-        .p <- str_replace(.p, stringr::regex("SAME", ignore_case=TRUE), "1") # replace 'SAME' with a numeric
+        #.p <- str_replace(.p, stringr::regex("SAME", ignore_case=TRUE), "1") # replace 'SAME' with a numeric
+        .p <- str_replace_all(.p, "\\(|\\)", "") # erase parentheses because they break as.numeric()
         .p <- as.numeric(.p)
         .p <- .p[!is.na(.p)]
         return(.p)

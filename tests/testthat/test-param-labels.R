@@ -42,7 +42,6 @@ test_that("param_labels.character errors on vector", {
 
 # test parsing labels from different OMEGA and SIGMA blocks
 for (.test_name in names(PARAM_BLOCK_REF)) {
-  print(glue("parse_param_comment() called internally on {.test_name}"))
   test_that(glue("parse_param_comment() called internally on {.test_name}"), {
     .tc <- PARAM_BLOCK_REF[[.test_name]]
     res_df <- .tc$ctl %>% param_labels() %>% apply_indices(.omega = .tc$omega, .sigma = .tc$sigma)
