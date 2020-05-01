@@ -1,0 +1,3 @@
+Mon Sep 17 13:45:48 2018
+qsub -N Run101 -o tidynm/inst/extdata/101 -e tidynm/inst/extdata/101   -V  -j y  -sync n -shell n -b y -cwd   perl -S /opt/NONMEM/nm74/nmqual/autolog.pl /opt/NONMEM/nm74/nmqual/log.xml run ce tidynm/inst/extdata/101 101
+Run 101 has exit code 0

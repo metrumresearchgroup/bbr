@@ -107,11 +107,9 @@ withr::with_options(list(rbabylon.model_directory = "model-examples"), {
 .TEST_CASES_WD <- list(
   list(test_wd = ".",               test_yaml_path = "model-examples/1.yaml"),
   list(test_wd = "..",              test_yaml_path = "testthat/model-examples/1.yaml"),
-  list(test_wd = "../..",           test_yaml_path = "tests/testthat/model-examples/1.yaml"),
   list(test_wd = "model-examples",  test_yaml_path = "1.yaml"),
   list(test_wd = ".",               test_yaml_path = "model-examples/1.yaml", change_midstream = TRUE),
   list(test_wd = "..",              test_yaml_path = "testthat/model-examples/1.yaml", change_midstream = TRUE),
-  list(test_wd = "../..",           test_yaml_path = "tests/testthat/model-examples/1.yaml", change_midstream = TRUE),
   list(test_wd = "model-examples",  test_yaml_path = "1.yaml", change_midstream = TRUE)
 )
 
