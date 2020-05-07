@@ -48,7 +48,7 @@ check_file <- function(.file, .head = 3, .tail = 5, .print = TRUE, .return = FAL
   if (.return) {
     return(res_vec)
   } else {
-    invisible()
+    return(invisible())
   }
 }
 

@@ -12,7 +12,7 @@ if (Sys.getenv("METWORX_VERSION") == "") {
 
 # define constants
 STARTER_FILE <- file.path("model-examples/1.ctl")
-PARAM_REF_FILE <- "data/acop_param_table_ref_200228.rds"
+PARAM_REF_FILE <- "data/acop_param_table_ref_200423_randeff.rds"
 
 MODEL_DIR <- "model-examples-bbi"
 BBI_PATH <- '/data/apps/bbi'

@@ -1,0 +1,2314 @@
+<log>
+ <logged on="run">
+  <config>
+   <!--Linux / Darwin with ifort compile opts for cross-platform reproducibility.-->
+   <alias id="folder">/mnt/nm743CD</alias>
+   <alias id="target">/opt/NONMEM/nm74</alias>
+   <alias id="origin">/mnt/nmqual-8.4.0</alias>
+   <alias id="unlock">/etc/chef/cookbooks/ifort-nonmem/files/default/nonmem.lic</alias>
+   <alias id="mpicha">/usr/local/mpich3/lib/libmpich.a</alias>
+   <!--The meta interface groups commands that collect metadata.-->
+   <do on="meta">pwd</do>
+   <do on="meta">date</do>
+   <do on="meta">perl -e 'use POSIX; print join qq(,),uname'</do>
+   <do on="meta">echo $SHELL</do>
+   <do on="meta">echo $USER</do>
+   <do on="meta">echo $PATH</do>
+   <do on="meta">head -n 5 target/util/nmfe74</do>
+   <do on="meta">which ifort</do>
+   <!--The 'install' interface installs NONMEM.-->
+   <do on="install">date</do>
+   <do on="install">rm -rf origin/temp</do>
+   <do on="install">mkdir origin/temp</do>
+   <do on="install">cp -r folder/* origin/temp</do>
+   <do on="install" in="origin">patch -p0 temp/SETUP74 nix/setup74.diff</do>
+   <!--alters compile options in setup73-->
+   <do on="install">rm -rf target</do>
+   <do on="install">mkdir target</do>
+   <do on="install" in="origin/temp">pwd</do>
+   <do on="install" in="origin/temp">ifort --version</do>
+   <do on="install" in="origin/temp">/bin/bash SETUP74 origin/temp target ifort y ar same rec q unzip nonmem74e.zip nonmem74r.zip</do>
+   <do on="install">mkdir target/nmqual</do>
+   <do on="install">mkdir target/nmqual/doc</do>
+   <do on="install">cp $0 target/nmqual</do>
+   <!--runtime copy of autolog.pl, uses nmqual/log.xml as config-->
+   <do on="install">cp -r origin/con target/nmqual</do>
+   <!--support for processing xml docs-->
+   <do on="install">cp -r origin/csv target/nmqual</do>
+   <!--support for processing csv docs-->
+   <do on="install">cp origin/doc/nix/* target/nmqual/doc</do>
+   <!--reference modeling results-->
+   <do on="install">cp -r origin/psn target/nmqual</do>
+   <!--support for psn qualification-->
+   <do on="install">cp origin/nix/setup74.diff target/nmqual/doc</do>
+   <!--keep for archival purposes-->
+   <do on="install">cp origin/temp/SETUP74 target/nmqual/doc</do>
+   <!--keep for archival purposes-->
+   <do on="install">rm -rf origin/temp</do>
+   <do on="install">cp -r origin/test target/nmqual</do>
+   <!--supports control tests-->
+   <do on="install">chmod 0777 target/license/nonmem.lic</do>
+   <!--enable overwriting-->
+   <do on="install">cp unlock target/license/nonmem.lic</do>
+   <!--replace expired license-->
+   <do on="install">cp mpicha target/mpi/mpi_lini</do>
+   <!--replace default mpich archive-->
+   <!--patch util/nmfe73 and run/nmfe73 to accept compile/execute option-->
+   <do on="install">cp target/util/nmfe74 target/util/nmfe74.old</do>
+   <do on="install">cp target/util/nmfe74 target/run/nmfe74.old</do>
+   <do on="install">patch -p0 -R target/util/nmfe74 nix/nmfe74.diff</do>
+   <do on="install">patch -p0 -R target/run/nmfe74 nix/nmfe74.diff</do>
+   <do on="install" as="xml">perl $0 $_0 meta</do>
+   <to on="install">target/nmqual/log.xml</to>
+   <!--The 'basic' interface does not expect a compile/execute argument (nmfe73-as-modified no longer requires it).-->
+   <!--Run directory and run name are required arguments.-->
+   <do on="basic" as="xml">perl $0 $_0 meta</do>
+   <do on="basic" in="$_1">target/util/nmfe74 $_2.ctl $_2.lst</do>
+   <do on="basic" in="$_1" as="xml">if [ -e $_2.xml ];then cat $_2.xml;else echo \&lt;nofile/\>; fi</do>
+   <do on="basic" as="xml">cat target/nmqual/log.xml</do>
+   <to on="basic">$_1/$_2.log.xml</to>
+   <!--The 'run' interface expects a leading compile/execute argument.-->
+   <do on="run" as="xml">perl $0 $_0 meta</do>
+   <do on="run" in="$_2">target/util/nmfe74 $_1 $_3.ctl $_3.lst</do>
+   <do on="run" in="$_2" as="xml">if [ -e $_3.xml ];then cat $_3.xml;else echo \&lt;nofile/\>; fi</do>
+   <do on="run" as="xml">cat target/nmqual/log.xml</do>
+   <to on="run">$_2/$_3.log.xml</to>
+   <!--The 'para' interface additionally expects [run].pnm to be present in the run directory.-->
+   <do on="para" as="xml">perl $0 $_0 meta</do>
+   <do on="para" in="$_2">target/util/nmfe74 $_1 $_3.ctl $_3.lst -parafile=$_3.pnm</do>
+   <do on="para" in="$_2" as="xml">if [ -e $_3.xml ];then cat $_3.xml;else echo \&lt;nofile/\>; fi</do>
+   <do on="para" as="xml">cat target/nmqual/log.xml</do>
+   <to on="para">$_2/$_3.log.xml</to>
+   <!--The 'test' interface invokes nmfe directly, without the compile/execute argument.-->
+   <do on="test" in="target/nmqual/test">target/util/nmfe74 $_1.ctl $_1.lst</do>
+   <do on="test" in="target/nmqual/test" as="xml">cat $_1.xml</do>
+   <!--The 'qualify' interface runs a full suite of qualification tests.-->
+   <do on="qualify" as="xml">perl $0 $_0 meta</do>
+   <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test 3</do>
+   <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test 4</do>
+   <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test 5</do>
+   <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test 6</do>
+   <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test 7</do>
+   <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test 8</do>
+   <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test example5</do>
+   <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test example6</do>
+   <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test example7</do>
+   <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test example10</do>
+   <do on="qualify" as="xml">cat target/nmqual/log.xml</do>
+   <to on="qualify">$_1</to>
+   <!--The 'regress' interface runs a reduced suite of tests quickly, e.g. for regression testing.-->
+   <do on="regress" as="xml">perl $0 $_0 meta</do>
+   <do on="regress" in="target/nmqual" as="xml">perl autolog.pl log.xml test 3</do>
+   <do on="regress" in="target/nmqual" as="xml">perl autolog.pl log.xml test 4</do>
+   <do on="regress" in="target/nmqual" as="xml">perl autolog.pl log.xml test 5</do>
+   <do on="regress" in="target/nmqual" as="xml">perl autolog.pl log.xml test 6</do>
+   <do on="regress" in="target/nmqual" as="xml">perl autolog.pl log.xml test 7</do>
+   <do on="regress" in="target/nmqual" as="xml">perl autolog.pl log.xml test 8</do>
+   <do on="regress" as="xml">cat target/nmqual/log.xml</do>
+   <to on="regress">$_1</to>
+   <!--The 'psntest' interface runs PsN control tests.-->
+   <do on="psntest" as="xml">perl $0 $_0 meta</do>
+   <do on="psntest" in="target/nmqual/psn">execute -directory=runs -seed=1 TST33611.nmctl TST33612.nmctl TST33613.nmctl</do>
+   <do on="psntest" in="target/nmqual/psn">bootstrap -samples=20 -dir=boot -seed=1 TST3362.nmctl</do>
+   <do on="psntest" in="target/nmqual/psn/runs" as="xml">perl target/nmqual/csv/csv2xml.pl raw_results_TST33611.csv</do>
+   <do on="psntest" in="target/nmqual/psn/boot" as="xml">perl target/nmqual/csv/csv2xml.pl raw_results_TST3362.csv</do>
+   <do on="psntest" in="target/nmqual/psn/boot" as="xml">perl target/nmqual/csv/sections2csv.pl '^means' bootstrap_results.csv | perl target/nmqual/csv/csv2xml.pl</do>
+   <do on="psntest" in="target/nmqual/psn/boot" as="xml">perl target/nmqual/csv/sections2csv.pl standard.error.confidence.intervals bootstrap_results.csv | perl target/nmqual/csv/csv2xml.pl</do>
+   <do on="psntest" as="xml">cat target/nmqual/log.xml</do>
+   <to on="psntest">$_1</to>
+   <!--The 'accept' interface embeds an acceptance statement at the end of the log.-->
+   <do on="accept">echo $_</do>
+   <to on="accept">$0</to>
+  </config>
+  <job>
+   <do>perl /opt/NONMEM/nm74/nmqual/autolog.pl /opt/NONMEM/nm74/nmqual/log.xml meta</do>
+   <so>
+    <log>
+     <logged on="meta">
+      <config>
+       <!--Linux / Darwin with ifort compile opts for cross-platform reproducibility.-->
+       <alias id="folder">/mnt/nm743CD</alias>
+       <alias id="target">/opt/NONMEM/nm74</alias>
+       <alias id="origin">/mnt/nmqual-8.4.0</alias>
+       <alias id="unlock">/etc/chef/cookbooks/ifort-nonmem/files/default/nonmem.lic</alias>
+       <alias id="mpicha">/usr/local/mpich3/lib/libmpich.a</alias>
+       <!--The meta interface groups commands that collect metadata.-->
+       <do on="meta">pwd</do>
+       <do on="meta">date</do>
+       <do on="meta">perl -e 'use POSIX; print join qq(,),uname'</do>
+       <do on="meta">echo $SHELL</do>
+       <do on="meta">echo $USER</do>
+       <do on="meta">echo $PATH</do>
+       <do on="meta">head -n 5 target/util/nmfe74</do>
+       <do on="meta">which ifort</do>
+       <!--The 'install' interface installs NONMEM.-->
+       <do on="install">date</do>
+       <do on="install">rm -rf origin/temp</do>
+       <do on="install">mkdir origin/temp</do>
+       <do on="install">cp -r folder/* origin/temp</do>
+       <do on="install" in="origin">patch -p0 temp/SETUP74 nix/setup74.diff</do>
+       <!--alters compile options in setup73-->
+       <do on="install">rm -rf target</do>
+       <do on="install">mkdir target</do>
+       <do on="install" in="origin/temp">pwd</do>
+       <do on="install" in="origin/temp">ifort --version</do>
+       <do on="install" in="origin/temp">/bin/bash SETUP74 origin/temp target ifort y ar same rec q unzip nonmem74e.zip nonmem74r.zip</do>
+       <do on="install">mkdir target/nmqual</do>
+       <do on="install">mkdir target/nmqual/doc</do>
+       <do on="install">cp $0 target/nmqual</do>
+       <!--runtime copy of autolog.pl, uses nmqual/log.xml as config-->
+       <do on="install">cp -r origin/con target/nmqual</do>
+       <!--support for processing xml docs-->
+       <do on="install">cp -r origin/csv target/nmqual</do>
+       <!--support for processing csv docs-->
+       <do on="install">cp origin/doc/nix/* target/nmqual/doc</do>
+       <!--reference modeling results-->
+       <do on="install">cp -r origin/psn target/nmqual</do>
+       <!--support for psn qualification-->
+       <do on="install">cp origin/nix/setup74.diff target/nmqual/doc</do>
+       <!--keep for archival purposes-->
+       <do on="install">cp origin/temp/SETUP74 target/nmqual/doc</do>
+       <!--keep for archival purposes-->
+       <do on="install">rm -rf origin/temp</do>
+       <do on="install">cp -r origin/test target/nmqual</do>
+       <!--supports control tests-->
+       <do on="install">chmod 0777 target/license/nonmem.lic</do>
+       <!--enable overwriting-->
+       <do on="install">cp unlock target/license/nonmem.lic</do>
+       <!--replace expired license-->
+       <do on="install">cp mpicha target/mpi/mpi_lini</do>
+       <!--replace default mpich archive-->
+       <!--patch util/nmfe73 and run/nmfe73 to accept compile/execute option-->
+       <do on="install">cp target/util/nmfe74 target/util/nmfe74.old</do>
+       <do on="install">cp target/util/nmfe74 target/run/nmfe74.old</do>
+       <do on="install">patch -p0 -R target/util/nmfe74 nix/nmfe74.diff</do>
+       <do on="install">patch -p0 -R target/run/nmfe74 nix/nmfe74.diff</do>
+       <do on="install" as="xml">perl $0 $_0 meta</do>
+       <to on="install">target/nmqual/log.xml</to>
+       <!--The 'basic' interface does not expect a compile/execute argument (nmfe73-as-modified no longer requires it).-->
+       <!--Run directory and run name are required arguments.-->
+       <do on="basic" as="xml">perl $0 $_0 meta</do>
+       <do on="basic" in="$_1">target/util/nmfe74 $_2.ctl $_2.lst</do>
+       <do on="basic" in="$_1" as="xml">if [ -e $_2.xml ];then cat $_2.xml;else echo \&lt;nofile/\>; fi</do>
+       <do on="basic" as="xml">cat target/nmqual/log.xml</do>
+       <to on="basic">$_1/$_2.log.xml</to>
+       <!--The 'run' interface expects a leading compile/execute argument.-->
+       <do on="run" as="xml">perl $0 $_0 meta</do>
+       <do on="run" in="$_2">target/util/nmfe74 $_1 $_3.ctl $_3.lst</do>
+       <do on="run" in="$_2" as="xml">if [ -e $_3.xml ];then cat $_3.xml;else echo \&lt;nofile/\>; fi</do>
+       <do on="run" as="xml">cat target/nmqual/log.xml</do>
+       <to on="run">$_2/$_3.log.xml</to>
+       <!--The 'para' interface additionally expects [run].pnm to be present in the run directory.-->
+       <do on="para" as="xml">perl $0 $_0 meta</do>
+       <do on="para" in="$_2">target/util/nmfe74 $_1 $_3.ctl $_3.lst -parafile=$_3.pnm</do>
+       <do on="para" in="$_2" as="xml">if [ -e $_3.xml ];then cat $_3.xml;else echo \&lt;nofile/\>; fi</do>
+       <do on="para" as="xml">cat target/nmqual/log.xml</do>
+       <to on="para">$_2/$_3.log.xml</to>
+       <!--The 'test' interface invokes nmfe directly, without the compile/execute argument.-->
+       <do on="test" in="target/nmqual/test">target/util/nmfe74 $_1.ctl $_1.lst</do>
+       <do on="test" in="target/nmqual/test" as="xml">cat $_1.xml</do>
+       <!--The 'qualify' interface runs a full suite of qualification tests.-->
+       <do on="qualify" as="xml">perl $0 $_0 meta</do>
+       <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test 3</do>
+       <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test 4</do>
+       <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test 5</do>
+       <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test 6</do>
+       <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test 7</do>
+       <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test 8</do>
+       <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test example5</do>
+       <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test example6</do>
+       <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test example7</do>
+       <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test example10</do>
+       <do on="qualify" as="xml">cat target/nmqual/log.xml</do>
+       <to on="qualify">$_1</to>
+       <!--The 'regress' interface runs a reduced suite of tests quickly, e.g. for regression testing.-->
+       <do on="regress" as="xml">perl $0 $_0 meta</do>
+       <do on="regress" in="target/nmqual" as="xml">perl autolog.pl log.xml test 3</do>
+       <do on="regress" in="target/nmqual" as="xml">perl autolog.pl log.xml test 4</do>
+       <do on="regress" in="target/nmqual" as="xml">perl autolog.pl log.xml test 5</do>
+       <do on="regress" in="target/nmqual" as="xml">perl autolog.pl log.xml test 6</do>
+       <do on="regress" in="target/nmqual" as="xml">perl autolog.pl log.xml test 7</do>
+       <do on="regress" in="target/nmqual" as="xml">perl autolog.pl log.xml test 8</do>
+       <do on="regress" as="xml">cat target/nmqual/log.xml</do>
+       <to on="regress">$_1</to>
+       <!--The 'psntest' interface runs PsN control tests.-->
+       <do on="psntest" as="xml">perl $0 $_0 meta</do>
+       <do on="psntest" in="target/nmqual/psn">execute -directory=runs -seed=1 TST33611.nmctl TST33612.nmctl TST33613.nmctl</do>
+       <do on="psntest" in="target/nmqual/psn">bootstrap -samples=20 -dir=boot -seed=1 TST3362.nmctl</do>
+       <do on="psntest" in="target/nmqual/psn/runs" as="xml">perl target/nmqual/csv/csv2xml.pl raw_results_TST33611.csv</do>
+       <do on="psntest" in="target/nmqual/psn/boot" as="xml">perl target/nmqual/csv/csv2xml.pl raw_results_TST3362.csv</do>
+       <do on="psntest" in="target/nmqual/psn/boot" as="xml">perl target/nmqual/csv/sections2csv.pl '^means' bootstrap_results.csv | perl target/nmqual/csv/csv2xml.pl</do>
+       <do on="psntest" in="target/nmqual/psn/boot" as="xml">perl target/nmqual/csv/sections2csv.pl standard.error.confidence.intervals bootstrap_results.csv | perl target/nmqual/csv/csv2xml.pl</do>
+       <do on="psntest" as="xml">cat target/nmqual/log.xml</do>
+       <to on="psntest">$_1</to>
+       <!--The 'accept' interface embeds an acceptance statement at the end of the log.-->
+       <do on="accept">echo $_</do>
+       <to on="accept">$0</to>
+      </config>
+      <job>
+       <do>pwd</do>
+       <so>/data/tidynm_dev</so>
+      </job>
+      <job>
+       <do>date</do>
+       <so>Mon Sep 17 13:46:00 UTC 2018</so>
+      </job>
+      <job>
+       <do>perl -e 'use POSIX; print join qq(,),uname'</do>
+       <so>Linux,ip-172-16-2-19,3.13.0-93-generic,#140-Ubuntu SMP Mon Jul 18 21:21:05 UTC 2016,x86_64</so>
+      </job>
+      <job>
+       <do>echo $SHELL</do>
+       <so>/bin/sh</so>
+      </job>
+      <job>
+       <do>echo $USER</do>
+       <so>danp</so>
+      </job>
+      <job>
+       <do>echo $PATH</do>
+       <so>/tmp/2.1.all.q:/usr/local/mpich3/bin:/usr/local/mpich3gf/bin:/opt/intel/bin/intel64:/opt/intel/mpirt/bin/intel64:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/opt/sge/bin/lx-amd64:/usr/local/texlive/2013/bin/x86_64-linux</so>
+      </job>
+      <job>
+       <do>head -n 5 /opt/NONMEM/nm74/util/nmfe74</do>
+       <so>#!/bin/bash
+          dir=/opt/NONMEM/nm74
+          f=ifort
+          o=' -fp-model strict -Gs -nologo -nbs -w '
+          opstat=' -static '</so>
+      </job>
+      <job>
+       <do>which ifort</do>
+       <so>/opt/intel/bin/intel64/ifort</so>
+      </job>
+     </logged>
+    </log>
+   </so>
+  </job>
+  <job>
+   <do in="tidynm/inst/extdata/101">/opt/NONMEM/nm74/util/nmfe74 ce 101.ctl 101.lst</do>
+   <so>Starting NMTRAN
+     
+    WARNINGS AND ERRORS (IF ANY) FOR PROBLEM    1
+                
+    (WARNING  2) NM-TRAN INFERS THAT THE DATA ARE POPULATION.
+   Recompiling certain components
+   Building NONMEM Executable
+   Starting nonmem execution ...
+   License Registered to: Metrum Research Group
+   Expiration Date:    14 JUL 2019
+   Current Date:       17 SEP 2018
+   Days until program expires : 302
+    
+    
+    First Order Conditional Estimation with Interaction
+    MONITORING OF SEARCH:
+   
+    
+   0ITERATION NO.:    0    OBJECTIVE VALUE:   32711.6154444340        NO. OF FUNC. EVALS.:  11
+    CUMULATIVE NO. OF FUNC. EVALS.:       11
+    NPARAMETR:  5.0000E-01  3.5000E+00  1.0000E+00  4.0000E+00  2.0000E+00  4.0000E-01  1.0000E-02  2.0000E-01  3.0000E-03  2.0000E-03
+                4.0000E-02  1.0000E-03  5.0000E-02  5.0000E-02  2.0000E+00
+    PARAMETER:  1.0000E-01  1.0000E-01  1.0000E-01  1.0000E-01  1.0000E-01  1.0000E-01  1.0000E-01  1.0000E-01  1.0000E-01  1.0000E-01
+                1.0000E-01  1.0000E-01  1.0000E-01  1.0000E-01  1.0000E-01
+    GRADIENT:   3.0454E+03 -1.0522E+05 -7.6531E+03 -9.4350E+04  8.2119E+03 -3.6098E+01  1.6295E+01 -1.9722E+02  1.2505E+02  7.0659E+00
+               -1.3395E+03 -1.2612E+02 -3.9773E+02  2.0695E+02 -3.0539E+01
+    
+   0ITERATION NO.:    1    OBJECTIVE VALUE:   32200.4238610032        NO. OF FUNC. EVALS.:  13
+    CUMULATIVE NO. OF FUNC. EVALS.:       24
+    NPARAMETR:  4.9783E-01  4.0250E+00  1.0109E+00  4.5380E+00  1.9766E+00  4.0002E-01  9.9998E-03  2.0001E-01  2.9995E-03  2.0000E-03
+                4.0015E-02  1.0004E-03  5.0006E-02  4.9997E-02  2.0000E+00
+    PARAMETER:  9.9566E-02  1.1500E-01  1.0109E-01  1.1345E-01  9.8829E-02  1.0001E-01  9.9998E-02  1.0003E-01  9.9982E-02  9.9999E-02
+                1.0019E-01  1.0002E-01  1.0006E-01  9.9970E-02  1.0000E-01
+    GRADIENT:   2.5251E+03  2.0088E+04 -9.3522E+03  1.0771E+05  3.9088E+04 -1.9206E+02  1.5777E+01 -1.5384E+02 -7.0645E+01 -4.7809E-01
+               -2.2265E+02 -5.1105E+01 -5.7898E+02 -8.1410E+02 -1.2743E+00
+    
+   0ITERATION NO.:    2    OBJECTIVE VALUE:   31989.0503619686        NO. OF FUNC. EVALS.:  13
+    CUMULATIVE NO. OF FUNC. EVALS.:       37
+    NPARAMETR:  4.9583E-01  3.9139E+00  1.0257E+00  3.8573E+00  1.8531E+00  4.0014E-01  9.9995E-03  2.0002E-01  3.0000E-03  2.0001E-03
+                4.0018E-02  1.0005E-03  5.0015E-02  5.0010E-02  2.0000E+00
+    PARAMETER:  9.9167E-02  1.1183E-01  1.0257E-01  9.6433E-02  9.2653E-02  1.0004E-01  9.9995E-02  1.0005E-01  9.9993E-02  9.9999E-02
+                1.0023E-01  1.0003E-01  1.0015E-01  1.0010E-01  1.0000E-01
+    GRADIENT:   8.8366E+02 -4.5694E+04 -6.6776E+03 -7.3759E+04  1.3972E+04 -9.6435E+01  1.6794E+01  4.0168E+00 -7.3053E+00 -1.5764E+01
+               -3.8708E+02 -8.7476E+01 -3.8530E+02  2.1138E+02 -2.6925E+01
+    
+   0ITERATION NO.:    3    OBJECTIVE VALUE:   31798.0522922094        NO. OF FUNC. EVALS.:  13
+    CUMULATIVE NO. OF FUNC. EVALS.:       50
+    NPARAMETR:  4.8970E-01  4.4008E+00  1.0864E+00  3.7656E+00  1.4706E+00  4.0057E-01  9.9982E-03  2.0004E-01  3.0009E-03  2.0003E-03
+                4.0038E-02  1.0013E-03  5.0051E-02  5.0027E-02  2.0001E+00
+    PARAMETER:  9.7940E-02  1.2574E-01  1.0864E-01  9.4139E-02  7.3530E-02  1.0014E-01  9.9982E-02  1.0010E-01  1.0002E-01  1.0001E-01
+                1.0047E-01  1.0008E-01  1.0051E-01  1.0027E-01  1.0002E-01
+    GRADIENT:  -8.0254E+02  4.4814E+04 -4.3308E+03 -5.2236E+04  1.4069E+04 -2.5868E+02  1.8365E+01  1.3788E+01 -5.7835E-01 -2.5119E+01
+               -3.3166E+02 -4.3750E+01 -3.6503E+02  1.4026E+02 -1.7134E+01
+    
+   0ITERATION NO.:    4    OBJECTIVE VALUE:   31554.2285266773        NO. OF FUNC. EVALS.:  13
+    CUMULATIVE NO. OF FUNC. EVALS.:       63
+    NPARAMETR:  4.8722E-01  4.3831E+00  1.1202E+00  3.8361E+00  1.2500E+00  4.0090E-01  9.9974E-03  2.0005E-01  3.0014E-03  2.0005E-03
+                4.0050E-02  1.0017E-03  5.0073E-02  5.0035E-02  2.0001E+00
+    PARAMETER:  9.7443E-02  1.2523E-01  1.1202E-01  9.5904E-02  6.2501E-02  1.0022E-01  9.9974E-02  1.0013E-01  1.0003E-01  1.0001E-01
+                1.0062E-01  1.0011E-01  1.0073E-01  1.0035E-01  1.0002E-01
+    GRADIENT:  -8.3881E+02  3.8828E+04 -2.6671E+03 -4.3747E+04  8.3471E+03 -3.7413E+02  1.9757E+01  1.5213E+01  6.8394E-01 -2.3157E+01
+               -2.6779E+02 -4.9386E+01 -3.6369E+02  4.9744E+02 -8.7413E+00
+    
+   0ITERATION NO.:    5    OBJECTIVE VALUE:   31531.6473292688        NO. OF FUNC. EVALS.:  13
+    CUMULATIVE NO. OF FUNC. EVALS.:       76
+    NPARAMETR:  4.7961E-01  4.3757E+00  1.1909E+00  3.8357E+00  1.2631E+00  4.4704E-01  9.9540E-03  2.0017E-01  3.0087E-03  2.0058E-03
+                4.0233E-02  1.0181E-03  5.0877E-02  4.7827E-02  1.9992E+00
+    PARAMETER:  9.5923E-02  1.2502E-01  1.1909E-01  9.5893E-02  6.3154E-02  1.1176E-01  9.9540E-02  1.0041E-01  1.0025E-01  1.0025E-01
+                1.0290E-01  1.0156E-01  1.0869E-01  7.7784E-02  9.9809E-02
+    GRADIENT:  -8.5879E+02  3.7646E+04  1.2832E+03 -4.7431E+04  8.8534E+03 -4.4008E+02  2.2190E+01  1.3997E+01 -4.3334E-01 -1.9607E+01
+               -2.6382E+02 -6.2979E+01 -3.4378E+02  2.7449E+02 -1.2229E+01
+    
+   0ITERATION NO.:    6    OBJECTIVE VALUE:   31450.3874605720        NO. OF FUNC. EVALS.:  12
+    CUMULATIVE NO. OF FUNC. EVALS.:       88
+    NPARAMETR:  4.3826E-01  4.3689E+00  1.1492E+00  3.8618E+00  1.0954E+00  6.9385E-01  9.7218E-03  2.0080E-01  3.0483E-03  2.0332E-03
+                4.1207E-02  1.1074E-03  5.5328E-02  3.7873E-02  1.9948E+00
+    PARAMETER:  8.7652E-02  1.2483E-01  1.1492E-01  9.6545E-02  5.4768E-02  1.7346E-01  9.7218E-02  1.0199E-01  1.0141E-01  1.0146E-01
+                1.1487E-01  1.0935E-01  1.5062E-01 -3.8892E-02  9.8703E-02
+    GRADIENT:  -1.1429E+03  3.7302E+04 -2.3501E+03 -4.7886E+04  4.3895E+03  3.7566E+02  1.9881E+01 -2.6173E+00  5.3955E+00 -2.3438E+01
+               -2.6493E+02 -4.8103E+01 -3.2175E+02 -7.1493E+02 -1.7471E+01
+    
+   0ITERATION NO.:    7    OBJECTIVE VALUE:   31360.0328537916        NO. OF FUNC. EVALS.:  12
+    CUMULATIVE NO. OF FUNC. EVALS.:      100
+    NPARAMETR:  5.4437E-01  4.3755E+00  1.1221E+00  3.8596E+00  1.1076E+00  6.1205E-01  7.0704E-03  2.1894E-01  3.5908E-03  2.4022E-03
+                5.6139E-02  2.3106E-03  1.3659E-01  3.7483E-02  1.9883E+00
+    PARAMETER:  1.0887E-01  1.2501E-01  1.1221E-01  9.6491E-02  5.5379E-02  1.5301E-01  7.0704E-02  1.4525E-01  1.1440E-01  1.1479E-01
+                2.6951E-01  1.9764E-01  6.0248E-01 -4.4073E-02  9.7067E-02
+    GRADIENT:  -5.9958E+02  2.8868E+04 -1.4552E+03 -5.0380E+04  4.8339E+03  9.1495E+01  7.8510E+00  1.4712E+01 -6.3747E+00 -1.0229E+01
+               -1.5351E+02 -1.6974E+01  3.9603E+01 -7.0685E+02 -1.9349E+01
+    
+   0ITERATION NO.:    8    OBJECTIVE VALUE:   31354.8478446531        NO. OF FUNC. EVALS.:  13
+    CUMULATIVE NO. OF FUNC. EVALS.:      113
+    NPARAMETR:  4.5820E-01  4.3627E+00  1.1241E+00  3.8672E+00  1.1300E+00  6.4140E-01  6.9097E-03  2.2021E-01  3.6534E-03  2.4205E-03
+                5.6957E-02  2.3914E-03  1.4204E-01  3.7915E-02  1.9880E+00
+    PARAMETER:  9.1641E-02  1.2465E-01  1.1241E-01  9.6681E-02  5.6499E-02  1.6035E-01  6.9097E-02  1.4813E-01  1.1606E-01  1.1534E-01
+                2.7674E-01  2.0313E-01  6.2205E-01 -3.8336E-02  9.7002E-02
+    GRADIENT:  -9.0518E+02  2.7662E+04 -1.4406E+03 -5.1211E+04  4.8930E+03  1.2037E+02  7.5748E+00  1.0676E+01 -1.8943E+00 -1.0251E+01
+               -1.4292E+02 -1.6261E+01  4.9265E+01 -6.2440E+02 -1.9207E+01
+    
+   0ITERATION NO.:    9    OBJECTIVE VALUE:   31353.1505611023        NO. OF FUNC. EVALS.:  13
+    CUMULATIVE NO. OF FUNC. EVALS.:      126
+    NPARAMETR:  4.7805E-01  4.3658E+00  1.1316E+00  3.8661E+00  1.1355E+00  7.0804E-01  6.7319E-03  2.2227E-01  3.7577E-03  2.4347E-03
+                5.7176E-02  2.4695E-03  1.4357E-01  3.8583E-02  1.9879E+00
+    PARAMETER:  9.5609E-02  1.2474E-01  1.1316E-01  9.6652E-02  5.6775E-02  1.7701E-01  6.7319E-02  1.5279E-01  1.1882E-01  1.1547E-01
+                2.7864E-01  2.0939E-01  6.2739E-01 -2.9606E-02  9.6961E-02
+    GRADIENT:  -8.1982E+02  2.7786E+04 -1.4645E+03 -5.0691E+04  5.1554E+03  1.8874E+02  7.5742E+00  1.4177E+01 -3.0395E+00 -9.8992E+00
+               -1.4276E+02 -1.5836E+01  4.9296E+01 -5.3254E+02 -1.8356E+01
+    
+   0ITERATION NO.:   10    OBJECTIVE VALUE:   31323.8653507847        NO. OF FUNC. EVALS.:  12
+    CUMULATIVE NO. OF FUNC. EVALS.:      138
+    NPARAMETR:  4.5144E-01  4.3391E+00  1.1566E+00  3.8922E+00  1.1450E+00  6.8972E-01 -1.1191E-02  5.5593E-01  2.2136E-02  3.5583E-03
+                5.4353E-02  9.5306E-03  1.2483E-01  3.7742E-02  1.9353E+00
+    PARAMETER:  9.0287E-02  1.2397E-01  1.1566E-01  9.7305E-02  5.7251E-02  1.7243E-01 -1.1191E-01  6.1116E-01  4.4257E-01  1.0671E-01
+                2.4570E-01  8.3669E-01  5.5117E-01 -4.0625E-02  8.3546E-02
+    GRADIENT:  -7.0820E+02  2.6986E+04 -1.4482E+03 -4.7277E+04  4.9797E+03  1.8246E+02  8.4999E+00  9.9008E+01 -1.5633E-01 -1.0425E+01
+               -1.4147E+02 -1.6115E+01  4.1233E+01 -5.8281E+02 -1.6175E+01
+    
+   0ITERATION NO.:   11    OBJECTIVE VALUE:   31208.2244588223        NO. OF FUNC. EVALS.:  13
+    CUMULATIVE NO. OF FUNC. EVALS.:      151
+    NPARAMETR:  5.3366E-01  4.2879E+00  1.2533E+00  3.9127E+00  1.1395E+00  6.7523E-01 -7.8334E-02  4.5958E-01  6.9570E-02  2.8819E-03
+                5.7135E-02  3.3123E-02  9.9335E-02  3.7575E-02  1.6443E+00
+    PARAMETER:  1.0673E-01  1.2251E-01  1.2533E-01  9.7818E-02  5.6976E-02  1.6881E-01 -7.8334E-01  5.1600E-01  1.5298E+00  9.5058E-02
+                1.7696E-01  3.1201E+00  3.1236E-01 -4.2845E-02  2.0837E-03
+    GRADIENT:  -7.3276E+02  2.1383E+04 -1.2733E+02 -4.5755E+04  3.3186E+03  1.3432E+02  1.2169E+01  7.3813E+01  1.0003E+01 -1.5431E+01
+               -1.1985E+02 -3.7297E+00 -1.0778E+01 -5.6009E+02 -1.3170E+01
+    
+   0ITERATION NO.:   12    OBJECTIVE VALUE:   31205.5394265566        NO. OF FUNC. EVALS.:  12
+    CUMULATIVE NO. OF FUNC. EVALS.:      163
+    NPARAMETR:  5.2849E-01  4.2853E+00  1.2575E+00  3.9202E+00  1.1332E+00  6.7500E-01 -8.2772E-02  4.5587E-01  7.0593E-02  3.4484E-03
+                5.1800E-02  3.1604E-02  1.0249E-01  3.7693E-02  1.6037E+00
+    PARAMETER:  1.0570E-01  1.2244E-01  1.2575E-01  9.8004E-02  5.6658E-02  1.6875E-01 -8.2772E-01  5.1195E-01  1.5586E+00  1.1420E-01
+                1.1131E-01  3.1671E+00  3.2815E-01 -4.1275E-02 -1.0419E-02
+    GRADIENT:  -8.1142E+02  2.3592E+04 -1.0531E+02 -4.3860E+04  3.1022E+03  1.2504E+02  1.1641E+01  7.3086E+01  8.9026E+00 -1.4628E+01
+               -1.6421E+02 -1.6364E+00  1.1263E+00 -5.4527E+02 -1.2186E+01
+    
+   0ITERATION NO.:   13    OBJECTIVE VALUE:   31020.8888407860        NO. OF FUNC. EVALS.:  17
+    CUMULATIVE NO. OF FUNC. EVALS.:      180
+    NPARAMETR:  6.5388E-01  4.2126E+00  1.3070E+00  4.0631E+00  1.0385E+00  6.6895E-01 -6.3626E-01  3.1430E-01  1.3052E-01  8.3335E-02
+                9.5346E-02  6.9859E-02  9.6067E-02  3.9284E-02  2.9352E-02
+    PARAMETER:  1.3078E-01  1.2036E-01  1.3070E-01  1.0158E-01  5.1924E-02  1.6724E-01 -6.3626E+00  3.2601E-01  3.4705E+00  3.3239E+00
+                1.1469E-01  3.5813E+00  3.3881E-02 -2.0598E-02 -2.0108E+00
+    GRADIENT:   9.5814E+01 -8.4422E+03  4.1502E+03 -1.9139E+04 -6.3507E+03 -1.5513E+02  1.7578E+00 -1.4846E+01  2.9709E+01 -1.4469E+01
+               -7.1867E+01  1.4218E+01 -9.7292E+01 -1.9852E+02 -1.1052E-01
+    
+   0ITERATION NO.:   14    OBJECTIVE VALUE:   30979.4187391729        NO. OF FUNC. EVALS.:  12
+    CUMULATIVE NO. OF FUNC. EVALS.:      192
+    NPARAMETR:  4.3520E-01  4.1637E+00  1.2735E+00  4.1097E+00  1.0352E+00  6.7771E-01 -6.3099E-01  3.5795E-01  4.4807E-02  1.3992E-01
+                5.9194E-02  5.6616E-02  1.1895E-01  3.9733E-02  1.2551E-02
+    PARAMETER:  8.7040E-02  1.1896E-01  1.2735E-01  1.0274E-01  5.1762E-02  1.6943E-01 -6.3099E+00  3.9104E-01  1.1164E+00  5.2296E+00
+                2.4676E-01  3.4808E+00 -6.7761E-02 -1.4914E-02 -2.4356E+00
+    GRADIENT:  -9.7018E+02 -1.1664E+04  5.0554E+03 -1.3951E+04 -8.7084E+03 -1.1470E+02  7.9303E-01  6.9691E+01 -1.4371E+01  6.9423E+00
+               -5.3197E+01  3.3606E+00  4.5653E+00 -7.1048E+01 -4.8213E-02
+    
+   0ITERATION NO.:   15    OBJECTIVE VALUE:   30933.8198562687        NO. OF FUNC. EVALS.:  12
+    CUMULATIVE NO. OF FUNC. EVALS.:      204
+    NPARAMETR:  4.8528E-01  4.1701E+00  1.2226E+00  4.1506E+00  1.0546E+00  6.8004E-01 -5.6748E-01  2.8457E-01  7.2622E-02  1.3393E-01
+                7.4657E-02  6.1382E-02  1.2516E-01  4.0191E-02  1.3295E-02
+    PARAMETER:  9.7056E-02  1.1915E-01  1.2226E-01  1.0376E-01  5.2728E-02  1.7001E-01 -5.6748E+00  2.7632E-01  2.0294E+00  5.6138E+00
+                2.6990E-01  2.3662E+00  8.9755E-02 -9.1905E-03 -2.4067E+00
+    GRADIENT:  -4.7270E+02 -8.2186E+01  9.8619E+02 -5.1342E+03 -6.8807E+03  5.9630E+01  7.6030E-01  2.8870E+01 -4.6920E+00  5.2605E+00
+               -4.6930E+00 -4.5461E+00  6.1879E+01  1.8096E+01 -1.7623E-02
+    
+   0ITERATION NO.:   16    OBJECTIVE VALUE:   30890.9987943899        NO. OF FUNC. EVALS.:  12
+    CUMULATIVE NO. OF FUNC. EVALS.:      216
+    NPARAMETR:  4.6376E-01  4.1118E+00  1.2081E+00  4.1754E+00  1.2844E+00  6.2408E-01 -6.5820E-01  2.3168E-01  7.5940E-02  1.1293E-01
+                8.0463E-02  6.3539E-02  1.1407E-01  3.8971E-02  7.7778E-01
+    PARAMETER:  9.2752E-02  1.1748E-01  1.2081E-01  1.0439E-01  6.4219E-02  1.5602E-01 -6.5820E+00  1.7352E-01  2.3519E+00  5.2463E+00
+                2.6496E-01  2.3185E+00  6.2728E-02 -2.4606E-02 -3.7223E-01
+    GRADIENT:   1.8338E+02 -9.8897E+02 -8.3728E+02 -7.0109E+03  9.5808E+02  1.7187E+01 -3.1489E+00 -5.4986E+00 -1.5577E+00  3.3943E+00
+               -1.8678E+01 -9.2803E-01  5.6787E+01 -7.5133E+01 -9.7328E-01
+    
+   0ITERATION NO.:   17    OBJECTIVE VALUE:   30886.8253362428        NO. OF FUNC. EVALS.:  12
+    CUMULATIVE NO. OF FUNC. EVALS.:      228
+    NPARAMETR:  4.3583E-01  4.1004E+00  1.2188E+00  4.2118E+00  1.2942E+00  6.2711E-01 -6.1493E-01  2.4804E-01  7.3022E-02  9.2629E-02
+                7.8343E-02  5.5304E-02  9.5145E-02  3.9960E-02  8.3353E-02
+    PARAMETER:  8.7166E-02  1.1715E-01  1.2188E-01  1.0529E-01  6.4708E-02  1.5678E-01 -6.1493E+00  2.0763E-01  2.1857E+00  4.1588E+00
+                2.7629E-01  2.4230E+00  6.6590E-02 -1.2076E-02 -1.4889E+00
+    GRADIENT:   7.5292E+01 -2.4055E+03 -1.0438E+02 -4.3551E+02  1.1310E+02 -2.7530E+01 -1.1847E+00  1.1530E+01  3.2645E-01 -4.2099E+00
+               -1.5264E+01 -2.4212E+00  3.9660E+01  4.5892E+01 -6.8847E-02
+    
+   0ITERATION NO.:   18    OBJECTIVE VALUE:   30881.5869119919        NO. OF FUNC. EVALS.:  12
+    CUMULATIVE NO. OF FUNC. EVALS.:      240
+    NPARAMETR:  4.3236E-01  4.1053E+00  1.2199E+00  4.2193E+00  1.2906E+00  6.2549E-01 -5.7849E-01  2.4885E-01  7.7767E-02  1.1200E-01
+                8.4400E-02  6.7479E-02  1.0825E-01  4.0331E-02  2.4921E-02
+    PARAMETER:  8.6471E-02  1.1729E-01  1.2199E-01  1.0548E-01  6.4531E-02  1.5637E-01 -5.7849E+00  2.0926E-01  2.3239E+00  5.0206E+00
+                3.0411E-01  2.7300E+00 -7.5583E-03 -7.4513E-03 -2.0926E+00
+    GRADIENT:   4.3098E+01 -1.5411E+03 -2.5310E+01  1.0867E+03 -5.4546E+01 -2.4254E+01 -5.2078E-01  6.7327E+00  9.3894E-01  2.2258E-01
+               -1.0679E+01  1.4983E+00  3.7321E+01  8.1757E+01 -1.5862E-02
+    
+   0ITERATION NO.:   19    OBJECTIVE VALUE:   30878.8554050043        NO. OF FUNC. EVALS.:  13
+    CUMULATIVE NO. OF FUNC. EVALS.:      253
+    NPARAMETR:  4.2075E-01  4.1167E+00  1.2232E+00  4.2109E+00  1.2870E+00  6.3017E-01 -5.9832E-01  2.3836E-01  7.0269E-02  1.1633E-01
+                8.7552E-02  7.0189E-02  1.0965E-01  3.9953E-02  3.5225E-02
+    PARAMETER:  8.4150E-02  1.1762E-01  1.2232E-01  1.0527E-01  6.4348E-02  1.5754E-01 -5.9832E+00  1.8774E-01  2.1456E+00  5.3277E+00
+                3.5725E-01  2.8612E+00 -9.8257E-02 -1.2156E-02 -1.9196E+00
+    GRADIENT:  -7.5196E+01  6.5017E+02 -1.1208E+02 -4.6735E+02  8.8075E+01 -4.8206E+00 -1.4512E+00  6.5017E+00 -1.3391E+00  2.1624E+00
+                1.1836E+01  9.9222E-01  2.6256E+01  2.7401E+01 -4.0039E-02
+    
+   0ITERATION NO.:   20    OBJECTIVE VALUE:   30877.5106981975        NO. OF FUNC. EVALS.:  12
+    CUMULATIVE NO. OF FUNC. EVALS.:      265
+    NPARAMETR:  4.2966E-01  4.1173E+00  1.2259E+00  4.2100E+00  1.2859E+00  6.3465E-01 -5.3943E-01  2.1975E-01  6.3728E-02  1.1144E-01
+                8.5439E-02  7.0042E-02  1.0796E-01  3.9697E-02  3.2937E-02
+    PARAMETER:  8.5932E-02  1.1764E-01  1.2259E-01  1.0525E-01  6.4295E-02  1.5866E-01 -5.3943E+00  1.4709E-01  2.0265E+00  5.3156E+00
+                3.5815E-01  3.0043E+00 -1.5169E-01 -1.5377E-02 -1.9531E+00
+    GRADIENT:  -2.7730E+01 -8.1769E+01  9.0180E+01 -4.9480E+02  5.8239E+01  5.9230E+00  4.4303E-01 -2.2821E+00 -1.0148E+00  1.8419E+00
+                6.7909E+00  2.4586E+00  1.8989E+01 -1.1768E+01 -4.5867E-02
+    
+   0ITERATION NO.:   21    OBJECTIVE VALUE:   30876.5127580710        NO. OF FUNC. EVALS.:  12
+    CUMULATIVE NO. OF FUNC. EVALS.:      277
+    NPARAMETR:  4.4604E-01  4.1217E+00  1.2291E+00  4.2162E+00  1.2789E+00  6.2803E-01 -5.7518E-01  2.1518E-01  6.2833E-02  1.0795E-01
+                8.3624E-02  6.8135E-02  9.9240E-02  3.9831E-02  1.2210E-02
+    PARAMETER:  8.9208E-02  1.1776E-01  1.2291E-01  1.0540E-01  6.3945E-02  1.5701E-01 -5.7518E+00  1.3658E-01  2.0192E+00  5.2038E+00
+                3.4544E-01  2.9530E+00 -2.5531E-01 -1.3685E-02 -2.4493E+00
+    GRADIENT:   1.9468E+01  4.1910E+02 -3.8378E+01  1.2075E+03 -1.3434E+02 -1.3889E+01 -7.5220E-01 -3.3308E+00  2.6393E+00 -2.0015E+00
+                2.1704E-01  3.0662E+00 -3.7970E-01 -8.3669E+00 -1.4232E-02
+    
+   0ITERATION NO.:   22    OBJECTIVE VALUE:   30875.8671950583        NO. OF FUNC. EVALS.:  12
+    CUMULATIVE NO. OF FUNC. EVALS.:      289
+    NPARAMETR:  4.4698E-01  4.1205E+00  1.2255E+00  4.2144E+00  1.2786E+00  6.2809E-01 -5.6253E-01  2.1266E-01  6.0311E-02  1.1016E-01
+                8.1797E-02  6.6001E-02  9.9469E-02  3.9802E-02  1.6555E-02
+    PARAMETER:  8.9395E-02  1.1773E-01  1.2255E-01  1.0536E-01  6.3929E-02  1.5702E-01 -5.6253E+00  1.3069E-01  1.9496E+00  5.3416E+00
+                3.4094E-01  2.8161E+00 -2.7225E-01 -1.4052E-02 -2.2971E+00
+    GRADIENT:   2.5026E+01  3.7691E+02 -1.2753E+02  8.8363E+02 -3.6944E+01 -1.1770E+00 -4.3707E-01 -3.4155E+00 -2.7881E-01 -2.7472E-01
+                2.9788E+00  1.3577E+00  3.8725E+00 -1.3539E+01 -2.0543E-02
+    
+   0ITERATION NO.:   23    OBJECTIVE VALUE:   30875.4777225277        NO. OF FUNC. EVALS.:  12
+    CUMULATIVE NO. OF FUNC. EVALS.:      301
+    NPARAMETR:  4.4839E-01  4.1204E+00  1.2248E+00  4.2102E+00  1.2803E+00  6.2998E-01 -5.4816E-01  2.1813E-01  6.2647E-02  1.1507E-01
+                8.0950E-02  6.5560E-02  9.9778E-02  3.9846E-02  2.1853E-02
+    PARAMETER:  8.9677E-02  1.1773E-01  1.2248E-01  1.0526E-01  6.4016E-02  1.5750E-01 -5.4816E+00  1.4339E-01  1.9996E+00  5.5091E+00
+                3.2735E-01  2.6702E+00 -3.0357E-01 -1.3498E-02 -2.1583E+00
+    GRADIENT:   8.1872E+00  3.7203E+02 -9.6840E+01 -5.9524E+01  4.3966E+01  1.1962E+01 -1.9869E-02 -6.6126E-01 -1.0316E+00  3.2416E-01
+               -1.5128E-01  4.6688E-01  3.4515E+00 -8.7725E+00 -2.9441E-02
+    
+   0ITERATION NO.:   24    OBJECTIVE VALUE:   30875.3494295638        NO. OF FUNC. EVALS.:  12
+    CUMULATIVE NO. OF FUNC. EVALS.:      313
+    NPARAMETR:  4.4789E-01  4.1189E+00  1.2240E+00  4.2111E+00  1.2830E+00  6.2241E-01 -5.4424E-01  2.2107E-01  6.5573E-02  1.1872E-01
+                8.1481E-02  6.6017E-02  1.0002E-01  3.9878E-02  2.2888E-02
+    PARAMETER:  8.9578E-02  1.1768E-01  1.2240E-01  1.0528E-01  6.4151E-02  1.5560E-01 -5.4424E+00  1.5009E-01  2.0790E+00  5.6461E+00
+                3.1994E-01  2.5486E+00 -3.3417E-01 -1.3097E-02 -2.1351E+00
+    GRADIENT:  -7.3814E-01  2.4969E+02 -4.4909E+01  2.7705E+01  5.5402E+01 -7.7761E+00  6.6214E-02  4.5738E-01 -8.3209E-01  4.1557E-01
+               -9.6093E-01 -1.3994E-01  2.1633E+00 -7.8884E+00 -3.0990E-02
+    
+   0ITERATION NO.:   25    OBJECTIVE VALUE:   30875.3168473098        NO. OF FUNC. EVALS.:  12
+    CUMULATIVE NO. OF FUNC. EVALS.:      325
+    NPARAMETR:  4.4858E-01  4.1183E+00  1.2262E+00  4.2118E+00  1.2843E+00  6.3179E-01 -5.4767E-01  2.2157E-01  6.7274E-02  1.1979E-01
+                8.2203E-02  6.6579E-02  9.9736E-02  3.9959E-02  2.1841E-02
+    PARAMETER:  8.9716E-02  1.1767E-01  1.2262E-01  1.0529E-01  6.4215E-02  1.5795E-01 -5.4767E+00  1.5120E-01  2.1305E+00  5.6904E+00
+                3.1789E-01  2.5045E+00 -3.5267E-01 -1.2081E-02 -2.1586E+00
+    GRADIENT:  -6.1733E-01  1.2831E+02  7.8896E-01  3.4989E+01  4.7170E+01  1.7021E+01  1.3015E-02  8.6882E-01 -1.7566E-01  9.1379E-02
+               -1.0897E+00 -2.1856E-01  4.7653E-01  3.7107E-01 -2.9257E-02
+    
+   0ITERATION NO.:   26    OBJECTIVE VALUE:   30875.3005835746        NO. OF FUNC. EVALS.:  12
+    CUMULATIVE NO. OF FUNC. EVALS.:      337
+    NPARAMETR:  4.4860E-01  4.1185E+00  1.2256E+00  4.2114E+00  1.2836E+00  6.2626E-01 -5.4695E-01  2.2053E-01  6.6906E-02  1.1931E-01
+                8.2291E-02  6.6647E-02  9.9687E-02  3.9951E-02  2.1830E-02
+    PARAMETER:  8.9720E-02  1.1767E-01  1.2256E-01  1.0528E-01  6.4180E-02  1.5656E-01 -5.4695E+00  1.4885E-01  2.1239E+00  5.6811E+00
+                3.1963E-01  2.5201E+00 -3.5322E-01 -1.2186E-02 -2.1588E+00
+    GRADIENT:  -1.2391E+00  9.6777E+01  1.3777E+01 -6.6533E+00  1.8709E+01  3.0912E-01  2.5125E-02  3.1111E-01 -4.4316E-02  1.2131E-02
+               -6.4568E-01 -9.2980E-02  3.6533E-01 -4.5433E-01 -2.9345E-02
+    
+   0ITERATION NO.:   27    OBJECTIVE VALUE:   30875.2992510535        NO. OF FUNC. EVALS.:  12
+    CUMULATIVE NO. OF FUNC. EVALS.:      349
+    NPARAMETR:  4.4845E-01  4.1182E+00  1.2254E+00  4.2115E+00  1.2835E+00  6.2561E-01 -5.4745E-01  2.1975E-01  6.6680E-02  1.1917E-01
+                8.2377E-02  6.6716E-02  9.9714E-02  3.9945E-02  2.2109E-02
+    PARAMETER:  8.9691E-02  1.1766E-01  1.2254E-01  1.0529E-01  6.4177E-02  1.5640E-01 -5.4745E+00  1.4709E-01  2.1204E+00  5.6845E+00
+                3.2085E-01  2.5258E+00 -3.5611E-01 -1.2266E-02 -2.1525E+00
+    GRADIENT:   1.1862E+00  5.9293E+01  8.4890E+00  1.3921E+01  1.7011E+01 -1.4324E+00 -3.5607E-04 -8.2212E-02 -2.9191E-02  3.2061E-02
+               -2.2834E-01 -4.6205E-02  2.8603E-01 -1.5538E+00 -2.9828E-02
+    
+   0ITERATION NO.:   28    OBJECTIVE VALUE:   30875.2990548952        NO. OF FUNC. EVALS.:  12
+    CUMULATIVE NO. OF FUNC. EVALS.:      361
+    NPARAMETR:  4.4824E-01  4.1180E+00  1.2252E+00  4.2114E+00  1.2835E+00  6.2557E-01 -5.4742E-01  2.1959E-01  6.6610E-02  1.1914E-01
+                8.2412E-02  6.6736E-02  9.9689E-02  3.9945E-02  2.2411E-02
+    PARAMETER:  8.9648E-02  1.1766E-01  1.2252E-01  1.0529E-01  6.4173E-02  1.5639E-01 -5.4742E+00  1.4671E-01  2.1190E+00  5.6850E+00
+                3.2135E-01  2.5279E+00 -3.5768E-01 -1.2254E-02 -2.1457E+00
+    GRADIENT:   9.7073E-01  3.7509E+01  8.7103E+00  2.5683E+00  1.1657E+01 -1.5053E+00 -3.4390E-04 -1.1501E-01 -1.6317E-02  1.6402E-02
+               -3.9764E-02 -3.8030E-02  1.8560E-01 -1.4624E+00 -3.0276E-02
+    
+   0ITERATION NO.:   29    OBJECTIVE VALUE:   30875.2990468735        NO. OF FUNC. EVALS.:  13
+    CUMULATIVE NO. OF FUNC. EVALS.:      374
+    NPARAMETR:  4.4824E-01  4.1180E+00  1.2252E+00  4.2114E+00  1.2835E+00  6.2557E-01 -5.4742E-01  2.1958E-01  6.6609E-02  1.1914E-01
+                8.2413E-02  6.6736E-02  9.9689E-02  3.9945E-02  2.2418E-02
+    PARAMETER:  8.9648E-02  1.1766E-01  1.2252E-01  1.0529E-01  6.4173E-02  1.5639E-01 -5.4742E+00  1.4671E-01  2.1190E+00  5.6850E+00
+                3.2136E-01  2.5279E+00 -3.5770E-01 -1.2254E-02 -2.1455E+00
+    GRADIENT:   9.7352E-01  3.7187E+01  8.7166E+00  2.3836E+00  1.1632E+01 -1.4963E+00 -3.1706E-04 -1.1528E-01 -1.6195E-02  1.6384E-02
+               -3.8643E-02 -3.7868E-02  1.8435E-01 -1.4613E+00 -3.0286E-02
+    
+   0ITERATION NO.:   30    OBJECTIVE VALUE:   30875.2990468735        NO. OF FUNC. EVALS.:  30
+    CUMULATIVE NO. OF FUNC. EVALS.:      404
+    NPARAMETR:  4.4824E-01  4.1180E+00  1.2252E+00  4.2114E+00  1.2835E+00  6.2557E-01 -5.4742E-01  2.1958E-01  6.6609E-02  1.1914E-01
+                8.2413E-02  6.6736E-02  9.9689E-02  3.9945E-02  2.2418E-02
+    PARAMETER:  8.9648E-02  1.1766E-01  1.2252E-01  1.0529E-01  6.4173E-02  1.5639E-01 -5.4742E+00  1.4671E-01  2.1190E+00  5.6850E+00
+                3.2136E-01  2.5279E+00 -3.5770E-01 -1.2254E-02 -2.1455E+00
+    GRADIENT:   7.9426E-01 -4.2366E+01 -1.8109E+01 -2.0301E+01  9.3095E+00 -2.0028E+00 -4.8127E-03 -1.1528E-01 -1.6195E-02  1.6384E-02
+               -3.8643E-02 -3.7868E-02  1.8435E-01 -1.4812E+00 -3.0284E-02
+    
+   0ITERATION NO.:   31    OBJECTIVE VALUE:   30875.2975587654        NO. OF FUNC. EVALS.:  29
+    CUMULATIVE NO. OF FUNC. EVALS.:      433
+    NPARAMETR:  4.4857E-01  4.1184E+00  1.2257E+00  4.2114E+00  1.2833E+00  6.2629E-01 -5.4761E-01  2.1961E-01  6.6602E-02  1.1914E-01
+                8.2429E-02  6.6759E-02  9.9685E-02  3.9951E-02  2.2256E-02
+    PARAMETER:  8.9715E-02  1.1767E-01  1.2257E-01  1.0528E-01  6.4163E-02  1.5657E-01 -5.4761E+00  1.4677E-01  2.1186E+00  5.6846E+00
+                3.2155E-01  2.5301E+00 -3.5815E-01 -1.2181E-02 -2.1491E+00
+    GRADIENT:  -8.0975E-01 -2.6452E+01 -5.5124E+00 -3.7300E+01  1.7428E+00 -5.7190E-01 -6.3785E-04 -2.8123E-02  2.7658E-03  1.3968E-03
+                8.3356E-03 -2.6367E-02  1.0719E-01 -8.2230E-01 -3.0077E-02
+    
+   0ITERATION NO.:   32    OBJECTIVE VALUE:   30875.2964208402        NO. OF FUNC. EVALS.:  27
+    CUMULATIVE NO. OF FUNC. EVALS.:      460
+    NPARAMETR:  4.4892E-01  4.1186E+00  1.2261E+00  4.2112E+00  1.2831E+00  6.2742E-01 -5.4795E-01  2.1943E-01  6.6476E-02  1.1916E-01
+                8.2506E-02  6.6841E-02  9.9680E-02  3.9957E-02  2.4151E-02
+    PARAMETER:  8.9785E-02  1.1767E-01  1.2261E-01  1.0528E-01  6.4154E-02  1.5685E-01 -5.4795E+00  1.4637E-01  2.1155E+00  5.6880E+00
+                3.2265E-01  2.5368E+00 -3.6226E-01 -1.2114E-02 -2.1083E+00
+    GRADIENT:  -1.5361E+00 -1.8499E+01  2.7812E+00 -6.6718E+01 -2.6352E+00  2.3763E+00 -6.9738E-03  3.6206E-03  3.3036E-02 -1.9595E-02
+                3.4788E-01  1.6952E-02 -1.6173E-01 -4.5735E-01 -3.2736E-02
+    
+   0ITERATION NO.:   33    OBJECTIVE VALUE:   30875.2939687226        NO. OF FUNC. EVALS.:  28
+    CUMULATIVE NO. OF FUNC. EVALS.:      488
+    NPARAMETR:  4.4958E-01  4.1186E+00  1.2261E+00  4.2114E+00  1.2834E+00  6.2643E-01 -5.4713E-01  2.1934E-01  6.6518E-02  1.1927E-01
+                8.2415E-02  6.6778E-02  9.9676E-02  3.9950E-02  2.7490E-02
+    PARAMETER:  8.9916E-02  1.1767E-01  1.2261E-01  1.0528E-01  6.4168E-02  1.5661E-01 -5.4713E+00  1.4615E-01  2.1173E+00  5.6946E+00
+                3.2164E-01  2.5281E+00 -3.6353E-01 -1.2195E-02 -2.0435E+00
+    GRADIENT:   1.9013E+00 -4.3688E+01  5.3310E+00 -2.7290E+01  8.2476E+00 -2.8570E-01  1.7441E-02 -1.6212E-01 -8.1404E-03  1.5021E-02
+                4.0707E-02 -2.0195E-02 -8.6227E-02 -1.5228E+00 -3.7175E-02
+    
+   0ITERATION NO.:   34    OBJECTIVE VALUE:   30875.1563716382        NO. OF FUNC. EVALS.:  31
+    CUMULATIVE NO. OF FUNC. EVALS.:      519
+    NPARAMETR:  4.5323E-01  4.1171E+00  1.2250E+00  4.2117E+00  1.2846E+00  6.1915E-01 -5.4280E-01  2.1862E-01  6.6243E-02  1.2012E-01
+                8.2048E-02  6.6486E-02  9.9487E-02  3.9883E-02  3.7288E-01
+    PARAMETER:  9.0645E-02  1.1763E-01  1.2250E-01  1.0529E-01  6.4229E-02  1.5479E-01 -5.4280E+00  1.4451E-01  2.1120E+00  5.7444E+00
+                3.1949E-01  2.4907E+00 -3.8648E-01 -1.3032E-02 -7.3983E-01
+    GRADIENT:   2.6346E+01 -2.8164E+02 -1.1435E+01  2.1327E+02  4.9476E+01 -1.8588E+01  1.0929E-01 -9.3940E-01 -2.6568E-01  1.1823E-01
+               -3.0666E-01 -2.2825E-01 -2.9002E-01 -4.7951E+00 -3.3889E-01
+    
+   0ITERATION NO.:   35    OBJECTIVE VALUE:   30875.0275427393        NO. OF FUNC. EVALS.:  27
+    CUMULATIVE NO. OF FUNC. EVALS.:      546
+    NPARAMETR:  4.5435E-01  4.1165E+00  1.2250E+00  4.2114E+00  1.2854E+00  6.1788E-01 -5.4117E-01  2.1806E-01  6.6211E-02  1.2042E-01
+                8.2025E-02  6.6481E-02  9.9469E-02  3.9837E-02  1.0042E+00
+    PARAMETER:  9.0869E-02  1.1762E-01  1.2250E-01  1.0528E-01  6.4271E-02  1.5447E-01 -5.4117E+00  1.4323E-01  2.1137E+00  5.7662E+00
+                3.1905E-01  2.4775E+00 -3.9625E-01 -1.3609E-02 -2.4447E-01
+    GRADIENT:   3.7235E+01 -3.3024E+02 -2.9973E+01  4.1304E+02  5.6768E+01 -2.1738E+01  1.5065E-01 -1.2550E+00 -2.7222E-01  1.1538E-01
+               -3.2732E-01 -2.9068E-01 -2.5637E-01  1.0967E+00 -1.1875E-01
+    
+   0ITERATION NO.:   36    OBJECTIVE VALUE:   30874.9935524912        NO. OF FUNC. EVALS.:  27
+    CUMULATIVE NO. OF FUNC. EVALS.:      573
+    NPARAMETR:  4.5330E-01  4.1170E+00  1.2258E+00  4.2104E+00  1.2856E+00  6.2058E-01 -5.4265E-01  2.1815E-01  6.6299E-02  1.2032E-01
+                8.2220E-02  6.6686E-02  9.9586E-02  3.9783E-02  1.3224E+00
+    PARAMETER:  9.0660E-02  1.1763E-01  1.2258E-01  1.0526E-01  6.4279E-02  1.5515E-01 -5.4265E+00  1.4344E-01  2.1160E+00  5.7604E+00
+                3.2026E-01  2.4912E+00 -3.9382E-01 -1.4292E-02 -1.0685E-01
+    GRADIENT:   3.0637E+01 -2.5427E+02 -2.0646E+01  3.1330E+02  4.9748E+01 -1.5286E+01  1.1394E-01 -9.9701E-01 -1.5263E-01  7.5932E-02
+               -1.7496E-01 -1.9244E-01 -3.1397E-01  5.0009E-01  2.8572E-01
+    
+   0ITERATION NO.:   37    OBJECTIVE VALUE:   30874.9475783545        NO. OF FUNC. EVALS.:  27
+    CUMULATIVE NO. OF FUNC. EVALS.:      600
+    NPARAMETR:  4.5157E-01  4.1177E+00  1.2268E+00  4.2095E+00  1.2854E+00  6.2456E-01 -5.4505E-01  2.1848E-01  6.6407E-02  1.2004E-01
+                8.2463E-02  6.6924E-02  9.9730E-02  3.9754E-02  1.1925E+00
+    PARAMETER:  9.0314E-02  1.1765E-01  1.2268E-01  1.0524E-01  6.4268E-02  1.5614E-01 -5.4505E+00  1.4418E-01  2.1179E+00  5.7425E+00
+                3.2193E-01  2.5134E+00 -3.8598E-01 -1.4654E-02 -1.5853E-01
+    GRADIENT:   1.7153E+01 -1.5388E+02  4.2526E+00  5.8019E+01  4.2838E+01 -5.5945E+00  5.7407E-02 -5.9973E-01 -1.9019E-02  4.3365E-02
+                4.8470E-02 -4.8058E-02 -4.3584E-01 -4.4895E+00  3.9046E-02
+    
+   0ITERATION NO.:   38    OBJECTIVE VALUE:   30874.9321997919        NO. OF FUNC. EVALS.:  27
+    CUMULATIVE NO. OF FUNC. EVALS.:      627
+    NPARAMETR:  4.4861E-01  4.1180E+00  1.2267E+00  4.2090E+00  1.2845E+00  6.2684E-01 -5.4719E-01  2.1880E-01  6.6239E-02  1.1950E-01
+                8.2496E-02  6.6899E-02  9.9748E-02  3.9762E-02  1.1591E+00
+    PARAMETER:  8.9722E-02  1.1766E-01  1.2267E-01  1.0523E-01  6.4225E-02  1.5671E-01 -5.4719E+00  1.4491E-01  2.1110E+00  5.7125E+00
+                3.2325E-01  2.5335E+00 -3.7377E-01 -1.4555E-02 -1.7275E-01
+    GRADIENT:   1.0916E+00 -6.6023E+01  1.1381E+01 -6.4657E+01 -3.2513E-01 -4.8843E-01  5.8683E-03  2.8986E-02 -3.9392E-02  8.3585E-03
+                3.7668E-01 -2.1651E-02 -1.9804E-01 -2.4975E+00 -2.0738E-03
+    
+   0ITERATION NO.:   39    OBJECTIVE VALUE:   30874.9306158503        NO. OF FUNC. EVALS.:  27
+    CUMULATIVE NO. OF FUNC. EVALS.:      654
+    NPARAMETR:  4.4837E-01  4.1183E+00  1.2268E+00  4.2092E+00  1.2845E+00  6.2716E-01 -5.4748E-01  2.1886E-01  6.6333E-02  1.1939E-01
+                8.2482E-02  6.6911E-02  9.9806E-02  3.9778E-02  1.1406E+00
+    PARAMETER:  8.9675E-02  1.1767E-01  1.2268E-01  1.0523E-01  6.4223E-02  1.5679E-01 -5.4748E+00  1.4506E-01  2.1137E+00  5.7065E+00
+                3.2273E-01  2.5352E+00 -3.6926E-01 -1.4355E-02 -1.8081E-01
+    GRADIENT:   2.9015E-01 -1.4861E+01  3.6946E+00 -2.7558E+01  1.6261E+00  3.7295E-01 -1.4472E-03  2.8899E-03 -5.2989E-03  1.2564E-02
+                9.4741E-02  9.9565E-03 -1.4454E-02 -5.6572E-01 -9.2091E-03
+    
+   0ITERATION NO.:   40    OBJECTIVE VALUE:   30874.9305148221        NO. OF FUNC. EVALS.:  27
+    CUMULATIVE NO. OF FUNC. EVALS.:      681
+    NPARAMETR:  4.4828E-01  4.1183E+00  1.2267E+00  4.2093E+00  1.2844E+00  6.2702E-01 -5.4744E-01  2.1886E-01  6.6340E-02  1.1934E-01
+                8.2458E-02  6.6878E-02  9.9772E-02  3.9782E-02  1.1403E+00
+    PARAMETER:  8.9655E-02  1.1767E-01  1.2267E-01  1.0523E-01  6.4221E-02  1.5675E-01 -5.4744E+00  1.4505E-01  2.1139E+00  5.7043E+00
+                3.2250E-01  2.5338E+00 -3.6848E-01 -1.4302E-02 -1.8093E-01
+    GRADIENT:  -1.6890E-02 -3.3033E+00  7.9521E-01 -2.0878E+00 -7.5662E-01  1.2379E-02  5.1581E-04  1.9034E-02 -1.2292E-03 -2.6164E-03
+                4.0850E-02 -3.7906E-03  3.8432E-03 -6.2921E-03 -3.0087E-03
+    
+   0ITERATION NO.:   41    OBJECTIVE VALUE:   30874.9304960298        NO. OF FUNC. EVALS.:  27
+    CUMULATIVE NO. OF FUNC. EVALS.:      708
+    NPARAMETR:  4.4829E-01  4.1183E+00  1.2267E+00  4.2093E+00  1.2844E+00  6.2700E-01 -5.4744E-01  2.1883E-01  6.6343E-02  1.1935E-01
+                8.2455E-02  6.6883E-02  9.9780E-02  3.9782E-02  1.1423E+00
+    PARAMETER:  8.9657E-02  1.1767E-01  1.2267E-01  1.0523E-01  6.4221E-02  1.5675E-01 -5.4744E+00  1.4500E-01  2.1141E+00  5.7049E+00
+                3.2244E-01  2.5337E+00 -3.6860E-01 -1.4299E-02 -1.8007E-01
+    GRADIENT:   8.5721E-02 -1.1622E+00  1.9203E-01 -1.7030E-02 -9.2482E-02 -3.3900E-03 -2.7394E-04  2.7011E-03  4.8572E-04  7.5333E-04
+                5.9664E-03  3.2417E-04  5.7939E-03  2.8500E-02 -1.8207E-04
+    
+   0ITERATION NO.:   42    OBJECTIVE VALUE:   30874.9304955391        NO. OF FUNC. EVALS.:  27
+    CUMULATIVE NO. OF FUNC. EVALS.:      735
+    NPARAMETR:  4.4827E-01  4.1183E+00  1.2267E+00  4.2093E+00  1.2844E+00  6.2699E-01 -5.4743E-01  2.1882E-01  6.6338E-02  1.1935E-01
+                8.2452E-02  6.6881E-02  9.9777E-02  3.9782E-02  1.1427E+00
+    PARAMETER:  8.9654E-02  1.1767E-01  1.2267E-01  1.0523E-01  6.4221E-02  1.5675E-01 -5.4743E+00  1.4497E-01  2.1140E+00  5.7050E+00
+                3.2243E-01  2.5337E+00 -3.6868E-01 -1.4301E-02 -1.7986E-01
+    GRADIENT:   3.7583E-02 -3.0466E-01 -1.6315E-02  2.1270E-01 -1.9074E-03 -1.1846E-02  3.2640E-06  5.1221E-04  2.0488E-04  8.6995E-05
+                2.2016E-03 -5.5178E-05  1.5920E-03  9.9566E-03  3.0741E-04
+    
+   0ITERATION NO.:   43    OBJECTIVE VALUE:   30874.9304873990        NO. OF FUNC. EVALS.:  31
+    CUMULATIVE NO. OF FUNC. EVALS.:      766            RESET HESSIAN, TYPE II
+    NPARAMETR:  4.4827E-01  4.1183E+00  1.2267E+00  4.2093E+00  1.2844E+00  6.2699E-01 -5.4743E-01  2.1882E-01  6.6338E-02  1.1935E-01
+                8.2452E-02  6.6881E-02  9.9777E-02  3.9782E-02  1.1407E+00
+    PARAMETER:  8.9654E-02  1.1767E-01  1.2267E-01  1.0523E-01  6.4221E-02  1.5675E-01 -5.4743E+00  1.4497E-01  2.1140E+00  5.7050E+00
+                3.2243E-01  2.5337E+00 -3.6868E-01 -1.4301E-02 -1.8074E-01
+    GRADIENT:   1.8932E-01  7.9168E+01  2.6683E+01  2.1398E+01  2.3951E+00  5.0209E-01  4.4509E-03  2.7642E-04  1.2136E-05  2.9089E-04
+                2.0063E-03 -4.6450E-05  6.1586E-04 -1.0792E-02 -2.4855E-03
+    
+   0ITERATION NO.:   44    OBJECTIVE VALUE:   30874.9304834182        NO. OF FUNC. EVALS.:  12
+    CUMULATIVE NO. OF FUNC. EVALS.:      778
+    NPARAMETR:  4.4827E-01  4.1183E+00  1.2267E+00  4.2093E+00  1.2844E+00  6.2699E-01 -5.4743E-01  2.1882E-01  6.6338E-02  1.1935E-01
+                8.2452E-02  6.6880E-02  9.9777E-02  3.9782E-02  1.1392E+00
+    PARAMETER:  8.9654E-02  1.1767E-01  1.2267E-01  1.0523E-01  6.4221E-02  1.5675E-01 -5.4743E+00  1.4497E-01  2.1140E+00  5.7050E+00
+                3.2243E-01  2.5337E+00 -3.6868E-01 -1.4301E-02 -1.8140E-01
+    GRADIENT:   1.9117E-01  7.8914E+01  2.6692E+01  2.0591E+01  2.4680E+00  4.9858E-01  4.4602E-03 -3.8668E-04 -6.2589E-05  4.5035E-04
+                1.7622E-03 -2.3631E-05  6.8825E-05 -3.9182E-02 -4.5883E-03
+    
+   0ITERATION NO.:   45    OBJECTIVE VALUE:   30874.9304834182        NO. OF FUNC. EVALS.:  31
+    CUMULATIVE NO. OF FUNC. EVALS.:      809
+    NPARAMETR:  4.4827E-01  4.1183E+00  1.2267E+00  4.2093E+00  1.2844E+00  6.2699E-01 -5.4743E-01  2.1882E-01  6.6338E-02  1.1935E-01
+                8.2452E-02  6.6880E-02  9.9777E-02  3.9782E-02  1.1392E+00
+    PARAMETER:  8.9654E-02  1.1767E-01  1.2267E-01  1.0523E-01  6.4221E-02  1.5675E-01 -5.4743E+00  1.4497E-01  2.1140E+00  5.7050E+00
+                3.2243E-01  2.5337E+00 -3.6868E-01 -1.4301E-02 -1.8140E-01
+    GRADIENT:   1.1926E-02 -4.8008E-01  1.2729E-01 -1.4986E+00  1.5218E-01 -9.3157E-03 -4.7021E-06 -3.8668E-04 -6.2589E-05  4.5035E-04
+                1.7622E-03 -2.3631E-05  6.8825E-05 -5.8901E-02 -4.6085E-03
+    
+   0ITERATION NO.:   46    OBJECTIVE VALUE:   30874.9304834182        NO. OF FUNC. EVALS.:  36
+    CUMULATIVE NO. OF FUNC. EVALS.:      845
+    NPARAMETR:  4.4827E-01  4.1183E+00  1.2267E+00  4.2093E+00  1.2844E+00  6.2699E-01 -5.4743E-01  2.1882E-01  6.6338E-02  1.1935E-01
+                8.2452E-02  6.6880E-02  9.9777E-02  3.9782E-02  1.1392E+00
+    PARAMETER:  8.9654E-02  1.1767E-01  1.2267E-01  1.0523E-01  6.4221E-02  1.5675E-01 -5.4743E+00  1.4497E-01  2.1140E+00  5.7050E+00
+                3.2243E-01  2.5337E+00 -3.6868E-01 -1.4301E-02 -1.8140E-01
+    GRADIENT:   7.1611E-03 -9.8862E+00 -2.0168E+00 -3.3427E-01  1.0826E-01  2.2494E-03 -2.0853E-04  1.4302E-02  3.2760E-04  1.3566E-03
+               -6.7599E-03  5.1272E-04 -8.0201E-03  2.0656E-03 -1.6029E-02
+    Elapsed estimation  time in seconds:  1721.54
+    Elapsed covariance  time in seconds:  1084.62
+    Elapsed postprocess time in seconds:     5.25
+    Elapsed finaloutput time in seconds:     0.94
+   Done with nonmem execution</so>
+  </job>
+  <job>
+   <do in="tidynm/inst/extdata/101">if [ -e 101.xml ];then cat 101.xml;else echo \&lt;nofile/\>; fi</do>
+   <so>
+    <nm:output xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nm="http://namespaces.oreilly.com/xmlnut/address" xsi:schemaLocation="http://namespaces.oreilly.com/xmlnut/address output.xsd">
+     <nm:start_datetime>2018-09-17T13:46:16.507</nm:start_datetime>
+     <nm:control_stream>
+     $PROB RUN# 101 - fit of Phase I data - full model
+     $INPUT C ID SUBJ TIME SEQ CMT EVID AMT DV AGE WT CRCL ALB BMI AAG
+            SCR AST ALT HT CP TAFD TAD LDOS MDV BLQ PHASE
+     $DATA ../analysis1.csv IGNORE=(C='C', BLQ=1)
+     $SUB ADVAN13 TOL=9
+     
+     $MODEL
+      COMP=(COMP1,DEFDOSE)
+      COMP=(COMP2,DEFOBS)
+      COMP=(COMP3)
+     
+     $PK
+     
+     ;log transformed PK parms
+     
+       V2WT  = LOG(WT/70)
+       CLWT = LOG(WT/70)*0.75
+       V3WT  = LOG(WT/70)
+       QWT = LOG(WT/70)*0.75
+     
+     
+     ; CRCL effect on CL
+       RFN=0
+       IF(CRCL.LT.80) RFN=LOG(CRCL/80)*THETA(6) ; RF effect only wneh CRCL &lt; 80 ml/min/1.73m^2
+     
+     ; Child-Pugh (CP) category on CL
+       LIV=0
+       IF(CP.EQ.3)LIV=THETA(7) ; liver function only important for bad liver (CP=3)
+     
+       KA   = EXP(THETA(1)+ETA(1))
+       V2   = EXP(THETA(2)+V2WT+ETA(2))
+       CL   = EXP(THETA(3)+CLWT+RFN+LIV+ETA(3))
+       V3   = EXP(THETA(4)+V3WT)
+       Q    = EXP(THETA(5)+QWT)
+     
+       K=CL/V2
+       K12=KA
+       K23=Q/V2
+       K32=Q/V3
+       S2 = V2/1000 ; dose in mcg, conc in mcg/mL
+     
+     $DES
+      CONC=A(2)/V2
+      DADT(1)=-KA*A(1)
+      DADT(2)= KA*A(1) - K23*A(2) + K32*A(3) - K*A(2)
+      DADT(3)= K23*A(2) - K32*A(3)
+     
+     
+     $ERROR
+      IPRED = F
+      Y=IPRED*(1+EPS(1))+EPS(2)
+     
+     $THETA
+     (0.5)    ;  [1/hr] KA
+     (3.5)    ;  [L]    V1
+     (1)      ;  [L/hr] CL
+     (4)      ;  [L] V2
+     (2)      ;  [L/hr] Q
+     (0.4)    ;  [f] Renal
+     (0.01)   ;  [f] Child-Pugh
+     
+     $OMEGA BLOCK(3)
+             0.2        ; [P]  Ka
+             0.003
+             0.04        ; [P]  CL
+             0.002
+             0.001
+             0.05        ; [P]  V2
+     
+     $SIGMA
+     0.05     ; [P] Prop
+     2        ; [A] Add
+     
+     $EST MAXEVAL=9999 METHOD=1 INTER SIGL=9 NSIG=3 PRINT=1 MSFO=./101.msf
+     $COV UNC
+     $TABLE ID TIME CMT EVID AMT TAFD TAD DV_1 IPRED CWRESI NOPRINT ONEHEADER FILE=./101.tab
+     $TABLE ID TIME EVID AGE WT CRCL CL V2 KA ETA1 ETA2 ETA3 NOAPPEND NOPRINT ONEHEADER FILE=./101par.tab
+     </nm:control_stream>
+     <nm:nmtran>
+     
+      WARNINGS AND ERRORS (IF ANY) FOR PROBLEM    1
+     
+      (WARNING  2) NM-TRAN INFERS THAT THE DATA ARE POPULATION.</nm:nmtran>
+     <nm:nonmem nm:version="7.4.3">
+      <nm:license_information>
+      License Registered to: Metrum Research Group
+      Expiration Date:    14 JUL 2019
+      Current Date:       17 SEP 2018
+      Days until program expires : 302</nm:license_information>
+      <nm:program_information>
+      1NONLINEAR MIXED EFFECTS MODEL PROGRAM (NONMEM) VERSION 7.4.3
+       ORIGINALLY DEVELOPED BY STUART BEAL, LEWIS SHEINER, AND ALISON BOECKMANN
+       CURRENT DEVELOPERS ARE ROBERT BAUER, ICON DEVELOPMENT SOLUTIONS,
+       AND ALISON BOECKMANN. IMPLEMENTATION, EFFICIENCY, AND STANDARDIZATION
+       PERFORMED BY NOUS INFOSYSTEMS.</nm:program_information>
+      <nm:problem nm:number="1" nm:subproblem="0" nm:superproblem1="0" nm:iteration1="0" nm:superproblem2="0" nm:iteration2="0">
+       <nm:problem_title>RUN# 101 - fit of Phase I data - full model</nm:problem_title>
+       <nm:problem_information>
+       
+        PROBLEM NO.:         1
+        RUN# 101 - fit of Phase I data - full model
+       0DATA CHECKOUT RUN:              NO
+        DATA SET LOCATED ON UNIT NO.:    2
+        THIS UNIT TO BE REWOUND:        NO
+        NO. OF DATA RECS IN DATA SET:     4292
+        NO. OF DATA ITEMS IN DATA SET:  26
+        ID DATA ITEM IS DATA ITEM NO.:   2
+        DEP VARIABLE IS DATA ITEM NO.:   9
+        MDV DATA ITEM IS DATA ITEM NO.: 24
+       0INDICES PASSED TO SUBROUTINE PRED:
+          7   4   8   0   0   0   6   0   0   0   0
+       0LABELS FOR DATA ITEMS:
+        C ID SUBJ TIME SEQ CMT EVID AMT DV AGE WT CRCL ALB BMI AAG SCR AST ALT HT CP TAFD TAD LDOS MDV BLQ PHASE
+       0(NONBLANK) LABELS FOR PRED-DEFINED ITEMS:
+        KA V2 CL IPRED
+       0FORMAT FOR DATA:
+        (2(10E7.0/),6E7.0)
+       
+        TOT. NO. OF OBS RECS:     3142
+        TOT. NO. OF INDIVIDUALS:      160
+       0LENGTH OF THETA:   7
+       0DEFAULT THETA BOUNDARY TEST OMITTED:    NO
+       0OMEGA HAS BLOCK FORM:
+         1
+         1  1
+         1  1  1
+       0DEFAULT OMEGA BOUNDARY TEST OMITTED:    NO
+       0SIGMA HAS SIMPLE DIAGONAL FORM WITH DIMENSION:   2
+       0DEFAULT SIGMA BOUNDARY TEST OMITTED:    NO
+       0INITIAL ESTIMATE OF THETA:
+          0.5000E+00  0.3500E+01  0.1000E+01  0.4000E+01  0.2000E+01  0.4000E+00  0.1000E-01
+       0INITIAL ESTIMATE OF OMEGA:
+        BLOCK SET NO.   BLOCK                                                                    FIXED
+               1                                                                                   NO
+                         0.2000E+00
+                         0.3000E-02   0.4000E-01
+                         0.2000E-02   0.1000E-02   0.5000E-01
+       0INITIAL ESTIMATE OF SIGMA:
+        0.5000E-01
+        0.0000E+00   0.2000E+01
+       0COVARIANCE STEP OMITTED:        NO
+        EIGENVLS. PRINTED:              NO
+        SPECIAL COMPUTATION:            NO
+        COMPRESSED FORMAT:              NO
+        GRADIENT METHOD USED:     NOSLOW
+        SIGDIGITS ETAHAT (SIGLO):                  -1
+        SIGDIGITS GRADIENTS (SIGL):                -1
+        EXCLUDE COV FOR FOCE (NOFCOV):              NO
+        TURN OFF Cholesky Transposition of R Matrix (CHOLROFF): NO
+        KNUTHSUMOFF:                                -1
+        RESUME COV ANALYSIS (RESUME):               NO
+        SIR SAMPLE SIZE (SIRSAMPLE):              -1
+        NON-LINEARLY TRANSFORM THETAS DURING COV (THBND): 1
+        PRECONDTIONING CYCLES (PRECOND):        0
+        PRECONDTIONING TYPES (PRECONDS):        TOS
+        FORCED PRECONDTIONING CYCLES (PFCOND):0
+        PRECONDTIONING TYPE (PRETYPE):        0
+        FORCED POS. DEFINITE SETTING: (FPOSDEF):0
+       0TABLES STEP OMITTED:    NO
+        NO. OF TABLES:           2
+        SEED NUMBER (SEED):    11456
+        RANMETHOD:             3U
+        MC SAMPLES (ESAMPLE):    300
+        WRES SQUARE ROOT TYPE (WRESCHOL): EIGENVALUE
+       0-- TABLE   1 --
+       0RECORDS ONLY:    ALL
+       04 COLUMNS APPENDED:    YES
+        PRINTED:                NO
+        HEADERS:               ONE
+        FILE TO BE FORWARDED:   NO
+        FORMAT:                S1PE11.4
+        LFORMAT:
+        RFORMAT:
+        FIXED_EFFECT_ETAS:
+       0USER-CHOSEN ITEMS:
+        ID TIME CMT EVID AMT TAFD TAD DV IPRED CWRESI
+       0-- TABLE   2 --
+       0RECORDS ONLY:    ALL
+       04 COLUMNS APPENDED:    NO
+        PRINTED:                NO
+        HEADERS:               ONE
+        FILE TO BE FORWARDED:   NO
+        FORMAT:                S1PE11.4
+        LFORMAT:
+        RFORMAT:
+        FIXED_EFFECT_ETAS:
+       0USER-CHOSEN ITEMS:
+        ID TIME EVID AGE WT CRCL CL V2 KA ETA1 ETA2 ETA3
+       1DOUBLE PRECISION PREDPP VERSION 7.4.3
+       
+        GENERAL NONLINEAR KINETICS MODEL WITH STIFF/NONSTIFF EQUATIONS (LSODA, ADVAN13)
+       0MODEL SUBROUTINE USER-SUPPLIED - ID NO. 9999
+       0MAXIMUM NO. OF BASIC PK PARAMETERS:   5
+       0COMPARTMENT ATTRIBUTES
+        COMPT. NO.   FUNCTION   INITIAL    ON/OFF      DOSE      DEFAULT    DEFAULT
+                                STATUS     ALLOWED    ALLOWED    FOR DOSE   FOR OBS.
+           1         COMP1        ON         YES        YES        YES        NO
+           2         COMP2        ON         YES        YES        NO         YES
+           3         COMP3        ON         YES        YES        NO         NO
+           4         OUTPUT       OFF        YES        NO         NO         NO
+        INITIAL (BASE) TOLERANCE SETTINGS:
+        NRD (RELATIVE) VALUE(S) OF TOLERANCE:   9
+        ANRD (ABSOLUTE) VALUE(S) OF TOLERANCE:  12
+       1
+        ADDITIONAL PK PARAMETERS - ASSIGNMENT OF ROWS IN GG
+        COMPT. NO.                             INDICES
+                     SCALE      BIOAVAIL.   ZERO-ORDER  ZERO-ORDER  ABSORB
+                                FRACTION    RATE        DURATION    LAG
+           1            *           *           *           *           *
+           2            6           *           *           *           *
+           3            *           *           *           *           *
+           4            *           -           -           -           -
+                    - PARAMETER IS NOT ALLOWED FOR THIS MODEL
+                    * PARAMETER IS NOT SUPPLIED BY PK SUBROUTINE;
+                      WILL DEFAULT TO ONE IF APPLICABLE
+       0DATA ITEM INDICES USED BY PRED ARE:
+          EVENT ID DATA ITEM IS DATA ITEM NO.:      7
+          TIME DATA ITEM IS DATA ITEM NO.:          4
+          DOSE AMOUNT DATA ITEM IS DATA ITEM NO.:   8
+          COMPT. NO. DATA ITEM IS DATA ITEM NO.:    6
+       
+       0PK SUBROUTINE CALLED WITH EVERY EVENT RECORD.
+        PK SUBROUTINE NOT CALLED AT NONEVENT (ADDITIONAL OR LAGGED) DOSE TIMES.
+       0ERROR SUBROUTINE CALLED WITH EVERY EVENT RECORD.
+       0DES SUBROUTINE USES COMPACT STORAGE MODE.</nm:problem_information>
+       <nm:problem_options nm:data_checkout_run="no" nm:data_unit="2" nm:data_rewind="no" nm:data_nrec="4292" nm:data_nitems="26" nm:data_id="2" nm:data_l2="0" nm:data_dv="9" nm:data_mdv="24" nm:data_mrg="0" nm:data_raw="0" nm:data_rpt="0" nm:data_sub_array1="0" nm:data_sub_array2="0" nm:data_sub_array3="0" nm:data_pred_indices="7,4,8,0,0,0,6,0,0,0,0" nm:data_format="(2(10e7.0/),6e7.0)" nm:data_nobs="3142" nm:data_nind="160" nm:data_mdv100="0" nm:nthetat="7" nm:theta_bound_test_omitted="no" nm:omega_blockdim="3" nm:omega_bound_test_omitted="no" nm:sigma_diagdim="2" nm:sigma_bound_test_omitted="no" nm:cov_omitted="no" nm:cov_matrix="rsr" nm:cov_eigen_print="no" nm:cov_special="no" nm:cov_compressed="no" nm:cov_slow_gradient="noslow" nm:cov_siglocov="-1" nm:cov_siglcov="-1" nm:cov_tol="-1" nm:cov_atol="-1" nm:cov_nofcov="no" nm:cov_cholroff="no" nm:cov_knuthsumoff="-1" nm:cov_resume="no" nm:cov_sirsample="-1" nm:cov_thbnd="1" nm:cov_precond="0" nm:cov_preconds="tos" nm:cov_pfcond="0" nm:cov_pretype="0" nm:cov_fposdef="0" nm:tab_omitted="no" nm:tab_number="2" nm:tab_seed="11456" nm:tab_ranmethod="3u" nm:tab_esample="300" nm:tab_wres="eigenvalue" nm:tab_fixedetas_01="BLANK" nm:tab_fixedetas_02="BLANK" nm:pred_advan="13" nm:pred_evid="7" nm:pred_time="4" nm:pred_amt="8" nm:pred_cmt="6"/>
+       <nm:estimation nm:number="1" nm:type="0">
+        <nm:table_series>1</nm:table_series>
+        <nm:estimation_method>focei</nm:estimation_method>
+        <nm:estimation_title>First Order Conditional Estimation with Interaction</nm:estimation_title>
+        <nm:estimation_information>
+         ESTIMATION STEP OMITTED:                 NO
+         ANALYSIS TYPE:                           POPULATION
+         NUMBER OF SADDLE POINT RESET ITERATIONS:      0
+         GRADIENT METHOD USED:               NOSLOW
+         CONDITIONAL ESTIMATES USED:              YES
+         CENTERED ETA:                            NO
+         EPS-ETA INTERACTION:                     YES
+         LAPLACIAN OBJ. FUNC.:                    NO
+         NO. OF FUNCT. EVALS. ALLOWED:            9999
+         NO. OF SIG. FIGURES REQUIRED:            3
+         INTERMEDIATE PRINTOUT:                   YES
+         ESTIMATE OUTPUT TO MSF:                  YES
+         IND. OBJ. FUNC. VALUES SORTED:           NO
+         NUMERICAL DERIVATIVE
+               FILE REQUEST (NUMDER):               NONE
+         MAP (ETAHAT) ESTIMATION METHOD (OPTMAP):   0
+         ETA HESSIAN EVALUATION METHOD (ETADER):    0
+         INITIAL ETA FOR MAP ESTIMATION (MCETA):    0
+         SIGDIGITS FOR MAP ESTIMATION (SIGLO):      9
+         GRADIENT SIGDIGITS OF
+               FIXED EFFECTS PARAMETERS (SIGL):     9
+         NOPRIOR SETTING (NOPRIOR):                 OFF
+         NOCOV SETTING (NOCOV):                     OFF
+         DERCONT SETTING (DERCONT):                 OFF
+         FINAL ETA RE-EVALUATION (FNLETA):          ON
+         EXCLUDE NON-INFLUENTIAL (NON-INFL.) ETAS
+               IN SHRINKAGE (ETASTYPE):             NO
+         NON-INFL. ETA CORRECTION (NONINFETA):      OFF
+         RAW OUTPUT FILE (FILE): 101.ext
+         EXCLUDE TITLE (NOTITLE):                   NO
+         EXCLUDE COLUMN LABELS (NOLABEL):           NO
+         FORMAT FOR ADDITIONAL FILES (FORMAT):      S1PE12.5
+         PARAMETER ORDER FOR OUTPUTS (ORDER):       TSOL
+         WISHART PRIOR DF INTERPRETATION (WISHTYPE):0
+         KNUTHSUMOFF:                               0
+         INCLUDE LNTWOPI:                           NO
+         INCLUDE CONSTANT TERM TO PRIOR (PRIORC):   NO
+         INCLUDE CONSTANT TERM TO OMEGA (ETA) (OLNTWOPI):NO
+         ADDITIONAL CONVERGENCE TEST (CTYPE=4)?:    NO
+         EM OR BAYESIAN METHOD USED:                 NONE
+        </nm:estimation_information>
+        <nm:estimation_options nm:estim_omitted="no" nm:analysis_type="pop" nm:saddle_reset="0" nm:saddle_hess="0" nm:slow_gradient="noslow" nm:cond_estim="yes" nm:centered_eta="no" nm:epseta_interaction="yes" nm:laplace="no" nm:predflag="0" nm:maxfn="9999" nm:nsig="3" nm:msfo="yes" nm:objsort="no" nm:numder="0" nm:optmap="0" nm:etader="0" nm:mceta="0" nm:siglo="9" nm:sigl="9" nm:noprior="0" nm:nocov="0" nm:dercont="0" nm:atol="0" nm:fnleta="1" nm:etastype="0" nm:noninfeta="0" nm:file="101.ext" nm:notitle="0" nm:nolabel="0" nm:format="s1pe12.5" nm:order="tsol" nm:wishtype="0" nm:knuthsumoff="0" nm:lntwopi="0" nm:priorc="0" nm:olntwopi="0" nm:ctype="0"/>
+        <nm:monitor>
+         <nm:obj nm:iteration="0">32711.6154444340</nm:obj>
+         <nm:obj nm:iteration="1">32200.4238610032</nm:obj>
+         <nm:obj nm:iteration="2">31989.0503619686</nm:obj>
+         <nm:obj nm:iteration="3">31798.0522922094</nm:obj>
+         <nm:obj nm:iteration="4">31554.2285266773</nm:obj>
+         <nm:obj nm:iteration="5">31531.6473292688</nm:obj>
+         <nm:obj nm:iteration="6">31450.3874605720</nm:obj>
+         <nm:obj nm:iteration="7">31360.0328537916</nm:obj>
+         <nm:obj nm:iteration="8">31354.8478446531</nm:obj>
+         <nm:obj nm:iteration="9">31353.1505611023</nm:obj>
+         <nm:obj nm:iteration="10">31323.8653507847</nm:obj>
+         <nm:obj nm:iteration="11">31208.2244588223</nm:obj>
+         <nm:obj nm:iteration="12">31205.5394265566</nm:obj>
+         <nm:obj nm:iteration="13">31020.8888407860</nm:obj>
+         <nm:obj nm:iteration="14">30979.4187391729</nm:obj>
+         <nm:obj nm:iteration="15">30933.8198562687</nm:obj>
+         <nm:obj nm:iteration="16">30890.9987943899</nm:obj>
+         <nm:obj nm:iteration="17">30886.8253362428</nm:obj>
+         <nm:obj nm:iteration="18">30881.5869119919</nm:obj>
+         <nm:obj nm:iteration="19">30878.8554050043</nm:obj>
+         <nm:obj nm:iteration="20">30877.5106981975</nm:obj>
+         <nm:obj nm:iteration="21">30876.5127580710</nm:obj>
+         <nm:obj nm:iteration="22">30875.8671950583</nm:obj>
+         <nm:obj nm:iteration="23">30875.4777225277</nm:obj>
+         <nm:obj nm:iteration="24">30875.3494295638</nm:obj>
+         <nm:obj nm:iteration="25">30875.3168473098</nm:obj>
+         <nm:obj nm:iteration="26">30875.3005835746</nm:obj>
+         <nm:obj nm:iteration="27">30875.2992510535</nm:obj>
+         <nm:obj nm:iteration="28">30875.2990548952</nm:obj>
+         <nm:obj nm:iteration="29">30875.2990468735</nm:obj>
+         <nm:obj nm:iteration="30">30875.2990468735</nm:obj>
+         <nm:obj nm:iteration="31">30875.2975587654</nm:obj>
+         <nm:obj nm:iteration="32">30875.2964208402</nm:obj>
+         <nm:obj nm:iteration="33">30875.2939687226</nm:obj>
+         <nm:obj nm:iteration="34">30875.1563716382</nm:obj>
+         <nm:obj nm:iteration="35">30875.0275427393</nm:obj>
+         <nm:obj nm:iteration="36">30874.9935524912</nm:obj>
+         <nm:obj nm:iteration="37">30874.9475783545</nm:obj>
+         <nm:obj nm:iteration="38">30874.9321997919</nm:obj>
+         <nm:obj nm:iteration="39">30874.9306158503</nm:obj>
+         <nm:obj nm:iteration="40">30874.9305148221</nm:obj>
+         <nm:obj nm:iteration="41">30874.9304960298</nm:obj>
+         <nm:obj nm:iteration="42">30874.9304955391</nm:obj>
+         <nm:obj nm:iteration="43">30874.9304873990</nm:obj>
+         <nm:obj nm:iteration="44">30874.9304834182</nm:obj>
+         <nm:obj nm:iteration="45">30874.9304834182</nm:obj>
+         <nm:obj nm:iteration="46">30874.9304834182</nm:obj>
+        </nm:monitor>
+        <nm:termination_status>0</nm:termination_status>
+        <nm:termination_nfuncevals>845</nm:termination_nfuncevals>
+        <nm:termination_sigdigits>3.96743970696657</nm:termination_sigdigits>
+        <nm:termination_information>
+        0MINIMIZATION SUCCESSFUL
+         HOWEVER, PROBLEMS OCCURRED WITH THE MINIMIZATION.
+         REGARD THE RESULTS OF THE ESTIMATION STEP CAREFULLY, AND ACCEPT THEM ONLY
+         AFTER CHECKING THAT THE COVARIANCE STEP PRODUCES REASONABLE OUTPUT.
+         NO. OF FUNCTION EVALUATIONS USED:      845
+         NO. OF SIG. DIGITS IN FINAL EST.:  4.0</nm:termination_information>
+        <nm:termination_txtmsg>
+         <nm:val nm:name="1">37</nm:val>
+         <nm:val nm:name="2">38</nm:val>
+        </nm:termination_txtmsg>
+        <nm:etabar>
+         <nm:row nm:rname="SUBPOP1">
+          <nm:col nm:cname="ETA1">-1.135855257656593E-002</nm:col>
+          <nm:col nm:cname="ETA2">-1.062780845093058E-003</nm:col>
+          <nm:col nm:cname="ETA3">5.396616736667720E-004</nm:col>
+         </nm:row>
+        </nm:etabar>
+        <nm:etabarse>
+         <nm:row nm:rname="SUBPOP1">
+          <nm:col nm:cname="ETA1">3.245377667518998E-002</nm:col>
+          <nm:col nm:cname="ETA2">2.151530355503988E-002</nm:col>
+          <nm:col nm:cname="ETA3">2.460760608278835E-002</nm:col>
+         </nm:row>
+        </nm:etabarse>
+        <nm:etabarn>
+         <nm:row nm:rname="SUBPOP1">
+          <nm:col nm:cname="ETA1">160</nm:col>
+          <nm:col nm:cname="ETA2">160</nm:col>
+          <nm:col nm:cname="ETA3">160</nm:col>
+         </nm:row>
+        </nm:etabarn>
+        <nm:etabarpval>
+         <nm:row nm:rname="SUBPOP1">
+          <nm:col nm:cname="ETA1">0.726345044896165</nm:col>
+          <nm:col nm:cname="ETA2">0.960603174794847</nm:col>
+          <nm:col nm:cname="ETA3">0.982503158653818</nm:col>
+         </nm:row>
+        </nm:etabarpval>
+        <nm:etashrinksd>
+         <nm:row nm:rname="SUBPOP1">
+          <nm:col nm:cname="ETA1">11.9675772402027</nm:col>
+          <nm:col nm:cname="ETA2">4.92447415095380</nm:col>
+          <nm:col nm:cname="ETA3">1.15015662329093</nm:col>
+         </nm:row>
+        </nm:etashrinksd>
+        <nm:etashrinkvr>
+         <nm:row nm:rname="SUBPOP1">
+          <nm:col nm:cname="ETA1">22.5029254304033</nm:col>
+          <nm:col nm:cname="ETA2">9.60644384527347</nm:col>
+          <nm:col nm:cname="ETA3">2.28708464400084</nm:col>
+         </nm:row>
+        </nm:etashrinkvr>
+        <nm:ebvshrinksd>
+         <nm:row nm:rname="SUBPOP1">
+          <nm:col nm:cname="EBV1">12.2852710016116</nm:col>
+          <nm:col nm:cname="EBV2">5.26007756413510</nm:col>
+          <nm:col nm:cname="EBV3">1.44310069192389</nm:col>
+         </nm:row>
+        </nm:ebvshrinksd>
+        <nm:ebvshrinkvr>
+         <nm:row nm:rname="SUBPOP1">
+          <nm:col nm:cname="EBV1">23.0612631673928</nm:col>
+          <nm:col nm:cname="EBV2">10.2434709684630</nm:col>
+          <nm:col nm:cname="EBV3">2.86537598777746</nm:col>
+         </nm:row>
+        </nm:ebvshrinkvr>
+        <nm:epsshrinksd>
+         <nm:row nm:rname="SUBPOP1">
+          <nm:col nm:cname="EPS1">4.89291085135265</nm:col>
+          <nm:col nm:cname="EPS2">4.89291085135265</nm:col>
+         </nm:row>
+        </nm:epsshrinksd>
+        <nm:epsshrinkvr>
+         <nm:row nm:rname="SUBPOP1">
+          <nm:col nm:cname="EPS1">9.54641593671245</nm:col>
+          <nm:col nm:cname="EPS2">9.54641593671245</nm:col>
+         </nm:row>
+        </nm:epsshrinkvr>
+        <nm:estimation_elapsed_time>1721.54</nm:estimation_elapsed_time>
+        <nm:covariance_information/>
+        <nm:covariance_status nm:error="0" nm:numnegeigenvalues="-1" nm:mineigenvalue="0.000000000000000E+000" nm:maxeigenvalue="0.000000000000000E+000" nm:rms="0.000000000000000E+000"/>
+        <nm:covariance_elapsed_time>1084.62</nm:covariance_elapsed_time>
+        <nm:final_objective_function_text>MINIMUM VALUE OF OBJECTIVE FUNCTION</nm:final_objective_function_text>
+        <nm:final_objective_function>30874.9304834182</nm:final_objective_function>
+        <nm:theta>
+         <nm:val nm:name="1">0.448268637773506</nm:val>
+         <nm:val nm:name="2">4.11830623344445</nm:val>
+         <nm:val nm:name="3">1.22668719618972</nm:val>
+         <nm:val nm:name="4">4.20933871901208</nm:val>
+         <nm:val nm:name="5">1.28442364945172</nm:val>
+         <nm:val nm:name="6">0.626992964569032</nm:val>
+         <nm:val nm:name="7">-0.547430047485107</nm:val>
+        </nm:theta>
+        <nm:omega>
+         <nm:row nm:rname="1">
+          <nm:col nm:cname="1">0.218820506501002</nm:col>
+         </nm:row>
+         <nm:row nm:rname="2">
+          <nm:col nm:cname="1">6.633767964540338E-002</nm:col>
+          <nm:col nm:cname="2">8.245183479986910E-002</nm:col>
+         </nm:row>
+         <nm:row nm:rname="3">
+          <nm:col nm:cname="1">0.119347255144858</nm:col>
+          <nm:col nm:cname="2">6.688048340805243E-002</nm:col>
+          <nm:col nm:cname="3">9.977680704102451E-002</nm:col>
+         </nm:row>
+        </nm:omega>
+        <nm:sigma>
+         <nm:row nm:rname="1">
+          <nm:col nm:cname="1">3.978223462573476E-002</nm:col>
+         </nm:row>
+         <nm:row nm:rname="2">
+          <nm:col nm:cname="1">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="2">1.13921568353960</nm:col>
+         </nm:row>
+        </nm:sigma>
+        <nm:omegac>
+         <nm:row nm:rname="1">
+          <nm:col nm:cname="1">0.467782541894203</nm:col>
+         </nm:row>
+         <nm:row nm:rname="2">
+          <nm:col nm:cname="1">0.493873933706304</nm:col>
+          <nm:col nm:cname="2">0.287144275234366</nm:col>
+         </nm:row>
+         <nm:row nm:rname="3">
+          <nm:col nm:cname="1">0.807706587104781</nm:col>
+          <nm:col nm:cname="2">0.737368261391593</nm:col>
+          <nm:col nm:cname="3">0.315874669831287</nm:col>
+         </nm:row>
+        </nm:omegac>
+        <nm:sigmac>
+         <nm:row nm:rname="1">
+          <nm:col nm:cname="1">0.199454843575519</nm:col>
+         </nm:row>
+         <nm:row nm:rname="2">
+          <nm:col nm:cname="1">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="2">1.06734047217352</nm:col>
+         </nm:row>
+        </nm:sigmac>
+        <nm:thetase>
+         <nm:val nm:name="1">6.536319172453872E-002</nm:val>
+         <nm:val nm:name="2">2.768512908356782E-002</nm:val>
+         <nm:val nm:name="3">2.744587967578783E-002</nm:val>
+         <nm:val nm:name="4">1.858886791877953E-002</nm:val>
+         <nm:val nm:name="5">3.506283632667086E-002</nm:val>
+         <nm:val nm:name="6">4.781663611620525E-002</nm:val>
+         <nm:val nm:name="7">6.249036770945815E-002</nm:val>
+        </nm:thetase>
+        <nm:omegase>
+         <nm:row nm:rname="1">
+          <nm:col nm:cname="1">5.571560905854778E-002</nm:col>
+         </nm:row>
+         <nm:row nm:rname="2">
+          <nm:col nm:cname="1">2.148181752999719E-002</nm:col>
+          <nm:col nm:cname="2">1.004519799005468E-002</nm:col>
+         </nm:row>
+         <nm:row nm:rname="3">
+          <nm:col nm:cname="1">2.341168223678754E-002</nm:col>
+          <nm:col nm:cname="2">9.101566364118014E-003</nm:col>
+          <nm:col nm:cname="3">1.167350986699449E-002</nm:col>
+         </nm:row>
+        </nm:omegase>
+        <nm:sigmase>
+         <nm:row nm:rname="1">
+          <nm:col nm:cname="1">1.214572972500812E-003</nm:col>
+         </nm:row>
+         <nm:row nm:rname="2">
+          <nm:col nm:cname="1">10000000000.0000</nm:col>
+          <nm:col nm:cname="2">1.20317741791359</nm:col>
+         </nm:row>
+        </nm:sigmase>
+        <nm:omegacse>
+         <nm:row nm:rname="1">
+          <nm:col nm:cname="1">5.955289484825278E-002</nm:col>
+         </nm:row>
+         <nm:row nm:rname="2">
+          <nm:col nm:cname="1">0.110895244805694</nm:col>
+          <nm:col nm:cname="2">1.749155190688696E-002</nm:col>
+         </nm:row>
+         <nm:row nm:rname="3">
+          <nm:col nm:cname="1">9.091749424487618E-002</nm:col>
+          <nm:col nm:cname="2">4.279658334296081E-002</nm:col>
+          <nm:col nm:cname="3">1.847807213099658E-002</nm:col>
+         </nm:row>
+        </nm:omegacse>
+        <nm:sigmacse>
+         <nm:row nm:rname="1">
+          <nm:col nm:cname="1">3.044731706505140E-003</nm:col>
+         </nm:row>
+         <nm:row nm:rname="2">
+          <nm:col nm:cname="1">10000000000.0000</nm:col>
+          <nm:col nm:cname="2">0.563633371581725</nm:col>
+         </nm:row>
+        </nm:sigmacse>
+        <nm:covariance>
+         <nm:row nm:rname="THETA1">
+          <nm:col nm:cname="THETA1">4.272346832418807E-003</nm:col>
+         </nm:row>
+         <nm:row nm:rname="THETA2">
+          <nm:col nm:cname="THETA1">1.032226926583871E-003</nm:col>
+          <nm:col nm:cname="THETA2">7.664663723738125E-004</nm:col>
+         </nm:row>
+         <nm:row nm:rname="THETA3">
+          <nm:col nm:cname="THETA1">7.989628686573298E-004</nm:col>
+          <nm:col nm:cname="THETA2">4.705590652995275E-004</nm:col>
+          <nm:col nm:cname="THETA3">7.532763111778234E-004</nm:col>
+         </nm:row>
+         <nm:row nm:rname="THETA4">
+          <nm:col nm:cname="THETA1">-2.864302353425041E-004</nm:col>
+          <nm:col nm:cname="THETA2">-8.736554494884493E-005</nm:col>
+          <nm:col nm:cname="THETA3">2.026042262050186E-005</nm:col>
+          <nm:col nm:cname="THETA4">3.455460105018306E-004</nm:col>
+         </nm:row>
+         <nm:row nm:rname="THETA5">
+          <nm:col nm:cname="THETA1">-1.077799302354122E-003</nm:col>
+          <nm:col nm:cname="THETA2">-4.425843294662352E-004</nm:col>
+          <nm:col nm:cname="THETA3">-1.524401469055064E-004</nm:col>
+          <nm:col nm:cname="THETA4">1.394063072485309E-004</nm:col>
+          <nm:col nm:cname="THETA5">1.229402491270909E-003</nm:col>
+         </nm:row>
+         <nm:row nm:rname="THETA6">
+          <nm:col nm:cname="THETA1">-2.470753937019011E-004</nm:col>
+          <nm:col nm:cname="THETA2">8.126828848601652E-005</nm:col>
+          <nm:col nm:cname="THETA3">4.763248657773544E-004</nm:col>
+          <nm:col nm:cname="THETA4">9.596870243510917E-005</nm:col>
+          <nm:col nm:cname="THETA5">-1.048500023465285E-004</nm:col>
+          <nm:col nm:cname="THETA6">2.286430689469584E-003</nm:col>
+         </nm:row>
+         <nm:row nm:rname="THETA7">
+          <nm:col nm:cname="THETA1">-1.108488547041870E-004</nm:col>
+          <nm:col nm:cname="THETA2">-7.256278117678572E-005</nm:col>
+          <nm:col nm:cname="THETA3">-4.367223812743530E-004</nm:col>
+          <nm:col nm:cname="THETA4">-2.034529157904715E-005</nm:col>
+          <nm:col nm:cname="THETA5">4.071611478628354E-004</nm:col>
+          <nm:col nm:cname="THETA6">-5.294837624004022E-004</nm:col>
+          <nm:col nm:cname="THETA7">3.905046056463290E-003</nm:col>
+         </nm:row>
+         <nm:row nm:rname="OMEGA(1,1)">
+          <nm:col nm:cname="THETA1">9.047569760667270E-004</nm:col>
+          <nm:col nm:cname="THETA2">4.012544382536332E-005</nm:col>
+          <nm:col nm:cname="THETA3">-5.640990779078281E-005</nm:col>
+          <nm:col nm:cname="THETA4">-7.290156187657754E-005</nm:col>
+          <nm:col nm:cname="THETA5">3.011519659241871E-005</nm:col>
+          <nm:col nm:cname="THETA6">-4.144256944833154E-004</nm:col>
+          <nm:col nm:cname="THETA7">7.871401751937303E-004</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">3.104229092764931E-003</nm:col>
+         </nm:row>
+         <nm:row nm:rname="OMEGA(1,2)">
+          <nm:col nm:cname="THETA1">1.564713821342576E-004</nm:col>
+          <nm:col nm:cname="THETA2">-4.054326422648482E-005</nm:col>
+          <nm:col nm:cname="THETA3">3.961224304436492E-006</nm:col>
+          <nm:col nm:cname="THETA4">-1.947552173976000E-005</nm:col>
+          <nm:col nm:cname="THETA5">1.764894080907563E-004</nm:col>
+          <nm:col nm:cname="THETA6">-9.466083028539367E-005</nm:col>
+          <nm:col nm:cname="THETA7">3.119935620198256E-006</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">7.496625149332308E-004</nm:col>
+          <nm:col nm:cname="OMEGA(1,2)">4.614684843920947E-004</nm:col>
+         </nm:row>
+         <nm:row nm:rname="OMEGA(1,3)">
+          <nm:col nm:cname="THETA1">5.124429644818585E-004</nm:col>
+          <nm:col nm:cname="THETA2">2.367572476329775E-005</nm:col>
+          <nm:col nm:cname="THETA3">-9.626648212693388E-006</nm:col>
+          <nm:col nm:cname="THETA4">-4.888772433428241E-005</nm:col>
+          <nm:col nm:cname="THETA5">3.100851053947581E-005</nm:col>
+          <nm:col nm:cname="THETA6">-2.196508530444629E-004</nm:col>
+          <nm:col nm:cname="THETA7">2.001803804580077E-004</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">9.426674903878121E-004</nm:col>
+          <nm:col nm:cname="OMEGA(1,2)">3.814754773748033E-004</nm:col>
+          <nm:col nm:cname="OMEGA(1,3)">5.481068651563132E-004</nm:col>
+         </nm:row>
+         <nm:row nm:rname="OMEGA(2,2)">
+          <nm:col nm:cname="THETA1">4.556313787941116E-006</nm:col>
+          <nm:col nm:cname="THETA2">-1.737404488622698E-005</nm:col>
+          <nm:col nm:cname="THETA3">-1.712775795592869E-005</nm:col>
+          <nm:col nm:cname="THETA4">-1.250498595243187E-005</nm:col>
+          <nm:col nm:cname="THETA5">9.093955418381690E-005</nm:col>
+          <nm:col nm:cname="THETA6">-4.880408355982076E-005</nm:col>
+          <nm:col nm:cname="THETA7">4.527079580857722E-005</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">1.920463543190240E-004</nm:col>
+          <nm:col nm:cname="OMEGA(1,2)">1.533725708167016E-004</nm:col>
+          <nm:col nm:cname="OMEGA(1,3)">1.087554252191578E-004</nm:col>
+          <nm:col nm:cname="OMEGA(2,2)">1.009060026593986E-004</nm:col>
+         </nm:row>
+         <nm:row nm:rname="OMEGA(2,3)">
+          <nm:col nm:cname="THETA1">2.546361851643159E-005</nm:col>
+          <nm:col nm:cname="THETA2">-2.226675351725487E-005</nm:col>
+          <nm:col nm:cname="THETA3">6.614259788745246E-007</nm:col>
+          <nm:col nm:cname="THETA4">-1.046992825602979E-005</nm:col>
+          <nm:col nm:cname="THETA5">5.556691362636293E-005</nm:col>
+          <nm:col nm:cname="THETA6">-6.739451606793493E-006</nm:col>
+          <nm:col nm:cname="THETA7">4.963464736494209E-005</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">2.143668785706838E-004</nm:col>
+          <nm:col nm:cname="OMEGA(1,2)">1.469580679219064E-004</nm:col>
+          <nm:col nm:cname="OMEGA(1,3)">1.425941534288940E-004</nm:col>
+          <nm:col nm:cname="OMEGA(2,2)">6.892087113218432E-005</nm:col>
+          <nm:col nm:cname="OMEGA(2,3)">8.283851028044440E-005</nm:col>
+         </nm:row>
+         <nm:row nm:rname="OMEGA(3,3)">
+          <nm:col nm:cname="THETA1">6.074322123579867E-005</nm:col>
+          <nm:col nm:cname="THETA2">1.883563646018912E-005</nm:col>
+          <nm:col nm:cname="THETA3">2.112252678297905E-005</nm:col>
+          <nm:col nm:cname="THETA4">-1.556167074863257E-005</nm:col>
+          <nm:col nm:cname="THETA5">-2.282199500640788E-005</nm:col>
+          <nm:col nm:cname="THETA6">3.773174170813021E-005</nm:col>
+          <nm:col nm:cname="THETA7">2.217878577321793E-005</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">2.121276888228470E-004</nm:col>
+          <nm:col nm:cname="OMEGA(1,2)">1.190514355283426E-004</nm:col>
+          <nm:col nm:cname="OMEGA(1,3)">1.691155368629760E-004</nm:col>
+          <nm:col nm:cname="OMEGA(2,2)">4.208855672973481E-005</nm:col>
+          <nm:col nm:cname="OMEGA(2,3)">8.236989039303888E-005</nm:col>
+          <nm:col nm:cname="OMEGA(3,3)">1.362708326148178E-004</nm:col>
+         </nm:row>
+         <nm:row nm:rname="SIGMA(1,1)">
+          <nm:col nm:cname="THETA1">1.171142143514267E-005</nm:col>
+          <nm:col nm:cname="THETA2">2.059180137682655E-006</nm:col>
+          <nm:col nm:cname="THETA3">7.774058496674219E-006</nm:col>
+          <nm:col nm:cname="THETA4">1.042732443546316E-006</nm:col>
+          <nm:col nm:cname="THETA5">-2.207897241343247E-008</nm:col>
+          <nm:col nm:cname="THETA6">3.438937603545752E-006</nm:col>
+          <nm:col nm:cname="THETA7">-1.504487470936986E-005</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">-4.262435534937110E-006</nm:col>
+          <nm:col nm:cname="OMEGA(1,2)">7.418125161538543E-007</nm:col>
+          <nm:col nm:cname="OMEGA(1,3)">4.106499980245681E-006</nm:col>
+          <nm:col nm:cname="OMEGA(2,2)">-9.651548240885902E-007</nm:col>
+          <nm:col nm:cname="OMEGA(2,3)">6.140444330481678E-007</nm:col>
+          <nm:col nm:cname="OMEGA(3,3)">1.542235802210947E-006</nm:col>
+          <nm:col nm:cname="SIGMA(1,1)">1.475187505529457E-006</nm:col>
+         </nm:row>
+         <nm:row nm:rname="SIGMA(1,2)">
+          <nm:col nm:cname="THETA1">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="THETA2">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="THETA3">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="THETA4">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="THETA5">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="THETA6">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="THETA7">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="OMEGA(1,2)">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="OMEGA(1,3)">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="OMEGA(2,2)">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="OMEGA(2,3)">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="OMEGA(3,3)">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="SIGMA(1,1)">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="SIGMA(1,2)">0.000000000000000E+000</nm:col>
+         </nm:row>
+         <nm:row nm:rname="SIGMA(2,2)">
+          <nm:col nm:cname="THETA1">1.703750169101508E-003</nm:col>
+          <nm:col nm:cname="THETA2">-2.065133982204560E-003</nm:col>
+          <nm:col nm:cname="THETA3">-1.068531665058039E-003</nm:col>
+          <nm:col nm:cname="THETA4">5.722071936222223E-004</nm:col>
+          <nm:col nm:cname="THETA5">4.145909318364458E-003</nm:col>
+          <nm:col nm:cname="THETA6">-2.601025537989293E-003</nm:col>
+          <nm:col nm:cname="THETA7">-3.908703036700112E-003</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">2.225913227606958E-002</nm:col>
+          <nm:col nm:cname="OMEGA(1,2)">1.305193773436189E-002</nm:col>
+          <nm:col nm:cname="OMEGA(1,3)">1.162636034574365E-002</nm:col>
+          <nm:col nm:cname="OMEGA(2,2)">1.490902984829353E-003</nm:col>
+          <nm:col nm:cname="OMEGA(2,3)">2.782389109311242E-003</nm:col>
+          <nm:col nm:cname="OMEGA(3,3)">3.475481090316788E-003</nm:col>
+          <nm:col nm:cname="SIGMA(1,1)">2.521597325691092E-004</nm:col>
+          <nm:col nm:cname="SIGMA(1,2)">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="SIGMA(2,2)">1.44763589897721</nm:col>
+         </nm:row>
+        </nm:covariance>
+        <nm:correlation>
+         <nm:row nm:rname="THETA1">
+          <nm:col nm:cname="THETA1">6.536319172453872E-002</nm:col>
+         </nm:row>
+         <nm:row nm:rname="THETA2">
+          <nm:col nm:cname="THETA1">0.570420835182913</nm:col>
+          <nm:col nm:cname="THETA2">2.768512908356782E-002</nm:col>
+         </nm:row>
+         <nm:row nm:rname="THETA3">
+          <nm:col nm:cname="THETA1">0.445365108917354</nm:col>
+          <nm:col nm:cname="THETA2">0.619284822898900</nm:col>
+          <nm:col nm:cname="THETA3">2.744587967578783E-002</nm:col>
+         </nm:row>
+         <nm:row nm:rname="THETA4">
+          <nm:col nm:cname="THETA1">-0.235739667870154</nm:col>
+          <nm:col nm:cname="THETA2">-0.169762083154078</nm:col>
+          <nm:col nm:cname="THETA3">3.971169310883211E-002</nm:col>
+          <nm:col nm:cname="THETA4">1.858886791877953E-002</nm:col>
+         </nm:row>
+         <nm:row nm:rname="THETA5">
+          <nm:col nm:cname="THETA1">-0.470281183883972</nm:col>
+          <nm:col nm:cname="THETA2">-0.455934478664428</nm:col>
+          <nm:col nm:cname="THETA3">-0.158407288160573</nm:col>
+          <nm:col nm:cname="THETA4">0.213886038749974</nm:col>
+          <nm:col nm:cname="THETA5">3.506283632667086E-002</nm:col>
+         </nm:row>
+         <nm:row nm:rname="THETA6">
+          <nm:col nm:cname="THETA1">-7.905279413752174E-002</nm:col>
+          <nm:col nm:cname="THETA2">6.138970414917395E-002</nm:col>
+          <nm:col nm:cname="THETA3">0.362950231985490</nm:col>
+          <nm:col nm:cname="THETA4">0.107968647449655</nm:col>
+          <nm:col nm:cname="THETA5">-6.253776838671964E-002</nm:col>
+          <nm:col nm:cname="THETA6">4.781663611620525E-002</nm:col>
+         </nm:row>
+         <nm:row nm:rname="THETA7">
+          <nm:col nm:cname="THETA1">-2.713843998529044E-002</nm:col>
+          <nm:col nm:cname="THETA2">-4.194249746953824E-002</nm:col>
+          <nm:col nm:cname="THETA3">-0.254633309187949</nm:col>
+          <nm:col nm:cname="THETA4">-1.751450616523800E-002</nm:col>
+          <nm:col nm:cname="THETA5">0.185825883132911</nm:col>
+          <nm:col nm:cname="THETA6">-0.177198705807621</nm:col>
+          <nm:col nm:cname="THETA7">6.249036770945815E-002</nm:col>
+         </nm:row>
+         <nm:row nm:rname="OMEGA(1,1)">
+          <nm:col nm:cname="THETA1">0.248440163901566</nm:col>
+          <nm:col nm:cname="THETA2">2.601335776995430E-002</nm:col>
+          <nm:col nm:cname="THETA3">-3.688937968423295E-002</nm:col>
+          <nm:col nm:cname="THETA4">-7.038935877746987E-002</nm:col>
+          <nm:col nm:cname="THETA5">1.541564766888320E-002</nm:col>
+          <nm:col nm:cname="THETA6">-0.155557434184918</nm:col>
+          <nm:col nm:cname="THETA7">0.226079985440712</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">5.571560905854778E-002</nm:col>
+         </nm:row>
+         <nm:row nm:rname="OMEGA(1,2)">
+          <nm:col nm:cname="THETA1">0.111437316289860</nm:col>
+          <nm:col nm:cname="THETA2">-6.817123089905933E-002</nm:col>
+          <nm:col nm:cname="THETA3">6.718638228276441E-003</nm:col>
+          <nm:col nm:cname="THETA4">-4.877139031992824E-002</nm:col>
+          <nm:col nm:cname="THETA5">0.234315262970335</nm:col>
+          <nm:col nm:cname="THETA6">-9.215528906800158E-002</nm:col>
+          <nm:col nm:cname="THETA7">2.324135952819604E-003</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">0.626351165444932</nm:col>
+          <nm:col nm:cname="OMEGA(1,2)">2.148181752999719E-002</nm:col>
+         </nm:row>
+         <nm:row nm:rname="OMEGA(1,3)">
+          <nm:col nm:cname="THETA1">0.334872637831562</nm:col>
+          <nm:col nm:cname="THETA2">3.652784984473519E-002</nm:col>
+          <nm:col nm:cname="THETA3">-1.498184590150054E-002</nm:col>
+          <nm:col nm:cname="THETA4">-0.112334785242691</nm:col>
+          <nm:col nm:cname="THETA5">3.777471884354795E-002</nm:col>
+          <nm:col nm:cname="THETA6">-0.196210052053375</nm:col>
+          <nm:col nm:cname="THETA7">0.136828261595439</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">0.722684976718704</nm:col>
+          <nm:col nm:cname="OMEGA(1,2)">0.758512917090678</nm:col>
+          <nm:col nm:cname="OMEGA(1,3)">2.341168223678754E-002</nm:col>
+         </nm:row>
+         <nm:row nm:rname="OMEGA(2,2)">
+          <nm:col nm:cname="THETA1">6.939399233682078E-003</nm:col>
+          <nm:col nm:cname="THETA2">-6.247350689014011E-002</nm:col>
+          <nm:col nm:cname="THETA3">-6.212477958605246E-002</nm:col>
+          <nm:col nm:cname="THETA4">-6.696868412572635E-002</nm:col>
+          <nm:col nm:cname="THETA5">0.258194671535122</nm:col>
+          <nm:col nm:cname="THETA6">-0.101605832969369</nm:col>
+          <nm:col nm:cname="THETA7">7.211847716637934E-002</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">0.343139476011686</nm:col>
+          <nm:col nm:cname="OMEGA(1,2)">0.710752134902497</nm:col>
+          <nm:col nm:cname="OMEGA(1,3)">0.462444702538227</nm:col>
+          <nm:col nm:cname="OMEGA(2,2)">1.004519799005468E-002</nm:col>
+         </nm:row>
+         <nm:row nm:rname="OMEGA(2,3)">
+          <nm:col nm:cname="THETA1">4.280265693450235E-002</nm:col>
+          <nm:col nm:cname="THETA2">-8.836783375208007E-002</nm:col>
+          <nm:col nm:cname="THETA3">2.647816923279477E-003</nm:col>
+          <nm:col nm:cname="THETA4">-6.188346516704190E-002</nm:col>
+          <nm:col nm:cname="THETA5">0.174121777023024</nm:col>
+          <nm:col nm:cname="THETA6">-1.548564855181935E-002</nm:col>
+          <nm:col nm:cname="THETA7">8.726814015708324E-002</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">0.422731549661884</nm:col>
+          <nm:col nm:cname="OMEGA(1,2)">0.751633745801488</nm:col>
+          <nm:col nm:cname="OMEGA(1,3)">0.669195417269501</nm:col>
+          <nm:col nm:cname="OMEGA(2,2)">0.753834686505961</nm:col>
+          <nm:col nm:cname="OMEGA(2,3)">9.101566364118014E-003</nm:col>
+         </nm:row>
+         <nm:row nm:rname="OMEGA(3,3)">
+          <nm:col nm:cname="THETA1">7.960917317768638E-002</nm:col>
+          <nm:col nm:cname="THETA2">5.828171088395264E-002</nm:col>
+          <nm:col nm:cname="THETA3">6.592759901755753E-002</nm:col>
+          <nm:col nm:cname="THETA4">-7.171364978891301E-002</nm:col>
+          <nm:col nm:cname="THETA5">-5.575773286704707E-002</nm:col>
+          <nm:col nm:cname="THETA6">6.759683744336593E-002</nm:col>
+          <nm:col nm:cname="THETA7">3.040347545574571E-002</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">0.326151231824353</nm:col>
+          <nm:col nm:cname="OMEGA(1,2)">0.474746922872719</nm:col>
+          <nm:col nm:cname="OMEGA(1,3)">0.618798757536099</nm:col>
+          <nm:col nm:cname="OMEGA(2,2)">0.358925304652777</nm:col>
+          <nm:col nm:cname="OMEGA(2,3)">0.775266277135333</nm:col>
+          <nm:col nm:cname="OMEGA(3,3)">1.167350986699449E-002</nm:col>
+         </nm:row>
+         <nm:row nm:rname="SIGMA(1,1)">
+          <nm:col nm:cname="THETA1">0.147520625699134</nm:col>
+          <nm:col nm:cname="THETA2">6.123844792005079E-002</nm:col>
+          <nm:col nm:cname="THETA3">0.233209928866330</nm:col>
+          <nm:col nm:cname="THETA4">4.618450912976667E-002</nm:col>
+          <nm:col nm:cname="THETA5">-5.184515769007257E-004</nm:col>
+          <nm:col nm:cname="THETA6">5.921362690369580E-002</nm:col>
+          <nm:col nm:cname="THETA7">-0.198222013143698</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">-6.298792891675836E-002</nm:col>
+          <nm:col nm:cname="OMEGA(1,2)">2.843148348272038E-002</nm:col>
+          <nm:col nm:cname="OMEGA(1,3)">0.144416093003902</nm:col>
+          <nm:col nm:cname="OMEGA(2,2)">-7.910699217412695E-002</nm:col>
+          <nm:col nm:cname="OMEGA(2,3)">5.554692801901308E-002</nm:col>
+          <nm:col nm:cname="OMEGA(3,3)">0.108774153799526</nm:col>
+          <nm:col nm:cname="SIGMA(1,1)">1.214572972500812E-003</nm:col>
+         </nm:row>
+         <nm:row nm:rname="SIGMA(1,2)">
+          <nm:col nm:cname="THETA1">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="THETA2">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="THETA3">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="THETA4">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="THETA5">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="THETA6">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="THETA7">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="OMEGA(1,2)">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="OMEGA(1,3)">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="OMEGA(2,2)">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="OMEGA(2,3)">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="OMEGA(3,3)">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="SIGMA(1,1)">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="SIGMA(1,2)">0.000000000000000E+000</nm:col>
+         </nm:row>
+         <nm:row nm:rname="SIGMA(2,2)">
+          <nm:col nm:cname="THETA1">2.166421658688491E-002</nm:col>
+          <nm:col nm:cname="THETA2">-6.199719035648921E-002</nm:col>
+          <nm:col nm:cname="THETA3">-3.235791795022772E-002</nm:col>
+          <nm:col nm:cname="THETA4">2.558413273204345E-002</nm:col>
+          <nm:col nm:cname="THETA5">9.827500670709428E-002</nm:col>
+          <nm:col nm:cname="THETA6">-4.521014747930219E-002</nm:col>
+          <nm:col nm:cname="THETA7">-5.198642152104801E-002</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">0.332048617006082</nm:col>
+          <nm:col nm:cname="OMEGA(1,2)">0.504980139302030</nm:col>
+          <nm:col nm:cname="OMEGA(1,3)">0.412744681933844</nm:col>
+          <nm:col nm:cname="OMEGA(2,2)">0.123356264911467</nm:col>
+          <nm:col nm:cname="OMEGA(2,3)">0.254080919538092</nm:col>
+          <nm:col nm:cname="OMEGA(3,3)">0.247447917396323</nm:col>
+          <nm:col nm:cname="SIGMA(1,1)">0.172552974585940</nm:col>
+          <nm:col nm:cname="SIGMA(1,2)">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="SIGMA(2,2)">1.20317741791359</nm:col>
+         </nm:row>
+        </nm:correlation>
+        <nm:invcovariance>
+         <nm:row nm:rname="THETA1">
+          <nm:col nm:cname="THETA1">596.346969685203</nm:col>
+         </nm:row>
+         <nm:row nm:rname="THETA2">
+          <nm:col nm:cname="THETA1">-244.450577253944</nm:col>
+          <nm:col nm:cname="THETA2">3510.42042567133</nm:col>
+         </nm:row>
+         <nm:row nm:rname="THETA3">
+          <nm:col nm:cname="THETA1">-509.927434434177</nm:col>
+          <nm:col nm:cname="THETA2">-2129.33830652457</nm:col>
+          <nm:col nm:cname="THETA3">3763.68624671389</nm:col>
+         </nm:row>
+         <nm:row nm:rname="THETA4">
+          <nm:col nm:cname="THETA1">198.449163893000</nm:col>
+          <nm:col nm:cname="THETA2">370.951187703146</nm:col>
+          <nm:col nm:cname="THETA3">-548.172013795824</nm:col>
+          <nm:col nm:cname="THETA4">3280.91675146345</nm:col>
+         </nm:row>
+         <nm:row nm:rname="THETA5">
+          <nm:col nm:cname="THETA1">390.479243948330</nm:col>
+          <nm:col nm:cname="THETA2">795.321509860955</nm:col>
+          <nm:col nm:cname="THETA3">-821.831031691517</nm:col>
+          <nm:col nm:cname="THETA4">-162.321304155808</nm:col>
+          <nm:col nm:cname="THETA5">1616.13926972252</nm:col>
+         </nm:row>
+         <nm:row nm:rname="THETA6">
+          <nm:col nm:cname="THETA1">85.5433493810211</nm:col>
+          <nm:col nm:cname="THETA2">260.194075055626</nm:col>
+          <nm:col nm:cname="THETA3">-589.863379863974</nm:col>
+          <nm:col nm:cname="THETA4">-30.4667463152051</nm:col>
+          <nm:col nm:cname="THETA5">143.330834645999</nm:col>
+          <nm:col nm:cname="THETA6">605.864649872945</nm:col>
+         </nm:row>
+         <nm:row nm:rname="THETA7">
+          <nm:col nm:cname="THETA1">-31.4442639961571</nm:col>
+          <nm:col nm:cname="THETA2">-255.894952346192</nm:col>
+          <nm:col nm:cname="THETA3">313.897979405448</nm:col>
+          <nm:col nm:cname="THETA4">-24.7990935690972</nm:col>
+          <nm:col nm:cname="THETA5">-233.874850848940</nm:col>
+          <nm:col nm:cname="THETA6">-7.49787319611263</nm:col>
+          <nm:col nm:cname="THETA7">362.523811870544</nm:col>
+         </nm:row>
+         <nm:row nm:rname="OMEGA(1,1)">
+          <nm:col nm:cname="THETA1">19.8480983196130</nm:col>
+          <nm:col nm:cname="THETA2">72.6678066012364</nm:col>
+          <nm:col nm:cname="THETA3">-104.021903065336</nm:col>
+          <nm:col nm:cname="THETA4">-42.7877157743108</nm:col>
+          <nm:col nm:cname="THETA5">157.449243126484</nm:col>
+          <nm:col nm:cname="THETA6">-13.0772803819479</nm:col>
+          <nm:col nm:cname="THETA7">-126.200374323760</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">839.550850930750</nm:col>
+         </nm:row>
+         <nm:row nm:rname="OMEGA(1,2)">
+          <nm:col nm:cname="THETA1">231.477630898807</nm:col>
+          <nm:col nm:cname="THETA2">-128.240069634099</nm:col>
+          <nm:col nm:cname="THETA3">-642.487822251720</nm:col>
+          <nm:col nm:cname="THETA4">118.834971455536</nm:col>
+          <nm:col nm:cname="THETA5">-618.531637361961</nm:col>
+          <nm:col nm:cname="THETA6">-163.465376889306</nm:col>
+          <nm:col nm:cname="THETA7">613.361195675297</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">-830.327023865421</nm:col>
+          <nm:col nm:cname="OMEGA(1,2)">14643.7641892569</nm:col>
+         </nm:row>
+         <nm:row nm:rname="OMEGA(1,3)">
+          <nm:col nm:cname="THETA1">-965.321271434935</nm:col>
+          <nm:col nm:cname="THETA2">116.788867880638</nm:col>
+          <nm:col nm:cname="THETA3">1093.48463251742</nm:col>
+          <nm:col nm:cname="THETA4">-22.1474370461863</nm:col>
+          <nm:col nm:cname="THETA5">-414.970514218781</nm:col>
+          <nm:col nm:cname="THETA6">384.639046747177</nm:col>
+          <nm:col nm:cname="THETA7">-156.557856379520</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">-1312.97549728720</nm:col>
+          <nm:col nm:cname="OMEGA(1,2)">-5066.31552038891</nm:col>
+          <nm:col nm:cname="OMEGA(1,3)">10583.9959489940</nm:col>
+         </nm:row>
+         <nm:row nm:rname="OMEGA(2,2)">
+          <nm:col nm:cname="THETA1">-16.6647710924373</nm:col>
+          <nm:col nm:cname="THETA2">-2817.47427119550</nm:col>
+          <nm:col nm:cname="THETA3">2239.05518695026</nm:col>
+          <nm:col nm:cname="THETA4">147.566778685871</nm:col>
+          <nm:col nm:cname="THETA5">-855.591442368861</nm:col>
+          <nm:col nm:cname="THETA6">122.224531380910</nm:col>
+          <nm:col nm:cname="THETA7">206.728802610121</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">273.260399952896</nm:col>
+          <nm:col nm:cname="OMEGA(1,2)">-7883.78985719776</nm:col>
+          <nm:col nm:cname="OMEGA(1,3)">2149.14006091840</nm:col>
+          <nm:col nm:cname="OMEGA(2,2)">40900.8357245858</nm:col>
+         </nm:row>
+         <nm:row nm:rname="OMEGA(2,3)">
+          <nm:col nm:cname="THETA1">-341.173817830407</nm:col>
+          <nm:col nm:cname="THETA2">5308.70753968457</nm:col>
+          <nm:col nm:cname="THETA3">-2886.67958120711</nm:col>
+          <nm:col nm:cname="THETA4">393.727815241337</nm:col>
+          <nm:col nm:cname="THETA5">234.671381265616</nm:col>
+          <nm:col nm:cname="THETA6">101.123520728212</nm:col>
+          <nm:col nm:cname="THETA7">-1185.95463097179</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">812.524364510238</nm:col>
+          <nm:col nm:cname="OMEGA(1,2)">-12879.1380608532</nm:col>
+          <nm:col nm:cname="OMEGA(1,3)">455.945405355796</nm:col>
+          <nm:col nm:cname="OMEGA(2,2)">-40535.8921909951</nm:col>
+          <nm:col nm:cname="OMEGA(2,3)">114131.781696610</nm:col>
+         </nm:row>
+         <nm:row nm:rname="OMEGA(3,3)">
+          <nm:col nm:cname="THETA1">1076.13487019472</nm:col>
+          <nm:col nm:cname="THETA2">-2373.57136414302</nm:col>
+          <nm:col nm:cname="THETA3">232.709793277039</nm:col>
+          <nm:col nm:cname="THETA4">84.5085280902161</nm:col>
+          <nm:col nm:cname="THETA5">1054.60308777836</nm:col>
+          <nm:col nm:cname="THETA6">-544.936797042032</nm:col>
+          <nm:col nm:cname="THETA7">381.860280118443</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">445.956288044985</nm:col>
+          <nm:col nm:cname="OMEGA(1,2)">6254.07828596061</nm:col>
+          <nm:col nm:cname="OMEGA(1,3)">-7327.05512221440</nm:col>
+          <nm:col nm:cname="OMEGA(2,2)">14094.4629034578</nm:col>
+          <nm:col nm:cname="OMEGA(2,3)">-47746.3951234844</nm:col>
+          <nm:col nm:cname="OMEGA(3,3)">35270.3042709402</nm:col>
+         </nm:row>
+         <nm:row nm:rname="SIGMA(1,1)">
+          <nm:col nm:cname="THETA1">-906.190219431660</nm:col>
+          <nm:col nm:cname="THETA2">3521.65480945862</nm:col>
+          <nm:col nm:cname="THETA3">-9423.22203788746</nm:col>
+          <nm:col nm:cname="THETA4">-1621.68288891790</nm:col>
+          <nm:col nm:cname="THETA5">-2283.89411895111</nm:col>
+          <nm:col nm:cname="THETA6">173.994655675400</nm:col>
+          <nm:col nm:cname="THETA7">2691.34923633539</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">4840.33703491163</nm:col>
+          <nm:col nm:cname="OMEGA(1,2)">16784.2561149135</nm:col>
+          <nm:col nm:cname="OMEGA(1,3)">-23084.5162949453</nm:col>
+          <nm:col nm:cname="OMEGA(2,2)">13074.8948421462</nm:col>
+          <nm:col nm:cname="OMEGA(2,3)">-26090.1692574708</nm:col>
+          <nm:col nm:cname="OMEGA(3,3)">13117.0883960121</nm:col>
+          <nm:col nm:cname="SIGMA(1,1)">862804.949587248</nm:col>
+         </nm:row>
+         <nm:row nm:rname="SIGMA(1,2)">
+          <nm:col nm:cname="THETA1">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="THETA2">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="THETA3">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="THETA4">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="THETA5">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="THETA6">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="THETA7">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="OMEGA(1,2)">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="OMEGA(1,3)">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="OMEGA(2,2)">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="OMEGA(2,3)">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="OMEGA(3,3)">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="SIGMA(1,1)">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="SIGMA(1,2)">0.000000000000000E+000</nm:col>
+         </nm:row>
+         <nm:row nm:rname="SIGMA(2,2)">
+          <nm:col nm:cname="THETA1">1.05282520293262</nm:col>
+          <nm:col nm:cname="THETA2">-2.03982830604352</nm:col>
+          <nm:col nm:cname="THETA3">5.63370912367291</nm:col>
+          <nm:col nm:cname="THETA4">-2.12744546445744</nm:col>
+          <nm:col nm:cname="THETA5">-8.534763519069410E-002</nm:col>
+          <nm:col nm:cname="THETA6">4.848761145848413E-002</nm:col>
+          <nm:col nm:cname="THETA7">-0.102671559493868</nm:col>
+          <nm:col nm:cname="OMEGA(1,1)">0.570403019020471</nm:col>
+          <nm:col nm:cname="OMEGA(1,2)">-61.4801823724125</nm:col>
+          <nm:col nm:cname="OMEGA(1,3)">2.96118938361338</nm:col>
+          <nm:col nm:cname="OMEGA(2,2)">50.1135073580391</nm:col>
+          <nm:col nm:cname="OMEGA(2,3)">43.5168082773769</nm:col>
+          <nm:col nm:cname="OMEGA(3,3)">-21.5888350431499</nm:col>
+          <nm:col nm:cname="SIGMA(1,1)">-171.560067499832</nm:col>
+          <nm:col nm:cname="SIGMA(1,2)">0.000000000000000E+000</nm:col>
+          <nm:col nm:cname="SIGMA(2,2)">1.15990322888308</nm:col>
+         </nm:row>
+        </nm:invcovariance>
+       </nm:estimation>
+       <nm:post_process_times>
+        <nm:post_elapsed_time>5.25</nm:post_elapsed_time>
+        <nm:finaloutput_elapsed_time>0.94</nm:finaloutput_elapsed_time>
+       </nm:post_process_times>
+      </nm:problem>
+     </nm:nonmem>
+     <nm:stop_datetime>2018-09-17T14:33:13.102</nm:stop_datetime>
+     <nm:total_cputime>2812.827</nm:total_cputime>
+    </nm:output>
+   </so>
+  </job>
+  <job>
+   <do>cat /opt/NONMEM/nm74/nmqual/log.xml</do>
+   <so>
+    <log>
+     <logged on="install">
+      <config>
+       <!--Linux / Darwin with ifort compile opts for cross-platform reproducibility.-->
+       <alias id="folder">/mnt/nm743CD</alias>
+       <alias id="target">/opt/NONMEM/nm74</alias>
+       <alias id="origin">/mnt/nmqual-8.4.0</alias>
+       <alias id="unlock">/etc/chef/cookbooks/ifort-nonmem/files/default/nonmem.lic</alias>
+       <alias id="mpicha">/usr/local/mpich3/lib/libmpich.a</alias>
+       <!--The meta interface groups commands that collect metadata.-->
+       <do on="meta">pwd</do>
+       <do on="meta">date</do>
+       <do on="meta">perl -e 'use POSIX; print join qq(,),uname'</do>
+       <do on="meta">echo $SHELL</do>
+       <do on="meta">echo $USER</do>
+       <do on="meta">echo $PATH</do>
+       <do on="meta">head -n 5 target/util/nmfe74</do>
+       <do on="meta">which ifort</do>
+       <!--The 'install' interface installs NONMEM.-->
+       <do on="install">date</do>
+       <do on="install">rm -rf origin/temp</do>
+       <do on="install">mkdir origin/temp</do>
+       <do on="install">cp -r folder/* origin/temp</do>
+       <do on="install" in="origin">patch -p0 temp/SETUP74 nix/setup74.diff</do>
+       <!--alters compile options in setup73-->
+       <do on="install">rm -rf target</do>
+       <do on="install">mkdir target</do>
+       <do on="install" in="origin/temp">pwd</do>
+       <do on="install" in="origin/temp">ifort --version</do>
+       <do on="install" in="origin/temp">/bin/bash SETUP74 origin/temp target ifort y ar same rec q unzip nonmem74e.zip nonmem74r.zip</do>
+       <do on="install">mkdir target/nmqual</do>
+       <do on="install">mkdir target/nmqual/doc</do>
+       <do on="install">cp $0 target/nmqual</do>
+       <!--runtime copy of autolog.pl, uses nmqual/log.xml as config-->
+       <do on="install">cp -r origin/con target/nmqual</do>
+       <!--support for processing xml docs-->
+       <do on="install">cp -r origin/csv target/nmqual</do>
+       <!--support for processing csv docs-->
+       <do on="install">cp origin/doc/nix/* target/nmqual/doc</do>
+       <!--reference modeling results-->
+       <do on="install">cp -r origin/psn target/nmqual</do>
+       <!--support for psn qualification-->
+       <do on="install">cp origin/nix/setup74.diff target/nmqual/doc</do>
+       <!--keep for archival purposes-->
+       <do on="install">cp origin/temp/SETUP74 target/nmqual/doc</do>
+       <!--keep for archival purposes-->
+       <do on="install">rm -rf origin/temp</do>
+       <do on="install">cp -r origin/test target/nmqual</do>
+       <!--supports control tests-->
+       <do on="install">chmod 0777 target/license/nonmem.lic</do>
+       <!--enable overwriting-->
+       <do on="install">cp unlock target/license/nonmem.lic</do>
+       <!--replace expired license-->
+       <do on="install">cp mpicha target/mpi/mpi_lini</do>
+       <!--replace default mpich archive-->
+       <!--patch util/nmfe73 and run/nmfe73 to accept compile/execute option-->
+       <do on="install">cp target/util/nmfe74 target/util/nmfe74.old</do>
+       <do on="install">cp target/util/nmfe74 target/run/nmfe74.old</do>
+       <do on="install">patch -p0 -R target/util/nmfe74 nix/nmfe74.diff</do>
+       <do on="install">patch -p0 -R target/run/nmfe74 nix/nmfe74.diff</do>
+       <do on="install" as="xml">perl $0 $_0 meta</do>
+       <to on="install">target/nmqual/log.xml</to>
+       <!--The 'basic' interface does not expect a compile/execute argument (nmfe73-as-modified no longer requires it).-->
+       <!--Run directory and run name are required arguments.-->
+       <do on="basic" as="xml">perl $0 $_0 meta</do>
+       <do on="basic" in="$_1">target/util/nmfe74 $_2.ctl $_2.lst</do>
+       <do on="basic" in="$_1" as="xml">if [ -e $_2.xml ];then cat $_2.xml;else echo \&lt;nofile/\>; fi</do>
+       <do on="basic" as="xml">cat target/nmqual/log.xml</do>
+       <to on="basic">$_1/$_2.log.xml</to>
+       <!--The 'run' interface expects a leading compile/execute argument.-->
+       <do on="run" as="xml">perl $0 $_0 meta</do>
+       <do on="run" in="$_2">target/util/nmfe74 $_1 $_3.ctl $_3.lst</do>
+       <do on="run" in="$_2" as="xml">if [ -e $_3.xml ];then cat $_3.xml;else echo \&lt;nofile/\>; fi</do>
+       <do on="run" as="xml">cat target/nmqual/log.xml</do>
+       <to on="run">$_2/$_3.log.xml</to>
+       <!--The 'para' interface additionally expects [run].pnm to be present in the run directory.-->
+       <do on="para" as="xml">perl $0 $_0 meta</do>
+       <do on="para" in="$_2">target/util/nmfe74 $_1 $_3.ctl $_3.lst -parafile=$_3.pnm</do>
+       <do on="para" in="$_2" as="xml">if [ -e $_3.xml ];then cat $_3.xml;else echo \&lt;nofile/\>; fi</do>
+       <do on="para" as="xml">cat target/nmqual/log.xml</do>
+       <to on="para">$_2/$_3.log.xml</to>
+       <!--The 'test' interface invokes nmfe directly, without the compile/execute argument.-->
+       <do on="test" in="target/nmqual/test">target/util/nmfe74 $_1.ctl $_1.lst</do>
+       <do on="test" in="target/nmqual/test" as="xml">cat $_1.xml</do>
+       <!--The 'qualify' interface runs a full suite of qualification tests.-->
+       <do on="qualify" as="xml">perl $0 $_0 meta</do>
+       <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test 3</do>
+       <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test 4</do>
+       <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test 5</do>
+       <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test 6</do>
+       <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test 7</do>
+       <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test 8</do>
+       <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test example5</do>
+       <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test example6</do>
+       <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test example7</do>
+       <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test example10</do>
+       <do on="qualify" as="xml">cat target/nmqual/log.xml</do>
+       <to on="qualify">$_1</to>
+       <!--The 'regress' interface runs a reduced suite of tests quickly, e.g. for regression testing.-->
+       <do on="regress" as="xml">perl $0 $_0 meta</do>
+       <do on="regress" in="target/nmqual" as="xml">perl autolog.pl log.xml test 3</do>
+       <do on="regress" in="target/nmqual" as="xml">perl autolog.pl log.xml test 4</do>
+       <do on="regress" in="target/nmqual" as="xml">perl autolog.pl log.xml test 5</do>
+       <do on="regress" in="target/nmqual" as="xml">perl autolog.pl log.xml test 6</do>
+       <do on="regress" in="target/nmqual" as="xml">perl autolog.pl log.xml test 7</do>
+       <do on="regress" in="target/nmqual" as="xml">perl autolog.pl log.xml test 8</do>
+       <do on="regress" as="xml">cat target/nmqual/log.xml</do>
+       <to on="regress">$_1</to>
+       <!--The 'psntest' interface runs PsN control tests.-->
+       <do on="psntest" as="xml">perl $0 $_0 meta</do>
+       <do on="psntest" in="target/nmqual/psn">execute -directory=runs -seed=1 TST33611.nmctl TST33612.nmctl TST33613.nmctl</do>
+       <do on="psntest" in="target/nmqual/psn">bootstrap -samples=20 -dir=boot -seed=1 TST3362.nmctl</do>
+       <do on="psntest" in="target/nmqual/psn/runs" as="xml">perl target/nmqual/csv/csv2xml.pl raw_results_TST33611.csv</do>
+       <do on="psntest" in="target/nmqual/psn/boot" as="xml">perl target/nmqual/csv/csv2xml.pl raw_results_TST3362.csv</do>
+       <do on="psntest" in="target/nmqual/psn/boot" as="xml">perl target/nmqual/csv/sections2csv.pl '^means' bootstrap_results.csv | perl target/nmqual/csv/csv2xml.pl</do>
+       <do on="psntest" in="target/nmqual/psn/boot" as="xml">perl target/nmqual/csv/sections2csv.pl standard.error.confidence.intervals bootstrap_results.csv | perl target/nmqual/csv/csv2xml.pl</do>
+       <do on="psntest" as="xml">cat target/nmqual/log.xml</do>
+       <to on="psntest">$_1</to>
+       <!--The 'accept' interface embeds an acceptance statement at the end of the log.-->
+       <do on="accept">echo $_</do>
+       <to on="accept">$0</to>
+      </config>
+      <job>
+       <do>date</do>
+       <so>Fri Jun 29 15:07:22 UTC 2018</so>
+      </job>
+      <job>
+       <do>rm -rf /mnt/nmqual-8.4.0/temp</do>
+       <so/>
+      </job>
+      <job>
+       <do>mkdir /mnt/nmqual-8.4.0/temp</do>
+       <so/>
+      </job>
+      <job>
+       <do>cp -r /mnt/nm743CD/* /mnt/nmqual-8.4.0/temp</do>
+       <so/>
+      </job>
+      <job>
+       <do in="/mnt/nmqual-8.4.0">patch -p0 temp/SETUP74 nix/setup74.diff</do>
+       <so>patching file temp/SETUP74</so>
+      </job>
+      <job>
+       <do>rm -rf /opt/NONMEM/nm74</do>
+       <so/>
+      </job>
+      <job>
+       <do>mkdir /opt/NONMEM/nm74</do>
+       <so/>
+      </job>
+      <job>
+       <do in="/mnt/nmqual-8.4.0/temp">pwd</do>
+       <so>/mnt/nmqual-8.4.0/temp</so>
+      </job>
+      <job>
+       <do in="/mnt/nmqual-8.4.0/temp">ifort --version</do>
+       <so>ifort (IFORT) 12.0.4 20110427
+          Copyright (C) 1985-2011 Intel Corporation.  All rights reserved.
+          </so>
+      </job>
+      <job>
+       <do in="/mnt/nmqual-8.4.0/temp">/bin/bash SETUP74 /mnt/nmqual-8.4.0/temp /opt/NONMEM/nm74 ifort y ar same rec q unzip nonmem74e.zip nonmem74r.zip</do>
+       <so>NONMEM 7.4.3 INSTALLATION UTILITY - UNIX Bourne-Again SHell version
+          For instructions, see readme_743.pdf on the CD or NONMEM installer directory
+           
+          SETUP74 /mnt/nmqual-8.4.0/temp /opt/NONMEM/nm74 ifort y ar same rec q unzip nonmem74e.zip nonmem74r.zip
+          CD-ROM drive is /mnt/nmqual-8.4.0/temp
+          NONMEM 7.4 directory is /opt/NONMEM/nm74
+          Command for FORTRAN compiles is ifort
+          Optimization for Fortran compiles is y
+          Command to build NONMEM archive is ar
+          Sizes is same (SIZES.f90 is always used)
+          Recompile is rec
+           All binaries will be recompiled
+          Interactive is q
+          Unzip program is unzip
+          Encrypted source file is nonmem74e.zip
+          Unencrypted file is nonmem74r.zip
+           
+          To learn how to override the defaults, enter
+          % SETUP74 help
+           
+          directory /opt/NONMEM/nm74
+          Step 1a. Copy files from /mnt/nmqual-8.4.0/temp to /opt/NONMEM/nm74
+          Step 1b. Copy files from /mnt/nmqual-8.4.0/temp/NONMEM_7.4.3 to /opt/NONMEM/nm74
+           
+          Installing NONMEM 7.4.3 (Enter Ctrl-C to interrupt) ...
+          Step 2a. Make sub-directories of /opt/NONMEM/nm74
+          Extract rest of files
+          Choosing platform-dependent files ...
+          os is Linux
+          cpu is x86_64
+            Will use install_Linux
+          Compiler is ifort
+            Will use util/finish_Linux_ifort
+          
+           
+          === Checking compiler
+          Version of ifort is:
+           
+          ===
+          the compiler options are -fp-model strict -Gs -nologo -nbs -w
+          Copying NONMEM license file nonmem.lic to
+          /opt/NONMEM/nm74/license/nonmem.lic
+          Warning: the license may be expired or may expire soon.
+          When this happens, NONMEM runs will fail.
+          If you have a new license file from IDS, you may stop, replace
+          it and restart SETUP74. Otherwise, allow NONMEM installation
+          to finish at this time.
+          Obtain a new license file from IDS (IDSSOFTWARE@iconplc.com)
+          as as soon as possible and replace
+          /opt/NONMEM/nm74/license/nonmem.lic
+           
+          Changes to License file, resource/SIZES.f90 and other resource
+          files may be made here.
+          Step 6. Compile resource files
+          Compile of resource files was successful.
+          resource directory has been compiled
+          Step 9. Compile all remaining source files
+          This will take a long time.
+          See file /opt/NONMEM/nm74/progress.txt for compiler progress
+          Step 10. Build NONMEM archive nm/nonmem.a
+          Step 13. Create shell script util/nmfe74
+          finished nmfe74
+          Step 14. Create directory run
+          run contains the following files:
+          nmfe74 CONTROL3 CONTROL5 DATA3 THEOPP REPORT5IDS.txt
+          run contains additional files
+           
+          Installation of NONMEM 7.4.3 is finished.
+          For future reference, the command has been saved in file SETUP.TXT
+           
+          Please review /opt/NONMEM/nm74/compilemsgs.txt
+                        /opt/NONMEM/nm74/finishmsgs.txt
+          Ignore warnings. Report error messages.
+           
+          Help and html files and Users Guides will be installed.
+          Step 15. Install NONMEM Users Guide files in /opt/NONMEM/nm74/guides
+          Unzipping guides.zip ...
+          To use the NONMEM Users Guides,
+            open pdf files in /opt/NONMEM/nm74/guides using Adobe Reader.
+          Step 16. Install On-line help files in /opt/NONMEM/nm74/help
+          Unzipping help.zip ...
+          For online help, enter (e.g.)
+            cd /opt/NONMEM/nm74/help
+            ./nmhelp advan2
+          Step 17. Install HTML files in /opt/NONMEM/nm74/html (this may take a while) ...
+          Unzipping html.zip ...
+          For online help HTML files,
+            open /opt/NONMEM/nm74/index.html in web browser
+           
+          Do you want to test the installation?
+          Testing the installation. Commands are
+              cd /opt/NONMEM/nm74/run
+              ./nmfe74 CONTROL5 REPORT5.txt -prdefault
+          If the run is successful, file REPORT5.txt will be created.
+           
+          Starting NMTRAN
+            
+           WARNINGS AND ERRORS (IF ANY) FOR PROBLEM    1
+                       
+           (WARNING  2) NM-TRAN INFERS THAT THE DATA ARE POPULATION.
+                       
+           (WARNING  43) THE $PK BLOCK REQUESTS "CALL ONCE PER INDIVIDUAL RECORD", BUT
+           DATA ITEMS ARE USED IN THE $PK BLOCK. VALUES OF THESE DATA ITEMS
+           SUBSEQUENT TO THOSE FROM THE FIRST EVENT RECORD WILL BE IGNORED.  IF THIS
+           IS NOT APPROPRIATE, THE CALL DATA ITEM CAN BE USED TO OBTAIN ADDITIONAL
+           CALLS, OR $PK'S CALLING PROTOCOL SHOULD BE CHANGED.
+          Building NONMEM Executable
+          Starting nonmem execution ...
+          License Registered to: Temporary License for Installing NONMEM 7.4.3
+          Expiration Date:    30 MAR 2018
+          Current Date:       29 JUN 2018
+           
+            **** NONMEM LICENSE HAS EXPIRED ****
+            ****     NONMEM TERMINATING     ****
+            **** CONTACT idssoftware@iconplc.com FOR RENEWAL ****
+           
+          Done with nonmem execution
+          Nonmem executable was created but did not run successfully.
+          This may be because the license is expired.
+          Obtain a new license file from IDS (IDSSOFTWARE@iconplc.com)
+          and replace
+          /opt/NONMEM/nm74/license/nonmem.lic</so>
+      </job>
+      <job>
+       <do>mkdir /opt/NONMEM/nm74/nmqual</do>
+       <so/>
+      </job>
+      <job>
+       <do>mkdir /opt/NONMEM/nm74/nmqual/doc</do>
+       <so/>
+      </job>
+      <job>
+       <do>cp autolog.pl /opt/NONMEM/nm74/nmqual</do>
+       <so/>
+      </job>
+      <job>
+       <do>cp -r /mnt/nmqual-8.4.0/con /opt/NONMEM/nm74/nmqual</do>
+       <so/>
+      </job>
+      <job>
+       <do>cp -r /mnt/nmqual-8.4.0/csv /opt/NONMEM/nm74/nmqual</do>
+       <so/>
+      </job>
+      <job>
+       <do>cp /mnt/nmqual-8.4.0/doc/nix/* /opt/NONMEM/nm74/nmqual/doc</do>
+       <so/>
+      </job>
+      <job>
+       <do>cp -r /mnt/nmqual-8.4.0/psn /opt/NONMEM/nm74/nmqual</do>
+       <so/>
+      </job>
+      <job>
+       <do>cp /mnt/nmqual-8.4.0/nix/setup74.diff /opt/NONMEM/nm74/nmqual/doc</do>
+       <so/>
+      </job>
+      <job>
+       <do>cp /mnt/nmqual-8.4.0/temp/SETUP74 /opt/NONMEM/nm74/nmqual/doc</do>
+       <so/>
+      </job>
+      <job>
+       <do>rm -rf /mnt/nmqual-8.4.0/temp</do>
+       <so/>
+      </job>
+      <job>
+       <do>cp -r /mnt/nmqual-8.4.0/test /opt/NONMEM/nm74/nmqual</do>
+       <so/>
+      </job>
+      <job>
+       <do>chmod 0777 /opt/NONMEM/nm74/license/nonmem.lic</do>
+       <so/>
+      </job>
+      <job>
+       <do>cp /etc/chef/cookbooks/ifort-nonmem/files/default/nonmem.lic /opt/NONMEM/nm74/license/nonmem.lic</do>
+       <so/>
+      </job>
+      <job>
+       <do>cp /usr/local/mpich3/lib/libmpich.a /opt/NONMEM/nm74/mpi/mpi_lini</do>
+       <so/>
+      </job>
+      <job>
+       <do>cp /opt/NONMEM/nm74/util/nmfe74 /opt/NONMEM/nm74/util/nmfe74.old</do>
+       <so/>
+      </job>
+      <job>
+       <do>cp /opt/NONMEM/nm74/util/nmfe74 /opt/NONMEM/nm74/run/nmfe74.old</do>
+       <so/>
+      </job>
+      <job>
+       <do>patch -p0 -R /opt/NONMEM/nm74/util/nmfe74 nix/nmfe74.diff</do>
+       <so>patching file /opt/NONMEM/nm74/util/nmfe74</so>
+      </job>
+      <job>
+       <do>patch -p0 -R /opt/NONMEM/nm74/run/nmfe74 nix/nmfe74.diff</do>
+       <so>patching file /opt/NONMEM/nm74/run/nmfe74</so>
+      </job>
+      <job>
+       <do>perl autolog.pl nix/nm74.xml meta</do>
+       <so>
+        <log>
+         <logged on="meta">
+          <config>
+           <!--Linux / Darwin with ifort compile opts for cross-platform reproducibility.-->
+           <alias id="folder">/mnt/nm743CD</alias>
+           <alias id="target">/opt/NONMEM/nm74</alias>
+           <alias id="origin">/mnt/nmqual-8.4.0</alias>
+           <alias id="unlock">/etc/chef/cookbooks/ifort-nonmem/files/default/nonmem.lic</alias>
+           <alias id="mpicha">/usr/local/mpich3/lib/libmpich.a</alias>
+           <!--The meta interface groups commands that collect metadata.-->
+           <do on="meta">pwd</do>
+           <do on="meta">date</do>
+           <do on="meta">perl -e 'use POSIX; print join qq(,),uname'</do>
+           <do on="meta">echo $SHELL</do>
+           <do on="meta">echo $USER</do>
+           <do on="meta">echo $PATH</do>
+           <do on="meta">head -n 5 target/util/nmfe74</do>
+           <do on="meta">which ifort</do>
+           <!--The 'install' interface installs NONMEM.-->
+           <do on="install">date</do>
+           <do on="install">rm -rf origin/temp</do>
+           <do on="install">mkdir origin/temp</do>
+           <do on="install">cp -r folder/* origin/temp</do>
+           <do on="install" in="origin">patch -p0 temp/SETUP74 nix/setup74.diff</do>
+           <!--alters compile options in setup73-->
+           <do on="install">rm -rf target</do>
+           <do on="install">mkdir target</do>
+           <do on="install" in="origin/temp">pwd</do>
+           <do on="install" in="origin/temp">ifort --version</do>
+           <do on="install" in="origin/temp">/bin/bash SETUP74 origin/temp target ifort y ar same rec q unzip nonmem74e.zip nonmem74r.zip</do>
+           <do on="install">mkdir target/nmqual</do>
+           <do on="install">mkdir target/nmqual/doc</do>
+           <do on="install">cp $0 target/nmqual</do>
+           <!--runtime copy of autolog.pl, uses nmqual/log.xml as config-->
+           <do on="install">cp -r origin/con target/nmqual</do>
+           <!--support for processing xml docs-->
+           <do on="install">cp -r origin/csv target/nmqual</do>
+           <!--support for processing csv docs-->
+           <do on="install">cp origin/doc/nix/* target/nmqual/doc</do>
+           <!--reference modeling results-->
+           <do on="install">cp -r origin/psn target/nmqual</do>
+           <!--support for psn qualification-->
+           <do on="install">cp origin/nix/setup74.diff target/nmqual/doc</do>
+           <!--keep for archival purposes-->
+           <do on="install">cp origin/temp/SETUP74 target/nmqual/doc</do>
+           <!--keep for archival purposes-->
+           <do on="install">rm -rf origin/temp</do>
+           <do on="install">cp -r origin/test target/nmqual</do>
+           <!--supports control tests-->
+           <do on="install">chmod 0777 target/license/nonmem.lic</do>
+           <!--enable overwriting-->
+           <do on="install">cp unlock target/license/nonmem.lic</do>
+           <!--replace expired license-->
+           <do on="install">cp mpicha target/mpi/mpi_lini</do>
+           <!--replace default mpich archive-->
+           <!--patch util/nmfe73 and run/nmfe73 to accept compile/execute option-->
+           <do on="install">cp target/util/nmfe74 target/util/nmfe74.old</do>
+           <do on="install">cp target/util/nmfe74 target/run/nmfe74.old</do>
+           <do on="install">patch -p0 -R target/util/nmfe74 nix/nmfe74.diff</do>
+           <do on="install">patch -p0 -R target/run/nmfe74 nix/nmfe74.diff</do>
+           <do on="install" as="xml">perl $0 $_0 meta</do>
+           <to on="install">target/nmqual/log.xml</to>
+           <!--The 'basic' interface does not expect a compile/execute argument (nmfe73-as-modified no longer requires it).-->
+           <!--Run directory and run name are required arguments.-->
+           <do on="basic" as="xml">perl $0 $_0 meta</do>
+           <do on="basic" in="$_1">target/util/nmfe74 $_2.ctl $_2.lst</do>
+           <do on="basic" in="$_1" as="xml">if [ -e $_2.xml ];then cat $_2.xml;else echo \&lt;nofile/\>; fi</do>
+           <do on="basic" as="xml">cat target/nmqual/log.xml</do>
+           <to on="basic">$_1/$_2.log.xml</to>
+           <!--The 'run' interface expects a leading compile/execute argument.-->
+           <do on="run" as="xml">perl $0 $_0 meta</do>
+           <do on="run" in="$_2">target/util/nmfe74 $_1 $_3.ctl $_3.lst</do>
+           <do on="run" in="$_2" as="xml">if [ -e $_3.xml ];then cat $_3.xml;else echo \&lt;nofile/\>; fi</do>
+           <do on="run" as="xml">cat target/nmqual/log.xml</do>
+           <to on="run">$_2/$_3.log.xml</to>
+           <!--The 'para' interface additionally expects [run].pnm to be present in the run directory.-->
+           <do on="para" as="xml">perl $0 $_0 meta</do>
+           <do on="para" in="$_2">target/util/nmfe74 $_1 $_3.ctl $_3.lst -parafile=$_3.pnm</do>
+           <do on="para" in="$_2" as="xml">if [ -e $_3.xml ];then cat $_3.xml;else echo \&lt;nofile/\>; fi</do>
+           <do on="para" as="xml">cat target/nmqual/log.xml</do>
+           <to on="para">$_2/$_3.log.xml</to>
+           <!--The 'test' interface invokes nmfe directly, without the compile/execute argument.-->
+           <do on="test" in="target/nmqual/test">target/util/nmfe74 $_1.ctl $_1.lst</do>
+           <do on="test" in="target/nmqual/test" as="xml">cat $_1.xml</do>
+           <!--The 'qualify' interface runs a full suite of qualification tests.-->
+           <do on="qualify" as="xml">perl $0 $_0 meta</do>
+           <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test 3</do>
+           <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test 4</do>
+           <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test 5</do>
+           <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test 6</do>
+           <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test 7</do>
+           <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test 8</do>
+           <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test example5</do>
+           <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test example6</do>
+           <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test example7</do>
+           <do on="qualify" in="target/nmqual" as="xml">perl autolog.pl log.xml test example10</do>
+           <do on="qualify" as="xml">cat target/nmqual/log.xml</do>
+           <to on="qualify">$_1</to>
+           <!--The 'regress' interface runs a reduced suite of tests quickly, e.g. for regression testing.-->
+           <do on="regress" as="xml">perl $0 $_0 meta</do>
+           <do on="regress" in="target/nmqual" as="xml">perl autolog.pl log.xml test 3</do>
+           <do on="regress" in="target/nmqual" as="xml">perl autolog.pl log.xml test 4</do>
+           <do on="regress" in="target/nmqual" as="xml">perl autolog.pl log.xml test 5</do>
+           <do on="regress" in="target/nmqual" as="xml">perl autolog.pl log.xml test 6</do>
+           <do on="regress" in="target/nmqual" as="xml">perl autolog.pl log.xml test 7</do>
+           <do on="regress" in="target/nmqual" as="xml">perl autolog.pl log.xml test 8</do>
+           <do on="regress" as="xml">cat target/nmqual/log.xml</do>
+           <to on="regress">$_1</to>
+           <!--The 'psntest' interface runs PsN control tests.-->
+           <do on="psntest" as="xml">perl $0 $_0 meta</do>
+           <do on="psntest" in="target/nmqual/psn">execute -directory=runs -seed=1 TST33611.nmctl TST33612.nmctl TST33613.nmctl</do>
+           <do on="psntest" in="target/nmqual/psn">bootstrap -samples=20 -dir=boot -seed=1 TST3362.nmctl</do>
+           <do on="psntest" in="target/nmqual/psn/runs" as="xml">perl target/nmqual/csv/csv2xml.pl raw_results_TST33611.csv</do>
+           <do on="psntest" in="target/nmqual/psn/boot" as="xml">perl target/nmqual/csv/csv2xml.pl raw_results_TST3362.csv</do>
+           <do on="psntest" in="target/nmqual/psn/boot" as="xml">perl target/nmqual/csv/sections2csv.pl '^means' bootstrap_results.csv | perl target/nmqual/csv/csv2xml.pl</do>
+           <do on="psntest" in="target/nmqual/psn/boot" as="xml">perl target/nmqual/csv/sections2csv.pl standard.error.confidence.intervals bootstrap_results.csv | perl target/nmqual/csv/csv2xml.pl</do>
+           <do on="psntest" as="xml">cat target/nmqual/log.xml</do>
+           <to on="psntest">$_1</to>
+           <!--The 'accept' interface embeds an acceptance statement at the end of the log.-->
+           <do on="accept">echo $_</do>
+           <to on="accept">$0</to>
+          </config>
+          <job>
+           <do>pwd</do>
+           <so>/mnt/nmqual-8.4.0</so>
+          </job>
+          <job>
+           <do>date</do>
+           <so>Fri Jun 29 15:11:45 UTC 2018</so>
+          </job>
+          <job>
+           <do>perl -e 'use POSIX; print join qq(,),uname'</do>
+           <so>Linux,ip-10-0-0-42,3.13.0-93-generic,#140-Ubuntu SMP Mon Jul 18 21:21:05 UTC 2016,x86_64</so>
+          </job>
+          <job>
+           <do>echo $SHELL</do>
+           <so>/bin/bash</so>
+          </job>
+          <job>
+           <do>echo $USER</do>
+           <so>root</so>
+          </job>
+          <job>
+           <do>echo $PATH</do>
+           <so>/opt/intel/bin/intel64:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/chef/embedded/bin:/opt/chef/embedded/bin:/opt/intel/mpirt/bin/intel64</so>
+          </job>
+          <job>
+           <do>head -n 5 /opt/NONMEM/nm74/util/nmfe74</do>
+           <so>#!/bin/bash
+                     dir=/opt/NONMEM/nm74
+                     f=ifort
+                     o=' -fp-model strict -Gs -nologo -nbs -w '
+                     opstat=' -static '</so>
+          </job>
+          <job>
+           <do>which ifort</do>
+           <so>/opt/intel/bin/intel64/ifort</so>
+          </job>
+         </logged>
+        </log>
+       </so>
+      </job>
+     </logged>
+    </log>
+   </so>
+  </job>
+ </logged>
+</log>

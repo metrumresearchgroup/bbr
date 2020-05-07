@@ -200,34 +200,3 @@ check_lst_file <- function(.x) {
 }
 
 
-######################################
-# format NONMEM output to tables
-######################################
-
-#' S3 generic for parsing parameter estimate table
-#' @param .summary generic summary object
-#' @export
-#' @rdname param_estimates
-param_estimates <- function(.summary) {
-  UseMethod("param_estimates")
-}
-
-#' S3 dispatch for parsing `bbi_nonmem_summary` object into parameter estimate table
-#' @param .summary `bbi_nonmem_summary` object
-#' @importFrom tibble tibble
-#' @export
-#' @rdname param_estimates
-param_estimates.bbi_nonmem_summary <- function(.summary) {
-  num_methods <- length(.summary$parameters_data)
-  param_names <- .summary$parameter_names
-  param_estimates <- .summary$parameters_data[[num_methods]]$estimates
-  tibble::tibble(
-    names = unlist(param_names),
-    estimate = unlist(param_estimates),
-    stderr = unlist(.summary$parameters_data[[num_methods]]$std_err) %||% NA_real_,
-    fixed = unlist(.summary$parameters_data[[num_methods]]$fixed),
-  )
-}
-
-
-
