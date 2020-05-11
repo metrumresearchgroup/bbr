@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-This vignette demonstrates parsing parameter estimates and labels into a table that can be used for diagnostics, or to generate reports. *Note, this vignette exclusively deals with NONMEM models.*
+This vignette demonstrates extracting parameter estimates and labels into a table that can be used for diagnostics, or to generate reports. *Note, this vignette exclusively deals with NONMEM models.*
 
 If you are new to `rbabylon`, the ["Getting Started with rbabylon"](getting-started.html) vignette will take you through some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its standard workflow and functionality.
 
@@ -56,7 +56,7 @@ class(mod1)
 
 The model object you have just created can now be passed to the post-processing functions to create your tables.
 
-## Parse Parameter labels
+## Extract Parameter labels
 
 Currently, the `param_labels()` function parses labels from the comments in the control stream. Here is the relevant section of our example control stream.
 
@@ -68,7 +68,7 @@ mod1 %>%
   cat()
 ```
 
-This control stream is parsed into the tibble below, **following the syntax guidelines [here](https://ghe.metrumrg.com/pages/software/mrgtable/reference/nm_tbl.html) NEED EXTERNAL REFERENCE.**
+This control stream is parsed into the tibble below, following the syntax defined in the "Details" section of the `?param_labels` documentation.
 
 ```{r summary 1}
 label_df <- mod1 %>% 
@@ -104,10 +104,13 @@ report_df
 
 Because there are numerous ways of specifying the diagonal and off-diagonal elements of an `$OMEGA` or `$SIGMA` block in a control stream, automatically parsing the structure of these blocks can be brittle and error prone. For this reason, indices are *not* automatically added to the output of the `param_labels()` function and are instead added with the  `apply_indices()` function.
 
-## Specifying Block Structure
-There are two arguments, `.omega` and `.sigma` which each take a logical vector. Each element in this vector corresponds to a parameter specified in the control stream and denotes (with a `TRUE` or `FALSE`) whether that element is a diagonal in the relevant matrix.
+## Default behavior: All Diagonal
+By default `apply_indices()` assumes that *all* `$OMEGA` and `$SIGMA` elements are diagonal. If this is the case, you do not need to pass anything to `.omega` or `.sigma` arguments described below. However, be careful that you do not accidentally overlook this because your indices will be incorrectly returned as simply `(1,1)`, `(2,2)`, `(3,3)`, etc.
 
-For example, an `$OMEGA BLOCK(3)` would be represented with the vector `.omega = c(TRUE, FALSE, TRUE, FALSE, FALSE, TRUE)` because the first, third, and sixth elements are the diagonals and the others represent the off-diagonals. However, `rbabylon` has a helper function `block()` that generates these vectors.
+## Specifying Block Structure
+Block structure is specified with two arguments, `.omega` and `.sigma` which each take a logical vector. Each element in this vector corresponds to a parameter specified in the control stream and denotes whether that element is a diagonal in the relevant matrix.
+
+For example, an `$OMEGA BLOCK(3)` would be represented with the vector `.omega = c(TRUE, FALSE, TRUE, FALSE, FALSE, TRUE)` because the first, third, and sixth elements are the diagonals and the others represent the off-diagonals. However, the user doesn't need to type this explicitly because `rbabylon` has a helper function `block()` that generates these vectors.
 
 ```{r block demo}
 cat(paste("block(1): ", paste(block(1), collapse = ", "), "\n"))
@@ -127,7 +130,6 @@ cat(REF_OMEGA)
 ```
 
 ```{r parse ref}
-options(dplyr.print_max = 20)
 REF_OMEGA %>%
   param_labels() %>%
   apply_indices(
@@ -135,7 +137,7 @@ REF_OMEGA %>%
     )
 ```
 
-Note this it is equally valid to replace any of these with logical vectors as well. For instance, instead of `c(..., block(1), block(1))` is may be easier to write `c(..., rep(TRUE, 2))`, especially if there are a number of `BLOCK(1)` lines in a row in the control stream.
+It is equally valid to replace any of these with logical vectors as well. For instance, instead of `c(..., block(1), block(1))` it may be easier to write `c(..., rep(TRUE, 2))`, especially if there are a number of `BLOCK(1)` lines in a row in the control stream.
 
 ## SAME blocks
-It is also worth noting here that blocks like `$OMEGA BLOCK(1) SAME` which use `SAME` will inherit the label from the block to which `SAME` refers. This is true even if there are several same blocks in a row.
+It is also worth noting here that blocks which use `SAME` (for example, `$OMEGA BLOCK(1) SAME` above) will inherit the label from the block to which `SAME` refers. This is true even if there are multiple `SAME` blocks in a row.

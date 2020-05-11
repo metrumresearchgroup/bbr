@@ -19,7 +19,11 @@ block(.n)
 \item{.n}{The size of the block}
 }
 \description{
-Add parameter indices to a label tibble
-
-Helper function for formatting blocks into .omega or .sigma logical vectors
+Because there are numerous ways of specifying the diagonal and off-diagonal elements of an `$OMEGA` or `$SIGMA` block in a control stream,
+automatically parsing the structure of these blocks can be brittle and error prone. For this reason, indices are *not* automatically added
+to the output of the `param_labels()` function and are instead added with the  `apply_indices()` function.
+}
+\details{
+For more details and examples of how to specify `$OMEGA` and `$SIGMA` block structure, see the "Parameter Labels" vignette:
+\href{../docs/articles/parameter-labels.html}{\code{vignette("parameter-labels", package = "rbabylon")}}
 }

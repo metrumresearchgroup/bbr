@@ -1,19 +1,57 @@
 
-# Extract parameter labels for report tables, etc.
-
-#' Generic s3 for parsing parameter labels from control stream
+#' Extract parameter labels for report tables, etc.
+#'
+#' Parse parameter labels from the model object. Currently this parses labels from comments in the  control stream,
+#' However it will be extended to parse labels from the model YAML file as well.
+#' The syntax for the labeling is described in "Details" below.
+#'
+#' This function will *not* return indices for the parameters, though they can be added with \code{param_labels() \%>\% apply_indices()}.
+#' See the \code{\link{apply_indices}} documentation for more details.
+#'
+#' @details The syntax for parsing labels from comments is inherited from the "Census" specification
+#' that was also used in the `tidynm` and `mrgtable` packages. The syntax is as follows,
+#' with everything after the comment character `;` parsed into the label.
+#'
+#' \code{<nonmem_inits> ; [directive] <Parameter name <LOGD>>}
+#'
+#' \itemize{
+#' \item Inits are the NONMEM initial values, following NONMEM specs
+#' \item Directives include:
+#'   \itemize{
+#'   \item For fixed effects the directives are translated to units, i.e., L/h
+#'   \item For variance components (and only variance components) the directive is parsed into the `type` column
+#'   and can be used for post-processing transformations. Some common types include:
+#'   \itemize{
+#'       \item [A] is the assumed directive and it yields standard deviation / correlation.
+#'       Typically used when the random component has a linear relationship to the typical value.
+#'       \item [P] yields Coefficient of Variation.
+#'       Commonly transformed with \eqn{CV_lognormal = sqrt( exp(omega^2)-1 ) \times 100} for omegas,
+#'       and the value of omega from the correlation matrix (i.e., the SD) for sigmas.
+#'       Typically used with exponentiated random effects or proportional residual error.
+#'       \item [R] indicates that this is an item that should be read from the correlation
+#'       matrix as opposed to the covariance matrix.
+#'       I.e., standard deviation and correlation of the parameter on the raw scale will be reported.
+#'       \item [C] indicates that this item should be read from the covariance matrix, i.e., variance
+#'        and covariance of the parameter on the raw scale will be reported.
+#'      }
+#'   }
+#' \item Paramemter name is parsed into the `label` column, and is commonly formatted to be run through a LaTex parser downstream.
+#' \item LOGD is a flag to indicate that the parameter is modeled on the log
+#' scale (i.e., \eqn{e^\theta}) and should be exponentiated for reporting.
+#' If so, the standard error for the parameter should adjusted via the delta method.
+#' NOTE: this is only a convention, such that downstream code can look for "LOGD" in the `label` column
+#' and transform the estimates accordingly. None of that processing is done automatically by this function.
+#' }
+#'
 #' @param .mod generic model input
-#' @param ... arguments passed through
+#' @param ... arguments passed through (currently to nowhere)
 #' @rdname param_labels
 #' @export
 param_labels <- function(.mod, ...) {
   UseMethod("param_labels", .mod)
 }
 
-#' Parse parameter labels from the model object control stream comments
-#'
-#' This is using the labeling scheme from "Census", as defined here: https://ghe.metrumrg.com/pages/software/mrgtable/reference/nm_tbl.html
-#' It will _not_ return indices for the parameters, though they can be added with `param_labels() %>% apply_indices()`
+
 #' @param .mod `bbi_{.model_type}_model` object
 #' @importFrom readr read_file
 #' @rdname param_labels
@@ -29,7 +67,6 @@ param_labels.bbi_nonmem_model <- function(.mod, ...) {
   return(.label_df)
 }
 
-#' Private implementation function for param_labels
 #' @importFrom tidyr replace_na
 #' @importFrom dplyr select everything
 #' @importFrom purrr map_df
@@ -63,6 +100,14 @@ param_labels.character <- function(.mod, ...) {
 }
 
 #' Add parameter indices to a label tibble
+#'
+#' Because there are numerous ways of specifying the diagonal and off-diagonal elements of an `$OMEGA` or `$SIGMA` block in a control stream,
+#' automatically parsing the structure of these blocks can be brittle and error prone. For this reason, indices are *not* automatically added
+#' to the output of the `param_labels()` function and are instead added with the  `apply_indices()` function.
+#'
+#' @details For more details and examples of how to specify `$OMEGA` and `$SIGMA` block structure, see the "Parameter Labels" vignette:
+#' \href{../docs/articles/parameter-labels.html}{\code{vignette("parameter-labels", package = "rbabylon")}}
+#'
 #' @param .label_df A tibble like the output of `param_labels()`, containing columns `names, label, unit, type`
 #' @param .omega A logical vector indicating whether each Omega parameter is a diagonal. If `NULL` function assumes all are diagonal. Alternatively you can pass `block(.n)` or pass a custom vector if control stream has both block and non-block.
 #' @param .sigma A logical vector indicating whether each Sigma parameter is a diagonal. If `NULL` function assumes all are diagonal. Alternatively you can pass `block(.n)` or pass a custom vector if control stream has both block and non-block.
