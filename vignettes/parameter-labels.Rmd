@@ -1,0 +1,143 @@
+---
+title: "rbabylon Parameter Labels"
+author: "Seth Green"
+date: "2020-05-11"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{parameter-labels}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+  ```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+This vignette demonstrates extracting parameter estimates and labels into a table that can be used for diagnostics, or to generate reports. *Note, this vignette exclusively deals with NONMEM models.*
+
+If you are new to `rbabylon`, the ["Getting Started with rbabylon"](getting-started.html) vignette will take you through some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its standard workflow and functionality.
+
+## Setup
+
+There is some initial set up necessary for using `rbabylon`. Please refer to the ["Getting Started"](getting-started.html) vignette, mentioned above, if you have not done this yet. Once this is done, load the library and set your modeling directory.
+
+```{r set_model_directory}
+library(rbabylon)
+set_model_directory("../inst/param_examples")
+```
+
+```{r setup, include = FALSE}
+MODEL_DIR <- "../inst/param_examples"
+source("../tests/testthat/data/test-param-labels-ref.R")
+REF_OMEGA <- PARAM_BLOCK_REF$PEX_BLOCK32S$ctl
+
+# set babylon execution path
+if (Sys.which("bbi") == "") {
+  # fall back to default location of /data/apps/bbi
+  options('rbabylon.bbi_exe_path' = '/data/apps/bbi')
+}
+```
+
+
+# Parameter labels
+
+## Create Model Object
+Our modeling directory contains a control stream and output directory, because the model has already been run.
+
+```{r first model}
+mod1 <- read_model("510")
+class(mod1)
+```
+
+The model object you have just created can now be passed to the post-processing functions to create your tables.
+
+## Extract Parameter labels
+
+Currently, the `param_labels()` function parses labels from the comments in the control stream. Here is the relevant section of our example control stream.
+
+```{r read ctl 1}
+mod1 %>% 
+  get_model_path() %>%                          # get control stream file path
+  readr::read_lines(skip = 15, n_max = 18) %>%  # read in only parameter section
+  paste(collapse = "\n") %>%
+  cat()
+```
+
+This control stream is parsed into the tibble below, following the syntax defined in the "Details" section of the `?param_labels` documentation.
+
+```{r summary 1}
+label_df <- mod1 %>% 
+  param_labels() %>% 
+  apply_indices(.omega = block(2))
+label_df
+```
+
+Note, there are some subtleties to the `apply_indices()` function that will be addressed in the next section.
+
+## Add Parameter Estimates
+The user can also extract parameter estimates using the `model_summary()` and `param_estimates()` functions.
+
+```{r model_summary}
+param_df <- mod1 %>% 
+  model_summary() %>% 
+  param_estimates()
+param_df
+```
+
+These two tibbles can be joined together to create a table for including in reports.
+
+```{r param_estimates}
+report_df <- dplyr::inner_join(
+  label_df %>% dplyr::select(-param_type),
+  param_df %>% dplyr::select(names, estimate, stderr),
+  by = "names"
+)
+report_df
+```
+
+# Applying indices
+
+Because there are numerous ways of specifying the diagonal and off-diagonal elements of an `$OMEGA` or `$SIGMA` block in a control stream, automatically parsing the structure of these blocks can be brittle and error prone. For this reason, indices are *not* automatically added to the output of the `param_labels()` function and are instead added with the  `apply_indices()` function.
+
+## Default behavior: All Diagonal
+By default `apply_indices()` assumes that *all* `$OMEGA` and `$SIGMA` elements are diagonal. If this is the case, you do not need to pass anything to `.omega` or `.sigma` arguments described below. However, be careful that you do not accidentally overlook this because your indices will be incorrectly returned as simply `(1,1)`, `(2,2)`, `(3,3)`, etc.
+
+## Specifying Block Structure
+Block structure is specified with two arguments, `.omega` and `.sigma` which each take a logical vector. Each element in this vector corresponds to a parameter specified in the control stream and denotes whether that element is a diagonal in the relevant matrix.
+
+For example, an `$OMEGA BLOCK(3)` would be represented with the vector `.omega = c(TRUE, FALSE, TRUE, FALSE, FALSE, TRUE)` because the first, third, and sixth elements are the diagonals and the others represent the off-diagonals. However, the user doesn't need to type this explicitly because `rbabylon` has a helper function `block()` that generates these vectors.
+
+```{r block demo}
+cat(paste("block(1): ", paste(block(1), collapse = ", "), "\n"))
+cat(paste("block(2): ", paste(block(2), collapse = ", "), "\n"))
+cat(paste("block(3): ", paste(block(3), collapse = ", "), "\n"))
+cat(paste("block(4): ", paste(block(4), collapse = ", "), "\n"))
+```
+
+Notice the use of `.omega = block(2)` in the example from the previous section.
+
+## Mixed structure
+
+More complicated block structures can be represented by concatenating these logical vectors together. For example, the following omega block:
+
+```{r ref omega}
+cat(REF_OMEGA)
+```
+
+```{r parse ref}
+REF_OMEGA %>%
+  param_labels() %>%
+  apply_indices(
+      .omega = c(block(3), block(2), block(1), block(1))
+    )
+```
+
+It is equally valid to replace any of these with logical vectors as well. For instance, instead of `c(..., block(1), block(1))` it may be easier to write `c(..., rep(TRUE, 2))`, especially if there are a number of `BLOCK(1)` lines in a row in the control stream.
+
+## SAME blocks
+It is also worth noting here that blocks which use `SAME` (for example, `$OMEGA BLOCK(1) SAME` above) will inherit the label from the block to which `SAME` refers. This is true even if there are multiple `SAME` blocks in a row.

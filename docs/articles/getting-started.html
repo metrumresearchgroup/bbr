@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
       </span>
     </div>
 
@@ -55,6 +55,9 @@
   <ul class="dropdown-menu" role="menu">
 <li>
       <a href="../articles/getting-started.html">Getting Started with rbabylon</a>
+    </li>
+    <li>
+      <a href="../articles/parameter-labels.html">rbabylon Parameter Labels</a>
     </li>
   </ul>
 </li>
@@ -115,8 +118,7 @@
 <a class="sourceLine" id="cb2-2" data-line-number="2">         <span class="dt">.nonmem_dir =</span> <span class="st">"/opt/NONMEM"</span>, <span class="co"># location of NONMEM installation</span></a>
 <a class="sourceLine" id="cb2-3" data-line-number="3">         <span class="dt">.nonmem_version =</span> <span class="st">"nm74gf"</span>)  <span class="co"># default NONMEM version to use</span></a></code></pre></div>
 <p>Finally, it is best to set the modeling directory. By doing this, you do not need to pass the full path to model files, but only the path relative to the specified modeling directory. Pass a path relative to your current working directory to <code><a href="../reference/set_model_directory.html">set_model_directory()</a></code></p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="../reference/set_model_directory.html">set_model_directory</a></span>(<span class="st">"../inst/nonmem"</span>)</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="co">#&gt; options('rbabylon.model_directory') set to /data/home/sethg/rbabylon/inst/nonmem</span></a></code></pre></div>
+<pre><code>#&gt; options('rbabylon.model_directory') set to /data/home/sethg/rbabylon/inst/nonmem</code></pre>
 </div>
 </div>
 <div id="initial-modeling-run" class="section level1">
@@ -148,18 +150,18 @@
 <p>These elements can be accessed manually or extracted with built-in helper functions like so:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">param_df1 &lt;-<span class="st"> </span>sum1 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/param_estimates.html">param_estimates</a></span>()</a>
 <a class="sourceLine" id="cb7-2" data-line-number="2">param_df1</a>
-<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="co">#&gt; # A tibble: 9 x 4</span></a>
-<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co">#&gt;   names      estimate   stderr fixed</span></a>
-<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">#&gt;   &lt;chr&gt;         &lt;dbl&gt;    &lt;dbl&gt; &lt;int&gt;</span></a>
-<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co">#&gt; 1 THETA1       2.31   8.63e- 2     0</span></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt; 2 THETA2      55.0    3.33e+ 0     0</span></a>
-<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="co">#&gt; 3 THETA3     465.     2.96e+ 1     0</span></a>
-<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#&gt; 4 THETA4      -0.0806 5.55e- 2     0</span></a>
-<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#&gt; 5 THETA5       4.13   1.36e+ 0     0</span></a>
-<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">#&gt; 6 OMEGA(1,1)   0.0964 2.00e- 2     0</span></a>
-<a class="sourceLine" id="cb7-12" data-line-number="12"><span class="co">#&gt; 7 OMEGA(2,1)   0      1.00e+10     1</span></a>
-<a class="sourceLine" id="cb7-13" data-line-number="13"><span class="co">#&gt; 8 OMEGA(2,2)   0.154  2.67e- 2     0</span></a>
-<a class="sourceLine" id="cb7-14" data-line-number="14"><span class="co">#&gt; 9 SIGMA(1,1)   1      1.00e+10     1</span></a></code></pre></div>
+<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="co">#&gt; # A tibble: 9 x 7</span></a>
+<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co">#&gt;   names      estimate   stderr random_effect_sd random_effect_sdse fixed diag </span></a>
+<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">#&gt;   &lt;chr&gt;         &lt;dbl&gt;    &lt;dbl&gt;            &lt;dbl&gt;              &lt;dbl&gt; &lt;int&gt; &lt;lgl&gt;</span></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co">#&gt; 1 THETA1       2.31   8.63e- 2           NA                NA          0 NA   </span></a>
+<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt; 2 THETA2      55.0    3.33e+ 0           NA                NA          0 NA   </span></a>
+<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="co">#&gt; 3 THETA3     465.     2.96e+ 1           NA                NA          0 NA   </span></a>
+<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#&gt; 4 THETA4      -0.0806 5.55e- 2           NA                NA          0 NA   </span></a>
+<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#&gt; 5 THETA5       4.13   1.36e+ 0           NA                NA          0 NA   </span></a>
+<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">#&gt; 6 OMEGA(1,1)   0.0964 2.00e- 2            0.311             0.0322     0 TRUE </span></a>
+<a class="sourceLine" id="cb7-12" data-line-number="12"><span class="co">#&gt; 7 OMEGA(2,1)   0      1.00e+10            0       10000000000          1 FALSE</span></a>
+<a class="sourceLine" id="cb7-13" data-line-number="13"><span class="co">#&gt; 8 OMEGA(2,2)   0.154  2.67e- 2            0.392             0.0341     0 TRUE </span></a>
+<a class="sourceLine" id="cb7-14" data-line-number="14"><span class="co">#&gt; 9 SIGMA(1,1)   1      1.00e+10            1       10000000000          1 TRUE</span></a></code></pre></div>
 </div>
 </div>
 <div id="iteration" class="section level1">

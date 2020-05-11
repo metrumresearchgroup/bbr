@@ -67,7 +67,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
       </span>
     </div>
 
@@ -91,6 +91,9 @@
   <ul class="dropdown-menu" role="menu">
     <li>
       <a href="../articles/getting-started.html">Getting Started with rbabylon</a>
+    </li>
+    <li>
+      <a href="../articles/parameter-labels.html">rbabylon Parameter Labels</a>
     </li>
   </ul>
 </li>
@@ -148,6 +151,12 @@
       </tr><tr>
         
         <td>
+          <p><code><a href="apply_indices.html">apply_indices()</a></code> <code><a href="apply_indices.html">block()</a></code> </p>
+        </td>
+        <td><p>Add parameter indices to a label tibble</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="as_model.html">as_model()</a></code> </p>
         </td>
         <td><p>Convert object to `bbi_.model_type_model`</p></td>
@@ -193,6 +202,12 @@
           <p><code><a href="build_bbi_param_list.html">build_bbi_param_list()</a></code> </p>
         </td>
         <td><p>Builds list of unique parameter sets for multiple model bbi calls</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="build_matrix_indices.html">build_matrix_indices()</a></code> </p>
+        </td>
+        <td><p>Builds matrix indices labels</p></td>
       </tr><tr>
         
         <td>
@@ -244,6 +259,12 @@
       </tr><tr>
         
         <td>
+          <p><code><a href="clean_ctl.html">clean_ctl()</a></code> </p>
+        </td>
+        <td><p>Parse control stream to a named list of the blocks</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="combine_directory_path.html">combine_directory_path()</a></code> </p>
         </td>
         <td><p>Build absolute path from a directory and path</p></td>
@@ -287,6 +308,12 @@ Any S3 classes will be inherited with those from .new_list given precedence.</p>
       </tr><tr>
         
         <td>
+          <p><code><a href="find_model_file_path.html">find_model_file_path()</a></code> </p>
+        </td>
+        <td><p>helper to find valid model file and return ctl_ext(.path) by default if not found</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="format_cmd_args.html">format_cmd_args()</a></code> </p>
         </td>
         <td><p>Formats command line args from a named list to a string as it would be passed on the command line</p></td>
@@ -311,6 +338,12 @@ Any S3 classes will be inherited with those from .new_list given precedence.</p>
       </tr><tr>
         
         <td>
+          <p><code><a href="is_diag.html">is_diag()</a></code> </p>
+        </td>
+        <td><p>Check if diagonal index or not</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="model_summary.html">model_summary()</a></code> <code><a href="model_summary.html">nonmem_summary()</a></code> </p>
         </td>
         <td><p>S3 generic for getting model summary</p></td>
@@ -320,6 +353,12 @@ Any S3 classes will be inherited with those from .new_list given precedence.</p>
           <p><code><a href="modify_model_field.html">modify_model_field()</a></code> <code><a href="modify_model_field.html">add_tags()</a></code> <code><a href="modify_model_field.html">replace_tags()</a></code> <code><a href="modify_model_field.html">add_decisions()</a></code> <code><a href="modify_model_field.html">replace_decisions()</a></code> <code><a href="modify_model_field.html">add_based_on()</a></code> <code><a href="modify_model_field.html">replace_based_on()</a></code> <code><a href="modify_model_field.html">replace_description()</a></code> </p>
         </td>
         <td><p>Modify field in model object</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="new_ext.html">new_ext()</a></code> <code><a href="new_ext.html">ctl_ext()</a></code> <code><a href="new_ext.html">mod_ext()</a></code> <code><a href="new_ext.html">yaml_ext()</a></code> </p>
+        </td>
+        <td><p>helpers that strip extension then add a diffent type</p></td>
       </tr><tr>
         
         <td>
@@ -336,9 +375,21 @@ Also creates necessary YAML file for using functions like `add_tags()` and `run_
       </tr><tr>
         
         <td>
+          <p><code><a href="param_labels.html">param_labels()</a></code> </p>
+        </td>
+        <td><p>Extract parameter labels for report tables, etc.</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="parse_args_list.html">parse_args_list()</a></code> </p>
         </td>
         <td><p>Combines NONMEM args that were passed into the function call with args that were parsed from a model yaml</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="parse_param_comment.html">parse_param_comment()</a></code> <code><a href="parse_param_comment.html">parse_same_block()</a></code> </p>
+        </td>
+        <td><p>extract labels from comments in raw ctl string</p></td>
       </tr><tr>
         
         <td>
