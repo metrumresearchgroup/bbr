@@ -36,8 +36,9 @@
 
 
 <meta property="og:title" content="Add parameter indices to a label tibble — apply_indices" />
-<meta property="og:description" content="Add parameter indices to a label tibble
-Helper function for formatting blocks into .omega or .sigma logical vectors" />
+<meta property="og:description" content="Because there are numerous ways of specifying the diagonal and off-diagonal elements of an `$OMEGA` or `$SIGMA` block in a control stream,
+automatically parsing the structure of these blocks can be brittle and error prone. For this reason, indices are *not* automatically added
+to the output of the `param_labels()` function and are instead added with the  `apply_indices()` function." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -95,6 +96,9 @@ Helper function for formatting blocks into .omega or .sigma logical vectors" />
     <li>
       <a href="../articles/getting-started.html">Getting Started with rbabylon</a>
     </li>
+    <li>
+      <a href="../articles/parameter-labels.html">rbabylon Parameter Labels</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -124,8 +128,9 @@ Helper function for formatting blocks into .omega or .sigma logical vectors" />
     </div>
 
     <div class="ref-description">
-    <p>Add parameter indices to a label tibble</p>
-<p>Helper function for formatting blocks into .omega or .sigma logical vectors</p>
+    <p>Because there are numerous ways of specifying the diagonal and off-diagonal elements of an `$OMEGA` or `$SIGMA` block in a control stream,
+automatically parsing the structure of these blocks can be brittle and error prone. For this reason, indices are *not* automatically added
+to the output of the `param_labels()` function and are instead added with the  `apply_indices()` function.</p>
     </div>
 
     <pre class="usage"><span class='fu'>apply_indices</span>(<span class='no'>.label_df</span>, <span class='kw'>.omega</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>.sigma</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
@@ -153,12 +158,17 @@ Helper function for formatting blocks into .omega or .sigma logical vectors" />
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>For more details and examples of how to specify `$OMEGA` and `$SIGMA` block structure, see the "Parameter Labels" vignette:
+<a href='../docs/articles/parameter-labels.html'><code><a href='../articles/parameter-labels.html'>vignette("parameter-labels", package = "rbabylon")</a></code></a></p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#details">Details</a></li>
     </ul>
 
   </div>

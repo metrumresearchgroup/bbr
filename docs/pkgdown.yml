@@ -3,4 +3,5 @@ pkgdown: 1.4.1
 pkgdown_sha: ~
 articles:
   getting-started: getting-started.html
+  parameter-labels: parameter-labels.html
 
