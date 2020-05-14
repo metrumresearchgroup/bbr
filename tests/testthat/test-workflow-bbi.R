@@ -1,3 +1,5 @@
+context("workflow-bbi")
+
 ####################################################
 # testing a composable workflow
 # This test file actually runs the bbi calls
