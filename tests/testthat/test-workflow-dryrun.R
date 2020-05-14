@@ -1,3 +1,5 @@
+context("testing a composable workflow but only dryrun and NOT running bbi")
+
 ####################################################
 # testing a composable workflow
 # checking that paths and return calls are correct

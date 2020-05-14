@@ -1,3 +1,5 @@
+context("testing a composable workflow and running bbi")
+
 ####################################################
 # testing a composable workflow
 # This test file actually runs the bbi calls
