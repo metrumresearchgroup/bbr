@@ -16,13 +16,13 @@ steps:
     path: /var/run/docker.sock
   commands:
   - $(aws ecr get-login --no-include-email --region us-east-1)
-  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24
+  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-05-09
 
 - name: R36
-  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24"
+  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-05-09"
   pull: never
   environment:
-    R_LIBS_USER: "/opt/rpkgs/3.6/2020-03-24"
+    R_LIBS_USER: "/opt/rpkgs/3.6/2020-05-09"
     # Reading in entire anchor
     <<: *default_environment
   commands:
@@ -42,10 +42,10 @@ steps:
 
 
 - name: R35
-  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24"
+  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-05-09"
   pull: never
   environment:
-    R_LIBS_USER: "/opt/rpkgs/3.5/2020-03-24"
+    R_LIBS_USER: "/opt/rpkgs/3.5/2020-05-09"
     <<: *default_environment
   commands:
   # download and setup bbi
@@ -67,10 +67,10 @@ steps:
     - tag
     status:
     - success
-  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24"
+  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-05-09"
   pull: never
   environment:
-    R_LIBS_USER: "/opt/rpkgs/3.6/2020-03-24"
+    R_LIBS_USER: "/opt/rpkgs/3.6/2020-05-09"
     <<: *default_environment
   commands:
   # download and setup bbi
