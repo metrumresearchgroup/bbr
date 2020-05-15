@@ -108,9 +108,11 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
         .label_df <- .mod %>% param_labels()
 
         # join to constuct full parameter table
-        .new_df <- inner_join(.param_df,
-                              .label_df %>% apply_indices(.omega = MODEL_PICK$omega, .sigma = MODEL_PICK$sigma) %>% select(-param_type),
-                              by = "names")
+        suppressSpecificWarning({
+          .new_df <- inner_join(.param_df,
+                                .label_df %>% apply_indices(.omega = MODEL_PICK$omega, .sigma = MODEL_PICK$sigma) %>% select(-param_type),
+                                by = "names")
+        }, .regexpr = "Column .+ has different attributes on LHS and RHS of join")
 
         # join against reference to make sure they're the same
         ref_df <- ref_df %>% mutate(names = ifelse(param == "THETA",

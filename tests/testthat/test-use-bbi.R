@@ -1,4 +1,4 @@
-context("use-bbi")
+context("test-use-bbi")
 
 tdir <- tempdir()
 bbi_tmp_path <- file.path(tdir, "bbi")

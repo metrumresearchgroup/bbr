@@ -1,4 +1,4 @@
-context("workflow-bbi")
+context("testing a composable workflow and running bbi")
 
 ####################################################
 # testing a composable workflow
@@ -82,9 +82,16 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
 
     # extract parameters table
     ref_df <- readRDS(PARAM_REF_FILE)
-    par_df1a <- param_estimates(sum1a); expect_identical(par_df1a, ref_df) # from model object
-    par_df1b <- param_estimates(sum1b); expect_identical(par_df1b, ref_df) # from process object
 
+    par_df1a <- param_estimates(sum1a)
+    suppressSpecificWarning({
+      expect_equal(par_df1a, ref_df) # from model object
+    }, .regexpr = "Column .+ has different attributes on LHS and RHS of join")
+
+    par_df1b <- param_estimates(sum1b)
+    suppressSpecificWarning({
+      expect_equal(par_df1b, ref_df) # from process object
+    }, .regexpr = "Column .+ has different attributes on LHS and RHS of join")
   })
 
   test_that("copying model works and new models run correctly", {
@@ -102,7 +109,10 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
 
     # extract parameters table
     ref_df <- readRDS(PARAM_REF_FILE)
-    par_df2 <- param_estimates(sum2); expect_identical(par_df2, ref_df) # from model object
+    par_df2 <- param_estimates(sum2)
+    suppressSpecificWarning({
+      expect_equal(par_df2, ref_df) # from process object
+    }, .regexpr = "Column .+ has different attributes on LHS and RHS of join")
 
     # add some tags to new model
     mod2 <- mod2 %>% add_tags(NEW_TAGS)
