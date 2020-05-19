@@ -46,7 +46,7 @@ run_log <- function(
   # create run log tibble
   df <- mod_yaml %>% map_df(run_log_entry)
 
-  class(df) <- c("bbi_nonmem_summary_df", class(df))
+  class(df) <- c("bbi_nonmem_summary_df", class(df)) ##### add constructor method in classes.R and check for the column names
   return(df)
 }
 
@@ -73,6 +73,7 @@ safe_read_model <- function(.yaml_path, .directory = getOption("rbabylon.model_d
 }
 
 
+
 #' Create a run log row from a `bbi_{.model_type}_model` object
 #' @param .mod S3 object of class `bbi_{.model_type}_model`
 #' @importFrom tibble tibble
@@ -80,18 +81,17 @@ safe_read_model <- function(.yaml_path, .directory = getOption("rbabylon.model_d
 run_log_entry <- function(.mod) {
   # build row
   entry_df <- tibble::tibble(
-    run_id = enforce_length(.mod, YAML_MOD_PATH) %>% get_model_id(),
-    !!WORKING_DIR       := enforce_length(.mod, WORKING_DIR),
-    !!YAML_YAML_NAME    := enforce_length(.mod, YAML_YAML_NAME),
+    absolute_model_path = file.path(
+      enforce_length(.mod, WORKING_DIR),
+      get_model_id(enforce_length(.mod, YAML_YAML_NAME))
+    ),
     !!YAML_YAML_MD5     := enforce_length(.mod, YAML_YAML_MD5),
     !!YAML_MOD_TYPE     := enforce_length(.mod, YAML_MOD_TYPE),
     !!YAML_DESCRIPTION  := enforce_length(.mod, YAML_DESCRIPTION),
-    !!YAML_MOD_PATH     := enforce_length(.mod, YAML_MOD_PATH),
     !!YAML_BBI_ARGS     := .mod[[YAML_BBI_ARGS]] %>% list(),
     !!YAML_BASED_ON     := .mod[[YAML_BASED_ON]] %>% list(),
     !!YAML_TAGS         := .mod[[YAML_TAGS]] %>% list(),
-    !!YAML_DECISIONS    := .mod[[YAML_DECISIONS]] %>% list(),
-    !!YAML_OUT_DIR      := enforce_length(.mod, YAML_OUT_DIR)
+    !!YAML_DECISIONS    := .mod[[YAML_DECISIONS]] %>% list()
   )
 
   # check that it is only one row
@@ -141,23 +141,23 @@ config_log <- function(
 
   # define json keys to keep as constant
   KEEPERS = c(
-    "model_name",
     "model_md5",
     "data_path",
-    "data_md5",
-    "output_dir"
+    "data_md5"
   )
 
+  BBI_CONFIG <- "/bbi_config.json$"
+
   # get json files and parse to df
-  json_files <- .base_dir %>% dir_ls(recurse = .recurse) %>% str_subset("bbi_config.json$")
+  json_files <- .base_dir %>% dir_ls(recurse = .recurse) %>% str_subset(BBI_CONFIG)
   if (length(json_files) == 0) {
     warning(glue("Found no bbi_config.json files in {.base_dir}"))
     return(NULL)
   } else {
     df <- json_files %>%
       map_df(function(.path) fromJSON(.path)[KEEPERS]) %>%
-      mutate(run_id = get_model_id(.data$model_name)) %>%
-      select(.data$run_id, everything(), -.data$model_name)
+      mutate(absolute_model_path = str_replace(json_files, BBI_CONFIG, "")) %>%
+      select(.data$absolute_model_path, everything())
 
     return(df)
   }
@@ -188,10 +188,11 @@ add_config <- function(.log_df, ...) {
   df <- left_join(
     .log_df,
     .conf_df,
-    by = "run_id",
+    by = "absolute_model_path",
     suffix = c(".log", ".config")
   )
 
   return(df)
 }
+
 
