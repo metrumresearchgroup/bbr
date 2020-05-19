@@ -15,17 +15,6 @@ get_path_from_object <- function(.bbi_object, .key) {
 }
 
 
-#' Builds the absolute path to file in the output directory from components of the `bbi_{.model_type}_model` object
-#' @param .mod `bbi_{.model_type}_model` object
-#' @param .extension file extension to append (for example `lst`, `ext`, `grd`, etc.)
-build_path_from_mod_obj <- function(.mod, .extension) {
-  ext_path <- file.path(.mod[[WORKING_DIR]],
-                        .mod[[YAML_OUT_DIR]],
-                        paste0(get_model_id(.mod[[YAML_MOD_PATH]]), ".", .extension))
-  return(ext_path)
-}
-
-
 #' Returns the path to the model file from a `bbi_{.model_type}_model` object
 #' @param .mod The `bbi_...` S3 object
 #' @export

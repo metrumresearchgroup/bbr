@@ -3,6 +3,17 @@ context("Reading NONMEM output files into R")
 # load reference objects
 source("data/read-output-reference.R")
 
+.test_cases <- c(
+  LST_TEST_FILE,
+  GRD_TEST_FILE,
+  EXT_TEST_FILE
+)
+for (.tc in .test_cases) {
+  test_that(glue::glue("build_path_from_mod_obj returns correct {tools::file_ext(.tc)}"), {
+    expect_identical(build_path_from_mod_obj(MOD1, tools::file_ext(.tc)),
+                     normalizePath(.tc))
+  })
+}
 
 test_that("check_file returns correctly", {
   # default is to print and return nothing
