@@ -50,7 +50,7 @@ YAML_REQ_INPUT_KEYS <- c(
   YAML_DESCRIPTION
 )
 
-WORKING_DIR <- "orig_working_dir"
+WORKING_DIR <- "model_working_dir"
 ABS_MOD_PATH <- "absolute_model_path"
 
 # keys required to create a model object

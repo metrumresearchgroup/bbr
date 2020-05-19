@@ -149,7 +149,10 @@ config_log <- function(
   BBI_CONFIG <- "/bbi_config.json$"
 
   # get json files and parse to df
-  json_files <- .base_dir %>% dir_ls(recurse = .recurse) %>% str_subset(BBI_CONFIG)
+  json_files <- dir_ls(.base_dir, recurse = .recurse)
+  json_files <- str_subset(json_files, BBI_CONFIG)
+  json_files <- normalizePath(json_files)
+
   if (length(json_files) == 0) {
     warning(glue("Found no bbi_config.json files in {.base_dir}"))
     return(NULL)

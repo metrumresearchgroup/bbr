@@ -128,14 +128,14 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
     # check run log for both models
     log_df <- run_log()
     expect_equal(nrow(log_df), 4)
-    expect_equal(ncol(log_df), 12)
-    expect_identical(log_df$run_id, c("1", "2", "3", "4"))
+    expect_equal(ncol(log_df), 8)
+    expect_identical(basename(log_df[[ABS_MOD_PATH]]), c("1", "2", "3", "4"))
     expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS, ORIG_TAGS))
 
     # add config log
     log_df <- expect_warning(log_df %>% add_config(), regexp = "in progress")
     expect_equal(nrow(log_df), 4)
-    expect_equal(ncol(log_df), 16)
+    expect_equal(ncol(log_df), 11)
     expect_false(any(is.na(log_df$data_md5[1:3])))
   })
 
