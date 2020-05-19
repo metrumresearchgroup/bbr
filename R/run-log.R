@@ -81,7 +81,7 @@ safe_read_model <- function(.yaml_path, .directory = getOption("rbabylon.model_d
 run_log_entry <- function(.mod) {
   # build row
   entry_df <- tibble::tibble(
-    absolute_model_path = file.path(
+    !!ABS_MOD_PATH := file.path(
       enforce_length(.mod, WORKING_DIR),
       get_model_id(enforce_length(.mod, YAML_YAML_NAME))
     ),
@@ -156,8 +156,8 @@ config_log <- function(
   } else {
     df <- json_files %>%
       map_df(function(.path) fromJSON(.path)[KEEPERS]) %>%
-      mutate(absolute_model_path = str_replace(json_files, BBI_CONFIG, "")) %>%
-      select(.data$absolute_model_path, everything())
+      mutate(!!ABS_MOD_PATH := str_replace(json_files, BBI_CONFIG, "")) %>%
+      select(.data[[ABS_MOD_PATH]], everything())
 
     return(df)
   }
@@ -188,7 +188,7 @@ add_config <- function(.log_df, ...) {
   df <- left_join(
     .log_df,
     .conf_df,
-    by = "absolute_model_path",
+    by = ABS_MOD_PATH,
     suffix = c(".log", ".config")
   )
 
