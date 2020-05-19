@@ -84,6 +84,33 @@ get_yaml_path.character <- function(.mod, .check_exists = TRUE) {
 }
 
 
+#' Helper to strip path and extension from model file to get only model identifier
+#' @param .mod generic model
+#' @importFrom tools file_path_sans_ext
+#' @returns Character scaler with only model identifier
+#' @rdname get_model_id
+#' @export
+get_model_id <- function(.mod) {
+  UseMethod("get_model_id")
+}
+
+# S3 dispatch to get model identifier from file path to model
+#' @param .mod Character scaler model path to strip
+#' @rdname get_model_id
+#' @export
+get_model_id.character <- function(.mod) {
+  return(basename(tools::file_path_sans_ext(.mod)))
+}
+
+#' S3 dispatch to get model identifier from a `bbi_{.model_type}_model` object
+#' @param .mod The `bbi_{.model_type}_model` object
+#' @rdname get_model_id
+#' @export
+get_model_id.bbi_nonmem_model <- function(.mod) {
+  return(basename(tools::file_path_sans_ext(.mod[[YAML_MOD_PATH]])))
+}
+
+
 #####################
 # File path helpers
 #####################
@@ -173,30 +200,4 @@ find_model_file_path <- function(.path) {
   }
 }
 
-
-#' Helper to strip path and extension from model file to get only model identifier
-#' @param .mod generic model
-#' @importFrom tools file_path_sans_ext
-#' @returns Character scaler with only model identifier
-#' @rdname get_model_id
-#' @export
-get_model_id <- function(.mod) {
-  UseMethod("get_model_id")
-}
-
-# S3 dispatch to get model identifier from file path to model
-#' @param .mod Character scaler model path to strip
-#' @rdname get_model_id
-#' @export
-get_model_id.character <- function(.mod) {
-  return(basename(tools::file_path_sans_ext(.mod)))
-}
-
-#' S3 dispatch to get model identifier from a `bbi_{.model_type}_model` object
-#' @param .mod The `bbi_{.model_type}_model` object
-#' @rdname get_model_id
-#' @export
-get_model_id.bbi_nonmem_model <- function(.mod) {
-  return(basename(tools::file_path_sans_ext(.mod[[YAML_MOD_PATH]])))
-}
 
