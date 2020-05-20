@@ -2,11 +2,12 @@ context("Copying model objects")
 
 source("data/test-workflow-ref.R")
 
-withr::with_options(list(rbabylon.model_directory = NULL), {
 
-  #########################
-  # copy_model_from tests
-  #########################
+#########################
+# copy_model_from tests
+#########################
+
+withr::with_options(list(rbabylon.model_directory = NULL), {
 
   cleanup()
 

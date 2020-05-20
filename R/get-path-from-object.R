@@ -6,103 +6,92 @@
 #' When the object is loaded into memory, the absolute path to the YAML is stored in the object.
 #' These functions simply stitch together that path with the requested relative path.
 #' As long as the YAML has not moved since it was loaded, this will work.
-#' @param .bbi_object The object to query
+#' @param .bbi_object The model object (or path, etc.) to query
 #' @param .key The key that contains the relative path
+#' @param .check_exists Logical scaler for whether it will check if the file exists and error if it does not. True by default.
 #' @export
 #' @rdname get_path_from_object
-get_path_from_object <- function(.bbi_object, .key) {
-  return(file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[.key]]))
+get_path_from_object <- function(.bbi_object, .key, .check_exists = TRUE) {
+  UseMethod("get_path_from_object")
+}
+
+
+#' The default method attempts to extract the path from any object passed to it
+#' @param .bbi_object The object to attempt to query. Could be a partially built bbi_{.model_type}_object or some other custom object containing model data.
+#' @rdname get_path_from_object
+#' @export
+get_path_from_object.default <- function(.bbi_object, .key, .check_exists = TRUE) {
+   tryCatch(
+     {
+       # do some QA on the required fields
+       if (any(map_lgl(c(WORKING_DIR, .key), ~ is.null(.bbi_object[[.x]])))) {
+         stop(glue(".bbi_object must contain keys for both `{WORKING_DIR}` and `{.key}`` but has only the following keys: {paste(names(.bbi_object), collapse = ', ')}"), call. = FALSE)
+       }
+
+       if (length(.bbi_object[[.key]]) > 1) {
+         stop(glue("Expected a scaler value for `.bbi_object[['{.key}']]` but instead got {class(.bbi_object[[.key]])[1]} of length {length(.bbi_object[[.key]])}"), call. = FALSE)
+       }
+
+       # extract the requested path and optionally check if it exists
+       .path <- file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[.key]])
+
+       if (isTRUE(.check_exists) && !fs::file_exists(.path)) {
+         stop(glue("Extracted path `{.path}` but nothing exists at that location. (If this is expected, pass `.check_exists = FALSE` to bypass this error.)"), call. = FALSE)
+       }
+
+       return(.path)
+
+     },
+     error = function(e) {
+       stop(glue("Cannot extract `{.key}` from object of class `{paste(class(.bbi_object), collapse = ', ')}` :\n{paste(e, collapse = '\n')}"), call. = FALSE)
+     }
+   )
+}
+
+
+#' @rdname get_path_from_object
+#' @param .bbi_object Character scaler of a path to a model that can be loaded with `read_model(.bbi_object)`
+#' @export
+get_path_from_object.character <- function(.bbi_object, .key, .check_exists = TRUE) {
+
+  .bbi_object <- tryCatch(
+    {
+      read_model(.bbi_object)
+    },
+    error = function(e) {
+      stop(glue("Cannot load model object from path `{.bbi_object}` :\n{paste(e, collapse = '\n')}"))
+    }
+  )
+
+  return(get_path_from_object(.bbi_object, .key, .check_exists = .check_exists))
 }
 
 
 #' Returns the path to the model file from a `bbi_{.model_type}_model` object
-#' @param .mod The `bbi_...` S3 object
 #' @export
 #' @rdname get_path_from_object
-get_model_path <- function(.mod) {
-  return(get_path_from_object(.mod, YAML_MOD_PATH))
+get_model_path <- function(.mod, .check_exists = TRUE) {
+  return(get_path_from_object(.mod, YAML_MOD_PATH, .check_exists = .check_exists))
 }
-
 
 #' Returns the path to the model output directory from a `bbi_{.model_type}_model` object
-#' @param .mod The `bbi_...` S3 object
 #' @export
 #' @rdname get_path_from_object
-get_output_dir <- function(.mod) {
-  return(get_path_from_object(.mod, YAML_OUT_DIR))
+get_output_dir <- function(.mod, .check_exists = TRUE) {
+  return(get_path_from_object(.mod, YAML_OUT_DIR, .check_exists = .check_exists))
 }
 
-
-#' S3 generic to return the path to the YAML file
-#' @param .mod generic file path to check
-#' @param .check_exists Boolean for whether it will check if the file exists and error if it does not. True by default.
+#' Returns the path to the model output directory from a `bbi_{.model_type}_model` object
 #' @export
-#' @rdname get_yaml_path
+#' @rdname get_path_from_object
 get_yaml_path <- function(.mod, .check_exists = TRUE) {
-  UseMethod("get_yaml_path")
+  return(get_path_from_object(.mod, YAML_YAML_NAME, .check_exists = .check_exists))
 }
 
 
-#' S3 dispatch to return the path to the YAML file from a `bbi_nonmem_model` object
-#' @param .mod The `bbi_nonmem_model` S3 object
-#' @export
-#' @rdname get_yaml_path
-get_yaml_path.bbi_nonmem_model <- function(.mod, .check_exists = TRUE) {
-  yaml_file <- .mod[[YAML_YAML_NAME]]
-  yaml_path <- file.path(.mod[[WORKING_DIR]], yaml_file) %>% get_yaml_path(.check_exists = .check_exists)
-  return(yaml_path)
-}
-
-
-#' S3 dispatch to return the path to the YAML file from a model path or output directory
-#' @param .mod The file path to convert to a YAML
-#' @export
-#' @rdname get_yaml_path
-get_yaml_path.character <- function(.mod, .check_exists = TRUE) {
-  # convert to .yaml extension
-  yaml_path <- .mod %>% yaml_ext()
-
-  # check that the YAML exists
-  if (isTRUE(.check_exists)) {
-    if (!fs::file_exists(yaml_path)) {
-      stop(glue("Inferred YAML path {yaml_path} but no file exists at that location. Use `read_model('path/to/yaml')` to explicitly create model object from YAML."))
-    }
-  }
-
-  return(yaml_path)
-}
-
-
-#' Helper to strip path and extension from model file to get only model identifier
-#' @param .mod generic model
-#' @importFrom tools file_path_sans_ext
-#' @returns Character scaler with only model identifier
-#' @rdname get_model_id
-#' @export
-get_model_id <- function(.mod) {
-  UseMethod("get_model_id")
-}
-
-# S3 dispatch to get model identifier from file path to model
-#' @param .mod Character scaler model path to strip
-#' @rdname get_model_id
-#' @export
-get_model_id.character <- function(.mod) {
-  return(basename(tools::file_path_sans_ext(.mod)))
-}
-
-#' S3 dispatch to get model identifier from a `bbi_{.model_type}_model` object
-#' @param .mod The `bbi_{.model_type}_model` object
-#' @rdname get_model_id
-#' @export
-get_model_id.bbi_nonmem_model <- function(.mod) {
-  return(basename(tools::file_path_sans_ext(.mod[[YAML_MOD_PATH]])))
-}
-
-
-#####################
-# File path helpers
-#####################
+###############################
+# Manipulating file extensions
+###############################
 
 is_valid_nonmem_extension <- function(.path) {
   tools::file_ext(.path) %in% c("ctl", "mod")
@@ -145,6 +134,36 @@ yaml_ext <- function(.x) {
   sprintf("%s.yaml", tools::file_path_sans_ext(.x))
 }
 
+
+###################################
+# Other Assorted file path helpers
+###################################
+
+#' Helper to strip path and extension from model file to get only model identifier
+#' @param .mod generic model
+#' @importFrom tools file_path_sans_ext
+#' @returns Character scaler with only model identifier
+#' @rdname get_model_id
+#' @export
+get_model_id <- function(.mod) {
+  UseMethod("get_model_id")
+}
+
+# S3 dispatch to get model identifier from file path to model
+#' @param .mod Character scaler model path to strip
+#' @rdname get_model_id
+#' @export
+get_model_id.character <- function(.mod) {
+  return(basename(tools::file_path_sans_ext(.mod)))
+}
+
+#' S3 dispatch to get model identifier from a `bbi_{.model_type}_model` object
+#' @param .mod The `bbi_{.model_type}_model` object
+#' @rdname get_model_id
+#' @export
+get_model_id.bbi_nonmem_model <- function(.mod) {
+  return(basename(tools::file_path_sans_ext(.mod[[YAML_MOD_PATH]])))
+}
 
 #' Build absolute path from a directory and path
 #'

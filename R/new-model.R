@@ -83,10 +83,9 @@ read_model <- function(
   # check for .directory and combine with .path
   .path <- combine_directory_path(.directory, .path)
 
-  # If not YAML extension, infer and look for file
-  if (!is_valid_yaml_extension(.path)) {
-    .path <- .path %>% get_yaml_path()
-  }
+  # If not YAML extension, convert to YAML
+  .path <- yaml_ext(.path)
+  if (!fs::file_exists(.path)) { stop(glue("`read_model()` found no YAML at `{.path}` -- Use `new_model()` to create the necessary YAML file.")) }
 
   # load from file
   yaml_list <- read_yaml(.path)
