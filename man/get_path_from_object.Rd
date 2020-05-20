@@ -4,6 +4,7 @@
 \alias{get_path_from_object}
 \alias{get_path_from_object.default}
 \alias{get_path_from_object.character}
+\alias{get_path_from_object.bbi_run_log_df}
 \alias{get_model_path}
 \alias{get_output_dir}
 \alias{get_yaml_path}
@@ -15,6 +16,8 @@ get_path_from_object(.bbi_object, .key, .check_exists = TRUE)
 
 \method{get_path_from_object}{character}(.bbi_object, .key, .check_exists = TRUE)
 
+\method{get_path_from_object}{bbi_run_log_df}(.bbi_object, .key, .check_exists = TRUE)
+
 get_model_path(.mod, .check_exists = TRUE)
 
 get_output_dir(.mod, .check_exists = TRUE)
@@ -22,7 +25,7 @@ get_output_dir(.mod, .check_exists = TRUE)
 get_yaml_path(.mod, .check_exists = TRUE)
 }
 \arguments{
-\item{.bbi_object}{Character scaler of a path to a model that can be loaded with `read_model(.bbi_object)`}
+\item{.bbi_object}{Tibble of class `bbi_run_log_df`}
 
 \item{.key}{The key that contains the relative path}
 

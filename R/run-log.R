@@ -46,7 +46,7 @@ run_log <- function(
   # create run log tibble
   df <- mod_yaml %>% map_df(run_log_entry)
 
-  class(df) <- c("bbi_nonmem_summary_df", class(df)) ##### add constructor method in classes.R and check for the column names
+  class(df) <- c("bbi_run_log_df", class(df)) ##### add constructor method in classes.R and check for the column names
   return(df)
 }
 

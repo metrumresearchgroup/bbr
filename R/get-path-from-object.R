@@ -67,6 +67,20 @@ get_path_from_object.character <- function(.bbi_object, .key, .check_exists = TR
 }
 
 
+#' @rdname get_path_from_object
+#' @param .bbi_object Tibble of class `bbi_run_log_df`
+#' @importFrom purrr map_chr
+#' @export
+get_path_from_object.bbi_run_log_df <- function(.bbi_object, .key, .check_exists = TRUE) {
+
+  .out_paths <- map_chr(.bbi_object[[ABS_MOD_PATH]], function(.path) {
+    get_path_from_object(.path, .key, .check_exists = .check_exists)
+  })
+
+  return(.out_paths)
+}
+
+
 #' Returns the path to the model file from a `bbi_{.model_type}_model` object
 #' @export
 #' @rdname get_path_from_object
