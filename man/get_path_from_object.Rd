@@ -18,11 +18,11 @@ get_path_from_object(.bbi_object, .key, .check_exists = TRUE)
 
 \method{get_path_from_object}{bbi_run_log_df}(.bbi_object, .key, .check_exists = TRUE)
 
-get_model_path(.mod, .check_exists = TRUE)
+get_model_path(.bbi_object, .check_exists = TRUE)
 
-get_output_dir(.mod, .check_exists = TRUE)
+get_output_dir(.bbi_object, .check_exists = TRUE)
 
-get_yaml_path(.mod, .check_exists = TRUE)
+get_yaml_path(.bbi_object, .check_exists = TRUE)
 }
 \arguments{
 \item{.bbi_object}{Tibble of class `bbi_run_log_df`}

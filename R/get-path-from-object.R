@@ -84,22 +84,22 @@ get_path_from_object.bbi_run_log_df <- function(.bbi_object, .key, .check_exists
 #' Returns the path to the model file from a `bbi_{.model_type}_model` object
 #' @export
 #' @rdname get_path_from_object
-get_model_path <- function(.mod, .check_exists = TRUE) {
-  return(get_path_from_object(.mod, YAML_MOD_PATH, .check_exists = .check_exists))
+get_model_path <- function(.bbi_object, .check_exists = TRUE) {
+  return(get_path_from_object(.bbi_object, YAML_MOD_PATH, .check_exists = .check_exists))
 }
 
 #' Returns the path to the model output directory from a `bbi_{.model_type}_model` object
 #' @export
 #' @rdname get_path_from_object
-get_output_dir <- function(.mod, .check_exists = TRUE) {
-  return(get_path_from_object(.mod, YAML_OUT_DIR, .check_exists = .check_exists))
+get_output_dir <- function(.bbi_object, .check_exists = TRUE) {
+  return(get_path_from_object(.bbi_object, YAML_OUT_DIR, .check_exists = .check_exists))
 }
 
 #' Returns the path to the model output directory from a `bbi_{.model_type}_model` object
 #' @export
 #' @rdname get_path_from_object
-get_yaml_path <- function(.mod, .check_exists = TRUE) {
-  return(get_path_from_object(.mod, YAML_YAML_NAME, .check_exists = .check_exists))
+get_yaml_path <- function(.bbi_object, .check_exists = TRUE) {
+  return(get_path_from_object(.bbi_object, YAML_YAML_NAME, .check_exists = .check_exists))
 }
 
 
