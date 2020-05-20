@@ -184,7 +184,7 @@ nonmem_summary <- function(
     paste(collapse="") %>%
     jsonlite::fromJSON(simplifyDataFrame = FALSE)
 
-  class(res_list) <- c("bbi_nonmem_summary", class(res_list))
+  res_list <- create_summary_object(res_list)
 
   return(res_list)
 }

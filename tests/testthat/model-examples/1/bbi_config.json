@@ -1,40 +1,49 @@
 {
-    "bbi_version": "2.1.0-alpha.10-2020-01-31T15:48:52-0500",
-    "model_name": "acop.mod",
-    "model_path": "/Users/devinp/clients/metrum/metrumresearchgroup/rbabylon/inst/nonmem/acop.mod",
-    "data_path": "../data/acop.csv",
+    "bbi_version": "v2.1.2",
+    "model_name": "1.ctl",
+    "original_model": "1.ctl",
+    "model_path": "/data/home/sethg/rbabylon/tests/testthat/model-examples/1/1.ctl",
+    "data_path": "../../data/acop.csv",
     "data_md5": "4ddb44da897c26681d892aa7be99f74b",
-    "model_filename": "acop",
-    "model_extension": "mod",
-    "original_path": "/Users/devinp/clients/metrum/metrumresearchgroup/rbabylon/inst/nonmem",
-    "output_dir": "/Users/devinp/clients/metrum/metrumresearchgroup/rbabylon/inst/nonmem/acop",
+    "model_md5": "731923458236cc008c3adafa2f0877a7",
+    "model_filename": "1",
+    "model_extension": "ctl",
+    "original_path": "/data/home/sethg/rbabylon/tests/testthat/model-examples/1",
+    "output_dir": "/data/home/sethg/rbabylon/tests/testthat/model-examples/1",
     "configuration": {
-        "overwrite": true,
         "clean_lvl": 1,
         "git": true,
-        "babylon_binary": "/Users/devinp/go/bin/bbi",
-        "save_config": true,
+        "babylon_binary": "/data/apps/bbi",
         "output_dir": "{{ .Name }}",
-        "threads": 16,
-        "local": {
-            "create_child_dirs": true
-        },
+        "threads": 4,
+        "local": {},
         "nonmem": {
+            "nm73gf": {
+                "home": "/opt/NONMEM/nm73gf",
+                "executable": "nmfe73",
+                "nmqual": true
+            },
             "nm73gf_nmfe": {
                 "home": "/opt/NONMEM/nm73gf_nmfe",
                 "executable": "nmfe73"
             },
+            "nm74gf": {
+                "home": "/opt/NONMEM/nm74gf",
+                "executable": "nmfe74",
+                "nmqual": true,
+                "default": true
+            },
             "nm74gf_nmfe": {
                 "home": "/opt/NONMEM/nm74gf_nmfe",
-                "executable": "nmfe74",
-                "default": true
+                "executable": "nmfe74"
             }
         },
-        "parallel": {
-            "nodes": 8,
-            "mpiExecPath": "/usr/local/mpich3/bin/mpiexec",
-            "timeout": 2147483647
-        }
+        "parallel": false,
+        "nmfe_options": {
+            "maxlim": 100
+        },
+        "mpi_exec_path": "/usr/local/mpich3/bin/mpiexec",
+        "parallel_timeout": 2147483647
     },
     "error": null
 }

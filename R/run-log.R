@@ -46,7 +46,8 @@ run_log <- function(
   # create run log tibble
   df <- mod_yaml %>% map_df(run_log_entry)
 
-  class(df) <- c("bbi_run_log_df", class(df)) ##### add constructor method in classes.R and check for the column names
+  df <- create_run_log_object(df)
+
   return(df)
 }
 
@@ -156,14 +157,26 @@ config_log <- function(
   if (length(json_files) == 0) {
     warning(glue("Found no bbi_config.json files in {.base_dir}"))
     return(NULL)
-  } else {
-    df <- json_files %>%
-      map_df(function(.path) fromJSON(.path)[KEEPERS]) %>%
-      mutate(!!ABS_MOD_PATH := str_replace(json_files, BBI_CONFIG, "")) %>%
-      select(.data[[ABS_MOD_PATH]], everything())
-
-    return(df)
   }
+
+  # map over json files and parse relevant fields
+  df <- map_df(json_files, function(.path) {
+    .conf_list <- fromJSON(.path)
+    if (!all(KEEPERS %in% names(.conf_list))) {
+      warning(paste(
+        glue("{.path} is missing the required keys: `{paste(KEEPERS[!(KEEPERS %in% names(.conf_list))], collapse=', ')}` and will be skipped."),
+        glue("This is likely because it was run with an old version of babylon. Model was run on version {.conf_list$bbi_version}"),
+        "User can call `bbi_current_release()` to see the most recent release version, and call `use_bbi(options('rbabylon.bbi_exe_path'))` to upgrade to the version.",
+        sep = "\n"
+      ))
+      return(NULL)
+    }
+    return(.conf_list[KEEPERS])
+  })
+  df <- mutate(df, !!ABS_MOD_PATH := str_replace(json_files, BBI_CONFIG, ""))
+  df <- select(df, .data[[ABS_MOD_PATH]], everything())
+
+  return(df)
 }
 
 #' Joins config log tibble onto a matching run log tibble
@@ -172,6 +185,11 @@ config_log <- function(
 #' @importFrom dplyr left_join
 #' @export
 add_config <- function(.log_df, ...) {
+  # check input df
+  if (!inherits(.log_df, "bbi_run_log_df")) {
+    stop(glue("Can only pass an object of class `bbi_run_log_df` to `add_config()`. Passed object has classes {paste(class(.log_df), collapse = ', ')}"))
+  }
+
   # get config log
   .conf_df <- config_log(...)
 
