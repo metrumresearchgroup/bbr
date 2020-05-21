@@ -7,6 +7,7 @@
 
 # define constants
 MODEL_DIR <- "model-examples"
+LEVEL2_DIR <- file.path(MODEL_DIR, "level2")
 YAML_TEST_FILE <- file.path(MODEL_DIR, "1.yaml")
 NEW_MOD2 <- file.path(MODEL_DIR, "2")
 NEW_MOD3 <- file.path(MODEL_DIR, "3")
@@ -29,4 +30,5 @@ cleanup <- function() {
     if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
     if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
   }
+  if (fs::dir_exists(LEVEL2_DIR)) fs::dir_delete(LEVEL2_DIR)
 }

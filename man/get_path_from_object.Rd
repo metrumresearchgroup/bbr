@@ -2,22 +2,34 @@
 % Please edit documentation in R/get-path-from-object.R
 \name{get_path_from_object}
 \alias{get_path_from_object}
+\alias{get_path_from_object.default}
+\alias{get_path_from_object.character}
+\alias{get_path_from_object.bbi_run_log_df}
 \alias{get_model_path}
 \alias{get_output_dir}
+\alias{get_yaml_path}
 \title{Get path from bbi object}
 \usage{
-get_path_from_object(.bbi_object, .key)
+get_path_from_object(.bbi_object, .key, .check_exists = TRUE)
 
-get_model_path(.mod)
+\method{get_path_from_object}{default}(.bbi_object, .key, .check_exists = TRUE)
 
-get_output_dir(.mod)
+\method{get_path_from_object}{character}(.bbi_object, .key, .check_exists = TRUE)
+
+\method{get_path_from_object}{bbi_run_log_df}(.bbi_object, .key, .check_exists = TRUE)
+
+get_model_path(.bbi_object, .check_exists = TRUE)
+
+get_output_dir(.bbi_object, .check_exists = TRUE)
+
+get_yaml_path(.bbi_object, .check_exists = TRUE)
 }
 \arguments{
-\item{.bbi_object}{The object to query}
+\item{.bbi_object}{Tibble of class `bbi_run_log_df`}
 
 \item{.key}{The key that contains the relative path}
 
-\item{.mod}{The `bbi_...` S3 object}
+\item{.check_exists}{Logical scaler for whether it will check if the file exists and error if it does not. True by default.}
 }
 \description{
 Builds the full path to a file that is stored as part of a `bbi_...` S3 object

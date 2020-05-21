@@ -50,7 +50,8 @@ YAML_REQ_INPUT_KEYS <- c(
   YAML_DESCRIPTION
 )
 
-WORKING_DIR <- "orig_working_dir"
+WORKING_DIR <- "model_working_dir"
+ABS_MOD_PATH <- "absolute_model_path"
 
 # keys required to create a model object
 MODEL_REQ_INPUT_KEYS <- c(
@@ -70,6 +71,20 @@ MODEL_REQ_KEYS <- c(
   YAML_BBI_ARGS,
   YAML_OUT_DIR
 )
+
+
+# columns required for a run log df
+RUN_LOG_REQ_COLS <- c(
+  ABS_MOD_PATH,
+  YAML_YAML_MD5,
+  YAML_MOD_TYPE,
+  YAML_DESCRIPTION,
+  YAML_BBI_ARGS,
+  YAML_BASED_ON,
+  YAML_TAGS,
+  YAML_DECISIONS
+)
+
 
 # keys that get erased when saving a model YAML on disk
 YAML_ERASE_OUT_KEYS <- c(
@@ -92,6 +107,13 @@ VALID_MOD_CLASSES <- purrr::map_chr(SUPPORTED_MOD_TYPES,
                                     function(.model_type) {
                                       as.character(glue::glue("bbi_{.model_type}_model"))
                                     })
+
+SUMMARY_DETAILS <- "run_details"
+
+# keys required for a summary object to have
+SUMMARY_REQ_KEYS <- c(
+  SUMMARY_DETAILS
+)
 
 # keys added when creating a process object
 PROC_PROCESS <- "process"

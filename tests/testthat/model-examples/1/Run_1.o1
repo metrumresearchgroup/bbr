@@ -1,0 +1,9 @@
+time="2020-05-20T16:45:27-04:00" level=info msg="Successfully loaded default configuration from /data/home/sethg/rbabylon/tests/testthat/model-examples/1/babylon.yaml"
+time="2020-05-20T16:45:27-04:00" level=info msg="Beginning Local Path"
+time="2020-05-20T16:45:27-04:00" level=info msg="A total of 1 models have completed the initial preparation phase"
+time="2020-05-20T16:45:27-04:00" level=info msg="[1] Beginning local work phase"
+time="2020-05-20T16:45:38-04:00" level=info msg="[1] Beginning cleanup phase"
+time="2020-05-20T16:45:39-04:00" level=info msg="[1] Cleanup completed"
+time="2020-05-20T16:45:39-04:00" level=info msg="Waiting for any post execution hooks to finish"
+time="2020-05-20T16:45:39-04:00" level=info msg="\r1 models completed in 11.913162728s"
+

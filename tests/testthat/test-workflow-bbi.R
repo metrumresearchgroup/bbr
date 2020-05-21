@@ -119,24 +119,53 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
 
   })
 
+  test_that("config_log() works correctly", {
+    # check config log for all models so far
+    log_df <- config_log()
+    expect_equal(nrow(log_df), 3)
+    expect_equal(ncol(log_df), 4)
+    expect_false(any(is.na(log_df$model_md5)))
+    expect_false(any(is.na(log_df$data_md5)))
+    expect_false(any(is.na(log_df$data_path)))
+  })
+
   test_that(".wait = FALSE returns correctly", {
+    # launch a model but don't wait for it to finish
     proc <- copy_model_from(1, 4, NEW_DESC, .inherit_tags = TRUE) %>% submit_model(.mode = "local", .wait = FALSE)
     expect_true(stringr::str_detect(proc[[PROC_STDOUT]], ".wait = FALSE"))
   })
 
   test_that("run_log() captures runs correctly", {
-    # check run log for both models
+    # check run log for all models
     log_df <- run_log()
     expect_equal(nrow(log_df), 4)
-    expect_equal(ncol(log_df), 12)
-    expect_identical(log_df$run_id, c("1", "2", "3", "4"))
+    expect_equal(ncol(log_df), 8)
+    expect_identical(basename(log_df[[ABS_MOD_PATH]]), c("1", "2", "3", "4"))
     expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS, ORIG_TAGS))
+  })
 
-    # add config log
-    log_df <- expect_warning(log_df %>% add_config(), regexp = "in progress")
+  test_that("add_config() md5 matches original md5", {
+    # add config log to run log
+    log_df <- expect_warning(run_log() %>% add_config(), regexp = "in progress")
     expect_equal(nrow(log_df), 4)
-    expect_equal(ncol(log_df), 16)
-    expect_false(any(is.na(log_df$data_md5[1:3])))
+    expect_equal(ncol(log_df), 11)
+
+    # check config md5's against ctl md5's
+    log_df <- log_df %>% filter(!is.na(model_md5))
+    expect_equal(nrow(log_df), 3)
+
+    norm_data_paths <- fs::path_norm(file.path(log_df$absolute_model_path, log_df$data_path))
+    norm_model_paths <- get_model_path(log_df)
+
+    log_df <- log_df %>% mutate(
+                            current_data_md5  = tools::md5sum(norm_data_paths),
+                            data_md5_match    = .data$data_md5 == .data$current_data_md5,
+                            current_model_md5  = tools::md5sum(norm_model_paths),
+                            model_md5_match   = .data$model_md5 == .data$current_model_md5
+                          )
+
+    expect_true(all(log_df$data_md5_match))
+    expect_true(all(log_df$model_md5_match))
   })
 
 }) # closing withr::with_options

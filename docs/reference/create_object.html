@@ -36,7 +36,9 @@
 
 
 <meta property="og:title" content="Creates S3 object of class `bbi_.model_type_model` from list with `MODEL_REQ_INPUT_KEYS` — create_model_object" />
-<meta property="og:description" content="First checks to be sure the required keys are all present" />
+<meta property="og:description" content="First checks to be sure the required keys are all present
+First checks to be sure the required keys are all present
+First checks to be sure the required columns are all present" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -69,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.0</span>
       </span>
     </div>
 
@@ -127,11 +129,17 @@
 
     <div class="ref-description">
     <p>First checks to be sure the required keys are all present</p>
+<p>First checks to be sure the required keys are all present</p>
+<p>First checks to be sure the required columns are all present</p>
     </div>
 
     <pre class="usage"><span class='fu'>create_model_object</span>(<span class='no'>.mod_list</span>)
 
-<span class='fu'>create_process_object</span>(<span class='no'>res</span>)</pre>
+<span class='fu'>create_summary_object</span>(<span class='no'>res</span>, <span class='kw'>.model_type</span> <span class='kw'>=</span> <span class='no'>SUPPORTED_MOD_TYPES</span>)
+
+<span class='fu'>create_process_object</span>(<span class='no'>res</span>)
+
+<span class='fu'>create_run_log_object</span>(<span class='no'>log_df</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -143,6 +151,14 @@
     <tr>
       <th>res</th>
       <td><p>List to attempt to assign the class to</p></td>
+    </tr>
+    <tr>
+      <th>.model_type</th>
+      <td><p>Character scaler of a valid model type (currently either `nonmem` or `stan`)</p></td>
+    </tr>
+    <tr>
+      <th>log_df</th>
+      <td><p>data.frame or tibble to attempt to assign the class to</p></td>
     </tr>
     </table>
 

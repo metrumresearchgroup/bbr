@@ -12,7 +12,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
       bbi_args = list(
         overwrite = TRUE,
         threads = 4L),
-      orig_working_dir = file.path(getwd(), "model-examples"),
+      model_working_dir = file.path(getwd(), "model-examples"),
       orig_yaml_file ="1.yaml",
       yaml_md5 = "ee5a30a015c4e09bc29334188ff28b58",
       model_path = "1.ctl",
@@ -246,7 +246,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("as_model() errors with non-existent model", {
     proc1 <- bbi_dry_run(c("naw", "dawg"), "yea")
-    expect_error(as_model(proc1), regexp = "Inferred YAML")
+    expect_error(as_model(proc1), regexp = "found no YAML")
   })
 
 }) # closing withr::with_options

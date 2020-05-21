@@ -1,7 +1,7 @@
 Package: rbabylon
 Type: Package
 Title: r package for babylon
-Version: 0.4.1
+Version: 0.5.0
 Description: r package for babylon.
 Encoding: UTF-8
 LazyData: true
@@ -14,7 +14,7 @@ Authors@R:
            family = "Green",
            role = c("aut"),
            email = "seth127@gmail.com"))
-RoxygenNote: 7.1.0
+RoxygenNote: 7.0.2
 Imports: 
     checkmate,
     digest,

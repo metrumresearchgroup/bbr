@@ -225,8 +225,9 @@ copy_nonmem_model_from <- function(
   .new_mod[[YAML_MOD_PATH]] <- basename(new_mod_path) # path should be relative to YAML location
 
   # copy control steam to new path
-  .new_model_path <- .new_mod %>% get_model_path()
-  .parent_model_path <- .parent_mod %>% get_model_path()
+  .parent_model_path <- get_model_path(.parent_mod)
+  .new_model_path <-  get_model_path(.new_mod, .check_exists = FALSE)
+
 
   if (fs::file_exists(.new_model_path) && !isTRUE(.overwrite)) {
     # if .overwrite != TRUE, warn that file already exists
