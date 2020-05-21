@@ -150,13 +150,21 @@ create_run_log_object <- function(log_df) {
     strict_mode_error(err_msg)
   }
 
-  # absolute_model_path column must be character and have none missing
+  # absolute_model_path column must be character, have none missing, and be unique
   if (!inherits(log_df[[ABS_MOD_PATH]], "character")) {
     stop(glue("`{ABS_MOD_PATH}` column must be character type, but has class {paste(class(log_df[[ABS_MOD_PATH]]), collapse = ', ')}"))
   }
 
   if (any(is.na(log_df[[ABS_MOD_PATH]]))) {
     stop(glue("`{ABS_MOD_PATH}` column must NOT have any NA values, but the following rows are NA: {paste(which(is.na(log_df[[ABS_MOD_PATH]])), collapse = ', ')}"))
+  }
+
+  if(any(duplicated(log_df[[ABS_MOD_PATH]]))) {
+    stop(paste(
+      glue("`{ABS_MOD_PATH}` column must contain unique values, but the following rows are duplicates:"),
+      paste(which(duplicated(log_df[[ABS_MOD_PATH]])), collapse = ', '),
+      "-- USER PROBABLY SHOULDN'T SEE THIS ERROR. This is more of a failsafe."
+    ))
   }
 
   # assign class and return

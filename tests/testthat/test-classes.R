@@ -135,6 +135,19 @@ test_that("create_run_log_object() errors if ABS_MOD_PATH is not character", {
   expect_error(create_run_log_object(.log_df), regexp = "column must be character type")
 })
 
+test_that("create_run_log_object() errors if ABS_MOD_PATH is not unique", {
+  .log_df <- tibble::tibble(
+    !!ABS_MOD_PATH      := c("naw", "naw"),
+    !!YAML_YAML_MD5     := c("naw", "dawg"),
+    !!YAML_MOD_TYPE     := c("naw", "dawg"),
+    !!YAML_DESCRIPTION  := c("naw", "dawg"),
+    !!YAML_BBI_ARGS     := c("naw", "dawg"),
+    !!YAML_BASED_ON     := c("naw", "dawg"),
+    !!YAML_TAGS         := c("naw", "dawg"),
+    !!YAML_DECISIONS    := c("naw", "dawg")
+  )
+  expect_error(create_run_log_object(.log_df), regexp = "column must contain unique values")
+})
 
 test_that("create_run_log_object() errors if ABS_MOD_PATH has missing values", {
   .log_df <- tibble::tibble(
