@@ -115,13 +115,13 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("check_nonmem_table_output() output matches ref df", {
     df <- check_nonmem_table_output("model-examples/1/1.ext", .x_var = "ITERATION")
-    ref_df <- readRDS("data/acop_ext_ref_floorNULL_200211.rds")
+    ref_df <- readRDS(EXT_REF_FLOOR_NULL)
     expect_identical(df, ref_df)
   })
 
   test_that("check_nonmem_table_output(.x_floor=0) works", {
     df <- check_nonmem_table_output("model-examples/1/1.ext", .x_var = "ITERATION", .x_floor = 0)
-    ref_df <- readRDS("data/acop_ext_ref_floor0_200211.rds")
+    ref_df <- readRDS(EXT_REF_FLOOR_0)
     expect_identical(df, ref_df)
   })
 
