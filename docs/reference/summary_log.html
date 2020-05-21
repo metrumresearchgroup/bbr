@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Checks nonmem output file that's a whitespace-delimited file (for instance .grd or .ext) — check_nonmem_table_output • rbabylon</title>
+<title>Create log of model summary outputs — summary_log • rbabylon</title>
 
 
 <!-- jquery -->
@@ -35,14 +35,9 @@
 
 
 
-<meta property="og:title" content="Checks nonmem output file that's a whitespace-delimited file (for instance .grd or .ext) — check_nonmem_table_output" />
-<meta property="og:description" content="Checks nonmem output file that's a whitespace-delimited file (for instance .grd or .ext)
-S3 generic for checking grd file
-S3 dispatch for checking grd file
-S3 dispatch for checking grd file
-S3 generic for checking ext file
-S3 dispatch for checking ext file
-S3 dispatch for checking ext file" />
+<meta property="og:title" content="Create log of model summary outputs — summary_log" />
+<meta property="og:description" content="This should probably be an implementation function for an S3 method that can take a list of model objects or paths etc.
+Or maybe just the character (default?) dispatch? Need to think on that." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -126,61 +121,34 @@ S3 dispatch for checking ext file" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Checks nonmem output file that's a whitespace-delimited file (for instance .grd or .ext)</h1>
+    <h1>Create log of model summary outputs</h1>
     
-    <div class="hidden name"><code>check_nonmem_table_output.Rd</code></div>
+    <div class="hidden name"><code>summary_log.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Checks nonmem output file that's a whitespace-delimited file (for instance .grd or .ext)</p>
-<p>S3 generic for checking grd file</p>
-<p>S3 dispatch for checking grd file</p>
-<p>S3 dispatch for checking grd file</p>
-<p>S3 generic for checking ext file</p>
-<p>S3 dispatch for checking ext file</p>
-<p>S3 dispatch for checking ext file</p>
+    <p>This should probably be an implementation function for an S3 method that can take a list of model objects or paths etc.
+Or maybe just the character (default?) dispatch? Need to think on that.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>check_nonmem_table_output</span>(<span class='no'>.path</span>, <span class='kw'>.x_var</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>.x_floor</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+    <pre class="usage"><span class='fu'>summary_log</span>(<span class='no'>.models</span>, <span class='no'>...</span>)
 
-<span class='fu'>check_grd</span>(<span class='no'>.mod</span>, <span class='kw'>.iter_floor</span> <span class='kw'>=</span> <span class='fl'>0</span>)
-
-<span class='co'># S3 method for character</span>
-<span class='fu'>check_grd</span>(<span class='no'>.mod</span>, <span class='kw'>.iter_floor</span> <span class='kw'>=</span> <span class='fl'>0</span>)
-
-<span class='co'># S3 method for bbi_nonmem_model</span>
-<span class='fu'>check_grd</span>(<span class='no'>.mod</span>, <span class='kw'>.iter_floor</span> <span class='kw'>=</span> <span class='fl'>0</span>)
-
-<span class='fu'>check_ext</span>(<span class='no'>.mod</span>, <span class='kw'>.iter_floor</span> <span class='kw'>=</span> <span class='fl'>0</span>)
-
-<span class='co'># S3 method for character</span>
-<span class='fu'>check_ext</span>(<span class='no'>.mod</span>, <span class='kw'>.iter_floor</span> <span class='kw'>=</span> <span class='fl'>0</span>)
-
-<span class='co'># S3 method for bbi_nonmem_model</span>
-<span class='fu'>check_ext</span>(<span class='no'>.mod</span>, <span class='kw'>.iter_floor</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
+<span class='fu'>add_summary</span>(<span class='no'>.log_df</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>.path</th>
-      <td><p>Character scalar path to the gradient file</p></td>
+      <th>.models</th>
+      <td><p>A character vector of paths to models. Can be absolute or relative to working directory, but will come out as absolute. All must exist.</p></td>
     </tr>
     <tr>
-      <th>.x_var</th>
-      <td><p>name of variable to filter with `.x_floor`</p></td>
+      <th>...</th>
+      <td><p>arguments passed through to `summary_log()`</p></td>
     </tr>
     <tr>
-      <th>.x_floor</th>
-      <td><p>Filters file to only rows with `.x_var` GREATER THAN this value.</p></td>
-    </tr>
-    <tr>
-      <th>.mod</th>
-      <td><p>`bbi_nonmem_model` object</p></td>
-    </tr>
-    <tr>
-      <th>.iter_floor</th>
-      <td><p>Filters file to only rows with `ITERATION` GREATER THAN this value.</p></td>
+      <th>.log_df</th>
+      <td><p>`bbi_run_log_df` object to add summary to</p></td>
     </tr>
     </table>
 
