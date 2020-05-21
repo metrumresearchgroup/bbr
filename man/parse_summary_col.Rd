@@ -20,6 +20,8 @@ extract_heuristics(.s)
 }
 \arguments{
 \item{.df}{A tibble with a list column called "summary" containing bbi_nonmem_summary objects}
+
+\item{.s}{`bbi_nonmem_summary` object to parse}
 }
 \description{
 Parses the list column with the bbi_nonmem_summary object into separate (wide-format) columns

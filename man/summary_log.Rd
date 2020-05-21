@@ -12,7 +12,9 @@ add_summary(.log_df, ...)
 \arguments{
 \item{.models}{A character vector of paths to models. Can be absolute or relative to working directory, but will come out as absolute. All must exist.}
 
-\item{...}{Arguments passed through to model_summary()}
+\item{...}{arguments passed through to `summary_log()`}
+
+\item{.log_df}{`bbi_run_log_df` object to add summary to}
 }
 \description{
 This should probably be an implementation function for an S3 method that can take a list of model objects or paths etc.

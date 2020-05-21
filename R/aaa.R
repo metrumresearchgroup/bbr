@@ -115,6 +115,8 @@ SUMMARY_REQ_KEYS <- c(
   SUMMARY_DETAILS
 )
 
+SUMMARY_ERROR_COL <- "summary_error"
+
 # keys added when creating a process object
 PROC_PROCESS <- "process"
 PROC_STDOUT <- "stdout"

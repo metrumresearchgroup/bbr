@@ -28,18 +28,16 @@ summary_log <- function(.models, ...) {
     )
 
     # construct output list
-    res_list <- list(
-      summary = .s,
-      summary_error = .s$error_msg %||% NA_character_
-    )
-    res_list[[ABS_MOD_PATH]] = .mf
+    res_list <- list(summary = .s)
+    res_list[[SUMMARY_ERROR_COL]] <- .s$error_msg %||% NA_character_
+    res_list[[ABS_MOD_PATH]] <- .mf
     return(res_list)
   })
 
   res_df <- as_tibble(transpose(res_df))
   res_df <- mutate(res_df,
-                   !!ABS_MOD_PATH := unlist(.data[[ABS_MOD_PATH]]),
-                   summary_error = unlist(summary_error)
+                   !!ABS_MOD_PATH      := unlist(.data[[ABS_MOD_PATH]]),
+                   !!SUMMARY_ERROR_COL := unlist(.data[[SUMMARY_ERROR_COL]])
   ) %>% select(.data[[ABS_MOD_PATH]], everything())
 
   return(res_df)
@@ -47,6 +45,8 @@ summary_log <- function(.models, ...) {
 
 
 #' Joins output of `summary_log()` to a `bbi_run_log_df` object (aka the output of `run_log()`)
+#' @param .log_df `bbi_run_log_df` object to add summary to
+#' @param ... arguments passed through to `summary_log()`
 #' @importFrom dplyr select inner_join mutate
 #' @rdname summary_log
 #' @export
@@ -88,8 +88,8 @@ parse_summary_col <- function(.df) {
 
   # pivot out the details and heuristics
   #https://stackoverflow.com/questions/49689927/unnest-a-list-column-directly-into-several-columns
-  .df <- unnest_wider(.df, d)
-  .df <- unnest_wider(.df, h)
+  .df <- unnest_wider(.df, .data$d)
+  .df <- unnest_wider(.df, .data$h)
 
   return(.df)
 }
@@ -98,6 +98,7 @@ parse_summary_col <- function(.df) {
 ########
 # internal helpers for parsing specific pieces of bbi_nonmem_summary
 
+#' @param .s `bbi_nonmem_summary` object to parse
 #' @importFrom purrr map map_dbl
 #' @rdname parse_summary_col
 extract_ofv <- function(.s) {
@@ -106,7 +107,7 @@ extract_ofv <- function(.s) {
   return(.out)
 }
 
-
+#' @param .s `bbi_nonmem_summary` object to parse
 #' @importFrom purrr map map_int
 #' @rdname parse_summary_col
 extract_param_count <- function(.s) {
@@ -123,6 +124,7 @@ extract_param_count <- function(.s) {
   return(.out)
 }
 
+#' @param .s `bbi_nonmem_summary` object to parse
 #' @importFrom purrr map
 #' @rdname parse_summary_col
 extract_details <- function(.s) {
@@ -140,6 +142,7 @@ extract_details <- function(.s) {
   return(.out)
 }
 
+#' @param .s `bbi_nonmem_summary` object to parse
 #' @importFrom purrr map
 #' @rdname parse_summary_col
 extract_heuristics <- function(.s) {
