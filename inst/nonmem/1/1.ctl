@@ -1,7 +1,7 @@
 $PROBLEM PK model 1 cmt base
 
 $INPUT ID TIME MDV EVID DV AMT  SEX WT ETN
-$DATA ../data/acop.csv IGNORE=@
+$DATA ../../extdata/acop.csv IGNORE=@
 $SUBROUTINES ADVAN2 TRANS2
 
 $PK

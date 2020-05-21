@@ -1,0 +1,52 @@
+nm_version: ""
+overwrite: false
+clean_lvl: 1
+copy_lvl: 0
+git: true
+babylon_binary: /data/apps/bbi
+save_config: false
+output_dir: '{{ .Name }}'
+threads: 4
+debug: false
+local:
+  create_child_dirs: false
+nonmem:
+  nm73gf:
+    home: /opt/NONMEM/nm73gf
+    executable: nmfe73
+    nmqual: true
+    default: false
+  nm73gf_nmfe:
+    home: /opt/NONMEM/nm73gf_nmfe
+    executable: nmfe73
+    nmqual: false
+    default: false
+  nm74gf:
+    home: /opt/NONMEM/nm74gf
+    executable: nmfe74
+    nmqual: true
+    default: true
+  nm74gf_nmfe:
+    home: /opt/NONMEM/nm74gf_nmfe
+    executable: nmfe74
+    nmqual: false
+    default: false
+parallel: false
+delay: 0
+nmqual: false
+json: false
+log_file: ""
+nmfe_options:
+  license_file: ""
+  prsame: false
+  background: false
+  prcompile: false
+  prdefault: false
+  tprdefault: false
+  nobuild: false
+  maxlim: 100
+mpi_exec_path: /usr/local/mpich3/bin/mpiexec
+parallel_timeout: 2147483647
+parafile: ""
+post_work_executable: ""
+grid_name_prefix: ""

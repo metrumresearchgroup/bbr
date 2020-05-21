@@ -1,3 +1,15 @@
+# Helper functions for reading output files
+
+#' Builds the absolute path to a file in the output directory from components of the `bbi_{.model_type}_model` object
+#' @param .mod `bbi_{.model_type}_model` object
+#' @param .extension file extension to append (for example `lst`, `ext`, `grd`, etc.)
+build_path_from_mod_obj <- function(.mod, .extension) {
+  out_file_path <- file.path(.mod[[WORKING_DIR]],
+                        .mod[[YAML_OUT_DIR]],
+                        paste0(get_model_id(.mod[[YAML_MOD_PATH]]), ".", .extension))
+  return(out_file_path)
+}
+
 #' Reads the head and tail of specified file and prints it the console and/or returns it as a character vector.
 #' @param .file Character scaler of path to file to read
 #' @param .head Integer for number of lines to read from the top of the file

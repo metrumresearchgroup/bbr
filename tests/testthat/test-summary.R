@@ -16,6 +16,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
   MOD2_PATH <- file.path(MODEL_DIR, "2")
 
   # references
+  SUMMARY_REF_FILE <- "data/acop_summary_obj_ref_200520.rds"
   SUM_CLASS_LIST <- c("bbi_nonmem_summary", "list")
   NOT_FINISHED_ERR_MSG <- "nonmem_summary.*modeling run has not finished"
   NO_LST_ERR_MSG <- "Unable to locate `.lst` file.*NONMEM output folder"
@@ -33,7 +34,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
     expect_identical(class(sum1), SUM_CLASS_LIST)
 
     # compare to reference
-    ref_sum <- readRDS("data/acop_summary_obj_ref_200305.rds")
+    ref_sum <- readRDS(SUMMARY_REF_FILE)
     expect_equal(ref_sum, sum1)
   })
 
@@ -46,7 +47,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
       expect_identical(class(sum1), SUM_CLASS_LIST)
 
       # compare to reference
-      ref_sum <- readRDS("data/acop_summary_obj_ref_200305.rds")
+      ref_sum <- readRDS(SUMMARY_REF_FILE)
       expect_equal(ref_sum, sum1)
     })
 
@@ -58,7 +59,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
       expect_identical(class(sum1), SUM_CLASS_LIST)
 
       # compare to reference
-      ref_sum <- readRDS("data/acop_summary_obj_ref_200305.rds")
+      ref_sum <- readRDS(SUMMARY_REF_FILE)
       expect_equal(ref_sum, sum1)
     })
   })

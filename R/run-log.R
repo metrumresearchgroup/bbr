@@ -46,7 +46,8 @@ run_log <- function(
   # create run log tibble
   df <- mod_yaml %>% map_df(run_log_entry)
 
-  class(df) <- c("bbi_nonmem_summary_df", class(df))
+  df <- create_run_log_object(df)
+
   return(df)
 }
 
@@ -73,6 +74,7 @@ safe_read_model <- function(.yaml_path, .directory = getOption("rbabylon.model_d
 }
 
 
+
 #' Create a run log row from a `bbi_{.model_type}_model` object
 #' @param .mod S3 object of class `bbi_{.model_type}_model`
 #' @importFrom tibble tibble
@@ -80,18 +82,17 @@ safe_read_model <- function(.yaml_path, .directory = getOption("rbabylon.model_d
 run_log_entry <- function(.mod) {
   # build row
   entry_df <- tibble::tibble(
-    run_id = enforce_length(.mod, YAML_MOD_PATH) %>% get_model_id(),
-    !!WORKING_DIR       := enforce_length(.mod, WORKING_DIR),
-    !!YAML_YAML_NAME    := enforce_length(.mod, YAML_YAML_NAME),
+    !!ABS_MOD_PATH := file.path(
+      enforce_length(.mod, WORKING_DIR),
+      get_model_id(enforce_length(.mod, YAML_YAML_NAME))
+    ),
     !!YAML_YAML_MD5     := enforce_length(.mod, YAML_YAML_MD5),
     !!YAML_MOD_TYPE     := enforce_length(.mod, YAML_MOD_TYPE),
     !!YAML_DESCRIPTION  := enforce_length(.mod, YAML_DESCRIPTION),
-    !!YAML_MOD_PATH     := enforce_length(.mod, YAML_MOD_PATH),
     !!YAML_BBI_ARGS     := .mod[[YAML_BBI_ARGS]] %>% list(),
     !!YAML_BASED_ON     := .mod[[YAML_BASED_ON]] %>% list(),
     !!YAML_TAGS         := .mod[[YAML_TAGS]] %>% list(),
-    !!YAML_DECISIONS    := .mod[[YAML_DECISIONS]] %>% list(),
-    !!YAML_OUT_DIR      := enforce_length(.mod, YAML_OUT_DIR)
+    !!YAML_DECISIONS    := .mod[[YAML_DECISIONS]] %>% list()
   )
 
   # check that it is only one row
@@ -141,26 +142,41 @@ config_log <- function(
 
   # define json keys to keep as constant
   KEEPERS = c(
-    "model_name",
     "model_md5",
     "data_path",
-    "data_md5",
-    "output_dir"
+    "data_md5"
   )
 
+  BBI_CONFIG <- "/bbi_config.json$"
+
   # get json files and parse to df
-  json_files <- .base_dir %>% dir_ls(recurse = .recurse) %>% str_subset("bbi_config.json$")
+  json_files <- dir_ls(.base_dir, recurse = .recurse)
+  json_files <- str_subset(json_files, BBI_CONFIG)
+  json_files <- normalizePath(json_files)
+
   if (length(json_files) == 0) {
     warning(glue("Found no bbi_config.json files in {.base_dir}"))
     return(NULL)
-  } else {
-    df <- json_files %>%
-      map_df(function(.path) fromJSON(.path)[KEEPERS]) %>%
-      mutate(run_id = get_model_id(.data$model_name)) %>%
-      select(.data$run_id, everything(), -.data$model_name)
-
-    return(df)
   }
+
+  # map over json files and parse relevant fields
+  df <- map_df(json_files, function(.path) {
+    .conf_list <- fromJSON(.path)
+    if (!all(KEEPERS %in% names(.conf_list))) {
+      warning(paste(
+        glue("{.path} is missing the required keys: `{paste(KEEPERS[!(KEEPERS %in% names(.conf_list))], collapse=', ')}` and will be skipped."),
+        glue("This is likely because it was run with an old version of babylon. Model was run on version {.conf_list$bbi_version}"),
+        "User can call `bbi_current_release()` to see the most recent release version, and call `use_bbi(options('rbabylon.bbi_exe_path'))` to upgrade to the version.",
+        sep = "\n"
+      ))
+      return(NULL)
+    }
+    return(.conf_list[KEEPERS])
+  })
+  df <- mutate(df, !!ABS_MOD_PATH := str_replace(json_files, BBI_CONFIG, ""))
+  df <- select(df, .data[[ABS_MOD_PATH]], everything())
+
+  return(df)
 }
 
 #' Joins config log tibble onto a matching run log tibble
@@ -169,6 +185,11 @@ config_log <- function(
 #' @importFrom dplyr left_join
 #' @export
 add_config <- function(.log_df, ...) {
+  # check input df
+  if (!inherits(.log_df, "bbi_run_log_df")) {
+    stop(glue("Can only pass an object of class `bbi_run_log_df` to `add_config()`. Passed object has classes {paste(class(.log_df), collapse = ', ')}"))
+  }
+
   # get config log
   .conf_df <- config_log(...)
 
@@ -188,10 +209,11 @@ add_config <- function(.log_df, ...) {
   df <- left_join(
     .log_df,
     .conf_df,
-    by = "run_id",
+    by = ABS_MOD_PATH,
     suffix = c(".log", ".config")
   )
 
   return(df)
 }
+
 
