@@ -219,7 +219,7 @@ Users can call `config_log` directly, but it is likely more useful to use `run_l
 orig_json <- jsonlite::fromJSON(file.path(getOption("rbabylon.model_directory"), "1", "bbi_config.json"))
 
 # fix data path (just in case)
-orig_json$data_path <- str_replace(orig_json$data_path, "/data/", "/extdata/")
+orig_json$data_path <- stringr::str_replace(orig_json$data_path, "/data/", "/extdata/")
 
 # copying the outputs from the original run 
 # and setting model md5 to match control stream (remember this "original" is fake)
