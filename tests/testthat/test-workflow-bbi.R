@@ -168,6 +168,24 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
     expect_true(all(log_df$model_md5_match))
   })
 
+  test_that("add_summary() works correctly", {
+    # add config log to run log
+    log_df <- expect_warning(run_log() %>% add_summary(), regexp = "model_summary.+failed")
+    expect_equal(nrow(log_df), 4)
+    expect_equal(ncol(log_df), 22) ### this will likely change
+
+    # filter to only the ones that have finished
+    log_df <- log_df %>% filter(is.na(summary_error))
+    expect_equal(nrow(log_df), 3)
+
+    # check some stuff
+    expect_equal(unique(round(log_df$ofv, 0)), 2637)
+    expect_equal(unique(log_df$param_count), 7)
+    expect_equal(unique(log_df$number_of_obs), 760)
+    expect_false(all(log_df$minimization_terminated))
+
+  })
+
 }) # closing withr::with_options
 
 # cleanup
