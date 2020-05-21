@@ -73,7 +73,7 @@ As long as the YAML has not moved since it was loaded, this will work." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1.9000</span>
       </span>
     </div>
 
@@ -137,26 +137,37 @@ These functions simply stitch together that path with the requested relative pat
 As long as the YAML has not moved since it was loaded, this will work.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_path_from_object</span>(<span class='no'>.bbi_object</span>, <span class='no'>.key</span>)
+    <pre class="usage"><span class='fu'>get_path_from_object</span>(<span class='no'>.bbi_object</span>, <span class='no'>.key</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
-<span class='fu'>get_model_path</span>(<span class='no'>.mod</span>)
+<span class='co'># S3 method for default</span>
+<span class='fu'>get_path_from_object</span>(<span class='no'>.bbi_object</span>, <span class='no'>.key</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
-<span class='fu'>get_output_dir</span>(<span class='no'>.mod</span>)</pre>
+<span class='co'># S3 method for character</span>
+<span class='fu'>get_path_from_object</span>(<span class='no'>.bbi_object</span>, <span class='no'>.key</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+
+<span class='co'># S3 method for bbi_run_log_df</span>
+<span class='fu'>get_path_from_object</span>(<span class='no'>.bbi_object</span>, <span class='no'>.key</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+
+<span class='fu'>get_model_path</span>(<span class='no'>.bbi_object</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+
+<span class='fu'>get_output_dir</span>(<span class='no'>.bbi_object</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+
+<span class='fu'>get_yaml_path</span>(<span class='no'>.bbi_object</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>.bbi_object</th>
-      <td><p>The object to query</p></td>
+      <td><p>Tibble of class `bbi_run_log_df`</p></td>
     </tr>
     <tr>
       <th>.key</th>
       <td><p>The key that contains the relative path</p></td>
     </tr>
     <tr>
-      <th>.mod</th>
-      <td><p>The `bbi_...` S3 object</p></td>
+      <th>.check_exists</th>
+      <td><p>Logical scaler for whether it will check if the file exists and error if it does not. True by default.</p></td>
     </tr>
     </table>
 
