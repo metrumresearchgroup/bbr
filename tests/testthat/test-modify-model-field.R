@@ -245,6 +245,28 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     cleanup()
   })
 
+  ####################################
+  # helper functions for model fields
+  ####################################
+
+  test_that("check_based_on works on happy path", {
+    # test on 1.yaml and copy a few around
+    expect_equal(1,1)
+  })
+
+  test_that("check_based_on works on nested dirs", {
+    # use LEVEL2_DIR constant to copy
+    # copy model 1 to level deeper
+    fs::dir_create(LEVEL2_DIR)
+    fs::file_copy(YAML_TEST_FILE, LEVEL2_DIR)
+
+    expect_equal(1,1)
+
+    cleanup()
+  })
+
+  # test some failures too
+
 
   ####################################################
   # check_yaml_in_sync gets triggered when it should

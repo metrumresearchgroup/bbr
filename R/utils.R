@@ -260,13 +260,13 @@ set_model_directory <- function(.path) {
 
 strict_mode_error <- function(err_msg) {
   if (isTRUE(getOption("rbabylon.strict"))) {
-    stop(err_msg)
+    stop(err_msg, call. = FALSE)
   } else {
     warning(paste(
       "The following error is being ignored because `options('rbabylon.strict')` is not set to TRUE.",
       "Consider setting `options('rbabylon.strict' = TRUE)` if you experience issues.",
       err_msg
-    ))
+    ), call. = FALSE)
   }
 }
 
