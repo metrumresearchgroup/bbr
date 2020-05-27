@@ -1,0 +1,78 @@
+
+#' Get based_on from bbi object
+#'
+#' Returns character vector of the absolute paths all models stored in the `based_on` field of a `bbi_...` object
+#' NOTE: All paths saved in the object or accompanying YAML will be relative **to the location of that YAML**
+#' When the object is loaded into memory, the absolute path to the YAML is stored in the object.
+#' These functions simply stitch together that path with the relative paths from the `based_on` field.
+#' As long as the YAML has not moved since it was loaded, this will work.
+#' @param .bbi_object The model object (or path, etc.) to query
+#' @param .check_exists Logical scaler for whether it will check if the file exists and error if it does not. FALSE by default.
+#' @export
+#' @rdname get_based_on
+get_based_on <- function(.bbi_object, .check_exists = FALSE) {
+  UseMethod("get_based_on")
+}
+
+
+#' The default method attempts to extract the path from any object passed to it
+#' @param .bbi_object The object to attempt to query. Could be a partially built bbi_{.model_type}_object or some other custom object containing model data.
+#' @rdname get_based_on
+#' @export
+get_based_on.default <- function(.bbi_object, .check_exists = FALSE) {
+  tryCatch(
+    {
+      # do some QA on the required fields
+      if (any(map_lgl(c(WORKING_DIR, YAML_BASED_ON), ~ is.null(.bbi_object[[.x]])))) {
+        stop(glue(".bbi_object must contain keys for both `{WORKING_DIR}` and `{YAML_BASED_ON}`` but has only the following keys: {paste(names(.bbi_object), collapse = ', ')}"), call. = FALSE)
+      }
+
+      # optionally check if they exists
+      if (isTRUE(.check_exists)) {
+        invisible(check_based_on(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_BASED_ON]]))
+      }
+
+      # extract the requested paths
+      return(file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_BASED_ON]]))
+
+    },
+    error = function(e) {
+      stop(glue("Cannot extract `{YAML_BASED_ON}` from object of class `{paste(class(.bbi_object), collapse = ', ')}` :\n{paste(e, collapse = '\n')}"), call. = FALSE)
+    }
+  )
+}
+
+
+#' @rdname get_based_on
+#' @param .bbi_object Character scaler of a path to a model that can be loaded with `read_model(.bbi_object)`
+#' @export
+get_based_on.character <- function(.bbi_object, .check_exists = FALSE) {
+
+  .bbi_object <- tryCatch(
+    {
+      read_model(.bbi_object)
+    },
+    error = function(e) {
+      stop(glue("Cannot load model object from path `{.bbi_object}` :\n{paste(e, collapse = '\n')}"))
+    }
+  )
+
+  return(get_based_on(.bbi_object, .check_exists = .check_exists))
+}
+
+
+#' @rdname get_based_on
+#' @param .bbi_object Tibble of class `bbi_run_log_df`
+#' @importFrom purrr map_chr
+#' @export
+get_based_on.bbi_run_log_df <- function(.bbi_object, .check_exists = FALSE) {
+
+  #### could just return .bbi_object[[YAML_BASED_ON]] and it should give back the list but
+  #### a) they wouldn't be absolute...
+  #### b) we'd have to reimplement the .check exists (although that's pretty easy)
+  .out_paths <- map_chr(.bbi_object[[ABS_MOD_PATH]], function(.path) {
+    get_based_on(.path, .check_exists = .check_exists)
+  })
+
+  return(.out_paths)
+}

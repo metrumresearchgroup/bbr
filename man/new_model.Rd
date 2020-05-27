@@ -19,7 +19,7 @@ new_model(
 \arguments{
 \item{.yaml_path}{Path to save resulting model YAML file to. MUST be either an absolute path, or a path relative to the `.directory` argument.}
 
-\item{.description}{Description of new model run. This will be stored in the yaml (to be used later in `run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.}
+\item{.description}{Description of new model run. This will be stored in the yaml (and can be viewed later in `run_log()`). By convention, it should match the $PROBLEM statement in the control stream, but this is not enforced.}
 
 \item{.model_path}{Path to model (control stream) file. MUST be an absolute path, or the model path relative to the location of the YAML file. It recommended for the control stream and YAML to be in the same directory. If nothing is passed, the function will look for a file with the same path/name as your YAML, but with either .ctl or .mod extension.}
 

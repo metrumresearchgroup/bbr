@@ -215,7 +215,7 @@ check_based_on <- function(.start, .based_on) {
 
   if (!all(.paths_bool)) {
     strict_mode_error(paste(
-      glue("Attempted to add {length(.paths_bool)} models as `based_on` but cannot find .yaml or .yml files for {length(.paths_bool) - sum(.paths_bool)} of them: "),
+      glue("Parsed {length(.paths_bool)} models as `based_on` but cannot find .yaml or .yml files for {length(.paths_bool) - sum(.paths_bool)} of them: "),
       paste(names(which(!.paths_bool)), collapse = ', ')
     ))
   }

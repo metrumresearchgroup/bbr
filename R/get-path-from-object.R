@@ -2,7 +2,7 @@
 #' Get path from bbi object
 #'
 #' Builds the full path to a file that is stored as part of a `bbi_...` S3 object
-#' All paths saved in the object or accompanying YAML will be relative **to the location of that YAML**
+#' NOTE: All paths saved in the object or accompanying YAML will be relative **to the location of that YAML**
 #' When the object is loaded into memory, the absolute path to the YAML is stored in the object.
 #' These functions simply stitch together that path with the requested relative path.
 #' As long as the YAML has not moved since it was loaded, this will work.
@@ -148,6 +148,16 @@ yaml_ext <- function(.x) {
   sprintf("%s.yaml", tools::file_path_sans_ext(.x))
 }
 
+#' @param .x file path to modify
+#' @rdname new_ext
+#' @export
+yml_ext <- function(.x) {
+  if (tools::file_ext(.x) == "yaml") {
+    return(.x)
+  }
+  sprintf("%s.yml", tools::file_path_sans_ext(.x))
+}
+
 
 ###################################
 # Other Assorted file path helpers
@@ -213,13 +223,29 @@ find_model_file_path <- function(.path) {
   .ctl_path <- ctl_ext(.path)
   .mod_path <- mod_ext(.path)
   if(fs::file_exists(.ctl_path)) {
-    return(basename(.ctl_path))
+    return(.ctl_path)
   } else if(fs::file_exists(.mod_path)) {
-    return(basename(.mod_path))
+    return(.mod_path)
   } else {
     warning(glue("No model file found at {.ctl_path} but setting that path as default model path for {.path}. Please put relevant model file in that location."))
-    return(basename(.ctl_path))
+    return(.ctl_path)
   }
 }
 
+
+#' helper to find valid yaml file and return ctl_ext(.path) by default if not found
+#' @param .path File path to a NONMEM model file (control stream) with either `.ctl` or `.mod` extension
+find_yaml_file_path <- function(.path) {
+  .yml_path <- yml_ext(.path)
+  .yaml_path <- yaml_ext(.path)
+  if(fs::file_exists(.yaml_path)) {
+    return(.yaml_path)
+  } else if(fs::file_exists(.yml_path)) {
+    return(.yml_path)
+  } else {
+    #warning(glue("No model file found at {.ctl_path} but setting that path as default model path for {.path}. Please put relevant model file in that location."))
+    #return(.ctl_path)
+    stop(glue("No file found at {.yml_path} OR {.yaml_path}"))
+  }
+}
 
