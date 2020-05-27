@@ -8,9 +8,10 @@ context("testing a composable workflow and running bbi")
 ####################################################
 
 # can't run on Drone because there's no NONMEM
-if (Sys.getenv("METWORX_VERSION") == "") {
-  skip("test-workflow-composable-bbi only runs on Metworx")
-}
+# if (Sys.getenv("METWORX_VERSION") == "") {
+#   skip("test-workflow-composable-bbi only runs on Metworx")
+# }
+skip("test-workflow-composable-bbi only runs on Metworx")
 
 # define constants
 STARTER_FILE <- file.path("model-examples/1.ctl")

@@ -184,6 +184,43 @@ replace_bbi_args <- function(.mod, .bbi_args) {
 }
 
 
+###################
+# helper functions
+###################
+
+#' Checks for yaml files relative to a starting location
+#' @importFrom fs file_exists
+#' @importFrom purrr map_lgl
+#' @param .start The directory of the model (i.e. the YAML file) that the `based_on` will be added to.
+#' @param .based_on Character vector or scaler of paths (with or without extension) to the models that will be added to `based_on`. Paths should be relative to `.start` argument.
+check_based_on <- function(.start, .based_on) {
+  # make all input paths relative to model and then absolute
+  .paths <- file.path(.start, .based_on)
+
+  # check for either a .yaml or .yml file at each location
+  .paths_bool <- map_lgl(.paths, function(.p) {
+    .y1 <- sprintf("%s.yaml", tools::file_path_sans_ext(.p))
+    .y2 <- sprintf("%s.yml", tools::file_path_sans_ext(.p))
+    .bool_test <- fs::file_exists(c(.y1, .y2))
+    return(any(.bool_test))
+  })
+  names(.paths_bool) <- .paths
+
+  if (!all(.paths_bool)) {
+    strict_mode_error(paste(
+      glue("Attempted to add {length(.paths_bool)} models as `based_on` but cannot find .yaml or .yml files for {length(.paths_bool) - sum(.paths_bool)} of them: "),
+      paste(names(which(!.paths_bool)), collapse = ', ')
+    ))
+  }
+
+  return(tools::file_path_sans_ext(.based_on))
+}
+
+
+################
+# synching YAML
+################
+
 #' Reconcile model object with YAML file
 #'
 #' Extracts YAML path from model object and pulls in YAML file.

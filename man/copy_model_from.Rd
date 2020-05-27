@@ -74,7 +74,7 @@ copy_nonmem_model_from(
 
 \item{.description}{Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.}
 
-\item{.based_on_additional}{The run id for the `.parent_model` will automatically be added to the `based_on` field but this argument can contain a character scaler or vector of additional run id's (model names) that this model was "based on." These are used to reconstuct model developement and ancestry.}
+\item{.based_on_additional}{Character scaler or vector of paths to other models that this model was "based on." These are used to reconstuct model developement and ancestry. \strong{Paths must be relative to `.new_model` path.} Note that the `.parent_model` will automatically be added to the `based_on` field, so no need to include that here.}
 
 \item{.add_tags}{A character scaler or vector with any new tags to be added to `{.new_model}.yaml`}
 

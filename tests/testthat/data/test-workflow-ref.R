@@ -28,6 +28,7 @@ cleanup <- function() {
   # delete tmp files if they are leftover from previous test
   for (m in c(NEW_MOD2, NEW_MOD3)) {
     if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
+    if (fs::file_exists(paste0(m, ".yml"))) fs::file_delete(paste0(m, ".yml"))
     if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
   }
   if (fs::dir_exists(LEVEL2_DIR)) fs::dir_delete(LEVEL2_DIR)

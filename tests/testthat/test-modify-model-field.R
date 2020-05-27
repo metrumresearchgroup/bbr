@@ -250,22 +250,40 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   ####################################
 
   test_that("check_based_on works on happy path", {
-    # test on 1.yaml and copy a few around
-    expect_equal(1,1)
+    # test on 1.yaml
+    expect_equal(check_based_on(.start = ".", .based_on = YAML_TEST_FILE), tools::file_path_sans_ext(YAML_TEST_FILE))
+    expect_equal(check_based_on(.start = MODEL_DIR, .based_on = "1.yaml"), "1")
   })
 
-  test_that("check_based_on works on nested dirs", {
-    # use LEVEL2_DIR constant to copy
-    # copy model 1 to level deeper
-    fs::dir_create(LEVEL2_DIR)
-    fs::file_copy(YAML_TEST_FILE, LEVEL2_DIR)
-
-    expect_equal(1,1)
+  test_that("check_based_on works on happy path with vector", {
+    fs::file_copy(YAML_TEST_FILE, paste0(NEW_MOD2, '.yml'))
+    expect_equal(check_based_on(.start = ".", .based_on = c(YAML_TEST_FILE, NEW_MOD2)), c(tools::file_path_sans_ext(YAML_TEST_FILE), NEW_MOD2))
+    expect_equal(check_based_on(.start = MODEL_DIR, .based_on = c("1", "2")), c("1", "2"))
 
     cleanup()
   })
 
-  # test some failures too
+  test_that("check_based_on works on nested dirs", {
+    # copy model 1 to level deeper
+    fs::dir_create(LEVEL2_DIR)
+    fs::file_copy(YAML_TEST_FILE, LEVEL2_DIR)
+    fs::file_copy(YAML_TEST_FILE, paste0(NEW_MOD2, '.yml'))
+
+    expect_equal(
+      check_based_on(.start = ".", .based_on = c(YAML_TEST_FILE, NEW_MOD2, file.path(LEVEL2_DIR, "1"))),
+      c(tools::file_path_sans_ext(YAML_TEST_FILE), NEW_MOD2, file.path(LEVEL2_DIR, "1"))
+    )
+
+    expect_equal(check_based_on(.start = MODEL_DIR, .based_on = c("1", "2", "level2/1")), c("1", "2", "level2/1"))
+
+    cleanup()
+  })
+
+  test_that("check_based_on fails when yaml can't be found", {
+    expect_error(check_based_on(.start = ".", .based_on = c(YAML_TEST_FILE, NEW_MOD2)), regexp = "cannot find .yaml or .yml files")
+    expect_error(check_based_on(.start = MODEL_DIR, .based_on = c("1", "2")), regexp = "cannot find .yaml or .yml files")
+
+  })
 
 
   ####################################################

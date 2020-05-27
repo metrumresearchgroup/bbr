@@ -6,7 +6,7 @@
 #' @param .parent_mod Model to copy from
 #' @param .new_model Path to write new model files to WITHOUT FILE EXTENSION. Function will create both `{.new_model}.yaml` and a new model file based on this path.
 #' @param .description Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`).
-#' @param .based_on_additional The run id for the `.parent_model` will automatically be added to the `based_on` field but this argument can contain a character scaler or vector of additional run id's (model names) that this model was "based on." These are used to reconstuct model developement and ancestry.
+#' @param .based_on_additional Character scaler or vector of paths to other models that this model was "based on." These are used to reconstuct model developement and ancestry. \strong{Paths must be relative to `.new_model` path.} Note that the `.parent_model` will automatically be added to the `based_on` field, so no need to include that here.
 #' @param .add_tags A character scaler or vector with any new tags to be added to `{.new_model}.yaml`
 #' @param .inherit_tags Boolean for whether to inherit any tags from `.parent_model.yaml`
 #' @param .update_model_file Boolean for whether to update the newly created model file. By default it is TRUE, but if FALSE is passed new model file will be an exact copy of its parent.
@@ -159,7 +159,7 @@ copy_model_from.numeric <- function(
 #' @param .description Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.
 #' @param .update_model_file Boolean for whether to update the `$PROBLEM` line in the new control stream. By default it is TRUE, but if FALSE is passed `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.
 #' @param .overwrite Boolean for whether to overwrite .ctl or .mod file if one already exists at `{.new_model}.[mod|ctl]`
-#' @importFrom fs file_copy
+#' @importFrom fs file_copy path_rel
 #' @importFrom readr read_file write_file
 #' @importFrom stringr str_replace
 #' @importFrom yaml write_yaml
@@ -200,7 +200,8 @@ copy_nonmem_model_from <- function(
   .new_mod[[YAML_OUT_DIR]] <- basename(tools::file_path_sans_ext(.new_model))
 
   # fill based_on
-  .new_mod[[YAML_BASED_ON]] <- get_model_id(.parent_mod[[YAML_MOD_PATH]]) %>% c(.based_on_additional)
+  .parent_based_on <- fs::path_rel(.parent_mod[[YAML_MOD_PATH]], start = .new_mod[[WORKING_DIR]])
+  .new_mod[[YAML_BASED_ON]] <- check_based_on(c(.parent_based_on, .based_on_additional))
 
   # pass through model type and bbi_args
   .new_mod[[YAML_MOD_TYPE]] <- .parent_mod[[YAML_MOD_TYPE]]
@@ -279,33 +280,5 @@ copy_control_stream <- function(.parent_model_path, .new_model_path, .update_mod
     write_file(mod_str, .new_model_path)
   } else {
     fs::file_copy(.parent_model_path, .new_model_path)
-  }
-}
-
-
-#' Checks for yaml files relative to a starting location
-#' @importFrom fs path_rel file_exists
-#' @importFrom purrr map_lgl
-#' @param .start The directory of the model (i.e. the YAML file) that the `based_on` will be added to.
-#' @param .based_on Character vector or scaler of paths (with or without extension) to the models that will be added to `based_on`. Paths should be relative to `.start` argument.
-check_based_on <- function(.start, .based_on) {
-  # make all input paths relative to model and then absolute
-  .paths <- fs::path_rel(.based_on, .start)
-  .paths <- file.path(.start, .paths)
-
-  # check for either a .yaml or .yml file at each location
-  .paths_bool <- map_lgl(.paths, function(.p) {
-    .y1 <- sprintf("%s.yaml", tools::file_path_sans_ext(.p))
-    .y2 <- sprintf("%s.yml", tools::file_path_sans_ext(.p))
-    .bool_test <- fs::file_exists(c(.y1, .y2))
-    return(any(.bool_test))
-  })
-  names(.paths_bool) <- .paths
-
-  if (!all(.paths_bool)) {
-    strict_mode_error(paste(
-      glue("Attempted to add {length(.paths_bool)} models as `based_on` but cannot find .yaml or .yml files for {length(.paths_bool) - sum(.paths_bool)} of them: "),
-      paste(names(which(!.paths_bool)), collapse = ', ')
-    ))
   }
 }
