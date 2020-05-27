@@ -200,7 +200,7 @@ copy_nonmem_model_from <- function(
   .new_mod[[YAML_OUT_DIR]] <- basename(tools::file_path_sans_ext(.new_model))
 
   # fill based_on
-  .parent_based_on <- fs::path_rel(.parent_mod[[YAML_MOD_PATH]], start = .new_mod[[WORKING_DIR]])
+  .parent_based_on <- fs::path_rel(get_model_path(.parent_mod), start = .new_mod[[WORKING_DIR]])
   .new_mod[[YAML_BASED_ON]] <- check_based_on(.new_mod[[WORKING_DIR]], c(.parent_based_on, .based_on_additional))
 
   # pass through model type and bbi_args
