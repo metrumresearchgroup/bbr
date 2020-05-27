@@ -7,10 +7,12 @@
 
 # define constants
 MODEL_DIR <- "model-examples"
-LEVEL2_DIR <- file.path(MODEL_DIR, "level2")
 YAML_TEST_FILE <- file.path(MODEL_DIR, "1.yaml")
 NEW_MOD2 <- file.path(MODEL_DIR, "2")
 NEW_MOD3 <- file.path(MODEL_DIR, "3")
+
+LEVEL2_DIR <- file.path(MODEL_DIR, "level2")
+LEVEL2_MOD <- file.path(LEVEL2_DIR, "1")
 
 ORIG_DESC <- "original acop model"
 NEW_DESC <- "new description"

@@ -189,12 +189,19 @@ replace_bbi_args <- function(.mod, .bbi_args) {
 ###################
 
 #' Checks for yaml files relative to a starting location
-#' @importFrom fs file_exists
+#' @importFrom fs file_exists is_absolute_path path_rel
 #' @importFrom purrr map_lgl
 #' @param .start The directory of the model (i.e. the YAML file) that the `based_on` will be added to.
 #' @param .based_on Character vector or scaler of paths (with or without extension) to the models that will be added to `based_on`. Paths should be relative to `.start` argument.
 check_based_on <- function(.start, .based_on) {
-  # make all input paths relative to model and then absolute
+  # make all input paths relative to .start
+  .based_on <- map_chr(.based_on, function(.p) {
+    if (fs::is_absolute_path(.p)) {
+      .p <- fs::path_rel(.p, .start)
+    }
+    return(.p)
+  })
+
   .paths <- file.path(.start, .based_on)
 
   # check for either a .yaml or .yml file at each location

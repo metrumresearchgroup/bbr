@@ -21,6 +21,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_identical(basename(log_df[[ABS_MOD_PATH]]), c("1", "2", "3"))
     expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS))
     expect_identical(log_df$yaml_md5, c("ee5a30a015c4e09bc29334188ff28b58", "5576ed6fa6e1e4e9b0c25dbf62ae42e5", "ebadcc4a3c0f4d16f61251605136942b"))
+    expect_identical(log_df$based_on, list(NULL, "1", c("1", "2")))
 
     # check class of each column
     log_classes <- log_df %>% dplyr::summarise_all(class) %>% as.list()
@@ -48,8 +49,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
   # copy model 1 to level deeper
   fs::dir_create(LEVEL2_DIR)
-  fs::file_copy(YAML_TEST_FILE, LEVEL2_DIR)
-  fs::file_copy(ctl_ext(YAML_TEST_FILE), LEVEL2_DIR)
+  copy_model_from(YAML_TEST_FILE, LEVEL2_MOD, "level 2 copy of 1.yaml", .inherit_tags = TRUE)
   fs::dir_copy(tools::file_path_sans_ext(YAML_TEST_FILE), file.path(LEVEL2_DIR, tools::file_path_sans_ext(basename(YAML_TEST_FILE))))
 
   test_that("run_log() works correctly with nested dirs", {
@@ -59,7 +59,8 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_false(any(duplicated(log_df[[ABS_MOD_PATH]])))
     expect_identical(basename(log_df[[ABS_MOD_PATH]]), c("1", "2", "3", "1"))
     expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS, ORIG_TAGS))
-    expect_identical(log_df$yaml_md5, c("ee5a30a015c4e09bc29334188ff28b58", "5576ed6fa6e1e4e9b0c25dbf62ae42e5", "ebadcc4a3c0f4d16f61251605136942b", "ee5a30a015c4e09bc29334188ff28b58"))
+    expect_identical(log_df$yaml_md5, c("ee5a30a015c4e09bc29334188ff28b58", "5576ed6fa6e1e4e9b0c25dbf62ae42e5", "ebadcc4a3c0f4d16f61251605136942b", "6132d34ba27caf3460d23c9b4a3937d9"))
+    expect_identical(log_df$based_on, list(NULL, "1", c("1", "2"), "../1"))
   })
 
   test_that("config_log() works correctly with nested dirs", {
@@ -70,7 +71,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_identical(basename(log_df[[ABS_MOD_PATH]]), c("1", "1"))
     expect_identical(log_df$data_md5, c("4ddb44da897c26681d892aa7be99f74b", "4ddb44da897c26681d892aa7be99f74b"))
     expect_identical(log_df$data_path, c("../../data/acop.csv", "../../data/acop.csv"))
-    expect_identical(log_df$model_md5, c("731923458236cc008c3adafa2f0877a7", "731923458236cc008c3adafa2f0877a7"))
+    expect_identical(log_df$model_md5, c("731923458236cc008c3adafa2f0877a7", "731923458236cc008c3adafa2f0877a7")) # these are the same because bbi_config.json was just copied through
   })
 
   test_that("add_config() works correctly with nested dirs", {
@@ -82,7 +83,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # run_log fields
     expect_identical(basename(log_df[[ABS_MOD_PATH]]), c("1", "2", "3", "1"))
     expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS, ORIG_TAGS))
-    expect_identical(log_df$yaml_md5, c("ee5a30a015c4e09bc29334188ff28b58", "5576ed6fa6e1e4e9b0c25dbf62ae42e5", "ebadcc4a3c0f4d16f61251605136942b", "ee5a30a015c4e09bc29334188ff28b58"))
+    expect_identical(log_df$yaml_md5, c("ee5a30a015c4e09bc29334188ff28b58", "5576ed6fa6e1e4e9b0c25dbf62ae42e5", "ebadcc4a3c0f4d16f61251605136942b", "6132d34ba27caf3460d23c9b4a3937d9"))
 
     # config log fields
     expect_identical(log_df$data_md5, c("4ddb44da897c26681d892aa7be99f74b", NA_character_, NA_character_, "4ddb44da897c26681d892aa7be99f74b"))

@@ -186,6 +186,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   test_that("add_based_on() and replace_based_on() work correctly", {
     # make a new yaml
     new_yaml <- yaml_ext(NEW_MOD2)
+    #new_yaml <- paste0(NEW_MOD2, '.yml') # change back to this once I fix yaml_ext i.e. line 86 of new-model.R
     fs::file_copy(YAML_TEST_FILE, new_yaml)
 
     # make a spec from it
@@ -198,7 +199,8 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     new_mod <- add_based_on(new_mod, "1")
     expect_identical(new_mod[[YAML_BASED_ON]], "1")
 
-    new_mod <- add_based_on(new_mod, "2")
+    # add itself to check adding an absolute path with get_yaml_path
+    new_mod <- add_based_on(new_mod, get_yaml_path(new_mod))
     expect_identical(new_mod[[YAML_BASED_ON]], c("1", "2"))
 
     # test_replacing
@@ -239,6 +241,21 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     )
 
     expect_equal(check_based_on(.start = MODEL_DIR, .based_on = c("1", "2", "level2/1")), c("1", "2", "level2/1"))
+
+    cleanup()
+  })
+
+  test_that("check_based_on works with absolute path" , {
+    # copy model 1 to level deeper
+    fs::dir_create(LEVEL2_DIR)
+    mod1 <- copy_model_from(YAML_TEST_FILE, LEVEL2_MOD, "level 2 copy of 1")
+    mod2 <- copy_model_from(YAML_TEST_FILE, NEW_MOD2,   "level 1 copy of 1")
+
+    new_model_path <- get_model_path(mod2)
+    expect_true(fs::is_absolute_path(new_model_path))
+
+    expect_identical(check_based_on(mod1[[WORKING_DIR]], c("1", new_model_path)), c("1", "../2"))
+    expect_identical(check_based_on(mod2[[WORKING_DIR]], c("1", new_model_path)), c("1", "2"))
 
     cleanup()
   })
