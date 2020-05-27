@@ -94,13 +94,13 @@ replace_decisions <- function(.mod, .decisions) {
 
 #' Append new `based_on` tag to the one in a model object and corresponding YAML
 #' @param .mod The `bbi_{.model_type}_model` object to modify
-#' @param .based_on Character scaler or vector of model id's to add to `based_on` field
+#' @param .based_on Character scaler or vector of relative paths to add to `based_on` field
 #' @export
 #' @rdname modify_model_field
 add_based_on <- function(.mod, .based_on) {
   .mod <- modify_model_field(.mod = .mod,
                              .field = YAML_BASED_ON,
-                             .value = .based_on,
+                             .value = check_based_on(.mod[[WORKING_DIR]], .based_on),
                              .append = TRUE)
   return(.mod)
 }
@@ -113,7 +113,7 @@ add_based_on <- function(.mod, .based_on) {
 replace_based_on <- function(.mod, .based_on) {
   .mod <- modify_model_field(.mod = .mod,
                              .field = YAML_BASED_ON,
-                             .value = .based_on,
+                             .value = check_based_on(.mod[[WORKING_DIR]], .based_on),
                              .append = FALSE)
   return(.mod)
 }

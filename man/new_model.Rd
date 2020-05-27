@@ -23,7 +23,7 @@ new_model(
 
 \item{.model_path}{Path to model (control stream) file. MUST be an absolute path, or the model path relative to the location of the YAML file. It recommended for the control stream and YAML to be in the same directory. If nothing is passed, the function will look for a file with the same path/name as your YAML, but with either .ctl or .mod extension.}
 
-\item{.based_on}{A character scaler or vector of run id's (model names) that this model was "based on." These are used to reconstuct model developement and ancestry.}
+\item{.based_on}{Character scaler or vector of paths to other models that this model was "based on." These are used to reconstuct model developement and ancestry. \strong{Paths must be relative to `.new_model` path.}}
 
 \item{.tags}{A character scaler or vector with any user tags to be added to the YAML file}
 
