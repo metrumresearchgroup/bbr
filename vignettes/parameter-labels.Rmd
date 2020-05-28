@@ -1,7 +1,6 @@
 ---
 title: "rbabylon Parameter Labels"
 author: "Seth Green"
-date: "2020-05-11"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{parameter-labels}

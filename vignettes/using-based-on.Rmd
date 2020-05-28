@@ -1,0 +1,216 @@
+---
+title: "Using the based_on field"
+author: "Seth Green"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{using-based-on}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r cleanup top, include=FALSE}
+# delete old files
+cleanup <- function() {
+  if (fs::file_exists("../inst/nonmem/1.yaml")) fs::file_delete("../inst/nonmem/1.yaml")
+  if (fs::file_exists("../inst/nonmem/babylon.yaml")) fs::file_delete("../inst/nonmem/babylon.yaml")
+  
+  mods_to_kill <- purrr::map_chr(seq(2,6), ~ file.path("../inst/nonmem", .x))
+  for (.m in mods_to_kill) {
+    if (fs::file_exists(paste0(.m, ".yaml"))) fs::file_delete(paste0(.m, ".yaml"))
+    if (fs::file_exists(paste0(.m, ".ctl"))) fs::file_delete(paste0(.m, ".ctl"))
+    if (fs::dir_exists(.m)) fs::dir_delete(.m)
+  }
+}
+cleanup()
+```
+
+
+# Introduction
+
+This vignette demonstrates how to using the `based_on` field to track a model's ancestry through the model development process. You will also see one common use for this: the tibble output from `run_log()` to check that your models are up-to-date. By "up-to-date" we mean that all of the model files and data files have not changed since the model was run. 
+
+If you are new to `rbabylon`, the ["Getting Started with rbabylon"](getting-started.html) vignette will take you through some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its standard workflow and functionality.
+
+## Setup
+
+There is some initial set up necessary for using `rbabylon`. Please refer to the ["Getting Started"](getting-started.html) vignette, mentioned above, if you have not done this yet. Once this is done, load the library and set your modeling directory.
+
+```{r set_model_directory}
+library(rbabylon)
+set_model_directory("../inst/nonmem")
+```
+
+```{r setup, include = FALSE}
+# set babylon execution path
+if (Sys.which("bbi") == "") {
+  # fall back to default location of /data/apps/bbi
+  options('rbabylon.bbi_exe_path' = '/data/apps/bbi')
+}
+```
+
+
+# Modeling process
+The modeling process will always start with an initial model, which we create with the `new_model()` call.
+
+```{r first model}
+mod1 <- new_model(.yaml_path = "1.yaml", .description = "our first model")
+```
+
+From there, the iterative model development process proceeds. The `copy_model_from()` function will do several things, including creating a new model file and filling in some relevant metadata. Notably, it will also add the model that you copied from into the `based_on` field for the new model.
+
+```{r copy_model 2}
+mod2 <- mod1 %>% copy_model_from(.new_model = 2, 
+                                 .description = "two compartment base model")
+
+mod2$based_on
+```
+
+*NOTE:* In a real model development process, these models would obviously be run and the diagnostics examined before moving on. For the sake of brevity, imagine that all happens "behind the curtain" in this example. In other words, _in between_ each of those calls to `copy_model_from()` you would be doing all of the normal iterative modeling work.
+
+
+```{r big copy}
+# ...submit mod2...look at diagnostics...decide on changes for next iteration...
+
+mod3 <- mod2 %>% 
+  copy_model_from(.new_model = 3, 
+                  .description = "two compartment with residual errors")
+
+# ...submit mod3...look at diagnostics...decide on changes for next iteration...
+
+mod4 <- mod3 %>% 
+  copy_model_from(.new_model = 4, 
+                  .description = "two compartment with residual errors and added covariates")
+
+# ...submit mod4...look at diagnostics...decide to go back to mod2 as basis for next iteration...
+
+mod5 <- mod2 %>% 
+  copy_model_from(.new_model = 5, 
+                  .description = "two compartment base model with added covariates")
+
+# ...submit mod5...look at diagnostics...decide on changes for next iteration...
+
+mod6 <- mod5 %>% 
+  copy_model_from(.new_model = 6, 
+                  .description = "two compartment base model with added covariates and something else")
+
+# ...submit mod6...look at diagnostics...decide you're done!
+```
+
+Now that you have arrived at your final model, you can add a tag to it, which will be used shortly for filtering the `run_log()` tibble.
+
+```{r final tag}
+mod6 <- mod6 %>% add_tags("final model")
+```
+
+# Run Log
+
+FILL IN THIS INTRO
+
+```{r run_log} 
+log_df <- run_log()
+log_df
+```
+
+## Filtering tags example
+
+First we use `purrr::map_lgl` to filter the run log to only the final model.
+
+```{r filtering}
+final_model_path <- log_df %>% 
+  filter(purrr::map_lgl(tags, ~ "final model" %in% .x)) %>%
+  get_model_path()
+
+final_model_path
+```
+
+Next we can use the `get_model_ancestry()` function to filter the tibble to only the models that led up to the final model.
+
+```{r filter to ancestry 1}
+log_df %>% 
+  filter(absolute_model_path %in% get_model_ancestry(final_model_path))
+```
+
+As you can see, models 3 and 4 are discarded because they did not lead to the final model. Review "Modeling Process" section above if you are not sure why this is the case.
+
+## Checking if models are up-to-date with config_log()
+
+Now imagine you are coming back to this project some time later and want to make sure that all of the outputs you have are still up-to-date with the model files and data currently in the project. First, we'll filter down to only the models that we care about: those that led to the final model.
+
+When `babylon` runs a model, it creates a file named `bbi_config.json` in the output directory. This file contains a lot of information about the state and configuration at runtime. Notably, it contains an md5 digest of both the model file _and_ the data file at run time. Users can compare this to the _current_ md5 hashes of these two files to check if any model or data files have changed _since the model was last run_. This serves as a check that the outputs are up-to-date with the model and data.
+
+Users can call `config_log` directly, but it is likely more useful to use `run_log() %>% add_config()` to join the two together automatically.
+
+```{r add_config fake prep, include=FALSE}
+# read in original json (which was actually fake a.k.a. copied from somewhere else)
+orig_json <- jsonlite::fromJSON(file.path(getOption("rbabylon.model_directory"), "1", "bbi_config.json"))
+
+# fix data path (just in case)
+orig_json$data_path <- stringr::str_replace(orig_json$data_path, "/data/", "/extdata/")
+
+# copying the outputs from the original run 
+# and setting model md5 to match control stream (remember this "original" is fake)
+for (i in seq_len(6)) {
+  out_dir <- file.path(getOption("rbabylon.model_directory"), i)
+  if (!fs::dir_exists(out_dir)) fs::dir_create(out_dir)
+  new_json <- orig_json
+  if (!(i %in% c(3,4))) {
+    new_json$model_md5 <- tools::md5sum(ctl_ext(out_dir))  
+  }
+  readr::write_file(jsonlite::toJSON(new_json), file.path(out_dir, "bbi_config.json"))
+}
+```
+
+```{r add_config}
+log_df <- log_df %>% add_config()
+log_df
+```
+
+Then a user can easily check the md5's digests from the config log against those of the current files.
+
+```{r check config md5}
+# extract path to data files and model files
+norm_data_paths <- fs::path_norm(file.path(log_df$absolute_model_path, log_df$data_path))
+norm_model_paths <- get_model_path(log_df)
+
+# get md5 digests and compare to those from config_log() columns
+log_df <- log_df %>% mutate(
+                        current_data_md5  = tools::md5sum(norm_data_paths),
+                        data_md5_match    = .data$data_md5 == .data$current_data_md5,
+                        current_model_md5  = tools::md5sum(norm_model_paths),
+                        model_md5_match   = .data$model_md5 == .data$current_model_md5
+                      )
+
+log_df %>% select(absolute_model_path, data_md5_match, model_md5_match)
+```
+
+From the `model_md5_match` column, you can see that some of the model files have changed since they were run. However, you may only care about your final models and the models that led to it.
+
+```{r filter to ancestry 2}
+final_model_family <- bind_rows(
+  log_df %>% 
+    filter(absolute_model_path %in% get_model_ancestry(final_model_path)), # the ancestors of the final model
+  log_df %>% 
+    filter(purrr::map_lgl(tags, ~ "final model" %in% .x)) # the final model itself
+)
+final_model_family %>% select(absolute_model_path, data_md5_match, model_md5_match)
+```
+
+When we filter to only those models, we see that they are all still up-to-date.
+
+# Operating on a model object
+
+FILL IN SOME EXAMPLES OF USING `get_based_on()` and `get_model_ancestry()` on a model object in the model process. Maybe put this above run_log() section. Not sure.
+
+
+```{r cleanup bottom, include=FALSE}
+# delete old files
+cleanup()
+```
+
