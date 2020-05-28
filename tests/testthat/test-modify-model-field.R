@@ -247,15 +247,13 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("check_based_on works with absolute path" , {
     # copy model 1 to level deeper
-    fs::dir_create(LEVEL2_DIR)
-    mod1 <- copy_model_from(YAML_TEST_FILE, LEVEL2_MOD, "level 2 copy of 1")
-    mod2 <- copy_model_from(YAML_TEST_FILE, NEW_MOD2,   "level 1 copy of 1")
+    create_all_models()
 
     new_model_path <- get_model_path(mod2)
     expect_true(fs::is_absolute_path(new_model_path))
 
-    expect_identical(check_based_on(mod1[[WORKING_DIR]], c("1", new_model_path)), c("1", "../2"))
     expect_identical(check_based_on(mod2[[WORKING_DIR]], c("1", new_model_path)), c("1", "2"))
+    expect_identical(check_based_on(mod4[[WORKING_DIR]], c("1", new_model_path)), c("1", "../2"))
 
     cleanup()
   })
