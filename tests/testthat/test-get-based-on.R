@@ -83,7 +83,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     cleanup()
   })
 
-  test_that("get_based_on .check_exists=TRUE errors if model is gone." , {
+  test_that("get_based_on .check_exists=TRUE errors if model is gone" , {
     # create two copies
     mod1 <- read_model(YAML_TEST_FILE)
     mod2 <- copy_model_from(mod1, NEW_MOD2,   "copy of 1")

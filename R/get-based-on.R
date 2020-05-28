@@ -73,12 +73,8 @@ get_based_on.character <- function(.bbi_object, .check_exists = FALSE) {
 #' @export
 get_based_on.bbi_run_log_df <- function(.bbi_object, .check_exists = FALSE) {
 
-  #### could just return .bbi_object[[YAML_BASED_ON]] and it should give back the list but
-  #### a) they wouldn't be absolute...
-  #### b) we'd have to reimplement the .check exists (although that's pretty easy)
   .out_paths <- map(.bbi_object[[ABS_MOD_PATH]], function(.path) {
-    #get_based_on(.path, .check_exists = .check_exists)
-    get_based_on(.path)
+    get_based_on(.path, .check_exists = .check_exists)
   })
 
   return(.out_paths)
