@@ -47,7 +47,8 @@ create_all_models <- function() {
 
 cleanup <- function() {
   # delete tmp files if they are leftover from previous test
-  for (m in c(NEW_MOD2, NEW_MOD3)) {
+  mods_to_kill <- map_chr(seq(2,7), ~ file.path(MODEL_DIR, .x))
+  for (m in mods_to_kill) {
     if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
     if (fs::file_exists(paste0(m, ".yml"))) fs::file_delete(paste0(m, ".yml"))
     if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
