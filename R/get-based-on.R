@@ -79,3 +79,35 @@ get_based_on.bbi_run_log_df <- function(.bbi_object, .check_exists = FALSE) {
 
   return(.out_paths)
 }
+
+
+#' Get model ancestry
+#'
+#' Extract paths to all models that this model is based on,
+#' and all models that those models are based on, recursively.
+#' Returns a sorted unique character vector.
+#' @importFrom purrr map
+#' @param .mod `bbi_{.model_type}_model` object
+#' @rdname get_based_on
+#' @export
+get_model_ancestry <- function(.mod) {
+  .checked <- c()
+  .to_check <- get_based_on(.mod)
+  .results <- .to_check
+  while(length(.to_check) > 0) {
+    # record this round of models as being checked
+    .checked <- c(.checked, .to_check)
+
+    # get based_on for this round of models
+    .this_res <- map(.to_check, ~ get_based_on(.x))
+    .this_res <- unique(unlist(.this_res))
+
+    # add to results
+    .results <- unique(c(.results, .this_res))
+
+    # see if there are any we haven't checked yet
+    .to_check <- .this_res[!(.this_res %in% .checked)]
+  }
+
+  return(sort(.results))
+}
