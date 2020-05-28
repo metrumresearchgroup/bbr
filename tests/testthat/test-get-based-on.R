@@ -143,30 +143,70 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     cleanup()
   })
 
-  # test_that("get_model_ancestry works happy path character" , {
-  #   # create copies
-  #   mod1 <- read_model(YAML_TEST_FILE)
-  #   # create first two copies
-  #   mod2 <- copy_model_from(YAML_TEST_FILE, NEW_MOD2,   "level 1 copy of 1")
-  #   mod3 <- copy_model_from(YAML_TEST_FILE, NEW_MOD3,   "level 1 copy of 1") %>% add_based_on("2")
-  #
-  #   # copy model 1 to level deeper
-  #   fs::dir_create(LEVEL2_DIR)
-  #   mod4 <- copy_model_from(mod2, LEVEL2_MOD, "level 2 copy of 2")
-  #
-  #   # check against character vector ref
-  #   expect_identical(get_based_on(LEVEL2_MOD), file.path(getwd(), NEW_MOD2))
-  #   expect_identical(
-  #     get_model_ancestry(LEVEL2_MOD),
-  #     c(file.path(getwd(), tools::file_path_sans_ext(YAML_TEST_FILE)), file.path(getwd(), NEW_MOD2))
-  #   )
-  #
-  #   # build log_df and check
-  #   log_df <- run_log(MODEL_DIR)
-  #   expect_equal(1, log_df %>% filter(absolute_model_path %in% get_based_on(LEVEL2_MOD)) %>% nrow())
-  #   expect_equal(2, log_df %>% filter(absolute_model_path %in% get_model_ancestry(LEVEL2_MOD)) %>% nrow())
-  #
-  #   cleanup()
-  # })
+  test_that("get_model_ancestry works happy path character" , {
+    # create copies
+    mod1 <- read_model(YAML_TEST_FILE)
+    # create first two copies
+    mod2 <- copy_model_from(YAML_TEST_FILE, NEW_MOD2,   "level 1 copy of 1")
+    mod3 <- copy_model_from(YAML_TEST_FILE, NEW_MOD3,   "level 1 copy of 1") %>% add_based_on("2")
+
+    # copy model 1 to level deeper
+    fs::dir_create(LEVEL2_DIR)
+    mod4 <- copy_model_from(mod2, LEVEL2_MOD, "level 2 copy of 2")
+
+    # check against character vector ref
+    expect_identical(get_based_on(LEVEL2_MOD), file.path(getwd(), NEW_MOD2))
+    expect_identical(
+      get_model_ancestry(LEVEL2_MOD),
+      c(file.path(getwd(), tools::file_path_sans_ext(YAML_TEST_FILE)), file.path(getwd(), NEW_MOD2))
+    )
+
+    cleanup()
+  })
+
+  test_that("get_model_ancestry works happy path run_log tibble" , {
+    # create copies
+    mod1 <- read_model(YAML_TEST_FILE)
+    # create first two copies
+    mod2 <- copy_model_from(YAML_TEST_FILE, NEW_MOD2,   "level 1 copy of 1")
+    mod3 <- copy_model_from(YAML_TEST_FILE, NEW_MOD3,   "level 1 copy of 1") %>% add_based_on("2")
+
+    # copy model 1 to level deeper
+    fs::dir_create(LEVEL2_DIR)
+    mod4 <- copy_model_from(mod2, LEVEL2_MOD, "level 2 copy of 2")
+
+    # build log_df and check get_based_on
+    log_df <- run_log(MODEL_DIR)
+
+    expect_identical(
+      get_model_ancestry(log_df),
+      list(
+        NULL,
+        file.path(getwd(), tools::file_path_sans_ext(YAML_TEST_FILE)),
+        c(file.path(getwd(), tools::file_path_sans_ext(YAML_TEST_FILE)), file.path(getwd(), NEW_MOD2)),
+        c(file.path(getwd(), tools::file_path_sans_ext(YAML_TEST_FILE)), file.path(getwd(), NEW_MOD2))
+      )
+    )
+
+    cleanup()
+  })
+
+  test_that("get_model_ancestry errors if model is gone" , {
+    # create two copies
+    mod1 <- read_model(YAML_TEST_FILE)
+    mod2 <- copy_model_from(mod1, NEW_MOD2,   "copy of 1")
+    mod3 <- copy_model_from(mod2, NEW_MOD3,   "copy of 2")
+    fs::dir_create(LEVEL2_DIR)
+    mod4 <- copy_model_from(mod2, LEVEL2_MOD, "level 2 copy of 2")
+
+    # check based_on is right
+    expect_identical(get_model_ancestry(mod4), c(file.path(getwd(), tools::file_path_sans_ext(YAML_TEST_FILE)), file.path(getwd(), NEW_MOD2)))
+
+    # delete mod2 yaml and check for error
+    fs::file_delete(yaml_ext(file.path(getwd(), NEW_MOD2)))
+    expect_error(get_model_ancestry(mod4), regexp = "get_model_ancestry.+could not find a YAML")
+
+    cleanup()
+  })
 
 }) # closing withr::with_options

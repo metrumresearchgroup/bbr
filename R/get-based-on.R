@@ -83,23 +83,47 @@ get_based_on.bbi_run_log_df <- function(.bbi_object, .check_exists = FALSE) {
 
 #' Get model ancestry
 #'
-#' Extract paths to all models that this model is based on,
+#' Extract paths to all models that this model is based on (iterating over `get_based_on()` function),
 #' and all models that those models are based on, recursively.
 #' Returns a sorted unique character vector.
-#' @importFrom purrr map
-#' @param .mod `bbi_{.model_type}_model` object
+#' @param .bbi_object The model object (or path, etc.) to query
 #' @rdname get_based_on
 #' @export
-get_model_ancestry <- function(.mod) {
+get_model_ancestry <- function(.bbi_object) {
+  UseMethod("get_model_ancestry")
+}
+
+#' The default method attempts to extract the path from any object passed to it
+#' @importFrom purrr map
+#' @importFrom stringr str_detect
+#' @param .bbi_object The object to attempt to query. Could be a partially built bbi_{.model_type}_object or some other custom object containing model data.
+#' @rdname get_based_on
+#' @export
+get_model_ancestry.default <- function(.bbi_object) {
   .checked <- c()
-  .to_check <- get_based_on(.mod)
+  .to_check <- get_based_on(.bbi_object)
   .results <- .to_check
+
   while(length(.to_check) > 0) {
     # record this round of models as being checked
     .checked <- c(.checked, .to_check)
 
     # get based_on for this round of models
-    .this_res <- map(.to_check, ~ get_based_on(.x))
+    .this_res <- map(.to_check, function(.p) {
+      .res <- tryCatch(
+        {
+          get_based_on(.p)
+        },
+        error = function(e) {
+          if (str_detect(e$message, "read_model.+found no YAML")) {
+            stop(glue("Found {.p} in get_model_ancestry() tree, but could not find a YAML file for that model."), call. = FALSE)
+          }
+          stop(e$message)
+        }
+      )
+
+      return(.res)
+    })
     .this_res <- unique(unlist(.this_res))
 
     # add to results
@@ -110,4 +134,36 @@ get_model_ancestry <- function(.mod) {
   }
 
   return(sort(.results))
+}
+
+
+#' @rdname get_based_on
+#' @param .bbi_object Character scaler of a path to a model that can be loaded with `read_model(.bbi_object)`
+#' @export
+get_model_ancestry.character <- function(.bbi_object) {
+
+  .bbi_object <- tryCatch(
+    {
+      read_model(.bbi_object)
+    },
+    error = function(e) {
+      stop(glue("Cannot load model object from path `{.bbi_object}` :\n{paste(e, collapse = '\n')}"))
+    }
+  )
+
+  return(get_model_ancestry(.bbi_object))
+}
+
+
+#' @rdname get_based_on
+#' @param .bbi_object Tibble of class `bbi_run_log_df`
+#' @importFrom purrr map
+#' @export
+get_model_ancestry.bbi_run_log_df <- function(.bbi_object) {
+
+  .out_paths <- map(.bbi_object[[ABS_MOD_PATH]], function(.path) {
+    get_model_ancestry(.path)
+  })
+
+  return(.out_paths)
 }
