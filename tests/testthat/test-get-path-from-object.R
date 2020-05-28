@@ -195,8 +195,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
 
-  #map_chr(c(.paths, "naw"), ~find_yaml_file_path(.x))
-
   test_that("find_yaml_file_path returns correct yaml path", {
     expect_identical(find_yaml_file_path(YAML_TEST_FILE), YAML_TEST_FILE)
   })

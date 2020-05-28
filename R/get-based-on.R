@@ -16,24 +16,30 @@ get_based_on <- function(.bbi_object, .check_exists = FALSE) {
 
 
 #' The default method attempts to extract the path from any object passed to it
+#' @importFrom fs path_norm
 #' @param .bbi_object The object to attempt to query. Could be a partially built bbi_{.model_type}_object or some other custom object containing model data.
 #' @rdname get_based_on
 #' @export
 get_based_on.default <- function(.bbi_object, .check_exists = FALSE) {
   tryCatch(
     {
-      # do some QA on the required fields
-      if (any(map_lgl(c(WORKING_DIR, YAML_BASED_ON), ~ is.null(.bbi_object[[.x]])))) {
-        stop(glue(".bbi_object must contain keys for both `{WORKING_DIR}` and `{YAML_BASED_ON}`` but has only the following keys: {paste(names(.bbi_object), collapse = ', ')}"), call. = FALSE)
+      # do some QA on the required WORKING_DIR field
+      if (is.null(.bbi_object[[WORKING_DIR]])) {
+        stop(glue(".bbi_object must contain key for `{WORKING_DIR}` but has only the following keys: {paste(names(.bbi_object), collapse = ', ')}"), call. = FALSE)
       }
 
-      # optionally check if they exists
+      # if no based_on field, return NULL
+      if (is.null(.bbi_object[[YAML_BASED_ON]])) {
+        return(invisible())
+      }
+
+      # optionally check if they exist
       if (isTRUE(.check_exists)) {
         invisible(check_based_on(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_BASED_ON]]))
       }
 
       # extract the requested paths
-      return(file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_BASED_ON]]))
+      return(as.character(fs::path_norm(file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_BASED_ON]]))))
 
     },
     error = function(e) {
@@ -63,15 +69,16 @@ get_based_on.character <- function(.bbi_object, .check_exists = FALSE) {
 
 #' @rdname get_based_on
 #' @param .bbi_object Tibble of class `bbi_run_log_df`
-#' @importFrom purrr map_chr
+#' @importFrom purrr map
 #' @export
 get_based_on.bbi_run_log_df <- function(.bbi_object, .check_exists = FALSE) {
 
   #### could just return .bbi_object[[YAML_BASED_ON]] and it should give back the list but
   #### a) they wouldn't be absolute...
   #### b) we'd have to reimplement the .check exists (although that's pretty easy)
-  .out_paths <- map_chr(.bbi_object[[ABS_MOD_PATH]], function(.path) {
-    get_based_on(.path, .check_exists = .check_exists)
+  .out_paths <- map(.bbi_object[[ABS_MOD_PATH]], function(.path) {
+    #get_based_on(.path, .check_exists = .check_exists)
+    get_based_on(.path)
   })
 
   return(.out_paths)

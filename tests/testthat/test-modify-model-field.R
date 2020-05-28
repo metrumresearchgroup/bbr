@@ -418,6 +418,3 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
 
 }) # closing withr::with_options
-
-
-
