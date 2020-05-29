@@ -44,6 +44,10 @@ There is some initial set up necessary for using `rbabylon`. Please refer to the
 
 ```{r set_model_directory}
 library(rbabylon)
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(purrr))
+suppressPackageStartupMessages(library(fs))
+
 set_model_directory("../inst/nonmem")
 ```
 
@@ -142,7 +146,7 @@ Among other things, the run log contains the tags that have been assigned to eac
 
 ```{r filtering}
 final_model_path <- log_df %>% 
-  dplyr::filter(purrr::map_lgl(tags, ~ "final model" %in% .x)) %>%
+  filter(map_lgl(tags, ~ "final model" %in% .x)) %>%
   get_model_path()
 
 final_model_path
@@ -152,7 +156,7 @@ Next we can use the `get_model_ancestry()` function to filter the tibble to only
 
 ```{r filter to ancestry 1}
 log_df %>% 
-  dplyr::filter(absolute_model_path %in% get_model_ancestry(final_model_path))
+  filter(absolute_model_path %in% get_model_ancestry(final_model_path))
 ```
 
 As you can see, models 3 and 4 are discarded because they did not lead to the final model. Review "Modeling Process" section above if you are not sure why this is the case. We will use the two techniques together in the "Final model family" section below.
@@ -198,14 +202,14 @@ norm_data_paths <- fs::path_norm(file.path(log_df$absolute_model_path, log_df$da
 norm_model_paths <- get_model_path(log_df)
 
 # get md5 digests and compare to those from config_log() columns
-log_df <- log_df %>% dplyr::mutate(
+log_df <- log_df %>% mutate(
                         current_data_md5  = tools::md5sum(norm_data_paths),
                         data_md5_match    = .data$data_md5 == .data$current_data_md5,
                         current_model_md5  = tools::md5sum(norm_model_paths),
                         model_md5_match   = .data$model_md5 == .data$current_model_md5
                       )
 
-log_df %>% dplyr::select(absolute_model_path, data_md5_match, model_md5_match)
+log_df %>% select(absolute_model_path, data_md5_match, model_md5_match)
 ```
 
 
@@ -214,13 +218,13 @@ log_df %>% dplyr::select(absolute_model_path, data_md5_match, model_md5_match)
 From the `model_md5_match` column in the previous example, you can see that some of the model files have changed since they were run. However, you may only care about your final model and the models that led to it.
 
 ```{r filter to ancestry 2}
-final_model_family <- dplyr::bind_rows(
+final_model_family <- bind_rows(
   log_df %>% 
-    dplyr::filter(absolute_model_path %in% get_model_ancestry(final_model_path)), # the ancestors of the final model
+    filter(absolute_model_path %in% get_model_ancestry(final_model_path)), # the ancestors of the final model
   log_df %>% 
-    dplyr::filter(purrr::map_lgl(tags, ~ "final model" %in% .x)) # the final model itself
+    filter(map_lgl(tags, ~ "final model" %in% .x)) # the final model itself
 )
-final_model_family %>% dplyr::select(absolute_model_path, data_md5_match, model_md5_match)
+final_model_family %>% select(absolute_model_path, data_md5_match, model_md5_match)
 ```
 
 When we filter to only those models, you can see that they are all still up-to-date. Great news.
