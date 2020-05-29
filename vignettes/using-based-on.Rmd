@@ -112,7 +112,7 @@ mod6 %>% get_based_on()
 
 This is useful because the path(s) retrieved will unambiguously identify the parent model(s) and can therefore be passed to things like `read_model()` or `model_summary()` like so:
 
-```{r mod object demo 1}
+```{r mod object demo 2}
 parent_mod <- mod6 %>% get_based_on() %>% read_model()
 str(parent_mod)
 ```
@@ -121,7 +121,7 @@ str(parent_mod)
 
 The second helper function walks up the tree of inheritence by iteratively calling `get_based_on()` on each parent model to determine the full set of models that led up to the current model.
 
-```{r mod object demo 1}
+```{r mod object demo 3}
 mod6 %>% get_model_ancestry()
 ```
 
