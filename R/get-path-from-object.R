@@ -243,8 +243,6 @@ find_yaml_file_path <- function(.path) {
   } else if(fs::file_exists(.yml_path)) {
     return(.yml_path)
   } else {
-    #warning(glue("No model file found at {.ctl_path} but setting that path as default model path for {.path}. Please put relevant model file in that location."))
-    #return(.ctl_path)
     stop(glue("No file found at {.yml_path} OR {.yaml_path}"))
   }
 }

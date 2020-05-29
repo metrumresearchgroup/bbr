@@ -89,7 +89,7 @@ read_model <- function(
       find_yaml_file_path(.path)
     },
     error = function(e) {
-      if (str_detect(e$message, "No file found at.+\\.yml.+OR.+\\.yaml")) {
+      if (str_detect(e$message, FIND_YAML_ERR_MSG)) {
         stop(glue("`read_model()` error: {e$message} -- Use `new_model()` to create the necessary YAML file."))
       }
       stop(e$message)

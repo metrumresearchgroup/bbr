@@ -207,7 +207,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
   test_that("find_yaml_file_path errors when no file found", {
-    expect_error(find_yaml_file_path(NEW_MOD2), regexp = "No file found at")
+    expect_error(find_yaml_file_path(NEW_MOD2), regexp = FIND_YAML_ERR_MSG)
   })
 
   test_that("combine_directory_path() builds the expected path .directory", {

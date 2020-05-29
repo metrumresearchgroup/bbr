@@ -15,10 +15,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     fs::file_copy(.yaml_path, .yml_path)
 
     # check against ref, reading with .yml extension specified
-    new_model <- suppressSpecificWarning({
+    mod2 <- suppressSpecificWarning({
       read_model(.yml_path)
     }, .regexpr = "No model file found at.+\\.ctl")
-    expect_equal(new_model, REF_LIST_TMP)
+    expect_equal(mod2, REF_LIST_TMP)
 
     fs::file_delete(.yml_path)
   })
@@ -30,10 +30,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     fs::file_copy(.yaml_path, .yml_path)
 
     # check against ref, reading with no extension
-    new_model <- suppressSpecificWarning({
+    mod2 <- suppressSpecificWarning({
       read_model(tools::file_path_sans_ext(.yml_path))
     }, .regexpr = "No model file found at.+\\.ctl")
-    expect_equal(new_model, REF_LIST_TMP)
+    expect_equal(mod2, REF_LIST_TMP)
 
     fs::file_delete(.yml_path)
   })
@@ -338,7 +338,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("as_model() errors with non-existent model", {
     proc1 <- bbi_dry_run(c("naw", "dawg"), "yea")
-    expect_error(as_model(proc1), regexp = "No file found at.+\\.yml.+OR.+\\.yaml")
+    expect_error(as_model(proc1), regexp = FIND_YAML_ERR_MSG)
   })
 
 }) # closing withr::with_options

@@ -79,32 +79,27 @@ submit_model.character <- function(
   # check for .directory and combine with .mod
   .mod <- combine_directory_path(.directory, .mod)
 
-  ## parse type of file passed
-  # if no extension, assume YAML
+  # If no extension, convert to YAML and look for file
   if (tools::file_path_sans_ext(.mod) == .mod) {
-    if (fs::file_exists(yaml_ext(.mod))) {
-      .mod <- read_model(yaml_ext(.mod))
-    } else {
-      stop(glue("Cannot find file {yaml_ext(.mod)}. If passing a non-YAML file to submit_model you must include the file extension."))
-    }
-  } else if (is_valid_yaml_extension(.mod) || is_valid_nonmem_extension(.mod)) {
-    .mod <- read_model(.mod)
-  # } else if (is_valid_nonmem_extension(.mod)) {
-  #   # if NONMEM file, try to read
-  #   if (fs::file_exists(yaml_ext(.mod))) {
-  #       stop(paste(glue("`submit_model({.mod})` is trying to create {yaml_ext(.mod)} but that file already exists."),
-  #                  "Either call `submit_model({yaml_ext(.mod)})` or delete the YAML file if it does not correspond to this model."))
-  #   }
-  #
-  #   # create new model from
-  #   .mod <- new_model(
-  #     .yaml_path = yaml_ext(.mod),
-  #     .description = as.character(glue("{.mod} passed directly to submit_model()")),
-  #     .model_type = c("nonmem"))
-
-  } else {
-    stop(glue("Unsupported file type passed to submit_model(): `{.mod}`. Valid options are `.yaml`, `.mod`, and `.ctl`"))
+    .mod <- tryCatch(
+      {
+        find_yaml_file_path(.mod)
+      },
+      error = function(e) {
+        if (str_detect(e$message, FIND_YAML_ERR_MSG)) {
+          stop(glue("`submit_model({.mod})` error: {e$message} -- Use `new_model()` to create the necessary YAML file."))
+        }
+        stop(e$message)
+      }
+    )
   }
+
+  if (!(is_valid_yaml_extension(.mod) || is_valid_nonmem_extension(.mod))) {
+    stop(glue("Unsupported file type passed to submit_model(): `{.mod}`. Valid options are `.yaml`, `.yml`, `.mod`, and `.ctl`"))
+  }
+
+  # load model from path
+  .mod <- read_model(.mod)
 
   # submit model
   .model_type <- .mod[[YAML_MOD_TYPE]]

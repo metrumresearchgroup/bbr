@@ -64,12 +64,11 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
                 expect_error(
                   submit_model(new_mod_path, .dry_run = T)[[PROC_CALL]],
-                  regexp = "No file found at.+\\.yml.+OR.+\\.yaml"
+                  regexp = FIND_YAML_ERR_MSG
                 )
 
                 # cleanup
                 fs::file_delete(new_mod_path)
-                fs::file_delete(yaml_ext(new_mod_path))
               })
             })
 
@@ -80,6 +79,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
                 # copy to a .mod extensions
                 new_mod_path <- stringr::str_replace(MODEL_PATH, "1.ctl", "2.mod")
                 fs::file_copy(MODEL_PATH, new_mod_path)
+                yaml::write_yaml(list(description = "original acop model",
+                                      model_type = "nonmem"),
+                                 yaml_ext(new_mod_path))
+
 
                 expect_identical(
                   submit_model(new_mod_path, .dry_run = T)[[PROC_CALL]],
