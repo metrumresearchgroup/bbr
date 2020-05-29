@@ -24,6 +24,26 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_equal(read_model("model-examples/1.yaml"), ref_list)
   })
 
+  test_that("read_model() returns expected object from yml ext", {
+    ref_list <- list(
+      description = ORIG_DESC,
+      model_type = "nonmem",
+      tags = ORIG_TAGS,
+      bbi_args = list(
+        overwrite = TRUE,
+        threads = 4L),
+      model_working_dir = file.path(getwd(), "model-examples"),
+      orig_yaml_file ="1.yaml",
+      yaml_md5 = "ee5a30a015c4e09bc29334188ff28b58",
+      model_path = "1.ctl",
+      output_dir = "1"
+    )
+    class(ref_list) <- MODEL_CLASS_LIST
+
+    # check against ref
+    expect_equal(read_model("model-examples/1.yaml"), ref_list)
+  })
+
 
   test_that("yaml with no model type will fail", {
     expect_error(read_model("test-yaml/zz_fail_no_modtype.yaml"), regexp = "Model yaml must have keys")
