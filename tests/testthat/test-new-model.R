@@ -5,43 +5,37 @@ source("data/test-workflow-ref.R")
 withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("read_model() returns expected object", {
-    ref_list <- list(
-      description = ORIG_DESC,
-      model_type = "nonmem",
-      tags = ORIG_TAGS,
-      bbi_args = list(
-        overwrite = TRUE,
-        threads = 4L),
-      model_working_dir = file.path(getwd(), "model-examples"),
-      orig_yaml_file ="1.yaml",
-      yaml_md5 = "ee5a30a015c4e09bc29334188ff28b58",
-      model_path = "1.ctl",
-      output_dir = "1"
-    )
-    class(ref_list) <- MODEL_CLASS_LIST
-
-    # check against ref
-    expect_equal(read_model("model-examples/1.yaml"), ref_list)
+    expect_equal(read_model("model-examples/1.yaml"), REF_LIST_1)
   })
 
   test_that("read_model() returns expected object from yml ext", {
-    ref_list <- list(
-      description = ORIG_DESC,
-      model_type = "nonmem",
-      tags = ORIG_TAGS,
-      bbi_args = list(
-        overwrite = TRUE,
-        threads = 4L),
-      model_working_dir = file.path(getwd(), "model-examples"),
-      orig_yaml_file ="1.yaml",
-      yaml_md5 = "ee5a30a015c4e09bc29334188ff28b58",
-      model_path = "1.ctl",
-      output_dir = "1"
-    )
-    class(ref_list) <- MODEL_CLASS_LIST
+    # copy the .yaml to .yml to test
+    .yaml_path <- "model-examples/1.yaml"
+    .yml_path <- "model-examples/tmp.yml"
+    fs::file_copy(.yaml_path, .yml_path)
 
-    # check against ref
-    expect_equal(read_model("model-examples/1.yaml"), ref_list)
+    # check against ref, reading with .yml extension specified
+    new_model <- suppressSpecificWarning({
+      read_model(.yml_path)
+    }, .regexpr = "No model file found at.+\\.ctl")
+    expect_equal(new_model, REF_LIST_TMP)
+
+    fs::file_delete(.yml_path)
+  })
+
+  test_that("read_model() returns expected object from no ext specified", {
+    # copy the .yaml to .yml to test
+    .yaml_path <- "model-examples/1.yaml"
+    .yml_path <- "model-examples/tmp.yml"
+    fs::file_copy(.yaml_path, .yml_path)
+
+    # check against ref, reading with no extension
+    new_model <- suppressSpecificWarning({
+      read_model(tools::file_path_sans_ext(.yml_path))
+    }, .regexpr = "No model file found at.+\\.ctl")
+    expect_equal(new_model, REF_LIST_TMP)
+
+    fs::file_delete(.yml_path)
   })
 
 
@@ -344,7 +338,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("as_model() errors with non-existent model", {
     proc1 <- bbi_dry_run(c("naw", "dawg"), "yea")
-    expect_error(as_model(proc1), regexp = "found no YAML")
+    expect_error(as_model(proc1), regexp = "No file found at.+\\.yml.+OR.+\\.yaml")
   })
 
 }) # closing withr::with_options
