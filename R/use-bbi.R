@@ -103,6 +103,7 @@ install_menu <- function(body,this_os){
 
 #' @title bbi version
 #' @description Returns string of installed bbi cli version
+#' @importFrom stringr str_detect
 #' @return character
 #' @examples
 #' \dontrun{
@@ -118,7 +119,16 @@ bbi_version <- function(){
   if (!fs::file_exists(bbi_path)) {
     return("")
   }
-  system(sprintf('%s version', bbi_path),intern = TRUE)
+
+  tryCatch(
+    system(sprintf('%s version', bbi_path),intern = TRUE),
+    error = function(e) {
+      if (str_detect(e$message, "error in running command")) {
+        stop(glue("The executable at {bbi_path} does not appear to be a valid babylon installation. Use `use_bbi({bbi_path})` to install babylon at that location."))
+      }
+    }
+  )
+
 }
 
 #' @importFrom cli rule col_blue

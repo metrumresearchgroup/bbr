@@ -2,7 +2,7 @@
 title: "Getting Started with rbabylon"
 author: "Seth Green"
 date: "2020-03-20"
-output: rmarkdown::html_vignette
+output: pdf_document
 vignette: >
   %\VignetteIndexEntry{getting-started}
   %\VignetteEngine{knitr::rmarkdown}
@@ -35,34 +35,55 @@ This "Getting Started with rbabylon" vignette takes the user through some basic 
 
 # Setup
 
-## Installing babylon
+## Do once on your system
 
-To use `rbabylon` you must first install `babylon`, often aliased as `bbi`, on your system. This can be done with the `rbabylon::use_bbi('/path/to/install/dir/')` command. (Make sure that `'/path/to/install/dir/'` is included in your `$PATH` so that `bbi` will be found by the system.) You can also check the [babylon documentation](https://github.com/metrumresearchgroup/babylon) for manual installation instructions.
+The _first time_ you use `rbabylon` on a system or disk, you must first install `babylon`, often aliased as `bbi`. The first time you are using it for a given project, you will also need to run `bbi_init()` in your modeling directory. 
 
-There is also some initial setup to get `rbabylon` configured. First, load the library and tell it where to find the `babylon` installation. For the purposes of this demo, assume the babylon executable is at `/data/apps/bbi`.
+To reiterate, there are two relevant paths for this section.
 
+* `BBI_EXE_PATH` -- the path the `babylon` executable file on your system.
+* `MODEL_DIR` -- the root modeling directory where you will be running models with `rbabylon`
 
-```{r bbi_exe_path}
+```{r define dirs}
 library(rbabylon)
-if (Sys.which("bbi") == "") {
-  # fall back to default location of /data/apps/bbi
-  options('rbabylon.bbi_exe_path' = '/data/apps/bbi')
-}
+
+BBI_EXE_PATH <- "/data/apps/bbi" # this should be an absolute path
+MODEL_DIR <- "../inst/nonmem"    # this should be relative to your working directory
 ```
 
-Next, initialize `babylon` by pointing it to a working installation of NONMEM, and default version to use.
+### Installing babylon
+
+You can install the `babylon` binary with the `rbabylon::use_bbi(BBI_EXE_PATH)` command. You can also check the [babylon documentation](https://github.com/metrumresearchgroup/babylon) for manual installation instructions.
+
+If you're not sure if you have `babylon` installed, you can use `bbi_version()` to check. This will return the version number of your installation, if one is found, or an empty string if you do _not_ have `babylon` installed. You can also use `bbi_current_release()` to see the most current version available and run `use_bbi()` as specified above if you want to update.
+
+### Initializing babylon
+
+Next, initialize `babylon` by pointing it to your modeling directory, a working installation of NONMEM, and a default NONMEM version to use.
 
 ```{r setup, eval=FALSE}
-bbi_init(.dir = "../inst/nonmem",     # the modeling directory, where your control streams are
+bbi_init(.dir = MODEL_DIR,            # the modeling directory, where your control streams are
          .nonmem_dir = "/opt/NONMEM", # location of NONMEM installation
          .nonmem_version = "nm74gf")  # default NONMEM version to use
 ```
 
-Finally, it is best to set the modeling directory. By doing this, you do not need to pass the full path to model files, but only the path relative to the specified modeling directory. Pass a path relative to your current working directory to `set_model_directory()`
+This will create a `babylon.yaml` file in your `MODEL_DIR` directory which contains a lot of default settings for running models, etc. Those settings will not be discussed here, but know that they can be modified by editing that file. 
 
-```{r set_model_directory, echo = FALSE}
-set_model_directory("../inst/nonmem")
+## Do for each R session
+
+Once `babylon` is installed and initialized, you will need to make `rbabylon` knows where to find it. This can be done by setting the following options:
+
+```{r bbi_exe_path}
+options(
+  'rbabylon.bbi_exe_path' = BBI_EXE_PATH,
+  'rbabylon.model_directory' = MODEL_DIR
+)
 ```
+
+This must be for every new R session, so it may be wise to **`include the above snippet in your `.Rprofile`**, replacing the `BBI_EXE_PATH` and `MODEL_DIR` constants with the relevant paths from your system/project. Note that, if setting them in `.Rprofile` instead of your script, the path passed to `rbabylon.model_directory` must be relative to your `.Rprofile` file.
+
+*NOTE:* By setting the `rbabylon.model_directory` option, you will _not_ need to pass the full path to model files, but only the path relative to the specified modeling directory. This is not necessary, but it is definitely a recommended convenience. By contrast, setting `rbabylon.bbi_exe_path` _is necessary_ for `rbabylon` to be able to find `bbi` on the system.
+
 
 # Initial Modeling Run
 
