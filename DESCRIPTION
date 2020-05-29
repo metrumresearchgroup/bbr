@@ -39,5 +39,7 @@ Suggests:
     testthat (>= 2.1.0),
     knitr,
     rmarkdown
+Depends:
+    R (>= 3.5)
 License: MIT + file LICENSE
 VignetteBuilder: knitr
