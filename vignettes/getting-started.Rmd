@@ -2,7 +2,7 @@
 title: "Getting Started with rbabylon"
 author: "Seth Green"
 date: "2020-03-20"
-output: pdf_document
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{getting-started}
   %\VignetteEngine{knitr::rmarkdown}
@@ -82,7 +82,7 @@ options(
 
 This must be for every new R session, so it may be wise to **`include the above snippet in your `.Rprofile`**, replacing the `BBI_EXE_PATH` and `MODEL_DIR` constants with the relevant paths from your system/project. Note that, if setting them in `.Rprofile` instead of your script, the path passed to `rbabylon.model_directory` must be relative to your `.Rprofile` file.
 
-*NOTE:* By setting the `rbabylon.model_directory` option, you will _not_ need to pass the full path to model files, but only the path relative to the specified modeling directory. This is not necessary, but it is definitely a recommended convenience. By contrast, setting `rbabylon.bbi_exe_path` _is necessary_ for `rbabylon` to be able to find `bbi` on the system.
+*NOTE:* By setting the `rbabylon.model_directory` option, you will _not_ need to pass the full path to model files, but only the path relative to the specified modeling directory. This is not necessary, but it is definitely a recommended convenience.
 
 
 # Initial Modeling Run
