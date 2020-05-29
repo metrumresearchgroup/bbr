@@ -92,6 +92,50 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     fs::file_delete(.test_path)
   })
 
+  test_that("read_model() works with yml path", {
+    # create new model with args
+    .test_yaml <- "model-examples/1.yaml"
+    .test_path <- "model-examples/tmp.yml"
+
+    suppressSpecificWarning({
+      mod1a <- new_model(
+        .yaml_path = .test_path,
+        .description = "original acop model",
+        .tags = c("acop tag", "other tag"),
+        .bbi_args = list(overwrite = TRUE, threads = 4)
+      )
+    }, "No model file found at.+\\.ctl")
+
+    # read model from YAML
+    mod1b <- read_model(.path = .test_yaml)
+
+    # check class and keys are right
+    expect_identical(class(mod1a), MODEL_CLASS_LIST)
+    expect_identical(class(mod1b), MODEL_CLASS_LIST)
+
+    expect_true(all(MODEL_REQ_KEYS %in% names(mod1a)))
+    expect_true(all(MODEL_REQ_KEYS %in% names(mod1b)))
+
+    # also check that some of the required keys have the same value
+    for (k in MODEL_REQ_KEYS) {
+      if (k == YAML_MOD_PATH) {
+        expect_identical(mod1a[[k]], basename(ctl_ext(.test_path)))
+        expect_identical(mod1b[[k]], basename(ctl_ext(.test_yaml)))
+      } else if (k == YAML_OUT_DIR) {
+        expect_identical(mod1a[[k]], basename(tools::file_path_sans_ext(.test_path)))
+        expect_identical(mod1b[[k]], basename(tools::file_path_sans_ext(.test_yaml)))
+      } else if (k == YAML_YAML_NAME) {
+        expect_identical(mod1a[[k]], basename(yaml_ext(.test_path)))
+        expect_identical(mod1b[[k]], basename(yaml_ext(.test_yaml)))
+      } else {
+        expect_equal(mod1a[[k]], mod1b[[k]])
+      }
+    }
+
+    # clean up tmp file
+    fs::file_delete(.test_path)
+  })
+
 
   test_that("new_model() .based_on arg works", {
     # create new model with args
