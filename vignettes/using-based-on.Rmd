@@ -34,7 +34,7 @@ cleanup()
 
 # Introduction
 
-This vignette demonstrates how to using the `based_on` field to track a model's ancestry through the model development process. You will also see one common use for this: the tibble output from `run_log()` to check that your models are up-to-date. By "up-to-date" we mean that all of the model files and data files have not changed since the model was run. 
+This vignette demonstrates how to using the `based_on` field to track a model's ancestry through the model development process. You will also see one common use for this: using the tibble output from `run_log()` to check that your models are up-to-date. By "up-to-date" we mean that none of the model files or data files have changed since the model was run. 
 
 If you are new to `rbabylon`, the ["Getting Started with rbabylon"](getting-started.html) vignette will take you through some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its standard workflow and functionality.
 
@@ -60,45 +60,36 @@ if (Sys.which("bbi") == "") {
 The modeling process will always start with an initial model, which we create with the `new_model()` call.
 
 ```{r first model}
-mod1 <- new_model(.yaml_path = "1.yaml", .description = "our first model")
+mod1 <- new_model(.yaml_path = "1.yaml", .description = "one compartment base model")
 ```
 
-From there, the iterative model development process proceeds. The `copy_model_from()` function will do several things, including creating a new model file and filling in some relevant metadata. Notably, it will also add the model that you copied from into the `based_on` field for the new model.
+From there, the iterative model development process proceeds. The `copy_model_from()` function will do several things, including creating a new model file and filling in some relevant metadata. Notably, it will also add the model that you copied _from_ into the `based_on` field for the new model.
 
 ```{r copy_model 2}
-mod2 <- mod1 %>% copy_model_from(.new_model = 2, 
-                                 .description = "two compartment base model")
+mod2 <- copy_model_from(.parent_mod = mod1, .new_model = 2, .description = "two compartment base model")
 
 mod2$based_on
 ```
 
-*NOTE:* In a real model development process, these models would obviously be run and the diagnostics examined before moving on. For the sake of brevity, imagine that all happens "behind the curtain" in this example. In other words, _in between_ each of those calls to `copy_model_from()` you would be doing all of the normal iterative modeling work.
+*NOTE:* In a real model development process, these models would obviously be run and the diagnostics examined before moving on. For the sake of brevity, imagine that all happens "behind the curtain" in this example. In other words, _in between_ each of the calls to `copy_model_from()` you would be doing all of the normal iterative modeling work.
 
 
 ```{r big copy}
 # ...submit mod2...look at diagnostics...decide on changes for next iteration...
 
-mod3 <- mod2 %>% 
-  copy_model_from(.new_model = 3, 
-                  .description = "two compartment with residual errors")
+mod3 <- copy_model_from(.parent_mod = mod2, .new_model = 3, .description = "two compartment with residual errors")
 
 # ...submit mod3...look at diagnostics...decide on changes for next iteration...
 
-mod4 <- mod3 %>% 
-  copy_model_from(.new_model = 4, 
-                  .description = "two compartment with residual errors and added covariates")
+mod4 <- copy_model_from(.parent_mod = mod3, .new_model = 4, .description = "two compartment with residual errors and added covariates")
 
 # ...submit mod4...look at diagnostics...decide to go back to mod2 as basis for next iteration...
 
-mod5 <- mod2 %>% 
-  copy_model_from(.new_model = 5, 
-                  .description = "two compartment base model with added covariates")
+mod5 <- copy_model_from(.parent_mod = mod2, .new_model = 5, .description = "two compartment base model with added covariates")
 
 # ...submit mod5...look at diagnostics...decide on changes for next iteration...
 
-mod6 <- mod5 %>% 
-  copy_model_from(.new_model = 6, 
-                  .description = "two compartment base model with added covariates and something else")
+mod6 <- copy_model_from(.parent_mod = mod5, .new_model = 6, .description = "two compartment base model with added covariates and something else")
 
 # ...submit mod6...look at diagnostics...decide you're done!
 ```
@@ -109,9 +100,36 @@ Now that you have arrived at your final model, you can add a tag to it, which wi
 mod6 <- mod6 %>% add_tags("final model")
 ```
 
-# Run Log
+# Operating on a model object
 
-FILL IN THIS INTRO
+As seen above, you can simply use `mod$based_on` to see what is stored in the `based_on` field of a given model. However, there are two additional helper functions that are useful to know.
+
+## get_based_on
+First, by using `get_based_on()` you can retrieve the absolute path to all models in the `based_on` field.
+```{r mod object demo 1}
+mod6 %>% get_based_on()
+```
+
+This is useful because the path(s) retrieved will unambiguously identify the parent model(s) and can therefore be passed to things like `read_model()` or `model_summary()` like so:
+
+```{r mod object demo 1}
+parent_mod <- mod6 %>% get_based_on() %>% read_model()
+str(parent_mod)
+```
+
+## get_model_ancestry
+
+The second helper function walks up the tree of inheritence by iteratively calling `get_based_on()` on each parent model to determine the full set of models that led up to the current model.
+
+```{r mod object demo 1}
+mod6 %>% get_model_ancestry()
+```
+
+In this case, model `6` was based on `5`, which was based on `2`, which in turn was based on `1`. You will see one example of how this can be useful in the "Final model family" section below.
+
+# Using the run Log
+
+While it may be useful to look at the ancestry of a single model object, it may be even more useful to use the `based_on` field later in the modeling process when you are looking back and trying to summarize the model activities as a whole. The `run_log()` function is helpful for this. It returns a tibble with metadata about each model.
 
 ```{r run_log} 
 log_df <- run_log()
@@ -120,7 +138,7 @@ log_df
 
 ## Filtering tags example
 
-First we use `purrr::map_lgl` to filter the run log to only the final model.
+Among other things, the run log contains the tags that have been assigned to each model. Here we use `purrr::map_lgl` to filter the run log to only the final model.
 
 ```{r filtering}
 final_model_path <- log_df %>% 
@@ -137,15 +155,15 @@ log_df %>%
   dplyr::filter(absolute_model_path %in% get_model_ancestry(final_model_path))
 ```
 
-As you can see, models 3 and 4 are discarded because they did not lead to the final model. Review "Modeling Process" section above if you are not sure why this is the case.
+As you can see, models 3 and 4 are discarded because they did not lead to the final model. Review "Modeling Process" section above if you are not sure why this is the case. We will use the two techniques together in the "Final model family" section below.
 
 ## Checking if models are up-to-date with config_log()
 
-Now imagine you are coming back to this project some time later and want to make sure that all of the outputs you have are still up-to-date with the model files and data currently in the project. First, we'll filter down to only the models that we care about: those that led to the final model.
+Now imagine you are coming back to this project some time later and want to make sure that all of the outputs you have are still up-to-date with the model files and data currently in the project.
 
 When `babylon` runs a model, it creates a file named `bbi_config.json` in the output directory. This file contains a lot of information about the state and configuration at runtime. Notably, it contains an md5 digest of both the model file _and_ the data file at run time. Users can compare this to the _current_ md5 hashes of these two files to check if any model or data files have changed _since the model was last run_. This serves as a check that the outputs are up-to-date with the model and data.
 
-Users can call `config_log` directly, but it is likely more useful to use `run_log() %>% add_config()` to join the two together automatically.
+You can call `config_log` directly, but it is likely more useful to join the two together automatically with `run_log() %>% add_config()`.
 
 ```{r add_config fake prep, include=FALSE}
 # read in original json (which was actually fake a.k.a. copied from somewhere else)
@@ -172,7 +190,7 @@ log_df <- log_df %>% add_config()
 log_df
 ```
 
-Then a user can easily check the md5's digests from the config log against those of the current files.
+Now you can easily check the md5 digests from the config log against those of the current files.
 
 ```{r check config md5}
 # extract path to data files and model files
@@ -190,7 +208,10 @@ log_df <- log_df %>% dplyr::mutate(
 log_df %>% dplyr::select(absolute_model_path, data_md5_match, model_md5_match)
 ```
 
-From the `model_md5_match` column, you can see that some of the model files have changed since they were run. However, you may only care about your final models and the models that led to it. Here we filter to those.
+
+## Final model family
+
+From the `model_md5_match` column in the previous example, you can see that some of the model files have changed since they were run. However, you may only care about your final model and the models that led to it.
 
 ```{r filter to ancestry 2}
 final_model_family <- dplyr::bind_rows(
@@ -202,11 +223,7 @@ final_model_family <- dplyr::bind_rows(
 final_model_family %>% dplyr::select(absolute_model_path, data_md5_match, model_md5_match)
 ```
 
-When we filter to only those models, we see that they are all still up-to-date.
-
-# Operating on a model object
-
-FILL IN SOME EXAMPLES OF USING `get_based_on()` and `get_model_ancestry()` on a model object in the model process. Maybe put this above run_log() section. Not sure.
+When we filter to only those models, you can see that they are all still up-to-date. Great news.
 
 
 ```{r cleanup bottom, include=FALSE}
