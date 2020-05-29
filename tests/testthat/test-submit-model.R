@@ -3,7 +3,6 @@ context("submit_model(.dry_run=T)")
 MODEL_DIR <- "model-examples"
 MODEL_FILE <- "1.ctl"
 YAML_PATH <- file.path(MODEL_DIR, yaml_ext(MODEL_FILE))
-YML_PATH  <- file.path(MODEL_DIR, yml_ext(MODEL_FILE))
 MODEL_PATH <- file.path(MODEL_DIR, MODEL_FILE)
 MODEL_ABS_PATH <- file.path(getwd(), MODEL_DIR, MODEL_FILE)
 
@@ -73,7 +72,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
             })
 
 
-  test_that("submit_model(.dry_run=T) with .mod input parses correctly",
+  test_that("submit_model(.dry_run=T) with .mod input and .yml file parses correctly",
             {
               withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
                 # copy to a .mod extensions
@@ -81,7 +80,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
                 fs::file_copy(MODEL_PATH, new_mod_path)
                 yaml::write_yaml(list(description = "original acop model",
                                       model_type = "nonmem"),
-                                 yaml_ext(new_mod_path))
+                                 yml_ext(new_mod_path))
 
 
                 expect_identical(
@@ -91,10 +90,37 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
                 # cleanup
                 fs::file_delete(new_mod_path)
-                fs::file_delete(yaml_ext(new_mod_path))
+                fs::file_delete(yml_ext(new_mod_path))
               })
             })
 
+  test_that("submit_model(.dry_run=T) with file path no extension parses correctly",
+            {
+              withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
+
+                # try with the original .yaml
+                expect_identical(
+                  submit_model(tools::file_path_sans_ext(MODEL_PATH), .dry_run = T)[[PROC_CALL]],
+                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {MODEL_FILE} --overwrite --threads=4"))
+                )
+
+                # try with a .yml
+                new_mod_path <- stringr::str_replace(MODEL_PATH, "1.ctl", "2.ctl")
+                fs::file_copy(MODEL_PATH, new_mod_path)
+                yaml::write_yaml(list(description = "original acop model",
+                                      model_type = "nonmem"),
+                                 yml_ext(new_mod_path))
+
+                expect_identical(
+                  submit_model(tools::file_path_sans_ext(new_mod_path), .dry_run = T)[[PROC_CALL]],
+                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {basename(new_mod_path)}"))
+                )
+
+                # cleanup
+                fs::file_delete(new_mod_path)
+                fs::file_delete(yml_ext(new_mod_path))
+              })
+            })
 
   test_that("submit_model(.dry_run=T) with bbi_nonmem_model object parses correctly",
             {

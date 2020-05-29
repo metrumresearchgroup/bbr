@@ -106,7 +106,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     fs::file_delete(.test_path)
   })
 
-  test_that("read_model() works with yml path", {
+  test_that("new_model() works with yml path", {
     # create new model with args
     .test_yaml <- "model-examples/1.yaml"
     .test_path <- "model-examples/tmp.yml"
