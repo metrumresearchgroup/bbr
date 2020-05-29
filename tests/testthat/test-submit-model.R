@@ -2,8 +2,8 @@ context("submit_model(.dry_run=T)")
 
 MODEL_DIR <- "model-examples"
 MODEL_FILE <- "1.ctl"
-MODEL_YAML <- yaml_ext(MODEL_FILE)
-YAML_PATH <- file.path(MODEL_DIR, MODEL_YAML)
+YAML_PATH <- file.path(MODEL_DIR, yaml_ext(MODEL_FILE))
+YML_PATH  <- file.path(MODEL_DIR, yml_ext(MODEL_FILE))
 MODEL_PATH <- file.path(MODEL_DIR, MODEL_FILE)
 MODEL_ABS_PATH <- file.path(getwd(), MODEL_DIR, MODEL_FILE)
 
@@ -51,20 +51,20 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("submit_model(.dry_run=T) with .ctl input parses correctly",
             {
-              # error if YAML exists
+              # find YAML if it exists
               withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
-                expect_error(
+                expect_identical(
                   submit_model(MODEL_PATH, .dry_run = T)[[PROC_CALL]],
-                  regexp = "delete the YAML file if it does not correspond to this model"
+                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {MODEL_FILE} --overwrite --threads=4"))
                 )
 
-                # copy to a different name and try it
+                # copy to a different name and error because no yaml
                 new_mod_path <- stringr::str_replace(MODEL_PATH, "1", "2")
                 fs::file_copy(MODEL_PATH, new_mod_path)
 
-                expect_identical(
+                expect_error(
                   submit_model(new_mod_path, .dry_run = T)[[PROC_CALL]],
-                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {basename(new_mod_path)}"))
+                  regexp = "No file found at.+\\.yml.+OR.+\\.yaml"
                 )
 
                 # cleanup

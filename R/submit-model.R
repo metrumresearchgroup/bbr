@@ -58,8 +58,8 @@ submit_model.bbi_nonmem_model <- function(
   return(res)
 }
 
-#' S3 dispatch for submit_model from character scaler
-#'   Should be path to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
+#' S3 dispatch for submit_model from character scaler.
+#' Should be path to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
 #' @param .mod Path to YAML or model file
 #' @param .directory Model directory which `.mod` path is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
 #' @importFrom fs file_exists
@@ -87,20 +87,20 @@ submit_model.character <- function(
     } else {
       stop(glue("Cannot find file {yaml_ext(.mod)}. If passing a non-YAML file to submit_model you must include the file extension."))
     }
-  } else if (is_valid_yaml_extension(.mod)) {
+  } else if (is_valid_yaml_extension(.mod) || is_valid_nonmem_extension(.mod)) {
     .mod <- read_model(.mod)
-  } else if (is_valid_nonmem_extension(.mod)) {
-    # if NONMEM file, create new model
-    if (fs::file_exists(yaml_ext(.mod))) {
-        stop(paste(glue("`submit_model({.mod})` is trying to create {yaml_ext(.mod)} but that file already exists."),
-                   "Either call `submit_model({yaml_ext(.mod)})` or delete the YAML file if it does not correspond to this model."))
-    }
-
-    # create new model from
-    .mod <- new_model(
-      .yaml_path = yaml_ext(.mod),
-      .description = as.character(glue("{.mod} passed directly to submit_model()")),
-      .model_type = c("nonmem"))
+  # } else if (is_valid_nonmem_extension(.mod)) {
+  #   # if NONMEM file, try to read
+  #   if (fs::file_exists(yaml_ext(.mod))) {
+  #       stop(paste(glue("`submit_model({.mod})` is trying to create {yaml_ext(.mod)} but that file already exists."),
+  #                  "Either call `submit_model({yaml_ext(.mod)})` or delete the YAML file if it does not correspond to this model."))
+  #   }
+  #
+  #   # create new model from
+  #   .mod <- new_model(
+  #     .yaml_path = yaml_ext(.mod),
+  #     .description = as.character(glue("{.mod} passed directly to submit_model()")),
+  #     .model_type = c("nonmem"))
 
   } else {
     stop(glue("Unsupported file type passed to submit_model(): `{.mod}`. Valid options are `.yaml`, `.mod`, and `.ctl`"))
