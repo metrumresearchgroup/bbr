@@ -145,7 +145,7 @@ save_model_yaml <- function(.mod, .out_path = NULL) {
   }
 
   # throw out empty and null keys
-  .mod <- .mod %>% purrr::compact()
+  .mod <- purrr::compact(.mod)
 
   # write to disk
   yaml::write_yaml(.mod, .out_path)

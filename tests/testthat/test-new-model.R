@@ -95,8 +95,8 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
         expect_identical(mod1a[[k]], basename(tools::file_path_sans_ext(.test_path)))
         expect_identical(mod1b[[k]], basename(tools::file_path_sans_ext(.test_yaml)))
       } else if (k == YAML_YAML_NAME) {
-        expect_identical(mod1a[[k]], basename(yaml_ext(.test_path)))
-        expect_identical(mod1b[[k]], basename(yaml_ext(.test_yaml)))
+        expect_identical(mod1a[[k]], basename(.test_path))
+        expect_identical(mod1b[[k]], basename(.test_yaml))
       } else {
         expect_equal(mod1a[[k]], mod1b[[k]])
       }
@@ -139,8 +139,8 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
         expect_identical(mod1a[[k]], basename(tools::file_path_sans_ext(.test_path)))
         expect_identical(mod1b[[k]], basename(tools::file_path_sans_ext(.test_yaml)))
       } else if (k == YAML_YAML_NAME) {
-        expect_identical(mod1a[[k]], basename(yaml_ext(.test_path)))
-        expect_identical(mod1b[[k]], basename(yaml_ext(.test_yaml)))
+        expect_identical(mod1a[[k]], basename(.test_path))
+        expect_identical(mod1b[[k]], basename(.test_yaml))
       } else {
         expect_equal(mod1a[[k]], mod1b[[k]])
       }

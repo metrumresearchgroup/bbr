@@ -318,6 +318,7 @@ submit_models.character <- function(
   all_ext <- tools::file_ext(.mods) %>% unique()
 
   if (length(all_ext) != 1) {
+
     stop(paste(
           "If passing character vector to submit_models(), must pass all the same type of file.",
           glue("Got files with {length(all_ext)} different extensions: {paste(all_ext, collapse=', ')}"),
@@ -331,10 +332,8 @@ submit_models.character <- function(
   # if no extension, assume YAML
   if (is_valid_yaml_extension(.mod) || tools::file_path_sans_ext(.mod) == .mod) {
     .mods <- map(.mods, function(.mod) {
-      if (!fs::file_exists(yaml_ext(.mod))) {
-        stop(glue("Cannot find file {yaml_ext(.mod)}. If passing a non-YAML file to submit_model you must include the file extension."))
-      }
-      read_model(yaml_ext(.mod))
+      .mod <- find_yaml_file_path(.mod)
+      read_model(.mod)
     })
   } else if (is_valid_nonmem_extension(.mod)) {
 

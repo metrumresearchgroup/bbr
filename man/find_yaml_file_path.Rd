@@ -2,13 +2,14 @@
 % Please edit documentation in R/get-path-from-object.R
 \name{find_yaml_file_path}
 \alias{find_yaml_file_path}
-\title{helper to find valid yaml file and return ctl_ext(.path) by default if not found}
+\title{helper to find valid yaml file}
 \usage{
 find_yaml_file_path(.path)
 }
 \arguments{
-\item{.path}{File path to a NONMEM model file (control stream) with either `.ctl` or `.mod` extension}
+\item{.path}{File path with any extension or no extension.
+Function will search for that path with either a .yaml or .yml extension (preferring .yaml) and error if neither is found.}
 }
 \description{
-helper to find valid yaml file and return ctl_ext(.path) by default if not found
+helper to find valid yaml file
 }
