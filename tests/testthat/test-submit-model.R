@@ -306,32 +306,5 @@ withr::with_options(list(rbabylon.model_directory = MODEL_DIR, rbabylon.bbi_exe_
 
             })
 
-  test_that("submit_models(.dry_run=T) with character input ctl",
-            {
-              # copy control streams
-              fs::file_copy(MODEL_PATH, file.path(MODEL_DIR, "2.ctl"))
-              fs::file_copy(MODEL_PATH, file.path(MODEL_DIR, "3.ctl"))
-
-              # only test the new ones so it doesn't complain about YAML already existing
-              proc_list <- submit_models(c("2.ctl", "3.ctl"), .dry_run = T)
-
-              # check that there is only one distinct arg set
-              expect_equal(length(proc_list), 1)
-
-              # check call
-              expect_identical(
-                proc_list[[1]][[PROC_CALL]],
-                as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge 2.ctl 3.ctl"))
-              )
-
-              # cleanup after test
-              for (m in c("2", "3")) {
-                m <- file.path(MODEL_DIR, m)
-                if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
-                if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
-              }
-
-            })
-
 
 }) # closing withr::with_options

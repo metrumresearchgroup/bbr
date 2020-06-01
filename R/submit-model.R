@@ -79,26 +79,11 @@ submit_model.character <- function(
   # check for .directory and combine with .mod
   .mod <- combine_directory_path(.directory, .mod)
 
-  # If no extension, convert to YAML and look for file
-  if (tools::file_path_sans_ext(.mod) == .mod) {
-    .mod <- tryCatch(
-      {
-        find_yaml_file_path(.mod)
-      },
-      error = function(e) {
-        if (str_detect(e$message, FIND_YAML_ERR_MSG)) {
-          stop(glue("`submit_model({.mod})` error: {e$message} -- Use `new_model()` to create the necessary YAML file."))
-        }
-        stop(e$message)
-      }
-    )
+  if (!(is_valid_yaml_extension(.mod) || is_valid_nonmem_extension(.mod) || tools::file_ext(.mod) == "")) {
+    stop(glue("Unsupported file type passed to submit_models(): `{.mod}`. Valid options are `.yaml`, `.yml`, `.mod`, and `.ctl` (or no extension, which will infer .yaml or .yml)"))
   }
 
-  if (!(is_valid_yaml_extension(.mod) || is_valid_nonmem_extension(.mod))) {
-    stop(glue("Unsupported file type passed to submit_model(): `{.mod}`. Valid options are `.yaml`, `.yml`, `.mod`, and `.ctl`"))
-  }
-
-  # load model from path
+  # attempt to read model from path
   .mod <- read_model(.mod)
 
   # submit model
@@ -234,7 +219,7 @@ submit_models <- function(
 #' @importFrom purrr map map_lgl
 #' @export
 #' @rdname submit_models
-submit_models.list <- function( ###### HAS TO CHECK FOR VALID MODEL TYPES and dispatch correctly
+submit_models.list <- function(
   .mods,
   .bbi_args = NULL,
   .mode = c("sge", "local"),
@@ -318,41 +303,35 @@ submit_models.character <- function(
   all_ext <- tools::file_ext(.mods) %>% unique()
 
   if (length(all_ext) != 1) {
-
-    stop(paste(
-          "If passing character vector to submit_models(), must pass all the same type of file.",
-          glue("Got files with {length(all_ext)} different extensions: {paste(all_ext, collapse=', ')}"),
-          sep = " "
-         ))
+    # .yaml and .yml OR .mod and .ctl can coexist, but otherwise must all be the same.
+    if (length(all_ext) == 2 && sort(all_ext) == c("yaml", "yml")) {
+      .pass <- TRUE
+    } else if (length(all_ext) == 2 && sort(all_ext) == c("ctl", "mod")) {
+      .pass <- TRUE
+    } else {
+      .pass <- FALSE
+    }
+    if (isFALSE(.pass)) {
+      stop(paste(
+        "If passing character vector to submit_models(), must pass all the same type of file.",
+        glue("Got files with {length(all_ext)} different extensions: {paste(all_ext, collapse=', ')}"),
+        sep = " "
+      ))
+    }
   }
 
-  # infer type from first path in vector
-  .mod <- .mods[1]
+  # attempt to load model objects
+  .mods <- map(.mods, function(.mod) {
+    if (!(is_valid_yaml_extension(.mod) || is_valid_nonmem_extension(.mod) || tools::file_ext(.mod) == "")) {
+      stop(glue("Unsupported file type passed to submit_models(): `{.mod}`. Valid options are `.yaml`, `.yml`, `.mod`, and `.ctl` (or no extension, which will infer .yaml or .yml)"))
+    }
 
-  # if no extension, assume YAML
-  if (is_valid_yaml_extension(.mod) || tools::file_path_sans_ext(.mod) == .mod) {
-    .mods <- map(.mods, function(.mod) {
-      .mod <- find_yaml_file_path(.mod)
-      read_model(.mod)
-    })
-  } else if (is_valid_nonmem_extension(.mod)) {
+    # load model from path
+    read_model(.mod)
+  })
 
-    .mods <- map(.mods, function(.mod) {
-      # if NONMEM file, create new model
-      if (fs::file_exists(yaml_ext(.mod))) {
-        stop(paste(glue("`submit_model({.mod})` is trying to create {yaml_ext(.mod)} but that file already exists."),
-                   "Either call `submit_model({yaml_ext(.mod)})` or delete the YAML file if it does not correspond to this model."))
-      }
-      # create new model from
-      new_model(
-        .yaml_path = yaml_ext(.mod),
-        .description = as.character(glue("{.mod} passed directly to submit_model()")),
-        .model_type = c("nonmem")
-      )
-    })
-  } else {
-    stop(glue("Unsupported file type passed to submit_model(): `{.mod}`. Valid options are `.yaml`, `.mod`, and `.ctl`"))
-  }
+
+
 
   # extract model type, and check that they are all the same type
   all_model_types <- map(.mods, function(.x) { .x[[YAML_MOD_TYPE]] })
@@ -423,6 +402,7 @@ submit_models.numeric <- function(
 #' @importFrom stringr str_detect
 #' @importFrom tools file_path_sans_ext
 #' @importFrom purrr map
+#' @importFrom rlang is_bare_list
 #' @return A list of S3 objects of class `babylon_process`
 #' @rdname submit_models
 submit_nonmem_models <- function(.mods,
@@ -432,6 +412,20 @@ submit_nonmem_models <- function(.mods,
                                 .config_path=NULL,
                                 .wait = TRUE,
                                 .dry_run=FALSE) {
+
+  # check input list (this is a private method so if these fail there is a bug somewhere that calls this)
+  if (!is_bare_list(.mods)) {
+    stop(glue("USER SHOULDN'T SEE THIS ERROR: Can only pass a list of bbi_nonmem_model objects to submit_nonmem_models. Passed object of class {paste(class(.mods), collapse = ', ')}"))
+  }
+
+  all_models_bool <- map_lgl(.mods, function(.x) { inherits(.x, "bbi_nonmem_model") })
+  if (isFALSE(all(all_models_bool))) {
+    losers <- which(!all_models_bool)
+    stop(paste(
+      glue("USER SHOULDN'T SEE THIS ERROR: Passed list must contain only bbi_nonmem_model objects, but found {length(losers)} invalid objects at indices:"),
+      paste(losers, collapse = ", ")
+    ))
+  }
 
   # check against YAML
   for (.mod in .mods) { check_yaml_in_sync(.mod) }
