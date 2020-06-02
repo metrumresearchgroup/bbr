@@ -41,7 +41,7 @@ cleanup(.recreate_dir = TRUE)
 
 # set options and run tests
 withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
-                         rbabylon.model_directory = MODEL_DIR), {
+                         rbabylon.model_directory = normalizePath(MODEL_DIR)), {
 
   # clear old babylon.yaml
   if (fs::file_exists(file.path(MODEL_DIR, "babylon.yaml"))) fs::file_delete(file.path(MODEL_DIR, "babylon.yaml"))

@@ -157,7 +157,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 }) # closing withr::with_options
 
 
-withr::with_options(list(rbabylon.model_directory = "model-examples"), {
+withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
   test_that("copy_from_model numeric", {
     # get integer input and check for related paths
     mod1 <- stringr::str_replace_all(YAML_TEST_FILE, "[^\\d]", "") %>% as.numeric()

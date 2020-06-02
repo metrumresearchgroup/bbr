@@ -144,7 +144,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 }) # closing withr::with_options
 
 
-withr::with_options(list(rbabylon.model_directory = "model-examples"), {
+withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
   test_that("submit_model(.dry_run=T) with numeric input parses correctly",
           {
             withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
@@ -161,7 +161,7 @@ withr::with_options(list(rbabylon.model_directory = "model-examples"), {
 # testing multiple model submission
 #####################################
 
-withr::with_options(list(rbabylon.model_directory = MODEL_DIR, rbabylon.bbi_exe_path = "bbi"), {
+withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR), rbabylon.bbi_exe_path = "bbi"), {
   test_that("submit_models(.dry_run=T) with list input simple",
             {
               # read first model

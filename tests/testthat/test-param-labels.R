@@ -88,7 +88,7 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
   skip("param_labels only runs on Metworx or Drone")
 } else {
   withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
-                           rbabylon.model_directory = MODEL_DIR), {
+                           rbabylon.model_directory = normalizePath(MODEL_DIR)), {
 
     for (MODEL_PICK in MODEL_PICKS) {
       .mod_id <- MODEL_PICK$mod_id

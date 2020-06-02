@@ -6,13 +6,14 @@ context("testing a composable workflow but only dryrun and NOT running bbi")
 ####################################################
 
 # reference constants
+MODEL_DIR <- "model-examples"
 REF_SUMMARY_CALL <- as.character(glue("cd {getwd()}/model-examples/1 ; {getOption('rbabylon.bbi_exe_path')} nonmem summary 1 --json"))
 MOD_CLASS <- c("bbi_nonmem_model", "list")
 PROC_CLASS <- c("babylon_process", "list")
 
 
 ###############################################################
-# with options("rbabylon.model_directory" = "model-examples")
+# with options("rbabylon.model_directory" = MODEL_DIR)
 ###############################################################
 
 test_yaml_path <- "1.yaml"
@@ -23,10 +24,10 @@ test_yaml_path <- "1.yaml"
   list(change_midstream = TRUE)
 )
 
-withr::with_options(list(rbabylon.model_directory = "model-examples"), {
+withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
 
   for (.test_case in .TEST_CASES_WD) {
-    test_that(paste("basic workflow is correct using rbabylon.model_directory = 'model-examples' ", if(isTRUE(.test_case$change_midstream)) "change_midstream"), {
+    test_that(glue::glue("basic workflow is correct using rbabylon.model_directory = '{MODEL_DIR}' {if(isTRUE(.test_case$change_midstream)) 'change_midstream'}"), {
 
       # load model from yaml
       this_mod <- read_model(.path = test_yaml_path)
@@ -77,7 +78,7 @@ withr::with_options(list(rbabylon.model_directory = "model-examples"), {
 
 
   for (.test_case in .TEST_CASES_WD) {
-    test_that(paste("summary call is the same using rbabylon.model_directory = 'model-examples'"), {
+    test_that(glue::glue("summary call is the same using rbabylon.model_directory = '{MODEL_DIR}'"), {
 
       # load mod from yaml and dry run through to summary object
       this_mod <- read_model(.path = test_yaml_path)
@@ -109,10 +110,10 @@ withr::with_options(list(rbabylon.model_directory = "model-examples"), {
 .TEST_CASES_WD <- list(
   list(test_wd = ".",               test_yaml_path = "model-examples/1.yaml"),
   list(test_wd = "..",              test_yaml_path = "testthat/model-examples/1.yaml"),
-  list(test_wd = "model-examples",  test_yaml_path = "1.yaml"),
+  list(test_wd = MODEL_DIR,  test_yaml_path = "1.yaml"),
   list(test_wd = ".",               test_yaml_path = "model-examples/1.yaml", change_midstream = TRUE),
   list(test_wd = "..",              test_yaml_path = "testthat/model-examples/1.yaml", change_midstream = TRUE),
-  list(test_wd = "model-examples",  test_yaml_path = "1.yaml", change_midstream = TRUE)
+  list(test_wd = MODEL_DIR,  test_yaml_path = "1.yaml", change_midstream = TRUE)
 )
 
 withr::with_options(list(rbabylon.model_directory = NULL), {

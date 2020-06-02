@@ -73,7 +73,7 @@ submit_model.character <- function(
   .config_path=NULL,
   .wait = TRUE,
   .dry_run=FALSE,
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 ) {
 
   # check for .directory and combine with .mod
@@ -119,7 +119,7 @@ submit_model.numeric <- function(
   .config_path=NULL,
   .wait = TRUE,
   .dry_run=FALSE,
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 ) {
   # convert to character
   .mod <- as.character(.mod)
@@ -165,13 +165,22 @@ submit_nonmem_model <- function(.mod,
   args_vec <- check_nonmem_args(.bbi_args)
   cmd_args <- c("nonmem", "run", .mode, .mod[[YAML_MOD_PATH]], args_vec)
 
+  # define working directory
+  model_dir <- .mod[[WORKING_DIR]]
+
+  # # check for babylon.yaml config
+  # .config_path <- normalizePath(.config_path)
+  # if (!fs::file_exists(.config_path)) {
+  #
+  # }
+  #
+  # cmd_args <- c(cmd_args, sprintf("--config=%s", .config_path))
+
   # add config path
   if (!is.null(.config_path)) {
     cmd_args <- c(cmd_args, sprintf("--config=%s", .config_path))
   }
 
-  # define working directory
-  model_dir <- .mod[[WORKING_DIR]]
 
   if (.dry_run) {
     # construct fake res object
@@ -291,7 +300,7 @@ submit_models.character <- function(
   .config_path=NULL,
   .wait = TRUE,
   .dry_run=FALSE,
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 ) {
 
   # check for .directory and combine with .mods
@@ -376,7 +385,7 @@ submit_models.numeric <- function(
   .config_path=NULL,
   .wait = TRUE,
   .dry_run=FALSE,
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 ) {
   # convert to character
   .mods <- as.character(.mods)

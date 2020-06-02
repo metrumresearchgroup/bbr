@@ -344,7 +344,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 }) # closing withr::with_options
 
 
-withr::with_options(list(rbabylon.model_directory = "model-examples"), {
+withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
   test_that("compare read_model() and new_model() objects with numeric input", {
   # create new model with args
     .test_yaml <- 1

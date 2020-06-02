@@ -24,7 +24,7 @@ new_model <- function(
   .tags = NULL,
   .bbi_args = NULL,
   .model_type = c("nonmem"),
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 ) {
 
   if (!is_valid_yaml_extension(.yaml_path)) {
@@ -77,7 +77,7 @@ new_model <- function(
 #' @export
 read_model <- function(
   .path,
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 ) {
 
   # check for .directory and combine with .path

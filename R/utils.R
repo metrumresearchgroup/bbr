@@ -253,6 +253,57 @@ set_model_directory <- function(.path) {
 }
 
 
+#' Set global model directory option
+#'
+#' Sets `options('rbabylon.model_directory')` to the absolute path of the directory passed to `.path`.
+#' Note that the directory must exist or this will error.
+#' This is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
+#' once this is set, those functions can take a path relative to this directory instead of the working/script directory.
+#' @param .path Path, either from working directory or absolute, that will be set as `options('rbabylon.model_directory')`
+#' @rdname model_directory
+#' @export
+set_model_directory <- function(.path) {
+  if (is.null(.path)) {
+    options('rbabylon.model_directory' = NULL)
+  } else {
+    options('rbabylon.model_directory' = normalizePath(.path, mustWork = TRUE))
+  }
+
+  cat(glue("options('rbabylon.model_directory') set to {options('rbabylon.model_directory')}"))
+}
+
+#' Get global model directory option
+#'
+#' Gets the path set to `options('rbabylon.model_directory')` and checks that it is both absolute and exists.
+#' This path is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
+#' once this is set, those functions can take a path relative to this directory instead of the working/script directory.
+#' @rdname model_directory
+#' @importFrom fs is_absolute_path dir_exists
+#' @export
+get_model_directory <- function() {
+  .mod_dir <- getOption("rbabylon.model_directory")
+  if (is.null(.mod_dir)) {
+    return(NULL)
+  }
+
+  if (!fs::is_absolute_path(.mod_dir)) {
+    strict_mode_error(paste(
+      glue("`options('rbabylon.model_directory')` must be set to an absolute path but is currently set to {.mod_dir}"),
+      "It is recommended to use `set_model_directory('...')` or put `options('rbabylon.model_directory' = normalizePath('...'))` in your .Rprofile for this project.",
+    sep = "\n"))
+  }
+
+  if (!fs::dir_exists(.mod_dir)) {
+    strict_mode_error(paste(
+      glue("`options('rbabylon.model_directory')` must be set to an existing directory but {.mod_dir} does not exist."),
+      "It is recommended to use `set_model_directory('...')` or put `options('rbabylon.model_directory' = normalizePath('...'))` in your .Rprofile for this project.",
+      sep = "\n"))
+  }
+
+  return(.mod_dir)
+}
+
+
 
 ############################
 # Error handlers

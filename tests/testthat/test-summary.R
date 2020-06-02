@@ -38,7 +38,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
     expect_equal(ref_sum, sum1)
   })
 
-  withr::with_options(list(rbabylon.model_directory = "model-examples"), {
+  withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
     test_that("model_summary.character produces expected output", {
       # get summary
       sum1 <- "1" %>% model_summary()
