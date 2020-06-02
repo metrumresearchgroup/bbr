@@ -241,3 +241,49 @@ test_that("suppressSpecificWarning() works", {
   # delete the underlying yaml
   fs::file_delete(new_yaml)
 })
+
+
+
+# testing find_config_file_path
+
+BBI_FILE <- file.path(MODEL_DIR, "babylon.yaml")
+BBI_DIR <- file.path(MODEL_DIR, "model-examples/babylon_yaml_test")
+
+readr::write_file("naw: dawg", BBI_FILE)
+fs::dir_create(BBI_DIR)
+
+tryCatch(
+  {
+    # cases that should work
+    .test_cases <- list(
+      list(md = normalizePath("."), ref = "model-examples/babylon.yaml"),
+      list(md = normalizePath(MODEL_DIR), ref = "babylon.yaml"),
+      list(md = normalizePath(BBI_DIR), ref = "../../babylon.yaml")
+    )
+    for (i in 1:length(.test_cases)) {
+      .tc <- .test_cases[[i]]
+      test_that(paste("find_config_file_path() parses correctly", i), {
+        expect_equal(find_config_file_path(BBI_FILE, .tc$md), .tc$ref)
+        expect_equal(find_config_file_path(MODEL_DIR, .tc$md), .tc$ref)
+      })
+    }
+
+    # cases that should fail
+    .test_cases <- list(
+      list(bb = BBI_FILE, md = ".", err = "is not absolute"),
+      list(bb = basename(BBI_FILE), md = normalizePath("."), err = "No babylon.yaml file exists at")
+    )
+    for (i in 1:length(.test_cases)) {
+      .tc <- .test_cases[[i]]
+      test_that(paste("find_config_file_path() errors correctly", i), {
+        expect_error(find_config_file_path(.tc$bb, .tc$md), regexp = .tc$err)
+      })
+    }
+
+  },
+  finally = {
+    fs::file_delete(BBI_FILE)
+    fs::dir_delete(BBI_DIR)
+  }
+)
+

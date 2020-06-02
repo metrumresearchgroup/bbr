@@ -6,6 +6,14 @@ YAML_PATH <- file.path(MODEL_DIR, yaml_ext(MODEL_FILE))
 MODEL_PATH <- file.path(MODEL_DIR, MODEL_FILE)
 MODEL_ABS_PATH <- file.path(getwd(), MODEL_DIR, MODEL_FILE)
 
+cleanup_2_3 <- function() {
+  for (m in c("2", "3")) {
+    m <- file.path(MODEL_DIR, m)
+    if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
+    if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
+  }
+}
+
 ###################################
 # testing single model submission
 ###################################
@@ -60,14 +68,12 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
                 # copy to a different name and error because no yaml
                 new_mod_path <- stringr::str_replace(MODEL_PATH, "1", "2")
                 fs::file_copy(MODEL_PATH, new_mod_path)
+                on.exit({ fs::file_delete(new_mod_path) })
 
                 expect_error(
                   submit_model(new_mod_path, .dry_run = T)[[PROC_CALL]],
                   regexp = FIND_YAML_ERR_MSG
                 )
-
-                # cleanup
-                fs::file_delete(new_mod_path)
               })
             })
 
@@ -81,16 +87,15 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
                 yaml::write_yaml(list(description = "original acop model",
                                       model_type = "nonmem"),
                                  yml_ext(new_mod_path))
-
+                on.exit({
+                  fs::file_delete(new_mod_path)
+                  fs::file_delete(yml_ext(new_mod_path))
+                })
 
                 expect_identical(
                   submit_model(new_mod_path, .dry_run = T)[[PROC_CALL]],
                   as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {basename(new_mod_path)}"))
                 )
-
-                # cleanup
-                fs::file_delete(new_mod_path)
-                fs::file_delete(yml_ext(new_mod_path))
               })
             })
 
@@ -111,14 +116,15 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
                                       model_type = "nonmem"),
                                  yml_ext(new_mod_path))
 
+                on.exit({
+                  fs::file_delete(new_mod_path)
+                  fs::file_delete(yml_ext(new_mod_path))
+                })
+
                 expect_identical(
                   submit_model(tools::file_path_sans_ext(new_mod_path), .dry_run = T)[[PROC_CALL]],
                   as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {basename(new_mod_path)}"))
                 )
-
-                # cleanup
-                fs::file_delete(new_mod_path)
-                fs::file_delete(yml_ext(new_mod_path))
               })
             })
 
@@ -170,6 +176,7 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR), rb
               # copy to two new models
               mod2 <- copy_model_from(1, 2, "naw")
               mod3 <- copy_model_from(1, 3, "naw")
+              on.exit({ cleanup_2_3() })
 
               .mods <- list(mod1, mod2, mod3)
 
@@ -185,14 +192,6 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR), rb
                 proc_list[[1]][[PROC_CALL]],
                 as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {MODEL_FILE} 2.ctl 3.ctl --overwrite --threads=4"))
               )
-
-              # cleanup after test
-              for (m in c("2", "3")) {
-                m <- file.path(MODEL_DIR, m)
-                if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
-                if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
-              }
-
             })
 
   test_that("submit_models(.dry_run=T) with list input, 2 arg sets",
@@ -203,6 +202,7 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR), rb
               # copy to two new models
               mod2 <- copy_model_from(1, 2, "naw") %>% add_bbi_args(list(threads = 3))
               mod3 <- copy_model_from(1, 3, "naw") %>% add_bbi_args(list(clean_lvl = 2))
+              on.exit({ cleanup_2_3() })
 
               .mods <- list(mod1, mod2, mod3)
 
@@ -222,14 +222,6 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR), rb
                 proc_list[[2]][[PROC_CALL]],
                 as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge 3.ctl --clean_lvl=2 --overwrite --threads=1"))
               )
-
-              # cleanup after test
-              for (m in c("2", "3")) {
-                m <- file.path(MODEL_DIR, m)
-                if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
-                if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
-              }
-
             })
 
   test_that("submit_models(.dry_run=T) errors with bad input",
@@ -240,6 +232,7 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR), rb
               # copy to two new models
               mod2 <- copy_model_from(1, 2, "naw")
               mod3 <- copy_model_from(1, 3, "naw")
+              on.exit({ cleanup_2_3() })
 
               # testing when one isn't a model
               fake <- list(naw = 1)
@@ -259,14 +252,6 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR), rb
                 submit_models(.mods, .dry_run = T),
                 regexp = "must contain all the same type of models"
               )
-
-              # cleanup after test
-              for (m in c("2", "3")) {
-                m <- file.path(MODEL_DIR, m)
-                if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
-                if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
-              }
-
             })
 
   test_that("submit_models(.dry_run=T) with character and numeric input yaml",
@@ -277,6 +262,7 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR), rb
               # copy to two new models
               mod2 <- copy_model_from(1, 2, "naw")
               mod3 <- copy_model_from(1, 3, "naw")
+              on.exit({ cleanup_2_3() })
 
               # try with and without extension
               .test_list <- list(
@@ -296,15 +282,9 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR), rb
                   as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {MODEL_FILE} 2.ctl 3.ctl --overwrite --threads=4"))
                 )
               }
-
-              # cleanup after test
-              for (m in c("2", "3")) {
-                m <- file.path(MODEL_DIR, m)
-                if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
-                if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
-              }
-
             })
 
 
 }) # closing withr::with_options
+
+
