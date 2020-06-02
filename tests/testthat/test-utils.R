@@ -247,9 +247,9 @@ test_that("suppressSpecificWarning() works", {
 # testing find_config_file_path
 
 BBI_FILE <- file.path(MODEL_DIR, "babylon.yaml")
-BBI_DIR <- file.path(MODEL_DIR, "model-examples/babylon_yaml_test")
+BBI_DIR <- file.path(MODEL_DIR, "babylon_yaml_test")
 
-readr::write_file("naw: dawg", BBI_FILE)
+readr::write_file("created_by: test-utils", BBI_FILE)
 fs::dir_create(BBI_DIR)
 
 tryCatch(
@@ -258,7 +258,7 @@ tryCatch(
     .test_cases <- list(
       list(md = normalizePath("."), ref = "model-examples/babylon.yaml"),
       list(md = normalizePath(MODEL_DIR), ref = "babylon.yaml"),
-      list(md = normalizePath(BBI_DIR), ref = "../../babylon.yaml")
+      list(md = normalizePath(BBI_DIR), ref = "../babylon.yaml")
     )
     for (i in 1:length(.test_cases)) {
       .tc <- .test_cases[[i]]

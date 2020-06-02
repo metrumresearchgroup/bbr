@@ -7,6 +7,8 @@ context("testing a composable workflow but only dryrun and NOT running bbi")
 
 # reference constants
 MODEL_DIR <- "model-examples"
+TEST_YAML <- "1.yaml"
+
 REF_SUMMARY_CALL <- as.character(glue("cd {getwd()}/model-examples/1 ; {getOption('rbabylon.bbi_exe_path')} nonmem summary 1 --json"))
 MOD_CLASS <- c("bbi_nonmem_model", "list")
 PROC_CLASS <- c("babylon_process", "list")
@@ -16,8 +18,6 @@ PROC_CLASS <- c("babylon_process", "list")
 # with options("rbabylon.model_directory" = MODEL_DIR)
 ###############################################################
 
-test_yaml_path <- "1.yaml"
-
 # when setting the model_directory relative to working directory, calls must be from that working directory
 .TEST_CASES_WD <- list(
   list(change_midstream = FALSE),
@@ -26,11 +26,15 @@ test_yaml_path <- "1.yaml"
 
 withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
 
+  # create fake babylon.yaml
+  readr::write_file("created_by: test-workflow-dryrun part 1", file.path(MODEL_DIR, "babylon.yaml"))
+  on.exit({ fs::file_delete(file.path(MODEL_DIR, "babylon.yaml")) })
+
   for (.test_case in .TEST_CASES_WD) {
     test_that(glue::glue("basic workflow is correct using rbabylon.model_directory = '{MODEL_DIR}' {if(isTRUE(.test_case$change_midstream)) 'change_midstream'}"), {
 
       # load model from yaml
-      this_mod <- read_model(.path = test_yaml_path)
+      this_mod <- read_model(.path = TEST_YAML)
 
       # check class and keys are right
       expect_identical(class(this_mod), MOD_CLASS)
@@ -58,7 +62,7 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
       expect_identical(call_str, proc_str)
 
       # look for outputs
-      expect_identical(this_mod[[YAML_OUT_DIR]], get_model_id(test_yaml_path))
+      expect_identical(this_mod[[YAML_OUT_DIR]], get_model_id(TEST_YAML))
       expect_true(fs::file_exists(build_path_from_mod_obj(this_mod, "lst")))
       expect_true(fs::file_exists(build_path_from_mod_obj(this_mod, "ext")))
       expect_true(fs::file_exists(build_path_from_mod_obj(this_mod, "grd")))
@@ -81,16 +85,16 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
     test_that(glue::glue("summary call is the same using rbabylon.model_directory = '{MODEL_DIR}'"), {
 
       # load mod from yaml and dry run through to summary object
-      this_mod <- read_model(.path = test_yaml_path)
+      this_mod <- read_model(.path = TEST_YAML)
       this_proc <- submit_model(this_mod, .dry_run = TRUE)
       this_sum <- this_proc %>% as_model() %>% model_summary(.dry_run = TRUE)
       expect_identical(this_sum[[PROC_CALL]], REF_SUMMARY_CALL)
 
       # check that summary call matches when generated with file path instead of object
-      this_out_dir <- tools::file_path_sans_ext(test_yaml_path)
+      this_out_dir <- tools::file_path_sans_ext(TEST_YAML)
       this_out_dir_sum <- model_summary(this_out_dir, .model_type = "nonmem", .dry_run = TRUE)
 
-      this_ctl_file <- ctl_ext(test_yaml_path)
+      this_ctl_file <- ctl_ext(TEST_YAML)
       this_ctl_file_sum <- model_summary(this_ctl_file, .model_type = "nonmem", .dry_run = TRUE)
 
       expect_identical(this_out_dir_sum$call, REF_SUMMARY_CALL)
@@ -108,15 +112,19 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
 ###################################################################################
 
 .TEST_CASES_WD <- list(
-  list(test_wd = ".",               test_yaml_path = "model-examples/1.yaml"),
-  list(test_wd = "..",              test_yaml_path = "testthat/model-examples/1.yaml"),
-  list(test_wd = MODEL_DIR,  test_yaml_path = "1.yaml"),
-  list(test_wd = ".",               test_yaml_path = "model-examples/1.yaml", change_midstream = TRUE),
-  list(test_wd = "..",              test_yaml_path = "testthat/model-examples/1.yaml", change_midstream = TRUE),
-  list(test_wd = MODEL_DIR,  test_yaml_path = "1.yaml", change_midstream = TRUE)
+  list(test_wd = ".",        bbi_path = "babylon.yaml",           test_yaml_path = file.path(MODEL_DIR, TEST_YAML)),
+  list(test_wd = "..",       bbi_path = "testthat/babylon.yaml",  test_yaml_path = file.path("testthat", MODEL_DIR, TEST_YAML)),
+  list(test_wd = MODEL_DIR,  bbi_path = "../babylon.yaml",        test_yaml_path = TEST_YAML),
+  list(test_wd = ".",        bbi_path = "babylon.yaml",           test_yaml_path = file.path(MODEL_DIR, TEST_YAML), change_midstream = TRUE),
+  list(test_wd = "..",       bbi_path = "testthat/babylon.yaml",  test_yaml_path = file.path("testthat", MODEL_DIR, TEST_YAML), change_midstream = TRUE),
+  list(test_wd = MODEL_DIR,  bbi_path = "../babylon.yaml",        test_yaml_path = TEST_YAML, change_midstream = TRUE)
 )
 
 withr::with_options(list(rbabylon.model_directory = NULL), {
+
+  # create fake babylon.yaml
+  readr::write_file("created_by: test-workflow-dryrun part 2", "babylon.yaml")
+  on.exit({ fs::file_delete("babylon.yaml") })
 
   for (.test_case in .TEST_CASES_WD) {
     test_that(paste("basic workflow is correct from different working directories", .test_case$test_wd, if(isTRUE(.test_case$change_midstream)) "change_midstream"), {
@@ -136,9 +144,9 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
         # dry run of model submission
         if (isTRUE(.test_case$change_midstream)) {
-          this_proc <- withr::with_dir("..", { submit_model(this_mod, .dry_run = TRUE) })
+          this_proc <- withr::with_dir("..", { submit_model(this_mod, .dry_run = TRUE, .config_path = .test_case$bbi_path) })
         } else {
-          this_proc <- submit_model(this_mod, .dry_run = TRUE)
+          this_proc <- submit_model(this_mod, .dry_run = TRUE, .config_path = .test_case$bbi_path)
         }
 
 
@@ -179,7 +187,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
         # load mod from yaml and dry run through to summary object
         this_mod <- read_model(.path = test_yaml_path)
-        this_proc <- submit_model(this_mod, .dry_run = TRUE)
+        this_proc <- submit_model(this_mod, .dry_run = TRUE, .config_path = .test_case$bbi_path)
         this_sum <- this_proc %>% as_model() %>% model_summary(.dry_run = TRUE)
         expect_identical(this_sum[[PROC_CALL]], REF_SUMMARY_CALL)
 

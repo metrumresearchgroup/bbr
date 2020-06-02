@@ -224,6 +224,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
   test_that("check_based_on works on happy path with vector", {
+    on.exit({ cleanup() })
     fs::file_copy(YAML_TEST_FILE, paste0(NEW_MOD2, '.yml'))
     expect_equal(check_based_on(.start = ".", .based_on = c(YAML_TEST_FILE, NEW_MOD2)), c(tools::file_path_sans_ext(YAML_TEST_FILE), NEW_MOD2))
     expect_equal(check_based_on(.start = MODEL_DIR, .based_on = c("1", "2")), c("1", "2"))
