@@ -21,31 +21,29 @@ get_path_from_object <- function(.bbi_object, .key, .check_exists = TRUE) {
 #' @rdname get_path_from_object
 #' @export
 get_path_from_object.default <- function(.bbi_object, .key, .check_exists = TRUE) {
-   tryCatch(
-     {
-       # do some QA on the required fields
-       if (any(map_lgl(c(WORKING_DIR, .key), ~ is.null(.bbi_object[[.x]])))) {
-         stop(glue(".bbi_object must contain keys for both `{WORKING_DIR}` and `{.key}`` but has only the following keys: {paste(names(.bbi_object), collapse = ', ')}"), call. = FALSE)
-       }
 
-       if (length(.bbi_object[[.key]]) > 1) {
-         stop(glue("Expected a scaler value for `.bbi_object[['{.key}']]` but instead got {class(.bbi_object[[.key]])[1]} of length {length(.bbi_object[[.key]])}"), call. = FALSE)
-       }
+  stop_with_msg <- function(.x) {
+    stop(glue("Cannot extract `{.key}` from object of class `{paste(class(.bbi_object), collapse = ', ')}` :\n{.x}"), call. = FALSE)
+  }
 
-       # extract the requested path and optionally check if it exists
-       .path <- file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[.key]])
+  # do some QA on the required fields
+  if (any(map_lgl(c(WORKING_DIR, .key), ~ is.null(.bbi_object[[.x]])))) {
+    stop_with_msg(glue(".bbi_object must contain keys for both `{WORKING_DIR}` and `{.key}`` but has only the following keys: {paste(names(.bbi_object), collapse = ', ')}"))
+  }
 
-       if (isTRUE(.check_exists) && !fs::file_exists(.path)) {
-         stop(glue("Extracted path `{.path}` but nothing exists at that location. (If this is expected, pass `.check_exists = FALSE` to bypass this error.)"), call. = FALSE)
-       }
+  if (length(.bbi_object[[.key]]) > 1) {
+    stop_with_msg(glue("Expected a scaler value for `.bbi_object[['{.key}']]` but instead got {class(.bbi_object[[.key]])[1]} of length {length(.bbi_object[[.key]])}"))
+  }
 
-       return(.path)
+  # extract the requested path and optionally check if it exists
+  .path <- file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[.key]])
 
-     },
-     error = function(e) {
-       stop(glue("Cannot extract `{.key}` from object of class `{paste(class(.bbi_object), collapse = ', ')}` :\n{paste(e, collapse = '\n')}"), call. = FALSE)
-     }
-   )
+  if (isTRUE(.check_exists) && !fs::file_exists(.path)) {
+    stop_with_msg(glue("Extracted path `{.path}` but nothing exists at that location. (If this is expected, pass `.check_exists = FALSE` to bypass this error.)"))
+  }
+
+  return(.path)
+
 }
 
 
