@@ -26,6 +26,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # copy YAML but _not_ model file
     YAML2 <- stringr::str_replace(YAML_TEST_FILE, "/1\\.", "/2.")
     fs::file_copy(YAML_TEST_FILE, YAML2)
+    on.exit({ fs::file_delete(YAML2) })
 
     # should error because no file is there
     expect_error(
@@ -38,9 +39,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
       suppressSpecificWarning(get_path_from_object(ctl_ext(YAML2) , YAML_MOD_PATH, .check_exists = FALSE), .regexpr = "No model file found"),
       stringr::str_replace(normalizePath(CTL_TEST_FILE), "/1\\.", "/2.")
     )
-
-    # cleanup
-    fs::file_delete(YAML2)
   })
 
   test_that("get_path_from_object.bbi_run_log_df() builds the right paths", {
@@ -49,6 +47,11 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     CTL2 <- ctl_ext(YAML2)
     fs::file_copy(YAML_TEST_FILE, YAML2)
     fs::file_copy(CTL_TEST_FILE, CTL2)
+    on.exit({
+      fs::file_delete(YAML2)
+      fs::file_delete(CTL2)
+    })
+
     .log_df <- run_log(MODEL_DIR)
 
     # check extracted paths
@@ -56,10 +59,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
       get_path_from_object(.log_df , YAML_MOD_PATH),
       c(normalizePath(CTL_TEST_FILE), stringr::str_replace(normalizePath(CTL_TEST_FILE), "/1\\.", "/2."))
     )
-
-    # cleanup
-    fs::file_delete(YAML2)
-    fs::file_delete(CTL2)
   })
 
 
@@ -202,8 +201,9 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   test_that("find_yaml_file_path returns correct yml path", {
     new_yaml <- paste0(NEW_MOD2, '.yml')
     fs::file_copy(YAML_TEST_FILE, new_yaml)
+    on.exit({ fs::file_delete(new_yaml) })
     expect_identical(find_yaml_file_path(NEW_MOD2), new_yaml)
-    fs::file_delete(new_yaml)
+
   })
 
   test_that("find_yaml_file_path errors when no file found", {
@@ -213,8 +213,8 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   test_that("find_yaml_file_path errors when two files found", {
     new_yaml <- paste0(tools::file_path_sans_ext(YAML_TEST_FILE), ".yml")
     fs::file_copy(YAML_TEST_FILE, new_yaml)
+    on.exit({ fs::file_delete(new_yaml) })
     expect_error(find_yaml_file_path(YAML_TEST_FILE), regexp = "Files found at BOTH")
-    fs::file_delete(new_yaml)
   })
 
   test_that("combine_directory_path() builds the expected path .directory", {

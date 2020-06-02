@@ -101,6 +101,8 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
         # get param df with rbabylon::model_summary()
         if (fs::file_exists(file.path(MODEL_DIR, glue("{.mod_id}.yaml")))) fs::file_delete(file.path(MODEL_DIR, glue("{.mod_id}.yaml")))
         .mod <-  rbabylon::new_model(glue("{.mod_id}.yaml"), glue("the {.mod_id} model"))
+        on.exit({ if (fs::file_exists(file.path(MODEL_DIR, glue("{.mod_id}.yaml")))) fs::file_delete(file.path(MODEL_DIR, glue("{.mod_id}.yaml"))) })
+
         .param_df <- .mod %>% rbabylon::model_summary() %>% param_estimates()
         names(.param_df) <- names(.param_df) %>% tolower()
 
@@ -129,9 +131,6 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
         expect_equal(join_df$se, join_df$stderr, tolerance = 0.01)
         expect_equal(join_df$c, join_df$random_effect_sd, tolerance = 0.01)
         expect_equal(join_df$cse, join_df$random_effect_sdse, tolerance = 0.01)
-
-        # cleanup
-        if (fs::file_exists(file.path(MODEL_DIR, glue("{.mod_id}.yaml")))) fs::file_delete(file.path(MODEL_DIR, glue("{.mod_id}.yaml")))
       })
     }
   })

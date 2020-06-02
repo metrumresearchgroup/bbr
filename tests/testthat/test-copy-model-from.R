@@ -12,6 +12,8 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   cleanup()
 
   test_that("copy_from_model creates accurate copy", {
+    on.exit({ cleanup() })
+
     # run copy_model_from
     new_mod <- copy_model_from(YAML_TEST_FILE, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
 
@@ -37,12 +39,12 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     new_mod_str <- ctl_ext(NEW_MOD2) %>% readr::read_file()
     new_desc_pattern <- paste0("\\$PROBLEM ", get_model_id(NEW_MOD2), " ", NEW_DESC, "\n\n\\$INPUT")
     expect_true(grepl(new_desc_pattern, new_mod_str))
-
-    cleanup()
   })
 
 
   test_that("copy_from_model options work", {
+    on.exit({ cleanup() })
+
     # run copy_model_from
     fs::file_copy(YAML_TEST_FILE, paste0(NEW_MOD2, '.yml'))
     copy_model_from(YAML_TEST_FILE,
@@ -69,11 +71,11 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
       stringr::str_extract(orig_mod_str, prob_pattern),
       stringr::str_extract(new_mod_str, prob_pattern)
     )
-
-    cleanup()
   })
 
   test_that("copy_from_model bbi_nonmem_model", {
+    on.exit({ cleanup() })
+
     # run copy_model_from on a model object
     mod1 <- read_model(YAML_TEST_FILE)
     new_yaml_path <- yaml_ext(NEW_MOD2)
@@ -95,12 +97,12 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     new_mod_str <- readr::read_file(new_ctl_path)
     new_desc_pattern <- paste0("\\$PROBLEM ", get_model_id(NEW_MOD2), " ", NEW_DESC, "\n\n\\$INPUT")
     expect_true(grepl(new_desc_pattern, new_mod_str))
-
-    cleanup()
   })
 
 
   test_that("copy_from_model .overwrite=TRUE works", {
+    on.exit({ cleanup() })
+
     # set up model object
     mod1 <- read_model(YAML_TEST_FILE)
     new_yaml_path <- yaml_ext(NEW_MOD2)
@@ -122,11 +124,11 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
     new_desc_pattern <- paste0("\\$PROBLEM ", get_model_id(NEW_MOD2), " ", NEW_DESC, "\n\n\\$INPUT")
     expect_true(grepl(new_desc_pattern, new_mod_str))
-
-    cleanup()
   })
 
   test_that("copy_from_model .overwrite=FALSE works", {
+    on.exit({ cleanup() })
+
     # set up model object
     mod1 <- read_model(YAML_TEST_FILE)
     new_yaml_path <- yaml_ext(NEW_MOD2)
@@ -151,14 +153,14 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
     new_desc_pattern <- paste0("\\$PROBLEM ", get_model_id(NEW_MOD2), " ", NEW_DESC, "\n\n\\$INPUT")
     expect_false(grepl(new_desc_pattern, new_mod_str))
-
-    cleanup()
   })
 }) # closing withr::with_options
 
 
 withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
   test_that("copy_from_model numeric", {
+    on.exit({ cleanup() })
+
     # get integer input and check for related paths
     mod1 <- stringr::str_replace_all(YAML_TEST_FILE, "[^\\d]", "") %>% as.numeric()
     mod2 <- stringr::str_replace_all(NEW_MOD2, "[^\\d]", "") %>% as.numeric()
@@ -183,7 +185,5 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
     new_mod_str <- readr::read_file(new_ctl_path)
     new_desc_pattern <- paste0("\\$PROBLEM ", get_model_id(NEW_MOD2), " ", NEW_DESC, "\n\n\\$INPUT")
     expect_true(grepl(new_desc_pattern, new_mod_str))
-
-    cleanup()
   })
 }) # closing withr::with_options

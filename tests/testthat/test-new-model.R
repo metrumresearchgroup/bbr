@@ -340,6 +340,8 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
     .test_yaml <- 1
     .test_path <- 2
     .cleanup_path <- "model-examples/2.yaml"
+    on.exit({ fs::file_delete(.cleanup_path) })
+
     expect_warning(mod1a <- new_model(
       .yaml_path = .test_path,
       .description = "original acop model",
@@ -372,9 +374,6 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
         expect_equal(mod1a[[k]], mod1b[[k]])
       }
     }
-
-    # clean up tmp file
-    fs::file_delete(.cleanup_path)
   })
 
 }) # closing withr::with_options

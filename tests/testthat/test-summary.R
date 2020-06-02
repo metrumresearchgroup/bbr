@@ -65,6 +65,12 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
   })
 
   test_that("model_summary() fails predictably if it can't find some parts (i.e. model isn't finished)", {
+    on.exit({
+      fs::dir_delete(MOD2_PATH)
+      fs::file_delete(ctl_ext(MOD2_PATH))
+      fs::file_delete(yaml_ext(MOD2_PATH))
+    })
+
     # create new model
     mod2 <- MOD1 %>% copy_model_from(MOD2_PATH, .description = "number 2")
 
@@ -76,14 +82,15 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
 
     # try to run and expect error with NOT_FINISHED_ERR_MSG
     expect_error(model_summary(mod2), regexp = NOT_FINISHED_ERR_MSG)
-
-    # cleanup
-    fs::dir_delete(MOD2_PATH)
-    fs::file_delete(ctl_ext(MOD2_PATH))
-    fs::file_delete(yaml_ext(MOD2_PATH))
   })
 
   test_that("model_summary() fails predictably if no .lst file present", {
+    on.exit({
+      fs::dir_delete(MOD2_PATH)
+      fs::file_delete(ctl_ext(MOD2_PATH))
+      fs::file_delete(yaml_ext(MOD2_PATH))
+    })
+
     # create new model
     mod2 <- MOD1 %>% copy_model_from(MOD2_PATH, .description = "number 2")
 
@@ -95,11 +102,6 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
 
     # try to run and expect error with NOT_FINISHED_ERR_MSG
     expect_error(model_summary(mod2), regexp = NO_LST_ERR_MSG)
-
-    # cleanup
-    fs::dir_delete(MOD2_PATH)
-    fs::file_delete(ctl_ext(MOD2_PATH))
-    fs::file_delete(yaml_ext(MOD2_PATH))
   })
 
 }) # closing withr::with_options
