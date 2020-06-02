@@ -76,7 +76,7 @@ Once `babylon` is installed and initialized, you will need to make `rbabylon` kn
 ```{r bbi_exe_path}
 options(
   'rbabylon.bbi_exe_path' = BBI_EXE_PATH,
-  'rbabylon.model_directory' = MODEL_DIR
+  'rbabylon.model_directory' = normalizePath(MODEL_DIR, mustWork = TRUE)
 )
 ```
 
