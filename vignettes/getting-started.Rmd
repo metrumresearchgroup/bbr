@@ -1,7 +1,6 @@
 ---
 title: "Getting Started with rbabylon"
 author: "Seth Green"
-date: "2020-03-20"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{getting-started}
@@ -18,13 +17,17 @@ knitr::opts_chunk$set(
 
 ```{r cleanup top, include=FALSE}
 # delete old files
-# if feels like I shouldn't need to do this, but R CMD CHECK fails without it
-if (fs::file_exists("../inst/nonmem/1.yaml")) fs::file_delete("../inst/nonmem/1.yaml")
-if (fs::file_exists("../inst/nonmem/2.yaml")) fs::file_delete("../inst/nonmem/2.yaml")
-if (fs::file_exists("../inst/nonmem/3.yaml")) fs::file_delete("../inst/nonmem/3.yaml")
-if (fs::file_exists("../inst/nonmem/2.ctl")) fs::file_delete("../inst/nonmem/2.ctl")
-if (fs::file_exists("../inst/nonmem/3.ctl")) fs::file_delete("../inst/nonmem/3.ctl")
-if (fs::file_exists("../inst/nonmem/babylon.yaml")) fs::file_delete("../inst/nonmem/babylon.yaml")
+cleanup <- function() {
+  if (fs::file_exists("../inst/nonmem/1.yaml")) fs::file_delete("../inst/nonmem/1.yaml")
+  if (fs::file_exists("../inst/nonmem/2.yaml")) fs::file_delete("../inst/nonmem/2.yaml")
+  if (fs::file_exists("../inst/nonmem/3.yaml")) fs::file_delete("../inst/nonmem/3.yaml")
+  if (fs::file_exists("../inst/nonmem/2.ctl")) fs::file_delete("../inst/nonmem/2.ctl")
+  if (fs::file_exists("../inst/nonmem/3.ctl")) fs::file_delete("../inst/nonmem/3.ctl")
+  if (fs::dir_exists("../inst/nonmem/2")) fs::dir_delete("../inst/nonmem/2")
+  if (fs::dir_exists("../inst/nonmem/3")) fs::dir_delete("../inst/nonmem/3")
+  if (fs::file_exists("../inst/nonmem/babylon.yaml")) fs::file_delete("../inst/nonmem/babylon.yaml")
+}
+cleanup()
 ```
 
 # Introduction
@@ -44,6 +47,9 @@ There is also some initial setup to get `rbabylon` configured. First, load the l
 
 ```{r bbi_exe_path}
 library(rbabylon)
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(purrr))
+
 if (Sys.which("bbi") == "") {
   # fall back to default location of /data/apps/bbi
   options('rbabylon.bbi_exe_path' = '/data/apps/bbi')
@@ -78,10 +84,6 @@ mod1 <- new_model(.yaml_path = "1.yaml", .description = "our first model")
 The model object you have just created can be passed to various functions which you will see in a minute. If you ever need to recreate it, just run `mod1 <- read_model("1.yaml")` to rebuild it from the YAML. The first thing we will do is submit the model to be run.
 
 ## Submit Model
-
-```{r submit_model_real, include = FALSE}
-mod1 %>% submit_model(.dry_run = TRUE)
-```
 
 ```{r submit_model_fake, eval = FALSE}
 mod1 %>% submit_model()
@@ -188,8 +190,6 @@ This example code displays a more human-readable version of the run log, with th
 character vector.
 
 ```{r run_log_cleanup} 
-suppressPackageStartupMessages(library(dplyr))
-
 log_df %>% 
   group_by(absolute_model_path) %>% 
   mutate_at(.vars = vars(tags:decisions), 
@@ -204,66 +204,12 @@ This code uses `purrr::map_lgl` to filter the run log to only rows containing a 
 
 ```{r filtering}
 log_df %>% 
-  filter(purrr::map_lgl(tags, ~ "2 compartment" %in% .x)) %>%
+  filter(map_lgl(tags, ~ "2 compartment" %in% .x)) %>%
   select(absolute_model_path, description, tags, decisions)
 ```
 
-## Checking if models are up-to-date with config_log()
-
-When `babylon` runs a model, it creates a file named `bbi_config.json` in the output directory. This file contains a lot of information about the state and configuration at runtime. Notably, it contains an md5 digest of both the model file _and_ the data file at run time. Users can compare this to the _current_ md5 hashes of these two files to check if any model or data files have changed _since the model was last run_. This serves as a check that the outputs are up-to-date with the model and data.
-
-Users can call `config_log` directly, but it is likely more useful to use `run_log() %>% add_config()` to join the two together automatically.
-
-```{r add_config fake prep, include=FALSE}
-# read in original json (which was actually fake a.k.a. copied from somewhere else)
-orig_json <- jsonlite::fromJSON(file.path(getOption("rbabylon.model_directory"), "1", "bbi_config.json"))
-
-# fix data path (just in case)
-orig_json$data_path <- stringr::str_replace(orig_json$data_path, "/data/", "/extdata/")
-
-# copying the outputs from the original run 
-# and setting model md5 to match control stream (remember this "original" is fake)
-for (i in c("1", "2", "3")) {
-  out_dir <- file.path(getOption("rbabylon.model_directory"), i)
-  if (!fs::dir_exists(out_dir)) fs::dir_create(out_dir)
-  new_json <- orig_json
-  new_json$model_md5 <- tools::md5sum(ctl_ext(out_dir))
-  readr::write_file(jsonlite::toJSON(new_json), file.path(out_dir, "bbi_config.json"))
-}
-```
-
-```{r add_config}
-log_df <- run_log() %>% add_config()
-log_df
-```
-
-Then a user can easily check the md5's digests from the config log against those of the current files.
-
-```{r check config md5}
-# extract path to data files and model files
-norm_data_paths <- fs::path_norm(file.path(log_df$absolute_model_path, log_df$data_path))
-norm_model_paths <- get_model_path(log_df)
-
-# get md5 digests and compare to those from config_log() columns
-log_df <- log_df %>% mutate(
-                        current_data_md5  = tools::md5sum(norm_data_paths),
-                        data_md5_match    = .data$data_md5 == .data$current_data_md5,
-                        current_model_md5  = tools::md5sum(norm_model_paths),
-                        model_md5_match   = .data$model_md5 == .data$current_model_md5
-                      )
-
-log_df %>% select(absolute_model_path, data_md5_match, model_md5_match)
-```
 
 ```{r cleanup bottom, include=FALSE}
 # delete old files
-# if feels like I shouldn't need to do this, but R CMD CHECK fails without it
-if (fs::file_exists("../inst/nonmem/1.yaml")) fs::file_delete("../inst/nonmem/1.yaml")
-if (fs::file_exists("../inst/nonmem/2.yaml")) fs::file_delete("../inst/nonmem/2.yaml")
-if (fs::file_exists("../inst/nonmem/3.yaml")) fs::file_delete("../inst/nonmem/3.yaml")
-if (fs::file_exists("../inst/nonmem/2.ctl")) fs::file_delete("../inst/nonmem/2.ctl")
-if (fs::file_exists("../inst/nonmem/3.ctl")) fs::file_delete("../inst/nonmem/3.ctl")
-if (fs::dir_exists("../inst/nonmem/2")) fs::dir_delete("../inst/nonmem/2")
-if (fs::dir_exists("../inst/nonmem/3")) fs::dir_delete("../inst/nonmem/3")
-if (fs::file_exists("../inst/nonmem/babylon.yaml")) fs::file_delete("../inst/nonmem/babylon.yaml")
+cleanup()
 ```

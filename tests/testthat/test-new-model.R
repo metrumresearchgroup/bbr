@@ -93,6 +93,40 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
 
+  test_that("new_model() .based_on arg works", {
+    # create new model with args
+    .test_path <- "model-examples/tmp.yaml"
+
+    suppressSpecificWarning({
+      mod1a <- new_model(
+        .yaml_path = .test_path,
+        .description = "original acop model",
+        .based_on = "1"
+      )
+    }, "No model file found at.+\\.ctl")
+
+    expect_equal(mod1a[[YAML_BASED_ON]], "1")
+
+    # clean up tmp file
+    fs::file_delete(.test_path)
+  })
+
+  test_that("new_model() .based_on arg errors on fake model", {
+    # create new model with args
+    .test_path <- "model-examples/tmp.yaml"
+
+    expect_error(
+      suppressSpecificWarning({
+        mod1a <- new_model(
+          .yaml_path = .test_path,
+          .description = "original acop model",
+          .based_on = c("1", "fake")
+        )
+      }, "No model file found at.+\\.ctl")
+      , regexp = "cannot find .yaml or .yml files"
+    )
+  })
+
   test_that("save_model_yaml() saves to correct default path", {
     # make a new yaml
     new_yaml <- yaml_ext(NEW_MOD2)

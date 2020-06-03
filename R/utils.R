@@ -260,15 +260,33 @@ set_model_directory <- function(.path) {
 
 strict_mode_error <- function(err_msg) {
   if (isTRUE(getOption("rbabylon.strict"))) {
-    stop(err_msg)
+    stop(err_msg, call. = FALSE)
   } else {
     warning(paste(
       "The following error is being ignored because `options('rbabylon.strict')` is not set to TRUE.",
       "Consider setting `options('rbabylon.strict' = TRUE)` if you experience issues.",
       err_msg
-    ))
+    ), call. = FALSE)
   }
 }
+
+#' Build error message and throw error for passing character vector to get_... functions
+#' @param .len The length of the vector that was passed.
+stop_get_scaler_msg <- function(.len) {
+  stop(paste(
+    glue("When passing character input to `rbabylon::get_...` functions, only scaler values are permitted. A vector of length {.len} was passed."),
+    "Consider instead passing the tibble output from `run_log()`, or iterating with something like `purrr::map(your_vector, ~ get_...(.x)`"
+  ))
+}
+
+#' Build error message and throw error for generic failure fo get_... functions
+#' @param .bbi_object The object that something is attempting to be extracted from
+#' @param .key The name of the field that is attempting to be extracted
+#' @param .msg Character scaler or vector of more specific error messages to include at the end
+stop_get_fail_msg <- function(.bbi_object, .key, .msg = "") {
+  stop(glue("Cannot extract `{.key}` from object of class `{paste(class(.bbi_object), collapse = ', ')}` :\n{paste(.msg, collapse = ', ')}"), call. = FALSE)
+}
+
 
 #' Suppress a warning that matches `.regexpr`
 #' @importFrom stringr str_detect
