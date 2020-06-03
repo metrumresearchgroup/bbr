@@ -48,7 +48,7 @@ new_model <- function(
   .mod[[YAML_DESCRIPTION]] <- .description
   .mod[[YAML_MOD_TYPE]] <- .model_type
   if (!is.null(.model_path)) .mod[[YAML_MOD_PATH]] <- .model_path
-  if (!is.null(.based_on)) .mod[[YAML_BASED_ON]] <- check_based_on(.mod[[WORKING_DIR]], .based_on)
+  if (!is.null(.based_on)) .mod[[YAML_BASED_ON]] <- safe_based_on(.mod[[WORKING_DIR]], .based_on)
   if (!is.null(.tags)) .mod[[YAML_TAGS]] <- .tags
   if (!is.null(.bbi_args)) .mod[[YAML_BBI_ARGS]] <- .bbi_args
 
