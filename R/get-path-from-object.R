@@ -61,7 +61,7 @@ get_path_from_object.default <- function(.bbi_object, .key, .check_exists = TRUE
 get_path_from_object.character <- function(.bbi_object, .key, .check_exists = TRUE) {
 
   if (length(.bbi_object) > 1) {
-    stop_scaler_get_msg(length(.bbi_object))
+    stop_get_scaler_msg(length(.bbi_object))
   }
 
   .bbi_object <- tryCatch(

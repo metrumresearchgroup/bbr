@@ -56,7 +56,7 @@ get_based_on.default <- function(.bbi_object, .check_exists = FALSE) {
 get_based_on.character <- function(.bbi_object, .check_exists = FALSE) {
 
   if (length(.bbi_object) > 1) {
-    stop_scaler_get_msg(length(.bbi_object))
+    stop_get_scaler_msg(length(.bbi_object))
   }
 
   .bbi_object <- tryCatch(
