@@ -40,7 +40,7 @@ get_based_on.default <- function(.bbi_object, .check_exists = FALSE) {
   # optionally check if they exist
   if (isTRUE(.check_exists)) {
     tryCatch({
-      invisible(check_based_on(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_BASED_ON]]))
+      invisible(safe_based_on(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_BASED_ON]]))
     }, error = function(e) {
       stop_with_msg(e$message)
     })
