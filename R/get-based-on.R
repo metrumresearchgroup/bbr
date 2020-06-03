@@ -21,31 +21,33 @@ get_based_on <- function(.bbi_object, .check_exists = FALSE) {
 #' @rdname get_based_on
 #' @export
 get_based_on.default <- function(.bbi_object, .check_exists = FALSE) {
-  tryCatch(
-    {
-      # do some QA on the required WORKING_DIR field
-      if (is.null(.bbi_object[[WORKING_DIR]])) {
-        stop(glue(".bbi_object must contain key for `{WORKING_DIR}` but has only the following keys: {paste(names(.bbi_object), collapse = ', ')}"), call. = FALSE)
-      }
 
-      # if no based_on field, return NULL
-      if (is.null(.bbi_object[[YAML_BASED_ON]])) {
-        return(invisible())
-      }
+  stop_with_msg <- function(.x) {
+    stop(glue("Cannot extract `{YAML_BASED_ON}` from object of class `{paste(class(.bbi_object), collapse = ', ')}` :\n{.x}"), call. = FALSE)
+  }
 
-      # optionally check if they exist
-      if (isTRUE(.check_exists)) {
-        invisible(check_based_on(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_BASED_ON]]))
-      }
 
-      # extract the requested paths
-      return(as.character(fs::path_norm(file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_BASED_ON]]))))
+  # do some QA on the required WORKING_DIR field
+  if (is.null(.bbi_object[[WORKING_DIR]])) {
+    stop_with_msg(glue(".bbi_object must contain key for `{WORKING_DIR}` but has only the following keys: {paste(names(.bbi_object), collapse = ', ')}"))
+  }
 
-    },
-    error = function(e) {
-      stop(glue("Cannot extract `{YAML_BASED_ON}` from object of class `{paste(class(.bbi_object), collapse = ', ')}` :\n{paste(e, collapse = '\n')}"), call. = FALSE)
-    }
-  )
+  # if no based_on field, return NULL
+  if (is.null(.bbi_object[[YAML_BASED_ON]])) {
+    return(NULL)
+  }
+
+  # optionally check if they exist
+  if (isTRUE(.check_exists)) {
+    tryCatch({
+      invisible(check_based_on(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_BASED_ON]]))
+    }, error = function(e) {
+      stop_with_msg(e$message)
+    })
+  }
+
+  # extract the requested paths
+  return(as.character(fs::path_norm(file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_BASED_ON]]))))
 }
 
 
