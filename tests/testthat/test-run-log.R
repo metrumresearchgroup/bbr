@@ -43,6 +43,23 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
 
+  test_that("run_log() works with both yaml and yml", {
+    fake_yml <- stringr::str_replace(YAML_TEST_FILE, "1.yaml", "4.yml")
+    fs::file_copy(YAML_TEST_FILE, fake_yml)
+
+    log_df <- suppressSpecificWarning({
+      run_log(MODEL_DIR)
+    }, .regexpr = "No model file found")
+
+    expect_equal(nrow(log_df), 4)
+    expect_equal(ncol(log_df), 8)
+    expect_identical(basename(log_df[[ABS_MOD_PATH]]), c("1", "2", "3", "4"))
+    expect_identical(log_df$yaml_md5, c("ee5a30a015c4e09bc29334188ff28b58", "5576ed6fa6e1e4e9b0c25dbf62ae42e5", "ebadcc4a3c0f4d16f61251605136942b", "ee5a30a015c4e09bc29334188ff28b58"))
+
+    fs::file_delete(fake_yml)
+
+  })
+
   ##########################################
   # testing hierarchical nested directories
   ##########################################

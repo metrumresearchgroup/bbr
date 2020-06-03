@@ -122,7 +122,7 @@ get_model_ancestry.default <- function(.bbi_object) {
           get_based_on(.p)
         },
         error = function(e) {
-          if (str_detect(e$message, "read_model.+found no YAML")) {
+          if (str_detect(e$message, FIND_YAML_ERR_MSG)) {
             stop(glue("Found {.p} in get_model_ancestry() tree, but could not find a YAML file for that model."), call. = FALSE)
           }
           stop(e$message)

@@ -211,7 +211,14 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
   test_that("find_yaml_file_path errors when no file found", {
-    expect_error(find_yaml_file_path(NEW_MOD2), regexp = "No file found at")
+    expect_error(find_yaml_file_path(NEW_MOD2), regexp = FIND_YAML_ERR_MSG)
+  })
+
+  test_that("find_yaml_file_path errors when two files found", {
+    new_yaml <- paste0(tools::file_path_sans_ext(YAML_TEST_FILE), ".yml")
+    fs::file_copy(YAML_TEST_FILE, new_yaml)
+    expect_error(find_yaml_file_path(YAML_TEST_FILE), regexp = "Files found at BOTH")
+    fs::file_delete(new_yaml)
   })
 
   test_that("combine_directory_path() builds the expected path .directory", {

@@ -70,7 +70,7 @@ copy_nonmem_model_from(
 \arguments{
 \item{.parent_mod}{S3 object of class `bbi_nonmem_model` to be used as the basis for copy.}
 
-\item{.new_model}{Path to write new model files to WITHOUT FILE EXTENSION. Function will create both `{.new_model}.yaml` and `{.new_model}.[mod|ctl]` based on this path.}
+\item{.new_model}{Integer that corresponds to the new model name to create. Function will create both `{.new_model}.yaml` and a new model file based on this path.}
 
 \item{.description}{Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.}
 
@@ -78,11 +78,11 @@ copy_nonmem_model_from(
 
 \item{.add_tags}{A character scaler or vector with any new tags to be added to `{.new_model}.yaml`}
 
-\item{.inherit_tags}{Boolean for whether to inherit any tags from `.parent_model.yaml`}
+\item{.inherit_tags}{Boolean for whether to inherit any tags from `.parent_mod`}
 
 \item{.update_model_file}{Boolean for whether to update the `$PROBLEM` line in the new control stream. By default it is TRUE, but if FALSE is passed `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.}
 
-\item{.overwrite}{Boolean for whether to overwrite .ctl or .mod file if one already exists at `{.new_model}.[mod|ctl]`}
+\item{.overwrite}{Boolean for whether to overwrite model file if one already exists specified `.new_model` path}
 
 \item{.directory}{Model directory which BOTH `.parent_model` and `.new_model` are relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
 }

@@ -152,9 +152,6 @@ mod_ext <- function(.x) {
 #' @rdname new_ext
 #' @export
 yaml_ext <- function(.x) {
-  if (tools::file_ext(.x) == "yml") {
-    return(.x)
-  }
   sprintf("%s.yaml", tools::file_path_sans_ext(.x))
 }
 
@@ -162,9 +159,6 @@ yaml_ext <- function(.x) {
 #' @rdname new_ext
 #' @export
 yml_ext <- function(.x) {
-  if (tools::file_ext(.x) == "yaml") {
-    return(.x)
-  }
   sprintf("%s.yml", tools::file_path_sans_ext(.x))
 }
 
@@ -243,19 +237,23 @@ find_model_file_path <- function(.path) {
 }
 
 
-#' helper to find valid yaml file and return ctl_ext(.path) by default if not found
-#' @param .path File path to a NONMEM model file (control stream) with either `.ctl` or `.mod` extension
+#' helper to find valid yaml file
+#' @param .path File path with any extension or no extension.
+#' Function will search for that path with either a .yaml or .yml extension and error if neither is found.
+#' Will also error if _both_ are found, because there cannot be two YAML files referring to the same model.
 find_yaml_file_path <- function(.path) {
   .yml_path <- yml_ext(.path)
   .yaml_path <- yaml_ext(.path)
-  if(fs::file_exists(.yaml_path)) {
-    return(.yaml_path)
-  } else if(fs::file_exists(.yml_path)) {
-    return(.yml_path)
-  } else {
-    #warning(glue("No model file found at {.ctl_path} but setting that path as default model path for {.path}. Please put relevant model file in that location."))
-    #return(.ctl_path)
+
+  .yaml_bool <- fs::file_exists(unique(c(.yml_path, .yaml_path)))
+
+  if (length(.yaml_bool) == 2 && all(.yaml_bool)) {
+    stop(glue("Files found at BOTH {.yml_path} AND {.yaml_path}. Cannot have two YAML files for a single model. Please confirm which is correct and delete the other."))
+  } else if(!any(.yaml_bool)) {
     stop(glue("No file found at {.yml_path} OR {.yaml_path}"))
   }
+
+  return(names(which(.yaml_bool)))
+
 }
 

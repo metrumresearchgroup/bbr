@@ -31,6 +31,42 @@ MOD2_ABS_PATH <- file.path(getwd(), NEW_MOD2)
 MOD3_ABS_PATH <- file.path(getwd(), NEW_MOD3)
 MOD4_ABS_PATH <- file.path(getwd(), LEVEL2_MOD)
 
+
+# model refs
+
+REF_LIST_1 <- list(
+  description = ORIG_DESC,
+  model_type = "nonmem",
+  tags = ORIG_TAGS,
+  bbi_args = list(
+    overwrite = TRUE,
+    threads = 4L),
+  model_working_dir = file.path(getwd(), "model-examples"),
+  orig_yaml_file ="1.yaml",
+  yaml_md5 = "ee5a30a015c4e09bc29334188ff28b58",
+  model_path = "1.ctl",
+  output_dir = "1"
+)
+class(REF_LIST_1) <- MODEL_CLASS_LIST
+
+
+REF_LIST_TMP <- list(
+  description = ORIG_DESC,
+  model_type = "nonmem",
+  tags = ORIG_TAGS,
+  bbi_args = list(
+    overwrite = TRUE,
+    threads = 4L),
+  model_working_dir = file.path(getwd(), "model-examples"),
+  orig_yaml_file ="tmp.yml",
+  yaml_md5 = "ee5a30a015c4e09bc29334188ff28b58",
+  model_path = "tmp.ctl",
+  output_dir = "tmp"
+)
+class(REF_LIST_TMP) <- MODEL_CLASS_LIST
+
+# test helper functions
+
 create_all_models <- function() {
   mod1 <- read_model(YAML_TEST_FILE)
   mod2 <- copy_model_from(mod1, NEW_MOD2,   "level 1 copy of 1")
