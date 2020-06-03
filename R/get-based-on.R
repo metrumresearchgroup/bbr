@@ -22,14 +22,13 @@ get_based_on <- function(.bbi_object, .check_exists = FALSE) {
 #' @export
 get_based_on.default <- function(.bbi_object, .check_exists = FALSE) {
 
-  stop_with_msg <- function(.x) {
-    stop(glue("Cannot extract `{YAML_BASED_ON}` from object of class `{paste(class(.bbi_object), collapse = ', ')}` :\n{.x}"), call. = FALSE)
-  }
-
-
   # do some QA on the required WORKING_DIR field
   if (is.null(.bbi_object[[WORKING_DIR]])) {
-    stop_with_msg(glue(".bbi_object must contain key for `{WORKING_DIR}` but has only the following keys: {paste(names(.bbi_object), collapse = ', ')}"))
+    stop_get_fail_msg(
+      .bbi_object,
+      YAML_BASED_ON,
+      glue(".bbi_object must contain key for `{WORKING_DIR}` but has only the following keys: {paste(names(.bbi_object), collapse = ', ')}")
+    )
   }
 
   # if no based_on field, return NULL
@@ -42,7 +41,7 @@ get_based_on.default <- function(.bbi_object, .check_exists = FALSE) {
     tryCatch({
       invisible(safe_based_on(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_BASED_ON]]))
     }, error = function(e) {
-      stop_with_msg(e$message)
+      stop_get_fail_msg(.bbi_object, YAML_BASED_ON, e$message)
     })
   }
 
@@ -56,6 +55,10 @@ get_based_on.default <- function(.bbi_object, .check_exists = FALSE) {
 #' @export
 get_based_on.character <- function(.bbi_object, .check_exists = FALSE) {
 
+  if (length(.bbi_object) > 1) {
+    stop_scaler_get_msg(length(.bbi_object))
+  }
+
   .bbi_object <- tryCatch(
     {
       read_model(.bbi_object)
@@ -65,7 +68,9 @@ get_based_on.character <- function(.bbi_object, .check_exists = FALSE) {
     }
   )
 
-  return(get_based_on(.bbi_object, .check_exists = .check_exists))
+  .out_paths <- get_based_on(.bbi_object, .check_exists = .check_exists)
+
+  return(.out_paths)
 }
 
 

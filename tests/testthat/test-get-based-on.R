@@ -22,6 +22,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     cleanup()
   })
 
+  test_that("get_based_on.character() fails with vector", {
+    expect_error(get_based_on(c("naw", "dawg")), regexp = "only scaler values are permitted")
+  })
+
   test_that("get_based_on works happy path run_log tibble" , {
     create_all_models()
     mod3 <- mod3 %>% add_based_on("2")

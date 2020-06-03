@@ -22,24 +22,32 @@ get_path_from_object <- function(.bbi_object, .key, .check_exists = TRUE) {
 #' @export
 get_path_from_object.default <- function(.bbi_object, .key, .check_exists = TRUE) {
 
-  stop_with_msg <- function(.x) {
-    stop(glue("Cannot extract `{.key}` from object of class `{paste(class(.bbi_object), collapse = ', ')}` :\n{.x}"), call. = FALSE)
-  }
-
   # do some QA on the required fields
   if (any(map_lgl(c(WORKING_DIR, .key), ~ is.null(.bbi_object[[.x]])))) {
-    stop_with_msg(glue(".bbi_object must contain keys for both `{WORKING_DIR}` and `{.key}`` but has only the following keys: {paste(names(.bbi_object), collapse = ', ')}"))
+    stop_get_fail_msg(
+      .bbi_object,
+      .key,
+      glue(".bbi_object must contain keys for both `{WORKING_DIR}` and `{.key}` but has only the following keys: {paste(names(.bbi_object), collapse = ', ')}")
+    )
   }
 
   if (length(.bbi_object[[.key]]) > 1) {
-    stop_with_msg(glue("Expected a scaler value for `.bbi_object[['{.key}']]` but instead got {class(.bbi_object[[.key]])[1]} of length {length(.bbi_object[[.key]])}"))
+    stop_get_fail_msg(
+      .bbi_object,
+      .key,
+      glue("Expected a scaler value for `.bbi_object[['{.key}']]` but instead got {class(.bbi_object[[.key]])[1]} of length {length(.bbi_object[[.key]])}")
+    )
   }
 
   # extract the requested path and optionally check if it exists
   .path <- file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[.key]])
 
   if (isTRUE(.check_exists) && !fs::file_exists(.path)) {
-    stop_with_msg(glue("Extracted path `{.path}` but nothing exists at that location. (If this is expected, pass `.check_exists = FALSE` to bypass this error.)"))
+    stop_get_fail_msg(
+      .bbi_object,
+      .key,
+      glue("Extracted path `{.path}` but nothing exists at that location. (If this is expected, pass `.check_exists = FALSE` to bypass this error.)")
+    )
   }
 
   return(.path)
@@ -51,6 +59,10 @@ get_path_from_object.default <- function(.bbi_object, .key, .check_exists = TRUE
 #' @param .bbi_object Character scaler of a path to a model that can be loaded with `read_model(.bbi_object)`
 #' @export
 get_path_from_object.character <- function(.bbi_object, .key, .check_exists = TRUE) {
+
+  if (length(.bbi_object) > 1) {
+    stop_scaler_get_msg(length(.bbi_object))
+  }
 
   .bbi_object <- tryCatch(
     {
