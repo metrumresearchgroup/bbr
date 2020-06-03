@@ -138,6 +138,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     cleanup()
   })
 
+  test_that("get_model_ancestry.character() fails with vector", {
+    expect_error(get_model_ancestry(c("naw", "dawg")), regexp = "only scaler values are permitted")
+  })
+
   test_that("get_model_ancestry works happy path run_log tibble" , {
     create_all_models()
     mod3 <- mod3 %>% add_based_on("2")

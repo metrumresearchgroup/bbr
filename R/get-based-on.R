@@ -149,6 +149,10 @@ get_model_ancestry.default <- function(.bbi_object) {
 #' @export
 get_model_ancestry.character <- function(.bbi_object) {
 
+  if (length(.bbi_object) > 1) {
+    stop_get_scaler_msg(length(.bbi_object))
+  }
+
   .bbi_object <- tryCatch(
     {
       read_model(.bbi_object)
@@ -168,8 +172,41 @@ get_model_ancestry.character <- function(.bbi_object) {
 #' @export
 get_model_ancestry.bbi_run_log_df <- function(.bbi_object) {
 
-  .out_paths <- map(.bbi_object[[ABS_MOD_PATH]], function(.path) {
-    get_model_ancestry(.path)
+  # create key-value for a get_based_on of all models in df
+  .all_mods <- .bbi_object[[ABS_MOD_PATH]]
+  .based_on_list <- map(.all_mods, function(.path) {
+    get_based_on(.path, .check_exists = FALSE)
+  })
+
+  names(.based_on_list) <- .all_mods
+
+  # iterate over models and recursively look up ancestors in .based_on_list
+  .out_paths <- map(.all_mods, function(.m) {
+    .checked <- c()
+    .to_check <- .based_on_list[[.m]]
+    .results <- .to_check
+
+    while(length(.to_check) > 0) {
+      # record this round of models as being checked
+      .checked <- c(.checked, .to_check)
+
+      # get based_on for this round of models
+      .this_res <- map(.to_check, function(.p) {
+        if(!(.p %in% .all_mods)) {
+          stop(glue("Found {.p} in get_model_ancestry() tree, but could not find a YAML file for that model."), call. = FALSE)
+        }
+        return(.based_on_list[[.p]])
+      })
+      .this_res <- unique(unlist(.this_res))
+
+      # add to results
+      .results <- unique(c(.results, .this_res))
+
+      # see if there are any we haven't checked yet
+      .to_check <- .this_res[!(.this_res %in% .checked)]
+    }
+
+    return(sort(.results))
   })
 
   return(.out_paths)
