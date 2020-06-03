@@ -299,29 +299,6 @@ submit_models.character <- function(
   # check for .directory and combine with .mods
   .mods <- map_chr(.mods, function(.mod) { combine_directory_path(.directory, .mod) })
 
-  ## parse type of file passed and create list of model objects
-
-  # check that all the same type of file was passed
-  all_ext <- tools::file_ext(.mods) %>% unique()
-
-  if (length(all_ext) != 1) {
-    # .yaml and .yml OR .mod and .ctl can coexist, but otherwise must all be the same.
-    if (length(all_ext) == 2 && sort(all_ext) == c("yaml", "yml")) {
-      .pass <- TRUE
-    } else if (length(all_ext) == 2 && sort(all_ext) == c("ctl", "mod")) {
-      .pass <- TRUE
-    } else {
-      .pass <- FALSE
-    }
-    if (isFALSE(.pass)) {
-      stop(paste(
-        "If passing character vector to submit_models(), must pass all the same type of file.",
-        glue("Got files with {length(all_ext)} different extensions: {paste(all_ext, collapse=', ')}"),
-        sep = " "
-      ))
-    }
-  }
-
   # attempt to load model objects
   .mods <- map(.mods, function(.mod) {
     if (!(is_valid_yaml_extension(.mod) || is_valid_nonmem_extension(.mod) || tools::file_ext(.mod) == "")) {
@@ -332,34 +309,14 @@ submit_models.character <- function(
     read_model(.mod)
   })
 
-
-
-
-  # extract model type, and check that they are all the same type
-  all_model_types <- map(.mods, function(.x) { .x[[YAML_MOD_TYPE]] })
-  uniq_model_types <- all_model_types %>% unlist() %>% unique()
-  if (length(uniq_model_types) != 1) {
-    stop(paste(
-      glue("Passed vector `.mods` must contain all the same type of models, but found {length(uniq_model_types)} different classes of model:"),
-      paste(uniq_model_types, collapse = ", ")
-    ))
-  }
-  .model_type <- uniq_model_types
-
   # pass to submit_models.list
-  if (.model_type == "nonmem") {
-    res_list <- submit_models(.mods,
-                               .bbi_args = .bbi_args,
-                               .mode = .mode,
-                               ...,
-                               .config_path = .config_path,
-                               .wait = .wait,
-                               .dry_run = .dry_run)
-  } else if (.model_type == "stan") {
-    stop(NO_STAN_ERR_MSG)
-  } else {
-    stop(glue("Passed `{.model_type}`. Valid options: `{paste(SUPPORTED_MOD_TYPES, collapse = ', ')}`"))
-  }
+  res_list <- submit_models(.mods,
+                            .bbi_args = .bbi_args,
+                            .mode = .mode,
+                            ...,
+                            .config_path = .config_path,
+                            .wait = .wait,
+                            .dry_run = .dry_run)
   return(res_list)
 }
 

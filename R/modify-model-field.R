@@ -100,7 +100,7 @@ replace_decisions <- function(.mod, .decisions) {
 add_based_on <- function(.mod, .based_on) {
   .mod <- modify_model_field(.mod = .mod,
                              .field = YAML_BASED_ON,
-                             .value = check_based_on(.mod[[WORKING_DIR]], .based_on),
+                             .value = safe_based_on(.mod[[WORKING_DIR]], .based_on),
                              .append = TRUE)
   return(.mod)
 }
@@ -113,7 +113,7 @@ add_based_on <- function(.mod, .based_on) {
 replace_based_on <- function(.mod, .based_on) {
   .mod <- modify_model_field(.mod = .mod,
                              .field = YAML_BASED_ON,
-                             .value = check_based_on(.mod[[WORKING_DIR]], .based_on),
+                             .value = safe_based_on(.mod[[WORKING_DIR]], .based_on),
                              .append = FALSE)
   return(.mod)
 }
@@ -193,7 +193,7 @@ replace_bbi_args <- function(.mod, .bbi_args) {
 #' @importFrom purrr map_lgl
 #' @param .start The directory of the model (i.e. the YAML file) that the `based_on` will be added to.
 #' @param .based_on Character vector or scaler of paths (with or without extension) to the models that will be added to `based_on`. Paths should be relative to `.start` argument.
-check_based_on <- function(.start, .based_on) {
+safe_based_on <- function(.start, .based_on) {
   # make all input paths relative to .start
   .based_on <- map_chr(.based_on, function(.p) {
     if (fs::is_absolute_path(.p)) {

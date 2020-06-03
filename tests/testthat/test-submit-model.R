@@ -293,6 +293,41 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
             })
 
 
+  test_that("submit_models(.dry_run=T) with character mixed extensions",
+            {
+              # read first model
+              mod1 <- read_model(1)
+
+              on.exit({
+                for (m in c("2", "3")) {
+                  m <- file.path(MODEL_DIR, m)
+                  if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
+                  if (fs::file_exists(yml_ext(m))) fs::file_delete(yml_ext(m))
+                  if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
+                }
+              })
+
+              # copy to two new models
+              mod2 <- copy_model_from(1, 2, "naw")
+              mod3 <- copy_model_from(1, 3, "naw")
+
+              # rename one to yml
+              fs::file_move(get_yaml_path(mod3), yml_ext(get_yaml_path(mod3)))
+
+              # try with mixed extensions
+              proc_list <- submit_models(c("1.yaml", "2.ctl", "3.yml"), .dry_run = T)
+
+              # check that there is only one distinct arg set
+              expect_equal(length(proc_list), 1)
+
+              # check call
+              expect_identical(
+                proc_list[[1]][[PROC_CALL]],
+                as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {MODEL_FILE} 2.ctl 3.ctl --overwrite --threads=4"))
+              )
+            })
+
+
 }) # closing withr::with_options
 
 

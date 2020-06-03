@@ -22,6 +22,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_identical(get_path_from_object(.mod_path , YAML_MOD_PATH), normalizePath(CTL_TEST_FILE))
   })
 
+  test_that("get_path_from_object.character() fails with vector", {
+    expect_error(get_path_from_object(c("naw", "dawg") , YAML_MOD_PATH), regexp = "only scaler values are permitted")
+  })
+
   test_that("get_path_from_object.character() .check_exists works", {
     # copy YAML but _not_ model file
     YAML2 <- stringr::str_replace(YAML_TEST_FILE, "/1\\.", "/2.")

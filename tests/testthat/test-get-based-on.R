@@ -22,6 +22,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_identical(get_based_on(NEW_MOD2), MOD1_ABS_PATH)
   })
 
+  test_that("get_based_on.character() fails with vector", {
+    expect_error(get_based_on(c("naw", "dawg")), regexp = "only scaler values are permitted")
+  })
+
   test_that("get_based_on works happy path run_log tibble" , {
     on.exit({ cleanup() })
     create_all_models()
@@ -131,6 +135,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
       get_model_ancestry(LEVEL2_MOD),
       c(MOD1_ABS_PATH, MOD2_ABS_PATH)
     )
+  })
+
+  test_that("get_model_ancestry.character() fails with vector", {
+    expect_error(get_model_ancestry(c("naw", "dawg")), regexp = "only scaler values are permitted")
   })
 
   test_that("get_model_ancestry works happy path run_log tibble" , {
