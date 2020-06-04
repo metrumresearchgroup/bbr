@@ -4,7 +4,7 @@
 \alias{config_log}
 \title{Parses model config.json outputs into a log tibble}
 \usage{
-config_log(.base_dir = getOption("rbabylon.model_directory"), .recurse = TRUE)
+config_log(.base_dir = get_model_directory(), .recurse = TRUE)
 }
 \arguments{
 \item{.base_dir}{Base directory to look from model YAML files in}

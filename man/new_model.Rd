@@ -13,7 +13,7 @@ new_model(
   .tags = NULL,
   .bbi_args = NULL,
   .model_type = c("nonmem"),
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 )
 }
 \arguments{

@@ -4,7 +4,7 @@
 \alias{read_model}
 \title{Creates a model object from a YAML model file}
 \usage{
-read_model(.path, .directory = getOption("rbabylon.model_directory"))
+read_model(.path, .directory = get_model_directory())
 }
 \arguments{
 \item{.path}{Path to the YAML file to parse. MUST be either an absolute path, or a path relative to the `.directory` argument.}

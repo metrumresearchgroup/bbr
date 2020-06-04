@@ -32,7 +32,7 @@ model_summary(
   .bbi_args = NULL,
   ...,
   .dry_run = FALSE,
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 )
 
 \method{model_summary}{numeric}(
@@ -41,7 +41,7 @@ model_summary(
   .bbi_args = NULL,
   ...,
   .dry_run = FALSE,
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 )
 
 nonmem_summary(.mod, .bbi_args = NULL, ..., .dry_run = FALSE)
