@@ -260,7 +260,7 @@ set_model_directory <- function(.path) {
 #' This is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
 #' once this is set, those functions can take a path relative to this directory instead of the working/script directory.
 #' @param .path Path, either from working directory or absolute, that will be set as `options('rbabylon.model_directory')`
-#' @rdname model_directory
+#' @rdname set_model_directory
 #' @export
 set_model_directory <- function(.path) {
   if (is.null(.path)) {
@@ -277,7 +277,7 @@ set_model_directory <- function(.path) {
 #' Gets the path set to `options('rbabylon.model_directory')` and checks that it is both absolute and exists.
 #' This path is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
 #' once this is set, those functions can take a path relative to this directory instead of the working/script directory.
-#' @rdname model_directory
+#' @rdname set_model_directory
 #' @importFrom fs is_absolute_path dir_exists
 #' @export
 get_model_directory <- function() {
