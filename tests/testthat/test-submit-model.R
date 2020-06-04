@@ -151,6 +151,8 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
               })
             })
 
+  fs::file_delete("babylon.yaml")
+
 }) # closing withr::with_options
 
 

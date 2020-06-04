@@ -308,22 +308,27 @@ get_model_directory <- function() {
 #' @param .config_path Path to config, possibly relative
 #' @param .model_dir absolute path to directory where model is be run from
 #' @importFrom fs is_file file_exists is_absolute_path
+#' @importFrom stringr str_detect
 #' @return path to babylon.yaml in `.config_path`, relative to `.model_dir`
 find_config_file_path <- function(.config_path, .model_dir) {
   if (!fs::is_absolute_path(.model_dir)) {
     stop(glue("USER SHOULDN'T SEE THIS ERROR: find_config_file_path(.model_dir) is not absolute: {.model_dir}"))
   }
 
-  .config_path <- normalizePath(.config_path)
-
   # if passed a directory, add babylon.yaml
   if (!is_valid_yaml_extension(.config_path)) {
     .config_path <- file.path(.config_path, "babylon.yaml")
   }
 
-  if (!fs::file_exists(.config_path)) {
-    stop(glue("No babylon.yaml file exists at {.config_path} -- Either use `bbi_init('model/dir/')` to create one, or pass a valid path to the `.config_path` argument of `submit_model()`"))
-  }
+  .config_path <- tryCatch({
+    normalizePath(.config_path, mustWork = TRUE)
+  },
+  error = function(e) {
+    if (str_detect(e$message, "No such file or directory")) {
+      stop(glue("No babylon.yaml file exists at {.config_path} -- Either use `bbi_init('model/dir/')` to create one, or pass a valid path to the `.config_path` argument of `submit_model()`"))
+    }
+    stop(e$message)
+  })
 
   .config_path <- fs::path_rel(.config_path, .model_dir)
   return(.config_path)

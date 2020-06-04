@@ -84,8 +84,6 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
     })
   }
 
-  on.exit({ fs::file_delete(bbi_yaml) })
-
   for (.test_case in .TEST_CASES_WD) {
     test_that(paste(glue::glue("summary call is the same using rbabylon.model_directory = '{MODEL_DIR}'"), .test_case$test_wd, if(isTRUE(.test_case$change_midstream)) "change_midstream"), {
       withr::with_dir(.test_case$test_wd, {
@@ -116,6 +114,8 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
       })
     })
   }
+
+  fs::file_delete(bbi_yaml)
 
 }) # closing withr::with_options
 
@@ -228,8 +228,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
       })
     })
   }
-
-  fs::file_delete("babylon.yaml")
 
 }) # closing withr::with_options
 
