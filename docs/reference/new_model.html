@@ -72,7 +72,7 @@ Also creates necessary YAML file for using functions like `add_tags()` and `run_
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.0.8000</span>
       </span>
     </div>
 
@@ -99,6 +99,9 @@ Also creates necessary YAML file for using functions like `add_tags()` and `run_
     </li>
     <li>
       <a href="../articles/parameter-labels.html">rbabylon Parameter Labels</a>
+    </li>
+    <li>
+      <a href="../articles/using-based-on.html">Using the based_on field</a>
     </li>
   </ul>
 </li>
@@ -154,7 +157,7 @@ Also creates necessary YAML file for using functions like `add_tags()` and `run_
     </tr>
     <tr>
       <th>.description</th>
-      <td><p>Description of new model run. This will be stored in the yaml (to be used later in `run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.</p></td>
+      <td><p>Description of new model run. This will be stored in the yaml (and can be viewed later in `run_log()`). By convention, it should match the $PROBLEM statement in the control stream, but this is not enforced.</p></td>
     </tr>
     <tr>
       <th>.model_path</th>
@@ -162,7 +165,7 @@ Also creates necessary YAML file for using functions like `add_tags()` and `run_
     </tr>
     <tr>
       <th>.based_on</th>
-      <td><p>A character scaler or vector of run id's (model names) that this model was "based on." These are used to reconstuct model developement and ancestry.</p></td>
+      <td><p>Character scaler or vector of paths to other models that this model was "based on." These are used to reconstuct model developement and ancestry. <strong>Paths must be relative to `.new_model` path.</strong></p></td>
     </tr>
     <tr>
       <th>.tags</th>

@@ -37,7 +37,7 @@
 
 <meta property="og:title" content="Get path from bbi object — get_path_from_object" />
 <meta property="og:description" content="Builds the full path to a file that is stored as part of a `bbi_...` S3 object
-All paths saved in the object or accompanying YAML will be relative **to the location of that YAML**
+NOTE: All paths saved in the object or accompanying YAML will be relative **to the location of that YAML**
 When the object is loaded into memory, the absolute path to the YAML is stored in the object.
 These functions simply stitch together that path with the requested relative path.
 As long as the YAML has not moved since it was loaded, this will work." />
@@ -73,7 +73,7 @@ As long as the YAML has not moved since it was loaded, this will work." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.0.8000</span>
       </span>
     </div>
 
@@ -100,6 +100,9 @@ As long as the YAML has not moved since it was loaded, this will work." />
     </li>
     <li>
       <a href="../articles/parameter-labels.html">rbabylon Parameter Labels</a>
+    </li>
+    <li>
+      <a href="../articles/using-based-on.html">Using the based_on field</a>
     </li>
   </ul>
 </li>
@@ -131,7 +134,7 @@ As long as the YAML has not moved since it was loaded, this will work." />
 
     <div class="ref-description">
     <p>Builds the full path to a file that is stored as part of a `bbi_...` S3 object
-All paths saved in the object or accompanying YAML will be relative **to the location of that YAML**
+NOTE: All paths saved in the object or accompanying YAML will be relative **to the location of that YAML**
 When the object is loaded into memory, the absolute path to the YAML is stored in the object.
 These functions simply stitch together that path with the requested relative path.
 As long as the YAML has not moved since it was loaded, this will work.</p>

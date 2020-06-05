@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Executes (`bbi init`) with bbi_exec() in specified directory — bbi_init • rbabylon</title>
+<title>Get based_on from bbi object — get_based_on • rbabylon</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,15 @@
 
 
 
-<meta property="og:title" content="Executes (`bbi init`) with bbi_exec() in specified directory — bbi_init" />
-<meta property="og:description" content="Executes (`bbi init`) with bbi_exec() in specified directory" />
+<meta property="og:title" content="Get based_on from bbi object — get_based_on" />
+<meta property="og:description" content="Returns character vector of the absolute paths all models stored in the `based_on` field of a `bbi_...` object
+NOTE: All paths saved in the object or accompanying YAML will be relative **to the location of that YAML**
+When the object is loaded into memory, the absolute path to the YAML is stored in the object.
+These functions simply stitch together that path with the relative paths from the `based_on` field.
+As long as the YAML has not moved since it was loaded, this will work.
+Extract paths to all models that this model is based on (iterating over `get_based_on()` function),
+and all models that those models are based on, recursively.
+Returns a sorted unique character vector." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -123,40 +130,54 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Executes (`bbi init`) with bbi_exec() in specified directory</h1>
+    <h1>Get based_on from bbi object</h1>
     
-    <div class="hidden name"><code>bbi_init.Rd</code></div>
+    <div class="hidden name"><code>get_based_on.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Executes (`bbi init`) with bbi_exec() in specified directory</p>
+    <p>Returns character vector of the absolute paths all models stored in the `based_on` field of a `bbi_...` object
+NOTE: All paths saved in the object or accompanying YAML will be relative **to the location of that YAML**
+When the object is loaded into memory, the absolute path to the YAML is stored in the object.
+These functions simply stitch together that path with the relative paths from the `based_on` field.
+As long as the YAML has not moved since it was loaded, this will work.</p>
+<p>Extract paths to all models that this model is based on (iterating over `get_based_on()` function),
+and all models that those models are based on, recursively.
+Returns a sorted unique character vector.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>bbi_init</span>(
-  <span class='no'>.dir</span>,
-  <span class='no'>.nonmem_dir</span>,
-  <span class='kw'>.nonmem_version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>.no_default_version</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>get_based_on</span>(<span class='no'>.bbi_object</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+
+<span class='co'># S3 method for default</span>
+<span class='fu'>get_based_on</span>(<span class='no'>.bbi_object</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+
+<span class='co'># S3 method for character</span>
+<span class='fu'>get_based_on</span>(<span class='no'>.bbi_object</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+
+<span class='co'># S3 method for bbi_run_log_df</span>
+<span class='fu'>get_based_on</span>(<span class='no'>.bbi_object</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+
+<span class='fu'>get_model_ancestry</span>(<span class='no'>.bbi_object</span>)
+
+<span class='co'># S3 method for default</span>
+<span class='fu'>get_model_ancestry</span>(<span class='no'>.bbi_object</span>)
+
+<span class='co'># S3 method for character</span>
+<span class='fu'>get_model_ancestry</span>(<span class='no'>.bbi_object</span>)
+
+<span class='co'># S3 method for bbi_run_log_df</span>
+<span class='fu'>get_model_ancestry</span>(<span class='no'>.bbi_object</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>.dir</th>
-      <td><p>Path to directory to run `init` in (and put the resulting `babylon.yml` file)</p></td>
+      <th>.bbi_object</th>
+      <td><p>Tibble of class `bbi_run_log_df`</p></td>
     </tr>
     <tr>
-      <th>.nonmem_dir</th>
-      <td><p>Path to directory with the NONMEM installation.</p></td>
-    </tr>
-    <tr>
-      <th>.nonmem_version</th>
-      <td><p>Character scaler for default version of NONMEM to use. If left NULL, function will exit and tell you which versions were found in `.nonmem_dir`</p></td>
-    </tr>
-    <tr>
-      <th>.no_default_version</th>
-      <td><p>Boolean to force creation of babylon.yaml with NO default NONMEM version. FALSE by default, and not encouraged.</p></td>
+      <th>.check_exists</th>
+      <td><p>Logical scaler for whether it will check if the file exists and error if it does not. FALSE by default.</p></td>
     </tr>
     </table>
 
