@@ -34,7 +34,7 @@ cleanup()
 
 # Introduction
 
-This vignette demonstrates how to using the `based_on` field to track a model's ancestry through the model development process. You will also see one common use for this: using the tibble output from `run_log()` to check that your models are up-to-date. By "up-to-date" we mean that none of the model files or data files have changed since the model was run. 
+This vignette demonstrates how to use the `based_on` field to track a model's ancestry through the model development process. You will also see one common use for this: using the tibble output from `run_log()` to check that your models are up-to-date. By "up-to-date" we mean that none of the model files or data files have changed since the model was run. 
 
 If you are new to `rbabylon`, the ["Getting Started with rbabylon"](getting-started.html) vignette will take you through some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its standard workflow and functionality.
 
@@ -47,11 +47,11 @@ library(rbabylon)
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(purrr))
 suppressPackageStartupMessages(library(fs))
-
-set_model_directory("../inst/nonmem")
 ```
 
 ```{r setup, include = FALSE}
+set_model_directory("../inst/nonmem")
+
 # set babylon execution path
 if (Sys.which("bbi") == "") {
   # fall back to default location of /data/apps/bbi

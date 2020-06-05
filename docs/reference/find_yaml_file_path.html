@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Executes (`bbi init`) with bbi_exec() in specified directory — bbi_init • rbabylon</title>
+<title>helper to find valid yaml file — find_yaml_file_path • rbabylon</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,8 @@
 
 
 
-<meta property="og:title" content="Executes (`bbi init`) with bbi_exec() in specified directory — bbi_init" />
-<meta property="og:description" content="Executes (`bbi init`) with bbi_exec() in specified directory" />
+<meta property="og:title" content="helper to find valid yaml file — find_yaml_file_path" />
+<meta property="og:description" content="helper to find valid yaml file" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -123,40 +123,25 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Executes (`bbi init`) with bbi_exec() in specified directory</h1>
+    <h1>helper to find valid yaml file</h1>
     
-    <div class="hidden name"><code>bbi_init.Rd</code></div>
+    <div class="hidden name"><code>find_yaml_file_path.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Executes (`bbi init`) with bbi_exec() in specified directory</p>
+    <p>helper to find valid yaml file</p>
     </div>
 
-    <pre class="usage"><span class='fu'>bbi_init</span>(
-  <span class='no'>.dir</span>,
-  <span class='no'>.nonmem_dir</span>,
-  <span class='kw'>.nonmem_version</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>.no_default_version</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>find_yaml_file_path</span>(<span class='no'>.path</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>.dir</th>
-      <td><p>Path to directory to run `init` in (and put the resulting `babylon.yml` file)</p></td>
-    </tr>
-    <tr>
-      <th>.nonmem_dir</th>
-      <td><p>Path to directory with the NONMEM installation.</p></td>
-    </tr>
-    <tr>
-      <th>.nonmem_version</th>
-      <td><p>Character scaler for default version of NONMEM to use. If left NULL, function will exit and tell you which versions were found in `.nonmem_dir`</p></td>
-    </tr>
-    <tr>
-      <th>.no_default_version</th>
-      <td><p>Boolean to force creation of babylon.yaml with NO default NONMEM version. FALSE by default, and not encouraged.</p></td>
+      <th>.path</th>
+      <td><p>File path with any extension or no extension.
+Function will search for that path with either a .yaml or .yml extension and error if neither is found.
+Will also error if _both_ are found, because there cannot be two YAML files referring to the same model.</p></td>
     </tr>
     </table>
 

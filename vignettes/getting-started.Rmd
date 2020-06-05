@@ -32,47 +32,69 @@ cleanup()
 
 # Introduction
 
-`rbabylon` is an R interface for running `babylon`. `babylon` is (will be) a complete solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. Currently, only NONMEM is supported, so this vignette will only address that. 
-
 This "Getting Started with rbabylon" vignette takes the user through some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its standard workflow and functionality. 
 
-# Setup
-
-## Installing babylon
-
-To use `rbabylon` you must first install `babylon`, often aliased as `bbi`, on your system. This can be done with the `rbabylon::use_bbi('/path/to/install/dir/')` command. (Make sure that `'/path/to/install/dir/'` is included in your `$PATH` so that `bbi` will be found by the system.) You can also check the [babylon documentation](https://github.com/metrumresearchgroup/babylon) for manual installation instructions.
-
-There is also some initial setup to get `rbabylon` configured. First, load the library and tell it where to find the `babylon` installation. For the purposes of this demo, assume the babylon executable is at `/data/apps/bbi`.
-
-
-```{r bbi_exe_path}
+```{r libraries}
 library(rbabylon)
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(purrr))
-
-if (Sys.which("bbi") == "") {
-  # fall back to default location of /data/apps/bbi
-  options('rbabylon.bbi_exe_path' = '/data/apps/bbi')
-}
 ```
 
-Next, initialize `babylon` by pointing it to a working installation of NONMEM, and default version to use.
+`rbabylon` is an R interface for running `babylon`. `babylon` is (will be) a complete solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. Currently, only NONMEM is supported, so this vignette will only address that. 
+
+# Setup
+
+## Do once on your system
+
+The _first time_ you use `rbabylon` on a system or disk, you must first install `babylon`, often aliased as `bbi`. The first time you are using it for a given project, you will also need to run `bbi_init()` in your modeling directory. 
+
+To reiterate, there are two relevant paths for this section.
+
+* `BBI_EXE_PATH` -- the path the `babylon` executable file on your system.
+* `MODEL_DIR` -- the root modeling directory where you will be running models with `rbabylon`
+
+```{r define dirs}
+BBI_EXE_PATH <- "/data/apps/bbi" # this should be an absolute path
+MODEL_DIR <- "../inst/nonmem"    # this should be relative to your working directory
+```
+
+### Installing babylon
+
+You can install the `babylon` binary with the `rbabylon::use_bbi(BBI_EXE_PATH)` command. You can also check the [babylon documentation](https://github.com/metrumresearchgroup/babylon) for manual installation instructions.
+
+If you're not sure if you have `babylon` installed, you can use `bbi_version()` to check. This will return the version number of your installation, if one is found, or an empty string if you do _not_ have `babylon` installed. You can also use `bbi_current_release()` to see the most current version available and run `use_bbi()` as specified above if you want to update.
+
+### Initializing babylon
+
+Next, initialize `babylon` by pointing it to your modeling directory, a working installation of NONMEM, and a default NONMEM version to use.
 
 ```{r setup, eval=FALSE}
-bbi_init(.dir = "../inst/nonmem",     # the modeling directory, where your control streams are
+bbi_init(.dir = MODEL_DIR,            # the modeling directory, where your control streams are
          .nonmem_dir = "/opt/NONMEM", # location of NONMEM installation
          .nonmem_version = "nm74gf")  # default NONMEM version to use
 ```
 
-Finally, it is best to set the modeling directory. By doing this, you do not need to pass the full path to model files, but only the path relative to the specified modeling directory. Pass a path relative to your current working directory to `set_model_directory()`
+This will create a `babylon.yaml` file in your `MODEL_DIR` directory which contains a lot of default settings for running models, etc. Those settings will not be discussed here, but know that they can be modified by editing that file. 
 
-```{r set_model_directory, echo = FALSE}
-set_model_directory("../inst/nonmem")
+## Do for each R session
+
+Once `babylon` is installed and initialized, you will need to make `rbabylon` knows where to find it. This can be done by setting the following options:
+
+```{r bbi_exe_path}
+options(
+  'rbabylon.bbi_exe_path' = BBI_EXE_PATH,
+  'rbabylon.model_directory' = normalizePath(MODEL_DIR, mustWork = TRUE)
+)
 ```
 
-# Initial Modeling Run
+This must be set for every new R session, so it may be wise to **`include the above snippet in your `.Rprofile`**, replacing the `BBI_EXE_PATH` and `MODEL_DIR` constants with the relevant paths from your system/project. Note that, if setting `'rbabylon.model_directory'` explicitly like this, you _must set it to an absolute path._ The recommended way to do this is to use `normalizePath("path/to/dir/")` where `"path/to/dir/"` is a relative path from the script location (in this case the `.Rprofile` location). That way the project will still be portable between different servers/disks.
 
-## Create Model Object
+*NOTE:* By setting the `rbabylon.model_directory` option, you will _not_ need to pass the full path to model files when calling functions like `read_model()` or `submit_model()`. Instead you will pass a path relative to the specified modeling directory. To be clear, it is not _necessary_ to set this option, but it is definitely a recommended convenience.
+
+
+# Initial modeling run
+
+## Create model object
 To begin modeling, first create a model object. This is an S3 object with an accompanying YAML file, kept in your modeling directory. The YAML serves as the "record of truth" for the model, and will persist changes you make to the model as you go.
 
 The `.yaml_path` argument should have the same name (but with a `.yaml` extension) as your base model control stream. For instance, the command below assumes you have a control stream name `1.ctl` or `1.mod` in the model directory you just defined. The `.description` argument is required and corresponds to what would be in the `$PROB` definition in a control stream.
@@ -83,7 +105,7 @@ mod1 <- new_model(.yaml_path = "1.yaml", .description = "our first model")
 
 The model object you have just created can be passed to various functions which you will see in a minute. If you ever need to recreate it, just run `mod1 <- read_model("1.yaml")` to rebuild it from the YAML. The first thing we will do is submit the model to be run.
 
-## Submit Model
+## Submit model
 
 ```{r submit_model_fake, eval = FALSE}
 mod1 %>% submit_model()
@@ -91,7 +113,36 @@ mod1 %>% submit_model()
 
 This will return a process object. We won't discuss this object in this vignette, but other documentation will show how it can be used to check on the model run in progress. Please note that, for this first release, **checking on a model run in progress is not fully implemented.** For now, users should check on their runs manually and only proceed to the next steps once it has successfully completed. 
 
-## Summarize Model
+### Passing arguments to bbi
+
+There are a number of arguments that `babylon` can take to modify how models are run. You can print a list of available arguments using the `print_nonmem_args()` helper function. (Similar helper functions will be added as new modeling software are supported.)
+
+```{r print_nonmem_args}
+print_nonmem_args()
+```
+
+These can be specified globally in the `babylon.yaml` file, and you can see the default values of them in that file. However, they can also be specified or changed for each model. This can be done in several ways:
+
+* Specifying them in the model YAML file, under the heading `bbi_args:`
+* Manually attaching them to a model object with `add_bbi_args()` or `replace_bbi_args`
+* Passing them as a named list to the `.bbi_args` argument of one of the following functions
+  * `new_model()`
+  * `submit_model()`
+  * `model_summary()`
+
+See the docs for any of those functions for more details on usage and syntax.
+
+### Overwriting output from previously a run model
+
+It is common to run a model, make some tweaks to it, and then run it again. However, to avoid accidentally deleting model outputs, `rbabylon` will error by default if it sees existing output when trying to submit a model. To automatically overwrite any previous model output, just pass `overwrite = TRUE` to the `.bbi_args` argument described in the previous section. For example:
+
+```{r overwrite true, eval = FALSE}
+mod1 %>% submit_model(.bbi_args = list(overwrite = TRUE))
+```
+
+You can also change this setting globally by adding `overwrite: true` to the `babylon.yaml` file for your project.
+
+## Summarize model
 Once the model run has completed, users can get a summary object containing much of the commonly used diagnostic information in a named list.
 
 ```{r model_summary}
@@ -168,7 +219,7 @@ mod3 <- mod3 %>%
         add_decisions("Added residual errors because it seemed like a good idea.")
 ```
 
-# Run Log
+# Run log
 
 At any point, the user can easily construct a run log tibble to summarize all 
 models run up to this point.
@@ -213,3 +264,10 @@ log_df %>%
 # delete old files
 cleanup()
 ```
+
+# Further reading
+
+Hopefully this has given you a good start on understanding the capabilities and basic workflow of `rbabylon`. Please see the other vignettes for demonstrations of more advanced or specific functionality.
+
+* [Using the based_on field](https://metrumresearchgroup.github.io/rbabylon/articles/using-based-on.html) -- How to use the `based_on` field to track a model's ancestry through the model development process, as well how to leverage md5 digests to check whether older models are still up-to-date.
+* [rbabylon Parameter Labels](https://metrumresearchgroup.github.io/rbabylon/articles/parameter-labels.html) -- Extracting parameter estimates and labels into a table that can be used for diagnostics, or to generate reports.

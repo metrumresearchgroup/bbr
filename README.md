@@ -10,7 +10,9 @@
 `rbabylon` is an R interface for running `babylon`. `babylon` is (will
 be) a complete solution for managing projects involving modeling and
 simulation with a number of software solutions used in pharmaceutical
-sciences. You can get more information on `babylon`
+sciences. Currently, only NONMEM modeling is supported, though there are
+plans to add Stan and other modeling software as well. You can get more
+detailed information on `babylon` (the underlying CLI tool)
 [here](https://github.com/metrumresearchgroup/babylon).
 
 `rbabylon` is intended to help scientists manage the entire modeling
@@ -22,12 +24,12 @@ reproducibility and external review much more streamlined.
 ## Installation
 
 You can install the latests released version of `rbabylon` via [MPN
-snapshots](https://mpn.metworx.com/docs/snapshots) from any date *after*
-2020-03-07.
+snapshots](https://mpn.metworx.com/docs/snapshots) from any snapshot
+date *after* 2020-03-07.
 
 You can also install development versions of `rbabylon` by downloading
 the source files for the latest version from
-`https://s3.amazonaws.com/mpn.metworx.dev/releases/rbabylon/<version>`. For example, to install the version 0.1.0.9002 you would use the url: `https://s3.amazonaws.com/mpn.metworx.dev/releases/rbabylon/0.1.0.9002`. You can also get the
+`https://s3.amazonaws.com/mpn.metworx.dev/releases/rbabylon/` or get the
 latest development version from [GitHub](https://github.com/) with:
 
 ``` r
@@ -41,5 +43,22 @@ You can find documentation and a “Getting Started” vignette that shows
 users how to set up `rbabylon` and demonstrates the basic modeling
 workflow [here](http://metrumresearchgroup.github.io/rbabylon/).
 
-More vignettes, demonstrating different modeling scenarios, will be
-added soon.
+There are several other vignettes, and more are being added as new
+functionality is rolled out. A complete list can be found
+[here](https://metrumresearchgroup.github.io/rbabylon/articles/).
+
+### Featured Vignettes
+
+  - [Getting Started with
+    rbabylon](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html)
+    – Some basic scenarios for modeling with NONMEM using `rbabylon`,
+    introducing you to its standard workflow and functionality.
+  - [Using the based\_on
+    field](https://metrumresearchgroup.github.io/rbabylon/articles/using-based-on.html)
+    – How to use the `based_on` field to track a model’s ancestry
+    through the model development process, as well how to leverage md5
+    digests to check whether older models are still up-to-date.
+  - [rbabylon Parameter
+    Labels](https://metrumresearchgroup.github.io/rbabylon/articles/parameter-labels.html)
+    – Extracting parameter estimates and labels into a table that can be
+    used for diagnostics, or to generate reports.

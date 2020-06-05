@@ -70,7 +70,7 @@ Also fills in necessary YAML fields for using `create_run_log()` later." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.0.8000</span>
       </span>
     </div>
 
@@ -97,6 +97,9 @@ Also fills in necessary YAML fields for using `create_run_log()` later." />
     </li>
     <li>
       <a href="../articles/parameter-labels.html">rbabylon Parameter Labels</a>
+    </li>
+    <li>
+      <a href="../articles/using-based-on.html">Using the based_on field</a>
     </li>
   </ul>
 </li>
@@ -202,7 +205,7 @@ Also fills in necessary YAML fields for using `create_run_log()` later.</p>
     </tr>
     <tr>
       <th>.new_model</th>
-      <td><p>Path to write new model files to WITHOUT FILE EXTENSION. Function will create both `.new_model.yaml` and `.new_model.[mod|ctl]` based on this path.</p></td>
+      <td><p>Integer that corresponds to the new model name to create. Function will create both `.new_model.yaml` and a new model file based on this path.</p></td>
     </tr>
     <tr>
       <th>.description</th>
@@ -210,7 +213,7 @@ Also fills in necessary YAML fields for using `create_run_log()` later.</p>
     </tr>
     <tr>
       <th>.based_on_additional</th>
-      <td><p>The run id for the `.parent_model` will automatically be added to the `based_on` field but this argument can contain a character scaler or vector of additional run id's (model names) that this model was "based on." These are used to reconstuct model developement and ancestry.</p></td>
+      <td><p>Character scaler or vector of paths to other models that this model was "based on." These are used to reconstuct model developement and ancestry. <strong>Paths must be relative to `.new_model` path.</strong> Note that the `.parent_model` will automatically be added to the `based_on` field, so no need to include that here.</p></td>
     </tr>
     <tr>
       <th>.add_tags</th>
@@ -218,7 +221,7 @@ Also fills in necessary YAML fields for using `create_run_log()` later.</p>
     </tr>
     <tr>
       <th>.inherit_tags</th>
-      <td><p>Boolean for whether to inherit any tags from `.parent_model.yaml`</p></td>
+      <td><p>Boolean for whether to inherit any tags from `.parent_mod`</p></td>
     </tr>
     <tr>
       <th>.update_model_file</th>
@@ -226,7 +229,7 @@ Also fills in necessary YAML fields for using `create_run_log()` later.</p>
     </tr>
     <tr>
       <th>.overwrite</th>
-      <td><p>Boolean for whether to overwrite .ctl or .mod file if one already exists at `.new_model.[mod|ctl]`</p></td>
+      <td><p>Boolean for whether to overwrite model file if one already exists specified `.new_model` path</p></td>
     </tr>
     <tr>
       <th>.directory</th>
