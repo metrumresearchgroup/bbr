@@ -74,7 +74,7 @@ Run `bbi nonmem summary` and parse the output to a list" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.0.8000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
       </span>
     </div>
 
@@ -168,7 +168,7 @@ This will only work if you are calling from the same directory as the models, or
   <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='no'>...</span>,
   <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"rbabylon.model_directory"</span>)
+  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>()
 )
 
 <span class='co'># S3 method for numeric</span>
@@ -178,7 +178,7 @@ This will only work if you are calling from the same directory as the models, or
   <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='no'>...</span>,
   <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"rbabylon.model_directory"</span>)
+  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>()
 )
 
 <span class='fu'>nonmem_summary</span>(<span class='no'>.mod</span>, <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>, <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>

@@ -39,6 +39,13 @@
 <meta property="og:description" content="Sets `options('rbabylon.model_directory')` to the absolute path of the directory passed to `.path`.
 Note that the directory must exist or this will error.
 This is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
+once this is set, those functions can take a path relative to this directory instead of the working/script directory.
+Sets `options('rbabylon.model_directory')` to the absolute path of the directory passed to `.path`.
+Note that the directory must exist or this will error.
+This is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
+once this is set, those functions can take a path relative to this directory instead of the working/script directory.
+Gets the path set to `options('rbabylon.model_directory')` and checks that it is both absolute and exists.
+This path is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
 once this is set, those functions can take a path relative to this directory instead of the working/script directory." />
 <meta name="twitter:card" content="summary" />
 
@@ -72,7 +79,7 @@ once this is set, those functions can take a path relative to this directory ins
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.0.8000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
       </span>
     </div>
 
@@ -136,9 +143,20 @@ once this is set, those functions can take a path relative to this directory ins
 Note that the directory must exist or this will error.
 This is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
 once this is set, those functions can take a path relative to this directory instead of the working/script directory.</p>
+<p>Sets `options('rbabylon.model_directory')` to the absolute path of the directory passed to `.path`.
+Note that the directory must exist or this will error.
+This is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
+once this is set, those functions can take a path relative to this directory instead of the working/script directory.</p>
+<p>Gets the path set to `options('rbabylon.model_directory')` and checks that it is both absolute and exists.
+This path is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
+once this is set, those functions can take a path relative to this directory instead of the working/script directory.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>set_model_directory</span>(<span class='no'>.path</span>)</pre>
+    <pre class="usage"><span class='fu'>set_model_directory</span>(<span class='no'>.path</span>)
+
+<span class='fu'>set_model_directory</span>(<span class='no'>.path</span>)
+
+<span class='fu'>get_model_directory</span>()</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">

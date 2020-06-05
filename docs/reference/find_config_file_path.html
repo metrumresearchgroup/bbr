@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Parse control stream to a named list of the blocks — clean_ctl • rbabylon</title>
+<title>Private helper to search for babylon.yaml config files — find_config_file_path • rbabylon</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,8 @@
 
 
 
-<meta property="og:title" content="Parse control stream to a named list of the blocks — clean_ctl" />
-<meta property="og:description" content="Taken directly from tidynm package." />
+<meta property="og:title" content="Private helper to search for babylon.yaml config files — find_config_file_path" />
+<meta property="og:description" content="Private helper to search for babylon.yaml config files" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -123,32 +123,40 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Parse control stream to a named list of the blocks</h1>
+    <h1>Private helper to search for babylon.yaml config files</h1>
     
-    <div class="hidden name"><code>clean_ctl.Rd</code></div>
+    <div class="hidden name"><code>find_config_file_path.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Taken directly from tidynm package.</p>
+    <p>Private helper to search for babylon.yaml config files</p>
     </div>
 
-    <pre class="usage"><span class='fu'>clean_ctl</span>(<span class='no'>x</span>)</pre>
+    <pre class="usage"><span class='fu'>find_config_file_path</span>(<span class='no'>.config_path</span>, <span class='no'>.model_dir</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
-      <td><p>control stream as a character scaler with lines separated by newline characters</p></td>
+      <th>.config_path</th>
+      <td><p>Path to config, possibly relative</p></td>
+    </tr>
+    <tr>
+      <th>.model_dir</th>
+      <td><p>absolute path to directory where model is be run from</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>path to babylon.yaml in `.config_path`, relative to `.model_dir`</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#value">Value</a></li>
     </ul>
 
   </div>
