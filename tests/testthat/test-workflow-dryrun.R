@@ -34,7 +34,7 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
   readr::write_file("created_by: test-workflow-dryrun part 1", bbi_yaml)
 
   for (.test_case in .TEST_CASES_WD) {
-    test_that(glue::glue("basic workflow is correct using rbabylon.model_directory = '{MODEL_DIR}' {if(isTRUE(.test_case$change_midstream)) 'change_midstream'}"), {
+    test_that(paste0("basic workflow is correct using rbabylon.model_directory = '", MODEL_DIR, "'", if(isTRUE(.test_case$change_midstream)) " change_midstream"), {
       withr::with_dir(.test_case$test_wd, {
 
         # load model from yaml
