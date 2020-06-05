@@ -18,7 +18,7 @@ submit_model <- function(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
-  .config_path=NULL,
+  .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
   .wait = TRUE,
   .dry_run=FALSE,
   .directory = NULL
@@ -36,7 +36,7 @@ submit_model.bbi_nonmem_model <- function(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
-  .config_path=NULL,
+  .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
   .wait = TRUE,
   .dry_run=FALSE,
   .directory = NULL
@@ -70,10 +70,10 @@ submit_model.character <- function(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
-  .config_path=NULL,
+  .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
   .wait = TRUE,
   .dry_run=FALSE,
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 ) {
 
   # check for .directory and combine with .mod
@@ -116,10 +116,10 @@ submit_model.numeric <- function(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
-  .config_path=NULL,
+  .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
   .wait = TRUE,
   .dry_run=FALSE,
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 ) {
   # convert to character
   .mod <- as.character(.mod)
@@ -150,7 +150,7 @@ submit_nonmem_model <- function(.mod,
                                 .bbi_args = NULL,
                                 .mode = c("sge", "local"),
                                 ...,
-                                .config_path=NULL,
+                                .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
                                 .wait = TRUE,
                                 .dry_run=FALSE) {
 
@@ -165,13 +165,15 @@ submit_nonmem_model <- function(.mod,
   args_vec <- check_nonmem_args(.bbi_args)
   cmd_args <- c("nonmem", "run", .mode, .mod[[YAML_MOD_PATH]], args_vec)
 
-  # add config path
-  if (!is.null(.config_path)) {
-    cmd_args <- c(cmd_args, sprintf("--config=%s", .config_path))
-  }
-
   # define working directory
   model_dir <- .mod[[WORKING_DIR]]
+
+  # check for babylon.yaml config
+  .config_path <- find_config_file_path(.config_path, model_dir)
+
+  if (.config_path != "babylon.yaml") {
+    cmd_args <- c(cmd_args, sprintf("--config=%s", .config_path))
+  }
 
   if (.dry_run) {
     # construct fake res object
@@ -205,7 +207,7 @@ submit_models <- function(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
-  .config_path=NULL,
+  .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
   .wait = TRUE,
   .dry_run=FALSE,
   .directory = NULL
@@ -224,7 +226,7 @@ submit_models.list <- function(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
-  .config_path=NULL,
+  .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
   .wait = TRUE,
   .dry_run=FALSE,
   .directory = NULL
@@ -288,10 +290,10 @@ submit_models.character <- function(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
-  .config_path=NULL,
+  .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
   .wait = TRUE,
   .dry_run=FALSE,
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 ) {
 
   # check for .directory and combine with .mods
@@ -330,10 +332,10 @@ submit_models.numeric <- function(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
-  .config_path=NULL,
+  .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
   .wait = TRUE,
   .dry_run=FALSE,
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 ) {
   # convert to character
   .mods <- as.character(.mods)
@@ -366,7 +368,7 @@ submit_nonmem_models <- function(.mods,
                                 .bbi_args = NULL,
                                 .mode = c("sge", "local"),
                                 ...,
-                                .config_path=NULL,
+                                .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
                                 .wait = TRUE,
                                 .dry_run=FALSE) {
 
@@ -397,12 +399,17 @@ submit_nonmem_models <- function(.mods,
   cmd_args_list <- map(param_list, function(.run) {
     cmd_args <- c("nonmem", "run", .mode, .run[[YAML_MOD_PATH]], .run[[YAML_BBI_ARGS]])
 
-    # add config path
-    if (!is.null(.config_path)) {
+    # define working directory
+    model_dir <- .run[[WORKING_DIR]]
+
+    # check for babylon.yaml config
+    .config_path <- find_config_file_path(.config_path, model_dir)
+
+    if (.config_path != "babylon.yaml") {
       cmd_args <- c(cmd_args, sprintf("--config=%s", .config_path))
     }
 
-    return(list(cmd_args = cmd_args, model_dir = .run[[WORKING_DIR]]))
+    return(list(cmd_args = cmd_args, model_dir = model_dir))
   })
   message(glue("Submitting {length(.mods)} models with {length(cmd_args_list)} unique configurations."))
 
@@ -423,3 +430,6 @@ submit_nonmem_models <- function(.mods,
 
   return(res_list)
 }
+
+
+

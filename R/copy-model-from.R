@@ -23,7 +23,7 @@ copy_model_from <- function(
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE,
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 ) {
   UseMethod("copy_model_from")
 }
@@ -41,7 +41,7 @@ copy_model_from.bbi_nonmem_model <- function(
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE,
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 ) {
 
   # check for .directory and combine with .new_model
@@ -75,7 +75,7 @@ copy_model_from.character <- function(
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE,
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 ) {
 
   # check for .directory and combine with both .parent_mod and .new_model
@@ -123,7 +123,7 @@ copy_model_from.numeric <- function(
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE,
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 ) {
 
   # convert to character

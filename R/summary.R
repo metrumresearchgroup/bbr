@@ -74,7 +74,7 @@ model_summary.character <- function(
   .bbi_args = NULL,
   ...,
   .dry_run = FALSE,
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 ) {
 
   # check for .directory and combine with .mod
@@ -112,7 +112,7 @@ model_summary.numeric <- function(
   .bbi_args = NULL,
   ...,
   .dry_run = FALSE,
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 ) {
 
   # convert to character

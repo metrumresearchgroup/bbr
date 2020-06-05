@@ -2,9 +2,14 @@
 % Please edit documentation in R/utils.R
 \name{set_model_directory}
 \alias{set_model_directory}
+\alias{get_model_directory}
 \title{Set global model directory option}
 \usage{
 set_model_directory(.path)
+
+set_model_directory(.path)
+
+get_model_directory()
 }
 \arguments{
 \item{.path}{Path, either from working directory or absolute, that will be set as `options('rbabylon.model_directory')`}
@@ -13,5 +18,14 @@ set_model_directory(.path)
 Sets `options('rbabylon.model_directory')` to the absolute path of the directory passed to `.path`.
 Note that the directory must exist or this will error.
 This is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
+once this is set, those functions can take a path relative to this directory instead of the working/script directory.
+
+Sets `options('rbabylon.model_directory')` to the absolute path of the directory passed to `.path`.
+Note that the directory must exist or this will error.
+This is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
+once this is set, those functions can take a path relative to this directory instead of the working/script directory.
+
+Gets the path set to `options('rbabylon.model_directory')` and checks that it is both absolute and exists.
+This path is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
 once this is set, those functions can take a path relative to this directory instead of the working/script directory.
 }

@@ -3,9 +3,10 @@ context("Constructing run log from model yaml")
 source("data/test-workflow-ref.R")
 
 withr::with_options(list(rbabylon.model_directory = NULL), {
+  cleanup()
+  on.exit({ cleanup() })
 
   # copy models before creating run log
-  cleanup()
   copy_model_from(YAML_TEST_FILE, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
   copy_model_from(YAML_TEST_FILE,
                   NEW_MOD3,
@@ -123,5 +124,3 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
 }) # closing withr::with_options
-
-cleanup()

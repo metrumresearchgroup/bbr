@@ -189,6 +189,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # make a new yaml
     new_yaml <- yaml_ext(NEW_MOD2)
     fs::file_copy(YAML_TEST_FILE, new_yaml)
+    on.exit({ fs::file_delete(new_yaml) })
 
     # make a spec from it
     suppressSpecificWarning({
@@ -204,9 +205,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
     # look for it
     expect_true(fs::file_exists(new_yaml))
-
-    # cleanup
-    fs::file_delete(new_yaml)
   })
 
   test_that("save_model_yaml() saves to user supplied path", {
@@ -219,12 +217,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
     # re-save yaml
     save_model_yaml(new_mod, fake_path)
+    on.exit({ fs::file_delete(fake_path) })
 
     # look for it
     expect_true(fs::file_exists(fake_path))
-
-    # cleanup
-    fs::file_delete(fake_path)
   })
 
   test_that("save_model_yaml() deletes the right keys", {
@@ -237,13 +233,11 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
     # re-save yaml
     save_model_yaml(new_mod, fake_path)
+    on.exit({ fs::file_delete(fake_path) })
 
     # read it back in and check the keys
     loaded_yaml <- yaml::read_yaml(fake_path)
     expect_false(any(names(loaded_yaml) %in% YAML_ERASE_OUT_KEYS))
-
-    # cleanup
-    fs::file_delete(fake_path)
   })
 
 
@@ -260,13 +254,11 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
     # re-save yaml
     save_model_yaml(new_mod, fake_path)
+    on.exit({ fs::file_delete(fake_path) })
 
     # read it back in and check that bbi_args are gone
     loaded_yaml <- readr::read_lines(fake_path)
     expect_false(any(stringr::str_detect(YAML_BBI_ARGS, loaded_yaml)))
-
-    # cleanup
-    fs::file_delete(fake_path)
   })
 
 
@@ -284,6 +276,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # erase tags and re-save
     new_mod[[YAML_TAGS]] <- NULL
     save_model_yaml(new_mod, fake_path)
+    on.exit({ fs::file_delete(fake_path) })
 
     # read it back in and check that tags are gone, then reconcile
     loaded_yaml <- readr::read_lines(fake_path)
@@ -308,9 +301,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_true(any(stringr::str_detect(glue("{YAML_TAGS}:"), loaded_yaml)))
     expect_true(any(stringr::str_detect(glue("- {FAKE_TAG1}"), loaded_yaml)))
     expect_true(any(stringr::str_detect(glue("- {FAKE_TAG2}"), loaded_yaml)))
-
-    # cleanup
-    fs::file_delete(fake_path)
   })
 
   test_that("as_model() returns the correct type from a model object", {
@@ -344,12 +334,14 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 }) # closing withr::with_options
 
 
-withr::with_options(list(rbabylon.model_directory = "model-examples"), {
+withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
   test_that("compare read_model() and new_model() objects with numeric input", {
   # create new model with args
     .test_yaml <- 1
     .test_path <- 2
     .cleanup_path <- "model-examples/2.yaml"
+    on.exit({ fs::file_delete(.cleanup_path) })
+
     expect_warning(mod1a <- new_model(
       .yaml_path = .test_path,
       .description = "original acop model",
@@ -382,9 +374,6 @@ withr::with_options(list(rbabylon.model_directory = "model-examples"), {
         expect_equal(mod1a[[k]], mod1b[[k]])
       }
     }
-
-    # clean up tmp file
-    fs::file_delete(.cleanup_path)
   })
 
 }) # closing withr::with_options
