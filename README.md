@@ -10,7 +10,9 @@
 `rbabylon` is an R interface for running `babylon`. `babylon` is (will
 be) a complete solution for managing projects involving modeling and
 simulation with a number of software solutions used in pharmaceutical
-sciences. You can get more information on `babylon`
+sciences. Currently, only NONMEM modeling is supported, though there are
+plans to add Stan and other modeling software as well. You can get more
+detailed information on `babylon` (the underlying CLI tool)
 [here](https://github.com/metrumresearchgroup/babylon).
 
 `rbabylon` is intended to help scientists manage the entire modeling
