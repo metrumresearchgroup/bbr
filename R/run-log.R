@@ -14,7 +14,7 @@
 #' @return tibble with information on each run
 #' @export
 run_log <- function(
-  .base_dir = getOption("rbabylon.model_directory"),
+  .base_dir = get_model_directory(),
   .recurse = TRUE
 ) {
 
@@ -57,7 +57,7 @@ run_log <- function(
 #' @param .yaml_path Path to read model from
 #' @param .directory Model directory which `.yaml_path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
 #' @importFrom stringr str_detect
-safe_read_model <- function(.yaml_path, .directory = getOption("rbabylon.model_directory")) {
+safe_read_model <- function(.yaml_path, .directory = get_model_directory()) {
   # check for .directory and combine with .yaml_path
   .yaml_path <- combine_directory_path(.directory, .yaml_path)
 
@@ -131,7 +131,7 @@ enforce_length <- function(.l, .k, .len = 1) {
 #' @return tibble with information on each run
 #' @export
 config_log <- function(
-  .base_dir = getOption("rbabylon.model_directory"),
+  .base_dir = get_model_directory(),
   .recurse = TRUE
 ) {
 

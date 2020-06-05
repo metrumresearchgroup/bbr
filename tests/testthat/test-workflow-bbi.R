@@ -41,7 +41,13 @@ cleanup(.recreate_dir = TRUE)
 
 # set options and run tests
 withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
-                         rbabylon.model_directory = MODEL_DIR), {
+                         rbabylon.model_directory = normalizePath(MODEL_DIR)), {
+
+  # cleanup when done
+  on.exit({
+    Sys.sleep(3) # wait for some NONMEM mess to delete itself
+    cleanup()
+  })
 
   # clear old babylon.yaml
   if (fs::file_exists(file.path(MODEL_DIR, "babylon.yaml"))) fs::file_delete(file.path(MODEL_DIR, "babylon.yaml"))
@@ -170,6 +176,3 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
 
 }) # closing withr::with_options
 
-# cleanup
-Sys.sleep(3) # wait for some NONMEM mess to delete itself
-cleanup()

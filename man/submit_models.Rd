@@ -13,7 +13,7 @@ submit_models(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
-  .config_path = NULL,
+  .config_path = file.path(get_model_directory() \%||\% ".", "babylon.yaml"),
   .wait = TRUE,
   .dry_run = FALSE,
   .directory = NULL
@@ -24,7 +24,7 @@ submit_models(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
-  .config_path = NULL,
+  .config_path = file.path(get_model_directory() \%||\% ".", "babylon.yaml"),
   .wait = TRUE,
   .dry_run = FALSE,
   .directory = NULL
@@ -35,10 +35,10 @@ submit_models(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
-  .config_path = NULL,
+  .config_path = file.path(get_model_directory() \%||\% ".", "babylon.yaml"),
   .wait = TRUE,
   .dry_run = FALSE,
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 )
 
 \method{submit_models}{numeric}(
@@ -46,10 +46,10 @@ submit_models(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
-  .config_path = NULL,
+  .config_path = file.path(get_model_directory() \%||\% ".", "babylon.yaml"),
   .wait = TRUE,
   .dry_run = FALSE,
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 )
 
 submit_nonmem_models(
@@ -57,7 +57,7 @@ submit_nonmem_models(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
-  .config_path = NULL,
+  .config_path = file.path(get_model_directory() \%||\% ".", "babylon.yaml"),
   .wait = TRUE,
   .dry_run = FALSE
 )

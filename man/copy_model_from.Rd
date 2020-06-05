@@ -17,7 +17,7 @@ copy_model_from(
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE,
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 )
 
 \method{copy_model_from}{bbi_nonmem_model}(
@@ -29,7 +29,7 @@ copy_model_from(
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE,
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 )
 
 \method{copy_model_from}{character}(
@@ -41,7 +41,7 @@ copy_model_from(
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE,
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 )
 
 \method{copy_model_from}{numeric}(
@@ -53,7 +53,7 @@ copy_model_from(
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE,
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 )
 
 copy_nonmem_model_from(

@@ -120,7 +120,7 @@ apply_indices <- function(.label_df, .omega = NULL, .sigma = NULL) {
   .sigma_df <- .label_df %>% filter(names == "SIGMA") %>% mutate(param_type = names)
 
   # theta
-  .theta_ind <- .theta_df %>% nrow() %>% seq_len()
+  .theta_ind <- seq_len(nrow(.theta_df))
   .theta_df <- .theta_df %>% mutate(names = paste0(names, .theta_ind))
 
   # omega

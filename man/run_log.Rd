@@ -4,7 +4,7 @@
 \alias{run_log}
 \title{Parses model yaml and outputs into a tibble that serves as a run log. Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.}
 \usage{
-run_log(.base_dir = getOption("rbabylon.model_directory"), .recurse = TRUE)
+run_log(.base_dir = get_model_directory(), .recurse = TRUE)
 }
 \arguments{
 \item{.base_dir}{Directory to search for model yaml files. Only runs with a corresponding yaml will be included.}
