@@ -116,15 +116,17 @@ check_status_code <- function(.status_code, .output, .cmd_args) {
   # consolidate output to a scaler
   .output <- paste(.output, collapse = "\n")
 
+  .custom_msg <- ""
   if (.status_code != 0) {
     if (str_detect(.output, NO_NONMEM_ERR_MSG)) {
-      cat("No version of NONMEM is specified. Either open the relevant `babylon.yml` and set a version of NONMEM to `default: true`, or pass a version of NONMEM to `.bbi_args=list(nm_version='some_version')`")
+      .custom_msg <- "No version of NONMEM is specified. Either open the relevant `babylon.yml` and set a version of NONMEM to `default: true`, or pass a version of NONMEM to `.bbi_args=list(nm_version='some_version')`"
     }
     if (str_detect(.output, MOD_ALREADY_EXISTS_ERR_MSG)) {
-      cat("The target output directory already exists. Please pass `.bbi_args=list(overwrite=TRUE)` to your `submit_model()` call. You can also set `overwrite: true` in the model .yaml file or the babylon.yaml file.")
+      .custom_msg <- "The target output directory already exists. Please pass `.bbi_args=list(overwrite=TRUE)` to your `submit_model()` call. You can also set `overwrite: true` in the model .yaml file or the babylon.yaml file."
     }
 
     err_msg <- paste0(
+      .custom_msg, "\n\n",
       "`bbi ", paste(.cmd_args, collapse=" "), "` returned status code ", .status_code,
       " -- STDOUT and STDERR: \n", .output
     )
