@@ -103,7 +103,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
   test_that("copying model works and new models run correctly", {
     # copy model
     mod2 <- copy_model_from(1, 2, NEW_DESC)
-    mod3 <- copy_model_from(1, 3, NEW_DESC, .inherit_tags = TRUE) %>% add_bbi_args(list(clean_lvl=2))
+    mod3 <- copy_model_from(1, 3, NEW_DESC, .inherit_tags = TRUE) %>% add_bbi_args(list(clean_lvl=2, overwrite = FALSE))
 
     # run new model
     list(mod2, mod3) %>% submit_models(.mode = "local", .wait = TRUE)
@@ -122,6 +122,12 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
 
     # add some tags to new model
     mod2 <- mod2 %>% add_tags(NEW_TAGS)
+
+    # check that overwrite error parses correctly
+    expect_error(
+      submit_model(mod3, .mode = "local", .wait = TRUE),
+      regexp = "configured not to overwrite"
+    )
 
   })
 
