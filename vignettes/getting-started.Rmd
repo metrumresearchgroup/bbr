@@ -113,6 +113,35 @@ mod1 %>% submit_model()
 
 This will return a process object. We won't discuss this object in this vignette, but other documentation will show how it can be used to check on the model run in progress. Please note that, for this first release, **checking on a model run in progress is not fully implemented.** For now, users should check on their runs manually and only proceed to the next steps once it has successfully completed. 
 
+### Passing arguments to bbi
+
+There are a number of arguments that `babylon` can take to modify how models are run. You can print a list of available arguments using the `print_nonmem_args()` helper function. (Similar helper functions will be added as new modeling software are supported.)
+
+```{r print_nonmem_args}
+print_nonmem_args()
+```
+
+These can be specified globally in the `babylon.yaml` file, and you can see the default values of them in that file. However, they can also be specified or changed for each model. This can be done in several ways:
+
+* Specifying them in the model YAML file, under the heading `bbi_args:`
+* Manually attaching them to a model object with `add_bbi_args()` or `replace_bbi_args`
+* Passing them as a named list to the `.bbi_args` argument of one of the following functions
+  * `new_model()`
+  * `submit_model()`
+  * `model_summary()`
+
+See the docs for any of those functions for more details on usage and syntax.
+
+### Overwriting output from previously a run model
+
+It is common to run a model, make some tweaks to it, and then run it again. However, to avoid accidentally deleting model outputs, `rbabylon` will error by default if it sees existing output when trying to submit a model. To automatically overwrite any previous model output, just pass `overwrite = TRUE` to the `.bbi_args` argument described in the previous section. For example:
+
+```{r overwrite true, eval = FALSE}
+mod1 %>% submit_model(.bbi_args = list(overwrite = TRUE))
+```
+
+You can also change this setting globally by adding `overwrite: true` to the `babylon.yaml` file for your project.
+
 ## Summarize model
 Once the model run has completed, users can get a summary object containing much of the commonly used diagnostic information in a named list.
 
