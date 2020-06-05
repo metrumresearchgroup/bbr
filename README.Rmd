@@ -36,4 +36,10 @@ devtools::install_github("metrumresearchgroup/rbabylon", ref = "develop")
 
 You can find documentation and a "Getting Started" vignette that shows users how to set up `rbabylon` and demonstrates the basic modeling workflow [here](http://metrumresearchgroup.github.io/rbabylon/).
 
-More vignettes, demonstrating different modeling scenarios, will be added soon.
+There are several other vignettes, and more are being added as new functionality is rolled out. A complete list can be found [here](https://metrumresearchgroup.github.io/rbabylon/articles/).
+
+### Featured Vignettes
+
+* [Getting Started with rbabylon](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html) -- Some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its standard workflow and functionality.
+* [Using the based_on field](https://metrumresearchgroup.github.io/rbabylon/articles/using-based-on.html) -- How to use the `based_on` field to track a model's ancestry through the model development process, as well how to leverage md5 digests to check whether older models are still up-to-date.
+* [rbabylon Parameter Labels](https://metrumresearchgroup.github.io/rbabylon/articles/parameter-labels.html) -- Extracting parameter estimates and labels into a table that can be used for diagnostics, or to generate reports.

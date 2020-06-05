@@ -87,9 +87,9 @@ options(
 )
 ```
 
-This must be for every new R session, so it may be wise to **`include the above snippet in your `.Rprofile`**, replacing the `BBI_EXE_PATH` and `MODEL_DIR` constants with the relevant paths from your system/project. Note that, if setting them in `.Rprofile` instead of your script, the path passed to `rbabylon.model_directory` must be relative to your `.Rprofile` file.
+This must be set for every new R session, so it may be wise to **`include the above snippet in your `.Rprofile`**, replacing the `BBI_EXE_PATH` and `MODEL_DIR` constants with the relevant paths from your system/project. Note that, if setting `'rbabylon.model_directory'` explicitly like this, you _must set it to an absolute path._ The recommended way to do this is to use `normalizePath("path/to/dir/")` where `"path/to/dir/"` is a relative path from the script location (in this case the `.Rprofile` location). That way the project will still be portable between different servers/disks.
 
-*NOTE:* By setting the `rbabylon.model_directory` option, you will _not_ need to pass the full path to model files, but only the path relative to the specified modeling directory. This is not necessary, but it is definitely a recommended convenience.
+*NOTE:* By setting the `rbabylon.model_directory` option, you will _not_ need to pass the full path to model files when calling functions like `read_model()` or `submit_model()`. Instead you will pass a path relative to the specified modeling directory. To be clear, it is not _necessary_ to set this option, but it is definitely a recommended convenience.
 
 
 # Initial Modeling Run
@@ -235,3 +235,10 @@ log_df %>%
 # delete old files
 cleanup()
 ```
+
+# Further Reading
+
+Hopefully this has given you a good start on understanding the capabilities and basic workflow of `rbabylon`. Please see the other vignettes for demonstrations of more advanced or specific functionality.
+
+* [Using the based_on field](https://metrumresearchgroup.github.io/rbabylon/articles/using-based-on.html) -- How to use the `based_on` field to track a model's ancestry through the model development process, as well how to leverage md5 digests to check whether older models are still up-to-date.
+* [rbabylon Parameter Labels](https://metrumresearchgroup.github.io/rbabylon/articles/parameter-labels.html) -- Extracting parameter estimates and labels into a table that can be used for diagnostics, or to generate reports.
