@@ -253,6 +253,87 @@ set_model_directory <- function(.path) {
 }
 
 
+#' Set global model directory option
+#'
+#' Sets `options('rbabylon.model_directory')` to the absolute path of the directory passed to `.path`.
+#' Note that the directory must exist or this will error.
+#' This is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
+#' once this is set, those functions can take a path relative to this directory instead of the working/script directory.
+#' @param .path Path, either from working directory or absolute, that will be set as `options('rbabylon.model_directory')`
+#' @rdname set_model_directory
+#' @export
+set_model_directory <- function(.path) {
+  if (is.null(.path)) {
+    options('rbabylon.model_directory' = NULL)
+  } else {
+    options('rbabylon.model_directory' = normalizePath(.path, mustWork = TRUE))
+  }
+
+  cat(glue("options('rbabylon.model_directory') set to {options('rbabylon.model_directory')}"))
+}
+
+#' Get global model directory option
+#'
+#' Gets the path set to `options('rbabylon.model_directory')` and checks that it is both absolute and exists.
+#' This path is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
+#' once this is set, those functions can take a path relative to this directory instead of the working/script directory.
+#' @rdname set_model_directory
+#' @importFrom fs is_absolute_path dir_exists
+#' @export
+get_model_directory <- function() {
+  .mod_dir <- getOption("rbabylon.model_directory")
+  if (is.null(.mod_dir)) {
+    return(NULL)
+  }
+
+  if (!fs::is_absolute_path(.mod_dir)) {
+    strict_mode_error(paste(
+      glue("`options('rbabylon.model_directory')` must be set to an absolute path but is currently set to {.mod_dir}"),
+      "It is recommended to use `set_model_directory('...')` or put `options('rbabylon.model_directory' = normalizePath('...'))` in your .Rprofile for this project.",
+    sep = "\n"))
+  }
+
+  if (!fs::dir_exists(.mod_dir)) {
+    strict_mode_error(paste(
+      glue("`options('rbabylon.model_directory')` must be set to an existing directory but {.mod_dir} does not exist."),
+      "It is recommended to use `set_model_directory('...')` or put `options('rbabylon.model_directory' = normalizePath('...'))` in your .Rprofile for this project.",
+      sep = "\n"))
+  }
+
+  return(.mod_dir)
+}
+
+
+#' Private helper to search for babylon.yaml config files
+#' @param .config_path Path to config, possibly relative
+#' @param .model_dir absolute path to directory where model is be run from
+#' @importFrom fs is_file file_exists is_absolute_path
+#' @importFrom stringr str_detect
+#' @return path to babylon.yaml in `.config_path`, relative to `.model_dir`
+find_config_file_path <- function(.config_path, .model_dir) {
+  if (!fs::is_absolute_path(.model_dir)) {
+    stop(glue("USER SHOULDN'T SEE THIS ERROR: find_config_file_path(.model_dir) is not absolute: {.model_dir}"))
+  }
+
+  # if passed a directory, add babylon.yaml
+  if (!is_valid_yaml_extension(.config_path)) {
+    .config_path <- file.path(.config_path, "babylon.yaml")
+  }
+
+  .config_path <- tryCatch({
+    normalizePath(.config_path, mustWork = TRUE)
+  },
+  error = function(e) {
+    if (str_detect(e$message, "No such file or directory")) {
+      stop(glue("No babylon.yaml file exists at {.config_path} -- Either use `bbi_init('model/dir/')` to create one, or pass a valid path to the `.config_path` argument of `submit_model()`"))
+    }
+    stop(e$message)
+  })
+
+  .config_path <- fs::path_rel(.config_path, .model_dir)
+  return(.config_path)
+}
+
 
 ############################
 # Error handlers
@@ -260,15 +341,33 @@ set_model_directory <- function(.path) {
 
 strict_mode_error <- function(err_msg) {
   if (isTRUE(getOption("rbabylon.strict"))) {
-    stop(err_msg)
+    stop(err_msg, call. = FALSE)
   } else {
     warning(paste(
       "The following error is being ignored because `options('rbabylon.strict')` is not set to TRUE.",
       "Consider setting `options('rbabylon.strict' = TRUE)` if you experience issues.",
       err_msg
-    ))
+    ), call. = FALSE)
   }
 }
+
+#' Build error message and throw error for passing character vector to get_... functions
+#' @param .len The length of the vector that was passed.
+stop_get_scaler_msg <- function(.len) {
+  stop(paste(
+    glue("When passing character input to `rbabylon::get_...` functions, only scaler values are permitted. A vector of length {.len} was passed."),
+    "Consider instead passing the tibble output from `run_log()`, or iterating with something like `purrr::map(your_vector, ~ get_...(.x)`"
+  ))
+}
+
+#' Build error message and throw error for generic failure fo get_... functions
+#' @param .bbi_object The object that something is attempting to be extracted from
+#' @param .key The name of the field that is attempting to be extracted
+#' @param .msg Character scaler or vector of more specific error messages to include at the end
+stop_get_fail_msg <- function(.bbi_object, .key, .msg = "") {
+  stop(glue("Cannot extract `{.key}` from object of class `{paste(class(.bbi_object), collapse = ', ')}` :\n{paste(.msg, collapse = ', ')}"), call. = FALSE)
+}
+
 
 #' Suppress a warning that matches `.regexpr`
 #' @importFrom stringr str_detect

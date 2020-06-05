@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
       </span>
     </div>
 
@@ -58,6 +58,9 @@
     </li>
     <li>
       <a href="articles/parameter-labels.html">rbabylon Parameter Labels</a>
+    </li>
+    <li>
+      <a href="articles/using-based-on.html">Using the based_on field</a>
     </li>
   </ul>
 </li>
@@ -86,13 +89,13 @@
 <a href="#rbabylon" class="anchor"></a>rbabylon</h1></div>
 <!-- badges: start -->
 <!-- badges: end -->
-<p><code>rbabylon</code> is an R interface for running <code>babylon</code>. <code>babylon</code> is (will be) a complete solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. You can get more information on <code>babylon</code> <a href="https://github.com/metrumresearchgroup/babylon">here</a>.</p>
+<p><code>rbabylon</code> is an R interface for running <code>babylon</code>. <code>babylon</code> is (will be) a complete solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. Currently, only NONMEM modeling is supported, though there are plans to add Stan and other modeling software as well. You can get more detailed information on <code>babylon</code> (the underlying CLI tool) <a href="https://github.com/metrumresearchgroup/babylon">here</a>.</p>
 <p><code>rbabylon</code> is intended to help scientists manage the entire modeling workflow from within R. Users can submit models, consume outputs and diagnostics, and iterate on models. Furthermore, workflow tools–like simple tagging of models and model inheritence trees–make reproducibility and external review much more streamlined.</p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<p>You can install the latests released version of <code>rbabylon</code> via <a href="https://mpn.metworx.com/docs/snapshots">MPN snapshots</a> from any date <em>after</em> 2020-03-07.</p>
-<p>You can also install development versions of <code>rbabylon</code> by downloading the source files for the latest version from <code>https://s3.amazonaws.com/mpn.metworx.dev/releases/rbabylon/&lt;version&gt;</code>. For example, to install the version 0.1.0.9002 you would use the url: <code>https://s3.amazonaws.com/mpn.metworx.dev/releases/rbabylon/0.1.0.9002</code>. You can also get the latest development version from <a href="https://github.com/">GitHub</a> with:</p>
+<p>You can install the latests released version of <code>rbabylon</code> via <a href="https://mpn.metworx.com/docs/snapshots">MPN snapshots</a> from any snapshot date <em>after</em> 2020-03-07.</p>
+<p>You can also install development versions of <code>rbabylon</code> by downloading the source files for the latest version from <code>https://s3.amazonaws.com/mpn.metworx.dev/releases/rbabylon/</code> or get the latest development version from <a href="https://github.com/">GitHub</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="co"># install.packages("devtools")</span></a>
 <a class="sourceLine" id="cb1-2" data-line-number="2">devtools<span class="op">::</span><span class="kw"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span>(<span class="st">"metrumresearchgroup/rbabylon"</span>, <span class="dt">ref =</span> <span class="st">"develop"</span>)</a></code></pre></div>
 </div>
@@ -100,7 +103,19 @@
 <h2 class="hasAnchor">
 <a href="#documentation" class="anchor"></a>Documentation</h2>
 <p>You can find documentation and a “Getting Started” vignette that shows users how to set up <code>rbabylon</code> and demonstrates the basic modeling workflow <a href="http://metrumresearchgroup.github.io/rbabylon/">here</a>.</p>
-<p>More vignettes, demonstrating different modeling scenarios, will be added soon.</p>
+<p>There are several other vignettes, and more are being added as new functionality is rolled out. A complete list can be found <a href="https://metrumresearchgroup.github.io/rbabylon/articles/">here</a>.</p>
+<div id="featured-vignettes" class="section level3">
+<h3 class="hasAnchor">
+<a href="#featured-vignettes" class="anchor"></a>Featured Vignettes</h3>
+<ul>
+<li>
+<a href="https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html">Getting Started with rbabylon</a> – Some basic scenarios for modeling with NONMEM using <code>rbabylon</code>, introducing you to its standard workflow and functionality.</li>
+<li>
+<a href="https://metrumresearchgroup.github.io/rbabylon/articles/using-based-on.html">Using the based_on field</a> – How to use the <code>based_on</code> field to track a model’s ancestry through the model development process, as well how to leverage md5 digests to check whether older models are still up-to-date.</li>
+<li>
+<a href="https://metrumresearchgroup.github.io/rbabylon/articles/parameter-labels.html">rbabylon Parameter Labels</a> – Extracting parameter estimates and labels into a table that can be used for diagnostics, or to generate reports.</li>
+</ul>
+</div>
 </div>
 </div>
   </div>

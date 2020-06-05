@@ -67,7 +67,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
       </span>
     </div>
 
@@ -94,6 +94,9 @@
     </li>
     <li>
       <a href="../articles/parameter-labels.html">rbabylon Parameter Labels</a>
+    </li>
+    <li>
+      <a href="../articles/using-based-on.html">Using the based_on field</a>
     </li>
   </ul>
 </li>
@@ -308,15 +311,33 @@ Any S3 classes will be inherited with those from .new_list given precedence.</p>
       </tr><tr>
         
         <td>
+          <p><code><a href="find_config_file_path.html">find_config_file_path()</a></code> </p>
+        </td>
+        <td><p>Private helper to search for babylon.yaml config files</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="find_model_file_path.html">find_model_file_path()</a></code> </p>
         </td>
         <td><p>helper to find valid model file and return ctl_ext(.path) by default if not found</p></td>
       </tr><tr>
         
         <td>
+          <p><code><a href="find_yaml_file_path.html">find_yaml_file_path()</a></code> </p>
+        </td>
+        <td><p>helper to find valid yaml file</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="format_cmd_args.html">format_cmd_args()</a></code> </p>
         </td>
         <td><p>Formats command line args from a named list to a string as it would be passed on the command line</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_based_on.html">get_based_on()</a></code> <code><a href="get_based_on.html">get_model_ancestry()</a></code> </p>
+        </td>
+        <td><p>Get based_on from bbi object</p></td>
       </tr><tr>
         
         <td>
@@ -350,7 +371,7 @@ Any S3 classes will be inherited with those from .new_list given precedence.</p>
       </tr><tr>
         
         <td>
-          <p><code><a href="new_ext.html">new_ext()</a></code> <code><a href="new_ext.html">ctl_ext()</a></code> <code><a href="new_ext.html">mod_ext()</a></code> <code><a href="new_ext.html">yaml_ext()</a></code> </p>
+          <p><code><a href="new_ext.html">new_ext()</a></code> <code><a href="new_ext.html">ctl_ext()</a></code> <code><a href="new_ext.html">mod_ext()</a></code> <code><a href="new_ext.html">yaml_ext()</a></code> <code><a href="new_ext.html">yml_ext()</a></code> </p>
         </td>
         <td><p>helpers that strip extension then add a diffent type</p></td>
       </tr><tr>
@@ -435,6 +456,12 @@ Also creates necessary YAML file for using functions like `add_tags()` and `run_
       </tr><tr>
         
         <td>
+          <p><code><a href="safe_based_on.html">safe_based_on()</a></code> </p>
+        </td>
+        <td><p>Checks for yaml files relative to a starting location</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="safe_read_model.html">safe_read_model()</a></code> </p>
         </td>
         <td><p>Read in model YAML with error handling</p></td>
@@ -447,9 +474,21 @@ Also creates necessary YAML file for using functions like `add_tags()` and `run_
       </tr><tr>
         
         <td>
-          <p><code><a href="set_model_directory.html">set_model_directory()</a></code> </p>
+          <p><code><a href="set_model_directory.html">set_model_directory()</a></code> <code><a href="set_model_directory.html">set_model_directory()</a></code> <code><a href="set_model_directory.html">get_model_directory()</a></code> </p>
         </td>
         <td><p>Set global model directory option</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="stop_get_fail_msg.html">stop_get_fail_msg()</a></code> </p>
+        </td>
+        <td><p>Build error message and throw error for generic failure fo get_... functions</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="stop_get_scaler_msg.html">stop_get_scaler_msg()</a></code> </p>
+        </td>
+        <td><p>Build error message and throw error for passing character vector to get_... functions</p></td>
       </tr><tr>
         
         <td>

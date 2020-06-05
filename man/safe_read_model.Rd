@@ -4,7 +4,7 @@
 \alias{safe_read_model}
 \title{Read in model YAML with error handling}
 \usage{
-safe_read_model(.yaml_path, .directory = getOption("rbabylon.model_directory"))
+safe_read_model(.yaml_path, .directory = get_model_directory())
 }
 \arguments{
 \item{.yaml_path}{Path to read model from}

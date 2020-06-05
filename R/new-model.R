@@ -5,9 +5,9 @@
 #' Create new model object by specifying relevant information as arguments
 #' Also creates necessary YAML file for using functions like `add_tags()` and `run_log()` later.
 #' @param .yaml_path Path to save resulting model YAML file to. MUST be either an absolute path, or a path relative to the `.directory` argument.
-#' @param .description Description of new model run. This will be stored in the yaml (to be used later in `run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.
+#' @param .description Description of new model run. This will be stored in the yaml (and can be viewed later in `run_log()`). By convention, it should match the $PROBLEM statement in the control stream, but this is not enforced.
 #' @param .model_path Path to model (control stream) file. MUST be an absolute path, or the model path relative to the location of the YAML file. It recommended for the control stream and YAML to be in the same directory. If nothing is passed, the function will look for a file with the same path/name as your YAML, but with either .ctl or .mod extension.
-#' @param .based_on A character scaler or vector of run id's (model names) that this model was "based on." These are used to reconstuct model developement and ancestry.
+#' @param .based_on Character scaler or vector of paths to other models that this model was "based on." These are used to reconstuct model developement and ancestry. \strong{Paths must be relative to `.new_model` path.}
 #' @param .tags A character scaler or vector with any user tags to be added to the YAML file
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments. These will be written into YAML file.
 #' @param .model_type Character scaler to specify type of model being created (used for S3 class). Currently only `'nonmem'` is supported.
@@ -24,7 +24,7 @@ new_model <- function(
   .tags = NULL,
   .bbi_args = NULL,
   .model_type = c("nonmem"),
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 ) {
 
   if (!is_valid_yaml_extension(.yaml_path)) {
@@ -48,7 +48,7 @@ new_model <- function(
   .mod[[YAML_DESCRIPTION]] <- .description
   .mod[[YAML_MOD_TYPE]] <- .model_type
   if (!is.null(.model_path)) .mod[[YAML_MOD_PATH]] <- .model_path
-  if (!is.null(.based_on)) .mod[[YAML_BASED_ON]] <- .based_on
+  if (!is.null(.based_on)) .mod[[YAML_BASED_ON]] <- safe_based_on(.mod[[WORKING_DIR]], .based_on)
   if (!is.null(.tags)) .mod[[YAML_TAGS]] <- .tags
   if (!is.null(.bbi_args)) .mod[[YAML_BBI_ARGS]] <- .bbi_args
 
@@ -77,15 +77,24 @@ new_model <- function(
 #' @export
 read_model <- function(
   .path,
-  .directory = getOption("rbabylon.model_directory")
+  .directory = get_model_directory()
 ) {
 
   # check for .directory and combine with .path
   .path <- combine_directory_path(.directory, .path)
 
-  # If not YAML extension, convert to YAML
-  .path <- yaml_ext(.path)
-  if (!fs::file_exists(.path)) { stop(glue("`read_model()` found no YAML at `{.path}` -- Use `new_model()` to create the necessary YAML file.")) }
+  # If not YAML extension, convert to YAML and look for file
+  .path <- tryCatch(
+    {
+      find_yaml_file_path(.path)
+    },
+    error = function(e) {
+      if (str_detect(e$message, FIND_YAML_ERR_MSG)) {
+        stop(glue("`read_model()` error: {e$message} -- Use `new_model()` to create the necessary YAML file."))
+      }
+      stop(e$message)
+    }
+  )
 
   # load from file
   yaml_list <- read_yaml(.path)
@@ -136,7 +145,7 @@ save_model_yaml <- function(.mod, .out_path = NULL) {
   }
 
   # throw out empty and null keys
-  .mod <- .mod %>% purrr::compact()
+  .mod <- purrr::compact(.mod)
 
   # write to disk
   yaml::write_yaml(.mod, .out_path)

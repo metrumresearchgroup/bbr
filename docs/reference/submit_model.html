@@ -38,8 +38,8 @@
 <meta property="og:title" content="S3 generic method for submit_model — submit_model" />
 <meta property="og:description" content="S3 generic method for submit_model
 S3 dispatch for submit_model from bbi_nonmem_model
-S3 dispatch for submit_model from character scaler
-  Should be path to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
+S3 dispatch for submit_model from character scaler.
+Should be path to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
 S3 dispatch for submit_model from numeric input
 This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`
 Submit a NONMEM model via babylon" />
@@ -75,7 +75,7 @@ Submit a NONMEM model via babylon" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
       </span>
     </div>
 
@@ -102,6 +102,9 @@ Submit a NONMEM model via babylon" />
     </li>
     <li>
       <a href="../articles/parameter-labels.html">rbabylon Parameter Labels</a>
+    </li>
+    <li>
+      <a href="../articles/using-based-on.html">Using the based_on field</a>
     </li>
   </ul>
 </li>
@@ -134,8 +137,8 @@ Submit a NONMEM model via babylon" />
     <div class="ref-description">
     <p>S3 generic method for submit_model</p>
 <p>S3 dispatch for submit_model from bbi_nonmem_model</p>
-<p>S3 dispatch for submit_model from character scaler
-  Should be path to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).</p>
+<p>S3 dispatch for submit_model from character scaler.
+Should be path to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).</p>
 <p>S3 dispatch for submit_model from numeric input
 This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`</p>
 <p>Submit a NONMEM model via babylon</p>
@@ -146,7 +149,7 @@ This will only work if you are calling from the same directory as the models, or
   <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
   <span class='no'>...</span>,
-  <span class='kw'>.config_path</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>.config_path</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>() <span class='kw'>%||%</span> <span class='st'>"."</span>, <span class='st'>"babylon.yaml"</span>),
   <span class='kw'>.wait</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
@@ -158,7 +161,7 @@ This will only work if you are calling from the same directory as the models, or
   <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
   <span class='no'>...</span>,
-  <span class='kw'>.config_path</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>.config_path</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>() <span class='kw'>%||%</span> <span class='st'>"."</span>, <span class='st'>"babylon.yaml"</span>),
   <span class='kw'>.wait</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
@@ -170,10 +173,10 @@ This will only work if you are calling from the same directory as the models, or
   <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
   <span class='no'>...</span>,
-  <span class='kw'>.config_path</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>.config_path</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>() <span class='kw'>%||%</span> <span class='st'>"."</span>, <span class='st'>"babylon.yaml"</span>),
   <span class='kw'>.wait</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"rbabylon.model_directory"</span>)
+  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>()
 )
 
 <span class='co'># S3 method for numeric</span>
@@ -182,10 +185,10 @@ This will only work if you are calling from the same directory as the models, or
   <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
   <span class='no'>...</span>,
-  <span class='kw'>.config_path</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>.config_path</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>() <span class='kw'>%||%</span> <span class='st'>"."</span>, <span class='st'>"babylon.yaml"</span>),
   <span class='kw'>.wait</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"rbabylon.model_directory"</span>)
+  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>()
 )
 
 <span class='fu'>submit_nonmem_model</span>(
@@ -193,7 +196,7 @@ This will only work if you are calling from the same directory as the models, or
   <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
   <span class='no'>...</span>,
-  <span class='kw'>.config_path</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>.config_path</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>() <span class='kw'>%||%</span> <span class='st'>"."</span>, <span class='st'>"babylon.yaml"</span>),
   <span class='kw'>.wait</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
 )</pre>

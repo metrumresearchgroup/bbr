@@ -8,7 +8,7 @@ context("testing a composable workflow and running bbi")
 ####################################################
 
 # can't run on Drone because there's no NONMEM
-if (Sys.getenv("METWORX_VERSION") == "") {
+if (Sys.getenv("METWORX_VERSION") == "" || Sys.getenv("SKIP_BBI_TEST") == "true") {
   skip("test-workflow-composable-bbi only runs on Metworx")
 }
 
@@ -41,7 +41,13 @@ cleanup(.recreate_dir = TRUE)
 
 # set options and run tests
 withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
-                         rbabylon.model_directory = MODEL_DIR), {
+                         rbabylon.model_directory = normalizePath(MODEL_DIR)), {
+
+  # cleanup when done
+  on.exit({
+    Sys.sleep(3) # wait for some NONMEM mess to delete itself
+    cleanup()
+  })
 
   # clear old babylon.yaml
   if (fs::file_exists(file.path(MODEL_DIR, "babylon.yaml"))) fs::file_delete(file.path(MODEL_DIR, "babylon.yaml"))
@@ -97,7 +103,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
   test_that("copying model works and new models run correctly", {
     # copy model
     mod2 <- copy_model_from(1, 2, NEW_DESC)
-    mod3 <- copy_model_from(1, 3, NEW_DESC, .inherit_tags = TRUE) %>% add_bbi_args(list(clean_lvl=2))
+    mod3 <- copy_model_from(1, 3, NEW_DESC, .inherit_tags = TRUE) %>% add_bbi_args(list(clean_lvl=2, overwrite = FALSE))
 
     # run new model
     list(mod2, mod3) %>% submit_models(.mode = "local", .wait = TRUE)
@@ -116,6 +122,12 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
 
     # add some tags to new model
     mod2 <- mod2 %>% add_tags(NEW_TAGS)
+
+    # check that overwrite error parses correctly
+    expect_error(
+      submit_model(mod3, .mode = "local", .wait = TRUE),
+      regexp = "The target output directory already exists"
+    )
 
   })
 
@@ -170,6 +182,3 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
 
 }) # closing withr::with_options
 
-# cleanup
-Sys.sleep(3) # wait for some NONMEM mess to delete itself
-cleanup()
