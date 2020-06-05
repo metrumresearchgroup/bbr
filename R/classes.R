@@ -3,6 +3,7 @@
 
 #' Creates S3 object of class `bbi_{.model_type}_model` from list with `MODEL_REQ_INPUT_KEYS`
 #' @param .mod_list List with the required information to create a model object
+#' @importFrom fs path_rel
 #' @return S3 object of class `bbi_{.model_type}_model` that can be passed to `submit_model()`, `model_summary()` etc.
 #' @rdname create_object
 create_model_object <- function(.mod_list) {
@@ -21,6 +22,7 @@ create_model_object <- function(.mod_list) {
     strict_mode_error(err_msg)
   }
 
+  # check model type
   .model_type <- .mod_list[[YAML_MOD_TYPE]]
   if (!(.model_type %in% SUPPORTED_MOD_TYPES)) {
     stop(glue("Invalid {YAML_MOD_TYPE} `{.model_type}`. Valid options include: `{paste(SUPPORTED_MOD_TYPES, collapse = ', ')}`"))
@@ -28,12 +30,15 @@ create_model_object <- function(.mod_list) {
 
   # by default, if no model defined, will use the YAML path to look for a model and set to .ctl if none found
   if (is.null(.mod_list[[YAML_MOD_PATH]])) {
-    if (!is.null(.mod_list[[YAML_YAML_NAME]])) {
-      .mod_list[[YAML_MOD_PATH]] <- file.path(.mod_list[[WORKING_DIR]], .mod_list[[YAML_YAML_NAME]]) %>% find_model_file_path()
-    } else {
+    if (is.null(.mod_list[[YAML_YAML_NAME]])) {
       stop("Must specify either a YAML_MOD_PATH or YAML_YAML_NAME to create a model. User should never see this error.")
     }
-  } else if (.mod_list[[YAML_MOD_TYPE]] == "nonmem" && (!is_valid_nonmem_extension(.mod_list[[YAML_MOD_PATH]]))) {
+    .mod_path <- find_model_file_path(file.path(.mod_list[[WORKING_DIR]], .mod_list[[YAML_YAML_NAME]]))
+    .mod_list[[YAML_MOD_PATH]] <- as.character(fs::path_rel(.mod_path, .mod_list[[WORKING_DIR]]))
+  }
+
+  # check for correct NONMEM extension
+  if (.model_type == "nonmem" && (!is_valid_nonmem_extension(.mod_list[[YAML_MOD_PATH]]))) {
     stop(glue::glue("model_path defined in yaml at {.mod_list[[YAML_MOD_PATH]]} must have either a .ctl or .mod extension, but found {.mod_list[[YAML_MOD_PATH]]}"))
   }
 

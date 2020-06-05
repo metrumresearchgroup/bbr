@@ -87,8 +87,8 @@ S3 generic method for submit_model
 
 S3 dispatch for submit_model from bbi_nonmem_model
 
-S3 dispatch for submit_model from character scaler
-  Should be path to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
+S3 dispatch for submit_model from character scaler.
+Should be path to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
 
 S3 dispatch for submit_model from numeric input
 This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`

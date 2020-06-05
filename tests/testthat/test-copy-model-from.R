@@ -44,6 +44,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("copy_from_model options work", {
     # run copy_model_from
+    fs::file_copy(YAML_TEST_FILE, paste0(NEW_MOD2, '.yml'))
     copy_model_from(YAML_TEST_FILE,
                     NEW_MOD3,
                     NEW_DESC,

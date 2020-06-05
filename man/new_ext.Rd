@@ -5,6 +5,7 @@
 \alias{ctl_ext}
 \alias{mod_ext}
 \alias{yaml_ext}
+\alias{yml_ext}
 \title{helpers that strip extension then add a diffent type}
 \usage{
 new_ext(.x, .ext)
@@ -14,6 +15,8 @@ ctl_ext(.x)
 mod_ext(.x)
 
 yaml_ext(.x)
+
+yml_ext(.x)
 }
 \arguments{
 \item{.x}{file path to modify}

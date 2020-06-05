@@ -136,3 +136,4 @@ PROCESS_REQ_KEYS <- c(
 # error messages that we grep for
 NO_NONMEM_ERR_MSG <- "No version was supplied and no default value exists in the configset"
 NO_STAN_ERR_MSG <- "stan support not yet implemented."
+FIND_YAML_ERR_MSG <- "No file found at.+\\.yml.+OR.+\\.yaml"

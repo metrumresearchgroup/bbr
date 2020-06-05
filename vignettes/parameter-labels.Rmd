@@ -1,7 +1,6 @@
 ---
 title: "rbabylon Parameter Labels"
 author: "Seth Green"
-date: "2020-05-11"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{parameter-labels}
@@ -28,6 +27,9 @@ There is some initial set up necessary for using `rbabylon`. Please refer to the
 
 ```{r set_model_directory}
 library(rbabylon)
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(readr))
+
 set_model_directory("../inst/param_examples")
 ```
 
@@ -63,7 +65,7 @@ Currently, the `param_labels()` function parses labels from the comments in the 
 ```{r read ctl 1}
 mod1 %>% 
   get_model_path() %>%                          # get control stream file path
-  readr::read_lines(skip = 15, n_max = 18) %>%  # read in only parameter section
+  read_lines(skip = 15, n_max = 18) %>%  # read in only parameter section
   paste(collapse = "\n") %>%
   cat()
 ```
@@ -92,9 +94,9 @@ param_df
 These two tibbles can be joined together to create a table for including in reports.
 
 ```{r param_estimates}
-report_df <- dplyr::inner_join(
-  label_df %>% dplyr::select(-param_type),
-  param_df %>% dplyr::select(names, estimate, stderr),
+report_df <- inner_join(
+  label_df %>% select(-param_type),
+  param_df %>% select(names, estimate, stderr),
   by = "names"
 )
 report_df
