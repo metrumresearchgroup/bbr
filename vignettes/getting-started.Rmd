@@ -32,8 +32,6 @@ cleanup()
 
 # Introduction
 
-`rbabylon` is an R interface for running `babylon`. `babylon` is (will be) a complete solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. Currently, only NONMEM is supported, so this vignette will only address that. 
-
 This "Getting Started with rbabylon" vignette takes the user through some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its standard workflow and functionality. 
 
 ```{r libraries}
@@ -41,6 +39,8 @@ library(rbabylon)
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(purrr))
 ```
+
+`rbabylon` is an R interface for running `babylon`. `babylon` is (will be) a complete solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. Currently, only NONMEM is supported, so this vignette will only address that. 
 
 # Setup
 
@@ -92,9 +92,9 @@ This must be set for every new R session, so it may be wise to **`include the ab
 *NOTE:* By setting the `rbabylon.model_directory` option, you will _not_ need to pass the full path to model files when calling functions like `read_model()` or `submit_model()`. Instead you will pass a path relative to the specified modeling directory. To be clear, it is not _necessary_ to set this option, but it is definitely a recommended convenience.
 
 
-# Initial Modeling Run
+# Initial modeling run
 
-## Create Model Object
+## Create model object
 To begin modeling, first create a model object. This is an S3 object with an accompanying YAML file, kept in your modeling directory. The YAML serves as the "record of truth" for the model, and will persist changes you make to the model as you go.
 
 The `.yaml_path` argument should have the same name (but with a `.yaml` extension) as your base model control stream. For instance, the command below assumes you have a control stream name `1.ctl` or `1.mod` in the model directory you just defined. The `.description` argument is required and corresponds to what would be in the `$PROB` definition in a control stream.
@@ -105,7 +105,7 @@ mod1 <- new_model(.yaml_path = "1.yaml", .description = "our first model")
 
 The model object you have just created can be passed to various functions which you will see in a minute. If you ever need to recreate it, just run `mod1 <- read_model("1.yaml")` to rebuild it from the YAML. The first thing we will do is submit the model to be run.
 
-## Submit Model
+## Submit model
 
 ```{r submit_model_fake, eval = FALSE}
 mod1 %>% submit_model()
@@ -113,7 +113,7 @@ mod1 %>% submit_model()
 
 This will return a process object. We won't discuss this object in this vignette, but other documentation will show how it can be used to check on the model run in progress. Please note that, for this first release, **checking on a model run in progress is not fully implemented.** For now, users should check on their runs manually and only proceed to the next steps once it has successfully completed. 
 
-## Summarize Model
+## Summarize model
 Once the model run has completed, users can get a summary object containing much of the commonly used diagnostic information in a named list.
 
 ```{r model_summary}
@@ -190,7 +190,7 @@ mod3 <- mod3 %>%
         add_decisions("Added residual errors because it seemed like a good idea.")
 ```
 
-# Run Log
+# Run log
 
 At any point, the user can easily construct a run log tibble to summarize all 
 models run up to this point.
@@ -236,7 +236,7 @@ log_df %>%
 cleanup()
 ```
 
-# Further Reading
+# Further reading
 
 Hopefully this has given you a good start on understanding the capabilities and basic workflow of `rbabylon`. Please see the other vignettes for demonstrations of more advanced or specific functionality.
 
