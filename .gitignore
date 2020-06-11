@@ -3,5 +3,6 @@
 .RData
 .Ruserdata
 .DS_Store
+.Rprofile
 
 inst/doc

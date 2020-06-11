@@ -60,7 +60,14 @@ MODEL_DIR <- "../inst/nonmem"    # this should be relative to your working direc
 
 ### Installing babylon
 
-You can install the `babylon` binary with the `rbabylon::use_bbi(BBI_EXE_PATH)` command. You can also check the [babylon documentation](https://github.com/metrumresearchgroup/babylon) for manual installation instructions.
+You can install the `babylon` binary with:
+```
+rbabylon::use_bbi()
+```
+
+This will install to the `/data/apps/` folder by default, which matches the `BBI_EXE_PATH` you just defined (and will use soon). If you have changed that, you can pass your custom path to the _directory_ where you want to put bbi like so `use_bbi("/some/other/dir")`. In that case, you would want to set `BBI_EXE_PATH = "/some/other/dir/bbi"`.
+
+You can also check the [babylon documentation](https://github.com/metrumresearchgroup/babylon) for manual installation instructions.
 
 If you're not sure if you have `babylon` installed, you can use `bbi_version()` to check. This will return the version number of your installation, if one is found, or an empty string if you do _not_ have `babylon` installed. You can also use `bbi_current_release()` to see the most current version available and run `use_bbi()` as specified above if you want to update.
 
@@ -87,7 +94,7 @@ options(
 )
 ```
 
-This must be set for every new R session, so it may be wise to **`include the above snippet in your `.Rprofile`**, replacing the `BBI_EXE_PATH` and `MODEL_DIR` constants with the relevant paths from your system/project. Note that, if setting `'rbabylon.model_directory'` explicitly like this, you _must set it to an absolute path._ The recommended way to do this is to use `normalizePath("path/to/dir/")` where `"path/to/dir/"` is a relative path from the script location (in this case the `.Rprofile` location). That way the project will still be portable between different servers/disks.
+This must be set for every new R session, so it may be wise to **include the above snippet in your `.Rprofile`**, replacing the `BBI_EXE_PATH` and `MODEL_DIR` constants with the relevant paths from your system/project. Note that, if setting `'rbabylon.model_directory'` explicitly like this, you _must set it to an absolute path._ The recommended way to do this is to use `normalizePath("path/to/dir/")` where `"path/to/dir/"` is a relative path from the script location (in this case the `.Rprofile` location). That way the project will still be portable between different servers/disks.
 
 *NOTE:* By setting the `rbabylon.model_directory` option, you will _not_ need to pass the full path to model files when calling functions like `read_model()` or `submit_model()`. Instead you will pass a path relative to the specified modeling directory. To be clear, it is not _necessary_ to set this option, but it is definitely a recommended convenience.
 
