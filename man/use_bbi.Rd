@@ -4,10 +4,12 @@
 \alias{use_bbi}
 \title{Installing bbi}
 \usage{
-use_bbi(.dir = "/data/apps")
+use_bbi(.dir = "/data/apps", .force = FALSE)
 }
 \arguments{
 \item{.dir}{directory to install bbi to on linux}
+
+\item{.force}{Boolean for whether to force the installation even if current version and local version are the same}
 }
 \value{
 character

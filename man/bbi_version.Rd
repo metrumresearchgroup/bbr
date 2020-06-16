@@ -4,7 +4,10 @@
 \alias{bbi_version}
 \title{bbi version}
 \usage{
-bbi_version()
+bbi_version(.bbi_exe_path = getOption("rbabylon.bbi_exe_path"))
+}
+\arguments{
+\item{.bbi_exe_path}{Path to bbi exe file that will be checked}
 }
 \value{
 character

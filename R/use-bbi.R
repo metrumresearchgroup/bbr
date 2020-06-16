@@ -2,10 +2,11 @@
 #' @description Identifies system running and return installation instructions
 #' @return character
 #' @param .dir directory to install bbi to on linux
+#' @param .force Boolean for whether to force the installation even if current version and local version are the same
 #' @export
 #' @importFrom glue glue glue_collapse
 #' @importFrom cli rule
-use_bbi <- function(.dir = "/data/apps"){
+use_bbi <- function(.dir = "/data/apps", .force = FALSE){
 
   bbi_loc <- normalizePath(file.path(.dir, "bbi"), mustWork = FALSE)
   os <- c('linux','darwin','mingw')
@@ -37,21 +38,31 @@ use_bbi <- function(.dir = "/data/apps"){
 
   glue_this <- c(header,body,footer)
 
-  on.exit(install_menu(body,this_os),add = TRUE)
+  on.exit(install_menu(body,this_os, force=.force),add = TRUE)
 
   print(glue::glue_collapse(glue_this,sep = '\n'))
 
 }
 
+#' @importFrom stringr str_detect
 #' @importFrom jsonlite read_json
+#' @importFrom glue glue
 current_release <- function(owner = 'metrumresearchgroup', repo = 'babylon', os = c('linux','darwin','windows')){
 
   tf <- tempfile(fileext = '.json')
 
   on.exit(unlink(tf),add = TRUE)
 
-  release_info <- jsonlite::fromJSON(glue::glue('https://api.github.com/repos/{owner}/{repo}/releases/latest'), simplifyDataFrame = FALSE)
-
+  release_info <- tryCatch(
+    {
+      jsonlite::fromJSON(glue('https://api.github.com/repos/{owner}/{repo}/releases/latest'), simplifyDataFrame = FALSE)
+    },
+    error = function(e) {
+      if (str_detect(e$message, "HTTP error 403")) {
+        stop(glue('`current_release({owner}, {repo})` failed, possibly because this IP is over the public Github rate limit of 60/hour.'))
+      }
+    }
+  )
 
   uris <- grep('gz$',sapply(release_info$assets,function(x) x$browser_download_url),value = TRUE)
   uris <- uris[grepl(x = uris, pattern = "amd64", fixed = TRUE)]
@@ -64,18 +75,19 @@ current_release <- function(owner = 'metrumresearchgroup', repo = 'babylon', os 
 
 #' @title current release
 #' @param os operating system, Default: 'linux'
+#' @importFrom stringr str_replace_all
 #' @rdname bbi_current_release
 #' @export
 bbi_current_release <- function(os = "linux"){
-  gsub('^v','',basename(dirname(current_release(os = os))))
+  str_replace_all(basename(dirname(current_release(os = os))), '^v', '')
 }
 
-install_menu <- function(body,this_os){
+install_menu <- function(body, this_os, force){
 
   release_v <- bbi_current_release()
   local_v <- bbi_version()
 
-  if(!identical(release_v,local_v)){
+  if(!identical(release_v,local_v) || isTRUE(force)){
 
     if(this_os%in%c('linux','darwin')){
 
@@ -97,13 +109,14 @@ install_menu <- function(body,this_os){
 
   }
 
-  version_message(local_v = local_v,release_v = release_v)
+  version_message(local_v = local_v, release_v = release_v)
 
 }
 
 #' @title bbi version
 #' @description Returns string of installed bbi cli version
-#' @importFrom stringr str_detect
+#' @importFrom stringr str_detect str_replace_all
+#' @param .bbi_exe_path Path to bbi exe file that will be checked
 #' @return character
 #' @examples
 #' \dontrun{
@@ -111,8 +124,8 @@ install_menu <- function(body,this_os){
 #' }
 #' @rdname bbi_version
 #' @export
-bbi_version <- function(){
-  bbi_path <- getOption('rbabylon.bbi_exe_path', Sys.which('bbi'))
+bbi_version <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')){
+  bbi_path <- Sys.which(.bbi_exe_path)
   if (is.null(bbi_path) || bbi_path == "") {
     return("")
   }
@@ -121,10 +134,13 @@ bbi_version <- function(){
   }
 
   tryCatch(
-    system(sprintf('%s version', bbi_path),intern = TRUE),
+    {
+      res <- system(sprintf('%s version', bbi_path),intern = TRUE)
+      return(str_replace_all(res, '^v', ''))
+    },
     error = function(e) {
       if (str_detect(e$message, "error in running command")) {
-        stop(glue("The executable at {bbi_path} does not appear to be a valid babylon installation. Use `use_bbi({bbi_path})` to install babylon at that location."))
+        stop(glue("The executable at {bbi_path} does not appear to be a valid babylon installation. Use `use_bbi({dirname(bbi_path)})` to install babylon at that location."))
       }
       stop(e$message)
     }
