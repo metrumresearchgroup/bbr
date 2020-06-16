@@ -44,6 +44,17 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
     expect_invisible(check_bbi_exe(BBI_EXE_PATH))
   })
 
+  test_that("check_bbi_exe() errors on too low version", {
+    skip_if_over_rate_limit()
+
+    withr::with_options(list("rbabylon.bbi_min_version" = package_version("100.0.0")), {
+      # should fail because version number is less than 100.0.0
+      CACHE_ENV$bbi_exe_paths[[BBI_EXE_PATH]] <- NULL
+      expect_error(check_bbi_exe(BBI_EXE_PATH), regexp = "minimum supported version of babylon is 100\\.0\\.0")
+      expect_null(CACHE_ENV$bbi_exe_paths[[BBI_EXE_PATH]])
+    })
+  })
+
 
   test_that("bbi_init creates babylon.yaml", {
     # create yaml

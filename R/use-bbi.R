@@ -2,10 +2,11 @@
 #' @description Identifies system running and return installation instructions
 #' @return character
 #' @param .dir directory to install bbi to on linux
+#' @param .force Boolean for whether to force the installation even if current version and local version are the same
 #' @export
 #' @importFrom glue glue glue_collapse
 #' @importFrom cli rule
-use_bbi <- function(.dir = "/data/apps"){
+use_bbi <- function(.dir = "/data/apps", .force = FALSE){
 
   bbi_loc <- normalizePath(file.path(.dir, "bbi"), mustWork = FALSE)
   os <- c('linux','darwin','mingw')
@@ -37,7 +38,7 @@ use_bbi <- function(.dir = "/data/apps"){
 
   glue_this <- c(header,body,footer)
 
-  on.exit(install_menu(body,this_os),add = TRUE)
+  on.exit(install_menu(body,this_os, force=.force),add = TRUE)
 
   print(glue::glue_collapse(glue_this,sep = '\n'))
 
@@ -74,18 +75,19 @@ current_release <- function(owner = 'metrumresearchgroup', repo = 'babylon', os 
 
 #' @title current release
 #' @param os operating system, Default: 'linux'
+#' @importFrom stringr str_replace_all
 #' @rdname bbi_current_release
 #' @export
 bbi_current_release <- function(os = "linux"){
-  gsub('^v','',basename(dirname(current_release(os = os))))
+  str_replace_all(basename(dirname(current_release(os = os))), '^v', '')
 }
 
-install_menu <- function(body,this_os){
+install_menu <- function(body, this_os, force){
 
   release_v <- bbi_current_release()
   local_v <- bbi_version()
 
-  if(!identical(release_v,local_v)){
+  if(!identical(release_v,local_v) || isTRUE(force)){
 
     if(this_os%in%c('linux','darwin')){
 
@@ -107,13 +109,13 @@ install_menu <- function(body,this_os){
 
   }
 
-  version_message(local_v = local_v,release_v = release_v)
+  version_message(local_v = local_v, release_v = release_v)
 
 }
 
 #' @title bbi version
 #' @description Returns string of installed bbi cli version
-#' @importFrom stringr str_detect
+#' @importFrom stringr str_detect str_replace_all
 #' @return character
 #' @examples
 #' \dontrun{
@@ -131,7 +133,10 @@ bbi_version <- function(){
   }
 
   tryCatch(
-    system(sprintf('%s version', bbi_path),intern = TRUE),
+    {
+      res <- system(sprintf('%s version', bbi_path),intern = TRUE)
+      return(str_replace_all(res, '^v', ''))
+    },
     error = function(e) {
       if (str_detect(e$message, "error in running command")) {
         stop(glue("The executable at {bbi_path} does not appear to be a valid babylon installation. Use `use_bbi({bbi_path})` to install babylon at that location."))
