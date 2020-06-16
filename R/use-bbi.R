@@ -112,7 +112,7 @@ install_menu <- function(body,this_os){
 #' @rdname bbi_version
 #' @export
 bbi_version <- function(){
-  bbi_path <- getOption('rbabylon.bbi_exe_path', Sys.which('bbi'))
+  bbi_path <- Sys.which(getOption('rbabylon.bbi_exe_path'))
   if (is.null(bbi_path) || bbi_path == "") {
     return("")
   }
