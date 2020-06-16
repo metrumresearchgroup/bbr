@@ -78,6 +78,9 @@ bbi_current_release <- function(os = "linux"){
 }
 
 #' Private implementation function for installing bbi with interactive menu
+#' @param body Character vector of installation commands to run with `system`
+#' @param this_os Character scaler of OS
+#' @param force Boolean for whether to force the installation even if current version and local version are the same
 install_menu <- function(body, this_os, force){
 
   release_v <- bbi_current_release()
@@ -111,6 +114,8 @@ install_menu <- function(body, this_os, force){
 
 
 #' Private helper function for building commands to install bbi on Linux
+#' @param .dir Directory to install into
+#' @param .bbi_url Full url to download tarball from
 linux_install_commands <- function(.dir, .bbi_url) {
 
   bbi_loc <- normalizePath(file.path(.dir, "bbi"), mustWork = FALSE)
