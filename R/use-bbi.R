@@ -116,6 +116,7 @@ install_menu <- function(body, this_os, force){
 #' @title bbi version
 #' @description Returns string of installed bbi cli version
 #' @importFrom stringr str_detect str_replace_all
+#' @param .bbi_exe_path Path to bbi exe file that will be checked
 #' @return character
 #' @examples
 #' \dontrun{
@@ -123,8 +124,8 @@ install_menu <- function(body, this_os, force){
 #' }
 #' @rdname bbi_version
 #' @export
-bbi_version <- function(){
-  bbi_path <- Sys.which(getOption('rbabylon.bbi_exe_path'))
+bbi_version <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')){
+  bbi_path <- Sys.which(.bbi_exe_path)
   if (is.null(bbi_path) || bbi_path == "") {
     return("")
   }
