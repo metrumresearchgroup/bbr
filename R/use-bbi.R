@@ -43,15 +43,25 @@ use_bbi <- function(.dir = "/data/apps"){
 
 }
 
+#' @importFrom stringr str_detect
 #' @importFrom jsonlite read_json
+#' @importFrom glue glue
 current_release <- function(owner = 'metrumresearchgroup', repo = 'babylon', os = c('linux','darwin','windows')){
 
   tf <- tempfile(fileext = '.json')
 
   on.exit(unlink(tf),add = TRUE)
 
-  release_info <- jsonlite::fromJSON(glue::glue('https://api.github.com/repos/{owner}/{repo}/releases/latest'), simplifyDataFrame = FALSE)
-
+  release_info <- tryCatch(
+    {
+      jsonlite::fromJSON(glue('https://api.github.com/repos/{owner}/{repo}/releases/latest'), simplifyDataFrame = FALSE)
+    },
+    error = function(e) {
+      if (str_detect(e$message, "HTTP error 403")) {
+        stop(glue('`current_release({owner}, {repo})` failed, possibly because this IP is over the public Github rate limit of 60/hour.'))
+      }
+    }
+  )
 
   uris <- grep('gz$',sapply(release_info$assets,function(x) x$browser_download_url),value = TRUE)
   uris <- uris[grepl(x = uris, pattern = "amd64", fixed = TRUE)]
