@@ -66,6 +66,10 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
   })
 
 
+  #####################
+  # passing file flags
+  #####################
+
   test_that("model_summary() works with custom .ext file", {
     on.exit({
       fs::dir_delete(MOD2_PATH)
@@ -96,7 +100,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
     # some things will be a little different, most will be the same
     ref_sum <- readRDS(SUMMARY_REF_FILE)
 
-    for (.d in names(sum2b$run_details)) {
+    for (.d in names(ref_sum$run_details)) {
       if (.d == "output_files_used") {
         expect_false(all(sum2b$run_details$output_files_used == ref_sum$run_details$output_files_used))
         expect_true(length(sum2b$run_details$output_files_used) == length(ref_sum$run_details$output_files_used))
@@ -105,7 +109,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
       }
     }
 
-    for (.n in names(sum2b)) {
+    for (.n in names(ref_sum)) {
       if (.n != "run_details") {
         expect_equal(sum2b[[.n]], ref_sum[[.n]])
       }
@@ -114,56 +118,75 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
   })
 
 
-  test_that("model_summary() works with no .ext file", {
-    on.exit({
-      fs::dir_delete(MOD2_PATH)
-      fs::file_delete(ctl_ext(MOD2_PATH))
-      fs::file_delete(yaml_ext(MOD2_PATH))
+  TEST_CASES <- list(
+    list(ext = "cor", missing = "correlation_theta"),
+    list(ext = "cov", missing = "covariance_theta"),
+    list(ext = "ext", missing = NULL),
+    list(ext = "grd", missing = NULL),
+    list(ext = "shk", missing = "shrinkage_details")
+  )
+  for (.tc in TEST_CASES) {
+    test_that(glue::glue("model_summary() works with no .{.tc$ext} file"), {
+      on.exit({
+        fs::dir_delete(MOD2_PATH)
+        fs::file_delete(ctl_ext(MOD2_PATH))
+        fs::file_delete(yaml_ext(MOD2_PATH))
+      })
+
+      # create new model
+      mod2 <- MOD1 %>% copy_model_from(MOD2_PATH, .description = "number 2")
+
+      # copy output directory (to simulate model run)
+      fs::dir_copy(MOD1_PATH, MOD2_PATH)
+
+      fs::file_delete(file.path(MOD2_PATH, paste0("1.", .tc$ext)))
+
+      # INCOMPLETE COMES BACK WITH NO FLAG AND NO FILE. IS THIS RIGHT?????
+      sum2a <- model_summary(mod2)
+      expect_equal(length(sum2a), 4)
+      expect_equal(length(sum2a$run_details), 0)
+      expect_equal(length(sum2a$run_heuristics), 7)
+      expect_equal(length(sum2a$parameter_names), 0)
+      expect_equal(length(sum2a$ofv), 0)
+
+      # works correctly with no_ext_file flag added
+      args_list <- list()
+      args_list[[as.character(glue::glue("no_{.tc$ext}_file"))]] <- TRUE
+      sum2b <- model_summary(mod2, .bbi_args = args_list)
+
+      # some things will be a little different, most will be the same
+      ref_sum <- readRDS(SUMMARY_REF_FILE)
+
+      expect_equal(length(ref_sum), length(sum2b) + length(.tc$missing))
+
+      for (.d in names(ref_sum$run_details)) {
+        if (.d != "output_files_used") {
+          expect_equal(sum2b$run_details[[.d]], ref_sum$run_details[[.d]])
+        }
+      }
+
+      if (is.null(.tc$missing)) .tc$missing <- "NAAAAAAAAH" # if nothing is missing, set to fake key so `.n != .tc$missing` works
+      for (.n in names(ref_sum)) {
+
+        if (.tc$ext == "ext" && .n == "parameters_data") {
+          # special test for .ext file because significant digits are different
+          expect_equal(
+            sum2b[["parameters_data"]][[1]][["estimates"]],
+            ref_sum[["parameters_data"]][[1]][["estimates"]],
+            tolerance = 0.01
+          )
+        } else if (.n != "run_details" && .n != .tc$missing) {
+          expect_equal(sum2b[[.n]], ref_sum[[.n]])
+        }
+      }
+
     })
+  }
 
-    # create new model
-    mod2 <- MOD1 %>% copy_model_from(MOD2_PATH, .description = "number 2")
 
-    # copy output directory (to simulate model run)
-    fs::dir_copy(MOD1_PATH, MOD2_PATH)
-
-    fs::file_delete(file.path(MOD2_PATH, "1.ext"))
-
-    # INCOMPLETE COMES BACK WITH NO FLAG AND NO EXT. IS THIS RIGHT?????
-    sum2a <- model_summary(mod2)
-    expect_equal(length(sum2a), 4)
-    expect_equal(length(sum2a$run_details), 0)
-    expect_equal(length(sum2a$run_heuristics), 7)
-    expect_equal(length(sum2a$parameter_names), 0)
-    expect_equal(length(sum2a$ofv), 0)
-
-    # works correctly with no_ext_file flag added
-    sum2b <- model_summary(mod2, .bbi_args = list(no_ext_file = TRUE))
-
-    # some things will be a little different, most will be the same
-    ref_sum <- readRDS(SUMMARY_REF_FILE)
-
-    expect_equal(
-      sum2b[["parameters_data"]][[1]][["estimates"]],
-      ref_sum[["parameters_data"]][[1]][["estimates"]],
-      tolerance = 0.01
-    )
-
-    for (.d in names(sum2b$run_details)) {
-      if (.d == "output_files_used") {
-        expect_false(length(sum2b$run_details$output_files_used) == length(ref_sum$run_details$output_files_used))
-      } else {
-        expect_equal(sum2b$run_details[[.d]], ref_sum$run_details[[.d]])
-      }
-    }
-
-    for (.n in names(sum2b)) {
-      if (.n != "run_details" && .n != "parameters_data") {
-        expect_equal(sum2b[[.n]], ref_sum[[.n]])
-      }
-    }
-  })
-
+  #######################
+  # errors when expected
+  #######################
 
   test_that("model_summary() fails predictably if it can't find some parts (i.e. model isn't finished)", {
     on.exit({
