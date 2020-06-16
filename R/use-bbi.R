@@ -140,7 +140,7 @@ bbi_version <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')){
     },
     error = function(e) {
       if (str_detect(e$message, "error in running command")) {
-        stop(glue("The executable at {bbi_path} does not appear to be a valid babylon installation. Use `use_bbi({bbi_path})` to install babylon at that location."))
+        stop(glue("The executable at {bbi_path} does not appear to be a valid babylon installation. Use `use_bbi({dirname(bbi_path)})` to install babylon at that location."))
       }
       stop(e$message)
     }

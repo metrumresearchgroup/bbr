@@ -60,7 +60,14 @@ MODEL_DIR <- "../inst/nonmem"    # this should be relative to your working direc
 
 ### Installing babylon
 
-You can install the `babylon` binary with the `rbabylon::use_bbi(BBI_EXE_PATH)` command. You can also check the [babylon documentation](https://github.com/metrumresearchgroup/babylon) for manual installation instructions.
+You can install the `babylon` binary with:
+```
+rbabylon::use_bbi()
+```
+
+This will install to the `/data/apps/` folder by default, which matches the `BBI_EXE_PATH` you just defined (and will use soon). If you have changed that, you can pass your custom path to the _directory_ where you want to put bbi like so `use_bbi("/some/other/dir")`. In that case, you would want to set `BBI_EXE_PATH = "/some/other/dir/bbi"`.
+
+You can also check the [babylon documentation](https://github.com/metrumresearchgroup/babylon) for manual installation instructions.
 
 If you're not sure if you have `babylon` installed, you can use `bbi_version()` to check. This will return the version number of your installation, if one is found, or an empty string if you do _not_ have `babylon` installed. You can also use `bbi_current_release()` to see the most current version available and run `use_bbi()` as specified above if you want to update.
 
@@ -69,12 +76,12 @@ If you're not sure if you have `babylon` installed, you can use `bbi_version()` 
 Next, initialize `babylon` by pointing it to your modeling directory, a working installation of NONMEM, and a default NONMEM version to use.
 
 ```{r setup, eval=FALSE}
-bbi_init(.dir = MODEL_DIR,            # the modeling directory, where your control streams are
+bbi_init(.dir = MODEL_DIR,            # the root modeling directory
          .nonmem_dir = "/opt/NONMEM", # location of NONMEM installation
          .nonmem_version = "nm74gf")  # default NONMEM version to use
 ```
 
-This will create a `babylon.yaml` file in your `MODEL_DIR` directory which contains a lot of default settings for running models, etc. Those settings will not be discussed here, but know that they can be modified by editing that file. 
+This will create a `babylon.yaml` file in your `MODEL_DIR` directory which contains a lot of default settings for running models, etc. Those settings will not be discussed here, but know that they can be modified globally by editing that file, or model-by-model as described in the "Passing arguments to bbi" section below.
 
 ## Do for each R session
 
