@@ -6,7 +6,6 @@ name: rbabylon
 global-variables:
     environment: &default_environment
         BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
-        BABYLON_VERSION: 2.1.1-rc1 # Not currently used
 
 steps:
 - name: Pull mpn container from ECR
@@ -16,7 +15,6 @@ steps:
     path: /var/run/docker.sock
   commands:
   - $(aws ecr get-login --no-include-email --region us-east-1)
-  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24
   - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-complete:2020-06-08
 
 - name: R40-new
@@ -40,28 +38,6 @@ steps:
   - /opt/R/4.0.1/bin/R -e "devtools::install_deps(upgrade = 'never')"
   - /opt/R/4.0.1/bin/R -e "devtools::test()"
   - /opt/R/4.0.1/bin/R -e "devtools::check()"
-  
-- name: R36
-  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24"
-  pull: never
-  environment:
-    R_LIBS_USER: "/opt/rpkgs/3.6/2020-03-24"
-    # Reading in entire anchor
-    <<: *default_environment
-  commands:
-  # download and setup bbi
-  - wget $BABYLON_URL -O bbi.tar.gz
-  - tar -xzf bbi.tar.gz
-  - rm bbi.tar.gz
-  - chmod +x bbi_linux_amd64/bbi
-  - mkdir -p /data/apps
-  - mv bbi_linux_amd64/bbi /data/apps
-  - ls -la /data/apps
-  - /data/apps/bbi -h
-  - export PATH=/data/apps:$PATH
-  - /opt/R/3.6.2/bin/R -e "devtools::install_deps(upgrade = 'never')"
-  - /opt/R/3.6.2/bin/R -e "devtools::test()"
-  - /opt/R/3.6.2/bin/R -e "devtools::check()"
 
 - name: R36-new
   image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-complete:2020-06-08"
@@ -85,37 +61,16 @@ steps:
   - /opt/R/3.6.3/bin/R -e "devtools::test()"
   - /opt/R/3.6.3/bin/R -e "devtools::check()"
 
-
-- name: R35
-  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24"
-  pull: never
-  environment:
-    R_LIBS_USER: "/opt/rpkgs/3.5/2020-03-24"
-    <<: *default_environment
-  commands:
-  # download and setup bbi
-  - wget $BABYLON_URL -O bbi.tar.gz
-  - tar -xzf bbi.tar.gz
-  - rm bbi.tar.gz
-  - ls -la bbi_linux_amd64
-  - chmod +x bbi_linux_amd64/bbi
-  - mkdir -p /data/apps
-  - mv bbi_linux_amd64/bbi /data/apps
-  - export PATH=/data/apps:$PATH
-  - /opt/R/3.5.3/bin/R -e "devtools::install_deps(upgrade = 'never')"
-  - /opt/R/3.5.3/bin/R -e "devtools::test()"
-  - /opt/R/3.5.3/bin/R -e "devtools::check()"
-
 - name: release
   when:
     event:
     - tag
     status:
     - success
-  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24"
+  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-complete:2020-06-08"
   pull: never
   environment:
-    R_LIBS_USER: "/opt/rpkgs/3.6/2020-03-24"
+    R_LIBS_USER: "/opt/rpkgs/3.6"
     <<: *default_environment
   commands:
   # download and setup bbi
@@ -133,8 +88,6 @@ steps:
   - aws s3 sync /tmp/${DRONE_TAG} s3://mpn.metworx.dev/releases/${DRONE_REPO_NAME}/${DRONE_TAG}
   - aws s3 sync /tmp/${DRONE_TAG} s3://mpn.metworx.dev/releases/${DRONE_REPO_NAME}/latest_tag
   depends_on:
-  - R36
-  - R35
   - R36-new
   - R40-new
 volumes:
