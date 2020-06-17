@@ -130,7 +130,7 @@ steps:
 
 kind: pipeline
 type: docker
-name: rbabylon-36-old
+name: rbabylon-35-old
 
 #Gobal variable definitions and anchors
 global-variables:
