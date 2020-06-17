@@ -52,7 +52,7 @@ steps:
   - /opt/R/4.0.1/bin/R -e "devtools::test()"
   - /opt/R/4.0.1/bin/R -e "devtools::check()"
   depends_on:
-  - Pull mpn container from ECR
+  - rbabylon-pull-docker
 
 ---
 
@@ -88,7 +88,7 @@ steps:
   - /opt/R/3.6.3/bin/R -e "devtools::test()"
   - /opt/R/3.6.3/bin/R -e "devtools::check()"
   depends_on:
-  - Pull mpn container from ECR
+  - rbabylon-pull-docker
 
 ---
 
@@ -124,7 +124,7 @@ steps:
   - /opt/R/3.6.2/bin/R -e "devtools::test()"
   - /opt/R/3.6.2/bin/R -e "devtools::check()"
   depends_on:
-  - Pull mpn container from ECR
+  - rbabylon-pull-docker
 
 ---
 
@@ -158,7 +158,7 @@ steps:
   - /opt/R/3.5.3/bin/R -e "devtools::test()"
   - /opt/R/3.5.3/bin/R -e "devtools::check()"
   depends_on:
-  - Pull mpn container from ECR
+  - rbabylon-pull-docker
 
 ---
 
@@ -199,8 +199,8 @@ steps:
   - aws s3 sync /tmp/${DRONE_TAG} s3://mpn.metworx.dev/releases/${DRONE_REPO_NAME}/${DRONE_TAG}
   - aws s3 sync /tmp/${DRONE_TAG} s3://mpn.metworx.dev/releases/${DRONE_REPO_NAME}/latest_tag
   depends_on:
-  - Pull mpn container from ECR
-  - R40
-  - R36
-  - R36-old
-  - R35-old
+  - rbabylon-pull-docker
+  - rbabylon-40
+  - rbabylon-36
+  - rbabylon-36-old
+  - rbabylon-35-old
