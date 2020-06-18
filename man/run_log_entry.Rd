@@ -12,3 +12,4 @@ run_log_entry(.mod)
 \description{
 Create a run log row from a `bbi_{.model_type}_model` object
 }
+\keyword{internal}

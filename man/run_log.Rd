@@ -2,7 +2,7 @@
 % Please edit documentation in R/run-log.R
 \name{run_log}
 \alias{run_log}
-\title{Parses model yaml and outputs into a tibble that serves as a run log. Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.}
+\title{Create tibble summarizing all model runs}
 \usage{
 run_log(.base_dir = get_model_directory(), .recurse = TRUE)
 }
@@ -15,5 +15,6 @@ run_log(.base_dir = get_model_directory(), .recurse = TRUE)
 tibble with information on each run
 }
 \description{
-Parses model yaml and outputs into a tibble that serves as a run log. Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
+Parses all model yaml and outputs into a tibble that serves as a run log for the project.
+Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
 }

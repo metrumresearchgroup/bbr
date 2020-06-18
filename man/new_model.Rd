@@ -2,8 +2,7 @@
 % Please edit documentation in R/new-model.R
 \name{new_model}
 \alias{new_model}
-\title{Create new model object by specifying relevant information as arguments
-Also creates necessary YAML file for using functions like `add_tags()` and `run_log()` later.}
+\title{Create new model object}
 \usage{
 new_model(
   .yaml_path,
@@ -37,6 +36,7 @@ new_model(
 S3 object of class `bbi_{.model_type}_model` that can be passed to `submit_model()`, `model_summary()`, etc.
 }
 \description{
-Create new model object by specifying relevant information as arguments
+Creates new model object by specifying relevant information as arguments.
 Also creates necessary YAML file for using functions like `add_tags()` and `run_log()` later.
+Will look for an associated model file (control stream) on disk and warn if it doesn't find one.
 }

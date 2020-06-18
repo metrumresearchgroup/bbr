@@ -36,7 +36,8 @@
 
 
 <meta property="og:title" content="Parses model config.json outputs into a log tibble — config_log" />
-<meta property="og:description" content="Parses model config.json outputs into a log tibble" />
+<meta property="og:description" content="Parses model config.json outputs into a log tibble
+Joins config log tibble onto a matching run log tibble" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -130,9 +131,12 @@
 
     <div class="ref-description">
     <p>Parses model config.json outputs into a log tibble</p>
+<p>Joins config log tibble onto a matching run log tibble</p>
     </div>
 
-    <pre class="usage"><span class='fu'>config_log</span>(<span class='kw'>.base_dir</span> <span class='kw'>=</span> <span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>(), <span class='kw'>.recurse</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+    <pre class="usage"><span class='fu'>config_log</span>(<span class='kw'>.base_dir</span> <span class='kw'>=</span> <span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>(), <span class='kw'>.recurse</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+
+<span class='fu'>add_config</span>(<span class='no'>.log_df</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -144,6 +148,14 @@
     <tr>
       <th>.recurse</th>
       <td><p>Boolean for whether to search recursively in subdirectories</p></td>
+    </tr>
+    <tr>
+      <th>.log_df</th>
+      <td><p>the output tibble from `run_log()`</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>arguments passed through to `config_log()`</p></td>
     </tr>
     </table>
 

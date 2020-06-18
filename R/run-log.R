@@ -2,8 +2,10 @@
 # Generating run logs
 #######################
 
-
-#' Parses model yaml and outputs into a tibble that serves as a run log. Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
+#' Create tibble summarizing all model runs
+#'
+#' Parses all model yaml and outputs into a tibble that serves as a run log for the project.
+#' Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
 #' @param .base_dir Directory to search for model yaml files. Only runs with a corresponding yaml will be included.
 #' @param .recurse Boolean for whether to search subdirectories recursively for additional yaml files. Defaults to TRUE.
 #' @importFrom stringr str_subset
@@ -79,7 +81,7 @@ safe_read_model <- function(.yaml_path, .directory = get_model_directory()) {
 #' Create a run log row from a `bbi_{.model_type}_model` object
 #' @param .mod S3 object of class `bbi_{.model_type}_model`
 #' @importFrom tibble tibble
-#' @export
+#' @keywords internal
 run_log_entry <- function(.mod) {
   # build row
   entry_df <- tibble::tibble(
@@ -131,6 +133,7 @@ enforce_length <- function(.l, .k, .len = 1) {
 #' @importFrom dplyr mutate select everything
 #' @importFrom jsonlite fromJSON
 #' @return tibble with information on each run
+#' @rdname config_log
 #' @export
 config_log <- function(
   .base_dir = get_model_directory(),
@@ -185,6 +188,7 @@ config_log <- function(
 #' @param .log_df the output tibble from `run_log()`
 #' @param ... arguments passed through to `config_log()`
 #' @importFrom dplyr left_join
+#' @rdname config_log
 #' @export
 add_config <- function(.log_df, ...) {
   # check input df

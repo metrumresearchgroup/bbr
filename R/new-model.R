@@ -2,8 +2,11 @@
 # Build or load model object
 #############################
 
-#' Create new model object by specifying relevant information as arguments
+#' Create new model object
+#'
+#' Creates new model object by specifying relevant information as arguments.
 #' Also creates necessary YAML file for using functions like `add_tags()` and `run_log()` later.
+#' Will look for an associated model file (control stream) on disk and warn if it doesn't find one.
 #' @param .yaml_path Path to save resulting model YAML file to. MUST be either an absolute path, or a path relative to the `.directory` argument.
 #' @param .description Description of new model run. This will be stored in the yaml (and can be viewed later in `run_log()`). By convention, it should match the $PROBLEM statement in the control stream, but this is not enforced.
 #' @param .model_path Path to model (control stream) file. MUST be an absolute path, or the model path relative to the location of the YAML file. It recommended for the control stream and YAML to be in the same directory. If nothing is passed, the function will look for a file with the same path/name as your YAML, but with either .ctl or .mod extension.
@@ -125,7 +128,7 @@ read_model <- function(
 #' @importFrom fs file_exists
 #' @importFrom purrr compact
 #' @return Output list as specified above.
-#' @export
+#' @keywords internal
 save_model_yaml <- function(.mod, .out_path = NULL) {
   # fill path if null
   if (is.null(.out_path)) {
@@ -152,7 +155,7 @@ save_model_yaml <- function(.mod, .out_path = NULL) {
 }
 
 
-#' Convert object to `bbi_{.model_type}_model`
+#' Convert object to `bbi_\{.model_type\}_model`
 #' @param .obj Object to convert to `bbi_{.model_type}_model`
 #' @rdname as_model
 #' @export

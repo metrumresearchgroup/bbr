@@ -2,18 +2,27 @@
 % Please edit documentation in R/run-log.R
 \name{config_log}
 \alias{config_log}
+\alias{add_config}
 \title{Parses model config.json outputs into a log tibble}
 \usage{
 config_log(.base_dir = get_model_directory(), .recurse = TRUE)
+
+add_config(.log_df, ...)
 }
 \arguments{
 \item{.base_dir}{Base directory to look from model YAML files in}
 
 \item{.recurse}{Boolean for whether to search recursively in subdirectories}
+
+\item{.log_df}{the output tibble from `run_log()`}
+
+\item{...}{arguments passed through to `config_log()`}
 }
 \value{
 tibble with information on each run
 }
 \description{
 Parses model config.json outputs into a log tibble
+
+Joins config log tibble onto a matching run log tibble
 }
