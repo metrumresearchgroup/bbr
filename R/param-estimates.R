@@ -17,8 +17,6 @@ param_estimates <- function(.summary) {
 #' @export
 #' @rdname param_estimates
 param_estimates.bbi_nonmem_summary <- function(.summary) {
-  num_methods <- length(.summary$parameters_data)
-  param_names <- .summary$parameter_names
   param_estimates <- .summary$parameters_data[[num_methods]]$estimates
 
   param_df <- tibble::tibble(
@@ -32,10 +30,12 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
       rep(NA, length(param_names$theta)),
       unlist(.summary$parameters_data[[num_methods]]$random_effect_sdse)) %||% NA_real_,
     fixed = unlist(.summary$parameters_data[[num_methods]]$fixed)
+  num_methods <- length(.summary[["parameters_data"]])
+  param_names <- .summary[["parameter_names"]]
   )
 
   # create boolean column for whether each row is a diagonal
-  param_df$diag <- map_lgl(param_df$names, is_diag)
+  param_df[["diag"]] <- map_lgl(param_df[["names"]], is_diag)
 
   return(param_df)
 }
