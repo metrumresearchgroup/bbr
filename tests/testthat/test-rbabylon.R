@@ -56,6 +56,26 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
   })
 
 
+  test_that("check_bbi_version_constraint() works with semantic versioning", {
+    # download dev version of bbi with semantic versioning
+    new_bbi_url <- "https://github.com/metrumresearchgroup/babylon/releases/download/v2.2.0-beta.2/bbi_linux_amd64.tar.gz"
+    body <- linux_install_commands(tempdir(), new_bbi_url)
+    system(paste(body, collapse =' ; '))
+
+    new_bbi_path <- file.path(tempdir(), "bbi")
+    v_res <- bbi_version(new_bbi_path)
+    expect_identical(v_res, "2.2.0-beta.2")
+
+    # check that it passes
+    expect_invisible(check_bbi_version_constraint(new_bbi_path))
+
+    # check that it fails with fake high version
+    withr::with_options(list("rbabylon.bbi_min_version" = package_version("100.0.0")), {
+      expect_error(check_bbi_exe(new_bbi_path), regexp = "minimum supported version of babylon is 100\\.0\\.0")
+    })
+  })
+
+
   test_that("bbi_init creates babylon.yaml", {
     # create yaml
 

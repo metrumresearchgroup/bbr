@@ -8,7 +8,6 @@
 #' @importFrom cli rule
 use_bbi <- function(.dir = "/data/apps", .force = FALSE){
 
-  bbi_loc <- normalizePath(file.path(.dir, "bbi"), mustWork = FALSE)
   os <- c('linux','darwin','mingw')
 
   header <- glue::glue(
@@ -26,11 +25,7 @@ use_bbi <- function(.dir = "/data/apps", .force = FALSE){
 
                   },
                   'linux' = {
-                    c(glue::glue('wget {current_release(os = "linux")} -O /tmp/bbi.tar.gz'),
-                      'tar -xzf /tmp/bbi.tar.gz -C /tmp --overwrite',
-                      glue::glue('mkdir -p {.dir}'),
-                      glue::glue('mv /tmp/bbi_linux_amd64/bbi {bbi_loc}'),
-                      glue::glue('chmod +x {bbi_loc}'))
+                    linux_install_commands(.dir = .dir, .bbi_url = current_release(os = "linux"))
                   },
                   {
                     c('browse to: https://github.com/metrumresearchgroup/babylon#getting-started')
@@ -82,6 +77,10 @@ bbi_current_release <- function(os = "linux"){
   str_replace_all(basename(dirname(current_release(os = os))), '^v', '')
 }
 
+#' Private implementation function for installing bbi with interactive menu
+#' @param body Character vector of installation commands to run with `system`
+#' @param this_os Character scaler of OS
+#' @param force Boolean for whether to force the installation even if current version and local version are the same
 install_menu <- function(body, this_os, force){
 
   release_v <- bbi_current_release()
@@ -102,7 +101,7 @@ install_menu <- function(body, this_os, force){
           local_v <- bbi_version()
         }
       } else {
-          system(paste(body,collapse =' ; '))
+        system(paste(body,collapse =' ; '))
       }
 
     }
@@ -112,6 +111,26 @@ install_menu <- function(body, this_os, force){
   version_message(local_v = local_v, release_v = release_v)
 
 }
+
+
+#' Private helper function for building commands to install bbi on Linux
+#' @param .dir Directory to install into
+#' @param .bbi_url Full url to download tarball from
+linux_install_commands <- function(.dir, .bbi_url) {
+
+  bbi_loc <- normalizePath(file.path(.dir, "bbi"), mustWork = FALSE)
+
+  cmd_vec <- c(
+    glue::glue('wget {.bbi_url} -O /tmp/bbi.tar.gz'),
+    'tar -xzf /tmp/bbi.tar.gz -C /tmp --overwrite',
+    glue::glue('mkdir -p {.dir}'),
+    glue::glue('mv /tmp/bbi_linux_amd64/bbi {bbi_loc}'),
+    glue::glue('chmod +x {bbi_loc}')
+  )
+
+  return(cmd_vec)
+}
+
 
 #' @title bbi version
 #' @description Returns string of installed bbi cli version
