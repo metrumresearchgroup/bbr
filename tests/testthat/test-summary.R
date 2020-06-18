@@ -86,32 +86,27 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
     # move .ext file
     fs::file_move(file.path(MOD2_PATH, "1.ext"), file.path(MOD2_PATH, "EXT"))
 
-    # INCOMPLETE COMES BACK WITH NO FLAG AND NO EXT. IS THIS RIGHT?????
-    sum2a <- model_summary(mod2)
-    expect_equal(length(sum2a), 4)
-    expect_equal(length(sum2a$run_details), 0)
-    expect_equal(length(sum2a$run_heuristics), 7)
-    expect_equal(length(sum2a$parameter_names), 0)
-    expect_equal(length(sum2a$ofv), 0)
+    # errors without the flag
+    expect_error(model_summary(mod2), "No file present at.*2/1\\.ext")
 
     # works correctly with ext_file flag added
-    sum2b <- model_summary(mod2, .bbi_args = list(ext_file = "EXT"))
+    sum2 <- model_summary(mod2, .bbi_args = list(ext_file = "EXT"))
 
     # some things will be a little different, most will be the same
     ref_sum <- readRDS(SUMMARY_REF_FILE)
 
     for (.d in names(ref_sum$run_details)) {
       if (.d == "output_files_used") {
-        expect_false(all(sum2b$run_details$output_files_used == ref_sum$run_details$output_files_used))
-        expect_true(length(sum2b$run_details$output_files_used) == length(ref_sum$run_details$output_files_used))
+        expect_false(all(sum2$run_details$output_files_used == ref_sum$run_details$output_files_used))
+        expect_true(length(sum2$run_details$output_files_used) == length(ref_sum$run_details$output_files_used))
       } else {
-        expect_equal(sum2b$run_details[[.d]], ref_sum$run_details[[.d]])
+        expect_equal(sum2$run_details[[.d]], ref_sum$run_details[[.d]])
       }
     }
 
     for (.n in names(ref_sum)) {
       if (.n != "run_details") {
-        expect_equal(sum2b[[.n]], ref_sum[[.n]])
+        expect_equal(sum2[[.n]], ref_sum[[.n]])
       }
     }
 
@@ -141,27 +136,22 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
 
       fs::file_delete(file.path(MOD2_PATH, paste0("1.", .tc$ext)))
 
-      # INCOMPLETE COMES BACK WITH NO FLAG AND NO FILE. IS THIS RIGHT?????
-      sum2a <- model_summary(mod2)
-      expect_equal(length(sum2a), 4)
-      expect_equal(length(sum2a$run_details), 0)
-      expect_equal(length(sum2a$run_heuristics), 7)
-      expect_equal(length(sum2a$parameter_names), 0)
-      expect_equal(length(sum2a$ofv), 0)
+      # errors without the flag
+      expect_error(model_summary(mod2), glue::glue("No file present at.*2/1\\.{.tc$ext}"))
 
-      # works correctly with no_ext_file flag added
+      # works correctly with flag added
       args_list <- list()
       args_list[[as.character(glue::glue("no_{.tc$ext}_file"))]] <- TRUE
-      sum2b <- model_summary(mod2, .bbi_args = args_list)
+      sum2 <- model_summary(mod2, .bbi_args = args_list)
 
       # some things will be a little different, most will be the same
       ref_sum <- readRDS(SUMMARY_REF_FILE)
 
-      expect_equal(length(ref_sum), length(sum2b) + length(.tc$missing))
+      expect_equal(length(ref_sum), length(sum2) + length(.tc$missing))
 
       for (.d in names(ref_sum$run_details)) {
         if (.d != "output_files_used") {
-          expect_equal(sum2b$run_details[[.d]], ref_sum$run_details[[.d]])
+          expect_equal(sum2$run_details[[.d]], ref_sum$run_details[[.d]])
         }
       }
 
@@ -171,15 +161,14 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
         if (.tc$ext == "ext" && .n == "parameters_data") {
           # special test for .ext file because significant digits are different
           expect_equal(
-            sum2b[["parameters_data"]][[1]][["estimates"]],
+            sum2[["parameters_data"]][[1]][["estimates"]],
             ref_sum[["parameters_data"]][[1]][["estimates"]],
             tolerance = 0.01
           )
         } else if (.n != "run_details" && .n != .tc$missing) {
-          expect_equal(sum2b[[.n]], ref_sum[[.n]])
+          expect_equal(sum2[[.n]], ref_sum[[.n]])
         }
       }
-
     })
   }
 
