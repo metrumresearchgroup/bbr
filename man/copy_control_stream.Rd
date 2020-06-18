@@ -24,3 +24,4 @@ copy_control_stream(
 Helper function to copy a NONMEM control stream file and optionally update the description, etc. in the new file.
 Note that any file existing at `.new_model_path` will be overwritten.
 }
+\keyword{internal}

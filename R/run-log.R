@@ -53,10 +53,11 @@ run_log <- function(
 
 #' Read in model YAML with error handling
 #'
-#' Helper function that tries to call `read_model()` on a yaml path and returns NULL, with no error, if the YAML is not a valid model file.
+#' Private helper function that tries to call `read_model()` on a yaml path and returns NULL, with no error, if the YAML is not a valid model file.
 #' @param .yaml_path Path to read model from
 #' @param .directory Model directory which `.yaml_path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
 #' @importFrom stringr str_detect
+#' @keywords internal
 safe_read_model <- function(.yaml_path, .directory = get_model_directory()) {
   # check for .directory and combine with .yaml_path
   .yaml_path <- combine_directory_path(.directory, .yaml_path)
@@ -103,10 +104,11 @@ run_log_entry <- function(.mod) {
   return(entry_df)
 }
 
-#' Helper to enforce length of a list element
+#' Private helper to enforce length of a list element
 #' @param .l list to check
 #' @param .k key to check
 #' @param .len length to enforce. Defaults to 1. Throws an error if `length(.l[[.k]]) != .len`
+#' @keywords internal
 enforce_length <- function(.l, .k, .len = 1) {
   len_k <- length(.l[[.k]])
   if (len_k != .len) {

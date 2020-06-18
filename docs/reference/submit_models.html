@@ -41,8 +41,7 @@ S3 dispatch for submit_model from bbi_nonmem_model
 S3 dispatch for submit_models from character vector
   Should be a vector of paths to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
 S3 dispatch for submit_models from numeric input
-This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`
-Submits multiple NONMEM models in batch via babylon" />
+This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -75,7 +74,7 @@ Submits multiple NONMEM models in batch via babylon" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0.7002</span>
       </span>
     </div>
 
@@ -141,7 +140,6 @@ Submits multiple NONMEM models in batch via babylon" />
   Should be a vector of paths to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).</p>
 <p>S3 dispatch for submit_models from numeric input
 This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`</p>
-<p>Submits multiple NONMEM models in batch via babylon</p>
     </div>
 
     <pre class="usage"><span class='fu'>submit_models</span>(
@@ -189,16 +187,6 @@ This will only work if you are calling from the same directory as the models, or
   <span class='kw'>.wait</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>()
-)
-
-<span class='fu'>submit_nonmem_models</span>(
-  <span class='no'>.mods</span>,
-  <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
-  <span class='no'>...</span>,
-  <span class='kw'>.config_path</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>() <span class='kw'>%||%</span> <span class='st'>"."</span>, <span class='st'>"babylon.yaml"</span>),
-  <span class='kw'>.wait</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -206,7 +194,7 @@ This will only work if you are calling from the same directory as the models, or
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>.mods</th>
-      <td><p>A list of S3 objects of class `bbi_nonmem_model`</p></td>
+      <td><p>Integer vector that corresponds to the names of YAML and model files</p></td>
     </tr>
     <tr>
       <th>.bbi_args</th>
@@ -238,16 +226,12 @@ This will only work if you are calling from the same directory as the models, or
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>A list of S3 objects of class `babylon_process`</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
     </ul>
 
   </div>

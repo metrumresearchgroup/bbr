@@ -36,8 +36,11 @@
 
 
 <meta property="og:title" content="Generic S3 method from iterating on models. — copy_model_from" />
-<meta property="og:description" content="Create new .mod/ctl and new .yaml files based on a previous model. Used for iterating on model development.
-Also fills in necessary YAML fields for using `create_run_log()` later." />
+<meta property="og:description" content="Generic S3 method from iterating on models.
+S3 dispatch for passing `bbi_nonmem_model` object to `copy_model_from()`
+S3 dispatch for passing a file path to copy_model_from()
+S3 dispatch for passing an integer model identifier to copy_model_from()
+This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -70,7 +73,7 @@ Also fills in necessary YAML fields for using `create_run_log()` later." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0.7002</span>
       </span>
     </div>
 
@@ -130,8 +133,11 @@ Also fills in necessary YAML fields for using `create_run_log()` later." />
     </div>
 
     <div class="ref-description">
-    <p>Create new .mod/ctl and new .yaml files based on a previous model. Used for iterating on model development.
-Also fills in necessary YAML fields for using `create_run_log()` later.</p>
+    <p>Generic S3 method from iterating on models.</p>
+<p>S3 dispatch for passing `bbi_nonmem_model` object to `copy_model_from()`</p>
+<p>S3 dispatch for passing a file path to copy_model_from()</p>
+<p>S3 dispatch for passing an integer model identifier to copy_model_from()
+This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`</p>
     </div>
 
     <pre class="usage"><span class='fu'>copy_model_from</span>(
@@ -183,17 +189,6 @@ Also fills in necessary YAML fields for using `create_run_log()` later.</p>
   <span class='kw'>.update_model_file</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>.overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>()
-)
-
-<span class='fu'>copy_nonmem_model_from</span>(
-  <span class='no'>.parent_mod</span>,
-  <span class='no'>.new_model</span>,
-  <span class='no'>.description</span>,
-  <span class='kw'>.based_on_additional</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>.add_tags</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>.inherit_tags</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>.update_model_file</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>.overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -201,7 +196,7 @@ Also fills in necessary YAML fields for using `create_run_log()` later.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>.parent_mod</th>
-      <td><p>S3 object of class `bbi_nonmem_model` to be used as the basis for copy.</p></td>
+      <td><p>Integer that corresponds to parent model to use as a basis for the copy.</p></td>
     </tr>
     <tr>
       <th>.new_model</th>
@@ -209,7 +204,7 @@ Also fills in necessary YAML fields for using `create_run_log()` later.</p>
     </tr>
     <tr>
       <th>.description</th>
-      <td><p>Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.</p></td>
+      <td><p>Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`).</p></td>
     </tr>
     <tr>
       <th>.based_on_additional</th>
@@ -225,7 +220,7 @@ Also fills in necessary YAML fields for using `create_run_log()` later.</p>
     </tr>
     <tr>
       <th>.update_model_file</th>
-      <td><p>Boolean for whether to update the `$PROBLEM` line in the new control stream. By default it is TRUE, but if FALSE is passed `.new_model.[mod|ctl]` will be an exact copy of its parent control stream.</p></td>
+      <td><p>Boolean for whether to update the newly created model file. By default it is TRUE, but if FALSE is passed new model file will be an exact copy of its parent.</p></td>
     </tr>
     <tr>
       <th>.overwrite</th>
@@ -237,16 +232,12 @@ Also fills in necessary YAML fields for using `create_run_log()` later.</p>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>S3 object of class `bbi_nonmem_model` that can be passed to `submit_nonmem_model()`</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
     </ul>
 
   </div>

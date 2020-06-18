@@ -117,10 +117,16 @@ get_yaml_path <- function(.bbi_object, .check_exists = TRUE) {
 # Manipulating file extensions
 ###############################
 
+#' Private helper to check if file has a valid NONMEM control stream extension
+#' @param .path File path to check
+#' @keywords internal
 is_valid_nonmem_extension <- function(.path) {
   tools::file_ext(.path) %in% c("ctl", "mod")
 }
 
+#' Private helper to check if file has a valid YAML extension
+#' @param .path File path to check
+#' @keywords internal
 is_valid_yaml_extension <- function(.path) {
   tools::file_ext(.path) %in% c("yaml", "yml")
 }
@@ -202,6 +208,7 @@ get_model_id.bbi_nonmem_model <- function(.mod) {
 #' Also NOTE that `.directory` must point an already existing directory so that the absolute path can be reliably built.
 #' @param .directory Character scaler for the directory
 #' @param .path Character scaler for the path to the file (could be just the file name, or could be in a subdirectory)
+#' @keywords internal
 combine_directory_path <- function(.directory, .path) {
   # If .directory is NULL, set to working directory
   if (is.null(.directory)) {
@@ -221,8 +228,9 @@ combine_directory_path <- function(.directory, .path) {
 }
 
 
-#' helper to find valid model file and return ctl_ext(.path) by default if not found
+#' Private helper to find valid model file and return ctl_ext(.path) by default if not found
 #' @param .path File path to a NONMEM model file (control stream) with either `.ctl` or `.mod` extension
+#' @keywords internal
 find_model_file_path <- function(.path) {
   .ctl_path <- ctl_ext(.path)
   .mod_path <- mod_ext(.path)
@@ -237,10 +245,11 @@ find_model_file_path <- function(.path) {
 }
 
 
-#' helper to find valid yaml file
+#' Private helper to find valid yaml file
 #' @param .path File path with any extension or no extension.
 #' Function will search for that path with either a .yaml or .yml extension and error if neither is found.
 #' Will also error if _both_ are found, because there cannot be two YAML files referring to the same model.
+#' @keywords internal
 find_yaml_file_path <- function(.path) {
   .yml_path <- yml_ext(.path)
   .yaml_path <- yaml_ext(.path)

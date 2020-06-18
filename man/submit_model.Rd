@@ -5,7 +5,6 @@
 \alias{submit_model.bbi_nonmem_model}
 \alias{submit_model.character}
 \alias{submit_model.numeric}
-\alias{submit_nonmem_model}
 \title{S3 generic method for submit_model}
 \usage{
 submit_model(
@@ -51,19 +50,9 @@ submit_model(
   .dry_run = FALSE,
   .directory = get_model_directory()
 )
-
-submit_nonmem_model(
-  .mod,
-  .bbi_args = NULL,
-  .mode = c("sge", "local"),
-  ...,
-  .config_path = file.path(get_model_directory() \%||\% ".", "babylon.yaml"),
-  .wait = TRUE,
-  .dry_run = FALSE
-)
 }
 \arguments{
-\item{.mod}{An S3 object of class `bbi_nonmem_model`, for example from `new_model()`, `read_model()` or `copy_model_from()`}
+\item{.mod}{Integer that corresponds to the name of a YAML and model file}
 
 \item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.}
 
@@ -79,9 +68,6 @@ submit_nonmem_model(
 
 \item{.directory}{Model directory containing the files referenced by `.mod`. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
 }
-\value{
-An S3 object of class `babylon_process`
-}
 \description{
 S3 generic method for submit_model
 
@@ -92,6 +78,4 @@ Should be path to yaml (with or without .yaml extension), or a valid model file 
 
 S3 dispatch for submit_model from numeric input
 This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`
-
-Submit a NONMEM model via babylon
 }

@@ -6,6 +6,7 @@
 #' @importFrom fs path_rel
 #' @return S3 object of class `bbi_{.model_type}_model` that can be passed to `submit_model()`, `model_summary()` etc.
 #' @rdname create_object
+#' @keywords internal
 create_model_object <- function(.mod_list) {
 
   if(!inherits(.mod_list, "list")) {
@@ -83,6 +84,7 @@ create_model_object <- function(.mod_list) {
 #' @param res List to attempt to assign the class to
 #' @param .model_type Character scaler of a valid model type (currently either `nonmem` or `stan`)
 #' @rdname create_object
+#' @keywords internal
 create_summary_object <- function(res, .model_type = SUPPORTED_MOD_TYPES) {
 
   if(!inherits(res, "list")) {
@@ -112,6 +114,7 @@ create_summary_object <- function(res, .model_type = SUPPORTED_MOD_TYPES) {
 #' First checks to be sure the required keys are all present
 #' @param res List to attempt to assign the class to
 #' @rdname create_object
+#' @keywords internal
 create_process_object <- function(res) {
 
   if(!inherits(res, "list")) {
@@ -139,6 +142,7 @@ create_process_object <- function(res) {
 #' First checks to be sure the required columns are all present
 #' @param log_df data.frame or tibble to attempt to assign the class to
 #' @rdname create_object
+#' @keywords internal
 create_run_log_object <- function(log_df) {
 
   if(!inherits(log_df, "data.frame")) {

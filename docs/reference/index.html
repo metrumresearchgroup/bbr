@@ -67,7 +67,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0.7002</span>
       </span>
     </div>
 
@@ -202,45 +202,21 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="build_bbi_param_list.html">build_bbi_param_list()</a></code> </p>
-        </td>
-        <td><p>Builds list of unique parameter sets for multiple model bbi calls</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="build_matrix_indices.html">build_matrix_indices()</a></code> </p>
-        </td>
-        <td><p>Builds matrix indices labels</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="build_path_from_mod_obj.html">build_path_from_mod_obj()</a></code> </p>
-        </td>
-        <td><p>Builds the absolute path to a file in the output directory from components of the `bbi_.model_type_model` object</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="check_bbi_exe.html">check_bbi_exe()</a></code> </p>
         </td>
         <td><p>Checks that a bbi binary is present at the path passed to .bbi_exe_path</p></td>
       </tr><tr>
         
         <td>
+          <p><code><a href="check_bbi_version_constraint.html">check_bbi_version_constraint()</a></code> </p>
+        </td>
+        <td><p>Check if bbi_version is below minimum allowed version</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="check_file.html">check_file()</a></code> <code><a href="check_file.html">tail_output()</a></code> <code><a href="check_file.html">tail_lst()</a></code> </p>
         </td>
         <td><p>Reads the head and tail of specified file and prints it the console and/or returns it as a character vector.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="check_lst_file.html">check_lst_file()</a></code> </p>
-        </td>
-        <td><p>Helper function to look for .lst function in a directory</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="check_nonmem_args.html">check_nonmem_args()</a></code> </p>
-        </td>
-        <td><p>Checks that all passed NONMEM command line args are valid and formats</p></td>
       </tr><tr>
         
         <td>
@@ -262,70 +238,15 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="clean_ctl.html">clean_ctl()</a></code> </p>
-        </td>
-        <td><p>Parse control stream to a named list of the blocks</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="combine_directory_path.html">combine_directory_path()</a></code> </p>
-        </td>
-        <td><p>Build absolute path from a directory and path</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="combine_list_objects.html">combine_list_objects()</a></code> </p>
-        </td>
-        <td><p>Combines two named lists. By default, shared keys are overwritten by that key in .new_list
-Any S3 classes will be inherited with those from .new_list given precedence.</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="config_log.html">config_log()</a></code> </p>
         </td>
         <td><p>Parses model config.json outputs into a log tibble</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="copy_control_stream.html">copy_control_stream()</a></code> </p>
-        </td>
-        <td><p>Copy a NONMEM control stream file</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="copy_model_from.html">copy_model_from()</a></code> <code><a href="copy_model_from.html">copy_nonmem_model_from()</a></code> </p>
+          <p><code><a href="copy_model_from.html">copy_model_from()</a></code> </p>
         </td>
         <td><p>Generic S3 method from iterating on models.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="create_object.html">create_model_object()</a></code> <code><a href="create_object.html">create_summary_object()</a></code> <code><a href="create_object.html">create_process_object()</a></code> <code><a href="create_object.html">create_run_log_object()</a></code> </p>
-        </td>
-        <td><p>Creates S3 object of class `bbi_.model_type_model` from list with `MODEL_REQ_INPUT_KEYS`</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="enforce_length.html">enforce_length()</a></code> </p>
-        </td>
-        <td><p>Helper to enforce length of a list element</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="find_config_file_path.html">find_config_file_path()</a></code> </p>
-        </td>
-        <td><p>Private helper to search for babylon.yaml config files</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="find_model_file_path.html">find_model_file_path()</a></code> </p>
-        </td>
-        <td><p>helper to find valid model file and return ctl_ext(.path) by default if not found</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="find_yaml_file_path.html">find_yaml_file_path()</a></code> </p>
-        </td>
-        <td><p>helper to find valid yaml file</p></td>
       </tr><tr>
         
         <td>
@@ -353,13 +274,7 @@ Any S3 classes will be inherited with those from .new_list given precedence.</p>
       </tr><tr>
         
         <td>
-          <p><code><a href="is_diag.html">is_diag()</a></code> </p>
-        </td>
-        <td><p>Check if diagonal index or not</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="model_summary.html">model_summary()</a></code> <code><a href="model_summary.html">nonmem_summary()</a></code> </p>
+          <p><code><a href="model_summary.html">model_summary()</a></code> </p>
         </td>
         <td><p>S3 generic for getting model summary</p></td>
       </tr><tr>
@@ -396,18 +311,6 @@ Also creates necessary YAML file for using functions like `add_tags()` and `run_
       </tr><tr>
         
         <td>
-          <p><code><a href="parse_args_list.html">parse_args_list()</a></code> </p>
-        </td>
-        <td><p>Combines NONMEM args that were passed into the function call with args that were parsed from a model yaml</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="parse_param_comment.html">parse_param_comment()</a></code> <code><a href="parse_param_comment.html">parse_same_block()</a></code> </p>
-        </td>
-        <td><p>extract labels from comments in raw ctl string</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="plot_nonmem_table_df.html">plot_nonmem_table_df()</a></code> <code><a href="plot_nonmem_table_df.html">plot_grd()</a></code> <code><a href="plot_nonmem_table_df.html">plot_ext()</a></code> </p>
         </td>
         <td><p>Creates a line plot of the wide-format tibble output from check_nonmem_table_output</p></td>
@@ -416,7 +319,7 @@ Also creates necessary YAML file for using functions like `add_tags()` and `run_
         <td>
           <p><code><a href="print_nonmem_args.html">print_nonmem_args()</a></code> </p>
         </td>
-        <td><p>Prints all valid arguments to pass in submit_nonmem_model(.args=list())</p></td>
+        <td><p>Print valid .bbi_args</p></td>
       </tr><tr>
         
         <td>
@@ -456,49 +359,25 @@ Also creates necessary YAML file for using functions like `add_tags()` and `run_
       </tr><tr>
         
         <td>
-          <p><code><a href="safe_based_on.html">safe_based_on()</a></code> </p>
-        </td>
-        <td><p>Checks for yaml files relative to a starting location</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="safe_read_model.html">safe_read_model()</a></code> </p>
-        </td>
-        <td><p>Read in model YAML with error handling</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="save_model_yaml.html">save_model_yaml()</a></code> </p>
         </td>
         <td><p>Saves a model model object to a yaml file</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="set_model_directory.html">set_model_directory()</a></code> <code><a href="set_model_directory.html">set_model_directory()</a></code> <code><a href="set_model_directory.html">get_model_directory()</a></code> </p>
+          <p><code><a href="set_model_directory.html">set_model_directory()</a></code> <code><a href="set_model_directory.html">get_model_directory()</a></code> </p>
         </td>
         <td><p>Set global model directory option</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="stop_get_fail_msg.html">stop_get_fail_msg()</a></code> </p>
-        </td>
-        <td><p>Build error message and throw error for generic failure fo get_... functions</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="stop_get_scaler_msg.html">stop_get_scaler_msg()</a></code> </p>
-        </td>
-        <td><p>Build error message and throw error for passing character vector to get_... functions</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="submit_model.html">submit_model()</a></code> <code><a href="submit_model.html">submit_nonmem_model()</a></code> </p>
+          <p><code><a href="submit_model.html">submit_model()</a></code> </p>
         </td>
         <td><p>S3 generic method for submit_model</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="submit_models.html">submit_models()</a></code> <code><a href="submit_models.html">submit_nonmem_models()</a></code> </p>
+          <p><code><a href="submit_models.html">submit_models()</a></code> </p>
         </td>
         <td><p>S3 generic method for submit_models</p></td>
       </tr><tr>

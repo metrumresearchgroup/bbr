@@ -2,13 +2,15 @@
   if (is.null(x)) return(y)
   return(x)
 }
+
+
 #' Checks that all passed NONMEM command line args are valid and formats
 #' @param .args A named list of .args to check
 #' @importFrom checkmate assert_list
 #' @importFrom rlang is_bare_character is_bare_numeric is_bare_logical
 #' @importFrom purrr imap set_names
 #' @return character string, output from format_cmd_args()
-#' @export
+#' @keywords internal
 check_nonmem_args <- function(.args) {
   # if NULL, return NULL back
   if (length(.args) == 0) {
@@ -114,6 +116,7 @@ format_cmd_args <- function(.args, .collapse = FALSE) {
 #' @importFrom purrr map_lgl
 #' @param .mods a list containing only `bbi_{.model_type}_model` objects
 #' @param .bbi_args A named list specifying arguments to pass to babylon. This will over-ride any shared arguments from the model objects.
+#' @keywords internal
 build_bbi_param_list <- function(.mods, .bbi_args = NULL) {
 
   # check that everything in list is a model object
@@ -156,7 +159,7 @@ build_bbi_param_list <- function(.mods, .bbi_args = NULL) {
 #' @param .yaml_args A named list of arguments for bbi, parsed from user input yaml
 #' @importFrom checkmate assert_list
 #' @return The combination of the two lists, with .func_args overwriting any keys that are shared
-#' @export
+#' @keywords internal
 parse_args_list <- function(.func_args, .yaml_args) {
   # start with .yaml_args
   if (is.null(.yaml_args)) {
@@ -186,7 +189,7 @@ parse_args_list <- function(.func_args, .yaml_args) {
 #' @param .append Shared keys will have their contents concatenated instead of overwriting from .new_list
 #' @importFrom checkmate assert_list
 #' @return The combined list
-#' @export
+#' @keywords internal
 combine_list_objects <- function(.new_list, .old_list, .append = FALSE) {
   # check that unique named lists were passed
   tryCatch(
@@ -218,8 +221,9 @@ combine_list_objects <- function(.new_list, .old_list, .append = FALSE) {
   return(.out_list)
 }
 
-
-#' Prints all valid arguments to pass in submit_nonmem_model(.args=list())
+#' Print valid .bbi_args
+#'
+#' Prints all valid arguments to pass in to `.bbi_args=list()` argument of `submit_model()` or `model_summary()`
 #' @importFrom purrr imap
 #' @export
 print_nonmem_args <- function() {
@@ -232,24 +236,6 @@ print_nonmem_args <- function() {
 
 check_required_keys <- function(.list, .req) {
   all(.req %in% names(.list))
-}
-
-#' Set global model directory option
-#'
-#' Sets `options('rbabylon.model_directory')` to the absolute path of the directory passed to `.path`.
-#' Note that the directory must exist or this will error.
-#' This is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
-#' once this is set, those functions can take a path relative to this directory instead of the working/script directory.
-#' @param .path Path, either from working directory or absolute, that will be set as `options('rbabylon.model_directory')`
-#' @export
-set_model_directory <- function(.path) {
-  if (is.null(.path)) {
-    options('rbabylon.model_directory' = NULL)
-  } else {
-    options('rbabylon.model_directory' = normalizePath(.path, mustWork = TRUE))
-  }
-
-  cat(glue("options('rbabylon.model_directory') set to {options('rbabylon.model_directory')}"))
 }
 
 
@@ -310,6 +296,7 @@ get_model_directory <- function() {
 #' @importFrom fs is_file file_exists is_absolute_path
 #' @importFrom stringr str_detect
 #' @return path to babylon.yaml in `.config_path`, relative to `.model_dir`
+#' @keywords internal
 find_config_file_path <- function(.config_path, .model_dir) {
   if (!fs::is_absolute_path(.model_dir)) {
     stop(glue("USER SHOULDN'T SEE THIS ERROR: find_config_file_path(.model_dir) is not absolute: {.model_dir}"))
@@ -339,6 +326,12 @@ find_config_file_path <- function(.config_path, .model_dir) {
 # Error handlers
 ############################
 
+#' Raise error in strict mode
+#'
+#' Raises an error if `options("rbabylon.strict" = TRUE)` (recommended). Otherwise raises a warning.
+#' These errors are used for things like type-checking which guarantees safe, predictable behavior of functions,
+#' but theoretically advanced users or developers could want to turn them off.
+#' @keywords internal
 strict_mode_error <- function(err_msg) {
   if (isTRUE(getOption("rbabylon.strict"))) {
     stop(err_msg, call. = FALSE)
@@ -353,6 +346,7 @@ strict_mode_error <- function(err_msg) {
 
 #' Build error message and throw error for passing character vector to get_... functions
 #' @param .len The length of the vector that was passed.
+#' @keywords internal
 stop_get_scaler_msg <- function(.len) {
   stop(paste(
     glue("When passing character input to `rbabylon::get_...` functions, only scaler values are permitted. A vector of length {.len} was passed."),
@@ -364,6 +358,7 @@ stop_get_scaler_msg <- function(.len) {
 #' @param .bbi_object The object that something is attempting to be extracted from
 #' @param .key The name of the field that is attempting to be extracted
 #' @param .msg Character scaler or vector of more specific error messages to include at the end
+#' @keywords internal
 stop_get_fail_msg <- function(.bbi_object, .key, .msg = "") {
   stop(glue("Cannot extract `{.key}` from object of class `{paste(class(.bbi_object), collapse = ', ')}` :\n{paste(.msg, collapse = ', ')}"), call. = FALSE)
 }

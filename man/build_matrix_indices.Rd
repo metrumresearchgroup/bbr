@@ -12,3 +12,4 @@ build_matrix_indices(.is_diag)
 \description{
 Builds matrix indices labels
 }
+\keyword{internal}

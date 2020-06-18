@@ -147,6 +147,7 @@ copy_model_from.numeric <- function(
 
 #' Copy model from an existing NONMEM model
 #'
+#' Private implementation function called by `copy_model_from()` dispatches.
 #' Create new .mod/ctl and new .yaml files based on a previous model. Used for iterating on model development.
 #' Also fills in necessary YAML fields for using `create_run_log()` later.
 #' @param .parent_mod S3 object of class `bbi_nonmem_model` to be used as the basis for copy.
@@ -158,7 +159,7 @@ copy_model_from.numeric <- function(
 #' @importFrom yaml write_yaml
 #' @importFrom purrr list_modify
 #' @return S3 object of class `bbi_nonmem_model` that can be passed to `submit_nonmem_model()`
-#' @rdname copy_model_from
+#' @keywords internal
 copy_nonmem_model_from <- function(
   .parent_mod,
   .new_model,
@@ -251,6 +252,7 @@ copy_nonmem_model_from <- function(
 #' @param .new_model_path Path to copy the new control stream to
 #' @param .update_model_file Boolean for whether to update the `$PROBLEM` line in the new control stream. By default it is TRUE, but if FALSE is passed `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.
 #' @param .description Description of new model run. This will be passed into the `$PROBLEM` of the new control stream (if `.update_model_file=TRUE`).
+#' @keywords internal
 copy_control_stream <- function(.parent_model_path, .new_model_path, .update_model_file = FALSE, .description = NULL) {
   if (.update_model_file) {
     if (is.null(.description)) {

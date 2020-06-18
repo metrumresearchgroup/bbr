@@ -16,3 +16,4 @@ stop_get_fail_msg(.bbi_object, .key, .msg = "")
 \description{
 Build error message and throw error for generic failure fo get_... functions
 }
+\keyword{internal}

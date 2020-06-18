@@ -12,3 +12,4 @@ stop_get_scaler_msg(.len)
 \description{
 Build error message and throw error for passing character vector to get_... functions
 }
+\keyword{internal}

@@ -133,10 +133,12 @@ model_summary.numeric <- function(
 
 
 #' Run `bbi nonmem summary` and parse the output to a list
+#'
+#' Private implementation function called by `model_summary()` dispatches.
 #' @param .mod `bbi_nonmem_model` object for summary
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.
 #' @return List of S3 Class "bbi_nonmem_summary" with all summary information
-#' @rdname model_summary
+#' @keywords internal
 nonmem_summary <- function(
   .mod,
   .bbi_args = NULL,
@@ -189,8 +191,9 @@ nonmem_summary <- function(
   return(res_list)
 }
 
-#' Helper function to look for .lst function in a directory
+#' Private helper function to look for .lst function in a directory
 #' @param .x The directory path to look in for the lst file
+#' @keywords internal
 check_lst_file <- function(.x) {
   lst_file <- fs::dir_ls(.x, type = "file", glob = "*.lst")
   if (!length(lst_file)) {

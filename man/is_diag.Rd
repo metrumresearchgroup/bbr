@@ -12,3 +12,4 @@ is_diag(.name)
 \description{
 Private helper to unpack an matrix index string like '(3,3)' is for a diagonal (i.e. if the numbers are the same)
 }
+\keyword{internal}

@@ -18,3 +18,4 @@ If .path is an absolute path, ignore .directory and just return .path,
 otherwise return `file.path(.directory, .path)`.
 Also NOTE that `.directory` must point an already existing directory so that the absolute path can be reliably built.
 }
+\keyword{internal}

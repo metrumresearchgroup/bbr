@@ -45,6 +45,7 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
 #' Private helper to unpack an matrix index string like '(3,3)' is for a diagonal (i.e. if the numbers are the same)
 #' @param .name A character scaler containing an index string
 #' @importFrom stringr str_replace_all str_split
+#' @keywords internal
 is_diag <- function(.name) {
   .ind <- .name %>%
     str_replace_all(glue("^.*\\(|\\)"), "") %>%

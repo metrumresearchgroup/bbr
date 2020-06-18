@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0.7002</span>
       </span>
     </div>
 
@@ -132,7 +132,7 @@
     <p>Identifies system running and return installation instructions</p>
     </div>
 
-    <pre class="usage"><span class='fu'>use_bbi</span>(<span class='kw'>.dir</span> <span class='kw'>=</span> <span class='st'>"/data/apps"</span>)</pre>
+    <pre class="usage"><span class='fu'>use_bbi</span>(<span class='kw'>.dir</span> <span class='kw'>=</span> <span class='st'>"/data/apps"</span>, <span class='kw'>.force</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -140,6 +140,10 @@
     <tr>
       <th>.dir</th>
       <td><p>directory to install bbi to on linux</p></td>
+    </tr>
+    <tr>
+      <th>.force</th>
+      <td><p>Boolean for whether to force the installation even if current version and local version are the same</p></td>
     </tr>
     </table>
 

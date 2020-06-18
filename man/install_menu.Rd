@@ -16,3 +16,4 @@ install_menu(body, this_os, force)
 \description{
 Private implementation function for installing bbi with interactive menu
 }
+\keyword{internal}

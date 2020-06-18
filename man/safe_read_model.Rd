@@ -12,5 +12,6 @@ safe_read_model(.yaml_path, .directory = get_model_directory())
 \item{.directory}{Model directory which `.yaml_path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
 }
 \description{
-Helper function that tries to call `read_model()` on a yaml path and returns NULL, with no error, if the YAML is not a valid model file.
+Private helper function that tries to call `read_model()` on a yaml path and returns NULL, with no error, if the YAML is not a valid model file.
 }
+\keyword{internal}

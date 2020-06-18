@@ -19,3 +19,4 @@ Heavily modified from tidynm::parse_theta() to parse out the comments into the r
 
 Iterates over a list of $OMEGA or $SIGMA blocks and replaces the SAME blocks with a copy of the block they are referring to.
 }
+\keyword{internal}

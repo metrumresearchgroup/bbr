@@ -1,11 +1,11 @@
 #' @title Installing bbi
 #' @description Identifies system running and return installation instructions
-#' @return character
-#' @param .dir directory to install bbi to on linux
-#' @param .force Boolean for whether to force the installation even if current version and local version are the same
-#' @export
 #' @importFrom glue glue glue_collapse
 #' @importFrom cli rule
+#' @param .dir directory to install bbi to on linux
+#' @param .force Boolean for whether to force the installation even if current version and local version are the same
+#' @return character
+#' @export
 use_bbi <- function(.dir = "/data/apps", .force = FALSE){
 
   os <- c('linux','darwin','mingw')
@@ -39,9 +39,11 @@ use_bbi <- function(.dir = "/data/apps", .force = FALSE){
 
 }
 
+#' Private helper function to most recent release version from repo
 #' @importFrom stringr str_detect
 #' @importFrom jsonlite read_json
 #' @importFrom glue glue
+#' @keywords internal
 current_release <- function(owner = 'metrumresearchgroup', repo = 'babylon', os = c('linux','darwin','windows')){
 
   tf <- tempfile(fileext = '.json')
@@ -69,18 +71,20 @@ current_release <- function(owner = 'metrumresearchgroup', repo = 'babylon', os 
 
 
 #' @title current release
+#' @description Helper function to get version number of most recent release of babylon from GitHub.
 #' @param os operating system, Default: 'linux'
-#' @importFrom stringr str_replace_all
+#' @importFrom stringr str_replace
 #' @rdname bbi_current_release
 #' @export
 bbi_current_release <- function(os = "linux"){
-  str_replace_all(basename(dirname(current_release(os = os))), '^v', '')
+  str_replace(basename(dirname(current_release(os = os))), '^v', '')
 }
 
 #' Private implementation function for installing bbi with interactive menu
 #' @param body Character vector of installation commands to run with `system`
 #' @param this_os Character scaler of OS
 #' @param force Boolean for whether to force the installation even if current version and local version are the same
+#' @keywords internal
 install_menu <- function(body, this_os, force){
 
   release_v <- bbi_current_release()
@@ -116,6 +120,7 @@ install_menu <- function(body, this_os, force){
 #' Private helper function for building commands to install bbi on Linux
 #' @param .dir Directory to install into
 #' @param .bbi_url Full url to download tarball from
+#' @keywords internal
 linux_install_commands <- function(.dir, .bbi_url) {
 
   bbi_loc <- normalizePath(file.path(.dir, "bbi"), mustWork = FALSE)
@@ -166,8 +171,10 @@ bbi_version <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')){
   )
 }
 
+#' Private helper to construct version comparison message
 #' @importFrom cli rule col_blue
 #' @importFrom glue glue
+#' @keywords internal
 version_message <- function(local_v = bbi_version(), release_v = bbi_current_release()){
 
   flag <- ifelse(identical(release_v,local_v),"Current Release","Not Current Release")

@@ -2,10 +2,10 @@
 % Please edit documentation in R/utils.R
 \name{print_nonmem_args}
 \alias{print_nonmem_args}
-\title{Prints all valid arguments to pass in submit_nonmem_model(.args=list())}
+\title{Print valid .bbi_args}
 \usage{
 print_nonmem_args()
 }
 \description{
-Prints all valid arguments to pass in submit_nonmem_model(.args=list())
+Prints all valid arguments to pass in to `.bbi_args=list()` argument of `submit_model()` or `model_summary()`
 }

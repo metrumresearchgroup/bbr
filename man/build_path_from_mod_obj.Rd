@@ -14,3 +14,4 @@ build_path_from_mod_obj(.mod, .extension)
 \description{
 Builds the absolute path to a file in the output directory from components of the `bbi_{.model_type}_model` object
 }
+\keyword{internal}

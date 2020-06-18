@@ -5,7 +5,6 @@
 \alias{submit_models.list}
 \alias{submit_models.character}
 \alias{submit_models.numeric}
-\alias{submit_nonmem_models}
 \title{S3 generic method for submit_models}
 \usage{
 submit_models(
@@ -51,19 +50,9 @@ submit_models(
   .dry_run = FALSE,
   .directory = get_model_directory()
 )
-
-submit_nonmem_models(
-  .mods,
-  .bbi_args = NULL,
-  .mode = c("sge", "local"),
-  ...,
-  .config_path = file.path(get_model_directory() \%||\% ".", "babylon.yaml"),
-  .wait = TRUE,
-  .dry_run = FALSE
-)
 }
 \arguments{
-\item{.mods}{A list of S3 objects of class `bbi_nonmem_model`}
+\item{.mods}{Integer vector that corresponds to the names of YAML and model files}
 
 \item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.}
 
@@ -79,9 +68,6 @@ submit_nonmem_models(
 
 \item{.directory}{Model directory containing the files referenced by `.mods`. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
 }
-\value{
-A list of S3 objects of class `babylon_process`
-}
 \description{
 S3 generic method for submit_models
 
@@ -92,6 +78,4 @@ S3 dispatch for submit_models from character vector
 
 S3 dispatch for submit_models from numeric input
 This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`
-
-Submits multiple NONMEM models in batch via babylon
 }

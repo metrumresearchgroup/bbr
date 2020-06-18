@@ -3,6 +3,7 @@
 #' Builds the absolute path to a file in the output directory from components of the `bbi_{.model_type}_model` object
 #' @param .mod `bbi_{.model_type}_model` object
 #' @param .extension file extension to append (for example `lst`, `ext`, `grd`, etc.)
+#' @keywords internal
 build_path_from_mod_obj <- function(.mod, .extension) {
   out_file_path <- file.path(.mod[[WORKING_DIR]],
                         .mod[[YAML_OUT_DIR]],

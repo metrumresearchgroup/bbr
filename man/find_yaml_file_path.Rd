@@ -2,7 +2,7 @@
 % Please edit documentation in R/get-path-from-object.R
 \name{find_yaml_file_path}
 \alias{find_yaml_file_path}
-\title{helper to find valid yaml file}
+\title{Private helper to find valid yaml file}
 \usage{
 find_yaml_file_path(.path)
 }
@@ -12,5 +12,6 @@ Function will search for that path with either a .yaml or .yml extension and err
 Will also error if _both_ are found, because there cannot be two YAML files referring to the same model.}
 }
 \description{
-helper to find valid yaml file
+Private helper to find valid yaml file
 }
+\keyword{internal}

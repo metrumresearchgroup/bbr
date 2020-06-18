@@ -40,8 +40,7 @@
 Get model summary from `bbi_nonmem_model` object and optionally check if model is done before erroring
 S3 dispatch for getting model summary from output directory path
 S3 dispatch for getting model summary from numeric input
-This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`
-Run `bbi nonmem summary` and parse the output to a list" />
+This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -74,7 +73,7 @@ Run `bbi nonmem summary` and parse the output to a list" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0.7002</span>
       </span>
     </div>
 
@@ -139,7 +138,6 @@ Run `bbi nonmem summary` and parse the output to a list" />
 <p>S3 dispatch for getting model summary from output directory path</p>
 <p>S3 dispatch for getting model summary from numeric input
 This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`</p>
-<p>Run `bbi nonmem summary` and parse the output to a list</p>
     </div>
 
     <pre class="usage"><span class='fu'>model_summary</span>(
@@ -179,16 +177,14 @@ This will only work if you are calling from the same directory as the models, or
   <span class='no'>...</span>,
   <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>()
-)
-
-<span class='fu'>nonmem_summary</span>(<span class='no'>.mod</span>, <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>, <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>.mod</th>
-      <td><p>`bbi_nonmem_model` object for summary</p></td>
+      <td><p>Integer that corresponds to the name of a YAML, model file, and output directory</p></td>
     </tr>
     <tr>
       <th>.model_type</th>
@@ -196,7 +192,7 @@ This will only work if you are calling from the same directory as the models, or
     </tr>
     <tr>
       <th>.bbi_args</th>
-      <td><p>A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.</p></td>
+      <td><p>A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -212,16 +208,12 @@ This will only work if you are calling from the same directory as the models, or
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>List of S3 Class "bbi_nonmem_summary" with all summary information</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
     </ul>
 
   </div>

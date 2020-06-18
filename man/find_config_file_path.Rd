@@ -17,3 +17,4 @@ path to babylon.yaml in `.config_path`, relative to `.model_dir`
 \description{
 Private helper to search for babylon.yaml config files
 }
+\keyword{internal}

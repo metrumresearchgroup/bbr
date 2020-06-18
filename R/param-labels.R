@@ -178,6 +178,7 @@ block <- function(.n) {
 #' @importFrom tidyr replace_na
 #' @importFrom purrr map map_df
 #' @rdname parse_param_comment
+#' @keywords internal
 parse_param_comment <- function(.x, .theta = FALSE){
 
   if(inherits(.x,'list')) {
@@ -264,6 +265,7 @@ parse_param_comment <- function(.x, .theta = FALSE){
 #' @param .x List of character vectors representing either $OMEGA or $SIGMA blocks, as parsed by `clean_ctl()`
 #' @importFrom stringr str_replace str_replace_all str_extract regex
 #' @rdname parse_param_comment
+#' @keywords internal
 parse_same_block <- function(.x) {
   if(!inherits(.x,'list')) {
     warning(paste(
@@ -296,6 +298,7 @@ parse_same_block <- function(.x) {
 
 #' Builds matrix indices labels
 #' @param .is_diag Boolean vector denoting whether each element is a diagonal
+#' @keywords internal
 build_matrix_indices <- function(.is_diag) {
   total_diag <- sum(.is_diag)
   .x <- character(length(.is_diag))
@@ -328,6 +331,7 @@ build_matrix_indices <- function(.is_diag) {
 #' Taken directly from tidynm package.
 #' @param x control stream as a character scaler with lines separated by newline characters
 #' @importFrom purrr set_names
+#' @keywords internal
 clean_ctl <- function(x){
 
   x0 <- strsplit(x,'\n')[[1]]

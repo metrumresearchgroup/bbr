@@ -139,13 +139,14 @@ submit_model.numeric <- function(
   return(res)
 }
 
-
 #' Submit a NONMEM model via babylon
+#'
+#' Private implementation function called by `submit_model()` dispatches.
 #' @param .mod An S3 object of class `bbi_nonmem_model`, for example from `new_model()`, `read_model()` or `copy_model_from()`
 #' @importFrom stringr str_detect
 #' @importFrom tools file_path_sans_ext
 #' @return An S3 object of class `babylon_process`
-#' @rdname submit_model
+#' @keywords internal
 submit_nonmem_model <- function(.mod,
                                 .bbi_args = NULL,
                                 .mode = c("sge", "local"),
@@ -356,14 +357,16 @@ submit_models.numeric <- function(
 }
 
 
-#' Submits multiple NONMEM models in batch via babylon
+#' Submit multiple NONMEM models in batch via babylon
+#'
+#' Private implementation function called by `submit_models()` dispatches.
 #' @param .mods A list of S3 objects of class `bbi_nonmem_model`
 #' @importFrom stringr str_detect
 #' @importFrom tools file_path_sans_ext
 #' @importFrom purrr map
 #' @importFrom rlang is_bare_list
 #' @return A list of S3 objects of class `babylon_process`
-#' @rdname submit_models
+#' @keywords internal
 submit_nonmem_models <- function(.mods,
                                 .bbi_args = NULL,
                                 .mode = c("sge", "local"),

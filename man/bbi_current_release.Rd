@@ -10,5 +10,5 @@ bbi_current_release(os = "linux")
 \item{os}{operating system, Default: 'linux'}
 }
 \description{
-current release
+Helper function to get version number of most recent release of babylon from GitHub.
 }
