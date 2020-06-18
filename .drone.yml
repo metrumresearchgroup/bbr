@@ -6,7 +6,7 @@ name: rbabylon
 global-variables:
     environment: &default_environment
         #BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
-        BABYLON_URL: https://github.com/metrumresearchgroup/babylon/releases/download/v2.2.0-beta.1/bbi_linux_amd64.tar.gz
+        BABYLON_URL: https://github.com/metrumresearchgroup/babylon/releases/download/v2.2.0-beta.2/bbi_linux_amd64.tar.gz
 
 steps:
 - name: Pull mpn container from ECR
