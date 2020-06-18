@@ -3,7 +3,7 @@
 # format NONMEM output to parameter tables
 ############################################
 
-#' S3 generic for parsing parameter estimate table
+#' Parses parameter estimates table from model_summary() output
 #' @param .summary generic summary object
 #' @export
 #' @rdname param_estimates

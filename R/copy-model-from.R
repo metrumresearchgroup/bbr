@@ -2,7 +2,10 @@
 # Iterating on models
 #######################
 
-#' Generic S3 method from iterating on models.
+#' Create new model by copying existing model
+#'
+#' Create new model by copying existing model. Useful for iterating during model development.
+#' Also fills `based_on` field by default, for constructing model ancestry. See \href{../articles/using-based-on.html}{"Using based_on field" vignette} for details.
 #' @param .parent_mod Model to copy from
 #' @param .new_model Path to write new model files to WITHOUT FILE EXTENSION. Function will create both `{.new_model}.yaml` and a new model file based on this path.
 #' @param .description Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`).

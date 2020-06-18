@@ -5,7 +5,7 @@
 \alias{submit_models.list}
 \alias{submit_models.character}
 \alias{submit_models.numeric}
-\title{S3 generic method for submit_models}
+\title{Submit multiple models to be run in batch}
 \usage{
 submit_models(
   .mods,
@@ -69,12 +69,12 @@ submit_models(
 \item{.directory}{Model directory containing the files referenced by `.mods`. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
 }
 \description{
-S3 generic method for submit_models
+Submit multiple models to be run in batch
 
 S3 dispatch for submit_model from bbi_nonmem_model
 
 S3 dispatch for submit_models from character vector
-  Should be a vector of paths to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
+Should be a vector of paths to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
 
 S3 dispatch for submit_models from numeric input
 This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`

@@ -4,7 +4,9 @@
 # s3 dispatches to parse NONMEM output to list
 ################################################
 
-#' S3 generic for getting model summary
+#' Summarize model outputs
+#'
+#' Returns a named list with model outputs and diagnostics.
 #' @param .mod model to summarize
 #' @param .model_type Only used for if passing a path to `.mod` instead of an S3 object. Character scaler specifying the type of model, either 'nonmem' or 'stan'
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`.

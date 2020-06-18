@@ -5,7 +5,7 @@
 \alias{model_summary.bbi_nonmem_model}
 \alias{model_summary.character}
 \alias{model_summary.numeric}
-\title{S3 generic for getting model summary}
+\title{Summarize model outputs}
 \usage{
 model_summary(
   .mod,
@@ -57,12 +57,5 @@ model_summary(
 \item{.directory}{Model directory containing the files referenced by `.mod`. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
 }
 \description{
-S3 generic for getting model summary
-
-Get model summary from `bbi_nonmem_model` object and optionally check if model is done before erroring
-
-S3 dispatch for getting model summary from output directory path
-
-S3 dispatch for getting model summary from numeric input
-This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`
+Returns a named list with model outputs and diagnostics.
 }

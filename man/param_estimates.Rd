@@ -3,7 +3,7 @@
 \name{param_estimates}
 \alias{param_estimates}
 \alias{param_estimates.bbi_nonmem_summary}
-\title{S3 generic for parsing parameter estimate table}
+\title{Parses parameter estimates table from model_summary() output}
 \usage{
 param_estimates(.summary)
 
@@ -13,7 +13,7 @@ param_estimates(.summary)
 \item{.summary}{`bbi_nonmem_summary` object}
 }
 \description{
-S3 generic for parsing parameter estimate table
+Parses parameter estimates table from model_summary() output
 
 S3 dispatch for parsing `bbi_nonmem_summary` object into parameter estimate table
 }

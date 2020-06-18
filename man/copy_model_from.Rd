@@ -5,7 +5,7 @@
 \alias{copy_model_from.bbi_nonmem_model}
 \alias{copy_model_from.character}
 \alias{copy_model_from.numeric}
-\title{Generic S3 method from iterating on models.}
+\title{Create new model by copying existing model}
 \usage{
 copy_model_from(
   .parent_mod,
@@ -75,12 +75,6 @@ copy_model_from(
 \item{.directory}{Model directory which BOTH `.parent_model` and `.new_model` are relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
 }
 \description{
-Generic S3 method from iterating on models.
-
-S3 dispatch for passing `bbi_nonmem_model` object to `copy_model_from()`
-
-S3 dispatch for passing a file path to copy_model_from()
-
-S3 dispatch for passing an integer model identifier to copy_model_from()
-This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`
+Create new model by copying existing model. Useful for iterating during model development.
+Also fills `based_on` field by default, for constructing model ancestry. See \href{../articles/using-based-on.html}{"Using based_on field" vignette} for details.
 }

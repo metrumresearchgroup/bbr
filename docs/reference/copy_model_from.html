@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Generic S3 method from iterating on models. — copy_model_from • rbabylon</title>
+<title>Create new model by copying existing model — copy_model_from • rbabylon</title>
 
 
 <!-- jquery -->
@@ -35,12 +35,9 @@
 
 
 
-<meta property="og:title" content="Generic S3 method from iterating on models. — copy_model_from" />
-<meta property="og:description" content="Generic S3 method from iterating on models.
-S3 dispatch for passing `bbi_nonmem_model` object to `copy_model_from()`
-S3 dispatch for passing a file path to copy_model_from()
-S3 dispatch for passing an integer model identifier to copy_model_from()
-This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`" />
+<meta property="og:title" content="Create new model by copying existing model — copy_model_from" />
+<meta property="og:description" content="Create new model by copying existing model. Useful for iterating during model development.
+Also fills `based_on` field by default, for constructing model ancestry. See &quot;Using based_on field&quot; vignette for details." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -127,17 +124,14 @@ This will only work if you are calling from the same directory as the models, or
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Generic S3 method from iterating on models.</h1>
+    <h1>Create new model by copying existing model</h1>
     
     <div class="hidden name"><code>copy_model_from.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Generic S3 method from iterating on models.</p>
-<p>S3 dispatch for passing `bbi_nonmem_model` object to `copy_model_from()`</p>
-<p>S3 dispatch for passing a file path to copy_model_from()</p>
-<p>S3 dispatch for passing an integer model identifier to copy_model_from()
-This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`</p>
+    <p>Create new model by copying existing model. Useful for iterating during model development.
+Also fills `based_on` field by default, for constructing model ancestry. See <a href='../articles/using-based-on.html'>"Using based_on field" vignette</a> for details.</p>
     </div>
 
     <pre class="usage"><span class='fu'>copy_model_from</span>(

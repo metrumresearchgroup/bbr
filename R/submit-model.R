@@ -2,7 +2,7 @@
 # S3 dispatches for submitting a single model
 ###############################################
 
-#' S3 generic method for submit_model
+#' Submit a model to be run
 #' @param .mod generic model to submit
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.
 #' @param .mode Either "local" for local execution or "sge" to submit model(s) to the grid
@@ -192,7 +192,7 @@ submit_nonmem_model <- function(.mod,
 # S3 dispatches for submitting multiple models in batch
 #########################################################
 
-#' S3 generic method for submit_models
+#' Submit multiple models to be run in batch
 #' @param .mods generic list or vector of models to submit
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.
 #' @param .mode Either "local" for local execution or "sge" to submit model(s) to the grid
@@ -279,7 +279,7 @@ submit_models.list <- function(
 
 
 #' S3 dispatch for submit_models from character vector
-#'   Should be a vector of paths to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
+#' Should be a vector of paths to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
 #' @param .mods Character vector of paths to YAML or model file
 #' @param .directory Model directory which `.mods` paths are relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
 #' @importFrom fs file_exists

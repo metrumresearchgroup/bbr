@@ -5,7 +5,7 @@
 \alias{submit_model.bbi_nonmem_model}
 \alias{submit_model.character}
 \alias{submit_model.numeric}
-\title{S3 generic method for submit_model}
+\title{Submit a model to be run}
 \usage{
 submit_model(
   .mod,
@@ -69,7 +69,7 @@ submit_model(
 \item{.directory}{Model directory containing the files referenced by `.mod`. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
 }
 \description{
-S3 generic method for submit_model
+Submit a model to be run
 
 S3 dispatch for submit_model from bbi_nonmem_model
 
