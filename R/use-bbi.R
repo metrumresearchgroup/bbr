@@ -181,6 +181,7 @@ bbi_version <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')){
 #' @importFrom cli rule col_blue col_red
 #' @importFrom glue glue
 #' @param local_v Character scaler for version number on local installation
+#' @param release_v Character scaler for version number of current release
 version_message <- function(local_v, release_v){
 
   if (local_v == "") {
