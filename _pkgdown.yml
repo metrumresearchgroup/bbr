@@ -17,10 +17,13 @@ reference:
   - read_model
   - reconcile_yaml
   - check_yaml_in_sync
+  - set_model_directory
+  - get_model_directory
 - title: Model submission
   contents:
   - submit_model
   - submit_models
+  - print_nonmem_args
 - title: Model summary
   contents:
   - add_config
@@ -80,7 +83,4 @@ reference:
   - plot_nonmem_table_df
   - plot_grd
   - plot_ext
-  - print_nonmem_args
-  - set_model_directory
-  - get_model_directory
   - suppressSpecificWarning

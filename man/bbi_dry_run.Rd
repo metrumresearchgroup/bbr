@@ -2,7 +2,7 @@
 % Please edit documentation in R/rbabylon.R
 \name{bbi_dry_run}
 \alias{bbi_dry_run}
-\title{Babylon dry_run}
+\title{Creates a `babylon_process` object with all the required keys, without actually running the command}
 \usage{
 bbi_dry_run(.cmd_args, .dir)
 }
@@ -12,7 +12,6 @@ bbi_dry_run(.cmd_args, .dir)
 \item{.dir}{The working directory to run command in. Defaults to "."}
 }
 \description{
-Creates a `babylon_process` object with all the required keys, without actually running the command.
 Returns an S3 object of class `babylon_process` but the `process` and `stdout` elements containing only the string "DRY_RUN".
 Also contains the element `call` with a string representing the command that could be called on the command line.
 }

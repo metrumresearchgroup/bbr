@@ -54,9 +54,8 @@ bbi_exec <- function(.cmd_args, .dir = ".", .verbose = FALSE, .wait = FALSE, ...
   return(res)
 }
 
-#' Babylon dry_run
+#' Creates a `babylon_process` object with all the required keys, without actually running the command
 #'
-#' Creates a `babylon_process` object with all the required keys, without actually running the command.
 #' Returns an S3 object of class `babylon_process` but the `process` and `stdout` elements containing only the string "DRY_RUN".
 #' Also contains the element `call` with a string representing the command that could be called on the command line.
 #' @param .cmd_args A character vector of command line arguments for the execution call

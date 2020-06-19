@@ -1,5 +1,7 @@
-#' @title Installing bbi
-#' @description Identifies system running and return installation instructions
+#' @title Installs most current release of bbi
+#' @description Identifies system running and pulls the relevant tarball for the current release of babylon from GitHub,
+#' and then installs it in the directory passed to `.dir`.
+#' If used in an interactive session, will open an installation menu confirming the installed version.
 #' @importFrom glue glue glue_collapse
 #' @importFrom cli rule
 #' @param .dir directory to install bbi to on linux
@@ -33,7 +35,7 @@ use_bbi <- function(.dir = "/data/apps", .force = FALSE){
 
   glue_this <- c(header,body,footer)
 
-  on.exit(install_menu(body,this_os, force=.force),add = TRUE)
+  on.exit(install_menu(body, this_os, .dir, .force), add = TRUE)
 
   print(glue::glue_collapse(glue_this,sep = '\n'))
 
@@ -70,7 +72,7 @@ current_release <- function(owner = 'metrumresearchgroup', repo = 'babylon', os 
 }
 
 
-#' @title current release
+#' @title Get version number of babylon current release
 #' @description Helper function to get version number of most recent release of babylon from GitHub.
 #' @param os operating system, Default: 'linux'
 #' @importFrom stringr str_replace
@@ -81,31 +83,35 @@ bbi_current_release <- function(os = "linux"){
 }
 
 #' Private implementation function for installing bbi with interactive menu
-#' @param body Character vector of installation commands to run with `system`
-#' @param this_os Character scaler of OS
-#' @param force Boolean for whether to force the installation even if current version and local version are the same
+#' @param .body Character vector of installation commands to run with `system`
+#' @param .this_os Character scaler of OS
+#' @param .dir directory to install bbi to
+#' @param .force Boolean for whether to force the installation even if current version and local version are the same
 #' @keywords internal
-install_menu <- function(body, this_os, force){
+install_menu <- function(.body, .this_os, .dir, .force){
 
+  .dest_bbi_path <- normalizePath(file.path(.dir, "bbi"), mustWork = FALSE)
   release_v <- bbi_current_release()
-  local_v <- bbi_version()
+  local_v <- bbi_version(.dest_bbi_path)
 
-  if(!identical(release_v,local_v) || isTRUE(force)){
+  if(!identical(release_v,local_v) || isTRUE(.force)){
 
-    if(this_os%in%c('linux','darwin')){
+    if(.this_os%in%c('linux','darwin')){
 
       # suppressing interactivity will allow for suppression in unit tests. This may be more general to name
       # like specifiying its a test environment, but a user could also want to generally suppress interactivity for
       # automatted build pipelines etc.
       if (interactive() && is.null(getOption('rbabylon.suppress_interactivity'))) {
-        print(glue::glue(cli::rule(left = cli::col_red('{local_v} is currently installed. Update to the {release_v}?'),line = 2)))
+        version_message(local_v = local_v, release_v = release_v)
+
+        print(glue::glue(cli::rule(left = cli::col_red('Do you want to install version {release_v}?'),line = 2)))
 
         if(utils::menu(choices = c('Yes','No'))==1){
-          system(paste(body,collapse =' ; '))
-          local_v <- bbi_version()
+          system(paste(.body,collapse =' ; '))
+          local_v <- bbi_version(.dest_bbi_path)
         }
       } else {
-          system(paste(body,collapse =' ; '))
+          system(paste(.body,collapse =' ; '))
       }
 
     }
@@ -137,8 +143,8 @@ linux_install_commands <- function(.dir, .bbi_url) {
 }
 
 
-#' @title bbi version
-#' @description Returns string of installed bbi cli version
+#' @title Get version number of babylon installed on system
+#' @description Returns version number of bbi binary installed at path passed to `.bbi_exe_path`
 #' @importFrom stringr str_detect str_replace_all
 #' @param .bbi_exe_path Path to bbi exe file that will be checked
 #' @return character
@@ -172,13 +178,19 @@ bbi_version <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')){
 }
 
 #' Private helper to construct version comparison message
-#' @importFrom cli rule col_blue
+#' @importFrom cli rule col_blue col_red
 #' @importFrom glue glue
 #' @keywords internal
-version_message <- function(local_v = bbi_version(), release_v = bbi_current_release()){
+version_message <- function(local_v, release_v){
 
-  flag <- ifelse(identical(release_v,local_v),"Current Release","Not Current Release")
+  if (local_v == "") {
+    cat(cli::col_red("No version currently installed "))
+  } else{
+    cat(glue::glue(cli::col_blue(' - Installed Version: {local_v} ')))
+    if (!identical(release_v,local_v)) {
+      cat(cli::col_red(" (Not Current Release) "))
+    }
+  }
 
-  cat(glue::glue(cli::col_blue('- Current release: {release_v}\n')))
-  cat(glue::glue(cli::col_blue('- Installed Version: {local_v}')))
+  cat(glue::glue(cli::col_blue(' - Current release: {release_v}\n')))
 }

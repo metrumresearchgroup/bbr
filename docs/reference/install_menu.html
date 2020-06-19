@@ -132,21 +132,25 @@
     <p>Private implementation function for installing bbi with interactive menu</p>
     </div>
 
-    <pre class="usage"><span class='fu'>install_menu</span>(<span class='no'>body</span>, <span class='no'>this_os</span>, <span class='no'>force</span>)</pre>
+    <pre class="usage"><span class='fu'>install_menu</span>(<span class='no'>.body</span>, <span class='no'>.this_os</span>, <span class='no'>.dir</span>, <span class='no'>.force</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>body</th>
+      <th>.body</th>
       <td><p>Character vector of installation commands to run with `system`</p></td>
     </tr>
     <tr>
-      <th>this_os</th>
+      <th>.this_os</th>
       <td><p>Character scaler of OS</p></td>
     </tr>
     <tr>
-      <th>force</th>
+      <th>.dir</th>
+      <td><p>directory to install bbi to</p></td>
+    </tr>
+    <tr>
+      <th>.force</th>
       <td><p>Boolean for whether to force the installation even if current version and local version are the same</p></td>
     </tr>
     </table>

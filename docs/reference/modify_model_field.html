@@ -37,7 +37,12 @@
 
 <meta property="og:title" content="Modify field in model object — modify_model_field" />
 <meta property="og:description" content="Implementation function for updating fields in a `bbi_.model_type_model` object
-Also checks the object against the corresponding YAML before modifying (and errors if they are out of sync) and then writes the modified object back to the YAML." />
+Also checks the object against the corresponding YAML before modifying (and errors if they are out of sync) and then writes the modified object back to the YAML.
+Modifies model object and corresponding YAML by adding new .bbi_args,
+overwriting any args that are already present with the new values.
+Use `print_nonmem_args()` to see a list list of valid babylon arguments.
+Modifies model object and corresponding YAML by replacing .bbi_args with new .bbi_args
+Use `print_nonmem_args()` to see a list list of valid babylon arguments." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -132,6 +137,11 @@ Also checks the object against the corresponding YAML before modifying (and erro
     <div class="ref-description">
     <p>Implementation function for updating fields in a `bbi_.model_type_model` object
 Also checks the object against the corresponding YAML before modifying (and errors if they are out of sync) and then writes the modified object back to the YAML.</p>
+<p>Modifies model object and corresponding YAML by adding new .bbi_args,
+overwriting any args that are already present with the new values.
+Use `print_nonmem_args()` to see a list list of valid babylon arguments.</p>
+<p>Modifies model object and corresponding YAML by replacing .bbi_args with new .bbi_args
+Use `print_nonmem_args()` to see a list list of valid babylon arguments.</p>
     </div>
 
     <pre class="usage"><span class='fu'>modify_model_field</span>(<span class='no'>.mod</span>, <span class='no'>.field</span>, <span class='no'>.value</span>, <span class='kw'>.append</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>.unique</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
@@ -148,14 +158,18 @@ Also checks the object against the corresponding YAML before modifying (and erro
 
 <span class='fu'>replace_based_on</span>(<span class='no'>.mod</span>, <span class='no'>.based_on</span>)
 
-<span class='fu'>replace_description</span>(<span class='no'>.mod</span>, <span class='no'>.description</span>)</pre>
+<span class='fu'>replace_description</span>(<span class='no'>.mod</span>, <span class='no'>.description</span>)
+
+<span class='fu'>add_bbi_args</span>(<span class='no'>.mod</span>, <span class='no'>.bbi_args</span>)
+
+<span class='fu'>replace_bbi_args</span>(<span class='no'>.mod</span>, <span class='no'>.bbi_args</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>.mod</th>
-      <td><p>The `bbi_.model_type_model` object to modify</p></td>
+      <td><p>A `bbi_.model_type_model` object</p></td>
     </tr>
     <tr>
       <th>.field</th>
@@ -188,6 +202,10 @@ Also checks the object against the corresponding YAML before modifying (and erro
     <tr>
       <th>.description</th>
       <td><p>Character scaler to use as replacement</p></td>
+    </tr>
+    <tr>
+      <th>.bbi_args</th>
+      <td><p>named list of arguments to add to the model</p></td>
     </tr>
     </table>
 

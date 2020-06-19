@@ -4,14 +4,16 @@
 \alias{install_menu}
 \title{Private implementation function for installing bbi with interactive menu}
 \usage{
-install_menu(body, this_os, force)
+install_menu(.body, .this_os, .dir, .force)
 }
 \arguments{
-\item{body}{Character vector of installation commands to run with `system`}
+\item{.body}{Character vector of installation commands to run with `system`}
 
-\item{this_os}{Character scaler of OS}
+\item{.this_os}{Character scaler of OS}
 
-\item{force}{Boolean for whether to force the installation even if current version and local version are the same}
+\item{.dir}{directory to install bbi to}
+
+\item{.force}{Boolean for whether to force the installation even if current version and local version are the same}
 }
 \description{
 Private implementation function for installing bbi with interactive menu

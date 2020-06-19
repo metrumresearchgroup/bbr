@@ -141,6 +141,7 @@ replace_description <- function(.mod, .description) {
 #' Use `print_nonmem_args()` to see a list list of valid babylon arguments.
 #' @param .mod A `bbi_{.model_type}_model` object
 #' @param .bbi_args named list of arguments to add to the model
+#' @rdname modify_model_field
 #' @export
 add_bbi_args <- function(.mod, .bbi_args) {
 
@@ -165,6 +166,7 @@ add_bbi_args <- function(.mod, .bbi_args) {
 #' Use `print_nonmem_args()` to see a list list of valid babylon arguments.
 #' @param .mod A `bbi_{.model_type}_model` object
 #' @param .bbi_args named list of arguments to add to the model
+#' @rdname modify_model_field
 #' @export
 replace_bbi_args <- function(.mod, .bbi_args) {
 

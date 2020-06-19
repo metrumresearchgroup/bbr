@@ -4,7 +4,7 @@
 \alias{version_message}
 \title{Private helper to construct version comparison message}
 \usage{
-version_message(local_v = bbi_version(), release_v = bbi_current_release())
+version_message(local_v, release_v)
 }
 \description{
 Private helper to construct version comparison message

@@ -9,6 +9,8 @@
 \alias{add_based_on}
 \alias{replace_based_on}
 \alias{replace_description}
+\alias{add_bbi_args}
+\alias{replace_bbi_args}
 \title{Modify field in model object}
 \usage{
 modify_model_field(.mod, .field, .value, .append = TRUE, .unique = TRUE)
@@ -26,9 +28,13 @@ add_based_on(.mod, .based_on)
 replace_based_on(.mod, .based_on)
 
 replace_description(.mod, .description)
+
+add_bbi_args(.mod, .bbi_args)
+
+replace_bbi_args(.mod, .bbi_args)
 }
 \arguments{
-\item{.mod}{The `bbi_{.model_type}_model` object to modify}
+\item{.mod}{A `bbi_{.model_type}_model` object}
 
 \item{.field}{Character scaler of the name of the component to modify}
 
@@ -45,8 +51,17 @@ replace_description(.mod, .description)
 \item{.based_on}{Character scaler or vector to use as replacement}
 
 \item{.description}{Character scaler to use as replacement}
+
+\item{.bbi_args}{named list of arguments to add to the model}
 }
 \description{
 Implementation function for updating fields in a `bbi_{.model_type}_model` object
 Also checks the object against the corresponding YAML before modifying (and errors if they are out of sync) and then writes the modified object back to the YAML.
+
+Modifies model object and corresponding YAML by adding new .bbi_args,
+overwriting any args that are already present with the new values.
+Use `print_nonmem_args()` to see a list list of valid babylon arguments.
+
+Modifies model object and corresponding YAML by replacing .bbi_args with new .bbi_args
+Use `print_nonmem_args()` to see a list list of valid babylon arguments.
 }
