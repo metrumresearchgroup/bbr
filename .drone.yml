@@ -1,6 +1,11 @@
 kind: pipeline
 type: docker
-name: rbabylon-pull-docker
+name: rbabylon-40
+
+#Gobal variable definitions and anchors
+global-variables:
+    environment: &default_environment
+        BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
 
 steps:
 - name: Pull mpn container from ECR
@@ -13,23 +18,6 @@ steps:
   - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24
   - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-complete:2020-06-08
 
-volumes:
-- name: docker.sock
-  host:
-    path: /var/run/docker.sock
-
----
-
-kind: pipeline
-type: docker
-name: rbabylon-40
-
-#Gobal variable definitions and anchors
-global-variables:
-    environment: &default_environment
-        BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
-
-steps:
 - name: R40
   image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-complete:2020-06-08"
   pull: never
@@ -51,8 +39,11 @@ steps:
   - /opt/R/4.0.1/bin/R -e "devtools::install_deps(upgrade = 'never')"
   - /opt/R/4.0.1/bin/R -e "devtools::test()"
   - /opt/R/4.0.1/bin/R -e "devtools::check()"
-depends_on:
-- rbabylon-pull-docker
+
+volumes:
+- name: docker.sock
+  host:
+    path: /var/run/docker.sock
 
 ---
 
@@ -66,6 +57,16 @@ global-variables:
         BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
 
 steps:
+- name: Pull mpn container from ECR
+  image: omerxx/drone-ecr-auth
+  volumes:
+  - name: docker.sock
+    path: /var/run/docker.sock
+  commands:
+  - $(aws ecr get-login --no-include-email --region us-east-1)
+  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24
+  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-complete:2020-06-08
+
 - name: R36
   image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-complete:2020-06-08"
   pull: never
@@ -87,8 +88,11 @@ steps:
   - /opt/R/3.6.3/bin/R -e "devtools::install_deps(upgrade = 'never')"
   - /opt/R/3.6.3/bin/R -e "devtools::test()"
   - /opt/R/3.6.3/bin/R -e "devtools::check()"
-depends_on:
-- rbabylon-pull-docker
+
+volumes:
+- name: docker.sock
+  host:
+    path: /var/run/docker.sock
 
 ---
 
@@ -102,6 +106,16 @@ global-variables:
         BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
 
 steps:
+- name: Pull mpn container from ECR
+  image: omerxx/drone-ecr-auth
+  volumes:
+  - name: docker.sock
+    path: /var/run/docker.sock
+  commands:
+  - $(aws ecr get-login --no-include-email --region us-east-1)
+  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24
+  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-complete:2020-06-08
+
 - name: R36-old
   image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24"
   pull: never
@@ -123,8 +137,11 @@ steps:
   - /opt/R/3.6.2/bin/R -e "devtools::install_deps(upgrade = 'never')"
   - /opt/R/3.6.2/bin/R -e "devtools::test()"
   - /opt/R/3.6.2/bin/R -e "devtools::check()"
-depends_on:
-- rbabylon-pull-docker
+
+volumes:
+- name: docker.sock
+  host:
+    path: /var/run/docker.sock
 
 ---
 
@@ -138,6 +155,16 @@ global-variables:
         BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
 
 steps:
+- name: Pull mpn container from ECR
+  image: omerxx/drone-ecr-auth
+  volumes:
+  - name: docker.sock
+    path: /var/run/docker.sock
+  commands:
+  - $(aws ecr get-login --no-include-email --region us-east-1)
+  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24
+  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-complete:2020-06-08
+
 - name: R35-old
   image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24"
   pull: never
@@ -157,8 +184,11 @@ steps:
   - /opt/R/3.5.3/bin/R -e "devtools::install_deps(upgrade = 'never')"
   - /opt/R/3.5.3/bin/R -e "devtools::test()"
   - /opt/R/3.5.3/bin/R -e "devtools::check()"
-depends_on:
-- rbabylon-pull-docker
+
+volumes:
+- name: docker.sock
+  host:
+    path: /var/run/docker.sock
 
 ---
 
@@ -172,6 +202,16 @@ global-variables:
         BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
 
 steps:
+- name: Pull mpn container from ECR
+  image: omerxx/drone-ecr-auth
+  volumes:
+  - name: docker.sock
+    path: /var/run/docker.sock
+  commands:
+  - $(aws ecr get-login --no-include-email --region us-east-1)
+  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24
+  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-complete:2020-06-08
+
 - name: release
   when:
     event:
@@ -199,8 +239,12 @@ steps:
   - aws s3 sync /tmp/${DRONE_TAG} s3://mpn.metworx.dev/releases/${DRONE_REPO_NAME}/${DRONE_TAG}
   - aws s3 sync /tmp/${DRONE_TAG} s3://mpn.metworx.dev/releases/${DRONE_REPO_NAME}/latest_tag
 depends_on:
-- rbabylon-pull-docker
 - rbabylon-40
 - rbabylon-36
 - rbabylon-36-old
 - rbabylon-35-old
+
+volumes:
+- name: docker.sock
+  host:
+    path: /var/run/docker.sock
