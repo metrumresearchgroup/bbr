@@ -5,11 +5,12 @@
 #' @importFrom glue glue glue_collapse
 #' @importFrom cli rule
 #' @param .dir directory to install bbi to on linux
+#' @param .version version of babylon to install. Must pass a character scaler corresponding to a tag found in `https://github.com/metrumresearchgroup/babylon/releases`
 #' @param .force Boolean for whether to force the installation even if current version and local version are the same. Primarily used for testing.
 #' @param .quiet Boolean for suppressing output printed to the console. False by default.
 #' @return character
 #' @export
-use_bbi <- function(.dir = "/data/apps", .force = FALSE, .quiet = FALSE){
+use_bbi <- function(.dir = "/data/apps", .version = "latest", .force = FALSE, .quiet = FALSE){
 
   os <- c('linux','darwin','mingw')
 
@@ -21,6 +22,16 @@ use_bbi <- function(.dir = "/data/apps", .force = FALSE, .quiet = FALSE){
 
   this_os <- os[sapply(os,grepl,x=R.version$os)]
 
+  if(.version == "latest") {
+    .bbi_url <- bbi_current_release(os = "linux")
+  } else {
+    if (this_os == "linux") {
+      .bbi_url <- as.character(glue("https://github.com/metrumresearchgroup/babylon/releases/download/{.version}/bbi_linux_amd64.tar.gz"))
+    } else {
+      warning(glue("User passed `.version = {.version}` and but this argument is only valid on Linux and current OS is {this_os}. Latest version of bbi will be installed."))
+    }
+  }
+
   body <-  switch(this_os,
                   'darwin'  = {
                     c('brew tap metrumresearchgroup/homebrew-tap',
@@ -28,7 +39,7 @@ use_bbi <- function(.dir = "/data/apps", .force = FALSE, .quiet = FALSE){
 
                   },
                   'linux' = {
-                    linux_install_commands(.dir = .dir, .bbi_url = current_release(os = "linux"))
+                    linux_install_commands(.dir = .dir, .bbi_url = .bbi_url)
                   },
                   {
                     c('browse to: https://github.com/metrumresearchgroup/babylon#getting-started')
@@ -36,7 +47,7 @@ use_bbi <- function(.dir = "/data/apps", .force = FALSE, .quiet = FALSE){
 
   glue_this <- c(header,body,footer)
 
-  on.exit(install_menu(body, this_os, .dir, .force, .quiet), add = TRUE)
+  on.exit(install_menu(body, this_os, .dir, .version, .force, .quiet), add = TRUE)
 
   if(isFALSE(.quiet)) print(glue::glue_collapse(glue_this, sep = '\n'))
 
@@ -82,20 +93,26 @@ current_release <- function(owner = 'metrumresearchgroup', repo = 'babylon', os 
 #' @rdname bbi_current_release
 #' @export
 bbi_current_release <- function(os = "linux"){
-  str_replace(basename(dirname(current_release(os = os))), '^v', '')
+  str_replace(basename(dirname(current_release(owner = 'metrumresearchgroup', repo = 'babylon', os = os))), '^v', '')
 }
 
 #' Private implementation function for installing bbi with interactive menu
 #' @param .body Character vector of installation commands to run with `system`
 #' @param .this_os Character scaler of OS
 #' @param .dir directory to install bbi to
+#' @param .version version of babylon to install. Must pass a character scaler corresponding to a tag found in `https://github.com/metrumresearchgroup/babylon/releases`
 #' @param .force Boolean for whether to force the installation even if current version and local version are the same
 #' @param .quiet Boolean for suppressing output printed to the console. False by default.
-install_menu <- function(.body, .this_os, .dir, .force, .quiet){
+install_menu <- function(.body, .this_os, .dir, .version, .force, .quiet){
 
   .dest_bbi_path <- normalizePath(file.path(.dir, "bbi"), mustWork = FALSE)
-  release_v <- bbi_current_release()
   local_v <- bbi_version(.dest_bbi_path)
+
+  if (.version == 'latest') {
+    release_v <- bbi_current_release()
+  } else {
+    release_v <- .version
+  }
 
   if(!identical(release_v,local_v) || isTRUE(.force)){
 
