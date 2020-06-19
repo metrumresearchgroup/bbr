@@ -218,7 +218,7 @@ steps:
     - tag
     status:
     - success
-  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-06-08"
+  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-complete:2020-06-08"
   pull: never
   environment:
     R_LIBS_USER: "/opt/rpkgs/3.6/2020-06-08"
