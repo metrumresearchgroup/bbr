@@ -45,6 +45,9 @@ use_bbi <- function(.dir = "/data/apps", .force = FALSE){
 #' @importFrom stringr str_detect
 #' @importFrom jsonlite read_json
 #' @importFrom glue glue
+#' @param owner Repository owner/organization
+#' @param repo Repository name
+#' @param os Operating system user intends to install on
 #' @keywords internal
 current_release <- function(owner = 'metrumresearchgroup', repo = 'babylon', os = c('linux','darwin','windows')){
 
@@ -111,7 +114,7 @@ install_menu <- function(.body, .this_os, .dir, .force){
           local_v <- bbi_version(.dest_bbi_path)
         }
       } else {
-          system(paste(.body,collapse =' ; '))
+        system(paste(.body,collapse =' ; '))
       }
 
     }
@@ -180,6 +183,8 @@ bbi_version <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')){
 #' Private helper to construct version comparison message
 #' @importFrom cli rule col_blue col_red
 #' @importFrom glue glue
+#' @param local_v Character scaler for version number on local installation
+#' @param release_v Character scaler for version number of current release
 #' @keywords internal
 version_message <- function(local_v, release_v){
 
