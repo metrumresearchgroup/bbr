@@ -5,10 +5,11 @@
 #' @importFrom glue glue glue_collapse
 #' @importFrom cli rule
 #' @param .dir directory to install bbi to on linux
-#' @param .force Boolean for whether to force the installation even if current version and local version are the same
+#' @param .force Boolean for whether to force the installation even if current version and local version are the same. Primarily used for testing.
+#' @param .quiet Boolean for suppressing output printed to the console. False by default.
 #' @return character
 #' @export
-use_bbi <- function(.dir = "/data/apps", .force = FALSE){
+use_bbi <- function(.dir = "/data/apps", .force = FALSE, .quiet = FALSE){
 
   os <- c('linux','darwin','mingw')
 
@@ -35,9 +36,9 @@ use_bbi <- function(.dir = "/data/apps", .force = FALSE){
 
   glue_this <- c(header,body,footer)
 
-  on.exit(install_menu(body, this_os, .dir, .force), add = TRUE)
+  on.exit(install_menu(body, this_os, .dir, .force, .quiet), add = TRUE)
 
-  print(glue::glue_collapse(glue_this,sep = '\n'))
+  if(isFALSE(.quiet)) print(glue::glue_collapse(glue_this, sep = '\n'))
 
 }
 
@@ -89,7 +90,8 @@ bbi_current_release <- function(os = "linux"){
 #' @param .this_os Character scaler of OS
 #' @param .dir directory to install bbi to
 #' @param .force Boolean for whether to force the installation even if current version and local version are the same
-install_menu <- function(.body, .this_os, .dir, .force){
+#' @param .quiet Boolean for suppressing output printed to the console. False by default.
+install_menu <- function(.body, .this_os, .dir, .force, .quiet){
 
   .dest_bbi_path <- normalizePath(file.path(.dir, "bbi"), mustWork = FALSE)
   release_v <- bbi_current_release()
@@ -108,11 +110,11 @@ install_menu <- function(.body, .this_os, .dir, .force){
         print(glue::glue(cli::rule(left = cli::col_red('Do you want to install version {release_v}?'),line = 2)))
 
         if(utils::menu(choices = c('Yes','No'))==1){
-          system(paste(.body,collapse =' ; '))
+          map(.body, ~ system(.x, ignore.stdout = .quiet, ignore.stderr = .quiet))
           local_v <- bbi_version(.dest_bbi_path)
         }
       } else {
-        system(paste(.body,collapse =' ; '))
+        map(.body, ~ system(.x, ignore.stdout = .quiet, ignore.stderr = .quiet))
       }
 
     }
@@ -120,7 +122,6 @@ install_menu <- function(.body, .this_os, .dir, .force){
   }
 
   version_message(local_v = local_v, release_v = release_v)
-
 }
 
 
