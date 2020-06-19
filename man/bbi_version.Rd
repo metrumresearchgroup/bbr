@@ -2,7 +2,7 @@
 % Please edit documentation in R/use-bbi.R
 \name{bbi_version}
 \alias{bbi_version}
-\title{bbi version}
+\title{Get version number of babylon installed on system}
 \usage{
 bbi_version(.bbi_exe_path = getOption("rbabylon.bbi_exe_path"))
 }
@@ -13,7 +13,7 @@ bbi_version(.bbi_exe_path = getOption("rbabylon.bbi_exe_path"))
 character
 }
 \description{
-Returns string of installed bbi cli version
+Returns version number of bbi binary installed at path passed to `.bbi_exe_path`
 }
 \examples{
 \dontrun{

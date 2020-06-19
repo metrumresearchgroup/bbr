@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.1</span>
       </span>
     </div>
 
@@ -151,7 +151,7 @@
 <a href="#get_based_on" class="anchor"></a>get_based_on</h2>
 <p>First, by using <code><a href="../reference/get_based_on.html">get_based_on()</a></code> you can retrieve the absolute path to all models in the <code>based_on</code> field.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">mod6 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/get_based_on.html">get_based_on</a></span>()</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="co">#&gt; [1] "/data/home/sethg/rbabylon/inst/nonmem/5"</span></a></code></pre></div>
+<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="co">#&gt; [1] "/data/home/seanw/git/rbabylon/inst/nonmem/5"</span></a></code></pre></div>
 <p>This is useful because the path(s) retrieved will unambiguously identify the parent model(s) and can therefore be passed to things like <code><a href="../reference/read_model.html">read_model()</a></code> or <code><a href="../reference/model_summary.html">model_summary()</a></code> like so:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">parent_mod &lt;-<span class="st"> </span>mod6 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/get_based_on.html">get_based_on</a></span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/read_model.html">read_model</a></span>()</a>
 <a class="sourceLine" id="cb7-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/utils/str.html">str</a></span>(parent_mod)</a>
@@ -160,7 +160,7 @@
 <a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">#&gt;  $ based_on         : chr "2"</span></a>
 <a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co">#&gt;  $ model_type       : chr "nonmem"</span></a>
 <a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt;  $ model_path       : chr "5.ctl"</span></a>
-<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="co">#&gt;  $ model_working_dir: chr "/data/home/sethg/rbabylon/inst/nonmem"</span></a>
+<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="co">#&gt;  $ model_working_dir: chr "/data/home/seanw/git/rbabylon/inst/nonmem"</span></a>
 <a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#&gt;  $ orig_yaml_file   : chr "5.yaml"</span></a>
 <a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#&gt;  $ yaml_md5         : chr "06d4b25a18ad1a729fe0498ff9cd7f60"</span></a>
 <a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">#&gt;  $ bbi_args         : list()</span></a>
@@ -172,9 +172,9 @@
 <a href="#get_model_ancestry" class="anchor"></a>get_model_ancestry</h2>
 <p>The second helper function walks up the tree of inheritence by iteratively calling <code><a href="../reference/get_based_on.html">get_based_on()</a></code> on each parent model to determine the full set of models that led up to the current model.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">mod6 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/get_based_on.html">get_model_ancestry</a></span>()</a>
-<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="co">#&gt; [1] "/data/home/sethg/rbabylon/inst/nonmem/1"</span></a>
-<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="co">#&gt; [2] "/data/home/sethg/rbabylon/inst/nonmem/2"</span></a>
-<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="co">#&gt; [3] "/data/home/sethg/rbabylon/inst/nonmem/5"</span></a></code></pre></div>
+<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="co">#&gt; [1] "/data/home/seanw/git/rbabylon/inst/nonmem/1"</span></a>
+<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="co">#&gt; [2] "/data/home/seanw/git/rbabylon/inst/nonmem/2"</span></a>
+<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="co">#&gt; [3] "/data/home/seanw/git/rbabylon/inst/nonmem/5"</span></a></code></pre></div>
 <p>In this case, model <code>6</code> was based on <code>5</code>, which was based on <code>2</code>, which in turn was based on <code>1</code>. You will see one example of how this can be useful in the “Final model family” section below.</p>
 </div>
 </div>
@@ -187,12 +187,12 @@
 <a class="sourceLine" id="cb9-3" data-line-number="3"><span class="co">#&gt; # A tibble: 6 x 8</span></a>
 <a class="sourceLine" id="cb9-4" data-line-number="4"><span class="co">#&gt;   absolute_model_… yaml_md5 model_type description bbi_args based_on tags </span></a>
 <a class="sourceLine" id="cb9-5" data-line-number="5"><span class="co">#&gt;   &lt;chr&gt;            &lt;chr&gt;    &lt;chr&gt;      &lt;chr&gt;       &lt;list&gt;   &lt;list&gt;   &lt;lis&gt;</span></a>
-<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="co">#&gt; 1 /data/home/seth… 8e2bfb1… nonmem     one compar… &lt;list [… &lt;NULL&gt;   &lt;NUL…</span></a>
-<a class="sourceLine" id="cb9-7" data-line-number="7"><span class="co">#&gt; 2 /data/home/seth… 7bf7577… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;NUL…</span></a>
-<a class="sourceLine" id="cb9-8" data-line-number="8"><span class="co">#&gt; 3 /data/home/seth… 0a39c21… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;NUL…</span></a>
-<a class="sourceLine" id="cb9-9" data-line-number="9"><span class="co">#&gt; 4 /data/home/seth… 685b34c… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;NUL…</span></a>
-<a class="sourceLine" id="cb9-10" data-line-number="10"><span class="co">#&gt; 5 /data/home/seth… 06d4b25… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;NUL…</span></a>
-<a class="sourceLine" id="cb9-11" data-line-number="11"><span class="co">#&gt; 6 /data/home/seth… d5aa7c4… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;chr…</span></a>
+<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="co">#&gt; 1 /data/home/sean… 8e2bfb1… nonmem     one compar… &lt;list [… &lt;NULL&gt;   &lt;NUL…</span></a>
+<a class="sourceLine" id="cb9-7" data-line-number="7"><span class="co">#&gt; 2 /data/home/sean… 7bf7577… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;NUL…</span></a>
+<a class="sourceLine" id="cb9-8" data-line-number="8"><span class="co">#&gt; 3 /data/home/sean… 0a39c21… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;NUL…</span></a>
+<a class="sourceLine" id="cb9-9" data-line-number="9"><span class="co">#&gt; 4 /data/home/sean… 685b34c… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;NUL…</span></a>
+<a class="sourceLine" id="cb9-10" data-line-number="10"><span class="co">#&gt; 5 /data/home/sean… 06d4b25… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;NUL…</span></a>
+<a class="sourceLine" id="cb9-11" data-line-number="11"><span class="co">#&gt; 6 /data/home/sean… d5aa7c4… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;chr…</span></a>
 <a class="sourceLine" id="cb9-12" data-line-number="12"><span class="co">#&gt; # … with 1 more variable: decisions &lt;list&gt;</span></a></code></pre></div>
 <div id="filtering-tags-example" class="section level2">
 <h2 class="hasAnchor">
@@ -203,16 +203,16 @@
 <a class="sourceLine" id="cb10-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="../reference/get_path_from_object.html">get_model_path</a></span>()</a>
 <a class="sourceLine" id="cb10-4" data-line-number="4"></a>
 <a class="sourceLine" id="cb10-5" data-line-number="5">final_model_path</a>
-<a class="sourceLine" id="cb10-6" data-line-number="6"><span class="co">#&gt; [1] "/data/home/sethg/rbabylon/inst/nonmem/6.ctl"</span></a></code></pre></div>
+<a class="sourceLine" id="cb10-6" data-line-number="6"><span class="co">#&gt; [1] "/data/home/seanw/git/rbabylon/inst/nonmem/6.ctl"</span></a></code></pre></div>
 <p>Next we can use the <code><a href="../reference/get_based_on.html">get_model_ancestry()</a></code> function to filter the tibble to only the models that led up to the final model.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">log_df <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb11-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(absolute_model_path <span class="op">%in%</span><span class="st"> </span><span class="kw"><a href="../reference/get_based_on.html">get_model_ancestry</a></span>(final_model_path))</a>
 <a class="sourceLine" id="cb11-3" data-line-number="3"><span class="co">#&gt; # A tibble: 3 x 8</span></a>
 <a class="sourceLine" id="cb11-4" data-line-number="4"><span class="co">#&gt;   absolute_model_… yaml_md5 model_type description bbi_args based_on tags </span></a>
 <a class="sourceLine" id="cb11-5" data-line-number="5"><span class="co">#&gt;   &lt;chr&gt;            &lt;chr&gt;    &lt;chr&gt;      &lt;chr&gt;       &lt;list&gt;   &lt;list&gt;   &lt;lis&gt;</span></a>
-<a class="sourceLine" id="cb11-6" data-line-number="6"><span class="co">#&gt; 1 /data/home/seth… 8e2bfb1… nonmem     one compar… &lt;list [… &lt;NULL&gt;   &lt;NUL…</span></a>
-<a class="sourceLine" id="cb11-7" data-line-number="7"><span class="co">#&gt; 2 /data/home/seth… 7bf7577… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;NUL…</span></a>
-<a class="sourceLine" id="cb11-8" data-line-number="8"><span class="co">#&gt; 3 /data/home/seth… 06d4b25… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;NUL…</span></a>
+<a class="sourceLine" id="cb11-6" data-line-number="6"><span class="co">#&gt; 1 /data/home/sean… 8e2bfb1… nonmem     one compar… &lt;list [… &lt;NULL&gt;   &lt;NUL…</span></a>
+<a class="sourceLine" id="cb11-7" data-line-number="7"><span class="co">#&gt; 2 /data/home/sean… 7bf7577… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;NUL…</span></a>
+<a class="sourceLine" id="cb11-8" data-line-number="8"><span class="co">#&gt; 3 /data/home/sean… 06d4b25… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;NUL…</span></a>
 <a class="sourceLine" id="cb11-9" data-line-number="9"><span class="co">#&gt; # … with 1 more variable: decisions &lt;list&gt;</span></a></code></pre></div>
 <p>As you can see, models 3 and 4 are discarded because they did not lead to the final model. Review “Modeling Process” section above if you are not sure why this is the case. We will use the two techniques together in the “Final model family” section below.</p>
 </div>
@@ -227,12 +227,12 @@
 <a class="sourceLine" id="cb12-3" data-line-number="3"><span class="co">#&gt; # A tibble: 6 x 11</span></a>
 <a class="sourceLine" id="cb12-4" data-line-number="4"><span class="co">#&gt;   absolute_model_… yaml_md5 model_type description bbi_args based_on tags </span></a>
 <a class="sourceLine" id="cb12-5" data-line-number="5"><span class="co">#&gt;   &lt;chr&gt;            &lt;chr&gt;    &lt;chr&gt;      &lt;chr&gt;       &lt;list&gt;   &lt;list&gt;   &lt;lis&gt;</span></a>
-<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="co">#&gt; 1 /data/home/seth… 8e2bfb1… nonmem     one compar… &lt;list [… &lt;NULL&gt;   &lt;NUL…</span></a>
-<a class="sourceLine" id="cb12-7" data-line-number="7"><span class="co">#&gt; 2 /data/home/seth… 7bf7577… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;NUL…</span></a>
-<a class="sourceLine" id="cb12-8" data-line-number="8"><span class="co">#&gt; 3 /data/home/seth… 0a39c21… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;NUL…</span></a>
-<a class="sourceLine" id="cb12-9" data-line-number="9"><span class="co">#&gt; 4 /data/home/seth… 685b34c… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;NUL…</span></a>
-<a class="sourceLine" id="cb12-10" data-line-number="10"><span class="co">#&gt; 5 /data/home/seth… 06d4b25… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;NUL…</span></a>
-<a class="sourceLine" id="cb12-11" data-line-number="11"><span class="co">#&gt; 6 /data/home/seth… d5aa7c4… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;chr…</span></a>
+<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="co">#&gt; 1 /data/home/sean… 8e2bfb1… nonmem     one compar… &lt;list [… &lt;NULL&gt;   &lt;NUL…</span></a>
+<a class="sourceLine" id="cb12-7" data-line-number="7"><span class="co">#&gt; 2 /data/home/sean… 7bf7577… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;NUL…</span></a>
+<a class="sourceLine" id="cb12-8" data-line-number="8"><span class="co">#&gt; 3 /data/home/sean… 0a39c21… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;NUL…</span></a>
+<a class="sourceLine" id="cb12-9" data-line-number="9"><span class="co">#&gt; 4 /data/home/sean… 685b34c… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;NUL…</span></a>
+<a class="sourceLine" id="cb12-10" data-line-number="10"><span class="co">#&gt; 5 /data/home/sean… 06d4b25… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;NUL…</span></a>
+<a class="sourceLine" id="cb12-11" data-line-number="11"><span class="co">#&gt; 6 /data/home/sean… d5aa7c4… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;chr…</span></a>
 <a class="sourceLine" id="cb12-12" data-line-number="12"><span class="co">#&gt; # … with 4 more variables: decisions &lt;list&gt;, model_md5 &lt;chr&gt;, data_path &lt;chr&gt;,</span></a>
 <a class="sourceLine" id="cb12-13" data-line-number="13"><span class="co">#&gt; #   data_md5 &lt;chr&gt;</span></a></code></pre></div>
 <p>Now you can easily check the md5 digests from the config log against those of the current files.</p>
@@ -250,14 +250,14 @@
 <a class="sourceLine" id="cb13-12" data-line-number="12"></a>
 <a class="sourceLine" id="cb13-13" data-line-number="13">log_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(absolute_model_path, data_md5_match, model_md5_match)</a>
 <a class="sourceLine" id="cb13-14" data-line-number="14"><span class="co">#&gt; # A tibble: 6 x 3</span></a>
-<a class="sourceLine" id="cb13-15" data-line-number="15"><span class="co">#&gt;   absolute_model_path                     data_md5_match model_md5_match</span></a>
-<a class="sourceLine" id="cb13-16" data-line-number="16"><span class="co">#&gt;   &lt;chr&gt;                                   &lt;lgl&gt;          &lt;lgl&gt;          </span></a>
-<a class="sourceLine" id="cb13-17" data-line-number="17"><span class="co">#&gt; 1 /data/home/sethg/rbabylon/inst/nonmem/1 TRUE           TRUE           </span></a>
-<a class="sourceLine" id="cb13-18" data-line-number="18"><span class="co">#&gt; 2 /data/home/sethg/rbabylon/inst/nonmem/2 TRUE           TRUE           </span></a>
-<a class="sourceLine" id="cb13-19" data-line-number="19"><span class="co">#&gt; 3 /data/home/sethg/rbabylon/inst/nonmem/3 TRUE           FALSE          </span></a>
-<a class="sourceLine" id="cb13-20" data-line-number="20"><span class="co">#&gt; 4 /data/home/sethg/rbabylon/inst/nonmem/4 TRUE           FALSE          </span></a>
-<a class="sourceLine" id="cb13-21" data-line-number="21"><span class="co">#&gt; 5 /data/home/sethg/rbabylon/inst/nonmem/5 TRUE           TRUE           </span></a>
-<a class="sourceLine" id="cb13-22" data-line-number="22"><span class="co">#&gt; 6 /data/home/sethg/rbabylon/inst/nonmem/6 TRUE           TRUE</span></a></code></pre></div>
+<a class="sourceLine" id="cb13-15" data-line-number="15"><span class="co">#&gt;   absolute_model_path                         data_md5_match model_md5_match</span></a>
+<a class="sourceLine" id="cb13-16" data-line-number="16"><span class="co">#&gt;   &lt;chr&gt;                                       &lt;lgl&gt;          &lt;lgl&gt;          </span></a>
+<a class="sourceLine" id="cb13-17" data-line-number="17"><span class="co">#&gt; 1 /data/home/seanw/git/rbabylon/inst/nonmem/1 TRUE           TRUE           </span></a>
+<a class="sourceLine" id="cb13-18" data-line-number="18"><span class="co">#&gt; 2 /data/home/seanw/git/rbabylon/inst/nonmem/2 TRUE           TRUE           </span></a>
+<a class="sourceLine" id="cb13-19" data-line-number="19"><span class="co">#&gt; 3 /data/home/seanw/git/rbabylon/inst/nonmem/3 TRUE           FALSE          </span></a>
+<a class="sourceLine" id="cb13-20" data-line-number="20"><span class="co">#&gt; 4 /data/home/seanw/git/rbabylon/inst/nonmem/4 TRUE           FALSE          </span></a>
+<a class="sourceLine" id="cb13-21" data-line-number="21"><span class="co">#&gt; 5 /data/home/seanw/git/rbabylon/inst/nonmem/5 TRUE           TRUE           </span></a>
+<a class="sourceLine" id="cb13-22" data-line-number="22"><span class="co">#&gt; 6 /data/home/seanw/git/rbabylon/inst/nonmem/6 TRUE           TRUE</span></a></code></pre></div>
 </div>
 <div id="final-model-family" class="section level2">
 <h2 class="hasAnchor">
@@ -271,12 +271,12 @@
 <a class="sourceLine" id="cb14-6" data-line-number="6">)</a>
 <a class="sourceLine" id="cb14-7" data-line-number="7">final_model_family <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(absolute_model_path, data_md5_match, model_md5_match)</a>
 <a class="sourceLine" id="cb14-8" data-line-number="8"><span class="co">#&gt; # A tibble: 4 x 3</span></a>
-<a class="sourceLine" id="cb14-9" data-line-number="9"><span class="co">#&gt;   absolute_model_path                     data_md5_match model_md5_match</span></a>
-<a class="sourceLine" id="cb14-10" data-line-number="10"><span class="co">#&gt;   &lt;chr&gt;                                   &lt;lgl&gt;          &lt;lgl&gt;          </span></a>
-<a class="sourceLine" id="cb14-11" data-line-number="11"><span class="co">#&gt; 1 /data/home/sethg/rbabylon/inst/nonmem/1 TRUE           TRUE           </span></a>
-<a class="sourceLine" id="cb14-12" data-line-number="12"><span class="co">#&gt; 2 /data/home/sethg/rbabylon/inst/nonmem/2 TRUE           TRUE           </span></a>
-<a class="sourceLine" id="cb14-13" data-line-number="13"><span class="co">#&gt; 3 /data/home/sethg/rbabylon/inst/nonmem/5 TRUE           TRUE           </span></a>
-<a class="sourceLine" id="cb14-14" data-line-number="14"><span class="co">#&gt; 4 /data/home/sethg/rbabylon/inst/nonmem/6 TRUE           TRUE</span></a></code></pre></div>
+<a class="sourceLine" id="cb14-9" data-line-number="9"><span class="co">#&gt;   absolute_model_path                         data_md5_match model_md5_match</span></a>
+<a class="sourceLine" id="cb14-10" data-line-number="10"><span class="co">#&gt;   &lt;chr&gt;                                       &lt;lgl&gt;          &lt;lgl&gt;          </span></a>
+<a class="sourceLine" id="cb14-11" data-line-number="11"><span class="co">#&gt; 1 /data/home/seanw/git/rbabylon/inst/nonmem/1 TRUE           TRUE           </span></a>
+<a class="sourceLine" id="cb14-12" data-line-number="12"><span class="co">#&gt; 2 /data/home/seanw/git/rbabylon/inst/nonmem/2 TRUE           TRUE           </span></a>
+<a class="sourceLine" id="cb14-13" data-line-number="13"><span class="co">#&gt; 3 /data/home/seanw/git/rbabylon/inst/nonmem/5 TRUE           TRUE           </span></a>
+<a class="sourceLine" id="cb14-14" data-line-number="14"><span class="co">#&gt; 4 /data/home/seanw/git/rbabylon/inst/nonmem/6 TRUE           TRUE</span></a></code></pre></div>
 <p>When we filter to only those models, you can see that they are all still up-to-date. Great news.</p>
 </div>
 </div>
