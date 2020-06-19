@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.1</span>
       </span>
     </div>
 
@@ -289,9 +289,9 @@
 <a class="sourceLine" id="cb19-3" data-line-number="3"><span class="co">#&gt; # A tibble: 3 x 8</span></a>
 <a class="sourceLine" id="cb19-4" data-line-number="4"><span class="co">#&gt;   absolute_model_… yaml_md5 model_type description bbi_args based_on tags </span></a>
 <a class="sourceLine" id="cb19-5" data-line-number="5"><span class="co">#&gt;   &lt;chr&gt;            &lt;chr&gt;    &lt;chr&gt;      &lt;chr&gt;       &lt;list&gt;   &lt;list&gt;   &lt;lis&gt;</span></a>
-<a class="sourceLine" id="cb19-6" data-line-number="6"><span class="co">#&gt; 1 /data/home/seth… 8521b38… nonmem     our first … &lt;list [… &lt;NULL&gt;   &lt;chr…</span></a>
-<a class="sourceLine" id="cb19-7" data-line-number="7"><span class="co">#&gt; 2 /data/home/seth… 63ee952… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;chr…</span></a>
-<a class="sourceLine" id="cb19-8" data-line-number="8"><span class="co">#&gt; 3 /data/home/seth… bfa56db… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;chr…</span></a>
+<a class="sourceLine" id="cb19-6" data-line-number="6"><span class="co">#&gt; 1 /data/home/sean… 8521b38… nonmem     our first … &lt;list [… &lt;NULL&gt;   &lt;chr…</span></a>
+<a class="sourceLine" id="cb19-7" data-line-number="7"><span class="co">#&gt; 2 /data/home/sean… 63ee952… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;chr…</span></a>
+<a class="sourceLine" id="cb19-8" data-line-number="8"><span class="co">#&gt; 3 /data/home/sean… bfa56db… nonmem     two compar… &lt;list [… &lt;chr [1… &lt;chr…</span></a>
 <a class="sourceLine" id="cb19-9" data-line-number="9"><span class="co">#&gt; # … with 1 more variable: decisions &lt;list&gt;</span></a></code></pre></div>
 <p>The <code><a href="../reference/run_log.html">run_log()</a></code> returns a tibble (called <code>log_df</code> in this example) which can be manipulated like any other tibble. However, several of the columns (<code>tags</code> and <code>based_on</code> for example) are list columns, which complicates how the user interacts with them. Future releases will have helper functions to more seamlessly interact with <code>log_df</code>, but until then, we have provided some sample <code>dplyr</code> code below.</p>
 <div id="viewing-tags-example" class="section level2">
@@ -305,11 +305,11 @@
 <a class="sourceLine" id="cb20-5" data-line-number="5"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb20-6" data-line-number="6"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(absolute_model_path, tags, decisions)</a>
 <a class="sourceLine" id="cb20-7" data-line-number="7"><span class="co">#&gt; # A tibble: 3 x 3</span></a>
-<a class="sourceLine" id="cb20-8" data-line-number="8"><span class="co">#&gt;   absolute_model_path          tags            decisions                        </span></a>
-<a class="sourceLine" id="cb20-9" data-line-number="9"><span class="co">#&gt;   &lt;chr&gt;                        &lt;chr&gt;           &lt;chr&gt;                            </span></a>
-<a class="sourceLine" id="cb20-10" data-line-number="10"><span class="co">#&gt; 1 /data/home/sethg/rbabylon/i… base model      ""                               </span></a>
-<a class="sourceLine" id="cb20-11" data-line-number="11"><span class="co">#&gt; 2 /data/home/sethg/rbabylon/i… base model, 2 … "2 compartment model more approp…</span></a>
-<a class="sourceLine" id="cb20-12" data-line-number="12"><span class="co">#&gt; 3 /data/home/sethg/rbabylon/i… 2 compartment   "Added residual errors because i…</span></a></code></pre></div>
+<a class="sourceLine" id="cb20-8" data-line-number="8"><span class="co">#&gt;   absolute_model_path           tags            decisions                       </span></a>
+<a class="sourceLine" id="cb20-9" data-line-number="9"><span class="co">#&gt;   &lt;chr&gt;                         &lt;chr&gt;           &lt;chr&gt;                           </span></a>
+<a class="sourceLine" id="cb20-10" data-line-number="10"><span class="co">#&gt; 1 /data/home/seanw/git/rbabylo… base model      ""                              </span></a>
+<a class="sourceLine" id="cb20-11" data-line-number="11"><span class="co">#&gt; 2 /data/home/seanw/git/rbabylo… base model, 2 … "2 compartment model more appro…</span></a>
+<a class="sourceLine" id="cb20-12" data-line-number="12"><span class="co">#&gt; 3 /data/home/seanw/git/rbabylo… 2 compartment   "Added residual errors because …</span></a></code></pre></div>
 </div>
 <div id="filtering-tags-example" class="section level2">
 <h2 class="hasAnchor">
@@ -319,10 +319,10 @@
 <a class="sourceLine" id="cb21-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="kw"><a href="https://purrr.tidyverse.org/reference/map.html">map_lgl</a></span>(tags, <span class="op">~</span><span class="st"> "2 compartment"</span> <span class="op">%in%</span><span class="st"> </span>.x)) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb21-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(absolute_model_path, description, tags, decisions)</a>
 <a class="sourceLine" id="cb21-4" data-line-number="4"><span class="co">#&gt; # A tibble: 2 x 4</span></a>
-<a class="sourceLine" id="cb21-5" data-line-number="5"><span class="co">#&gt;   absolute_model_path              description                 tags    decisions</span></a>
-<a class="sourceLine" id="cb21-6" data-line-number="6"><span class="co">#&gt;   &lt;chr&gt;                            &lt;chr&gt;                       &lt;list&gt;  &lt;list&gt;   </span></a>
-<a class="sourceLine" id="cb21-7" data-line-number="7"><span class="co">#&gt; 1 /data/home/sethg/rbabylon/inst/… two compartment base model  &lt;chr [… &lt;chr [1]&gt;</span></a>
-<a class="sourceLine" id="cb21-8" data-line-number="8"><span class="co">#&gt; 2 /data/home/sethg/rbabylon/inst/… two compartment with resid… &lt;chr [… &lt;chr [1]&gt;</span></a></code></pre></div>
+<a class="sourceLine" id="cb21-5" data-line-number="5"><span class="co">#&gt;   absolute_model_path               description                tags    decisions</span></a>
+<a class="sourceLine" id="cb21-6" data-line-number="6"><span class="co">#&gt;   &lt;chr&gt;                             &lt;chr&gt;                      &lt;list&gt;  &lt;list&gt;   </span></a>
+<a class="sourceLine" id="cb21-7" data-line-number="7"><span class="co">#&gt; 1 /data/home/seanw/git/rbabylon/in… two compartment base model &lt;chr [… &lt;chr [1]&gt;</span></a>
+<a class="sourceLine" id="cb21-8" data-line-number="8"><span class="co">#&gt; 2 /data/home/seanw/git/rbabylon/in… two compartment with resi… &lt;chr [… &lt;chr [1]&gt;</span></a></code></pre></div>
 </div>
 </div>
 <div id="further-reading" class="section level1">
