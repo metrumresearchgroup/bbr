@@ -9,7 +9,7 @@ BLOCK_REF <- list(
   c(TRUE, FALSE, TRUE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, TRUE)
 )
 
-
+tibble_class <- class(tibble::tibble())
 
 
 
@@ -87,7 +87,7 @@ PARAM_BLOCK_REF <- list(
                          label = c("5 P1NPF", "", "6 CTFX", "", "", "7 LSF"),
                          type = c("[P]", "[A]", "[P]", "[A]", "[A]", "[P]"),
                          param_type = c("OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA")),
-                    row.names = c(NA, -6L), class = c("tbl_df", "tbl", "data.frame"))
+                    row.names = c(NA, -6L), class = tibble_class)
   ),
   ### .tc <- PARAM_REF[["PEX_BLOCK3"]]
   ### dput(.tc$ctl %>% param_labels() %>% apply_indices(.omega = .tc$omega, .sigma = .tc$sigma))
@@ -106,7 +106,7 @@ PARAM_BLOCK_REF <- list(
                          label = c("5 P1NPF", "", "6 CTFX", "", "", "7 LSF", "8 FAKE1", "", "9 FAKE2"),
                          type = c("[P]", "[A]", "[P]", "[A]", "[A]", "[P]", "[P]", "[A]", "[P]"),
                          param_type = c("OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA")),
-                    row.names = c(NA, -9L), class = c("tbl_df", "tbl", "data.frame"))
+                    row.names = c(NA, -9L), class = tibble_class)
   ),
 
   PEX_BLOCK32S = list(
@@ -126,7 +126,7 @@ PARAM_BLOCK_REF <- list(
                          label = c("5 P1NPF", "", "6 CTFX", "", "", "7 LSF", "8 FAKE1", "", "9 FAKE2", "IOV_{KA}", "IOV_{KA}"),
                          type = c("[P]", "[A]", "[P]", "[A]", "[A]", "[P]", "[P]", "[A]", "[P]", "[P]", "[P]"),
                          param_type = c("OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA")),
-                    row.names = c(NA, -11L), class = c("tbl_df", "tbl", "data.frame"))
+                    row.names = c(NA, -11L), class = tibble_class)
   ),
 
   PEX_KAT_DBL2 = list(
@@ -144,7 +144,7 @@ PARAM_BLOCK_REF <- list(
                          label = c("", "", "", "", "", ""),
                          type = c("[A]", "[A]", "[A]", "[A]", "[A]", "[A]"),
                          param_type = c("OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA")),
-                    row.names = c(NA, -6L), class = c("tbl_df", "tbl", "data.frame"))
+                    row.names = c(NA, -6L), class = tibble_class)
   ),
   PEX_KAT_DBL2S = list(
     ctl = "
@@ -161,7 +161,7 @@ PARAM_BLOCK_REF <- list(
                          label = c("", "", "", "", "", ""),
                          type = c("[A]", "[A]", "[A]", "[A]", "[A]", "[A]"),
                          param_type = c("OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA")),
-                    row.names = c(NA, -6L), class = c("tbl_df", "tbl", "data.frame"))
+                    row.names = c(NA, -6L), class = tibble_class)
   ),
 
   PEX_KAT_PKPD = list(
@@ -193,7 +193,7 @@ PARAM_BLOCK_REF <- list(
                          type = c("[P]", "[R]", "[P]", "[R]", "[R]", "[P]", "[A]", "[A]", "[A]", "[A]", "[A]", "[A]", "[A]"),
                          param_type = c("OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA",
                                         "SIGMA", "SIGMA", "SIGMA", "SIGMA", "SIGMA", "SIGMA")),
-                    row.names = c(NA, -13L), class = c("tbl_df", "tbl", "data.frame"))
+                    row.names = c(NA, -13L), class = tibble_class)
   ),
 
   PEX_KAT_ALL = list(
@@ -245,7 +245,8 @@ PARAM_BLOCK_REF <- list(
                                     "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA",
                                     "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA",
                                     "OMEGA")),
-                    row.names = c(NA, -26L), class = "data.frame")
+                    row.names = c(NA, -26L), class = tibble_class
+    )
   ),
 
   PEX_SAM1 = list(
@@ -290,7 +291,7 @@ PARAM_BLOCK_REF <- list(
                          param_type = c("OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA",
                                         "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA",
                                         "OMEGA", "OMEGA", "OMEGA", "OMEGA", "SIGMA", "SIGMA", "SIGMA")),
-                    row.names = c(NA, -22L), class = "data.frame")
+                    row.names = c(NA, -22L), class = tibble_class)
   ),
 
   PEX_DBL_CMT = list( ## parses "correctly" but as expected only takes first label
@@ -330,7 +331,7 @@ PARAM_BLOCK_REF <- list(
                          type = c("", "", "", "", "", "", "", "", "", "", "[A]", "[A]", "[A]", "[A]", "[A]", "[A]", "[A]", "[A]"),
                          param_type = c("THETA", "THETA", "THETA", "THETA", "THETA", "THETA", "THETA", "THETA", "THETA", "THETA",
                                         "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "SIGMA")),
-                    row.names = c(NA, -18L), class = c("tbl_df", "tbl", "data.frame"))
+                    row.names = c(NA, -18L), class = tibble_class)
   )
 
 )
