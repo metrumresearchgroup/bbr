@@ -2,7 +2,7 @@
 % Please edit documentation in R/use-bbi.R
 \name{use_bbi}
 \alias{use_bbi}
-\title{Installing bbi}
+\title{Installs most current release of bbi}
 \usage{
 use_bbi(.dir = "/data/apps", .force = FALSE)
 }
@@ -15,5 +15,7 @@ use_bbi(.dir = "/data/apps", .force = FALSE)
 character
 }
 \description{
-Identifies system running and return installation instructions
+Identifies system running and pulls the relevant tarball for the current release of babylon from GitHub,
+and then installs it in the directory passed to `.dir`.
+If used in an interactive session, will open an installation menu confirming the installed version.
 }
