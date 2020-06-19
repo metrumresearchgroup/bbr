@@ -6,6 +6,9 @@
 \usage{
 version_message(local_v, release_v)
 }
+\arguments{
+\item{local_v}{Character scaler for version number on local installation}
+}
 \description{
 Private helper to construct version comparison message
 }

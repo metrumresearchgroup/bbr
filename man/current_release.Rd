@@ -10,6 +10,13 @@ current_release(
   os = c("linux", "darwin", "windows")
 )
 }
+\arguments{
+\item{owner}{Repository owner/organization}
+
+\item{repo}{Repository name}
+
+\item{os}{Operating system user intends to install on}
+}
 \description{
 Private helper function to most recent release version from repo
 }

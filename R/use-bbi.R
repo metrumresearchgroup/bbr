@@ -45,6 +45,9 @@ use_bbi <- function(.dir = "/data/apps", .force = FALSE){
 #' @importFrom stringr str_detect
 #' @importFrom jsonlite read_json
 #' @importFrom glue glue
+#' @param owner Repository owner/organization
+#' @param repo Repository name
+#' @param os Operating system user intends to install on
 current_release <- function(owner = 'metrumresearchgroup', repo = 'babylon', os = c('linux','darwin','windows')){
 
   tf <- tempfile(fileext = '.json')
@@ -177,6 +180,7 @@ bbi_version <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')){
 #' Private helper to construct version comparison message
 #' @importFrom cli rule col_blue col_red
 #' @importFrom glue glue
+#' @param local_v Character scaler for version number on local installation
 version_message <- function(local_v, release_v){
 
   if (local_v == "") {
