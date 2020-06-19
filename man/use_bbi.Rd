@@ -4,12 +4,21 @@
 \alias{use_bbi}
 \title{Installs most current release of bbi}
 \usage{
-use_bbi(.dir = "/data/apps", .force = FALSE)
+use_bbi(
+  .dir = "/data/apps",
+  .version = "latest",
+  .force = FALSE,
+  .quiet = FALSE
+)
 }
 \arguments{
 \item{.dir}{directory to install bbi to on linux}
 
-\item{.force}{Boolean for whether to force the installation even if current version and local version are the same}
+\item{.version}{version of babylon to install. Must pass a character scaler corresponding to a tag found in `https://github.com/metrumresearchgroup/babylon/releases`}
+
+\item{.force}{Boolean for whether to force the installation even if current version and local version are the same. Primarily used for testing.}
+
+\item{.quiet}{Boolean for suppressing output printed to the console. False by default.}
 }
 \value{
 character

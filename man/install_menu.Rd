@@ -4,7 +4,7 @@
 \alias{install_menu}
 \title{Private implementation function for installing bbi with interactive menu}
 \usage{
-install_menu(.body, .this_os, .dir, .force)
+install_menu(.body, .this_os, .dir, .version, .force, .quiet)
 }
 \arguments{
 \item{.body}{Character vector of installation commands to run with `system`}
@@ -13,7 +13,11 @@ install_menu(.body, .this_os, .dir, .force)
 
 \item{.dir}{directory to install bbi to}
 
+\item{.version}{version of babylon to install. Must pass a character scaler corresponding to a tag found in `https://github.com/metrumresearchgroup/babylon/releases`}
+
 \item{.force}{Boolean for whether to force the installation even if current version and local version are the same}
+
+\item{.quiet}{Boolean for suppressing output printed to the console. False by default.}
 }
 \description{
 Private implementation function for installing bbi with interactive menu
