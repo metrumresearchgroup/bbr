@@ -22,16 +22,16 @@
 #'   \item For variance components (and only variance components) the directive is parsed into the `type` column
 #'   and can be used for post-processing transformations. Some common types include:
 #'   \itemize{
-#'       \item [A] is the assumed directive and it yields standard deviation / correlation.
+#'       \item \[A\] is the assumed directive and it yields standard deviation / correlation.
 #'       Typically used when the random component has a linear relationship to the typical value.
-#'       \item [P] yields Coefficient of Variation.
+#'       \item \[P\] yields Coefficient of Variation.
 #'       Commonly transformed with \eqn{CV_lognormal = sqrt( exp(omega^2)-1 ) \times 100} for omegas,
 #'       and the value of omega from the correlation matrix (i.e., the SD) for sigmas.
 #'       Typically used with exponentiated random effects or proportional residual error.
-#'       \item [R] indicates that this is an item that should be read from the correlation
+#'       \item \[R\] indicates that this is an item that should be read from the correlation
 #'       matrix as opposed to the covariance matrix.
 #'       I.e., standard deviation and correlation of the parameter on the raw scale will be reported.
-#'       \item [C] indicates that this item should be read from the covariance matrix, i.e., variance
+#'       \item \[C\] indicates that this item should be read from the covariance matrix, i.e., variance
 #'        and covariance of the parameter on the raw scale will be reported.
 #'      }
 #'   }
