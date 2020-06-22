@@ -5,7 +5,7 @@
 #' @importFrom glue glue glue_collapse
 #' @importFrom cli rule
 #' @param .dir directory to install bbi to on linux
-#' @param .force Boolean for whether to force the installation even if current version and local version are the same
+#' @param .force If `FALSE`, the default, skips installation if requested version and local version are the same. If `TRUE` forces installation if it will be the same version.
 #' @return character
 #' @export
 use_bbi <- function(.dir = "/data/apps", .force = FALSE){
@@ -89,7 +89,7 @@ bbi_current_release <- function(os = "linux"){
 #' @param .body Character vector of installation commands to run with `system`
 #' @param .this_os Character scaler of OS
 #' @param .dir directory to install bbi to
-#' @param .force Boolean for whether to force the installation even if current version and local version are the same
+#' @param .force If `FALSE`, the default, skips installation if requested version and local version are the same. If `TRUE` forces installation if it will be the same version.
 #' @keywords internal
 install_menu <- function(.body, .this_os, .dir, .force){
 

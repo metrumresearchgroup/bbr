@@ -23,7 +23,7 @@ However it will be extended to parse labels from the model YAML file as well.
 The syntax for the labeling is described in "Details" below.
 }
 \details{
-This function will \emph{not} return indices for the parameters, though they can be added with \verb{param_labels() \\\%>\\\% apply_indices()}.
+This function will \emph{not} return indices for the parameters, though they can be added with \code{param_labels() \%>\% apply_indices()}.
 See the \code{apply_indices()} documentation for more details.
 
 The syntax for parsing labels from comments is inherited from the "Census" specification

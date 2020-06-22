@@ -162,7 +162,7 @@ The syntax for the labeling is described in "Details" below.</p>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>This function will <em>not</em> return indices for the parameters, though they can be added with <code>param_labels() \%&gt;\% apply_indices()</code>.
+    <p>This function will <em>not</em> return indices for the parameters, though they can be added with <code>param_labels() %&gt;% apply_indices()</code>.
 See the <code><a href='apply_indices.html'>apply_indices()</a></code> documentation for more details.</p>
 <p>The syntax for parsing labels from comments is inherited from the "Census" specification
 that was also used in the <code>tidynm</code> and <code>mrgtable</code> packages. The syntax is as follows,
@@ -174,16 +174,16 @@ with everything after the comment character <code>;</code> parsed into the label
 <li><p>For fixed effects the directives are translated to units, i.e., L/h</p></li>
 <li><p>For variance components (and only variance components) the directive is parsed into the <code>type</code> column
 and can be used for post-processing transformations. Some common types include:</p><ul>
-<li><p>A is the assumed directive and it yields standard deviation / correlation.
+<li><p>[A] is the assumed directive and it yields standard deviation / correlation.
 Typically used when the random component has a linear relationship to the typical value.</p></li>
-<li><p>P yields Coefficient of Variation.
+<li><p>[P] yields Coefficient of Variation.
 Commonly transformed with \(CV_lognormal = sqrt( exp(omega^2)-1 ) \times 100\) for omegas,
 and the value of omega from the correlation matrix (i.e., the SD) for sigmas.
 Typically used with exponentiated random effects or proportional residual error.</p></li>
-<li><p>R indicates that this is an item that should be read from the correlation
+<li><p>[R] indicates that this is an item that should be read from the correlation
 matrix as opposed to the covariance matrix.
 I.e., standard deviation and correlation of the parameter on the raw scale will be reported.</p></li>
-<li><p><a href='https://rdrr.io/r/stats/zC.html'>C</a> indicates that this item should be read from the covariance matrix, i.e., variance
+<li><p>[C] indicates that this item should be read from the covariance matrix, i.e., variance
 and covariance of the parameter on the raw scale will be reported.</p></li>
 </ul></li>
 </ul></li>

@@ -20,7 +20,7 @@ copy_nonmem_model_from(
 
 \item{.description}{Description of new model run. This will be stored in the yaml (to be used later in \code{run_log()}) and optionally passed into the \verb{$PROBLEM} of the new control stream.}
 
-\item{.update_model_file}{Boolean for whether to update the \verb{$PROBLEM} line in the new control stream. By default it is TRUE, but if FALSE is passed \verb{\{.new_model\}.[mod|ctl]} will be an exact copy of its parent control stream.}
+\item{.update_model_file}{If \code{TRUE}, the default, update the \verb{$PROBLEM} line in the new control stream. If \code{FALSE}, \verb{\{.new_model\}.[mod|ctl]} will be an exact copy of its parent control stream.}
 }
 \value{
 S3 object of class \code{bbi_nonmem_model} that can be passed to \code{submit_nonmem_model()}

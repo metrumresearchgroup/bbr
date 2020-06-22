@@ -13,7 +13,7 @@ install_menu(.body, .this_os, .dir, .force)
 
 \item{.dir}{directory to install bbi to}
 
-\item{.force}{Boolean for whether to force the installation even if current version and local version are the same}
+\item{.force}{If \code{FALSE}, the default, skips installation if requested version and local version are the same. If \code{TRUE} forces installation if it will be the same version.}
 }
 \description{
 Private implementation function for installing bbi with interactive menu

@@ -155,7 +155,7 @@ save_model_yaml <- function(.mod, .out_path = NULL) {
 }
 
 
-#' Convert object to `bbi_\{.model_type\}_model`
+#' Convert object to `bbi_{.model_type}_model`
 #' @param .obj Object to convert to `bbi_{.model_type}_model`
 #' @rdname as_model
 #' @export

@@ -5,7 +5,7 @@
 #' However it will be extended to parse labels from the model YAML file as well.
 #' The syntax for the labeling is described in "Details" below.
 #'
-#' This function will *not* return indices for the parameters, though they can be added with `param_labels() \%>\% apply_indices()`.
+#' This function will *not* return indices for the parameters, though they can be added with `param_labels() %>% apply_indices()`.
 #' See the `apply_indices()` documentation for more details.
 #'
 #' @details The syntax for parsing labels from comments is inherited from the "Census" specification
@@ -172,7 +172,7 @@ block <- function(.n) {
 #'
 #' Heavily modified from tidynm::parse_theta() to parse out the comments into the right columns for all three params.
 #' @param .x an object from the list that comes out of clean_ctl() (i.e. .ctl_clean$THETA, .ctl_clean$SIGMA, .ctl_clean$OMEGA)
-#' @param .theta Boolean for if it's a theta. If TRUE, parses `[{}]` to unit, otherwise parses to type
+#' @param .theta If `FALSE`, the default, assumes element is an OMEGA or SIGMA and parses `[{}]` to "type" column. If `TRUE`, assumes THETA and parses `[{}]` to unit.
 #' @importFrom stringr str_match str_split str_trim str_replace str_replace_all regex
 #' @importFrom dplyr mutate
 #' @importFrom tidyr replace_na
@@ -297,7 +297,7 @@ parse_same_block <- function(.x) {
 }
 
 #' Builds matrix indices labels
-#' @param .is_diag Boolean vector denoting whether each element is a diagonal
+#' @param .is_diag Logical vector denoting whether each element is a diagonal
 #' @keywords internal
 build_matrix_indices <- function(.is_diag) {
   total_diag <- sum(.is_diag)

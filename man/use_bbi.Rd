@@ -9,7 +9,7 @@ use_bbi(.dir = "/data/apps", .force = FALSE)
 \arguments{
 \item{.dir}{directory to install bbi to on linux}
 
-\item{.force}{Boolean for whether to force the installation even if current version and local version are the same}
+\item{.force}{If \code{FALSE}, the default, skips installation if requested version and local version are the same. If \code{TRUE} forces installation if it will be the same version.}
 }
 \value{
 character

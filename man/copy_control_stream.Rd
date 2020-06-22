@@ -16,7 +16,7 @@ copy_control_stream(
 
 \item{.new_model_path}{Path to copy the new control stream to}
 
-\item{.update_model_file}{Boolean for whether to update the \verb{$PROBLEM} line in the new control stream. By default it is TRUE, but if FALSE is passed \verb{\{.new_model\}.[mod|ctl]} will be an exact copy of its parent control stream.}
+\item{.update_model_file}{If \code{TRUE}, the default, update the \verb{$PROBLEM} line in the new control stream. If \code{FALSE}, \verb{\{.new_model\}.[mod|ctl]} will be an exact copy of its parent control stream.}
 
 \item{.description}{Description of new model run. This will be passed into the \verb{$PROBLEM} of the new control stream (if \code{.update_model_file=TRUE}).}
 }

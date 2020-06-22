@@ -38,17 +38,17 @@ replace_bbi_args(.mod, .bbi_args)
 
 \item{.field}{Character scaler of the name of the component to modify}
 
-\item{.value}{Whatever is to be added to \code{.mod[[.field]]}, typically a character scaler or vector}
+\item{.value}{Whatever is to be added to \code{.mod[[.field]]}, typically a character vector}
 
-\item{.append}{Boolean for whether to concatenate new values with currently present values. TRUE by default. If FALSE, new values will overwrite old values.}
+\item{.append}{If \code{TRUE}, the default, concatenate new values with currently present values. If \code{FALSE}, new values will overwrite old values.}
 
-\item{.unique}{Boolean for whether to de-duplicate \code{.mod[[.field]]} after adding new values. TRUE by default.}
+\item{.unique}{If \code{TRUE}, the default, de-duplicate \code{.mod[[.field]]} after adding new values. If \code{FALSE} duplicate values will be kept.}
 
-\item{.tags}{Character scaler or vector of tags use as replacement}
+\item{.tags}{Character vector of tags use as replacement}
 
-\item{.decisions}{Character scaler or vector to use as replacement}
+\item{.decisions}{Character vector to use as replacement}
 
-\item{.based_on}{Character scaler or vector to use as replacement}
+\item{.based_on}{Character vector to use as replacement}
 
 \item{.description}{Character scaler to use as replacement}
 

@@ -176,7 +176,7 @@ bbi_help <- function(.cmd_args=NULL) {
 #' @param .dir Path to directory to run `init` in (and put the resulting `babylon.yml` file)
 #' @param .nonmem_dir Path to directory with the NONMEM installation.
 #' @param .nonmem_version Character scaler for default version of NONMEM to use. If left NULL, function will exit and tell you which versions were found in `.nonmem_dir`
-#' @param .no_default_version Boolean to force creation of babylon.yaml with NO default NONMEM version. FALSE by default, and not encouraged.
+#' @param .no_default_version If `TRUE`, force creation of babylon.yaml with **no default NONMEM version**. `FALSE` by default, and using `TRUE` is *not* encouraged.
 #' @importFrom yaml read_yaml write_yaml
 #' @export
 bbi_init <- function(.dir, .nonmem_dir, .nonmem_version = NULL, .no_default_version = FALSE) {

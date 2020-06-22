@@ -62,15 +62,15 @@ copy_model_from(
 
 \item{.description}{Description of new model run. This will be stored in the yaml (to be used later in \code{run_log()}).}
 
-\item{.based_on_additional}{Character scaler or vector of paths to other models that this model was "based on." These are used to reconstuct model developement and ancestry. \strong{Paths must be relative to \code{.new_model} path.} Note that the \code{.parent_model} will automatically be added to the \code{based_on} field, so no need to include that here.}
+\item{.based_on_additional}{Character vector of path(s) to other models that this model was "based on." These are used to reconstuct model developement and ancestry. \strong{Paths must be relative to \code{.new_model} path.} Note that the \code{.parent_model} will automatically be added to the \code{based_on} field, so no need to include that here.}
 
-\item{.add_tags}{A character scaler or vector with any new tags to be added to \verb{\{.new_model\}.yaml}}
+\item{.add_tags}{Character vector with any new tags(s) to be added to \verb{\{.new_model\}.yaml}}
 
-\item{.inherit_tags}{Boolean for whether to inherit any tags from \code{.parent_mod}}
+\item{.inherit_tags}{If \code{FALSE}, the default, new model will only have any tags passed to \code{.add_tags} argument. If \code{TRUE} inherit any tags from \code{.parent_mod}, with any tags passed to \code{.add_tags} appended.}
 
-\item{.update_model_file}{Boolean for whether to update the newly created model file. By default it is TRUE, but if FALSE is passed new model file will be an exact copy of its parent.}
+\item{.update_model_file}{If \code{TRUE}, the default, update the newly created model file with new description and name. If \code{FALSE}, new model file will be an exact copy of its parent.}
 
-\item{.overwrite}{Boolean for whether to overwrite model file if one already exists specified \code{.new_model} path}
+\item{.overwrite}{If \code{FALSE}, the default,  function will error if a model file already exists at specified \code{.new_model} path. If \code{TRUE} any existing file at \code{.new_model} will be overwritten silently.}
 
 \item{.directory}{Model directory which BOTH \code{.parent_model} and \code{.new_model} are relative to. Defaults to \code{options('rbabylon.model_directory')}, which can be set globally with \code{set_model_directory()}.}
 }

@@ -15,8 +15,8 @@ build_path_from_mod_obj <- function(.mod, .extension) {
 #' @param .file Character scaler of path to file to read
 #' @param .head Integer for number of lines to read from the top of the file
 #' @param .tail Integer for number of lines to read from the bottom of the file
-#' @param .print Boolean for whether to print resulting head and tail to console. Defaults to TRUE.
-#' @param .return Boolean for whether to return resulting head and tail as a character vector. Defaults to FALSE.
+#' @param .print If `TRUE`, the default, print resulting head and tail to console.
+#' @param .return If `FALSE`, the default, returns `NULL` invisibly. If `TRUE` returns resulting head and tail as a character vector.
 #' @importFrom readr read_lines
 #' @rdname check_file
 #' @export
@@ -81,8 +81,8 @@ tail_output <- function(.mod, ...) {
 #' @param .mod Path to OUTPUT file
 #' @param .head Integer for number of lines to read from the top of the file
 #' @param .tail Integer for number of lines to read from the bottom of the file
-#' @param .print Boolean for whether to print resulting head and tail to console. Defaults to TRUE.
-#' @param .return Boolean for whether to return resulting head and tail as a character vector. Defaults to FALSE.
+#' @param .print If `TRUE`, the default, print resulting head and tail to console.
+#' @param .return If `FALSE`, the default, returns `NULL` invisibly. If `TRUE` returns resulting head and tail as a character vector.
 #' @param ... arguments passed through to check_file
 #' @export
 #' @rdname check_file
@@ -99,8 +99,8 @@ tail_output.character <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .re
 #' @param .mod bbi_nonmem_model object
 #' @param .head Integer for number of lines to read from the top of the file
 #' @param .tail Integer for number of lines to read from the bottom of the file
-#' @param .print Boolean for whether to print resulting head and tail to console. Defaults to TRUE.
-#' @param .return Boolean for whether to return resulting head and tail as a character vector. Defaults to FALSE.
+#' @param .print If `TRUE`, the default, print resulting head and tail to console.
+#' @param .return If `FALSE`, the default, returns `NULL` invisibly. If `TRUE` returns resulting head and tail as a character vector.
 #' @param ... arguments passed through to check_file
 #' @export
 #' @rdname check_file
@@ -125,8 +125,8 @@ tail_lst <- function(.mod, ...) {
 #' @param .mod Path to lst file
 #' @param .head Integer for number of lines to read from the top of the file
 #' @param .tail Integer for number of lines to read from the bottom of the file
-#' @param .print Boolean for whether to print resulting head and tail to console. Defaults to TRUE.
-#' @param .return Boolean for whether to return resulting head and tail as a character vector. Defaults to FALSE.
+#' @param .print If `TRUE`, the default, print resulting head and tail to console.
+#' @param .return If `FALSE`, the default, returns `NULL` invisibly. If `TRUE` returns resulting head and tail as a character vector.
 #' @export
 #' @rdname check_file
 tail_lst.character <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE, ...) {
@@ -142,8 +142,8 @@ tail_lst.character <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .retur
 #' @param .mod bbi_nonmem_model object
 #' @param .head Integer for number of lines to read from the top of the file
 #' @param .tail Integer for number of lines to read from the bottom of the file
-#' @param .print Boolean for whether to print resulting head and tail to console. Defaults to TRUE.
-#' @param .return Boolean for whether to return resulting head and tail as a character vector. Defaults to FALSE.
+#' @param .print If `TRUE`, the default, print resulting head and tail to console.
+#' @param .return If `FALSE`, the default, returns `NULL` invisibly. If `TRUE` returns resulting head and tail as a character vector.
 #' @export
 #' @rdname check_file
 tail_lst.bbi_nonmem_model <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE, ...) {

@@ -8,9 +8,9 @@
 #' Also checks the object against the corresponding YAML before modifying (and errors if they are out of sync) and then writes the modified object back to the YAML.
 #' @param .mod The `bbi_{.model_type}_model` object to modify
 #' @param .field Character scaler of the name of the component to modify
-#' @param .value Whatever is to be added to `.mod[[.field]]`, typically a character scaler or vector
-#' @param .append Boolean for whether to concatenate new values with currently present values. TRUE by default. If FALSE, new values will overwrite old values.
-#' @param .unique Boolean for whether to de-duplicate `.mod[[.field]]` after adding new values. TRUE by default.
+#' @param .value Whatever is to be added to `.mod[[.field]]`, typically a character vector
+#' @param .append If `TRUE`, the default, concatenate new values with currently present values. If `FALSE`, new values will overwrite old values.
+#' @param .unique If `TRUE`, the default, de-duplicate `.mod[[.field]]` after adding new values. If `FALSE` duplicate values will be kept.
 #' @rdname modify_model_field
 #' @export
 modify_model_field <- function(.mod, .field, .value, .append = TRUE, .unique = TRUE) {
@@ -41,7 +41,7 @@ modify_model_field <- function(.mod, .field, .value, .append = TRUE, .unique = T
 
 #' Add tags to a model object and corresponding YAML
 #' @param .mod The `bbi_{.model_type}_model` object to modify
-#' @param .tags Character scaler or vector of tags to add
+#' @param .tags Character vector of tags to add
 #' @export
 #' @rdname modify_model_field
 add_tags <- function(.mod, .tags) {
@@ -54,7 +54,7 @@ add_tags <- function(.mod, .tags) {
 
 #' Replaces tags on a model object and corresponding YAML with new tags
 #' @param .mod The `bbi_{.model_type}_model` object to modify
-#' @param .tags Character scaler or vector of tags use as replacement
+#' @param .tags Character vector of tags use as replacement
 #' @export
 #' @rdname modify_model_field
 replace_tags <- function(.mod, .tags) {
@@ -67,7 +67,7 @@ replace_tags <- function(.mod, .tags) {
 
 #' Append new decisions to the one(s) in a model object and corresponding YAML
 #' @param .mod The `bbi_{.model_type}_model` object to modify
-#' @param .decisions Character scaler or vector of text to add to `decisions` field
+#' @param .decisions Character vector of text to add to `decisions` field
 #' @export
 #' @rdname modify_model_field
 add_decisions <- function(.mod, .decisions) {
@@ -80,7 +80,7 @@ add_decisions <- function(.mod, .decisions) {
 
 #' Replaces `decisions` field in a model object and corresponding YAML with new values
 #' @param .mod The `bbi_{.model_type}_model` object to modify
-#' @param .decisions Character scaler or vector to use as replacement
+#' @param .decisions Character vector to use as replacement
 #' @export
 #' @rdname modify_model_field
 replace_decisions <- function(.mod, .decisions) {
@@ -94,7 +94,7 @@ replace_decisions <- function(.mod, .decisions) {
 
 #' Append new `based_on` tag to the one in a model object and corresponding YAML
 #' @param .mod The `bbi_{.model_type}_model` object to modify
-#' @param .based_on Character scaler or vector of relative paths to add to `based_on` field
+#' @param .based_on Character vector of relative paths to add to `based_on` field
 #' @export
 #' @rdname modify_model_field
 add_based_on <- function(.mod, .based_on) {
@@ -107,7 +107,7 @@ add_based_on <- function(.mod, .based_on) {
 
 #' Replaces `based_on` field in a model object and corresponding YAML with new values
 #' @param .mod The `bbi_{.model_type}_model` object to modify
-#' @param .based_on Character scaler or vector to use as replacement
+#' @param .based_on Character vector to use as replacement
 #' @export
 #' @rdname modify_model_field
 replace_based_on <- function(.mod, .based_on) {

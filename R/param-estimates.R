@@ -52,7 +52,7 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
     ) %>%
     tibble::as_tibble()
 
-  # create boolean column for whether each row is a diagonal
+  # create logical column for whether each row is a diagonal
   param_df[["diag"]] <- map_lgl(param_df[["names"]], is_diag)
 
   return(param_df)

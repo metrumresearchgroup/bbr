@@ -205,23 +205,23 @@ Also fills <code>based_on</code> field by default, for constructing model ancest
     </tr>
     <tr>
       <th>.based_on_additional</th>
-      <td><p>Character scaler or vector of paths to other models that this model was "based on." These are used to reconstuct model developement and ancestry. <strong>Paths must be relative to <code>.new_model</code> path.</strong> Note that the <code>.parent_model</code> will automatically be added to the <code>based_on</code> field, so no need to include that here.</p></td>
+      <td><p>Character vector of path(s) to other models that this model was "based on." These are used to reconstuct model developement and ancestry. <strong>Paths must be relative to <code>.new_model</code> path.</strong> Note that the <code>.parent_model</code> will automatically be added to the <code>based_on</code> field, so no need to include that here.</p></td>
     </tr>
     <tr>
       <th>.add_tags</th>
-      <td><p>A character scaler or vector with any new tags to be added to <code>{.new_model}.yaml</code></p></td>
+      <td><p>Character vector with any new tags(s) to be added to <code>{.new_model}.yaml</code></p></td>
     </tr>
     <tr>
       <th>.inherit_tags</th>
-      <td><p>Boolean for whether to inherit any tags from <code>.parent_mod</code></p></td>
+      <td><p>If <code>FALSE</code>, the default, new model will only have any tags passed to <code>.add_tags</code> argument. If <code>TRUE</code> inherit any tags from <code>.parent_mod</code>, with any tags passed to <code>.add_tags</code> appended.</p></td>
     </tr>
     <tr>
       <th>.update_model_file</th>
-      <td><p>Boolean for whether to update the newly created model file. By default it is TRUE, but if FALSE is passed new model file will be an exact copy of its parent.</p></td>
+      <td><p>If <code>TRUE</code>, the default, update the newly created model file with new description and name. If <code>FALSE</code>, new model file will be an exact copy of its parent.</p></td>
     </tr>
     <tr>
       <th>.overwrite</th>
-      <td><p>Boolean for whether to overwrite model file if one already exists specified <code>.new_model</code> path</p></td>
+      <td><p>If <code>FALSE</code>, the default,  function will error if a model file already exists at specified <code>.new_model</code> path. If <code>TRUE</code> any existing file at <code>.new_model</code> will be overwritten silently.</p></td>
     </tr>
     <tr>
       <th>.directory</th>

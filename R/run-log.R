@@ -7,7 +7,7 @@
 #' Parses all model yaml and outputs into a tibble that serves as a run log for the project.
 #' Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
 #' @param .base_dir Directory to search for model yaml files. Only runs with a corresponding yaml will be included.
-#' @param .recurse Boolean for whether to search subdirectories recursively for additional yaml files. Defaults to TRUE.
+#' @param .recurse If `TRUE`, the default, search recursively in subdirectories.
 #' @importFrom stringr str_subset
 #' @importFrom fs dir_ls
 #' @importFrom purrr map map_lgl transpose
@@ -126,7 +126,7 @@ enforce_length <- function(.l, .k, .len = 1) {
 
 #' Parses model config.json outputs into a log tibble
 #' @param .base_dir Base directory to look from model YAML files in
-#' @param .recurse Boolean for whether to search recursively in subdirectories
+#' @param .recurse If `TRUE`, the default, search recursively in subdirectories.
 #' @importFrom stringr str_subset
 #' @importFrom fs dir_ls
 #' @importFrom purrr map_df

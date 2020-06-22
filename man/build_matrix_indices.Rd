@@ -7,7 +7,7 @@
 build_matrix_indices(.is_diag)
 }
 \arguments{
-\item{.is_diag}{Boolean vector denoting whether each element is a diagonal}
+\item{.is_diag}{Logical vector denoting whether each element is a diagonal}
 }
 \description{
 Builds matrix indices labels

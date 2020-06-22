@@ -31,9 +31,9 @@ tail_lst(.mod, ...)
 
 \item{.tail}{Integer for number of lines to read from the bottom of the file}
 
-\item{.print}{Boolean for whether to print resulting head and tail to console. Defaults to TRUE.}
+\item{.print}{If \code{TRUE}, the default, print resulting head and tail to console.}
 
-\item{.return}{Boolean for whether to return resulting head and tail as a character vector. Defaults to FALSE.}
+\item{.return}{If \code{FALSE}, the default, returns \code{NULL} invisibly. If \code{TRUE} returns resulting head and tail as a character vector.}
 
 \item{.mod}{bbi_nonmem_model object}
 

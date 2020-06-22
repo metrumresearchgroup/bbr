@@ -18,7 +18,7 @@ bbi_init(
 
 \item{.nonmem_version}{Character scaler for default version of NONMEM to use. If left NULL, function will exit and tell you which versions were found in \code{.nonmem_dir}}
 
-\item{.no_default_version}{Boolean to force creation of babylon.yaml with NO default NONMEM version. FALSE by default, and not encouraged.}
+\item{.no_default_version}{If \code{TRUE}, force creation of babylon.yaml with \strong{no default NONMEM version}. \code{FALSE} by default, and using \code{TRUE} is \emph{not} encouraged.}
 }
 \description{
 Executes (\verb{bbi init}) with bbi_exec() in specified directory

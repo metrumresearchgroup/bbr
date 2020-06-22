@@ -12,7 +12,7 @@ parse_same_block(.x)
 \arguments{
 \item{.x}{List of character vectors representing either $OMEGA or $SIGMA blocks, as parsed by \code{clean_ctl()}}
 
-\item{.theta}{Boolean for if it's a theta. If TRUE, parses \verb{[\{\}]} to unit, otherwise parses to type}
+\item{.theta}{If \code{FALSE}, the default, assumes element is an OMEGA or SIGMA and parses \verb{[\{\}]} to "type" column. If \code{TRUE}, assumes THETA and parses \verb{[\{\}]} to unit.}
 }
 \description{
 Heavily modified from tidynm::parse_theta() to parse out the comments into the right columns for all three params.

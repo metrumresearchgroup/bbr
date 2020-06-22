@@ -73,7 +73,7 @@ check_nonmem_args <- function(.args) {
 
 #' Formats command line args from a named list to a string as it would be passed on the command line
 #' @param .args A named list of .args to check
-#' @param .collapse Boolean for whether to collapse return vector to a single string (FALSE by default)
+#' @param .collapse If `FALSE`, the default, returns a character vector. If `TRUE`, collapses return vector to a single string.
 #' @importFrom checkmate assert_list
 #' @importFrom rlang is_bare_logical
 #' @importFrom purrr imap set_names

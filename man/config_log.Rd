@@ -12,7 +12,7 @@ add_config(.log_df, ...)
 \arguments{
 \item{.base_dir}{Base directory to look from model YAML files in}
 
-\item{.recurse}{Boolean for whether to search recursively in subdirectories}
+\item{.recurse}{If \code{TRUE}, the default, search recursively in subdirectories.}
 
 \item{.log_df}{the output tibble from \code{run_log()}}
 
