@@ -14,9 +14,9 @@ add_config(.log_df, ...)
 
 \item{.recurse}{Boolean for whether to search recursively in subdirectories}
 
-\item{.log_df}{the output tibble from `run_log()`}
+\item{.log_df}{the output tibble from \code{run_log()}}
 
-\item{...}{arguments passed through to `config_log()`}
+\item{...}{arguments passed through to \code{config_log()}}
 }
 \value{
 tibble with information on each run

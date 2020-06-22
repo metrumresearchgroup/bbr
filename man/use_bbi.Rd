@@ -16,6 +16,6 @@ character
 }
 \description{
 Identifies system running and pulls the relevant tarball for the current release of babylon from GitHub,
-and then installs it in the directory passed to `.dir`.
+and then installs it in the directory passed to \code{.dir}.
 If used in an interactive session, will open an installation menu confirming the installed version.
 }

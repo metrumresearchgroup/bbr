@@ -10,10 +10,10 @@ param_estimates(.summary)
 \method{param_estimates}{bbi_nonmem_summary}(.summary)
 }
 \arguments{
-\item{.summary}{`bbi_nonmem_summary` object}
+\item{.summary}{\code{bbi_nonmem_summary} object}
 }
 \description{
 Parses parameter estimates table from model_summary() output
 
-S3 dispatch for parsing `bbi_nonmem_summary` object into parameter estimate table
+S3 dispatch for parsing \code{bbi_nonmem_summary} object into parameter estimate table
 }

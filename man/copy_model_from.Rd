@@ -58,23 +58,23 @@ copy_model_from(
 \arguments{
 \item{.parent_mod}{Integer that corresponds to parent model to use as a basis for the copy.}
 
-\item{.new_model}{Integer that corresponds to the new model name to create. Function will create both `{.new_model}.yaml` and a new model file based on this path.}
+\item{.new_model}{Integer that corresponds to the new model name to create. Function will create both \verb{\{.new_model\}.yaml} and a new model file based on this path.}
 
-\item{.description}{Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`).}
+\item{.description}{Description of new model run. This will be stored in the yaml (to be used later in \code{run_log()}).}
 
-\item{.based_on_additional}{Character scaler or vector of paths to other models that this model was "based on." These are used to reconstuct model developement and ancestry. \strong{Paths must be relative to `.new_model` path.} Note that the `.parent_model` will automatically be added to the `based_on` field, so no need to include that here.}
+\item{.based_on_additional}{Character scaler or vector of paths to other models that this model was "based on." These are used to reconstuct model developement and ancestry. \strong{Paths must be relative to \code{.new_model} path.} Note that the \code{.parent_model} will automatically be added to the \code{based_on} field, so no need to include that here.}
 
-\item{.add_tags}{A character scaler or vector with any new tags to be added to `{.new_model}.yaml`}
+\item{.add_tags}{A character scaler or vector with any new tags to be added to \verb{\{.new_model\}.yaml}}
 
-\item{.inherit_tags}{Boolean for whether to inherit any tags from `.parent_mod`}
+\item{.inherit_tags}{Boolean for whether to inherit any tags from \code{.parent_mod}}
 
 \item{.update_model_file}{Boolean for whether to update the newly created model file. By default it is TRUE, but if FALSE is passed new model file will be an exact copy of its parent.}
 
-\item{.overwrite}{Boolean for whether to overwrite model file if one already exists specified `.new_model` path}
+\item{.overwrite}{Boolean for whether to overwrite model file if one already exists specified \code{.new_model} path}
 
-\item{.directory}{Model directory which BOTH `.parent_model` and `.new_model` are relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
+\item{.directory}{Model directory which BOTH \code{.parent_model} and \code{.new_model} are relative to. Defaults to \code{options('rbabylon.model_directory')}, which can be set globally with \code{set_model_directory()}.}
 }
 \description{
 Create new model by copying existing model. Useful for iterating during model development.
-Also fills `based_on` field by default, for constructing model ancestry. See \href{../articles/using-based-on.html}{"Using based_on field" vignette} for details.
+Also fills \code{based_on} field by default, for constructing model ancestry. See \href{../articles/using-based-on.html}{"Using based_on field" vignette} for details.
 }

@@ -13,14 +13,14 @@ check_output_dir(.mod, ...)
 \method{check_output_dir}{bbi_nonmem_model}(.mod, ...)
 }
 \arguments{
-\item{.mod}{The `bbi_{.model_type}_model` object}
+\item{.mod}{The \verb{bbi_\{.model_type\}_model} object}
 
-\item{...}{values to pass to `fs::dir_ls`}
+\item{...}{values to pass to \code{fs::dir_ls}}
 }
 \description{
 List files in the output directory to glance at where the process is
 
 S3 dispatch to list output directory files from a directory path
 
-S3 dispatch to list output directory files from a `bbi_{.model_type}_model` object
+S3 dispatch to list output directory files from a \verb{bbi_\{.model_type\}_model} object
 }

@@ -28,18 +28,18 @@ get_model_ancestry(.bbi_object)
 \method{get_model_ancestry}{bbi_run_log_df}(.bbi_object)
 }
 \arguments{
-\item{.bbi_object}{Tibble of class `bbi_run_log_df`}
+\item{.bbi_object}{Tibble of class \code{bbi_run_log_df}}
 
 \item{.check_exists}{Logical scaler for whether it will check if the file exists and error if it does not. FALSE by default.}
 }
 \description{
-Returns character vector of the absolute paths all models stored in the `based_on` field of a `bbi_...` object
-NOTE: All paths saved in the object or accompanying YAML will be relative **to the location of that YAML**
+Returns character vector of the absolute paths all models stored in the \code{based_on} field of a \code{bbi_...} object
+NOTE: All paths saved in the object or accompanying YAML will be relative \strong{to the location of that YAML}
 When the object is loaded into memory, the absolute path to the YAML is stored in the object.
-These functions simply stitch together that path with the relative paths from the `based_on` field.
+These functions simply stitch together that path with the relative paths from the \code{based_on} field.
 As long as the YAML has not moved since it was loaded, this will work.
 
-Extract paths to all models that this model is based on (iterating over `get_based_on()` function),
+Extract paths to all models that this model is based on (iterating over \code{get_based_on()} function),
 and all models that those models are based on, recursively.
 Returns a sorted unique character vector.
 }

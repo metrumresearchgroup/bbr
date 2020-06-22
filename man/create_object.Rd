@@ -5,7 +5,7 @@
 \alias{create_summary_object}
 \alias{create_process_object}
 \alias{create_run_log_object}
-\title{Creates S3 object of class `bbi_{.model_type}_model` from list with `MODEL_REQ_INPUT_KEYS`}
+\title{Creates S3 object of class \verb{bbi_\{.model_type\}_model} from list with \code{MODEL_REQ_INPUT_KEYS}}
 \usage{
 create_model_object(.mod_list)
 
@@ -20,12 +20,12 @@ create_run_log_object(log_df)
 
 \item{res}{List to attempt to assign the class to}
 
-\item{.model_type}{Character scaler of a valid model type (currently either `nonmem` or `stan`)}
+\item{.model_type}{Character scaler of a valid model type (currently either \code{nonmem} or \code{stan})}
 
 \item{log_df}{data.frame or tibble to attempt to assign the class to}
 }
 \value{
-S3 object of class `bbi_{.model_type}_model` that can be passed to `submit_model()`, `model_summary()` etc.
+S3 object of class \verb{bbi_\{.model_type\}_model} that can be passed to \code{submit_model()}, \code{model_summary()} etc.
 }
 \description{
 First checks to be sure the required keys are all present

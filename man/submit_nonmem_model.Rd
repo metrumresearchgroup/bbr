@@ -15,12 +15,12 @@ submit_nonmem_model(
 )
 }
 \arguments{
-\item{.mod}{An S3 object of class `bbi_nonmem_model`, for example from `new_model()`, `read_model()` or `copy_model_from()`}
+\item{.mod}{An S3 object of class \code{bbi_nonmem_model}, for example from \code{new_model()}, \code{read_model()} or \code{copy_model_from()}}
 }
 \value{
-An S3 object of class `babylon_process`
+An S3 object of class \code{babylon_process}
 }
 \description{
-Private implementation function called by `submit_model()` dispatches.
+Private implementation function called by \code{submit_model()} dispatches.
 }
 \keyword{internal}

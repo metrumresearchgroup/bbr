@@ -48,13 +48,13 @@ model_summary(
 
 \item{.model_type}{Character scaler specifying the type of model, either 'nonmem' or 'stan'}
 
-\item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`.}
+\item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}.}
 
-\item{...}{args passed through to `bbi_exec()`}
+\item{...}{args passed through to \code{bbi_exec()}}
 
 \item{.dry_run}{show what the command would be without actually running it}
 
-\item{.directory}{Model directory containing the files referenced by `.mod`. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
+\item{.directory}{Model directory containing the files referenced by \code{.mod}. Defaults to \code{options('rbabylon.model_directory')}, which can be set globally with \code{set_model_directory()}.}
 }
 \description{
 Returns a named list with model outputs and diagnostics.

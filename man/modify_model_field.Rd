@@ -34,15 +34,15 @@ add_bbi_args(.mod, .bbi_args)
 replace_bbi_args(.mod, .bbi_args)
 }
 \arguments{
-\item{.mod}{A `bbi_{.model_type}_model` object}
+\item{.mod}{A \verb{bbi_\{.model_type\}_model} object}
 
 \item{.field}{Character scaler of the name of the component to modify}
 
-\item{.value}{Whatever is to be added to `.mod[[.field]]`, typically a character scaler or vector}
+\item{.value}{Whatever is to be added to \code{.mod[[.field]]}, typically a character scaler or vector}
 
 \item{.append}{Boolean for whether to concatenate new values with currently present values. TRUE by default. If FALSE, new values will overwrite old values.}
 
-\item{.unique}{Boolean for whether to de-duplicate `.mod[[.field]]` after adding new values. TRUE by default.}
+\item{.unique}{Boolean for whether to de-duplicate \code{.mod[[.field]]} after adding new values. TRUE by default.}
 
 \item{.tags}{Character scaler or vector of tags use as replacement}
 
@@ -55,13 +55,13 @@ replace_bbi_args(.mod, .bbi_args)
 \item{.bbi_args}{named list of arguments to add to the model}
 }
 \description{
-Implementation function for updating fields in a `bbi_{.model_type}_model` object
+Implementation function for updating fields in a \verb{bbi_\{.model_type\}_model} object
 Also checks the object against the corresponding YAML before modifying (and errors if they are out of sync) and then writes the modified object back to the YAML.
 
 Modifies model object and corresponding YAML by adding new .bbi_args,
 overwriting any args that are already present with the new values.
-Use `print_nonmem_args()` to see a list list of valid babylon arguments.
+Use \code{print_nonmem_args()} to see a list list of valid babylon arguments.
 
 Modifies model object and corresponding YAML by replacing .bbi_args with new .bbi_args
-Use `print_nonmem_args()` to see a list list of valid babylon arguments.
+Use \code{print_nonmem_args()} to see a list list of valid babylon arguments.
 }

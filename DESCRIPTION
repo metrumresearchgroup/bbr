@@ -18,7 +18,8 @@ Authors@R:
            family = "Wilson",
            role = c("aut"),
            email = "copernican@gmail.com"))
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
+Roxygen: list(markdown = TRUE)
 Imports: 
     checkmate,
     digest,

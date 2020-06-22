@@ -7,14 +7,14 @@
 read_model(.path, .directory = get_model_directory())
 }
 \arguments{
-\item{.path}{Path to the YAML file to parse. MUST be either an absolute path, or a path relative to the `.directory` argument.}
+\item{.path}{Path to the YAML file to parse. MUST be either an absolute path, or a path relative to the \code{.directory} argument.}
 
-\item{.directory}{Model directory which `.path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
+\item{.directory}{Model directory which \code{.path} is relative to. Defaults to \code{options('rbabylon.model_directory')}, which can be set globally with \code{set_model_directory()}.}
 }
 \value{
-S3 object of class `bbi_{.model_type}_model`
+S3 object of class \verb{bbi_\{.model_type\}_model}
 }
 \description{
 Parses a model YAML file into a list object that contains correctly formatted information from the YAML
-and is an S3 object of class `bbi_{.model_type}_model` that can be passed to `submit_model()`, `model_summary()`, etc.
+and is an S3 object of class \verb{bbi_\{.model_type\}_model} that can be passed to \code{submit_model()}, \code{model_summary()}, etc.
 }

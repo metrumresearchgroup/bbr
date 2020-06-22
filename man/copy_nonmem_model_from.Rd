@@ -16,18 +16,18 @@ copy_nonmem_model_from(
 )
 }
 \arguments{
-\item{.parent_mod}{S3 object of class `bbi_nonmem_model` to be used as the basis for copy.}
+\item{.parent_mod}{S3 object of class \code{bbi_nonmem_model} to be used as the basis for copy.}
 
-\item{.description}{Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.}
+\item{.description}{Description of new model run. This will be stored in the yaml (to be used later in \code{run_log()}) and optionally passed into the \verb{$PROBLEM} of the new control stream.}
 
-\item{.update_model_file}{Boolean for whether to update the `$PROBLEM` line in the new control stream. By default it is TRUE, but if FALSE is passed `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.}
+\item{.update_model_file}{Boolean for whether to update the \verb{$PROBLEM} line in the new control stream. By default it is TRUE, but if FALSE is passed \verb{\{.new_model\}.[mod|ctl]} will be an exact copy of its parent control stream.}
 }
 \value{
-S3 object of class `bbi_nonmem_model` that can be passed to `submit_nonmem_model()`
+S3 object of class \code{bbi_nonmem_model} that can be passed to \code{submit_nonmem_model()}
 }
 \description{
-Private implementation function called by `copy_model_from()` dispatches.
+Private implementation function called by \code{copy_model_from()} dispatches.
 Create new .mod/ctl and new .yaml files based on a previous model. Used for iterating on model development.
-Also fills in necessary YAML fields for using `create_run_log()` later.
+Also fills in necessary YAML fields for using \code{run_log()} later.
 }
 \keyword{internal}

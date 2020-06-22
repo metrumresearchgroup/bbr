@@ -10,7 +10,7 @@ reconcile_yaml(.mod)
 check_yaml_in_sync(.mod)
 }
 \arguments{
-\item{.mod}{`bbi_{.model_type}_model` object}
+\item{.mod}{\verb{bbi_\{.model_type\}_model} object}
 }
 \description{
 Extracts YAML path from model object and pulls in YAML file.

@@ -7,9 +7,9 @@
 safe_based_on(.start, .based_on)
 }
 \arguments{
-\item{.start}{The directory of the model (i.e. the YAML file) that the `based_on` will be added to.}
+\item{.start}{The directory of the model (i.e. the YAML file) that the \code{based_on} will be added to.}
 
-\item{.based_on}{Character vector or scaler of paths (with or without extension) to the models that will be added to `based_on`. Paths should be relative to `.start` argument.}
+\item{.based_on}{Character vector or scaler of paths (with or without extension) to the models that will be added to \code{based_on}. Paths should be relative to \code{.start} argument.}
 }
 \description{
 Checks for yaml files relative to a starting location

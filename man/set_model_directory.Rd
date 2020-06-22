@@ -10,15 +10,15 @@ set_model_directory(.path)
 get_model_directory()
 }
 \arguments{
-\item{.path}{Path, either from working directory or absolute, that will be set as `options('rbabylon.model_directory')`}
+\item{.path}{Path, either from working directory or absolute, that will be set as \code{options('rbabylon.model_directory')}}
 }
 \description{
-Sets `options('rbabylon.model_directory')` to the absolute path of the directory passed to `.path`.
+Sets \code{options('rbabylon.model_directory')} to the absolute path of the directory passed to \code{.path}.
 Note that the directory must exist or this will error.
-This is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
+This is used by default in functions like \code{read_model()}, \code{submit_model()} and \code{model_summary()} so that,
 once this is set, those functions can take a path relative to this directory instead of the working/script directory.
 
-Gets the path set to `options('rbabylon.model_directory')` and checks that it is both absolute and exists.
-This path is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
+Gets the path set to \code{options('rbabylon.model_directory')} and checks that it is both absolute and exists.
+This path is used by default in functions like \code{read_model()}, \code{submit_model()} and \code{model_summary()} so that,
 once this is set, those functions can take a path relative to this directory instead of the working/script directory.
 }

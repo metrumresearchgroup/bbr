@@ -2,19 +2,19 @@
 % Please edit documentation in R/summary.R
 \name{nonmem_summary}
 \alias{nonmem_summary}
-\title{Run `bbi nonmem summary` and parse the output to a list}
+\title{Run \verb{bbi nonmem summary} and parse the output to a list}
 \usage{
 nonmem_summary(.mod, .bbi_args = NULL, ..., .dry_run = FALSE)
 }
 \arguments{
-\item{.mod}{`bbi_nonmem_model` object for summary}
+\item{.mod}{\code{bbi_nonmem_model} object for summary}
 
-\item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.}
+\item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}. Run \code{print_nonmem_args()} to see valid arguments.}
 }
 \value{
 List of S3 Class "bbi_nonmem_summary" with all summary information
 }
 \description{
-Private implementation function called by `model_summary()` dispatches.
+Private implementation function called by \code{model_summary()} dispatches.
 }
 \keyword{internal}

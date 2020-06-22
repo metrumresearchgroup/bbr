@@ -15,12 +15,12 @@ submit_nonmem_models(
 )
 }
 \arguments{
-\item{.mods}{A list of S3 objects of class `bbi_nonmem_model`}
+\item{.mods}{A list of S3 objects of class \code{bbi_nonmem_model}}
 }
 \value{
-A list of S3 objects of class `babylon_process`
+A list of S3 objects of class \code{babylon_process}
 }
 \description{
-Private implementation function called by `submit_models()` dispatches.
+Private implementation function called by \code{submit_models()} dispatches.
 }
 \keyword{internal}

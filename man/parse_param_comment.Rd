@@ -10,9 +10,9 @@ parse_param_comment(.x, .theta = FALSE)
 parse_same_block(.x)
 }
 \arguments{
-\item{.x}{List of character vectors representing either $OMEGA or $SIGMA blocks, as parsed by `clean_ctl()`}
+\item{.x}{List of character vectors representing either $OMEGA or $SIGMA blocks, as parsed by \code{clean_ctl()}}
 
-\item{.theta}{Boolean for if it's a theta. If TRUE, parses `[{}]` to unit, otherwise parses to type}
+\item{.theta}{Boolean for if it's a theta. If TRUE, parses \verb{[\{\}]} to unit, otherwise parses to type}
 }
 \description{
 Heavily modified from tidynm::parse_theta() to parse out the comments into the right columns for all three params.

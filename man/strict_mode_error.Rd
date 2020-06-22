@@ -7,7 +7,7 @@
 strict_mode_error(err_msg)
 }
 \description{
-Raises an error if `options("rbabylon.strict" = TRUE)` (recommended). Otherwise raises a warning.
+Raises an error if \code{options("rbabylon.strict" = TRUE)} (recommended). Otherwise raises a warning.
 These errors are used for things like type-checking which guarantees safe, predictable behavior of functions,
 but theoretically advanced users or developers could want to turn them off.
 }

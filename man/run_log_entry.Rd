@@ -2,14 +2,14 @@
 % Please edit documentation in R/run-log.R
 \name{run_log_entry}
 \alias{run_log_entry}
-\title{Create a run log row from a `bbi_{.model_type}_model` object}
+\title{Create a run log row from a \verb{bbi_\{.model_type\}_model} object}
 \usage{
 run_log_entry(.mod)
 }
 \arguments{
-\item{.mod}{S3 object of class `bbi_{.model_type}_model`}
+\item{.mod}{S3 object of class \verb{bbi_\{.model_type\}_model}}
 }
 \description{
-Create a run log row from a `bbi_{.model_type}_model` object
+Create a run log row from a \verb{bbi_\{.model_type\}_model} object
 }
 \keyword{internal}

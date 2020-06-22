@@ -13,7 +13,7 @@ get_model_id(.mod)
 \method{get_model_id}{bbi_nonmem_model}(.mod)
 }
 \arguments{
-\item{.mod}{The `bbi_{.model_type}_model` object}
+\item{.mod}{The \verb{bbi_\{.model_type\}_model} object}
 }
 \value{
 Character scaler with only model identifier
@@ -21,5 +21,5 @@ Character scaler with only model identifier
 \description{
 Helper to strip path and extension from model file to get only model identifier
 
-S3 dispatch to get model identifier from a `bbi_{.model_type}_model` object
+S3 dispatch to get model identifier from a \verb{bbi_\{.model_type\}_model} object
 }

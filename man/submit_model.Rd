@@ -54,11 +54,11 @@ submit_model(
 \arguments{
 \item{.mod}{Integer that corresponds to the name of a YAML and model file}
 
-\item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.}
+\item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}. Run \code{print_nonmem_args()} to see valid arguments.}
 
 \item{.mode}{Either "local" for local execution or "sge" to submit model(s) to the grid}
 
-\item{...}{args passed through to `bbi_exec()`}
+\item{...}{args passed through to \code{bbi_exec()}}
 
 \item{.config_path}{Optionally specify a path to a babylon.yml config. If not specified, the config in the model directory will be used by default. Path MUST be either an absolute path or relative to the model directory.}
 
@@ -66,7 +66,7 @@ submit_model(
 
 \item{.dry_run}{Returns an object detailing the command that would be run, insted of running it. This is primarily for testing but also a debugging tool.}
 
-\item{.directory}{Model directory containing the files referenced by `.mod`. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
+\item{.directory}{Model directory containing the files referenced by \code{.mod}. Defaults to \code{options('rbabylon.model_directory')}, which can be set globally with \code{set_model_directory()}.}
 }
 \description{
 Submit a model to be run
@@ -77,5 +77,5 @@ S3 dispatch for submit_model from character scaler.
 Should be path to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
 
 S3 dispatch for submit_model from numeric input
-This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`
+This will only work if you are calling from the same directory as the models, or if you have set the model directory with \code{set_model_directory()}
 }

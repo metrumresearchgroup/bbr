@@ -7,7 +7,7 @@
 install_menu(.body, .this_os, .dir, .force)
 }
 \arguments{
-\item{.body}{Character vector of installation commands to run with `system`}
+\item{.body}{Character vector of installation commands to run with \code{system}}
 
 \item{.this_os}{Character scaler of OS}
 

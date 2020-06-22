@@ -15,7 +15,7 @@ combine_directory_path(.directory, .path)
 Concatenates a directory and path, and uses normalizePath() to create an absolute path, with some specific rules:
 If .directory is NULL, set to working directory.
 If .path is an absolute path, ignore .directory and just return .path,
-otherwise return `file.path(.directory, .path)`.
-Also NOTE that `.directory` must point an already existing directory so that the absolute path can be reliably built.
+otherwise return \code{file.path(.directory, .path)}.
+Also NOTE that \code{.directory} must point an already existing directory so that the absolute path can be reliably built.
 }
 \keyword{internal}

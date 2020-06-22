@@ -5,11 +5,11 @@
 #' Create new model by copying existing model
 #'
 #' Create new model by copying existing model. Useful for iterating during model development.
-#' Also fills `based_on` field by default, for constructing model ancestry. See \href{../articles/using-based-on.html}{"Using based_on field" vignette} for details.
+#' Also fills `based_on` field by default, for constructing model ancestry. See ["Using based_on field" vignette](../articles/using-based-on.html) for details.
 #' @param .parent_mod Model to copy from
 #' @param .new_model Path to write new model files to WITHOUT FILE EXTENSION. Function will create both `{.new_model}.yaml` and a new model file based on this path.
-#' @param .description Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`).
-#' @param .based_on_additional Character scaler or vector of paths to other models that this model was "based on." These are used to reconstuct model developement and ancestry. \strong{Paths must be relative to `.new_model` path.} Note that the `.parent_model` will automatically be added to the `based_on` field, so no need to include that here.
+#' @param .description Description of new model run. This will be stored in the yaml (to be used later in `run_log()`).
+#' @param .based_on_additional Character scaler or vector of paths to other models that this model was "based on." These are used to reconstuct model developement and ancestry. **Paths must be relative to `.new_model` path.** Note that the `.parent_model` will automatically be added to the `based_on` field, so no need to include that here.
 #' @param .add_tags A character scaler or vector with any new tags to be added to `{.new_model}.yaml`
 #' @param .inherit_tags Boolean for whether to inherit any tags from `.parent_mod`
 #' @param .update_model_file Boolean for whether to update the newly created model file. By default it is TRUE, but if FALSE is passed new model file will be an exact copy of its parent.
@@ -152,9 +152,9 @@ copy_model_from.numeric <- function(
 #'
 #' Private implementation function called by `copy_model_from()` dispatches.
 #' Create new .mod/ctl and new .yaml files based on a previous model. Used for iterating on model development.
-#' Also fills in necessary YAML fields for using `create_run_log()` later.
+#' Also fills in necessary YAML fields for using `run_log()` later.
 #' @param .parent_mod S3 object of class `bbi_nonmem_model` to be used as the basis for copy.
-#' @param .description Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.
+#' @param .description Description of new model run. This will be stored in the yaml (to be used later in `run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.
 #' @param .update_model_file Boolean for whether to update the `$PROBLEM` line in the new control stream. By default it is TRUE, but if FALSE is passed `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.
 #' @importFrom fs file_copy path_rel
 #' @importFrom readr read_file write_file

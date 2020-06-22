@@ -7,5 +7,5 @@
 print_nonmem_args()
 }
 \description{
-Prints all valid arguments to pass in to `.bbi_args=list()` argument of `submit_model()` or `model_summary()`
+Prints all valid arguments to pass in to \code{.bbi_args=list()} argument of \code{submit_model()} or \code{model_summary()}
 }

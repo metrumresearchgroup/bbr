@@ -27,13 +27,13 @@ check_ext(.mod, .iter_floor = 0)
 \arguments{
 \item{.path}{Character scalar path to the gradient file}
 
-\item{.x_var}{name of variable to filter with `.x_floor`}
+\item{.x_var}{name of variable to filter with \code{.x_floor}}
 
-\item{.x_floor}{Filters file to only rows with `.x_var` GREATER THAN this value.}
+\item{.x_floor}{Filters file to only rows with \code{.x_var} GREATER THAN this value.}
 
-\item{.mod}{`bbi_nonmem_model` object}
+\item{.mod}{\code{bbi_nonmem_model} object}
 
-\item{.iter_floor}{Filters file to only rows with `ITERATION` GREATER THAN this value.}
+\item{.iter_floor}{Filters file to only rows with \code{ITERATION} GREATER THAN this value.}
 }
 \description{
 Checks nonmem output file that's a whitespace-delimited file (for instance .grd or .ext)

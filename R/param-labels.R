@@ -5,8 +5,8 @@
 #' However it will be extended to parse labels from the model YAML file as well.
 #' The syntax for the labeling is described in "Details" below.
 #'
-#' This function will *not* return indices for the parameters, though they can be added with \code{param_labels() \%>\% apply_indices()}.
-#' See the \code{\link{apply_indices}} documentation for more details.
+#' This function will *not* return indices for the parameters, though they can be added with `param_labels() \%>\% apply_indices()`.
+#' See the `apply_indices()` documentation for more details.
 #'
 #' @details The syntax for parsing labels from comments is inherited from the "Census" specification
 #' that was also used in the `tidynm` and `mrgtable` packages. The syntax is as follows,
@@ -106,7 +106,7 @@ param_labels.character <- function(.mod, ...) {
 #' to the output of the `param_labels()` function and are instead added with the  `apply_indices()` function.
 #'
 #' @details For more details and examples of how to specify `$OMEGA` and `$SIGMA` block structure, see the "Parameter Labels" vignette:
-#' \href{../docs/articles/parameter-labels.html}{\code{vignette("parameter-labels", package = "rbabylon")}}
+#' [`vignette("parameter-labels", package = "rbabylon")`](../docs/articles/parameter-labels.html)
 #'
 #' @param .label_df A tibble like the output of `param_labels()`, containing columns `names, label, unit, type`
 #' @param .omega A logical vector indicating whether each Omega parameter is a diagonal. If `NULL` function assumes all are diagonal. Alternatively you can pass `block(.n)` or pass a custom vector if control stream has both block and non-block.

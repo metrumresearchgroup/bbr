@@ -25,15 +25,15 @@ get_output_dir(.bbi_object, .check_exists = TRUE)
 get_yaml_path(.bbi_object, .check_exists = TRUE)
 }
 \arguments{
-\item{.bbi_object}{Tibble of class `bbi_run_log_df`}
+\item{.bbi_object}{Tibble of class \code{bbi_run_log_df}}
 
 \item{.key}{The key that contains the relative path}
 
 \item{.check_exists}{Logical scaler for whether it will check if the file exists and error if it does not. True by default.}
 }
 \description{
-Builds the full path to a file that is stored as part of a `bbi_...` S3 object
-NOTE: All paths saved in the object or accompanying YAML will be relative **to the location of that YAML**
+Builds the full path to a file that is stored as part of a \code{bbi_...} S3 object
+NOTE: All paths saved in the object or accompanying YAML will be relative \strong{to the location of that YAML}
 When the object is loaded into memory, the absolute path to the YAML is stored in the object.
 These functions simply stitch together that path with the requested relative path.
 As long as the YAML has not moved since it was loaded, this will work.

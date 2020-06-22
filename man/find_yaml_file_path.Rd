@@ -9,7 +9,7 @@ find_yaml_file_path(.path)
 \arguments{
 \item{.path}{File path with any extension or no extension.
 Function will search for that path with either a .yaml or .yml extension and error if neither is found.
-Will also error if _both_ are found, because there cannot be two YAML files referring to the same model.}
+Will also error if \emph{both} are found, because there cannot be two YAML files referring to the same model.}
 }
 \description{
 Private helper to find valid yaml file

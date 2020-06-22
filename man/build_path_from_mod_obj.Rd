@@ -2,16 +2,16 @@
 % Please edit documentation in R/read-output.R
 \name{build_path_from_mod_obj}
 \alias{build_path_from_mod_obj}
-\title{Builds the absolute path to a file in the output directory from components of the `bbi_{.model_type}_model` object}
+\title{Builds the absolute path to a file in the output directory from components of the \verb{bbi_\{.model_type\}_model} object}
 \usage{
 build_path_from_mod_obj(.mod, .extension)
 }
 \arguments{
-\item{.mod}{`bbi_{.model_type}_model` object}
+\item{.mod}{\verb{bbi_\{.model_type\}_model} object}
 
-\item{.extension}{file extension to append (for example `lst`, `ext`, `grd`, etc.)}
+\item{.extension}{file extension to append (for example \code{lst}, \code{ext}, \code{grd}, etc.)}
 }
 \description{
-Builds the absolute path to a file in the output directory from components of the `bbi_{.model_type}_model` object
+Builds the absolute path to a file in the output directory from components of the \verb{bbi_\{.model_type\}_model} object
 }
 \keyword{internal}

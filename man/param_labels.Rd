@@ -23,41 +23,41 @@ However it will be extended to parse labels from the model YAML file as well.
 The syntax for the labeling is described in "Details" below.
 }
 \details{
-This function will *not* return indices for the parameters, though they can be added with \code{param_labels() \%>\% apply_indices()}.
-See the \code{\link{apply_indices}} documentation for more details.
+This function will \emph{not} return indices for the parameters, though they can be added with \verb{param_labels() \\\%>\\\% apply_indices()}.
+See the \code{apply_indices()} documentation for more details.
 
 The syntax for parsing labels from comments is inherited from the "Census" specification
-that was also used in the `tidynm` and `mrgtable` packages. The syntax is as follows,
-with everything after the comment character `;` parsed into the label.
+that was also used in the \code{tidynm} and \code{mrgtable} packages. The syntax is as follows,
+with everything after the comment character \verb{;} parsed into the label.
 
 \code{<nonmem_inits> ; [directive] <Parameter name <LOGD>>}
 
 \itemize{
 \item Inits are the NONMEM initial values, following NONMEM specs
 \item Directives include:
-  \itemize{
-  \item For fixed effects the directives are translated to units, i.e., L/h
-  \item For variance components (and only variance components) the directive is parsed into the `type` column
-  and can be used for post-processing transformations. Some common types include:
-  \itemize{
-      \item [A] is the assumed directive and it yields standard deviation / correlation.
-      Typically used when the random component has a linear relationship to the typical value.
-      \item [P] yields Coefficient of Variation.
-      Commonly transformed with \eqn{CV_lognormal = sqrt( exp(omega^2)-1 ) \times 100} for omegas,
-      and the value of omega from the correlation matrix (i.e., the SD) for sigmas.
-      Typically used with exponentiated random effects or proportional residual error.
-      \item [R] indicates that this is an item that should be read from the correlation
-      matrix as opposed to the covariance matrix.
-      I.e., standard deviation and correlation of the parameter on the raw scale will be reported.
-      \item [C] indicates that this item should be read from the covariance matrix, i.e., variance
-       and covariance of the parameter on the raw scale will be reported.
-     }
-  }
-\item Paramemter name is parsed into the `label` column, and is commonly formatted to be run through a LaTex parser downstream.
+\itemize{
+\item For fixed effects the directives are translated to units, i.e., L/h
+\item For variance components (and only variance components) the directive is parsed into the \code{type} column
+and can be used for post-processing transformations. Some common types include:
+\itemize{
+\item \link{A} is the assumed directive and it yields standard deviation / correlation.
+Typically used when the random component has a linear relationship to the typical value.
+\item \link{P} yields Coefficient of Variation.
+Commonly transformed with \eqn{CV_lognormal = sqrt( exp(omega^2)-1 ) \times 100} for omegas,
+and the value of omega from the correlation matrix (i.e., the SD) for sigmas.
+Typically used with exponentiated random effects or proportional residual error.
+\item \link{R} indicates that this is an item that should be read from the correlation
+matrix as opposed to the covariance matrix.
+I.e., standard deviation and correlation of the parameter on the raw scale will be reported.
+\item \link{C} indicates that this item should be read from the covariance matrix, i.e., variance
+and covariance of the parameter on the raw scale will be reported.
+}
+}
+\item Paramemter name is parsed into the \code{label} column, and is commonly formatted to be run through a LaTex parser downstream.
 \item LOGD is a flag to indicate that the parameter is modeled on the log
 scale (i.e., \eqn{e^\theta}) and should be exponentiated for reporting.
 If so, the standard error for the parameter should adjusted via the delta method.
-NOTE: this is only a convention, such that downstream code can look for "LOGD" in the `label` column
+NOTE: this is only a convention, such that downstream code can look for "LOGD" in the \code{label} column
 and transform the estimates accordingly. None of that processing is done automatically by this function.
 }
 }
