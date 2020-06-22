@@ -23,7 +23,7 @@ use_bbi <- function(.dir = "/data/apps", .version = "latest", .force = FALSE, .q
   this_os <- os[sapply(os,grepl,x=R.version$os)]
 
   if(.version == "latest") {
-    .bbi_url <- bbi_current_release(os = "linux")
+    .bbi_url <- current_release(owner = 'metrumresearchgroup', repo = 'babylon', os = "linux")
   } else {
     if (this_os == "linux") {
       .bbi_url <- as.character(glue("https://github.com/metrumresearchgroup/babylon/releases/download/{.version}/bbi_linux_amd64.tar.gz"))
@@ -150,7 +150,7 @@ linux_install_commands <- function(.dir, .bbi_url) {
   bbi_loc <- normalizePath(file.path(.dir, "bbi"), mustWork = FALSE)
 
   cmd_vec <- c(
-    glue::glue('wget {.bbi_url} -O /tmp/bbi.tar.gz'),
+    glue::glue('wget {.bbi_url} -O /tmp/bbi.tar.gz  --timeout=15 --tries=2'),
     'tar -xzf /tmp/bbi.tar.gz -C /tmp --overwrite',
     glue::glue('mkdir -p {.dir}'),
     glue::glue('mv /tmp/bbi_linux_amd64/bbi {bbi_loc}'),
