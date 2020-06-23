@@ -25,8 +25,9 @@ NULL
 #' @importFrom processx process
 #' @export
 bbi_exec <- function(.cmd_args, .dir = ".", .verbose = FALSE, .wait = FALSE, ...) {
-  bbi_exe_path <- getOption("rbabylon.bbi_exe_path")
-  check_bbi_exe(bbi_exe_path)
+  bbi_exe_path <- get_bbi_exe_path()
+  #check_bbi_exe(bbi_exe_path) # don't think we need this because get_bbi_exe_path checks that it exists
+  check_bbi_version_constraint(bbi_exe_path) # need this instead
 
   p <- processx::process$new(bbi_exe_path, .cmd_args, ..., wd = .dir,  stdout = "|", stderr = "2>&1")
 
@@ -67,7 +68,7 @@ bbi_dry_run <- function(.cmd_args, .dir) {
   res <- list()
   res[[PROC_PROCESS]] <- "DRY_RUN"
   res[[PROC_STDOUT]] <- "DRY_RUN"
-  res[[PROC_BBI]] <- getOption("rbabylon.bbi_exe_path")
+  res[[PROC_BBI]] <- get_bbi_exe_path()
   res[[PROC_CMD_ARGS]] <- .cmd_args
   res[[PROC_WD]] <- .dir
 
@@ -84,37 +85,37 @@ bbi_dry_run <- function(.cmd_args, .dir) {
   return(res)
 }
 
-#' Checks that a bbi binary is present at the path passed to .bbi_exe_path
-#' @param .bbi_exe_path Path to bbi exe file that will be checked
-#' @export
-check_bbi_exe <- function(.bbi_exe_path) {
-  # check if this path is not in the already checked paths
-  if (is.null(CACHE_ENV$bbi_exe_paths[[.bbi_exe_path]])) {
-    which_path <- Sys.which(.bbi_exe_path)
-
-    # if missing, reject it
-    if (which_path == "") {
-      stop(glue("`{.bbi_exe_path}` was not found on system. Please assign a path to a working version of babylon with `options('rbabylon.bbi_exe_path' = '/path/to/bbi')`"))
-    }
-
-    # if version too low, reject it
-    check_bbi_version_constraint(.bbi_exe_path)
-
-    # if found, and passes version constraint, add it to cache
-    CACHE_ENV$bbi_exe_paths[[.bbi_exe_path]] <- TRUE
-  }
-  return(invisible())
-}
+#' #' Checks that a bbi binary is present at the path passed to .bbi_exe_path
+#' #' @param .bbi_exe_path Path to bbi exe file that will be checked
+#' #' @export
+#' check_bbi_exe <- function(.bbi_exe_path) {
+#'   # check if this path is not in the already checked paths
+#'   if (is.null(CACHE_ENV$bbi_exe_paths[[.bbi_exe_path]])) {
+#'     which_path <- Sys.which(.bbi_exe_path)
+#'
+#'     # if missing, reject it
+#'     if (which_path == "") {
+#'       stop(glue("`{.bbi_exe_path}` was not found on system. Please assign a path to a working version of babylon with `options('rbabylon.bbi_exe_path' = '/path/to/bbi')`"))
+#'     }
+#'
+#'     # if version too low, reject it
+#'     check_bbi_version_constraint(.bbi_exe_path)
+#'
+#'     # if found, and passes version constraint, add it to cache
+#'     CACHE_ENV$bbi_exe_paths[[.bbi_exe_path]] <- TRUE
+#'   }
+#'   return(invisible())
+#' }
 
 
 #' Check if bbi_version is below minimum allowed version
 #' @importFrom stringr str_replace_all
 #' @param .bbi_exe_path Path to bbi exe file that will be checked
 #' @export
-check_bbi_version_constraint <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')) {
-  .bbi_exe_path <- Sys.which(.bbi_exe_path)
+check_bbi_version_constraint <- function(.bbi_exe_path = get_bbi_exe_path()) {
+  .bbi_exe_path <- Sys.which(.bbi_exe_path) ##### ???? do we check that it exists and is absolute here too???
   if (.bbi_exe_path == "") {
-    stop(glue("`{getOption('rbabylon.bbi_exe_path')}` was not found on system. Please assign a path to a working version of babylon with `options('rbabylon.bbi_exe_path' = '/path/to/bbi')`"))
+    stop(glue("`{.bbi_exe_path}` was not found on system. Please assign a path to a working version of babylon with `options('rbabylon.bbi_exe_path' = '/path/to/bbi')`"))
   }
 
   this_version <- bbi_version(.bbi_exe_path)
