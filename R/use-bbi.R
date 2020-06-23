@@ -161,10 +161,10 @@ linux_install_commands <- function(.dir, .bbi_url) {
 }
 
 
-#' @title Get version number of babylon installed on system
+#' @title Get version number of a babylon installation
 #' @description Returns version number of bbi binary installed at path passed to `.bbi_exe_path`
 #' @importFrom stringr str_detect str_replace_all
-#' @param .bbi_exe_path Path to bbi exe file that will be checked
+#' @param .bbi_exe_path Path to bbi exe file that will be checked. Defaults to `getOption('rbabylon.bbi_exe_path')`.
 #' @return character
 #' @examples
 #' \dontrun{
@@ -172,23 +172,24 @@ linux_install_commands <- function(.dir, .bbi_url) {
 #' }
 #' @rdname bbi_version
 #' @export
-bbi_version <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')){
-  bbi_path <- Sys.which(.bbi_exe_path)
-  if (is.null(bbi_path) || bbi_path == "") {
+bbi_version <- function(.bbi_exe_path = get_bbi_exe_path()){
+  if (is.null(.bbi_exe_path) || .bbi_exe_path == "") {
+    warning(glue("bbi_version() was passed NULL or an empty string. You may need to set `options('rbabylon.bbi_exe_path' = '/path/to/bbi')`"))
     return("")
   }
-  if (!fs::file_exists(bbi_path)) {
+  if (!fs::file_exists(.bbi_exe_path)) {
+    warning(glue("bbi_version() did not find a file at {.bbi_exe_path}"))
     return("")
   }
 
   tryCatch(
     {
-      res <- system(sprintf('%s version', bbi_path),intern = TRUE)
+      res <- system(sprintf('%s version', .bbi_exe_path),intern = TRUE)
       return(str_replace_all(res, '^v', ''))
     },
     error = function(e) {
       if (str_detect(e$message, "error in running command")) {
-        stop(glue("The executable at {bbi_path} does not appear to be a valid babylon installation. Use `use_bbi({dirname(bbi_path)})` to install babylon at that location."))
+        stop(glue("The executable at {.bbi_exe_path} does not appear to be a valid babylon installation. Use `use_bbi({dirname(.bbi_exe_path)})` to install babylon at that location."))
       }
       stop(e$message)
     }
