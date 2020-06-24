@@ -241,7 +241,6 @@ check_required_keys <- function(.list, .req) {
 #' This is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
 #' once this is set, those functions can take a path relative to this directory instead of the working/script directory.
 #' @param .path Path, either from working directory or absolute, that will be set as `options('rbabylon.model_directory')`
-#' @rdname set_model_directory
 #' @export
 set_model_directory <- function(.path) {
   if (is.null(.path)) {
@@ -253,6 +252,25 @@ set_model_directory <- function(.path) {
   cat(glue("options('rbabylon.model_directory') set to {options('rbabylon.model_directory')}"))
 }
 
+
+#' Set global model directory option
+#'
+#' Sets `options('rbabylon.model_directory')` to the absolute path of the directory passed to `.path`.
+#' Note that the directory must exist or this will error.
+#' This is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
+#' once this is set, those functions can take a path relative to this directory instead of the working/script directory.
+#' @param .path Path, either from working directory or absolute, that will be set as `options('rbabylon.model_directory')`
+#' @rdname set_model_directory
+#' @export
+set_model_directory <- function(.path) {
+  if (is.null(.path)) {
+    options('rbabylon.model_directory' = NULL)
+  } else {
+    options('rbabylon.model_directory' = normalizePath(.path, mustWork = TRUE))
+  }
+
+  cat(glue("options('rbabylon.model_directory') set to {options('rbabylon.model_directory')}"))
+}
 
 #' Get global model directory option
 #'
@@ -283,55 +301,6 @@ get_model_directory <- function() {
   }
 
   return(.mod_dir)
-}
-
-#' Set global bbi_exe_path option
-#'
-#' Sets `options('rbabylon.bbi_exe_path')` to the absolute path passed to `.path`.
-#' Note that the file must exist or this will error.
-#' This is used whenever a function calls out to `bbi` to execute something, for example in `submit_model()` and `model_summary()`.
-#' @param .path Path, either from working directory or absolute, that will be set as `options('rbabylon.bbi_exe_path')`
-#' @rdname set_bbi_exe_path
-#' @export
-set_bbi_exe_path <- function(.path) {
-  if (is.null(.path)) {
-    options('rbabylon.bbi_exe_path' = NULL)
-  } else {
-    options('rbabylon.bbi_exe_path' = normalizePath(.path, mustWork = TRUE))
-  }
-
-  cat(glue("options('rbabylon.bbi_exe_path') set to {options('rbabylon.bbi_exe_path')}"))
-}
-
-
-#' Get global bbi_exe_path option
-#'
-#' Gets the path set to `options('rbabylon.bbi_exe_path')` and checks that it is both absolute and exists.
-#' This is used whenever a function calls out to `bbi` to execute something, for example in `submit_model()` and `model_summary()`.
-#' @rdname set_bbi_exe_path
-#' @importFrom fs is_absolute_path file_exists
-#' @export
-get_bbi_exe_path <- function() {
-  .bbi_path <- getOption("rbabylon.bbi_exe_path")
-  if (is.null(.bbi_path)) {
-    return(NULL)
-  }
-
-  if (!fs::is_absolute_path(.bbi_path)) {
-    strict_mode_error(paste(
-      glue("`options('rbabylon.bbi_exe_path')` must be set to an absolute path but is currently set to {.bbi_path}"),
-      "It is recommended to use `set_bbi_exe_path('...')` or put `options('rbabylon.bbi_exe_path' = normalizePath('...'))` in your .Rprofile for this project.",
-      sep = "\n"))
-  }
-
-  if (!fs::file_exists(.bbi_path)) {
-    strict_mode_error(paste(
-      glue("`options('rbabylon.bbi_exe_path')` must be set to an existing file but {.bbi_path} does not exist."),
-      "It is recommended to use `set_bbi_exe_path('...')` or put `options('rbabylon.bbi_exe_path' = normalizePath('...'))` in your .Rprofile for this project.",
-      sep = "\n"))
-  }
-
-  return(.bbi_path)
 }
 
 
