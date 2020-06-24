@@ -6,7 +6,7 @@ YAML_PATH <- file.path(MODEL_DIR, yaml_ext(MODEL_FILE))
 MODEL_PATH <- file.path(MODEL_DIR, MODEL_FILE)
 MODEL_ABS_PATH <- file.path(getwd(), MODEL_DIR, MODEL_FILE)
 
-BBI_EXE_PATH <- "/data/apps/bbi"
+BBI_EXE_PATH <- "/fake/path/bbi"
 
 cleanup_2_3 <- function() {
   for (m in c("2", "3")) {
