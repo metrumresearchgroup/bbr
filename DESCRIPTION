@@ -20,6 +20,7 @@ Authors@R:
            email = "copernican@gmail.com"))
 RoxygenNote: 7.1.0
 Roxygen: list(markdown = TRUE)
+SystemRequirements: babylon (>= 2.2.0)
 Imports: 
     checkmate,
     digest,

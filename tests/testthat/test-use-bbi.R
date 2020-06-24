@@ -13,7 +13,7 @@ test_that("use-bbi works on linux", {
   skip_if_over_rate_limit()
 
   withr::with_options(c('rbabylon.suppress_interactivity' = TRUE), {
-    use_bbi(tdir, .force = TRUE)
+    use_bbi(tdir, .force = TRUE, .quiet = TRUE)
   })
   f_info <- file.info(bbi_tmp_path)
   expect_equal(as.character(f_info$mode), '755')
@@ -35,4 +35,22 @@ test_that("bbi_version returns nothing with fake bbi", {
   })
 })
 
+
+test_that("use_bbi .version argument works", {
+
+  skip_if_over_rate_limit()
+  if(fs::file_exists(bbi_tmp_path)) fs::file_delete(bbi_tmp_path)
+
+  test_version <- "v2.1.2"
+
+  withr::with_options(c('rbabylon.suppress_interactivity' = TRUE), {
+    use_bbi(tdir, .version = test_version, .force = TRUE, .quiet = TRUE)
+  })
+  f_info <- file.info(bbi_tmp_path)
+  expect_equal(as.character(f_info$mode), '755')
+
+  v_res <- bbi_version(bbi_tmp_path)
+  expect_identical(v_res, sub("^v", "", test_version))
+
+})
 

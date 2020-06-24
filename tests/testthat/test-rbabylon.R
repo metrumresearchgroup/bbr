@@ -60,7 +60,7 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
     # download dev version of bbi with semantic versioning
     new_bbi_url <- "https://github.com/metrumresearchgroup/babylon/releases/download/v2.2.0-beta.2/bbi_linux_amd64.tar.gz"
     body <- linux_install_commands(tempdir(), new_bbi_url)
-    system(paste(body, collapse =' ; '))
+    map(body, ~ system(.x, ignore.stdout = TRUE, ignore.stderr = TRUE))
 
     new_bbi_path <- file.path(tempdir(), "bbi")
     v_res <- bbi_version(new_bbi_path)

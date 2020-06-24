@@ -4,12 +4,21 @@
 \alias{use_bbi}
 \title{Installs most current release of bbi}
 \usage{
-use_bbi(.dir = "/data/apps", .force = FALSE)
+use_bbi(
+  .dir = "/data/apps",
+  .version = "latest",
+  .force = FALSE,
+  .quiet = FALSE
+)
 }
 \arguments{
 \item{.dir}{directory to install bbi to on linux}
 
+\item{.version}{version of babylon to install. Must pass a character scaler corresponding to a tag found in \verb{https://github.com/metrumresearchgroup/babylon/releases}}
+
 \item{.force}{If \code{FALSE}, the default, skips installation if requested version and local version are the same. If \code{TRUE} forces installation if it will be the same version.}
+
+\item{.quiet}{If \code{TRUE}, suppresses output printed to the console. \code{FALSE} by default.}
 }
 \value{
 character
