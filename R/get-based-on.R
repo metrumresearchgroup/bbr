@@ -1,7 +1,7 @@
 
-#' Get based_on from bbi object
+#' @title Get based_on from bbi object
 #'
-#' Returns character vector of the absolute paths to all models stored in the `based_on` field of a `bbi_...` object
+#' @description Returns character vector of the absolute paths to all models stored in the `based_on` field of a `bbi_...` object
 #'
 #' @details
 #' All paths saved in the object or accompanying YAML will be relative **to the location of that YAML**
@@ -26,7 +26,8 @@ get_based_on <- function(.bbi_object, .check_exists = FALSE) {
 }
 
 
-#' @describeIn get_based_on The default method attempts to extract the path from any object passed to it
+#' @describeIn get_based_on The default method attempts to extract the path from any object passed to it,
+#' but is designed for a list of class `bbi_{.model_type}_object` or something similar.
 #' @importFrom fs path_norm
 #' @export
 get_based_on.default <- function(.bbi_object, .check_exists = FALSE) {

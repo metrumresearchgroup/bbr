@@ -53,7 +53,8 @@ Note that \code{.check_exists = TRUE} is set for this iterative search because e
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{default}: The default method attempts to extract the path from any object passed to it
+\item \code{default}: The default method attempts to extract the path from any object passed to it,
+but is designed for a list of class \verb{bbi_\{.model_type\}_object} or something similar.
 
 \item \code{character}: Takes a character scaler of a path to a model that can be loaded with \code{read_model(.bbi_object)}.
 
