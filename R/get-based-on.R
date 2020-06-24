@@ -2,23 +2,29 @@
 #' Get based_on from bbi object
 #'
 #' Returns character vector of the absolute paths all models stored in the `based_on` field of a `bbi_...` object
-#' NOTE: All paths saved in the object or accompanying YAML will be relative **to the location of that YAML**
+#' *NOTE:* All paths saved in the object or accompanying YAML will be relative **to the location of that YAML**
 #' When the object is loaded into memory, the absolute path to the YAML is stored in the object.
 #' These functions simply stitch together that path with the relative paths from the `based_on` field.
-#' As long as the YAML has not moved since it was loaded, this will work.
-#' @param .bbi_object The model object (or path, etc.) to query
-#' @param .check_exists Logical scaler for whether it will check if the file exists and error if it does not. FALSE by default.
+#' As long as the YAML has not moved since it was read into memory, these paths will be both absolute and correct.
+#'
+#' `get_model_ancestry()` extracts paths to all models that this model is based on (iterating over `get_based_on()` function),
+#' and all models that those models are based on, recursively.
+#' It returns a sorted unique character vector for the `default` and `character` method, and a list of such vectors for the `bbi_run_log_df` method.
+#' @param .bbi_object The model object to query. Could be
+#' a `bbi_{.model_type}_object`,
+#' a  file path to a model,
+#' a tibble of class `bbi_run_log_df`,
+#' or some other custom object containing model data.
+#' @param .check_exists If `FALSE`, the default, function will return all paths in `based_on` regardless of whether they point to an existing file.
+#' If `TRUE`, function will check if a file exists at each path in `based_on` and error if one does not.
 #' @export
-#' @rdname get_based_on
 get_based_on <- function(.bbi_object, .check_exists = FALSE) {
   UseMethod("get_based_on")
 }
 
 
-#' The default method attempts to extract the path from any object passed to it
+#' @describeIn get_based_on The default method attempts to extract the path from any object passed to it
 #' @importFrom fs path_norm
-#' @param .bbi_object The object to attempt to query. Could be a partially built bbi_{.model_type}_object or some other custom object containing model data.
-#' @rdname get_based_on
 #' @export
 get_based_on.default <- function(.bbi_object, .check_exists = FALSE) {
 
@@ -49,9 +55,7 @@ get_based_on.default <- function(.bbi_object, .check_exists = FALSE) {
   return(as.character(fs::path_norm(file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_BASED_ON]]))))
 }
 
-
-#' @rdname get_based_on
-#' @param .bbi_object Character scaler of a path to a model that can be loaded with `read_model(.bbi_object)`
+#' @describeIn get_based_on Takes a character scaler of a path to a model that can be loaded with `read_model(.bbi_object)`.
 #' @export
 get_based_on.character <- function(.bbi_object, .check_exists = FALSE) {
 
@@ -74,8 +78,7 @@ get_based_on.character <- function(.bbi_object, .check_exists = FALSE) {
 }
 
 
-#' @rdname get_based_on
-#' @param .bbi_object Tibble of class `bbi_run_log_df`
+#' @describeIn get_based_on Takes a tibble of class `bbi_run_log_df` and returns a list containing one character vector of paths for each row of the tibble.
 #' @importFrom purrr map
 #' @export
 get_based_on.bbi_run_log_df <- function(.bbi_object, .check_exists = FALSE) {
@@ -88,23 +91,14 @@ get_based_on.bbi_run_log_df <- function(.bbi_object, .check_exists = FALSE) {
 }
 
 
-#' Get model ancestry
-#'
-#' Extract paths to all models that this model is based on (iterating over `get_based_on()` function),
-#' and all models that those models are based on, recursively.
-#' Returns a sorted unique character vector.
-#' @param .bbi_object The model object (or path, etc.) to query
 #' @rdname get_based_on
+#' @inheritParams get_based_on
 #' @export
 get_model_ancestry <- function(.bbi_object) {
   UseMethod("get_model_ancestry")
 }
 
-#' The default method attempts to extract the path from any object passed to it
-#' @importFrom purrr map
-#' @importFrom stringr str_detect
-#' @param .bbi_object The object to attempt to query. Could be a partially built bbi_{.model_type}_object or some other custom object containing model data.
-#' @rdname get_based_on
+
 #' @export
 get_model_ancestry.default <- function(.bbi_object) {
   .checked <- c()
@@ -144,8 +138,6 @@ get_model_ancestry.default <- function(.bbi_object) {
 }
 
 
-#' @rdname get_based_on
-#' @param .bbi_object Character scaler of a path to a model that can be loaded with `read_model(.bbi_object)`
 #' @export
 get_model_ancestry.character <- function(.bbi_object) {
 
@@ -166,8 +158,6 @@ get_model_ancestry.character <- function(.bbi_object) {
 }
 
 
-#' @rdname get_based_on
-#' @param .bbi_object Tibble of class `bbi_run_log_df`
 #' @importFrom purrr map
 #' @export
 get_model_ancestry.bbi_run_log_df <- function(.bbi_object) {
