@@ -314,24 +314,20 @@ set_bbi_exe_path <- function(.path) {
 get_bbi_exe_path <- function() {
   .bbi_path <- getOption("rbabylon.bbi_exe_path")
   if (is.null(.bbi_path)) {
-    strict_mode_error(paste(
-      "`options('rbabylon.bbi_exe_path')` is NULL",
-      BBI_EXE_REC_MSG,
-      sep = "\n"))
     return(NULL)
   }
 
   if (!fs::is_absolute_path(.bbi_path)) {
     strict_mode_error(paste(
       glue("`options('rbabylon.bbi_exe_path')` must be set to an absolute path but is currently set to {.bbi_path}"),
-      BBI_EXE_REC_MSG,
+      "It is recommended to use `set_bbi_exe_path('...')` or put `options('rbabylon.bbi_exe_path' = normalizePath('...'))` in your .Rprofile for this project.",
       sep = "\n"))
   }
 
   if (!fs::file_exists(.bbi_path)) {
     strict_mode_error(paste(
       glue("`options('rbabylon.bbi_exe_path')` must be set to an existing file but {.bbi_path} does not exist."),
-      BBI_EXE_REC_MSG,
+      "It is recommended to use `set_bbi_exe_path('...')` or put `options('rbabylon.bbi_exe_path' = normalizePath('...'))` in your .Rprofile for this project.",
       sep = "\n"))
   }
 

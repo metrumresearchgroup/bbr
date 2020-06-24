@@ -33,8 +33,6 @@ NONMEM_ARGS = list(
   verbose = list(type = "logical", flag="--verbose", description = "verbose output")
 )
 
-BBI_EXE_REC_MSG <- "It is recommended to use `set_bbi_exe_path('...')` or put `options('rbabylon.bbi_exe_path' = normalizePath('...'))` in your .Rprofile for this project."
-
 # YAML keys that are hard-coded
 YAML_MOD_PATH <- "model_path"
 YAML_YAML_NAME <- "orig_yaml_file"

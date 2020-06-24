@@ -113,6 +113,10 @@ bbi_dry_run <- function(.cmd_args, .dir) {
 #' @param .bbi_exe_path Path to bbi exe file that will be checked
 #' @export
 check_bbi_version_constraint <- function(.bbi_exe_path = get_bbi_exe_path()) {
+  .bbi_exe_path <- Sys.which(.bbi_exe_path) ##### ???? do we check that it exists and is absolute here too???
+  if (.bbi_exe_path == "") {
+    stop(glue("`{.bbi_exe_path}` was not found on system. Please assign a path to a working version of babylon with `options('rbabylon.bbi_exe_path' = '/path/to/bbi')`"))
+  }
 
   this_version <- bbi_version(.bbi_exe_path)
   test_version_test <- package_version(str_replace_all(this_version, "[^0-9\\.]", ""))
