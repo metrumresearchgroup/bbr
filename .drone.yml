@@ -35,7 +35,7 @@ steps:
   - mv bbi_linux_amd64/bbi /data/apps
   - ls -la /data/apps
   - /data/apps/bbi -h
-  #- echo "options('rbabylon.bbi_exe_path' = '/data/apps/bbi')" > .Rprofile
+  - echo "options('rbabylon.bbi_exe_path' = '/data/apps/bbi')" > .Rprofile
   - /opt/R/4.0.1/bin/R -e "devtools::install_deps(upgrade = 'never')"
   - /opt/R/4.0.1/bin/R -e "devtools::test()"
   - /opt/R/4.0.1/bin/R -e "devtools::check()"
