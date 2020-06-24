@@ -6,6 +6,9 @@
 \alias{get_based_on.character}
 \alias{get_based_on.bbi_run_log_df}
 \alias{get_model_ancestry}
+\alias{get_model_ancestry.default}
+\alias{get_model_ancestry.character}
+\alias{get_model_ancestry.bbi_run_log_df}
 \title{Get based_on from bbi object}
 \usage{
 get_based_on(.bbi_object, .check_exists = FALSE)
@@ -17,6 +20,12 @@ get_based_on(.bbi_object, .check_exists = FALSE)
 \method{get_based_on}{bbi_run_log_df}(.bbi_object, .check_exists = FALSE)
 
 get_model_ancestry(.bbi_object)
+
+\method{get_model_ancestry}{default}(.bbi_object)
+
+\method{get_model_ancestry}{character}(.bbi_object)
+
+\method{get_model_ancestry}{bbi_run_log_df}(.bbi_object)
 }
 \arguments{
 \item{.bbi_object}{The model object to query. Could be
@@ -29,16 +38,18 @@ or some other custom object containing model data.}
 If \code{TRUE}, function will check if a file exists at each path in \code{based_on} and error if one does not.}
 }
 \description{
-Returns character vector of the absolute paths all models stored in the \code{based_on} field of a \code{bbi_...} object
-\emph{NOTE:} All paths saved in the object or accompanying YAML will be relative \strong{to the location of that YAML}
+Returns character vector of the absolute paths to all models stored in the \code{based_on} field of a \code{bbi_...} object
+}
+\details{
+All paths saved in the object or accompanying YAML will be relative \strong{to the location of that YAML}
 When the object is loaded into memory, the absolute path to the YAML is stored in the object.
 These functions simply stitch together that path with the relative paths from the \code{based_on} field.
 As long as the YAML has not moved since it was read into memory, these paths will be both absolute and correct.
-}
-\details{
+
 \code{get_model_ancestry()} extracts paths to all models that this model is based on (iterating over \code{get_based_on()} function),
 and all models that those models are based on, recursively.
 It returns a sorted unique character vector for the \code{default} and \code{character} method, and a list of such vectors for the \code{bbi_run_log_df} method.
+Note that \code{.check_exists = TRUE} is set for this iterative search because each model found will subsequently be loaded.
 }
 \section{Methods (by class)}{
 \itemize{

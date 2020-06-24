@@ -12,11 +12,12 @@
 #' @param .based_on_additional Character vector of path(s) to other models that this model was "based on." These are used to reconstuct model developement and ancestry. **Paths must be relative to `.new_model` path.** Note that the `.parent_model` will automatically be added to the `based_on` field, so no need to include that here.
 #' @param .add_tags Character vector with any new tags(s) to be added to `{.new_model}.yaml`
 #' @param .inherit_tags If `FALSE`, the default, new model will only have any tags passed to `.add_tags` argument. If `TRUE` inherit any tags from `.parent_mod`, with any tags passed to `.add_tags` appended.
-#' @param .update_model_file If `TRUE`, the default, update the newly created model file with new description and name. If `FALSE`, new model file will be an exact copy of its parent.
+#' @param .update_model_file If `TRUE`, the default, update the newly created model file with new description and name.
+#' For a NONMEM model, this currently means only the `$PROBLEM` line in the new control stream will be updated.
+#' If `FALSE`, new model file will be an exact copy of its parent.
 #' @param .overwrite If `FALSE`, the default,  function will error if a model file already exists at specified `.new_model` path. If `TRUE` any existing file at `.new_model` will be overwritten silently.
 #' @param .directory Model directory which `.new_model` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
 #' @export
-#' @rdname copy_model_from
 copy_model_from <- function(
   .parent_mod,
   .new_model,
@@ -31,10 +32,8 @@ copy_model_from <- function(
   UseMethod("copy_model_from")
 }
 
-#' S3 dispatch for passing `bbi_nonmem_model` object to `copy_model_from()`
-#' @param .parent_mod `bbi_nonmem_model` object to use as a basis for the copy.
+#' @describeIn copy_model_from `.parent_mod` takes a `bbi_nonmem_model` object to use as a basis for the copy.
 #' @export
-#' @rdname copy_model_from
 copy_model_from.bbi_nonmem_model <- function(
   .parent_mod,
   .new_model,
@@ -64,11 +63,9 @@ copy_model_from.bbi_nonmem_model <- function(
   return(.mod)
 }
 
-#' S3 dispatch for passing a file path to copy_model_from()
-#' @param .parent_mod Path to parent model to use as a basis for the copy. Ideally a YAML path, but can also pass control stream or output directory.
-#' @param .directory Model directory which BOTH `.parent_model` and `.new_model` are relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
+#' @describeIn copy_model_from Takes a file path to parent model to use as a basis for the copy. Ideally a YAML path, but can also pass control stream or output directory.
+#' Can be absolute or relative to `.directory`, which defaults to `options('rbabylon.model_directory')`.
 #' @export
-#' @rdname copy_model_from
 copy_model_from.character <- function(
   .parent_mod,
   .new_model,
@@ -110,13 +107,9 @@ copy_model_from.character <- function(
   return(.mod)
 }
 
-#' S3 dispatch for passing an integer model identifier to copy_model_from()
-#' This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`
-#' @param .parent_mod Integer that corresponds to parent model to use as a basis for the copy.
-#' @param .new_model Integer that corresponds to the new model name to create. Function will create both `{.new_model}.yaml` and a new model file based on this path.
-#' @param .directory Model directory which BOTH `.parent_model` and `.new_model` are relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
+#' @describeIn copy_model_from Both `.parent_mod` and `.new_model` take integers which must correspond to a model file name (without extension obviously).
+#' This will only work if you are calling from the same directory as the models, or if you have set `options('rbabylon.model_directory')` to the directory constaining the relevant models.
 #' @export
-#' @rdname copy_model_from
 copy_model_from.numeric <- function(
   .parent_mod,
   .new_model,

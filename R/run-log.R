@@ -124,16 +124,27 @@ enforce_length <- function(.l, .k, .len = 1) {
 # Fields from bbi_config.json
 ###############################
 
-#' Parses model config.json outputs into a log tibble
-#' @param .base_dir Base directory to look from model YAML files in
+#' Parse babylon configs to log
+#'
+#' Parses `bbi_config.json` files into a log tibble.
+#' This file is created by babylon and stores metadata about the execution of a model run.
+#'
+#' @details
+#' `config_log()` will return a tibble with one row per `bbi_config.json` found.
+#'
+#' `add_config()` takes a `bbi_run_log_df` tibble (the output of `run_log()`) as its input,
+#' searches for a `bbi_config.json` for each row in the input tibble,
+#' and joins on the data from the relevant config, if found.
+#' The returned tibble will have all of its input columns, plus all of the columns returned from `config_log()`
+#'
+#' @seealso `run_log()`
+#' @param .base_dir Base directory to look from `bbi_config.json` files in
 #' @param .recurse If `TRUE`, the default, search recursively in subdirectories.
 #' @importFrom stringr str_subset
 #' @importFrom fs dir_ls
 #' @importFrom purrr map_df
 #' @importFrom dplyr mutate select everything
 #' @importFrom jsonlite fromJSON
-#' @return tibble with information on each run
-#' @rdname config_log
 #' @export
 config_log <- function(
   .base_dir = get_model_directory(),
@@ -184,8 +195,8 @@ config_log <- function(
   return(df)
 }
 
-#' Joins config log tibble onto a matching run log tibble
-#' @param .log_df the output tibble from `run_log()`
+
+#' @param .log_df a `bbi_run_log_df` tibble (the output of `run_log()`)
 #' @param ... arguments passed through to `config_log()`
 #' @importFrom dplyr left_join
 #' @rdname config_log

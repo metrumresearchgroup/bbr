@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>extract labels from comments in raw ctl string — parse_param_comment • rbabylon</title>
+<title>Parse parameter labels — parse_param_comment • rbabylon</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,8 @@
 
 
 
-<meta property="og:title" content="extract labels from comments in raw ctl string — parse_param_comment" />
-<meta property="og:description" content="Heavily modified from tidynm::parse_theta() to parse out the comments into the right columns for all three params.
-Iterates over a list of $OMEGA or $SIGMA blocks and replaces the SAME blocks with a copy of the block they are referring to." />
+<meta property="og:title" content="Parse parameter labels — parse_param_comment" />
+<meta property="og:description" content="Extracts parameter labels from comments in raw ctl string." />
 
 
 
@@ -127,14 +126,13 @@ Iterates over a list of $OMEGA or $SIGMA blocks and replaces the SAME blocks wit
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>extract labels from comments in raw ctl string</h1>
+    <h1>Parse parameter labels</h1>
     
     <div class="hidden name"><code>parse_param_comment.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Heavily modified from tidynm::parse_theta() to parse out the comments into the right columns for all three params.</p>
-<p>Iterates over a list of $OMEGA or $SIGMA blocks and replaces the SAME blocks with a copy of the block they are referring to.</p>
+    <p>Extracts parameter labels from comments in raw ctl string.</p>
     </div>
 
     <pre class="usage"><span class='fu'>parse_param_comment</span>(<span class='no'>.x</span>, <span class='kw'>.theta</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
@@ -146,7 +144,7 @@ Iterates over a list of $OMEGA or $SIGMA blocks and replaces the SAME blocks wit
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>.x</th>
-      <td><p>List of character vectors representing either $OMEGA or $SIGMA blocks, as parsed by <code><a href='clean_ctl.html'>clean_ctl()</a></code></p></td>
+      <td><p>an object from the list that comes out of clean_ctl() (i.e. .ctl_clean$THETA, .ctl_clean$SIGMA, .ctl_clean$OMEGA)</p></td>
     </tr>
     <tr>
       <th>.theta</th>
@@ -154,6 +152,10 @@ Iterates over a list of $OMEGA or $SIGMA blocks and replaces the SAME blocks wit
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p><code>parse_param_comment()</code> is heavily modified from tidynm::parse_theta() to parse out the comments into the right columns for all three params.</p>
+<p><code>parse_same_block()</code> iterates over a list of $OMEGA or $SIGMA blocks and replaces the SAME blocks with a copy of the block they are referring to.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

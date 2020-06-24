@@ -193,11 +193,11 @@ Also fills <code>based_on</code> field by default, for constructing model ancest
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>.parent_mod</th>
-      <td><p>Integer that corresponds to parent model to use as a basis for the copy.</p></td>
+      <td><p>Model to copy from</p></td>
     </tr>
     <tr>
       <th>.new_model</th>
-      <td><p>Integer that corresponds to the new model name to create. Function will create both <code>{.new_model}.yaml</code> and a new model file based on this path.</p></td>
+      <td><p>Path to write new model files to WITHOUT FILE EXTENSION. Function will create both <code>{.new_model}.yaml</code> and a new model file based on this path.</p></td>
     </tr>
     <tr>
       <th>.description</th>
@@ -217,7 +217,9 @@ Also fills <code>based_on</code> field by default, for constructing model ancest
     </tr>
     <tr>
       <th>.update_model_file</th>
-      <td><p>If <code>TRUE</code>, the default, update the newly created model file with new description and name. If <code>FALSE</code>, new model file will be an exact copy of its parent.</p></td>
+      <td><p>If <code>TRUE</code>, the default, update the newly created model file with new description and name.
+For a NONMEM model, this currently means only the <code>$PROBLEM</code> line in the new control stream will be updated.
+If <code>FALSE</code>, new model file will be an exact copy of its parent.</p></td>
     </tr>
     <tr>
       <th>.overwrite</th>
@@ -225,10 +227,20 @@ Also fills <code>based_on</code> field by default, for constructing model ancest
     </tr>
     <tr>
       <th>.directory</th>
-      <td><p>Model directory which BOTH <code>.parent_model</code> and <code>.new_model</code> are relative to. Defaults to <code><a href='https://rdrr.io/r/base/options.html'>options('rbabylon.model_directory')</a></code>, which can be set globally with <code><a href='set_model_directory.html'>set_model_directory()</a></code>.</p></td>
+      <td><p>Model directory which <code>.new_model</code> is relative to. Defaults to <code><a href='https://rdrr.io/r/base/options.html'>options('rbabylon.model_directory')</a></code>, which can be set globally with <code><a href='set_model_directory.html'>set_model_directory()</a></code>.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="methods-by-class-"><a class="anchor" href="#methods-by-class-"></a>Methods (by class)</h2>
+
+    
+<ul>
+<li><p><code>bbi_nonmem_model</code>: <code>.parent_mod</code> takes a <code>bbi_nonmem_model</code> object to use as a basis for the copy.</p></li>
+<li><p><code>character</code>: Takes a file path to parent model to use as a basis for the copy. Ideally a YAML path, but can also pass control stream or output directory.
+Can be absolute or relative to <code>.directory</code>, which defaults to <code><a href='https://rdrr.io/r/base/options.html'>options('rbabylon.model_directory')</a></code>.</p></li>
+<li><p><code>numeric</code>: Both <code>.parent_mod</code> and <code>.new_model</code> take integers which must correspond to a model file name (without extension obviously).
+This will only work if you are calling from the same directory as the models, or if you have set <code><a href='https://rdrr.io/r/base/options.html'>options('rbabylon.model_directory')</a></code> to the directory constaining the relevant models.</p></li>
+</ul>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

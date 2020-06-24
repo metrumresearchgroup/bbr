@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Parse babylon configs to log — config_log • rbabylon</title>
+<title>Create bbi object — create_bbi_object • rbabylon</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,8 @@
 
 
 
-<meta property="og:title" content="Parse babylon configs to log — config_log" />
-<meta property="og:description" content="Parses bbi_config.json files into a log tibble.
-This file is created by babylon and stores metadata about the execution of a model run." />
+<meta property="og:title" content="Create bbi object — create_bbi_object" />
+<meta property="og:description" content="Constructor functions for objects of fundamental rbabylon classes." />
 
 
 
@@ -127,51 +126,53 @@ This file is created by babylon and stores metadata about the execution of a mod
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Parse babylon configs to log</h1>
+    <h1>Create bbi object</h1>
     
-    <div class="hidden name"><code>config_log.Rd</code></div>
+    <div class="hidden name"><code>create_bbi_object.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Parses <code>bbi_config.json</code> files into a log tibble.
-This file is created by babylon and stores metadata about the execution of a model run.</p>
+    <p>Constructor functions for objects of fundamental rbabylon classes.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>config_log</span>(<span class='kw'>.base_dir</span> <span class='kw'>=</span> <span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>(), <span class='kw'>.recurse</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+    <pre class="usage"><span class='fu'>create_model_object</span>(<span class='no'>.mod_list</span>)
 
-<span class='fu'>add_config</span>(<span class='no'>.log_df</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>create_summary_object</span>(<span class='no'>res</span>, <span class='kw'>.model_type</span> <span class='kw'>=</span> <span class='no'>SUPPORTED_MOD_TYPES</span>)
+
+<span class='fu'>create_process_object</span>(<span class='no'>res</span>)
+
+<span class='fu'>create_run_log_object</span>(<span class='no'>log_df</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>.base_dir</th>
-      <td><p>Base directory to look from <code>bbi_config.json</code> files in</p></td>
+      <th>.mod_list</th>
+      <td><p>List with the required information to create a model object</p></td>
     </tr>
     <tr>
-      <th>.recurse</th>
-      <td><p>If <code>TRUE</code>, the default, search recursively in subdirectories.</p></td>
+      <th>res</th>
+      <td><p>List to attempt to assign the class to</p></td>
     </tr>
     <tr>
-      <th>.log_df</th>
-      <td><p>a <code>bbi_run_log_df</code> tibble (the output of <code><a href='run_log.html'>run_log()</a></code>)</p></td>
+      <th>.model_type</th>
+      <td><p>Character scaler of a valid model type (currently either <code>nonmem</code> or <code>stan</code>)</p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>arguments passed through to <code>config_log()</code></p></td>
+      <th>log_df</th>
+      <td><p>data.frame or tibble to attempt to assign the class to</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+    <h2 class="hasAnchor" id="functions"><a class="anchor" href="#functions"></a>Functions</h2>
 
-    <p><code>config_log()</code> will return a tibble with one row per <code>bbi_config.json</code> found.</p>
-<p><code>add_config()</code> takes a <code>bbi_run_log_df</code> tibble (the output of <code><a href='run_log.html'>run_log()</a></code>) as its input,
-searches for a <code>bbi_config.json</code> for each row in the input tibble,
-and joins on the data from the relevant config, if found.
-The returned tibble will have all of its input columns, plus all of the columns returned from <code>config_log()</code></p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p><code><a href='run_log.html'>run_log()</a></code></p></div>
+    
+<ul>
+<li><p><code>create_model_object</code>: Creates list object of class <code>bbi_{.model_type}_model</code> from named list with <code>MODEL_REQ_INPUT_KEYS</code></p></li>
+<li><p><code>create_summary_object</code>: Create list object of <code>bbi_{.model_type}_summary</code> class, first checking that all the required keys are present.</p></li>
+<li><p><code>create_process_object</code>: Create list object of <code>babylon_process</code> class, first checking that all the required keys are present.</p></li>
+<li><p><code>create_run_log_object</code>: Create list object of <code>bbi_run_log_df</code> class, first checking that all the required columns are present.</p></li>
+</ul>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

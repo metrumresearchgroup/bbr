@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Set global model directory option — set_model_directory • rbabylon</title>
+<title>Get or set global model directory option — set_model_directory • rbabylon</title>
 
 
 <!-- jquery -->
@@ -39,13 +39,9 @@
 
 
 
-<meta property="og:title" content="Set global model directory option — set_model_directory" />
-<meta property="og:description" content="Sets options('rbabylon.model_directory') to the absolute path of the directory passed to .path.
-Note that the directory must exist or this will error.
-This is used by default in functions like read_model(), submit_model() and model_summary() so that,
-once this is set, those functions can take a path relative to this directory instead of the working/script directory.
-Gets the path set to options('rbabylon.model_directory') and checks that it is both absolute and exists.
-This path is used by default in functions like read_model(), submit_model() and model_summary() so that,
+<meta property="og:title" content="Get or set global model directory option — set_model_directory" />
+<meta property="og:description" content="Gets or sets options('rbabylon.model_directory'),
+which is used by default in functions like read_model(), submit_model() and model_summary() so that,
 once this is set, those functions can take a path relative to this directory instead of the working/script directory." />
 
 
@@ -132,18 +128,14 @@ once this is set, those functions can take a path relative to this directory ins
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Set global model directory option</h1>
+    <h1>Get or set global model directory option</h1>
     
     <div class="hidden name"><code>set_model_directory.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Sets <code><a href='https://rdrr.io/r/base/options.html'>options('rbabylon.model_directory')</a></code> to the absolute path of the directory passed to <code>.path</code>.
-Note that the directory must exist or this will error.
-This is used by default in functions like <code><a href='read_model.html'>read_model()</a></code>, <code><a href='submit_model.html'>submit_model()</a></code> and <code><a href='model_summary.html'>model_summary()</a></code> so that,
-once this is set, those functions can take a path relative to this directory instead of the working/script directory.</p>
-<p>Gets the path set to <code><a href='https://rdrr.io/r/base/options.html'>options('rbabylon.model_directory')</a></code> and checks that it is both absolute and exists.
-This path is used by default in functions like <code><a href='read_model.html'>read_model()</a></code>, <code><a href='submit_model.html'>submit_model()</a></code> and <code><a href='model_summary.html'>model_summary()</a></code> so that,
+    <p>Gets or sets <code><a href='https://rdrr.io/r/base/options.html'>options('rbabylon.model_directory')</a></code>,
+which is used by default in functions like <code><a href='read_model.html'>read_model()</a></code>, <code><a href='submit_model.html'>submit_model()</a></code> and <code><a href='model_summary.html'>model_summary()</a></code> so that,
 once this is set, those functions can take a path relative to this directory instead of the working/script directory.</p>
     </div>
 
@@ -160,6 +152,12 @@ once this is set, those functions can take a path relative to this directory ins
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p><code>set_model_directory()</code> sets <code><a href='https://rdrr.io/r/base/options.html'>options('rbabylon.model_directory')</a></code> to the absolute path of the directory passed to <code>.path</code>.
+Note that the directory must exist or this will error.</p>
+<p><code>get_model_directory()</code> gets the path set to <code><a href='https://rdrr.io/r/base/options.html'>options('rbabylon.model_directory')</a></code> and checks that it is both absolute and exists,
+erroring if it is not.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

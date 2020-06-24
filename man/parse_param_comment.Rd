@@ -3,20 +3,23 @@
 \name{parse_param_comment}
 \alias{parse_param_comment}
 \alias{parse_same_block}
-\title{extract labels from comments in raw ctl string}
+\title{Parse parameter labels}
 \usage{
 parse_param_comment(.x, .theta = FALSE)
 
 parse_same_block(.x)
 }
 \arguments{
-\item{.x}{List of character vectors representing either $OMEGA or $SIGMA blocks, as parsed by \code{clean_ctl()}}
+\item{.x}{an object from the list that comes out of clean_ctl() (i.e. .ctl_clean$THETA, .ctl_clean$SIGMA, .ctl_clean$OMEGA)}
 
 \item{.theta}{If \code{FALSE}, the default, assumes element is an OMEGA or SIGMA and parses \verb{[\{\}]} to "type" column. If \code{TRUE}, assumes THETA and parses \verb{[\{\}]} to unit.}
 }
 \description{
-Heavily modified from tidynm::parse_theta() to parse out the comments into the right columns for all three params.
+Extracts parameter labels from comments in raw ctl string.
+}
+\details{
+\code{parse_param_comment()} is heavily modified from tidynm::parse_theta() to parse out the comments into the right columns for all three params.
 
-Iterates over a list of $OMEGA or $SIGMA blocks and replaces the SAME blocks with a copy of the block they are referring to.
+\code{parse_same_block()} iterates over a list of $OMEGA or $SIGMA blocks and replaces the SAME blocks with a copy of the block they are referring to.
 }
 \keyword{internal}

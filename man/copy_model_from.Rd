@@ -56,9 +56,9 @@ copy_model_from(
 )
 }
 \arguments{
-\item{.parent_mod}{Integer that corresponds to parent model to use as a basis for the copy.}
+\item{.parent_mod}{Model to copy from}
 
-\item{.new_model}{Integer that corresponds to the new model name to create. Function will create both \verb{\{.new_model\}.yaml} and a new model file based on this path.}
+\item{.new_model}{Path to write new model files to WITHOUT FILE EXTENSION. Function will create both \verb{\{.new_model\}.yaml} and a new model file based on this path.}
 
 \item{.description}{Description of new model run. This will be stored in the yaml (to be used later in \code{run_log()}).}
 
@@ -68,13 +68,26 @@ copy_model_from(
 
 \item{.inherit_tags}{If \code{FALSE}, the default, new model will only have any tags passed to \code{.add_tags} argument. If \code{TRUE} inherit any tags from \code{.parent_mod}, with any tags passed to \code{.add_tags} appended.}
 
-\item{.update_model_file}{If \code{TRUE}, the default, update the newly created model file with new description and name. If \code{FALSE}, new model file will be an exact copy of its parent.}
+\item{.update_model_file}{If \code{TRUE}, the default, update the newly created model file with new description and name.
+For a NONMEM model, this currently means only the \verb{$PROBLEM} line in the new control stream will be updated.
+If \code{FALSE}, new model file will be an exact copy of its parent.}
 
 \item{.overwrite}{If \code{FALSE}, the default,  function will error if a model file already exists at specified \code{.new_model} path. If \code{TRUE} any existing file at \code{.new_model} will be overwritten silently.}
 
-\item{.directory}{Model directory which BOTH \code{.parent_model} and \code{.new_model} are relative to. Defaults to \code{options('rbabylon.model_directory')}, which can be set globally with \code{set_model_directory()}.}
+\item{.directory}{Model directory which \code{.new_model} is relative to. Defaults to \code{options('rbabylon.model_directory')}, which can be set globally with \code{set_model_directory()}.}
 }
 \description{
 Create new model by copying existing model. Useful for iterating during model development.
 Also fills \code{based_on} field by default, for constructing model ancestry. See \href{../articles/using-based-on.html}{"Using based_on field" vignette} for details.
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{bbi_nonmem_model}: \code{.parent_mod} takes a \code{bbi_nonmem_model} object to use as a basis for the copy.
+
+\item \code{character}: Takes a file path to parent model to use as a basis for the copy. Ideally a YAML path, but can also pass control stream or output directory.
+Can be absolute or relative to \code{.directory}, which defaults to \code{options('rbabylon.model_directory')}.
+
+\item \code{numeric}: Both \code{.parent_mod} and \code{.new_model} take integers which must correspond to a model file name (without extension obviously).
+This will only work if you are calling from the same directory as the models, or if you have set \code{options('rbabylon.model_directory')} to the directory constaining the relevant models.
+}}
+

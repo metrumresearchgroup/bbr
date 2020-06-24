@@ -5,10 +5,11 @@
 #' However it will be extended to parse labels from the model YAML file as well.
 #' The syntax for the labeling is described in "Details" below.
 #'
-#' This function will *not* return indices for the parameters, though they can be added with `param_labels() %>% apply_indices()`.
+#' @details
+#' Note that `param_labels()` will *not* return indices for the parameters, though they can be added with `param_labels() %>% apply_indices()`.
 #' See the `apply_indices()` documentation for more details.
 #'
-#' @details The syntax for parsing labels from comments is inherited from the "Census" specification
+#' The syntax for parsing labels from comments is inherited from the "Census" specification
 #' that was also used in the `tidynm` and `mrgtable` packages. The syntax is as follows,
 #' with everything after the comment character `;` parsed into the label.
 #'
@@ -45,16 +46,14 @@
 #'
 #' @param .mod generic model input
 #' @param ... arguments passed through (currently to nowhere)
-#' @rdname param_labels
 #' @export
 param_labels <- function(.mod, ...) {
   UseMethod("param_labels", .mod)
 }
 
 
-#' @param .mod `bbi_{.model_type}_model` object
+#' @describeIn param_labels Takes a `bbi_nonmem_model` object
 #' @importFrom readr read_file
-#' @rdname param_labels
 #' @export
 param_labels.bbi_nonmem_model <- function(.mod, ...) {
 
@@ -67,11 +66,10 @@ param_labels.bbi_nonmem_model <- function(.mod, ...) {
   return(.label_df)
 }
 
+#' @describeIn param_labels Takes a character scaler of the raw control stream with newline character separating lines
 #' @importFrom tidyr replace_na
 #' @importFrom dplyr select everything
 #' @importFrom purrr map_df
-#' @rdname param_labels
-#' @param .mod Character scaler of the raw control stream with newline character separating lines
 #' @export
 param_labels.character <- function(.mod, ...) {
   if(length(.mod) != 1) {
@@ -105,14 +103,18 @@ param_labels.character <- function(.mod, ...) {
 #' automatically parsing the structure of these blocks can be brittle and error prone. For this reason, indices are *not* automatically added
 #' to the output of the `param_labels()` function and are instead added with the  `apply_indices()` function.
 #'
-#' @details For more details and examples of how to specify `$OMEGA` and `$SIGMA` block structure, see the "Parameter Labels" vignette:
+#' @details
+#' `block()` is a helper function for formatting blocks into .omega or .sigma logical vectors.
+#' It takes an integer and returns a logical vector indicating whether each element
+#' of an `.n`-sized block with diagonal or not.
+#'
+#' For more details and examples of how to specify `$OMEGA` and `$SIGMA` block structure, see the "Parameter Labels" vignette:
 #' [`vignette("parameter-labels", package = "rbabylon")`](../docs/articles/parameter-labels.html)
 #'
 #' @param .label_df A tibble like the output of `param_labels()`, containing columns `names, label, unit, type`
 #' @param .omega A logical vector indicating whether each Omega parameter is a diagonal. If `NULL` function assumes all are diagonal. Alternatively you can pass `block(.n)` or pass a custom vector if control stream has both block and non-block.
 #' @param .sigma A logical vector indicating whether each Sigma parameter is a diagonal. If `NULL` function assumes all are diagonal. Alternatively you can pass `block(.n)` or pass a custom vector if control stream has both block and non-block.
 #' @importFrom dplyr filter mutate n bind_rows
-#' @rdname apply_indices
 #' @export
 apply_indices <- function(.label_df, .omega = NULL, .sigma = NULL) {
   .theta_df <- .label_df %>% filter(names == "THETA") %>% mutate(param_type = names)
@@ -151,9 +153,8 @@ apply_indices <- function(.label_df, .omega = NULL, .sigma = NULL) {
   ))
 }
 
-#' Helper function for formatting blocks into .omega or .sigma logical vectors
-#' @param .n The size of the block
 #' @rdname apply_indices
+#' @param .n The size of the block
 #' @export
 block <- function(.n) {
   .is_diag <- logical(0)
@@ -168,16 +169,21 @@ block <- function(.n) {
 # private helpers
 ###################
 
-#' extract labels from comments in raw ctl string
+#' Parse parameter labels
 #'
-#' Heavily modified from tidynm::parse_theta() to parse out the comments into the right columns for all three params.
+#' Extracts parameter labels from comments in raw ctl string.
+#'
+#' @details
+#' `parse_param_comment()` is heavily modified from tidynm::parse_theta() to parse out the comments into the right columns for all three params.
+#'
+#' `parse_same_block()` iterates over a list of $OMEGA or $SIGMA blocks and replaces the SAME blocks with a copy of the block they are referring to.
+#'
 #' @param .x an object from the list that comes out of clean_ctl() (i.e. .ctl_clean$THETA, .ctl_clean$SIGMA, .ctl_clean$OMEGA)
 #' @param .theta If `FALSE`, the default, assumes element is an OMEGA or SIGMA and parses `[{}]` to "type" column. If `TRUE`, assumes THETA and parses `[{}]` to unit.
 #' @importFrom stringr str_match str_split str_trim str_replace str_replace_all regex
 #' @importFrom dplyr mutate
 #' @importFrom tidyr replace_na
 #' @importFrom purrr map map_df
-#' @rdname parse_param_comment
 #' @keywords internal
 parse_param_comment <- function(.x, .theta = FALSE){
 
@@ -259,12 +265,8 @@ parse_param_comment <- function(.x, .theta = FALSE){
   return(out_tbl)
 }
 
-#' Parses out SAME blocks
-#'
-#' Iterates over a list of $OMEGA or $SIGMA blocks and replaces the SAME blocks with a copy of the block they are referring to.
-#' @param .x List of character vectors representing either $OMEGA or $SIGMA blocks, as parsed by `clean_ctl()`
-#' @importFrom stringr str_replace str_replace_all str_extract regex
 #' @rdname parse_param_comment
+#' @importFrom stringr str_replace str_replace_all str_extract regex
 #' @keywords internal
 parse_same_block <- function(.x) {
   if(!inherits(.x,'list')) {

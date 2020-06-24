@@ -13,7 +13,7 @@ param_labels(.mod, ...)
 \method{param_labels}{character}(.mod, ...)
 }
 \arguments{
-\item{.mod}{Character scaler of the raw control stream with newline character separating lines}
+\item{.mod}{generic model input}
 
 \item{...}{arguments passed through (currently to nowhere)}
 }
@@ -23,7 +23,7 @@ However it will be extended to parse labels from the model YAML file as well.
 The syntax for the labeling is described in "Details" below.
 }
 \details{
-This function will \emph{not} return indices for the parameters, though they can be added with \code{param_labels() \%>\% apply_indices()}.
+Note that \code{param_labels()} will \emph{not} return indices for the parameters, though they can be added with \code{param_labels() \%>\% apply_indices()}.
 See the \code{apply_indices()} documentation for more details.
 
 The syntax for parsing labels from comments is inherited from the "Census" specification
@@ -61,3 +61,10 @@ NOTE: this is only a convention, such that downstream code can look for "LOGD" i
 and transform the estimates accordingly. None of that processing is done automatically by this function.
 }
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{bbi_nonmem_model}: Takes a \code{bbi_nonmem_model} object
+
+\item \code{character}: Takes a character scaler of the raw control stream with newline character separating lines
+}}
+

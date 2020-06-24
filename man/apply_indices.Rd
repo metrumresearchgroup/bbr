@@ -24,6 +24,10 @@ automatically parsing the structure of these blocks can be brittle and error pro
 to the output of the \code{param_labels()} function and are instead added with the  \code{apply_indices()} function.
 }
 \details{
+\code{block()} is a helper function for formatting blocks into .omega or .sigma logical vectors.
+It takes an integer and returns a logical vector indicating whether each element
+of an \code{.n}-sized block with diagonal or not.
+
 For more details and examples of how to specify \verb{$OMEGA} and \verb{$SIGMA} block structure, see the "Parameter Labels" vignette:
 \href{../docs/articles/parameter-labels.html}{\code{vignette("parameter-labels", package = "rbabylon")}}
 }

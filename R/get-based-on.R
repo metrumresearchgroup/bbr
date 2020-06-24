@@ -1,8 +1,10 @@
 
 #' Get based_on from bbi object
 #'
-#' Returns character vector of the absolute paths all models stored in the `based_on` field of a `bbi_...` object
-#' *NOTE:* All paths saved in the object or accompanying YAML will be relative **to the location of that YAML**
+#' Returns character vector of the absolute paths to all models stored in the `based_on` field of a `bbi_...` object
+#'
+#' @details
+#' All paths saved in the object or accompanying YAML will be relative **to the location of that YAML**
 #' When the object is loaded into memory, the absolute path to the YAML is stored in the object.
 #' These functions simply stitch together that path with the relative paths from the `based_on` field.
 #' As long as the YAML has not moved since it was read into memory, these paths will be both absolute and correct.
@@ -10,6 +12,7 @@
 #' `get_model_ancestry()` extracts paths to all models that this model is based on (iterating over `get_based_on()` function),
 #' and all models that those models are based on, recursively.
 #' It returns a sorted unique character vector for the `default` and `character` method, and a list of such vectors for the `bbi_run_log_df` method.
+#' Note that `.check_exists = TRUE` is set for this iterative search because each model found will subsequently be loaded.
 #' @param .bbi_object The model object to query. Could be
 #' a `bbi_{.model_type}_object`,
 #' a  file path to a model,
@@ -92,13 +95,12 @@ get_based_on.bbi_run_log_df <- function(.bbi_object, .check_exists = FALSE) {
 
 
 #' @rdname get_based_on
-#' @inheritParams get_based_on
 #' @export
 get_model_ancestry <- function(.bbi_object) {
   UseMethod("get_model_ancestry")
 }
 
-
+#' @rdname get_based_on
 #' @export
 get_model_ancestry.default <- function(.bbi_object) {
   .checked <- c()
@@ -137,7 +139,7 @@ get_model_ancestry.default <- function(.bbi_object) {
   return(sort(.results))
 }
 
-
+#' @rdname get_based_on
 #' @export
 get_model_ancestry.character <- function(.bbi_object) {
 
@@ -157,7 +159,7 @@ get_model_ancestry.character <- function(.bbi_object) {
   return(get_model_ancestry(.bbi_object))
 }
 
-
+#' @rdname get_based_on
 #' @importFrom purrr map
 #' @export
 get_model_ancestry.bbi_run_log_df <- function(.bbi_object) {
