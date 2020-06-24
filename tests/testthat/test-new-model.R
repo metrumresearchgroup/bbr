@@ -150,6 +150,37 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     fs::file_delete(.test_path)
   })
 
+  test_that("new_model() .overwrite arg works", {
+    # create new model with args
+    .test_yaml <- "model-examples/1.yaml"
+    .new_path <- "model-examples/new.yml"
+    on.exit({
+      if (fs::file_exists(.new_path)) fs::file_delete(.new_path)
+    })
+    fs::file_copy(.test_yaml, .new_path)
+
+    # error if file exists
+    expect_error(new_model(
+        .yaml_path = .new_path,
+        .description = "fake model"),
+      regexp = "that file already exists")
+
+    suppressSpecificWarning({
+      new_model(
+        .yaml_path = .new_path,
+        .description = "fake model",
+        .overwrite = TRUE
+      )
+    }, "No model file found at.+\\.ctl")
+
+    suppressSpecificWarning({
+      new_mod <- read_model(.new_path)
+    }, "No model file found at.+\\.ctl")
+
+    expect_equal(new_mod$description, "fake model")
+
+  })
+
 
   test_that("new_model() .based_on arg works", {
     # create new model with args
