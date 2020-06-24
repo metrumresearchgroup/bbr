@@ -7,12 +7,19 @@
 \usage{
 set_model_directory(.path)
 
+set_model_directory(.path)
+
 get_model_directory()
 }
 \arguments{
 \item{.path}{Path, either from working directory or absolute, that will be set as `options('rbabylon.model_directory')`}
 }
 \description{
+Sets `options('rbabylon.model_directory')` to the absolute path of the directory passed to `.path`.
+Note that the directory must exist or this will error.
+This is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
+once this is set, those functions can take a path relative to this directory instead of the working/script directory.
+
 Sets `options('rbabylon.model_directory')` to the absolute path of the directory passed to `.path`.
 Note that the directory must exist or this will error.
 This is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,

@@ -85,27 +85,27 @@ bbi_dry_run <- function(.cmd_args, .dir) {
   return(res)
 }
 
-# #' Checks that a bbi binary is present at the path passed to .bbi_exe_path
-# #' @param .bbi_exe_path Path to bbi exe file that will be checked
-# #' @export
-# check_bbi_exe <- function(.bbi_exe_path) {
-#   # check if this path is not in the already checked paths
-#   if (is.null(CACHE_ENV$bbi_exe_paths[[.bbi_exe_path]])) {
-#     which_path <- Sys.which(.bbi_exe_path)
-#
-#     # if missing, reject it
-#     if (which_path == "") {
-#       stop(glue("`{.bbi_exe_path}` was not found on system. Please assign a path to a working version of babylon with `options('rbabylon.bbi_exe_path' = '/path/to/bbi')`"))
-#     }
-#
-#     # if version too low, reject it
-#     check_bbi_version_constraint(.bbi_exe_path)
-#
-#     # if found, and passes version constraint, add it to cache
-#     CACHE_ENV$bbi_exe_paths[[.bbi_exe_path]] <- TRUE
-#   }
-#   return(invisible())
-# }
+#' #' Checks that a bbi binary is present at the path passed to .bbi_exe_path
+#' #' @param .bbi_exe_path Path to bbi exe file that will be checked
+#' #' @export
+#' check_bbi_exe <- function(.bbi_exe_path) {
+#'   # check if this path is not in the already checked paths
+#'   if (is.null(CACHE_ENV$bbi_exe_paths[[.bbi_exe_path]])) {
+#'     which_path <- Sys.which(.bbi_exe_path)
+#'
+#'     # if missing, reject it
+#'     if (which_path == "") {
+#'       stop(glue("`{.bbi_exe_path}` was not found on system. Please assign a path to a working version of babylon with `options('rbabylon.bbi_exe_path' = '/path/to/bbi')`"))
+#'     }
+#'
+#'     # if version too low, reject it
+#'     check_bbi_version_constraint(.bbi_exe_path)
+#'
+#'     # if found, and passes version constraint, add it to cache
+#'     CACHE_ENV$bbi_exe_paths[[.bbi_exe_path]] <- TRUE
+#'   }
+#'   return(invisible())
+#' }
 
 
 #' Check if bbi_version is below minimum allowed version
