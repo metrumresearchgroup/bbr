@@ -101,8 +101,7 @@ name: rbabylon-40-new
 #Gobal variable definitions and anchors
 global-variables:
     environment: &default_environment
-        #BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
-        BABYLON_URL: https://github.com/metrumresearchgroup/babylon/releases/download/v2.2.0-beta.2/bbi_linux_amd64.tar.gz
+        BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
 
 steps:
 - name: Pull mpn container from ECR
@@ -150,8 +149,7 @@ name: rbabylon-36-new
 #Gobal variable definitions and anchors
 global-variables:
     environment: &default_environment
-        #BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
-        BABYLON_URL: https://github.com/metrumresearchgroup/babylon/releases/download/v2.2.0-beta.2/bbi_linux_amd64.tar.gz
+        BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
 
 steps:
 - name: Pull mpn container from ECR
@@ -199,8 +197,7 @@ name: rbabylon-36-old
 #Gobal variable definitions and anchors
 global-variables:
     environment: &default_environment
-        #BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
-        BABYLON_URL: https://github.com/metrumresearchgroup/babylon/releases/download/v2.2.0-beta.2/bbi_linux_amd64.tar.gz
+        BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
 
 steps:
 - name: Pull mpn container from ECR
@@ -248,8 +245,7 @@ name: rbabylon-35-old
 #Gobal variable definitions and anchors
 global-variables:
     environment: &default_environment
-        #BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
-        BABYLON_URL: https://github.com/metrumresearchgroup/babylon/releases/download/v2.2.0-beta.2/bbi_linux_amd64.tar.gz
+        BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
 
 steps:
 - name: Pull mpn container from ECR
@@ -295,8 +291,7 @@ name: rbabylon-release
 #Gobal variable definitions and anchors
 global-variables:
     environment: &default_environment
-        #BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
-        BABYLON_URL: https://github.com/metrumresearchgroup/babylon/releases/download/v2.2.0-beta.2/bbi_linux_amd64.tar.gz
+        BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
 
 steps:
 - name: Pull mpn container from ECR
