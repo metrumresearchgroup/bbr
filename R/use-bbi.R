@@ -5,7 +5,7 @@
 #' @importFrom glue glue glue_collapse
 #' @importFrom cli rule
 #' @param .dir directory to install bbi to on linux
-#' @param .version version of babylon to install. Must pass a character scaler corresponding to a tag found in `https://github.com/metrumresearchgroup/babylon/releases`
+#' @param .version version of babylon to install. Must pass a character scalar corresponding to a tag found in `https://github.com/metrumresearchgroup/babylon/releases`
 #' @param .force Boolean for whether to force the installation even if current version and local version are the same. Primarily used for testing.
 #' @param .quiet Boolean for suppressing output printed to the console. False by default.
 #' @return character
@@ -23,7 +23,7 @@ use_bbi <- function(.dir = "/data/apps", .version = "latest", .force = FALSE, .q
   this_os <- os[sapply(os,grepl,x=R.version$os)]
 
   if(.version == "latest") {
-    .bbi_url <- current_release(owner = 'metrumresearchgroup', repo = 'babylon', os = "linux")
+    .bbi_url <- current_release(owner = 'metrumresearchgroup', repo = 'babylon', os = this_os)
   } else {
     if (this_os == "linux") {
       .bbi_url <- as.character(glue("https://github.com/metrumresearchgroup/babylon/releases/download/{.version}/bbi_linux_amd64.tar.gz"))
@@ -98,9 +98,9 @@ bbi_current_release <- function(os = "linux"){
 
 #' Private implementation function for installing bbi with interactive menu
 #' @param .body Character vector of installation commands to run with `system`
-#' @param .this_os Character scaler of OS
+#' @param .this_os Character scalar of OS
 #' @param .dir directory to install bbi to
-#' @param .version version of babylon to install. Must pass a character scaler corresponding to a tag found in `https://github.com/metrumresearchgroup/babylon/releases`
+#' @param .version version of babylon to install. Must pass a character scalar corresponding to a tag found in `https://github.com/metrumresearchgroup/babylon/releases`
 #' @param .force Boolean for whether to force the installation even if current version and local version are the same
 #' @param .quiet Boolean for suppressing output printed to the console. False by default.
 install_menu <- function(.body, .this_os, .dir, .version, .force, .quiet){
@@ -198,8 +198,8 @@ bbi_version <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')){
 #' Private helper to construct version comparison message
 #' @importFrom cli rule col_blue col_red
 #' @importFrom glue glue
-#' @param local_v Character scaler for version number on local installation
-#' @param release_v Character scaler for version number of current release
+#' @param local_v Character scalar for version number on local installation
+#' @param release_v Character scalar for version number of current release
 version_message <- function(local_v, release_v){
 
   if (local_v == "") {

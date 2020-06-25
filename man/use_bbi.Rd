@@ -14,7 +14,7 @@ use_bbi(
 \arguments{
 \item{.dir}{directory to install bbi to on linux}
 
-\item{.version}{version of babylon to install. Must pass a character scaler corresponding to a tag found in `https://github.com/metrumresearchgroup/babylon/releases`}
+\item{.version}{version of babylon to install. Must pass a character scalar corresponding to a tag found in `https://github.com/metrumresearchgroup/babylon/releases`}
 
 \item{.force}{Boolean for whether to force the installation even if current version and local version are the same. Primarily used for testing.}
 
