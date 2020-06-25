@@ -2,7 +2,7 @@
 % Please edit documentation in R/use-bbi.R
 \name{bbi_current_release}
 \alias{bbi_current_release}
-\title{current release}
+\title{Get version number of babylon current release}
 \usage{
 bbi_current_release(os = "linux")
 }
@@ -10,5 +10,5 @@ bbi_current_release(os = "linux")
 \item{os}{operating system, Default: 'linux'}
 }
 \description{
-current release
+Helper function to get version number of most recent release of babylon from GitHub.
 }

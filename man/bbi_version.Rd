@@ -2,15 +2,18 @@
 % Please edit documentation in R/use-bbi.R
 \name{bbi_version}
 \alias{bbi_version}
-\title{bbi version}
+\title{Get version number of babylon installed on system}
 \usage{
-bbi_version()
+bbi_version(.bbi_exe_path = getOption("rbabylon.bbi_exe_path"))
+}
+\arguments{
+\item{.bbi_exe_path}{Path to bbi exe file that will be checked}
 }
 \value{
 character
 }
 \description{
-Returns string of installed bbi cli version
+Returns version number of bbi binary installed at path passed to `.bbi_exe_path`
 }
 \examples{
 \dontrun{

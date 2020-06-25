@@ -91,18 +91,42 @@ check_bbi_exe <- function(.bbi_exe_path) {
   # check if this path is not in the already checked paths
   if (is.null(CACHE_ENV$bbi_exe_paths[[.bbi_exe_path]])) {
     which_path <- Sys.which(.bbi_exe_path)
+
     # if missing, reject it
     if (which_path == "") {
-      stop(paste0(
-            "`", .bbi_exe_path, "`",
-            " was not found on system. Please assign a path to a working version of babylon with `options('rbabylon.bbi_exe_path' = '/path/to/bbi')`")
-           )
-    # if found, add it
-    } else {
-      CACHE_ENV$bbi_exe_paths[[.bbi_exe_path]] <- TRUE
+      stop(glue("`{.bbi_exe_path}` was not found on system. Please assign a path to a working version of babylon with `options('rbabylon.bbi_exe_path' = '/path/to/bbi')`"))
     }
+
+    # if version too low, reject it
+    check_bbi_version_constraint(.bbi_exe_path)
+
+    # if found, and passes version constraint, add it to cache
+    CACHE_ENV$bbi_exe_paths[[.bbi_exe_path]] <- TRUE
   }
   return(invisible())
+}
+
+
+#' Check if bbi_version is below minimum allowed version
+#' @importFrom stringr str_replace_all
+#' @param .bbi_exe_path Path to bbi exe file that will be checked
+#' @export
+check_bbi_version_constraint <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')) {
+  .bbi_exe_path <- Sys.which(.bbi_exe_path)
+  if (.bbi_exe_path == "") {
+    stop(glue("`{.bbi_exe_path}` was not found on the system."))
+  }
+
+  this_version <- bbi_version(.bbi_exe_path)
+  test_version_test <- package_version(str_replace_all(this_version, "[^0-9\\.]", ""))
+
+  if (test_version_test < getOption("rbabylon.bbi_min_version")) {
+    strict_mode_error(paste(
+      glue("The executable at `{.bbi_exe_path}` is version {this_version} but the minimum supported version of babylon is {getOption('rbabylon.bbi_min_version')}"),
+      glue("Call `use_bbi('{dirname(.bbi_exe_path)}')` to update to the most recent release."),
+      sep = "\n"
+    ))
+  }
 }
 
 

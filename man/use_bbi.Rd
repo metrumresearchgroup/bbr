@@ -2,16 +2,29 @@
 % Please edit documentation in R/use-bbi.R
 \name{use_bbi}
 \alias{use_bbi}
-\title{Installing bbi}
+\title{Installs most current release of bbi}
 \usage{
-use_bbi(.dir = "/data/apps")
+use_bbi(
+  .dir = "/data/apps",
+  .version = "latest",
+  .force = FALSE,
+  .quiet = FALSE
+)
 }
 \arguments{
 \item{.dir}{directory to install bbi to on linux}
+
+\item{.version}{version of babylon to install. Must pass a character scalar corresponding to a tag found in `https://github.com/metrumresearchgroup/babylon/releases`}
+
+\item{.force}{Boolean for whether to force the installation even if current version and local version are the same. Primarily used for testing.}
+
+\item{.quiet}{Boolean for suppressing output printed to the console. False by default.}
 }
 \value{
 character
 }
 \description{
-Identifies system running and return installation instructions
+Identifies system running and pulls the relevant tarball for the current release of babylon from GitHub,
+and then installs it in the directory passed to `.dir`.
+If used in an interactive session, will open an installation menu confirming the installed version.
 }

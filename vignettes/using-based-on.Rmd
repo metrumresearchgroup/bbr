@@ -131,7 +131,7 @@ mod6 %>% get_model_ancestry()
 
 In this case, model `6` was based on `5`, which was based on `2`, which in turn was based on `1`. You will see one example of how this can be useful in the "Final model family" section below.
 
-# Using the run Log
+# Using the run log
 
 While it may be useful to look at the ancestry of a single model object, it may be even more useful to use the `based_on` field later in the modeling process when you are looking back and trying to summarize the model activities as a whole. The `run_log()` function is helpful for this. It returns a tibble with metadata about each model.
 
