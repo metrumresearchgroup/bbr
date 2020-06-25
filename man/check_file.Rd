@@ -8,7 +8,7 @@
 \alias{tail_lst}
 \alias{tail_lst.character}
 \alias{tail_lst.bbi_nonmem_model}
-\title{Reads the head and tail of specified file and prints it the console and/or returns it as a character vector.}
+\title{Check an output file}
 \usage{
 check_file(.file, .head = 3, .tail = 5, .print = TRUE, .return = FALSE)
 
@@ -35,22 +35,22 @@ tail_lst(.mod, ...)
 
 \item{.return}{If \code{FALSE}, the default, returns \code{NULL} invisibly. If \code{TRUE} returns resulting head and tail as a character vector.}
 
-\item{.mod}{bbi_nonmem_model object}
+\item{.mod}{Model object or path associated with file.}
 
-\item{...}{args passed through}
+\item{...}{arguments passed through to \code{check_file()}}
 }
 \description{
 Reads the head and tail of specified file and prints it the console and/or returns it as a character vector.
-
-S3 generic for tailing the OUTPUT file
-
-S3 dispatch for tailing the OUTPUT file
-
-S3 dispatch for tailing the OUTPUT file
-
-S3 generic for tailing the lst file
-
-S3 dispatch for tailing the lst file
-
-S3 dispatch for tailing the lst file
+This is called internally in several S3 methods described below.
 }
+\section{Methods (by generic)}{
+\itemize{
+\item \code{tail_output}: Tail the OUTPUT file from a file path to a model.
+
+\item \code{tail_output}: Tail the OUTPUT file from a \code{bbi_nonmem_model} object.
+
+\item \code{tail_lst}: Tail the .lst file from a file path to a model.
+
+\item \code{tail_lst}: Tail the .lst file from a \code{bbi_nonmem_model} object.
+}}
+

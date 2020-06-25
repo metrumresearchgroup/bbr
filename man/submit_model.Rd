@@ -52,11 +52,14 @@ submit_model(
 )
 }
 \arguments{
-\item{.mod}{Integer that corresponds to the name of a YAML and model file}
+\item{.mod}{The model object to submit. Could be
+a \verb{bbi_\{.model_type\}_object},
+a file path to a model,
+an integer corresponding to a file name of a model.}
 
 \item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}. Run \code{print_nonmem_args()} to see valid arguments.}
 
-\item{.mode}{Either "local" for local execution or "sge" to submit model(s) to the grid}
+\item{.mode}{Either \code{"sge"}, the default, to submit model(s) to the grid or \code{"local"} for local execution.}
 
 \item{...}{args passed through to \code{bbi_exec()}}
 
@@ -66,16 +69,19 @@ submit_model(
 
 \item{.dry_run}{Returns an object detailing the command that would be run, insted of running it. This is primarily for testing but also a debugging tool.}
 
-\item{.directory}{Model directory containing the files referenced by \code{.mod}. Defaults to \code{options('rbabylon.model_directory')}, which can be set globally with \code{set_model_directory()}.}
+\item{.directory}{Model directory which \code{.mod} path is relative to. Defaults to \code{options('rbabylon.model_directory')}, which can be set globally with \code{set_model_directory()}. \strong{Only used when passing a file path for \code{.mod} instead of a \verb{bbi_\{.model_type\}_model} object.}}
 }
 \description{
-Submit a model to be run
-
-S3 dispatch for submit_model from bbi_nonmem_model
-
-S3 dispatch for submit_model from character scaler.
-Should be path to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
-
-S3 dispatch for submit_model from numeric input
-This will only work if you are calling from the same directory as the models, or if you have set the model directory with \code{set_model_directory()}
+Submits a model to be run by calling out to \code{bbi}.
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{bbi_nonmem_model}: Takes a \code{bbi_nonmem_model} object.
+
+\item \code{character}: Takes a file path to a model that can be loaded with \code{read_model()}.
+Should be path to YAML (with or without .yaml extension), or a valid model file (control stream, etc.).
+
+\item \code{numeric}: Takes an integer corresponding to the file name of a model that can be loaded with \code{read_model()}.
+This will only work if you are calling from the same directory as the models, or if you have set \code{options('rbabylon.model_directory')} to the directory constaining the relevant model.
+}}
+

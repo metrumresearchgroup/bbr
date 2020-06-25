@@ -3,17 +3,24 @@
 \name{param_estimates}
 \alias{param_estimates}
 \alias{param_estimates.bbi_nonmem_summary}
-\title{Parses parameter estimates table from model_summary() output}
+\title{Parses parameter estimates table}
 \usage{
 param_estimates(.summary)
 
 \method{param_estimates}{bbi_nonmem_summary}(.summary)
 }
 \arguments{
-\item{.summary}{\code{bbi_nonmem_summary} object}
+\item{.summary}{\verb{bbi_\{.model_type\}_summary} object}
 }
 \description{
-Parses parameter estimates table from model_summary() output
+Returns a tibble containing parameter estimates from a model.
+Currently can only take a \verb{bbi_\{.model_type\}_summary} object, as output from \code{model_summary()}.
+}
+\section{Methods (by class)}{
+\itemize{
+\item \code{bbi_nonmem_summary}: Takes \code{bbi_nonmem_summary} object.
+}}
 
-S3 dispatch for parsing \code{bbi_nonmem_summary} object into parameter estimate table
+\seealso{
+\code{param_labels()} \code{apply_indices()}
 }

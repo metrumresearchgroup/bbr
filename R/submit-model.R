@@ -3,16 +3,20 @@
 ###############################################
 
 #' Submit a model to be run
-#' @param .mod generic model to submit
+#'
+#' Submits a model to be run by calling out to `bbi`.
+#' @param .mod The model object to submit. Could be
+#' a `bbi_{.model_type}_object`,
+#' a file path to a model,
+#' an integer corresponding to a file name of a model.
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.
-#' @param .mode Either "local" for local execution or "sge" to submit model(s) to the grid
+#' @param .mode Either `"sge"`, the default, to submit model(s) to the grid or `"local"` for local execution.
 #' @param ... args passed through to `bbi_exec()`
 #' @param .config_path Optionally specify a path to a babylon.yml config. If not specified, the config in the model directory will be used by default. Path MUST be either an absolute path or relative to the model directory.
 #' @param .wait If `TRUE`, the default, wait for the bbi process to return before this function call returns. If `FALSE` function will return while bbi process runs in the background.
 #' @param .dry_run Returns an object detailing the command that would be run, insted of running it. This is primarily for testing but also a debugging tool.
-#' @param .directory Model directory which `.mod` path is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`. Only used when passing a path for `.mod` instead of a `bbi_{.model_type}_model` object.
+#' @param .directory Model directory which `.mod` path is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`. **Only used when passing a file path for `.mod` instead of a `bbi_{.model_type}_model` object.**
 #' @export
-#' @rdname submit_model
 submit_model <- function(
   .mod,
   .bbi_args = NULL,
@@ -26,11 +30,8 @@ submit_model <- function(
   UseMethod("submit_model")
 }
 
-#' S3 dispatch for submit_model from bbi_nonmem_model
-#' @param .mod S3 object of class `bbi_nonmem_model` to submit
-#' @param .directory This argument is only used when passing a path to `submit_model()`. When `bbi_nonmem_model` object is passed, `.directory` is inferred from the model object.
+#' @describeIn submit_model Takes a `bbi_nonmem_model` object.
 #' @export
-#' @rdname submit_model
 submit_model.bbi_nonmem_model <- function(
   .mod,
   .bbi_args = NULL,
@@ -58,13 +59,10 @@ submit_model.bbi_nonmem_model <- function(
   return(res)
 }
 
-#' S3 dispatch for submit_model from character scaler.
-#' Should be path to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
-#' @param .mod Path to YAML or model file
-#' @param .directory Model directory which `.mod` path is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
+#' @describeIn submit_model Takes a file path to a model that can be loaded with `read_model()`.
+#' Should be path to YAML (with or without .yaml extension), or a valid model file (control stream, etc.).
 #' @importFrom fs file_exists
 #' @export
-#' @rdname submit_model
 submit_model.character <- function(
   .mod,
   .bbi_args = NULL,
@@ -105,12 +103,9 @@ submit_model.character <- function(
 }
 
 
-#' S3 dispatch for submit_model from numeric input
-#' This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`
-#' @param .mod Integer that corresponds to the name of a YAML and model file
-#' @param .directory Model directory containing the files referenced by `.mod`. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
+#' @describeIn submit_model Takes an integer corresponding to the file name of a model that can be loaded with `read_model()`.
+#' This will only work if you are calling from the same directory as the models, or if you have set `options('rbabylon.model_directory')` to the directory constaining the relevant model.
 #' @export
-#' @rdname submit_model
 submit_model.numeric <- function(
   .mod,
   .bbi_args = NULL,
@@ -192,17 +187,19 @@ submit_nonmem_model <- function(.mod,
 # S3 dispatches for submitting multiple models in batch
 #########################################################
 
-#' Submit multiple models to be run in batch
-#' @param .mods generic list or vector of models to submit
-#' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.
-#' @param .mode Either "local" for local execution or "sge" to submit model(s) to the grid
-#' @param ... args passed through to `bbi_exec()`
-#' @param .config_path Optionally specify a path to a babylon.yml config. If not specified, the config in the model directory will be used by default. Path MUST be either an absolute path or relative to the model directory.
-#' @param .wait If `TRUE`, the default, wait for the bbi process to return before this function call returns. If `FALSE` function will return while bbi process runs in the background.
-#' @param .dry_run Returns an object detailing the command that would be run, insted of running it. This is primarily for testing but also a debugging tool.
-#' @param .directory Model directory which `.mod` path is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`. Only used when passing a path for `.mod` instead of a `bbi_{.model_type}_model` object.
+#' Submit models to be run in batch
+#'
+#' Submits a group of models to be run in batch by calling out to `bbi` in as few external calls as possible (see "Details").
+#'
+#' @details
+#' The number of `bbi` calls to make is determined by the number of distinct sets of `bbi` arguments passed to the submission calls,
+#' either explicitly through `.bbi_args`, as specified in the `bbi_args` field of the model YAML, or specified globally in `babylon.yml`.
+#' @param .mods The model object to submit. Could be
+#' a list of `bbi_{.model_type}_object` object,
+#' a character vector of file paths to models,
+#' a numeric vector of integers corresponding to a file names of a models.
+#' @inheritParams submit_model
 #' @export
-#' @rdname submit_models
 submit_models <- function(
   .mods,
   .bbi_args = NULL,
@@ -216,12 +213,9 @@ submit_models <- function(
   UseMethod("submit_models")
 }
 
-#' S3 dispatch for submit_model from bbi_nonmem_model
-#' @param .mods a list of S3 object of class `bbi_nonmem_model` to submit
-#' @param .directory This argument is only used when passing a path to `submit_model()`. When `bbi_nonmem_model` object is passed, `.directory` is inferred from the model object.
+#' @describeIn submit_models Takes a list of `bbi_nonmem_model` objects.
 #' @importFrom purrr map map_lgl
 #' @export
-#' @rdname submit_models
 submit_models.list <- function(
   .mods,
   .bbi_args = NULL,
@@ -277,15 +271,11 @@ submit_models.list <- function(
   return(res_list)
 }
 
-
-#' S3 dispatch for submit_models from character vector
-#' Should be a vector of paths to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
-#' @param .mods Character vector of paths to YAML or model file
-#' @param .directory Model directory which `.mods` paths are relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
+#' @describeIn submit_models Takes a character vector of file paths to models that can be loaded with `read_model()`.
+#' Should be a vector of paths to YAML (with or without .yaml extension), or valid model files (control stream, etc.).
 #' @importFrom fs file_exists
 #' @importFrom purrr map map_chr
 #' @export
-#' @rdname submit_models
 submit_models.character <- function(
   .mods,
   .bbi_args = NULL,
@@ -322,12 +312,9 @@ submit_models.character <- function(
 }
 
 
-#' S3 dispatch for submit_models from numeric input
-#' This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`
-#' @param .mods Integer vector that corresponds to the names of YAML and model files
-#' @param .directory Model directory containing the files referenced by `.mods`. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
+#' @describeIn submit_models Takes a numeric vector of integers corresponding to file names of models that can be loaded with `read_model()`.
+#' This will only work if you are calling from the same directory as the models, or if you have set `options('rbabylon.model_directory')` to the directory constaining the relevant model.
 #' @export
-#' @rdname submit_models
 submit_models.numeric <- function(
   .mods,
   .bbi_args = NULL,

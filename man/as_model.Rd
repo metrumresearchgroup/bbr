@@ -13,13 +13,16 @@ as_model(.obj)
 \method{as_model}{babylon_process}(.obj)
 }
 \arguments{
-\item{.obj}{\code{babylon_process} object to convert}
+\item{.obj}{Object to convert to \verb{bbi_\{.model_type\}_model}}
 }
 \description{
 Convert object to \verb{bbi_\{.model_type\}_model}
-
-S3 dispatch for passing through \code{bbi_nonmem_model} object
-
-S3 dispatch for converting \code{babylon_process} to corresponding \code{bbi_nonmem_model} object.
-Only works if YAML and model file are in the same directory with the same name and different file extensions.
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{bbi_nonmem_model}: Simply passes through the \code{bbi_nonmem_model} object.
+
+\item \code{babylon_process}: Takes a \code{babylon_process} object and converts it to the corresponding \code{bbi_nonmem_model} object.
+Only works if YAML and model file are in the same directory with the same name and different file extensions.
+}}
+

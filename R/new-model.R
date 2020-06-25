@@ -76,7 +76,6 @@ new_model <- function(
 #' @importFrom digest digest
 #' @importFrom fs file_exists
 #' @return S3 object of class `bbi_{.model_type}_model`
-#' @rdname read_model
 #' @export
 read_model <- function(
   .path,
@@ -157,24 +156,19 @@ save_model_yaml <- function(.mod, .out_path = NULL) {
 
 #' Convert object to `bbi_{.model_type}_model`
 #' @param .obj Object to convert to `bbi_{.model_type}_model`
-#' @rdname as_model
 #' @export
 as_model <- function(.obj) {
   UseMethod("as_model")
 }
 
-#' S3 dispatch for passing through `bbi_nonmem_model` object
-#' @param .obj `bbi_nonmem_model` object that will be passed through
-#' @rdname as_model
+#' @describeIn as_model Simply passes through the `bbi_nonmem_model` object.
 #' @export
 as_model.bbi_nonmem_model <- function(.obj) {
   return(.obj)
 }
 
-#' S3 dispatch for converting `babylon_process` to corresponding `bbi_nonmem_model` object.
+#' @describeIn as_model Takes a `babylon_process` object and converts it to the corresponding `bbi_nonmem_model` object.
 #' Only works if YAML and model file are in the same directory with the same name and different file extensions.
-#' @param .obj `babylon_process` object to convert
-#' @rdname as_model
 #' @export
 as_model.babylon_process <- function(.obj) {
   # construct path to YAML

@@ -11,14 +11,16 @@ build_path_from_mod_obj <- function(.mod, .extension) {
   return(out_file_path)
 }
 
+#' Check an output file
+#'
 #' Reads the head and tail of specified file and prints it the console and/or returns it as a character vector.
+#' This is called internally in several S3 methods described below.
 #' @param .file Character scaler of path to file to read
 #' @param .head Integer for number of lines to read from the top of the file
 #' @param .tail Integer for number of lines to read from the bottom of the file
 #' @param .print If `TRUE`, the default, print resulting head and tail to console.
 #' @param .return If `FALSE`, the default, returns `NULL` invisibly. If `TRUE` returns resulting head and tail as a character vector.
 #' @importFrom readr read_lines
-#' @rdname check_file
 #' @export
 check_file <- function(.file, .head = 3, .tail = 5, .print = TRUE, .return = FALSE) {
   l <- read_lines(.file)
@@ -68,24 +70,16 @@ check_file <- function(.file, .head = 3, .tail = 5, .print = TRUE, .return = FAL
 
 # wrappers to interact easily with OUTPUT file
 
-#' S3 generic for tailing the OUTPUT file
-#' @param .mod generic input
-#' @param ... args passed through
-#' @export
 #' @rdname check_file
+#' @param .mod Model object or path associated with file.
+#' @param ... arguments passed through to `check_file()`
+#' @export
 tail_output <- function(.mod, ...) {
   UseMethod("tail_output")
 }
 
-#' S3 dispatch for tailing the OUTPUT file
-#' @param .mod Path to OUTPUT file
-#' @param .head Integer for number of lines to read from the top of the file
-#' @param .tail Integer for number of lines to read from the bottom of the file
-#' @param .print If `TRUE`, the default, print resulting head and tail to console.
-#' @param .return If `FALSE`, the default, returns `NULL` invisibly. If `TRUE` returns resulting head and tail as a character vector.
-#' @param ... arguments passed through to check_file
+#' @describeIn check_file Tail the OUTPUT file from a file path to a model.
 #' @export
-#' @rdname check_file
 tail_output.character <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE, ...) {
   # if model path passed, construct path
   if (basename(.mod) != "OUTPUT") {
@@ -95,15 +89,8 @@ tail_output.character <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .re
   check_file(.mod, .head, .tail, .print, .return, ...)
 }
 
-#' S3 dispatch for tailing the OUTPUT file
-#' @param .mod bbi_nonmem_model object
-#' @param .head Integer for number of lines to read from the top of the file
-#' @param .tail Integer for number of lines to read from the bottom of the file
-#' @param .print If `TRUE`, the default, print resulting head and tail to console.
-#' @param .return If `FALSE`, the default, returns `NULL` invisibly. If `TRUE` returns resulting head and tail as a character vector.
-#' @param ... arguments passed through to check_file
+#' @describeIn check_file Tail the OUTPUT file from a `bbi_nonmem_model` object.
 #' @export
-#' @rdname check_file
 tail_output.bbi_nonmem_model <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE, ...) {
   .file <- file.path(.mod[[WORKING_DIR]], .mod[[YAML_OUT_DIR]], "OUTPUT")
   check_file(.file, .head, .tail, .print, .return, ...)
@@ -112,23 +99,16 @@ tail_output.bbi_nonmem_model <- function(.mod, .head = 3, .tail = 5, .print = TR
 
 # wrappers to interact easily with .lst file
 
-#' S3 generic for tailing the lst file
-#' @param .mod generic input
-#' @param ... args passed through
-#' @export
 #' @rdname check_file
+#' @param .mod Model object or path associated with file.
+#' @param ... arguments passed through to `check_file()`
+#' @export
 tail_lst <- function(.mod, ...) {
   UseMethod("tail_lst")
 }
 
-#' S3 dispatch for tailing the lst file
-#' @param .mod Path to lst file
-#' @param .head Integer for number of lines to read from the top of the file
-#' @param .tail Integer for number of lines to read from the bottom of the file
-#' @param .print If `TRUE`, the default, print resulting head and tail to console.
-#' @param .return If `FALSE`, the default, returns `NULL` invisibly. If `TRUE` returns resulting head and tail as a character vector.
+#' @describeIn check_file Tail the .lst file from a file path to a model.
 #' @export
-#' @rdname check_file
 tail_lst.character <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE, ...) {
   # if model path passed, construct path
   if (tools::file_ext(.mod) != "lst") {
@@ -138,14 +118,8 @@ tail_lst.character <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .retur
   check_file(.mod, .head, .tail, .print, .return, ...)
 }
 
-#' S3 dispatch for tailing the lst file
-#' @param .mod bbi_nonmem_model object
-#' @param .head Integer for number of lines to read from the top of the file
-#' @param .tail Integer for number of lines to read from the bottom of the file
-#' @param .print If `TRUE`, the default, print resulting head and tail to console.
-#' @param .return If `FALSE`, the default, returns `NULL` invisibly. If `TRUE` returns resulting head and tail as a character vector.
+#' @describeIn check_file Tail the .lst file from a `bbi_nonmem_model` object.
 #' @export
-#' @rdname check_file
 tail_lst.bbi_nonmem_model <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE, ...) {
   .file <- build_path_from_mod_obj(.mod, "lst")
   check_file(.file, .head, .tail, .print, .return, ...)

@@ -44,9 +44,9 @@ model_summary(
 )
 }
 \arguments{
-\item{.mod}{Integer that corresponds to the name of a YAML, model file, and output directory}
+\item{.mod}{Model to summarize. Can be a \verb{bbi_\{.model_type\}_object}, a file path, or an integer corresponding to a file path.}
 
-\item{.model_type}{Character scaler specifying the type of model, either 'nonmem' or 'stan'}
+\item{.model_type}{String specifying the type of model, either 'nonmem' or 'stan'.  \strong{Only used when passing a path for \code{.mod} instead of a \verb{bbi_\{.model_type\}_model} object.}}
 
 \item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}.}
 
@@ -54,8 +54,47 @@ model_summary(
 
 \item{.dry_run}{show what the command would be without actually running it}
 
-\item{.directory}{Model directory containing the files referenced by \code{.mod}. Defaults to \code{options('rbabylon.model_directory')}, which can be set globally with \code{set_model_directory()}.}
+\item{.directory}{Model directory which \code{.mod} path is relative to. Defaults to \code{options('rbabylon.model_directory')}, which can be set globally with \code{set_model_directory()}. \strong{Only used when passing a path for \code{.mod} instead of a \verb{bbi_\{.model_type\}_model} object.}}
 }
 \description{
-Returns a named list with model outputs and diagnostics.
+Calls out to bbi and returns a named list of class \verb{bbi_\{.model_type\}_summary} with model outputs and diagnostics.
 }
+\details{
+\strong{NONMEM}
+
+The returned list for a NONMEM model will contain the following top-level elements:
+\itemize{
+\item run_details
+\item run_heuristics
+\item parameters_data
+\item parameter_names
+\item ofv
+\item shrinkage_details
+\item covariance_theta
+\item correlation_theta
+}
+
+The summary call will error if it does not find certain files in the output folder.
+However, you can override this behavior with the following file-specific flags:
+\itemize{
+\item \code{no_cor_file}
+\item \code{no_cov_file}
+\item \code{no_ext_file}
+\item \code{no_grd_file}
+\item \code{no_shk_file}
+}
+
+If you are using an estimation method that does not produce any of the following files,
+or they are missing for some other legitimate reason, pass the appropriate flags through the \code{.bbi_args} argument.
+For example, if have asked to skip the \verb{$COV} step, you would call \code{model_summary(..., .bbi_args = list(no_cov_file = TRUE))}.
+}
+\section{Methods (by class)}{
+\itemize{
+\item \code{bbi_nonmem_model}: Get model summary from \code{bbi_nonmem_model} object
+
+\item \code{character}: Get model summary from output directory path
+
+\item \code{numeric}: Get model summary from numeric input.
+This will only work if you are calling from the same directory as the models, or if you have set \code{options('rbabylon.model_directory')} to the directory constaining the relevant model.
+}}
+
