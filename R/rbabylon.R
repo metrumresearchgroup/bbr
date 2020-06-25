@@ -113,7 +113,7 @@ check_bbi_exe <- function(.bbi_exe_path) {
 check_bbi_version_constraint <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')) {
   .bbi_exe_path <- Sys.which(.bbi_exe_path)
   if (.bbi_exe_path == "") {
-    stop(glue("`{getOption('rbabylon.bbi_exe_path')}` was not found on system. Please assign a path to a working version of babylon with `options('rbabylon.bbi_exe_path' = '/path/to/bbi')`"))
+    stop(glue("`{.bbi_exe_path}` was not found on the system."))
   }
 
   this_version <- bbi_version(.bbi_exe_path)

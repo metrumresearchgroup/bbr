@@ -9,11 +9,11 @@ install_menu(.body, .this_os, .dir, .version, .force, .quiet)
 \arguments{
 \item{.body}{Character vector of installation commands to run with \code{system}}
 
-\item{.this_os}{Character scaler of OS}
+\item{.this_os}{Character scalar of OS}
 
 \item{.dir}{directory to install bbi to}
 
-\item{.version}{version of babylon to install. Must pass a character scaler corresponding to a tag found in \verb{https://github.com/metrumresearchgroup/babylon/releases}}
+\item{.version}{version of babylon to install. Must pass a character scalar corresponding to a tag found in \verb{https://github.com/metrumresearchgroup/babylon/releases}}
 
 \item{.force}{If \code{FALSE}, the default, skips installation if requested version and local version are the same. If \code{TRUE} forces installation if it will be the same version.}
 
