@@ -17,6 +17,7 @@
 #' @param .directory Model directory which `.yaml_path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
 #' @importFrom yaml write_yaml
 #' @importFrom fs file_exists
+#' @importFrom digest digest
 #' @return S3 object of class `bbi_{.model_type}_model` that can be passed to `submit_model()`, `model_summary()`, etc.
 #' @export
 new_model <- function(

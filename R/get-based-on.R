@@ -1,20 +1,23 @@
 
 #' @title Get based_on from bbi object
 #'
-#' @description Returns character vector of the absolute paths to all models stored in the `based_on` field of a `bbi_...` object
+#' @description Returns character vector (or list of character vectors) of the absolute paths to all models stored in the `based_on` field of a `bbi_...` object.
 #'
 #' @details
-#' All paths saved in the object or accompanying YAML will be relative **to the location of that YAML**
+#' `get_model_ancestry()` extracts paths to all models that this model is based on (iterating over `get_based_on()` function),
+#' and all models that those models are based on, recursively.
+#' It returns a sorted unique character vector for the `default` and `character` method, and a list of such vectors for the `bbi_run_log_df` method.
+#' Some notes on `get_model_ancestry()`:
+#' * `.check_exists = TRUE` is set for this iterative search because each model found will subsequently be loaded.
+#' * `get_model_ancestry()` has all the same S3 methods as `get_based_on()`
+#'
+#' For both `get_based_on()` and `get_model_ancestry()`, all paths saved in the object or accompanying YAML will be relative **to the location of that YAML**
 #' When the object is loaded into memory, the absolute path to the YAML is stored in the object.
 #' These functions simply stitch together that path with the relative paths from the `based_on` field.
 #' As long as the YAML has not moved since it was read into memory, these paths will be both absolute and correct.
 #'
-#' `get_model_ancestry()` extracts paths to all models that this model is based on (iterating over `get_based_on()` function),
-#' and all models that those models are based on, recursively.
-#' It returns a sorted unique character vector for the `default` and `character` method, and a list of such vectors for the `bbi_run_log_df` method.
-#' Note that `.check_exists = TRUE` is set for this iterative search because each model found will subsequently be loaded.
 #' @param .bbi_object The model object to query. Could be
-#' a `bbi_{.model_type}_object`,
+#' a `bbi_{.model_type}_model` object,
 #' a  file path to a model,
 #' a tibble of class `bbi_run_log_df`,
 #' or some other custom object containing model data.
@@ -27,7 +30,7 @@ get_based_on <- function(.bbi_object, .check_exists = FALSE) {
 
 
 #' @describeIn get_based_on The default method attempts to extract the path from any object passed to it,
-#' but is designed for a list of class `bbi_{.model_type}_object` or something similar.
+#' but is designed for a list of class `bbi_{.model_type}_model` or something similar.
 #' @importFrom fs path_norm
 #' @export
 get_based_on.default <- function(.bbi_object, .check_exists = FALSE) {

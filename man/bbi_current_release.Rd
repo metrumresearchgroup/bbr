@@ -7,7 +7,7 @@
 bbi_current_release(os = "linux")
 }
 \arguments{
-\item{os}{operating system, Default: 'linux'}
+\item{os}{operating system, Default: \code{'linux'}}
 }
 \description{
 Helper function to get version number of most recent release of babylon from GitHub.

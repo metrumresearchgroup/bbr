@@ -33,7 +33,7 @@
 #' or they are missing for some other legitimate reason, pass the appropriate flags through the `.bbi_args` argument.
 #' For example, if have asked to skip the `$COV` step, you would call `model_summary(..., .bbi_args = list(no_cov_file = TRUE))`.
 #'
-#' @param .mod Model to summarize. Can be a `bbi_{.model_type}_object`, a file path, or an integer corresponding to a file path.
+#' @param .mod Model to summarize. Can be a `bbi_{.model_type}_model` object, a file path, or an integer corresponding to a file path.
 #' @param .model_type String specifying the type of model, either 'nonmem' or 'stan'.  **Only used when passing a path for `.mod` instead of a `bbi_{.model_type}_model` object.**
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`.
 #' @param ... args passed through to `bbi_exec()`

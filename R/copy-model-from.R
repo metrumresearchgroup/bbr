@@ -154,6 +154,7 @@ copy_model_from.numeric <- function(
 #' @importFrom stringr str_replace
 #' @importFrom yaml write_yaml
 #' @importFrom purrr list_modify
+#' @importFrom digest digest
 #' @return S3 object of class `bbi_nonmem_model` that can be passed to `submit_nonmem_model()`
 #' @keywords internal
 copy_nonmem_model_from <- function(

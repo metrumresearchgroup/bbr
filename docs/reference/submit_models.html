@@ -6,31 +6,27 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Submit multiple models to be run in batch — submit_models • rbabylon</title>
+<title>Submit models to be run in batch — submit_models • rbabylon</title>
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
-
-<!-- bootstrap-toc -->
-<link rel="stylesheet" href="../bootstrap-toc.css">
-<script src="../bootstrap-toc.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -39,13 +35,9 @@
 
 
 
-<meta property="og:title" content="Submit multiple models to be run in batch — submit_models" />
-<meta property="og:description" content="Submit multiple models to be run in batch
-S3 dispatch for submit_model from bbi_nonmem_model
-S3 dispatch for submit_models from character vector
-Should be a vector of paths to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
-S3 dispatch for submit_models from numeric input
-This will only work if you are calling from the same directory as the models, or if you have set the model directory with set_model_directory()" />
+<meta property="og:title" content="Submit models to be run in batch — submit_models" />
+<meta property="og:description" content="Submits a group of models to be run in batch by calling out to bbi in as few external calls as possible (see &quot;Details&quot;)." />
+<meta name="twitter:card" content="summary" />
 
 
 
@@ -63,7 +55,7 @@ This will only work if you are calling from the same directory as the models, or
 
   </head>
 
-  <body data-spy="scroll" data-target="#toc">
+  <body>
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -131,18 +123,13 @@ This will only work if you are calling from the same directory as the models, or
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Submit multiple models to be run in batch</h1>
+    <h1>Submit models to be run in batch</h1>
     
     <div class="hidden name"><code>submit_models.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Submit multiple models to be run in batch</p>
-<p>S3 dispatch for submit_model from bbi_nonmem_model</p>
-<p>S3 dispatch for submit_models from character vector
-Should be a vector of paths to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).</p>
-<p>S3 dispatch for submit_models from numeric input
-This will only work if you are calling from the same directory as the models, or if you have set the model directory with <code><a href='set_model_directory.html'>set_model_directory()</a></code></p>
+    <p>Submits a group of models to be run in batch by calling out to <code>bbi</code> in as few external calls as possible (see "Details").</p>
     </div>
 
     <pre class="usage"><span class='fu'>submit_models</span>(
@@ -150,7 +137,7 @@ This will only work if you are calling from the same directory as the models, or
   <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
   <span class='no'>...</span>,
-  <span class='kw'>.config_path</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>() <span class='kw'>%||%</span> <span class='st'>"."</span>, <span class='st'>"babylon.yaml"</span>),
+  <span class='kw'>.config_path</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='get_model_directory.html'>get_model_directory</a></span>() <span class='kw'>%||%</span> <span class='st'>"."</span>, <span class='st'>"babylon.yaml"</span>),
   <span class='kw'>.wait</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
@@ -162,7 +149,7 @@ This will only work if you are calling from the same directory as the models, or
   <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
   <span class='no'>...</span>,
-  <span class='kw'>.config_path</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>() <span class='kw'>%||%</span> <span class='st'>"."</span>, <span class='st'>"babylon.yaml"</span>),
+  <span class='kw'>.config_path</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='get_model_directory.html'>get_model_directory</a></span>() <span class='kw'>%||%</span> <span class='st'>"."</span>, <span class='st'>"babylon.yaml"</span>),
   <span class='kw'>.wait</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
@@ -174,10 +161,10 @@ This will only work if you are calling from the same directory as the models, or
   <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
   <span class='no'>...</span>,
-  <span class='kw'>.config_path</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>() <span class='kw'>%||%</span> <span class='st'>"."</span>, <span class='st'>"babylon.yaml"</span>),
+  <span class='kw'>.config_path</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='get_model_directory.html'>get_model_directory</a></span>() <span class='kw'>%||%</span> <span class='st'>"."</span>, <span class='st'>"babylon.yaml"</span>),
   <span class='kw'>.wait</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>()
+  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='get_model_directory.html'>get_model_directory</a></span>()
 )
 
 <span class='co'># S3 method for numeric</span>
@@ -186,10 +173,10 @@ This will only work if you are calling from the same directory as the models, or
   <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.mode</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sge"</span>, <span class='st'>"local"</span>),
   <span class='no'>...</span>,
-  <span class='kw'>.config_path</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>() <span class='kw'>%||%</span> <span class='st'>"."</span>, <span class='st'>"babylon.yaml"</span>),
+  <span class='kw'>.config_path</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='get_model_directory.html'>get_model_directory</a></span>() <span class='kw'>%||%</span> <span class='st'>"."</span>, <span class='st'>"babylon.yaml"</span>),
   <span class='kw'>.wait</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>()
+  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='get_model_directory.html'>get_model_directory</a></span>()
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -197,7 +184,10 @@ This will only work if you are calling from the same directory as the models, or
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>.mods</th>
-      <td><p>Integer vector that corresponds to the names of YAML and model files</p></td>
+      <td><p>The model object to submit. Could be
+a list of <code>bbi_{.model_type}_model </code> object,
+a character vector of file paths to models,
+a numeric vector of integers corresponding to a file names of a models.</p></td>
     </tr>
     <tr>
       <th>.bbi_args</th>
@@ -205,7 +195,7 @@ This will only work if you are calling from the same directory as the models, or
     </tr>
     <tr>
       <th>.mode</th>
-      <td><p>Either "local" for local execution or "sge" to submit model(s) to the grid</p></td>
+      <td><p>Either <code>"sge"</code>, the default, to submit model(s) to the grid or <code>"local"</code> for local execution.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -225,16 +215,34 @@ This will only work if you are calling from the same directory as the models, or
     </tr>
     <tr>
       <th>.directory</th>
-      <td><p>Model directory containing the files referenced by <code>.mods</code>. Defaults to <code><a href='https://rdrr.io/r/base/options.html'>options('rbabylon.model_directory')</a></code>, which can be set globally with <code><a href='set_model_directory.html'>set_model_directory()</a></code>.</p></td>
+      <td><p>Model directory which <code>.mod</code> path is relative to. Defaults to <code><a href='https://rdrr.io/r/base/options.html'>options('rbabylon.model_directory')</a></code>, which can be set globally with <code><a href='get_model_directory.html'>set_model_directory()</a></code>. <strong>Only used when passing a file path for <code>.mod</code> instead of a <code>bbi_{.model_type}_model</code> object.</strong></p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>The number of <code>bbi</code> calls to make is determined by the number of distinct sets of <code>bbi</code> arguments passed to the submission calls,
+either explicitly through <code>.bbi_args</code>, as specified in the <code>bbi_args</code> field of the model YAML, or specified globally in <code>babylon.yml</code>.</p>
+    <h2 class="hasAnchor" id="methods-by-class-"><a class="anchor" href="#methods-by-class-"></a>Methods (by class)</h2>
+
+    
+<ul>
+<li><p><code>list</code>: Takes a list of <code>bbi_nonmem_model</code> objects.</p></li>
+<li><p><code>character</code>: Takes a character vector of file paths to models that can be loaded with <code><a href='read_model.html'>read_model()</a></code>.
+Should be a vector of paths to YAML (with or without .yaml extension), or valid model files (control stream, etc.).</p></li>
+<li><p><code>numeric</code>: Takes a numeric vector of integers corresponding to file names of models that can be loaded with <code><a href='read_model.html'>read_model()</a></code>.
+This will only work if you are calling from the same directory as the models, or if you have set <code><a href='https://rdrr.io/r/base/options.html'>options('rbabylon.model_directory')</a></code> to the directory constaining the relevant model.</p></li>
+</ul>
 
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-    <nav id="toc" data-toggle="toc" class="sticky-top">
-      <h2 data-toc-skip>Contents</h2>
-    </nav>
+  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+    <h2>Contents</h2>
+    <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#details">Details</a></li>
+      <li><a href="#methods-by-class-">Methods (by class)</a></li>
+    </ul>
+
   </div>
 </div>
 
@@ -245,7 +253,7 @@ This will only work if you are calling from the same directory as the models, or
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
 
       </footer>

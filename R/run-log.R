@@ -4,16 +4,18 @@
 
 #' Create tibble summarizing all model runs
 #'
-#' Parses all model yaml and outputs into a tibble that serves as a run log for the project.
+#' Parses all model YAML files and outputs into a tibble that serves as a run log for the project.
 #' Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
-#' @param .base_dir Directory to search for model yaml files. Only runs with a corresponding yaml will be included.
+#' Users can also use `add_config()` to append additional output about the model run.
+#' @seealso `add_config()`
+#' @param .base_dir Directory to search for model YAML files. Only runs with a corresponding YAML will be included.
 #' @param .recurse If `TRUE`, the default, search recursively in subdirectories.
 #' @importFrom stringr str_subset
 #' @importFrom fs dir_ls
 #' @importFrom purrr map map_lgl transpose
 #' @importFrom dplyr as_tibble mutate_at mutate select everything
 #' @importFrom yaml read_yaml
-#' @return tibble with information on each run
+#' @return A tibble of class `bbi_run_log_df` with information on each model.
 #' @export
 run_log <- function(
   .base_dir = get_model_directory(),

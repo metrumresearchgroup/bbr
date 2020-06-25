@@ -120,14 +120,7 @@ format_cmd_args <- function(.args, .collapse = FALSE) {
 build_bbi_param_list <- function(.mods, .bbi_args = NULL) {
 
   # check that everything in list is a model object
-  all_models_bool <- map_lgl(.mods, function(.x) { inherits(.x, VALID_MOD_CLASSES) })
-  if (isFALSE(all(all_models_bool))) {
-    losers <- which(!all_models_bool)
-    stop(paste(
-          glue("Passed list `.mods` must contain only model objects, but found {length(losers)} invalid objects at indices:"),
-          paste(losers, collapse = ", ")
-      ))
-  }
+  check_model_object_list(.mods)
 
   # build list of unique arg sets
   param_list <- list()
@@ -251,19 +244,6 @@ check_required_keys <- function(.list, .req) {
 #'
 #' `get_model_directory()` gets the path set to `options('rbabylon.model_directory')` and checks that it is both absolute and exists,
 #' erroring if it is not.
-#' @param .path Path, either from working directory or absolute, that will be set as `options('rbabylon.model_directory')`
-#' @export
-set_model_directory <- function(.path) {
-  if (is.null(.path)) {
-    options('rbabylon.model_directory' = NULL)
-  } else {
-    options('rbabylon.model_directory' = normalizePath(.path, mustWork = TRUE))
-  }
-
-  cat(glue("options('rbabylon.model_directory') set to {options('rbabylon.model_directory')}"))
-}
-
-#' @rdname set_model_directory
 #' @importFrom fs is_absolute_path dir_exists
 #' @export
 get_model_directory <- function() {
@@ -276,7 +256,7 @@ get_model_directory <- function() {
     strict_mode_error(paste(
       glue("`options('rbabylon.model_directory')` must be set to an absolute path but is currently set to {.mod_dir}"),
       "It is recommended to use `set_model_directory('...')` or put `options('rbabylon.model_directory' = normalizePath('...'))` in your .Rprofile for this project.",
-    sep = "\n"))
+      sep = "\n"))
   }
 
   if (!fs::dir_exists(.mod_dir)) {
@@ -287,6 +267,20 @@ get_model_directory <- function() {
   }
 
   return(.mod_dir)
+}
+
+
+#' @rdname get_model_directory
+#' @param .path Path, either from working directory or absolute, that will be set as `options('rbabylon.model_directory')`
+#' @export
+set_model_directory <- function(.path) {
+  if (is.null(.path)) {
+    options('rbabylon.model_directory' = NULL)
+  } else {
+    options('rbabylon.model_directory' = normalizePath(.path, mustWork = TRUE))
+  }
+
+  cat(glue("options('rbabylon.model_directory') set to {options('rbabylon.model_directory')}"))
 }
 
 
@@ -321,6 +315,32 @@ find_config_file_path <- function(.config_path, .model_dir) {
   return(.config_path)
 }
 
+#' Private helper to check if an object inherits a model class and error if not
+#' @param .mod The object to check
+#' @param .mod_types Character vector of acceptable classes, defaulting to `VALID_MOD_CLASSES`
+#' @keywords internal
+check_model_object <- function(.mod, .mod_types = VALID_MOD_CLASSES) {
+  if (!inherits(.mod, .mod_types)) {
+    stop(glue("Must pass a model object, but got object of class {paste(class(.mod), collapse = ', ')}"))
+  }
+  return(invisible(TRUE))
+}
+
+#' Private helper to check if a list of objects all inherit a model class and error if not
+#' @param .mods The list of objects to check
+#' @param .mod_types Character vector of acceptable classes, defaulting to `VALID_MOD_CLASSES`
+#' @keywords internal
+check_model_object_list <- function(.mods, .mod_types = VALID_MOD_CLASSES) {
+  all_models_bool <- map_lgl(.mods, function(.x) { inherits(.x, .mod_types) })
+  if (isFALSE(all(all_models_bool))) {
+    losers <- which(!all_models_bool)
+    stop(paste(
+      glue("Passed list must contain only model objects, but found {length(losers)} invalid objects at indices:"),
+      paste(losers, collapse = ", ")
+    ))
+  }
+  return(invisible(TRUE))
+}
 
 ############################
 # Error handlers

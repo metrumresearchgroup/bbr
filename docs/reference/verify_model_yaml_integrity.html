@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Builds list of unique parameter sets for multiple model bbi calls — build_bbi_param_list • rbabylon</title>
+<title>Verify YAML file integrity — verify_model_yaml_integrity • rbabylon</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,9 @@
 
 
 
-<meta property="og:title" content="Builds list of unique parameter sets for multiple model bbi calls — build_bbi_param_list" />
-<meta property="og:description" content="Builds list of unique parameter sets for multiple model bbi calls" />
+<meta property="og:title" content="Verify YAML file integrity — verify_model_yaml_integrity" />
+<meta property="og:description" content="These functions use an md5 digest of the model YAML file, stored each time a model is loaded into memory,
+to keep track of any changes made to the YAML that are not reflected in the object held in memory." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -123,36 +124,47 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Builds list of unique parameter sets for multiple model bbi calls</h1>
+    <h1>Verify YAML file integrity</h1>
     
-    <div class="hidden name"><code>build_bbi_param_list.Rd</code></div>
+    <div class="hidden name"><code>verify_model_yaml_integrity.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Builds list of unique parameter sets for multiple model bbi calls</p>
+    <p>These functions use an md5 digest of the model YAML file, stored each time a model is loaded into memory,
+to keep track of any changes made to the YAML that are <em>not</em> reflected in the object held in memory.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>build_bbi_param_list</span>(<span class='no'>.mods</span>, <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>reconcile_yaml</span>(<span class='no'>.mod</span>)
+
+<span class='fu'>check_yaml_in_sync</span>(<span class='no'>.mod</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>.mods</th>
-      <td><p>a list containing only <code>bbi_{.model_type}_model</code> objects</p></td>
-    </tr>
-    <tr>
-      <th>.bbi_args</th>
-      <td><p>A named list specifying arguments to pass to babylon. This will over-ride any shared arguments from the model objects.</p></td>
+      <th>.mod</th>
+      <td><p><code>bbi_{.model_type}_model</code> object</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="functions"><a class="anchor" href="#functions"></a>Functions</h2>
+
+    
+<ul>
+<li><p><code>reconcile_yaml</code>: Use to manually reconcile model object in memory with its YAML file.
+Extracts YAML path from model object and pulls in YAML file.
+Any shared keys are overwritten with the values from the YAML and new keys in YAML are added to the model object.
+The md5 digest is then updated to reflect the new state.</p></li>
+<li><p><code>check_yaml_in_sync</code>: Checks that model YAML file is the same as when it was last read into the model object.
+Errors if the md5 digests are not identical. This is called internally in most functions that interact with a model object.</p></li>
+</ul>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#functions">Functions</a></li>
     </ul>
 
   </div>

@@ -34,7 +34,7 @@ add_bbi_args(.mod, .bbi_args)
 replace_bbi_args(.mod, .bbi_args)
 }
 \arguments{
-\item{.mod}{A \verb{bbi_\{.model_type\}_model} object}
+\item{.mod}{The \verb{bbi_\{.model_type\}_model} object to modify}
 
 \item{.field}{Character scaler of the name of the component to modify}
 
@@ -44,24 +44,47 @@ replace_bbi_args(.mod, .bbi_args)
 
 \item{.unique}{If \code{TRUE}, the default, de-duplicate \code{.mod[[.field]]} after adding new values. If \code{FALSE} duplicate values will be kept.}
 
-\item{.tags}{Character vector of tags use as replacement}
-
 \item{.decisions}{Character vector to use as replacement}
 
-\item{.based_on}{Character vector to use as replacement}
+\item{.based_on}{Character vector of relative paths to add to \code{based_on} field}
 
-\item{.description}{Character scaler to use as replacement}
+\item{.description}{Character scalar to use as replacement for the \code{description} field}
 
 \item{.bbi_args}{named list of arguments to add to the model}
 }
 \description{
-Implementation function for updating fields in a \verb{bbi_\{.model_type\}_model} object
-Also checks the object against the corresponding YAML before modifying (and errors if they are out of sync) and then writes the modified object back to the YAML.
-
-Modifies model object and corresponding YAML by adding new .bbi_args,
-overwriting any args that are already present with the new values.
-Use \code{print_nonmem_args()} to see a list list of valid babylon arguments.
-
-Modifies model object and corresponding YAML by replacing .bbi_args with new .bbi_args
-Use \code{print_nonmem_args()} to see a list list of valid babylon arguments.
+Helper functions for updating fields in a \verb{bbi_\{.model_type\}_model} object.
+Note that calling \code{modify_model_field()} directly is not recommended for most users
+because it requires knowing about the internal structure of the model object.
+Instead we recommend using the friendlier helpers listed below (\code{add_...} or \code{replace_...}) when possible.
 }
+\details{
+All functions in this family also check the object against the corresponding YAML with \code{check_yaml_in_sync()} before modifying it,
+and errors if they are out of sync.
+After the object has been modified they will write the modified object back to the YAML and update the model object in
+memory with an md5 digest of the newly written YAML.
+}
+\section{Functions}{
+\itemize{
+\item \code{add_tags}: Add tags to a model object and corresponding YAML
+
+\item \code{replace_tags}: Replaces tags on a model object and corresponding YAML with new tags
+
+\item \code{add_decisions}: Append new decisions to the one(s) in a model object and corresponding YAML
+
+\item \code{replace_decisions}: Replaces \code{decisions} field in a model object and corresponding YAML with new values
+
+\item \code{add_based_on}: Append new \code{based_on} tag to the one in a model object and corresponding YAML
+
+\item \code{replace_based_on}: Replaces \code{based_on} field in a model object and corresponding YAML with new values
+
+\item \code{replace_description}: Replaces description field in a model object and corresponding YAML with new description
+
+\item \code{add_bbi_args}: Modifies model object and corresponding YAML by adding new \code{bbi_args},
+overwriting any args that are already present with the new values.
+Use \code{print_nonmem_args()} to see a list of valid babylon arguments.
+
+\item \code{replace_bbi_args}: Modifies model object and corresponding YAML by replacing \code{bbi_args} with new list passed to \code{.bbi_args}.
+Use \code{print_nonmem_args()} to see a list of valid babylon arguments.
+}}
+

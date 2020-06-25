@@ -6,7 +6,7 @@
 #'
 #' Submits a model to be run by calling out to `bbi`.
 #' @param .mod The model object to submit. Could be
-#' a `bbi_{.model_type}_object`,
+#' a `bbi_{.model_type}_model ` object,
 #' a file path to a model,
 #' an integer corresponding to a file name of a model.
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.
@@ -195,7 +195,7 @@ submit_nonmem_model <- function(.mod,
 #' The number of `bbi` calls to make is determined by the number of distinct sets of `bbi` arguments passed to the submission calls,
 #' either explicitly through `.bbi_args`, as specified in the `bbi_args` field of the model YAML, or specified globally in `babylon.yml`.
 #' @param .mods The model object to submit. Could be
-#' a list of `bbi_{.model_type}_object` object,
+#' a list of `bbi_{.model_type}_model ` object,
 #' a character vector of file paths to models,
 #' a numeric vector of integers corresponding to a file names of a models.
 #' @inheritParams submit_model
@@ -234,14 +234,7 @@ submit_models.list <- function(
   }
 
   # check that each element is a model object
-  all_models_bool <- map_lgl(.mods, function(.x) { inherits(.x, VALID_MOD_CLASSES) })
-  if (isFALSE(all(all_models_bool))) {
-    losers <- which(!all_models_bool)
-    stop(paste(
-      glue("Passed list must contain only model objects, but found {length(losers)} invalid objects at indices:"),
-      paste(losers, collapse = ", ")
-    ))
-  }
+  check_model_object_list(.mods)
 
   # check that all are the same type of model object
   all_model_types <- map(.mods, function(.x) { .x[[YAML_MOD_TYPE]] })
@@ -366,15 +359,7 @@ submit_nonmem_models <- function(.mods,
   if (!is_bare_list(.mods)) {
     stop(glue("USER SHOULDN'T SEE THIS ERROR: Can only pass a list of bbi_nonmem_model objects to submit_nonmem_models. Passed object of class {paste(class(.mods), collapse = ', ')}"))
   }
-
-  all_models_bool <- map_lgl(.mods, function(.x) { inherits(.x, "bbi_nonmem_model") })
-  if (isFALSE(all(all_models_bool))) {
-    losers <- which(!all_models_bool)
-    stop(paste(
-      glue("USER SHOULDN'T SEE THIS ERROR: Passed list must contain only bbi_nonmem_model objects, but found {length(losers)} invalid objects at indices:"),
-      paste(losers, collapse = ", ")
-    ))
-  }
+  check_model_object_list(.mods, "bbi_nonmem_model")
 
   # check against YAML
   for (.mod in .mods) { check_yaml_in_sync(.mod) }

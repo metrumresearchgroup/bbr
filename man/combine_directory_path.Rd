@@ -12,7 +12,7 @@ combine_directory_path(.directory, .path)
 \item{.path}{Character scaler for the path to the file (could be just the file name, or could be in a subdirectory)}
 }
 \description{
-Concatenates a directory and path, and uses normalizePath() to create an absolute path, with some specific rules:
+Private helper that concatenates a directory and path, and uses normalizePath() to create an absolute path, with some specific rules:
 If .directory is NULL, set to working directory.
 If .path is an absolute path, ignore .directory and just return .path,
 otherwise return \code{file.path(.directory, .path)}.

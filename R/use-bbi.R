@@ -92,9 +92,8 @@ current_release <- function(owner = 'metrumresearchgroup', repo = 'babylon', os 
 
 #' @title Get version number of babylon current release
 #' @description Helper function to get version number of most recent release of babylon from GitHub.
-#' @param os operating system, Default: 'linux'
+#' @param os operating system, Default: `'linux'`
 #' @importFrom stringr str_replace
-#' @rdname bbi_current_release
 #' @export
 bbi_current_release <- function(os = "linux"){
   str_replace(basename(dirname(current_release(owner = 'metrumresearchgroup', repo = 'babylon', os = os))), '^v', '')
@@ -176,7 +175,6 @@ linux_install_commands <- function(.dir, .bbi_url) {
 #' \dontrun{
 #' bbi_version()
 #' }
-#' @rdname bbi_version
 #' @export
 bbi_version <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')){
   bbi_path <- Sys.which(.bbi_exe_path)

@@ -126,27 +126,24 @@ tail_lst.bbi_nonmem_model <- function(.mod, .head = 3, .tail = 5, .print = TRUE,
 }
 
 
+#' Check output directory
+#'
 #' List files in the output directory to glance at where the process is
-#' @param .mod generic res
+#' @param .mod Either a `bbi_{.model_type}_model` object or a file path to an output directory
 #' @param ... values to pass to `fs::dir_ls`
-#' @rdname check_output_dir
 #' @export
 check_output_dir <- function(.mod, ...) {
   UseMethod("check_output_dir")
 }
 
-#' S3 dispatch to list output directory files from a directory path
-#' @param .mod Character scaler of path to output directory
-#' @rdname check_output_dir
+#' @describeIn check_output_dir Takes a file path to the output directory.
 #' @export
 check_output_dir.character <- function(.mod, ...) {
   .out_files <- fs::dir_ls(.mod, ...)
   return(.out_files)
 }
 
-#' S3 dispatch to list output directory files from a `bbi_{.model_type}_model` object
-#' @param .mod The `bbi_{.model_type}_model` object
-#' @rdname check_output_dir
+#' @describeIn check_output_dir Takes a `bbi_{.model_type}_model` object.
 #' @export
 check_output_dir.bbi_nonmem_model <- function(.mod, ...) {
   .output_dir <- .mod %>% get_output_dir()
@@ -155,13 +152,14 @@ check_output_dir.bbi_nonmem_model <- function(.mod, ...) {
 }
 
 
-#' Checks nonmem output file that's a whitespace-delimited file (for instance .grd or .ext)
-#' @param .path Character scalar path to the gradient file
+#' Check NONMEM output files
+#'
+#' Checks a NONMEM output file that's a whitespace-delimited file (for instance .grd or .ext)
+#' @param .path Character scalar path to the file
 #' @param .x_var name of variable to filter with `.x_floor`
 #' @param .x_floor Filters file to only rows with `.x_var` GREATER THAN this value.
 #' @importFrom readr read_table2 cols
 #' @importFrom dplyr filter
-#' @rdname check_nonmem_table_output
 #' @export
 check_nonmem_table_output <- function(
   .path,
@@ -180,14 +178,15 @@ check_nonmem_table_output <- function(
 }
 
 
-#' Creates a line plot of the wide-format tibble output from check_nonmem_table_output
-#' @param .df the wide-format tibble output from check_nonmem_table_output
-#' @param .x_var Character scaler for the variable name to use on the X-axis
-#' @param .stat_name Character scaler for the name of the stat the other columns represents (like "gradient" or "theta").
+#' Plot NONMEM output files
+#'
+#' Creates a line plot of the wide-format tibble output from `check_nonmem_table_output()`
+#' @param .df the wide-format tibble output from `check_nonmem_table_output()`
+#' @param .x_var String of the variable name to use on the X-axis
+#' @param .stat_name String of the name of the stat the other columns represents (like "gradient" or "theta").
 #' @importFrom tidyr gather
 #' @importFrom ggplot2 ggplot aes geom_line xlab ylab scale_colour_discrete ggtitle
 #' @importFrom forcats fct_inorder
-#' @rdname plot_nonmem_table_df
 #' @export
 plot_nonmem_table_df <- function(.df, .x_var, .stat_name) {
   p <- .df %>% gather("stat", "value", -.data[[.x_var]]) %>%
@@ -200,19 +199,16 @@ plot_nonmem_table_df <- function(.df, .x_var, .stat_name) {
 
 # wrappers to interact with .grd files easily
 
-#' S3 generic for checking grd file
-#' @param .mod generic input
+#' @rdname check_nonmem_table_output
+#' @param .mod Model to check. Either a `bbi_nonmem_model` object or a file path.
 #' @param .iter_floor Filters file to only rows with `ITERATION` GREATER THAN this value.
 #' @export
-#' @rdname check_nonmem_table_output
 check_grd <- function(.mod, .iter_floor = 0) {
   UseMethod("check_grd")
 }
 
-#' S3 dispatch for checking grd file
-#' @param .mod Path to file
+#' @describeIn check_nonmem_table_output Checks .grd file from a file path
 #' @export
-#' @rdname check_nonmem_table_output
 check_grd.character <- function(.mod, .iter_floor = 0) {
   # if model path passed, construct path
   if (tools::file_ext(.mod) != "grd") {
@@ -223,20 +219,16 @@ check_grd.character <- function(.mod, .iter_floor = 0) {
   return(df)
 }
 
-#' S3 dispatch for checking grd file
-#' @param .mod `bbi_nonmem_model` object
+#' @describeIn check_nonmem_table_output Checks .grd file from a `bbi_nonmem_model`
 #' @export
-#' @rdname check_nonmem_table_output
 check_grd.bbi_nonmem_model <- function(.mod, .iter_floor = 0) {
   grd_path <- build_path_from_mod_obj(.mod, "grd")
   df <- check_nonmem_table_output(grd_path, .x_var = "ITERATION", .x_floor = .iter_floor)
   return(df)
 }
 
-#' S3 dispatch for plotting grd file
-#' @param .df tibble from from check_grd() output
+#' @describeIn plot_nonmem_table_df Plot the .grd file
 #' @export
-#' @rdname plot_nonmem_table_df
 plot_grd <- function(.df) {
   plot_nonmem_table_df(.df, .x_var = "ITERATION", .stat_name = "GRADIENT")
 }
@@ -244,19 +236,16 @@ plot_grd <- function(.df) {
 
 # wrappers to interact with .ext files easily
 
-#' S3 generic for checking ext file
-#' @param .mod generic input
+#' @rdname check_nonmem_table_output
+#' @param .mod Model to check. Either a `bbi_nonmem_model` object or a file path.
 #' @param .iter_floor Filters file to only rows with `ITERATION` GREATER THAN this value.
 #' @export
-#' @rdname check_nonmem_table_output
 check_ext <- function(.mod, .iter_floor = 0) {
   UseMethod("check_ext")
 }
 
-#' S3 dispatch for checking ext file
-#' @param .mod path to ext file
+#' @describeIn check_nonmem_table_output Checks .ext file from a file path
 #' @export
-#' @rdname check_nonmem_table_output
 check_ext.character <- function(.mod, .iter_floor = 0) {
   # if model path passed, construct path
   if (tools::file_ext(.mod) != "ext") {
@@ -267,22 +256,18 @@ check_ext.character <- function(.mod, .iter_floor = 0) {
   return(df)
 }
 
-#' S3 dispatch for checking ext file
-#' @param .mod `bbi_nonmem_model` object
+#' @describeIn check_nonmem_table_output Checks .ext file from a `bbi_nonmem_model` object
 #' @export
-#' @rdname check_nonmem_table_output
 check_ext.bbi_nonmem_model <- function(.mod, .iter_floor = 0) {
   ext_path <- build_path_from_mod_obj(.mod, "ext")
   df <- check_nonmem_table_output(ext_path, .x_var = "ITERATION", .x_floor = .iter_floor)
   return(df)
 }
 
-#' S3 dispatch for plotting ext file
-#' @param .df tibble from from check_ext() output
+#' @describeIn plot_nonmem_table_df Plot the .ext file
 #' @export
-#' @rdname plot_nonmem_table_df
 plot_ext <- function(.df) {
-  plot_nonmem_table_df(.df, .x_var = "ITERATION", .stat_name = "GRADIENT")
+  plot_nonmem_table_df(.df, .x_var = "ITERATION", .stat_name = "PARAMETER")
 }
 
 

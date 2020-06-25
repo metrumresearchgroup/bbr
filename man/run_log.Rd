@@ -7,14 +7,18 @@
 run_log(.base_dir = get_model_directory(), .recurse = TRUE)
 }
 \arguments{
-\item{.base_dir}{Directory to search for model yaml files. Only runs with a corresponding yaml will be included.}
+\item{.base_dir}{Directory to search for model YAML files. Only runs with a corresponding YAML will be included.}
 
 \item{.recurse}{If \code{TRUE}, the default, search recursively in subdirectories.}
 }
 \value{
-tibble with information on each run
+A tibble of class \code{bbi_run_log_df} with information on each model.
 }
 \description{
-Parses all model yaml and outputs into a tibble that serves as a run log for the project.
+Parses all model YAML files and outputs into a tibble that serves as a run log for the project.
 Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
+Users can also use \code{add_config()} to append additional output about the model run.
+}
+\seealso{
+\code{add_config()}
 }

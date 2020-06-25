@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Builds list of unique parameter sets for multiple model bbi calls — build_bbi_param_list • rbabylon</title>
+<title>Private helper to check if an object inherits a model class and error if not — check_model_object • rbabylon</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,8 @@
 
 
 
-<meta property="og:title" content="Builds list of unique parameter sets for multiple model bbi calls — build_bbi_param_list" />
-<meta property="og:description" content="Builds list of unique parameter sets for multiple model bbi calls" />
+<meta property="og:title" content="Private helper to check if an object inherits a model class and error if not — check_model_object" />
+<meta property="og:description" content="Private helper to check if an object inherits a model class and error if not" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -123,27 +123,27 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Builds list of unique parameter sets for multiple model bbi calls</h1>
+    <h1>Private helper to check if an object inherits a model class and error if not</h1>
     
-    <div class="hidden name"><code>build_bbi_param_list.Rd</code></div>
+    <div class="hidden name"><code>check_model_object.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Builds list of unique parameter sets for multiple model bbi calls</p>
+    <p>Private helper to check if an object inherits a model class and error if not</p>
     </div>
 
-    <pre class="usage"><span class='fu'>build_bbi_param_list</span>(<span class='no'>.mods</span>, <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>check_model_object</span>(<span class='no'>.mod</span>, <span class='kw'>.mod_types</span> <span class='kw'>=</span> <span class='no'>VALID_MOD_CLASSES</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>.mods</th>
-      <td><p>a list containing only <code>bbi_{.model_type}_model</code> objects</p></td>
+      <th>.mod</th>
+      <td><p>The object to check</p></td>
     </tr>
     <tr>
-      <th>.bbi_args</th>
-      <td><p>A named list specifying arguments to pass to babylon. This will over-ride any shared arguments from the model objects.</p></td>
+      <th>.mod_types</th>
+      <td><p>Character vector of acceptable classes, defaulting to <code>VALID_MOD_CLASSES</code></p></td>
     </tr>
     </table>
 

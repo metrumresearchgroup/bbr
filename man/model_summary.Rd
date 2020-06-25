@@ -44,7 +44,7 @@ model_summary(
 )
 }
 \arguments{
-\item{.mod}{Model to summarize. Can be a \verb{bbi_\{.model_type\}_object}, a file path, or an integer corresponding to a file path.}
+\item{.mod}{Model to summarize. Can be a \verb{bbi_\{.model_type\}_model} object, a file path, or an integer corresponding to a file path.}
 
 \item{.model_type}{String specifying the type of model, either 'nonmem' or 'stan'.  \strong{Only used when passing a path for \code{.mod} instead of a \verb{bbi_\{.model_type\}_model} object.}}
 
