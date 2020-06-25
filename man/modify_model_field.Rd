@@ -44,6 +44,8 @@ replace_bbi_args(.mod, .bbi_args)
 
 \item{.unique}{If \code{TRUE}, the default, de-duplicate \code{.mod[[.field]]} after adding new values. If \code{FALSE} duplicate values will be kept.}
 
+\item{.tags}{Character vector to add to \code{tags} field}
+
 \item{.decisions}{Character vector to use as replacement}
 
 \item{.based_on}{Character vector of relative paths to add to \code{based_on} field}

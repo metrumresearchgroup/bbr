@@ -48,7 +48,7 @@ modify_model_field <- function(.mod, .field, .value, .append = TRUE, .unique = T
 }
 
 #' @describeIn modify_model_field Add tags to a model object and corresponding YAML
-#' @param .decisions Character vector to add to `tags` field
+#' @param .tags Character vector to add to `tags` field
 #' @export
 add_tags <- function(.mod, .tags) {
   .mod <- modify_model_field(.mod = .mod,
