@@ -68,7 +68,7 @@ current_release <- function(owner = 'metrumresearchgroup', repo = 'babylon', os 
 
   release_info <- tryCatch(
     {
-      jsonlite::fromJSON(glue('https://api.github.com/repos/{owner}/{repo}/releases/latest'), simplifyDataFrame = FALSE)
+      jsonlite::fromJSON(glue('https://api.github.com/repos/{owner}/{repo}/releases/latest'), simplifyDataFrame = FALSE) # this uses curl under the hood
     },
     error = function(e) {
       if (str_detect(e$message, "HTTP error 403")) {

@@ -6,7 +6,7 @@
 #' @param by if less than this number of requests are left before hitting the rate limit, skip the test
 skip_if_over_rate_limit <- function(by = 5) {
 
-  res <- jsonlite::fromJSON("https://api.github.com/rate_limit", simplifyDataFrame = FALSE)
+  res <- jsonlite::fromJSON("https://api.github.com/rate_limit", simplifyDataFrame = FALSE) # this uses curl under the hood
 
   res <- res$rate$remaining
 
