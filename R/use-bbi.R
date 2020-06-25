@@ -55,20 +55,21 @@ use_bbi <- function(.dir = "/data/apps", .version = "latest", .force = FALSE, .q
 
 #' Private helper function to most recent release version from repo
 #' @importFrom stringr str_detect
-#' @importFrom jsonlite read_json
+#' @importFrom jsonlite fromJSON
 #' @importFrom glue glue
+#' @importFrom utils download.file
 #' @param owner Repository owner/organization
 #' @param repo Repository name
 #' @param os Operating system user intends to install on
 current_release <- function(owner = 'metrumresearchgroup', repo = 'babylon', os = c('linux','darwin','windows')){
 
-  tf <- tempfile(fileext = '.json')
+  tmp <- tempfile(fileext = '.json')
 
-  on.exit(unlink(tf),add = TRUE)
+  on.exit(unlink(tmp),add = TRUE)
 
-  release_info <- tryCatch(
+  tryCatch(
     {
-      jsonlite::fromJSON(glue('https://api.github.com/repos/{owner}/{repo}/releases/latest'), simplifyDataFrame = FALSE) # this uses curl under the hood
+      download.file(glue('https://api.github.com/repos/{owner}/{repo}/releases/latest'), destfile = tmp, quiet = TRUE)
     },
     error = function(e) {
       if (str_detect(e$message, "HTTP error 403")) {
@@ -76,6 +77,8 @@ current_release <- function(owner = 'metrumresearchgroup', repo = 'babylon', os 
       }
     }
   )
+
+  release_info <- jsonlite::fromJSON(tmp, simplifyDataFrame = FALSE)
 
   uris <- grep('gz$',sapply(release_info$assets,function(x) x$browser_download_url),value = TRUE)
   uris <- uris[grepl(x = uris, pattern = "amd64", fixed = TRUE)]
