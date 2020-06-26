@@ -1,7 +1,8 @@
 .onLoad <- function(libname, pkgname) {
 
   # set bbi minimum version
-  options("rbabylon.bbi_min_version" = parse_description_version_spec("../DESCRIPTION", "SystemRequirements", "babylon"))
+  .dir <- stringr::str_replace(getwd(), "rbabylon/?.*", "rbabylon")
+  options("rbabylon.bbi_min_version" = parse_description_version_spec(file.path(.dir, "DESCRIPTION"), "SystemRequirements", "babylon"))
 
   # set bbi executable path
   if (is.null(getOption("rbabylon.bbi_exe_path"))) {
