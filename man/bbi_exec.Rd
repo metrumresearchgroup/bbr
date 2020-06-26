@@ -28,3 +28,4 @@ An S3 object of class `babylon_process`
 \description{
 Executes a babylon call (`bbi ...`) with processx::process$new()
 }
+\keyword{internal}

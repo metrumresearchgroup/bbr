@@ -23,7 +23,7 @@ NULL
 #'         cmd_args -- character vector of all command arguments passed to the process.
 #'         working_dir -- the directory the command was run in, passed through from .dir argument.
 #' @importFrom processx process
-#' @export
+#' @keywords internal
 bbi_exec <- function(.cmd_args, .dir = ".", .verbose = FALSE, .wait = FALSE, ...) {
   bbi_exe_path <- getOption("rbabylon.bbi_exe_path")
   check_bbi_exe(bbi_exe_path)
