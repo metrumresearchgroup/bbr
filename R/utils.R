@@ -335,6 +335,20 @@ find_config_file_path <- function(.config_path, .model_dir) {
 }
 
 
+#' Parsing specified version number of a package from the DESCRIPTION file
+#' @param .file path to DESCRIPTION file
+#' @param .field Field to parse from, i.e. `"SystemRequirements"` or `"Imports"` etc.
+#' @param .package The name of the package that you are parsing a version for
+#' @importFrom stringr str_split str_subset str_replace_all
+#' @keywords internal
+parse_description_version_spec <- function(.file, .field, .package) {
+  sys_req <- read.dcf(.file, fields = .field)
+  sys_req <- unlist(str_split(sys_req, "\n"))
+  pkg_string <- str_subset(sys_req, paste0("^", .package))
+  version_string <- str_replace_all(pkg_string, "[^\\d\\.]", "")
+  return(package_version(version_string))
+}
+
 ############################
 # Error handlers
 ############################

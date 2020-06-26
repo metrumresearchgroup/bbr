@@ -1,4 +1,5 @@
 # reference character vectors for checking the contents of output files
+BBI_CONSTRAINT_REF <- package_version("2.2.0")
 
 # lists for combining and merging
 LIST1 <- list(naw=4, paw=6)

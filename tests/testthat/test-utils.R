@@ -287,3 +287,38 @@ tryCatch(
   }
 )
 
+
+TEST_CASES <- list(
+  list(.test = "single",  .input = "SystemRequirements: babylon (>= 2.2.0)"),
+  list(.test = "first",   .input = "SystemRequirements: \n    babylon (>= 2.2.0),\n    something (>= 1.1.0)"),
+  list(.test = "last",    .input = "SystemRequirements: \n    something (>= 1.1.0),\n    babylon (>= 2.2.0)"),
+  list(.test = "middle",  .input = "SystemRequirements: \n    something (>= 1.1.0),\n    babylon (>= 2.2.0),\n    else (>= 0.1.1)")
+)
+tmp_file <- file.path(tempdir(), "parse_description_version_spec_REF")
+for (.tc in TEST_CASES) {
+  test_that(paste("parse_description_version_spec works correctly", .tc$.test), {
+    on.exit({
+      rm(res)
+      fs::file_delete(tmp_file)
+    })
+    readr::write_file(.tc$.input, tmp_file)
+    res <- parse_description_version_spec(tmp_file, "SystemRequirements", "babylon")
+    expect_equal(res, BBI_CONSTRAINT_REF)
+  })
+}
+
+test_that("parse_description_version_spec works correctly other", {
+  on.exit({
+    rm(res)
+    fs::file_delete(tmp_file)
+  })
+  readr::write_file("Imports:  \n    something (>= 1.1.0),\n    babylon (>= 2.2.0),\n    else (>= 0.1.1),\n    other (>= 1.1.0)", tmp_file)
+  res <- parse_description_version_spec(tmp_file, "Imports", "other")
+  expect_equal(res, package_version("1.1.0"))
+})
+
+test_that("bbi version constraint is parsed correctly from DESCRIPTION", {
+  res <- parse_description_version_spec("../../DESCRIPTION", "SystemRequirements", "babylon")
+  expect_equal(res, BBI_CONSTRAINT_REF)
+  expect_equal(getOption("rbabylon.bbi_min_version"), BBI_CONSTRAINT_REF)
+})
