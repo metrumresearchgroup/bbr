@@ -15,7 +15,7 @@ build_path_from_mod_obj <- function(.mod, .extension) {
 #'
 #' Reads the head and tail of specified file and prints it the console and/or returns it as a character vector.
 #' This is called internally in several S3 methods described below.
-#' @param .file Character scaler of path to file to read
+#' @param .file Character scalar of path to file to read
 #' @param .head Integer for number of lines to read from the top of the file
 #' @param .tail Integer for number of lines to read from the bottom of the file
 #' @param .print If `TRUE`, the default, print resulting head and tail to console.

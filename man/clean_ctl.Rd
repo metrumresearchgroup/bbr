@@ -7,7 +7,7 @@
 clean_ctl(x)
 }
 \arguments{
-\item{x}{control stream as a character scaler with lines separated by newline characters}
+\item{x}{control stream as a character scalar with lines separated by newline characters}
 }
 \description{
 Taken directly from tidynm package.

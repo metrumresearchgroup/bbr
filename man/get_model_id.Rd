@@ -16,7 +16,7 @@ get_model_id(.mod)
 \item{.mod}{Model to use, either a \verb{bbi_\{.model_type\}_model} or file path to a model.}
 }
 \value{
-Character scaler with only model identifier
+Character scalar with only model identifier
 }
 \description{
 Helper to strip path and extension from model file to get only model identifier

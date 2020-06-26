@@ -367,9 +367,9 @@ strict_mode_error <- function(err_msg) {
 #' Build error message and throw error for passing character vector to get_... functions
 #' @param .len The length of the vector that was passed.
 #' @keywords internal
-stop_get_scaler_msg <- function(.len) {
+stop_get_scalar_msg <- function(.len) {
   stop(paste(
-    glue("When passing character input to `rbabylon::get_...` functions, only scaler values are permitted. A vector of length {.len} was passed."),
+    glue("When passing character input to `rbabylon::get_...` functions, only scalar values are permitted. A vector of length {.len} was passed."),
     "Consider instead passing the tibble output from `run_log()`, or iterating with something like `purrr::map(your_vector, ~ get_...(.x)`"
   ))
 }
@@ -377,7 +377,7 @@ stop_get_scaler_msg <- function(.len) {
 #' Build error message and throw error for generic failure fo get_... functions
 #' @param .bbi_object The object that something is attempting to be extracted from
 #' @param .key The name of the field that is attempting to be extracted
-#' @param .msg Character scaler or vector of more specific error messages to include at the end
+#' @param .msg Character scalar or vector of more specific error messages to include at the end
 #' @keywords internal
 stop_get_fail_msg <- function(.bbi_object, .key, .msg = "") {
   stop(glue("Cannot extract `{.key}` from object of class `{paste(class(.bbi_object), collapse = ', ')}` :\n{paste(.msg, collapse = ', ')}"), call. = FALSE)

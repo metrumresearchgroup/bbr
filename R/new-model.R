@@ -10,10 +10,10 @@
 #' @param .yaml_path Path to save resulting model YAML file to. MUST be either an absolute path, or a path relative to the `.directory` argument.
 #' @param .description Description of new model run. This will be stored in the yaml (and can be viewed later in `run_log()`). By convention, it should match the $PROBLEM statement in the control stream, but this is not enforced.
 #' @param .model_path Path to model (control stream) file. MUST be an absolute path, or the model path relative to the location of the YAML file. It recommended for the control stream and YAML to be in the same directory. If nothing is passed, the function will look for a file with the same path/name as your YAML, but with either .ctl or .mod extension.
-#' @param .based_on Character scaler or vector of paths to other models that this model was "based on." These are used to reconstuct model developement and ancestry. \strong{Paths must be relative to `.new_model` path.}
-#' @param .tags A character scaler or vector with any user tags to be added to the YAML file
+#' @param .based_on Character scalar or vector of paths to other models that this model was "based on." These are used to reconstuct model developement and ancestry. \strong{Paths must be relative to `.new_model` path.}
+#' @param .tags A character scalar or vector with any user tags to be added to the YAML file
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments. These will be written into YAML file.
-#' @param .model_type Character scaler to specify type of model being created (used for S3 class). Currently only `'nonmem'` is supported.
+#' @param .model_type Character scalar to specify type of model being created (used for S3 class). Currently only `'nonmem'` is supported.
 #' @param .directory Model directory which `.yaml_path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
 #' @importFrom yaml write_yaml
 #' @importFrom fs file_exists
@@ -123,7 +123,7 @@ read_model <- function(
 
 #' Saves a model model object to a yaml file
 #' @param .mod S3 object of class `bbi_{.model_type}_model`
-#' @param .out_path Character scaler with path to save out YAML file. By default, sets it to the model file name, with a yaml extension.
+#' @param .out_path Character scalar with path to save out YAML file. By default, sets it to the model file name, with a yaml extension.
 #' @importFrom yaml write_yaml
 #' @importFrom fs file_exists
 #' @importFrom purrr compact
@@ -141,7 +141,7 @@ save_model_yaml <- function(.mod, .out_path = NULL) {
   }
 
   # convert keys that need to be coerced to arrays
-  for (.key in YAML_SCALER_TO_LIST_KEYS) {
+  for (.key in YAML_SCALAR_TO_LIST_KEYS) {
     if (length(.mod[[.key]]) == 1) {
       .mod[[.key]] <- (list(.mod[[.key]]))
     }

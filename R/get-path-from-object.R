@@ -45,7 +45,7 @@ get_path_from_object.default <- function(.bbi_object, .key, .check_exists = TRUE
     stop_get_fail_msg(
       .bbi_object,
       .key,
-      glue("Expected a scaler value for `.bbi_object[['{.key}']]` but instead got {class(.bbi_object[[.key]])[1]} of length {length(.bbi_object[[.key]])}")
+      glue("Expected a scalar value for `.bbi_object[['{.key}']]` but instead got {class(.bbi_object[[.key]])[1]} of length {length(.bbi_object[[.key]])}")
     )
   }
 
@@ -70,7 +70,7 @@ get_path_from_object.default <- function(.bbi_object, .key, .check_exists = TRUE
 get_path_from_object.character <- function(.bbi_object, .key, .check_exists = TRUE) {
 
   if (length(.bbi_object) > 1) {
-    stop_get_scaler_msg(length(.bbi_object))
+    stop_get_scalar_msg(length(.bbi_object))
   }
 
   .bbi_object <- tryCatch(
@@ -182,7 +182,7 @@ yml_ext <- function(.x) {
 #' (i.e. the model file name without extension)
 #' @param .mod Model to use, either a `bbi_{.model_type}_model` or file path to a model.
 #' @importFrom tools file_path_sans_ext
-#' @returns Character scaler with only model identifier
+#' @returns Character scalar with only model identifier
 #' @export
 get_model_id <- function(.mod) {
   UseMethod("get_model_id")
@@ -207,8 +207,8 @@ get_model_id.bbi_nonmem_model <- function(.mod) {
 #' If .path is an absolute path, ignore .directory and just return .path,
 #' otherwise return `file.path(.directory, .path)`.
 #' Also NOTE that `.directory` must point an already existing directory so that the absolute path can be reliably built.
-#' @param .directory Character scaler for the directory
-#' @param .path Character scaler for the path to the file (could be just the file name, or could be in a subdirectory)
+#' @param .directory Character scalar for the directory
+#' @param .path Character scalar for the path to the file (could be just the file name, or could be in a subdirectory)
 #' @keywords internal
 combine_directory_path <- function(.directory, .path) {
   # If .directory is NULL, set to working directory

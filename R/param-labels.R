@@ -66,14 +66,14 @@ param_labels.bbi_nonmem_model <- function(.mod, ...) {
   return(.label_df)
 }
 
-#' @describeIn param_labels Takes a character scaler of the raw control stream with newline character separating lines
+#' @describeIn param_labels Takes a character scalar of the raw control stream with newline character separating lines
 #' @importFrom tidyr replace_na
 #' @importFrom dplyr select everything
 #' @importFrom purrr map_df
 #' @export
 param_labels.character <- function(.mod, ...) {
   if(length(.mod) != 1) {
-    stop(glue("param_labels() takes a character scaler of the raw control stream with newline character separating lines. A vector of length {length(.mod)} was passed."))
+    stop(glue("param_labels() takes a character scalar of the raw control stream with newline character separating lines. A vector of length {length(.mod)} was passed."))
   }
 
   .ctl_clean <- clean_ctl(.mod)
@@ -331,7 +331,7 @@ build_matrix_indices <- function(.is_diag) {
 #' Parse control stream to a named list of the blocks
 #'
 #' Taken directly from tidynm package.
-#' @param x control stream as a character scaler with lines separated by newline characters
+#' @param x control stream as a character scalar with lines separated by newline characters
 #' @importFrom purrr set_names
 #' @keywords internal
 clean_ctl <- function(x){

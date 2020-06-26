@@ -23,7 +23,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
   test_that("get_path_from_object.character() fails with vector", {
-    expect_error(get_path_from_object(c("naw", "dawg") , YAML_MOD_PATH), regexp = "only scaler values are permitted")
+    expect_error(get_path_from_object(c("naw", "dawg") , YAML_MOD_PATH), regexp = "only scalar values are permitted")
   })
 
   test_that("get_path_from_object.character() .check_exists works", {
@@ -79,7 +79,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   test_that("get_path_from_object() errors on vector field", {
     .test_list <- list(naw = c(1,2))
     .test_list[[WORKING_DIR]] <- "/fake/path"
-    expect_error(get_path_from_object(.test_list, "naw"), regexp = "Expected a scaler value")
+    expect_error(get_path_from_object(.test_list, "naw"), regexp = "Expected a scalar value")
   })
 
   test_that("get_path_from_object() errors on fake path", {

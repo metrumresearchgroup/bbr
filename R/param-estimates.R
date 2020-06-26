@@ -53,7 +53,6 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
     ) %>%
     tibble::as_tibble()
 
-  # create logical column for whether each row is a diagonal
   param_df[["diag"]] <- map_lgl(param_df[["names"]], is_diag)
 
   return(param_df)
@@ -62,7 +61,7 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
 #' Check if diagonal index or not
 #'
 #' Private helper to unpack an matrix index string like '(3,3)' is for a diagonal (i.e. if the numbers are the same)
-#' @param .name A character scaler containing an index string
+#' @param .name A character scalar containing an index string
 #' @importFrom stringr str_replace_all str_split
 #' @keywords internal
 is_diag <- function(.name) {

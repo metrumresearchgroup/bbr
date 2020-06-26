@@ -81,7 +81,7 @@ create_model_object <- function(.mod_list) {
 
 #' @describeIn create_bbi_object Create list object of `bbi_{.model_type}_summary` class, first checking that all the required keys are present.
 #' @param res List to attempt to assign the class to
-#' @param .model_type Character scaler of a valid model type (currently either `nonmem` or `stan`)
+#' @param .model_type Character scalar of a valid model type (currently either `nonmem` or `stan`)
 #' @keywords internal
 create_summary_object <- function(res, .model_type = SUPPORTED_MOD_TYPES) {
 

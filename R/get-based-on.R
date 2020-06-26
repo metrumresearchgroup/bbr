@@ -62,12 +62,12 @@ get_based_on.default <- function(.bbi_object, .check_exists = FALSE) {
   return(as.character(fs::path_norm(file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_BASED_ON]]))))
 }
 
-#' @describeIn get_based_on Takes a character scaler of a path to a model that can be loaded with `read_model(.bbi_object)`.
+#' @describeIn get_based_on Takes a character scalar of a path to a model that can be loaded with `read_model(.bbi_object)`.
 #' @export
 get_based_on.character <- function(.bbi_object, .check_exists = FALSE) {
 
   if (length(.bbi_object) > 1) {
-    stop_get_scaler_msg(length(.bbi_object))
+    stop_get_scalar_msg(length(.bbi_object))
   }
 
   .bbi_object <- tryCatch(
@@ -148,7 +148,7 @@ get_model_ancestry.default <- function(.bbi_object) {
 get_model_ancestry.character <- function(.bbi_object) {
 
   if (length(.bbi_object) > 1) {
-    stop_get_scaler_msg(length(.bbi_object))
+    stop_get_scalar_msg(length(.bbi_object))
   }
 
   .bbi_object <- tryCatch(

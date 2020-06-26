@@ -60,7 +60,7 @@ As long as the YAML has not moved since it was read into memory, these paths wil
 \item \code{default}: The default method attempts to extract the path from any object passed to it,
 but is designed for a list of class \verb{bbi_\{.model_type\}_model} or something similar.
 
-\item \code{character}: Takes a character scaler of a path to a model that can be loaded with \code{read_model(.bbi_object)}.
+\item \code{character}: Takes a character scalar of a path to a model that can be loaded with \code{read_model(.bbi_object)}.
 
 \item \code{bbi_run_log_df}: Takes a tibble of class \code{bbi_run_log_df} and returns a list containing one character vector of paths for each row of the tibble.
 }}

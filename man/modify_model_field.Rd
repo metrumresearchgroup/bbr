@@ -36,7 +36,7 @@ replace_bbi_args(.mod, .bbi_args)
 \arguments{
 \item{.mod}{The \verb{bbi_\{.model_type\}_model} object to modify}
 
-\item{.field}{Character scaler of the name of the component to modify}
+\item{.field}{Character scalar of the name of the component to modify}
 
 \item{.value}{Whatever is to be added to \code{.mod[[.field]]}, typically a character vector}
 

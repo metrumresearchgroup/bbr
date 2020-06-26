@@ -19,7 +19,7 @@ NULL
 #' @return An S3 object of class `babylon_process`
 #'         process -- The process object (see ?processx::process$new for more details on what you can do with this).
 #'         stdout -- the stdout and stderr from the process, if `.wait = TRUE`. If `.wait = FALSE` this will be NULL.
-#'         bbi -- character scaler with the execution path used for bbi.
+#'         bbi -- character scalar with the execution path used for bbi.
 #'         cmd_args -- character vector of all command arguments passed to the process.
 #'         working_dir -- the directory the command was run in, passed through from .dir argument.
 #' @importFrom processx process
@@ -136,7 +136,7 @@ check_bbi_version_constraint <- function(.bbi_exe_path = getOption('rbabylon.bbi
 #' @importFrom stringr str_detect
 #' @export
 check_status_code <- function(.status_code, .output, .cmd_args) {
-  # consolidate output to a scaler
+  # consolidate output to a scalar
   .output <- paste(.output, collapse = "\n")
 
   .custom_msg <- ""
@@ -175,7 +175,7 @@ bbi_help <- function(.cmd_args=NULL) {
 #' Executes (`bbi init`) with bbi_exec() in specified directory
 #' @param .dir Path to directory to run `init` in (and put the resulting `babylon.yml` file)
 #' @param .nonmem_dir Path to directory with the NONMEM installation.
-#' @param .nonmem_version Character scaler for default version of NONMEM to use. If left NULL, function will exit and tell you which versions were found in `.nonmem_dir`
+#' @param .nonmem_version Character scalar for default version of NONMEM to use. If left NULL, function will exit and tell you which versions were found in `.nonmem_dir`
 #' @param .no_default_version If `TRUE`, force creation of babylon.yaml with **no default NONMEM version**. `FALSE` by default, and using `TRUE` is *not* encouraged.
 #' @importFrom yaml read_yaml write_yaml
 #' @export

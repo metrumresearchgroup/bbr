@@ -11,7 +11,7 @@ stop_get_fail_msg(.bbi_object, .key, .msg = "")
 
 \item{.key}{The name of the field that is attempting to be extracted}
 
-\item{.msg}{Character scaler or vector of more specific error messages to include at the end}
+\item{.msg}{Character scalar or vector of more specific error messages to include at the end}
 }
 \description{
 Build error message and throw error for generic failure fo get_... functions

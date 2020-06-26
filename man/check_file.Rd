@@ -25,7 +25,7 @@ tail_lst(.mod, ...)
 \method{tail_lst}{bbi_nonmem_model}(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE, ...)
 }
 \arguments{
-\item{.file}{Character scaler of path to file to read}
+\item{.file}{Character scalar of path to file to read}
 
 \item{.head}{Integer for number of lines to read from the top of the file}
 

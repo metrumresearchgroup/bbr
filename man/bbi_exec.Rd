@@ -21,7 +21,7 @@ bbi_exec(.cmd_args, .dir = ".", .verbose = FALSE, .wait = FALSE, ...)
 An S3 object of class \code{babylon_process}
 process -- The process object (see ?processx::process$new for more details on what you can do with this).
 stdout -- the stdout and stderr from the process, if \code{.wait = TRUE}. If \code{.wait = FALSE} this will be NULL.
-bbi -- character scaler with the execution path used for bbi.
+bbi -- character scalar with the execution path used for bbi.
 cmd_args -- character vector of all command arguments passed to the process.
 working_dir -- the directory the command was run in, passed through from .dir argument.
 }

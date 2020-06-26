@@ -21,7 +21,7 @@ create_run_log_object(log_df)
 
 \item{res}{List to attempt to assign the class to}
 
-\item{.model_type}{Character scaler of a valid model type (currently either \code{nonmem} or \code{stan})}
+\item{.model_type}{Character scalar of a valid model type (currently either \code{nonmem} or \code{stan})}
 
 \item{log_df}{data.frame or tibble to attempt to assign the class to}
 }

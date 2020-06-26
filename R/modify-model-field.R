@@ -16,7 +16,7 @@
 #' memory with an md5 digest of the newly written YAML.
 #' @importFrom digest digest
 #' @param .mod The `bbi_{.model_type}_model` object to modify
-#' @param .field Character scaler of the name of the component to modify
+#' @param .field Character scalar of the name of the component to modify
 #' @param .value Whatever is to be added to `.mod[[.field]]`, typically a character vector
 #' @param .append If `TRUE`, the default, concatenate new values with currently present values. If `FALSE`, new values will overwrite old values.
 #' @param .unique If `TRUE`, the default, de-duplicate `.mod[[.field]]` after adding new values. If `FALSE` duplicate values will be kept.
@@ -179,7 +179,7 @@ replace_bbi_args <- function(.mod, .bbi_args) {
 #' @importFrom fs file_exists is_absolute_path path_rel
 #' @importFrom purrr map_lgl
 #' @param .start The directory of the model (i.e. the YAML file) that the `based_on` will be added to.
-#' @param .based_on Character vector or scaler of paths (with or without extension) to the models that will be added to `based_on`. Paths should be relative to `.start` argument.
+#' @param .based_on Character vector or scalar of paths (with or without extension) to the models that will be added to `based_on`. Paths should be relative to `.start` argument.
 #' @keywords internal
 safe_based_on <- function(.start, .based_on) {
   # make all input paths relative to .start
