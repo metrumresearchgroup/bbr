@@ -2,7 +2,7 @@
 % Please edit documentation in R/rbabylon.R
 \name{bbi_exec}
 \alias{bbi_exec}
-\title{Executes a babylon call (\verb{bbi ...}) with processx::process$new()}
+\title{Execute call to bbi}
 \usage{
 bbi_exec(.cmd_args, .dir = ".", .verbose = FALSE, .wait = FALSE, ...)
 }
@@ -26,5 +26,6 @@ cmd_args -- character vector of all command arguments passed to the process.
 working_dir -- the directory the command was run in, passed through from .dir argument.
 }
 \description{
-Executes a babylon call (\verb{bbi ...}) with processx::process$new()
+Private implementation function that executes a babylon call (\verb{bbi ...}) with processx::process$new()
 }
+\keyword{internal}

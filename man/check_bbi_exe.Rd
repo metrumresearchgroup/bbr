@@ -12,3 +12,4 @@ check_bbi_exe(.bbi_exe_path)
 \description{
 Checks that a bbi binary is present at the path passed to .bbi_exe_path
 }
+\keyword{internal}

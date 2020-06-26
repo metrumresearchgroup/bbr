@@ -10,7 +10,9 @@
 NULL
 
 
-#' Executes a babylon call (`bbi ...`) with processx::process$new()
+#' Execute call to bbi
+#'
+#' Private implementation function that executes a babylon call (`bbi ...`) with processx::process$new()
 #' @param .cmd_args A character vector of command line arguments for the execution call
 #' @param .dir The working directory to run command in. Defaults to "."
 #' @param .verbose Print stdout and stderr as process runs #### NOT IMPLEMENTED?
@@ -23,7 +25,7 @@ NULL
 #'         cmd_args -- character vector of all command arguments passed to the process.
 #'         working_dir -- the directory the command was run in, passed through from .dir argument.
 #' @importFrom processx process
-#' @export
+#' @keywords internal
 bbi_exec <- function(.cmd_args, .dir = ".", .verbose = FALSE, .wait = FALSE, ...) {
   bbi_exe_path <- getOption("rbabylon.bbi_exe_path")
   check_bbi_exe(bbi_exe_path)
@@ -60,7 +62,7 @@ bbi_exec <- function(.cmd_args, .dir = ".", .verbose = FALSE, .wait = FALSE, ...
 #' Also contains the element `call` with a string representing the command that could be called on the command line.
 #' @param .cmd_args A character vector of command line arguments for the execution call
 #' @param .dir The working directory to run command in. Defaults to "."
-#' @export
+#' @keywords internal
 bbi_dry_run <- function(.cmd_args, .dir) {
   # build result object
   res <- list()
@@ -85,7 +87,7 @@ bbi_dry_run <- function(.cmd_args, .dir) {
 
 #' Checks that a bbi binary is present at the path passed to .bbi_exe_path
 #' @param .bbi_exe_path Path to bbi exe file that will be checked
-#' @export
+#' @keywords internal
 check_bbi_exe <- function(.bbi_exe_path) {
   # check if this path is not in the already checked paths
   if (is.null(CACHE_ENV$bbi_exe_paths[[.bbi_exe_path]])) {
@@ -109,7 +111,7 @@ check_bbi_exe <- function(.bbi_exe_path) {
 #' Check if bbi_version is below minimum allowed version
 #' @importFrom stringr str_replace_all
 #' @param .bbi_exe_path Path to bbi exe file that will be checked
-#' @export
+#' @keywords internal
 check_bbi_version_constraint <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')) {
   .bbi_exe_path <- Sys.which(.bbi_exe_path)
   if (.bbi_exe_path == "") {
@@ -158,7 +160,7 @@ check_status_code <- function(.status_code, .output, .cmd_args) {
 }
 
 
-#' Executes (`bbi --help`) with bbi_exec and prints the output string
+#' Executes (`bbi --help`) with and prints the output string
 #' @param .cmd_args You can optionally pass a vector of args to get help about a specific call
 #' @export
 bbi_help <- function(.cmd_args=NULL) {
@@ -172,7 +174,9 @@ bbi_help <- function(.cmd_args=NULL) {
 }
 
 
-#' Executes (`bbi init`) with bbi_exec() in specified directory
+#' Initialize babylon
+#'
+#' Executes (`bbi init`) with in specified directory which creates a `babylon.yml` file in that directory.
 #' @param .dir Path to directory to run `init` in (and put the resulting `babylon.yml` file)
 #' @param .nonmem_dir Path to directory with the NONMEM installation.
 #' @param .nonmem_version Character scalar for default version of NONMEM to use. If left NULL, function will exit and tell you which versions were found in `.nonmem_dir`

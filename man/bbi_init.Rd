@@ -2,7 +2,7 @@
 % Please edit documentation in R/rbabylon.R
 \name{bbi_init}
 \alias{bbi_init}
-\title{Executes (\verb{bbi init}) with bbi_exec() in specified directory}
+\title{Initialize babylon}
 \usage{
 bbi_init(
   .dir,
@@ -21,5 +21,5 @@ bbi_init(
 \item{.no_default_version}{If \code{TRUE}, force creation of babylon.yaml with \strong{no default NONMEM version}. \code{FALSE} by default, and using \code{TRUE} is \emph{not} encouraged.}
 }
 \description{
-Executes (\verb{bbi init}) with bbi_exec() in specified directory
+Executes (\verb{bbi init}) with in specified directory which creates a \code{babylon.yml} file in that directory.
 }

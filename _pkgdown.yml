@@ -56,13 +56,9 @@ reference:
 - title: Babylon configuration
   contents:
   - bbi_current_release
-  - bbi_dry_run
-  - bbi_exec
   - bbi_help
   - bbi_init
   - bbi_version
-  - check_bbi_exe
-  - check_bbi_version_constraint
   - use_bbi
 - title: Assorted helpers
   contents:

@@ -15,3 +15,4 @@ bbi_dry_run(.cmd_args, .dir)
 Returns an S3 object of class \code{babylon_process} but the \code{process} and \code{stdout} elements containing only the string "DRY_RUN".
 Also contains the element \code{call} with a string representing the command that could be called on the command line.
 }
+\keyword{internal}
