@@ -28,18 +28,40 @@ get_model_ancestry(.bbi_object)
 \method{get_model_ancestry}{bbi_run_log_df}(.bbi_object)
 }
 \arguments{
-\item{.bbi_object}{Tibble of class `bbi_run_log_df`}
+\item{.bbi_object}{The model object to query. Could be
+a \verb{bbi_\{.model_type\}_model} object,
+a  file path to a model,
+a tibble of class \code{bbi_run_log_df},
+or some other custom object containing model data.}
 
-\item{.check_exists}{Logical scaler for whether it will check if the file exists and error if it does not. FALSE by default.}
+\item{.check_exists}{If \code{FALSE}, the default, function will return all paths in \code{based_on} regardless of whether they point to an existing file.
+If \code{TRUE}, function will check if a file exists at each path in \code{based_on} and error if one does not.}
 }
 \description{
-Returns character vector of the absolute paths all models stored in the `based_on` field of a `bbi_...` object
-NOTE: All paths saved in the object or accompanying YAML will be relative **to the location of that YAML**
-When the object is loaded into memory, the absolute path to the YAML is stored in the object.
-These functions simply stitch together that path with the relative paths from the `based_on` field.
-As long as the YAML has not moved since it was loaded, this will work.
-
-Extract paths to all models that this model is based on (iterating over `get_based_on()` function),
-and all models that those models are based on, recursively.
-Returns a sorted unique character vector.
+Returns character vector (or list of character vectors) of the absolute paths to all models stored in the \code{based_on} field of a \code{bbi_...} object.
 }
+\details{
+\code{get_model_ancestry()} extracts paths to all models that this model is based on (iterating over \code{get_based_on()} function),
+and all models that those models are based on, recursively.
+It returns a sorted unique character vector for the \code{default} and \code{character} method, and a list of such vectors for the \code{bbi_run_log_df} method.
+Some notes on \code{get_model_ancestry()}:
+\itemize{
+\item \code{.check_exists = TRUE} is set for this iterative search because each model found will subsequently be loaded.
+\item \code{get_model_ancestry()} has all the same S3 methods as \code{get_based_on()}
+}
+
+For both \code{get_based_on()} and \code{get_model_ancestry()}, all paths saved in the object or accompanying YAML will be relative \strong{to the location of that YAML}
+When the object is loaded into memory, the absolute path to the YAML is stored in the object.
+These functions simply stitch together that path with the relative paths from the \code{based_on} field.
+As long as the YAML has not moved since it was read into memory, these paths will be both absolute and correct.
+}
+\section{Methods (by class)}{
+\itemize{
+\item \code{default}: The default method attempts to extract the path from any object passed to it,
+but is designed for a list of class \verb{bbi_\{.model_type\}_model} or something similar.
+
+\item \code{character}: Takes a character scalar of a path to a model that can be loaded with \code{read_model(.bbi_object)}.
+
+\item \code{bbi_run_log_df}: Takes a tibble of class \code{bbi_run_log_df} and returns a list containing one character vector of paths for each row of the tibble.
+}}
+

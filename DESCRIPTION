@@ -1,8 +1,8 @@
 Package: rbabylon
 Type: Package
-Title: r package for babylon
-Version: 0.6.1
-Description: r package for babylon.
+Title: R package for babylon
+Version: 0.7.0
+Description: R package for making calls to babylon for running NONMEM and other models. Also manages model metadata, workflow, and run logs.
 Encoding: UTF-8
 LazyData: true
 Authors@R: 
@@ -13,8 +13,14 @@ Authors@R:
     person(given = "Seth",
            family = "Green",
            role = c("aut"),
-           email = "seth127@gmail.com"))
-RoxygenNote: 7.0.2
+           email = "seth127@gmail.com"),
+    person(given = "Sean",
+           family = "Wilson",
+           role = c("aut"),
+           email = "copernican@gmail.com"))
+RoxygenNote: 7.1.0
+Roxygen: list(markdown = TRUE)
+SystemRequirements: babylon (>= 2.2.0)
 Imports: 
     checkmate,
     digest,

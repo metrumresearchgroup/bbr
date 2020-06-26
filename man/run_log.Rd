@@ -2,18 +2,23 @@
 % Please edit documentation in R/run-log.R
 \name{run_log}
 \alias{run_log}
-\title{Parses model yaml and outputs into a tibble that serves as a run log. Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.}
+\title{Create tibble summarizing all model runs}
 \usage{
 run_log(.base_dir = get_model_directory(), .recurse = TRUE)
 }
 \arguments{
-\item{.base_dir}{Directory to search for model yaml files. Only runs with a corresponding yaml will be included.}
+\item{.base_dir}{Directory to search for model YAML files. Only runs with a corresponding YAML will be included.}
 
-\item{.recurse}{Boolean for whether to search subdirectories recursively for additional yaml files. Defaults to TRUE.}
+\item{.recurse}{If \code{TRUE}, the default, search recursively in subdirectories.}
 }
 \value{
-tibble with information on each run
+A tibble of class \code{bbi_run_log_df} with information on each model.
 }
 \description{
-Parses model yaml and outputs into a tibble that serves as a run log. Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
+Parses all model YAML files and outputs into a tibble that serves as a run log for the project.
+Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
+Users can also use \code{add_config()} to append additional output about the model run.
+}
+\seealso{
+\code{add_config()}
 }

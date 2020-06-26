@@ -9,6 +9,7 @@ NONMEM_ARGS = list(
   copy_lvl = list(type = "numeric", flag="--copy_lvl", description = "copy level used for file output from a given (set of) runs"),
   debug = list(type = "logical", flag="--debug", description = "debug mode"),
   delay = list(type = "numeric", flag="--delay", description = "Selects a random number of seconds between 1 and this value to stagger / jitter job execution. Assists in dealing with large volumes of work dealing with the same data set. May avoid NMTRAN issues about not being able read / close files"),
+  ext_file = list(type = "character", flag="--ext-file", description = "name of custom ext-file"),
   git = list(type = "logical", flag="--git", description = "whether git is used"),
   gitignore_lvl = list(type = "numeric", flag="--gitignoreLvl", description = "gitignore lvl for a given (set of) runs"),
   json = list(type = "logical", flag="--json", description = "json tree of output, if possible"),
@@ -95,7 +96,7 @@ YAML_ERASE_OUT_KEYS <- c(
 )
 
 # keys that need to be coerced to arrays when saving a model YAML on disk
-YAML_SCALER_TO_LIST_KEYS <- c(
+YAML_SCALAR_TO_LIST_KEYS <- c(
   YAML_BASED_ON,
   YAML_TAGS,
   YAML_DECISIONS

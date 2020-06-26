@@ -2,13 +2,14 @@
 % Please edit documentation in R/get-path-from-object.R
 \name{find_model_file_path}
 \alias{find_model_file_path}
-\title{helper to find valid model file and return ctl_ext(.path) by default if not found}
+\title{Private helper to find valid model file and return ctl_ext(.path) by default if not found}
 \usage{
 find_model_file_path(.path)
 }
 \arguments{
-\item{.path}{File path to a NONMEM model file (control stream) with either `.ctl` or `.mod` extension}
+\item{.path}{File path to a NONMEM model file (control stream) with either \code{.ctl} or \code{.mod} extension}
 }
 \description{
-helper to find valid model file and return ctl_ext(.path) by default if not found
+Private helper to find valid model file and return ctl_ext(.path) by default if not found
 }
+\keyword{internal}

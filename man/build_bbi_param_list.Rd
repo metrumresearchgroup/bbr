@@ -7,10 +7,11 @@
 build_bbi_param_list(.mods, .bbi_args = NULL)
 }
 \arguments{
-\item{.mods}{a list containing only `bbi_{.model_type}_model` objects}
+\item{.mods}{a list containing only \verb{bbi_\{.model_type\}_model} objects}
 
 \item{.bbi_args}{A named list specifying arguments to pass to babylon. This will over-ride any shared arguments from the model objects.}
 }
 \description{
 Builds list of unique parameter sets for multiple model bbi calls
 }
+\keyword{internal}

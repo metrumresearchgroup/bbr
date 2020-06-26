@@ -1,11 +1,11 @@
 kind: pipeline
 type: docker
-name: rbabylon-40
+name: rbabylon-40-cran
 
 #Gobal variable definitions and anchors
 global-variables:
     environment: &default_environment
-        BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
+        BABYLON_URL: https://github.com/metrumresearchgroup/babylon/releases/download/v2.2.0-beta.2/bbi_linux_amd64.tar.gz
 
 steps:
 - name: Pull mpn container from ECR
@@ -15,7 +15,102 @@ steps:
     path: /var/run/docker.sock
   commands:
   - $(aws ecr get-login --no-include-email --region us-east-1)
-  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24
+  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-dev:cran-latest
+
+- name: R40
+  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-dev:cran-latest"
+  pull: never
+  environment:
+    R_LIBS_USER: "/opt/rpkgs/4.0"
+    # Reading in entire anchor
+    <<: *default_environment
+  commands:
+  # download and setup bbi
+  - wget $BABYLON_URL -O bbi.tar.gz
+  - tar -xzf bbi.tar.gz
+  - rm bbi.tar.gz
+  - chmod +x bbi_linux_amd64/bbi
+  - mkdir -p /data/apps
+  - mv bbi_linux_amd64/bbi /data/apps
+  - ls -la /data/apps
+  - /data/apps/bbi -h
+  - export PATH=/data/apps:$PATH
+  - /opt/R/4.0.1/bin/R -e "devtools::install_deps(upgrade = 'never')"
+  - /opt/R/4.0.1/bin/R -e "devtools::test()"
+  - /opt/R/4.0.1/bin/R -e "devtools::check()"
+
+volumes:
+- name: docker.sock
+  host:
+    path: /var/run/docker.sock
+
+---
+
+kind: pipeline
+type: docker
+name: rbabylon-36-cran
+
+#Gobal variable definitions and anchors
+global-variables:
+    environment: &default_environment
+        BABYLON_URL: https://github.com/metrumresearchgroup/babylon/releases/download/v2.2.0-beta.2/bbi_linux_amd64.tar.gz
+
+steps:
+- name: Pull mpn container from ECR
+  image: omerxx/drone-ecr-auth
+  volumes:
+  - name: docker.sock
+    path: /var/run/docker.sock
+  commands:
+  - $(aws ecr get-login --no-include-email --region us-east-1)
+  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-dev:cran-latest
+
+- name: R36
+  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-dev:cran-latest"
+  pull: never
+  environment:
+    R_LIBS_USER: "/opt/rpkgs/3.6"
+    # Reading in entire anchor
+    <<: *default_environment
+  commands:
+  # download and setup bbi
+  - wget $BABYLON_URL -O bbi.tar.gz
+  - tar -xzf bbi.tar.gz
+  - rm bbi.tar.gz
+  - chmod +x bbi_linux_amd64/bbi
+  - mkdir -p /data/apps
+  - mv bbi_linux_amd64/bbi /data/apps
+  - ls -la /data/apps
+  - /data/apps/bbi -h
+  - export PATH=/data/apps:$PATH
+  - /opt/R/3.6.3/bin/R -e "devtools::install_deps(upgrade = 'never')"
+  - /opt/R/3.6.3/bin/R -e "devtools::test()"
+  - /opt/R/3.6.3/bin/R -e "devtools::check()"
+
+volumes:
+- name: docker.sock
+  host:
+    path: /var/run/docker.sock
+
+---
+
+kind: pipeline
+type: docker
+name: rbabylon-40-new
+
+#Gobal variable definitions and anchors
+global-variables:
+    environment: &default_environment
+        BABYLON_URL: https://github.com/metrumresearchgroup/babylon/releases/download/v2.2.0-beta.2/bbi_linux_amd64.tar.gz
+
+steps:
+- name: Pull mpn container from ECR
+  image: omerxx/drone-ecr-auth
+  volumes:
+  - name: docker.sock
+    path: /var/run/docker.sock
+  commands:
+  - $(aws ecr get-login --no-include-email --region us-east-1)
   - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-complete:2020-06-08
 
 - name: R40
@@ -49,12 +144,12 @@ volumes:
 
 kind: pipeline
 type: docker
-name: rbabylon-36
+name: rbabylon-36-new
 
 #Gobal variable definitions and anchors
 global-variables:
     environment: &default_environment
-        BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
+        BABYLON_URL: https://github.com/metrumresearchgroup/babylon/releases/download/v2.2.0-beta.2/bbi_linux_amd64.tar.gz
 
 steps:
 - name: Pull mpn container from ECR
@@ -64,7 +159,6 @@ steps:
     path: /var/run/docker.sock
   commands:
   - $(aws ecr get-login --no-include-email --region us-east-1)
-  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24
   - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-complete:2020-06-08
 
 - name: R36
@@ -103,7 +197,7 @@ name: rbabylon-36-old
 #Gobal variable definitions and anchors
 global-variables:
     environment: &default_environment
-        BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
+        BABYLON_URL: https://github.com/metrumresearchgroup/babylon/releases/download/v2.2.0-beta.2/bbi_linux_amd64.tar.gz
 
 steps:
 - name: Pull mpn container from ECR
@@ -114,7 +208,6 @@ steps:
   commands:
   - $(aws ecr get-login --no-include-email --region us-east-1)
   - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24
-  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-complete:2020-06-08
 
 - name: R36-old
   image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24"
@@ -152,7 +245,7 @@ name: rbabylon-35-old
 #Gobal variable definitions and anchors
 global-variables:
     environment: &default_environment
-        BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
+        BABYLON_URL: https://github.com/metrumresearchgroup/babylon/releases/download/v2.2.0-beta.2/bbi_linux_amd64.tar.gz
 
 steps:
 - name: Pull mpn container from ECR
@@ -163,7 +256,6 @@ steps:
   commands:
   - $(aws ecr get-login --no-include-email --region us-east-1)
   - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24
-  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-complete:2020-06-08
 
 - name: R35-old
   image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24"
@@ -199,7 +291,7 @@ name: rbabylon-release
 #Gobal variable definitions and anchors
 global-variables:
     environment: &default_environment
-        BABYLON_URL: https://www.github.com/metrumresearchgroup/babylon/releases/latest/download/bbi_linux_amd64.tar.gz
+        BABYLON_URL: https://github.com/metrumresearchgroup/babylon/releases/download/v2.2.0-beta.2/bbi_linux_amd64.tar.gz
 
 steps:
 - name: Pull mpn container from ECR
@@ -209,7 +301,6 @@ steps:
     path: /var/run/docker.sock
   commands:
   - $(aws ecr get-login --no-include-email --region us-east-1)
-  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-03-24
   - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-complete:2020-06-08
 
 - name: release
@@ -239,8 +330,10 @@ steps:
   - aws s3 sync /tmp/${DRONE_TAG} s3://mpn.metworx.dev/releases/${DRONE_REPO_NAME}/${DRONE_TAG}
   - aws s3 sync /tmp/${DRONE_TAG} s3://mpn.metworx.dev/releases/${DRONE_REPO_NAME}/latest_tag
 depends_on:
-- rbabylon-40
-- rbabylon-36
+- rbabylon-40-cran
+- rbabylon-36-cran
+- rbabylon-40-new
+- rbabylon-36-new
 - rbabylon-36-old
 - rbabylon-35-old
 

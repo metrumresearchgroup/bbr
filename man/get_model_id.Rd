@@ -4,7 +4,7 @@
 \alias{get_model_id}
 \alias{get_model_id.character}
 \alias{get_model_id.bbi_nonmem_model}
-\title{Helper to strip path and extension from model file to get only model identifier}
+\title{Get model identifier}
 \usage{
 get_model_id(.mod)
 
@@ -13,13 +13,19 @@ get_model_id(.mod)
 \method{get_model_id}{bbi_nonmem_model}(.mod)
 }
 \arguments{
-\item{.mod}{The `bbi_{.model_type}_model` object}
+\item{.mod}{Model to use, either a \verb{bbi_\{.model_type\}_model} or file path to a model.}
 }
 \value{
-Character scaler with only model identifier
+Character scalar with only model identifier
 }
 \description{
 Helper to strip path and extension from model file to get only model identifier
-
-S3 dispatch to get model identifier from a `bbi_{.model_type}_model` object
+(i.e. the model file name without extension)
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{character}: Takes file path to model.
+
+\item \code{bbi_nonmem_model}: Takes \code{bbi_nonmem_model} object
+}}
+

@@ -2,16 +2,20 @@
 # Generating run logs
 #######################
 
-
-#' Parses model yaml and outputs into a tibble that serves as a run log. Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
-#' @param .base_dir Directory to search for model yaml files. Only runs with a corresponding yaml will be included.
-#' @param .recurse Boolean for whether to search subdirectories recursively for additional yaml files. Defaults to TRUE.
+#' Create tibble summarizing all model runs
+#'
+#' Parses all model YAML files and outputs into a tibble that serves as a run log for the project.
+#' Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
+#' Users can also use `add_config()` to append additional output about the model run.
+#' @seealso `add_config()`
+#' @param .base_dir Directory to search for model YAML files. Only runs with a corresponding YAML will be included.
+#' @param .recurse If `TRUE`, the default, search recursively in subdirectories.
 #' @importFrom stringr str_subset
 #' @importFrom fs dir_ls
 #' @importFrom purrr map map_lgl transpose
 #' @importFrom dplyr as_tibble mutate_at mutate select everything
 #' @importFrom yaml read_yaml
-#' @return tibble with information on each run
+#' @return A tibble of class `bbi_run_log_df` with information on each model.
 #' @export
 run_log <- function(
   .base_dir = get_model_directory(),
@@ -53,10 +57,11 @@ run_log <- function(
 
 #' Read in model YAML with error handling
 #'
-#' Helper function that tries to call `read_model()` on a yaml path and returns NULL, with no error, if the YAML is not a valid model file.
+#' Private helper function that tries to call `read_model()` on a yaml path and returns NULL, with no error, if the YAML is not a valid model file.
 #' @param .yaml_path Path to read model from
 #' @param .directory Model directory which `.yaml_path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
 #' @importFrom stringr str_detect
+#' @keywords internal
 safe_read_model <- function(.yaml_path, .directory = get_model_directory()) {
   # check for .directory and combine with .yaml_path
   .yaml_path <- combine_directory_path(.directory, .yaml_path)
@@ -78,7 +83,7 @@ safe_read_model <- function(.yaml_path, .directory = get_model_directory()) {
 #' Create a run log row from a `bbi_{.model_type}_model` object
 #' @param .mod S3 object of class `bbi_{.model_type}_model`
 #' @importFrom tibble tibble
-#' @export
+#' @keywords internal
 run_log_entry <- function(.mod) {
   # build row
   entry_df <- tibble::tibble(
@@ -103,10 +108,11 @@ run_log_entry <- function(.mod) {
   return(entry_df)
 }
 
-#' Helper to enforce length of a list element
+#' Private helper to enforce length of a list element
 #' @param .l list to check
 #' @param .k key to check
 #' @param .len length to enforce. Defaults to 1. Throws an error if `length(.l[[.k]]) != .len`
+#' @keywords internal
 enforce_length <- function(.l, .k, .len = 1) {
   len_k <- length(.l[[.k]])
   if (len_k != .len) {
@@ -120,15 +126,27 @@ enforce_length <- function(.l, .k, .len = 1) {
 # Fields from bbi_config.json
 ###############################
 
-#' Parses model config.json outputs into a log tibble
-#' @param .base_dir Base directory to look from model YAML files in
-#' @param .recurse Boolean for whether to search recursively in subdirectories
+#' Parse babylon configs to log
+#'
+#' Parses `bbi_config.json` files into a log tibble.
+#' This file is created by babylon and stores metadata about the execution of a model run.
+#'
+#' @details
+#' `config_log()` will return a tibble with one row per `bbi_config.json` found.
+#'
+#' `add_config()` takes a `bbi_run_log_df` tibble (the output of `run_log()`) as its input,
+#' searches for a `bbi_config.json` for each row in the input tibble,
+#' and joins on the data from the relevant config, if found.
+#' The returned tibble will have all of its input columns, plus all of the columns returned from `config_log()`
+#'
+#' @seealso `run_log()`
+#' @param .base_dir Base directory to look from `bbi_config.json` files in
+#' @param .recurse If `TRUE`, the default, search recursively in subdirectories.
 #' @importFrom stringr str_subset
 #' @importFrom fs dir_ls
 #' @importFrom purrr map_df
 #' @importFrom dplyr mutate select everything
 #' @importFrom jsonlite fromJSON
-#' @return tibble with information on each run
 #' @export
 config_log <- function(
   .base_dir = get_model_directory(),
@@ -179,10 +197,11 @@ config_log <- function(
   return(df)
 }
 
-#' Joins config log tibble onto a matching run log tibble
-#' @param .log_df the output tibble from `run_log()`
+
+#' @param .log_df a `bbi_run_log_df` tibble (the output of `run_log()`)
 #' @param ... arguments passed through to `config_log()`
 #' @importFrom dplyr left_join
+#' @rdname config_log
 #' @export
 add_config <- function(.log_df, ...) {
   # check input df

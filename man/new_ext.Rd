@@ -6,7 +6,7 @@
 \alias{mod_ext}
 \alias{yaml_ext}
 \alias{yml_ext}
-\title{helpers that strip extension then add a diffent type}
+\title{Change file extension}
 \usage{
 new_ext(.x, .ext)
 
@@ -24,5 +24,5 @@ yml_ext(.x)
 \item{.ext}{new file extension to apply}
 }
 \description{
-helpers that strip extension then add a diffent type
+Helpers that strip file extension then add a different one
 }

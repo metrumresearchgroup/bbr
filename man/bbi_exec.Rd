@@ -2,7 +2,7 @@
 % Please edit documentation in R/rbabylon.R
 \name{bbi_exec}
 \alias{bbi_exec}
-\title{Executes a babylon call (`bbi ...`) with processx::process$new()}
+\title{Execute call to bbi}
 \usage{
 bbi_exec(.cmd_args, .dir = ".", .verbose = FALSE, .wait = FALSE, ...)
 }
@@ -18,13 +18,14 @@ bbi_exec(.cmd_args, .dir = ".", .verbose = FALSE, .wait = FALSE, ...)
 \item{...}{arguments to pass to processx::process$new()}
 }
 \value{
-An S3 object of class `babylon_process`
-        process -- The process object (see ?processx::process$new for more details on what you can do with this).
-        stdout -- the stdout and stderr from the process, if `.wait = TRUE`. If `.wait = FALSE` this will be NULL.
-        bbi -- character scaler with the execution path used for bbi.
-        cmd_args -- character vector of all command arguments passed to the process.
-        working_dir -- the directory the command was run in, passed through from .dir argument.
+An S3 object of class \code{babylon_process}
+process -- The process object (see ?processx::process$new for more details on what you can do with this).
+stdout -- the stdout and stderr from the process, if \code{.wait = TRUE}. If \code{.wait = FALSE} this will be NULL.
+bbi -- character scalar with the execution path used for bbi.
+cmd_args -- character vector of all command arguments passed to the process.
+working_dir -- the directory the command was run in, passed through from .dir argument.
 }
 \description{
-Executes a babylon call (`bbi ...`) with processx::process$new()
+Private implementation function that executes a babylon call (\verb{bbi ...}) with processx::process$new()
 }
+\keyword{internal}

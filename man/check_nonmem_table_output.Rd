@@ -8,7 +8,7 @@
 \alias{check_ext}
 \alias{check_ext.character}
 \alias{check_ext.bbi_nonmem_model}
-\title{Checks nonmem output file that's a whitespace-delimited file (for instance .grd or .ext)}
+\title{Check NONMEM output files}
 \usage{
 check_nonmem_table_output(.path, .x_var = NULL, .x_floor = NULL)
 
@@ -25,28 +25,27 @@ check_ext(.mod, .iter_floor = 0)
 \method{check_ext}{bbi_nonmem_model}(.mod, .iter_floor = 0)
 }
 \arguments{
-\item{.path}{Character scalar path to the gradient file}
+\item{.path}{Character scalar path to the file}
 
-\item{.x_var}{name of variable to filter with `.x_floor`}
+\item{.x_var}{name of variable to filter with \code{.x_floor}}
 
-\item{.x_floor}{Filters file to only rows with `.x_var` GREATER THAN this value.}
+\item{.x_floor}{Filters file to only rows with \code{.x_var} GREATER THAN this value.}
 
-\item{.mod}{`bbi_nonmem_model` object}
+\item{.mod}{Model to check. Either a \code{bbi_nonmem_model} object or a file path.}
 
-\item{.iter_floor}{Filters file to only rows with `ITERATION` GREATER THAN this value.}
+\item{.iter_floor}{Filters file to only rows with \code{ITERATION} GREATER THAN this value.}
 }
 \description{
-Checks nonmem output file that's a whitespace-delimited file (for instance .grd or .ext)
-
-S3 generic for checking grd file
-
-S3 dispatch for checking grd file
-
-S3 dispatch for checking grd file
-
-S3 generic for checking ext file
-
-S3 dispatch for checking ext file
-
-S3 dispatch for checking ext file
+Checks a NONMEM output file that's a whitespace-delimited file (for instance .grd or .ext)
 }
+\section{Methods (by generic)}{
+\itemize{
+\item \code{check_grd}: Checks .grd file from a file path
+
+\item \code{check_grd}: Checks .grd file from a \code{bbi_nonmem_model}
+
+\item \code{check_ext}: Checks .ext file from a file path
+
+\item \code{check_ext}: Checks .ext file from a \code{bbi_nonmem_model} object
+}}
+
