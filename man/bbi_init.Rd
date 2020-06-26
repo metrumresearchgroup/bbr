@@ -21,5 +21,18 @@ bbi_init(
 \item{.no_default_version}{If \code{TRUE}, force creation of babylon.yaml with \strong{no default NONMEM version}. \code{FALSE} by default, and using \code{TRUE} is \emph{not} encouraged.}
 }
 \description{
-Executes (\verb{bbi init}) with in specified directory which creates a \code{babylon.yml} file in that directory.
+Executes \verb{bbi init ...} in specified directory. This creates a \code{babylon.yml} file, which contains defaults
+for many configurable \code{babylon} settings, in that directory.
+}
+\details{
+For \code{rbabylon} to make any calls out to \code{bbi} (for example in \code{submit_model()} or \code{model_summary()}) it must find a
+\code{babylon.yml} file in one of the following places:
+\itemize{
+\item The directory specified in \code{options("rbabylon.model_directory")}
+\item The working directory, if \code{options("rbabylon.model_directory")} is \code{NULL}
+\item A path passed to the \code{.config_path} argument of the functions mentioned above
+}
+
+The recommended behavior is to set \code{options("rbabylon.model_directory")}, ideally in your \code{.Rprofile},
+and then call \code{bbi_init(.dir = getOption("rbabylon.model_directory"), ...)}. This only has to be done once.
 }

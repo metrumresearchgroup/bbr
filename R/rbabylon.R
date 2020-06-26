@@ -160,7 +160,7 @@ check_status_code <- function(.status_code, .output, .cmd_args) {
 }
 
 
-#' Executes (`bbi --help`) with and prints the output string
+#' Executes (`bbi --help`) and prints the output string
 #' @param .cmd_args You can optionally pass a vector of args to get help about a specific call
 #' @export
 bbi_help <- function(.cmd_args=NULL) {
@@ -176,7 +176,18 @@ bbi_help <- function(.cmd_args=NULL) {
 
 #' Initialize babylon
 #'
-#' Executes (`bbi init`) with in specified directory which creates a `babylon.yml` file in that directory.
+#' Executes `bbi init ...` in specified directory. This creates a `babylon.yml` file, which contains defaults
+#' for many configurable `babylon` settings, in that directory.
+#'
+#' @details
+#' For `rbabylon` to make any calls out to `bbi` (for example in `submit_model()` or `model_summary()`) it must find a
+#' `babylon.yml` file in one of the following places:
+#'  * The directory specified in `options("rbabylon.model_directory")`
+#'  * The working directory, if `options("rbabylon.model_directory")` is `NULL`
+#'  * A path passed to the `.config_path` argument of the functions mentioned above
+#'
+#' The recommended behavior is to set `options("rbabylon.model_directory")`, ideally in your `.Rprofile`,
+#' and then call `bbi_init(.dir = getOption("rbabylon.model_directory"), ...)`. This only has to be done once.
 #' @param .dir Path to directory to run `init` in (and put the resulting `babylon.yml` file)
 #' @param .nonmem_dir Path to directory with the NONMEM installation.
 #' @param .nonmem_version Character scalar for default version of NONMEM to use. If left NULL, function will exit and tell you which versions were found in `.nonmem_dir`

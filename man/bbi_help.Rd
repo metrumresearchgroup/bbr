@@ -2,7 +2,7 @@
 % Please edit documentation in R/rbabylon.R
 \name{bbi_help}
 \alias{bbi_help}
-\title{Executes (\code{bbi --help}) with and prints the output string}
+\title{Executes (\code{bbi --help}) and prints the output string}
 \usage{
 bbi_help(.cmd_args = NULL)
 }
@@ -10,5 +10,5 @@ bbi_help(.cmd_args = NULL)
 \item{.cmd_args}{You can optionally pass a vector of args to get help about a specific call}
 }
 \description{
-Executes (\code{bbi --help}) with and prints the output string
+Executes (\code{bbi --help}) and prints the output string
 }

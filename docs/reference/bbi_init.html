@@ -40,7 +40,8 @@
 
 
 <meta property="og:title" content="Initialize babylon — bbi_init" />
-<meta property="og:description" content="Executes (bbi init) with in specified directory which creates a babylon.yml file in that directory." />
+<meta property="og:description" content="Executes bbi init ... in specified directory. This creates a babylon.yml file, which contains defaults
+for many configurable babylon settings, in that directory." />
 
 
 
@@ -132,7 +133,8 @@
     </div>
 
     <div class="ref-description">
-    <p>Executes (<code>bbi init</code>) with in specified directory which creates a <code>babylon.yml</code> file in that directory.</p>
+    <p>Executes <code>bbi init ...</code> in specified directory. This creates a <code>babylon.yml</code> file, which contains defaults
+for many configurable <code>babylon</code> settings, in that directory.</p>
     </div>
 
     <pre class="usage"><span class='fu'>bbi_init</span>(
@@ -163,6 +165,17 @@
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>For <code>rbabylon</code> to make any calls out to <code>bbi</code> (for example in <code><a href='submit_model.html'>submit_model()</a></code> or <code><a href='model_summary.html'>model_summary()</a></code>) it must find a
+<code>babylon.yml</code> file in one of the following places:</p><ul>
+<li><p>The directory specified in <code><a href='https://rdrr.io/r/base/options.html'>options("rbabylon.model_directory")</a></code></p></li>
+<li><p>The working directory, if <code><a href='https://rdrr.io/r/base/options.html'>options("rbabylon.model_directory")</a></code> is <code>NULL</code></p></li>
+<li><p>A path passed to the <code>.config_path</code> argument of the functions mentioned above</p></li>
+</ul>
+
+<p>The recommended behavior is to set <code><a href='https://rdrr.io/r/base/options.html'>options("rbabylon.model_directory")</a></code>, ideally in your <code>.Rprofile</code>,
+and then call <code>bbi_init(.dir = getOption("rbabylon.model_directory"), ...)</code>. This only has to be done once.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
