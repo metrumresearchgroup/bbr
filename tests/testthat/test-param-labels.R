@@ -36,7 +36,7 @@ for (i in length(BLOCK_REF)) {
 
 
 test_that("param_labels.character errors on vector", {
-  expect_error(param_labels(c("naw", "dawg")), regexp = "character scaler of the raw control stream")
+  expect_error(param_labels(c("naw", "dawg")), regexp = "character scalar of the raw control stream")
 })
 
 

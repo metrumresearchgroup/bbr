@@ -2,8 +2,7 @@
 % Please edit documentation in R/new-model.R
 \name{new_model}
 \alias{new_model}
-\title{Create new model object by specifying relevant information as arguments
-Also creates necessary YAML file for using functions like `add_tags()` and `run_log()` later.}
+\title{Create new model object}
 \usage{
 new_model(
   .yaml_path,
@@ -17,26 +16,27 @@ new_model(
 )
 }
 \arguments{
-\item{.yaml_path}{Path to save resulting model YAML file to. MUST be either an absolute path, or a path relative to the `.directory` argument.}
+\item{.yaml_path}{Path to save resulting model YAML file to. MUST be either an absolute path, or a path relative to the \code{.directory} argument.}
 
-\item{.description}{Description of new model run. This will be stored in the yaml (and can be viewed later in `run_log()`). By convention, it should match the $PROBLEM statement in the control stream, but this is not enforced.}
+\item{.description}{Description of new model run. This will be stored in the yaml (and can be viewed later in \code{run_log()}). By convention, it should match the $PROBLEM statement in the control stream, but this is not enforced.}
 
 \item{.model_path}{Path to model (control stream) file. MUST be an absolute path, or the model path relative to the location of the YAML file. It recommended for the control stream and YAML to be in the same directory. If nothing is passed, the function will look for a file with the same path/name as your YAML, but with either .ctl or .mod extension.}
 
-\item{.based_on}{Character scaler or vector of paths to other models that this model was "based on." These are used to reconstuct model developement and ancestry. \strong{Paths must be relative to `.new_model` path.}}
+\item{.based_on}{Character scalar or vector of paths to other models that this model was "based on." These are used to reconstuct model developement and ancestry. \strong{Paths must be relative to \code{.new_model} path.}}
 
-\item{.tags}{A character scaler or vector with any user tags to be added to the YAML file}
+\item{.tags}{A character scalar or vector with any user tags to be added to the YAML file}
 
-\item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments. These will be written into YAML file.}
+\item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}. Run \code{print_nonmem_args()} to see valid arguments. These will be written into YAML file.}
 
-\item{.model_type}{Character scaler to specify type of model being created (used for S3 class). Currently only `'nonmem'` is supported.}
+\item{.model_type}{Character scalar to specify type of model being created (used for S3 class). Currently only \code{'nonmem'} is supported.}
 
-\item{.directory}{Model directory which `.yaml_path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
+\item{.directory}{Model directory which \code{.yaml_path} is relative to. Defaults to \code{options('rbabylon.model_directory')}, which can be set globally with \code{set_model_directory()}.}
 }
 \value{
-S3 object of class `bbi_{.model_type}_model` that can be passed to `submit_model()`, `model_summary()`, etc.
+S3 object of class \verb{bbi_\{.model_type\}_model} that can be passed to \code{submit_model()}, \code{model_summary()}, etc.
 }
 \description{
-Create new model object by specifying relevant information as arguments
-Also creates necessary YAML file for using functions like `add_tags()` and `run_log()` later.
+Creates new model object by specifying relevant information as arguments.
+Also creates necessary YAML file for using functions like \code{add_tags()} and \code{run_log()} later.
+Will look for an associated model file (control stream) on disk and warn if it doesn't find one.
 }

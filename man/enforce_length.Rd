@@ -2,7 +2,7 @@
 % Please edit documentation in R/run-log.R
 \name{enforce_length}
 \alias{enforce_length}
-\title{Helper to enforce length of a list element}
+\title{Private helper to enforce length of a list element}
 \usage{
 enforce_length(.l, .k, .len = 1)
 }
@@ -11,8 +11,9 @@ enforce_length(.l, .k, .len = 1)
 
 \item{.k}{key to check}
 
-\item{.len}{length to enforce. Defaults to 1. Throws an error if `length(.l[[.k]]) != .len`}
+\item{.len}{length to enforce. Defaults to 1. Throws an error if \code{length(.l[[.k]]) != .len}}
 }
 \description{
-Helper to enforce length of a list element
+Private helper to enforce length of a list element
 }
+\keyword{internal}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{suppressSpecificWarning}
 \alias{suppressSpecificWarning}
-\title{Suppress a warning that matches `.regexpr`}
+\title{Suppress a warning that matches \code{.regexpr}}
 \usage{
 suppressSpecificWarning(.expr, .regexpr)
 }
@@ -12,5 +12,5 @@ suppressSpecificWarning(.expr, .regexpr)
 \item{.regexpr}{Regex to match against any generated warning. Warning will be suppressed if this matches the warning message.}
 }
 \description{
-Suppress a warning that matches `.regexpr`
+Suppress a warning that matches \code{.regexpr}
 }

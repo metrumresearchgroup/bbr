@@ -2,7 +2,7 @@
 % Please edit documentation in R/summary.R
 \name{check_lst_file}
 \alias{check_lst_file}
-\title{Helper function to look for .lst function in a directory}
+\title{Private helper function to look for .lst function in a directory}
 \usage{
 check_lst_file(.x)
 }
@@ -10,5 +10,6 @@ check_lst_file(.x)
 \item{.x}{The directory path to look in for the lst file}
 }
 \description{
-Helper function to look for .lst function in a directory
+Private helper function to look for .lst function in a directory
 }
+\keyword{internal}

@@ -21,3 +21,4 @@ The combined list
 Combines two named lists. By default, shared keys are overwritten by that key in .new_list
 Any S3 classes will be inherited with those from .new_list given precedence.
 }
+\keyword{internal}

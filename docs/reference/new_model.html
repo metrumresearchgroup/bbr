@@ -6,28 +6,31 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create new model object by specifying relevant information as arguments
-Also creates necessary YAML file for using functions like `add_tags()` and `run_log()` later. — new_model • rbabylon</title>
+<title>Create new model object — new_model • rbabylon</title>
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -36,11 +39,10 @@ Also creates necessary YAML file for using functions like `add_tags()` and `run_
 
 
 
-<meta property="og:title" content="Create new model object by specifying relevant information as arguments
-Also creates necessary YAML file for using functions like `add_tags()` and `run_log()` later. — new_model" />
-<meta property="og:description" content="Create new model object by specifying relevant information as arguments
-Also creates necessary YAML file for using functions like `add_tags()` and `run_log()` later." />
-<meta name="twitter:card" content="summary" />
+<meta property="og:title" content="Create new model object — new_model" />
+<meta property="og:description" content="Creates new model object by specifying relevant information as arguments.
+Also creates necessary YAML file for using functions like add_tags() and run_log() later.
+Will look for an associated model file (control stream) on disk and warn if it doesn't find one." />
 
 
 
@@ -58,7 +60,7 @@ Also creates necessary YAML file for using functions like `add_tags()` and `run_
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -72,7 +74,7 @@ Also creates necessary YAML file for using functions like `add_tags()` and `run_
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.1.7100</span>
       </span>
     </div>
 
@@ -126,15 +128,15 @@ Also creates necessary YAML file for using functions like `add_tags()` and `run_
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Create new model object by specifying relevant information as arguments
-Also creates necessary YAML file for using functions like `add_tags()` and `run_log()` later.</h1>
+    <h1>Create new model object</h1>
     
     <div class="hidden name"><code>new_model.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Create new model object by specifying relevant information as arguments
-Also creates necessary YAML file for using functions like `add_tags()` and `run_log()` later.</p>
+    <p>Creates new model object by specifying relevant information as arguments.
+Also creates necessary YAML file for using functions like <code><a href='modify_model_field.html'>add_tags()</a></code> and <code><a href='run_log.html'>run_log()</a></code> later.
+Will look for an associated model file (control stream) on disk and warn if it doesn't find one.</p>
     </div>
 
     <pre class="usage"><span class='fu'>new_model</span>(
@@ -145,7 +147,7 @@ Also creates necessary YAML file for using functions like `add_tags()` and `run_
   <span class='kw'>.tags</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.model_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"nonmem"</span>),
-  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>()
+  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='get_model_directory.html'>get_model_directory</a></span>()
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -153,11 +155,11 @@ Also creates necessary YAML file for using functions like `add_tags()` and `run_
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>.yaml_path</th>
-      <td><p>Path to save resulting model YAML file to. MUST be either an absolute path, or a path relative to the `.directory` argument.</p></td>
+      <td><p>Path to save resulting model YAML file to. MUST be either an absolute path, or a path relative to the <code>.directory</code> argument.</p></td>
     </tr>
     <tr>
       <th>.description</th>
-      <td><p>Description of new model run. This will be stored in the yaml (and can be viewed later in `run_log()`). By convention, it should match the $PROBLEM statement in the control stream, but this is not enforced.</p></td>
+      <td><p>Description of new model run. This will be stored in the yaml (and can be viewed later in <code><a href='run_log.html'>run_log()</a></code>). By convention, it should match the $PROBLEM statement in the control stream, but this is not enforced.</p></td>
     </tr>
     <tr>
       <th>.model_path</th>
@@ -165,49 +167,46 @@ Also creates necessary YAML file for using functions like `add_tags()` and `run_
     </tr>
     <tr>
       <th>.based_on</th>
-      <td><p>Character scaler or vector of paths to other models that this model was "based on." These are used to reconstuct model developement and ancestry. <strong>Paths must be relative to `.new_model` path.</strong></p></td>
+      <td><p>Character scalar or vector of paths to other models that this model was "based on." These are used to reconstuct model developement and ancestry. <strong>Paths must be relative to <code>.new_model</code> path.</strong></p></td>
     </tr>
     <tr>
       <th>.tags</th>
-      <td><p>A character scaler or vector with any user tags to be added to the YAML file</p></td>
+      <td><p>A character scalar or vector with any user tags to be added to the YAML file</p></td>
     </tr>
     <tr>
       <th>.bbi_args</th>
-      <td><p>A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments. These will be written into YAML file.</p></td>
+      <td><p>A named list specifying arguments to pass to babylon formatted like <code><a href='https://rdrr.io/r/base/list.html'>list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)</a></code>. Run <code><a href='print_nonmem_args.html'>print_nonmem_args()</a></code> to see valid arguments. These will be written into YAML file.</p></td>
     </tr>
     <tr>
       <th>.model_type</th>
-      <td><p>Character scaler to specify type of model being created (used for S3 class). Currently only `'nonmem'` is supported.</p></td>
+      <td><p>Character scalar to specify type of model being created (used for S3 class). Currently only <code>'nonmem'</code> is supported.</p></td>
     </tr>
     <tr>
       <th>.directory</th>
-      <td><p>Model directory which `.yaml_path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.</p></td>
+      <td><p>Model directory which <code>.yaml_path</code> is relative to. Defaults to <code><a href='https://rdrr.io/r/base/options.html'>options('rbabylon.model_directory')</a></code>, which can be set globally with <code><a href='get_model_directory.html'>set_model_directory()</a></code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>S3 object of class `bbi_.model_type_model` that can be passed to `submit_model()`, `model_summary()`, etc.</p>
+    <p>S3 object of class <code>bbi_{.model_type}_model</code> that can be passed to <code><a href='submit_model.html'>submit_model()</a></code>, <code><a href='model_summary.html'>model_summary()</a></code>, etc.</p>
 
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
 
       <footer>
       <div class="copyright">
-  <p>Developed by Devin Pastoor, Seth Green.</p>
+  <p>Developed by Devin Pastoor, Seth Green, Sean Wilson.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

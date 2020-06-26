@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -39,7 +43,6 @@
 <meta property="og:description" content="Parse parameter labels from the model object. Currently this parses labels from comments in the  control stream,
 However it will be extended to parse labels from the model YAML file as well.
 The syntax for the labeling is described in &quot;Details&quot; below." />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -57,7 +60,7 @@ The syntax for the labeling is described in &quot;Details&quot; below." />
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -71,7 +74,7 @@ The syntax for the labeling is described in &quot;Details&quot; below." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.1.7100</span>
       </span>
     </div>
 
@@ -149,7 +152,7 @@ The syntax for the labeling is described in "Details" below.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>.mod</th>
-      <td><p>Character scaler of the raw control stream with newline character separating lines</p></td>
+      <td><p>generic model input</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -159,59 +162,63 @@ The syntax for the labeling is described in "Details" below.</p>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>This function will *not* return indices for the parameters, though they can be added with <code>param_labels() %&gt;% apply_indices()</code>.
-See the <code><a href='apply_indices.html'>apply_indices</a></code> documentation for more details.</p>
+    <p>Note that <code>param_labels()</code> will <em>not</em> return indices for the parameters, though they can be added with <code>param_labels() %&gt;% apply_indices()</code>.
+See the <code><a href='apply_indices.html'>apply_indices()</a></code> documentation for more details.</p>
 <p>The syntax for parsing labels from comments is inherited from the "Census" specification
-that was also used in the `tidynm` and `mrgtable` packages. The syntax is as follows,
-with everything after the comment character `;` parsed into the label.</p>
+that was also used in the <code>tidynm</code> and <code>mrgtable</code> packages. The syntax is as follows,
+with everything after the comment character <code>;</code> parsed into the label.</p>
 <p><code>&lt;nonmem_inits&gt; ; [directive] &lt;Parameter name &lt;LOGD&gt;&gt;</code></p>
 <ul>
 <li><p>Inits are the NONMEM initial values, following NONMEM specs</p></li>
 <li><p>Directives include:</p><ul>
 <li><p>For fixed effects the directives are translated to units, i.e., L/h</p></li>
-<li><p>For variance components (and only variance components) the directive is parsed into the `type` column
-  and can be used for post-processing transformations. Some common types include:</p><ul>
+<li><p>For variance components (and only variance components) the directive is parsed into the <code>type</code> column
+and can be used for post-processing transformations. Some common types include:</p><ul>
 <li><p>[A] is the assumed directive and it yields standard deviation / correlation.
-      Typically used when the random component has a linear relationship to the typical value.</p></li>
+Typically used when the random component has a linear relationship to the typical value.</p></li>
 <li><p>[P] yields Coefficient of Variation.
-      Commonly transformed with \(CV_lognormal = sqrt( exp(omega^2)-1 ) \times 100\) for omegas,
-      and the value of omega from the correlation matrix (i.e., the SD) for sigmas.
-      Typically used with exponentiated random effects or proportional residual error.</p></li>
+Commonly transformed with \(CV_lognormal = sqrt( exp(omega^2)-1 ) \times 100\) for omegas,
+and the value of omega from the correlation matrix (i.e., the SD) for sigmas.
+Typically used with exponentiated random effects or proportional residual error.</p></li>
 <li><p>[R] indicates that this is an item that should be read from the correlation
-      matrix as opposed to the covariance matrix.
-      I.e., standard deviation and correlation of the parameter on the raw scale will be reported.</p></li>
+matrix as opposed to the covariance matrix.
+I.e., standard deviation and correlation of the parameter on the raw scale will be reported.</p></li>
 <li><p>[C] indicates that this item should be read from the covariance matrix, i.e., variance
-       and covariance of the parameter on the raw scale will be reported.</p></li>
+and covariance of the parameter on the raw scale will be reported.</p></li>
 </ul></li>
 </ul></li>
-<li><p>Paramemter name is parsed into the `label` column, and is commonly formatted to be run through a LaTex parser downstream.</p></li>
+<li><p>Paramemter name is parsed into the <code>label</code> column, and is commonly formatted to be run through a LaTex parser downstream.</p></li>
 <li><p>LOGD is a flag to indicate that the parameter is modeled on the log
 scale (i.e., \(e^\theta\)) and should be exponentiated for reporting.
 If so, the standard error for the parameter should adjusted via the delta method.
-NOTE: this is only a convention, such that downstream code can look for "LOGD" in the `label` column
+NOTE: this is only a convention, such that downstream code can look for "LOGD" in the <code>label</code> column
 and transform the estimates accordingly. None of that processing is done automatically by this function.</p></li>
 </ul>
 
+    <h2 class="hasAnchor" id="methods-by-class-"><a class="anchor" href="#methods-by-class-"></a>Methods (by class)</h2>
+
+    
+<ul>
+<li><p><code>bbi_nonmem_model</code>: Takes a <code>bbi_nonmem_model</code> object</p></li>
+<li><p><code>character</code>: Takes a character scalar of the raw control stream with newline character separating lines</p></li>
+</ul>
 
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#details">Details</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
 
       <footer>
       <div class="copyright">
-  <p>Developed by Devin Pastoor, Seth Green.</p>
+  <p>Developed by Devin Pastoor, Seth Green, Sean Wilson.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

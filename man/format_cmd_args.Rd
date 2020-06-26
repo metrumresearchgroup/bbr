@@ -9,7 +9,7 @@ format_cmd_args(.args, .collapse = FALSE)
 \arguments{
 \item{.args}{A named list of .args to check}
 
-\item{.collapse}{Boolean for whether to collapse return vector to a single string (FALSE by default)}
+\item{.collapse}{If \code{FALSE}, the default, returns a character vector. If \code{TRUE}, collapses return vector to a single string.}
 }
 \value{
 character vector of command args
