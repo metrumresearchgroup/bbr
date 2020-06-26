@@ -1,7 +1,7 @@
 Package: rbabylon
 Type: Package
 Title: R package for babylon
-Version: 0.6.1.7101
+Version: 0.7.0
 Description: R package for making calls to babylon for running NONMEM and other models. Also manages model metadata, workflow, and run logs.
 Encoding: UTF-8
 LazyData: true

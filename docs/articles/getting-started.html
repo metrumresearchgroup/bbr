@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.1.7100</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7.0</span>
       </span>
     </div>
 
@@ -149,7 +149,7 @@
   <span class="st">'rbabylon.bbi_exe_path'</span> <span class="kw">=</span> <span class="no">BBI_EXE_PATH</span>,
   <span class="st">'rbabylon.model_directory'</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span>(<span class="no">MODEL_DIR</span>, <span class="kw">mustWork</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
 )</pre></body></html></div>
-<p>This must be set for every new R session, so it may be wise to **<code>include the above snippet in your</code>.Rprofile<code>**, replacing the</code>BBI_EXE_PATH<code>and</code>MODEL_DIR<code>constants with the relevant paths from your system/project. Note that, if setting</code>‘rbabylon.model_directory’<code>explicitly like this, you _must set it to an absolute path._ The recommended way to do this is to use</code>normalizePath(“path/to/dir/”)<code>where</code>“path/to/dir/”<code>is a relative path from the script location (in this case the</code>.Rprofile` location). That way the project will still be portable between different servers/disks.</p>
+<p>This must be set for every new R session, so it may be wise to <strong>include the above snippet in your <code>.Rprofile</code></strong>, replacing the <code>BBI_EXE_PATH</code> and <code>MODEL_DIR</code> constants with the relevant paths from your system/project. Note that, if setting <code>'rbabylon.model_directory'</code> explicitly like this, you <em>must set it to an absolute path.</em> The recommended way to do this is to use <code><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath("path/to/dir/")</a></code> where <code>"path/to/dir/"</code> is a relative path from the script location (in this case the <code>.Rprofile</code> location). That way the project will still be portable between different servers/disks.</p>
 <p><em>NOTE:</em> By setting the <code>rbabylon.model_directory</code> option, you will <em>not</em> need to pass the full path to model files when calling functions like <code><a href="../reference/read_model.html">read_model()</a></code> or <code><a href="../reference/submit_model.html">submit_model()</a></code>. Instead you will pass a path relative to the specified modeling directory. To be clear, it is not <em>necessary</em> to set this option, but it is definitely a recommended convenience.</p>
 </div>
 </div>
