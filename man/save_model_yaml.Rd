@@ -7,9 +7,9 @@
 save_model_yaml(.mod, .out_path = NULL)
 }
 \arguments{
-\item{.mod}{S3 object of class `bbi_{.model_type}_model`}
+\item{.mod}{S3 object of class \verb{bbi_\{.model_type\}_model}}
 
-\item{.out_path}{Character scaler with path to save out YAML file. By default, sets it to the model file name, with a yaml extension.}
+\item{.out_path}{Character scalar with path to save out YAML file. By default, sets it to the model file name, with a yaml extension.}
 }
 \value{
 Output list as specified above.
@@ -17,3 +17,4 @@ Output list as specified above.
 \description{
 Saves a model model object to a yaml file
 }
+\keyword{internal}

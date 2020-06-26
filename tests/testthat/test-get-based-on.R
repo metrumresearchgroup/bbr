@@ -23,7 +23,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
   test_that("get_based_on.character() fails with vector", {
-    expect_error(get_based_on(c("naw", "dawg")), regexp = "only scaler values are permitted")
+    expect_error(get_based_on(c("naw", "dawg")), regexp = "only scalar values are permitted")
   })
 
   test_that("get_based_on works happy path run_log tibble" , {
@@ -138,7 +138,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
   test_that("get_model_ancestry.character() fails with vector", {
-    expect_error(get_model_ancestry(c("naw", "dawg")), regexp = "only scaler values are permitted")
+    expect_error(get_model_ancestry(c("naw", "dawg")), regexp = "only scalar values are permitted")
   })
 
   test_that("get_model_ancestry works happy path run_log tibble" , {

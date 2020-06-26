@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -53,7 +57,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-index">
       <header>
       <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -67,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.1.7002</span>
       </span>
     </div>
 
@@ -135,22 +139,101 @@
     <tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
+          <h2 id="section-model-management" class="hasAnchor"><a href="#section-model-management" class="anchor"></a>Model management</h2>
           <p class="section-desc"></p>
         </th>
       </tr>
+      
+      
+    </tbody><tbody>
+      
+      
       <tr>
         
         <td>
-          <p><code><a href="add_bbi_args.html">add_bbi_args()</a></code> </p>
+          <p><code><a href="as_model.html">as_model()</a></code> </p>
         </td>
-        <td><p>Add new babylon args to model</p></td>
+        <td><p>Convert object to <code>bbi_{.model_type}_model</code></p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="add_config.html">add_config()</a></code> </p>
+          <p><code><a href="copy_model_from.html">copy_model_from()</a></code> </p>
         </td>
-        <td><p>Joins config log tibble onto a matching run log tibble</p></td>
+        <td><p>Create new model by copying existing model</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="new_model.html">new_model()</a></code> </p>
+        </td>
+        <td><p>Create new model object</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="read_model.html">read_model()</a></code> </p>
+        </td>
+        <td><p>Creates a model object from a YAML model file</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="verify_model_yaml_integrity.html">reconcile_yaml()</a></code> <code><a href="verify_model_yaml_integrity.html">check_yaml_in_sync()</a></code> </p>
+        </td>
+        <td><p>Verify YAML file integrity</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_model_directory.html">get_model_directory()</a></code> <code><a href="get_model_directory.html">set_model_directory()</a></code> </p>
+        </td>
+        <td><p>Get or set global model directory option</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-model-submission" class="hasAnchor"><a href="#section-model-submission" class="anchor"></a>Model submission</h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="submit_model.html">submit_model()</a></code> </p>
+        </td>
+        <td><p>Submit a model to be run</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="submit_models.html">submit_models()</a></code> </p>
+        </td>
+        <td><p>Submit models to be run in batch</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="print_nonmem_args.html">print_nonmem_args()</a></code> </p>
+        </td>
+        <td><p>Print valid .bbi_args</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-model-summary" class="hasAnchor"><a href="#section-model-summary" class="anchor"></a>Model summary</h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="config_log.html">config_log()</a></code> <code><a href="config_log.html">add_config()</a></code> </p>
+        </td>
+        <td><p>Parse babylon configs to log</p></td>
       </tr><tr>
         
         <td>
@@ -160,178 +243,46 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="as_model.html">as_model()</a></code> </p>
+          <p><code><a href="model_summary.html">model_summary()</a></code> </p>
         </td>
-        <td><p>Convert object to `bbi_.model_type_model`</p></td>
+        <td><p>Summarize model outputs</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="bbi_current_release.html">bbi_current_release()</a></code> </p>
+          <p><code><a href="param_estimates.html">param_estimates()</a></code> </p>
         </td>
-        <td><p>current release</p></td>
+        <td><p>Parses parameter estimates table</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="bbi_dry_run.html">bbi_dry_run()</a></code> </p>
+          <p><code><a href="param_labels.html">param_labels()</a></code> </p>
         </td>
-        <td><p>Babylon dry_run</p></td>
+        <td><p>Extract parameter labels for report tables, etc.</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="bbi_exec.html">bbi_exec()</a></code> </p>
+          <p><code><a href="run_log.html">run_log()</a></code> </p>
         </td>
-        <td><p>Executes a babylon call (`bbi ...`) with processx::process$new()</p></td>
-      </tr><tr>
+        <td><p>Create tibble summarizing all model runs</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-model-object-interactions" class="hasAnchor"><a href="#section-model-object-interactions" class="anchor"></a>Model object interactions</h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
         
         <td>
-          <p><code><a href="bbi_help.html">bbi_help()</a></code> </p>
+          <p><code><a href="modify_model_field.html">modify_model_field()</a></code> <code><a href="modify_model_field.html">add_tags()</a></code> <code><a href="modify_model_field.html">replace_tags()</a></code> <code><a href="modify_model_field.html">add_decisions()</a></code> <code><a href="modify_model_field.html">replace_decisions()</a></code> <code><a href="modify_model_field.html">add_based_on()</a></code> <code><a href="modify_model_field.html">replace_based_on()</a></code> <code><a href="modify_model_field.html">replace_description()</a></code> <code><a href="modify_model_field.html">add_bbi_args()</a></code> <code><a href="modify_model_field.html">replace_bbi_args()</a></code> </p>
         </td>
-        <td><p>Executes (`bbi --help`) with bbi_exec and prints the output string</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="bbi_init.html">bbi_init()</a></code> </p>
-        </td>
-        <td><p>Executes (`bbi init`) with bbi_exec() in specified directory</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="bbi_version.html">bbi_version()</a></code> </p>
-        </td>
-        <td><p>bbi version</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="build_bbi_param_list.html">build_bbi_param_list()</a></code> </p>
-        </td>
-        <td><p>Builds list of unique parameter sets for multiple model bbi calls</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="build_matrix_indices.html">build_matrix_indices()</a></code> </p>
-        </td>
-        <td><p>Builds matrix indices labels</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="build_path_from_mod_obj.html">build_path_from_mod_obj()</a></code> </p>
-        </td>
-        <td><p>Builds the absolute path to a file in the output directory from components of the `bbi_.model_type_model` object</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="check_bbi_exe.html">check_bbi_exe()</a></code> </p>
-        </td>
-        <td><p>Checks that a bbi binary is present at the path passed to .bbi_exe_path</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="check_file.html">check_file()</a></code> <code><a href="check_file.html">tail_output()</a></code> <code><a href="check_file.html">tail_lst()</a></code> </p>
-        </td>
-        <td><p>Reads the head and tail of specified file and prints it the console and/or returns it as a character vector.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="check_lst_file.html">check_lst_file()</a></code> </p>
-        </td>
-        <td><p>Helper function to look for .lst function in a directory</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="check_nonmem_args.html">check_nonmem_args()</a></code> </p>
-        </td>
-        <td><p>Checks that all passed NONMEM command line args are valid and formats</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="check_nonmem_table_output.html">check_nonmem_table_output()</a></code> <code><a href="check_nonmem_table_output.html">check_grd()</a></code> <code><a href="check_nonmem_table_output.html">check_ext()</a></code> </p>
-        </td>
-        <td><p>Checks nonmem output file that's a whitespace-delimited file (for instance .grd or .ext)</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="check_output_dir.html">check_output_dir()</a></code> </p>
-        </td>
-        <td><p>List files in the output directory to glance at where the process is</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="check_status_code.html">check_status_code()</a></code> </p>
-        </td>
-        <td><p>Checks status code from processx process</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="clean_ctl.html">clean_ctl()</a></code> </p>
-        </td>
-        <td><p>Parse control stream to a named list of the blocks</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="combine_directory_path.html">combine_directory_path()</a></code> </p>
-        </td>
-        <td><p>Build absolute path from a directory and path</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="combine_list_objects.html">combine_list_objects()</a></code> </p>
-        </td>
-        <td><p>Combines two named lists. By default, shared keys are overwritten by that key in .new_list
-Any S3 classes will be inherited with those from .new_list given precedence.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="config_log.html">config_log()</a></code> </p>
-        </td>
-        <td><p>Parses model config.json outputs into a log tibble</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="copy_control_stream.html">copy_control_stream()</a></code> </p>
-        </td>
-        <td><p>Copy a NONMEM control stream file</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="copy_model_from.html">copy_model_from()</a></code> <code><a href="copy_model_from.html">copy_nonmem_model_from()</a></code> </p>
-        </td>
-        <td><p>Generic S3 method from iterating on models.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="create_object.html">create_model_object()</a></code> <code><a href="create_object.html">create_summary_object()</a></code> <code><a href="create_object.html">create_process_object()</a></code> <code><a href="create_object.html">create_run_log_object()</a></code> </p>
-        </td>
-        <td><p>Creates S3 object of class `bbi_.model_type_model` from list with `MODEL_REQ_INPUT_KEYS`</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="enforce_length.html">enforce_length()</a></code> </p>
-        </td>
-        <td><p>Helper to enforce length of a list element</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="find_config_file_path.html">find_config_file_path()</a></code> </p>
-        </td>
-        <td><p>Private helper to search for babylon.yaml config files</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="find_model_file_path.html">find_model_file_path()</a></code> </p>
-        </td>
-        <td><p>helper to find valid model file and return ctl_ext(.path) by default if not found</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="find_yaml_file_path.html">find_yaml_file_path()</a></code> </p>
-        </td>
-        <td><p>helper to find valid yaml file</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="format_cmd_args.html">format_cmd_args()</a></code> </p>
-        </td>
-        <td><p>Formats command line args from a named list to a string as it would be passed on the command line</p></td>
+        <td><p>Modify field in model object</p></td>
       </tr><tr>
         
         <td>
@@ -343,197 +294,137 @@ Any S3 classes will be inherited with those from .new_list given precedence.</p>
         <td>
           <p><code><a href="get_model_id.html">get_model_id()</a></code> </p>
         </td>
-        <td><p>Helper to strip path and extension from model file to get only model identifier</p></td>
+        <td><p>Get model identifier</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="get_path_from_object.html">get_path_from_object()</a></code> <code><a href="get_path_from_object.html">get_model_path()</a></code> <code><a href="get_path_from_object.html">get_output_dir()</a></code> <code><a href="get_path_from_object.html">get_yaml_path()</a></code> </p>
         </td>
         <td><p>Get path from bbi object</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-babylon-configuration" class="hasAnchor"><a href="#section-babylon-configuration" class="anchor"></a>Babylon configuration</h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="bbi_current_release.html">bbi_current_release()</a></code> </p>
+        </td>
+        <td><p>Get version number of babylon current release</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="is_diag.html">is_diag()</a></code> </p>
+          <p><code><a href="bbi_help.html">bbi_help()</a></code> </p>
         </td>
-        <td><p>Check if diagonal index or not</p></td>
+        <td><p>Executes (<code>bbi --help</code>) and prints the output string</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="model_summary.html">model_summary()</a></code> <code><a href="model_summary.html">nonmem_summary()</a></code> </p>
+          <p><code><a href="bbi_init.html">bbi_init()</a></code> </p>
         </td>
-        <td><p>S3 generic for getting model summary</p></td>
+        <td><p>Initialize babylon</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="modify_model_field.html">modify_model_field()</a></code> <code><a href="modify_model_field.html">add_tags()</a></code> <code><a href="modify_model_field.html">replace_tags()</a></code> <code><a href="modify_model_field.html">add_decisions()</a></code> <code><a href="modify_model_field.html">replace_decisions()</a></code> <code><a href="modify_model_field.html">add_based_on()</a></code> <code><a href="modify_model_field.html">replace_based_on()</a></code> <code><a href="modify_model_field.html">replace_description()</a></code> </p>
+          <p><code><a href="bbi_version.html">bbi_version()</a></code> </p>
         </td>
-        <td><p>Modify field in model object</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="new_ext.html">new_ext()</a></code> <code><a href="new_ext.html">ctl_ext()</a></code> <code><a href="new_ext.html">mod_ext()</a></code> <code><a href="new_ext.html">yaml_ext()</a></code> <code><a href="new_ext.html">yml_ext()</a></code> </p>
-        </td>
-        <td><p>helpers that strip extension then add a diffent type</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="new_model.html">new_model()</a></code> </p>
-        </td>
-        <td><p>Create new model object by specifying relevant information as arguments
-Also creates necessary YAML file for using functions like `add_tags()` and `run_log()` later.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="param_estimates.html">param_estimates()</a></code> </p>
-        </td>
-        <td><p>S3 generic for parsing parameter estimate table</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="param_labels.html">param_labels()</a></code> </p>
-        </td>
-        <td><p>Extract parameter labels for report tables, etc.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="parse_args_list.html">parse_args_list()</a></code> </p>
-        </td>
-        <td><p>Combines NONMEM args that were passed into the function call with args that were parsed from a model yaml</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="parse_param_comment.html">parse_param_comment()</a></code> <code><a href="parse_param_comment.html">parse_same_block()</a></code> </p>
-        </td>
-        <td><p>extract labels from comments in raw ctl string</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="plot_nonmem_table_df.html">plot_nonmem_table_df()</a></code> <code><a href="plot_nonmem_table_df.html">plot_grd()</a></code> <code><a href="plot_nonmem_table_df.html">plot_ext()</a></code> </p>
-        </td>
-        <td><p>Creates a line plot of the wide-format tibble output from check_nonmem_table_output</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="print_nonmem_args.html">print_nonmem_args()</a></code> </p>
-        </td>
-        <td><p>Prints all valid arguments to pass in submit_nonmem_model(.args=list())</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="rbabylon.html">rbabylon</a></code> </p>
-        </td>
-        <td><p>RBabylon</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="read_model.html">read_model()</a></code> </p>
-        </td>
-        <td><p>Creates a model object from a YAML model file</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="reconcile_yaml.html">reconcile_yaml()</a></code> <code><a href="reconcile_yaml.html">check_yaml_in_sync()</a></code> </p>
-        </td>
-        <td><p>Reconcile model object with YAML file</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="replace_bbi_args.html">replace_bbi_args()</a></code> </p>
-        </td>
-        <td><p>Replaces babylon args to model</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="run_log.html">run_log()</a></code> </p>
-        </td>
-        <td><p>Parses model yaml and outputs into a tibble that serves as a run log. Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="run_log_entry.html">run_log_entry()</a></code> </p>
-        </td>
-        <td><p>Create a run log row from a `bbi_.model_type_model` object</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="safe_based_on.html">safe_based_on()</a></code> </p>
-        </td>
-        <td><p>Checks for yaml files relative to a starting location</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="safe_read_model.html">safe_read_model()</a></code> </p>
-        </td>
-        <td><p>Read in model YAML with error handling</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="save_model_yaml.html">save_model_yaml()</a></code> </p>
-        </td>
-        <td><p>Saves a model model object to a yaml file</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="set_model_directory.html">set_model_directory()</a></code> <code><a href="set_model_directory.html">set_model_directory()</a></code> <code><a href="set_model_directory.html">get_model_directory()</a></code> </p>
-        </td>
-        <td><p>Set global model directory option</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="stop_get_fail_msg.html">stop_get_fail_msg()</a></code> </p>
-        </td>
-        <td><p>Build error message and throw error for generic failure fo get_... functions</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="stop_get_scaler_msg.html">stop_get_scaler_msg()</a></code> </p>
-        </td>
-        <td><p>Build error message and throw error for passing character vector to get_... functions</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="submit_model.html">submit_model()</a></code> <code><a href="submit_model.html">submit_nonmem_model()</a></code> </p>
-        </td>
-        <td><p>S3 generic method for submit_model</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="submit_models.html">submit_models()</a></code> <code><a href="submit_models.html">submit_nonmem_models()</a></code> </p>
-        </td>
-        <td><p>S3 generic method for submit_models</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="suppressSpecificWarning.html">suppressSpecificWarning()</a></code> </p>
-        </td>
-        <td><p>Suppress a warning that matches `.regexpr`</p></td>
+        <td><p>Get version number of babylon installed on system</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="use_bbi.html">use_bbi()</a></code> </p>
         </td>
-        <td><p>Installing bbi</p></td>
+        <td><p>Installs most current release of bbi</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-assorted-helpers" class="hasAnchor"><a href="#section-assorted-helpers" class="anchor"></a>Assorted helpers</h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="check_file.html">check_file()</a></code> <code><a href="check_file.html">tail_output()</a></code> <code><a href="check_file.html">tail_lst()</a></code> </p>
+        </td>
+        <td><p>Check an output file</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="check_nonmem_table_output.html">check_nonmem_table_output()</a></code> <code><a href="check_nonmem_table_output.html">check_grd()</a></code> <code><a href="check_nonmem_table_output.html">check_ext()</a></code> </p>
+        </td>
+        <td><p>Check NONMEM output files</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="check_output_dir.html">check_output_dir()</a></code> </p>
+        </td>
+        <td><p>Check output directory</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="check_status_code.html">check_status_code()</a></code> </p>
+        </td>
+        <td><p>Checks status code from processx process</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="format_cmd_args.html">format_cmd_args()</a></code> </p>
+        </td>
+        <td><p>Formats command line args from a named list to a string as it would be passed on the command line</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="new_ext.html">new_ext()</a></code> <code><a href="new_ext.html">ctl_ext()</a></code> <code><a href="new_ext.html">mod_ext()</a></code> <code><a href="new_ext.html">yaml_ext()</a></code> <code><a href="new_ext.html">yml_ext()</a></code> </p>
+        </td>
+        <td><p>Change file extension</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="plot_nonmem_table_df.html">plot_nonmem_table_df()</a></code> <code><a href="plot_nonmem_table_df.html">plot_grd()</a></code> <code><a href="plot_nonmem_table_df.html">plot_ext()</a></code> </p>
+        </td>
+        <td><p>Plot NONMEM output files</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="suppressSpecificWarning.html">suppressSpecificWarning()</a></code> </p>
+        </td>
+        <td><p>Suppress a warning that matches <code>.regexpr</code></p></td>
       </tr>
     </tbody>
     </table>
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#section-all-functions">All functions</a></li>
-    </ul>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
 
       <footer>
       <div class="copyright">
-  <p>Developed by Devin Pastoor, Seth Green.</p>
+  <p>Developed by Devin Pastoor, Seth Green, Sean Wilson.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

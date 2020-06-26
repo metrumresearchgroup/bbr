@@ -13,7 +13,7 @@ bbi_version(.bbi_exe_path = getOption("rbabylon.bbi_exe_path"))
 character
 }
 \description{
-Returns version number of bbi binary installed at path passed to `.bbi_exe_path`
+Returns version number of bbi binary installed at path passed to \code{.bbi_exe_path}
 }
 \examples{
 \dontrun{

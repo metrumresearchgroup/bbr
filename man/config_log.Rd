@@ -2,18 +2,34 @@
 % Please edit documentation in R/run-log.R
 \name{config_log}
 \alias{config_log}
-\title{Parses model config.json outputs into a log tibble}
+\alias{add_config}
+\title{Parse babylon configs to log}
 \usage{
 config_log(.base_dir = get_model_directory(), .recurse = TRUE)
+
+add_config(.log_df, ...)
 }
 \arguments{
-\item{.base_dir}{Base directory to look from model YAML files in}
+\item{.base_dir}{Base directory to look from \code{bbi_config.json} files in}
 
-\item{.recurse}{Boolean for whether to search recursively in subdirectories}
-}
-\value{
-tibble with information on each run
+\item{.recurse}{If \code{TRUE}, the default, search recursively in subdirectories.}
+
+\item{.log_df}{a \code{bbi_run_log_df} tibble (the output of \code{run_log()})}
+
+\item{...}{arguments passed through to \code{config_log()}}
 }
 \description{
-Parses model config.json outputs into a log tibble
+Parses \code{bbi_config.json} files into a log tibble.
+This file is created by babylon and stores metadata about the execution of a model run.
+}
+\details{
+\code{config_log()} will return a tibble with one row per \code{bbi_config.json} found.
+
+\code{add_config()} takes a \code{bbi_run_log_df} tibble (the output of \code{run_log()}) as its input,
+searches for a \code{bbi_config.json} for each row in the input tibble,
+and joins on the data from the relevant config, if found.
+The returned tibble will have all of its input columns, plus all of the columns returned from \code{config_log()}
+}
+\seealso{
+\code{run_log()}
 }

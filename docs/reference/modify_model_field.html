@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -36,9 +40,10 @@
 
 
 <meta property="og:title" content="Modify field in model object — modify_model_field" />
-<meta property="og:description" content="Implementation function for updating fields in a `bbi_.model_type_model` object
-Also checks the object against the corresponding YAML before modifying (and errors if they are out of sync) and then writes the modified object back to the YAML." />
-<meta name="twitter:card" content="summary" />
+<meta property="og:description" content="Helper functions for updating fields in a bbi_{.model_type}_model object.
+Note that calling modify_model_field() directly is not recommended for most users
+because it requires knowing about the internal structure of the model object.
+Instead we recommend using the friendlier helpers listed below (add_... or replace_...) when possible." />
 
 
 
@@ -56,7 +61,7 @@ Also checks the object against the corresponding YAML before modifying (and erro
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -70,7 +75,7 @@ Also checks the object against the corresponding YAML before modifying (and erro
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.1.7002</span>
       </span>
     </div>
 
@@ -130,8 +135,10 @@ Also checks the object against the corresponding YAML before modifying (and erro
     </div>
 
     <div class="ref-description">
-    <p>Implementation function for updating fields in a `bbi_.model_type_model` object
-Also checks the object against the corresponding YAML before modifying (and errors if they are out of sync) and then writes the modified object back to the YAML.</p>
+    <p>Helper functions for updating fields in a <code>bbi_{.model_type}_model</code> object.
+Note that calling <code>modify_model_field()</code> directly is not recommended for most users
+because it requires knowing about the internal structure of the model object.
+Instead we recommend using the friendlier helpers listed below (<code>add_...</code> or <code>replace_...</code>) when possible.</p>
     </div>
 
     <pre class="usage"><span class='fu'>modify_model_field</span>(<span class='no'>.mod</span>, <span class='no'>.field</span>, <span class='no'>.value</span>, <span class='kw'>.append</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>.unique</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
@@ -148,68 +155,97 @@ Also checks the object against the corresponding YAML before modifying (and erro
 
 <span class='fu'>replace_based_on</span>(<span class='no'>.mod</span>, <span class='no'>.based_on</span>)
 
-<span class='fu'>replace_description</span>(<span class='no'>.mod</span>, <span class='no'>.description</span>)</pre>
+<span class='fu'>replace_description</span>(<span class='no'>.mod</span>, <span class='no'>.description</span>)
+
+<span class='fu'>add_bbi_args</span>(<span class='no'>.mod</span>, <span class='no'>.bbi_args</span>)
+
+<span class='fu'>replace_bbi_args</span>(<span class='no'>.mod</span>, <span class='no'>.bbi_args</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>.mod</th>
-      <td><p>The `bbi_.model_type_model` object to modify</p></td>
+      <td><p>The <code>bbi_{.model_type}_model</code> object to modify</p></td>
     </tr>
     <tr>
       <th>.field</th>
-      <td><p>Character scaler of the name of the component to modify</p></td>
+      <td><p>Character scalar of the name of the component to modify</p></td>
     </tr>
     <tr>
       <th>.value</th>
-      <td><p>Whatever is to be added to `.mod[[.field]]`, typically a character scaler or vector</p></td>
+      <td><p>Whatever is to be added to <code>.mod[[.field]]</code>, typically a character vector</p></td>
     </tr>
     <tr>
       <th>.append</th>
-      <td><p>Boolean for whether to concatenate new values with currently present values. TRUE by default. If FALSE, new values will overwrite old values.</p></td>
+      <td><p>If <code>TRUE</code>, the default, concatenate new values with currently present values. If <code>FALSE</code>, new values will overwrite old values.</p></td>
     </tr>
     <tr>
       <th>.unique</th>
-      <td><p>Boolean for whether to de-duplicate `.mod[[.field]]` after adding new values. TRUE by default.</p></td>
+      <td><p>If <code>TRUE</code>, the default, de-duplicate <code>.mod[[.field]]</code> after adding new values. If <code>FALSE</code> duplicate values will be kept.</p></td>
     </tr>
     <tr>
       <th>.tags</th>
-      <td><p>Character scaler or vector of tags use as replacement</p></td>
+      <td><p>Character vector to add to <code>tags</code> field</p></td>
     </tr>
     <tr>
       <th>.decisions</th>
-      <td><p>Character scaler or vector to use as replacement</p></td>
+      <td><p>Character vector to use as replacement</p></td>
     </tr>
     <tr>
       <th>.based_on</th>
-      <td><p>Character scaler or vector to use as replacement</p></td>
+      <td><p>Character vector of relative paths to add to <code>based_on</code> field</p></td>
     </tr>
     <tr>
       <th>.description</th>
-      <td><p>Character scaler to use as replacement</p></td>
+      <td><p>Character scalar to use as replacement for the <code>description</code> field</p></td>
+    </tr>
+    <tr>
+      <th>.bbi_args</th>
+      <td><p>named list of arguments to add to the model</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>All functions in this family also check the object against the corresponding YAML with <code><a href='verify_model_yaml_integrity.html'>check_yaml_in_sync()</a></code> before modifying it,
+and errors if they are out of sync.
+After the object has been modified they will write the modified object back to the YAML and update the model object in
+memory with an md5 digest of the newly written YAML.</p>
+    <h2 class="hasAnchor" id="functions"><a class="anchor" href="#functions"></a>Functions</h2>
+
+    
+<ul>
+<li><p><code>add_tags</code>: Add tags to a model object and corresponding YAML</p></li>
+<li><p><code>replace_tags</code>: Replaces tags on a model object and corresponding YAML with new tags</p></li>
+<li><p><code>add_decisions</code>: Append new decisions to the one(s) in a model object and corresponding YAML</p></li>
+<li><p><code>replace_decisions</code>: Replaces <code>decisions</code> field in a model object and corresponding YAML with new values</p></li>
+<li><p><code>add_based_on</code>: Append new <code>based_on</code> tag to the one in a model object and corresponding YAML</p></li>
+<li><p><code>replace_based_on</code>: Replaces <code>based_on</code> field in a model object and corresponding YAML with new values</p></li>
+<li><p><code>replace_description</code>: Replaces description field in a model object and corresponding YAML with new description</p></li>
+<li><p><code>add_bbi_args</code>: Modifies model object and corresponding YAML by adding new <code>bbi_args</code>,
+overwriting any args that are already present with the new values.
+Use <code><a href='print_nonmem_args.html'>print_nonmem_args()</a></code> to see a list of valid babylon arguments.</p></li>
+<li><p><code>replace_bbi_args</code>: Modifies model object and corresponding YAML by replacing <code>bbi_args</code> with new list passed to <code>.bbi_args</code>.
+Use <code><a href='print_nonmem_args.html'>print_nonmem_args()</a></code> to see a list of valid babylon arguments.</p></li>
+</ul>
 
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
 
       <footer>
       <div class="copyright">
-  <p>Developed by Devin Pastoor, Seth Green.</p>
+  <p>Developed by Devin Pastoor, Seth Green, Sean Wilson.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

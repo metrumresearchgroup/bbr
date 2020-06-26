@@ -96,7 +96,7 @@ YAML_ERASE_OUT_KEYS <- c(
 )
 
 # keys that need to be coerced to arrays when saving a model YAML on disk
-YAML_SCALER_TO_LIST_KEYS <- c(
+YAML_SCALAR_TO_LIST_KEYS <- c(
   YAML_BASED_ON,
   YAML_TAGS,
   YAML_DECISIONS

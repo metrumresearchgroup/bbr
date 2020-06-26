@@ -6,27 +6,31 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Generic S3 method from iterating on models. — copy_model_from • rbabylon</title>
+<title>Create new model by copying existing model — copy_model_from • rbabylon</title>
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -35,10 +39,9 @@
 
 
 
-<meta property="og:title" content="Generic S3 method from iterating on models. — copy_model_from" />
-<meta property="og:description" content="Create new .mod/ctl and new .yaml files based on a previous model. Used for iterating on model development.
-Also fills in necessary YAML fields for using `create_run_log()` later." />
-<meta name="twitter:card" content="summary" />
+<meta property="og:title" content="Create new model by copying existing model — copy_model_from" />
+<meta property="og:description" content="Create new model by copying existing model. Useful for iterating during model development.
+Also fills based_on field by default, for constructing model ancestry. See &quot;Using based_on field&quot; vignette for details." />
 
 
 
@@ -56,7 +59,7 @@ Also fills in necessary YAML fields for using `create_run_log()` later." />
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -70,7 +73,7 @@ Also fills in necessary YAML fields for using `create_run_log()` later." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.1.7002</span>
       </span>
     </div>
 
@@ -124,14 +127,14 @@ Also fills in necessary YAML fields for using `create_run_log()` later." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Generic S3 method from iterating on models.</h1>
+    <h1>Create new model by copying existing model</h1>
     
     <div class="hidden name"><code>copy_model_from.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Create new .mod/ctl and new .yaml files based on a previous model. Used for iterating on model development.
-Also fills in necessary YAML fields for using `create_run_log()` later.</p>
+    <p>Create new model by copying existing model. Useful for iterating during model development.
+Also fills <code>based_on</code> field by default, for constructing model ancestry. See <a href='../articles/using-based-on.html'>"Using based_on field" vignette</a> for details.</p>
     </div>
 
     <pre class="usage"><span class='fu'>copy_model_from</span>(
@@ -143,7 +146,7 @@ Also fills in necessary YAML fields for using `create_run_log()` later.</p>
   <span class='kw'>.inherit_tags</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>.update_model_file</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>.overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>()
+  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='get_model_directory.html'>get_model_directory</a></span>()
 )
 
 <span class='co'># S3 method for bbi_nonmem_model</span>
@@ -156,7 +159,7 @@ Also fills in necessary YAML fields for using `create_run_log()` later.</p>
   <span class='kw'>.inherit_tags</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>.update_model_file</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>.overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>()
+  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='get_model_directory.html'>get_model_directory</a></span>()
 )
 
 <span class='co'># S3 method for character</span>
@@ -169,7 +172,7 @@ Also fills in necessary YAML fields for using `create_run_log()` later.</p>
   <span class='kw'>.inherit_tags</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>.update_model_file</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>.overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>()
+  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='get_model_directory.html'>get_model_directory</a></span>()
 )
 
 <span class='co'># S3 method for numeric</span>
@@ -182,18 +185,7 @@ Also fills in necessary YAML fields for using `create_run_log()` later.</p>
   <span class='kw'>.inherit_tags</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>.update_model_file</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>.overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>()
-)
-
-<span class='fu'>copy_nonmem_model_from</span>(
-  <span class='no'>.parent_mod</span>,
-  <span class='no'>.new_model</span>,
-  <span class='no'>.description</span>,
-  <span class='kw'>.based_on_additional</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>.add_tags</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>.inherit_tags</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>.update_model_file</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>.overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='get_model_directory.html'>get_model_directory</a></span>()
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -201,65 +193,71 @@ Also fills in necessary YAML fields for using `create_run_log()` later.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>.parent_mod</th>
-      <td><p>S3 object of class `bbi_nonmem_model` to be used as the basis for copy.</p></td>
+      <td><p>Model to copy from</p></td>
     </tr>
     <tr>
       <th>.new_model</th>
-      <td><p>Integer that corresponds to the new model name to create. Function will create both `.new_model.yaml` and a new model file based on this path.</p></td>
+      <td><p>Path to write new model files to WITHOUT FILE EXTENSION. Function will create both <code>{.new_model}.yaml</code> and a new model file based on this path.</p></td>
     </tr>
     <tr>
       <th>.description</th>
-      <td><p>Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.</p></td>
+      <td><p>Description of new model run. This will be stored in the yaml (to be used later in <code><a href='run_log.html'>run_log()</a></code>).</p></td>
     </tr>
     <tr>
       <th>.based_on_additional</th>
-      <td><p>Character scaler or vector of paths to other models that this model was "based on." These are used to reconstuct model developement and ancestry. <strong>Paths must be relative to `.new_model` path.</strong> Note that the `.parent_model` will automatically be added to the `based_on` field, so no need to include that here.</p></td>
+      <td><p>Character vector of path(s) to other models that this model was "based on." These are used to reconstuct model developement and ancestry. <strong>Paths must be relative to <code>.new_model</code> path.</strong> Note that the <code>.parent_model</code> will automatically be added to the <code>based_on</code> field, so no need to include that here.</p></td>
     </tr>
     <tr>
       <th>.add_tags</th>
-      <td><p>A character scaler or vector with any new tags to be added to `.new_model.yaml`</p></td>
+      <td><p>Character vector with any new tags(s) to be added to <code>{.new_model}.yaml</code></p></td>
     </tr>
     <tr>
       <th>.inherit_tags</th>
-      <td><p>Boolean for whether to inherit any tags from `.parent_mod`</p></td>
+      <td><p>If <code>FALSE</code>, the default, new model will only have any tags passed to <code>.add_tags</code> argument. If <code>TRUE</code> inherit any tags from <code>.parent_mod</code>, with any tags passed to <code>.add_tags</code> appended.</p></td>
     </tr>
     <tr>
       <th>.update_model_file</th>
-      <td><p>Boolean for whether to update the `$PROBLEM` line in the new control stream. By default it is TRUE, but if FALSE is passed `.new_model.[mod|ctl]` will be an exact copy of its parent control stream.</p></td>
+      <td><p>If <code>TRUE</code>, the default, update the newly created model file with new description and name.
+For a NONMEM model, this currently means only the <code>$PROBLEM</code> line in the new control stream will be updated.
+If <code>FALSE</code>, new model file will be an exact copy of its parent.</p></td>
     </tr>
     <tr>
       <th>.overwrite</th>
-      <td><p>Boolean for whether to overwrite model file if one already exists specified `.new_model` path</p></td>
+      <td><p>If <code>FALSE</code>, the default,  function will error if a model file already exists at specified <code>.new_model</code> path. If <code>TRUE</code> any existing file at <code>.new_model</code> will be overwritten silently.</p></td>
     </tr>
     <tr>
       <th>.directory</th>
-      <td><p>Model directory which BOTH `.parent_model` and `.new_model` are relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.</p></td>
+      <td><p>Model directory which <code>.new_model</code> is relative to. Defaults to <code><a href='https://rdrr.io/r/base/options.html'>options('rbabylon.model_directory')</a></code>, which can be set globally with <code><a href='get_model_directory.html'>set_model_directory()</a></code>.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <h2 class="hasAnchor" id="methods-by-class-"><a class="anchor" href="#methods-by-class-"></a>Methods (by class)</h2>
 
-    <p>S3 object of class `bbi_nonmem_model` that can be passed to `submit_nonmem_model()`</p>
+    
+<ul>
+<li><p><code>bbi_nonmem_model</code>: <code>.parent_mod</code> takes a <code>bbi_nonmem_model</code> object to use as a basis for the copy.</p></li>
+<li><p><code>character</code>: Takes a file path to parent model to use as a basis for the copy. Ideally a YAML path, but can also pass control stream or output directory.
+Can be absolute or relative to <code>.directory</code>, which defaults to <code><a href='https://rdrr.io/r/base/options.html'>options('rbabylon.model_directory')</a></code>.</p></li>
+<li><p><code>numeric</code>: Both <code>.parent_mod</code> and <code>.new_model</code> take integers which must correspond to a model file name (without extension obviously).
+This will only work if you are calling from the same directory as the models, or if you have set <code><a href='https://rdrr.io/r/base/options.html'>options('rbabylon.model_directory')</a></code> to the directory constaining the relevant models.</p></li>
+</ul>
 
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
 
       <footer>
       <div class="copyright">
-  <p>Developed by Devin Pastoor, Seth Green.</p>
+  <p>Developed by Devin Pastoor, Seth Green, Sean Wilson.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

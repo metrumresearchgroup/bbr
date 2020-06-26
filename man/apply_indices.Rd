@@ -10,20 +10,24 @@ apply_indices(.label_df, .omega = NULL, .sigma = NULL)
 block(.n)
 }
 \arguments{
-\item{.label_df}{A tibble like the output of `param_labels()`, containing columns `names, label, unit, type`}
+\item{.label_df}{A tibble like the output of \code{param_labels()}, containing columns \verb{names, label, unit, type}}
 
-\item{.omega}{A logical vector indicating whether each Omega parameter is a diagonal. If `NULL` function assumes all are diagonal. Alternatively you can pass `block(.n)` or pass a custom vector if control stream has both block and non-block.}
+\item{.omega}{A logical vector indicating whether each Omega parameter is a diagonal. If \code{NULL} function assumes all are diagonal. Alternatively you can pass \code{block(.n)} or pass a custom vector if control stream has both block and non-block.}
 
-\item{.sigma}{A logical vector indicating whether each Sigma parameter is a diagonal. If `NULL` function assumes all are diagonal. Alternatively you can pass `block(.n)` or pass a custom vector if control stream has both block and non-block.}
+\item{.sigma}{A logical vector indicating whether each Sigma parameter is a diagonal. If \code{NULL} function assumes all are diagonal. Alternatively you can pass \code{block(.n)} or pass a custom vector if control stream has both block and non-block.}
 
 \item{.n}{The size of the block}
 }
 \description{
-Because there are numerous ways of specifying the diagonal and off-diagonal elements of an `$OMEGA` or `$SIGMA` block in a control stream,
-automatically parsing the structure of these blocks can be brittle and error prone. For this reason, indices are *not* automatically added
-to the output of the `param_labels()` function and are instead added with the  `apply_indices()` function.
+Because there are numerous ways of specifying the diagonal and off-diagonal elements of an \verb{$OMEGA} or \verb{$SIGMA} block in a control stream,
+automatically parsing the structure of these blocks can be brittle and error prone. For this reason, indices are \emph{not} automatically added
+to the output of the \code{param_labels()} function and are instead added with the  \code{apply_indices()} function.
 }
 \details{
-For more details and examples of how to specify `$OMEGA` and `$SIGMA` block structure, see the "Parameter Labels" vignette:
+\code{block()} is a helper function for formatting blocks into .omega or .sigma logical vectors.
+It takes an integer and returns a logical vector indicating whether each element
+of an \code{.n}-sized block with diagonal or not.
+
+For more details and examples of how to specify \verb{$OMEGA} and \verb{$SIGMA} block structure, see the "Parameter Labels" vignette:
 \href{../docs/articles/parameter-labels.html}{\code{vignette("parameter-labels", package = "rbabylon")}}
 }

@@ -5,8 +5,7 @@
 \alias{submit_models.list}
 \alias{submit_models.character}
 \alias{submit_models.numeric}
-\alias{submit_nonmem_models}
-\title{S3 generic method for submit_models}
+\title{Submit models to be run in batch}
 \usage{
 submit_models(
   .mods,
@@ -51,47 +50,42 @@ submit_models(
   .dry_run = FALSE,
   .directory = get_model_directory()
 )
-
-submit_nonmem_models(
-  .mods,
-  .bbi_args = NULL,
-  .mode = c("sge", "local"),
-  ...,
-  .config_path = file.path(get_model_directory() \%||\% ".", "babylon.yaml"),
-  .wait = TRUE,
-  .dry_run = FALSE
-)
 }
 \arguments{
-\item{.mods}{A list of S3 objects of class `bbi_nonmem_model`}
+\item{.mods}{The model object to submit. Could be
+a list of \verb{bbi_\{.model_type\}_model } object,
+a character vector of file paths to models,
+a numeric vector of integers corresponding to a file names of a models.}
 
-\item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.}
+\item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}. Run \code{print_nonmem_args()} to see valid arguments.}
 
-\item{.mode}{Either "local" for local execution or "sge" to submit model(s) to the grid}
+\item{.mode}{Either \code{"sge"}, the default, to submit model(s) to the grid or \code{"local"} for local execution.}
 
-\item{...}{args passed through to `bbi_exec()`}
+\item{...}{args passed through to \code{bbi_exec()}}
 
 \item{.config_path}{Optionally specify a path to a babylon.yml config. If not specified, the config in the model directory will be used by default. Path MUST be either an absolute path or relative to the model directory.}
 
-\item{.wait}{Boolean for whether to wait for the bbi process to return before this function call returns.}
+\item{.wait}{If \code{TRUE}, the default, wait for the bbi process to return before this function call returns. If \code{FALSE} function will return while bbi process runs in the background.}
 
 \item{.dry_run}{Returns an object detailing the command that would be run, insted of running it. This is primarily for testing but also a debugging tool.}
 
-\item{.directory}{Model directory containing the files referenced by `.mods`. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.}
-}
-\value{
-A list of S3 objects of class `babylon_process`
+\item{.directory}{Model directory which \code{.mod} path is relative to. Defaults to \code{options('rbabylon.model_directory')}, which can be set globally with \code{set_model_directory()}. \strong{Only used when passing a file path for \code{.mod} instead of a \verb{bbi_\{.model_type\}_model} object.}}
 }
 \description{
-S3 generic method for submit_models
-
-S3 dispatch for submit_model from bbi_nonmem_model
-
-S3 dispatch for submit_models from character vector
-  Should be a vector of paths to yaml (with or without .yaml extension), or a valid model file (control stream, etc.).
-
-S3 dispatch for submit_models from numeric input
-This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`
-
-Submits multiple NONMEM models in batch via babylon
+Submits a group of models to be run in batch by calling out to \code{bbi} in as few external calls as possible (see "Details").
 }
+\details{
+The number of \code{bbi} calls to make is determined by the number of distinct sets of \code{bbi} arguments passed to the submission calls,
+either explicitly through \code{.bbi_args}, as specified in the \code{bbi_args} field of the model YAML, or specified globally in \code{babylon.yml}.
+}
+\section{Methods (by class)}{
+\itemize{
+\item \code{list}: Takes a list of \code{bbi_nonmem_model} objects.
+
+\item \code{character}: Takes a character vector of file paths to models that can be loaded with \code{read_model()}.
+Should be a vector of paths to YAML (with or without .yaml extension), or valid model files (control stream, etc.).
+
+\item \code{numeric}: Takes a numeric vector of integers corresponding to file names of models that can be loaded with \code{read_model()}.
+This will only work if you are calling from the same directory as the models, or if you have set \code{options('rbabylon.model_directory')} to the directory constaining the relevant model.
+}}
+

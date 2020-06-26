@@ -14,3 +14,4 @@ linux_install_commands(.dir, .bbi_url)
 \description{
 Private helper function for building commands to install bbi on Linux
 }
+\keyword{internal}

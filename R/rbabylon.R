@@ -10,7 +10,9 @@
 NULL
 
 
-#' Executes a babylon call (`bbi ...`) with processx::process$new()
+#' Execute call to bbi
+#'
+#' Private implementation function that executes a babylon call (`bbi ...`) with processx::process$new()
 #' @param .cmd_args A character vector of command line arguments for the execution call
 #' @param .dir The working directory to run command in. Defaults to "."
 #' @param .verbose Print stdout and stderr as process runs #### NOT IMPLEMENTED?
@@ -19,11 +21,11 @@ NULL
 #' @return An S3 object of class `babylon_process`
 #'         process -- The process object (see ?processx::process$new for more details on what you can do with this).
 #'         stdout -- the stdout and stderr from the process, if `.wait = TRUE`. If `.wait = FALSE` this will be NULL.
-#'         bbi -- character scaler with the execution path used for bbi.
+#'         bbi -- character scalar with the execution path used for bbi.
 #'         cmd_args -- character vector of all command arguments passed to the process.
 #'         working_dir -- the directory the command was run in, passed through from .dir argument.
 #' @importFrom processx process
-#' @export
+#' @keywords internal
 bbi_exec <- function(.cmd_args, .dir = ".", .verbose = FALSE, .wait = FALSE, ...) {
   bbi_exe_path <- getOption("rbabylon.bbi_exe_path")
   check_bbi_exe(bbi_exe_path)
@@ -54,14 +56,13 @@ bbi_exec <- function(.cmd_args, .dir = ".", .verbose = FALSE, .wait = FALSE, ...
   return(res)
 }
 
-#' Babylon dry_run
+#' Creates a `babylon_process` object with all the required keys, without actually running the command
 #'
-#' Creates a `babylon_process` object with all the required keys, without actually running the command.
 #' Returns an S3 object of class `babylon_process` but the `process` and `stdout` elements containing only the string "DRY_RUN".
 #' Also contains the element `call` with a string representing the command that could be called on the command line.
 #' @param .cmd_args A character vector of command line arguments for the execution call
 #' @param .dir The working directory to run command in. Defaults to "."
-#' @export
+#' @keywords internal
 bbi_dry_run <- function(.cmd_args, .dir) {
   # build result object
   res <- list()
@@ -86,7 +87,7 @@ bbi_dry_run <- function(.cmd_args, .dir) {
 
 #' Checks that a bbi binary is present at the path passed to .bbi_exe_path
 #' @param .bbi_exe_path Path to bbi exe file that will be checked
-#' @export
+#' @keywords internal
 check_bbi_exe <- function(.bbi_exe_path) {
   # check if this path is not in the already checked paths
   if (is.null(CACHE_ENV$bbi_exe_paths[[.bbi_exe_path]])) {
@@ -110,7 +111,7 @@ check_bbi_exe <- function(.bbi_exe_path) {
 #' Check if bbi_version is below minimum allowed version
 #' @importFrom stringr str_replace_all
 #' @param .bbi_exe_path Path to bbi exe file that will be checked
-#' @export
+#' @keywords internal
 check_bbi_version_constraint <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')) {
   .bbi_exe_path <- Sys.which(.bbi_exe_path)
   if (.bbi_exe_path == "") {
@@ -137,7 +138,7 @@ check_bbi_version_constraint <- function(.bbi_exe_path = getOption('rbabylon.bbi
 #' @importFrom stringr str_detect
 #' @export
 check_status_code <- function(.status_code, .output, .cmd_args) {
-  # consolidate output to a scaler
+  # consolidate output to a scalar
   .output <- paste(.output, collapse = "\n")
 
   .custom_msg <- ""
@@ -159,7 +160,7 @@ check_status_code <- function(.status_code, .output, .cmd_args) {
 }
 
 
-#' Executes (`bbi --help`) with bbi_exec and prints the output string
+#' Executes (`bbi --help`) and prints the output string
 #' @param .cmd_args You can optionally pass a vector of args to get help about a specific call
 #' @export
 bbi_help <- function(.cmd_args=NULL) {
@@ -173,11 +174,24 @@ bbi_help <- function(.cmd_args=NULL) {
 }
 
 
-#' Executes (`bbi init`) with bbi_exec() in specified directory
+#' Initialize babylon
+#'
+#' Executes `bbi init ...` in specified directory. This creates a `babylon.yml` file, which contains defaults
+#' for many configurable `babylon` settings, in that directory.
+#'
+#' @details
+#' For `rbabylon` to make any calls out to `bbi` (for example in `submit_model()` or `model_summary()`) it must find a
+#' `babylon.yml` file in one of the following places:
+#'  * The directory specified in `options("rbabylon.model_directory")`
+#'  * The working directory, if `options("rbabylon.model_directory")` is `NULL`
+#'  * A path passed to the `.config_path` argument of the functions mentioned above
+#'
+#' The recommended behavior is to set `options("rbabylon.model_directory")`, ideally in your `.Rprofile`,
+#' and then call `bbi_init(.dir = getOption("rbabylon.model_directory"), ...)`. This only has to be done once.
 #' @param .dir Path to directory to run `init` in (and put the resulting `babylon.yml` file)
 #' @param .nonmem_dir Path to directory with the NONMEM installation.
-#' @param .nonmem_version Character scaler for default version of NONMEM to use. If left NULL, function will exit and tell you which versions were found in `.nonmem_dir`
-#' @param .no_default_version Boolean to force creation of babylon.yaml with NO default NONMEM version. FALSE by default, and not encouraged.
+#' @param .nonmem_version Character scalar for default version of NONMEM to use. If left NULL, function will exit and tell you which versions were found in `.nonmem_dir`
+#' @param .no_default_version If `TRUE`, force creation of babylon.yaml with **no default NONMEM version**. `FALSE` by default, and using `TRUE` is *not* encouraged.
 #' @importFrom yaml read_yaml write_yaml
 #' @export
 bbi_init <- function(.dir, .nonmem_dir, .nonmem_version = NULL, .no_default_version = FALSE) {

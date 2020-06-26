@@ -20,3 +20,4 @@ current_release(
 \description{
 Private helper function to most recent release version from repo
 }
+\keyword{internal}

@@ -14,3 +14,4 @@ version_message(local_v, release_v)
 \description{
 Private helper to construct version comparison message
 }
+\keyword{internal}

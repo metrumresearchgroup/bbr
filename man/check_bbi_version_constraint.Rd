@@ -14,3 +14,4 @@ check_bbi_version_constraint(
 \description{
 Check if bbi_version is below minimum allowed version
 }
+\keyword{internal}

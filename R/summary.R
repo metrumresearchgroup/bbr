@@ -4,15 +4,42 @@
 # s3 dispatches to parse NONMEM output to list
 ################################################
 
-#' S3 generic for getting model summary
-#' @param .mod model to summarize
-#' @param .model_type Only used for if passing a path to `.mod` instead of an S3 object. Character scaler specifying the type of model, either 'nonmem' or 'stan'
+#' Summarize model outputs
+#'
+#' Calls out to bbi and returns a named list of class `bbi_{.model_type}_summary` with model outputs and diagnostics.
+#'
+#' @details
+#' **NONMEM**
+#'
+#' The returned list for a NONMEM model will contain the following top-level elements:
+#'  * run_details
+#'  * run_heuristics
+#'  * parameters_data
+#'  * parameter_names
+#'  * ofv
+#'  * shrinkage_details
+#'  * covariance_theta
+#'  * correlation_theta
+#'
+#' The summary call will error if it does not find certain files in the output folder.
+#' However, you can override this behavior with the following file-specific flags:
+#'  * `no_cor_file`
+#'  * `no_cov_file`
+#'  * `no_ext_file`
+#'  * `no_grd_file`
+#'  * `no_shk_file`
+#'
+#' If you are using an estimation method that does not produce any of the following files,
+#' or they are missing for some other legitimate reason, pass the appropriate flags through the `.bbi_args` argument.
+#' For example, if have asked to skip the `$COV` step, you would call `model_summary(..., .bbi_args = list(no_cov_file = TRUE))`.
+#'
+#' @param .mod Model to summarize. Can be a `bbi_{.model_type}_model` object, a file path, or an integer corresponding to a file path.
+#' @param .model_type String specifying the type of model, either 'nonmem' or 'stan'.  **Only used when passing a path for `.mod` instead of a `bbi_{.model_type}_model` object.**
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`.
 #' @param ... args passed through to `bbi_exec()`
 #' @param .dry_run show what the command would be without actually running it
-#' @param .directory Model directory which `.mod` path is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`. Only used when passing a path for `.mod` instead of a `bbi_{.model_type}_model` object.
+#' @param .directory Model directory which `.mod` path is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`. **Only used when passing a path for `.mod` instead of a `bbi_{.model_type}_model` object.**
 #' @export
-#' @rdname model_summary
 model_summary <- function(
   .mod,
   .model_type = NULL,
@@ -24,11 +51,7 @@ model_summary <- function(
   UseMethod("model_summary")
 }
 
-#' Get model summary from `bbi_nonmem_model` object and optionally check if model is done before erroring
-#' @param .mod `bbi_nonmem_model` object for summary
-#' @param .model_type Ignored by this dispatch. `bbi_nonmem_model` object can only represent a NONMEM model
-#' @param .directory This argument is only used when passing a path to `model_summary()`. When `bbi_nonmem_model` object is passed, `.directory` is inferred from the model object.
-#' @rdname model_summary
+#' @describeIn model_summary Get model summary from `bbi_nonmem_model` object
 #' @export
 model_summary.bbi_nonmem_model <- function(
   .mod,
@@ -60,14 +83,8 @@ model_summary.bbi_nonmem_model <- function(
   return(res_list)
 }
 
-#' S3 dispatch for getting model summary from output directory path
-#' @param .mod Full path to one of the following:
-#'     1) path to a model file in the output directory
-#'     2) path to a nonmem output directory
-#' @param .model_type Character scaler specifying the type of model, either 'nonmem' or 'stan'
-#' @param .directory Model directory which `.mod` path is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
+#' @describeIn model_summary Get model summary from output directory path
 #' @export
-#' @rdname model_summary
 model_summary.character <- function(
   .mod,
   .model_type = c("nonmem", "stan"),
@@ -99,13 +116,9 @@ model_summary.character <- function(
 }
 
 
-#' S3 dispatch for getting model summary from numeric input
-#' This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`
-#' @param .mod Integer that corresponds to the name of a YAML, model file, and output directory
-#' @param .model_type Character scaler specifying the type of model, either 'nonmem' or 'stan'
-#' @param .directory Model directory containing the files referenced by `.mod`. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
+#' @describeIn model_summary Get model summary from numeric input.
+#' This will only work if you are calling from the same directory as the models, or if you have set `options('rbabylon.model_directory')` to the directory constaining the relevant model.
 #' @export
-#' @rdname model_summary
 model_summary.numeric <- function(
   .mod,
   .model_type = c("nonmem", "stan"),
@@ -133,10 +146,12 @@ model_summary.numeric <- function(
 
 
 #' Run `bbi nonmem summary` and parse the output to a list
+#'
+#' Private implementation function called by `model_summary()` dispatches.
 #' @param .mod `bbi_nonmem_model` object for summary
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.
 #' @return List of S3 Class "bbi_nonmem_summary" with all summary information
-#' @rdname model_summary
+#' @keywords internal
 nonmem_summary <- function(
   .mod,
   .bbi_args = NULL,
@@ -189,8 +204,9 @@ nonmem_summary <- function(
   return(res_list)
 }
 
-#' Helper function to look for .lst function in a directory
+#' Private helper function to look for .lst function in a directory
 #' @param .x The directory path to look in for the lst file
+#' @keywords internal
 check_lst_file <- function(.x) {
   lst_file <- fs::dir_ls(.x, type = "file", glob = "*.lst")
   if (!length(lst_file)) {
