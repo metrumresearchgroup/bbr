@@ -342,6 +342,16 @@ check_model_object_list <- function(.mods, .mod_types = VALID_MOD_CLASSES) {
   return(invisible(TRUE))
 }
 
+#' Private helper to check if an object inherits a run log class and error if not
+#' @param .df The object to check
+#' @keywords internal
+check_bbi_run_log_df_object <- function(.df) {
+  if (!inherits(.df, "bbi_run_log_df")) {
+    stop(glue("Can only pass an tibble of class `bbi_run_log_df`. Passed object has classes {paste(class(.df), collapse = ', ')}"))
+  }
+  return(invisible(TRUE))
+}
+
 ############################
 # Error handlers
 ############################

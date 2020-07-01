@@ -205,9 +205,7 @@ config_log <- function(
 #' @export
 add_config <- function(.log_df, ...) {
   # check input df
-  if (!inherits(.log_df, "bbi_run_log_df")) {
-    stop(glue("Can only pass an object of class `bbi_run_log_df` to `add_config()`. Passed object has classes {paste(class(.log_df), collapse = ', ')}"))
-  }
+  check_bbi_run_log_df_object(.log_df)
 
   # get config log
   .conf_df <- config_log(...)
@@ -236,3 +234,111 @@ add_config <- function(.log_df, ...) {
 }
 
 
+#####################################
+# Fields `bbi_{.model_type}_summary`
+#####################################
+
+#### #' Parse `bbi_{.model_type}_summary` objects to log
+#### #'
+#### #' Parses `bbi_{.model_type}_summary` objects to log tibble.
+#### #' This object is the output from `model_summary()`,
+#### #' though this function actually calls `model_summaries()` which returns a list of `bbi_{.model_type}_summary` objects
+#### #' and extracts pieces of them to parse into columns
+####
+#### #' @seealso `run_log()`
+#### #' @param .base_dir Base directory to look from `bbi_config.json` files in
+#### #' @param .recurse If `TRUE`, the default, search recursively in subdirectories.
+#### #' @importFrom stringr str_subset
+#### #' @importFrom fs dir_ls
+#### #' @importFrom purrr map_df
+#### #' @importFrom dplyr mutate select everything
+#### #' @importFrom jsonlite fromJSON
+#### #' @export
+#### config_log <- function(
+####   .base_dir = get_model_directory(),
+####   .recurse = TRUE
+#### ) {
+####
+####   # if no directory defined, set to working directory
+####   if (is.null(.base_dir)) {
+####     .base_dir <- getwd()
+####   }
+####
+####   # define json keys to keep as constant
+####   KEEPERS = c(
+####     "model_md5",
+####     "data_path",
+####     "data_md5"
+####   )
+####
+####   BBI_CONFIG <- "/bbi_config.json$"
+####
+####   # get json files and parse to df
+####   json_files <- dir_ls(.base_dir, recurse = .recurse)
+####   json_files <- str_subset(json_files, BBI_CONFIG)
+####   json_files <- normalizePath(json_files)
+####
+####   if (length(json_files) == 0) {
+####     warning(glue("Found no bbi_config.json files in {.base_dir}"))
+####     return(NULL)
+####   }
+####
+####   # map over json files and parse relevant fields
+####   df <- map_df(json_files, function(.path) {
+####     .conf_list <- fromJSON(.path)
+####     if (!all(KEEPERS %in% names(.conf_list))) {
+####       warning(paste(
+####         glue("{.path} is missing the required keys: `{paste(KEEPERS[!(KEEPERS %in% names(.conf_list))], collapse=', ')}` and will be skipped."),
+####         glue("This is likely because it was run with an old version of babylon. Model was run on version {.conf_list$bbi_version}"),
+####         "User can call `bbi_current_release()` to see the most recent release version, and call `use_bbi(options('rbabylon.bbi_exe_path'))` to upgrade to the version.",
+####         sep = "\n"
+####       ))
+####       return(NULL)
+####     }
+####     return(.conf_list[KEEPERS])
+####   })
+####   df <- mutate(df, !!ABS_MOD_PATH := str_replace(json_files, BBI_CONFIG, ""))
+####   df <- select(df, .data[[ABS_MOD_PATH]], everything())
+####
+####   return(df)
+#### }
+####
+####
+#### #' @param .log_df a `bbi_run_log_df` tibble (the output of `run_log()`)
+#### #' @param ... arguments passed through to `config_log()`
+#### #' @importFrom dplyr left_join
+#### #' @rdname config_log
+#### #' @export
+#### add_config <- function(.log_df, ...) {
+####   # check input df
+####   check_bbi_run_log_df_object(.log_df)
+####
+####   # get config log
+####   .conf_df <- config_log(...)
+####
+####   # check for missing rows
+####   if (is.null(.conf_df)) {
+####     warning(paste(glue("add_config() found {nrow(.log_df)} runs but found {nrow(.conf_df)} configs."),
+####                   "Check if your runs are still in progress.",
+####                   sep = "\n"))
+####     return(.log_df)
+####   } else if (nrow(.log_df) != nrow(.conf_df)) {
+####     warning(paste(glue("add_config() found {nrow(.log_df)} runs but found {nrow(.conf_df)} configs."),
+####                   "Check for rows with `is.null('model_md5')` in tibble. Some runs may have failed or still be in progress.",
+####                   sep = "\n"))
+####   }
+####
+####   # join to log df
+####   df <- left_join(
+####     .log_df,
+####     .conf_df,
+####     by = ABS_MOD_PATH,
+####     suffix = c(".log", ".config")
+####   )
+####
+####   return(df)
+#### }
+####
+####
+####
+####

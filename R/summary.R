@@ -145,6 +145,10 @@ model_summary.numeric <- function(
 }
 
 
+###################################
+# PRIVATE IMPLEMENTATION FUNCTIONS
+###################################
+
 #' Run `bbi nonmem summary` and parse the output to a list
 #'
 #' Private implementation function called by `model_summary()` dispatches.
