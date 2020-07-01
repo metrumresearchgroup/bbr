@@ -195,7 +195,7 @@ submit_nonmem_model <- function(.mod,
 #' The number of `bbi` calls to make is determined by the number of distinct sets of `bbi` arguments passed to the submission calls,
 #' either explicitly through `.bbi_args`, as specified in the `bbi_args` field of the model YAML, or specified globally in `babylon.yml`.
 #' @param .mods The model object to submit. Could be
-#' a list of `bbi_{.model_type}_model ` object,
+#' a list of `bbi_{.model_type}_model ` objects,
 #' a character vector of file paths to models,
 #' a numeric vector of integers corresponding to a file names of a models.
 #' @inheritParams submit_model
@@ -228,9 +228,9 @@ submit_models.list <- function(
 ) {
 
   if (!is.null(.directory)) {
-    warning(paste(glue("Passed `.directory = {.directory}` to submit_models.bbi_nonmem_model().") ,
+    warning(paste(glue("Passed `.directory = {.directory}` to submit_models.list().") ,
                   "This argument is only valid when passing a path to `submit_models()`.",
-                  "`bbi_nonmem_model` objects were passed, so `.directory` inferred from `.mod${WORKING_DIR}`"))
+                  "Directory will be extracted from each model object."))
   }
 
   # check that each element is a model object
