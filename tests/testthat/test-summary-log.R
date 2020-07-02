@@ -1,4 +1,4 @@
-context("Test bbi summary on multiple models")
+context("Test creating summary logs")
 
 if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
   skip("test-summary only runs on Metworx or Drone")
@@ -15,24 +15,22 @@ ALL_PATHS <- c(MOD1_PATH, MOD2_PATH, MOD3_PATH)
 
 # references
 NUM_MODS <- length(ALL_PATHS)
-SUMMARY_REF_FILE <- "data/acop_summary_obj_ref_200616.rds"
-SUM_CLASS_LIST <- c("bbi_nonmem_summary", "list")
 MOD_CLASS_LIST <- c("bbi_nonmem_model", "list")
-RES_NAMES_LIST <- c("absolute_model_path", "error_msg", "needed_fail_flags", "bbi_summary")
-NOT_FINISHED_ERR_MSG <- "nonmem_summary.*modeling run has not finished"
-NO_LST_ERR_MSG <- "Unable to locate `.lst` file.*NONMEM output folder"
+OFV_REF <- 2636.846
+PARAM_COUNT_REF <- 7
 
 # helper to run expectations
-test_mod_sums <- function(mod_sums) {
-  expect_equal(length(mod_sums), NUM_MODS)
+test_sum_df <- function(sum_df) {
+  expect_equal(nrow(sum_df), NUM_MODS)
+  expect_true(ncol(sum_df) %in% c(16, 23)) # two options for summary_log() and add_summary()
 
-  ref_sum <- readRDS(SUMMARY_REF_FILE)
-
-  for (.s in mod_sums) {
-    expect_equal(names(.s), RES_NAMES_LIST)
-    expect_identical(class(.s$bbi_summary), SUM_CLASS_LIST)
-    expect_equal(ref_sum, .s$bbi_summary)
-  }
+  # check some columns
+  expect_equal(sum_df$absolute_model_path, purrr::map_chr(ALL_PATHS, ~normalizePath(.x)))
+  expect_true(all(is.na(sum_df$error_msg)))
+  expect_false(any(sum_df$needed_fail_flags))
+  expect_equal(sum_df$ofv, rep(OFV_REF, NUM_MODS))
+  expect_equal(sum_df$param_count, rep(PARAM_COUNT_REF, NUM_MODS))
+  expect_false(any(sum_df$minimization_terminated))
 }
 
 setup({
@@ -57,41 +55,38 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
   # extracting things from summary object
   #########################################
 
-  test_that("model_summaries.list produces expected output", {
+  test_that("summary_log works with list of models input", {
     mods <- purrr::map(c("1", "2", "3"), ~read_model(.x))
     expect_equal(length(mods), NUM_MODS)
     for (.m in mods) {
       expect_equal(class(.m), MOD_CLASS_LIST)
     }
 
-    mod_sums <- model_summaries(mods)
-    test_mod_sums(mod_sums)
+    sum_df <- summary_log(mods)
+    test_sum_df(sum_df)
 
   })
 
-  test_that("model_summaries.list fails with bad list", {
-    bad_mods <- list(read_model(1), list(naw = "dawg"))
-    expect_equal(length(bad_mods), 2)
-    expect_equal(class(bad_mods[[1]]), MOD_CLASS_LIST)
-
-    expect_error(model_summaries(bad_mods), regexp = "must contain only model objects")
+  test_that("summary_log works with character input", {
+    sum_df <- summary_log(c("1", "2", "3"))
+    test_sum_df(sum_df)
   })
 
-  test_that("model_summaries.character produces expected output", {
-    mod_sums <- model_summaries(c("1", "2", "3"))
-    test_mod_sums(mod_sums)
+  test_that("summary_log works with numeric input", {
+    sum_df <- summary_log(c(1, 2, 3))
+    test_sum_df(sum_df)
   })
 
-  test_that("model_summaries.numeric produces expected output", {
-    mod_sums <- model_summaries(c(1, 2, 3))
-    test_mod_sums(mod_sums)
+  test_that("summary_log works with bbi_run_log_df input", {
+    sum_df <- run_log() %>% summary_log()
+    test_sum_df(sum_df)
   })
 
-
-
-  test_that("model_summaries.bbi_run_log_df produces expected output", {
-    mod_sums <- run_log() %>% model_summaries()
-    test_mod_sums(mod_sums)
+  test_that("add_summary works correctly", {
+    sum_df <- run_log() %>% add_summary()
+    test_sum_df(sum_df)
+    expect_identical(sum_df$model_type, rep("nonmem", 3))
+    expect_identical(sum_df$yaml_md5, c("ee5a30a015c4e09bc29334188ff28b58", "95df46d60fae0ed80cd9f212f9a6a72d", "912cf4c649bb841322cfd81ad68434ef"))
   })
 
 }) # closing withr::with_options

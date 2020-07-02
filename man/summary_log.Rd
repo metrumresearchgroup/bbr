@@ -5,17 +5,23 @@
 \alias{add_summary}
 \title{Add data from \code{model_summary()} to \code{bbi_run_log_df}}
 \usage{
-summary_log(.log_df, ..., .keep_bbi_object = FALSE)
+summary_log(.mods, ..., .keep_bbi_object = FALSE)
 
 add_summary(.log_df, ..., .keep_bbi_object = FALSE)
 }
 \arguments{
-\item{.log_df}{\code{bbi_run_log_df} tibble}
+\item{.mods}{The model object that will be passed through to \code{model_summaries()} before constructing the output tibble. Could be
+a \code{bbi_run_log_df} tibble,
+a list of \verb{bbi_\{.model_type\}_model } objects,
+a character vector of file paths to models,
+a numeric vector of integers corresponding to a file names of a models.}
 
 \item{...}{Arguments passed through to \code{model_summaries()}.}
 
 \item{.keep_bbi_object}{\code{FALSE} by default. If \code{TRUE}, a list column will be added containing the full \code{bbi_nonmem_summary} object for each row.
 Use this if you would like to extract additional fields from the summary object.}
+
+\item{.log_df}{a \code{bbi_run_log_df} tibble}
 }
 \description{
 Takes a \code{bbi_run_log_df} tibble and runs \code{model_summary()} for each model in the tibble.

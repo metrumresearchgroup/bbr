@@ -27,7 +27,11 @@
 #' * `has_final_zero_gradient` -- Extracted from `$run_heuristics`
 #' * `minimization_terminated` -- Extracted from `$run_heuristics`
 #'
-#' @param .log_df `bbi_run_log_df` tibble
+#' @param .mods The model object that will be passed through to `model_summaries()` before constructing the output tibble. Could be
+#' a `bbi_run_log_df` tibble,
+#' a list of `bbi_{.model_type}_model ` objects,
+#' a character vector of file paths to models,
+#' a numeric vector of integers corresponding to a file names of a models.
 #' @param .keep_bbi_object `FALSE` by default. If `TRUE`, a list column will be added containing the full `bbi_nonmem_summary` object for each row.
 #' Use this if you would like to extract additional fields from the summary object.
 #' @param ... Arguments passed through to `model_summaries()`.
@@ -38,17 +42,13 @@
 #' @importFrom tidyr unnest_wider
 #' @export
 summary_log <- function(
-  .log_df,
+  .mods,
   ...,
   .keep_bbi_object = FALSE
 ) {
-  # check input df
-  if (!inherits(.log_df, "bbi_run_log_df")) {
-    stop(glue("Can only pass an object of class `bbi_run_log_df` to `summary_log()`. Passed object has classes {paste(class(.log_df), collapse = ', ')}"))
-  }
 
   # get list of summaries
-  res_list <- model_summaries(.log_df)
+  res_list <- model_summaries(.mods)
 
   # create tibble from list of lists
   res_df <- res_list %>% transpose() %>% as_tibble() %>%
@@ -75,14 +75,19 @@ summary_log <- function(
 
 
 #' @describeIn summary_log Create `summary_log()` tibble and join against the input `bbi_run_log_df` tibble.
+#' @param .log_df a `bbi_run_log_df` tibble
 #' @importFrom dplyr left_join
 add_summary <- function(
   .log_df,
   ...,
   .keep_bbi_object = FALSE
 ) {
+
+  # check input df
+  check_bbi_run_log_df_object(.log_df)
+
   sum_df <- summary_log(
-    .log_df = .log_df,
+    .mods = .log_df,
     ...,
     .keep_bbi_object = .keep_bbi_object
   )
