@@ -104,10 +104,17 @@ YAML_SCALAR_TO_LIST_KEYS <- c(
 
 
 SUPPORTED_MOD_TYPES <- c("nonmem", "stan")
+
 VALID_MOD_CLASSES <- purrr::map_chr(SUPPORTED_MOD_TYPES,
                                     function(.model_type) {
                                       as.character(glue::glue("bbi_{.model_type}_model"))
                                     })
+
+VALID_SUM_CLASSES <- purrr::map_chr(SUPPORTED_MOD_TYPES,
+                                    function(.model_type) {
+                                      as.character(glue::glue("bbi_{.model_type}_summary"))
+                                    })
+
 
 SUMMARY_DETAILS <- "run_details"
 

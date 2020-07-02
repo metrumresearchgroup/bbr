@@ -321,10 +321,31 @@ find_config_file_path <- function(.config_path, .model_dir) {
 #' @keywords internal
 check_model_object <- function(.mod, .mod_types = VALID_MOD_CLASSES) {
   if (!inherits(.mod, .mod_types)) {
-    stop(glue("Must pass a model object, but got object of class {paste(class(.mod), collapse = ', ')}"))
+    stop(glue("Must pass a model object, but got object of class: `{paste(class(.mod), collapse = ', ')}`"))
   }
   return(invisible(TRUE))
 }
+
+#' Private helper to check if an object inherits a model summary class and error if not
+#' @param .s The object to check
+#' @keywords internal
+check_summary_object <- function(.s) {
+  if (!inherits(.s, VALID_SUM_CLASSES)) {
+    err_msg <- glue("Must pass a model summary object, but got object of class: `{paste(class(.s), collapse = ', ')}`")
+
+    if(inherits(.s, "bbi_run_log_df")) {
+      err_msg <- paste(
+        err_msg,
+        "If you are trying to append summary fields onto a run log, use either `summary_log()` or `add_summary()`.",
+        sep = "\n"
+      )
+    }
+
+    stop(err_msg)
+  }
+  return(invisible(TRUE))
+}
+
 
 #' Private helper to check if a list of objects all inherit a model class and error if not
 #' @param .mods The list of objects to check
@@ -347,10 +368,11 @@ check_model_object_list <- function(.mods, .mod_types = VALID_MOD_CLASSES) {
 #' @keywords internal
 check_bbi_run_log_df_object <- function(.df) {
   if (!inherits(.df, "bbi_run_log_df")) {
-    stop(glue("Can only pass an tibble of class `bbi_run_log_df`. Passed object has classes {paste(class(.df), collapse = ', ')}"))
+    stop(glue("Must pass a tibble of class `bbi_run_log_df`, but got object of class: `{paste(class(.mod), collapse = ', ')}`"))
   }
   return(invisible(TRUE))
 }
+
 
 ############################
 # Error handlers

@@ -69,7 +69,7 @@ model_summaries.list <- function(
         # if fails, try again with flags
         tryCatch({
           if (!is.null(.bbi_args)) {
-            .fail_flags <- rbabylon:::combine_list_objects(.fail_flags, .bbi_args)
+            .fail_flags <- combine_list_objects(.fail_flags, .bbi_args)
           }
           .retry <- rbabylon::model_summary(.m, .bbi_args = .fail_flags)
           .retry$needed_fail_flags <- TRUE
@@ -94,7 +94,7 @@ model_summaries.list <- function(
 
 
 #' @describeIn model_summaries Takes a character vector of file paths to models and summarizes all of them.
-#' @param purrr map map_chr
+#' @importFrom purrr map map_chr
 #' @export
 model_summaries.character <- function(
   .mods,

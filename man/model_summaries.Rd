@@ -73,8 +73,6 @@ See details section for more info on these flags.}
 \item{.dry_run}{show what the command would be without actually running it}
 
 \item{.directory}{Model directory which \code{.mod} path is relative to. Defaults to \code{options('rbabylon.model_directory')}, which can be set globally with \code{set_model_directory()}. \strong{Only used when passing a path for \code{.mod} instead of a \verb{bbi_\{.model_type\}_model} object.}}
-
-\item{purrr}{map map_chr}
 }
 \description{
 Run multiple \code{model_summary()} calls in batch.

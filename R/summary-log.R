@@ -35,6 +35,7 @@
 #' @importFrom purrr map transpose
 #' @importFrom tibble as_tibble
 #' @importFrom glue glue
+#' @importFrom tidyr unnest_wider
 #' @export
 summary_log <- function(
   .log_df,
@@ -52,21 +53,21 @@ summary_log <- function(
   # create tibble from list of lists
   res_df <- res_list %>% transpose() %>% as_tibble() %>%
     mutate(
-      absolute_model_path = unlist(absolute_model_path),
-      error_msg = unlist(error_msg),
-      needed_fail_flags = unlist(needed_fail_flags)
+      !!ABS_MOD_PATH := unlist(.data[[ABS_MOD_PATH]]),
+      error_msg = unlist(.data$error_msg),
+      needed_fail_flags = unlist(.data$needed_fail_flags)
     )
 
   res_df <- mutate(res_df,
-      d =            extract_details(bbi_summary),
-      ofv =          extract_ofv(bbi_summary),
-      param_count =  extract_param_count(bbi_summary),
-      h =            extract_heuristics(bbi_summary)
+      d =            extract_details(.data$bbi_summary),
+      ofv =          extract_ofv(.data$bbi_summary),
+      param_count =  extract_param_count(.data$bbi_summary),
+      h =            extract_heuristics(.data$bbi_summary)
     ) %>%
-    unnest_wider(d) %>% unnest_wider(h) #https://stackoverflow.com/questions/49689927/unnest-a-list-column-directly-into-several-columns
+    unnest_wider(.data$d) %>% unnest_wider(.data$h)
 
   if (isFALSE(.keep_bbi_object)) {
-    res_df <- select(res_df, -bbi_summary)
+    res_df <- select(res_df, -.data$bbi_summary)
   }
 
   return(res_df)
@@ -77,18 +78,16 @@ summary_log <- function(
 #' @importFrom dplyr left_join
 add_summary <- function(
   .log_df,
-  .bbi_args = NULL,
-  .fail_flags = list(no_grd_file = TRUE, no_shk_file = TRUE),
+  ...,
   .keep_bbi_object = FALSE
 ) {
   sum_df <- summary_log(
     .log_df = .log_df,
-    .bbi_args = .bbi_args,
-    .fail_flags = .fail_flags,
+    ...,
     .keep_bbi_object = .keep_bbi_object
   )
 
-  out_df <- left_join(.log_df, sum_df, by = "absolute_model_path")
+  out_df <- left_join(.log_df, sum_df, by = ABS_MOD_PATH)
 
   return(out_df)
 }
@@ -98,6 +97,15 @@ add_summary <- function(
 # helper functions
 ###################
 
+#' Extract from summary object
+#'
+#' These are all helper functions to extract a specific field or sub-field from a `bbi_{.model_type}_summary` object.
+#' @name extract_from_summary
+#' @param .s The summary object to extract from
+NULL
+
+#' @describeIn extract_from_summary Extract count of non-fixed parameters
+#' @importFrom purrr map map_int
 extract_param_count <- function(.s) {
 
   .pm <- map(.s, "parameters_data")
@@ -112,6 +120,8 @@ extract_param_count <- function(.s) {
   return(.out)
 }
 
+#' @describeIn extract_from_summary Extract `run_details` field
+#' @importFrom purrr map
 extract_details <- function(.s) {
   .rd <- map(.s, "run_details", .default = NA)
 
@@ -127,6 +137,8 @@ extract_details <- function(.s) {
   return(.out)
 }
 
+#' @describeIn extract_from_summary Extract `run_heuristics` field
+#' @importFrom purrr map
 extract_heuristics <- function(.s) {
   .rh <- map(.s, "run_heuristics", .default = NA)
 
@@ -150,9 +162,13 @@ extract_heuristics <- function(.s) {
   return(.out)
 }
 
-extract_ofv <- function(.s) {
+#' @describeIn extract_from_summary Extract objective function value
+#' @importFrom purrr map map_dbl
+#' @param .subfield The field to extract from within "ofv". Defaults to the objective function value with no constant added, but the other fields are available too.
+extract_ofv <- function(.s, .subfield = c("ofv_no_constant", "ofv_with_constant", "ofv")) {
+  .subfield <- match.arg(.subfield)
   .ofv <- map(.s, "ofv")
-  .out <- map_dbl(.ofv, "ofv_no_constant", .default = NA_real_)
+  .out <- map_dbl(.ofv, .subfield, .default = NA_real_)
   return(.out)
 }
 

@@ -7,12 +7,7 @@
 \usage{
 summary_log(.log_df, ..., .keep_bbi_object = FALSE)
 
-add_summary(
-  .log_df,
-  .bbi_args = NULL,
-  .fail_flags = list(no_grd_file = TRUE, no_shk_file = TRUE),
-  .keep_bbi_object = FALSE
-)
+add_summary(.log_df, ..., .keep_bbi_object = FALSE)
 }
 \arguments{
 \item{.log_df}{\code{bbi_run_log_df} tibble}
