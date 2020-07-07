@@ -3,7 +3,7 @@
 \name{summary_log}
 \alias{summary_log}
 \alias{add_summary}
-\title{Add data from \code{model_summary()} to \code{bbi_run_log_df}}
+\title{Add data from \code{model_summaries()} to \code{bbi_run_log_df}}
 \usage{
 summary_log(.mods, ..., .keep_bbi_object = FALSE)
 
@@ -24,10 +24,10 @@ Use this if you would like to extract additional fields from the summary object.
 \item{.log_df}{a \code{bbi_run_log_df} tibble}
 }
 \description{
-Takes a \code{bbi_run_log_df} tibble and runs \code{model_summary()} for each model in the tibble.
+Runs \code{model_summaries()} on all models in the input and return a subset of the resulting summaries as a tibble.
 \code{summary_log()} will return a new tibble with the \code{"absolute_model_path"} column as the primary key,
-and all the columns extracted from \code{model_summary()} (but none of the other columns from the input tibble).
-\code{add_summary()} returns the input tibble, with all the columns extracted from \code{model_summary()} joined onto it.
+and all the columns extracted from \code{model_summaries()} (but none of the other columns from the input tibble).
+\code{add_summary()} returns the input tibble, with all the columns extracted from \code{model_summaries()} joined onto it.
 See details section for fields included.
 }
 \details{

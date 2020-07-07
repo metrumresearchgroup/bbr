@@ -1,9 +1,9 @@
-#' Add data from `model_summary()` to `bbi_run_log_df`
+#' Add data from `model_summaries()` to `bbi_run_log_df`
 #'
-#' Takes a `bbi_run_log_df` tibble and runs `model_summary()` for each model in the tibble.
+#' Runs `model_summaries()` on all models in the input and return a subset of the resulting summaries as a tibble.
 #' `summary_log()` will return a new tibble with the `"absolute_model_path"` column as the primary key,
-#' and all the columns extracted from `model_summary()` (but none of the other columns from the input tibble).
-#' `add_summary()` returns the input tibble, with all the columns extracted from `model_summary()` joined onto it.
+#' and all the columns extracted from `model_summaries()` (but none of the other columns from the input tibble).
+#' `add_summary()` returns the input tibble, with all the columns extracted from `model_summaries()` joined onto it.
 #' See details section for fields included.
 #'
 #' @details
