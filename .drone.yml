@@ -44,6 +44,10 @@ volumes:
   host:
     path: /var/run/docker.sock
 
+trigger:
+  event:
+    exclude: [ promote ]
+
 ---
 
 kind: pipeline
@@ -91,6 +95,10 @@ volumes:
 - name: docker.sock
   host:
     path: /var/run/docker.sock
+
+trigger:
+  event:
+    exclude: [ promote ]
 
 ---
 
@@ -140,6 +148,10 @@ volumes:
   host:
     path: /var/run/docker.sock
 
+trigger:
+  event:
+    exclude: [ promote ]
+
 ---
 
 kind: pipeline
@@ -187,6 +199,10 @@ volumes:
 - name: docker.sock
   host:
     path: /var/run/docker.sock
+
+trigger:
+  event:
+    exclude: [ promote ]
 
 ---
 
@@ -236,6 +252,10 @@ volumes:
   host:
     path: /var/run/docker.sock
 
+trigger:
+  event:
+    exclude: [ promote ]
+
 ---
 
 kind: pipeline
@@ -281,6 +301,10 @@ volumes:
 - name: docker.sock
   host:
     path: /var/run/docker.sock
+
+trigger:
+  event:
+    exclude: [ promote ]
 
 ---
 
@@ -341,3 +365,7 @@ volumes:
 - name: docker.sock
   host:
     path: /var/run/docker.sock
+
+trigger:
+  event:
+    exclude: [ promote ]
