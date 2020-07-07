@@ -87,6 +87,7 @@ model_summaries.list <- function(
       error_msg = .s$error_msg %||% NA_character_,
       needed_fail_flags = .s$needed_fail_flags %||% FALSE,
       bbi_summary = .s
+      #bbi_summary = ifelse(is.null(.s$error_msg), .s, NA)
     ))
   })
 
