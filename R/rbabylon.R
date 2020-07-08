@@ -98,8 +98,12 @@ bbi_dry_run <- function(.cmd_args, .dir) {
   return(res)
 }
 
-#' Checks that a bbi binary is present at the path passed to .bbi_exe_path
-#' @param .bbi_exe_path Path to bbi exe file that will be checked
+#' Check that babylon is installed
+#'
+#' Raises an error if a babylon executable is not found at `.bbi_exe_path`.
+#'
+#' @inheritParams bbi_version
+#' @return `NULL`, invisibly
 #' @keywords internal
 check_bbi_exe <- function(.bbi_exe_path) {
   # check if this path is not in the already checked paths
@@ -121,9 +125,12 @@ check_bbi_exe <- function(.bbi_exe_path) {
 }
 
 
-#' Check if bbi_version is below minimum allowed version
+#' Check that babylon satisfies a version constraint
+#'
 #' @importFrom stringr str_replace_all
-#' @param .bbi_exe_path Path to bbi exe file that will be checked
+#' @inheritParams bbi_version
+#'
+#' @return `NULL` if `.bbi_exe_path` satisfies the constraint
 #' @keywords internal
 check_bbi_version_constraint <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')) {
   .bbi_exe_path <- Sys.which(.bbi_exe_path)
