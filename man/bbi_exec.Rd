@@ -4,7 +4,14 @@
 \alias{bbi_exec}
 \title{Execute call to bbi}
 \usage{
-bbi_exec(.cmd_args, .dir = ".", .verbose = FALSE, .wait = FALSE, ...)
+bbi_exec(
+  .cmd_args,
+  .dir = ".",
+  .verbose = FALSE,
+  .wait = FALSE,
+  .bbi_exe_path = getOption("rbabylon.bbi_exe_path"),
+  ...
+)
 }
 \arguments{
 \item{.cmd_args}{A character vector of command line arguments for the execution call}
@@ -14,6 +21,8 @@ bbi_exec(.cmd_args, .dir = ".", .verbose = FALSE, .wait = FALSE, ...)
 \item{.verbose}{Print stdout and stderr as process runs #### NOT IMPLEMENTED?}
 
 \item{.wait}{If true, don't return until process has exited.}
+
+\item{.bbi_exe_path}{Path to babylon executable}
 
 \item{...}{arguments to pass to processx::process$new()}
 }

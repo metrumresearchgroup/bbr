@@ -13,6 +13,8 @@ NULL
 #' Execute call to bbi
 #'
 #' Private implementation function that executes a babylon call (`bbi ...`) with processx::process$new()
+#'
+#' @inheritParams bbi_version
 #' @param .cmd_args A character vector of command line arguments for the execution call
 #' @param .dir The working directory to run command in. Defaults to "."
 #' @param .verbose Print stdout and stderr as process runs #### NOT IMPLEMENTED?
@@ -26,11 +28,22 @@ NULL
 #'         working_dir -- the directory the command was run in, passed through from .dir argument.
 #' @importFrom processx process
 #' @keywords internal
-bbi_exec <- function(.cmd_args, .dir = ".", .verbose = FALSE, .wait = FALSE, ...) {
-  bbi_exe_path <- getOption("rbabylon.bbi_exe_path")
-  check_bbi_exe(bbi_exe_path)
+bbi_exec <- function(.cmd_args,
+                     .dir = ".",
+                     .verbose = FALSE,
+                     .wait = FALSE,
+                     .bbi_exe_path = getOption("rbabylon.bbi_exe_path"),
+                     ...) {
+  check_bbi_exe(.bbi_exe_path)
 
-  p <- processx::process$new(bbi_exe_path, .cmd_args, ..., wd = .dir,  stdout = "|", stderr = "2>&1")
+  p <- processx::process$new(
+    .bbi_exe_path,
+    .cmd_args,
+    ...,
+    wd = .dir,
+    stdout = "|",
+    stderr = "2>&1"
+  )
 
   if (.wait) {
     # wait for process and capture stdout and stderr
@@ -47,7 +60,7 @@ bbi_exec <- function(.cmd_args, .dir = ".", .verbose = FALSE, .wait = FALSE, ...
   res <- list()
   res[[PROC_PROCESS]] <- p
   res[[PROC_STDOUT]] <- output
-  res[[PROC_BBI]] <- bbi_exe_path
+  res[[PROC_BBI]] <- .bbi_exe_path
   res[[PROC_CMD_ARGS]] <- .cmd_args
   res[[PROC_WD]] <- .dir
 
