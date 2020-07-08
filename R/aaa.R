@@ -1,3 +1,5 @@
+BBI_DEFAULT_PATH <- "/data/apps/bbi"
+
 CACHE_ENV <- new.env(parent = emptyenv())
 CACHE_ENV$bbi_exe_paths <- list()
 
