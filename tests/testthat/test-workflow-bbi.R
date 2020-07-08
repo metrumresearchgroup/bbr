@@ -17,7 +17,7 @@ STARTER_FILE <- file.path("model-examples/1.ctl")
 PARAM_REF_FILE <- "data/acop_param_table_ref_200423_randeff.rds"
 
 MODEL_DIR <- "model-examples-bbi"
-BBI_PATH <- '/data/apps/bbi'
+BBI_PATH <- read_bbi_path()
 
 ORIG_DESC <- "original acop model"
 NEW_DESC <- "new description"

@@ -4,7 +4,7 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
   skip("test-summary only runs on Metworx or Drone")
 }
 
-withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
+withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
                          rbabylon.model_directory = NULL), {
 
   # constants
