@@ -53,8 +53,13 @@ To reiterate, there are two relevant paths for this section.
 * `BBI_EXE_PATH` -- the path to the `babylon` executable file on your system.
 * `MODEL_DIR` -- the root modeling directory where you will be running models with `rbabylon`
 
-```{r define dirs}
+```{r, include = FALSE}
 BBI_EXE_PATH <- read_bbi_path()
+MODEL_DIR <- "../inst/nonmem"
+```
+
+```{r define dirs, eval = FALSE}
+BBI_EXE_PATH <- "/data/apps/bbi" # this should be an absolute path
 MODEL_DIR <- "../inst/nonmem"    # this should be relative to your working directory
 ```
 
@@ -66,7 +71,7 @@ You can install the `babylon` binary with:
 rbabylon::use_bbi()
 ```
 
-This will install to the `/data/apps/` folder by default, which will usually match the `BBI_EXE_PATH` you just defined (it will not match only if the `BABYLON_EXE_PATH` environment variable is deliberately set to a different path). If you have changed that, you can pass your custom path to the _directory_ where you want to put bbi like so `use_bbi("/some/other/dir")`. In that case, you would want to set `BBI_EXE_PATH = "/some/other/dir/bbi"`.
+This will install to the `/data/apps/` folder by default, which matches the `BBI_EXE_PATH` you just defined (and will use soon). If you have changed that, you can pass your custom path to the _directory_ where you want to put bbi like so `use_bbi("/some/other/dir")`. In that case, you would want to set `BBI_EXE_PATH = "/some/other/dir/bbi"`.
 
 You can also check the [babylon documentation](https://github.com/metrumresearchgroup/babylon) for manual installation instructions.
 
