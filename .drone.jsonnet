@@ -35,6 +35,12 @@ local mpn_snapshots = [
 # set to "" to disable installing babylon
 local bbi_version = "v2.2.0-beta.2";
 
+# events that should not trigger Drone; recommended value is "promote", see
+# https://discourse.drone.io/t/github-pages-triggering-builds-incorrectly/6370
+local exclude_events = [
+  "promote",
+];
+
 ########################################
 ##        END CONFIGURE BLOCK         ##
 ########################################
@@ -104,6 +110,19 @@ local get_major_minor(r_version) = r_version[0:3];
 ########################################
 ##        START PIPELINE BLOCK        ##
 ########################################
+
+# Add a block to control whether Drone executes for certain events
+#
+# include         array of events that should trigger Drone
+# exclude         array of events that should not trigger Drone
+local add_trigger(include=[], exclude=[]) = {
+  "trigger": {
+    "event": {
+      "include": include,
+      "exclude": exclude,
+    }
+  }
+};
 
 # Create a volume "object"
 #
@@ -235,6 +254,7 @@ local check(name, r_version, mpn_snapshot, bbi_version) =
 
   setup_docker_pipeline(build_tag) +
   add_volumes([host_volume], [temp_volume]) +
+  add_trigger(exclude=exclude_events) +
   {
     "steps": [
       pull_image(mpn_image, [host_volume]),
@@ -276,12 +296,8 @@ local release(name, r_version, mpn_snapshot, bbi_version) =
 
   setup_docker_pipeline(name + '-release') +
   add_volumes([host_volume], [temp_volume]) +
+  add_trigger(include=["tag"])
   {
-    "trigger": {
-      "event": [
-        "tag",
-      ],
-    },
     "steps": [
       pull_image(mpn_image, [host_volume]),
       if std.length(bbi_version) > 0 then
