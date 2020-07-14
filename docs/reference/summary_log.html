@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Summarize model outputs — model_summary • rbabylon</title>
+<title>Add data from <code>model_summaries()</code> to <code>bbi_run_log_df</code> — summary_log • rbabylon</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,12 @@
 
 
 
-<meta property="og:title" content="Summarize model outputs — model_summary" />
-<meta property="og:description" content="Calls out to bbi and returns a named list of class bbi_{.model_type}_summary with model outputs and diagnostics." />
+<meta property="og:title" content="Add data from <code>model_summaries()</code> to <code>bbi_run_log_df</code> — summary_log" />
+<meta property="og:description" content="Runs model_summaries() on all models in the input and return a subset of the resulting summaries as a tibble.
+summary_log() will return a new tibble with the &quot;absolute_model_path&quot; column as the primary key,
+and all the columns extracted from model_summaries() (but none of the other columns from the input tibble).
+add_summary() returns the input tibble, with all the columns extracted from model_summaries() joined onto it.
+See details section for fields included." />
 
 
 
@@ -126,98 +130,76 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Summarize model outputs</h1>
+    <h1>Add data from <code>model_summaries()</code> to <code>bbi_run_log_df</code></h1>
     
-    <div class="hidden name"><code>model_summary.Rd</code></div>
+    <div class="hidden name"><code>summary_log.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Calls out to bbi and returns a named list of class <code>bbi_{.model_type}_summary</code> with model outputs and diagnostics.</p>
+    <p>Runs <code><a href='model_summaries.html'>model_summaries()</a></code> on all models in the input and return a subset of the resulting summaries as a tibble.
+<code>summary_log()</code> will return a new tibble with the <code>"absolute_model_path"</code> column as the primary key,
+and all the columns extracted from <code><a href='model_summaries.html'>model_summaries()</a></code> (but none of the other columns from the input tibble).
+<code>add_summary()</code> returns the input tibble, with all the columns extracted from <code><a href='model_summaries.html'>model_summaries()</a></code> joined onto it.
+See details section for fields included.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>model_summary</span>(<span class='no'>.mod</span>, <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>, <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+    <pre class="usage"><span class='fu'>summary_log</span>(<span class='no'>.mods</span>, <span class='no'>...</span>, <span class='kw'>.keep_bbi_object</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
-<span class='co'># S3 method for bbi_nonmem_model</span>
-<span class='fu'>model_summary</span>(<span class='no'>.mod</span>, <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>, <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
-
-<span class='co'># S3 method for character</span>
-<span class='fu'>model_summary</span>(
-  <span class='no'>.mod</span>,
-  <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>...</span>,
-  <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='get_model_directory.html'>get_model_directory</a></span>()
-)
-
-<span class='co'># S3 method for numeric</span>
-<span class='fu'>model_summary</span>(
-  <span class='no'>.mod</span>,
-  <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>...</span>,
-  <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='get_model_directory.html'>get_model_directory</a></span>()
-)</pre>
+<span class='fu'>add_summary</span>(<span class='no'>.log_df</span>, <span class='no'>...</span>, <span class='kw'>.keep_bbi_object</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>.mod</th>
-      <td><p>Model to summarize. Can be a <code>bbi_{.model_type}_model</code> object, a file path, or an integer corresponding to a file path.</p></td>
-    </tr>
-    <tr>
-      <th>.bbi_args</th>
-      <td><p>A named list specifying arguments to pass to babylon formatted like <code><a href='https://rdrr.io/r/base/list.html'>list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)</a></code>.
-See <code><a href='print_nonmem_args.html'>print_nonmem_args()</a></code> for full list of options.</p></td>
+      <th>.mods</th>
+      <td><p>The model object that will be passed through to <code><a href='model_summaries.html'>model_summaries()</a></code> before constructing the output tibble. Could be
+a <code>bbi_run_log_df</code> tibble,
+a list of <code>bbi_{.model_type}_model </code> objects,
+a character vector of file paths to models,
+a numeric vector of integers corresponding to a file names of a models.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>args passed through to <code><a href='bbi_exec.html'>bbi_exec()</a></code></p></td>
+      <td><p>Arguments passed through to <code><a href='model_summaries.html'>model_summaries()</a></code>.</p></td>
     </tr>
     <tr>
-      <th>.dry_run</th>
-      <td><p>show what the command would be without actually running it</p></td>
+      <th>.keep_bbi_object</th>
+      <td><p><code>FALSE</code> by default. If <code>TRUE</code>, a list column will be added containing the full <code>bbi_nonmem_summary</code> object for each row.
+Use this if you would like to extract additional fields from the summary object.</p></td>
     </tr>
     <tr>
-      <th>.directory</th>
-      <td><p>Model directory which <code>.mod</code> path is relative to. Defaults to <code><a href='https://rdrr.io/r/base/options.html'>options('rbabylon.model_directory')</a></code>, which can be set globally with <code><a href='get_model_directory.html'>set_model_directory()</a></code>. <strong>Only used when passing a path for <code>.mod</code> instead of a <code>bbi_{.model_type}_model</code> object.</strong></p></td>
+      <th>.log_df</th>
+      <td><p>a <code>bbi_run_log_df</code> tibble</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p><strong>NONMEM</strong></p>
-<p>The returned list for a NONMEM model will contain the following top-level elements:</p><ul>
-<li><p>run_details</p></li>
-<li><p>run_heuristics</p></li>
-<li><p>parameters_data</p></li>
-<li><p>parameter_names</p></li>
-<li><p>ofv</p></li>
-<li><p>shrinkage_details</p></li>
-<li><p>covariance_theta</p></li>
-<li><p>correlation_theta</p></li>
+    <p>The following fields from <code>bbi_nonmem_summary</code> are extracted and included by default.
+If you would like more fields, you can set <code>.keep_bbi_object = TRUE</code> and extract them manually.</p><ul>
+<li><p><code>error_msg</code> -- Error message from <code><a href='model_summary.html'>model_summary()</a></code>. If <code>NULL</code> the call succeeded. If not <code>NULL</code>, the rest of the fields will be <code>NULL</code>.</p></li>
+<li><p><code>needed_fail_flags</code> -- Logical for whether the call initially failed, but passed with the inclusion of <code>.fail_flags</code></p></li>
+<li><p><code>bbi_summary</code> -- The full <code>bbi_nonmem_summary</code> object. This will only be included if <code>.keep_bbi_object = TRUE</code> was passed.</p></li>
+<li><p><code>ofv</code> -- Objective function value from last estimation method, using <code>$ofv$ofv_no_constant</code> field.</p></li>
+<li><p><code>param_count</code> -- Count of (non-fixed) parameters estimated in final estimation method.</p></li>
+<li><p><code>estimation_method</code> -- Character vector of estimation method(s) used. Extracted from <code>$run_details</code></p></li>
+<li><p><code>problem_text</code> -- Character vector of text from <code>$PROB</code>. Extracted from <code>$run_details</code></p></li>
+<li><p><code>number_of_patients</code> -- Extracted from <code>$run_details</code></p></li>
+<li><p><code>number_of_obs</code> -- Extracted from <code>$run_details</code></p></li>
+<li><p><code>covariance_step_aborted</code> -- Extracted from <code>$run_heuristics</code></p></li>
+<li><p><code>large_condition_number</code> -- Extracted from <code>$run_heuristics</code></p></li>
+<li><p><code>correlations_not_ok</code> -- Extracted from <code>$run_heuristics</code></p></li>
+<li><p><code>parameter_near_boundary</code> -- Extracted from <code>$run_heuristics</code></p></li>
+<li><p><code>hessian_reset</code> -- Extracted from <code>$run_heuristics</code></p></li>
+<li><p><code>has_final_zero_gradient</code> -- Extracted from <code>$run_heuristics</code></p></li>
+<li><p><code>minimization_terminated</code> -- Extracted from <code>$run_heuristics</code></p></li>
 </ul>
 
-<p>The summary call will error if it does not find certain files in the output folder.
-However, you can override this behavior with the following file-specific flags:</p><ul>
-<li><p><code>no_cor_file</code></p></li>
-<li><p><code>no_cov_file</code></p></li>
-<li><p><code>no_ext_file</code></p></li>
-<li><p><code>no_grd_file</code></p></li>
-<li><p><code>no_shk_file</code></p></li>
-</ul>
-
-<p>If you are using an estimation method that does not produce any of the following files,
-or they are missing for some other legitimate reason, pass the appropriate flags through the <code>.bbi_args</code> argument.
-For example, if have asked to skip the <code>$COV</code> step, you would call <code>model_summary(..., .bbi_args = list(no_cov_file = TRUE))</code>.</p>
-    <h2 class="hasAnchor" id="methods-by-class-"><a class="anchor" href="#methods-by-class-"></a>Methods (by class)</h2>
+    <h2 class="hasAnchor" id="functions"><a class="anchor" href="#functions"></a>Functions</h2>
 
     
 <ul>
-<li><p><code>bbi_nonmem_model</code>: Get model summary from <code>bbi_nonmem_model</code> object</p></li>
-<li><p><code>character</code>: Get model summary from output directory path</p></li>
-<li><p><code>numeric</code>: Get model summary from numeric input.
-This will only work if you are calling from the same directory as the models, or if you have set <code><a href='https://rdrr.io/r/base/options.html'>options('rbabylon.model_directory')</a></code> to the directory constaining the relevant model.</p></li>
+<li><p><code>add_summary</code>: Create <code>summary_log()</code> tibble and join against the input <code>bbi_run_log_df</code> tibble.</p></li>
 </ul>
 
   </div>

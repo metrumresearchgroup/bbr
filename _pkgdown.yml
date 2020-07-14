@@ -30,10 +30,14 @@ reference:
   - apply_indices
   - block
   - config_log
+  - extract_from_summary
   - model_summary
+  - model_summaries
   - param_estimates
   - param_labels
   - run_log
+  - summary_log
+  - add_summary
 - title: Model object interactions
   contents:
   - add_bbi_args

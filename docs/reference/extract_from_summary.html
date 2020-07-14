@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Summarize model outputs — model_summary • rbabylon</title>
+<title>Extract from summary object — extract_from_summary • rbabylon</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Summarize model outputs — model_summary" />
-<meta property="og:description" content="Calls out to bbi and returns a named list of class bbi_{.model_type}_summary with model outputs and diagnostics." />
+<meta property="og:title" content="Extract from summary object — extract_from_summary" />
+<meta property="og:description" content="These are all helper functions to extract a specific field or sub-field from a bbi_{.model_type}_summary object." />
 
 
 
@@ -126,98 +126,44 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Summarize model outputs</h1>
+    <h1>Extract from summary object</h1>
     
-    <div class="hidden name"><code>model_summary.Rd</code></div>
+    <div class="hidden name"><code>extract_from_summary.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Calls out to bbi and returns a named list of class <code>bbi_{.model_type}_summary</code> with model outputs and diagnostics.</p>
+    <p>These are all helper functions to extract a specific field or sub-field from a <code>bbi_{.model_type}_summary</code> object.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>model_summary</span>(<span class='no'>.mod</span>, <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>, <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+    <pre class="usage"><span class='fu'>extract_param_count</span>(<span class='no'>.s</span>)
 
-<span class='co'># S3 method for bbi_nonmem_model</span>
-<span class='fu'>model_summary</span>(<span class='no'>.mod</span>, <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>, <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+<span class='fu'>extract_details</span>(<span class='no'>.s</span>)
 
-<span class='co'># S3 method for character</span>
-<span class='fu'>model_summary</span>(
-  <span class='no'>.mod</span>,
-  <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>...</span>,
-  <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='get_model_directory.html'>get_model_directory</a></span>()
-)
+<span class='fu'>extract_heuristics</span>(<span class='no'>.s</span>)
 
-<span class='co'># S3 method for numeric</span>
-<span class='fu'>model_summary</span>(
-  <span class='no'>.mod</span>,
-  <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>...</span>,
-  <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='get_model_directory.html'>get_model_directory</a></span>()
-)</pre>
+<span class='fu'>extract_ofv</span>(<span class='no'>.s</span>, <span class='kw'>.subfield</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"ofv_no_constant"</span>, <span class='st'>"ofv_with_constant"</span>, <span class='st'>"ofv"</span>))</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>.mod</th>
-      <td><p>Model to summarize. Can be a <code>bbi_{.model_type}_model</code> object, a file path, or an integer corresponding to a file path.</p></td>
+      <th>.s</th>
+      <td><p>The summary object to extract from</p></td>
     </tr>
     <tr>
-      <th>.bbi_args</th>
-      <td><p>A named list specifying arguments to pass to babylon formatted like <code><a href='https://rdrr.io/r/base/list.html'>list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)</a></code>.
-See <code><a href='print_nonmem_args.html'>print_nonmem_args()</a></code> for full list of options.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>args passed through to <code><a href='bbi_exec.html'>bbi_exec()</a></code></p></td>
-    </tr>
-    <tr>
-      <th>.dry_run</th>
-      <td><p>show what the command would be without actually running it</p></td>
-    </tr>
-    <tr>
-      <th>.directory</th>
-      <td><p>Model directory which <code>.mod</code> path is relative to. Defaults to <code><a href='https://rdrr.io/r/base/options.html'>options('rbabylon.model_directory')</a></code>, which can be set globally with <code><a href='get_model_directory.html'>set_model_directory()</a></code>. <strong>Only used when passing a path for <code>.mod</code> instead of a <code>bbi_{.model_type}_model</code> object.</strong></p></td>
+      <th>.subfield</th>
+      <td><p>The field to extract from within "ofv". Defaults to the objective function value with no constant added, but the other fields are available too.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p><strong>NONMEM</strong></p>
-<p>The returned list for a NONMEM model will contain the following top-level elements:</p><ul>
-<li><p>run_details</p></li>
-<li><p>run_heuristics</p></li>
-<li><p>parameters_data</p></li>
-<li><p>parameter_names</p></li>
-<li><p>ofv</p></li>
-<li><p>shrinkage_details</p></li>
-<li><p>covariance_theta</p></li>
-<li><p>correlation_theta</p></li>
-</ul>
-
-<p>The summary call will error if it does not find certain files in the output folder.
-However, you can override this behavior with the following file-specific flags:</p><ul>
-<li><p><code>no_cor_file</code></p></li>
-<li><p><code>no_cov_file</code></p></li>
-<li><p><code>no_ext_file</code></p></li>
-<li><p><code>no_grd_file</code></p></li>
-<li><p><code>no_shk_file</code></p></li>
-</ul>
-
-<p>If you are using an estimation method that does not produce any of the following files,
-or they are missing for some other legitimate reason, pass the appropriate flags through the <code>.bbi_args</code> argument.
-For example, if have asked to skip the <code>$COV</code> step, you would call <code>model_summary(..., .bbi_args = list(no_cov_file = TRUE))</code>.</p>
-    <h2 class="hasAnchor" id="methods-by-class-"><a class="anchor" href="#methods-by-class-"></a>Methods (by class)</h2>
+    <h2 class="hasAnchor" id="functions"><a class="anchor" href="#functions"></a>Functions</h2>
 
     
 <ul>
-<li><p><code>bbi_nonmem_model</code>: Get model summary from <code>bbi_nonmem_model</code> object</p></li>
-<li><p><code>character</code>: Get model summary from output directory path</p></li>
-<li><p><code>numeric</code>: Get model summary from numeric input.
-This will only work if you are calling from the same directory as the models, or if you have set <code><a href='https://rdrr.io/r/base/options.html'>options('rbabylon.model_directory')</a></code> to the directory constaining the relevant model.</p></li>
+<li><p><code>extract_param_count</code>: Extract count of non-fixed parameters</p></li>
+<li><p><code>extract_details</code>: Extract <code>run_details</code> field</p></li>
+<li><p><code>extract_heuristics</code>: Extract <code>run_heuristics</code> field</p></li>
+<li><p><code>extract_ofv</code>: Extract objective function value</p></li>
 </ul>
 
   </div>
