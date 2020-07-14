@@ -34,7 +34,7 @@
 model_summaries <- function(
   .mods,
   .bbi_args = NULL,
-  .fail_flags = list(no_grd_file = TRUE, no_shk_file = TRUE), ##### WE DONT WANT THIS SOLUTION
+  .fail_flags = NULL,
   ...,
   .dry_run = FALSE,
   .directory = NULL
@@ -46,7 +46,7 @@ model_summaries <- function(
 model_summaries.list <- function(
   .mods,
   .bbi_args = NULL,
-  .fail_flags = list(no_grd_file = TRUE, no_shk_file = TRUE), ##### WE DONT WANT THIS SOLUTION
+  .fail_flags = NULL,
   ...,
   .dry_run = FALSE,
   .directory = NULL
@@ -101,7 +101,7 @@ model_summaries.list <- function(
 model_summaries.character <- function(
   .mods,
   .bbi_args = NULL,
-  .fail_flags = list(no_grd_file = TRUE, no_shk_file = TRUE), ##### WE DONT WANT THIS SOLUTION
+  .fail_flags = NULL,
   ...,
   .dry_run = FALSE,
   .directory = get_model_directory()
@@ -131,7 +131,7 @@ model_summaries.character <- function(
 model_summaries.numeric <- function(
   .mods,
   .bbi_args = NULL,
-  .fail_flags = list(no_grd_file = TRUE, no_shk_file = TRUE), ##### WE DONT WANT THIS SOLUTION
+  .fail_flags = NULL,
   ...,
   .dry_run = FALSE,
   .directory = get_model_directory()
@@ -158,7 +158,7 @@ model_summaries.numeric <- function(
 model_summaries.bbi_run_log_df <- function(
   .mods,
   .bbi_args = NULL,
-  .fail_flags = list(no_grd_file = TRUE, no_shk_file = TRUE), ##### WE DONT WANT THIS SOLUTION
+  .fail_flags = NULL,
   ...,
   .dry_run = FALSE,
   .directory = NULL

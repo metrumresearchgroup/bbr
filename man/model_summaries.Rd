@@ -11,7 +11,7 @@
 model_summaries(
   .mods,
   .bbi_args = NULL,
-  .fail_flags = list(no_grd_file = TRUE, no_shk_file = TRUE),
+  .fail_flags = NULL,
   ...,
   .dry_run = FALSE,
   .directory = NULL
@@ -20,7 +20,7 @@ model_summaries(
 \method{model_summaries}{list}(
   .mods,
   .bbi_args = NULL,
-  .fail_flags = list(no_grd_file = TRUE, no_shk_file = TRUE),
+  .fail_flags = NULL,
   ...,
   .dry_run = FALSE,
   .directory = NULL
@@ -29,7 +29,7 @@ model_summaries(
 \method{model_summaries}{character}(
   .mods,
   .bbi_args = NULL,
-  .fail_flags = list(no_grd_file = TRUE, no_shk_file = TRUE),
+  .fail_flags = NULL,
   ...,
   .dry_run = FALSE,
   .directory = get_model_directory()
@@ -38,7 +38,7 @@ model_summaries(
 \method{model_summaries}{numeric}(
   .mods,
   .bbi_args = NULL,
-  .fail_flags = list(no_grd_file = TRUE, no_shk_file = TRUE),
+  .fail_flags = NULL,
   ...,
   .dry_run = FALSE,
   .directory = get_model_directory()
@@ -47,7 +47,7 @@ model_summaries(
 \method{model_summaries}{bbi_run_log_df}(
   .mods,
   .bbi_args = NULL,
-  .fail_flags = list(no_grd_file = TRUE, no_shk_file = TRUE),
+  .fail_flags = NULL,
   ...,
   .dry_run = FALSE,
   .directory = NULL
