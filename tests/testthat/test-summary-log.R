@@ -89,4 +89,28 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
     expect_identical(sum_df$yaml_md5, c("ee5a30a015c4e09bc29334188ff28b58", "95df46d60fae0ed80cd9f212f9a6a72d", "912cf4c649bb841322cfd81ad68434ef"))
   })
 
+  # THESE TEST NEEDS TO BE LAST BECAUSE IT DELETES NECESSARY FILES
+  fs::file_delete(file.path(MOD3_PATH, "1.grd"))
+  fs::file_delete(file.path(MOD2_PATH, "1.grd"))
+
+  test_that("summary_log works all failed summaries", {
+
+    expect_warning({
+      sum_df <- c(2,3) %>% summary_log()
+    }, regexp = "ALL 2 MODEL SUMMARIES FAILED")
+
+    expect_equal(names(sum_df), c(ABS_MOD_PATH, "error_msg"))
+    expect_true(all(grepl("--no-grd-file", sum_df$error_msg)))
+
+  })
+
+  test_that("summary_log works some failed summaries", {
+    sum_df <- c(1, 2, 3) %>% summary_log()
+    expect_equal(is.na(sum_df$error_msg), c(TRUE, FALSE, FALSE))
+    expect_true(ncol(sum_df) > 10) # check that extra columns are added, doesn't matter how many so keeping test unbrittle
+
+    sum_df <- c(1, 2, 3) %>% summary_log(.bbi_args = list(no_grd_file = TRUE))
+    test_sum_df(sum_df)
+  })
+
 }) # closing withr::with_options

@@ -48,7 +48,7 @@ summary_log <- function(
 ) {
 
   # get list of summaries
-  res_list <- model_summaries(.mods)
+  res_list <- model_summaries(.mods, ...)
 
   # create tibble from list of lists
   res_df <- res_list %>% transpose() %>% as_tibble() %>%
@@ -57,6 +57,13 @@ summary_log <- function(
       error_msg = unlist(.data$error_msg),
       needed_fail_flags = unlist(.data$needed_fail_flags)
     )
+
+  # if ALL models failed, the next section will error trying to unnest them,
+  # and everything else will be NULL/NA anyway, so we just return the errors here.
+  if (all(!is.na(res_df$error_msg))) {
+    warning(glue("ALL {nrow(res_df)} MODEL SUMMARIES FAILED in `summary_log()` call. Check `error_msg` column for details."))
+    return(select(res_df, -.data$bbi_summary, -.data$needed_fail_flags))
+  }
 
   res_df <- mutate(res_df,
       d =            extract_details(.data$bbi_summary),
