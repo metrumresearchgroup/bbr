@@ -44,6 +44,7 @@ If you would like more fields, you can set \code{.keep_bbi_object = TRUE} and ex
 \item \code{problem_text} -- Character vector of text from \verb{$PROB}. Extracted from \verb{$run_details}
 \item \code{number_of_patients} -- Extracted from \verb{$run_details}
 \item \code{number_of_obs} -- Extracted from \verb{$run_details}
+\item \code{any_heuristics} -- Logical indicating whether \emph{any} of the columns extracted from \verb{$run_heuristics} are \code{TRUE}. Duplicative information, but helpful for filtering.
 \item \code{covariance_step_aborted} -- Extracted from \verb{$run_heuristics}
 \item \code{large_condition_number} -- Extracted from \verb{$run_heuristics}
 \item \code{correlations_not_ok} -- Extracted from \verb{$run_heuristics}

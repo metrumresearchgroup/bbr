@@ -19,6 +19,7 @@
 #' * `problem_text` -- Character vector of text from `$PROB`. Extracted from `$run_details`
 #' * `number_of_patients` -- Extracted from `$run_details`
 #' * `number_of_obs` -- Extracted from `$run_details`
+#' * `any_heuristics` -- Logical indicating whether _any_ of the columns extracted from `$run_heuristics` are `TRUE`. Duplicative information, but helpful for filtering.
 #' * `covariance_step_aborted` -- Extracted from `$run_heuristics`
 #' * `large_condition_number` -- Extracted from `$run_heuristics`
 #' * `correlations_not_ok` -- Extracted from `$run_heuristics`
