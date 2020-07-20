@@ -125,6 +125,16 @@ SUMMARY_REQ_KEYS <- c(
   SUMMARY_HEURISTICS
 )
 
+ANY_HEURISTICS <- "any_heuristics"
+HEURISTICS_ELEMENTS <- c(
+  "covariance_step_aborted",
+  "large_condition_number",
+  "correlations_not_ok",
+  "parameter_near_boundary",
+  "hessian_reset",
+  "has_final_zero_gradient",
+  "minimization_terminated"
+)
 
 SL_SUMMARY <- "bbi_summary"
 SL_ERROR <- "error_msg"

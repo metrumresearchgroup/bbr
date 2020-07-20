@@ -140,7 +140,7 @@ extract_param_count <- function(.s) {
 #' @describeIn extract_from_summary Extract `run_details` field
 #' @importFrom purrr map
 extract_details <- function(.s) {
-  .rd <- map(.s, "run_details", .default = NA)
+  .rd <- map(.s, SUMMARY_DETAILS, .default = NA)
 
   KEEPERS <- c("estimation_method", "problem_text", "number_of_patients", "number_of_obs")
 
@@ -159,21 +159,17 @@ extract_details <- function(.s) {
 extract_heuristics <- function(.s) {
   .rh <- map(.s, "run_heuristics", .default = NA)
 
-  KEEPERS <- c(
-    "covariance_step_aborted",
-    "large_condition_number",
-    "correlations_not_ok",
-    "parameter_near_boundary",
-    "hessian_reset",
-    "has_final_zero_gradient",
-    "minimization_terminated"
-  )
-
   .out <- map(.rh, function(.x) {
     if(!inherits(.x, "list")) {
       return(NULL)
     }
-    return(.x[KEEPERS])
+
+    .x <- .x[HEURISTICS_ELEMENTS]
+
+    .any <- list()
+    .any[[ANY_HEURISTICS]] = any(unlist(.x))
+
+    return(combine_list_objects(.any, .x))
   })
 
   return(.out)
