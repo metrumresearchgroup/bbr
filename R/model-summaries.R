@@ -91,6 +91,7 @@ model_summaries.list <- function(
     ))
   })
 
+  res_list <- create_summary_list(res_list)
   return(res_list)
 }
 

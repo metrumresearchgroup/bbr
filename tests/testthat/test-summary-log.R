@@ -77,6 +77,14 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
     test_sum_df(sum_df)
   })
 
+  test_that("summary_log works with bbi_summary_list input", {
+    mod_sums <- model_summaries(c(1, 2, 3))
+    expect_true(inherits(mod_sums, "bbi_summary_list"))
+
+    sum_df <- mod_sums %>% summary_log()
+    test_sum_df(sum_df)
+  })
+
   test_that("summary_log works with bbi_run_log_df input", {
     sum_df <- run_log() %>% summary_log()
     test_sum_df(sum_df)

@@ -117,10 +117,24 @@ VALID_SUM_CLASSES <- purrr::map_chr(SUPPORTED_MOD_TYPES,
 
 
 SUMMARY_DETAILS <- "run_details"
+SUMMARY_HEURISTICS <- "run_heuristics"
 
 # keys required for a summary object to have
 SUMMARY_REQ_KEYS <- c(
-  SUMMARY_DETAILS
+  SUMMARY_DETAILS,
+  SUMMARY_HEURISTICS
+)
+
+
+SL_SUMMARY <- "bbi_summary"
+SL_ERROR <- "error_msg"
+SL_FAIL_FLAGS <- "needed_fail_flags"
+
+SUMMARY_LIST_REQ_KEYS <- c(
+  ABS_MOD_PATH,
+  SL_SUMMARY,
+  SL_ERROR,
+  SL_FAIL_FLAGS
 )
 
 # keys added when creating a process object

@@ -107,6 +107,32 @@ create_summary_object <- function(res, .model_type = SUPPORTED_MOD_TYPES) {
 }
 
 
+#' @describeIn create_bbi_object Create list output from model_summaries(). Each element will contain a `bbi_{.model_type}_summary` object, as well as some metadata about possible errors.
+#' @param res_list List to attempt to assign the class to
+#' @keywords internal
+create_summary_list <- function(res_list) {
+
+  if(!inherits(res_list, "list")) {
+    stop(glue("Can only pass a list. Passed object has classes {paste(class(res), collapse = ', ')}"))
+  }
+
+  # check for required keys, just as an extra safety precaution
+  sum_bool <- map_lgl(res_list , ~check_required_keys(.x, .req = SUMMARY_LIST_REQ_KEYS))
+
+  if (!all(sum_bool)) {
+    err_msg <- paste0(
+      glue("Each element of summary list object must have the following named elements to be converted to an S3 object of class `bbi_summary_list`: `"), paste(SUMMARY_LIST_REQ_KEYS, collapse=", "),
+      "`\nThe following elements have missing keys: ", paste(which(!sum_bool), collapse=", ")
+    )
+    strict_mode_error(err_msg)
+  }
+
+  # assign class and return
+  class(res_list) <- c(as.character("bbi_summary_list"), class(res_list))
+  return(res_list)
+}
+
+
 #' @describeIn create_bbi_object Create list object of `babylon_process` class, first checking that all the required keys are present.
 #' @param res List to attempt to assign the class to
 #' @keywords internal
