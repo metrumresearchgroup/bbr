@@ -34,8 +34,8 @@
 #' a character vector of file paths to models,
 #' a numeric vector of integers corresponding to a file names of a models.
 #' Could also be a `bbi_summary_list` (output from `model_summaries()`) in which case it is passed straight through and `model_summaries()` is _not_ re-run.
-#' @param .keep_bbi_object `FALSE` by default. If `TRUE`, a list column will be added containing the full `bbi_nonmem_summary` object for each row.
-#' Use this if you would like to extract additional fields from the summary object.
+#' @param .keep_bbi_object If `TRUE`, the default, a list column will be added containing the full `bbi_nonmem_summary` object for each row.
+#' This can be used to extract additional fields from the summary object. If `FALSE` this column is dropped.
 #' @param ... Arguments passed through to `model_summaries()`.
 #' @importFrom dplyr mutate
 #' @importFrom purrr map transpose
@@ -46,7 +46,7 @@
 summary_log <- function(
   .mods,
   ...,
-  .keep_bbi_object = FALSE
+  .keep_bbi_object = TRUE
 ) {
 
   # get list of summaries

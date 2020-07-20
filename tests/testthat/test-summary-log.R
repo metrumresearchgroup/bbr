@@ -19,10 +19,13 @@ MOD_CLASS_LIST <- c("bbi_nonmem_model", "list")
 OFV_REF <- 2636.846
 PARAM_COUNT_REF <- 7
 
+SUMMARY_LOG_COLS <- 18
+ADD_SUMMARY_COLS <- 25
+
 # helper to run expectations
 test_sum_df <- function(sum_df) {
   expect_equal(nrow(sum_df), NUM_MODS)
-  expect_true(ncol(sum_df) %in% c(17, 24)) # two options for summary_log() and add_summary()
+  expect_true(ncol(sum_df) %in% c(SUMMARY_LOG_COLS, ADD_SUMMARY_COLS)) # two options for summary_log() and add_summary()
 
   # check some columns
   expect_equal(sum_df$absolute_model_path, purrr::map_chr(ALL_PATHS, ~normalizePath(.x)))
@@ -88,6 +91,31 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
   test_that("summary_log works with bbi_run_log_df input", {
     sum_df <- run_log() %>% summary_log()
     test_sum_df(sum_df)
+  })
+
+  test_that("summary_log bbi_summary column is correct", {
+    sum_df <- summary_log(c(1,2,3))
+    test_sum_df(sum_df)
+
+    sum_list <- sum_df[[SL_SUMMARY]]
+    expect_true(all(map_lgl(sum_list, ~ inherits(.x, "bbi_nonmem_summary")) ))
+
+    # check objective function to make sure it's a real summary object
+    ofvs <- map(sum_list, ~.x$ofv$ofv_no_constant) %>% unlist() %>% unique()
+    expect_equal(ofvs, OFV_REF)
+
+  })
+
+  test_that("summary_log .keep_bbi_object=FALSE drops column", {
+    sum_df <- summary_log(sum_df, .keep_bbi_object=FALSE)
+
+    # this is the important one
+    expect_equal(ncol(sum_df), SUMMARY_LOG_COLS-1)
+
+    # these just check that it returned other stuff normally
+    expect_equal(nrow(sum_df), NUM_MODS)
+    expect_equal(sum_df$absolute_model_path, purrr::map_chr(ALL_PATHS, ~normalizePath(.x)))
+    expect_true(all(is.na(sum_df$error_msg)))
   })
 
   test_that("add_summary works correctly", {
