@@ -2,13 +2,17 @@
 % Please edit documentation in R/rbabylon.R
 \name{check_bbi_exe}
 \alias{check_bbi_exe}
-\title{Checks that a bbi binary is present at the path passed to .bbi_exe_path}
+\title{Check that babylon is installed}
 \usage{
 check_bbi_exe(.bbi_exe_path)
 }
 \arguments{
-\item{.bbi_exe_path}{Path to bbi exe file that will be checked}
+\item{.bbi_exe_path}{Path to babylon executable}
+}
+\value{
+\code{NULL}, invisibly
 }
 \description{
-Checks that a bbi binary is present at the path passed to .bbi_exe_path
+Raises an error if a babylon executable is not found at \code{.bbi_exe_path}.
 }
+\keyword{internal}

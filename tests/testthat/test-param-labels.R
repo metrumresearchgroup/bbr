@@ -36,7 +36,7 @@ for (i in length(BLOCK_REF)) {
 
 
 test_that("param_labels.character errors on vector", {
-  expect_error(param_labels(c("naw", "dawg")), regexp = "character scaler of the raw control stream")
+  expect_error(param_labels(c("naw", "dawg")), regexp = "character scalar of the raw control stream")
 })
 
 
@@ -87,7 +87,7 @@ for (MODEL_PICK in MODEL_PICKS) {
 if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
   skip("param_labels only runs on Metworx or Drone")
 } else {
-  withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
+  withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
                            rbabylon.model_directory = normalizePath(MODEL_DIR)), {
 
     for (MODEL_PICK in MODEL_PICKS) {

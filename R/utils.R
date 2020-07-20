@@ -2,13 +2,15 @@
   if (is.null(x)) return(y)
   return(x)
 }
+
+
 #' Checks that all passed NONMEM command line args are valid and formats
 #' @param .args A named list of .args to check
 #' @importFrom checkmate assert_list
 #' @importFrom rlang is_bare_character is_bare_numeric is_bare_logical
 #' @importFrom purrr imap set_names
 #' @return character string, output from format_cmd_args()
-#' @export
+#' @keywords internal
 check_nonmem_args <- function(.args) {
   # if NULL, return NULL back
   if (length(.args) == 0) {
@@ -71,7 +73,7 @@ check_nonmem_args <- function(.args) {
 
 #' Formats command line args from a named list to a string as it would be passed on the command line
 #' @param .args A named list of .args to check
-#' @param .collapse Boolean for whether to collapse return vector to a single string (FALSE by default)
+#' @param .collapse If `FALSE`, the default, returns a character vector. If `TRUE`, collapses return vector to a single string.
 #' @importFrom checkmate assert_list
 #' @importFrom rlang is_bare_logical
 #' @importFrom purrr imap set_names
@@ -114,17 +116,11 @@ format_cmd_args <- function(.args, .collapse = FALSE) {
 #' @importFrom purrr map_lgl
 #' @param .mods a list containing only `bbi_{.model_type}_model` objects
 #' @param .bbi_args A named list specifying arguments to pass to babylon. This will over-ride any shared arguments from the model objects.
+#' @keywords internal
 build_bbi_param_list <- function(.mods, .bbi_args = NULL) {
 
   # check that everything in list is a model object
-  all_models_bool <- map_lgl(.mods, function(.x) { inherits(.x, VALID_MOD_CLASSES) })
-  if (isFALSE(all(all_models_bool))) {
-    losers <- which(!all_models_bool)
-    stop(paste(
-          glue("Passed list `.mods` must contain only model objects, but found {length(losers)} invalid objects at indices:"),
-          paste(losers, collapse = ", ")
-      ))
-  }
+  check_model_object_list(.mods)
 
   # build list of unique arg sets
   param_list <- list()
@@ -156,7 +152,7 @@ build_bbi_param_list <- function(.mods, .bbi_args = NULL) {
 #' @param .yaml_args A named list of arguments for bbi, parsed from user input yaml
 #' @importFrom checkmate assert_list
 #' @return The combination of the two lists, with .func_args overwriting any keys that are shared
-#' @export
+#' @keywords internal
 parse_args_list <- function(.func_args, .yaml_args) {
   # start with .yaml_args
   if (is.null(.yaml_args)) {
@@ -186,7 +182,7 @@ parse_args_list <- function(.func_args, .yaml_args) {
 #' @param .append Shared keys will have their contents concatenated instead of overwriting from .new_list
 #' @importFrom checkmate assert_list
 #' @return The combined list
-#' @export
+#' @keywords internal
 combine_list_objects <- function(.new_list, .old_list, .append = FALSE) {
   # check that unique named lists were passed
   tryCatch(
@@ -218,8 +214,9 @@ combine_list_objects <- function(.new_list, .old_list, .append = FALSE) {
   return(.out_list)
 }
 
-
-#' Prints all valid arguments to pass in submit_nonmem_model(.args=list())
+#' Print valid .bbi_args
+#'
+#' Prints all valid arguments to pass in to `.bbi_args=list()` argument of `submit_model()` or `model_summary()`
 #' @importFrom purrr imap
 #' @export
 print_nonmem_args <- function() {
@@ -234,50 +231,19 @@ check_required_keys <- function(.list, .req) {
   all(.req %in% names(.list))
 }
 
-#' Set global model directory option
+
+#' Get or set global model directory option
 #'
-#' Sets `options('rbabylon.model_directory')` to the absolute path of the directory passed to `.path`.
+#' Gets or sets `options('rbabylon.model_directory')`,
+#' which is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
+#' once this is set, those functions can take a path relative to this directory instead of the working/script directory.
+#'
+#' @details
+#' `set_model_directory()` sets `options('rbabylon.model_directory')` to the absolute path of the directory passed to `.path`.
 #' Note that the directory must exist or this will error.
-#' This is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
-#' once this is set, those functions can take a path relative to this directory instead of the working/script directory.
-#' @param .path Path, either from working directory or absolute, that will be set as `options('rbabylon.model_directory')`
-#' @export
-set_model_directory <- function(.path) {
-  if (is.null(.path)) {
-    options('rbabylon.model_directory' = NULL)
-  } else {
-    options('rbabylon.model_directory' = normalizePath(.path, mustWork = TRUE))
-  }
-
-  cat(glue("options('rbabylon.model_directory') set to {options('rbabylon.model_directory')}"))
-}
-
-
-#' Set global model directory option
 #'
-#' Sets `options('rbabylon.model_directory')` to the absolute path of the directory passed to `.path`.
-#' Note that the directory must exist or this will error.
-#' This is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
-#' once this is set, those functions can take a path relative to this directory instead of the working/script directory.
-#' @param .path Path, either from working directory or absolute, that will be set as `options('rbabylon.model_directory')`
-#' @rdname set_model_directory
-#' @export
-set_model_directory <- function(.path) {
-  if (is.null(.path)) {
-    options('rbabylon.model_directory' = NULL)
-  } else {
-    options('rbabylon.model_directory' = normalizePath(.path, mustWork = TRUE))
-  }
-
-  cat(glue("options('rbabylon.model_directory') set to {options('rbabylon.model_directory')}"))
-}
-
-#' Get global model directory option
-#'
-#' Gets the path set to `options('rbabylon.model_directory')` and checks that it is both absolute and exists.
-#' This path is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
-#' once this is set, those functions can take a path relative to this directory instead of the working/script directory.
-#' @rdname set_model_directory
+#' `get_model_directory()` gets the path set to `options('rbabylon.model_directory')` and checks that it is both absolute and exists,
+#' erroring if it is not.
 #' @importFrom fs is_absolute_path dir_exists
 #' @export
 get_model_directory <- function() {
@@ -290,7 +256,7 @@ get_model_directory <- function() {
     strict_mode_error(paste(
       glue("`options('rbabylon.model_directory')` must be set to an absolute path but is currently set to {.mod_dir}"),
       "It is recommended to use `set_model_directory('...')` or put `options('rbabylon.model_directory' = normalizePath('...'))` in your .Rprofile for this project.",
-    sep = "\n"))
+      sep = "\n"))
   }
 
   if (!fs::dir_exists(.mod_dir)) {
@@ -304,12 +270,27 @@ get_model_directory <- function() {
 }
 
 
+#' @rdname get_model_directory
+#' @param .path Path, either from working directory or absolute, that will be set as `options('rbabylon.model_directory')`
+#' @export
+set_model_directory <- function(.path) {
+  if (is.null(.path)) {
+    options('rbabylon.model_directory' = NULL)
+  } else {
+    options('rbabylon.model_directory' = normalizePath(.path, mustWork = TRUE))
+  }
+
+  cat(glue("options('rbabylon.model_directory') set to {options('rbabylon.model_directory')}"))
+}
+
+
 #' Private helper to search for babylon.yaml config files
 #' @param .config_path Path to config, possibly relative
 #' @param .model_dir absolute path to directory where model is be run from
 #' @importFrom fs is_file file_exists is_absolute_path
 #' @importFrom stringr str_detect
 #' @return path to babylon.yaml in `.config_path`, relative to `.model_dir`
+#' @keywords internal
 find_config_file_path <- function(.config_path, .model_dir) {
   if (!fs::is_absolute_path(.model_dir)) {
     stop(glue("USER SHOULDN'T SEE THIS ERROR: find_config_file_path(.model_dir) is not absolute: {.model_dir}"))
@@ -334,11 +315,43 @@ find_config_file_path <- function(.config_path, .model_dir) {
   return(.config_path)
 }
 
+#' Private helper to check if an object inherits a model class and error if not
+#' @param .mod The object to check
+#' @param .mod_types Character vector of acceptable classes, defaulting to `VALID_MOD_CLASSES`
+#' @keywords internal
+check_model_object <- function(.mod, .mod_types = VALID_MOD_CLASSES) {
+  if (!inherits(.mod, .mod_types)) {
+    stop(glue("Must pass a model object, but got object of class {paste(class(.mod), collapse = ', ')}"))
+  }
+  return(invisible(TRUE))
+}
+
+#' Private helper to check if a list of objects all inherit a model class and error if not
+#' @param .mods The list of objects to check
+#' @param .mod_types Character vector of acceptable classes, defaulting to `VALID_MOD_CLASSES`
+#' @keywords internal
+check_model_object_list <- function(.mods, .mod_types = VALID_MOD_CLASSES) {
+  all_models_bool <- map_lgl(.mods, function(.x) { inherits(.x, .mod_types) })
+  if (isFALSE(all(all_models_bool))) {
+    losers <- which(!all_models_bool)
+    stop(paste(
+      glue("Passed list must contain only model objects, but found {length(losers)} invalid objects at indices:"),
+      paste(losers, collapse = ", ")
+    ))
+  }
+  return(invisible(TRUE))
+}
 
 ############################
 # Error handlers
 ############################
 
+#' Raise error in strict mode
+#'
+#' Raises an error if `options("rbabylon.strict" = TRUE)` (recommended). Otherwise raises a warning.
+#' These errors are used for things like type-checking which guarantees safe, predictable behavior of functions,
+#' but theoretically advanced users or developers could want to turn them off.
+#' @keywords internal
 strict_mode_error <- function(err_msg) {
   if (isTRUE(getOption("rbabylon.strict"))) {
     stop(err_msg, call. = FALSE)
@@ -353,9 +366,10 @@ strict_mode_error <- function(err_msg) {
 
 #' Build error message and throw error for passing character vector to get_... functions
 #' @param .len The length of the vector that was passed.
-stop_get_scaler_msg <- function(.len) {
+#' @keywords internal
+stop_get_scalar_msg <- function(.len) {
   stop(paste(
-    glue("When passing character input to `rbabylon::get_...` functions, only scaler values are permitted. A vector of length {.len} was passed."),
+    glue("When passing character input to `rbabylon::get_...` functions, only scalar values are permitted. A vector of length {.len} was passed."),
     "Consider instead passing the tibble output from `run_log()`, or iterating with something like `purrr::map(your_vector, ~ get_...(.x)`"
   ))
 }
@@ -363,7 +377,8 @@ stop_get_scaler_msg <- function(.len) {
 #' Build error message and throw error for generic failure fo get_... functions
 #' @param .bbi_object The object that something is attempting to be extracted from
 #' @param .key The name of the field that is attempting to be extracted
-#' @param .msg Character scaler or vector of more specific error messages to include at the end
+#' @param .msg Character scalar or vector of more specific error messages to include at the end
+#' @keywords internal
 stop_get_fail_msg <- function(.bbi_object, .key, .msg = "") {
   stop(glue("Cannot extract `{.key}` from object of class `{paste(class(.bbi_object), collapse = ', ')}` :\n{paste(.msg, collapse = ', ')}"), call. = FALSE)
 }

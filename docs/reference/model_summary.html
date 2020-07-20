@@ -6,27 +6,31 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>S3 generic for getting model summary — model_summary • rbabylon</title>
+<title>Summarize model outputs — model_summary • rbabylon</title>
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -35,14 +39,8 @@
 
 
 
-<meta property="og:title" content="S3 generic for getting model summary — model_summary" />
-<meta property="og:description" content="S3 generic for getting model summary
-Get model summary from `bbi_nonmem_model` object and optionally check if model is done before erroring
-S3 dispatch for getting model summary from output directory path
-S3 dispatch for getting model summary from numeric input
-This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`
-Run `bbi nonmem summary` and parse the output to a list" />
-<meta name="twitter:card" content="summary" />
+<meta property="og:title" content="Summarize model outputs — model_summary" />
+<meta property="og:description" content="Calls out to bbi and returns a named list of class bbi_{.model_type}_summary with model outputs and diagnostics." />
 
 
 
@@ -60,7 +58,7 @@ Run `bbi nonmem summary` and parse the output to a list" />
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -74,7 +72,7 @@ Run `bbi nonmem summary` and parse the output to a list" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7.0</span>
       </span>
     </div>
 
@@ -128,18 +126,13 @@ Run `bbi nonmem summary` and parse the output to a list" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>S3 generic for getting model summary</h1>
+    <h1>Summarize model outputs</h1>
     
     <div class="hidden name"><code>model_summary.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>S3 generic for getting model summary</p>
-<p>Get model summary from `bbi_nonmem_model` object and optionally check if model is done before erroring</p>
-<p>S3 dispatch for getting model summary from output directory path</p>
-<p>S3 dispatch for getting model summary from numeric input
-This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`</p>
-<p>Run `bbi nonmem summary` and parse the output to a list</p>
+    <p>Calls out to bbi and returns a named list of class <code>bbi_{.model_type}_summary</code> with model outputs and diagnostics.</p>
     </div>
 
     <pre class="usage"><span class='fu'>model_summary</span>(
@@ -168,7 +161,7 @@ This will only work if you are calling from the same directory as the models, or
   <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='no'>...</span>,
   <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>()
+  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='get_model_directory.html'>get_model_directory</a></span>()
 )
 
 <span class='co'># S3 method for numeric</span>
@@ -178,29 +171,27 @@ This will only work if you are calling from the same directory as the models, or
   <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='no'>...</span>,
   <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='set_model_directory.html'>get_model_directory</a></span>()
-)
-
-<span class='fu'>nonmem_summary</span>(<span class='no'>.mod</span>, <span class='kw'>.bbi_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>, <span class='kw'>.dry_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+  <span class='kw'>.directory</span> <span class='kw'>=</span> <span class='fu'><a href='get_model_directory.html'>get_model_directory</a></span>()
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>.mod</th>
-      <td><p>`bbi_nonmem_model` object for summary</p></td>
+      <td><p>Model to summarize. Can be a <code>bbi_{.model_type}_model</code> object, a file path, or an integer corresponding to a file path.</p></td>
     </tr>
     <tr>
       <th>.model_type</th>
-      <td><p>Character scaler specifying the type of model, either 'nonmem' or 'stan'</p></td>
+      <td><p>String specifying the type of model, either 'nonmem' or 'stan'.  <strong>Only used when passing a path for <code>.mod</code> instead of a <code>bbi_{.model_type}_model</code> object.</strong></p></td>
     </tr>
     <tr>
       <th>.bbi_args</th>
-      <td><p>A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.</p></td>
+      <td><p>A named list specifying arguments to pass to babylon formatted like <code><a href='https://rdrr.io/r/base/list.html'>list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)</a></code>.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>args passed through to `bbi_exec()`</p></td>
+      <td><p>args passed through to <code><a href='bbi_exec.html'>bbi_exec()</a></code></p></td>
     </tr>
     <tr>
       <th>.dry_run</th>
@@ -208,33 +199,62 @@ This will only work if you are calling from the same directory as the models, or
     </tr>
     <tr>
       <th>.directory</th>
-      <td><p>Model directory containing the files referenced by `.mod`. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.</p></td>
+      <td><p>Model directory which <code>.mod</code> path is relative to. Defaults to <code><a href='https://rdrr.io/r/base/options.html'>options('rbabylon.model_directory')</a></code>, which can be set globally with <code><a href='get_model_directory.html'>set_model_directory()</a></code>. <strong>Only used when passing a path for <code>.mod</code> instead of a <code>bbi_{.model_type}_model</code> object.</strong></p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>List of S3 Class "bbi_nonmem_summary" with all summary information</p>
+    <p><strong>NONMEM</strong></p>
+<p>The returned list for a NONMEM model will contain the following top-level elements:</p><ul>
+<li><p>run_details</p></li>
+<li><p>run_heuristics</p></li>
+<li><p>parameters_data</p></li>
+<li><p>parameter_names</p></li>
+<li><p>ofv</p></li>
+<li><p>shrinkage_details</p></li>
+<li><p>covariance_theta</p></li>
+<li><p>correlation_theta</p></li>
+</ul>
+
+<p>The summary call will error if it does not find certain files in the output folder.
+However, you can override this behavior with the following file-specific flags:</p><ul>
+<li><p><code>no_cor_file</code></p></li>
+<li><p><code>no_cov_file</code></p></li>
+<li><p><code>no_ext_file</code></p></li>
+<li><p><code>no_grd_file</code></p></li>
+<li><p><code>no_shk_file</code></p></li>
+</ul>
+
+<p>If you are using an estimation method that does not produce any of the following files,
+or they are missing for some other legitimate reason, pass the appropriate flags through the <code>.bbi_args</code> argument.
+For example, if have asked to skip the <code>$COV</code> step, you would call <code>model_summary(..., .bbi_args = list(no_cov_file = TRUE))</code>.</p>
+    <h2 class="hasAnchor" id="methods-by-class-"><a class="anchor" href="#methods-by-class-"></a>Methods (by class)</h2>
+
+    
+<ul>
+<li><p><code>bbi_nonmem_model</code>: Get model summary from <code>bbi_nonmem_model</code> object</p></li>
+<li><p><code>character</code>: Get model summary from output directory path</p></li>
+<li><p><code>numeric</code>: Get model summary from numeric input.
+This will only work if you are calling from the same directory as the models, or if you have set <code><a href='https://rdrr.io/r/base/options.html'>options('rbabylon.model_directory')</a></code> to the directory constaining the relevant model.</p></li>
+</ul>
 
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
 
       <footer>
       <div class="copyright">
-  <p>Developed by Devin Pastoor, Seth Green.</p>
+  <p>Developed by Devin Pastoor, Seth Green, Sean Wilson.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

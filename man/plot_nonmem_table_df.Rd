@@ -4,7 +4,7 @@
 \alias{plot_nonmem_table_df}
 \alias{plot_grd}
 \alias{plot_ext}
-\title{Creates a line plot of the wide-format tibble output from check_nonmem_table_output}
+\title{Plot NONMEM output files}
 \usage{
 plot_nonmem_table_df(.df, .x_var, .stat_name)
 
@@ -13,16 +13,19 @@ plot_grd(.df)
 plot_ext(.df)
 }
 \arguments{
-\item{.df}{tibble from from check_ext() output}
+\item{.df}{the wide-format tibble output from \code{check_nonmem_table_output()}}
 
-\item{.x_var}{Character scaler for the variable name to use on the X-axis}
+\item{.x_var}{String of the variable name to use on the X-axis}
 
-\item{.stat_name}{Character scaler for the name of the stat the other columns represents (like "gradient" or "theta").}
+\item{.stat_name}{String of the name of the stat the other columns represents (like "gradient" or "theta").}
 }
 \description{
-Creates a line plot of the wide-format tibble output from check_nonmem_table_output
-
-S3 dispatch for plotting grd file
-
-S3 dispatch for plotting ext file
+Creates a line plot of the wide-format tibble output from \code{check_nonmem_table_output()}
 }
+\section{Functions}{
+\itemize{
+\item \code{plot_grd}: Plot the .grd file
+
+\item \code{plot_ext}: Plot the .ext file
+}}
+

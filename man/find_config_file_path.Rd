@@ -12,8 +12,9 @@ find_config_file_path(.config_path, .model_dir)
 \item{.model_dir}{absolute path to directory where model is be run from}
 }
 \value{
-path to babylon.yaml in `.config_path`, relative to `.model_dir`
+path to babylon.yaml in \code{.config_path}, relative to \code{.model_dir}
 }
 \description{
 Private helper to search for babylon.yaml config files
 }
+\keyword{internal}

@@ -4,7 +4,7 @@
 \alias{check_output_dir}
 \alias{check_output_dir.character}
 \alias{check_output_dir.bbi_nonmem_model}
-\title{List files in the output directory to glance at where the process is}
+\title{Check output directory}
 \usage{
 check_output_dir(.mod, ...)
 
@@ -13,14 +13,17 @@ check_output_dir(.mod, ...)
 \method{check_output_dir}{bbi_nonmem_model}(.mod, ...)
 }
 \arguments{
-\item{.mod}{The `bbi_{.model_type}_model` object}
+\item{.mod}{Either a \verb{bbi_\{.model_type\}_model} object or a file path to an output directory}
 
-\item{...}{values to pass to `fs::dir_ls`}
+\item{...}{values to pass to \code{fs::dir_ls}}
 }
 \description{
 List files in the output directory to glance at where the process is
-
-S3 dispatch to list output directory files from a directory path
-
-S3 dispatch to list output directory files from a `bbi_{.model_type}_model` object
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{character}: Takes a file path to the output directory.
+
+\item \code{bbi_nonmem_model}: Takes a \verb{bbi_\{.model_type\}_model} object.
+}}
+

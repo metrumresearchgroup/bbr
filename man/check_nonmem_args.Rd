@@ -15,3 +15,4 @@ character string, output from format_cmd_args()
 \description{
 Checks that all passed NONMEM command line args are valid and formats
 }
+\keyword{internal}

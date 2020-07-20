@@ -3,19 +3,20 @@
 # format NONMEM output to parameter tables
 ############################################
 
-#' S3 generic for parsing parameter estimate table
-#' @param .summary generic summary object
+#' Parses parameter estimates table
+#'
+#' Returns a tibble containing parameter estimates from a model.
+#' Currently can only take a `bbi_{.model_type}_summary` object, as output from `model_summary()`.
+#' @seealso `param_labels()` `apply_indices()`
+#' @param .summary `bbi_{.model_type}_summary` object
 #' @export
-#' @rdname param_estimates
 param_estimates <- function(.summary) {
   UseMethod("param_estimates")
 }
 
-#' S3 dispatch for parsing `bbi_nonmem_summary` object into parameter estimate table
-#' @param .summary `bbi_nonmem_summary` object
+#' @describeIn param_estimates Takes `bbi_nonmem_summary` object.
 #' @importFrom tibble tibble
 #' @export
-#' @rdname param_estimates
 param_estimates.bbi_nonmem_summary <- function(.summary) {
   num_methods <- length(.summary[["parameters_data"]])
   param_names <- .summary[["parameter_names"]]
@@ -52,7 +53,6 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
     ) %>%
     tibble::as_tibble()
 
-  # create boolean column for whether each row is a diagonal
   param_df[["diag"]] <- map_lgl(param_df[["names"]], is_diag)
 
   return(param_df)
@@ -61,8 +61,9 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
 #' Check if diagonal index or not
 #'
 #' Private helper to unpack an matrix index string like '(3,3)' is for a diagonal (i.e. if the numbers are the same)
-#' @param .name A character scaler containing an index string
+#' @param .name A character scalar containing an index string
 #' @importFrom stringr str_replace_all str_split
+#' @keywords internal
 is_diag <- function(.name) {
   .ind <- .name %>%
     str_replace_all(glue("^.*\\(|\\)"), "") %>%

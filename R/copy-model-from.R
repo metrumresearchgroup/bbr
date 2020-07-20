@@ -2,18 +2,22 @@
 # Iterating on models
 #######################
 
-#' Generic S3 method from iterating on models.
+#' Create new model by copying existing model
+#'
+#' Create new model by copying existing model. Useful for iterating during model development.
+#' Also fills `based_on` field by default, for constructing model ancestry. See ["Using based_on field" vignette](../articles/using-based-on.html) for details.
 #' @param .parent_mod Model to copy from
 #' @param .new_model Path to write new model files to WITHOUT FILE EXTENSION. Function will create both `{.new_model}.yaml` and a new model file based on this path.
-#' @param .description Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`).
-#' @param .based_on_additional Character scaler or vector of paths to other models that this model was "based on." These are used to reconstuct model developement and ancestry. \strong{Paths must be relative to `.new_model` path.} Note that the `.parent_model` will automatically be added to the `based_on` field, so no need to include that here.
-#' @param .add_tags A character scaler or vector with any new tags to be added to `{.new_model}.yaml`
-#' @param .inherit_tags Boolean for whether to inherit any tags from `.parent_mod`
-#' @param .update_model_file Boolean for whether to update the newly created model file. By default it is TRUE, but if FALSE is passed new model file will be an exact copy of its parent.
-#' @param .overwrite Boolean for whether to overwrite model file if one already exists specified `.new_model` path
+#' @param .description Description of new model run. This will be stored in the yaml (to be used later in `run_log()`).
+#' @param .based_on_additional Character vector of path(s) to other models that this model was "based on." These are used to reconstuct model developement and ancestry. **Paths must be relative to `.new_model` path.** Note that the `.parent_model` will automatically be added to the `based_on` field, so no need to include that here.
+#' @param .add_tags Character vector with any new tags(s) to be added to `{.new_model}.yaml`
+#' @param .inherit_tags If `FALSE`, the default, new model will only have any tags passed to `.add_tags` argument. If `TRUE` inherit any tags from `.parent_mod`, with any tags passed to `.add_tags` appended.
+#' @param .update_model_file If `TRUE`, the default, update the newly created model file with new description and name.
+#' For a NONMEM model, this currently means only the `$PROBLEM` line in the new control stream will be updated.
+#' If `FALSE`, new model file will be an exact copy of its parent.
+#' @param .overwrite If `FALSE`, the default,  function will error if a model file already exists at specified `.new_model` path. If `TRUE` any existing file at `.new_model` will be overwritten silently.
 #' @param .directory Model directory which `.new_model` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
 #' @export
-#' @rdname copy_model_from
 copy_model_from <- function(
   .parent_mod,
   .new_model,
@@ -28,10 +32,8 @@ copy_model_from <- function(
   UseMethod("copy_model_from")
 }
 
-#' S3 dispatch for passing `bbi_nonmem_model` object to `copy_model_from()`
-#' @param .parent_mod `bbi_nonmem_model` object to use as a basis for the copy.
+#' @describeIn copy_model_from `.parent_mod` takes a `bbi_nonmem_model` object to use as a basis for the copy.
 #' @export
-#' @rdname copy_model_from
 copy_model_from.bbi_nonmem_model <- function(
   .parent_mod,
   .new_model,
@@ -61,11 +63,9 @@ copy_model_from.bbi_nonmem_model <- function(
   return(.mod)
 }
 
-#' S3 dispatch for passing a file path to copy_model_from()
-#' @param .parent_mod Path to parent model to use as a basis for the copy. Ideally a YAML path, but can also pass control stream or output directory.
-#' @param .directory Model directory which BOTH `.parent_model` and `.new_model` are relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
+#' @describeIn copy_model_from Takes a file path to parent model to use as a basis for the copy. Ideally a YAML path, but can also pass control stream or output directory.
+#' Can be absolute or relative to `.directory`, which defaults to `options('rbabylon.model_directory')`.
 #' @export
-#' @rdname copy_model_from
 copy_model_from.character <- function(
   .parent_mod,
   .new_model,
@@ -107,13 +107,9 @@ copy_model_from.character <- function(
   return(.mod)
 }
 
-#' S3 dispatch for passing an integer model identifier to copy_model_from()
-#' This will only work if you are calling from the same directory as the models, or if you have set the model directory with `set_model_directory()`
-#' @param .parent_mod Integer that corresponds to parent model to use as a basis for the copy.
-#' @param .new_model Integer that corresponds to the new model name to create. Function will create both `{.new_model}.yaml` and a new model file based on this path.
-#' @param .directory Model directory which BOTH `.parent_model` and `.new_model` are relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
+#' @describeIn copy_model_from Both `.parent_mod` and `.new_model` take integers which must correspond to a model file name (without extension obviously).
+#' This will only work if you are calling from the same directory as the models, or if you have set `options('rbabylon.model_directory')` to the directory constaining the relevant models.
 #' @export
-#' @rdname copy_model_from
 copy_model_from.numeric <- function(
   .parent_mod,
   .new_model,
@@ -147,18 +143,20 @@ copy_model_from.numeric <- function(
 
 #' Copy model from an existing NONMEM model
 #'
+#' Private implementation function called by `copy_model_from()` dispatches.
 #' Create new .mod/ctl and new .yaml files based on a previous model. Used for iterating on model development.
-#' Also fills in necessary YAML fields for using `create_run_log()` later.
+#' Also fills in necessary YAML fields for using `run_log()` later.
 #' @param .parent_mod S3 object of class `bbi_nonmem_model` to be used as the basis for copy.
-#' @param .description Description of new model run. This will be stored in the yaml (to be used later in `create_run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.
-#' @param .update_model_file Boolean for whether to update the `$PROBLEM` line in the new control stream. By default it is TRUE, but if FALSE is passed `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.
+#' @param .description Description of new model run. This will be stored in the yaml (to be used later in `run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.
+#' @param .update_model_file If `TRUE`, the default, update the `$PROBLEM` line in the new control stream. If `FALSE`, `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.
 #' @importFrom fs file_copy path_rel
 #' @importFrom readr read_file write_file
 #' @importFrom stringr str_replace
 #' @importFrom yaml write_yaml
 #' @importFrom purrr list_modify
+#' @importFrom digest digest
 #' @return S3 object of class `bbi_nonmem_model` that can be passed to `submit_nonmem_model()`
-#' @rdname copy_model_from
+#' @keywords internal
 copy_nonmem_model_from <- function(
   .parent_mod,
   .new_model,
@@ -249,8 +247,9 @@ copy_nonmem_model_from <- function(
 #' Note that any file existing at `.new_model_path` will be overwritten.
 #' @param .parent_model_path Path to the control stream to copy
 #' @param .new_model_path Path to copy the new control stream to
-#' @param .update_model_file Boolean for whether to update the `$PROBLEM` line in the new control stream. By default it is TRUE, but if FALSE is passed `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.
+#' @param .update_model_file If `TRUE`, the default, update the `$PROBLEM` line in the new control stream. If `FALSE`, `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.
 #' @param .description Description of new model run. This will be passed into the `$PROBLEM` of the new control stream (if `.update_model_file=TRUE`).
+#' @keywords internal
 copy_control_stream <- function(.parent_model_path, .new_model_path, .update_model_file = FALSE, .description = NULL) {
   if (.update_model_file) {
     if (is.null(.description)) {

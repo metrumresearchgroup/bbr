@@ -7,3 +7,76 @@ navbar:
   right:
   - icon: fa-github fa-lg
     href: https://github.com/metrumresearchgroup/rbabylon
+
+reference:
+- title: Model management
+  contents:
+  - as_model
+  - copy_model_from
+  - new_model
+  - read_model
+  - reconcile_yaml
+  - check_yaml_in_sync
+  - set_model_directory
+  - get_model_directory
+- title: Model submission
+  contents:
+  - submit_model
+  - submit_models
+  - print_nonmem_args
+- title: Model summary
+  contents:
+  - add_config
+  - apply_indices
+  - block
+  - config_log
+  - model_summary
+  - param_estimates
+  - param_labels
+  - run_log
+- title: Model object interactions
+  contents:
+  - add_bbi_args
+  - get_based_on
+  - get_model_ancestry
+  - get_model_id
+  - get_path_from_object
+  - get_model_path
+  - get_output_dir
+  - get_yaml_path
+  - modify_model_field
+  - add_tags
+  - replace_tags
+  - add_decisions
+  - replace_decisions
+  - add_based_on
+  - replace_based_on
+  - replace_description
+  - replace_bbi_args
+- title: Babylon configuration
+  contents:
+  - bbi_current_release
+  - bbi_help
+  - bbi_init
+  - bbi_version
+  - use_bbi
+- title: Assorted helpers
+  contents:
+  - check_file
+  - tail_output
+  - tail_lst
+  - check_nonmem_table_output
+  - check_grd
+  - check_ext
+  - check_output_dir
+  - check_status_code
+  - format_cmd_args
+  - new_ext
+  - ctl_ext
+  - mod_ext
+  - yaml_ext
+  - yml_ext
+  - plot_nonmem_table_df
+  - plot_grd
+  - plot_ext
+  - suppressSpecificWarning

@@ -1,45 +1,54 @@
-Package: rbabylon
 Type: Package
-Title: r package for babylon
+Package: rbabylon
+Title: R package for babylon
 Version: 0.6.1.8005
-Description: r package for babylon.
-Encoding: UTF-8
-LazyData: true
 Authors@R: 
     c(person(given = "Devin",
-           family = "Pastoor",
-           role = c("aut", "cre"),
-           email = "devin.pastoor@gmail.com"),
-    person(given = "Seth",
-           family = "Green",
-           role = c("aut"),
-           email = "seth127@gmail.com"))
-RoxygenNote: 7.0.2
+             family = "Pastoor",
+             role = c("aut", "cre"),
+             email = "devin.pastoor@gmail.com"),
+      person(given = "Seth",
+             family = "Green",
+             role = "aut",
+             email = "seth127@gmail.com"),
+      person(given = "Sean",
+             family = "Wilson",
+             role = "aut",
+             email = "copernican@gmail.com"))
+Description: R package for making calls to babylon for running
+    NONMEM and other models. Also manages model metadata, workflow, and
+    run logs.
+License: MIT + file LICENSE
+Depends:
+    R (>= 3.5)
 Imports: 
     checkmate,
+    cli,
     digest,
     dplyr,
+    forcats,
     fs,
-    glue,
     ggplot2,
-    magrittr,
+    glue,
     jsonlite,
+    magrittr,
     processx,
     purrr,
     readr,
     rlang,
-    withr,
     stringr,
     tibble,
     tidyr,
-    yaml,
-    forcats,
-    cli
+    yaml
 Suggests: 
-    testthat (>= 2.1.0),
     knitr,
-    rmarkdown
-Depends:
-    R (>= 3.5)
-License: MIT + file LICENSE
-VignetteBuilder: knitr
+    rmarkdown,
+    testthat (>= 2.1.0),
+    withr
+VignetteBuilder: 
+    knitr
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.0
+SystemRequirements: babylon (>= 2.2.0)

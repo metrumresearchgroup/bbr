@@ -4,14 +4,22 @@
 
 #' Modify field in model object
 #'
-#' Implementation function for updating fields in a `bbi_{.model_type}_model` object
-#' Also checks the object against the corresponding YAML before modifying (and errors if they are out of sync) and then writes the modified object back to the YAML.
+#' Helper functions for updating fields in a `bbi_{.model_type}_model` object.
+#' Note that calling `modify_model_field()` directly is not recommended for most users
+#' because it requires knowing about the internal structure of the model object.
+#' Instead we recommend using the friendlier helpers listed below (`add_...` or `replace_...`) when possible.
+#'
+#' @details
+#' All functions in this family also check the object against the corresponding YAML with `check_yaml_in_sync()` before modifying it,
+#' and errors if they are out of sync.
+#' After the object has been modified they will write the modified object back to the YAML and update the model object in
+#' memory with an md5 digest of the newly written YAML.
+#' @importFrom digest digest
 #' @param .mod The `bbi_{.model_type}_model` object to modify
-#' @param .field Character scaler of the name of the component to modify
-#' @param .value Whatever is to be added to `.mod[[.field]]`, typically a character scaler or vector
-#' @param .append Boolean for whether to concatenate new values with currently present values. TRUE by default. If FALSE, new values will overwrite old values.
-#' @param .unique Boolean for whether to de-duplicate `.mod[[.field]]` after adding new values. TRUE by default.
-#' @rdname modify_model_field
+#' @param .field Character scalar of the name of the component to modify
+#' @param .value Whatever is to be added to `.mod[[.field]]`, typically a character vector
+#' @param .append If `TRUE`, the default, concatenate new values with currently present values. If `FALSE`, new values will overwrite old values.
+#' @param .unique If `TRUE`, the default, de-duplicate `.mod[[.field]]` after adding new values. If `FALSE` duplicate values will be kept.
 #' @export
 modify_model_field <- function(.mod, .field, .value, .append = TRUE, .unique = TRUE) {
 
@@ -39,11 +47,9 @@ modify_model_field <- function(.mod, .field, .value, .append = TRUE, .unique = T
   return(.mod)
 }
 
-#' Add tags to a model object and corresponding YAML
-#' @param .mod The `bbi_{.model_type}_model` object to modify
-#' @param .tags Character scaler or vector of tags to add
+#' @describeIn modify_model_field Add tags to a model object and corresponding YAML
+#' @param .tags Character vector to add to `tags` field
 #' @export
-#' @rdname modify_model_field
 add_tags <- function(.mod, .tags) {
   .mod <- modify_model_field(.mod = .mod,
                              .field = YAML_TAGS,
@@ -52,11 +58,8 @@ add_tags <- function(.mod, .tags) {
   return(.mod)
 }
 
-#' Replaces tags on a model object and corresponding YAML with new tags
-#' @param .mod The `bbi_{.model_type}_model` object to modify
-#' @param .tags Character scaler or vector of tags use as replacement
+#' @describeIn modify_model_field Replaces tags on a model object and corresponding YAML with new tags
 #' @export
-#' @rdname modify_model_field
 replace_tags <- function(.mod, .tags) {
   .mod <- modify_model_field(.mod = .mod,
                              .field = YAML_TAGS,
@@ -65,11 +68,9 @@ replace_tags <- function(.mod, .tags) {
   return(.mod)
 }
 
-#' Append new decisions to the one(s) in a model object and corresponding YAML
-#' @param .mod The `bbi_{.model_type}_model` object to modify
-#' @param .decisions Character scaler or vector of text to add to `decisions` field
+#' @describeIn modify_model_field Append new decisions to the one(s) in a model object and corresponding YAML
+#' @param .decisions Character vector to add to `decisions` field
 #' @export
-#' @rdname modify_model_field
 add_decisions <- function(.mod, .decisions) {
   .mod <- modify_model_field(.mod = .mod,
                              .field = YAML_DECISIONS,
@@ -78,11 +79,9 @@ add_decisions <- function(.mod, .decisions) {
   return(.mod)
 }
 
-#' Replaces `decisions` field in a model object and corresponding YAML with new values
-#' @param .mod The `bbi_{.model_type}_model` object to modify
-#' @param .decisions Character scaler or vector to use as replacement
+#' @describeIn modify_model_field Replaces `decisions` field in a model object and corresponding YAML with new values
+#' @param .decisions Character vector to use as replacement
 #' @export
-#' @rdname modify_model_field
 replace_decisions <- function(.mod, .decisions) {
   .mod <- modify_model_field(.mod = .mod,
                              .field = YAML_DECISIONS,
@@ -92,11 +91,9 @@ replace_decisions <- function(.mod, .decisions) {
 }
 
 
-#' Append new `based_on` tag to the one in a model object and corresponding YAML
-#' @param .mod The `bbi_{.model_type}_model` object to modify
-#' @param .based_on Character scaler or vector of relative paths to add to `based_on` field
+#' @describeIn modify_model_field Append new `based_on` tag to the one in a model object and corresponding YAML
+#' @param .based_on Character vector of relative paths to add to `based_on` field
 #' @export
-#' @rdname modify_model_field
 add_based_on <- function(.mod, .based_on) {
   .mod <- modify_model_field(.mod = .mod,
                              .field = YAML_BASED_ON,
@@ -105,11 +102,8 @@ add_based_on <- function(.mod, .based_on) {
   return(.mod)
 }
 
-#' Replaces `based_on` field in a model object and corresponding YAML with new values
-#' @param .mod The `bbi_{.model_type}_model` object to modify
-#' @param .based_on Character scaler or vector to use as replacement
+#' @describeIn modify_model_field Replaces `based_on` field in a model object and corresponding YAML with new values
 #' @export
-#' @rdname modify_model_field
 replace_based_on <- function(.mod, .based_on) {
   .mod <- modify_model_field(.mod = .mod,
                              .field = YAML_BASED_ON,
@@ -119,11 +113,9 @@ replace_based_on <- function(.mod, .based_on) {
 }
 
 
-#' Replaces description field in a model object and corresponding YAML with new description
-#' @param .mod The `bbi_{.model_type}_model` object to modify
-#' @param .description Character scaler to use as replacement
+#' @describeIn modify_model_field Replaces description field in a model object and corresponding YAML with new description
+#' @param .description Character scalar to use as replacement for the `description` field
 #' @export
-#' @rdname modify_model_field
 replace_description <- function(.mod, .description) {
   .mod <- modify_model_field(.mod = .mod,
                              .field = YAML_DESCRIPTION,
@@ -134,12 +126,10 @@ replace_description <- function(.mod, .description) {
 }
 
 
-#' Add new babylon args to model
-#'
-#' Modifies model object and corresponding YAML by adding new .bbi_args,
+#' @describeIn modify_model_field Modifies model object and corresponding YAML by adding new `bbi_args`,
 #' overwriting any args that are already present with the new values.
-#' Use `print_nonmem_args()` to see a list list of valid babylon arguments.
-#' @param .mod A `bbi_{.model_type}_model` object
+#' Use `print_nonmem_args()` to see a list of valid babylon arguments.
+#' @importFrom digest digest
 #' @param .bbi_args named list of arguments to add to the model
 #' @export
 add_bbi_args <- function(.mod, .bbi_args) {
@@ -159,12 +149,9 @@ add_bbi_args <- function(.mod, .bbi_args) {
   return(.mod)
 }
 
-#' Replaces babylon args to model
-#'
-#' Modifies model object and corresponding YAML by replacing .bbi_args with new .bbi_args
-#' Use `print_nonmem_args()` to see a list list of valid babylon arguments.
-#' @param .mod A `bbi_{.model_type}_model` object
-#' @param .bbi_args named list of arguments to add to the model
+#' @describeIn modify_model_field Modifies model object and corresponding YAML by replacing `bbi_args` with new list passed to `.bbi_args`.
+#' Use `print_nonmem_args()` to see a list of valid babylon arguments.
+#' @importFrom digest digest
 #' @export
 replace_bbi_args <- function(.mod, .bbi_args) {
 
@@ -192,7 +179,8 @@ replace_bbi_args <- function(.mod, .bbi_args) {
 #' @importFrom fs file_exists is_absolute_path path_rel
 #' @importFrom purrr map_lgl
 #' @param .start The directory of the model (i.e. the YAML file) that the `based_on` will be added to.
-#' @param .based_on Character vector or scaler of paths (with or without extension) to the models that will be added to `based_on`. Paths should be relative to `.start` argument.
+#' @param .based_on Character vector or scalar of paths (with or without extension) to the models that will be added to `based_on`. Paths should be relative to `.start` argument.
+#' @keywords internal
 safe_based_on <- function(.start, .based_on) {
   # make all input paths relative to .start
   .based_on <- map_chr(.based_on, function(.p) {
@@ -228,14 +216,21 @@ safe_based_on <- function(.start, .based_on) {
 # synching YAML
 ################
 
-#' Reconcile model object with YAML file
+#' Verify YAML file integrity
 #'
+#' These functions use an md5 digest of the model YAML file, stored each time a model is loaded into memory,
+#' to keep track of any changes made to the YAML that are _not_ reflected in the object held in memory.
+#' @name verify_model_yaml_integrity
+#' @param .mod `bbi_{.model_type}_model` object
+NULL
+
+#' @describeIn verify_model_yaml_integrity Use to manually reconcile model object in memory with its YAML file.
 #' Extracts YAML path from model object and pulls in YAML file.
 #' Any shared keys are overwritten with the values from the YAML and new keys in YAML are added to the model object.
-#' @param .mod `bbi_{.model_type}_model` object
-#' @rdname reconcile_yaml
+#' The md5 digest is then updated to reflect the new state.
 #' @export
 reconcile_yaml <- function(.mod) {
+  check_model_object(.mod)
 
   # extract path to yaml
   .yaml_path <- get_yaml_path(.mod)
@@ -250,15 +245,13 @@ reconcile_yaml <- function(.mod) {
 }
 
 
-#' Check model against YAML
-#'
-#' Checks that model YAML file is the same as when it was last read into the model object.
-#' Errors if the md5 hashes are not identical.
+#' @describeIn verify_model_yaml_integrity Checks that model YAML file is the same as when it was last read into the model object.
+#' Errors if the md5 digests are not identical. This is called internally in most functions that interact with a model object.
 #' @importFrom digest digest
-#' @param .mod `bbi_{.model_type}_model` object
-#' @rdname reconcile_yaml
 #' @export
 check_yaml_in_sync <- function(.mod) {
+  check_model_object(.mod)
+
   # get md5 of current YAML on disk
   .yaml_file <- get_yaml_path(.mod)
   current_md5 <- digest(file = .yaml_file, algo = "md5")

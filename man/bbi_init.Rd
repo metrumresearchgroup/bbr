@@ -2,7 +2,7 @@
 % Please edit documentation in R/rbabylon.R
 \name{bbi_init}
 \alias{bbi_init}
-\title{Executes (`bbi init`) with bbi_exec() in specified directory}
+\title{Initialize babylon}
 \usage{
 bbi_init(
   .dir,
@@ -12,14 +12,27 @@ bbi_init(
 )
 }
 \arguments{
-\item{.dir}{Path to directory to run `init` in (and put the resulting `babylon.yml` file)}
+\item{.dir}{Path to directory to run \code{init} in (and put the resulting \code{babylon.yml} file)}
 
 \item{.nonmem_dir}{Path to directory with the NONMEM installation.}
 
-\item{.nonmem_version}{Character scaler for default version of NONMEM to use. If left NULL, function will exit and tell you which versions were found in `.nonmem_dir`}
+\item{.nonmem_version}{Character scalar for default version of NONMEM to use. If left NULL, function will exit and tell you which versions were found in \code{.nonmem_dir}}
 
-\item{.no_default_version}{Boolean to force creation of babylon.yaml with NO default NONMEM version. FALSE by default, and not encouraged.}
+\item{.no_default_version}{If \code{TRUE}, force creation of babylon.yaml with \strong{no default NONMEM version}. \code{FALSE} by default, and using \code{TRUE} is \emph{not} encouraged.}
 }
 \description{
-Executes (`bbi init`) with bbi_exec() in specified directory
+Executes \verb{bbi init ...} in specified directory. This creates a \code{babylon.yml} file, which contains defaults
+for many configurable \code{babylon} settings, in that directory.
+}
+\details{
+For \code{rbabylon} to make any calls out to \code{bbi} (for example in \code{submit_model()} or \code{model_summary()}) it must find a
+\code{babylon.yml} file in one of the following places:
+\itemize{
+\item The directory specified in \code{options("rbabylon.model_directory")}
+\item The working directory, if \code{options("rbabylon.model_directory")} is \code{NULL}
+\item A path passed to the \code{.config_path} argument of the functions mentioned above
+}
+
+The recommended behavior is to set \code{options("rbabylon.model_directory")}, ideally in your \code{.Rprofile},
+and then call \code{bbi_init(.dir = getOption("rbabylon.model_directory"), ...)}. This only has to be done once.
 }
