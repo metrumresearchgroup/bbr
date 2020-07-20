@@ -82,13 +82,14 @@ model_summaries.list <- function(
         })
       }
     )
-    return(list(
-      absolute_model_path = tools::file_path_sans_ext(get_model_path(.m)),
-      error_msg = .s$error_msg %||% NA_character_,
-      needed_fail_flags = .s$needed_fail_flags %||% FALSE,
-      bbi_summary = .s
-      #bbi_summary = ifelse(is.null(.s$error_msg), .s, NA)
-    ))
+
+    res <- list()
+    res[[ABS_MOD_PATH]] = tools::file_path_sans_ext(get_model_path(.m))
+    res[[SL_SUMMARY]] = .s
+    res[[SL_ERROR]] = .s$error_msg %||% NA_character_
+    res[[SL_FAIL_FLAGS]] = .s$needed_fail_flags %||% FALSE
+
+    return(res)
   })
 
   res_list <- create_summary_list(res_list)

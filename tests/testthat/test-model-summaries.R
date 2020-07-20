@@ -18,7 +18,7 @@ NUM_MODS <- length(ALL_PATHS)
 SUMMARY_REF_FILE <- "data/acop_summary_obj_ref_200616.rds"
 SUM_CLASS_LIST <- c("bbi_nonmem_summary", "list")
 MOD_CLASS_LIST <- c("bbi_nonmem_model", "list")
-RES_NAMES_LIST <- c("absolute_model_path", "error_msg", "needed_fail_flags", "bbi_summary")
+RES_NAMES_LIST <- c("absolute_model_path", "bbi_summary", "error_msg", "needed_fail_flags")
 NOT_FINISHED_ERR_MSG <- "nonmem_summary.*modeling run has not finished"
 NO_LST_ERR_MSG <- "Unable to locate `.lst` file.*NONMEM output folder"
 

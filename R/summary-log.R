@@ -59,27 +59,27 @@ summary_log <- function(
   res_df <- res_list %>% transpose() %>% as_tibble() %>%
     mutate(
       !!ABS_MOD_PATH := unlist(.data[[ABS_MOD_PATH]]),
-      error_msg = unlist(.data$error_msg),
-      needed_fail_flags = unlist(.data$needed_fail_flags)
+      !!SL_ERROR := unlist(.data[[SL_ERROR]]),
+      !!SL_FAIL_FLAGS := unlist(.data[[SL_FAIL_FLAGS]])
     )
 
   # if ALL models failed, the next section will error trying to unnest them,
   # and everything else will be NULL/NA anyway, so we just return the errors here.
-  if (all(!is.na(res_df$error_msg))) {
+  if (all(!is.na(res_df[[SL_ERROR]]))) {
     warning(glue("ALL {nrow(res_df)} MODEL SUMMARIES FAILED in `summary_log()` call. Check `error_msg` column for details."))
-    return(select(res_df, -.data$bbi_summary, -.data$needed_fail_flags))
+    return(select(res_df, -.data[[SL_SUMMARY]], -.data[[SL_FAIL_FLAGS]]))
   }
 
   res_df <- mutate(res_df,
-      d =            extract_details(.data$bbi_summary),
-      ofv =          extract_ofv(.data$bbi_summary),
-      param_count =  extract_param_count(.data$bbi_summary),
-      h =            extract_heuristics(.data$bbi_summary)
+      d =            extract_details(.data[[SL_SUMMARY]]),
+      ofv =          extract_ofv(.data[[SL_SUMMARY]]),
+      param_count =  extract_param_count(.data[[SL_SUMMARY]]),
+      h =            extract_heuristics(.data[[SL_SUMMARY]])
     ) %>%
     unnest_wider(.data$d) %>% unnest_wider(.data$h)
 
   if (isFALSE(.keep_bbi_object)) {
-    res_df <- select(res_df, -.data$bbi_summary)
+    res_df <- select(res_df, -.data[[SL_SUMMARY]])
   }
 
   return(res_df)
