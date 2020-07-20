@@ -13,7 +13,8 @@
 #' @param .based_on Character scalar or vector of paths to other models that this model was "based on." These are used to reconstuct model developement and ancestry. \strong{Paths must be relative to `.new_model` path.}
 #' @param .tags A character scalar or vector with any user tags to be added to the YAML file
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments. These will be written into YAML file.
-#' @param .model_type Character scalar to specify type of model being created (used for S3 class). Currently only `'nonmem'` is supported.
+#' @param .overwrite If `FALSE`, the default, error if a file already exists at `.yaml_path`. If `TRUE` overwrite existing file, if one exists.
+#' @param .model_type Character scaler to specify type of model being created (used for S3 class). Currently only `'nonmem'` is supported.
 #' @param .directory Model directory which `.yaml_path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
 #' @importFrom yaml write_yaml
 #' @importFrom fs file_exists
@@ -27,6 +28,7 @@ new_model <- function(
   .based_on = NULL,
   .tags = NULL,
   .bbi_args = NULL,
+  .overwrite = FALSE,
   .model_type = c("nonmem"),
   .directory = get_model_directory()
 ) {
@@ -40,9 +42,9 @@ new_model <- function(
   .yaml_path <- combine_directory_path(.directory, .yaml_path)
 
   # check if file already exists
-  if (fs::file_exists(.yaml_path)) {
+  if (fs::file_exists(.yaml_path) && !isTRUE(.overwrite)) {
     stop(paste(glue("Passed {.yaml_path} to `new_model(.yaml_path)` but that file already exists."),
-               "Either call `read_model()` to load model from YAML or delete the YAML file and try `new_model()` call again."))
+               "Either call `read_model()` to load model from YAML or use `new_model(.overwrite = TRUE)` to overwrite the existing YAML."))
   }
 
   # fill list from passed args
