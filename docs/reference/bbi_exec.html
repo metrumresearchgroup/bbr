@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7.0.8000.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7.0.8000</span>
       </span>
     </div>
 
@@ -135,7 +135,14 @@
     <p>Private implementation function that executes a babylon call (<code>bbi ...</code>) with processx::process$new()</p>
     </div>
 
-    <pre class="usage"><span class='fu'>bbi_exec</span>(<span class='no'>.cmd_args</span>, <span class='kw'>.dir</span> <span class='kw'>=</span> <span class='st'>"."</span>, <span class='kw'>.verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>.wait</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>bbi_exec</span>(
+  <span class='no'>.cmd_args</span>,
+  <span class='kw'>.dir</span> <span class='kw'>=</span> <span class='st'>"."</span>,
+  <span class='kw'>.verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>.wait</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>.bbi_exe_path</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"rbabylon.bbi_exe_path"</span>),
+  <span class='no'>...</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -155,6 +162,10 @@
     <tr>
       <th>.wait</th>
       <td><p>If true, don't return until process has exited.</p></td>
+    </tr>
+    <tr>
+      <th>.bbi_exe_path</th>
+      <td><p>Path to babylon executable</p></td>
     </tr>
     <tr>
       <th>...</th>

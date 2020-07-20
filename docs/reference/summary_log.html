@@ -76,7 +76,7 @@ See details section for fields included." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7.0.8000.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7.0.8000</span>
       </span>
     </div>
 
@@ -156,7 +156,8 @@ See details section for fields included.</p>
 a <code>bbi_run_log_df</code> tibble,
 a list of <code>bbi_{.model_type}_model </code> objects,
 a character vector of file paths to models,
-a numeric vector of integers corresponding to a file names of a models.</p></td>
+a numeric vector of integers corresponding to a file names of a models.
+Could also be a <code>bbi_summary_list</code> (output from <code><a href='model_summaries.html'>model_summaries()</a></code>) in which case it is passed straight through and <code><a href='model_summaries.html'>model_summaries()</a></code> is <em>not</em> re-run.</p></td>
     </tr>
     <tr>
       <th>...</th>

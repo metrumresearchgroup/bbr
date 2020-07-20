@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get version number of babylon installed on system — bbi_version • rbabylon</title>
+<title>Get version of installed babylon — bbi_version • rbabylon</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Get version number of babylon installed on system — bbi_version" />
-<meta property="og:description" content="Returns version number of bbi binary installed at path passed to .bbi_exe_path" />
+<meta property="og:title" content="Get version of installed babylon — bbi_version" />
+<meta property="og:description" content="Get version of installed babylon" />
 
 
 
@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7.0.8000.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7.0.8000</span>
       </span>
     </div>
 
@@ -126,13 +126,13 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get version number of babylon installed on system</h1>
+    <h1>Get version of installed babylon</h1>
     
     <div class="hidden name"><code>bbi_version.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Returns version number of bbi binary installed at path passed to <code>.bbi_exe_path</code></p>
+    <p>Get version of installed babylon</p>
     </div>
 
     <pre class="usage"><span class='fu'>bbi_version</span>(<span class='kw'>.bbi_exe_path</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"rbabylon.bbi_exe_path"</span>))</pre>
@@ -142,13 +142,13 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>.bbi_exe_path</th>
-      <td><p>Path to bbi exe file that will be checked</p></td>
+      <td><p>Path to babylon executable</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>character</p>
+    <p>String giving the version of the bbi binary installed at <code>.bbi_exe_path</code></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {

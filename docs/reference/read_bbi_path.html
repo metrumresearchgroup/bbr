@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Builds matrix indices labels — build_matrix_indices • rbabylon</title>
+<title>Set the path to the babylon executable — read_bbi_path • rbabylon</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,15 @@
 
 
 
-<meta property="og:title" content="Builds matrix indices labels — build_matrix_indices" />
-<meta property="og:description" content="Builds matrix indices labels" />
+<meta property="og:title" content="Set the path to the babylon executable — read_bbi_path" />
+<meta property="og:description" content="withr::with_options() is used throughout package tests to set the path to
+the babylon executable. The test suite will fail if this path does not exist,
+which limits flexibility across environments, e.g., in continuous
+integration. Any solution that decouples the with_options() pattern from a
+particular default path must work with devtools::check(), which runs in a
+separate process. We can inject environment variables into check(), so the
+default behavior is to rely on such a variable to set the path, falling back
+to a default path if unset." />
 
 
 
@@ -126,27 +133,46 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Builds matrix indices labels</h1>
+    <h1>Set the path to the babylon executable</h1>
     
-    <div class="hidden name"><code>build_matrix_indices.Rd</code></div>
+    <div class="hidden name"><code>read_bbi_path.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Builds matrix indices labels</p>
+    <p><code><a href='https://rdrr.io/pkg/withr/man/with_options.html'>withr::with_options()</a></code> is used throughout package tests to set the path to
+the babylon executable. The test suite will fail if this path does not exist,
+which limits flexibility across environments, e.g., in continuous
+integration. Any solution that decouples the <code>with_options()</code> pattern from a
+particular default path must work with <code><a href='https://devtools.r-lib.org//reference/check.html'>devtools::check()</a></code>, which runs in a
+separate process. We can inject environment variables into <code><a href='https://rdrr.io/r/utils/PkgUtils.html'>check()</a></code>, so the
+default behavior is to rely on such a variable to set the path, falling back
+to a default path if unset.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>build_matrix_indices</span>(<span class='no'>.is_diag</span>)</pre>
+    <pre class="usage"><span class='fu'>read_bbi_path</span>(
+  <span class='kw'>path</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span>(<span class='st'>"BABYLON_EXE_PATH"</span>, <span class='fl'>NA</span>),
+  <span class='kw'>default</span> <span class='kw'>=</span> <span class='no'>BBI_DEFAULT_PATH</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>.is_diag</th>
-      <td><p>Logical vector denoting whether each element is a diagonal</p></td>
+      <th>path</th>
+      <td><p>path to the babylon executable</p></td>
+    </tr>
+    <tr>
+      <th>default</th>
+      <td><p>a default path if <code>path</code> is <code>NA</code></p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
+    <p><code>path</code> if not <code>NA</code>, else <code>default</code></p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'>read_bbi_path</span>()</div><div class='output co'>#&gt; [1] "/data/apps/bbi"</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

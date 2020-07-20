@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7.0.8000.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7.0.8000</span>
       </span>
     </div>
 
@@ -139,6 +139,8 @@
 
 <span class='fu'>create_summary_object</span>(<span class='no'>res</span>, <span class='kw'>.model_type</span> <span class='kw'>=</span> <span class='no'>SUPPORTED_MOD_TYPES</span>)
 
+<span class='fu'>create_summary_list</span>(<span class='no'>res_list</span>)
+
 <span class='fu'>create_process_object</span>(<span class='no'>res</span>)
 
 <span class='fu'>create_run_log_object</span>(<span class='no'>log_df</span>)</pre>
@@ -159,6 +161,10 @@
       <td><p>Character scalar of a valid model type (currently either <code>nonmem</code> or <code>stan</code>)</p></td>
     </tr>
     <tr>
+      <th>res_list</th>
+      <td><p>List to attempt to assign the class to</p></td>
+    </tr>
+    <tr>
       <th>log_df</th>
       <td><p>data.frame or tibble to attempt to assign the class to</p></td>
     </tr>
@@ -170,6 +176,7 @@
 <ul>
 <li><p><code>create_model_object</code>: Creates list object of class <code>bbi_{.model_type}_model</code> from named list with <code>MODEL_REQ_INPUT_KEYS</code></p></li>
 <li><p><code>create_summary_object</code>: Create list object of <code>bbi_{.model_type}_summary</code> class, first checking that all the required keys are present.</p></li>
+<li><p><code>create_summary_list</code>: Create list output from model_summaries(). Each element will contain a <code>bbi_{.model_type}_summary</code> object, as well as some metadata about possible errors.</p></li>
 <li><p><code>create_process_object</code>: Create list object of <code>babylon_process</code> class, first checking that all the required keys are present.</p></li>
 <li><p><code>create_run_log_object</code>: Create list object of <code>bbi_run_log_df</code> class, first checking that all the required columns are present.</p></li>
 </ul>

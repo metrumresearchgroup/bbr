@@ -54,8 +54,7 @@ set_model_directory("../inst/nonmem")
 
 # set babylon execution path
 if (Sys.which("bbi") == "") {
-  # fall back to default location of /data/apps/bbi
-  options('rbabylon.bbi_exe_path' = '/data/apps/bbi')
+  options('rbabylon.bbi_exe_path' = read_bbi_path())
 }
 ```
 

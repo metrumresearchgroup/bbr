@@ -14,7 +14,8 @@ add_summary(.log_df, ..., .keep_bbi_object = FALSE)
 a \code{bbi_run_log_df} tibble,
 a list of \verb{bbi_\{.model_type\}_model } objects,
 a character vector of file paths to models,
-a numeric vector of integers corresponding to a file names of a models.}
+a numeric vector of integers corresponding to a file names of a models.
+Could also be a \code{bbi_summary_list} (output from \code{model_summaries()}) in which case it is passed straight through and \code{model_summaries()} is \emph{not} re-run.}
 
 \item{...}{Arguments passed through to \code{model_summaries()}.}
 

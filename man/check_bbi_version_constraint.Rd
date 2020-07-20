@@ -2,16 +2,19 @@
 % Please edit documentation in R/rbabylon.R
 \name{check_bbi_version_constraint}
 \alias{check_bbi_version_constraint}
-\title{Check if bbi_version is below minimum allowed version}
+\title{Check that babylon satisfies a version constraint}
 \usage{
 check_bbi_version_constraint(
   .bbi_exe_path = getOption("rbabylon.bbi_exe_path")
 )
 }
 \arguments{
-\item{.bbi_exe_path}{Path to bbi exe file that will be checked}
+\item{.bbi_exe_path}{Path to babylon executable}
+}
+\value{
+\code{NULL} if \code{.bbi_exe_path} satisfies the constraint
 }
 \description{
-Check if bbi_version is below minimum allowed version
+Check that babylon satisfies a version constraint
 }
 \keyword{internal}

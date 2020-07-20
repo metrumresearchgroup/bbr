@@ -22,7 +22,7 @@ PARAM_COUNT_REF <- 7
 # helper to run expectations
 test_sum_df <- function(sum_df) {
   expect_equal(nrow(sum_df), NUM_MODS)
-  expect_true(ncol(sum_df) %in% c(16, 23)) # two options for summary_log() and add_summary()
+  expect_true(ncol(sum_df) %in% c(17, 24)) # two options for summary_log() and add_summary()
 
   # check some columns
   expect_equal(sum_df$absolute_model_path, purrr::map_chr(ALL_PATHS, ~normalizePath(.x)))

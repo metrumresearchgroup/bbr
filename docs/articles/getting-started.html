@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7.0.8000.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7.0.8000</span>
       </span>
     </div>
 
@@ -115,7 +115,7 @@
 <p>To reiterate, there are two relevant paths for this section.</p>
 <ul>
 <li>
-<code>BBI_EXE_PATH</code> – the path the <code>babylon</code> executable file on your system.</li>
+<code>BBI_EXE_PATH</code> – the path to the <code>babylon</code> executable file on your system.</li>
 <li>
 <code>MODEL_DIR</code> – the root modeling directory where you will be running models with <code>rbabylon</code>
 </li>
@@ -126,7 +126,7 @@
 <h3 class="hasAnchor">
 <a href="#installing-babylon" class="anchor"></a>Installing babylon</h3>
 <p>You can install the <code>babylon</code> binary with:</p>
-<pre><code><a href="../reference/use_bbi.html">rbabylon::use_bbi()</a></code></pre>
+<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="kw pkg">rbabylon</span><span class="kw ns">::</span><span class="fu"><a href="../reference/use_bbi.html">use_bbi</a></span>()</pre></body></html></div>
 <p>This will install to the <code>/data/apps/</code> folder by default, which matches the <code>BBI_EXE_PATH</code> you just defined (and will use soon). If you have changed that, you can pass your custom path to the <em>directory</em> where you want to put bbi like so <code><a href="../reference/use_bbi.html">use_bbi("/some/other/dir")</a></code>. In that case, you would want to set <code>BBI_EXE_PATH = "/some/other/dir/bbi"</code>.</p>
 <p>You can also check the <a href="https://github.com/metrumresearchgroup/babylon">babylon documentation</a> for manual installation instructions.</p>
 <p>If you’re not sure if you have <code>babylon</code> installed, you can use <code><a href="../reference/bbi_version.html">bbi_version()</a></code> to check. This will return the version number of your installation, if one is found, or an empty string if you do <em>not</em> have <code>babylon</code> installed. You can also use <code><a href="../reference/bbi_current_release.html">bbi_current_release()</a></code> to see the most current version available and run <code><a href="../reference/use_bbi.html">use_bbi()</a></code> as specified above if you want to update.</p>

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Check if bbi_version is below minimum allowed version — check_bbi_version_constraint • rbabylon</title>
+<title>Check that babylon satisfies a version constraint — check_bbi_version_constraint • rbabylon</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Check if bbi_version is below minimum allowed version — check_bbi_version_constraint" />
-<meta property="og:description" content="Check if bbi_version is below minimum allowed version" />
+<meta property="og:title" content="Check that babylon satisfies a version constraint — check_bbi_version_constraint" />
+<meta property="og:description" content="Check that babylon satisfies a version constraint" />
 
 
 
@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7.0.8000.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7.0.8000</span>
       </span>
     </div>
 
@@ -126,13 +126,13 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Check if bbi_version is below minimum allowed version</h1>
+    <h1>Check that babylon satisfies a version constraint</h1>
     
     <div class="hidden name"><code>check_bbi_version_constraint.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Check if bbi_version is below minimum allowed version</p>
+    <p>Check that babylon satisfies a version constraint</p>
     </div>
 
     <pre class="usage"><span class='fu'>check_bbi_version_constraint</span>(
@@ -144,10 +144,13 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>.bbi_exe_path</th>
-      <td><p>Path to bbi exe file that will be checked</p></td>
+      <td><p>Path to babylon executable</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p><code>NULL</code> if <code>.bbi_exe_path</code> satisfies the constraint</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

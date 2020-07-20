@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Checks that a bbi binary is present at the path passed to .bbi_exe_path — check_bbi_exe • rbabylon</title>
+<title>Check that babylon is installed — check_bbi_exe • rbabylon</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Checks that a bbi binary is present at the path passed to .bbi_exe_path — check_bbi_exe" />
-<meta property="og:description" content="Checks that a bbi binary is present at the path passed to .bbi_exe_path" />
+<meta property="og:title" content="Check that babylon is installed — check_bbi_exe" />
+<meta property="og:description" content="Raises an error if a babylon executable is not found at .bbi_exe_path." />
 
 
 
@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7.0.8000.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7.0.8000</span>
       </span>
     </div>
 
@@ -126,13 +126,13 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Checks that a bbi binary is present at the path passed to .bbi_exe_path</h1>
+    <h1>Check that babylon is installed</h1>
     
     <div class="hidden name"><code>check_bbi_exe.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Checks that a bbi binary is present at the path passed to .bbi_exe_path</p>
+    <p>Raises an error if a babylon executable is not found at <code>.bbi_exe_path</code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>check_bbi_exe</span>(<span class='no'>.bbi_exe_path</span>)</pre>
@@ -142,10 +142,13 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>.bbi_exe_path</th>
-      <td><p>Path to bbi exe file that will be checked</p></td>
+      <td><p>Path to babylon executable</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p><code>NULL</code>, invisibly</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

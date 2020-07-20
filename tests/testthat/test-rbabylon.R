@@ -1,7 +1,7 @@
 context("rbabylon exec functions")
 
 # constants
-BBI_EXE_PATH <- "/data/apps/bbi"
+BBI_EXE_PATH <- read_bbi_path()
 
 test_that("check_status_code works as expected", {
   # nothing happens on status 0
@@ -79,7 +79,7 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
   test_that("bbi_init creates babylon.yaml", {
     # create yaml
 
-      withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi'), {
+      withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
         bbi_init(".", ".", .no_default_version=TRUE)
       })
 
@@ -97,7 +97,7 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
     expect_error(bbi_init(".", "."), regexp = "Must specify a `.nonmem_version`")
 
     # fails if what you specify isn't in the babylon.yaml (i.e. isn't a valid NONMEM installation)
-    withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi'), {
+    withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
       expect_error(bbi_init(".", ".", "naw"), regexp = "Must specify a valid `.nonmem_version`")
       fs::file_delete("babylon.yaml")
     })
