@@ -7,7 +7,7 @@
 run_log(.base_dir = get_model_directory(), .recurse = TRUE)
 }
 \arguments{
-\item{.base_dir}{Directory to search for model YAML files. Only runs with a corresponding YAML will be included.}
+\item{.base_dir}{Directory to search for model YAML files. Only models with a corresponding YAML will be included. Defaults to \code{get_model_directory()}, and falls back to \code{getwd()} if \code{get_model_directory()} returns \code{NULL}.}
 
 \item{.recurse}{If \code{TRUE}, the default, search recursively in all subdirectories. Passed through to \code{fs::dir_ls()} -- If a positive number, the number of levels to recurse.}
 }

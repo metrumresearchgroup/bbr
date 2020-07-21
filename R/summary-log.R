@@ -1,6 +1,6 @@
-#' Add data from `model_summaries()` to `bbi_run_log_df`
+#' Create a tibble from `model_summaries()` data
 #'
-#' Runs `model_summaries()` on all models in the input and return a subset of the resulting summaries as a tibble.
+#' Runs `model_summaries()` on all models in the input and returns a subset of the resulting summaries as a tibble.
 #' `summary_log()` will return a new tibble with the `"absolute_model_path"` column as the primary key,
 #' and all the columns extracted from `model_summaries()` (but none of the other columns from the input tibble).
 #' `add_summary()` returns the input tibble, with all the columns extracted from `model_summaries()` joined onto it.
@@ -8,11 +8,11 @@
 #'
 #' @details
 #' The following fields from `bbi_nonmem_summary` are extracted and included by default.
-#' If you would like more fields, you can set `.keep_bbi_object = TRUE` and extract them manually.
+#' If you would like more fields, you can extract them manually from the object in the `bbi_summary` column.
 #'
 #' * `error_msg` -- Error message from `model_summary()`. If `NULL` the call succeeded. If not `NULL`, the rest of the fields will be `NULL`.
 #' * `needed_fail_flags` -- Logical for whether the call initially failed, but passed with the inclusion of `.fail_flags`
-#' * `bbi_summary` -- The full `bbi_nonmem_summary` object. This will only be included if `.keep_bbi_object = TRUE` was passed.
+#' * `bbi_summary` -- The full `bbi_nonmem_summary` object for each row. This can be queried further by extracting it as a list, or by using `dplyr::mutate()` etc.
 #' * `ofv` -- Objective function value from last estimation method, using `$ofv$ofv_no_constant` field.
 #' * `param_count` -- Count of (non-fixed) parameters estimated in final estimation method.
 #' * `estimation_method` -- Character vector of estimation method(s) used. Extracted from `$run_details`
@@ -28,14 +28,8 @@
 #' * `has_final_zero_gradient` -- Extracted from `$run_heuristics`
 #' * `minimization_terminated` -- Extracted from `$run_heuristics`
 #'
-#' @param .mods The model object that will be passed through to `model_summaries()` before constructing the output tibble. Could be
-#' a `bbi_run_log_df` tibble,
-#' a list of `bbi_{.model_type}_model ` objects,
-#' a character vector of file paths to models,
-#' a numeric vector of integers corresponding to a file names of a models.
-#' Could also be a `bbi_summary_list` (output from `model_summaries()`) in which case it is passed straight through and `model_summaries()` is _not_ re-run.
-#' @param .keep_bbi_object `FALSE` by default. If `TRUE`, a list column will be added containing the full `bbi_nonmem_summary` object for each row.
-#' Use this if you would like to extract additional fields from the summary object.
+#' @param .base_dir Base directory to look in for models that will be summarized. Defaults to `get_model_directory()`, and falls back to `getwd()` if `get_model_directory()` returns `NULL`.
+#' @param .recurse If `TRUE`, the default, search recursively in subdirectories.
 #' @param ... Arguments passed through to `model_summaries()`.
 #' @importFrom dplyr mutate
 #' @importFrom purrr map transpose
@@ -44,17 +38,70 @@
 #' @importFrom tidyr unnest_wider
 #' @export
 summary_log <- function(
-  .mods,
-  ...,
-  .keep_bbi_object = FALSE
+  .base_dir = get_model_directory(),
+  .recurse = TRUE,
+  ...
 ) {
 
-  # get list of summaries
-  if (inherits(.mods, "bbi_summary_list")) {
-    res_list <- .mods
-  } else {
-    res_list <- model_summaries(.mods, ...)
+  # if no directory defined, set to working directory
+  if (is.null(.base_dir)) {
+    .base_dir <- getwd()
   }
+
+  mod_list <- find_models(.base_dir, .recurse)
+  if(is.null(mod_list)) {
+    return(NULL)
+  }
+
+  res_df <- summary_log_impl(mod_list, ...)
+
+  return(res_df)
+}
+
+
+#' @describeIn summary_log Create `summary_log()` tibble and join against the input `bbi_run_log_df` tibble.
+#' @param .log_df a `bbi_run_log_df` tibble
+#' @importFrom dplyr left_join
+add_summary <- function(
+  .log_df,
+  ...
+) {
+
+  # check input df
+  check_bbi_run_log_df_object(.log_df)
+
+  # get config log
+  mod_list <- map(.log_df[[ABS_MOD_PATH]], ~ read_model(.x))
+  .sum_df <- summary_log_impl(mod_list, ...)
+
+  # join to log df
+  df <- left_join(
+    .log_df,
+    .sum_df,
+    by = ABS_MOD_PATH
+  )
+
+  return(df)
+}
+
+
+#' Build summary log
+#'
+#' Private implementation function for building the summary log from a list of model objects.
+#' This is called by both `summary_log()` and `add_summary()`.
+#' @importFrom stringr str_subset
+#' @importFrom fs dir_ls file_exists
+#' @importFrom purrr map_df map_chr
+#' @importFrom dplyr select everything
+#' @importFrom jsonlite fromJSON
+#' @param .mods List of model objects that will be passed to `model_summaries()`.
+#' @param ... Arguments passed through to `model_summaries()`
+#' @keywords internal
+summary_log_impl <- function(.mods, ...) {
+
+  check_model_object_list(.mods)
+
+  res_list <- model_summaries(.mods, ...)
 
   # create tibble from list of lists
   res_df <- res_list %>% transpose() %>% as_tibble() %>%
@@ -72,44 +119,15 @@ summary_log <- function(
   }
 
   res_df <- mutate(res_df,
-      d =            extract_details(.data[[SL_SUMMARY]]),
-      ofv =          extract_ofv(.data[[SL_SUMMARY]]),
-      param_count =  extract_param_count(.data[[SL_SUMMARY]]),
-      h =            extract_heuristics(.data[[SL_SUMMARY]])
-    ) %>%
+                   d =            extract_details(.data[[SL_SUMMARY]]),
+                   ofv =          extract_ofv(.data[[SL_SUMMARY]]),
+                   param_count =  extract_param_count(.data[[SL_SUMMARY]]),
+                   h =            extract_heuristics(.data[[SL_SUMMARY]])
+  ) %>%
     unnest_wider(.data$d) %>% unnest_wider(.data$h)
-
-  if (isFALSE(.keep_bbi_object)) {
-    res_df <- select(res_df, -.data[[SL_SUMMARY]])
-  }
 
   return(res_df)
 }
-
-
-#' @describeIn summary_log Create `summary_log()` tibble and join against the input `bbi_run_log_df` tibble.
-#' @param .log_df a `bbi_run_log_df` tibble
-#' @importFrom dplyr left_join
-add_summary <- function(
-  .log_df,
-  ...,
-  .keep_bbi_object = FALSE
-) {
-
-  # check input df
-  check_bbi_run_log_df_object(.log_df)
-
-  sum_df <- summary_log(
-    .mods = .log_df,
-    ...,
-    .keep_bbi_object = .keep_bbi_object
-  )
-
-  out_df <- left_join(.log_df, sum_df, by = ABS_MOD_PATH)
-
-  return(out_df)
-}
-
 
 ###################
 # helper functions

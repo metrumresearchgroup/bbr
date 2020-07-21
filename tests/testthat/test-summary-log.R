@@ -4,32 +4,32 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
   skip("test-summary only runs on Metworx or Drone")
 }
 
-# constants
-MODEL_FILE <- "1.ctl"
-MODEL_YAML <- yaml_ext(MODEL_FILE)
-MODEL_DIR <- "model-examples"
-MOD1_PATH <- file.path(MODEL_DIR, "1")
-MOD2_PATH <- file.path(MODEL_DIR, "2")
-MOD3_PATH <- file.path(MODEL_DIR, "3")
-ALL_PATHS <- c(MOD1_PATH, MOD2_PATH, MOD3_PATH)
+# # constants
+# MODEL_FILE <- "1.ctl"
+# MODEL_YAML <- yaml_ext(MODEL_FILE)
+# MODEL_DIR <- "model-examples"
+# MOD1_PATH <- file.path(MODEL_DIR, "1")
+# MOD2_PATH <- file.path(MODEL_DIR, "2")
+# MOD3_PATH <- file.path(MODEL_DIR, "3")
+# ALL_PATHS <- c(MOD1_PATH, MOD2_PATH, MOD3_PATH)
+source("data/test-workflow-ref.R") ##### NEED to check that all these are correctly mapped in here ^
 
 # references
-NUM_MODS <- length(ALL_PATHS)
 MOD_CLASS_LIST <- c("bbi_nonmem_model", "list")
 OFV_REF <- 2636.846
 PARAM_COUNT_REF <- 7
 
 # helper to run expectations
-test_sum_df <- function(sum_df) {
-  expect_equal(nrow(sum_df), NUM_MODS)
+test_sum_df <- function(sum_df, num_mods) {
+  expect_equal(nrow(sum_df), num_mods)
   expect_true(ncol(sum_df) %in% c(17, 24)) # two options for summary_log() and add_summary()
 
   # check some columns
   expect_equal(sum_df$absolute_model_path, purrr::map_chr(ALL_PATHS, ~normalizePath(.x)))
   expect_true(all(is.na(sum_df$error_msg)))
   expect_false(any(sum_df$needed_fail_flags))
-  expect_equal(sum_df$ofv, rep(OFV_REF, NUM_MODS))
-  expect_equal(sum_df$param_count, rep(PARAM_COUNT_REF, NUM_MODS))
+  expect_equal(sum_df$ofv, rep(OFV_REF, num_mods))
+  expect_equal(sum_df$param_count, rep(PARAM_COUNT_REF, num_mods))
   expect_false(any(sum_df$minimization_terminated))
 }
 
@@ -38,6 +38,12 @@ setup({
   invisible(copy_model_from(yaml_ext(MOD1_PATH), MOD3_PATH, "model from test-model-summaries.R", .directory = "."))
   fs::dir_copy(MOD1_PATH, MOD2_PATH)
   fs::dir_copy(MOD1_PATH, MOD3_PATH)
+
+  # copy model 1 to level deeper
+  fs::dir_create(LEVEL2_DIR)
+  invisible(copy_model_from(YAML_TEST_FILE, LEVEL2_MOD, "level 2 copy of 1.yaml", .inherit_tags = TRUE))
+  fs::dir_copy(tools::file_path_sans_ext(YAML_TEST_FILE), file.path(LEVEL2_DIR, tools::file_path_sans_ext(basename(YAML_TEST_FILE))))
+
 })
 teardown({
   if (fs::dir_exists(MOD2_PATH)) fs::dir_delete(MOD2_PATH)

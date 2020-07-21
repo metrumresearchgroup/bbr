@@ -5,7 +5,8 @@
 #' Parse babylon configs to log
 #'
 #' Parses `bbi_config.json` files into a log tibble.
-#' This file is created by babylon and stores metadata about the execution of a model run.
+#' This file is created by babylon, in the model output folder.
+#' It stores metadata about the execution of a model run.
 #'
 #' @details
 #' `config_log()` will return a tibble with one row per `bbi_config.json` found.
@@ -16,7 +17,7 @@
 #' The returned tibble will have all of its input columns, plus all of the columns returned from `config_log()`
 #'
 #' @seealso `run_log()`
-#' @param .base_dir Base directory to look from `bbi_config.json` files in
+#' @param .base_dir Base directory to look in for models. Defaults to `get_model_directory()`, and falls back to `getwd()` if `get_model_directory()` returns `NULL`.
 #' @param .recurse If `TRUE`, the default, search recursively in subdirectories.
 #' @export
 config_log <- function(
@@ -56,8 +57,7 @@ add_config <- function(.log_df) {
   df <- left_join(
     .log_df,
     .conf_df,
-    by = ABS_MOD_PATH,
-    suffix = c(".log", ".config")
+    by = ABS_MOD_PATH
   )
 
   return(df)

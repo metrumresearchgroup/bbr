@@ -3,29 +3,23 @@
 \name{summary_log}
 \alias{summary_log}
 \alias{add_summary}
-\title{Add data from \code{model_summaries()} to \code{bbi_run_log_df}}
+\title{Create a tibble from \code{model_summaries()} data}
 \usage{
-summary_log(.mods, ..., .keep_bbi_object = FALSE)
+summary_log(.base_dir = get_model_directory(), .recurse = TRUE, ...)
 
-add_summary(.log_df, ..., .keep_bbi_object = FALSE)
+add_summary(.log_df, ...)
 }
 \arguments{
-\item{.mods}{The model object that will be passed through to \code{model_summaries()} before constructing the output tibble. Could be
-a \code{bbi_run_log_df} tibble,
-a list of \verb{bbi_\{.model_type\}_model } objects,
-a character vector of file paths to models,
-a numeric vector of integers corresponding to a file names of a models.
-Could also be a \code{bbi_summary_list} (output from \code{model_summaries()}) in which case it is passed straight through and \code{model_summaries()} is \emph{not} re-run.}
+\item{.base_dir}{Base directory to look in for models that will be summarized. Defaults to \code{get_model_directory()}, and falls back to \code{getwd()} if \code{get_model_directory()} returns \code{NULL}.}
+
+\item{.recurse}{If \code{TRUE}, the default, search recursively in subdirectories.}
 
 \item{...}{Arguments passed through to \code{model_summaries()}.}
-
-\item{.keep_bbi_object}{\code{FALSE} by default. If \code{TRUE}, a list column will be added containing the full \code{bbi_nonmem_summary} object for each row.
-Use this if you would like to extract additional fields from the summary object.}
 
 \item{.log_df}{a \code{bbi_run_log_df} tibble}
 }
 \description{
-Runs \code{model_summaries()} on all models in the input and return a subset of the resulting summaries as a tibble.
+Runs \code{model_summaries()} on all models in the input and returns a subset of the resulting summaries as a tibble.
 \code{summary_log()} will return a new tibble with the \code{"absolute_model_path"} column as the primary key,
 and all the columns extracted from \code{model_summaries()} (but none of the other columns from the input tibble).
 \code{add_summary()} returns the input tibble, with all the columns extracted from \code{model_summaries()} joined onto it.
@@ -33,11 +27,11 @@ See details section for fields included.
 }
 \details{
 The following fields from \code{bbi_nonmem_summary} are extracted and included by default.
-If you would like more fields, you can set \code{.keep_bbi_object = TRUE} and extract them manually.
+If you would like more fields, you can extract them manually from the object in the \code{bbi_summary} column.
 \itemize{
 \item \code{error_msg} -- Error message from \code{model_summary()}. If \code{NULL} the call succeeded. If not \code{NULL}, the rest of the fields will be \code{NULL}.
 \item \code{needed_fail_flags} -- Logical for whether the call initially failed, but passed with the inclusion of \code{.fail_flags}
-\item \code{bbi_summary} -- The full \code{bbi_nonmem_summary} object. This will only be included if \code{.keep_bbi_object = TRUE} was passed.
+\item \code{bbi_summary} -- The full \code{bbi_nonmem_summary} object for each row. This can be queried further by extracting it as a list, or by using \code{dplyr::mutate()} etc.
 \item \code{ofv} -- Objective function value from last estimation method, using \verb{$ofv$ofv_no_constant} field.
 \item \code{param_count} -- Count of (non-fixed) parameters estimated in final estimation method.
 \item \code{estimation_method} -- Character vector of estimation method(s) used. Extracted from \verb{$run_details}

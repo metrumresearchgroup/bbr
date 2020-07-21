@@ -8,7 +8,7 @@
 #' Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
 #' Users can also use `add_config()` to append additional output about the model run.
 #' @seealso `add_config()`
-#' @param .base_dir Directory to search for model YAML files. Only runs with a corresponding YAML will be included.
+#' @param .base_dir Directory to search for model YAML files. Only models with a corresponding YAML will be included. Defaults to `get_model_directory()`, and falls back to `getwd()` if `get_model_directory()` returns `NULL`.
 #' @param .recurse If `TRUE`, the default, search recursively in all subdirectories. Passed through to `fs::dir_ls()` -- If a positive number, the number of levels to recurse.
 #' @importFrom purrr map_df
 #' @return A tibble of class `bbi_run_log_df` with information on each model.

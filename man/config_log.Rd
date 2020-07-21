@@ -10,7 +10,7 @@ config_log(.base_dir = get_model_directory(), .recurse = TRUE)
 add_config(.log_df)
 }
 \arguments{
-\item{.base_dir}{Base directory to look from \code{bbi_config.json} files in}
+\item{.base_dir}{Base directory to look in for models. Defaults to \code{get_model_directory()}, and falls back to \code{getwd()} if \code{get_model_directory()} returns \code{NULL}.}
 
 \item{.recurse}{If \code{TRUE}, the default, search recursively in subdirectories.}
 
@@ -18,7 +18,8 @@ add_config(.log_df)
 }
 \description{
 Parses \code{bbi_config.json} files into a log tibble.
-This file is created by babylon and stores metadata about the execution of a model run.
+This file is created by babylon, in the model output folder.
+It stores metadata about the execution of a model run.
 }
 \details{
 \code{config_log()} will return a tibble with one row per \code{bbi_config.json} found.
