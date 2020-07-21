@@ -8,14 +8,6 @@ local name = "rbabylon";
 # where to mount a temporary volume; useful for persisting files across steps
 local temp_volume_dir = "/ephemeral";
 
-# R versions to test against; first element will be used to build release
-local r_versions = [
-  "4.0.1",
-  "3.6.3",
-  "3.6.2",
-  "3.5.3",
-];
-
 # environment variables available to every R call, including devtools::check();
 # R_LIBS_USER will be set separately; use the empty object {} if there are no
 # variables to pass
@@ -50,6 +42,14 @@ local exclude_events = [
 ########################################
 ##        START SETTINGS BLOCK        ##
 ########################################
+
+# R major.minor versions to test against
+# - first element will be used to lint package and build release
+# - must be updated when versions in images are updated
+local r_versions = [
+  "4.0",
+  "3.6",
+];
 
 local bbi_url_base = "https://github.com/metrumresearchgroup/babylon/releases/download";
 local bbi_artifact_name = "bbi_linux_amd64.tar.gz";
@@ -98,10 +98,10 @@ local create_build_tag(name, r_major_minor, mpn_snapshot) =
 # tag             tag name
 local create_mpn_image(tag) = std.join(":", [mpn_image_base, tag]);
 
-# Get the major.minor version of R
-#
-# r_version       R version to use, as major.minor.patch, e.g., "4.0.1"
-local get_major_minor(r_version) = r_version[0:3];
+# Get the name of the environment variable holding the path to the R executable
+# r_major_minor   R version to use, as major.minor, e.g., "4.0"
+local get_r_exe_var(r_major_minor) =
+  std.join("_", ["R", "EXE"] + std.split(r_major_minor, "."));
 
 ########################################
 ##        END UTILITIES BLOCK         ##
@@ -236,15 +236,17 @@ local setup_docker_pipeline(name) = {
   "name": name,
 };
 
+# Shell command to source /etc/environment
+local source_env() = ". /etc/environment";
+
 # Drone pipeline to check an R package
 #
 # name            name of the application
-# r_version       R version to use, as major.minor.patch, e.g., "4.0.1"
+# r_major_minor   R version to use, as major.minor, e.g., "4.0"
 # mpn_snapshot    MPN snapshot, must be a tag
 # bbi_version     babylon version, passed to install_babylon()
-local check(name, r_version, mpn_snapshot, bbi_version) =
-  local r_major_minor = get_major_minor(r_version);
-  local r_path = "/opt/R/" + r_version + "/bin/R";
+local check(name, r_major_minor, mpn_snapshot, bbi_version) =
+  local r_bin_var = "$${" + get_r_exe_var(r_major_minor) + "}";
 
   local build_tag = create_build_tag(name, r_major_minor, mpn_snapshot);
   local mpn_image = create_mpn_image(mpn_snapshot);
@@ -273,9 +275,13 @@ local check(name, r_version, mpn_snapshot, bbi_version) =
           # can't evaluate shell expressions in environment
           # https://docs.drone.io/pipeline/environment/syntax/#common-problems
           "export PATH=" + temp_volume.path + ":$PATH",
-          run_r_expression(r_path, "devtools::install_deps(upgrade = 'never')"),
+          source_env(),
           run_r_expression(
-            r_path,
+            r_bin_var,
+            "devtools::install_deps(upgrade = 'never')"
+          ),
+          run_r_expression(
+            r_bin_var,
             "devtools::check(env_vars = c(" + concat_kvs(r_env_vars) + "))"
           ),
         ],
@@ -283,11 +289,41 @@ local check(name, r_version, mpn_snapshot, bbi_version) =
     ],
   };
 
+# Drone pipeline to lint an R package
+# arguments are the same as for check()
+local lint(name, r_major_minor, mpn_snapshot) =
+  local r_bin_var = "$${" + get_r_exe_var(r_major_minor) + "}";
+
+  local mpn_image = create_mpn_image(mpn_snapshot);
+
+  local host_volume = volume(default_volume_name, default_volume_path);
+
+  setup_docker_pipeline(name + "-lint") +
+  add_volumes([host_volume]) +
+  add_trigger(exclude=exclude_events) +
+  {
+    "steps": [
+      pull_image(mpn_image, [host_volume]),
+      {
+        "name": "Lint package",
+        "image": mpn_image,
+        "pull": "never",
+        "environment": r_env_vars + {
+          "R_LIBS_USER": "/opt/rpkgs/" + r_major_minor,
+        },
+        "commands": [
+          source_env(),
+          # need NOT_CRAN = "true" to run this
+          run_r_expression(r_bin_var, "lintr::expect_lint_free()"),
+        ],
+      },
+    ],
+  };
+
 # Drone pipeline to build and deploy an R package
 # arguments are the same as for check()
-local release(name, r_version, mpn_snapshot, bbi_version) =
-  local r_major_minor = get_major_minor(r_version);
-  local r_path = "/opt/R/" + r_version + "/bin/R";
+local release(name, r_major_minor, mpn_snapshot, bbi_version) =
+  local r_bin_var = "$${" + get_r_exe_var(r_major_minor) + "}";
 
   local mpn_image = create_mpn_image(mpn_snapshot);
 
@@ -296,7 +332,7 @@ local release(name, r_version, mpn_snapshot, bbi_version) =
 
   setup_docker_pipeline(name + '-release') +
   add_volumes([host_volume], [temp_volume]) +
-  add_trigger(include=["tag"])
+  add_trigger(include=["tag"]) +
   {
     "steps": [
       pull_image(mpn_image, [host_volume]),
@@ -316,8 +352,9 @@ local release(name, r_version, mpn_snapshot, bbi_version) =
           "git config --global user.name " + default_git_user,
           "git fetch --tags",
           "export PATH=" + temp_volume.path + ":$PATH",
+          source_env(),
           run_r_expression(
-            r_path,
+            r_bin_var,
             std.format(
               "pkgpub::create_tagged_repo(.dir = '%s')",
               temp_volume.path
@@ -357,13 +394,14 @@ local release(name, r_version, mpn_snapshot, bbi_version) =
   for r_version in r_versions
   for mpn_snapshot in mpn_snapshots
 ] + [
+  lint(name, r_versions[0], mpn_snapshots[0]),
   # release step requires all check steps to pass
   release(name, r_versions[0], mpn_snapshots[0], bbi_version) +
     {
       "depends_on": [
         create_build_tag(
           name,
-          get_major_minor(r_version),
+          r_version,
           mpn_snapshot
         )
         for r_version in r_versions
