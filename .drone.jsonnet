@@ -21,7 +21,7 @@ local r_env_vars = {
 local mpn_snapshots = [
   "cran-latest",
   "2020-05-27",
-  "2020-03-24",
+  "v1.3",
 ];
 
 # set to "" to disable installing babylon
