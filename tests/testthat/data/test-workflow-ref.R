@@ -31,6 +31,9 @@ MOD2_ABS_PATH <- file.path(getwd(), NEW_MOD2)
 MOD3_ABS_PATH <- file.path(getwd(), NEW_MOD3)
 MOD4_ABS_PATH <- file.path(getwd(), LEVEL2_MOD)
 
+RUN_LOG_ROWS <- 3
+RUN_LOG_COLS <- 8
+CONFIG_COLS <- 4
 
 # model refs
 
@@ -89,6 +92,9 @@ cleanup <- function() {
     if (fs::file_exists(paste0(m, ".yml"))) fs::file_delete(paste0(m, ".yml"))
     if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
   }
+
+  if (fs::dir_exists(NEW_MOD2)) fs::dir_delete(NEW_MOD2)
+  if (fs::dir_exists(NEW_MOD3)) fs::dir_delete(NEW_MOD3)
   if (fs::dir_exists(LEVEL2_DIR)) fs::dir_delete(LEVEL2_DIR)
 
   # delete model objects from memory

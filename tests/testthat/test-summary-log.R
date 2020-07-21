@@ -97,7 +97,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
     expect_identical(sum_df$yaml_md5, c("ee5a30a015c4e09bc29334188ff28b58", "95df46d60fae0ed80cd9f212f9a6a72d", "912cf4c649bb841322cfd81ad68434ef"))
   })
 
-  # THESE TEST NEEDS TO BE LAST BECAUSE IT DELETES NECESSARY FILES
+  # THESE TESTS NEEDS TO BE LAST BECAUSE IT DELETES NECESSARY FILES
   fs::file_delete(file.path(MOD3_PATH, "1.grd"))
   fs::file_delete(file.path(MOD2_PATH, "1.grd"))
 
