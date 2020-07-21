@@ -88,7 +88,6 @@ RUN_LOG_REQ_COLS <- c(
   YAML_DECISIONS
 )
 
-
 # keys that get erased when saving a model YAML on disk
 YAML_ERASE_OUT_KEYS <- c(
   WORKING_DIR,
@@ -127,6 +126,16 @@ SUMMARY_REQ_KEYS <- c(
   SUMMARY_HEURISTICS
 )
 
+OFV_COL <- "ofv"
+PARAM_COUNT_COL <- "param_count"
+
+DETAILS_ELEMENTS <- c(
+  "estimation_method",
+  "problem_text",
+  "number_of_patients",
+  "number_of_obs"
+)
+
 ANY_HEURISTICS <- "any_heuristics"
 HEURISTICS_ELEMENTS <- c(
   "covariance_step_aborted",
@@ -147,6 +156,18 @@ SUMMARY_LIST_REQ_KEYS <- c(
   SL_SUMMARY,
   SL_ERROR,
   SL_FAIL_FLAGS
+)
+
+# columns required for a summary log df
+SUMMARY_LOG_REQ_COLS <- c(
+  ABS_MOD_PATH,
+  SL_ERROR,
+  SL_FAIL_FLAGS,
+  DETAILS_ELEMENTS,
+  PARAM_COUNT_COL,
+  OFV_COL,
+  ANY_HEURISTICS,
+  HEURISTICS_ELEMENTS
 )
 
 # keys added when creating a process object

@@ -24,6 +24,8 @@ ADD_SUMMARY_COLS <- 25
 
 # helper to run expectations
 test_sum_df <- function(sum_df) {
+  expect_true(inherits(sum_df, "bbi_summary_log_df"))
+
   expect_equal(nrow(sum_df), NUM_MODS)
   expect_true(ncol(sum_df) %in% c(SUMMARY_LOG_COLS, ADD_SUMMARY_COLS)) # two options for summary_log() and add_summary()
 

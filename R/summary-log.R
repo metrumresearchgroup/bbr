@@ -72,10 +72,10 @@ summary_log <- function(
   }
 
   res_df <- mutate(res_df,
-      d =            extract_details(.data[[SL_SUMMARY]]),
-      ofv =          extract_ofv(.data[[SL_SUMMARY]]),
-      param_count =  extract_param_count(.data[[SL_SUMMARY]]),
-      h =            extract_heuristics(.data[[SL_SUMMARY]])
+      d =                  extract_details(.data[[SL_SUMMARY]]),
+      !!OFV_COL :=         extract_ofv(.data[[SL_SUMMARY]]),
+      !!PARAM_COUNT_COL := extract_param_count(.data[[SL_SUMMARY]]),
+      h =                  extract_heuristics(.data[[SL_SUMMARY]])
     ) %>%
     unnest_wider(.data$d) %>% unnest_wider(.data$h)
 
@@ -83,6 +83,7 @@ summary_log <- function(
     res_df <- select(res_df, -.data[[SL_SUMMARY]])
   }
 
+  res_df <- create_summary_log_object(res_df)
   return(res_df)
 }
 
@@ -143,13 +144,11 @@ extract_param_count <- function(.s) {
 extract_details <- function(.s) {
   .rd <- map(.s, SUMMARY_DETAILS, .default = NA)
 
-  KEEPERS <- c("estimation_method", "problem_text", "number_of_patients", "number_of_obs")
-
   .out <- map(.rd, function(.x) {
     if(!inherits(.x, "list")) {
       return(NULL)
     }
-    return(.x[KEEPERS])
+    return(.x[DETAILS_ELEMENTS])
   })
 
   return(.out)

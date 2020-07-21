@@ -197,3 +197,45 @@ create_run_log_object <- function(log_df) {
   class(log_df) <- c("bbi_run_log_df", class(log_df))
   return(log_df)
 }
+
+
+#' @describeIn create_bbi_object Create list object of `bbi_summary_log_df` class, first checking that all the required columns are present.
+#' @param log_df data.frame or tibble to attempt to assign the class to
+#' @keywords internal
+create_summary_log_object <- function(log_df) {
+
+  if(!inherits(log_df, "data.frame")) {
+    stop(glue("Can only create `bbi_summary_log_df` object from a data.frame. Passed object has classes {paste(class(log_df), collapse = ', ')}"))
+  }
+
+  # check for required keys, just as an extra safety precaution
+  if (!check_required_keys(log_df, .req = SUMMARY_LOG_REQ_COLS)) {
+    err_msg <- paste0(
+      "data.frame must have the following columns to be converted to an S3 object of class `bbi_summary_log_df`: `", paste(SUMMARY_LOG_REQ_COLS, collapse=", "),
+      "` but the following keys are missing: `", paste(SUMMARY_LOG_REQ_COLS[!(SUMMARY_LOG_REQ_COLS %in% names(log_df))], collapse=", "),
+      "`\ndata.frame has the following columns: ", paste(names(log_df), collapse=", ")
+    )
+    strict_mode_error(err_msg)
+  }
+
+  # absolute_model_path column must be character, have none missing, and be unique
+  if (!inherits(log_df[[ABS_MOD_PATH]], "character")) {
+    stop(glue("`{ABS_MOD_PATH}` column must be character type, but has class {paste(class(log_df[[ABS_MOD_PATH]]), collapse = ', ')}"))
+  }
+
+  if (any(is.na(log_df[[ABS_MOD_PATH]]))) {
+    stop(glue("`{ABS_MOD_PATH}` column must NOT have any NA values, but the following rows are NA: {paste(which(is.na(log_df[[ABS_MOD_PATH]])), collapse = ', ')}"))
+  }
+
+  if(any(duplicated(log_df[[ABS_MOD_PATH]]))) {
+    stop(paste(
+      glue("`{ABS_MOD_PATH}` column must contain unique values, but the following rows are duplicates:"),
+      paste(which(duplicated(log_df[[ABS_MOD_PATH]])), collapse = ', '),
+      "-- USER PROBABLY SHOULDN'T SEE THIS ERROR. This is more of a failsafe."
+    ))
+  }
+
+  # assign class and return
+  class(log_df) <- c("bbi_summary_log_df", class(log_df))
+  return(log_df)
+}

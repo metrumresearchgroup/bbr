@@ -75,3 +75,32 @@ is_diag <- function(.name) {
 
   return(.ind[1] == .ind[2])
 }
+
+
+
+### WILL REPLACE THIS WITH LIBRARY FUNCTION IN rbabylon
+get_param_estimates_new <- function(.df) {
+
+  if(is.null(.df$bbi_summary)) {
+    stop("No bbi_summary column")
+  }
+
+  sum_list <- .df$bbi_summary
+
+  param_df <- imap_dfr(sum_list, function(.mod, .i) {
+    if(!is.null(.mod$error_msg)){
+      message(paste("found missing summary: ", .mod$error_msg))
+      return(invisible())
+    }
+    .mod %>%
+      param_estimates() %>%
+      select(names, estimate) %>%
+      mutate(i = .i)
+
+  })
+
+  param_df <- param_df %>%
+    pivot_wider(names_from = names,values_from = estimate)
+
+  return(param_df)
+}
