@@ -157,85 +157,68 @@ create_process_object <- function(res) {
   return(res)
 }
 
-#' @describeIn create_bbi_object Create list object of `bbi_run_log_df` class, first checking that all the required columns are present.
-#' @param log_df data.frame or tibble to attempt to assign the class to
+#' @describeIn create_bbi_object Create tibble object of `bbi_run_log_df` class, first checking that all the required columns are present.
 #' @keywords internal
 create_run_log_object <- function(log_df) {
+  log_df <- create_log_df_impl(log_df, "bbi_run_log_df", RUN_LOG_REQ_COLS, ABS_MOD_PATH)
+  return(log_df)
+}
 
-  if(!inherits(log_df, "data.frame")) {
-    stop(glue("Can only create `bbi_run_log_df` object from a data.frame. Passed object has classes {paste(class(log_df), collapse = ', ')}"))
-  }
+#' @describeIn create_bbi_object Create tibble object of `bbi_config_log_df` class, first checking that all the required columns are present.
+#' @keywords internal
+create_config_log_object <- function(log_df) {
+  log_df <- create_log_df_impl(log_df, "bbi_config_log_df", CONFIG_LOG_REQ_COLS, ABS_MOD_PATH)
+  return(log_df)
+}
 
-  # check for required keys, just as an extra safety precaution
-  if (!check_required_keys(log_df, .req = RUN_LOG_REQ_COLS)) {
-    err_msg <- paste0(
-      "data.frame must have the following columns to be converted to an S3 object of class `bbi_run_log_df`: `", paste(RUN_LOG_REQ_COLS, collapse=", "),
-      "` but the following keys are missing: `", paste(RUN_LOG_REQ_COLS[!(RUN_LOG_REQ_COLS %in% names(log_df))], collapse=", "),
-      "`\ndata.frame has the following columns: ", paste(names(log_df), collapse=", ")
-    )
-    strict_mode_error(err_msg)
-  }
-
-  # absolute_model_path column must be character, have none missing, and be unique
-  if (!inherits(log_df[[ABS_MOD_PATH]], "character")) {
-    stop(glue("`{ABS_MOD_PATH}` column must be character type, but has class {paste(class(log_df[[ABS_MOD_PATH]]), collapse = ', ')}"))
-  }
-
-  if (any(is.na(log_df[[ABS_MOD_PATH]]))) {
-    stop(glue("`{ABS_MOD_PATH}` column must NOT have any NA values, but the following rows are NA: {paste(which(is.na(log_df[[ABS_MOD_PATH]])), collapse = ', ')}"))
-  }
-
-  if(any(duplicated(log_df[[ABS_MOD_PATH]]))) {
-    stop(paste(
-      glue("`{ABS_MOD_PATH}` column must contain unique values, but the following rows are duplicates:"),
-      paste(which(duplicated(log_df[[ABS_MOD_PATH]])), collapse = ', '),
-      "-- USER PROBABLY SHOULDN'T SEE THIS ERROR. This is more of a failsafe."
-    ))
-  }
-
-  # assign class and return
-  class(log_df) <- c("bbi_run_log_df", class(log_df))
+#' @describeIn create_bbi_object Create tibble object of `bbi_summary_log_df` class, first checking that all the required columns are present.
+#' @keywords internal
+create_summary_log_object <- function(log_df) {
+  log_df <- create_log_df_impl(log_df, "bbi_summary_log_df", SUMMARY_LOG_REQ_COLS, ABS_MOD_PATH)
   return(log_df)
 }
 
 
-#' @describeIn create_bbi_object Create list object of `bbi_summary_log_df` class, first checking that all the required columns are present.
+#' @describeIn create_bbi_object Implementation function used to create objects of class `bbi_summary_log_df`, `bbi_config_log_df`, and `bbi_summary_log_df`
 #' @param log_df data.frame or tibble to attempt to assign the class to
+#' @param .class Character scalar of the class to assign
+#' @param .req_cols Character vector of required columns
+#' @param .key Character scalar of column name that will be treated as a primary key. Must be a type character, unique, and have no NA's or NULL's.
 #' @keywords internal
-create_summary_log_object <- function(log_df) {
+create_log_df_impl <- function(log_df, .class, .req_cols, .key) {
 
   if(!inherits(log_df, "data.frame")) {
-    stop(glue("Can only create `bbi_summary_log_df` object from a data.frame. Passed object has classes {paste(class(log_df), collapse = ', ')}"))
+    stop(glue("Can only create `{.class}` object from a data.frame. Passed object has classes {paste(class(log_df), collapse = ', ')}"))
   }
 
   # check for required keys, just as an extra safety precaution
-  if (!check_required_keys(log_df, .req = SUMMARY_LOG_REQ_COLS)) {
+  if (!check_required_keys(log_df, .req = .req_cols)) {
     err_msg <- paste0(
-      "data.frame must have the following columns to be converted to an S3 object of class `bbi_summary_log_df`: `", paste(SUMMARY_LOG_REQ_COLS, collapse=", "),
-      "` but the following keys are missing: `", paste(SUMMARY_LOG_REQ_COLS[!(SUMMARY_LOG_REQ_COLS %in% names(log_df))], collapse=", "),
-      "`\ndata.frame has the following columns: ", paste(names(log_df), collapse=", ")
+      glue("data.frame must have the following columns to be converted to an S3 object of class `{.class}`: `"), paste(.req_cols, collapse=", "),
+      "`\n\nThe following keys are missing: `", paste(.req_cols[!(.req_cols %in% names(log_df))], collapse=", "),
+      "`\n\ndata.frame has the following columns: ", paste(names(log_df), collapse=", "), "\n"
     )
     strict_mode_error(err_msg)
   }
 
   # absolute_model_path column must be character, have none missing, and be unique
-  if (!inherits(log_df[[ABS_MOD_PATH]], "character")) {
-    stop(glue("`{ABS_MOD_PATH}` column must be character type, but has class {paste(class(log_df[[ABS_MOD_PATH]]), collapse = ', ')}"))
+  if (!inherits(log_df[[.key]], "character")) {
+    stop(glue("`{.key}` column must be character type, but has class {paste(class(log_df[[.key]]), collapse = ', ')}"))
   }
 
-  if (any(is.na(log_df[[ABS_MOD_PATH]]))) {
-    stop(glue("`{ABS_MOD_PATH}` column must NOT have any NA values, but the following rows are NA: {paste(which(is.na(log_df[[ABS_MOD_PATH]])), collapse = ', ')}"))
+  if (any(is.na(log_df[[.key]])) || any(is.null(log_df[[.key]]))) {
+    stop(glue("`{.key}` column must NOT have any NA or NULL values, but the following rows are either NA or NULL: {paste(c(which(is.na(log_df[[.key]])), which(is.null(log_df[[.key]]))), collapse = ', ')}"))
   }
 
-  if(any(duplicated(log_df[[ABS_MOD_PATH]]))) {
+  if(any(duplicated(log_df[[.key]]))) {
     stop(paste(
-      glue("`{ABS_MOD_PATH}` column must contain unique values, but the following rows are duplicates:"),
-      paste(which(duplicated(log_df[[ABS_MOD_PATH]])), collapse = ', '),
+      glue("`{.key}` column must contain unique values, but the following rows are duplicates:"),
+      paste(which(duplicated(log_df[[.key]])), collapse = ', '),
       "-- USER PROBABLY SHOULDN'T SEE THIS ERROR. This is more of a failsafe."
     ))
   }
 
   # assign class and return
-  class(log_df) <- c("bbi_summary_log_df", class(log_df))
+  class(log_df) <- c(.class, class(log_df))
   return(log_df)
 }

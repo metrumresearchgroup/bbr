@@ -177,6 +177,11 @@ CONFIG_KEEPERS <- c(
   "data_md5"
 )
 
+CONFIG_LOG_REQ_COLS <- c(
+  ABS_MOD_PATH,
+  CONFIG_KEEPERS
+)
+
 # keys added when creating a process object
 PROC_PROCESS <- "process"
 PROC_STDOUT <- "stdout"

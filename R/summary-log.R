@@ -55,10 +55,14 @@ summary_log <- function(
     return(NULL)
   }
 
-  res_df <- summary_log_impl(mod_list, ...)
+  sum_df <- summary_log_impl(mod_list, ...)
 
-  res_df <- create_summary_log_object(res_df)
-  return(res_df)
+  # assign `bbi_summary_log_df` class, unless all models failed and we only have an error column
+  if(identical(names(sum_df), c(ABS_MOD_PATH, SL_ERROR))) {
+    sum_df <- create_summary_log_object(sum_df)
+  }
+
+  return(sum_df)
 }
 
 
@@ -76,15 +80,19 @@ add_summary <- function(
 
   # get config log
   mod_list <- map(.log_df[[ABS_MOD_PATH]], ~ read_model(.x))
-  .sum_df <- summary_log_impl(mod_list, ...)
+  sum_df <- summary_log_impl(mod_list, ...)
 
   # join to log df
   df <- left_join(
     .log_df,
-    .sum_df,
+    sum_df,
     by = ABS_MOD_PATH
   )
 
+  # assign `bbi_summary_log_df` class, unless all models failed and we only have an error column
+  if(identical(names(sum_df), c(ABS_MOD_PATH, SL_ERROR))) {
+    df <- create_summary_log_object(df)
+  }
   return(df)
 }
 
@@ -119,7 +127,7 @@ summary_log_impl <- function(.mods, ...) {
   # and everything else will be NULL/NA anyway, so we just return the errors here.
   if (all(!is.na(res_df[[SL_ERROR]]))) {
     warning(glue("ALL {nrow(res_df)} MODEL SUMMARIES FAILED in `summary_log()` call. Check `error_msg` column for details."))
-    return(select(res_df, -.data[[SL_SUMMARY]], -.data[[SL_FAIL_FLAGS]]))
+    return(select(res_df, .data[[ABS_MOD_PATH]], .data[[SL_ERROR]]))
   }
 
   res_df <- mutate(res_df,

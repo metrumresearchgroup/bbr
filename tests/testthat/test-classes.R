@@ -117,7 +117,7 @@ test_that("create_process_object() errors if keys are missing", {
 })
 
 
-test_that("create_run_log_object() correctly assigns class", {
+test_that("create_log_df_impl() correctly assigns class", {
   .log_df <- tibble::tibble(
     !!ABS_MOD_PATH      := c("naw", "dawg"),
     !!YAML_YAML_MD5     := c("naw", "dawg"),
@@ -129,7 +129,7 @@ test_that("create_run_log_object() correctly assigns class", {
     !!YAML_DECISIONS    := c("naw", "dawg")
   )
   expect_false(inherits(.log_df, LOG_CLASS))
-  .log_df <- create_run_log_object(.log_df)
+  .log_df <- create_log_df_impl(.log_df, LOG_CLASS, RUN_LOG_REQ_COLS, ABS_MOD_PATH)
   expect_true(inherits(.log_df, LOG_CLASS))
 })
 
@@ -144,7 +144,10 @@ test_that("create_run_log_object() errors if keys are missing", {
     !!YAML_TAGS         := c("naw", "dawg"),
     !!YAML_DECISIONS    := c("naw", "dawg")
   )
-  expect_error(create_run_log_object(.log_df), regexp = "data.frame must have the following columns")
+  expect_error(
+    create_log_df_impl(.log_df, LOG_CLASS, RUN_LOG_REQ_COLS, ABS_MOD_PATH),
+    regexp = "data.frame must have the following columns"
+  )
 })
 
 
@@ -159,7 +162,10 @@ test_that("create_run_log_object() errors if ABS_MOD_PATH is not character", {
     !!YAML_TAGS         := c("naw", "dawg"),
     !!YAML_DECISIONS    := c("naw", "dawg")
   )
-  expect_error(create_run_log_object(.log_df), regexp = "column must be character type")
+  expect_error(
+    create_log_df_impl(.log_df, LOG_CLASS, RUN_LOG_REQ_COLS, ABS_MOD_PATH)
+    , regexp = "column must be character type"
+  )
 })
 
 test_that("create_run_log_object() errors if ABS_MOD_PATH is not unique", {
@@ -173,7 +179,10 @@ test_that("create_run_log_object() errors if ABS_MOD_PATH is not unique", {
     !!YAML_TAGS         := c("naw", "dawg"),
     !!YAML_DECISIONS    := c("naw", "dawg")
   )
-  expect_error(create_run_log_object(.log_df), regexp = "column must contain unique values")
+  expect_error(
+    create_log_df_impl(.log_df, LOG_CLASS, RUN_LOG_REQ_COLS, ABS_MOD_PATH),
+    regexp = "column must contain unique values"
+  )
 })
 
 test_that("create_run_log_object() errors if ABS_MOD_PATH has missing values", {
@@ -187,7 +196,10 @@ test_that("create_run_log_object() errors if ABS_MOD_PATH has missing values", {
     !!YAML_TAGS         := c("aww", "naw", "dawg"),
     !!YAML_DECISIONS    := c("aww", "naw", "dawg")
   )
-  expect_error(create_run_log_object(.log_df), regexp = "column must NOT have any NA values.+1, 3")
+  expect_error(
+    create_log_df_impl(.log_df, LOG_CLASS, RUN_LOG_REQ_COLS, ABS_MOD_PATH),
+    regexp = "column must NOT have any NA or NULL values.+1, 3"
+  )
 })
 
 

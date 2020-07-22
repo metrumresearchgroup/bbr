@@ -37,6 +37,9 @@ config_log <- function(
   }
 
   df <- config_log_impl(mod_list)
+
+  df <- create_config_log_object(df)
+
   return(df)
 }
 
@@ -60,6 +63,8 @@ add_config <- function(.log_df) {
     .conf_df,
     by = ABS_MOD_PATH
   )
+
+  df <- create_config_log_object(df)
 
   return(df)
 }
