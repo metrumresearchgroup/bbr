@@ -7,7 +7,8 @@
 
 # define constants
 MODEL_DIR <- "model-examples"
-YAML_TEST_FILE <- file.path(MODEL_DIR, "1.yaml")
+MOD1_PATH <- file.path(MODEL_DIR, "1")
+YAML_TEST_FILE <- yaml_ext(MOD1_PATH)
 NEW_MOD2 <- file.path(MODEL_DIR, "2")
 NEW_MOD3 <- file.path(MODEL_DIR, "3")
 
@@ -24,13 +25,20 @@ NEW_TAGS <- c("new tag 1", "new tag 2")
 NEW_TEXT1 <- c("naw", "paw")
 NEW_TEXT2 <- c("all", "done")
 
+SUMMARY_REF_FILE <- "data/acop_summary_obj_ref_200616.rds"
+SUM_CLASS_LIST <- c("bbi_nonmem_summary", "list")
 MODEL_CLASS_LIST <- c("bbi_nonmem_model", "list")
+RES_NAMES_LIST <- c("absolute_model_path", "bbi_summary", "error_msg", "needed_fail_flags")
 
 MOD1_ABS_PATH <- file.path(getwd(), tools::file_path_sans_ext(YAML_TEST_FILE))
 MOD2_ABS_PATH <- file.path(getwd(), NEW_MOD2)
 MOD3_ABS_PATH <- file.path(getwd(), NEW_MOD3)
 MOD4_ABS_PATH <- file.path(getwd(), LEVEL2_MOD)
 
+RUN_LOG_ROWS <- 3
+RUN_LOG_COLS <- 8
+CONFIG_COLS <- 4
+SUM_LOG_COLS <- 18
 
 # model refs
 
@@ -65,6 +73,8 @@ REF_LIST_TMP <- list(
 )
 class(REF_LIST_TMP) <- MODEL_CLASS_LIST
 
+ALL_MODS_YAML_MD5 <- c("ee5a30a015c4e09bc29334188ff28b58", "9d689b937fb36e5c3e98e59053b59e73", "b65d8911e9f8007a743e7c93934ce88e", "793cf7a6a04ddcdfc3b6511466a690b3")
+
 # test helper functions
 
 create_all_models <- function() {
@@ -89,6 +99,9 @@ cleanup <- function() {
     if (fs::file_exists(paste0(m, ".yml"))) fs::file_delete(paste0(m, ".yml"))
     if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
   }
+
+  if (fs::dir_exists(NEW_MOD2)) fs::dir_delete(NEW_MOD2)
+  if (fs::dir_exists(NEW_MOD3)) fs::dir_delete(NEW_MOD3)
   if (fs::dir_exists(LEVEL2_DIR)) fs::dir_delete(LEVEL2_DIR)
 
   # delete model objects from memory

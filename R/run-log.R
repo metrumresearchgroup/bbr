@@ -8,13 +8,9 @@
 #' Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
 #' Users can also use `add_config()` to append additional output about the model run.
 #' @seealso `add_config()`
-#' @param .base_dir Directory to search for model YAML files. Only runs with a corresponding YAML will be included.
-#' @param .recurse If `TRUE`, the default, search recursively in subdirectories.
-#' @importFrom stringr str_subset
-#' @importFrom fs dir_ls
-#' @importFrom purrr map map_lgl transpose
-#' @importFrom dplyr as_tibble mutate_at mutate select everything
-#' @importFrom yaml read_yaml
+#' @param .base_dir Directory to search for model YAML files. Only models with a corresponding YAML will be included. Defaults to `get_model_directory()`, and falls back to `getwd()` if `get_model_directory()` returns `NULL`.
+#' @param .recurse If `TRUE`, the default, search recursively in all subdirectories. Passed through to `fs::dir_ls()` -- If a positive number, the number of levels to recurse.
+#' @importFrom purrr map_df
 #' @return A tibble of class `bbi_run_log_df` with information on each model.
 #' @export
 run_log <- function(
@@ -27,8 +23,35 @@ run_log <- function(
     .base_dir <- getwd()
   }
 
+  mod_list <- find_models(.base_dir, .recurse)
+  if(is.null(mod_list)) {
+    return(NULL)
+  }
+
+  df <- mod_list %>% map_df(run_log_entry)
+
+  df <- create_run_log_object(df)
+
+  return(df)
+}
+
+
+#' Search for model YAML files and read them
+#'
+#' Private helper function that searches from a base directory for any YAML files (excluding `babylon.yaml`)
+#' and attempts to read them to a model object with `safe_read_model()`.
+#' @param .base_dir Directory to search for model YAML files.
+#' @param .recurse If `TRUE` search recursively in subdirectories as well.
+#' @importFrom stringr str_subset
+#' @importFrom purrr map_lgl map
+#' @importFrom fs dir_ls
+#' @keywords internal
+find_models <- function(.base_dir, .recurse) {
+
   # get yaml files
-  yaml_files <- .base_dir %>% dir_ls(recurse = .recurse) %>% str_subset("\\.ya?ml$") %>% str_subset("babylon\\.yaml$", negate = TRUE)
+  yaml_files <- dir_ls(.base_dir, recurse = .recurse)
+  yaml_files <- str_subset(yaml_files, "\\.ya?ml$")
+  yaml_files <- str_subset(yaml_files, "babylon\\.ya?ml$", negate = TRUE)
 
   # read in all candidate yaml's
   all_yaml <- map(yaml_files, safe_read_model, .directory = NULL)
@@ -39,21 +62,17 @@ run_log <- function(
   if (length(not_mod) > 0) {
     warning(glue("Found {length(not_mod)} YAML files that do not contain required keys for a model YAML. Ignoring the following files: `{paste(not_mod, collapse='`, `')}`"))
   }
-  mod_yaml <- all_yaml[!not_mod_bool]
+  mod_list <- all_yaml[!not_mod_bool]
 
   # stop if no valid model YAML found
-  if (length(mod_yaml) == 0) {
+  if (length(mod_list) == 0) {
     warning(glue("Found no valid model YAML files in {.base_dir}"))
     return(NULL)
   }
 
-  # create run log tibble
-  df <- mod_yaml %>% map_df(run_log_entry)
-
-  df <- create_run_log_object(df)
-
-  return(df)
+  return(mod_list)
 }
+
 
 #' Read in model YAML with error handling
 #'
@@ -119,117 +138,5 @@ enforce_length <- function(.l, .k, .len = 1) {
     stop(glue("The `{.k}` key in file `{.l[[YAML_YAML_NAME]]}` is expected to have length of {.len} but it has length {len_k}. Please fix YAML."))
   }
   return(.l[[.k]])
-}
-
-
-###############################
-# Fields from bbi_config.json
-###############################
-
-#' Parse babylon configs to log
-#'
-#' Parses `bbi_config.json` files into a log tibble.
-#' This file is created by babylon and stores metadata about the execution of a model run.
-#'
-#' @details
-#' `config_log()` will return a tibble with one row per `bbi_config.json` found.
-#'
-#' `add_config()` takes a `bbi_run_log_df` tibble (the output of `run_log()`) as its input,
-#' searches for a `bbi_config.json` for each row in the input tibble,
-#' and joins on the data from the relevant config, if found.
-#' The returned tibble will have all of its input columns, plus all of the columns returned from `config_log()`
-#'
-#' @seealso `run_log()`
-#' @param .base_dir Base directory to look from `bbi_config.json` files in
-#' @param .recurse If `TRUE`, the default, search recursively in subdirectories.
-#' @importFrom stringr str_subset
-#' @importFrom fs dir_ls
-#' @importFrom purrr map_df
-#' @importFrom dplyr mutate select everything
-#' @importFrom jsonlite fromJSON
-#' @export
-config_log <- function(
-  .base_dir = get_model_directory(),
-  .recurse = TRUE
-) {
-
-  # if no directory defined, set to working directory
-  if (is.null(.base_dir)) {
-    .base_dir <- getwd()
-  }
-
-  # define json keys to keep as constant
-  KEEPERS = c(
-    "model_md5",
-    "data_path",
-    "data_md5"
-  )
-
-  BBI_CONFIG <- "/bbi_config.json$"
-
-  # get json files and parse to df
-  json_files <- dir_ls(.base_dir, recurse = .recurse)
-  json_files <- str_subset(json_files, BBI_CONFIG)
-  json_files <- normalizePath(json_files)
-
-  if (length(json_files) == 0) {
-    warning(glue("Found no bbi_config.json files in {.base_dir}"))
-    return(NULL)
-  }
-
-  # map over json files and parse relevant fields
-  df <- map_df(json_files, function(.path) {
-    .conf_list <- fromJSON(.path)
-    if (!all(KEEPERS %in% names(.conf_list))) {
-      warning(paste(
-        glue("{.path} is missing the required keys: `{paste(KEEPERS[!(KEEPERS %in% names(.conf_list))], collapse=', ')}` and will be skipped."),
-        glue("This is likely because it was run with an old version of babylon. Model was run on version {.conf_list$bbi_version}"),
-        "User can call `bbi_current_release()` to see the most recent release version, and call `use_bbi(options('rbabylon.bbi_exe_path'))` to upgrade to the version.",
-        sep = "\n"
-      ))
-      return(NULL)
-    }
-    return(.conf_list[KEEPERS])
-  })
-  df <- mutate(df, !!ABS_MOD_PATH := str_replace(json_files, BBI_CONFIG, ""))
-  df <- select(df, .data[[ABS_MOD_PATH]], everything())
-
-  return(df)
-}
-
-
-#' @param .log_df a `bbi_run_log_df` tibble (the output of `run_log()`)
-#' @param ... arguments passed through to `config_log()`
-#' @importFrom dplyr left_join
-#' @rdname config_log
-#' @export
-add_config <- function(.log_df, ...) {
-  # check input df
-  check_bbi_run_log_df_object(.log_df)
-
-  # get config log
-  .conf_df <- config_log(...)
-
-  # check for missing rows
-  if (is.null(.conf_df)) {
-    warning(paste(glue("add_config() found {nrow(.log_df)} runs but found {nrow(.conf_df)} configs."),
-                  "Check if your runs are still in progress.",
-                  sep = "\n"))
-    return(.log_df)
-  } else if (nrow(.log_df) != nrow(.conf_df)) {
-    warning(paste(glue("add_config() found {nrow(.log_df)} runs but found {nrow(.conf_df)} configs."),
-                  "Check for rows with `is.null('model_md5')` in tibble. Some runs may have failed or still be in progress.",
-                  sep = "\n"))
-  }
-
-  # join to log df
-  df <- left_join(
-    .log_df,
-    .conf_df,
-    by = ABS_MOD_PATH,
-    suffix = c(".log", ".config")
-  )
-
-  return(df)
 }
 

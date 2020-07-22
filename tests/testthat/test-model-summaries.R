@@ -4,21 +4,10 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
   skip("test-summary only runs on Metworx or Drone")
 }
 
-# constants
-MODEL_FILE <- "1.ctl"
-MODEL_YAML <- yaml_ext(MODEL_FILE)
-MODEL_DIR <- "model-examples"
-MOD1_PATH <- file.path(MODEL_DIR, "1")
-MOD2_PATH <- file.path(MODEL_DIR, "2")
-MOD3_PATH <- file.path(MODEL_DIR, "3")
-ALL_PATHS <- c(MOD1_PATH, MOD2_PATH, MOD3_PATH)
+source("data/test-workflow-ref.R")
 
 # references
-NUM_MODS <- length(ALL_PATHS)
-SUMMARY_REF_FILE <- "data/acop_summary_obj_ref_200616.rds"
-SUM_CLASS_LIST <- c("bbi_nonmem_summary", "list")
-MOD_CLASS_LIST <- c("bbi_nonmem_model", "list")
-RES_NAMES_LIST <- c("absolute_model_path", "bbi_summary", "error_msg", "needed_fail_flags")
+NUM_MODS <- 3
 NOT_FINISHED_ERR_MSG <- "nonmem_summary.*modeling run has not finished"
 NO_LST_ERR_MSG <- "Unable to locate `.lst` file.*NONMEM output folder"
 
@@ -36,18 +25,14 @@ test_mod_sums <- function(mod_sums) {
 }
 
 setup({
-  invisible(copy_model_from(yaml_ext(MOD1_PATH), MOD2_PATH, "model from test-model-summaries.R", .directory = "."))
-  invisible(copy_model_from(yaml_ext(MOD1_PATH), MOD3_PATH, "model from test-model-summaries.R", .directory = "."))
-  fs::dir_copy(MOD1_PATH, MOD2_PATH)
-  fs::dir_copy(MOD1_PATH, MOD3_PATH)
+  cleanup()
+  invisible(copy_model_from(yaml_ext(MOD1_PATH), NEW_MOD2, "model from test-model-summaries.R", .directory = "."))
+  invisible(copy_model_from(yaml_ext(MOD1_PATH), NEW_MOD3, "model from test-model-summaries.R", .directory = "."))
+  fs::dir_copy(MOD1_PATH, NEW_MOD2)
+  fs::dir_copy(MOD1_PATH, NEW_MOD3)
 })
 teardown({
-  if (fs::dir_exists(MOD2_PATH)) fs::dir_delete(MOD2_PATH)
-  if (fs::dir_exists(MOD3_PATH)) fs::dir_delete(MOD3_PATH)
-  if (fs::file_exists(ctl_ext(MOD2_PATH))) fs::file_delete(ctl_ext(MOD2_PATH))
-  if (fs::file_exists(ctl_ext(MOD3_PATH))) fs::file_delete(ctl_ext(MOD3_PATH))
-  if (fs::file_exists(yaml_ext(MOD2_PATH))) fs::file_delete(yaml_ext(MOD2_PATH))
-  if (fs::file_exists(yaml_ext(MOD3_PATH))) fs::file_delete(yaml_ext(MOD3_PATH))
+  cleanup()
 })
 
 withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
@@ -61,7 +46,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
     mods <- purrr::map(c("1", "2", "3"), ~read_model(.x))
     expect_equal(length(mods), NUM_MODS)
     for (.m in mods) {
-      expect_equal(class(.m), MOD_CLASS_LIST)
+      expect_equal(class(.m), MODEL_CLASS_LIST)
     }
 
     mod_sums <- model_summaries(mods)
@@ -72,7 +57,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
   test_that("model_summaries.list fails with bad list", {
     bad_mods <- list(read_model(1), list(naw = "dawg"))
     expect_equal(length(bad_mods), 2)
-    expect_equal(class(bad_mods[[1]]), MOD_CLASS_LIST)
+    expect_equal(class(bad_mods[[1]]), MODEL_CLASS_LIST)
 
     expect_error(model_summaries(bad_mods), regexp = "must contain only model objects")
   })

@@ -4,17 +4,9 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
   skip("test-summary only runs on Metworx or Drone")
 }
 
-# constants
-MODEL_FILE <- "1.ctl"
-MODEL_YAML <- yaml_ext(MODEL_FILE)
-MODEL_DIR <- "model-examples"
-MOD1_PATH <- file.path(MODEL_DIR, "1")
-MOD2_PATH <- file.path(MODEL_DIR, "2")
-MOD3_PATH <- file.path(MODEL_DIR, "3")
-ALL_PATHS <- c(MOD1_PATH, MOD2_PATH, MOD3_PATH)
+source("data/test-workflow-ref.R")
 
 # references
-NUM_MODS <- length(ALL_PATHS)
 MOD_CLASS_LIST <- c("bbi_nonmem_model", "list")
 OFV_REF <- 2636.846
 PARAM_COUNT_REF <- 7
@@ -23,35 +15,43 @@ SUMMARY_LOG_COLS <- 18
 ADD_SUMMARY_COLS <- 25
 
 # helper to run expectations
-test_sum_df <- function(sum_df) {
-  expect_true(inherits(sum_df, "bbi_summary_log_df"))
-
-  expect_equal(nrow(sum_df), NUM_MODS)
-  expect_true(ncol(sum_df) %in% c(SUMMARY_LOG_COLS, ADD_SUMMARY_COLS)) # two options for summary_log() and add_summary()
+test_sum_df <- function(sum_df, .paths, .col_count) {
+  num_mods <- length(.paths)
+  expect_equal(nrow(sum_df), num_mods)
+  expect_equal(ncol(sum_df), .col_count)
 
   # check some columns
-  expect_equal(sum_df$absolute_model_path, purrr::map_chr(ALL_PATHS, ~normalizePath(.x)))
+  expect_equal(sum_df$absolute_model_path, purrr::map_chr(.paths, ~normalizePath(.x)))
   expect_true(all(is.na(sum_df$error_msg)))
   expect_false(any(sum_df$needed_fail_flags))
-  expect_equal(sum_df$ofv, rep(OFV_REF, NUM_MODS))
-  expect_equal(sum_df$param_count, rep(PARAM_COUNT_REF, NUM_MODS))
+  expect_equal(sum_df$ofv, rep(OFV_REF, num_mods))
+  expect_equal(sum_df$param_count, rep(PARAM_COUNT_REF, num_mods))
   expect_false(any(sum_df$minimization_terminated))
 }
 
 setup({
-  invisible(copy_model_from(yaml_ext(MOD1_PATH), MOD2_PATH, "model from test-model-summaries.R", .directory = "."))
-  invisible(copy_model_from(yaml_ext(MOD1_PATH), MOD3_PATH, "model from test-model-summaries.R", .directory = "."))
-  fs::dir_copy(MOD1_PATH, MOD2_PATH)
-  fs::dir_copy(MOD1_PATH, MOD3_PATH)
+  cleanup()
+  create_all_models()
+  fs::dir_copy(MOD1_PATH, NEW_MOD2)
+  fs::dir_copy(MOD1_PATH, NEW_MOD3)
+  fs::dir_copy(MOD1_PATH, LEVEL2_MOD)
 })
 teardown({
-  if (fs::dir_exists(MOD2_PATH)) fs::dir_delete(MOD2_PATH)
-  if (fs::dir_exists(MOD3_PATH)) fs::dir_delete(MOD3_PATH)
-  if (fs::file_exists(ctl_ext(MOD2_PATH))) fs::file_delete(ctl_ext(MOD2_PATH))
-  if (fs::file_exists(ctl_ext(MOD3_PATH))) fs::file_delete(ctl_ext(MOD3_PATH))
-  if (fs::file_exists(yaml_ext(MOD2_PATH))) fs::file_delete(yaml_ext(MOD2_PATH))
-  if (fs::file_exists(yaml_ext(MOD3_PATH))) fs::file_delete(yaml_ext(MOD3_PATH))
+  cleanup()
 })
+
+withr::with_options(list(rbabylon.model_directory = NULL), {
+
+  test_that("summary_log() errors with malformed YAML", {
+    log_df <- expect_error(summary_log(), regexp = "Unexpected error.+model_path defined in yaml")
+  })
+
+  test_that("summary_log() returns NULL and warns when no YAML found", {
+    log_df <- expect_warning(summary_log("data"), regexp = "Found no valid model YAML files in data")
+    expect_true(is.null(log_df))
+  })
+}) # closing withr::with_options
+
 
 withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
                          rbabylon.model_directory = normalizePath(MODEL_DIR)), {
@@ -60,95 +60,44 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
   # extracting things from summary object
   #########################################
 
-  test_that("summary_log works with list of models input", {
-    mods <- purrr::map(c("1", "2", "3"), ~read_model(.x))
-    expect_equal(length(mods), NUM_MODS)
-    for (.m in mods) {
-      expect_equal(class(.m), MOD_CLASS_LIST)
-    }
-
-    sum_df <- summary_log(mods)
-    test_sum_df(sum_df)
-
+  test_that("summary_log() works correctly with nested dirs", {
+    sum_df <- summary_log()
+    test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3, LEVEL2_MOD), SUM_LOG_COLS)
   })
 
-  test_that("summary_log works with character input", {
-    sum_df <- summary_log(c("1", "2", "3"))
-    test_sum_df(sum_df)
+  test_that("summary_log(.recurse = FALSE) works", {
+    sum_df <- summary_log(.recurse = FALSE)
+    test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3), SUM_LOG_COLS)
   })
 
-  test_that("summary_log works with numeric input", {
-    sum_df <- summary_log(c(1, 2, 3))
-    test_sum_df(sum_df)
-  })
-
-  test_that("summary_log works with bbi_summary_list input", {
-    mod_sums <- model_summaries(c(1, 2, 3))
-    expect_true(inherits(mod_sums, "bbi_summary_list"))
-
-    sum_df <- mod_sums %>% summary_log()
-    test_sum_df(sum_df)
-  })
-
-  test_that("summary_log works with bbi_run_log_df input", {
-    sum_df <- run_log() %>% summary_log()
-    test_sum_df(sum_df)
-  })
-
-  test_that("summary_log bbi_summary column is correct", {
-    sum_df <- summary_log(c(1,2,3))
-    test_sum_df(sum_df)
-
-    sum_list <- sum_df[[SL_SUMMARY]]
-    expect_true(all(map_lgl(sum_list, ~ inherits(.x, "bbi_nonmem_summary")) ))
-
-    # check objective function to make sure it's a real summary object
-    ofvs <- map(sum_list, ~.x$ofv$ofv_no_constant) %>% unlist() %>% unique()
-    expect_equal(ofvs, OFV_REF)
-
-  })
-
-  test_that("summary_log .keep_bbi_object=FALSE drops column", {
-    sum_df <- summary_log(sum_df, .keep_bbi_object=FALSE)
-
-    # this is the important one
-    expect_equal(ncol(sum_df), SUMMARY_LOG_COLS-1)
-
-    # these just check that it returned other stuff normally
-    expect_equal(nrow(sum_df), NUM_MODS)
-    expect_equal(sum_df$absolute_model_path, purrr::map_chr(ALL_PATHS, ~normalizePath(.x)))
-    expect_true(all(is.na(sum_df$error_msg)))
-  })
-
-  test_that("add_summary works correctly", {
+  test_that("add_summary() works correctly", {
     sum_df <- run_log() %>% add_summary()
-    test_sum_df(sum_df)
-    expect_identical(sum_df$model_type, rep("nonmem", 3))
-    expect_identical(sum_df$yaml_md5, c("ee5a30a015c4e09bc29334188ff28b58", "95df46d60fae0ed80cd9f212f9a6a72d", "912cf4c649bb841322cfd81ad68434ef"))
+    test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3, LEVEL2_MOD), RUN_LOG_COLS+SUM_LOG_COLS-1)
+    expect_identical(sum_df$model_type, rep("nonmem", RUN_LOG_ROWS+1))
+    expect_identical(sum_df$yaml_md5, ALL_MODS_YAML_MD5)
   })
 
-  # THESE TEST NEEDS TO BE LAST BECAUSE IT DELETES NECESSARY FILES
-  fs::file_delete(file.path(MOD3_PATH, "1.grd"))
-  fs::file_delete(file.path(MOD2_PATH, "1.grd"))
+  # THESE TESTS NEEDS TO BE LAST BECAUSE IT DELETES NECESSARY FILES
+  fs::file_delete(file.path(LEVEL2_MOD, "1.grd"))
+
+  test_that("summary_log works some failed summaries", {
+    sum_df <- summary_log()
+    expect_equal(is.na(sum_df$error_msg), c(TRUE, TRUE, TRUE, FALSE))
+    expect_equal(ncol(sum_df), SUM_LOG_COLS)
+
+    sum_df <- summary_log(.bbi_args = list(no_grd_file = TRUE))
+    test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3, LEVEL2_MOD), SUM_LOG_COLS)
+  })
 
   test_that("summary_log works all failed summaries", {
 
     expect_warning({
-      sum_df <- c(2,3) %>% summary_log()
-    }, regexp = "ALL 2 MODEL SUMMARIES FAILED")
+      sum_df <- summary_log(LEVEL2_DIR)
+    }, regexp = "ALL 1 MODEL SUMMARIES FAILED")
 
     expect_equal(names(sum_df), c(ABS_MOD_PATH, "error_msg"))
     expect_true(all(grepl("--no-grd-file", sum_df$error_msg)))
 
-  })
-
-  test_that("summary_log works some failed summaries", {
-    sum_df <- c(1, 2, 3) %>% summary_log()
-    expect_equal(is.na(sum_df$error_msg), c(TRUE, FALSE, FALSE))
-    expect_true(ncol(sum_df) > 10) # check that extra columns are added, doesn't matter how many so keeping test unbrittle
-
-    sum_df <- c(1, 2, 3) %>% summary_log(.bbi_args = list(no_grd_file = TRUE))
-    test_sum_df(sum_df)
   })
 
 }) # closing withr::with_options

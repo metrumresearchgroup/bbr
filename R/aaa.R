@@ -170,6 +170,13 @@ SUMMARY_LOG_REQ_COLS <- c(
   HEURISTICS_ELEMENTS
 )
 
+# define json keys to keep as from bbi_config.json
+CONFIG_KEEPERS <- c(
+  "model_md5",
+  "data_path",
+  "data_md5"
+)
+
 # keys added when creating a process object
 PROC_PROCESS <- "process"
 PROC_STDOUT <- "stdout"
