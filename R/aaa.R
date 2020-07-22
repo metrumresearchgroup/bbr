@@ -150,7 +150,7 @@ SUMMARY_LIST_REQ_KEYS <- c(
 )
 
 # define json keys to keep as from bbi_config.json
-CONFIG_KEEPERS = c(
+CONFIG_KEEPERS <- c(
   "model_md5",
   "data_path",
   "data_md5"

@@ -37,6 +37,19 @@ teardown({
   cleanup()
 })
 
+withr::with_options(list(rbabylon.model_directory = NULL), {
+
+  test_that("summary_log() errors with malformed YAML", {
+    log_df <- expect_error(summary_log(), regexp = "Unexpected error.+model_path defined in yaml")
+  })
+
+  test_that("summary_log() returns NULL and warns when no YAML found", {
+    log_df <- expect_warning(summary_log("data"), regexp = "Found no valid model YAML files in data")
+    expect_true(is.null(log_df))
+  })
+}) # closing withr::with_options
+
+
 withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
                          rbabylon.model_directory = normalizePath(MODEL_DIR)), {
 

@@ -19,6 +19,15 @@ teardown({ cleanup() })
 
 withr::with_options(list(rbabylon.model_directory = NULL), {
 
+  test_that("run_log errors with malformed YAML", {
+    log_df <- expect_error(run_log(), regexp = "Unexpected error.+model_path defined in yaml")
+  })
+
+  test_that("run_log returns NULL and warns when no YAML found", {
+    log_df <- expect_warning(run_log("data"), regexp = "Found no valid model YAML files in data")
+    expect_true(is.null(log_df))
+  })
+
   test_that("run_log matches reference", {
     log_df <- run_log(MODEL_DIR)
     expect_equal(nrow(log_df), RUN_LOG_ROWS)

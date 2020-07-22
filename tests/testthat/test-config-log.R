@@ -46,6 +46,15 @@ teardown({ cleanup() })
 
 withr::with_options(list(rbabylon.model_directory = NULL), {
 
+  test_that("config_log() errors with malformed YAML", {
+    log_df <- expect_error(config_log(), regexp = "Unexpected error.+model_path defined in yaml")
+  })
+
+  test_that("config_log() returns NULL and warns when no YAML found", {
+    log_df <- expect_warning(config_log("data"), regexp = "Found no valid model YAML files in data")
+    expect_true(is.null(log_df))
+  })
+
   test_that("config_log() works correctly with nested dirs", {
     log_df <- config_log(MODEL_DIR)
     check_config_ref(log_df, c("1", "2", "3", "1"), CONFIG_COLS)
