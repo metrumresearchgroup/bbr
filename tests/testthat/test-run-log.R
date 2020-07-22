@@ -72,7 +72,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   # copy model 1 to level deeper
   fs::dir_create(LEVEL2_DIR)
   copy_model_from(YAML_TEST_FILE, LEVEL2_MOD, "level 2 copy of 1.yaml", .inherit_tags = TRUE)
-  fs::dir_copy(tools::file_path_sans_ext(YAML_TEST_FILE), file.path(LEVEL2_DIR, tools::file_path_sans_ext(basename(YAML_TEST_FILE))))
+  fs::dir_copy(MOD1_PATH, LEVEL2_MOD)
 
   test_that("run_log() works correctly with nested dirs", {
     log_df <- run_log(MODEL_DIR)

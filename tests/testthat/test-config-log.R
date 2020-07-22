@@ -30,17 +30,15 @@ setup({
                   .inherit_tags = TRUE,
                   .update_model_file = FALSE)
 
-
   CONFIG_1 <- file.path(tools::file_path_sans_ext(YAML_TEST_FILE), "bbi_config.json")
-  fs::dir_create(NEW_MOD2)
-  fs::dir_create(NEW_MOD3)
-  fs::file_copy(CONFIG_1, file.path(NEW_MOD2, "bbi_config.json"))
-  fs::file_copy(CONFIG_1, file.path(NEW_MOD3, "bbi_config.json"))
+
+  fs::dir_copy(MOD1_PATH, NEW_MOD2)
+  fs::dir_copy(MOD1_PATH, NEW_MOD3)
 
   # copy model 1 to level deeper
   fs::dir_create(LEVEL2_DIR)
   copy_model_from(YAML_TEST_FILE, LEVEL2_MOD, "level 2 copy of 1.yaml", .inherit_tags = TRUE)
-  fs::dir_copy(tools::file_path_sans_ext(YAML_TEST_FILE), file.path(LEVEL2_DIR, tools::file_path_sans_ext(basename(YAML_TEST_FILE))))
+  fs::dir_copy(MOD1_PATH, LEVEL2_MOD)
 
 })
 

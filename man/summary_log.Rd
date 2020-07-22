@@ -19,10 +19,11 @@ add_summary(.log_df, ...)
 \item{.log_df}{a \code{bbi_run_log_df} tibble}
 }
 \description{
-Runs \code{model_summaries()} on all models in the input and returns a subset of the resulting summaries as a tibble.
+Runs \code{model_summaries()} on all models in the input and returns a subset of the each resulting summary as a tibble.
 \code{summary_log()} will return a new tibble with the \code{"absolute_model_path"} column as the primary key,
 and all the columns extracted from \code{model_summaries()} (but none of the other columns from the input tibble).
-\code{add_summary()} returns the input tibble, with all the columns extracted from \code{model_summaries()} joined onto it.
+\code{add_summary()} takes a \code{bbi_run_log_df} tibble (the output from \code{run_log()}) and returns the input tibble,
+with all the columns extracted from \code{model_summaries()} joined onto it.
 See details section for fields included.
 }
 \details{
@@ -48,8 +49,6 @@ If you would like more fields, you can extract them manually from the object in 
 \item \code{minimization_terminated} -- Extracted from \verb{$run_heuristics}
 }
 }
-\section{Functions}{
-\itemize{
-\item \code{add_summary}: Create \code{summary_log()} tibble and join against the input \code{bbi_run_log_df} tibble.
-}}
-
+\seealso{
+\code{run_log()}
+}

@@ -19,7 +19,8 @@ add_config(.log_df)
 \description{
 Parses \code{bbi_config.json} files into a log tibble.
 This file is created by babylon, in the model output folder.
-It stores metadata about the execution of a model run.
+It stores metadata about the execution of a model run,
+including md5 hashes of the model file (control stream) and data file at the time the model was run.
 }
 \details{
 \code{config_log()} will return a tibble with one row per \code{bbi_config.json} found.

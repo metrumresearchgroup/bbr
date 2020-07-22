@@ -1,9 +1,10 @@
 #' Create a tibble from `model_summaries()` data
 #'
-#' Runs `model_summaries()` on all models in the input and returns a subset of the resulting summaries as a tibble.
+#' Runs `model_summaries()` on all models in the input and returns a subset of the each resulting summary as a tibble.
 #' `summary_log()` will return a new tibble with the `"absolute_model_path"` column as the primary key,
 #' and all the columns extracted from `model_summaries()` (but none of the other columns from the input tibble).
-#' `add_summary()` returns the input tibble, with all the columns extracted from `model_summaries()` joined onto it.
+#' `add_summary()` takes a `bbi_run_log_df` tibble (the output from `run_log()`) and returns the input tibble,
+#' with all the columns extracted from `model_summaries()` joined onto it.
 #' See details section for fields included.
 #'
 #' @details
@@ -28,6 +29,7 @@
 #' * `has_final_zero_gradient` -- Extracted from `$run_heuristics`
 #' * `minimization_terminated` -- Extracted from `$run_heuristics`
 #'
+#' @seealso `run_log()`
 #' @param .base_dir Base directory to look in for models that will be summarized. Defaults to `get_model_directory()`, and falls back to `getwd()` if `get_model_directory()` returns `NULL`.
 #' @param .recurse If `TRUE`, the default, search recursively in subdirectories.
 #' @param ... Arguments passed through to `model_summaries()`.
@@ -59,9 +61,10 @@ summary_log <- function(
 }
 
 
-#' @describeIn summary_log Create `summary_log()` tibble and join against the input `bbi_run_log_df` tibble.
+#' @rdname summary_log
 #' @param .log_df a `bbi_run_log_df` tibble
 #' @importFrom dplyr left_join
+#' @export
 add_summary <- function(
   .log_df,
   ...
