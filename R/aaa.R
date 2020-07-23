@@ -36,6 +36,16 @@ NONMEM_ARGS = list(
   verbose = list(type = "logical", flag="--verbose", description = "verbose output")
 )
 
+# S3 classes
+NM_MOD_CLASS <- "bbi_nonmem_model"
+SUM_CLASS <- "bbi_nonmem_summary"
+SL_CLASS <- "bbi_summary_list"
+PROC_CLASS <- "babylon_process"
+RUN_LOG_CLASS <- "bbi_run_log_df"
+CONF_LOG_CLASS <- "bbi_config_log_df"
+SUM_LOG_CLASS <- "bbi_summary_log_df"
+
+
 # YAML keys that are hard-coded
 YAML_MOD_PATH <- "model_path"
 YAML_YAML_NAME <- "orig_yaml_file"

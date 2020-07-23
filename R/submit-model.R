@@ -357,9 +357,9 @@ submit_nonmem_models <- function(.mods,
 
   # check input list (this is a private method so if these fail there is a bug somewhere that calls this)
   if (!is_bare_list(.mods)) {
-    stop(glue("USER SHOULDN'T SEE THIS ERROR: Can only pass a list of bbi_nonmem_model objects to submit_nonmem_models. Passed object of class {paste(class(.mods), collapse = ', ')}"))
+    stop(glue("USER SHOULDN'T SEE THIS ERROR: Can only pass a list of {NM_MOD_CLASS} objects to submit_nonmem_models. Passed object of class {paste(class(.mods), collapse = ', ')}"))
   }
-  check_model_object_list(.mods, "bbi_nonmem_model")
+  check_model_object_list(.mods, NM_MOD_CLASS)
 
   # check against YAML
   for (.mod in .mods) { check_yaml_in_sync(.mod) }

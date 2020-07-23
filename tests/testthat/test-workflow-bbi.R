@@ -20,11 +20,11 @@ MODEL_DIR_BBI <- "model-examples-bbi"
 BBI_PATH <- read_bbi_path()
 
 # cleanup function
-cleanup <- function(.recreate_dir = FALSE) {
+cleanup_bbi <- function(.recreate_dir = FALSE) {
   if (fs::dir_exists(MODEL_DIR_BBI)) fs::dir_delete(MODEL_DIR_BBI)
   if (isTRUE(.recreate_dir)) fs::dir_create(MODEL_DIR_BBI)
 }
-cleanup(.recreate_dir = TRUE)
+cleanup_bbi(.recreate_dir = TRUE)
 
 # set options and run tests
 withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
@@ -33,7 +33,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
   # cleanup when done
   on.exit({
     Sys.sleep(3) # wait for some NONMEM mess to delete itself
-    cleanup()
+    cleanup_bbi()
   })
 
   # clear old babylon.yaml

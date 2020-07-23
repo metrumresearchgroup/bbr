@@ -28,6 +28,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("run_log matches reference", {
     log_df <- run_log(MODEL_DIR)
+    expect_true(inherits(log_df, RUN_LOG_CLASS))
     expect_equal(nrow(log_df), RUN_LOG_ROWS)
     expect_equal(ncol(log_df), RUN_LOG_COLS)
     expect_identical(basename(log_df[[ABS_MOD_PATH]]), c("1", "2", "3"))
@@ -62,6 +63,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     log_df <- suppressSpecificWarning({
       run_log(MODEL_DIR)
     }, .regexpr = "No model file found")
+    expect_true(inherits(log_df, RUN_LOG_CLASS))
 
     expect_equal(nrow(log_df), RUN_LOG_ROWS+1)
     expect_equal(ncol(log_df), RUN_LOG_COLS)
@@ -83,6 +85,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("run_log() works correctly with nested dirs", {
     log_df <- run_log(MODEL_DIR)
+    expect_true(inherits(log_df, RUN_LOG_CLASS))
     expect_equal(nrow(log_df), RUN_LOG_ROWS+1)
     expect_equal(ncol(log_df), RUN_LOG_COLS)
     expect_false(any(duplicated(log_df[[ABS_MOD_PATH]])))

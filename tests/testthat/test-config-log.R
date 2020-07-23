@@ -1,6 +1,7 @@
 context("Constructing config log from bbi_config.json")
 
 check_config_ref <- function(log_df, run_nums, col_count) {
+  expect_true(inherits(log_df, CONF_LOG_CLASS))
 
   expect_identical(basename(log_df[[ABS_MOD_PATH]]), run_nums)
 
@@ -65,6 +66,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("add_config() works correctly", {
     log_df <- run_log(MODEL_DIR) %>% add_config()
+    expect_true(inherits(log_df, RUN_LOG_CLASS))
     check_config_ref(log_df, c("1", "2", "3", "1"), RUN_LOG_COLS+CONFIG_COLS-1)
   })
 
@@ -74,6 +76,8 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("add_config() works correctly with missing json", {
     log_df <- expect_warning(run_log(MODEL_DIR) %>% add_config(), regexp = "Found only 2 bbi_config.json files for 4 models")
+    expect_true(inherits(log_df, CONF_LOG_CLASS))
+    expect_true(inherits(log_df, RUN_LOG_CLASS))
     expect_equal(nrow(log_df), RUN_LOG_ROWS+1)
     expect_equal(ncol(log_df), RUN_LOG_COLS+CONFIG_COLS-1)
     expect_false(any(duplicated(log_df[[ABS_MOD_PATH]])))

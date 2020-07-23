@@ -13,6 +13,8 @@ ADD_SUMMARY_COLS <- 25
 
 # helper to run expectations
 test_sum_df <- function(sum_df, .paths, .col_count) {
+  expect_true(inherits(sum_df, SUM_LOG_CLASS))
+
   num_mods <- length(.paths)
   expect_equal(nrow(sum_df), num_mods)
   expect_equal(ncol(sum_df), .col_count)
@@ -69,6 +71,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
 
   test_that("add_summary() works correctly", {
     sum_df <- run_log() %>% add_summary()
+    expect_true(inherits(sum_df, RUN_LOG_CLASS))
     test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3, LEVEL2_MOD), RUN_LOG_COLS+SUM_LOG_COLS-1)
     expect_identical(sum_df$model_type, rep("nonmem", RUN_LOG_ROWS+1))
     expect_identical(sum_df$yaml_md5, ALL_MODS_YAML_MD5)

@@ -121,14 +121,14 @@ create_summary_list <- function(res_list) {
 
   if (!all(sum_bool)) {
     err_msg <- paste0(
-      glue("Each element of summary list object must have the following named elements to be converted to an S3 object of class `bbi_summary_list`: `"), paste(SUMMARY_LIST_REQ_KEYS, collapse=", "),
+      glue("Each element of summary list object must have the following named elements to be converted to an S3 object of class `{SL_CLASS}`: `"), paste(SUMMARY_LIST_REQ_KEYS, collapse=", "),
       "`\nThe following elements have missing keys: ", paste(which(!sum_bool), collapse=", ")
     )
     strict_mode_error(err_msg)
   }
 
   # assign class and return
-  class(res_list) <- c(as.character("bbi_summary_list"), class(res_list))
+  class(res_list) <- c(SL_CLASS, class(res_list))
   return(res_list)
 }
 
@@ -153,28 +153,28 @@ create_process_object <- function(res) {
   }
 
   # assign class and return
-  class(res) <- c("babylon_process", class(res))
+  class(res) <- c(PROC_CLASS, class(res))
   return(res)
 }
 
 #' @describeIn create_bbi_object Create tibble object of `bbi_run_log_df` class, first checking that all the required columns are present.
 #' @keywords internal
 create_run_log_object <- function(log_df) {
-  log_df <- create_log_df_impl(log_df, "bbi_run_log_df", RUN_LOG_REQ_COLS, ABS_MOD_PATH)
+  log_df <- create_log_df_impl(log_df, RUN_LOG_CLASS, RUN_LOG_REQ_COLS, ABS_MOD_PATH)
   return(log_df)
 }
 
 #' @describeIn create_bbi_object Create tibble object of `bbi_config_log_df` class, first checking that all the required columns are present.
 #' @keywords internal
 create_config_log_object <- function(log_df) {
-  log_df <- create_log_df_impl(log_df, "bbi_config_log_df", CONFIG_LOG_REQ_COLS, ABS_MOD_PATH)
+  log_df <- create_log_df_impl(log_df, CONF_LOG_CLASS, CONFIG_LOG_REQ_COLS, ABS_MOD_PATH)
   return(log_df)
 }
 
 #' @describeIn create_bbi_object Create tibble object of `bbi_summary_log_df` class, first checking that all the required columns are present.
 #' @keywords internal
 create_summary_log_object <- function(log_df) {
-  log_df <- create_log_df_impl(log_df, "bbi_summary_log_df", SUMMARY_LOG_REQ_COLS, ABS_MOD_PATH)
+  log_df <- create_log_df_impl(log_df, SUM_LOG_CLASS, SUMMARY_LOG_REQ_COLS, ABS_MOD_PATH)
   return(log_df)
 }
 

@@ -12,6 +12,8 @@
 # - test-get-based-on.R
 # - maybe others...
 
+# clear any model_directory that is set
+set_model_directory(NULL)
 
 # define constants
 MOD_ID <- "1"
@@ -47,15 +49,8 @@ NEW_TEXT2 <- c("all", "done")
 
 SUMMARY_REF_FILE <- "data/acop_summary_obj_ref_200616.rds"
 
-MOD_CLASS <- "bbi_nonmem_model"
-SUM_CLASS <- "bbi_nonmem_summary"
-SL_CLASS <- "bbi_summary_list"
-PROC_CLASS <- "babylon_process"
-LOG_CLASS <- "bbi_run_log_df"
-
-
 SUM_CLASS_LIST <- c(SUM_CLASS, "list")
-MOD_CLASS_LIST <- c(MOD_CLASS, "list")
+MOD_CLASS_LIST <- c(NM_MOD_CLASS, "list")
 PROC_CLASS_LIST <- c(PROC_CLASS, "list")
 
 SUMS_LIST_NAMES_REF <- c("absolute_model_path", "bbi_summary", "error_msg", "needed_fail_flags")

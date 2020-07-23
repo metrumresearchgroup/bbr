@@ -58,7 +58,7 @@ summary_log <- function(
   sum_df <- summary_log_impl(mod_list, ...)
 
   # assign `bbi_summary_log_df` class, unless all models failed and we only have an error column
-  if(identical(names(sum_df), c(ABS_MOD_PATH, SL_ERROR))) {
+  if(!identical(names(sum_df), c(ABS_MOD_PATH, SL_ERROR))) {
     sum_df <- create_summary_log_object(sum_df)
   }
 
@@ -90,7 +90,7 @@ add_summary <- function(
   )
 
   # assign `bbi_summary_log_df` class, unless all models failed and we only have an error column
-  if(identical(names(sum_df), c(ABS_MOD_PATH, SL_ERROR))) {
+  if(!identical(names(sum_df), c(ABS_MOD_PATH, SL_ERROR))) {
     df <- create_summary_log_object(df)
   }
   return(df)
