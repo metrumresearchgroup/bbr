@@ -7,17 +7,7 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
 withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
                          rbabylon.model_directory = NULL), {
 
-  # constants
-  MODEL_FILE <- "1.ctl"
-  MODEL_YAML <- yaml_ext(MODEL_FILE)
-  MODEL_DIR <- "model-examples"
-  MOD1_PATH <- file.path(MODEL_DIR, "1")
-  MOD1 <- MOD1_PATH %>% read_model()
-  MOD2_PATH <- file.path(MODEL_DIR, "2")
-
   # references
-  SUMMARY_REF_FILE <- "data/acop_summary_obj_ref_200616.rds"
-  SUM_CLASS_LIST <- c("bbi_nonmem_summary", "list")
   NOT_FINISHED_ERR_MSG <- "nonmem_summary.*modeling run has not finished"
   NO_LST_ERR_MSG <- "Unable to locate `.lst` file.*NONMEM output folder"
 
@@ -72,19 +62,19 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
 
   test_that("model_summary() works with custom .ext file", {
     on.exit({
-      fs::dir_delete(MOD2_PATH)
-      fs::file_delete(ctl_ext(MOD2_PATH))
-      fs::file_delete(yaml_ext(MOD2_PATH))
+      fs::dir_delete(NEW_MOD2)
+      fs::file_delete(ctl_ext(NEW_MOD2))
+      fs::file_delete(yaml_ext(NEW_MOD2))
     })
 
     # create new model
-    mod2 <- MOD1 %>% copy_model_from(MOD2_PATH, .description = "number 2")
+    mod2 <- MOD1 %>% copy_model_from(NEW_MOD2, .description = "number 2")
 
     # copy output directory (to simulate model run)
-    fs::dir_copy(MOD1_PATH, MOD2_PATH)
+    fs::dir_copy(MOD1_PATH, NEW_MOD2)
 
     # move .ext file
-    fs::file_move(file.path(MOD2_PATH, "1.ext"), file.path(MOD2_PATH, "EXT"))
+    fs::file_move(file.path(NEW_MOD2, "1.ext"), file.path(NEW_MOD2, "EXT"))
 
     # errors without the flag
     expect_error(model_summary(mod2), "No file present at.*2/1\\.ext")
@@ -123,18 +113,18 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
   for (.tc in TEST_CASES) {
     test_that(glue::glue("model_summary() works with no .{.tc$ext} file"), {
       on.exit({
-        fs::dir_delete(MOD2_PATH)
-        fs::file_delete(ctl_ext(MOD2_PATH))
-        fs::file_delete(yaml_ext(MOD2_PATH))
+        fs::dir_delete(NEW_MOD2)
+        fs::file_delete(ctl_ext(NEW_MOD2))
+        fs::file_delete(yaml_ext(NEW_MOD2))
       })
 
       # create new model
-      mod2 <- MOD1 %>% copy_model_from(MOD2_PATH, .description = "number 2")
+      mod2 <- MOD1 %>% copy_model_from(NEW_MOD2, .description = "number 2")
 
       # copy output directory (to simulate model run)
-      fs::dir_copy(MOD1_PATH, MOD2_PATH)
+      fs::dir_copy(MOD1_PATH, NEW_MOD2)
 
-      fs::file_delete(file.path(MOD2_PATH, paste0("1.", .tc$ext)))
+      fs::file_delete(file.path(NEW_MOD2, paste0("1.", .tc$ext)))
 
       # errors without the flag
       expect_error(model_summary(mod2), glue::glue("No file present at.*2/1\\.{.tc$ext}"))
@@ -179,19 +169,19 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
 
   test_that("model_summary() fails predictably if it can't find some parts (i.e. model isn't finished)", {
     on.exit({
-      fs::dir_delete(MOD2_PATH)
-      fs::file_delete(ctl_ext(MOD2_PATH))
-      fs::file_delete(yaml_ext(MOD2_PATH))
+      fs::dir_delete(NEW_MOD2)
+      fs::file_delete(ctl_ext(NEW_MOD2))
+      fs::file_delete(yaml_ext(NEW_MOD2))
       rm(mod2)
     })
 
     # create new model
-    mod2 <- MOD1 %>% copy_model_from(MOD2_PATH, .description = "number 2")
+    mod2 <- MOD1 %>% copy_model_from(NEW_MOD2, .description = "number 2")
 
     # copy head of .lst file (to simulate partially done model run)
-    fs::dir_create(MOD2_PATH)
+    fs::dir_create(NEW_MOD2)
     lst_head <- readr::read_lines(file.path(MOD1_PATH, "1.lst"), n_max = 20)
-    readr::write_lines(lst_head, file.path(MOD2_PATH, "2.lst"))
+    readr::write_lines(lst_head, file.path(NEW_MOD2, "2.lst"))
 
     # try to run and expect error with NOT_FINISHED_ERR_MSG
     expect_error(model_summary(mod2), regexp = NOT_FINISHED_ERR_MSG)
@@ -199,19 +189,19 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
 
   test_that("model_summary() fails predictably if no .lst file present", {
     on.exit({
-      fs::dir_delete(MOD2_PATH)
-      fs::file_delete(ctl_ext(MOD2_PATH))
-      fs::file_delete(yaml_ext(MOD2_PATH))
+      fs::dir_delete(NEW_MOD2)
+      fs::file_delete(ctl_ext(NEW_MOD2))
+      fs::file_delete(yaml_ext(NEW_MOD2))
     })
 
     # create new model
-    mod2 <- MOD1 %>% copy_model_from(MOD2_PATH, .description = "number 2")
+    mod2 <- MOD1 %>% copy_model_from(NEW_MOD2, .description = "number 2")
 
     # copy output directory (to simulate model run)
-    fs::dir_copy(MOD1_PATH, MOD2_PATH)
+    fs::dir_copy(MOD1_PATH, NEW_MOD2)
 
     # delete a necessary file
-    fs::file_delete(file.path(MOD2_PATH, "1.lst"))
+    fs::file_delete(file.path(NEW_MOD2, "1.lst"))
 
     # try to run and expect error with NO_LST_ERR_MSG
     expect_error(model_summary(mod2), regexp = NO_LST_ERR_MSG)

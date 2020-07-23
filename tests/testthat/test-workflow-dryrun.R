@@ -6,13 +6,8 @@ context("testing a composable workflow but only dryrun and NOT running bbi")
 ####################################################
 
 # reference constants
-MODEL_DIR <- "model-examples"
-TEST_YAML <- "1.yaml"
-
+TEST_YAML_DRY <- basename(YAML_TEST_FILE)
 REF_SUMMARY_CALL <- as.character(glue("cd {getwd()}/model-examples/1 ; {getOption('rbabylon.bbi_exe_path')} nonmem summary 1 --json"))
-MOD_CLASS <- c("bbi_nonmem_model", "list")
-PROC_CLASS <- c("babylon_process", "list")
-
 
 ###############################################################
 # with options("rbabylon.model_directory" = MODEL_DIR)
@@ -38,10 +33,10 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
       withr::with_dir(.test_case$test_wd, {
 
         # load model from yaml
-        this_mod <- read_model(.path = TEST_YAML)
+        this_mod <- read_model(.path = TEST_YAML_DRY)
 
         # check class and keys are right
-        expect_identical(class(this_mod), MOD_CLASS)
+        expect_identical(class(this_mod), MOD_CLASS_LIST)
         expect_true(all(MODEL_REQ_KEYS %in% names(this_mod)))
 
         # check the the model path parses correctly
@@ -56,7 +51,7 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
         }
 
         # check class and keys are right
-        expect_identical(class(this_proc), PROC_CLASS)
+        expect_identical(class(this_proc), PROC_CLASS_LIST)
         expect_true(all(PROCESS_REQ_KEYS %in% names(this_proc)))
 
         # check the call looks right
@@ -65,7 +60,7 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
         expect_identical(call_str, proc_str)
 
         # look for outputs
-        expect_identical(this_mod[[YAML_OUT_DIR]], get_model_id(TEST_YAML))
+        expect_identical(this_mod[[YAML_OUT_DIR]], get_model_id(TEST_YAML_DRY))
         expect_true(fs::file_exists(build_path_from_mod_obj(this_mod, "lst")))
         expect_true(fs::file_exists(build_path_from_mod_obj(this_mod, "ext")))
         expect_true(fs::file_exists(build_path_from_mod_obj(this_mod, "grd")))
@@ -89,15 +84,15 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
       withr::with_dir(.test_case$test_wd, {
 
         # load mod from yaml and dry run through to summary object
-        this_mod <- read_model(.path = TEST_YAML)
+        this_mod <- read_model(.path = TEST_YAML_DRY)
         #this_proc <- submit_model(this_mod, .dry_run = TRUE, .config_path = .test_case$bbi_path)
         this_proc <- submit_model(this_mod, .dry_run = TRUE)
         this_sum <- this_proc %>% as_model() %>% model_summary(.dry_run = TRUE)
         expect_identical(this_sum[[PROC_CALL]], REF_SUMMARY_CALL)
 
         # check that summary call matches when generated with file path instead of object
-        this_out_dir <- tools::file_path_sans_ext(TEST_YAML)
-        this_ctl_file <- ctl_ext(TEST_YAML)
+        this_out_dir <- tools::file_path_sans_ext(TEST_YAML_DRY)
+        this_ctl_file <- ctl_ext(TEST_YAML_DRY)
 
         if (isTRUE(.test_case$change_midstream)) {
           withr::with_dir("..", {
@@ -126,12 +121,12 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
 ###################################################################################
 
 .TEST_CASES_WD <- list(
-  list(test_wd = ".",        bbi_path = "babylon.yaml",           test_yaml_path = file.path(MODEL_DIR, TEST_YAML)),
-  list(test_wd = "..",       bbi_path = "testthat/babylon.yaml",  test_yaml_path = file.path("testthat", MODEL_DIR, TEST_YAML)),
-  list(test_wd = MODEL_DIR,  bbi_path = "../babylon.yaml",        test_yaml_path = TEST_YAML),
-  list(test_wd = ".",        bbi_path = "babylon.yaml",           test_yaml_path = file.path(MODEL_DIR, TEST_YAML),              change_midstream = "testthat/babylon.yaml"),
-  list(test_wd = "..",       bbi_path = "testthat/babylon.yaml",  test_yaml_path = file.path("testthat", MODEL_DIR, TEST_YAML),  change_midstream = "tests/testthat/babylon.yaml"),
-  list(test_wd = MODEL_DIR,  bbi_path = "../babylon.yaml",        test_yaml_path = TEST_YAML,                                    change_midstream = "babylon.yaml")
+  list(test_wd = ".",        bbi_path = "babylon.yaml",           test_yaml_path = file.path(MODEL_DIR, TEST_YAML_DRY)),
+  list(test_wd = "..",       bbi_path = "testthat/babylon.yaml",  test_yaml_path = file.path("testthat", MODEL_DIR, TEST_YAML_DRY)),
+  list(test_wd = MODEL_DIR,  bbi_path = "../babylon.yaml",        test_yaml_path = TEST_YAML_DRY),
+  list(test_wd = ".",        bbi_path = "babylon.yaml",           test_yaml_path = file.path(MODEL_DIR, TEST_YAML_DRY),              change_midstream = "testthat/babylon.yaml"),
+  list(test_wd = "..",       bbi_path = "testthat/babylon.yaml",  test_yaml_path = file.path("testthat", MODEL_DIR, TEST_YAML_DRY),  change_midstream = "tests/testthat/babylon.yaml"),
+  list(test_wd = MODEL_DIR,  bbi_path = "../babylon.yaml",        test_yaml_path = TEST_YAML_DRY,                                    change_midstream = "babylon.yaml")
 )
 
 withr::with_options(list(rbabylon.model_directory = NULL), {
@@ -149,7 +144,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
         this_mod <- read_model(.path = test_yaml_path)
 
         # check class and keys are right
-        expect_identical(class(this_mod), MOD_CLASS)
+        expect_identical(class(this_mod), MOD_CLASS_LIST)
         expect_true(all(MODEL_REQ_KEYS %in% names(this_mod)))
 
         # check the the model path parses correctly
@@ -165,7 +160,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
 
         # check class and keys are right
-        expect_identical(class(this_proc), PROC_CLASS)
+        expect_identical(class(this_proc), PROC_CLASS_LIST)
         expect_true(all(PROCESS_REQ_KEYS %in% names(this_proc)))
 
         # check the call looks right

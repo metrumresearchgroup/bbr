@@ -1,7 +1,5 @@
 context("Constructing config log from bbi_config.json")
 
-source("data/test-workflow-ref.R")
-
 check_config_ref <- function(log_df, run_nums, col_count) {
 
   expect_identical(basename(log_df[[ABS_MOD_PATH]]), run_nums)

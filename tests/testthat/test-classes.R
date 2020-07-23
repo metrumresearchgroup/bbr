@@ -1,12 +1,5 @@
 context("creating S3 objects")
 
-# reference
-MOD_CLASS <- "bbi_nonmem_model"
-SUM_CLASS <- "bbi_nonmem_summary"
-SL_CLASS <- "bbi_summary_list"
-PROC_CLASS <- "babylon_process"
-LOG_CLASS <- "bbi_run_log_df"
-
 
 test_that("create_model_object() correctly assigns class", {
   .mod <- list()

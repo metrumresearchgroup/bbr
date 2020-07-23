@@ -1,7 +1,5 @@
 context("Constructing run log from model yaml")
 
-source("data/test-workflow-ref.R")
-
 setup({
   cleanup()
 

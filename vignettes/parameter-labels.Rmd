@@ -35,7 +35,7 @@ set_model_directory("../inst/param_examples")
 
 ```{r setup, include = FALSE}
 MODEL_DIR <- "../inst/param_examples"
-source("../tests/testthat/data/test-param-labels-ref.R")
+source("../tests/testthat/setup-param-labels-ref.R")
 REF_OMEGA <- PARAM_BLOCK_REF$PEX_BLOCK32S$ctl
 
 # set babylon execution path

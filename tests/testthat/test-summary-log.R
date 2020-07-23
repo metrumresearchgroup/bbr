@@ -4,10 +4,7 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
   skip("test-summary only runs on Metworx or Drone")
 }
 
-source("data/test-workflow-ref.R")
-
 # references
-MOD_CLASS_LIST <- c("bbi_nonmem_model", "list")
 OFV_REF <- 2636.846
 PARAM_COUNT_REF <- 7
 
@@ -53,7 +50,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 }) # closing withr::with_options
 
 
-withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
+withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
                          rbabylon.model_directory = normalizePath(MODEL_DIR)), {
 
   #########################################
