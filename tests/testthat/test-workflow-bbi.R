@@ -16,32 +16,19 @@ if (Sys.getenv("METWORX_VERSION") == "" || Sys.getenv("SKIP_BBI_TEST") == "true"
 STARTER_FILE <- file.path("model-examples/1.ctl")
 PARAM_REF_FILE <- "data/acop_param_table_ref_200423_randeff.rds"
 
-MODEL_DIR <- "model-examples-bbi"
+MODEL_DIR_BBI <- "model-examples-bbi"
 BBI_PATH <- read_bbi_path()
-
-ORIG_DESC <- "original acop model"
-NEW_DESC <- "new description"
-
-ORIG_TAGS <- c("acop tag", "other tag")
-NEW_TAGS <- c("acop tag", "new tag")
-
-# reference
-MODEL_CLASS_REF <- c("bbi_nonmem_model", "list")
-PROCESS_CLASS_REF <- c("babylon_process", "list")
-SUM_CLASS_REF <- c("bbi_nonmem_summary", "list")
-SUM_NAMES_REF <- c("run_details", "run_heuristics", "parameters_data", "parameter_names",
-                   "ofv", "shrinkage_details", "covariance_theta", "correlation_theta")
 
 # cleanup function
 cleanup <- function(.recreate_dir = FALSE) {
-  if (fs::dir_exists(MODEL_DIR)) fs::dir_delete(MODEL_DIR)
-  if (isTRUE(.recreate_dir)) fs::dir_create(MODEL_DIR)
+  if (fs::dir_exists(MODEL_DIR_BBI)) fs::dir_delete(MODEL_DIR_BBI)
+  if (isTRUE(.recreate_dir)) fs::dir_create(MODEL_DIR_BBI)
 }
 cleanup(.recreate_dir = TRUE)
 
 # set options and run tests
 withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
-                         rbabylon.model_directory = normalizePath(MODEL_DIR)), {
+                         rbabylon.model_directory = normalizePath(MODEL_DIR_BBI)), {
 
   # cleanup when done
   on.exit({
@@ -50,13 +37,13 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
   })
 
   # clear old babylon.yaml
-  if (fs::file_exists(file.path(MODEL_DIR, "babylon.yaml"))) fs::file_delete(file.path(MODEL_DIR, "babylon.yaml"))
+  if (fs::file_exists(file.path(MODEL_DIR_BBI, "babylon.yaml"))) fs::file_delete(file.path(MODEL_DIR_BBI, "babylon.yaml"))
 
   # create new babylon.yaml
-  bbi_init(MODEL_DIR, "/opt/NONMEM", "nm74gf")
+  bbi_init(MODEL_DIR_BBI, "/opt/NONMEM", "nm74gf")
 
   # copy model file into new model dir
-  fs::file_copy(STARTER_FILE, MODEL_DIR)
+  fs::file_copy(STARTER_FILE, MODEL_DIR_BBI)
 
   #######################
   # create model from R
@@ -70,20 +57,20 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
       .tags = ORIG_TAGS,
       .bbi_args = list(overwrite = TRUE, threads = 4)
     ))
-    expect_identical(class(mod1), MODEL_CLASS_REF)
+    expect_identical(class(mod1), MOD_CLASS_LIST)
 
     # submit model
     proc1 <- submit_model(mod1, .mode = "local", .wait = TRUE)
-    expect_identical(class(proc1), PROCESS_CLASS_REF)
+    expect_identical(class(proc1), PROC_CLASS_LIST)
 
     # get summary from model object
     sum1a <- mod1 %>% model_summary()
-    expect_identical(class(sum1a), SUM_CLASS_REF)
+    expect_identical(class(sum1a), SUM_CLASS_LIST)
     expect_identical(names(sum1a), SUM_NAMES_REF)
 
     # get summary from process object
     sum1b <- proc1 %>% as_model %>% model_summary()
-    expect_identical(class(sum1b), SUM_CLASS_REF)
+    expect_identical(class(sum1b), SUM_CLASS_LIST)
     expect_identical(names(sum1b), SUM_NAMES_REF)
 
     # extract parameters table
@@ -110,7 +97,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
 
     # get summary from model object
     sum2 <- mod2 %>% model_summary()
-    expect_identical(class(sum2), SUM_CLASS_REF)
+    expect_identical(class(sum2), SUM_CLASS_LIST)
     expect_identical(names(sum2), SUM_NAMES_REF)
 
     # extract parameters table

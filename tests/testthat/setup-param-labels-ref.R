@@ -1,4 +1,4 @@
-library(rbabylon)
+# constants used for reference in test-param-labels.R
 
 # testing block
 BLOCK_REF <- list(

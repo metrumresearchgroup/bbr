@@ -1,7 +1,5 @@
 context("Testing function to create or read in model object")
 
-source("data/test-workflow-ref.R")
-
 withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("read_model() returns expected object", {
@@ -80,8 +78,8 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     mod1b <- read_model(.path = .test_yaml)
 
     # check class and keys are right
-    expect_identical(class(mod1a), MODEL_CLASS_LIST)
-    expect_identical(class(mod1b), MODEL_CLASS_LIST)
+    expect_identical(class(mod1a), MOD_CLASS_LIST)
+    expect_identical(class(mod1b), MOD_CLASS_LIST)
 
     expect_true(all(MODEL_REQ_KEYS %in% names(mod1a)))
     expect_true(all(MODEL_REQ_KEYS %in% names(mod1b)))
@@ -124,8 +122,8 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     mod1b <- read_model(.path = .test_yaml)
 
     # check class and keys are right
-    expect_identical(class(mod1a), MODEL_CLASS_LIST)
-    expect_identical(class(mod1b), MODEL_CLASS_LIST)
+    expect_identical(class(mod1a), MOD_CLASS_LIST)
+    expect_identical(class(mod1b), MOD_CLASS_LIST)
 
     expect_true(all(MODEL_REQ_KEYS %in% names(mod1a)))
     expect_true(all(MODEL_REQ_KEYS %in% names(mod1b)))
@@ -354,7 +352,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
     # check class and model path
     expect_identical(mod1[[YAML_MOD_PATH]], .ctl_file)
-    expect_identical(class(mod1), MODEL_CLASS_LIST)
+    expect_identical(class(mod1), MOD_CLASS_LIST)
   })
 
   test_that("as_model() errors with non-existent model", {
@@ -384,8 +382,8 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
     mod1b <- read_model(.path = .test_yaml)
 
     # check class and keys are right
-    expect_identical(class(mod1a), MODEL_CLASS_LIST)
-    expect_identical(class(mod1b), MODEL_CLASS_LIST)
+    expect_identical(class(mod1a), MOD_CLASS_LIST)
+    expect_identical(class(mod1b), MOD_CLASS_LIST)
 
     expect_true(all(MODEL_REQ_KEYS %in% names(mod1a)))
     expect_true(all(MODEL_REQ_KEYS %in% names(mod1b)))

@@ -1,8 +1,5 @@
 context("Copying model objects")
 
-source("data/test-workflow-ref.R")
-
-
 #########################
 # copy_model_from tests
 #########################
@@ -18,7 +15,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     new_mod <- copy_model_from(YAML_TEST_FILE, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
 
     # check that everything is copied through in the object
-    expect_identical(class(new_mod), MODEL_CLASS_LIST)
+    expect_identical(class(new_mod), MOD_CLASS_LIST)
     expect_identical(new_mod[[YAML_MOD_PATH]], basename(ctl_ext(NEW_MOD2)))
     expect_identical(new_mod[[YAML_DESCRIPTION]], NEW_DESC)
     expect_identical(new_mod[[YAML_BASED_ON]], "1")

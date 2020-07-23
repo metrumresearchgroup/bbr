@@ -4,8 +4,6 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
   skip("test-summary only runs on Metworx or Drone")
 }
 
-source("data/test-workflow-ref.R")
-
 # references
 NUM_MODS <- 3
 NOT_FINISHED_ERR_MSG <- "nonmem_summary.*modeling run has not finished"
@@ -18,7 +16,7 @@ test_mod_sums <- function(mod_sums) {
   ref_sum <- readRDS(SUMMARY_REF_FILE)
 
   for (.s in mod_sums) {
-    expect_equal(names(.s), RES_NAMES_LIST)
+    expect_equal(names(.s), SUMS_LIST_NAMES_REF)
     expect_identical(class(.s$bbi_summary), SUM_CLASS_LIST)
     expect_equal(ref_sum, .s$bbi_summary)
   }
@@ -35,7 +33,7 @@ teardown({
   cleanup()
 })
 
-withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
+withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
                          rbabylon.model_directory = normalizePath(MODEL_DIR)), {
 
   #########################################
@@ -46,7 +44,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
     mods <- purrr::map(c("1", "2", "3"), ~read_model(.x))
     expect_equal(length(mods), NUM_MODS)
     for (.m in mods) {
-      expect_equal(class(.m), MODEL_CLASS_LIST)
+      expect_equal(class(.m), MOD_CLASS_LIST)
     }
 
     mod_sums <- model_summaries(mods)
@@ -57,7 +55,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
   test_that("model_summaries.list fails with bad list", {
     bad_mods <- list(read_model(1), list(naw = "dawg"))
     expect_equal(length(bad_mods), 2)
-    expect_equal(class(bad_mods[[1]]), MODEL_CLASS_LIST)
+    expect_equal(class(bad_mods[[1]]), MOD_CLASS_LIST)
 
     expect_error(model_summaries(bad_mods), regexp = "must contain only model objects")
   })
