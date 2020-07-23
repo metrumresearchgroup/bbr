@@ -79,28 +79,32 @@ is_diag <- function(.name) {
 
 
 ### WILL REPLACE THIS WITH LIBRARY FUNCTION IN rbabylon
+### needs to become new s3 dispatches:
+### * param_estimates.bbi_summary_list
+### * param_estimates.bbi_summary_log_df
 get_param_estimates_new <- function(.df) {
 
-  if(is.null(.df$bbi_summary)) {
-    stop("No bbi_summary column")
-  }
-
-  sum_list <- .df$bbi_summary
+  # should this be some dplyr rowwise thing?
+  # or should I maybe just pull these things back into a bbi_summary_list style list and then pass to that dispatch?
+  # this feels awkward having to use abs_paths[.i] and stuff
+  sum_list <- .df[[SL_SUMMARY]]
+  abs_paths <- .df[[ABS_MOD_PATH]]
 
   param_df <- imap_dfr(sum_list, function(.mod, .i) {
-    if(!is.null(.mod$error_msg)){
-      message(paste("found missing summary: ", .mod$error_msg))
+    if(!is.null(.mod[[SL_ERROR]])){
+      warning(paste("Missing summary for", abs_paths[.i], "\n", .mod[[SL_ERROR]]))
       return(invisible())
     }
     .mod %>%
       param_estimates() %>%
-      select(names, estimate) %>%
-      mutate(i = .i)
+      mutate(!!ABS_MOD_PATH := abs_paths[.i]) %>%
+      #mutate(i = .i) # haven't tried this yet but if it works can replace ^
+      select(.data$ABS_MOD_PATH, .data$names, .data$estimate)
 
   })
 
   param_df <- param_df %>%
-    pivot_wider(names_from = names,values_from = estimate)
+    pivot_wider(names_from = .data$names, values_from = .data$estimate)
 
   return(param_df)
 }

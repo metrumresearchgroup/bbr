@@ -171,6 +171,7 @@ SUMMARY_LIST_REQ_KEYS <- c(
 # columns required for a summary log df
 SUMMARY_LOG_REQ_COLS <- c(
   ABS_MOD_PATH,
+  SL_SUMMARY,
   SL_ERROR,
   SL_FAIL_FLAGS,
   DETAILS_ELEMENTS,
