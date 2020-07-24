@@ -106,16 +106,47 @@ YAML_SCALAR_TO_LIST_KEYS <- c(
 
 
 SUPPORTED_MOD_TYPES <- c("nonmem", "stan")
+
 VALID_MOD_CLASSES <- purrr::map_chr(SUPPORTED_MOD_TYPES,
                                     function(.model_type) {
                                       as.character(glue::glue("bbi_{.model_type}_model"))
                                     })
 
+VALID_SUM_CLASSES <- purrr::map_chr(SUPPORTED_MOD_TYPES,
+                                    function(.model_type) {
+                                      as.character(glue::glue("bbi_{.model_type}_summary"))
+                                    })
+
+
 SUMMARY_DETAILS <- "run_details"
+SUMMARY_HEURISTICS <- "run_heuristics"
 
 # keys required for a summary object to have
 SUMMARY_REQ_KEYS <- c(
-  SUMMARY_DETAILS
+  SUMMARY_DETAILS,
+  SUMMARY_HEURISTICS
+)
+
+ANY_HEURISTICS <- "any_heuristics"
+HEURISTICS_ELEMENTS <- c(
+  "covariance_step_aborted",
+  "large_condition_number",
+  "correlations_not_ok",
+  "parameter_near_boundary",
+  "hessian_reset",
+  "has_final_zero_gradient",
+  "minimization_terminated"
+)
+
+SL_SUMMARY <- "bbi_summary"
+SL_ERROR <- "error_msg"
+SL_FAIL_FLAGS <- "needed_fail_flags"
+
+SUMMARY_LIST_REQ_KEYS <- c(
+  ABS_MOD_PATH,
+  SL_SUMMARY,
+  SL_ERROR,
+  SL_FAIL_FLAGS
 )
 
 # keys added when creating a process object
