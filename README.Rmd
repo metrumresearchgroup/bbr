@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 # rbabylon
 
 <!-- badges: start -->
+[![Build Status](https://github-drone.metrumrg.com/api/badges/metrumresearchgroup/rbabylon/status.svg)](https://github-drone.metrumrg.com/metrumresearchgroup/rbabylon)
 <!-- badges: end -->
 
 `rbabylon` is an R interface for running `babylon`. `babylon` is (will be) a complete solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. Currently, only NONMEM modeling is supported, though there are plans to add Stan and other modeling software as well. You can get more detailed information on `babylon` (the underlying CLI tool)  [here](https://github.com/metrumresearchgroup/babylon).
