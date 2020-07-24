@@ -58,6 +58,27 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
   return(param_df)
 }
 
+
+
+param_estimates.bbi_summary_list <- function(.summary) {
+  ### do that stuff
+
+  return(param_df)
+}
+
+param_estimates.bbi_summary_log_df <- function(.summary) {
+  # extract needed pieces into a `bbi_summary_list` object
+  .summary <- as_summary_list(.summary)
+
+  # pass to `bbi_summary_list` dispatch
+  param_df <- param_estimates(.summary)
+
+  return(param_df)
+}
+
+
+
+
 #' Check if diagonal index or not
 #'
 #' Private helper to unpack an matrix index string like '(3,3)' is for a diagonal (i.e. if the numbers are the same)

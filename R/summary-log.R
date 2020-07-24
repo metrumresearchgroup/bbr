@@ -33,11 +33,6 @@
 #' @param .base_dir Base directory to look in for models that will be summarized. Defaults to `get_model_directory()`, and falls back to `getwd()` if `get_model_directory()` returns `NULL`.
 #' @param .recurse If `TRUE`, the default, search recursively in subdirectories.
 #' @param ... Arguments passed through to `model_summaries()`.
-#' @importFrom dplyr mutate
-#' @importFrom purrr map transpose
-#' @importFrom tibble as_tibble
-#' @importFrom glue glue
-#' @importFrom tidyr unnest_wider
 #' @export
 summary_log <- function(
   .base_dir = get_model_directory(),
@@ -101,11 +96,10 @@ add_summary <- function(
 #'
 #' Private implementation function for building the summary log from a list of model objects.
 #' This is called by both `summary_log()` and `add_summary()`.
-#' @importFrom stringr str_subset
-#' @importFrom fs dir_ls file_exists
-#' @importFrom purrr map_df map_chr
-#' @importFrom dplyr select everything
-#' @importFrom jsonlite fromJSON
+#' @importFrom purrr transpose
+#' @importFrom dplyr select mutate
+#' @importFrom tibble as_tibble
+#' @importFrom tidyr unnest_wider
 #' @param .mods List of model objects that will be passed to `model_summaries()`.
 #' @param ... Arguments passed through to `model_summaries()`
 #' @keywords internal
