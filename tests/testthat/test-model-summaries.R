@@ -4,8 +4,6 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
   skip("test-summary only runs on Metworx or Drone")
 }
 
-source("data/test-workflow-ref.R")
-
 # references
 NUM_MODS <- 3
 NOT_FINISHED_ERR_MSG <- "nonmem_summary.*modeling run has not finished"

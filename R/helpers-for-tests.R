@@ -6,6 +6,7 @@
 #' @importFrom utils download.file
 #' @importFrom jsonlite fromJSON
 #' @param by if less than this number of requests are left before hitting the rate limit, skip the test
+#' @keywords internal
 skip_if_over_rate_limit <- function(by = 5) {
 
   tmp <- tempfile(fileext = '.json')
@@ -18,5 +19,5 @@ skip_if_over_rate_limit <- function(by = 5) {
 
   res <- res$rate$remaining
 
-  if (is.null(res) || res <= by) skip("Over the GitHub rate limit")
+  if (is.null(res) || res <= by) testthat::skip("Over the GitHub rate limit")
 }

@@ -1,10 +1,7 @@
 context("Constructing run log from model yaml")
 
-source("data/test-workflow-ref.R")
-
-withr::with_options(list(rbabylon.model_directory = NULL), {
+setup({
   cleanup()
-  on.exit({ cleanup() })
 
   # copy models before creating run log
   copy_model_from(YAML_TEST_FILE, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
@@ -14,11 +11,25 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
                   .based_on_additional = get_model_id(NEW_MOD2),
                   .inherit_tags = TRUE,
                   .update_model_file = FALSE)
+})
+
+teardown({ cleanup() })
+
+withr::with_options(list(rbabylon.model_directory = NULL), {
+
+  test_that("run_log errors with malformed YAML", {
+    log_df <- expect_error(run_log(), regexp = "Unexpected error.+model_path defined in yaml")
+  })
+
+  test_that("run_log returns NULL and warns when no YAML found", {
+    log_df <- expect_warning(run_log("data"), regexp = "Found no valid model YAML files in data")
+    expect_true(is.null(log_df))
+  })
 
   test_that("run_log matches reference", {
     log_df <- run_log(MODEL_DIR)
-    expect_equal(nrow(log_df), 3)
-    expect_equal(ncol(log_df), 8)
+    expect_equal(nrow(log_df), RUN_LOG_ROWS)
+    expect_equal(ncol(log_df), RUN_LOG_COLS)
     expect_identical(basename(log_df[[ABS_MOD_PATH]]), c("1", "2", "3"))
     expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS))
     expect_identical(log_df$yaml_md5, c("ee5a30a015c4e09bc29334188ff28b58", "5576ed6fa6e1e4e9b0c25dbf62ae42e5", "ebadcc4a3c0f4d16f61251605136942b"))
@@ -52,8 +63,8 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
       run_log(MODEL_DIR)
     }, .regexpr = "No model file found")
 
-    expect_equal(nrow(log_df), 4)
-    expect_equal(ncol(log_df), 8)
+    expect_equal(nrow(log_df), RUN_LOG_ROWS+1)
+    expect_equal(ncol(log_df), RUN_LOG_COLS)
     expect_identical(basename(log_df[[ABS_MOD_PATH]]), c("1", "2", "3", "4"))
     expect_identical(log_df$yaml_md5, c("ee5a30a015c4e09bc29334188ff28b58", "5576ed6fa6e1e4e9b0c25dbf62ae42e5", "ebadcc4a3c0f4d16f61251605136942b", "ee5a30a015c4e09bc29334188ff28b58"))
 
@@ -68,12 +79,12 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   # copy model 1 to level deeper
   fs::dir_create(LEVEL2_DIR)
   copy_model_from(YAML_TEST_FILE, LEVEL2_MOD, "level 2 copy of 1.yaml", .inherit_tags = TRUE)
-  fs::dir_copy(tools::file_path_sans_ext(YAML_TEST_FILE), file.path(LEVEL2_DIR, tools::file_path_sans_ext(basename(YAML_TEST_FILE))))
+  fs::dir_copy(MOD1_PATH, LEVEL2_MOD)
 
   test_that("run_log() works correctly with nested dirs", {
     log_df <- run_log(MODEL_DIR)
-    expect_equal(nrow(log_df), 4)
-    expect_equal(ncol(log_df), 8)
+    expect_equal(nrow(log_df), RUN_LOG_ROWS+1)
+    expect_equal(ncol(log_df), RUN_LOG_COLS)
     expect_false(any(duplicated(log_df[[ABS_MOD_PATH]])))
     expect_identical(basename(log_df[[ABS_MOD_PATH]]), c("1", "2", "3", "1"))
     expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS, ORIG_TAGS))
@@ -108,7 +119,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_identical(log_df$data_path, c("../../data/acop.csv", NA_character_, NA_character_, "../../data/acop.csv"))
     expect_identical(log_df$model_md5, c("731923458236cc008c3adafa2f0877a7", NA_character_, NA_character_, "731923458236cc008c3adafa2f0877a7"))
   })
-
 
   ##########################################
   # testing errors after meddling

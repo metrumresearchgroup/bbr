@@ -4,8 +4,7 @@ suppressPackageStartupMessages(library(glue))
 suppressPackageStartupMessages(library(dplyr))
 
 # constants
-source("data/test-param-labels-ref.R")
-MODEL_DIR <- "data/tidynm_extdata"
+PL_MODEL_DIR <- "data/tidynm_extdata"
 MODEL_PICKS <- list(
   list(mod_id = "101", omega = block(3), sigma = NULL),
   list(mod_id = "510", omega = block(2), sigma = NULL),
@@ -60,7 +59,7 @@ for (MODEL_PICK in MODEL_PICKS) {
     names(ref_df) <- names(ref_df) %>% tolower()
 
     #
-    .ctl_raw <-  file.path(MODEL_DIR, glue("{.mod_id}.ctl")) %>% readr::read_file()
+    .ctl_raw <-  file.path(PL_MODEL_DIR, glue("{.mod_id}.ctl")) %>% readr::read_file()
 
     # make label df
     .label_df <- .ctl_raw %>%
@@ -88,7 +87,7 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
   skip("param_labels only runs on Metworx or Drone")
 } else {
   withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
-                           rbabylon.model_directory = normalizePath(MODEL_DIR)), {
+                           rbabylon.model_directory = normalizePath(PL_MODEL_DIR)), {
 
     for (MODEL_PICK in MODEL_PICKS) {
       .mod_id <- MODEL_PICK$mod_id
@@ -99,9 +98,9 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
         names(ref_df) <- names(ref_df) %>% tolower()
 
         # get param df with rbabylon::model_summary()
-        if (fs::file_exists(file.path(MODEL_DIR, glue("{.mod_id}.yaml")))) fs::file_delete(file.path(MODEL_DIR, glue("{.mod_id}.yaml")))
+        if (fs::file_exists(file.path(PL_MODEL_DIR, glue("{.mod_id}.yaml")))) fs::file_delete(file.path(PL_MODEL_DIR, glue("{.mod_id}.yaml")))
         .mod <-  rbabylon::new_model(glue("{.mod_id}.yaml"), glue("the {.mod_id} model"))
-        on.exit({ if (fs::file_exists(file.path(MODEL_DIR, glue("{.mod_id}.yaml")))) fs::file_delete(file.path(MODEL_DIR, glue("{.mod_id}.yaml"))) })
+        on.exit({ if (fs::file_exists(file.path(PL_MODEL_DIR, glue("{.mod_id}.yaml")))) fs::file_delete(file.path(PL_MODEL_DIR, glue("{.mod_id}.yaml"))) })
 
         .param_df <- .mod %>% rbabylon::model_summary() %>% param_estimates()
         names(.param_df) <- names(.param_df) %>% tolower()
