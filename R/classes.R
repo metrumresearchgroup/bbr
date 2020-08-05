@@ -5,82 +5,81 @@
 NULL
 
 #' @describeIn create_bbi_object Creates list object of class `bbi_{.model_type}_model` from named list with `MODEL_REQ_INPUT_KEYS`
-#' @param .mod_list List with the required information to create a model object
+#' @param res List to attempt to assign the class to
 #' @importFrom fs path_rel
 #' @keywords internal
-create_model_object <- function(.mod_list) {
+create_model_object <- function(res) {
 
-  if(!inherits(.mod_list, "list")) {
-    stop(glue("Can only create model object from a named list. Passed object has classes {paste(class(.mod_list), collapse = ', ')}"))
+  if(!inherits(res, "list")) {
+    stop(glue("Can only create model object from a named list. Passed object has classes {paste(class(res), collapse = ', ')}"))
   }
 
   # check that necessary keys are present
-  if (!check_required_keys(.mod_list, .req = MODEL_REQ_INPUT_KEYS)) {
+  if (!check_required_keys(res, .req = MODEL_REQ_INPUT_KEYS)) {
     err_msg <- paste0(
       "Model list must have keys `", paste(MODEL_REQ_INPUT_KEYS, collapse=", "), "` specified in order to create model. ",
-      "But `", paste(MODEL_REQ_INPUT_KEYS[!(MODEL_REQ_INPUT_KEYS %in% names(.mod_list))], collapse=", "), "` are missing. ",
-      "List has the following keys: ", paste(names(.mod_list) %||% "NO NAMES", collapse=", ")
+      "But `", paste(MODEL_REQ_INPUT_KEYS[!(MODEL_REQ_INPUT_KEYS %in% names(res))], collapse=", "), "` are missing. ",
+      "List has the following keys: ", paste(names(res) %||% "NO NAMES", collapse=", ")
     )
     strict_mode_error(err_msg)
   }
 
   # check model type
-  .model_type <- .mod_list[[YAML_MOD_TYPE]]
+  .model_type <- res[[YAML_MOD_TYPE]]
   if (!(.model_type %in% SUPPORTED_MOD_TYPES)) {
     stop(glue("Invalid {YAML_MOD_TYPE} `{.model_type}`. Valid options include: `{paste(SUPPORTED_MOD_TYPES, collapse = ', ')}`"))
   }
 
   # by default, if no model defined, will use the YAML path to look for a model and set to .ctl if none found
-  if (is.null(.mod_list[[YAML_MOD_PATH]])) {
-    if (is.null(.mod_list[[YAML_YAML_NAME]])) {
+  if (is.null(res[[YAML_MOD_PATH]])) {
+    if (is.null(res[[YAML_YAML_NAME]])) {
       stop("Must specify either a YAML_MOD_PATH or YAML_YAML_NAME to create a model. User should never see this error.")
     }
-    .mod_path <- find_model_file_path(file.path(.mod_list[[WORKING_DIR]], .mod_list[[YAML_YAML_NAME]]))
-    .mod_list[[YAML_MOD_PATH]] <- as.character(fs::path_rel(.mod_path, .mod_list[[WORKING_DIR]]))
+    .mod_path <- find_model_file_path(file.path(res[[WORKING_DIR]], res[[YAML_YAML_NAME]]))
+    res[[YAML_MOD_PATH]] <- as.character(fs::path_rel(.mod_path, res[[WORKING_DIR]]))
   }
 
   # check for correct NONMEM extension
-  if (.model_type == "nonmem" && (!is_valid_nonmem_extension(.mod_list[[YAML_MOD_PATH]]))) {
-    stop(glue::glue("model_path defined in yaml at {.mod_list[[YAML_MOD_PATH]]} must have either a .ctl or .mod extension, but found {.mod_list[[YAML_MOD_PATH]]}"))
+  if (.model_type == "nonmem" && (!is_valid_nonmem_extension(res[[YAML_MOD_PATH]]))) {
+    stop(glue::glue("model_path defined in yaml at {res[[YAML_MOD_PATH]]} must have either a .ctl or .mod extension, but found {res[[YAML_MOD_PATH]]}"))
   }
 
   # check babylon args and add an empty list if missing
-  if (is.null(.mod_list[[YAML_BBI_ARGS]])) {
-    .mod_list[[YAML_BBI_ARGS]] <- list()
+  if (is.null(res[[YAML_BBI_ARGS]])) {
+    res[[YAML_BBI_ARGS]] <- list()
   } else {
     # check that unique named list was passed
     tryCatch(
-      checkmate::assert_list(.mod_list[[YAML_BBI_ARGS]], names="unique"),
+      checkmate::assert_list(res[[YAML_BBI_ARGS]], names="unique"),
       error = function(e) { stop(glue("`{YAML_BBI_ARGS}` must be a unique, named list: {e}")) }
     )
   }
 
   # add output_dir
-  if (!is.null(.mod_list[[YAML_BBI_ARGS]][["output_dir"]])) {
+  if (!is.null(res[[YAML_BBI_ARGS]][["output_dir"]])) {
     # if specified in bbi_args, overwrite anything that's in YAML or list
-    .mod_list[[YAML_OUT_DIR]] <- .mod_list[[YAML_BBI_ARGS]][["output_dir"]]
-  } else if (is.null(.mod_list[[YAML_OUT_DIR]])) {
+    res[[YAML_OUT_DIR]] <- res[[YAML_BBI_ARGS]][["output_dir"]]
+  } else if (is.null(res[[YAML_OUT_DIR]])) {
     # if null, infer from model path
-    .mod_list[[YAML_OUT_DIR]] <- .mod_list[[YAML_MOD_PATH]] %>% tools::file_path_sans_ext()
+    res[[YAML_OUT_DIR]] <- res[[YAML_MOD_PATH]] %>% tools::file_path_sans_ext()
   }
 
   # check for required keys, just as an extra safety precaution
-  if (!check_required_keys(.mod_list, .req = MODEL_REQ_KEYS)) {
+  if (!check_required_keys(res, .req = MODEL_REQ_KEYS)) {
     err_msg <- paste0(
       "Model object must have the following named elements to be converted to an S3 object of class `bbi_{.model_type}_model`: `", paste(MODEL_REQ_KEYS, collapse=", "),
-      "` but the following keys are missing: `", paste(MODEL_REQ_KEYS[!(MODEL_REQ_KEYS %in% names(.mod_list))], collapse=", "),
-      "`\nObject has the following keys: ", paste(names(.mod_list), collapse=", ")
+      "` but the following keys are missing: `", paste(MODEL_REQ_KEYS[!(MODEL_REQ_KEYS %in% names(res))], collapse=", "),
+      "`\nObject has the following keys: ", paste(names(res), collapse=", ")
     )
     strict_mode_error(err_msg)
   }
 
   # assign class and return
-  class(.mod_list) <- c(as.character(glue("bbi_{.model_type}_model")), class(.mod_list))
-  return(.mod_list)
+  class(res) <- c(as.character(glue("bbi_{.model_type}_model")), class(res))
+  return(res)
 }
 
 #' @describeIn create_bbi_object Create list object of `bbi_{.model_type}_summary` class, first checking that all the required keys are present.
-#' @param res List to attempt to assign the class to
 #' @param .model_type Character scalar of a valid model type (currently either `nonmem` or `stan`)
 #' @keywords internal
 create_summary_object <- function(res, .model_type = SUPPORTED_MOD_TYPES) {
@@ -107,17 +106,16 @@ create_summary_object <- function(res, .model_type = SUPPORTED_MOD_TYPES) {
 }
 
 
-#' @describeIn create_bbi_object Create list output from model_summaries(). Each element will contain a `bbi_{.model_type}_summary` object, as well as some metadata about possible errors.
-#' @param res_list List to attempt to assign the class to
+#' @describeIn create_bbi_object Create list output from [model_summaries()]. Each element will contain a `bbi_{.model_type}_summary` object, as well as some metadata about possible errors.
 #' @keywords internal
-create_summary_list <- function(res_list) {
+create_summary_list <- function(res) {
 
-  if(!inherits(res_list, "list")) {
+  if(!inherits(res, "list")) {
     stop(glue("Can only pass a list. Passed object has classes {paste(class(res), collapse = ', ')}"))
   }
 
   # check for required keys, just as an extra safety precaution
-  sum_bool <- map_lgl(res_list , ~check_required_keys(.x, .req = SUMMARY_LIST_REQ_KEYS))
+  sum_bool <- map_lgl(res, check_required_keys, .req = SUMMARY_LIST_REQ_KEYS)
 
   if (!all(sum_bool)) {
     err_msg <- paste0(
@@ -128,13 +126,12 @@ create_summary_list <- function(res_list) {
   }
 
   # assign class and return
-  class(res_list) <- c(as.character("bbi_summary_list"), class(res_list))
-  return(res_list)
+  class(res) <- c(as.character("bbi_summary_list"), class(res))
+  return(res)
 }
 
 
 #' @describeIn create_bbi_object Create list object of `babylon_process` class, first checking that all the required keys are present.
-#' @param res List to attempt to assign the class to
 #' @keywords internal
 create_process_object <- function(res) {
 

@@ -56,7 +56,7 @@ model_summaries(
 \arguments{
 \item{.mods}{The model object to summarize. Could be
 a \code{bbi_run_log_df} tibble,
-a list of \verb{bbi_\{.model_type\}_model } objects,
+a list of \verb{bbi_\{.model_type\}_model} objects,
 a character vector of file paths to models,
 a numeric vector of integers corresponding to a file names of a models.}
 
