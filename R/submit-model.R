@@ -353,7 +353,7 @@ submit_nonmem_models <- function(.mods,
                                  ...,
                                  .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
                                  .wait = TRUE,
-                                 .dry_run=FALSE) {
+                                 .dry_run = FALSE) {
 
   # check input list (this is a private method so if these fail there is a bug somewhere that calls this)
   if (!is_bare_list(.mods)) {

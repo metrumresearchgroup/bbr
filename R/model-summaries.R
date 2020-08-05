@@ -21,7 +21,7 @@
 #'
 #' @param .mods The model object to summarize. Could be
 #' a `bbi_run_log_df` tibble,
-#' a list of `bbi_{.model_type}_model ` objects,
+#' a list of `bbi_{.model_type}_model` objects,
 #' a character vector of file paths to models,
 #' a numeric vector of integers corresponding to a file names of a models.
 #' @param .fail_flags Same as `.bbi_args` except these are used _only_ when a [model_summary()] call fails.
