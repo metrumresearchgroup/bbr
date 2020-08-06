@@ -52,7 +52,6 @@ model_summaries.list <- function(
   .dry_run = FALSE,
   .directory = NULL
 ) {
-
   # Dev note: this dispatch is where the real work happens. All the other trickle through to here eventually.
 
   if (!is.null(.directory)) {

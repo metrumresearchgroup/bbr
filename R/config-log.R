@@ -31,7 +31,6 @@ config_log <- function(
   mod_list <- find_models(.base_dir, .recurse)
 
   df <- config_log_impl(mod_list)
-
   return(df)
 }
 
