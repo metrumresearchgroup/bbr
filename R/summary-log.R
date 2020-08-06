@@ -1,17 +1,12 @@
 #' Create a tibble from `model_summaries()` data
 #'
-#' Runs `model_summaries()` on all models in the input and returns a subset of the each resulting summary as a tibble.
-#' `summary_log()` will return a new tibble with the `"absolute_model_path"` column as the primary key,
-#' and all the columns extracted from `model_summaries()` (but none of the other columns from the input tibble).
-#' `add_summary()` takes a `bbi_run_log_df` tibble (the output from `run_log()`) and returns the input tibble,
-#' with all the columns extracted from `model_summaries()` joined onto it.
-#' See details section for fields included.
+#' Runs [model_summaries()] on all models in the input and returns a subset of the each resulting summary as a tibble.
 #'
 #' @details
 #' The following fields from `bbi_nonmem_summary` are extracted and included by default.
-#' If you would like more fields, you can extract them manually from the object in the `bbi_summary` column.
+#' If you would like more fields from the summary object, you can extract them manually from the `bbi_summary` list column.
 #'
-#' * `error_msg` -- Error message from `model_summary()`. If `NULL` the call succeeded. If not `NULL`, the rest of the fields will be `NULL`.
+#' * `error_msg` -- Error message from [model_summary()]. If `NULL` the call succeeded. If not `NULL`, the rest of the fields will be `NULL`.
 #' * `needed_fail_flags` -- Logical for whether the call initially failed, but passed with the inclusion of `.fail_flags`
 #' * `bbi_summary` -- The full `bbi_nonmem_summary` object for each row. This can be queried further by extracting it as a list, or by using `dplyr::mutate()` etc.
 #' * `ofv` -- Objective function value from last estimation method, using `$ofv$ofv_no_constant` field.
@@ -29,10 +24,21 @@
 #' * `has_final_zero_gradient` -- Extracted from `$run_heuristics`
 #' * `minimization_terminated` -- Extracted from `$run_heuristics`
 #'
-#' @seealso `run_log()`
-#' @param .base_dir Base directory to look in for models that will be summarized. Defaults to `get_model_directory()`, and falls back to `getwd()` if `get_model_directory()` returns `NULL`.
-#' @param .recurse If `TRUE`, the default, search recursively in subdirectories.
-#' @param ... Arguments passed through to `model_summaries()`.
+#' @return
+#' `summary_log()` will return a new tibble with the `'absolute_model_path'` column as the primary key,
+#' and all the columns extracted from [model_summaries()] (but none of the other columns from the input tibble).
+#'
+#' `add_summary()` takes a `bbi_run_log_df` tibble (the output from [run_log()]) and returns the input tibble,
+#' with all the columns extracted from [model_summaries()] joined onto it.
+#'
+#' @seealso [run_log()]
+#' @inheritParams run_log
+#' @param ... Arguments passed through to [model_summaries()].
+#' @importFrom dplyr mutate
+#' @importFrom purrr map transpose
+#' @importFrom tibble as_tibble
+#' @importFrom glue glue
+#' @importFrom tidyr unnest_wider
 #' @export
 summary_log <- function(
   .base_dir = get_model_directory(),
@@ -42,52 +48,26 @@ summary_log <- function(
 
   # if no directory defined, set to working directory
   if (is.null(.base_dir)) {
-    .base_dir <- getwd()
+    stop("`.base_dir` cannot be `NULL`. Either pass a valid directory path or use `set_model_directory()` to set `options('rbabylon.model_directory')` which will be used by default.", call. = FALSE)
   }
 
   mod_list <- find_models(.base_dir, .recurse)
-  if(is.null(mod_list)) {
-    return(NULL)
-  }
 
-  sum_df <- summary_log_impl(mod_list, ...)
+  res_df <- summary_log_impl(mod_list, ...)
 
-  # assign `bbi_summary_log_df` class, unless all models failed and we only have an error column
-  if(!identical(names(sum_df), c(ABS_MOD_PATH, SL_ERROR))) {
-    sum_df <- create_summary_log_object(sum_df)
-  }
-
-  return(sum_df)
+  return(res_df)
 }
 
 
 #' @rdname summary_log
-#' @param .log_df a `bbi_run_log_df` tibble
-#' @importFrom dplyr left_join
+#' @param .log_df a `bbi_run_log_df` tibble (the output of [run_log()])
+#' @param ... Arguments passed through to [model_summaries()]
 #' @export
 add_summary <- function(
   .log_df,
   ...
 ) {
-
-  # check input df
-  check_bbi_run_log_df_object(.log_df)
-
-  # get config log
-  mod_list <- map(.log_df[[ABS_MOD_PATH]], ~ read_model(.x))
-  sum_df <- summary_log_impl(mod_list, ...)
-
-  # join to log df
-  df <- left_join(
-    .log_df,
-    sum_df,
-    by = ABS_MOD_PATH
-  )
-
-  # assign `bbi_summary_log_df` class, unless all models failed and we only have an error column
-  if(!identical(names(sum_df), c(ABS_MOD_PATH, SL_ERROR))) {
-    df <- create_summary_log_object(df)
-  }
+  df <- add_log_impl(.log_df, summary_log_impl, ...)
   return(df)
 }
 
@@ -95,15 +75,21 @@ add_summary <- function(
 #' Build summary log
 #'
 #' Private implementation function for building the summary log from a list of model objects.
-#' This is called by both `summary_log()` and `add_summary()`.
-#' @importFrom purrr transpose
-#' @importFrom dplyr select mutate
-#' @importFrom tibble as_tibble
-#' @importFrom tidyr unnest_wider
-#' @param .mods List of model objects that will be passed to `model_summaries()`.
-#' @param ... Arguments passed through to `model_summaries()`
+#' This is called by both [summary_log()] and [add_summary()].
+#' @importFrom stringr str_subset
+#' @importFrom fs dir_ls file_exists
+#' @importFrom purrr map_df map_chr
+#' @importFrom dplyr select everything mutate mutate_at vars
+#' @importFrom jsonlite fromJSON
+#' @importFrom tibble tibble
+#' @param .mods List of model objects that will be passed to [model_summaries()].
+#' @param ... Arguments passed through to [model_summaries()]
 #' @keywords internal
 summary_log_impl <- function(.mods, ...) {
+
+  if(length(.mods) == 0) {
+    return(tibble())
+  }
 
   check_model_object_list(.mods)
 
@@ -121,16 +107,20 @@ summary_log_impl <- function(.mods, ...) {
   # and everything else will be NULL/NA anyway, so we just return the errors here.
   if (all(!is.na(res_df[[SL_ERROR]]))) {
     warning(glue("ALL {nrow(res_df)} MODEL SUMMARIES FAILED in `summary_log()` call. Check `error_msg` column for details."))
-    return(select(res_df, .data[[ABS_MOD_PATH]], .data[[SL_ERROR]]))
+    return(select(res_df, -.data[[SL_SUMMARY]], -.data[[SL_FAIL_FLAGS]]))
   }
 
-  res_df <- mutate(res_df,
-                   d =            extract_details(.data[[SL_SUMMARY]]),
-                   ofv =          extract_ofv(.data[[SL_SUMMARY]]),
-                   param_count =  extract_param_count(.data[[SL_SUMMARY]]),
-                   h =            extract_heuristics(.data[[SL_SUMMARY]])
-  ) %>%
-    unnest_wider(.data$d) %>% unnest_wider(.data$h)
+  res_df <- mutate_at(
+    res_df,
+    vars(SL_SUMMARY),
+    list(
+      d = extract_details,
+      ofv = extract_ofv,
+      param_count = extract_param_count,
+      h = extract_heuristics
+    ))
+
+  res_df <- res_df %>% unnest_wider(.data$d) %>% unnest_wider(.data$h)
 
   return(res_df)
 }
@@ -171,6 +161,7 @@ extract_details <- function(.s) {
     if(!inherits(.x, "list")) {
       return(NULL)
     }
+
     return(.x[DETAILS_ELEMENTS])
   })
 

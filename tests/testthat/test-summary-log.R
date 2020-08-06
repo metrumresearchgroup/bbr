@@ -8,6 +8,7 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
 OFV_REF <- 2636.846
 PARAM_COUNT_REF <- 7
 
+<<<<<<< HEAD
 SUMMARY_LOG_COLS <- 18
 ADD_SUMMARY_COLS <- 25
 
@@ -15,6 +16,10 @@ ADD_SUMMARY_COLS <- 25
 test_sum_df <- function(sum_df, .paths, .col_count) {
   expect_true(inherits(sum_df, SUM_LOG_CLASS))
 
+=======
+# helper to run expectations
+test_sum_df <- function(sum_df, .paths, .col_count) {
+>>>>>>> 71e27acfa38078b05a73db0da385c964964e810d
   num_mods <- length(.paths)
   expect_equal(nrow(sum_df), num_mods)
   expect_equal(ncol(sum_df), .col_count)
@@ -41,13 +46,28 @@ teardown({
 
 withr::with_options(list(rbabylon.model_directory = NULL), {
 
+<<<<<<< HEAD
   test_that("summary_log() errors with malformed YAML", {
     log_df <- expect_error(summary_log(), regexp = "Unexpected error.+model_path defined in yaml")
+=======
+  test_that("summary_log() errors with no .base_dir set", {
+    log_df <- expect_error(summary_log(), regexp = "`.base_dir` cannot be `NULL`")
+  })
+
+  test_that("summary_log() errors with malformed YAML", {
+    log_df <- expect_error(summary_log(getwd()), regexp = "Unexpected error.+model_path defined in yaml")
+>>>>>>> 71e27acfa38078b05a73db0da385c964964e810d
   })
 
   test_that("summary_log() returns NULL and warns when no YAML found", {
     log_df <- expect_warning(summary_log("data"), regexp = "Found no valid model YAML files in data")
+<<<<<<< HEAD
     expect_true(is.null(log_df))
+=======
+    expect_true(inherits(log_df, "tbl"))
+    expect_equal(nrow(log_df), 0)
+    expect_equal(ncol(log_df), 0)
+>>>>>>> 71e27acfa38078b05a73db0da385c964964e810d
   })
 }) # closing withr::with_options
 
@@ -71,7 +91,10 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
 
   test_that("add_summary() works correctly", {
     sum_df <- run_log() %>% add_summary()
+<<<<<<< HEAD
     expect_true(inherits(sum_df, RUN_LOG_CLASS))
+=======
+>>>>>>> 71e27acfa38078b05a73db0da385c964964e810d
     test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3, LEVEL2_MOD), RUN_LOG_COLS+SUM_LOG_COLS-1)
     expect_identical(sum_df$model_type, rep("nonmem", RUN_LOG_ROWS+1))
     expect_identical(sum_df$yaml_md5, ALL_MODS_YAML_MD5)

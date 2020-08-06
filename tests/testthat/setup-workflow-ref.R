@@ -49,8 +49,20 @@ NEW_TEXT2 <- c("all", "done")
 
 SUMMARY_REF_FILE <- "data/acop_summary_obj_ref_200616.rds"
 
+<<<<<<< HEAD:tests/testthat/setup-workflow-ref.R
 SUM_CLASS_LIST <- c(SUM_CLASS, "list")
 MOD_CLASS_LIST <- c(NM_MOD_CLASS, "list")
+=======
+MOD_CLASS <- "bbi_nonmem_model"
+SUM_CLASS <- "bbi_nonmem_summary"
+SL_CLASS <- "bbi_summary_list"
+PROC_CLASS <- "babylon_process"
+LOG_CLASS <- "bbi_run_log_df"
+
+
+SUM_CLASS_LIST <- c(SUM_CLASS, "list")
+MOD_CLASS_LIST <- c(MOD_CLASS, "list")
+>>>>>>> 71e27acfa38078b05a73db0da385c964964e810d:tests/testthat/data/test-workflow-ref.R
 PROC_CLASS_LIST <- c(PROC_CLASS, "list")
 
 SUMS_LIST_NAMES_REF <- c("absolute_model_path", "bbi_summary", "error_msg", "needed_fail_flags")
@@ -101,6 +113,7 @@ REF_LIST_TMP <- list(
   output_dir = "tmp"
 )
 class(REF_LIST_TMP) <- MOD_CLASS_LIST
+<<<<<<< HEAD:tests/testthat/setup-workflow-ref.R
 
 ALL_MODS_YAML_MD5 <- c("ee5a30a015c4e09bc29334188ff28b58", "9d689b937fb36e5c3e98e59053b59e73", "b65d8911e9f8007a743e7c93934ce88e", "793cf7a6a04ddcdfc3b6511466a690b3")
 
@@ -112,6 +125,19 @@ ALL_MODS_YAML_MD5 <- c("ee5a30a015c4e09bc29334188ff28b58", "9d689b937fb36e5c3e98
 LIST1 <- list(naw=4, paw=6)
 LIST2 <- list(naw=5, saw="hey")
 
+=======
+
+ALL_MODS_YAML_MD5 <- c("ee5a30a015c4e09bc29334188ff28b58", "9d689b937fb36e5c3e98e59053b59e73", "b65d8911e9f8007a743e7c93934ce88e", "793cf7a6a04ddcdfc3b6511466a690b3")
+
+#####################
+# utils.R constants
+#####################
+
+# lists for combining and merging
+LIST1 <- list(naw=4, paw=6)
+LIST2 <- list(naw=5, saw="hey")
+
+>>>>>>> 71e27acfa38078b05a73db0da385c964964e810d:tests/testthat/data/test-workflow-ref.R
 # for combine_directory_path()
 ABS_CTL_PATH <- file.path(getwd(), MODEL_DIR, glue::glue("{MOD_ID}.ctl"))
 FAKE_CTL_PATH <- file.path(getwd(), MODEL_DIR, CTL_TEST_FILE)

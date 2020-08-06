@@ -1,6 +1,6 @@
 #' Summarize multiple models in batch
 #'
-#' Run multiple `model_summary()` calls in batch.
+#' Run multiple [model_summary()] calls in batch.
 #' All these dispatches will return a list of `bbi_{.model_type}_summary` objects.
 #'
 #' @details
@@ -21,10 +21,10 @@
 #'
 #' @param .mods The model object to summarize. Could be
 #' a `bbi_run_log_df` tibble,
-#' a list of `bbi_{.model_type}_model ` objects,
+#' a list of `bbi_{.model_type}_model` objects,
 #' a character vector of file paths to models,
 #' a numeric vector of integers corresponding to a file names of a models.
-#' @param .fail_flags Same as `.bbi_args` except these are used _only_ when a `model_summary()` call fails.
+#' @param .fail_flags Same as `.bbi_args` except these are used _only_ when a [model_summary()] call fails.
 #' In that case, flags are appended to anything in `.bbi_args` and the summary is tried again.
 #' Defaults to `list(no_grd_file = TRUE, no_shk_file = TRUE)`.
 #' This is a "dumb" way of automatically catching Bayesian or something else that doesn't produce certain output files.
@@ -43,6 +43,7 @@ model_summaries <- function(
 }
 
 #' @describeIn model_summaries Summarize a list of `bbi_{.model_type}_model` objects.
+#' @export
 model_summaries.list <- function(
   .mods,
   .bbi_args = NULL,
@@ -51,6 +52,8 @@ model_summaries.list <- function(
   .dry_run = FALSE,
   .directory = NULL
 ) {
+
+  # Dev note: this dispatch is where the real work happens. All the other trickle through to here eventually.
 
   if (!is.null(.directory)) {
     warning(paste(glue("Passed `.directory = {.directory}` to model_summaries.list().") ,
@@ -220,3 +223,4 @@ as_summary_list.bbi_summary_log_df <- function(.sums) {
   .sum_list <- create_summary_list(.sum_list)
   return(.sum_list)
 }
+

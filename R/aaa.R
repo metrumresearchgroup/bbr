@@ -146,6 +146,7 @@ DETAILS_ELEMENTS <- c(
   "number_of_obs"
 )
 
+
 ANY_HEURISTICS <- "any_heuristics"
 HEURISTICS_ELEMENTS <- c(
   "covariance_step_aborted",

@@ -20,7 +20,11 @@ MODEL_DIR_BBI <- "model-examples-bbi"
 BBI_PATH <- read_bbi_path()
 
 # cleanup function
+<<<<<<< HEAD
 cleanup_bbi <- function(.recreate_dir = FALSE) {
+=======
+cleanup <- function(.recreate_dir = FALSE) {
+>>>>>>> 71e27acfa38078b05a73db0da385c964964e810d
   if (fs::dir_exists(MODEL_DIR_BBI)) fs::dir_delete(MODEL_DIR_BBI)
   if (isTRUE(.recreate_dir)) fs::dir_create(MODEL_DIR_BBI)
 }

@@ -6,12 +6,13 @@
 #'
 #' Parses all model YAML files and outputs into a tibble that serves as a run log for the project.
 #' Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
-#' Users can also use `add_config()` to append additional output about the model run.
-#' @seealso `add_config()`
-#' @param .base_dir Directory to search for model YAML files. Only models with a corresponding YAML will be included. Defaults to `get_model_directory()`, and falls back to `getwd()` if `get_model_directory()` returns `NULL`.
+#' Users can also use [add_config()] or [add_summary()] to append additional output about the model run.
+#' @seealso [config_log()], [summary_log()]
+#' @param .base_dir Base directory to look in for models. Defaults to [get_model_directory()].
 #' @param .recurse If `TRUE`, the default, search recursively in all subdirectories. Passed through to `fs::dir_ls()` -- If a positive number, the number of levels to recurse.
 #' @importFrom purrr map_df
-#' @return A tibble of class `bbi_run_log_df` with information on each model.
+#' @importFrom tibble tibble
+#' @return A tibble of class `bbi_run_log_df` with information on each model, or an empty tibble if no models are found.
 #' @export
 run_log <- function(
   .base_dir = get_model_directory(),
@@ -20,12 +21,12 @@ run_log <- function(
 
   # if no directory defined, set to working directory
   if (is.null(.base_dir)) {
-    .base_dir <- getwd()
+    stop("`.base_dir` cannot be `NULL`. Either pass a valid directory path or use `set_model_directory()` to set `options('rbabylon.model_directory')` which will be used by default.", call. = FALSE)
   }
 
   mod_list <- find_models(.base_dir, .recurse)
-  if(is.null(mod_list)) {
-    return(NULL)
+  if(length(mod_list) == 0) {
+    return(tibble())
   }
 
   df <- mod_list %>% map_df(run_log_entry)
@@ -39,11 +40,11 @@ run_log <- function(
 #' Search for model YAML files and read them
 #'
 #' Private helper function that searches from a base directory for any YAML files (excluding `babylon.yaml`)
-#' and attempts to read them to a model object with `safe_read_model()`.
+#' and attempts to read them to a model object with [safe_read_model()].
 #' @param .base_dir Directory to search for model YAML files.
 #' @param .recurse If `TRUE` search recursively in subdirectories as well.
 #' @importFrom stringr str_subset
-#' @importFrom purrr map_lgl map
+#' @importFrom purrr map_lgl map compact
 #' @importFrom fs dir_ls
 #' @keywords internal
 find_models <- function(.base_dir, .recurse) {
@@ -57,17 +58,15 @@ find_models <- function(.base_dir, .recurse) {
   all_yaml <- map(yaml_files, safe_read_model, .directory = NULL)
 
   # filter to only model yaml's
-  not_mod_bool <- map_lgl(all_yaml, is.null)
-  not_mod <- yaml_files[which(not_mod_bool)]
-  if (length(not_mod) > 0) {
+  mod_list <- purrr::compact(all_yaml)
+  if (length(mod_list) != length(all_yaml)) {
+    not_mod <- yaml_files[which(is.null(all_yaml))]
     warning(glue("Found {length(not_mod)} YAML files that do not contain required keys for a model YAML. Ignoring the following files: `{paste(not_mod, collapse='`, `')}`"))
   }
-  mod_list <- all_yaml[!not_mod_bool]
 
-  # stop if no valid model YAML found
+  # warn if no valid model YAML found
   if (length(mod_list) == 0) {
     warning(glue("Found no valid model YAML files in {.base_dir}"))
-    return(NULL)
   }
 
   return(mod_list)
@@ -97,6 +96,33 @@ safe_read_model <- function(.yaml_path, .directory = get_model_directory()) {
   return(.mod)
 }
 
+
+#' Add columns to log df
+#'
+#' Private helper to extact columns from another log tibble and join them onto a `bbi_run_log_df`
+#' @importFrom dplyr left_join
+#' @importFrom purrr map
+#' @param .log_df a `bbi_run_log_df` tibble (the output of [run_log()])
+#' @param .impl_func Implementation function to extract the appropriate log tibble that will be joined against the input tibble.
+#' @param ... Arguments passed through to `.impl_func`
+#' @return The input `bbi_run_log_df` tibble, with any columns from the tibble output by `.impl_func` left joined onto it.
+add_log_impl <- function(.log_df, .impl_func, ...) {
+  # check input df
+  check_bbi_run_log_df_object(.log_df)
+
+  # get config log
+  mod_list <- map(.log_df[[ABS_MOD_PATH]], read_model)
+  .new_df <- .impl_func(mod_list, ...)
+
+  # join to log df
+  df <- left_join(
+    .log_df,
+    .new_df,
+    by = ABS_MOD_PATH
+  )
+
+  return(df)
+}
 
 
 #' Create a run log row from a `bbi_{.model_type}_model` object

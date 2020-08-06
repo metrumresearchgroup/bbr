@@ -348,12 +348,12 @@ submit_models.numeric <- function(
 #' @return A list of S3 objects of class `babylon_process`
 #' @keywords internal
 submit_nonmem_models <- function(.mods,
-                                .bbi_args = NULL,
-                                .mode = c("sge", "local"),
-                                ...,
-                                .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
-                                .wait = TRUE,
-                                .dry_run=FALSE) {
+                                 .bbi_args = NULL,
+                                 .mode = c("sge", "local"),
+                                 ...,
+                                 .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
+                                 .wait = TRUE,
+                                 .dry_run = FALSE) {
 
   # check input list (this is a private method so if these fail there is a bug somewhere that calls this)
   if (!is_bare_list(.mods)) {
@@ -393,7 +393,7 @@ submit_nonmem_models <- function(.mods,
     return(map(
       cmd_args_list,
       function(.run) { bbi_dry_run(.run$cmd_args, .run$model_dir) }
-      ))
+    ))
   }
 
   # launch models
@@ -405,6 +405,5 @@ submit_nonmem_models <- function(.mods,
 
   return(res_list)
 }
-
 
 

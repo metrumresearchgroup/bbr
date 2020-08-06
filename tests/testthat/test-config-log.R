@@ -1,7 +1,10 @@
 context("Constructing config log from bbi_config.json")
 
 check_config_ref <- function(log_df, run_nums, col_count) {
+<<<<<<< HEAD
   expect_true(inherits(log_df, CONF_LOG_CLASS))
+=======
+>>>>>>> 71e27acfa38078b05a73db0da385c964964e810d
 
   expect_identical(basename(log_df[[ABS_MOD_PATH]]), run_nums)
 
@@ -45,13 +48,28 @@ teardown({ cleanup() })
 
 withr::with_options(list(rbabylon.model_directory = NULL), {
 
+<<<<<<< HEAD
   test_that("config_log() errors with malformed YAML", {
     log_df <- expect_error(config_log(), regexp = "Unexpected error.+model_path defined in yaml")
+=======
+  test_that("config_log() errors with no .base_dir set", {
+    log_df <- expect_error(config_log(), regexp = "`.base_dir` cannot be `NULL`")
+  })
+
+  test_that("config_log() errors with malformed YAML", {
+    log_df <- expect_error(config_log(getwd()), regexp = "Unexpected error.+model_path defined in yaml")
+>>>>>>> 71e27acfa38078b05a73db0da385c964964e810d
   })
 
   test_that("config_log() returns NULL and warns when no YAML found", {
     log_df <- expect_warning(config_log("data"), regexp = "Found no valid model YAML files in data")
+<<<<<<< HEAD
     expect_true(is.null(log_df))
+=======
+    expect_true(inherits(log_df, "tbl"))
+    expect_equal(nrow(log_df), 0)
+    expect_equal(ncol(log_df), 0)
+>>>>>>> 71e27acfa38078b05a73db0da385c964964e810d
   })
 
   test_that("config_log() works correctly with nested dirs", {
@@ -66,18 +84,28 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("add_config() works correctly", {
     log_df <- run_log(MODEL_DIR) %>% add_config()
+<<<<<<< HEAD
     expect_true(inherits(log_df, RUN_LOG_CLASS))
     check_config_ref(log_df, c("1", "2", "3", "1"), RUN_LOG_COLS+CONFIG_COLS-1)
   })
 
   # THESE TESTS NEEDS TO BE LAST BECAUSE IT DELETES NECESSARY FILES
+=======
+    check_config_ref(log_df, c("1", "2", "3", "1"), RUN_LOG_COLS+CONFIG_COLS-1)
+  })
+
+  # THESE TESTS NEED TO BE LAST BECAUSE IT DELETES NECESSARY FILES
+>>>>>>> 71e27acfa38078b05a73db0da385c964964e810d
   fs::file_delete(file.path(NEW_MOD2, "bbi_config.json"))
   fs::file_delete(file.path(NEW_MOD3, "bbi_config.json"))
 
   test_that("add_config() works correctly with missing json", {
     log_df <- expect_warning(run_log(MODEL_DIR) %>% add_config(), regexp = "Found only 2 bbi_config.json files for 4 models")
+<<<<<<< HEAD
     expect_true(inherits(log_df, CONF_LOG_CLASS))
     expect_true(inherits(log_df, RUN_LOG_CLASS))
+=======
+>>>>>>> 71e27acfa38078b05a73db0da385c964964e810d
     expect_equal(nrow(log_df), RUN_LOG_ROWS+1)
     expect_equal(ncol(log_df), RUN_LOG_COLS+CONFIG_COLS-1)
     expect_false(any(duplicated(log_df[[ABS_MOD_PATH]])))

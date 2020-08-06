@@ -13,6 +13,6 @@ find_models(.base_dir, .recurse)
 }
 \description{
 Private helper function that searches from a base directory for any YAML files (excluding \code{babylon.yaml})
-and attempts to read them to a model object with \code{safe_read_model()}.
+and attempts to read them to a model object with \code{\link[=safe_read_model]{safe_read_model()}}.
 }
 \keyword{internal}

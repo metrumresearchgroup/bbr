@@ -56,14 +56,14 @@ model_summaries(
 \arguments{
 \item{.mods}{The model object to summarize. Could be
 a \code{bbi_run_log_df} tibble,
-a list of \verb{bbi_\{.model_type\}_model } objects,
+a list of \verb{bbi_\{.model_type\}_model} objects,
 a character vector of file paths to models,
 a numeric vector of integers corresponding to a file names of a models.}
 
 \item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}.
 See \code{print_nonmem_args()} for full list of options.}
 
-\item{.fail_flags}{Same as \code{.bbi_args} except these are used \emph{only} when a \code{model_summary()} call fails.
+\item{.fail_flags}{Same as \code{.bbi_args} except these are used \emph{only} when a \code{\link[=model_summary]{model_summary()}} call fails.
 In that case, flags are appended to anything in \code{.bbi_args} and the summary is tried again.
 Defaults to \code{list(no_grd_file = TRUE, no_shk_file = TRUE)}.
 This is a "dumb" way of automatically catching Bayesian or something else that doesn't produce certain output files.
@@ -76,7 +76,7 @@ See details section for more info on these flags.}
 \item{.directory}{Model directory which \code{.mod} path is relative to. Defaults to \code{options('rbabylon.model_directory')}, which can be set globally with \code{set_model_directory()}. \strong{Only used when passing a path for \code{.mod} instead of a \verb{bbi_\{.model_type\}_model} object.}}
 }
 \description{
-Run multiple \code{model_summary()} calls in batch.
+Run multiple \code{\link[=model_summary]{model_summary()}} calls in batch.
 All these dispatches will return a list of \verb{bbi_\{.model_type\}_summary} objects.
 }
 \details{
