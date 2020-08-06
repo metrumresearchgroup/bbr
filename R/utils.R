@@ -347,7 +347,7 @@ check_model_object_list <- function(.mods, .mod_types = VALID_MOD_CLASSES) {
 #' @keywords internal
 check_bbi_run_log_df_object <- function(.df) {
   if (!inherits(.df, "bbi_run_log_df")) {
-    stop(glue("Must pass a tibble of class `bbi_run_log_df`, but got object of class: `{paste(class(.mod), collapse = ', ')}`"))
+    stop(glue("Must pass a tibble of class `bbi_run_log_df`, but got object of class: `{paste(class(.df), collapse = ', ')}`"))
   }
   return(invisible(TRUE))
 }

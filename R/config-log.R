@@ -9,17 +9,14 @@
 #' It stores metadata about the execution of a model run,
 #' including md5 hashes of the model file (control stream) and data file at the time the model was run.
 #'
-#' @details
-#' `config_log()` will return a tibble with one row per `bbi_config.json` found.
+#' @return
+#' `config_log()` will return a tibble with one row per `bbi_config.json` found in `.base_dir` (and optionally subdirectories).
 #'
-#' `add_config()` takes a `bbi_run_log_df` tibble (the output of `run_log()`) as its input,
-#' searches for a `bbi_config.json` for each row in the input tibble,
-#' and joins on the data from the relevant config, if found.
-#' The returned tibble will have all of its input columns, plus all of the columns returned from `config_log()`
+#' `add_config()` takes a `bbi_run_log_df` tibble (the output from [run_log()]) and returns the input tibble,
+#' with all the columns from `config_log()` joined onto it.
 #'
-#' @seealso `run_log()`
-#' @param .base_dir Base directory to look in for models. Defaults to `get_model_directory()`, and falls back to `getwd()` if `get_model_directory()` returns `NULL`.
-#' @param .recurse If `TRUE`, the default, search recursively in subdirectories.
+#' @seealso [run_log()]
+#' @inheritParams run_log
 #' @export
 config_log <- function(
   .base_dir = get_model_directory(),
@@ -28,54 +25,41 @@ config_log <- function(
 
   # if no directory defined, set to working directory
   if (is.null(.base_dir)) {
-    .base_dir <- getwd()
+    stop("`.base_dir` cannot be `NULL`. Either pass a valid directory path or use `set_model_directory()` to set `options('rbabylon.model_directory')` which will be used by default.", call. = FALSE)
   }
 
   mod_list <- find_models(.base_dir, .recurse)
-  if(is.null(mod_list)) {
-    return(NULL)
-  }
 
   df <- config_log_impl(mod_list)
   return(df)
 }
 
 
-#' @param .log_df a `bbi_run_log_df` tibble (the output of `run_log()`)
-#' @importFrom dplyr left_join
-#' @importFrom purrr map
 #' @rdname config_log
+#' @param .log_df a `bbi_run_log_df` tibble (the output of [run_log()])
 #' @export
 add_config <- function(.log_df) {
-  # check input df
-  check_bbi_run_log_df_object(.log_df)
-
-  # get config log
-  mod_list <- map(.log_df[[ABS_MOD_PATH]], ~ read_model(.x))
-  .conf_df <- config_log_impl(mod_list)
-
-  # join to log df
-  df <- left_join(
-    .log_df,
-    .conf_df,
-    by = ABS_MOD_PATH
-  )
-
+  df <- add_log_impl(.log_df, config_log_impl)
   return(df)
 }
 
 #' Build config log
 #'
 #' Private implementation function for building the config log from a list of model objects.
-#' This is called by both `config_log()` and `add_config()`.
+#' This is called by both [config_log()] and [add_config()].
 #' @importFrom stringr str_subset
 #' @importFrom fs dir_ls file_exists
 #' @importFrom purrr map_df map_chr
 #' @importFrom dplyr select everything
 #' @importFrom jsonlite fromJSON
+#' @importFrom tibble tibble
 #' @param .mods List of model objects. The function will attempt to find a `bbi_config.json` file for each model.
 #' @keywords internal
 config_log_impl <- function(.mods) {
+
+  if(length(.mods) == 0) {
+    return(tibble())
+  }
 
   check_model_object_list(.mods)
 
@@ -87,7 +71,7 @@ config_log_impl <- function(.mods) {
 
   if (all(missing)) {
     warning(glue("Found no bbi_config.json files for {length(.mods)} models."), call. = FALSE)
-    return(NULL)
+    return(tibble())
   }
 
   if (any(missing)) {
@@ -118,7 +102,7 @@ config_log_impl <- function(.mods) {
     }
 
     .conf_list <- .conf_list[CONFIG_KEEPERS]
-    .conf_list[[ABS_MOD_PATH]] = dirname(.path)
+    .conf_list[[ABS_MOD_PATH]] <- dirname(.path)
 
     return(.conf_list)
   })

@@ -44,13 +44,19 @@ teardown({ cleanup() })
 
 withr::with_options(list(rbabylon.model_directory = NULL), {
 
+  test_that("config_log() errors with no .base_dir set", {
+    log_df <- expect_error(config_log(), regexp = "`.base_dir` cannot be `NULL`")
+  })
+
   test_that("config_log() errors with malformed YAML", {
-    log_df <- expect_error(config_log(), regexp = "Unexpected error.+model_path defined in yaml")
+    log_df <- expect_error(config_log(getwd()), regexp = "Unexpected error.+model_path defined in yaml")
   })
 
   test_that("config_log() returns NULL and warns when no YAML found", {
     log_df <- expect_warning(config_log("data"), regexp = "Found no valid model YAML files in data")
-    expect_true(is.null(log_df))
+    expect_true(inherits(log_df, "tbl"))
+    expect_equal(nrow(log_df), 0)
+    expect_equal(ncol(log_df), 0)
   })
 
   test_that("config_log() works correctly with nested dirs", {
@@ -68,7 +74,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     check_config_ref(log_df, c("1", "2", "3", "1"), RUN_LOG_COLS+CONFIG_COLS-1)
   })
 
-  # THESE TESTS NEEDS TO BE LAST BECAUSE IT DELETES NECESSARY FILES
+  # THESE TESTS NEED TO BE LAST BECAUSE IT DELETES NECESSARY FILES
   fs::file_delete(file.path(NEW_MOD2, "bbi_config.json"))
   fs::file_delete(file.path(NEW_MOD3, "bbi_config.json"))
 

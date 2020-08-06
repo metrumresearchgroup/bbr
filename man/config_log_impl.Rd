@@ -11,6 +11,6 @@ config_log_impl(.mods)
 }
 \description{
 Private implementation function for building the config log from a list of model objects.
-This is called by both \code{config_log()} and \code{add_config()}.
+This is called by both \code{\link[=config_log]{config_log()}} and \code{\link[=add_config]{add_config()}}.
 }
 \keyword{internal}

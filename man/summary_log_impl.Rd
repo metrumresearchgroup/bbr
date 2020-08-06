@@ -7,12 +7,12 @@
 summary_log_impl(.mods, ...)
 }
 \arguments{
-\item{.mods}{List of model objects that will be passed to \code{model_summaries()}.}
+\item{.mods}{List of model objects that will be passed to \code{\link[=model_summaries]{model_summaries()}}.}
 
-\item{...}{Arguments passed through to \code{model_summaries()}}
+\item{...}{Arguments passed through to \code{\link[=model_summaries]{model_summaries()}}}
 }
 \description{
 Private implementation function for building the summary log from a list of model objects.
-This is called by both \code{summary_log()} and \code{add_summary()}.
+This is called by both \code{\link[=summary_log]{summary_log()}} and \code{\link[=add_summary]{add_summary()}}.
 }
 \keyword{internal}

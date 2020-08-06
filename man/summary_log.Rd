@@ -10,27 +10,29 @@ summary_log(.base_dir = get_model_directory(), .recurse = TRUE, ...)
 add_summary(.log_df, ...)
 }
 \arguments{
-\item{.base_dir}{Base directory to look in for models that will be summarized. Defaults to \code{get_model_directory()}, and falls back to \code{getwd()} if \code{get_model_directory()} returns \code{NULL}.}
+\item{.base_dir}{Base directory to look in for models. Defaults to \code{\link[=get_model_directory]{get_model_directory()}}.}
 
-\item{.recurse}{If \code{TRUE}, the default, search recursively in subdirectories.}
+\item{.recurse}{If \code{TRUE}, the default, search recursively in all subdirectories. Passed through to \code{fs::dir_ls()} -- If a positive number, the number of levels to recurse.}
 
-\item{...}{Arguments passed through to \code{model_summaries()}.}
+\item{...}{Arguments passed through to \code{\link[=model_summaries]{model_summaries()}}}
 
-\item{.log_df}{a \code{bbi_run_log_df} tibble}
+\item{.log_df}{a \code{bbi_run_log_df} tibble (the output of \code{\link[=run_log]{run_log()}})}
+}
+\value{
+\code{summary_log()} will return a new tibble with the \code{'absolute_model_path'} column as the primary key,
+and all the columns extracted from \code{\link[=model_summaries]{model_summaries()}} (but none of the other columns from the input tibble).
+
+\code{add_summary()} takes a \code{bbi_run_log_df} tibble (the output from \code{\link[=run_log]{run_log()}}) and returns the input tibble,
+with all the columns extracted from \code{\link[=model_summaries]{model_summaries()}} joined onto it.
 }
 \description{
-Runs \code{model_summaries()} on all models in the input and returns a subset of the each resulting summary as a tibble.
-\code{summary_log()} will return a new tibble with the \code{"absolute_model_path"} column as the primary key,
-and all the columns extracted from \code{model_summaries()} (but none of the other columns from the input tibble).
-\code{add_summary()} takes a \code{bbi_run_log_df} tibble (the output from \code{run_log()}) and returns the input tibble,
-with all the columns extracted from \code{model_summaries()} joined onto it.
-See details section for fields included.
+Runs \code{\link[=model_summaries]{model_summaries()}} on all models in the input and returns a subset of the each resulting summary as a tibble.
 }
 \details{
 The following fields from \code{bbi_nonmem_summary} are extracted and included by default.
-If you would like more fields, you can extract them manually from the object in the \code{bbi_summary} column.
+If you would like more fields from the summary object, you can extract them manually from the \code{bbi_summary} list column.
 \itemize{
-\item \code{error_msg} -- Error message from \code{model_summary()}. If \code{NULL} the call succeeded. If not \code{NULL}, the rest of the fields will be \code{NULL}.
+\item \code{error_msg} -- Error message from \code{\link[=model_summary]{model_summary()}}. If \code{NULL} the call succeeded. If not \code{NULL}, the rest of the fields will be \code{NULL}.
 \item \code{needed_fail_flags} -- Logical for whether the call initially failed, but passed with the inclusion of \code{.fail_flags}
 \item \code{bbi_summary} -- The full \code{bbi_nonmem_summary} object for each row. This can be queried further by extracting it as a list, or by using \code{dplyr::mutate()} etc.
 \item \code{ofv} -- Objective function value from last estimation method, using \verb{$ofv$ofv_no_constant} field.
@@ -50,5 +52,5 @@ If you would like more fields, you can extract them manually from the object in 
 }
 }
 \seealso{
-\code{run_log()}
+\code{\link[=run_log]{run_log()}}
 }

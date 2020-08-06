@@ -36,13 +36,19 @@ teardown({
 
 withr::with_options(list(rbabylon.model_directory = NULL), {
 
+  test_that("summary_log() errors with no .base_dir set", {
+    log_df <- expect_error(summary_log(), regexp = "`.base_dir` cannot be `NULL`")
+  })
+
   test_that("summary_log() errors with malformed YAML", {
-    log_df <- expect_error(summary_log(), regexp = "Unexpected error.+model_path defined in yaml")
+    log_df <- expect_error(summary_log(getwd()), regexp = "Unexpected error.+model_path defined in yaml")
   })
 
   test_that("summary_log() returns NULL and warns when no YAML found", {
     log_df <- expect_warning(summary_log("data"), regexp = "Found no valid model YAML files in data")
-    expect_true(is.null(log_df))
+    expect_true(inherits(log_df, "tbl"))
+    expect_equal(nrow(log_df), 0)
+    expect_equal(ncol(log_df), 0)
   })
 }) # closing withr::with_options
 
