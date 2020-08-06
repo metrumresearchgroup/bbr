@@ -53,7 +53,7 @@ submit_models(
 }
 \arguments{
 \item{.mods}{The model object to submit. Could be
-a list of \verb{bbi_\{.model_type\}_model } object,
+a list of \verb{bbi_\{.model_type\}_model } objects,
 a character vector of file paths to models,
 a numeric vector of integers corresponding to a file names of a models.}
 

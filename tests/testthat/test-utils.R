@@ -1,10 +1,5 @@
 context("Utility functions for building args, etc.")
 
-# source constants and reference objects
-source("data/utils-reference.R")
-
-# tests
-
 ################
 # parsing args
 ################

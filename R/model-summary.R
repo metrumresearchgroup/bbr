@@ -34,15 +34,14 @@
 #' For example, if have asked to skip the `$COV` step, you would call `model_summary(..., .bbi_args = list(no_cov_file = TRUE))`.
 #'
 #' @param .mod Model to summarize. Can be a `bbi_{.model_type}_model` object, a file path, or an integer corresponding to a file path.
-#' @param .model_type String specifying the type of model, either 'nonmem' or 'stan'.  **Only used when passing a path for `.mod` instead of a `bbi_{.model_type}_model` object.**
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`.
+#' See `print_nonmem_args()` for full list of options.
 #' @param ... args passed through to `bbi_exec()`
 #' @param .dry_run show what the command would be without actually running it
 #' @param .directory Model directory which `.mod` path is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`. **Only used when passing a path for `.mod` instead of a `bbi_{.model_type}_model` object.**
 #' @export
 model_summary <- function(
   .mod,
-  .model_type = NULL,
   .bbi_args = NULL,
   ...,
   .dry_run = FALSE,
@@ -55,7 +54,6 @@ model_summary <- function(
 #' @export
 model_summary.bbi_nonmem_model <- function(
   .mod,
-  .model_type = NULL,
   .bbi_args = NULL,
   ...,
   .dry_run = FALSE,
@@ -66,12 +64,6 @@ model_summary.bbi_nonmem_model <- function(
     warning(paste(glue("Passed `.directory = {.directory}` to model_summary.bbi_nonmem_model().") ,
                   "This argument is only valid when passing a path to `model_summary()`.",
                   "`bbi_nonmem_model` object was passed, so `.directory` inferred from `.mod${WORKING_DIR}`"))
-  }
-
-  if (!is.null(.model_type)) {
-    warning(paste(glue("Passed `.model_type = {.model_type}` to model_summary.bbi_nonmem_model().") ,
-                  "This argument is only valid when passing a path to `model_summary()`.",
-                  "`bbi_nonmem_model` object was passed, so `.model_type` set to `nonmem`"))
   }
 
   res_list <- nonmem_summary(
@@ -87,7 +79,6 @@ model_summary.bbi_nonmem_model <- function(
 #' @export
 model_summary.character <- function(
   .mod,
-  .model_type = c("nonmem", "stan"),
   .bbi_args = NULL,
   ...,
   .dry_run = FALSE,
@@ -98,20 +89,16 @@ model_summary.character <- function(
   .mod <- combine_directory_path(.directory, .mod)
 
   # check model type
-  .model_type <- match.arg(.model_type)
-  if (.model_type == "nonmem") {
-    .mod <- read_model(.mod)
-    res_list <- nonmem_summary(
-      .mod = .mod,
-      .bbi_args = .bbi_args,
-      ...,
-      .dry_run = .dry_run
-    )
-  } else if (.model_type == "stan") {
-    stop(NO_STAN_ERR_MSG)
-  } else {
-    stop(glue("Passed `{.model_type}`. Valid options: `{paste(SUPPORTED_MOD_TYPES, collapse = ', ')}`"))
-  }
+  .mod <- read_model(.mod)
+
+  res_list <- model_summary(
+    .mod,
+    .bbi_args = .bbi_args,
+    ...,
+    .dry_run = .dry_run,
+    .directory = NULL
+  )
+
   return(res_list)
 }
 
@@ -121,7 +108,6 @@ model_summary.character <- function(
 #' @export
 model_summary.numeric <- function(
   .mod,
-  .model_type = c("nonmem", "stan"),
   .bbi_args = NULL,
   ...,
   .dry_run = FALSE,
@@ -134,7 +120,6 @@ model_summary.numeric <- function(
   # call character dispatch
   res_list <- model_summary(
     .mod = .mod,
-    .model_type = .model_type,
     .bbi_args = .bbi_args,
     ...,
     .dry_run = .dry_run,
@@ -144,6 +129,10 @@ model_summary.numeric <- function(
   return(res_list)
 }
 
+
+###################################
+# PRIVATE IMPLEMENTATION FUNCTIONS
+###################################
 
 #' Run `bbi nonmem summary` and parse the output to a list
 #'
@@ -214,5 +203,4 @@ check_lst_file <- function(.x) {
   }
   lst_file
 }
-
 

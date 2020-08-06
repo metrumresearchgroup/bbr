@@ -321,7 +321,7 @@ find_config_file_path <- function(.config_path, .model_dir) {
 #' @keywords internal
 check_model_object <- function(.mod, .mod_types = VALID_MOD_CLASSES) {
   if (!inherits(.mod, .mod_types)) {
-    stop(glue("Must pass a model object, but got object of class {paste(class(.mod), collapse = ', ')}"))
+    stop(glue("Must pass a model object, but got object of class: `{paste(class(.mod), collapse = ', ')}`"))
   }
   return(invisible(TRUE))
 }

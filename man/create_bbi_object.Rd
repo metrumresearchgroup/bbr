@@ -4,21 +4,22 @@
 \alias{create_bbi_object}
 \alias{create_model_object}
 \alias{create_summary_object}
+\alias{create_summary_list}
 \alias{create_process_object}
 \alias{create_run_log_object}
 \title{Create bbi object}
 \usage{
-create_model_object(.mod_list)
+create_model_object(res)
 
 create_summary_object(res, .model_type = SUPPORTED_MOD_TYPES)
+
+create_summary_list(res)
 
 create_process_object(res)
 
 create_run_log_object(log_df)
 }
 \arguments{
-\item{.mod_list}{List with the required information to create a model object}
-
 \item{res}{List to attempt to assign the class to}
 
 \item{.model_type}{Character scalar of a valid model type (currently either \code{nonmem} or \code{stan})}
@@ -33,6 +34,8 @@ Constructor functions for objects of fundamental rbabylon classes.
 \item \code{create_model_object}: Creates list object of class \verb{bbi_\{.model_type\}_model} from named list with \code{MODEL_REQ_INPUT_KEYS}
 
 \item \code{create_summary_object}: Create list object of \verb{bbi_\{.model_type\}_summary} class, first checking that all the required keys are present.
+
+\item \code{create_summary_list}: Create list output from \code{\link[=model_summaries]{model_summaries()}}. Each element will contain a \verb{bbi_\{.model_type\}_summary} object, as well as some metadata about possible errors.
 
 \item \code{create_process_object}: Create list object of \code{babylon_process} class, first checking that all the required keys are present.
 
