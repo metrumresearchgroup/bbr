@@ -108,6 +108,7 @@ config_log_impl <- function(.mods) {
   })
 
   df <- select(df, .data[[ABS_MOD_PATH]], everything())
+  df <- create_config_log_object(df)
 
   return(df)
 }

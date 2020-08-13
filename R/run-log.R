@@ -121,6 +121,10 @@ add_log_impl <- function(.log_df, .impl_func, ...) {
     by = ABS_MOD_PATH
   )
 
+  # add new class
+  .new_class <- setdiff(class(.new_df), class(.log_df))
+  class(df) <- c(.new_class, class(.log_df))
+
   return(df)
 }
 
