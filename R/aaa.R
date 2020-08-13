@@ -36,6 +36,16 @@ NONMEM_ARGS = list(
   verbose = list(type = "logical", flag="--verbose", description = "verbose output")
 )
 
+# S3 classes
+NM_MOD_CLASS <- "bbi_nonmem_model"
+SUM_CLASS <- "bbi_nonmem_summary"
+SL_CLASS <- "bbi_summary_list"
+PROC_CLASS <- "babylon_process"
+RUN_LOG_CLASS <- "bbi_run_log_df"
+CONF_LOG_CLASS <- "bbi_config_log_df"
+SUM_LOG_CLASS <- "bbi_summary_log_df"
+
+
 # YAML keys that are hard-coded
 YAML_MOD_PATH <- "model_path"
 YAML_YAML_NAME <- "orig_yaml_file"
@@ -127,6 +137,17 @@ SUMMARY_REQ_KEYS <- c(
   SUMMARY_HEURISTICS
 )
 
+OFV_COL <- "ofv"
+PARAM_COUNT_COL <- "param_count"
+
+DETAILS_ELEMENTS <- c(
+  "estimation_method",
+  "problem_text",
+  "number_of_patients",
+  "number_of_obs"
+)
+
+
 ANY_HEURISTICS <- "any_heuristics"
 HEURISTICS_ELEMENTS <- c(
   "covariance_step_aborted",
@@ -149,11 +170,29 @@ SUMMARY_LIST_REQ_KEYS <- c(
   SL_FAIL_FLAGS
 )
 
+# columns required for a summary log df
+SUMMARY_LOG_REQ_COLS <- c(
+  ABS_MOD_PATH,
+  SL_SUMMARY,
+  SL_ERROR,
+  SL_FAIL_FLAGS,
+  DETAILS_ELEMENTS,
+  PARAM_COUNT_COL,
+  OFV_COL,
+  ANY_HEURISTICS,
+  HEURISTICS_ELEMENTS
+)
+
 # define json keys to keep as from bbi_config.json
 CONFIG_KEEPERS <- c(
   "model_md5",
   "data_path",
   "data_md5"
+)
+
+CONFIG_LOG_REQ_COLS <- c(
+  ABS_MOD_PATH,
+  CONFIG_KEEPERS
 )
 
 # keys added when creating a process object

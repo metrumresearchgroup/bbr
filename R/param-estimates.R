@@ -58,6 +58,27 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
   return(param_df)
 }
 
+
+
+param_estimates.bbi_summary_list <- function(.summary) {
+  ### do that stuff
+
+  return(param_df)
+}
+
+param_estimates.bbi_summary_log_df <- function(.summary) {
+  # extract needed pieces into a `bbi_summary_list` object
+  .summary <- as_summary_list(.summary)
+
+  # pass to `bbi_summary_list` dispatch
+  param_df <- param_estimates(.summary)
+
+  return(param_df)
+}
+
+
+
+
 #' Check if diagonal index or not
 #'
 #' Private helper to unpack an matrix index string like '(3,3)' is for a diagonal (i.e. if the numbers are the same)
@@ -74,4 +95,37 @@ is_diag <- function(.name) {
   }
 
   return(.ind[1] == .ind[2])
+}
+
+
+
+### WILL REPLACE THIS WITH LIBRARY FUNCTION IN rbabylon
+### needs to become new s3 dispatches:
+### * param_estimates.bbi_summary_list
+### * param_estimates.bbi_summary_log_df
+get_param_estimates_new <- function(.df) {
+
+  # should this be some dplyr rowwise thing?
+  # or should I maybe just pull these things back into a bbi_summary_list style list and then pass to that dispatch?
+  # this feels awkward having to use abs_paths[.i] and stuff
+  sum_list <- .df[[SL_SUMMARY]]
+  abs_paths <- .df[[ABS_MOD_PATH]]
+
+  param_df <- imap_dfr(sum_list, function(.mod, .i) {
+    if(!is.null(.mod[[SL_ERROR]])){
+      warning(paste("Missing summary for", abs_paths[.i], "\n", .mod[[SL_ERROR]]))
+      return(invisible())
+    }
+    .mod %>%
+      param_estimates() %>%
+      mutate(!!ABS_MOD_PATH := abs_paths[.i]) %>%
+      #mutate(i = .i) # haven't tried this yet but if it works can replace ^
+      select(.data$ABS_MOD_PATH, .data$names, .data$estimate)
+
+  })
+
+  param_df <- param_df %>%
+    pivot_wider(names_from = .data$names, values_from = .data$estimate)
+
+  return(param_df)
 }

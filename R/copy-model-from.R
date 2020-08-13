@@ -168,7 +168,7 @@ copy_nonmem_model_from <- function(
   .overwrite = FALSE
 ) {
   # Check model for correct class
-  if (!("bbi_nonmem_model" %in% class(.parent_mod))) {
+  if (!inherits(.parent_mod, NM_MOD_CLASS)) {
     stop(paste(
       "copy_nonmem_model_from() requires a model object of class `bbi_nonmem_model`. Passed object has the following classes:",
       paste(class(.parent_mod), collapse = ", "),
