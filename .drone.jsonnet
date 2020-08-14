@@ -16,12 +16,13 @@ local r_env_vars = {
   "BABYLON_EXE_PATH": std.join("/", [temp_volume_dir, "bbi"]),
 };
 
-# mpn-dev image tags; first element will be used to build release
+# images specified as repo:tag; first element will be used to build release
 # https://console.aws.amazon.com/ecr/repositories/mpn-dev/?region=us-east-1
-local mpn_snapshots = [
-  "cran-latest",
-  "2020-05-27",
-  "v1.3",
+# generally, only the second element should be modified
+local ci_images = [
+  "mpn-dev:latest",      # latest MPN snapshot
+  "mpn-dev:2020-03-24",  # oldest compatible snapshot
+  "cran-latest:latest",  # latest MPN snapshot for MRG packages + current CRAN
 ];
 
 # set to "" to disable installing babylon
@@ -54,7 +55,7 @@ local r_versions = [
 local bbi_url_base = "https://github.com/metrumresearchgroup/babylon/releases/download";
 local bbi_artifact_name = "bbi_linux_amd64.tar.gz";
 
-local mpn_image_base = "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-dev";
+local ecr_repo_base = "906087756158.dkr.ecr.us-east-1.amazonaws.com";
 
 local s3_url_base = "s3://mpn.metworx.dev/releases";
 
@@ -93,10 +94,11 @@ local concat_kvs(obj) =
 local create_build_tag(name, r_major_minor, mpn_snapshot) =
   name + "-" + r_major_minor + "-" + mpn_snapshot;
 
-# Create an MPN image name
+# Create a CI image name
 #
-# tag             tag name
-local create_mpn_image(tag) = std.join(":", [mpn_image_base, tag]);
+# repo            the repository base
+# tag             image name as repo:tag
+local create_ci_image(repo, image) = std.join("/", [repo, image]);
 
 # Get the name of the environment variable holding the path to the R executable
 # r_major_minor   R version to use, as major.minor, e.g., "4.0"
@@ -243,13 +245,13 @@ local source_env() = ". /etc/environment";
 #
 # name            name of the application
 # r_major_minor   R version to use, as major.minor, e.g., "4.0"
-# mpn_snapshot    MPN snapshot, must be a tag
+# image           CI image, as repo:tag
 # bbi_version     babylon version, passed to install_babylon()
-local check(name, r_major_minor, mpn_snapshot, bbi_version) =
+local check(name, r_major_minor, image, bbi_version) =
   local r_bin_var = "$${" + get_r_exe_var(r_major_minor) + "}";
 
-  local build_tag = create_build_tag(name, r_major_minor, mpn_snapshot);
-  local mpn_image = create_mpn_image(mpn_snapshot);
+  local build_tag = create_build_tag(name, r_major_minor, image);
+  local image_uri = create_ci_image(ecr_repo_base, image);
 
   local host_volume = volume(default_volume_name, default_volume_path);
   local temp_volume = volume("cache", temp_volume_dir);
@@ -259,13 +261,18 @@ local check(name, r_major_minor, mpn_snapshot, bbi_version) =
   add_trigger(exclude=exclude_events) +
   {
     "steps": [
-      pull_image(mpn_image, [host_volume]),
+      pull_image(image_uri, [host_volume]),
       if std.length(bbi_version) > 0 then
         # pass temp_volume to persist babylon executable
-        install_babylon(bbi_version, temp_volume.path, mpn_image, [temp_volume]),
+        install_babylon(
+          bbi_version,
+          temp_volume.path,
+          image_uri,
+          [temp_volume]
+        ),
       {
         "name": "Check package",
-        "image": mpn_image,
+        "image": image_uri,
         "pull": "never",
         "volumes": [add_step_volume(v) for v in [temp_volume]],
         "environment": r_env_vars + {
@@ -291,10 +298,10 @@ local check(name, r_major_minor, mpn_snapshot, bbi_version) =
 
 # Drone pipeline to lint an R package
 # arguments are the same as for check()
-local lint(name, r_major_minor, mpn_snapshot) =
+local lint(name, r_major_minor, image) =
   local r_bin_var = "$${" + get_r_exe_var(r_major_minor) + "}";
 
-  local mpn_image = create_mpn_image(mpn_snapshot);
+  local image_uri = create_ci_image(ecr_repo_base, image);
 
   local host_volume = volume(default_volume_name, default_volume_path);
 
@@ -303,10 +310,10 @@ local lint(name, r_major_minor, mpn_snapshot) =
   add_trigger(exclude=exclude_events) +
   {
     "steps": [
-      pull_image(mpn_image, [host_volume]),
+      pull_image(image_uri, [host_volume]),
       {
         "name": "Lint package",
-        "image": mpn_image,
+        "image": image_uri,
         "pull": "never",
         "environment": r_env_vars + {
           "R_LIBS_USER": "/opt/rpkgs/" + r_major_minor,
@@ -322,10 +329,10 @@ local lint(name, r_major_minor, mpn_snapshot) =
 
 # Drone pipeline to build and deploy an R package
 # arguments are the same as for check()
-local release(name, r_major_minor, mpn_snapshot, bbi_version) =
+local release(name, r_major_minor, image, bbi_version) =
   local r_bin_var = "$${" + get_r_exe_var(r_major_minor) + "}";
 
-  local mpn_image = create_mpn_image(mpn_snapshot);
+  local image_uri = create_ci_image(ecr_repo_base, image);
 
   local host_volume = volume(default_volume_name, default_volume_path);
   local temp_volume = volume("cache", temp_volume_dir);
@@ -335,12 +342,17 @@ local release(name, r_major_minor, mpn_snapshot, bbi_version) =
   add_trigger(include=["tag"]) +
   {
     "steps": [
-      pull_image(mpn_image, [host_volume]),
+      pull_image(image_uri, [host_volume]),
       if std.length(bbi_version) > 0 then
-        install_babylon(bbi_version, temp_volume.path, mpn_image, [temp_volume]),
+        install_babylon(
+          bbi_version,
+          temp_volume.path,
+          image_uri,
+          [temp_volume]
+        ),
       {
         "name": "Build package",
-        "image": mpn_image,
+        "image": image_uri,
         "pull": "never",
         "volumes": [add_step_volume(v) for v in [temp_volume]],
         "environment": r_env_vars + {
@@ -364,7 +376,7 @@ local release(name, r_major_minor, mpn_snapshot, bbi_version) =
       },
       {
         "name": "Publish package",
-        "image": mpn_image,
+        "image": image_uri,
         "pull": "never",
         "volumes": [add_step_volume(v) for v in [temp_volume]],
         "commands": [
@@ -390,22 +402,22 @@ local release(name, r_major_minor, mpn_snapshot, bbi_version) =
 ########################################
 
 [
-  check(name, r_version, mpn_snapshot, bbi_version)
+  check(name, r_version, image, bbi_version)
   for r_version in r_versions
-  for mpn_snapshot in mpn_snapshots
+  for image in ci_images
 ] + [
-  lint(name, r_versions[0], mpn_snapshots[0]),
+  lint(name, r_versions[0], ci_images[0]),
   # release step requires all check steps to pass
-  release(name, r_versions[0], mpn_snapshots[0], bbi_version) +
+  release(name, r_versions[0], ci_images[0], bbi_version) +
     {
       "depends_on": [
         create_build_tag(
           name,
           r_version,
-          mpn_snapshot
+          image
         )
         for r_version in r_versions
-        for mpn_snapshot in mpn_snapshots
+        for image in ci_images
       ],
     },
 ]
