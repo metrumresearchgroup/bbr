@@ -201,7 +201,7 @@ local install_babylon(bbi_version, path, image, volumes=[]) = {
 # image           image to pull
 # volumes         array of volume objects
 local pull_image(image, volumes=[]) = {
-  "name": "Pull MPN image",
+  "name": "Pull image",
   "image": "omerxx/drone-ecr-auth",
   "volumes": [add_step_volume(v) for v in volumes],
   "commands": [
