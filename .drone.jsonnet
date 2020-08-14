@@ -89,10 +89,8 @@ local concat_kvs(obj) =
 # Create a build tag
 #
 # name            name of the application
-# r_major_minor   R version to use, as major.minor, e.g., "4.0"
-# mpn_snapshot    MPN snapshot, must be a tag
-local create_build_tag(name, r_major_minor, mpn_snapshot) =
-  name + "-" + r_major_minor + "-" + mpn_snapshot;
+# image           image name as repo:tag
+local create_build_tag(name, image) = std.join("-", [name, image]);
 
 # Create a CI image name
 #
@@ -241,16 +239,44 @@ local setup_docker_pipeline(name) = {
 # Shell command to source /etc/environment
 local source_env() = ". /etc/environment";
 
+# Drone step to check an R package
+#
+# r_major_minor   R version to use, as major.minor, e.g., "4.0"
+# image_uri       URI of the CI image
+# volumes         array of volume objects
+local check_step(r_major_minor, image, volumes=[]) = {
+  local r_bin_var = "$${" + get_r_exe_var(r_major_minor) + "}",
+
+  "name": "Check package: R " + r_major_minor,
+  "image": image,
+  "pull": "never",
+  "volumes": [add_step_volume(v) for v in volumes],
+  "environment": r_env_vars + {
+    "R_LIBS_USER": "/opt/rpkgs/" + r_major_minor,
+  },
+  "commands": [
+    # can't evaluate shell expressions in environment
+    # https://docs.drone.io/pipeline/environment/syntax/#common-problems
+    "export PATH=" + volumes[0].path + ":$PATH",
+    source_env(),
+    run_r_expression(
+      r_bin_var,
+      "devtools::install_deps(upgrade = 'never')"
+    ),
+    run_r_expression(
+      r_bin_var,
+      "devtools::check(env_vars = c(" + concat_kvs(r_env_vars) + "))"
+    ),
+  ],
+};
+
 # Drone pipeline to check an R package
 #
 # name            name of the application
-# r_major_minor   R version to use, as major.minor, e.g., "4.0"
 # image           CI image, as repo:tag
 # bbi_version     babylon version, passed to install_babylon()
-local check(name, r_major_minor, image, bbi_version) =
-  local r_bin_var = "$${" + get_r_exe_var(r_major_minor) + "}";
-
-  local build_tag = create_build_tag(name, r_major_minor, image);
+local check(name, image, bbi_version) =
+  local build_tag = create_build_tag(name, image);
   local image_uri = create_ci_image(ecr_repo_base, image);
 
   local host_volume = volume(default_volume_name, default_volume_path);
@@ -270,29 +296,9 @@ local check(name, r_major_minor, image, bbi_version) =
           image_uri,
           [temp_volume]
         ),
-      {
-        "name": "Check package",
-        "image": image_uri,
-        "pull": "never",
-        "volumes": [add_step_volume(v) for v in [temp_volume]],
-        "environment": r_env_vars + {
-          "R_LIBS_USER": "/opt/rpkgs/" + r_major_minor,
-        },
-        "commands": [
-          # can't evaluate shell expressions in environment
-          # https://docs.drone.io/pipeline/environment/syntax/#common-problems
-          "export PATH=" + temp_volume.path + ":$PATH",
-          source_env(),
-          run_r_expression(
-            r_bin_var,
-            "devtools::install_deps(upgrade = 'never')"
-          ),
-          run_r_expression(
-            r_bin_var,
-            "devtools::check(env_vars = c(" + concat_kvs(r_env_vars) + "))"
-          ),
-        ],
-      },
+    ] + [
+      check_step(r_ver, image_uri, [temp_volume])
+      for r_ver in r_versions
     ],
   };
 
@@ -402,8 +408,7 @@ local release(name, r_major_minor, image, bbi_version) =
 ########################################
 
 [
-  check(name, r_version, image, bbi_version)
-  for r_version in r_versions
+  check(name, image, bbi_version)
   for image in ci_images
 ] + [
   lint(name, r_versions[0], ci_images[0]),
@@ -411,12 +416,7 @@ local release(name, r_major_minor, image, bbi_version) =
   release(name, r_versions[0], ci_images[0], bbi_version) +
     {
       "depends_on": [
-        create_build_tag(
-          name,
-          r_version,
-          image
-        )
-        for r_version in r_versions
+        create_build_tag(name, image)
         for image in ci_images
       ],
     },
