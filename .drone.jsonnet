@@ -411,7 +411,7 @@ local release(name, r_major_minor, image, bbi_version) =
   check(name, image, bbi_version)
   for image in ci_images
 ] + [
-  lint(name, r_versions[0], ci_images[0]),
+  # lint(name, r_versions[0], ci_images[0]),
   # release step requires all check steps to pass
   release(name, r_versions[0], ci_images[0], bbi_version) +
     {
