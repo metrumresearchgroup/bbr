@@ -8,21 +8,23 @@
 #' Returns a tibble containing parameter estimates from a model.
 #' Currently can only take a `bbi_{.model_type}_summary` object, as output from `model_summary()`.
 #' @seealso `param_labels()` `apply_indices()`
-#' @param .summary `bbi_{.model_type}_summary` object
+#' @param .summary `bbi_{.model_type}_summary`, `bbi_summary_list`, or `bbi_summary_log_df` object
 #' @export
 param_estimates <- function(.summary) {
   UseMethod("param_estimates")
 }
 
 #' @describeIn param_estimates Takes `bbi_nonmem_summary` object.
-#' @importFrom tibble tibble
+#' @importFrom tibble tibble as_tibble
+#' @importFrom purrr map_at map_depth map_lgl
+#' @importFrom rlang list2
 #' @export
 param_estimates.bbi_nonmem_summary <- function(.summary) {
-  num_methods <- length(.summary[["parameters_data"]])
-  param_names <- .summary[["parameter_names"]]
+  num_methods <- length(.summary[[SUMMARY_PARAM_DATA]])
+  param_names <- .summary[[SUMMARY_PARAM_NAMES]]
 
   summary_vars <- with(
-    .summary[["parameters_data"]][[num_methods]],
+    .summary[[SUMMARY_PARAM_DATA]][[num_methods]],
     list(
       estimate = estimates,
       stderr = std_err,
@@ -40,7 +42,7 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
   )
 
   all_vars <- c(
-    list(names = param_names),
+    rlang::list2(!!SUMMARY_PARAM_NAMES := param_names),
     summary_vars_padded
   )
 
@@ -53,7 +55,7 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
     ) %>%
     tibble::as_tibble()
 
-  param_df[["diag"]] <- map_lgl(param_df[["names"]], is_diag)
+  param_df[["diag"]] <- map_lgl(param_df[[SUMMARY_PARAM_NAMES]], is_diag)
 
   return(param_df)
 }
@@ -61,7 +63,20 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
 
 
 param_estimates.bbi_summary_list <- function(.summary) {
-  ### do that stuff
+
+  param_df <- map_df(.summary, function(.s) {
+    if(!is.na(.s[[SL_ERROR]])){
+      warning(paste("Missing summary for", .s[[ABS_MOD_PATH]], "\n", .s[[SL_ERROR]]))
+      return(invisible())
+    }
+    .s[[SL_SUMMARY]] %>%
+      param_estimates() %>%
+      mutate(!!ABS_MOD_PATH := .s[[ABS_MOD_PATH]]) %>%
+      select(.data[[ABS_MOD_PATH]], .data[[SUMMARY_PARAM_NAMES]], .data[["estimate"]])
+  })
+
+  # param_df <- param_df %>%
+  #   pivot_wider(names_from = .data$names, values_from = .data$estimate)
 
   return(param_df)
 }
@@ -75,8 +90,6 @@ param_estimates.bbi_summary_log_df <- function(.summary) {
 
   return(param_df)
 }
-
-
 
 
 #' Check if diagonal index or not
@@ -95,37 +108,4 @@ is_diag <- function(.name) {
   }
 
   return(.ind[1] == .ind[2])
-}
-
-
-
-### WILL REPLACE THIS WITH LIBRARY FUNCTION IN rbabylon
-### needs to become new s3 dispatches:
-### * param_estimates.bbi_summary_list
-### * param_estimates.bbi_summary_log_df
-get_param_estimates_new <- function(.df) {
-
-  # should this be some dplyr rowwise thing?
-  # or should I maybe just pull these things back into a bbi_summary_list style list and then pass to that dispatch?
-  # this feels awkward having to use abs_paths[.i] and stuff
-  sum_list <- .df[[SL_SUMMARY]]
-  abs_paths <- .df[[ABS_MOD_PATH]]
-
-  param_df <- imap_dfr(sum_list, function(.mod, .i) {
-    if(!is.null(.mod[[SL_ERROR]])){
-      warning(paste("Missing summary for", abs_paths[.i], "\n", .mod[[SL_ERROR]]))
-      return(invisible())
-    }
-    .mod %>%
-      param_estimates() %>%
-      mutate(!!ABS_MOD_PATH := abs_paths[.i]) %>%
-      #mutate(i = .i) # haven't tried this yet but if it works can replace ^
-      select(.data$ABS_MOD_PATH, .data$names, .data$estimate)
-
-  })
-
-  param_df <- param_df %>%
-    pivot_wider(names_from = .data$names, values_from = .data$estimate)
-
-  return(param_df)
 }

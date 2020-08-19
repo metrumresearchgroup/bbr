@@ -10,7 +10,7 @@ param_estimates(.summary)
 \method{param_estimates}{bbi_nonmem_summary}(.summary)
 }
 \arguments{
-\item{.summary}{\verb{bbi_\{.model_type\}_summary} object}
+\item{.summary}{\verb{bbi_\{.model_type\}_summary}, \code{bbi_summary_list}, or \code{bbi_summary_log_df} object}
 }
 \description{
 Returns a tibble containing parameter estimates from a model.

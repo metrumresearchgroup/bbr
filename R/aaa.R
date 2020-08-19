@@ -130,6 +130,8 @@ VALID_SUM_CLASSES <- purrr::map_chr(SUPPORTED_MOD_TYPES,
 
 SUMMARY_DETAILS <- "run_details"
 SUMMARY_HEURISTICS <- "run_heuristics"
+SUMMARY_PARAM_NAMES <- "parameter_names"
+SUMMARY_PARAM_DATA <- "parameters_data"
 
 # keys required for a summary object to have
 SUMMARY_REQ_KEYS <- c(
