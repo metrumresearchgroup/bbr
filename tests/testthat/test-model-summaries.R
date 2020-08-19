@@ -77,4 +77,10 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
     test_mod_sums(mod_sums)
   })
 
+
+  test_that("as_summary_list.bbi_summary_log_df works", {
+    mod_sums <- summary_log() %>% as_summary_list()
+    test_mod_sums(mod_sums)
+  })
+
 }) # closing withr::with_options
