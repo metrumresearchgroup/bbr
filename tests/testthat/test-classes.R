@@ -180,6 +180,6 @@ test_that("create_run_log_object() errors if ABS_MOD_PATH has missing values", {
     !!YAML_TAGS         := c("aww", "naw", "dawg"),
     !!YAML_DECISIONS    := c("aww", "naw", "dawg")
   )
-  expect_error(create_run_log_object(.log_df), regexp = "column must NOT have any NA values.+1, 3")
+  expect_error(create_run_log_object(.log_df), regexp = "column must NOT have any NA or NULL values.+1, 3")
 })
 
