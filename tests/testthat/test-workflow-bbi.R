@@ -14,17 +14,15 @@ if (Sys.getenv("METWORX_VERSION") == "" || Sys.getenv("SKIP_BBI_TEST") == "true"
 
 # define constants
 STARTER_FILE <- file.path("model-examples/1.ctl")
-PARAM_REF_FILE <- "data/acop_param_table_ref_200423_randeff.rds"
-
 MODEL_DIR_BBI <- "model-examples-bbi"
 BBI_PATH <- read_bbi_path()
 
 # cleanup function
-cleanup <- function(.recreate_dir = FALSE) {
+cleanup_bbi <- function(.recreate_dir = FALSE) {
   if (fs::dir_exists(MODEL_DIR_BBI)) fs::dir_delete(MODEL_DIR_BBI)
   if (isTRUE(.recreate_dir)) fs::dir_create(MODEL_DIR_BBI)
 }
-cleanup(.recreate_dir = TRUE)
+cleanup_bbi(.recreate_dir = TRUE)
 
 # set options and run tests
 withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
@@ -33,7 +31,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
   # cleanup when done
   on.exit({
     Sys.sleep(3) # wait for some NONMEM mess to delete itself
-    cleanup()
+    cleanup_bbi()
   })
 
   # clear old babylon.yaml

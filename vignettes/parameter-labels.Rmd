@@ -95,8 +95,8 @@ These two tibbles can be joined together to create a table for including in repo
 ```{r param_estimates}
 report_df <- inner_join(
   label_df %>% select(-param_type),
-  param_df %>% select(names, estimate, stderr),
-  by = "names"
+  param_df %>% select(parameter_names, estimate, stderr),
+  by = "parameter_names"
 )
 report_df
 ```

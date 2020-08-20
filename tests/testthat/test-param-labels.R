@@ -68,9 +68,9 @@ for (MODEL_PICK in MODEL_PICKS) {
                    select(-param_type)
 
     # join against reference to make sure they're the same
-    ref_df <- ref_df %>% mutate(names = ifelse(param == "THETA",
-                                               paste0(param, var1),
-                                               paste0(param, "(", var1, ",", var2, ")")))
+    ref_df <- ref_df %>% mutate(!!SUMMARY_PARAM_NAMES := ifelse(param == "THETA",
+                                                                paste0(param, var1),
+                                                                paste0(param, "(", var1, ",", var2, ")")))
 
     join_df <- ref_df %>%
       full_join(.label_df, by = names(.label_df))
@@ -112,13 +112,13 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
         suppressSpecificWarning({
           .new_df <- inner_join(.param_df,
                                 .label_df %>% apply_indices(.omega = MODEL_PICK$omega, .sigma = MODEL_PICK$sigma) %>% select(-param_type),
-                                by = "names")
+                                by = SUMMARY_PARAM_NAMES)
         }, .regexpr = "Column .+ has different attributes on LHS and RHS of join")
 
         # join against reference to make sure they're the same
-        ref_df <- ref_df %>% mutate(names = ifelse(param == "THETA",
-                                                   paste0(param, var1),
-                                                   paste0(param, "(", var1, ",", var2, ")")))
+        ref_df <- ref_df %>% mutate(!!SUMMARY_PARAM_NAMES := ifelse(param == "THETA",
+                                                                    paste0(param, var1),
+                                                                    paste0(param, "(", var1, ",", var2, ")")))
 
         join_df <- ref_df %>%
           full_join(.new_df, by = names(.label_df))

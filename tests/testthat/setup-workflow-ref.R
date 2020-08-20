@@ -48,6 +48,7 @@ NEW_TEXT1 <- c("naw", "paw")
 NEW_TEXT2 <- c("all", "done")
 
 SUMMARY_REF_FILE <- "data/acop_summary_obj_ref_200616.rds"
+PARAM_REF_FILE <- "data/acop_param_table_ref_200818.rds"
 
 MOD_CLASS <- "bbi_nonmem_model"
 SUM_CLASS <- "bbi_nonmem_summary"
