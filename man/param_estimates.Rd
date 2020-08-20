@@ -3,22 +3,55 @@
 \name{param_estimates}
 \alias{param_estimates}
 \alias{param_estimates.bbi_nonmem_summary}
+\alias{param_estimates.bbi_summary_list}
+\alias{param_estimates.bbi_summary_log_df}
 \title{Parses parameter estimates table}
 \usage{
 param_estimates(.summary)
 
 \method{param_estimates}{bbi_nonmem_summary}(.summary)
+
+\method{param_estimates}{bbi_summary_list}(.summary)
+
+\method{param_estimates}{bbi_summary_log_df}(.summary)
 }
 \arguments{
 \item{.summary}{\verb{bbi_\{.model_type\}_summary}, \code{bbi_summary_list}, or \code{bbi_summary_log_df} object}
 }
+\value{
+\strong{Single model:} For \verb{bbi_\{.model_type\}_summary} dispatch returns a tibble with the following columns:
+\itemize{
+\item parameter_names -- Parameter name ("THETA1", "THETA2", etc.)
+\item estimate -- Parameter estimate
+\item stderr -- Standard Error
+\item random_effect_sd
+\item random_effect_sdse
+\item fixed -- TRUE if parameter is fixed, FALSE otherwise
+\item diag -- TRUE if parameter is a diagonal element in random effect matrix, FALSE if off-diagonal, NA if parameter is a THETA
+}
+
+\strong{Multiple models:} For \code{bbi_summary_list} or \code{bbi_summary_log_df} objects returns a long-format tibble with the following columns for all models in the input:
+\itemize{
+\item absolute_model_path -- absolute path to the model yaml (without extension), serving as the unique identifier for the model
+\item parameter_names -- Parameter name ("THETA1", "THETA2", etc.)
+\item estimate -- Parameter estimate
+}
+
+This can be easily pivoted to wide-format (one model per row, one parameter per column)
+with something like \code{param_estimates() \%>\% tidyr::pivot_wider(names_from = parameter_names, values_from = estimate)}
+}
 \description{
-Returns a tibble containing parameter estimates from a model.
-Currently can only take a \verb{bbi_\{.model_type\}_summary} object, as output from \code{model_summary()}.
+Returns a tibble containing parameter estimates from a model or batch of models.
+Takes either a \verb{bbi_\{.model_type\}_summary}, \code{bbi_summary_list}, or \code{bbi_summary_log_df} object.
+Details about the tibble tibble that is returned are in the return value section below.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{bbi_nonmem_summary}: Takes \code{bbi_nonmem_summary} object.
+\item \code{bbi_nonmem_summary}: Takes \code{bbi_nonmem_summary} object, the output of \code{\link[=model_summary]{model_summary()}}.
+
+\item \code{bbi_summary_list}: Takes a \code{bbi_summary_list} object, the output of \code{\link[=model_summaries]{model_summaries()}}.
+
+\item \code{bbi_summary_log_df}: Takes a \code{bbi_summary_log_df} object, the output of \code{\link[=summary_log]{summary_log()}}.
 }}
 
 \seealso{

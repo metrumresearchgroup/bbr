@@ -6,8 +6,6 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
 
 # references
 NUM_MODS <- 3
-NOT_FINISHED_ERR_MSG <- "nonmem_summary.*modeling run has not finished"
-NO_LST_ERR_MSG <- "Unable to locate `.lst` file.*NONMEM output folder"
 
 # helper to run expectations
 test_mod_sums <- function(mod_sums) {

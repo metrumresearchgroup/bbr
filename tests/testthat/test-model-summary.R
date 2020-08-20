@@ -7,11 +7,6 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
 withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
                          rbabylon.model_directory = NULL), {
 
-  # references
-  NOT_FINISHED_ERR_MSG <- "nonmem_summary.*modeling run has not finished"
-  NO_LST_ERR_MSG <- "Unable to locate `.lst` file.*NONMEM output folder"
-
-
   #########################################
   # extracting things from summary object
   #########################################
