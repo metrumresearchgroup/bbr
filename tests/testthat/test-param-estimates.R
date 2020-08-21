@@ -19,9 +19,9 @@ teardown({
 ref_df1 <- readRDS(PARAM_REF_FILE)
 ref_df1b <- dplyr::select(ref_df1, .data[[SUMMARY_PARAM_NAMES]], .data[["estimate"]])
 ref_df2 <- dplyr::bind_rows(
-  dplyr::bind_cols(!!ABS_MOD_PATH := normalizePath(MOD1_PATH), ref_df1b),
-  dplyr::bind_cols(!!ABS_MOD_PATH := normalizePath(NEW_MOD2),  ref_df1b),
-  dplyr::bind_cols(!!ABS_MOD_PATH := normalizePath(NEW_MOD3),  ref_df1b)
+  dplyr::bind_cols(!!ABS_MOD_PATH := normalizePath(rep(MOD1_PATH, nrow(ref_df1b))), ref_df1b),
+  dplyr::bind_cols(!!ABS_MOD_PATH := normalizePath(rep(NEW_MOD2, nrow(ref_df1b))),  ref_df1b),
+  dplyr::bind_cols(!!ABS_MOD_PATH := normalizePath(rep(NEW_MOD3, nrow(ref_df1b))),  ref_df1b)
 )
 
 withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
