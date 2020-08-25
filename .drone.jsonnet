@@ -57,7 +57,8 @@ local bbi_artifact_name = "bbi_linux_amd64.tar.gz";
 
 local ecr_repo_base = "906087756158.dkr.ecr.us-east-1.amazonaws.com";
 
-local s3_url_base = "s3://mpn.metworx.dev/releases";
+local s3_bucket = "mpn.metworx.dev";
+local s3_target = "/releases";
 
 local default_git_user    = "Drony";
 local default_git_email   = "drone@metrumrg.com";
@@ -215,17 +216,35 @@ local pull_image(image, volumes=[]) = {
 local run_r_expression(r_path, expr) =
   std.join(" ", [r_path, "-e", std.escapeStringBash(expr)]);
 
-# Sync to S3
+# Drone step to copy a tagged release to S3
 #
-# local_path      path to local object
-# remote_path     path to S3 location
-local s3_sync(local_path, remote_path) = std.format(
-  "aws s3 sync %(local)s %(remote)s",
-  {
-    "local": local_path,
-    "remote": remote_path,
+# source_tag      source tag name
+# target_tag      target "tag" name (allows for renaming tag)
+# temp            volume object
+local s3_publish_tag(source_tag, target_tag, temp) = {
+  local strip_prefix = std.join("/", [temp.path, source_tag]),
+
+  "name": "Publish package: " + target_tag,
+  # s3-sync plugin does not appear to support volumes (/tmp appears as
+  # /drone/src/tmp), and may not be under active development
+  # https://github.com/drone-plugins/drone-s3-sync/issues/17#issuecomment-374286940
+  "image": "plugins/s3",
+  "pull": "if-not-exists",
+  "volumes": [add_step_volume(temp)],
+  "settings": {
+    "bucket": s3_bucket,
+    "source": std.join("/", [strip_prefix, "**/*"]),
+    "target": std.join(
+      "/",
+      [
+        s3_target,
+        "${DRONE_REPO_NAME}",
+        target_tag
+      ]
+    ),
+    "strip_prefix": strip_prefix + "/",
   },
-);
+};
 
 # Set up a Docker pipeline
 #
@@ -380,22 +399,8 @@ local release(name, r_major_minor, image, bbi_version) =
           ),
         ],
       },
-      {
-        "name": "Publish package",
-        "image": image_uri,
-        "pull": "never",
-        "volumes": [add_step_volume(v) for v in [temp_volume]],
-        "commands": [
-          s3_sync(
-            std.join("/", [temp_volume.path, "${DRONE_TAG}"]),
-            std.join("/", [s3_url_base, "${DRONE_REPO_NAME}", "${DRONE_TAG}"]),
-          ),
-          s3_sync(
-            std.join("/", [temp_volume.path, "${DRONE_TAG}"]),
-            std.join("/", [s3_url_base, "${DRONE_REPO_NAME}", "latest_tag"]),
-          ),
-        ],
-      },
+      s3_publish_tag("${DRONE_TAG}", "${DRONE_TAG}", temp_volume),
+      s3_publish_tag("${DRONE_TAG}", "latest_tag", temp_volume),
     ],
   };
 
