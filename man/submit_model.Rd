@@ -57,7 +57,7 @@ a \verb{bbi_\{.model_type\}_model } object,
 a file path to a model,
 an integer corresponding to a file name of a model.}
 
-\item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}. Run \code{print_nonmem_args()} to see valid arguments.}
+\item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}. Run \code{\link[=print_bbi_args]{print_bbi_args()}} to see valid arguments.}
 
 \item{.mode}{Either \code{"sge"}, the default, to submit model(s) to the grid or \code{"local"} for local execution.}
 

@@ -128,10 +128,10 @@ This will return a process object. We won't discuss this object in this vignette
 
 ### Passing arguments to bbi
 
-There are a number of arguments that `babylon` can take to modify how models are run. You can print a list of available arguments using the `print_nonmem_args()` helper function. (Similar helper functions will be added as new modeling software are supported.)
+There are a number of arguments that `babylon` can take to modify how models are run. You can print a list of available arguments using the `print_bbi_args()` helper function. (Similar helper functions will be added as new modeling software are supported.)
 
-```{r print_nonmem_args}
-print_nonmem_args()
+```{r print_bbi_args}
+print_bbi_args()
 ```
 
 These can be specified globally in the `babylon.yaml` file, and you can see the default values of them in that file. However, they can also be specified or changed for each model. This can be done in several ways:

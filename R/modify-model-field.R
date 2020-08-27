@@ -128,7 +128,7 @@ replace_description <- function(.mod, .description) {
 
 #' @describeIn modify_model_field Modifies model object and corresponding YAML by adding new `bbi_args`,
 #' overwriting any args that are already present with the new values.
-#' Use `print_nonmem_args()` to see a list of valid babylon arguments.
+#' Use `print_bbi_args()` to see a list of valid babylon arguments.
 #' @importFrom digest digest
 #' @param .bbi_args named list of arguments to add to the model
 #' @export
@@ -150,7 +150,7 @@ add_bbi_args <- function(.mod, .bbi_args) {
 }
 
 #' @describeIn modify_model_field Modifies model object and corresponding YAML by replacing `bbi_args` with new list passed to `.bbi_args`.
-#' Use `print_nonmem_args()` to see a list of valid babylon arguments.
+#' Use `print_bbi_args()` to see a list of valid babylon arguments.
 #' @importFrom digest digest
 #' @export
 replace_bbi_args <- function(.mod, .bbi_args) {

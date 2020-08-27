@@ -35,7 +35,7 @@
 #'
 #' @param .mod Model to summarize. Can be a `bbi_{.model_type}_model` object, a file path, or an integer corresponding to a file path.
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`.
-#' See `print_nonmem_args()` for full list of options.
+#' See [print_bbi_args()] for full list of options.
 #' @param ... args passed through to `bbi_exec()`
 #' @param .dry_run show what the command would be without actually running it
 #' @param .directory Model directory which `.mod` path is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`. **Only used when passing a path for `.mod` instead of a `bbi_{.model_type}_model` object.**
@@ -138,7 +138,7 @@ model_summary.numeric <- function(
 #'
 #' Private implementation function called by `model_summary()` dispatches.
 #' @param .mod `bbi_nonmem_model` object for summary
-#' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.
+#' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run [print_bbi_args()] to see valid arguments.
 #' @return List of S3 Class "bbi_nonmem_summary" with all summary information
 #' @keywords internal
 nonmem_summary <- function(
@@ -166,7 +166,7 @@ nonmem_summary <- function(
   }
   .bbi_args <- purrr::list_modify(.bbi_args, json = TRUE)
 
-  args_vec <- check_nonmem_args(.bbi_args)
+  args_vec <- check_bbi_args(.bbi_args)
   cmd_args <- c("nonmem", "summary", get_model_id(lst_file_path), args_vec)
 
   # if .dry_run return output call

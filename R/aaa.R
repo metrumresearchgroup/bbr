@@ -3,7 +3,7 @@ BBI_DEFAULT_PATH <- "/data/apps/bbi"
 CACHE_ENV <- new.env(parent = emptyenv())
 CACHE_ENV$bbi_exe_paths <- list()
 
-NONMEM_ARGS = list(
+BBI_ARGS = list(
   additional_post_work_envs = list(type = "character", flag="--additional_post_work_envs", description = "Any additional values (as ENV KEY=VALUE) to provide for the post execution environment"),
   background = list(type = "logical", flag="--background", description = "RAW NMFE OPTION - Tells nonmem not to scan StdIn for control characters"),
   clean_lvl = list(type = "numeric", flag="--clean_lvl", description = "clean level used for file output from a given (set of) runs (default 1)"),

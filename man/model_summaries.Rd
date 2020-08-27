@@ -61,7 +61,7 @@ a character vector of file paths to models,
 a numeric vector of integers corresponding to a file names of a models.}
 
 \item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}.
-See \code{print_nonmem_args()} for full list of options.}
+See \code{\link[=print_bbi_args]{print_bbi_args()}} for full list of options.}
 
 \item{.fail_flags}{Same as \code{.bbi_args} except these are used \emph{only} when a \code{\link[=model_summary]{model_summary()}} call fails.
 In that case, flags are appended to anything in \code{.bbi_args} and the summary is tried again.
