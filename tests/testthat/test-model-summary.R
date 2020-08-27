@@ -99,8 +99,6 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
 
 
   TEST_CASES <- list(
-    list(ext = "cor", missing = "correlation_theta"),
-    list(ext = "cov", missing = "covariance_theta"),
     list(ext = "ext", missing = NULL),
     list(ext = "grd", missing = NULL),
     list(ext = "shk", missing = "shrinkage_details")
