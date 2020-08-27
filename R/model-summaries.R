@@ -190,3 +190,39 @@ model_summaries.bbi_run_log_df <- function(
   return(res_df)
 }
 
+
+###################
+# helper functions
+###################
+
+#' Convert object to `bbi_summary_list`
+#'
+#' This is used to convert an object containing `bbi_{.model_type}_summary` objects into a `bbi_summary_list`.
+#' Currently it is only used for converting a `bbi_summary_log_df` into a `bbi_summary_list`
+#' (primarily so that it can more easily be mapped over), but theoretically it could be used for other purposes in the future.
+#' Note this is primarily intended as a developer function, though it was exposed because users may have a use for it as well.
+#' @param .sums Object to convert.
+#' @export
+as_summary_list <- function(.sums) {
+  UseMethod("as_summary_list")
+}
+
+#' @describeIn as_summary_list Convert a `bbi_summary_log_df` into a `bbi_summary_list`
+#' @importFrom dplyr group_split select row_number
+#' @importFrom purrr map
+as_summary_list.bbi_summary_log_df <- function(.sums) {
+  .sums <- .sums[SUMMARY_LIST_REQ_KEYS]
+
+  # create list of lists
+  .sum_list <- group_split(.sums, rn = row_number())
+  .sum_list <- map(.sum_list, function(.row) {
+    .row <- select(.row, -.data$rn)
+    .row <- as.list(.row)
+    .row[[SL_SUMMARY]] <- .row[[SL_SUMMARY]][[1]] # this gets buried one level deep by the as.list call
+    return(.row)
+  })
+
+  .sum_list <- create_summary_list(.sum_list)
+  return(.sum_list)
+}
+

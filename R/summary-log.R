@@ -122,6 +122,8 @@ summary_log_impl <- function(.mods, ...) {
 
   res_df <- res_df %>% unnest_wider(.data$d) %>% unnest_wider(.data$h)
 
+  res_df <- create_summary_log_object(res_df)
+
   return(res_df)
 }
 
@@ -157,13 +159,12 @@ extract_param_count <- function(.s) {
 extract_details <- function(.s) {
   .rd <- map(.s, SUMMARY_DETAILS, .default = NA)
 
-  KEEPERS <- c("estimation_method", "problem_text", "number_of_patients", "number_of_obs")
-
   .out <- map(.rd, function(.x) {
     if(!inherits(.x, "list")) {
       return(NULL)
     }
-    return(.x[KEEPERS])
+
+    return(.x[DETAILS_ELEMENTS])
   })
 
   return(.out)

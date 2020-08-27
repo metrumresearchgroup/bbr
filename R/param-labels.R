@@ -89,8 +89,8 @@ param_labels.character <- function(.mod, ...) {
       .pick_list,
       .theta = (.pick == "THETA")
     )
-    .pick_labels$names <- rep(.pick, nrow(.pick_labels))
-     return(select(.pick_labels, names, everything()))
+    .pick_labels[[SUMMARY_PARAM_NAMES]] <- rep(.pick, nrow(.pick_labels))
+     return(select(.pick_labels, .data[[SUMMARY_PARAM_NAMES]], everything()))
   }) %>%
     tidyr::replace_na(list(label="", unit="", type=""))
 
@@ -111,19 +111,19 @@ param_labels.character <- function(.mod, ...) {
 #' For more details and examples of how to specify `$OMEGA` and `$SIGMA` block structure, see the "Parameter Labels" vignette:
 #' [`vignette("parameter-labels", package = "rbabylon")`](../docs/articles/parameter-labels.html)
 #'
-#' @param .label_df A tibble like the output of `param_labels()`, containing columns `names, label, unit, type`
+#' @param .label_df A tibble like the output of `param_labels()`, containing columns `parameter_names, label, unit, type`
 #' @param .omega A logical vector indicating whether each Omega parameter is a diagonal. If `NULL` function assumes all are diagonal. Alternatively you can pass `block(.n)` or pass a custom vector if control stream has both block and non-block.
 #' @param .sigma A logical vector indicating whether each Sigma parameter is a diagonal. If `NULL` function assumes all are diagonal. Alternatively you can pass `block(.n)` or pass a custom vector if control stream has both block and non-block.
 #' @importFrom dplyr filter mutate n bind_rows
 #' @export
 apply_indices <- function(.label_df, .omega = NULL, .sigma = NULL) {
-  .theta_df <- .label_df %>% filter(names == "THETA") %>% mutate(param_type = names)
-  .omega_df <- .label_df %>% filter(names == "OMEGA") %>% mutate(param_type = names)
-  .sigma_df <- .label_df %>% filter(names == "SIGMA") %>% mutate(param_type = names)
+  .theta_df <- .label_df %>% filter(.data[[SUMMARY_PARAM_NAMES]] == "THETA") %>% mutate(param_type = .data[[SUMMARY_PARAM_NAMES]])
+  .omega_df <- .label_df %>% filter(.data[[SUMMARY_PARAM_NAMES]] == "OMEGA") %>% mutate(param_type = .data[[SUMMARY_PARAM_NAMES]])
+  .sigma_df <- .label_df %>% filter(.data[[SUMMARY_PARAM_NAMES]] == "SIGMA") %>% mutate(param_type = .data[[SUMMARY_PARAM_NAMES]])
 
   # theta
   .theta_ind <- seq_len(nrow(.theta_df))
-  .theta_df <- .theta_df %>% mutate(names = paste0(names, .theta_ind))
+  .theta_df <- .theta_df %>% mutate(!!SUMMARY_PARAM_NAMES := paste0(.data[[SUMMARY_PARAM_NAMES]], .theta_ind))
 
   # omega
   if(!is.null(.omega) && length(.omega) != nrow(.omega_df)) {
@@ -133,7 +133,7 @@ apply_indices <- function(.label_df, .omega = NULL, .sigma = NULL) {
     .omega <- rep(TRUE, .omega_df %>% nrow()) # if null assume all are diagonals
   }
   .omega_ind <- build_matrix_indices(.omega)
-  .omega_df <- .omega_df %>% mutate(names = paste0(names, .omega_ind))
+  .omega_df <- .omega_df %>% mutate(!!SUMMARY_PARAM_NAMES := paste0(.data[[SUMMARY_PARAM_NAMES]], .omega_ind))
 
   # sigma
   if(!is.null(.sigma) && length(.sigma) != nrow(.sigma_df)) {
@@ -143,7 +143,7 @@ apply_indices <- function(.label_df, .omega = NULL, .sigma = NULL) {
     .sigma <- rep(TRUE, .sigma_df %>% nrow()) # if null assume all are diagonals
   }
   .sigma_ind <- build_matrix_indices(.sigma)
-  .sigma_df <- .sigma_df %>% mutate(names = paste0(names, .sigma_ind))
+  .sigma_df <- .sigma_df %>% mutate(!!SUMMARY_PARAM_NAMES := paste0(.data[[SUMMARY_PARAM_NAMES]], .sigma_ind))
 
 
   return(bind_rows(

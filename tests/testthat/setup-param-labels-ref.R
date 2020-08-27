@@ -83,7 +83,7 @@ PARAM_BLOCK_REF <- list(
       .01 .01 .1  ; [P] 7 LSF",
     omega = block(3),
     sigma = NULL,
-    ref = structure(list(names = c("OMEGA(1,1)", "OMEGA(2,1)", "OMEGA(2,2)", "OMEGA(3,1)", "OMEGA(3,2)", "OMEGA(3,3)"),
+    ref = structure(list(parameter_names = c("OMEGA(1,1)", "OMEGA(2,1)", "OMEGA(2,2)", "OMEGA(3,1)", "OMEGA(3,2)", "OMEGA(3,3)"),
                          label = c("5 P1NPF", "", "6 CTFX", "", "", "7 LSF"),
                          type = c("[P]", "[A]", "[P]", "[A]", "[A]", "[P]"),
                          param_type = c("OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA")),
@@ -102,7 +102,7 @@ PARAM_BLOCK_REF <- list(
       .01 .1      ;[P] 9 FAKE2",
     omega = c(block(3), block(2)),
     sigma = NULL,
-    ref = structure(list(names = c("OMEGA(1,1)", "OMEGA(2,1)", "OMEGA(2,2)", "OMEGA(3,1)", "OMEGA(3,2)", "OMEGA(3,3)", "OMEGA(4,4)", "OMEGA(5,4)", "OMEGA(5,5)"),
+    ref = structure(list(parameter_names = c("OMEGA(1,1)", "OMEGA(2,1)", "OMEGA(2,2)", "OMEGA(3,1)", "OMEGA(3,2)", "OMEGA(3,3)", "OMEGA(4,4)", "OMEGA(5,4)", "OMEGA(5,5)"),
                          label = c("5 P1NPF", "", "6 CTFX", "", "", "7 LSF", "8 FAKE1", "", "9 FAKE2"),
                          type = c("[P]", "[A]", "[P]", "[A]", "[A]", "[P]", "[P]", "[A]", "[P]"),
                          param_type = c("OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA")),
@@ -122,7 +122,7 @@ PARAM_BLOCK_REF <- list(
       $OMEGA BLOCK(1) SAME",
     omega = c(block(3), block(2), TRUE, TRUE),
     sigma = NULL,
-    ref = structure(list(names = c("OMEGA(1,1)", "OMEGA(2,1)", "OMEGA(2,2)", "OMEGA(3,1)", "OMEGA(3,2)", "OMEGA(3,3)", "OMEGA(4,4)", "OMEGA(5,4)", "OMEGA(5,5)", "OMEGA(6,6)", "OMEGA(7,7)"),
+    ref = structure(list(parameter_names = c("OMEGA(1,1)", "OMEGA(2,1)", "OMEGA(2,2)", "OMEGA(3,1)", "OMEGA(3,2)", "OMEGA(3,3)", "OMEGA(4,4)", "OMEGA(5,4)", "OMEGA(5,5)", "OMEGA(6,6)", "OMEGA(7,7)"),
                          label = c("5 P1NPF", "", "6 CTFX", "", "", "7 LSF", "8 FAKE1", "", "9 FAKE2", "IOV_{KA}", "IOV_{KA}"),
                          type = c("[P]", "[A]", "[P]", "[A]", "[A]", "[P]", "[P]", "[A]", "[P]", "[P]", "[P]"),
                          param_type = c("OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA")),
@@ -140,7 +140,7 @@ PARAM_BLOCK_REF <- list(
       block(2)
     ),
     sigma = NULL,
-    ref = structure(list(names = c("OMEGA(1,1)", "OMEGA(2,1)", "OMEGA(2,2)", "OMEGA(3,3)", "OMEGA(4,3)", "OMEGA(4,4)"),
+    ref = structure(list(parameter_names = c("OMEGA(1,1)", "OMEGA(2,1)", "OMEGA(2,2)", "OMEGA(3,3)", "OMEGA(4,3)", "OMEGA(4,4)"),
                          label = c("", "", "", "", "", ""),
                          type = c("[A]", "[A]", "[A]", "[A]", "[A]", "[A]"),
                          param_type = c("OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA")),
@@ -157,7 +157,7 @@ PARAM_BLOCK_REF <- list(
       block(2)
     ),
     sigma = NULL,
-    ref = structure(list(names = c("OMEGA(1,1)", "OMEGA(2,1)", "OMEGA(2,2)", "OMEGA(3,3)", "OMEGA(4,3)", "OMEGA(4,4)"),
+    ref = structure(list(parameter_names = c("OMEGA(1,1)", "OMEGA(2,1)", "OMEGA(2,2)", "OMEGA(3,3)", "OMEGA(4,3)", "OMEGA(4,4)"),
                          label = c("", "", "", "", "", ""),
                          type = c("[A]", "[A]", "[A]", "[A]", "[A]", "[A]"),
                          param_type = c("OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA", "OMEGA")),
@@ -186,7 +186,7 @@ PARAM_BLOCK_REF <- list(
       1 6",
     omega = c(block(3), TRUE),
     sigma = c(block(2), block(2)),
-    ref = structure(list(names = c("OMEGA(1,1)", "OMEGA(2,1)", "OMEGA(2,2)",
+    ref = structure(list(parameter_names = c("OMEGA(1,1)", "OMEGA(2,1)", "OMEGA(2,2)",
                                    "OMEGA(3,1)", "OMEGA(3,2)", "OMEGA(3,3)", "OMEGA(4,4)", "SIGMA(1,1)",
                                    "SIGMA(2,1)", "SIGMA(2,2)", "SIGMA(3,3)", "SIGMA(4,3)", "SIGMA(4,4)"),
                          label = c("CL", "CL-V2", "V2", "CL-CLDX", "CL-V2", "CLDX", "KA", "", "", "", "", "", ""),
@@ -229,7 +229,7 @@ PARAM_BLOCK_REF <- list(
       rep(TRUE, 7)
     ),
     sigma = NULL,
-    ref = structure(list(names = c("OMEGA(1,1)", "OMEGA(2,1)", "OMEGA(2,2)",
+    ref = structure(list(parameter_names = c("OMEGA(1,1)", "OMEGA(2,1)", "OMEGA(2,2)",
                                    "OMEGA(3,1)", "OMEGA(3,2)", "OMEGA(3,3)", "OMEGA(4,4)", "OMEGA(5,4)",
                                    "OMEGA(5,5)", "OMEGA(6,4)", "OMEGA(6,5)", "OMEGA(6,6)", "OMEGA(7,7)",
                                    "OMEGA(8,8)", "OMEGA(9,8)", "OMEGA(9,9)", "OMEGA(10,10)", "OMEGA(11,10)",
@@ -279,7 +279,7 @@ PARAM_BLOCK_REF <- list(
       3.00E-02  ;3 BMDLS",
     omega = c(TRUE, TRUE, block(2), block(3), TRUE, TRUE, block(3)),
     sigma = NULL,
-    ref = structure(list(names = c("OMEGA(1,1)", "OMEGA(2,2)", "OMEGA(3,3)",
+    ref = structure(list(parameter_names = c("OMEGA(1,1)", "OMEGA(2,2)", "OMEGA(3,3)",
                                    "OMEGA(4,3)", "OMEGA(4,4)", "OMEGA(5,5)", "OMEGA(6,5)", "OMEGA(6,6)",
                                    "OMEGA(7,5)", "OMEGA(7,6)", "OMEGA(7,7)", "OMEGA(8,8)", "OMEGA(9,9)",
                                    "OMEGA(10,10)", "OMEGA(11,10)", "OMEGA(11,11)", "OMEGA(12,10)",
@@ -322,7 +322,7 @@ PARAM_BLOCK_REF <- list(
       0.4 ; 0.4367 ; KA",
     omega = c(block(2), block(2), TRUE),
     sigma = NULL,
-    ref = structure(list(names = c("THETA1", "THETA2", "THETA3", "THETA4", "THETA5", "THETA6", "THETA7", "THETA8", "THETA9", "THETA10",
+    ref = structure(list(parameter_names = c("THETA1", "THETA2", "THETA3", "THETA4", "THETA5", "THETA6", "THETA7", "THETA8", "THETA9", "THETA10",
                                    "OMEGA(1,1)", "OMEGA(2,1)", "OMEGA(2,2)", "OMEGA(3,3)", "OMEGA(4,3)", "OMEGA(4,4)", "OMEGA(5,5)", "SIGMA(1,1)"),
                          label = c("31.5 1 CL", "244.2", "0.49", "14.16", "1.05", "6 weight on CL", "7 weight on V",
                                    "8 prop res err LLOQ=0.02", "9  fractional change in prop res err LLOQ=0.25", "10 low dose effect on Ka",
@@ -339,7 +339,7 @@ PARAM_BLOCK_REF <- list(
 #### visual references
 # PEX_BLOCK3
 # # A tibble: 6 x 4
-# names      label   type  param_type
+# parameter_names  label   type  param_type
 # <chr>      <chr>   <chr> <chr>
 # 1 OMEGA(1,1) 5 P1NPF [P]   OMEGA
 # 2 OMEGA(2,1) ""      [A]   OMEGA
@@ -350,7 +350,7 @@ PARAM_BLOCK_REF <- list(
 
 # PEX_BLOCK32
 # # A tibble: 9 x 4
-# names      label   type  param_type
+# parameter_names  label   type  param_type
 # <chr>      <chr>   <chr> <chr>
 # 1 OMEGA(1,1) 5 P1NPF [P]   OMEGA
 # 2 OMEGA(2,1) ""      [A]   OMEGA
@@ -365,7 +365,7 @@ PARAM_BLOCK_REF <- list(
 
 # PEX_BLOCK32S
 # # A tibble: 11 x 4
-# names      label    type  param_type
+# parameter_names  label    type  param_type
 # <chr>      <chr>    <chr> <chr>
 # 1 OMEGA(1,1) 5 P1NPF  [P]   OMEGA
 # 2 OMEGA(2,1) ""       [A]   OMEGA
@@ -382,7 +382,7 @@ PARAM_BLOCK_REF <- list(
 
 # PEX_KAT_DBL2 and PEX_KAT_DBL2S
 # # A tibble: 6 x 4
-# names      label type  param_type
+# parameter_names  label type  param_type
 # <chr>      <chr> <chr> <chr>
 # 1 OMEGA(1,1) ""    [A]   OMEGA
 # 2 OMEGA(2,1) ""    [A]   OMEGA
@@ -394,7 +394,7 @@ PARAM_BLOCK_REF <- list(
 
 # PEX_KAT_PKPD
 # # A tibble: 13 x 4
-# names      label   type  param_type
+# parameter_names  label   type  param_type
 # <chr>      <chr>   <chr> <chr>
 # 1 OMEGA(1,1) CL      [P]   OMEGA
 # 2 OMEGA(2,1) CL-V2   [R]   OMEGA
@@ -413,7 +413,7 @@ PARAM_BLOCK_REF <- list(
 
 # PEX_KAT_ALL
 # # A tibble: 26 x 4
-#      names       label    type     param_type
+#      parameter_names   label    type     param_type
 #      <chr>       <chr>    <chr>    <chr>
 # 1    OMEGA(1,1)       CL  [P]      OMEGA
 # 2    OMEGA(2,1)           [A]      OMEGA
@@ -445,7 +445,7 @@ PARAM_BLOCK_REF <- list(
 
 # PEX_SAM1
 # # A tibble: 22 x 4
-#      names       label    type     param_type
+#      parameter_names   label    type     param_type
 #      <chr>       <chr>    <chr>    <chr>
 # 1    OMEGA(1,1)  1 LSCF  [A]      OMEGA
 # 2    OMEGA(2,2)   2 PLE  [A]      OMEGA
@@ -473,7 +473,7 @@ PARAM_BLOCK_REF <- list(
 
 # PEX_DBL_CMT ## parses "correctly" but as expected only takes first label
 # # A tibble: 17 x 5
-# names      label                                          unit  type  param_type
+# parameter_names  label                                          unit  type  param_type
 # <chr>      <chr>                                          <chr> <chr> <chr>
 # 1 THETA1     31.5 1 CL                                      ""    ""    THETA
 # 2 THETA2     244.2                                          ""    ""    THETA

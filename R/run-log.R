@@ -6,7 +6,7 @@
 #'
 #' Parses all model YAML files and outputs into a tibble that serves as a run log for the project.
 #' Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
-#' Users can also use [add_config()] to append additional output about the model run.
+#' Users can also use [add_config()] or [add_summary()] to append additional output about the model run.
 #' @seealso [config_log()], [summary_log()]
 #' @param .base_dir Base directory to look in for models. Defaults to [get_model_directory()].
 #' @param .recurse If `TRUE`, the default, search recursively in all subdirectories. Passed through to `fs::dir_ls()` -- If a positive number, the number of levels to recurse.
@@ -120,6 +120,10 @@ add_log_impl <- function(.log_df, .impl_func, ...) {
     .new_df,
     by = ABS_MOD_PATH
   )
+
+  # add new class
+  .new_class <- setdiff(class(.new_df), class(.log_df))
+  class(df) <- c(.new_class, class(.log_df))
 
   return(df)
 }

@@ -1,7 +1,7 @@
 Type: Package
 Package: rbabylon
 Title: R package for babylon
-Version: 0.7.0.8003
+Version: 0.7.0.8004
 Authors@R: 
     c(person(given = "Devin",
              family = "Pastoor",
@@ -25,7 +25,7 @@ Imports:
     checkmate,
     cli,
     digest,
-    dplyr,
+    dplyr (>= 0.8.0),
     forcats,
     fs,
     ggplot2,

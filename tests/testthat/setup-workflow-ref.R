@@ -48,6 +48,7 @@ NEW_TEXT1 <- c("naw", "paw")
 NEW_TEXT2 <- c("all", "done")
 
 SUMMARY_REF_FILE <- "data/acop_summary_obj_ref_200616.rds"
+PARAM_REF_FILE <- "data/acop_param_table_ref_200818.rds"
 
 MOD_CLASS <- "bbi_nonmem_model"
 SUM_CLASS <- "bbi_nonmem_summary"
@@ -65,6 +66,8 @@ SUMS_LIST_NAMES_REF <- c("absolute_model_path", "bbi_summary", "error_msg", "nee
 SUM_NAMES_REF <- c("run_details", "run_heuristics", "parameters_data", "parameter_names",
                    "ofv", "shrinkage_details", "covariance_theta", "correlation_theta")
 
+NOT_FINISHED_ERR_MSG <- "nonmem_summary.*modeling run has not finished"
+NO_LST_ERR_MSG <- "Unable to locate `.lst` file.*NONMEM output folder"
 
 MOD1_ABS_PATH <- file.path(getwd(), tools::file_path_sans_ext(YAML_TEST_FILE))
 MOD2_ABS_PATH <- file.path(getwd(), NEW_MOD2)

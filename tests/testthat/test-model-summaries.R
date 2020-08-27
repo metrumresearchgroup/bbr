@@ -6,8 +6,6 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
 
 # references
 NUM_MODS <- 3
-NOT_FINISHED_ERR_MSG <- "nonmem_summary.*modeling run has not finished"
-NO_LST_ERR_MSG <- "Unable to locate `.lst` file.*NONMEM output folder"
 
 # helper to run expectations
 test_mod_sums <- function(mod_sums) {
@@ -74,6 +72,12 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
 
   test_that("model_summaries.bbi_run_log_df produces expected output", {
     mod_sums <- run_log() %>% model_summaries()
+    test_mod_sums(mod_sums)
+  })
+
+
+  test_that("as_summary_list.bbi_summary_log_df works", {
+    mod_sums <- summary_log() %>% as_summary_list()
     test_mod_sums(mod_sums)
   })
 

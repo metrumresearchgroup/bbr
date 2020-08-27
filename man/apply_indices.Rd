@@ -10,7 +10,7 @@ apply_indices(.label_df, .omega = NULL, .sigma = NULL)
 block(.n)
 }
 \arguments{
-\item{.label_df}{A tibble like the output of \code{param_labels()}, containing columns \verb{names, label, unit, type}}
+\item{.label_df}{A tibble like the output of \code{param_labels()}, containing columns \verb{parameter_names, label, unit, type}}
 
 \item{.omega}{A logical vector indicating whether each Omega parameter is a diagonal. If \code{NULL} function assumes all are diagonal. Alternatively you can pass \code{block(.n)} or pass a custom vector if control stream has both block and non-block.}
 
