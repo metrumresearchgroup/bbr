@@ -24,8 +24,8 @@ param_estimates(.summary)
 \item parameter_names -- Parameter name ("THETA1", "THETA2", etc.)
 \item estimate -- Parameter estimate
 \item stderr -- Standard Error
-\item random_effect_sd
-\item random_effect_sdse
+\item random_effect_sd -- OMEGA and SIGMA elements in standard deviation/correlation format
+\item random_effect_sdse -- Standard errors to the OMEGA and SIGMA elements in standard deviation/correlation format
 \item fixed -- TRUE if parameter is fixed, FALSE otherwise
 \item diag -- TRUE if parameter is a diagonal element in random effect matrix, FALSE if off-diagonal, NA if parameter is a THETA
 }
@@ -37,13 +37,12 @@ param_estimates(.summary)
 \item estimate -- Parameter estimate
 }
 
-This can be easily pivoted to wide-format (one model per row, one parameter per column)
-with something like \code{param_estimates() \%>\% tidyr::pivot_wider(names_from = parameter_names, values_from = estimate)}
+See examples section for how to pivot this to a wide-format table (one model per row, one parameter per column).
 }
 \description{
 Returns a tibble containing parameter estimates from a model or batch of models.
 Takes either a \verb{bbi_\{.model_type\}_summary}, \code{bbi_summary_list}, or \code{bbi_summary_log_df} object.
-Details about the tibble tibble that is returned are in the return value section below.
+Details about the tibble that is returned are in the return value section below.
 }
 \section{Methods (by class)}{
 \itemize{
@@ -54,6 +53,18 @@ Details about the tibble tibble that is returned are in the return value section
 \item \code{bbi_summary_log_df}: Takes a \code{bbi_summary_log_df} object, the output of \code{\link[=summary_log]{summary_log()}}.
 }}
 
+\examples{
+\dontrun{
+ # pivot to a wide table
+ summary_log() \%>\%
+   param_estimates() \%>\%
+   tidyr::pivot_wider(
+     names_from = parameter_names,
+     values_from = estimate
+   )
+}
+
+}
 \seealso{
-\code{param_labels()} \code{apply_indices()}
+\code{\link[=param_labels]{param_labels()}} \code{\link[=apply_indices]{apply_indices()}}
 }

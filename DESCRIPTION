@@ -25,7 +25,7 @@ Imports:
     checkmate,
     cli,
     digest,
-    dplyr,
+    dplyr (>= 0.8.0),
     forcats,
     fs,
     ggplot2,

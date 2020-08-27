@@ -16,7 +16,7 @@ as_summary_list(.sums)
 This is used to convert an object containing \verb{bbi_\{.model_type\}_summary} objects into a \code{bbi_summary_list}.
 Currently it is only used for converting a \code{bbi_summary_log_df} into a \code{bbi_summary_list}
 (primarily so that it can more easily be mapped over), but theoretically it could be used for other purposes in the future.
-Note this is primarily intended as a developer functions, though it was exposed because users may have a use for it as well.
+Note this is primarily intended as a developer function, though it was exposed because users may have a use for it as well.
 }
 \section{Methods (by class)}{
 \itemize{

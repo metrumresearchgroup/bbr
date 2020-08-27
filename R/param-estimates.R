@@ -7,7 +7,7 @@
 #'
 #' Returns a tibble containing parameter estimates from a model or batch of models.
 #' Takes either a `bbi_{.model_type}_summary`, `bbi_summary_list`, or `bbi_summary_log_df` object.
-#' Details about the tibble tibble that is returned are in the return value section below.
+#' Details about the tibble that is returned are in the return value section below.
 #'
 #' @return
 #' **Single model:** For `bbi_{.model_type}_summary` dispatch returns a tibble with the following columns:
@@ -15,8 +15,8 @@
 #' * parameter_names -- Parameter name ("THETA1", "THETA2", etc.)
 #' * estimate -- Parameter estimate
 #' * stderr -- Standard Error
-#' * random_effect_sd
-#' * random_effect_sdse
+#' * random_effect_sd -- OMEGA and SIGMA elements in standard deviation/correlation format
+#' * random_effect_sdse -- Standard errors to the OMEGA and SIGMA elements in standard deviation/correlation format
 #' * fixed -- TRUE if parameter is fixed, FALSE otherwise
 #' * diag -- TRUE if parameter is a diagonal element in random effect matrix, FALSE if off-diagonal, NA if parameter is a THETA
 #'
@@ -26,10 +26,20 @@
 #' * parameter_names -- Parameter name ("THETA1", "THETA2", etc.)
 #' * estimate -- Parameter estimate
 #'
-#' This can be easily pivoted to wide-format (one model per row, one parameter per column)
-#' with something like `param_estimates() %>% tidyr::pivot_wider(names_from = parameter_names, values_from = estimate)`
+#' See examples section for how to pivot this to a wide-format table (one model per row, one parameter per column).
 #'
-#' @seealso `param_labels()` `apply_indices()`
+#' @examples
+#' \dontrun{
+#'  # pivot to a wide table
+#'  summary_log() %>%
+#'    param_estimates() %>%
+#'    tidyr::pivot_wider(
+#'      names_from = parameter_names,
+#'      values_from = estimate
+#'    )
+#' }
+#'
+#' @seealso [param_labels()] [apply_indices()]
 #' @param .summary `bbi_{.model_type}_summary`, `bbi_summary_list`, or `bbi_summary_log_df` object
 #' @export
 param_estimates <- function(.summary) {
@@ -77,7 +87,7 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
     ) %>%
     tibble::as_tibble()
 
-  param_df[["fixed"]] <- map_lgl(param_df[["fixed"]], ~ .x == 1)
+  param_df[["fixed"]] <- param_df[["fixed"]] == 1 # convert from 1/0 to T/F
   param_df[["diag"]] <- map_lgl(param_df[[SUMMARY_PARAM_NAMES]], is_diag)
 
   return(param_df)
@@ -92,7 +102,7 @@ param_estimates.bbi_summary_list <- function(.summary) {
   param_df <- map_df(.summary, function(.s) {
     if(!is.na(.s[[SL_ERROR]])){
       warning(paste("Missing summary for", .s[[ABS_MOD_PATH]], "\n", .s[[SL_ERROR]]))
-      return(invisible())
+      return(NULL)
     }
     .s[[SL_SUMMARY]] %>%
       param_estimates() %>%
