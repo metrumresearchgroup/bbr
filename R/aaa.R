@@ -151,15 +151,6 @@ DETAILS_ELEMENTS <- c(
 
 
 ANY_HEURISTICS <- "any_heuristics"
-HEURISTICS_ELEMENTS <- c(
-  "covariance_step_aborted",
-  "large_condition_number",
-  "correlations_not_ok",
-  "parameter_near_boundary",
-  "hessian_reset",
-  "has_final_zero_gradient",
-  "minimization_terminated"
-)
 
 SL_SUMMARY <- "bbi_summary"
 SL_ERROR <- "error_msg"
@@ -181,8 +172,7 @@ SUMMARY_LOG_REQ_COLS <- c(
   DETAILS_ELEMENTS,
   PARAM_COUNT_COL,
   OFV_COL,
-  ANY_HEURISTICS,
-  HEURISTICS_ELEMENTS
+  ANY_HEURISTICS
 )
 
 # define json keys to keep as from bbi_config.json
