@@ -77,7 +77,7 @@ MOD4_ABS_PATH <- file.path(getwd(), LEVEL2_MOD)
 RUN_LOG_ROWS <- 3
 RUN_LOG_COLS <- 8
 CONFIG_COLS <- 4
-SUM_LOG_COLS <- 18
+SUM_LOG_COLS <- 20
 
 # model refs
 
