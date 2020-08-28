@@ -6,6 +6,7 @@
 \alias{extract_details}
 \alias{extract_heuristics}
 \alias{extract_ofv}
+\alias{extract_condition_number}
 \title{Extract from summary object}
 \usage{
 extract_param_count(.s)
@@ -14,7 +15,9 @@ extract_details(.s)
 
 extract_heuristics(.s)
 
-extract_ofv(.s, .subfield = c("ofv_no_constant", "ofv_with_constant", "ofv"))
+extract_ofv(.s)
+
+extract_condition_number(.s)
 }
 \arguments{
 \item{.s}{The summary object to extract from}
@@ -32,6 +35,8 @@ These are all helper functions to extract a specific field or sub-field from a \
 
 \item \code{extract_heuristics}: Extract \code{run_heuristics} field
 
-\item \code{extract_ofv}: Extract objective function value
+\item \code{extract_ofv}: Extract objective function value (without constant) for the final estimation method
+
+\item \code{extract_condition_number}: Extract condition number for the final estimation method
 }}
 
