@@ -82,7 +82,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
 
     expect_false(sum_df2$minimization_terminated[[1]])
     expect_true(sum_df2$large_condition_number[[1]])
-    expect_true(sum_df2$prederr[[1]])
+    expect_true(sum_df2$prderr[[1]])
     expect_true(sum_df2[[ANY_HEURISTICS]][[1]])
   })
 
