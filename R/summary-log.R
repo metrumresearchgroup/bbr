@@ -117,6 +117,7 @@ summary_log_impl <- function(.mods, ...) {
       d = extract_details,
       ofv = extract_ofv,
       param_count = extract_param_count,
+      condition_number = extract_condition_number,
       h = extract_heuristics
     ))
 
@@ -210,4 +211,24 @@ extract_ofv <- function(.s) {
   return(.out)
 }
 
+#' @describeIn extract_from_summary Extract condition number for the final estimation method
+#' @importFrom purrr map map_dbl
+#' @param .subfield The field to extract from within "ofv". Defaults to the objective function value with no constant added, but the other fields are available too.
+extract_condition_number <- function(.s) {
+  .ofv <- map(.s, function(.x) {
+    .x <- .x[[SUMMARY_COND_NUM]]
+    if (!is.null(.x)) {
+      .x <- .x[[length(.x)]] # take the final estimation method
+    }
+    return(.x)
+  })
+  .out <- map_dbl(.ofv, function(.x) {
+    .cn <- .x[[SUMMARY_COND_NUM]]
+    if (is.null(.cn) || .cn == BBI_NULL_NUM) {
+      .cn <- NA_real_
+    }
+    return(.cn)
+  })
+  return(.out)
+}
 

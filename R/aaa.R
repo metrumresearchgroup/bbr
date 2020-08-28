@@ -130,6 +130,7 @@ VALID_SUM_CLASSES <- purrr::map_chr(SUPPORTED_MOD_TYPES,
 
 SUMMARY_DETAILS <- "run_details"
 SUMMARY_HEURISTICS <- "run_heuristics"
+SUMMARY_COND_NUM <- "condition_number"
 SUMMARY_PARAM_NAMES <- "parameter_names"
 SUMMARY_PARAM_DATA <- "parameters_data"
 
@@ -151,6 +152,9 @@ DETAILS_ELEMENTS <- c(
 
 
 ANY_HEURISTICS <- "any_heuristics"
+
+BBI_NULL_NUM <- -999999999
+BBI_NULL_STR <- "-999999999"
 
 SL_SUMMARY <- "bbi_summary"
 SL_ERROR <- "error_msg"
