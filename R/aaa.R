@@ -136,6 +136,8 @@ SUMMARY_COND_NUM <- "condition_number"
 SUMMARY_PARAM_NAMES <- "parameter_names"
 SUMMARY_PARAM_DATA <- "parameters_data"
 SUMMARY_EST_METHOD <- "estimation_method"
+SUMMARY_SHRINKAGE <- "shrinkage_details"
+SUMMARY_PARAM_DIAG <- "diag"
 
 # keys required for a summary object to have
 SUMMARY_REQ_KEYS <- c(

@@ -82,7 +82,9 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
     tibble::as_tibble()
 
   param_df[["fixed"]] <- param_df[["fixed"]] == 1 # convert from 1/0 to T/F
-  param_df[["diag"]] <- map_lgl(param_df[[SUMMARY_PARAM_NAMES]], is_diag)
+  param_df[[SUMMARY_PARAM_DIAG]] <- map_lgl(param_df[[SUMMARY_PARAM_NAMES]], is_diag)
+
+  param_df <- add_param_shrinkage(param_df, .summary[[SUMMARY_SHRINKAGE]])
 
   return(param_df)
 }
@@ -90,7 +92,7 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
 
 #' Check if diagonal index or not
 #'
-#' Private helper to unpack an matrix index string like '(3,3)' is for a diagonal (i.e. if the numbers are the same)
+#' Private helper to unpack a matrix index string like '(3,3)' is for a diagonal (i.e. if the numbers are the same)
 #' @param .name A character scalar containing an index string
 #' @importFrom stringr str_replace_all str_split
 #' @keywords internal
@@ -104,4 +106,24 @@ is_diag <- function(.name) {
   }
 
   return(.ind[1] == .ind[2])
+}
+
+
+#' Add shrinkage details to param table
+#'
+#' Private helper to unpack shrinkage details and create a column on the input tibble
+#' with the shrinkage assigned to the relevant parameters.
+#' @param .param_df The parameter estimates table containing, at minimum `parameter_names` and `diag` columns.
+#' @param .shrinkage_details A named list containing shrinkage information, structured like the `shrinkage_details` element in a `bbi_nonmem_summary` object.
+#' @importFrom dplyr select filter left_join
+#' @keywords internal
+add_param_shrinkage <- function(.param_df, .shrinkage_details) {
+  #.diag_df <- .param_df %>% filter({{ SUMMARY_PARAM_DIAG }}) %>% select({{ SUMMARY_PARAM_NAMES }}, {{ SUMMARY_PARAM_DIAG }})
+  # doesn't work ^ need to do
+  .diag_df <- .param_df %>% filter(diag) %>% select({{ SUMMARY_PARAM_NAMES }}, {{ SUMMARY_PARAM_DIAG }})
+
+  ### pull out eta_sd and maybe eps_sd and add to this
+  ### then left_join back to .param_df and return
+
+
 }
