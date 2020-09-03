@@ -84,7 +84,7 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
   param_df[["fixed"]] <- param_df[["fixed"]] == 1 # convert from 1/0 to T/F
   param_df[[SUMMARY_PARAM_DIAG]] <- map_lgl(param_df[[SUMMARY_PARAM_NAMES]], is_diag)
 
-  param_df <- add_param_shrinkage(param_df, .summary[[SUMMARY_SHRINKAGE]])
+  param_df <- add_param_shrinkage(param_df, .summary)
 
   return(param_df)
 }
@@ -114,16 +114,56 @@ is_diag <- function(.name) {
 #' Private helper to unpack shrinkage details and create a column on the input tibble
 #' with the shrinkage assigned to the relevant parameters.
 #' @param .param_df The parameter estimates table containing, at minimum `parameter_names` and `diag` columns.
-#' @param .shrinkage_details A named list containing shrinkage information, structured like the `shrinkage_details` element in a `bbi_nonmem_summary` object.
-#' @importFrom dplyr select filter left_join
+#' @param .summary A `bbi_nonmem_summary` object.
+#' @importFrom dplyr select filter left_join bind_rows
+#' @importFrom stringr str_detect
 #' @keywords internal
-add_param_shrinkage <- function(.param_df, .shrinkage_details) {
-  #.diag_df <- .param_df %>% filter({{ SUMMARY_PARAM_DIAG }}) %>% select({{ SUMMARY_PARAM_NAMES }}, {{ SUMMARY_PARAM_DIAG }})
-  # doesn't work ^ need to do
-  .diag_df <- .param_df %>% filter(diag) %>% select({{ SUMMARY_PARAM_NAMES }}, {{ SUMMARY_PARAM_DIAG }})
+add_param_shrinkage <- function(.param_df, .summary) {
 
-  ### pull out eta_sd and maybe eps_sd and add to this
-  ### then left_join back to .param_df and return
+  # extract shrinkage for final estimation method
+  shk <- .summary[[SUMMARY_SHRINKAGE]]
+  shk <- shk[[length(shk)]]
 
+  ### CHECK is.null(shk) (no shrinkage details) AND
+  ### IF EST=BAYESIAN AND IF EITHER RETURN COLUMN OF NA ###### !!!!!!!!!!!!
 
+  # check for mixture model with multiple subpops
+  if (length(shk) != 1) {
+    stop("Mixture Model in add_param_shrinkage() WHAT TO DO?") ###### !!!!!!!!!!!!
+  } else {
+    shk <- shk[[1]]
+  }
+
+  # filter to only omega and sigma diagonal elements
+  diag_df <- .param_df %>%
+                filter(.data[[SUMMARY_PARAM_DIAG]]) %>%
+                select({{ SUMMARY_PARAM_NAMES }}, {{ SUMMARY_PARAM_DIAG }})
+
+  # parse shrinkage for OMEGA diagonals
+  omega_df <- filter(diag_df, str_detect(.data[[SUMMARY_PARAM_NAMES]], "OMEGA"))
+  omega_shk <- shk[[SUMMARY_SHRINKAGE_OMEGA]]
+  if (nrow(omega_df) != length(omega_shk)) {
+    stop(paste(
+      glue("Found {nrow(omega_df)} OMEGA diagonals in parameter table and {length(omega_shk)} elements in `.summary[['{SUMMARY_SHRINKAGE}']][['{SUMMARY_SHRINKAGE_OMEGA}']]`."),
+      "Summary object may be malformed."
+      ))
+  }
+  omega_df[[SUMMARY_PARAM_SHRINKAGE]] <- omega_shk
+
+  # parse shrinkage for SIGMA diagonals
+  sigma_df <- filter(diag_df, str_detect(.data[[SUMMARY_PARAM_NAMES]], "SIGMA"))
+  sigma_shk <- shk[[SUMMARY_SHRINKAGE_SIGMA]]
+  if (nrow(sigma_df) != length(sigma_shk)) {
+    stop(paste(
+      glue("Found {nrow(sigma_df)} SIGMA diagonals in parameter table and {length(sigma_shk)} elements in `.summary[['{SUMMARY_SHRINKAGE}']][['{SUMMARY_SHRINKAGE_SIGMA}']]`."),
+      "Summary object may be malformed."
+    ))
+  }
+  sigma_df[[SUMMARY_PARAM_SHRINKAGE]] <- sigma_shk
+
+  # combine shrinkage tibbles with original .param_df
+  shk_df <- bind_rows(omega_df, sigma_df)
+  out_df <- left_join(.param_df, shk_df, by = c(SUMMARY_PARAM_NAMES, SUMMARY_PARAM_DIAG))
+
+  return(out_df)
 }
