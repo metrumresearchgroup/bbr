@@ -170,3 +170,15 @@ cleanup <- function() {
   suppressSpecificWarning(rm(log_df, pos = parent.frame()),.regexpr = "object.+not found")
 }
 
+#' Temporarily perturb a file
+#'
+#' Appends a line to the end of a text file, and flexibly revert the change.
+#'
+#' @param path string giving the file path
+#' @inheritParams withr::defer
+perturb_file <- function(path, envir = parent.frame()) {
+  checkmate::assert_string(path)
+  original <- readr::read_file(path)
+  readr::write_lines("foo", path, append = TRUE)
+  withr::defer(readr::write_file(original, path), envir)
+}
