@@ -28,7 +28,6 @@ setup({
                   .inherit_tags = TRUE,
                   .update_model_file = FALSE)
 
-  CONFIG_1 <- file.path(tools::file_path_sans_ext(YAML_TEST_FILE), "bbi_config.json")
 
   fs::dir_copy(MOD1_PATH, NEW_MOD2)
   fs::dir_copy(MOD1_PATH, NEW_MOD3)
