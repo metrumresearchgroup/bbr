@@ -14,8 +14,11 @@ check_config_ref <- function(log_df, run_nums, col_count) {
   expect_identical(log_df$data_md5, rep(CONFIG_DATA_MD5, run_count))
   expect_identical(log_df$data_path, rep(CONFIG_DATA_PATH, run_count))
   expect_identical(log_df$model_md5, rep(CONFIG_MODEL_MD5, run_count))
+  expect_identical(log_df[["model_has_changed"]], rep(FALSE, run_count))
+  expect_identical(log_df[["data_has_changed"]], rep(FALSE, run_count))
 }
 
+# TODO: replace setup() and teardown() with 3e test fixtures
 setup({
   cleanup()
 
@@ -66,6 +69,20 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   test_that("config_log(.recurse = FALSE) works", {
     log_df <- config_log(MODEL_DIR, .recurse = FALSE)
     check_config_ref(log_df, c("1", "2", "3"), CONFIG_COLS)
+  })
+
+  test_that("config_log() reflects model mismatch", {
+    # TODO: update this pattern once the model_directory option is deprecated
+    perturb_file(CTL_TEST_FILE)
+    log_df <- config_log(MODEL_DIR)
+    expect_equal(log_df[["model_has_changed"]], rep(TRUE, 4L))
+  })
+
+  test_that("config_log() reflects data mismatch", {
+    # TODO: update this pattern once the model_directory option is deprecated
+    perturb_file("data/acop.csv")
+    log_df <- config_log(MODEL_DIR)
+    expect_equal(log_df[["data_has_changed"]], rep(TRUE, 4L))
   })
 
   test_that("add_config() works correctly", {
