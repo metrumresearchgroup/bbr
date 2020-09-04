@@ -97,6 +97,7 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
 #' @describeIn param_estimates Takes a `bbi_summary_list` object, the output of [model_summaries()].
 #' @importFrom purrr map_df
 #' @importFrom dplyr mutate select
+#' @export
 param_estimates.bbi_summary_list <- function(.summary) {
 
   param_df <- map_df(.summary, function(.s) {
@@ -114,6 +115,7 @@ param_estimates.bbi_summary_list <- function(.summary) {
 }
 
 #' @describeIn param_estimates Takes a `bbi_summary_log_df` object, the output of [summary_log()].
+#' @export
 param_estimates.bbi_summary_log_df <- function(.summary) {
   # extract needed pieces into a `bbi_summary_list` object
   .summary <- as_summary_list(.summary)
