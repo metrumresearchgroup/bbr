@@ -1,7 +1,7 @@
 Type: Package
 Package: rbabylon
 Title: R package for babylon
-Version: 0.7.0.8004
+Version: 0.7.0.8005
 Authors@R: 
     c(person(given = "Devin",
              family = "Pastoor",
