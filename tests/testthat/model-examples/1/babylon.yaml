@@ -1,15 +1,15 @@
 nm_version: ""
-overwrite: false
+overwrite: true
 clean_lvl: 1
 copy_lvl: 0
 git: true
-babylon_binary: /data/apps/bbi
-save_config: false
+babylon_binary: /data/apps2/bbi
+save_config: true
 output_dir: '{{ .Name }}'
 threads: 4
 debug: false
 local:
-  create_child_dirs: false
+  create_child_dirs: true
 nonmem:
   nm73gf:
     home: /opt/NONMEM/nm73gf
