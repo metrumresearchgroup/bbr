@@ -6,10 +6,10 @@ Starting NMTRAN
 Recompiling certain components
 Building NONMEM Executable
 Starting nonmem execution ...
-License Registered to: Metrum Research Group
-Expiration Date:    14 JUL 2020
-Current Date:       20 MAY 2020
-Days until program expires :  54
+License Registered to: Metrum
+Expiration Date:    14 JUL 2021
+Current Date:        8 SEP 2020
+Days until program expires : 311
 
 
  First Order Conditional Estimation with Interaction
@@ -57,8 +57,8 @@ Days until program expires :  54
  NPARAMETR:  2.3103E+00  5.4960E+01  4.6466E+02 -8.0572E-02  4.1303E+00  9.6441E-02  1.5357E-01
  PARAMETER:  2.4425E-01  3.0080E+00  3.9387E+00 -4.0286E-01  4.1303E-01  4.2845E-01 -3.2076E-02
  GRADIENT:   1.5687E-02 -2.0836E-02 -1.4475E-01  5.7882E-02 -5.1950E-02 -1.8675E-02  3.4278E-03
- Elapsed estimation  time in seconds:     2.00
- Elapsed covariance  time in seconds:     0.56
+ Elapsed estimation  time in seconds:     2.54
+ Elapsed covariance  time in seconds:     0.91
  Elapsed postprocess time in seconds:     0.00
- Elapsed finaloutput time in seconds:     0.11
+ Elapsed finaloutput time in seconds:     0.00
 Done with nonmem execution

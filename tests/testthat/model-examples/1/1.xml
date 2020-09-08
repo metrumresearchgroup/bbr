@@ -5,7 +5,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="http://namespaces.oreilly.com/xmlnut/address output.xsd"
 xmlns:nm="http://namespaces.oreilly.com/xmlnut/address"
 >
-<nm:start_datetime>2020-05-20T16:45:35.282</nm:start_datetime>
+<nm:start_datetime>2020-09-08T15:30:09.498</nm:start_datetime>
 <nm:control_stream><![CDATA[
 $PROBLEM PK model 1 cmt base
 
@@ -55,10 +55,10 @@ $COV
 ]]></nm:nmtran>
 <nm:nonmem nm:version='7.4.4'>
 <nm:license_information><![CDATA[
-License Registered to: Metrum Research Group
-Expiration Date:    14 JUL 2020
-Current Date:       20 MAY 2020
-Days until program expires :  54
+License Registered to: Metrum
+Expiration Date:    14 JUL 2021
+Current Date:        8 SEP 2020
+Days until program expires : 311
 ]]></nm:license_information>
 <nm:program_information><![CDATA[
 1NONLINEAR MIXED EFFECTS MODEL PROGRAM (NONMEM) VERSION 7.4.4
@@ -331,11 +331,11 @@ Days until program expires :  54
 <nm:col nm:cname='EPS1'>8.0147236558988588</nm:col>
 </nm:row>
 </nm:epsshrinkvr>
-<nm:estimation_elapsed_time>2.00</nm:estimation_elapsed_time>
+<nm:estimation_elapsed_time>2.54</nm:estimation_elapsed_time>
 <nm:covariance_information><![CDATA[
 ]]></nm:covariance_information>
 <nm:covariance_status nm:error='0' nm:numnegeigenvalues='-1' nm:mineigenvalue='0.0000000000000000' nm:maxeigenvalue='0.0000000000000000' nm:rms='0.0000000000000000'/>
-<nm:covariance_elapsed_time>0.56</nm:covariance_elapsed_time>
+<nm:covariance_elapsed_time>0.91</nm:covariance_elapsed_time>
 <nm:final_objective_function_text>MINIMUM VALUE OF OBJECTIVE FUNCTION</nm:final_objective_function_text>
 <nm:final_objective_function>2636.8457703290751</nm:final_objective_function>
 <nm:theta>
@@ -606,10 +606,10 @@ Days until program expires :  54
 </nm:estimation>
 <nm:post_process_times>
 <nm:post_elapsed_time>0.00</nm:post_elapsed_time>
-<nm:finaloutput_elapsed_time>0.11</nm:finaloutput_elapsed_time>
+<nm:finaloutput_elapsed_time>0.00</nm:finaloutput_elapsed_time>
 </nm:post_process_times>
 </nm:problem>
 </nm:nonmem>
-<nm:stop_datetime>2020-05-20T16:45:38.302</nm:stop_datetime>
-<nm:total_cputime>2.543</nm:total_cputime>
+<nm:stop_datetime>2020-09-08T15:30:12.970</nm:stop_datetime>
+<nm:total_cputime>3.358</nm:total_cputime>
 </nm:output>
