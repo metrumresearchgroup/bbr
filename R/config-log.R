@@ -129,7 +129,6 @@ config_log_impl <- function(.mods) {
 parse_bbi_config <- function(path,
                              fields = CONFIG_KEEPERS,
                              model_path_field = ABS_MOD_PATH) {
-  # checkmate::assert_string(path)
   checkmate::assert_file_exists(path)
   checkmate::assert_character(fields)
   checkmate::assert_string(model_path_field)
