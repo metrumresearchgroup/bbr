@@ -86,23 +86,12 @@ config_log_impl <- function(.mods) {
     json_files <- json_files[!missing]
   }
 
-  # map over json files and parse relevant fields
-  df <- map_df(json_files, function(.path) {
+  json_files %>%
+    purrr::map_dfr(parse_bbi_config) %>%
+    dplyr::select(.data[[ABS_MOD_PATH]], everything()) %>%
+    create_config_log_object()
+}
 
-    .conf_list <- fromJSON(.path)
-
-    if (!all(CONFIG_KEEPERS %in% names(.conf_list))) {
-      warning(paste(
-        glue("{.path} is missing the required keys: `{paste(CONFIG_KEEPERS[!(CONFIG_KEEPERS %in% names(.conf_list))], collapse=', ')}` and will be skipped."),
-        glue("This is likely because it was run with an old version of babylon. Model was run on version {.conf_list$bbi_version}"),
-        "User can call `bbi_current_release()` to see the most recent release version, and call `use_bbi(options('rbabylon.bbi_exe_path'))` to upgrade to the version.",
-        sep = "\n"
-      ))
-      return(NULL)
-    }
-
-    .conf_list <- .conf_list[CONFIG_KEEPERS]
-    .conf_list[[ABS_MOD_PATH]] <- dirname(.path)
 #' Parse a bbi config file
 #'
 #' @param path A string giving the path to `bbi_config.json`.
@@ -159,8 +148,6 @@ parse_bbi_config <- function(path,
     return(NULL)
   }
 
-    return(.conf_list)
-  })
   # the model_path field may not exist, e.g., it could be the home directory of
   # the user who ran the model, so we cannot use it directly
   output_dir <- dirname(path)
@@ -186,8 +173,6 @@ parse_bbi_config <- function(path,
   config[c(fields, model_path_field, "model_has_changed", "data_has_changed")]
 }
 
-  df <- select(df, .data[[ABS_MOD_PATH]], everything())
-  df <- create_config_log_object(df)
 #' Compare a file to an MD5 sum
 #'
 #' @param path String giving the path to the file.
