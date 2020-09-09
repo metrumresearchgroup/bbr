@@ -4,16 +4,30 @@
 
 #' Parse babylon configs to log
 #'
-#' Parses `bbi_config.json` files into a log tibble.
-#' This file is created by babylon, in the model output folder.
-#' It stores metadata about the execution of a model run,
-#' including md5 hashes of the model file (control stream) and data file at the time the model was run.
+#' Extracts selected fields from `bbi_config.json`, which is created by babylon
+#' in the model output folder to store metadata about the execution of a model
+#' run.
 #'
-#' @return
-#' `config_log()` will return a tibble with one row per `bbi_config.json` found in `.base_dir` (and optionally subdirectories).
+#' @return An object of class `bbi_config_log_df`, which includes the fields
 #'
-#' `add_config()` takes a `bbi_run_log_df` tibble (the output from [run_log()]) and returns the input tibble,
-#' with all the columns from `config_log()` joined onto it.
+#'   * `absolute_model_path`: the path to the model file, excluding the file
+#'   extension
+#'
+#'   * `model_md5`: the MD5 sum of the model file
+#'
+#'   * `model_has_changed`: a logical indicating whether the model file has
+#'   changed since it was last run
+#'
+#'   * `data_path`: the path to the data file, relative to `absolute_model_path`
+#'
+#'   * `data_md5`: the MD5 sum of the data file
+#'
+#'   * `data_has_changed`: a logical indicating whether the data file has
+#'   changed since the model was last run
+#'
+#'   `config_log()` creates a new tibble with one row per `bbi_config.json`
+#'   found in `.base_dir` (and subdirectories, if `.recurse = TRUE`).
+#'   `add_config()` adds these fields to `.log_df`.
 #'
 #' @seealso [run_log()]
 #' @inheritParams run_log
@@ -36,7 +50,7 @@ config_log <- function(
 
 
 #' @rdname config_log
-#' @param .log_df a `bbi_run_log_df` tibble (the output of [run_log()])
+#' @param .log_df A `bbi_run_log_df` tibble (the output of [run_log()]).
 #' @export
 add_config <- function(.log_df) {
   df <- add_log_impl(.log_df, config_log_impl)
@@ -186,6 +200,5 @@ file_matches <- function(path, md5) {
   checkmate::assert_string(path)
   checkmate::assert_string(md5)
 
-  return(df)
   tools::md5sum(path) == md5
 }

@@ -14,19 +14,30 @@ add_config(.log_df)
 
 \item{.recurse}{If \code{TRUE}, the default, search recursively in all subdirectories. Passed through to \code{fs::dir_ls()} -- If a positive number, the number of levels to recurse.}
 
-\item{.log_df}{a \code{bbi_run_log_df} tibble (the output of \code{\link[=run_log]{run_log()}})}
+\item{.log_df}{A \code{bbi_run_log_df} tibble (the output of \code{\link[=run_log]{run_log()}}).}
 }
 \value{
-\code{config_log()} will return a tibble with one row per \code{bbi_config.json} found in \code{.base_dir} (and optionally subdirectories).
+An object of class \code{bbi_config_log_df}, which includes the fields
+\itemize{
+\item \code{absolute_model_path}: the path to the model file, excluding the file
+extension
+\item \code{model_md5}: the MD5 sum of the model file
+\item \code{model_has_changed}: a logical indicating whether the model file has
+changed since it was last run
+\item \code{data_path}: the path to the data file, relative to \code{absolute_model_path}
+\item \code{data_md5}: the MD5 sum of the data file
+\item \code{data_has_changed}: a logical indicating whether the data file has
+changed since the model was last run
+}
 
-\code{add_config()} takes a \code{bbi_run_log_df} tibble (the output from \code{\link[=run_log]{run_log()}}) and returns the input tibble,
-with all the columns from \code{config_log()} joined onto it.
+\code{config_log()} creates a new tibble with one row per \code{bbi_config.json}
+found in \code{.base_dir} (and subdirectories, if \code{.recurse = TRUE}).
+\code{add_config()} adds these fields to \code{.log_df}.
 }
 \description{
-Parses \code{bbi_config.json} files into a log tibble.
-This file is created by babylon, in the model output folder.
-It stores metadata about the execution of a model run,
-including md5 hashes of the model file (control stream) and data file at the time the model was run.
+Extracts selected fields from \code{bbi_config.json}, which is created by babylon
+in the model output folder to store metadata about the execution of a model
+run.
 }
 \seealso{
 \code{\link[=run_log]{run_log()}}
