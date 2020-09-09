@@ -97,31 +97,46 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("config_log() works correctly with nested dirs", {
     log_df <- config_log(MODEL_DIR)
-    check_config_ref(log_df, c("1", "2", "3", "1"), CONFIG_COLS)
+    check_config_ref(
+      log_df,
+      c("1", "2", "3", "1"),
+      CONFIG_COLS,
+      run_status
+    )
   })
 
   test_that("config_log(.recurse = FALSE) works", {
     log_df <- config_log(MODEL_DIR, .recurse = FALSE)
-    check_config_ref(log_df, c("1", "2", "3"), CONFIG_COLS)
+    check_config_ref(
+      log_df,
+      c("1", "2", "3"),
+      CONFIG_COLS,
+      run_status
+    )
   })
 
   test_that("config_log() reflects model mismatch", {
     # TODO: update this pattern once the model_directory option is deprecated
     perturb_file(CTL_TEST_FILE)
     log_df <- config_log(MODEL_DIR)
-    expect_equal(log_df[["model_has_changed"]], rep(TRUE, 4L))
+    expect_equal(log_df[["model_has_changed"]][1], TRUE)
   })
 
   test_that("config_log() reflects data mismatch", {
     # TODO: update this pattern once the model_directory option is deprecated
     perturb_file("data/acop.csv")
     log_df <- config_log(MODEL_DIR)
-    expect_equal(log_df[["data_has_changed"]], rep(TRUE, 4L))
+    expect_equal(log_df[["data_has_changed"]][1], TRUE)
   })
 
   test_that("add_config() works correctly", {
     log_df <- run_log(MODEL_DIR) %>% add_config()
-    check_config_ref(log_df, c("1", "2", "3", "1"), RUN_LOG_COLS+CONFIG_COLS-1)
+    check_config_ref(
+      log_df,
+      c("1", "2", "3", "1"),
+      RUN_LOG_COLS + CONFIG_COLS - 1,
+      run_status
+    )
   })
 
   test_that("add_config() has correct columns", {
