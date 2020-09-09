@@ -1,6 +1,22 @@
 context("Constructing config log from bbi_config.json")
 
-check_config_ref <- function(log_df, run_nums, col_count) {
+# to minimize changes to the existing tests, we define the model and data status
+# for each of the models any particular test might need
+run_status <- dplyr::tribble(
+  ~rel_path, ~model_has_changed, ~data_has_changed,
+        "1",              FALSE,             FALSE,
+        "2",               TRUE,             FALSE,
+        "3",              FALSE,             FALSE,
+ "level2/1",               TRUE,                NA
+)
+
+#' Helper to check config output
+#'
+#' @param log_df an object of class `bbi_config_log_df`
+#' @param run_nums character vector of model run numbers
+#' @param col_count number of columns to expect in `log_df`
+#' @param run_status a tibble holding model and data status by run
+check_config_ref <- function(log_df, run_nums, col_count, run_status) {
 
   expect_identical(basename(log_df[[ABS_MOD_PATH]]), run_nums)
 
@@ -16,6 +32,24 @@ check_config_ref <- function(log_df, run_nums, col_count) {
   expect_identical(log_df$model_md5, rep(CONFIG_MODEL_MD5, run_count))
   expect_identical(log_df[["model_has_changed"]], rep(FALSE, run_count))
   expect_identical(log_df[["data_has_changed"]], rep(FALSE, run_count))
+
+  base_path <- fs::path_common(log_df[["absolute_model_path"]])
+
+  actual_status <-
+    run_status %>%
+    dplyr::mutate(
+      absolute_model_path = as.character(fs::path(base_path, rel_path))
+    ) %>%
+    dplyr::semi_join(log_df, by = "absolute_model_path")
+
+  expect_identical(
+    log_df[["model_has_changed"]],
+    actual_status[["model_has_changed"]]
+  )
+  expect_identical(
+    log_df[["data_has_changed"]],
+    actual_status[["data_has_changed"]]
+  )
 }
 
 # TODO: replace setup() and teardown() with 3e test fixtures
