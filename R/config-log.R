@@ -109,6 +109,19 @@ config_log_impl <- function(.mods) {
 
   df <- select(df, .data[[ABS_MOD_PATH]], everything())
   df <- create_config_log_object(df)
+#' Compare a file to an MD5 sum
+#'
+#' @param path String giving the path to the file.
+#' @param md5 String giving expected MD5 sum.
+#'
+#' @return `TRUE` if `path` matches `md5`, `FALSE` if they don't match, and `NA`
+#'   if `path` doesn't exist.
+#' @keywords internal
+file_matches <- function(path, md5) {
+  # TODO: consider if this assertion should be that `path` exists
+  checkmate::assert_string(path)
+  checkmate::assert_string(md5)
 
   return(df)
+  tools::md5sum(path) == md5
 }
