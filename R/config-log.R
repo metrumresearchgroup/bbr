@@ -103,9 +103,88 @@ config_log_impl <- function(.mods) {
 
     .conf_list <- .conf_list[CONFIG_KEEPERS]
     .conf_list[[ABS_MOD_PATH]] <- dirname(.path)
+#' Parse a bbi config file
+#'
+#' @param path A string giving the path to `bbi_config.json`.
+#' @param fields A character vector of fields to include.
+#' @param model_path_field A string giving the field name for the model path.
+#'
+#' @return A list whose elements include
+#'
+#'   * the path to the model file (minus extension)
+#'
+#'   * `fields`
+#'
+#'   * whether the model file has changed
+#'
+#'   * whether the data file has changed
+#'
+#'   The return value is `NULL` if any element of `fields` is not found in
+#'   `path`.
+#'
+#' @keywords internal
+parse_bbi_config <- function(path,
+                             fields = CONFIG_KEEPERS,
+                             model_path_field = ABS_MOD_PATH) {
+  # checkmate::assert_string(path)
+  checkmate::assert_file_exists(path)
+  checkmate::assert_character(fields)
+  checkmate::assert_string(model_path_field)
+
+  config <- jsonlite::fromJSON(path)
+
+  if (!all(fields %in% names(config))) {
+    msg <- glue::glue(
+      glue::glue(
+        "{path} is missing the required keys:",
+        "`{paste(fields[!(fields %in% names(config))], collapse = ', ')}`",
+        "and will be skipped.",
+        .sep = " "
+      ),
+      glue::glue(
+        "This is likely because it was run with an old version of babylon.",
+        "Model was run on version {config[['bbi_version']]}",
+        .sep = " "
+      ),
+      glue::glue(
+        "User can call `bbi_current_release()` to see the most recent release",
+        "version, and call `use_bbi(options('rbabylon.bbi_exe_path'))` to",
+        "upgrade to the version.",
+        .sep = " "
+      ),
+      .sep = "\n"
+    )
+
+    warning(msg)
+    return(NULL)
+  }
 
     return(.conf_list)
   })
+  # the model_path field may not exist, e.g., it could be the home directory of
+  # the user who ran the model, so we cannot use it directly
+  output_dir <- dirname(path)
+  model_path <- fs::path_ext_set(output_dir, config[["model_extension"]])
+
+  data_path <- fs::path_norm(
+    file.path(
+      output_dir,
+      config[["data_path"]]
+    )
+  )
+
+  matches <- purrr::map2_lgl(
+    c(model_path, data_path),
+    c(config[["model_md5"]], config[["data_md5"]]),
+    file_matches
+  )
+
+  config[["model_has_changed"]] <- !matches[1]
+  config[["data_has_changed"]] <- !matches[2]
+
+  config[[model_path_field]] <- output_dir
+  config[c(fields, model_path_field, "model_has_changed", "data_has_changed")]
+}
 
   df <- select(df, .data[[ABS_MOD_PATH]], everything())
   df <- create_config_log_object(df)
