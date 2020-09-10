@@ -207,3 +207,24 @@ file_matches <- function(path, md5) {
 
   res
 }
+
+#' Determine the NONMEM version used
+#'
+#' The version of NONMEM used to run a model is represented in `bbi_config.json`
+#' as either the field `nm_version`, or the version in the `nonmem` object with
+#' `default: true`.
+#'
+#' @param x A list representing `bbi_config.json`.
+#'
+#' @return A string giving the version of NONMEM used.
+#' @keywords internal
+resolve_nonmem_version <- function(x) {
+  checkmate::assert_list(x)
+
+  ver <- x[["nm_version"]]
+  if (is.null(ver)) {
+    idx <- purrr::map(x[["configuration"]][["nonmem"]], "default")
+    ver <- names(purrr::compact(idx))
+  }
+  ver
+}
