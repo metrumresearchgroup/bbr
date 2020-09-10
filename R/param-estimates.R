@@ -5,12 +5,11 @@
 
 #' Parses parameter estimates table
 #'
-#' Returns a tibble containing parameter estimates from a model or batch of models.
-#' Takes either a `bbi_{.model_type}_summary`, `bbi_summary_list`, or `bbi_summary_log_df` object.
+#' Returns a tibble containing parameter estimates from a `bbi_{.model_type}_summary` object.
 #' Details about the tibble that is returned are in the return value section below.
 #'
 #' @return
-#' **Single model:** For `bbi_{.model_type}_summary` dispatch returns a tibble with the following columns:
+#' Returns a tibble with the following columns:
 #'
 #' * parameter_names -- Parameter name ("THETA1", "THETA2", etc.)
 #' * estimate -- Parameter estimate
@@ -20,33 +19,15 @@
 #' * fixed -- TRUE if parameter is fixed, FALSE otherwise
 #' * diag -- TRUE if parameter is a diagonal element in random effect matrix, FALSE if off-diagonal, NA if parameter is a THETA
 #'
-#' **Multiple models:** For `bbi_summary_list` or `bbi_summary_log_df` objects returns a long-format tibble with the following columns for all models in the input:
-#'
-#' * absolute_model_path -- absolute path to the model yaml (without extension), serving as the unique identifier for the model
-#' * parameter_names -- Parameter name ("THETA1", "THETA2", etc.)
-#' * estimate -- Parameter estimate
-#'
-#' See examples section for how to pivot this to a wide-format table (one model per row, one parameter per column).
-#'
-#' @examples
-#' \dontrun{
-#'  # pivot to a wide table
-#'  summary_log() %>%
-#'    param_estimates() %>%
-#'    tidyr::pivot_wider(
-#'      names_from = parameter_names,
-#'      values_from = estimate
-#'    )
-#' }
 #'
 #' @seealso [param_labels()] [apply_indices()]
-#' @param .summary `bbi_{.model_type}_summary`, `bbi_summary_list`, or `bbi_summary_log_df` object
+#' @param .summary A `bbi_{.model_type}_summary` object.
 #' @export
 param_estimates <- function(.summary) {
   UseMethod("param_estimates")
 }
 
-#' @describeIn param_estimates Takes `bbi_nonmem_summary` object, the output of [model_summary()].
+#' @describeIn param_estimates Takes `bbi_nonmem_summary` object, the output of [model_summary.bbi_nonmem_model()].
 #' @importFrom tibble tibble as_tibble
 #' @importFrom purrr map_at map_depth map_lgl
 #' @importFrom rlang list2
@@ -89,39 +70,6 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
 
   param_df[["fixed"]] <- param_df[["fixed"]] == 1 # convert from 1/0 to T/F
   param_df[["diag"]] <- map_lgl(param_df[[SUMMARY_PARAM_NAMES]], is_diag)
-
-  return(param_df)
-}
-
-
-#' @describeIn param_estimates Takes a `bbi_summary_list` object, the output of [model_summaries()].
-#' @importFrom purrr map_df
-#' @importFrom dplyr mutate select
-#' @export
-param_estimates.bbi_summary_list <- function(.summary) {
-
-  param_df <- map_df(.summary, function(.s) {
-    if(!is.na(.s[[SL_ERROR]])){
-      warning(paste("Missing summary for", .s[[ABS_MOD_PATH]], "\n", .s[[SL_ERROR]]))
-      return(NULL)
-    }
-    .s[[SL_SUMMARY]] %>%
-      param_estimates() %>%
-      mutate(!!ABS_MOD_PATH := .s[[ABS_MOD_PATH]]) %>%
-      select(.data[[ABS_MOD_PATH]], .data[[SUMMARY_PARAM_NAMES]], .data[["estimate"]])
-  })
-
-  return(param_df)
-}
-
-#' @describeIn param_estimates Takes a `bbi_summary_log_df` object, the output of [summary_log()].
-#' @export
-param_estimates.bbi_summary_log_df <- function(.summary) {
-  # extract needed pieces into a `bbi_summary_list` object
-  .summary <- as_summary_list(.summary)
-
-  # pass to `bbi_summary_list` dispatch
-  param_df <- param_estimates(.summary)
 
   return(param_df)
 }
