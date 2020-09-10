@@ -15,14 +15,8 @@ teardown({
   cleanup()
 })
 
-# build references
+# build reference
 ref_df1 <- readRDS(PARAM_REF_FILE)
-ref_df1b <- dplyr::select(ref_df1, .data[[SUMMARY_PARAM_NAMES]], .data[["estimate"]])
-ref_df2 <- dplyr::bind_rows(
-  dplyr::bind_cols(!!ABS_MOD_PATH := normalizePath(rep(MOD1_PATH, nrow(ref_df1b))), ref_df1b),
-  dplyr::bind_cols(!!ABS_MOD_PATH := normalizePath(rep(NEW_MOD2, nrow(ref_df1b))),  ref_df1b),
-  dplyr::bind_cols(!!ABS_MOD_PATH := normalizePath(rep(NEW_MOD3, nrow(ref_df1b))),  ref_df1b)
-)
 
 withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
                          rbabylon.model_directory = NULL), {
@@ -37,23 +31,5 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
     expect_true(all(round(par_df$estimate, 2) == round(ref_df1$estimate, 2)))
     expect_true(all(par_df$fixed == ref_df1$fixed))
   })
-
-test_that("param_estimates.bbi_summary_list gets expected table", {
-
-  # extract parameter df
-  par_df <- summary_log(MODEL_DIR) %>% as_summary_list() %>% param_estimates()
-
-  # check against reference
-  expect_equal(par_df, ref_df2)
-})
-
-test_that("param_estimates.bbi_summary_log_df gets expected table", {
-
-  # extract parameter df
-  par_df <- summary_log(MODEL_DIR) %>% param_estimates()
-
-  # check against reference
-  expect_equal(par_df, ref_df2)
-})
 
 }) # closing withr::with_options
