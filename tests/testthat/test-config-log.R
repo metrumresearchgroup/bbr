@@ -1,5 +1,8 @@
 context("Constructing config log from bbi_config.json")
 
+expected_bbi_version <- "v2.1.2"
+expected_nonmem_version <- "nm74gf"
+
 # to minimize changes to the existing tests, we define the model and data status
 # for each of the models any particular test might need
 run_status <- dplyr::tribble(
@@ -127,6 +130,16 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_equal(log_df[["data_has_changed"]][1], TRUE)
   })
 
+  test_that("config_log() includes babylon version", {
+    log_df <- config_log(MODEL_DIR)
+    expect_equal(log_df[["bbi_version"]][1], expected_bbi_version)
+  })
+
+  test_that("config_log() includes NONMEM version", {
+    log_df <- config_log(MODEL_DIR)
+    expect_equal(log_df[["nm_version"]][1], expected_nonmem_version)
+  })
+
   test_that("add_config() works correctly", {
     log_df <- run_log(MODEL_DIR) %>% add_config()
     check_config_ref(
@@ -153,6 +166,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   # THESE TESTS NEED TO BE LAST BECAUSE IT DELETES NECESSARY FILES
   fs::file_delete(file.path(NEW_MOD2, "bbi_config.json"))
   fs::file_delete(file.path(NEW_MOD3, "bbi_config.json"))
+  missing_idx <- c(2L, 3L)
 
   test_that("add_config() works correctly with missing json", {
     log_df <- expect_warning(run_log(MODEL_DIR) %>% add_config(), regexp = "Found only 2 bbi_config.json files for 4 models")
@@ -169,6 +183,14 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_identical(log_df$data_md5, c(CONFIG_DATA_MD5, NA_character_, NA_character_, CONFIG_DATA_MD5))
     expect_identical(log_df$data_path, c(CONFIG_DATA_PATH, NA_character_, NA_character_, CONFIG_DATA_PATH))
     expect_identical(log_df$model_md5, c(CONFIG_MODEL_MD5, NA_character_, NA_character_, CONFIG_MODEL_MD5))
+    expect_identical(
+      log_df[["bbi_version"]],
+      rep_missing(expected_bbi_version, missing_idx, 4L)
+    )
+    expect_identical(
+      log_df[["nm_version"]],
+      rep_missing(expected_nonmem_version, missing_idx, 4L)
+    )
   })
 
 }) # closing withr::with_options
