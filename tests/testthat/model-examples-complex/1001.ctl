@@ -1,0 +1,122 @@
+; THIS IS USED BY BBI TO TEST BAYESIAN RUNS
+; IT ALSO TESTS LARGE CONDITION NUMBER HEURISTIC
+; It is from Janelle Lennie's DMD disease progression model
+$SIZES LPAR=40
+
+$PROB Run# 1001.1
+
+$INPUT C ID DV TIME AGE EVID DOSE PATIENT CMT AMT LOQ MDV FLG      BL STER REF CAT     DROP
+$DATA ../tranNM_final.csv IGNORE=(C="C")
+
+$SUBROUTINE ADVAN13 TRANS1 TOL=12
+
+$PRIOR NWPRI NTHETA=6, NETA=4, NEPS=2, NTHP=6, NETP=4, NEPP=0
+
+$MODEL
+COMP = (SMWT, DEFOBS)
+
+$PK
+IF(PATIENT.EQ.0) KOUT = EXP(THETA(1) + ETA(1))
+IF(PATIENT.EQ.1) KOUT = EXP(THETA(1) + ETA(2))
+
+KIN1 = 0
+
+IF(PATIENT.EQ.0) KCOV = 0
+IF(PATIENT.EQ.1) KCOV = THETA(3)
+
+IF(PATIENT.EQ.0) KIN2 = EXP(THETA(2))
+IF(PATIENT.EQ.1) KINDMD = THETA(2) * KCOV
+IF(PATIENT.EQ.1) KIN2 = EXP(KINDMD + ETA(3))
+
+MTDIFF = 1
+MTIME(1)= EXP(THETA(4))
+
+KIN = KIN1*(1-MPAST(1)) + KIN2*(MPAST(1))
+
+IF(PATIENT.EQ.0) SCALAR = 0                   ;healthy
+IF(PATIENT.EQ.1) SCALAR = EXP(THETA(5) + ETA(4))    ;dmd
+
+IF(PATIENT.EQ.0) EXPON = 0                            ;healthy
+IF(PATIENT.EQ.1) EXPON = (EXP(THETA(6)) / (1 + EXP(THETA(6))))  ;dmd
+
+A_0(1) = 0
+
+$DES
+IF(PATIENT.EQ.0) DIS = 0                                ;healthy
+
+IF(T.EQ.0.AND.PATIENT.EQ.1) DIS = 0                       ;dmd
+IF(T.GT.0.AND.PATIENT.EQ.1) DIS = SCALAR*EXP(T*(EXPON))   ;dmd
+
+DADT(1) = KIN-(KOUT*A(1)*(1+DIS))
+
+$ERROR
+IF(PATIENT.EQ.0) Y = F + ERR(1) ;healthy
+IF(PATIENT.EQ.1) Y = F + ERR(2) ;dmd
+
+SMWT = A(1)
+IPRED = F
+
+$THETA
+-0.574219127214817 ;[1/year] KOUT LOGD
+5.67154052944669 ;[meters/year] KIN LOGD
+1.03568637508119 ;[na] KCOV LOGD
+0.241769673098703 ;[years] MTIME LOGD
+-11.3632385211334 ;[na] Scalar LOGD
+5.11272713931817 ;[na] EXPON LOGD
+
+
+$OMEGA
+0.09          ;[P] KOUThealthy
+
+
+$OMEGA BLOCK (3)
+    0.09          ;[P] KOUTdmd
+    0.01          ;[P] cov21
+    0.09          ;[P] KINdmd
+    0.01          ;[P] cov31
+    0.01          ;[P] cov32
+    0.09          ;[P] SCALAR
+
+
+$SIGMA
+0.04           ;[A] healthy
+0.04           ;[A] dmd
+
+
+$THETAP ;prior mode for thetas
+  -0.676 FIX
+  5.8 FIX
+  0.921 FIX
+  0.390 FIX
+  -11.4 FIX
+  5 FIX
+
+
+$THETAPV BLOCK(6) ;var-cov for prior on thetas --> uncertainty for thetas     *uncertainty
+  10 FIX
+  0  10
+  0  0  10
+  0  0  0  0.0625
+  0  0  0  0  10
+  0  0  0  0  0  2
+
+
+$OMEGAP
+  0.09 FIX
+
+
+$OMEGAP BLOCK(3)
+  0.09 FIX
+  0.01 0.09
+  0.01 0.01 0.09
+
+
+
+$OMEGAPD (1 FIX)(3 FIX); df for each $omega block
+
+
+$EST METHOD=BAYES LAPLACIAN NUMERICAL MUM=NNNNNN
+NBURN = 5000 NITER = 10000 SEED = 1111
+PRINT = 1 NOABORT FILE = 1001.1.TXT
+$COV PRINT = E UNCONDITIONAL
+$TABLE ID AGE PRED IPRED EVID ETAS(1:LAST) RES CWRES SMWT DIS KIN KOUT DIS NOPRINT ONEHEADER FILE=./1001.1.tab

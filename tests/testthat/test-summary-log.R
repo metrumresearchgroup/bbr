@@ -77,6 +77,28 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
     expect_identical(sum_df$yaml_md5, ALL_MODS_YAML_MD5)
   })
 
+  test_that("summary_log() parses heuristics correctly", {
+    sum_df2 <- summary_log(MODEL_DIR_X, .fail_flags = list(ext_file = "1001.1.TXT"))
+
+    expect_false(sum_df2$minimization_terminated[[1]])
+    expect_true(sum_df2$large_condition_number[[1]])
+    expect_true(sum_df2$prderr[[1]])
+    expect_true(sum_df2[[ANY_HEURISTICS]][[1]])
+  })
+
+  test_that("summary_log() parses more complex flags and stats", {
+    sum_df2 <- summary_log(MODEL_DIR_X, .fail_flags = list(ext_file = "1001.1.TXT"))
+
+    # check fail flag parsed
+    expect_equal(sum_df2[[SL_FAIL_FLAGS]], c(TRUE, FALSE))
+
+    # check multiple estimation methods
+    num_est_methods <- map_int(sum_df2[["estimation_method"]], length)
+    expect_equal(num_est_methods, c(1, 2))
+    expect_equal(sum_df2[[OFV_COL]], c(3842.571, -10838.582), tolerance = 0.01)
+    expect_equal(sum_df2[[SUMMARY_COND_NUM]], c(4352.941, NA_real_), tolerance = 0.01)
+  })
+
   # THESE TESTS NEEDS TO BE LAST BECAUSE IT DELETES NECESSARY FILES
   fs::file_delete(file.path(LEVEL2_MOD, "1.grd"))
 

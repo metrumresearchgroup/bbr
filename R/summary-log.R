@@ -117,6 +117,7 @@ summary_log_impl <- function(.mods, ...) {
       d = extract_details,
       ofv = extract_ofv,
       param_count = extract_param_count,
+      condition_number = extract_condition_number,
       h = extract_heuristics
     ))
 
@@ -148,7 +149,13 @@ extract_param_count <- function(.s) {
     num_methods <- length(.x)
 
     .fix <- unlist(.x[[num_methods]]$fixed)
-    length(.fix) - sum(.fix)
+
+    .pm_count <- length(.fix) - sum(.fix)
+
+    if (.pm_count == 0) {
+      .pm_count <- NA_integer_
+    }
+    .pm_count
   })
 
   return(.out)
@@ -180,8 +187,6 @@ extract_heuristics <- function(.s) {
       return(NULL)
     }
 
-    .x <- .x[HEURISTICS_ELEMENTS]
-
     .any <- list()
     .any[[ANY_HEURISTICS]] = any(unlist(.x))
 
@@ -191,14 +196,39 @@ extract_heuristics <- function(.s) {
   return(.out)
 }
 
-#' @describeIn extract_from_summary Extract objective function value
+#' @describeIn extract_from_summary Extract objective function value (without constant) for the final estimation method
 #' @importFrom purrr map map_dbl
 #' @param .subfield The field to extract from within "ofv". Defaults to the objective function value with no constant added, but the other fields are available too.
-extract_ofv <- function(.s, .subfield = c("ofv_no_constant", "ofv_with_constant", "ofv")) {
-  .subfield <- match.arg(.subfield)
-  .ofv <- map(.s, "ofv")
-  .out <- map_dbl(.ofv, .subfield, .default = NA_real_)
+extract_ofv <- function(.s) {
+  .ofv <- map(.s, function(.x) {
+    .x <- .x[["ofv"]]
+    if (!is.null(.x)) {
+      .x <- .x[[length(.x)]] # take the final estimation method
+    }
+    return(.x)
+  })
+  .out <- map_dbl(.ofv, "ofv_no_constant", .default = NA_real_)
   return(.out)
 }
 
+#' @describeIn extract_from_summary Extract condition number for the final estimation method
+#' @importFrom purrr map map_dbl
+#' @param .subfield The field to extract from within "ofv". Defaults to the objective function value with no constant added, but the other fields are available too.
+extract_condition_number <- function(.s) {
+  .ofv <- map(.s, function(.x) {
+    .x <- .x[[SUMMARY_COND_NUM]]
+    if (!is.null(.x)) {
+      .x <- .x[[length(.x)]] # take the final estimation method
+    }
+    return(.x)
+  })
+  .out <- map_dbl(.ofv, function(.x) {
+    .cn <- .x[[SUMMARY_COND_NUM]]
+    if (is.null(.cn) || .cn == BBI_NULL_NUM) {
+      .cn <- NA_real_
+    }
+    return(.cn)
+  })
+  return(.out)
+}
 
