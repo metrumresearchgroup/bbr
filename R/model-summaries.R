@@ -210,6 +210,7 @@ as_summary_list <- function(.sums) {
 #' @describeIn as_summary_list Convert a `bbi_summary_log_df` into a `bbi_summary_list`
 #' @importFrom dplyr group_split select row_number
 #' @importFrom purrr map
+#' @export
 as_summary_list.bbi_summary_log_df <- function(.sums) {
   .sums <- .sums[SUMMARY_LIST_REQ_KEYS]
 
