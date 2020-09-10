@@ -24,6 +24,7 @@ A list whose elements include
 \item \code{fields}
 \item whether the model file has changed
 \item whether the data file has changed
+\item the version of NONMEM
 }
 
 The return value is \code{NULL} if any element of \code{fields} is not found in

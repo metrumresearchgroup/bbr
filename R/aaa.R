@@ -183,7 +183,8 @@ SUMMARY_LOG_REQ_COLS <- c(
 CONFIG_KEEPERS <- c(
   "model_md5",
   "data_path",
-  "data_md5"
+  "data_md5",
+  "bbi_version"
 )
 
 CONFIG_LOG_REQ_COLS <- c(

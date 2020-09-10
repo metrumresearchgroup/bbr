@@ -15,12 +15,16 @@
 #'
 #'   * `model_md5`: the MD5 sum of the model file
 #'
-#'   * `model_has_changed`: a logical indicating whether the model file has
-#'   changed since it was last run
-#'
 #'   * `data_path`: the path to the data file, relative to `absolute_model_path`
 #'
 #'   * `data_md5`: the MD5 sum of the data file
+#'
+#'   * `bbi_version`: the version of babylon last used to run the model
+#'
+#'   * `nm_version`: the version of NONMEM last used to run the model
+#'
+#'   * `model_has_changed`: a logical indicating whether the model file has
+#'   changed since it was last run
 #'
 #'   * `data_has_changed`: a logical indicating whether the data file has
 #'   changed since the model was last run
@@ -122,6 +126,8 @@ config_log_impl <- function(.mods) {
 #'
 #'   * whether the data file has changed
 #'
+#'   * the version of NONMEM
+#'
 #'   The return value is `NULL` if any element of `fields` is not found in
 #'   `path`.
 #'
@@ -181,9 +187,18 @@ config_log_entry <- function(path,
 
   config[["model_has_changed"]] <- !matches[1]
   config[["data_has_changed"]] <- !matches[2]
-
+  config[["nm_version"]] <- resolve_nonmem_version(config)
   config[[model_path_field]] <- output_dir
-  config[c(fields, model_path_field, "model_has_changed", "data_has_changed")]
+
+  out_fields <- c(
+    fields,
+    model_path_field,
+    "nm_version",
+    "model_has_changed",
+    "data_has_changed"
+  )
+
+  config[out_fields]
 }
 
 #' Compare a file to an MD5 sum
