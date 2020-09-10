@@ -177,12 +177,29 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # run_log fields
     expect_identical(basename(log_df[[ABS_MOD_PATH]]), c("1", "2", "3", "1"))
     expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS, ORIG_TAGS))
-    expect_identical(log_df$yaml_md5, c("ee5a30a015c4e09bc29334188ff28b58", "5576ed6fa6e1e4e9b0c25dbf62ae42e5", "ebadcc4a3c0f4d16f61251605136942b", "6132d34ba27caf3460d23c9b4a3937d9"))
+    expect_identical(
+      log_df[["yaml_md5"]],
+      c(
+        "ee5a30a015c4e09bc29334188ff28b58",
+        "5576ed6fa6e1e4e9b0c25dbf62ae42e5",
+        "ebadcc4a3c0f4d16f61251605136942b",
+        "6132d34ba27caf3460d23c9b4a3937d9"
+      )
+    )
 
     # config log fields
-    expect_identical(log_df$data_md5, c(CONFIG_DATA_MD5, NA_character_, NA_character_, CONFIG_DATA_MD5))
-    expect_identical(log_df$data_path, c(CONFIG_DATA_PATH, NA_character_, NA_character_, CONFIG_DATA_PATH))
-    expect_identical(log_df$model_md5, c(CONFIG_MODEL_MD5, NA_character_, NA_character_, CONFIG_MODEL_MD5))
+    expect_identical(
+      log_df[["data_md5"]],
+      rep_missing(CONFIG_DATA_MD5, missing_idx, 4L)
+    )
+    expect_identical(
+      log_df[["data_path"]],
+      rep_missing(CONFIG_DATA_PATH, missing_idx, 4L)
+    )
+    expect_identical(
+      log_df[["model_md5"]],
+      rep_missing(CONFIG_MODEL_MD5, missing_idx, 4L)
+    )
     expect_identical(
       log_df[["bbi_version"]],
       rep_missing(expected_bbi_version, missing_idx, 4L)
