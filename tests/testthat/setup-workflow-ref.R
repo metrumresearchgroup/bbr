@@ -183,3 +183,24 @@ perturb_file <- function(path, envir = parent.frame()) {
   readr::write_lines("foo", path, append = TRUE)
   withr::defer(readr::write_file(original, path), envir)
 }
+
+#' Selectively repeat a value
+#'
+#' It can be useful to create a vector of a particular length with certain
+#' elements set to `NA`.
+#'
+#' @param x The scalar value to repeat.
+#' @param i Integer vector of indices that should be `NA`.
+#' @param len Non-negative integer giving the desired length of the output
+#'   vector.
+#'
+#' @return A vector of length `len` whose elements
+rep_missing <- function(x, i, len) {
+  checkmate::assert_scalar(x)
+  checkmate::assert_integerish(i)
+  checkmate::assert_count(len)
+
+  res <- rep(x, len)
+  res[i] <- NA
+  res
+}
