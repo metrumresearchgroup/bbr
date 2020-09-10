@@ -79,6 +79,10 @@ RUN_LOG_COLS <- 8
 CONFIG_COLS <- 4
 SUM_LOG_COLS <- 18
 
+CONFIG_DATA_PATH <- "../../data/acop.csv"
+CONFIG_DATA_MD5 <- "4ddb44da897c26681d892aa7be99f74b"
+CONFIG_MODEL_MD5 <- "6b930119c4224ba077091b47959b0604"
+
 # model refs
 
 REF_LIST_1 <- list(

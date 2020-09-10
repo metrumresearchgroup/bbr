@@ -11,9 +11,9 @@ check_config_ref <- function(log_df, run_nums, col_count) {
   expect_false(any(duplicated(log_df[[ABS_MOD_PATH]])))
 
   # these are the same because bbi_config.json was just copied through
-  expect_identical(log_df$data_md5, rep("4ddb44da897c26681d892aa7be99f74b", run_count))
-  expect_identical(log_df$data_path, rep("../../data/acop.csv", run_count))
-  expect_identical(log_df$model_md5, rep("731923458236cc008c3adafa2f0877a7", run_count))
+  expect_identical(log_df$data_md5, rep(CONFIG_DATA_MD5, run_count))
+  expect_identical(log_df$data_path, rep(CONFIG_DATA_PATH, run_count))
+  expect_identical(log_df$model_md5, rep(CONFIG_MODEL_MD5, run_count))
 }
 
 setup({
@@ -90,9 +90,9 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_identical(log_df$yaml_md5, c("ee5a30a015c4e09bc29334188ff28b58", "5576ed6fa6e1e4e9b0c25dbf62ae42e5", "ebadcc4a3c0f4d16f61251605136942b", "6132d34ba27caf3460d23c9b4a3937d9"))
 
     # config log fields
-    expect_identical(log_df$data_md5, c("4ddb44da897c26681d892aa7be99f74b", NA_character_, NA_character_, "4ddb44da897c26681d892aa7be99f74b"))
-    expect_identical(log_df$data_path, c("../../data/acop.csv", NA_character_, NA_character_, "../../data/acop.csv"))
-    expect_identical(log_df$model_md5, c("731923458236cc008c3adafa2f0877a7", NA_character_, NA_character_, "731923458236cc008c3adafa2f0877a7"))
+    expect_identical(log_df$data_md5, c(CONFIG_DATA_MD5, NA_character_, NA_character_, CONFIG_DATA_MD5))
+    expect_identical(log_df$data_path, c(CONFIG_DATA_PATH, NA_character_, NA_character_, CONFIG_DATA_PATH))
+    expect_identical(log_df$model_md5, c(CONFIG_MODEL_MD5, NA_character_, NA_character_, CONFIG_MODEL_MD5))
   })
 
 }) # closing withr::with_options
