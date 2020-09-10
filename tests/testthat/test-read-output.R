@@ -7,25 +7,25 @@ context("Reading NONMEM output files into R")
 # .lst file
 LST_FULL_VEC <- readr::read_lines(LST_TEST_FILE)
 
-LST_REF_DEFAULT <- c("Wed May 20 16:45:27 EDT 2020", "$PROBLEM PK model 1 cmt base",
-                     "", "...", " ", " Elapsed finaloutput time in seconds:     0.11",
-                     " #CPUT: Total CPU Time in Seconds,        2.543", "Stop Time:",
-                     "Wed May 20 16:45:38 EDT 2020")
+LST_REF_DEFAULT <- c("Thu Sep 10 15:12:29 EDT 2020", "$PROBLEM PK model 1 cmt base",
+                     "", "...", " ", " Elapsed finaloutput time in seconds:     0.01",
+                     " #CPUT: Total CPU Time in Seconds,        2.696", "Stop Time:",
+                     "Thu Sep 10 15:12:50 EDT 2020")
 
-LST_REF_0_5 <- c("...", " ", " Elapsed finaloutput time in seconds:     0.11",
-                 " #CPUT: Total CPU Time in Seconds,        2.543", "Stop Time:",
-                 "Wed May 20 16:45:38 EDT 2020")
+LST_REF_0_5 <- c("...", " ", " Elapsed finaloutput time in seconds:     0.01",
+                 " #CPUT: Total CPU Time in Seconds,        2.696", "Stop Time:",
+                 "Thu Sep 10 15:12:50 EDT 2020")
 
-LST_REF_5_0 <- c("Wed May 20 16:45:27 EDT 2020", "$PROBLEM PK model 1 cmt base",
+LST_REF_5_0 <- c("Thu Sep 10 15:12:29 EDT 2020", "$PROBLEM PK model 1 cmt base",
                  "", "$INPUT ID TIME MDV EVID DV AMT  SEX WT ETN", "$DATA ../../data/acop.csv IGNORE=@", "...")
 
-LST_REF_1_5 <- c("Wed May 20 16:45:27 EDT 2020", "...", " ", " Elapsed finaloutput time in seconds:     0.11",
-                 " #CPUT: Total CPU Time in Seconds,        2.543", "Stop Time:",
-                 "Wed May 20 16:45:38 EDT 2020")
+LST_REF_1_5 <- c("Thu Sep 10 15:12:29 EDT 2020", "...", " ", " Elapsed finaloutput time in seconds:     0.01",
+                 " #CPUT: Total CPU Time in Seconds,        2.696", "Stop Time:",
+                 "Thu Sep 10 15:12:50 EDT 2020")
 
-LST_REF_5_1 <- c("Wed May 20 16:45:27 EDT 2020", "$PROBLEM PK model 1 cmt base",
+LST_REF_5_1 <- c("Thu Sep 10 15:12:29 EDT 2020", "$PROBLEM PK model 1 cmt base",
                  "", "$INPUT ID TIME MDV EVID DV AMT  SEX WT ETN", "$DATA ../../data/acop.csv IGNORE=@",
-                 "...", "Wed May 20 16:45:38 EDT 2020")
+                 "...", "Thu Sep 10 15:12:50 EDT 2020")
 
 
 # directory ls stuff
