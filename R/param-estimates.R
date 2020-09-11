@@ -24,6 +24,7 @@
 #' * random_effect_sdse -- Standard errors to the OMEGA and SIGMA elements in standard deviation/correlation format
 #' * fixed -- TRUE if parameter is fixed, FALSE otherwise
 #' * diag -- TRUE if parameter is a diagonal element in random effect matrix, FALSE if off-diagonal, NA if parameter is a THETA
+#' * shrinkage -- Shrinkage using SD parameterization (for NONMEM this is ETAshrinkSD and EPSshrinkSD)
 #'
 #'
 #' @seealso [param_labels()] [apply_indices()]
