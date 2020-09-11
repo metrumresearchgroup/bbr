@@ -77,6 +77,19 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
     expect_identical(sum_df$yaml_md5, ALL_MODS_YAML_MD5)
   })
 
+  test_that("add_summary() has correct columns", {
+    sum_df <- summary_log()
+    log_df <- run_log()
+    add_df <- log_df %>% add_summary()
+
+    # should have all columns from both (minus the join key)
+    expect_identical(names(add_df), c(names(log_df), names(sum_df)[2:length(names(sum_df))]))
+
+    # check one col to make sure it matches
+    col_to_check <- names(sum_df)[2]
+    expect_identical(sum_df[[col_to_check]], add_df[[col_to_check]])
+  })
+
   test_that("summary_log() parses heuristics correctly", {
     sum_df2 <- summary_log(MODEL_DIR_X, .fail_flags = list(ext_file = "1001.1.TXT"))
 

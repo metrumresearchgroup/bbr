@@ -38,3 +38,4 @@ These are all helper functions to extract a specific field or sub-field from a \
 \item \code{extract_condition_number}: Extract condition number for the final estimation method
 }}
 
+\keyword{internal}

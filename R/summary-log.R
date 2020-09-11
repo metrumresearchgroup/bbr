@@ -137,18 +137,19 @@ summary_log_impl <- function(.mods, ...) {
 #' These are all helper functions to extract a specific field or sub-field from a `bbi_{.model_type}_summary` object.
 #' @name extract_from_summary
 #' @param .s The summary object to extract from
+#' @keywords internal
 NULL
 
 #' @describeIn extract_from_summary Extract count of non-fixed parameters
 #' @importFrom purrr map map_int
+#' @keywords internal
 extract_param_count <- function(.s) {
 
   .pm <- map(.s, "parameters_data")
 
   .out <- map_int(.pm, function(.x) {
-    num_methods <- length(.x)
 
-    .fix <- unlist(.x[[num_methods]]$fixed)
+    .fix <- unlist(.x[[length(.x)]]$fixed)
 
     .pm_count <- length(.fix) - sum(.fix)
 
@@ -163,6 +164,7 @@ extract_param_count <- function(.s) {
 
 #' @describeIn extract_from_summary Extract `run_details` field
 #' @importFrom purrr map
+#' @keywords internal
 extract_details <- function(.s) {
   .rd <- map(.s, SUMMARY_DETAILS, .default = NA)
 
@@ -179,6 +181,7 @@ extract_details <- function(.s) {
 
 #' @describeIn extract_from_summary Extract `run_heuristics` field
 #' @importFrom purrr map
+#' @keywords internal
 extract_heuristics <- function(.s) {
   .rh <- map(.s, "run_heuristics", .default = NA)
 
@@ -198,6 +201,7 @@ extract_heuristics <- function(.s) {
 
 #' @describeIn extract_from_summary Extract objective function value (without constant) for the final estimation method
 #' @importFrom purrr map map_dbl
+#' @keywords internal
 extract_ofv <- function(.s) {
   .ofv <- map(.s, function(.x) {
     .x <- .x[["ofv"]]
@@ -212,6 +216,7 @@ extract_ofv <- function(.s) {
 
 #' @describeIn extract_from_summary Extract condition number for the final estimation method
 #' @importFrom purrr map map_dbl
+#' @keywords internal
 extract_condition_number <- function(.s) {
   .ofv <- map(.s, function(.x) {
     .x <- .x[[SUMMARY_COND_NUM]]

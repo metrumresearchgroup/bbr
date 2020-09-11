@@ -74,6 +74,19 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     check_config_ref(log_df, c("1", "2", "3", "1"), RUN_LOG_COLS+CONFIG_COLS-1)
   })
 
+  test_that("add_config() has correct columns", {
+    conf_df <- config_log(MODEL_DIR)
+    log_df <- run_log(MODEL_DIR)
+    add_df <- log_df %>% add_config()
+
+    # should have all columns from both (minus the join key)
+    expect_identical(names(add_df), c(names(log_df), names(conf_df)[2:length(names(conf_df))]))
+
+    # check one col to make sure it matches
+    col_to_check <- names(conf_df)[2]
+    expect_identical(conf_df[[col_to_check]], add_df[[col_to_check]])
+  })
+
   # THESE TESTS NEED TO BE LAST BECAUSE IT DELETES NECESSARY FILES
   fs::file_delete(file.path(NEW_MOD2, "bbi_config.json"))
   fs::file_delete(file.path(NEW_MOD3, "bbi_config.json"))
