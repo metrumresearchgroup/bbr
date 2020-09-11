@@ -26,7 +26,7 @@ local ci_images = [
 ];
 
 # set to "" to disable installing babylon
-local bbi_version = "v2.2.0-beta.2";
+local bbi_version = "v2.3.0";
 
 # events that should not trigger Drone; recommended value is "promote", see
 # https://discourse.drone.io/t/github-pages-triggering-builds-incorrectly/6370

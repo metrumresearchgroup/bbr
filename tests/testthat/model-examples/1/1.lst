@@ -1,4 +1,4 @@
-Wed May 20 16:45:27 EDT 2020
+Thu Sep 10 15:12:29 EDT 2020
 $PROBLEM PK model 1 cmt base
 
 $INPUT ID TIME MDV EVID DV AMT  SEX WT ETN
@@ -38,16 +38,17 @@ Y= IPRED+W*ERR(1)
 
 $EST METHOD=1 INTERACTION MAXEVAL=9999 SIG=3 PRINT=5 NOABORT POSTHOC
 $COV
+
 NM-TRAN MESSAGES
   
  WARNINGS AND ERRORS (IF ANY) FOR PROBLEM    1
              
  (WARNING  2) NM-TRAN INFERS THAT THE DATA ARE POPULATION.
 
-License Registered to: Metrum Research Group
-Expiration Date:    14 JUL 2020
-Current Date:       20 MAY 2020
-Days until program expires :  54
+License Registered to: Metrum
+Expiration Date:    14 JUL 2021
+Current Date:       10 SEP 2020
+Days until program expires : 309
 1NONLINEAR MIXED EFFECTS MODEL PROGRAM (NONMEM) VERSION 7.4.4
  ORIGINALLY DEVELOPED BY STUART BEAL, LEWIS SHEINER, AND ALISON BOECKMANN
  CURRENT DEVELOPERS ARE ROBERT BAUER, ICON DEVELOPMENT SOLUTIONS,
@@ -278,8 +279,8 @@ Days until program expires :  54
  TOTAL EFFECTIVE ETAS (NIND*NETA):                            80
   
  #TERE:
- Elapsed estimation  time in seconds:     2.00
- Elapsed covariance  time in seconds:     0.56
+ Elapsed estimation  time in seconds:     2.11
+ Elapsed covariance  time in seconds:     0.68
  Elapsed postprocess time in seconds:     0.00
 1
  
@@ -557,7 +558,7 @@ Days until program expires :  54
  SG11
 +       ......... ......... ......... ......... ......... ......... ......... ......... .........
  
- Elapsed finaloutput time in seconds:     0.11
- #CPUT: Total CPU Time in Seconds,        2.543
+ Elapsed finaloutput time in seconds:     0.01
+ #CPUT: Total CPU Time in Seconds,        2.696
 Stop Time:
-Wed May 20 16:45:38 EDT 2020
+Thu Sep 10 15:12:50 EDT 2020

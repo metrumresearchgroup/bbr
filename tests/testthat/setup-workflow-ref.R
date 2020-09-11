@@ -47,7 +47,7 @@ NEW_TAGS <- c("new tag 1", "new tag 2")
 NEW_TEXT1 <- c("naw", "paw")
 NEW_TEXT2 <- c("all", "done")
 
-SUMMARY_REF_FILE <- "data/acop_summary_obj_ref_200616.rds"
+SUMMARY_REF_FILE <- "data/acop_summary_obj_ref_200910.rds"
 PARAM_REF_FILE <- "data/acop_param_table_ref_200818.rds"
 
 MOD_CLASS <- "bbi_nonmem_model"
@@ -64,7 +64,7 @@ PROC_CLASS_LIST <- c(PROC_CLASS, "list")
 SUMS_LIST_NAMES_REF <- c("absolute_model_path", "bbi_summary", "error_msg", "needed_fail_flags")
 
 SUM_NAMES_REF <- c("run_details", "run_heuristics", "parameters_data", "parameter_names",
-                   "ofv", "shrinkage_details", "covariance_theta", "correlation_theta")
+                   "ofv", "condition_number", "shrinkage_details")
 
 NOT_FINISHED_ERR_MSG <- "nonmem_summary.*modeling run has not finished"
 NO_LST_ERR_MSG <- "Unable to locate `.lst` file.*NONMEM output folder"
@@ -78,6 +78,10 @@ RUN_LOG_ROWS <- 3
 RUN_LOG_COLS <- 8
 CONFIG_COLS <- 4
 SUM_LOG_COLS <- 18
+
+CONFIG_DATA_PATH <- "../../data/acop.csv"
+CONFIG_DATA_MD5 <- "4ddb44da897c26681d892aa7be99f74b"
+CONFIG_MODEL_MD5 <- "6b930119c4224ba077091b47959b0604"
 
 # model refs
 
