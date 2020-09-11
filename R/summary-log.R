@@ -198,7 +198,6 @@ extract_heuristics <- function(.s) {
 
 #' @describeIn extract_from_summary Extract objective function value (without constant) for the final estimation method
 #' @importFrom purrr map map_dbl
-#' @param .subfield The field to extract from within "ofv". Defaults to the objective function value with no constant added, but the other fields are available too.
 extract_ofv <- function(.s) {
   .ofv <- map(.s, function(.x) {
     .x <- .x[["ofv"]]
@@ -213,7 +212,6 @@ extract_ofv <- function(.s) {
 
 #' @describeIn extract_from_summary Extract condition number for the final estimation method
 #' @importFrom purrr map map_dbl
-#' @param .subfield The field to extract from within "ofv". Defaults to the objective function value with no constant added, but the other fields are available too.
 extract_condition_number <- function(.s) {
   .ofv <- map(.s, function(.x) {
     .x <- .x[[SUMMARY_COND_NUM]]

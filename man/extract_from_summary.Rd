@@ -21,8 +21,6 @@ extract_condition_number(.s)
 }
 \arguments{
 \item{.s}{The summary object to extract from}
-
-\item{.subfield}{The field to extract from within "ofv". Defaults to the objective function value with no constant added, but the other fields are available too.}
 }
 \description{
 These are all helper functions to extract a specific field or sub-field from a \verb{bbi_\{.model_type\}_summary} object.
