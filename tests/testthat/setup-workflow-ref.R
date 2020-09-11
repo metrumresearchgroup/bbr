@@ -18,6 +18,7 @@ set_model_directory(NULL)
 # define constants
 MOD_ID <- "1"
 MODEL_DIR <- "model-examples"
+MODEL_DIR_X <- "model-examples-complex"
 MOD1_PATH <- file.path(MODEL_DIR, MOD_ID)
 MOD1 <- MOD1_PATH %>% read_model()
 
@@ -77,7 +78,7 @@ MOD4_ABS_PATH <- file.path(getwd(), LEVEL2_MOD)
 RUN_LOG_ROWS <- 3
 RUN_LOG_COLS <- 8
 CONFIG_COLS <- 4
-SUM_LOG_COLS <- 18
+SUM_LOG_COLS <- 21
 
 CONFIG_DATA_PATH <- "../../data/acop.csv"
 CONFIG_DATA_MD5 <- "4ddb44da897c26681d892aa7be99f74b"
