@@ -37,4 +37,15 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
     )
   })
 
+  test_that("param_estimates correctly warns on mixture model", {
+    expect_warning(
+      par_df <- "iovmm" %>%
+        model_summary(.directory = MODEL_DIR_X) %>%
+        param_estimates(),
+      regexp = "mixture model"
+    )
+
+    expect_true(all(is.na(par_df[[SUMMARY_PARAM_SHRINKAGE]])))
+  })
+
 }) # closing withr::with_options

@@ -118,6 +118,7 @@ is_diag <- function(.name) {
 #' @param .summary A `bbi_nonmem_summary` object.
 #' @importFrom dplyr select filter left_join bind_rows
 #' @importFrom stringr str_detect
+#' @importFrom tibble add_column
 #' @keywords internal
 add_param_shrinkage <- function(.param_df, .summary) {
 
@@ -125,15 +126,22 @@ add_param_shrinkage <- function(.param_df, .summary) {
   shk <- .summary[[SUMMARY_SHRINKAGE]]
   shk <- shk[[length(shk)]]
 
-  ### CHECK is.null(shk) (no shrinkage details) AND
-  ### IF EST=BAYESIAN AND IF EITHER RETURN COLUMN OF NA ###### !!!!!!!!!!!!
+  if (is.null(shk)) {
+    return(.param_df %>% add_column(!!SUMMARY_PARAM_SHRINKAGE := NA_real_))
+  }
 
   # check for mixture model with multiple subpops
   if (length(shk) != 1) {
-    stop("Mixture Model in add_param_shrinkage() WHAT TO DO?") ###### !!!!!!!!!!!!
-  } else {
-    shk <- shk[[1]]
+    warning(paste(
+      glue("When using `param_estimates()` with a mixture model (multiple subpops) the `{SUMMARY_PARAM_SHRINKAGE}` column will be all `NA`."),
+      glue("Users can manually extract shrinkage for each subpop from the `{SUMMARY_SHRINKAGE}` element of the `bbi_nonmem_summary` object."),
+      sep = "\n"
+      ))
+    return(.param_df %>% add_column(!!SUMMARY_PARAM_SHRINKAGE := NA_real_))
   }
+
+  # select the first (and only) subpop
+  shk <- shk[[1]]
 
   # filter to only omega and sigma diagonal elements
   diag_df <- .param_df %>%
