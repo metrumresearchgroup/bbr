@@ -28,6 +28,12 @@ Returns a tibble with the following columns:
 Returns a tibble containing parameter estimates from a \verb{bbi_\{.model_type\}_summary} object.
 Details about the tibble that is returned are in the return value section below.
 }
+\details{
+Note that \strong{Bayesian methods are not yet supported} by this function. Creating a parameter table
+like this for Bayesian estimation methods requires a different approach, which has not yet been
+implemented. If the final estimation method of the input model is Bayesian, a \verb{not implemented}
+error will be thrown.
+}
 \section{Methods (by class)}{
 \itemize{
 \item \code{bbi_nonmem_summary}: Takes \code{bbi_nonmem_summary} object, the output of \code{\link[=model_summary.bbi_nonmem_model]{model_summary.bbi_nonmem_model()}}.
