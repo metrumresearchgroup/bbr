@@ -7,7 +7,7 @@ run_status <- dplyr::tribble(
         "1",              FALSE,             FALSE,
         "2",               TRUE,             FALSE,
         "3",              FALSE,             FALSE,
- "level2/1",               TRUE,                NA
+ "level2/1",               TRUE,             TRUE
 )
 
 #' Helper to check config output

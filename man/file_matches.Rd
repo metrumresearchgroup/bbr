@@ -12,8 +12,8 @@ file_matches(path, md5)
 \item{md5}{String giving expected MD5 sum.}
 }
 \value{
-\code{TRUE} if \code{path} matches \code{md5}, \code{FALSE} if they don't match, and \code{NA}
-if \code{path} doesn't exist.
+\code{TRUE} if \code{path} matches \code{md5}, otherwise \code{FALSE} (including if
+\code{path} doesn't exist).
 }
 \description{
 Compare a file to an MD5 sum
