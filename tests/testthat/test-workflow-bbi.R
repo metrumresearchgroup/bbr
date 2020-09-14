@@ -120,7 +120,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
     # check config log for all models so far
     log_df <- config_log()
     expect_equal(nrow(log_df), 3)
-    expect_equal(ncol(log_df), 4)
+    expect_equal(ncol(log_df), CONFIG_COLS)
     expect_false(any(is.na(log_df$model_md5)))
     expect_false(any(is.na(log_df$data_md5)))
     expect_false(any(is.na(log_df$data_path)))
@@ -145,7 +145,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
     # add config log to run log
     log_df <- expect_warning(run_log() %>% add_config(), regexp = "in progress")
     expect_equal(nrow(log_df), 4)
-    expect_equal(ncol(log_df), 11)
+    expect_equal(ncol(log_df), RUN_LOG_COLS + CONFIG_COLS - 1)
 
     # check config md5's against ctl md5's
     log_df <- log_df %>% filter(!is.na(model_md5))

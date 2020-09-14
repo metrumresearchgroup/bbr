@@ -77,7 +77,7 @@ MOD4_ABS_PATH <- file.path(getwd(), LEVEL2_MOD)
 
 RUN_LOG_ROWS <- 3
 RUN_LOG_COLS <- 8
-CONFIG_COLS <- 4
+CONFIG_COLS <- 6L
 SUM_LOG_COLS <- 21
 
 CONFIG_DATA_PATH <- "../../data/acop.csv"
@@ -170,3 +170,16 @@ cleanup <- function() {
   suppressSpecificWarning(rm(log_df, pos = parent.frame()),.regexpr = "object.+not found")
 }
 
+#' Temporarily perturb a file
+#'
+#' Appends a line to the end of a text file, and reverts the change in an
+#' environment specified by the caller.
+#'
+#' @param path string giving the file path
+#' @inheritParams withr::defer
+perturb_file <- function(path, envir = parent.frame()) {
+  checkmate::assert_string(path)
+  original <- readr::read_file(path)
+  readr::write_lines("foo", path, append = TRUE)
+  withr::defer(readr::write_file(original, path), envir)
+}

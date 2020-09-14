@@ -1,6 +1,22 @@
 context("Constructing config log from bbi_config.json")
 
-check_config_ref <- function(log_df, run_nums, col_count) {
+# to minimize changes to the existing tests, we define the model and data status
+# for each of the models any particular test might need
+run_status <- dplyr::tribble(
+  ~rel_path, ~model_has_changed, ~data_has_changed,
+        "1",              FALSE,             FALSE,
+        "2",               TRUE,             FALSE,
+        "3",              FALSE,             FALSE,
+ "level2/1",               TRUE,             TRUE
+)
+
+#' Helper to check config output
+#'
+#' @param log_df an object of class `bbi_config_log_df`
+#' @param run_nums character vector of model run numbers
+#' @param col_count number of columns to expect in `log_df`
+#' @param run_status a tibble holding model and data status by run
+check_config_ref <- function(log_df, run_nums, col_count, run_status) {
 
   expect_identical(basename(log_df[[ABS_MOD_PATH]]), run_nums)
 
@@ -14,8 +30,27 @@ check_config_ref <- function(log_df, run_nums, col_count) {
   expect_identical(log_df$data_md5, rep(CONFIG_DATA_MD5, run_count))
   expect_identical(log_df$data_path, rep(CONFIG_DATA_PATH, run_count))
   expect_identical(log_df$model_md5, rep(CONFIG_MODEL_MD5, run_count))
+
+  base_path <- fs::path_common(log_df[["absolute_model_path"]])
+
+  actual_status <-
+    run_status %>%
+    dplyr::mutate(
+      absolute_model_path = as.character(fs::path(base_path, rel_path))
+    ) %>%
+    dplyr::semi_join(log_df, by = "absolute_model_path")
+
+  expect_identical(
+    log_df[["model_has_changed"]],
+    actual_status[["model_has_changed"]]
+  )
+  expect_identical(
+    log_df[["data_has_changed"]],
+    actual_status[["data_has_changed"]]
+  )
 }
 
+# TODO: replace setup() and teardown() with 3e test fixtures
 setup({
   cleanup()
 
@@ -28,7 +63,6 @@ setup({
                   .inherit_tags = TRUE,
                   .update_model_file = FALSE)
 
-  CONFIG_1 <- file.path(tools::file_path_sans_ext(YAML_TEST_FILE), "bbi_config.json")
 
   fs::dir_copy(MOD1_PATH, NEW_MOD2)
   fs::dir_copy(MOD1_PATH, NEW_MOD3)
@@ -61,17 +95,46 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("config_log() works correctly with nested dirs", {
     log_df <- config_log(MODEL_DIR)
-    check_config_ref(log_df, c("1", "2", "3", "1"), CONFIG_COLS)
+    check_config_ref(
+      log_df,
+      c("1", "2", "3", "1"),
+      CONFIG_COLS,
+      run_status
+    )
   })
 
   test_that("config_log(.recurse = FALSE) works", {
     log_df <- config_log(MODEL_DIR, .recurse = FALSE)
-    check_config_ref(log_df, c("1", "2", "3"), CONFIG_COLS)
+    check_config_ref(
+      log_df,
+      c("1", "2", "3"),
+      CONFIG_COLS,
+      run_status
+    )
+  })
+
+  test_that("config_log() reflects model mismatch", {
+    # TODO: update this pattern once the model_directory option is deprecated
+    perturb_file(CTL_TEST_FILE)
+    log_df <- config_log(MODEL_DIR)
+    expect_equal(log_df[["model_has_changed"]][1], TRUE)
+  })
+
+  test_that("config_log() reflects data mismatch", {
+    # TODO: update this pattern once the model_directory option is deprecated
+    perturb_file("data/acop.csv")
+    log_df <- config_log(MODEL_DIR)
+    expect_equal(log_df[["data_has_changed"]][1], TRUE)
   })
 
   test_that("add_config() works correctly", {
     log_df <- run_log(MODEL_DIR) %>% add_config()
-    check_config_ref(log_df, c("1", "2", "3", "1"), RUN_LOG_COLS+CONFIG_COLS-1)
+    check_config_ref(
+      log_df,
+      c("1", "2", "3", "1"),
+      RUN_LOG_COLS + CONFIG_COLS - 1,
+      run_status
+    )
   })
 
   test_that("add_config() has correct columns", {
