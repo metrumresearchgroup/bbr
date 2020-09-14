@@ -8,6 +8,12 @@
 #' Returns a tibble containing parameter estimates from a `bbi_{.model_type}_summary` object.
 #' Details about the tibble that is returned are in the return value section below.
 #'
+#' @details
+#' Note that **Bayesian methods are not yet supported** by this function. Creating a parameter table
+#' like this for Bayesian estimation methods requires a different approach, which has not yet been
+#' implemented. If the final estimation method of the input model is Bayesian, a `not implemented`
+#' error will be thrown.
+#'
 #' @return
 #' Returns a tibble with the following columns:
 #'
@@ -31,10 +37,17 @@ param_estimates <- function(.summary) {
 #' @importFrom tibble tibble as_tibble
 #' @importFrom purrr map_at map_depth map_lgl
 #' @importFrom rlang list2
+#' @importFrom stringr str_detect
 #' @export
 param_estimates.bbi_nonmem_summary <- function(.summary) {
   num_methods <- length(.summary[[SUMMARY_PARAM_DATA]])
   param_names <- .summary[[SUMMARY_PARAM_NAMES]]
+
+  # if Bayesian method (includes NUTS) do not return df because it is incorrect and misleading
+  est_method <- .summary[[SUMMARY_DETAILS]][[SUMMARY_EST_METHOD]][[num_methods]]
+  if (str_detect(est_method, "Bayesian")) {
+    stop(glue("param_estimates() is not currently implemented for Bayesian methods. Passed has final estimation method: {est_method}"), call. = FALSE)
+  }
 
   summary_vars <- with(
     .summary[[SUMMARY_PARAM_DATA]][[num_methods]],

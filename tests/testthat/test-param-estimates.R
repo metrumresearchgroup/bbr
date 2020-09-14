@@ -6,10 +6,6 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
 
 setup({
   cleanup()
-  invisible(copy_model_from(yaml_ext(MOD1_PATH), NEW_MOD2, "model from test-param-estimates.R", .directory = "."))
-  invisible(copy_model_from(yaml_ext(MOD1_PATH), NEW_MOD3, "model from test-param-estimates.R", .directory = "."))
-  fs::dir_copy(MOD1_PATH, NEW_MOD2)
-  fs::dir_copy(MOD1_PATH, NEW_MOD3)
 })
 teardown({
   cleanup()
@@ -30,6 +26,15 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
     expect_true(all(par_df$parameter_names == ref_df1$parameter_names))
     expect_true(all(round(par_df$estimate, 2) == round(ref_df1$estimate, 2)))
     expect_true(all(par_df$fixed == ref_df1$fixed))
+  })
+
+  test_that("param_estimates correctly errors on Bayesian model", {
+    expect_error(
+      par_df <- 1001 %>%
+        model_summary(.directory = MODEL_DIR_X, .bbi_args = list(ext_file = "1001.1.TXT")) %>%
+        param_estimates(),
+      regexp = "not currently implemented for Bayesian methods"
+    )
   })
 
 }) # closing withr::with_options
