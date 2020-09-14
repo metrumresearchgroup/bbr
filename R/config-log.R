@@ -101,7 +101,7 @@ config_log_impl <- function(.mods) {
   }
 
   json_files %>%
-    purrr::map_dfr(parse_bbi_config) %>%
+    purrr::map_dfr(config_log_entry) %>%
     dplyr::select(.data[[ABS_MOD_PATH]], everything()) %>%
     create_config_log_object()
 }
@@ -126,7 +126,7 @@ config_log_impl <- function(.mods) {
 #'   `path`.
 #'
 #' @keywords internal
-parse_bbi_config <- function(path,
+config_log_entry <- function(path,
                              fields = CONFIG_KEEPERS,
                              model_path_field = ABS_MOD_PATH) {
   checkmate::assert_file_exists(path)
