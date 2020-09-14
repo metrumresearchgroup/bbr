@@ -7,7 +7,7 @@ BBI_ARGS = list(
   additional_post_work_envs = list(type = "character", flag="--additional_post_work_envs", description = "Any additional values (as ENV KEY=VALUE) to provide for the post execution environment"),
   background = list(type = "logical", flag="--background", description = "RAW NMFE OPTION - Tells nonmem not to scan StdIn for control characters"),
   clean_lvl = list(type = "numeric", flag="--clean_lvl", description = "clean level used for file output from a given (set of) runs (default 1)"),
-  config = list(type = "character", flag="--config", description = "config file (default is $HOME/babylon.yaml)"),
+  config = list(type = "character", flag="--config", description = "Path (relative or absolute) to another babylon.yaml to load"),
   copy_lvl = list(type = "numeric", flag="--copy_lvl", description = "copy level used for file output from a given (set of) runs"),
   debug = list(type = "logical", flag="--debug", description = "debug mode"),
   delay = list(type = "numeric", flag="--delay", description = "Selects a random number of seconds between 1 and this value to stagger / jitter job execution. Assists in dealing with large volumes of work dealing with the same data set. May avoid NMTRAN issues about not being able read / close files"),
