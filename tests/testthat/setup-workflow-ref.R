@@ -172,7 +172,8 @@ cleanup <- function() {
 
 #' Temporarily perturb a file
 #'
-#' Appends a line to the end of a text file, and flexibly revert the change.
+#' Appends a line to the end of a text file, and reverts the change in an
+#' environment specified by the caller.
 #'
 #' @param path string giving the file path
 #' @inheritParams withr::defer
