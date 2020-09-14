@@ -31,7 +31,7 @@ model_summary(.mod, .bbi_args = NULL, ..., .dry_run = FALSE, .directory = NULL)
 \item{.mod}{Model to summarize. Can be a \verb{bbi_\{.model_type\}_model} object, a file path, or an integer corresponding to a file path.}
 
 \item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}.
-See \code{print_nonmem_args()} for full list of options.}
+See \code{\link[=print_bbi_args]{print_bbi_args()}} for full list of options.}
 
 \item{...}{args passed through to \code{bbi_exec()}}
 

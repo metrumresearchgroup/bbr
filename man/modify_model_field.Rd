@@ -84,9 +84,9 @@ memory with an md5 digest of the newly written YAML.
 
 \item \code{add_bbi_args}: Modifies model object and corresponding YAML by adding new \code{bbi_args},
 overwriting any args that are already present with the new values.
-Use \code{print_nonmem_args()} to see a list of valid babylon arguments.
+Use \code{\link[=print_bbi_args]{print_bbi_args()}} to see a list of valid babylon arguments.
 
 \item \code{replace_bbi_args}: Modifies model object and corresponding YAML by replacing \code{bbi_args} with new list passed to \code{.bbi_args}.
-Use \code{print_nonmem_args()} to see a list of valid babylon arguments.
+Use \code{\link[=print_bbi_args]{print_bbi_args()}} to see a list of valid babylon arguments.
 }}
 

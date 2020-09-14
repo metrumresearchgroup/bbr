@@ -9,7 +9,7 @@
 #' a `bbi_{.model_type}_model ` object,
 #' a file path to a model,
 #' an integer corresponding to a file name of a model.
-#' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.
+#' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run [print_bbi_args()] to see valid arguments.
 #' @param .mode Either `"sge"`, the default, to submit model(s) to the grid or `"local"` for local execution.
 #' @param ... args passed through to `bbi_exec()`
 #' @param .config_path Optionally specify a path to a babylon.yml config. If not specified, the config in the model directory will be used by default. Path MUST be either an absolute path or relative to the model directory.
@@ -158,7 +158,7 @@ submit_nonmem_model <- function(.mod,
 
   # build command line args
   .bbi_args <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])
-  args_vec <- check_nonmem_args(.bbi_args)
+  args_vec <- check_bbi_args(.bbi_args)
   cmd_args <- c("nonmem", "run", .mode, .mod[[YAML_MOD_PATH]], args_vec)
 
   # define working directory

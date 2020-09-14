@@ -4,7 +4,7 @@ context("Utility functions for building args, etc.")
 # parsing args
 ################
 
-test_that("check_nonmem_args parses correctly", {
+test_that("check_bbi_args parses correctly", {
   # check some that should parse correctly
   .arg_list <- list(
     list(list("json" = T, "threads" = 4, "nm_version" = "nm74"), c("--json", "--threads=4", "--nm_version=nm74")), # check flag conversion
@@ -13,18 +13,18 @@ test_that("check_nonmem_args parses correctly", {
   )
 
   for (.a in .arg_list) {
-    expect_identical(check_nonmem_args(.a[[1]]), .a[[2]])
+    expect_identical(check_bbi_args(.a[[1]]), .a[[2]])
   }
 
   # check some that should error
   .arg_list <- list(
     list("json" = T, "threads" = 4, "json" = F), # need to pass unique keys (json passed twice)
-    list("json" = T, "threads" = 4, "naw" = "naw"), # trying to pass a key that doesn't exist in NONMEM_ARGS
+    list("json" = T, "threads" = 4, "naw" = "naw"), # trying to pass a key that doesn't exist in BBI_ARGS
     list("json" = T, "threads" = 4, "debug" = "naw") # passing the wrong type of value (char instead of bool)
   )
 
   for (.a in .arg_list) {
-    expect_error(check_nonmem_args(.a))
+    expect_error(check_bbi_args(.a))
   }
 })
 
