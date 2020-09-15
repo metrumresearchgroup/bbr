@@ -83,25 +83,28 @@ names(sum_df)
 sum_df <- summary_log(MODEL_DIR, .fail_flags = list(ext_file = "1001.1.TXT"))
 ```
 
+The specific columns returned are described below, though there is also a list of them, with brief definitions, in the [`summary_log()` docs](https://metrumresearchgroup.github.io/rbabylon/reference/summary_log.html) that can be accessed any time with `?summary_log()` in the console.
+
 ## Housekeeping Columns
 
 The first column is `absolute_model_path` which contains an absolute path that unambiguously identifies each model. This serves as the primary key for the tibble. 
 
 The second column contains the `bbi_nonmem_summary` object, discussed above, for each model. This can be extracted and manipulated if you would like more detailed data from it.
 
-The `error_msg` and `needed_fail_flags` columns describe whether `bbi` had any trouble parsing the model outputs. These won't be discussed in detail here. Refer the the `summary_log()` docs for more information.
+The `error_msg` and `needed_fail_flags` columns describe whether `bbi` had any trouble parsing the model outputs. These won't be discussed in detail here. Refer to the [`summary_log()` docs](https://metrumresearchgroup.github.io/rbabylon/reference/summary_log.html) for more information.
 
 ## Run Details Columns
 
 The next batch of columns contain the core diagnostics and model outputs. 
 
-* `ofv` -- Objective function value from last estimation method, extracted from `bbi_nonmem_summary$ofv$ofv_no_constant`
+* `ofv` -- Objective function value _with no constant_ from the final estimation method. The constant, and the value _with_ the constant can be found in `bbi_nonmem_summary$ofv`
 * `param_count` -- Count of (non-fixed) parameters estimated in final estimation method, extracted from `bbi_nonmem_summary$parameters_data`
 * `estimation_method` -- Character vector of estimation method(s) used, extracted from `bbi_nonmem_summary$run_details`
 * `problem_text` -- Text from `$PROB`, extracted from `bbi_nonmem_summary$run_details`
 * `number_of_patients` -- Count of unique patients in the input data set, extracted from `bbi_nonmem_summary$run_details`
 * `number_of_obs` -- Total count of observations in the input data set, extracted from `bbi_nonmem_summary$run_details`
 * `condition_number` -- The condition number for the final estimation method, if present. Extracted from `bbi_nonmem_summary$condition_number`
+
 
 ```{r details columns}
 sum_df %>% 
@@ -118,9 +121,9 @@ sum_df %>%
 
 ## Run Heuristics Columns
 
-The `run_heuristics` element of the `bbi_nonmem_summary` object contains a number of logical values indicating whether particular heuristic issues 
-were found in the model. Note that these are not necessarily _errors_ with the model run, but are closer to warning flags that should possibly be 
-investigated. Each heuristic is described in more detail in the `summary_log()` docs.
+The `run_heuristics` element of the `bbi_nonmem_summary` object contains a number of logical values indicating whether particular heuristic issues were found in the model. Note that these are not necessarily _errors_ with the model run, but are closer to warning flags that should possibly be investigated. Each heuristic is described in more detail in the [`summary_log()` docs](https://metrumresearchgroup.github.io/rbabylon/reference/summary_log.html). 
+
+Note that **all heuristics will be `FALSE` be default (and _never_ `NA`) and will only be `TRUE` if they are explicitly triggered.** For example, `large_condition_number` will be `FALSE` even in the case when a condition number was not calculated at all.
 
 All of the heuristic flags are pivoted out to their own columns in the `bbi_summary_log_df` tibble. It's useful to note that, except for `needed_fail_flags` (discussed above), these are the _only logical columns_ in the tibble and can therefore be easily selected with `tidyselect::where(is.logical)`.
 
