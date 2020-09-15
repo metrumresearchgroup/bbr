@@ -1,5 +1,7 @@
 # rbabylon (development version)
 
+* Added vignette demonstrating new `summary_log()` functionality.
+
 * Added shrinkage column to the tibble output from `param_estimates.bbi_nonmem_summary()`. 
 
 * `param_estimates.bbi_nonmem_summary()` now errors with a "not implemented" error for 
@@ -18,7 +20,8 @@
 * `config_log()` returns the versions of babylon and NONMEM (#115).
 
 * `config_log()` indicates whether the model file or the data file has changed
-  since the model was last run (#30).
+  since the model was last run (#30). Updated "Using the based_on field" vignette
+  to reflect the new feature and its usage.
   
 * Model summaries no longer include information about covariance or correlation,
   because `bbi nonmem summary` no longer parses the relevant files (#128).
