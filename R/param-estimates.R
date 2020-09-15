@@ -47,7 +47,7 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
   # if Bayesian method (includes NUTS) do not return df because it is incorrect and misleading
   est_method <- .summary[[SUMMARY_DETAILS]][[SUMMARY_EST_METHOD]][[num_methods]]
   if (str_detect(est_method, "Bayesian")) {
-    stop(glue("param_estimates() is not currently implemented for Bayesian methods. Passed has final estimation method: {est_method}"), call. = FALSE)
+    stop(glue("param_estimates() is not currently implemented for Bayesian methods. `.summary` has final estimation method: {est_method}"), call. = FALSE)
   }
 
   summary_vars <- with(
