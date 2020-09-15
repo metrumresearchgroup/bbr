@@ -1,0 +1,53 @@
+---
+title: "Creating A Model Summary Log"
+author: "Seth Green"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{using-summary-log}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+This vignette demonstrates how to use `summary_log()` to extract model diagnostics like the objective function value, condition number, and parameter counts. If you are new to `rbabylon`, the ["Getting Started with rbabylon"](getting-started.html) vignette will take you through some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its standard workflow and functionality.
+
+There is a lot of information in the `bbi_summary_log_df` tibble that is output from `summary_log()`. However, it is important to note that all of this, and quite a bit more, is contained in the output of `model_summary()`. If you are trying to dig deep into the outputs of a small number of models, see the [Summarize section](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html#summarize-model) of the "Getting Started" vignette for an introduction to that functionality. `summary_log()` is more useful for getting a slightly higher-level view of a larger batch of models, potentially all models in a given project, or something like a large group of bootstrapped modeling runs.
+
+## Setup
+
+There is some initial set up necessary for using `rbabylon`. Please refer to the ["Getting Started"](getting-started.html) vignette, mentioned above, if you have not done this yet. Once this is done, load the library and set your modeling directory.
+
+```{r set_model_directory}
+library(rbabylon)
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(purrr))
+suppressPackageStartupMessages(library(fs))
+```
+
+```{r setup, include = FALSE}
+#set_model_directory("../tests/testthat/model-examples-complex")
+
+# set babylon execution path
+if (Sys.which("bbi") == "") {
+  options('rbabylon.bbi_exe_path' = read_bbi_path())
+}
+```
+
+# Summarizing in batch
+
+```{r first summary_log}
+MODEL_DIR <- "../tests/testthat/model-examples-complex"
+
+summary_log(MODEL_DIR)
+```
+
+
+
