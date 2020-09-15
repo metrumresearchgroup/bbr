@@ -194,7 +194,7 @@ perturb_file <- function(path, envir = parent.frame()) {
 #' @param len Non-negative integer giving the desired length of the output
 #'   vector.
 #'
-#' @return A vector of length `len` whose elements
+#' @return A vector of length `len` whose elements are either `x` or `NA`.
 rep_missing <- function(x, i, len) {
   checkmate::assert_scalar(x)
   checkmate::assert_integerish(i)
