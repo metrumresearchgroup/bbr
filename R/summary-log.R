@@ -7,7 +7,7 @@
 #' If you would like more fields from the summary object, you can extract them manually from the `bbi_summary` list column.
 #'
 #' * `error_msg` -- Error message from [model_summary()]. If `NULL` the call succeeded. If not `NULL`, the rest of the fields will be `NULL`.
-#' * `needed_fail_flags` -- Logical for whether the call initially failed, but passed with the inclusion of `.fail_flags`
+#' * `needed_fail_flags` -- Logical for whether the call initially failed, but passed with the inclusion of `.fail_flags`. See [model_summaries()] docs for more details.
 #' * `bbi_summary` -- The full `bbi_nonmem_summary` object for each row. This can be queried further by extracting it as a list, or by using `dplyr::mutate()` etc.
 #' * `ofv` -- Objective function value from last estimation method, using `$ofv$ofv_no_constant` field.
 #' * `param_count` -- Count of (non-fixed) parameters estimated in final estimation method.

@@ -33,7 +33,7 @@ The following fields from \code{bbi_nonmem_summary} are extracted and included b
 If you would like more fields from the summary object, you can extract them manually from the \code{bbi_summary} list column.
 \itemize{
 \item \code{error_msg} -- Error message from \code{\link[=model_summary]{model_summary()}}. If \code{NULL} the call succeeded. If not \code{NULL}, the rest of the fields will be \code{NULL}.
-\item \code{needed_fail_flags} -- Logical for whether the call initially failed, but passed with the inclusion of \code{.fail_flags}
+\item \code{needed_fail_flags} -- Logical for whether the call initially failed, but passed with the inclusion of \code{.fail_flags}. See \code{\link[=model_summaries]{model_summaries()}} docs for more details.
 \item \code{bbi_summary} -- The full \code{bbi_nonmem_summary} object for each row. This can be queried further by extracting it as a list, or by using \code{dplyr::mutate()} etc.
 \item \code{ofv} -- Objective function value from last estimation method, using \verb{$ofv$ofv_no_constant} field.
 \item \code{param_count} -- Count of (non-fixed) parameters estimated in final estimation method.
