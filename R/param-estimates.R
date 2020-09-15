@@ -118,7 +118,6 @@ is_diag <- function(.name) {
 #' @param .summary A `bbi_nonmem_summary` object.
 #' @importFrom dplyr select filter left_join bind_rows
 #' @importFrom stringr str_detect
-#' @importFrom tibble add_column
 #' @keywords internal
 add_param_shrinkage <- function(.param_df, .summary) {
 
@@ -127,7 +126,8 @@ add_param_shrinkage <- function(.param_df, .summary) {
   shk <- shk[[length(shk)]]
 
   if (is.null(shk)) {
-    return(.param_df %>% add_column(!!SUMMARY_PARAM_SHRINKAGE := NA_real_))
+    .param_df[[SUMMARY_PARAM_SHRINKAGE]] <- NA_real_
+    return(.param_df)
   }
 
   # check for mixture model with multiple subpops
@@ -137,7 +137,8 @@ add_param_shrinkage <- function(.param_df, .summary) {
       glue("Users can manually extract shrinkage for each subpop from the `{SUMMARY_SHRINKAGE}` element of the `bbi_nonmem_summary` object."),
       sep = "\n"
       ))
-    return(.param_df %>% add_column(!!SUMMARY_PARAM_SHRINKAGE := NA_real_))
+    .param_df[[SUMMARY_PARAM_SHRINKAGE]] <- NA_real_
+    return(.param_df)
   }
 
   # select the first (and only) subpop
@@ -171,6 +172,7 @@ add_param_shrinkage <- function(.param_df, .summary) {
   sigma_df[[SUMMARY_PARAM_SHRINKAGE]] <- sigma_shk
 
   # combine shrinkage tibbles with original .param_df
+  # note the left join because all THETA rows _should_ have NA values for shrinkage
   shk_df <- bind_rows(omega_df, sigma_df)
   out_df <- left_join(.param_df, shk_df, by = c(SUMMARY_PARAM_NAMES, SUMMARY_PARAM_DIAG))
 
