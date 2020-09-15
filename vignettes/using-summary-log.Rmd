@@ -127,8 +127,14 @@ Note that **all heuristics will be `FALSE` be default (and _never_ `NA`) and wil
 
 All of the heuristic flags are pivoted out to their own columns in the `bbi_summary_log_df` tibble. It's useful to note that, except for `needed_fail_flags` (discussed above), these are the _only logical columns_ in the tibble and can therefore be easily selected with `tidyselect::where(is.logical)`.
 
-```{r heuristics columns}
+```{r heuristics columns fake where, eval=FALSE}
 sum_df %>% select(problem_text, where(is.logical), -needed_fail_flags)
+```
+```{r heuristics columns real where, echo=FALSE}
+# tidyselect::where() was only added in May 2020 so, in order to avoid having to bump our "oldest supported"
+# for the sake of vignette, we just do it the ugly way under-the-hood.
+lgl_vars <- purrr::map_lgl(sum_df, is.logical)
+sum_df %>% select(c("problem_text", names(lgl_vars)[which(lgl_vars)]))
 ```
 
 Notice that there is also an **any_heuristics column**, which can easily be used to filter to only runs that had at least one heuristic flag triggered.
