@@ -17,14 +17,11 @@
 #'  * parameters_data
 #'  * parameter_names
 #'  * ofv
+#'  * condition_number
 #'  * shrinkage_details
-#'  * covariance_theta
-#'  * correlation_theta
 #'
 #' The summary call will error if it does not find certain files in the output folder.
 #' However, you can override this behavior with the following file-specific flags:
-#'  * `no_cor_file`
-#'  * `no_cov_file`
 #'  * `no_ext_file`
 #'  * `no_grd_file`
 #'  * `no_shk_file`
@@ -32,6 +29,9 @@
 #' If you are using an estimation method that does not produce any of the following files,
 #' or they are missing for some other legitimate reason, pass the appropriate flags through the `.bbi_args` argument.
 #' For example, if have asked to skip the `$COV` step, you would call `model_summary(..., .bbi_args = list(no_cov_file = TRUE))`.
+#'
+#' Additionally, if you have renamed the `.ext` file from its default of `<root>.ext` you will need to pass
+#' `ext_file = "NEWNAME"` to `.bbi_args`.
 #'
 #' @param .mod Model to summarize. Can be a `bbi_{.model_type}_model` object, a file path, or an integer corresponding to a file path.
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`.

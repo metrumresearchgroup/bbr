@@ -39,8 +39,9 @@ If you would like more fields from the summary object, you can extract them manu
 \item \code{param_count} -- Count of (non-fixed) parameters estimated in final estimation method.
 \item \code{estimation_method} -- Character vector of estimation method(s) used. Extracted from \verb{$run_details}
 \item \code{problem_text} -- Character vector of text from \verb{$PROB}. Extracted from \verb{$run_details}
-\item \code{number_of_patients} -- Extracted from \verb{$run_details}
-\item \code{number_of_obs} -- Extracted from \verb{$run_details}
+\item \code{number_of_patients} -- Count of unique patients in the input data set, extracted from \verb{$run_details}
+\item \code{number_of_obs} -- Total count of observations in the input data set, extracted from \verb{$run_details}
+\item \code{condition_number} -- The condition number for the final estimation method, if present.
 \item \code{any_heuristics} -- Logical indicating whether \emph{any} of the columns extracted from \verb{$run_heuristics} are \code{TRUE}. Duplicative information, but helpful for filtering.
 \item \code{covariance_step_aborted} -- Extracted from \verb{$run_heuristics}
 \item \code{large_condition_number} -- Extracted from \verb{$run_heuristics}
@@ -49,6 +50,8 @@ If you would like more fields from the summary object, you can extract them manu
 \item \code{hessian_reset} -- Extracted from \verb{$run_heuristics}
 \item \code{has_final_zero_gradient} -- Extracted from \verb{$run_heuristics}
 \item \code{minimization_terminated} -- Extracted from \verb{$run_heuristics}
+\item \code{eta_pval_significant} -- \code{TRUE} if any of the ETA p-values are < 0.05. Extracted from \code{bbi_summary$shrinkage_details$pval}
+\item \code{prderr} -- \code{TRUE} if a \code{PRDERR} file is present in the output folder.
 }
 }
 \seealso{

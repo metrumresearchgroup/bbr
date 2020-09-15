@@ -13,8 +13,9 @@
 #' * `param_count` -- Count of (non-fixed) parameters estimated in final estimation method.
 #' * `estimation_method` -- Character vector of estimation method(s) used. Extracted from `$run_details`
 #' * `problem_text` -- Character vector of text from `$PROB`. Extracted from `$run_details`
-#' * `number_of_patients` -- Extracted from `$run_details`
-#' * `number_of_obs` -- Extracted from `$run_details`
+#' * `number_of_patients` -- Count of unique patients in the input data set, extracted from `$run_details`
+#' * `number_of_obs` -- Total count of observations in the input data set, extracted from `$run_details`
+#' * `condition_number` -- The condition number for the final estimation method, if present.
 #' * `any_heuristics` -- Logical indicating whether _any_ of the columns extracted from `$run_heuristics` are `TRUE`. Duplicative information, but helpful for filtering.
 #' * `covariance_step_aborted` -- Extracted from `$run_heuristics`
 #' * `large_condition_number` -- Extracted from `$run_heuristics`
@@ -23,6 +24,8 @@
 #' * `hessian_reset` -- Extracted from `$run_heuristics`
 #' * `has_final_zero_gradient` -- Extracted from `$run_heuristics`
 #' * `minimization_terminated` -- Extracted from `$run_heuristics`
+#' * `eta_pval_significant` -- `TRUE` if any of the ETA p-values are < 0.05. Extracted from `bbi_summary$shrinkage_details$pval`
+#' * `prderr` -- `TRUE` if a `PRDERR` file is present in the output folder.
 #'
 #' @return
 #' `summary_log()` will return a new tibble with the `'absolute_model_path'` column as the primary key,
