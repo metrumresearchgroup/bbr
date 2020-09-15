@@ -1,5 +1,10 @@
 # rbabylon (development version)
 
+* Added shrinkage column to the tibble output from `param_estimates.bbi_nonmem_summary()`. 
+
+* `param_estimates.bbi_nonmem_summary()` now errors with a "not implemented" error for 
+  models where the final estimation method is Bayesian.
+
 * Added a `NEWS.md` file to track changes to the package.
 
 * The minimum compatible version of babylon is increased to 2.3.0. 

@@ -18,14 +18,8 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
                          rbabylon.model_directory = NULL), {
 
   test_that("param_estimates.bbi_model_summary gets expected table", {
-
-    # extract parameter df
     par_df <- MOD1 %>% model_summary() %>% param_estimates()
-
-    # for some arcane reason `expect_equal(par_df, ref_df1)` fails, so we just check a few columns
-    expect_true(all(par_df$parameter_names == ref_df1$parameter_names))
-    expect_true(all(round(par_df$estimate, 2) == round(ref_df1$estimate, 2)))
-    expect_true(all(par_df$fixed == ref_df1$fixed))
+    expect_equal(par_df, ref_df1)
   })
 
   test_that("param_estimates correctly errors on Bayesian model", {
@@ -35,6 +29,17 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
         param_estimates(),
       regexp = "not currently implemented for Bayesian methods"
     )
+  })
+
+  test_that("param_estimates correctly warns on mixture model", {
+    expect_warning(
+      par_df <- "iovmm" %>%
+        model_summary(.directory = MODEL_DIR_X) %>%
+        param_estimates(),
+      regexp = "mixture model"
+    )
+
+    expect_true(all(is.na(par_df[[SUMMARY_PARAM_SHRINKAGE]])))
   })
 
 }) # closing withr::with_options
