@@ -1,5 +1,8 @@
 context("Constructing config log from bbi_config.json")
 
+expected_bbi_version <- "v2.3.0"
+expected_nonmem_version <- "nm74gf"
+
 # to minimize changes to the existing tests, we define the model and data status
 # for each of the models any particular test might need
 run_status <- dplyr::tribble(
@@ -127,6 +130,16 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_equal(log_df[["data_has_changed"]][1], TRUE)
   })
 
+  test_that("config_log() includes babylon version", {
+    log_df <- config_log(MODEL_DIR)
+    expect_equal(log_df[["bbi_version"]][1], expected_bbi_version)
+  })
+
+  test_that("config_log() includes NONMEM version", {
+    log_df <- config_log(MODEL_DIR)
+    expect_equal(log_df[["nm_version"]][1], expected_nonmem_version)
+  })
+
   test_that("add_config() works correctly", {
     log_df <- run_log(MODEL_DIR) %>% add_config()
     check_config_ref(
@@ -153,6 +166,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   # THESE TESTS NEED TO BE LAST BECAUSE IT DELETES NECESSARY FILES
   fs::file_delete(file.path(NEW_MOD2, "bbi_config.json"))
   fs::file_delete(file.path(NEW_MOD3, "bbi_config.json"))
+  missing_idx <- c(2L, 3L)
 
   test_that("add_config() works correctly with missing json", {
     log_df <- expect_warning(run_log(MODEL_DIR) %>% add_config(), regexp = "Found only 2 bbi_config.json files for 4 models")
@@ -163,12 +177,37 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # run_log fields
     expect_identical(basename(log_df[[ABS_MOD_PATH]]), c("1", "2", "3", "1"))
     expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS, ORIG_TAGS))
-    expect_identical(log_df$yaml_md5, c("ee5a30a015c4e09bc29334188ff28b58", "5576ed6fa6e1e4e9b0c25dbf62ae42e5", "ebadcc4a3c0f4d16f61251605136942b", "6132d34ba27caf3460d23c9b4a3937d9"))
+    expect_identical(
+      log_df[["yaml_md5"]],
+      c(
+        "ee5a30a015c4e09bc29334188ff28b58",
+        "5576ed6fa6e1e4e9b0c25dbf62ae42e5",
+        "ebadcc4a3c0f4d16f61251605136942b",
+        "6132d34ba27caf3460d23c9b4a3937d9"
+      )
+    )
 
     # config log fields
-    expect_identical(log_df$data_md5, c(CONFIG_DATA_MD5, NA_character_, NA_character_, CONFIG_DATA_MD5))
-    expect_identical(log_df$data_path, c(CONFIG_DATA_PATH, NA_character_, NA_character_, CONFIG_DATA_PATH))
-    expect_identical(log_df$model_md5, c(CONFIG_MODEL_MD5, NA_character_, NA_character_, CONFIG_MODEL_MD5))
+    expect_identical(
+      log_df[["data_md5"]],
+      rep_missing(CONFIG_DATA_MD5, missing_idx, 4L)
+    )
+    expect_identical(
+      log_df[["data_path"]],
+      rep_missing(CONFIG_DATA_PATH, missing_idx, 4L)
+    )
+    expect_identical(
+      log_df[["model_md5"]],
+      rep_missing(CONFIG_MODEL_MD5, missing_idx, 4L)
+    )
+    expect_identical(
+      log_df[["bbi_version"]],
+      rep_missing(expected_bbi_version, missing_idx, 4L)
+    )
+    expect_identical(
+      log_df[["nm_version"]],
+      rep_missing(expected_nonmem_version, missing_idx, 4L)
+    )
   })
 
 }) # closing withr::with_options

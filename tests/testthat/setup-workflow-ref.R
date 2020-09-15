@@ -77,7 +77,7 @@ MOD4_ABS_PATH <- file.path(getwd(), LEVEL2_MOD)
 
 RUN_LOG_ROWS <- 3
 RUN_LOG_COLS <- 8
-CONFIG_COLS <- 6L
+CONFIG_COLS <- 8L
 SUM_LOG_COLS <- 21
 
 CONFIG_DATA_PATH <- "../../data/acop.csv"
@@ -182,4 +182,25 @@ perturb_file <- function(path, envir = parent.frame()) {
   original <- readr::read_file(path)
   readr::write_lines("foo", path, append = TRUE)
   withr::defer(readr::write_file(original, path), envir)
+}
+
+#' Selectively repeat a value
+#'
+#' It can be useful to create a vector of a particular length with certain
+#' elements set to `NA`.
+#'
+#' @param x The scalar value to repeat.
+#' @param i Integer vector of indices that should be `NA`.
+#' @param len Non-negative integer giving the desired length of the output
+#'   vector.
+#'
+#' @return A vector of length `len` whose elements are either `x` or `NA`.
+rep_missing <- function(x, i, len) {
+  checkmate::assert_scalar(x)
+  checkmate::assert_integerish(i)
+  checkmate::assert_count(len)
+
+  res <- rep(x, len)
+  res[i] <- NA
+  res
 }
