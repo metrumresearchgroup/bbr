@@ -19,3 +19,4 @@ The input \code{bbi_run_log_df} tibble, with any columns from the tibble output 
 \description{
 Private helper to extact columns from another log tibble and join them onto a \code{bbi_run_log_df}
 }
+\keyword{internal}

@@ -106,6 +106,7 @@ safe_read_model <- function(.yaml_path, .directory = get_model_directory()) {
 #' @param .impl_func Implementation function to extract the appropriate log tibble that will be joined against the input tibble.
 #' @param ... Arguments passed through to `.impl_func`
 #' @return The input `bbi_run_log_df` tibble, with any columns from the tibble output by `.impl_func` left joined onto it.
+#' @keywords internal
 add_log_impl <- function(.log_df, .impl_func, ...) {
   # check input df
   check_bbi_run_log_df_object(.log_df)
