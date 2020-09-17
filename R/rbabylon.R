@@ -67,7 +67,7 @@ bbi_exec <- function(.cmd_args,
       # in such a case that people report errors where summary takes longer
       # then we can establish a longer potential timeout or more heuristics
       # around what time might be (eg if see its a summary on a range of models)
-      p$wait(timeout = getOption("rbabylon.summary_wait_timeout", 3))
+      p$wait(timeout = getOption("rbabylon.summary_wait_timeout", 1000L))
     } else {
       p$wait()
     }
