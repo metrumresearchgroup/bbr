@@ -1,3 +1,5 @@
+context("read_bbi_path() helper function")
+
 test_that("read_bbi_path() looks for environment variable", {
   withr::with_envvar(
     c("BABYLON_EXE_PATH" = "foo"),

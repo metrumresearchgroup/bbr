@@ -52,16 +52,13 @@ The returned list for a NONMEM model will contain the following top-level elemen
 \item parameters_data
 \item parameter_names
 \item ofv
+\item condition_number
 \item shrinkage_details
-\item covariance_theta
-\item correlation_theta
 }
 
 The summary call will error if it does not find certain files in the output folder.
 However, you can override this behavior with the following file-specific flags:
 \itemize{
-\item \code{no_cor_file}
-\item \code{no_cov_file}
 \item \code{no_ext_file}
 \item \code{no_grd_file}
 \item \code{no_shk_file}
@@ -70,6 +67,9 @@ However, you can override this behavior with the following file-specific flags:
 If you are using an estimation method that does not produce any of the following files,
 or they are missing for some other legitimate reason, pass the appropriate flags through the \code{.bbi_args} argument.
 For example, if have asked to skip the \verb{$COV} step, you would call \code{model_summary(..., .bbi_args = list(no_cov_file = TRUE))}.
+
+Additionally, if you have renamed the \code{.ext} file from its default of \verb{<root>.ext} you will need to pass
+\code{ext_file = "NEWNAME"} to \code{.bbi_args}.
 }
 \section{Methods (by class)}{
 \itemize{

@@ -24,7 +24,9 @@
 #' * random_effect_sdse -- Standard errors to the OMEGA and SIGMA elements in standard deviation/correlation format
 #' * fixed -- TRUE if parameter is fixed, FALSE otherwise
 #' * diag -- TRUE if parameter is a diagonal element in random effect matrix, FALSE if off-diagonal, NA if parameter is a THETA
-#' * shrinkage -- Shrinkage using SD parameterization (for NONMEM this is ETAshrinkSD and EPSshrinkSD)
+#' * shrinkage -- Shrinkage for final estimation method, using SD parameterization (for NONMEM this is ETAshrinkSD and EPSshrinkSD).
+#' The shrinkage using Variance Parameterization, as well as for other estimation methods and multiple subpops if present,
+#' can be found in `bbi_nonmem_summary$shrinkage_details`.
 #'
 #'
 #' @seealso [param_labels()] [apply_indices()]

@@ -22,7 +22,9 @@ Returns a tibble with the following columns:
 \item random_effect_sdse -- Standard errors to the OMEGA and SIGMA elements in standard deviation/correlation format
 \item fixed -- TRUE if parameter is fixed, FALSE otherwise
 \item diag -- TRUE if parameter is a diagonal element in random effect matrix, FALSE if off-diagonal, NA if parameter is a THETA
-\item shrinkage -- Shrinkage using SD parameterization (for NONMEM this is ETAshrinkSD and EPSshrinkSD)
+\item shrinkage -- Shrinkage for final estimation method, using SD parameterization (for NONMEM this is ETAshrinkSD and EPSshrinkSD).
+The shrinkage using Variance Parameterization, as well as for other estimation methods and multiple subpops if present,
+can be found in \code{bbi_nonmem_summary$shrinkage_details}.
 }
 }
 \description{

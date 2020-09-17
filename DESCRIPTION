@@ -1,7 +1,7 @@
 Type: Package
 Package: rbabylon
 Title: R package for babylon
-Version: 0.7.0.8009
+Version: 0.7.0.8010
 Authors@R: 
     c(person(given = "Devin",
              family = "Pastoor",
@@ -44,6 +44,7 @@ Suggests:
     knitr,
     rmarkdown,
     testthat (>= 2.1.0),
+    tidyselect,
     withr
 VignetteBuilder: 
     knitr
