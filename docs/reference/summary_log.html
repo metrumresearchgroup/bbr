@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7.0.8100</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.8.0</span>
       </span>
     </div>
 
@@ -165,13 +165,13 @@
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code>summary_log()</code> will return a new tibble with the <code>'absolute_model_path'</code> column as the primary key,
-and all the columns extracted from <code><a href='model_summaries.html'>model_summaries()</a></code> (but none of the other columns from the input tibble).</p>
-<p><code>add_summary()</code> takes a <code>bbi_run_log_df</code> tibble (the output from <code><a href='run_log.html'>run_log()</a></code>) and returns the input tibble,
-with all the columns extracted from <code><a href='model_summaries.html'>model_summaries()</a></code> joined onto it.</p>
+    <p>An object of class <code>bbi_summary_log_df</code>, which includes the fields described below.</p>
+<p><code>summary_log()</code> creates a new tibble with one row per model
+found in <code>.base_dir</code> (and subdirectories, if <code>.recurse = TRUE</code>).</p>
+<p><code>add_summary()</code> adds these fields to the tibble passed to <code>.log_df</code>.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The following fields from <code>bbi_nonmem_summary</code> are extracted and included by default.
+    <p>The following fields from <code>bbi_nonmem_summary</code> (the output of <code><a href='model_summary.html'>model_summary()</a></code>) are extracted and included by default.
 If you would like more fields from the summary object, you can extract them manually from the <code>bbi_summary</code> list column.</p><ul>
 <li><p><code>error_msg</code> -- Error message from <code><a href='model_summary.html'>model_summary()</a></code>. If <code>NULL</code> the call succeeded. If not <code>NULL</code>, the rest of the fields will be <code>NULL</code>.</p></li>
 <li><p><code>needed_fail_flags</code> -- Logical for whether the call initially failed, but passed with the inclusion of <code>.fail_flags</code>. See <code><a href='model_summaries.html'>model_summaries()</a></code> docs for more details.</p></li>
@@ -197,7 +197,7 @@ If you would like more fields from the summary object, you can extract them manu
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='run_log.html'>run_log()</a></code></p></div>
+    <div class='dont-index'><p><code><a href='run_log.html'>run_log()</a></code>, <code><a href='config_log.html'>config_log()</a></code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

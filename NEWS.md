@@ -1,4 +1,4 @@
-# rbabylon (development version)
+# rbabylon 0.8.0
 
 * Added vignette demonstrating new `summary_log()` functionality.
 

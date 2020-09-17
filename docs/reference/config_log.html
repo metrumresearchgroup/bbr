@@ -71,7 +71,7 @@ run." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7.0.8100</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.8.0</span>
       </span>
     </div>
 
@@ -165,7 +165,13 @@ run.</p>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An object of class <code>bbi_config_log_df</code>, which includes the fields</p><ul>
+    <p>An object of class <code>bbi_config_log_df</code>, which includes the fields described below.</p>
+<p><code>config_log()</code> creates a new tibble with one row per <code>bbi_config.json</code>
+found in <code>.base_dir</code> (and subdirectories, if <code>.recurse = TRUE</code>).</p>
+<p><code>add_config()</code> adds these fields to the tibble passed to <code>.log_df</code>.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>The following fields from are extracted from <code>bbi_config.json</code>.</p><ul>
 <li><p><code>absolute_model_path</code>: the path to the model file, excluding the file
 extension</p></li>
 <li><p><code>model_md5</code>: the MD5 sum of the model file</p></li>
@@ -179,12 +185,9 @@ changed since it was last run</p></li>
 changed since the model was last run</p></li>
 </ul>
 
-<p><code>config_log()</code> creates a new tibble with one row per <code>bbi_config.json</code>
-found in <code>.base_dir</code> (and subdirectories, if <code>.recurse = TRUE</code>).
-<code>add_config()</code> adds these fields to <code>.log_df</code>.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='run_log.html'>run_log()</a></code></p></div>
+    <div class='dont-index'><p><code><a href='run_log.html'>run_log()</a></code>, <code><a href='summary_log.html'>summary_log()</a></code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -192,6 +195,7 @@ found in <code>.base_dir</code> (and subdirectories, if <code>.recurse = TRUE</c
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
+      <li><a href="#details">Details</a></li>
       <li><a href="#see-also">See also</a></li>
     </ul>
 
