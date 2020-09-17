@@ -2,8 +2,15 @@
 #'
 #' Runs [model_summaries()] on all models in the input and returns a subset of the each resulting summary as a tibble.
 #'
+#' @return An object of class `bbi_summary_log_df`, which includes the fields described below.
+#'
+#' `summary_log()` creates a new tibble with one row per model
+#' found in `.base_dir` (and subdirectories, if `.recurse = TRUE`).
+#'
+#' `add_summary()` adds these fields to the tibble passed to `.log_df`.
+#'
 #' @details
-#' The following fields from `bbi_nonmem_summary` are extracted and included by default.
+#' The following fields from `bbi_nonmem_summary` (the output of `model_summary()`) are extracted and included by default.
 #' If you would like more fields from the summary object, you can extract them manually from the `bbi_summary` list column.
 #'
 #' * `error_msg` -- Error message from [model_summary()]. If `NULL` the call succeeded. If not `NULL`, the rest of the fields will be `NULL`.
@@ -27,14 +34,7 @@
 #' * `eta_pval_significant` -- `TRUE` if any of the ETA p-values are < 0.05. Extracted from `$shrinkage_details$pval`.
 #' * `prderr` -- `TRUE` if a `PRDERR` file is present in the output folder.
 #'
-#' @return
-#' `summary_log()` will return a new tibble with the `'absolute_model_path'` column as the primary key,
-#' and all the columns extracted from [model_summaries()] (but none of the other columns from the input tibble).
-#'
-#' `add_summary()` takes a `bbi_run_log_df` tibble (the output from [run_log()]) and returns the input tibble,
-#' with all the columns extracted from [model_summaries()] joined onto it.
-#'
-#' @seealso [run_log()]
+#' @seealso [run_log()], [config_log()]
 #' @inheritParams run_log
 #' @param ... Arguments passed through to [model_summaries()].
 #' @importFrom dplyr mutate

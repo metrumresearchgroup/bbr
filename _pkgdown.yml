@@ -33,6 +33,7 @@ reference:
   - extract_from_summary
   - model_summary
   - model_summaries
+  - as_summary_list
   - param_estimates
   - param_labels
   - run_log
