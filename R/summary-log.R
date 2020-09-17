@@ -9,22 +9,22 @@
 #' * `error_msg` -- Error message from [model_summary()]. If `NULL` the call succeeded. If not `NULL`, the rest of the fields will be `NULL`.
 #' * `needed_fail_flags` -- Logical for whether the call initially failed, but passed with the inclusion of `.fail_flags`. See [model_summaries()] docs for more details.
 #' * `bbi_summary` -- The full `bbi_nonmem_summary` object for each row. This can be queried further by extracting it as a list, or by using `dplyr::mutate()` etc.
-#' * `ofv` -- Objective function value _with no constant_ from the final estimation method. The constant, and the value _with_ the constant can be found in `bbi_nonmem_summary$ofv`
+#' * `ofv` -- Objective function value _with no constant_ from the final estimation method. The constant, and the value _with_ the constant can be found in `$ofv`.
 #' * `param_count` -- Count of (non-fixed) parameters estimated in final estimation method.
-#' * `estimation_method` -- Character vector of estimation method(s) used. Extracted from `$run_details`
-#' * `problem_text` -- Character vector of text from `$PROB`. Extracted from `$run_details`
-#' * `number_of_patients` -- Count of unique patients in the input data set, extracted from `$run_details`
-#' * `number_of_obs` -- Total count of observations in the input data set, extracted from `$run_details`
+#' * `estimation_method` -- Character vector of estimation method(s) used. Extracted from `$run_details`.
+#' * `problem_text` -- Character vector of text from `$PROB`. Extracted from `$run_details`.
+#' * `number_of_patients` -- Count of unique patients in the input data set, extracted from `$run_details`.
+#' * `number_of_obs` -- Total count of observations in the input data set, extracted from `$run_details`.
 #' * `condition_number` -- The condition number for the final estimation method, if present.
 #' * `any_heuristics` -- Logical indicating whether _any_ of the columns extracted from `$run_heuristics` are `TRUE`. Duplicative information, but helpful for filtering.
-#' * `covariance_step_aborted` -- Extracted from `$run_heuristics`
-#' * `large_condition_number` -- `TRUE` if `condition_number > 1000`. Extracted from `$run_heuristics`
-#' * `correlations_not_ok` -- Not currently implemented in `bbi`; will always be `FALSE`. Extracted from `$run_heuristics`
-#' * `parameter_near_boundary` -- Extracted from `$run_heuristics`
-#' * `hessian_reset` -- Extracted from `$run_heuristics`
-#' * `has_final_zero_gradient` -- Extracted from `$run_heuristics`
-#' * `minimization_terminated` -- Extracted from `$run_heuristics`
-#' * `eta_pval_significant` -- `TRUE` if any of the ETA p-values are < 0.05. Extracted from `bbi_summary$shrinkage_details$pval`
+#' * `covariance_step_aborted` -- Extracted from `$run_heuristics`.
+#' * `large_condition_number` -- `TRUE` if `condition_number > 1000`. Extracted from `$run_heuristics`.
+#' * `correlations_not_ok` -- Not currently implemented in `bbi`; will always be `FALSE`. Extracted from `$run_heuristics`.
+#' * `parameter_near_boundary` -- Extracted from `$run_heuristics`.
+#' * `hessian_reset` -- Extracted from `$run_heuristics`.
+#' * `has_final_zero_gradient` -- Extracted from `$run_heuristics`.
+#' * `minimization_terminated` -- Extracted from `$run_heuristics`.
+#' * `eta_pval_significant` -- `TRUE` if any of the ETA p-values are < 0.05. Extracted from `$shrinkage_details$pval`.
 #' * `prderr` -- `TRUE` if a `PRDERR` file is present in the output folder.
 #'
 #' @return

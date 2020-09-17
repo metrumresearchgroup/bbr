@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 
 This vignette demonstrates how to use `summary_log()` to extract model diagnostics like the objective function value, condition number, and parameter counts. 
 
-If you are new to `rbabylon`, the ["Getting Started with rbabylon"](getting-started.html) vignette will take you through some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its standard workflow and functionality.
+If you are new to `rbabylon`, the ["Getting Started with rbabylon"](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html) vignette will take you through some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its standard workflow and functionality.
 
 There is a lot of information in the `bbi_summary_log_df` tibble that is output from `summary_log()`. However, it is important to note that all of this, and quite a bit more, is contained in the `bbi_nonmem_summary` object output from `model_summary()`. If you are trying to dig deep into the outputs of a small number of models, see the [Summarize section](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html#summarize-model) of the "Getting Started" vignette for an introduction to that functionality. 
 
@@ -27,7 +27,7 @@ There is a lot of information in the `bbi_summary_log_df` tibble that is output 
 
 ## Setup
 
-There is some initial set up necessary for using `rbabylon`. Please refer to the ["Getting Started"](getting-started.html) vignette, mentioned above, if you have not done this yet. Once this is done, load the library.
+There is some initial set up necessary for using `rbabylon`. Please refer to the ["Getting Started"](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html#setup) vignette, mentioned above, if you have not done this yet. Once this is done, load the library.
 
 ```{r set_model_directory}
 library(rbabylon)
@@ -46,7 +46,7 @@ if (Sys.which("bbi") == "") {
 
 # What's in a Model Summary?
 
-As mentioned above, the `bbi_summary_log_df` tibble contains a lot of information, which is a subset of what is contained in the `bbi_nonmem_summary` object returned from `model_summary()`
+As mentioned above, the `bbi_summary_log_df` tibble contains a lot of information, which is a subset of what is contained in the `bbi_nonmem_summary` object returned from `model_summary()`.
 
 ```{r model summary single}
 MODEL_DIR <- "../tests/testthat/model-examples-complex"
@@ -95,16 +95,7 @@ The `error_msg` and `needed_fail_flags` columns describe whether `bbi` had any t
 
 ## Run Details Columns
 
-The next batch of columns contain the core diagnostics and model outputs. 
-
-* `ofv` -- Objective function value _with no constant_ from the final estimation method. The constant, and the value _with_ the constant can be found in `bbi_nonmem_summary$ofv`
-* `param_count` -- Count of (non-fixed) parameters estimated in final estimation method, extracted from `bbi_nonmem_summary$parameters_data`
-* `estimation_method` -- Character vector of estimation method(s) used, extracted from `bbi_nonmem_summary$run_details`
-* `problem_text` -- Text from `$PROB`, extracted from `bbi_nonmem_summary$run_details`
-* `number_of_patients` -- Count of unique patients in the input data set, extracted from `bbi_nonmem_summary$run_details`
-* `number_of_obs` -- Total count of observations in the input data set, extracted from `bbi_nonmem_summary$run_details`
-* `condition_number` -- The condition number for the final estimation method, if present. Extracted from `bbi_nonmem_summary$condition_number`
-
+The next batch of columns contain the core diagnostics and model outputs. As mentioned above, descriptions of what each column contains can be found in the [`summary_log()` docs](https://metrumresearchgroup.github.io/rbabylon/reference/summary_log.html).
 
 ```{r details columns}
 sum_df %>% 
@@ -123,9 +114,9 @@ sum_df %>%
 
 The `run_heuristics` element of the `bbi_nonmem_summary` object contains a number of logical values indicating whether particular heuristic issues were found in the model. Note that these are not necessarily _errors_ with the model run, but are closer to warning flags that should possibly be investigated. Each heuristic is described in more detail in the [`summary_log()` docs](https://metrumresearchgroup.github.io/rbabylon/reference/summary_log.html). 
 
-Note that **all heuristics will be `FALSE` be default (and _never_ `NA`) and will only be `TRUE` if they are explicitly triggered.** For example, `large_condition_number` will be `FALSE` even in the case when a condition number was not calculated at all.
+Note that **all heuristics will be `FALSE` by default (and _never_ `NA`) and will only be `TRUE` if they are explicitly triggered.** For example, `large_condition_number` will be `FALSE` even in the case when a condition number was not calculated at all.
 
-All of the heuristic flags are pivoted out to their own columns in the `bbi_summary_log_df` tibble. It's useful to note that, except for `needed_fail_flags` (discussed above), these are the _only logical columns_ in the tibble and can therefore be easily selected with `tidyselect::where(is.logical)`.
+All of the heuristic flags are pivoted out to their own columns in the `bbi_summary_log_df` tibble. It's useful to note that, except for `needed_fail_flags` (discussed above), these are the _only logical columns_ in the tibble and can therefore be easily selected with `tidyselect::where(is.logical)`. _(Note: `where()` only became available in `tidyselect (>= 1.1.0)`, released May 2020.)_
 
 ```{r heuristics columns fake where, eval=FALSE}
 sum_df %>% select(problem_text, where(is.logical), -needed_fail_flags)

@@ -236,7 +236,7 @@ mod3 <- mod3 %>%
 
 At any point, the user can easily construct a run log tibble to summarize all models run up to this point. 
 
-Before we move on, note that there are also the `config_log()` and `summary_log()` functions, as well as `add_config()` and `add_summary()` which automatically join the columns output from those functions against the tibble output from `run_log()`.  See the **Further Reading** section below for links to vignettes demostrating those functions.
+Before we move on, note that there are also the `config_log()` and `summary_log()` functions, as well as `add_config()` and `add_summary()` which automatically join the columns output from those functions against the tibble output from `run_log()`.  See the **Further Reading** section below for links to vignettes demonstrating those functions.
 
 ```{r run_log} 
 log_df <- run_log()
@@ -278,5 +278,5 @@ cleanup()
 
 Hopefully this has given you a good start on understanding the capabilities and basic workflow of `rbabylon`. Please see the other vignettes for demonstrations of more advanced or specific functionality.
 
-* [Using the based_on field](using-based-on.html) -- How to use the `based_on` field to track a model's ancestry through the model development process, as well how to leverage `config_log()` to check whether older models are still up-to-date.
-* [Creating a Model Summary Log](using-summary-log.html) -- How to use `summary_log()` to extract model diagnostics like the objective function value, condition number, and parameter counts.
+* [Using the based_on field](https://metrumresearchgroup.github.io/rbabylon/articles/using-based-on.html) -- How to use the `based_on` field to track a model's ancestry through the model development process, as well how to leverage `config_log()` to check whether older models are still up-to-date.
+* [Creating a Model Summary Log](https://metrumresearchgroup.github.io/rbabylon/articles/using-summary-log.html) -- How to use `summary_log()` to extract model diagnostics like the objective function value, condition number, and parameter counts.
