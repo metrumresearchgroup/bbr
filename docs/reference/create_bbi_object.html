@@ -10,27 +10,23 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
-
-<!-- bootstrap-toc -->
-<link rel="stylesheet" href="../bootstrap-toc.css">
-<script src="../bootstrap-toc.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -41,6 +37,7 @@
 
 <meta property="og:title" content="Create bbi object — create_bbi_object" />
 <meta property="og:description" content="Constructor functions for objects of fundamental rbabylon classes." />
+<meta name="twitter:card" content="summary" />
 
 
 
@@ -58,7 +55,7 @@
 
   </head>
 
-  <body data-spy="scroll" data-target="#toc">
+  <body>
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -72,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7.0.8100</span>
       </span>
     </div>
 
@@ -103,7 +100,13 @@
     <li>
       <a href="../articles/using-based-on.html">Using the based_on field</a>
     </li>
+    <li>
+      <a href="../articles/using-summary-log.html">Creating a Model Summary Log</a>
+    </li>
   </ul>
+</li>
+<li>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -135,21 +138,25 @@
     <p>Constructor functions for objects of fundamental rbabylon classes.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>create_model_object</span>(<span class='no'>.mod_list</span>)
+    <pre class="usage"><span class='fu'>create_model_object</span>(<span class='no'>res</span>)
 
 <span class='fu'>create_summary_object</span>(<span class='no'>res</span>, <span class='kw'>.model_type</span> <span class='kw'>=</span> <span class='no'>SUPPORTED_MOD_TYPES</span>)
 
+<span class='fu'>create_summary_list</span>(<span class='no'>res</span>)
+
 <span class='fu'>create_process_object</span>(<span class='no'>res</span>)
 
-<span class='fu'>create_run_log_object</span>(<span class='no'>log_df</span>)</pre>
+<span class='fu'>create_run_log_object</span>(<span class='no'>log_df</span>)
+
+<span class='fu'>create_config_log_object</span>(<span class='no'>log_df</span>)
+
+<span class='fu'>create_summary_log_object</span>(<span class='no'>log_df</span>)
+
+<span class='fu'>create_log_df_impl</span>(<span class='no'>log_df</span>, <span class='no'>.class</span>, <span class='no'>.req_cols</span>, <span class='no'>.key</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>.mod_list</th>
-      <td><p>List with the required information to create a model object</p></td>
-    </tr>
     <tr>
       <th>res</th>
       <td><p>List to attempt to assign the class to</p></td>
@@ -162,6 +169,18 @@
       <th>log_df</th>
       <td><p>data.frame or tibble to attempt to assign the class to</p></td>
     </tr>
+    <tr>
+      <th>.class</th>
+      <td><p>Character scalar of the class to assign</p></td>
+    </tr>
+    <tr>
+      <th>.req_cols</th>
+      <td><p>Character vector of required columns</p></td>
+    </tr>
+    <tr>
+      <th>.key</th>
+      <td><p>Character scalar of column name that will be treated as a primary key. Must be a type character, unique, and have no NA's or NULL's.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="functions"><a class="anchor" href="#functions"></a>Functions</h2>
@@ -170,15 +189,22 @@
 <ul>
 <li><p><code>create_model_object</code>: Creates list object of class <code>bbi_{.model_type}_model</code> from named list with <code>MODEL_REQ_INPUT_KEYS</code></p></li>
 <li><p><code>create_summary_object</code>: Create list object of <code>bbi_{.model_type}_summary</code> class, first checking that all the required keys are present.</p></li>
+<li><p><code>create_summary_list</code>: Create list output from <code><a href='model_summaries.html'>model_summaries()</a></code>. Each element will contain a <code>bbi_{.model_type}_summary</code> object, as well as some metadata about possible errors.</p></li>
 <li><p><code>create_process_object</code>: Create list object of <code>babylon_process</code> class, first checking that all the required keys are present.</p></li>
-<li><p><code>create_run_log_object</code>: Create list object of <code>bbi_run_log_df</code> class, first checking that all the required columns are present.</p></li>
+<li><p><code>create_run_log_object</code>: Create tibble object of <code>bbi_run_log_df</code> class, first checking that all the required columns are present.</p></li>
+<li><p><code>create_config_log_object</code>: Create tibble object of <code>bbi_config_log_df</code> class, first checking that all the required columns are present.</p></li>
+<li><p><code>create_summary_log_object</code>: Create tibble object of <code>bbi_summary_log_df</code> class, first checking that all the required columns are present.</p></li>
+<li><p><code>create_log_df_impl</code>: Implementation function used to create objects of class <code>bbi_summary_log_df</code>, <code>bbi_config_log_df</code>, and <code>bbi_summary_log_df</code></p></li>
 </ul>
 
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-    <nav id="toc" data-toggle="toc" class="sticky-top">
-      <h2 data-toc-skip>Contents</h2>
-    </nav>
+  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+    <h2>Contents</h2>
+    <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#functions">Functions</a></li>
+    </ul>
+
   </div>
 </div>
 
@@ -189,7 +215,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
 
       </footer>
