@@ -1,8 +1,5 @@
 context("Build paths from model object")
 
-# source constants and reference objects
-source("data/utils-reference.R")
-
 ########################################
 # file path and file name manipulation
 ########################################

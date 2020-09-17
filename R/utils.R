@@ -11,7 +11,7 @@
 #' @importFrom purrr imap set_names
 #' @return character string, output from format_cmd_args()
 #' @keywords internal
-check_nonmem_args <- function(.args) {
+check_bbi_args <- function(.args) {
   # if NULL, return NULL back
   if (length(.args) == 0) {
     return(NULL)
@@ -26,12 +26,12 @@ check_nonmem_args <- function(.args) {
     }
   )
 
-  # check against NONMEM_ARGS
+  # check against BBI_ARGS
   err_vec <- imap(.args, function(.v, .n) {
     # check that arg is valid
-    ref <- NONMEM_ARGS[[.n]]
+    ref <- BBI_ARGS[[.n]]
     if (is.null(ref)) {
-      err_msg <- paste(.n, "is not a valid argument for the `.args` list in submit_nonmem_model(). Run `print_nonmem_args()` to see valid arguments.")
+      err_msg <- paste(.n, "is not a valid argument for the `.args` list in submit_nonmem_model(). Run `print_bbi_args()` to see valid arguments.")
       return(err_msg)
     }
 
@@ -45,7 +45,7 @@ check_nonmem_args <- function(.args) {
     } else {
       # This feels weird to put an intentional bug catch in here, but I don't like having to rely on raw string matching
       # from our aaa.R file to trigger functionality, so this feels like the safest option.
-      stop(paste0("BUG!!! NONMEM_ARGS[['", .n, "']][['type']] is `", ref$type, "` which is invalid. Must be either 'character', 'logical', or 'numeric'"))
+      stop(paste0("BUG!!! BBI_ARGS[['", .n, "']][['type']] is `", ref$type, "` which is invalid. Must be either 'character', 'logical', or 'numeric'"))
     }
     if (!type_pass_bool) {
       err_msg <- paste0("`", .v, "` passed for arg `", .n, "`. Expected '", ref$type, "' type.")
@@ -58,13 +58,13 @@ check_nonmem_args <- function(.args) {
   # check for errors, if no errors format arguments
   if (length(err_vec) > 0) {
     err_msg <- paste0(
-      "There are ", length(err_vec), " errors in check_nonmem_args(): ", paste(err_vec, collapse = " :: ")
+      "There are ", length(err_vec), " errors in check_bbi_args(): ", paste(err_vec, collapse = " :: ")
     )
     stop(err_msg)
   }
 
   # format to key value pairs with command line flags
-  key_value_flags <- unlist(imap(.args, function(.v, .n) {NONMEM_ARGS[[.n]]$flag}))
+  key_value_flags <- unlist(imap(.args, function(.v, .n) {BBI_ARGS[[.n]]$flag}))
   key_value_list <- imap(.args, function(.v, .n) {.v}) %>% set_names(key_value_flags)
 
   # format list to character vector
@@ -126,7 +126,7 @@ build_bbi_param_list <- function(.mods, .bbi_args = NULL) {
   param_list <- list()
   for (.mod in .mods) {
     # extract babylon args vector and working directory, then get md5 hash
-    args_vec <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]]) %>% check_nonmem_args() %>% sort()
+    args_vec <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]]) %>% check_bbi_args() %>% sort()
     model_dir <- .mod[[WORKING_DIR]]
     arg_md5 <- c(args_vec, model_dir) %>% digest(algo = "md5")
 
@@ -219,8 +219,8 @@ combine_list_objects <- function(.new_list, .old_list, .append = FALSE) {
 #' Prints all valid arguments to pass in to `.bbi_args=list()` argument of `submit_model()` or `model_summary()`
 #' @importFrom purrr imap
 #' @export
-print_nonmem_args <- function() {
-  doc_list <- imap(NONMEM_ARGS, function(.v, .n) {
+print_bbi_args <- function() {
+  doc_list <- imap(BBI_ARGS, function(.v, .n) {
     paste0(.n, " (", .v$type, ") -- ", .v$description, " (sets CLI flag `", .v$flag, "`)")
   })
   cat(paste(doc_list, collapse = "\n"))
@@ -321,7 +321,7 @@ find_config_file_path <- function(.config_path, .model_dir) {
 #' @keywords internal
 check_model_object <- function(.mod, .mod_types = VALID_MOD_CLASSES) {
   if (!inherits(.mod, .mod_types)) {
-    stop(glue("Must pass a model object, but got object of class {paste(class(.mod), collapse = ', ')}"))
+    stop(glue("Must pass a model object, but got object of class: `{paste(class(.mod), collapse = ', ')}`"))
   }
   return(invisible(TRUE))
 }
@@ -341,6 +341,17 @@ check_model_object_list <- function(.mods, .mod_types = VALID_MOD_CLASSES) {
   }
   return(invisible(TRUE))
 }
+
+#' Private helper to check if an object inherits a run log class and error if not
+#' @param .df The object to check
+#' @keywords internal
+check_bbi_run_log_df_object <- function(.df) {
+  if (!inherits(.df, "bbi_run_log_df")) {
+    stop(glue("Must pass a tibble of class `bbi_run_log_df`, but got object of class: `{paste(class(.df), collapse = ', ')}`"))
+  }
+  return(invisible(TRUE))
+}
+
 
 ############################
 # Error handlers

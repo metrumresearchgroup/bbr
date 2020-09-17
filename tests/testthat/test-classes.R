@@ -1,10 +1,5 @@
 context("creating S3 objects")
 
-# reference
-MOD_CLASS <- "bbi_nonmem_model"
-SUM_CLASS <- "bbi_nonmem_summary"
-PROC_CLASS <- "babylon_process"
-LOG_CLASS <- "bbi_run_log_df"
 
 test_that("create_model_object() correctly assigns class", {
   .mod <- list()
@@ -54,6 +49,7 @@ test_that("create_model_object() errors if keys are missing", {
 test_that("create_summary_object() correctly assigns class", {
   .sum <- list()
   .sum[[SUMMARY_DETAILS]] <- "naw"
+  .sum[[SUMMARY_HEURISTICS]] <- "naw"
   expect_false(inherits(.sum, SUM_CLASS))
   .sum <- create_summary_object(.sum)
   expect_true(inherits(.sum, SUM_CLASS))
@@ -62,8 +58,32 @@ test_that("create_summary_object() correctly assigns class", {
 test_that("create_summary_object() errors if keys are missing", {
   .sum <- list()
   #.sum[[SUMMARY_DETAILS]] <- "naw"
-  .sum$naw <- "naw"
+  .sum[[SUMMARY_HEURISTICS]] <- "naw"
   expect_error(create_summary_object(.sum), regexp = "Summary object must have the following named elements")
+})
+
+
+test_that("create_summary_list() correctly assigns class", {
+  .sum <- list()
+  .sum[[ABS_MOD_PATH]] <- "naw"
+  .sum[[SL_SUMMARY]] <- "naw"
+  .sum[[SL_ERROR]] <- "naw"
+  .sum[[SL_FAIL_FLAGS]]  <- "naw"
+  .sum_list <- list(.sum, .sum, .sum)
+  expect_false(inherits(.sum_list, SL_CLASS))
+  .sum_list <- create_summary_list(.sum_list)
+  expect_true(inherits(.sum_list, SL_CLASS))
+})
+
+test_that("create_summary_list() errors if keys are missing", {
+  .sum <- list()
+  .sum[[ABS_MOD_PATH]] <- "naw"
+  #.sum[[SL_SUMMARY]] <- "naw"
+  .sum[[SL_ERROR]] <- "naw"
+  .sum[[SL_FAIL_FLAGS]]  <- "naw"
+  .sum_list <- list(.sum, .sum, .sum)
+  expect_false(inherits(.sum_list, SL_CLASS))
+  expect_error(create_summary_list(.sum_list), regexp = "Each element of summary list object must have the following")
 })
 
 
@@ -160,6 +180,6 @@ test_that("create_run_log_object() errors if ABS_MOD_PATH has missing values", {
     !!YAML_TAGS         := c("aww", "naw", "dawg"),
     !!YAML_DECISIONS    := c("aww", "naw", "dawg")
   )
-  expect_error(create_run_log_object(.log_df), regexp = "column must NOT have any NA values.+1, 3")
+  expect_error(create_run_log_object(.log_df), regexp = "column must NOT have any NA or NULL values.+1, 3")
 })
 

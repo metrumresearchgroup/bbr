@@ -10,6 +10,6 @@ is_diag(.name)
 \item{.name}{A character scalar containing an index string}
 }
 \description{
-Private helper to unpack an matrix index string like '(3,3)' is for a diagonal (i.e. if the numbers are the same)
+Private helper to unpack a matrix index string like '(3,3)' is for a diagonal (i.e. if the numbers are the same)
 }
 \keyword{internal}

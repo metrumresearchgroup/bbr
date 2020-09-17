@@ -4,26 +4,42 @@
 \alias{create_bbi_object}
 \alias{create_model_object}
 \alias{create_summary_object}
+\alias{create_summary_list}
 \alias{create_process_object}
 \alias{create_run_log_object}
+\alias{create_config_log_object}
+\alias{create_summary_log_object}
+\alias{create_log_df_impl}
 \title{Create bbi object}
 \usage{
-create_model_object(.mod_list)
+create_model_object(res)
 
 create_summary_object(res, .model_type = SUPPORTED_MOD_TYPES)
+
+create_summary_list(res)
 
 create_process_object(res)
 
 create_run_log_object(log_df)
+
+create_config_log_object(log_df)
+
+create_summary_log_object(log_df)
+
+create_log_df_impl(log_df, .class, .req_cols, .key)
 }
 \arguments{
-\item{.mod_list}{List with the required information to create a model object}
-
 \item{res}{List to attempt to assign the class to}
 
 \item{.model_type}{Character scalar of a valid model type (currently either \code{nonmem} or \code{stan})}
 
 \item{log_df}{data.frame or tibble to attempt to assign the class to}
+
+\item{.class}{Character scalar of the class to assign}
+
+\item{.req_cols}{Character vector of required columns}
+
+\item{.key}{Character scalar of column name that will be treated as a primary key. Must be a type character, unique, and have no NA's or NULL's.}
 }
 \description{
 Constructor functions for objects of fundamental rbabylon classes.
@@ -34,9 +50,17 @@ Constructor functions for objects of fundamental rbabylon classes.
 
 \item \code{create_summary_object}: Create list object of \verb{bbi_\{.model_type\}_summary} class, first checking that all the required keys are present.
 
+\item \code{create_summary_list}: Create list output from \code{\link[=model_summaries]{model_summaries()}}. Each element will contain a \verb{bbi_\{.model_type\}_summary} object, as well as some metadata about possible errors.
+
 \item \code{create_process_object}: Create list object of \code{babylon_process} class, first checking that all the required keys are present.
 
-\item \code{create_run_log_object}: Create list object of \code{bbi_run_log_df} class, first checking that all the required columns are present.
+\item \code{create_run_log_object}: Create tibble object of \code{bbi_run_log_df} class, first checking that all the required columns are present.
+
+\item \code{create_config_log_object}: Create tibble object of \code{bbi_config_log_df} class, first checking that all the required columns are present.
+
+\item \code{create_summary_log_object}: Create tibble object of \code{bbi_summary_log_df} class, first checking that all the required columns are present.
+
+\item \code{create_log_df_impl}: Implementation function used to create objects of class \code{bbi_summary_log_df}, \code{bbi_config_log_df}, and \code{bbi_summary_log_df}
 }}
 
 \keyword{internal}

@@ -4,8 +4,7 @@ suppressPackageStartupMessages(library(glue))
 suppressPackageStartupMessages(library(dplyr))
 
 # constants
-source("data/test-param-labels-ref.R")
-MODEL_DIR <- "data/tidynm_extdata"
+PL_MODEL_DIR <- "data/tidynm_extdata"
 MODEL_PICKS <- list(
   list(mod_id = "101", omega = block(3), sigma = NULL),
   list(mod_id = "510", omega = block(2), sigma = NULL),
@@ -60,7 +59,7 @@ for (MODEL_PICK in MODEL_PICKS) {
     names(ref_df) <- names(ref_df) %>% tolower()
 
     #
-    .ctl_raw <-  file.path(MODEL_DIR, glue("{.mod_id}.ctl")) %>% readr::read_file()
+    .ctl_raw <-  file.path(PL_MODEL_DIR, glue("{.mod_id}.ctl")) %>% readr::read_file()
 
     # make label df
     .label_df <- .ctl_raw %>%
@@ -69,9 +68,9 @@ for (MODEL_PICK in MODEL_PICKS) {
                    select(-param_type)
 
     # join against reference to make sure they're the same
-    ref_df <- ref_df %>% mutate(names = ifelse(param == "THETA",
-                                               paste0(param, var1),
-                                               paste0(param, "(", var1, ",", var2, ")")))
+    ref_df <- ref_df %>% mutate(!!SUMMARY_PARAM_NAMES := ifelse(param == "THETA",
+                                                                paste0(param, var1),
+                                                                paste0(param, "(", var1, ",", var2, ")")))
 
     join_df <- ref_df %>%
       full_join(.label_df, by = names(.label_df))
@@ -87,8 +86,8 @@ for (MODEL_PICK in MODEL_PICKS) {
 if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
   skip("param_labels only runs on Metworx or Drone")
 } else {
-  withr::with_options(list(rbabylon.bbi_exe_path = '/data/apps/bbi',
-                           rbabylon.model_directory = normalizePath(MODEL_DIR)), {
+  withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
+                           rbabylon.model_directory = normalizePath(PL_MODEL_DIR)), {
 
     for (MODEL_PICK in MODEL_PICKS) {
       .mod_id <- MODEL_PICK$mod_id
@@ -99,9 +98,9 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
         names(ref_df) <- names(ref_df) %>% tolower()
 
         # get param df with rbabylon::model_summary()
-        if (fs::file_exists(file.path(MODEL_DIR, glue("{.mod_id}.yaml")))) fs::file_delete(file.path(MODEL_DIR, glue("{.mod_id}.yaml")))
+        if (fs::file_exists(file.path(PL_MODEL_DIR, glue("{.mod_id}.yaml")))) fs::file_delete(file.path(PL_MODEL_DIR, glue("{.mod_id}.yaml")))
         .mod <-  rbabylon::new_model(glue("{.mod_id}.yaml"), glue("the {.mod_id} model"))
-        on.exit({ if (fs::file_exists(file.path(MODEL_DIR, glue("{.mod_id}.yaml")))) fs::file_delete(file.path(MODEL_DIR, glue("{.mod_id}.yaml"))) })
+        on.exit({ if (fs::file_exists(file.path(PL_MODEL_DIR, glue("{.mod_id}.yaml")))) fs::file_delete(file.path(PL_MODEL_DIR, glue("{.mod_id}.yaml"))) })
 
         .param_df <- .mod %>% rbabylon::model_summary() %>% param_estimates()
         names(.param_df) <- names(.param_df) %>% tolower()
@@ -113,13 +112,13 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
         suppressSpecificWarning({
           .new_df <- inner_join(.param_df,
                                 .label_df %>% apply_indices(.omega = MODEL_PICK$omega, .sigma = MODEL_PICK$sigma) %>% select(-param_type),
-                                by = "names")
+                                by = SUMMARY_PARAM_NAMES)
         }, .regexpr = "Column .+ has different attributes on LHS and RHS of join")
 
         # join against reference to make sure they're the same
-        ref_df <- ref_df %>% mutate(names = ifelse(param == "THETA",
-                                                   paste0(param, var1),
-                                                   paste0(param, "(", var1, ",", var2, ")")))
+        ref_df <- ref_df %>% mutate(!!SUMMARY_PARAM_NAMES := ifelse(param == "THETA",
+                                                                    paste0(param, var1),
+                                                                    paste0(param, "(", var1, ",", var2, ")")))
 
         join_df <- ref_df %>%
           full_join(.new_df, by = names(.label_df))

@@ -7,12 +7,15 @@
 #' @importFrom glue glue
 #' @importFrom rlang .data :=
 #' @import fs
+#' @keywords internal
 NULL
 
 
 #' Execute call to bbi
 #'
 #' Private implementation function that executes a babylon call (`bbi ...`) with processx::process$new()
+#'
+#' @inheritParams bbi_version
 #' @param .cmd_args A character vector of command line arguments for the execution call
 #' @param .dir The working directory to run command in. Defaults to "."
 #' @param .verbose Print stdout and stderr as process runs #### NOT IMPLEMENTED?
@@ -26,15 +29,49 @@ NULL
 #'         working_dir -- the directory the command was run in, passed through from .dir argument.
 #' @importFrom processx process
 #' @keywords internal
-bbi_exec <- function(.cmd_args, .dir = ".", .verbose = FALSE, .wait = FALSE, ...) {
-  bbi_exe_path <- getOption("rbabylon.bbi_exe_path")
-  check_bbi_exe(bbi_exe_path)
+bbi_exec <- function(.cmd_args,
+                     .dir = ".",
+                     .verbose = FALSE,
+                     .wait = FALSE,
+                     .bbi_exe_path = getOption("rbabylon.bbi_exe_path"),
+                     ...) {
+  check_bbi_exe(.bbi_exe_path)
 
-  p <- processx::process$new(bbi_exe_path, .cmd_args, ..., wd = .dir,  stdout = "|", stderr = "2>&1")
-
+  p <- processx::process$new(
+    .bbi_exe_path,
+    .cmd_args,
+    ...,
+    wd = .dir,
+    stdout = "|",
+    stderr = "2>&1"
+  )
   if (.wait) {
     # wait for process and capture stdout and stderr
-    p$wait()
+    if (all(c("nonmem", "summary", "--json") %in% .cmd_args)) {
+      # this was originally just a wait, however this caused an infinite
+      # hang with model 510 summary in the tests as of 0.7.0.8009 on mac
+      # it _could_ be due to processes finishing so fast that ps/processx
+      # are not able to adequately track the status of the subprocess while
+      # waiting.
+      # This was attempted to be artifically delayed by making the ext 50k lines
+      # but this still resulted in the hang so not positive. Have not seen
+      # this error in other models.
+      # To get around this false hang we want to timeout.
+      # This should be ok as the json should
+      # be back at that point, in which p$read_all_output_lines will return
+      # valid values.
+      #
+      # in addition to give a debug capability, setting the timeout to
+      # an option default of 3. generally summary should return in 10 ms
+      # or so, however if we move towards providing batch summaries
+      # this process could take longer. This will give us an escape hatch
+      # in such a case that people report errors where summary takes longer
+      # then we can establish a longer potential timeout or more heuristics
+      # around what time might be (eg if see its a summary on a range of models)
+      p$wait(timeout = getOption("rbabylon.summary_wait_timeout", 1000L))
+    } else {
+      p$wait()
+    }
     # check output status code
     output <- p$read_all_output_lines()
     check_status_code(p$get_exit_status(), output, .cmd_args)
@@ -42,12 +79,11 @@ bbi_exec <- function(.cmd_args, .dir = ".", .verbose = FALSE, .wait = FALSE, ...
   } else {
     output <- "NO STDOUT BECAUSE `.wait = FALSE`"
   }
-
   # build result object
   res <- list()
   res[[PROC_PROCESS]] <- p
   res[[PROC_STDOUT]] <- output
-  res[[PROC_BBI]] <- bbi_exe_path
+  res[[PROC_BBI]] <- .bbi_exe_path
   res[[PROC_CMD_ARGS]] <- .cmd_args
   res[[PROC_WD]] <- .dir
 
@@ -85,8 +121,12 @@ bbi_dry_run <- function(.cmd_args, .dir) {
   return(res)
 }
 
-#' Checks that a bbi binary is present at the path passed to .bbi_exe_path
-#' @param .bbi_exe_path Path to bbi exe file that will be checked
+#' Check that babylon is installed
+#'
+#' Raises an error if a babylon executable is not found at `.bbi_exe_path`.
+#'
+#' @inheritParams bbi_version
+#' @return `NULL`, invisibly
 #' @keywords internal
 check_bbi_exe <- function(.bbi_exe_path) {
   # check if this path is not in the already checked paths
@@ -108,9 +148,12 @@ check_bbi_exe <- function(.bbi_exe_path) {
 }
 
 
-#' Check if bbi_version is below minimum allowed version
+#' Check that babylon satisfies a version constraint
+#'
 #' @importFrom stringr str_replace_all
-#' @param .bbi_exe_path Path to bbi exe file that will be checked
+#' @inheritParams bbi_version
+#'
+#' @return `NULL` if `.bbi_exe_path` satisfies the constraint
 #' @keywords internal
 check_bbi_version_constraint <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')) {
   .bbi_exe_path <- Sys.which(.bbi_exe_path)

@@ -5,6 +5,8 @@
 
 <!-- badges: start -->
 
+[![Build
+Status](https://github-drone.metrumrg.com/api/badges/metrumresearchgroup/rbabylon/status.svg)](https://github-drone.metrumrg.com/metrumresearchgroup/rbabylon)
 <!-- badges: end -->
 
 `rbabylon` is an R interface for running `babylon`. `babylon` is (will
@@ -56,9 +58,9 @@ functionality is rolled out. A complete list can be found
   - [Using the based\_on
     field](https://metrumresearchgroup.github.io/rbabylon/articles/using-based-on.html)
     – How to use the `based_on` field to track a model’s ancestry
-    through the model development process, as well how to leverage md5
-    digests to check whether older models are still up-to-date.
-  - [rbabylon Parameter
-    Labels](https://metrumresearchgroup.github.io/rbabylon/articles/parameter-labels.html)
-    – Extracting parameter estimates and labels into a table that can be
-    used for diagnostics, or to generate reports.
+    through the model development process, as well how to leverage
+    `config_log()` to check whether older models are still up-to-date.
+  - [Creating a Model Summary
+    Log](https://metrumresearchgroup.github.io/rbabylon/articles/using-summary-log.html)
+    – How to use `summary_log()` to extract model diagnostics like the
+    objective function value, condition number, and parameter counts.

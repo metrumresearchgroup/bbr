@@ -50,10 +50,15 @@ The _first time_ you use `rbabylon` on a system or disk, you must first install 
 
 To reiterate, there are two relevant paths for this section.
 
-* `BBI_EXE_PATH` -- the path the `babylon` executable file on your system.
+* `BBI_EXE_PATH` -- the path to the `babylon` executable file on your system.
 * `MODEL_DIR` -- the root modeling directory where you will be running models with `rbabylon`
 
-```{r define dirs}
+```{r, include = FALSE}
+BBI_EXE_PATH <- read_bbi_path()
+MODEL_DIR <- "../inst/nonmem"
+```
+
+```{r define dirs, eval = FALSE}
 BBI_EXE_PATH <- "/data/apps/bbi" # this should be an absolute path
 MODEL_DIR <- "../inst/nonmem"    # this should be relative to your working directory
 ```
@@ -61,7 +66,8 @@ MODEL_DIR <- "../inst/nonmem"    # this should be relative to your working direc
 ### Installing babylon
 
 You can install the `babylon` binary with:
-```
+
+```{r, eval = FALSE}
 rbabylon::use_bbi()
 ```
 
@@ -75,7 +81,7 @@ If you're not sure if you have `babylon` installed, you can use `bbi_version()` 
 
 Next, initialize `babylon` by pointing it to your modeling directory, a working installation of NONMEM, and a default NONMEM version to use.
 
-```{r setup, eval=FALSE}
+```{r setup, eval = FALSE}
 bbi_init(.dir = MODEL_DIR,            # the root modeling directory
          .nonmem_dir = "/opt/NONMEM", # location of NONMEM installation
          .nonmem_version = "nm74gf")  # default NONMEM version to use
@@ -118,14 +124,14 @@ The model object you have just created can be passed to various functions which 
 mod1 %>% submit_model()
 ```
 
-This will return a process object. We won't discuss this object in this vignette, but other documentation will show how it can be used to check on the model run in progress. Please note that, for this first release, **checking on a model run in progress is not fully implemented.** For now, users should check on their runs manually and only proceed to the next steps once it has successfully completed. 
+This will return a process object. We won't discuss this object in this vignette, but other documentation will show how it can be used to check on the model run in progress. Please note that **checking on a model run in progress is not fully implemented.** For now, users should check on their runs manually (by looking at the output directory) and only proceed to the next steps once it has successfully completed. 
 
 ### Passing arguments to bbi
 
-There are a number of arguments that `babylon` can take to modify how models are run. You can print a list of available arguments using the `print_nonmem_args()` helper function. (Similar helper functions will be added as new modeling software are supported.)
+There are a number of arguments that `babylon` can take to modify how models are run. You can print a list of available arguments using the `print_bbi_args()` helper function.
 
-```{r print_nonmem_args}
-print_nonmem_args()
+```{r print_bbi_args}
+print_bbi_args()
 ```
 
 These can be specified globally in the `babylon.yaml` file, and you can see the default values of them in that file. However, they can also be specified or changed for each model. This can be done in several ways:
@@ -139,7 +145,7 @@ These can be specified globally in the `babylon.yaml` file, and you can see the 
 
 See the docs for any of those functions for more details on usage and syntax.
 
-### Overwriting output from previously a run model
+### Overwriting output from a previously run model
 
 It is common to run a model, make some tweaks to it, and then run it again. However, to avoid accidentally deleting model outputs, `rbabylon` will error by default if it sees existing output when trying to submit a model. To automatically overwrite any previous model output, just pass `overwrite = TRUE` to the `.bbi_args` argument described in the previous section. For example:
 
@@ -168,7 +174,7 @@ param_df1
 
 Much of the benefit of `rbabylon` is leveraged in the model iteration workflow, and the run log summaries that can be created afterwards. For example, imagine you look at these model results and want to begin iterating on them with a new model. 
 
-Imagine you are now in a new R session and no longer have your `mod1` object. You can easily rebuild it from the YAML file on disk. *NOTE:* You can pass either a character or integer to `read_model()`, `submit_model()`, etc. to identify your model, assuming that you have set your model directory correctly.
+If you are now in a new R session and no longer have your `mod1` object, you can easily rebuild it from the YAML file on disk. *NOTE:* You can pass either a character or integer to `read_model()`, `submit_model()`, etc. to identify your model, assuming that you have set your model directory correctly.
 
 ```{r read_model fake, eval=FALSE}
 mod1 <- read_model(1)
@@ -228,24 +234,20 @@ mod3 <- mod3 %>%
 
 # Run log
 
-At any point, the user can easily construct a run log tibble to summarize all 
-models run up to this point.
+At any point, the user can easily construct a run log tibble to summarize all models run up to this point. 
+
+Before we move on, note that there are also the `config_log()` and `summary_log()` functions, as well as `add_config()` and `add_summary()` which automatically join the columns output from those functions against the tibble output from `run_log()`.  See the **Further Reading** section below for links to vignettes demonstrating those functions.
 
 ```{r run_log} 
 log_df <- run_log()
 log_df
 ```
 
-The `run_log()` returns a tibble (called `log_df` in this example) which can be manipulated
-like any other tibble. However, several of the columns (`tags` and `based_on` for example) are
-list columns, which complicates how the user interacts with them. Future releases will have 
-helper functions to more seamlessly interact with `log_df`, but until then, we have provided
-some sample `dplyr` code below.
+The `run_log()` returns a tibble (called `log_df` in this example) which can be manipulated like any other tibble. However, several of the columns (`tags` and `based_on` for example) are list columns, which complicates how the user interacts with them. Future releases will have  helper functions to more seamlessly interact with `log_df`, but until then, we have provided some sample `tidyverse` code below.
 
 ## Viewing tags example
 
-This example code displays a more human-readable version of the run log, with the tags collapsed to a 
-character vector.
+This example code displays a more human-readable version of the run log, with the tags collapsed to a character vector.
 
 ```{r run_log_cleanup} 
 log_df %>% 
@@ -276,5 +278,5 @@ cleanup()
 
 Hopefully this has given you a good start on understanding the capabilities and basic workflow of `rbabylon`. Please see the other vignettes for demonstrations of more advanced or specific functionality.
 
-* [Using the based_on field](https://metrumresearchgroup.github.io/rbabylon/articles/using-based-on.html) -- How to use the `based_on` field to track a model's ancestry through the model development process, as well how to leverage md5 digests to check whether older models are still up-to-date.
-* [rbabylon Parameter Labels](https://metrumresearchgroup.github.io/rbabylon/articles/parameter-labels.html) -- Extracting parameter estimates and labels into a table that can be used for diagnostics, or to generate reports.
+* [Using the based_on field](https://metrumresearchgroup.github.io/rbabylon/articles/using-based-on.html) -- How to use the `based_on` field to track a model's ancestry through the model development process, as well how to leverage `config_log()` to check whether older models are still up-to-date.
+* [Creating a Model Summary Log](https://metrumresearchgroup.github.io/rbabylon/articles/using-summary-log.html) -- How to use `summary_log()` to extract model diagnostics like the objective function value, condition number, and parameter counts.

@@ -11,6 +11,7 @@ new_model(
   .based_on = NULL,
   .tags = NULL,
   .bbi_args = NULL,
+  .overwrite = FALSE,
   .model_type = c("nonmem"),
   .directory = get_model_directory()
 )
@@ -26,9 +27,11 @@ new_model(
 
 \item{.tags}{A character scalar or vector with any user tags to be added to the YAML file}
 
-\item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}. Run \code{print_nonmem_args()} to see valid arguments. These will be written into YAML file.}
+\item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}. Run \code{\link[=print_bbi_args]{print_bbi_args()}} to see valid arguments. These will be written into YAML file.}
 
-\item{.model_type}{Character scalar to specify type of model being created (used for S3 class). Currently only \code{'nonmem'} is supported.}
+\item{.overwrite}{If \code{FALSE}, the default, error if a file already exists at \code{.yaml_path}. If \code{TRUE} overwrite existing file, if one exists.}
+
+\item{.model_type}{Character scaler to specify type of model being created (used for S3 class). Currently only \code{'nonmem'} is supported.}
 
 \item{.directory}{Model directory which \code{.yaml_path} is relative to. Defaults to \code{options('rbabylon.model_directory')}, which can be set globally with \code{set_model_directory()}.}
 }

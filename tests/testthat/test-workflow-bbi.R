@@ -14,49 +14,34 @@ if (Sys.getenv("METWORX_VERSION") == "" || Sys.getenv("SKIP_BBI_TEST") == "true"
 
 # define constants
 STARTER_FILE <- file.path("model-examples/1.ctl")
-PARAM_REF_FILE <- "data/acop_param_table_ref_200423_randeff.rds"
-
-MODEL_DIR <- "model-examples-bbi"
-BBI_PATH <- '/data/apps/bbi'
-
-ORIG_DESC <- "original acop model"
-NEW_DESC <- "new description"
-
-ORIG_TAGS <- c("acop tag", "other tag")
-NEW_TAGS <- c("acop tag", "new tag")
-
-# reference
-MODEL_CLASS_REF <- c("bbi_nonmem_model", "list")
-PROCESS_CLASS_REF <- c("babylon_process", "list")
-SUM_CLASS_REF <- c("bbi_nonmem_summary", "list")
-SUM_NAMES_REF <- c("run_details", "run_heuristics", "parameters_data", "parameter_names",
-                   "ofv", "shrinkage_details", "covariance_theta", "correlation_theta")
+MODEL_DIR_BBI <- "model-examples-bbi"
+BBI_PATH <- read_bbi_path()
 
 # cleanup function
-cleanup <- function(.recreate_dir = FALSE) {
-  if (fs::dir_exists(MODEL_DIR)) fs::dir_delete(MODEL_DIR)
-  if (isTRUE(.recreate_dir)) fs::dir_create(MODEL_DIR)
+cleanup_bbi <- function(.recreate_dir = FALSE) {
+  if (fs::dir_exists(MODEL_DIR_BBI)) fs::dir_delete(MODEL_DIR_BBI)
+  if (isTRUE(.recreate_dir)) fs::dir_create(MODEL_DIR_BBI)
 }
-cleanup(.recreate_dir = TRUE)
+cleanup_bbi(.recreate_dir = TRUE)
 
 # set options and run tests
 withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
-                         rbabylon.model_directory = normalizePath(MODEL_DIR)), {
+                         rbabylon.model_directory = normalizePath(MODEL_DIR_BBI)), {
 
   # cleanup when done
   on.exit({
     Sys.sleep(3) # wait for some NONMEM mess to delete itself
-    cleanup()
+    cleanup_bbi()
   })
 
   # clear old babylon.yaml
-  if (fs::file_exists(file.path(MODEL_DIR, "babylon.yaml"))) fs::file_delete(file.path(MODEL_DIR, "babylon.yaml"))
+  if (fs::file_exists(file.path(MODEL_DIR_BBI, "babylon.yaml"))) fs::file_delete(file.path(MODEL_DIR_BBI, "babylon.yaml"))
 
   # create new babylon.yaml
-  bbi_init(MODEL_DIR, "/opt/NONMEM", "nm74gf")
+  bbi_init(MODEL_DIR_BBI, "/opt/NONMEM", "nm74gf")
 
   # copy model file into new model dir
-  fs::file_copy(STARTER_FILE, MODEL_DIR)
+  fs::file_copy(STARTER_FILE, MODEL_DIR_BBI)
 
   #######################
   # create model from R
@@ -70,20 +55,20 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
       .tags = ORIG_TAGS,
       .bbi_args = list(overwrite = TRUE, threads = 4)
     ))
-    expect_identical(class(mod1), MODEL_CLASS_REF)
+    expect_identical(class(mod1), MOD_CLASS_LIST)
 
     # submit model
     proc1 <- submit_model(mod1, .mode = "local", .wait = TRUE)
-    expect_identical(class(proc1), PROCESS_CLASS_REF)
+    expect_identical(class(proc1), PROC_CLASS_LIST)
 
     # get summary from model object
     sum1a <- mod1 %>% model_summary()
-    expect_identical(class(sum1a), SUM_CLASS_REF)
+    expect_identical(class(sum1a), SUM_CLASS_LIST)
     expect_identical(names(sum1a), SUM_NAMES_REF)
 
     # get summary from process object
     sum1b <- proc1 %>% as_model %>% model_summary()
-    expect_identical(class(sum1b), SUM_CLASS_REF)
+    expect_identical(class(sum1b), SUM_CLASS_LIST)
     expect_identical(names(sum1b), SUM_NAMES_REF)
 
     # extract parameters table
@@ -110,7 +95,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
 
     # get summary from model object
     sum2 <- mod2 %>% model_summary()
-    expect_identical(class(sum2), SUM_CLASS_REF)
+    expect_identical(class(sum2), SUM_CLASS_LIST)
     expect_identical(names(sum2), SUM_NAMES_REF)
 
     # extract parameters table
@@ -135,7 +120,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
     # check config log for all models so far
     log_df <- config_log()
     expect_equal(nrow(log_df), 3)
-    expect_equal(ncol(log_df), 4)
+    expect_equal(ncol(log_df), CONFIG_COLS)
     expect_false(any(is.na(log_df$model_md5)))
     expect_false(any(is.na(log_df$data_md5)))
     expect_false(any(is.na(log_df$data_path)))
@@ -160,7 +145,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
     # add config log to run log
     log_df <- expect_warning(run_log() %>% add_config(), regexp = "in progress")
     expect_equal(nrow(log_df), 4)
-    expect_equal(ncol(log_df), 11)
+    expect_equal(ncol(log_df), RUN_LOG_COLS + CONFIG_COLS - 1)
 
     # check config md5's against ctl md5's
     log_df <- log_df %>% filter(!is.na(model_md5))

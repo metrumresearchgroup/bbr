@@ -9,7 +9,7 @@
 #' a `bbi_{.model_type}_model ` object,
 #' a file path to a model,
 #' an integer corresponding to a file name of a model.
-#' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run `print_nonmem_args()` to see valid arguments.
+#' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run [print_bbi_args()] to see valid arguments.
 #' @param .mode Either `"sge"`, the default, to submit model(s) to the grid or `"local"` for local execution.
 #' @param ... args passed through to `bbi_exec()`
 #' @param .config_path Optionally specify a path to a babylon.yml config. If not specified, the config in the model directory will be used by default. Path MUST be either an absolute path or relative to the model directory.
@@ -158,7 +158,7 @@ submit_nonmem_model <- function(.mod,
 
   # build command line args
   .bbi_args <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])
-  args_vec <- check_nonmem_args(.bbi_args)
+  args_vec <- check_bbi_args(.bbi_args)
   cmd_args <- c("nonmem", "run", .mode, .mod[[YAML_MOD_PATH]], args_vec)
 
   # define working directory
@@ -195,7 +195,7 @@ submit_nonmem_model <- function(.mod,
 #' The number of `bbi` calls to make is determined by the number of distinct sets of `bbi` arguments passed to the submission calls,
 #' either explicitly through `.bbi_args`, as specified in the `bbi_args` field of the model YAML, or specified globally in `babylon.yml`.
 #' @param .mods The model object to submit. Could be
-#' a list of `bbi_{.model_type}_model ` object,
+#' a list of `bbi_{.model_type}_model ` objects,
 #' a character vector of file paths to models,
 #' a numeric vector of integers corresponding to a file names of a models.
 #' @inheritParams submit_model
@@ -228,9 +228,9 @@ submit_models.list <- function(
 ) {
 
   if (!is.null(.directory)) {
-    warning(paste(glue("Passed `.directory = {.directory}` to submit_models.bbi_nonmem_model().") ,
+    warning(paste(glue("Passed `.directory = {.directory}` to submit_models.list().") ,
                   "This argument is only valid when passing a path to `submit_models()`.",
-                  "`bbi_nonmem_model` objects were passed, so `.directory` inferred from `.mod${WORKING_DIR}`"))
+                  "Directory will be extracted from each model object."))
   }
 
   # check that each element is a model object
@@ -348,18 +348,18 @@ submit_models.numeric <- function(
 #' @return A list of S3 objects of class `babylon_process`
 #' @keywords internal
 submit_nonmem_models <- function(.mods,
-                                .bbi_args = NULL,
-                                .mode = c("sge", "local"),
-                                ...,
-                                .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
-                                .wait = TRUE,
-                                .dry_run=FALSE) {
+                                 .bbi_args = NULL,
+                                 .mode = c("sge", "local"),
+                                 ...,
+                                 .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
+                                 .wait = TRUE,
+                                 .dry_run = FALSE) {
 
   # check input list (this is a private method so if these fail there is a bug somewhere that calls this)
   if (!is_bare_list(.mods)) {
-    stop(glue("USER SHOULDN'T SEE THIS ERROR: Can only pass a list of bbi_nonmem_model objects to submit_nonmem_models. Passed object of class {paste(class(.mods), collapse = ', ')}"))
+    stop(glue("USER SHOULDN'T SEE THIS ERROR: Can only pass a list of {NM_MOD_CLASS} objects to submit_nonmem_models. Passed object of class {paste(class(.mods), collapse = ', ')}"))
   }
-  check_model_object_list(.mods, "bbi_nonmem_model")
+  check_model_object_list(.mods, NM_MOD_CLASS)
 
   # check against YAML
   for (.mod in .mods) { check_yaml_in_sync(.mod) }
@@ -393,7 +393,7 @@ submit_nonmem_models <- function(.mods,
     return(map(
       cmd_args_list,
       function(.run) { bbi_dry_run(.run$cmd_args, .run$model_dir) }
-      ))
+    ))
   }
 
   # launch models
@@ -405,6 +405,5 @@ submit_nonmem_models <- function(.mods,
 
   return(res_list)
 }
-
 
 

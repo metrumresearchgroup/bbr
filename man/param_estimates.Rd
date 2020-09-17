@@ -10,17 +10,38 @@ param_estimates(.summary)
 \method{param_estimates}{bbi_nonmem_summary}(.summary)
 }
 \arguments{
-\item{.summary}{\verb{bbi_\{.model_type\}_summary} object}
+\item{.summary}{A \verb{bbi_\{.model_type\}_summary} object.}
+}
+\value{
+Returns a tibble with the following columns:
+\itemize{
+\item parameter_names -- Parameter name ("THETA1", "THETA2", etc.)
+\item estimate -- Parameter estimate
+\item stderr -- Standard Error
+\item random_effect_sd -- OMEGA and SIGMA elements in standard deviation/correlation format
+\item random_effect_sdse -- Standard errors to the OMEGA and SIGMA elements in standard deviation/correlation format
+\item fixed -- TRUE if parameter is fixed, FALSE otherwise
+\item diag -- TRUE if parameter is a diagonal element in random effect matrix, FALSE if off-diagonal, NA if parameter is a THETA
+\item shrinkage -- Shrinkage for final estimation method, using SD parameterization (for NONMEM this is ETAshrinkSD and EPSshrinkSD).
+The shrinkage using Variance Parameterization, as well as for other estimation methods and multiple subpops if present,
+can be found in \code{bbi_nonmem_summary$shrinkage_details}.
+}
 }
 \description{
-Returns a tibble containing parameter estimates from a model.
-Currently can only take a \verb{bbi_\{.model_type\}_summary} object, as output from \code{model_summary()}.
+Returns a tibble containing parameter estimates from a \verb{bbi_\{.model_type\}_summary} object.
+Details about the tibble that is returned are in the return value section below.
+}
+\details{
+Note that \strong{Bayesian methods are not yet supported} by this function. Creating a parameter table
+like this for Bayesian estimation methods requires a different approach, which has not yet been
+implemented. If the final estimation method of the input model is Bayesian, a \verb{not implemented}
+error will be thrown.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{bbi_nonmem_summary}: Takes \code{bbi_nonmem_summary} object.
+\item \code{bbi_nonmem_summary}: Takes \code{bbi_nonmem_summary} object, the output of \code{\link[=model_summary.bbi_nonmem_model]{model_summary.bbi_nonmem_model()}}.
 }}
 
 \seealso{
-\code{param_labels()} \code{apply_indices()}
+\code{\link[=param_labels]{param_labels()}} \code{\link[=apply_indices]{apply_indices()}}
 }

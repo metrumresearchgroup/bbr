@@ -1,7 +1,5 @@
 context("Testing function to create or read in model object")
 
-source("data/test-workflow-ref.R")
-
 withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("read_model() returns expected object", {
@@ -80,8 +78,8 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     mod1b <- read_model(.path = .test_yaml)
 
     # check class and keys are right
-    expect_identical(class(mod1a), MODEL_CLASS_LIST)
-    expect_identical(class(mod1b), MODEL_CLASS_LIST)
+    expect_identical(class(mod1a), MOD_CLASS_LIST)
+    expect_identical(class(mod1b), MOD_CLASS_LIST)
 
     expect_true(all(MODEL_REQ_KEYS %in% names(mod1a)))
     expect_true(all(MODEL_REQ_KEYS %in% names(mod1b)))
@@ -124,8 +122,8 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     mod1b <- read_model(.path = .test_yaml)
 
     # check class and keys are right
-    expect_identical(class(mod1a), MODEL_CLASS_LIST)
-    expect_identical(class(mod1b), MODEL_CLASS_LIST)
+    expect_identical(class(mod1a), MOD_CLASS_LIST)
+    expect_identical(class(mod1b), MOD_CLASS_LIST)
 
     expect_true(all(MODEL_REQ_KEYS %in% names(mod1a)))
     expect_true(all(MODEL_REQ_KEYS %in% names(mod1b)))
@@ -148,6 +146,37 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
     # clean up tmp file
     fs::file_delete(.test_path)
+  })
+
+  test_that("new_model() .overwrite arg works", {
+    # create new model with args
+    .test_yaml <- "model-examples/1.yaml"
+    .new_path <- "model-examples/new.yml"
+    on.exit({
+      if (fs::file_exists(.new_path)) fs::file_delete(.new_path)
+    })
+    fs::file_copy(.test_yaml, .new_path)
+
+    # error if file exists
+    expect_error(new_model(
+        .yaml_path = .new_path,
+        .description = "fake model"),
+      regexp = "that file already exists")
+
+    suppressSpecificWarning({
+      new_model(
+        .yaml_path = .new_path,
+        .description = "fake model",
+        .overwrite = TRUE
+      )
+    }, "No model file found at.+\\.ctl")
+
+    suppressSpecificWarning({
+      new_mod <- read_model(.new_path)
+    }, "No model file found at.+\\.ctl")
+
+    expect_equal(new_mod$description, "fake model")
+
   })
 
 
@@ -323,7 +352,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
     # check class and model path
     expect_identical(mod1[[YAML_MOD_PATH]], .ctl_file)
-    expect_identical(class(mod1), MODEL_CLASS_LIST)
+    expect_identical(class(mod1), MOD_CLASS_LIST)
   })
 
   test_that("as_model() errors with non-existent model", {
@@ -353,8 +382,8 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
     mod1b <- read_model(.path = .test_yaml)
 
     # check class and keys are right
-    expect_identical(class(mod1a), MODEL_CLASS_LIST)
-    expect_identical(class(mod1b), MODEL_CLASS_LIST)
+    expect_identical(class(mod1a), MOD_CLASS_LIST)
+    expect_identical(class(mod1b), MOD_CLASS_LIST)
 
     expect_true(all(MODEL_REQ_KEYS %in% names(mod1a)))
     expect_true(all(MODEL_REQ_KEYS %in% names(mod1b)))

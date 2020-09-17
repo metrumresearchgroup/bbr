@@ -166,11 +166,11 @@ linux_install_commands <- function(.dir, .bbi_url) {
 }
 
 
-#' @title Get version number of babylon installed on system
-#' @description Returns version number of bbi binary installed at path passed to `.bbi_exe_path`
+#' @title Get version of installed babylon
+#'
 #' @importFrom stringr str_detect str_replace_all
-#' @param .bbi_exe_path Path to bbi exe file that will be checked
-#' @return character
+#' @param .bbi_exe_path Path to babylon executable
+#' @return String giving the version of the bbi binary installed at `.bbi_exe_path`
 #' @examples
 #' \dontrun{
 #' bbi_version()

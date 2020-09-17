@@ -1,7 +1,5 @@
 context("Modify attributes of model object")
 
-source("data/test-workflow-ref.R")
-
 withr::with_options(list(rbabylon.model_directory = NULL), {
 
   ######################################

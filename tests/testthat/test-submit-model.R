@@ -1,18 +1,6 @@
 context("submit_model(.dry_run=T)")
 
-MODEL_DIR <- "model-examples"
-MODEL_FILE <- "1.ctl"
-YAML_PATH <- file.path(MODEL_DIR, yaml_ext(MODEL_FILE))
-MODEL_PATH <- file.path(MODEL_DIR, MODEL_FILE)
-MODEL_ABS_PATH <- file.path(getwd(), MODEL_DIR, MODEL_FILE)
-
-cleanup_2_3 <- function() {
-  for (m in c("2", "3")) {
-    m <- file.path(MODEL_DIR, m)
-    if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
-    if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
-  }
-}
+CTL_FILENAME <- ctl_ext(MOD_ID)
 
 ###################################
 # testing single model submission
@@ -29,32 +17,32 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
               withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
                 # correctly parsing yaml
                 expect_identical(
-                  submit_model(YAML_PATH, .dry_run = T)[[PROC_CALL]],
-                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {MODEL_FILE} --overwrite --threads=4 --config=../babylon.yaml"))
+                  submit_model(YAML_TEST_FILE, .dry_run = T)[[PROC_CALL]],
+                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {CTL_FILENAME} --overwrite --threads=4 --config=../babylon.yaml"))
                 )
 
                 # switch to local mode
                 expect_identical(
-                  submit_model(YAML_PATH, .mode = "local", .dry_run = T)[[PROC_CALL]],
-                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run local {MODEL_FILE} --overwrite --threads=4 --config=../babylon.yaml"))
+                  submit_model(YAML_TEST_FILE, .mode = "local", .dry_run = T)[[PROC_CALL]],
+                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run local {CTL_FILENAME} --overwrite --threads=4 --config=../babylon.yaml"))
                 )
 
                 # no extension correctly finds yaml
                 expect_identical(
-                  submit_model(file.path(MODEL_DIR, tools::file_path_sans_ext(MODEL_FILE)), .dry_run = T)[[PROC_CALL]],
-                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {MODEL_FILE} --overwrite --threads=4 --config=../babylon.yaml"))
+                  submit_model(file.path(MODEL_DIR, tools::file_path_sans_ext(CTL_FILENAME)), .dry_run = T)[[PROC_CALL]],
+                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {CTL_FILENAME} --overwrite --threads=4 --config=../babylon.yaml"))
                 )
 
                 # over-riding yaml arg with passed args
                 expect_identical(
-                  submit_model(YAML_PATH,
+                  submit_model(YAML_TEST_FILE,
                                .bbi_args=list(
                                  "json" = T,
                                  "threads" = 2,
                                  "nm_version" = "nm74"
                                ),
                                .dry_run = T)[[PROC_CALL]],
-                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {MODEL_FILE} --overwrite --threads=2 --json --nm_version=nm74 --config=../babylon.yaml"))
+                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {CTL_FILENAME} --overwrite --threads=2 --json --nm_version=nm74 --config=../babylon.yaml"))
                 )
               })
             })
@@ -65,13 +53,13 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
               # find YAML if it exists
               withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
                 expect_identical(
-                  submit_model(MODEL_PATH, .dry_run = T)[[PROC_CALL]],
-                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {MODEL_FILE} --overwrite --threads=4 --config=../babylon.yaml"))
+                  submit_model(CTL_TEST_FILE, .dry_run = T)[[PROC_CALL]],
+                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {CTL_FILENAME} --overwrite --threads=4 --config=../babylon.yaml"))
                 )
 
                 # copy to a different name and error because no yaml
-                new_mod_path <- stringr::str_replace(MODEL_PATH, "1", "2")
-                fs::file_copy(MODEL_PATH, new_mod_path)
+                new_mod_path <- stringr::str_replace(CTL_TEST_FILE, "1", "2")
+                fs::file_copy(CTL_TEST_FILE, new_mod_path)
                 on.exit({ fs::file_delete(new_mod_path) })
 
                 expect_error(
@@ -86,8 +74,8 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
             {
               withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
                 # copy to a .mod extensions
-                new_mod_path <- stringr::str_replace(MODEL_PATH, "1.ctl", "2.mod")
-                fs::file_copy(MODEL_PATH, new_mod_path)
+                new_mod_path <- stringr::str_replace(CTL_TEST_FILE, "1.ctl", "2.mod")
+                fs::file_copy(CTL_TEST_FILE, new_mod_path)
                 yaml::write_yaml(list(description = "original acop model",
                                       model_type = "nonmem"),
                                  yml_ext(new_mod_path))
@@ -109,13 +97,13 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
                 # try with the original .yaml
                 expect_identical(
-                  submit_model(tools::file_path_sans_ext(MODEL_PATH), .dry_run = T)[[PROC_CALL]],
-                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {MODEL_FILE} --overwrite --threads=4 --config=../babylon.yaml"))
+                  submit_model(tools::file_path_sans_ext(CTL_TEST_FILE), .dry_run = T)[[PROC_CALL]],
+                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {CTL_FILENAME} --overwrite --threads=4 --config=../babylon.yaml"))
                 )
 
                 # try with a .yml
-                new_mod_path <- stringr::str_replace(MODEL_PATH, "1.ctl", "2.ctl")
-                fs::file_copy(MODEL_PATH, new_mod_path)
+                new_mod_path <- stringr::str_replace(CTL_TEST_FILE, "1.ctl", "2.ctl")
+                fs::file_copy(CTL_TEST_FILE, new_mod_path)
                 yaml::write_yaml(list(description = "original acop model",
                                       model_type = "nonmem"),
                                  yml_ext(new_mod_path))
@@ -134,18 +122,18 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("submit_model(.dry_run=T) with bbi_nonmem_model object parses correctly",
             {
-              MOD1 <- read_model(YAML_PATH)
+              MOD1 <- read_model(YAML_TEST_FILE)
               withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
                 # correctly parsing yaml
                 expect_identical(
                   submit_model(MOD1, .dry_run = T)[[PROC_CALL]],
-                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {MODEL_FILE} --overwrite --threads=4 --config=../babylon.yaml"))
+                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {CTL_FILENAME} --overwrite --threads=4 --config=../babylon.yaml"))
                 )
 
                 # over-riding yaml arg with passed arg
                 expect_identical(
                   submit_model(MOD1, list(threads=2), .dry_run = T)[[PROC_CALL]],
-                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {MODEL_FILE} --overwrite --threads=2 --config=../babylon.yaml"))
+                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {CTL_FILENAME} --overwrite --threads=2 --config=../babylon.yaml"))
                 )
 
               })
@@ -169,7 +157,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
               # correctly parsing yaml
               expect_identical(
                 submit_model(1, .dry_run = T)[[PROC_CALL]],
-                as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {MODEL_FILE} --overwrite --threads=4"))
+                as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {CTL_FILENAME} --overwrite --threads=4"))
               )
             })
 
@@ -186,7 +174,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
               # copy to two new models
               mod2 <- copy_model_from(1, 2, "naw")
               mod3 <- copy_model_from(1, 3, "naw")
-              on.exit({ cleanup_2_3() })
+              on.exit({ cleanup() })
 
               .mods <- list(mod1, mod2, mod3)
 
@@ -200,7 +188,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
               # check call
               expect_identical(
                 proc_list[[1]][[PROC_CALL]],
-                as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {MODEL_FILE} 2.ctl 3.ctl --overwrite --threads=4"))
+                as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {CTL_FILENAME} 2.ctl 3.ctl --overwrite --threads=4"))
               )
             })
 
@@ -212,7 +200,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
               # copy to two new models
               mod2 <- copy_model_from(1, 2, "naw") %>% add_bbi_args(list(threads = 3))
               mod3 <- copy_model_from(1, 3, "naw") %>% add_bbi_args(list(clean_lvl = 2))
-              on.exit({ cleanup_2_3() })
+              on.exit({ cleanup() })
 
               .mods <- list(mod1, mod2, mod3)
 
@@ -226,7 +214,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
               # check each call
               expect_identical(
                 proc_list[[1]][[PROC_CALL]],
-                as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {MODEL_FILE} 2.ctl --overwrite --threads=1"))
+                as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {CTL_FILENAME} 2.ctl --overwrite --threads=1"))
               )
               expect_identical(
                 proc_list[[2]][[PROC_CALL]],
@@ -242,7 +230,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
               # copy to two new models
               mod2 <- copy_model_from(1, 2, "naw")
               mod3 <- copy_model_from(1, 3, "naw")
-              on.exit({ cleanup_2_3() })
+              on.exit({ cleanup() })
 
               # testing when one isn't a model
               fake <- list(naw = 1)
@@ -272,7 +260,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
               # copy to two new models
               mod2 <- copy_model_from(1, 2, "naw")
               mod3 <- copy_model_from(1, 3, "naw")
-              on.exit({ cleanup_2_3() })
+              on.exit({ cleanup() })
 
               # try with and without extension
               .test_list <- list(
@@ -289,7 +277,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
                 # check call
                 expect_identical(
                   proc_list[[1]][[PROC_CALL]],
-                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {MODEL_FILE} 2.ctl 3.ctl --overwrite --threads=4"))
+                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {CTL_FILENAME} 2.ctl 3.ctl --overwrite --threads=4"))
                 )
               }
             })
@@ -325,7 +313,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
               # check call
               expect_identical(
                 proc_list[[1]][[PROC_CALL]],
-                as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {MODEL_FILE} 2.ctl 3.ctl --overwrite --threads=4"))
+                as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {CTL_FILENAME} 2.ctl 3.ctl --overwrite --threads=4"))
               )
             })
 

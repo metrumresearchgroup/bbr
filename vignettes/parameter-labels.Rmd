@@ -8,7 +8,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-  ```{r, include = FALSE}
+```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -19,11 +19,11 @@ knitr::opts_chunk$set(
 
 This vignette demonstrates extracting parameter estimates and labels into a table that can be used for diagnostics, or to generate reports. *Note, this vignette exclusively deals with NONMEM models.*
 
-If you are new to `rbabylon`, the ["Getting Started with rbabylon"](getting-started.html) vignette will take you through some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its standard workflow and functionality.
+If you are new to `rbabylon`, the ["Getting Started with rbabylon"](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html) vignette will take you through some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its standard workflow and functionality.
 
 ## Setup
 
-There is some initial set up necessary for using `rbabylon`. Please refer to the ["Getting Started"](getting-started.html) vignette, mentioned above, if you have not done this yet. Once this is done, load the library and set your modeling directory.
+There is some initial set up necessary for using `rbabylon`. Please refer to the ["Getting Started"](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html#setup) vignette, mentioned above, if you have not done this yet. Once this is done, load the library and set your modeling directory.
 
 ```{r set_model_directory}
 library(rbabylon)
@@ -35,13 +35,12 @@ set_model_directory("../inst/param_examples")
 
 ```{r setup, include = FALSE}
 MODEL_DIR <- "../inst/param_examples"
-source("../tests/testthat/data/test-param-labels-ref.R")
+source("../tests/testthat/setup-param-labels-ref.R")
 REF_OMEGA <- PARAM_BLOCK_REF$PEX_BLOCK32S$ctl
 
 # set babylon execution path
 if (Sys.which("bbi") == "") {
-  # fall back to default location of /data/apps/bbi
-  options('rbabylon.bbi_exe_path' = '/data/apps/bbi')
+  options('rbabylon.bbi_exe_path' = read_bbi_path())
 }
 ```
 
@@ -96,8 +95,8 @@ These two tibbles can be joined together to create a table for including in repo
 ```{r param_estimates}
 report_df <- inner_join(
   label_df %>% select(-param_type),
-  param_df %>% select(names, estimate, stderr),
-  by = "names"
+  param_df %>% select(parameter_names, estimate, stderr),
+  by = "parameter_names"
 )
 report_df
 ```

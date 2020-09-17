@@ -34,13 +34,13 @@ cleanup()
 
 # Introduction
 
-This vignette demonstrates how to use the `based_on` field to track a model's ancestry through the model development process. You will also see one common use for this: using the tibble output from `run_log()` to check that your models are up-to-date. By "up-to-date" we mean that none of the model files or data files have changed since the model was run. 
+This vignette demonstrates how to use the `based_on` field to track a model's ancestry through the model development process. You will also see one common use for this: using the tibble output from `config_log()` to check that your models are up-to-date. By "up-to-date" we mean that none of the model files or data files have changed since the model was run. 
 
-If you are new to `rbabylon`, the ["Getting Started with rbabylon"](getting-started.html) vignette will take you through some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its standard workflow and functionality.
+If you are new to `rbabylon`, the ["Getting Started with rbabylon"](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html) vignette will take you through some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its standard workflow and functionality.
 
 ## Setup
 
-There is some initial set up necessary for using `rbabylon`. Please refer to the ["Getting Started"](getting-started.html) vignette, mentioned above, if you have not done this yet. Once this is done, load the library and set your modeling directory.
+There is some initial set up necessary for using `rbabylon`. Please refer to the ["Getting Started"](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html#setup) vignette, mentioned above, if you have not done this yet. Once this is done, load the library and set your modeling directory.
 
 ```{r set_model_directory}
 library(rbabylon)
@@ -54,8 +54,7 @@ set_model_directory("../inst/nonmem")
 
 # set babylon execution path
 if (Sys.which("bbi") == "") {
-  # fall back to default location of /data/apps/bbi
-  options('rbabylon.bbi_exe_path' = '/data/apps/bbi')
+  options('rbabylon.bbi_exe_path' = read_bbi_path())
 }
 ```
 
@@ -165,9 +164,11 @@ As you can see, models 3 and 4 are discarded because they did not lead to the fi
 
 Now imagine you are coming back to this project some time later and want to make sure that all of the outputs you have are still up-to-date with the model files and data currently in the project.
 
-When `babylon` runs a model, it creates a file named `bbi_config.json` in the output directory. This file contains a lot of information about the state and configuration at runtime. Notably, it contains an md5 digest of both the model file _and_ the data file at run time. Users can compare this to the _current_ md5 hashes of these two files to check if any model or data files have changed _since the model was last run_. This serves as a check that the outputs are up-to-date with the model and data.
+When `babylon` runs a model, it creates a file named `bbi_config.json` in the output directory. This file contains a lot of information about the state and configuration at the time when the model was run. Notably, it contains an md5 digest of both the model file _and_ the data file at execution time. 
 
-You can call `config_log` directly, but it is likely more useful to join the two together automatically with `run_log() %>% add_config()`.
+The `config_log()` function parses these `bbi_config.json` files and extracts some relevant information to a `bbi_config_log_df` tibble. The `model_has_changed` and `data_has_changed` columns compare the md5 digests (stored during model execution) against the model and data files _as they currently exist on disk_ at the time `config_log()` is called. This serves as a check that the outputs are up-to-date with the current model and data.
+
+You can call `config_log` directly, but it is often useful to join it to a run log automatically with `run_log() %>% add_config()`.
 
 ```{r add_config fake prep, include=FALSE}
 # read in original json (which was actually fake a.k.a. copied from somewhere else)
@@ -191,31 +192,13 @@ for (i in seq_len(6)) {
 
 ```{r add_config}
 log_df <- log_df %>% add_config()
-log_df
-```
-
-Now you can easily check the md5 digests from the config log against those of the current files.
-
-```{r check config md5}
-# extract path to data files and model files
-norm_data_paths <- fs::path_norm(file.path(log_df$absolute_model_path, log_df$data_path))
-norm_model_paths <- get_model_path(log_df)
-
-# get md5 digests and compare to those from config_log() columns
-log_df <- log_df %>% mutate(
-                        current_data_md5  = tools::md5sum(norm_data_paths),
-                        data_md5_match    = .data$data_md5 == .data$current_data_md5,
-                        current_model_md5  = tools::md5sum(norm_model_paths),
-                        model_md5_match   = .data$model_md5 == .data$current_model_md5
-                      )
-
-log_df %>% select(absolute_model_path, data_md5_match, model_md5_match)
+log_df %>% select(absolute_model_path, model_has_changed, data_has_changed)
 ```
 
 
 ## Final model family
 
-From the `model_md5_match` column in the previous example, you can see that some of the model files have changed since they were run. However, you may only care about your final model and the models that led to it.
+From the `model_has_changed` column in the previous example, you can see that some of the model files have changed since they were run. However, you may only care about your final model and the models that led to it. You can use the `tags` and `based_on` columns from the `run_log()` to filter to only those models.
 
 ```{r filter to ancestry 2}
 final_model_family <- bind_rows(
@@ -224,7 +207,7 @@ final_model_family <- bind_rows(
   log_df %>% 
     filter(map_lgl(tags, ~ "final model" %in% .x)) # the final model itself
 )
-final_model_family %>% select(absolute_model_path, data_md5_match, model_md5_match)
+final_model_family %>% select(absolute_model_path, model_has_changed, data_has_changed)
 ```
 
 When we filter to only those models, you can see that they are all still up-to-date. Great news.
