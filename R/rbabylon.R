@@ -44,10 +44,33 @@ bbi_exec <- function(.cmd_args,
     stdout = "|",
     stderr = "2>&1"
   )
-
   if (.wait) {
     # wait for process and capture stdout and stderr
-    p$wait()
+    if (all(c("nonmem", "summary", "--json") %in% .cmd_args)) {
+      # this was originally just a wait, however this caused an infinite
+      # hang with model 510 summary in the tests as of 0.7.0.8009 on mac
+      # it _could_ be due to processes finishing so fast that ps/processx
+      # are not able to adequately track the status of the subprocess while
+      # waiting.
+      # This was attempted to be artifically delayed by making the ext 50k lines
+      # but this still resulted in the hang so not positive. Have not seen
+      # this error in other models.
+      # To get around this false hang we want to timeout.
+      # This should be ok as the json should
+      # be back at that point, in which p$read_all_output_lines will return
+      # valid values.
+      #
+      # in addition to give a debug capability, setting the timeout to
+      # an option default of 3. generally summary should return in 10 ms
+      # or so, however if we move towards providing batch summaries
+      # this process could take longer. This will give us an escape hatch
+      # in such a case that people report errors where summary takes longer
+      # then we can establish a longer potential timeout or more heuristics
+      # around what time might be (eg if see its a summary on a range of models)
+      p$wait(timeout = getOption("rbabylon.summary_wait_timeout", 1000L))
+    } else {
+      p$wait()
+    }
     # check output status code
     output <- p$read_all_output_lines()
     check_status_code(p$get_exit_status(), output, .cmd_args)
@@ -55,7 +78,6 @@ bbi_exec <- function(.cmd_args,
   } else {
     output <- "NO STDOUT BECAUSE `.wait = FALSE`"
   }
-
   # build result object
   res <- list()
   res[[PROC_PROCESS]] <- p
