@@ -19,17 +19,18 @@ add_summary(.log_df, ...)
 \item{.log_df}{a \code{bbi_run_log_df} tibble (the output of \code{\link[=run_log]{run_log()}})}
 }
 \value{
-\code{summary_log()} will return a new tibble with the \code{'absolute_model_path'} column as the primary key,
-and all the columns extracted from \code{\link[=model_summaries]{model_summaries()}} (but none of the other columns from the input tibble).
+An object of class \code{bbi_summary_log_df}, which includes the fields described below.
 
-\code{add_summary()} takes a \code{bbi_run_log_df} tibble (the output from \code{\link[=run_log]{run_log()}}) and returns the input tibble,
-with all the columns extracted from \code{\link[=model_summaries]{model_summaries()}} joined onto it.
+\code{summary_log()} creates a new tibble with one row per model
+found in \code{.base_dir} (and subdirectories, if \code{.recurse = TRUE}).
+
+\code{add_summary()} adds these fields to the tibble passed to \code{.log_df}.
 }
 \description{
 Runs \code{\link[=model_summaries]{model_summaries()}} on all models in the input and returns a subset of the each resulting summary as a tibble.
 }
 \details{
-The following fields from \code{bbi_nonmem_summary} are extracted and included by default.
+The following fields from \code{bbi_nonmem_summary} (the output of \code{model_summary()}) are extracted and included by default.
 If you would like more fields from the summary object, you can extract them manually from the \code{bbi_summary} list column.
 \itemize{
 \item \code{error_msg} -- Error message from \code{\link[=model_summary]{model_summary()}}. If \code{NULL} the call succeeded. If not \code{NULL}, the rest of the fields will be \code{NULL}.
@@ -55,5 +56,5 @@ If you would like more fields from the summary object, you can extract them manu
 }
 }
 \seealso{
-\code{\link[=run_log]{run_log()}}
+\code{\link[=run_log]{run_log()}}, \code{\link[=config_log]{config_log()}}
 }

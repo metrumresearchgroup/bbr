@@ -8,7 +8,15 @@
 #' in the model output folder to store metadata about the execution of a model
 #' run.
 #'
-#' @return An object of class `bbi_config_log_df`, which includes the fields
+#' @return An object of class `bbi_config_log_df`, which includes the fields described below.
+#'
+#' `config_log()` creates a new tibble with one row per `bbi_config.json`
+#' found in `.base_dir` (and subdirectories, if `.recurse = TRUE`).
+#'
+#' `add_config()` adds these fields to the tibble passed to `.log_df`.
+#'
+#' @details
+#' The following fields from are extracted from `bbi_config.json`.
 #'
 #'   * `absolute_model_path`: the path to the model file, excluding the file
 #'   extension
@@ -29,11 +37,7 @@
 #'   * `data_has_changed`: a logical indicating whether the data file has
 #'   changed since the model was last run
 #'
-#'   `config_log()` creates a new tibble with one row per `bbi_config.json`
-#'   found in `.base_dir` (and subdirectories, if `.recurse = TRUE`).
-#'   `add_config()` adds these fields to `.log_df`.
-#'
-#' @seealso [run_log()]
+#' @seealso [run_log()], [summary_log()]
 #' @inheritParams run_log
 #' @export
 config_log <- function(

@@ -17,7 +17,20 @@ add_config(.log_df)
 \item{.log_df}{A \code{bbi_run_log_df} tibble (the output of \code{\link[=run_log]{run_log()}}).}
 }
 \value{
-An object of class \code{bbi_config_log_df}, which includes the fields
+An object of class \code{bbi_config_log_df}, which includes the fields described below.
+
+\code{config_log()} creates a new tibble with one row per \code{bbi_config.json}
+found in \code{.base_dir} (and subdirectories, if \code{.recurse = TRUE}).
+
+\code{add_config()} adds these fields to the tibble passed to \code{.log_df}.
+}
+\description{
+Extracts selected fields from \code{bbi_config.json}, which is created by babylon
+in the model output folder to store metadata about the execution of a model
+run.
+}
+\details{
+The following fields from are extracted from \code{bbi_config.json}.
 \itemize{
 \item \code{absolute_model_path}: the path to the model file, excluding the file
 extension
@@ -31,16 +44,7 @@ changed since it was last run
 \item \code{data_has_changed}: a logical indicating whether the data file has
 changed since the model was last run
 }
-
-\code{config_log()} creates a new tibble with one row per \code{bbi_config.json}
-found in \code{.base_dir} (and subdirectories, if \code{.recurse = TRUE}).
-\code{add_config()} adds these fields to \code{.log_df}.
-}
-\description{
-Extracts selected fields from \code{bbi_config.json}, which is created by babylon
-in the model output folder to store metadata about the execution of a model
-run.
 }
 \seealso{
-\code{\link[=run_log]{run_log()}}
+\code{\link[=run_log]{run_log()}}, \code{\link[=summary_log]{summary_log()}}
 }
