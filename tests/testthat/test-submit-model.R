@@ -168,15 +168,13 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
 
   test_that("submit_models(.dry_run=T) with list input simple",
             {
-              # read first model
-              mod1 <- read_model(1)
 
               # copy to two new models
-              mod2 <- copy_model_from(1, 2, "naw")
-              mod3 <- copy_model_from(1, 3, "naw")
+              mod2 <- copy_model_from(MOD1, 2, "naw")
+              mod3 <- copy_model_from(MOD1, 3, "naw")
               on.exit({ cleanup() })
 
-              .mods <- list(mod1, mod2, mod3)
+              .mods <- list(MOD1, mod2, mod3)
 
               # submit models
               proc_list <- submit_models(.mods, .dry_run = T)
@@ -194,15 +192,12 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
 
   test_that("submit_models(.dry_run=T) with list input, 2 arg sets",
             {
-              # read first model
-              mod1 <- read_model(1)
-
               # copy to two new models
-              mod2 <- copy_model_from(1, 2, "naw") %>% add_bbi_args(list(threads = 3))
-              mod3 <- copy_model_from(1, 3, "naw") %>% add_bbi_args(list(clean_lvl = 2))
+              mod2 <- copy_model_from(MOD1, 2, "naw") %>% add_bbi_args(list(threads = 3))
+              mod3 <- copy_model_from(MOD1, 3, "naw") %>% add_bbi_args(list(clean_lvl = 2))
               on.exit({ cleanup() })
 
-              .mods <- list(mod1, mod2, mod3)
+              .mods <- list(MOD1, mod2, mod3)
 
               # submit and test that passed .bbi_args override args in object
               proc_list <- submit_models(.mods, .dry_run = T, .bbi_args = list(threads = 1))
@@ -224,17 +219,14 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
 
   test_that("submit_models(.dry_run=T) errors with bad input",
             {
-              # read first model
-              mod1 <- read_model(1)
-
               # copy to two new models
-              mod2 <- copy_model_from(1, 2, "naw")
-              mod3 <- copy_model_from(1, 3, "naw")
+              mod2 <- copy_model_from(MOD1, 2, "naw")
+              mod3 <- copy_model_from(MOD1, 3, "naw")
               on.exit({ cleanup() })
 
               # testing when one isn't a model
               fake <- list(naw = 1)
-              .mods <- list(mod1, mod2, mod3, fake)
+              .mods <- list(MOD1, mod2, mod3, fake)
 
               expect_error(
                 submit_models(.mods, .dry_run = T),
@@ -244,7 +236,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
               # testing two different kinds of models
               class(fake) <- c("bbi_stan_model", class(fake))
               fake[[YAML_MOD_TYPE]] <- "stan"
-              .mods <- list(mod1, mod2, mod3, fake)
+              .mods <- list(MOD1, mod2, mod3, fake)
 
               expect_error(
                 submit_models(.mods, .dry_run = T),
@@ -254,12 +246,9 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
 
   test_that("submit_models(.dry_run=T) with character and numeric input yaml",
             {
-              # read first model
-              mod1 <- read_model(1)
-
               # copy to two new models
-              mod2 <- copy_model_from(1, 2, "naw")
-              mod3 <- copy_model_from(1, 3, "naw")
+              mod2 <- copy_model_from(MOD1, 2, "naw")
+              mod3 <- copy_model_from(MOD1, 3, "naw")
               on.exit({ cleanup() })
 
               # try with and without extension
@@ -285,9 +274,6 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
 
   test_that("submit_models(.dry_run=T) with character mixed extensions",
             {
-              # read first model
-              mod1 <- read_model(1)
-
               on.exit({
                 for (m in c("2", "3")) {
                   m <- file.path(MODEL_DIR, m)
@@ -298,8 +284,8 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
               })
 
               # copy to two new models
-              mod2 <- copy_model_from(1, 2, "naw")
-              mod3 <- copy_model_from(1, 3, "naw")
+              mod2 <- copy_model_from(MOD1, 2, "naw")
+              mod3 <- copy_model_from(MOD1, 3, "naw")
 
               # rename one to yml
               fs::file_move(get_yaml_path(mod3), yml_ext(get_yaml_path(mod3)))

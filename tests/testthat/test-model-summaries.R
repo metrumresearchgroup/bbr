@@ -22,8 +22,8 @@ test_mod_sums <- function(mod_sums) {
 
 setup({
   cleanup()
-  invisible(copy_model_from(yaml_ext(MOD1_PATH), NEW_MOD2, "model from test-model-summaries.R", .directory = "."))
-  invisible(copy_model_from(yaml_ext(MOD1_PATH), NEW_MOD3, "model from test-model-summaries.R", .directory = "."))
+  invisible(copy_model_from(MOD1, NEW_MOD2, "model from test-model-summaries.R", .directory = "."))
+  invisible(copy_model_from(MOD1, NEW_MOD3, "model from test-model-summaries.R", .directory = "."))
   fs::dir_copy(MOD1_PATH, NEW_MOD2)
   fs::dir_copy(MOD1_PATH, NEW_MOD3)
 })

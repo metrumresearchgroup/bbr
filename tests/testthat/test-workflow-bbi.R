@@ -87,10 +87,11 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
 
   test_that("copying model works and new models run correctly", {
     # copy model
-    mod2 <- copy_model_from(1, 2, NEW_DESC)
-    mod3 <- copy_model_from(1, 3, NEW_DESC, .inherit_tags = TRUE) %>% add_bbi_args(list(clean_lvl=2, overwrite = FALSE))
+    mod1 <- read_model(1)
+    mod2 <- copy_model_from(mod1, 2, NEW_DESC)
+    mod3 <- copy_model_from(mod1, 3, NEW_DESC, .inherit_tags = TRUE) %>% add_bbi_args(list(clean_lvl=2, overwrite = FALSE))
 
-    # run new model
+    # run new models
     list(mod2, mod3) %>% submit_models(.mode = "local", .wait = TRUE)
 
     # get summary from model object
@@ -128,7 +129,8 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
 
   test_that(".wait = FALSE returns correctly", {
     # launch a model but don't wait for it to finish
-    proc <- copy_model_from(1, 4, NEW_DESC, .inherit_tags = TRUE) %>% submit_model(.mode = "local", .wait = FALSE)
+    mod1 <- read_model(1)
+    proc <- copy_model_from(mod1, 4, NEW_DESC, .inherit_tags = TRUE) %>% submit_model(.mode = "local", .wait = FALSE)
     expect_true(stringr::str_detect(proc[[PROC_STDOUT]], ".wait = FALSE"))
   })
 
