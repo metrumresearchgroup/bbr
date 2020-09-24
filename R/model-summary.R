@@ -33,7 +33,7 @@
 #' Additionally, if you have renamed the `.ext` file from its default of `<root>.ext` you will need to pass
 #' `ext_file = "NEWNAME"` to `.bbi_args`.
 #'
-#' @param .mod Model to summarize. Can be a `bbi_{.model_type}_model` object, a file path, or an integer corresponding to a file path.
+#' @param .mod Model to summarize.
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`.
 #' See [print_bbi_args()] for full list of options.
 #' @param ... args passed through to `bbi_exec()`
@@ -72,60 +72,6 @@ model_summary.bbi_nonmem_model <- function(
     ...,
     .dry_run = .dry_run
   )
-  return(res_list)
-}
-
-#' @describeIn model_summary Get model summary from output directory path
-#' @export
-model_summary.character <- function(
-  .mod,
-  .bbi_args = NULL,
-  ...,
-  .dry_run = FALSE,
-  .directory = get_model_directory()
-) {
-
-  # check for .directory and combine with .mod
-  .mod <- combine_directory_path(.directory, .mod)
-
-  # check model type
-  .mod <- read_model(.mod)
-
-  res_list <- model_summary(
-    .mod,
-    .bbi_args = .bbi_args,
-    ...,
-    .dry_run = .dry_run,
-    .directory = NULL
-  )
-
-  return(res_list)
-}
-
-
-#' @describeIn model_summary Get model summary from numeric input.
-#' This will only work if you are calling from the same directory as the models, or if you have set `options('rbabylon.model_directory')` to the directory constaining the relevant model.
-#' @export
-model_summary.numeric <- function(
-  .mod,
-  .bbi_args = NULL,
-  ...,
-  .dry_run = FALSE,
-  .directory = get_model_directory()
-) {
-
-  # convert to character
-  .mod <- as.character(.mod)
-
-  # call character dispatch
-  res_list <- model_summary(
-    .mod = .mod,
-    .bbi_args = .bbi_args,
-    ...,
-    .dry_run = .dry_run,
-    .directory = .directory
-  )
-
   return(res_list)
 }
 

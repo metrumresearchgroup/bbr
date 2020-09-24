@@ -24,33 +24,6 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
     expect_equal(ref_sum, sum1)
   })
 
-  withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
-    test_that("model_summary.character produces expected output", {
-      # get summary
-      sum1 <- "1" %>% model_summary()
-
-      # check class
-      expect_identical(class(sum1), SUM_CLASS_LIST)
-
-      # compare to reference
-      ref_sum <- readRDS(SUMMARY_REF_FILE)
-      expect_equal(ref_sum, sum1)
-    })
-
-    test_that("model_summary.numeric produces expected output", {
-      # get summary
-      sum1 <- 1 %>% model_summary()
-
-      # check class
-      expect_identical(class(sum1), SUM_CLASS_LIST)
-
-      # compare to reference
-      ref_sum <- readRDS(SUMMARY_REF_FILE)
-      expect_equal(ref_sum, sum1)
-    })
-  })
-
-
   #####################
   # passing file flags
   #####################

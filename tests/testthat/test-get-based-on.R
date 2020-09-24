@@ -6,7 +6,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     on.exit({ cleanup() })
 
     # create copy
-    mod2 <- copy_model_from(YAML_TEST_FILE, NEW_MOD2,   "level 1 copy of 1")
+    mod2 <- copy_model_from(MOD1, NEW_MOD2,   "level 1 copy of 1")
 
     expect_identical(get_based_on(mod2), MOD1_ABS_PATH)
   })
@@ -15,7 +15,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     on.exit({ cleanup() })
 
     # create copy
-    mod2 <- copy_model_from(YAML_TEST_FILE, NEW_MOD2,   "level 1 copy of 1")
+    mod2 <- copy_model_from(MOD1, NEW_MOD2,   "level 1 copy of 1")
 
     expect_identical(get_based_on(NEW_MOD2), MOD1_ABS_PATH)
   })

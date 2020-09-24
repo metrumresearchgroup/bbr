@@ -3,8 +3,6 @@
 \name{submit_model}
 \alias{submit_model}
 \alias{submit_model.bbi_nonmem_model}
-\alias{submit_model.character}
-\alias{submit_model.numeric}
 \title{Submit a model to be run}
 \usage{
 submit_model(
@@ -28,34 +26,9 @@ submit_model(
   .dry_run = FALSE,
   .directory = NULL
 )
-
-\method{submit_model}{character}(
-  .mod,
-  .bbi_args = NULL,
-  .mode = c("sge", "local"),
-  ...,
-  .config_path = file.path(get_model_directory() \%||\% ".", "babylon.yaml"),
-  .wait = TRUE,
-  .dry_run = FALSE,
-  .directory = get_model_directory()
-)
-
-\method{submit_model}{numeric}(
-  .mod,
-  .bbi_args = NULL,
-  .mode = c("sge", "local"),
-  ...,
-  .config_path = file.path(get_model_directory() \%||\% ".", "babylon.yaml"),
-  .wait = TRUE,
-  .dry_run = FALSE,
-  .directory = get_model_directory()
-)
 }
 \arguments{
-\item{.mod}{The model object to submit. Could be
-a \verb{bbi_\{.model_type\}_model } object,
-a file path to a model,
-an integer corresponding to a file name of a model.}
+\item{.mod}{The model object to submit.}
 
 \item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}. Run \code{\link[=print_bbi_args]{print_bbi_args()}} to see valid arguments.}
 
@@ -77,11 +50,5 @@ Submits a model to be run by calling out to \code{bbi}.
 \section{Methods (by class)}{
 \itemize{
 \item \code{bbi_nonmem_model}: Takes a \code{bbi_nonmem_model} object.
-
-\item \code{character}: Takes a file path to a model that can be loaded with \code{read_model()}.
-Should be path to YAML (with or without .yaml extension), or a valid model file (control stream, etc.).
-
-\item \code{numeric}: Takes an integer corresponding to the file name of a model that can be loaded with \code{read_model()}.
-This will only work if you are calling from the same directory as the models, or if you have set \code{options('rbabylon.model_directory')} to the directory constaining the relevant model.
 }}
 

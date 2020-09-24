@@ -22,8 +22,8 @@ test_mod_sums <- function(mod_sums) {
 
 setup({
   cleanup()
-  invisible(copy_model_from(yaml_ext(MOD1_PATH), NEW_MOD2, "model from test-model-summaries.R", .directory = "."))
-  invisible(copy_model_from(yaml_ext(MOD1_PATH), NEW_MOD3, "model from test-model-summaries.R", .directory = "."))
+  invisible(copy_model_from(MOD1, NEW_MOD2, "model from test-model-summaries.R", .directory = "."))
+  invisible(copy_model_from(MOD1, NEW_MOD3, "model from test-model-summaries.R", .directory = "."))
   fs::dir_copy(MOD1_PATH, NEW_MOD2)
   fs::dir_copy(MOD1_PATH, NEW_MOD3)
 })
@@ -57,18 +57,6 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
 
     expect_error(model_summaries(bad_mods), regexp = "must contain only model objects")
   })
-
-  test_that("model_summaries.character produces expected output", {
-    mod_sums <- model_summaries(c("1", "2", "3"))
-    test_mod_sums(mod_sums)
-  })
-
-  test_that("model_summaries.numeric produces expected output", {
-    mod_sums <- model_summaries(c(1, 2, 3))
-    test_mod_sums(mod_sums)
-  })
-
-
 
   test_that("model_summaries.bbi_run_log_df produces expected output", {
     mod_sums <- run_log() %>% model_summaries()

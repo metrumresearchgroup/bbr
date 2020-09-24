@@ -27,6 +27,7 @@ NEW_MOD3 <- file.path(MODEL_DIR, "3")
 
 # file names and file paths
 OUTPUT_DIR <-     MOD1_PATH
+CTL_FILENAME <- ctl_ext(MOD_ID)
 YAML_TEST_FILE <- as.character(glue::glue("{MOD1_PATH}.yaml"))
 CTL_TEST_FILE <-  as.character(glue::glue("{MOD1_PATH}.ctl"))
 MOD_TEST_FILE <-  as.character(glue::glue("{MOD1_PATH}.mod"))

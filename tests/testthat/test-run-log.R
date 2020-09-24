@@ -4,8 +4,8 @@ setup({
   cleanup()
 
   # copy models before creating run log
-  copy_model_from(YAML_TEST_FILE, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
-  copy_model_from(YAML_TEST_FILE,
+  copy_model_from(MOD1, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
+  copy_model_from(MOD1,
                   NEW_MOD3,
                   NEW_DESC,
                   .based_on_additional = get_model_id(NEW_MOD2),
@@ -84,7 +84,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
   # copy model 1 to level deeper
   fs::dir_create(LEVEL2_DIR)
-  copy_model_from(YAML_TEST_FILE, LEVEL2_MOD, "level 2 copy of 1.yaml", .inherit_tags = TRUE)
+  copy_model_from(MOD1, LEVEL2_MOD, "level 2 copy of 1.yaml", .inherit_tags = TRUE)
   fs::dir_copy(MOD1_PATH, LEVEL2_MOD)
 
   test_that("run_log() works correctly with nested dirs", {
