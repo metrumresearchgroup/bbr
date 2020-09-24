@@ -17,25 +17,19 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
               withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
                 # correctly parsing yaml
                 expect_identical(
-                  submit_model(YAML_TEST_FILE, .dry_run = T)[[PROC_CALL]],
+                  submit_model(MOD1, .dry_run = T)[[PROC_CALL]],
                   as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {CTL_FILENAME} --overwrite --threads=4 --config=../babylon.yaml"))
                 )
 
                 # switch to local mode
                 expect_identical(
-                  submit_model(YAML_TEST_FILE, .mode = "local", .dry_run = T)[[PROC_CALL]],
+                  submit_model(MOD1, .mode = "local", .dry_run = T)[[PROC_CALL]],
                   as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run local {CTL_FILENAME} --overwrite --threads=4 --config=../babylon.yaml"))
-                )
-
-                # no extension correctly finds yaml
-                expect_identical(
-                  submit_model(file.path(MODEL_DIR, tools::file_path_sans_ext(CTL_FILENAME)), .dry_run = T)[[PROC_CALL]],
-                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {CTL_FILENAME} --overwrite --threads=4 --config=../babylon.yaml"))
                 )
 
                 # over-riding yaml arg with passed args
                 expect_identical(
-                  submit_model(YAML_TEST_FILE,
+                  submit_model(MOD1,
                                .bbi_args=list(
                                  "json" = T,
                                  "threads" = 2,
@@ -47,82 +41,8 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
               })
             })
 
-
-  test_that("submit_model(.dry_run=T) with .ctl input parses correctly",
-            {
-              # find YAML if it exists
-              withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
-                expect_identical(
-                  submit_model(CTL_TEST_FILE, .dry_run = T)[[PROC_CALL]],
-                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {CTL_FILENAME} --overwrite --threads=4 --config=../babylon.yaml"))
-                )
-
-                # copy to a different name and error because no yaml
-                new_mod_path <- stringr::str_replace(CTL_TEST_FILE, "1", "2")
-                fs::file_copy(CTL_TEST_FILE, new_mod_path)
-                on.exit({ fs::file_delete(new_mod_path) })
-
-                expect_error(
-                  submit_model(new_mod_path, .dry_run = T)[[PROC_CALL]],
-                  regexp = FIND_YAML_ERR_MSG
-                )
-              })
-            })
-
-
-  test_that("submit_model(.dry_run=T) with .mod input and .yml file parses correctly",
-            {
-              withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
-                # copy to a .mod extensions
-                new_mod_path <- stringr::str_replace(CTL_TEST_FILE, "1.ctl", "2.mod")
-                fs::file_copy(CTL_TEST_FILE, new_mod_path)
-                yaml::write_yaml(list(description = "original acop model",
-                                      model_type = "nonmem"),
-                                 yml_ext(new_mod_path))
-                on.exit({
-                  fs::file_delete(new_mod_path)
-                  fs::file_delete(yml_ext(new_mod_path))
-                })
-
-                expect_identical(
-                  submit_model(new_mod_path, .dry_run = T)[[PROC_CALL]],
-                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {basename(new_mod_path)} --config=../babylon.yaml"))
-                )
-              })
-            })
-
-  test_that("submit_model(.dry_run=T) with file path no extension parses correctly",
-            {
-              withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
-
-                # try with the original .yaml
-                expect_identical(
-                  submit_model(tools::file_path_sans_ext(CTL_TEST_FILE), .dry_run = T)[[PROC_CALL]],
-                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {CTL_FILENAME} --overwrite --threads=4 --config=../babylon.yaml"))
-                )
-
-                # try with a .yml
-                new_mod_path <- stringr::str_replace(CTL_TEST_FILE, "1.ctl", "2.ctl")
-                fs::file_copy(CTL_TEST_FILE, new_mod_path)
-                yaml::write_yaml(list(description = "original acop model",
-                                      model_type = "nonmem"),
-                                 yml_ext(new_mod_path))
-
-                on.exit({
-                  fs::file_delete(new_mod_path)
-                  fs::file_delete(yml_ext(new_mod_path))
-                })
-
-                expect_identical(
-                  submit_model(tools::file_path_sans_ext(new_mod_path), .dry_run = T)[[PROC_CALL]],
-                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {basename(new_mod_path)} --config=../babylon.yaml"))
-                )
-              })
-            })
-
   test_that("submit_model(.dry_run=T) with bbi_nonmem_model object parses correctly",
             {
-              MOD1 <- read_model(YAML_TEST_FILE)
               withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
                 # correctly parsing yaml
                 expect_identical(
@@ -144,23 +64,12 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 }) # closing withr::with_options
 
 
-
 withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
                          rbabylon.model_directory = normalizePath(MODEL_DIR)), {
 
   # create fake babylon.yaml
   readr::write_file("created_by: test-submit-model part 2", file.path(MODEL_DIR, "babylon.yaml"))
   on.exit({ fs::file_delete(file.path(MODEL_DIR, "babylon.yaml")) })
-
-  test_that("submit_model(.dry_run=T) with numeric input parses correctly",
-            {
-              # correctly parsing yaml
-              expect_identical(
-                submit_model(1, .dry_run = T)[[PROC_CALL]],
-                as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {CTL_FILENAME} --overwrite --threads=4"))
-              )
-            })
-
 
   #####################################
   # testing multiple model submission
@@ -244,66 +153,5 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
               )
             })
 
-  test_that("submit_models(.dry_run=T) with character and numeric input yaml",
-            {
-              # copy to two new models
-              mod2 <- copy_model_from(MOD1, 2, "naw")
-              mod3 <- copy_model_from(MOD1, 3, "naw")
-              on.exit({ cleanup() })
-
-              # try with and without extension
-              .test_list <- list(
-                c(1, 2, 3),
-                c("1", "2", "3"),
-                c("1.yaml", "2.yaml", "3.yaml")
-              )
-              for (.mods in .test_list) {
-                proc_list <- submit_models(.mods, .dry_run = T)
-
-                # check that there is only one distinct arg set
-                expect_equal(length(proc_list), 1)
-
-                # check call
-                expect_identical(
-                  proc_list[[1]][[PROC_CALL]],
-                  as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {CTL_FILENAME} 2.ctl 3.ctl --overwrite --threads=4"))
-                )
-              }
-            })
-
-
-  test_that("submit_models(.dry_run=T) with character mixed extensions",
-            {
-              on.exit({
-                for (m in c("2", "3")) {
-                  m <- file.path(MODEL_DIR, m)
-                  if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
-                  if (fs::file_exists(yml_ext(m))) fs::file_delete(yml_ext(m))
-                  if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
-                }
-              })
-
-              # copy to two new models
-              mod2 <- copy_model_from(MOD1, 2, "naw")
-              mod3 <- copy_model_from(MOD1, 3, "naw")
-
-              # rename one to yml
-              fs::file_move(get_yaml_path(mod3), yml_ext(get_yaml_path(mod3)))
-
-              # try with mixed extensions
-              proc_list <- submit_models(c("1.yaml", "2.ctl", "3.yml"), .dry_run = T)
-
-              # check that there is only one distinct arg set
-              expect_equal(length(proc_list), 1)
-
-              # check call
-              expect_identical(
-                proc_list[[1]][[PROC_CALL]],
-                as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {CTL_FILENAME} 2.ctl 3.ctl --overwrite --threads=4"))
-              )
-            })
-
-
 }) # closing withr::with_options
-
 

@@ -5,10 +5,7 @@
 #' Submit a model to be run
 #'
 #' Submits a model to be run by calling out to `bbi`.
-#' @param .mod The model object to submit. Could be
-#' a `bbi_{.model_type}_model ` object,
-#' a file path to a model,
-#' an integer corresponding to a file name of a model.
+#' @param .mod The model object to submit.
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run [print_bbi_args()] to see valid arguments.
 #' @param .mode Either `"sge"`, the default, to submit model(s) to the grid or `"local"` for local execution.
 #' @param ... args passed through to `bbi_exec()`
@@ -59,80 +56,6 @@ submit_model.bbi_nonmem_model <- function(
   return(res)
 }
 
-#' @describeIn submit_model Takes a file path to a model that can be loaded with `read_model()`.
-#' Should be path to YAML (with or without .yaml extension), or a valid model file (control stream, etc.).
-#' @importFrom fs file_exists
-#' @export
-submit_model.character <- function(
-  .mod,
-  .bbi_args = NULL,
-  .mode = c("sge", "local"),
-  ...,
-  .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
-  .wait = TRUE,
-  .dry_run=FALSE,
-  .directory = get_model_directory()
-) {
-
-  # check for .directory and combine with .mod
-  .mod <- combine_directory_path(.directory, .mod)
-
-  if (!(is_valid_yaml_extension(.mod) || is_valid_nonmem_extension(.mod) || tools::file_ext(.mod) == "")) {
-    stop(glue("Unsupported file type passed to submit_models(): `{.mod}`. Valid options are `.yaml`, `.yml`, `.mod`, and `.ctl` (or no extension, which will infer .yaml or .yml)"))
-  }
-
-  # attempt to read model from path
-  .mod <- read_model(.mod)
-
-  # submit model
-  .model_type <- .mod[[YAML_MOD_TYPE]]
-  if (.model_type == "nonmem") {
-    res <- submit_nonmem_model(.mod,
-                               .bbi_args = .bbi_args,
-                               .mode = .mode,
-                               ...,
-                               .config_path = .config_path,
-                               .wait = .wait,
-                               .dry_run = .dry_run)
-  } else if (.model_type == "stan") {
-    stop(NO_STAN_ERR_MSG)
-  } else {
-    stop(glue("Passed `{.model_type}`. Valid options: `{paste(SUPPORTED_MOD_TYPES, collapse = ', ')}`"))
-  }
-  return(res)
-}
-
-
-#' @describeIn submit_model Takes an integer corresponding to the file name of a model that can be loaded with `read_model()`.
-#' This will only work if you are calling from the same directory as the models, or if you have set `options('rbabylon.model_directory')` to the directory constaining the relevant model.
-#' @export
-submit_model.numeric <- function(
-  .mod,
-  .bbi_args = NULL,
-  .mode = c("sge", "local"),
-  ...,
-  .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
-  .wait = TRUE,
-  .dry_run=FALSE,
-  .directory = get_model_directory()
-) {
-  # convert to character
-  .mod <- as.character(.mod)
-
-  # call character dispatch
-  res <- submit_model(
-    .mod = .mod,
-    .bbi_args = .bbi_args,
-    .mode = .mode,
-    ...,
-    .config_path = .config_path,
-    .wait = .wait,
-    .dry_run = .dry_run,
-    .directory = .directory
-  )
-
-  return(res)
-}
 
 #' Submit a NONMEM model via babylon
 #'
@@ -194,10 +117,7 @@ submit_nonmem_model <- function(.mod,
 #' @details
 #' The number of `bbi` calls to make is determined by the number of distinct sets of `bbi` arguments passed to the submission calls,
 #' either explicitly through `.bbi_args`, as specified in the `bbi_args` field of the model YAML, or specified globally in `babylon.yml`.
-#' @param .mods The model object to submit. Could be
-#' a list of `bbi_{.model_type}_model ` objects,
-#' a character vector of file paths to models,
-#' a numeric vector of integers corresponding to a file names of a models.
+#' @param .mods The model objects to submit.
 #' @inheritParams submit_model
 #' @export
 submit_models <- function(
@@ -261,78 +181,6 @@ submit_models.list <- function(
   } else {
     stop(glue("Passed `{.model_type}`. Valid options: `{paste(SUPPORTED_MOD_TYPES, collapse = ', ')}`"))
   }
-  return(res_list)
-}
-
-#' @describeIn submit_models Takes a character vector of file paths to models that can be loaded with `read_model()`.
-#' Should be a vector of paths to YAML (with or without .yaml extension), or valid model files (control stream, etc.).
-#' @importFrom fs file_exists
-#' @importFrom purrr map map_chr
-#' @export
-submit_models.character <- function(
-  .mods,
-  .bbi_args = NULL,
-  .mode = c("sge", "local"),
-  ...,
-  .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
-  .wait = TRUE,
-  .dry_run=FALSE,
-  .directory = get_model_directory()
-) {
-
-  # check for .directory and combine with .mods
-  .mods <- map_chr(.mods, function(.mod) { combine_directory_path(.directory, .mod) })
-
-  # attempt to load model objects
-  .mods <- map(.mods, function(.mod) {
-    if (!(is_valid_yaml_extension(.mod) || is_valid_nonmem_extension(.mod) || tools::file_ext(.mod) == "")) {
-      stop(glue("Unsupported file type passed to submit_models(): `{.mod}`. Valid options are `.yaml`, `.yml`, `.mod`, and `.ctl` (or no extension, which will infer .yaml or .yml)"))
-    }
-
-    # load model from path
-    read_model(.mod)
-  })
-
-  # pass to submit_models.list
-  res_list <- submit_models(.mods,
-                            .bbi_args = .bbi_args,
-                            .mode = .mode,
-                            ...,
-                            .config_path = .config_path,
-                            .wait = .wait,
-                            .dry_run = .dry_run)
-  return(res_list)
-}
-
-
-#' @describeIn submit_models Takes a numeric vector of integers corresponding to file names of models that can be loaded with `read_model()`.
-#' This will only work if you are calling from the same directory as the models, or if you have set `options('rbabylon.model_directory')` to the directory constaining the relevant model.
-#' @export
-submit_models.numeric <- function(
-  .mods,
-  .bbi_args = NULL,
-  .mode = c("sge", "local"),
-  ...,
-  .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
-  .wait = TRUE,
-  .dry_run=FALSE,
-  .directory = get_model_directory()
-) {
-  # convert to character
-  .mods <- as.character(.mods)
-
-  # call character dispatch
-  res_list <- submit_models(
-    .mods = .mods,
-    .bbi_args = .bbi_args,
-    .mode = .mode,
-    ...,
-    .config_path = .config_path,
-    .wait = .wait,
-    .dry_run = .dry_run,
-    .directory = .directory
-  )
-
   return(res_list)
 }
 
