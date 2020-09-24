@@ -58,18 +58,6 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
     expect_error(model_summaries(bad_mods), regexp = "must contain only model objects")
   })
 
-  test_that("model_summaries.character produces expected output", {
-    mod_sums <- model_summaries(c("1", "2", "3"))
-    test_mod_sums(mod_sums)
-  })
-
-  test_that("model_summaries.numeric produces expected output", {
-    mod_sums <- model_summaries(c(1, 2, 3))
-    test_mod_sums(mod_sums)
-  })
-
-
-
   test_that("model_summaries.bbi_run_log_df produces expected output", {
     mod_sums <- run_log() %>% model_summaries()
     test_mod_sums(mod_sums)
