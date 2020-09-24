@@ -59,7 +59,7 @@ new_model <- function(
   if (!is.null(.bbi_args)) .mod[[YAML_BBI_ARGS]] <- .bbi_args
 
   # write YAML to disk
-  save_model_yaml(.mod, .out_path = .yaml_path)
+  save_model_yaml(.mod)
 
   # make list into S3 object
   .mod[[YAML_YAML_MD5]] <- digest(file = .yaml_path, algo = "md5")
@@ -123,19 +123,16 @@ read_model <- function(
 }
 
 
-#' Saves a model model object to a yaml file
+#' Saves a model object to a yaml file
 #' @param .mod S3 object of class `bbi_{.model_type}_model`
-#' @param .out_path Character scalar with path to save out YAML file. By default, sets it to the model file name, with a yaml extension.
 #' @importFrom yaml write_yaml
 #' @importFrom fs file_exists
 #' @importFrom purrr compact
 #' @return Output list as specified above.
 #' @keywords internal
-save_model_yaml <- function(.mod, .out_path = NULL) {
-  # fill path if null
-  if (is.null(.out_path)) {
-    .out_path <- get_yaml_path(.mod, .check_exists = FALSE)
-  }
+save_model_yaml <- function(.mod) {
+
+  .out_path <- get_yaml_path(.mod, .check_exists = FALSE)
 
   # erase keys that don't need to be saved out
   for (key in YAML_ERASE_OUT_KEYS) {

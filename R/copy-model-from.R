@@ -174,7 +174,7 @@ copy_nonmem_model_from <- function(
 
   # write .new_mod out to yaml
   new_yaml_path <- yaml_ext(.new_model)
-  save_model_yaml(.new_mod, .out_path = new_yaml_path)
+  save_model_yaml(.new_mod)
 
   # make list into S3 object
   .new_mod[[YAML_YAML_MD5]] <- digest(file = new_yaml_path, algo = "md5")
