@@ -23,19 +23,20 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
   })
 
   test_that("param_estimates correctly errors on Bayesian model", {
+    mod1 <- read_model(1001, .directory = MODEL_DIR_X)
+    sum1 <- model_summary(mod1, .bbi_args = list(ext_file = "1001.1.TXT"))
     expect_error(
-      par_df <- 1001 %>%
-        model_summary(.directory = MODEL_DIR_X, .bbi_args = list(ext_file = "1001.1.TXT")) %>%
-        param_estimates(),
+      param_estimates(sum1),
       regexp = "not currently implemented for Bayesian methods"
     )
   })
 
   test_that("param_estimates correctly warns on mixture model", {
+    mod1 <- read_model("iovmm", .directory = MODEL_DIR_X)
+    sum1 <- model_summary(mod1)
+
     expect_warning(
-      par_df <- "iovmm" %>%
-        model_summary(.directory = MODEL_DIR_X) %>%
-        param_estimates(),
+      par_df <- param_estimates(sum1),
       regexp = "mixture model"
     )
 

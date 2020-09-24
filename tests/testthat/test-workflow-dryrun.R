@@ -85,27 +85,16 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
 
         # load mod from yaml and dry run through to summary object
         this_mod <- read_model(.path = TEST_YAML_DRY)
-        #this_proc <- submit_model(this_mod, .dry_run = TRUE, .config_path = .test_case$bbi_path)
         this_proc <- submit_model(this_mod, .dry_run = TRUE)
-        this_sum <- this_proc %>% as_model() %>% model_summary(.dry_run = TRUE)
+        this_sum <- model_summary(this_mod, .dry_run = TRUE)
         expect_identical(this_sum[[PROC_CALL]], REF_SUMMARY_CALL)
-
-        # check that summary call matches when generated with file path instead of object
-        this_out_dir <- tools::file_path_sans_ext(TEST_YAML_DRY)
-        this_ctl_file <- ctl_ext(TEST_YAML_DRY)
 
         if (isTRUE(.test_case$change_midstream)) {
           withr::with_dir("..", {
-            this_out_dir_sum <- model_summary(this_out_dir, .model_type = "nonmem", .dry_run = TRUE)
-            this_ctl_file_sum <- model_summary(this_ctl_file, .model_type = "nonmem", .dry_run = TRUE)
+            sum_change_dir <- model_summary(this_mod, .dry_run = TRUE)
+            expect_identical(sum_change_dir$call, REF_SUMMARY_CALL)
           })
-        } else {
-          this_out_dir_sum <- model_summary(this_out_dir, .model_type = "nonmem", .dry_run = TRUE)
-          this_ctl_file_sum <- model_summary(this_ctl_file, .model_type = "nonmem", .dry_run = TRUE)
         }
-        expect_identical(this_out_dir_sum$call, REF_SUMMARY_CALL)
-        expect_identical(this_ctl_file_sum$call, REF_SUMMARY_CALL)
-
       })
     })
   }
@@ -197,29 +186,16 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
         # load mod from yaml and dry run through to summary object
         this_mod <- read_model(.path = test_yaml_path)
         this_proc <- submit_model(this_mod, .dry_run = TRUE, .config_path = .test_case$bbi_path)
-        this_sum <- this_proc %>% as_model() %>% model_summary(.dry_run = TRUE)
+        this_sum <- model_summary(this_mod, .dry_run = TRUE)
         expect_identical(this_sum[[PROC_CALL]], REF_SUMMARY_CALL)
 
         # check that summary call matches when generated with file path instead of object
         if (!is.null(.test_case$change_midstream)) {
-          .former_dir <- basename(getwd())
           withr::with_dir("..", {
-            this_out_dir <- tools::file_path_sans_ext(file.path(.former_dir, test_yaml_path))
-            this_out_dir_sum <- model_summary(this_out_dir, .model_type = "nonmem", .dry_run = TRUE)
-
-            this_ctl_file <- ctl_ext(file.path(.former_dir, test_yaml_path))
-            this_ctl_file_sum <- model_summary(this_ctl_file, .model_type = "nonmem", .dry_run = TRUE)
+            sum_change_dir <- model_summary(this_mod, .model_type = "nonmem", .dry_run = TRUE)
+            expect_identical(sum_change_dir$call, REF_SUMMARY_CALL)
           })
-        } else {
-          this_out_dir <- tools::file_path_sans_ext(test_yaml_path)
-          this_out_dir_sum <- model_summary(this_out_dir, .model_type = "nonmem", .dry_run = TRUE)
-
-          this_ctl_file <- ctl_ext(test_yaml_path)
-          this_ctl_file_sum <- model_summary(this_ctl_file, .model_type = "nonmem", .dry_run = TRUE)
         }
-        expect_identical(this_out_dir_sum$call, REF_SUMMARY_CALL)
-        expect_identical(this_ctl_file_sum$call, REF_SUMMARY_CALL)
-
       })
     })
   }

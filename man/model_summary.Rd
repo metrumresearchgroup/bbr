@@ -3,32 +3,14 @@
 \name{model_summary}
 \alias{model_summary}
 \alias{model_summary.bbi_nonmem_model}
-\alias{model_summary.character}
-\alias{model_summary.numeric}
 \title{Summarize model outputs}
 \usage{
 model_summary(.mod, .bbi_args = NULL, ..., .dry_run = FALSE, .directory = NULL)
 
 \method{model_summary}{bbi_nonmem_model}(.mod, .bbi_args = NULL, ..., .dry_run = FALSE, .directory = NULL)
-
-\method{model_summary}{character}(
-  .mod,
-  .bbi_args = NULL,
-  ...,
-  .dry_run = FALSE,
-  .directory = get_model_directory()
-)
-
-\method{model_summary}{numeric}(
-  .mod,
-  .bbi_args = NULL,
-  ...,
-  .dry_run = FALSE,
-  .directory = get_model_directory()
-)
 }
 \arguments{
-\item{.mod}{Model to summarize. Can be a \verb{bbi_\{.model_type\}_model} object, a file path, or an integer corresponding to a file path.}
+\item{.mod}{Model to summarize.}
 
 \item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}.
 See \code{\link[=print_bbi_args]{print_bbi_args()}} for full list of options.}
@@ -74,10 +56,5 @@ Additionally, if you have renamed the \code{.ext} file from its default of \verb
 \section{Methods (by class)}{
 \itemize{
 \item \code{bbi_nonmem_model}: Get model summary from \code{bbi_nonmem_model} object
-
-\item \code{character}: Get model summary from output directory path
-
-\item \code{numeric}: Get model summary from numeric input.
-This will only work if you are calling from the same directory as the models, or if you have set \code{options('rbabylon.model_directory')} to the directory constaining the relevant model.
 }}
 
