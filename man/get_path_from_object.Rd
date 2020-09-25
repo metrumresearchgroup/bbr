@@ -2,62 +2,43 @@
 % Please edit documentation in R/get-path-from-object.R
 \name{get_path_from_object}
 \alias{get_path_from_object}
-\alias{get_path_from_object.default}
-\alias{get_path_from_object.character}
-\alias{get_path_from_object.bbi_run_log_df}
 \alias{get_model_path}
+\alias{get_model_path.bbi_nonmem_model}
+\alias{get_model_path.bbi_log_df}
 \alias{get_output_dir}
+\alias{get_output_dir.bbi_nonmem_model}
+\alias{get_output_dir.bbi_log_df}
 \alias{get_yaml_path}
+\alias{get_yaml_path.bbi_nonmem_model}
+\alias{get_yaml_path.bbi_log_df}
 \title{Get path from bbi object}
 \usage{
-get_path_from_object(.bbi_object, .key, .check_exists = TRUE)
-
-\method{get_path_from_object}{default}(.bbi_object, .key, .check_exists = TRUE)
-
-\method{get_path_from_object}{character}(.bbi_object, .key, .check_exists = TRUE)
-
-\method{get_path_from_object}{bbi_run_log_df}(.bbi_object, .key, .check_exists = TRUE)
-
 get_model_path(.bbi_object, .check_exists = TRUE)
+
+\method{get_model_path}{bbi_nonmem_model}(.bbi_object, .check_exists = TRUE)
+
+\method{get_model_path}{bbi_log_df}(.bbi_object, .check_exists = TRUE)
 
 get_output_dir(.bbi_object, .check_exists = TRUE)
 
+\method{get_output_dir}{bbi_nonmem_model}(.bbi_object, .check_exists = TRUE)
+
+\method{get_output_dir}{bbi_log_df}(.bbi_object, .check_exists = TRUE)
+
 get_yaml_path(.bbi_object, .check_exists = TRUE)
+
+\method{get_yaml_path}{bbi_nonmem_model}(.bbi_object, .check_exists = TRUE)
+
+\method{get_yaml_path}{bbi_log_df}(.bbi_object, .check_exists = TRUE)
 }
 \arguments{
-\item{.bbi_object}{The model object to query. Could be
+\item{.bbi_object}{The object to query. Could be
 a \verb{bbi_\{.model_type\}_model} object,
-a  file path to a model,
-a tibble of class \code{bbi_run_log_df},
-or some other custom object containing model data.}
+or a tibble of class \code{bbi_log_df}.}
 
-\item{.key}{The key that contains the relative path.}
-
-\item{.check_exists}{If \code{TRUE}, the default, function will check if a file exists at the returned path and error if it does not. If \code{FALSE}, will return the path without checking.}
+\item{.check_exists}{If \code{TRUE}, the default, will throw an error if the file does not exist}
 }
 \description{
-Builds the full path to a file that is stored as part of a \code{bbi_...} S3 object.
-Note that calling \code{get_path_from_object()} directly is not recommended for most users
-because it requires knowing about the internal structure of the model object.
-Instead we recommend using the friendlier helpers \code{get_model_path()}, \code{get_yaml_path()}, \code{get_output_dir()} when possible.
+\verb{bbi_\{.model_type\}_model} objects correspond to multiple files on disk. These functions
+provide an easy way to retrieve the absolute path to these files.
 }
-\details{
-All helper functions mentioned above call \code{get_path_from_object()} under the hood and will dispatch
-via S3 in the same way that it would.
-
-Note that all paths saved in the object or accompanying YAML will be relative \strong{to the location of that YAML}
-When the object is loaded into memory, the absolute path to the YAML is stored in the object.
-These functions simply stitch together that path with the requested relative path.
-As long as the YAML has not moved since it was read into memory, this will work.
-}
-\section{Methods (by class)}{
-\itemize{
-\item \code{default}: The default method attempts to extract the path from any object passed to it,
-but is designed for a list of class \verb{bbi_\{.model_type\}_model} or something similar.
-
-\item \code{character}: Takes a file path to a model that can be loaded with \code{read_model(.bbi_object)}
-
-\item \code{bbi_run_log_df}: Takes a tibble of class \code{bbi_run_log_df} and returns a character vector
-of one path per row in the tibble.
-}}
-

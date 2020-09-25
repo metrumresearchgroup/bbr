@@ -58,12 +58,13 @@ new_model <- function(
   if (!is.null(.tags)) .mod[[YAML_TAGS]] <- .tags
   if (!is.null(.bbi_args)) .mod[[YAML_BBI_ARGS]] <- .bbi_args
 
+  # make list into S3 object
+  .mod[[YAML_YAML_MD5]] <- "fake" ########### !!!!
+  .mod <- create_model_object(.mod)
+
   # write YAML to disk
   save_model_yaml(.mod)
-
-  # make list into S3 object
   .mod[[YAML_YAML_MD5]] <- digest(file = .yaml_path, algo = "md5")
-  .mod <- create_model_object(.mod)
 
   return(.mod)
 }

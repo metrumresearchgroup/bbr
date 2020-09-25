@@ -159,10 +159,13 @@ copy_nonmem_model_from <- function(
   }
   .new_mod[[YAML_MOD_PATH]] <- basename(new_mod_path) # path should be relative to YAML location
 
+  # make list into S3 object
+  .new_mod[[YAML_YAML_MD5]] <- "fake" ########### !!!!
+  .new_mod <- create_model_object(.new_mod)
+
   # copy control steam to new path
   .parent_model_path <- get_model_path(.parent_mod)
   .new_model_path <-  get_model_path(.new_mod, .check_exists = FALSE)
-
 
   if (fs::file_exists(.new_model_path) && !isTRUE(.overwrite)) {
     # if .overwrite != TRUE, warn that file already exists
@@ -176,9 +179,7 @@ copy_nonmem_model_from <- function(
   new_yaml_path <- yaml_ext(.new_model)
   save_model_yaml(.new_mod)
 
-  # make list into S3 object
   .new_mod[[YAML_YAML_MD5]] <- digest(file = new_yaml_path, algo = "md5")
-  .new_mod <- create_model_object(.new_mod)
 
   return(.new_mod)
 }
