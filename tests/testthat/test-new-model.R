@@ -65,7 +65,9 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     }, "No model file found at.+\\.ctl")
 
     # read model from YAML
-    mod1b <- read_model(.path = .test_path)
+    suppressSpecificWarning({
+      mod1b <- read_model(.path = .test_path)
+    }, "No model file found at.+\\.ctl")
 
     # check class and keys are right
     expect_identical(class(mod1a), MOD_CLASS_LIST)

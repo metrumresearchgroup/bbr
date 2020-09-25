@@ -20,6 +20,9 @@ run_status <- dplyr::tribble(
 #' @param col_count number of columns to expect in `log_df`
 #' @param run_status a tibble holding model and data status by run
 check_config_ref <- function(log_df, run_nums, col_count, run_status) {
+  # check log_df class
+  expect_true(inherits(log_df, CONF_LOG_CLASS))
+  expect_true(inherits(log_df, LOG_DF_CLASS))
 
   expect_identical(basename(log_df[[ABS_MOD_PATH]]), run_nums)
 

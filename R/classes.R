@@ -216,6 +216,6 @@ create_log_df_impl <- function(log_df, .class, .req_cols, .key) {
   }
 
   # assign class and return
-  class(log_df) <- c(.class, class(log_df))
+  class(log_df) <- c(.class, LOG_DF_CLASS, class(log_df))
   return(log_df)
 }

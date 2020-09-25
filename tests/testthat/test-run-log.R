@@ -41,6 +41,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_identical(log_df$yaml_md5, c("ee5a30a015c4e09bc29334188ff28b58", "5576ed6fa6e1e4e9b0c25dbf62ae42e5", "ebadcc4a3c0f4d16f61251605136942b"))
     expect_identical(log_df$based_on, list(NULL, "1", c("1", "2")))
 
+    # check log_df class
+    expect_true(inherits(log_df, RUN_LOG_CLASS))
+    expect_true(inherits(log_df, LOG_DF_CLASS))
+
     # check class of each column
     log_classes <- log_df %>% dplyr::summarise_all(class) %>% as.list()
 

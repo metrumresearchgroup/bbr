@@ -10,6 +10,10 @@ PARAM_COUNT_REF <- 7
 
 # helper to run expectations
 test_sum_df <- function(sum_df, .paths, .col_count) {
+  # check sum_df class
+  expect_true(inherits(sum_df, SUM_LOG_CLASS))
+  expect_true(inherits(sum_df, LOG_DF_CLASS))
+
   num_mods <- length(.paths)
   expect_equal(nrow(sum_df), num_mods)
   expect_equal(ncol(sum_df), .col_count)
