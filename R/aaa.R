@@ -46,7 +46,7 @@ PROC_CLASS <- "babylon_process"
 RUN_LOG_CLASS <- "bbi_run_log_df"
 CONF_LOG_CLASS <- "bbi_config_log_df"
 SUM_LOG_CLASS <- "bbi_summary_log_df"
-
+LOG_DF_CLASS <- "bbi_log_df"
 
 # YAML keys that are hard-coded
 YAML_MOD_PATH <- "model_path"
