@@ -239,34 +239,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     )
   })
 
-  test_that("as_model() returns the correct type from a model object", {
-    # read model from disk
-    mod1 <- read_model(YAML_TEST_FILE)
-
-    # pass through as_model() and expect the same thing
-    mod2 <- mod1 %>% as_model()
-    expect_equal(mod1, mod2)
-  })
-
-
-  test_that("as_model() returns the correct type from a process object", {
-    # build fake process object
-    .ctl_file <- basename(ctl_ext(YAML_TEST_FILE))
-    proc1 <- bbi_dry_run(.cmd_args = c("run", "nonmem", "sge", .ctl_file), .dir = MODEL_DIR)
-
-    # convert to model
-    mod1 <- proc1 %>% as_model()
-
-    # check class and model path
-    expect_identical(mod1[[YAML_MOD_PATH]], .ctl_file)
-    expect_identical(class(mod1), MOD_CLASS_LIST)
-  })
-
-  test_that("as_model() errors with non-existent model", {
-    proc1 <- bbi_dry_run(c("naw", "dawg"), "yea")
-    expect_error(as_model(proc1), regexp = FIND_YAML_ERR_MSG)
-  })
-
 }) # closing withr::with_options
 
 

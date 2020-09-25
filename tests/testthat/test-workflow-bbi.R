@@ -62,26 +62,16 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
     expect_identical(class(proc1), PROC_CLASS_LIST)
 
     # get summary from model object
-    sum1a <- mod1 %>% model_summary()
-    expect_identical(class(sum1a), SUM_CLASS_LIST)
-    expect_identical(names(sum1a), SUM_NAMES_REF)
-
-    # get summary from process object
-    sum1b <- proc1 %>% as_model %>% model_summary()
-    expect_identical(class(sum1b), SUM_CLASS_LIST)
-    expect_identical(names(sum1b), SUM_NAMES_REF)
+    sum1 <- mod1 %>% model_summary()
+    expect_identical(class(sum1), SUM_CLASS_LIST)
+    expect_identical(names(sum1), SUM_NAMES_REF)
 
     # extract parameters table
     ref_df <- readRDS(PARAM_REF_FILE)
 
-    par_df1a <- param_estimates(sum1a)
+    par_df1a <- param_estimates(sum1)
     suppressSpecificWarning({
       expect_equal(par_df1a, ref_df) # from model object
-    }, .regexpr = "Column .+ has different attributes on LHS and RHS of join")
-
-    par_df1b <- param_estimates(sum1b)
-    suppressSpecificWarning({
-      expect_equal(par_df1b, ref_df) # from process object
     }, .regexpr = "Column .+ has different attributes on LHS and RHS of join")
   })
 

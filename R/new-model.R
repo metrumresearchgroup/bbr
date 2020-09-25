@@ -153,29 +153,3 @@ save_model_yaml <- function(.mod) {
   yaml::write_yaml(.mod, .out_path)
 }
 
-
-#' Convert object to `bbi_{.model_type}_model`
-#' @param .obj Object to convert to `bbi_{.model_type}_model`
-#' @export
-as_model <- function(.obj) {
-  UseMethod("as_model")
-}
-
-#' @describeIn as_model Simply passes through the `bbi_nonmem_model` object.
-#' @export
-as_model.bbi_nonmem_model <- function(.obj) {
-  return(.obj)
-}
-
-#' @describeIn as_model Takes a `babylon_process` object and converts it to the corresponding `bbi_nonmem_model` object.
-#' Only works if YAML and model file are in the same directory with the same name and different file extensions.
-#' @export
-as_model.babylon_process <- function(.obj) {
-  # construct path to YAML
-  mod_file <- .obj[[PROC_CMD_ARGS]][4] # cmd_args will have c("run", "nonmem", .mode, .model_file)
-  yaml_path <- file.path(.obj[[PROC_WD]], mod_file) %>% get_yaml_path()
-
-  # read model from YAML
-  .mod <- read_model(yaml_path)
-  return(.mod)
-}
