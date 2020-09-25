@@ -59,12 +59,7 @@ new_model <- function(
   if (!is.null(.bbi_args)) .mod[[YAML_BBI_ARGS]] <- .bbi_args
 
   # make list into S3 object
-  .mod[[YAML_YAML_MD5]] <- "fake" ########### !!!!
-  .mod <- create_model_object(.mod)
-
-  # write YAML to disk
-  save_model_yaml(.mod)
-  .mod[[YAML_YAML_MD5]] <- digest(file = .yaml_path, algo = "md5")
+  .mod <- create_model_object(.mod, save_yaml = TRUE)
 
   return(.mod)
 }
@@ -118,39 +113,50 @@ read_model <- function(
     strict_mode_error(err_msg)
   }
 
-  .mod <- create_model_object(yaml_list)
+  .mod <- create_model_object(yaml_list, save_yaml = FALSE)
 
   return(.mod)
 }
 
 
 #' Saves a model object to a yaml file
+#'
+#' Saves the passed model object to its YAML file and updates
+#' the md5 hash after saving.
 #' @param .mod S3 object of class `bbi_{.model_type}_model`
 #' @importFrom yaml write_yaml
 #' @importFrom fs file_exists
 #' @importFrom purrr compact
-#' @return Output list as specified above.
+#' @return The input `bbi_{.model_type}_model` object, with its YAML md5 hash updated.
 #' @keywords internal
 save_model_yaml <- function(.mod) {
 
   .out_path <- get_yaml_path(.mod, .check_exists = FALSE)
 
+  # create copy to save out
+  .out_mod <- .mod
+
   # erase keys that don't need to be saved out
   for (key in YAML_ERASE_OUT_KEYS) {
-    .mod[[key]] <- NULL
+    .out_mod[[key]] <- NULL
   }
 
   # convert keys that need to be coerced to arrays
   for (.key in YAML_SCALAR_TO_LIST_KEYS) {
-    if (length(.mod[[.key]]) == 1) {
-      .mod[[.key]] <- (list(.mod[[.key]]))
+    if (length(.out_mod[[.key]]) == 1) {
+      .out_mod[[.key]] <- (list(.out_mod[[.key]]))
     }
   }
 
   # throw out empty and null keys
-  .mod <- purrr::compact(.mod)
+  .out_mod <- purrr::compact(.out_mod)
 
   # write to disk
-  yaml::write_yaml(.mod, .out_path)
+  yaml::write_yaml(.out_mod, .out_path)
+
+  # update md5 after writing new yaml
+  .mod[[YAML_YAML_MD5]] <- digest(file = .out_path, algo = "md5")
+
+  return(.mod)
 }
 
