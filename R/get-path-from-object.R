@@ -1,123 +1,108 @@
 
 #' Get path from bbi object
 #'
-#' Builds the full path to a file that is stored as part of a `bbi_...` S3 object.
-#' Note that calling `get_path_from_object()` directly is not recommended for most users
-#' because it requires knowing about the internal structure of the model object.
-#' Instead we recommend using the friendlier helpers `get_model_path()`, `get_yaml_path()`, `get_output_dir()` when possible.
+#' `bbi_{.model_type}_model` objects correspond to multiple files on disk. These functions
+#' provide an easy way to retrieve the absolute path to these files.
 #'
-#' @details
-#' All helper functions mentioned above call `get_path_from_object()` under the hood and will dispatch
-#' via S3 in the same way that it would.
-#'
-#' Note that all paths saved in the object or accompanying YAML will be relative **to the location of that YAML**
-#' When the object is loaded into memory, the absolute path to the YAML is stored in the object.
-#' These functions simply stitch together that path with the requested relative path.
-#' As long as the YAML has not moved since it was read into memory, this will work.
-#' @param .bbi_object The model object to query. Could be
+#' @param .bbi_object The object to query. Could be
 #' a `bbi_{.model_type}_model` object,
-#' a  file path to a model,
-#' a tibble of class `bbi_run_log_df`,
-#' or some other custom object containing model data.
-#' @param .key The key that contains the relative path.
-#' @param .check_exists If `TRUE`, the default, function will check if a file exists at the returned path and error if it does not. If `FALSE`, will return the path without checking.
+#' or a tibble of class `bbi_log_df`.
+#' @param .check_exists If `TRUE`, the default, will throw an error if the file does not exist
+#' @name get_path_from_object
+NULL
+
+#' @rdname get_path_from_object
 #' @export
-get_path_from_object <- function(.bbi_object, .key, .check_exists = TRUE) {
-  UseMethod("get_path_from_object")
+get_model_path <- function(.bbi_object, .check_exists = TRUE) {
+  UseMethod("get_model_path")
 }
 
-
-#' @describeIn get_path_from_object The default method attempts to extract the path from any object passed to it,
-#' but is designed for a list of class `bbi_{.model_type}_model` or something similar.
+#' @rdname get_path_from_object
 #' @export
-get_path_from_object.default <- function(.bbi_object, .key, .check_exists = TRUE) {
+get_model_path.bbi_nonmem_model <- function(.bbi_object, .check_exists = TRUE) {
 
-  # do some QA on the required fields
-  if (any(map_lgl(c(WORKING_DIR, .key), ~ is.null(.bbi_object[[.x]])))) {
-    stop_get_fail_msg(
-      .bbi_object,
-      .key,
-      glue(".bbi_object must contain keys for both `{WORKING_DIR}` and `{.key}` but has only the following keys: {paste(names(.bbi_object), collapse = ', ')}")
-    )
-  }
+  #.path <- find_model_file_path(.bbi_object[[ABS_MOD_PATH]])
+  .path <- file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_MOD_PATH]])
 
-  if (length(.bbi_object[[.key]]) > 1) {
-    stop_get_fail_msg(
-      .bbi_object,
-      .key,
-      glue("Expected a scalar value for `.bbi_object[['{.key}']]` but instead got {class(.bbi_object[[.key]])[1]} of length {length(.bbi_object[[.key]])}")
-    )
-  }
-
-  # extract the requested path and optionally check if it exists
-  .path <- file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[.key]])
-
-  if (isTRUE(.check_exists) && !fs::file_exists(.path)) {
-    stop_get_fail_msg(
-      .bbi_object,
-      .key,
-      glue("Extracted path `{.path}` but nothing exists at that location. (If this is expected, pass `.check_exists = FALSE` to bypass this error.)")
-    )
+  if(isTRUE(.check_exists)) {
+    checkmate::assert_file_exists(.path)
   }
 
   return(.path)
-
-}
-
-
-#' @describeIn get_path_from_object Takes a file path to a model that can be loaded with `read_model(.bbi_object)`
-#' @export
-get_path_from_object.character <- function(.bbi_object, .key, .check_exists = TRUE) {
-
-  if (length(.bbi_object) > 1) {
-    stop_get_scalar_msg(length(.bbi_object))
-  }
-
-  .bbi_object <- tryCatch(
-    {
-      read_model(.bbi_object)
-    },
-    error = function(e) {
-      stop(glue("Cannot load model object from path `{.bbi_object}` :\n{paste(e, collapse = '\n')}"))
-    }
-  )
-
-  return(get_path_from_object(.bbi_object, .key, .check_exists = .check_exists))
-}
-
-
-#' @describeIn get_path_from_object Takes a tibble of class `bbi_run_log_df` and returns a character vector
-#' of one path per row in the tibble.
-#' @importFrom purrr map_chr
-#' @export
-get_path_from_object.bbi_run_log_df <- function(.bbi_object, .key, .check_exists = TRUE) {
-
-  .out_paths <- map_chr(.bbi_object[[ABS_MOD_PATH]], function(.path) {
-    get_path_from_object(.path, .key, .check_exists = .check_exists)
-  })
-
-  return(.out_paths)
 }
 
 
 #' @rdname get_path_from_object
 #' @export
-get_model_path <- function(.bbi_object, .check_exists = TRUE) {
-  return(get_path_from_object(.bbi_object, YAML_MOD_PATH, .check_exists = .check_exists))
+get_model_path.bbi_log_df <- function(.bbi_object, .check_exists = TRUE) {
+  get_path_from_log_df(.bbi_object, get_model_path, .check_exists = .check_exists)
 }
 
 #' @rdname get_path_from_object
 #' @export
 get_output_dir <- function(.bbi_object, .check_exists = TRUE) {
-  return(get_path_from_object(.bbi_object, YAML_OUT_DIR, .check_exists = .check_exists))
+  UseMethod("get_output_dir")
+}
+
+#' @rdname get_path_from_object
+#' @export
+get_output_dir.bbi_nonmem_model <- function(.bbi_object, .check_exists = TRUE) {
+
+  #.path <- .bbi_object[[ABS_MOD_PATH]]
+  .path <- file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_OUT_DIR]])
+
+  if(isTRUE(.check_exists)) {
+    checkmate::assert_directory_exists(.path)
+  }
+
+  return(.path)
+}
+
+#' @rdname get_path_from_object
+#' @export
+get_output_dir.bbi_log_df <- function(.bbi_object, .check_exists = TRUE) {
+  get_path_from_log_df(.bbi_object, get_output_dir, .check_exists = .check_exists)
 }
 
 #' @rdname get_path_from_object
 #' @export
 get_yaml_path <- function(.bbi_object, .check_exists = TRUE) {
-  return(get_path_from_object(.bbi_object, YAML_YAML_NAME, .check_exists = .check_exists))
+  UseMethod("get_yaml_path")
 }
 
+#' @rdname get_path_from_object
+#' @export
+get_yaml_path.bbi_nonmem_model <- function(.bbi_object, .check_exists = TRUE) {
+
+  #.path <- yaml_ext(.bbi_object[[ABS_MOD_PATH]])
+  .path <- file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_YAML_NAME]])
+
+  if(isTRUE(.check_exists)) {
+    checkmate::assert_file_exists(.path)
+  }
+
+  return(.path)
+}
+
+#' @rdname get_path_from_object
+#' @export
+get_yaml_path.bbi_log_df <- function(.bbi_object, .check_exists = TRUE) {
+  get_path_from_log_df(.bbi_object, get_yaml_path, .check_exists = .check_exists)
+}
+
+#' Private helper function to extract paths from bbi_log_df
+#' @param .log_df The `bbi_log_df` object
+#' @param .get_func The getter function to call
+#' @inheritParams get_path_from_object
+#' @importFrom purrr map_chr
+#' @keywords internal
+get_path_from_log_df <- function(.log_df, .get_func, .check_exists) {
+  .out_paths <- map_chr(.log_df[[ABS_MOD_PATH]], function(.path) {
+    .mod <- read_model(.path)
+    .get_func(.mod, .check_exists = .check_exists)
+  })
+  return(.out_paths)
+}
 
 ###############################
 # Manipulating file extensions

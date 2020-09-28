@@ -6,9 +6,10 @@ NULL
 
 #' @describeIn create_bbi_object Creates list object of class `bbi_{.model_type}_model` from named list with `MODEL_REQ_INPUT_KEYS`
 #' @param res List to attempt to assign the class to
+#' @param save_yaml Logical scalar for whether to save the newly created model object to its corresponding YAML file and update the md5 hash.
 #' @importFrom fs path_rel
 #' @keywords internal
-create_model_object <- function(res) {
+create_model_object <- function(res, save_yaml) {
 
   if(!inherits(res, "list")) {
     stop(glue("Can only create model object from a named list. Passed object has classes {paste(class(res), collapse = ', ')}"))
@@ -64,7 +65,13 @@ create_model_object <- function(res) {
     res[[YAML_OUT_DIR]] <- res[[YAML_MOD_PATH]] %>% tools::file_path_sans_ext()
   }
 
-  # check for required keys, just as an extra safety precaution
+  # assign class and write YAML to disk
+  class(res) <- c(as.character(glue("bbi_{.model_type}_model")), class(res))
+  if(isTRUE(save_yaml)) {
+    res <- save_model_yaml(res)
+  }
+
+  # check for required keys, just as an extra safety precaution before returning
   if (!check_required_keys(res, .req = MODEL_REQ_KEYS)) {
     err_msg <- paste0(
       "Model object must have the following named elements to be converted to an S3 object of class `bbi_{.model_type}_model`: `", paste(MODEL_REQ_KEYS, collapse=", "),
@@ -74,8 +81,6 @@ create_model_object <- function(res) {
     strict_mode_error(err_msg)
   }
 
-  # assign class and return
-  class(res) <- c(as.character(glue("bbi_{.model_type}_model")), class(res))
   return(res)
 }
 

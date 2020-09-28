@@ -134,6 +134,8 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
   })
 
   test_that("add_config() md5 matches original md5", {
+    # TODO: consider whether to delete this test now that we have done https://github.com/metrumresearchgroup/rbabylon/issues/30
+
     # add config log to run log
     log_df <- expect_warning(run_log() %>% add_config(), regexp = "in progress")
     expect_equal(nrow(log_df), 4)

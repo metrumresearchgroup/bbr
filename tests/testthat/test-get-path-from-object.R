@@ -10,86 +10,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   # get_path_from_object
   #######################
 
-  test_that("get_path_from_object.default() builds the right path", {
-    expect_identical(get_path_from_object(MOD1 , YAML_MOD_PATH), normalizePath(CTL_TEST_FILE))
-  })
-
-  test_that("get_path_from_object.character() builds the right path", {
-    .mod_path <- file.path(MOD1[[WORKING_DIR]], MOD1[[YAML_MOD_PATH]])
-    expect_identical(get_path_from_object(.mod_path , YAML_MOD_PATH), normalizePath(CTL_TEST_FILE))
-  })
-
-  test_that("get_path_from_object.character() fails with vector", {
-    expect_error(get_path_from_object(c("naw", "dawg") , YAML_MOD_PATH), regexp = "only scalar values are permitted")
-  })
-
-  test_that("get_path_from_object.character() .check_exists works", {
-    # copy YAML but _not_ model file
-    YAML2 <- stringr::str_replace(YAML_TEST_FILE, "/1\\.", "/2.")
-    fs::file_copy(YAML_TEST_FILE, YAML2)
-    on.exit({ fs::file_delete(YAML2) })
-
-    # should error because no file is there
-    expect_error(
-      suppressSpecificWarning(get_path_from_object(ctl_ext(YAML2) , YAML_MOD_PATH), .regexpr = "No model file found"),
-      regexp = "nothing exists at that location"
-    )
-
-    # should work with .check_exists = FALSE
-    expect_identical(
-      suppressSpecificWarning(get_path_from_object(ctl_ext(YAML2) , YAML_MOD_PATH, .check_exists = FALSE), .regexpr = "No model file found"),
-      stringr::str_replace(normalizePath(CTL_TEST_FILE), "/1\\.", "/2.")
-    )
-  })
-
-  test_that("get_path_from_object.bbi_run_log_df() builds the right paths", {
-    # copy the model files and create a fake run log
-    YAML2 <- stringr::str_replace(YAML_TEST_FILE, "/1\\.", "/2.")
-    CTL2 <- ctl_ext(YAML2)
-    fs::file_copy(YAML_TEST_FILE, YAML2)
-    fs::file_copy(CTL_TEST_FILE, CTL2)
-    on.exit({
-      fs::file_delete(YAML2)
-      fs::file_delete(CTL2)
-    })
-
-    .log_df <- run_log(MODEL_DIR)
-
-    # check extracted paths
-    expect_identical(
-      get_path_from_object(.log_df , YAML_MOD_PATH),
-      c(normalizePath(CTL_TEST_FILE), stringr::str_replace(normalizePath(CTL_TEST_FILE), "/1\\.", "/2."))
-    )
-  })
-
-
-  # testing error handling
-
-  test_that("get_path_from_object() errors on missing keys", {
-    .test_list <- list(naw = 1)
-    expect_error(get_path_from_object(.test_list, "naw"), regexp = "must contain keys")
-
-    .test_list[[WORKING_DIR]] <- "/fake/path"
-    expect_error(get_path_from_object(.test_list, "dawg"), regexp = "must contain keys")
-  })
-
-  test_that("get_path_from_object() errors on vector field", {
-    .test_list <- list(naw = c(1,2))
-    .test_list[[WORKING_DIR]] <- "/fake/path"
-    expect_error(get_path_from_object(.test_list, "naw"), regexp = "Expected a scalar value")
-  })
-
-  test_that("get_path_from_object() errors on fake path", {
-    .test_list <- list(naw = 1)
-    .test_list[[WORKING_DIR]] <- "/fake/path"
-    expect_error(get_path_from_object(.test_list, "naw"), regexp = "nothing exists at that location")
-    expect_identical(get_path_from_object(.test_list, "naw", .check_exists = FALSE), "/fake/path/1")
-  })
-
-  #########################################
-  # helpers that call get_path_from_object
-  #########################################
-
   test_that("get_model_path() builds the right path", {
     expect_identical(get_model_path(MOD1), normalizePath(CTL_TEST_FILE))
   })
@@ -102,6 +22,19 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_identical(get_yaml_path(MOD1), normalizePath(YAML_TEST_FILE))
   })
 
+
+  # TODO: consider adding a test for logs with more than one model
+  test_that("get_model_path() works with bbi_*_log_df", {
+    expect_identical(get_model_path(run_log(MODEL_DIR)), normalizePath(CTL_TEST_FILE))
+  })
+
+  test_that("get_output_dir() works with bbi_*_log_df", {
+    expect_identical(get_output_dir(run_log(MODEL_DIR)), normalizePath(OUTPUT_DIR))
+  })
+
+  test_that("get_yaml_path() works with bbi_*_log_df", {
+    expect_identical(get_yaml_path(run_log(MODEL_DIR)), normalizePath(YAML_TEST_FILE))
+  })
 
   ##################
   # other functions

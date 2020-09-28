@@ -39,10 +39,7 @@ modify_model_field <- function(.mod, .field, .value, .append = TRUE, .unique = T
   }
 
   # overwrite the yaml on disk with modified model
-  save_model_yaml(.mod)
-
-  # refresh md5 hash in model object
-  .mod[[YAML_YAML_MD5]] <- digest(file = get_yaml_path(.mod), algo = "md5")
+  .mod <- save_model_yaml(.mod)
 
   return(.mod)
 }
@@ -141,10 +138,7 @@ add_bbi_args <- function(.mod, .bbi_args) {
   .mod[[YAML_BBI_ARGS]] <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])
 
   # overwrite the yaml on disk with modified model
-  save_model_yaml(.mod)
-
-  # refresh md5 hash in model object
-  .mod[[YAML_YAML_MD5]] <- digest(file = get_yaml_path(.mod), algo = "md5")
+  .mod <- save_model_yaml(.mod)
 
   return(.mod)
 }
@@ -162,10 +156,7 @@ replace_bbi_args <- function(.mod, .bbi_args) {
   .mod[[YAML_BBI_ARGS]] <- .bbi_args
 
   # overwrite the yaml on disk with modified model
-  save_model_yaml(.mod)
-
-  # refresh md5 hash in model object
-  .mod[[YAML_YAML_MD5]] <- digest(file = get_yaml_path(.mod), algo = "md5")
+  .mod <- save_model_yaml(.mod)
 
   return(.mod)
 }
