@@ -143,6 +143,24 @@ create_all_models <- function() {
   assign("mod4", mod4, pos = parent.frame())
 }
 
+copy_all_output_dirs <- function() {
+  if (!fs::dir_exists(LEVEL2_DIR)) { fs::dir_create(LEVEL2_DIR) }
+  fs::dir_copy(MOD1_PATH, NEW_MOD2)
+  fs::dir_copy(MOD1_PATH, NEW_MOD3)
+  fs::dir_copy(MOD1_PATH, LEVEL2_MOD)
+}
+
+create_rlg_models <- function() {
+  # copy models before creating run log
+  copy_model_from(YAML_TEST_FILE, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
+  copy_model_from(YAML_TEST_FILE,
+                  NEW_MOD3,
+                  NEW_DESC,
+                  .based_on_additional = get_model_id(NEW_MOD2),
+                  .inherit_tags = TRUE,
+                  .update_model_file = FALSE)
+}
+
 cleanup <- function() {
   # delete tmp files if they are leftover from previous test
   mods_to_kill <- purrr::map_chr(seq(2,7), ~ file.path(MODEL_DIR, .x))

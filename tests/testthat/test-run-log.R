@@ -2,15 +2,7 @@ context("Constructing run log from model yaml")
 
 setup({
   cleanup()
-
-  # copy models before creating run log
-  copy_model_from(MOD1, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
-  copy_model_from(MOD1,
-                  NEW_MOD3,
-                  NEW_DESC,
-                  .based_on_additional = get_model_id(NEW_MOD2),
-                  .inherit_tags = TRUE,
-                  .update_model_file = FALSE)
+  create_rlg_models()
 })
 
 teardown({ cleanup() })
