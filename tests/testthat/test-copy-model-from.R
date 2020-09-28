@@ -26,7 +26,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # check that everything is copied through in the YAML
     new_yaml <- yaml::read_yaml(yaml_ext(NEW_MOD2))
 
-    expect_identical(new_yaml[[YAML_MOD_PATH]], basename(ctl_ext(NEW_MOD2)))
     expect_identical(new_yaml[[YAML_DESCRIPTION]], NEW_DESC)
     expect_identical(new_yaml[[YAML_BASED_ON]], "1")
     expect_identical(new_yaml[[YAML_TAGS]], NEW_TAGS)
@@ -54,7 +53,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # check that everything is copied through
     new_yaml <- yaml::read_yaml(yaml_ext(NEW_MOD3))
 
-    expect_identical(new_yaml[[YAML_MOD_PATH]], basename(ctl_ext(NEW_MOD3)))
     expect_identical(new_yaml[[YAML_DESCRIPTION]], NEW_DESC)
     expect_identical(new_yaml[[YAML_BASED_ON]], c("1", get_model_id(NEW_MOD2)))
     expect_identical(new_yaml[[YAML_TAGS]], ORIG_TAGS)
@@ -84,7 +82,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # check that everything is copied through
     new_yaml <- yaml::read_yaml(new_yaml_path)
 
-    expect_identical(new_yaml[[YAML_MOD_PATH]], basename(new_ctl_path))
     expect_identical(new_yaml[[YAML_DESCRIPTION]], NEW_DESC)
     expect_identical(new_yaml[[YAML_BASED_ON]], "1")
     expect_identical(new_yaml[[YAML_TAGS]], NEW_TAGS)
@@ -150,3 +147,4 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_false(grepl(new_desc_pattern, new_mod_str))
   })
 }) # closing withr::with_options
+

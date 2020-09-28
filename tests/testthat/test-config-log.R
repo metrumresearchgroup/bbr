@@ -170,12 +170,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS, ORIG_TAGS))
     expect_identical(
       log_df[["yaml_md5"]],
-      c(
-        "ee5a30a015c4e09bc29334188ff28b58",
-        "5576ed6fa6e1e4e9b0c25dbf62ae42e5",
-        "ebadcc4a3c0f4d16f61251605136942b",
-        "6132d34ba27caf3460d23c9b4a3937d9"
-      )
+      c(RUN_LOG_YAML_MD5, MOD_LEVEL2_MD5)
     )
 
     # config log fields

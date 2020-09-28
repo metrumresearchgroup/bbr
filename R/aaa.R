@@ -105,8 +105,9 @@ RUN_LOG_REQ_COLS <- c(
 YAML_ERASE_OUT_KEYS <- c(
   WORKING_DIR,
   YAML_YAML_NAME,
-  YAML_YAML_MD5,
-  YAML_OUT_DIR
+  YAML_MOD_PATH,
+  YAML_OUT_DIR,
+  YAML_YAML_MD5
 )
 
 # keys that need to be coerced to arrays when saving a model YAML on disk
