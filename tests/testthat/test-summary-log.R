@@ -30,9 +30,7 @@ test_sum_df <- function(sum_df, .paths, .col_count) {
 setup({
   cleanup()
   create_all_models()
-  fs::dir_copy(MOD1_PATH, NEW_MOD2)
-  fs::dir_copy(MOD1_PATH, NEW_MOD3)
-  fs::dir_copy(MOD1_PATH, LEVEL2_MOD)
+  copy_all_output_dirs()
 })
 teardown({
   cleanup()

@@ -60,23 +60,12 @@ check_config_ref <- function(log_df, run_nums, col_count, run_status) {
 setup({
   cleanup()
 
-  # copy models before creating logs
-  copy_model_from(MOD1, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
-  copy_model_from(MOD1,
-                  NEW_MOD3,
-                  NEW_DESC,
-                  .based_on_additional = get_model_id(NEW_MOD2),
-                  .inherit_tags = TRUE,
-                  .update_model_file = FALSE)
-
-  fs::dir_copy(MOD1_PATH, NEW_MOD2)
-  fs::dir_copy(MOD1_PATH, NEW_MOD3)
+  create_rlg_models()
 
   # copy model 1 to level deeper
   fs::dir_create(LEVEL2_DIR)
   copy_model_from(MOD1, LEVEL2_MOD, "level 2 copy of 1.yaml", .inherit_tags = TRUE)
-  fs::dir_copy(MOD1_PATH, LEVEL2_MOD)
-
+  copy_all_output_dirs()
 })
 
 teardown({ cleanup() })
@@ -181,12 +170,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS, ORIG_TAGS))
     expect_identical(
       log_df[["yaml_md5"]],
-      c(
-        "ee5a30a015c4e09bc29334188ff28b58",
-        "5576ed6fa6e1e4e9b0c25dbf62ae42e5",
-        "ebadcc4a3c0f4d16f61251605136942b",
-        "6132d34ba27caf3460d23c9b4a3937d9"
-      )
+      c(RUN_LOG_YAML_MD5, MOD_LEVEL2_MD5)
     )
 
     # config log fields

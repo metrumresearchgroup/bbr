@@ -78,6 +78,12 @@ CONFIG_DATA_PATH <- "../../data/acop.csv"
 CONFIG_DATA_MD5 <- "4ddb44da897c26681d892aa7be99f74b"
 CONFIG_MODEL_MD5 <- "6b930119c4224ba077091b47959b0604"
 
+# yaml md5 hashes
+MOD1_YAML_MD5 <- "ee5a30a015c4e09bc29334188ff28b58"
+MOD_LEVEL2_MD5 <- "d121c8a5ffb6778329a7bf017a08bdde"
+ALL_MODS_YAML_MD5 <- c(MOD1_YAML_MD5, "a647aaa37758fd71d966fe91bfef201f", "a647aaa37758fd71d966fe91bfef201f", "2c433bb473027ace622c5055be568416")
+RUN_LOG_YAML_MD5 <- c(MOD1_YAML_MD5, "7c3d57c26bb0f5fe6019317775b735bd", "06a67b9430d10aacaeee81f91fea5c80")
+
 # model refs
 
 REF_LIST_1 <- list(
@@ -89,7 +95,7 @@ REF_LIST_1 <- list(
     threads = 4L),
   model_working_dir = file.path(getwd(), "model-examples"),
   orig_yaml_file ="1.yaml",
-  yaml_md5 = "ee5a30a015c4e09bc29334188ff28b58",
+  yaml_md5 = MOD1_YAML_MD5,
   model_path = "1.ctl",
   output_dir = "1"
 )
@@ -105,13 +111,12 @@ REF_LIST_TMP <- list(
     threads = 4L),
   model_working_dir = file.path(getwd(), "model-examples"),
   orig_yaml_file ="tmp.yml",
-  yaml_md5 = "ee5a30a015c4e09bc29334188ff28b58",
+  yaml_md5 = MOD1_YAML_MD5,
   model_path = "tmp.ctl",
   output_dir = "tmp"
 )
 class(REF_LIST_TMP) <- MOD_CLASS_LIST
 
-ALL_MODS_YAML_MD5 <- c("ee5a30a015c4e09bc29334188ff28b58", "9d689b937fb36e5c3e98e59053b59e73", "b65d8911e9f8007a743e7c93934ce88e", "793cf7a6a04ddcdfc3b6511466a690b3")
 
 #####################
 # utils.R constants
@@ -141,6 +146,25 @@ create_all_models <- function() {
   assign("mod2", mod2, pos = parent.frame())
   assign("mod3", mod3, pos = parent.frame())
   assign("mod4", mod4, pos = parent.frame())
+}
+
+copy_all_output_dirs <- function() {
+  if (!fs::dir_exists(LEVEL2_DIR)) { fs::dir_create(LEVEL2_DIR) }
+  fs::dir_copy(MOD1_PATH, NEW_MOD2)
+  fs::dir_copy(MOD1_PATH, NEW_MOD3)
+  fs::dir_copy(MOD1_PATH, LEVEL2_MOD)
+}
+
+create_rlg_models <- function() {
+  # copy models before creating run log
+  mod1 <- read_model(YAML_TEST_FILE)
+  copy_model_from(mod1, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
+  copy_model_from(mod1,
+                  NEW_MOD3,
+                  NEW_DESC,
+                  .based_on_additional = get_model_id(NEW_MOD2),
+                  .inherit_tags = TRUE,
+                  .update_model_file = FALSE)
 }
 
 cleanup <- function() {

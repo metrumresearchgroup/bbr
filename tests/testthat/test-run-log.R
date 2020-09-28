@@ -2,15 +2,7 @@ context("Constructing run log from model yaml")
 
 setup({
   cleanup()
-
-  # copy models before creating run log
-  copy_model_from(MOD1, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
-  copy_model_from(MOD1,
-                  NEW_MOD3,
-                  NEW_DESC,
-                  .based_on_additional = get_model_id(NEW_MOD2),
-                  .inherit_tags = TRUE,
-                  .update_model_file = FALSE)
+  create_rlg_models()
 })
 
 teardown({ cleanup() })
@@ -38,7 +30,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_equal(ncol(log_df), RUN_LOG_COLS)
     expect_identical(basename(log_df[[ABS_MOD_PATH]]), c("1", "2", "3"))
     expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS))
-    expect_identical(log_df$yaml_md5, c("ee5a30a015c4e09bc29334188ff28b58", "5576ed6fa6e1e4e9b0c25dbf62ae42e5", "ebadcc4a3c0f4d16f61251605136942b"))
+    expect_identical(log_df$yaml_md5, RUN_LOG_YAML_MD5)
     expect_identical(log_df$based_on, list(NULL, "1", c("1", "2")))
 
     # check log_df class
@@ -76,7 +68,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_equal(nrow(log_df), RUN_LOG_ROWS+1)
     expect_equal(ncol(log_df), RUN_LOG_COLS)
     expect_identical(basename(log_df[[ABS_MOD_PATH]]), c("1", "2", "3", "4"))
-    expect_identical(log_df$yaml_md5, c("ee5a30a015c4e09bc29334188ff28b58", "5576ed6fa6e1e4e9b0c25dbf62ae42e5", "ebadcc4a3c0f4d16f61251605136942b", "ee5a30a015c4e09bc29334188ff28b58"))
+    expect_identical(log_df$yaml_md5, c(RUN_LOG_YAML_MD5, MOD1_YAML_MD5))
 
     fs::file_delete(fake_yml)
 
@@ -87,6 +79,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   ##########################################
 
   # copy model 1 to level deeper
+  # TODO: consider unifying this (and the same thing on line 63 of test-config-log.R) with the other create_ functions in setup-workflow-ref.R
   fs::dir_create(LEVEL2_DIR)
   copy_model_from(MOD1, LEVEL2_MOD, "level 2 copy of 1.yaml", .inherit_tags = TRUE)
   fs::dir_copy(MOD1_PATH, LEVEL2_MOD)
@@ -98,7 +91,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_false(any(duplicated(log_df[[ABS_MOD_PATH]])))
     expect_identical(basename(log_df[[ABS_MOD_PATH]]), c("1", "2", "3", "1"))
     expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS, ORIG_TAGS))
-    expect_identical(log_df$yaml_md5, c("ee5a30a015c4e09bc29334188ff28b58", "5576ed6fa6e1e4e9b0c25dbf62ae42e5", "ebadcc4a3c0f4d16f61251605136942b", "6132d34ba27caf3460d23c9b4a3937d9"))
+    expect_identical(log_df$yaml_md5, c(RUN_LOG_YAML_MD5, MOD_LEVEL2_MD5))
     expect_identical(log_df$based_on, list(NULL, "1", c("1", "2"), "../1"))
   })
 
