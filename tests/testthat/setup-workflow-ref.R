@@ -157,8 +157,9 @@ copy_all_output_dirs <- function() {
 
 create_rlg_models <- function() {
   # copy models before creating run log
-  copy_model_from(YAML_TEST_FILE, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
-  copy_model_from(YAML_TEST_FILE,
+  mod1 <- read_model(YAML_TEST_FILE)
+  copy_model_from(mod1, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
+  copy_model_from(mod1,
                   NEW_MOD3,
                   NEW_DESC,
                   .based_on_additional = get_model_id(NEW_MOD2),
