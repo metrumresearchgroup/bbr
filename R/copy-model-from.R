@@ -92,7 +92,7 @@ copy_model_from.bbi_nonmem_model <- function(
 #' @param .parent_mod S3 object of class `bbi_nonmem_model` to be used as the basis for copy.
 #' @param .description Description of new model run. This will be stored in the yaml (to be used later in `run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.
 #' @param .update_model_file If `TRUE`, the default, update the `$PROBLEM` line in the new control stream. If `FALSE`, `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.
-#' @importFrom fs file_copy path_rel
+#' @importFrom fs file_copy path_rel is_absolute_path
 #' @importFrom readr read_file write_file
 #' @importFrom stringr str_replace
 #' @importFrom yaml write_yaml
@@ -122,58 +122,36 @@ copy_nonmem_model_from <- function(
   # check parent against YAML
   check_yaml_in_sync(.parent_mod)
 
-  # build new model object
-  .new_mod <- list()
-  .new_mod[[YAML_DESCRIPTION]] <- .description
+  # build based_on
+  if(!fs::is_absolute_path(.new_model)) {
+    stop(".new_model argument to copy_nonmem_model_from() must be absolute. USER SHOULD NOT SEE THIS ERROR.")
+  }
+  .parent_based_on <- fs::path_rel(get_model_path(.parent_mod), start = dirname(.new_model))
 
-  # reset model working directory and yaml path
-  .new_mod[[WORKING_DIR]] <- normalizePath(dirname(.new_model))
-  .new_mod[[YAML_YAML_NAME]] <- basename(yaml_ext(.new_model))
-
-  # fill output directory
-  .new_mod[[YAML_OUT_DIR]] <- basename(tools::file_path_sans_ext(.new_model))
-
-  # fill based_on
-  .parent_based_on <- fs::path_rel(get_model_path(.parent_mod), start = .new_mod[[WORKING_DIR]])
-  .new_mod[[YAML_BASED_ON]] <- safe_based_on(.new_mod[[WORKING_DIR]], c(.parent_based_on, .based_on_additional))
-
-  # pass through model type and bbi_args
-  .new_mod[[YAML_MOD_TYPE]] <- .parent_mod[[YAML_MOD_TYPE]]
-  .new_mod[[YAML_BBI_ARGS]] <- .parent_mod[[YAML_BBI_ARGS]]
-
-  # fill tags
+  # build tags
   if (.inherit_tags && !is.null(.parent_mod[[YAML_TAGS]])) {
-    .new_mod[[YAML_TAGS]] <- .parent_mod[[YAML_TAGS]] %>% c(.add_tags)
+    new_tags <- c(.parent_mod[[YAML_TAGS]], .add_tags)
   } else {
-    .new_mod[[YAML_TAGS]] <- .add_tags
+    new_tags <- .add_tags
   }
-
-  # build new model path
-  .file_ext <- tools::file_ext(.parent_mod[[YAML_MOD_PATH]])
-  if (.file_ext == "mod") {
-    new_mod_path <- mod_ext(.new_model)
-  } else if (.file_ext == "ctl") {
-    new_mod_path <- ctl_ext(.new_model)
-  } else {
-    stop(glue("copy_nonmem_model_from() requires a model object with a `{YAML_MOD_PATH}` pointing to either a .ctl or .mod file. Got `{YAML_MOD_PATH} = {.parent_mod[[YAML_MOD_PATH]]}`"))
-  }
-  .new_mod[[YAML_MOD_PATH]] <- basename(new_mod_path) # path should be relative to YAML location
 
   # copy control steam to new path
   .parent_model_path <- get_model_path(.parent_mod)
   parent_ext <- fs::path_ext(.parent_model_path)
   .new_model_path <- fs::path_ext_set(.new_model, parent_ext)
+  copy_control_stream(.parent_model_path, .new_model_path, .overwrite, .update_model_file, .description)
 
-  if (fs::file_exists(.new_model_path) && !isTRUE(.overwrite)) {
-    # if .overwrite != TRUE, warn that file already exists
-    stop(glue("File already exists at {.new_model_path} -- cannot copy new control stream. Either delete old file or use `new_model({yaml_ext(.new_model_path)})`"))
-  }
-
-  # copy control stream file to new location, optionally updating it
-  copy_control_stream(.parent_model_path, .new_model_path, .update_model_file, .description)
-
-  # make list into S3 object
-  .new_mod <- create_model_object(.new_mod, save_yaml = TRUE)
+  # create new model
+  .new_mod <- new_model(
+    .yaml_path = yaml_ext(.new_model),
+    .description = .description,
+    .based_on = c(.parent_based_on, .based_on_additional),
+    .tags = new_tags,
+    .bbi_args = .parent_mod[[YAML_BBI_ARGS]],
+    .overwrite = .overwrite,
+    .model_type = "nonmem",
+    .directory = NULL
+  )
 
   return(.new_mod)
 }
@@ -185,10 +163,16 @@ copy_nonmem_model_from <- function(
 #' Note that any file existing at `.new_model_path` will be overwritten.
 #' @param .parent_model_path Path to the control stream to copy
 #' @param .new_model_path Path to copy the new control stream to
+#' @param .overwrite If `TRUE`, overwrite existing file at `.new_model_path`. If `FALSE` and file exists at `.new_model_path` error.
 #' @param .update_model_file If `TRUE`, the default, update the `$PROBLEM` line in the new control stream. If `FALSE`, `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.
 #' @param .description Description of new model run. This will be passed into the `$PROBLEM` of the new control stream (if `.update_model_file=TRUE`).
 #' @keywords internal
-copy_control_stream <- function(.parent_model_path, .new_model_path, .update_model_file = FALSE, .description = NULL) {
+copy_control_stream <- function(.parent_model_path, .new_model_path, .overwrite, .update_model_file = FALSE, .description = NULL) {
+
+  if (fs::file_exists(.new_model_path) && !isTRUE(.overwrite)) {
+    stop(glue("File already exists at {.new_model_path} -- cannot copy new control stream. Either delete old file or use `new_model({yaml_ext(.new_model_path)})`"))
+  }
+
   if (.update_model_file) {
     if (is.null(.description)) {
       stop("If `.update_model_file` is TRUE, user must specify a `.description` for the new model.")
