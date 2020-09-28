@@ -94,9 +94,10 @@ get_yaml_path.bbi_log_df <- function(.bbi_object, .check_exists = TRUE) {
 #' @param .log_df The `bbi_log_df` object
 #' @param .get_func The getter function to call
 #' @inheritParams get_path_from_object
+#' @importFrom purrr map_chr
 #' @keywords internal
 get_path_from_log_df <- function(.log_df, .get_func, .check_exists) {
-  .out_paths <- map(.log_df[[ABS_MOD_PATH]], function(.path) {
+  .out_paths <- map_chr(.log_df[[ABS_MOD_PATH]], function(.path) {
     .mod <- read_model(.path)
     .get_func(.mod, .check_exists = .check_exists)
   })

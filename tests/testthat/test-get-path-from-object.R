@@ -23,7 +23,18 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
 
-  #### add log_df tests
+  # TODO: consider adding a test for logs with more than one model
+  test_that("get_model_path() works with bbi_*_log_df", {
+    expect_identical(get_model_path(run_log(MODEL_DIR)), normalizePath(CTL_TEST_FILE))
+  })
+
+  test_that("get_output_dir() works with bbi_*_log_df", {
+    expect_identical(get_output_dir(run_log(MODEL_DIR)), normalizePath(OUTPUT_DIR))
+  })
+
+  test_that("get_yaml_path() works with bbi_*_log_df", {
+    expect_identical(get_yaml_path(run_log(MODEL_DIR)), normalizePath(YAML_TEST_FILE))
+  })
 
   ##################
   # other functions
