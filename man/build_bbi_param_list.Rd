@@ -2,16 +2,25 @@
 % Please edit documentation in R/utils.R
 \name{build_bbi_param_list}
 \alias{build_bbi_param_list}
-\title{Builds list of unique parameter sets for multiple model bbi calls}
+\title{Group models for bbi submission}
 \usage{
 build_bbi_param_list(.mods, .bbi_args = NULL)
 }
 \arguments{
-\item{.mods}{a list containing only \verb{bbi_\{.model_type\}_model} objects}
+\item{.mods}{A list of S3 objects of class \code{bbi_nonmem_model}}
 
-\item{.bbi_args}{A named list specifying arguments to pass to babylon. This will over-ride any shared arguments from the model objects.}
+\item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}. Run \code{\link[=print_bbi_args]{print_bbi_args()}} to see valid arguments.}
+}
+\value{
+A list whose elements correspond to groups of models that can be
+submitted in a single bbi call. Each element is itself a list with elements
+\itemize{
+\item \code{bbi_args}: a set of CLI arguments
+\item \code{models}: a list of the elements of \code{.mods} in the group
+}
 }
 \description{
-Builds list of unique parameter sets for multiple model bbi calls
+Multiple models can be submitted in a single bbi call if those models share a
+working directory and a set of CLI arguments.
 }
 \keyword{internal}

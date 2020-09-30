@@ -86,6 +86,7 @@ submit_models.list <- function(
 #'
 #' Private implementation function called by `submit_models()` dispatches.
 #' @param .mods A list of S3 objects of class `bbi_nonmem_model`
+#' @inheritParams submit_models
 #' @importFrom stringr str_detect
 #' @importFrom tools file_path_sans_ext
 #' @importFrom purrr map
@@ -115,12 +116,18 @@ submit_nonmem_models <- function(.mods,
   # get unique sets of params
   param_list <- build_bbi_param_list(.mods, .bbi_args)
 
-  # build command line args
+  # a .run is a group of models that can be passed in a single bbi call
   cmd_args_list <- map(param_list, function(.run) {
-    cmd_args <- c("nonmem", "run", .mode, .run[[YAML_MOD_PATH]], .run[[YAML_BBI_ARGS]])
+    cmd_args <- c(
+      "nonmem",
+      "run",
+      .mode,
+      purrr::map_chr(.run[["models"]], get_model_path),
+      .run[["bbi_args"]]
+    )
 
-    # define working directory
-    model_dir <- .run[[WORKING_DIR]]
+    # TODO: change this once we have the helper
+    model_dir <- .run[["models"]][[1]][[WORKING_DIR]]
 
     # check for babylon.yaml config
     .config_path <- find_config_file_path(.config_path, model_dir)

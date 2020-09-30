@@ -106,40 +106,69 @@ format_cmd_args <- function(.args, .collapse = FALSE) {
   }
 }
 
-#' Builds list of unique parameter sets for multiple model bbi calls
-#' @importFrom purrr map_lgl
-#' @param .mods a list containing only `bbi_{.model_type}_model` objects
-#' @param .bbi_args A named list specifying arguments to pass to babylon. This will over-ride any shared arguments from the model objects.
+#' Group models for bbi submission
+#'
+#' Multiple models can be submitted in a single bbi call if those models share a
+#' working directory and a set of CLI arguments.
+#'
+#' @inheritParams submit_nonmem_models
+#'
+#' @return A list whose elements correspond to groups of models that can be
+#'   submitted in a single bbi call. Each element is itself a list with elements
+#'
+#'   * `bbi_args`: a set of CLI arguments
+#'
+#'   * `models`: a list of the elements of `.mods` in the group
+#'
 #' @keywords internal
 build_bbi_param_list <- function(.mods, .bbi_args = NULL) {
 
   # check that everything in list is a model object
   check_model_object_list(.mods)
 
-  # build list of unique arg sets
-  param_list <- list()
-  for (.mod in .mods) {
-    # extract babylon args vector and working directory, then get md5 hash
-    args_vec <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]]) %>% check_bbi_args() %>% sort()
-    model_dir <- .mod[[WORKING_DIR]]
-    arg_md5 <- c(args_vec, model_dir) %>% digest(algo = "md5")
+  # character vector whose elements correspond to `.mods` and are strings
+  # representing the CLI args to bbi for the corresponding model
+  all_mod_args <-
+    .mods %>%
+    # TODO: consider whether this should be abstracted
+    purrr::map(YAML_BBI_ARGS) %>%
+    # `parse_args_list()` will return an empty list if both are `NULL`
+    purrr::map(~ parse_args_list(.bbi_args, .)) %>%
+    purrr::map(check_bbi_args) %>%
+    purrr::map(sort)
 
-    if (is.null(param_list[[arg_md5]])) {
-      # create list for this arg set
-      param_list[[arg_md5]] <- list()
+  mod_working_dirs <-
+    .mods %>%
+    # TODO: change this once we have the helper
+    purrr::map(WORKING_DIR) %>%
+    purrr::map_chr(dirname)
 
-      # add args vector and working directory
-      param_list[[arg_md5]][[YAML_BBI_ARGS]] <- args_vec
-      param_list[[arg_md5]][[WORKING_DIR]] <- model_dir
+  mod_keys <- purrr::map2(
+    all_mod_args,
+    mod_working_dirs,
+    c
+  )
+
+  purrr::map(
+    unique(mod_keys),
+    ~ {
+      key_idx <- purrr::map_lgl(mod_keys, identical, .)
+      key <- mod_keys[key_idx][[1L]]
+      # `key` can be of variable length, but the directory is always last
+      dir_idx <- length(key)
+      args <- key[-dir_idx]
+      keep_mod_idx <- purrr::map2_lgl(
+        all_mod_args,
+        mod_working_dirs,
+        ~ identical(.x, args) && identical(.y, key[dir_idx])
+      )
+      list(
+        bbi_args = args,
+        models = .mods[keep_mod_idx]
+      )
     }
-
-    # append model path
-    param_list[[arg_md5]][[YAML_MOD_PATH]] <- c(param_list[[arg_md5]][[YAML_MOD_PATH]], .mod[[YAML_MOD_PATH]])
-  }
-
-  return(param_list)
+  )
 }
-
 
 #' Combines NONMEM args that were passed into the function call with args that were parsed from a model yaml
 #' @param .func_args A named list of arguments for bbi, passed into submit_model function call

@@ -11,6 +11,12 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
   readr::write_file("created_by: test-submit-models", file.path(MODEL_DIR, "babylon.yaml"))
   on.exit({ fs::file_delete(file.path(MODEL_DIR, "babylon.yaml")) })
 
+  model_dir <- file.path(getwd(), MODEL_DIR)
+  mod_ctl_path <- purrr::map_chr(
+    as.character(1:3),
+    ~ file.path(model_dir, fs::path_ext_set(., "ctl"))
+  )
+
   test_that("submit_models(.dry_run=T) with list input simple",
             {
               # copy to two new models
@@ -30,7 +36,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
               # check call
               expect_identical(
                 proc_list[[1]][[PROC_CALL]],
-                as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {CTL_FILENAME} 2.ctl 3.ctl --overwrite --threads=4"))
+                as.character(glue("cd {model_dir} ; bbi nonmem run sge {paste(mod_ctl_path, collapse = ' ')} --overwrite --threads=4"))
               )
             })
 
@@ -53,13 +59,46 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
               # check each call
               expect_identical(
                 proc_list[[1]][[PROC_CALL]],
-                as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge {CTL_FILENAME} 2.ctl --overwrite --threads=1"))
+                as.character(
+                  glue(
+                    "cd {model_dir} ; bbi nonmem run sge {mod_ctl_path[1]} {mod_ctl_path[2]} --overwrite --threads=1"
+                  )
+                )
               )
               expect_identical(
                 proc_list[[2]][[PROC_CALL]],
-                as.character(glue("cd {file.path(getwd(), MODEL_DIR)} ; bbi nonmem run sge 3.ctl --clean_lvl=2 --overwrite --threads=1"))
+                as.character(
+                  glue("cd {model_dir} ; bbi nonmem run sge {mod_ctl_path[3]} --clean_lvl=2 --overwrite --threads=1"))
               )
             })
+
+  test_that("submit_models() works for models in different directories", {
+    new_dir <- "level2"
+    fs::dir_create(file.path(MODEL_DIR, new_dir))
+    on.exit(cleanup())
+
+    # TODO: use test helper functions, e.g., create_all_models(), once the
+    # model_directory option is deprecated
+    mod2 <- copy_model_from(
+      MOD1,
+      file.path(new_dir, CTL_FILENAME),
+      "created by test-submit-models.R"
+    )
+    proc_list <- submit_models(list(MOD1, mod2), .dry_run = TRUE)
+
+    expect_equal(length(proc_list), 2L)
+
+    # should not generate a --config
+    expect_false(grepl("--config", proc_list[[1L]][["call"]], fixed = TRUE))
+
+    expect_true(
+      grepl(
+        "--config=../babylon.yaml",
+        proc_list[[2L]][["call"]],
+        fixed = TRUE
+      )
+    )
+  })
 
   test_that("submit_models(.dry_run=T) errors with bad input",
             {
@@ -87,6 +126,5 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
                 regexp = "must contain all the same type of models"
               )
             })
-
 }) # closing withr::with_options
 
