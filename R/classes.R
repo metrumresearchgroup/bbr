@@ -8,6 +8,7 @@ NULL
 #' @param res List to attempt to assign the class to
 #' @param save_yaml Logical scalar for whether to save the newly created model object to its corresponding YAML file and update the md5 hash.
 #' @importFrom fs path_rel
+#' @importFrom rlang %||%
 #' @keywords internal
 create_model_object <- function(res, save_yaml) {
 
