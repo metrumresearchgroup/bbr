@@ -61,6 +61,32 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
               )
             })
 
+  test_that("submit_models() works for models in different directories", {
+    new_dir <- "level2"
+    fs::dir_create(file.path(MODEL_DIR, new_dir))
+    on.exit(cleanup())
+
+    mod2 <- copy_model_from(
+      MOD1,
+      file.path(new_dir, CTL_FILENAME),
+      "created by test-submit-models.R"
+    )
+    proc_list <- submit_models(list(MOD1, mod2), .dry_run = TRUE)
+
+    expect_equal(length(proc_list), 2L)
+
+    # should not generate a --config
+    expect_false(grepl("--config", proc_list[[1L]][["call"]], fixed = TRUE))
+
+    expect_true(
+      grepl(
+        "--config=../babylon.yaml",
+        proc_list[[2L]][["call"]],
+        fixed = TRUE
+      )
+    )
+  })
+
   test_that("submit_models(.dry_run=T) errors with bad input",
             {
               # copy to two new models
@@ -87,6 +113,5 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
                 regexp = "must contain all the same type of models"
               )
             })
-
 }) # closing withr::with_options
 
