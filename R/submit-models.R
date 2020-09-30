@@ -86,6 +86,7 @@ submit_models.list <- function(
 #'
 #' Private implementation function called by `submit_models()` dispatches.
 #' @param .mods A list of S3 objects of class `bbi_nonmem_model`
+#' @inheritParams submit_models
 #' @importFrom stringr str_detect
 #' @importFrom tools file_path_sans_ext
 #' @importFrom purrr map

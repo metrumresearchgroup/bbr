@@ -16,6 +16,18 @@ submit_nonmem_models(
 }
 \arguments{
 \item{.mods}{A list of S3 objects of class \code{bbi_nonmem_model}}
+
+\item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}. Run \code{\link[=print_bbi_args]{print_bbi_args()}} to see valid arguments.}
+
+\item{.mode}{Either \code{"sge"}, the default, to submit model(s) to the grid or \code{"local"} for local execution.}
+
+\item{...}{args passed through to \code{bbi_exec()}}
+
+\item{.config_path}{Optionally specify a path to a babylon.yml config. If not specified, the config in the model directory will be used by default. Path MUST be either an absolute path or relative to the model directory.}
+
+\item{.wait}{If \code{TRUE}, the default, wait for the bbi process to return before this function call returns. If \code{FALSE} function will return while bbi process runs in the background.}
+
+\item{.dry_run}{Returns an object detailing the command that would be run, insted of running it. This is primarily for testing but also a debugging tool.}
 }
 \value{
 A list of S3 objects of class \code{babylon_process}
