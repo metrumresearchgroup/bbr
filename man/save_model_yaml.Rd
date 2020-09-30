@@ -10,9 +10,10 @@ save_model_yaml(.mod)
 \item{.mod}{S3 object of class \verb{bbi_\{.model_type\}_model}}
 }
 \value{
-Output list as specified above.
+The input \verb{bbi_\{.model_type\}_model} object, with its YAML md5 hash updated.
 }
 \description{
-Saves a model object to a yaml file
+Saves the passed model object to its YAML file and updates
+the md5 hash after saving.
 }
 \keyword{internal}
