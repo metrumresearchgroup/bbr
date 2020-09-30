@@ -77,6 +77,8 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
     fs::dir_create(file.path(MODEL_DIR, new_dir))
     on.exit(cleanup())
 
+    # TODO: use test helper functions, e.g., create_all_models(), once the
+    # model_directory option is deprecated
     mod2 <- copy_model_from(
       MOD1,
       file.path(new_dir, CTL_FILENAME),
