@@ -20,9 +20,7 @@ get_model_path <- function(.bbi_object, .check_exists = TRUE) {
 #' @rdname get_path_from_object
 #' @export
 get_model_path.bbi_nonmem_model <- function(.bbi_object, .check_exists = TRUE) {
-
-  #.path <- find_model_file_path(.bbi_object[[ABS_MOD_PATH]])
-  .path <- file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_MOD_PATH]])
+  .path <- find_model_file_path(.bbi_object[[ABS_MOD_PATH]])
 
   if(isTRUE(.check_exists)) {
     checkmate::assert_file_exists(.path)
@@ -47,9 +45,7 @@ get_output_dir <- function(.bbi_object, .check_exists = TRUE) {
 #' @rdname get_path_from_object
 #' @export
 get_output_dir.bbi_nonmem_model <- function(.bbi_object, .check_exists = TRUE) {
-
-  #.path <- .bbi_object[[ABS_MOD_PATH]]
-  .path <- file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_OUT_DIR]])
+  .path <- .bbi_object[[ABS_MOD_PATH]]
 
   if(isTRUE(.check_exists)) {
     checkmate::assert_directory_exists(.path)
@@ -73,9 +69,7 @@ get_yaml_path <- function(.bbi_object, .check_exists = TRUE) {
 #' @rdname get_path_from_object
 #' @export
 get_yaml_path.bbi_nonmem_model <- function(.bbi_object, .check_exists = TRUE) {
-
-  #.path <- yaml_ext(.bbi_object[[ABS_MOD_PATH]])
-  .path <- file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_YAML_NAME]])
+  .path <- yaml_ext(.bbi_object[[ABS_MOD_PATH]])
 
   if(isTRUE(.check_exists)) {
     checkmate::assert_file_exists(.path)
@@ -102,6 +96,19 @@ get_path_from_log_df <- function(.log_df, .get_func, .check_exists) {
     .get_func(.mod, .check_exists = .check_exists)
   })
   return(.out_paths)
+}
+
+#' Get the working directory of a model object
+#'
+#' The working directory of a model object is the parent directory of the
+#' absolute model path.
+#'
+#' @param .mod A model object.
+#'
+#' @return The path to the working directory.
+#' @keywords internal
+get_model_working_directory <- function(.mod) {
+  dirname(.mod[[ABS_MOD_PATH]])
 }
 
 ###############################
