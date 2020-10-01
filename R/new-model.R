@@ -33,9 +33,10 @@ new_model <- function(
   .directory = get_model_directory()
 ) {
 
-  if (!is_valid_yaml_extension(.yaml_path)) {
-    warning(glue("Did not pass a YAML extension to .yaml_path. Inferred path `{yaml_ext(.yaml_path)}` from `{.yaml_path}`"))
-    .yaml_path <- yaml_ext(.yaml_path)
+  # TODO: update once numeric "dispatch" is formally deprecated
+  if (fs::path_ext(as.character(.yaml_path)) != "yaml") {
+      warning(glue("Did not pass a YAML extension to .yaml_path. Inferred path `{yaml_ext(.yaml_path)}` from `{.yaml_path}`"))
+      .yaml_path <- yaml_ext(.yaml_path)
   }
 
   # check for .directory and combine with .yaml_path
