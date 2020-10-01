@@ -186,7 +186,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
     # make a new yaml
     new_yaml <- yaml_ext(NEW_MOD2)
-    #new_yaml <- paste0(NEW_MOD2, '.yml') # change back to this once I fix yaml_ext i.e. line 86 of new-model.R
     fs::file_copy(YAML_TEST_FILE, new_yaml)
 
     # make a spec from it

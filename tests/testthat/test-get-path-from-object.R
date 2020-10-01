@@ -66,7 +66,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   test_that("is_valid_yaml_extension() works", {
     expect_true(is_valid_yaml_extension(YAML_TEST_FILE))
     expect_true(is_valid_yaml_extension("naw.yaml"))
-    expect_true(is_valid_yaml_extension("naw.yml"))
     expect_false(is_valid_yaml_extension(MOD_TEST_FILE))
   })
 
