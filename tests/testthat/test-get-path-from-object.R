@@ -110,14 +110,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_identical(find_model_file_path(MOD_TEST_FILE), CTL_TEST_FILE)
   })
 
-  test_that("find_model_file_path returns ctl path when no path found", {
-    mod_file <- "data/1.mod"
-    expect_identical(
-      suppressSpecificWarning(find_model_file_path(mod_file), .regexpr = "No model file found"),
-      ctl_ext(mod_file)
-    )
-  })
-
   test_that("find_model_file_path returns mod path when only path found", {
     mod_file <- "data/1.mod"
     withr::with_file(mod_file, {

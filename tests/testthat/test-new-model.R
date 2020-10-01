@@ -27,14 +27,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_error(read_model("test-yaml/zz_fail_bad_modpath.yaml"), regexp = "must have either a .ctl or .mod extension")
   })
 
-  test_that("yaml with no model path will return ctl", {
-    .test_path <- "test-yaml/zz_pass_no_modpath"
-    suppressSpecificWarning({
-      .spec <- read_model(yaml_ext(.test_path))
-    }, .regexpr = "No model file found at.+\\.ctl")
-    expect_identical(.spec[[YAML_MOD_PATH]], basename(ctl_ext(.test_path)))
-  })
-
   test_that("new_model() creates new YAML file", {
     .test_path <- "model-examples/tmp.yaml"
     on.exit({ fs::file_delete(.test_path) })
