@@ -49,8 +49,6 @@ SUM_LOG_CLASS <- "bbi_summary_log_df"
 LOG_DF_CLASS <- "bbi_log_df"
 
 # YAML keys that are hard-coded
-YAML_MOD_PATH <- "model_path"
-YAML_YAML_NAME <- "orig_yaml_file"
 YAML_YAML_MD5 <- "yaml_md5"
 YAML_DESCRIPTION <- "description"
 YAML_BASED_ON <- "based_on"
@@ -58,20 +56,17 @@ YAML_TAGS <- "tags"
 YAML_DECISIONS <- "decisions"
 YAML_BBI_ARGS <- "bbi_args"
 YAML_MOD_TYPE <- "model_type"
-YAML_OUT_DIR <- "output_dir"
 
 YAML_REQ_INPUT_KEYS <- c(
   YAML_MOD_TYPE,
   YAML_DESCRIPTION
 )
 
-WORKING_DIR <- "model_working_dir"
 ABS_MOD_PATH <- "absolute_model_path"
 
 # keys required to create a model object
 MODEL_REQ_INPUT_KEYS <- c(
   ABS_MOD_PATH,
-  WORKING_DIR,
   YAML_MOD_TYPE,
   YAML_DESCRIPTION
 )
@@ -79,16 +74,11 @@ MODEL_REQ_INPUT_KEYS <- c(
 # keys required for a model object to have
 MODEL_REQ_KEYS <- c(
   ABS_MOD_PATH,
-  WORKING_DIR,
-  YAML_YAML_NAME,
   YAML_YAML_MD5,
   YAML_MOD_TYPE,
   YAML_DESCRIPTION,
-  YAML_MOD_PATH,
-  YAML_BBI_ARGS,
-  YAML_OUT_DIR
+  YAML_BBI_ARGS
 )
-
 
 # columns required for a run log df
 RUN_LOG_REQ_COLS <- c(
@@ -106,10 +96,6 @@ RUN_LOG_REQ_COLS <- c(
 # keys that get erased when saving a model YAML on disk
 YAML_ERASE_OUT_KEYS <- c(
   ABS_MOD_PATH,
-  WORKING_DIR,
-  YAML_YAML_NAME,
-  YAML_MOD_PATH,
-  YAML_OUT_DIR,
   YAML_YAML_MD5
 )
 
