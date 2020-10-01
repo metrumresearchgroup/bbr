@@ -150,13 +150,6 @@ yaml_ext <- function(.x) {
   sprintf("%s.yaml", tools::file_path_sans_ext(.x))
 }
 
-#' @rdname new_ext
-#' @export
-yml_ext <- function(.x) {
-  sprintf("%s.yml", tools::file_path_sans_ext(.x))
-}
-
-
 ###################################
 # Other Assorted file path helpers
 ###################################
