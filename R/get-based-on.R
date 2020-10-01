@@ -35,7 +35,7 @@ get_based_on <- function(.bbi_object, .check_exists = FALSE) {
 #' @export
 get_based_on.default <- function(.bbi_object, .check_exists = FALSE) {
 
-  # do some QA on the required WORKING_DIR field
+  # do some QA on the required ABS_MOD_PATH field
   if (is.null(.bbi_object[[ABS_MOD_PATH]])) {
     stop_get_fail_msg(
       .bbi_object,
