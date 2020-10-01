@@ -70,6 +70,7 @@ ABS_MOD_PATH <- "absolute_model_path"
 
 # keys required to create a model object
 MODEL_REQ_INPUT_KEYS <- c(
+  ABS_MOD_PATH,
   WORKING_DIR,
   YAML_MOD_TYPE,
   YAML_DESCRIPTION
@@ -77,6 +78,7 @@ MODEL_REQ_INPUT_KEYS <- c(
 
 # keys required for a model object to have
 MODEL_REQ_KEYS <- c(
+  ABS_MOD_PATH,
   WORKING_DIR,
   YAML_YAML_NAME,
   YAML_YAML_MD5,
@@ -103,6 +105,7 @@ RUN_LOG_REQ_COLS <- c(
 
 # keys that get erased when saving a model YAML on disk
 YAML_ERASE_OUT_KEYS <- c(
+  ABS_MOD_PATH,
   WORKING_DIR,
   YAML_YAML_NAME,
   YAML_MOD_PATH,

@@ -4,6 +4,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
   # these will be deprecated by the end of this PR, so don't check them
   bad_keys <- c(
+    ABS_MOD_PATH,
     WORKING_DIR,
     YAML_MOD_PATH,
     YAML_OUT_DIR,

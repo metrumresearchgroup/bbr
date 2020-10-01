@@ -93,6 +93,7 @@ REF_LIST_1 <- list(
   bbi_args = list(
     overwrite = TRUE,
     threads = 4L),
+  absolute_model_path = file.path(getwd(), "model-examples", "1"),
   model_working_dir = file.path(getwd(), "model-examples"),
   orig_yaml_file ="1.yaml",
   yaml_md5 = MOD1_YAML_MD5,
@@ -109,6 +110,7 @@ REF_LIST_TMP <- list(
   bbi_args = list(
     overwrite = TRUE,
     threads = 4L),
+  absolute_model_path = file.path(getwd(), "model-examples", "tmp"),
   model_working_dir = file.path(getwd(), "model-examples"),
   orig_yaml_file ="temp.yaml",
   yaml_md5 = MOD1_YAML_MD5,

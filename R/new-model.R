@@ -48,8 +48,12 @@ new_model <- function(
                "Either call `read_model()` to load model from YAML or use `new_model(.overwrite = TRUE)` to overwrite the existing YAML."))
   }
 
+  model_working_directory <- normalizePath(dirname(.yaml_path))
+  model_id <- get_model_id(.yaml_path)
+
   # fill list from passed args
   .mod <- list()
+  .mod[[ABS_MOD_PATH]] <- file.path(model_working_directory, model_id)
   .mod[[WORKING_DIR]] <- normalizePath(dirname(.yaml_path))
   .mod[[YAML_YAML_NAME]] <- basename(.yaml_path)
   .mod[[YAML_DESCRIPTION]] <- .description
@@ -89,8 +93,12 @@ read_model <- function(
   .path <- yaml_ext(.path)
   checkmate::assert_file_exists(.path)
 
+  model_working_directory <- normalizePath(dirname(.path))
+  model_id <- get_model_id(.path)
+
   # load from file
   yaml_list <- read_yaml(.path)
+  yaml_list[[ABS_MOD_PATH]] <- file.path(model_working_directory, model_id)
   yaml_list[[WORKING_DIR]] <- normalizePath(dirname(.path))
   yaml_list[[YAML_YAML_NAME]] <- basename(.path)
   yaml_list[[YAML_YAML_MD5]] <- digest(file = .path, algo = "md5")
