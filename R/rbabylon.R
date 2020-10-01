@@ -219,22 +219,35 @@ bbi_help <- function(.cmd_args=NULL) {
 
 #' Initialize babylon
 #'
-#' Executes `bbi init ...` in specified directory. This creates a `babylon.yml` file, which contains defaults
-#' for many configurable `babylon` settings, in that directory.
+#' Executes `bbi init ...` in specified directory. This creates a `babylon.yaml`
+#' file, which contains defaults for many configurable `babylon` settings, in
+#' that directory.
 #'
-#' @details
-#' For `rbabylon` to make any calls out to `bbi` (for example in `submit_model()` or `model_summary()`) it must find a
-#' `babylon.yml` file in one of the following places:
-#'  * The directory specified in `options("rbabylon.model_directory")`
-#'  * The working directory, if `options("rbabylon.model_directory")` is `NULL`
-#'  * A path passed to the `.config_path` argument of the functions mentioned above
+#' @details For `rbabylon` to make any calls out to `bbi` (for example in
+#'   `submit_model()` or `model_summary()`) it must find a `babylon.yaml` file
+#'   in one of the following places:
 #'
-#' The recommended behavior is to set `options("rbabylon.model_directory")`, ideally in your `.Rprofile`,
-#' and then call `bbi_init(.dir = getOption("rbabylon.model_directory"), ...)`. This only has to be done once.
-#' @param .dir Path to directory to run `init` in (and put the resulting `babylon.yml` file)
+#'   * The directory specified in `options("rbabylon.model_directory")`
+#'
+#'   * The working directory, if `options("rbabylon.model_directory")` is `NULL`
+#'
+#'   * A path passed to the `.config_path` argument of the functions mentioned
+#'   above
+#'
+#'   The recommended behavior is to set `options("rbabylon.model_directory")`,
+#'   ideally in your `.Rprofile`, and then call `bbi_init(.dir =
+#'   getOption("rbabylon.model_directory"), ...)`. This only has to be done
+#'   once.
+#'
+#' @param .dir Path to directory to run `init` in (and put the resulting
+#'   `babylon.yaml` file)
 #' @param .nonmem_dir Path to directory with the NONMEM installation.
-#' @param .nonmem_version Character scalar for default version of NONMEM to use. If left NULL, function will exit and tell you which versions were found in `.nonmem_dir`
-#' @param .no_default_version If `TRUE`, force creation of babylon.yaml with **no default NONMEM version**. `FALSE` by default, and using `TRUE` is *not* encouraged.
+#' @param .nonmem_version Character scalar for default version of NONMEM to use.
+#'   If left NULL, function will exit and tell you which versions were found in
+#'   `.nonmem_dir`
+#' @param .no_default_version If `TRUE`, force creation of babylon.yaml with
+#'   **no default NONMEM version**. `FALSE` by default, and using `TRUE` is
+#'   *not* encouraged.
 #' @importFrom yaml read_yaml write_yaml
 #' @export
 bbi_init <- function(.dir, .nonmem_dir, .nonmem_version = NULL, .no_default_version = FALSE) {
