@@ -221,3 +221,22 @@ rep_missing <- function(x, i, len) {
   res[i] <- NA
   res
 }
+
+#' Create a temporary model
+#'
+#' It is useful to create a model file and YAML file that can be discarded.
+#'
+#' @param path The path to the YAML file to copy.
+#' @param mod_content A string giving the content of the model file.
+#' @param mod_ext The extension for the model file.
+#'
+#' @return The path to the temporary YAML file.
+create_temp_model <- function(path = YAML_TEST_FILE,
+                              mod_content = "foo",
+                              mod_ext = "ctl") {
+  # TODO: unlink these when done, probably need withr::defer()
+  tmp_yaml <- tempfile(fileext = ".yaml")
+  fs::file_copy(path, tmp_yaml)
+  readr::write_file(mod_content, fs::path_ext_set(tmp_yaml, mod_ext))
+  tmp_yaml
+}
