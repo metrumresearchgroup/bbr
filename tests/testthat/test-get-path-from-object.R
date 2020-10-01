@@ -66,7 +66,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   test_that("is_valid_yaml_extension() works", {
     expect_true(is_valid_yaml_extension(YAML_TEST_FILE))
     expect_true(is_valid_yaml_extension("naw.yaml"))
-    expect_true(is_valid_yaml_extension("naw.yml"))
     expect_false(is_valid_yaml_extension(MOD_TEST_FILE))
   })
 
@@ -125,30 +124,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
       readr::write_lines(c("naw", "dawg"), mod_file)
       expect_identical(find_model_file_path(mod_file), mod_file)
     })
-  })
-
-
-  test_that("find_yaml_file_path returns correct yaml path", {
-    expect_identical(find_yaml_file_path(YAML_TEST_FILE), YAML_TEST_FILE)
-  })
-
-  test_that("find_yaml_file_path returns correct yml path", {
-    new_yaml <- paste0(NEW_MOD2, '.yml')
-    fs::file_copy(YAML_TEST_FILE, new_yaml)
-    on.exit({ fs::file_delete(new_yaml) })
-    expect_identical(find_yaml_file_path(NEW_MOD2), new_yaml)
-
-  })
-
-  test_that("find_yaml_file_path errors when no file found", {
-    expect_error(find_yaml_file_path(NEW_MOD2), regexp = FIND_YAML_ERR_MSG)
-  })
-
-  test_that("find_yaml_file_path errors when two files found", {
-    new_yaml <- paste0(tools::file_path_sans_ext(YAML_TEST_FILE), ".yml")
-    fs::file_copy(YAML_TEST_FILE, new_yaml)
-    on.exit({ fs::file_delete(new_yaml) })
-    expect_error(find_yaml_file_path(YAML_TEST_FILE), regexp = "Files found at BOTH")
   })
 
   test_that("combine_directory_path() builds the expected path .directory", {

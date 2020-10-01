@@ -150,13 +150,6 @@ yaml_ext <- function(.x) {
   sprintf("%s.yaml", tools::file_path_sans_ext(.x))
 }
 
-#' @rdname new_ext
-#' @export
-yml_ext <- function(.x) {
-  sprintf("%s.yml", tools::file_path_sans_ext(.x))
-}
-
-
 ###################################
 # Other Assorted file path helpers
 ###################################
@@ -229,26 +222,3 @@ find_model_file_path <- function(.path) {
     return(.ctl_path)
   }
 }
-
-
-#' Private helper to find valid yaml file
-#' @param .path File path with any extension or no extension.
-#' Function will search for that path with either a .yaml or .yml extension and error if neither is found.
-#' Will also error if _both_ are found, because there cannot be two YAML files referring to the same model.
-#' @keywords internal
-find_yaml_file_path <- function(.path) {
-  .yml_path <- yml_ext(.path)
-  .yaml_path <- yaml_ext(.path)
-
-  .yaml_bool <- fs::file_exists(unique(c(.yml_path, .yaml_path)))
-
-  if (length(.yaml_bool) == 2 && all(.yaml_bool)) {
-    stop(glue("Files found at BOTH {.yml_path} AND {.yaml_path}. Cannot have two YAML files for a single model. Please confirm which is correct and delete the other."))
-  } else if(!any(.yaml_bool)) {
-    stop(glue("No file found at {.yml_path} OR {.yaml_path}"))
-  }
-
-  return(names(which(.yaml_bool)))
-
-}
-

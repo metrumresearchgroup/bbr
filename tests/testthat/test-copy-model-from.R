@@ -42,7 +42,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     on.exit({ cleanup() })
 
     # run copy_model_from
-    fs::file_copy(YAML_TEST_FILE, paste0(NEW_MOD2, '.yml'))
+    fs::file_copy(YAML_TEST_FILE, paste0(NEW_MOD2, '.yaml'))
     copy_model_from(MOD1,
                     NEW_MOD3,
                     NEW_DESC,

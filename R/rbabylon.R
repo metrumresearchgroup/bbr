@@ -187,10 +187,10 @@ check_status_code <- function(.status_code, .output, .cmd_args) {
   .custom_msg <- ""
   if (.status_code != 0) {
     if (str_detect(.output, NO_NONMEM_ERR_MSG)) {
-      .custom_msg <- "No version of NONMEM is specified. Either open the relevant `babylon.yml` and set a version of NONMEM to `default: true`, or pass a version of NONMEM to `.bbi_args=list(nm_version='some_version')`"
+      .custom_msg <- "No version of NONMEM is specified. Either open the relevant `babylon.yaml` and set a version of NONMEM to `default: true`, or pass a version of NONMEM to `.bbi_args=list(nm_version='some_version')`"
     }
     if (str_detect(.output, MOD_ALREADY_EXISTS_ERR_MSG)) {
-      .custom_msg <- "The target output directory already exists. Please pass `.bbi_args=list(overwrite=TRUE)` to your `submit_model()` call. You can also set `overwrite: true` in the model .yaml file or the babylon.yaml file."
+      .custom_msg <- "The target output directory already exists. Please pass `.bbi_args=list(overwrite=TRUE)` to your `submit_model()` call. You can also set `overwrite: true` in the model .yaml file or the `babylon.yaml` file."
     }
 
     err_msg <- paste0(
@@ -219,22 +219,35 @@ bbi_help <- function(.cmd_args=NULL) {
 
 #' Initialize babylon
 #'
-#' Executes `bbi init ...` in specified directory. This creates a `babylon.yml` file, which contains defaults
-#' for many configurable `babylon` settings, in that directory.
+#' Executes `bbi init ...` in specified directory. This creates a `babylon.yaml`
+#' file, which contains defaults for many configurable `babylon` settings, in
+#' that directory.
 #'
-#' @details
-#' For `rbabylon` to make any calls out to `bbi` (for example in `submit_model()` or `model_summary()`) it must find a
-#' `babylon.yml` file in one of the following places:
-#'  * The directory specified in `options("rbabylon.model_directory")`
-#'  * The working directory, if `options("rbabylon.model_directory")` is `NULL`
-#'  * A path passed to the `.config_path` argument of the functions mentioned above
+#' @details For `rbabylon` to make any calls out to `bbi` (for example in
+#'   `submit_model()` or `model_summary()`) it must find a `babylon.yaml` file
+#'   in one of the following places:
 #'
-#' The recommended behavior is to set `options("rbabylon.model_directory")`, ideally in your `.Rprofile`,
-#' and then call `bbi_init(.dir = getOption("rbabylon.model_directory"), ...)`. This only has to be done once.
-#' @param .dir Path to directory to run `init` in (and put the resulting `babylon.yml` file)
+#'   * The directory specified in `options("rbabylon.model_directory")`
+#'
+#'   * The working directory, if `options("rbabylon.model_directory")` is `NULL`
+#'
+#'   * A path passed to the `.config_path` argument of the functions mentioned
+#'   above
+#'
+#'   The recommended behavior is to set `options("rbabylon.model_directory")`,
+#'   ideally in your `.Rprofile`, and then call `bbi_init(.dir =
+#'   getOption("rbabylon.model_directory"), ...)`. This only has to be done
+#'   once.
+#'
+#' @param .dir Path to directory to run `init` in (and put the resulting
+#'   `babylon.yaml` file)
 #' @param .nonmem_dir Path to directory with the NONMEM installation.
-#' @param .nonmem_version Character scalar for default version of NONMEM to use. If left NULL, function will exit and tell you which versions were found in `.nonmem_dir`
-#' @param .no_default_version If `TRUE`, force creation of babylon.yaml with **no default NONMEM version**. `FALSE` by default, and using `TRUE` is *not* encouraged.
+#' @param .nonmem_version Character scalar for default version of NONMEM to use.
+#'   If left NULL, function will exit and tell you which versions were found in
+#'   `.nonmem_dir`
+#' @param .no_default_version If `TRUE`, force creation of babylon.yaml with
+#'   **no default NONMEM version**. `FALSE` by default, and using `TRUE` is
+#'   *not* encouraged.
 #' @importFrom yaml read_yaml write_yaml
 #' @export
 bbi_init <- function(.dir, .nonmem_dir, .nonmem_version = NULL, .no_default_version = FALSE) {

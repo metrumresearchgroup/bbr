@@ -183,18 +183,17 @@ safe_based_on <- function(.start, .based_on) {
 
   .paths <- file.path(.start, .based_on)
 
-  # check for either a .yaml or .yml file at each location
-  .paths_bool <- map_lgl(.paths, function(.p) {
-    .y1 <- sprintf("%s.yaml", tools::file_path_sans_ext(.p))
-    .y2 <- sprintf("%s.yml", tools::file_path_sans_ext(.p))
-    .bool_test <- fs::file_exists(c(.y1, .y2))
-    return(any(.bool_test))
-  })
+  # check for a .yaml file at each location
+  .paths_bool <-
+    .paths %>%
+    purrr::map(yaml_ext) %>%
+    purrr::map_lgl(fs::file_exists)
+
   names(.paths_bool) <- .paths
 
   if (!all(.paths_bool)) {
     strict_mode_error(paste(
-      glue("Parsed {length(.paths_bool)} models as `based_on` but cannot find .yaml or .yml files for {length(.paths_bool) - sum(.paths_bool)} of them: "),
+      glue("Parsed {length(.paths_bool)} models as `based_on` but cannot find .yaml files for {length(.paths_bool) - sum(.paths_bool)} of them: "),
       paste(names(which(!.paths_bool)), collapse = ', ')
     ))
   }

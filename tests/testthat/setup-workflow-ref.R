@@ -110,10 +110,10 @@ REF_LIST_TMP <- list(
     overwrite = TRUE,
     threads = 4L),
   model_working_dir = file.path(getwd(), "model-examples"),
-  orig_yaml_file ="tmp.yml",
+  orig_yaml_file ="temp.yaml",
   yaml_md5 = MOD1_YAML_MD5,
-  model_path = "tmp.ctl",
-  output_dir = "tmp"
+  model_path = "temp.ctl",
+  output_dir = "temp"
 )
 class(REF_LIST_TMP) <- MOD_CLASS_LIST
 
@@ -172,7 +172,6 @@ cleanup <- function() {
   mods_to_kill <- purrr::map_chr(seq(2,7), ~ file.path(MODEL_DIR, .x))
   for (m in mods_to_kill) {
     if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
-    if (fs::file_exists(paste0(m, ".yml"))) fs::file_delete(paste0(m, ".yml"))
     if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
   }
 

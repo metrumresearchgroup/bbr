@@ -5,11 +5,13 @@
 
 #' Submit models to be run in batch
 #'
-#' Submits a group of models to be run in batch by calling out to `bbi` in as few external calls as possible (see "Details").
+#' Submits a group of models to be run in batch by calling out to `bbi` in as
+#' few external calls as possible (see "Details").
 #'
-#' @details
-#' The number of `bbi` calls to make is determined by the number of distinct sets of `bbi` arguments passed to the submission calls,
-#' either explicitly through `.bbi_args`, as specified in the `bbi_args` field of the model YAML, or specified globally in `babylon.yml`.
+#' @details The number of `bbi` calls to make is determined by the number of
+#' distinct sets of `bbi` arguments passed to the submission calls, either
+#' explicitly through `.bbi_args`, as specified in the `bbi_args` field of the
+#' model YAML, or specified globally in `babylon.yaml`.
 #' @param .mods The model objects to submit.
 #' @inheritParams submit_model
 #' @export

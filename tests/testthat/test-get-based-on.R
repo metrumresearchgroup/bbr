@@ -84,7 +84,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_identical(get_based_on(mod3), c(MOD1_ABS_PATH, MOD2_ABS_PATH))
 
     # check that it fails with .check_exists=TRUE
-    expect_error(get_based_on(mod3, .check_exists = TRUE), regexp = "but cannot find .yaml or .yml")
+    expect_error(get_based_on(mod3, .check_exists = TRUE), regexp = "but cannot find .yaml")
   })
 
   test_that("get_based_on() behaves correctly on missing keys", {
@@ -168,7 +168,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
     # delete mod2 yaml and check for error
     fs::file_delete(yaml_ext(MOD2_ABS_PATH))
-    expect_error(get_model_ancestry(mod4), regexp = "get_model_ancestry.+could not find a YAML")
+    expect_error(get_model_ancestry(mod4), regexp = "Cannot load model object from path")
   })
 
   test_that("get_model_ancestry works on run_log tibble with more complicated ancestry" , {

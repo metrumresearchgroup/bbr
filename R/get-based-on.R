@@ -116,21 +116,7 @@ get_model_ancestry.default <- function(.bbi_object) {
     .checked <- c(.checked, .to_check)
 
     # get based_on for this round of models
-    .this_res <- map(.to_check, function(.p) {
-      .res <- tryCatch(
-        {
-          get_based_on(.p)
-        },
-        error = function(e) {
-          if (str_detect(e$message, FIND_YAML_ERR_MSG)) {
-            stop(glue("Found {.p} in get_model_ancestry() tree, but could not find a YAML file for that model."), call. = FALSE)
-          }
-          stop(e$message)
-        }
-      )
-
-      return(.res)
-    })
+    .this_res <- map(.to_check, get_based_on)
     .this_res <- unique(unlist(.this_res))
 
     # add to results

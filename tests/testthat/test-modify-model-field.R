@@ -186,7 +186,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
     # make a new yaml
     new_yaml <- yaml_ext(NEW_MOD2)
-    #new_yaml <- paste0(NEW_MOD2, '.yml') # change back to this once I fix yaml_ext i.e. line 86 of new-model.R
     fs::file_copy(YAML_TEST_FILE, new_yaml)
 
     # make a spec from it
@@ -206,59 +205,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # test_replacing
     new_mod <- replace_based_on(new_mod, "2")
     expect_identical(new_mod[[YAML_BASED_ON]], "2")
-  })
-
-
-  ####################################
-  # helper functions for model fields
-  ####################################
-
-  test_that("safe_based_on works on happy path", {
-    on.exit({ cleanup() })
-    # test on 1.yaml
-    expect_equal(safe_based_on(.start = ".", .based_on = YAML_TEST_FILE), tools::file_path_sans_ext(YAML_TEST_FILE))
-    expect_equal(safe_based_on(.start = MODEL_DIR, .based_on = "1.yaml"), "1")
-  })
-
-  test_that("safe_based_on works on happy path with vector", {
-    on.exit({ cleanup() })
-    fs::file_copy(YAML_TEST_FILE, paste0(NEW_MOD2, '.yml'))
-    expect_equal(safe_based_on(.start = ".", .based_on = c(YAML_TEST_FILE, NEW_MOD2)), c(tools::file_path_sans_ext(YAML_TEST_FILE), NEW_MOD2))
-    expect_equal(safe_based_on(.start = MODEL_DIR, .based_on = c("1", "2")), c("1", "2"))
-  })
-
-  test_that("safe_based_on works on nested dirs", {
-    on.exit({ cleanup() })
-
-    # copy model 1 to level deeper
-    fs::dir_create(LEVEL2_DIR)
-    fs::file_copy(YAML_TEST_FILE, LEVEL2_DIR)
-    fs::file_copy(YAML_TEST_FILE, paste0(NEW_MOD2, '.yml'))
-
-    expect_equal(
-      safe_based_on(.start = ".", .based_on = c(YAML_TEST_FILE, NEW_MOD2, file.path(LEVEL2_DIR, "1"))),
-      c(tools::file_path_sans_ext(YAML_TEST_FILE), NEW_MOD2, file.path(LEVEL2_DIR, "1"))
-    )
-
-    expect_equal(safe_based_on(.start = MODEL_DIR, .based_on = c("1", "2", "level2/1")), c("1", "2", "level2/1"))
-  })
-
-  test_that("safe_based_on works with absolute path" , {
-    on.exit({ cleanup() })
-
-    # copy model 1 to level deeper
-    create_all_models()
-
-    new_model_path <- get_model_path(mod2)
-    expect_true(fs::is_absolute_path(new_model_path))
-
-    expect_identical(safe_based_on(mod2[[WORKING_DIR]], c("1", new_model_path)), c("1", "2"))
-    expect_identical(safe_based_on(mod4[[WORKING_DIR]], c("1", new_model_path)), c("1", "../2"))
-  })
-
-  test_that("safe_based_on fails when yaml can't be found", {
-    expect_error(safe_based_on(.start = ".", .based_on = c(YAML_TEST_FILE, NEW_MOD2)), regexp = "cannot find .yaml or .yml files")
-    expect_error(safe_based_on(.start = MODEL_DIR, .based_on = c("1", "2")), regexp = "cannot find .yaml or .yml files")
   })
 
 
