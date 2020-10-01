@@ -60,7 +60,8 @@ find_models <- function(.base_dir, .recurse) {
   # filter to only model yaml's
   mod_list <- purrr::compact(all_yaml)
   if (length(mod_list) != length(all_yaml)) {
-    not_mod <- yaml_files[which(is.null(all_yaml))]
+    null_idx <- purrr::map_lgl(all_yaml, is.null)
+    not_mod <- yaml_files[which(null_idx)]
     warning(glue("Found {length(not_mod)} YAML files that do not contain required keys for a model YAML. Ignoring the following files: `{paste(not_mod, collapse='`, `')}`"))
   }
 
