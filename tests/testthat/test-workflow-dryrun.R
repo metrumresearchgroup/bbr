@@ -40,7 +40,7 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
         expect_true(all(MODEL_REQ_KEYS %in% names(this_mod)))
 
         # check the the model path parses correctly
-        this_mod_path <- file.path(this_mod[[WORKING_DIR]], this_mod[[YAML_MOD_PATH]])
+        this_mod_path <- get_model_path(this_mod)
         expect_true(fs::file_exists(this_mod_path))
 
         # dry run of model submission
@@ -60,7 +60,6 @@ withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
         expect_identical(call_str, proc_str)
 
         # look for outputs
-        expect_identical(this_mod[[YAML_OUT_DIR]], get_model_id(TEST_YAML_DRY))
         expect_true(fs::file_exists(build_path_from_mod_obj(this_mod, "lst")))
         expect_true(fs::file_exists(build_path_from_mod_obj(this_mod, "ext")))
         expect_true(fs::file_exists(build_path_from_mod_obj(this_mod, "grd")))
@@ -137,7 +136,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
         expect_true(all(MODEL_REQ_KEYS %in% names(this_mod)))
 
         # check the the model path parses correctly
-        this_mod_path <- file.path(this_mod[[WORKING_DIR]], this_mod[[YAML_MOD_PATH]])
+        this_mod_path <- get_model_path(this_mod)
         expect_true(fs::file_exists(this_mod_path))
 
         # dry run of model submission
@@ -158,7 +157,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
         expect_identical(call_str, proc_str)
 
         # look for outputs
-        expect_identical(this_mod[[YAML_OUT_DIR]], get_model_id(test_yaml_path))
         expect_true(fs::file_exists(build_path_from_mod_obj(this_mod, "lst")))
         expect_true(fs::file_exists(build_path_from_mod_obj(this_mod, "ext")))
         expect_true(fs::file_exists(build_path_from_mod_obj(this_mod, "grd")))

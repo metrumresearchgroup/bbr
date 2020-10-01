@@ -94,11 +94,7 @@ REF_LIST_1 <- list(
     overwrite = TRUE,
     threads = 4L),
   absolute_model_path = file.path(getwd(), "model-examples", "1"),
-  model_working_dir = file.path(getwd(), "model-examples"),
-  orig_yaml_file ="1.yaml",
-  yaml_md5 = MOD1_YAML_MD5,
-  model_path = "1.ctl",
-  output_dir = "1"
+  yaml_md5 = MOD1_YAML_MD5
 )
 class(REF_LIST_1) <- MOD_CLASS_LIST
 
@@ -111,11 +107,7 @@ REF_LIST_TMP <- list(
     overwrite = TRUE,
     threads = 4L),
   absolute_model_path = file.path(getwd(), "model-examples", "temp"),
-  model_working_dir = file.path(getwd(), "model-examples"),
-  orig_yaml_file ="temp.yaml",
-  yaml_md5 = MOD1_YAML_MD5,
-  model_path = "temp.ctl",
-  output_dir = "temp"
+  yaml_md5 = MOD1_YAML_MD5
 )
 class(REF_LIST_TMP) <- MOD_CLASS_LIST
 

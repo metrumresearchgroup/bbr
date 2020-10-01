@@ -164,7 +164,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # add the tags to the yaml manually
     rogue_spec <- yaml::read_yaml(temp_yaml)
     rogue_spec[[YAML_TAGS]] <- c(rogue_spec[[YAML_TAGS]], NEW_TAGS)
-    rogue_spec[[YAML_YAML_NAME]] <- temp_yaml
     yaml::write_yaml(rogue_spec, temp_yaml)
 
     # check that reconcile adds the new tags
@@ -188,7 +187,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # add the tags to the yaml manually
     rogue_spec <- yaml::read_yaml(temp_yaml)
     rogue_spec[[YAML_TAGS]] <- c(rogue_spec[[YAML_TAGS]], NEW_TAGS)
-    rogue_spec[[YAML_YAML_NAME]] <- temp_yaml
     yaml::write_yaml(rogue_spec, temp_yaml)
 
     # check against the YAML and expect error

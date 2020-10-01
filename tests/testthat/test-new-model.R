@@ -2,13 +2,8 @@ context("Testing function to create or read in model object")
 
 withr::with_options(list(rbabylon.model_directory = NULL), {
 
-  # these will be deprecated by the end of this PR, so don't check them
   bad_keys <- c(
-    ABS_MOD_PATH,
-    WORKING_DIR,
-    YAML_MOD_PATH,
-    YAML_OUT_DIR,
-    YAML_YAML_NAME
+    ABS_MOD_PATH
   )
 
   test_that("read_model() returns expected object", {
@@ -33,10 +28,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("yaml with no model type will fail", {
     expect_error(read_model("test-yaml/zz_fail_no_modtype.yaml"), regexp = "Model yaml must have keys")
-  })
-
-  test_that("yaml with bad model path will fail", {
-    expect_error(read_model("test-yaml/zz_fail_bad_modpath.yaml"), regexp = "must have either a .ctl or .mod extension")
   })
 
   test_that("new_model() creates new YAML file", {
