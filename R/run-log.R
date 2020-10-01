@@ -135,15 +135,16 @@ add_log_impl <- function(.log_df, .impl_func, ...) {
 #' @importFrom tibble tibble
 #' @keywords internal
 run_log_entry <- function(.mod) {
+  checkmate::assert_scalar(.mod[[YAML_YAML_MD5]])
+  checkmate::assert_scalar(.mod[[YAML_MOD_TYPE]])
+  checkmate::assert_scalar(.mod[[YAML_DESCRIPTION]])
+
   # build row
   entry_df <- tibble::tibble(
-    !!ABS_MOD_PATH := file.path(
-      enforce_length(.mod, WORKING_DIR),
-      get_model_id(enforce_length(.mod, YAML_YAML_NAME))
-    ),
-    !!YAML_YAML_MD5     := enforce_length(.mod, YAML_YAML_MD5),
-    !!YAML_MOD_TYPE     := enforce_length(.mod, YAML_MOD_TYPE),
-    !!YAML_DESCRIPTION  := enforce_length(.mod, YAML_DESCRIPTION),
+    !!ABS_MOD_PATH      := .mod[[ABS_MOD_PATH]],
+    !!YAML_YAML_MD5     := .mod[[YAML_YAML_MD5]],
+    !!YAML_MOD_TYPE     := .mod[[YAML_MOD_TYPE]],
+    !!YAML_DESCRIPTION  := .mod[[YAML_DESCRIPTION]],
     !!YAML_BBI_ARGS     := .mod[[YAML_BBI_ARGS]] %>% list(),
     !!YAML_BASED_ON     := .mod[[YAML_BASED_ON]] %>% list(),
     !!YAML_TAGS         := .mod[[YAML_TAGS]] %>% list(),
@@ -152,22 +153,8 @@ run_log_entry <- function(.mod) {
 
   # check that it is only one row
   if (nrow(entry_df) != 1) {
-    stop(glue("There is a problem with {.mod[[YAML_YAML_NAME]]} file. `run_log()` should be able to load it to 1 row but got {nrow(entry_df)} rows instead. User should not see this error; report to developers if encountered."))
+    stop(glue("There is a problem with {get_yaml_path(.mod)} file. `run_log()` should be able to load it to 1 row but got {nrow(entry_df)} rows instead. User should not see this error; report to developers if encountered."))
   }
 
   return(entry_df)
 }
-
-#' Private helper to enforce length of a list element
-#' @param .l list to check
-#' @param .k key to check
-#' @param .len length to enforce. Defaults to 1. Throws an error if `length(.l[[.k]]) != .len`
-#' @keywords internal
-enforce_length <- function(.l, .k, .len = 1) {
-  len_k <- length(.l[[.k]])
-  if (len_k != .len) {
-    stop(glue("The `{.k}` key in file `{.l[[YAML_YAML_NAME]]}` is expected to have length of {.len} but it has length {len_k}. Please fix YAML."))
-  }
-  return(.l[[.k]])
-}
-

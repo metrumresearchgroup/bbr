@@ -92,23 +92,24 @@ replace_decisions <- function(.mod, .decisions) {
 #' @param .based_on Character vector of relative paths to add to `based_on` field
 #' @export
 add_based_on <- function(.mod, .based_on) {
-  .mod <- modify_model_field(.mod = .mod,
-                             .field = YAML_BASED_ON,
-                             .value = safe_based_on(.mod[[WORKING_DIR]], .based_on),
-                             .append = TRUE)
-  return(.mod)
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_BASED_ON,
+    .value = safe_based_on(get_model_working_directory(.mod), .based_on),
+    .append = TRUE
+  )
 }
 
 #' @describeIn modify_model_field Replaces `based_on` field in a model object and corresponding YAML with new values
 #' @export
 replace_based_on <- function(.mod, .based_on) {
-  .mod <- modify_model_field(.mod = .mod,
-                             .field = YAML_BASED_ON,
-                             .value = safe_based_on(.mod[[WORKING_DIR]], .based_on),
-                             .append = FALSE)
-  return(.mod)
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_BASED_ON,
+    .value = safe_based_on(get_model_working_directory(.mod), .based_on),
+    .append = FALSE
+  )
 }
-
 
 #' @describeIn modify_model_field Replaces description field in a model object and corresponding YAML with new description
 #' @param .description Character scalar to use as replacement for the `description` field

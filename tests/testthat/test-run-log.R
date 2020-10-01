@@ -87,7 +87,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     rogue_yaml[[YAML_DESCRIPTION]] <- c(rogue_yaml[[YAML_DESCRIPTION]], "bad stuff")
     yaml::write_yaml(rogue_yaml, yaml_ext(NEW_MOD3))
 
-    expect_error(log_df <- run_log(MODEL_DIR), regexp = "expected to have length of")
+    expect_error(log_df <- run_log(MODEL_DIR), regexp = "Must have length 1")
   })
 
 }) # closing withr::with_options

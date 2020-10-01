@@ -60,12 +60,6 @@ model_summary.bbi_nonmem_model <- function(
   .directory = NULL
 ) {
 
-  if (!is.null(.directory)) {
-    warning(paste(glue("Passed `.directory = {.directory}` to model_summary.bbi_nonmem_model().") ,
-                  "This argument is only valid when passing a path to `model_summary()`.",
-                  "`bbi_nonmem_model` object was passed, so `.directory` inferred from `.mod${WORKING_DIR}`"))
-  }
-
   res_list <- nonmem_summary(
     .mod = .mod,
     .bbi_args = .bbi_args,
@@ -98,7 +92,7 @@ nonmem_summary <- function(
   check_yaml_in_sync(.mod)
 
   # extract output path
-  .path <- file.path(.mod[[WORKING_DIR]], .mod[[YAML_OUT_DIR]])
+  .path <- get_output_dir(.mod)
 
   # lst file can both be the check for whether the dir is a nonmem output dir
   # and also the output always should be runname.lst so we can determine the model name

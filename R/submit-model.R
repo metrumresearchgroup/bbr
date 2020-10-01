@@ -40,12 +40,6 @@ submit_model.bbi_nonmem_model <- function(
   .directory = NULL
 ) {
 
-  if (!is.null(.directory)) {
-    warning(paste(glue("Passed `.directory = {.directory}` to submit_model.bbi_nonmem_model().") ,
-                  "This argument is only valid when passing a path to `submit_model()`.",
-                  "`bbi_nonmem_model` object was passed, so `.directory` inferred from `.mod${WORKING_DIR}`"))
-  }
-
   res <- submit_nonmem_model(.mod,
                              .bbi_args = .bbi_args,
                              .mode = .mode,
@@ -86,10 +80,10 @@ submit_nonmem_model <- function(.mod,
   # build command line args
   .bbi_args <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])
   args_vec <- check_bbi_args(.bbi_args)
-  cmd_args <- c("nonmem", "run", .mode, .mod[[YAML_MOD_PATH]], args_vec)
+  cmd_args <- c("nonmem", "run", .mode, get_model_path(.mod), args_vec)
 
   # define working directory
-  model_dir <- .mod[[WORKING_DIR]]
+  model_dir <- get_model_working_directory(.mod)
 
   # check for babylon.yaml config
   .config_path <- find_config_file_path(.config_path, model_dir)

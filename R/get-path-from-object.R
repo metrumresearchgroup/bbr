@@ -182,7 +182,7 @@ get_model_id.character <- function(.mod) {
 #' @describeIn get_model_id Takes `bbi_nonmem_model` object
 #' @export
 get_model_id.bbi_nonmem_model <- function(.mod) {
-  return(basename(tools::file_path_sans_ext(.mod[[YAML_MOD_PATH]])))
+  return(basename(tools::file_path_sans_ext(get_model_path(.mod))))
 }
 
 #' Build absolute path from a directory and path
