@@ -65,6 +65,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_warning(new_model(.yaml_path = .test_path, .description = "naw dawg"), regexp = "Did not pass a YAML extension")
   })
 
+  test_that("new_model() throws an error if the model file does not exist", {
+    expect_error(new_model("foo.yaml", "bar"), "No model file found")
+  })
+
   test_that("compare read_model() and new_model() objects", {
     # create new model with args
     .test_yaml <- "model-examples/1.yaml"

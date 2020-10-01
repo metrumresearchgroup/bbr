@@ -218,7 +218,7 @@ find_model_file_path <- function(.path) {
   } else if(fs::file_exists(.mod_path)) {
     return(.mod_path)
   } else {
-    warning(glue("No model file found at {.ctl_path} but setting that path as default model path for {.path}. Please put relevant model file in that location."))
+    stop(glue("No model file found at {.ctl_path} or {.mod_path}. Please put relevant model file in that location."))
     return(.ctl_path)
   }
 }
