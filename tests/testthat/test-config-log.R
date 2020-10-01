@@ -77,7 +77,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
   test_that("config_log() errors with malformed YAML", {
-    log_df <- expect_error(config_log(getwd()), regexp = "Unexpected error.+model_path defined in yaml")
+    log_df <- expect_error(config_log(getwd()), regexp = "Unexpected error trying to read yaml")
   })
 
   test_that("config_log() returns NULL and warns when no YAML found", {
