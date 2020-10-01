@@ -126,30 +126,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     })
   })
 
-
-  test_that("find_yaml_file_path returns correct yaml path", {
-    expect_identical(find_yaml_file_path(YAML_TEST_FILE), YAML_TEST_FILE)
-  })
-
-  test_that("find_yaml_file_path returns correct yml path", {
-    new_yaml <- paste0(NEW_MOD2, '.yml')
-    fs::file_copy(YAML_TEST_FILE, new_yaml)
-    on.exit({ fs::file_delete(new_yaml) })
-    expect_identical(find_yaml_file_path(NEW_MOD2), new_yaml)
-
-  })
-
-  test_that("find_yaml_file_path errors when no file found", {
-    expect_error(find_yaml_file_path(NEW_MOD2), regexp = FIND_YAML_ERR_MSG)
-  })
-
-  test_that("find_yaml_file_path errors when two files found", {
-    new_yaml <- paste0(tools::file_path_sans_ext(YAML_TEST_FILE), ".yml")
-    fs::file_copy(YAML_TEST_FILE, new_yaml)
-    on.exit({ fs::file_delete(new_yaml) })
-    expect_error(find_yaml_file_path(YAML_TEST_FILE), regexp = "Files found at BOTH")
-  })
-
   test_that("combine_directory_path() builds the expected path .directory", {
     res_path <- combine_directory_path(MODEL_DIR, ctl_ext(MOD_ID))
     expect_identical(res_path, ABS_CTL_PATH)
