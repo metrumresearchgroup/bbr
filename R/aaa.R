@@ -223,4 +223,3 @@ PROCESS_REQ_KEYS <- c(
 NO_NONMEM_ERR_MSG <- "No version was supplied and no default value exists in the configset"
 MOD_ALREADY_EXISTS_ERR_MSG <- "already exist, but we are configured not to overwrite"
 NO_STAN_ERR_MSG <- "stan support not yet implemented."
-FIND_YAML_ERR_MSG <- "No file found at.+\\.yml.+OR.+\\.yaml"
