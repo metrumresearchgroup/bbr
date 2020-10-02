@@ -5,19 +5,19 @@
 \title{Create new model object}
 \usage{
 new_model(
-  .yaml_path,
+  .path,
   .description,
   .based_on = NULL,
   .tags = NULL,
   .bbi_args = NULL,
   .overwrite = FALSE,
-  .model_type = c("nonmem"),
-  .directory = get_model_directory()
+  .model_type = c("nonmem")
 )
 }
 \arguments{
-\item{.yaml_path}{Path to save resulting model YAML file to. MUST be either
-an absolute path, or a path relative to the \code{.directory} argument.}
+\item{.path}{Path to save the new model. Will be the path to the model file
+and YAML file (both without extension), and the path to the output
+directory.}
 
 \item{.description}{Description of new model run. This will be stored in the
 yaml (and can be viewed later in \code{run_log()}). By convention, it should
@@ -40,10 +40,6 @@ into YAML file.}
 
 \item{.model_type}{Character scaler to specify type of model being created
 (used for S3 class). Currently only \code{'nonmem'} is supported.}
-
-\item{.directory}{Model directory which \code{.yaml_path} is relative to. Defaults
-to \code{options('rbabylon.model_directory')}, which can be set globally with
-\code{set_model_directory()}.}
 }
 \value{
 S3 object of class \verb{bbi_\{.model_type\}_model} that can be passed to
