@@ -36,6 +36,32 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_identical(get_yaml_path(run_log(MODEL_DIR)), normalizePath(YAML_TEST_FILE))
   })
 
+  test_that("get_model_path() finds .mod path", {
+    temp_yaml <- create_temp_model(mod_ext = "mod")
+    temp_mod <- mod_ext(temp_yaml)
+    new_mod <- read_model(temp_yaml)
+    expect_identical(get_model_path(new_mod), temp_mod)
+  })
+
+  test_that("get_model_path() errors with both .ctl and .mod paths", {
+    on.exit(fs::file_delete(MOD_TEST_FILE))
+    fs::file_copy(CTL_TEST_FILE, MOD_TEST_FILE)
+    expect_error(get_model_path(MOD1), "Both.+files found")
+  })
+
+  test_that("get_model_path() works no paths found", {
+    temp_yaml <- create_temp_model()
+    temp_mod <- read_model(temp_yaml)
+    # save path to model file and then delete the file
+    former_ctl_path <- get_model_path(temp_mod)
+    fs::file_delete(former_ctl_path)
+    expect_error(get_model_path(temp_mod), "No model file found")
+    expect_equal(
+      get_model_path(temp_mod, .check_exists = FALSE),
+      former_ctl_path
+    )
+  })
+
   ##################
   # other functions
   ##################
@@ -101,22 +127,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
       expect_identical(yaml_ext(.tc), YAML_TEST_FILE)
     })
   }
-
-  test_that("find_model_file_path returns correct ctl path", {
-    expect_identical(find_model_file_path(CTL_TEST_FILE), CTL_TEST_FILE)
-  })
-
-  test_that("find_model_file_path prefers ctl path", {
-    expect_identical(find_model_file_path(MOD_TEST_FILE), CTL_TEST_FILE)
-  })
-
-  test_that("find_model_file_path returns mod path when only path found", {
-    mod_file <- "data/1.mod"
-    withr::with_file(mod_file, {
-      readr::write_lines(c("naw", "dawg"), mod_file)
-      expect_identical(find_model_file_path(mod_file), mod_file)
-    })
-  })
 
   test_that("combine_directory_path() builds the expected path .directory", {
     res_path <- combine_directory_path(MODEL_DIR, ctl_ext(MOD_ID))
