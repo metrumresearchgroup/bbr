@@ -34,7 +34,7 @@ create_model_object <- function(res, save_yaml) {
 
   # we won't know the model file extension, so we rely on this helper to check
   # the possible extensions and throw an error if none exists
-  find_model_file_path(res[[ABS_MOD_PATH]])
+  find_nonmem_model_file_path(res[[ABS_MOD_PATH]])
 
   # check babylon args and add an empty list if missing
   if (is.null(res[[YAML_BBI_ARGS]])) {
