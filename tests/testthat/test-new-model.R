@@ -27,7 +27,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
   test_that("yaml with no model type will fail", {
-    expect_error(read_model("test-yaml/zz_fail_no_modtype.yaml"), regexp = "Model yaml must have keys")
+    expect_error(
+      read_model("test-yaml/zz_fail_no_modtype.yaml"),
+      regexp = "Model list must have keys"
+    )
   })
 
   test_that("new_model() creates new YAML file", {

@@ -88,7 +88,7 @@ safe_read_model <- function(.yaml_path, .directory = get_model_directory()) {
   # try to read in model
   .mod <- tryCatch(read_model(.yaml_path),
                    error = function(e) {
-                     if (stringr::str_detect(e$message, "Model yaml must have keys")) {
+                     if (stringr::str_detect(e$message, "Model list must have keys")) {
                        return(NULL)
                      } else {
                        stop(glue("Unexpected error trying to read yaml `{.yaml_path}`: {e$message}"))
