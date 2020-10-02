@@ -146,4 +146,17 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     )
   })
 
+  test_that("new_model() supports `.path` containing a period", {
+    temp_ctl <- tempfile(pattern = "file.", fileext = ".ctl")
+    # ensure that `temp_ctl` exists
+    readr::write_file("foo", temp_ctl)
+
+    # this will be created by new_model()
+    temp_yaml <- fs::path_ext_set(temp_ctl, ".yaml")
+    on.exit(fs::file_delete(c(temp_ctl, temp_yaml)))
+
+    mod <- new_model(fs::path_ext_remove(temp_ctl), "path with period")
+    expect_true(fs::file_exists(temp_yaml))
+  })
+
 }) # closing withr::with_options
