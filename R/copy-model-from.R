@@ -143,14 +143,13 @@ copy_nonmem_model_from <- function(
 
   # create new model
   .new_mod <- new_model(
-    .yaml_path = yaml_ext(.new_model),
+    .new_model,
     .description = .description,
     .based_on = c(.parent_based_on, .based_on_additional),
     .tags = new_tags,
     .bbi_args = .parent_mod[[YAML_BBI_ARGS]],
     .overwrite = .overwrite,
-    .model_type = "nonmem",
-    .directory = NULL
+    .model_type = "nonmem"
   )
 
   return(.new_mod)
