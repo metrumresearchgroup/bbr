@@ -218,19 +218,23 @@ rep_missing <- function(x, i, len) {
 
 #' Create a temporary model
 #'
-#' It is useful to create a model file and YAML file that can be discarded.
+#' It is useful to create a model file and YAML file that can be discarded. The
+#' files will be deleted when `envir` exits.
 #'
 #' @param path The path to the YAML file to copy.
 #' @param mod_content A string giving the content of the model file.
 #' @param mod_ext The extension for the model file.
+#' @inheritParams withr::defer
 #'
 #' @return The path to the temporary YAML file.
 create_temp_model <- function(path = YAML_TEST_FILE,
                               mod_content = "foo",
-                              mod_ext = "ctl") {
-  # TODO: unlink these when done, probably need withr::defer()
-  tmp_yaml <- tempfile(fileext = ".yaml")
-  fs::file_copy(path, tmp_yaml)
-  readr::write_file(mod_content, fs::path_ext_set(tmp_yaml, mod_ext))
-  tmp_yaml
+                              mod_ext = "ctl",
+                              envir = parent.frame()) {
+  temp_yaml <- tempfile(fileext = ".yaml")
+  fs::file_copy(path, temp_yaml)
+  temp_ctl <- fs::path_ext_set(temp_yaml, mod_ext)
+  readr::write_file(mod_content, temp_ctl)
+  withr::defer(fs::file_delete(c(temp_yaml, temp_ctl)), envir)
+  temp_yaml
 }
