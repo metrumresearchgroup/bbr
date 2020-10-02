@@ -48,13 +48,18 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
   #######################
 
   test_that("step by step create_model to submit_model to model_summary works", {
+    # TODO: this test needs to clean up after itself by removing the files it
+    # created
+
     # create model spec
-    mod1 <- suppressWarnings(new_model(
-      .yaml_path = 1,
-      .description = ORIG_DESC,
-      .tags = ORIG_TAGS,
-      .bbi_args = list(overwrite = TRUE, threads = 4)
-    ))
+    mod1 <- suppressWarnings(
+      new_model(
+        file.path(MODEL_DIR_BBI, "1"),
+        .description = ORIG_DESC,
+        .tags = ORIG_TAGS,
+        .bbi_args = list(overwrite = TRUE, threads = 4)
+      )
+    )
     expect_identical(class(mod1), MOD_CLASS_LIST)
 
     # submit model
@@ -76,6 +81,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
   })
 
   test_that("copying model works and new models run correctly", {
+    # TODO: this test relies on model-examples-bbi/1.ctl being present
     # copy model
     mod1 <- read_model(1)
     mod2 <- copy_model_from(mod1, 2, NEW_DESC)

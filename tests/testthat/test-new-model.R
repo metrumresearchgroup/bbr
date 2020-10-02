@@ -39,7 +39,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     fs::file_delete(temp_yaml)
 
     mod1a <- new_model(
-      .yaml_path = temp_yaml,
+      fs::path_ext_remove(temp_yaml),
       .description = "new model test"
     )
 
@@ -66,7 +66,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # create a new model with arguments known to match the reference model at
     # YAML_TEST_FILE
     mod1a <- new_model(
-      .yaml_path = temp_yaml,
+      fs::path_ext_remove(temp_yaml),
       .description = "original acop model",
       .tags = c("acop tag", "other tag"),
       .bbi_args = list(overwrite = TRUE, threads = 4)
@@ -98,14 +98,14 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # error if file exists
     expect_error(
       new_model(
-        .yaml_path = temp_yaml,
+        fs::path_ext_remove(temp_yaml),
         .description = "fake model"
       ),
-      regexp = "that file already exists"
+      regexp = "File already exists at"
     )
 
     new_model(
-      .yaml_path = temp_yaml,
+      fs::path_ext_remove(temp_yaml),
       .description = "fake model",
       .overwrite = TRUE
     )
@@ -122,7 +122,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     fs::file_delete(temp_yaml)
 
     mod1a <- new_model(
-      .yaml_path = temp_yaml,
+      fs::path_ext_remove(temp_yaml),
       .description = "original acop model",
       .based_on = parent_model_id
     )
@@ -137,7 +137,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_error(
       suppressSpecificWarning({
         mod1a <- new_model(
-          .yaml_path = .test_path,
+          fs::path_ext_remove(.test_path),
           .description = "original acop model",
           .based_on = c("1", "fake")
         )
