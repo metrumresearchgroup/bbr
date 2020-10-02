@@ -137,7 +137,7 @@ build_bbi_param_list <- function(.mods, .bbi_args = NULL) {
     purrr::map(check_bbi_args) %>%
     purrr::map(sort)
 
-  mod_working_dirs <- purrr::map(.mods, get_model_working_directory)
+  mod_working_dirs <- purrr::map_chr(.mods, get_model_working_directory)
 
   mod_keys <- purrr::map2(
     all_mod_args,
