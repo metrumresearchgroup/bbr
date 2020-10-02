@@ -35,12 +35,12 @@ get_based_on <- function(.bbi_object, .check_exists = FALSE) {
 #' @export
 get_based_on.default <- function(.bbi_object, .check_exists = FALSE) {
 
-  # do some QA on the required WORKING_DIR field
-  if (is.null(.bbi_object[[WORKING_DIR]])) {
+  # do some QA on the required ABS_MOD_PATH field
+  if (is.null(.bbi_object[[ABS_MOD_PATH]])) {
     stop_get_fail_msg(
       .bbi_object,
       YAML_BASED_ON,
-      glue(".bbi_object must contain key for `{WORKING_DIR}` but has only the following keys: {paste(names(.bbi_object), collapse = ', ')}")
+      glue(".bbi_object must contain key for `{ABS_MOD_PATH}` but has only the following keys: {paste(names(.bbi_object), collapse = ', ')}")
     )
   }
 
@@ -49,17 +49,18 @@ get_based_on.default <- function(.bbi_object, .check_exists = FALSE) {
     return(NULL)
   }
 
+  model_working_dir <- get_model_working_directory(.bbi_object)
   # optionally check if they exist
   if (isTRUE(.check_exists)) {
     tryCatch({
-      invisible(safe_based_on(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_BASED_ON]]))
+      invisible(safe_based_on(model_working_dir, .bbi_object[[YAML_BASED_ON]]))
     }, error = function(e) {
       stop_get_fail_msg(.bbi_object, YAML_BASED_ON, e$message)
     })
   }
 
   # extract the requested paths
-  return(as.character(fs::path_norm(file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_BASED_ON]]))))
+  return(as.character(fs::path_norm(file.path(model_working_dir, .bbi_object[[YAML_BASED_ON]]))))
 }
 
 #' @describeIn get_based_on Takes a character scalar of a path to a model that can be loaded with `read_model(.bbi_object)`.

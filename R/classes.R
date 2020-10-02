@@ -32,19 +32,9 @@ create_model_object <- function(res, save_yaml) {
     stop(glue("Invalid {YAML_MOD_TYPE} `{.model_type}`. Valid options include: `{paste(SUPPORTED_MOD_TYPES, collapse = ', ')}`"))
   }
 
-  # by default, if no model defined, will use the YAML path to look for a model and set to .ctl if none found
-  if (is.null(res[[YAML_MOD_PATH]])) {
-    if (is.null(res[[YAML_YAML_NAME]])) {
-      stop("Must specify either a YAML_MOD_PATH or YAML_YAML_NAME to create a model. User should never see this error.")
-    }
-    .mod_path <- find_model_file_path(file.path(res[[WORKING_DIR]], res[[YAML_YAML_NAME]]))
-    res[[YAML_MOD_PATH]] <- as.character(fs::path_rel(.mod_path, res[[WORKING_DIR]]))
-  }
-
-  # check for correct NONMEM extension
-  if (.model_type == "nonmem" && (!is_valid_nonmem_extension(res[[YAML_MOD_PATH]]))) {
-    stop(glue::glue("model_path defined in yaml at {res[[YAML_MOD_PATH]]} must have either a .ctl or .mod extension, but found {res[[YAML_MOD_PATH]]}"))
-  }
+  # we won't know the model file extension, so we rely on this helper to check
+  # the possible extensions and throw an error if none exists
+  find_nonmem_model_file_path(res[[ABS_MOD_PATH]], .check_exists = TRUE)
 
   # check babylon args and add an empty list if missing
   if (is.null(res[[YAML_BBI_ARGS]])) {
@@ -55,15 +45,6 @@ create_model_object <- function(res, save_yaml) {
       checkmate::assert_list(res[[YAML_BBI_ARGS]], names="unique"),
       error = function(e) { stop(glue("`{YAML_BBI_ARGS}` must be a unique, named list: {e}")) }
     )
-  }
-
-  # add output_dir
-  if (!is.null(res[[YAML_BBI_ARGS]][["output_dir"]])) {
-    # if specified in bbi_args, overwrite anything that's in YAML or list
-    res[[YAML_OUT_DIR]] <- res[[YAML_BBI_ARGS]][["output_dir"]]
-  } else if (is.null(res[[YAML_OUT_DIR]])) {
-    # if null, infer from model path
-    res[[YAML_OUT_DIR]] <- res[[YAML_MOD_PATH]] %>% tools::file_path_sans_ext()
   }
 
   # assign class and write YAML to disk

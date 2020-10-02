@@ -90,10 +90,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   test_that("get_based_on() behaves correctly on missing keys", {
     # missing YAML_BASED_ON
     .test_list <- list()
-    .test_list[[WORKING_DIR]] <- "/fake/path"
+    .test_list[[ABS_MOD_PATH]] <- "/fake/path"
     expect_null(get_based_on(.test_list))
 
-    # missing WORKING_DIR
+    # missing ABS_MOD_PATH
     .test_list <- list()
     expect_error(get_based_on(.test_list), regexp = "must contain key")
 

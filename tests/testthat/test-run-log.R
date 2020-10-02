@@ -13,8 +13,22 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     log_df <- expect_error(run_log(), regexp = "`.base_dir` cannot be `NULL`")
   })
 
-  test_that("run_log errors with malformed YAML", {
-    log_df <- expect_error(run_log(getwd()), regexp = "Unexpected error.+model_path defined in yaml")
+  test_that("run_log() errors with malformed YAML", {
+    temp_dir <- tempdir()
+    temp_yaml <- fs::file_copy("test-yaml/zz_fail_no_modtype.yaml", temp_dir)
+    on.exit({
+      fs::file_delete(temp_yaml)
+      fs::file_delete(file.path(temp_dir, basename(YAML_TEST_FILE)))
+    })
+
+    expect_warning(log_df <- run_log(temp_dir), "do not contain required keys")
+    expect_true(nrow(log_df) == 0L)
+
+    fs::file_copy(YAML_TEST_FILE, temp_dir)
+    expect_error(
+      run_log(temp_dir),
+      regexp = "Unexpected error trying to read yaml"
+    )
   })
 
   test_that("run_log returns NULL and warns when no YAML found", {
@@ -87,7 +101,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     rogue_yaml[[YAML_DESCRIPTION]] <- c(rogue_yaml[[YAML_DESCRIPTION]], "bad stuff")
     yaml::write_yaml(rogue_yaml, yaml_ext(NEW_MOD3))
 
-    expect_error(log_df <- run_log(MODEL_DIR), regexp = "expected to have length of")
+    expect_error(log_df <- run_log(MODEL_DIR), regexp = "Must have length 1")
   })
 
 }) # closing withr::with_options

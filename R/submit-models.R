@@ -129,7 +129,7 @@ submit_nonmem_models <- function(.mods,
     )
 
     # TODO: change this once we have the helper
-    model_dir <- .run[["models"]][[1]][[WORKING_DIR]]
+    model_dir <- get_model_working_directory(.run[["models"]][[1L]])
 
     # check for babylon.yaml config
     .config_path <- find_config_file_path(.config_path, model_dir)

@@ -20,15 +20,7 @@ get_model_path <- function(.bbi_object, .check_exists = TRUE) {
 #' @rdname get_path_from_object
 #' @export
 get_model_path.bbi_nonmem_model <- function(.bbi_object, .check_exists = TRUE) {
-
-  #.path <- find_model_file_path(.bbi_object[[ABS_MOD_PATH]])
-  .path <- file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_MOD_PATH]])
-
-  if(isTRUE(.check_exists)) {
-    checkmate::assert_file_exists(.path)
-  }
-
-  return(.path)
+  find_nonmem_model_file_path(.bbi_object[[ABS_MOD_PATH]], .check_exists)
 }
 
 
@@ -47,11 +39,9 @@ get_output_dir <- function(.bbi_object, .check_exists = TRUE) {
 #' @rdname get_path_from_object
 #' @export
 get_output_dir.bbi_nonmem_model <- function(.bbi_object, .check_exists = TRUE) {
+  .path <- .bbi_object[[ABS_MOD_PATH]]
 
-  #.path <- .bbi_object[[ABS_MOD_PATH]]
-  .path <- file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_OUT_DIR]])
-
-  if(isTRUE(.check_exists)) {
+  if (isTRUE(.check_exists)) {
     checkmate::assert_directory_exists(.path)
   }
 
@@ -73,11 +63,9 @@ get_yaml_path <- function(.bbi_object, .check_exists = TRUE) {
 #' @rdname get_path_from_object
 #' @export
 get_yaml_path.bbi_nonmem_model <- function(.bbi_object, .check_exists = TRUE) {
+  .path <- yaml_ext(.bbi_object[[ABS_MOD_PATH]])
 
-  #.path <- yaml_ext(.bbi_object[[ABS_MOD_PATH]])
-  .path <- file.path(.bbi_object[[WORKING_DIR]], .bbi_object[[YAML_YAML_NAME]])
-
-  if(isTRUE(.check_exists)) {
+  if (isTRUE(.check_exists)) {
     checkmate::assert_file_exists(.path)
   }
 
@@ -102,6 +90,19 @@ get_path_from_log_df <- function(.log_df, .get_func, .check_exists) {
     .get_func(.mod, .check_exists = .check_exists)
   })
   return(.out_paths)
+}
+
+#' Get the working directory of a model object
+#'
+#' The working directory of a model object is the parent directory of the
+#' absolute model path.
+#'
+#' @param .mod A model object.
+#'
+#' @return The path to the working directory.
+#' @keywords internal
+get_model_working_directory <- function(.mod) {
+  dirname(.mod[[ABS_MOD_PATH]])
 }
 
 ###############################
@@ -175,7 +176,7 @@ get_model_id.character <- function(.mod) {
 #' @describeIn get_model_id Takes `bbi_nonmem_model` object
 #' @export
 get_model_id.bbi_nonmem_model <- function(.mod) {
-  return(basename(tools::file_path_sans_ext(.mod[[YAML_MOD_PATH]])))
+  return(basename(tools::file_path_sans_ext(get_model_path(.mod))))
 }
 
 #' Build absolute path from a directory and path
@@ -207,18 +208,50 @@ combine_directory_path <- function(.directory, .path) {
 }
 
 
-#' Private helper to find valid model file and return ctl_ext(.path) by default if not found
-#' @param .path File path to a NONMEM model file (control stream) with either `.ctl` or `.mod` extension
+#' Find the path to a NONMEM model file
+#'
+#' NONMEM recognizes two model file extensions, `.ctl` and (less common) `.mod`.
+#' Look for these at `.path` and if exactly one exists, return it. If both
+#' exist, throw an error, because there is no way to know which should be used.
+#' If neither exists and `.check_exists = TRUE`, throw an error.
+#'
+#' @param .path File path to a NONMEM model file (control stream) with either
+#'   `.ctl` or `.mod` extension.
+#' @inheritParams get_model_path
+#'
+#' @return The path to the model file, if it exists. If the model file does not
+#'   exist and `.check_exists = FALSE`, a string that is `.path` with the `.ctl`
+#'   extension.
 #' @keywords internal
-find_model_file_path <- function(.path) {
-  .ctl_path <- ctl_ext(.path)
-  .mod_path <- mod_ext(.path)
-  if(fs::file_exists(.ctl_path)) {
-    return(.ctl_path)
-  } else if(fs::file_exists(.mod_path)) {
-    return(.mod_path)
-  } else {
-    warning(glue("No model file found at {.ctl_path} but setting that path as default model path for {.path}. Please put relevant model file in that location."))
-    return(.ctl_path)
+find_nonmem_model_file_path <- function(.path, .check_exists = TRUE) {
+  checkmate::assert_string(.path)
+  checkmate::assert_logical(.check_exists, any.missing = FALSE, len = 1L)
+
+  maybe_paths <- c(ctl_ext(.path), mod_ext(.path))
+  exists_idx <- purrr::map_lgl(maybe_paths, fs::file_exists)
+
+  if (all(exists_idx)) {
+    stop(
+      glue::glue(
+        "Both `.ctl` and `.mod` files found at {.path}. Remove one to continue."
+      )
+    )
   }
+
+  if (!any(exists_idx)) {
+    if (isTRUE(.check_exists)) {
+      stop(
+        glue::glue(
+          "No model file found at {maybe_paths[1L]} or {maybe_paths[2L]}.",
+          "Please put relevant model file in that location.",
+          .sep = " "
+        )
+      )
+    } else {
+      res <- maybe_paths[1L]
+    }
+  } else {
+    res <- maybe_paths[which(exists_idx)]
+  }
+  res
 }

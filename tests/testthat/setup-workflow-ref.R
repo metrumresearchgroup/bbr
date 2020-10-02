@@ -93,11 +93,8 @@ REF_LIST_1 <- list(
   bbi_args = list(
     overwrite = TRUE,
     threads = 4L),
-  model_working_dir = file.path(getwd(), "model-examples"),
-  orig_yaml_file ="1.yaml",
-  yaml_md5 = MOD1_YAML_MD5,
-  model_path = "1.ctl",
-  output_dir = "1"
+  absolute_model_path = file.path(getwd(), "model-examples", "1"),
+  yaml_md5 = MOD1_YAML_MD5
 )
 class(REF_LIST_1) <- MOD_CLASS_LIST
 
@@ -109,11 +106,8 @@ REF_LIST_TMP <- list(
   bbi_args = list(
     overwrite = TRUE,
     threads = 4L),
-  model_working_dir = file.path(getwd(), "model-examples"),
-  orig_yaml_file ="temp.yaml",
-  yaml_md5 = MOD1_YAML_MD5,
-  model_path = "temp.ctl",
-  output_dir = "temp"
+  absolute_model_path = file.path(getwd(), "model-examples", "temp"),
+  yaml_md5 = MOD1_YAML_MD5
 )
 class(REF_LIST_TMP) <- MOD_CLASS_LIST
 
@@ -220,4 +214,27 @@ rep_missing <- function(x, i, len) {
   res <- rep(x, len)
   res[i] <- NA
   res
+}
+
+#' Create a temporary model
+#'
+#' It is useful to create a model file and YAML file that can be discarded. The
+#' files will be deleted when `envir` exits.
+#'
+#' @param path The path to the YAML file to copy.
+#' @param mod_content A string giving the content of the model file.
+#' @param mod_ext The extension for the model file.
+#' @inheritParams withr::defer
+#'
+#' @return The path to the temporary YAML file.
+create_temp_model <- function(path = YAML_TEST_FILE,
+                              mod_content = "foo",
+                              mod_ext = "ctl",
+                              envir = parent.frame()) {
+  temp_yaml <- tempfile(fileext = ".yaml")
+  fs::file_copy(path, temp_yaml)
+  temp_ctl <- fs::path_ext_set(temp_yaml, mod_ext)
+  readr::write_file(mod_content, temp_ctl)
+  withr::defer(fs::file_delete(c(temp_yaml, temp_ctl)), envir)
+  temp_yaml
 }

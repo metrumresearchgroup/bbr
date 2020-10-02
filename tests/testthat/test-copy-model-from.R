@@ -16,12 +16,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
     # check that everything is copied through in the object
     expect_identical(class(new_mod), MOD_CLASS_LIST)
-    expect_identical(new_mod[[YAML_MOD_PATH]], basename(ctl_ext(NEW_MOD2)))
     expect_identical(new_mod[[YAML_DESCRIPTION]], NEW_DESC)
     expect_identical(new_mod[[YAML_BASED_ON]], "1")
     expect_identical(new_mod[[YAML_TAGS]], NEW_TAGS)
     expect_equal(new_mod[[YAML_BBI_ARGS]], list(overwrite = TRUE, threads = 4L))
-    expect_identical(new_mod[[YAML_OUT_DIR]], basename(NEW_MOD2))
 
     # check that everything is copied through in the YAML
     new_yaml <- yaml::read_yaml(yaml_ext(NEW_MOD2))
