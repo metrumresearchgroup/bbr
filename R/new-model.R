@@ -115,18 +115,7 @@ read_model <- function(
   yaml_list[[ABS_MOD_PATH]] <- file.path(model_working_directory, model_id)
   yaml_list[[YAML_YAML_MD5]] <- digest(file = .path, algo = "md5")
 
-  # parse model path
-  if (!check_required_keys(yaml_list, .req = YAML_REQ_INPUT_KEYS)) {
-    err_msg <- paste0(
-      "Model yaml must have keys `", paste(YAML_REQ_INPUT_KEYS, collapse=", "), "` specified in it. ",
-      "But `", paste(YAML_REQ_INPUT_KEYS[!(YAML_REQ_INPUT_KEYS %in% names(yaml_list))], collapse=", "), "` are missing. ",
-      .path, " has the following keys: ", paste(names(yaml_list), collapse=", ")
-    )
-    strict_mode_error(err_msg)
-  }
-
   .mod <- create_model_object(yaml_list, save_yaml = FALSE)
-
   return(.mod)
 }
 
