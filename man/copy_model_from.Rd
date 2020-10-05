@@ -13,8 +13,7 @@ copy_model_from(
   .add_tags = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
-  .overwrite = FALSE,
-  .directory = get_model_directory()
+  .overwrite = FALSE
 )
 
 \method{copy_model_from}{bbi_nonmem_model}(
@@ -25,16 +24,17 @@ copy_model_from(
   .add_tags = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
-  .overwrite = FALSE,
-  .directory = get_model_directory()
+  .overwrite = FALSE
 )
 }
 \arguments{
 \item{.parent_mod}{Model to copy from}
 
-\item{.new_model}{Path to write new model files to \strong{without file extension}.
-Function will create both \verb{\{.new_model\}.yaml} and a new model file based on
-this path.}
+\item{.new_model}{Path, relative to location of \code{.parent_model}, to write new
+model files to. Should have \strong{no file extension} because function will
+create both \verb{\{.new_model\}.yaml} and a new model file (i.e. \verb{\{.new_model\}.ctl})
+based on this path. User can also pass a numeric, which will create the new
+model files in the same directory as \code{.parent_mod}.}
 
 \item{.description}{Description of new model run. This will be stored in the
 yaml (to be used later in \code{run_log()}).}
@@ -60,10 +60,6 @@ updated. If \code{FALSE}, new model file will be an exact copy of its parent.}
 \item{.overwrite}{If \code{FALSE}, the default,  function will error if a model
 file already exists at specified \code{.new_model} path. If \code{TRUE} any existing
 file at \code{.new_model} will be overwritten silently.}
-
-\item{.directory}{Model directory which \code{.new_model} is relative to. Defaults
-to \code{options('rbabylon.model_directory')}, which can be set globally with
-\code{set_model_directory()}.}
 }
 \description{
 Create new model by copying existing model. Useful for iterating during model
