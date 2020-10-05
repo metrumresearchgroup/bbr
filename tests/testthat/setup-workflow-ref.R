@@ -129,7 +129,7 @@ FAKE_CTL_PATH <- file.path(getwd(), MODEL_DIR, CTL_TEST_FILE)
 ########################
 
 create_all_models <- function() {
-  mod1 <- read_model(YAML_TEST_FILE)
+  mod1 <- read_model(MOD1_PATH)
   mod2 <- copy_model_from(mod1, NEW_MOD2,   "level 1 copy of 1")
   mod3 <- copy_model_from(mod1, NEW_MOD3,   "level 1 copy of 1")
   fs::dir_create(LEVEL2_DIR)
@@ -151,7 +151,7 @@ copy_all_output_dirs <- function() {
 
 create_rlg_models <- function() {
   # copy models before creating run log
-  mod1 <- read_model(YAML_TEST_FILE)
+  mod1 <- read_model(MOD1_PATH)
   copy_model_from(mod1, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
   copy_model_from(mod1,
                   NEW_MOD3,
