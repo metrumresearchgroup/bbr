@@ -12,7 +12,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     on.exit({ cleanup() })
 
     # run copy_model_from
-    new_mod <- copy_model_from(MOD1, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
+    new_mod <- copy_model_from(MOD1, basename(NEW_MOD2), NEW_DESC, .add_tags = NEW_TAGS)
 
     # check that everything is copied through in the object
     expect_identical(class(new_mod), MOD_CLASS_LIST)
@@ -42,7 +42,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # run copy_model_from
     fs::file_copy(YAML_TEST_FILE, paste0(NEW_MOD2, '.yaml'))
     copy_model_from(MOD1,
-                    NEW_MOD3,
+                    basename(NEW_MOD3),
                     NEW_DESC,
                     .based_on_additional = get_model_id(NEW_MOD2),
                     .inherit_tags = TRUE,
@@ -66,28 +66,23 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     )
   })
 
-  test_that("copy_from_model bbi_nonmem_model", {
+  test_that("copy_from_model.bbi_nonmem_model works with numeric input", {
     on.exit({ cleanup() })
 
-    # run copy_model_from on a model object
+    # check that the model is not there already
     new_yaml_path <- yaml_ext(NEW_MOD2)
     new_ctl_path <- ctl_ext(NEW_MOD2)
     expect_false(fs::file_exists(new_yaml_path))
     expect_false(fs::file_exists(new_ctl_path))
-    copy_model_from(MOD1, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
 
-    # check that everything is copied through
-    new_yaml <- yaml::read_yaml(new_yaml_path)
+    # copy with numeric
+    num_input <- as.numeric(basename(NEW_MOD2))
+    expect_equal(num_input, 2)
+    copy_model_from(MOD1, num_input, NEW_DESC, .add_tags = NEW_TAGS)
 
-    expect_identical(new_yaml[[YAML_DESCRIPTION]], NEW_DESC)
-    expect_identical(new_yaml[[YAML_BASED_ON]], "1")
-    expect_identical(new_yaml[[YAML_TAGS]], NEW_TAGS)
-    expect_equal(new_yaml[[YAML_BBI_ARGS]], list(overwrite = TRUE, threads = 4L))
-
-    # check the control stream is modified
-    new_mod_str <- readr::read_file(new_ctl_path)
-    new_desc_pattern <- paste0("\\$PROBLEM ", get_model_id(NEW_MOD2), " ", NEW_DESC, "\n\n\\$INPUT")
-    expect_true(grepl(new_desc_pattern, new_mod_str))
+    # check that the model was created
+    new_mod <- read_model(NEW_MOD2)
+    expect_true(inherits(new_mod, NM_MOD_CLASS))
   })
 
 
@@ -104,7 +99,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     fs::file_copy(ctl_ext(YAML_TEST_FILE), new_ctl_path)
 
     # copy with .overwrite=TRUE
-    copy_model_from(MOD1, NEW_MOD2, NEW_DESC, .overwrite=TRUE)
+    copy_model_from(MOD1, basename(NEW_MOD2), NEW_DESC, .overwrite=TRUE)
 
     # check the control stream is modified by overwrite
     new_mod_str <- readr::read_file(new_ctl_path)
@@ -130,7 +125,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
     # copy with .overwrite=FALSE
     expect_error(
-      copy_model_from(MOD1, NEW_MOD2, NEW_DESC, .overwrite=FALSE),
+      copy_model_from(MOD1, basename(NEW_MOD2), NEW_DESC, .overwrite=FALSE),
       regexp = "File already exists at"
     )
 
