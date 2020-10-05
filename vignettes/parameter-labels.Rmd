@@ -51,7 +51,7 @@ if (Sys.which("bbi") == "") {
 Our modeling directory contains a control stream and output directory, because the model has already been run.
 
 ```{r first model}
-mod1 <- read_model("510")
+mod1 <- read_model(file.path(MODEL_DIR, "510"))
 class(mod1)
 ```
 
