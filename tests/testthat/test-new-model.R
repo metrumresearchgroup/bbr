@@ -135,14 +135,12 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     .test_path <- "model-examples/tmp.yaml"
 
     expect_error(
-      suppressSpecificWarning({
-        mod1a <- new_model(
-          fs::path_ext_remove(.test_path),
-          .description = "original acop model",
-          .based_on = c("1", "fake")
-        )
-      }, "No model file found at.+\\.ctl")
-      , regexp = "cannot find .yaml files"
+      new_model(
+        fs::path_ext_remove(.test_path),
+        .description = "original acop model",
+        .based_on = c("1", "fake")
+      ),
+      regexp = "cannot find .yaml files"
     )
   })
 

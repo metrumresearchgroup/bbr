@@ -52,13 +52,11 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
     # created
 
     # create model spec
-    mod1 <- suppressWarnings(
-      new_model(
-        file.path(MODEL_DIR_BBI, "1"),
-        .description = ORIG_DESC,
-        .tags = ORIG_TAGS,
-        .bbi_args = list(overwrite = TRUE, threads = 4)
-      )
+    mod1 <- new_model(
+      file.path(MODEL_DIR_BBI, "1"),
+      .description = ORIG_DESC,
+      .tags = ORIG_TAGS,
+      .bbi_args = list(overwrite = TRUE, threads = 4)
     )
     expect_identical(class(mod1), MOD_CLASS_LIST)
 
@@ -81,8 +79,8 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
   })
 
   test_that("copying model works and new models run correctly", {
-    # TODO: this test relies on model-examples-bbi/1.ctl being present
-    # copy model
+    # TODO: isolate this test so it does not depend on a model created by a
+    # previous test
     mod1 <- read_model(1)
     mod2 <- copy_model_from(mod1, 2, NEW_DESC)
     mod3 <- copy_model_from(mod1, 3, NEW_DESC, .inherit_tags = TRUE) %>% add_bbi_args(list(clean_lvl=2, overwrite = FALSE))
