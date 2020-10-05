@@ -64,7 +64,7 @@ setup({
 
   # copy model 1 to level deeper
   fs::dir_create(LEVEL2_DIR)
-  copy_model_from(MOD1, LEVEL2_MOD, "level 2 copy of 1.yaml", .inherit_tags = TRUE)
+  copy_model_from(MOD1, file.path(LEVEL2_SUBDIR, MOD_ID), "level 2 copy of 1.yaml", .inherit_tags = TRUE)
   copy_all_output_dirs()
 })
 

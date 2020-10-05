@@ -36,8 +36,9 @@ GRD_TEST_FILE <-  as.character(glue::glue("{MOD1_PATH}/{MOD_ID}.grd"))
 EXT_TEST_FILE <-  as.character(glue::glue("{MOD1_PATH}/{MOD_ID}.ext"))
 OUTPUT_FILE <-    file.path(MOD1_PATH, "OUTPUT")
 
-LEVEL2_DIR <- file.path(MODEL_DIR, "level2")
-LEVEL2_MOD <- file.path(LEVEL2_DIR, "1")
+LEVEL2_SUBDIR <- "level2"
+LEVEL2_DIR <- file.path(MODEL_DIR, LEVEL2_SUBDIR)
+LEVEL2_MOD <- file.path(LEVEL2_DIR, MOD_ID)
 
 ORIG_DESC <- "original acop model"
 NEW_DESC <- "new description"
@@ -130,10 +131,10 @@ FAKE_CTL_PATH <- file.path(getwd(), MODEL_DIR, CTL_TEST_FILE)
 
 create_all_models <- function() {
   mod1 <- read_model(MOD1_PATH)
-  mod2 <- copy_model_from(mod1, NEW_MOD2,   "level 1 copy of 1")
-  mod3 <- copy_model_from(mod1, NEW_MOD3,   "level 1 copy of 1")
+  mod2 <- copy_model_from(mod1, basename(NEW_MOD2),   "level 1 copy of 1")
+  mod3 <- copy_model_from(mod1, basename(NEW_MOD3),   "level 1 copy of 1")
   fs::dir_create(LEVEL2_DIR)
-  mod4 <- copy_model_from(mod2, LEVEL2_MOD, "level 2 copy of 2")
+  mod4 <- copy_model_from(mod2, file.path(LEVEL2_SUBDIR, MOD_ID), "level 2 copy of 2")
 
   # load or create models and assign model objects to global environment
   assign("mod1", mod1, pos = parent.frame())
@@ -152,9 +153,9 @@ copy_all_output_dirs <- function() {
 create_rlg_models <- function() {
   # copy models before creating run log
   mod1 <- read_model(MOD1_PATH)
-  copy_model_from(mod1, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
+  copy_model_from(mod1, basename(NEW_MOD2), NEW_DESC, .add_tags = NEW_TAGS)
   copy_model_from(mod1,
-                  NEW_MOD3,
+                  basename(NEW_MOD3),
                   NEW_DESC,
                   .based_on_additional = get_model_id(NEW_MOD2),
                   .inherit_tags = TRUE,
