@@ -14,11 +14,11 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
   test_that("run_log() errors with malformed YAML", {
-    temp_dir <- tempdir()
+    temp_dir <- file.path(tempdir(), "run_log_malformed_yaml_test")
+    fs::dir_create(temp_dir)
     temp_yaml <- fs::file_copy("test-yaml/zz_fail_no_modtype.yaml", temp_dir)
     on.exit({
-      fs::file_delete(temp_yaml)
-      fs::file_delete(file.path(temp_dir, basename(YAML_TEST_FILE)))
+      fs::dir_delete(temp_dir)
     })
 
     expect_warning(log_df <- run_log(temp_dir), "do not contain required keys")
