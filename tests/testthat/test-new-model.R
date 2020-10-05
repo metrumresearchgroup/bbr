@@ -26,6 +26,17 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_equal(mod2, REF_LIST_TMP)
   })
 
+  test_that("read_model() can read a model whose path has a period", {
+    temp_ctl <- tempfile(pattern = "file.", fileext = ".ctl")
+    # ensure that `temp_ctl` exists
+    readr::write_file("foo", temp_ctl)
+
+    temp_yaml <- fs::path_ext_set(temp_ctl, ".yaml")
+    fs::file_copy(YAML_TEST_FILE, temp_yaml)
+    on.exit(fs::file_delete(c(temp_ctl, temp_yaml)))
+
+    mod <- read_model(fs::path_ext_remove(temp_yaml))
+    expect_identical(class(mod), MOD_CLASS_LIST)
   })
 
   test_that("new_model() creates new YAML file", {
