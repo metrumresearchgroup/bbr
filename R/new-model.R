@@ -9,8 +9,9 @@
 #' `run_log()` later. Will look for an associated model file (control stream) on
 #' disk and throw an error if it doesn't find one.
 #'
-#' @param .yaml_path Path to save resulting model YAML file to. MUST be either
-#'   an absolute path, or a path relative to the `.directory` argument.
+#' @param .path Path to save the new model. Will be the path to the model file
+#'   and YAML file (both without extension), and the path to the output
+#'   directory.
 #' @param .description Description of new model run. This will be stored in the
 #'   yaml (and can be viewed later in `run_log()`). By convention, it should
 #'   match the $PROBLEM statement in the control stream, but this is not
@@ -28,51 +29,48 @@
 #'   `.yaml_path`. If `TRUE` overwrite existing file, if one exists.
 #' @param .model_type Character scaler to specify type of model being created
 #'   (used for S3 class). Currently only `'nonmem'` is supported.
-#' @param .directory Model directory which `.yaml_path` is relative to. Defaults
-#'   to `options('rbabylon.model_directory')`, which can be set globally with
-#'   `set_model_directory()`.
-#' @importFrom yaml write_yaml
-#' @importFrom fs file_exists
-#' @importFrom digest digest
+#'
 #' @return S3 object of class `bbi_{.model_type}_model` that can be passed to
 #'   `submit_model()`, `model_summary()`, etc.
 #' @export
 new_model <- function(
-  .yaml_path,
+  .path,
   .description,
   .based_on = NULL,
   .tags = NULL,
   .bbi_args = NULL,
   .overwrite = FALSE,
-  .model_type = c("nonmem"),
-  .directory = get_model_directory()
+  .model_type = c("nonmem")
 ) {
 
-  # TODO: update once numeric "dispatch" is formally deprecated
-  if (fs::path_ext(as.character(.yaml_path)) != "yaml") {
-      warning(glue("Did not pass a YAML extension to .yaml_path. Inferred path `{yaml_ext(.yaml_path)}` from `{.yaml_path}`"))
-      .yaml_path <- yaml_ext(.yaml_path)
-  }
-
-  # check for .directory and combine with .yaml_path
-  .yaml_path <- combine_directory_path(.directory, .yaml_path)
-
+  maybe_yaml_path <- paste0(.path, ".yaml")
   # check if file already exists
-  if (fs::file_exists(.yaml_path) && !isTRUE(.overwrite)) {
-    stop(paste(glue("Passed {.yaml_path} to `new_model(.yaml_path)` but that file already exists."),
-               "Either call `read_model()` to load model from YAML or use `new_model(.overwrite = TRUE)` to overwrite the existing YAML."))
+  if (fs::file_exists(maybe_yaml_path) && !isTRUE(.overwrite)) {
+    stop(
+      glue::glue(
+        "File already exists at {maybe_yaml_path}.",
+        "Either call `read_model()` to load model from YAML or use,",
+        "`new_model(.overwrite = TRUE)` to overwrite the existing YAML.",
+        .sep = " "
+      )
+    )
   }
 
-  model_working_directory <- normalizePath(dirname(.yaml_path))
-  model_id <- get_model_id(.yaml_path)
+  # construct the absolute model path in a way that avoids a warning from
+  # normalizePath() if `.path` does not exist (we only require that the model
+  # file exist at `.path`)
+  abs_mod_path <- file.path(
+    normalizePath(dirname(.path)),
+    basename(.path)
+  )
 
   # fill list from passed args
   .mod <- list()
-  .mod[[ABS_MOD_PATH]] <- file.path(model_working_directory, model_id)
+  .mod[[ABS_MOD_PATH]] <- abs_mod_path
   .mod[[YAML_DESCRIPTION]] <- .description
   .mod[[YAML_MOD_TYPE]] <- .model_type
   if (!is.null(.based_on)) {
-    .mod[[YAML_BASED_ON]] <- safe_based_on(model_working_directory, .based_on)
+    .mod[[YAML_BASED_ON]] <- safe_based_on(dirname(.path), .based_on)
   }
   if (!is.null(.tags)) .mod[[YAML_TAGS]] <- .tags
   if (!is.null(.bbi_args)) .mod[[YAML_BBI_ARGS]] <- .bbi_args

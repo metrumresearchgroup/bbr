@@ -81,7 +81,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
     # model_directory option is deprecated
     mod2 <- copy_model_from(
       MOD1,
-      file.path(new_dir, CTL_FILENAME),
+      file.path(new_dir, MOD_ID),
       "created by test-submit-models.R"
     )
     proc_list <- submit_models(list(MOD1, mod2), .dry_run = TRUE)

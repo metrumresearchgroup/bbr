@@ -63,7 +63,10 @@ if (Sys.which("bbi") == "") {
 The modeling process will always start with an initial model, which we create with the `new_model()` call.
 
 ```{r first model}
-mod1 <- new_model(.yaml_path = "1.yaml", .description = "one compartment base model")
+mod1 <- new_model(
+  system.file("nonmem/1", package = "rbabylon"), 
+  .description = "one compartment base model"
+)
 ```
 
 From there, the iterative model development process proceeds. The `copy_model_from()` function will do several things, including creating a new model file and filling in some relevant metadata. Notably, it will also add the model that you copied _from_ into the `based_on` field for the new model.

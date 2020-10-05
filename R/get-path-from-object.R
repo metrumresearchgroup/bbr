@@ -63,7 +63,7 @@ get_yaml_path <- function(.bbi_object, .check_exists = TRUE) {
 #' @rdname get_path_from_object
 #' @export
 get_yaml_path.bbi_nonmem_model <- function(.bbi_object, .check_exists = TRUE) {
-  .path <- yaml_ext(.bbi_object[[ABS_MOD_PATH]])
+  .path <- paste0(.bbi_object[[ABS_MOD_PATH]], ".yaml")
 
   if (isTRUE(.check_exists)) {
     checkmate::assert_file_exists(.path)
@@ -227,7 +227,7 @@ find_nonmem_model_file_path <- function(.path, .check_exists = TRUE) {
   checkmate::assert_string(.path)
   checkmate::assert_logical(.check_exists, any.missing = FALSE, len = 1L)
 
-  maybe_paths <- c(ctl_ext(.path), mod_ext(.path))
+  maybe_paths <- paste0(.path, c(".ctl", ".mod"))
   exists_idx <- purrr::map_lgl(maybe_paths, fs::file_exists)
 
   if (all(exists_idx)) {

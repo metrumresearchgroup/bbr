@@ -16,8 +16,10 @@ knitr::opts_chunk$set(
 ```
 
 ```{r cleanup top, include=FALSE}
+# TODO: this will be cleaned up in #165
 # delete old files
 cleanup <- function() {
+  nonmem_path <- system.file("nonmem", package = "rbabylon")
   if (fs::file_exists("../inst/nonmem/1.yaml")) fs::file_delete("../inst/nonmem/1.yaml")
   if (fs::file_exists("../inst/nonmem/2.yaml")) fs::file_delete("../inst/nonmem/2.yaml")
   if (fs::file_exists("../inst/nonmem/3.yaml")) fs::file_delete("../inst/nonmem/3.yaml")
@@ -26,6 +28,7 @@ cleanup <- function() {
   if (fs::dir_exists("../inst/nonmem/2")) fs::dir_delete("../inst/nonmem/2")
   if (fs::dir_exists("../inst/nonmem/3")) fs::dir_delete("../inst/nonmem/3")
   if (fs::file_exists("../inst/nonmem/babylon.yaml")) fs::file_delete("../inst/nonmem/babylon.yaml")
+  if (fs::file_exists(file.path(nonmem_path, "1.yaml"))) fs::file_delete(file.path(nonmem_path, "1.yaml"))
 }
 cleanup()
 ```
@@ -113,7 +116,10 @@ To begin modeling, first create a model object. This is an S3 object with an acc
 The `.yaml_path` argument should have the same name (but with a `.yaml` extension) as your base model control stream. For instance, the command below assumes you have a control stream name `1.ctl` or `1.mod` in the model directory you just defined. The `.description` argument is required and corresponds to what would be in the `$PROB` definition in a control stream.
 
 ```{r first model}
-mod1 <- new_model(.yaml_path = "1.yaml", .description = "our first model")
+mod1 <- new_model(
+  system.file("nonmem/1", package = "rbabylon"), 
+  .description = "our first model"
+)
 ```
 
 The model object you have just created can be passed to various functions which you will see in a minute. If you ever need to recreate it, just run `mod1 <- read_model("1.yaml")` to rebuild it from the YAML. The first thing we will do is submit the model to be run.
