@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r cleanup top, include=FALSE}
+# TODO: this will be cleaned up in #165
 # delete old files
 cleanup <- function() {
   nonmem_path <- system.file("nonmem", package = "rbabylon")
