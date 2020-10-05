@@ -23,7 +23,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
   })
 
   test_that("param_estimates correctly errors on Bayesian model", {
-    mod1 <- read_model(1001, .directory = MODEL_DIR_X)
+    mod1 <- read_model(file.path(MODEL_DIR_X, "1001"))
     sum1 <- model_summary(mod1, .bbi_args = list(ext_file = "1001.1.TXT"))
     expect_error(
       param_estimates(sum1),
@@ -32,7 +32,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
   })
 
   test_that("param_estimates correctly warns on mixture model", {
-    mod1 <- read_model("iovmm", .directory = MODEL_DIR_X)
+    mod1 <- read_model(file.path(MODEL_DIR_X, "iovmm"))
     sum1 <- model_summary(mod1)
 
     expect_warning(

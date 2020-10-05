@@ -7,7 +7,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   )
 
   test_that("read_model() returns expected object", {
-    expect_equal(read_model("model-examples/1.yaml"), REF_LIST_1)
+    expect_equal(read_model(MOD1_PATH), REF_LIST_1)
   })
 
   test_that("read_model() returns expected object from no ext specified", {
@@ -35,16 +35,13 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("new_model() creates new YAML file", {
     # TODO: change this pending #179
-    temp_yaml <- create_temp_model()
-    fs::file_delete(temp_yaml)
+    temp_mod_path <- create_temp_model()
+    fs::file_delete(fs::path_ext_set(temp_mod_path, "yaml"))
 
-    mod1a <- new_model(
-      fs::path_ext_remove(temp_yaml),
-      .description = "new model test"
-    )
+    mod1a <- new_model(temp_mod_path, .description = "new model test")
 
     # read model from YAML
-    mod1b <- read_model(.path = temp_yaml)
+    mod1b <- read_model(temp_mod_path)
 
     # check class and keys are right
     expect_identical(class(mod1a), MOD_CLASS_LIST)
@@ -60,20 +57,20 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("compare read_model() and new_model() objects", {
     # TODO: change this pending #179
-    temp_yaml <- create_temp_model(YAML_TEST_FILE)
-    fs::file_delete(temp_yaml)
+    temp_mod_path <- create_temp_model(YAML_TEST_FILE)
+    fs::file_delete(fs::path_ext_set(temp_mod_path, "yaml"))
 
     # create a new model with arguments known to match the reference model at
     # YAML_TEST_FILE
     mod1a <- new_model(
-      fs::path_ext_remove(temp_yaml),
+      temp_mod_path,
       .description = "original acop model",
       .tags = c("acop tag", "other tag"),
       .bbi_args = list(overwrite = TRUE, threads = 4)
     )
 
     # read in the reference model
-    mod1b <- read_model(.path = YAML_TEST_FILE)
+    mod1b <- read_model(temp_mod_path)
 
     # check class and keys are right
     expect_identical(class(mod1a), MOD_CLASS_LIST)
@@ -93,36 +90,30 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
   test_that("new_model() .overwrite arg works", {
-    temp_yaml <- create_temp_model(YAML_TEST_FILE)
+    temp_mod_path <- create_temp_model(YAML_TEST_FILE)
 
     # error if file exists
     expect_error(
-      new_model(
-        fs::path_ext_remove(temp_yaml),
-        .description = "fake model"
-      ),
+      new_model(temp_mod_path, .description = "fake model"),
       regexp = "File already exists at"
     )
 
-    new_model(
-      fs::path_ext_remove(temp_yaml),
-      .description = "fake model",
-      .overwrite = TRUE
-    )
+    # overwrite the description
+    new_model(temp_mod_path, .description = "fake model", .overwrite = TRUE)
 
-    new_mod <- read_model(temp_yaml)
+    new_mod <- read_model(temp_mod_path)
     expect_equal(new_mod$description, "fake model")
   })
 
 
   test_that("new_model() .based_on arg works", {
     # TODO: change this pending #179
-    temp_yaml <- create_temp_model(YAML_TEST_FILE)
+    temp_mod_path <- create_temp_model(YAML_TEST_FILE)
     parent_model_id <- get_model_id(create_temp_model())
-    fs::file_delete(temp_yaml)
+    fs::file_delete(fs::path_ext_set(temp_mod_path, "yaml"))
 
     mod1a <- new_model(
-      fs::path_ext_remove(temp_yaml),
+      temp_mod_path,
       .description = "original acop model",
       .based_on = parent_model_id
     )

@@ -129,7 +129,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
         test_yaml_path <- .test_case$test_yaml_path
 
         # load model from yaml
-        this_mod <- read_model(.path = test_yaml_path)
+        this_mod <- read_model(fs::path_ext_remove(test_yaml_path))
 
         # check class and keys are right
         expect_identical(class(this_mod), MOD_CLASS_LIST)
@@ -182,7 +182,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
         test_yaml_path <- .test_case$test_yaml_path
 
         # load mod from yaml and dry run through to summary object
-        this_mod <- read_model(.path = test_yaml_path)
+        this_mod <- read_model(fs::path_ext_remove(test_yaml_path))
         this_proc <- submit_model(this_mod, .dry_run = TRUE, .config_path = .test_case$bbi_path)
         this_sum <- model_summary(this_mod, .dry_run = TRUE)
         expect_identical(this_sum[[PROC_CALL]], REF_SUMMARY_CALL)
