@@ -227,7 +227,7 @@ reconcile_yaml <- function(.mod) {
   .yaml_path <- get_yaml_path(.mod)
 
   # load model from yaml on disk
-  .loaded_mod <- read_model(.yaml_path)
+  .loaded_mod <- read_model(fs::path_ext_remove(.yaml_path))
 
   # overwrite values in memory from the ones on disk
   .new_mod <- combine_list_objects(.loaded_mod, .mod)

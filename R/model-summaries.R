@@ -111,7 +111,10 @@ model_summaries.bbi_run_log_df <- function(
 
   # extract models
   .mod_paths <- get_model_path(.mods)
-  .mod_list <- map(.mod_paths, read_model)
+  .mod_list <-
+    .mod_paths %>%
+    purrr::map(fs::path_ext_remove) %>%
+    purrr::map(read_model)
 
   # pass to character dispatch
   res_df <- model_summaries(
