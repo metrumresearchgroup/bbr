@@ -51,3 +51,6 @@ Also creates necessary YAML file for using functions like \code{add_tags()} and
 \code{run_log()} later. Will look for an associated model file (control stream) on
 disk and throw an error if it doesn't find one.
 }
+\seealso{
+\code{\link[=copy_model_from]{copy_model_from()}}, \code{\link[=read_model]{read_model()}}
+}

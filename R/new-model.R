@@ -32,6 +32,7 @@
 #'
 #' @return S3 object of class `bbi_{.model_type}_model` that can be passed to
 #'   `submit_model()`, `model_summary()`, etc.
+#' @seealso [copy_model_from()], [read_model()]
 #' @export
 new_model <- function(
   .path,
@@ -84,37 +85,25 @@ new_model <- function(
 
 #' Creates a model object from a YAML model file
 #'
-#' Parses a model YAML file into a list object that contains correctly formatted information from the YAML
-#' and is an S3 object of class `bbi_{.model_type}_model` that can be passed to `submit_model()`, `model_summary()`, etc.
-#' @param .path Path to the YAML file to parse. MUST be either an absolute path, or a path relative to the `.directory` argument.
-#' @param .directory Model directory which `.path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
-#' @importFrom yaml read_yaml
-#' @importFrom digest digest
-#' @importFrom fs file_exists
+#' Parses a model YAML file into a list object that contains correctly formatted
+#' information from the YAML and is an S3 object of class
+#' `bbi_{.model_type}_model` that can be passed to [submit_model()],
+#' [model_summary()], etc.
+#'
+#' @param .path Path to the model to read, in the sense of absolute model path.
+#'
 #' @return S3 object of class `bbi_{.model_type}_model`
+#' @seealso [copy_model_from()], [new_model()]
 #' @export
-read_model <- function(
-  .path,
-  .directory = get_model_directory()
-) {
+read_model <- function(.path) {
+  yaml_path <- paste0(.path, ".yaml")
+  checkmate::assert_file_exists(yaml_path)
 
-  # check for .directory and combine with .path
-  .path <- combine_directory_path(.directory, .path)
+  yaml_list <- yaml::read_yaml(yaml_path)
+  yaml_list[[ABS_MOD_PATH]] <- fs::path_ext_remove(normalizePath(yaml_path))
+  yaml_list[[YAML_YAML_MD5]] <- digest::digest(file = yaml_path, algo = "md5")
 
-  # If not YAML extension, convert to YAML and look for file
-  .path <- yaml_ext(.path)
-  checkmate::assert_file_exists(.path)
-
-  model_working_directory <- normalizePath(dirname(.path))
-  model_id <- get_model_id(.path)
-
-  # load from file
-  yaml_list <- read_yaml(.path)
-  yaml_list[[ABS_MOD_PATH]] <- file.path(model_working_directory, model_id)
-  yaml_list[[YAML_YAML_MD5]] <- digest(file = .path, algo = "md5")
-
-  .mod <- create_model_object(yaml_list, save_yaml = FALSE)
-  return(.mod)
+  create_model_object(yaml_list, save_yaml = FALSE)
 }
 
 
