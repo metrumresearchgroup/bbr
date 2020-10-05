@@ -15,24 +15,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r cleanup top, include=FALSE}
-# TODO: this will be cleaned up in #165
-# delete old files
-cleanup <- function() {
-  nonmem_path <- system.file("nonmem", package = "rbabylon")
-  if (fs::file_exists("../inst/nonmem/1.yaml")) fs::file_delete("../inst/nonmem/1.yaml")
-  if (fs::file_exists("../inst/nonmem/2.yaml")) fs::file_delete("../inst/nonmem/2.yaml")
-  if (fs::file_exists("../inst/nonmem/3.yaml")) fs::file_delete("../inst/nonmem/3.yaml")
-  if (fs::file_exists("../inst/nonmem/2.ctl")) fs::file_delete("../inst/nonmem/2.ctl")
-  if (fs::file_exists("../inst/nonmem/3.ctl")) fs::file_delete("../inst/nonmem/3.ctl")
-  if (fs::dir_exists("../inst/nonmem/2")) fs::dir_delete("../inst/nonmem/2")
-  if (fs::dir_exists("../inst/nonmem/3")) fs::dir_delete("../inst/nonmem/3")
-  if (fs::file_exists("../inst/nonmem/babylon.yaml")) fs::file_delete("../inst/nonmem/babylon.yaml")
-  if (fs::file_exists(file.path(nonmem_path, "1.yaml"))) fs::file_delete(file.path(nonmem_path, "1.yaml"))
-}
-cleanup()
-```
-
 # Introduction
 
 This "Getting Started with rbabylon" vignette takes the user through some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its standard workflow and functionality. 
@@ -58,13 +40,29 @@ To reiterate, there are two relevant paths for this section.
 
 ```{r, include = FALSE}
 BBI_EXE_PATH <- read_bbi_path()
-MODEL_DIR <- "../inst/nonmem"
+MODEL_DIR <- system.file("nonmem", package = "rbabylon")
 ```
 
 ```{r define dirs, eval = FALSE}
 BBI_EXE_PATH <- "/data/apps/bbi" # this should be an absolute path
-MODEL_DIR <- "../inst/nonmem"    # this should be relative to your working directory
+MODEL_DIR <- "../nonmem"    # this should be relative to your working directory
 ```
+
+```{r cleanup top, include=FALSE}
+# delete old files
+cleanup <- function() {
+  if (fs::file_exists(file.path(MODEL_DIR, "1.yaml"))) fs::file_delete(file.path(MODEL_DIR, "1.yaml"))
+  if (fs::file_exists(file.path(MODEL_DIR, "2.yaml"))) fs::file_delete(file.path(MODEL_DIR, "2.yaml"))
+  if (fs::file_exists(file.path(MODEL_DIR, "3.yaml"))) fs::file_delete(file.path(MODEL_DIR, "3.yaml"))
+  if (fs::file_exists(file.path(MODEL_DIR, "2.ctl"))) fs::file_delete(file.path(MODEL_DIR, "2.ctl"))
+  if (fs::file_exists(file.path(MODEL_DIR, "3.ctl"))) fs::file_delete(file.path(MODEL_DIR, "3.ctl"))
+  if (fs::dir_exists(file.path(MODEL_DIR, "2"))) fs::dir_delete(file.path(MODEL_DIR, "2"))
+  if (fs::dir_exists(file.path(MODEL_DIR, "3"))) fs::dir_delete(file.path(MODEL_DIR, "3"))
+  if (fs::file_exists(file.path(MODEL_DIR, "babylon.yaml"))) fs::file_delete(file.path(MODEL_DIR, "babylon.yaml"))
+}
+cleanup()
+```
+
 
 ### Installing babylon
 
@@ -117,7 +115,7 @@ The `.yaml_path` argument should have the same name (but with a `.yaml` extensio
 
 ```{r first model}
 mod1 <- new_model(
-  system.file("nonmem/1", package = "rbabylon"), 
+  file.path(MODEL_DIR, 1),
   .description = "our first model"
 )
 ```
@@ -245,7 +243,7 @@ At any point, the user can easily construct a run log tibble to summarize all mo
 Before we move on, note that there are also the `config_log()` and `summary_log()` functions, as well as `add_config()` and `add_summary()` which automatically join the columns output from those functions against the tibble output from `run_log()`.  See the **Further Reading** section below for links to vignettes demonstrating those functions.
 
 ```{r run_log} 
-log_df <- run_log()
+log_df <- run_log(MODEL_DIR)
 log_df
 ```
 
