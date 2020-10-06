@@ -12,8 +12,7 @@ submit_models(
   ...,
   .config_path = file.path(get_model_directory() \%||\% ".", "babylon.yaml"),
   .wait = TRUE,
-  .dry_run = FALSE,
-  .directory = NULL
+  .dry_run = FALSE
 )
 
 \method{submit_models}{list}(
@@ -23,8 +22,7 @@ submit_models(
   ...,
   .config_path = file.path(get_model_directory() \%||\% ".", "babylon.yaml"),
   .wait = TRUE,
-  .dry_run = FALSE,
-  .directory = NULL
+  .dry_run = FALSE
 )
 }
 \arguments{
@@ -41,8 +39,6 @@ submit_models(
 \item{.wait}{If \code{TRUE}, the default, wait for the bbi process to return before this function call returns. If \code{FALSE} function will return while bbi process runs in the background.}
 
 \item{.dry_run}{Returns an object detailing the command that would be run, insted of running it. This is primarily for testing but also a debugging tool.}
-
-\item{.directory}{Model directory which \code{.mod} path is relative to. Defaults to \code{options('rbabylon.model_directory')}, which can be set globally with \code{set_model_directory()}. \strong{Only used when passing a file path for \code{.mod} instead of a \verb{bbi_\{.model_type\}_model} object.}}
 }
 \description{
 Submits a group of models to be run in batch by calling out to \code{bbi} in as

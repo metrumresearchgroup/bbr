@@ -22,8 +22,7 @@ submit_models <- function(
   ...,
   .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
   .wait = TRUE,
-  .dry_run=FALSE,
-  .directory = NULL
+  .dry_run=FALSE
 ) {
   UseMethod("submit_models")
 }
@@ -38,16 +37,8 @@ submit_models.list <- function(
   ...,
   .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
   .wait = TRUE,
-  .dry_run=FALSE,
-  .directory = NULL
+  .dry_run=FALSE
 ) {
-
-  if (!is.null(.directory)) {
-    warning(paste(glue("Passed `.directory = {.directory}` to submit_models.list().") ,
-                  "This argument is only valid when passing a path to `submit_models()`.",
-                  "Directory will be extracted from each model object."))
-  }
-
   # check that each element is a model object
   check_model_object_list(.mods)
 
