@@ -9,11 +9,11 @@
 #' ancestry. See ["Using based_on field"
 #' vignette](../articles/using-based-on.html) for details.
 #' @param .parent_mod Model to copy from
-#' @param .new_model Path, relative to location of `.parent_model`, to write new
-#'   model files to. Should have **no file extension** because function will
-#'   create both `{.new_model}.yaml` and a new model file (i.e. `{.new_model}.ctl`)
-#'   based on this path. User can also pass a numeric, which will create the new
-#'   model files in the same directory as `.parent_mod`.
+#' @param .new_model Path to the new model, either absolute or relative to the
+#'   path to `.parent_model`. Represents an absolute model path, which is the
+#'   path to the YAML file and model file, both without extension, and the
+#'   output directory (once the model is run). Numeric values will be coerced to
+#'   character. See examples for usage.
 #' @param .description Description of new model run. This will be stored in the
 #'   yaml (to be used later in `run_log()`).
 #' @param .based_on_additional Character vector of path(s) to other models that
@@ -33,6 +33,24 @@
 #' @param .overwrite If `FALSE`, the default,  function will error if a model
 #'   file already exists at specified `.new_model` path. If `TRUE` any existing
 #'   file at `.new_model` will be overwritten silently.
+#' @examples
+#' \dontrun{
+#' parent <- read_model("/foo/parent")
+#'
+#' # create model file at /bar/child.ctl and YAML at /bar/child.yaml
+#' copy_model_from(parent, "/bar/child", "child model with absolute path")
+#'
+#' # create model file at /foo/child.ctl and YAML at /foo/child.yaml
+#' copy_model_from(parent, "child", "relative to parent model path")
+#'
+#' mod1 <- read_model("/path/to/1")
+#'
+#' # create model file at /path/to/2.ctl and YAML at /path/to/2.yaml
+#' copy_model_from(mod1, 2, "numeric input works")
+#'
+#' # create model file at /path/to/100.1.ctl and YAML at /path/to/100.1.yaml
+#' copy_model_from(mod1, 100.1, "a period is okay")
+#' }
 #' @export
 copy_model_from <- function(
   .parent_mod,

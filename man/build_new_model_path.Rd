@@ -11,11 +11,11 @@ build_new_model_path(.parent_mod, .new_model)
 \arguments{
 \item{.parent_mod}{Model to copy from}
 
-\item{.new_model}{Path, relative to location of \code{.parent_model}, to write new
-model files to. Should have \strong{no file extension} because function will
-create both \verb{\{.new_model\}.yaml} and a new model file (i.e. \verb{\{.new_model\}.ctl})
-based on this path. User can also pass a numeric, which will create the new
-model files in the same directory as \code{.parent_mod}.}
+\item{.new_model}{Path to the new model, either absolute or relative to the
+path to \code{.parent_model}. Represents an absolute model path, which is the
+path to the YAML file and model file, both without extension, and the
+output directory (once the model is run). Numeric values will be coerced to
+character. See examples for usage.}
 }
 \value{
 absolute file path to save new model to (without file extension)

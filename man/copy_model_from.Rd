@@ -30,11 +30,11 @@ copy_model_from(
 \arguments{
 \item{.parent_mod}{Model to copy from}
 
-\item{.new_model}{Path, relative to location of \code{.parent_model}, to write new
-model files to. Should have \strong{no file extension} because function will
-create both \verb{\{.new_model\}.yaml} and a new model file (i.e. \verb{\{.new_model\}.ctl})
-based on this path. User can also pass a numeric, which will create the new
-model files in the same directory as \code{.parent_mod}.}
+\item{.new_model}{Path to the new model, either absolute or relative to the
+path to \code{.parent_model}. Represents an absolute model path, which is the
+path to the YAML file and model file, both without extension, and the
+output directory (once the model is run). Numeric values will be coerced to
+character. See examples for usage.}
 
 \item{.description}{Description of new model run. This will be stored in the
 yaml (to be used later in \code{run_log()}).}
@@ -71,3 +71,22 @@ ancestry. See \href{../articles/using-based-on.html}{"Using based_on field" vign
 \item \code{bbi_nonmem_model}: \code{.parent_mod} takes a \code{bbi_nonmem_model} object to use as a basis for the copy.
 }}
 
+\examples{
+\dontrun{
+parent <- read_model("/foo/parent")
+
+# create model file at /bar/child.ctl and YAML at /bar/child.yaml
+copy_model_from(parent, "/bar/child", "child model with absolute path")
+
+# create model file at /foo/child.ctl and YAML at /foo/child.yaml
+copy_model_from(parent, "child", "relative to parent model path")
+
+mod1 <- read_model("/path/to/1")
+
+# create model file at /path/to/2.ctl and YAML at /path/to/2.yaml
+copy_model_from(mod1, 2, "numeric input works")
+
+# create model file at /path/to/100.1.ctl and YAML at /path/to/100.1.yaml
+copy_model_from(mod1, 100.1, "a period is okay")
+}
+}
