@@ -138,5 +138,24 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     new_desc_pattern <- paste0("\\$PROBLEM ", get_model_id(NEW_MOD2), " ", NEW_DESC, "\n\n\\$INPUT")
     expect_false(grepl(new_desc_pattern, new_mod_str))
   })
+
+  test_that("copy_model_from() supports `.new_model` containing a period", {
+    temp_mod_path <- create_temp_model()
+    temp_mod <- read_model(temp_mod_path)
+
+    new_mod_path <- "foo.bar"
+    new_ctl <- paste0(file.path(tempdir(), new_mod_path), ".ctl")
+    new_yaml <- paste0(file.path(tempdir(), new_mod_path), ".yaml")
+
+    expect_false(fs::file_exists(new_ctl))
+    expect_false(fs::file_exists(new_yaml))
+    on.exit(fs::file_delete(c(new_ctl, new_yaml)))
+
+    new_mod <- copy_model_from(temp_mod, new_mod_path, "baz")
+    expect_true(inherits(new_mod, NM_MOD_CLASS))
+    expect_true(fs::file_exists(new_ctl))
+    expect_true(fs::file_exists(new_yaml))
+
+  })
 }) # closing withr::with_options
 

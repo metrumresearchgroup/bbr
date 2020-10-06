@@ -134,7 +134,7 @@ copy_nonmem_model_from <- function(
   # copy control steam to new path
   .parent_model_path <- get_model_path(.parent_mod)
   parent_ext <- fs::path_ext(.parent_model_path)
-  .new_model_path <- fs::path_ext_set(.new_model, parent_ext)
+  .new_model_path <- paste(.new_model, parent_ext, sep = ".")
   copy_control_stream(.parent_model_path, .new_model_path, .overwrite, .update_model_file, .description)
 
   # create new model
