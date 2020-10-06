@@ -91,6 +91,8 @@ new_model <- function(
 #' [model_summary()], etc.
 #'
 #' @param .path Path to the model to read, in the sense of absolute model path.
+#'   The absolute model path is the path to the YAML file and model file, both
+#'   without extension, and (possibly) the output directory.
 #'
 #' @return S3 object of class `bbi_{.model_type}_model`
 #' @seealso [copy_model_from()], [new_model()]
