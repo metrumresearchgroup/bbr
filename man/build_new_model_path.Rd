@@ -2,7 +2,9 @@
 % Please edit documentation in R/copy-model-from.R
 \name{build_new_model_path}
 \alias{build_new_model_path}
-\title{Private helper to build absolute path for copy_model_from}
+\title{Private helper to build absolute path for \code{\link[=copy_model_from]{copy_model_from()}}.
+Importantly, if the input \code{.new_model} is \emph{not} absolute, it will
+be treated as relative to the working directory of \code{.parent_mod}.}
 \usage{
 build_new_model_path(.parent_mod, .new_model)
 }
@@ -15,7 +17,12 @@ create both \verb{\{.new_model\}.yaml} and a new model file (i.e. \verb{\{.new_m
 based on this path. User can also pass a numeric, which will create the new
 model files in the same directory as \code{.parent_mod}.}
 }
+\value{
+absolute file path to save new model to (without file extension)
+}
 \description{
-Private helper to build absolute path for copy_model_from
+Private helper to build absolute path for \code{\link[=copy_model_from]{copy_model_from()}}.
+Importantly, if the input \code{.new_model} is \emph{not} absolute, it will
+be treated as relative to the working directory of \code{.parent_mod}.
 }
 \keyword{internal}
