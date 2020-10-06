@@ -12,7 +12,6 @@
 #' @param .config_path Optionally specify a path to a `babylon.yaml` config. If not specified, the config in the model directory will be used by default. Path MUST be either an absolute path or relative to the model directory.
 #' @param .wait If `TRUE`, the default, wait for the bbi process to return before this function call returns. If `FALSE` function will return while bbi process runs in the background.
 #' @param .dry_run Returns an object detailing the command that would be run, insted of running it. This is primarily for testing but also a debugging tool.
-#' @param .directory Model directory which `.mod` path is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`. **Only used when passing a file path for `.mod` instead of a `bbi_{.model_type}_model` object.**
 #' @export
 submit_model <- function(
   .mod,
@@ -21,8 +20,7 @@ submit_model <- function(
   ...,
   .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
   .wait = TRUE,
-  .dry_run=FALSE,
-  .directory = NULL
+  .dry_run=FALSE
 ) {
   UseMethod("submit_model")
 }
@@ -36,8 +34,7 @@ submit_model.bbi_nonmem_model <- function(
   ...,
   .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
   .wait = TRUE,
-  .dry_run=FALSE,
-  .directory = NULL
+  .dry_run=FALSE
 ) {
 
   res <- submit_nonmem_model(.mod,
