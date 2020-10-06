@@ -6,7 +6,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     on.exit({ cleanup() })
 
     # create copy
-    mod2 <- copy_model_from(MOD1, NEW_MOD2,   "level 1 copy of 1")
+    mod2 <- copy_model_from(MOD1, basename(NEW_MOD2),   "level 1 copy of 1")
 
     expect_identical(get_based_on(mod2), MOD1_ABS_PATH)
   })
@@ -15,7 +15,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     on.exit({ cleanup() })
 
     # create copy
-    mod2 <- copy_model_from(MOD1, NEW_MOD2,   "level 1 copy of 1")
+    mod2 <- copy_model_from(MOD1, basename(NEW_MOD2),   "level 1 copy of 1")
 
     expect_identical(get_based_on(NEW_MOD2), MOD1_ABS_PATH)
   })
@@ -175,12 +175,12 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     on.exit({ cleanup() })
     create_all_models()
 
-    mod5 <- copy_model_from(mod3, file.path(MODEL_DIR, 5),   "level 1 copy of 3")
-    mod6 <- copy_model_from(mod5, file.path(MODEL_DIR, 6),   "level 1 copy of 5")
-    mod7 <- copy_model_from(mod6, file.path(MODEL_DIR, 7),   "level 1 copy of 6")
-    mod8 <- copy_model_from(mod4, file.path(LEVEL2_DIR, 2),   "level 2 copy of 4")
-    mod9 <- copy_model_from(mod3, file.path(LEVEL2_DIR, 3),   "level 2 copy of 3")
-    mod10 <- copy_model_from(mod3, file.path(LEVEL2_DIR, 4),   "level 2 copy of 3")
+    mod5 <- copy_model_from(mod3, 5,   "level 1 copy of 3")
+    mod6 <- copy_model_from(mod5, 6,   "level 1 copy of 5")
+    mod7 <- copy_model_from(mod6, 7,   "level 1 copy of 6")
+    mod8 <- copy_model_from(mod4, 2,   "level 2 copy of 4")
+    mod9 <- copy_model_from(mod3, file.path(LEVEL2_SUBDIR, 3),   "level 2 copy of 3")
+    mod10 <- copy_model_from(mod3, file.path(LEVEL2_SUBDIR, 4),   "level 2 copy of 3")
     mod10 <- mod10 %>% add_based_on(get_model_path(mod4))
 
     # build log_df and check get_based_on

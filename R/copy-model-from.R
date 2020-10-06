@@ -9,9 +9,11 @@
 #' ancestry. See ["Using based_on field"
 #' vignette](../articles/using-based-on.html) for details.
 #' @param .parent_mod Model to copy from
-#' @param .new_model Path to write new model files to **without file extension**.
-#'   Function will create both `{.new_model}.yaml` and a new model file based on
-#'   this path.
+#' @param .new_model Path to the new model, either absolute or relative to the
+#'   path to `.parent_model`. Represents an absolute model path, which is the
+#'   path to the YAML file and model file, both without extension, and the
+#'   output directory (once the model is run). Numeric values will be coerced to
+#'   character. See examples for usage.
 #' @param .description Description of new model run. This will be stored in the
 #'   yaml (to be used later in `run_log()`).
 #' @param .based_on_additional Character vector of path(s) to other models that
@@ -31,9 +33,24 @@
 #' @param .overwrite If `FALSE`, the default,  function will error if a model
 #'   file already exists at specified `.new_model` path. If `TRUE` any existing
 #'   file at `.new_model` will be overwritten silently.
-#' @param .directory Model directory which `.new_model` is relative to. Defaults
-#'   to `options('rbabylon.model_directory')`, which can be set globally with
-#'   `set_model_directory()`.
+#' @examples
+#' \dontrun{
+#' parent <- read_model("/foo/parent")
+#'
+#' # create model file at /bar/child.ctl and YAML at /bar/child.yaml
+#' copy_model_from(parent, "/bar/child", "child model with absolute path")
+#'
+#' # create model file at /foo/child.ctl and YAML at /foo/child.yaml
+#' copy_model_from(parent, "child", "relative to parent model path")
+#'
+#' mod1 <- read_model("/path/to/1")
+#'
+#' # create model file at /path/to/2.ctl and YAML at /path/to/2.yaml
+#' copy_model_from(mod1, 2, "numeric input works")
+#'
+#' # create model file at /path/to/100.1.ctl and YAML at /path/to/100.1.yaml
+#' copy_model_from(mod1, 100.1, "a period is okay")
+#' }
 #' @export
 copy_model_from <- function(
   .parent_mod,
@@ -43,8 +60,7 @@ copy_model_from <- function(
   .add_tags = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
-  .overwrite = FALSE,
-  .directory = get_model_directory()
+  .overwrite = FALSE
 ) {
   UseMethod("copy_model_from")
 }
@@ -59,12 +75,10 @@ copy_model_from.bbi_nonmem_model <- function(
   .add_tags = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
-  .overwrite = FALSE,
-  .directory = get_model_directory()
+  .overwrite = FALSE
 ) {
 
-  # check for .directory and combine with .new_model
-  .new_model <- combine_directory_path(.directory, .new_model)
+  .new_model <- build_new_model_path(.parent_mod, .new_model)
 
   .mod <- copy_nonmem_model_from(
     .parent_mod = .parent_mod,
@@ -138,7 +152,7 @@ copy_nonmem_model_from <- function(
   # copy control steam to new path
   .parent_model_path <- get_model_path(.parent_mod)
   parent_ext <- fs::path_ext(.parent_model_path)
-  .new_model_path <- fs::path_ext_set(.new_model, parent_ext)
+  .new_model_path <- paste(.new_model, parent_ext, sep = ".")
   copy_control_stream(.parent_model_path, .new_model_path, .overwrite, .update_model_file, .description)
 
   # create new model
@@ -194,4 +208,19 @@ copy_control_stream <- function(.parent_model_path, .new_model_path, .overwrite,
   } else {
     fs::file_copy(.parent_model_path, .new_model_path)
   }
+}
+
+#' Private helper to build absolute path for [copy_model_from()].
+#' Importantly, if the input `.new_model` is _not_ absolute, it will
+#' be treated as relative to the working directory of `.parent_mod`.
+#' @inheritParams copy_model_from
+#' @return absolute file path to save new model to (without file extension)
+#' @keywords internal
+build_new_model_path <- function(.parent_mod, .new_model) {
+  if (!fs::is_absolute_path(.new_model)) {
+    .new_model <- as.character(.new_model)
+    .new_model <- file.path(get_model_working_directory(.parent_mod), .new_model)
+    .new_model <- fs::path_norm(.new_model)
+  }
+  return(.new_model)
 }

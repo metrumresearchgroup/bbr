@@ -15,23 +15,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r cleanup top, include=FALSE}
-# delete old files
-cleanup <- function() {
-  if (fs::file_exists("../inst/nonmem/1.yaml")) fs::file_delete("../inst/nonmem/1.yaml")
-  if (fs::file_exists("../inst/nonmem/babylon.yaml")) fs::file_delete("../inst/nonmem/babylon.yaml")
-  
-  mods_to_kill <- purrr::map_chr(seq(2,6), ~ file.path("../inst/nonmem", .x))
-  for (.m in mods_to_kill) {
-    if (fs::file_exists(paste0(.m, ".yaml"))) fs::file_delete(paste0(.m, ".yaml"))
-    if (fs::file_exists(paste0(.m, ".ctl"))) fs::file_delete(paste0(.m, ".ctl"))
-    if (fs::dir_exists(.m)) fs::dir_delete(.m)
-  }
-}
-cleanup()
-```
-
-
 # Introduction
 
 This vignette demonstrates how to use the `based_on` field to track a model's ancestry through the model development process. You will also see one common use for this: using the tibble output from `config_log()` to check that your models are up-to-date. By "up-to-date" we mean that none of the model files or data files have changed since the model was run. 
@@ -50,7 +33,8 @@ suppressPackageStartupMessages(library(fs))
 ```
 
 ```{r setup, include = FALSE}
-set_model_directory("../inst/nonmem")
+MODEL_DIR <- system.file("nonmem", package = "rbabylon")
+set_model_directory(MODEL_DIR)
 
 # set babylon execution path
 if (Sys.which("bbi") == "") {
@@ -58,13 +42,31 @@ if (Sys.which("bbi") == "") {
 }
 ```
 
+```{r cleanup top, include=FALSE}
+# delete old files
+cleanup <- function() {
+  if (fs::file_exists(file.path(MODEL_DIR, "1.yaml"))) fs::file_delete(file.path(MODEL_DIR, "1.yaml"))
+  if (fs::file_exists(file.path(MODEL_DIR, "babylon.yaml"))) fs::file_delete(file.path(MODEL_DIR, "babylon.yaml"))
+  
+  mods_to_kill <- purrr::map_chr(seq(2,6), ~ file.path(MODEL_DIR, .x))
+  for (.m in mods_to_kill) {
+    if (fs::file_exists(paste0(.m, ".yaml"))) fs::file_delete(paste0(.m, ".yaml"))
+    if (fs::file_exists(paste0(.m, ".ctl"))) fs::file_delete(paste0(.m, ".ctl"))
+    if (fs::dir_exists(.m)) fs::dir_delete(.m)
+  }
+}
+cleanup()
+```
 
 # Modeling process
 The modeling process will always start with an initial model, which we create with the `new_model()` call.
 
+```{r fake model dir, eval = FALSE}
+MODEL_DIR <- "../nonmem"
+```
 ```{r first model}
 mod1 <- new_model(
-  system.file("nonmem/1", package = "rbabylon"), 
+  file.path(MODEL_DIR, 1), 
   .description = "one compartment base model"
 )
 ```
@@ -138,7 +140,7 @@ In this case, model `6` was based on `5`, which was based on `2`, which in turn 
 While it may be useful to look at the ancestry of a single model object, it may be even more useful to use the `based_on` field later in the modeling process when you are looking back and trying to summarize the model activities as a whole. The `run_log()` function is helpful for this. It returns a tibble with metadata about each model.
 
 ```{r run_log} 
-log_df <- run_log()
+log_df <- run_log(MODEL_DIR)
 log_df
 ```
 

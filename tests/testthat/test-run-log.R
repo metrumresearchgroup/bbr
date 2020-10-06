@@ -17,9 +17,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     temp_dir <- file.path(tempdir(), "run_log_malformed_yaml_test")
     fs::dir_create(temp_dir)
     temp_yaml <- fs::file_copy("test-yaml/zz_fail_no_modtype.yaml", temp_dir)
-    on.exit({
-      fs::dir_delete(temp_dir)
-    })
+    on.exit(fs::dir_delete(temp_dir))
 
     expect_warning(log_df <- run_log(temp_dir), "do not contain required keys")
     expect_true(nrow(log_df) == 0L)
@@ -77,7 +75,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   # copy model 1 to level deeper
   # TODO: consider unifying this (and the same thing on line 63 of test-config-log.R) with the other create_ functions in setup-workflow-ref.R
   fs::dir_create(LEVEL2_DIR)
-  copy_model_from(MOD1, LEVEL2_MOD, "level 2 copy of 1.yaml", .inherit_tags = TRUE)
+  copy_model_from(MOD1, file.path(LEVEL2_SUBDIR, MOD_ID), "level 2 copy of 1.yaml", .inherit_tags = TRUE)
   fs::dir_copy(MOD1_PATH, LEVEL2_MOD)
 
   test_that("run_log() works correctly with nested dirs", {

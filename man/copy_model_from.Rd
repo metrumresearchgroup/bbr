@@ -13,8 +13,7 @@ copy_model_from(
   .add_tags = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
-  .overwrite = FALSE,
-  .directory = get_model_directory()
+  .overwrite = FALSE
 )
 
 \method{copy_model_from}{bbi_nonmem_model}(
@@ -25,16 +24,17 @@ copy_model_from(
   .add_tags = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
-  .overwrite = FALSE,
-  .directory = get_model_directory()
+  .overwrite = FALSE
 )
 }
 \arguments{
 \item{.parent_mod}{Model to copy from}
 
-\item{.new_model}{Path to write new model files to \strong{without file extension}.
-Function will create both \verb{\{.new_model\}.yaml} and a new model file based on
-this path.}
+\item{.new_model}{Path to the new model, either absolute or relative to the
+path to \code{.parent_model}. Represents an absolute model path, which is the
+path to the YAML file and model file, both without extension, and the
+output directory (once the model is run). Numeric values will be coerced to
+character. See examples for usage.}
 
 \item{.description}{Description of new model run. This will be stored in the
 yaml (to be used later in \code{run_log()}).}
@@ -60,10 +60,6 @@ updated. If \code{FALSE}, new model file will be an exact copy of its parent.}
 \item{.overwrite}{If \code{FALSE}, the default,  function will error if a model
 file already exists at specified \code{.new_model} path. If \code{TRUE} any existing
 file at \code{.new_model} will be overwritten silently.}
-
-\item{.directory}{Model directory which \code{.new_model} is relative to. Defaults
-to \code{options('rbabylon.model_directory')}, which can be set globally with
-\code{set_model_directory()}.}
 }
 \description{
 Create new model by copying existing model. Useful for iterating during model
@@ -75,3 +71,22 @@ ancestry. See \href{../articles/using-based-on.html}{"Using based_on field" vign
 \item \code{bbi_nonmem_model}: \code{.parent_mod} takes a \code{bbi_nonmem_model} object to use as a basis for the copy.
 }}
 
+\examples{
+\dontrun{
+parent <- read_model("/foo/parent")
+
+# create model file at /bar/child.ctl and YAML at /bar/child.yaml
+copy_model_from(parent, "/bar/child", "child model with absolute path")
+
+# create model file at /foo/child.ctl and YAML at /foo/child.yaml
+copy_model_from(parent, "child", "relative to parent model path")
+
+mod1 <- read_model("/path/to/1")
+
+# create model file at /path/to/2.ctl and YAML at /path/to/2.yaml
+copy_model_from(mod1, 2, "numeric input works")
+
+# create model file at /path/to/100.1.ctl and YAML at /path/to/100.1.yaml
+copy_model_from(mod1, 100.1, "a period is okay")
+}
+}
