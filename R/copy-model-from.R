@@ -192,8 +192,11 @@ copy_control_stream <- function(.parent_model_path, .new_model_path, .overwrite,
   }
 }
 
-#' Private helper to build absolute path for copy_model_from
+#' Private helper to build absolute path for [copy_model_from()].
+#' Importantly, if the input `.new_model` is _not_ absolute, it will
+#' be treated as relative to the working directory of `.parent_mod`.
 #' @inheritParams copy_model_from
+#' @return absolute file path to save new model to (without file extension)
 #' @keywords internal
 build_new_model_path <- function(.parent_mod, .new_model) {
   if (!fs::is_absolute_path(.new_model)) {
