@@ -150,8 +150,7 @@ Among other things, the run log contains the tags that have been assigned to eac
 final_model_path <- 
   log_df %>% 
   filter(map_lgl(tags, ~ "final model" %in% .x)) %>%
-  get_model_path() %>% 
-  purrr::map_chr(fs::path_ext_remove)
+  pull(absolute_model_path)
 
 final_model_path
 ```
