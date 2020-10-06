@@ -7,10 +7,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   ######################################
 
   test_that("modify_model_field() works correctly", {
-    temp_yaml <- create_temp_model()
+    temp_mod_path <- create_temp_model()
 
     # make a spec from it
-    new_mod <- read_model(temp_yaml)
+    new_mod <- read_model(temp_mod_path)
     expect_identical(new_mod[[YAML_TAGS]], ORIG_TAGS)
 
     # modify the tags field
@@ -18,7 +18,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_identical(new_mod[[YAML_TAGS]], c(ORIG_TAGS, NEW_TAGS))
 
     # check that the yaml was also modified
-    rogue_spec <- yaml::read_yaml(temp_yaml)
+    rogue_spec <- yaml::read_yaml(fs::path_ext_set(temp_mod_path, "yaml"))
     expect_identical(rogue_spec[[YAML_TAGS]], c(ORIG_TAGS, NEW_TAGS))
   })
 
@@ -26,9 +26,9 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     dupe_tags <- c("ha", "hey", "ha")
     uniq_tags <- c("ha", "hey")
 
-    temp_yaml <- create_temp_model()
+    temp_mod_path <- create_temp_model()
 
-    new_mod <- read_model(temp_yaml)
+    new_mod <- read_model(temp_mod_path)
     expect_identical(new_mod[[YAML_TAGS]], ORIG_TAGS)
 
     # check that .unique = FALSE turns off de-duping
@@ -41,10 +41,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
   test_that("add_tags() and replace_tags() work correctly", {
-    temp_yaml <- create_temp_model()
+    temp_mod_path <- create_temp_model()
 
     # make a spec from it
-    new_mod <- read_model(temp_yaml)
+    new_mod <- read_model(temp_mod_path)
     expect_identical(new_mod[[YAML_TAGS]], ORIG_TAGS)
 
     # test adding
@@ -57,10 +57,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
   test_that("add_decisions() and replace_decisions() work correctly", {
-    temp_yaml <- create_temp_model()
+    temp_mod_path <- create_temp_model()
 
     # make a spec from it
-    new_mod <- read_model(temp_yaml)
+    new_mod <- read_model(temp_mod_path)
     expect_null(new_mod[[YAML_DECISIONS]])
 
     # test adding
@@ -75,10 +75,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
   test_that("replace_description() works correctly", {
-    temp_yaml <- create_temp_model()
+    temp_mod_path <- create_temp_model()
 
     # make a spec from it
-    new_mod <- read_model(temp_yaml)
+    new_mod <- read_model(temp_mod_path)
     expect_identical(new_mod[[YAML_DESCRIPTION]], ORIG_DESC)
 
     # test_replacing
@@ -88,10 +88,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
 
   test_that("add_bbi_args() and replace_bbi_args() work correctly", {
-    temp_yaml <- create_temp_model()
+    temp_mod_path <- create_temp_model()
 
     # make a spec from it
-    new_mod <- read_model(temp_yaml)
+    new_mod <- read_model(temp_mod_path)
     expect_null(new_mod[[YAML_BBI_ARGS]][["clean_lvl"]])
 
     # test adding
@@ -107,10 +107,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
 
   test_that("add_tags etc. can be chained", {
-    temp_yaml <- create_temp_model()
+    temp_mod_path <- create_temp_model()
 
     # make a spec from it
-    new_mod <- read_model(temp_yaml)
+    new_mod <- read_model(temp_mod_path)
     expect_identical(new_mod[[YAML_DESCRIPTION]], ORIG_DESC)
 
     # test adding and replacing
@@ -125,12 +125,12 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
   test_that("add_based_on() and replace_based_on() work correctly", {
-    temp_yaml <- create_temp_model()
+    temp_mod_path <- create_temp_model()
     parent_model_id <- get_model_id(create_temp_model())
-    child_model_id <- get_model_id(temp_yaml)
+    child_model_id <- get_model_id(temp_mod_path)
 
     # make a spec from it
-    new_mod <- read_model(temp_yaml)
+    new_mod <- read_model(temp_mod_path)
     expect_null(new_mod[[YAML_BASED_ON]])
 
     # test adding
@@ -155,10 +155,11 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   ####################################################
 
   test_that("reconcile_yaml() pulls in new tags", {
-    temp_yaml <- create_temp_model()
+    temp_mod_path <- create_temp_model()
+    temp_yaml <- fs::path_ext_set(temp_mod_path, "yaml")
 
     # make a spec from it
-    new_mod <- read_model(temp_yaml)
+    new_mod <- read_model(temp_mod_path)
     expect_identical(new_mod[[YAML_TAGS]], ORIG_TAGS)
 
     # add the tags to the yaml manually
@@ -173,15 +174,15 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
 
   test_that("check_yaml_in_sync() passes when nothing has changed", {
-    new_mod <- read_model(YAML_TEST_FILE)
-    expect_invisible(check_yaml_in_sync(new_mod))
+    expect_invisible(check_yaml_in_sync(MOD1))
   })
 
   test_that("check_yaml_in_sync() fails when YAML has changed and passes after reconciled", {
-    temp_yaml <- create_temp_model()
+    temp_mod_path <- create_temp_model()
+    temp_yaml <- fs::path_ext_set(temp_mod_path, "yaml")
 
     # make a spec from it
-    new_mod <- read_model(temp_yaml)
+    new_mod <- read_model(temp_mod_path)
     expect_identical(new_mod[[YAML_TAGS]], ORIG_TAGS)
 
     # add the tags to the yaml manually
@@ -199,10 +200,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
   test_that("add_tags fails if it wasn't re-assigned previously (testing check_yaml_in_sync)", {
-    temp_yaml <- create_temp_model()
+    temp_mod_path <- create_temp_model()
 
     # make a spec from it
-    new_mod <- read_model(temp_yaml)
+    new_mod <- read_model(temp_mod_path)
 
     # test adding with assignment
     new_mod <- new_mod %>% add_tags(NEW_TAGS)
@@ -217,10 +218,11 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
   test_that("submit_model() fails YAML out of sync (testing check_yaml_in_sync)", {
-    temp_yaml <- create_temp_model()
+    temp_mod_path <- create_temp_model()
+    temp_yaml <- fs::path_ext_set(temp_mod_path, "yaml")
 
     # make a spec from it
-    new_mod <- read_model(temp_yaml)
+    new_mod <- read_model(temp_mod_path)
 
     # add some garbage (so YAML gets out of sync)
     readr::write_lines("naw: dawg", temp_yaml, append = TRUE)
@@ -230,10 +232,11 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
   test_that("model_summary() fails YAML out of sync (testing check_yaml_in_sync)", {
-    temp_yaml <- create_temp_model()
+    temp_mod_path <- create_temp_model()
+    temp_yaml <- fs::path_ext_set(temp_mod_path, "yaml")
 
     # make a spec from it
-    new_mod <- read_model(temp_yaml)
+    new_mod <- read_model(temp_mod_path)
 
     # add some garbage (so YAML gets out of sync)
     readr::write_lines("naw: dawg", temp_yaml, append = TRUE)
@@ -243,10 +246,11 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
   test_that("copy_model_from() fails YAML out of sync (testing check_yaml_in_sync)", {
-    temp_yaml <- create_temp_model()
+    temp_mod_path <- create_temp_model()
+    temp_yaml <- fs::path_ext_set(temp_mod_path, "yaml")
 
     # make a spec from it
-    new_mod <- read_model(temp_yaml)
+    new_mod <- read_model(temp_mod_path)
 
     # add some garbage (so YAML gets out of sync)
     readr::write_lines("naw: dawg", temp_yaml, append = TRUE)

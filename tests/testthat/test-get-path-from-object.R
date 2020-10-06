@@ -37,10 +37,10 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
   test_that("get_model_path() finds .mod path", {
-    temp_yaml <- create_temp_model(mod_ext = "mod")
-    temp_mod <- mod_ext(temp_yaml)
-    new_mod <- read_model(temp_yaml)
-    expect_identical(get_model_path(new_mod), temp_mod)
+    temp_mod_path <- create_temp_model(mod_ext = "mod")
+    temp_mod <- mod_ext(temp_mod_path)
+    mod <- read_model(temp_mod_path)
+    expect_identical(get_model_path(mod), temp_mod)
   })
 
   test_that("get_model_path() errors with both .ctl and .mod paths", {
@@ -50,14 +50,14 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
   test_that("get_model_path() works no paths found", {
-    temp_yaml <- create_temp_model()
-    temp_mod <- read_model(temp_yaml)
+    temp_mod_path <- create_temp_model()
+    mod <- read_model(temp_mod_path)
     # save path to model file and then delete the file
-    former_ctl_path <- get_model_path(temp_mod)
+    former_ctl_path <- get_model_path(mod)
     fs::file_delete(former_ctl_path)
-    expect_error(get_model_path(temp_mod), "No model file found")
+    expect_error(get_model_path(mod), "No model file found")
     expect_equal(
-      get_model_path(temp_mod, .check_exists = FALSE),
+      get_model_path(mod, .check_exists = FALSE),
       former_ctl_path
     )
   })

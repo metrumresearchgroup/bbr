@@ -39,7 +39,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
   #########################################
 
   test_that("model_summaries.list produces expected output", {
-    mods <- purrr::map(c("1", "2", "3"), ~read_model(.x))
+    mods <- purrr::map(file.path(MODEL_DIR, seq(3)), read_model)
     expect_equal(length(mods), NUM_MODS)
     for (.m in mods) {
       expect_equal(class(.m), MOD_CLASS_LIST)
@@ -51,7 +51,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
   })
 
   test_that("model_summaries.list fails with bad list", {
-    bad_mods <- list(read_model(1), list(naw = "dawg"))
+    bad_mods <- list(read_model(file.path(MODEL_DIR, 1)), list(naw = "dawg"))
     expect_equal(length(bad_mods), 2)
     expect_equal(class(bad_mods[[1]]), MOD_CLASS_LIST)
 

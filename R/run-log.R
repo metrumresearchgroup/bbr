@@ -55,7 +55,10 @@ find_models <- function(.base_dir, .recurse) {
   yaml_files <- str_subset(yaml_files, "babylon\\.ya?ml$", negate = TRUE)
 
   # read in all candidate yaml's
-  all_yaml <- map(yaml_files, safe_read_model, .directory = NULL)
+  all_yaml <-
+    yaml_files %>%
+    purrr::map(fs::path_ext_remove) %>%
+    purrr::map(safe_read_model)
 
   # filter to only model yaml's
   mod_list <- purrr::compact(all_yaml)
@@ -77,24 +80,24 @@ find_models <- function(.base_dir, .recurse) {
 #' Read in model YAML with error handling
 #'
 #' Private helper function that tries to call `read_model()` on a yaml path and returns NULL, with no error, if the YAML is not a valid model file.
-#' @param .yaml_path Path to read model from
-#' @param .directory Model directory which `.yaml_path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
-#' @importFrom stringr str_detect
+#'
+#' @inheritParams read_model
+#'
+#' @return A model object, if `.path` represents a valid model.
 #' @keywords internal
-safe_read_model <- function(.yaml_path, .directory = get_model_directory()) {
-  # check for .directory and combine with .yaml_path
-  .yaml_path <- combine_directory_path(.directory, .yaml_path)
-
-  # try to read in model
-  .mod <- tryCatch(read_model(.yaml_path),
-                   error = function(e) {
-                     if (stringr::str_detect(e$message, "Model list must have keys")) {
-                       return(NULL)
-                     } else {
-                       stop(glue("Unexpected error trying to read yaml `{.yaml_path}`: {e$message}"))
-                     }
-                   })
-  return(.mod)
+safe_read_model <- function(.path) {
+  tryCatch(
+    read_model(.path),
+    error = function(e) {
+      if (stringr::str_detect(e$message, "Model list must have keys")) {
+        return(NULL)
+      } else {
+        stop(
+          glue("Unexpected error trying to read model `{.path}`: {e$message}")
+        )
+      }
+    }
+  )
 }
 
 

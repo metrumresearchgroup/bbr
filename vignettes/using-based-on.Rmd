@@ -147,9 +147,10 @@ log_df
 Among other things, the run log contains the tags that have been assigned to each model. Here we use `purrr::map_lgl` to filter the run log to only the final model.
 
 ```{r filtering}
-final_model_path <- log_df %>% 
+final_model_path <- 
+  log_df %>% 
   filter(map_lgl(tags, ~ "final model" %in% .x)) %>%
-  get_model_path()
+  pull(absolute_model_path)
 
 final_model_path
 ```

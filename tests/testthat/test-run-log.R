@@ -27,7 +27,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     fs::file_copy(YAML_TEST_FILE, temp_dir)
     expect_error(
       run_log(temp_dir),
-      regexp = "Unexpected error trying to read yaml"
+      regexp = "Unexpected error trying to read model"
     )
   })
 

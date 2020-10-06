@@ -129,7 +129,7 @@ FAKE_CTL_PATH <- file.path(getwd(), MODEL_DIR, CTL_TEST_FILE)
 ########################
 
 create_all_models <- function() {
-  mod1 <- read_model(YAML_TEST_FILE)
+  mod1 <- read_model(MOD1_PATH)
   mod2 <- copy_model_from(mod1, NEW_MOD2,   "level 1 copy of 1")
   mod3 <- copy_model_from(mod1, NEW_MOD3,   "level 1 copy of 1")
   fs::dir_create(LEVEL2_DIR)
@@ -151,7 +151,7 @@ copy_all_output_dirs <- function() {
 
 create_rlg_models <- function() {
   # copy models before creating run log
-  mod1 <- read_model(YAML_TEST_FILE)
+  mod1 <- read_model(MOD1_PATH)
   copy_model_from(mod1, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
   copy_model_from(mod1,
                   NEW_MOD3,
@@ -226,7 +226,7 @@ rep_missing <- function(x, i, len) {
 #' @param mod_ext The extension for the model file.
 #' @inheritParams withr::defer
 #'
-#' @return The path to the temporary YAML file.
+#' @return The absolute model path to the temporary model.
 create_temp_model <- function(path = YAML_TEST_FILE,
                               mod_content = "foo",
                               mod_ext = "ctl",
@@ -236,5 +236,5 @@ create_temp_model <- function(path = YAML_TEST_FILE,
   temp_ctl <- fs::path_ext_set(temp_yaml, mod_ext)
   readr::write_file(mod_content, temp_ctl)
   withr::defer(fs::file_delete(c(temp_yaml, temp_ctl)), envir)
-  temp_yaml
+  fs::path_ext_remove(temp_yaml)
 }

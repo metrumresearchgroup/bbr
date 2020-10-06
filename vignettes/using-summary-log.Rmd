@@ -51,9 +51,9 @@ As mentioned above, the `bbi_summary_log_df` tibble contains a lot of informatio
 ```{r model summary single}
 MODEL_DIR <- "../tests/testthat/model-examples-complex"
 
-sum1 <- "iovmm" %>%
-          read_model(.directory = MODEL_DIR) %>%
-          model_summary()
+sum1 <- 
+  read_model(file.path(MODEL_DIR, "iovmm")) %>%
+  model_summary()
 
 names(sum1)
 ```

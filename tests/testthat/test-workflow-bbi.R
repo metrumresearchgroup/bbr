@@ -81,7 +81,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
   test_that("copying model works and new models run correctly", {
     # TODO: isolate this test so it does not depend on a model created by a
     # previous test
-    mod1 <- read_model(1)
+    mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
     mod2 <- copy_model_from(mod1, 2, NEW_DESC)
     mod3 <- copy_model_from(mod1, 3, NEW_DESC, .inherit_tags = TRUE) %>% add_bbi_args(list(clean_lvl=2, overwrite = FALSE))
 
@@ -123,7 +123,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
 
   test_that(".wait = FALSE returns correctly", {
     # launch a model but don't wait for it to finish
-    mod1 <- read_model(1)
+    mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
     proc <- copy_model_from(mod1, 4, NEW_DESC, .inherit_tags = TRUE) %>% submit_model(.mode = "local", .wait = FALSE)
     expect_true(stringr::str_detect(proc[[PROC_STDOUT]], ".wait = FALSE"))
   })

@@ -70,12 +70,11 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     on.exit({ cleanup() })
 
     # run copy_model_from on a model object
-    mod1 <- read_model(YAML_TEST_FILE)
     new_yaml_path <- yaml_ext(NEW_MOD2)
     new_ctl_path <- ctl_ext(NEW_MOD2)
     expect_false(fs::file_exists(new_yaml_path))
     expect_false(fs::file_exists(new_ctl_path))
-    copy_model_from(mod1, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
+    copy_model_from(MOD1, NEW_MOD2, NEW_DESC, .add_tags = NEW_TAGS)
 
     # check that everything is copied through
     new_yaml <- yaml::read_yaml(new_yaml_path)
