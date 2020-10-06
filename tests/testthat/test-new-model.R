@@ -40,7 +40,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
   test_that("new_model() creates new YAML file", {
-    # TODO: change this pending #179
     temp_mod_path <- create_temp_model()
     fs::file_delete(fs::path_ext_set(temp_mod_path, "yaml"))
 
@@ -62,7 +61,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
   test_that("compare read_model() and new_model() objects", {
-    # TODO: change this pending #179
     temp_mod_path <- create_temp_model(YAML_TEST_FILE)
     fs::file_delete(fs::path_ext_set(temp_mod_path, "yaml"))
 
@@ -113,7 +111,6 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
 
   test_that("new_model() .based_on arg works", {
-    # TODO: change this pending #179
     temp_mod_path <- create_temp_model(YAML_TEST_FILE)
     parent_model_id <- get_model_id(create_temp_model())
     fs::file_delete(fs::path_ext_set(temp_mod_path, "yaml"))
