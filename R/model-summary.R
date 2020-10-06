@@ -38,14 +38,12 @@
 #' See [print_bbi_args()] for full list of options.
 #' @param ... args passed through to `bbi_exec()`
 #' @param .dry_run show what the command would be without actually running it
-#' @param .directory Model directory which `.mod` path is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`. **Only used when passing a path for `.mod` instead of a `bbi_{.model_type}_model` object.**
 #' @export
 model_summary <- function(
   .mod,
   .bbi_args = NULL,
   ...,
-  .dry_run = FALSE,
-  .directory = NULL
+  .dry_run = FALSE
 ) {
   UseMethod("model_summary")
 }
@@ -56,8 +54,7 @@ model_summary.bbi_nonmem_model <- function(
   .mod,
   .bbi_args = NULL,
   ...,
-  .dry_run = FALSE,
-  .directory = NULL
+  .dry_run = FALSE
 ) {
 
   res_list <- nonmem_summary(

@@ -11,8 +11,7 @@ model_summaries(
   .bbi_args = NULL,
   .fail_flags = NULL,
   ...,
-  .dry_run = FALSE,
-  .directory = NULL
+  .dry_run = FALSE
 )
 
 \method{model_summaries}{list}(
@@ -20,8 +19,7 @@ model_summaries(
   .bbi_args = NULL,
   .fail_flags = NULL,
   ...,
-  .dry_run = FALSE,
-  .directory = NULL
+  .dry_run = FALSE
 )
 
 \method{model_summaries}{bbi_run_log_df}(
@@ -29,8 +27,7 @@ model_summaries(
   .bbi_args = NULL,
   .fail_flags = NULL,
   ...,
-  .dry_run = FALSE,
-  .directory = NULL
+  .dry_run = FALSE
 )
 }
 \arguments{
@@ -48,8 +45,6 @@ See details section for more info on these flags.}
 \item{...}{args passed through to \code{bbi_exec()}}
 
 \item{.dry_run}{show what the command would be without actually running it}
-
-\item{.directory}{Model directory which \code{.mod} path is relative to. Defaults to \code{options('rbabylon.model_directory')}, which can be set globally with \code{set_model_directory()}. \strong{Only used when passing a path for \code{.mod} instead of a \verb{bbi_\{.model_type\}_model} object.}}
 }
 \value{
 All dispatches will return a list of \verb{bbi_\{.model_type\}_summary} objects.
