@@ -6,7 +6,6 @@ context("testing a composable workflow but only dryrun and NOT running bbi")
 ####################################################
 
 # reference constants
-TEST_YAML_DRY <- basename(YAML_TEST_FILE)
 REF_SUMMARY_CALL <- as.character(glue("cd {getwd()}/model-examples/1 ; {getOption('rbabylon.bbi_exe_path')} nonmem summary 1 --json"))
 
 ###################################################################################
@@ -14,12 +13,12 @@ REF_SUMMARY_CALL <- as.character(glue("cd {getwd()}/model-examples/1 ; {getOptio
 ###################################################################################
 
 .TEST_CASES_WD <- list(
-  list(test_wd = ".",        bbi_path = "babylon.yaml",           test_yaml_path = file.path(MODEL_DIR, TEST_YAML_DRY)),
-  list(test_wd = "..",       bbi_path = "testthat/babylon.yaml",  test_yaml_path = file.path("testthat", MODEL_DIR, TEST_YAML_DRY)),
-  list(test_wd = MODEL_DIR,  bbi_path = "../babylon.yaml",        test_yaml_path = TEST_YAML_DRY),
-  list(test_wd = ".",        bbi_path = "babylon.yaml",           test_yaml_path = file.path(MODEL_DIR, TEST_YAML_DRY),              change_midstream = "testthat/babylon.yaml"),
-  list(test_wd = "..",       bbi_path = "testthat/babylon.yaml",  test_yaml_path = file.path("testthat", MODEL_DIR, TEST_YAML_DRY),  change_midstream = "tests/testthat/babylon.yaml"),
-  list(test_wd = MODEL_DIR,  bbi_path = "../babylon.yaml",        test_yaml_path = TEST_YAML_DRY,                                    change_midstream = "babylon.yaml")
+  list(test_wd = ".",        bbi_path = "babylon.yaml",           test_path = file.path(MODEL_DIR, MOD_ID)),
+  list(test_wd = "..",       bbi_path = "testthat/babylon.yaml",  test_path = file.path("testthat", MODEL_DIR, MOD_ID)),
+  list(test_wd = MODEL_DIR,  bbi_path = "../babylon.yaml",        test_path = MOD_ID),
+  list(test_wd = ".",        bbi_path = "babylon.yaml",           test_path = file.path(MODEL_DIR, MOD_ID),              change_midstream = "testthat/babylon.yaml"),
+  list(test_wd = "..",       bbi_path = "testthat/babylon.yaml",  test_path = file.path("testthat", MODEL_DIR, MOD_ID),  change_midstream = "tests/testthat/babylon.yaml"),
+  list(test_wd = MODEL_DIR,  bbi_path = "../babylon.yaml",        test_path = MOD_ID,                                    change_midstream = "babylon.yaml")
 )
 
 withr::with_options(list(rbabylon.model_directory = NULL), {
@@ -31,10 +30,9 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   for (.test_case in .TEST_CASES_WD) {
     test_that(paste("basic workflow is correct from different working directories", .test_case$test_wd, if(!is.null(.test_case$change_midstream)) "change_midstream"), {
       withr::with_dir(.test_case$test_wd, {
-        test_yaml_path <- .test_case$test_yaml_path
 
         # load model from yaml
-        this_mod <- read_model(fs::path_ext_remove(test_yaml_path))
+        this_mod <- read_model(.test_case[["test_path"]])
 
         # check class and keys are right
         expect_identical(class(this_mod), MOD_CLASS_LIST)
@@ -84,10 +82,9 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   for (.test_case in .TEST_CASES_WD) {
     test_that(paste("Summary call is the same after changing directories", .test_case$test_wd, if(!is.null(.test_case$change_midstream)) "change_midstream"), {
       withr::with_dir(.test_case$test_wd, {
-        test_yaml_path <- .test_case$test_yaml_path
 
         # load mod from yaml and dry run through to summary object
-        this_mod <- read_model(fs::path_ext_remove(test_yaml_path))
+        this_mod <- read_model(.test_case[["test_path"]])
         this_proc <- submit_model(this_mod, .dry_run = TRUE, .config_path = .test_case$bbi_path)
         this_sum <- model_summary(this_mod, .dry_run = TRUE)
         expect_identical(this_sum[[PROC_CALL]], REF_SUMMARY_CALL)
