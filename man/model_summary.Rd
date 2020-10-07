@@ -5,9 +5,9 @@
 \alias{model_summary.bbi_nonmem_model}
 \title{Summarize model outputs}
 \usage{
-model_summary(.mod, .bbi_args = NULL, ..., .dry_run = FALSE, .directory = NULL)
+model_summary(.mod, .bbi_args = NULL, ..., .dry_run = FALSE)
 
-\method{model_summary}{bbi_nonmem_model}(.mod, .bbi_args = NULL, ..., .dry_run = FALSE, .directory = NULL)
+\method{model_summary}{bbi_nonmem_model}(.mod, .bbi_args = NULL, ..., .dry_run = FALSE)
 }
 \arguments{
 \item{.mod}{Model to summarize.}
@@ -18,8 +18,6 @@ See \code{\link[=print_bbi_args]{print_bbi_args()}} for full list of options.}
 \item{...}{args passed through to \code{bbi_exec()}}
 
 \item{.dry_run}{show what the command would be without actually running it}
-
-\item{.directory}{Model directory which \code{.mod} path is relative to. Defaults to \code{options('rbabylon.model_directory')}, which can be set globally with \code{set_model_directory()}. \strong{Only used when passing a path for \code{.mod} instead of a \verb{bbi_\{.model_type\}_model} object.}}
 }
 \description{
 Calls out to bbi and returns a named list of class \verb{bbi_\{.model_type\}_summary} with model outputs and diagnostics.

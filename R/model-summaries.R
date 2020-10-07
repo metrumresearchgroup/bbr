@@ -30,8 +30,7 @@ model_summaries <- function(
   .bbi_args = NULL,
   .fail_flags = NULL,
   ...,
-  .dry_run = FALSE,
-  .directory = NULL
+  .dry_run = FALSE
 ) {
   UseMethod("model_summaries")
 }
@@ -43,17 +42,8 @@ model_summaries.list <- function(
   .bbi_args = NULL,
   .fail_flags = NULL,
   ...,
-  .dry_run = FALSE,
-  .directory = NULL
+  .dry_run = FALSE
 ) {
-  # Dev note: this dispatch is where the real work happens. All the other trickle through to here eventually.
-
-  if (!is.null(.directory)) {
-    warning(paste(glue("Passed `.directory = {.directory}` to model_summaries.list().") ,
-                  "This argument is only valid when passing a path to `model_summaries()`.",
-                  "Directory will be extracted from each model object."))
-  }
-
   # check that each element is a model object
   check_model_object_list(.mods)
 
@@ -99,15 +89,8 @@ model_summaries.bbi_run_log_df <- function(
   .bbi_args = NULL,
   .fail_flags = NULL,
   ...,
-  .dry_run = FALSE,
-  .directory = NULL
+  .dry_run = FALSE
 ) {
-
-  if (!is.null(.directory)) {
-    warning(paste(glue("Passed `.directory = {.directory}` to model_summaries.bbi_run_log_df().") ,
-                  "This argument is only valid when passing a path to `model_summaries()`.",
-                  "Directory will be extracted from each model object."))
-  }
 
   # extract models
   .mod_paths <- get_model_path(.mods)
@@ -122,8 +105,7 @@ model_summaries.bbi_run_log_df <- function(
     .bbi_args = .bbi_args,
     .fail_flags = .fail_flags,
     ...,
-    .dry_run = .dry_run,
-    .directory = .directory
+    .dry_run = .dry_run
   )
 
   return(res_df)
