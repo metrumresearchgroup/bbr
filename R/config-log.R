@@ -40,15 +40,8 @@
 #' @seealso [run_log()], [summary_log()]
 #' @inheritParams run_log
 #' @export
-config_log <- function(
-  .base_dir = get_model_directory(),
-  .recurse = TRUE
-) {
-
-  # if no directory defined, set to working directory
-  if (is.null(.base_dir)) {
-    stop("`.base_dir` cannot be `NULL`. Either pass a valid directory path or use `set_model_directory()` to set `options('rbabylon.model_directory')` which will be used by default.", call. = FALSE)
-  }
+config_log <- function(.base_dir, .recurse = TRUE) {
+  checkmate::assert_string(.base_dir)
 
   mod_list <- find_models(.base_dir, .recurse)
 

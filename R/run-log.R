@@ -8,21 +8,16 @@
 #' Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
 #' Users can also use [add_config()] or [add_summary()] to append additional output about the model run.
 #' @seealso [config_log()], [summary_log()]
-#' @param .base_dir Base directory to look in for models. Defaults to [get_model_directory()].
+#'
+#' @param .base_dir Base directory to look in for models.
 #' @param .recurse If `TRUE`, the default, search recursively in all subdirectories. Passed through to `fs::dir_ls()` -- If a positive number, the number of levels to recurse.
+#'
 #' @importFrom purrr map_df
 #' @importFrom tibble tibble
 #' @return A tibble of class `bbi_run_log_df` with information on each model, or an empty tibble if no models are found.
 #' @export
-run_log <- function(
-  .base_dir = get_model_directory(),
-  .recurse = TRUE
-) {
-
-  # if no directory defined, set to working directory
-  if (is.null(.base_dir)) {
-    stop("`.base_dir` cannot be `NULL`. Either pass a valid directory path or use `set_model_directory()` to set `options('rbabylon.model_directory')` which will be used by default.", call. = FALSE)
-  }
+run_log <- function(.base_dir, .recurse = TRUE) {
+  checkmate::assert_string(.base_dir)
 
   mod_list <- find_models(.base_dir, .recurse)
   if(length(mod_list) == 0) {
