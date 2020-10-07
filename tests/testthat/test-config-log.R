@@ -72,10 +72,6 @@ teardown({ cleanup() })
 
 withr::with_options(list(rbabylon.model_directory = NULL), {
 
-  test_that("config_log() errors with no .base_dir set", {
-    expect_error(config_log(), regexp = "argument.+is missing")
-  })
-
   test_that("config_log() returns NULL and warns when no YAML found", {
     log_df <- expect_warning(config_log("data"), regexp = "Found no valid model YAML files in data")
     expect_true(inherits(log_df, "tbl"))

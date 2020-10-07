@@ -38,10 +38,6 @@ teardown({
 
 withr::with_options(list(rbabylon.model_directory = NULL), {
 
-  test_that("summary_log() errors with no .base_dir set", {
-    log_df <- expect_error(summary_log(), regexp = "argument.+is missing")
-  })
-
   test_that("summary_log() returns NULL and warns when no YAML found", {
     log_df <- expect_warning(summary_log("data"), regexp = "Found no valid model YAML files in data")
     expect_true(inherits(log_df, "tbl"))
