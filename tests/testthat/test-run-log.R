@@ -10,7 +10,7 @@ teardown({ cleanup() })
 withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("run_log errors with no .base_dir set", {
-    log_df <- expect_error(run_log(), regexp = "`.base_dir` cannot be `NULL`")
+    expect_error(run_log(), regexp = "argument.+is missing")
   })
 
   test_that("run_log() errors with malformed YAML", {

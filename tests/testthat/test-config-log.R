@@ -73,7 +73,7 @@ teardown({ cleanup() })
 withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("config_log() errors with no .base_dir set", {
-    expect_error(config_log(), regexp = "`.base_dir` cannot be `NULL`")
+    expect_error(config_log(), regexp = "argument.+is missing")
   })
 
   test_that("config_log() returns NULL and warns when no YAML found", {
