@@ -113,7 +113,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
 
   test_that("config_log() works correctly", {
     # check config log for all models so far
-    log_df <- config_log()
+    log_df <- config_log(MODEL_DIR_BBI)
     expect_equal(nrow(log_df), 3)
     expect_equal(ncol(log_df), CONFIG_COLS)
     expect_false(any(is.na(log_df$model_md5)))
@@ -130,7 +130,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
 
   test_that("run_log() captures runs correctly", {
     # check run log for all models
-    log_df <- run_log()
+    log_df <- run_log(MODEL_DIR_BBI)
     expect_equal(nrow(log_df), 4)
     expect_equal(ncol(log_df), 8)
     expect_identical(basename(log_df[[ABS_MOD_PATH]]), c("1", "2", "3", "4"))
@@ -141,7 +141,10 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
     # TODO: consider whether to delete this test now that we have done https://github.com/metrumresearchgroup/rbabylon/issues/30
 
     # add config log to run log
-    log_df <- expect_warning(run_log() %>% add_config(), regexp = "in progress")
+    log_df <- expect_warning(
+      run_log(MODEL_DIR_BBI) %>% add_config(),
+      regexp = "in progress"
+    )
     expect_equal(nrow(log_df), 4)
     expect_equal(ncol(log_df), RUN_LOG_COLS + CONFIG_COLS - 1)
 

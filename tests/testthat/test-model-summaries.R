@@ -58,13 +58,13 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
   })
 
   test_that("model_summaries.bbi_run_log_df produces expected output", {
-    mod_sums <- run_log() %>% model_summaries()
+    mod_sums <- run_log(MODEL_DIR) %>% model_summaries()
     test_mod_sums(mod_sums)
   })
 
 
   test_that("as_summary_list.bbi_summary_log_df works", {
-    mod_sums <- summary_log() %>% as_summary_list()
+    mod_sums <- summary_log(MODEL_DIR) %>% as_summary_list()
     test_mod_sums(mod_sums)
   })
 

@@ -9,10 +9,6 @@ teardown({ cleanup() })
 
 withr::with_options(list(rbabylon.model_directory = NULL), {
 
-  test_that("run_log errors with no .base_dir set", {
-    log_df <- expect_error(run_log(), regexp = "`.base_dir` cannot be `NULL`")
-  })
-
   test_that("run_log() errors with malformed YAML", {
     temp_dir <- file.path(tempdir(), "run_log_malformed_yaml_test")
     fs::dir_create(temp_dir)
