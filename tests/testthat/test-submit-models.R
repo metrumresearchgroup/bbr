@@ -4,8 +4,7 @@ context("submit_models(.dry_run=T)")
 # testing multiple model submission
 #####################################
 
-withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
-                         rbabylon.model_directory = normalizePath(MODEL_DIR)), {
+withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
 
   # create fake babylon.yaml
   readr::write_file("created_by: test-submit-models", file.path(MODEL_DIR, "babylon.yaml"))

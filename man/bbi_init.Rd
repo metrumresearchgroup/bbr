@@ -32,16 +32,8 @@ that directory.
 }
 \details{
 For \code{rbabylon} to make any calls out to \code{bbi} (for example in
-\code{submit_model()} or \code{model_summary()}) it must find a \code{babylon.yaml} file
-in one of the following places:
-\itemize{
-\item The directory specified in \code{options("rbabylon.model_directory")}
-\item The working directory, if \code{options("rbabylon.model_directory")} is \code{NULL}
-\item A path passed to the \code{.config_path} argument of the functions mentioned
-above
-}
-
-The recommended behavior is to set \code{options("rbabylon.model_directory")},
-ideally in your \code{.Rprofile}, and then call \code{bbi_init(.dir = getOption("rbabylon.model_directory"), ...)}. This only has to be done
-once.
+\code{\link[=submit_model]{submit_model()}} or \code{\link[=model_summary]{model_summary()}}) it must find a \code{babylon.yaml} file.
+The default behavior is to look for this file in the same directory as the
+model. \code{submit_model()} and \code{submit_models()} also support passing a
+configuration file via the \code{.config_path} argument.
 }

@@ -250,59 +250,6 @@ check_required_keys <- function(.list, .req) {
   all(.req %in% names(.list))
 }
 
-
-#' Get or set global model directory option
-#'
-#' Gets or sets `options('rbabylon.model_directory')`,
-#' which is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
-#' once this is set, those functions can take a path relative to this directory instead of the working/script directory.
-#'
-#' @details
-#' `set_model_directory()` sets `options('rbabylon.model_directory')` to the absolute path of the directory passed to `.path`.
-#' Note that the directory must exist or this will error.
-#'
-#' `get_model_directory()` gets the path set to `options('rbabylon.model_directory')` and checks that it is both absolute and exists,
-#' erroring if it is not.
-#' @importFrom fs is_absolute_path dir_exists
-#' @export
-get_model_directory <- function() {
-  .mod_dir <- getOption("rbabylon.model_directory")
-  if (is.null(.mod_dir)) {
-    return(NULL)
-  }
-
-  if (!fs::is_absolute_path(.mod_dir)) {
-    strict_mode_error(paste(
-      glue("`options('rbabylon.model_directory')` must be set to an absolute path but is currently set to {.mod_dir}"),
-      "It is recommended to use `set_model_directory('...')` or put `options('rbabylon.model_directory' = normalizePath('...'))` in your .Rprofile for this project.",
-      sep = "\n"))
-  }
-
-  if (!fs::dir_exists(.mod_dir)) {
-    strict_mode_error(paste(
-      glue("`options('rbabylon.model_directory')` must be set to an existing directory but {.mod_dir} does not exist."),
-      "It is recommended to use `set_model_directory('...')` or put `options('rbabylon.model_directory' = normalizePath('...'))` in your .Rprofile for this project.",
-      sep = "\n"))
-  }
-
-  return(.mod_dir)
-}
-
-
-#' @rdname get_model_directory
-#' @param .path Path, either from working directory or absolute, that will be set as `options('rbabylon.model_directory')`
-#' @export
-set_model_directory <- function(.path) {
-  if (is.null(.path)) {
-    options('rbabylon.model_directory' = NULL)
-  } else {
-    options('rbabylon.model_directory' = normalizePath(.path, mustWork = TRUE))
-  }
-
-  cat(glue("options('rbabylon.model_directory') set to {options('rbabylon.model_directory')}"))
-}
-
-
 #' Private helper to check if an object inherits a model class and error if not
 #' @param .mod The object to check
 #' @param .mod_types Character vector of acceptable classes, defaulting to `VALID_MOD_CLASSES`

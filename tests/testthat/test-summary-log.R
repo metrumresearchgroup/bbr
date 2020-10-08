@@ -36,19 +36,15 @@ teardown({
   cleanup()
 })
 
-withr::with_options(list(rbabylon.model_directory = NULL), {
 
-  test_that("summary_log() returns NULL and warns when no YAML found", {
-    log_df <- expect_warning(summary_log("data"), regexp = "Found no valid model YAML files in data")
-    expect_true(inherits(log_df, "tbl"))
-    expect_equal(nrow(log_df), 0)
-    expect_equal(ncol(log_df), 0)
-  })
-}) # closing withr::with_options
+test_that("summary_log() returns NULL and warns when no YAML found", {
+  log_df <- expect_warning(summary_log("data"), regexp = "Found no valid model YAML files in data")
+  expect_true(inherits(log_df, "tbl"))
+  expect_equal(nrow(log_df), 0)
+  expect_equal(ncol(log_df), 0)
+})
 
-
-withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
-                         rbabylon.model_directory = normalizePath(MODEL_DIR)), {
+withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
 
   #########################################
   # extracting things from summary object

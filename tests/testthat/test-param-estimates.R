@@ -14,8 +14,7 @@ teardown({
 # build reference
 ref_df1 <- readRDS(PARAM_REF_FILE)
 
-withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
-                         rbabylon.model_directory = NULL), {
+withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
 
   test_that("param_estimates.bbi_model_summary gets expected table", {
     par_df <- MOD1 %>% model_summary() %>% param_estimates()

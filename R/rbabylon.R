@@ -224,20 +224,10 @@ bbi_help <- function(.cmd_args=NULL) {
 #' that directory.
 #'
 #' @details For `rbabylon` to make any calls out to `bbi` (for example in
-#'   `submit_model()` or `model_summary()`) it must find a `babylon.yaml` file
-#'   in one of the following places:
-#'
-#'   * The directory specified in `options("rbabylon.model_directory")`
-#'
-#'   * The working directory, if `options("rbabylon.model_directory")` is `NULL`
-#'
-#'   * A path passed to the `.config_path` argument of the functions mentioned
-#'   above
-#'
-#'   The recommended behavior is to set `options("rbabylon.model_directory")`,
-#'   ideally in your `.Rprofile`, and then call `bbi_init(.dir =
-#'   getOption("rbabylon.model_directory"), ...)`. This only has to be done
-#'   once.
+#'   [submit_model()] or [model_summary()]) it must find a `babylon.yaml` file.
+#'   The default behavior is to look for this file in the same directory as the
+#'   model. `submit_model()` and `submit_models()` also support passing a
+#'   configuration file via the `.config_path` argument.
 #'
 #' @param .dir Path to directory to run `init` in (and put the resulting
 #'   `babylon.yaml` file)

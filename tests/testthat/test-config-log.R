@@ -70,122 +70,116 @@ setup({
 
 teardown({ cleanup() })
 
-withr::with_options(list(rbabylon.model_directory = NULL), {
+test_that("config_log() returns NULL and warns when no YAML found", {
+  log_df <- expect_warning(config_log("data"), regexp = "Found no valid model YAML files in data")
+  expect_true(inherits(log_df, "tbl"))
+  expect_equal(nrow(log_df), 0)
+  expect_equal(ncol(log_df), 0)
+})
 
-  test_that("config_log() returns NULL and warns when no YAML found", {
-    log_df <- expect_warning(config_log("data"), regexp = "Found no valid model YAML files in data")
-    expect_true(inherits(log_df, "tbl"))
-    expect_equal(nrow(log_df), 0)
-    expect_equal(ncol(log_df), 0)
-  })
+test_that("config_log() works correctly with nested dirs", {
+  log_df <- config_log(MODEL_DIR)
+  check_config_ref(
+    log_df,
+    c("1", "2", "3", "1"),
+    CONFIG_COLS,
+    run_status
+  )
+})
 
-  test_that("config_log() works correctly with nested dirs", {
-    log_df <- config_log(MODEL_DIR)
-    check_config_ref(
-      log_df,
-      c("1", "2", "3", "1"),
-      CONFIG_COLS,
-      run_status
-    )
-  })
+test_that("config_log(.recurse = FALSE) works", {
+  log_df <- config_log(MODEL_DIR, .recurse = FALSE)
+  check_config_ref(
+    log_df,
+    c("1", "2", "3"),
+    CONFIG_COLS,
+    run_status
+  )
+})
 
-  test_that("config_log(.recurse = FALSE) works", {
-    log_df <- config_log(MODEL_DIR, .recurse = FALSE)
-    check_config_ref(
-      log_df,
-      c("1", "2", "3"),
-      CONFIG_COLS,
-      run_status
-    )
-  })
+test_that("config_log() reflects model mismatch", {
+  perturb_file(CTL_TEST_FILE)
+  log_df <- config_log(MODEL_DIR)
+  expect_equal(log_df[["model_has_changed"]][1], TRUE)
+})
 
-  test_that("config_log() reflects model mismatch", {
-    # TODO: update this pattern once the model_directory option is deprecated
-    perturb_file(CTL_TEST_FILE)
-    log_df <- config_log(MODEL_DIR)
-    expect_equal(log_df[["model_has_changed"]][1], TRUE)
-  })
+test_that("config_log() reflects data mismatch", {
+  perturb_file("data/acop.csv")
+  log_df <- config_log(MODEL_DIR)
+  expect_equal(log_df[["data_has_changed"]][1], TRUE)
+})
 
-  test_that("config_log() reflects data mismatch", {
-    # TODO: update this pattern once the model_directory option is deprecated
-    perturb_file("data/acop.csv")
-    log_df <- config_log(MODEL_DIR)
-    expect_equal(log_df[["data_has_changed"]][1], TRUE)
-  })
+test_that("config_log() includes babylon version", {
+  log_df <- config_log(MODEL_DIR)
+  expect_equal(log_df[["bbi_version"]][1], expected_bbi_version)
+})
 
-  test_that("config_log() includes babylon version", {
-    log_df <- config_log(MODEL_DIR)
-    expect_equal(log_df[["bbi_version"]][1], expected_bbi_version)
-  })
+test_that("config_log() includes NONMEM version", {
+  log_df <- config_log(MODEL_DIR)
+  expect_equal(log_df[["nm_version"]][1], expected_nonmem_version)
+})
 
-  test_that("config_log() includes NONMEM version", {
-    log_df <- config_log(MODEL_DIR)
-    expect_equal(log_df[["nm_version"]][1], expected_nonmem_version)
-  })
+test_that("add_config() works correctly", {
+  log_df <- run_log(MODEL_DIR) %>% add_config()
+  check_config_ref(
+    log_df,
+    c("1", "2", "3", "1"),
+    RUN_LOG_COLS + CONFIG_COLS - 1,
+    run_status
+  )
+})
 
-  test_that("add_config() works correctly", {
-    log_df <- run_log(MODEL_DIR) %>% add_config()
-    check_config_ref(
-      log_df,
-      c("1", "2", "3", "1"),
-      RUN_LOG_COLS + CONFIG_COLS - 1,
-      run_status
-    )
-  })
+test_that("add_config() has correct columns", {
+  conf_df <- config_log(MODEL_DIR)
+  log_df <- run_log(MODEL_DIR)
+  add_df <- log_df %>% add_config()
 
-  test_that("add_config() has correct columns", {
-    conf_df <- config_log(MODEL_DIR)
-    log_df <- run_log(MODEL_DIR)
-    add_df <- log_df %>% add_config()
+  # should have all columns from both (minus the join key)
+  expect_identical(names(add_df), c(names(log_df), names(conf_df)[2:length(names(conf_df))]))
 
-    # should have all columns from both (minus the join key)
-    expect_identical(names(add_df), c(names(log_df), names(conf_df)[2:length(names(conf_df))]))
+  # check one col to make sure it matches
+  col_to_check <- names(conf_df)[2]
+  expect_identical(conf_df[[col_to_check]], add_df[[col_to_check]])
+})
 
-    # check one col to make sure it matches
-    col_to_check <- names(conf_df)[2]
-    expect_identical(conf_df[[col_to_check]], add_df[[col_to_check]])
-  })
+# THESE TESTS NEED TO BE LAST BECAUSE IT DELETES NECESSARY FILES
+fs::file_delete(file.path(NEW_MOD2, "bbi_config.json"))
+fs::file_delete(file.path(NEW_MOD3, "bbi_config.json"))
+missing_idx <- c(2L, 3L)
 
-  # THESE TESTS NEED TO BE LAST BECAUSE IT DELETES NECESSARY FILES
-  fs::file_delete(file.path(NEW_MOD2, "bbi_config.json"))
-  fs::file_delete(file.path(NEW_MOD3, "bbi_config.json"))
-  missing_idx <- c(2L, 3L)
+test_that("add_config() works correctly with missing json", {
+  log_df <- expect_warning(run_log(MODEL_DIR) %>% add_config(), regexp = "Found only 2 bbi_config.json files for 4 models")
+  expect_equal(nrow(log_df), RUN_LOG_ROWS+1)
+  expect_equal(ncol(log_df), RUN_LOG_COLS+CONFIG_COLS-1)
+  expect_false(any(duplicated(log_df[[ABS_MOD_PATH]])))
 
-  test_that("add_config() works correctly with missing json", {
-    log_df <- expect_warning(run_log(MODEL_DIR) %>% add_config(), regexp = "Found only 2 bbi_config.json files for 4 models")
-    expect_equal(nrow(log_df), RUN_LOG_ROWS+1)
-    expect_equal(ncol(log_df), RUN_LOG_COLS+CONFIG_COLS-1)
-    expect_false(any(duplicated(log_df[[ABS_MOD_PATH]])))
+  # run_log fields
+  expect_identical(basename(log_df[[ABS_MOD_PATH]]), c("1", "2", "3", "1"))
+  expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS, ORIG_TAGS))
+  expect_identical(
+    log_df[["yaml_md5"]],
+    c(RUN_LOG_YAML_MD5, MOD_LEVEL2_MD5)
+  )
 
-    # run_log fields
-    expect_identical(basename(log_df[[ABS_MOD_PATH]]), c("1", "2", "3", "1"))
-    expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS, ORIG_TAGS))
-    expect_identical(
-      log_df[["yaml_md5"]],
-      c(RUN_LOG_YAML_MD5, MOD_LEVEL2_MD5)
-    )
-
-    # config log fields
-    expect_identical(
-      log_df[["data_md5"]],
-      rep_missing(CONFIG_DATA_MD5, missing_idx, 4L)
-    )
-    expect_identical(
-      log_df[["data_path"]],
-      rep_missing(CONFIG_DATA_PATH, missing_idx, 4L)
-    )
-    expect_identical(
-      log_df[["model_md5"]],
-      rep_missing(CONFIG_MODEL_MD5, missing_idx, 4L)
-    )
-    expect_identical(
-      log_df[["bbi_version"]],
-      rep_missing(expected_bbi_version, missing_idx, 4L)
-    )
-    expect_identical(
-      log_df[["nm_version"]],
-      rep_missing(expected_nonmem_version, missing_idx, 4L)
-    )
-  })
-
-}) # closing withr::with_options
+  # config log fields
+  expect_identical(
+    log_df[["data_md5"]],
+    rep_missing(CONFIG_DATA_MD5, missing_idx, 4L)
+  )
+  expect_identical(
+    log_df[["data_path"]],
+    rep_missing(CONFIG_DATA_PATH, missing_idx, 4L)
+  )
+  expect_identical(
+    log_df[["model_md5"]],
+    rep_missing(CONFIG_MODEL_MD5, missing_idx, 4L)
+  )
+  expect_identical(
+    log_df[["bbi_version"]],
+    rep_missing(expected_bbi_version, missing_idx, 4L)
+  )
+  expect_identical(
+    log_df[["nm_version"]],
+    rep_missing(expected_nonmem_version, missing_idx, 4L)
+  )
+})

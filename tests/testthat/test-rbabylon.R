@@ -58,9 +58,9 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
   test_that("bbi_init creates babylon.yaml", {
     # create yaml
 
-      withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
-        bbi_init(".", ".", .no_default_version=TRUE)
-      })
+    withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
+      bbi_init(".", ".", .no_default_version=TRUE)
+    })
 
     # read in yaml and check that it has a babylon key
     bbi_yaml <- yaml::read_yaml("babylon.yaml")
