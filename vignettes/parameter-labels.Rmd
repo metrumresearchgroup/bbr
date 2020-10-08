@@ -30,11 +30,10 @@ library(rbabylon)
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(readr))
 
-set_model_directory("../inst/param_examples")
+MODEL_DIR <- "../inst/param_examples"
 ```
 
 ```{r setup, include = FALSE}
-MODEL_DIR <- "../inst/param_examples"
 source("../tests/testthat/setup-param-labels-ref.R")
 REF_OMEGA <- PARAM_BLOCK_REF$PEX_BLOCK32S$ctl
 

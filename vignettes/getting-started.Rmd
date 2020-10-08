@@ -92,19 +92,13 @@ This will create a `babylon.yaml` file in your `MODEL_DIR` directory which conta
 
 ## Do for each R session
 
-Once `babylon` is installed and initialized, you will need to make `rbabylon` knows where to find it. This can be done by setting the following options:
+Once `babylon` is installed and initialized, you will need to make `rbabylon` knows where to find it. This can be done by setting the option
 
 ```{r bbi_exe_path}
-options(
-  'rbabylon.bbi_exe_path' = BBI_EXE_PATH,
-  'rbabylon.model_directory' = normalizePath(MODEL_DIR, mustWork = TRUE)
-)
+options('rbabylon.bbi_exe_path' = BBI_EXE_PATH)
 ```
 
-This must be set for every new R session, so it may be wise to **include the above snippet in your `.Rprofile`**, replacing the `BBI_EXE_PATH` and `MODEL_DIR` constants with the relevant paths from your system/project. Note that, if setting `'rbabylon.model_directory'` explicitly like this, you _must set it to an absolute path._ The recommended way to do this is to use `normalizePath("path/to/dir/")` where `"path/to/dir/"` is a relative path from the script location (in this case the `.Rprofile` location). That way the project will still be portable between different servers/disks.
-
-*NOTE:* By setting the `rbabylon.model_directory` option, you will _not_ need to pass the full path to model files when calling functions like `read_model()` or `submit_model()`. Instead you will pass a path relative to the specified modeling directory. To be clear, it is not _necessary_ to set this option, but it is definitely a recommended convenience.
-
+This must be set for every new R session, so it may be wise to **include the above snippet in your `.Rprofile`**, replacing the `BBI_EXE_PATH` and `MODEL_DIR` constants with the relevant paths from your system/project.
 
 # Initial modeling run
 
