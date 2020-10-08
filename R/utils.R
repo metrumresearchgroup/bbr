@@ -303,37 +303,6 @@ set_model_directory <- function(.path) {
 }
 
 
-#' Private helper to search for babylon.yaml config files
-#' @param .config_path Path to config, possibly relative
-#' @param .model_dir absolute path to directory where model is be run from
-#' @importFrom fs is_file file_exists is_absolute_path
-#' @importFrom stringr str_detect
-#' @return path to babylon.yaml in `.config_path`, relative to `.model_dir`
-#' @keywords internal
-find_config_file_path <- function(.config_path, .model_dir) {
-  if (!fs::is_absolute_path(.model_dir)) {
-    stop(glue("USER SHOULDN'T SEE THIS ERROR: find_config_file_path(.model_dir) is not absolute: {.model_dir}"))
-  }
-
-  # if passed a directory, add babylon.yaml
-  if (!is_valid_yaml_extension(.config_path)) {
-    .config_path <- file.path(.config_path, "babylon.yaml")
-  }
-
-  .config_path <- tryCatch({
-    normalizePath(.config_path, mustWork = TRUE)
-  },
-  error = function(e) {
-    if (str_detect(e$message, "No such file or directory")) {
-      stop(glue("No babylon.yaml file exists at {.config_path} -- Either use `bbi_init('model/dir/')` to create one, or pass a valid path to the `.config_path` argument of `submit_model()`"))
-    }
-    stop(e$message)
-  })
-
-  .config_path <- fs::path_rel(.config_path, .model_dir)
-  return(.config_path)
-}
-
 #' Private helper to check if an object inherits a model class and error if not
 #' @param .mod The object to check
 #' @param .mod_types Character vector of acceptable classes, defaulting to `VALID_MOD_CLASSES`
