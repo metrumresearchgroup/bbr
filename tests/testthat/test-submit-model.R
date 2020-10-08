@@ -19,13 +19,13 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
                 # correctly parsing yaml
                 expect_identical(
                   submit_model(MOD1, .dry_run = T)[[PROC_CALL]],
-                  as.character(glue("cd {model_dir} ; bbi nonmem run sge {mod_ctl_path} --overwrite --threads=4 --config=../babylon.yaml"))
+                  as.character(glue("cd {model_dir} ; bbi nonmem run sge {mod_ctl_path} --overwrite --threads=4"))
                 )
 
                 # switch to local mode
                 expect_identical(
                   submit_model(MOD1, .mode = "local", .dry_run = T)[[PROC_CALL]],
-                  as.character(glue("cd {model_dir} ; bbi nonmem run local {mod_ctl_path} --overwrite --threads=4 --config=../babylon.yaml"))
+                  as.character(glue("cd {model_dir} ; bbi nonmem run local {mod_ctl_path} --overwrite --threads=4"))
                 )
 
                 # over-riding yaml arg with passed args
@@ -37,7 +37,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
                                  "nm_version" = "nm74"
                                ),
                                .dry_run = T)[[PROC_CALL]],
-                  as.character(glue("cd {model_dir} ; bbi nonmem run sge {mod_ctl_path} --overwrite --threads=2 --json --nm_version=nm74 --config=../babylon.yaml"))
+                  as.character(glue("cd {model_dir} ; bbi nonmem run sge {mod_ctl_path} --overwrite --threads=2 --json --nm_version=nm74"))
                 )
               })
             })
@@ -48,13 +48,13 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
                 # correctly parsing yaml
                 expect_identical(
                   submit_model(MOD1, .dry_run = T)[[PROC_CALL]],
-                  as.character(glue("cd {model_dir} ; bbi nonmem run sge {mod_ctl_path} --overwrite --threads=4 --config=../babylon.yaml"))
+                  as.character(glue("cd {model_dir} ; bbi nonmem run sge {mod_ctl_path} --overwrite --threads=4"))
                 )
 
                 # over-riding yaml arg with passed arg
                 expect_identical(
                   submit_model(MOD1, list(threads=2), .dry_run = T)[[PROC_CALL]],
-                  as.character(glue("cd {model_dir} ; bbi nonmem run sge {mod_ctl_path} --overwrite --threads=2 --config=../babylon.yaml"))
+                  as.character(glue("cd {model_dir} ; bbi nonmem run sge {mod_ctl_path} --overwrite --threads=2"))
                 )
 
               })

@@ -87,17 +87,6 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
     proc_list <- submit_models(list(MOD1, mod2), .dry_run = TRUE)
 
     expect_equal(length(proc_list), 2L)
-
-    # should not generate a --config
-    expect_false(grepl("--config", proc_list[[1L]][["call"]], fixed = TRUE))
-
-    expect_true(
-      grepl(
-        "--config=../babylon.yaml",
-        proc_list[[2L]][["call"]],
-        fixed = TRUE
-      )
-    )
   })
 
   test_that("submit_models(.dry_run=T) errors with bad input",
