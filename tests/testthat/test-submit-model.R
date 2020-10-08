@@ -60,4 +60,23 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
               })
             })
 
+  test_that("submit_model() creates correct call for non-NULL .config_path", {
+    temp_config <- tempfile(fileext = ".yaml")
+    readr::write_file("foo", temp_config)
+    on.exit(fs::file_delete(temp_config))
+
+    res <- submit_model(MOD1, .config_path = temp_config, .dry_run = TRUE)
+    expect_identical(
+      res[[PROC_CALL]],
+      as.character(
+        glue::glue(
+          "cd {model_dir} ;",
+          "bbi nonmem run sge {mod_ctl_path} --overwrite --threads=4",
+          "--config={temp_config}",
+          .sep = " "
+        )
+      )
+    )
+  })
+
 }) # closing withr::with_options
