@@ -119,14 +119,14 @@ submit_nonmem_models <- function(.mods,
       .run[["bbi_args"]]
     )
 
-    # TODO: change this once we have the helper
     model_dir <- get_model_working_directory(.run[["models"]][[1L]])
 
-    # check for babylon.yaml config
-    .config_path <- find_config_file_path(.config_path, model_dir)
-
-    if (.config_path != "babylon.yaml") {
-      cmd_args <- c(cmd_args, sprintf("--config=%s", .config_path))
+    if (!is.null(.config_path)) {
+      checkmate::assert_file_exists(.config_path)
+      cmd_args <- c(
+        cmd_args,
+        sprintf("--config=%s", normalizePath(.config_path))
+      )
     }
 
     return(list(cmd_args = cmd_args, model_dir = model_dir))
