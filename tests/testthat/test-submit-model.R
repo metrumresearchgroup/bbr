@@ -81,6 +81,7 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
   test_that("submit_model() works with non-NULL .config_path", {
     skip_if(Sys.getenv("SKIP_BBI_TEST") == "true")
+    skip_if(Sys.getenv("DRONE") == "true")
 
     test_dir <- getwd()
     withr::with_tempdir({
