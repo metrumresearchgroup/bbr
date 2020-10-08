@@ -63,9 +63,9 @@ for (MODEL_PICK in MODEL_PICKS) {
 
     # make label df
     .label_df <- .ctl_raw %>%
-                   param_labels() %>%
-                   apply_indices(.omega = MODEL_PICK$omega, .sigma = MODEL_PICK$sigma) %>%
-                   select(-param_type)
+      param_labels() %>%
+      apply_indices(.omega = MODEL_PICK$omega, .sigma = MODEL_PICK$sigma) %>%
+      select(-param_type)
 
     # join against reference to make sure they're the same
     ref_df <- ref_df %>% mutate(!!SUMMARY_PARAM_NAMES := ifelse(param == "THETA",

@@ -155,11 +155,11 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
     norm_model_paths <- get_model_path(log_df)
 
     log_df <- log_df %>% mutate(
-                            current_data_md5  = tools::md5sum(norm_data_paths),
-                            data_md5_match    = .data$data_md5 == .data$current_data_md5,
-                            current_model_md5  = tools::md5sum(norm_model_paths),
-                            model_md5_match   = .data$model_md5 == .data$current_model_md5
-                          )
+      current_data_md5  = tools::md5sum(norm_data_paths),
+      data_md5_match    = .data$data_md5 == .data$current_data_md5,
+      current_model_md5  = tools::md5sum(norm_model_paths),
+      model_md5_match   = .data$model_md5 == .data$current_model_md5
+    )
 
     expect_true(all(log_df$data_md5_match))
     expect_true(all(log_df$model_md5_match))
