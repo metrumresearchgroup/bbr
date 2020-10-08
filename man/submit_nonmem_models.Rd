@@ -9,7 +9,7 @@ submit_nonmem_models(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
-  .config_path = file.path(get_model_directory() \%||\% ".", "babylon.yaml"),
+  .config_path = NULL,
   .wait = TRUE,
   .dry_run = FALSE
 )
@@ -23,7 +23,9 @@ submit_nonmem_models(
 
 \item{...}{args passed through to \code{bbi_exec()}}
 
-\item{.config_path}{Optionally specify a path to a \code{babylon.yaml} config. If not specified, the config in the model directory will be used by default. Path MUST be either an absolute path or relative to the model directory.}
+\item{.config_path}{Path to a babylon configuration file. If \code{NULL}, the
+default, will attempt to use a \code{babylon.yaml} in the same directory as the
+model.}
 
 \item{.wait}{If \code{TRUE}, the default, wait for the bbi process to return before this function call returns. If \code{FALSE} function will return while bbi process runs in the background.}
 

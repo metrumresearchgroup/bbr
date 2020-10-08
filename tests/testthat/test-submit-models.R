@@ -87,17 +87,6 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
     proc_list <- submit_models(list(MOD1, mod2), .dry_run = TRUE)
 
     expect_equal(length(proc_list), 2L)
-
-    # should not generate a --config
-    expect_false(grepl("--config", proc_list[[1L]][["call"]], fixed = TRUE))
-
-    expect_true(
-      grepl(
-        "--config=../babylon.yaml",
-        proc_list[[2L]][["call"]],
-        fixed = TRUE
-      )
-    )
   })
 
   test_that("submit_models(.dry_run=T) errors with bad input",
@@ -126,5 +115,29 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi",
                 regexp = "must contain all the same type of models"
               )
             })
+
+  test_that("submit_models() works with non-NULL .config_path", {
+    temp_config <- tempfile(fileext = ".yaml")
+    readr::write_file("foo", temp_config)
+    on.exit(fs::file_delete(temp_config))
+
+    res <- submit_models(
+      list(MOD1),
+      .config_path = temp_config,
+      .dry_run = TRUE
+    )
+
+    expect_identical(
+      res[[1L]][[PROC_CALL]],
+      as.character(
+        glue::glue(
+          "cd {model_dir} ;",
+          "bbi nonmem run sge {mod_ctl_path[[1L]]} --overwrite --threads=4",
+          "--config={temp_config}",
+          .sep = " "
+        )
+      )
+    )
+  })
 }) # closing withr::with_options
 

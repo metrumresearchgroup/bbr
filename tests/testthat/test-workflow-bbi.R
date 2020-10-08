@@ -166,5 +166,41 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
     expect_true(all(log_df$model_md5_match))
   })
 
+
+  test_that("submit_model() works with non-NULL .config_path", {
+    if (requireNamespace("withr", quietly = TRUE) &&
+        utils::packageVersion("withr") < "2.2.0") {
+      skip("must have withr >= 2.2.0 to run this test")
+    }
+
+    test_dir <- getwd()
+    withr::with_tempdir({
+      # copy model, YAML, and data files to the same location
+      files_to_copy <- file.path(
+        test_dir,
+        MODEL_DIR,
+        c("1.ctl", "1.yaml", "../data/acop.csv")
+      )
+
+      purrr::walk(files_to_copy, fs::file_copy, ".")
+
+      # modify DATA to reflect location in temp dir
+      readr::read_file("1.ctl") %>%
+        stringr::str_replace("\\$DATA\\s+[^\\s]+", "$DATA ../acop.csv") %>%
+        readr::write_file("1.ctl")
+
+      mod <- read_model("1")
+      res <- submit_model(
+        mod,
+        .mode = "local",
+        .config_path = file.path(test_dir, MODEL_DIR_BBI, "babylon.yaml"),
+        .wait = TRUE
+      )
+
+      expect_true(any(grepl("--config", res[["cmd_args"]], fixed = TRUE)))
+      expect_true(any(grepl("models completed", res[["stdout"]], fixed = TRUE)))
+    })
+  })
+
 }) # closing withr::with_options
 

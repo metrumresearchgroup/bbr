@@ -9,7 +9,9 @@
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run [print_bbi_args()] to see valid arguments.
 #' @param .mode Either `"sge"`, the default, to submit model(s) to the grid or `"local"` for local execution.
 #' @param ... args passed through to `bbi_exec()`
-#' @param .config_path Optionally specify a path to a `babylon.yaml` config. If not specified, the config in the model directory will be used by default. Path MUST be either an absolute path or relative to the model directory.
+#' @param .config_path Path to a babylon configuration file. If `NULL`, the
+#'   default, will attempt to use a `babylon.yaml` in the same directory as the
+#'   model.
 #' @param .wait If `TRUE`, the default, wait for the bbi process to return before this function call returns. If `FALSE` function will return while bbi process runs in the background.
 #' @param .dry_run Returns an object detailing the command that would be run, insted of running it. This is primarily for testing but also a debugging tool.
 #' @export
@@ -18,7 +20,7 @@ submit_model <- function(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
-  .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
+  .config_path = NULL,
   .wait = TRUE,
   .dry_run=FALSE
 ) {
@@ -32,7 +34,7 @@ submit_model.bbi_nonmem_model <- function(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
-  .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
+  .config_path = NULL,
   .wait = TRUE,
   .dry_run=FALSE
 ) {
@@ -64,7 +66,7 @@ submit_nonmem_model <- function(.mod,
                                 .bbi_args = NULL,
                                 .mode = c("sge", "local"),
                                 ...,
-                                .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
+                                .config_path = NULL,
                                 .wait = TRUE,
                                 .dry_run=FALSE) {
 
@@ -82,11 +84,12 @@ submit_nonmem_model <- function(.mod,
   # define working directory
   model_dir <- get_model_working_directory(.mod)
 
-  # check for babylon.yaml config
-  .config_path <- find_config_file_path(.config_path, model_dir)
-
-  if (.config_path != "babylon.yaml") {
-    cmd_args <- c(cmd_args, sprintf("--config=%s", .config_path))
+  if (!is.null(.config_path)) {
+    checkmate::assert_file_exists(.config_path)
+    cmd_args <- c(
+      cmd_args,
+      sprintf("--config=%s", normalizePath(.config_path))
+    )
   }
 
   if (.dry_run) {
