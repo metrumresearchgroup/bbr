@@ -9,8 +9,9 @@
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run [print_bbi_args()] to see valid arguments.
 #' @param .mode Either `"sge"`, the default, to submit model(s) to the grid or `"local"` for local execution.
 #' @param ... args passed through to `bbi_exec()`
-#' @param .config_path Path to a babylon configuration file. If `NULL`, will
-#'   attempt to use a `babylon.yaml` in the same directory as the model.
+#' @param .config_path Path to a babylon configuration file. If `NULL`, the
+#'   default, will attempt to use a `babylon.yaml` in the same directory as the
+#'   model.
 #' @param .wait If `TRUE`, the default, wait for the bbi process to return before this function call returns. If `FALSE` function will return while bbi process runs in the background.
 #' @param .dry_run Returns an object detailing the command that would be run, insted of running it. This is primarily for testing but also a debugging tool.
 #' @export

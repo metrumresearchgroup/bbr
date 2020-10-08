@@ -34,8 +34,9 @@ submit_model(
 
 \item{...}{args passed through to \code{bbi_exec()}}
 
-\item{.config_path}{Path to a babylon configuration file. If \code{NULL}, will
-attempt to use a \code{babylon.yaml} in the same directory as the model.}
+\item{.config_path}{Path to a babylon configuration file. If \code{NULL}, the
+default, will attempt to use a \code{babylon.yaml} in the same directory as the
+model.}
 
 \item{.wait}{If \code{TRUE}, the default, wait for the bbi process to return before this function call returns. If \code{FALSE} function will return while bbi process runs in the background.}
 
