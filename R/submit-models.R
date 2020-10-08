@@ -20,7 +20,7 @@ submit_models <- function(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
-  .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
+  .config_path = NULL,
   .wait = TRUE,
   .dry_run=FALSE
 ) {
@@ -35,7 +35,7 @@ submit_models.list <- function(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
-  .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
+  .config_path = NULL,
   .wait = TRUE,
   .dry_run=FALSE
 ) {
@@ -90,7 +90,7 @@ submit_nonmem_models <- function(.mods,
                                  .bbi_args = NULL,
                                  .mode = c("sge", "local"),
                                  ...,
-                                 .config_path = file.path(get_model_directory() %||% ".", "babylon.yaml"),
+                                 .config_path = NULL,
                                  .wait = TRUE,
                                  .dry_run = FALSE) {
 
