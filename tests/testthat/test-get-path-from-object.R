@@ -4,8 +4,6 @@ context("Build paths from model object")
 # file path and file name manipulation
 ########################################
 
-withr::with_options(list(rbabylon.model_directory = NULL), {
-
   #######################
   # get_path_from_object
   #######################
@@ -146,5 +144,3 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   test_that("combine_directory_path() errors with fake .directory", {
     expect_error(combine_directory_path("aaa", CTL_TEST_FILE), regexp = "No such file or directory")
   })
-
-}) # closing withr::with_options

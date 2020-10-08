@@ -8,9 +8,9 @@ context("testing a composable workflow but only dryrun and NOT running bbi")
 # reference constants
 REF_SUMMARY_CALL <- as.character(glue("cd {getwd()}/model-examples/1 ; {getOption('rbabylon.bbi_exe_path')} nonmem summary 1 --json"))
 
-###################################################################################
-# with options("rbabylon.model_directory" = NULL), changing the working directory
-###################################################################################
+########################################
+###   change the working directory   ###
+########################################
 
 .TEST_CASES_WD <- list(
   list(test_wd = ".",        bbi_path = "babylon.yaml",           test_path = file.path(MODEL_DIR, MOD_ID)),
@@ -20,8 +20,6 @@ REF_SUMMARY_CALL <- as.character(glue("cd {getwd()}/model-examples/1 ; {getOptio
   list(test_wd = "..",       bbi_path = "testthat/babylon.yaml",  test_path = file.path("testthat", MODEL_DIR, MOD_ID),  change_midstream = "tests/testthat/babylon.yaml"),
   list(test_wd = MODEL_DIR,  bbi_path = "../babylon.yaml",        test_path = MOD_ID,                                    change_midstream = "babylon.yaml")
 )
-
-withr::with_options(list(rbabylon.model_directory = NULL), {
 
   # create fake babylon.yaml
   readr::write_file("created_by: test-workflow-dryrun part 2", "babylon.yaml")
@@ -99,6 +97,4 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
       })
     })
   }
-
-}) # closing withr::with_options
 

@@ -12,9 +12,6 @@
 # - test-get-based-on.R
 # - maybe others...
 
-# clear any model_directory that is set
-set_model_directory(NULL)
-
 # define constants
 MOD_ID <- "1"
 MODEL_DIR <- "model-examples"

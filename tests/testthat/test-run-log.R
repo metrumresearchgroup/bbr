@@ -7,8 +7,6 @@ setup({
 
 teardown({ cleanup() })
 
-withr::with_options(list(rbabylon.model_directory = NULL), {
-
   test_that("run_log() errors with malformed YAML", {
     temp_dir <- file.path(tempdir(), "run_log_malformed_yaml_test")
     fs::dir_create(temp_dir)
@@ -97,5 +95,3 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
 
     expect_error(log_df <- run_log(MODEL_DIR), regexp = "Must have length 1")
   })
-
-}) # closing withr::with_options

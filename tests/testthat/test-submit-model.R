@@ -4,8 +4,6 @@ context("submit_model(.dry_run=T)")
 # testing single model submission
 ###################################
 
-withr::with_options(list(rbabylon.model_directory = NULL), {
-
   # create fake babylon.yaml
   readr::write_file("created_by: test-submit-model", "babylon.yaml")
   on.exit({ fs::file_delete("babylon.yaml")})
@@ -78,4 +76,3 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
       )
     )
   })
-}) # closing withr::with_options

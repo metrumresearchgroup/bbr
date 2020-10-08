@@ -25,8 +25,7 @@ cleanup_bbi <- function(.recreate_dir = FALSE) {
 cleanup_bbi(.recreate_dir = TRUE)
 
 # set options and run tests
-withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH,
-                         rbabylon.model_directory = normalizePath(MODEL_DIR_BBI)), {
+withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
 
   # cleanup when done
   on.exit({

@@ -70,8 +70,6 @@ setup({
 
 teardown({ cleanup() })
 
-withr::with_options(list(rbabylon.model_directory = NULL), {
-
   test_that("config_log() returns NULL and warns when no YAML found", {
     log_df <- expect_warning(config_log("data"), regexp = "Found no valid model YAML files in data")
     expect_true(inherits(log_df, "tbl"))
@@ -100,14 +98,12 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
   })
 
   test_that("config_log() reflects model mismatch", {
-    # TODO: update this pattern once the model_directory option is deprecated
     perturb_file(CTL_TEST_FILE)
     log_df <- config_log(MODEL_DIR)
     expect_equal(log_df[["model_has_changed"]][1], TRUE)
   })
 
   test_that("config_log() reflects data mismatch", {
-    # TODO: update this pattern once the model_directory option is deprecated
     perturb_file("data/acop.csv")
     log_df <- config_log(MODEL_DIR)
     expect_equal(log_df[["data_has_changed"]][1], TRUE)
@@ -187,5 +183,3 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
       rep_missing(expected_nonmem_version, missing_idx, 4L)
     )
   })
-
-}) # closing withr::with_options

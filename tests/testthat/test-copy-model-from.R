@@ -4,8 +4,6 @@ context("Copying model objects")
 # copy_model_from tests
 #########################
 
-withr::with_options(list(rbabylon.model_directory = NULL), {
-
   cleanup()
 
   test_that("copy_from_model creates accurate copy", {
@@ -157,5 +155,3 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     expect_true(fs::file_exists(new_yaml))
 
   })
-}) # closing withr::with_options
-

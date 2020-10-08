@@ -45,8 +45,6 @@ GRD_REF_FLOOR_NULL <- "data/acop_grd_ref_floorNULL_200520.rds"
 # tests
 ################
 
-withr::with_options(list(rbabylon.model_directory = NULL), {
-
   .test_cases <- c(
     LST_TEST_FILE,
     GRD_TEST_FILE,
@@ -252,5 +250,3 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
       expect_failure(expect_identical(df, ref_df))
     })
   }
-
-}) # closing withr::with_options

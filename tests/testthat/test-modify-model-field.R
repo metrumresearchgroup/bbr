@@ -1,7 +1,5 @@
 context("Modify attributes of model object")
 
-withr::with_options(list(rbabylon.model_directory = NULL), {
-
   ######################################
   # modify_model_field and its wrappers
   ######################################
@@ -258,4 +256,3 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     # try to submit_model and get error
     expect_error(copy_model_from(new_mod, "naw", "dawg"), regexp = "Model NOT in sync with corresponding YAML file")
   })
-}) # closing withr::with_options

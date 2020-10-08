@@ -1,7 +1,5 @@
 context("Testing function to create or read in model object")
 
-withr::with_options(list(rbabylon.model_directory = NULL), {
-
   bad_keys <- c(
     ABS_MOD_PATH
   )
@@ -150,5 +148,3 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
     mod <- new_model(fs::path_ext_remove(temp_ctl), "path with period")
     expect_true(fs::file_exists(temp_yaml))
   })
-
-}) # closing withr::with_options

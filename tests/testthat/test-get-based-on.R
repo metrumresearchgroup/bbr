@@ -1,7 +1,5 @@
 context("Extract model paths from based_on fields")
 
-withr::with_options(list(rbabylon.model_directory = NULL), {
-
   test_that("get_based_on works happy path model object" , {
     on.exit({ cleanup() })
 
@@ -202,5 +200,3 @@ withr::with_options(list(rbabylon.model_directory = NULL), {
       )
     )
   })
-
-}) # closing withr::with_options
