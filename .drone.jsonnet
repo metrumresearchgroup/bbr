@@ -299,6 +299,9 @@ local cover_step(r_major_minor, image, volumes=[]) = {
   "volumes": [add_step_volume(v) for v in volumes],
   "environment": r_env_vars + {
     "R_LIBS_USER": "/opt/rpkgs/" + r_major_minor,
+    "CODECOV_TOKEN": {
+      from_secret: "CODECOV_TOKEN",
+    },
   },
   "commands": [
     # can't evaluate shell expressions in environment
