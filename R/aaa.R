@@ -24,7 +24,6 @@ BBI_ARGS = list(
   no_ext_file = list(type = "logical", flag="--no-ext-file", description = "do not use ext file"),
   no_grd_file = list(type = "logical", flag="--no-grd-file", description = "do not use grd file"),
   no_shk_file = list(type = "logical", flag="--no-shk-file", description = "do not use shk file"),
-  output_dir = list(type = "character", flag="--output_dir", description = "Go template for the output directory to use for storging details of each executed model (default '{{ .Name}}')"),
   overwrite = list(type = "logical", flag="--overwrite", description = "Whether or not to remove existing output directories if they are present"),
   parafile = list(type = "character", flag="--parafile", description = "Location of a user-provided parafile to use for parallel execution"),
   parallel = list(type = "logical", flag="--parallel", description = "Whether or not to run nonmem in parallel mode"),
