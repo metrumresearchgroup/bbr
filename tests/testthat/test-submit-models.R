@@ -118,6 +118,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
   test_that("submit_models() works with non-NULL .config_path", {
     temp_config <- tempfile(fileext = ".yaml")
     readr::write_file("foo", temp_config)
+    temp_config <- normalizePath(temp_config)
     on.exit(fs::file_delete(temp_config))
 
     res <- submit_models(
