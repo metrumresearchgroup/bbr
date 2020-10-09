@@ -14,8 +14,9 @@ REF_SUMMARY_CALL <- as.character(glue("cd {getwd()}/model-examples/1 ; {getOptio
 
 # if we are running in covr, then the directory holding the tests will be
 # `rbabylon-tests`, rather than `tests`, which is a consequence of
-# tools::testInstalledPackage()
-if (covr::in_covr()) {
+# tools::testInstalledPackage(); note that the conditional is the definition
+# of covr::in_covr()
+if (identical(Sys.getenv("R_COVR"), "true")) {
   test_dir <- "rbabylon-tests"
 } else {
   test_dir <- "tests"
