@@ -76,3 +76,10 @@ test_that("submit_model() creates correct call for non-NULL .config_path", {
     )
   )
 })
+
+test_that("submit_model() throws an error if passed `output_dir` bbi arg", {
+  expect_error(
+    submit_model(MOD1, .bbi_args = list(output_dir = "foo")),
+    "is not a valid argument"
+  )
+})

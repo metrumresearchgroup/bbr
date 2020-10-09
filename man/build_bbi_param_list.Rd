@@ -9,7 +9,10 @@ build_bbi_param_list(.mods, .bbi_args = NULL)
 \arguments{
 \item{.mods}{A list of S3 objects of class \code{bbi_nonmem_model}}
 
-\item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}. Run \code{\link[=print_bbi_args]{print_bbi_args()}} to see valid arguments.}
+\item{.bbi_args}{A named list specifying arguments to pass to babylon
+formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}. Run \code{\link[=print_bbi_args]{print_bbi_args()}} to see valid arguments. Note that rbabylon does
+not support changing the output directory (including through the model or
+global YAML files).}
 }
 \value{
 A list whose elements correspond to groups of models that can be
