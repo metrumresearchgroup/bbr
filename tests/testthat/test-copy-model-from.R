@@ -141,9 +141,10 @@ test_that("copy_model_from() supports `.new_model` containing a period", {
   temp_mod_path <- create_temp_model()
   temp_mod <- read_model(temp_mod_path)
 
+  temp_dir <- normalizePath(tempdir())
   new_mod_path <- "foo.bar"
-  new_ctl <- paste0(file.path(tempdir(), new_mod_path), ".ctl")
-  new_yaml <- paste0(file.path(tempdir(), new_mod_path), ".yaml")
+  new_ctl <- paste0(file.path(temp_dir, new_mod_path), ".ctl")
+  new_yaml <- paste0(file.path(temp_dir, new_mod_path), ".yaml")
 
   expect_false(fs::file_exists(new_ctl))
   expect_false(fs::file_exists(new_yaml))

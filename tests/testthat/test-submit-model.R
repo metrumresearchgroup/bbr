@@ -61,6 +61,7 @@ test_that("submit_model(.dry_run=T) with bbi_nonmem_model object parses correctl
 test_that("submit_model() creates correct call for non-NULL .config_path", {
   temp_config <- tempfile(fileext = ".yaml")
   readr::write_file("foo", temp_config)
+  temp_config <- normalizePath(temp_config)
   on.exit(fs::file_delete(temp_config))
 
   res <- submit_model(MOD1, .config_path = temp_config, .dry_run = TRUE)
