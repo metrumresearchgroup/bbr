@@ -17,9 +17,13 @@ submit_nonmem_models(
 \arguments{
 \item{.mods}{A list of S3 objects of class \code{bbi_nonmem_model}}
 
-\item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}. Run \code{\link[=print_bbi_args]{print_bbi_args()}} to see valid arguments.}
+\item{.bbi_args}{A named list specifying arguments to pass to babylon
+formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}. Run \code{\link[=print_bbi_args]{print_bbi_args()}} to see valid arguments. Note that rbabylon does
+not support changing the output directory (including through the model or
+global YAML files).}
 
-\item{.mode}{Either \code{"sge"}, the default, to submit model(s) to the grid or \code{"local"} for local execution.}
+\item{.mode}{Either \code{"sge"}, the default, to submit model(s) to the grid or
+\code{"local"} for local execution.}
 
 \item{...}{args passed through to \code{bbi_exec()}}
 
@@ -27,9 +31,13 @@ submit_nonmem_models(
 default, will attempt to use a \code{babylon.yaml} in the same directory as the
 model.}
 
-\item{.wait}{If \code{TRUE}, the default, wait for the bbi process to return before this function call returns. If \code{FALSE} function will return while bbi process runs in the background.}
+\item{.wait}{If \code{TRUE}, the default, wait for the bbi process to return
+before this function call returns. If \code{FALSE} function will return while
+bbi process runs in the background.}
 
-\item{.dry_run}{Returns an object detailing the command that would be run, insted of running it. This is primarily for testing but also a debugging tool.}
+\item{.dry_run}{Returns an object detailing the command that would be run,
+insted of running it. This is primarily for testing but also a debugging
+tool.}
 }
 \value{
 A list of S3 objects of class \code{babylon_process}
