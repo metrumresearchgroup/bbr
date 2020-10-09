@@ -62,7 +62,7 @@ The `use_bbi()` function takes the _directory_ into which you want to install `b
 
 Once `bbi` is installed, you will need to make sure `rbabylon` knows where to find it. This can be done by setting the `rbabylon.bbi_exe_path` option like so:
 
-```{r bbi_exe_path}
+```{r bbi_exe_path, eval = FALSE}
 options("rbabylon.bbi_exe_path" = "/data/apps/bbi")
 ```
 
