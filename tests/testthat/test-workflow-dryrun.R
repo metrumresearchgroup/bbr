@@ -12,12 +12,21 @@ REF_SUMMARY_CALL <- as.character(glue("cd {getwd()}/model-examples/1 ; {getOptio
 ###   change the working directory   ###
 ########################################
 
+# if we are running in covr, then the directory holding the tests will be
+# `rbabylon-tests`, rather than `tests`, which is a consequence of
+# tools::testInstalledPackage()
+if (covr::in_covr()) {
+  test_dir <- "rbabylon-tests"
+} else {
+  test_dir <- "tests"
+}
+
 .TEST_CASES_WD <- list(
   list(test_wd = ".",        bbi_path = "babylon.yaml",           test_path = file.path(MODEL_DIR, MOD_ID)),
   list(test_wd = "..",       bbi_path = "testthat/babylon.yaml",  test_path = file.path("testthat", MODEL_DIR, MOD_ID)),
   list(test_wd = MODEL_DIR,  bbi_path = "../babylon.yaml",        test_path = MOD_ID),
   list(test_wd = ".",        bbi_path = "babylon.yaml",           test_path = file.path(MODEL_DIR, MOD_ID),              change_midstream = "testthat/babylon.yaml"),
-  list(test_wd = "..",       bbi_path = "testthat/babylon.yaml",  test_path = file.path("testthat", MODEL_DIR, MOD_ID),  change_midstream = "tests/testthat/babylon.yaml"),
+  list(test_wd = "..",       bbi_path = "testthat/babylon.yaml",  test_path = file.path("testthat", MODEL_DIR, MOD_ID),  change_midstream = file.path(test_dir, "testthat/babylon.yaml")),
   list(test_wd = MODEL_DIR,  bbi_path = "../babylon.yaml",        test_path = MOD_ID,                                    change_midstream = "babylon.yaml")
 )
 
