@@ -32,15 +32,14 @@ suppressPackageStartupMessages(library(purrr))
 suppressPackageStartupMessages(library(fs))
 ```
 
-```{r setup, include = FALSE}
+```{r set up and define cleanup, include = FALSE}
 MODEL_DIR <- system.file("nonmem", package = "rbabylon")
+
 # set babylon execution path
 if (Sys.which("bbi") == "") {
   options('rbabylon.bbi_exe_path' = read_bbi_path())
 }
-```
 
-```{r cleanup top, include=FALSE}
 # delete old files
 cleanup <- function() {
   if (fs::file_exists(file.path(MODEL_DIR, "1.yaml"))) fs::file_delete(file.path(MODEL_DIR, "1.yaml"))
