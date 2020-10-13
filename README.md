@@ -7,6 +7,7 @@
 
 [![Build
 Status](https://github-drone.metrumrg.com/api/badges/metrumresearchgroup/rbabylon/status.svg)](https://github-drone.metrumrg.com/metrumresearchgroup/rbabylon)
+[![codecov](https://codecov.io/gh/metrumresearchgroup/rbabylon/branch/develop/graph/badge.svg)](https://codecov.io/gh/metrumresearchgroup/rbabylon)
 <!-- badges: end -->
 
 `rbabylon` is an R interface for running `babylon`. `babylon` is (will
