@@ -5,10 +5,10 @@
 #' @param .extension file extension to append (for example `lst`, `ext`, `grd`, etc.)
 #' @keywords internal
 build_path_from_mod_obj <- function(.mod, .extension) {
-  out_file_path <- file.path(.mod[[WORKING_DIR]],
-                        .mod[[YAML_OUT_DIR]],
-                        paste0(get_model_id(.mod[[YAML_MOD_PATH]]), ".", .extension))
-  return(out_file_path)
+  file.path(
+    get_output_dir(.mod),
+    fs::path_ext_set(get_model_id(.mod), .extension)
+  )
 }
 
 #' Check an output file
@@ -92,7 +92,7 @@ tail_output.character <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .re
 #' @describeIn check_file Tail the OUTPUT file from a `bbi_nonmem_model` object.
 #' @export
 tail_output.bbi_nonmem_model <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE, ...) {
-  .file <- file.path(.mod[[WORKING_DIR]], .mod[[YAML_OUT_DIR]], "OUTPUT")
+  .file <- file.path(get_output_dir(.mod), "OUTPUT")
   check_file(.file, .head, .tail, .print, .return, ...)
 }
 

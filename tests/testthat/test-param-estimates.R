@@ -14,8 +14,7 @@ teardown({
 # build reference
 ref_df1 <- readRDS(PARAM_REF_FILE)
 
-withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
-                         rbabylon.model_directory = NULL), {
+withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
 
   test_that("param_estimates.bbi_model_summary gets expected table", {
     par_df <- MOD1 %>% model_summary() %>% param_estimates()
@@ -23,19 +22,20 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
   })
 
   test_that("param_estimates correctly errors on Bayesian model", {
+    mod1 <- read_model(file.path(MODEL_DIR_X, "1001"))
+    sum1 <- model_summary(mod1, .bbi_args = list(ext_file = "1001.1.TXT"))
     expect_error(
-      par_df <- 1001 %>%
-        model_summary(.directory = MODEL_DIR_X, .bbi_args = list(ext_file = "1001.1.TXT")) %>%
-        param_estimates(),
+      param_estimates(sum1),
       regexp = "not currently implemented for Bayesian methods"
     )
   })
 
   test_that("param_estimates correctly warns on mixture model", {
+    mod1 <- read_model(file.path(MODEL_DIR_X, "iovmm"))
+    sum1 <- model_summary(mod1)
+
     expect_warning(
-      par_df <- "iovmm" %>%
-        model_summary(.directory = MODEL_DIR_X) %>%
-        param_estimates(),
+      par_df <- param_estimates(sum1),
       regexp = "mixture model"
     )
 

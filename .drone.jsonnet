@@ -289,6 +289,37 @@ local check_step(r_major_minor, image, volumes=[]) = {
   ],
 };
 
+# Drone step to generate code coverage for an R package
+local cover_step(r_major_minor, image, volumes=[]) = {
+  local r_bin_var = "$${" + get_r_exe_var(r_major_minor) + "}",
+
+  "name": "Code coverage",
+  "image": image,
+  "pull": "never",
+  "volumes": [add_step_volume(v) for v in volumes],
+  "environment": r_env_vars + {
+    "R_LIBS_USER": "/opt/rpkgs/" + r_major_minor,
+    "CODECOV_TOKEN": {
+      from_secret: "CODECOV_TOKEN",
+    },
+  },
+  "commands": [
+    # can't evaluate shell expressions in environment
+    # https://docs.drone.io/pipeline/environment/syntax/#common-problems
+    "export PATH=" + volumes[0].path + ":$PATH",
+    source_env(),
+    run_r_expression(
+      r_bin_var,
+      "devtools::install_deps(upgrade = 'never')"
+    ),
+    run_r_expression(
+      r_bin_var,
+      # need to set CODECOV_TOKEN environment variable
+      "covr::codecov()"
+    ),
+  ],
+};
+
 # Drone pipeline to check an R package
 #
 # name            name of the application
@@ -349,6 +380,33 @@ local lint(name, r_major_minor, image) =
           run_r_expression(r_bin_var, "lintr::expect_lint_free()"),
         ],
       },
+    ],
+  };
+
+# Drone pipeline to generate code coverage for an R package
+# arguments are the same as for check()
+local coverage(name, r_major_minor, image, bbi_version) =
+  local image_uri = create_ci_image(ecr_repo_base, image);
+
+  local host_volume = volume(default_volume_name, default_volume_path);
+  local temp_volume = volume("cache", temp_volume_dir);
+
+  setup_docker_pipeline(name + "-coverage") +
+  add_volumes([host_volume], [temp_volume]) +
+  add_trigger(exclude=exclude_events) +
+  {
+    "steps": [
+      pull_image(image_uri, [host_volume]),
+      if std.length(bbi_version) > 0 then
+        # pass temp_volume to persist babylon executable
+        install_babylon(
+          bbi_version,
+          temp_volume.path,
+          image_uri,
+          [temp_volume]
+        ),
+    ] + [
+      cover_step(r_major_minor, image_uri, [temp_volume])
     ],
   };
 
@@ -417,6 +475,7 @@ local release(name, r_major_minor, image, bbi_version) =
   for image in ci_images
 ] + [
   # lint(name, r_versions[0], ci_images[0]),
+  coverage(name, r_versions[0], ci_images[0], bbi_version),
   # release step requires all check steps to pass
   release(name, r_versions[0], ci_images[0], bbi_version) +
     {

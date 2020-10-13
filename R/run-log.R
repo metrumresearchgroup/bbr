@@ -8,21 +8,16 @@
 #' Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
 #' Users can also use [add_config()] or [add_summary()] to append additional output about the model run.
 #' @seealso [config_log()], [summary_log()]
-#' @param .base_dir Base directory to look in for models. Defaults to [get_model_directory()].
+#'
+#' @param .base_dir Base directory to look in for models.
 #' @param .recurse If `TRUE`, the default, search recursively in all subdirectories. Passed through to `fs::dir_ls()` -- If a positive number, the number of levels to recurse.
+#'
 #' @importFrom purrr map_df
 #' @importFrom tibble tibble
 #' @return A tibble of class `bbi_run_log_df` with information on each model, or an empty tibble if no models are found.
 #' @export
-run_log <- function(
-  .base_dir = get_model_directory(),
-  .recurse = TRUE
-) {
-
-  # if no directory defined, set to working directory
-  if (is.null(.base_dir)) {
-    stop("`.base_dir` cannot be `NULL`. Either pass a valid directory path or use `set_model_directory()` to set `options('rbabylon.model_directory')` which will be used by default.", call. = FALSE)
-  }
+run_log <- function(.base_dir, .recurse = TRUE) {
+  checkmate::assert_string(.base_dir)
 
   mod_list <- find_models(.base_dir, .recurse)
   if(length(mod_list) == 0) {
@@ -55,12 +50,16 @@ find_models <- function(.base_dir, .recurse) {
   yaml_files <- str_subset(yaml_files, "babylon\\.ya?ml$", negate = TRUE)
 
   # read in all candidate yaml's
-  all_yaml <- map(yaml_files, safe_read_model, .directory = NULL)
+  all_yaml <-
+    yaml_files %>%
+    purrr::map(fs::path_ext_remove) %>%
+    purrr::map(safe_read_model)
 
   # filter to only model yaml's
   mod_list <- purrr::compact(all_yaml)
   if (length(mod_list) != length(all_yaml)) {
-    not_mod <- yaml_files[which(is.null(all_yaml))]
+    null_idx <- purrr::map_lgl(all_yaml, is.null)
+    not_mod <- yaml_files[which(null_idx)]
     warning(glue("Found {length(not_mod)} YAML files that do not contain required keys for a model YAML. Ignoring the following files: `{paste(not_mod, collapse='`, `')}`"))
   }
 
@@ -76,24 +75,24 @@ find_models <- function(.base_dir, .recurse) {
 #' Read in model YAML with error handling
 #'
 #' Private helper function that tries to call `read_model()` on a yaml path and returns NULL, with no error, if the YAML is not a valid model file.
-#' @param .yaml_path Path to read model from
-#' @param .directory Model directory which `.yaml_path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
-#' @importFrom stringr str_detect
+#'
+#' @inheritParams read_model
+#'
+#' @return A model object, if `.path` represents a valid model.
 #' @keywords internal
-safe_read_model <- function(.yaml_path, .directory = get_model_directory()) {
-  # check for .directory and combine with .yaml_path
-  .yaml_path <- combine_directory_path(.directory, .yaml_path)
-
-  # try to read in model
-  .mod <- tryCatch(read_model(.yaml_path),
-                   error = function(e) {
-                     if (stringr::str_detect(e$message, "Model yaml must have keys")) {
-                       return(NULL)
-                     } else {
-                       stop(glue("Unexpected error trying to read yaml `{.yaml_path}`: {e$message}"))
-                     }
-                   })
-  return(.mod)
+safe_read_model <- function(.path) {
+  tryCatch(
+    read_model(.path),
+    error = function(e) {
+      if (stringr::str_detect(e$message, "Model list must have keys")) {
+        return(NULL)
+      } else {
+        stop(
+          glue("Unexpected error trying to read model `{.path}`: {e$message}")
+        )
+      }
+    }
+  )
 }
 
 
@@ -135,15 +134,16 @@ add_log_impl <- function(.log_df, .impl_func, ...) {
 #' @importFrom tibble tibble
 #' @keywords internal
 run_log_entry <- function(.mod) {
+  checkmate::assert_scalar(.mod[[YAML_YAML_MD5]])
+  checkmate::assert_scalar(.mod[[YAML_MOD_TYPE]])
+  checkmate::assert_scalar(.mod[[YAML_DESCRIPTION]])
+
   # build row
   entry_df <- tibble::tibble(
-    !!ABS_MOD_PATH := file.path(
-      enforce_length(.mod, WORKING_DIR),
-      get_model_id(enforce_length(.mod, YAML_YAML_NAME))
-    ),
-    !!YAML_YAML_MD5     := enforce_length(.mod, YAML_YAML_MD5),
-    !!YAML_MOD_TYPE     := enforce_length(.mod, YAML_MOD_TYPE),
-    !!YAML_DESCRIPTION  := enforce_length(.mod, YAML_DESCRIPTION),
+    !!ABS_MOD_PATH      := .mod[[ABS_MOD_PATH]],
+    !!YAML_YAML_MD5     := .mod[[YAML_YAML_MD5]],
+    !!YAML_MOD_TYPE     := .mod[[YAML_MOD_TYPE]],
+    !!YAML_DESCRIPTION  := .mod[[YAML_DESCRIPTION]],
     !!YAML_BBI_ARGS     := .mod[[YAML_BBI_ARGS]] %>% list(),
     !!YAML_BASED_ON     := .mod[[YAML_BASED_ON]] %>% list(),
     !!YAML_TAGS         := .mod[[YAML_TAGS]] %>% list(),
@@ -152,22 +152,8 @@ run_log_entry <- function(.mod) {
 
   # check that it is only one row
   if (nrow(entry_df) != 1) {
-    stop(glue("There is a problem with {.mod[[YAML_YAML_NAME]]} file. `run_log()` should be able to load it to 1 row but got {nrow(entry_df)} rows instead. User should not see this error; report to developers if encountered."))
+    stop(glue("There is a problem with {get_yaml_path(.mod)} file. `run_log()` should be able to load it to 1 row but got {nrow(entry_df)} rows instead. User should not see this error; report to developers if encountered."))
   }
 
   return(entry_df)
 }
-
-#' Private helper to enforce length of a list element
-#' @param .l list to check
-#' @param .k key to check
-#' @param .len length to enforce. Defaults to 1. Throws an error if `length(.l[[.k]]) != .len`
-#' @keywords internal
-enforce_length <- function(.l, .k, .len = 1) {
-  len_k <- length(.l[[.k]])
-  if (len_k != .len) {
-    stop(glue("The `{.k}` key in file `{.l[[YAML_YAML_NAME]]}` is expected to have length of {.len} but it has length {len_k}. Please fix YAML."))
-  }
-  return(.l[[.k]])
-}
-

@@ -24,7 +24,6 @@ BBI_ARGS = list(
   no_ext_file = list(type = "logical", flag="--no-ext-file", description = "do not use ext file"),
   no_grd_file = list(type = "logical", flag="--no-grd-file", description = "do not use grd file"),
   no_shk_file = list(type = "logical", flag="--no-shk-file", description = "do not use shk file"),
-  output_dir = list(type = "character", flag="--output_dir", description = "Go template for the output directory to use for storging details of each executed model (default '{{ .Name}}')"),
   overwrite = list(type = "logical", flag="--overwrite", description = "Whether or not to remove existing output directories if they are present"),
   parafile = list(type = "character", flag="--parafile", description = "Location of a user-provided parafile to use for parallel execution"),
   parallel = list(type = "logical", flag="--parallel", description = "Whether or not to run nonmem in parallel mode"),
@@ -46,11 +45,9 @@ PROC_CLASS <- "babylon_process"
 RUN_LOG_CLASS <- "bbi_run_log_df"
 CONF_LOG_CLASS <- "bbi_config_log_df"
 SUM_LOG_CLASS <- "bbi_summary_log_df"
-
+LOG_DF_CLASS <- "bbi_log_df"
 
 # YAML keys that are hard-coded
-YAML_MOD_PATH <- "model_path"
-YAML_YAML_NAME <- "orig_yaml_file"
 YAML_YAML_MD5 <- "yaml_md5"
 YAML_DESCRIPTION <- "description"
 YAML_BASED_ON <- "based_on"
@@ -58,35 +55,29 @@ YAML_TAGS <- "tags"
 YAML_DECISIONS <- "decisions"
 YAML_BBI_ARGS <- "bbi_args"
 YAML_MOD_TYPE <- "model_type"
-YAML_OUT_DIR <- "output_dir"
 
 YAML_REQ_INPUT_KEYS <- c(
   YAML_MOD_TYPE,
   YAML_DESCRIPTION
 )
 
-WORKING_DIR <- "model_working_dir"
 ABS_MOD_PATH <- "absolute_model_path"
 
 # keys required to create a model object
 MODEL_REQ_INPUT_KEYS <- c(
-  WORKING_DIR,
+  ABS_MOD_PATH,
   YAML_MOD_TYPE,
   YAML_DESCRIPTION
 )
 
 # keys required for a model object to have
 MODEL_REQ_KEYS <- c(
-  WORKING_DIR,
-  YAML_YAML_NAME,
+  ABS_MOD_PATH,
   YAML_YAML_MD5,
   YAML_MOD_TYPE,
   YAML_DESCRIPTION,
-  YAML_MOD_PATH,
-  YAML_BBI_ARGS,
-  YAML_OUT_DIR
+  YAML_BBI_ARGS
 )
-
 
 # columns required for a run log df
 RUN_LOG_REQ_COLS <- c(
@@ -103,10 +94,8 @@ RUN_LOG_REQ_COLS <- c(
 
 # keys that get erased when saving a model YAML on disk
 YAML_ERASE_OUT_KEYS <- c(
-  WORKING_DIR,
-  YAML_YAML_NAME,
-  YAML_YAML_MD5,
-  YAML_OUT_DIR
+  ABS_MOD_PATH,
+  YAML_YAML_MD5
 )
 
 # keys that need to be coerced to arrays when saving a model YAML on disk
@@ -222,4 +211,3 @@ PROCESS_REQ_KEYS <- c(
 NO_NONMEM_ERR_MSG <- "No version was supplied and no default value exists in the configset"
 MOD_ALREADY_EXISTS_ERR_MSG <- "already exist, but we are configured not to overwrite"
 NO_STAN_ERR_MSG <- "stan support not yet implemented."
-FIND_YAML_ERR_MSG <- "No file found at.+\\.yml.+OR.+\\.yaml"

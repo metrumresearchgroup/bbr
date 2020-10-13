@@ -11,7 +11,6 @@ navbar:
 reference:
 - title: Model management
   contents:
-  - as_model
   - copy_model_from
   - new_model
   - read_model

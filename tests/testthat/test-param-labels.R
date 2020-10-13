@@ -63,9 +63,9 @@ for (MODEL_PICK in MODEL_PICKS) {
 
     # make label df
     .label_df <- .ctl_raw %>%
-                   param_labels() %>%
-                   apply_indices(.omega = MODEL_PICK$omega, .sigma = MODEL_PICK$sigma) %>%
-                   select(-param_type)
+      param_labels() %>%
+      apply_indices(.omega = MODEL_PICK$omega, .sigma = MODEL_PICK$sigma) %>%
+      select(-param_type)
 
     # join against reference to make sure they're the same
     ref_df <- ref_df %>% mutate(!!SUMMARY_PARAM_NAMES := ifelse(param == "THETA",
@@ -86,8 +86,7 @@ for (MODEL_PICK in MODEL_PICKS) {
 if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
   skip("param_labels only runs on Metworx or Drone")
 } else {
-  withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
-                           rbabylon.model_directory = normalizePath(PL_MODEL_DIR)), {
+  withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
 
     for (MODEL_PICK in MODEL_PICKS) {
       .mod_id <- MODEL_PICK$mod_id
@@ -99,7 +98,12 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
 
         # get param df with rbabylon::model_summary()
         if (fs::file_exists(file.path(PL_MODEL_DIR, glue("{.mod_id}.yaml")))) fs::file_delete(file.path(PL_MODEL_DIR, glue("{.mod_id}.yaml")))
-        .mod <-  rbabylon::new_model(glue("{.mod_id}.yaml"), glue("the {.mod_id} model"))
+
+        .mod <- new_model(
+          file.path(PL_MODEL_DIR, .mod_id),
+          glue("the {.mod_id} model")
+        )
+
         on.exit({ if (fs::file_exists(file.path(PL_MODEL_DIR, glue("{.mod_id}.yaml")))) fs::file_delete(file.path(PL_MODEL_DIR, glue("{.mod_id}.yaml"))) })
 
         .param_df <- .mod %>% rbabylon::model_summary() %>% param_estimates()

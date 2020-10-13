@@ -4,10 +4,10 @@
 \alias{run_log}
 \title{Create tibble summarizing all model runs}
 \usage{
-run_log(.base_dir = get_model_directory(), .recurse = TRUE)
+run_log(.base_dir, .recurse = TRUE)
 }
 \arguments{
-\item{.base_dir}{Base directory to look in for models. Defaults to \code{\link[=get_model_directory]{get_model_directory()}}.}
+\item{.base_dir}{Base directory to look in for models.}
 
 \item{.recurse}{If \code{TRUE}, the default, search recursively in all subdirectories. Passed through to \code{fs::dir_ls()} -- If a positive number, the number of levels to recurse.}
 }

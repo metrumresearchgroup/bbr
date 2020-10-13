@@ -4,19 +4,53 @@
 
 #' Create new model by copying existing model
 #'
-#' Create new model by copying existing model. Useful for iterating during model development.
-#' Also fills `based_on` field by default, for constructing model ancestry. See ["Using based_on field" vignette](../articles/using-based-on.html) for details.
+#' Create new model by copying existing model. Useful for iterating during model
+#' development. Also fills `based_on` field by default, for constructing model
+#' ancestry. See ["Using based_on field"
+#' vignette](../articles/using-based-on.html) for details.
 #' @param .parent_mod Model to copy from
-#' @param .new_model Path to write new model files to WITHOUT FILE EXTENSION. Function will create both `{.new_model}.yaml` and a new model file based on this path.
-#' @param .description Description of new model run. This will be stored in the yaml (to be used later in `run_log()`).
-#' @param .based_on_additional Character vector of path(s) to other models that this model was "based on." These are used to reconstuct model developement and ancestry. **Paths must be relative to `.new_model` path.** Note that the `.parent_model` will automatically be added to the `based_on` field, so no need to include that here.
-#' @param .add_tags Character vector with any new tags(s) to be added to `{.new_model}.yaml`
-#' @param .inherit_tags If `FALSE`, the default, new model will only have any tags passed to `.add_tags` argument. If `TRUE` inherit any tags from `.parent_mod`, with any tags passed to `.add_tags` appended.
-#' @param .update_model_file If `TRUE`, the default, update the newly created model file with new description and name.
-#' For a NONMEM model, this currently means only the `$PROBLEM` line in the new control stream will be updated.
-#' If `FALSE`, new model file will be an exact copy of its parent.
-#' @param .overwrite If `FALSE`, the default,  function will error if a model file already exists at specified `.new_model` path. If `TRUE` any existing file at `.new_model` will be overwritten silently.
-#' @param .directory Model directory which `.new_model` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
+#' @param .new_model Path to the new model, either absolute or relative to the
+#'   path to `.parent_mod`. Represents an absolute model path, which is the path
+#'   to the YAML file and model file, both without extension, and the output
+#'   directory (once the model is run). Numeric values will be coerced to
+#'   character. See examples for usage.
+#' @param .description Description of new model run. This will be stored in the
+#'   yaml (to be used later in `run_log()`).
+#' @param .based_on_additional Character vector of path(s) to other models that
+#'   this model was "based on." These are used to reconstuct model developement
+#'   and ancestry. **Paths must be relative to `.new_model` path.** Note that
+#'   the `.parent_model` will automatically be added to the `based_on` field, so
+#'   no need to include that here.
+#' @param .add_tags Character vector with any new tags(s) to be added to
+#'   `{.new_model}.yaml`
+#' @param .inherit_tags If `FALSE`, the default, new model will only have any
+#'   tags passed to `.add_tags` argument. If `TRUE` inherit any tags from
+#'   `.parent_mod`, with any tags passed to `.add_tags` appended.
+#' @param .update_model_file If `TRUE`, the default, update the newly created
+#'   model file with new description and name. For a NONMEM model, this
+#'   currently means only the `$PROBLEM` line in the new control stream will be
+#'   updated. If `FALSE`, new model file will be an exact copy of its parent.
+#' @param .overwrite If `FALSE`, the default,  function will error if a model
+#'   file already exists at specified `.new_model` path. If `TRUE` any existing
+#'   file at `.new_model` will be overwritten silently.
+#' @examples
+#' \dontrun{
+#' parent <- read_model("/foo/parent")
+#'
+#' # create model file at /bar/child.ctl and YAML at /bar/child.yaml
+#' copy_model_from(parent, "/bar/child", "child model with absolute path")
+#'
+#' # create model file at /foo/child.ctl and YAML at /foo/child.yaml
+#' copy_model_from(parent, "child", "relative to parent model path")
+#'
+#' mod1 <- read_model("/path/to/1")
+#'
+#' # create model file at /path/to/2.ctl and YAML at /path/to/2.yaml
+#' copy_model_from(mod1, 2, "numeric input works")
+#'
+#' # create model file at /path/to/100.1.ctl and YAML at /path/to/100.1.yaml
+#' copy_model_from(mod1, 100.1, "a period is okay")
+#' }
 #' @export
 copy_model_from <- function(
   .parent_mod,
@@ -26,8 +60,7 @@ copy_model_from <- function(
   .add_tags = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
-  .overwrite = FALSE,
-  .directory = get_model_directory()
+  .overwrite = FALSE
 ) {
   UseMethod("copy_model_from")
 }
@@ -42,12 +75,10 @@ copy_model_from.bbi_nonmem_model <- function(
   .add_tags = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
-  .overwrite = FALSE,
-  .directory = get_model_directory()
+  .overwrite = FALSE
 ) {
 
-  # check for .directory and combine with .new_model
-  .new_model <- combine_directory_path(.directory, .new_model)
+  .new_model <- build_new_model_path(.parent_mod, .new_model)
 
   .mod <- copy_nonmem_model_from(
     .parent_mod = .parent_mod,
@@ -63,83 +94,9 @@ copy_model_from.bbi_nonmem_model <- function(
   return(.mod)
 }
 
-#' @describeIn copy_model_from Takes a file path to parent model to use as a basis for the copy. Ideally a YAML path, but can also pass control stream or output directory.
-#' Can be absolute or relative to `.directory`, which defaults to `options('rbabylon.model_directory')`.
-#' @export
-copy_model_from.character <- function(
-  .parent_mod,
-  .new_model,
-  .description,
-  .based_on_additional = NULL,
-  .add_tags = NULL,
-  .inherit_tags = FALSE,
-  .update_model_file = TRUE,
-  .overwrite = FALSE,
-  .directory = get_model_directory()
-) {
-
-  # check for .directory and combine with both .parent_mod and .new_model
-  .parent_mod <- combine_directory_path(.directory, .parent_mod)
-  .new_model <- combine_directory_path(.directory, .new_model)
-
-  # attempt to read in parent model
-  .parent_mod <- read_model(.parent_mod)
-  .model_type <- .parent_mod[[YAML_MOD_TYPE]]
-
-  # copy from model
-  if (.model_type == "nonmem") {
-    # create new model
-    .mod <- copy_nonmem_model_from(
-      .parent_mod = .parent_mod,
-      .new_model = .new_model,
-      .description = .description,
-      .based_on_additional = .based_on_additional,
-      .add_tags = .add_tags,
-      .inherit_tags = .inherit_tags,
-      .update_model_file = .update_model_file,
-      .overwrite = .overwrite
-    )
-  } else if (.model_type == "stan") {
-    stop(NO_STAN_ERR_MSG)
-  } else {
-    stop(glue("Passed `{.model_type}`. Valid options: `{paste(SUPPORTED_MOD_TYPES, collapse = ', ')}`"))
-  }
-  return(.mod)
-}
-
-#' @describeIn copy_model_from Both `.parent_mod` and `.new_model` take integers which must correspond to a model file name (without extension obviously).
-#' This will only work if you are calling from the same directory as the models, or if you have set `options('rbabylon.model_directory')` to the directory constaining the relevant models.
-#' @export
-copy_model_from.numeric <- function(
-  .parent_mod,
-  .new_model,
-  .description,
-  .based_on_additional = NULL,
-  .add_tags = NULL,
-  .inherit_tags = FALSE,
-  .update_model_file = TRUE,
-  .overwrite = FALSE,
-  .directory = get_model_directory()
-) {
-
-  # convert to character
-  .parent_mod <- as.character(.parent_mod)
-  .new_model <- as.character(.new_model)
-
-  # call the character dispatch
-  .mod <- copy_model_from(
-    .parent_mod = .parent_mod,
-    .new_model = .new_model,
-    .description = .description,
-    .based_on_additional = .based_on_additional,
-    .add_tags = .add_tags,
-    .inherit_tags = .inherit_tags,
-    .update_model_file = .update_model_file,
-    .overwrite = .overwrite,
-    .directory = .directory
-  )
-  return(.mod)
-}
+#####################################
+# Private implementation function(s)
+#####################################
 
 #' Copy model from an existing NONMEM model
 #'
@@ -149,7 +106,7 @@ copy_model_from.numeric <- function(
 #' @param .parent_mod S3 object of class `bbi_nonmem_model` to be used as the basis for copy.
 #' @param .description Description of new model run. This will be stored in the yaml (to be used later in `run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.
 #' @param .update_model_file If `TRUE`, the default, update the `$PROBLEM` line in the new control stream. If `FALSE`, `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.
-#' @importFrom fs file_copy path_rel
+#' @importFrom fs file_copy path_rel is_absolute_path
 #' @importFrom readr read_file write_file
 #' @importFrom stringr str_replace
 #' @importFrom yaml write_yaml
@@ -179,63 +136,35 @@ copy_nonmem_model_from <- function(
   # check parent against YAML
   check_yaml_in_sync(.parent_mod)
 
-  # build new model object
-  .new_mod <- list()
-  .new_mod[[YAML_DESCRIPTION]] <- .description
+  # build based_on
+  if(!fs::is_absolute_path(.new_model)) {
+    stop(".new_model argument to copy_nonmem_model_from() must be absolute. USER SHOULD NOT SEE THIS ERROR.")
+  }
+  .parent_based_on <- fs::path_rel(get_model_path(.parent_mod), start = dirname(.new_model))
 
-  # reset model working directory and yaml path
-  .new_mod[[WORKING_DIR]] <- normalizePath(dirname(.new_model))
-  .new_mod[[YAML_YAML_NAME]] <- basename(yaml_ext(.new_model))
-
-  # fill output directory
-  .new_mod[[YAML_OUT_DIR]] <- basename(tools::file_path_sans_ext(.new_model))
-
-  # fill based_on
-  .parent_based_on <- fs::path_rel(get_model_path(.parent_mod), start = .new_mod[[WORKING_DIR]])
-  .new_mod[[YAML_BASED_ON]] <- safe_based_on(.new_mod[[WORKING_DIR]], c(.parent_based_on, .based_on_additional))
-
-  # pass through model type and bbi_args
-  .new_mod[[YAML_MOD_TYPE]] <- .parent_mod[[YAML_MOD_TYPE]]
-  .new_mod[[YAML_BBI_ARGS]] <- .parent_mod[[YAML_BBI_ARGS]]
-
-  # fill tags
+  # build tags
   if (.inherit_tags && !is.null(.parent_mod[[YAML_TAGS]])) {
-    .new_mod[[YAML_TAGS]] <- .parent_mod[[YAML_TAGS]] %>% c(.add_tags)
+    new_tags <- c(.parent_mod[[YAML_TAGS]], .add_tags)
   } else {
-    .new_mod[[YAML_TAGS]] <- .add_tags
+    new_tags <- .add_tags
   }
-
-  # build new model path
-  .file_ext <- tools::file_ext(.parent_mod[[YAML_MOD_PATH]])
-  if (.file_ext == "mod") {
-    new_mod_path <- mod_ext(.new_model)
-  } else if (.file_ext == "ctl") {
-    new_mod_path <- ctl_ext(.new_model)
-  } else {
-    stop(glue("copy_nonmem_model_from() requires a model object with a `{YAML_MOD_PATH}` pointing to either a .ctl or .mod file. Got `{YAML_MOD_PATH} = {.parent_mod[[YAML_MOD_PATH]]}`"))
-  }
-  .new_mod[[YAML_MOD_PATH]] <- basename(new_mod_path) # path should be relative to YAML location
 
   # copy control steam to new path
   .parent_model_path <- get_model_path(.parent_mod)
-  .new_model_path <-  get_model_path(.new_mod, .check_exists = FALSE)
+  parent_ext <- fs::path_ext(.parent_model_path)
+  .new_model_path <- paste(.new_model, parent_ext, sep = ".")
+  copy_control_stream(.parent_model_path, .new_model_path, .overwrite, .update_model_file, .description)
 
-
-  if (fs::file_exists(.new_model_path) && !isTRUE(.overwrite)) {
-    # if .overwrite != TRUE, warn that file already exists
-    stop(glue("File already exists at {.new_model_path} -- cannot copy new control stream. Either delete old file or use `new_model({yaml_ext(.new_model_path)})`"))
-  }
-
-  # copy control stream file to new location, optionally updating it
-  copy_control_stream(.parent_model_path, .new_model_path, .update_model_file, .description)
-
-  # write .new_mod out to yaml
-  new_yaml_path <- yaml_ext(.new_model)
-  save_model_yaml(.new_mod, .out_path = new_yaml_path)
-
-  # make list into S3 object
-  .new_mod[[YAML_YAML_MD5]] <- digest(file = new_yaml_path, algo = "md5")
-  .new_mod <- create_model_object(.new_mod)
+  # create new model
+  .new_mod <- new_model(
+    .new_model,
+    .description = .description,
+    .based_on = c(.parent_based_on, .based_on_additional),
+    .tags = new_tags,
+    .bbi_args = .parent_mod[[YAML_BBI_ARGS]],
+    .overwrite = .overwrite,
+    .model_type = "nonmem"
+  )
 
   return(.new_mod)
 }
@@ -247,10 +176,16 @@ copy_nonmem_model_from <- function(
 #' Note that any file existing at `.new_model_path` will be overwritten.
 #' @param .parent_model_path Path to the control stream to copy
 #' @param .new_model_path Path to copy the new control stream to
+#' @param .overwrite If `TRUE`, overwrite existing file at `.new_model_path`. If `FALSE` and file exists at `.new_model_path` error.
 #' @param .update_model_file If `TRUE`, the default, update the `$PROBLEM` line in the new control stream. If `FALSE`, `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.
 #' @param .description Description of new model run. This will be passed into the `$PROBLEM` of the new control stream (if `.update_model_file=TRUE`).
 #' @keywords internal
-copy_control_stream <- function(.parent_model_path, .new_model_path, .update_model_file = FALSE, .description = NULL) {
+copy_control_stream <- function(.parent_model_path, .new_model_path, .overwrite, .update_model_file = FALSE, .description = NULL) {
+
+  if (fs::file_exists(.new_model_path) && !isTRUE(.overwrite)) {
+    stop(glue("File already exists at {.new_model_path} -- cannot copy new control stream. Either delete old file or use `new_model({yaml_ext(.new_model_path)})`"))
+  }
+
   if (.update_model_file) {
     if (is.null(.description)) {
       stop("If `.update_model_file` is TRUE, user must specify a `.description` for the new model.")
@@ -273,4 +208,19 @@ copy_control_stream <- function(.parent_model_path, .new_model_path, .update_mod
   } else {
     fs::file_copy(.parent_model_path, .new_model_path)
   }
+}
+
+#' Private helper to build absolute path for [copy_model_from()].
+#' Importantly, if the input `.new_model` is _not_ absolute, it will
+#' be treated as relative to the working directory of `.parent_mod`.
+#' @inheritParams copy_model_from
+#' @return absolute file path to save new model to (without file extension)
+#' @keywords internal
+build_new_model_path <- function(.parent_mod, .new_model) {
+  if (!fs::is_absolute_path(.new_model)) {
+    .new_model <- as.character(.new_model)
+    .new_model <- file.path(get_model_working_directory(.parent_mod), .new_model)
+    .new_model <- fs::path_norm(.new_model)
+  }
+  return(.new_model)
 }
