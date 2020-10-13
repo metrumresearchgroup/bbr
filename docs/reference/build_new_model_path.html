@@ -6,7 +6,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Private helper to check if file has a valid NONMEM control stream extension — is_valid_nonmem_extension • rbabylon</title>
+<title>Private helper to build absolute path for <code><a href='copy_model_from.html'>copy_model_from()</a></code>.
+Importantly, if the input <code>.new_model</code> is <em>not</em> absolute, it will
+be treated as relative to the working directory of <code>.parent_mod</code>. — build_new_model_path • rbabylon</title>
 
 
 <!-- jquery -->
@@ -39,8 +41,12 @@
 
 
 
-<meta property="og:title" content="Private helper to check if file has a valid NONMEM control stream extension — is_valid_nonmem_extension" />
-<meta property="og:description" content="Private helper to check if file has a valid NONMEM control stream extension" />
+<meta property="og:title" content="Private helper to build absolute path for <code><a href='copy_model_from.html'>copy_model_from()</a></code>.
+Importantly, if the input <code>.new_model</code> is <em>not</em> absolute, it will
+be treated as relative to the working directory of <code>.parent_mod</code>. — build_new_model_path" />
+<meta property="og:description" content="Private helper to build absolute path for copy_model_from().
+Importantly, if the input .new_model is not absolute, it will
+be treated as relative to the working directory of .parent_mod." />
 
 
 
@@ -132,26 +138,41 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Private helper to check if file has a valid NONMEM control stream extension</h1>
+    <h1>Private helper to build absolute path for <code><a href='copy_model_from.html'>copy_model_from()</a></code>.
+Importantly, if the input <code>.new_model</code> is <em>not</em> absolute, it will
+be treated as relative to the working directory of <code>.parent_mod</code>.</h1>
     
-    <div class="hidden name"><code>is_valid_nonmem_extension.Rd</code></div>
+    <div class="hidden name"><code>build_new_model_path.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Private helper to check if file has a valid NONMEM control stream extension</p>
+    <p>Private helper to build absolute path for <code><a href='copy_model_from.html'>copy_model_from()</a></code>.
+Importantly, if the input <code>.new_model</code> is <em>not</em> absolute, it will
+be treated as relative to the working directory of <code>.parent_mod</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>is_valid_nonmem_extension</span>(<span class='no'>.path</span>)</pre>
+    <pre class="usage"><span class='fu'>build_new_model_path</span>(<span class='no'>.parent_mod</span>, <span class='no'>.new_model</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>.path</th>
-      <td><p>File path to check</p></td>
+      <th>.parent_mod</th>
+      <td><p>Model to copy from</p></td>
+    </tr>
+    <tr>
+      <th>.new_model</th>
+      <td><p>Path to the new model, either absolute or relative to the
+path to <code>.parent_mod</code>. Represents an absolute model path, which is the path
+to the YAML file and model file, both without extension, and the output
+directory (once the model is run). Numeric values will be coerced to
+character. See examples for usage.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>absolute file path to save new model to (without file extension)</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

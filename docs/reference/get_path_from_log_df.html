@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Private helper to check if file has a valid NONMEM control stream extension — is_valid_nonmem_extension • rbabylon</title>
+<title>Private helper function to extract paths from bbi_log_df — get_path_from_log_df • rbabylon</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Private helper to check if file has a valid NONMEM control stream extension — is_valid_nonmem_extension" />
-<meta property="og:description" content="Private helper to check if file has a valid NONMEM control stream extension" />
+<meta property="og:title" content="Private helper function to extract paths from bbi_log_df — get_path_from_log_df" />
+<meta property="og:description" content="Private helper function to extract paths from bbi_log_df" />
 
 
 
@@ -132,23 +132,31 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Private helper to check if file has a valid NONMEM control stream extension</h1>
+    <h1>Private helper function to extract paths from bbi_log_df</h1>
     
-    <div class="hidden name"><code>is_valid_nonmem_extension.Rd</code></div>
+    <div class="hidden name"><code>get_path_from_log_df.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Private helper to check if file has a valid NONMEM control stream extension</p>
+    <p>Private helper function to extract paths from bbi_log_df</p>
     </div>
 
-    <pre class="usage"><span class='fu'>is_valid_nonmem_extension</span>(<span class='no'>.path</span>)</pre>
+    <pre class="usage"><span class='fu'>get_path_from_log_df</span>(<span class='no'>.log_df</span>, <span class='no'>.get_func</span>, <span class='no'>.check_exists</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>.path</th>
-      <td><p>File path to check</p></td>
+      <th>.log_df</th>
+      <td><p>The <code>bbi_log_df</code> object</p></td>
+    </tr>
+    <tr>
+      <th>.get_func</th>
+      <td><p>The getter function to call</p></td>
+    </tr>
+    <tr>
+      <th>.check_exists</th>
+      <td><p>If <code>TRUE</code>, the default, will throw an error if the file does not exist</p></td>
     </tr>
     </table>
 

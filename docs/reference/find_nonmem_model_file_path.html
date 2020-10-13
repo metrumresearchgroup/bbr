@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Private helper to check if file has a valid NONMEM control stream extension — is_valid_nonmem_extension • rbabylon</title>
+<title>Find the path to a NONMEM model file — find_nonmem_model_file_path • rbabylon</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,11 @@
 
 
 
-<meta property="og:title" content="Private helper to check if file has a valid NONMEM control stream extension — is_valid_nonmem_extension" />
-<meta property="og:description" content="Private helper to check if file has a valid NONMEM control stream extension" />
+<meta property="og:title" content="Find the path to a NONMEM model file — find_nonmem_model_file_path" />
+<meta property="og:description" content="NONMEM recognizes two model file extensions, .ctl and (less common) .mod.
+Look for these at .path and if exactly one exists, return it. If both
+exist, throw an error, because there is no way to know which should be used.
+If neither exists and .check_exists = TRUE, throw an error." />
 
 
 
@@ -132,26 +135,39 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Private helper to check if file has a valid NONMEM control stream extension</h1>
+    <h1>Find the path to a NONMEM model file</h1>
     
-    <div class="hidden name"><code>is_valid_nonmem_extension.Rd</code></div>
+    <div class="hidden name"><code>find_nonmem_model_file_path.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Private helper to check if file has a valid NONMEM control stream extension</p>
+    <p>NONMEM recognizes two model file extensions, <code>.ctl</code> and (less common) <code>.mod</code>.
+Look for these at <code>.path</code> and if exactly one exists, return it. If both
+exist, throw an error, because there is no way to know which should be used.
+If neither exists and <code>.check_exists = TRUE</code>, throw an error.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>is_valid_nonmem_extension</span>(<span class='no'>.path</span>)</pre>
+    <pre class="usage"><span class='fu'>find_nonmem_model_file_path</span>(<span class='no'>.path</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>.path</th>
-      <td><p>File path to check</p></td>
+      <td><p>File path to a NONMEM model file (control stream) with either
+<code>.ctl</code> or <code>.mod</code> extension.</p></td>
+    </tr>
+    <tr>
+      <th>.check_exists</th>
+      <td><p>If <code>TRUE</code>, the default, will throw an error if the file does not exist</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>The path to the model file, if it exists. If the model file does not
+exist and <code>.check_exists = FALSE</code>, a string that is <code>.path</code> with the <code>.ctl</code>
+extension.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
