@@ -31,9 +31,9 @@ copy_model_from(
 \item{.parent_mod}{Model to copy from}
 
 \item{.new_model}{Path to the new model, either absolute or relative to the
-path to \code{.parent_model}. Represents an absolute model path, which is the
-path to the YAML file and model file, both without extension, and the
-output directory (once the model is run). Numeric values will be coerced to
+path to \code{.parent_mod}. Represents an absolute model path, which is the path
+to the YAML file and model file, both without extension, and the output
+directory (once the model is run). Numeric values will be coerced to
 character. See examples for usage.}
 
 \item{.description}{Description of new model run. This will be stored in the

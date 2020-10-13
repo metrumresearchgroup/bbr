@@ -10,9 +10,9 @@
 #' vignette](../articles/using-based-on.html) for details.
 #' @param .parent_mod Model to copy from
 #' @param .new_model Path to the new model, either absolute or relative to the
-#'   path to `.parent_model`. Represents an absolute model path, which is the
-#'   path to the YAML file and model file, both without extension, and the
-#'   output directory (once the model is run). Numeric values will be coerced to
+#'   path to `.parent_mod`. Represents an absolute model path, which is the path
+#'   to the YAML file and model file, both without extension, and the output
+#'   directory (once the model is run). Numeric values will be coerced to
 #'   character. See examples for usage.
 #' @param .description Description of new model run. This will be stored in the
 #'   yaml (to be used later in `run_log()`).
