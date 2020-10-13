@@ -5,65 +5,79 @@
 #' Create new model object
 #'
 #' Creates new model object by specifying relevant information as arguments.
-#' Also creates necessary YAML file for using functions like `add_tags()` and `run_log()` later.
-#' Will look for an associated model file (control stream) on disk and warn if it doesn't find one.
-#' @param .yaml_path Path to save resulting model YAML file to. MUST be either an absolute path, or a path relative to the `.directory` argument.
-#' @param .description Description of new model run. This will be stored in the yaml (and can be viewed later in `run_log()`). By convention, it should match the $PROBLEM statement in the control stream, but this is not enforced.
-#' @param .model_path Path to model (control stream) file. MUST be an absolute path, or the model path relative to the location of the YAML file. It recommended for the control stream and YAML to be in the same directory. If nothing is passed, the function will look for a file with the same path/name as your YAML, but with either .ctl or .mod extension.
-#' @param .based_on Character scalar or vector of paths to other models that this model was "based on." These are used to reconstuct model developement and ancestry. \strong{Paths must be relative to `.new_model` path.}
-#' @param .tags A character scalar or vector with any user tags to be added to the YAML file
-#' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run [print_bbi_args()] to see valid arguments. These will be written into YAML file.
-#' @param .overwrite If `FALSE`, the default, error if a file already exists at `.yaml_path`. If `TRUE` overwrite existing file, if one exists.
-#' @param .model_type Character scaler to specify type of model being created (used for S3 class). Currently only `'nonmem'` is supported.
-#' @param .directory Model directory which `.yaml_path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
-#' @importFrom yaml write_yaml
-#' @importFrom fs file_exists
-#' @importFrom digest digest
-#' @return S3 object of class `bbi_{.model_type}_model` that can be passed to `submit_model()`, `model_summary()`, etc.
+#' Also creates necessary YAML file for using functions like `add_tags()` and
+#' `run_log()` later. Will look for an associated model file (control stream) on
+#' disk and throw an error if it doesn't find one.
+#'
+#' @param .path Path to save the new model. Will be the path to the model file
+#'   and YAML file (both without extension), and the path to the output
+#'   directory.
+#' @param .description Description of new model run. This will be stored in the
+#'   yaml (and can be viewed later in `run_log()`). By convention, it should
+#'   match the $PROBLEM statement in the control stream, but this is not
+#'   enforced.
+#' @param .based_on Character scalar or vector of paths to other models that
+#'   this model was "based on." These are used to reconstuct model developement
+#'   and ancestry. \strong{Paths must be relative to `.yaml_path`.}
+#' @param .tags A character scalar or vector with any user tags to be added to
+#'   the YAML file
+#' @param .bbi_args A named list specifying arguments to pass to babylon
+#'   formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" =
+#'   4)`. Run [print_bbi_args()] to see valid arguments. These will be written
+#'   into YAML file.
+#' @param .overwrite If `FALSE`, the default, error if a file already exists at
+#'   `.yaml_path`. If `TRUE` overwrite existing file, if one exists.
+#' @param .model_type Character scaler to specify type of model being created
+#'   (used for S3 class). Currently only `'nonmem'` is supported.
+#'
+#' @return S3 object of class `bbi_{.model_type}_model` that can be passed to
+#'   `submit_model()`, `model_summary()`, etc.
+#' @seealso [copy_model_from()], [read_model()]
 #' @export
 new_model <- function(
-  .yaml_path,
+  .path,
   .description,
-  .model_path = NULL,
   .based_on = NULL,
   .tags = NULL,
   .bbi_args = NULL,
   .overwrite = FALSE,
-  .model_type = c("nonmem"),
-  .directory = get_model_directory()
+  .model_type = c("nonmem")
 ) {
 
-  if (!is_valid_yaml_extension(.yaml_path)) {
-    warning(glue("Did not pass a YAML extension to .yaml_path. Inferred path `{yaml_ext(.yaml_path)}` from `{.yaml_path}`"))
-    .yaml_path <- yaml_ext(.yaml_path)
-  }
-
-  # check for .directory and combine with .yaml_path
-  .yaml_path <- combine_directory_path(.directory, .yaml_path)
-
+  maybe_yaml_path <- paste0(.path, ".yaml")
   # check if file already exists
-  if (fs::file_exists(.yaml_path) && !isTRUE(.overwrite)) {
-    stop(paste(glue("Passed {.yaml_path} to `new_model(.yaml_path)` but that file already exists."),
-               "Either call `read_model()` to load model from YAML or use `new_model(.overwrite = TRUE)` to overwrite the existing YAML."))
+  if (fs::file_exists(maybe_yaml_path) && !isTRUE(.overwrite)) {
+    stop(
+      glue::glue(
+        "File already exists at {maybe_yaml_path}.",
+        "Either call `read_model()` to load model from YAML or use,",
+        "`new_model(.overwrite = TRUE)` to overwrite the existing YAML.",
+        .sep = " "
+      )
+    )
   }
+
+  # construct the absolute model path in a way that avoids a warning from
+  # normalizePath() if `.path` does not exist (we only require that the model
+  # file exist at `.path`)
+  abs_mod_path <- file.path(
+    normalizePath(dirname(.path)),
+    basename(.path)
+  )
 
   # fill list from passed args
   .mod <- list()
-  .mod[[WORKING_DIR]] <- normalizePath(dirname(.yaml_path))
-  .mod[[YAML_YAML_NAME]] <- basename(.yaml_path)
+  .mod[[ABS_MOD_PATH]] <- abs_mod_path
   .mod[[YAML_DESCRIPTION]] <- .description
   .mod[[YAML_MOD_TYPE]] <- .model_type
-  if (!is.null(.model_path)) .mod[[YAML_MOD_PATH]] <- .model_path
-  if (!is.null(.based_on)) .mod[[YAML_BASED_ON]] <- safe_based_on(.mod[[WORKING_DIR]], .based_on)
+  if (!is.null(.based_on)) {
+    .mod[[YAML_BASED_ON]] <- safe_based_on(dirname(.path), .based_on)
+  }
   if (!is.null(.tags)) .mod[[YAML_TAGS]] <- .tags
   if (!is.null(.bbi_args)) .mod[[YAML_BBI_ARGS]] <- .bbi_args
 
-  # write YAML to disk
-  save_model_yaml(.mod, .out_path = .yaml_path)
-
   # make list into S3 object
-  .mod[[YAML_YAML_MD5]] <- digest(file = .yaml_path, algo = "md5")
-  .mod <- create_model_object(.mod)
+  .mod <- create_model_object(.mod, save_yaml = TRUE)
 
   return(.mod)
 }
@@ -71,114 +85,68 @@ new_model <- function(
 
 #' Creates a model object from a YAML model file
 #'
-#' Parses a model YAML file into a list object that contains correctly formatted information from the YAML
-#' and is an S3 object of class `bbi_{.model_type}_model` that can be passed to `submit_model()`, `model_summary()`, etc.
-#' @param .path Path to the YAML file to parse. MUST be either an absolute path, or a path relative to the `.directory` argument.
-#' @param .directory Model directory which `.path` is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`.
-#' @importFrom yaml read_yaml
-#' @importFrom digest digest
-#' @importFrom fs file_exists
+#' Parses a model YAML file into a list object that contains correctly formatted
+#' information from the YAML and is an S3 object of class
+#' `bbi_{.model_type}_model` that can be passed to [submit_model()],
+#' [model_summary()], etc.
+#'
+#' @param .path Path to the model to read, in the sense of absolute model path.
+#'   The absolute model path is the path to the YAML file and model file, both
+#'   without extension, and (possibly) the output directory.
+#'
 #' @return S3 object of class `bbi_{.model_type}_model`
+#' @seealso [copy_model_from()], [new_model()]
 #' @export
-read_model <- function(
-  .path,
-  .directory = get_model_directory()
-) {
+read_model <- function(.path) {
+  yaml_path <- paste0(.path, ".yaml")
+  checkmate::assert_file_exists(yaml_path)
 
-  # check for .directory and combine with .path
-  .path <- combine_directory_path(.directory, .path)
+  yaml_list <- yaml::read_yaml(yaml_path)
+  yaml_list[[ABS_MOD_PATH]] <- fs::path_ext_remove(normalizePath(yaml_path))
+  yaml_list[[YAML_YAML_MD5]] <- digest::digest(file = yaml_path, algo = "md5")
 
-  # If not YAML extension, convert to YAML and look for file
-  .path <- tryCatch(
-    {
-      find_yaml_file_path(.path)
-    },
-    error = function(e) {
-      if (str_detect(e$message, FIND_YAML_ERR_MSG)) {
-        stop(glue("`read_model()` error: {e$message} -- Use `new_model()` to create the necessary YAML file."))
-      }
-      stop(e$message)
-    }
-  )
-
-  # load from file
-  yaml_list <- read_yaml(.path)
-  yaml_list[[WORKING_DIR]] <- normalizePath(dirname(.path))
-  yaml_list[[YAML_YAML_NAME]] <- basename(.path)
-  yaml_list[[YAML_YAML_MD5]] <- digest(file = .path, algo = "md5")
-
-  # parse model path
-  if (!check_required_keys(yaml_list, .req = YAML_REQ_INPUT_KEYS)) {
-    err_msg <- paste0(
-      "Model yaml must have keys `", paste(YAML_REQ_INPUT_KEYS, collapse=", "), "` specified in it. ",
-      "But `", paste(YAML_REQ_INPUT_KEYS[!(YAML_REQ_INPUT_KEYS %in% names(yaml_list))], collapse=", "), "` are missing. ",
-      .path, " has the following keys: ", paste(names(yaml_list), collapse=", ")
-    )
-    strict_mode_error(err_msg)
-  }
-
-  .mod <- create_model_object(yaml_list)
-
-  return(.mod)
+  create_model_object(yaml_list, save_yaml = FALSE)
 }
 
 
-#' Saves a model model object to a yaml file
+#' Saves a model object to a yaml file
+#'
+#' Saves the passed model object to its YAML file and updates
+#' the md5 hash after saving.
 #' @param .mod S3 object of class `bbi_{.model_type}_model`
-#' @param .out_path Character scalar with path to save out YAML file. By default, sets it to the model file name, with a yaml extension.
 #' @importFrom yaml write_yaml
 #' @importFrom fs file_exists
 #' @importFrom purrr compact
-#' @return Output list as specified above.
+#' @return The input `bbi_{.model_type}_model` object, with its YAML md5 hash updated.
 #' @keywords internal
-save_model_yaml <- function(.mod, .out_path = NULL) {
-  # fill path if null
-  if (is.null(.out_path)) {
-    .out_path <- get_yaml_path(.mod, .check_exists = FALSE)
-  }
+save_model_yaml <- function(.mod) {
+
+  .out_path <- get_yaml_path(.mod, .check_exists = FALSE)
+
+  # create copy to save out
+  .out_mod <- .mod
 
   # erase keys that don't need to be saved out
   for (key in YAML_ERASE_OUT_KEYS) {
-    .mod[[key]] <- NULL
+    .out_mod[[key]] <- NULL
   }
 
   # convert keys that need to be coerced to arrays
   for (.key in YAML_SCALAR_TO_LIST_KEYS) {
-    if (length(.mod[[.key]]) == 1) {
-      .mod[[.key]] <- (list(.mod[[.key]]))
+    if (length(.out_mod[[.key]]) == 1) {
+      .out_mod[[.key]] <- (list(.out_mod[[.key]]))
     }
   }
 
   # throw out empty and null keys
-  .mod <- purrr::compact(.mod)
+  .out_mod <- purrr::compact(.out_mod)
 
   # write to disk
-  yaml::write_yaml(.mod, .out_path)
-}
+  yaml::write_yaml(.out_mod, .out_path)
 
+  # update md5 after writing new yaml
+  .mod[[YAML_YAML_MD5]] <- digest(file = .out_path, algo = "md5")
 
-#' Convert object to `bbi_{.model_type}_model`
-#' @param .obj Object to convert to `bbi_{.model_type}_model`
-#' @export
-as_model <- function(.obj) {
-  UseMethod("as_model")
-}
-
-#' @describeIn as_model Simply passes through the `bbi_nonmem_model` object.
-#' @export
-as_model.bbi_nonmem_model <- function(.obj) {
-  return(.obj)
-}
-
-#' @describeIn as_model Takes a `babylon_process` object and converts it to the corresponding `bbi_nonmem_model` object.
-#' Only works if YAML and model file are in the same directory with the same name and different file extensions.
-#' @export
-as_model.babylon_process <- function(.obj) {
-  # construct path to YAML
-  mod_file <- .obj[[PROC_CMD_ARGS]][4] # cmd_args will have c("run", "nonmem", .mode, .model_file)
-  yaml_path <- file.path(.obj[[PROC_WD]], mod_file) %>% get_yaml_path()
-
-  # read model from YAML
-  .mod <- read_model(yaml_path)
   return(.mod)
 }
+

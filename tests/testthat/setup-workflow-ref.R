@@ -12,9 +12,6 @@
 # - test-get-based-on.R
 # - maybe others...
 
-# clear any model_directory that is set
-set_model_directory(NULL)
-
 # define constants
 MOD_ID <- "1"
 MODEL_DIR <- "model-examples"
@@ -27,6 +24,7 @@ NEW_MOD3 <- file.path(MODEL_DIR, "3")
 
 # file names and file paths
 OUTPUT_DIR <-     MOD1_PATH
+CTL_FILENAME <- ctl_ext(MOD_ID)
 YAML_TEST_FILE <- as.character(glue::glue("{MOD1_PATH}.yaml"))
 CTL_TEST_FILE <-  as.character(glue::glue("{MOD1_PATH}.ctl"))
 MOD_TEST_FILE <-  as.character(glue::glue("{MOD1_PATH}.mod"))
@@ -35,8 +33,9 @@ GRD_TEST_FILE <-  as.character(glue::glue("{MOD1_PATH}/{MOD_ID}.grd"))
 EXT_TEST_FILE <-  as.character(glue::glue("{MOD1_PATH}/{MOD_ID}.ext"))
 OUTPUT_FILE <-    file.path(MOD1_PATH, "OUTPUT")
 
-LEVEL2_DIR <- file.path(MODEL_DIR, "level2")
-LEVEL2_MOD <- file.path(LEVEL2_DIR, "1")
+LEVEL2_SUBDIR <- "level2"
+LEVEL2_DIR <- file.path(MODEL_DIR, LEVEL2_SUBDIR)
+LEVEL2_MOD <- file.path(LEVEL2_DIR, MOD_ID)
 
 ORIG_DESC <- "original acop model"
 NEW_DESC <- "new description"
@@ -51,15 +50,8 @@ NEW_TEXT2 <- c("all", "done")
 SUMMARY_REF_FILE <- "data/acop_summary_obj_ref_200910.rds"
 PARAM_REF_FILE <- "data/acop_param_table_ref_200914.rds"
 
-MOD_CLASS <- "bbi_nonmem_model"
-SUM_CLASS <- "bbi_nonmem_summary"
-SL_CLASS <- "bbi_summary_list"
-PROC_CLASS <- "babylon_process"
-LOG_CLASS <- "bbi_run_log_df"
-
-
 SUM_CLASS_LIST <- c(SUM_CLASS, "list")
-MOD_CLASS_LIST <- c(MOD_CLASS, "list")
+MOD_CLASS_LIST <- c(NM_MOD_CLASS, "list")
 PROC_CLASS_LIST <- c(PROC_CLASS, "list")
 
 SUMS_LIST_NAMES_REF <- c("absolute_model_path", "bbi_summary", "error_msg", "needed_fail_flags")
@@ -84,6 +76,12 @@ CONFIG_DATA_PATH <- "../../data/acop.csv"
 CONFIG_DATA_MD5 <- "4ddb44da897c26681d892aa7be99f74b"
 CONFIG_MODEL_MD5 <- "6b930119c4224ba077091b47959b0604"
 
+# yaml md5 hashes
+MOD1_YAML_MD5 <- "ee5a30a015c4e09bc29334188ff28b58"
+MOD_LEVEL2_MD5 <- "1c18961a778fc6b71e3990b500f4bca5"
+ALL_MODS_YAML_MD5 <- c(MOD1_YAML_MD5, rep("22c7176b3dbbbf932091c82c2fd9f749", 2), "edd548af82d8556971c442f36a3907e0")
+RUN_LOG_YAML_MD5 <- c(MOD1_YAML_MD5, "62fc26bf3bf941c6bad352f23cc6c2ad", "ebd4861c9d0584b03a23edcfdda9a67e")
+
 # model refs
 
 REF_LIST_1 <- list(
@@ -93,11 +91,8 @@ REF_LIST_1 <- list(
   bbi_args = list(
     overwrite = TRUE,
     threads = 4L),
-  model_working_dir = file.path(getwd(), "model-examples"),
-  orig_yaml_file ="1.yaml",
-  yaml_md5 = "ee5a30a015c4e09bc29334188ff28b58",
-  model_path = "1.ctl",
-  output_dir = "1"
+  absolute_model_path = file.path(getwd(), "model-examples", "1"),
+  yaml_md5 = MOD1_YAML_MD5
 )
 class(REF_LIST_1) <- MOD_CLASS_LIST
 
@@ -109,15 +104,11 @@ REF_LIST_TMP <- list(
   bbi_args = list(
     overwrite = TRUE,
     threads = 4L),
-  model_working_dir = file.path(getwd(), "model-examples"),
-  orig_yaml_file ="tmp.yml",
-  yaml_md5 = "ee5a30a015c4e09bc29334188ff28b58",
-  model_path = "tmp.ctl",
-  output_dir = "tmp"
+  absolute_model_path = file.path(getwd(), "model-examples", "temp"),
+  yaml_md5 = MOD1_YAML_MD5
 )
 class(REF_LIST_TMP) <- MOD_CLASS_LIST
 
-ALL_MODS_YAML_MD5 <- c("ee5a30a015c4e09bc29334188ff28b58", "9d689b937fb36e5c3e98e59053b59e73", "b65d8911e9f8007a743e7c93934ce88e", "793cf7a6a04ddcdfc3b6511466a690b3")
 
 #####################
 # utils.R constants
@@ -136,11 +127,11 @@ FAKE_CTL_PATH <- file.path(getwd(), MODEL_DIR, CTL_TEST_FILE)
 ########################
 
 create_all_models <- function() {
-  mod1 <- read_model(YAML_TEST_FILE)
-  mod2 <- copy_model_from(mod1, NEW_MOD2,   "level 1 copy of 1")
-  mod3 <- copy_model_from(mod1, NEW_MOD3,   "level 1 copy of 1")
+  mod1 <- read_model(MOD1_PATH)
+  mod2 <- copy_model_from(mod1, basename(NEW_MOD2),   "level 1 copy of 1")
+  mod3 <- copy_model_from(mod1, basename(NEW_MOD3),   "level 1 copy of 1")
   fs::dir_create(LEVEL2_DIR)
-  mod4 <- copy_model_from(mod2, LEVEL2_MOD, "level 2 copy of 2")
+  mod4 <- copy_model_from(mod2, file.path(LEVEL2_SUBDIR, MOD_ID), "level 2 copy of 2")
 
   # load or create models and assign model objects to global environment
   assign("mod1", mod1, pos = parent.frame())
@@ -149,12 +140,30 @@ create_all_models <- function() {
   assign("mod4", mod4, pos = parent.frame())
 }
 
+copy_all_output_dirs <- function() {
+  if (!fs::dir_exists(LEVEL2_DIR)) { fs::dir_create(LEVEL2_DIR) }
+  fs::dir_copy(MOD1_PATH, NEW_MOD2)
+  fs::dir_copy(MOD1_PATH, NEW_MOD3)
+  fs::dir_copy(MOD1_PATH, LEVEL2_MOD)
+}
+
+create_rlg_models <- function() {
+  # copy models before creating run log
+  mod1 <- read_model(MOD1_PATH)
+  copy_model_from(mod1, basename(NEW_MOD2), NEW_DESC, .add_tags = NEW_TAGS)
+  copy_model_from(mod1,
+                  basename(NEW_MOD3),
+                  NEW_DESC,
+                  .based_on_additional = get_model_id(NEW_MOD2),
+                  .inherit_tags = TRUE,
+                  .update_model_file = FALSE)
+}
+
 cleanup <- function() {
   # delete tmp files if they are leftover from previous test
   mods_to_kill <- purrr::map_chr(seq(2,7), ~ file.path(MODEL_DIR, .x))
   for (m in mods_to_kill) {
     if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
-    if (fs::file_exists(paste0(m, ".yml"))) fs::file_delete(paste0(m, ".yml"))
     if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
   }
 
@@ -203,4 +212,28 @@ rep_missing <- function(x, i, len) {
   res <- rep(x, len)
   res[i] <- NA
   res
+}
+
+#' Create a temporary model
+#'
+#' It is useful to create a model file and YAML file that can be discarded. The
+#' files will be deleted when `envir` exits.
+#'
+#' @param path The path to the YAML file to copy.
+#' @param mod_content A string giving the content of the model file.
+#' @param mod_ext The extension for the model file.
+#' @inheritParams withr::defer
+#'
+#' @return The absolute model path to the temporary model.
+create_temp_model <- function(path = YAML_TEST_FILE,
+                              mod_content = "foo",
+                              mod_ext = "ctl",
+                              envir = parent.frame()) {
+  temp_yaml <- tempfile(fileext = ".yaml")
+  fs::file_copy(path, temp_yaml)
+  temp_ctl <- fs::path_ext_set(temp_yaml, mod_ext)
+  readr::write_file(mod_content, temp_ctl)
+  withr::defer(fs::file_delete(c(temp_yaml, temp_ctl)), envir)
+  # normalizePath() needs to be called when the file actually exists
+  fs::path_ext_remove(normalizePath(temp_yaml))
 }

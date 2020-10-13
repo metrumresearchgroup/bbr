@@ -3,8 +3,6 @@
 \name{model_summaries}
 \alias{model_summaries}
 \alias{model_summaries.list}
-\alias{model_summaries.character}
-\alias{model_summaries.numeric}
 \alias{model_summaries.bbi_run_log_df}
 \title{Summarize multiple models in batch}
 \usage{
@@ -13,8 +11,7 @@ model_summaries(
   .bbi_args = NULL,
   .fail_flags = NULL,
   ...,
-  .dry_run = FALSE,
-  .directory = NULL
+  .dry_run = FALSE
 )
 
 \method{model_summaries}{list}(
@@ -22,26 +19,7 @@ model_summaries(
   .bbi_args = NULL,
   .fail_flags = NULL,
   ...,
-  .dry_run = FALSE,
-  .directory = NULL
-)
-
-\method{model_summaries}{character}(
-  .mods,
-  .bbi_args = NULL,
-  .fail_flags = NULL,
-  ...,
-  .dry_run = FALSE,
-  .directory = get_model_directory()
-)
-
-\method{model_summaries}{numeric}(
-  .mods,
-  .bbi_args = NULL,
-  .fail_flags = NULL,
-  ...,
-  .dry_run = FALSE,
-  .directory = get_model_directory()
+  .dry_run = FALSE
 )
 
 \method{model_summaries}{bbi_run_log_df}(
@@ -49,42 +27,35 @@ model_summaries(
   .bbi_args = NULL,
   .fail_flags = NULL,
   ...,
-  .dry_run = FALSE,
-  .directory = NULL
+  .dry_run = FALSE
 )
 }
 \arguments{
-\item{.mods}{The model object to summarize. Could be
-a \code{bbi_run_log_df} tibble,
-a list of \verb{bbi_\{.model_type\}_model} objects,
-a character vector of file paths to models,
-a numeric vector of integers corresponding to a file names of a models.}
+\item{.mods}{The model objects to summarize. Could be
+a \code{bbi_run_log_df} tibble, or
+a list of \verb{bbi_\{.model_type\}_model} objects.}
 
 \item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}.
 See \code{\link[=print_bbi_args]{print_bbi_args()}} for full list of options.}
 
 \item{.fail_flags}{Same as \code{.bbi_args} except these are used \emph{only} when a \code{\link[=model_summary]{model_summary()}} call fails.
 In that case, flags are appended to anything in \code{.bbi_args} and the summary is tried again.
-Defaults to \code{list(no_grd_file = TRUE, no_shk_file = TRUE)}.
-This is a "dumb" way of automatically catching Bayesian or something else that doesn't produce certain output files.
 See details section for more info on these flags.}
 
 \item{...}{args passed through to \code{bbi_exec()}}
 
 \item{.dry_run}{show what the command would be without actually running it}
-
-\item{.directory}{Model directory which \code{.mod} path is relative to. Defaults to \code{options('rbabylon.model_directory')}, which can be set globally with \code{set_model_directory()}. \strong{Only used when passing a path for \code{.mod} instead of a \verb{bbi_\{.model_type\}_model} object.}}
+}
+\value{
+All dispatches will return a list of \verb{bbi_\{.model_type\}_summary} objects.
 }
 \description{
 Run multiple \code{\link[=model_summary]{model_summary()}} calls in batch.
-All these dispatches will return a list of \verb{bbi_\{.model_type\}_summary} objects.
 }
 \details{
 The summary call will error if it does not find certain files in the output folder.
 However, you can override this behavior with the following file-specific flags:
 \itemize{
-\item \code{no_cor_file}
-\item \code{no_cov_file}
 \item \code{no_ext_file}
 \item \code{no_grd_file}
 \item \code{no_shk_file}
@@ -92,7 +63,6 @@ However, you can override this behavior with the following file-specific flags:
 
 If some of your runs are using an estimation method that does not produce any of the following files,
 or they are missing for some other legitimate reason, pass the appropriate flags through the \code{.fail_flags} argument.
-For example, if have asked to skip the \verb{$COV} step, you would call \code{model_summary(..., .fail_flags = list(no_cov_file = TRUE))}.
 
 Additionally, \strong{if you have renamed your \code{.ext} file, you will need to pass the new name through}, to \code{.bbi_args} or \code{.fail_flags} like so:
 \code{model_summaries(..., .bbi_args = list(ext_file = "whatever_you_named_it"))}
@@ -100,11 +70,6 @@ Additionally, \strong{if you have renamed your \code{.ext} file, you will need t
 \section{Methods (by class)}{
 \itemize{
 \item \code{list}: Summarize a list of \verb{bbi_\{.model_type\}_model} objects.
-
-\item \code{character}: Takes a character vector of file paths to models and summarizes all of them.
-
-\item \code{numeric}: Takes a numeric vector of file paths to models and summarizes all of them.
-This will only work if you are calling from the same directory as the models, or if you have set \code{options('rbabylon.model_directory')} to the directory constaining the relevant model.
 
 \item \code{bbi_run_log_df}: Takes a \code{bbi_run_log_df} tibble and summarizes all models in it.
 }}

@@ -9,7 +9,7 @@ submit_nonmem_model(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
-  .config_path = file.path(get_model_directory() \%||\% ".", "babylon.yaml"),
+  .config_path = NULL,
   .wait = TRUE,
   .dry_run = FALSE
 )

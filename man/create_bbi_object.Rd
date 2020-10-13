@@ -12,7 +12,7 @@
 \alias{create_log_df_impl}
 \title{Create bbi object}
 \usage{
-create_model_object(res)
+create_model_object(res, save_yaml)
 
 create_summary_object(res, .model_type = SUPPORTED_MOD_TYPES)
 
@@ -30,6 +30,8 @@ create_log_df_impl(log_df, .class, .req_cols, .key)
 }
 \arguments{
 \item{res}{List to attempt to assign the class to}
+
+\item{save_yaml}{Logical scalar for whether to save the newly created model object to its corresponding YAML file and update the md5 hash.}
 
 \item{.model_type}{Character scalar of a valid model type (currently either \code{nonmem} or \code{stan})}
 

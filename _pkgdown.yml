@@ -11,14 +11,11 @@ navbar:
 reference:
 - title: Model management
   contents:
-  - as_model
   - copy_model_from
   - new_model
   - read_model
   - reconcile_yaml
   - check_yaml_in_sync
-  - set_model_directory
-  - get_model_directory
 - title: Model submission
   contents:
   - submit_model
@@ -45,7 +42,6 @@ reference:
   - get_based_on
   - get_model_ancestry
   - get_model_id
-  - get_path_from_object
   - get_model_path
   - get_output_dir
   - get_yaml_path
@@ -80,7 +76,6 @@ reference:
   - ctl_ext
   - mod_ext
   - yaml_ext
-  - yml_ext
   - plot_nonmem_table_df
   - plot_grd
   - plot_ext

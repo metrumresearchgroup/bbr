@@ -15,13 +15,37 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r cleanup top, include=FALSE}
+# Introduction
+
+This vignette demonstrates how to use the `based_on` field to track a model's ancestry through the model development process. You will also see one common use for this: using the tibble output from `config_log()` to check that your models are up-to-date. By "up-to-date" we mean that none of the model files or data files have changed since the model was run. 
+
+If you are new to `rbabylon`, the ["Getting Started with rbabylon"](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html) vignette will take you through some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its standard workflow and functionality.
+
+## Setup
+
+There is some initial set up necessary for using `rbabylon`. Please refer to the ["Getting Started"](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html#setup) vignette, mentioned above, if you have not done this yet. Once this is done, load the library.
+
+```{r}
+library(rbabylon)
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(purrr))
+suppressPackageStartupMessages(library(fs))
+```
+
+```{r set up and define cleanup, include = FALSE}
+MODEL_DIR <- system.file("nonmem", package = "rbabylon")
+
+# set babylon execution path
+if (Sys.which("bbi") == "") {
+  options('rbabylon.bbi_exe_path' = read_bbi_path())
+}
+
 # delete old files
 cleanup <- function() {
-  if (fs::file_exists("../inst/nonmem/1.yaml")) fs::file_delete("../inst/nonmem/1.yaml")
-  if (fs::file_exists("../inst/nonmem/babylon.yaml")) fs::file_delete("../inst/nonmem/babylon.yaml")
+  if (fs::file_exists(file.path(MODEL_DIR, "1.yaml"))) fs::file_delete(file.path(MODEL_DIR, "1.yaml"))
+  if (fs::file_exists(file.path(MODEL_DIR, "babylon.yaml"))) fs::file_delete(file.path(MODEL_DIR, "babylon.yaml"))
   
-  mods_to_kill <- purrr::map_chr(seq(2,6), ~ file.path("../inst/nonmem", .x))
+  mods_to_kill <- purrr::map_chr(seq(2,6), ~ file.path(MODEL_DIR, .x))
   for (.m in mods_to_kill) {
     if (fs::file_exists(paste0(.m, ".yaml"))) fs::file_delete(paste0(.m, ".yaml"))
     if (fs::file_exists(paste0(.m, ".ctl"))) fs::file_delete(paste0(.m, ".ctl"))
@@ -31,39 +55,17 @@ cleanup <- function() {
 cleanup()
 ```
 
-
-# Introduction
-
-This vignette demonstrates how to use the `based_on` field to track a model's ancestry through the model development process. You will also see one common use for this: using the tibble output from `config_log()` to check that your models are up-to-date. By "up-to-date" we mean that none of the model files or data files have changed since the model was run. 
-
-If you are new to `rbabylon`, the ["Getting Started with rbabylon"](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html) vignette will take you through some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its standard workflow and functionality.
-
-## Setup
-
-There is some initial set up necessary for using `rbabylon`. Please refer to the ["Getting Started"](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html#setup) vignette, mentioned above, if you have not done this yet. Once this is done, load the library and set your modeling directory.
-
-```{r set_model_directory}
-library(rbabylon)
-suppressPackageStartupMessages(library(dplyr))
-suppressPackageStartupMessages(library(purrr))
-suppressPackageStartupMessages(library(fs))
-```
-
-```{r setup, include = FALSE}
-set_model_directory("../inst/nonmem")
-
-# set babylon execution path
-if (Sys.which("bbi") == "") {
-  options('rbabylon.bbi_exe_path' = read_bbi_path())
-}
-```
-
-
 # Modeling process
 The modeling process will always start with an initial model, which we create with the `new_model()` call.
 
+```{r fake model dir, eval = FALSE}
+MODEL_DIR <- "../nonmem"
+```
 ```{r first model}
-mod1 <- new_model(.yaml_path = "1.yaml", .description = "one compartment base model")
+mod1 <- new_model(
+  file.path(MODEL_DIR, 1), 
+  .description = "one compartment base model"
+)
 ```
 
 From there, the iterative model development process proceeds. The `copy_model_from()` function will do several things, including creating a new model file and filling in some relevant metadata. Notably, it will also add the model that you copied _from_ into the `based_on` field for the new model.
@@ -135,7 +137,7 @@ In this case, model `6` was based on `5`, which was based on `2`, which in turn 
 While it may be useful to look at the ancestry of a single model object, it may be even more useful to use the `based_on` field later in the modeling process when you are looking back and trying to summarize the model activities as a whole. The `run_log()` function is helpful for this. It returns a tibble with metadata about each model.
 
 ```{r run_log} 
-log_df <- run_log()
+log_df <- run_log(MODEL_DIR)
 log_df
 ```
 
@@ -144,9 +146,10 @@ log_df
 Among other things, the run log contains the tags that have been assigned to each model. Here we use `purrr::map_lgl` to filter the run log to only the final model.
 
 ```{r filtering}
-final_model_path <- log_df %>% 
+final_model_path <- 
+  log_df %>% 
   filter(map_lgl(tags, ~ "final model" %in% .x)) %>%
-  get_model_path()
+  pull(absolute_model_path)
 
 final_model_path
 ```
@@ -172,7 +175,7 @@ You can call `config_log` directly, but it is often useful to join it to a run l
 
 ```{r add_config fake prep, include=FALSE}
 # read in original json (which was actually fake a.k.a. copied from somewhere else)
-orig_json <- jsonlite::fromJSON(file.path(getOption("rbabylon.model_directory"), "1", "bbi_config.json"))
+orig_json <- jsonlite::fromJSON(file.path(MODEL_DIR, "1", "bbi_config.json"))
 
 # fix data path (just in case)
 orig_json$data_path <- stringr::str_replace(orig_json$data_path, "/data/", "/extdata/")
@@ -180,7 +183,7 @@ orig_json$data_path <- stringr::str_replace(orig_json$data_path, "/data/", "/ext
 # copying the outputs from the original run 
 # and setting model md5 to match control stream (remember this "original" is fake)
 for (i in seq_len(6)) {
-  out_dir <- file.path(getOption("rbabylon.model_directory"), i)
+  out_dir <- file.path(MODEL_DIR, i)
   if (!fs::dir_exists(out_dir)) fs::dir_create(out_dir)
   new_json <- orig_json
   if (!(i %in% c(3,4))) {

@@ -10,6 +10,10 @@ PARAM_COUNT_REF <- 7
 
 # helper to run expectations
 test_sum_df <- function(sum_df, .paths, .col_count) {
+  # check sum_df class
+  expect_true(inherits(sum_df, SUM_LOG_CLASS))
+  expect_true(inherits(sum_df, LOG_DF_CLASS))
+
   num_mods <- length(.paths)
   expect_equal(nrow(sum_df), num_mods)
   expect_equal(ncol(sum_df), .col_count)
@@ -26,60 +30,46 @@ test_sum_df <- function(sum_df, .paths, .col_count) {
 setup({
   cleanup()
   create_all_models()
-  fs::dir_copy(MOD1_PATH, NEW_MOD2)
-  fs::dir_copy(MOD1_PATH, NEW_MOD3)
-  fs::dir_copy(MOD1_PATH, LEVEL2_MOD)
+  copy_all_output_dirs()
 })
 teardown({
   cleanup()
 })
 
-withr::with_options(list(rbabylon.model_directory = NULL), {
 
-  test_that("summary_log() errors with no .base_dir set", {
-    log_df <- expect_error(summary_log(), regexp = "`.base_dir` cannot be `NULL`")
-  })
+test_that("summary_log() returns NULL and warns when no YAML found", {
+  log_df <- expect_warning(summary_log("data"), regexp = "Found no valid model YAML files in data")
+  expect_true(inherits(log_df, "tbl"))
+  expect_equal(nrow(log_df), 0)
+  expect_equal(ncol(log_df), 0)
+})
 
-  test_that("summary_log() errors with malformed YAML", {
-    log_df <- expect_error(summary_log(getwd()), regexp = "Unexpected error.+model_path defined in yaml")
-  })
-
-  test_that("summary_log() returns NULL and warns when no YAML found", {
-    log_df <- expect_warning(summary_log("data"), regexp = "Found no valid model YAML files in data")
-    expect_true(inherits(log_df, "tbl"))
-    expect_equal(nrow(log_df), 0)
-    expect_equal(ncol(log_df), 0)
-  })
-}) # closing withr::with_options
-
-
-withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
-                         rbabylon.model_directory = normalizePath(MODEL_DIR)), {
+withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
 
   #########################################
   # extracting things from summary object
   #########################################
 
   test_that("summary_log() works correctly with nested dirs", {
-    sum_df <- summary_log()
+    sum_df <- summary_log(MODEL_DIR)
     test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3, LEVEL2_MOD), SUM_LOG_COLS)
   })
 
   test_that("summary_log(.recurse = FALSE) works", {
-    sum_df <- summary_log(.recurse = FALSE)
+    sum_df <- summary_log(MODEL_DIR, .recurse = FALSE)
     test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3), SUM_LOG_COLS)
   })
 
   test_that("add_summary() works correctly", {
-    sum_df <- run_log() %>% add_summary()
+    sum_df <- run_log(MODEL_DIR) %>% add_summary()
     test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3, LEVEL2_MOD), RUN_LOG_COLS+SUM_LOG_COLS-1)
     expect_identical(sum_df$model_type, rep("nonmem", RUN_LOG_ROWS+1))
     expect_identical(sum_df$yaml_md5, ALL_MODS_YAML_MD5)
   })
 
   test_that("add_summary() has correct columns", {
-    sum_df <- summary_log()
-    log_df <- run_log()
+    sum_df <- summary_log(MODEL_DIR)
+    log_df <- run_log(MODEL_DIR)
     add_df <- log_df %>% add_summary()
 
     # should have all columns from both (minus the join key)
@@ -116,11 +106,11 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
   fs::file_delete(file.path(LEVEL2_MOD, "1.grd"))
 
   test_that("summary_log works some failed summaries", {
-    sum_df <- summary_log()
+    sum_df <- summary_log(MODEL_DIR)
     expect_equal(is.na(sum_df$error_msg), c(TRUE, TRUE, TRUE, FALSE))
     expect_equal(ncol(sum_df), SUM_LOG_COLS)
 
-    sum_df <- summary_log(.bbi_args = list(no_grd_file = TRUE))
+    sum_df <- summary_log(MODEL_DIR, .bbi_args = list(no_grd_file = TRUE))
     test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3, LEVEL2_MOD), SUM_LOG_COLS)
   })
 

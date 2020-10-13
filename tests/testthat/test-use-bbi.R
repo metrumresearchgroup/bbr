@@ -3,7 +3,7 @@ context("test-use-bbi")
 skip_if_not(R.version$os == "linux-gnu")
 skip_if_offline()
 
-tdir <- tempdir()
+tdir <- normalizePath(tempdir())
 bbi_tmp_path <- file.path(tdir, "bbi")
 teardown({
   unlink(bbi_tmp_path)

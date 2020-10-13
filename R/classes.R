@@ -6,9 +6,11 @@ NULL
 
 #' @describeIn create_bbi_object Creates list object of class `bbi_{.model_type}_model` from named list with `MODEL_REQ_INPUT_KEYS`
 #' @param res List to attempt to assign the class to
+#' @param save_yaml Logical scalar for whether to save the newly created model object to its corresponding YAML file and update the md5 hash.
 #' @importFrom fs path_rel
+#' @importFrom rlang %||%
 #' @keywords internal
-create_model_object <- function(res) {
+create_model_object <- function(res, save_yaml) {
 
   if(!inherits(res, "list")) {
     stop(glue("Can only create model object from a named list. Passed object has classes {paste(class(res), collapse = ', ')}"))
@@ -30,19 +32,9 @@ create_model_object <- function(res) {
     stop(glue("Invalid {YAML_MOD_TYPE} `{.model_type}`. Valid options include: `{paste(SUPPORTED_MOD_TYPES, collapse = ', ')}`"))
   }
 
-  # by default, if no model defined, will use the YAML path to look for a model and set to .ctl if none found
-  if (is.null(res[[YAML_MOD_PATH]])) {
-    if (is.null(res[[YAML_YAML_NAME]])) {
-      stop("Must specify either a YAML_MOD_PATH or YAML_YAML_NAME to create a model. User should never see this error.")
-    }
-    .mod_path <- find_model_file_path(file.path(res[[WORKING_DIR]], res[[YAML_YAML_NAME]]))
-    res[[YAML_MOD_PATH]] <- as.character(fs::path_rel(.mod_path, res[[WORKING_DIR]]))
-  }
-
-  # check for correct NONMEM extension
-  if (.model_type == "nonmem" && (!is_valid_nonmem_extension(res[[YAML_MOD_PATH]]))) {
-    stop(glue::glue("model_path defined in yaml at {res[[YAML_MOD_PATH]]} must have either a .ctl or .mod extension, but found {res[[YAML_MOD_PATH]]}"))
-  }
+  # we won't know the model file extension, so we rely on this helper to check
+  # the possible extensions and throw an error if none exists
+  find_nonmem_model_file_path(res[[ABS_MOD_PATH]], .check_exists = TRUE)
 
   # check babylon args and add an empty list if missing
   if (is.null(res[[YAML_BBI_ARGS]])) {
@@ -55,16 +47,13 @@ create_model_object <- function(res) {
     )
   }
 
-  # add output_dir
-  if (!is.null(res[[YAML_BBI_ARGS]][["output_dir"]])) {
-    # if specified in bbi_args, overwrite anything that's in YAML or list
-    res[[YAML_OUT_DIR]] <- res[[YAML_BBI_ARGS]][["output_dir"]]
-  } else if (is.null(res[[YAML_OUT_DIR]])) {
-    # if null, infer from model path
-    res[[YAML_OUT_DIR]] <- res[[YAML_MOD_PATH]] %>% tools::file_path_sans_ext()
+  # assign class and write YAML to disk
+  class(res) <- c(as.character(glue("bbi_{.model_type}_model")), class(res))
+  if(isTRUE(save_yaml)) {
+    res <- save_model_yaml(res)
   }
 
-  # check for required keys, just as an extra safety precaution
+  # check for required keys, just as an extra safety precaution before returning
   if (!check_required_keys(res, .req = MODEL_REQ_KEYS)) {
     err_msg <- paste0(
       "Model object must have the following named elements to be converted to an S3 object of class `bbi_{.model_type}_model`: `", paste(MODEL_REQ_KEYS, collapse=", "),
@@ -74,8 +63,6 @@ create_model_object <- function(res) {
     strict_mode_error(err_msg)
   }
 
-  # assign class and return
-  class(res) <- c(as.character(glue("bbi_{.model_type}_model")), class(res))
   return(res)
 }
 
@@ -216,6 +203,6 @@ create_log_df_impl <- function(log_df, .class, .req_cols, .key) {
   }
 
   # assign class and return
-  class(log_df) <- c(.class, class(log_df))
+  class(log_df) <- c(.class, LOG_DF_CLASS, class(log_df))
   return(log_df)
 }

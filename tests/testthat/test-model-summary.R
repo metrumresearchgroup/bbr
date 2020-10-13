@@ -4,8 +4,7 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
   skip("test-summary only runs on Metworx or Drone")
 }
 
-withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
-                         rbabylon.model_directory = NULL), {
+withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
 
   #########################################
   # extracting things from summary object
@@ -24,33 +23,6 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
     expect_equal(ref_sum, sum1)
   })
 
-  withr::with_options(list(rbabylon.model_directory = normalizePath(MODEL_DIR)), {
-    test_that("model_summary.character produces expected output", {
-      # get summary
-      sum1 <- "1" %>% model_summary()
-
-      # check class
-      expect_identical(class(sum1), SUM_CLASS_LIST)
-
-      # compare to reference
-      ref_sum <- readRDS(SUMMARY_REF_FILE)
-      expect_equal(ref_sum, sum1)
-    })
-
-    test_that("model_summary.numeric produces expected output", {
-      # get summary
-      sum1 <- 1 %>% model_summary()
-
-      # check class
-      expect_identical(class(sum1), SUM_CLASS_LIST)
-
-      # compare to reference
-      ref_sum <- readRDS(SUMMARY_REF_FILE)
-      expect_equal(ref_sum, sum1)
-    })
-  })
-
-
   #####################
   # passing file flags
   #####################
@@ -63,7 +35,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
     })
 
     # create new model
-    mod2 <- MOD1 %>% copy_model_from(NEW_MOD2, .description = "number 2")
+    mod2 <- MOD1 %>% copy_model_from(basename(NEW_MOD2), .description = "number 2")
 
     # copy output directory (to simulate model run)
     fs::dir_copy(MOD1_PATH, NEW_MOD2)
@@ -112,7 +84,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
       })
 
       # create new model
-      mod2 <- MOD1 %>% copy_model_from(NEW_MOD2, .description = "number 2")
+      mod2 <- MOD1 %>% copy_model_from(basename(NEW_MOD2), .description = "number 2")
 
       # copy output directory (to simulate model run)
       fs::dir_copy(MOD1_PATH, NEW_MOD2)
@@ -169,7 +141,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
     })
 
     # create new model
-    mod2 <- MOD1 %>% copy_model_from(NEW_MOD2, .description = "number 2")
+    mod2 <- MOD1 %>% copy_model_from(basename(NEW_MOD2), .description = "number 2")
 
     # copy head of .lst file (to simulate partially done model run)
     fs::dir_create(NEW_MOD2)
@@ -188,7 +160,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path(),
     })
 
     # create new model
-    mod2 <- MOD1 %>% copy_model_from(NEW_MOD2, .description = "number 2")
+    mod2 <- MOD1 %>% copy_model_from(basename(NEW_MOD2), .description = "number 2")
 
     # copy output directory (to simulate model run)
     fs::dir_copy(MOD1_PATH, NEW_MOD2)

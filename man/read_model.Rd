@@ -4,17 +4,22 @@
 \alias{read_model}
 \title{Creates a model object from a YAML model file}
 \usage{
-read_model(.path, .directory = get_model_directory())
+read_model(.path)
 }
 \arguments{
-\item{.path}{Path to the YAML file to parse. MUST be either an absolute path, or a path relative to the \code{.directory} argument.}
-
-\item{.directory}{Model directory which \code{.path} is relative to. Defaults to \code{options('rbabylon.model_directory')}, which can be set globally with \code{set_model_directory()}.}
+\item{.path}{Path to the model to read, in the sense of absolute model path.
+The absolute model path is the path to the YAML file and model file, both
+without extension, and (possibly) the output directory.}
 }
 \value{
 S3 object of class \verb{bbi_\{.model_type\}_model}
 }
 \description{
-Parses a model YAML file into a list object that contains correctly formatted information from the YAML
-and is an S3 object of class \verb{bbi_\{.model_type\}_model} that can be passed to \code{submit_model()}, \code{model_summary()}, etc.
+Parses a model YAML file into a list object that contains correctly formatted
+information from the YAML and is an S3 object of class
+\verb{bbi_\{.model_type\}_model} that can be passed to \code{\link[=submit_model]{submit_model()}},
+\code{\link[=model_summary]{model_summary()}}, etc.
+}
+\seealso{
+\code{\link[=copy_model_from]{copy_model_from()}}, \code{\link[=new_model]{new_model()}}
 }

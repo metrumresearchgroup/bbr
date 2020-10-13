@@ -33,19 +33,17 @@
 #' Additionally, if you have renamed the `.ext` file from its default of `<root>.ext` you will need to pass
 #' `ext_file = "NEWNAME"` to `.bbi_args`.
 #'
-#' @param .mod Model to summarize. Can be a `bbi_{.model_type}_model` object, a file path, or an integer corresponding to a file path.
+#' @param .mod Model to summarize.
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`.
 #' See [print_bbi_args()] for full list of options.
 #' @param ... args passed through to `bbi_exec()`
 #' @param .dry_run show what the command would be without actually running it
-#' @param .directory Model directory which `.mod` path is relative to. Defaults to `options('rbabylon.model_directory')`, which can be set globally with `set_model_directory()`. **Only used when passing a path for `.mod` instead of a `bbi_{.model_type}_model` object.**
 #' @export
 model_summary <- function(
   .mod,
   .bbi_args = NULL,
   ...,
-  .dry_run = FALSE,
-  .directory = NULL
+  .dry_run = FALSE
 ) {
   UseMethod("model_summary")
 }
@@ -56,15 +54,8 @@ model_summary.bbi_nonmem_model <- function(
   .mod,
   .bbi_args = NULL,
   ...,
-  .dry_run = FALSE,
-  .directory = NULL
+  .dry_run = FALSE
 ) {
-
-  if (!is.null(.directory)) {
-    warning(paste(glue("Passed `.directory = {.directory}` to model_summary.bbi_nonmem_model().") ,
-                  "This argument is only valid when passing a path to `model_summary()`.",
-                  "`bbi_nonmem_model` object was passed, so `.directory` inferred from `.mod${WORKING_DIR}`"))
-  }
 
   res_list <- nonmem_summary(
     .mod = .mod,
@@ -72,60 +63,6 @@ model_summary.bbi_nonmem_model <- function(
     ...,
     .dry_run = .dry_run
   )
-  return(res_list)
-}
-
-#' @describeIn model_summary Get model summary from output directory path
-#' @export
-model_summary.character <- function(
-  .mod,
-  .bbi_args = NULL,
-  ...,
-  .dry_run = FALSE,
-  .directory = get_model_directory()
-) {
-
-  # check for .directory and combine with .mod
-  .mod <- combine_directory_path(.directory, .mod)
-
-  # check model type
-  .mod <- read_model(.mod)
-
-  res_list <- model_summary(
-    .mod,
-    .bbi_args = .bbi_args,
-    ...,
-    .dry_run = .dry_run,
-    .directory = NULL
-  )
-
-  return(res_list)
-}
-
-
-#' @describeIn model_summary Get model summary from numeric input.
-#' This will only work if you are calling from the same directory as the models, or if you have set `options('rbabylon.model_directory')` to the directory constaining the relevant model.
-#' @export
-model_summary.numeric <- function(
-  .mod,
-  .bbi_args = NULL,
-  ...,
-  .dry_run = FALSE,
-  .directory = get_model_directory()
-) {
-
-  # convert to character
-  .mod <- as.character(.mod)
-
-  # call character dispatch
-  res_list <- model_summary(
-    .mod = .mod,
-    .bbi_args = .bbi_args,
-    ...,
-    .dry_run = .dry_run,
-    .directory = .directory
-  )
-
   return(res_list)
 }
 
@@ -152,7 +89,7 @@ nonmem_summary <- function(
   check_yaml_in_sync(.mod)
 
   # extract output path
-  .path <- file.path(.mod[[WORKING_DIR]], .mod[[YAML_OUT_DIR]])
+  .path <- get_output_dir(.mod)
 
   # lst file can both be the check for whether the dir is a nonmem output dir
   # and also the output always should be runname.lst so we can determine the model name

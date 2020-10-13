@@ -1,7 +1,7 @@
 Type: Package
 Package: rbabylon
 Title: R package for babylon
-Version: 0.8.0
+Version: 0.9.0
 Authors@R: 
     c(person(given = "Devin",
              family = "Pastoor",
@@ -41,6 +41,7 @@ Imports:
     tidyr,
     yaml
 Suggests: 
+    covr,
     knitr,
     rmarkdown,
     testthat (>= 2.1.0),

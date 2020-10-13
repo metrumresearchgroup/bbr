@@ -3,32 +3,14 @@
 \name{model_summary}
 \alias{model_summary}
 \alias{model_summary.bbi_nonmem_model}
-\alias{model_summary.character}
-\alias{model_summary.numeric}
 \title{Summarize model outputs}
 \usage{
-model_summary(.mod, .bbi_args = NULL, ..., .dry_run = FALSE, .directory = NULL)
+model_summary(.mod, .bbi_args = NULL, ..., .dry_run = FALSE)
 
-\method{model_summary}{bbi_nonmem_model}(.mod, .bbi_args = NULL, ..., .dry_run = FALSE, .directory = NULL)
-
-\method{model_summary}{character}(
-  .mod,
-  .bbi_args = NULL,
-  ...,
-  .dry_run = FALSE,
-  .directory = get_model_directory()
-)
-
-\method{model_summary}{numeric}(
-  .mod,
-  .bbi_args = NULL,
-  ...,
-  .dry_run = FALSE,
-  .directory = get_model_directory()
-)
+\method{model_summary}{bbi_nonmem_model}(.mod, .bbi_args = NULL, ..., .dry_run = FALSE)
 }
 \arguments{
-\item{.mod}{Model to summarize. Can be a \verb{bbi_\{.model_type\}_model} object, a file path, or an integer corresponding to a file path.}
+\item{.mod}{Model to summarize.}
 
 \item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}.
 See \code{\link[=print_bbi_args]{print_bbi_args()}} for full list of options.}
@@ -36,8 +18,6 @@ See \code{\link[=print_bbi_args]{print_bbi_args()}} for full list of options.}
 \item{...}{args passed through to \code{bbi_exec()}}
 
 \item{.dry_run}{show what the command would be without actually running it}
-
-\item{.directory}{Model directory which \code{.mod} path is relative to. Defaults to \code{options('rbabylon.model_directory')}, which can be set globally with \code{set_model_directory()}. \strong{Only used when passing a path for \code{.mod} instead of a \verb{bbi_\{.model_type\}_model} object.}}
 }
 \description{
 Calls out to bbi and returns a named list of class \verb{bbi_\{.model_type\}_summary} with model outputs and diagnostics.
@@ -74,10 +54,5 @@ Additionally, if you have renamed the \code{.ext} file from its default of \verb
 \section{Methods (by class)}{
 \itemize{
 \item \code{bbi_nonmem_model}: Get model summary from \code{bbi_nonmem_model} object
-
-\item \code{character}: Get model summary from output directory path
-
-\item \code{numeric}: Get model summary from numeric input.
-This will only work if you are calling from the same directory as the models, or if you have set \code{options('rbabylon.model_directory')} to the directory constaining the relevant model.
 }}
 

@@ -1,9 +1,3 @@
-`%||%` <- function(x, y) {
-  if (is.null(x)) return(y)
-  return(x)
-}
-
-
 #' Checks that all passed NONMEM command line args are valid and formats
 #' @param .args A named list of .args to check
 #' @importFrom checkmate assert_list
@@ -112,40 +106,65 @@ format_cmd_args <- function(.args, .collapse = FALSE) {
   }
 }
 
-#' Builds list of unique parameter sets for multiple model bbi calls
-#' @importFrom purrr map_lgl
-#' @param .mods a list containing only `bbi_{.model_type}_model` objects
-#' @param .bbi_args A named list specifying arguments to pass to babylon. This will over-ride any shared arguments from the model objects.
+#' Group models for bbi submission
+#'
+#' Multiple models can be submitted in a single bbi call if those models share a
+#' working directory and a set of CLI arguments.
+#'
+#' @inheritParams submit_nonmem_models
+#'
+#' @return A list whose elements correspond to groups of models that can be
+#'   submitted in a single bbi call. Each element is itself a list with elements
+#'
+#'   * `bbi_args`: a set of CLI arguments
+#'
+#'   * `models`: a list of the elements of `.mods` in the group
+#'
 #' @keywords internal
 build_bbi_param_list <- function(.mods, .bbi_args = NULL) {
 
   # check that everything in list is a model object
   check_model_object_list(.mods)
 
-  # build list of unique arg sets
-  param_list <- list()
-  for (.mod in .mods) {
-    # extract babylon args vector and working directory, then get md5 hash
-    args_vec <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]]) %>% check_bbi_args() %>% sort()
-    model_dir <- .mod[[WORKING_DIR]]
-    arg_md5 <- c(args_vec, model_dir) %>% digest(algo = "md5")
+  # character vector whose elements correspond to `.mods` and are strings
+  # representing the CLI args to bbi for the corresponding model
+  all_mod_args <-
+    .mods %>%
+    # TODO: consider whether this should be abstracted
+    purrr::map(YAML_BBI_ARGS) %>%
+    # `parse_args_list()` will return an empty list if both are `NULL`
+    purrr::map(~ parse_args_list(.bbi_args, .)) %>%
+    purrr::map(check_bbi_args) %>%
+    purrr::map(sort)
 
-    if (is.null(param_list[[arg_md5]])) {
-      # create list for this arg set
-      param_list[[arg_md5]] <- list()
+  mod_working_dirs <- purrr::map_chr(.mods, get_model_working_directory)
 
-      # add args vector and working directory
-      param_list[[arg_md5]][[YAML_BBI_ARGS]] <- args_vec
-      param_list[[arg_md5]][[WORKING_DIR]] <- model_dir
+  mod_keys <- purrr::map2(
+    all_mod_args,
+    mod_working_dirs,
+    c
+  )
+
+  purrr::map(
+    unique(mod_keys),
+    ~ {
+      key_idx <- purrr::map_lgl(mod_keys, identical, .)
+      key <- mod_keys[key_idx][[1L]]
+      # `key` can be of variable length, but the directory is always last
+      dir_idx <- length(key)
+      args <- key[-dir_idx]
+      keep_mod_idx <- purrr::map2_lgl(
+        all_mod_args,
+        mod_working_dirs,
+        ~ identical(.x, args) && identical(.y, key[dir_idx])
+      )
+      list(
+        bbi_args = args,
+        models = .mods[keep_mod_idx]
+      )
     }
-
-    # append model path
-    param_list[[arg_md5]][[YAML_MOD_PATH]] <- c(param_list[[arg_md5]][[YAML_MOD_PATH]], .mod[[YAML_MOD_PATH]])
-  }
-
-  return(param_list)
+  )
 }
-
 
 #' Combines NONMEM args that were passed into the function call with args that were parsed from a model yaml
 #' @param .func_args A named list of arguments for bbi, passed into submit_model function call
@@ -231,90 +250,6 @@ check_required_keys <- function(.list, .req) {
   all(.req %in% names(.list))
 }
 
-
-#' Get or set global model directory option
-#'
-#' Gets or sets `options('rbabylon.model_directory')`,
-#' which is used by default in functions like `read_model()`, `submit_model()` and `model_summary()` so that,
-#' once this is set, those functions can take a path relative to this directory instead of the working/script directory.
-#'
-#' @details
-#' `set_model_directory()` sets `options('rbabylon.model_directory')` to the absolute path of the directory passed to `.path`.
-#' Note that the directory must exist or this will error.
-#'
-#' `get_model_directory()` gets the path set to `options('rbabylon.model_directory')` and checks that it is both absolute and exists,
-#' erroring if it is not.
-#' @importFrom fs is_absolute_path dir_exists
-#' @export
-get_model_directory <- function() {
-  .mod_dir <- getOption("rbabylon.model_directory")
-  if (is.null(.mod_dir)) {
-    return(NULL)
-  }
-
-  if (!fs::is_absolute_path(.mod_dir)) {
-    strict_mode_error(paste(
-      glue("`options('rbabylon.model_directory')` must be set to an absolute path but is currently set to {.mod_dir}"),
-      "It is recommended to use `set_model_directory('...')` or put `options('rbabylon.model_directory' = normalizePath('...'))` in your .Rprofile for this project.",
-      sep = "\n"))
-  }
-
-  if (!fs::dir_exists(.mod_dir)) {
-    strict_mode_error(paste(
-      glue("`options('rbabylon.model_directory')` must be set to an existing directory but {.mod_dir} does not exist."),
-      "It is recommended to use `set_model_directory('...')` or put `options('rbabylon.model_directory' = normalizePath('...'))` in your .Rprofile for this project.",
-      sep = "\n"))
-  }
-
-  return(.mod_dir)
-}
-
-
-#' @rdname get_model_directory
-#' @param .path Path, either from working directory or absolute, that will be set as `options('rbabylon.model_directory')`
-#' @export
-set_model_directory <- function(.path) {
-  if (is.null(.path)) {
-    options('rbabylon.model_directory' = NULL)
-  } else {
-    options('rbabylon.model_directory' = normalizePath(.path, mustWork = TRUE))
-  }
-
-  cat(glue("options('rbabylon.model_directory') set to {options('rbabylon.model_directory')}"))
-}
-
-
-#' Private helper to search for babylon.yaml config files
-#' @param .config_path Path to config, possibly relative
-#' @param .model_dir absolute path to directory where model is be run from
-#' @importFrom fs is_file file_exists is_absolute_path
-#' @importFrom stringr str_detect
-#' @return path to babylon.yaml in `.config_path`, relative to `.model_dir`
-#' @keywords internal
-find_config_file_path <- function(.config_path, .model_dir) {
-  if (!fs::is_absolute_path(.model_dir)) {
-    stop(glue("USER SHOULDN'T SEE THIS ERROR: find_config_file_path(.model_dir) is not absolute: {.model_dir}"))
-  }
-
-  # if passed a directory, add babylon.yaml
-  if (!is_valid_yaml_extension(.config_path)) {
-    .config_path <- file.path(.config_path, "babylon.yaml")
-  }
-
-  .config_path <- tryCatch({
-    normalizePath(.config_path, mustWork = TRUE)
-  },
-  error = function(e) {
-    if (str_detect(e$message, "No such file or directory")) {
-      stop(glue("No babylon.yaml file exists at {.config_path} -- Either use `bbi_init('model/dir/')` to create one, or pass a valid path to the `.config_path` argument of `submit_model()`"))
-    }
-    stop(e$message)
-  })
-
-  .config_path <- fs::path_rel(.config_path, .model_dir)
-  return(.config_path)
-}
-
 #' Private helper to check if an object inherits a model class and error if not
 #' @param .mod The object to check
 #' @param .mod_types Character vector of acceptable classes, defaulting to `VALID_MOD_CLASSES`
@@ -346,8 +281,8 @@ check_model_object_list <- function(.mods, .mod_types = VALID_MOD_CLASSES) {
 #' @param .df The object to check
 #' @keywords internal
 check_bbi_run_log_df_object <- function(.df) {
-  if (!inherits(.df, "bbi_run_log_df")) {
-    stop(glue("Must pass a tibble of class `bbi_run_log_df`, but got object of class: `{paste(class(.df), collapse = ', ')}`"))
+  if (!inherits(.df, RUN_LOG_CLASS)) {
+    stop(glue("Must pass a tibble of class `{RUN_LOG_CLASS}`, but got object of class: `{paste(class(.df), collapse = ', ')}`"))
   }
   return(invisible(TRUE))
 }

@@ -39,10 +39,7 @@ modify_model_field <- function(.mod, .field, .value, .append = TRUE, .unique = T
   }
 
   # overwrite the yaml on disk with modified model
-  save_model_yaml(.mod)
-
-  # refresh md5 hash in model object
-  .mod[[YAML_YAML_MD5]] <- digest(file = get_yaml_path(.mod), algo = "md5")
+  .mod <- save_model_yaml(.mod)
 
   return(.mod)
 }
@@ -95,23 +92,24 @@ replace_decisions <- function(.mod, .decisions) {
 #' @param .based_on Character vector of relative paths to add to `based_on` field
 #' @export
 add_based_on <- function(.mod, .based_on) {
-  .mod <- modify_model_field(.mod = .mod,
-                             .field = YAML_BASED_ON,
-                             .value = safe_based_on(.mod[[WORKING_DIR]], .based_on),
-                             .append = TRUE)
-  return(.mod)
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_BASED_ON,
+    .value = safe_based_on(get_model_working_directory(.mod), .based_on),
+    .append = TRUE
+  )
 }
 
 #' @describeIn modify_model_field Replaces `based_on` field in a model object and corresponding YAML with new values
 #' @export
 replace_based_on <- function(.mod, .based_on) {
-  .mod <- modify_model_field(.mod = .mod,
-                             .field = YAML_BASED_ON,
-                             .value = safe_based_on(.mod[[WORKING_DIR]], .based_on),
-                             .append = FALSE)
-  return(.mod)
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_BASED_ON,
+    .value = safe_based_on(get_model_working_directory(.mod), .based_on),
+    .append = FALSE
+  )
 }
-
 
 #' @describeIn modify_model_field Replaces description field in a model object and corresponding YAML with new description
 #' @param .description Character scalar to use as replacement for the `description` field
@@ -141,10 +139,7 @@ add_bbi_args <- function(.mod, .bbi_args) {
   .mod[[YAML_BBI_ARGS]] <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])
 
   # overwrite the yaml on disk with modified model
-  save_model_yaml(.mod)
-
-  # refresh md5 hash in model object
-  .mod[[YAML_YAML_MD5]] <- digest(file = get_yaml_path(.mod), algo = "md5")
+  .mod <- save_model_yaml(.mod)
 
   return(.mod)
 }
@@ -162,10 +157,7 @@ replace_bbi_args <- function(.mod, .bbi_args) {
   .mod[[YAML_BBI_ARGS]] <- .bbi_args
 
   # overwrite the yaml on disk with modified model
-  save_model_yaml(.mod)
-
-  # refresh md5 hash in model object
-  .mod[[YAML_YAML_MD5]] <- digest(file = get_yaml_path(.mod), algo = "md5")
+  .mod <- save_model_yaml(.mod)
 
   return(.mod)
 }
@@ -192,18 +184,17 @@ safe_based_on <- function(.start, .based_on) {
 
   .paths <- file.path(.start, .based_on)
 
-  # check for either a .yaml or .yml file at each location
-  .paths_bool <- map_lgl(.paths, function(.p) {
-    .y1 <- sprintf("%s.yaml", tools::file_path_sans_ext(.p))
-    .y2 <- sprintf("%s.yml", tools::file_path_sans_ext(.p))
-    .bool_test <- fs::file_exists(c(.y1, .y2))
-    return(any(.bool_test))
-  })
+  # check for a .yaml file at each location
+  .paths_bool <-
+    .paths %>%
+    purrr::map(yaml_ext) %>%
+    purrr::map_lgl(fs::file_exists)
+
   names(.paths_bool) <- .paths
 
   if (!all(.paths_bool)) {
     strict_mode_error(paste(
-      glue("Parsed {length(.paths_bool)} models as `based_on` but cannot find .yaml or .yml files for {length(.paths_bool) - sum(.paths_bool)} of them: "),
+      glue("Parsed {length(.paths_bool)} models as `based_on` but cannot find .yaml files for {length(.paths_bool) - sum(.paths_bool)} of them: "),
       paste(names(which(!.paths_bool)), collapse = ', ')
     ))
   }
@@ -236,7 +227,7 @@ reconcile_yaml <- function(.mod) {
   .yaml_path <- get_yaml_path(.mod)
 
   # load model from yaml on disk
-  .loaded_mod <- read_model(.yaml_path)
+  .loaded_mod <- read_model(fs::path_ext_remove(.yaml_path))
 
   # overwrite values in memory from the ones on disk
   .new_mod <- combine_list_objects(.loaded_mod, .mod)
