@@ -23,14 +23,12 @@ If you are new to `rbabylon`, the ["Getting Started with rbabylon"](https://metr
 
 ## Setup
 
-There is some initial set up necessary for using `rbabylon`. Please refer to the ["Getting Started"](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html#setup) vignette, mentioned above, if you have not done this yet. Once this is done, load the library and set your modeling directory.
+There is some initial set up necessary for using `rbabylon`. Please refer to the ["Getting Started"](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html#setup) vignette, mentioned above, if you have not done this yet. Once this is done, load the library.
 
-```{r set_model_directory}
+```{r load packages}
 library(rbabylon)
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(readr))
-
-MODEL_DIR <- "../inst/param_examples"
 ```
 
 ```{r setup, include = FALSE}
@@ -47,9 +45,11 @@ if (Sys.which("bbi") == "") {
 # Parameter labels
 
 ## Create Model Object
-Our modeling directory contains a control stream and output directory, because the model has already been run.
+We have a control stream and output directory, because the model has already been run.
 
 ```{r first model}
+MODEL_DIR <- system.file("param_examples", package = "rbabylon")
+
 mod1 <- read_model(file.path(MODEL_DIR, "510"))
 class(mod1)
 ```
