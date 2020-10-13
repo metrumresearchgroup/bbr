@@ -1,3 +1,48 @@
+# rbabylon (development version)
+
+## Breaking changes
+
+* `.base_dir` becomes a required argument to `config_log()`, `run_log()`, and 
+  `summary_log()` (#227).
+
+* The `.directory` argument is removed from `copy_model_from()`, 
+  `model_summaries()`, `model_summary()`, `new_model()`, and `read_model()` 
+  (#217, #222, #224, #226).
+
+* The `.yaml_path` argument to `new_model()` becomes `.path` to reflect that a
+  single path identifies the output directory and the model and YAML files 
+  (without extension). `new_model()` and `read_model()` throw an error if a 
+  model file is not found at `.path` (#217).
+  
+### Removed
+
+* `as_model()` has been removed because it was not used (#194).
+
+* The `character` and `numeric` methods for `copy_model_from()`, 
+  `model_summaries()`, `model_summary()`, `submit_model()`, and 
+  `submit_models()` have been removed because they created an unnecessarily 
+  complicated interface (#188).
+  
+* `get_path_from_object()` has been removed and replaced by equivalent 
+  functionality, e.g., `get_model_path()` (#195).
+
+* `get_model_directory()` and `set_model_directory()` have been removed because
+  the `rbabylon.model_directory` option is no longer used (#229).
+
+* `yml_ext()` has been removed because support for the `yml` file extension has 
+  been removed (#211).
+
+## New features
+
+* `get_model_path()`, `get_output_dir()`, `get_yaml_path()` return the paths to 
+  the model file, the output directory, and the model YAML file, respectively,
+  replacing `get_path_from_object()` (#195).
+
+* The object returned by each of `add_config()`, `add_summary()`, 
+  `config_log()`, `run_log()`, and `summary_log()` inherits from abstract class
+  `bbi_log_df`. `get_model_path()`, `get_output_dir()`, and `get_yaml_path()` 
+  gain methods for this new class (#192).
+
 # rbabylon 0.8.0
 
 * Added vignette demonstrating new `summary_log()` functionality.
