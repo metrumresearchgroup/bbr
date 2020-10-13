@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Private helper to check if file has a valid NONMEM control stream extension — is_valid_nonmem_extension • rbabylon</title>
+<title>Get the working directory of a model object — get_model_working_directory • rbabylon</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,9 @@
 
 
 
-<meta property="og:title" content="Private helper to check if file has a valid NONMEM control stream extension — is_valid_nonmem_extension" />
-<meta property="og:description" content="Private helper to check if file has a valid NONMEM control stream extension" />
+<meta property="og:title" content="Get the working directory of a model object — get_model_working_directory" />
+<meta property="og:description" content="The working directory of a model object is the parent directory of the
+absolute model path." />
 
 
 
@@ -132,26 +133,30 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Private helper to check if file has a valid NONMEM control stream extension</h1>
+    <h1>Get the working directory of a model object</h1>
     
-    <div class="hidden name"><code>is_valid_nonmem_extension.Rd</code></div>
+    <div class="hidden name"><code>get_model_working_directory.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Private helper to check if file has a valid NONMEM control stream extension</p>
+    <p>The working directory of a model object is the parent directory of the
+absolute model path.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>is_valid_nonmem_extension</span>(<span class='no'>.path</span>)</pre>
+    <pre class="usage"><span class='fu'>get_model_working_directory</span>(<span class='no'>.mod</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>.path</th>
-      <td><p>File path to check</p></td>
+      <th>.mod</th>
+      <td><p>A model object.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>The path to the working directory.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

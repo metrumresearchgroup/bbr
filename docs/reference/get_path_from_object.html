@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -36,11 +40,8 @@
 
 
 <meta property="og:title" content="Get path from bbi object — get_path_from_object" />
-<meta property="og:description" content="Builds the full path to a file that is stored as part of a bbi_... S3 object.
-Note that calling get_path_from_object() directly is not recommended for most users
-because it requires knowing about the internal structure of the model object.
-Instead we recommend using the friendlier helpers get_model_path(), get_yaml_path(), get_output_dir() when possible." />
-<meta name="twitter:card" content="summary" />
+<meta property="og:description" content="bbi_{.model_type}_model objects correspond to multiple files on disk. These functions
+provide an easy way to retrieve the absolute path to these files." />
 
 
 
@@ -58,7 +59,7 @@ Instead we recommend using the friendlier helpers get_model_path(), get_yaml_pat
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -72,7 +73,7 @@ Instead we recommend using the friendlier helpers get_model_path(), get_yaml_pat
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.8.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0</span>
       </span>
     </div>
 
@@ -138,27 +139,32 @@ Instead we recommend using the friendlier helpers get_model_path(), get_yaml_pat
     </div>
 
     <div class="ref-description">
-    <p>Builds the full path to a file that is stored as part of a <code>bbi_...</code> S3 object.
-Note that calling <code>get_path_from_object()</code> directly is not recommended for most users
-because it requires knowing about the internal structure of the model object.
-Instead we recommend using the friendlier helpers <code>get_model_path()</code>, <code>get_yaml_path()</code>, <code>get_output_dir()</code> when possible.</p>
+    <p><code>bbi_{.model_type}_model</code> objects correspond to multiple files on disk. These functions
+provide an easy way to retrieve the absolute path to these files.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_path_from_object</span>(<span class='no'>.bbi_object</span>, <span class='no'>.key</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+    <pre class="usage"><span class='fu'>get_model_path</span>(<span class='no'>.bbi_object</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
-<span class='co'># S3 method for default</span>
-<span class='fu'>get_path_from_object</span>(<span class='no'>.bbi_object</span>, <span class='no'>.key</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='co'># S3 method for bbi_nonmem_model</span>
+<span class='fu'>get_model_path</span>(<span class='no'>.bbi_object</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
-<span class='co'># S3 method for character</span>
-<span class='fu'>get_path_from_object</span>(<span class='no'>.bbi_object</span>, <span class='no'>.key</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-
-<span class='co'># S3 method for bbi_run_log_df</span>
-<span class='fu'>get_path_from_object</span>(<span class='no'>.bbi_object</span>, <span class='no'>.key</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-
+<span class='co'># S3 method for bbi_log_df</span>
 <span class='fu'>get_model_path</span>(<span class='no'>.bbi_object</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='fu'>get_output_dir</span>(<span class='no'>.bbi_object</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
+<span class='co'># S3 method for bbi_nonmem_model</span>
+<span class='fu'>get_output_dir</span>(<span class='no'>.bbi_object</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+
+<span class='co'># S3 method for bbi_log_df</span>
+<span class='fu'>get_output_dir</span>(<span class='no'>.bbi_object</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+
+<span class='fu'>get_yaml_path</span>(<span class='no'>.bbi_object</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+
+<span class='co'># S3 method for bbi_nonmem_model</span>
+<span class='fu'>get_yaml_path</span>(<span class='no'>.bbi_object</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+
+<span class='co'># S3 method for bbi_log_df</span>
 <span class='fu'>get_yaml_path</span>(<span class='no'>.bbi_object</span>, <span class='kw'>.check_exists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -166,50 +172,22 @@ Instead we recommend using the friendlier helpers <code>get_model_path()</code>,
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>.bbi_object</th>
-      <td><p>The model object to query. Could be
+      <td><p>The object to query. Could be
 a <code>bbi_{.model_type}_model</code> object,
-a  file path to a model,
-a tibble of class <code>bbi_run_log_df</code>,
-or some other custom object containing model data.</p></td>
-    </tr>
-    <tr>
-      <th>.key</th>
-      <td><p>The key that contains the relative path.</p></td>
+or a tibble of class <code>bbi_log_df</code>.</p></td>
     </tr>
     <tr>
       <th>.check_exists</th>
-      <td><p>If <code>TRUE</code>, the default, function will check if a file exists at the returned path and error if it does not. If <code>FALSE</code>, will return the path without checking.</p></td>
+      <td><p>If <code>TRUE</code>, the default, will throw an error if the file does not exist</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>All helper functions mentioned above call <code>get_path_from_object()</code> under the hood and will dispatch
-via S3 in the same way that it would.</p>
-<p>Note that all paths saved in the object or accompanying YAML will be relative <strong>to the location of that YAML</strong>
-When the object is loaded into memory, the absolute path to the YAML is stored in the object.
-These functions simply stitch together that path with the requested relative path.
-As long as the YAML has not moved since it was read into memory, this will work.</p>
-    <h2 class="hasAnchor" id="methods-by-class-"><a class="anchor" href="#methods-by-class-"></a>Methods (by class)</h2>
-
-    
-<ul>
-<li><p><code>default</code>: The default method attempts to extract the path from any object passed to it,
-but is designed for a list of class <code>bbi_{.model_type}_model</code> or something similar.</p></li>
-<li><p><code>character</code>: Takes a file path to a model that can be loaded with <code><a href='read_model.html'>read_model(.bbi_object)</a></code></p></li>
-<li><p><code>bbi_run_log_df</code>: Takes a tibble of class <code>bbi_run_log_df</code> and returns a character vector
-of one path per row in the tibble.</p></li>
-</ul>
 
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#details">Details</a></li>
-      <li><a href="#methods-by-class-">Methods (by class)</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -220,7 +198,7 @@ of one path per row in the tibble.</p></li>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>
