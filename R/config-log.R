@@ -78,7 +78,7 @@ config_log_impl <- function(.mods) {
 
   check_model_object_list(.mods)
 
-  out_dirs <- map_chr(.mods, get_output_dir)
+  out_dirs <- map_chr(.mods, get_output_dir, .check_exists = FALSE)
   json_files <- file.path(out_dirs, "bbi_config.json")
 
   # check for files that don't exist
