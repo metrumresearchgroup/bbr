@@ -38,6 +38,13 @@ test_that("modify_model_field() de-duplication works", {
   expect_identical(new_mod[[YAML_TAGS]], c(ORIG_TAGS, uniq_tags))
 })
 
+test_that("modify_model_field() errors with .append=T and .remove=T", {
+  expect_error(
+    modify_model_field(MOD1, YAML_TAGS, ORIG_TAGS, .append = TRUE, .remove = TRUE),
+    regexp = "cannot have both"
+  )
+})
+
 test_that("add_tags() and replace_tags() work correctly", {
   temp_mod_path <- create_temp_model()
 
@@ -52,6 +59,25 @@ test_that("add_tags() and replace_tags() work correctly", {
   # test_replacing
   new_mod <- replace_tags(new_mod, NEW_TAGS)
   expect_identical(new_mod[[YAML_TAGS]], NEW_TAGS)
+})
+
+test_that("remove_tags() works correctly", {
+  temp_mod_path <- create_temp_model()
+  test_tags <- c("one", "two", "three", "four", "five")
+  rem_tags <- c("two", "four", "bad")
+  ref_tags <- c("one", "three", "five")
+
+  # make a model object and replace the tags
+  new_mod <- read_model(temp_mod_path)
+  new_mod <- replace_tags(new_mod, test_tags)
+  expect_identical(new_mod[[YAML_TAGS]], test_tags)
+
+  # test removing
+  new_mod <- expect_warning(
+    remove_tags(new_mod, rem_tags),
+    regexp = "does not contain any of the following.+bad"
+  )
+  expect_identical(new_mod[[YAML_TAGS]], ref_tags)
 })
 
 test_that("add_decisions() and replace_decisions() work correctly", {
