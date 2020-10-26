@@ -35,7 +35,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
     })
 
     # create new model
-    mod2 <- MOD1 %>% copy_model_from(basename(NEW_MOD2), .description = "number 2")
+    mod2 <- MOD1 %>% copy_model_from(basename(NEW_MOD2))
 
     # copy output directory (to simulate model run)
     fs::dir_copy(MOD1_PATH, NEW_MOD2)
@@ -84,7 +84,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
       })
 
       # create new model
-      mod2 <- MOD1 %>% copy_model_from(basename(NEW_MOD2), .description = "number 2")
+      mod2 <- MOD1 %>% copy_model_from(basename(NEW_MOD2))
 
       # copy output directory (to simulate model run)
       fs::dir_copy(MOD1_PATH, NEW_MOD2)
@@ -141,7 +141,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
     })
 
     # create new model
-    mod2 <- MOD1 %>% copy_model_from(basename(NEW_MOD2), .description = "number 2")
+    mod2 <- MOD1 %>% copy_model_from(basename(NEW_MOD2))
 
     # copy head of .lst file (to simulate partially done model run)
     fs::dir_create(NEW_MOD2)
@@ -160,7 +160,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
     })
 
     # create new model
-    mod2 <- MOD1 %>% copy_model_from(basename(NEW_MOD2), .description = "number 2")
+    mod2 <- MOD1 %>% copy_model_from(basename(NEW_MOD2))
 
     # copy output directory (to simulate model run)
     fs::dir_copy(MOD1_PATH, NEW_MOD2)

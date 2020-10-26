@@ -10,11 +10,11 @@ test_that("copy_from_model creates accurate copy", {
   on.exit({ cleanup() })
 
   # run copy_model_from
-  new_mod <- copy_model_from(MOD1, basename(NEW_MOD2), NEW_DESC, .add_tags = NEW_TAGS)
+  new_mod <- copy_model_from(MOD1, basename(NEW_MOD2), .add_tags = NEW_TAGS)
 
   # check that everything is copied through in the object
   expect_identical(class(new_mod), MOD_CLASS_LIST)
-  expect_identical(new_mod[[YAML_DESCRIPTION]], NEW_DESC)
+  expect_identical(new_mod[[YAML_DESCRIPTION]], basename(NEW_MOD2))
   expect_identical(new_mod[[YAML_BASED_ON]], "1")
   expect_identical(new_mod[[YAML_TAGS]], NEW_TAGS)
   expect_equal(new_mod[[YAML_BBI_ARGS]], list(overwrite = TRUE, threads = 4L))
@@ -22,14 +22,14 @@ test_that("copy_from_model creates accurate copy", {
   # check that everything is copied through in the YAML
   new_yaml <- yaml::read_yaml(yaml_ext(NEW_MOD2))
 
-  expect_identical(new_yaml[[YAML_DESCRIPTION]], NEW_DESC)
+  expect_identical(new_yaml[[YAML_DESCRIPTION]], basename(NEW_MOD2))
   expect_identical(new_yaml[[YAML_BASED_ON]], "1")
   expect_identical(new_yaml[[YAML_TAGS]], NEW_TAGS)
   expect_equal(new_yaml[[YAML_BBI_ARGS]], list(overwrite = TRUE, threads = 4L))
 
   # check the control stream is modified
   new_mod_str <- ctl_ext(NEW_MOD2) %>% readr::read_file()
-  new_desc_pattern <- paste0("\\$PROBLEM ", get_model_id(NEW_MOD2), " ", NEW_DESC, "\n\n\\$INPUT")
+  new_desc_pattern <- paste0("\\$PROBLEM ", basename(NEW_MOD2), "\n\n\\$INPUT")
   expect_true(grepl(new_desc_pattern, new_mod_str))
 })
 
@@ -76,7 +76,7 @@ test_that("copy_from_model.bbi_nonmem_model works with numeric input", {
   # copy with numeric
   num_input <- as.numeric(basename(NEW_MOD2))
   expect_equal(num_input, 2)
-  copy_model_from(MOD1, num_input, NEW_DESC, .add_tags = NEW_TAGS)
+  copy_model_from(MOD1, num_input, .add_tags = NEW_TAGS)
 
   # check that the model was created
   new_mod <- read_model(NEW_MOD2)
@@ -97,7 +97,7 @@ test_that("copy_from_model .overwrite=TRUE works", {
   fs::file_copy(ctl_ext(YAML_TEST_FILE), new_ctl_path)
 
   # copy with .overwrite=TRUE
-  copy_model_from(MOD1, basename(NEW_MOD2), NEW_DESC, .overwrite=TRUE)
+  copy_model_from(MOD1, basename(NEW_MOD2), .overwrite=TRUE)
 
   # check the control stream is modified by overwrite
   new_mod_str <- readr::read_file(new_ctl_path)
@@ -105,7 +105,7 @@ test_that("copy_from_model .overwrite=TRUE works", {
   orig_desc_pattern <- paste0("\\$PROBLEM ", DESC_IN_CTL, "\n\n\\$INPUT")
   expect_false(grepl(orig_desc_pattern, new_mod_str))
 
-  new_desc_pattern <- paste0("\\$PROBLEM ", get_model_id(NEW_MOD2), " ", NEW_DESC, "\n\n\\$INPUT")
+  new_desc_pattern <- paste0("\\$PROBLEM ", basename(NEW_MOD2), "\n\n\\$INPUT")
   expect_true(grepl(new_desc_pattern, new_mod_str))
 })
 
@@ -123,7 +123,7 @@ test_that("copy_from_model .overwrite=FALSE works", {
 
   # copy with .overwrite=FALSE
   expect_error(
-    copy_model_from(MOD1, basename(NEW_MOD2), NEW_DESC, .overwrite=FALSE),
+    copy_model_from(MOD1, basename(NEW_MOD2), .overwrite=FALSE),
     regexp = "File already exists at"
   )
 
@@ -133,7 +133,7 @@ test_that("copy_from_model .overwrite=FALSE works", {
   orig_desc_pattern <- paste0("\\$PROBLEM ", DESC_IN_CTL, "\n\n\\$INPUT")
   expect_true(grepl(orig_desc_pattern, new_mod_str))
 
-  new_desc_pattern <- paste0("\\$PROBLEM ", get_model_id(NEW_MOD2), " ", NEW_DESC, "\n\n\\$INPUT")
+  new_desc_pattern <- paste0("\\$PROBLEM ", basename(NEW_MOD2), "\n\n\\$INPUT")
   expect_false(grepl(new_desc_pattern, new_mod_str))
 })
 
@@ -150,7 +150,7 @@ test_that("copy_model_from() supports `.new_model` containing a period", {
   expect_false(fs::file_exists(new_yaml))
   on.exit(fs::file_delete(c(new_ctl, new_yaml)))
 
-  new_mod <- copy_model_from(temp_mod, new_mod_path, "baz")
+  new_mod <- copy_model_from(temp_mod, new_mod_path)
   expect_true(inherits(new_mod, NM_MOD_CLASS))
   expect_true(fs::file_exists(new_ctl))
   expect_true(fs::file_exists(new_yaml))

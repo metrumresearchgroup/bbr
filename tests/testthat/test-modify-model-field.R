@@ -280,5 +280,5 @@ test_that("copy_model_from() fails YAML out of sync (testing check_yaml_in_sync)
   readr::write_lines("naw: dawg", temp_yaml, append = TRUE)
 
   # try to submit_model and get error
-  expect_error(copy_model_from(new_mod, "naw", "dawg"), regexp = "Model NOT in sync with corresponding YAML file")
+  expect_error(copy_model_from(new_mod, "foo"), regexp = "Model NOT in sync with corresponding YAML file")
 })
