@@ -44,6 +44,9 @@ DESC_IN_CTL <- "PK model 1 cmt base"
 ORIG_TAGS <- c("acop tag", "other tag")
 NEW_TAGS <- c("new tag 1", "new tag 2")
 
+NEW_NOTES <- c("I like it", "Actually I don't like it")
+EXTRA_NOTE <- "Oh wait I do like it"
+
 NEW_TEXT1 <- c("naw", "paw")
 NEW_TEXT2 <- c("all", "done")
 
@@ -67,10 +70,10 @@ MOD2_ABS_PATH <- file.path(getwd(), NEW_MOD2)
 MOD3_ABS_PATH <- file.path(getwd(), NEW_MOD3)
 MOD4_ABS_PATH <- file.path(getwd(), LEVEL2_MOD)
 
-RUN_LOG_ROWS <- 3
-RUN_LOG_COLS <- 8
+RUN_LOG_ROWS <- 3L
+RUN_LOG_COLS <- 9L
 CONFIG_COLS <- 8L
-SUM_LOG_COLS <- 21
+SUM_LOG_COLS <- 21L
 
 CONFIG_DATA_PATH <- "../../data/acop.csv"
 CONFIG_DATA_MD5 <- "4ddb44da897c26681d892aa7be99f74b"

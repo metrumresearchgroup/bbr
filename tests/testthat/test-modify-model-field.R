@@ -80,6 +80,36 @@ test_that("remove_tags() works correctly", {
   expect_identical(new_mod[[YAML_TAGS]], ref_tags)
 })
 
+test_that("add_notes() and replace_notes() work correctly", {
+  temp_mod_path <- create_temp_model()
+  new_mod <- read_model(temp_mod_path)
+  expect_null(new_mod[[YAML_NOTES]])
+
+  # test adding
+  new_mod <- add_notes(new_mod, c(NEW_NOTES, EXTRA_NOTE))
+  expect_identical(new_mod[[YAML_NOTES]], c(NEW_NOTES, EXTRA_NOTE))
+
+  # test_replacing
+  new_mod <- replace_notes(new_mod, NEW_NOTES)
+  expect_identical(new_mod[[YAML_NOTES]], NEW_NOTES)
+})
+
+test_that("remove_notes() works correctly", {
+  temp_mod_path <- create_temp_model()
+
+  # make a model object and replace the notes
+  new_mod <- read_model(temp_mod_path)
+  new_mod <- replace_notes(new_mod, c(NEW_NOTES, EXTRA_NOTE))
+  expect_identical(new_mod[[YAML_NOTES]], c(NEW_NOTES, EXTRA_NOTE))
+
+  # test removing
+  new_mod <- expect_warning(
+    remove_notes(new_mod, c(EXTRA_NOTE, "bad note")),
+    regexp = "does not contain any of the following.+bad"
+  )
+  expect_identical(new_mod[[YAML_NOTES]], NEW_NOTES)
+})
+
 test_that("add_decisions() and replace_decisions() work correctly", {
   temp_mod_path <- create_temp_model()
 
