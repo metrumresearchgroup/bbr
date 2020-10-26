@@ -135,9 +135,11 @@ replace_based_on <- function(.mod, .based_on) {
 }
 
 #' @describeIn modify_model_field Replaces description field in a model object and corresponding YAML with new description
+#' @importFrom checkmate assert_scalar
 #' @param .description Character scalar to use as replacement for the `description` field
 #' @export
 replace_description <- function(.mod, .description) {
+  checkmate::assert_scalar(.description)
   .mod <- modify_model_field(.mod = .mod,
                              .field = YAML_DESCRIPTION,
                              .value = .description,

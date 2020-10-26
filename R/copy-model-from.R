@@ -14,8 +14,10 @@
 #'   to the YAML file and model file, both without extension, and the output
 #'   directory (once the model is run). Numeric values will be coerced to
 #'   character. See examples for usage.
-#' @param .description Description of new model run. This will be stored in the
-#'   yaml (to be used later in `run_log()`).
+#' @param .description Character scalar description of new model run. This will
+#'   be stored in the yaml (and can be viewed later in `run_log()`). If `NULL`,
+#'   the default, will be set to `basename(.path)`. This will be passed into
+#'   the new model file if `.update_model_file=TRUE`.
 #' @param .based_on_additional Character vector of path(s) to other models that
 #'   this model was "based on." These are used to reconstuct model developement
 #'   and ancestry. **Paths must be relative to `.new_model` path.** Note that
@@ -55,7 +57,7 @@
 copy_model_from <- function(
   .parent_mod,
   .new_model,
-  .description,
+  .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
   .inherit_tags = FALSE,
@@ -70,7 +72,7 @@ copy_model_from <- function(
 copy_model_from.bbi_nonmem_model <- function(
   .parent_mod,
   .new_model,
-  .description,
+  .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
   .inherit_tags = FALSE,
@@ -104,8 +106,8 @@ copy_model_from.bbi_nonmem_model <- function(
 #' Create new .mod/ctl and new .yaml files based on a previous model. Used for iterating on model development.
 #' Also fills in necessary YAML fields for using `run_log()` later.
 #' @param .parent_mod S3 object of class `bbi_nonmem_model` to be used as the basis for copy.
-#' @param .description Description of new model run. This will be stored in the yaml (to be used later in `run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.
 #' @param .update_model_file If `TRUE`, the default, update the `$PROBLEM` line in the new control stream. If `FALSE`, `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.
+#' @inheritParams copy_model_from
 #' @importFrom fs file_copy path_rel is_absolute_path
 #' @importFrom readr read_file write_file
 #' @importFrom stringr str_replace
@@ -117,7 +119,7 @@ copy_model_from.bbi_nonmem_model <- function(
 copy_nonmem_model_from <- function(
   .parent_mod,
   .new_model,
-  .description,
+  .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
   .inherit_tags = FALSE,
@@ -135,6 +137,12 @@ copy_nonmem_model_from <- function(
 
   # check parent against YAML
   check_yaml_in_sync(.parent_mod)
+
+  # build description
+  if (is.null(.description)) {
+    .description <- basename(.new_model)
+  }
+  checkmate::assert_scalar(.description)
 
   # build based_on
   if(!fs::is_absolute_path(.new_model)) {
@@ -191,17 +199,13 @@ copy_control_stream <- function(.parent_model_path, .new_model_path, .overwrite,
       stop("If `.update_model_file` is TRUE, user must specify a `.description` for the new model.")
     }
 
-    # get model id's
-    parent_mod_id <- .parent_model_path %>% get_model_id()
-    new_mod_id <- .new_model_path %>% get_model_id()
-
     # read parent control stream
     mod_str <- .parent_model_path %>% read_file()
 
     # replace the $PROBLEM line(s)
     mod_str <- str_replace(mod_str,
                            "\\$PROB(.|\n)*?\\$",
-                           as.character(glue("$PROBLEM {new_mod_id} {.description}\n\n$")))
+                           as.character(glue("$PROBLEM {.description}\n\n$")))
 
     # read parent control stream
     write_file(mod_str, .new_model_path)
