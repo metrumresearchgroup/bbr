@@ -125,6 +125,7 @@ remove_notes <- function(.mod, .notes) {
 #' @param .decisions Character vector to add to `decisions` field
 #' @export
 add_decisions <- function(.mod, .decisions) {
+  warning("The `decisions` field has been replaced by `notes`. At some point it will be removed. Please use `add_notes()` going forward.")
   .mod <- modify_model_field(.mod = .mod,
                              .field = YAML_DECISIONS,
                              .value = .decisions,
@@ -136,6 +137,7 @@ add_decisions <- function(.mod, .decisions) {
 #' @param .decisions Character vector to use as replacement
 #' @export
 replace_decisions <- function(.mod, .decisions) {
+  warning("The `decisions` field has been replaced by `notes`. At some point it will be removed. Please use `replace_notes()` going forward.")
   .mod <- modify_model_field(.mod = .mod,
                              .field = YAML_DECISIONS,
                              .value = .decisions,
