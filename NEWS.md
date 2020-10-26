@@ -1,3 +1,31 @@
+# rbabylon (development)
+
+## New features and changes
+
+* Added `remove_tags()` function for removing specific strings added to the
+model object `tags` field. (#252)
+  
+* `.description` is no longer a required argument for `new_model()` or
+`copy_model_from()`. The default is `NULL`, in which case it is set to
+`basename(.path)` for `new_model()` or `basename(.new_model)` for
+`copy_model_from()`. (#256)
+
+* Added `notes` field to model object (and `bbi_run_log_df`) and associated
+helpers `add_notes()`, `replace_notes()`, `remove_notes()`. This will replace
+`decisions`, to reflect the fact that users will want to use this field
+throughout the modeling process, not only at the end once some "decisions" have
+been reached. `add_decisions()` and `replace_decisions()` now print a warning
+telling the user that they will be deprecated in the future and encouraging use
+of their `_notes` counterparts. (#258)
+  
+## Bug fixes
+
+* `config_log()` and `add_config()` are supposed to warn a user if models are
+found that do _not_ have a corresponding `bbi_config.json` file (i.e. have not
+yet been run, or did not finish successfully). However, if there is no output
+directory at all for a given model (it has never been run) then these functions
+would error. Now they correctly warn in that scenario. (#253)
+
 # rbabylon 0.9.0
 
 ## Breaking changes
