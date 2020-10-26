@@ -88,6 +88,39 @@ remove_tags <- function(.mod, .tags) {
   return(.mod)
 }
 
+
+#' @describeIn modify_model_field Add notes to a model object and corresponding YAML
+#' @param .notes Character vector to add to `notes` field
+#' @export
+add_notes <- function(.mod, .notes) {
+  .mod <- modify_model_field(.mod = .mod,
+                             .field = YAML_NOTES,
+                             .value = .notes,
+                             .append = TRUE)
+  return(.mod)
+}
+
+#' @describeIn modify_model_field Replaces notes on a model object and corresponding YAML with new notes
+#' @export
+replace_notes <- function(.mod, .notes) {
+  .mod <- modify_model_field(.mod = .mod,
+                             .field = YAML_NOTES,
+                             .value = .notes,
+                             .append = FALSE)
+  return(.mod)
+}
+
+#' @describeIn modify_model_field Removes notes from a model object and corresponding YAML
+#' @export
+remove_notes <- function(.mod, .notes) {
+  .mod <- modify_model_field(.mod = .mod,
+                             .field = YAML_NOTES,
+                             .value = .notes,
+                             .append = FALSE,
+                             .remove = TRUE)
+  return(.mod)
+}
+
 #' @describeIn modify_model_field Append new decisions to the one(s) in a model object and corresponding YAML
 #' @param .decisions Character vector to add to `decisions` field
 #' @export
