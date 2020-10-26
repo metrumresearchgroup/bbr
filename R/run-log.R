@@ -112,7 +112,7 @@ add_log_impl <- function(.log_df, .impl_func, ...) {
 
   # get config log
   mod_list <- map(.log_df[[ABS_MOD_PATH]], read_model)
-  .new_df <- .impl_func(mod_list, ...)
+  .new_df <- .impl_func(mod_list, ...) %>% select(-{{RUN_ID_COL}})
 
   # join to log df
   df <- left_join(
@@ -150,6 +150,8 @@ run_log_entry <- function(.mod) {
     !!YAML_NOTES        := .mod[[YAML_NOTES]] %>% list(),
     !!YAML_DECISIONS    := .mod[[YAML_DECISIONS]] %>% list()
   )
+
+  entry_df <- add_run_id_col(entry_df)
 
   # check that it is only one row
   if (nrow(entry_df) != 1) {

@@ -63,6 +63,7 @@ YAML_REQ_INPUT_KEYS <- c(
 )
 
 ABS_MOD_PATH <- "absolute_model_path"
+RUN_ID_COL <- "run"
 
 # keys required to create a model object
 MODEL_REQ_INPUT_KEYS <- c(
@@ -83,6 +84,7 @@ MODEL_REQ_KEYS <- c(
 # columns required for a run log df
 RUN_LOG_REQ_COLS <- c(
   ABS_MOD_PATH,
+  RUN_ID_COL,
   YAML_YAML_MD5,
   YAML_MOD_TYPE,
   YAML_DESCRIPTION,
@@ -170,6 +172,7 @@ SUMMARY_LIST_REQ_KEYS <- c(
 # columns required for a summary log df
 SUMMARY_LOG_REQ_COLS <- c(
   ABS_MOD_PATH,
+  RUN_ID_COL,
   SL_SUMMARY,
   SL_ERROR,
   SL_FAIL_FLAGS,
@@ -189,6 +192,7 @@ CONFIG_KEEPERS <- c(
 
 CONFIG_LOG_REQ_COLS <- c(
   ABS_MOD_PATH,
+  RUN_ID_COL,
   CONFIG_KEEPERS
 )
 

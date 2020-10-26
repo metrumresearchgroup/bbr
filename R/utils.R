@@ -233,6 +233,17 @@ combine_list_objects <- function(.new_list, .old_list, .append = FALSE) {
   return(.out_list)
 }
 
+#' add run col to bbi_log_df
+#' @param df tibble to modify
+#' @importFrom dplyr mutate select everything
+#' @keywords internal
+add_run_id_col <- function(df) {
+  df %>%
+    mutate(!!RUN_ID_COL := basename(.data[[ABS_MOD_PATH]])) %>%
+    select(ABS_MOD_PATH, RUN_ID_COL, everything())
+}
+
+
 #' Print valid .bbi_args
 #'
 #' Prints all valid arguments to pass in to `.bbi_args=list()` argument of `submit_model()` or `model_summary()`
