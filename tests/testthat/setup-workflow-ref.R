@@ -71,9 +71,9 @@ MOD3_ABS_PATH <- file.path(getwd(), NEW_MOD3)
 MOD4_ABS_PATH <- file.path(getwd(), LEVEL2_MOD)
 
 RUN_LOG_ROWS <- 3L
-RUN_LOG_COLS <- 9L
-CONFIG_COLS <- 8L
-SUM_LOG_COLS <- 21L
+RUN_LOG_COLS <- 10L
+CONFIG_COLS <- 9L
+SUM_LOG_COLS <- 22L
 
 CONFIG_DATA_PATH <- "../../data/acop.csv"
 CONFIG_DATA_MD5 <- "4ddb44da897c26681d892aa7be99f74b"

@@ -62,7 +62,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
 
   test_that("add_summary() works correctly", {
     sum_df <- run_log(MODEL_DIR) %>% add_summary()
-    test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3, LEVEL2_MOD), RUN_LOG_COLS+SUM_LOG_COLS-1)
+    test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3, LEVEL2_MOD), RUN_LOG_COLS+SUM_LOG_COLS-2)
     expect_identical(sum_df$model_type, rep("nonmem", RUN_LOG_ROWS+1))
     expect_identical(sum_df$yaml_md5, ALL_MODS_YAML_MD5)
   })
@@ -73,10 +73,10 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
     add_df <- log_df %>% add_summary()
 
     # should have all columns from both (minus the join key)
-    expect_identical(names(add_df), c(names(log_df), names(sum_df)[2:length(names(sum_df))]))
+    expect_identical(names(add_df), c(names(log_df), names(sum_df)[3:length(names(sum_df))]))
 
     # check one col to make sure it matches
-    col_to_check <- names(sum_df)[2]
+    col_to_check <- names(sum_df)[3]
     expect_identical(sum_df[[col_to_check]], add_df[[col_to_check]])
   })
 

@@ -124,7 +124,7 @@ test_that("add_config() works correctly", {
   check_config_ref(
     log_df,
     c("1", "2", "3", "1"),
-    RUN_LOG_COLS + CONFIG_COLS - 1,
+    RUN_LOG_COLS + CONFIG_COLS-2,
     run_status
   )
 })
@@ -135,10 +135,10 @@ test_that("add_config() has correct columns", {
   add_df <- log_df %>% add_config()
 
   # should have all columns from both (minus the join key)
-  expect_identical(names(add_df), c(names(log_df), names(conf_df)[2:length(names(conf_df))]))
+  expect_identical(names(add_df), c(names(log_df), names(conf_df)[3:length(names(conf_df))]))
 
   # check one col to make sure it matches
-  col_to_check <- names(conf_df)[2]
+  col_to_check <- names(conf_df)[3]
   expect_identical(conf_df[[col_to_check]], add_df[[col_to_check]])
 })
 
@@ -150,7 +150,7 @@ missing_idx <- c(2L, 3L)
 test_that("add_config() works correctly with missing json", {
   log_df <- expect_warning(run_log(MODEL_DIR) %>% add_config(), regexp = "Found only 2 bbi_config.json files for 4 models")
   expect_equal(nrow(log_df), RUN_LOG_ROWS+1)
-  expect_equal(ncol(log_df), RUN_LOG_COLS+CONFIG_COLS-1)
+  expect_equal(ncol(log_df), RUN_LOG_COLS+CONFIG_COLS-2)
   expect_false(any(duplicated(log_df[[ABS_MOD_PATH]])))
 
   # run_log fields
