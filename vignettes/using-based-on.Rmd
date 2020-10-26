@@ -62,16 +62,13 @@ The modeling process will always start with an initial model, which we create wi
 MODEL_DIR <- "../nonmem"
 ```
 ```{r first model}
-mod1 <- new_model(
-  file.path(MODEL_DIR, 1), 
-  .description = "one compartment base model"
-)
+mod1 <- new_model(file.path(MODEL_DIR, 1))
 ```
 
 From there, the iterative model development process proceeds. The `copy_model_from()` function will do several things, including creating a new model file and filling in some relevant metadata. Notably, it will also add the model that you copied _from_ into the `based_on` field for the new model.
 
 ```{r copy_model 2}
-mod2 <- copy_model_from(.parent_mod = mod1, .new_model = 2, .description = "two compartment base model")
+mod2 <- copy_model_from(.parent_mod = mod1, .new_model = 2)
 
 mod2$based_on
 ```
@@ -82,19 +79,19 @@ mod2$based_on
 ```{r big copy}
 # ...submit mod2...look at diagnostics...decide on changes for next iteration...
 
-mod3 <- copy_model_from(.parent_mod = mod2, .new_model = 3, .description = "two compartment with residual errors")
+mod3 <- copy_model_from(mod2, 3)
 
 # ...submit mod3...look at diagnostics...decide on changes for next iteration...
 
-mod4 <- copy_model_from(.parent_mod = mod3, .new_model = 4, .description = "two compartment with residual errors and added covariates")
+mod4 <- copy_model_from(mod3, 4)
 
 # ...submit mod4...look at diagnostics...decide to go back to mod2 as basis for next iteration...
 
-mod5 <- copy_model_from(.parent_mod = mod2, .new_model = 5, .description = "two compartment base model with added covariates")
+mod5 <- copy_model_from(mod2, 5)
 
 # ...submit mod5...look at diagnostics...decide on changes for next iteration...
 
-mod6 <- copy_model_from(.parent_mod = mod5, .new_model = 6, .description = "two compartment base model with added covariates and something else")
+mod6 <- copy_model_from(mod5, 6)
 
 # ...submit mod6...look at diagnostics...decide you're done!
 ```

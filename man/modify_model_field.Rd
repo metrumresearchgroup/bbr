@@ -5,6 +5,9 @@
 \alias{add_tags}
 \alias{replace_tags}
 \alias{remove_tags}
+\alias{add_notes}
+\alias{replace_notes}
+\alias{remove_notes}
 \alias{add_decisions}
 \alias{replace_decisions}
 \alias{add_based_on}
@@ -28,6 +31,12 @@ add_tags(.mod, .tags)
 replace_tags(.mod, .tags)
 
 remove_tags(.mod, .tags)
+
+add_notes(.mod, .notes)
+
+replace_notes(.mod, .notes)
+
+remove_notes(.mod, .notes)
 
 add_decisions(.mod, .decisions)
 
@@ -58,6 +67,8 @@ replace_bbi_args(.mod, .bbi_args)
 
 \item{.tags}{Character vector to add to \code{tags} field}
 
+\item{.notes}{Character vector to add to \code{notes} field}
+
 \item{.decisions}{Character vector to use as replacement}
 
 \item{.based_on}{Character vector of relative paths to add to \code{based_on} field}
@@ -85,6 +96,12 @@ memory with an md5 digest of the newly written YAML.
 \item \code{replace_tags}: Replaces tags on a model object and corresponding YAML with new tags
 
 \item \code{remove_tags}: Removes tags from a model object and corresponding YAML
+
+\item \code{add_notes}: Add notes to a model object and corresponding YAML
+
+\item \code{replace_notes}: Replaces notes on a model object and corresponding YAML with new notes
+
+\item \code{remove_notes}: Removes notes from a model object and corresponding YAML
 
 \item \code{add_decisions}: Append new decisions to the one(s) in a model object and corresponding YAML
 
