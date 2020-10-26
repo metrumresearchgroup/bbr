@@ -192,7 +192,7 @@ for (i in seq_len(6)) {
 
 ```{r add_config}
 log_df <- log_df %>% add_config()
-log_df %>% select(absolute_model_path, model_has_changed, data_has_changed)
+log_df %>% select(run, model_has_changed, data_has_changed)
 ```
 
 
@@ -207,7 +207,7 @@ final_model_family <- bind_rows(
   log_df %>% 
     filter(map_lgl(tags, ~ "final model" %in% .x)) # the final model itself
 )
-final_model_family %>% select(absolute_model_path, model_has_changed, data_has_changed)
+final_model_family %>% select(run, model_has_changed, data_has_changed)
 ```
 
 When we filter to only those models, you can see that they are all still up-to-date. Great news.
