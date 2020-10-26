@@ -8,7 +8,7 @@
 copy_model_from(
   .parent_mod,
   .new_model,
-  .description,
+  .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
   .inherit_tags = FALSE,
@@ -19,7 +19,7 @@ copy_model_from(
 \method{copy_model_from}{bbi_nonmem_model}(
   .parent_mod,
   .new_model,
-  .description,
+  .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
   .inherit_tags = FALSE,
@@ -36,8 +36,10 @@ to the YAML file and model file, both without extension, and the output
 directory (once the model is run). Numeric values will be coerced to
 character. See examples for usage.}
 
-\item{.description}{Description of new model run. This will be stored in the
-yaml (to be used later in \code{run_log()}).}
+\item{.description}{Character scalar description of new model run. This will
+be stored in the yaml (and can be viewed later in \code{run_log()}). If \code{NULL},
+the default, will be set to \code{basename(.path)}. This will be passed into
+the new model file if \code{.update_model_file=TRUE}.}
 
 \item{.based_on_additional}{Character vector of path(s) to other models that
 this model was "based on." These are used to reconstuct model developement

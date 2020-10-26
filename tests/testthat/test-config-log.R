@@ -183,3 +183,17 @@ test_that("add_config() works correctly with missing json", {
     rep_missing(expected_nonmem_version, missing_idx, 4L)
   )
 })
+
+fs::dir_delete(NEW_MOD2)
+fs::dir_delete(NEW_MOD3)
+
+test_that("config_log() works with missing output dirs", {
+  log_df <- expect_warning(
+    config_log(MODEL_DIR),
+    regexp = "Found only 2 bbi_config.json files for 4 models"
+  )
+  expect_true(inherits(log_df, CONF_LOG_CLASS))
+  expect_equal(nrow(log_df), RUN_LOG_ROWS+1-2)
+  expect_equal(ncol(log_df), CONFIG_COLS)
+  expect_false(any(duplicated(log_df[[ABS_MOD_PATH]])))
+})

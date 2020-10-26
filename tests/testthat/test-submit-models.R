@@ -19,8 +19,8 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
   test_that("submit_models(.dry_run=T) with list input simple",
             {
               # copy to two new models
-              mod2 <- copy_model_from(MOD1, 2, "naw")
-              mod3 <- copy_model_from(MOD1, 3, "naw")
+              mod2 <- copy_model_from(MOD1, 2)
+              mod3 <- copy_model_from(MOD1, 3)
               on.exit({ cleanup() })
 
               .mods <- list(MOD1, mod2, mod3)
@@ -42,8 +42,8 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
   test_that("submit_models(.dry_run=T) with list input, 2 arg sets",
             {
               # copy to two new models
-              mod2 <- copy_model_from(MOD1, 2, "naw") %>% add_bbi_args(list(threads = 3))
-              mod3 <- copy_model_from(MOD1, 3, "naw") %>% add_bbi_args(list(clean_lvl = 2))
+              mod2 <- copy_model_from(MOD1, 2) %>% add_bbi_args(list(threads = 3))
+              mod3 <- copy_model_from(MOD1, 3) %>% add_bbi_args(list(clean_lvl = 2))
               on.exit({ cleanup() })
 
               .mods <- list(MOD1, mod2, mod3)
@@ -91,8 +91,8 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
   test_that("submit_models(.dry_run=T) errors with bad input",
             {
               # copy to two new models
-              mod2 <- copy_model_from(MOD1, 2, "naw")
-              mod3 <- copy_model_from(MOD1, 3, "naw")
+              mod2 <- copy_model_from(MOD1, 2)
+              mod3 <- copy_model_from(MOD1, 3)
               on.exit({ cleanup() })
 
               # testing when one isn't a model

@@ -19,16 +19,28 @@
 #' @param .field Character scalar of the name of the component to modify
 #' @param .value Whatever is to be added to `.mod[[.field]]`, typically a character vector
 #' @param .append If `TRUE`, the default, concatenate new values with currently present values. If `FALSE`, new values will overwrite old values.
+#' @param .remove If `TRUE`, `.value` with be removed from the `.field` instead of added. `FALSE` by default. Cannot have both `.append` and `.remove` be true in the same call.
 #' @param .unique If `TRUE`, the default, de-duplicate `.mod[[.field]]` after adding new values. If `FALSE` duplicate values will be kept.
 #' @export
-modify_model_field <- function(.mod, .field, .value, .append = TRUE, .unique = TRUE) {
+modify_model_field <- function(.mod, .field, .value, .append = TRUE, .remove = FALSE, .unique = TRUE) {
 
   # update .mod with any changes from yaml on disk
   check_yaml_in_sync(.mod)
 
-  # Either append new value or overwrite with new value
+  if (isTRUE(.append) & isTRUE(.remove)) {
+    stop("modify_model_field() cannot have both `.append` and `.remove` be true in the same call.")
+  }
+
   if (isTRUE(.append)) {
     .mod[[.field]] <- c(.mod[[.field]], .value)
+  } else if (isTRUE(.remove)) {
+    # first warn if trying to remove values that aren't present, then remove any that are
+    missing <- !(.value %in% .mod[[.field]])
+    if (any(missing)) {
+      missing_vals <- paste(.value[which(missing)], collapse = ", ")
+      warning(glue("Field `{.field}` does not contain any of the following, so they cannot be removed: {missing_vals}"))
+    }
+    .mod[[.field]] <- setdiff(.mod[[.field]], .value)
   } else {
     .mod[[.field]] <- .value
   }
@@ -65,10 +77,55 @@ replace_tags <- function(.mod, .tags) {
   return(.mod)
 }
 
+#' @describeIn modify_model_field Removes tags from a model object and corresponding YAML
+#' @export
+remove_tags <- function(.mod, .tags) {
+  .mod <- modify_model_field(.mod = .mod,
+                             .field = YAML_TAGS,
+                             .value = .tags,
+                             .append = FALSE,
+                             .remove = TRUE)
+  return(.mod)
+}
+
+
+#' @describeIn modify_model_field Add notes to a model object and corresponding YAML
+#' @param .notes Character vector to add to `notes` field
+#' @export
+add_notes <- function(.mod, .notes) {
+  .mod <- modify_model_field(.mod = .mod,
+                             .field = YAML_NOTES,
+                             .value = .notes,
+                             .append = TRUE)
+  return(.mod)
+}
+
+#' @describeIn modify_model_field Replaces notes on a model object and corresponding YAML with new notes
+#' @export
+replace_notes <- function(.mod, .notes) {
+  .mod <- modify_model_field(.mod = .mod,
+                             .field = YAML_NOTES,
+                             .value = .notes,
+                             .append = FALSE)
+  return(.mod)
+}
+
+#' @describeIn modify_model_field Removes notes from a model object and corresponding YAML
+#' @export
+remove_notes <- function(.mod, .notes) {
+  .mod <- modify_model_field(.mod = .mod,
+                             .field = YAML_NOTES,
+                             .value = .notes,
+                             .append = FALSE,
+                             .remove = TRUE)
+  return(.mod)
+}
+
 #' @describeIn modify_model_field Append new decisions to the one(s) in a model object and corresponding YAML
 #' @param .decisions Character vector to add to `decisions` field
 #' @export
 add_decisions <- function(.mod, .decisions) {
+  warning("The `decisions` field has been replaced by `notes`. At some point it will be removed. Please use `add_notes()` going forward.")
   .mod <- modify_model_field(.mod = .mod,
                              .field = YAML_DECISIONS,
                              .value = .decisions,
@@ -80,6 +137,7 @@ add_decisions <- function(.mod, .decisions) {
 #' @param .decisions Character vector to use as replacement
 #' @export
 replace_decisions <- function(.mod, .decisions) {
+  warning("The `decisions` field has been replaced by `notes`. At some point it will be removed. Please use `replace_notes()` going forward.")
   .mod <- modify_model_field(.mod = .mod,
                              .field = YAML_DECISIONS,
                              .value = .decisions,
@@ -112,9 +170,11 @@ replace_based_on <- function(.mod, .based_on) {
 }
 
 #' @describeIn modify_model_field Replaces description field in a model object and corresponding YAML with new description
+#' @importFrom checkmate assert_scalar
 #' @param .description Character scalar to use as replacement for the `description` field
 #' @export
 replace_description <- function(.mod, .description) {
+  checkmate::assert_scalar(.description)
   .mod <- modify_model_field(.mod = .mod,
                              .field = YAML_DESCRIPTION,
                              .value = .description,
