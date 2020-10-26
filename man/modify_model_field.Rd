@@ -4,6 +4,7 @@
 \alias{modify_model_field}
 \alias{add_tags}
 \alias{replace_tags}
+\alias{remove_tags}
 \alias{add_decisions}
 \alias{replace_decisions}
 \alias{add_based_on}
@@ -13,11 +14,20 @@
 \alias{replace_bbi_args}
 \title{Modify field in model object}
 \usage{
-modify_model_field(.mod, .field, .value, .append = TRUE, .unique = TRUE)
+modify_model_field(
+  .mod,
+  .field,
+  .value,
+  .append = TRUE,
+  .remove = FALSE,
+  .unique = TRUE
+)
 
 add_tags(.mod, .tags)
 
 replace_tags(.mod, .tags)
+
+remove_tags(.mod, .tags)
 
 add_decisions(.mod, .decisions)
 
@@ -41,6 +51,8 @@ replace_bbi_args(.mod, .bbi_args)
 \item{.value}{Whatever is to be added to \code{.mod[[.field]]}, typically a character vector}
 
 \item{.append}{If \code{TRUE}, the default, concatenate new values with currently present values. If \code{FALSE}, new values will overwrite old values.}
+
+\item{.remove}{If \code{TRUE}, \code{.value} with be removed from the \code{.field} instead of added. \code{FALSE} by default. Cannot have both \code{.append} and \code{.remove} be true in the same call.}
 
 \item{.unique}{If \code{TRUE}, the default, de-duplicate \code{.mod[[.field]]} after adding new values. If \code{FALSE} duplicate values will be kept.}
 
@@ -71,6 +83,8 @@ memory with an md5 digest of the newly written YAML.
 \item \code{add_tags}: Add tags to a model object and corresponding YAML
 
 \item \code{replace_tags}: Replaces tags on a model object and corresponding YAML with new tags
+
+\item \code{remove_tags}: Removes tags from a model object and corresponding YAML
 
 \item \code{add_decisions}: Append new decisions to the one(s) in a model object and corresponding YAML
 

@@ -19,16 +19,28 @@
 #' @param .field Character scalar of the name of the component to modify
 #' @param .value Whatever is to be added to `.mod[[.field]]`, typically a character vector
 #' @param .append If `TRUE`, the default, concatenate new values with currently present values. If `FALSE`, new values will overwrite old values.
+#' @param .remove If `TRUE`, `.value` with be removed from the `.field` instead of added. `FALSE` by default. Cannot have both `.append` and `.remove` be true in the same call.
 #' @param .unique If `TRUE`, the default, de-duplicate `.mod[[.field]]` after adding new values. If `FALSE` duplicate values will be kept.
 #' @export
-modify_model_field <- function(.mod, .field, .value, .append = TRUE, .unique = TRUE) {
+modify_model_field <- function(.mod, .field, .value, .append = TRUE, .remove = FALSE, .unique = TRUE) {
 
   # update .mod with any changes from yaml on disk
   check_yaml_in_sync(.mod)
 
-  # Either append new value or overwrite with new value
+  if (isTRUE(.append) & isTRUE(.remove)) {
+    stop("modify_model_field() cannot have both `.append` and `.remove` be true in the same call.")
+  }
+
   if (isTRUE(.append)) {
     .mod[[.field]] <- c(.mod[[.field]], .value)
+  } else if (isTRUE(.remove)) {
+    # first warn if trying to remove values that aren't present, then remove any that are
+    missing <- !(.value %in% .mod[[.field]])
+    if (any(missing)) {
+      missing_vals <- paste(.value[which(missing)], collapse = ", ")
+      warning(glue("Field `{.field}` does not contain any of the following, so they cannot be removed: {missing_vals}"))
+    }
+    .mod[[.field]] <- setdiff(.mod[[.field]], .value)
   } else {
     .mod[[.field]] <- .value
   }
@@ -62,6 +74,17 @@ replace_tags <- function(.mod, .tags) {
                              .field = YAML_TAGS,
                              .value = .tags,
                              .append = FALSE)
+  return(.mod)
+}
+
+#' @describeIn modify_model_field Removes tags from a model object and corresponding YAML
+#' @export
+remove_tags <- function(.mod, .tags) {
+  .mod <- modify_model_field(.mod = .mod,
+                             .field = YAML_TAGS,
+                             .value = .tags,
+                             .append = FALSE,
+                             .remove = TRUE)
   return(.mod)
 }
 
