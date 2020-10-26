@@ -80,6 +80,36 @@ test_that("remove_tags() works correctly", {
   expect_identical(new_mod[[YAML_TAGS]], ref_tags)
 })
 
+test_that("add_notes() and replace_notes() work correctly", {
+  temp_mod_path <- create_temp_model()
+  new_mod <- read_model(temp_mod_path)
+  expect_null(new_mod[[YAML_NOTES]])
+
+  # test adding
+  new_mod <- add_notes(new_mod, c(NEW_NOTES, EXTRA_NOTE))
+  expect_identical(new_mod[[YAML_NOTES]], c(NEW_NOTES, EXTRA_NOTE))
+
+  # test_replacing
+  new_mod <- replace_notes(new_mod, NEW_NOTES)
+  expect_identical(new_mod[[YAML_NOTES]], NEW_NOTES)
+})
+
+test_that("remove_notes() works correctly", {
+  temp_mod_path <- create_temp_model()
+
+  # make a model object and replace the notes
+  new_mod <- read_model(temp_mod_path)
+  new_mod <- replace_notes(new_mod, c(NEW_NOTES, EXTRA_NOTE))
+  expect_identical(new_mod[[YAML_NOTES]], c(NEW_NOTES, EXTRA_NOTE))
+
+  # test removing
+  new_mod <- expect_warning(
+    remove_notes(new_mod, c(EXTRA_NOTE, "bad note")),
+    regexp = "does not contain any of the following.+bad"
+  )
+  expect_identical(new_mod[[YAML_NOTES]], NEW_NOTES)
+})
+
 test_that("add_decisions() and replace_decisions() work correctly", {
   temp_mod_path <- create_temp_model()
 
@@ -88,13 +118,23 @@ test_that("add_decisions() and replace_decisions() work correctly", {
   expect_null(new_mod[[YAML_DECISIONS]])
 
   # test adding
-  new_mod <- add_decisions(new_mod, NEW_TEXT1)
+  new_mod <- expect_warning(
+    add_decisions(new_mod, NEW_TEXT1),
+    regexp = "has been replaced by"
+  )
   expect_identical(new_mod[[YAML_DECISIONS]], NEW_TEXT1)
-  new_mod <- add_decisions(new_mod, NEW_TEXT2)
+
+  new_mod <- expect_warning(
+    add_decisions(new_mod, NEW_TEXT2),
+    regexp = "has been replaced by"
+  )
   expect_identical(new_mod[[YAML_DECISIONS]], c(NEW_TEXT1, NEW_TEXT2))
 
   # test_replacing
-  new_mod <- replace_decisions(new_mod, NEW_TEXT2)
+  new_mod <- expect_warning(
+    replace_decisions(new_mod, NEW_TEXT2),
+    regexp = "has been replaced by"
+  )
   expect_identical(new_mod[[YAML_DECISIONS]], NEW_TEXT2)
 })
 
@@ -140,11 +180,11 @@ test_that("add_tags etc. can be chained", {
   # test adding and replacing
   new_mod <- new_mod %>%
     add_tags(NEW_TAGS) %>%
-    add_decisions(NEW_TEXT1) %>%
+    add_notes(NEW_NOTES) %>%
     replace_description(NEW_DESC)
 
   expect_identical(new_mod[[YAML_TAGS]], c(ORIG_TAGS, NEW_TAGS))
-  expect_identical(new_mod[[YAML_DECISIONS]], NEW_TEXT1)
+  expect_identical(new_mod[[YAML_NOTES]], NEW_NOTES)
   expect_identical(new_mod[[YAML_DESCRIPTION]], NEW_DESC)
 })
 
@@ -234,8 +274,8 @@ test_that("add_tags fails if it wasn't re-assigned previously (testing check_yam
   expect_identical(new_mod[[YAML_TAGS]], c(ORIG_TAGS, NEW_TAGS))
 
   # add without assignment (so YAML gets out of sync)
-  new_mod %>% add_decisions(NEW_TEXT1)
-  expect_null(new_mod[[YAML_DECISIONS]])
+  new_mod %>% add_notes(NEW_NOTES)
+  expect_null(new_mod[[YAML_NOTES]])
 
   # try to add more and get error
   expect_error(new_mod %>% replace_description(NEW_DESC), regexp = "Model NOT in sync with corresponding YAML file")

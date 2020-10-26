@@ -130,7 +130,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
     # check run log for all models
     log_df <- run_log(MODEL_DIR_BBI)
     expect_equal(nrow(log_df), 4)
-    expect_equal(ncol(log_df), 8)
+    expect_equal(ncol(log_df), RUN_LOG_COLS)
     expect_identical(basename(log_df[[ABS_MOD_PATH]]), as.character(seq(1:4)))
     expect_identical(log_df$description, as.character(seq(1:4)))
     expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS, ORIG_TAGS))
