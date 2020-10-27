@@ -243,18 +243,15 @@ log_df <- run_log(MODEL_DIR)
 log_df
 ```
 
-The `run_log()` returns a tibble which can be manipulated like any other tibble. However, several of the columns (`tags` and `based_on` for example) are list columns, which complicates how you can interact with them. Future releases will have helper functions to more seamlessly interact with these log tibbles, but until then, we have provided some sample `tidyverse` code below.
+The `run_log()` returns a tibble which can be manipulated like any other tibble. However, several of the columns (`tags`, `notes`, and `based_on` for example) are list columns, which complicates how you can interact with them. We provide some helper functions to more seamlessly interact with these log tibbles, as well as some sample `tidyverse` code below.
 
 ## Viewing tags example
 
-This example code displays a more human-readable version of the run log, with the tags collapsed to a character vector.
+The `bbi_log_df` method of the `toString()` generic can be passed a tibble output from `run_log()`, `summary_log()`, or `config_log()`, along with any columns that are a list of vectors. It is specifically designed for collapsing columns like `tags`, `notes`, and `based_on` to a more human-readable format.
 
-```{r run_log_cleanup} 
+```{r viewing tags new} 
 log_df %>% 
-  group_by(absolute_model_path) %>% 
-  mutate_at(.vars = vars(tags:notes), 
-                   ~ paste(unlist(.x), collapse=", ")) %>% 
-  ungroup() %>% 
+  toString(tags, notes) %>%
   select(run, tags, notes)
 ```
 
