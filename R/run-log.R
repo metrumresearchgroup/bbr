@@ -32,6 +32,79 @@ run_log <- function(.base_dir, .recurse = TRUE) {
 }
 
 
+
+#' Collapse list column to vector
+#'
+#' Collapses a list column in a tibble into a column of character scalars.
+#' @details
+#' Any non-list columns passed to `...` will be ignored and will trigger a warning notifying the user that only list columns can be collapsed.
+#'
+#' Any list columns passed to `...` which do _not_ contain either character, numeric, or logical vectors (i.e. lists of lists) will be silently ignored.
+#'
+#' @return
+#' Returns the same tibble as `.data`, but any list columns named in `...` will be collapsed to a character column, with one scalar value (or `NA`) for each row.
+#' See "Details" section for caveats.
+#'
+#' @examples
+#' df <- tibble(
+#'   row_num   = c(1, 2, 3),
+#'   char_list = list(c("foo", "bar"), "baz", c("naw", "dawg")),
+#'   num_list  = list(c(23, 34, 45), c(-1, -2, -3), NULL)
+#' )
+#'
+#' collapse(df, char_list, num_list)
+#'
+#' @param .data Input tibble to modify
+#' @param ... <[`tidy-select`][dplyr::dplyr_tidy_select]> One or more unquoted
+#'   expressions separated by commas. Variable names can be used as if they
+#'   were positions in the data frame, so expressions like `x:y` can
+#'   be used to select a range of variables.
+#' @param .sep Character scalar to use a separator when collapsing vectors. Defaults to `", "`.
+#' @importFrom dplyr mutate mutate_at group_by ungroup select row_number
+#' @importFrom tidyselect eval_select
+#' @importFrom rlang expr
+#' @importFrom purrr map_lgl
+#' @importFrom checkmate assert_scalar
+#' @export
+collapse <- function(.data, ..., .sep = ", ") {
+  checkmate::assert_scalar(.sep)
+
+  loc <- tidyselect::eval_select(rlang::expr(c(...)), .data)
+
+  # do we need this? seems like a reasonable safety catch but it's internal... danger...
+  loc <- dplyr:::ensure_group_vars(loc, .data, notify = TRUE)
+
+  # warn if passed columns that are not lists
+  valid_cols <- map_lgl(loc, ~ inherits(.data[[.x]], "list"))
+  if (any(!valid_cols)) {
+    bad_cols <- names(valid_cols)[!valid_cols]
+    warning(glue("collapse() only works on list columns. The following columns are not lists and will be ignored: {paste(bad_cols, collapse = ', ')}"))
+  }
+
+  # collapse together any lists of vectors
+  .data %>%
+    mutate(.collapse_key = row_number()) %>%
+    group_by(.collapse_key) %>%
+    mutate_at(.vars = vars({{loc}}),
+              function(.vec) {
+                if (inherits(.vec, "list")) {
+                  if (is.null(.vec[[1]])) {
+                    .vec <- NA
+                  } else if (inherits(.vec[[1]], c("character", "numeric", "logical"))) {
+                    .vec <- paste(unlist(.vec), collapse = .sep)
+                  }
+                }
+                .vec
+              }) %>%
+    ungroup(.collapse_key) %>%
+    select(-.collapse_key)
+}
+
+
+##################
+# PRIVATE HELPERS
+##################
+
 #' Search for model YAML files and read them
 #'
 #' Private helper function that searches from a base directory for any YAML files (excluding `babylon.yaml`)
