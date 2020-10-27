@@ -33,7 +33,7 @@ run_log <- function(.base_dir, .recurse = TRUE) {
 
 
 
-#' Collapse list column to vector
+#' Collapse list column to a character column
 #'
 #' Collapses a list column in a tibble into a column of character scalars.
 #' @details
@@ -46,13 +46,13 @@ run_log <- function(.base_dir, .recurse = TRUE) {
 #' See "Details" section for caveats.
 #'
 #' @examples
-#' df <- tibble(
+#' df <- tibble::tibble(
 #'   row_num   = c(1, 2, 3),
 #'   char_list = list(c("foo", "bar"), "baz", c("naw", "dawg")),
 #'   num_list  = list(c(23, 34, 45), c(-1, -2, -3), NULL)
 #' )
 #'
-#' collapse(df, char_list, num_list)
+#' collapse_to_string(df, char_list, num_list)
 #'
 #' @param .data Input tibble to modify
 #' @param ... <[`tidy-select`][dplyr::dplyr_tidy_select]> One or more unquoted
@@ -66,7 +66,7 @@ run_log <- function(.base_dir, .recurse = TRUE) {
 #' @importFrom purrr map_lgl
 #' @importFrom checkmate assert_scalar
 #' @export
-collapse <- function(.data, ..., .sep = ", ") {
+collapse_to_string <- function(.data, ..., .sep = ", ") {
   checkmate::assert_scalar(.sep)
 
   loc <- tidyselect::eval_select(rlang::expr(c(...)), .data)
@@ -78,7 +78,7 @@ collapse <- function(.data, ..., .sep = ", ") {
   valid_cols <- map_lgl(loc, ~ inherits(.data[[.x]], "list"))
   if (any(!valid_cols)) {
     bad_cols <- names(valid_cols)[!valid_cols]
-    warning(glue("collapse() only works on list columns. The following columns are not lists and will be ignored: {paste(bad_cols, collapse = ', ')}"))
+    warning(glue("collapse_to_string() only works on list columns. The following columns are not lists and will be ignored: {paste(bad_cols, collapse = ', ')}"))
   }
 
   # collapse together any lists of vectors
