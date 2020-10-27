@@ -55,10 +55,10 @@ run_log <- function(.base_dir, .recurse = TRUE) {
 #' collapse_to_string(df, char_list, num_list)
 #'
 #' @param .data Input tibble to modify
-#' @param ... <[`tidy-select`][dplyr::dplyr_tidy_select]> One or more unquoted
-#'   expressions separated by commas. Variable names can be used as if they
-#'   were positions in the data frame, so expressions like `x:y` can
-#'   be used to select a range of variables.
+#' @param ... One or more unquoted expressions separated by commas (in the style
+#'   of [dplyr::select()]. Variable names can be used as if they were positions
+#'   in the data frame, so expressions like `x:y` can be used to select a range
+#'   of variables.
 #' @param .sep Character scalar to use a separator when collapsing vectors. Defaults to `", "`.
 #' @importFrom dplyr mutate mutate_at group_by ungroup select row_number
 #' @importFrom tidyselect eval_select
@@ -72,7 +72,7 @@ collapse_to_string <- function(.data, ..., .sep = ", ") {
   loc <- tidyselect::eval_select(rlang::expr(c(...)), .data)
 
   # do we need this? seems like a reasonable safety catch but it's internal... danger...
-  loc <- dplyr:::ensure_group_vars(loc, .data, notify = TRUE)
+  #loc <- dplyr:::ensure_group_vars(loc, .data, notify = TRUE)
 
   # warn if passed columns that are not lists
   valid_cols <- map_lgl(loc, ~ inherits(.data[[.x]], "list"))
@@ -84,7 +84,7 @@ collapse_to_string <- function(.data, ..., .sep = ", ") {
   # collapse together any lists of vectors
   .data %>%
     mutate(.collapse_key = row_number()) %>%
-    group_by(.collapse_key) %>%
+    group_by(.data[[".collapse_key"]]) %>%
     mutate_at(.vars = vars({{loc}}),
               function(.vec) {
                 if (inherits(.vec, "list")) {
@@ -96,8 +96,8 @@ collapse_to_string <- function(.data, ..., .sep = ", ") {
                 }
                 .vec
               }) %>%
-    ungroup(.collapse_key) %>%
-    select(-.collapse_key)
+    ungroup(.data[[".collapse_key"]]) %>%
+    select(-.data[[".collapse_key"]])
 }
 
 
