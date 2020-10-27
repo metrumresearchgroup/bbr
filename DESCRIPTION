@@ -39,13 +39,13 @@ Imports:
     stringr,
     tibble,
     tidyr,
+    tidyselect (>= 1.0.0),
     yaml
 Suggests: 
     covr,
     knitr,
     rmarkdown,
     testthat (>= 2.1.0),
-    tidyselect,
     withr
 VignetteBuilder: 
     knitr
