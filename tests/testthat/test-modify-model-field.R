@@ -45,7 +45,7 @@ test_that("modify_model_field() errors with .append=T and .remove=T", {
   )
 })
 
-test_that("add_tags() and replace_tags() work correctly", {
+test_that("add_tags() and replace_all_tags() work correctly", {
   temp_mod_path <- create_temp_model()
 
   # make a spec from it
@@ -57,9 +57,22 @@ test_that("add_tags() and replace_tags() work correctly", {
   expect_identical(new_mod[[YAML_TAGS]], c(ORIG_TAGS, NEW_TAGS))
 
   # test_replacing
-  new_mod <- replace_tags(new_mod, NEW_TAGS)
+  new_mod <- replace_all_tags(new_mod, NEW_TAGS)
   expect_identical(new_mod[[YAML_TAGS]], NEW_TAGS)
 })
+
+test_that("replace_tag() works correctly", {
+  temp_mod_path <- create_temp_model()
+
+  # make a spec from it
+  new_mod <- read_model(temp_mod_path)
+  expect_identical(new_mod[[YAML_TAGS]], ORIG_TAGS)
+
+  # test_replacing
+  new_mod <- replace_tag(new_mod, ORIG_TAGS[1], NEW_TAGS[1])
+  expect_identical(new_mod[[YAML_TAGS]], c(NEW_TAGS[1], ORIG_TAGS[2:length(ORIG_TAGS)]))
+})
+
 
 test_that("remove_tags() works correctly", {
   temp_mod_path <- create_temp_model()
@@ -69,7 +82,7 @@ test_that("remove_tags() works correctly", {
 
   # make a model object and replace the tags
   new_mod <- read_model(temp_mod_path)
-  new_mod <- replace_tags(new_mod, test_tags)
+  new_mod <- replace_all_tags(new_mod, test_tags)
   expect_identical(new_mod[[YAML_TAGS]], test_tags)
 
   # test removing

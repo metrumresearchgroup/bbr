@@ -3,7 +3,8 @@
 \name{modify_model_field}
 \alias{modify_model_field}
 \alias{add_tags}
-\alias{replace_tags}
+\alias{replace_tag}
+\alias{replace_all_tags}
 \alias{remove_tags}
 \alias{add_notes}
 \alias{replace_notes}
@@ -28,7 +29,9 @@ modify_model_field(
 
 add_tags(.mod, .tags)
 
-replace_tags(.mod, .tags)
+replace_tag(.mod, .old_tag, .new_tag)
+
+replace_all_tags(.mod, .tags)
 
 remove_tags(.mod, .tags)
 
@@ -67,6 +70,10 @@ replace_bbi_args(.mod, .bbi_args)
 
 \item{.tags}{Character vector to add to \code{tags} field}
 
+\item{.old_tag}{Character scalar of tag to be replaced}
+
+\item{.new_tag}{Character scalar of tag that will be added}
+
 \item{.notes}{Character vector to add to \code{notes} field}
 
 \item{.decisions}{Character vector to use as replacement}
@@ -93,7 +100,10 @@ memory with an md5 digest of the newly written YAML.
 \itemize{
 \item \code{add_tags}: Add tags to a model object and corresponding YAML
 
-\item \code{replace_tags}: Replaces tags on a model object and corresponding YAML with new tags
+\item \code{replace_tag}: Replaces a specific \code{.old_tag} with \code{.new_tag} on a model object and corresponding YAML.
+Warns and does nothing if \code{.old_tag} is not present.
+
+\item \code{replace_all_tags}: Replaces all tags on a model object and corresponding YAML with new tags
 
 \item \code{remove_tags}: Removes tags from a model object and corresponding YAML
 

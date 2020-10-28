@@ -38,7 +38,7 @@ modify_model_field <- function(.mod, .field, .value, .append = TRUE, .remove = F
     missing <- !(.value %in% .mod[[.field]])
     if (any(missing)) {
       missing_vals <- paste(.value[which(missing)], collapse = ", ")
-      warning(glue("Field `{.field}` does not contain any of the following, so they cannot be removed: {missing_vals}"))
+      warning(glue("`{.field}` does not contain any of the following, so they cannot be removed: {missing_vals}"))
     }
     .mod[[.field]] <- setdiff(.mod[[.field]], .value)
   } else {
@@ -56,6 +56,23 @@ modify_model_field <- function(.mod, .field, .value, .append = TRUE, .remove = F
   return(.mod)
 }
 
+#' @keywords internal
+replace_model_field <- function(.mod, .field, .old_val, .new_val) {
+
+  # update .mod with any changes from yaml on disk
+  check_yaml_in_sync(.mod)
+
+  idx <- which(.mod[[.field]] == .old_val)
+  if (length(idx) == 0) {
+    warning(glue("`{.field}` does not contain the {.old_val}, so it cannot be replaced."))
+    return(.mod)
+  }
+
+  .mod[[.field]][idx] <- .new_val
+
+  return(.mod)
+}
+
 #' @describeIn modify_model_field Add tags to a model object and corresponding YAML
 #' @param .tags Character vector to add to `tags` field
 #' @export
@@ -67,9 +84,18 @@ add_tags <- function(.mod, .tags) {
   return(.mod)
 }
 
-#' @describeIn modify_model_field Replaces tags on a model object and corresponding YAML with new tags
+#' @describeIn modify_model_field Replaces a specific `.old_tag` with `.new_tag` on a model object and corresponding YAML.
+#' Warns and does nothing if `.old_tag` is not present.
+#' @param .old_tag Character scalar of tag to be replaced
+#' @param .new_tag Character scalar of tag that will be added
 #' @export
-replace_tags <- function(.mod, .tags) {
+replace_tag <- function(.mod, .old_tag, .new_tag) {
+  replace_model_field(.mod, YAML_TAGS, .old_tag, .new_tag)
+}
+
+#' @describeIn modify_model_field Replaces all tags on a model object and corresponding YAML with new tags
+#' @export
+replace_all_tags <- function(.mod, .tags) {
   .mod <- modify_model_field(.mod = .mod,
                              .field = YAML_TAGS,
                              .value = .tags,
