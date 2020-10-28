@@ -71,9 +71,6 @@ collapse_to_string <- function(.data, ..., .sep = ", ") {
 
   loc <- tidyselect::eval_select(rlang::expr(c(...)), .data)
 
-  # do we need this? seems like a reasonable safety catch but it's internal... danger...
-  #loc <- dplyr:::ensure_group_vars(loc, .data, notify = TRUE)
-
   # warn if passed columns that are not lists
   valid_cols <- map_lgl(loc, ~ inherits(.data[[.x]], "list"))
   if (any(!valid_cols)) {
