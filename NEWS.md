@@ -2,13 +2,11 @@
 
 ## New features and changes
 
-* Added `remove_tags()` function for removing specific strings added to the
-model object `tags` field. (#252)
-  
-* `.description` is no longer a required argument for `new_model()` or
-`copy_model_from()`. The default is `NULL`, in which case it is set to
-`basename(.path)` for `new_model()` or `basename(.new_model)` for
-`copy_model_from()`. (#256)
+* Added `run` column to all `bbi_log_df` tibbles. This is always the second
+column and is equivalent to `basename(absolute_model_path)`. While,
+`absolute_model_path` remains the primary key for the tibble, `run` is useful
+for displaying tables when `absolute_model_path` becomes long and difficult to
+look at.
 
 * Added `notes` field to model object (and `bbi_run_log_df`) and associated
 helpers `add_notes()`, `replace_notes()`, `remove_notes()`. This will replace
@@ -17,6 +15,14 @@ throughout the modeling process, not only at the end once some "decisions" have
 been reached. `add_decisions()` and `replace_decisions()` now print a warning
 telling the user that they will be deprecated in the future and encouraging use
 of their `_notes` counterparts. (#258)
+  
+* `.description` is no longer a required argument for `new_model()` or
+`copy_model_from()`. The default is `NULL`, in which case it is set to
+`basename(.path)` for `new_model()` or `basename(.new_model)` for
+`copy_model_from()`. (#256)
+
+* Added `remove_tags()` function for removing specific strings added to the
+model object `tags` field. (#252)
   
 ## Bug fixes
 

@@ -85,9 +85,9 @@ The specific columns returned are described below, though there is also a list o
 
 ## Housekeeping Columns
 
-The first column is `absolute_model_path` which contains an absolute path that unambiguously identifies each model. This serves as the primary key for the tibble. 
+The first column is `absolute_model_path` which contains an absolute path that unambiguously identifies each model. This serves as the primary key for the tibble. The second column is simply the `basename` of this path, which is just a convenience for printing and viewing.
 
-The second column contains the `bbi_nonmem_summary` object, discussed above, for each model. This can be extracted and manipulated if you would like more detailed data from it.
+The third column contains the `bbi_nonmem_summary` object, discussed above, for each model. This can be extracted and manipulated if you would like more detailed data from it.
 
 The `error_msg` and `needed_fail_flags` columns describe whether `bbi` had any trouble parsing the model outputs. These won't be discussed in detail here. Refer to the [`summary_log()` docs](https://metrumresearchgroup.github.io/rbabylon/reference/summary_log.html) for more information.
 
@@ -98,6 +98,7 @@ The next batch of columns contain the core diagnostics and model outputs. As men
 ```{r details columns}
 sum_df %>% 
   select(
+    run,
     ofv, 
     param_count, 
     estimation_method, 
@@ -117,13 +118,13 @@ Note that **all heuristics will be `FALSE` by default (and _never_ `NA`) and wil
 All of the heuristic flags are pivoted out to their own columns in the `bbi_summary_log_df` tibble. It's useful to note that, except for `needed_fail_flags` (discussed above), these are the _only logical columns_ in the tibble and can therefore be easily selected with `tidyselect::where(is.logical)`. _(Note: `where()` only became available in `tidyselect (>= 1.1.0)`, released May 2020.)_
 
 ```{r heuristics columns fake where, eval=FALSE}
-sum_df %>% select(problem_text, where(is.logical), -needed_fail_flags)
+sum_df %>% select(run, where(is.logical), -needed_fail_flags)
 ```
 ```{r heuristics columns real where, echo=FALSE}
 # tidyselect::where() was only added in May 2020 so, in order to avoid having to bump our "oldest supported"
 # for the sake of vignette, we just do it the ugly way under-the-hood.
 lgl_vars <- purrr::map_lgl(sum_df, is.logical)
-sum_df %>% select(c("problem_text", names(lgl_vars)[which(lgl_vars)]))
+sum_df %>% select(c("run", names(lgl_vars)[which(lgl_vars)]))
 ```
 
 Notice that there is also an **any_heuristics column**, which can easily be used to filter to only runs that had at least one heuristic flag triggered.
@@ -141,5 +142,5 @@ log_df <- log_df[2:3, ]
 # add summary columns
 log_df <- log_df %>% add_summary()
 
-log_df %>% select(description, tags, ofv, param_count, any_heuristics)
+log_df %>% select(run, tags, ofv, param_count, any_heuristics)
 ```

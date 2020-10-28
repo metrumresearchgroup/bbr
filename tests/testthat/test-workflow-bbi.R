@@ -145,7 +145,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
       regexp = "in progress"
     )
     expect_equal(nrow(log_df), 4)
-    expect_equal(ncol(log_df), RUN_LOG_COLS + CONFIG_COLS - 1)
+    expect_equal(ncol(log_df), RUN_LOG_COLS + CONFIG_COLS-2)
 
     # check config md5's against ctl md5's
     log_df <- log_df %>% filter(!is.na(model_md5))

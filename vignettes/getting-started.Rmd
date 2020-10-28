@@ -255,7 +255,7 @@ log_df %>%
   mutate_at(.vars = vars(tags:notes), 
                    ~ paste(unlist(.x), collapse=", ")) %>% 
   ungroup() %>% 
-  select(absolute_model_path, tags, notes)
+  select(run, tags, notes)
 ```
 
 ## Filtering tags example
@@ -265,7 +265,7 @@ This code uses `purrr::map_lgl` to filter the run log to only rows containing a 
 ```{r filtering}
 log_df %>% 
   filter(map_lgl(tags, ~ "2 compartment" %in% .x)) %>%
-  select(absolute_model_path, tags, notes)
+  select(run, tags, notes)
 ```
 
 
