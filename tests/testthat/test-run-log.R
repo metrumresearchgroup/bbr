@@ -63,6 +63,52 @@ test_that("run_log matches reference", {
   }
 })
 
+test_that("collapse_to_string() works correctly", {
+  # add a note to collapse
+  mod2 <- read_model(file.path(MODEL_DIR, 2)) %>% add_notes(NEW_NOTES)
+  on.exit(replace_notes(mod2, NULL))
+
+  log_df <- run_log(MODEL_DIR)
+  expect_true(inherits(log_df[[YAML_TAGS]], "list"))
+  expect_true(inherits(log_df[[YAML_NOTES]], "list"))
+
+  log_df <- log_df %>%
+    collapse_to_string({{YAML_TAGS}}, {{YAML_NOTES}})
+
+  expect_identical(
+    log_df[[YAML_TAGS]],
+    c(
+      paste(ORIG_TAGS, collapse = ", "),
+      paste(NEW_TAGS, collapse = ", "),
+      paste(ORIG_TAGS, collapse = ", ")
+    )
+  )
+
+  expect_identical(
+    log_df[[YAML_NOTES]],
+    c(
+      NA,
+      paste(NEW_NOTES, collapse = ", "),
+      NA
+    )
+  )
+})
+
+test_that("collapse_to_string() warns and errors correctly", {
+  log_df <- run_log(MODEL_DIR) %>%
+    collapse_to_string({{YAML_TAGS}})
+
+  expect_warning(
+    collapse_to_string(log_df, {{YAML_TAGS}}),
+    regexp = "The following columns are not lists and will be ignored: tags"
+  )
+
+  expect_error(
+    collapse_to_string(log_df, bags),
+    regexp = "Can't subset columns that don't exist"
+  )
+})
+
 ##########################################
 # testing hierarchical nested directories
 ##########################################
@@ -91,8 +137,13 @@ test_that("run_log() works correctly with nested dirs", {
 test_that("run_log fails after messing with YAML", {
   # make the description field an array
   rogue_yaml <- yaml::read_yaml(yaml_ext(NEW_MOD3))
-  rogue_yaml[[YAML_DESCRIPTION]] <- c(rogue_yaml[[YAML_DESCRIPTION]], "bad stuff")
+  orig_desc <- rogue_yaml[[YAML_DESCRIPTION]]
+  rogue_yaml[[YAML_DESCRIPTION]] <- c(orig_desc, "bad stuff")
   yaml::write_yaml(rogue_yaml, yaml_ext(NEW_MOD3))
+  on.exit({
+    rogue_yaml[[YAML_DESCRIPTION]] <- orig_desc
+    yaml::write_yaml(rogue_yaml, yaml_ext(NEW_MOD3))
+  })
 
   expect_error(log_df <- run_log(MODEL_DIR), regexp = "Must have length 1")
 })
