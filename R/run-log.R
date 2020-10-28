@@ -35,15 +35,17 @@ run_log <- function(.base_dir, .recurse = TRUE) {
 
 #' Collapse list column to a character column
 #'
-#' Collapses a list column in a tibble into a column of character scalars.
-#' @details
-#' Any non-list columns passed to `...` will be ignored and will trigger a warning notifying the user that only list columns can be collapsed.
+#' Collapses tibble list columns into columns of character scalars.
 #'
-#' Any list columns passed to `...` which do _not_ contain either character, numeric, or logical vectors (i.e. lists of lists) will be silently ignored.
+#' @details Any non-list columns passed to `...` will be ignored and will
+#' trigger a warning notifying the user that only list columns can be collapsed.
 #'
-#' @return
-#' Returns the same tibble as `.data`, but any list columns named in `...` will be collapsed to a character column, with one scalar value (or `NA`) for each row.
-#' See "Details" section for caveats.
+#' Any list columns passed to `...` which do _not_ contain either character,
+#' numeric, or logical vectors (i.e. lists of lists) will be silently ignored.
+#'
+#' @return Returns the same tibble as `.data`, but any list columns named in
+#' `...` will be collapsed to a character column, with one scalar value (or
+#' `NA`) for each row. See "Details" section for caveats.
 #'
 #' @examples
 #' df <- tibble::tibble(
@@ -59,7 +61,8 @@ run_log <- function(.base_dir, .recurse = TRUE) {
 #'   of [dplyr::select()]. Variable names can be used as if they were positions
 #'   in the data frame, so expressions like `x:y` can be used to select a range
 #'   of variables.
-#' @param .sep Character scalar to use a separator when collapsing vectors. Defaults to `", "`.
+#' @param .sep Character scalar to use a separator when collapsing vectors.
+#'   Defaults to `", "`.
 #' @importFrom dplyr mutate mutate_at group_by ungroup select row_number
 #' @importFrom tidyselect eval_select
 #' @importFrom rlang expr
