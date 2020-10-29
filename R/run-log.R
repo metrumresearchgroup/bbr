@@ -58,7 +58,7 @@ run_log <- function(.base_dir, .recurse = TRUE) {
 #'
 #' @param .data Input tibble to modify
 #' @param ... One or more unquoted expressions separated by commas (in the style
-#'   of [dplyr::select()]. Variable names can be used as if they were positions
+#'   of [dplyr::select()], etc.). Variable names can be used as if they were positions
 #'   in the data frame, so expressions like `x:y` can be used to select a range
 #'   of variables.
 #' @param .sep Character scalar to use a separator when collapsing vectors.
@@ -72,27 +72,26 @@ run_log <- function(.base_dir, .recurse = TRUE) {
 collapse_to_string <- function(.data, ..., .sep = ", ") {
   checkmate::assert_scalar(.sep)
 
-  loc <- tidyselect::eval_select(rlang::expr(c(...)), .data)
+  cols <- tidyselect::eval_select(rlang::expr(c(...)), .data)
 
-  # warn if passed columns that are not lists
-  valid_cols <- map_lgl(loc, ~ inherits(.data[[.x]], "list"))
+  # subset to only list cols and warn if passed any columns that are not lists
+  valid_cols <- map_lgl(cols, ~ inherits(.data[[.x]], "list"))
   if (any(!valid_cols)) {
     bad_cols <- names(valid_cols)[!valid_cols]
     warning(glue("collapse_to_string() only works on list columns. The following columns are not lists and will be ignored: {paste(bad_cols, collapse = ', ')}"))
   }
+  cols <- cols[valid_cols]
 
   # collapse together any lists of vectors
   .data %>%
     mutate(.collapse_key = row_number()) %>%
     group_by(.data[[".collapse_key"]]) %>%
-    mutate_at(.vars = vars({{loc}}),
+    mutate_at(.vars = vars({{cols}}),
               function(.vec) {
-                if (inherits(.vec, "list")) {
-                  if (is.null(.vec[[1]])) {
-                    .vec <- NA
-                  } else if (inherits(.vec[[1]], c("character", "numeric", "logical"))) {
-                    .vec <- paste(unlist(.vec), collapse = .sep)
-                  }
+                if (is.null(.vec[[1]])) {
+                  .vec <- NA_character_
+                } else if (inherits(.vec[[1]], c("character", "numeric", "logical"))) {
+                  .vec <- paste(unlist(.vec), collapse = .sep)
                 }
                 .vec
               }) %>%
