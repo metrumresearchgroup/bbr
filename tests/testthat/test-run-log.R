@@ -94,7 +94,7 @@ test_that("collapse_to_string() works correctly", {
   )
 })
 
-test_that("collapse_to_string() warns and errors correctly", {
+test_that("collapse_to_string() warns correctly", {
   log_df <- run_log(MODEL_DIR) %>%
     collapse_to_string({{YAML_TAGS}})
 
@@ -102,11 +102,26 @@ test_that("collapse_to_string() warns and errors correctly", {
     collapse_to_string(log_df, {{YAML_TAGS}}),
     regexp = "The following columns are not lists and will be ignored: tags"
   )
+})
+
+test_that("collapse_to_string() errors correctly", {
+  log_df <- run_log(MODEL_DIR) %>%
+    collapse_to_string({{YAML_TAGS}})
 
   expect_error(
     collapse_to_string(log_df, bags),
-    regexp = "Can't subset columns that don't exist"
+    class = "vctrs_error_subscript_oob"
   )
+})
+
+test_that("collapse_to_string() leaves list of lists untouched", {
+  log_df <- run_log(MODEL_DIR)
+  orig_args <- log_df[[YAML_BBI_ARGS]]
+
+  log_df <- log_df %>%
+    collapse_to_string({{YAML_TAGS}}, {{YAML_BBI_ARGS}})
+
+  expect_identical(orig_args, log_df[[YAML_BBI_ARGS]])
 })
 
 ##########################################
