@@ -93,6 +93,8 @@ would error. Now they correctly warn in that scenario. (#253)
 
 * Added shrinkage column to the tibble output from `param_estimates.bbi_nonmem_summary()`. 
 
+* Changed the column name containing the names of the parameters, in the table output from `param_estimates.bbi_nonmem_summary()`, from `names` to `parameter_names` to avoid confusion.
+
 * `param_estimates.bbi_nonmem_summary()` now errors with a "not implemented" error for 
   models where the final estimation method is Bayesian.
 

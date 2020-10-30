@@ -32,6 +32,10 @@ run_log <- function(.base_dir, .recurse = TRUE) {
 }
 
 
+##################
+# PRIVATE HELPERS
+##################
+
 #' Search for model YAML files and read them
 #'
 #' Private helper function that searches from a base directory for any YAML files (excluding `babylon.yaml`)

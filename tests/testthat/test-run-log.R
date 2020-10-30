@@ -91,8 +91,13 @@ test_that("run_log() works correctly with nested dirs", {
 test_that("run_log fails after messing with YAML", {
   # make the description field an array
   rogue_yaml <- yaml::read_yaml(yaml_ext(NEW_MOD3))
-  rogue_yaml[[YAML_DESCRIPTION]] <- c(rogue_yaml[[YAML_DESCRIPTION]], "bad stuff")
+  orig_desc <- rogue_yaml[[YAML_DESCRIPTION]]
+  rogue_yaml[[YAML_DESCRIPTION]] <- c(orig_desc, "bad stuff")
   yaml::write_yaml(rogue_yaml, yaml_ext(NEW_MOD3))
+  on.exit({
+    rogue_yaml[[YAML_DESCRIPTION]] <- orig_desc
+    yaml::write_yaml(rogue_yaml, yaml_ext(NEW_MOD3))
+  })
 
   expect_error(log_df <- run_log(MODEL_DIR), regexp = "Must have length 1")
 })
