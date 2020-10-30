@@ -93,7 +93,7 @@ test_that("remove_tags() works correctly", {
   expect_identical(new_mod[[YAML_TAGS]], ref_tags)
 })
 
-test_that("add_notes() and replace_notes() work correctly", {
+test_that("add_notes() and replace_all_notes() work correctly", {
   temp_mod_path <- create_temp_model()
   new_mod <- read_model(temp_mod_path)
   expect_null(new_mod[[YAML_NOTES]])
@@ -103,7 +103,7 @@ test_that("add_notes() and replace_notes() work correctly", {
   expect_identical(new_mod[[YAML_NOTES]], c(NEW_NOTES, EXTRA_NOTE))
 
   # test_replacing
-  new_mod <- replace_notes(new_mod, NEW_NOTES)
+  new_mod <- replace_all_notes(new_mod, NEW_NOTES)
   expect_identical(new_mod[[YAML_NOTES]], NEW_NOTES)
 })
 
@@ -112,7 +112,7 @@ test_that("remove_notes() works correctly", {
 
   # make a model object and replace the notes
   new_mod <- read_model(temp_mod_path)
-  new_mod <- replace_notes(new_mod, c(NEW_NOTES, EXTRA_NOTE))
+  new_mod <- replace_all_notes(new_mod, c(NEW_NOTES, EXTRA_NOTE))
   expect_identical(new_mod[[YAML_NOTES]], c(NEW_NOTES, EXTRA_NOTE))
 
   # test removing
@@ -164,7 +164,7 @@ test_that("replace_description() works correctly", {
 })
 
 
-test_that("add_bbi_args() and replace_bbi_args() work correctly", {
+test_that("add_bbi_args() and replace_all_bbi_args() work correctly", {
   temp_mod_path <- create_temp_model()
 
   # make a spec from it
@@ -177,7 +177,7 @@ test_that("add_bbi_args() and replace_bbi_args() work correctly", {
   expect_identical(new_mod[[YAML_BBI_ARGS]][["clean_lvl"]], 1)
 
   # test_replacing
-  new_mod <- replace_bbi_args(new_mod, list(clean_lvl = 1))
+  new_mod <- replace_all_bbi_args(new_mod, list(clean_lvl = 1))
   expect_null(new_mod[[YAML_BBI_ARGS]][["threads"]])
   expect_identical(new_mod[[YAML_BBI_ARGS]][["clean_lvl"]], 1)
 })
@@ -201,7 +201,7 @@ test_that("add_tags etc. can be chained", {
   expect_identical(new_mod[[YAML_DESCRIPTION]], NEW_DESC)
 })
 
-test_that("add_based_on() and replace_based_on() work correctly", {
+test_that("add_based_on() and replace_all_based_on() work correctly", {
   temp_mod_path <- create_temp_model()
   parent_model_id <- get_model_id(create_temp_model())
   child_model_id <- get_model_id(temp_mod_path)
@@ -222,7 +222,7 @@ test_that("add_based_on() and replace_based_on() work correctly", {
   )
 
   # test_replacing
-  new_mod <- replace_based_on(new_mod, child_model_id)
+  new_mod <- replace_all_based_on(new_mod, child_model_id)
   expect_identical(new_mod[[YAML_BASED_ON]], child_model_id)
 })
 
