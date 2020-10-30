@@ -6,18 +6,20 @@
 \alias{add_tags}
 \alias{replace_tag}
 \alias{replace_all_tags}
+\alias{replace_tags}
 \alias{remove_tags}
 \alias{add_notes}
 \alias{replace_note}
 \alias{replace_all_notes}
 \alias{remove_notes}
 \alias{add_based_on}
-\alias{replace_based_on}
 \alias{replace_all_based_on}
+\alias{replace_based_on}
 \alias{remove_based_on}
 \alias{replace_description}
 \alias{add_bbi_args}
 \alias{replace_all_bbi_args}
+\alias{replace_bbi_args}
 \alias{add_decisions}
 \alias{replace_decisions}
 \title{Modify field in model object}
@@ -39,6 +41,8 @@ replace_tag(.mod, .old_tag, .new_tag)
 
 replace_all_tags(.mod, .tags)
 
+replace_tags(.mod, .tags)
+
 remove_tags(.mod, .tags)
 
 add_notes(.mod, .notes)
@@ -51,9 +55,9 @@ remove_notes(.mod, .notes)
 
 add_based_on(.mod, .based_on)
 
-replace_based_on(.mod, .old_based_on, .new_based_on)
-
 replace_all_based_on(.mod, .based_on)
+
+replace_based_on(.mod, .based_on)
 
 remove_based_on(.mod, .based_on)
 
@@ -62,6 +66,8 @@ replace_description(.mod, .description)
 add_bbi_args(.mod, .bbi_args)
 
 replace_all_bbi_args(.mod, .bbi_args)
+
+replace_bbi_args(.mod, .bbi_args)
 
 add_decisions(.mod, .decisions)
 
@@ -100,10 +106,6 @@ replace_decisions(.mod, .decisions)
 
 \item{.based_on}{Character vector of relative paths to add to \code{based_on} field}
 
-\item{.old_based_on}{Character scalar of based_on element to be replaced}
-
-\item{.new_based_on}{Character scalar of based_on element that will be added}
-
 \item{.description}{Character scalar to use as replacement for the \code{description} field}
 
 \item{.bbi_args}{named list of arguments to add to the model}
@@ -134,6 +136,8 @@ Warns and does nothing if \code{.old_tag} is not present.
 
 \item \code{replace_all_tags}: Replaces all tags on a model object and corresponding YAML with new tags
 
+\item \code{replace_tags}: \emph{Deprecated} as of rbabylon 0.10.0, use \code{replace_all_tags()} instead.
+
 \item \code{remove_tags}: Removes tags from a model object and corresponding YAML
 
 \item \code{add_notes}: Add notes to a model object and corresponding YAML
@@ -147,10 +151,9 @@ Warns and does nothing if \code{.old_note} is not present.
 
 \item \code{add_based_on}: Append new \code{based_on} tag(s) to a model object and corresponding YAML
 
-\item \code{replace_based_on}: Replaces a specific \code{.old_based_on} with \code{.new_based_on} on a model object and corresponding YAML.
-Warns and does nothing if \code{.old_based_on} is not present.
-
 \item \code{replace_all_based_on}: Replaces entire \code{based_on} field in a model object and corresponding YAML with new values
+
+\item \code{replace_based_on}: \emph{Deprecated} as of rbabylon 0.10.0, use \code{replace_all_based_on()} instead.
 
 \item \code{remove_based_on}: Remove specified \code{based_on} tag(s) from a model object and corresponding YAML
 
@@ -164,6 +167,8 @@ of valid babylon arguments.
 \item \code{replace_all_bbi_args}: Modifies model object and corresponding YAML
 by replacing all \code{bbi_args} with named list passed to \code{.bbi_args}. Use
 \code{\link[=print_bbi_args]{print_bbi_args()}} to see a list of valid babylon arguments.
+
+\item \code{replace_bbi_args}: \emph{Deprecated} as of rbabylon 0.10.0, use \code{replace_all_bbi_args()} instead.
 
 \item \code{add_decisions}: \emph{Deprecaed}  Append new decisions to the one(s) in a model object and corresponding YAML
 
