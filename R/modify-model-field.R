@@ -115,6 +115,13 @@ replace_all_tags <- function(.mod, .tags) {
   )
 }
 
+#' @describeIn modify_model_field _Deprecated_ as of rbabylon 0.10.0, use `replace_all_tags()` instead.
+#' @export
+replace_tags <- function(.mod, .tags) {
+  deprecate_warn("0.10.0", "rbabylon::replace_tags()", "replace_all_tags()")
+  replace_all_tags(.mod, .tags)
+}
+
 #' @describeIn modify_model_field Removes tags from a model object and corresponding YAML
 #' @export
 remove_tags <- function(.mod, .tags) {
@@ -184,15 +191,6 @@ add_based_on <- function(.mod, .based_on) {
   )
 }
 
-#' @describeIn modify_model_field Replaces a specific `.old_based_on` with `.new_based_on` on a model object and corresponding YAML.
-#' Warns and does nothing if `.old_based_on` is not present.
-#' @param .old_based_on Character scalar of based_on element to be replaced
-#' @param .new_based_on Character scalar of based_on element that will be added
-#' @export
-replace_based_on <- function(.mod, .old_based_on, .new_based_on) {
-  replace_model_field(.mod, YAML_BASED_ON, .old_based_on, .new_based_on)
-}
-
 #' @describeIn modify_model_field Replaces entire `based_on` field in a model object and corresponding YAML with new values
 #' @export
 replace_all_based_on <- function(.mod, .based_on) {
@@ -202,6 +200,13 @@ replace_all_based_on <- function(.mod, .based_on) {
     .value = safe_based_on(get_model_working_directory(.mod), .based_on),
     .append = FALSE
   )
+}
+
+#' @describeIn modify_model_field _Deprecated_ as of rbabylon 0.10.0, use `replace_all_based_on()` instead.
+#' @export
+replace_based_on <- function(.mod, .based_on) {
+  deprecate_warn("0.10.0", "rbabylon::replace_based_on()", "replace_all_based_on()")
+  replace_all_based_on(.mod, .based_on)
 }
 
 #' @describeIn modify_model_field Remove specified `based_on` tag(s) from a model object and corresponding YAML
@@ -269,11 +274,19 @@ replace_all_bbi_args <- function(.mod, .bbi_args) {
   return(.mod)
 }
 
+#' @describeIn modify_model_field _Deprecated_ as of rbabylon 0.10.0, use `replace_all_bbi_args()` instead.
+#' @export
+replace_bbi_args <- function(.mod, .bbi_args) {
+  deprecate_warn("0.10.0", "rbabylon::replace_bbi_args()", "replace_all_bbi_args()")
+  replace_all_bbi_args(.mod, .bbi_args)
+}
+
 #' @describeIn modify_model_field _Deprecaed_  Append new decisions to the one(s) in a model object and corresponding YAML
 #' @param .decisions Character vector to add to `decisions` field
 #' @export
 add_decisions <- function(.mod, .decisions) {
-  warning("The `decisions` field has been replaced by `notes`. At some point it will be removed. Please use `add_notes()` going forward.")
+  warning("The `decisions` field has been replaced by `notes` as of rbabylon 0.10.0 and will be removed in a future release. Please use `add_notes()` going forward.")
+  deprecate_warn("0.10.0", "rbabylon::replace_bbi_args()", "replace_all_bbi_args()")
   modify_model_field(
     .mod = .mod,
     .field = YAML_DECISIONS,
@@ -286,7 +299,7 @@ add_decisions <- function(.mod, .decisions) {
 #' @param .decisions Character vector to use as replacement
 #' @export
 replace_decisions <- function(.mod, .decisions) {
-  warning("The `decisions` field has been replaced by `notes`. At some point it will be removed. Please use `replace_notes()` going forward.")
+  warning("The `decisions` field has been replaced by `notes` as of rbabylon 0.10.0 and will be removed in a future release. Please use `replace_all_notes()` going forward.")
   modify_model_field(
     .mod = .mod,
     .field = YAML_DECISIONS,
