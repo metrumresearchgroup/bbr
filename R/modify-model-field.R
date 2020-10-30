@@ -5,9 +5,10 @@
 #' Modify field in model object
 #'
 #' Helper functions for updating fields in a `bbi_{.model_type}_model` object.
-#' Note that calling `modify_model_field()` directly is not recommended for most users
-#' because it requires knowing about the internal structure of the model object.
-#' Instead we recommend using the friendlier helpers listed below (`add_...` or `replace_...`) when possible.
+#' Note that calling `modify_model_field()` or `replace_model_field()` directly
+#' is _not_ recommended for most users because it requires knowing about the
+#' internal structure of the model object. Instead, **we recommend using the
+#' friendlier helpers listed below** (`add_...` or `replace_...`) when possible.
 #'
 #' @details
 #' All functions in this family also check the object against the corresponding YAML with `check_yaml_in_sync()` before modifying it,
@@ -56,7 +57,12 @@ modify_model_field <- function(.mod, .field, .value, .append = TRUE, .remove = F
   return(.mod)
 }
 
-#' @keywords internal
+#' @describeIn modify_model_field Replace a single item in a model field
+#' @param .old_val The value to be replaced. If `.old_val` is not present in
+#'   `.mod[[.field]]`, function will warn user and return `.mod` unchanged.
+#' @param .new_val The value to insert in place of `.old_val` in
+#'   `.mod[[.field]]`.
+#' @export
 replace_model_field <- function(.mod, .field, .old_val, .new_val) {
 
   # update .mod with any changes from yaml on disk
@@ -72,6 +78,11 @@ replace_model_field <- function(.mod, .field, .old_val, .new_val) {
 
   return(.mod)
 }
+
+
+#####################
+# FRIENDLIER HELPERS
+#####################
 
 #' @describeIn modify_model_field Add tags to a model object and corresponding YAML
 #' @param .tags Character vector to add to `tags` field

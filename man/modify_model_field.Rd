@@ -2,6 +2,7 @@
 % Please edit documentation in R/modify-model-field.R
 \name{modify_model_field}
 \alias{modify_model_field}
+\alias{replace_model_field}
 \alias{add_tags}
 \alias{replace_tag}
 \alias{replace_all_tags}
@@ -26,6 +27,8 @@ modify_model_field(
   .remove = FALSE,
   .unique = TRUE
 )
+
+replace_model_field(.mod, .field, .old_val, .new_val)
 
 add_tags(.mod, .tags)
 
@@ -68,6 +71,12 @@ replace_bbi_args(.mod, .bbi_args)
 
 \item{.unique}{If \code{TRUE}, the default, de-duplicate \code{.mod[[.field]]} after adding new values. If \code{FALSE} duplicate values will be kept.}
 
+\item{.old_val}{The value to be replaced. If \code{.old_val} is not present in
+\code{.mod[[.field]]}, function will warn user and return \code{.mod} unchanged.}
+
+\item{.new_val}{The value to insert in place of \code{.old_val} in
+\code{.mod[[.field]]}.}
+
 \item{.tags}{Character vector to add to \code{tags} field}
 
 \item{.old_tag}{Character scalar of tag to be replaced}
@@ -86,9 +95,10 @@ replace_bbi_args(.mod, .bbi_args)
 }
 \description{
 Helper functions for updating fields in a \verb{bbi_\{.model_type\}_model} object.
-Note that calling \code{modify_model_field()} directly is not recommended for most users
-because it requires knowing about the internal structure of the model object.
-Instead we recommend using the friendlier helpers listed below (\code{add_...} or \code{replace_...}) when possible.
+Note that calling \code{modify_model_field()} or \code{replace_model_field()} directly
+is \emph{not} recommended for most users because it requires knowing about the
+internal structure of the model object. Instead, \strong{we recommend using the
+friendlier helpers listed below} (\code{add_...} or \code{replace_...}) when possible.
 }
 \details{
 All functions in this family also check the object against the corresponding YAML with \code{check_yaml_in_sync()} before modifying it,
@@ -98,6 +108,8 @@ memory with an md5 digest of the newly written YAML.
 }
 \section{Functions}{
 \itemize{
+\item \code{replace_model_field}: Replace a single item in a model field
+
 \item \code{add_tags}: Add tags to a model object and corresponding YAML
 
 \item \code{replace_tag}: Replaces a specific \code{.old_tag} with \code{.new_tag} on a model object and corresponding YAML.
