@@ -19,8 +19,14 @@ Defaults to \code{", "}.}
 }
 \value{
 Returns the same tibble as \code{.data}, but any list columns named in
-\code{...} will be collapsed to a character column, with one scalar value (or
-\code{NA}) for each row. See "Details" section for caveats.
+\code{...} will be collapsed to a character column, with a character scalar (or
+\code{NA}) for each row.
+
+Cells containing either \code{character}, \code{numeric}, or \code{logical} vectors will
+be collapsed to a single string with \code{paste0(collapse = .sep)}.
+
+Cells containing \emph{anything else} (i.e. lists, nested tibbles, etc.) will
+be converted to a string representation of that object via \code{\link[=dput]{dput()}}.
 }
 \description{
 Collapses list columns in a tibble into columns of character scalars.
@@ -28,17 +34,15 @@ Collapses list columns in a tibble into columns of character scalars.
 \details{
 Any non-list columns passed to \code{...} will be ignored and will
 trigger a warning notifying the user that only list columns can be collapsed.
-
-Any list columns passed to \code{...} which do \emph{not} contain either character,
-numeric, or logical vectors (i.e. lists of lists) will be silently ignored.
 }
 \examples{
 df <- tibble::tibble(
   row_num   = c(1, 2, 3),
   char_list = list(c("foo", "bar"), "baz", c("naw", "dawg")),
-  num_list  = list(c(23, 34, 45), c(-1, -2, -3), NULL)
+  num_list  = list(c(23, 34, 45), c(-1, -2, -3), NULL),
+  list_list  = list(list(a=1, b=2, c=3), NULL, list(z=-1, y=-2, x=-3))
 )
 
-collapse_to_string(df, char_list, num_list)
+collapse_to_string(df, char_list, num_list, list_list)
 
 }

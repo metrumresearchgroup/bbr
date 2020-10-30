@@ -5,21 +5,25 @@
 #' @details Any non-list columns passed to `...` will be ignored and will
 #' trigger a warning notifying the user that only list columns can be collapsed.
 #'
-#' Any list columns passed to `...` which do _not_ contain either character,
-#' numeric, or logical vectors (i.e. lists of lists) will be silently ignored.
-#'
 #' @return Returns the same tibble as `.data`, but any list columns named in
-#' `...` will be collapsed to a character column, with one scalar value (or
-#' `NA`) for each row. See "Details" section for caveats.
+#' `...` will be collapsed to a character column, with a character scalar (or
+#' `NA`) for each row.
+#'
+#' Cells containing either `character`, `numeric`, or `logical` vectors will
+#' be collapsed to a single string with `paste0(collapse = .sep)`.
+#'
+#' Cells containing _anything else_ (i.e. lists, nested tibbles, etc.) will
+#' be converted to a string representation of that object via [dput()].
 #'
 #' @examples
 #' df <- tibble::tibble(
 #'   row_num   = c(1, 2, 3),
 #'   char_list = list(c("foo", "bar"), "baz", c("naw", "dawg")),
-#'   num_list  = list(c(23, 34, 45), c(-1, -2, -3), NULL)
+#'   num_list  = list(c(23, 34, 45), c(-1, -2, -3), NULL),
+#'   list_list  = list(list(a=1, b=2, c=3), NULL, list(z=-1, y=-2, x=-3))
 #' )
 #'
-#' collapse_to_string(df, char_list, num_list)
+#' collapse_to_string(df, char_list, num_list, list_list)
 #'
 #' @param .data Input tibble to modify
 #' @param ... One or more unquoted expressions separated by commas (in the style
@@ -28,11 +32,12 @@
 #'   of variables.
 #' @param .sep Character scalar to use a separator when collapsing vectors.
 #'   Defaults to `", "`.
-#' @importFrom dplyr mutate mutate_at group_by ungroup select row_number
+#' @importFrom dplyr mutate mutate_at select
 #' @importFrom tidyselect eval_select
 #' @importFrom rlang expr
-#' @importFrom purrr map_lgl
+#' @importFrom purrr map_lgl modify_at map_chr
 #' @importFrom checkmate assert_scalar
+#' @importFrom utils capture.output
 #' @export
 collapse_to_string <- function(.data, ..., .sep = ", ") {
   checkmate::assert_scalar(.sep)
@@ -49,17 +54,19 @@ collapse_to_string <- function(.data, ..., .sep = ", ") {
 
   # collapse together any lists of vectors
   .data %>%
-    mutate(.collapse_key = row_number()) %>%
-    group_by(.data[[".collapse_key"]]) %>%
-    mutate_at(.vars = vars({{cols}}),
-              function(.vec) {
-                if (is.null(.vec[[1]])) {
-                  .vec <- NA_character_
-                } else if (inherits(.vec[[1]], c("character", "numeric", "logical"))) {
-                  .vec <- paste(unlist(.vec), collapse = .sep)
-                }
-                .vec
-              }) %>%
-    ungroup(.data[[".collapse_key"]]) %>%
-    select(-.data[[".collapse_key"]])
+    modify_at(.at = cols, .f = function(x) {
+      map_chr(x, .f = function(.vec) {
+        if (inherits(.vec, c("character", "numeric", "logical"))) {
+          .vec <- paste0(.vec, collapse = .sep)
+        } else if (is.null(.vec)) {
+          .vec <- NA_character_
+        } else {
+          .vec <- paste(
+            capture.output(dput(.vec)),
+            collapse = ""
+          )
+        }
+        return(.vec)
+      })
+    })
 }

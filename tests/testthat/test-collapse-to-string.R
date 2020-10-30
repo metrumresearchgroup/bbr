@@ -58,12 +58,36 @@ test_that("collapse_to_string() errors correctly", {
   )
 })
 
-test_that("collapse_to_string() leaves list of lists untouched", {
+test_that("collapse_to_string() renders dput correctly", {
   log_df <- run_log(MODEL_DIR)
-  orig_args <- log_df[[YAML_BBI_ARGS]]
+  ref_args <- purrr::map_chr(
+    log_df[[YAML_BBI_ARGS]],
+    ~ capture.output(dput(.x))
+  )
 
   log_df <- log_df %>%
-    collapse_to_string({{YAML_TAGS}}, {{YAML_BBI_ARGS}})
+    collapse_to_string({{YAML_BBI_ARGS}})
 
-  expect_identical(orig_args, log_df[[YAML_BBI_ARGS]])
+  expect_identical(ref_args, log_df[[YAML_BBI_ARGS]])
+})
+
+test_that("collapse_to_string() renders dput for tibbles", {
+  nums <- seq_len(3)
+  df <- tibble::tibble(
+    row_num   = nums,
+    tibby     = list(
+      tibble::tibble(a = nums, b=nums, c=nums),
+      tibble::tibble(d = nums, e=nums, f=nums),
+      tibble::tibble(g = nums, h=nums, i=nums)
+    )
+  )
+
+  ref_tib <- purrr::map_chr(
+    df$tibby,
+    ~ paste(capture.output(dput(.x)), collapse = "")
+  )
+
+  df <- collapse_to_string(df, tibby)
+
+  expect_identical(ref_tib, df$tibby)
 })
