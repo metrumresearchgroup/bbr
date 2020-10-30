@@ -15,7 +15,6 @@
 #' and errors if they are out of sync.
 #' After the object has been modified they will write the modified object back to the YAML and update the model object in
 #' memory with an md5 digest of the newly written YAML.
-#' @importFrom digest digest
 #' @param .mod The `bbi_{.model_type}_model` object to modify
 #' @param .field Character scalar of the name of the component to modify
 #' @param .value Whatever is to be added to `.mod[[.field]]`, typically a character vector
@@ -88,11 +87,12 @@ replace_model_field <- function(.mod, .field, .old_val, .new_val) {
 #' @param .tags Character vector to add to `tags` field
 #' @export
 add_tags <- function(.mod, .tags) {
-  .mod <- modify_model_field(.mod = .mod,
-                             .field = YAML_TAGS,
-                             .value = .tags,
-                             .append = TRUE)
-  return(.mod)
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_TAGS,
+    .value = .tags,
+    .append = TRUE
+  )
 }
 
 #' @describeIn modify_model_field Replaces a specific `.old_tag` with `.new_tag` on a model object and corresponding YAML.
@@ -107,22 +107,24 @@ replace_tag <- function(.mod, .old_tag, .new_tag) {
 #' @describeIn modify_model_field Replaces all tags on a model object and corresponding YAML with new tags
 #' @export
 replace_all_tags <- function(.mod, .tags) {
-  .mod <- modify_model_field(.mod = .mod,
-                             .field = YAML_TAGS,
-                             .value = .tags,
-                             .append = FALSE)
-  return(.mod)
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_TAGS,
+    .value = .tags,
+    .append = FALSE
+  )
 }
 
 #' @describeIn modify_model_field Removes tags from a model object and corresponding YAML
 #' @export
 remove_tags <- function(.mod, .tags) {
-  .mod <- modify_model_field(.mod = .mod,
-                             .field = YAML_TAGS,
-                             .value = .tags,
-                             .append = FALSE,
-                             .remove = TRUE)
-  return(.mod)
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_TAGS,
+    .value = .tags,
+    .append = FALSE,
+    .remove = TRUE
+  )
 }
 
 
@@ -130,11 +132,12 @@ remove_tags <- function(.mod, .tags) {
 #' @param .notes Character vector to add to `notes` field
 #' @export
 add_notes <- function(.mod, .notes) {
-  .mod <- modify_model_field(.mod = .mod,
-                             .field = YAML_NOTES,
-                             .value = .notes,
-                             .append = TRUE)
-  return(.mod)
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_NOTES,
+    .value = .notes,
+    .append = TRUE
+  )
 }
 
 #' @describeIn modify_model_field Replaces a specific `.old_note` with `.new_note` on a model object and corresponding YAML.
@@ -149,22 +152,24 @@ replace_note <- function(.mod, .old_note, .new_note) {
 #' @describeIn modify_model_field Replaces all notes on a model object and corresponding YAML with new notes
 #' @export
 replace_all_notes <- function(.mod, .notes) {
-  .mod <- modify_model_field(.mod = .mod,
-                             .field = YAML_NOTES,
-                             .value = .notes,
-                             .append = FALSE)
-  return(.mod)
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_NOTES,
+    .value = .notes,
+    .append = FALSE
+  )
 }
 
 #' @describeIn modify_model_field Removes notes from a model object and corresponding YAML
 #' @export
 remove_notes <- function(.mod, .notes) {
-  .mod <- modify_model_field(.mod = .mod,
-                             .field = YAML_NOTES,
-                             .value = .notes,
-                             .append = FALSE,
-                             .remove = TRUE)
-  return(.mod)
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_NOTES,
+    .value = .notes,
+    .append = FALSE,
+    .remove = TRUE
+  )
 }
 
 #' @describeIn modify_model_field Append new `based_on` tag(s) to a model object and corresponding YAML
@@ -218,19 +223,18 @@ remove_based_on <- function(.mod, .based_on) {
 #' @export
 replace_description <- function(.mod, .description) {
   checkmate::assert_scalar(.description)
-  .mod <- modify_model_field(.mod = .mod,
-                             .field = YAML_DESCRIPTION,
-                             .value = .description,
-                             .append = FALSE)
-
-  return(.mod)
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_DESCRIPTION,
+    .value = .description,
+    .append = FALSE
+  )
 }
 
 #' @describeIn modify_model_field Modifies model object and corresponding YAML
 #'   by adding named list passed to `.bbi_args`, overwriting any args that are
 #'   already present with the new values. Use [print_bbi_args()] to see a list
 #'   of valid babylon arguments.
-#' @importFrom digest digest
 #' @param .bbi_args named list of arguments to add to the model
 #' @export
 add_bbi_args <- function(.mod, .bbi_args) {
@@ -250,7 +254,6 @@ add_bbi_args <- function(.mod, .bbi_args) {
 #' @describeIn modify_model_field Modifies model object and corresponding YAML
 #'   by replacing all `bbi_args` with named list passed to `.bbi_args`. Use
 #'   [print_bbi_args()] to see a list of valid babylon arguments.
-#' @importFrom digest digest
 #' @export
 replace_all_bbi_args <- function(.mod, .bbi_args) {
 
@@ -271,11 +274,12 @@ replace_all_bbi_args <- function(.mod, .bbi_args) {
 #' @export
 add_decisions <- function(.mod, .decisions) {
   warning("The `decisions` field has been replaced by `notes`. At some point it will be removed. Please use `add_notes()` going forward.")
-  .mod <- modify_model_field(.mod = .mod,
-                             .field = YAML_DECISIONS,
-                             .value = .decisions,
-                             .append = TRUE)
-  return(.mod)
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_DECISIONS,
+    .value = .decisions,
+    .append = TRUE
+  )
 }
 
 #' @describeIn modify_model_field _Deprecaed_ Replaces `decisions` field in a model object and corresponding YAML with new values
@@ -283,11 +287,12 @@ add_decisions <- function(.mod, .decisions) {
 #' @export
 replace_decisions <- function(.mod, .decisions) {
   warning("The `decisions` field has been replaced by `notes`. At some point it will be removed. Please use `replace_notes()` going forward.")
-  .mod <- modify_model_field(.mod = .mod,
-                             .field = YAML_DECISIONS,
-                             .value = .decisions,
-                             .append = FALSE)
-  return(.mod)
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_DECISIONS,
+    .value = .decisions,
+    .append = FALSE
+  )
 }
 
 ###########################

@@ -156,12 +156,14 @@ Warns and does nothing if \code{.old_based_on} is not present.
 
 \item \code{replace_description}: Replaces description field in a model object and corresponding YAML with new description
 
-\item \code{add_bbi_args}: Modifies model object and corresponding YAML by adding new \code{bbi_args},
-overwriting any args that are already present with the new values.
-Use \code{\link[=print_bbi_args]{print_bbi_args()}} to see a list of valid babylon arguments.
+\item \code{add_bbi_args}: Modifies model object and corresponding YAML
+by adding named list passed to \code{.bbi_args}, overwriting any args that are
+already present with the new values. Use \code{\link[=print_bbi_args]{print_bbi_args()}} to see a list
+of valid babylon arguments.
 
-\item \code{replace_all_bbi_args}: Modifies model object and corresponding YAML by replacing all \code{bbi_args} with new list passed to \code{.bbi_args}.
-Use \code{\link[=print_bbi_args]{print_bbi_args()}} to see a list of valid babylon arguments.
+\item \code{replace_all_bbi_args}: Modifies model object and corresponding YAML
+by replacing all \code{bbi_args} with named list passed to \code{.bbi_args}. Use
+\code{\link[=print_bbi_args]{print_bbi_args()}} to see a list of valid babylon arguments.
 
 \item \code{add_decisions}: \emph{Deprecaed}  Append new decisions to the one(s) in a model object and corresponding YAML
 
