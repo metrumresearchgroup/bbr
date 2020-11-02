@@ -46,6 +46,9 @@ model object `tags` field. (#252)
   
 ## Bug fixes
 
+* `submit_models()` correctly handles the case where bbi arguments are neither
+  present in the YAML file nor passed at runtime (#248).
+
 * `config_log()` and `add_config()` are supposed to warn a user if models are
 found that do _not_ have a corresponding `bbi_config.json` file (i.e. have not
 yet been run, or did not finish successfully). However, if there is no output

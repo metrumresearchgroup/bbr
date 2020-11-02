@@ -135,6 +135,8 @@ build_bbi_param_list <- function(.mods, .bbi_args = NULL) {
     # `parse_args_list()` will return an empty list if both are `NULL`
     purrr::map(~ parse_args_list(.bbi_args, .)) %>%
     purrr::map(check_bbi_args) %>%
+    # replace `NULL` by the empty string to avoid indexing issues below
+    purrr::map(~ . %||% character(1L)) %>%
     purrr::map(sort)
 
   mod_working_dirs <- purrr::map_chr(.mods, get_model_working_directory)
@@ -158,6 +160,8 @@ build_bbi_param_list <- function(.mods, .bbi_args = NULL) {
         mod_working_dirs,
         ~ identical(.x, args) && identical(.y, key[dir_idx])
       )
+      # but replace the empty string by `NULL` to maintain existing behavior
+      if (identical(args, character(1L))) args <- NULL
       list(
         bbi_args = args,
         models = .mods[keep_mod_idx]
