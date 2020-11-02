@@ -17,6 +17,7 @@
 \alias{replace_based_on}
 \alias{remove_based_on}
 \alias{replace_description}
+\alias{add_description}
 \alias{add_bbi_args}
 \alias{replace_all_bbi_args}
 \alias{replace_bbi_args}
@@ -62,6 +63,8 @@ replace_based_on(.mod, .based_on)
 remove_based_on(.mod, .based_on)
 
 replace_description(.mod, .description)
+
+add_description(.mod, .description)
 
 add_bbi_args(.mod, .bbi_args)
 
@@ -159,6 +162,8 @@ Warns and does nothing if \code{.old_note} is not present.
 
 \item \code{replace_description}: Replaces description field in a model object and corresponding YAML with new description
 
+\item \code{add_description}: Fills the description field in a model object and corresponding YAML, if it is currently empty.
+
 \item \code{add_bbi_args}: Modifies model object and corresponding YAML
 by adding named list passed to \code{.bbi_args}, overwriting any args that are
 already present with the new values. Use \code{\link[=print_bbi_args]{print_bbi_args()}} to see a list
@@ -170,7 +175,7 @@ by replacing all \code{bbi_args} with named list passed to \code{.bbi_args}. Use
 
 \item \code{replace_bbi_args}: \emph{Deprecated} as of rbabylon 0.10.0, use \code{replace_all_bbi_args()} instead.
 
-\item \code{add_decisions}: \emph{Deprecaed}  Append new decisions to the one(s) in a model object and corresponding YAML
+\item \code{add_decisions}: \emph{Deprecated}  Append new decisions to the one(s) in a model object and corresponding YAML
 
 \item \code{replace_decisions}: \emph{Deprecaed} Replaces \code{decisions} field in a model object and corresponding YAML with new values
 }}

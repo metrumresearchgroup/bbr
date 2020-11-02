@@ -20,8 +20,7 @@ and YAML file (both without extension), and the path to the output
 directory.}
 
 \item{.description}{Character scalar description of new model run. This will
-be stored in the yaml (and can be viewed later in \code{run_log()}). If \code{NULL},
-the default, will be set to \code{basename(.path)}.}
+be stored in the yaml (and can be viewed later in \code{run_log()}).}
 
 \item{.based_on}{Character scalar or vector of paths to other models that
 this model was "based on." These are used to reconstuct model developement

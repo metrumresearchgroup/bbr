@@ -14,15 +14,14 @@ test_that("copy_from_model creates accurate copy", {
 
   # check that everything is copied through in the object
   expect_identical(class(new_mod), MOD_CLASS_LIST)
-  expect_identical(new_mod[[YAML_DESCRIPTION]], basename(NEW_MOD2))
   expect_identical(new_mod[[YAML_BASED_ON]], "1")
   expect_identical(new_mod[[YAML_TAGS]], NEW_TAGS)
   expect_equal(new_mod[[YAML_BBI_ARGS]], list(overwrite = TRUE, threads = 4L))
+  expect_null(new_mod[[YAML_DESCRIPTION]])
 
   # check that everything is copied through in the YAML
   new_yaml <- yaml::read_yaml(yaml_ext(NEW_MOD2))
 
-  expect_identical(new_yaml[[YAML_DESCRIPTION]], basename(NEW_MOD2))
   expect_identical(new_yaml[[YAML_BASED_ON]], "1")
   expect_identical(new_yaml[[YAML_TAGS]], NEW_TAGS)
   expect_equal(new_yaml[[YAML_BBI_ARGS]], list(overwrite = TRUE, threads = 4L))
