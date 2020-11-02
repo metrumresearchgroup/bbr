@@ -139,5 +139,39 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
       )
     )
   })
+
+  test_that("submit_models() works if .bbi_args is empty", {
+    # set existing arguments to NULL via `.bbi_args`
+    res <- submit_models(
+      list(MOD1),
+      .bbi_args = list(overwrite = NULL, threads = NULL),
+      .dry_run = TRUE
+    )
+
+    expect_identical(
+      res[[1L]][[PROC_CALL]],
+      as.character(
+        glue::glue("cd {model_dir} ; bbi nonmem run sge {mod_ctl_path[[1L]]}")
+      )
+    )
+
+    # now the case where the YAML file does not contain any CLI arguments
+    temp_mod_path <- create_temp_model()
+    mod <- read_model(temp_mod_path)
+    mod <- replace_all_bbi_args(mod, NULL)
+
+    res <- submit_models(list(mod), .dry_run = TRUE)
+
+    expect_identical(
+      res[[1L]][[PROC_CALL]],
+      as.character(
+        glue::glue(
+          "cd {dirname(temp_mod_path)} ;",
+          "bbi nonmem run sge {fs::path_ext_set(temp_mod_path, 'ctl')}",
+          .sep = " "
+        )
+      )
+    )
+  })
 }) # closing withr::with_options
 
