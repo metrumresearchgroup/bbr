@@ -286,7 +286,6 @@ replace_bbi_args <- function(.mod, .bbi_args) {
 #' @export
 add_decisions <- function(.mod, .decisions) {
   warning("The `decisions` field has been replaced by `notes` as of rbabylon 0.10.0 and will be removed in a future release. Please use `add_notes()` going forward.")
-  deprecate_warn("0.10.0", "rbabylon::replace_bbi_args()", "replace_all_bbi_args()")
   modify_model_field(
     .mod = .mod,
     .field = YAML_DECISIONS,
