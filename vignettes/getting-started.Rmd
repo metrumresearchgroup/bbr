@@ -247,7 +247,7 @@ The `run_log()` returns a tibble which can be manipulated like any other tibble.
 
 ## Viewing tags example
 
-The `rbabylon::collapse_to_string()` function can be passed any column that is a list of vectors. It is specifically designed for collapsing columns like `tags`, `notes`, and `based_on` to a more human-readable format.
+The `rbabylon::collapse_to_string()` function can collapse any list column into a string representation of its contents. It is specifically designed for collapsing columns like `tags`, `notes`, and `based_on` into a more human-readable format.
 
 ```{r viewing tags new} 
 log_df %>% 

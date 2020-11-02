@@ -10,7 +10,7 @@ teardown({ cleanup() })
 test_that("collapse_to_string() works correctly", {
   # add a note to collapse
   mod2 <- read_model(file.path(MODEL_DIR, 2)) %>% add_notes(NEW_NOTES)
-  on.exit(replace_notes(mod2, NULL))
+  on.exit(replace_all_notes(mod2, NULL))
 
   log_df <- run_log(MODEL_DIR)
   expect_true(inherits(log_df[[YAML_TAGS]], "list"))

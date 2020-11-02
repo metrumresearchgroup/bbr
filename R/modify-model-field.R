@@ -5,16 +5,16 @@
 #' Modify field in model object
 #'
 #' Helper functions for updating fields in a `bbi_{.model_type}_model` object.
-#' Note that calling `modify_model_field()` directly is not recommended for most users
-#' because it requires knowing about the internal structure of the model object.
-#' Instead we recommend using the friendlier helpers listed below (`add_...` or `replace_...`) when possible.
+#' Note that calling `modify_model_field()` or `replace_model_field()` directly
+#' is _not_ recommended for most users because it requires knowing about the
+#' internal structure of the model object. Instead, **we recommend using the
+#' friendlier helpers listed below** (`add_...` or `replace_...`) when possible.
 #'
 #' @details
 #' All functions in this family also check the object against the corresponding YAML with `check_yaml_in_sync()` before modifying it,
 #' and errors if they are out of sync.
 #' After the object has been modified they will write the modified object back to the YAML and update the model object in
 #' memory with an md5 digest of the newly written YAML.
-#' @importFrom digest digest
 #' @param .mod The `bbi_{.model_type}_model` object to modify
 #' @param .field Character scalar of the name of the component to modify
 #' @param .value Whatever is to be added to `.mod[[.field]]`, typically a character vector
@@ -38,7 +38,7 @@ modify_model_field <- function(.mod, .field, .value, .append = TRUE, .remove = F
     missing <- !(.value %in% .mod[[.field]])
     if (any(missing)) {
       missing_vals <- paste(.value[which(missing)], collapse = ", ")
-      warning(glue("Field `{.field}` does not contain any of the following, so they cannot be removed: {missing_vals}"))
+      warning(glue("`{.field}` does not contain any of the following, so they cannot be removed: {missing_vals}"))
     }
     .mod[[.field]] <- setdiff(.mod[[.field]], .value)
   } else {
@@ -56,36 +56,82 @@ modify_model_field <- function(.mod, .field, .value, .append = TRUE, .remove = F
   return(.mod)
 }
 
+#' @describeIn modify_model_field Replace a single item in a model field
+#' @param .old_val The value to be replaced. If `.old_val` is not present in
+#'   `.mod[[.field]]`, function will warn user and return `.mod` unchanged.
+#' @param .new_val The value to insert in place of `.old_val` in
+#'   `.mod[[.field]]`.
+#' @export
+replace_model_field <- function(.mod, .field, .old_val, .new_val) {
+
+  # update .mod with any changes from yaml on disk
+  check_yaml_in_sync(.mod)
+
+  idx <- which(.mod[[.field]] == .old_val)
+  if (length(idx) == 0) {
+    warning(glue("`{.field}` does not contain the {.old_val}, so it cannot be replaced."))
+    return(.mod)
+  }
+
+  .mod[[.field]][idx] <- .new_val
+
+  return(.mod)
+}
+
+
+#####################
+# FRIENDLIER HELPERS
+#####################
+
 #' @describeIn modify_model_field Add tags to a model object and corresponding YAML
 #' @param .tags Character vector to add to `tags` field
 #' @export
 add_tags <- function(.mod, .tags) {
-  .mod <- modify_model_field(.mod = .mod,
-                             .field = YAML_TAGS,
-                             .value = .tags,
-                             .append = TRUE)
-  return(.mod)
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_TAGS,
+    .value = .tags,
+    .append = TRUE
+  )
 }
 
-#' @describeIn modify_model_field Replaces tags on a model object and corresponding YAML with new tags
+#' @describeIn modify_model_field Replaces a specific `.old_tag` with `.new_tag` on a model object and corresponding YAML.
+#' Warns and does nothing if `.old_tag` is not present.
+#' @param .old_tag Character scalar of tag to be replaced
+#' @param .new_tag Character scalar of tag that will be added
+#' @export
+replace_tag <- function(.mod, .old_tag, .new_tag) {
+  replace_model_field(.mod, YAML_TAGS, .old_tag, .new_tag)
+}
+
+#' @describeIn modify_model_field Replaces all tags on a model object and corresponding YAML with new tags
+#' @export
+replace_all_tags <- function(.mod, .tags) {
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_TAGS,
+    .value = .tags,
+    .append = FALSE
+  )
+}
+
+#' @describeIn modify_model_field _Deprecated_ as of rbabylon 0.10.0, use `replace_all_tags()` instead.
 #' @export
 replace_tags <- function(.mod, .tags) {
-  .mod <- modify_model_field(.mod = .mod,
-                             .field = YAML_TAGS,
-                             .value = .tags,
-                             .append = FALSE)
-  return(.mod)
+  deprecate_warn("0.10.0", "rbabylon::replace_tags()", "replace_all_tags()")
+  replace_all_tags(.mod, .tags)
 }
 
 #' @describeIn modify_model_field Removes tags from a model object and corresponding YAML
 #' @export
 remove_tags <- function(.mod, .tags) {
-  .mod <- modify_model_field(.mod = .mod,
-                             .field = YAML_TAGS,
-                             .value = .tags,
-                             .append = FALSE,
-                             .remove = TRUE)
-  return(.mod)
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_TAGS,
+    .value = .tags,
+    .append = FALSE,
+    .remove = TRUE
+  )
 }
 
 
@@ -93,60 +139,47 @@ remove_tags <- function(.mod, .tags) {
 #' @param .notes Character vector to add to `notes` field
 #' @export
 add_notes <- function(.mod, .notes) {
-  .mod <- modify_model_field(.mod = .mod,
-                             .field = YAML_NOTES,
-                             .value = .notes,
-                             .append = TRUE)
-  return(.mod)
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_NOTES,
+    .value = .notes,
+    .append = TRUE
+  )
 }
 
-#' @describeIn modify_model_field Replaces notes on a model object and corresponding YAML with new notes
+#' @describeIn modify_model_field Replaces a specific `.old_note` with `.new_note` on a model object and corresponding YAML.
+#' Warns and does nothing if `.old_note` is not present.
+#' @param .old_note Character scalar of note to be replaced
+#' @param .new_note Character scalar of note that will be added
 #' @export
-replace_notes <- function(.mod, .notes) {
-  .mod <- modify_model_field(.mod = .mod,
-                             .field = YAML_NOTES,
-                             .value = .notes,
-                             .append = FALSE)
-  return(.mod)
+replace_note <- function(.mod, .old_note, .new_note) {
+  replace_model_field(.mod, YAML_NOTES, .old_note, .new_note)
+}
+
+#' @describeIn modify_model_field Replaces all notes on a model object and corresponding YAML with new notes
+#' @export
+replace_all_notes <- function(.mod, .notes) {
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_NOTES,
+    .value = .notes,
+    .append = FALSE
+  )
 }
 
 #' @describeIn modify_model_field Removes notes from a model object and corresponding YAML
 #' @export
 remove_notes <- function(.mod, .notes) {
-  .mod <- modify_model_field(.mod = .mod,
-                             .field = YAML_NOTES,
-                             .value = .notes,
-                             .append = FALSE,
-                             .remove = TRUE)
-  return(.mod)
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_NOTES,
+    .value = .notes,
+    .append = FALSE,
+    .remove = TRUE
+  )
 }
 
-#' @describeIn modify_model_field Append new decisions to the one(s) in a model object and corresponding YAML
-#' @param .decisions Character vector to add to `decisions` field
-#' @export
-add_decisions <- function(.mod, .decisions) {
-  warning("The `decisions` field has been replaced by `notes`. At some point it will be removed. Please use `add_notes()` going forward.")
-  .mod <- modify_model_field(.mod = .mod,
-                             .field = YAML_DECISIONS,
-                             .value = .decisions,
-                             .append = TRUE)
-  return(.mod)
-}
-
-#' @describeIn modify_model_field Replaces `decisions` field in a model object and corresponding YAML with new values
-#' @param .decisions Character vector to use as replacement
-#' @export
-replace_decisions <- function(.mod, .decisions) {
-  warning("The `decisions` field has been replaced by `notes`. At some point it will be removed. Please use `replace_notes()` going forward.")
-  .mod <- modify_model_field(.mod = .mod,
-                             .field = YAML_DECISIONS,
-                             .value = .decisions,
-                             .append = FALSE)
-  return(.mod)
-}
-
-
-#' @describeIn modify_model_field Append new `based_on` tag to the one in a model object and corresponding YAML
+#' @describeIn modify_model_field Append new `based_on` tag(s) to a model object and corresponding YAML
 #' @param .based_on Character vector of relative paths to add to `based_on` field
 #' @export
 add_based_on <- function(.mod, .based_on) {
@@ -158,14 +191,34 @@ add_based_on <- function(.mod, .based_on) {
   )
 }
 
-#' @describeIn modify_model_field Replaces `based_on` field in a model object and corresponding YAML with new values
+#' @describeIn modify_model_field Replaces entire `based_on` field in a model object and corresponding YAML with new values
 #' @export
-replace_based_on <- function(.mod, .based_on) {
+replace_all_based_on <- function(.mod, .based_on) {
   modify_model_field(
     .mod = .mod,
     .field = YAML_BASED_ON,
     .value = safe_based_on(get_model_working_directory(.mod), .based_on),
     .append = FALSE
+  )
+}
+
+#' @describeIn modify_model_field _Deprecated_ as of rbabylon 0.10.0, use `replace_all_based_on()` instead.
+#' @export
+replace_based_on <- function(.mod, .based_on) {
+  deprecate_warn("0.10.0", "rbabylon::replace_based_on()", "replace_all_based_on()")
+  replace_all_based_on(.mod, .based_on)
+}
+
+#' @describeIn modify_model_field Remove specified `based_on` tag(s) from a model object and corresponding YAML
+#' @param .based_on Character vector of relative paths to add to `based_on` field
+#' @export
+remove_based_on <- function(.mod, .based_on) {
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_BASED_ON,
+    .value = safe_based_on(get_model_working_directory(.mod), .based_on),
+    .append = FALSE,
+    .remove = TRUE
   )
 }
 
@@ -175,19 +228,18 @@ replace_based_on <- function(.mod, .based_on) {
 #' @export
 replace_description <- function(.mod, .description) {
   checkmate::assert_scalar(.description)
-  .mod <- modify_model_field(.mod = .mod,
-                             .field = YAML_DESCRIPTION,
-                             .value = .description,
-                             .append = FALSE)
-
-  return(.mod)
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_DESCRIPTION,
+    .value = .description,
+    .append = FALSE
+  )
 }
 
-
-#' @describeIn modify_model_field Modifies model object and corresponding YAML by adding new `bbi_args`,
-#' overwriting any args that are already present with the new values.
-#' Use [print_bbi_args()] to see a list of valid babylon arguments.
-#' @importFrom digest digest
+#' @describeIn modify_model_field Modifies model object and corresponding YAML
+#'   by adding named list passed to `.bbi_args`, overwriting any args that are
+#'   already present with the new values. Use [print_bbi_args()] to see a list
+#'   of valid babylon arguments.
 #' @param .bbi_args named list of arguments to add to the model
 #' @export
 add_bbi_args <- function(.mod, .bbi_args) {
@@ -204,16 +256,16 @@ add_bbi_args <- function(.mod, .bbi_args) {
   return(.mod)
 }
 
-#' @describeIn modify_model_field Modifies model object and corresponding YAML by replacing `bbi_args` with new list passed to `.bbi_args`.
-#' Use [print_bbi_args()] to see a list of valid babylon arguments.
-#' @importFrom digest digest
+#' @describeIn modify_model_field Modifies model object and corresponding YAML
+#'   by replacing all `bbi_args` with named list passed to `.bbi_args`. Use
+#'   [print_bbi_args()] to see a list of valid babylon arguments.
 #' @export
-replace_bbi_args <- function(.mod, .bbi_args) {
+replace_all_bbi_args <- function(.mod, .bbi_args) {
 
   # update .mod with any changes from yaml on disk
   check_yaml_in_sync(.mod)
 
-  # combine the two lists, with .bbi_args overwriting any keys that are shared
+  # overwrite all previous
   .mod[[YAML_BBI_ARGS]] <- .bbi_args
 
   # overwrite the yaml on disk with modified model
@@ -222,10 +274,43 @@ replace_bbi_args <- function(.mod, .bbi_args) {
   return(.mod)
 }
 
+#' @describeIn modify_model_field _Deprecated_ as of rbabylon 0.10.0, use `replace_all_bbi_args()` instead.
+#' @export
+replace_bbi_args <- function(.mod, .bbi_args) {
+  deprecate_warn("0.10.0", "rbabylon::replace_bbi_args()", "replace_all_bbi_args()")
+  replace_all_bbi_args(.mod, .bbi_args)
+}
 
-###################
-# helper functions
-###################
+#' @describeIn modify_model_field _Deprecaed_  Append new decisions to the one(s) in a model object and corresponding YAML
+#' @param .decisions Character vector to add to `decisions` field
+#' @export
+add_decisions <- function(.mod, .decisions) {
+  warning("The `decisions` field has been replaced by `notes` as of rbabylon 0.10.0 and will be removed in a future release. Please use `add_notes()` going forward.")
+  deprecate_warn("0.10.0", "rbabylon::replace_bbi_args()", "replace_all_bbi_args()")
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_DECISIONS,
+    .value = .decisions,
+    .append = TRUE
+  )
+}
+
+#' @describeIn modify_model_field _Deprecaed_ Replaces `decisions` field in a model object and corresponding YAML with new values
+#' @param .decisions Character vector to use as replacement
+#' @export
+replace_decisions <- function(.mod, .decisions) {
+  warning("The `decisions` field has been replaced by `notes` as of rbabylon 0.10.0 and will be removed in a future release. Please use `replace_all_notes()` going forward.")
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_DECISIONS,
+    .value = .decisions,
+    .append = FALSE
+  )
+}
+
+###########################
+# private helper functions
+###########################
 
 #' Checks for yaml files relative to a starting location
 #' @importFrom fs file_exists is_absolute_path path_rel
