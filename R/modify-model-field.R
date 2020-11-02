@@ -69,7 +69,7 @@ replace_model_field <- function(.mod, .field, .old_val, .new_val) {
 
   idx <- which(.mod[[.field]] == .old_val)
   if (length(idx) == 0) {
-    warning(glue("`{.field}` does not contain the {.old_val}, so it cannot be replaced."))
+    warning(glue("`{.field}` does not contain {.old_val}, so it cannot be replaced."))
     return(.mod)
   }
 
@@ -286,7 +286,6 @@ replace_bbi_args <- function(.mod, .bbi_args) {
 #' @export
 add_decisions <- function(.mod, .decisions) {
   warning("The `decisions` field has been replaced by `notes` as of rbabylon 0.10.0 and will be removed in a future release. Please use `add_notes()` going forward.")
-  deprecate_warn("0.10.0", "rbabylon::replace_bbi_args()", "replace_all_bbi_args()")
   modify_model_field(
     .mod = .mod,
     .field = YAML_DECISIONS,
