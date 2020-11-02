@@ -201,7 +201,7 @@ copy_control_stream <- function(.parent_model_path, .new_model_path, .overwrite,
     new_mod_id <- get_model_id(.new_model_path)
     mod_str <- str_replace(mod_str,
                            "\\$PROB(.|\n)*?\\$",
-                           as.character(glue("$PROBLEM See {new_mod_id}.yaml. Created by rbabylon.\n\n$")))
+                           as.character(glue("$PROBLEM From rbabylon: see {new_mod_id}.yaml for details\n\n$")))
     glue("")
 
     # read parent control stream
