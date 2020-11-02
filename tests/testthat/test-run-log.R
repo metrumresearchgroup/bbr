@@ -83,21 +83,3 @@ test_that("run_log() works correctly with nested dirs", {
   expect_identical(log_df$yaml_md5, c(RUN_LOG_YAML_MD5, MOD_LEVEL2_MD5))
   expect_identical(log_df$based_on, list(NULL, "1", c("1", "2"), "../1"))
 })
-
-##########################################
-# testing errors after meddling
-##########################################
-
-test_that("run_log fails after messing with YAML", {
-  # make the description field an array
-  rogue_yaml <- yaml::read_yaml(yaml_ext(NEW_MOD3))
-  orig_desc <- rogue_yaml[[YAML_DESCRIPTION]]
-  rogue_yaml[[YAML_DESCRIPTION]] <- c(orig_desc, "bad stuff")
-  yaml::write_yaml(rogue_yaml, yaml_ext(NEW_MOD3))
-  on.exit({
-    rogue_yaml[[YAML_DESCRIPTION]] <- orig_desc
-    yaml::write_yaml(rogue_yaml, yaml_ext(NEW_MOD3))
-  })
-
-  expect_error(log_df <- run_log(MODEL_DIR), regexp = "Must have length 1")
-})
