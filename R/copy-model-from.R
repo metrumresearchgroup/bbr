@@ -161,7 +161,7 @@ copy_nonmem_model_from <- function(
   .parent_model_path <- get_model_path(.parent_mod)
   parent_ext <- fs::path_ext(.parent_model_path)
   .new_model_path <- paste(.new_model, parent_ext, sep = ".")
-  copy_control_stream(.parent_model_path, .new_model_path, .overwrite, .update_model_file, .description)
+  copy_control_stream(.parent_model_path, .new_model_path, .overwrite, .update_model_file)
 
   # create new model
   .new_mod <- new_model(
@@ -188,24 +188,23 @@ copy_nonmem_model_from <- function(
 #' @param .update_model_file If `TRUE`, the default, update the `$PROBLEM` line in the new control stream. If `FALSE`, `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.
 #' @param .description Description of new model run. This will be passed into the `$PROBLEM` of the new control stream (if `.update_model_file=TRUE`).
 #' @keywords internal
-copy_control_stream <- function(.parent_model_path, .new_model_path, .overwrite, .update_model_file = FALSE, .description = NULL) {
+copy_control_stream <- function(.parent_model_path, .new_model_path, .overwrite, .update_model_file = FALSE) {
 
   if (fs::file_exists(.new_model_path) && !isTRUE(.overwrite)) {
     stop(glue("File already exists at {.new_model_path} -- cannot copy new control stream. Either delete old file or use `new_model({yaml_ext(.new_model_path)})`"))
   }
 
   if (.update_model_file) {
-    if (is.null(.description)) {
-      stop("If `.update_model_file` is TRUE, user must specify a `.description` for the new model.")
-    }
 
     # read parent control stream
     mod_str <- .parent_model_path %>% read_file()
 
     # replace the $PROBLEM line(s)
+    new_mod_id <- get_model_id(.new_model_path)
     mod_str <- str_replace(mod_str,
                            "\\$PROB(.|\n)*?\\$",
-                           as.character(glue("$PROBLEM {.description}\n\n$")))
+                           as.character(glue("$PROBLEM See {new_mod_id}.yaml. Created by rbabylon.\n\n$")))
+    glue("")
 
     # read parent control stream
     write_file(mod_str, .new_model_path)

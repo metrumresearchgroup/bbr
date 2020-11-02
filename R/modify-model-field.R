@@ -281,7 +281,7 @@ replace_bbi_args <- function(.mod, .bbi_args) {
   replace_all_bbi_args(.mod, .bbi_args)
 }
 
-#' @describeIn modify_model_field _Deprecaed_  Append new decisions to the one(s) in a model object and corresponding YAML
+#' @describeIn modify_model_field _Deprecated_  Append new decisions to the one(s) in a model object and corresponding YAML
 #' @param .decisions Character vector to add to `decisions` field
 #' @export
 add_decisions <- function(.mod, .decisions) {

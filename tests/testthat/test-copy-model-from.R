@@ -29,7 +29,7 @@ test_that("copy_from_model creates accurate copy", {
 
   # check the control stream is modified
   new_mod_str <- ctl_ext(NEW_MOD2) %>% readr::read_file()
-  new_desc_pattern <- paste0("\\$PROBLEM ", basename(NEW_MOD2), "\n\n\\$INPUT")
+  new_desc_pattern <- as.character(glue("\\$PROBLEM See {basename(NEW_MOD2)}.yaml. Created by rbabylon.\n\n\\$INPUT"))
   expect_true(grepl(new_desc_pattern, new_mod_str))
 })
 
@@ -105,7 +105,7 @@ test_that("copy_from_model .overwrite=TRUE works", {
   orig_desc_pattern <- paste0("\\$PROBLEM ", DESC_IN_CTL, "\n\n\\$INPUT")
   expect_false(grepl(orig_desc_pattern, new_mod_str))
 
-  new_desc_pattern <- paste0("\\$PROBLEM ", basename(NEW_MOD2), "\n\n\\$INPUT")
+  new_desc_pattern <- as.character(glue("\\$PROBLEM See {basename(NEW_MOD2)}.yaml. Created by rbabylon.\n\n\\$INPUT"))
   expect_true(grepl(new_desc_pattern, new_mod_str))
 })
 
