@@ -36,6 +36,11 @@ deprecated in the future and encouraging use of their `_notes` counterparts.
 `basename(.path)` for `new_model()` or `basename(.new_model)` for
 `copy_model_from()`. (#256)
 
+* The `.update_model_file` argument to `copy_model_from()` no longer updates the
+`$PROB` in the new control stream with the `.description` argument. Instead it
+puts the following in `$PROB`: `From rbabylon: see
+{get_model_id(.new_model)}.yaml for details` (#265)
+
 * Added `remove_tags()` function for removing specific strings added to the
 model object `tags` field. (#252)
   

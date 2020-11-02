@@ -37,9 +37,7 @@ directory (once the model is run). Numeric values will be coerced to
 character. See examples for usage.}
 
 \item{.description}{Character scalar description of new model run. This will
-be stored in the yaml (and can be viewed later in \code{run_log()}). If \code{NULL},
-the default, will be set to \code{basename(.path)}. This will be passed into
-the new model file if \code{.update_model_file=TRUE}.}
+be stored in the yaml (and can be viewed later in \code{run_log()}).}
 
 \item{.based_on_additional}{Character vector of path(s) to other models that
 this model was "based on." These are used to reconstuct model developement
@@ -55,9 +53,9 @@ tags passed to \code{.add_tags} argument. If \code{TRUE} inherit any tags from
 \code{.parent_mod}, with any tags passed to \code{.add_tags} appended.}
 
 \item{.update_model_file}{If \code{TRUE}, the default, update the newly created
-model file with new description and name. For a NONMEM model, this
-currently means only the \verb{$PROBLEM} line in the new control stream will be
-updated. If \code{FALSE}, new model file will be an exact copy of its parent.}
+model file. If \code{FALSE}, new model file will be an exact copy of its parent.
+For a NONMEM model, this currently means only the \verb{$PROBLEM} line in the
+new control stream will be updated to read \verb{See \{.new_model\}.yaml. Created by rbabylon.}.}
 
 \item{.overwrite}{If \code{FALSE}, the default,  function will error if a model
 file already exists at specified \code{.new_model} path. If \code{TRUE} any existing
