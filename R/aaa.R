@@ -58,8 +58,7 @@ YAML_BBI_ARGS <- "bbi_args"
 YAML_MOD_TYPE <- "model_type"
 
 YAML_REQ_INPUT_KEYS <- c(
-  YAML_MOD_TYPE,
-  YAML_DESCRIPTION
+  YAML_MOD_TYPE
 )
 
 ABS_MOD_PATH <- "absolute_model_path"
@@ -68,8 +67,7 @@ RUN_ID_COL <- "run"
 # keys required to create a model object
 MODEL_REQ_INPUT_KEYS <- c(
   ABS_MOD_PATH,
-  YAML_MOD_TYPE,
-  YAML_DESCRIPTION
+  YAML_MOD_TYPE
 )
 
 # keys required for a model object to have
@@ -77,7 +75,6 @@ MODEL_REQ_KEYS <- c(
   ABS_MOD_PATH,
   YAML_YAML_MD5,
   YAML_MOD_TYPE,
-  YAML_DESCRIPTION,
   YAML_BBI_ARGS
 )
 

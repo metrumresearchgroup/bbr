@@ -13,8 +13,7 @@
 #'   and YAML file (both without extension), and the path to the output
 #'   directory.
 #' @param .description Character scalar description of new model run. This will
-#'   be stored in the yaml (and can be viewed later in `run_log()`). If `NULL`,
-#'   the default, will be set to `basename(.path)`.
+#'   be stored in the yaml (and can be viewed later in `run_log()`).
 #' @param .based_on Character scalar or vector of paths to other models that
 #'   this model was "based on." These are used to reconstuct model developement
 #'   and ancestry. \strong{Paths must be relative to `.yaml_path`.}
@@ -65,17 +64,14 @@ new_model <- function(
     basename(.path)
   )
 
-  # build description
-  if (is.null(.description)) {
-    .description <- basename(.path)
-  }
-  checkmate::assert_scalar(.description)
-
   # fill list from passed args
   .mod <- list()
   .mod[[ABS_MOD_PATH]] <- abs_mod_path
-  .mod[[YAML_DESCRIPTION]] <- .description
   .mod[[YAML_MOD_TYPE]] <- .model_type
+  if (!is.null(.description)) {
+    checkmate::assert_scalar(.description)
+    .mod[[YAML_DESCRIPTION]] <- .description
+  }
   if (!is.null(.based_on)) {
     .mod[[YAML_BASED_ON]] <- safe_based_on(dirname(.path), .based_on)
   }

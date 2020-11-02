@@ -137,12 +137,6 @@ copy_nonmem_model_from <- function(
   # check parent against YAML
   check_yaml_in_sync(.parent_mod)
 
-  # build description
-  if (is.null(.description)) {
-    .description <- basename(.new_model)
-  }
-  checkmate::assert_scalar(.description)
-
   # build based_on
   if(!fs::is_absolute_path(.new_model)) {
     stop(".new_model argument to copy_nonmem_model_from() must be absolute. USER SHOULD NOT SEE THIS ERROR.")

@@ -80,16 +80,16 @@ CONFIG_DATA_MD5 <- "4ddb44da897c26681d892aa7be99f74b"
 CONFIG_MODEL_MD5 <- "6b930119c4224ba077091b47959b0604"
 
 # yaml md5 hashes
-MOD1_YAML_MD5 <- "ee5a30a015c4e09bc29334188ff28b58"
-MOD_LEVEL2_MD5 <- "1c18961a778fc6b71e3990b500f4bca5"
-ALL_MODS_YAML_MD5 <- c(MOD1_YAML_MD5, rep("22c7176b3dbbbf932091c82c2fd9f749", 2), "edd548af82d8556971c442f36a3907e0")
-RUN_LOG_YAML_MD5 <- c(MOD1_YAML_MD5, "62fc26bf3bf941c6bad352f23cc6c2ad", "ebd4861c9d0584b03a23edcfdda9a67e")
+MOD1_YAML_MD5 <- "6ccf206e167485b5adf29bc135197929"
+MOD_LEVEL2_MD5 <- "a6e124ea392bd028ed7747eb67c46b03"
+ALL_MODS_YAML_MD5 <- c(MOD1_YAML_MD5, rep("49c9511a0a4325a5ea354b95b863ed85", 2), "0e4c259b9edce9dc2cdda60f624b2009")
+RUN_LOG_YAML_MD5 <- c(MOD1_YAML_MD5, "8af45a14df4b51efb641fda0434be63d", "086595d0f235d0c4fc789d44c103cac0")
 
 # model refs
 
 REF_LIST_1 <- list(
-  description = ORIG_DESC,
   model_type = "nonmem",
+  description = ORIG_DESC,
   tags = ORIG_TAGS,
   bbi_args = list(
     overwrite = TRUE,
@@ -101,8 +101,8 @@ class(REF_LIST_1) <- MOD_CLASS_LIST
 
 
 REF_LIST_TMP <- list(
-  description = ORIG_DESC,
   model_type = "nonmem",
+  description = ORIG_DESC,
   tags = ORIG_TAGS,
   bbi_args = list(
     overwrite = TRUE,
@@ -153,13 +153,14 @@ copy_all_output_dirs <- function() {
 create_rlg_models <- function() {
   # copy models before creating run log
   mod1 <- read_model(MOD1_PATH)
-  copy_model_from(mod1, basename(NEW_MOD2), NEW_DESC, .add_tags = NEW_TAGS)
-  copy_model_from(mod1,
-                  basename(NEW_MOD3),
-                  NEW_DESC,
-                  .based_on_additional = get_model_id(NEW_MOD2),
-                  .inherit_tags = TRUE,
-                  .update_model_file = FALSE)
+  copy_model_from(mod1, basename(NEW_MOD2), .add_tags = NEW_TAGS)
+  copy_model_from(
+    mod1,
+    basename(NEW_MOD3),
+    .based_on_additional = get_model_id(NEW_MOD2),
+    .inherit_tags = TRUE,
+    .update_model_file = FALSE
+  )
 }
 
 cleanup <- function() {

@@ -32,9 +32,9 @@ deprecated in the future and encouraging use of their `_notes` counterparts.
 (#258)
   
 * `.description` is no longer a required argument for `new_model()` or
-`copy_model_from()`. The default is `NULL`, in which case it is set to
-`basename(.path)` for `new_model()` or `basename(.new_model)` for
-`copy_model_from()`. (#256)
+`copy_model_from()`, nor is it a required element of a model object or YAML
+file. The helper function `add_description()` has been added to fill the
+`description` field. (#267)
 
 * The `.update_model_file` argument to `copy_model_from()` no longer updates the
 `$PROB` in the new control stream with the `.description` argument. Instead it

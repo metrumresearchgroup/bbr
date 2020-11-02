@@ -236,6 +236,19 @@ replace_description <- function(.mod, .description) {
   )
 }
 
+#' @describeIn modify_model_field Fills the description field in a model object and corresponding YAML, if it is currently empty.
+#' @importFrom checkmate assert_scalar
+#' @export
+add_description <- function(.mod, .description) {
+  if (!is.null(.mod[[YAML_DESCRIPTION]])) {
+    stop(paste(
+      "`description` field is not empty. Please use `replace_description()` to replace contents.",
+      glue("Current description: {.mod[[YAML_DESCRIPTION]]}")
+    ))
+  }
+  replace_description(.mod, .description)
+}
+
 #' @describeIn modify_model_field Modifies model object and corresponding YAML
 #'   by adding named list passed to `.bbi_args`, overwriting any args that are
 #'   already present with the new values. Use [print_bbi_args()] to see a list

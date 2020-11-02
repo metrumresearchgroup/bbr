@@ -50,9 +50,10 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
     # TODO: this test needs to clean up after itself by removing the files it
     # created
 
-    # create model spec
+    # create model
     mod1 <- new_model(
       file.path(MODEL_DIR_BBI, "1"),
+      .description = "original test-workflow-bbi model",
       .tags = ORIG_TAGS,
       .bbi_args = list(overwrite = TRUE, threads = 4)
     )
@@ -132,7 +133,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
     expect_equal(nrow(log_df), 4)
     expect_equal(ncol(log_df), RUN_LOG_COLS)
     expect_identical(basename(log_df[[ABS_MOD_PATH]]), as.character(seq(1:4)))
-    expect_identical(log_df$description, as.character(seq(1:4)))
+    expect_identical(log_df$description, c("original test-workflow-bbi model", rep(NA_character_, 3)))
     expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS, ORIG_TAGS))
   })
 
