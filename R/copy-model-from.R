@@ -15,9 +15,7 @@
 #'   directory (once the model is run). Numeric values will be coerced to
 #'   character. See examples for usage.
 #' @param .description Character scalar description of new model run. This will
-#'   be stored in the yaml (and can be viewed later in `run_log()`). If `NULL`,
-#'   the default, will be set to `basename(.path)`. This will be passed into
-#'   the new model file if `.update_model_file=TRUE`.
+#'   be stored in the yaml (and can be viewed later in `run_log()`).
 #' @param .based_on_additional Character vector of path(s) to other models that
 #'   this model was "based on." These are used to reconstuct model developement
 #'   and ancestry. **Paths must be relative to `.new_model` path.** Note that
@@ -29,9 +27,10 @@
 #'   tags passed to `.add_tags` argument. If `TRUE` inherit any tags from
 #'   `.parent_mod`, with any tags passed to `.add_tags` appended.
 #' @param .update_model_file If `TRUE`, the default, update the newly created
-#'   model file with new description and name. For a NONMEM model, this
-#'   currently means only the `$PROBLEM` line in the new control stream will be
-#'   updated. If `FALSE`, new model file will be an exact copy of its parent.
+#'   model file. If `FALSE`, new model file will be an exact copy of its parent.
+#'   For a NONMEM model, this currently means only the `$PROBLEM` line in the
+#'   new control stream will be updated to read `See {.new_model}.yaml. Created
+#'   by rbabylon.`.
 #' @param .overwrite If `FALSE`, the default,  function will error if a model
 #'   file already exists at specified `.new_model` path. If `TRUE` any existing
 #'   file at `.new_model` will be overwritten silently.
@@ -180,13 +179,12 @@ copy_nonmem_model_from <- function(
 
 #' Copy a NONMEM control stream file
 #'
-#' Helper function to copy a NONMEM control stream file and optionally update the description, etc. in the new file.
+#' Helper function to copy a NONMEM control stream file and optionally update the new file.
 #' Note that any file existing at `.new_model_path` will be overwritten.
 #' @param .parent_model_path Path to the control stream to copy
 #' @param .new_model_path Path to copy the new control stream to
 #' @param .overwrite If `TRUE`, overwrite existing file at `.new_model_path`. If `FALSE` and file exists at `.new_model_path` error.
 #' @param .update_model_file If `TRUE`, the default, update the `$PROBLEM` line in the new control stream. If `FALSE`, `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.
-#' @param .description Description of new model run. This will be passed into the `$PROBLEM` of the new control stream (if `.update_model_file=TRUE`).
 #' @keywords internal
 copy_control_stream <- function(.parent_model_path, .new_model_path, .overwrite, .update_model_file = FALSE) {
 
