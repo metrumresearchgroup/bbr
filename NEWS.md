@@ -38,8 +38,8 @@ deprecated in the future and encouraging use of their `_notes` counterparts.
 
 * The `.update_model_file` argument to `copy_model_from()` no longer updates the
 `$PROB` in the new control stream with the `.description` argument. Instead it
-puts the following in `$PROB`: `See {get_model_id(.new_model)}.yaml. Created by
-rbabylon.`
+puts the following in `$PROB`: `From rbabylon: see
+{get_model_id(.new_model)}.yaml for details` (#265)
 
 * Added `remove_tags()` function for removing specific strings added to the
 model object `tags` field. (#252)
