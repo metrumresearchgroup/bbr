@@ -69,7 +69,7 @@ replace_model_field <- function(.mod, .field, .old_val, .new_val) {
 
   idx <- which(.mod[[.field]] == .old_val)
   if (length(idx) == 0) {
-    warning(glue("`{.field}` does not contain the {.old_val}, so it cannot be replaced."))
+    warning(glue("`{.field}` does not contain {.old_val}, so it cannot be replaced."))
     return(.mod)
   }
 
