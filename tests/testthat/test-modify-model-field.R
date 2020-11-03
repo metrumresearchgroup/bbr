@@ -184,7 +184,7 @@ test_that("replace_description() can use NA", {
 
   # test_replacing
   new_mod <- replace_description(new_mod, NA)
-  expect_equal(new_mod[[YAML_DESCRIPTION]], NA)
+  expect_null(new_mod[[YAML_DESCRIPTION]])
 })
 
 test_that("add_bbi_args() and replace_all_bbi_args() work correctly", {
