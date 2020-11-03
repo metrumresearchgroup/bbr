@@ -227,7 +227,7 @@ remove_based_on <- function(.mod, .based_on) {
 #' @param .description Character scalar to use as replacement for the `description` field
 #' @export
 replace_description <- function(.mod, .description) {
-  checkmate::assert_scalar(.description)
+  checkmate::assert_scalar(.description, na.ok = TRUE, null.ok = TRUE)
   modify_model_field(
     .mod = .mod,
     .field = YAML_DESCRIPTION,
