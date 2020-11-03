@@ -81,7 +81,8 @@ replace_decisions(.mod, .decisions)
 
 \item{.field}{Character scalar of the name of the component to modify}
 
-\item{.value}{Whatever is to be added to \code{.mod[[.field]]}, typically a character vector}
+\item{.value}{Whatever is to be added to \code{.mod[[.field]]}, typically a character vector (or a named list in the case of \verb{*_bbi_args()}).
+If \code{NULL} or \code{NA} is passed and \code{.append = FALSE} then \code{.field} with be deleted from the object and corresponding YAML.}
 
 \item{.append}{If \code{TRUE}, the default, concatenate new values with currently present values. If \code{FALSE}, new values will overwrite old values.}
 

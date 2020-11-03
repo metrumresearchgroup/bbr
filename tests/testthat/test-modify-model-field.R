@@ -163,6 +163,29 @@ test_that("replace_description() works correctly", {
   expect_identical(new_mod[[YAML_DESCRIPTION]], NEW_DESC)
 })
 
+test_that("replace_description() can use NULL", {
+  temp_mod_path <- create_temp_model()
+
+  # make a spec from it
+  new_mod <- read_model(temp_mod_path)
+  expect_identical(new_mod[[YAML_DESCRIPTION]], ORIG_DESC)
+
+  # test_replacing
+  new_mod <- replace_description(new_mod, NULL)
+  expect_null(new_mod[[YAML_DESCRIPTION]])
+})
+
+test_that("replace_description() can use NA", {
+  temp_mod_path <- create_temp_model()
+
+  # make a spec from it
+  new_mod <- read_model(temp_mod_path)
+  expect_identical(new_mod[[YAML_DESCRIPTION]], ORIG_DESC)
+
+  # test_replacing
+  new_mod <- replace_description(new_mod, NA)
+  expect_null(new_mod[[YAML_DESCRIPTION]])
+})
 
 test_that("add_bbi_args() and replace_all_bbi_args() work correctly", {
   temp_mod_path <- create_temp_model()

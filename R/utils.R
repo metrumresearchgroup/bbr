@@ -247,6 +247,18 @@ add_run_id_col <- function(df) {
     select(ABS_MOD_PATH, RUN_ID_COL, everything())
 }
 
+#' Convert an object containing entirely NA's to NULL
+#' @param .obj Object to check for NA
+#' @keywords internal
+na_to_null <- function(.obj) {
+  if (is.null(.obj)) {
+    return(.obj)
+  }
+  if (all(is.na(.obj))) {
+    .obj <- NULL
+  }
+  .obj
+}
 
 #' Print valid .bbi_args
 #'

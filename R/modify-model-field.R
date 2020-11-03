@@ -17,7 +17,8 @@
 #' memory with an md5 digest of the newly written YAML.
 #' @param .mod The `bbi_{.model_type}_model` object to modify
 #' @param .field Character scalar of the name of the component to modify
-#' @param .value Whatever is to be added to `.mod[[.field]]`, typically a character vector
+#' @param .value Whatever is to be added to `.mod[[.field]]`, typically a character vector (or a named list in the case of `*_bbi_args()`).
+#'   If `NULL` or `NA` is passed and `.append = FALSE` then `.field` with be deleted from the object and corresponding YAML.
 #' @param .append If `TRUE`, the default, concatenate new values with currently present values. If `FALSE`, new values will overwrite old values.
 #' @param .remove If `TRUE`, `.value` with be removed from the `.field` instead of added. `FALSE` by default. Cannot have both `.append` and `.remove` be true in the same call.
 #' @param .unique If `TRUE`, the default, de-duplicate `.mod[[.field]]` after adding new values. If `FALSE` duplicate values will be kept.
@@ -42,6 +43,7 @@ modify_model_field <- function(.mod, .field, .value, .append = TRUE, .remove = F
     }
     .mod[[.field]] <- setdiff(.mod[[.field]], .value)
   } else {
+    .value <- na_to_null(.value) # both NA and NULL will remove the field from the object
     .mod[[.field]] <- .value
   }
 
@@ -227,7 +229,7 @@ remove_based_on <- function(.mod, .based_on) {
 #' @param .description Character scalar to use as replacement for the `description` field
 #' @export
 replace_description <- function(.mod, .description) {
-  checkmate::assert_scalar(.description)
+  checkmate::assert_scalar(.description, na.ok = TRUE, null.ok = TRUE)
   modify_model_field(
     .mod = .mod,
     .field = YAML_DESCRIPTION,
