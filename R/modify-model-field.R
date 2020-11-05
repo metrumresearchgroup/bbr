@@ -8,13 +8,21 @@
 #' Note that calling `modify_model_field()` or `replace_model_field()` directly
 #' is _not_ recommended for most users because it requires knowing about the
 #' internal structure of the model object. Instead, **we recommend using the
-#' friendlier helpers listed below** (`add_...` or `replace_...`) when possible.
+#' friendlier helpers listed below in "See also"** whenever possible.
 #'
 #' @details
-#' All functions in this family also check the object against the corresponding YAML with `check_yaml_in_sync()` before modifying it,
-#' and errors if they are out of sync.
-#' After the object has been modified they will write the modified object back to the YAML and update the model object in
-#' memory with an md5 digest of the newly written YAML.
+#' All functions in this family also check the object against the corresponding
+#' YAML with `check_yaml_in_sync()` before modifying it, and errors if they are
+#' out of sync. After the object has been modified they will write the modified
+#' object back to the YAML and update the model object in memory with an md5
+#' digest of the newly written YAML.
+#'
+#' @seealso [add_tags()] [replace_tag()] [replace_all_tags()] [remove_tags()]
+#'   [add_notes()] [replace_note()] [replace_all_notes()] [remove_notes()]
+#'   [add_based_on()] [replace_all_based_on()] [remove_based_on()]
+#'   [add_description()] [replace_description()] [add_bbi_args()]
+#'   [replace_all_bbi_args()]
+#'
 #' @param .mod The `bbi_{.model_type}_model` object to modify
 #' @param .field Character scalar of the name of the component to modify
 #' @param .value Whatever is to be added to `.mod[[.field]]`, typically a character vector (or a named list in the case of `*_bbi_args()`).
@@ -85,8 +93,41 @@ replace_model_field <- function(.mod, .field, .old_val, .new_val) {
 # FRIENDLIER HELPERS
 #####################
 
-#' @describeIn modify_model_field Add tags to a model object and corresponding YAML
-#' @param .tags Character vector to add to `tags` field
+#' @name modify_tags
+#' @title Modify tags on a model object
+#'
+#' @description Add, replace, or remove tags on a model object and corresponding YAML.
+#' Tags can be modified at any time (i.e. before _or_ after a model is submitted).
+#'
+#' @details
+#' The `tags` fields on a `bbi_{.model_type}_model` object contains a character
+#' vector of brief descriptors about the model. Often this is used to keep track
+#' of the model structure, such as the covariates or error stucture that was
+#' used.
+#'
+#' One of the more useful things to do with tags is to use them for filtering a
+#' `bbi_run_log_df` (the tibble output from [run_log()]); for example to look at
+#' all models that used a particular random effect or covariate. To facilitate
+#' this, it is recommended to keep individual tags consistent and short, and/or
+#' to use a "glossary" of acceptable tags, stored elsewhere in your project
+#' (i.e. in a `.yaml` or `.csv` or a named list that you can source). In other
+#' words, if you tag one model with `"CLAGE"` and another with
+#' `"ClearanceAgeCov"`, etc. then it will be very difficult to make any use of
+#' those tags later, for instance when you want to filter to models with that
+#' covariate.
+#'
+#' Tags can also be collapsed using [collapse_to_string()] to create a compact description of the
+#' model stucture. See the ["Getting Started" vignette](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html#viewing-tags-example)
+#' for an example of this.
+#'
+#' @return The modified `bbi_{.model_type}_model` object
+#'
+#' @seealso [run_log()] [collapse_to_string()] [modify_notes()] [modify_based_on()] [modify_description()] [modify_bbi_args()]
+NULL
+
+#' @describeIn modify_tags Add tags to a model object and corresponding YAML.
+#' @inheritParams modify_model_field
+#' @param .tags Character vector of tags to add or remove
 #' @export
 add_tags <- function(.mod, .tags) {
   modify_model_field(
@@ -97,7 +138,7 @@ add_tags <- function(.mod, .tags) {
   )
 }
 
-#' @describeIn modify_model_field Replaces a specific `.old_tag` with `.new_tag` on a model object and corresponding YAML.
+#' @describeIn modify_tags Replaces a specific `.old_tag` with `.new_tag` on a model object and corresponding YAML.
 #' Warns and does nothing if `.old_tag` is not present.
 #' @param .old_tag Character scalar of tag to be replaced
 #' @param .new_tag Character scalar of tag that will be added
@@ -106,7 +147,7 @@ replace_tag <- function(.mod, .old_tag, .new_tag) {
   replace_model_field(.mod, YAML_TAGS, .old_tag, .new_tag)
 }
 
-#' @describeIn modify_model_field Replaces all tags on a model object and corresponding YAML with new tags
+#' @describeIn modify_tags Replaces all tags on a model object and corresponding YAML with new tags.
 #' @export
 replace_all_tags <- function(.mod, .tags) {
   modify_model_field(
@@ -117,14 +158,14 @@ replace_all_tags <- function(.mod, .tags) {
   )
 }
 
-#' @describeIn modify_model_field _Deprecated_ as of rbabylon 0.10.0, use `replace_all_tags()` instead.
+#' @describeIn modify_tags **Deprecated** as of rbabylon 0.10.0, use `replace_all_tags()` instead.
 #' @export
 replace_tags <- function(.mod, .tags) {
   deprecate_warn("0.10.0", "rbabylon::replace_tags()", "replace_all_tags()")
   replace_all_tags(.mod, .tags)
 }
 
-#' @describeIn modify_model_field Removes tags from a model object and corresponding YAML
+#' @describeIn modify_tags Removes tags from a model object and corresponding YAML.
 #' @export
 remove_tags <- function(.mod, .tags) {
   modify_model_field(
@@ -137,8 +178,33 @@ remove_tags <- function(.mod, .tags) {
 }
 
 
-#' @describeIn modify_model_field Add notes to a model object and corresponding YAML
-#' @param .notes Character vector to add to `notes` field
+#' @name modify_notes
+#' @title Modify notes on a model object
+#'
+#' @description Add, replace, or remove notes on a model object and corresponding YAML.
+#' Notes can be modified at any time (i.e. before _or_ after a model is submitted).
+#'
+#' @details
+#' The `notes` field on a `bbi_{.model_type}_model` object contains a character
+#' vector of brief notes about the model or modeling process.
+#'
+#' These are often useful when looking at a `bbi_run_log_df` (the tibble output
+#' from [run_log()]); for example to remind yourself of decisions you made along
+#' the way, or of a particular thing you noticed when looking at model
+#' diagnostics.
+#'
+#' Like tags, notes can also be collapsed using [collapse_to_string()]
+#' See the ["Getting Started" vignette](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html#viewing-tags-example)
+#' for an example of this.
+#'
+#' @return The modified `bbi_{.model_type}_model` object
+#'
+#' @seealso [run_log()] [collapse_to_string()] [modify_tags()] [modify_based_on()] [modify_description()] [modify_bbi_args()]
+NULL
+
+#' @describeIn modify_notes Add notes to a model object and corresponding YAML.
+#' @inheritParams modify_model_field
+#' @param .notes Character vector of notes to add or remove
 #' @export
 add_notes <- function(.mod, .notes) {
   modify_model_field(
@@ -149,7 +215,7 @@ add_notes <- function(.mod, .notes) {
   )
 }
 
-#' @describeIn modify_model_field Replaces a specific `.old_note` with `.new_note` on a model object and corresponding YAML.
+#' @describeIn modify_notes Replaces a specific `.old_note` with `.new_note` on a model object and corresponding YAML.
 #' Warns and does nothing if `.old_note` is not present.
 #' @param .old_note Character scalar of note to be replaced
 #' @param .new_note Character scalar of note that will be added
@@ -158,7 +224,7 @@ replace_note <- function(.mod, .old_note, .new_note) {
   replace_model_field(.mod, YAML_NOTES, .old_note, .new_note)
 }
 
-#' @describeIn modify_model_field Replaces all notes on a model object and corresponding YAML with new notes
+#' @describeIn modify_notes Replaces all notes on a model object and corresponding YAML with new notes.
 #' @export
 replace_all_notes <- function(.mod, .notes) {
   modify_model_field(
@@ -169,7 +235,7 @@ replace_all_notes <- function(.mod, .notes) {
   )
 }
 
-#' @describeIn modify_model_field Removes notes from a model object and corresponding YAML
+#' @describeIn modify_notes Removes notes from a model object and corresponding YAML.
 #' @export
 remove_notes <- function(.mod, .notes) {
   modify_model_field(
@@ -181,8 +247,34 @@ remove_notes <- function(.mod, .notes) {
   )
 }
 
-#' @describeIn modify_model_field Append new `based_on` tag(s) to a model object and corresponding YAML
-#' @param .based_on Character vector of relative paths to add to `based_on` field
+
+#' @name modify_based_on
+#' @title Modify based_on field in a model object
+#'
+#' @description Add, replace, or remove model identifiers from the `based_on`
+#'   field of a model object and corresponding YAML. The `based_on` field can be
+#'   modified at any time (i.e. before _or_ after a model is submitted).
+#'
+#' @details
+#' The `based_on` field on a `bbi_{.model_type}_model` object contains a
+#' character vector identifying models which preceded `.mod` in the model
+#' development process. This field is automatically populated with `.parent_mod`
+#' when a model is created with [copy_model_from()].
+#'
+#' The model identifiers in the `based_on` field are paths another model file
+#' (without file extension) _relative_ to the location of `.mod`.
+#'
+#' There is a ["Using the based_on field" vignette](https://metrumresearchgroup.github.io/rbabylon/articles/using-based-on.html)
+#' which demonstrates the motivation and usage of this field.
+#'
+#' @return The modified `bbi_{.model_type}_model` object
+#'
+#' @seealso [copy_model_from()] [modify_tags()] [modify_notes()] [modify_description()] [modify_bbi_args()]
+NULL
+
+#' @describeIn modify_based_on Append new `based_on` identifiers to a model object and corresponding YAML.
+#' @inheritParams modify_model_field
+#' @param .based_on Character vector of relative paths to add or remove
 #' @export
 add_based_on <- function(.mod, .based_on) {
   modify_model_field(
@@ -193,7 +285,7 @@ add_based_on <- function(.mod, .based_on) {
   )
 }
 
-#' @describeIn modify_model_field Replaces entire `based_on` field in a model object and corresponding YAML with new values
+#' @describeIn modify_based_on Replaces entire `based_on` field in a model object and corresponding YAML with new values.
 #' @export
 replace_all_based_on <- function(.mod, .based_on) {
   modify_model_field(
@@ -204,15 +296,14 @@ replace_all_based_on <- function(.mod, .based_on) {
   )
 }
 
-#' @describeIn modify_model_field _Deprecated_ as of rbabylon 0.10.0, use `replace_all_based_on()` instead.
+#' @describeIn modify_based_on **Deprecated** as of rbabylon 0.10.0, use `replace_all_based_on()` instead.
 #' @export
 replace_based_on <- function(.mod, .based_on) {
   deprecate_warn("0.10.0", "rbabylon::replace_based_on()", "replace_all_based_on()")
   replace_all_based_on(.mod, .based_on)
 }
 
-#' @describeIn modify_model_field Remove specified `based_on` tag(s) from a model object and corresponding YAML
-#' @param .based_on Character vector of relative paths to add to `based_on` field
+#' @describeIn modify_based_on Remove specified `based_on` identifier(s) from a model object and corresponding YAML.
 #' @export
 remove_based_on <- function(.mod, .based_on) {
   modify_model_field(
@@ -224,22 +315,34 @@ remove_based_on <- function(.mod, .based_on) {
   )
 }
 
-#' @describeIn modify_model_field Replaces description field in a model object and corresponding YAML with new description
-#' @importFrom checkmate assert_scalar
-#' @param .description Character scalar to use as replacement for the `description` field
-#' @export
-replace_description <- function(.mod, .description) {
-  checkmate::assert_scalar(.description, na.ok = TRUE, null.ok = TRUE)
-  modify_model_field(
-    .mod = .mod,
-    .field = YAML_DESCRIPTION,
-    .value = .description,
-    .append = FALSE
-  )
-}
 
-#' @describeIn modify_model_field Fills the description field in a model object and corresponding YAML, if it is currently empty.
+#' @name modify_description
+#' @title Modify description on a model object
+#'
+#' @description Add or replace a description on a model object and corresponding YAML.
+#' The description can be modified at any time (i.e. before _or_ after a model is submitted).
+#'
+#' @details
+#' The `description` field on a `bbi_{.model_type}_model` object contains a character
+#' scalar with a brief description of the model. Note that it is _not_ a required field
+#' and some users prefer to leave it blank and instead use the `tags` and/or `notes` fields
+#' to describe their models instead.
+#'
+#' Another pattern is to fill the `description` field _only_ on notable models,
+#' for instance with `"Base Model"` or `"Final Model"`. This can be useful when
+#' looking at a `bbi_run_log_df` (the tibble output from [run_log()]); for
+#' example to look at only the most important models by calling
+#' `run_log() %>% filter(!is.na(description))`.
+#'
+#' @return The modified `bbi_{.model_type}_model` object
+#'
+#' @seealso [run_log()] [modify_tags()] [modify_notes()] [modify_based_on()] [modify_bbi_args()]
+NULL
+
+#' @describeIn modify_description Fills the description field in a model object and corresponding YAML, if it is currently empty.
 #' @importFrom checkmate assert_scalar
+#' @inheritParams modify_model_field
+#' @param .description Character scalar to put in `description` field
 #' @export
 add_description <- function(.mod, .description) {
   if (!is.null(.mod[[YAML_DESCRIPTION]])) {
@@ -251,11 +354,53 @@ add_description <- function(.mod, .description) {
   replace_description(.mod, .description)
 }
 
-#' @describeIn modify_model_field Modifies model object and corresponding YAML
+#' @describeIn modify_description Replaces description field in a model object and corresponding YAML with new description.
+#' @importFrom checkmate assert_scalar
+#' @export
+replace_description <- function(.mod, .description) {
+  checkmate::assert_scalar(.description, na.ok = TRUE, null.ok = TRUE)
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_DESCRIPTION,
+    .value = .description,
+    .append = FALSE
+  )
+}
+
+
+#' @name modify_bbi_args
+#' @title Modify bbi_args on a model object
+#'
+#' @description Add or replace the `bbi_args` field on a model object and corresponding YAML.
+#'
+#' @details
+#' The `bbi_args` field on a `bbi_{.model_type}_model` object contains a named
+#' list of arguments that will be passed through to `bbi` to modify how a model
+#' is processed (for instance, when it is submitted to be run with
+#' [submit_model()]). In many cases, it is preferable to store these arguments
+#' with the model object, as opposed to passing them to
+#' `submit_model(.bbi_args)` because then they will be applied every time that
+#' model is run, for example if you need to re-run the model later.
+#'
+#' The options for what can be included in this list (and a brief description of
+#' what each does) can be seen by calling [print_bbi_args()].
+#'
+#' Note that there is no `replace_bbi_arg` (singular) to replace individual arguments.
+#' This is because you can use `add_bbi_args()` and any arguments passed in will automatically
+#' overwrite any previous value stored for that argument.
+#'
+#' @return The modified `bbi_{.model_type}_model` object
+#'
+#' @seealso [submit_model()] [model_summary()] [print_bbi_args()]
+#'   [modify_tags()] [modify_notes()] [modify_based_on()] [modify_description()]
+NULL
+
+#' @describeIn modify_bbi_args Modifies model object and corresponding YAML
 #'   by adding named list passed to `.bbi_args`, overwriting any args that are
-#'   already present with the new values. Use [print_bbi_args()] to see a list
-#'   of valid babylon arguments.
-#' @param .bbi_args named list of arguments to add to the model
+#'   already present with the new values.
+#' @inheritParams modify_model_field
+#' @param .bbi_args named list of arguments to add to the model. See
+#'   [print_bbi_args()] for valid options.
 #' @export
 add_bbi_args <- function(.mod, .bbi_args) {
 
@@ -271,9 +416,8 @@ add_bbi_args <- function(.mod, .bbi_args) {
   return(.mod)
 }
 
-#' @describeIn modify_model_field Modifies model object and corresponding YAML
-#'   by replacing all `bbi_args` with named list passed to `.bbi_args`. Use
-#'   [print_bbi_args()] to see a list of valid babylon arguments.
+#' @describeIn modify_bbi_args Modifies model object and corresponding YAML
+#'   by replacing all `bbi_args` with named list passed to `.bbi_args`.
 #' @export
 replace_all_bbi_args <- function(.mod, .bbi_args) {
 
@@ -289,14 +433,33 @@ replace_all_bbi_args <- function(.mod, .bbi_args) {
   return(.mod)
 }
 
-#' @describeIn modify_model_field _Deprecated_ as of rbabylon 0.10.0, use `replace_all_bbi_args()` instead.
+#' @describeIn modify_bbi_args **Deprecated** as of rbabylon 0.10.0, use `replace_all_bbi_args()` instead.
 #' @export
 replace_bbi_args <- function(.mod, .bbi_args) {
   deprecate_warn("0.10.0", "rbabylon::replace_bbi_args()", "replace_all_bbi_args()")
   replace_all_bbi_args(.mod, .bbi_args)
 }
 
-#' @describeIn modify_model_field _Deprecated_  Append new decisions to the one(s) in a model object and corresponding YAML
+
+#' @name modify_decisions
+#' @title Deprecated: Modify decisions on a model object
+#'
+#' @description The `decisions` field has been deprecated as of `rbabylon 0.10.0` and
+#' replaced by the `notes` field, to reflect the fact that users
+#' will want to use this field throughout the modeling process, not only at the end
+#' once some "decisions" have been reached. `add_decisions()` and
+#' `replace_decisions()` now print a warning telling the user that they will be
+#' deprecated in the future and encouraging use of their `*_notes` counterparts.
+#' They will begin erroring, instead of warning, in two releases, and then will be
+#' removed two releases after that.
+#'
+#' @return The modified `bbi_{.model_type}_model` object
+#'
+#' @seealso [modify_notes()]
+NULL
+
+#' @describeIn modify_decisions **Deprecated**  Append new decisions to the one(s) in a model object and corresponding YAML.
+#' @inheritParams modify_model_field
 #' @param .decisions Character vector to add to `decisions` field
 #' @export
 add_decisions <- function(.mod, .decisions) {
@@ -309,8 +472,7 @@ add_decisions <- function(.mod, .decisions) {
   )
 }
 
-#' @describeIn modify_model_field _Deprecaed_ Replaces `decisions` field in a model object and corresponding YAML with new values
-#' @param .decisions Character vector to use as replacement
+#' @describeIn modify_decisions **Deprecated** Replaces `decisions` field in a model object and corresponding YAML with new values.
 #' @export
 replace_decisions <- function(.mod, .decisions) {
   warning("The `decisions` field has been replaced by `notes` as of rbabylon 0.10.0 and will be removed in a future release. Please use `replace_all_notes()` going forward.")

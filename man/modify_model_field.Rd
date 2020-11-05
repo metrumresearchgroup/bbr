@@ -3,26 +3,6 @@
 \name{modify_model_field}
 \alias{modify_model_field}
 \alias{replace_model_field}
-\alias{add_tags}
-\alias{replace_tag}
-\alias{replace_all_tags}
-\alias{replace_tags}
-\alias{remove_tags}
-\alias{add_notes}
-\alias{replace_note}
-\alias{replace_all_notes}
-\alias{remove_notes}
-\alias{add_based_on}
-\alias{replace_all_based_on}
-\alias{replace_based_on}
-\alias{remove_based_on}
-\alias{replace_description}
-\alias{add_description}
-\alias{add_bbi_args}
-\alias{replace_all_bbi_args}
-\alias{replace_bbi_args}
-\alias{add_decisions}
-\alias{replace_decisions}
 \title{Modify field in model object}
 \usage{
 modify_model_field(
@@ -35,46 +15,6 @@ modify_model_field(
 )
 
 replace_model_field(.mod, .field, .old_val, .new_val)
-
-add_tags(.mod, .tags)
-
-replace_tag(.mod, .old_tag, .new_tag)
-
-replace_all_tags(.mod, .tags)
-
-replace_tags(.mod, .tags)
-
-remove_tags(.mod, .tags)
-
-add_notes(.mod, .notes)
-
-replace_note(.mod, .old_note, .new_note)
-
-replace_all_notes(.mod, .notes)
-
-remove_notes(.mod, .notes)
-
-add_based_on(.mod, .based_on)
-
-replace_all_based_on(.mod, .based_on)
-
-replace_based_on(.mod, .based_on)
-
-remove_based_on(.mod, .based_on)
-
-replace_description(.mod, .description)
-
-add_description(.mod, .description)
-
-add_bbi_args(.mod, .bbi_args)
-
-replace_all_bbi_args(.mod, .bbi_args)
-
-replace_bbi_args(.mod, .bbi_args)
-
-add_decisions(.mod, .decisions)
-
-replace_decisions(.mod, .decisions)
 }
 \arguments{
 \item{.mod}{The \verb{bbi_\{.model_type\}_model} object to modify}
@@ -95,89 +35,30 @@ If \code{NULL} or \code{NA} is passed and \code{.append = FALSE} then \code{.fie
 
 \item{.new_val}{The value to insert in place of \code{.old_val} in
 \code{.mod[[.field]]}.}
-
-\item{.tags}{Character vector to add to \code{tags} field}
-
-\item{.old_tag}{Character scalar of tag to be replaced}
-
-\item{.new_tag}{Character scalar of tag that will be added}
-
-\item{.notes}{Character vector to add to \code{notes} field}
-
-\item{.old_note}{Character scalar of note to be replaced}
-
-\item{.new_note}{Character scalar of note that will be added}
-
-\item{.based_on}{Character vector of relative paths to add to \code{based_on} field}
-
-\item{.description}{Character scalar to use as replacement for the \code{description} field}
-
-\item{.bbi_args}{named list of arguments to add to the model}
-
-\item{.decisions}{Character vector to use as replacement}
 }
 \description{
 Helper functions for updating fields in a \verb{bbi_\{.model_type\}_model} object.
 Note that calling \code{modify_model_field()} or \code{replace_model_field()} directly
 is \emph{not} recommended for most users because it requires knowing about the
 internal structure of the model object. Instead, \strong{we recommend using the
-friendlier helpers listed below} (\code{add_...} or \code{replace_...}) when possible.
+friendlier helpers listed below in "See also"} whenever possible.
 }
 \details{
-All functions in this family also check the object against the corresponding YAML with \code{check_yaml_in_sync()} before modifying it,
-and errors if they are out of sync.
-After the object has been modified they will write the modified object back to the YAML and update the model object in
-memory with an md5 digest of the newly written YAML.
+All functions in this family also check the object against the corresponding
+YAML with \code{check_yaml_in_sync()} before modifying it, and errors if they are
+out of sync. After the object has been modified they will write the modified
+object back to the YAML and update the model object in memory with an md5
+digest of the newly written YAML.
 }
 \section{Functions}{
 \itemize{
 \item \code{replace_model_field}: Replace a single item in a model field
-
-\item \code{add_tags}: Add tags to a model object and corresponding YAML
-
-\item \code{replace_tag}: Replaces a specific \code{.old_tag} with \code{.new_tag} on a model object and corresponding YAML.
-Warns and does nothing if \code{.old_tag} is not present.
-
-\item \code{replace_all_tags}: Replaces all tags on a model object and corresponding YAML with new tags
-
-\item \code{replace_tags}: \emph{Deprecated} as of rbabylon 0.10.0, use \code{replace_all_tags()} instead.
-
-\item \code{remove_tags}: Removes tags from a model object and corresponding YAML
-
-\item \code{add_notes}: Add notes to a model object and corresponding YAML
-
-\item \code{replace_note}: Replaces a specific \code{.old_note} with \code{.new_note} on a model object and corresponding YAML.
-Warns and does nothing if \code{.old_note} is not present.
-
-\item \code{replace_all_notes}: Replaces all notes on a model object and corresponding YAML with new notes
-
-\item \code{remove_notes}: Removes notes from a model object and corresponding YAML
-
-\item \code{add_based_on}: Append new \code{based_on} tag(s) to a model object and corresponding YAML
-
-\item \code{replace_all_based_on}: Replaces entire \code{based_on} field in a model object and corresponding YAML with new values
-
-\item \code{replace_based_on}: \emph{Deprecated} as of rbabylon 0.10.0, use \code{replace_all_based_on()} instead.
-
-\item \code{remove_based_on}: Remove specified \code{based_on} tag(s) from a model object and corresponding YAML
-
-\item \code{replace_description}: Replaces description field in a model object and corresponding YAML with new description
-
-\item \code{add_description}: Fills the description field in a model object and corresponding YAML, if it is currently empty.
-
-\item \code{add_bbi_args}: Modifies model object and corresponding YAML
-by adding named list passed to \code{.bbi_args}, overwriting any args that are
-already present with the new values. Use \code{\link[=print_bbi_args]{print_bbi_args()}} to see a list
-of valid babylon arguments.
-
-\item \code{replace_all_bbi_args}: Modifies model object and corresponding YAML
-by replacing all \code{bbi_args} with named list passed to \code{.bbi_args}. Use
-\code{\link[=print_bbi_args]{print_bbi_args()}} to see a list of valid babylon arguments.
-
-\item \code{replace_bbi_args}: \emph{Deprecated} as of rbabylon 0.10.0, use \code{replace_all_bbi_args()} instead.
-
-\item \code{add_decisions}: \emph{Deprecated}  Append new decisions to the one(s) in a model object and corresponding YAML
-
-\item \code{replace_decisions}: \emph{Deprecaed} Replaces \code{decisions} field in a model object and corresponding YAML with new values
 }}
 
+\seealso{
+\code{\link[=add_tags]{add_tags()}} \code{\link[=replace_tag]{replace_tag()}} \code{\link[=replace_all_tags]{replace_all_tags()}} \code{\link[=remove_tags]{remove_tags()}}
+\code{\link[=add_notes]{add_notes()}} \code{\link[=replace_note]{replace_note()}} \code{\link[=replace_all_notes]{replace_all_notes()}} \code{\link[=remove_notes]{remove_notes()}}
+\code{\link[=add_based_on]{add_based_on()}} \code{\link[=replace_all_based_on]{replace_all_based_on()}} \code{\link[=remove_based_on]{remove_based_on()}}
+\code{\link[=add_description]{add_description()}} \code{\link[=replace_description]{replace_description()}} \code{\link[=add_bbi_args]{add_bbi_args()}}
+\code{\link[=replace_all_bbi_args]{replace_all_bbi_args()}}
+}
