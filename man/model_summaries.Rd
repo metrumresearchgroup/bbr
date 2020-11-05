@@ -42,7 +42,7 @@ See \code{\link[=print_bbi_args]{print_bbi_args()}} for full list of options.}
 In that case, flags are appended to anything in \code{.bbi_args} and the summary is tried again.
 See details section for more info on these flags.}
 
-\item{...}{args passed through to \code{bbi_exec()}}
+\item{...}{args passed through to \code{\link[=bbi_exec]{bbi_exec()}}}
 
 \item{.dry_run}{show what the command would be without actually running it}
 }
