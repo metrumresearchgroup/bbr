@@ -1,20 +1,20 @@
 #' @name rbabylon
-#' @title RBabylon
-#' @description RBabylon is a library written in R that facilitates modeling and
+#' @title rbabylon
+#' @description rbabylon is a library written in R that facilitates modeling and
 #'   simulation by exposing functionality from the
-#'   https://github.com/metrumresearchgroup/babylon project in R. From Babylon's
-#'   docs: Babylon is (will be) a complete solution for managing projects
-#'   involving modeling and simulation with a number of software solutions used
-#'   in pharmaceutical sciences. This is a fork of the `nonmemutils`` project
-#'   that is broader in scope. Initial support encompasses NONMEM however the
-#'   api is designed in a way to be flexible to handle other software.
+#'   [babylon](https://github.com/metrumresearchgroup/babylon) project in R.
+#'   From Babylon's docs: Babylon is a solution for managing projects involving
+#'   modeling and simulation with a number of software solutions used in
+#'   pharmaceutical sciences. This is a fork of the `nonmemutils` project that
+#'   is broader in scope. Initial support encompasses NONMEM however the api is
+#'   designed in a way to be flexible to handle other software.
 #'
 #' @details
 #' RBabylon uses several fundamental objects, each of which has a number of S3
 #' methods associated with it:
 #'
 #' * `bbi_{.model_type}_model` -- Represents a single model. Contains paths to
-#'   any elements of this model that are stored on disk (i.e. a NONMEM control
+#'   any elements of this model that are stored on disk (e.g. a NONMEM control
 #'   stream) as well as various fields containing metadata about the model. You
 #'   can read more about these fields, and how to interact with them, in the
 #'   following help pages: [modify_tags()] [modify_notes()] [modify_based_on()]
