@@ -8,7 +8,7 @@ this for two more releases and then begin to error for two more releases before
 being removed altogether. (#264)
 
 * Added `replace_tag()` (singular) which replaces a single tag with a new tag.
-(#264)
+`replace_note()` (mentioned below) functions the same way. (#264)
 
 * Added `collapse_to_string()` which collapses a list column in a tibble to a
 character column containing a string representation of the column's previous
@@ -41,8 +41,8 @@ file. The helper function `add_description()` has been added to fill the
 puts the following in `$PROB`: `From rbabylon: see
 {get_model_id(.new_model)}.yaml for details` (#265)
 
-* Added `remove_tags()` function for removing specific strings added to the
-model object `tags` field. (#252)
+* Added `remove_tags()`, `remove_notes()`, and `remove_based_on()` functions for
+removing specific strings from the relevant model object field. (#252)
   
 ## Bug fixes
 
