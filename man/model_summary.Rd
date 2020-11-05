@@ -15,7 +15,7 @@ model_summary(.mod, .bbi_args = NULL, ..., .dry_run = FALSE)
 \item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}.
 See \code{\link[=print_bbi_args]{print_bbi_args()}} for full list of options.}
 
-\item{...}{args passed through to \code{bbi_exec()}}
+\item{...}{args passed through to \code{\link[=bbi_exec]{bbi_exec()}}}
 
 \item{.dry_run}{show what the command would be without actually running it}
 }
@@ -27,13 +27,28 @@ Calls out to bbi and returns a named list of class \verb{bbi_\{.model_type\}_sum
 
 The returned list for a NONMEM model will contain the following top-level elements:
 \itemize{
-\item run_details
-\item run_heuristics
-\item parameters_data
-\item parameter_names
-\item ofv
-\item condition_number
-\item shrinkage_details
+\item \strong{run_details} -- General details about the run including estimation
+method, numbers of patients and records, significant digits, run time, and
+more.
+\item \strong{run_heuristics} -- Boolean flags indicating potential issues with the
+run. For example, if there was a large condition number or a parameter near
+boundary. \code{TRUE} for a given element indicates that issue was detected.
+\code{FALSE} can either mean it was not detected or it was not applicable for
+that run.
+\item \strong{parameters_data} -- Data about parameter estimates. This can be
+accessed directly, but is much easier to look at with the
+\code{\link[=param_estimates]{param_estimates()}} function (which parses this, and other related elements,
+into a tibble).
+\item \strong{parameter_names} -- Names of parameters (\code{THETA1}, \code{THETA2}, etc.).
+Parsed into tibble by \code{\link[=param_estimates]{param_estimates()}}.
+\item \strong{ofv} -- Objective function value, with and without constant. List with
+one element for each estimation method.
+\item \strong{condition_number} -- Condition number, if eigenvalues were returned
+from NONMEM. List with one element for each estimation method.
+\item \strong{shrinkage_details} -- Information about shrinkage. The shrinkage values
+(using SD parameterization) are parsed into the tibble output from
+\code{\link[=param_estimates]{param_estimates()}}. List of lists with one element for each estimation
+method, and one element per sub-population within that.
 }
 
 The summary call will error if it does not find certain files in the output folder.

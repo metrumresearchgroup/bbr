@@ -38,22 +38,18 @@ reference:
   - add_summary
 - title: Model object interactions
   contents:
+  - add_tags
+  - add_notes
+  - add_based_on
+  - add_description
   - add_bbi_args
+  - add_decisions
   - get_based_on
   - get_model_ancestry
   - get_model_id
   - get_model_path
   - get_output_dir
   - get_yaml_path
-  - modify_model_field
-  - add_tags
-  - replace_tags
-  - add_decisions
-  - replace_decisions
-  - add_based_on
-  - replace_based_on
-  - replace_description
-  - replace_bbi_args
 - title: Babylon configuration
   contents:
   - bbi_current_release
@@ -64,6 +60,7 @@ reference:
 - title: Assorted helpers
   contents:
   - check_file
+  - collapse_to_string
   - tail_output
   - tail_lst
   - check_nonmem_table_output

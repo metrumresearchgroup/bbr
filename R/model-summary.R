@@ -12,13 +12,28 @@
 #' **NONMEM**
 #'
 #' The returned list for a NONMEM model will contain the following top-level elements:
-#'  * run_details
-#'  * run_heuristics
-#'  * parameters_data
-#'  * parameter_names
-#'  * ofv
-#'  * condition_number
-#'  * shrinkage_details
+#'  * **run_details** -- General details about the run including estimation
+#'    method, numbers of patients and records, significant digits, run time, and
+#'    more.
+#'  * **run_heuristics** -- Boolean flags indicating potential issues with the
+#'    run. For example, if there was a large condition number or a parameter near
+#'    boundary. `TRUE` for a given element indicates that issue was detected.
+#'    `FALSE` can either mean it was not detected or it was not applicable for
+#'    that run.
+#'  * **parameters_data** -- Data about parameter estimates. This can be
+#'    accessed directly, but is much easier to look at with the
+#'    [param_estimates()] function (which parses this, and other related elements,
+#'    into a tibble).
+#'  * **parameter_names** -- Names of parameters (`THETA1`, `THETA2`, etc.).
+#'    Parsed into tibble by [param_estimates()].
+#'  * **ofv** -- Objective function value, with and without constant. List with
+#'    one element for each estimation method.
+#'  * **condition_number** -- Condition number, if eigenvalues were returned
+#'    from NONMEM. List with one element for each estimation method.
+#'  * **shrinkage_details** -- Information about shrinkage. The shrinkage values
+#'    (using SD parameterization) are parsed into the tibble output from
+#'    [param_estimates()]. List of lists with one element for each estimation
+#'    method, and one element per sub-population within that.
 #'
 #' The summary call will error if it does not find certain files in the output folder.
 #' However, you can override this behavior with the following file-specific flags:
@@ -36,7 +51,7 @@
 #' @param .mod Model to summarize.
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`.
 #' See [print_bbi_args()] for full list of options.
-#' @param ... args passed through to `bbi_exec()`
+#' @param ... args passed through to [bbi_exec()]
 #' @param .dry_run show what the command would be without actually running it
 #' @export
 model_summary <- function(
