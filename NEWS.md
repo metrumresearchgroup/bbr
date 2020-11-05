@@ -1,4 +1,4 @@
-# rbabylon (development)
+# rbabylon 0.10.0
 
 ## New features and changes
 
