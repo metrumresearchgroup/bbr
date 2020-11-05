@@ -2,91 +2,63 @@
 % Please edit documentation in R/modify-model-field.R
 \name{modify_model_field}
 \alias{modify_model_field}
-\alias{add_tags}
-\alias{replace_tags}
-\alias{add_decisions}
-\alias{replace_decisions}
-\alias{add_based_on}
-\alias{replace_based_on}
-\alias{replace_description}
-\alias{add_bbi_args}
-\alias{replace_bbi_args}
+\alias{replace_model_field}
 \title{Modify field in model object}
 \usage{
-modify_model_field(.mod, .field, .value, .append = TRUE, .unique = TRUE)
+modify_model_field(
+  .mod,
+  .field,
+  .value,
+  .append = TRUE,
+  .remove = FALSE,
+  .unique = TRUE
+)
 
-add_tags(.mod, .tags)
-
-replace_tags(.mod, .tags)
-
-add_decisions(.mod, .decisions)
-
-replace_decisions(.mod, .decisions)
-
-add_based_on(.mod, .based_on)
-
-replace_based_on(.mod, .based_on)
-
-replace_description(.mod, .description)
-
-add_bbi_args(.mod, .bbi_args)
-
-replace_bbi_args(.mod, .bbi_args)
+replace_model_field(.mod, .field, .old_val, .new_val)
 }
 \arguments{
 \item{.mod}{The \verb{bbi_\{.model_type\}_model} object to modify}
 
 \item{.field}{Character scalar of the name of the component to modify}
 
-\item{.value}{Whatever is to be added to \code{.mod[[.field]]}, typically a character vector}
+\item{.value}{Whatever is to be added to \code{.mod[[.field]]}, typically a character vector (or a named list in the case of \verb{*_bbi_args()}).
+If \code{NULL} or \code{NA} is passed and \code{.append = FALSE} then \code{.field} with be deleted from the object and corresponding YAML.}
 
 \item{.append}{If \code{TRUE}, the default, concatenate new values with currently present values. If \code{FALSE}, new values will overwrite old values.}
 
+\item{.remove}{If \code{TRUE}, \code{.value} with be removed from the \code{.field} instead of added. \code{FALSE} by default. Cannot have both \code{.append} and \code{.remove} be true in the same call.}
+
 \item{.unique}{If \code{TRUE}, the default, de-duplicate \code{.mod[[.field]]} after adding new values. If \code{FALSE} duplicate values will be kept.}
 
-\item{.tags}{Character vector to add to \code{tags} field}
+\item{.old_val}{The value to be replaced. If \code{.old_val} is not present in
+\code{.mod[[.field]]}, function will warn user and return \code{.mod} unchanged.}
 
-\item{.decisions}{Character vector to use as replacement}
-
-\item{.based_on}{Character vector of relative paths to add to \code{based_on} field}
-
-\item{.description}{Character scalar to use as replacement for the \code{description} field}
-
-\item{.bbi_args}{named list of arguments to add to the model}
+\item{.new_val}{The value to insert in place of \code{.old_val} in
+\code{.mod[[.field]]}.}
 }
 \description{
 Helper functions for updating fields in a \verb{bbi_\{.model_type\}_model} object.
-Note that calling \code{modify_model_field()} directly is not recommended for most users
-because it requires knowing about the internal structure of the model object.
-Instead we recommend using the friendlier helpers listed below (\code{add_...} or \code{replace_...}) when possible.
+Note that calling \code{modify_model_field()} or \code{replace_model_field()} directly
+is \emph{not} recommended for most users because it requires knowing about the
+internal structure of the model object. Instead, \strong{we recommend using the
+friendlier helpers listed below in "See also"} whenever possible.
 }
 \details{
-All functions in this family also check the object against the corresponding YAML with \code{check_yaml_in_sync()} before modifying it,
-and errors if they are out of sync.
-After the object has been modified they will write the modified object back to the YAML and update the model object in
-memory with an md5 digest of the newly written YAML.
+All functions in this family also check the object against the corresponding
+YAML with \code{check_yaml_in_sync()} before modifying it, and errors if they are
+out of sync. After the object has been modified they will write the modified
+object back to the YAML and update the model object in memory with an md5
+digest of the newly written YAML.
 }
 \section{Functions}{
 \itemize{
-\item \code{add_tags}: Add tags to a model object and corresponding YAML
-
-\item \code{replace_tags}: Replaces tags on a model object and corresponding YAML with new tags
-
-\item \code{add_decisions}: Append new decisions to the one(s) in a model object and corresponding YAML
-
-\item \code{replace_decisions}: Replaces \code{decisions} field in a model object and corresponding YAML with new values
-
-\item \code{add_based_on}: Append new \code{based_on} tag to the one in a model object and corresponding YAML
-
-\item \code{replace_based_on}: Replaces \code{based_on} field in a model object and corresponding YAML with new values
-
-\item \code{replace_description}: Replaces description field in a model object and corresponding YAML with new description
-
-\item \code{add_bbi_args}: Modifies model object and corresponding YAML by adding new \code{bbi_args},
-overwriting any args that are already present with the new values.
-Use \code{\link[=print_bbi_args]{print_bbi_args()}} to see a list of valid babylon arguments.
-
-\item \code{replace_bbi_args}: Modifies model object and corresponding YAML by replacing \code{bbi_args} with new list passed to \code{.bbi_args}.
-Use \code{\link[=print_bbi_args]{print_bbi_args()}} to see a list of valid babylon arguments.
+\item \code{replace_model_field}: Replace a single item in a model field
 }}
 
+\seealso{
+\code{\link[=add_tags]{add_tags()}} \code{\link[=replace_tag]{replace_tag()}} \code{\link[=replace_all_tags]{replace_all_tags()}} \code{\link[=remove_tags]{remove_tags()}}
+\code{\link[=add_notes]{add_notes()}} \code{\link[=replace_note]{replace_note()}} \code{\link[=replace_all_notes]{replace_all_notes()}} \code{\link[=remove_notes]{remove_notes()}}
+\code{\link[=add_based_on]{add_based_on()}} \code{\link[=replace_all_based_on]{replace_all_based_on()}} \code{\link[=remove_based_on]{remove_based_on()}}
+\code{\link[=add_description]{add_description()}} \code{\link[=replace_description]{replace_description()}} \code{\link[=add_bbi_args]{add_bbi_args()}}
+\code{\link[=replace_all_bbi_args]{replace_all_bbi_args()}}
+}

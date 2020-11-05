@@ -36,7 +36,7 @@
 #'        and covariance of the parameter on the raw scale will be reported.
 #'      }
 #'   }
-#' \item Paramemter name is parsed into the `label` column, and is commonly formatted to be run through a LaTex parser downstream.
+#' \item Parameter name is parsed into the `label` column, and is commonly formatted to be run through a LaTex parser downstream.
 #' \item LOGD is a flag to indicate that the parameter is modeled on the log
 #' scale (i.e., \eqn{e^\theta}) and should be exponentiated for reporting.
 #' If so, the standard error for the parameter should adjusted via the delta method.

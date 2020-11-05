@@ -99,13 +99,10 @@ Note **this only needs to be done once** for each folder you are modeling in. On
 ## Create model object
 To begin modeling, first create a model object using `new_model()`. This is an S3 object which you will pass to all of the other `rbabylon` functions that submit, summarize, or manipulate models.
 
-The first argument (`.path`) must be the path to your model control stream _without file extension_. For instance, the call below assumes you have a control stream named `1.ctl` or `1.mod` in the directory you just assigned to `MODEL_DIR` above. The `.description` argument is also required and roughly corresponds to what would be in the `$PROB` definition in a control stream.
+The first argument (`.path`) must be the path to your model control stream _without file extension_. For instance, the call below assumes you have a control stream named `1.ctl` or `1.mod` in the directory you just assigned to `MODEL_DIR` above. 
 
 ```{r first model}
-mod1 <- new_model(
-  file.path(MODEL_DIR, 1),
-  .description = "our first model"
-)
+mod1 <- new_model(file.path(MODEL_DIR, 1))
 ```
 
 This `new_model()` call will also create a `1.yaml` file in that same directory, which stores model metadata like description and tags (discussed below). If you ever need to recreate this model object in memory, just run `mod1 <- read_model(file.path(MODEL_DIR, 1))` to rebuild it from the YAML file on disk. 
@@ -182,8 +179,7 @@ mod1 <- read_model(file.path(MODEL_DIR, 1))
 Now you can create a new model object, based on the original, copying and renaming the control stream in the process. The `copy_model_from()` call below will create both `2.ctl` and `2.yaml` files in the same directory as the parent model, and return the model object corresponding to them. (`copy_model_from()` also stores the model's "ancestry" which can be useful later in the project, as shown in the [Using the based_on field](https://metrumresearchgroup.github.io/rbabylon/articles/using-based-on.html) vignette.)
 
 ```{r copy_model 2}
-mod2 <- mod1 %>% copy_model_from(.new_model = 2, 
-                                 .description = "two compartment base model")
+mod2 <- copy_model_from(mod1, 2)
 ```
 
 Note that, while the `.path` argument in  `new_model()` and `read_model()` is relative to your working directory, the `.new_model` argument of `copy_model_from()` is _relative to the directory containing the parent model._ This means that, assuming you would like to create the new model in the same directory as its parent, you only have to pass a filename (without extension) for the new model. Since, by convention, scientists often name their models numerically, you can also pass a number, which will be coerced to the relevant file names internally.
@@ -196,7 +192,7 @@ mod2 %>% submit_model()
 mod2 %>% model_summary()
 ```
 
-## Adding tags and decisions
+## Adding tags and notes
 
 After looking at these results, the user can add tags, which can later be used to organize your modeling runs.
 
@@ -205,11 +201,11 @@ mod1 <- mod1 %>% add_tags("base model")
 mod2 <- mod2 %>% add_tags(c("base model", "2 compartment"))
 ```
 
-In addition to tags, the user can add decisions that can be referenced later.
+In addition to tags, the user can add notes that can be referenced later.
 
 ```{r}
 mod2 <- mod2 %>% 
-  add_decisions("2 compartment model more appropriate than 1 compartment")
+  add_notes("2 compartment model more appropriate than 1 compartment")
 ```
 
 ## Continue to iterate...
@@ -217,9 +213,7 @@ mod2 <- mod2 %>%
 Now the iteration process continues with a third model. 
 
 ```{r copy_model 3}
-mod3 <- mod2 %>% 
-  copy_model_from(.new_model = 3, 
-                  .description = "two compartment with residual errors")
+mod3 <- copy_model_from(mod2, 3)
 ```
 
 Submit and summarize as before.
@@ -230,12 +224,12 @@ mod3 %>% submit_model()
 mod3 %>% model_summary()
 ```
 
-Add tags and decisions for filtering in run log, described next.
+Add tags and notes for filtering in run log, described next.
 
 ```{r add_tags 3}
 mod3 <- mod3 %>% 
         add_tags("2 compartment") %>%
-        add_decisions("Added residual errors because it seemed like a good idea.")
+        add_notes("Added residual errors because it seemed like a good idea.")
 ```
 
 # Run log
@@ -249,20 +243,18 @@ log_df <- run_log(MODEL_DIR)
 log_df
 ```
 
-The `run_log()` returns a tibble which can be manipulated like any other tibble. However, several of the columns (`tags` and `based_on` for example) are list columns, which complicates how you can interact with them. Future releases will have helper functions to more seamlessly interact with these log tibbles, but until then, we have provided some sample `tidyverse` code below.
+The `run_log()` returns a tibble which can be manipulated like any other tibble. However, several of the columns (`tags`, `notes`, and `based_on` for example) are list columns, which complicates how you can interact with them. We provide some helper functions to more seamlessly interact with these log tibbles, as well as some sample `tidyverse` code below.
 
 ## Viewing tags example
 
-This example code displays a more human-readable version of the run log, with the tags collapsed to a character vector.
+The `rbabylon::collapse_to_string()` function can collapse any list column into a string representation of its contents. It is specifically designed for collapsing columns like `tags`, `notes`, and `based_on` into a more human-readable format.
 
-```{r run_log_cleanup} 
+```{r viewing tags new} 
 log_df %>% 
-  group_by(absolute_model_path) %>% 
-  mutate_at(.vars = vars(tags:decisions), 
-                   ~ paste(unlist(.x), collapse=", ")) %>% 
-  ungroup() %>% 
-  select(absolute_model_path, tags, decisions)
+  collapse_to_string(tags, notes) %>%
+  select(run, tags, notes)
 ```
+
 
 ## Filtering tags example
 
@@ -271,7 +263,7 @@ This code uses `purrr::map_lgl` to filter the run log to only rows containing a 
 ```{r filtering}
 log_df %>% 
   filter(map_lgl(tags, ~ "2 compartment" %in% .x)) %>%
-  select(absolute_model_path, description, tags, decisions)
+  select(run, tags, notes)
 ```
 
 

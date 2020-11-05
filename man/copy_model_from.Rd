@@ -8,7 +8,7 @@
 copy_model_from(
   .parent_mod,
   .new_model,
-  .description,
+  .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
   .inherit_tags = FALSE,
@@ -19,7 +19,7 @@ copy_model_from(
 \method{copy_model_from}{bbi_nonmem_model}(
   .parent_mod,
   .new_model,
-  .description,
+  .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
   .inherit_tags = FALSE,
@@ -36,8 +36,8 @@ to the YAML file and model file, both without extension, and the output
 directory (once the model is run). Numeric values will be coerced to
 character. See examples for usage.}
 
-\item{.description}{Description of new model run. This will be stored in the
-yaml (to be used later in \code{run_log()}).}
+\item{.description}{Character scalar description of new model run. This will
+be stored in the yaml (and can be viewed later in \code{run_log()}).}
 
 \item{.based_on_additional}{Character vector of path(s) to other models that
 this model was "based on." These are used to reconstuct model developement
@@ -53,9 +53,9 @@ tags passed to \code{.add_tags} argument. If \code{TRUE} inherit any tags from
 \code{.parent_mod}, with any tags passed to \code{.add_tags} appended.}
 
 \item{.update_model_file}{If \code{TRUE}, the default, update the newly created
-model file with new description and name. For a NONMEM model, this
-currently means only the \verb{$PROBLEM} line in the new control stream will be
-updated. If \code{FALSE}, new model file will be an exact copy of its parent.}
+model file. If \code{FALSE}, new model file will be an exact copy of its parent.
+For a NONMEM model, this currently means only the \verb{$PROBLEM} line in the
+new control stream will be updated to read \verb{See \{.new_model\}.yaml. Created by rbabylon.}.}
 
 \item{.overwrite}{If \code{FALSE}, the default,  function will error if a model
 file already exists at specified \code{.new_model} path. If \code{TRUE} any existing

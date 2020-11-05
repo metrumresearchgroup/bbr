@@ -8,8 +8,7 @@ copy_control_stream(
   .parent_model_path,
   .new_model_path,
   .overwrite,
-  .update_model_file = FALSE,
-  .description = NULL
+  .update_model_file = FALSE
 )
 }
 \arguments{
@@ -20,11 +19,9 @@ copy_control_stream(
 \item{.overwrite}{If \code{TRUE}, overwrite existing file at \code{.new_model_path}. If \code{FALSE} and file exists at \code{.new_model_path} error.}
 
 \item{.update_model_file}{If \code{TRUE}, the default, update the \verb{$PROBLEM} line in the new control stream. If \code{FALSE}, \verb{\{.new_model\}.[mod|ctl]} will be an exact copy of its parent control stream.}
-
-\item{.description}{Description of new model run. This will be passed into the \verb{$PROBLEM} of the new control stream (if \code{.update_model_file=TRUE}).}
 }
 \description{
-Helper function to copy a NONMEM control stream file and optionally update the description, etc. in the new file.
+Helper function to copy a NONMEM control stream file and optionally update the new file.
 Note that any file existing at \code{.new_model_path} will be overwritten.
 }
 \keyword{internal}

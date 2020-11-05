@@ -8,29 +8,32 @@
 
 <title>Create new model by copying existing model — copy_model_from • rbabylon</title>
 
+<!-- favicons -->
+<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
-
-<!-- bootstrap-toc -->
-<link rel="stylesheet" href="../bootstrap-toc.css">
-<script src="../bootstrap-toc.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -43,6 +46,8 @@
 <meta property="og:description" content="Create new model by copying existing model. Useful for iterating during model
 development. Also fills based_on field by default, for constructing model
 ancestry. See &quot;Using based_on field&quot; vignette for details." />
+<meta property="og:image" content="https://metrumresearchgroup.github.io/rbabylon/logo.png" />
+<meta name="twitter:card" content="summary" />
 
 
 
@@ -60,7 +65,7 @@ ancestry. See &quot;Using based_on field&quot; vignette for details." />
 
   </head>
 
-  <body data-spy="scroll" data-target="#toc">
+  <body>
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -74,7 +79,7 @@ ancestry. See &quot;Using based_on field&quot; vignette for details." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.10.0</span>
       </span>
     </div>
 
@@ -148,7 +153,7 @@ ancestry. See <a href='../articles/using-based-on.html'>"Using based_on field" v
     <pre class="usage"><span class='fu'>copy_model_from</span>(
   <span class='no'>.parent_mod</span>,
   <span class='no'>.new_model</span>,
-  <span class='no'>.description</span>,
+  <span class='kw'>.description</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.based_on_additional</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.add_tags</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.inherit_tags</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
@@ -160,7 +165,7 @@ ancestry. See <a href='../articles/using-based-on.html'>"Using based_on field" v
 <span class='fu'>copy_model_from</span>(
   <span class='no'>.parent_mod</span>,
   <span class='no'>.new_model</span>,
-  <span class='no'>.description</span>,
+  <span class='kw'>.description</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.based_on_additional</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.add_tags</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>.inherit_tags</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
@@ -185,8 +190,8 @@ character. See examples for usage.</p></td>
     </tr>
     <tr>
       <th>.description</th>
-      <td><p>Description of new model run. This will be stored in the
-yaml (to be used later in <code><a href='run_log.html'>run_log()</a></code>).</p></td>
+      <td><p>Character scalar description of new model run. This will
+be stored in the yaml (and can be viewed later in <code><a href='run_log.html'>run_log()</a></code>).</p></td>
     </tr>
     <tr>
       <th>.based_on_additional</th>
@@ -210,9 +215,9 @@ tags passed to <code>.add_tags</code> argument. If <code>TRUE</code> inherit any
     <tr>
       <th>.update_model_file</th>
       <td><p>If <code>TRUE</code>, the default, update the newly created
-model file with new description and name. For a NONMEM model, this
-currently means only the <code>$PROBLEM</code> line in the new control stream will be
-updated. If <code>FALSE</code>, new model file will be an exact copy of its parent.</p></td>
+model file. If <code>FALSE</code>, new model file will be an exact copy of its parent.
+For a NONMEM model, this currently means only the <code>$PROBLEM</code> line in the
+new control stream will be updated to read <code>See {.new_model}.yaml. Created by rbabylon.</code>.</p></td>
     </tr>
     <tr>
       <th>.overwrite</th>
@@ -248,10 +253,14 @@ file at <code>.new_model</code> will be overwritten silently.</p></td>
 <span class='fu'>copy_model_from</span>(<span class='no'>mod1</span>, <span class='fl'>100.1</span>, <span class='st'>"a period is okay"</span>)
 }</div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-    <nav id="toc" data-toggle="toc" class="sticky-top">
-      <h2 data-toc-skip>Contents</h2>
-    </nav>
+  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+    <h2>Contents</h2>
+    <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#methods-by-class-">Methods (by class)</a></li>
+      <li><a href="#examples">Examples</a></li>
+    </ul>
+
   </div>
 </div>
 
@@ -262,7 +271,7 @@ file at <code>.new_model</code> will be overwritten silently.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
 
       </footer>

@@ -32,6 +32,10 @@ run_log <- function(.base_dir, .recurse = TRUE) {
 }
 
 
+##################
+# PRIVATE HELPERS
+##################
+
 #' Search for model YAML files and read them
 #'
 #' Private helper function that searches from a base directory for any YAML files (excluding `babylon.yaml`)
@@ -112,7 +116,7 @@ add_log_impl <- function(.log_df, .impl_func, ...) {
 
   # get config log
   mod_list <- map(.log_df[[ABS_MOD_PATH]], read_model)
-  .new_df <- .impl_func(mod_list, ...)
+  .new_df <- .impl_func(mod_list, ...) %>% select(-{{RUN_ID_COL}})
 
   # join to log df
   df <- left_join(
@@ -136,19 +140,22 @@ add_log_impl <- function(.log_df, .impl_func, ...) {
 run_log_entry <- function(.mod) {
   checkmate::assert_scalar(.mod[[YAML_YAML_MD5]])
   checkmate::assert_scalar(.mod[[YAML_MOD_TYPE]])
-  checkmate::assert_scalar(.mod[[YAML_DESCRIPTION]])
+  if (!is.null(.mod[[YAML_DESCRIPTION]])) checkmate::assert_scalar(.mod[[YAML_DESCRIPTION]])
 
   # build row
   entry_df <- tibble::tibble(
     !!ABS_MOD_PATH      := .mod[[ABS_MOD_PATH]],
     !!YAML_YAML_MD5     := .mod[[YAML_YAML_MD5]],
     !!YAML_MOD_TYPE     := .mod[[YAML_MOD_TYPE]],
-    !!YAML_DESCRIPTION  := .mod[[YAML_DESCRIPTION]],
+    !!YAML_DESCRIPTION  := .mod[[YAML_DESCRIPTION]] %||% NA_character_,
     !!YAML_BBI_ARGS     := .mod[[YAML_BBI_ARGS]] %>% list(),
     !!YAML_BASED_ON     := .mod[[YAML_BASED_ON]] %>% list(),
     !!YAML_TAGS         := .mod[[YAML_TAGS]] %>% list(),
+    !!YAML_NOTES        := .mod[[YAML_NOTES]] %>% list(),
     !!YAML_DECISIONS    := .mod[[YAML_DECISIONS]] %>% list()
   )
+
+  entry_df <- add_run_id_col(entry_df)
 
   # check that it is only one row
   if (nrow(entry_df) != 1) {

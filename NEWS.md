@@ -1,3 +1,60 @@
+# rbabylon 0.10.0
+
+## New features and changes
+
+* Deprecated `replace_tags()`, `replace_bbi_args()`, and `replace_based_on()`
+and replaced them with `replace_all_` variants. These functions will warn about
+this for two more releases and then begin to error for two more releases before
+being removed altogether. (#264)
+
+* Added `replace_tag()` (singular) which replaces a single tag with a new tag.
+`replace_note()` (mentioned below) functions the same way. (#264)
+
+* Added `collapse_to_string()` which collapses a list column in a tibble to a
+character column containing a string representation of the column's previous
+contents. For list columns containing character, numeric, or logical vectors,
+this means collapsing with `paste(collapse = ', ')`. For other types `dput()` is
+used. (#260)
+
+* Added `run` column to all `bbi_log_df` tibbles. This is always the second
+column and is equivalent to `basename(absolute_model_path)`. While,
+`absolute_model_path` remains the primary key for the tibble, `run` is useful
+for displaying tables when `absolute_model_path` becomes long and difficult to
+look at. (#259)
+
+* Added `notes` field to model object (and `bbi_run_log_df`) and associated
+helpers `add_notes()`, `replace_note()`, `replace_all_notes()`,
+`remove_notes()`. This will replace `decisions`, to reflect the fact that users
+will want to use this field throughout the modeling process, not only at the end
+once some "decisions" have been reached. `add_decisions()` and
+`replace_decisions()` now print a warning telling the user that they will be
+deprecated in the future and encouraging use of their `_notes` counterparts.
+(#258)
+  
+* `.description` is no longer a required argument for `new_model()` or
+`copy_model_from()`, nor is it a required element of a model object or YAML
+file. The helper function `add_description()` has been added to fill the
+`description` field. (#267)
+
+* The `.update_model_file` argument to `copy_model_from()` no longer updates the
+`$PROB` in the new control stream with the `.description` argument. Instead it
+puts the following in `$PROB`: `From rbabylon: see
+{get_model_id(.new_model)}.yaml for details` (#265)
+
+* Added `remove_tags()`, `remove_notes()`, and `remove_based_on()` functions for
+removing specific strings from the relevant model object field. (#252)
+  
+## Bug fixes
+
+* `submit_models()` correctly handles the case where bbi arguments are neither
+  present in the YAML file nor passed at runtime (#248).
+
+* `config_log()` and `add_config()` are supposed to warn a user if models are
+found that do _not_ have a corresponding `bbi_config.json` file (i.e. have not
+yet been run, or did not finish successfully). However, if there is no output
+directory at all for a given model (it has never been run) then these functions
+would error. Now they correctly warn in that scenario. (#253)
+
 # rbabylon 0.9.0
 
 ## Breaking changes
@@ -58,6 +115,8 @@
 * Added vignette demonstrating new `summary_log()` functionality.
 
 * Added shrinkage column to the tibble output from `param_estimates.bbi_nonmem_summary()`. 
+
+* Changed the column name containing the names of the parameters, in the table output from `param_estimates.bbi_nonmem_summary()`, from `names` to `parameter_names` to avoid confusion.
 
 * `param_estimates.bbi_nonmem_summary()` now errors with a "not implemented" error for 
   models where the final estimation method is Bayesian.

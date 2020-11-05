@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# rbabylon
+# rbabylon <a href='https:/metrumresearchgroup.github.io/rbabylon'><img src='man/figures/logo.png' align="right" height="120" /></a>
 
 <!-- badges: start -->
 [![Build Status](https://github-drone.metrumrg.com/api/badges/metrumresearchgroup/rbabylon/status.svg)](https://github-drone.metrumrg.com/metrumresearchgroup/rbabylon)

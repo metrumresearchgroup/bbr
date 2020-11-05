@@ -14,8 +14,8 @@
 #'   to the YAML file and model file, both without extension, and the output
 #'   directory (once the model is run). Numeric values will be coerced to
 #'   character. See examples for usage.
-#' @param .description Description of new model run. This will be stored in the
-#'   yaml (to be used later in `run_log()`).
+#' @param .description Character scalar description of new model run. This will
+#'   be stored in the yaml (and can be viewed later in `run_log()`).
 #' @param .based_on_additional Character vector of path(s) to other models that
 #'   this model was "based on." These are used to reconstuct model developement
 #'   and ancestry. **Paths must be relative to `.new_model` path.** Note that
@@ -27,9 +27,10 @@
 #'   tags passed to `.add_tags` argument. If `TRUE` inherit any tags from
 #'   `.parent_mod`, with any tags passed to `.add_tags` appended.
 #' @param .update_model_file If `TRUE`, the default, update the newly created
-#'   model file with new description and name. For a NONMEM model, this
-#'   currently means only the `$PROBLEM` line in the new control stream will be
-#'   updated. If `FALSE`, new model file will be an exact copy of its parent.
+#'   model file. If `FALSE`, new model file will be an exact copy of its parent.
+#'   For a NONMEM model, this currently means only the `$PROBLEM` line in the
+#'   new control stream will be updated to read `See {.new_model}.yaml. Created
+#'   by rbabylon.`.
 #' @param .overwrite If `FALSE`, the default,  function will error if a model
 #'   file already exists at specified `.new_model` path. If `TRUE` any existing
 #'   file at `.new_model` will be overwritten silently.
@@ -55,7 +56,7 @@
 copy_model_from <- function(
   .parent_mod,
   .new_model,
-  .description,
+  .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
   .inherit_tags = FALSE,
@@ -70,7 +71,7 @@ copy_model_from <- function(
 copy_model_from.bbi_nonmem_model <- function(
   .parent_mod,
   .new_model,
-  .description,
+  .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
   .inherit_tags = FALSE,
@@ -104,8 +105,8 @@ copy_model_from.bbi_nonmem_model <- function(
 #' Create new .mod/ctl and new .yaml files based on a previous model. Used for iterating on model development.
 #' Also fills in necessary YAML fields for using `run_log()` later.
 #' @param .parent_mod S3 object of class `bbi_nonmem_model` to be used as the basis for copy.
-#' @param .description Description of new model run. This will be stored in the yaml (to be used later in `run_log()`) and optionally passed into the `$PROBLEM` of the new control stream.
 #' @param .update_model_file If `TRUE`, the default, update the `$PROBLEM` line in the new control stream. If `FALSE`, `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.
+#' @inheritParams copy_model_from
 #' @importFrom fs file_copy path_rel is_absolute_path
 #' @importFrom readr read_file write_file
 #' @importFrom stringr str_replace
@@ -117,7 +118,7 @@ copy_model_from.bbi_nonmem_model <- function(
 copy_nonmem_model_from <- function(
   .parent_mod,
   .new_model,
-  .description,
+  .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
   .inherit_tags = FALSE,
@@ -153,7 +154,7 @@ copy_nonmem_model_from <- function(
   .parent_model_path <- get_model_path(.parent_mod)
   parent_ext <- fs::path_ext(.parent_model_path)
   .new_model_path <- paste(.new_model, parent_ext, sep = ".")
-  copy_control_stream(.parent_model_path, .new_model_path, .overwrite, .update_model_file, .description)
+  copy_control_stream(.parent_model_path, .new_model_path, .overwrite, .update_model_file)
 
   # create new model
   .new_mod <- new_model(
@@ -172,36 +173,30 @@ copy_nonmem_model_from <- function(
 
 #' Copy a NONMEM control stream file
 #'
-#' Helper function to copy a NONMEM control stream file and optionally update the description, etc. in the new file.
+#' Helper function to copy a NONMEM control stream file and optionally update the new file.
 #' Note that any file existing at `.new_model_path` will be overwritten.
 #' @param .parent_model_path Path to the control stream to copy
 #' @param .new_model_path Path to copy the new control stream to
 #' @param .overwrite If `TRUE`, overwrite existing file at `.new_model_path`. If `FALSE` and file exists at `.new_model_path` error.
 #' @param .update_model_file If `TRUE`, the default, update the `$PROBLEM` line in the new control stream. If `FALSE`, `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.
-#' @param .description Description of new model run. This will be passed into the `$PROBLEM` of the new control stream (if `.update_model_file=TRUE`).
 #' @keywords internal
-copy_control_stream <- function(.parent_model_path, .new_model_path, .overwrite, .update_model_file = FALSE, .description = NULL) {
+copy_control_stream <- function(.parent_model_path, .new_model_path, .overwrite, .update_model_file = FALSE) {
 
   if (fs::file_exists(.new_model_path) && !isTRUE(.overwrite)) {
     stop(glue("File already exists at {.new_model_path} -- cannot copy new control stream. Either delete old file or use `new_model({yaml_ext(.new_model_path)})`"))
   }
 
   if (.update_model_file) {
-    if (is.null(.description)) {
-      stop("If `.update_model_file` is TRUE, user must specify a `.description` for the new model.")
-    }
-
-    # get model id's
-    parent_mod_id <- .parent_model_path %>% get_model_id()
-    new_mod_id <- .new_model_path %>% get_model_id()
 
     # read parent control stream
     mod_str <- .parent_model_path %>% read_file()
 
     # replace the $PROBLEM line(s)
+    new_mod_id <- get_model_id(.new_model_path)
     mod_str <- str_replace(mod_str,
                            "\\$PROB(.|\n)*?\\$",
-                           as.character(glue("$PROBLEM {new_mod_id} {.description}\n\n$")))
+                           as.character(glue("$PROBLEM From rbabylon: see {new_mod_id}.yaml for details\n\n$")))
+    glue("")
 
     # read parent control stream
     write_file(mod_str, .new_model_path)

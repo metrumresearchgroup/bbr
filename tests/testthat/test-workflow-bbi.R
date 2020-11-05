@@ -50,10 +50,10 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
     # TODO: this test needs to clean up after itself by removing the files it
     # created
 
-    # create model spec
+    # create model
     mod1 <- new_model(
       file.path(MODEL_DIR_BBI, "1"),
-      .description = ORIG_DESC,
+      .description = "original test-workflow-bbi model",
       .tags = ORIG_TAGS,
       .bbi_args = list(overwrite = TRUE, threads = 4)
     )
@@ -81,8 +81,8 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
     # TODO: isolate this test so it does not depend on a model created by a
     # previous test
     mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
-    mod2 <- copy_model_from(mod1, 2, NEW_DESC)
-    mod3 <- copy_model_from(mod1, 3, NEW_DESC, .inherit_tags = TRUE) %>% add_bbi_args(list(clean_lvl=2, overwrite = FALSE))
+    mod2 <- copy_model_from(mod1, 2)
+    mod3 <- copy_model_from(mod1, 3, .inherit_tags = TRUE) %>% add_bbi_args(list(clean_lvl=2, overwrite = FALSE))
 
     # run new models
     list(mod2, mod3) %>% submit_models(.mode = "local", .wait = TRUE)
@@ -123,7 +123,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
   test_that(".wait = FALSE returns correctly", {
     # launch a model but don't wait for it to finish
     mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
-    proc <- copy_model_from(mod1, 4, NEW_DESC, .inherit_tags = TRUE) %>% submit_model(.mode = "local", .wait = FALSE)
+    proc <- copy_model_from(mod1, 4, .inherit_tags = TRUE) %>% submit_model(.mode = "local", .wait = FALSE)
     expect_true(stringr::str_detect(proc[[PROC_STDOUT]], ".wait = FALSE"))
   })
 
@@ -131,8 +131,9 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
     # check run log for all models
     log_df <- run_log(MODEL_DIR_BBI)
     expect_equal(nrow(log_df), 4)
-    expect_equal(ncol(log_df), 8)
-    expect_identical(basename(log_df[[ABS_MOD_PATH]]), c("1", "2", "3", "4"))
+    expect_equal(ncol(log_df), RUN_LOG_COLS)
+    expect_identical(basename(log_df[[ABS_MOD_PATH]]), as.character(seq(1:4)))
+    expect_identical(log_df$description, c("original test-workflow-bbi model", rep(NA_character_, 3)))
     expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS, ORIG_TAGS))
   })
 
@@ -145,7 +146,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
       regexp = "in progress"
     )
     expect_equal(nrow(log_df), 4)
-    expect_equal(ncol(log_df), RUN_LOG_COLS + CONFIG_COLS - 1)
+    expect_equal(ncol(log_df), RUN_LOG_COLS + CONFIG_COLS-2)
 
     # check config md5's against ctl md5's
     log_df <- log_df %>% filter(!is.na(model_md5))

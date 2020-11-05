@@ -6,7 +6,7 @@
 \usage{
 new_model(
   .path,
-  .description,
+  .description = NULL,
   .based_on = NULL,
   .tags = NULL,
   .bbi_args = NULL,
@@ -19,10 +19,8 @@ new_model(
 and YAML file (both without extension), and the path to the output
 directory.}
 
-\item{.description}{Description of new model run. This will be stored in the
-yaml (and can be viewed later in \code{run_log()}). By convention, it should
-match the $PROBLEM statement in the control stream, but this is not
-enforced.}
+\item{.description}{Character scalar description of new model run. This will
+be stored in the yaml (and can be viewed later in \code{run_log()}).}
 
 \item{.based_on}{Character scalar or vector of paths to other models that
 this model was "based on." These are used to reconstuct model developement

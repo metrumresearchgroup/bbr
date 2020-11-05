@@ -7,7 +7,7 @@
 copy_nonmem_model_from(
   .parent_mod,
   .new_model,
-  .description,
+  .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
   .inherit_tags = FALSE,
@@ -18,9 +18,33 @@ copy_nonmem_model_from(
 \arguments{
 \item{.parent_mod}{S3 object of class \code{bbi_nonmem_model} to be used as the basis for copy.}
 
-\item{.description}{Description of new model run. This will be stored in the yaml (to be used later in \code{run_log()}) and optionally passed into the \verb{$PROBLEM} of the new control stream.}
+\item{.new_model}{Path to the new model, either absolute or relative to the
+path to \code{.parent_mod}. Represents an absolute model path, which is the path
+to the YAML file and model file, both without extension, and the output
+directory (once the model is run). Numeric values will be coerced to
+character. See examples for usage.}
+
+\item{.description}{Character scalar description of new model run. This will
+be stored in the yaml (and can be viewed later in \code{run_log()}).}
+
+\item{.based_on_additional}{Character vector of path(s) to other models that
+this model was "based on." These are used to reconstuct model developement
+and ancestry. \strong{Paths must be relative to \code{.new_model} path.} Note that
+the \code{.parent_model} will automatically be added to the \code{based_on} field, so
+no need to include that here.}
+
+\item{.add_tags}{Character vector with any new tags(s) to be added to
+\verb{\{.new_model\}.yaml}}
+
+\item{.inherit_tags}{If \code{FALSE}, the default, new model will only have any
+tags passed to \code{.add_tags} argument. If \code{TRUE} inherit any tags from
+\code{.parent_mod}, with any tags passed to \code{.add_tags} appended.}
 
 \item{.update_model_file}{If \code{TRUE}, the default, update the \verb{$PROBLEM} line in the new control stream. If \code{FALSE}, \verb{\{.new_model\}.[mod|ctl]} will be an exact copy of its parent control stream.}
+
+\item{.overwrite}{If \code{FALSE}, the default,  function will error if a model
+file already exists at specified \code{.new_model} path. If \code{TRUE} any existing
+file at \code{.new_model} will be overwritten silently.}
 }
 \value{
 S3 object of class \code{bbi_nonmem_model} that can be passed to \code{submit_nonmem_model()}

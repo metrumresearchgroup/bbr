@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# rbabylon
+# rbabylon <a href='https:/metrumresearchgroup.github.io/rbabylon'><img src='man/figures/logo.png' align="right" height="120" /></a>
 
 <!-- badges: start -->
 

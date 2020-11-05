@@ -34,7 +34,8 @@ test_that("run_log matches reference", {
   log_df <- run_log(MODEL_DIR)
   expect_equal(nrow(log_df), RUN_LOG_ROWS)
   expect_equal(ncol(log_df), RUN_LOG_COLS)
-  expect_identical(basename(log_df[[ABS_MOD_PATH]]), c("1", "2", "3"))
+  expect_identical(log_df[[RUN_ID_COL]], c("1", "2", "3"))
+  expect_identical(log_df[[RUN_ID_COL]], basename(log_df[[ABS_MOD_PATH]]))
   expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS))
   expect_identical(log_df$yaml_md5, RUN_LOG_YAML_MD5)
   expect_identical(log_df$based_on, list(NULL, "1", c("1", "2")))
@@ -81,17 +82,4 @@ test_that("run_log() works correctly with nested dirs", {
   expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS, ORIG_TAGS))
   expect_identical(log_df$yaml_md5, c(RUN_LOG_YAML_MD5, MOD_LEVEL2_MD5))
   expect_identical(log_df$based_on, list(NULL, "1", c("1", "2"), "../1"))
-})
-
-##########################################
-# testing errors after meddling
-##########################################
-
-test_that("run_log fails after messing with YAML", {
-  # make the description field an array
-  rogue_yaml <- yaml::read_yaml(yaml_ext(NEW_MOD3))
-  rogue_yaml[[YAML_DESCRIPTION]] <- c(rogue_yaml[[YAML_DESCRIPTION]], "bad stuff")
-  yaml::write_yaml(rogue_yaml, yaml_ext(NEW_MOD3))
-
-  expect_error(log_df <- run_log(MODEL_DIR), regexp = "Must have length 1")
 })

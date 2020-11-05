@@ -19,8 +19,8 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
   test_that("submit_models(.dry_run=T) with list input simple",
             {
               # copy to two new models
-              mod2 <- copy_model_from(MOD1, 2, "naw")
-              mod3 <- copy_model_from(MOD1, 3, "naw")
+              mod2 <- copy_model_from(MOD1, 2)
+              mod3 <- copy_model_from(MOD1, 3)
               on.exit({ cleanup() })
 
               .mods <- list(MOD1, mod2, mod3)
@@ -42,8 +42,8 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
   test_that("submit_models(.dry_run=T) with list input, 2 arg sets",
             {
               # copy to two new models
-              mod2 <- copy_model_from(MOD1, 2, "naw") %>% add_bbi_args(list(threads = 3))
-              mod3 <- copy_model_from(MOD1, 3, "naw") %>% add_bbi_args(list(clean_lvl = 2))
+              mod2 <- copy_model_from(MOD1, 2) %>% add_bbi_args(list(threads = 3))
+              mod3 <- copy_model_from(MOD1, 3) %>% add_bbi_args(list(clean_lvl = 2))
               on.exit({ cleanup() })
 
               .mods <- list(MOD1, mod2, mod3)
@@ -91,8 +91,8 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
   test_that("submit_models(.dry_run=T) errors with bad input",
             {
               # copy to two new models
-              mod2 <- copy_model_from(MOD1, 2, "naw")
-              mod3 <- copy_model_from(MOD1, 3, "naw")
+              mod2 <- copy_model_from(MOD1, 2)
+              mod3 <- copy_model_from(MOD1, 3)
               on.exit({ cleanup() })
 
               # testing when one isn't a model
@@ -134,6 +134,40 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
           "cd {model_dir} ;",
           "bbi nonmem run sge {mod_ctl_path[[1L]]} --overwrite --threads=4",
           "--config={temp_config}",
+          .sep = " "
+        )
+      )
+    )
+  })
+
+  test_that("submit_models() works if .bbi_args is empty", {
+    # set existing arguments to NULL via `.bbi_args`
+    res <- submit_models(
+      list(MOD1),
+      .bbi_args = list(overwrite = NULL, threads = NULL),
+      .dry_run = TRUE
+    )
+
+    expect_identical(
+      res[[1L]][[PROC_CALL]],
+      as.character(
+        glue::glue("cd {model_dir} ; bbi nonmem run sge {mod_ctl_path[[1L]]}")
+      )
+    )
+
+    # now the case where the YAML file does not contain any CLI arguments
+    temp_mod_path <- create_temp_model()
+    mod <- read_model(temp_mod_path)
+    mod <- replace_all_bbi_args(mod, NULL)
+
+    res <- submit_models(list(mod), .dry_run = TRUE)
+
+    expect_identical(
+      res[[1L]][[PROC_CALL]],
+      as.character(
+        glue::glue(
+          "cd {dirname(temp_mod_path)} ;",
+          "bbi nonmem run sge {fs::path_ext_set(temp_mod_path, 'ctl')}",
           .sep = " "
         )
       )

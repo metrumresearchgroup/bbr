@@ -78,7 +78,7 @@ config_log_impl <- function(.mods) {
 
   check_model_object_list(.mods)
 
-  out_dirs <- map_chr(.mods, get_output_dir)
+  out_dirs <- map_chr(.mods, get_output_dir, .check_exists = FALSE)
   json_files <- file.path(out_dirs, "bbi_config.json")
 
   # check for files that don't exist
@@ -101,10 +101,13 @@ config_log_impl <- function(.mods) {
     json_files <- json_files[!missing]
   }
 
-  json_files %>%
-    purrr::map_dfr(config_log_entry) %>%
-    dplyr::select(.data[[ABS_MOD_PATH]], everything()) %>%
-    create_config_log_object()
+  res_df <- purrr::map_dfr(json_files, config_log_entry)
+
+  res_df <- add_run_id_col(res_df)
+
+  res_df <- create_config_log_object(res_df)
+
+  return(res_df)
 }
 
 #' Parse a bbi config file

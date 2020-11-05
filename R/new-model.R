@@ -12,10 +12,8 @@
 #' @param .path Path to save the new model. Will be the path to the model file
 #'   and YAML file (both without extension), and the path to the output
 #'   directory.
-#' @param .description Description of new model run. This will be stored in the
-#'   yaml (and can be viewed later in `run_log()`). By convention, it should
-#'   match the $PROBLEM statement in the control stream, but this is not
-#'   enforced.
+#' @param .description Character scalar description of new model run. This will
+#'   be stored in the yaml (and can be viewed later in `run_log()`).
 #' @param .based_on Character scalar or vector of paths to other models that
 #'   this model was "based on." These are used to reconstuct model developement
 #'   and ancestry. \strong{Paths must be relative to `.yaml_path`.}
@@ -33,10 +31,11 @@
 #' @return S3 object of class `bbi_{.model_type}_model` that can be passed to
 #'   `submit_model()`, `model_summary()`, etc.
 #' @seealso [copy_model_from()], [read_model()]
+#' @importFrom checkmate assert_scalar
 #' @export
 new_model <- function(
   .path,
-  .description,
+  .description = NULL,
   .based_on = NULL,
   .tags = NULL,
   .bbi_args = NULL,
@@ -68,8 +67,11 @@ new_model <- function(
   # fill list from passed args
   .mod <- list()
   .mod[[ABS_MOD_PATH]] <- abs_mod_path
-  .mod[[YAML_DESCRIPTION]] <- .description
   .mod[[YAML_MOD_TYPE]] <- .model_type
+  if (!is.null(.description)) {
+    checkmate::assert_scalar(.description)
+    .mod[[YAML_DESCRIPTION]] <- .description
+  }
   if (!is.null(.based_on)) {
     .mod[[YAML_BASED_ON]] <- safe_based_on(dirname(.path), .based_on)
   }

@@ -52,22 +52,22 @@ YAML_YAML_MD5 <- "yaml_md5"
 YAML_DESCRIPTION <- "description"
 YAML_BASED_ON <- "based_on"
 YAML_TAGS <- "tags"
+YAML_NOTES <- "notes"
 YAML_DECISIONS <- "decisions"
 YAML_BBI_ARGS <- "bbi_args"
 YAML_MOD_TYPE <- "model_type"
 
 YAML_REQ_INPUT_KEYS <- c(
-  YAML_MOD_TYPE,
-  YAML_DESCRIPTION
+  YAML_MOD_TYPE
 )
 
 ABS_MOD_PATH <- "absolute_model_path"
+RUN_ID_COL <- "run"
 
 # keys required to create a model object
 MODEL_REQ_INPUT_KEYS <- c(
   ABS_MOD_PATH,
-  YAML_MOD_TYPE,
-  YAML_DESCRIPTION
+  YAML_MOD_TYPE
 )
 
 # keys required for a model object to have
@@ -75,19 +75,20 @@ MODEL_REQ_KEYS <- c(
   ABS_MOD_PATH,
   YAML_YAML_MD5,
   YAML_MOD_TYPE,
-  YAML_DESCRIPTION,
   YAML_BBI_ARGS
 )
 
 # columns required for a run log df
 RUN_LOG_REQ_COLS <- c(
   ABS_MOD_PATH,
+  RUN_ID_COL,
   YAML_YAML_MD5,
   YAML_MOD_TYPE,
   YAML_DESCRIPTION,
   YAML_BBI_ARGS,
   YAML_BASED_ON,
   YAML_TAGS,
+  YAML_NOTES,
   YAML_DECISIONS
 )
 
@@ -102,6 +103,7 @@ YAML_ERASE_OUT_KEYS <- c(
 YAML_SCALAR_TO_LIST_KEYS <- c(
   YAML_BASED_ON,
   YAML_TAGS,
+  YAML_NOTES,
   YAML_DECISIONS
 )
 
@@ -167,6 +169,7 @@ SUMMARY_LIST_REQ_KEYS <- c(
 # columns required for a summary log df
 SUMMARY_LOG_REQ_COLS <- c(
   ABS_MOD_PATH,
+  RUN_ID_COL,
   SL_SUMMARY,
   SL_ERROR,
   SL_FAIL_FLAGS,
@@ -186,6 +189,7 @@ CONFIG_KEEPERS <- c(
 
 CONFIG_LOG_REQ_COLS <- c(
   ABS_MOD_PATH,
+  RUN_ID_COL,
   CONFIG_KEEPERS
 )
 
