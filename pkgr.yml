@@ -1,35 +1,9 @@
 Version: 1
-Packages:
-  - checkmate
-  - cli
-  - covr
-  - devtools
-  - digest
-  - dplyr
-  - forcats
-  - fs
-  - ggplot2
-  - glue
-  - jsonlite
-  - knitr
-  - lifecycle
-  - magrittr
-  - processx
-  - purrr
-  - readr
-  - renv
-  - rlang
-  - rmarkdown
-  - stringr
-  - testthat
-  - tibble
-  - tidyr
-  - tidyselect
-  - withr
-  - yaml
+Descriptions:
+  - DESCRIPTION
 
 Repos:
   - MPN: https://mpn.metworx.com/snapshots/stable/2020-03-24
 
 Lockfile:
-    Type: renv
+  Type: renv
