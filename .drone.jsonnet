@@ -214,7 +214,7 @@ local pull_image(image, volumes=[]) = {
 # r_path          path to R executable
 # expr            expression to run
 local run_r_expression(r_path, expr) =
-  std.join(" ", [r_path, "-e", std.escapeStringBash(expr)]);
+  std.join(" ", [r_path, "--no-init-file", "-e", std.escapeStringBash(expr)]);
 
 # Drone step to copy a tagged release to S3
 #
