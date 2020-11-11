@@ -7,6 +7,17 @@ Packages:
 
 Repos:
   - MPN: https://mpn.metworx.com/snapshots/stable/2020-03-24
+  - MPN_Rcpp: https://mpn.metworx.com/snapshots/stable/2020-04-18
+Customizations:
+  Repos:
+    - MPN:
+        Type: source
+    - MPN_Rcpp:
+        Type: source
+  Packages:
+    - Rcpp:
+        Repo: MPN_Rcpp
+        Type: source
 
 Lockfile:
   Type: renv
