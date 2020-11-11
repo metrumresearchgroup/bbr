@@ -25,11 +25,10 @@ If you are new to `rbabylon`, the ["Getting Started with rbabylon"](https://metr
 
 There is some initial set up necessary for using `rbabylon`. Please refer to the ["Getting Started"](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html#setup) vignette, mentioned above, if you have not done this yet. Once this is done, load the library.
 
-```{r}
+```{r results = 'hide', message=FALSE, warning=FALSE}
 library(rbabylon)
-suppressPackageStartupMessages(library(dplyr))
-suppressPackageStartupMessages(library(purrr))
-suppressPackageStartupMessages(library(fs))
+library(dplyr)
+library(purrr)
 ```
 
 ```{r set up and define cleanup, include = FALSE}
@@ -96,10 +95,10 @@ mod6 <- copy_model_from(mod5, 6)
 # ...submit mod6...look at diagnostics...decide you're done!
 ```
 
-Now that you have arrived at your final model, you can add a tag to it, which will be used shortly for filtering the `run_log()` tibble.
+Now that you have arrived at your final model, you can add description to identify it, which will be used shortly for filtering the `run_log()` tibble.
 
 ```{r final tag}
-mod6 <- mod6 %>% add_tags("final model")
+mod6 <- mod6 %>% add_description("Final model")
 ```
 
 # Operating on a model object
@@ -138,14 +137,12 @@ log_df <- run_log(MODEL_DIR)
 log_df
 ```
 
-## Filtering tags example
-
-Among other things, the run log contains the tags that have been assigned to each model. Here we use `purrr::map_lgl` to filter the run log to only the final model.
+Among other things, the run log contains any descriptions that have been assigned to each model. Here we use `filter` and `pull` to get the path to the final model.
 
 ```{r filtering}
 final_model_path <- 
   log_df %>% 
-  filter(map_lgl(tags, ~ "final model" %in% .x)) %>%
+  filter(description == "Final model") %>%
   pull(absolute_model_path)
 
 final_model_path
@@ -155,7 +152,9 @@ Next we can use the `get_model_ancestry()` function to filter the tibble to only
 
 ```{r filter to ancestry 1}
 log_df %>% 
-  filter(absolute_model_path %in% get_model_ancestry(final_model_path))
+  filter(absolute_model_path %in% get_model_ancestry(final_model_path)) %>%
+  collapse_to_string(based_on) %>% # collapses list column for easier printing
+  select(run, based_on)
 ```
 
 As you can see, models 3 and 4 are discarded because they did not lead to the final model. Review "Modeling Process" section above if you are not sure why this is the case. We will use the two techniques together in the "Final model family" section below.
@@ -198,16 +197,19 @@ log_df %>% select(run, model_has_changed, data_has_changed)
 
 ## Final model family
 
-From the `model_has_changed` column in the previous example, you can see that some of the model files have changed since they were run. However, you may only care about your final model and the models that led to it. You can use the `tags` and `based_on` columns from the `run_log()` to filter to only those models.
+From the `model_has_changed` column in the previous example, you can see that some of the model files have changed since they were run. However, you may only care about your final model and the models that led to it. You can use the `description` and `based_on` columns from the `run_log()` to filter to only those models.
 
 ```{r filter to ancestry 2}
 final_model_family <- bind_rows(
   log_df %>% 
     filter(absolute_model_path %in% get_model_ancestry(final_model_path)), # the ancestors of the final model
   log_df %>% 
-    filter(map_lgl(tags, ~ "final model" %in% .x)) # the final model itself
+    filter(description == "Final model") # the final model itself
 )
-final_model_family %>% select(run, model_has_changed, data_has_changed)
+
+final_model_family %>% 
+  collapse_to_string(based_on) %>%
+  select(run, based_on, description, model_has_changed, data_has_changed)
 ```
 
 When we filter to only those models, you can see that they are all still up-to-date. Great news.
