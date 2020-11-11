@@ -8,6 +8,8 @@ Packages:
 Repos:
   - MPN: https://mpn.metworx.com/snapshots/stable/2020-03-24
   - MPN_Rcpp: https://mpn.metworx.com/snapshots/stable/2020-04-18
+  - MPN_withr: https://mpn.metworx.com/snapshots/stable/2020-05-09
+
 Customizations:
   Repos:
     - MPN:
@@ -17,6 +19,9 @@ Customizations:
   Packages:
     - Rcpp:
         Repo: MPN_Rcpp
+        Type: source
+    - withr:
+        Repo: MPN_withr
         Type: source
 
 Lockfile:
