@@ -2,6 +2,9 @@ Version: 1
 Descriptions:
   - DESCRIPTION
 
+Packages:
+  - devtools
+
 Repos:
   - MPN: https://mpn.metworx.com/snapshots/stable/2020-03-24
 
