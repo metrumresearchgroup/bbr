@@ -23,6 +23,7 @@
 #' @param .fail_flags Same as `.bbi_args` except these are used _only_ when a [model_summary()] call fails.
 #' In that case, flags are appended to anything in `.bbi_args` and the summary is tried again.
 #' See details section for more info on these flags.
+#' @seealso [model_summary()]
 #' @inheritParams model_summary
 #' @export
 model_summaries <- function(
