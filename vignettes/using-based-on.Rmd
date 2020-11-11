@@ -95,7 +95,7 @@ mod6 <- copy_model_from(mod5, 6)
 # ...submit mod6...look at diagnostics...decide you're done!
 ```
 
-Now that you have arrived at your final model, you can add description to identify it, which will be used shortly for filtering the `run_log()` tibble.
+Now that you have arrived at your final model, you can add a description to identify it, which will be used shortly for filtering the `run_log()` tibble.
 
 ```{r final tag}
 mod6 <- mod6 %>% add_description("Final model")
@@ -137,7 +137,7 @@ log_df <- run_log(MODEL_DIR)
 log_df
 ```
 
-Among other things, the run log contains any descriptions that have been assigned to each model. Here we use `filter` and `pull` to get the path to the final model.
+Among other things, the run log contains any descriptions that have been assigned to each model. Here we use `dplyr::filter()` and `dplyr::pull()` to get the path to the final model.
 
 ```{r filtering}
 final_model_path <- 
