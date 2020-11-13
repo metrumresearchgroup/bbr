@@ -120,7 +120,20 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
       sum_df <- summary_log(LEVEL2_DIR)
     }, regexp = "ALL 1 MODEL SUMMARIES FAILED")
 
-    expect_equal(names(sum_df), c(ABS_MOD_PATH, "error_msg"))
+    expect_equal(nrow(sum_df), 1)
+    expect_equal(names(sum_df), c(ABS_MOD_PATH, RUN_ID_COL, "error_msg"))
+    expect_true(all(grepl("--no-grd-file", sum_df$error_msg)))
+
+  })
+
+  test_that("add_summary works all failed summaries", {
+
+    expect_warning({
+      sum_df <- run_log(LEVEL2_DIR) %>% add_summary()
+    }, regexp = "ALL 1 MODEL SUMMARIES FAILED")
+
+    expect_equal(nrow(sum_df), 1)
+    expect_true(all(c(ABS_MOD_PATH, RUN_ID_COL, YAML_TAGS, "error_msg") %in% names(sum_df)))
     expect_true(all(grepl("--no-grd-file", sum_df$error_msg)))
 
   })
