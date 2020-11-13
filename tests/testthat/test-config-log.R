@@ -143,9 +143,9 @@ test_that("add_config() has correct columns", {
 })
 
 # THESE TESTS NEED TO BE LAST BECAUSE IT DELETES NECESSARY FILES
-fs::file_delete(file.path(NEW_MOD2, "bbi_config.json"))
 fs::file_delete(file.path(NEW_MOD3, "bbi_config.json"))
-missing_idx <- c(2L, 3L)
+fs::file_delete(file.path(LEVEL2_MOD, "bbi_config.json"))
+missing_idx <- c(3L, 4L)
 
 test_that("add_config() works correctly with missing json", {
   log_df <- expect_warning(run_log(MODEL_DIR) %>% add_config(), regexp = "Found only 2 bbi_config.json files for 4 models")
@@ -184,8 +184,8 @@ test_that("add_config() works correctly with missing json", {
   )
 })
 
-fs::dir_delete(NEW_MOD2)
 fs::dir_delete(NEW_MOD3)
+fs::dir_delete(LEVEL2_MOD)
 
 test_that("config_log() works with missing output dirs", {
   log_df <- expect_warning(
@@ -196,4 +196,24 @@ test_that("config_log() works with missing output dirs", {
   expect_equal(nrow(log_df), RUN_LOG_ROWS+1-2)
   expect_equal(ncol(log_df), CONFIG_COLS)
   expect_false(any(duplicated(log_df[[ABS_MOD_PATH]])))
+})
+
+test_that("config_log() works with no json found", {
+
+  expect_warning({
+    log_df <- config_log(LEVEL2_DIR)
+  }, regexp = "Found no bbi_config")
+
+  expect_equal(nrow(log_df), 0)
+  expect_equal(names(log_df), c(ABS_MOD_PATH, RUN_ID_COL))
+})
+
+test_that("add_config() works no json found", {
+
+  expect_warning({
+    log_df <- run_log(LEVEL2_DIR) %>% add_config()
+  }, regexp = "Found no bbi_config")
+
+  expect_equal(nrow(log_df), 1)
+  expect_true(all(c(ABS_MOD_PATH, RUN_ID_COL, YAML_TAGS) %in% names(log_df)))
 })
