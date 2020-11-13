@@ -2,7 +2,8 @@
 #'
 #' Runs [model_summaries()] on all models in the input and returns a subset of the each resulting summary as a tibble.
 #'
-#' @return An object of class `bbi_summary_log_df`, which includes the fields described below.
+#' @return An object of class `bbi_summary_log_df`, which includes the fields described below. If _all_ model summaries
+#' fail, the returned tibble will only contain the `absolute_model_path`, `run`, and `error_msg` columns.
 #'
 #' `summary_log()` creates a new tibble with one row per model
 #' found in `.base_dir` (and subdirectories, if `.recurse = TRUE`).
@@ -91,12 +92,15 @@ summary_log_impl <- function(.mods, ...) {
   res_list <- model_summaries(.mods, ...)
 
   # create tibble from list of lists
-  res_df <- res_list %>% transpose() %>% as_tibble() %>%
+  res_df <- res_list %>%
+    transpose() %>%
+    as_tibble() %>%
     mutate(
       !!ABS_MOD_PATH := unlist(.data[[ABS_MOD_PATH]]),
       !!SL_ERROR := unlist(.data[[SL_ERROR]]),
       !!SL_FAIL_FLAGS := unlist(.data[[SL_FAIL_FLAGS]])
-    )
+    ) %>%
+    add_run_id_col()
 
   # if ALL models failed, the next section will error trying to unnest them,
   # and everything else will be NULL/NA anyway, so we just return the errors here.
@@ -117,8 +121,6 @@ summary_log_impl <- function(.mods, ...) {
     ))
 
   res_df <- res_df %>% unnest_wider(.data$d) %>% unnest_wider(.data$h)
-
-  res_df <- add_run_id_col(res_df)
 
   res_df <- create_summary_log_object(res_df)
 
