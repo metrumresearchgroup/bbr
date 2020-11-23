@@ -85,6 +85,8 @@ replace_model_field <- function(.mod, .field, .old_val, .new_val) {
 
   .mod[[.field]][idx] <- .new_val
 
+  .mod <- save_model_yaml(.mod)
+
   return(.mod)
 }
 

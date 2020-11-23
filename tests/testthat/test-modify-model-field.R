@@ -61,7 +61,7 @@ test_that("add_tags() and replace_all_tags() work correctly", {
   expect_identical(new_mod[[YAML_TAGS]], NEW_TAGS)
 })
 
-test_that("replace_tag() works correctly", {
+test_that("replace_model_field() works correctly", {
   temp_mod_path <- create_temp_model()
 
   # make a spec from it
@@ -69,8 +69,12 @@ test_that("replace_tag() works correctly", {
   expect_identical(new_mod[[YAML_TAGS]], ORIG_TAGS)
 
   # test_replacing
-  new_mod <- replace_tag(new_mod, ORIG_TAGS[1], NEW_TAGS[1])
+  new_mod <- replace_model_field(new_mod, YAML_TAGS, ORIG_TAGS[1], NEW_TAGS[1])
   expect_identical(new_mod[[YAML_TAGS]], c(NEW_TAGS[1], ORIG_TAGS[2:length(ORIG_TAGS)]))
+
+  # check that YAML is modified
+  mod_yaml <- new_mod %>% get_yaml_path() %>% yaml::read_yaml()
+  expect_identical(new_mod[[YAML_TAGS]], mod_yaml[[YAML_TAGS]])
 })
 
 
