@@ -56,8 +56,41 @@ run_test_model <- function(
       }
     }
 
+    if (isTRUE(.read_output_refs)) {
+      message("  writing out test-read-output.R refs")
+      build_read_output_refs(.mod)
+    }
+
     message("  Done.")
   })
+}
+
+
+build_read_output_refs <- function(.mod) {
+  .root <- file.path(get_output_dir(.mod), get_model_id(.mod))
+  out_dir <- system.file("test-refs/read-output-refs", package = "rbabylon")
+
+  # write out .lst file test cases
+  lst_file <- paste0(.root, ".lst")
+  lst_out_stem <- file.path(out_dir, paste0(get_model_id(.mod), "_lst_ref_"))
+
+  lst_lines <- readLines(lst_file)
+  lst_len <- length(lst_lines)
+
+  lst_default <- c(lst_lines[1:3], "...", lst_lines[(lst_len-4):lst_len])
+  writeLines(lst_default, paste0(lst_out_stem, "default.txt"))
+
+  lst_0_5 <- c("...", lst_lines[(lst_len-4):lst_len])
+  writeLines(lst_default, paste0(lst_out_stem, "0_5.txt"))
+
+  lst_5_0 <- c(lst_lines[1:5], "...")
+  writeLines(lst_default, paste0(lst_out_stem, "5_0.txt"))
+
+  lst_1_5 <- c(lst_lines[1], "...", lst_lines[(lst_len-4):lst_len])
+  writeLines(lst_default, paste0(lst_out_stem, "1_5.txt"))
+
+  lst_5_1 <- c(lst_lines[1:3], "...", lst_lines[lst_len])
+  writeLines(lst_default, paste0(lst_out_stem, "5_1.txt"))
 }
 
 ###################

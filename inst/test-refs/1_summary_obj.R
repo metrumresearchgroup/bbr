@@ -1,6 +1,6 @@
 structure(list(run_details = list(version = "7.4.4", run_start = "-999999999", 
-    run_end = "Wed Nov 25 15:57:55 EST 2020", estimation_time = 3.3, 
-    cpu_time = 4.339, function_evaluations = 366L, significant_digits = 3.2, 
+    run_end = "Wed Nov 25 16:51:15 EST 2020", estimation_time = 3.38, 
+    cpu_time = 4.366, function_evaluations = 366L, significant_digits = 3.2, 
     problem_text = "LEM PK model 1 cmt base", mod_file = "-999999999", 
     estimation_method = "First Order Conditional Estimation with Interaction", 
     data_set = "../../../../extdata/acop.csv", number_of_patients = 40L, 
