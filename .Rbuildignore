@@ -11,3 +11,4 @@
 ^pkgdown$
 ^codecov\.yml$
 ^pkgr\.yml$
+^data-raw$
