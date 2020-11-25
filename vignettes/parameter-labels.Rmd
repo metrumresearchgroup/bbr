@@ -48,7 +48,7 @@ if (Sys.which("bbi") == "") {
 We have a control stream and output directory, because the model has already been run.
 
 ```{r first model}
-MODEL_DIR <- system.file("param_examples", package = "rbabylon")
+MODEL_DIR <- system.file("test-refs/param-examples", package = "rbabylon")
 
 mod1 <- read_model(file.path(MODEL_DIR, "510"))
 class(mod1)

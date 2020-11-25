@@ -12,7 +12,7 @@ teardown({
 })
 
 # build reference
-ref_df1 <- readRDS(PARAM_REF_FILE)
+ref_df1 <- dget(PARAM_REF_FILE)
 
 withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
 

@@ -19,7 +19,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
     expect_identical(class(sum1), SUM_CLASS_LIST)
 
     # compare to reference
-    ref_sum <- readRDS(SUMMARY_REF_FILE)
+    ref_sum <- dget(SUMMARY_REF_FILE)
     expect_equal(ref_sum, sum1)
   })
 
@@ -50,7 +50,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
     sum2 <- model_summary(mod2, .bbi_args = list(ext_file = "EXT"))
 
     # some things will be a little different, most will be the same
-    ref_sum <- readRDS(SUMMARY_REF_FILE)
+    ref_sum <- dget(SUMMARY_REF_FILE)
 
     for (.d in names(ref_sum$run_details)) {
       if (.d == "output_files_used") {
@@ -100,7 +100,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
       sum2 <- model_summary(mod2, .bbi_args = args_list)
 
       # some things will be a little different, most will be the same
-      ref_sum <- readRDS(SUMMARY_REF_FILE)
+      ref_sum <- dget(SUMMARY_REF_FILE)
 
       expect_equal(length(ref_sum), length(sum2) + length(.tc$missing))
 

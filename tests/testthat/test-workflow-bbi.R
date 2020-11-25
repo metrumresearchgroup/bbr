@@ -69,7 +69,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
     expect_identical(names(sum1), SUM_NAMES_REF)
 
     # extract parameters table
-    ref_df <- readRDS(PARAM_REF_FILE)
+    ref_df <- dget(PARAM_REF_FILE)
 
     par_df1a <- param_estimates(sum1)
     suppressSpecificWarning({
@@ -93,7 +93,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
     expect_identical(names(sum2), SUM_NAMES_REF)
 
     # extract parameters table
-    ref_df <- readRDS(PARAM_REF_FILE)
+    ref_df <- dget(PARAM_REF_FILE)
     par_df2 <- param_estimates(sum2)
     suppressSpecificWarning({
       expect_equal(par_df2, ref_df) # from process object

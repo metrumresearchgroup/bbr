@@ -215,6 +215,8 @@ combine_directory_path <- function(.directory, .path) {
 #' exist, throw an error, because there is no way to know which should be used.
 #' If neither exists and `.check_exists = TRUE`, throw an error.
 #'
+#' @importFrom fs path_norm
+#'
 #' @param .path File path to a NONMEM model file (control stream) with either
 #'   `.ctl` or `.mod` extension.
 #' @inheritParams get_model_path
@@ -253,5 +255,8 @@ find_nonmem_model_file_path <- function(.path, .check_exists = TRUE) {
   } else {
     res <- maybe_paths[which(exists_idx)]
   }
-  res
+
+  res %>%
+    fs::path_norm() %>%
+    as.character()
 }

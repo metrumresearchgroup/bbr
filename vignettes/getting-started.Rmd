@@ -31,7 +31,7 @@ library(purrr)
 
 ```{r set paths and define cleanup, include = FALSE}
 options('rbabylon.bbi_exe_path' = read_bbi_path())
-MODEL_DIR <- system.file("nonmem", package = "rbabylon")
+MODEL_DIR <- system.file("model/nonmem/basic", package = "rbabylon")
 
 # delete old files
 cleanup <- function() {
@@ -83,7 +83,7 @@ To actually submit models with `bbi`, you will also need a `babylon.yaml` config
 The `bbi_init()` function will create a `babylon.yaml`, with the default settings, in the specified directory. Optionally, you can pass the path to a `babylon.yaml` to the `.config_path` argument of any `rbabylon` function that needs one. However, by default these functions will look for one in the same folder as the model being submitted or manipulated. Therefore, if you will have a number of models in the same folder, it is easiest to put a `babylon.yaml` that folder.
 
 ```{r setup, eval = FALSE}
-MODEL_DIR <- "../nonmem"    # this should be relative to your working directory
+MODEL_DIR <- "../model/nonmem/basic"  # this should be relative to your working directory
 
 bbi_init(.dir = MODEL_DIR,            # the directory to create the babylon.yaml in
          .nonmem_dir = "/opt/NONMEM", # location of NONMEM installation
