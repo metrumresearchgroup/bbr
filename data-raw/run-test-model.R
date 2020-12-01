@@ -1,4 +1,5 @@
-library(rbabylon)
+library(dplyr)
+devtools::load_all() # can't call library(rbabylon) from within rbabylon when using pkgr
 
 ###################
 # FUNCTION DEF
@@ -12,13 +13,11 @@ library(rbabylon)
 #' @param .summary If `TRUE`, the default, will also save the summary object (with `dput()`) to `inst/test-refs/{.model_name}_summary_obj.R`.
 #' @param .param_table If `TRUE`, the default, will also save the summary object (with `dput()`) to `inst/test-refs/{.model_name}_param_table.R`.
 #'   Only checked if `.summary` is also `TRUE`.
-#' @param .read_output_refs If `TRUE`, will also save the ref strings for `test-read-output.R` to `inst/test-refs/{.model_name}_output_*.txt`.
 run_test_model <- function(
   .model_dir,
   .model_name,
   .summary = TRUE,
-  .param_table = TRUE,
-  .read_output_refs = TRUE
+  .param_table = TRUE
 ) {
 
   .model_dir <- file.path(rprojroot::find_rstudio_root_file(), .model_dir)
@@ -56,48 +55,16 @@ run_test_model <- function(
       }
     }
 
-    if (isTRUE(.read_output_refs)) {
-      message("  writing out test-read-output.R refs")
-      build_read_output_refs(.mod)
-    }
-
     message("  Done.")
   })
 }
 
 
-build_read_output_refs <- function(.mod) {
-  .root <- file.path(get_output_dir(.mod), get_model_id(.mod))
-  out_dir <- system.file("test-refs/read-output-refs", package = "rbabylon")
-
-  # write out .lst file test cases
-  lst_file <- paste0(.root, ".lst")
-  lst_out_stem <- file.path(out_dir, paste0(get_model_id(.mod), "_lst_ref_"))
-
-  lst_lines <- readLines(lst_file)
-  lst_len <- length(lst_lines)
-
-  lst_default <- c(lst_lines[1:3], "...", lst_lines[(lst_len-4):lst_len])
-  writeLines(lst_default, paste0(lst_out_stem, "default.txt"))
-
-  lst_0_5 <- c("...", lst_lines[(lst_len-4):lst_len])
-  writeLines(lst_default, paste0(lst_out_stem, "0_5.txt"))
-
-  lst_5_0 <- c(lst_lines[1:5], "...")
-  writeLines(lst_default, paste0(lst_out_stem, "5_0.txt"))
-
-  lst_1_5 <- c(lst_lines[1], "...", lst_lines[(lst_len-4):lst_len])
-  writeLines(lst_default, paste0(lst_out_stem, "1_5.txt"))
-
-  lst_5_1 <- c(lst_lines[1:3], "...", lst_lines[lst_len])
-  writeLines(lst_default, paste0(lst_out_stem, "5_1.txt"))
-}
-
 ###################
-# SAMPLE CALLS
+# CALLS
 ###################
 
-# To re-run models, uncomment whichever model calls you want below
-#   and then source this script.
+# To re-run models, source this script.
+.proj_root <- rprojroot::find_rstudio_root_file()
 
-run_test_model("inst/model/nonmem/basic", 1)
+run_test_model(file.path(.proj_root, "inst/model/nonmem/basic"), 1)

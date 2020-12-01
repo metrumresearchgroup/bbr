@@ -1,9 +1,6 @@
-Wed Nov 25 16:51:02 EST 2020
+Mon Nov 30 10:26:16 EST 2020
 $PROBLEM PK model 1 cmt base
 
+$INPUT ID TIME MDV EVID DV AMT  SEX WT ETN
+$DATA ../../../../extdata/acop.csv IGNORE=@
 ...
- 
- Elapsed finaloutput time in seconds:     0.00
- #CPUT: Total CPU Time in Seconds,        4.366
-Stop Time:
-Wed Nov 25 16:51:15 EST 2020
