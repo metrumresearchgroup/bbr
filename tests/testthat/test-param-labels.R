@@ -99,10 +99,7 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
         # get param df with rbabylon::model_summary()
         if (fs::file_exists(file.path(PL_MODEL_DIR, glue("{.mod_id}.yaml")))) fs::file_delete(file.path(PL_MODEL_DIR, glue("{.mod_id}.yaml")))
 
-        .mod <- new_model(
-          file.path(PL_MODEL_DIR, .mod_id),
-          glue("the {.mod_id} model")
-        )
+        .mod <- new_model(file.path(PL_MODEL_DIR, .mod_id))
 
         on.exit({ if (fs::file_exists(file.path(PL_MODEL_DIR, glue("{.mod_id}.yaml")))) fs::file_delete(file.path(PL_MODEL_DIR, glue("{.mod_id}.yaml"))) })
 
