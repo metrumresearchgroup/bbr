@@ -232,12 +232,20 @@ rep_missing <- function(x, i, len) {
 create_temp_model <- function(path = YAML_TEST_FILE,
                               mod_content = "foo",
                               mod_ext = "ctl",
-                              envir = parent.frame()) {
+                              envir = parent.frame(),
+                              delete_yaml = TRUE,
+                              delete_mod = TRUE
+                              ) {
   temp_yaml <- tempfile(fileext = ".yaml")
   fs::file_copy(path, temp_yaml)
   temp_ctl <- fs::path_ext_set(temp_yaml, mod_ext)
   readr::write_file(mod_content, temp_ctl)
-  withr::defer(fs::file_delete(c(temp_yaml, temp_ctl)), envir)
+
+  to_delete <- character()
+  if (isTRUE(delete_yaml)) to_delete <- c(to_delete, temp_yaml)
+  if (isTRUE(delete_mod)) to_delete <- c(to_delete, temp_ctl)
+
+  withr::defer(fs::file_delete(to_delete), envir)
   # normalizePath() needs to be called when the file actually exists
   fs::path_ext_remove(normalizePath(temp_yaml))
 }
