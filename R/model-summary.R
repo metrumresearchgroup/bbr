@@ -48,6 +48,7 @@
 #' Additionally, if you have renamed the `.ext` file from its default of `<root>.ext` you will need to pass
 #' `ext_file = "NEWNAME"` to `.bbi_args`.
 #'
+#' @seealso [model_summaries()]
 #' @param .mod Model to summarize.
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`.
 #' See [print_bbi_args()] for full list of options.

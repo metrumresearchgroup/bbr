@@ -71,3 +71,6 @@ Additionally, if you have renamed the \code{.ext} file from its default of \verb
 \item \code{bbi_nonmem_model}: Get model summary from \code{bbi_nonmem_model} object
 }}
 
+\seealso{
+\code{\link[=model_summaries]{model_summaries()}}
+}

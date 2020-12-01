@@ -18,6 +18,8 @@ add_config(.log_df)
 }
 \value{
 An object of class \code{bbi_config_log_df}, which includes the fields described below.
+If \emph{no} \code{bbi_config.json} files are found, the returned tibble will only contain the
+\code{absolute_model_path} and \code{run} columns, and will have 0 rows.
 
 \code{config_log()} creates a new tibble with one row per \code{bbi_config.json}
 found in \code{.base_dir} (and subdirectories, if \code{.recurse = TRUE}).
