@@ -48,7 +48,7 @@ test_that("get_model_path() errors with both .ctl and .mod paths", {
 })
 
 test_that("get_model_path() works no paths found", {
-  temp_mod_path <- create_temp_model()
+  temp_mod_path <- create_temp_model(delete_mod = FALSE)
   mod <- read_model(temp_mod_path)
   # save path to model file and then delete the file
   former_ctl_path <- get_model_path(mod)
