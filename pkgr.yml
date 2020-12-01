@@ -4,29 +4,10 @@ Descriptions:
 
 Packages:
   - devtools
+  - renv
 
 Repos:
-  - MPN: https://mpn.metworx.com/snapshots/stable/2020-03-24
-  # fix a compilation issue for fs on macOS
-  - MPN_Rcpp: https://mpn.metworx.com/snapshots/stable/2020-04-18
-  # need withr >= 2.2.0 to run a particular test
-  - MPN_withr: https://mpn.metworx.com/snapshots/stable/2020-05-09
-
-Customizations:
-  # install from source for all repos because the 2020-03-24 snapshot does not
-  # have binaries for R 4.0, and pkgr does not fall back to source
-  Repos:
-    - MPN:
-        Type: source
-    - MPN_Rcpp:
-        Type: source
-  Packages:
-    - Rcpp:
-        Repo: MPN_Rcpp
-        Type: source
-    - withr:
-        Repo: MPN_withr
-        Type: source
+  - MPN: https://cran.rstudio.com
 
 Lockfile:
   Type: renv
