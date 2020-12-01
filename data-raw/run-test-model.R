@@ -65,6 +65,4 @@ run_test_model <- function(
 ###################
 
 # To re-run models, source this script.
-.proj_root <- rprojroot::find_rstudio_root_file()
-
-run_test_model(file.path(.proj_root, "inst/model/nonmem/basic"), 1)
+run_test_model("inst/model/nonmem/basic", 1)

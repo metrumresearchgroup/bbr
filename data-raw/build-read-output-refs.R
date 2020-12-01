@@ -12,6 +12,7 @@ devtools::load_all() # can't call library(rbabylon) from within rbabylon when us
 build_read_output_refs <- function(.mod) {
   .root <- file.path(get_output_dir(.mod), get_model_id(.mod))
   out_dir <- system.file("test-refs/read-output-refs", package = "rbabylon")
+  message(glue::glue("Writing test-read-output.R refs for {.root} into {out_dir}"))
 
   # write out .lst file test cases
   lst_file <- paste0(.root, ".lst")
