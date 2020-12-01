@@ -8,7 +8,7 @@ context("submit_model(.dry_run=T)")
 readr::write_file("created_by: test-submit-model", "babylon.yaml")
 on.exit({ fs::file_delete("babylon.yaml")})
 
-model_dir <- file.path(getwd(), MODEL_DIR)
+model_dir <- ABS_MODEL_DIR
 mod_ctl_path <- file.path(model_dir, CTL_FILENAME)
 
 test_that("submit_model(.dry_run=T) returns correct command string",

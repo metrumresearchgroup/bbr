@@ -10,7 +10,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
   readr::write_file("created_by: test-submit-models", file.path(MODEL_DIR, "babylon.yaml"))
   on.exit({ fs::file_delete(file.path(MODEL_DIR, "babylon.yaml")) })
 
-  model_dir <- file.path(getwd(), MODEL_DIR)
+  model_dir <- ABS_MODEL_DIR
   mod_ctl_path <- purrr::map_chr(
     as.character(1:3),
     ~ file.path(model_dir, fs::path_ext_set(., "ctl"))
