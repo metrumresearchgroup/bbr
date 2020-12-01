@@ -4,7 +4,7 @@ suppressPackageStartupMessages(library(glue))
 suppressPackageStartupMessages(library(dplyr))
 
 # constants
-PL_MODEL_DIR <- file.path(REF_DIR, "tidynm_extdata")
+PL_MODEL_DIR <- file.path(REF_DIR, "param-labels", "tidynm_extdata")
 MODEL_PICKS <- list(
   list(mod_id = "101", omega = block(3), sigma = NULL),
   list(mod_id = "510", omega = block(2), sigma = NULL),
@@ -55,7 +55,7 @@ for (MODEL_PICK in MODEL_PICKS) {
 
   test_that(glue("param_labels.character() %>% apply_indices() matches tidynm reference for {.mod_id}"), {
     # get reference df from tidynm test data
-    ref_df <- readRDS(glue("{REF_DIR}/{.mod_id}_PARAMTBL.rds"))[[1]]
+    ref_df <- readRDS(file.path(REF_DIR, "param-labels", glue("{.mod_id}_PARAMTBL.rds")))[[1]]
     names(ref_df) <- names(ref_df) %>% tolower()
 
     #
@@ -93,7 +93,7 @@ if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
 
       test_that(glue("param_labels.bbi_nonmem_model() %>% apply_indices() matches tidynm reference for {.mod_id}"), {
         # get reference df from tidynm test data
-        ref_df <- readRDS(glue("{REF_DIR}/{.mod_id}_PARAMTBL.rds"))[[1]]
+        ref_df <- readRDS(file.path(REF_DIR, "param-labels", glue("{.mod_id}_PARAMTBL.rds")))[[1]]
         names(ref_df) <- names(ref_df) %>% tolower()
 
         # get param df with rbabylon::model_summary()
