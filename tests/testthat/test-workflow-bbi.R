@@ -14,7 +14,6 @@ if (Sys.getenv("METWORX_VERSION") == "" || Sys.getenv("SKIP_BBI_TEST") == "true"
 
 # define constants
 MODEL_DIR_BBI <- file.path(dirname(ABS_MODEL_DIR), "test-workflow-bbi-models")
-BBI_PATH <- read_bbi_path()
 
 # cleanup function
 cleanup_bbi <- function(.recreate_dir = FALSE) {
@@ -24,7 +23,7 @@ cleanup_bbi <- function(.recreate_dir = FALSE) {
 cleanup_bbi(.recreate_dir = TRUE)
 
 # set options and run tests
-withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
+withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
 
   # cleanup when done
   on.exit({

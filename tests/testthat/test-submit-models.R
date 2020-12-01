@@ -4,7 +4,7 @@ context("submit_models(.dry_run=T)")
 # testing multiple model submission
 #####################################
 
-withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
+withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
 
   # create fake babylon.yaml
   readr::write_file("created_by: test-submit-models", file.path(MODEL_DIR, "babylon.yaml"))
@@ -35,7 +35,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
               # check call
               expect_identical(
                 proc_list[[1]][[PROC_CALL]],
-                as.character(glue("cd {model_dir} ; bbi nonmem run sge {paste(mod_ctl_path, collapse = ' ')} --overwrite --threads=4"))
+                as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {paste(mod_ctl_path, collapse = ' ')} --overwrite --threads=4"))
               )
             })
 
@@ -60,14 +60,14 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
                 proc_list[[1]][[PROC_CALL]],
                 as.character(
                   glue(
-                    "cd {model_dir} ; bbi nonmem run sge {mod_ctl_path[1]} {mod_ctl_path[2]} --overwrite --threads=1"
+                    "cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path[1]} {mod_ctl_path[2]} --overwrite --threads=1"
                   )
                 )
               )
               expect_identical(
                 proc_list[[2]][[PROC_CALL]],
                 as.character(
-                  glue("cd {model_dir} ; bbi nonmem run sge {mod_ctl_path[3]} --clean_lvl=2 --overwrite --threads=1"))
+                  glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path[3]} --clean_lvl=2 --overwrite --threads=1"))
               )
             })
 
@@ -132,7 +132,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
       as.character(
         glue::glue(
           "cd {model_dir} ;",
-          "bbi nonmem run sge {mod_ctl_path[[1L]]} --overwrite --threads=4",
+          "{read_bbi_path()} nonmem run sge {mod_ctl_path[[1L]]} --overwrite --threads=4",
           "--config={temp_config}",
           .sep = " "
         )
@@ -151,7 +151,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
     expect_identical(
       res[[1L]][[PROC_CALL]],
       as.character(
-        glue::glue("cd {model_dir} ; bbi nonmem run sge {mod_ctl_path[[1L]]}")
+        glue::glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path[[1L]]}")
       )
     )
 
@@ -167,7 +167,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = "bbi"), {
       as.character(
         glue::glue(
           "cd {dirname(temp_mod_path)} ;",
-          "bbi nonmem run sge {fs::path_ext_set(temp_mod_path, 'ctl')}",
+          "{read_bbi_path()} nonmem run sge {fs::path_ext_set(temp_mod_path, 'ctl')}",
           .sep = " "
         )
       )
