@@ -33,4 +33,4 @@ structure(list(ITERATION = c(0, 5, 10, 15, 20, 25, 28, -1e+09,
     "collector")), `OMEGA(2,2)` = structure(list(), class = c("collector_double", 
     "collector")), OBJ = structure(list(), class = c("collector_double", 
     "collector"))), default = structure(list(), class = c("collector_guess", 
-    "collector")), skip = 2), class = "col_spec"))
+    "collector")), skip = 2L), class = "col_spec"))

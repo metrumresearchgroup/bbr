@@ -16,4 +16,4 @@ structure(list(ITERATION = c(5, 10, 15, 20, 25, 28), `GRD(1)` = c(117.078,
     "collector")), `GRD(6)` = structure(list(), class = c("collector_double", 
     "collector")), `GRD(7)` = structure(list(), class = c("collector_double", 
     "collector"))), default = structure(list(), class = c("collector_guess", 
-    "collector")), skip = 2), class = "col_spec"))
+    "collector")), skip = 2L), class = "col_spec"))

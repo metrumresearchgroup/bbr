@@ -1,4 +1,4 @@
-Mon Nov 30 10:26:16 EST 2020
+Wed Dec  2 11:10:29 EST 2020
 $PROBLEM PK model 1 cmt base
 
 $INPUT ID TIME MDV EVID DV AMT  SEX WT ETN
@@ -47,8 +47,8 @@ NM-TRAN MESSAGES
 
 License Registered to: Metrum
 Expiration Date:    14 JUL 2021
-Current Date:       30 NOV 2020
-Days until program expires : 229
+Current Date:        2 DEC 2020
+Days until program expires : 227
 1NONLINEAR MIXED EFFECTS MODEL PROGRAM (NONMEM) VERSION 7.4.4
  ORIGINALLY DEVELOPED BY STUART BEAL, LEWIS SHEINER, AND ALISON BOECKMANN
  CURRENT DEVELOPERS ARE ROBERT BAUER, ICON DEVELOPMENT SOLUTIONS,
@@ -279,8 +279,8 @@ Days until program expires : 229
  TOTAL EFFECTIVE ETAS (NIND*NETA):                            80
   
  #TERE:
- Elapsed estimation  time in seconds:     2.59
- Elapsed covariance  time in seconds:     0.92
+ Elapsed estimation  time in seconds:     1.96
+ Elapsed covariance  time in seconds:     0.58
  Elapsed postprocess time in seconds:     0.00
 1
  
@@ -559,6 +559,6 @@ Days until program expires : 229
 +       ......... ......... ......... ......... ......... ......... ......... ......... .........
  
  Elapsed finaloutput time in seconds:     0.00
- #CPUT: Total CPU Time in Seconds,        3.474
+ #CPUT: Total CPU Time in Seconds,        2.555
 Stop Time:
-Mon Nov 30 10:26:25 EST 2020
+Wed Dec  2 11:10:39 EST 2020
