@@ -10,14 +10,9 @@ devtools::load_all() # can't call library(rbabylon) from within rbabylon when us
 #' Note: will overwrite any output directory for this model.
 #' @param .model_dir Path to directory model will be run in, relative to project/package root
 #' @param .model_name Name of model file, without extension
-#' @param .summary If `TRUE`, the default, will also save the summary object (with `dput()`) to `inst/test-refs/{.model_name}_summary_obj.R`.
-#' @param .param_table If `TRUE`, the default, will also save the summary object (with `dput()`) to `inst/test-refs/{.model_name}_param_table.R`.
-#'   Only checked if `.summary` is also `TRUE`.
 run_test_model <- function(
   .model_dir,
-  .model_name,
-  .summary = TRUE,
-  .param_table = TRUE
+  .model_name
 ) {
 
   .model_dir <- file.path(rprojroot::find_rstudio_root_file(), .model_dir)
@@ -31,31 +26,10 @@ run_test_model <- function(
 
     mod_path <- file.path(.model_dir, .model_name)
 
-    message(paste("Running", mod_path))
-    .mod <- read_model(file.path(.model_dir, .model_name))
-    .proc <- .mod %>% submit_model(.mode = "local", .bbi_args = list(overwrite = TRUE))
-
-    if (isTRUE(.summary)) {
-      message("  writing out summary object...")
-      .sum <- model_summary(.mod)
-      sum_out_path <- file.path(
-        .ref_out_dir,
-        as.character(glue::glue("{.model_name}_summary_obj.R"))
-      )
-      dput(.sum, file = sum_out_path)
-
-      if (isTRUE(.param_table)) {
-        message("  writing out parameter table...")
-        param_df <- param_estimates(.sum)
-        param_out_path <- file.path(
-          .ref_out_dir,
-          as.character(glue::glue("{.model_name}_param_table.R"))
-        )
-        dput(param_df, file = param_out_path)
-      }
-    }
-
-    message("  Done.")
+    message(paste("Running", mod_path, "..."))
+    .proc <- read_model(mod_path) %>%
+      submit_model(.mode = "local", .bbi_args = list(overwrite = TRUE))
+    message("  finished model run.")
   })
 }
 
