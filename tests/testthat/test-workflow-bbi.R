@@ -182,9 +182,11 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
       purrr::walk(files_to_copy, fs::file_copy, ".")
 
       # modify DATA to reflect location in temp dir
-      readr::read_file("1.ctl") %>%
-        stringr::str_replace("\\$DATA\\s+[^\\s]+", "$DATA ../acop.csv") %>%
-        readr::write_file("1.ctl")
+      ctl <- readr::read_file("1.ctl")
+      ctl_mod <- stringr::str_replace(
+        ctl, "\\$DATA\\s+[^\\s]+", "$DATA ../acop.csv"
+      )
+      readr::write_file(ctl_mod, "1.ctl")
 
       mod <- read_model("1")
       res <- submit_model(
