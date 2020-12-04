@@ -11,6 +11,8 @@ NULL
 #' @describeIn print_bbi Prints the call made to bbi and whether the process is still running or has finished.
 #' @param .call_limit Integer scalar for the max number of characters to print before truncating the call string.
 #' @importFrom stringr str_split str_detect
+#' @importFrom fs path_norm
+#' @importFrom cli cat_line
 print.babylon_process <- function(x, ..., .call_limit = 250) {
   call_str <- glue("{x[[PROC_BBI]]} {paste(x[[PROC_CMD_ARGS]], collapse = ' ')}")
 
@@ -26,14 +28,25 @@ print.babylon_process <- function(x, ..., .call_limit = 250) {
     }
   }
 
+  # print call string
+  cli::cat_line("Running:", col = "green")
+  cat(paste0("  ", call_str, "\n"))
+
+  # format and print run directory string
+  run_dir <- fs::path_norm(x[[PROC_WD]])
+  if (run_dir == ".") {
+    run_dir <- getwd()
+  }
+  cli::cat_line(paste("In", run_dir), col = "green")
+
+  # format and print status string
   if (length(x[[PROC_STDOUT]]) > 1) {
-    wait_str <- "Process finished."
+    cli::cat_line("Process finished.", col = "green")
   } else if (x[[PROC_STDOUT]] == "DRY_RUN") {
-    wait_str <- "DRY RUN! Process not actually run."
+    cli::cat_line("DRY RUN! Process not actually run.", col = "red")
   } else if (str_detect(x[[PROC_STDOUT]], ".wait = FALSE")) {
-    wait_str <- "Not waiting for process to finish."
+    cli::cat_line("Not waiting for process to finish.", col = "blue")
   }
 
-  cat(glue("Running:\n  {call_str}\nIn {x[[PROC_WD]]}\n{wait_str}"))
 }
 
