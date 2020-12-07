@@ -9,20 +9,21 @@ devtools::load_all() # can't call library(rbabylon) from within rbabylon when us
 #'
 #' Saves to `inst/test-refs/`.
 #' @param .mod bbi_nonmem_model object
-build_model_summary_refs <- function(.mod) {
+#' @param .bbi_path absolute path to bbi installation
+build_model_summary_refs <- function(.mod, .bbi_path = read_bbi_path()) {
 
-  .model_name <- get_model_id(.mod)
-  .ref_out_dir <- system.file('test-refs', package = 'rbabylon')
+  model_name <- get_model_id(.mod)
+  ref_out_dir <- system.file('test-refs', package = 'rbabylon')
   sum_out_path <- file.path(
-    .ref_out_dir,
-    as.character(glue::glue("{.model_name}_summary_obj.R"))
+    ref_out_dir,
+    as.character(glue::glue("{model_name}_summary_obj.R"))
   )
   param_out_path <- file.path(
-    .ref_out_dir,
-    as.character(glue::glue("{.model_name}_param_table.R"))
+    ref_out_dir,
+    as.character(glue::glue("{model_name}_param_table.R"))
   )
 
-  withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
+  withr::with_options(list(rbabylon.bbi_exe_path = .bbi_path), {
     message(paste("  writing", sum_out_path))
     .sum <- model_summary(.mod)
     dput(.sum, file = sum_out_path)
