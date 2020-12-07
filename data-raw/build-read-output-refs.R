@@ -11,7 +11,7 @@ devtools::load_all() # can't call library(rbabylon) from within rbabylon when us
 #' @param .mod bbi_nonmem_model object
 build_read_output_refs <- function(.mod) {
   .root <- file.path(get_output_dir(.mod), get_model_id(.mod))
-  out_dir <- system.file("test-refs/read-output-refs", package = "rbabylon")
+  out_dir <- system.file(file.path("test-refs", "read-output-refs"), package = "rbabylon")
   message(glue::glue("Writing test-read-output.R refs for {.root} into {out_dir}"))
 
   # write out .lst file test cases
@@ -73,6 +73,6 @@ build_read_output_refs <- function(.mod) {
 # To render refs, source this script.
 .proj_root <- rprojroot::find_rstudio_root_file()
 
-file.path(.proj_root, "inst/model/nonmem/basic", 1) %>%
+file.path(.proj_root, "inst", "model", "nonmem", "basic", 1) %>%
   read_model() %>%
   build_read_output_refs()

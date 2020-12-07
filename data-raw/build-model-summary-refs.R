@@ -40,6 +40,6 @@ build_model_summary_refs <- function(.mod) {
 # To render refs, source this script.
 .proj_root <- rprojroot::find_rstudio_root_file()
 
-file.path(.proj_root, "inst/model/nonmem/basic", 1) %>%
+file.path(.proj_root, "inst", "model", "nonmem", "basic", 1) %>%
   read_model() %>%
   build_model_summary_refs()

@@ -104,7 +104,7 @@ test_that("config_log() reflects model mismatch", {
 })
 
 test_that("config_log() reflects data mismatch", {
-  perturb_file(system.file("extdata/acop.csv", package = "rbabylon"))
+  perturb_file(system.file(file.path("extdata", "acop.csv"), package = "rbabylon"))
   log_df <- config_log(MODEL_DIR)
   expect_equal(log_df[["data_has_changed"]][1], TRUE)
 })
