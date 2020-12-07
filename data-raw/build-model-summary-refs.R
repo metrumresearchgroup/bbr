@@ -27,10 +27,12 @@ build_model_summary_refs <- function(.mod, .bbi_path = read_bbi_path()) {
     message(paste("  writing", sum_out_path))
     .sum <- model_summary(.mod)
     dput(.sum, file = sum_out_path)
+    styler::style_file(sum_out_path)
 
     message(paste("  writing", param_out_path))
     param_df <- param_estimates(.sum)
     dput(param_df, file = param_out_path)
+    styler::style_file(param_out_path)
   })
 }
 

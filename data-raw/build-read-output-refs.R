@@ -41,28 +41,30 @@ build_read_output_refs <- function(.mod) {
   ext_out_stem <- file.path(out_dir, paste0(get_model_id(.mod), "_ext_ref_"))
   ext_df <- readr::read_table2(ext_file, skip=1, col_types = readr::cols())
 
-  ext_df %>%
-    dput(file = paste0(ext_out_stem, "floorNULL.R"))
+  out_path <- paste0(ext_out_stem, "floorNULL.R")
+  dput(ext_df, file = out_path)
+  styler::style_file(out_path)
 
-  ext_df %>%
-    filter(ITERATION > 0) %>%
-    dput(file = paste0(ext_out_stem, "floor0.R"))
+  out_path <- paste0(ext_out_stem, "floor0.R")
+  dput(filter(ext_df, ITERATION > 0), file = out_path)
+  styler::style_file(out_path)
 
   # write out .grd file tibbles
   grd_file <- fs::path_ext_set(root_dir, ".grd")
   grd_out_stem <- file.path(out_dir, paste0(get_model_id(.mod), "_grd_ref_"))
   grd_df <- readr::read_table2(grd_file, skip=1, col_types = readr::cols())
 
-  grd_df %>%
-    dput(file = paste0(grd_out_stem, "floorNULL.R"))
+  out_path <- paste0(grd_out_stem, "floorNULL.R")
+  dput(grd_df, file = out_path)
+  styler::style_file(out_path)
 
-  grd_df %>%
-    filter(ITERATION > 0) %>%
-    dput(file = paste0(grd_out_stem, "floor0.R"))
+  out_path <- paste0(grd_out_stem, "floor0.R")
+  dput(filter(grd_df, ITERATION > 0), file = out_path)
+  styler::style_file(out_path)
 
-  grd_df %>%
-    filter(ITERATION > 10) %>%
-    dput(file = paste0(grd_out_stem, "floor10.R"))
+  out_path <- paste0(grd_out_stem, "floor10.R")
+  dput(filter(grd_df, ITERATION > 10), file = out_path)
+  styler::style_file(out_path)
 
 }
 
