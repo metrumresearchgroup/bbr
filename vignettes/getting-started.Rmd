@@ -19,7 +19,14 @@ knitr::opts_chunk$set(
 
 This "Getting Started with rbabylon" vignette takes the user through some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its standard workflow and functionality. 
 
-```{r results = 'hide', message=FALSE, warning=FALSE}
+```{r setup, include=FALSE}
+# NOTE: if running chunks interactively we need to load the package first
+#   because renv isolation prevents us from finding an rbabylon installation
+if (interactive()) {
+  devtools::load_all()
+}
+```
+```{r load packages results = 'hide', message=FALSE, warning=FALSE}
 library(rbabylon)
 library(dplyr)
 library(purrr)
@@ -82,7 +89,7 @@ To actually submit models with `bbi`, you will also need a `babylon.yaml` config
 
 The `bbi_init()` function will create a `babylon.yaml`, with the default settings, in the specified directory. Optionally, you can pass the path to a `babylon.yaml` to the `.config_path` argument of any `rbabylon` function that needs one. However, by default these functions will look for one in the same folder as the model being submitted or manipulated. Therefore, if you will have a number of models in the same folder, it is easiest to put a `babylon.yaml` that folder.
 
-```{r setup, eval = FALSE}
+```{r configure bbi fake, eval = FALSE}
 MODEL_DIR <- "../model/nonmem/basic"  # this should be relative to your working directory
 
 bbi_init(.dir = MODEL_DIR,            # the directory to create the babylon.yaml in

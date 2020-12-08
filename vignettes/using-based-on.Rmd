@@ -25,7 +25,14 @@ If you are new to `rbabylon`, the ["Getting Started with rbabylon"](https://metr
 
 There is some initial set up necessary for using `rbabylon`. Please refer to the ["Getting Started"](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html#setup) vignette, mentioned above, if you have not done this yet. Once this is done, load the library.
 
-```{r results = 'hide', message=FALSE, warning=FALSE}
+```{r setup, include=FALSE}
+# NOTE: if running chunks interactively we need to load the package first
+#   because renv isolation prevents us from finding an rbabylon installation
+if (interactive()) {
+  devtools::load_all()
+}
+```
+```{r load packages results = 'hide', message=FALSE, warning=FALSE}
 library(rbabylon)
 library(dplyr)
 library(purrr)
