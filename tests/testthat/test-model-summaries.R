@@ -11,7 +11,7 @@ NUM_MODS <- 3
 test_mod_sums <- function(mod_sums) {
   expect_equal(length(mod_sums), NUM_MODS)
 
-  ref_sum <- readRDS(SUMMARY_REF_FILE)
+  ref_sum <- dget(SUMMARY_REF_FILE)
 
   for (.s in mod_sums) {
     expect_equal(names(.s), SUMS_LIST_NAMES_REF)

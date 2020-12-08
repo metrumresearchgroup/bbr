@@ -13,9 +13,7 @@ if (Sys.getenv("METWORX_VERSION") == "" || Sys.getenv("SKIP_BBI_TEST") == "true"
 }
 
 # define constants
-STARTER_FILE <- file.path("model-examples/1.ctl")
-MODEL_DIR_BBI <- "model-examples-bbi"
-BBI_PATH <- read_bbi_path()
+MODEL_DIR_BBI <- file.path(dirname(ABS_MODEL_DIR), "test-workflow-bbi-models")
 
 # cleanup function
 cleanup_bbi <- function(.recreate_dir = FALSE) {
@@ -25,7 +23,7 @@ cleanup_bbi <- function(.recreate_dir = FALSE) {
 cleanup_bbi(.recreate_dir = TRUE)
 
 # set options and run tests
-withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
+withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
 
   # cleanup when done
   on.exit({
@@ -40,7 +38,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
   bbi_init(MODEL_DIR_BBI, "/opt/NONMEM", "nm74gf")
 
   # copy model file into new model dir
-  fs::file_copy(STARTER_FILE, MODEL_DIR_BBI)
+  fs::file_copy(CTL_TEST_FILE, MODEL_DIR_BBI)
 
   #######################
   # create model from R
@@ -69,7 +67,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
     expect_identical(names(sum1), SUM_NAMES_REF)
 
     # extract parameters table
-    ref_df <- readRDS(PARAM_REF_FILE)
+    ref_df <- dget(PARAM_REF_FILE)
 
     par_df1a <- param_estimates(sum1)
     suppressSpecificWarning({
@@ -93,7 +91,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
     expect_identical(names(sum2), SUM_NAMES_REF)
 
     # extract parameters table
-    ref_df <- readRDS(PARAM_REF_FILE)
+    ref_df <- dget(PARAM_REF_FILE)
     par_df2 <- param_estimates(sum2)
     suppressSpecificWarning({
       expect_equal(par_df2, ref_df) # from process object
@@ -177,9 +175,8 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
     withr::with_tempdir({
       # copy model, YAML, and data files to the same location
       files_to_copy <- file.path(
-        test_dir,
-        MODEL_DIR,
-        c("1.ctl", "1.yaml", "../data/acop.csv")
+        ABS_MODEL_DIR,
+        c("1.ctl", "1.yaml", "../../../extdata/acop.csv")
       )
 
       purrr::walk(files_to_copy, fs::file_copy, ".")
@@ -195,7 +192,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
       res <- submit_model(
         mod,
         .mode = "local",
-        .config_path = file.path(test_dir, MODEL_DIR_BBI, "babylon.yaml"),
+        .config_path = file.path(MODEL_DIR_BBI, "babylon.yaml"),
         .wait = TRUE
       )
 

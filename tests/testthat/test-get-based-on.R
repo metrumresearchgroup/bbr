@@ -191,8 +191,8 @@ test_that("get_model_ancestry works on run_log tibble with more complicated ance
       MOD1_ABS_PATH, #2
       MOD1_ABS_PATH, #3
       c(MOD1_ABS_PATH, MOD3_ABS_PATH), #5
-      c(MOD1_ABS_PATH, MOD3_ABS_PATH, file.path(getwd(), MODEL_DIR, "5")), #6
-      c(MOD1_ABS_PATH, MOD3_ABS_PATH, file.path(getwd(), MODEL_DIR, "5"), file.path(getwd(), MODEL_DIR, "6")), #7
+      c(MOD1_ABS_PATH, MOD3_ABS_PATH, file.path(ABS_MODEL_DIR, "5")), #6
+      c(MOD1_ABS_PATH, MOD3_ABS_PATH, file.path(ABS_MODEL_DIR, "5"), file.path(ABS_MODEL_DIR, "6")), #7
       c(MOD1_ABS_PATH, MOD2_ABS_PATH), #level2/1
       c(MOD1_ABS_PATH, MOD2_ABS_PATH, MOD4_ABS_PATH), #level2/2
       c(MOD1_ABS_PATH, MOD3_ABS_PATH), #level2/3

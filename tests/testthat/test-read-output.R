@@ -5,28 +5,14 @@ context("Reading NONMEM output files into R")
 ################################################################################################
 
 # .lst file
-LST_FULL_VEC <- readr::read_lines(LST_TEST_FILE)
+LST_FULL_VEC <- readLines(LST_TEST_FILE)
+LST_STEM <- file.path(REF_DIR, "read-output-refs", "1_lst_ref_")
 
-LST_REF_DEFAULT <- c("Thu Sep 10 15:12:29 EDT 2020", "$PROBLEM PK model 1 cmt base",
-                     "", "...", " ", " Elapsed finaloutput time in seconds:     0.01",
-                     " #CPUT: Total CPU Time in Seconds,        2.696", "Stop Time:",
-                     "Thu Sep 10 15:12:50 EDT 2020")
-
-LST_REF_0_5 <- c("...", " ", " Elapsed finaloutput time in seconds:     0.01",
-                 " #CPUT: Total CPU Time in Seconds,        2.696", "Stop Time:",
-                 "Thu Sep 10 15:12:50 EDT 2020")
-
-LST_REF_5_0 <- c("Thu Sep 10 15:12:29 EDT 2020", "$PROBLEM PK model 1 cmt base",
-                 "", "$INPUT ID TIME MDV EVID DV AMT  SEX WT ETN", "$DATA ../../data/acop.csv IGNORE=@", "...")
-
-LST_REF_1_5 <- c("Thu Sep 10 15:12:29 EDT 2020", "...", " ", " Elapsed finaloutput time in seconds:     0.01",
-                 " #CPUT: Total CPU Time in Seconds,        2.696", "Stop Time:",
-                 "Thu Sep 10 15:12:50 EDT 2020")
-
-LST_REF_5_1 <- c("Thu Sep 10 15:12:29 EDT 2020", "$PROBLEM PK model 1 cmt base",
-                 "", "$INPUT ID TIME MDV EVID DV AMT  SEX WT ETN", "$DATA ../../data/acop.csv IGNORE=@",
-                 "...", "Thu Sep 10 15:12:50 EDT 2020")
-
+LST_REF_DEFAULT <- readLines(paste0(LST_STEM, "default.txt"))
+LST_REF_0_5 <- readLines(paste0(LST_STEM, "0_5.txt"))
+LST_REF_5_0 <- readLines(paste0(LST_STEM, "5_0.txt"))
+LST_REF_1_5 <- readLines(paste0(LST_STEM, "1_5.txt"))
+LST_REF_5_1 <- readLines(paste0(LST_STEM, "5_1.txt"))
 
 # directory ls stuff
 OUTPUT_DIR_LS <- fs::dir_ls(OUTPUT_DIR)
@@ -34,12 +20,14 @@ CTL_FILTER <- ".ctl"
 CTL_FILTER_RES <- as.character(grep(CTL_FILTER, OUTPUT_DIR_LS, value = TRUE))
 
 # table output
-EXT_REF_FLOOR_0 <- "data/acop_ext_ref_floor0_200520.rds"
-EXT_REF_FLOOR_NULL <- "data/acop_ext_ref_floorNULL_200520.rds"
+EXT_STEM <- file.path(REF_DIR, "read-output-refs", "1_ext_ref_")
+EXT_REF_FLOOR_0 <- paste0(EXT_STEM, "floor0.R")
+EXT_REF_FLOOR_NULL <- paste0(EXT_STEM, "floorNULL.R")
 
-GRD_REF_FLOOR_0 <- "data/acop_grd_ref_floor0_200520.rds"
-GRD_REF_FLOOR_10 <- "data/acop_grd_ref_floor10_200520.rds"
-GRD_REF_FLOOR_NULL <- "data/acop_grd_ref_floorNULL_200520.rds"
+GRD_STEM <- file.path(REF_DIR, "read-output-refs", "1_grd_ref_")
+GRD_REF_FLOOR_0 <- paste0(GRD_STEM, "floor0.R")
+GRD_REF_FLOOR_10 <- paste0(GRD_STEM, "floor10.R")
+GRD_REF_FLOOR_NULL <- paste0(GRD_STEM, "floorNULL.R")
 
 ################
 # tests
@@ -154,15 +142,26 @@ for (.tc in .test_cases) {
 #######################################
 
 test_that("check_nonmem_table_output() output matches ref df", {
-  df <- check_nonmem_table_output("model-examples/1/1.ext", .x_var = "ITERATION")
-  ref_df <- readRDS(EXT_REF_FLOOR_NULL)
-  expect_identical(df, ref_df)
+  df <- check_nonmem_table_output(file.path(MOD1_PATH, paste0(MOD_ID, ".ext")), .x_var = "ITERATION")
+  ref_df <- dget(EXT_REF_FLOOR_NULL)
+
+  # This mutate call is because of bug in testthat::expect_equal
+  # we can remove this when we switch to testthat 3e
+  df    <-      df %>% mutate(OBJ = round(OBJ, 5))
+  ref_df <- ref_df %>% mutate(OBJ = round(OBJ, 5))
+  expect_equal(df, ref_df)
+
 })
 
 test_that("check_nonmem_table_output(.x_floor=0) works", {
-  df <- check_nonmem_table_output("model-examples/1/1.ext", .x_var = "ITERATION", .x_floor = 0)
-  ref_df <- readRDS(EXT_REF_FLOOR_0)
-  expect_identical(df, ref_df)
+  df <- check_nonmem_table_output(file.path(MOD1_PATH, paste0(MOD_ID, ".ext")), .x_var = "ITERATION", .x_floor = 0)
+  ref_df <- dget(EXT_REF_FLOOR_0)
+
+  # This mutate call is because of bug in testthat::expect_equal
+  # we can remove this when we switch to testthat 3e
+  df    <-      df %>% mutate(OBJ = round(OBJ, 5))
+  ref_df <- ref_df %>% mutate(OBJ = round(OBJ, 5))
+  expect_equal(df, ref_df)
 })
 
 # test check_ext
@@ -173,11 +172,16 @@ test_that("check_nonmem_table_output(.x_floor=0) works", {
 for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
     df <- check_ext(.tc[[".test_arg"]])
-    ref_df <- readRDS(EXT_REF_FLOOR_0)
-    expect_identical(df, ref_df)
+    ref_df <- dget(EXT_REF_FLOOR_0)
 
-    ref_df <- readRDS(EXT_REF_FLOOR_NULL)
-    expect_failure(expect_identical(df, ref_df))
+    # This mutate call is because of bug in testthat::expect_equal
+    # we can remove this when we switch to testthat 3e
+    df    <-      df %>% mutate(OBJ = round(OBJ, 5))
+    ref_df <- ref_df %>% mutate(OBJ = round(OBJ, 5))
+    expect_equal(df, ref_df)
+
+    ref_df <- dget(EXT_REF_FLOOR_NULL)
+    expect_failure(expect_equal(df, ref_df))
   })
 }
 
@@ -188,11 +192,16 @@ for (.tc in .test_cases) {
 for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
     df <- check_ext(.tc[[".test_arg"]], .iter_floor = NULL)
-    ref_df <- readRDS(EXT_REF_FLOOR_NULL)
-    expect_identical(df, ref_df)
+    ref_df <- dget(EXT_REF_FLOOR_NULL)
 
-    ref_df <- readRDS(EXT_REF_FLOOR_0)
-    expect_failure(expect_identical(df, ref_df))
+    # This mutate call is because of bug in testthat::expect_equal
+    # we can remove this when we switch to testthat 3e
+    df    <-      df %>% mutate(OBJ = round(OBJ, 5))
+    ref_df <- ref_df %>% mutate(OBJ = round(OBJ, 5))
+    expect_equal(df, ref_df)
+
+    ref_df <- dget(EXT_REF_FLOOR_0)
+    expect_failure(expect_equal(df, ref_df))
   })
 }
 
@@ -204,14 +213,14 @@ for (.tc in .test_cases) {
 for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
     df <- check_grd(.tc[[".test_arg"]])
-    ref_df <- readRDS(GRD_REF_FLOOR_0)
-    expect_identical(df, ref_df)
+    ref_df <- dget(GRD_REF_FLOOR_0)
+    expect_equal(df, ref_df)
 
-    ref_df <- readRDS(GRD_REF_FLOOR_10)
-    expect_failure(expect_identical(df, ref_df))
+    ref_df <- dget(GRD_REF_FLOOR_10)
+    expect_failure(expect_equal(df, ref_df))
 
-    ref_df <- readRDS(GRD_REF_FLOOR_NULL)
-    expect_failure(expect_identical(df, ref_df))
+    ref_df <- dget(GRD_REF_FLOOR_NULL)
+    expect_failure(expect_equal(df, ref_df))
   })
 }
 
@@ -222,14 +231,14 @@ for (.tc in .test_cases) {
 for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
     df <- check_grd(.tc[[".test_arg"]], .iter_floor = 10)
-    ref_df <- readRDS(GRD_REF_FLOOR_10)
-    expect_identical(df, ref_df)
+    ref_df <- dget(GRD_REF_FLOOR_10)
+    expect_equal(df, ref_df)
 
-    ref_df <- readRDS(GRD_REF_FLOOR_0)
-    expect_failure(expect_identical(df, ref_df))
+    ref_df <- dget(GRD_REF_FLOOR_0)
+    expect_failure(expect_equal(df, ref_df))
 
-    ref_df <- readRDS(GRD_REF_FLOOR_NULL)
-    expect_failure(expect_identical(df, ref_df))
+    ref_df <- dget(GRD_REF_FLOOR_NULL)
+    expect_failure(expect_equal(df, ref_df))
   })
 }
 
@@ -240,13 +249,13 @@ for (.tc in .test_cases) {
 for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
     df <- check_grd(.tc[[".test_arg"]], .iter_floor = NULL)
-    ref_df <- readRDS(GRD_REF_FLOOR_NULL)
-    expect_identical(df, ref_df)
+    ref_df <- dget(GRD_REF_FLOOR_NULL)
+    expect_equal(df, ref_df)
 
-    ref_df <- readRDS(GRD_REF_FLOOR_0)
-    expect_failure(expect_identical(df, ref_df))
+    ref_df <- dget(GRD_REF_FLOOR_0)
+    expect_failure(expect_equal(df, ref_df))
 
-    ref_df <- readRDS(GRD_REF_FLOOR_10)
-    expect_failure(expect_identical(df, ref_df))
+    ref_df <- dget(GRD_REF_FLOOR_10)
+    expect_failure(expect_equal(df, ref_df))
   })
 }

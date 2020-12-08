@@ -1,6 +1,6 @@
 context("Constructing config log from bbi_config.json")
 
-expected_bbi_version <- "v2.3.0"
+expected_bbi_version <- "v2.3.1"
 expected_nonmem_version <- "nm74gf"
 
 # to minimize changes to the existing tests, we define the model and data status
@@ -71,7 +71,7 @@ setup({
 teardown({ cleanup() })
 
 test_that("config_log() returns NULL and warns when no YAML found", {
-  log_df <- expect_warning(config_log("data"), regexp = "Found no valid model YAML files in data")
+  log_df <- expect_warning(config_log("."), regexp = "Found no valid model YAML files in")
   expect_true(inherits(log_df, "tbl"))
   expect_equal(nrow(log_df), 0)
   expect_equal(ncol(log_df), 0)
@@ -104,7 +104,7 @@ test_that("config_log() reflects model mismatch", {
 })
 
 test_that("config_log() reflects data mismatch", {
-  perturb_file("data/acop.csv")
+  perturb_file(system.file("extdata", "acop.csv", package = "rbabylon"))
   log_df <- config_log(MODEL_DIR)
   expect_equal(log_df[["data_has_changed"]][1], TRUE)
 })

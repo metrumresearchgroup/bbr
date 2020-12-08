@@ -38,7 +38,7 @@ teardown({
 
 
 test_that("summary_log() returns NULL and warns when no YAML found", {
-  log_df <- expect_warning(summary_log("data"), regexp = "Found no valid model YAML files in data")
+  log_df <- expect_warning(summary_log(file.path(REF_DIR, "read-output-refs")), regexp = "Found no valid model YAML files in")
   expect_true(inherits(log_df, "tbl"))
   expect_equal(nrow(log_df), 0)
   expect_equal(ncol(log_df), 0)
