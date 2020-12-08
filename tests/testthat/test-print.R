@@ -1,5 +1,9 @@
 context("testing print methods for bbi objects")
 
+if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
+  skip("test-print only runs on Metworx or Drone")
+}
+
 model_dir <- ABS_MODEL_DIR
 mod_ctl_path <- file.path(model_dir, CTL_FILENAME)
 
