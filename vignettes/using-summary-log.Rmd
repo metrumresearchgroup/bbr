@@ -36,7 +36,7 @@ if (interactive()) {
   devtools::load_all()
 }
 ```
-```{r load packages results = 'hide', message=FALSE, warning=FALSE}
+```{r load packages, results = 'hide', message=FALSE, warning=FALSE}
 library(rbabylon)
 library(dplyr)
 library(tidyselect)

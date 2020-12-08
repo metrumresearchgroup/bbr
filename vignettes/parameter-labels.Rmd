@@ -32,10 +32,10 @@ if (interactive()) {
   devtools::load_all()
 }
 ```
-```{r load packages}
+```{r load packages, results = 'hide', message=FALSE, warning=FALSE}
 library(rbabylon)
-suppressPackageStartupMessages(library(dplyr))
-suppressPackageStartupMessages(library(readr))
+library(dplyr)
+library(readr)
 ```
 
 ```{r load data and configure bbi, include = FALSE}
