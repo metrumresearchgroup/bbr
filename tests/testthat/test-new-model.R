@@ -1,8 +1,5 @@
 context("Testing function to create or read in model object")
 
-bad_keys <- c(
-  ABS_MOD_PATH
-)
 
 test_that("read_model() returns expected object", {
   expect_equal(read_model(MOD1_PATH), REF_LIST_1)
@@ -81,11 +78,10 @@ test_that("compare read_model() and new_model() objects", {
   expect_true(all(MODEL_REQ_KEYS %in% names(mod1a)))
   expect_true(all(MODEL_REQ_KEYS %in% names(mod1b)))
 
-  # also check that some of the required keys have the same value
+  # also check that the required keys have the same value
   for (k in MODEL_REQ_KEYS) {
-    # TODO: eventually we will only exclude ABS_MOD_PATH, because that should
-    # not in general be equal
-    if (!(k %in% bad_keys)) {
+    # exclude ABS_MOD_PATH, because that should not in general be equal
+    if (k != ABS_MOD_PATH) {
       expect_equal(mod1a[[k]], mod1b[[k]])
     }
   }
