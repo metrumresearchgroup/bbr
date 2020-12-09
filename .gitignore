@@ -2,7 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
-.Rprofile
 .DS_Store
 
 inst/doc

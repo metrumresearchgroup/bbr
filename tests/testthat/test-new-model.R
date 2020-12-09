@@ -9,7 +9,7 @@ test_that("read_model() returns expected object", {
 })
 
 test_that("read_model() returns expected object from no ext specified", {
-  temp_path <- "model-examples/temp.yaml"
+  temp_path <- file.path(ABS_MODEL_DIR, "temp.yaml")
   ctl_path <- fs::path_ext_set(temp_path, "ctl")
 
   fs::file_copy(YAML_TEST_FILE, temp_path)
@@ -124,11 +124,9 @@ test_that("new_model() .based_on arg works", {
 
 test_that("new_model() .based_on arg errors on fake model", {
   # create new model with args
-  .test_path <- "model-examples/tmp.yaml"
-
   expect_error(
     new_model(
-      fs::path_ext_remove(.test_path),
+      file.path(ABS_MODEL_DIR, "tmp"),
       .description = "original acop model",
       .based_on = c("1", "fake")
     ),
