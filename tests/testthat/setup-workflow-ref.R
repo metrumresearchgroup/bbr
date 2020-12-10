@@ -14,7 +14,7 @@
 
 # define constants
 REF_DIR <- system.file("test-refs",   package = "rbabylon")
-ABS_MODEL_DIR <- system.file("model/nonmem/basic",   package = "rbabylon")
+ABS_MODEL_DIR <- system.file("model", "nonmem", "basic",   package = "rbabylon")
 
 MOD_ID <- "1"
 MODEL_DIR <-   fs::path_rel(ABS_MODEL_DIR, getwd()) %>% as.character()
@@ -24,7 +24,7 @@ MOD1 <- MOD1_PATH %>% read_model()
 NEW_MOD2 <- file.path(MODEL_DIR, "2")
 NEW_MOD3 <- file.path(MODEL_DIR, "3")
 
-MODEL_DIR_X <- fs::path_rel(system.file("model/nonmem/complex",   package = "rbabylon"), getwd()) %>% as.character()
+MODEL_DIR_X <- fs::path_rel(system.file("model", "nonmem", "complex",   package = "rbabylon"), getwd()) %>% as.character()
 
 # file names and file paths
 OUTPUT_DIR <-     MOD1_PATH

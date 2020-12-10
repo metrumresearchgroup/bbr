@@ -10,12 +10,12 @@ devtools::load_all() # can't call library(rbabylon) from within rbabylon when us
 #' Saves to `inst/test-refs/read-output-refs/`.
 #' @param .mod bbi_nonmem_model object
 build_read_output_refs <- function(.mod) {
-  .root <- file.path(get_output_dir(.mod), get_model_id(.mod))
-  out_dir <- system.file("test-refs/read-output-refs", package = "rbabylon")
-  message(glue::glue("Writing test-read-output.R refs for {.root} into {out_dir}"))
+  root_dir <- file.path(get_output_dir(.mod), get_model_id(.mod))
+  out_dir <- system.file("test-refs", "read-output-refs", package = "rbabylon")
+  message(glue::glue("Writing test-read-output.R refs for {root_dir} into {out_dir}"))
 
   # write out .lst file test cases
-  lst_file <- paste0(.root, ".lst")
+  lst_file <- fs::path_ext_set(root_dir, ".lst")
   lst_out_stem <- file.path(out_dir, paste0(get_model_id(.mod), "_lst_ref_"))
 
   lst_lines <- readLines(lst_file)
@@ -37,32 +37,34 @@ build_read_output_refs <- function(.mod) {
     writeLines(paste0(lst_out_stem, "5_1.txt"))
 
   # write out .ext file tibbles
-  ext_file <- paste0(.root, ".ext")
+  ext_file <- fs::path_ext_set(root_dir, ".ext")
   ext_out_stem <- file.path(out_dir, paste0(get_model_id(.mod), "_ext_ref_"))
   ext_df <- readr::read_table2(ext_file, skip=1, col_types = readr::cols())
 
-  ext_df %>%
-    dput(file = paste0(ext_out_stem, "floorNULL.R"))
+  out_path <- paste0(ext_out_stem, "floorNULL.R")
+  dput(ext_df, file = out_path)
+  styler::style_file(out_path)
 
-  ext_df %>%
-    filter(ITERATION > 0) %>%
-    dput(file = paste0(ext_out_stem, "floor0.R"))
+  out_path <- paste0(ext_out_stem, "floor0.R")
+  dput(filter(ext_df, ITERATION > 0), file = out_path)
+  styler::style_file(out_path)
 
   # write out .grd file tibbles
-  grd_file <- paste0(.root, ".grd")
+  grd_file <- fs::path_ext_set(root_dir, ".grd")
   grd_out_stem <- file.path(out_dir, paste0(get_model_id(.mod), "_grd_ref_"))
   grd_df <- readr::read_table2(grd_file, skip=1, col_types = readr::cols())
 
-  grd_df %>%
-    dput(file = paste0(grd_out_stem, "floorNULL.R"))
+  out_path <- paste0(grd_out_stem, "floorNULL.R")
+  dput(grd_df, file = out_path)
+  styler::style_file(out_path)
 
-  grd_df %>%
-    filter(ITERATION > 0) %>%
-    dput(file = paste0(grd_out_stem, "floor0.R"))
+  out_path <- paste0(grd_out_stem, "floor0.R")
+  dput(filter(grd_df, ITERATION > 0), file = out_path)
+  styler::style_file(out_path)
 
-  grd_df %>%
-    filter(ITERATION > 10) %>%
-    dput(file = paste0(grd_out_stem, "floor10.R"))
+  out_path <- paste0(grd_out_stem, "floor10.R")
+  dput(filter(grd_df, ITERATION > 10), file = out_path)
+  styler::style_file(out_path)
 
 }
 
@@ -73,6 +75,6 @@ build_read_output_refs <- function(.mod) {
 # To render refs, source this script.
 .proj_root <- rprojroot::find_rstudio_root_file()
 
-file.path(.proj_root, "inst/model/nonmem/basic", 1) %>%
+file.path(.proj_root, "inst", "model", "nonmem", "basic", 1) %>%
   read_model() %>%
   build_read_output_refs()
