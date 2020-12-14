@@ -54,7 +54,7 @@ if (Sys.which("bbi") == "") {
 As mentioned above, the `bbi_summary_log_df` tibble contains a lot of information, which is a subset of what is contained in the `bbi_nonmem_summary` object returned from `model_summary()`.
 
 ```{r model summary single}
-MODEL_DIR <- system.file("model/nonmem/complex",   package = "rbabylon")
+MODEL_DIR <- system.file("model", "nonmem", "complex", package = "rbabylon")
 
 sum1 <- 
   read_model(file.path(MODEL_DIR, "iovmm")) %>%

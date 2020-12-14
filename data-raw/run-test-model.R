@@ -10,15 +10,17 @@ devtools::load_all() # can't call library(rbabylon) from within rbabylon when us
 #' Note: will overwrite any output directory for this model.
 #' @param .model_dir Path to directory model will be run in, relative to project/package root
 #' @param .model_name Name of model file, without extension
+#' @param .bbi_path absolute path to bbi installation
 run_test_model <- function(
   .model_dir,
-  .model_name
+  .model_name,
+  .bbi_path = read_bbi_path()
 ) {
 
   .model_dir <- file.path(rprojroot::find_rstudio_root_file(), .model_dir)
   .ref_out_dir <- system.file('test-refs', package = 'rbabylon')
 
-  withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
+  withr::with_options(list(rbabylon.bbi_exe_path = .bbi_path), {
     bbi_init(.dir = .model_dir,            # the directory to create the babylon.yaml in
              .nonmem_dir = "/opt/NONMEM", # location of NONMEM installation
              .nonmem_version = "nm74gf")  # default NONMEM version to use

@@ -38,7 +38,7 @@ library(purrr)
 
 ```{r set paths and define cleanup, include = FALSE}
 options('rbabylon.bbi_exe_path' = read_bbi_path())
-MODEL_DIR <- system.file("model/nonmem/basic", package = "rbabylon")
+MODEL_DIR <- system.file("model", "nonmem", "basic", package = "rbabylon")
 
 # delete old files
 cleanup <- function() {

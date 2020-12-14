@@ -5,6 +5,7 @@ Descriptions:
 Packages:
   - devtools
   - renv
+  - styler
 
 Repos:
   - CRAN: https://cran.rstudio.com
