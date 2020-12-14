@@ -8,7 +8,7 @@ Packages:
   - styler
 
 Repos:
-  - MPN: https://cran.rstudio.com
+  - CRAN: https://cran.rstudio.com
 
 Lockfile:
   Type: renv

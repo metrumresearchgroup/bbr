@@ -20,10 +20,14 @@ test_that("get_yaml_path() builds the right path", {
   expect_identical(get_yaml_path(MOD1), normalizePath(YAML_TEST_FILE))
 })
 
-
-# TODO: consider adding a test for logs with more than one model
 test_that("get_model_path() works with bbi_*_log_df", {
-  expect_identical(get_model_path(run_log(MODEL_DIR)), normalizePath(CTL_TEST_FILE))
+  create_all_models()
+  on.exit(cleanup())
+
+  ref_mod_paths <- as.character(fs::path_ext_set(c(MOD1_ABS_PATH, MOD2_ABS_PATH, MOD3_ABS_PATH, MOD4_ABS_PATH), ".ctl"))
+  res_mod_paths <- get_model_path(run_log(MODEL_DIR))
+
+  expect_identical(ref_mod_paths, res_mod_paths)
 })
 
 test_that("get_output_dir() works with bbi_*_log_df", {
