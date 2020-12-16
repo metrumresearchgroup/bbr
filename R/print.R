@@ -50,3 +50,30 @@ print.babylon_process <- function(x, ..., .call_limit = 250) {
 
 }
 
+
+#' @describeIn print_bbi Prints a high level summary of a model from a bbi_nonmem_summary object
+#' @importFrom purrr map_chr
+print.bbi_nonmem_summary <- function(x, ...) {
+  print_str <- character()
+
+  .d <- .x[[SUMMARY_DETAILS]]
+  print_str <- c(print_str, glue("Dataset: {.d$data_set}"))
+  print_str <- c(print_str, glue("Records: {.d$number_of_data_records}\t Observations: {.d$number_of_obs}\t Patients: {.d$number_of_patients}"))
+  print_str <- c(print_str, "Estimation Method(s):", map_chr(.d$estimation_method, ~glue("  - {.x}")))
+
+  .h <- unlist(.x[[SUMMARY_HEURISTICS]])
+  if (any(.h)) {
+    h_str <- c("Heuristic Problem(s) Detected:", map_chr(names(which(.h)), ~glue("  - {.x}")))
+  } else {
+    h_str <- "No Heuristic Problems Detected"
+  }
+  print_str <- c(print_str, h_str)
+
+  param_str <- .x %>%
+    param_estimates() %>%
+    select(parameter_names, estimate, stderr, shrinkage) %>%
+    knitr::kable()
+  print_str <- c(print_str, "", param_str)
+
+  cat(print_str, sep = "\n")
+}
