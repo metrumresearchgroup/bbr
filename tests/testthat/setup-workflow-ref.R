@@ -19,7 +19,8 @@ ABS_MODEL_DIR <- system.file("model", "nonmem", "basic",   package = "rbabylon")
 MOD_ID <- "1"
 MODEL_DIR <-   fs::path_rel(ABS_MODEL_DIR, getwd()) %>% as.character()
 MOD1_PATH <- file.path(MODEL_DIR, MOD_ID)
-MOD1 <- MOD1_PATH %>% read_model()
+MOD1 <- read_model(MOD1_PATH)
+SUM1 <- model_summary(MOD1)
 
 NEW_MOD2 <- file.path(MODEL_DIR, "2")
 NEW_MOD3 <- file.path(MODEL_DIR, "3")

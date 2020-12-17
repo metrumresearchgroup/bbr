@@ -4,6 +4,18 @@
 #' `bbi_{.model_type}_model` objects correspond to multiple files on disk. These functions
 #' provide an easy way to retrieve the absolute path to these files.
 #'
+#' @details
+#' **`get_model_path()`** returns the path the model definition file.
+#'   For NONMEM models, this is the control stream.
+#'
+#' **`get_output_dir()`** returns the path the directory containing
+#'   output files created when the model is run.
+#'
+#' **`get_yaml_path()`** returns the path the YAML file created by rbabylon.
+#'   This file contains metadata like tags, etc. and should, generally speaking,
+#'   _not_ be interacted with directly. The helper functions mentioned in
+#'   [?modify_model_field] modify this file for you.
+#'
 #' @param .bbi_object The object to query. Could be
 #' a `bbi_{.model_type}_model` object,
 #' or a tibble of class `bbi_log_df`.
@@ -20,7 +32,13 @@ get_model_path <- function(.bbi_object, .check_exists = TRUE) {
 #' @rdname get_path_from_object
 #' @export
 get_model_path.bbi_nonmem_model <- function(.bbi_object, .check_exists = TRUE) {
-  find_nonmem_model_file_path(.bbi_object[[ABS_MOD_PATH]], .check_exists)
+  get_model_path_bbi(.bbi_object, .check_exists)
+}
+
+#' @rdname get_path_from_object
+#' @export
+get_model_path.bbi_nonmem_summary <- function(.bbi_object, .check_exists = TRUE) {
+  get_model_path_bbi(.bbi_object, .check_exists)
 }
 
 
@@ -39,13 +57,13 @@ get_output_dir <- function(.bbi_object, .check_exists = TRUE) {
 #' @rdname get_path_from_object
 #' @export
 get_output_dir.bbi_nonmem_model <- function(.bbi_object, .check_exists = TRUE) {
-  .path <- .bbi_object[[ABS_MOD_PATH]]
+  get_output_dir_bbi(.bbi_object, .check_exists)
+}
 
-  if (isTRUE(.check_exists)) {
-    checkmate::assert_directory_exists(.path)
-  }
-
-  return(.path)
+#' @rdname get_path_from_object
+#' @export
+get_output_dir.bbi_nonmem_summary <- function(.bbi_object, .check_exists = TRUE) {
+  get_output_dir_bbi(.bbi_object, .check_exists)
 }
 
 #' @rdname get_path_from_object
@@ -53,6 +71,7 @@ get_output_dir.bbi_nonmem_model <- function(.bbi_object, .check_exists = TRUE) {
 get_output_dir.bbi_log_df <- function(.bbi_object, .check_exists = TRUE) {
   get_path_from_log_df(.bbi_object, get_output_dir, .check_exists = .check_exists)
 }
+
 
 #' @rdname get_path_from_object
 #' @export
@@ -63,6 +82,76 @@ get_yaml_path <- function(.bbi_object, .check_exists = TRUE) {
 #' @rdname get_path_from_object
 #' @export
 get_yaml_path.bbi_nonmem_model <- function(.bbi_object, .check_exists = TRUE) {
+  get_yaml_path_bbi(.bbi_object, .check_exists)
+}
+
+#' @rdname get_path_from_object
+#' @export
+get_yaml_path.bbi_nonmem_summary <- function(.bbi_object, .check_exists = TRUE) {
+  get_yaml_path_bbi(.bbi_object, .check_exists)
+}
+
+#' @rdname get_path_from_object
+#' @export
+get_yaml_path.bbi_log_df <- function(.bbi_object, .check_exists = TRUE) {
+  get_path_from_log_df(.bbi_object, get_yaml_path, .check_exists = .check_exists)
+}
+
+
+#' Get model identifier
+#'
+#' Helper to strip path and extension from model file to get only model identifier
+#' (i.e. the model file name without extension)
+#' @param .mod Model to use, either a `bbi_{.model_type}_model` or `..._summary`,
+#'   or a file path to a model.
+#' @importFrom tools file_path_sans_ext
+#' @returns Character scalar with only model identifier
+#' @export
+get_model_id <- function(.mod) {
+  UseMethod("get_model_id")
+}
+
+#' @describeIn get_model_id Takes file path to model.
+#' @export
+get_model_id.character <- function(.mod) {
+  return(basename(tools::file_path_sans_ext(.mod)))
+}
+
+#' @describeIn get_model_id Takes `bbi_nonmem_model` object
+#' @export
+get_model_id.bbi_nonmem_model <- function(.mod) {
+  get_model_id_bbi(.mod)
+}
+
+#' @describeIn get_model_id Takes `bbi_nonmem_summary` object
+#' @export
+get_model_id.bbi_nonmem_summary <- function(.mod) {
+  get_model_id_bbi(.mod)
+}
+
+
+####################################################
+# Get path from bbi object implementation functions
+####################################################
+
+#' @keywords internal
+get_model_path_bbi <- function(.bbi_object, .check_exists = TRUE) {
+  find_nonmem_model_file_path(.bbi_object[[ABS_MOD_PATH]], .check_exists)
+}
+
+#' @keywords internal
+get_output_dir_bbi <- function(.bbi_object, .check_exists = TRUE) {
+.path <- .bbi_object[[ABS_MOD_PATH]]
+
+if (isTRUE(.check_exists)) {
+  checkmate::assert_directory_exists(.path)
+}
+
+return(.path)
+}
+
+#' @keywords internal
+get_yaml_path_bbi <- function(.bbi_object, .check_exists = TRUE) {
   .path <- paste0(.bbi_object[[ABS_MOD_PATH]], ".yaml")
 
   if (isTRUE(.check_exists)) {
@@ -72,11 +161,14 @@ get_yaml_path.bbi_nonmem_model <- function(.bbi_object, .check_exists = TRUE) {
   return(.path)
 }
 
-#' @rdname get_path_from_object
-#' @export
-get_yaml_path.bbi_log_df <- function(.bbi_object, .check_exists = TRUE) {
-  get_path_from_log_df(.bbi_object, get_yaml_path, .check_exists = .check_exists)
+#' @keywords internal
+get_model_id_bbi <- function(.bbi_object) {
+  return(basename(tools::file_path_sans_ext(get_model_path(.bbi_object))))
 }
+
+###########################
+# Get path private helpers
+###########################
 
 #' Private helper function to extract paths from bbi_log_df
 #' @param .log_df The `bbi_log_df` object
@@ -97,13 +189,14 @@ get_path_from_log_df <- function(.log_df, .get_func, .check_exists) {
 #' The working directory of a model object is the parent directory of the
 #' absolute model path.
 #'
-#' @param .mod A model object.
+#' @param .mod A bbi model or summary object.
 #'
 #' @return The path to the working directory.
 #' @keywords internal
 get_model_working_directory <- function(.mod) {
   dirname(.mod[[ABS_MOD_PATH]])
 }
+
 
 ###############################
 # Manipulating file extensions
@@ -155,29 +248,6 @@ yaml_ext <- function(.x) {
 # Other Assorted file path helpers
 ###################################
 
-#' Get model identifier
-#'
-#' Helper to strip path and extension from model file to get only model identifier
-#' (i.e. the model file name without extension)
-#' @param .mod Model to use, either a `bbi_{.model_type}_model` or file path to a model.
-#' @importFrom tools file_path_sans_ext
-#' @returns Character scalar with only model identifier
-#' @export
-get_model_id <- function(.mod) {
-  UseMethod("get_model_id")
-}
-
-#' @describeIn get_model_id Takes file path to model.
-#' @export
-get_model_id.character <- function(.mod) {
-  return(basename(tools::file_path_sans_ext(.mod)))
-}
-
-#' @describeIn get_model_id Takes `bbi_nonmem_model` object
-#' @export
-get_model_id.bbi_nonmem_model <- function(.mod) {
-  return(basename(tools::file_path_sans_ext(get_model_path(.mod))))
-}
 
 #' Build absolute path from a directory and path
 #'
