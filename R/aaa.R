@@ -135,6 +135,7 @@ SUMMARY_SHRINKAGE_SIGMA <- "eps_sd"
 
 # keys required for a summary object to have
 SUMMARY_REQ_KEYS <- c(
+  ABS_MOD_PATH,
   SUMMARY_DETAILS,
   SUMMARY_HEURISTICS
 )

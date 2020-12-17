@@ -27,6 +27,9 @@ Calls out to bbi and returns a named list of class \verb{bbi_\{.model_type\}_sum
 
 The returned list for a NONMEM model will contain the following top-level elements:
 \itemize{
+\item \strong{absolute_model_path} -- Absolute path to the model that generated this summary.
+Note, using this directly is discouraged in favor of using the "getters"
+described in \link{?get_path_from_object}.
 \item \strong{run_details} -- General details about the run including estimation
 method, numbers of patients and records, significant digits, run time, and
 more.

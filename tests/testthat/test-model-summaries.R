@@ -14,8 +14,7 @@ test_mod_sums <- function(mod_sums) {
   ref_sum <- dget(SUMMARY_REF_FILE)
 
   for (.s in mod_sums) {
-    expect_equal(names(.s), SUMS_LIST_NAMES_REF)
-    expect_identical(class(.s$bbi_summary), SUM_CLASS_LIST)
+    ref_sum[[ABS_MOD_PATH]] <- .s$bbi_summary[[ABS_MOD_PATH]]
     expect_equal(ref_sum, .s$bbi_summary)
   }
 }

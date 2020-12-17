@@ -12,6 +12,9 @@
 #' **NONMEM**
 #'
 #' The returned list for a NONMEM model will contain the following top-level elements:
+#'  * **absolute_model_path** -- Absolute path to the model that generated this summary.
+#'    Note, using this directly is discouraged in favor of using the "getters"
+#'    described in [?get_path_from_object].
 #'  * **run_details** -- General details about the run including estimation
 #'    method, numbers of patients and records, significant digits, run time, and
 #'    more.
@@ -137,9 +140,14 @@ nonmem_summary <- function(
     }
   )
 
-  res_list <- res$stdout %>%
+  res_list <- list()
+  res_list[[ABS_MOD_PATH]] <- tools::file_path_sans_ext(get_model_path(.mod))
+
+  bbi_list <- res$stdout %>%
     paste(collapse="") %>%
     jsonlite::fromJSON(simplifyDataFrame = FALSE)
+
+  res_list <- combine_list_objects(res_list, bbi_list)
 
   res_list <- create_summary_object(res_list)
 

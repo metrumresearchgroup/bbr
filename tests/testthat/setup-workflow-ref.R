@@ -65,8 +65,8 @@ PROC_HELP_STR <- c("Running:", as.character(glue("  {read_bbi_path()} --help")),
 
 SUMS_LIST_NAMES_REF <- c("absolute_model_path", "bbi_summary", "error_msg", "needed_fail_flags")
 
-SUM_NAMES_REF <- c("run_details", "run_heuristics", "parameters_data", "parameter_names",
-                   "ofv", "condition_number", "shrinkage_details")
+SUM_NAMES_REF <- c("absolute_model_path", "run_details", "run_heuristics", "parameters_data",
+                   "parameter_names", "ofv", "condition_number", "shrinkage_details")
 
 NOT_FINISHED_ERR_MSG <- "nonmem_summary.*modeling run has not finished"
 NO_LST_ERR_MSG <- "Unable to locate `.lst` file.*NONMEM output folder"
