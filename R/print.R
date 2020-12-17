@@ -29,7 +29,7 @@ print.babylon_process <- function(x, ..., .call_limit = 250) {
   }
 
   # print call string
-  cli::cat_line("Running:", col = "green")
+  cat_line("Running:", col = "green")
   cat(paste0("  ", call_str, "\n"))
 
   # format and print run directory string
@@ -37,15 +37,15 @@ print.babylon_process <- function(x, ..., .call_limit = 250) {
   if (run_dir == ".") {
     run_dir <- getwd()
   }
-  cli::cat_line(paste("In", run_dir), col = "green")
+  cat_line(paste("In", run_dir), col = "green")
 
   # format and print status string
   if (length(x[[PROC_STDOUT]]) > 1) {
-    cli::cat_line("Process finished.", col = "green")
+    cat_line("Process finished.", col = "green")
   } else if (x[[PROC_STDOUT]] == "DRY_RUN") {
-    cli::cat_line("DRY RUN! Process not actually run.", col = "red")
+    cat_line("DRY RUN! Process not actually run.", col = "red")
   } else if (str_detect(x[[PROC_STDOUT]], ".wait = FALSE")) {
-    cli::cat_line("Not waiting for process to finish.", col = "blue")
+    cat_line("Not waiting for process to finish.", col = "blue")
   }
 
 }
@@ -55,17 +55,24 @@ print.babylon_process <- function(x, ..., .call_limit = 250) {
 #' @importFrom purrr map_chr
 #' @importFrom cli cat_line
 #' @importFrom dplyr mutate_if
+#' @importFrom checkmate assert_number
 #'
 #' @param .digits Number of significant digits to use for parameter table. Defaults to 3.
+#' @param .fixed If `FALSE`, the default, omits fixed parameters from the parameter table.
+#' @param .off_diag If `FALSE`, the default, omits off-diagonals of OMEGA and SIGMA matrices from the parameter table.
+#' @param .nrow If `NULL`, the default, print all rows of the parameter table.
+#'   Otherwise, prints only `.nrow` rows.
 #' @export
-print.bbi_nonmem_summary <- function(x, .digits = 3, ...) {
+print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag = FALSE, .nrow = NULL, ...) {
   print_str <- character()
 
+  # print top line info
   .d <- x[[SUMMARY_DETAILS]]
   cat_line(glue("Dataset: {.d$data_set}"))
   cat_line(glue("Records: {.d$number_of_data_records}\t Observations: {.d$number_of_obs}\t Patients: {.d$number_of_patients}"))
-  cat_line("Estimation Method(s):", map_chr(.d$estimation_method, ~glue("  - {.x}")))
+  cat_line(c("Estimation Method(s):", map_chr(.d$estimation_method, ~glue("  - {.x}"))))
 
+  # check heuristics
   .h <- unlist(x[[SUMMARY_HEURISTICS]])
   if (any(.h)) {
     h_str <- c("Heuristic Problem(s) Detected:", map_chr(names(which(.h)), ~glue("  - {.x}")))
@@ -74,14 +81,30 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, ...) {
     cat_line("No Heuristic Problems Detected")
   }
 
-  param_str <- x %>%
-    param_estimates() %>%
+  # build parameter table
+  param_df <- param_estimates(x)
+
+  if (isFALSE(.fixed)) {
+    param_df <- filter(param_df, !fixed)
+  }
+
+  if (isFALSE(.off_diag)) {
+    param_df <- filter(param_df, is.na(diag) | diag)
+  }
+
+  if (!is.null(.nrow)) {
+    checkmate::assert_number(.nrow)
+    orig_rows <- nrow(param_df)
+    param_df <- param_df[1:.nrow, ]
+  }
+
+  param_str <- param_df %>%
     select(parameter_names, estimate, stderr, shrinkage) %>%
     mutate_if(is.numeric, sig, .digits = .digits) %>%
     knitr::kable()
-  print_str <- c(print_str, "", param_str)
 
-  cat(print_str, sep = "\n")
+  cat_line(c("", param_str))
+  if (!is.null(.nrow)) cat_line(glue("... {orig_rows - .nrow} more rows"), col = "grey")
 }
 
 
