@@ -21,7 +21,7 @@ MODEL_DIR <-   fs::path_rel(ABS_MODEL_DIR, getwd()) %>% as.character()
 MOD1_PATH <- file.path(MODEL_DIR, MOD_ID)
 MOD1 <- read_model(MOD1_PATH)
 # if we're on Metworx or Drone, run the summary
-if (!Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") == "true") {
+if (!Sys.getenv("METWORX_VERSION") == "" || Sys.getenv("DRONE") == "true") {
   withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
     SUM1 <- model_summary(MOD1)
   })
