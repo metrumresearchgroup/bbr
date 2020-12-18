@@ -2,8 +2,10 @@
 
 S3method(as_summary_list,bbi_summary_log_df)
 S3method(check_ext,bbi_nonmem_model)
+S3method(check_ext,bbi_nonmem_summary)
 S3method(check_ext,character)
 S3method(check_grd,bbi_nonmem_model)
+S3method(check_grd,bbi_nonmem_summary)
 S3method(check_grd,character)
 S3method(check_output_dir,bbi_nonmem_model)
 S3method(check_output_dir,character)

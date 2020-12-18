@@ -14,7 +14,7 @@
 #' The returned list for a NONMEM model will contain the following top-level elements:
 #'  * **absolute_model_path** -- Absolute path to the model that generated this summary.
 #'    Note, using this directly is discouraged in favor of using the "getters"
-#'    described in [?get_path_from_object].
+#'    described in `?get_path_from_object`.
 #'  * **run_details** -- General details about the run including estimation
 #'    method, numbers of patients and records, significant digits, run time, and
 #'    more.

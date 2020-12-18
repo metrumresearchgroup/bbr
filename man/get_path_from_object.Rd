@@ -43,6 +43,7 @@ get_yaml_path(.bbi_object, .check_exists = TRUE)
 \arguments{
 \item{.bbi_object}{The object to query. Could be
 a \verb{bbi_\{.model_type\}_model} object,
+\verb{bbi_\{.model_type\}_summary} object,
 or a tibble of class \code{bbi_log_df}.}
 
 \item{.check_exists}{If \code{TRUE}, the default, will throw an error if the file does not exist}
@@ -61,5 +62,5 @@ output files created when the model is run.
 \strong{\code{get_yaml_path()}} returns the path the YAML file created by rbabylon.
 This file contains metadata like tags, etc. and should, generally speaking,
 \emph{not} be interacted with directly. The helper functions mentioned in
-\link{?modify_model_field} modify this file for you.
+\code{?modify_model_field} modify this file for you.
 }

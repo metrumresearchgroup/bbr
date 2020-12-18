@@ -16,8 +16,8 @@ get_model_id(.mod)
 \method{get_model_id}{bbi_nonmem_summary}(.mod)
 }
 \arguments{
-\item{.mod}{Model to use, either a \verb{bbi_\{.model_type\}_model} or \code{..._summary},
-or a file path to a model.}
+\item{.mod}{Model to use, either a \verb{bbi_\{.model_type\}_model} or
+\verb{bbi_\{.model_type\}_summary}, or a file path to a model.}
 }
 \value{
 Character scalar with only model identifier

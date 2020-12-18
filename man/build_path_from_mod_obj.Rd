@@ -7,7 +7,7 @@
 build_path_from_mod_obj(.mod, .extension)
 }
 \arguments{
-\item{.mod}{\verb{bbi_\{.model_type\}_model} object}
+\item{.mod}{Model to use, either a \verb{bbi_\{.model_type\}_model} or \verb{bbi_\{.model_type\}_summary} object.}
 
 \item{.extension}{file extension to append (for example \code{lst}, \code{ext}, \code{grd}, etc.)}
 }

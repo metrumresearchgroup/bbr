@@ -14,10 +14,11 @@
 #' **`get_yaml_path()`** returns the path the YAML file created by rbabylon.
 #'   This file contains metadata like tags, etc. and should, generally speaking,
 #'   _not_ be interacted with directly. The helper functions mentioned in
-#'   [?modify_model_field] modify this file for you.
+#'   `?modify_model_field` modify this file for you.
 #'
 #' @param .bbi_object The object to query. Could be
 #' a `bbi_{.model_type}_model` object,
+#' `bbi_{.model_type}_summary` object,
 #' or a tibble of class `bbi_log_df`.
 #' @param .check_exists If `TRUE`, the default, will throw an error if the file does not exist
 #' @name get_path_from_object
@@ -102,8 +103,8 @@ get_yaml_path.bbi_log_df <- function(.bbi_object, .check_exists = TRUE) {
 #'
 #' Helper to strip path and extension from model file to get only model identifier
 #' (i.e. the model file name without extension)
-#' @param .mod Model to use, either a `bbi_{.model_type}_model` or `..._summary`,
-#'   or a file path to a model.
+#' @param .mod Model to use, either a `bbi_{.model_type}_model` or
+#' `bbi_{.model_type}_summary`, or a file path to a model.
 #' @importFrom tools file_path_sans_ext
 #' @returns Character scalar with only model identifier
 #' @export

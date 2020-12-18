@@ -167,7 +167,8 @@ test_that("check_nonmem_table_output(.x_floor=0) works", {
 # test check_ext
 .test_cases <- list(
   list(.test_arg = OUTPUT_DIR, .test_name = "check_ext() character dir default .iter_floor"),
-  list(.test_arg = MOD1, .test_name = "check_ext() model object default .iter_floor")
+  list(.test_arg = MOD1, .test_name = "check_ext() model object default .iter_floor"),
+  list(.test_arg = SUM1, .test_name = "check_ext() summary object default .iter_floor")
 )
 for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
@@ -187,7 +188,8 @@ for (.tc in .test_cases) {
 
 .test_cases <- list(
   list(.test_arg = OUTPUT_DIR, .test_name = "check_ext() character dir default .iter_floor NULL"),
-  list(.test_arg = MOD1, .test_name = "check_ext() model object .iter_floor NULL")
+  list(.test_arg = MOD1, .test_name = "check_ext() model object .iter_floor NULL"),
+  list(.test_arg = SUM1, .test_name = "check_ext() summary object .iter_floor NULL")
 )
 for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
@@ -208,7 +210,8 @@ for (.tc in .test_cases) {
 # test check_grd
 .test_cases <- list(
   list(.test_arg = OUTPUT_DIR, .test_name = "check_grd() character dir default .iter_floor"),
-  list(.test_arg = MOD1, .test_name = "check_grd() model object default .iter_floor")
+  list(.test_arg = MOD1, .test_name = "check_grd() model object default .iter_floor"),
+  list(.test_arg = SUM1, .test_name = "check_grd() summary object default .iter_floor")
 )
 for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
@@ -226,7 +229,8 @@ for (.tc in .test_cases) {
 
 .test_cases <- list(
   list(.test_arg = OUTPUT_DIR, .test_name = "check_grd() character dir .iter_floor 10"),
-  list(.test_arg = MOD1, .test_name = "check_grd() model object .iter_floor 10")
+  list(.test_arg = MOD1, .test_name = "check_grd() model object .iter_floor 10"),
+  list(.test_arg = SUM1, .test_name = "check_grd() summary object .iter_floor 10")
 )
 for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
@@ -244,7 +248,8 @@ for (.tc in .test_cases) {
 
 .test_cases <- list(
   list(.test_arg = OUTPUT_DIR, .test_name = "check_grd() character dir .iter_floor NULL"),
-  list(.test_arg = MOD1, .test_name = "check_grd() model object .iter_floor NULL")
+  list(.test_arg = MOD1, .test_name = "check_grd() model object .iter_floor NULL"),
+  list(.test_arg = SUM1, .test_name = "check_grd() summary object .iter_floor NULL")
 )
 for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
