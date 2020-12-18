@@ -5,16 +5,16 @@
 #' provide an easy way to retrieve the absolute path to these files.
 #'
 #' @details
-#' **`get_model_path()`** returns the path the model definition file.
+#' **`get_model_path()`** returns the path to the model definition file.
 #'   For NONMEM models, this is the control stream.
 #'
-#' **`get_output_dir()`** returns the path the directory containing
+#' **`get_output_dir()`** returns the path to the directory containing
 #'   output files created when the model is run.
 #'
-#' **`get_yaml_path()`** returns the path the YAML file created by rbabylon.
+#' **`get_yaml_path()`** returns the path to the YAML file created by rbabylon.
 #'   This file contains metadata like tags, etc. and should, generally speaking,
-#'   _not_ be interacted with directly. The helper functions mentioned in
-#'   `?modify_model_field` modify this file for you.
+#'   _not_ be interacted with directly. Use the helper functions mentioned in the
+#'   [modify_model_field()] help page to modify this file for you.
 #'
 #' @param .bbi_object The object to query. Could be
 #' a `bbi_{.model_type}_model` object,
@@ -142,13 +142,13 @@ get_model_path_bbi <- function(.bbi_object, .check_exists = TRUE) {
 
 #' @keywords internal
 get_output_dir_bbi <- function(.bbi_object, .check_exists = TRUE) {
-.path <- .bbi_object[[ABS_MOD_PATH]]
+  .path <- .bbi_object[[ABS_MOD_PATH]]
 
-if (isTRUE(.check_exists)) {
-  checkmate::assert_directory_exists(.path)
-}
+  if (isTRUE(.check_exists)) {
+    checkmate::assert_directory_exists(.path)
+  }
 
-return(.path)
+  return(.path)
 }
 
 #' @keywords internal
