@@ -1,8 +1,6 @@
 context("Test bbi summary on multiple models")
 
-if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
-  skip("test-model-summaries only runs on Metworx or Drone")
-}
+skip_if_not_drone_or_metworx("test-model-summaries")
 
 # references
 NUM_MODS <- 3

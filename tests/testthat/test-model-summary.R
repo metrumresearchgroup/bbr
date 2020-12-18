@@ -1,8 +1,6 @@
 context("Test bbi summary functions")
 
-if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
-  skip("test-model-summary only runs on Metworx or Drone")
-}
+skip_if_not_drone_or_metworx("test-model-summary")
 
 withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
 

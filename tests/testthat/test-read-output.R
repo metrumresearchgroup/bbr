@@ -167,8 +167,7 @@ test_that("check_nonmem_table_output(.x_floor=0) works", {
 # test check_ext
 .test_cases <- list(
   list(.test_arg = OUTPUT_DIR, .test_name = "check_ext() character dir default .iter_floor"),
-  list(.test_arg = MOD1, .test_name = "check_ext() model object default .iter_floor"),
-  list(.test_arg = SUM1, .test_name = "check_ext() summary object default .iter_floor")
+  list(.test_arg = MOD1, .test_name = "check_ext() model object default .iter_floor")
 )
 for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
@@ -186,10 +185,21 @@ for (.tc in .test_cases) {
   })
 }
 
+test_that("check_ext() summary object", {
+  skip_if_not_drone_or_metworx("check_ext() summary object")
+  df <- check_ext(SUM1)
+  ref_df <- dget(EXT_REF_FLOOR_0)
+
+  # This mutate call is because of bug in testthat::expect_equal
+  # we can remove this when we switch to testthat 3e
+  df    <-      df %>% mutate(OBJ = round(OBJ, 5))
+  ref_df <- ref_df %>% mutate(OBJ = round(OBJ, 5))
+  expect_equal(df, ref_df)
+})
+
 .test_cases <- list(
   list(.test_arg = OUTPUT_DIR, .test_name = "check_ext() character dir default .iter_floor NULL"),
-  list(.test_arg = MOD1, .test_name = "check_ext() model object .iter_floor NULL"),
-  list(.test_arg = SUM1, .test_name = "check_ext() summary object .iter_floor NULL")
+  list(.test_arg = MOD1, .test_name = "check_ext() model object .iter_floor NULL")
 )
 for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
@@ -210,8 +220,7 @@ for (.tc in .test_cases) {
 # test check_grd
 .test_cases <- list(
   list(.test_arg = OUTPUT_DIR, .test_name = "check_grd() character dir default .iter_floor"),
-  list(.test_arg = MOD1, .test_name = "check_grd() model object default .iter_floor"),
-  list(.test_arg = SUM1, .test_name = "check_grd() summary object default .iter_floor")
+  list(.test_arg = MOD1, .test_name = "check_grd() model object default .iter_floor")
 )
 for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
@@ -227,10 +236,16 @@ for (.tc in .test_cases) {
   })
 }
 
+test_that("check_grd() summary object", {
+  skip_if_not_drone_or_metworx("check_grd() summary object")
+  df <- check_grd(SUM1)
+  ref_df <- dget(GRD_REF_FLOOR_0)
+  expect_equal(df, ref_df)
+})
+
 .test_cases <- list(
   list(.test_arg = OUTPUT_DIR, .test_name = "check_grd() character dir .iter_floor 10"),
-  list(.test_arg = MOD1, .test_name = "check_grd() model object .iter_floor 10"),
-  list(.test_arg = SUM1, .test_name = "check_grd() summary object .iter_floor 10")
+  list(.test_arg = MOD1, .test_name = "check_grd() model object .iter_floor 10")
 )
 for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
@@ -248,8 +263,7 @@ for (.tc in .test_cases) {
 
 .test_cases <- list(
   list(.test_arg = OUTPUT_DIR, .test_name = "check_grd() character dir .iter_floor NULL"),
-  list(.test_arg = MOD1, .test_name = "check_grd() model object .iter_floor NULL"),
-  list(.test_arg = SUM1, .test_name = "check_grd() summary object .iter_floor NULL")
+  list(.test_arg = MOD1, .test_name = "check_grd() model object .iter_floor NULL")
 )
 for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
