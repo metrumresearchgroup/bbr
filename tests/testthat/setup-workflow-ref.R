@@ -20,11 +20,11 @@ MOD_ID <- "1"
 MODEL_DIR <-   fs::path_rel(ABS_MODEL_DIR, getwd()) %>% as.character()
 MOD1_PATH <- file.path(MODEL_DIR, MOD_ID)
 MOD1 <- read_model(MOD1_PATH)
-withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
-  skip_if_not_drone_or_metworx("creating SUM1 object")
-  SUM1 <- model_summary(MOD1)
-})
-
+if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
+  withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
+    SUM1 <- model_summary(MOD1)
+  })
+}
 
 NEW_MOD2 <- file.path(MODEL_DIR, "2")
 NEW_MOD3 <- file.path(MODEL_DIR, "3")
