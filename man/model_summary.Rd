@@ -29,7 +29,7 @@ The returned list for a NONMEM model will contain the following top-level elemen
 \itemize{
 \item \strong{absolute_model_path} -- Absolute path to the model that generated this summary.
 Note, using this directly is discouraged in favor of using the "getters"
-described in \code{?get_path_from_object}.
+described in the \code{\link{get_path_from_object}} help page.
 \item \strong{run_details} -- General details about the run including estimation
 method, numbers of patients and records, significant digits, run time, and
 more.

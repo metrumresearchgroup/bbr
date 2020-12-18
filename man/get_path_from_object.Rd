@@ -53,14 +53,14 @@ or a tibble of class \code{bbi_log_df}.}
 provide an easy way to retrieve the absolute path to these files.
 }
 \details{
-\strong{\code{get_model_path()}} returns the path the model definition file.
+\strong{\code{get_model_path()}} returns the path to the model definition file.
 For NONMEM models, this is the control stream.
 
-\strong{\code{get_output_dir()}} returns the path the directory containing
+\strong{\code{get_output_dir()}} returns the path to the directory containing
 output files created when the model is run.
 
-\strong{\code{get_yaml_path()}} returns the path the YAML file created by rbabylon.
+\strong{\code{get_yaml_path()}} returns the path to the YAML file created by rbabylon.
 This file contains metadata like tags, etc. and should, generally speaking,
-\emph{not} be interacted with directly. The helper functions mentioned in
-\code{?modify_model_field} modify this file for you.
+\emph{not} be interacted with directly. Use the helper functions mentioned in the
+\code{\link[=modify_model_field]{modify_model_field()}} help page to modify this file for you.
 }
