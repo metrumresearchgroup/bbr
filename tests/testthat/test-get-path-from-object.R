@@ -20,6 +20,21 @@ test_that("get_yaml_path() builds the right path", {
   expect_identical(get_yaml_path(MOD1), normalizePath(YAML_TEST_FILE))
 })
 
+test_that("get_model_path() builds the right path from summary object", {
+  skip_if_not_drone_or_metworx("get_model_path.bbi_nonmem_summary")
+  expect_identical(get_model_path(SUM1), normalizePath(CTL_TEST_FILE))
+})
+
+test_that("get_output_dir() builds the right path from summary object", {
+  skip_if_not_drone_or_metworx("get_output_dir.bbi_nonmem_summary")
+  expect_identical(get_output_dir(SUM1), normalizePath(OUTPUT_DIR))
+})
+
+test_that("get_yaml_path() builds the right path from summary object", {
+  skip_if_not_drone_or_metworx("get_yaml_path.bbi_nonmem_summary")
+  expect_identical(get_yaml_path(SUM1), normalizePath(YAML_TEST_FILE))
+})
+
 test_that("get_model_path() works with bbi_*_log_df", {
   create_all_models()
   on.exit(cleanup())
@@ -83,6 +98,11 @@ for (.tc in .test_cases) {
 
 test_that(glue::glue("get_model_id parses model object"), {
   expect_identical(get_model_id(MOD1), MOD_ID)
+})
+
+test_that(glue::glue("get_model_id parses summary object"), {
+  skip_if_not_drone_or_metworx("get_model_id.bbi_nonmem_summary")
+  expect_identical(get_model_id(SUM1), MOD_ID)
 })
 
 test_that("is_valid_nonmem_extension() works", {

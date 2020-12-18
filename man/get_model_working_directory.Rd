@@ -7,7 +7,7 @@
 get_model_working_directory(.mod)
 }
 \arguments{
-\item{.mod}{A model object.}
+\item{.mod}{A bbi model or summary object.}
 }
 \value{
 The path to the working directory.

@@ -4,6 +4,7 @@
 \alias{get_model_id}
 \alias{get_model_id.character}
 \alias{get_model_id.bbi_nonmem_model}
+\alias{get_model_id.bbi_nonmem_summary}
 \title{Get model identifier}
 \usage{
 get_model_id(.mod)
@@ -11,9 +12,12 @@ get_model_id(.mod)
 \method{get_model_id}{character}(.mod)
 
 \method{get_model_id}{bbi_nonmem_model}(.mod)
+
+\method{get_model_id}{bbi_nonmem_summary}(.mod)
 }
 \arguments{
-\item{.mod}{Model to use, either a \verb{bbi_\{.model_type\}_model} or file path to a model.}
+\item{.mod}{Model to use, either a \verb{bbi_\{.model_type\}_model} or
+\verb{bbi_\{.model_type\}_summary}, or a file path to a model.}
 }
 \value{
 Character scalar with only model identifier
@@ -27,5 +31,7 @@ Helper to strip path and extension from model file to get only model identifier
 \item \code{character}: Takes file path to model.
 
 \item \code{bbi_nonmem_model}: Takes \code{bbi_nonmem_model} object
+
+\item \code{bbi_nonmem_summary}: Takes \code{bbi_nonmem_summary} object
 }}
 

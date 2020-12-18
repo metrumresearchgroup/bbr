@@ -1,8 +1,6 @@
 context("Test bbi summary functions")
 
-if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
-  skip("test-model-summary only runs on Metworx or Drone")
-}
+skip_if_not_drone_or_metworx("test-model-summary")
 
 withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
 
@@ -20,6 +18,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
 
     # compare to reference
     ref_sum <- dget(SUMMARY_REF_FILE)
+    ref_sum[[ABS_MOD_PATH]] <- sum1[[ABS_MOD_PATH]]
     expect_equal(ref_sum, sum1)
   })
 
@@ -62,7 +61,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
     }
 
     for (.n in names(ref_sum)) {
-      if (.n != "run_details") {
+      if (!(.n %in% c("run_details", ABS_MOD_PATH))) {
         expect_equal(sum2[[.n]], ref_sum[[.n]])
       }
     }
@@ -120,13 +119,12 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
             ref_sum[["parameters_data"]][[1]][["estimates"]],
             tolerance = 0.01
           )
-        } else if (.n != "run_details" && .n != .tc$missing) {
+        } else if (!(.n %in% c("run_details", ABS_MOD_PATH)) && .n != .tc$missing) {
           expect_equal(sum2[[.n]], ref_sum[[.n]])
         }
       }
     })
   }
-
 
   #######################
   # errors when expected

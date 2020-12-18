@@ -185,6 +185,18 @@ for (.tc in .test_cases) {
   })
 }
 
+test_that("check_ext() summary object", {
+  skip_if_not_drone_or_metworx("check_ext() summary object")
+  df <- check_ext(SUM1)
+  ref_df <- dget(EXT_REF_FLOOR_0)
+
+  # This mutate call is because of bug in testthat::expect_equal
+  # we can remove this when we switch to testthat 3e
+  df    <-      df %>% mutate(OBJ = round(OBJ, 5))
+  ref_df <- ref_df %>% mutate(OBJ = round(OBJ, 5))
+  expect_equal(df, ref_df)
+})
+
 .test_cases <- list(
   list(.test_arg = OUTPUT_DIR, .test_name = "check_ext() character dir default .iter_floor NULL"),
   list(.test_arg = MOD1, .test_name = "check_ext() model object .iter_floor NULL")
@@ -223,6 +235,13 @@ for (.tc in .test_cases) {
     expect_failure(expect_equal(df, ref_df))
   })
 }
+
+test_that("check_grd() summary object", {
+  skip_if_not_drone_or_metworx("check_grd() summary object")
+  df <- check_grd(SUM1)
+  ref_df <- dget(GRD_REF_FLOOR_0)
+  expect_equal(df, ref_df)
+})
 
 .test_cases <- list(
   list(.test_arg = OUTPUT_DIR, .test_name = "check_grd() character dir .iter_floor 10"),

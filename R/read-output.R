@@ -1,7 +1,7 @@
 # Helper functions for reading output files
 
 #' Builds the absolute path to a file in the output directory from components of the `bbi_{.model_type}_model` object
-#' @param .mod `bbi_{.model_type}_model` object
+#' @param .mod Model to use, either a `bbi_{.model_type}_model` or `bbi_{.model_type}_summary` object.
 #' @param .extension file extension to append (for example `lst`, `ext`, `grd`, etc.)
 #' @keywords internal
 build_path_from_mod_obj <- function(.mod, .extension) {
@@ -222,9 +222,13 @@ check_grd.character <- function(.mod, .iter_floor = 0) {
 #' @describeIn check_nonmem_table_output Checks .grd file from a `bbi_nonmem_model`
 #' @export
 check_grd.bbi_nonmem_model <- function(.mod, .iter_floor = 0) {
-  grd_path <- build_path_from_mod_obj(.mod, "grd")
-  df <- check_nonmem_table_output(grd_path, .x_var = "ITERATION", .x_floor = .iter_floor)
-  return(df)
+  check_nonmem_table_bbi(.mod, .iter_floor, .extension = "grd")
+}
+
+#' @describeIn check_nonmem_table_output Checks .grd file from a `bbi_nonmem_summary`
+#' @export
+check_grd.bbi_nonmem_summary <- function(.mod, .iter_floor = 0) {
+  check_nonmem_table_bbi(.mod, .iter_floor, .extension = "grd")
 }
 
 #' @describeIn plot_nonmem_table_df Plot the .grd file
@@ -259,9 +263,13 @@ check_ext.character <- function(.mod, .iter_floor = 0) {
 #' @describeIn check_nonmem_table_output Checks .ext file from a `bbi_nonmem_model` object
 #' @export
 check_ext.bbi_nonmem_model <- function(.mod, .iter_floor = 0) {
-  ext_path <- build_path_from_mod_obj(.mod, "ext")
-  df <- check_nonmem_table_output(ext_path, .x_var = "ITERATION", .x_floor = .iter_floor)
-  return(df)
+  check_nonmem_table_bbi(.mod, .iter_floor, .extension = "ext")
+}
+
+#' @describeIn check_nonmem_table_output Checks .ext file from a `bbi_nonmem_summary` object
+#' @export
+check_ext.bbi_nonmem_summary <- function(.mod, .iter_floor = 0) {
+  check_nonmem_table_bbi(.mod, .iter_floor, .extension = "ext")
 }
 
 #' @describeIn plot_nonmem_table_df Plot the .ext file
@@ -270,4 +278,12 @@ plot_ext <- function(.df) {
   plot_nonmem_table_df(.df, .x_var = "ITERATION", .stat_name = "PARAMETER")
 }
 
+
+#' Private helper to pull a NONMEM table from a model
+#' @keywords internal
+check_nonmem_table_bbi <- function(.mod, .iter_floor, .extension) {
+  ext_path <- build_path_from_mod_obj(.mod, .extension)
+  df <- check_nonmem_table_output(ext_path, .x_var = "ITERATION", .x_floor = .iter_floor)
+  return(df)
+}
 

@@ -12,6 +12,9 @@
 #' **NONMEM**
 #'
 #' The returned list for a NONMEM model will contain the following top-level elements:
+#'  * **absolute_model_path** -- Absolute path to the model that generated this summary.
+#'    Note, using this directly is discouraged in favor of using the "getters"
+#'    described in the [`get_path_from_object`] help page.
 #'  * **run_details** -- General details about the run including estimation
 #'    method, numbers of patients and records, significant digits, run time, and
 #'    more.
@@ -92,6 +95,9 @@ model_summary.bbi_nonmem_model <- function(
 #' Private implementation function called by `model_summary()` dispatches.
 #' @param .mod `bbi_nonmem_model` object for summary
 #' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run [print_bbi_args()] to see valid arguments.
+#'
+#' @importFrom purrr list_modify
+#' @importFrom rlang list2
 #' @return List of S3 Class "bbi_nonmem_summary" with all summary information
 #' @keywords internal
 nonmem_summary <- function(
@@ -137,9 +143,15 @@ nonmem_summary <- function(
     }
   )
 
-  res_list <- res$stdout %>%
+  res_list <- list2(
+    !!ABS_MOD_PATH := tools::file_path_sans_ext(get_model_path(.mod))
+  )
+
+  bbi_list <- res$stdout %>%
     paste(collapse="") %>%
     jsonlite::fromJSON(simplifyDataFrame = FALSE)
+
+  res_list <- combine_list_objects(res_list, bbi_list)
 
   res_list <- create_summary_object(res_list)
 

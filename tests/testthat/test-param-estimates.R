@@ -1,8 +1,6 @@
 context("Test param_estimates functions")
 
-if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
-  skip("test-param-estimates only runs on Metworx or Drone")
-}
+skip_if_not_drone_or_metworx("test-param-estimates")
 
 setup({
   cleanup()

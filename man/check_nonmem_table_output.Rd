@@ -5,9 +5,11 @@
 \alias{check_grd}
 \alias{check_grd.character}
 \alias{check_grd.bbi_nonmem_model}
+\alias{check_grd.bbi_nonmem_summary}
 \alias{check_ext}
 \alias{check_ext.character}
 \alias{check_ext.bbi_nonmem_model}
+\alias{check_ext.bbi_nonmem_summary}
 \title{Check NONMEM output files}
 \usage{
 check_nonmem_table_output(.path, .x_var = NULL, .x_floor = NULL)
@@ -18,11 +20,15 @@ check_grd(.mod, .iter_floor = 0)
 
 \method{check_grd}{bbi_nonmem_model}(.mod, .iter_floor = 0)
 
+\method{check_grd}{bbi_nonmem_summary}(.mod, .iter_floor = 0)
+
 check_ext(.mod, .iter_floor = 0)
 
 \method{check_ext}{character}(.mod, .iter_floor = 0)
 
 \method{check_ext}{bbi_nonmem_model}(.mod, .iter_floor = 0)
+
+\method{check_ext}{bbi_nonmem_summary}(.mod, .iter_floor = 0)
 }
 \arguments{
 \item{.path}{Character scalar path to the file}
@@ -44,8 +50,12 @@ Checks a NONMEM output file that's a whitespace-delimited file (for instance .gr
 
 \item \code{check_grd}: Checks .grd file from a \code{bbi_nonmem_model}
 
+\item \code{check_grd}: Checks .grd file from a \code{bbi_nonmem_summary}
+
 \item \code{check_ext}: Checks .ext file from a file path
 
 \item \code{check_ext}: Checks .ext file from a \code{bbi_nonmem_model} object
+
+\item \code{check_ext}: Checks .ext file from a \code{bbi_nonmem_summary} object
 }}
 
