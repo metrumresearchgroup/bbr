@@ -1,0 +1,155 @@
+---
+title: "Testing print.bbi_nonmem_summary"
+output: 
+- pdf_document
+- hmtl_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+devtools::load_all()
+options('rbabylon.bbi_exe_path' = read_bbi_path())
+```
+
+# Basic FOCE
+
+```{r}
+# load a model summary
+.s <- system.file("model", "nonmem", "basic", "1", package = "rbabylon") %>% 
+    read_model() %>% 
+    model_summary()
+```
+
+
+```{r comment=""}
+# using comment = "" to get rid of ##
+.s
+```
+
+
+```{r results = "asis"}
+# asis
+.s
+```
+
+
+# SAEM
+
+```{r}
+#load a model summary
+.s <- system.file("model", "nonmem", "complex", "example2_saemimp", package = "rbabylon") %>%
+    read_model() %>%
+    model_summary()
+```
+
+
+```{r }
+.s
+```
+
+```{r results = "asis"}
+# asis
+.s
+```
+
+```{r results = "asis"}
+# show the fixed parameters too
+print(.s, .fixed = TRUE)
+```
+
+```{r results = "asis"}
+# show the off-diagonals too
+print(.s, .off_diag = TRUE)
+```
+
+```{r results = "asis"}
+# show both the fixed parameters and the off-diagonals
+print(.s, .fixed = TRUE, .off_diag = TRUE)
+```
+
+# Mixture Model
+
+```{r}
+# load a model summary
+.s <- system.file("model", "nonmem", "complex", "iovmm", package = "rbabylon") %>% 
+    read_model() %>% 
+    model_summary()
+```
+
+
+```{r }
+.s
+```
+
+```{r results = "asis"}
+# asis
+.s
+```
+
+
+# Bayes
+
+```{r}
+# load a model summary
+.s <- system.file("model", "nonmem", "complex", "1001", package = "rbabylon") %>%
+    read_model() %>%
+    model_summary(.bbi_args = list(ext_file = "1001.1.TXT"))
+```
+
+
+```{r }
+.s
+```
+
+```{r results = "asis"}
+# asis
+.s
+```
+
+
+
+# IOV
+
+```{r}
+# load a model summary
+.s <- system.file("model", "nonmem", "complex", "acop-iov", package = "rbabylon") %>%
+    read_model() %>%
+    model_summary()
+```
+
+
+```{r }
+.s
+```
+
+```{r results = "asis"}
+# asis
+.s
+```
+
+### show the fixed params too (all the IOV omegas)
+
+```{r}
+print(.s, .fixed = TRUE)
+```
+
+```{r, results="asis"}
+# asis
+print(.s, .fixed = TRUE)
+```
+
+### show the fixed params but limit rows
+
+```{r}
+print(.s, .fixed = TRUE, .nrow = 15)
+```
+
+```{r, results = "asis"}
+# asis
+print(.s, .fixed = TRUE, .nrow = 15)
+```
+
