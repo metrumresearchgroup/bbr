@@ -68,21 +68,36 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
 
   # print top line info
   .d <- x[[SUMMARY_DETAILS]]
-  cat_line(glue("Dataset: {.d$data_set}"))
-  cat_line(glue("Records: {.d$number_of_data_records}\t Observations: {.d$number_of_obs}\t Patients: {.d$number_of_patients}"))
-  cat_line(c("Estimation Method(s):", map_chr(.d$estimation_method, ~glue("  - {.x}"))))
+  cat_line(glue("Dataset: {.d$data_set}\n\n"))
+  cat_line(glue("Records: {.d$number_of_data_records}\t Observations: {.d$number_of_obs}\t Patients: {.d$number_of_patients}\n\n"))
+  cat_line(c("Estimation Method(s):\n", map_chr(.d$estimation_method, ~glue("  - {.x}\n\n"))))
+  cat_line(glue("Objective Function Value (final est. method): {extract_ofv(list(x))}\n\n"))
 
   # check heuristics
   .h <- unlist(x[[SUMMARY_HEURISTICS]])
   if (any(.h)) {
-    h_str <- c("Heuristic Problem(s) Detected:", map_chr(names(which(.h)), ~glue("  - {.x}")))
+    h_str <- c("**Heuristic Problem(s) Detected:**\n", map_chr(names(which(.h)), ~glue("  - {.x}\n\n")))
     cat_line(h_str, col = "red")
   } else {
-    cat_line("No Heuristic Problems Detected")
+    cat_line("No Heuristic Problems Detected\n\n")
   }
 
-  # build parameter table
-  param_df <- param_estimates(x)
+  # build parameter table (catch Bayesian error)
+  param_df <- tryCatch(
+    param_estimates(x),
+    error = function(.e) {
+      .error_msg <- paste(as.character(.e$message), collapse = " -- ")
+      if (grepl(PARAM_BAYES_ERR_MSG, .error_msg, fixed = TRUE)) {
+        cat_line(glue("**{PARAM_BAYES_ERR_MSG}**"), col = "red")
+        return(NULL)
+      } else {
+        stop(.e)
+      }
+    }
+  )
+  if(is.null(param_df)) {
+    return(invisible(NULL))
+  }
 
   if (isFALSE(.fixed)) {
     param_df <- filter(param_df, !fixed)
@@ -98,12 +113,21 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
     param_df <- param_df[1:.nrow, ]
   }
 
-  param_str <- param_df %>%
+  param_df <- param_df %>%
     select(parameter_names, estimate, stderr, shrinkage) %>%
-    mutate_if(is.numeric, sig, .digits = .digits) %>%
-    knitr::kable()
+    mutate_if(is.numeric, sig, .digits = .digits)
 
-  cat_line(c("", param_str))
+  if (requireNamespace("knitr", quietly = TRUE)) {
+    param_str <- param_df %>%
+      knitr::kable() %>%
+      as.character()
+  } else {
+    param_str <- param_df %>%
+      print() %>%
+      capture.output()
+  }
+
+  cat_line(param_str)
   if (!is.null(.nrow)) cat_line(glue("... {orig_rows - .nrow} more rows"), col = "grey")
 }
 
