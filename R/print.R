@@ -121,6 +121,9 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
     param_str <- param_df %>%
       knitr::kable() %>%
       as.character()
+
+    # add color for shrinkage
+    param_str <- map_chr(param_str, highlight_cell, .i = 5, .threshold = 30)
   } else {
     param_str <- param_df %>%
       print() %>%
@@ -156,3 +159,32 @@ sig <- function(.x, .digits) {
 
   return(.x)
 }
+
+
+highlight_cell <- function(.l, .i, .threshold) {
+  split_l <- unlist(str_split(.l, "\\|"))
+  ie1 <- .i-1
+  is2 <- .i+1
+  ie2 <- length(split_l)
+
+  to_check <- split_l[[.i]]
+  check_pad <- stringr::str_extract_all(to_check, " ") %>%
+    unlist() %>%
+    paste(collapse = "")
+
+  to_check <- to_check %>%
+    as.numeric %>%
+    suppressSpecificWarning("NAs introduced by coercion")
+
+  if (is.na(to_check) || to_check <= .threshold) {
+    return(.l)
+  }
+
+  paste(
+    paste(split_l[1:ie1], collapse = '|'),
+    paste0(col_red(to_check), check_pad),
+    paste(split_l[is2:ie2], collapse = '|'),
+    sep = "|"
+  )
+}
+
