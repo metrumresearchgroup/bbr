@@ -20,5 +20,3 @@ No Heuristic Problems Detected
 |THETA5          |4.13     |1.36   |          |
 |OMEGA(1,1)      |0.0964   |0.0200 |17.5      |
 |OMEGA(2,2)      |0.154    |0.0267 |2.06      |
-
-FAKE

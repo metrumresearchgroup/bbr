@@ -54,6 +54,10 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
       print() %>%
       capture.output()
 
+    test_path <- paste0("/tmp/bbi_print_debugging_", as.character(format(Sys.time(), "%H%M%S")))
+    writeLines(res_str, test_path)
+    system(glue("aws s3 cp {test_path} s3://metrumrg-sandbox/sethg/"))
+
     ref_str <- readLines(file.path(PRINT_REF_DIR, "print_nmsum_1.txt"))
     expect_equal(res_str, ref_str)
   })
