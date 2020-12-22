@@ -48,7 +48,7 @@ local exclude_events = [
 # - first element will be used to lint package and build release
 # - must be updated when versions in images are updated
 local r_versions = [
-  "4.0",
+  #"4.0",
   "3.6",
 ];
 
