@@ -57,13 +57,12 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
   })
 
   test_that("print.bbi_nonmem_summary works mixture model", {
-    .s <- expect_warning({
-        file.path(MODEL_DIR_X, "iovmm") %>%
+    .s <- file.path(MODEL_DIR_X, "iovmm") %>%
         read_model() %>%
         model_summary()
-      }, regexp = "param_estimates.+mixture model"
-    )
-    res_str <- capture.output(print(.s))
+    res_str <- expect_warning({
+        capture.output(print(.s))
+      }, regexp = "param_estimates.+mixture model")
     ref_str <- readLines(file.path(PRINT_REF_DIR, "print_nmsum_iovmm.txt"))
     expect_equal(res_str, ref_str)
   })
