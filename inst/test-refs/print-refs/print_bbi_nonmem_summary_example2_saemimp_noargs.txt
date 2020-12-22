@@ -1,0 +1,32 @@
+Dataset: ../example2.csv
+
+Records: 2400	 Observations: 2000	 Patients: 400
+
+Estimation Method(s):
+
+- Stochastic Approximation Expectation-Maximization
+
+- Objective Function Evaluation by Importance Sampling
+
+Objective Function Value (final est. method): -10838.582
+
+No Heuristic Problems Detected
+
+
+|parameter_names |estimate |stderr   |shrinkage |
+|:---------------|:--------|:--------|:---------|
+|THETA1          |3.30     |0.0327   |          |
+|THETA2          |3.25     |0.0287   |          |
+|THETA3          |-0.612   |0.00954  |          |
+|THETA4          |-0.208   |0.00832  |          |
+|THETA5          |0.737    |0.0397   |          |
+|THETA6          |1.14     |0.0359   |          |
+|THETA7          |0.335    |0.0115   |          |
+|THETA8          |0.192    |0.0104   |          |
+|THETA9          |0.692    |0.0108   |          |
+|THETA10         |2.30     |0.00873  |          |
+|THETA11         |0.0992   |0.00277  |          |
+|OMEGA(1,1)      |0.0104   |0.000970 |7.31      |
+|OMEGA(2,2)      |0.00828  |0.00136  |33.7      |
+|OMEGA(3,3)      |0.0131   |0.00324  |40.6      |
+|OMEGA(4,4)      |0.0110   |0.00204  |27.8      |

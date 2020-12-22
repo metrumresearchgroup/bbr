@@ -1,0 +1,34 @@
+Dataset: ../acop_iov.csv
+
+Records: 7566	 Observations: 6396	 Patients: 39
+
+Estimation Method(s):
+
+- First Order Conditional Estimation with Interaction
+
+Objective Function Value (final est. method): 44158.939
+
+**Heuristic Problem(s) Detected:**
+
+- hessian_reset
+
+- eta_pval_significant
+
+|parameter_names |estimate |stderr   |shrinkage |
+|:---------------|:--------|:--------|:---------|
+|THETA1          |1.96     |0.0189   |          |
+|THETA2          |4.08     |0.174    |          |
+|THETA3          |9.03     |0.664    |          |
+|THETA4          |0.134    |0.00206  |          |
+|THETA5          |1.01     |0.0180   |          |
+|OMEGA(1,1)      |0.0629   |0.0170   |4.41      |
+|OMEGA(2,2)      |0.178    |0.0428   |2.83      |
+|OMEGA(3,3)      |0.223    |0.00871  |3.95      |
+|OMEGA(4,4)      |0.223    |1.00e+10 |1.00e-10  |
+|OMEGA(5,5)      |0.223    |1.00e+10 |18.4      |
+|OMEGA(6,6)      |0.223    |1.00e+10 |1.00e-10  |
+|OMEGA(7,7)      |0.223    |1.00e+10 |1.00e-10  |
+|OMEGA(8,8)      |0.223    |1.00e+10 |1.00e-10  |
+|OMEGA(9,9)      |0.223    |1.00e+10 |19.5      |
+|OMEGA(10,10)    |0.223    |1.00e+10 |31.2      |
+... 53 more rows
