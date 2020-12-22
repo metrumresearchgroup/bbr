@@ -48,7 +48,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
   })
 
   test_that("print.bbi_nonmem_summary works basic FOCE model", {
-    res_str <- system.file("model", "nonmem", "basic", "1", package = "rbabylon") %>%
+    res_str <- file.path(MODEL_DIR, 1) %>%
       read_model() %>%
       model_summary() %>%
       print() %>%
@@ -60,7 +60,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
 
   test_that("print.bbi_nonmem_summary works mixture model", {
     res_str <- expect_warning({
-      system.file("model", "nonmem", "complex", "iovmm", package = "rbabylon") %>%
+        file.path(MODEL_DIR_X, "iovmm") %>%
         read_model() %>%
         model_summary() %>%
         print() %>%
@@ -73,7 +73,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
   })
 
   test_that("print.bbi_nonmem_summary works Bayes model", {
-    res_str <- system.file("model", "nonmem", "complex", "1001", package = "rbabylon") %>%
+    res_str <- file.path(MODEL_DIR_X, "1001") %>%
       read_model() %>%
       model_summary(.bbi_args = list(ext_file = "1001.1.TXT")) %>%
       print() %>%
@@ -84,7 +84,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
   })
 
   test_that("print.bbi_nonmem_summary works SAEM-IMP model", {
-    res_str <- system.file("model", "nonmem", "complex", "example2_saemimp", package = "rbabylon") %>%
+    res_str <- file.path(MODEL_DIR_X, "example2_saemimp") %>%
       read_model() %>%
       model_summary() %>%
       print() %>%
@@ -96,7 +96,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
 
   test_that("print.bbi_nonmem_summary works IOV model", {
     # load a model summary
-    res_str <- system.file("model", "nonmem", "complex", "acop-iov", package = "rbabylon") %>%
+    res_str <- file.path(MODEL_DIR_X, "acop-iov") %>%
       read_model() %>%
       model_summary() %>%
       print() %>%
@@ -108,7 +108,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
 
   test_that("print.bbi_nonmem_summary .fixed=TRUE", {
     # check with IOV model
-    res_str <- system.file("model", "nonmem", "complex", "acop-iov", package = "rbabylon") %>%
+    res_str <- file.path(MODEL_DIR_X, "acop-iov") %>%
       read_model() %>%
       model_summary() %>%
       print(.fixed = TRUE) %>%
@@ -118,7 +118,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
     expect_equal(res_str, ref_str)
 
     # check with SAEM-IMP model
-    res_str <- system.file("model", "nonmem", "complex", "example2_saemimp", package = "rbabylon") %>%
+    res_str <- file.path(MODEL_DIR_X, "example2_saemimp") %>%
       read_model() %>%
       model_summary() %>%
       print(.fixed = TRUE) %>%
@@ -130,7 +130,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
 
   test_that("print.bbi_nonmem_summary .nrow argument", {
     # load a model summary
-    res_str <- system.file("model", "nonmem", "complex", "acop-iov", package = "rbabylon") %>%
+    res_str <- file.path(MODEL_DIR_X, "acop-iov") %>%
       read_model() %>%
       model_summary() %>%
       print(.nrow = 15, .fixed = TRUE) %>%
@@ -142,7 +142,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
 
 
   test_that("print.bbi_nonmem_summary .off_diag=TRUE", {
-    .s <- system.file("model", "nonmem", "complex", "example2_saemimp", package = "rbabylon") %>%
+    .s <- file.path(MODEL_DIR_X, "example2_saemimp") %>%
       read_model() %>%
       model_summary()
 
