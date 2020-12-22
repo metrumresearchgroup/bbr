@@ -100,11 +100,11 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
   }
 
   if (isFALSE(.fixed)) {
-    param_df <- filter(param_df, !fixed)
+    param_df <- filter(param_df, !.data$fixed)
   }
 
   if (isFALSE(.off_diag)) {
-    param_df <- filter(param_df, is.na(diag) | diag)
+    param_df <- filter(param_df, is.na(.data$diag) | .data$diag)
   }
 
   if (!is.null(.nrow)) {
@@ -114,7 +114,7 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
   }
 
   param_df <- param_df %>%
-    select(parameter_names, estimate, stderr, shrinkage) %>%
+    select(.data$parameter_names, .data$estimate, .data$stderr, .data$shrinkage) %>%
     mutate_if(is.numeric, sig, .digits = .digits)
 
   if (requireNamespace("knitr", quietly = TRUE)) {
@@ -151,9 +151,9 @@ sig <- function(.x, .digits) {
 
   .x <- .x %>%
     as.numeric() %>%
-    formatC(digits = .digits, format = 'g', flag = '#') %>%
-    gsub("\\.$", "", .) %>%
-    gsub("NA", "", .)
+    formatC(digits = .digits, format = 'g', flag = '#')
+  .x <- gsub("\\.$", "", .x)
+  .x <- gsub("NA", "", .x)
 
   names(.x) <- namez
 
@@ -161,6 +161,18 @@ sig <- function(.x, .digits) {
 }
 
 
+#' Highlight cell in kable table
+#'
+#' Highlights in red numeric cells that are above the specified threshold.
+#'
+#' @param .l character scalar of the line to be formatted (a row of a kable table)
+#' @param .i the index of the column to check
+#' @param .threshold the threshold to check against. If value is greater than
+#'   .threshold then it is formatted as red.
+#'
+#' @return character vector of formatted values
+#'
+#' @keywords internal
 highlight_cell <- function(.l, .i, .threshold) {
   split_l <- unlist(str_split(.l, "\\|"))
   ie1 <- .i-1
