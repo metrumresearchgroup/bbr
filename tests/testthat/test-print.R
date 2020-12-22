@@ -52,7 +52,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
     model_1[[YAML_NOTES]] <- list('a' = 'x',
                                   'b' = 'y')
 
-    res <- paste(capture.output(print(model_1)),
+    res <- paste(capture_messages(print(model_1)),
                  collapse = '\n')
 
     fields <- c('Status',
@@ -67,24 +67,24 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
 
   test_that("print.bbi_nonmem_model run status functions properly", {
 
-    res <- paste(capture.output(print(model_1)),
+    res <- paste(capture_messages(print(model_1)),
                  collapse = '\n')
 
-    expect_true(str_detect(res, "Status: Finished Running"))
+    expect_true(str_detect(res, "Finished Running"))
 
     model1_no_output_dir <- model_1
     model1_no_output_dir[[ABS_MOD_PATH]] <- 'some/fake/path'
 
-    res <- paste(capture.output(print(model1_no_output_dir)),
+    res <- paste(capture_messages(print(model1_no_output_dir)),
                  collapse = '\n')
 
-    expect_true(str_detect(res, "Status: Not Run"))
+    expect_true(str_detect(res, "Not Run"))
 
     mod_no_config <- read_model(file.path(MODEL_DIR_X, "1001"))
-    res <- paste(capture.output(print(mod_no_config)),
+    res <- paste(capture_messages(print(mod_no_config)),
                  collapse = '\n')
 
-    expect_true(str_detect(res, "Status: Incomplete Run"))
+    expect_true(str_detect(res, "Incomplete Run"))
 
   })
 
@@ -102,13 +102,13 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
       structure(model_1[!names(model_1) %in% optional_fields],
                 class = class(model_1))
 
-    res <- paste(capture.output(print(mod_no_optionals)),
+    res <- paste(capture_messages(print(mod_no_optionals)),
                  collapse = '\n')
 
-    expect_false(str_detect(res, 'Notes:'))
-    expect_false(str_detect(res, 'BBI Args:'))
-    expect_false(str_detect(res, 'Tags:'))
-    expect_false(str_detect(res, 'Description:'))
+    expect_false(str_detect(res, 'Notes'))
+    expect_false(str_detect(res, 'BBI Args'))
+    expect_false(str_detect(res, 'Tags'))
+    expect_false(str_detect(res, 'Description'))
 
   })
 
