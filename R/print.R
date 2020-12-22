@@ -50,3 +50,79 @@ print.babylon_process <- function(x, ..., .call_limit = 250) {
 
 }
 
+#' @describeIn print_bbi Prints the information contained in the model object and whether the model has been run
+#' @importFrom crayon bold italic magenta red green blue
+#' @importFrom purrr imap_chr
+print.bbi_nonmem_model <- function(x, ...) {
+  bullet <- function(.x) {
+    bold(magenta(paste("\n*", .x)))
+  }
+
+  sub_bullet <- function(.x) {
+    paste(paste("\n    *", .x),
+          collapse = ' ')
+  }
+
+  is_valid_print <- function(.x) {
+    if (!is.null(.x)) {
+      length(.x) != 0
+    } else {
+      FALSE
+    }
+  }
+
+  status <- red("Not Run")
+  output_dir <- get_output_dir(x, .check_exists = FALSE)
+
+  if (dir.exists(output_dir)) {
+    status <- green("Finished Running")
+    json_file <- file.path(output_dir, "bbi_config.json")
+
+    if (!fs::file_exists(json_file)) {
+      status <- red("Incomplete Run")
+    }
+
+  }
+
+  cat(paste(bullet('Status:'),
+            status))
+
+  cat(paste(bullet("Absolute Model Path:"),
+            sub_bullet(x[[ABS_MOD_PATH]])))
+
+  cat(paste(
+    bullet("YAML & Model Files:"),
+    sub_bullet(get_yaml_path(x, .check_exists = FALSE)),
+    sub_bullet(get_model_path(x, .check_exists = FALSE))
+  ))
+
+  if (is_valid_print(x[[YAML_DESCRIPTION]])) {
+    cat(paste(bullet("Description:"),
+              sub_bullet(x[[YAML_DESCRIPTION]])))
+  }
+
+  if (is_valid_print(x[[YAML_TAGS]])) {
+    cat(paste(bullet("Tags:"),
+              sub_bullet(x[[YAML_TAGS]])))
+  }
+
+  if (is_valid_print(x[[YAML_NOTES]])) {
+    cat(paste(bullet("Notes:"),
+              sub_bullet(imap_chr(
+                x[[YAML_NOTES]],
+                ~ paste0(.y,
+                         ": ",
+                         italic(.x))
+              ))))
+  }
+
+  if (is_valid_print(x[[YAML_BBI_ARGS]])) {
+    cat(paste(bullet("BBI Args:"),
+              sub_bullet(imap_chr(
+                x[[YAML_BBI_ARGS]],
+                ~ paste0(.y,
+                         ": ",
+                         blue(.x))
+              ))))
+  }
+}

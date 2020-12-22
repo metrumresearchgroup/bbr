@@ -3,9 +3,12 @@
 \name{print_bbi}
 \alias{print_bbi}
 \alias{print.babylon_process}
+\alias{print.bbi_nonmem_model}
 \title{Print methods for rbabylon objects}
 \usage{
 \method{print}{babylon_process}(x, ..., .call_limit = 250)
+
+\method{print}{bbi_nonmem_model}(x, ...)
 }
 \arguments{
 \item{x}{Object to format or print.}
@@ -21,5 +24,7 @@ allow users to get a quick view of the contents of the object.
 \section{Functions}{
 \itemize{
 \item \code{print.babylon_process}: Prints the call made to bbi and whether the process is still running or has finished.
+
+\item \code{print.bbi_nonmem_model}: Prints the information contained in the model object and whether the model has been run
 }}
 
