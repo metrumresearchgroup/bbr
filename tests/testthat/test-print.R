@@ -54,7 +54,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
       print() %>%
       capture.output()
 
-    ref_str <- readLines(file.path(PRINT_REF_DIR, "print_bbi_nonmem_summary_1.txt"))
+    ref_str <- readLines(file.path(PRINT_REF_DIR, "print_nmsum_1.txt"))
     expect_equal(res_str, ref_str)
   })
 
@@ -68,7 +68,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
       }, regexp = "param_estimates.+mixture model"
     )
 
-    ref_str <- readLines(file.path(PRINT_REF_DIR, "print_bbi_nonmem_summary_iovmm.txt"))
+    ref_str <- readLines(file.path(PRINT_REF_DIR, "print_nmsum_iovmm.txt"))
     expect_equal(res_str, ref_str)
   })
 
@@ -79,7 +79,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
       print() %>%
       capture.output()
 
-    ref_str <- readLines(file.path(PRINT_REF_DIR, "print_bbi_nonmem_summary_1001.txt"))
+    ref_str <- readLines(file.path(PRINT_REF_DIR, "print_nmsum_1001.txt"))
     expect_equal(res_str, ref_str)
   })
 
@@ -90,7 +90,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
       print() %>%
       capture.output()
 
-    ref_str <- readLines(file.path(PRINT_REF_DIR, "print_bbi_nonmem_summary_example2_saemimp_noargs.txt"))
+    ref_str <- readLines(file.path(PRINT_REF_DIR, "print_nmsum_example2_saemimp_noargs.txt"))
     expect_equal(res_str, ref_str)
   })
 
@@ -102,7 +102,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
       print() %>%
       capture.output()
 
-    ref_str <- readLines(file.path(PRINT_REF_DIR, "print_bbi_nonmem_summary_acop-iov_noargs.txt"))
+    ref_str <- readLines(file.path(PRINT_REF_DIR, "print_nmsum_acop-iov_noargs.txt"))
     expect_equal(res_str, ref_str)
   })
 
@@ -114,7 +114,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
       print(.fixed = TRUE) %>%
       capture.output()
 
-    ref_str <- readLines(file.path(PRINT_REF_DIR, "print_bbi_nonmem_summary_acop-iov_fixedTRUE.txt"))
+    ref_str <- readLines(file.path(PRINT_REF_DIR, "print_nmsum_acop-iov_fixedTRUE.txt"))
     expect_equal(res_str, ref_str)
 
     # check with SAEM-IMP model
@@ -124,7 +124,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
       print(.fixed = TRUE) %>%
       capture.output()
 
-    ref_str <- readLines(file.path(PRINT_REF_DIR, "print_bbi_nonmem_summary_example2_saemimp_fixedTRUE.txt"))
+    ref_str <- readLines(file.path(PRINT_REF_DIR, "print_nmsum_example2_saemimp_fixedTRUE.txt"))
     expect_equal(res_str, ref_str)
   })
 
@@ -136,7 +136,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
       print(.nrow = 15, .fixed = TRUE) %>%
       capture.output()
 
-    ref_str <- readLines(file.path(PRINT_REF_DIR, "print_bbi_nonmem_summary_acop-iov_fixedTRUE_nrow15.txt"))
+    ref_str <- readLines(file.path(PRINT_REF_DIR, "print_nmsum_acop-iov_fixedTRUE_nrow15.txt"))
     expect_equal(res_str, ref_str)
   })
 
@@ -150,14 +150,14 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
     res_str <- .s %>%
       print(.off_diag = TRUE) %>%
       capture.output()
-    ref_str <- readLines(file.path(PRINT_REF_DIR, "print_bbi_nonmem_summary_example2_saemimp_offdiagTRUE.txt"))
+    ref_str <- readLines(file.path(PRINT_REF_DIR, "print_nmsum_example2_saemimp_offdiagTRUE.txt"))
     expect_equal(res_str, ref_str)
 
     # check with .fixed=TRUE
     res_str <- .s %>%
       print(.off_diag = TRUE, .fixed = TRUE) %>%
       capture.output()
-    ref_str <- readLines(file.path(PRINT_REF_DIR, "print_bbi_nonmem_summary_example2_saemimp_fixedTRUE_offdiagTRUE.txt"))
+    ref_str <- readLines(file.path(PRINT_REF_DIR, "print_nmsum_example2_saemimp_fixedTRUE_offdiagTRUE.txt"))
     expect_equal(res_str, ref_str)
   })
 

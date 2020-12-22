@@ -16,7 +16,7 @@ build_print_bbi_nonmem_summary_refs <- function(.s, .args = list(), .suffix = ""
 
   # build output path
   .suffix <- ifelse(.suffix == "", .suffix, paste0("_", .suffix))
-  out_path <- file.path(out_dir, paste0("print_bbi_nonmem_summary_", get_model_id(.s), .suffix, ".txt"))
+  out_path <- file.path(out_dir, paste0("print_nmsum_", get_model_id(.s), .suffix, ".txt"))
   message(glue::glue("Writing test-print.R refs for {get_model_id(.s)} into {out_path}"))
 
   # capture print output and write to file
@@ -30,39 +30,40 @@ build_print_bbi_nonmem_summary_refs <- function(.s, .args = list(), .suffix = ""
 ###################
 
 # To render refs, source this script.
-.proj_root <- rprojroot::find_rstudio_root_file()
+withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
+  .proj_root <- rprojroot::find_rstudio_root_file()
 
-file.path(.proj_root, "inst", "model", "nonmem", "basic", 1) %>%
-  read_model() %>%
-  model_summary() %>%
-  build_print_bbi_nonmem_summary_refs()
+  file.path(.proj_root, "inst", "model", "nonmem", "basic", 1) %>%
+    read_model() %>%
+    model_summary() %>%
+    build_print_bbi_nonmem_summary_refs()
 
-file.path(.proj_root, "inst", "model", "nonmem", "complex", "iovmm") %>%
-  read_model() %>%
-  model_summary() %>%
-  build_print_bbi_nonmem_summary_refs()
+  file.path(.proj_root, "inst", "model", "nonmem", "complex", "iovmm") %>%
+    read_model() %>%
+    model_summary() %>%
+    build_print_bbi_nonmem_summary_refs()
 
-file.path(.proj_root, "inst", "model", "nonmem", "complex", "1001") %>%
-  read_model() %>%
-  model_summary(.bbi_args = list(ext_file = "1001.1.TXT")) %>%
-  build_print_bbi_nonmem_summary_refs()
+  file.path(.proj_root, "inst", "model", "nonmem", "complex", "1001") %>%
+    read_model() %>%
+    model_summary(.bbi_args = list(ext_file = "1001.1.TXT")) %>%
+    build_print_bbi_nonmem_summary_refs()
 
-iov_sum <- file.path(.proj_root, "inst", "model", "nonmem", "complex", "acop-iov") %>%
-  read_model() %>%
-  model_summary()
+  iov_sum <- file.path(.proj_root, "inst", "model", "nonmem", "complex", "acop-iov") %>%
+    read_model() %>%
+    model_summary()
 
-build_print_bbi_nonmem_summary_refs(iov_sum, .suffix = "noargs")
-build_print_bbi_nonmem_summary_refs(iov_sum, .args = list(.fixed = TRUE), .suffix = "fixedTRUE")
-build_print_bbi_nonmem_summary_refs(iov_sum, .args = list(.fixed = TRUE, .nrow = 15), .suffix = "fixedTRUE_nrow15")
+  build_print_bbi_nonmem_summary_refs(iov_sum, .suffix = "noargs")
+  build_print_bbi_nonmem_summary_refs(iov_sum, .args = list(.fixed = TRUE), .suffix = "fixedTRUE")
+  build_print_bbi_nonmem_summary_refs(iov_sum, .args = list(.fixed = TRUE, .nrow = 15), .suffix = "fixedTRUE_nrow15")
 
-# write out args scenarios
-saem_imp_sum <- file.path(.proj_root, "inst", "model", "nonmem", "complex", "example2_saemimp") %>%
-  read_model() %>%
-  model_summary()
+  # write out args scenarios
+  saem_imp_sum <- file.path(.proj_root, "inst", "model", "nonmem", "complex", "example2_saemimp") %>%
+    read_model() %>%
+    model_summary()
 
-build_print_bbi_nonmem_summary_refs(saem_imp_sum, .suffix = "noargs")
-build_print_bbi_nonmem_summary_refs(saem_imp_sum, .args = list(.fixed = TRUE), .suffix = "fixedTRUE")
-build_print_bbi_nonmem_summary_refs(saem_imp_sum, .args = list(.off_diag = TRUE), .suffix = "offdiagTRUE")
-build_print_bbi_nonmem_summary_refs(saem_imp_sum, .args = list(.fixed = TRUE, .off_diag = TRUE), .suffix = "fixedTRUE_offdiagTRUE")
+  build_print_bbi_nonmem_summary_refs(saem_imp_sum, .suffix = "noargs")
+  build_print_bbi_nonmem_summary_refs(saem_imp_sum, .args = list(.fixed = TRUE), .suffix = "fixedTRUE")
+  build_print_bbi_nonmem_summary_refs(saem_imp_sum, .args = list(.off_diag = TRUE), .suffix = "offdiagTRUE")
+  build_print_bbi_nonmem_summary_refs(saem_imp_sum, .args = list(.fixed = TRUE, .off_diag = TRUE), .suffix = "fixedTRUE_offdiagTRUE")
 
-
+})
