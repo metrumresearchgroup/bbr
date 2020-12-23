@@ -1,0 +1,34 @@
+---
+title: "Testing print.bbi_nonmem_model"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+#library(rbabylon)
+devtools::load_all()
+options('rbabylon.bbi_exe_path' = read_bbi_path())
+```
+
+# Basic FOCE
+
+```{r}
+# load a model summary
+.m <- system.file("model", "nonmem", "basic", "1", package = "rbabylon") %>% 
+    read_model() 
+```
+
+```{r}
+.m
+```
+
+
+```{r results = "asis"}
+# asis
+.m
+```
+

@@ -5,7 +5,7 @@ devtools::load_all() # can't call library(rbabylon) from within rbabylon when us
 # FUNCTION DEF
 ###################
 
-#' Helper to re-build references for test-print.R
+#' Helper to re-build references for print.bbi_nonmem_summary tests
 #'
 #' Saves to `inst/test-refs/print-refs/`.
 #' @param .s bbi_nonmem_summary object
@@ -17,11 +17,29 @@ build_print_bbi_nonmem_summary_refs <- function(.s, .args = list(), .suffix = ""
   # build output path
   .suffix <- ifelse(.suffix == "", .suffix, paste0("_", .suffix))
   out_path <- file.path(out_dir, paste0("print_nmsum_", get_model_id(.s), .suffix, ".txt"))
-  message(glue::glue("Writing test-print.R refs for {get_model_id(.s)} into {out_path}"))
+  message(glue::glue("Writing print.bbi_nonmem_summary refs for {get_model_id(.s)} into {out_path}"))
 
   # capture print output and write to file
   .args[["x"]] <- .s
   print_str <- capture.output(do.call("print", .args))
+  writeLines(print_str, out_path)
+}
+
+#' Helper to re-build references for print.bbi_nonmem_model tests
+#'
+#' Saves to `inst/test-refs/print-refs/`.
+#' @param .m bbi_nonmem_model object
+#' @param .suffix optional suffix to put on output file name
+build_print_bbi_nonmem_model_refs <- function(.m, .suffix = "") {
+  out_dir <- system.file("test-refs", "print-refs", package = "rbabylon")
+
+  # build output path
+  .suffix <- ifelse(.suffix == "", .suffix, paste0("_", .suffix))
+  out_path <- file.path(out_dir, paste0("print_nmmod_", get_model_id(.m), .suffix, ".txt"))
+  message(glue::glue("Writing print.bbi_nonmem_model refs for {get_model_id(.m)} into {out_path}"))
+
+  # capture print output and write to file
+  print_str <- capture.output(print(.m))
   writeLines(print_str, out_path)
 }
 
@@ -33,10 +51,17 @@ build_print_bbi_nonmem_summary_refs <- function(.s, .args = list(), .suffix = ""
 withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
   .proj_root <- rprojroot::find_rstudio_root_file()
 
-  file.path(.proj_root, "inst", "model", "nonmem", "basic", 1) %>%
-    read_model() %>%
+  # basic FOCE model
+  .m1 <- file.path(.proj_root, "inst", "model", "nonmem", "basic", 1) %>%
+    read_model()
+
+  build_print_bbi_nonmem_model_refs(.m1)
+
+  .m1 %>%
     model_summary() %>%
     build_print_bbi_nonmem_summary_refs()
+
+  # OTHER MODELS SUMMARY OBJECTS
 
   file.path(.proj_root, "inst", "model", "nonmem", "complex", "iovmm") %>%
     read_model() %>%

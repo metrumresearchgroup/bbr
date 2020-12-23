@@ -209,7 +209,7 @@ highlight_cell <- function(.l, .i, .threshold) {
 }
 
 #' @describeIn print_bbi Prints the information contained in the model object and whether the model has been run
-#' @importFrom cli cli_h1 cli_h2 cat_bullet style_italic col_blue col_green col_red
+#' @importFrom cli cat_rule cat_line cat_bullet style_italic col_blue col_green col_red
 #' @importFrom purrr iwalk walk
 print.bbi_nonmem_model <- function(x, ...) {
   is_valid_print <- function(.x) {
@@ -233,35 +233,34 @@ print.bbi_nonmem_model <- function(x, ...) {
 
   }
 
-  cli_h1('Status')
-  cli_h2(status)
+  cat_rule("Status", col = "blue"); cat("\n")
+  cat_line(paste(status, "\n"))
 
-  cli_h1("Absolute Model Path")
-  cat_bullet(x[[ABS_MOD_PATH]])
+  cat_rule("Absolute Model Path", col = "blue"); cat("\n")
+  cat_bullet(paste(x[[ABS_MOD_PATH]], "\n"))
 
-  cli_h1("YAML & Model Files")
-  cat_bullet(get_yaml_path(x, .check_exists = FALSE))
-  cat_bullet(get_model_path(x, .check_exists = FALSE))
+  cat_rule("YAML & Model Files", col = "blue"); cat("\n")
+  cat_bullet(paste(get_yaml_path(x, .check_exists = FALSE), "\n"))
+  cat_bullet(paste(get_model_path(x, .check_exists = FALSE), "\n"))
 
   if (is_valid_print(x[[YAML_DESCRIPTION]])) {
-    cli_h1('Description')
-    cat_bullet(style_italic(x[[YAML_DESCRIPTION]]))
+    cat_rule("Description", col = "blue"); cat("\n")
+    cat_bullet(paste(style_italic(x[[YAML_DESCRIPTION]]), "\n"))
   }
 
   if (is_valid_print(x[[YAML_TAGS]])) {
-    cli_h1('Tags')
-    walk(x[[YAML_TAGS]], cat_bullet)
+    cat_rule("Tags", col = "blue"); cat("\n")
+    walk(paste(x[[YAML_TAGS]], "\n"), cat_bullet)
   }
 
   if (is_valid_print(x[[YAML_NOTES]])) {
-    cli_h1('Notes')
-    iwalk(x[[YAML_NOTES]],
-          ~cat_bullet(paste0(.y, ": ", style_italic(.x))))
+    cat_rule("Notes", col = "blue"); cat("\n")
+    walk(paste(x[[YAML_NOTES]], "\n"), cat_bullet)
   }
 
   if (is_valid_print(x[[YAML_BBI_ARGS]])) {
-    cli_h1("BBI Args")
+    cat_rule("BBI Args", col = "blue"); cat("\n")
     iwalk(x[[YAML_BBI_ARGS]],
-          ~cat_bullet(paste0(.y, ": ", col_blue(.x))))
+          ~cat_bullet(paste0(.y, ": ", col_blue(.x), "\n")))
   }
 }
