@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.10.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.11.0</span>
       </span>
     </div>
 
@@ -46,7 +46,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -81,7 +81,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/metrumresearchgroup/rbabylon">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fas fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -121,24 +121,24 @@
 <a href="#setup" class="anchor"></a>Setup</h2>
 <p>There is some initial set up necessary for using <code>rbabylon</code>. Please refer to the <a href="https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html#setup">“Getting Started”</a> vignette, mentioned above, if you have not done this yet. Once this is done, load the library.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(rbabylon)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(dplyr))</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(tidyselect))</a></code></pre></div>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(dplyr)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(tidyselect)</a></code></pre></div>
 </div>
 </div>
 <div id="whats-in-a-model-summary" class="section level1">
 <h1 class="hasAnchor">
 <a href="#whats-in-a-model-summary" class="anchor"></a>What’s in a Model Summary?</h1>
 <p>As mentioned above, the <code>bbi_summary_log_df</code> tibble contains a lot of information, which is a subset of what is contained in the <code>bbi_nonmem_summary</code> object returned from <code><a href="../reference/model_summary.html">model_summary()</a></code>.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">MODEL_DIR &lt;-<span class="st"> "../tests/testthat/model-examples-complex"</span></a>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">MODEL_DIR &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"model"</span>, <span class="st">"nonmem"</span>, <span class="st">"complex"</span>, <span class="dt">package =</span> <span class="st">"rbabylon"</span>)</a>
 <a class="sourceLine" id="cb2-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb2-3" data-line-number="3">sum1 &lt;-<span class="st"> </span></a>
 <a class="sourceLine" id="cb2-4" data-line-number="4"><span class="st">  </span><span class="kw"><a href="../reference/read_model.html">read_model</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(MODEL_DIR, <span class="st">"iovmm"</span>)) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb2-5" data-line-number="5"><span class="st">  </span><span class="kw"><a href="../reference/model_summary.html">model_summary</a></span>()</a>
 <a class="sourceLine" id="cb2-6" data-line-number="6"></a>
 <a class="sourceLine" id="cb2-7" data-line-number="7"><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(sum1)</a>
-<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="co">#&gt; [1] "run_details"       "run_heuristics"    "parameters_data"  </span></a>
-<a class="sourceLine" id="cb2-9" data-line-number="9"><span class="co">#&gt; [4] "parameter_names"   "ofv"               "condition_number" </span></a>
-<a class="sourceLine" id="cb2-10" data-line-number="10"><span class="co">#&gt; [7] "shrinkage_details"</span></a></code></pre></div>
+<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="co">#&gt; [1] "absolute_model_path" "run_details"         "run_heuristics"     </span></a>
+<a class="sourceLine" id="cb2-9" data-line-number="9"><span class="co">#&gt; [4] "parameters_data"     "parameter_names"     "ofv"                </span></a>
+<a class="sourceLine" id="cb2-10" data-line-number="10"><span class="co">#&gt; [7] "condition_number"    "shrinkage_details"</span></a></code></pre></div>
 <p>For example, the <code>run_details</code> section alone contains wealth of information about this model run:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/utils/str.html">str</a></span>(sum1<span class="op">$</span>run_details)</a>
 <a class="sourceLine" id="cb3-2" data-line-number="2"><span class="co">#&gt; List of 16</span></a>
@@ -196,37 +196,40 @@
 <a href="#run-details-columns" class="anchor"></a>Run Details Columns</h2>
 <p>The next batch of columns contain the core diagnostics and model outputs. As mentioned above, descriptions of what each column contains can be found in the <a href="https://metrumresearchgroup.github.io/rbabylon/reference/summary_log.html"><code><a href="../reference/summary_log.html">summary_log()</a></code> docs</a>.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">sum_df <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(</a>
-<a class="sourceLine" id="cb5-3" data-line-number="3">    run,</a>
-<a class="sourceLine" id="cb5-4" data-line-number="4">    ofv, </a>
-<a class="sourceLine" id="cb5-5" data-line-number="5">    param_count, </a>
-<a class="sourceLine" id="cb5-6" data-line-number="6">    estimation_method, </a>
-<a class="sourceLine" id="cb5-7" data-line-number="7">    problem_text, </a>
-<a class="sourceLine" id="cb5-8" data-line-number="8">    number_of_patients, </a>
-<a class="sourceLine" id="cb5-9" data-line-number="9">    number_of_obs, </a>
-<a class="sourceLine" id="cb5-10" data-line-number="10">    condition_number</a>
-<a class="sourceLine" id="cb5-11" data-line-number="11">  )</a>
-<a class="sourceLine" id="cb5-12" data-line-number="12"><span class="co">#&gt; # A tibble: 3 x 8</span></a>
-<a class="sourceLine" id="cb5-13" data-line-number="13"><span class="co">#&gt;   run       ofv param_count estimation_meth… problem_text number_of_patie…</span></a>
-<a class="sourceLine" id="cb5-14" data-line-number="14"><span class="co">#&gt;   &lt;chr&gt;   &lt;dbl&gt;       &lt;int&gt; &lt;list&gt;           &lt;chr&gt;                   &lt;int&gt;</span></a>
-<a class="sourceLine" id="cb5-15" data-line-number="15"><span class="co">#&gt; 1 1001    3843.          15 &lt;chr [1]&gt;        Run# 1001.1               240</span></a>
-<a class="sourceLine" id="cb5-16" data-line-number="16"><span class="co">#&gt; 2 exam… -10839.          21 &lt;chr [2]&gt;        RUN# exampl…              400</span></a>
-<a class="sourceLine" id="cb5-17" data-line-number="17"><span class="co">#&gt; 3 iovmm  14722.          11 &lt;chr [1]&gt;        LEM 10 mixt…              300</span></a>
-<a class="sourceLine" id="cb5-18" data-line-number="18"><span class="co">#&gt; # … with 2 more variables: number_of_obs &lt;int&gt;, condition_number &lt;dbl&gt;</span></a></code></pre></div>
+<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="../reference/collapse_to_string.html">collapse_to_string</a></span>(estimation_method) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(</a>
+<a class="sourceLine" id="cb5-4" data-line-number="4">    run,</a>
+<a class="sourceLine" id="cb5-5" data-line-number="5">    ofv, </a>
+<a class="sourceLine" id="cb5-6" data-line-number="6">    param_count, </a>
+<a class="sourceLine" id="cb5-7" data-line-number="7">    estimation_method, </a>
+<a class="sourceLine" id="cb5-8" data-line-number="8">    problem_text, </a>
+<a class="sourceLine" id="cb5-9" data-line-number="9">    number_of_patients, </a>
+<a class="sourceLine" id="cb5-10" data-line-number="10">    number_of_obs, </a>
+<a class="sourceLine" id="cb5-11" data-line-number="11">    condition_number</a>
+<a class="sourceLine" id="cb5-12" data-line-number="12">  )</a>
+<a class="sourceLine" id="cb5-13" data-line-number="13"><span class="co">#&gt; # A tibble: 4 x 8</span></a>
+<a class="sourceLine" id="cb5-14" data-line-number="14"><span class="co">#&gt;   run       ofv param_count estimation_meth… problem_text number_of_patie…</span></a>
+<a class="sourceLine" id="cb5-15" data-line-number="15"><span class="co">#&gt;   &lt;chr&gt;   &lt;dbl&gt;       &lt;int&gt; &lt;chr&gt;            &lt;chr&gt;                   &lt;int&gt;</span></a>
+<a class="sourceLine" id="cb5-16" data-line-number="16"><span class="co">#&gt; 1 1001    3843.          15 MCMC Bayesian A… Run# 1001.1               240</span></a>
+<a class="sourceLine" id="cb5-17" data-line-number="17"><span class="co">#&gt; 2 acop…  44159.           9 First Order Con… LEM PK mode…               39</span></a>
+<a class="sourceLine" id="cb5-18" data-line-number="18"><span class="co">#&gt; 3 exam… -10839.          21 Stochastic Appr… RUN# exampl…              400</span></a>
+<a class="sourceLine" id="cb5-19" data-line-number="19"><span class="co">#&gt; 4 iovmm  14722.          11 First Order Con… LEM 10 mixt…              300</span></a>
+<a class="sourceLine" id="cb5-20" data-line-number="20"><span class="co">#&gt; # … with 2 more variables: number_of_obs &lt;int&gt;, condition_number &lt;dbl&gt;</span></a></code></pre></div>
 </div>
 <div id="run-heuristics-columns" class="section level2">
 <h2 class="hasAnchor">
 <a href="#run-heuristics-columns" class="anchor"></a>Run Heuristics Columns</h2>
 <p>The <code>run_heuristics</code> element of the <code>bbi_nonmem_summary</code> object contains a number of logical values indicating whether particular heuristic issues were found in the model. Note that these are not necessarily <em>errors</em> with the model run, but are closer to warning flags that should possibly be investigated. Each heuristic is described in more detail in the <a href="https://metrumresearchgroup.github.io/rbabylon/reference/summary_log.html"><code><a href="../reference/summary_log.html">summary_log()</a></code> docs</a>.</p>
 <p>Note that <strong>all heuristics will be <code>FALSE</code> by default (and <em>never</em> <code>NA</code>) and will only be <code>TRUE</code> if they are explicitly triggered.</strong> For example, <code>large_condition_number</code> will be <code>FALSE</code> even in the case when a condition number was not calculated at all.</p>
-<p>All of the heuristic flags are pivoted out to their own columns in the <code>bbi_summary_log_df</code> tibble. It’s useful to note that, except for <code>needed_fail_flags</code> (discussed above), these are the <em>only logical columns</em> in the tibble and can therefore be easily selected with <code>tidyselect::where(is.logical)</code>. <em>(Note: <code>where()</code> only became available in <code>tidyselect (&gt;= 1.1.0)</code>, released May 2020.)</em></p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">sum_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(run, <span class="kw">where</span>(is.logical), <span class="op">-</span>needed_fail_flags)</a></code></pre></div>
-<pre><code>#&gt; # A tibble: 3 x 12
+<p>All of the heuristic flags are pivoted out to their own columns in the <code>bbi_summary_log_df</code> tibble. It’s useful to note that, except for <code>needed_fail_flags</code> (discussed above), these are the <em>only logical columns</em> in the tibble and can therefore be easily selected with <code><a href="https://tidyselect.r-lib.org/reference/where.html">tidyselect::where(is.logical)</a></code>. <em>(Note: <code><a href="https://tidyselect.r-lib.org/reference/where.html">where()</a></code> only became available in <code>tidyselect (&gt;= 1.1.0)</code>, released May 2020.)</em></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">sum_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(run, <span class="kw"><a href="https://tidyselect.r-lib.org/reference/where.html">where</a></span>(is.logical), <span class="op">-</span>needed_fail_flags)</a></code></pre></div>
+<pre><code>#&gt; # A tibble: 4 x 12
 #&gt;   run   needed_fail_fla… any_heuristics covariance_step… large_condition…
 #&gt;   &lt;chr&gt; &lt;lgl&gt;            &lt;lgl&gt;          &lt;lgl&gt;            &lt;lgl&gt;           
 #&gt; 1 1001  TRUE             TRUE           FALSE            TRUE            
-#&gt; 2 exam… FALSE            FALSE          FALSE            FALSE           
-#&gt; 3 iovmm FALSE            TRUE           FALSE            FALSE           
+#&gt; 2 acop… FALSE            TRUE           FALSE            FALSE           
+#&gt; 3 exam… FALSE            FALSE          FALSE            FALSE           
+#&gt; 4 iovmm FALSE            TRUE           FALSE            FALSE           
 #&gt; # … with 7 more variables: correlations_not_ok &lt;lgl&gt;,
 #&gt; #   parameter_near_boundary &lt;lgl&gt;, hessian_reset &lt;lgl&gt;,
 #&gt; #   has_final_zero_gradient &lt;lgl&gt;, minimization_terminated &lt;lgl&gt;,
@@ -249,8 +252,8 @@
 <a class="sourceLine" id="cb8-9" data-line-number="9"><span class="co">#&gt; # A tibble: 2 x 5</span></a>
 <a class="sourceLine" id="cb8-10" data-line-number="10"><span class="co">#&gt;   run              tags       ofv param_count any_heuristics</span></a>
 <a class="sourceLine" id="cb8-11" data-line-number="11"><span class="co">#&gt;   &lt;chr&gt;            &lt;list&gt;   &lt;dbl&gt;       &lt;int&gt; &lt;lgl&gt;         </span></a>
-<a class="sourceLine" id="cb8-12" data-line-number="12"><span class="co">#&gt; 1 example2_saemimp &lt;NULL&gt; -10839.          21 FALSE         </span></a>
-<a class="sourceLine" id="cb8-13" data-line-number="13"><span class="co">#&gt; 2 iovmm            &lt;NULL&gt;  14722.          11 TRUE</span></a></code></pre></div>
+<a class="sourceLine" id="cb8-12" data-line-number="12"><span class="co">#&gt; 1 acop-iov         &lt;NULL&gt;  44159.           9 TRUE          </span></a>
+<a class="sourceLine" id="cb8-13" data-line-number="13"><span class="co">#&gt; 2 example2_saemimp &lt;NULL&gt; -10839.          21 FALSE</span></a></code></pre></div>
 </div>
   </div>
 

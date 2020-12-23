@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Check if diagonal index or not — is_diag • rbabylon</title>
+<title>Private helper to pull a NONMEM table from a model — check_nonmem_table_bbi • rbabylon</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -42,8 +42,8 @@
 
 
 
-<meta property="og:title" content="Check if diagonal index or not — is_diag" />
-<meta property="og:description" content="Private helper to unpack a matrix index string like '(3,3)' is for a diagonal (i.e. if the numbers are the same)" />
+<meta property="og:title" content="Private helper to pull a NONMEM table from a model — check_nonmem_table_bbi" />
+<meta property="og:description" content="Private helper to pull a NONMEM table from a model" />
 <meta property="og:image" content="https://metrumresearchgroup.github.io/rbabylon/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -137,32 +137,23 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Check if diagonal index or not</h1>
+    <h1>Private helper to pull a NONMEM table from a model</h1>
     
-    <div class="hidden name"><code>is_diag.Rd</code></div>
+    <div class="hidden name"><code>check_nonmem_table_bbi.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Private helper to unpack a matrix index string like '(3,3)' is for a diagonal (i.e. if the numbers are the same)</p>
+    <p>Private helper to pull a NONMEM table from a model</p>
     </div>
 
-    <pre class="usage"><span class='fu'>is_diag</span>(<span class='no'>.name</span>)</pre>
+    <pre class="usage"><span class='fu'>check_nonmem_table_bbi</span>(<span class='no'>.mod</span>, <span class='no'>.iter_floor</span>, <span class='no'>.extension</span>)</pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>.name</th>
-      <td><p>A character scalar containing an index string</p></td>
-    </tr>
-    </table>
 
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
     </ul>
 
   </div>

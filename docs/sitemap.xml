@@ -73,6 +73,9 @@
     <loc>https://metrumresearchgroup.github.io/rbabylon/reference/check_model_object_list.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/rbabylon/reference/check_nonmem_table_bbi.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/rbabylon/reference/check_nonmem_table_output.html</loc>
   </url>
   <url>
@@ -148,6 +151,9 @@
     <loc>https://metrumresearchgroup.github.io/rbabylon/reference/get_path_from_object.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/rbabylon/reference/highlight_cell.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/rbabylon/reference/install_menu.html</loc>
   </url>
   <url>
@@ -220,6 +226,9 @@
     <loc>https://metrumresearchgroup.github.io/rbabylon/reference/plot_nonmem_table_df.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/rbabylon/reference/print_bbi.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/rbabylon/reference/print_bbi_args.html</loc>
   </url>
   <url>
@@ -248,6 +257,12 @@
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/rbabylon/reference/save_model_yaml.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/rbabylon/reference/sig.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/rbabylon/reference/skip_if_not_drone_or_metworx.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/rbabylon/reference/skip_if_over_rate_limit.html</loc>
