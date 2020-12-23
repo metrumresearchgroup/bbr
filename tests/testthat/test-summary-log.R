@@ -1,8 +1,6 @@
 context("Test creating summary logs")
 
-if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
-  skip("test-summary only runs on Metworx or Drone")
-}
+skip_if_not_drone_or_metworx("test-summary-log")
 
 # references
 OFV_REF <- 2636.846
@@ -38,7 +36,7 @@ teardown({
 
 
 test_that("summary_log() returns NULL and warns when no YAML found", {
-  log_df <- expect_warning(summary_log("data"), regexp = "Found no valid model YAML files in data")
+  log_df <- expect_warning(summary_log(file.path(REF_DIR, "read-output-refs")), regexp = "Found no valid model YAML files in")
   expect_true(inherits(log_df, "tbl"))
   expect_equal(nrow(log_df), 0)
   expect_equal(ncol(log_df), 0)
@@ -93,13 +91,13 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
     sum_df2 <- summary_log(MODEL_DIR_X, .fail_flags = list(ext_file = "1001.1.TXT"))
 
     # check fail flag parsed
-    expect_equal(sum_df2[[SL_FAIL_FLAGS]], c(TRUE, FALSE, FALSE))
+    expect_equal(sum_df2[[SL_FAIL_FLAGS]], c(TRUE, FALSE, FALSE, FALSE))
 
     # check multiple estimation methods
     num_est_methods <- map_int(sum_df2[["estimation_method"]], length)
-    expect_equal(num_est_methods, c(1, 2, 1))
-    expect_equal(sum_df2[[OFV_COL]], c(3842.571, -10838.582, 14722.149), tolerance = 0.01)
-    expect_equal(sum_df2[[SUMMARY_COND_NUM]], c(4352.941, NA_real_, NA_real_), tolerance = 0.01)
+    expect_equal(num_est_methods, c(1, 1, 2, 1))
+    expect_equal(sum_df2[[OFV_COL]], c(3842.571, 44158.939, -10838.582, 14722.149), tolerance = 0.01)
+    expect_equal(sum_df2[[SUMMARY_COND_NUM]], c(4352.941, NA_real_, NA_real_, NA_real_), tolerance = 0.01)
   })
 
   # THESE TESTS NEEDS TO BE LAST BECAUSE IT DELETES NECESSARY FILES
@@ -120,7 +118,20 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
       sum_df <- summary_log(LEVEL2_DIR)
     }, regexp = "ALL 1 MODEL SUMMARIES FAILED")
 
-    expect_equal(names(sum_df), c(ABS_MOD_PATH, "error_msg"))
+    expect_equal(nrow(sum_df), 1)
+    expect_equal(names(sum_df), c(ABS_MOD_PATH, RUN_ID_COL, "error_msg"))
+    expect_true(all(grepl("--no-grd-file", sum_df$error_msg)))
+
+  })
+
+  test_that("add_summary works all failed summaries", {
+
+    expect_warning({
+      sum_df <- run_log(LEVEL2_DIR) %>% add_summary()
+    }, regexp = "ALL 1 MODEL SUMMARIES FAILED")
+
+    expect_equal(nrow(sum_df), 1)
+    expect_true(all(c(ABS_MOD_PATH, RUN_ID_COL, YAML_TAGS, "error_msg") %in% names(sum_df)))
     expect_true(all(grepl("--no-grd-file", sum_df$error_msg)))
 
   })

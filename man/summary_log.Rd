@@ -19,7 +19,8 @@ add_summary(.log_df, ...)
 \item{.log_df}{a \code{bbi_run_log_df} tibble (the output of \code{\link[=run_log]{run_log()}})}
 }
 \value{
-An object of class \code{bbi_summary_log_df}, which includes the fields described below.
+An object of class \code{bbi_summary_log_df}, which includes the fields described below. If \emph{all} model summaries
+fail, the returned tibble will only contain the \code{absolute_model_path}, \code{run}, and \code{error_msg} columns.
 
 \code{summary_log()} creates a new tibble with one row per model
 found in \code{.base_dir} (and subdirectories, if \code{.recurse = TRUE}).

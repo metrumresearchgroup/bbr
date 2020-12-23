@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.10.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.11.0</span>
       </span>
     </div>
 
@@ -48,7 +48,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -83,7 +83,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/metrumresearchgroup/rbabylon">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fas fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -132,6 +132,17 @@
 <a href="https://metrumresearchgroup.github.io/rbabylon/articles/using-summary-log.html">Creating a Model Summary Log</a> – How to use <code><a href="reference/summary_log.html">summary_log()</a></code> to extract model diagnostics like the objective function value, condition number, and parameter counts.</li>
 </ul>
 </div>
+</div>
+<div id="development" class="section level2">
+<h2 class="hasAnchor">
+<a href="#development" class="anchor"></a>Development</h2>
+<p><code>rbabylon</code> uses <a href="https://github.com/metrumresearchgroup/pkgr">pkgr</a> to manage development dependencies and <a href="https://rstudio.github.io/renv/">renv</a> to provide isolation. To replicate this environment,</p>
+<ol>
+<li><p>clone the repo</p></li>
+<li><p>install pkgr</p></li>
+<li><p>run <code>pkgr install</code></p></li>
+</ol>
+<p>Then, launch R with the repo as the working directory (open the project in RStudio). renv will activate and find the project library.</p>
 </div>
 </div>
   </div>

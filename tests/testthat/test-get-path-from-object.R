@@ -20,10 +20,29 @@ test_that("get_yaml_path() builds the right path", {
   expect_identical(get_yaml_path(MOD1), normalizePath(YAML_TEST_FILE))
 })
 
+test_that("get_model_path() builds the right path from summary object", {
+  skip_if_not_drone_or_metworx("get_model_path.bbi_nonmem_summary")
+  expect_identical(get_model_path(SUM1), normalizePath(CTL_TEST_FILE))
+})
 
-# TODO: consider adding a test for logs with more than one model
+test_that("get_output_dir() builds the right path from summary object", {
+  skip_if_not_drone_or_metworx("get_output_dir.bbi_nonmem_summary")
+  expect_identical(get_output_dir(SUM1), normalizePath(OUTPUT_DIR))
+})
+
+test_that("get_yaml_path() builds the right path from summary object", {
+  skip_if_not_drone_or_metworx("get_yaml_path.bbi_nonmem_summary")
+  expect_identical(get_yaml_path(SUM1), normalizePath(YAML_TEST_FILE))
+})
+
 test_that("get_model_path() works with bbi_*_log_df", {
-  expect_identical(get_model_path(run_log(MODEL_DIR)), normalizePath(CTL_TEST_FILE))
+  create_all_models()
+  on.exit(cleanup())
+
+  ref_mod_paths <- as.character(fs::path_ext_set(c(MOD1_ABS_PATH, MOD2_ABS_PATH, MOD3_ABS_PATH, MOD4_ABS_PATH), ".ctl"))
+  res_mod_paths <- get_model_path(run_log(MODEL_DIR))
+
+  expect_identical(ref_mod_paths, res_mod_paths)
 })
 
 test_that("get_output_dir() works with bbi_*_log_df", {
@@ -48,7 +67,7 @@ test_that("get_model_path() errors with both .ctl and .mod paths", {
 })
 
 test_that("get_model_path() works no paths found", {
-  temp_mod_path <- create_temp_model()
+  temp_mod_path <- create_temp_model(delete_mod = FALSE)
   mod <- read_model(temp_mod_path)
   # save path to model file and then delete the file
   former_ctl_path <- get_model_path(mod)
@@ -79,6 +98,11 @@ for (.tc in .test_cases) {
 
 test_that(glue::glue("get_model_id parses model object"), {
   expect_identical(get_model_id(MOD1), MOD_ID)
+})
+
+test_that(glue::glue("get_model_id parses summary object"), {
+  skip_if_not_drone_or_metworx("get_model_id.bbi_nonmem_summary")
+  expect_identical(get_model_id(SUM1), MOD_ID)
 })
 
 test_that("is_valid_nonmem_extension() works", {
@@ -125,22 +149,3 @@ for (.tc in .test_cases) {
     expect_identical(yaml_ext(.tc), YAML_TEST_FILE)
   })
 }
-
-test_that("combine_directory_path() builds the expected path .directory", {
-  res_path <- combine_directory_path(MODEL_DIR, ctl_ext(MOD_ID))
-  expect_identical(res_path, ABS_CTL_PATH)
-})
-
-test_that("combine_directory_path() builds the expected path with NULL .directory", {
-  res_path <- combine_directory_path(.directory = NULL, CTL_TEST_FILE)
-  expect_identical(res_path, ABS_CTL_PATH)
-})
-
-test_that("combine_directory_path() builds fake .path in real .directory", {
-  res_path <- combine_directory_path(MODEL_DIR, CTL_TEST_FILE)
-  expect_identical(res_path, FAKE_CTL_PATH)
-})
-
-test_that("combine_directory_path() errors with fake .directory", {
-  expect_error(combine_directory_path("aaa", CTL_TEST_FILE), regexp = "No such file or directory")
-})

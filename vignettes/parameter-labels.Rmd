@@ -25,13 +25,20 @@ If you are new to `rbabylon`, the ["Getting Started with rbabylon"](https://metr
 
 There is some initial set up necessary for using `rbabylon`. Please refer to the ["Getting Started"](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html#setup) vignette, mentioned above, if you have not done this yet. Once this is done, load the library.
 
-```{r load packages}
+```{r setup, include=FALSE}
+# NOTE: if running chunks interactively we need to load the package first
+#   because renv isolation prevents us from finding an rbabylon installation
+if (interactive()) {
+  devtools::load_all()
+}
+```
+```{r load packages, results = 'hide', message=FALSE, warning=FALSE}
 library(rbabylon)
-suppressPackageStartupMessages(library(dplyr))
-suppressPackageStartupMessages(library(readr))
+library(dplyr)
+library(readr)
 ```
 
-```{r setup, include = FALSE}
+```{r load data and configure bbi, include = FALSE}
 source("../tests/testthat/setup-param-labels-ref.R")
 REF_OMEGA <- PARAM_BLOCK_REF$PEX_BLOCK32S$ctl
 
@@ -48,7 +55,7 @@ if (Sys.which("bbi") == "") {
 We have a control stream and output directory, because the model has already been run.
 
 ```{r first model}
-MODEL_DIR <- system.file("param_examples", package = "rbabylon")
+MODEL_DIR <- system.file("test-refs", "param-labels", "example-model", package = "rbabylon")
 
 mod1 <- read_model(file.path(MODEL_DIR, "510"))
 class(mod1)

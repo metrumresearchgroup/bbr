@@ -135,6 +135,7 @@ SUMMARY_SHRINKAGE_SIGMA <- "eps_sd"
 
 # keys required for a summary object to have
 SUMMARY_REQ_KEYS <- c(
+  ABS_MOD_PATH,
   SUMMARY_DETAILS,
   SUMMARY_HEURISTICS
 )
@@ -215,3 +216,4 @@ PROCESS_REQ_KEYS <- c(
 NO_NONMEM_ERR_MSG <- "No version was supplied and no default value exists in the configset"
 MOD_ALREADY_EXISTS_ERR_MSG <- "already exist, but we are configured not to overwrite"
 NO_STAN_ERR_MSG <- "stan support not yet implemented."
+PARAM_BAYES_ERR_MSG <- "param_estimates() is not currently implemented for Bayesian methods."

@@ -79,7 +79,7 @@ run." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.10.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.11.0</span>
       </span>
     </div>
 
@@ -87,7 +87,7 @@ run." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -122,7 +122,7 @@ run." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/metrumresearchgroup/rbabylon">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fas fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -173,7 +173,9 @@ run.</p>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An object of class <code>bbi_config_log_df</code>, which includes the fields described below.</p>
+    <p>An object of class <code>bbi_config_log_df</code>, which includes the fields described below.
+If <em>no</em> <code>bbi_config.json</code> files are found, the returned tibble will only contain the
+<code>absolute_model_path</code> and <code>run</code> columns, and will have 0 rows.</p>
 <p><code>config_log()</code> creates a new tibble with one row per <code>bbi_config.json</code>
 found in <code>.base_dir</code> (and subdirectories, if <code>.recurse = TRUE</code>).</p>
 <p><code>add_config()</code> adds these fields to the tibble passed to <code>.log_df</code>.</p>

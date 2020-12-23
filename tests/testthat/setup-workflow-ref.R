@@ -13,14 +13,24 @@
 # - maybe others...
 
 # define constants
+REF_DIR <- system.file("test-refs",   package = "rbabylon")
+ABS_MODEL_DIR <- system.file("model", "nonmem", "basic",   package = "rbabylon")
+
 MOD_ID <- "1"
-MODEL_DIR <- "model-examples"
-MODEL_DIR_X <- "model-examples-complex"
+MODEL_DIR <-   fs::path_rel(ABS_MODEL_DIR, getwd()) %>% as.character()
 MOD1_PATH <- file.path(MODEL_DIR, MOD_ID)
-MOD1 <- MOD1_PATH %>% read_model()
+MOD1 <- read_model(MOD1_PATH)
+# if we're on Metworx or Drone, run the summary
+if (!Sys.getenv("METWORX_VERSION") == "" || Sys.getenv("DRONE") == "true") {
+  withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
+    SUM1 <- model_summary(MOD1)
+  })
+}
 
 NEW_MOD2 <- file.path(MODEL_DIR, "2")
 NEW_MOD3 <- file.path(MODEL_DIR, "3")
+
+MODEL_DIR_X <- fs::path_rel(system.file("model", "nonmem", "complex",   package = "rbabylon"), getwd()) %>% as.character()
 
 # file names and file paths
 OUTPUT_DIR <-     MOD1_PATH
@@ -50,34 +60,36 @@ EXTRA_NOTE <- "Oh wait I do like it"
 NEW_TEXT1 <- c("naw", "paw")
 NEW_TEXT2 <- c("all", "done")
 
-SUMMARY_REF_FILE <- "data/acop_summary_obj_ref_200910.rds"
-PARAM_REF_FILE <- "data/acop_param_table_ref_200914.rds"
+SUMMARY_REF_FILE <- file.path(REF_DIR, "1_summary_obj.R")
+PARAM_REF_FILE <-   file.path(REF_DIR, "1_param_table.R")
 
 SUM_CLASS_LIST <- c(SUM_CLASS, "list")
 MOD_CLASS_LIST <- c(NM_MOD_CLASS, "list")
 PROC_CLASS_LIST <- c(PROC_CLASS, "list")
 
+PROC_HELP_STR <- c("Running:", as.character(glue("  {read_bbi_path()} --help")), as.character(glue("In {getwd()}")))
+
 SUMS_LIST_NAMES_REF <- c("absolute_model_path", "bbi_summary", "error_msg", "needed_fail_flags")
 
-SUM_NAMES_REF <- c("run_details", "run_heuristics", "parameters_data", "parameter_names",
-                   "ofv", "condition_number", "shrinkage_details")
+SUM_NAMES_REF <- c("absolute_model_path", "run_details", "run_heuristics", "parameters_data",
+                   "parameter_names", "ofv", "condition_number", "shrinkage_details")
 
 NOT_FINISHED_ERR_MSG <- "nonmem_summary.*modeling run has not finished"
 NO_LST_ERR_MSG <- "Unable to locate `.lst` file.*NONMEM output folder"
 
-MOD1_ABS_PATH <- file.path(getwd(), tools::file_path_sans_ext(YAML_TEST_FILE))
-MOD2_ABS_PATH <- file.path(getwd(), NEW_MOD2)
-MOD3_ABS_PATH <- file.path(getwd(), NEW_MOD3)
-MOD4_ABS_PATH <- file.path(getwd(), LEVEL2_MOD)
+MOD1_ABS_PATH <- fs::path_norm(file.path(getwd(), tools::file_path_sans_ext(YAML_TEST_FILE))) %>% as.character()
+MOD2_ABS_PATH <- fs::path_norm(file.path(getwd(), NEW_MOD2)) %>% as.character()
+MOD3_ABS_PATH <- fs::path_norm(file.path(getwd(), NEW_MOD3)) %>% as.character()
+MOD4_ABS_PATH <- fs::path_norm(file.path(getwd(), LEVEL2_MOD)) %>% as.character()
 
 RUN_LOG_ROWS <- 3L
 RUN_LOG_COLS <- 10L
 CONFIG_COLS <- 9L
 SUM_LOG_COLS <- 22L
 
-CONFIG_DATA_PATH <- "../../data/acop.csv"
+CONFIG_DATA_PATH <- "../../../../extdata/acop.csv"
 CONFIG_DATA_MD5 <- "4ddb44da897c26681d892aa7be99f74b"
-CONFIG_MODEL_MD5 <- "6b930119c4224ba077091b47959b0604"
+CONFIG_MODEL_MD5 <- "9092189126b23a80bf91a67d1dd8973c"
 
 # yaml md5 hashes
 MOD1_YAML_MD5 <- "6ccf206e167485b5adf29bc135197929"
@@ -94,7 +106,7 @@ REF_LIST_1 <- list(
   bbi_args = list(
     overwrite = TRUE,
     threads = 4L),
-  absolute_model_path = file.path(getwd(), "model-examples", "1"),
+  absolute_model_path = file.path(ABS_MODEL_DIR, "1"),
   yaml_md5 = MOD1_YAML_MD5
 )
 class(REF_LIST_1) <- MOD_CLASS_LIST
@@ -107,7 +119,7 @@ REF_LIST_TMP <- list(
   bbi_args = list(
     overwrite = TRUE,
     threads = 4L),
-  absolute_model_path = file.path(getwd(), "model-examples", "temp"),
+  absolute_model_path = file.path(ABS_MODEL_DIR, "temp"),
   yaml_md5 = MOD1_YAML_MD5
 )
 class(REF_LIST_TMP) <- MOD_CLASS_LIST
@@ -122,8 +134,8 @@ LIST1 <- list(naw=4, paw=6)
 LIST2 <- list(naw=5, saw="hey")
 
 # for combine_directory_path()
-ABS_CTL_PATH <- file.path(getwd(), MODEL_DIR, glue::glue("{MOD_ID}.ctl"))
-FAKE_CTL_PATH <- file.path(getwd(), MODEL_DIR, CTL_TEST_FILE)
+ABS_CTL_PATH <-  fs::path_norm(file.path(getwd(), MODEL_DIR, glue::glue("{MOD_ID}.ctl"))) %>% as.character()
+FAKE_CTL_PATH <- fs::path_norm(file.path(getwd(), MODEL_DIR, CTL_TEST_FILE)) %>% as.character()
 
 ########################
 # test helper functions
@@ -232,12 +244,20 @@ rep_missing <- function(x, i, len) {
 create_temp_model <- function(path = YAML_TEST_FILE,
                               mod_content = "foo",
                               mod_ext = "ctl",
-                              envir = parent.frame()) {
+                              envir = parent.frame(),
+                              delete_yaml = TRUE,
+                              delete_mod = TRUE
+                              ) {
   temp_yaml <- tempfile(fileext = ".yaml")
   fs::file_copy(path, temp_yaml)
   temp_ctl <- fs::path_ext_set(temp_yaml, mod_ext)
   readr::write_file(mod_content, temp_ctl)
-  withr::defer(fs::file_delete(c(temp_yaml, temp_ctl)), envir)
+
+  to_delete <- character()
+  if (isTRUE(delete_yaml)) to_delete <- c(to_delete, temp_yaml)
+  if (isTRUE(delete_mod)) to_delete <- c(to_delete, temp_ctl)
+
+  withr::defer(fs::file_delete(to_delete), envir)
   # normalizePath() needs to be called when the file actually exists
   fs::path_ext_remove(normalizePath(temp_yaml))
 }

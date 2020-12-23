@@ -74,3 +74,6 @@ Additionally, \strong{if you have renamed your \code{.ext} file, you will need t
 \item \code{bbi_run_log_df}: Takes a \code{bbi_run_log_df} tibble and summarizes all models in it.
 }}
 
+\seealso{
+\code{\link[=model_summary]{model_summary()}}
+}

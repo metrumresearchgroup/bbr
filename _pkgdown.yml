@@ -52,6 +52,7 @@ reference:
   - get_model_path
   - get_output_dir
   - get_yaml_path
+  - print_bbi
 - title: Babylon configuration
   contents:
   - bbi_current_release

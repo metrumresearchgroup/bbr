@@ -5,6 +5,7 @@
 #' Submit a model to be run
 #'
 #' Submits a model to be run by calling out to `bbi`.
+#' @seealso [submit_models()]
 #' @param .mod The model object to submit.
 #' @param .bbi_args A named list specifying arguments to pass to babylon
 #'   formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" =

@@ -9,6 +9,8 @@
 #' run.
 #'
 #' @return An object of class `bbi_config_log_df`, which includes the fields described below.
+#' If _no_ `bbi_config.json` files are found, the returned tibble will only contain the
+#' `absolute_model_path` and `run` columns, and will have 0 rows.
 #'
 #' `config_log()` creates a new tibble with one row per `bbi_config.json`
 #' found in `.base_dir` (and subdirectories, if `.recurse = TRUE`).
@@ -64,7 +66,7 @@ add_config <- function(.log_df) {
 #' This is called by both [config_log()] and [add_config()].
 #' @importFrom stringr str_subset
 #' @importFrom fs dir_ls file_exists
-#' @importFrom purrr map_df map_chr
+#' @importFrom purrr map_df map_chr map_dfc
 #' @importFrom dplyr select everything
 #' @importFrom jsonlite fromJSON
 #' @importFrom tibble tibble
@@ -86,7 +88,9 @@ config_log_impl <- function(.mods) {
 
   if (all(missing)) {
     warning(glue("Found no bbi_config.json files for {length(.mods)} models."), call. = FALSE)
-    return(tibble())
+    return(
+      c(ABS_MOD_PATH, RUN_ID_COL) %>% map_dfc(~ tibble(!!.x := character()))
+    )
   }
 
   if (any(missing)) {

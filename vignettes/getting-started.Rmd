@@ -19,10 +19,17 @@ knitr::opts_chunk$set(
 
 This "Getting Started with rbabylon" vignette takes the user through some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its standard workflow and functionality. 
 
-```{r libraries}
+```{r setup, include=FALSE}
+# NOTE: if running chunks interactively we need to load the package first
+#   because renv isolation prevents us from finding an rbabylon installation
+if (interactive()) {
+  devtools::load_all()
+}
+```
+```{r load packages, results = 'hide', message=FALSE, warning=FALSE}
 library(rbabylon)
-suppressPackageStartupMessages(library(dplyr))
-suppressPackageStartupMessages(library(purrr))
+library(dplyr)
+library(purrr)
 ```
 
 `rbabylon` is an R interface for running `babylon`, which is (will be) a complete solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. Currently, only NONMEM is supported, so this vignette will only address that. 
@@ -31,7 +38,7 @@ suppressPackageStartupMessages(library(purrr))
 
 ```{r set paths and define cleanup, include = FALSE}
 options('rbabylon.bbi_exe_path' = read_bbi_path())
-MODEL_DIR <- system.file("nonmem", package = "rbabylon")
+MODEL_DIR <- system.file("model", "nonmem", "basic", package = "rbabylon")
 
 # delete old files
 cleanup <- function() {
@@ -82,8 +89,8 @@ To actually submit models with `bbi`, you will also need a `babylon.yaml` config
 
 The `bbi_init()` function will create a `babylon.yaml`, with the default settings, in the specified directory. Optionally, you can pass the path to a `babylon.yaml` to the `.config_path` argument of any `rbabylon` function that needs one. However, by default these functions will look for one in the same folder as the model being submitted or manipulated. Therefore, if you will have a number of models in the same folder, it is easiest to put a `babylon.yaml` that folder.
 
-```{r setup, eval = FALSE}
-MODEL_DIR <- "../nonmem"    # this should be relative to your working directory
+```{r configure bbi fake, eval = FALSE}
+MODEL_DIR <- "../model/nonmem/basic"  # this should be relative to your working directory
 
 bbi_init(.dir = MODEL_DIR,            # the directory to create the babylon.yaml in
          .nonmem_dir = "/opt/NONMEM", # location of NONMEM installation
@@ -197,9 +204,11 @@ mod2 %>% model_summary()
 After looking at these results, the user can add tags, which can later be used to organize your modeling runs.
 
 ```{r add_tags 2}
-mod1 <- mod1 %>% add_tags("base model")
-mod2 <- mod2 %>% add_tags(c("base model", "2 compartment"))
+mod1 <- mod1 %>% add_tags("orig acop model")
+mod2 <- mod2 %>% add_tags("2 compartment")
 ```
+
+Note that using free text for your tags is discouraged, for reasons mentioned in the `?modify_tags` help page. For simplicity's sake, we ignore that advice here, but please read it before using tags extensively in the wild.
 
 In addition to tags, the user can add notes that can be referenced later.
 
@@ -210,10 +219,10 @@ mod2 <- mod2 %>%
 
 ## Continue to iterate...
 
-Now the iteration process continues with a third model. 
+Now the iteration process continues with a third model. Note that you can tell `copy_model_from()` to inherit the tags from the parent model and automatically add them to the new model.
 
 ```{r copy_model 3}
-mod3 <- copy_model_from(mod2, 3)
+mod3 <- copy_model_from(mod2, 3, .inherit_tags = TRUE)
 ```
 
 Submit and summarize as before.
@@ -228,8 +237,8 @@ Add tags and notes for filtering in run log, described next.
 
 ```{r add_tags 3}
 mod3 <- mod3 %>% 
-        add_tags("2 compartment") %>%
-        add_notes("Added residual errors because it seemed like a good idea.")
+        add_tags(c("combined RUV", "iiv CL")) %>%
+        add_notes("Added combined error structure because it seemed like a good idea")
 ```
 
 # Run log
@@ -263,6 +272,7 @@ This code uses `purrr::map_lgl` to filter the run log to only rows containing a 
 ```{r filtering}
 log_df %>% 
   filter(map_lgl(tags, ~ "2 compartment" %in% .x)) %>%
+  collapse_to_string(tags, notes) %>%
   select(run, tags, notes)
 ```
 

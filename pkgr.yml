@@ -1,0 +1,14 @@
+Version: 1
+Descriptions:
+  - DESCRIPTION
+
+Packages:
+  - devtools
+  - renv
+  - styler
+
+Repos:
+  - CRAN: https://cran.rstudio.com
+
+Lockfile:
+  Type: renv

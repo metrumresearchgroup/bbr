@@ -58,3 +58,6 @@ Submits a model to be run by calling out to \code{bbi}.
 \item \code{bbi_nonmem_model}: Takes a \code{bbi_nonmem_model} object.
 }}
 
+\seealso{
+\code{\link[=submit_models]{submit_models()}}
+}

@@ -1,0 +1,7 @@
+Wed Dec  2 11:10:29 EST 2020
+$PROBLEM PK model 1 cmt base
+
+$INPUT ID TIME MDV EVID DV AMT  SEX WT ETN
+$DATA ../../../../extdata/acop.csv IGNORE=@
+...
+Wed Dec  2 11:10:39 EST 2020

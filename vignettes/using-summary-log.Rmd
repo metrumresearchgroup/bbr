@@ -29,13 +29,20 @@ There is a lot of information in the `bbi_summary_log_df` tibble that is output 
 
 There is some initial set up necessary for using `rbabylon`. Please refer to the ["Getting Started"](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html#setup) vignette, mentioned above, if you have not done this yet. Once this is done, load the library.
 
-```{r}
+```{r setup, include=FALSE}
+# NOTE: if running chunks interactively we need to load the package first
+#   because renv isolation prevents us from finding an rbabylon installation
+if (interactive()) {
+  devtools::load_all()
+}
+```
+```{r load packages, results = 'hide', message=FALSE, warning=FALSE}
 library(rbabylon)
-suppressPackageStartupMessages(library(dplyr))
-suppressPackageStartupMessages(library(tidyselect))
+library(dplyr)
+library(tidyselect)
 ```
 
-```{r setup, include = FALSE}
+```{r configure bbi, include = FALSE}
 # set babylon execution path
 if (Sys.which("bbi") == "") {
   options('rbabylon.bbi_exe_path' = read_bbi_path())
@@ -47,7 +54,7 @@ if (Sys.which("bbi") == "") {
 As mentioned above, the `bbi_summary_log_df` tibble contains a lot of information, which is a subset of what is contained in the `bbi_nonmem_summary` object returned from `model_summary()`.
 
 ```{r model summary single}
-MODEL_DIR <- "../tests/testthat/model-examples-complex"
+MODEL_DIR <- system.file("model", "nonmem", "complex", package = "rbabylon")
 
 sum1 <- 
   read_model(file.path(MODEL_DIR, "iovmm")) %>%
@@ -97,6 +104,7 @@ The next batch of columns contain the core diagnostics and model outputs. As men
 
 ```{r details columns}
 sum_df %>% 
+  collapse_to_string(estimation_method) %>%
   select(
     run,
     ofv, 

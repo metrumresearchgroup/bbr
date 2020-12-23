@@ -1,15 +1,12 @@
 context("Testing function to create or read in model object")
 
-bad_keys <- c(
-  ABS_MOD_PATH
-)
 
 test_that("read_model() returns expected object", {
   expect_equal(read_model(MOD1_PATH), REF_LIST_1)
 })
 
 test_that("read_model() returns expected object from no ext specified", {
-  temp_path <- "model-examples/temp.yaml"
+  temp_path <- file.path(ABS_MODEL_DIR, "temp.yaml")
   ctl_path <- fs::path_ext_set(temp_path, "ctl")
 
   fs::file_copy(YAML_TEST_FILE, temp_path)
@@ -81,11 +78,10 @@ test_that("compare read_model() and new_model() objects", {
   expect_true(all(MODEL_REQ_KEYS %in% names(mod1a)))
   expect_true(all(MODEL_REQ_KEYS %in% names(mod1b)))
 
-  # also check that some of the required keys have the same value
+  # also check that the required keys have the same value
   for (k in MODEL_REQ_KEYS) {
-    # TODO: eventually we will only exclude ABS_MOD_PATH, because that should
-    # not in general be equal
-    if (!(k %in% bad_keys)) {
+    # exclude ABS_MOD_PATH, because that should not in general be equal
+    if (k != ABS_MOD_PATH) {
       expect_equal(mod1a[[k]], mod1b[[k]])
     }
   }
@@ -124,11 +120,9 @@ test_that("new_model() .based_on arg works", {
 
 test_that("new_model() .based_on arg errors on fake model", {
   # create new model with args
-  .test_path <- "model-examples/tmp.yaml"
-
   expect_error(
     new_model(
-      fs::path_ext_remove(.test_path),
+      file.path(ABS_MODEL_DIR, "tmp"),
       .description = "original acop model",
       .based_on = c("1", "fake")
     ),

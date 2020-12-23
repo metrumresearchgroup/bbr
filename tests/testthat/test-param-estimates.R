@@ -1,8 +1,6 @@
 context("Test param_estimates functions")
 
-if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
-  skip("test-param-estimates only runs on Metworx or Drone")
-}
+skip_if_not_drone_or_metworx("test-param-estimates")
 
 setup({
   cleanup()
@@ -12,7 +10,7 @@ teardown({
 })
 
 # build reference
-ref_df1 <- readRDS(PARAM_REF_FILE)
+ref_df1 <- dget(PARAM_REF_FILE)
 
 withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
 

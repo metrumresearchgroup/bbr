@@ -26,7 +26,7 @@ local ci_images = [
 ];
 
 # set to "" to disable installing babylon
-local bbi_version = "v2.3.0";
+local bbi_version = "v2.3.1";
 
 # events that should not trigger Drone; recommended value is "promote", see
 # https://discourse.drone.io/t/github-pages-triggering-builds-incorrectly/6370
@@ -214,7 +214,7 @@ local pull_image(image, volumes=[]) = {
 # r_path          path to R executable
 # expr            expression to run
 local run_r_expression(r_path, expr) =
-  std.join(" ", [r_path, "-e", std.escapeStringBash(expr)]);
+  std.join(" ", [r_path, "--no-init-file", "-e", std.escapeStringBash(expr)]);
 
 # Drone step to copy a tagged release to S3
 #

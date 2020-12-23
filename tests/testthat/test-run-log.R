@@ -10,7 +10,7 @@ teardown({ cleanup() })
 test_that("run_log() errors with malformed YAML", {
   temp_dir <- file.path(tempdir(), "run_log_malformed_yaml_test")
   fs::dir_create(temp_dir)
-  temp_yaml <- fs::file_copy("test-yaml/zz_fail_no_modtype.yaml", temp_dir)
+  temp_yaml <- fs::file_copy(file.path(REF_DIR, "test-yaml", "zz_fail_no_modtype.yaml"), temp_dir)
   on.exit(fs::dir_delete(temp_dir))
 
   expect_warning(log_df <- run_log(temp_dir), "do not contain required keys")
@@ -24,7 +24,7 @@ test_that("run_log() errors with malformed YAML", {
 })
 
 test_that("run_log returns NULL and warns when no YAML found", {
-  log_df <- expect_warning(run_log("data"), regexp = "Found no valid model YAML files in data")
+  log_df <- expect_warning(run_log(file.path(REF_DIR, "read-output-refs")), regexp = "Found no valid model YAML files in")
   expect_true(inherits(log_df, "tbl"))
   expect_equal(nrow(log_df), 0)
   expect_equal(ncol(log_df), 0)

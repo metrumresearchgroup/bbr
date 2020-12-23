@@ -5,6 +5,9 @@ context("testing a composable workflow and running bbi")
 # This test file actually runs the bbi calls
 # and so it must have working version of both bbi and NONMEM.
 # Because of this, it is disabled unless on Metworx.
+#
+# Additionally, tests in this file rely on each other
+# and therefore must be run in order.
 ####################################################
 
 # can't run on Drone because there's no NONMEM
@@ -13,9 +16,7 @@ if (Sys.getenv("METWORX_VERSION") == "" || Sys.getenv("SKIP_BBI_TEST") == "true"
 }
 
 # define constants
-STARTER_FILE <- file.path("model-examples/1.ctl")
-MODEL_DIR_BBI <- "model-examples-bbi"
-BBI_PATH <- read_bbi_path()
+MODEL_DIR_BBI <- file.path(dirname(ABS_MODEL_DIR), "test-workflow-bbi-models")
 
 # cleanup function
 cleanup_bbi <- function(.recreate_dir = FALSE) {
@@ -25,7 +26,7 @@ cleanup_bbi <- function(.recreate_dir = FALSE) {
 cleanup_bbi(.recreate_dir = TRUE)
 
 # set options and run tests
-withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
+withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
 
   # cleanup when done
   on.exit({
@@ -40,16 +41,13 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
   bbi_init(MODEL_DIR_BBI, "/opt/NONMEM", "nm74gf")
 
   # copy model file into new model dir
-  fs::file_copy(STARTER_FILE, MODEL_DIR_BBI)
+  fs::file_copy(CTL_TEST_FILE, MODEL_DIR_BBI)
 
   #######################
   # create model from R
   #######################
 
   test_that("step by step create_model to submit_model to model_summary works", {
-    # TODO: this test needs to clean up after itself by removing the files it
-    # created
-
     # create model
     mod1 <- new_model(
       file.path(MODEL_DIR_BBI, "1"),
@@ -65,21 +63,17 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
 
     # get summary from model object
     sum1 <- mod1 %>% model_summary()
+
+    # can't check against SUMMARY_REF_FILE because run time, etc. will be different
+    # so we just check the structure
     expect_identical(class(sum1), SUM_CLASS_LIST)
     expect_identical(names(sum1), SUM_NAMES_REF)
 
-    # extract parameters table
-    ref_df <- readRDS(PARAM_REF_FILE)
-
-    par_df1a <- param_estimates(sum1)
-    suppressSpecificWarning({
-      expect_equal(par_df1a, ref_df) # from model object
-    }, .regexpr = "Column .+ has different attributes on LHS and RHS of join")
+    # check parameters table
+    expect_equal(param_estimates(sum1), dget(PARAM_REF_FILE))
   })
 
   test_that("copying model works and new models run correctly", {
-    # TODO: isolate this test so it does not depend on a model created by a
-    # previous test
     mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
     mod2 <- copy_model_from(mod1, 2)
     mod3 <- copy_model_from(mod1, 3, .inherit_tags = TRUE) %>% add_bbi_args(list(clean_lvl=2, overwrite = FALSE))
@@ -92,12 +86,8 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
     expect_identical(class(sum2), SUM_CLASS_LIST)
     expect_identical(names(sum2), SUM_NAMES_REF)
 
-    # extract parameters table
-    ref_df <- readRDS(PARAM_REF_FILE)
-    par_df2 <- param_estimates(sum2)
-    suppressSpecificWarning({
-      expect_equal(par_df2, ref_df) # from process object
-    }, .regexpr = "Column .+ has different attributes on LHS and RHS of join")
+    # check parameters table
+    expect_equal(param_estimates(sum2), dget(PARAM_REF_FILE))
 
     # add some tags to new model
     mod2 <- mod2 %>% add_tags(NEW_TAGS)
@@ -137,9 +127,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
     expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS, ORIG_TAGS))
   })
 
-  test_that("add_config() md5 matches original md5", {
-    # TODO: consider whether to delete this test now that we have done https://github.com/metrumresearchgroup/rbabylon/issues/30
-
+  test_that("add_config() works with in progress model run", {
     # add config log to run log
     log_df <- expect_warning(
       run_log(MODEL_DIR_BBI) %>% add_config(),
@@ -148,22 +136,8 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
     expect_equal(nrow(log_df), 4)
     expect_equal(ncol(log_df), RUN_LOG_COLS + CONFIG_COLS-2)
 
-    # check config md5's against ctl md5's
-    log_df <- log_df %>% filter(!is.na(model_md5))
-    expect_equal(nrow(log_df), 3)
-
-    norm_data_paths <- fs::path_norm(file.path(log_df$absolute_model_path, log_df$data_path))
-    norm_model_paths <- get_model_path(log_df)
-
-    log_df <- log_df %>% mutate(
-      current_data_md5  = tools::md5sum(norm_data_paths),
-      data_md5_match    = .data$data_md5 == .data$current_data_md5,
-      current_model_md5  = tools::md5sum(norm_model_paths),
-      model_md5_match   = .data$model_md5 == .data$current_model_md5
-    )
-
-    expect_true(all(log_df$data_md5_match))
-    expect_true(all(log_df$model_md5_match))
+    # check that the running model has NA for config fields
+    expect_equal(sum(is.na(log_df$model_md5)), 1L)
   })
 
 
@@ -177,23 +151,24 @@ withr::with_options(list(rbabylon.bbi_exe_path = BBI_PATH), {
     withr::with_tempdir({
       # copy model, YAML, and data files to the same location
       files_to_copy <- file.path(
-        test_dir,
-        MODEL_DIR,
-        c("1.ctl", "1.yaml", "../data/acop.csv")
+        ABS_MODEL_DIR,
+        c("1.ctl", "1.yaml", "../../../extdata/acop.csv")
       )
 
       purrr::walk(files_to_copy, fs::file_copy, ".")
 
       # modify DATA to reflect location in temp dir
-      readr::read_file("1.ctl") %>%
-        stringr::str_replace("\\$DATA\\s+[^\\s]+", "$DATA ../acop.csv") %>%
-        readr::write_file("1.ctl")
+      ctl <- readr::read_file("1.ctl")
+      ctl_mod <- stringr::str_replace(
+        ctl, "\\$DATA\\s+[^\\s]+", "$DATA ../acop.csv"
+      )
+      readr::write_file(ctl_mod, "1.ctl")
 
       mod <- read_model("1")
       res <- submit_model(
         mod,
         .mode = "local",
-        .config_path = file.path(test_dir, MODEL_DIR_BBI, "babylon.yaml"),
+        .config_path = file.path(MODEL_DIR_BBI, "babylon.yaml"),
         .wait = TRUE
       )
 

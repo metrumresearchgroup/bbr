@@ -65,3 +65,6 @@ model YAML, or specified globally in \code{babylon.yaml}.
 \item \code{list}: Takes a list of \code{bbi_nonmem_model} objects.
 }}
 
+\seealso{
+\code{\link[=submit_model]{submit_model()}}
+}
