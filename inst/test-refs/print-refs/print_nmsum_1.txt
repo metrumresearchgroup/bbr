@@ -1,0 +1,22 @@
+Dataset: ../../../../extdata/acop.csv
+
+Records: 799	 Observations: 760	 Patients: 40
+
+Objective Function Value (final est. method): 2636.846
+
+Estimation Method(s):
+
+– First Order Conditional Estimation with Interaction 
+
+No Heuristic Problems Detected
+
+
+|parameter_names |estimate |stderr |shrinkage |
+|:---------------|:--------|:------|:---------|
+|THETA1          |2.31     |0.0861 |          |
+|THETA2          |55.0     |3.33   |          |
+|THETA3          |465      |29.6   |          |
+|THETA4          |-0.0806  |0.0555 |          |
+|THETA5          |4.13     |1.36   |          |
+|OMEGA(1,1)      |0.0964   |0.0200 |17.5      |
+|OMEGA(2,2)      |0.154    |0.0267 |2.06      |
