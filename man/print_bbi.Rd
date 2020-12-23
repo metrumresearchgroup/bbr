@@ -29,6 +29,9 @@ Otherwise, prints only \code{.nrow} rows.}
 \description{
 The various objects defined by \code{rbabylon} have their own print methods to
 allow users to get a quick view of the contents of the object.
+\strong{When printing a \code{bbi} object in an \code{.Rmd} file} that is intended to be
+knit, consider setting \code{results = 'asis'} in the chunk options. This
+will make for prettier formatting, especially of table outputs.
 }
 \section{Functions}{
 \itemize{

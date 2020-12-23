@@ -2,6 +2,10 @@
 #'
 #' The various objects defined by `rbabylon` have their own print methods to
 #' allow users to get a quick view of the contents of the object.
+#' **When printing a `bbi` object in an `.Rmd` file** that is intended to be
+#' knit, consider setting `results = 'asis'` in the chunk options. This
+#' will make for prettier formatting, especially of table outputs.
+#'
 #' @param x Object to format or print.
 #' @param ... Other arguments passed on to individual methods.
 #'
@@ -154,6 +158,7 @@ sig <- function(.x, .digits) {
 
   .x <- .x %>%
     as.numeric() %>%
+    suppressSpecificWarning("NAs introduced by coercion") %>%
     formatC(digits = .digits, format = 'g', flag = '#')
   .x <- gsub("\\.$", "", .x)
   .x <- gsub("NA", "", .x)
@@ -188,7 +193,7 @@ highlight_cell <- function(.l, .i, .threshold) {
     paste(collapse = "")
 
   to_check <- to_check %>%
-    as.numeric %>%
+    as.numeric() %>%
     suppressSpecificWarning("NAs introduced by coercion")
 
   if (is.na(to_check) || to_check <= .threshold) {
