@@ -64,20 +64,23 @@ print.babylon_process <- function(x, ..., .call_limit = 250) {
 #'   Otherwise, prints only `.nrow` rows.
 #' @export
 print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag = FALSE, .nrow = NULL, ...) {
-  print_str <- character()
 
   # print top line info
   .d <- x[[SUMMARY_DETAILS]]
   cat_line(glue("Dataset: {.d$data_set}\n\n"))
   cat_line(glue("Records: {.d$number_of_data_records}\t Observations: {.d$number_of_obs}\t Patients: {.d$number_of_patients}\n\n"))
-  cat_line(c("Estimation Method(s):\n", map_chr(.d$estimation_method, ~glue("  - {.x}\n\n"))))
   cat_line(glue("Objective Function Value (final est. method): {extract_ofv(list(x))}\n\n"))
+  cli::cat_line("Estimation Method(s):\n")
+  purrr::walk(paste(.d$estimation_method, "\n"), cli::cat_bullet, bullet = "en_dash")
 
   # check heuristics
   .h <- unlist(x[[SUMMARY_HEURISTICS]])
   if (any(.h)) {
-    h_str <- c("**Heuristic Problem(s) Detected:**\n", map_chr(names(which(.h)), ~glue("  - {.x}\n\n")))
-    cat_line(h_str, col = "red")
+    # h_str <- c("**Heuristic Problem(s) Detected:**\n", map_chr(names(which(.h)), ~glue("  - {.x}\n\n")))
+    # cat_line(h_str, col = "red")
+    #
+    cli::cat_line("**Heuristic Problem(s) Detected:**\n", col = "red")
+    purrr::walk(paste(names(which(.h)), "\n"), cli::cat_bullet, bullet = "en_dash", col = "red")
   } else {
     cat_line("No Heuristic Problems Detected\n\n")
   }

@@ -2,11 +2,11 @@ Dataset: ../../../../extdata/acop.csv
 
 Records: 799	 Observations: 760	 Patients: 40
 
+Objective Function Value (final est. method): 2636.846
+
 Estimation Method(s):
 
-- First Order Conditional Estimation with Interaction
-
-Objective Function Value (final est. method): 2636.846
+– First Order Conditional Estimation with Interaction 
 
 No Heuristic Problems Detected
 

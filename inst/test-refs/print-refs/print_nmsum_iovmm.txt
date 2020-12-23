@@ -2,17 +2,17 @@ Dataset: ../MixSim.csv
 
 Records: 13500	 Observations: 12600	 Patients: 300
 
+Objective Function Value (final est. method): 14722.149
+
 Estimation Method(s):
 
-- First Order Conditional Estimation
-
-Objective Function Value (final est. method): 14722.149
+– First Order Conditional Estimation 
 
 **Heuristic Problem(s) Detected:**
 
-- parameter_near_boundary
+– parameter_near_boundary 
 
-- has_final_zero_gradient
+– has_final_zero_gradient 
 
 |parameter_names |estimate |stderr    |shrinkage |
 |:---------------|:--------|:---------|:---------|

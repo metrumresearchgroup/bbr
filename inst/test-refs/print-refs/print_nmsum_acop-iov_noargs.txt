@@ -2,17 +2,17 @@ Dataset: ../acop_iov.csv
 
 Records: 7566	 Observations: 6396	 Patients: 39
 
+Objective Function Value (final est. method): 44158.939
+
 Estimation Method(s):
 
-- First Order Conditional Estimation with Interaction
-
-Objective Function Value (final est. method): 44158.939
+– First Order Conditional Estimation with Interaction 
 
 **Heuristic Problem(s) Detected:**
 
-- hessian_reset
+– hessian_reset 
 
-- eta_pval_significant
+– eta_pval_significant 
 
 |parameter_names |estimate |stderr  |shrinkage |
 |:---------------|:--------|:-------|:---------|
