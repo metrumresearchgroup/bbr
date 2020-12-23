@@ -1,3 +1,19 @@
+# rbabylon 0.11.0
+
+## New features and changes
+
+* Added print methods for `bbi_nonmem_summary` and `babylon_process` objects. The `bbi_nonmem_summary` object should print nicely in the console, and also look good in `.Rmd` chunks with the option `results = 'asis'`. (#298 and #294)
+
+* The `bbi_nonmem_summary` object now contains the `absolute_model_path` and we have added the following methods to work on that object (these previously only worked on `bbi_nonmem_model` objects): `get_model_id()`, `get_model_path()`, `get_output_dir()`, `get_yaml_path()`, `check_grd()`, `check_ext()`. (#297)
+
+* For developers, there are now scripts in `data-raw` which regenerate the test reference files and re-run the test models. All test references and example files have now been consolidated in `inst` as well. Users will see these files in `extdata`, `model`, and `test-refs` when the package is installed. (#289)
+
+## Bug fixes
+
+* Previously `replace_model_field()`, which is called under the hood by `replace_tag()` and `replace_note()` did _not_ modify the YAML file as it should have. That has been fixed. (#281)
+
+* Previously the `add_summary()` function would error if all the model summaries errored. Now it will return, passing through the model summary errors to the tibble, as it should. (#282)
+
 # rbabylon 0.10.0
 
 ## New features and changes
