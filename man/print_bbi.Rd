@@ -3,10 +3,13 @@
 \name{print_bbi}
 \alias{print_bbi}
 \alias{print.babylon_process}
+\alias{print.bbi_nonmem_summary}
 \alias{print.bbi_nonmem_model}
 \title{Print methods for rbabylon objects}
 \usage{
 \method{print}{babylon_process}(x, ..., .call_limit = 250)
+
+\method{print}{bbi_nonmem_summary}(x, .digits = 3, .fixed = FALSE, .off_diag = FALSE, .nrow = NULL, ...)
 
 \method{print}{bbi_nonmem_model}(x, ...)
 }
@@ -16,14 +19,28 @@
 \item{...}{Other arguments passed on to individual methods.}
 
 \item{.call_limit}{Integer scalar for the max number of characters to print before truncating the call string.}
+
+\item{.digits}{Number of significant digits to use for parameter table. Defaults to 3.}
+
+\item{.fixed}{If \code{FALSE}, the default, omits fixed parameters from the parameter table.}
+
+\item{.off_diag}{If \code{FALSE}, the default, omits off-diagonals of OMEGA and SIGMA matrices from the parameter table.}
+
+\item{.nrow}{If \code{NULL}, the default, print all rows of the parameter table.
+Otherwise, prints only \code{.nrow} rows.}
 }
 \description{
 The various objects defined by \code{rbabylon} have their own print methods to
 allow users to get a quick view of the contents of the object.
+\strong{When printing a \code{bbi} object in an \code{.Rmd} file} that is intended to be
+knit, consider setting \code{results = 'asis'} in the chunk options. This
+will make for prettier formatting, especially of table outputs.
 }
 \section{Functions}{
 \itemize{
 \item \code{print.babylon_process}: Prints the call made to bbi and whether the process is still running or has finished.
+
+\item \code{print.bbi_nonmem_summary}: Prints a high level summary of a model from a bbi_nonmem_summary object
 
 \item \code{print.bbi_nonmem_model}: Prints the information contained in the model object and whether the model has been run
 }}
