@@ -8,6 +8,8 @@
 
 * For developers, there are now scripts in `data-raw` which regenerate the test reference files and re-run the test models. All test references and example files have now been consolidated in `inst` as well. Users will see these files in `extdata`, `model`, and `test-refs` when the package is installed. (#289)
 
+* Also for developers, we are now using `pkgr` and `renv` to isolate dependencies when developing. The `README` has been updated with instructions for how to use this when developing. (#276)
+
 ## Bug fixes
 
 * Previously `replace_model_field()`, which is called under the hood by `replace_tag()` and `replace_note()` did _not_ modify the YAML file as it should have. That has been fixed. (#281)
