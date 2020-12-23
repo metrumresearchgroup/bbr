@@ -78,7 +78,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.10.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.11.0</span>
       </span>
     </div>
 
@@ -86,7 +86,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -121,7 +121,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/metrumresearchgroup/rbabylon">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fas fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -154,6 +154,9 @@
 <span class='fu'>get_model_id</span>(<span class='no'>.mod</span>)
 
 <span class='co'># S3 method for bbi_nonmem_model</span>
+<span class='fu'>get_model_id</span>(<span class='no'>.mod</span>)
+
+<span class='co'># S3 method for bbi_nonmem_summary</span>
 <span class='fu'>get_model_id</span>(<span class='no'>.mod</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -161,7 +164,8 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>.mod</th>
-      <td><p>Model to use, either a <code>bbi_{.model_type}_model</code> or file path to a model.</p></td>
+      <td><p>Model to use, either a <code>bbi_{.model_type}_model</code> or
+<code>bbi_{.model_type}_summary</code>, or a file path to a model.</p></td>
     </tr>
     </table>
 
@@ -174,6 +178,7 @@
 <ul>
 <li><p><code>character</code>: Takes file path to model.</p></li>
 <li><p><code>bbi_nonmem_model</code>: Takes <code>bbi_nonmem_model</code> object</p></li>
+<li><p><code>bbi_nonmem_summary</code>: Takes <code>bbi_nonmem_summary</code> object</p></li>
 </ul>
 
   </div>

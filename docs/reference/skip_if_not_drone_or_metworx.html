@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Check if diagonal index or not — is_diag • rbabylon</title>
+<title>Skip test if not on Metworx or Drone — skip_if_not_drone_or_metworx • rbabylon</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -42,8 +42,9 @@
 
 
 
-<meta property="og:title" content="Check if diagonal index or not — is_diag" />
-<meta property="og:description" content="Private helper to unpack a matrix index string like '(3,3)' is for a diagonal (i.e. if the numbers are the same)" />
+<meta property="og:title" content="Skip test if not on Metworx or Drone — skip_if_not_drone_or_metworx" />
+<meta property="og:description" content="Checks for Metworx and Drone environment variables and skips the test if neither are found.
+This is primarily used for tests that require bbi to be installed." />
 <meta property="og:image" content="https://metrumresearchgroup.github.io/rbabylon/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -137,23 +138,25 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Check if diagonal index or not</h1>
+    <h1>Skip test if not on Metworx or Drone</h1>
     
-    <div class="hidden name"><code>is_diag.Rd</code></div>
+    <div class="hidden name"><code>skip_if_not_drone_or_metworx.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Private helper to unpack a matrix index string like '(3,3)' is for a diagonal (i.e. if the numbers are the same)</p>
+    <p>Checks for Metworx and Drone environment variables and skips the test if neither are found.
+This is primarily used for tests that require <code>bbi</code> to be installed.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>is_diag</span>(<span class='no'>.name</span>)</pre>
+    <pre class="usage"><span class='fu'>skip_if_not_drone_or_metworx</span>(<span class='no'>.test_name</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>.name</th>
-      <td><p>A character scalar containing an index string</p></td>
+      <th>.test_name</th>
+      <td><p>Character scalar to identify the test being potentially skipped.
+This is printed in the skip message</p></td>
     </tr>
     </table>
 

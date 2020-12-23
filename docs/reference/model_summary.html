@@ -77,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.10.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.11.0</span>
       </span>
     </div>
 
@@ -85,7 +85,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -120,7 +120,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/metrumresearchgroup/rbabylon">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fas fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -177,6 +177,9 @@ See <code><a href='print_bbi_args.html'>print_bbi_args()</a></code> for full lis
 
     <p><strong>NONMEM</strong></p>
 <p>The returned list for a NONMEM model will contain the following top-level elements:</p><ul>
+<li><p><strong>absolute_model_path</strong> -- Absolute path to the model that generated this summary.
+Note, using this directly is discouraged in favor of using the "getters"
+described in the <code><a href='get_path_from_object.html'>get_path_from_object</a></code> help page.</p></li>
 <li><p><strong>run_details</strong> -- General details about the run including estimation
 method, numbers of patients and records, significant digits, run time, and
 more.</p></li>
@@ -219,6 +222,9 @@ For example, if have asked to skip the <code>$COV</code> step, you would call <c
 <ul>
 <li><p><code>bbi_nonmem_model</code>: Get model summary from <code>bbi_nonmem_model</code> object</p></li>
 </ul>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><code><a href='model_summaries.html'>model_summaries()</a></code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -227,6 +233,7 @@ For example, if have asked to skip the <code>$COV</code> step, you would call <c
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#details">Details</a></li>
       <li><a href="#methods-by-class-">Methods (by class)</a></li>
+      <li><a href="#see-also">See also</a></li>
     </ul>
 
   </div>
