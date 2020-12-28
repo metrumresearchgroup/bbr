@@ -175,10 +175,12 @@ check_bbi_exe <- function(.bbi_exe_path) {
 #'
 #' @importFrom stringr str_replace_all
 #' @inheritParams bbi_version
-#'
 #' @return `NULL` if `.bbi_exe_path` satisfies the constraint
 #' @keywords internal
 check_bbi_version_constraint <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')) {
+  if (isTRUE(getOption("rbabylon.DEV_no_min_version"))) {
+    return(invisible(TRUE))
+  }
   .bbi_exe_path <- Sys.which(.bbi_exe_path)
   if (.bbi_exe_path == "") {
     stop(glue("`{.bbi_exe_path}` was not found on the system."))
