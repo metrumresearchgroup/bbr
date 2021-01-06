@@ -12,7 +12,7 @@ find_models(.base_dir, .recurse)
 \item{.recurse}{If \code{TRUE} search recursively in subdirectories as well.}
 }
 \description{
-Private helper function that searches from a base directory for any YAML files (excluding \code{babylon.yaml})
+Private helper function that searches from a base directory for any YAML files (excluding \code{bbi.yaml})
 and attempts to read them to a model object with \code{\link[=safe_read_model]{safe_read_model()}}.
 }
 \keyword{internal}

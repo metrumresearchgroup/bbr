@@ -1,6 +1,6 @@
-url: https://metrumresearchgroup.github.io/rbabylon
+url: https://metrumresearchgroup.github.io/bbr
 
-title: rbabylon
+title: bbr
 template:
   params:
     bootswatch: flatly
@@ -8,7 +8,7 @@ navbar:
   type: inverse
   right:
   - icon: fa-github fa-lg
-    href: https://github.com/metrumresearchgroup/rbabylon
+    href: https://github.com/metrumresearchgroup/bbr
 
 reference:
 - title: Model management
@@ -53,7 +53,7 @@ reference:
   - get_output_dir
   - get_yaml_path
   - print_bbi
-- title: Babylon configuration
+- title: bbi configuration
   contents:
   - bbi_current_release
   - bbi_help

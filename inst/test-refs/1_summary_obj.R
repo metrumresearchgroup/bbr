@@ -1,4 +1,4 @@
-structure(list(absolute_model_path = "/data/home/sethg/rbabylon/inst/model/nonmem/basic/1"
+structure(list(absolute_model_path = "/data/home/sethg/bbr/inst/model/nonmem/basic/1"
 , run_details = list(
   version = "7.4.4", run_start = "-999999999",
   run_end = "Wed Dec  2 11:10:39 EST 2020", estimation_time = 1.96,

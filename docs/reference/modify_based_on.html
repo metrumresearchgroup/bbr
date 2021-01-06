@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Modify based_on field in a model object — modify_based_on • rbabylon</title>
+<title>Modify based_on field in a model object — modify_based_on • bbr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,7 +46,7 @@
 <meta property="og:description" content="Add, replace, or remove model identifiers from the based_on
 field of a model object and corresponding YAML. The based_on field can be
 modified at any time (i.e. before or after a model is submitted)." />
-<meta property="og:image" content="https://metrumresearchgroup.github.io/rbabylon/logo.png" />
+<meta property="og:image" content="https://metrumresearchgroup.github.io/bbr/logo.png" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -78,8 +78,8 @@ modified at any time (i.e. before or after a model is submitted)." />
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.11.0</span>
+        <a class="navbar-link" href="../index.html">bbr</a>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.11.0.9000</span>
       </span>
     </div>
 
@@ -102,10 +102,10 @@ modified at any time (i.e. before or after a model is submitted)." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/getting-started.html">Getting Started with rbabylon</a>
+      <a href="../articles/getting-started.html">Getting Started with bbr</a>
     </li>
     <li>
-      <a href="../articles/parameter-labels.html">rbabylon Parameter Labels</a>
+      <a href="../articles/parameter-labels.html">bbr Parameter Labels</a>
     </li>
     <li>
       <a href="../articles/using-based-on.html">Using the based_on field</a>
@@ -121,7 +121,7 @@ modified at any time (i.e. before or after a model is submitted)." />
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/metrumresearchgroup/rbabylon">
+  <a href="https://github.com/metrumresearchgroup/bbr">
     <span class="fas fa-github fa-lg"></span>
      
   </a>
@@ -182,7 +182,7 @@ development process. This field is automatically populated with <code>.parent_mo
 when a model is created with <code><a href='copy_model_from.html'>copy_model_from()</a></code>.</p>
 <p>The model identifiers in the <code>based_on</code> field are paths another model file
 (without file extension) <em>relative</em> to the location of <code>.mod</code>.</p>
-<p>There is a <a href='https://metrumresearchgroup.github.io/rbabylon/articles/using-based-on.html'>"Using the based_on field" vignette</a>
+<p>There is a <a href='https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html'>"Using the based_on field" vignette</a>
 which demonstrates the motivation and usage of this field.</p>
     <h2 class="hasAnchor" id="functions"><a class="anchor" href="#functions"></a>Functions</h2>
 
@@ -190,7 +190,7 @@ which demonstrates the motivation and usage of this field.</p>
 <ul>
 <li><p><code>add_based_on</code>: Append new <code>based_on</code> identifiers to a model object and corresponding YAML.</p></li>
 <li><p><code>replace_all_based_on</code>: Replaces entire <code>based_on</code> field in a model object and corresponding YAML with new values.</p></li>
-<li><p><code>replace_based_on</code>: <strong>Deprecated</strong> as of rbabylon 0.10.0, use <code>replace_all_based_on()</code> instead.</p></li>
+<li><p><code>replace_based_on</code>: <strong>Deprecated</strong> as of bbr 0.10.0, use <code>replace_all_based_on()</code> instead.</p></li>
 <li><p><code>remove_based_on</code>: Remove specified <code>based_on</code> identifier(s) from a model object and corresponding YAML.</p></li>
 </ul>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>

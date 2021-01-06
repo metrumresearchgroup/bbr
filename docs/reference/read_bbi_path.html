@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Set the path to the babylon executable — read_bbi_path • rbabylon</title>
+<title>Set the path to the bbi executable — read_bbi_path • bbr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -42,16 +42,16 @@
 
 
 
-<meta property="og:title" content="Set the path to the babylon executable — read_bbi_path" />
+<meta property="og:title" content="Set the path to the bbi executable — read_bbi_path" />
 <meta property="og:description" content="withr::with_options() is used throughout package tests to set the path to
-the babylon executable. The test suite will fail if this path does not exist,
+the bbi executable. The test suite will fail if this path does not exist,
 which limits flexibility across environments, e.g., in continuous
 integration. Any solution that decouples the with_options() pattern from a
 particular default path must work with devtools::check(), which runs in a
 separate process. We can inject environment variables into check(), so the
 default behavior is to rely on such a variable to set the path, falling back
 to a default path if unset." />
-<meta property="og:image" content="https://metrumresearchgroup.github.io/rbabylon/logo.png" />
+<meta property="og:image" content="https://metrumresearchgroup.github.io/bbr/logo.png" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -83,8 +83,8 @@ to a default path if unset." />
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.11.0</span>
+        <a class="navbar-link" href="../index.html">bbr</a>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.11.0.9000</span>
       </span>
     </div>
 
@@ -107,10 +107,10 @@ to a default path if unset." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/getting-started.html">Getting Started with rbabylon</a>
+      <a href="../articles/getting-started.html">Getting Started with bbr</a>
     </li>
     <li>
-      <a href="../articles/parameter-labels.html">rbabylon Parameter Labels</a>
+      <a href="../articles/parameter-labels.html">bbr Parameter Labels</a>
     </li>
     <li>
       <a href="../articles/using-based-on.html">Using the based_on field</a>
@@ -126,7 +126,7 @@ to a default path if unset." />
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/metrumresearchgroup/rbabylon">
+  <a href="https://github.com/metrumresearchgroup/bbr">
     <span class="fas fa-github fa-lg"></span>
      
   </a>
@@ -144,14 +144,14 @@ to a default path if unset." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Set the path to the babylon executable</h1>
+    <h1>Set the path to the bbi executable</h1>
     
     <div class="hidden name"><code>read_bbi_path.Rd</code></div>
     </div>
 
     <div class="ref-description">
     <p><code><a href='https://withr.r-lib.org/reference/with_options.html'>withr::with_options()</a></code> is used throughout package tests to set the path to
-the babylon executable. The test suite will fail if this path does not exist,
+the bbi executable. The test suite will fail if this path does not exist,
 which limits flexibility across environments, e.g., in continuous
 integration. Any solution that decouples the <code>with_options()</code> pattern from a
 particular default path must work with <code><a href='https://devtools.r-lib.org//reference/check.html'>devtools::check()</a></code>, which runs in a
@@ -161,7 +161,7 @@ to a default path if unset.</p>
     </div>
 
     <pre class="usage"><span class='fu'>read_bbi_path</span>(
-  <span class='kw'>path</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span>(<span class='st'>"BABYLON_EXE_PATH"</span>, <span class='fl'>NA</span>),
+  <span class='kw'>path</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span>(<span class='st'>"BBI_EXE_PATH"</span>, <span class='fl'>NA</span>),
   <span class='kw'>default</span> <span class='kw'>=</span> <span class='no'>BBI_DEFAULT_PATH</span>
 )</pre>
 
@@ -170,7 +170,7 @@ to a default path if unset.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>path</th>
-      <td><p>path to the babylon executable</p></td>
+      <td><p>path to the bbi executable</p></td>
     </tr>
     <tr>
       <th>default</th>

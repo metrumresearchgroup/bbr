@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Submit multiple NONMEM models in batch via babylon — submit_nonmem_models • rbabylon</title>
+<title>Submit multiple NONMEM models in batch via bbi — submit_nonmem_models • bbr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -42,9 +42,9 @@
 
 
 
-<meta property="og:title" content="Submit multiple NONMEM models in batch via babylon — submit_nonmem_models" />
+<meta property="og:title" content="Submit multiple NONMEM models in batch via bbi — submit_nonmem_models" />
 <meta property="og:description" content="Private implementation function called by submit_models() dispatches." />
-<meta property="og:image" content="https://metrumresearchgroup.github.io/rbabylon/logo.png" />
+<meta property="og:image" content="https://metrumresearchgroup.github.io/bbr/logo.png" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -76,8 +76,8 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.11.0</span>
+        <a class="navbar-link" href="../index.html">bbr</a>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.11.0.9000</span>
       </span>
     </div>
 
@@ -100,10 +100,10 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/getting-started.html">Getting Started with rbabylon</a>
+      <a href="../articles/getting-started.html">Getting Started with bbr</a>
     </li>
     <li>
-      <a href="../articles/parameter-labels.html">rbabylon Parameter Labels</a>
+      <a href="../articles/parameter-labels.html">bbr Parameter Labels</a>
     </li>
     <li>
       <a href="../articles/using-based-on.html">Using the based_on field</a>
@@ -119,7 +119,7 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/metrumresearchgroup/rbabylon">
+  <a href="https://github.com/metrumresearchgroup/bbr">
     <span class="fas fa-github fa-lg"></span>
      
   </a>
@@ -137,7 +137,7 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Submit multiple NONMEM models in batch via babylon</h1>
+    <h1>Submit multiple NONMEM models in batch via bbi</h1>
     
     <div class="hidden name"><code>submit_nonmem_models.Rd</code></div>
     </div>
@@ -165,8 +165,8 @@
     </tr>
     <tr>
       <th>.bbi_args</th>
-      <td><p>A named list specifying arguments to pass to babylon
-formatted like <code><a href='https://rdrr.io/r/base/list.html'>list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)</a></code>. Run <code><a href='print_bbi_args.html'>print_bbi_args()</a></code> to see valid arguments. Note that rbabylon does
+      <td><p>A named list specifying arguments to pass to bbi
+formatted like <code><a href='https://rdrr.io/r/base/list.html'>list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)</a></code>. Run <code><a href='print_bbi_args.html'>print_bbi_args()</a></code> to see valid arguments. Note that bbr does
 not support changing the output directory (including through the model or
 global YAML files).</p></td>
     </tr>
@@ -181,8 +181,8 @@ global YAML files).</p></td>
     </tr>
     <tr>
       <th>.config_path</th>
-      <td><p>Path to a babylon configuration file. If <code>NULL</code>, the
-default, will attempt to use a <code>babylon.yaml</code> in the same directory as the
+      <td><p>Path to a bbi configuration file. If <code>NULL</code>, the
+default, will attempt to use a <code>bbi.yaml</code> in the same directory as the
 model.</p></td>
     </tr>
     <tr>
@@ -201,7 +201,7 @@ tool.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A list of S3 objects of class <code>babylon_process</code></p>
+    <p>A list of S3 objects of class <code>bbi_process</code></p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

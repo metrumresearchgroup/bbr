@@ -2,15 +2,15 @@
 % Please edit documentation in R/read-bbi-path.R
 \name{read_bbi_path}
 \alias{read_bbi_path}
-\title{Set the path to the babylon executable}
+\title{Set the path to the bbi executable}
 \usage{
 read_bbi_path(
-  path = Sys.getenv("BABYLON_EXE_PATH", NA),
+  path = Sys.getenv("BBI_EXE_PATH", NA),
   default = BBI_DEFAULT_PATH
 )
 }
 \arguments{
-\item{path}{path to the babylon executable}
+\item{path}{path to the bbi executable}
 
 \item{default}{a default path if \code{path} is \code{NA}}
 }
@@ -19,7 +19,7 @@ read_bbi_path(
 }
 \description{
 \code{\link[withr:with_options]{withr::with_options()}} is used throughout package tests to set the path to
-the babylon executable. The test suite will fail if this path does not exist,
+the bbi executable. The test suite will fail if this path does not exist,
 which limits flexibility across environments, e.g., in continuous
 integration. Any solution that decouples the \code{with_options()} pattern from a
 particular default path must work with \code{\link[devtools:check]{devtools::check()}}, which runs in a

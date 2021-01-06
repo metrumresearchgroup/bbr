@@ -9,7 +9,7 @@ nonmem_summary(.mod, .bbi_args = NULL, ..., .dry_run = FALSE)
 \arguments{
 \item{.mod}{\code{bbi_nonmem_model} object for summary}
 
-\item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}. Run \code{\link[=print_bbi_args]{print_bbi_args()}} to see valid arguments.}
+\item{.bbi_args}{A named list specifying arguments to pass to bbi formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}. Run \code{\link[=print_bbi_args]{print_bbi_args()}} to see valid arguments.}
 }
 \value{
 List of S3 Class "bbi_nonmem_summary" with all summary information

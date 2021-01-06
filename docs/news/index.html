@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Changelog • rbabylon</title>
+<title>Changelog • bbr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -43,7 +43,7 @@
 
 
 <meta property="og:title" content="Changelog" />
-<meta property="og:image" content="https://metrumresearchgroup.github.io/rbabylon/logo.png" />
+<meta property="og:image" content="https://metrumresearchgroup.github.io/bbr/logo.png" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -75,8 +75,8 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.11.0</span>
+        <a class="navbar-link" href="../index.html">bbr</a>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.11.0.9000</span>
       </span>
     </div>
 
@@ -99,10 +99,10 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/getting-started.html">Getting Started with rbabylon</a>
+      <a href="../articles/getting-started.html">Getting Started with bbr</a>
     </li>
     <li>
-      <a href="../articles/parameter-labels.html">rbabylon Parameter Labels</a>
+      <a href="../articles/parameter-labels.html">bbr Parameter Labels</a>
     </li>
     <li>
       <a href="../articles/using-based-on.html">Using the based_on field</a>
@@ -118,7 +118,7 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/metrumresearchgroup/rbabylon">
+  <a href="https://github.com/metrumresearchgroup/bbr">
     <span class="fas fa-github fa-lg"></span>
      
   </a>
@@ -140,14 +140,14 @@
       
     </div>
 
-    <div id="rbabylon-0-11-0" class="section level1">
+    <div id="bbr-0-11-0" class="section level1">
 <h1 class="page-header">
-<a href="#rbabylon-0-11-0" class="anchor"></a>rbabylon 0.11.0</h1>
+<a href="#bbr-0-11-0" class="anchor"></a>bbr 0.11.0</h1>
 <div id="new-features-and-changes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#new-features-and-changes" class="anchor"></a>New features and changes</h2>
 <ul>
-<li><p>Added print methods for <code>bbi_nonmem_summary</code> and <code>babylon_process</code> objects. The <code>bbi_nonmem_summary</code> object should print nicely in the console, and also look good in <code>.Rmd</code> chunks with the option <code>results = 'asis'</code>. (#298 and #294)</p></li>
+<li><p>Added print methods for <code>bbi_nonmem_summary</code> and <code>bbi_process</code> objects. The <code>bbi_nonmem_summary</code> object should print nicely in the console, and also look good in <code>.Rmd</code> chunks with the option <code>results = 'asis'</code>. (#298 and #294)</p></li>
 <li><p>The <code>bbi_nonmem_summary</code> object now contains the <code>absolute_model_path</code> and we have added the following methods to work on that object (these previously only worked on <code>bbi_nonmem_model</code> objects): <code><a href="../reference/get_model_id.html">get_model_id()</a></code>, <code><a href="../reference/get_path_from_object.html">get_model_path()</a></code>, <code><a href="../reference/get_path_from_object.html">get_output_dir()</a></code>, <code><a href="../reference/get_path_from_object.html">get_yaml_path()</a></code>, <code><a href="../reference/check_nonmem_table_output.html">check_grd()</a></code>, <code><a href="../reference/check_nonmem_table_output.html">check_ext()</a></code>. (#297)</p></li>
 <li><p>For developers, there are now scripts in <code>data-raw</code> which regenerate the test reference files and re-run the test models. All test references and example files have now been consolidated in <code>inst</code> as well. Users will see these files in <code>extdata</code>, <code>model</code>, and <code>test-refs</code> when the package is installed. (#289)</p></li>
 <li><p>Also for developers, we are now using <code>pkgr</code> and <code>renv</code> to isolate dependencies when developing. The <code>README</code> has been updated with instructions for how to use this when developing. (#276)</p></li>
@@ -162,9 +162,9 @@
 </ul>
 </div>
 </div>
-    <div id="rbabylon-0-10-0" class="section level1">
+    <div id="bbr-0-10-0" class="section level1">
 <h1 class="page-header">
-<a href="#rbabylon-0-10-0" class="anchor"></a>rbabylon 0.10.0</h1>
+<a href="#bbr-0-10-0" class="anchor"></a>bbr 0.10.0</h1>
 <div id="new-features-and-changes-1" class="section level2">
 <h2 class="hasAnchor">
 <a href="#new-features-and-changes-1" class="anchor"></a>New features and changes</h2>
@@ -175,7 +175,7 @@
 <li><p>Added <code>run</code> column to all <code>bbi_log_df</code> tibbles. This is always the second column and is equivalent to <code><a href="https://rdrr.io/r/base/basename.html">basename(absolute_model_path)</a></code>. While, <code>absolute_model_path</code> remains the primary key for the tibble, <code>run</code> is useful for displaying tables when <code>absolute_model_path</code> becomes long and difficult to look at. (#259)</p></li>
 <li><p>Added <code>notes</code> field to model object (and <code>bbi_run_log_df</code>) and associated helpers <code><a href="../reference/modify_notes.html">add_notes()</a></code>, <code><a href="../reference/modify_notes.html">replace_note()</a></code>, <code><a href="../reference/modify_notes.html">replace_all_notes()</a></code>, <code><a href="../reference/modify_notes.html">remove_notes()</a></code>. This will replace <code>decisions</code>, to reflect the fact that users will want to use this field throughout the modeling process, not only at the end once some “decisions” have been reached. <code><a href="../reference/modify_decisions.html">add_decisions()</a></code> and <code><a href="../reference/modify_decisions.html">replace_decisions()</a></code> now print a warning telling the user that they will be deprecated in the future and encouraging use of their <code>_notes</code> counterparts. (#258)</p></li>
 <li><p><code>.description</code> is no longer a required argument for <code><a href="../reference/new_model.html">new_model()</a></code> or <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code>, nor is it a required element of a model object or YAML file. The helper function <code><a href="../reference/modify_description.html">add_description()</a></code> has been added to fill the <code>description</code> field. (#267)</p></li>
-<li><p>The <code>.update_model_file</code> argument to <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> no longer updates the <code>$PROB</code> in the new control stream with the <code>.description</code> argument. Instead it puts the following in <code>$PROB</code>: <code>From rbabylon: see {get_model_id(.new_model)}.yaml for details</code> (#265)</p></li>
+<li><p>The <code>.update_model_file</code> argument to <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> no longer updates the <code>$PROB</code> in the new control stream with the <code>.description</code> argument. Instead it puts the following in <code>$PROB</code>: <code>From bbr: see {get_model_id(.new_model)}.yaml for details</code> (#265)</p></li>
 <li><p>Added <code><a href="../reference/modify_tags.html">remove_tags()</a></code>, <code><a href="../reference/modify_notes.html">remove_notes()</a></code>, and <code><a href="../reference/modify_based_on.html">remove_based_on()</a></code> functions for removing specific strings from the relevant model object field. (#252)</p></li>
 </ul>
 </div>
@@ -188,9 +188,9 @@
 </ul>
 </div>
 </div>
-    <div id="rbabylon-0-9-0" class="section level1">
+    <div id="bbr-0-9-0" class="section level1">
 <h1 class="page-header">
-<a href="#rbabylon-0-9-0" class="anchor"></a>rbabylon 0.9.0</h1>
+<a href="#bbr-0-9-0" class="anchor"></a>bbr 0.9.0</h1>
 <div id="breaking-changes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#breaking-changes" class="anchor"></a>Breaking changes</h2>
@@ -222,9 +222,9 @@
 </ul>
 </div>
 </div>
-    <div id="rbabylon-0-8-0" class="section level1">
+    <div id="bbr-0-8-0" class="section level1">
 <h1 class="page-header">
-<a href="#rbabylon-0-8-0" class="anchor"></a>rbabylon 0.8.0</h1>
+<a href="#bbr-0-8-0" class="anchor"></a>bbr 0.8.0</h1>
 <ul>
 <li><p>Added vignette demonstrating new <code><a href="../reference/summary_log.html">summary_log()</a></code> functionality.</p></li>
 <li><p>Added shrinkage column to the tibble output from <code><a href="../reference/param_estimates.html">param_estimates.bbi_nonmem_summary()</a></code>.</p></li>
@@ -247,10 +247,10 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
-        <li><a href="#rbabylon-0-11-0">0.11.0</a></li>
-        <li><a href="#rbabylon-0-10-0">0.10.0</a></li>
-        <li><a href="#rbabylon-0-9-0">0.9.0</a></li>
-        <li><a href="#rbabylon-0-8-0">0.8.0</a></li>
+        <li><a href="#bbr-0-11-0">0.11.0</a></li>
+        <li><a href="#bbr-0-10-0">0.10.0</a></li>
+        <li><a href="#bbr-0-9-0">0.9.0</a></li>
+        <li><a href="#bbr-0-8-0">0.8.0</a></li>
       </ul>
     </div>
   </div>

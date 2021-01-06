@@ -1,8 +1,8 @@
-# rbabylon 0.11.0
+# bbr 0.11.0
 
 ## New features and changes
 
-* Added print methods for `bbi_nonmem_summary` and `babylon_process` objects. The `bbi_nonmem_summary` object should print nicely in the console, and also look good in `.Rmd` chunks with the option `results = 'asis'`. (#298 and #294)
+* Added print methods for `bbi_nonmem_summary` and `bbi_process` objects. The `bbi_nonmem_summary` object should print nicely in the console, and also look good in `.Rmd` chunks with the option `results = 'asis'`. (#298 and #294)
 
 * The `bbi_nonmem_summary` object now contains the `absolute_model_path` and we have added the following methods to work on that object (these previously only worked on `bbi_nonmem_model` objects): `get_model_id()`, `get_model_path()`, `get_output_dir()`, `get_yaml_path()`, `check_grd()`, `check_ext()`. (#297)
 
@@ -16,7 +16,7 @@
 
 * Previously the `add_summary()` function would error if all the model summaries errored. Now it will return, passing through the model summary errors to the tibble, as it should. (#282)
 
-# rbabylon 0.10.0
+# bbr 0.10.0
 
 ## New features and changes
 
@@ -56,7 +56,7 @@ file. The helper function `add_description()` has been added to fill the
 
 * The `.update_model_file` argument to `copy_model_from()` no longer updates the
 `$PROB` in the new control stream with the `.description` argument. Instead it
-puts the following in `$PROB`: `From rbabylon: see
+puts the following in `$PROB`: `From bbr: see
 {get_model_id(.new_model)}.yaml for details` (#265)
 
 * Added `remove_tags()`, `remove_notes()`, and `remove_based_on()` functions for
@@ -73,7 +73,7 @@ yet been run, or did not finish successfully). However, if there is no output
 directory at all for a given model (it has never been run) then these functions
 would error. Now they correctly warn in that scenario. (#253)
 
-# rbabylon 0.9.0
+# bbr 0.9.0
 
 ## Breaking changes
 
@@ -128,7 +128,7 @@ would error. Now they correctly warn in that scenario. (#253)
   `bbi_log_df`. `get_model_path()`, `get_output_dir()`, and `get_yaml_path()` 
   gain methods for this new class (#192).
 
-# rbabylon 0.8.0
+# bbr 0.8.0
 
 * Added vignette demonstrating new `summary_log()` functionality.
 

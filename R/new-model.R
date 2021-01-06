@@ -19,7 +19,7 @@
 #'   and ancestry. \strong{Paths must be relative to `.yaml_path`.}
 #' @param .tags A character scalar or vector with any user tags to be added to
 #'   the YAML file
-#' @param .bbi_args A named list specifying arguments to pass to babylon
+#' @param .bbi_args A named list specifying arguments to pass to bbi
 #'   formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" =
 #'   4)`. Run [print_bbi_args()] to see valid arguments. These will be written
 #'   into YAML file.

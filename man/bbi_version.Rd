@@ -2,18 +2,18 @@
 % Please edit documentation in R/use-bbi.R
 \name{bbi_version}
 \alias{bbi_version}
-\title{Get version of installed babylon}
+\title{Get version of installed bbi}
 \usage{
-bbi_version(.bbi_exe_path = getOption("rbabylon.bbi_exe_path"))
+bbi_version(.bbi_exe_path = getOption("bbr.bbi_exe_path"))
 }
 \arguments{
-\item{.bbi_exe_path}{Path to babylon executable}
+\item{.bbi_exe_path}{Path to bbi executable}
 }
 \value{
 String giving the version of the bbi binary installed at \code{.bbi_exe_path}
 }
 \description{
-Get version of installed babylon
+Get version of installed bbi
 }
 \examples{
 \dontrun{

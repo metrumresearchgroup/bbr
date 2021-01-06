@@ -29,5 +29,5 @@ It takes an integer and returns a logical vector indicating whether each element
 of an \code{.n}-sized block with diagonal or not.
 
 For more details and examples of how to specify \verb{$OMEGA} and \verb{$SIGMA} block structure, see the "Parameter Labels" vignette:
-\href{../docs/articles/parameter-labels.html}{\code{vignette("parameter-labels", package = "rbabylon")}}
+\href{../docs/articles/parameter-labels.html}{\code{vignette("parameter-labels", package = "bbr")}}
 }

@@ -53,7 +53,7 @@
 #'
 #' @seealso [model_summaries()]
 #' @param .mod Model to summarize.
-#' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`.
+#' @param .bbi_args A named list specifying arguments to pass to bbi formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`.
 #' See [print_bbi_args()] for full list of options.
 #' @param ... args passed through to [bbi_exec()]
 #' @param .dry_run show what the command would be without actually running it
@@ -94,7 +94,7 @@ model_summary.bbi_nonmem_model <- function(
 #'
 #' Private implementation function called by `model_summary()` dispatches.
 #' @param .mod `bbi_nonmem_model` object for summary
-#' @param .bbi_args A named list specifying arguments to pass to babylon formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run [print_bbi_args()] to see valid arguments.
+#' @param .bbi_args A named list specifying arguments to pass to bbi formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`. Run [print_bbi_args()] to see valid arguments.
 #'
 #' @importFrom purrr list_modify
 #' @importFrom rlang list2

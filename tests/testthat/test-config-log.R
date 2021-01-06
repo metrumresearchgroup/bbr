@@ -104,12 +104,12 @@ test_that("config_log() reflects model mismatch", {
 })
 
 test_that("config_log() reflects data mismatch", {
-  perturb_file(system.file("extdata", "acop.csv", package = "rbabylon"))
+  perturb_file(system.file("extdata", "acop.csv", package = "bbr"))
   log_df <- config_log(MODEL_DIR)
   expect_equal(log_df[["data_has_changed"]][1], TRUE)
 })
 
-test_that("config_log() includes babylon version", {
+test_that("config_log() includes bbi version", {
   log_df <- config_log(MODEL_DIR)
   expect_equal(log_df[["bbi_version"]][1], expected_bbi_version)
 })

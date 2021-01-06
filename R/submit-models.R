@@ -11,7 +11,7 @@
 #' @details The number of `bbi` calls to make is determined by the number of
 #' distinct sets of `bbi` arguments passed to the submission calls, either
 #' explicitly through `.bbi_args`, as specified in the `bbi_args` field of the
-#' model YAML, or specified globally in `babylon.yaml`.
+#' model YAML, or specified globally in `bbi.yaml`.
 #' @seealso [submit_model()]
 #' @param .mods The model objects to submit.
 #' @inheritParams submit_model
@@ -76,7 +76,7 @@ submit_models.list <- function(
 # Private implementation function(s)
 #####################################
 
-#' Submit multiple NONMEM models in batch via babylon
+#' Submit multiple NONMEM models in batch via bbi
 #'
 #' Private implementation function called by `submit_models()` dispatches.
 #' @param .mods A list of S3 objects of class `bbi_nonmem_model`
@@ -85,7 +85,7 @@ submit_models.list <- function(
 #' @importFrom tools file_path_sans_ext
 #' @importFrom purrr map
 #' @importFrom rlang is_bare_list
-#' @return A list of S3 objects of class `babylon_process`
+#' @return A list of S3 objects of class `bbi_process`
 #' @keywords internal
 submit_nonmem_models <- function(.mods,
                                  .bbi_args = NULL,

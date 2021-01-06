@@ -38,7 +38,7 @@ when a model is created with \code{\link[=copy_model_from]{copy_model_from()}}.
 The model identifiers in the \code{based_on} field are paths another model file
 (without file extension) \emph{relative} to the location of \code{.mod}.
 
-There is a \href{https://metrumresearchgroup.github.io/rbabylon/articles/using-based-on.html}{"Using the based_on field" vignette}
+There is a \href{https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html}{"Using the based_on field" vignette}
 which demonstrates the motivation and usage of this field.
 }
 \section{Functions}{
@@ -47,7 +47,7 @@ which demonstrates the motivation and usage of this field.
 
 \item \code{replace_all_based_on}: Replaces entire \code{based_on} field in a model object and corresponding YAML with new values.
 
-\item \code{replace_based_on}: \strong{Deprecated} as of rbabylon 0.10.0, use \code{replace_all_based_on()} instead.
+\item \code{replace_based_on}: \strong{Deprecated} as of bbr 0.10.0, use \code{replace_all_based_on()} instead.
 
 \item \code{remove_based_on}: Remove specified \code{based_on} identifier(s) from a model object and corresponding YAML.
 }}

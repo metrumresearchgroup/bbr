@@ -2,7 +2,7 @@
 % Please edit documentation in R/submit-model.R
 \name{submit_nonmem_model}
 \alias{submit_nonmem_model}
-\title{Submit a NONMEM model via babylon}
+\title{Submit a NONMEM model via bbi}
 \usage{
 submit_nonmem_model(
   .mod,
@@ -18,7 +18,7 @@ submit_nonmem_model(
 \item{.mod}{An S3 object of class \code{bbi_nonmem_model}, for example from \code{new_model()}, \code{read_model()} or \code{copy_model_from()}}
 }
 \value{
-An S3 object of class \code{babylon_process}
+An S3 object of class \code{bbi_process}
 }
 \description{
 Private implementation function called by \code{submit_model()} dispatches.

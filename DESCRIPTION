@@ -1,6 +1,6 @@
 Type: Package
-Package: rbabylon
-Title: R package for babylon
+Package: bbr
+Title: R package for bbi
 Version: 0.11.0.9000
 Authors@R: 
     c(person(given = "Devin",
@@ -15,7 +15,7 @@ Authors@R:
              family = "Wilson",
              role = "aut",
              email = "copernican@gmail.com"))
-Description: R package for making calls to babylon for running
+Description: R package for making calls to bbi for running
     NONMEM and other models. Also manages model metadata, workflow, and
     run logs.
 License: MIT + file LICENSE
@@ -55,4 +55,4 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
-SystemRequirements: babylon (>= 2.3.0)
+SystemRequirements: bbi (>= 3.0.0)
