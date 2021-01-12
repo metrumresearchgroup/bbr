@@ -45,6 +45,7 @@ test_that("check_bbi_exe() correctly errors or finds paths", {
 
 test_that("check_bbi_exe() errors on too low version", {
   skip_if_over_rate_limit()
+  skip_if(getOption("rbabylon.DEV_no_min_version"))
 
   withr::with_options(list("rbabylon.bbi_min_version" = package_version("100.0.0")), {
     # should fail because version number is less than 100.0.0
