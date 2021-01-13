@@ -63,8 +63,8 @@ local({
       return(repos)
 
     # if we're testing, re-use the test repositories
-   # if (renv_bootstrap_tests_running())
-  #    return(getOption("renv.tests.repos"))
+    if (renv_bootstrap_tests_running())
+     return(getOption("renv.tests.repos"))
 
     # retrieve current repos
     repos <- getOption("repos")
@@ -160,7 +160,11 @@ local({
 
   renv_bootstrap_download_cran_latest_find <- function(version) {
 
-    all <- renv_bootstrap_repos()
+    #all <- renv_bootstrap_repos()
+    all <- unique(c(
+      getOption("repos"),
+      getOption("renv.bootstrap.repos", default = "https://cloud.r-project.org")
+    ))
 
     for (repos in all) {
 
