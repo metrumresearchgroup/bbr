@@ -209,7 +209,7 @@ highlight_cell <- function(.l, .i, .threshold) {
 }
 
 #' @describeIn print_bbi Prints the information contained in the model object and whether the model has been run
-#' @importFrom cli cli_h1 cli_h2 cat_bullet style_italic col_blue col_green col_red
+#' @importFrom cli cli_h1 cli_h2 cat_bullet style_italic col_blue col_green col_red cat_rule
 #' @importFrom purrr iwalk walk
 print.bbi_nonmem_model <- function(x, ...) {
   is_valid_print <- function(.x) {
@@ -217,6 +217,33 @@ print.bbi_nonmem_model <- function(x, ...) {
       length(.x) != 0
     } else {
       FALSE
+    }
+  }
+
+  heading <- cli_h1
+  subheading <- cli_h2
+  bullet_list <- cat_bullet
+
+  if (isTRUE(getOption('knitr.in.progress'))) {
+    is_asis <- knitr::opts_current$get("results") == 'asis'
+
+    heading <- function(x) {
+      # alphanumeric width = 1, line width = 2
+      # w = ncharacters in output to width = 80
+      cat('\n')
+      if (is_asis) {
+        w <- ceiling(nchar(x) + (80 - nchar(x)) / 2)
+        cat_rule(x, width = w)
+      } else {
+        cat_rule(x)
+      }
+    }
+
+    bullet_list <- subheading <- function(x) {
+      if (is_asis) {
+        cat("\n")
+      }
+      cat_bullet(x)
     }
   }
 
@@ -233,35 +260,35 @@ print.bbi_nonmem_model <- function(x, ...) {
 
   }
 
-  cli_h1('Status')
-  cli_h2(status)
+  heading('Status')
+  subheading(status)
 
-  cli_h1("Absolute Model Path")
-  cat_bullet(x[[ABS_MOD_PATH]])
+  heading("Absolute Model Path")
+  bullet_list(x[[ABS_MOD_PATH]])
 
-  cli_h1("YAML & Model Files")
-  cat_bullet(get_yaml_path(x, .check_exists = FALSE))
-  cat_bullet(get_model_path(x, .check_exists = FALSE))
+  heading("YAML & Model Files")
+  bullet_list(get_yaml_path(x, .check_exists = FALSE))
+  bullet_list(get_model_path(x, .check_exists = FALSE))
 
   if (is_valid_print(x[[YAML_DESCRIPTION]])) {
-    cli_h1('Description')
-    cat_bullet(style_italic(x[[YAML_DESCRIPTION]]))
+    heading('Description')
+    bullet_list(style_italic(x[[YAML_DESCRIPTION]]))
   }
 
   if (is_valid_print(x[[YAML_TAGS]])) {
-    cli_h1('Tags')
-    walk(x[[YAML_TAGS]], cat_bullet)
+    heading('Tags')
+    walk(x[[YAML_TAGS]], bullet_list)
   }
 
   if (is_valid_print(x[[YAML_NOTES]])) {
-    cli_h1('Notes')
+    heading('Notes')
     iwalk(x[[YAML_NOTES]],
-          ~cat_bullet(paste0(.y, ": ", style_italic(.x))))
+          ~ bullet_list(paste0(.y, ": ", style_italic(.x))))
   }
 
   if (is_valid_print(x[[YAML_BBI_ARGS]])) {
-    cli_h1("BBI Args")
+    heading("BBI Args")
     iwalk(x[[YAML_BBI_ARGS]],
-          ~cat_bullet(paste0(.y, ": ", col_blue(.x))))
+          ~ bullet_list(paste0(.y, ": ", col_blue(.x))))
   }
 }
