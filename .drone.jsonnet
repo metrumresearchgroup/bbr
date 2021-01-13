@@ -14,6 +14,7 @@ local temp_volume_dir = "/ephemeral";
 local r_env_vars = {
   "NOT_CRAN": "true",  # you almost certainly want this
   "BABYLON_EXE_PATH": std.join("/", [temp_volume_dir, "bbi"]),
+  "R_PROFILE_USER": "do_not_use", # we do not want to source .Rprofile in any R processes including subprocesses
 };
 
 # images specified as repo:tag; first element will be used to build release
@@ -214,7 +215,7 @@ local pull_image(image, volumes=[]) = {
 # r_path          path to R executable
 # expr            expression to run
 local run_r_expression(r_path, expr) =
-  std.join(" ", [r_path, "--no-init-file", "-e", std.escapeStringBash(expr)]);
+  std.join(" ", [r_path, "-e", std.escapeStringBash(expr)]);
 
 # Drone step to copy a tagged release to S3
 #
