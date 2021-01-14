@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.10.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.11.0</span>
       </span>
     </div>
 
@@ -46,7 +46,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -81,7 +81,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/metrumresearchgroup/rbabylon">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fas fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -114,8 +114,8 @@
 <a href="#introduction" class="anchor"></a>Introduction</h1>
 <p>This “Getting Started with rbabylon” vignette takes the user through some basic scenarios for modeling with NONMEM using <code>rbabylon</code>, introducing you to its standard workflow and functionality.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(rbabylon)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(dplyr))</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(purrr))</a></code></pre></div>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(dplyr)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(purrr)</a></code></pre></div>
 <p><code>rbabylon</code> is an R interface for running <code>babylon</code>, which is (will be) a complete solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. Currently, only NONMEM is supported, so this vignette will only address that.</p>
 </div>
 <div id="setup" class="section level1">
@@ -149,7 +149,7 @@
 <h3 class="hasAnchor">
 <a href="#bbi_init" class="anchor"></a>bbi_init()</h3>
 <p>The <code><a href="../reference/bbi_init.html">bbi_init()</a></code> function will create a <code>babylon.yaml</code>, with the default settings, in the specified directory. Optionally, you can pass the path to a <code>babylon.yaml</code> to the <code>.config_path</code> argument of any <code>rbabylon</code> function that needs one. However, by default these functions will look for one in the same folder as the model being submitted or manipulated. Therefore, if you will have a number of models in the same folder, it is easiest to put a <code>babylon.yaml</code> that folder.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">MODEL_DIR &lt;-<span class="st"> "../nonmem"</span>    <span class="co"># this should be relative to your working directory</span></a>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">MODEL_DIR &lt;-<span class="st"> "../model/nonmem/basic"</span>  <span class="co"># this should be relative to your working directory</span></a>
 <a class="sourceLine" id="cb4-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb4-3" data-line-number="3"><span class="kw"><a href="../reference/bbi_init.html">bbi_init</a></span>(<span class="dt">.dir =</span> MODEL_DIR,            <span class="co"># the directory to create the babylon.yaml in</span></a>
 <a class="sourceLine" id="cb4-4" data-line-number="4">         <span class="dt">.nonmem_dir =</span> <span class="st">"/opt/NONMEM"</span>, <span class="co"># location of NONMEM installation</span></a>
@@ -247,9 +247,9 @@
 <p>Once the model run has completed, users can get a summary object containing much of the commonly used diagnostic information in a named list.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">sum1 &lt;-<span class="st"> </span>mod1 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/model_summary.html">model_summary</a></span>()</a>
 <a class="sourceLine" id="cb9-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(sum1))</a>
-<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="co">#&gt; [1] "run_details"       "run_heuristics"    "parameters_data"  </span></a>
-<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="co">#&gt; [4] "parameter_names"   "ofv"               "condition_number" </span></a>
-<a class="sourceLine" id="cb9-5" data-line-number="5"><span class="co">#&gt; [7] "shrinkage_details"</span></a></code></pre></div>
+<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="co">#&gt; [1] "absolute_model_path" "run_details"         "run_heuristics"     </span></a>
+<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="co">#&gt; [4] "parameters_data"     "parameter_names"     "ofv"                </span></a>
+<a class="sourceLine" id="cb9-5" data-line-number="5"><span class="co">#&gt; [7] "condition_number"    "shrinkage_details"</span></a></code></pre></div>
 <p>These elements can be accessed manually or extracted with built-in helper functions like so:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">param_df1 &lt;-<span class="st"> </span>sum1 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/param_estimates.html">param_estimates</a></span>()</a>
 <a class="sourceLine" id="cb10-2" data-line-number="2">param_df1</a>
@@ -290,8 +290,9 @@
 <h2 class="hasAnchor">
 <a href="#adding-tags-and-notes" class="anchor"></a>Adding tags and notes</h2>
 <p>After looking at these results, the user can add tags, which can later be used to organize your modeling runs.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">mod1 &lt;-<span class="st"> </span>mod1 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/modify_tags.html">add_tags</a></span>(<span class="st">"base model"</span>)</a>
-<a class="sourceLine" id="cb14-2" data-line-number="2">mod2 &lt;-<span class="st"> </span>mod2 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/modify_tags.html">add_tags</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"base model"</span>, <span class="st">"2 compartment"</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">mod1 &lt;-<span class="st"> </span>mod1 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/modify_tags.html">add_tags</a></span>(<span class="st">"orig acop model"</span>)</a>
+<a class="sourceLine" id="cb14-2" data-line-number="2">mod2 &lt;-<span class="st"> </span>mod2 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/modify_tags.html">add_tags</a></span>(<span class="st">"2 compartment"</span>)</a></code></pre></div>
+<p>Note that using free text for your tags is discouraged, for reasons mentioned in the <code><a href="../reference/modify_tags.html">?modify_tags</a></code> help page. For simplicity’s sake, we ignore that advice here, but please read it before using tags extensively in the wild.</p>
 <p>In addition to tags, the user can add notes that can be referenced later.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">mod2 &lt;-<span class="st"> </span>mod2 <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb15-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="../reference/modify_notes.html">add_notes</a></span>(<span class="st">"2 compartment model more appropriate than 1 compartment"</span>)</a></code></pre></div>
@@ -299,16 +300,16 @@
 <div id="continue-to-iterate" class="section level2">
 <h2 class="hasAnchor">
 <a href="#continue-to-iterate" class="anchor"></a>Continue to iterate…</h2>
-<p>Now the iteration process continues with a third model.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">mod3 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/copy_model_from.html">copy_model_from</a></span>(mod2, <span class="dv">3</span>)</a></code></pre></div>
+<p>Now the iteration process continues with a third model. Note that you can tell <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> to inherit the tags from the parent model and automatically add them to the new model.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">mod3 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/copy_model_from.html">copy_model_from</a></span>(mod2, <span class="dv">3</span>, <span class="dt">.inherit_tags =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <p>Submit and summarize as before.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="co"># manually edit control stream, then...</span></a>
 <a class="sourceLine" id="cb17-2" data-line-number="2">mod3 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/submit_model.html">submit_model</a></span>()</a>
 <a class="sourceLine" id="cb17-3" data-line-number="3">mod3 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/model_summary.html">model_summary</a></span>()</a></code></pre></div>
 <p>Add tags and notes for filtering in run log, described next.</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">mod3 &lt;-<span class="st"> </span>mod3 <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb18-2" data-line-number="2"><span class="st">        </span><span class="kw"><a href="../reference/modify_tags.html">add_tags</a></span>(<span class="st">"2 compartment"</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb18-3" data-line-number="3"><span class="st">        </span><span class="kw"><a href="../reference/modify_notes.html">add_notes</a></span>(<span class="st">"Added residual errors because it seemed like a good idea."</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb18-2" data-line-number="2"><span class="st">        </span><span class="kw"><a href="../reference/modify_tags.html">add_tags</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"combined RUV"</span>, <span class="st">"iiv CL"</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb18-3" data-line-number="3"><span class="st">        </span><span class="kw"><a href="../reference/modify_notes.html">add_notes</a></span>(<span class="st">"Added combined error structure because it seemed like a good idea"</span>)</a></code></pre></div>
 </div>
 </div>
 <div id="run-log" class="section level1">
@@ -321,9 +322,9 @@
 <a class="sourceLine" id="cb19-3" data-line-number="3"><span class="co">#&gt; # A tibble: 3 x 10</span></a>
 <a class="sourceLine" id="cb19-4" data-line-number="4"><span class="co">#&gt;   absolute_model_… run   yaml_md5 model_type description bbi_args based_on tags </span></a>
 <a class="sourceLine" id="cb19-5" data-line-number="5"><span class="co">#&gt;   &lt;chr&gt;            &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;chr&gt;       &lt;list&gt;   &lt;list&gt;   &lt;lis&gt;</span></a>
-<a class="sourceLine" id="cb19-6" data-line-number="6"><span class="co">#&gt; 1 /tmp/RtmpZUCZ4V… 1     7850aa9… nonmem     &lt;NA&gt;        &lt;list [… &lt;NULL&gt;   &lt;chr…</span></a>
-<a class="sourceLine" id="cb19-7" data-line-number="7"><span class="co">#&gt; 2 /tmp/RtmpZUCZ4V… 2     8175338… nonmem     &lt;NA&gt;        &lt;list [… &lt;chr [1… &lt;chr…</span></a>
-<a class="sourceLine" id="cb19-8" data-line-number="8"><span class="co">#&gt; 3 /tmp/RtmpZUCZ4V… 3     a304c5f… nonmem     &lt;NA&gt;        &lt;list [… &lt;chr [1… &lt;chr…</span></a>
+<a class="sourceLine" id="cb19-6" data-line-number="6"><span class="co">#&gt; 1 /tmp/Rtmpxo18BY… 1     c7486e7… nonmem     &lt;NA&gt;        &lt;list [… &lt;NULL&gt;   &lt;chr…</span></a>
+<a class="sourceLine" id="cb19-7" data-line-number="7"><span class="co">#&gt; 2 /tmp/Rtmpxo18BY… 2     bc60c6b… nonmem     &lt;NA&gt;        &lt;list [… &lt;chr [1… &lt;chr…</span></a>
+<a class="sourceLine" id="cb19-8" data-line-number="8"><span class="co">#&gt; 3 /tmp/Rtmpxo18BY… 3     cfceb67… nonmem     &lt;NA&gt;        &lt;list [… &lt;chr [1… &lt;chr…</span></a>
 <a class="sourceLine" id="cb19-9" data-line-number="9"><span class="co">#&gt; # … with 2 more variables: notes &lt;list&gt;, decisions &lt;list&gt;</span></a></code></pre></div>
 <p>The <code><a href="../reference/run_log.html">run_log()</a></code> returns a tibble which can be manipulated like any other tibble. However, several of the columns (<code>tags</code>, <code>notes</code>, and <code>based_on</code> for example) are list columns, which complicates how you can interact with them. We provide some helper functions to more seamlessly interact with these log tibbles, as well as some sample <code>tidyverse</code> code below.</p>
 <div id="viewing-tags-example" class="section level2">
@@ -334,11 +335,11 @@
 <a class="sourceLine" id="cb20-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="../reference/collapse_to_string.html">collapse_to_string</a></span>(tags, notes) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb20-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(run, tags, notes)</a>
 <a class="sourceLine" id="cb20-4" data-line-number="4"><span class="co">#&gt; # A tibble: 3 x 3</span></a>
-<a class="sourceLine" id="cb20-5" data-line-number="5"><span class="co">#&gt;   run   tags                   notes                                            </span></a>
-<a class="sourceLine" id="cb20-6" data-line-number="6"><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;                  &lt;chr&gt;                                            </span></a>
-<a class="sourceLine" id="cb20-7" data-line-number="7"><span class="co">#&gt; 1 1     base model             &lt;NA&gt;                                             </span></a>
-<a class="sourceLine" id="cb20-8" data-line-number="8"><span class="co">#&gt; 2 2     base model, 2 compart… 2 compartment model more appropriate than 1 comp…</span></a>
-<a class="sourceLine" id="cb20-9" data-line-number="9"><span class="co">#&gt; 3 3     2 compartment          Added residual errors because it seemed like a g…</span></a></code></pre></div>
+<a class="sourceLine" id="cb20-5" data-line-number="5"><span class="co">#&gt;   run   tags                       notes                                        </span></a>
+<a class="sourceLine" id="cb20-6" data-line-number="6"><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;                      &lt;chr&gt;                                        </span></a>
+<a class="sourceLine" id="cb20-7" data-line-number="7"><span class="co">#&gt; 1 1     orig acop model            &lt;NA&gt;                                         </span></a>
+<a class="sourceLine" id="cb20-8" data-line-number="8"><span class="co">#&gt; 2 2     2 compartment              2 compartment model more appropriate than 1 …</span></a>
+<a class="sourceLine" id="cb20-9" data-line-number="9"><span class="co">#&gt; 3 3     2 compartment, combined R… Added combined error structure because it se…</span></a></code></pre></div>
 </div>
 <div id="filtering-tags-example" class="section level2">
 <h2 class="hasAnchor">
@@ -346,12 +347,13 @@
 <p>This code uses <code><a href="https://purrr.tidyverse.org/reference/map.html">purrr::map_lgl</a></code> to filter the run log to only rows containing a specific tag (<code>"2 compartment"</code>).</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">log_df <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb21-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="kw"><a href="https://purrr.tidyverse.org/reference/map.html">map_lgl</a></span>(tags, <span class="op">~</span><span class="st"> "2 compartment"</span> <span class="op">%in%</span><span class="st"> </span>.x)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb21-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(run, tags, notes)</a>
-<a class="sourceLine" id="cb21-4" data-line-number="4"><span class="co">#&gt; # A tibble: 2 x 3</span></a>
-<a class="sourceLine" id="cb21-5" data-line-number="5"><span class="co">#&gt;   run   tags      notes    </span></a>
-<a class="sourceLine" id="cb21-6" data-line-number="6"><span class="co">#&gt;   &lt;chr&gt; &lt;list&gt;    &lt;list&gt;   </span></a>
-<a class="sourceLine" id="cb21-7" data-line-number="7"><span class="co">#&gt; 1 2     &lt;chr [2]&gt; &lt;chr [1]&gt;</span></a>
-<a class="sourceLine" id="cb21-8" data-line-number="8"><span class="co">#&gt; 2 3     &lt;chr [1]&gt; &lt;chr [1]&gt;</span></a></code></pre></div>
+<a class="sourceLine" id="cb21-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="../reference/collapse_to_string.html">collapse_to_string</a></span>(tags, notes) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb21-4" data-line-number="4"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(run, tags, notes)</a>
+<a class="sourceLine" id="cb21-5" data-line-number="5"><span class="co">#&gt; # A tibble: 2 x 3</span></a>
+<a class="sourceLine" id="cb21-6" data-line-number="6"><span class="co">#&gt;   run   tags                       notes                                        </span></a>
+<a class="sourceLine" id="cb21-7" data-line-number="7"><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;                      &lt;chr&gt;                                        </span></a>
+<a class="sourceLine" id="cb21-8" data-line-number="8"><span class="co">#&gt; 1 2     2 compartment              2 compartment model more appropriate than 1 …</span></a>
+<a class="sourceLine" id="cb21-9" data-line-number="9"><span class="co">#&gt; 2 3     2 compartment, combined R… Added combined error structure because it se…</span></a></code></pre></div>
 </div>
 </div>
 <div id="further-reading" class="section level1">
