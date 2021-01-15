@@ -76,7 +76,12 @@ isolation. To replicate this environment,
 
 2. install pkgr
 
-3. run `pkgr install`
+3. open package in an R session and run `renv::init()` 
+   - install `renv` > 0.8.3-4 into default `.libPaths()` if not already installed
+
+3. run `pkgr install` in terminal within package directory
+
+4. restart session
 
 Then, launch R with the repo as the working directory (open the project in 
 RStudio). renv will activate and find the project library.
