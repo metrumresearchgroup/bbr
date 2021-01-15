@@ -67,3 +67,26 @@ functionality is rolled out. A complete list can be found
     Log](https://metrumresearchgroup.github.io/bbr/articles/using-summary-log.html)
     – How to use `summary_log()` to extract model diagnostics like the
     objective function value, condition number, and parameter counts.
+
+## Development
+
+`rbabylon` uses [pkgr](https://github.com/metrumresearchgroup/pkgr) to
+manage development dependencies and
+[renv](https://rstudio.github.io/renv/) to provide isolation. To
+replicate this environment,
+
+1.  clone the repo
+
+2.  install pkgr
+
+3.  open package in an R session and run `renv::init()`
+    
+      - install `renv` \> 0.8.3-4 into default `.libPaths()` if not
+        already installed
+
+4.  run `pkgr install` in terminal within package directory
+
+5.  restart session
+
+Then, launch R with the repo as the working directory (open the project
+in RStudio). renv will activate and find the project library.
