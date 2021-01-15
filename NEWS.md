@@ -1,4 +1,8 @@
-# bbr 0.11.0
+# bbr (development)
+
+This package has been renamed to from `rbabylon` to `bbr` and the accompanying command-line tool has been renamed from `babylon` to `bbi` (which was already its alias, used throughout the package). Any mentions of `babylon` and `rbabylon` throughout the package have been renamed accordingly. Mentions of either in the older parts of this `NEWS.md` document were left as is for historical purposes.
+
+# rbabylon 0.11.0
 
 ## New features and changes
 
@@ -16,7 +20,7 @@
 
 * Previously the `add_summary()` function would error if all the model summaries errored. Now it will return, passing through the model summary errors to the tibble, as it should. (#282)
 
-# bbr 0.10.0
+# rbabylon 0.10.0
 
 ## New features and changes
 
@@ -56,7 +60,7 @@ file. The helper function `add_description()` has been added to fill the
 
 * The `.update_model_file` argument to `copy_model_from()` no longer updates the
 `$PROB` in the new control stream with the `.description` argument. Instead it
-puts the following in `$PROB`: `From bbr: see
+puts the following in `$PROB`: `From rbabylon: see
 {get_model_id(.new_model)}.yaml for details` (#265)
 
 * Added `remove_tags()`, `remove_notes()`, and `remove_based_on()` functions for
@@ -73,7 +77,7 @@ yet been run, or did not finish successfully). However, if there is no output
 directory at all for a given model (it has never been run) then these functions
 would error. Now they correctly warn in that scenario. (#253)
 
-# bbr 0.9.0
+# rbabylon 0.9.0
 
 ## Breaking changes
 
@@ -128,7 +132,7 @@ would error. Now they correctly warn in that scenario. (#253)
   `bbi_log_df`. `get_model_path()`, `get_output_dir()`, and `get_yaml_path()` 
   gain methods for this new class (#192).
 
-# bbr 0.8.0
+# rbabylon 0.8.0
 
 * Added vignette demonstrating new `summary_log()` functionality.
 
