@@ -70,10 +70,9 @@ functionality is rolled out. A complete list can be found
 
 ## Development
 
-`rbabylon` uses [pkgr](https://github.com/metrumresearchgroup/pkgr) to
-manage development dependencies and
-[renv](https://rstudio.github.io/renv/) to provide isolation. To
-replicate this environment,
+`bbr` uses [pkgr](https://github.com/metrumresearchgroup/pkgr) to manage
+development dependencies and [renv](https://rstudio.github.io/renv/) to
+provide isolation. To replicate this environment,
 
 1.  clone the repo
 

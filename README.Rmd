@@ -48,7 +48,7 @@ There are several other vignettes, and more are being added as new functionality
 
 ## Development
 
-`rbabylon` uses [pkgr](https://github.com/metrumresearchgroup/pkgr) to manage 
+`bbr` uses [pkgr](https://github.com/metrumresearchgroup/pkgr) to manage 
 development dependencies and [renv](https://rstudio.github.io/renv/) to provide 
 isolation. To replicate this environment, 
 
