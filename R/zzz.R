@@ -7,7 +7,7 @@
 
   # set bbi minimum version
   if (is.null(getOption("bbr.bbi_min_version"))) {
-    options("bbr.bbi_min_version" = package_version("2.3.0"))
+    options("bbr.bbi_min_version" = package_version("3.0.0"))
   }
 
   # by default turn on strict mode to check for malformed objects and classes, etc.
