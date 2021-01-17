@@ -26,6 +26,7 @@ if [ -f "$path" ]; then
   fi
 fi
 
+# this will likely run every time for now given how our ephemeral volume is created
 wget -O bbi.tar.gz -q https://github.com/metrumresearchgroup/bbi/releases/download/$version/bbi_linux_amd64.tar.gz
 tar -xzf bbi.tar.gz
 rm bbi.tar.gz
