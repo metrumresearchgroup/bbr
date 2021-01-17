@@ -70,7 +70,7 @@ trigger:
 ---
 kind: pipeline
 type: docker
-name: mpn:2020-04-18
+name: mpn:oldest
 
 platform:
   os: linux
@@ -262,6 +262,9 @@ trigger:
     exclude:
     - promote
 
+depends_on:
+- mpn:latest
+- cran-latest
 ---
 kind: pipeline
 type: docker
