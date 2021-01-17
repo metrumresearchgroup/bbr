@@ -1,63 +1,56 @@
 ---
 kind: pipeline
 type: docker
-name: bbr-mpn-dev:latest
+name: mpn:latest
 
 platform:
   os: linux
   arch: amd64
 
 steps:
-- name: Pull image
+- name: pull
   image: omerxx/drone-ecr-auth
   commands:
   - $(aws ecr get-login --no-include-email --region us-east-1)
-  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-dev:latest
+  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:latest
+  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-3.6:latest
   volumes:
   - name: docker.sock
     path: /var/run/docker.sock
 
+
 - name: Install bbi
   pull: never
-  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-dev:latest
+  # TODO replace with tiny image
+  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:latest
   commands:
-  - wget -O bbi.tar.gz -q https://github.com/metrumresearchgroup/bbi/releases/download/v3.0.0/bbi_linux_amd64.tar.gz
-  - tar -xzf bbi.tar.gz
-  - rm bbi.tar.gz
-  - chmod +x bbi_linux_amd64/bbi
-  - mv bbi_linux_amd64/bbi /ephemeral
+  - chmod +x install_bbi.sh
+  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.0.0'
   volumes:
   - name: cache
     path: /ephemeral
 
 - name: "Check package: R 4.0"
   pull: never
-  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-dev:latest
+  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:latest
   commands:
-  - export PATH=/ephemeral:$PATH
-  - . /etc/environment
-  - $${R_EXE_4_0} -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
-  - $${R_EXE_4_0} -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
+  - R -s -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
+  - R -s -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
   environment:
     BBI_EXE_PATH: /ephemeral/bbi
     NOT_CRAN: true
-    R_LIBS_USER: /opt/rpkgs/4.0
   volumes:
   - name: cache
     path: /ephemeral
 
 - name: "Check package: R 3.6"
   pull: never
-  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-dev:latest
+  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-3.6:latest
   commands:
-  - export PATH=/ephemeral:$PATH
-  - . /etc/environment
-  - $${R_EXE_3_6} -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
-  - $${R_EXE_3_6} -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
+  - R -s -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
+  - R -s -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
   environment:
     BBI_EXE_PATH: /ephemeral/bbi
-    NOT_CRAN: true
-    R_LIBS_USER: /opt/rpkgs/3.6
   volumes:
   - name: cache
     path: /ephemeral
@@ -77,63 +70,55 @@ trigger:
 ---
 kind: pipeline
 type: docker
-name: bbr-mpn-dev:2020-03-24
+name: mpn:2020-04-18
 
 platform:
   os: linux
   arch: amd64
 
 steps:
-- name: Pull image
+- name: pull
   image: omerxx/drone-ecr-auth
   commands:
   - $(aws ecr get-login --no-include-email --region us-east-1)
-  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-dev:2020-03-24
+  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:2020-04-18
+  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-3.6:2020-04-18
   volumes:
   - name: docker.sock
     path: /var/run/docker.sock
 
 - name: Install bbi
   pull: never
-  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-dev:2020-03-24
+  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:2020-04-18
   commands:
-  - wget -O bbi.tar.gz -q https://github.com/metrumresearchgroup/bbi/releases/download/v3.0.0/bbi_linux_amd64.tar.gz
-  - tar -xzf bbi.tar.gz
-  - rm bbi.tar.gz
-  - chmod +x bbi_linux_amd64/bbi
-  - mv bbi_linux_amd64/bbi /ephemeral
+  - chmod +x install_bbi.sh
+  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.0.0'
   volumes:
   - name: cache
     path: /ephemeral
 
 - name: "Check package: R 4.0"
   pull: never
-  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-dev:2020-03-24
+  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:2020-04-18
   commands:
-  - export PATH=/ephemeral:$PATH
-  - . /etc/environment
-  - $${R_EXE_4_0} -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
-  - $${R_EXE_4_0} -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
+  - R -s -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
+  - R -s -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
   environment:
     BBI_EXE_PATH: /ephemeral/bbi
     NOT_CRAN: true
-    R_LIBS_USER: /opt/rpkgs/4.0
   volumes:
   - name: cache
     path: /ephemeral
 
 - name: "Check package: R 3.6"
   pull: never
-  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-dev:2020-03-24
+  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-3.6:2020-04-18
   commands:
-  - export PATH=/ephemeral:$PATH
-  - . /etc/environment
-  - $${R_EXE_3_6} -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
-  - $${R_EXE_3_6} -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
+  - R -s -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
+  - R -s -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
   environment:
     BBI_EXE_PATH: /ephemeral/bbi
     NOT_CRAN: true
-    R_LIBS_USER: /opt/rpkgs/3.6
   volumes:
   - name: cache
     path: /ephemeral
@@ -149,10 +134,11 @@ trigger:
   event:
     exclude:
     - promote
+
 ---
 kind: pipeline
 type: docker
-name: cran-latest:4.0.3
+name: cran-latest
 
 platform:
   os: linux
@@ -164,31 +150,25 @@ steps:
   commands:
   - $(aws ecr get-login --no-include-email --region us-east-1)
   - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-cran-latest:4.0.3
+  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-cran-latest:3.6.3
   volumes:
   - name: docker.sock
     path: /var/run/docker.sock
 
 - name: Install bbi
   pull: never
-  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-cran-latest:4.0.3
+  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/cran-latest:latest
   commands:
-  - wget -O bbi.tar.gz -q https://github.com/metrumresearchgroup/bbi/releases/download/v3.0.0/bbi_linux_amd64.tar.gz
-  - tar -xzf bbi.tar.gz
-  - rm bbi.tar.gz
-  - chmod +x bbi_linux_amd64/bbi
-  - mv bbi_linux_amd64/bbi /ephemeral
+  - chmod +x install_bbi.sh
+  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.0.0'
   volumes:
   - name: cache
     path: /ephemeral
-  depends_on:
-  - pull
 
 - name: "Check package: R 4.0"
   pull: never
   image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-cran-latest:4.0.3
   commands:
-  - export PATH=/ephemeral:$PATH
-  - . /etc/environment
   - R -s -e 'devtools::install_deps(upgrade = '"'"'always'"'"')'
   - R -s -e 'devtools::load_all(); sessioninfo::session_info()'
   - R -s -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
@@ -198,60 +178,13 @@ steps:
   volumes:
   - name: cache
     path: /ephemeral
-  depends_on:
-  - Install bbi
 
-volumes:
-- name: docker.sock
-  host:
-    path: /var/run/docker.sock
-- name: cache
-  temp: {}
-
-trigger:
-  event:
-    exclude:
-    - promote
-
----
-kind: pipeline
-type: docker
-name: cran-latest:3.6.3
-
-platform:
-  os: linux
-  arch: amd64
-
-steps:
-- name: Pull image
-  image: omerxx/drone-ecr-auth
-  commands:
-  - $(aws ecr get-login --no-include-email --region us-east-1)
-  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-ci-dev-cran-latest:3.6.3
-  volumes:
-  - name: docker.sock
-    path: /var/run/docker.sock
-
-- name: Install bbi
-  pull: never
-  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/cran-latest:latest
-  commands:
-  - wget -O bbi.tar.gz -q https://github.com/metrumresearchgroup/bbi/releases/download/v3.0.0/bbi_linux_amd64.tar.gz
-  - tar -xzf bbi.tar.gz
-  - rm bbi.tar.gz
-  - chmod +x bbi_linux_amd64/bbi
-  - mv bbi_linux_amd64/bbi /ephemeral
-  volumes:
-  - name: cache
-    path: /ephemeral
 
 - name: "Check package: R 3.6"
   pull: never
-  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/cran-latest:latest
+  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-cran-latest:3.6.3
   commands:
-  - export PATH=/ephemeral:$PATH
-  - . /etc/environment
-  - R -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
+  - R -s -e 'devtools::install_deps(upgrade = '"'"'always'"'"')'
   - R -s -e 'devtools::load_all(); sessioninfo::session_info()'
   - R -s -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
   environment:
@@ -283,42 +216,36 @@ platform:
   arch: amd64
 
 steps:
-- name: Pull image
+- name: pull
   image: omerxx/drone-ecr-auth
   commands:
   - $(aws ecr get-login --no-include-email --region us-east-1)
-  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-dev:latest
+  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:latest
   volumes:
   - name: docker.sock
     path: /var/run/docker.sock
 
 - name: Install bbi
   pull: never
-  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-dev:latest
+  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:latest
   commands:
-  - wget -O bbi.tar.gz -q https://github.com/metrumresearchgroup/bbi/releases/download/v3.0.0/bbi_linux_amd64.tar.gz
-  - tar -xzf bbi.tar.gz
-  - rm bbi.tar.gz
-  - chmod +x bbi_linux_amd64/bbi
-  - mv bbi_linux_amd64/bbi /ephemeral
+  - chmod +x install_bbi.sh
+  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.0.0'
   volumes:
   - name: cache
     path: /ephemeral
 
 - name: Code coverage
   pull: never
-  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-cran-latest:4.0.3
+  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:latest
   commands:
-  - export PATH=/ephemeral:$PATH
-  - . /etc/environment
-  - $${R_EXE_4_0} -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
-  - $${R_EXE_4_0} -e 'covr::codecov()'
+  - R -s -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
+  - R -s -e 'covr::codecov()'
   environment:
     BBI_EXE_PATH: /ephemeral/bbi
     CODECOV_TOKEN:
       from_secret: CODECOV_TOKEN
     NOT_CRAN: true
-    R_LIBS_USER: /opt/rpkgs/4.0
   volumes:
   - name: cache
     path: /ephemeral
@@ -345,42 +272,36 @@ platform:
   arch: amd64
 
 steps:
-- name: Pull image
+- name: pull
   image: omerxx/drone-ecr-auth
   commands:
   - $(aws ecr get-login --no-include-email --region us-east-1)
-  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-dev:latest
+  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:latest
   volumes:
   - name: docker.sock
     path: /var/run/docker.sock
 
 - name: Install bbi
   pull: never
-  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-dev:latest
+  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:latest
   commands:
-  - wget -O bbi.tar.gz -q https://github.com/metrumresearchgroup/bbi/releases/download/v3.0.0/bbi_linux_amd64.tar.gz
-  - tar -xzf bbi.tar.gz
-  - rm bbi.tar.gz
-  - chmod +x bbi_linux_amd64/bbi
-  - mv bbi_linux_amd64/bbi /ephemeral
+  - chmod +x install_bbi.sh
+  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.0.0'
   volumes:
   - name: cache
     path: /ephemeral
 
 - name: Build package
   pull: never
-  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-dev:latest
+  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:latest
   commands:
   - git config --global user.email drone@metrumrg.com
   - git config --global user.name Drony
   - git fetch --tags
-  - export PATH=/ephemeral:$PATH
-  - . /etc/environment
-  - $${R_EXE_4_0} -e 'pkgpub::create_tagged_repo(.dir = '"'"'/ephemeral'"'"')'
+  - R -s -e 'pkgpub::create_tagged_repo(.dir = '"'"'/ephemeral'"'"')'
   environment:
     BBI_EXE_PATH: /ephemeral/bbi
     NOT_CRAN: true
-    R_LIBS_USER: /opt/rpkgs/4.0
   volumes:
   - name: cache
     path: /ephemeral
@@ -421,6 +342,7 @@ trigger:
   - tag
 
 depends_on:
-- bbr-mpn-dev:latest
-- bbr-mpn-dev:2020-03-24
-- bbr-cran-latest:latest
+- mpn:latest
+- mpn:oldest
+- cran-latest
+
