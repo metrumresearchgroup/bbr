@@ -7,3 +7,5 @@
 inst/doc
 renv/
 renv.lock
+
+docs/

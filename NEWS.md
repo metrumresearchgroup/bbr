@@ -1,4 +1,4 @@
-# bbr (development)
+# bbr 0.12.0
 
 **This package has been renamed to from `rbabylon` to `bbr`** and the accompanying command-line tool has been renamed from `babylon` to `bbi` (which was already its alias, used throughout the package). Any mentions of `babylon` and `rbabylon` throughout the package have been renamed accordingly. Mentions of either in the older parts of this `NEWS.md` document were left as is for historical purposes.
 
