@@ -12,3 +12,4 @@
 ^codecov\.yml$
 ^pkgr\.yml$
 ^data-raw$
+^install_bbi\.sh$
