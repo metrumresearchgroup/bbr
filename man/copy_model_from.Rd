@@ -55,7 +55,7 @@ tags passed to \code{.add_tags} argument. If \code{TRUE} inherit any tags from
 \item{.update_model_file}{If \code{TRUE}, the default, update the newly created
 model file. If \code{FALSE}, new model file will be an exact copy of its parent.
 For a NONMEM model, this currently means only the \verb{$PROBLEM} line in the
-new control stream will be updated to read \verb{See \{.new_model\}.yaml. Created by rbabylon.}.}
+new control stream will be updated to read \verb{See \{.new_model\}.yaml. Created by bbr.}.}
 
 \item{.overwrite}{If \code{FALSE}, the default,  function will error if a model
 file already exists at specified \code{.new_model} path. If \code{TRUE} any existing

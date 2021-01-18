@@ -59,7 +59,7 @@ For NONMEM models, this is the control stream.
 \strong{\code{get_output_dir()}} returns the path to the directory containing
 output files created when the model is run.
 
-\strong{\code{get_yaml_path()}} returns the path to the YAML file created by rbabylon.
+\strong{\code{get_yaml_path()}} returns the path to the YAML file created by bbr.
 This file contains metadata like tags, etc. and should, generally speaking,
 \emph{not} be interacted with directly. Use the helper functions mentioned in the
 \code{\link[=modify_model_field]{modify_model_field()}} help page to modify this file for you.

@@ -53,7 +53,7 @@ those tags later, for instance when you want to filter to models with that
 covariate.
 
 Tags can also be collapsed using \code{\link[=collapse_to_string]{collapse_to_string()}} to create a compact description of the
-model stucture. See the \href{https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html#viewing-tags-example}{"Getting Started" vignette}
+model stucture. See the \href{https://metrumresearchgroup.github.io/bbr/articles/getting-started.html#viewing-tags-example}{"Getting Started" vignette}
 for an example of this.
 }
 \section{Functions}{
@@ -65,7 +65,7 @@ Warns and does nothing if \code{.old_tag} is not present.
 
 \item \code{replace_all_tags}: Replaces all tags on a model object and corresponding YAML with new tags.
 
-\item \code{replace_tags}: \strong{Deprecated} as of rbabylon 0.10.0, use \code{replace_all_tags()} instead.
+\item \code{replace_tags}: \strong{Deprecated} as of bbr 0.10.0, use \code{replace_all_tags()} instead.
 
 \item \code{remove_tags}: Removes tags from a model object and corresponding YAML.
 }}

@@ -321,17 +321,17 @@ check_bbi_run_log_df_object <- function(.df) {
 
 #' Raise error in strict mode
 #'
-#' Raises an error if `options("rbabylon.strict" = TRUE)` (recommended). Otherwise raises a warning.
+#' Raises an error if `options("bbr.strict" = TRUE)` (recommended). Otherwise raises a warning.
 #' These errors are used for things like type-checking which guarantees safe, predictable behavior of functions,
 #' but theoretically advanced users or developers could want to turn them off.
 #' @keywords internal
 strict_mode_error <- function(err_msg) {
-  if (isTRUE(getOption("rbabylon.strict"))) {
+  if (isTRUE(getOption("bbr.strict"))) {
     stop(err_msg, call. = FALSE)
   } else {
     warning(paste(
-      "The following error is being ignored because `options('rbabylon.strict')` is not set to TRUE.",
-      "Consider setting `options('rbabylon.strict' = TRUE)` if you experience issues.",
+      "The following error is being ignored because `options('bbr.strict')` is not set to TRUE.",
+      "Consider setting `options('bbr.strict' = TRUE)` if you experience issues.",
       err_msg
     ), call. = FALSE)
   }
@@ -342,7 +342,7 @@ strict_mode_error <- function(err_msg) {
 #' @keywords internal
 stop_get_scalar_msg <- function(.len) {
   stop(paste(
-    glue("When passing character input to `rbabylon::get_...` functions, only scalar values are permitted. A vector of length {.len} was passed."),
+    glue("When passing character input to `bbr::get_...` functions, only scalar values are permitted. A vector of length {.len} was passed."),
     "Consider instead passing the tibble output from `run_log()`, or iterating with something like `purrr::map(your_vector, ~ get_...(.x)`"
   ))
 }

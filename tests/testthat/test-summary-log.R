@@ -42,7 +42,7 @@ test_that("summary_log() returns NULL and warns when no YAML found", {
   expect_equal(ncol(log_df), 0)
 })
 
-withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
+withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   #########################################
   # extracting things from summary object

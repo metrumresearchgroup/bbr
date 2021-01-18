@@ -19,33 +19,33 @@ knitr::opts_chunk$set(
 
 This vignette demonstrates how to use `summary_log()` to extract model diagnostics like the objective function value, condition number, and parameter counts. 
 
-If you are new to `rbabylon`, the ["Getting Started with rbabylon"](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html) vignette will take you through some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its standard workflow and functionality.
+If you are new to `bbr`, the ["Getting Started with bbr"](https://metrumresearchgroup.github.io/bbr/articles/getting-started.html) vignette will take you through some basic scenarios for modeling with NONMEM using `bbr`, introducing you to its standard workflow and functionality.
 
-There is a lot of information in the `bbi_summary_log_df` tibble that is output from `summary_log()`. However, it is important to note that all of this, and quite a bit more, is contained in the `bbi_nonmem_summary` object output from `model_summary()`. If you are trying to dig deep into the outputs of a small number of models, see the [Summarize section](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html#summarize-model) of the "Getting Started" vignette for an introduction to that functionality. 
+There is a lot of information in the `bbi_summary_log_df` tibble that is output from `summary_log()`. However, it is important to note that all of this, and quite a bit more, is contained in the `bbi_nonmem_summary` object output from `model_summary()`. If you are trying to dig deep into the outputs of a small number of models, see the [Summarize section](https://metrumresearchgroup.github.io/bbr/articles/getting-started.html#summarize-model) of the "Getting Started" vignette for an introduction to that functionality. 
 
 `summary_log()` is more useful for getting a slightly higher-level view of a larger batch of models; potentially all the models in a given project, or something like a large group of bootstrapped runs.
 
 ## Setup
 
-There is some initial set up necessary for using `rbabylon`. Please refer to the ["Getting Started"](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html#setup) vignette, mentioned above, if you have not done this yet. Once this is done, load the library.
+There is some initial set up necessary for using `bbr`. Please refer to the ["Getting Started"](https://metrumresearchgroup.github.io/bbr/articles/getting-started.html#setup) vignette, mentioned above, if you have not done this yet. Once this is done, load the library.
 
 ```{r setup, include=FALSE}
 # NOTE: if running chunks interactively we need to load the package first
-#   because renv isolation prevents us from finding an rbabylon installation
+#   because renv isolation prevents us from finding an bbr installation
 if (interactive()) {
   devtools::load_all()
 }
 ```
 ```{r load packages, results = 'hide', message=FALSE, warning=FALSE}
-library(rbabylon)
+library(bbr)
 library(dplyr)
 library(tidyselect)
 ```
 
 ```{r configure bbi, include = FALSE}
-# set babylon execution path
+# set bbi execution path
 if (Sys.which("bbi") == "") {
-  options('rbabylon.bbi_exe_path' = read_bbi_path())
+  options('bbr.bbi_exe_path' = read_bbi_path())
 }
 ```
 
@@ -54,7 +54,7 @@ if (Sys.which("bbi") == "") {
 As mentioned above, the `bbi_summary_log_df` tibble contains a lot of information, which is a subset of what is contained in the `bbi_nonmem_summary` object returned from `model_summary()`.
 
 ```{r model summary single}
-MODEL_DIR <- system.file("model", "nonmem", "complex", package = "rbabylon")
+MODEL_DIR <- system.file("model", "nonmem", "complex", package = "bbr")
 
 sum1 <- 
   read_model(file.path(MODEL_DIR, "iovmm")) %>%
@@ -88,7 +88,7 @@ names(sum_df)
 sum_df <- summary_log(MODEL_DIR, .fail_flags = list(ext_file = "1001.1.TXT"))
 ```
 
-The specific columns returned are described below, though there is also a list of them, with brief definitions, in the [`summary_log()` docs](https://metrumresearchgroup.github.io/rbabylon/reference/summary_log.html) that can be accessed any time with `?summary_log()` in the console.
+The specific columns returned are described below, though there is also a list of them, with brief definitions, in the [`summary_log()` docs](https://metrumresearchgroup.github.io/bbr/reference/summary_log.html) that can be accessed any time with `?summary_log()` in the console.
 
 ## Housekeeping Columns
 
@@ -96,11 +96,11 @@ The first column is `absolute_model_path` which contains an absolute path that u
 
 The third column contains the `bbi_nonmem_summary` object, discussed above, for each model. This can be extracted and manipulated if you would like more detailed data from it.
 
-The `error_msg` and `needed_fail_flags` columns describe whether `bbi` had any trouble parsing the model outputs. These won't be discussed in detail here. Refer to the [`summary_log()` docs](https://metrumresearchgroup.github.io/rbabylon/reference/summary_log.html) for more information.
+The `error_msg` and `needed_fail_flags` columns describe whether `bbi` had any trouble parsing the model outputs. These won't be discussed in detail here. Refer to the [`summary_log()` docs](https://metrumresearchgroup.github.io/bbr/reference/summary_log.html) for more information.
 
 ## Run Details Columns
 
-The next batch of columns contain the core diagnostics and model outputs. As mentioned above, descriptions of what each column contains can be found in the [`summary_log()` docs](https://metrumresearchgroup.github.io/rbabylon/reference/summary_log.html).
+The next batch of columns contain the core diagnostics and model outputs. As mentioned above, descriptions of what each column contains can be found in the [`summary_log()` docs](https://metrumresearchgroup.github.io/bbr/reference/summary_log.html).
 
 ```{r details columns}
 sum_df %>% 
@@ -119,7 +119,7 @@ sum_df %>%
 
 ## Run Heuristics Columns
 
-The `run_heuristics` element of the `bbi_nonmem_summary` object contains a number of logical values indicating whether particular heuristic issues were found in the model. Note that these are not necessarily _errors_ with the model run, but are closer to warning flags that should possibly be investigated. Each heuristic is described in more detail in the [`summary_log()` docs](https://metrumresearchgroup.github.io/rbabylon/reference/summary_log.html). 
+The `run_heuristics` element of the `bbi_nonmem_summary` object contains a number of logical values indicating whether particular heuristic issues were found in the model. Note that these are not necessarily _errors_ with the model run, but are closer to warning flags that should possibly be investigated. Each heuristic is described in more detail in the [`summary_log()` docs](https://metrumresearchgroup.github.io/bbr/reference/summary_log.html). 
 
 Note that **all heuristics will be `FALSE` by default (and _never_ `NA`) and will only be `TRUE` if they are explicitly triggered.** For example, `large_condition_number` will be `FALSE` even in the case when a condition number was not calculated at all.
 
@@ -139,7 +139,7 @@ Notice that there is also an **any_heuristics column**, which can easily be used
 
 # Add Summary
 
-Just like [`config_log()` has `add_config()`](https://metrumresearchgroup.github.io/rbabylon/articles/using-based-on.html#checking-if-models-are-up-to-date-with-config_log), you can also use `add_summary()` to join all of these columns onto an existing `bbi_run_log_df` (the tibble output from `run_log()`). This can be useful if you have a run log that you have previously filtered on something like the [`tags`](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html#filtering-tags-example) or [`based_on`](https://metrumresearchgroup.github.io/rbabylon/articles/using-based-on.html#filtering-tags-example) columns, and you would like to append some simple diagnostics.
+Just like [`config_log()` has `add_config()`](https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html#checking-if-models-are-up-to-date-with-config_log), you can also use `add_summary()` to join all of these columns onto an existing `bbi_run_log_df` (the tibble output from `run_log()`). This can be useful if you have a run log that you have previously filtered on something like the [`tags`](https://metrumresearchgroup.github.io/bbr/articles/getting-started.html#filtering-tags-example) or [`based_on`](https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html#filtering-tags-example) columns, and you would like to append some simple diagnostics.
 
 
 ```{r add summary}

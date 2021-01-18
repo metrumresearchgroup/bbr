@@ -109,7 +109,7 @@ param_labels.character <- function(.mod, ...) {
 #' of an `.n`-sized block with diagonal or not.
 #'
 #' For more details and examples of how to specify `$OMEGA` and `$SIGMA` block structure, see the "Parameter Labels" vignette:
-#' [`vignette("parameter-labels", package = "rbabylon")`](../docs/articles/parameter-labels.html)
+#' [`vignette("parameter-labels", package = "bbr")`](../docs/articles/parameter-labels.html)
 #'
 #' @param .label_df A tibble like the output of `param_labels()`, containing columns `parameter_names, label, unit, type`
 #' @param .omega A logical vector indicating whether each Omega parameter is a diagonal. If `NULL` function assumes all are diagonal. Alternatively you can pass `block(.n)` or pass a custom vector if control stream has both block and non-block.

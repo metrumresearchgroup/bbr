@@ -119,7 +119,7 @@ replace_model_field <- function(.mod, .field, .old_val, .new_val) {
 #' covariate.
 #'
 #' Tags can also be collapsed using [collapse_to_string()] to create a compact description of the
-#' model stucture. See the ["Getting Started" vignette](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html#viewing-tags-example)
+#' model stucture. See the ["Getting Started" vignette](https://metrumresearchgroup.github.io/bbr/articles/getting-started.html#viewing-tags-example)
 #' for an example of this.
 #'
 #' @return The modified `bbi_{.model_type}_model` object
@@ -160,10 +160,10 @@ replace_all_tags <- function(.mod, .tags) {
   )
 }
 
-#' @describeIn modify_tags **Deprecated** as of rbabylon 0.10.0, use `replace_all_tags()` instead.
+#' @describeIn modify_tags **Deprecated** as of bbr 0.10.0, use `replace_all_tags()` instead.
 #' @export
 replace_tags <- function(.mod, .tags) {
-  deprecate_warn("0.10.0", "rbabylon::replace_tags()", "replace_all_tags()")
+  deprecate_warn("0.10.0", "bbr::replace_tags()", "replace_all_tags()")
   replace_all_tags(.mod, .tags)
 }
 
@@ -196,7 +196,7 @@ remove_tags <- function(.mod, .tags) {
 #' diagnostics.
 #'
 #' Like tags, notes can also be collapsed using [collapse_to_string()]
-#' See the ["Getting Started" vignette](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html#viewing-tags-example)
+#' See the ["Getting Started" vignette](https://metrumresearchgroup.github.io/bbr/articles/getting-started.html#viewing-tags-example)
 #' for an example of this.
 #'
 #' @return The modified `bbi_{.model_type}_model` object
@@ -266,7 +266,7 @@ remove_notes <- function(.mod, .notes) {
 #' The model identifiers in the `based_on` field are paths another model file
 #' (without file extension) _relative_ to the location of `.mod`.
 #'
-#' There is a ["Using the based_on field" vignette](https://metrumresearchgroup.github.io/rbabylon/articles/using-based-on.html)
+#' There is a ["Using the based_on field" vignette](https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html)
 #' which demonstrates the motivation and usage of this field.
 #'
 #' @return The modified `bbi_{.model_type}_model` object
@@ -298,10 +298,10 @@ replace_all_based_on <- function(.mod, .based_on) {
   )
 }
 
-#' @describeIn modify_based_on **Deprecated** as of rbabylon 0.10.0, use `replace_all_based_on()` instead.
+#' @describeIn modify_based_on **Deprecated** as of bbr 0.10.0, use `replace_all_based_on()` instead.
 #' @export
 replace_based_on <- function(.mod, .based_on) {
-  deprecate_warn("0.10.0", "rbabylon::replace_based_on()", "replace_all_based_on()")
+  deprecate_warn("0.10.0", "bbr::replace_based_on()", "replace_all_based_on()")
   replace_all_based_on(.mod, .based_on)
 }
 
@@ -435,10 +435,10 @@ replace_all_bbi_args <- function(.mod, .bbi_args) {
   return(.mod)
 }
 
-#' @describeIn modify_bbi_args **Deprecated** as of rbabylon 0.10.0, use `replace_all_bbi_args()` instead.
+#' @describeIn modify_bbi_args **Deprecated** as of bbr 0.10.0, use `replace_all_bbi_args()` instead.
 #' @export
 replace_bbi_args <- function(.mod, .bbi_args) {
-  deprecate_warn("0.10.0", "rbabylon::replace_bbi_args()", "replace_all_bbi_args()")
+  deprecate_warn("0.10.0", "bbr::replace_bbi_args()", "replace_all_bbi_args()")
   replace_all_bbi_args(.mod, .bbi_args)
 }
 
@@ -446,7 +446,7 @@ replace_bbi_args <- function(.mod, .bbi_args) {
 #' @name modify_decisions
 #' @title Deprecated: Modify decisions on a model object
 #'
-#' @description The `decisions` field has been deprecated as of `rbabylon 0.10.0` and
+#' @description The `decisions` field has been deprecated as of `bbr 0.10.0` and
 #' replaced by the `notes` field, to reflect the fact that users
 #' will want to use this field throughout the modeling process, not only at the end
 #' once some "decisions" have been reached. `add_decisions()` and
@@ -465,7 +465,7 @@ NULL
 #' @param .decisions Character vector to add to `decisions` field
 #' @export
 add_decisions <- function(.mod, .decisions) {
-  warning("The `decisions` field has been replaced by `notes` as of rbabylon 0.10.0 and will be removed in a future release. Please use `add_notes()` going forward.")
+  warning("The `decisions` field has been replaced by `notes` as of bbr 0.10.0 and will be removed in a future release. Please use `add_notes()` going forward.")
   modify_model_field(
     .mod = .mod,
     .field = YAML_DECISIONS,
@@ -477,7 +477,7 @@ add_decisions <- function(.mod, .decisions) {
 #' @describeIn modify_decisions **Deprecated** Replaces `decisions` field in a model object and corresponding YAML with new values.
 #' @export
 replace_decisions <- function(.mod, .decisions) {
-  warning("The `decisions` field has been replaced by `notes` as of rbabylon 0.10.0 and will be removed in a future release. Please use `replace_all_notes()` going forward.")
+  warning("The `decisions` field has been replaced by `notes` as of bbr 0.10.0 and will be removed in a future release. Please use `replace_all_notes()` going forward.")
   modify_model_field(
     .mod = .mod,
     .field = YAML_DECISIONS,

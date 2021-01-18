@@ -1,8 +1,16 @@
+# bbr 0.12.0
+
+**This package has been renamed to from `rbabylon` to `bbr`** and the accompanying command-line tool has been renamed from `babylon` to `bbi` (which was already its alias, used throughout the package). Any mentions of `babylon` and `rbabylon` throughout the package have been renamed accordingly. Mentions of either in the older parts of this `NEWS.md` document were left as is for historical purposes.
+
+## New features and changes
+
+* The minimum compatible version of `bbi` is increased to 3.0.0.
+
 # rbabylon 0.11.0
 
 ## New features and changes
 
-* Added print methods for `bbi_nonmem_summary` and `babylon_process` objects. The `bbi_nonmem_summary` object should print nicely in the console, and also look good in `.Rmd` chunks with the option `results = 'asis'`. (#298 and #294)
+* Added print methods for `bbi_nonmem_summary` and `bbi_process` objects. The `bbi_nonmem_summary` object should print nicely in the console, and also look good in `.Rmd` chunks with the option `results = 'asis'`. (#298 and #294)
 
 * The `bbi_nonmem_summary` object now contains the `absolute_model_path` and we have added the following methods to work on that object (these previously only worked on `bbi_nonmem_model` objects): `get_model_id()`, `get_model_path()`, `get_output_dir()`, `get_yaml_path()`, `check_grd()`, `check_ext()`. (#297)
 
