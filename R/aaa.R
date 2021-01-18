@@ -7,7 +7,7 @@ BBI_ARGS = list(
   additional_post_work_envs = list(type = "character", flag="--additional_post_work_envs", description = "Any additional values (as ENV KEY=VALUE) to provide for the post execution environment"),
   background = list(type = "logical", flag="--background", description = "RAW NMFE OPTION - Tells nonmem not to scan StdIn for control characters"),
   clean_lvl = list(type = "numeric", flag="--clean_lvl", description = "clean level used for file output from a given (set of) runs (default 1)"),
-  config = list(type = "character", flag="--config", description = "Path (relative or absolute) to another babylon.yaml to load"),
+  config = list(type = "character", flag="--config", description = "Path (relative or absolute) to another bbi.yaml to load"),
   copy_lvl = list(type = "numeric", flag="--copy_lvl", description = "copy level used for file output from a given (set of) runs"),
   debug = list(type = "logical", flag="--debug", description = "debug mode"),
   delay = list(type = "numeric", flag="--delay", description = "Selects a random number of seconds between 1 and this value to stagger / jitter job execution. Assists in dealing with large volumes of work dealing with the same data set. May avoid NMTRAN issues about not being able read / close files"),
@@ -15,7 +15,7 @@ BBI_ARGS = list(
   git = list(type = "logical", flag="--git", description = "whether git is used"),
   json = list(type = "logical", flag="--json", description = "json tree of output, if possible"),
   licfile = list(type = "character", flag="--licfile", description = "RAW NMFE OPTION - Specify a license file to use with NMFE (Nonmem)"),
-  log_file = list(type = "character", flag="--log_file", description = "If populated, specifies the file into which to store the output / logging details from Babylon"),
+  log_file = list(type = "character", flag="--log_file", description = "If populated, specifies the file into which to store the output / logging details from bbi"),
   maxlim = list(type = "numeric", flag="--maxlim", description = "RAW NMFE OPTION - Set the maximum values set for the buffers used by Nonmem (default 100)"),
   mpi_exec_path = list(type = "character", flag="--mpi_exec_path", description = "The fully qualified path to mpiexec. Used for nonmem parallel operations (default '/usr/local/mpich3/bin/mpiexec')"),
   nm_version = list(type = "character", flag="--nm_version", description = "Version of nonmem from the configuration list to use"),
@@ -41,7 +41,7 @@ BBI_ARGS = list(
 NM_MOD_CLASS <- "bbi_nonmem_model"
 SUM_CLASS <- "bbi_nonmem_summary"
 SL_CLASS <- "bbi_summary_list"
-PROC_CLASS <- "babylon_process"
+PROC_CLASS <- "bbi_process"
 RUN_LOG_CLASS <- "bbi_run_log_df"
 CONF_LOG_CLASS <- "bbi_config_log_df"
 SUM_LOG_CLASS <- "bbi_summary_log_df"

@@ -35,7 +35,7 @@ model_summaries(
 a \code{bbi_run_log_df} tibble, or
 a list of \verb{bbi_\{.model_type\}_model} objects.}
 
-\item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}.
+\item{.bbi_args}{A named list specifying arguments to pass to bbi formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}.
 See \code{\link[=print_bbi_args]{print_bbi_args()}} for full list of options.}
 
 \item{.fail_flags}{Same as \code{.bbi_args} except these are used \emph{only} when a \code{\link[=model_summary]{model_summary()}} call fails.

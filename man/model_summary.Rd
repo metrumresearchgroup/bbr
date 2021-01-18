@@ -12,7 +12,7 @@ model_summary(.mod, .bbi_args = NULL, ..., .dry_run = FALSE)
 \arguments{
 \item{.mod}{Model to summarize.}
 
-\item{.bbi_args}{A named list specifying arguments to pass to babylon formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}.
+\item{.bbi_args}{A named list specifying arguments to pass to bbi formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}.
 See \code{\link[=print_bbi_args]{print_bbi_args()}} for full list of options.}
 
 \item{...}{args passed through to \code{\link[=bbi_exec]{bbi_exec()}}}

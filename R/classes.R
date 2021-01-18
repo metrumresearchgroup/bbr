@@ -1,6 +1,6 @@
 #' Create bbi object
 #'
-#' Constructor functions for objects of fundamental rbabylon classes.
+#' Constructor functions for objects of fundamental bbr classes.
 #' @name create_bbi_object
 NULL
 
@@ -36,7 +36,7 @@ create_model_object <- function(res, save_yaml) {
   # the possible extensions and throw an error if none exists
   find_nonmem_model_file_path(res[[ABS_MOD_PATH]], .check_exists = TRUE)
 
-  # check babylon args and add an empty list if missing
+  # check bbi args and add an empty list if missing
   if (is.null(res[[YAML_BBI_ARGS]])) {
     res[[YAML_BBI_ARGS]] <- list()
   } else {
@@ -118,7 +118,7 @@ create_summary_list <- function(res) {
 }
 
 
-#' @describeIn create_bbi_object Create list object of `babylon_process` class, first checking that all the required keys are present.
+#' @describeIn create_bbi_object Create list object of `bbi_process` class, first checking that all the required keys are present.
 #' @keywords internal
 create_process_object <- function(res) {
 
@@ -129,7 +129,7 @@ create_process_object <- function(res) {
   # check for required keys, just as an extra safety precaution
   if (!check_required_keys(res, .req = PROCESS_REQ_KEYS)) {
     err_msg <- paste0(
-      "Process object must have the following named elements to be converted to an S3 object of class `babylon_process`: `", paste(PROCESS_REQ_KEYS, collapse=", "),
+      "Process object must have the following named elements to be converted to an S3 object of class `bbi_process`: `", paste(PROCESS_REQ_KEYS, collapse=", "),
       "` but the following keys are missing: `", paste(PROCESS_REQ_KEYS[!(PROCESS_REQ_KEYS %in% names(res))], collapse=", "),
       "`\nObject has the following keys: ", paste(names(res) %||% "NO NAMES", collapse=", ")
     )

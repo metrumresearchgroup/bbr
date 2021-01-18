@@ -6,7 +6,7 @@
 \usage{
 current_release(
   owner = "metrumresearchgroup",
-  repo = "babylon",
+  repo = "bbi",
   os = c("linux", "darwin", "windows")
 )
 }

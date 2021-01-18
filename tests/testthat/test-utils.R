@@ -111,13 +111,13 @@ test_that("check_required_keys() works correctly", {
 
 
 test_that("strict_mode_error() works correctly", {
-  withr::with_options(list(rbabylon.strict = TRUE), {
+  withr::with_options(list(bbr.strict = TRUE), {
     expect_error(strict_mode_error("hello"))
   })
-  withr::with_options(list(rbabylon.strict = FALSE), {
+  withr::with_options(list(bbr.strict = FALSE), {
     expect_warning(strict_mode_error("hello"))
   })
-  withr::with_options(list(rbabylon.strict = "oops"), {
+  withr::with_options(list(bbr.strict = "oops"), {
     expect_warning(strict_mode_error("hello"))
   })
 })

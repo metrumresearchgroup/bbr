@@ -13,8 +13,8 @@
 # - maybe others...
 
 # define constants
-REF_DIR <- system.file("test-refs",   package = "rbabylon")
-ABS_MODEL_DIR <- system.file("model", "nonmem", "basic",   package = "rbabylon")
+REF_DIR <- system.file("test-refs",   package = "bbr")
+ABS_MODEL_DIR <- system.file("model", "nonmem", "basic",   package = "bbr")
 
 MOD_ID <- "1"
 MODEL_DIR <-   fs::path_rel(ABS_MODEL_DIR, getwd()) %>% as.character()
@@ -22,7 +22,7 @@ MOD1_PATH <- file.path(MODEL_DIR, MOD_ID)
 MOD1 <- read_model(MOD1_PATH)
 # if we're on Metworx or Drone, run the summary
 if (!Sys.getenv("METWORX_VERSION") == "" || Sys.getenv("DRONE") == "true") {
-  withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
+  withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     SUM1 <- model_summary(MOD1)
   })
 }
@@ -30,7 +30,7 @@ if (!Sys.getenv("METWORX_VERSION") == "" || Sys.getenv("DRONE") == "true") {
 NEW_MOD2 <- file.path(MODEL_DIR, "2")
 NEW_MOD3 <- file.path(MODEL_DIR, "3")
 
-MODEL_DIR_X <- fs::path_rel(system.file("model", "nonmem", "complex",   package = "rbabylon"), getwd()) %>% as.character()
+MODEL_DIR_X <- fs::path_rel(system.file("model", "nonmem", "complex",   package = "bbr"), getwd()) %>% as.character()
 
 # file names and file paths
 OUTPUT_DIR <-     MOD1_PATH

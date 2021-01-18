@@ -3,7 +3,7 @@
 ########################################
 
 # project name
-local name = "rbabylon";
+local name = "bbr";
 
 # where to mount a temporary volume; useful for persisting files across steps
 local temp_volume_dir = "/ephemeral";
@@ -13,7 +13,7 @@ local temp_volume_dir = "/ephemeral";
 # variables to pass
 local r_env_vars = {
   "NOT_CRAN": "true",  # you almost certainly want this
-  "BABYLON_EXE_PATH": std.join("/", [temp_volume_dir, "bbi"]),
+  "BBI_EXE_PATH": std.join("/", [temp_volume_dir, "bbi"]),
 };
 
 # images specified as repo:tag; first element will be used to build release
@@ -25,8 +25,8 @@ local ci_images = [
   "cran-latest:latest",  # latest MPN snapshot for MRG packages + current CRAN
 ];
 
-# set to "" to disable installing babylon
-local bbi_version = "v2.3.1";
+# set to "" to disable installing bbi
+local bbi_version = "v3.0.0";
 
 # events that should not trigger Drone; recommended value is "promote", see
 # https://discourse.drone.io/t/github-pages-triggering-builds-incorrectly/6370
@@ -52,7 +52,7 @@ local r_versions = [
   "3.6",
 ];
 
-local bbi_url_base = "https://github.com/metrumresearchgroup/babylon/releases/download";
+local bbi_url_base = "https://github.com/metrumresearchgroup/bbi/releases/download";
 local bbi_artifact_name = "bbi_linux_amd64.tar.gz";
 
 local ecr_repo_base = "906087756158.dkr.ecr.us-east-1.amazonaws.com";
@@ -172,16 +172,16 @@ local add_step_volume(volume) = {
   "path": volume.path,
 };
 
-# Drone step to install babylon
+# Drone step to install bbi
 #
-# bbi_version     babylon version
-# path            path to install babylon, e.g., "/data/apps"
+# bbi_version     bbi version
+# path            path to install bbi, e.g., "/data/apps"
 # image           image to use
 # volumes         array of volume objects
-local install_babylon(bbi_version, path, image, volumes=[]) = {
+local install_bbi(bbi_version, path, image, volumes=[]) = {
   local bbi_url = std.join("/", [bbi_url_base, bbi_version, bbi_artifact_name]),
 
-  "name": "Install babylon",
+  "name": "Install bbi",
   "image": image,
   "pull": "never",
   "volumes": [add_step_volume(v) for v in volumes],
@@ -214,7 +214,7 @@ local pull_image(image, volumes=[]) = {
 # r_path          path to R executable
 # expr            expression to run
 local run_r_expression(r_path, expr) =
-  std.join(" ", [r_path, "--no-init-file", "-e", std.escapeStringBash(expr)]);
+  std.join(" ", [r_path, "-e", std.escapeStringBash(expr)]);
 
 # Drone step to copy a tagged release to S3
 #
@@ -324,7 +324,7 @@ local cover_step(r_major_minor, image, volumes=[]) = {
 #
 # name            name of the application
 # image           CI image, as repo:tag
-# bbi_version     babylon version, passed to install_babylon()
+# bbi_version     bbi version, passed to install_bbi()
 local check(name, image, bbi_version) =
   local build_tag = create_build_tag(name, image);
   local image_uri = create_ci_image(ecr_repo_base, image);
@@ -339,8 +339,8 @@ local check(name, image, bbi_version) =
     "steps": [
       pull_image(image_uri, [host_volume]),
       if std.length(bbi_version) > 0 then
-        # pass temp_volume to persist babylon executable
-        install_babylon(
+        # pass temp_volume to persist bbi executable
+        install_bbi(
           bbi_version,
           temp_volume.path,
           image_uri,
@@ -398,8 +398,8 @@ local coverage(name, r_major_minor, image, bbi_version) =
     "steps": [
       pull_image(image_uri, [host_volume]),
       if std.length(bbi_version) > 0 then
-        # pass temp_volume to persist babylon executable
-        install_babylon(
+        # pass temp_volume to persist bbi executable
+        install_bbi(
           bbi_version,
           temp_volume.path,
           image_uri,
@@ -427,7 +427,7 @@ local release(name, r_major_minor, image, bbi_version) =
     "steps": [
       pull_image(image_uri, [host_volume]),
       if std.length(bbi_version) > 0 then
-        install_babylon(
+        install_bbi(
           bbi_version,
           temp_volume.path,
           image_uri,

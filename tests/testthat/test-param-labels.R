@@ -83,7 +83,7 @@ for (MODEL_PICK in MODEL_PICKS) {
 
 
 # test param_labels against tidynm reference tibbles (testing bbi_nonmem_model dispatch)
-withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
+withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   skip_if_not_drone_or_metworx("test-param-labels tidynm tests")
 
   for (MODEL_PICK in MODEL_PICKS) {
@@ -94,14 +94,14 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
       ref_df <- readRDS(file.path(REF_DIR, "param-labels", glue("{.mod_id}_PARAMTBL.rds")))[[1]]
       names(ref_df) <- names(ref_df) %>% tolower()
 
-      # get param df with rbabylon::model_summary()
+      # get param df with bbr::model_summary()
       if (fs::file_exists(file.path(PL_MODEL_DIR, glue("{.mod_id}.yaml")))) fs::file_delete(file.path(PL_MODEL_DIR, glue("{.mod_id}.yaml")))
 
       .mod <- new_model(file.path(PL_MODEL_DIR, .mod_id))
 
       on.exit({ if (fs::file_exists(file.path(PL_MODEL_DIR, glue("{.mod_id}.yaml")))) fs::file_delete(file.path(PL_MODEL_DIR, glue("{.mod_id}.yaml"))) })
 
-      .param_df <- .mod %>% rbabylon::model_summary() %>% param_estimates()
+      .param_df <- .mod %>% bbr::model_summary() %>% param_estimates()
       names(.param_df) <- names(.param_df) %>% tolower()
 
       # make label df

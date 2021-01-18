@@ -4,11 +4,11 @@ context("submit_models(.dry_run=T)")
 # testing multiple model submission
 #####################################
 
-withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
+withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
-  # create fake babylon.yaml
-  readr::write_file("created_by: test-submit-models", file.path(MODEL_DIR, "babylon.yaml"))
-  on.exit({ fs::file_delete(file.path(MODEL_DIR, "babylon.yaml")) })
+  # create fake bbi.yaml
+  readr::write_file("created_by: test-submit-models", file.path(MODEL_DIR, "bbi.yaml"))
+  on.exit({ fs::file_delete(file.path(MODEL_DIR, "bbi.yaml")) })
 
   model_dir <- ABS_MODEL_DIR
   mod_ctl_path <- purrr::map_chr(
@@ -27,7 +27,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
 
               # submit models
               proc_list <- submit_models(.mods, .dry_run = T)
-              expect_true(all(purrr::map_lgl(proc_list, function(.proc) { "babylon_process" %in% class(.proc) })))
+              expect_true(all(purrr::map_lgl(proc_list, function(.proc) { "bbi_process" %in% class(.proc) })))
 
               # check that there is only one distinct arg set
               expect_equal(length(proc_list), 1)
@@ -50,7 +50,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
 
               # submit and test that passed .bbi_args override args in object
               proc_list <- submit_models(.mods, .dry_run = T, .bbi_args = list(threads = 1))
-              expect_true(all(purrr::map_lgl(proc_list, function(.proc) { "babylon_process" %in% class(.proc) })))
+              expect_true(all(purrr::map_lgl(proc_list, function(.proc) { "bbi_process" %in% class(.proc) })))
 
               # check that there are two distinct arg sets
               expect_equal(length(proc_list), 2)

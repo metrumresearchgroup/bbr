@@ -50,7 +50,7 @@ already present with the new values.
 \item \code{replace_all_bbi_args}: Modifies model object and corresponding YAML
 by replacing all \code{bbi_args} with named list passed to \code{.bbi_args}.
 
-\item \code{replace_bbi_args}: \strong{Deprecated} as of rbabylon 0.10.0, use \code{replace_all_bbi_args()} instead.
+\item \code{replace_bbi_args}: \strong{Deprecated} as of bbr 0.10.0, use \code{replace_all_bbi_args()} instead.
 }}
 
 \seealso{

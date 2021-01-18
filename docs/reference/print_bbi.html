@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Print methods for rbabylon objects — print_bbi • rbabylon</title>
+<title>Print methods for bbr objects — print_bbi • bbr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -42,13 +42,13 @@
 
 
 
-<meta property="og:title" content="Print methods for rbabylon objects — print_bbi" />
-<meta property="og:description" content="The various objects defined by rbabylon have their own print methods to
+<meta property="og:title" content="Print methods for bbr objects — print_bbi" />
+<meta property="og:description" content="The various objects defined by bbr have their own print methods to
 allow users to get a quick view of the contents of the object.
 When printing a bbi object in an .Rmd file that is intended to be
 knit, consider setting results = 'asis' in the chunk options. This
 will make for prettier formatting, especially of table outputs." />
-<meta property="og:image" content="https://metrumresearchgroup.github.io/rbabylon/logo.png" />
+<meta property="og:image" content="https://metrumresearchgroup.github.io/bbr/logo.png" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -80,8 +80,8 @@ will make for prettier formatting, especially of table outputs." />
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">rbabylon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.11.0</span>
+        <a class="navbar-link" href="../index.html">bbr</a>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.11.0.9000</span>
       </span>
     </div>
 
@@ -104,10 +104,10 @@ will make for prettier formatting, especially of table outputs." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/getting-started.html">Getting Started with rbabylon</a>
+      <a href="../articles/getting-started.html">Getting Started with bbr</a>
     </li>
     <li>
-      <a href="../articles/parameter-labels.html">rbabylon Parameter Labels</a>
+      <a href="../articles/parameter-labels.html">bbr Parameter Labels</a>
     </li>
     <li>
       <a href="../articles/using-based-on.html">Using the based_on field</a>
@@ -123,7 +123,7 @@ will make for prettier formatting, especially of table outputs." />
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/metrumresearchgroup/rbabylon">
+  <a href="https://github.com/metrumresearchgroup/bbr">
     <span class="fas fa-github fa-lg"></span>
      
   </a>
@@ -141,20 +141,20 @@ will make for prettier formatting, especially of table outputs." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Print methods for rbabylon objects</h1>
+    <h1>Print methods for bbr objects</h1>
     
     <div class="hidden name"><code>print_bbi.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>The various objects defined by <code>rbabylon</code> have their own print methods to
+    <p>The various objects defined by <code>bbr</code> have their own print methods to
 allow users to get a quick view of the contents of the object.
 <strong>When printing a <code>bbi</code> object in an <code>.Rmd</code> file</strong> that is intended to be
 knit, consider setting <code>results = 'asis'</code> in the chunk options. This
 will make for prettier formatting, especially of table outputs.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for babylon_process</span>
+    <pre class="usage"><span class='co'># S3 method for bbi_process</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>x</span>, <span class='no'>...</span>, <span class='kw'>.call_limit</span> <span class='kw'>=</span> <span class='fl'>250</span>)
 
 <span class='co'># S3 method for bbi_nonmem_summary</span>
@@ -198,7 +198,7 @@ Otherwise, prints only <code>.nrow</code> rows.</p></td>
 
     
 <ul>
-<li><p><code>print.babylon_process</code>: Prints the call made to bbi and whether the process is still running or has finished.</p></li>
+<li><p><code>print.bbi_process</code>: Prints the call made to bbi and whether the process is still running or has finished.</p></li>
 <li><p><code>print.bbi_nonmem_summary</code>: Prints a high level summary of a model from a bbi_nonmem_summary object</p></li>
 </ul>
 

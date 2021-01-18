@@ -6,15 +6,15 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>MIT License • bbr</title>
+<title>bbr — bbr • bbr</title>
 
 <!-- favicons -->
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="apple-touch-icon.png" />
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="apple-touch-icon-120x120.png" />
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="apple-touch-icon-76x76.png" />
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="apple-touch-icon-60x60.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -36,13 +36,21 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
-<link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script>
+<link href="../pkgdown.css" rel="stylesheet">
+<script src="../pkgdown.js"></script>
 
 
 
 
-<meta property="og:title" content="MIT License" />
+<meta property="og:title" content="bbr — bbr" />
+<meta property="og:description" content="bbr is a library written in R that facilitates modeling and
+simulation by exposing functionality from the
+bbi project in R.
+From bbi's docs: bbi is a solution for managing projects involving
+modeling and simulation with a number of software solutions used in
+pharmaceutical sciences. This is a fork of the nonmemutils project that
+is broader in scope. Initial support encompasses NONMEM, however the API is
+designed in a way to be flexible to handle other software." />
 <meta property="og:image" content="https://metrumresearchgroup.github.io/bbr/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -63,7 +71,7 @@
   </head>
 
   <body>
-    <div class="container template-title-body">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container">
@@ -75,7 +83,7 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="index.html">bbr</a>
+        <a class="navbar-link" href="../index.html">bbr</a>
         <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.11.0.9000</span>
       </span>
     </div>
@@ -83,13 +91,13 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="index.html">
+  <a href="../index.html">
     <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
 <li>
-  <a href="reference/index.html">Reference</a>
+  <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -99,21 +107,21 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="articles/getting-started.html">Getting Started with bbr</a>
+      <a href="../articles/getting-started.html">Getting Started with bbr</a>
     </li>
     <li>
-      <a href="articles/parameter-labels.html">bbr Parameter Labels</a>
+      <a href="../articles/parameter-labels.html">bbr Parameter Labels</a>
     </li>
     <li>
-      <a href="articles/using-based-on.html">Using the based_on field</a>
+      <a href="../articles/using-based-on.html">Using the based_on field</a>
     </li>
     <li>
-      <a href="articles/using-summary-log.html">Creating a Model Summary Log</a>
+      <a href="../articles/using-summary-log.html">Creating a Model Summary Log</a>
     </li>
   </ul>
 </li>
 <li>
-  <a href="news/index.html">Changelog</a>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -134,23 +142,55 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>MIT License</h1>
+    <h1>bbr</h1>
+    
+    <div class="hidden name"><code>bbr.Rd</code></div>
     </div>
 
-<div id="mit-license" class="section level1">
+    <div class="ref-description">
+    <p><code>bbr</code> is a library written in R that facilitates modeling and
+simulation by exposing functionality from the
+<a href='https://github.com/metrumresearchgroup/bbi'>bbi</a> project in R.
+From <code>bbi</code>'s docs: <code>bbi</code> is a solution for managing projects involving
+modeling and simulation with a number of software solutions used in
+pharmaceutical sciences. This is a fork of the <code>nonmemutils</code> project that
+is broader in scope. Initial support encompasses NONMEM, however the API is
+designed in a way to be flexible to handle other software.</p>
+    </div>
 
-<p>Copyright (c) 2020 Metrum Research Group</p>
-<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
-<p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
-<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
-</div>
+
+
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p><code>bbr</code> uses several fundamental objects, each of which has a number of S3
+methods associated with it:</p><ul>
+<li><p><code>bbi_{.model_type}_model</code> -- Represents a single model. Contains paths to
+any elements of this model that are stored on disk (e.g. a NONMEM control
+stream) as well as various fields containing metadata about the model. You
+can read more about these fields, and how to interact with them, in the
+following help pages: <code><a href='modify_tags.html'>modify_tags()</a></code> <code><a href='modify_notes.html'>modify_notes()</a></code> <code><a href='modify_based_on.html'>modify_based_on()</a></code>
+<code><a href='modify_description.html'>modify_description()</a></code> <code><a href='modify_bbi_args.html'>modify_bbi_args()</a></code></p></li>
+<li><p><code>bbi_{.model_type}_summary</code> -- Contains information and diagnostics about
+a model that has been run. See <code><a href='model_summary.html'>model_summary()</a></code> for more information about
+contents and usage.</p></li>
+<li><p><code>bbi_log_df</code> -- A tibble containing information about multiple models.
+There are several sub-classes of <code>bbi_log_df</code> tibbles, variously containing
+metadata, information, and diagnostics about the models. See the following
+help pages for more information: <code><a href='run_log.html'>run_log()</a></code> <code><a href='summary_log.html'>summary_log()</a></code> <code><a href='config_log.html'>config_log()</a></code></p></li>
+</ul>
+
 
   </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+    <h2>Contents</h2>
+    <ul class="nav nav-pills nav-stacked">
+      <li><a href="#details">Details</a></li>
+    </ul>
 
+  </div>
 </div>
-
 
 
       <footer>

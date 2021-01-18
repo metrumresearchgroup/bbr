@@ -27,7 +27,7 @@ teardown({
   cleanup()
 })
 
-withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
+withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   #########################################
   # extracting things from summary object

@@ -19,7 +19,7 @@ replace_decisions(.mod, .decisions)
 The modified \verb{bbi_\{.model_type\}_model} object
 }
 \description{
-The \code{decisions} field has been deprecated as of \verb{rbabylon 0.10.0} and
+The \code{decisions} field has been deprecated as of \verb{bbr 0.10.0} and
 replaced by the \code{notes} field, to reflect the fact that users
 will want to use this field throughout the modeling process, not only at the end
 once some "decisions" have been reached. \code{add_decisions()} and

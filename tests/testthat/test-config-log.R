@@ -1,6 +1,6 @@
 context("Constructing config log from bbi_config.json")
 
-expected_bbi_version <- "v2.3.1"
+expected_bbi_version <- "v3.0.0"
 expected_nonmem_version <- "nm74gf"
 
 # to minimize changes to the existing tests, we define the model and data status
@@ -104,12 +104,12 @@ test_that("config_log() reflects model mismatch", {
 })
 
 test_that("config_log() reflects data mismatch", {
-  perturb_file(system.file("extdata", "acop.csv", package = "rbabylon"))
+  perturb_file(system.file("extdata", "acop.csv", package = "bbr"))
   log_df <- config_log(MODEL_DIR)
   expect_equal(log_df[["data_has_changed"]][1], TRUE)
 })
 
-test_that("config_log() includes babylon version", {
+test_that("config_log() includes bbi version", {
   log_df <- config_log(MODEL_DIR)
   expect_equal(log_df[["bbi_version"]][1], expected_bbi_version)
 })

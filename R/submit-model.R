@@ -7,16 +7,16 @@
 #' Submits a model to be run by calling out to `bbi`.
 #' @seealso [submit_models()]
 #' @param .mod The model object to submit.
-#' @param .bbi_args A named list specifying arguments to pass to babylon
+#' @param .bbi_args A named list specifying arguments to pass to bbi
 #'   formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" =
-#'   4)`. Run [print_bbi_args()] to see valid arguments. Note that rbabylon does
+#'   4)`. Run [print_bbi_args()] to see valid arguments. Note that bbr does
 #'   not support changing the output directory (including through the model or
 #'   global YAML files).
 #' @param .mode Either `"sge"`, the default, to submit model(s) to the grid or
 #'   `"local"` for local execution.
 #' @param ... args passed through to `bbi_exec()`
-#' @param .config_path Path to a babylon configuration file. If `NULL`, the
-#'   default, will attempt to use a `babylon.yaml` in the same directory as the
+#' @param .config_path Path to a bbi configuration file. If `NULL`, the
+#'   default, will attempt to use a `bbi.yaml` in the same directory as the
 #'   model.
 #' @param .wait If `TRUE`, the default, wait for the bbi process to return
 #'   before this function call returns. If `FALSE` function will return while
@@ -64,13 +64,13 @@ submit_model.bbi_nonmem_model <- function(
 # Private implementation function(s)
 #####################################
 
-#' Submit a NONMEM model via babylon
+#' Submit a NONMEM model via bbi
 #'
 #' Private implementation function called by `submit_model()` dispatches.
 #' @param .mod An S3 object of class `bbi_nonmem_model`, for example from `new_model()`, `read_model()` or `copy_model_from()`
 #' @importFrom stringr str_detect
 #' @importFrom tools file_path_sans_ext
-#' @return An S3 object of class `babylon_process`
+#' @return An S3 object of class `bbi_process`
 #' @keywords internal
 submit_nonmem_model <- function(.mod,
                                 .bbi_args = NULL,

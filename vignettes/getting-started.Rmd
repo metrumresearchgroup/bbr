@@ -1,5 +1,5 @@
 ---
-title: "Getting Started with rbabylon"
+title: "Getting Started with bbr"
 author: "Seth Green"
 output: rmarkdown::html_vignette
 vignette: >
@@ -17,28 +17,28 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-This "Getting Started with rbabylon" vignette takes the user through some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its standard workflow and functionality. 
+This "Getting Started with bbr" vignette takes the user through some basic scenarios for modeling with NONMEM using `bbr`, introducing you to its standard workflow and functionality. 
 
 ```{r setup, include=FALSE}
 # NOTE: if running chunks interactively we need to load the package first
-#   because renv isolation prevents us from finding an rbabylon installation
+#   because renv isolation prevents us from finding an bbr installation
 if (interactive()) {
   devtools::load_all()
 }
 ```
 ```{r load packages, results = 'hide', message=FALSE, warning=FALSE}
-library(rbabylon)
+library(bbr)
 library(dplyr)
 library(purrr)
 ```
 
-`rbabylon` is an R interface for running `babylon`, which is (will be) a complete solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. Currently, only NONMEM is supported, so this vignette will only address that. 
+`bbr` is an R interface for running `bbi`. Together they provide a solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. Currently, only NONMEM is supported, so this vignette will only address that. 
 
 # Setup
 
 ```{r set paths and define cleanup, include = FALSE}
-options('rbabylon.bbi_exe_path' = read_bbi_path())
-MODEL_DIR <- system.file("model", "nonmem", "basic", package = "rbabylon")
+options('bbr.bbi_exe_path' = read_bbi_path())
+MODEL_DIR <- system.file("model", "nonmem", "basic", package = "bbr")
 
 # delete old files
 cleanup <- function() {
@@ -49,62 +49,62 @@ cleanup <- function() {
   if (fs::file_exists(file.path(MODEL_DIR, "3.ctl"))) fs::file_delete(file.path(MODEL_DIR, "3.ctl"))
   if (fs::dir_exists(file.path(MODEL_DIR, "2"))) fs::dir_delete(file.path(MODEL_DIR, "2"))
   if (fs::dir_exists(file.path(MODEL_DIR, "3"))) fs::dir_delete(file.path(MODEL_DIR, "3"))
-  if (fs::file_exists(file.path(MODEL_DIR, "babylon.yaml"))) fs::file_delete(file.path(MODEL_DIR, "babylon.yaml"))
+  if (fs::file_exists(file.path(MODEL_DIR, "bbi.yaml"))) fs::file_delete(file.path(MODEL_DIR, "bbi.yaml"))
 }
 cleanup()
 ```
 
 
-## Installing babylon
+## Installing bbi
 
-The _first time_ you use `rbabylon` on a system or disk, you must first install `babylon`, often aliased as `bbi`. The `babylon` executable is a single binary file that can be easily installed with:
+The _first time_ you use `bbr` on a system or disk, you must first install `bbi`, often aliased as `bbi`. The `bbi` executable is a single binary file that can be easily installed with:
 
 ```{r, eval = FALSE}
-rbabylon::use_bbi("/data/apps/")
+bbr::use_bbi("/data/apps/")
 ```
 
-The `use_bbi()` function takes the _directory_ into which you want to install `bbi`. Note that this can be pointed to anywhere on your system; installing to `/data/apps/bbi` is merely a convention used at Metrum Research Group, where `rbabylon` was developed.
+The `use_bbi()` function takes the _directory_ into which you want to install `bbi`. Note that this can be pointed to anywhere on your system; installing to `/data/apps/bbi` is merely a convention used at Metrum Research Group, where `bbr` was developed.
 
 ### Setting bbi_exe_path
 
-Once `bbi` is installed, you will need to make sure `rbabylon` knows where to find it. This can be done by setting the `rbabylon.bbi_exe_path` option like so:
+Once `bbi` is installed, you will need to make sure `bbr` knows where to find it. This can be done by setting the `bbr.bbi_exe_path` option like so:
 
 ```{r bbi_exe_path, eval = FALSE}
-options("rbabylon.bbi_exe_path" = "/data/apps/bbi")
+options("bbr.bbi_exe_path" = "/data/apps/bbi")
 ```
 
 Please note that **this must be set for every new R session, so it's recommended to include the above snippet in your .Rprofile**, replacing the `"/data/apps/bbi"` with the absolute path from your system/project, if you have installed it somewhere different.
 
 ### Updating bbi or checking if it's installed
 
-If you're not sure if you have `babylon` installed, you can use `bbi_version()` to check. This will return the version number of your installation, if one is found, or an empty string if you do _not_ have `babylon` installed. You can also use `bbi_current_release()` to see the most current version available and run `use_bbi()` as specified above if you want to update.
+If you're not sure if you have `bbi` installed, you can use `bbi_version()` to check. This will return the version number of your installation, if one is found, or an empty string if you do _not_ have `bbi` installed. You can also use `bbi_current_release()` to see the most current version available and run `use_bbi()` as specified above if you want to update.
 
-You can also check the [babylon documentation](https://github.com/metrumresearchgroup/babylon) for manual installation instructions from the command line.
+You can also check the [bbi documentation](https://github.com/metrumresearchgroup/bbi) for manual installation instructions from the command line.
 
-## babylon.yaml configuration file
+## bbi.yaml configuration file
 
-To actually submit models with `bbi`, you will also need a `babylon.yaml` configuration file. Think of this as containing "global default settings" for your `bbi` runs.  Those settings will not be discussed here, but know that they can be modified globally by editing that file, or model-by-model as described in the "Passing arguments to bbi" section below.
+To actually submit models with `bbi`, you will also need a `bbi.yaml` configuration file. Think of this as containing "global default settings" for your `bbi` runs.  Those settings will not be discussed here, but know that they can be modified globally by editing that file, or model-by-model as described in the "Passing arguments to bbi" section below.
 
 ### bbi_init()
 
-The `bbi_init()` function will create a `babylon.yaml`, with the default settings, in the specified directory. Optionally, you can pass the path to a `babylon.yaml` to the `.config_path` argument of any `rbabylon` function that needs one. However, by default these functions will look for one in the same folder as the model being submitted or manipulated. Therefore, if you will have a number of models in the same folder, it is easiest to put a `babylon.yaml` that folder.
+The `bbi_init()` function will create a `bbi.yaml`, with the default settings, in the specified directory. Optionally, you can pass the path to a `bbi.yaml` to the `.config_path` argument of any `bbr` function that needs one. However, by default these functions will look for one in the same folder as the model being submitted or manipulated. Therefore, if you will have a number of models in the same folder, it is easiest to put a `bbi.yaml` that folder.
 
 ```{r configure bbi fake, eval = FALSE}
 MODEL_DIR <- "../model/nonmem/basic"  # this should be relative to your working directory
 
-bbi_init(.dir = MODEL_DIR,            # the directory to create the babylon.yaml in
+bbi_init(.dir = MODEL_DIR,            # the directory to create the bbi.yaml in
          .nonmem_dir = "/opt/NONMEM", # location of NONMEM installation
          .nonmem_version = "nm74gf")  # default NONMEM version to use
 ```
 
 Here we define a define variable `MODEL_DIR` with the path to the directory containing our models. Notice that you must also pass the path to a working installation of NONMEM, and a default NONMEM version to use.
 
-Note **this only needs to be done once** for each folder you are modeling in. Once the `babylon.yaml` exists, you will _not_ need to run `bbi_init()` again unless you want to create another one; for example if you move to modeling in a different directory, or if you want a different set of default settings for some specific subset of models.
+Note **this only needs to be done once** for each folder you are modeling in. Once the `bbi.yaml` exists, you will _not_ need to run `bbi_init()` again unless you want to create another one; for example if you move to modeling in a different directory, or if you want a different set of default settings for some specific subset of models.
 
 # Initial modeling run
 
 ## Create model object
-To begin modeling, first create a model object using `new_model()`. This is an S3 object which you will pass to all of the other `rbabylon` functions that submit, summarize, or manipulate models.
+To begin modeling, first create a model object using `new_model()`. This is an S3 object which you will pass to all of the other `bbr` functions that submit, summarize, or manipulate models.
 
 The first argument (`.path`) must be the path to your model control stream _without file extension_. For instance, the call below assumes you have a control stream named `1.ctl` or `1.mod` in the directory you just assigned to `MODEL_DIR` above. 
 
@@ -132,7 +132,7 @@ There are a number of arguments that `bbi` can take to modify how models are run
 print_bbi_args()
 ```
 
-As discussed in "Setup" above, these can be set globally in the `babylon.yaml` file, and you can see the default values of them in that file. However, **specific arguments can also be set or changed for each model.** This can be done in two ways:
+As discussed in "Setup" above, these can be set globally in the `bbi.yaml` file, and you can see the default values of them in that file. However, **specific arguments can also be set or changed for each model.** This can be done in two ways:
 
 * Attaching them to a model object with `add_bbi_args()` or `replace_bbi_args()`
 * Passing them as a named list to the `.bbi_args` argument of one of the following functions
@@ -140,19 +140,19 @@ As discussed in "Setup" above, these can be set globally in the `babylon.yaml` f
   * `submit_model()` or `submit_models()`
   * `model_summary()` or `model_summaries()`
 
-Note that any `bbi_args` attached to a model object will override the relevant settings in `babylon.yaml`, and that `.bbi_args` passed into a `submit_` or `_summary` call will override the relevant settings in both `babylon.yaml` _and_ `bbi_args` attached to the model object.
+Note that any `bbi_args` attached to a model object will override the relevant settings in `bbi.yaml`, and that `.bbi_args` passed into a `submit_` or `_summary` call will override the relevant settings in both `bbi.yaml` _and_ `bbi_args` attached to the model object.
 
 See the docs for any of the functions just mentioned for more details on usage and syntax.
 
 ### Overwriting output from a previously run model
 
-It is common to run a model, make some tweaks to it, and then run it again. However, to avoid accidentally deleting model outputs, `rbabylon` will error by default if it sees existing output when trying to submit a model. To automatically overwrite any previous model output, just pass `overwrite = TRUE` to the `.bbi_args` argument described in the previous section. For example:
+It is common to run a model, make some tweaks to it, and then run it again. However, to avoid accidentally deleting model outputs, `bbr` will error by default if it sees existing output when trying to submit a model. To automatically overwrite any previous model output, just pass `overwrite = TRUE` to the `.bbi_args` argument described in the previous section. For example:
 
 ```{r overwrite true, eval = FALSE}
 mod1 %>% submit_model(.bbi_args = list(overwrite = TRUE))
 ```
 
-You can also change this setting globally by setting `overwrite: true` in the `babylon.yaml` file for your project.
+You can also change this setting globally by setting `overwrite: true` in the `bbi.yaml` file for your project.
 
 ## Summarize model
 Once the model run has completed, users can get a summary object containing much of the commonly used diagnostic information in a named list.
@@ -169,11 +169,11 @@ param_df1 <- sum1 %>% param_estimates()
 param_df1
 ```
 
-To see how to load summaries of multiple models to an easy-to-read tibble, see the [Creating a Model Summary Log](https://metrumresearchgroup.github.io/rbabylon/articles/using-summary-log.html) vignette.
+To see how to load summaries of multiple models to an easy-to-read tibble, see the [Creating a Model Summary Log](https://metrumresearchgroup.github.io/bbr/articles/using-summary-log.html) vignette.
 
 # Iteration
 
-Much of the benefit of `rbabylon` is leveraged in the model iteration workflow, and the run log summaries that can be created afterwards. For example, imagine you look at these model results and want to begin iterating on them with a new model. 
+Much of the benefit of `bbr` is leveraged in the model iteration workflow, and the run log summaries that can be created afterwards. For example, imagine you look at these model results and want to begin iterating on them with a new model. 
 
 If you are now in a new R session and no longer have your `mod1` object in memory, you can easily rebuild it from the YAML file on disk with `read_model()`:
 
@@ -183,7 +183,7 @@ mod1 <- read_model(file.path(MODEL_DIR, 1))
 
 ## copy_model_from()
 
-Now you can create a new model object, based on the original, copying and renaming the control stream in the process. The `copy_model_from()` call below will create both `2.ctl` and `2.yaml` files in the same directory as the parent model, and return the model object corresponding to them. (`copy_model_from()` also stores the model's "ancestry" which can be useful later in the project, as shown in the [Using the based_on field](https://metrumresearchgroup.github.io/rbabylon/articles/using-based-on.html) vignette.)
+Now you can create a new model object, based on the original, copying and renaming the control stream in the process. The `copy_model_from()` call below will create both `2.ctl` and `2.yaml` files in the same directory as the parent model, and return the model object corresponding to them. (`copy_model_from()` also stores the model's "ancestry" which can be useful later in the project, as shown in the [Using the based_on field](https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html) vignette.)
 
 ```{r copy_model 2}
 mod2 <- copy_model_from(mod1, 2)
@@ -256,7 +256,7 @@ The `run_log()` returns a tibble which can be manipulated like any other tibble.
 
 ## Viewing tags example
 
-The `rbabylon::collapse_to_string()` function can collapse any list column into a string representation of its contents. It is specifically designed for collapsing columns like `tags`, `notes`, and `based_on` into a more human-readable format.
+The `bbr::collapse_to_string()` function can collapse any list column into a string representation of its contents. It is specifically designed for collapsing columns like `tags`, `notes`, and `based_on` into a more human-readable format.
 
 ```{r viewing tags new} 
 log_df %>% 
@@ -284,7 +284,7 @@ cleanup()
 
 # Further reading
 
-Hopefully this has given you a good start on understanding the capabilities and basic workflow of `rbabylon`. Please see the other vignettes for demonstrations of more advanced or specific functionality.
+Hopefully this has given you a good start on understanding the capabilities and basic workflow of `bbr`. Please see the other vignettes for demonstrations of more advanced or specific functionality.
 
-* [Using the based_on field](https://metrumresearchgroup.github.io/rbabylon/articles/using-based-on.html) -- How to use the `based_on` field to track a model's ancestry through the model development process, as well how to leverage `config_log()` to check whether older models are still up-to-date.
-* [Creating a Model Summary Log](https://metrumresearchgroup.github.io/rbabylon/articles/using-summary-log.html) -- How to use `summary_log()` to extract model diagnostics like the objective function value, condition number, and parameter counts.
+* [Using the based_on field](https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html) -- How to use the `based_on` field to track a model's ancestry through the model development process, as well how to leverage `config_log()` to check whether older models are still up-to-date.
+* [Creating a Model Summary Log](https://metrumresearchgroup.github.io/bbr/articles/using-summary-log.html) -- How to use `summary_log()` to extract model diagnostics like the objective function value, condition number, and parameter counts.

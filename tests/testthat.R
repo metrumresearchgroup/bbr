@@ -1,4 +1,4 @@
 library(testthat)
-library(rbabylon)
+library(bbr)
 
-test_check("rbabylon")
+test_check("bbr")
