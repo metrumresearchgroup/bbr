@@ -1,5 +1,5 @@
 library(dplyr)
-devtools::load_all() # can't call library(rbabylon) from within rbabylon when using pkgr
+devtools::load_all() # can't call library(bbr) from within bbr when using pkgr
 
 ###################
 # FUNCTION DEF
@@ -12,7 +12,7 @@ devtools::load_all() # can't call library(rbabylon) from within rbabylon when us
 #' @param .args list of arguments to pass through to print method
 #' @param .suffix optional suffix to put on output file name
 build_print_bbi_nonmem_summary_refs <- function(.s, .args = list(), .suffix = "") {
-  out_dir <- system.file("test-refs", "print-refs", package = "rbabylon")
+  out_dir <- system.file("test-refs", "print-refs", package = "bbr")
 
   # build output path
   .suffix <- ifelse(.suffix == "", .suffix, paste0("_", .suffix))
@@ -30,7 +30,7 @@ build_print_bbi_nonmem_summary_refs <- function(.s, .args = list(), .suffix = ""
 ###################
 
 # To render refs, source this script.
-withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
+withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   .proj_root <- rprojroot::find_rstudio_root_file()
 
   file.path(.proj_root, "inst", "model", "nonmem", "basic", 1) %>%

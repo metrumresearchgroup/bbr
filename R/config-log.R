@@ -2,9 +2,9 @@
 # Fields from bbi_config.json
 ###############################
 
-#' Parse babylon configs to log
+#' Parse bbi configs to log
 #'
-#' Extracts selected fields from `bbi_config.json`, which is created by babylon
+#' Extracts selected fields from `bbi_config.json`, which is created by bbi
 #' in the model output folder to store metadata about the execution of a model
 #' run.
 #'
@@ -29,7 +29,7 @@
 #'
 #'   * `data_md5`: the MD5 sum of the data file
 #'
-#'   * `bbi_version`: the version of babylon last used to run the model
+#'   * `bbi_version`: the version of bbi last used to run the model
 #'
 #'   * `nm_version`: the version of NONMEM last used to run the model
 #'
@@ -154,13 +154,13 @@ config_log_entry <- function(path,
         .sep = " "
       ),
       glue::glue(
-        "This is likely because it was run with an old version of babylon.",
+        "This is likely because it was run with an old version of bbi.",
         "Model was run on version {config[['bbi_version']]}",
         .sep = " "
       ),
       glue::glue(
         "User can call `bbi_current_release()` to see the most recent release",
-        "version, and call `use_bbi(options('rbabylon.bbi_exe_path'))` to",
+        "version, and call `use_bbi(options('bbr.bbi_exe_path'))` to",
         "upgrade to the version.",
         .sep = " "
       ),

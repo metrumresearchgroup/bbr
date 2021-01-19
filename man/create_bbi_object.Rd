@@ -44,7 +44,7 @@ create_log_df_impl(log_df, .class, .req_cols, .key)
 \item{.key}{Character scalar of column name that will be treated as a primary key. Must be a type character, unique, and have no NA's or NULL's.}
 }
 \description{
-Constructor functions for objects of fundamental rbabylon classes.
+Constructor functions for objects of fundamental bbr classes.
 }
 \section{Functions}{
 \itemize{
@@ -54,7 +54,7 @@ Constructor functions for objects of fundamental rbabylon classes.
 
 \item \code{create_summary_list}: Create list output from \code{\link[=model_summaries]{model_summaries()}}. Each element will contain a \verb{bbi_\{.model_type\}_summary} object, as well as some metadata about possible errors.
 
-\item \code{create_process_object}: Create list object of \code{babylon_process} class, first checking that all the required keys are present.
+\item \code{create_process_object}: Create list object of \code{bbi_process} class, first checking that all the required keys are present.
 
 \item \code{create_run_log_object}: Create tibble object of \code{bbi_run_log_df} class, first checking that all the required columns are present.
 

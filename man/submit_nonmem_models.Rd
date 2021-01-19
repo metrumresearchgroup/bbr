@@ -2,7 +2,7 @@
 % Please edit documentation in R/submit-models.R
 \name{submit_nonmem_models}
 \alias{submit_nonmem_models}
-\title{Submit multiple NONMEM models in batch via babylon}
+\title{Submit multiple NONMEM models in batch via bbi}
 \usage{
 submit_nonmem_models(
   .mods,
@@ -17,8 +17,8 @@ submit_nonmem_models(
 \arguments{
 \item{.mods}{A list of S3 objects of class \code{bbi_nonmem_model}}
 
-\item{.bbi_args}{A named list specifying arguments to pass to babylon
-formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}. Run \code{\link[=print_bbi_args]{print_bbi_args()}} to see valid arguments. Note that rbabylon does
+\item{.bbi_args}{A named list specifying arguments to pass to bbi
+formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}. Run \code{\link[=print_bbi_args]{print_bbi_args()}} to see valid arguments. Note that bbr does
 not support changing the output directory (including through the model or
 global YAML files).}
 
@@ -27,8 +27,8 @@ global YAML files).}
 
 \item{...}{args passed through to \code{bbi_exec()}}
 
-\item{.config_path}{Path to a babylon configuration file. If \code{NULL}, the
-default, will attempt to use a \code{babylon.yaml} in the same directory as the
+\item{.config_path}{Path to a bbi configuration file. If \code{NULL}, the
+default, will attempt to use a \code{bbi.yaml} in the same directory as the
 model.}
 
 \item{.wait}{If \code{TRUE}, the default, wait for the bbi process to return
@@ -40,7 +40,7 @@ insted of running it. This is primarily for testing but also a debugging
 tool.}
 }
 \value{
-A list of S3 objects of class \code{babylon_process}
+A list of S3 objects of class \code{bbi_process}
 }
 \description{
 Private implementation function called by \code{submit_models()} dispatches.

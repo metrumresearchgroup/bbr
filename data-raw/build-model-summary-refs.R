@@ -1,5 +1,5 @@
 library(dplyr)
-devtools::load_all() # can't call library(rbabylon) from within rbabylon when using pkgr
+devtools::load_all() # can't call library(bbr) from within bbr when using pkgr
 
 ###################
 # FUNCTION DEF
@@ -13,7 +13,7 @@ devtools::load_all() # can't call library(rbabylon) from within rbabylon when us
 build_model_summary_refs <- function(.mod, .bbi_path = read_bbi_path()) {
 
   model_name <- get_model_id(.mod)
-  ref_out_dir <- system.file('test-refs', package = 'rbabylon')
+  ref_out_dir <- system.file('test-refs', package = 'bbr')
   sum_out_path <- file.path(
     ref_out_dir,
     as.character(glue::glue("{model_name}_summary_obj.R"))
@@ -23,7 +23,7 @@ build_model_summary_refs <- function(.mod, .bbi_path = read_bbi_path()) {
     as.character(glue::glue("{model_name}_param_table.R"))
   )
 
-  withr::with_options(list(rbabylon.bbi_exe_path = .bbi_path), {
+  withr::with_options(list(bbr.bbi_exe_path = .bbi_path), {
     message(paste("  writing", sum_out_path))
     .sum <- model_summary(.mod)
     dput(.sum, file = sum_out_path)

@@ -1,5 +1,5 @@
 library(dplyr)
-devtools::load_all() # can't call library(rbabylon) from within rbabylon when using pkgr
+devtools::load_all() # can't call library(bbr) from within bbr when using pkgr
 
 ###################
 # FUNCTION DEF
@@ -18,13 +18,13 @@ run_test_model <- function(
 ) {
 
   .model_dir <- file.path(rprojroot::find_rstudio_root_file(), .model_dir)
-  .ref_out_dir <- system.file('test-refs', package = 'rbabylon')
+  .ref_out_dir <- system.file('test-refs', package = 'bbr')
 
-  withr::with_options(list(rbabylon.bbi_exe_path = .bbi_path), {
-    bbi_init(.dir = .model_dir,            # the directory to create the babylon.yaml in
+  withr::with_options(list(bbr.bbi_exe_path = .bbi_path), {
+    bbi_init(.dir = .model_dir,            # the directory to create the bbi.yaml in
              .nonmem_dir = "/opt/NONMEM", # location of NONMEM installation
              .nonmem_version = "nm74gf")  # default NONMEM version to use
-    withr::defer(fs::file_delete(file.path(.model_dir, "babylon.yaml")))
+    withr::defer(fs::file_delete(file.path(.model_dir, "bbi.yaml")))
 
     mod_path <- file.path(.model_dir, .model_name)
 

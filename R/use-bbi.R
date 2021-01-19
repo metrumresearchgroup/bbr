@@ -1,11 +1,11 @@
 #' @title Installs most current release of bbi
-#' @description Identifies system running and pulls the relevant tarball for the current release of babylon from GitHub,
+#' @description Identifies system running and pulls the relevant tarball for the current release of bbi from GitHub,
 #' and then installs it in the directory passed to `.dir`.
 #' If used in an interactive session, will open an installation menu confirming the installed version.
 #' @importFrom glue glue glue_collapse
 #' @importFrom cli rule
 #' @param .dir directory to install bbi to on linux
-#' @param .version version of babylon to install. Must pass a character scalar corresponding to a tag found in `https://github.com/metrumresearchgroup/babylon/releases`
+#' @param .version version of bbi to install. Must pass a character scalar corresponding to a tag found in `https://github.com/metrumresearchgroup/bbi/releases`
 #' @param .force If `FALSE`, the default, skips installation if requested version and local version are the same. If `TRUE` forces installation if it will be the same version.
 #' @param .quiet If `TRUE`, suppresses output printed to the console. `FALSE` by default.
 #' @return character
@@ -23,10 +23,10 @@ use_bbi <- function(.dir = "/data/apps", .version = "latest", .force = FALSE, .q
   this_os <- os[sapply(os,grepl,x=R.version$os)]
 
   if(.version == "latest") {
-    .bbi_url <- current_release(owner = 'metrumresearchgroup', repo = 'babylon', os = this_os)
+    .bbi_url <- current_release(owner = 'metrumresearchgroup', repo = 'bbi', os = this_os)
   } else {
     if (this_os == "linux") {
-      .bbi_url <- as.character(glue("https://github.com/metrumresearchgroup/babylon/releases/download/{.version}/bbi_linux_amd64.tar.gz"))
+      .bbi_url <- as.character(glue("https://github.com/metrumresearchgroup/bbi/releases/download/{.version}/bbi_linux_amd64.tar.gz"))
     } else {
       warning(glue("User passed `.version = {.version}` and but this argument is only valid on Linux and current OS is {this_os}. Latest version of bbi will be installed."))
     }
@@ -42,7 +42,7 @@ use_bbi <- function(.dir = "/data/apps", .version = "latest", .force = FALSE, .q
                     linux_install_commands(.dir = .dir, .bbi_url = .bbi_url)
                   },
                   {
-                    c('browse to: https://github.com/metrumresearchgroup/babylon#getting-started')
+                    c('browse to: https://github.com/metrumresearchgroup/bbi#getting-started')
                   })
 
   glue_this <- c(header,body,footer)
@@ -62,7 +62,7 @@ use_bbi <- function(.dir = "/data/apps", .version = "latest", .force = FALSE, .q
 #' @param repo Repository name
 #' @param os Operating system user intends to install on
 #' @keywords internal
-current_release <- function(owner = 'metrumresearchgroup', repo = 'babylon', os = c('linux','darwin','windows')){
+current_release <- function(owner = 'metrumresearchgroup', repo = 'bbi', os = c('linux','darwin','windows')){
 
   tmp <- tempfile(fileext = '.json')
 
@@ -90,20 +90,20 @@ current_release <- function(owner = 'metrumresearchgroup', repo = 'babylon', os 
 }
 
 
-#' @title Get version number of babylon current release
-#' @description Helper function to get version number of most recent release of babylon from GitHub.
+#' @title Get version number of bbi current release
+#' @description Helper function to get version number of most recent release of bbi from GitHub.
 #' @param os operating system, Default: `'linux'`
 #' @importFrom stringr str_replace
 #' @export
 bbi_current_release <- function(os = "linux"){
-  str_replace(basename(dirname(current_release(owner = 'metrumresearchgroup', repo = 'babylon', os = os))), '^v', '')
+  str_replace(basename(dirname(current_release(owner = 'metrumresearchgroup', repo = 'bbi', os = os))), '^v', '')
 }
 
 #' Private implementation function for installing bbi with interactive menu
 #' @param .body Character vector of installation commands to run with `system`
 #' @param .this_os Character scalar of OS
 #' @param .dir directory to install bbi to
-#' @param .version version of babylon to install. Must pass a character scalar corresponding to a tag found in `https://github.com/metrumresearchgroup/babylon/releases`
+#' @param .version version of bbi to install. Must pass a character scalar corresponding to a tag found in `https://github.com/metrumresearchgroup/bbi/releases`
 #' @param .force If `FALSE`, the default, skips installation if requested version and local version are the same. If `TRUE` forces installation if it will be the same version.
 #' @param .quiet If `TRUE`, suppresses output printed to the console. `FALSE` by default.
 #' @keywords internal
@@ -125,7 +125,7 @@ install_menu <- function(.body, .this_os, .dir, .version, .force, .quiet){
       # suppressing interactivity will allow for suppression in unit tests. This may be more general to name
       # like specifiying its a test environment, but a user could also want to generally suppress interactivity for
       # automatted build pipelines etc.
-      if (interactive() && is.null(getOption('rbabylon.suppress_interactivity'))) {
+      if (interactive() && is.null(getOption('bbr.suppress_interactivity'))) {
         version_message(local_v = local_v, release_v = release_v)
 
         print(glue::glue(cli::rule(left = cli::col_red('Do you want to install version {release_v}?'),line = 2)))
@@ -166,17 +166,17 @@ linux_install_commands <- function(.dir, .bbi_url) {
 }
 
 
-#' @title Get version of installed babylon
+#' @title Get version of installed bbi
 #'
 #' @importFrom stringr str_detect str_replace_all
-#' @param .bbi_exe_path Path to babylon executable
+#' @param .bbi_exe_path Path to bbi executable
 #' @return String giving the version of the bbi binary installed at `.bbi_exe_path`
 #' @examples
 #' \dontrun{
 #' bbi_version()
 #' }
 #' @export
-bbi_version <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')){
+bbi_version <- function(.bbi_exe_path = getOption('bbr.bbi_exe_path')){
   bbi_path <- Sys.which(.bbi_exe_path)
   if (is.null(bbi_path) || bbi_path == "") {
     return("")
@@ -192,7 +192,7 @@ bbi_version <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')){
     },
     error = function(e) {
       if (str_detect(e$message, "error in running command")) {
-        stop(glue("The executable at {bbi_path} does not appear to be a valid babylon installation. Use `use_bbi({dirname(bbi_path)})` to install babylon at that location."))
+        stop(glue("The executable at {bbi_path} does not appear to be a valid bbi installation. Use `use_bbi({dirname(bbi_path)})` to install bbi at that location."))
       }
       stop(e$message)
     }

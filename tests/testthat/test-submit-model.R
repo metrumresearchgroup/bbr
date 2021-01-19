@@ -4,14 +4,14 @@ context("submit_model(.dry_run=T)")
 # testing single model submission
 ###################################
 
-# create fake babylon.yaml
-readr::write_file("created_by: test-submit-model", "babylon.yaml")
-on.exit({ fs::file_delete("babylon.yaml")})
+# create fake bbi.yaml
+readr::write_file("created_by: test-submit-model", "bbi.yaml")
+on.exit({ fs::file_delete("bbi.yaml")})
 
 model_dir <- ABS_MODEL_DIR
 mod_ctl_path <- file.path(model_dir, CTL_FILENAME)
 
-withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
+withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   test_that("submit_model(.dry_run=T) returns correct command string",
             {
               # correctly parsing yaml

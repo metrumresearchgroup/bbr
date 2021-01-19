@@ -11,7 +11,7 @@
 #' **`get_output_dir()`** returns the path to the directory containing
 #'   output files created when the model is run.
 #'
-#' **`get_yaml_path()`** returns the path to the YAML file created by rbabylon.
+#' **`get_yaml_path()`** returns the path to the YAML file created by bbr.
 #'   This file contains metadata like tags, etc. and should, generally speaking,
 #'   _not_ be interacted with directly. Use the helper functions mentioned in the
 #'   [modify_model_field()] help page to modify this file for you.
