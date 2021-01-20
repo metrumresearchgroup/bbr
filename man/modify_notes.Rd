@@ -42,7 +42,7 @@ the way, or of a particular thing you noticed when looking at model
 diagnostics.
 
 Like tags, notes can also be collapsed using \code{\link[=collapse_to_string]{collapse_to_string()}}
-See the \href{https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html#viewing-tags-example}{"Getting Started" vignette}
+See the \href{https://metrumresearchgroup.github.io/bbr/articles/getting-started.html#viewing-tags-example}{"Getting Started" vignette}
 for an example of this.
 }
 \section{Functions}{

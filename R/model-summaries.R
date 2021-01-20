@@ -59,7 +59,7 @@ model_summaries.list <- function(
           if (!is.null(.bbi_args)) {
             .fail_flags <- combine_list_objects(.fail_flags, .bbi_args)
           }
-          .retry <- rbabylon::model_summary(.m, .bbi_args = .fail_flags)
+          .retry <- bbr::model_summary(.m, .bbi_args = .fail_flags)
           .retry$needed_fail_flags <- TRUE
           return(.retry)
         },

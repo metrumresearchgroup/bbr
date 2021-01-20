@@ -12,7 +12,7 @@ teardown({
 test_that("use-bbi works on linux", {
   skip_if_over_rate_limit()
 
-  withr::with_options(c('rbabylon.suppress_interactivity' = TRUE), {
+  withr::with_options(c('bbr.suppress_interactivity' = TRUE), {
     use_bbi(tdir, .force = TRUE, .quiet = TRUE)
   })
   f_info <- file.info(bbi_tmp_path)
@@ -23,14 +23,14 @@ test_that("use-bbi works on linux", {
 test_that("bbi_version and bbi_current_version match", {
   skip_if_over_rate_limit()
 
-  withr::with_options(list("rbabylon.bbi_exe_path" = bbi_tmp_path), {
+  withr::with_options(list("bbr.bbi_exe_path" = bbi_tmp_path), {
     expect_equal(bbi_version(), bbi_current_release())
   })
 })
 
 
 test_that("bbi_version returns nothing with fake bbi", {
-  withr::with_options(list("rbabylon.bbi_exe_path" = "/fake/path/bbi"), {
+  withr::with_options(list("bbr.bbi_exe_path" = "/fake/path/bbi"), {
     expect_equal(bbi_version(), "")
   })
 })
@@ -43,7 +43,7 @@ test_that("use_bbi .version argument works", {
 
   test_version <- "v2.1.2"
 
-  withr::with_options(c('rbabylon.suppress_interactivity' = TRUE), {
+  withr::with_options(c('bbr.suppress_interactivity' = TRUE), {
     use_bbi(tdir, .version = test_version, .force = TRUE, .quiet = TRUE)
   })
   f_info <- file.info(bbi_tmp_path)

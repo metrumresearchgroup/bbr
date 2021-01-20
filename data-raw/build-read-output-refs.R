@@ -1,5 +1,5 @@
 library(dplyr)
-devtools::load_all() # can't call library(rbabylon) from within rbabylon when using pkgr
+devtools::load_all() # can't call library(bbr) from within bbr when using pkgr
 
 ###################
 # FUNCTION DEF
@@ -11,7 +11,7 @@ devtools::load_all() # can't call library(rbabylon) from within rbabylon when us
 #' @param .mod bbi_nonmem_model object
 build_read_output_refs <- function(.mod) {
   root_dir <- file.path(get_output_dir(.mod), get_model_id(.mod))
-  out_dir <- system.file("test-refs", "read-output-refs", package = "rbabylon")
+  out_dir <- system.file("test-refs", "read-output-refs", package = "bbr")
   message(glue::glue("Writing test-read-output.R refs for {root_dir} into {out_dir}"))
 
   # write out .lst file test cases

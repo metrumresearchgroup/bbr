@@ -13,7 +13,7 @@ install_menu(.body, .this_os, .dir, .version, .force, .quiet)
 
 \item{.dir}{directory to install bbi to}
 
-\item{.version}{version of babylon to install. Must pass a character scalar corresponding to a tag found in \verb{https://github.com/metrumresearchgroup/babylon/releases}}
+\item{.version}{version of bbi to install. Must pass a character scalar corresponding to a tag found in \verb{https://github.com/metrumresearchgroup/bbi/releases}}
 
 \item{.force}{If \code{FALSE}, the default, skips installation if requested version and local version are the same. If \code{TRUE} forces installation if it will be the same version.}
 

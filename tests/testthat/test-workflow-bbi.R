@@ -26,7 +26,7 @@ cleanup_bbi <- function(.recreate_dir = FALSE) {
 cleanup_bbi(.recreate_dir = TRUE)
 
 # set options and run tests
-withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
+withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   # cleanup when done
   on.exit({
@@ -34,10 +34,10 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
     cleanup_bbi()
   })
 
-  # clear old babylon.yaml
-  if (fs::file_exists(file.path(MODEL_DIR_BBI, "babylon.yaml"))) fs::file_delete(file.path(MODEL_DIR_BBI, "babylon.yaml"))
+  # clear old bbi.yaml
+  if (fs::file_exists(file.path(MODEL_DIR_BBI, "bbi.yaml"))) fs::file_delete(file.path(MODEL_DIR_BBI, "bbi.yaml"))
 
-  # create new babylon.yaml
+  # create new bbi.yaml
   bbi_init(MODEL_DIR_BBI, "/opt/NONMEM", "nm74gf")
 
   # copy model file into new model dir
@@ -168,7 +168,7 @@ withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
       res <- submit_model(
         mod,
         .mode = "local",
-        .config_path = file.path(MODEL_DIR_BBI, "babylon.yaml"),
+        .config_path = file.path(MODEL_DIR_BBI, "bbi.yaml"),
         .wait = TRUE
       )
 

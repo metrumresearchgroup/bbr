@@ -14,7 +14,7 @@ use_bbi(
 \arguments{
 \item{.dir}{directory to install bbi to on linux}
 
-\item{.version}{version of babylon to install. Must pass a character scalar corresponding to a tag found in \verb{https://github.com/metrumresearchgroup/babylon/releases}}
+\item{.version}{version of bbi to install. Must pass a character scalar corresponding to a tag found in \verb{https://github.com/metrumresearchgroup/bbi/releases}}
 
 \item{.force}{If \code{FALSE}, the default, skips installation if requested version and local version are the same. If \code{TRUE} forces installation if it will be the same version.}
 
@@ -24,7 +24,7 @@ use_bbi(
 character
 }
 \description{
-Identifies system running and pulls the relevant tarball for the current release of babylon from GitHub,
+Identifies system running and pulls the relevant tarball for the current release of bbi from GitHub,
 and then installs it in the directory passed to \code{.dir}.
 If used in an interactive session, will open an installation menu confirming the installed version.
 }

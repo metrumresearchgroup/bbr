@@ -2,12 +2,12 @@
 % Please edit documentation in R/print.R
 \name{print_bbi}
 \alias{print_bbi}
-\alias{print.babylon_process}
+\alias{print.bbi_process}
 \alias{print.bbi_nonmem_summary}
 \alias{print.bbi_nonmem_model}
-\title{Print methods for rbabylon objects}
+\title{Print methods for bbr objects}
 \usage{
-\method{print}{babylon_process}(x, ..., .call_limit = 250)
+\method{print}{bbi_process}(x, ..., .call_limit = 250)
 
 \method{print}{bbi_nonmem_summary}(x, .digits = 3, .fixed = FALSE, .off_diag = FALSE, .nrow = NULL, ...)
 
@@ -30,7 +30,7 @@
 Otherwise, prints only \code{.nrow} rows.}
 }
 \description{
-The various objects defined by \code{rbabylon} have their own print methods to
+The various objects defined by \code{bbr} have their own print methods to
 allow users to get a quick view of the contents of the object.
 \strong{When printing a \code{bbi} object in an \code{.Rmd} file} that is intended to be
 knit, consider setting \code{results = 'asis'} in the chunk options. This
@@ -38,7 +38,7 @@ will make for prettier formatting, especially of table outputs.
 }
 \section{Functions}{
 \itemize{
-\item \code{print.babylon_process}: Prints the call made to bbi and whether the process is still running or has finished.
+\item \code{print.bbi_process}: Prints the call made to bbi and whether the process is still running or has finished.
 
 \item \code{print.bbi_nonmem_summary}: Prints a high level summary of a model from a bbi_nonmem_summary object
 

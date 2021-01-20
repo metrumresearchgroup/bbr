@@ -7,28 +7,27 @@ mod_ctl_path <- file.path(model_dir, CTL_FILENAME)
 PRINT_REF_DIR <- file.path(REF_DIR, "print-refs")
 
 model_1 <- MOD1
+withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
-withr::with_options(list(rbabylon.bbi_exe_path = read_bbi_path()), {
-
-  test_that("print.babylon_process works with .wait = TRUE", {
+  test_that("print.bbi_process works with .wait = TRUE", {
     proc <- bbi_exec("--help", .wait = TRUE)
     res <- capture.output(print(proc))
     expect_identical(res, c(PROC_HELP_STR, "Process finished."))
   })
 
-  test_that("print.babylon_process works with .wait = FALSE", {
+  test_that("print.bbi_process works with .wait = FALSE", {
     proc <- bbi_exec("--help", .wait = FALSE)
     res <- capture.output(print(proc))
     expect_identical(res, c(PROC_HELP_STR, "Not waiting for process to finish."))
   })
 
-  test_that("print.babylon_process works with dry run", {
+  test_that("print.bbi_process works with dry run", {
     proc <- bbi_dry_run("--help", ".")
     res <- capture.output(print(proc))
     expect_identical(res, c(PROC_HELP_STR, "DRY RUN! Process not actually run."))
   })
 
-  test_that("print.babylon_process(.call_limit) works", {
+  test_that("print.bbi_process(.call_limit) works", {
     # create a bunch of fake models
     temp_dir <- file.path(get_model_working_directory(MOD1), "print-test")
     fs::dir_create(temp_dir)

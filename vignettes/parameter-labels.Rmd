@@ -1,5 +1,5 @@
 ---
-title: "rbabylon Parameter Labels"
+title: "bbr Parameter Labels"
 author: "Seth Green"
 output: rmarkdown::html_vignette
 vignette: >
@@ -19,21 +19,21 @@ knitr::opts_chunk$set(
 
 This vignette demonstrates extracting parameter estimates and labels into a table that can be used for diagnostics, or to generate reports. *Note, this vignette exclusively deals with NONMEM models.*
 
-If you are new to `rbabylon`, the ["Getting Started with rbabylon"](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html) vignette will take you through some basic scenarios for modeling with NONMEM using `rbabylon`, introducing you to its standard workflow and functionality.
+If you are new to `bbr`, the ["Getting Started with bbr"](https://metrumresearchgroup.github.io/bbr/articles/getting-started.html) vignette will take you through some basic scenarios for modeling with NONMEM using `bbr`, introducing you to its standard workflow and functionality.
 
 ## Setup
 
-There is some initial set up necessary for using `rbabylon`. Please refer to the ["Getting Started"](https://metrumresearchgroup.github.io/rbabylon/articles/getting-started.html#setup) vignette, mentioned above, if you have not done this yet. Once this is done, load the library.
+There is some initial set up necessary for using `bbr`. Please refer to the ["Getting Started"](https://metrumresearchgroup.github.io/bbr/articles/getting-started.html#setup) vignette, mentioned above, if you have not done this yet. Once this is done, load the library.
 
 ```{r setup, include=FALSE}
 # NOTE: if running chunks interactively we need to load the package first
-#   because renv isolation prevents us from finding an rbabylon installation
+#   because renv isolation prevents us from finding an bbr installation
 if (interactive()) {
   devtools::load_all()
 }
 ```
 ```{r load packages, results = 'hide', message=FALSE, warning=FALSE}
-library(rbabylon)
+library(bbr)
 library(dplyr)
 library(readr)
 ```
@@ -42,9 +42,9 @@ library(readr)
 source("../tests/testthat/setup-param-labels-ref.R")
 REF_OMEGA <- PARAM_BLOCK_REF$PEX_BLOCK32S$ctl
 
-# set babylon execution path
+# set bbi execution path
 if (Sys.which("bbi") == "") {
-  options('rbabylon.bbi_exe_path' = read_bbi_path())
+  options('bbr.bbi_exe_path' = read_bbi_path())
 }
 ```
 
@@ -55,7 +55,7 @@ if (Sys.which("bbi") == "") {
 We have a control stream and output directory, because the model has already been run.
 
 ```{r first model}
-MODEL_DIR <- system.file("test-refs", "param-labels", "example-model", package = "rbabylon")
+MODEL_DIR <- system.file("test-refs", "param-labels", "example-model", package = "bbr")
 
 mod1 <- read_model(file.path(MODEL_DIR, "510"))
 class(mod1)
@@ -117,7 +117,7 @@ By default `apply_indices()` assumes that *all* `$OMEGA` and `$SIGMA` elements a
 ## Specifying Block Structure
 Block structure is specified with two arguments, `.omega` and `.sigma` which each take a logical vector. Each element in this vector corresponds to a parameter specified in the control stream and denotes whether that element is a diagonal in the relevant matrix.
 
-For example, an `$OMEGA BLOCK(3)` would be represented with the vector `.omega = c(TRUE, FALSE, TRUE, FALSE, FALSE, TRUE)` because the first, third, and sixth elements are the diagonals and the others represent the off-diagonals. However, the user doesn't need to type this explicitly because `rbabylon` has a helper function `block()` that generates these vectors.
+For example, an `$OMEGA BLOCK(3)` would be represented with the vector `.omega = c(TRUE, FALSE, TRUE, FALSE, FALSE, TRUE)` because the first, third, and sixth elements are the diagonals and the others represent the off-diagonals. However, the user doesn't need to type this explicitly because `bbr` has a helper function `block()` that generates these vectors.
 
 ```{r block demo}
 cat(paste("block(1): ", paste(block(1), collapse = ", "), "\n"))

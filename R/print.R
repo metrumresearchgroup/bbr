@@ -1,6 +1,6 @@
-#' Print methods for rbabylon objects
+#' Print methods for bbr objects
 #'
-#' The various objects defined by `rbabylon` have their own print methods to
+#' The various objects defined by `bbr` have their own print methods to
 #' allow users to get a quick view of the contents of the object.
 #' **When printing a `bbi` object in an `.Rmd` file** that is intended to be
 #' knit, consider setting `results = 'asis'` in the chunk options. This
@@ -17,7 +17,7 @@ NULL
 #' @importFrom stringr str_split str_detect
 #' @importFrom fs path_norm
 #' @importFrom cli cat_line
-print.babylon_process <- function(x, ..., .call_limit = 250) {
+print.bbi_process <- function(x, ..., .call_limit = 250) {
   call_str <- glue("{x[[PROC_BBI]]} {paste(x[[PROC_CMD_ARGS]], collapse = ' ')}")
 
   # truncate model list if too long, keeping flags at the end (if any present)

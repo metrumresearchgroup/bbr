@@ -30,7 +30,7 @@
 #'   model file. If `FALSE`, new model file will be an exact copy of its parent.
 #'   For a NONMEM model, this currently means only the `$PROBLEM` line in the
 #'   new control stream will be updated to read `See {.new_model}.yaml. Created
-#'   by rbabylon.`.
+#'   by bbr.`.
 #' @param .overwrite If `FALSE`, the default,  function will error if a model
 #'   file already exists at specified `.new_model` path. If `TRUE` any existing
 #'   file at `.new_model` will be overwritten silently.
@@ -195,7 +195,7 @@ copy_control_stream <- function(.parent_model_path, .new_model_path, .overwrite,
     new_mod_id <- get_model_id(.new_model_path)
     mod_str <- str_replace(mod_str,
                            "\\$PROB(.|\n)*?\\$",
-                           as.character(glue("$PROBLEM From rbabylon: see {new_mod_id}.yaml for details\n\n$")))
+                           as.character(glue("$PROBLEM From bbr: see {new_mod_id}.yaml for details\n\n$")))
     glue("")
 
     # read parent control stream

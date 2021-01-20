@@ -1,16 +1,16 @@
-#' @name rbabylon
-#' @title rbabylon
-#' @description rbabylon is a library written in R that facilitates modeling and
+#' @name bbr
+#' @title bbr
+#' @description `bbr` is a library written in R that facilitates modeling and
 #'   simulation by exposing functionality from the
-#'   [babylon](https://github.com/metrumresearchgroup/babylon) project in R.
-#'   From Babylon's docs: Babylon is a solution for managing projects involving
+#'   [bbi](https://github.com/metrumresearchgroup/bbi) project in R.
+#'   From `bbi`'s docs: `bbi` is a solution for managing projects involving
 #'   modeling and simulation with a number of software solutions used in
 #'   pharmaceutical sciences. This is a fork of the `nonmemutils` project that
-#'   is broader in scope. Initial support encompasses NONMEM however the api is
+#'   is broader in scope. Initial support encompasses NONMEM, however the API is
 #'   designed in a way to be flexible to handle other software.
 #'
 #' @details
-#' RBabylon uses several fundamental objects, each of which has a number of S3
+#' `bbr` uses several fundamental objects, each of which has a number of S3
 #' methods associated with it:
 #'
 #' * `bbi_{.model_type}_model` -- Represents a single model. Contains paths to
@@ -36,7 +36,7 @@ NULL
 
 #' Execute call to bbi
 #'
-#' Private implementation function that executes a babylon call (`bbi ...`) with processx::process$new()
+#' Private implementation function that executes a bbi call (`bbi ...`) with processx::process$new()
 #'
 #' @inheritParams bbi_version
 #' @param .cmd_args A character vector of command line arguments for the execution call
@@ -44,7 +44,7 @@ NULL
 #' @param .verbose Print stdout and stderr as process runs #### NOT IMPLEMENTED?
 #' @param .wait If true, don't return until process has exited.
 #' @param ... arguments to pass to processx::process$new()
-#' @return An S3 object of class `babylon_process`
+#' @return An S3 object of class `bbi_process`
 #'         process -- The process object (see ?processx::process$new for more details on what you can do with this).
 #'         stdout -- the stdout and stderr from the process, if `.wait = TRUE`. If `.wait = FALSE` this will be NULL.
 #'         bbi -- character scalar with the execution path used for bbi.
@@ -56,7 +56,7 @@ bbi_exec <- function(.cmd_args,
                      .dir = ".",
                      .verbose = FALSE,
                      .wait = FALSE,
-                     .bbi_exe_path = getOption("rbabylon.bbi_exe_path"),
+                     .bbi_exe_path = getOption("bbr.bbi_exe_path"),
                      ...) {
   check_bbi_exe(.bbi_exe_path)
 
@@ -91,7 +91,7 @@ bbi_exec <- function(.cmd_args,
       # in such a case that people report errors where summary takes longer
       # then we can establish a longer potential timeout or more heuristics
       # around what time might be (eg if see its a summary on a range of models)
-      p$wait(timeout = getOption("rbabylon.summary_wait_timeout", 1000L))
+      p$wait(timeout = getOption("bbr.summary_wait_timeout", 1000L))
     } else {
       p$wait()
     }
@@ -115,9 +115,9 @@ bbi_exec <- function(.cmd_args,
   return(res)
 }
 
-#' Creates a `babylon_process` object with all the required keys, without actually running the command
+#' Creates a `bbi_process` object with all the required keys, without actually running the command
 #'
-#' Returns an S3 object of class `babylon_process` but the `process` and `stdout` elements containing only the string "DRY_RUN".
+#' Returns an S3 object of class `bbi_process` but the `process` and `stdout` elements containing only the string "DRY_RUN".
 #' Also contains the element `call` with a string representing the command that could be called on the command line.
 #' @param .cmd_args A character vector of command line arguments for the execution call
 #' @param .dir The working directory to run command in. Defaults to "."
@@ -127,7 +127,7 @@ bbi_dry_run <- function(.cmd_args, .dir) {
   res <- list()
   res[[PROC_PROCESS]] <- "DRY_RUN"
   res[[PROC_STDOUT]] <- "DRY_RUN"
-  res[[PROC_BBI]] <- getOption("rbabylon.bbi_exe_path")
+  res[[PROC_BBI]] <- getOption("bbr.bbi_exe_path")
   res[[PROC_CMD_ARGS]] <- .cmd_args
   res[[PROC_WD]] <- .dir
 
@@ -144,9 +144,9 @@ bbi_dry_run <- function(.cmd_args, .dir) {
   return(res)
 }
 
-#' Check that babylon is installed
+#' Check that bbi is installed
 #'
-#' Raises an error if a babylon executable is not found at `.bbi_exe_path`.
+#' Raises an error if a bbi executable is not found at `.bbi_exe_path`.
 #'
 #' @inheritParams bbi_version
 #' @return `NULL`, invisibly
@@ -158,7 +158,7 @@ check_bbi_exe <- function(.bbi_exe_path) {
 
     # if missing, reject it
     if (which_path == "") {
-      stop(glue("`{.bbi_exe_path}` was not found on system. Please assign a path to a working version of babylon with `options('rbabylon.bbi_exe_path' = '/path/to/bbi')`"))
+      stop(glue("`{.bbi_exe_path}` was not found on system. Please assign a path to a working version of bbi with `options('bbr.bbi_exe_path' = '/path/to/bbi')`"))
     }
 
     # if version too low, reject it
@@ -171,14 +171,16 @@ check_bbi_exe <- function(.bbi_exe_path) {
 }
 
 
-#' Check that babylon satisfies a version constraint
+#' Check that bbi satisfies a version constraint
 #'
 #' @importFrom stringr str_replace_all
 #' @inheritParams bbi_version
-#'
 #' @return `NULL` if `.bbi_exe_path` satisfies the constraint
 #' @keywords internal
 check_bbi_version_constraint <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')) {
+  if (isTRUE(getOption("rbabylon.DEV_no_min_version"))) {
+    return(invisible(TRUE))
+  }
   .bbi_exe_path <- Sys.which(.bbi_exe_path)
   if (.bbi_exe_path == "") {
     stop(glue("`{.bbi_exe_path}` was not found on the system."))
@@ -187,9 +189,9 @@ check_bbi_version_constraint <- function(.bbi_exe_path = getOption('rbabylon.bbi
   this_version <- bbi_version(.bbi_exe_path)
   test_version_test <- package_version(str_replace_all(this_version, "[^0-9\\.]", ""))
 
-  if (test_version_test < getOption("rbabylon.bbi_min_version")) {
+  if (test_version_test < getOption("bbr.bbi_min_version")) {
     strict_mode_error(paste(
-      glue("The executable at `{.bbi_exe_path}` is version {this_version} but the minimum supported version of babylon is {getOption('rbabylon.bbi_min_version')}"),
+      glue("The executable at `{.bbi_exe_path}` is version {this_version} but the minimum supported version of bbi is {getOption('bbr.bbi_min_version')}"),
       glue("Call `use_bbi('{dirname(.bbi_exe_path)}')` to update to the most recent release."),
       sep = "\n"
     ))
@@ -210,10 +212,10 @@ check_status_code <- function(.status_code, .output, .cmd_args) {
   .custom_msg <- ""
   if (.status_code != 0) {
     if (str_detect(.output, NO_NONMEM_ERR_MSG)) {
-      .custom_msg <- "No version of NONMEM is specified. Either open the relevant `babylon.yaml` and set a version of NONMEM to `default: true`, or pass a version of NONMEM to `.bbi_args=list(nm_version='some_version')`"
+      .custom_msg <- "No version of NONMEM is specified. Either open the relevant `bbi.yaml` and set a version of NONMEM to `default: true`, or pass a version of NONMEM to `.bbi_args=list(nm_version='some_version')`"
     }
     if (str_detect(.output, MOD_ALREADY_EXISTS_ERR_MSG)) {
-      .custom_msg <- "The target output directory already exists. Please pass `.bbi_args=list(overwrite=TRUE)` to your `submit_model()` call. You can also set `overwrite: true` in the model .yaml file or the `babylon.yaml` file."
+      .custom_msg <- "The target output directory already exists. Please pass `.bbi_args=list(overwrite=TRUE)` to your `submit_model()` call. You can also set `overwrite: true` in the model .yaml file or the `bbi.yaml` file."
     }
 
     err_msg <- paste0(
@@ -240,25 +242,25 @@ bbi_help <- function(.cmd_args=NULL) {
 }
 
 
-#' Initialize babylon
+#' Initialize bbi
 #'
-#' Executes `bbi init ...` in specified directory. This creates a `babylon.yaml`
-#' file, which contains defaults for many configurable `babylon` settings, in
+#' Executes `bbi init ...` in specified directory. This creates a `bbi.yaml`
+#' file, which contains defaults for many configurable `bbi` settings, in
 #' that directory.
 #'
-#' @details For `rbabylon` to make any calls out to `bbi` (for example in
-#'   [submit_model()] or [model_summary()]) it must find a `babylon.yaml` file.
+#' @details For `bbr` to make any calls out to `bbi` (for example in
+#'   [submit_model()] or [model_summary()]) it must find a `bbi.yaml` file.
 #'   The default behavior is to look for this file in the same directory as the
 #'   model. `submit_model()` and `submit_models()` also support passing a
 #'   configuration file via the `.config_path` argument.
 #'
 #' @param .dir Path to directory to run `init` in (and put the resulting
-#'   `babylon.yaml` file)
+#'   `bbi.yaml` file)
 #' @param .nonmem_dir Path to directory with the NONMEM installation.
 #' @param .nonmem_version Character scalar for default version of NONMEM to use.
 #'   If left NULL, function will exit and tell you which versions were found in
 #'   `.nonmem_dir`
-#' @param .no_default_version If `TRUE`, force creation of babylon.yaml with
+#' @param .no_default_version If `TRUE`, force creation of bbi.yaml with
 #'   **no default NONMEM version**. `FALSE` by default, and using `TRUE` is
 #'   *not* encouraged.
 #' @importFrom yaml read_yaml write_yaml
@@ -277,8 +279,8 @@ bbi_init <- function(.dir, .nonmem_dir, .nonmem_version = NULL, .no_default_vers
 
   # set default NONMEM version
   if (!is.null(.nonmem_version)) {
-    # load babylon.yaml
-    bbi_yaml_path <- file.path(.dir, "babylon.yaml")
+    # load bbi.yaml
+    bbi_yaml_path <- file.path(.dir, "bbi.yaml")
     bbi_yaml <- read_yaml(bbi_yaml_path)
 
     # check for valid version

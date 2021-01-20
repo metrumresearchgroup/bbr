@@ -29,7 +29,7 @@ and ancestry. \strong{Paths must be relative to \code{.yaml_path}.}}
 \item{.tags}{A character scalar or vector with any user tags to be added to
 the YAML file}
 
-\item{.bbi_args}{A named list specifying arguments to pass to babylon
+\item{.bbi_args}{A named list specifying arguments to pass to bbi
 formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}. Run \code{\link[=print_bbi_args]{print_bbi_args()}} to see valid arguments. These will be written
 into YAML file.}
 
