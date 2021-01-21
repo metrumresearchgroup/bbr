@@ -1,10 +1,30 @@
+# bbr 1.0.0
+
+This release if fairly small in terms of changes, but it increments to a new major release version primarily because of the name change which happened in `bbr 0.12.0`.
+
+The `1.0.0` release also represents a stable feature set of basic NONMEM-related functionality. While there will be more features and development relevant to NONMEM in the future, for the immediate future we are shifting our attention towards building similar functionality to support Stan modeling with `bbr`.
+
+## New features and changes
+
+* The minimum compatible version of `bbi` is increased to `3.0.1`. This is primarily because there was a bug where `bbi` could not parse the summary output from NONMEM 7.5 and this bug has been fixed in `3.0.1`. 
+
+* Added print method for `bbi_nonmem_model` object. Similar to the `bbi_nonmem_summary` object, the `bbi_nonmem_model` object should print nicely in the console, and also look good in `.Rmd` chunks with the option `results = 'asis'`. (#307)
+
+## Developer-facing changes
+
+* We are no longer checking in either the `.Rprofile` or anything in the `renv` folder. As a result, the development workflow has changed slightly. This change is reflected in the README. (#307 and #308)
+
+* Added an option to suppress the minimum `bbi` version constraint. **This is intended only for developers** who want to try out development (unreleased) version of `bbi` while developing on `bbr`. (#305)
+
+* Our Drone CI system now uses a `.drone.yml` instead of `.drone.jsonette`. We have also switched the containers that we use for testing in CI to smaller containers which are more specialized for the purpose. (#309)
+
 # bbr 0.12.0
 
 **This package has been renamed to from `rbabylon` to `bbr`** and the accompanying command-line tool has been renamed from `babylon` to `bbi` (which was already its alias, used throughout the package). Any mentions of `babylon` and `rbabylon` throughout the package have been renamed accordingly. Mentions of either in the older parts of this `NEWS.md` document were left as is for historical purposes.
 
 ## New features and changes
 
-* The minimum compatible version of `bbi` is increased to 3.0.0.
+* The minimum compatible version of `bbi` is increased to `3.0.0`.
 
 # rbabylon 0.11.0
 
