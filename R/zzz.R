@@ -4,7 +4,7 @@
   # if it isn't one of the false-y settings, then will set to true
   if (is.null(getOption("rbabylon.DEV_no_min_version")) &&
       !Sys.getenv("RBABYLON_DEV_NO_MIN_VERSION", unset = "FALSE") %in% c("0", "FALSE", "false")) {
-    message("setting `rbabylon.DEV_no_min_version` to TRUE so no validation of bbi version will occur")
+    packageStartupMessage("setting `rbabylon.DEV_no_min_version` to TRUE so no validation of bbi version will occur")
     options("rbabylon.DEV_no_min_version" = TRUE)
   }
   # set bbi executable path
