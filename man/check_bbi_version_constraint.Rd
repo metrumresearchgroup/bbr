@@ -4,7 +4,9 @@
 \alias{check_bbi_version_constraint}
 \title{Check that bbi satisfies a version constraint}
 \usage{
-check_bbi_version_constraint(.bbi_exe_path = getOption("bbr.bbi_exe_path"))
+check_bbi_version_constraint(
+  .bbi_exe_path = getOption("rbabylon.bbi_exe_path")
+)
 }
 \arguments{
 \item{.bbi_exe_path}{Path to bbi executable}
