@@ -39,8 +39,8 @@ GRD_REF_FLOOR_NULL <- paste0(GRD_STEM, "floorNULL.R")
   EXT_TEST_FILE
 )
 for (.tc in .test_cases) {
-  test_that(glue::glue("build_path_from_mod_obj returns correct {tools::file_ext(.tc)}"), {
-    expect_identical(build_path_from_mod_obj(MOD1, tools::file_ext(.tc)),
+  test_that(glue::glue("build_path_from_model returns correct {tools::file_ext(.tc)}"), {
+    expect_identical(build_path_from_model(MOD1, tools::file_ext(.tc)),
                      normalizePath(.tc))
   })
 }
