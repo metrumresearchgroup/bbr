@@ -465,7 +465,7 @@ NULL
 #' @param .decisions Character vector to add to `decisions` field
 #' @export
 add_decisions <- function(.mod, .decisions) {
-  warning("The `decisions` field has been replaced by `notes` as of bbr 0.10.0 and will be removed in a future release. Please use `add_notes()` going forward.")
+  stop("The `decisions` field has been replaced by `notes` as of bbr 0.10.0 and will be removed in a future release. Please use `add_notes()` going forward.", call. = FALSE)
   modify_model_field(
     .mod = .mod,
     .field = YAML_DECISIONS,
@@ -477,7 +477,7 @@ add_decisions <- function(.mod, .decisions) {
 #' @describeIn modify_decisions **Deprecated** Replaces `decisions` field in a model object and corresponding YAML with new values.
 #' @export
 replace_decisions <- function(.mod, .decisions) {
-  warning("The `decisions` field has been replaced by `notes` as of bbr 0.10.0 and will be removed in a future release. Please use `replace_all_notes()` going forward.")
+  stop("The `decisions` field has been replaced by `notes` as of bbr 0.10.0 and will be removed in a future release. Please use `replace_all_notes()` going forward.", call. = FALSE)
   modify_model_field(
     .mod = .mod,
     .field = YAML_DECISIONS,
