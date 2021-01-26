@@ -127,32 +127,23 @@ test_that("remove_notes() works correctly", {
   expect_identical(new_mod[[YAML_NOTES]], NEW_NOTES)
 })
 
-test_that("add_decisions() and replace_decisions() work correctly", {
+test_that("add_decisions() and replace_decisions() error", {
   temp_mod_path <- create_temp_model()
 
   # make a spec from it
   new_mod <- read_model(temp_mod_path)
-  expect_null(new_mod[[YAML_DECISIONS]])
 
   # test adding
-  new_mod <- expect_warning(
+  new_mod <- expect_error(
     add_decisions(new_mod, NEW_TEXT1),
     regexp = "has been replaced by"
   )
-  expect_identical(new_mod[[YAML_DECISIONS]], NEW_TEXT1)
-
-  new_mod <- expect_warning(
-    add_decisions(new_mod, NEW_TEXT2),
-    regexp = "has been replaced by"
-  )
-  expect_identical(new_mod[[YAML_DECISIONS]], c(NEW_TEXT1, NEW_TEXT2))
 
   # test_replacing
-  new_mod <- expect_warning(
+  new_mod <- expect_error(
     replace_decisions(new_mod, NEW_TEXT2),
     regexp = "has been replaced by"
   )
-  expect_identical(new_mod[[YAML_DECISIONS]], NEW_TEXT2)
 })
 
 test_that("replace_description() works correctly", {
