@@ -33,25 +33,6 @@ GRD_REF_FLOOR_NULL <- paste0(GRD_STEM, "floorNULL.R")
 # tests
 ################
 
-.test_cases <- c(
-  LST_TEST_FILE,
-  GRD_TEST_FILE,
-  EXT_TEST_FILE
-)
-for (.tc in .test_cases) {
-  test_that(glue::glue("build_path_from_model returns correct {tools::file_ext(.tc)} from model object"), {
-    expect_identical(build_path_from_model(MOD1, tools::file_ext(.tc)),
-                     normalizePath(.tc))
-  })
-
-  test_that(glue::glue("build_path_from_model returns correct {tools::file_ext(.tc)} from summary object"), {
-    skip_if_not_drone_or_metworx(glue::glue("build_path_from_model.bbi_nonmem_summary {tools::file_ext(.tc)}"))
-    expect_identical(build_path_from_model(SUM1, tools::file_ext(.tc)),
-                     normalizePath(.tc))
-  })
-}
-
-
 test_that("check_file returns correctly", {
   # default is to print and return nothing
   null_output <- capture.output(

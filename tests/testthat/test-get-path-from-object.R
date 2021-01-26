@@ -120,6 +120,25 @@ test_that(glue::glue("get_data_path parses summary object"), {
 })
 
 
+.test_cases <- c(
+  LST_TEST_FILE,
+  GRD_TEST_FILE,
+  EXT_TEST_FILE
+)
+for (.tc in .test_cases) {
+  test_that(glue::glue("build_path_from_model returns correct {tools::file_ext(.tc)} from model object"), {
+    expect_identical(build_path_from_model(MOD1, tools::file_ext(.tc)),
+                     normalizePath(.tc))
+  })
+
+  test_that(glue::glue("build_path_from_model returns correct {tools::file_ext(.tc)} from summary object"), {
+    skip_if_not_drone_or_metworx(glue::glue("build_path_from_model.bbi_nonmem_summary {tools::file_ext(.tc)}"))
+    expect_identical(build_path_from_model(SUM1, tools::file_ext(.tc)),
+                     normalizePath(.tc))
+  })
+}
+
+
 test_that("is_valid_nonmem_extension() works", {
   expect_true(is_valid_nonmem_extension(MOD_TEST_FILE))
   expect_true(is_valid_nonmem_extension(CTL_TEST_FILE))
