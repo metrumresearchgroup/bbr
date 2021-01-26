@@ -105,6 +105,21 @@ test_that(glue::glue("get_model_id parses summary object"), {
   expect_identical(get_model_id(SUM1), MOD_ID)
 })
 
+
+test_that(glue::glue("get_data_path parses model object"), {
+  res_data_path <- get_data_path(MOD1)
+  expect_identical(res_data_path, DATA_TEST_FILE)
+  expect_identical(readLines(res_data_path, n = 1), DATA_TEST_FIRST_LINE)
+})
+
+test_that(glue::glue("get_data_path parses summary object"), {
+  skip_if_not_drone_or_metworx("get_data_path.bbi_nonmem_summary")
+  res_data_path <- get_data_path(SUM1)
+  expect_identical(res_data_path, DATA_TEST_FILE)
+  expect_identical(readLines(res_data_path, n = 1), DATA_TEST_FIRST_LINE)
+})
+
+
 test_that("is_valid_nonmem_extension() works", {
   expect_true(is_valid_nonmem_extension(MOD_TEST_FILE))
   expect_true(is_valid_nonmem_extension(CTL_TEST_FILE))
