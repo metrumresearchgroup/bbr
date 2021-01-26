@@ -10,6 +10,12 @@ The `1.0.0` release also represents a stable feature set of basic NONMEM-related
 
 * Added print method for `bbi_nonmem_model` object. Similar to the `bbi_nonmem_summary` object, the `bbi_nonmem_model` object should print nicely in the console, and also look good in `.Rmd` chunks with the option `results = 'asis'`. (#307)
 
+* Added `get_data_path()` helper function to extract the absolute path to the input data file from `bbi_nonmem_model` and `bbi_nonmem_summary` objects. (#314)
+
+* Added `build_path_from_model()` helper function to extract the absolute path to various output files from `bbi_nonmem_model` and `bbi_nonmem_summary` objects. (#314)
+
+* Per guidance in `rbabylon 0.10.0` release, `replace_tags()`, `replace_bbi_args()`, `replace_based_on()`, `add_decisions()`, and `replace_decisions()` will no error instead of warn about their impending deprecation. These functions will be removed entirely in two more releases.
+
 ## Developer-facing changes
 
 * We are no longer checking in either the `.Rprofile` or anything in the `renv` folder. As a result, the development workflow has changed slightly. This change is reflected in the README. (#307 and #308)
