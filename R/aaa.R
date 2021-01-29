@@ -42,7 +42,7 @@ NM_MOD_CLASS <- "bbi_nonmem_model"
 NM_SUM_CLASS <- "bbi_nonmem_summary"
 
 STAN_MOD_CLASS <- "bbi_stan_model"
-STAN_MOD_CLASS <- "bbi_stan_summary"
+STAN_SUM_CLASS <- "bbi_stan_summary"
 
 SL_CLASS <- "bbi_summary_list"
 PROC_CLASS <- "bbi_process"
@@ -82,10 +82,14 @@ MODEL_REQ_KEYS <- c(
   YAML_BBI_ARGS
 )
 
+STANMOD_SUFFIX <- ".stan"
+STANDATA_SUFFIX <- "-standata.R"
+STANINIT_SUFFIX <- "-init.R"
+
 STAN_MODEL_REQ_FILES <- c(
-    "-standata.R",
-    "-init.R",
-    ".stan"
+  STANMOD_SUFFIX,
+  STANDATA_SUFFIX,
+  STANINIT_SUFFIX
 )
 
 # columns required for a run log df

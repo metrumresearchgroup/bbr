@@ -14,25 +14,143 @@
 #' * `build_path_from_model(.mod, "-standata.R")`
 #' * `build_path_from_model(.mod, "-init.R")`
 #' * `build_path_from_model(.mod, ".stan")`
-check_stan_model <- function(.mod) {
+#'
+#' @param .mod A `bbi_stan_model` object
+#' @param .error If `FALSE`, the default, will warn if any necessary files are missing.
+#'   If `TRUE` will error instead.
+#' @importFrom stringr str_replace
+#' @importFrom purrr map_lgl
+#' @export
+check_stan_model <- function(.mod, .error = FALSE) {
   files_to_check <- build_path_from_model(.mod, STAN_MODEL_REQ_FILES)
-  files_missing <- !fs::file_exists(files_to_check)
+  files_present <- fs::file_exists(files_to_check)
+  files_missing <- !files_present
+
+  problems <- NULL
+
   if (any(files_missing)) {
-    warning(paste(
+    problems <- paste(
+      problems,
       glue("The following files, which are necessary to run a `bbi_stan_model` are missing from {get_model_id(.mod)}:"),
       paste(paste0(" * ", names(which(files_missing))), collapse = "\n"),
+      paste("See for `?add_file_to_model_dir` for helper functions to add them.\n"),
       sep = "\n"
-    ))
-    return(FALSE)
+    )
   }
-  return(TRUE)
+
+  # checking if any of the files found are only scaffolds
+  if (any(files_present)) {
+    candidates <- names(which(files_present))
+
+    scaffold_bool <- map_lgl(candidates, function(.f) {
+      tools::md5sum(.f) %in% STAN_SCAFFOLD_MD5_VEC
+    })
+
+    if (any(scaffold_bool)) {
+      problems <- paste(
+        problems,
+        glue("The following files, which are necessary to run a `bbi_stan_model` are only scaffolds:"),
+        paste(paste0(" * ", candidates[scaffold_bool]), collapse = "\n"),
+        "Please add necessary code to the scaffolded files.\n",
+        sep = "\n"
+      )
+    }
+  }
+
+  if (!is.null(problems)) {
+    if (isTRUE(.error)) {
+      stop(problems, call. = FALSE)
+    } else {
+      warning(problems, call. = FALSE)
+    }
+  }
+
+  return(is.null(problems))
 }
 
-#' Attaches a .stan file to a model
+
+#' Attaches a file to a model
 #'
-#' When a `bbi_stan_model` is created, an empty .stan
-add_stan_file <- function(.mod) {
-  checkmate::assert_class(.mod, STAN_MOD_CLASS)
+#' These functions take a model object and create the appropriate
+#' file in the required location. If `.source_file` argument is used,
+#' this file will be copied to the location. Otherwise, a scaffold of
+#' the required file is created in that location. **Note, this primarily
+#' intended for Stan models** which require a number of required files.
+#' Users can call `check_stan_model(.mod)` to see if any of these
+#' files are missing.
+#' @param .mod a `bbi_{.model_type}_model` object
+#' @.source_file If `NULL`, the default, create an empty scaffold file
+#'   at the destination path. If not `NULL`, pass a path to a file that
+#'   will be copied to the destination path. Use this if you have a
+#'   file elsewhere on disk that you would like to use for this model.
+#' @name add_file_to_model_dir
+#' NULL
 
+#' @describeIn add_file_to_model_dir Adds a `.stan` model file
+#' @export
+add_stan_file <- function(.mod, .source_file = NULL) {
+  add_file_to_model_dir_impl(
+    .mod,
+    STAN_MOD_CLASS,
+    STANMOD_SUFFIX,
+    STANMOD_SCAFFOLD_STRING,
+    .source_file
+  )
+}
 
+#' @describeIn add_file_to_model_dir Adds a `.stan` model file
+#' @export
+add_standata_file <- function(.mod, .source_file = NULL) {
+  add_file_to_model_dir_impl(
+    .mod,
+    STAN_MOD_CLASS,
+    STANDATA_SUFFIX,
+    STANDATA_SCAFFOLD_STRING,
+    .source_file
+  )
+}
+
+#' @describeIn add_file_to_model_dir Adds a `.stan` model file
+#' @export
+add_stan_init <- function(.mod, .source_file = NULL) {
+  add_file_to_model_dir_impl(
+    .mod,
+    STAN_MOD_CLASS,
+    STANINIT_SUFFIX,
+    STANINIT_SCAFFOLD_STRING,
+    .source_file
+  )
+}
+
+#' Attaches a file to a model
+#'
+#' Takes
+#' @inheritParams add_file_to_model_dir
+#' @param .model_class Function will assert that `.mod` inherits from this class.
+#' @param .file_suffix Destination path is created with `build_path_from_model(.mod, .file_suffix)`
+#' @param .scaffold_string If `.source_file` is `NULL`, the default, this string will be written
+#'   into a new file at the destination path.
+#' @keywords internal
+add_file_to_model_dir_impl <- function(
+  .mod,
+  .model_class,
+  .file_suffix,
+  .scaffold_string,
+  .source_file = NULL
+) {
+  checkmate::assert_class(.mod, .model_class)
+
+  dest_path <- build_path_from_model(.mod, .file_suffix)
+
+  if(!is.null(.source_file)) {
+    checkmate::assert_string(.source_file)
+    fs::file_copy(.source_file, dest_path)
+    message(glue("Copied {.source_file} to {dest_path}"))
+    return(.mod)
+  }
+
+  # write scaffold to file
+  writeLines(.scaffold_string, dest_path)
+
+  return(.mod)
 }
