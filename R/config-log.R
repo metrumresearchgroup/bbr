@@ -205,27 +205,6 @@ config_log_entry <- function(path,
   config[out_fields]
 }
 
-#' Compare a file to an MD5 sum
-#'
-#' @param path String giving the path to the file.
-#' @param md5 String giving expected MD5 sum.
-#'
-#' @return `TRUE` if `path` matches `md5`, otherwise `FALSE` (including if
-#'   `path` doesn't exist).
-#'
-#' @keywords internal
-file_matches <- function(path, md5) {
-  checkmate::assert_string(path)
-  checkmate::assert_string(md5)
-
-  if (file.exists(path)) {
-    res <- tools::md5sum(path) == md5
-  } else {
-    res <- FALSE
-  }
-
-  res
-}
 
 #' Determine the NONMEM version used
 #'

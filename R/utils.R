@@ -260,6 +260,55 @@ na_to_null <- function(.obj) {
   .obj
 }
 
+#' Compare a file to an MD5 sum
+#'
+#' @param path String giving the path to the file.
+#' @param md5 String giving expected MD5 sum.
+#'
+#' @return `TRUE` if `path` matches `md5`, otherwise `FALSE` (including if
+#'   `path` doesn't exist).
+#'
+#' @keywords internal
+file_matches <- function(path, md5) {
+  checkmate::assert_string(path)
+  checkmate::assert_string(md5)
+
+  if (file.exists(path)) {
+    res <- tools::md5sum(path) == md5
+  } else {
+    res <- FALSE
+  }
+
+  res
+}
+
+#' Compare a file to a string
+#'
+#' Similar to [file_matches] but takes a string that
+#' will be hashed to MD5 before comparing. By default
+#' it also appends a new line to the end of the string
+#' before hashing (because most file writer functions
+#' do this automatically).
+#'
+#' @importFrom withr local_file
+#'
+#' @param path String giving the path to the file.
+#' @param string Character scalar to hash and compare to hash of file
+#'
+#' @return `TRUE` if `path` matches `string`, otherwise `FALSE` (including if
+#'   `path` doesn't exist).
+#'
+#' @keywords internal
+file_matches_string <- function(path, string) {
+  checkmate::assert_string(string)
+
+  .f <- tempfile()
+  withr::local_file(.f)
+  writeLines(string, .f)
+
+  file_matches(path, tools::md5sum(.f))
+}
+
 #' Print valid .bbi_args
 #'
 #' Prints all valid arguments to pass in to `.bbi_args=list()` argument of `submit_model()` or `model_summary()`
