@@ -24,7 +24,7 @@
 #'   4)`. Run [print_bbi_args()] to see valid arguments. These will be written
 #'   into YAML file.
 #' @param .overwrite If `FALSE`, the default, error if a file already exists at
-#'   `.yaml_path`. If `TRUE` overwrite existing file, if one exists.
+#'   `.yaml_path`. If `TRUE` overwrite existing file and output directory, if they exist.
 #' @param .model_type Character scaler to specify type of model being created
 #'   (used for S3 class). Currently only `'nonmem'` and `'stan'` are supported.
 #'   Defaults to `'nonmem'` to preserve legacy API.
@@ -33,6 +33,7 @@
 #'   `submit_model()`, `model_summary()`, etc.
 #' @seealso [copy_model_from()], [read_model()]
 #' @importFrom checkmate assert_scalar
+#' @importFrom fs file_exists file_delete dir_exists dir_delete
 #' @export
 new_model <- function(
   .path,
@@ -46,17 +47,19 @@ new_model <- function(
 
   .model_type <- match.arg(.model_type)
 
+  # check if file already exists and decide whether to overwrite if it does
   maybe_yaml_path <- paste0(.path, ".yaml")
-  # check if file already exists
-  if (fs::file_exists(maybe_yaml_path) && !isTRUE(.overwrite)) {
-    stop(
-      glue::glue(
-        "File already exists at {maybe_yaml_path}.",
+  if (fs::file_exists(maybe_yaml_path)) {
+    if (isTRUE(.overwrite)) {
+      fs::file_delete(maybe_yaml_path)
+      if (fs::dir_exists(.path)) fs::dir_delete(.path)
+    } else {
+      stop(paste(
+        glue("File already exists at {maybe_yaml_path}."),
         "Either call `read_model()` to load model from YAML or use,",
-        "`new_model(.overwrite = TRUE)` to overwrite the existing YAML.",
-        .sep = " "
-      )
-    )
+        "`new_model(.overwrite = TRUE)` to overwrite the existing YAML."
+      ))
+    }
   }
 
   # construct the absolute model path in a way that avoids a warning from

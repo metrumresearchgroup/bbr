@@ -26,16 +26,6 @@ create_model_object <- function(res, save_yaml) {
     strict_mode_error(err_msg)
   }
 
-  # check model type
-  .model_type <- res[[YAML_MOD_TYPE]]
-  if (!(.model_type %in% SUPPORTED_MOD_TYPES)) {
-    stop(glue("Invalid {YAML_MOD_TYPE} `{.model_type}`. Valid options include: `{paste(SUPPORTED_MOD_TYPES, collapse = ', ')}`"))
-  } else if (.model_type == "nonmem") {
-    # we won't know the model file extension, so we rely on this helper to check
-    # the possible extensions and throw an error if none exists
-    find_nonmem_model_file_path(res[[ABS_MOD_PATH]], .check_exists = TRUE)
-  }
-
   # check bbi args and add an empty list if missing
   if (is.null(res[[YAML_BBI_ARGS]])) {
     res[[YAML_BBI_ARGS]] <- list()
@@ -48,9 +38,27 @@ create_model_object <- function(res, save_yaml) {
   }
 
   # assign class and write YAML to disk
+  .model_type <- res[[YAML_MOD_TYPE]]
+  if (!(.model_type %in% SUPPORTED_MOD_TYPES)) {
+    dev_error(glue("Invalid {YAML_MOD_TYPE} `{.model_type}`. Valid options include: `{paste(SUPPORTED_MOD_TYPES, collapse = ', ')}`"))
+  }
+
   class(res) <- c(as.character(glue("bbi_{.model_type}_model")), class(res))
   if(isTRUE(save_yaml)) {
     res <- save_model_yaml(res)
+  }
+
+  # look for appropriate model files on disk
+  # must be done AFTER assigning the class so that associated helpers can dispatch correctly
+  if (.model_type == "nonmem") {
+    # we won't know the model file extension, so we rely on this helper to check
+    # the possible extensions and throw an error if none exists
+    find_nonmem_model_file_path(res[[ABS_MOD_PATH]], .check_exists = TRUE)
+  } else if (.model_type == "stan") {
+    # check for necessary files and
+    # warn and scaffold if any are missing
+    check_stan_model(res)
+    scaffold_missing_stan_files(res)
   }
 
   # check for required keys, just as an extra safety precaution before returning
