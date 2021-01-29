@@ -6,28 +6,33 @@
 \alias{build_path_from_model.bbi_nonmem_summary}
 \title{Build path to output file}
 \usage{
-build_path_from_model(.mod, .extension, ...)
+build_path_from_model(.mod, .suffix, ...)
 
-\method{build_path_from_model}{bbi_nonmem_model}(.mod, .extension, ...)
+\method{build_path_from_model}{bbi_nonmem_model}(.mod, .suffix, ...)
 
-\method{build_path_from_model}{bbi_nonmem_summary}(.mod, .extension, ...)
+\method{build_path_from_model}{bbi_nonmem_summary}(.mod, .suffix, ...)
 }
 \arguments{
 \item{.mod}{Model to use, either a \verb{bbi_\{.model_type\}_model} or \verb{bbi_\{.model_type\}_summary} object.}
 
-\item{.extension}{file extension to append (for example \code{lst}, \code{ext}, \code{grd}, etc.).
-Appended with \code{\link[fs:path_file]{fs::path_ext_set()}} so can either begin with a \code{"."} or not. See \code{fs} docs for more details.}
+\item{.suffix}{Character vector to append the end of the absolute model path.
+Will be appended \emph{as is} so, if passing a file extension, be sure to included the leading \code{"."}.
+See examples.}
 
 \item{...}{arguments passed through to methods. (Currently none.)}
+}
+\value{
+Returns an absolute path to \verb{\{output_dir\}/\{model_id\}\{.suffix\}}.
+Does \emph{not} check whether the file exists.
 }
 \description{
 Builds the absolute path to a file in the output directory from components of the \verb{bbi_\{.model_type\}_model} object
 }
-\section{Methods (by class)}{
-\itemize{
-\item \code{bbi_nonmem_model}: Returns an absolute path to \verb{\{output_dir\}/\{model_id\}.\{.extension\}}.
-Does \emph{not} check whether the file exists.
+\examples{
+.mod <- read_model(
+  system.file("model", "nonmem", "basic", "1", package = "bbr")
+)
+build_path_from_model(.mod, ".lst")
+build_path_from_model(.mod, "-standata.R")
 
-\item \code{bbi_nonmem_summary}: Same as \code{bbi_nonmem_model} method.
-}}
-
+}

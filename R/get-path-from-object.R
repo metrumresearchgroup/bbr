@@ -167,26 +167,38 @@ get_data_path.bbi_nonmem_summary <- function(.mod, ...) {
 #' Build path to output file
 #'
 #' Builds the absolute path to a file in the output directory from components of the `bbi_{.model_type}_model` object
+#'
+#' @return Returns an absolute path to `{output_dir}/{model_id}{.suffix}`.
+#'   Does _not_ check whether the file exists.
+#'
 #' @param .mod Model to use, either a `bbi_{.model_type}_model` or `bbi_{.model_type}_summary` object.
-#' @param .extension file extension to append (for example `lst`, `ext`, `grd`, etc.).
-#'   Appended with [fs::path_ext_set()] so can either begin with a `"."` or not. See `fs` docs for more details.
+#' @param .suffix Character vector to append the end of the absolute model path.
+#'   Will be appended _as is_ so, if passing a file extension, be sure to included the leading `"."`.
+#'   See examples.
 #' @param ... arguments passed through to methods. (Currently none.)
+#'
+#' @examples
+#' .mod <- read_model(
+#'   system.file("model", "nonmem", "basic", "1", package = "bbr")
+#' )
+#' build_path_from_model(.mod, ".lst")
+#' build_path_from_model(.mod, "-standata.R")
+#'
 #' @export
-build_path_from_model <- function(.mod, .extension, ...) {
+build_path_from_model <- function(.mod, .suffix, ...) {
   UseMethod("build_path_from_model")
 }
 
-#' @describeIn build_path_from_model Returns an absolute path to `{output_dir}/{model_id}.{.extension}`.
-#'   Does _not_ check whether the file exists.
+#' @rdname build_path_from_model
 #' @export
-build_path_from_model.bbi_nonmem_model <- function(.mod, .extension, ...) {
-  build_path_from_model_bbi(.mod, .extension)
+build_path_from_model.bbi_nonmem_model <- function(.mod, .suffix, ...) {
+  build_path_from_model_bbi(.mod, .suffix)
 }
 
-#' @describeIn build_path_from_model Same as `bbi_nonmem_model` method.
+#' @rdname build_path_from_model
 #' @export
-build_path_from_model.bbi_nonmem_summary <- function(.mod, .extension, ...) {
-  build_path_from_model_bbi(.mod, .extension)
+build_path_from_model.bbi_nonmem_summary <- function(.mod, .suffix, ...) {
+  build_path_from_model_bbi(.mod, .suffix)
 }
 
 ####################################################
@@ -250,10 +262,10 @@ get_data_path_bbi <- function(.mod) {
 }
 
 #' @keywords internal
-build_path_from_model_bbi <- function(.mod, .extension) {
+build_path_from_model_bbi <- function(.mod, .suffix) {
   file.path(
     get_output_dir(.mod),
-    fs::path_ext_set(get_model_id(.mod), .extension)
+    paste0(get_model_id(.mod), .suffix)
   )
 }
 
