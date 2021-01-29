@@ -73,6 +73,18 @@ get_output_dir.bbi_nonmem_summary <- function(.bbi_object, .check_exists = TRUE)
 
 #' @rdname get_path_from_object
 #' @export
+get_output_dir.bbi_stan_model <- function(.bbi_object, .check_exists = TRUE) {
+  get_output_dir_bbi(.bbi_object, .check_exists)
+}
+
+#' @rdname get_path_from_object
+#' @export
+get_output_dir.bbi_stan_summary <- function(.bbi_object, .check_exists = TRUE) {
+  get_output_dir_bbi(.bbi_object, .check_exists)
+}
+
+#' @rdname get_path_from_object
+#' @export
 get_output_dir.bbi_log_df <- function(.bbi_object, .check_exists = TRUE) {
   get_path_from_log_df(.bbi_object, get_output_dir, .check_exists = .check_exists)
 }
@@ -93,6 +105,18 @@ get_yaml_path.bbi_nonmem_model <- function(.bbi_object, .check_exists = TRUE) {
 #' @rdname get_path_from_object
 #' @export
 get_yaml_path.bbi_nonmem_summary <- function(.bbi_object, .check_exists = TRUE) {
+  get_yaml_path_bbi(.bbi_object, .check_exists)
+}
+
+#' @rdname get_path_from_object
+#' @export
+get_yaml_path.bbi_stan_model <- function(.bbi_object, .check_exists = TRUE) {
+  get_yaml_path_bbi(.bbi_object, .check_exists)
+}
+
+#' @rdname get_path_from_object
+#' @export
+get_yaml_path.bbi_stan_summary <- function(.bbi_object, .check_exists = TRUE) {
   get_yaml_path_bbi(.bbi_object, .check_exists)
 }
 
@@ -134,6 +158,17 @@ get_model_id.bbi_nonmem_summary <- function(.mod) {
   get_model_id_bbi(.mod)
 }
 
+#' @describeIn get_model_id Takes `bbi_nonmem_model` object
+#' @export
+get_model_id.bbi_stan_model <- function(.mod) {
+  get_model_id_bbi(.mod)
+}
+
+#' @describeIn get_model_id Takes `bbi_nonmem_summary` object
+#' @export
+get_model_id.bbi_stan_summary <- function(.mod) {
+  get_model_id_bbi(.mod)
+}
 
 #' Get path to data file
 #'
@@ -201,6 +236,18 @@ build_path_from_model.bbi_nonmem_summary <- function(.mod, .suffix, ...) {
   build_path_from_model_bbi(.mod, .suffix)
 }
 
+#' @rdname build_path_from_model
+#' @export
+build_path_from_model.bbi_stan_model <- function(.mod, .suffix, ...) {
+  build_path_from_model_bbi(.mod, .suffix)
+}
+
+#' @rdname build_path_from_model
+#' @export
+build_path_from_model.bbi_stan_summary <- function(.mod, .suffix, ...) {
+  build_path_from_model_bbi(.mod, .suffix)
+}
+
 ####################################################
 # Get path from bbi object implementation functions
 ####################################################
@@ -234,7 +281,7 @@ get_yaml_path_bbi <- function(.bbi_object, .check_exists = TRUE) {
 
 #' @keywords internal
 get_model_id_bbi <- function(.bbi_object) {
-  return(basename(tools::file_path_sans_ext(get_model_path(.bbi_object))))
+  return(basename(.bbi_object[[ABS_MOD_PATH]]))
 }
 
 #' @keywords internal
@@ -415,13 +462,15 @@ find_nonmem_model_file_path <- function(.path, .check_exists = TRUE) {
 
   if (!any(exists_idx)) {
     if (isTRUE(.check_exists)) {
-      stop(
+      stop(paste(
         glue::glue(
           "No model file found at {maybe_paths[1L]} or {maybe_paths[2L]}.",
           "Please put relevant model file in that location.",
           .sep = " "
-        )
-      )
+        ),
+        "IF THIS IS NOT A NONMEM MODEL please pass the appropriate type to `.model_type`",
+        sep = "\n"
+      ))
     } else {
       res <- maybe_paths[1L]
     }

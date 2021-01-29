@@ -30,11 +30,11 @@ create_model_object <- function(res, save_yaml) {
   .model_type <- res[[YAML_MOD_TYPE]]
   if (!(.model_type %in% SUPPORTED_MOD_TYPES)) {
     stop(glue("Invalid {YAML_MOD_TYPE} `{.model_type}`. Valid options include: `{paste(SUPPORTED_MOD_TYPES, collapse = ', ')}`"))
+  } else if (.model_type == "nonmem") {
+    # we won't know the model file extension, so we rely on this helper to check
+    # the possible extensions and throw an error if none exists
+    find_nonmem_model_file_path(res[[ABS_MOD_PATH]], .check_exists = TRUE)
   }
-
-  # we won't know the model file extension, so we rely on this helper to check
-  # the possible extensions and throw an error if none exists
-  find_nonmem_model_file_path(res[[ABS_MOD_PATH]], .check_exists = TRUE)
 
   # check bbi args and add an empty list if missing
   if (is.null(res[[YAML_BBI_ARGS]])) {

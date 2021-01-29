@@ -66,7 +66,7 @@ NEW_TEXT2 <- c("all", "done")
 SUMMARY_REF_FILE <- file.path(REF_DIR, "1_summary_obj.R")
 PARAM_REF_FILE <-   file.path(REF_DIR, "1_param_table.R")
 
-SUM_CLASS_LIST <- c(SUM_CLASS, "list")
+SUM_CLASS_LIST <- c(NM_SUM_CLASS, "list")
 MOD_CLASS_LIST <- c(NM_MOD_CLASS, "list")
 PROC_CLASS_LIST <- c(PROC_CLASS, "list")
 

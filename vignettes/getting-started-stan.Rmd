@@ -1,9 +1,9 @@
 ---
-title: "Getting Started with bbr and NONMEM"
+title: "Getting Started with bbr and Stan"
 author: "Seth Green"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{getting-started}
+  %\VignetteIndexEntry{getting-started-stan}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-This "Getting Started with bbr" vignette takes the user through some basic scenarios for modeling with NONMEM using `bbr`, introducing you to its standard workflow and functionality. 
+This "Getting Started with bbr" vignette takes the user through some basic scenarios for modeling with Stan using `bbr`, introducing you to its standard workflow and functionality. 
 
 ```{r setup, include=FALSE}
 # NOTE: if running chunks interactively we need to load the package first
@@ -32,13 +32,13 @@ library(dplyr)
 library(purrr)
 ```
 
-`bbr` is an R interface for running `bbi`. Together they provide a solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. Currently, only NONMEM and Stan are supported. For details on modeling in Stan, the ["Getting Started with bbr and Stan" vignette](https://metrumresearchgroup.github.io/bbr/articles/getting-started-stan.html).
+`bbr` is an R interface for running `bbi`. Together they provide a solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. Currently, only NONMEM and Stan are supported. For details on modeling in NONMEM, the ["Getting Started with bbr and NONMEM" vignette](https://metrumresearchgroup.github.io/bbr/articles/getting-started.html).
 
 # Setup
 
 ```{r set paths and define cleanup, include = FALSE}
-options('bbr.bbi_exe_path' = read_bbi_path())
-MODEL_DIR <- system.file("model", "nonmem", "basic", package = "bbr")
+#options('bbr.bbi_exe_path' = read_bbi_path())
+MODEL_DIR <- system.file("model", "stan", package = "bbr")
 
 # delete old files
 cleanup <- function() {

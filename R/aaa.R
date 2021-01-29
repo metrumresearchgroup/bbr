@@ -39,7 +39,11 @@ BBI_ARGS = list(
 
 # S3 classes
 NM_MOD_CLASS <- "bbi_nonmem_model"
-SUM_CLASS <- "bbi_nonmem_summary"
+NM_SUM_CLASS <- "bbi_nonmem_summary"
+
+STAN_MOD_CLASS <- "bbi_stan_model"
+STAN_MOD_CLASS <- "bbi_stan_summary"
+
 SL_CLASS <- "bbi_summary_list"
 PROC_CLASS <- "bbi_process"
 RUN_LOG_CLASS <- "bbi_run_log_df"
@@ -76,6 +80,12 @@ MODEL_REQ_KEYS <- c(
   YAML_YAML_MD5,
   YAML_MOD_TYPE,
   YAML_BBI_ARGS
+)
+
+STAN_MODEL_REQ_FILES <- c(
+    "-standata.R",
+    "-init.R",
+    ".stan"
 )
 
 # columns required for a run log df

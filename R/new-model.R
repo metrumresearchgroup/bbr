@@ -26,7 +26,8 @@
 #' @param .overwrite If `FALSE`, the default, error if a file already exists at
 #'   `.yaml_path`. If `TRUE` overwrite existing file, if one exists.
 #' @param .model_type Character scaler to specify type of model being created
-#'   (used for S3 class). Currently only `'nonmem'` is supported.
+#'   (used for S3 class). Currently only `'nonmem'` and `'stan'` are supported.
+#'   Defaults to `'nonmem'` to preserve legacy API.
 #'
 #' @return S3 object of class `bbi_{.model_type}_model` that can be passed to
 #'   `submit_model()`, `model_summary()`, etc.
@@ -40,8 +41,10 @@ new_model <- function(
   .tags = NULL,
   .bbi_args = NULL,
   .overwrite = FALSE,
-  .model_type = c("nonmem")
+  .model_type = c("nonmem", "stan")
 ) {
+
+  .model_type <- match.arg(.model_type)
 
   maybe_yaml_path <- paste0(.path, ".yaml")
   # check if file already exists
