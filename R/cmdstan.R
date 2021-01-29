@@ -38,7 +38,7 @@ check_stan_model <- function(.mod, .error = FALSE) {
       problems,
       glue("The following files, which are necessary to run a `bbi_stan_model` are missing from {get_model_id(.mod)}:"),
       paste(paste0(" * ", names(which(files_missing))), collapse = "\n"),
-      paste("See for `?add_file_to_model_dir` for helper functions to add them.\n"),
+      paste("See `?add_file_to_model_dir` for helper functions to add them.\n"),
       sep = "\n"
     )
   }
@@ -84,10 +84,16 @@ check_stan_model <- function(.mod, .error = FALSE) {
 #' Users can call `check_stan_model(.mod)` to see if any of these
 #' files are missing.
 #' @param .mod a `bbi_{.model_type}_model` object
-#' @.source_file If `NULL`, the default, create an empty scaffold file
+#' @param .source_file If `NULL`, the default, create an empty scaffold file
 #'   at the destination path. If not `NULL`, pass a path to a file that
 #'   will be copied to the destination path. Use this if you have a
 #'   file elsewhere on disk that you would like to use for this model.
+#' @param .overwrite Logical scalar for whether to overwrite and existing
+#'   file at the destination path. If `is.null(.source_file)` this defaults
+#'   to `FALSE`, forcing the user to explicitly confirm overwriting an
+#'   existing file with a scaffold. However, **if `.source_file` is passed
+#'   then `.overwrite` defaults to `TRUE`**, assuming that the user intends
+#'   to use the `.source_file` instead of the existing file.
 #' @name add_file_to_model_dir
 NULL
 
@@ -129,7 +135,11 @@ add_stan_init <- function(.mod, .source_file = NULL) {
 
 #' Attaches a file to a model
 #'
-#' Takes
+#' Implementation function for [add_file_to_model_dir()].
+#'
+#' @importFrom checkmate assert_class assert_string
+#' @importFrom digest digest
+#'
 #' @inheritParams add_file_to_model_dir
 #' @param .model_class Function will assert that `.mod` inherits from this class.
 #' @param .file_suffix Destination path is created with `build_path_from_model(.mod, .file_suffix)`
@@ -141,20 +151,38 @@ add_file_to_model_dir_impl <- function(
   .model_class,
   .file_suffix,
   .scaffold_string,
-  .source_file = NULL
+  .source_file = NULL,
+  .overwrite = ifelse(is.null(.source_file), FALSE, TRUE)
 ) {
   checkmate::assert_class(.mod, .model_class)
 
   dest_path <- build_path_from_model(.mod, .file_suffix)
 
+  # copy over .source_file if one was passed in
   if(!is.null(.source_file)) {
     checkmate::assert_string(.source_file)
+
+    if (fs::file_exists(dest_path)) {
+      if (isTRUE(.overwrite)) {
+        fs::file_delete(dest_path)
+      } else {
+        stop(glue("File already exists at {dest_path}. To overwrite existing file with a {.source_file} pass `.overwrite = TRUE`"), call. = FALSE)
+      }
+    }
+
     fs::file_copy(.source_file, dest_path)
     message(glue("Copied {.source_file} to {dest_path}"))
     return(.mod)
   }
 
-  # write scaffold to file
+  # write scaffold to file, first checking if a non-scaffold file would be overwritten
+  if (fs::file_exists(dest_path)) {
+    if (file_matches_string(dest_path, .scaffold_string)) {
+      return(invisible(.mod))
+    } else if (!isTRUE(.overwrite)) {
+      stop(glue("File already exists at {dest_path}. To overwrite existing file with a scaffold pass `.overwrite = TRUE`"), call. = FALSE)
+    }
+  }
   writeLines(.scaffold_string, dest_path)
 
   # return invisibly so this will work in pipes
@@ -165,6 +193,7 @@ add_file_to_model_dir_impl <- function(
 #' @importFrom rlang list2
 #' @importFrom purrr walk
 #' @importFrom fs file_exists
+#'
 #' @param .mod a `bbi_stan_model`
 #' @keywords internal
 scaffold_missing_stan_files <- function(.mod) {
