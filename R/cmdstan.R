@@ -22,6 +22,11 @@
 #' @importFrom purrr map_lgl
 #' @export
 check_stan_model <- function(.mod, .error = FALSE) {
+  # check if output dir exists and if not create an empty one
+  out_dir <- get_output_dir(.mod, .check_exists = FALSE)
+  if (!fs::dir_exists(out_dir)) fs::dir_create(out_dir)
+
+  # check for files in output dir
   files_to_check <- build_path_from_model(.mod, STAN_MODEL_REQ_FILES)
   files_present <- fs::file_exists(files_to_check)
   files_missing <- !files_present
@@ -61,11 +66,11 @@ check_stan_model <- function(.mod, .error = FALSE) {
     if (isTRUE(.error)) {
       stop(problems, call. = FALSE)
     } else {
-      warning(problems, call. = FALSE)
+      message(problems)
     }
   }
 
-  return(is.null(problems))
+  return(invisible(is.null(problems)))
 }
 
 
@@ -84,7 +89,7 @@ check_stan_model <- function(.mod, .error = FALSE) {
 #'   will be copied to the destination path. Use this if you have a
 #'   file elsewhere on disk that you would like to use for this model.
 #' @name add_file_to_model_dir
-#' NULL
+NULL
 
 #' @describeIn add_file_to_model_dir Adds a `.stan` model file
 #' @export
@@ -152,5 +157,31 @@ add_file_to_model_dir_impl <- function(
   # write scaffold to file
   writeLines(.scaffold_string, dest_path)
 
-  return(.mod)
+  # return invisibly so this will work in pipes
+  return(invisible(.mod))
+}
+
+#' Adds scaffolds of any missing stan files
+#' @importFrom rlang list2
+#' @importFrom purrr walk
+#' @importFrom fs file_exists
+#' @param .mod a `bbi_stan_model`
+#' @keywords internal
+scaffold_missing_stan_files <- function(.mod) {
+  checkmate::assert_class(.mod, STAN_MOD_CLASS)
+  files_to_check <- build_path_from_model(.mod, STAN_MODEL_REQ_FILES)
+  missing_files <- STAN_MODEL_REQ_FILES[!fs::file_exists(files_to_check)]
+
+  SCAFFOLD_LOOKUP <- rlang::list2(
+    !!STANMOD_SUFFIX  := add_stan_file,
+    !!STANDATA_SUFFIX := add_standata_file,
+    !!STANINIT_SUFFIX := add_stan_init
+  )
+
+  purrr::walk(missing_files, function(.f) {
+    message(glue("Automatically adding scaffolded {.f} file"))
+    SCAFFOLD_LOOKUP[[.f]](.mod)
+  })
+
+  return(invisible(NULL))
 }

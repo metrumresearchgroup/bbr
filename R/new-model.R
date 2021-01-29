@@ -34,6 +34,7 @@
 #'   `submit_model()`, `model_summary()`, etc.
 #' @seealso [copy_model_from()], [read_model()]
 #' @importFrom checkmate assert_scalar
+#' @importFrom fs file_exists file_delete dir_exists dir_delete
 #' @export
 new_model <- function(
   .path,
