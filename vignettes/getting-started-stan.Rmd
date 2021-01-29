@@ -42,79 +42,132 @@ MODEL_DIR <- system.file("model", "stan", package = "bbr")
 
 # delete old files
 cleanup <- function() {
-  if (fs::file_exists(file.path(MODEL_DIR, "1.yaml"))) fs::file_delete(file.path(MODEL_DIR, "1.yaml"))
-  if (fs::file_exists(file.path(MODEL_DIR, "2.yaml"))) fs::file_delete(file.path(MODEL_DIR, "2.yaml"))
-  if (fs::file_exists(file.path(MODEL_DIR, "3.yaml"))) fs::file_delete(file.path(MODEL_DIR, "3.yaml"))
-  if (fs::file_exists(file.path(MODEL_DIR, "2.ctl"))) fs::file_delete(file.path(MODEL_DIR, "2.ctl"))
-  if (fs::file_exists(file.path(MODEL_DIR, "3.ctl"))) fs::file_delete(file.path(MODEL_DIR, "3.ctl"))
-  if (fs::dir_exists(file.path(MODEL_DIR, "2"))) fs::dir_delete(file.path(MODEL_DIR, "2"))
-  if (fs::dir_exists(file.path(MODEL_DIR, "3"))) fs::dir_delete(file.path(MODEL_DIR, "3"))
-  if (fs::file_exists(file.path(MODEL_DIR, "bbi.yaml"))) fs::file_delete(file.path(MODEL_DIR, "bbi.yaml"))
+  # delete new model entirely
+  if (fs::file_exists(file.path(MODEL_DIR, "fxaNew.yaml"))) fs::file_delete(file.path(MODEL_DIR, "fxaNew.yaml"))
+  if (fs::dir_exists(file.path(MODEL_DIR, "fxaNew"))) fs::dir_delete(file.path(MODEL_DIR, "fxaNew"))
+  
+  # set up incomplete model
+  if (fs::file_exists(file.path(MODEL_DIR, "fxaInc.yaml"))) {
+    fs::file_delete(file.path(MODEL_DIR, "fxaInc.yaml"))
+  }
+  fs::file_copy(
+    file.path(MODEL_DIR, "fxa.yaml"),
+    file.path(MODEL_DIR, "fxaInc.yaml")
+  )
+  
+  if (fs::dir_exists(file.path(MODEL_DIR, "fxaInc"))) fs::dir_delete(file.path(MODEL_DIR, "fxaInc"))
+  fs::dir_create(file.path(MODEL_DIR, "fxaInc"))
+  
+  writeLines(STANINIT_SCAFFOLD_STRING, file.path(MODEL_DIR, "fxaInc", "fxaInc-init.R"))
+  fs::file_copy(
+    file.path(MODEL_DIR, "fxa", "fxa.stan"),
+    file.path(MODEL_DIR, "fxaInc", "fxaInc.stan")
+  )
+
+  writeLines(
+    "init <- function() {\n  list(param1 = c(1,2,3,4), param2 = c(5,6,7,8))\n}", 
+    file.path(MODEL_DIR, "some_other_init.R")
+  )
+
 }
 cleanup()
 ```
 
 
 ## Installing bbi
-
-The _first time_ you use `bbr` on a system or disk, you must first install `bbi`, often aliased as `bbi`. The `bbi` executable is a single binary file that can be easily installed with:
-
-```{r, eval = FALSE}
-bbr::use_bbi("/data/apps/")
-```
-
-The `use_bbi()` function takes the _directory_ into which you want to install `bbi`. Note that this can be pointed to anywhere on your system; installing to `/data/apps/bbi` is merely a convention used at Metrum Research Group, where `bbr` was developed.
-
-### Setting bbi_exe_path
-
-Once `bbi` is installed, you will need to make sure `bbr` knows where to find it. This can be done by setting the `bbr.bbi_exe_path` option like so:
-
-```{r bbi_exe_path, eval = FALSE}
-options("bbr.bbi_exe_path" = "/data/apps/bbi")
-```
-
-Please note that **this must be set for every new R session, so it's recommended to include the above snippet in your .Rprofile**, replacing the `"/data/apps/bbi"` with the absolute path from your system/project, if you have installed it somewhere different.
-
-### Updating bbi or checking if it's installed
-
-If you're not sure if you have `bbi` installed, you can use `bbi_version()` to check. This will return the version number of your installation, if one is found, or an empty string if you do _not_ have `bbi` installed. You can also use `bbi_current_release()` to see the most current version available and run `use_bbi()` as specified above if you want to update.
-
-You can also check the [bbi documentation](https://github.com/metrumresearchgroup/bbi) for manual installation instructions from the command line.
-
-## bbi.yaml configuration file
-
-To actually submit models with `bbi`, you will also need a `bbi.yaml` configuration file. Think of this as containing "global default settings" for your `bbi` runs.  Those settings will not be discussed here, but know that they can be modified globally by editing that file, or model-by-model as described in the "Passing arguments to bbi" section below.
-
-### bbi_init()
-
-The `bbi_init()` function will create a `bbi.yaml`, with the default settings, in the specified directory. Optionally, you can pass the path to a `bbi.yaml` to the `.config_path` argument of any `bbr` function that needs one. However, by default these functions will look for one in the same folder as the model being submitted or manipulated. Therefore, if you will have a number of models in the same folder, it is easiest to put a `bbi.yaml` that folder.
-
-```{r configure bbi fake, eval = FALSE}
-MODEL_DIR <- "../model/nonmem/basic"  # this should be relative to your working directory
-
-bbi_init(.dir = MODEL_DIR,            # the directory to create the bbi.yaml in
-         .nonmem_dir = "/opt/NONMEM", # location of NONMEM installation
-         .nonmem_version = "nm74gf")  # default NONMEM version to use
-```
-
-Here we define a define variable `MODEL_DIR` with the path to the directory containing our models. Notice that you must also pass the path to a working installation of NONMEM, and a default NONMEM version to use.
-
-Note **this only needs to be done once** for each folder you are modeling in. Once the `bbi.yaml` exists, you will _not_ need to run `bbi_init()` again unless you want to create another one; for example if you move to modeling in a different directory, or if you want a different set of default settings for some specific subset of models.
+**DON'T NEED ANY OF THIS STUFF ABOUT BBI** but probably need a section about setting up `cmdstan`. Maybe just a little explanation and then link to [the `cmdstanr` docs](http://mc-stan.org/cmdstanr/articles/cmdstanr.html#installing-cmdstan-1).
 
 # Initial modeling run
 
 ## Create model object
 To begin modeling, first create a model object using `new_model()`. This is an S3 object which you will pass to all of the other `bbr` functions that submit, summarize, or manipulate models.
 
-The first argument (`.path`) must be the path to your model control stream _without file extension_. For instance, the call below assumes you have a control stream named `1.ctl` or `1.mod` in the directory you just assigned to `MODEL_DIR` above. 
+The first argument (`.path`) must be the path to the directory containing the necessary files. For Stan models, you will also have to add `.model_type = "stan"` to the the `new_model()` call.
 
 ```{r first model}
-mod1 <- new_model(file.path(MODEL_DIR, 1))
+fxaNew <- new_model(file.path(MODEL_DIR, "fxaNew"), .model_type = "stan")
 ```
 
-This `new_model()` call will also create a `1.yaml` file in that same directory, which stores model metadata like description and tags (discussed below). If you ever need to recreate this model object in memory, just run `mod1 <- read_model(file.path(MODEL_DIR, 1))` to rebuild it from the YAML file on disk. 
+The call above will look for a directory called `{MODEL_DIR}/fxa_new`. _Inside_ this directory it will expect to find files like `fxaNew.stan` and `fxaNew-standata.R`. These "required files" will be discussed in more detail below. For now, notice that--if any of them are _not_ found when you initialize the model--`new_model()` will print a message to the console and create scaffolds (files with boilerplate non-working code) of the missing files.
 
-The model object you have just created can be passed to various functions which you will see in a minute. Now that we've created a model, the first thing we will do is submit the model to be run.
+You can use the `bbr::build_path_from_model()` function to take a look at any of these scaffolded files.
+
+```{r, comment=""}
+fxaNew %>% 
+  build_path_from_model("-standata.R") %>%
+  readLines() %>%
+  cat(sep = "\n")
+```
+
+The purpose of this scaffold is to provide some helpful framework to begin writing the necessary code for submitting a model with `bbr`. Below (in the `copy_model_from()` section) you will see how, once you have defined a model or two, you can use those models as your starting point for new models, instead of relying on writing new code from scaffolds.
+
+## The `bbr` YAML file
+
+This `new_model()` call will also create an `fxa.yaml` file that will sit next to this directory on disk. This YAML file  stores model metadata like description and tags (discussed below). For now the YAML file will look very bare, but hopefully its purpose will become more clear later.
+
+Note that if you _already have the relevant code for your new model_, you can manually create these files in the output directory _before_ calling `new_model()`. In that case, you won't see any of the messages shown above and the `new_model()` call will simply create the `.yaml` file next to your directory.
+
+## Reading in an existing model
+
+Now assume that you have previously created a model and written all the necessary code. You can read this model into memory with `read_model()`.
+
+```{r}
+fxaOld <- read_model(file.path(MODEL_DIR, "fxa"))
+```
+
+If take a look at _this model's_ `-standata.R` file, you can see an example of how this script might look in a real model.
+
+```{r, comment=""}
+fxaOld %>% 
+  build_path_from_model("-standata.R") %>%
+  readLines() %>%
+  cat(sep = "\n")
+```
+
+
+### An incomplete model
+
+Sometimes you will have created your model and begun writing code, but the model has not been fully defined. When you read in a model like this, you will see some messages that are similar to the ones we saw when we first called `new_model()` above.
+
+```{r}
+fxaInc <- read_model(file.path(MODEL_DIR, "fxaInc"))
+```
+
+In this (somewhat contrived) example, we see three different messages:
+
+* The first tells us that we are missing the `-standata.R` file and points to helpful documentation for creating one.
+* The second tells us that the `-init.R` file is only a scaffold and must be completed from the model can be submitted.
+* And finally we're told that a scaffold has been added for the missing file(s) mentioned in the first message.
+
+### Adding required files and using `check_stan_model()`
+
+The user can manually check whether all the required files are present at any time by calling the `check_stan_model()` function.
+
+```{r}
+check_stan_model(fxaInc)
+```
+
+Notice that now we see that we have all our files, but that two of them are still scaffolds. There are several helper functions designed to make it easy to add these files to the model. You can read about all of them in the `?add_file_to_model_dir` documentation page.
+
+By default, all of these functions will attempt to add a scaffold of the relevant file, erroring if there is already a (non-scaffold) file present. However, you can also supply a path to the `.source_file` argument, in order to copy a file from another location into a given model.
+
+```{r}
+fxaInc <- fxaInc %>% 
+  add_stan_init(.source_file = file.path(MODEL_DIR, "some_other_init.R")) %>%    # copy from external file
+  add_standata_file(.source_file = build_path_from_model(fxaOld, "-standata.R")) # copy from another model
+```
+
+Now we run `check_stan_model()` we get a clean bill of health.
+
+```{r}
+check_stan_model(fxaInc)
+```
+
+
+
+
+
+
 
 ## Submit model
 
@@ -126,33 +179,19 @@ This will return a process object. We won't discuss this object in this vignette
 
 ### Passing arguments to bbi
 
-There are a number of arguments that `bbi` can take to modify how models are run. You can print a list of available arguments using the `print_bbi_args()` helper function.
-
-```{r print_bbi_args}
-print_bbi_args()
-```
-
-As discussed in "Setup" above, these can be set globally in the `bbi.yaml` file, and you can see the default values of them in that file. However, **specific arguments can also be set or changed for each model.** This can be done in two ways:
-
-* Attaching them to a model object with `add_bbi_args()` or `replace_bbi_args()`
-* Passing them as a named list to the `.bbi_args` argument of one of the following functions
-  * `new_model()` or `copy_model_from()`
-  * `submit_model()` or `submit_models()`
-  * `model_summary()` or `model_summaries()`
-
-Note that any `bbi_args` attached to a model object will override the relevant settings in `bbi.yaml`, and that `.bbi_args` passed into a `submit_` or `_summary` call will override the relevant settings in both `bbi.yaml` _and_ `bbi_args` attached to the model object.
-
-See the docs for any of the functions just mentioned for more details on usage and syntax.
+**WE PROBABLY DON'T NEED THIS SECTION** but it's not clear if we'll use this field to control parallelization or anything. Probably not, but want to make sure we consider that before we delete this.
 
 ### Overwriting output from a previously run model
 
-It is common to run a model, make some tweaks to it, and then run it again. However, to avoid accidentally deleting model outputs, `bbr` will error by default if it sees existing output when trying to submit a model. To automatically overwrite any previous model output, just pass `overwrite = TRUE` to the `.bbi_args` argument described in the previous section. For example:
+**FOR EXAMPLE: THIS PART.** I'm not sure how `cmdstanr` deals with overwriting old posteriors, etc. Do we want to build this in or just let people overwrite by accident? Not sure.
+
+_It is common to run a model, make some tweaks to it, and then run it again. However, to avoid accidentally deleting model outputs, `bbr` will error by default if it sees existing output when trying to submit a model. To automatically overwrite any previous model output, just pass `overwrite = TRUE` to the `.bbi_args` argument described in the previous section. For example:_
 
 ```{r overwrite true, eval = FALSE}
 mod1 %>% submit_model(.bbi_args = list(overwrite = TRUE))
 ```
 
-You can also change this setting globally by setting `overwrite: true` in the `bbi.yaml` file for your project.
+_You can also change this setting globally by setting `overwrite: true` in the `bbi.yaml` file for your project._
 
 ## Summarize model
 Once the model run has completed, users can get a summary object containing much of the commonly used diagnostic information in a named list.
