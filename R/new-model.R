@@ -27,7 +27,8 @@
 #'   `.yaml_path`. If `TRUE` overwrite existing file and output directory, if
 #'   they exist.
 #' @param .model_type Character scaler to specify type of model being created
-#'   (used for S3 class). Currently only `'nonmem'` is supported.
+#'   (used for S3 class). Currently only `'nonmem'` and `'stan'` are supported.
+#'   Defaults to `'nonmem'` to preserve legacy API.
 #'
 #' @return S3 object of class `bbi_{.model_type}_model` that can be passed to
 #'   `submit_model()`, `model_summary()`, etc.
@@ -41,7 +42,7 @@ new_model <- function(
   .tags = NULL,
   .bbi_args = NULL,
   .overwrite = FALSE,
-  .model_type = c("nonmem")
+  .model_type = c("nonmem", "stan")
 ) {
 
   .model_type <- match.arg(.model_type)
