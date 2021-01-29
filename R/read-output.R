@@ -1,16 +1,5 @@
 # Helper functions for reading output files
 
-#' Builds the absolute path to a file in the output directory from components of the `bbi_{.model_type}_model` object
-#' @param .mod Model to use, either a `bbi_{.model_type}_model` or `bbi_{.model_type}_summary` object.
-#' @param .extension file extension to append (for example `lst`, `ext`, `grd`, etc.)
-#' @keywords internal
-build_path_from_mod_obj <- function(.mod, .extension) {
-  file.path(
-    get_output_dir(.mod),
-    fs::path_ext_set(get_model_id(.mod), .extension)
-  )
-}
-
 #' Check an output file
 #'
 #' Reads the head and tail of specified file and prints it the console and/or returns it as a character vector.
@@ -121,7 +110,7 @@ tail_lst.character <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .retur
 #' @describeIn check_file Tail the .lst file from a `bbi_nonmem_model` object.
 #' @export
 tail_lst.bbi_nonmem_model <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE, ...) {
-  .file <- build_path_from_mod_obj(.mod, "lst")
+  .file <- build_path_from_model(.mod, ".lst")
   check_file(.file, .head, .tail, .print, .return, ...)
 }
 
@@ -222,13 +211,13 @@ check_grd.character <- function(.mod, .iter_floor = 0) {
 #' @describeIn check_nonmem_table_output Checks .grd file from a `bbi_nonmem_model`
 #' @export
 check_grd.bbi_nonmem_model <- function(.mod, .iter_floor = 0) {
-  check_nonmem_table_bbi(.mod, .iter_floor, .extension = "grd")
+  check_nonmem_table_bbi(.mod, .iter_floor, .extension = ".grd")
 }
 
 #' @describeIn check_nonmem_table_output Checks .grd file from a `bbi_nonmem_summary`
 #' @export
 check_grd.bbi_nonmem_summary <- function(.mod, .iter_floor = 0) {
-  check_nonmem_table_bbi(.mod, .iter_floor, .extension = "grd")
+  check_nonmem_table_bbi(.mod, .iter_floor, .extension = ".grd")
 }
 
 #' @describeIn plot_nonmem_table_df Plot the .grd file
@@ -263,13 +252,13 @@ check_ext.character <- function(.mod, .iter_floor = 0) {
 #' @describeIn check_nonmem_table_output Checks .ext file from a `bbi_nonmem_model` object
 #' @export
 check_ext.bbi_nonmem_model <- function(.mod, .iter_floor = 0) {
-  check_nonmem_table_bbi(.mod, .iter_floor, .extension = "ext")
+  check_nonmem_table_bbi(.mod, .iter_floor, .extension = ".ext")
 }
 
 #' @describeIn check_nonmem_table_output Checks .ext file from a `bbi_nonmem_summary` object
 #' @export
 check_ext.bbi_nonmem_summary <- function(.mod, .iter_floor = 0) {
-  check_nonmem_table_bbi(.mod, .iter_floor, .extension = "ext")
+  check_nonmem_table_bbi(.mod, .iter_floor, .extension = ".ext")
 }
 
 #' @describeIn plot_nonmem_table_df Plot the .ext file
@@ -282,7 +271,7 @@ plot_ext <- function(.df) {
 #' Private helper to pull a NONMEM table from a model
 #' @keywords internal
 check_nonmem_table_bbi <- function(.mod, .iter_floor, .extension) {
-  ext_path <- build_path_from_mod_obj(.mod, .extension)
+  ext_path <- build_path_from_model(.mod, .extension)
   df <- check_nonmem_table_output(ext_path, .x_var = "ITERATION", .x_floor = .iter_floor)
   return(df)
 }
