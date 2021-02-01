@@ -138,6 +138,13 @@ for (.tc in .test_cases) {
   })
 }
 
+test_that("build_path_from_model works with period in extension", {
+  expect_identical(
+    build_path_from_model(MOD1, "par.tab"),
+    as.character(glue::glue("{MOD1_ABS_PATH}/{MOD_ID}par.tab"))
+  )
+})
+
 
 test_that("is_valid_nonmem_extension() works", {
   expect_true(is_valid_nonmem_extension(MOD_TEST_FILE))
