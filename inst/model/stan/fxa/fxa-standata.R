@@ -1,6 +1,6 @@
-standata <- function() {
+standata <- function(.dir) {
   ## get data file
-  xdata <- read.csv(file.path("fake", "fxa.data.csv"))
+  xdata <- readr::read_csv(file.path(.dir, "..", "..", "..", "extdata", "fxa.data.csv"))
 
   ## create data set
   data <- with(
