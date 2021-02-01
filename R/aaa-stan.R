@@ -19,11 +19,11 @@ STANDATA_SCAFFOLD_STRING <- "standata <- function(.dir) {
 STANDATA_SCAFFOLD_MD5 <- "45f2b82bf31010ef018da0827c5314a0"
 
 
-STANINIT_SCAFFOLD_STRING <- "init <- function() {
+STANINIT_SCAFFOLD_STRING <- "init <- function(data) {
   # return list of initial estimates that can be passed to cmdstanr
 }"
 
-STANINIT_SCAFFOLD_MD5 <- "afb27da800b0fbca9105851f94a1e29d"
+STANINIT_SCAFFOLD_MD5 <- "23dcebfde6c27bfd8278055a707c7ca5"
 
 STAN_SCAFFOLD_MD5_VEC <- c(
   STANMOD_SCAFFOLD_MD5,
