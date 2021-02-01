@@ -290,23 +290,22 @@ file_matches <- function(path, md5) {
 #' before hashing (because most file writer functions
 #' do this automatically).
 #'
-#' @importFrom withr local_file
-#'
 #' @param path String giving the path to the file.
 #' @param string Character scalar to hash and compare to hash of file
+#' @param append Character scalar to append to the end of string. Defaults
+#'   to `"\n"` because helpers like `writeLines()` and `readr::write_lines()`
+#'   automatically append a `"\n"` to a string when writing to a file.
 #'
 #' @return `TRUE` if `path` matches `string`, otherwise `FALSE` (including if
 #'   `path` doesn't exist).
 #'
 #' @keywords internal
-file_matches_string <- function(path, string) {
+file_matches_string <- function(path, string, append = "\n") {
   checkmate::assert_string(string)
 
-  .f <- tempfile()
-  withr::local_file(.f)
-  writeLines(string, .f)
+  test_string <- paste0(string, append)
 
-  file_matches(path, tools::md5sum(.f))
+  file_matches(path, digest::digest(test_string, serialize = FALSE))
 }
 
 #' Print valid .bbi_args
