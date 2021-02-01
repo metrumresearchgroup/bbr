@@ -112,3 +112,84 @@ submit_nonmem_model <- function(.mod,
 
   return(res)
 }
+
+
+#' Submit a Stan model via cmdstanr
+#'
+#' Private implementation function called by `submit_model()` dispatches.
+#' @param .mod An S3 object of class `bbi_stan_model`, for example from `new_model()`, `read_model()` or `copy_model_from()`
+#' @importFrom cmdstanr sample
+#' @importFrom stringr str_detect
+#' @importFrom tools file_path_sans_ext
+#' @return An S3 object of class `bbi_process`
+#' @keywords internal
+submit_stan_model_cmdstanr <- function(.mod,
+                                .bbi_args = NULL,
+                                #.mode = c("sge", "local"),
+                                .mode = "local", ###### FOR DEV
+                                ...,
+                                .config_path = NULL,
+                                .wait = TRUE,
+                                .dry_run=FALSE) {
+
+  # check against YAML
+  check_yaml_in_sync(.mod)
+  check_stan_model(.mod, .error = TRUE)
+
+  # check for valid type arg
+  .mode <- match.arg(.mode)
+
+  # define working directory
+  model_dir <- get_model_working_directory(.mod)
+
+  ############################# NONMEM STUFF that may go away
+  # # build command line args
+  if (!is.null(.bbi_args)) {
+    warning(".bbi_args is not implemented for submit_stan_model_cmdstanr()")
+  }
+  # .bbi_args <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])
+  # args_vec <- check_bbi_args(.bbi_args)
+  # cmd_args <- c("nonmem", "run", .mode, get_model_path(.mod), args_vec)
+
+  if (!is.null(.config_path)) {
+    warning(".config_path is not implemented for submit_stan_model_cmdstanr()")
+    # checkmate::assert_file_exists(.config_path)
+    # cmd_args <- c(
+    #   cmd_args,
+    #   sprintf("--config=%s", normalizePath(.config_path))
+    # )
+  }
+  #####################
+
+  stanmod <- cmdstanr::cmdstan_model(build_path_from_model(.mod, STANMOD_SUFFIX))
+
+  standata_list <- standata_to_json(.mod)
+  init_res <- standata_list
+
+
+  # capture args, maybe check against sample(), then write to stanargs.R
+
+  # construct bbi_config.json
+  # * hash standata.json
+  # * hash init.R
+  # * hash stanargs.R
+  # * get cmdstan and cmdstanr versions
+
+
+  stanargs[["data"]] <- build_path_from_model(.mod, STANDATA_JSON_SUFFIX)
+  stanargs[["init"]] <- init_res
+
+  # launch model
+
+  # if (.dry_run) {
+  #   # construct fake res object
+  #   return(bbi_dry_run(cmd_args, model_dir))
+  # }
+
+  res <- do.call(
+    "stanmod$sample",
+    args = stanargs
+  )
+
+  return(res)
+}

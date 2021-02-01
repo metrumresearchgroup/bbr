@@ -115,7 +115,7 @@ add_standata_file <- function(.mod, .source_file = NULL) {
   add_file_to_model_dir_impl(
     .mod,
     STAN_MOD_CLASS,
-    STANDATA_SUFFIX,
+    STANDATA_R_SUFFIX,
     STANDATA_SCAFFOLD_STRING,
     .source_file
   )
@@ -202,9 +202,9 @@ scaffold_missing_stan_files <- function(.mod) {
   missing_files <- STAN_MODEL_REQ_FILES[!fs::file_exists(files_to_check)]
 
   SCAFFOLD_LOOKUP <- rlang::list2(
-    !!STANMOD_SUFFIX  := add_stan_file,
-    !!STANDATA_SUFFIX := add_standata_file,
-    !!STANINIT_SUFFIX := add_stan_init
+    !!STANMOD_SUFFIX    := add_stan_file,
+    !!STANDATA_R_SUFFIX := add_standata_file,
+    !!STANINIT_SUFFIX   := add_stan_init
   )
 
   purrr::walk(missing_files, function(.f) {
@@ -213,4 +213,65 @@ scaffold_missing_stan_files <- function(.mod) {
   })
 
   return(invisible(NULL))
+}
+
+
+##############
+# modeling
+##############
+
+#' Write Stan input data to json
+#'
+#' Runs the `-standata.R` file associated with a model
+#' and writes the returned data list to json with
+#' [cmdstanr::write_stan_json].
+#'
+#' @importFrom cmdstanr write_stan_json
+#'
+#' @param .mod a `bbi_stan_model` object
+#' @param .out_path The path to write the json to on disk.
+#'   If `NULL`, the default, it will be written to
+#'   `build_path_from_model(.mod, STANDATA_JSON_SUFFIX)`.
+#'   This is primarily used to write to a temp path
+#'   when testing whether the json in an output folder
+#'   is the same as what is produced by calling this.
+#'
+#' @return Invisibly returns the list object returned
+#'   from standata()
+#'
+#' @keywords internal
+standata_to_json <- function(.mod) {
+  # make sure the standata function doesn't exist in a parent environment
+  suppressSpecificWarning(rm(standata), .regexpr = "object 'standata' not found")
+
+  # source and call function
+  source(build_path_from_model(.mod, STANDATA_R_SUFFIX))
+  standata_list <- standata(.dir = get_output_dir(.mod))
+
+  # write to json and return path
+  if (is.null(.out_path)) {
+    .out_path <- build_path_from_model(.mod, STANDATA_JSON_SUFFIX)
+  }
+  cmdstanr::write_stan_json(standata_list, .out_path)
+  return(invisible(standata_list))
+}
+
+
+#' Pull in Stan init file
+#'
+#' Sources the `-init.R` file associated with a model
+#' and returns whatever is returned by the the `make_init()`
+#' function it contains.
+#'
+#' @param .mod a `bbi_stan_model` object
+#' @param .standata the data list that is returned from [standata_to_json(.mod)]
+#'
+#' @keywords internal
+import_stan_init <- function(.mod, .standata) {
+  # make sure the standata function doesn't exist in a parent environment
+  suppressSpecificWarning(rm(make_init), .regexpr = "object 'make_init' not found")
+
+  # source and call function
+  source(build_path_from_model(.mod, STANINIT_SUFFIX))
+  return(make_init(.standata))
 }
