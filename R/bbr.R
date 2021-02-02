@@ -264,8 +264,18 @@ bbi_help <- function(.cmd_args=NULL) {
 #'   **no default NONMEM version**. `FALSE` by default, and using `TRUE` is
 #'   *not* encouraged.
 #' @importFrom yaml read_yaml write_yaml
+#' @importFrom fs dir_exists
 #' @export
 bbi_init <- function(.dir, .nonmem_dir, .nonmem_version = NULL, .no_default_version = FALSE) {
+  # check that destination directory exists
+  if (!fs::dir_exists(.dir)) {
+    stop(paste(
+      glue("Cannot find {file.path(getwd(), .dir)}"),
+      "Make sure you are in the correct working directory and have passed the correct path to bbi_init(.dir)",
+      sep = "\n"
+    ), call. = FALSE)
+  }
+
   # check for files in NONMEM directory
   nm_files <- list.files(.nonmem_dir)
   if (length(nm_files) == 0) {
