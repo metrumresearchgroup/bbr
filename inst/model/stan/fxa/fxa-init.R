@@ -1,4 +1,4 @@
-init <- function(data) {
+make_init <- function(data) {
   function() {
     list(
       emax = runif(1, 40, 100),

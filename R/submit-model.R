@@ -119,15 +119,16 @@ submit_nonmem_model <- function(.mod,
 #' Private implementation function called by `submit_model()` dispatches.
 #' @param .mod An S3 object of class `bbi_stan_model`, for example from `new_model()`, `read_model()` or `copy_model_from()`
 #' @importFrom cmdstanr sample
-#' @importFrom digest digest
+#' @importFrom jsonlite toJSON
 #' @return An S3 object of class `bbi_process` MAYBE???? Maybe a cmdstanr model. Will there be a wait=F option?
 #' @keywords internal
 submit_stan_model_cmdstanr <- function(.mod,
-                                .bbi_args = NULL,
+                                #.bbi_args = NULL,
+                                .overwrite = FALSE, ######## HOW TO DO THIS? currently passed through .bbi_args but that feels weird...
                                 #.mode = c("sge", "local"),
-                                .mode = "local", ###### FOR DEV
+                                .mode = c("local"), ###### FOR DEV
                                 ...,
-                                .config_path = NULL,
+                                #.config_path = NULL, ### NOT CLEAR THAT WE CAN USE THIS... but maybe for stuff like overwrite
                                 .wait = TRUE,
                                 .dry_run=FALSE) {
 
@@ -136,49 +137,51 @@ submit_stan_model_cmdstanr <- function(.mod,
   check_stan_model(.mod, .error = TRUE)
 
   # check for valid type arg
-  .mode <- match.arg(.mode)
+  .mode <- match.arg(.mode) ##### currently does nothing. How do we submit to grid?
 
-  # define working directory
-  model_dir <- get_model_working_directory(.mod)
+  out_dir <- get_output_dir(.mod, .check_exists = FALSE)
+  if (fs::dir_exists(out_dir)) {
+    if (isTRUE(.overwrite)) {
+      fs::dir_delete(out_dir)
+      #### should we also delete stanargs here? or just are we going to try to pull them in?
+      fs::dir_create(out_dir)
+    } else {
+      stop(glue("{out_dir} already exists. Pass submit_model(..., .overwrite = TRUE) to delete it and re-run the model."), call. = FALSE)
+    }
+  } else {
+    fs::dir_create(out_dir)
+  }
 
   ############################# NONMEM STUFF that may go away
+
+  # define working directory
+  # model_dir <- get_model_working_directory(.mod)
+
   # # build command line args
-  if (!is.null(.bbi_args)) {
-    warning(".bbi_args is not implemented for submit_stan_model_cmdstanr()")
-  }
   # .bbi_args <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])
   # args_vec <- check_bbi_args(.bbi_args)
   # cmd_args <- c("nonmem", "run", .mode, get_model_path(.mod), args_vec)
-
-  if (!is.null(.config_path)) {
-    warning(".config_path is not implemented for submit_stan_model_cmdstanr()")
-    # checkmate::assert_file_exists(.config_path)
-    # cmd_args <- c(
-    #   cmd_args,
-    #   sprintf("--config=%s", normalizePath(.config_path))
-    # )
-  }
+  #
+  # if (!is.null(.config_path)) {
+  #   checkmate::assert_file_exists(.config_path)
+  #   cmd_args <- c(
+  #     cmd_args,
+  #     sprintf("--config=%s", normalizePath(.config_path))
+  #   )
+  # }
   #####################
 
-  stanmod <- cmdstanr::cmdstan_model(build_path_from_model(.mod, STANMOD_SUFFIX))
+  stanmod <- compile_stanmod(.mod)
   valid_stanargs <- formalArgs(stanmod$sample)
 
   # capture args, maybe check against sample(), then write to stanargs.R
   stanargs <- parse_stanargs(.mod, valid_stanargs, ...)
 
-
-  # construct bbi_config.json
-  # * hash standata.json
-  # * hash init.R
-  # * hash stanargs.R
-  # * get cmdstan and cmdstanr versions
-
-
   # construct input data set and initial estimates
   standata_list <- standata_to_json(.mod)
   stanargs[["data"]] <- build_path_from_model(.mod, STANDATA_JSON_SUFFIX)
-
   stanargs[["init"]] <- import_stan_init(.mod, .standata = standata_list)
+  stanargs[["output_dir"]] <- get_output_dir(.mod)
 
   # launch model
 
@@ -189,9 +192,16 @@ submit_stan_model_cmdstanr <- function(.mod,
 
 
   res <- do.call(
-    "stanmod$sample",
+    stanmod$sample,
     args = stanargs
   )
+
+  # construct bbi_config.json
+  # * hash standata.json
+  # * hash init.R
+  # * hash stanargs.R
+  # * get cmdstan and cmdstanr versions
+  stan_config <- build_stan_bbi_config(.mod, .write = TRUE)
 
   return(res)
 }
