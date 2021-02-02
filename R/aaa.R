@@ -86,11 +86,18 @@ STANMOD_SUFFIX <- ".stan"
 STANDATA_R_SUFFIX <- "-standata.R"
 STANDATA_JSON_SUFFIX <- "-standata.json"
 STANINIT_SUFFIX <- "-init.R"
+STANARGS_SUFFIX <- "-stanargs.R"
 
 STAN_MODEL_REQ_FILES <- c(
   STANMOD_SUFFIX,
   STANDATA_R_SUFFIX,
   STANINIT_SUFFIX
+)
+
+STAN_RESERVED_ARGS <- c(
+  "data",
+  "init",
+  "output_dir"
 )
 
 # columns required for a run log df
