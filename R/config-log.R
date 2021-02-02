@@ -143,6 +143,10 @@ config_log_entry <- function(path,
   cfg_mod <- read_model_from_config(path)
   config <- jsonlite::fromJSON(path)
 
+  if (!is.null(config[['configuration']][['cmdstanr_version']])) {
+    config[['bbi_version']] <- STAN_BBI_VERSION_STRING
+  }
+
   if (!all(fields %in% names(config))) {
     msg <- paste(
       glue(
