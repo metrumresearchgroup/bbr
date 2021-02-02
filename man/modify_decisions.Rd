@@ -22,11 +22,10 @@ The modified \verb{bbi_\{.model_type\}_model} object
 The \code{decisions} field has been deprecated as of \verb{bbr 0.10.0} and
 replaced by the \code{notes} field, to reflect the fact that users
 will want to use this field throughout the modeling process, not only at the end
-once some "decisions" have been reached. \code{add_decisions()} and
-\code{replace_decisions()} now print a warning telling the user that they will be
+once some "decisions" have been reached. As of \verb{bbr 1.0.0}, \code{add_decisions()} and
+\code{replace_decisions()} now error telling the user that they will be
 deprecated in the future and encouraging use of their \verb{*_notes} counterparts.
-They will begin erroring, instead of warning, in two releases, and then will be
-removed two releases after that.
+The functions will be removed entirely two releases after that.
 }
 \section{Functions}{
 \itemize{

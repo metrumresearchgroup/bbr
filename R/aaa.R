@@ -136,6 +136,7 @@ SUMMARY_PARAM_DIAG <- "diag"
 SUMMARY_PARAM_SHRINKAGE <- "shrinkage"
 SUMMARY_SHRINKAGE_OMEGA <- "eta_sd"
 SUMMARY_SHRINKAGE_SIGMA <- "eps_sd"
+CONFIG_DATA_PATH <- "data_path"
 
 # keys required for a summary object to have
 SUMMARY_REQ_KEYS <- c(
@@ -187,7 +188,7 @@ SUMMARY_LOG_REQ_COLS <- c(
 # define json keys to keep as from bbi_config.json
 CONFIG_KEEPERS <- c(
   "model_md5",
-  "data_path",
+  CONFIG_DATA_PATH,
   "data_md5",
   "bbi_version"
 )

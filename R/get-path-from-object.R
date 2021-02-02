@@ -16,12 +16,16 @@
 #'   _not_ be interacted with directly. Use the helper functions mentioned in the
 #'   [modify_model_field()] help page to modify this file for you.
 #'
+#' Note that [build_path_from_model()] and [get_data_path()] provide similar functionality, but have a slightly
+#' different interface and implementation and so are documented separately.
+#'
 #' @param .bbi_object The object to query. Could be
 #' a `bbi_{.model_type}_model` object,
 #' `bbi_{.model_type}_summary` object,
 #' or a tibble of class `bbi_log_df`.
 #' @param .check_exists If `TRUE`, the default, will throw an error if the file does not exist
 #' @name get_path_from_object
+#' @seealso [get_model_id()] [get_data_path()] [build_path_from_model()]
 NULL
 
 #' @rdname get_path_from_object
@@ -106,7 +110,7 @@ get_yaml_path.bbi_log_df <- function(.bbi_object, .check_exists = TRUE) {
 #' @param .mod Model to use, either a `bbi_{.model_type}_model` or
 #' `bbi_{.model_type}_summary`, or a file path to a model.
 #' @importFrom tools file_path_sans_ext
-#' @returns Character scalar with only model identifier
+#' @return Character scalar with only model identifier
 #' @export
 get_model_id <- function(.mod) {
   UseMethod("get_model_id")
@@ -130,6 +134,72 @@ get_model_id.bbi_nonmem_summary <- function(.mod) {
   get_model_id_bbi(.mod)
 }
 
+
+#' Get path to data file
+#'
+#' Helper to extract the path to the input data from a `bbi_nonmem_summary` or
+#' `bbi_nonmem_model` object. Note that **this function only works on models that
+#' have been successfully run** because the path to the data is constructed
+#' during model submission.
+#' @param .mod Model to use, either a `bbi_{.model_type}_model` or
+#' `bbi_{.model_type}_summary` object.
+#' @param ... Arguments passed through to methods.
+#'   (Currently none, but will likely have some modifier arguments for `bbi_stan_model` objects.)
+#' @importFrom fs path_rel
+#' @return Absolute path to input data file
+#' @export
+get_data_path <- function(.mod, ...) {
+  UseMethod("get_data_path")
+}
+
+#' @describeIn get_data_path Takes `bbi_nonmem_model` object
+#' @export
+get_data_path.bbi_nonmem_model <- function(.mod, ...) {
+  get_data_path_bbi(.mod)
+}
+
+#' @describeIn get_data_path Takes `bbi_nonmem_summary` object
+#' @export
+get_data_path.bbi_nonmem_summary <- function(.mod, ...) {
+  get_data_path_bbi(.mod)
+}
+
+#' Build path to output file
+#'
+#' Builds the absolute path to a file in the output directory from components of the `bbi_{.model_type}_model` object
+#'
+#' @return Returns an absolute path to `{output_dir}/{model_id}{.suffix}`.
+#'   Does _not_ check whether the file exists.
+#'
+#' @param .mod Model to use, either a `bbi_{.model_type}_model` or `bbi_{.model_type}_summary` object.
+#' @param .suffix Character vector to append the end of the absolute model path.
+#'   Will be appended _as is_ so, if passing a file extension, be sure to included the leading `"."`.
+#'   See examples.
+#' @param ... arguments passed through to methods. (Currently none.)
+#'
+#' @examples
+#' .mod <- read_model(
+#'   system.file("model", "nonmem", "basic", "1", package = "bbr")
+#' )
+#' build_path_from_model(.mod, ".lst")
+#' build_path_from_model(.mod, "-standata.R")
+#'
+#' @export
+build_path_from_model <- function(.mod, .suffix, ...) {
+  UseMethod("build_path_from_model")
+}
+
+#' @rdname build_path_from_model
+#' @export
+build_path_from_model.bbi_nonmem_model <- function(.mod, .suffix, ...) {
+  build_path_from_model_bbi(.mod, .suffix)
+}
+
+#' @rdname build_path_from_model
+#' @export
+build_path_from_model.bbi_nonmem_summary <- function(.mod, .suffix, ...) {
+  build_path_from_model_bbi(.mod, .suffix)
+}
 
 ####################################################
 # Get path from bbi object implementation functions
@@ -165,6 +235,38 @@ get_yaml_path_bbi <- function(.bbi_object, .check_exists = TRUE) {
 #' @keywords internal
 get_model_id_bbi <- function(.bbi_object) {
   return(basename(tools::file_path_sans_ext(get_model_path(.bbi_object))))
+}
+
+#' @keywords internal
+get_data_path_bbi <- function(.mod) {
+  cfg_path <- file.path(get_output_dir(.mod), "bbi_config.json")
+
+  if (!fs::file_exists(cfg_path)) {
+    stop(paste(
+      glue("Cannot extract data path because no config file exists as {cfg_path}"),
+      "This likely means the model has not successfully been run yet.",
+      sep = "\n"
+    ))
+  }
+
+  cfg <- jsonlite::fromJSON(cfg_path)
+
+  fs::path_norm(
+    file.path(
+      get_output_dir(.mod),
+      cfg[[CONFIG_DATA_PATH]]
+    )
+  ) %>%
+    as.character()
+
+}
+
+#' @keywords internal
+build_path_from_model_bbi <- function(.mod, .suffix) {
+  file.path(
+    get_output_dir(.mod),
+    paste0(get_model_id(.mod), .suffix)
+  )
 }
 
 ###########################

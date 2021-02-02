@@ -63,4 +63,10 @@ output files created when the model is run.
 This file contains metadata like tags, etc. and should, generally speaking,
 \emph{not} be interacted with directly. Use the helper functions mentioned in the
 \code{\link[=modify_model_field]{modify_model_field()}} help page to modify this file for you.
+
+Note that \code{\link[=build_path_from_model]{build_path_from_model()}} and \code{\link[=get_data_path]{get_data_path()}} provide similar functionality, but have a slightly
+different interface and implementation and so are documented separately.
+}
+\seealso{
+\code{\link[=get_model_id]{get_model_id()}} \code{\link[=get_data_path]{get_data_path()}} \code{\link[=build_path_from_model]{build_path_from_model()}}
 }
