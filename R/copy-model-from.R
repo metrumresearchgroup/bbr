@@ -139,7 +139,7 @@ copy_nonmem_model_from <- function(
 
   # build based_on
   if(!fs::is_absolute_path(.new_model)) {
-    stop(".new_model argument to copy_nonmem_model_from() must be absolute. USER SHOULD NOT SEE THIS ERROR.")
+    dev_error(".new_model argument to copy_nonmem_model_from() must be absolute.")
   }
   .parent_based_on <- fs::path_rel(get_model_path(.parent_mod), start = dirname(.new_model))
 

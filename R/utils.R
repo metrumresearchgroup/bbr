@@ -357,6 +357,19 @@ stop_get_fail_msg <- function(.bbi_object, .key, .msg = "") {
 }
 
 
+#' Construct error message that users shouldn't see
+#'
+#' Contains a note to file an issue if ever encountered by a user.
+#' @keywords internal
+dev_error <- function(.msg) {
+  stop(paste(
+    .msg,
+    "USER SHOULD NEVER SEE THIS ERROR. If encountered, please file an issue at https://github.com/metrumresearchgroup/bbr/issues",
+    sep = "\n"
+  ))
+}
+
+
 #' Suppress a warning that matches `.regexpr`
 #' @importFrom stringr str_detect
 #' @param .expr Expression to run
