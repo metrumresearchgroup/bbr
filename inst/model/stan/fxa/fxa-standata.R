@@ -1,4 +1,4 @@
-standata <- function(.dir) {
+make_standata <- function(.dir) {
   ## get data file
   xdata <- readr::read_csv(file.path(.dir, "..", "..", "..", "extdata", "fxa.data.csv"))
 

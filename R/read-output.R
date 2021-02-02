@@ -132,9 +132,33 @@ check_output_dir.character <- function(.mod, ...) {
   return(.out_files)
 }
 
-#' @describeIn check_output_dir Takes a `bbi_{.model_type}_model` object.
+#' @describeIn check_output_dir Takes a `bbi_nonmem_model` object.
 #' @export
 check_output_dir.bbi_nonmem_model <- function(.mod, ...) {
+  check_output_dir_bbi(.mod, ...)
+}
+
+#' @describeIn check_output_dir Takes a `bbi_nonmem_summary` object.
+#' @export
+check_output_dir.bbi_nonmem_summary <- function(.mod, ...) {
+  check_output_dir_bbi(.mod, ...)
+}
+
+#' @describeIn check_output_dir Takes a `bbi_stan_model` object.
+#' @export
+check_output_dir.bbi_stan_model <- function(.mod, ...) {
+  check_output_dir_bbi(.mod, ...)
+}
+
+#' @describeIn check_output_dir Takes a `bbi_stan_summary` object.
+#' @export
+check_output_dir.bbi_stan_summary <- function(.mod, ...) {
+  check_output_dir_bbi(.mod, ...)
+}
+
+#' Implementation function for check_output_dir
+#' @keywords internal
+check_output_dir_bbi <- function(.mod, ...) {
   .output_dir <- .mod %>% get_output_dir()
   .out_files <- check_output_dir(.output_dir, ...)
   return(.out_files)
