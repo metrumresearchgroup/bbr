@@ -24,6 +24,8 @@ STANCFG_INIT_MD5 <- "init_script_md5"
 STANCFG_ARGS_PATH <- "stanargs_path"
 STANCFG_ARGS_MD5 <- "stanargs_md5"
 
+STAN_BBI_VERSION_STRING <- "STAN"
+
 ############
 # SCAFFOLDS
 ############

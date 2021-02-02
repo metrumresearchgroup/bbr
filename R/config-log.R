@@ -145,20 +145,24 @@ config_log_entry <- function(path,
 
   config <- jsonlite::fromJSON(path)
 
+  if (!is.null(config[['configuration']][['cmdstanr_version']])) {
+    config[['bbi_version']] <- STAN_BBI_VERSION_STRING
+  }
+
   if (!all(fields %in% names(config))) {
-    msg <- glue::glue(
-      glue::glue(
+    msg <- paste(
+      glue(
         "{path} is missing the required keys:",
         "`{paste(fields[!(fields %in% names(config))], collapse = ', ')}`",
         "and will be skipped.",
         .sep = " "
       ),
-      glue::glue(
+      glue(
         "This is likely because it was run with an old version of bbi.",
         "Model was run on version {config[['bbi_version']]}",
         .sep = " "
       ),
-      glue::glue(
+      glue(
         "User can call `bbi_current_release()` to see the most recent release",
         "version, and call `use_bbi(options('bbr.bbi_exe_path'))` to",
         "upgrade to the version.",
