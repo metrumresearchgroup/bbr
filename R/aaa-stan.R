@@ -3,6 +3,7 @@ STANDATA_R_SUFFIX <- "-standata.R"
 STANDATA_JSON_SUFFIX <- "-standata.json"
 STANINIT_SUFFIX <- "-init.R"
 STANARGS_SUFFIX <- "-stanargs.R"
+STAN_OUTDIR_SUFFIX <- "-output"
 
 STAN_MODEL_REQ_FILES <- c(
   STANMOD_SUFFIX,

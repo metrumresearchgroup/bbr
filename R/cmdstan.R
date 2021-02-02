@@ -23,8 +23,8 @@
 #' @export
 check_stan_model <- function(.mod, .error = FALSE) {
   # check if output dir exists and if not create an empty one
-  out_dir <- get_output_dir(.mod, .check_exists = FALSE)
-  if (!fs::dir_exists(out_dir)) fs::dir_create(out_dir)
+  model_dir <- dirname(get_output_dir(.mod, .check_exists = FALSE))
+  if (!fs::dir_exists(model_dir)) fs::dir_create(model_dir)
 
   # check for files in output dir
   files_to_check <- build_path_from_model(.mod, STAN_MODEL_REQ_FILES)
@@ -246,7 +246,8 @@ standata_to_json <- function(.mod, .out_path = NULL) {
 
   # source and call function
   source(build_path_from_model(.mod, STANDATA_R_SUFFIX))
-  standata_list <- make_standata(.dir = get_output_dir(.mod))
+  model_dir <- dirname(get_output_dir(.mod, .check_exists = FALSE))
+  standata_list <- make_standata(.dir = model_dir)
 
   # write to json and return path
   if (is.null(.out_path)) {
@@ -324,6 +325,25 @@ parse_stanargs <- function(.mod, valid_stanargs, ...) {
 }
 
 
+compile_stanmod <- function(.mod) {
+  # compile model
+  stanmod <- cmdstanr::cmdstan_model(build_path_from_model(.mod, STANMOD_SUFFIX))
+
+  # add to gitignore, if not already present
+  gitignore <- file.path(get_absolute_model_path(.mod), ".gitignore")
+  ignore_string <- paste(get_model_id(.mod), "# ignore model binary")
+  if (!fs::file_exists(gitignore)) {
+    readr::write_lines(ignore_string, gitignore)
+  } else {
+    gitignore_lines <- readr::read_lines(gitignore)
+    if (!stringr::str_detect(gitignore_lines, ignore_string)) {
+      readr::write_lines(ignore_string, gitignore, append = TRUE)
+    }
+  }
+
+  return(stanmod)
+}
+
 #' Build bbi_config.json for Stan models
 #'
 #' Contains information, including hashes and configuration,
@@ -345,15 +365,19 @@ build_stan_bbi_config <- function(.mod, .write) {
     !!STANCFG_INIT_MD5   := tools::md5sum(build_path_from_model(.mod, STANINIT_SUFFIX)),
     !!STANCFG_ARGS_PATH  := build_path_from_model(.mod, STANINIT_SUFFIX),
     !!STANCFG_ARGS_MD5   := tools::md5sum(build_path_from_model(.mod, STANINIT_SUFFIX)),
-    "configuration": list(
+    "configuration" = rlang::list2(
       "cmdstan_version"     = cmdstanr::cmdstan_version(),
       "cmdstanr_version"    = as.character(packageVersion('cmdstanr')),
     )
   )
 
   if (isTRUE(.write)) {
-    stan_json <- jsonlite::toJSON(stan_config)
+    stan_json <- jsonlite::toJSON(stan_config, pretty = TRUE, auto_unbox = TRUE)
+    readr::write_lines(stan_json, file.path(get_output_dir(.mod), "bbi_config.json"))
   }
 
   return(stan_config)
 }
+
+
+
