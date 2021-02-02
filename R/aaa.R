@@ -1,4 +1,3 @@
-
 BBI_DEFAULT_PATH <- if (.Platform$OS.type == "windows") {
   "bbi.exe"
 } else {
