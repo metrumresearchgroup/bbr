@@ -1,3 +1,32 @@
+STANMOD_SUFFIX <- ".stan"
+STANDATA_R_SUFFIX <- "-standata.R"
+STANDATA_JSON_SUFFIX <- "-standata.json"
+STANINIT_SUFFIX <- "-init.R"
+STANARGS_SUFFIX <- "-stanargs.R"
+
+STAN_MODEL_REQ_FILES <- c(
+  STANMOD_SUFFIX,
+  STANDATA_R_SUFFIX,
+  STANINIT_SUFFIX
+)
+
+STAN_RESERVED_ARGS <- c(
+  "data",
+  "init",
+  "output_dir"
+)
+
+STANCFG_DATA_PATH <- "standata_script_path"
+STANCFG_DATA_MD5 <- "standata_script_md5"
+STANCFG_INIT_PATH <- "init_script_path"
+STANCFG_INIT_MD5 <- "init_script_md5"
+STANCFG_ARGS_PATH <- "stanargs_path"
+STANCFG_ARGS_MD5 <- "stanargs_md5"
+
+############
+# SCAFFOLDS
+############
+
 STANMOD_SCAFFOLD_STRING <- "data{}
 
 parameters{}

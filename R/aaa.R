@@ -86,23 +86,6 @@ MODEL_REQ_KEYS <- c(
   YAML_MOD_TYPE
 )
 
-STANMOD_SUFFIX <- ".stan"
-STANDATA_R_SUFFIX <- "-standata.R"
-STANDATA_JSON_SUFFIX <- "-standata.json"
-STANINIT_SUFFIX <- "-init.R"
-STANARGS_SUFFIX <- "-stanargs.R"
-
-STAN_MODEL_REQ_FILES <- c(
-  STANMOD_SUFFIX,
-  STANDATA_R_SUFFIX,
-  STANINIT_SUFFIX
-)
-
-STAN_RESERVED_ARGS <- c(
-  "data",
-  "init",
-  "output_dir"
-)
 
 # columns required for a run log df
 RUN_LOG_REQ_COLS <- c(
@@ -213,9 +196,9 @@ SUMMARY_LOG_REQ_COLS <- c(
 
 # define json keys to keep as from bbi_config.json
 CONFIG_KEEPERS <- c(
-  "model_md5",
+  CONFIG_MODEL_MD5,
   CONFIG_DATA_PATH,
-  "data_md5",
+  CONFIG_DATA_MD5,
   "bbi_version"
 )
 

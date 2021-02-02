@@ -6,7 +6,8 @@
 #'
 #' @details
 #' **`get_model_path()`** returns the path to the model definition file.
-#'   For NONMEM models, this is the control stream.
+#'   For NONMEM models, this is the control stream. For Stan models,
+#'   this is the `.stan` file.
 #'
 #' **`get_output_dir()`** returns the path to the directory containing
 #'   output files created when the model is run.
@@ -44,6 +45,18 @@ get_model_path.bbi_nonmem_model <- function(.bbi_object, .check_exists = TRUE) {
 #' @export
 get_model_path.bbi_nonmem_summary <- function(.bbi_object, .check_exists = TRUE) {
   get_model_path_nonmem(.bbi_object, .check_exists)
+}
+
+#' @rdname get_path_from_object
+#' @export
+get_model_path.bbi_stan_model <- function(.bbi_object, .check_exists = TRUE) {
+  get_model_path_stan(.bbi_object, .check_exists)
+}
+
+#' @rdname get_path_from_object
+#' @export
+get_model_path.bbi_stan_summary <- function(.bbi_object, .check_exists = TRUE) {
+  get_model_path_stan(.bbi_object, .check_exists)
 }
 
 #' @rdname get_path_from_object
@@ -261,6 +274,17 @@ get_model_path_nonmem <- function(.bbi_object, .check_exists = TRUE) {
   find_nonmem_model_file_path(.bbi_object[[ABS_MOD_PATH]], .check_exists)
 }
 
+
+#' @keywords internal
+get_model_path_stan <- function(.bbi_object, .check_exists = TRUE) {
+  .path <- build_path_from_model(.bbi_object, STANMOD_SUFFIX)
+
+  if (isTRUE(.check_exists)) {
+    checkmate::assert_file_exists(.path)
+  }
+
+  return(.path)
+}
 
 #' @keywords internal
 get_output_dir_nonmem <- function(.bbi_object, .check_exists = TRUE) {

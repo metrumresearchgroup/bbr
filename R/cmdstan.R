@@ -322,3 +322,38 @@ parse_stanargs <- function(.mod, valid_stanargs, ...) {
 
   return(stanargs)
 }
+
+
+#' Build bbi_config.json for Stan models
+#'
+#' Contains information, including hashes and configuration,
+#' for successfully run models.
+#' @param .mod a `bbi_stan_model` object
+#' @param .write Logical scalar for whether to write the resulting list to
+#'   a file at `file.path(get_output_dir(.mod), "bbi_config.json")`
+#' @keywords internal
+build_stan_bbi_config <- function(.mod, .write) {
+  stan_config <- rlang::list2(
+    "output_dir"          = get_output_dir(.mod),
+    !!CONFIG_MODEL_PATH  := get_model_path(.mod),
+    !!CONFIG_MODEL_MD5   := tools::md5sum(get_model_path(.mod)),
+    !!CONFIG_DATA_PATH   := build_path_from_model(.mod, STANDATA_JSON_SUFFIX),
+    !!CONFIG_DATA_MD5    := tools::md5sum(build_path_from_model(.mod, STANDATA_JSON_SUFFIX)),
+    !!STANCFG_DATA_PATH  := build_path_from_model(.mod, STANDATA_R_SUFFIX),
+    !!STANCFG_DATA_MD5   := tools::md5sum(build_path_from_model(.mod, STANDATA_R_SUFFIX)),
+    !!STANCFG_INIT_PATH  := build_path_from_model(.mod, STANINIT_SUFFIX),
+    !!STANCFG_INIT_MD5   := tools::md5sum(build_path_from_model(.mod, STANINIT_SUFFIX)),
+    !!STANCFG_ARGS_PATH  := build_path_from_model(.mod, STANINIT_SUFFIX),
+    !!STANCFG_ARGS_MD5   := tools::md5sum(build_path_from_model(.mod, STANINIT_SUFFIX)),
+    "configuration": list(
+      "cmdstan_version"     = cmdstanr::cmdstan_version(),
+      "cmdstanr_version"    = as.character(packageVersion('cmdstanr')),
+    )
+  )
+
+  if (isTRUE(.write)) {
+    stan_json <- jsonlite::toJSON(stan_config)
+  }
+
+  return(stan_config)
+}
