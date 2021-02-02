@@ -110,7 +110,7 @@ get_yaml_path.bbi_log_df <- function(.bbi_object, .check_exists = TRUE) {
 #' @param .mod Model to use, either a `bbi_{.model_type}_model` or
 #' `bbi_{.model_type}_summary`, or a file path to a model.
 #' @importFrom tools file_path_sans_ext
-#' @returns Character scalar with only model identifier
+#' @return Character scalar with only model identifier
 #' @export
 get_model_id <- function(.mod) {
   UseMethod("get_model_id")
@@ -146,7 +146,7 @@ get_model_id.bbi_nonmem_summary <- function(.mod) {
 #' @param ... Arguments passed through to methods.
 #'   (Currently none, but will likely have some modifier arguments for `bbi_stan_model` objects.)
 #' @importFrom fs path_rel
-#' @returns Absolute path to input data file
+#' @return Absolute path to input data file
 #' @export
 get_data_path <- function(.mod, ...) {
   UseMethod("get_data_path")

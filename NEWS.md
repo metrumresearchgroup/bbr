@@ -14,7 +14,7 @@ The `1.0.0` release also represents a stable feature set of basic NONMEM-related
 
 * Added `build_path_from_model()` helper function to extract the absolute path to various output files from `bbi_nonmem_model` and `bbi_nonmem_summary` objects. (#314)
 
-* Per guidance in `rbabylon 0.10.0` release, `replace_tags()`, `replace_bbi_args()`, `replace_based_on()`, `add_decisions()`, and `replace_decisions()` will no error instead of warn about their impending deprecation. These functions will be removed entirely in two more releases.
+* Per guidance in `rbabylon 0.10.0` release, `replace_tags()`, `replace_bbi_args()`, `replace_based_on()`, `add_decisions()`, and `replace_decisions()` will now error instead of warn about their impending deprecation. These functions will be removed entirely in two more releases.
 
 ## Developer-facing changes
 
