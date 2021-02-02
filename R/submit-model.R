@@ -119,9 +119,8 @@ submit_nonmem_model <- function(.mod,
 #' Private implementation function called by `submit_model()` dispatches.
 #' @param .mod An S3 object of class `bbi_stan_model`, for example from `new_model()`, `read_model()` or `copy_model_from()`
 #' @importFrom cmdstanr sample
-#' @importFrom stringr str_detect
-#' @importFrom tools file_path_sans_ext
-#' @return An S3 object of class `bbi_process`
+#' @importFrom digest digest
+#' @return An S3 object of class `bbi_process` MAYBE???? Maybe a cmdstanr model. Will there be a wait=F option?
 #' @keywords internal
 submit_stan_model_cmdstanr <- function(.mod,
                                 .bbi_args = NULL,
@@ -162,12 +161,11 @@ submit_stan_model_cmdstanr <- function(.mod,
   #####################
 
   stanmod <- cmdstanr::cmdstan_model(build_path_from_model(.mod, STANMOD_SUFFIX))
-
-  standata_list <- standata_to_json(.mod)
-  init_res <- standata_list
-
+  valid_stanargs <- formalArgs(stanmod$sample)
 
   # capture args, maybe check against sample(), then write to stanargs.R
+  stanargs <- parse_stanargs(.mod, valid_stanargs, ...)
+
 
   # construct bbi_config.json
   # * hash standata.json
@@ -176,8 +174,11 @@ submit_stan_model_cmdstanr <- function(.mod,
   # * get cmdstan and cmdstanr versions
 
 
+  # construct input data set and initial estimates
+  standata_list <- standata_to_json(.mod)
   stanargs[["data"]] <- build_path_from_model(.mod, STANDATA_JSON_SUFFIX)
-  stanargs[["init"]] <- init_res
+
+  stanargs[["init"]] <- import_stan_init(.mod, .standata = standata_list)
 
   # launch model
 
@@ -185,6 +186,7 @@ submit_stan_model_cmdstanr <- function(.mod,
   #   # construct fake res object
   #   return(bbi_dry_run(cmd_args, model_dir))
   # }
+
 
   res <- do.call(
     "stanmod$sample",
