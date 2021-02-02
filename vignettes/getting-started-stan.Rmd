@@ -165,11 +165,48 @@ check_stan_model(fxaInc)
 
 
 
-
-
-
-
 ## Submit model
+
+```{r}
+#### WORK IN PROGRESS!!!!
+nChains <- 4
+nIter <- 500
+
+fxa_res <- submit_stan_model_cmdstanr(
+  fxaOld, 
+  seed = 123456,
+  chains = nChains,
+  iter_sampling = nIter,
+  .overwrite = TRUE
+)
+
+```
+
+
+#### diagnostics from cmdstanr
+
+```{r}
+# this is just diagnostics
+fxa_res$sampler_diagnostics() %>% str()
+```
+
+
+```{r}
+# this pulls in the the actual posteriors
+.s <- fxa_res$summary()
+print(dim(.s))
+#[1] 7731   10 !!!!!!!!!
+```
+
+```{r}
+.s
+```
+
+
+
+
+
+### !!!!!
 
 ```{r submit_model_fake, eval = FALSE}
 mod1 %>% submit_model()
