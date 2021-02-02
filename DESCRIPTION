@@ -1,7 +1,7 @@
 Type: Package
 Package: bbr
 Title: R package for bbi
-Version: 0.12.0.7103
+Version: 0.12.0.7104
 Authors@R: 
     c(person(given = "Devin",
              family = "Pastoor",
