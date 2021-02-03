@@ -160,7 +160,7 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
   # print top line info
   .d <- x[[SUMMARY_DETAILS]]
   cat_line(glue("Dataset: {.d$data_set}\n\n"))
-  cat_line(glue("Records: {.d$number_of_data_records}\t Observations: {.d$number_of_obs}\t Patients: {.d$number_of_patients}\n\n"))
+  cat_line(glue("Records: {.d$number_of_data_records}\t Observations: {.d$number_of_obs}\t Subjects: {.d$number_of_subjects}\n\n"))
   cat_line(glue("Objective Function Value (final est. method): {extract_ofv(list(x))}\n\n"))
   cli::cat_line("Estimation Method(s):\n")
   purrr::walk(paste(.d$estimation_method, "\n"), cli::cat_bullet, bullet = "en_dash")

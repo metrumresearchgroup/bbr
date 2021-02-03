@@ -21,7 +21,7 @@
 #' * `param_count` -- Count of (non-fixed) parameters estimated in final estimation method.
 #' * `estimation_method` -- Character vector of estimation method(s) used. Extracted from `$run_details`.
 #' * `problem_text` -- Character vector of text from `$PROB`. Extracted from `$run_details`.
-#' * `number_of_patients` -- Count of unique patients in the input data set, extracted from `$run_details`.
+#' * `number_of_subjects` -- Count of unique subjects in the input data set, extracted from `$run_details`.
 #' * `number_of_obs` -- Total count of observations in the input data set, extracted from `$run_details`.
 #' * `condition_number` -- The condition number for the final estimation method, if present.
 #' * `any_heuristics` -- Logical indicating whether _any_ of the columns extracted from `$run_heuristics` are `TRUE`. Duplicative information, but helpful for filtering.

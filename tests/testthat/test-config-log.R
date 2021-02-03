@@ -1,6 +1,6 @@
 context("Constructing config log from bbi_config.json")
 
-expected_bbi_version <- "v3.0.0"
+expected_bbi_version <- "v3.0.2"
 expected_nonmem_version <- "nm74gf"
 
 # to minimize changes to the existing tests, we define the model and data status

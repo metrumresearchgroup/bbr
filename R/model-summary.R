@@ -16,7 +16,7 @@
 #'    Note, using this directly is discouraged in favor of using the "getters"
 #'    described in the [`get_path_from_object`] help page.
 #'  * **run_details** -- General details about the run including estimation
-#'    method, numbers of patients and records, significant digits, run time, and
+#'    method, numbers of subjects and records, significant digits, run time, and
 #'    more.
 #'  * **run_heuristics** -- Boolean flags indicating potential issues with the
 #'    run. For example, if there was a large condition number or a parameter near
