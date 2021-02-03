@@ -26,17 +26,6 @@ create_model_object <- function(res, save_yaml) {
     strict_mode_error(err_msg)
   }
 
-  # check bbi args and add an empty list if missing
-  if (is.null(res[[YAML_BBI_ARGS]])) {
-    res[[YAML_BBI_ARGS]] <- list()
-  } else {
-    # check that unique named list was passed
-    tryCatch(
-      checkmate::assert_list(res[[YAML_BBI_ARGS]], names="unique"),
-      error = function(e) { stop(glue("`{YAML_BBI_ARGS}` must be a unique, named list: {e}")) }
-    )
-  }
-
   # assign class and write YAML to disk
   .model_type <- res[[YAML_MOD_TYPE]]
   if (!(.model_type %in% SUPPORTED_MOD_TYPES)) {
