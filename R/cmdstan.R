@@ -229,12 +229,11 @@ scaffold_missing_stan_files <- function(.mod) {
 #' @importFrom cmdstanr write_stan_json
 #'
 #' @param .mod a `bbi_stan_model` object
-#' @param .out_path The path to write the json to on disk.
-#'   If `NULL`, the default, it will be written to
-#'   `build_path_from_model(.mod, STANDATA_JSON_SUFFIX)`.
-#'   This is primarily used to write to a temp path
-#'   when testing whether the json in an output folder
-#'   is the same as what is produced by calling this.
+#' @param .out_path The path to write the json to on disk. If `NULL`, the
+#'   default, it will be written to `build_path_from_model(.mod,
+#'   STANDATA_JSON_SUFFIX)`. This argument is primarily used to write to a temp
+#'   path when testing whether the json in an output folder is the same as what
+#'   is produced by calling this.
 #'
 #' @return Invisibly returns the list object returned
 #'   from make_standata()
@@ -324,7 +323,7 @@ parse_stanargs <- function(.mod, valid_stanargs, ...) {
   return(stanargs)
 }
 
-
+#' Private helper to compile a stan model and save a gitignore that ignores the binary
 compile_stanmod <- function(.mod) {
   # compile model
   stanmod <- cmdstanr::cmdstan_model(build_path_from_model(.mod, STANMOD_SUFFIX))
@@ -353,17 +352,20 @@ compile_stanmod <- function(.mod) {
 #'   a file at `file.path(get_output_dir(.mod), "bbi_config.json")`
 #' @keywords internal
 build_stan_bbi_config <- function(.mod, .write) {
+
+  out_dir <- get_output_dir(.mod)
+  data_path <- fs::path_rel(
+    build_path_from_model(.mod, STANDATA_JSON_SUFFIX),
+    start = out_dir
+  )
+
   stan_config <- rlang::list2(
-    "output_dir"          = get_output_dir(.mod),
-    !!CONFIG_MODEL_PATH  := get_model_path(.mod),
+    "output_dir"          = out_dir,
+    !!CONFIG_DATA_PATH   := data_path,
     !!CONFIG_MODEL_MD5   := tools::md5sum(get_model_path(.mod)),
-    !!CONFIG_DATA_PATH   := build_path_from_model(.mod, STANDATA_JSON_SUFFIX),
     !!CONFIG_DATA_MD5    := tools::md5sum(build_path_from_model(.mod, STANDATA_JSON_SUFFIX)),
-    !!STANCFG_DATA_PATH  := build_path_from_model(.mod, STANDATA_R_SUFFIX),
     !!STANCFG_DATA_MD5   := tools::md5sum(build_path_from_model(.mod, STANDATA_R_SUFFIX)),
-    !!STANCFG_INIT_PATH  := build_path_from_model(.mod, STANINIT_SUFFIX),
     !!STANCFG_INIT_MD5   := tools::md5sum(build_path_from_model(.mod, STANINIT_SUFFIX)),
-    !!STANCFG_ARGS_PATH  := build_path_from_model(.mod, STANARGS_SUFFIX),
     !!STANCFG_ARGS_MD5   := tools::md5sum(build_path_from_model(.mod, STANARGS_SUFFIX)),
     "configuration" = rlang::list2(
       "cmdstan_version"     = cmdstanr::cmdstan_version(),

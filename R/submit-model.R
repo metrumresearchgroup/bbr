@@ -118,7 +118,6 @@ submit_nonmem_model <- function(.mod,
 #'
 #' Private implementation function called by `submit_model()` dispatches.
 #' @param .mod An S3 object of class `bbi_stan_model`, for example from `new_model()`, `read_model()` or `copy_model_from()`
-#' @importFrom cmdstanr sample
 #' @importFrom jsonlite toJSON
 #' @return An S3 object of class `bbi_process` MAYBE???? Maybe a cmdstanr model. Will there be a wait=F option?
 #' @keywords internal

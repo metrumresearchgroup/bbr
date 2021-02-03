@@ -25,9 +25,8 @@
 #'
 #'   * `model_md5`: the MD5 sum of the model file
 #'
-#'   * `data_path`: the path to the data file, relative to `absolute_model_path`
-#'
-#'   * `data_md5`: the MD5 sum of the data file
+#'   * `data_path`: the path to the data file, relative to the model's output directory
+#'     (which can be extracted via [get_output_dir()])
 #'
 #'   * `bbi_version`: the version of bbi last used to run the model
 #'
@@ -137,15 +136,15 @@ config_log_impl <- function(.mods) {
 #'
 #' @keywords internal
 config_log_entry <- function(path,
-                             fields = CONFIG_KEEPERS,
-                             model_path_field = ABS_MOD_PATH) {
+                             fields = CONFIG_KEEPERS) {
   checkmate::assert_file_exists(path)
   checkmate::assert_character(fields)
-  checkmate::assert_string(model_path_field)
 
+  cfg_mod <- read_model_from_config(path)
   config <- jsonlite::fromJSON(path)
 
-  if (!is.null(config[['configuration']][['cmdstanr_version']])) {
+
+  if (inherits(cfg_mod, STAN_MOD_CLASS)) {
     config[['bbi_version']] <- STAN_BBI_VERSION_STRING
   }
 
@@ -175,32 +174,18 @@ config_log_entry <- function(path,
     return(NULL)
   }
 
-  # the model_path field may not exist, e.g., it could be the home directory of
-  # the user who ran the model, so we cannot use it directly
-  output_dir <- dirname(path)
-  model_path <- fs::path_ext_set(output_dir, config[["model_extension"]])
-
-  data_path <- fs::path_norm(
-    file.path(
-      output_dir,
-      config[["data_path"]]
-    )
+  matches <- suppressMessages(
+    check_model_up_to_date(cfg_mod, .build_data = TRUE) ##### DO WANT WANT .build_data? I THINK SO...
   )
 
-  matches <- purrr::map2_lgl(
-    c(model_path, data_path),
-    c(config[["model_md5"]], config[["data_md5"]]),
-    file_matches
-  )
-
-  config[["model_has_changed"]] <- !matches[1]
-  config[["data_has_changed"]] <- !matches[2]
-  config[["nm_version"]] <- resolve_nonmem_version(config)
-  config[[model_path_field]] <- output_dir
+  config[["model_has_changed"]] <- !matches["model"]
+  config[["data_has_changed"]] <- !matches["data"]
+  config[["nm_version"]] <- resolve_nonmem_version(config) %||% NA_character_
+  config[[ABS_MOD_PATH]] <- get_absolute_model_path(cfg_mod)
 
   out_fields <- c(
+    ABS_MOD_PATH,
     fields,
-    model_path_field,
     "nm_version",
     "model_has_changed",
     "data_has_changed"
@@ -229,4 +214,42 @@ resolve_nonmem_version <- function(x) {
     ver <- names(purrr::compact(idx))
   }
   ver
+}
+
+#' Create a model object from a bbi_config.json path
+#'
+#' This is non-trivial because, while configs
+#' always sit in the ouput directory, for NONMEM models
+#' this is one dir deeper than the YAML and for Stan
+#' models this is two dirs deeper than the YAML.
+#' Hence, this is abstracted into an obnoxious private
+#' helper function.
+#' @importFrom fs path_norm path_ext_set file_exists
+#' @importFrom stringr str_detect
+#' @importFrom checkmate assert_file_exists assert_true
+#' @param .config_path The absolute path a `bbi_config.json` file
+#' @return a `bbi_{.model_type}_model` object
+#' @keywords internal
+read_model_from_config <- function(.config_path) {
+  checkmate::assert_true(stringr::str_detect(.config_path, "bbi_config\\.json$"))
+  checkmate::assert_file_exists(.config_path)
+
+  potential_nm_path   <- file.path(.config_path, "..") %>%
+    fs::path_norm() %>%
+    fs::path_ext_set("yaml")
+
+  potential_stan_path <- file.path(.config_path, "..", "..") %>%
+    fs::path_norm() %>%
+    fs::path_ext_set("yaml")
+
+  winner <- names(which(fs::file_exists(c(potential_nm_path, potential_stan_path))))
+
+  if (length(winner) != 1) {
+    dev_error(glue("read_model_from_config() checked {potential_nm_path} and {potential_stan_path} and the following exist: {paste(winner, collapse = ', ')}"))
+  }
+
+  mod <- suppressMessages(
+    read_model(tools::file_path_sans_ext(winner))
+  )
+  return(mod)
 }

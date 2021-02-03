@@ -192,9 +192,7 @@ SUMMARY_LOG_REQ_COLS <- c(
 
 # define json keys to keep as from bbi_config.json
 CONFIG_KEEPERS <- c(
-  CONFIG_MODEL_MD5,
   CONFIG_DATA_PATH,
-  CONFIG_DATA_MD5,
   "bbi_version"
 )
 

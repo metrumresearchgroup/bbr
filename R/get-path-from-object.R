@@ -200,15 +200,27 @@ get_data_path <- function(.mod, ...) {
   UseMethod("get_data_path")
 }
 
-#' @describeIn get_data_path Takes `bbi_nonmem_model` object
+#' @rdname get_data_path
 #' @export
 get_data_path.bbi_nonmem_model <- function(.mod, ...) {
   get_data_path_bbi(.mod)
 }
 
-#' @describeIn get_data_path Takes `bbi_nonmem_summary` object
+#' @rdname get_data_path
 #' @export
 get_data_path.bbi_nonmem_summary <- function(.mod, ...) {
+  get_data_path_bbi(.mod)
+}
+
+#' @rdname get_data_path
+#' @export
+get_data_path.bbi_stan_model <- function(.mod, ...) {
+  get_data_path_bbi(.mod)
+}
+
+#' @rdname get_data_path
+#' @export
+get_data_path.bbi_stan_summary <- function(.mod, ...) {
   get_data_path_bbi(.mod)
 }
 
@@ -353,7 +365,7 @@ get_model_id_bbi <- function(.bbi_object) {
 
 #' @keywords internal
 get_data_path_bbi <- function(.mod) {
-  cfg_path <- file.path(get_output_dir(.mod), "bbi_config.json")
+  cfg_path <- file.path(get_output_dir(.mod, .check_exists = FALSE), "bbi_config.json")
 
   if (!fs::file_exists(cfg_path)) {
     stop(paste(

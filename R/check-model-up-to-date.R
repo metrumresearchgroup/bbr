@@ -26,20 +26,23 @@
 #'   * <run>-standata.json
 #'
 #' @param .mod a `bbi_{.model_type}_model` or `bbi_{.model_type}_summary` object
-#' @param .build_data **Only relevant to Stan models.** If `FALSE`, the default,
-#'   check the hashes of the `-standata.R` and `-standata.json` against the
-#'   hashes in `bbi_config.json`. If `TRUE`, run `-standata.R` and save the
-#'   output to a temp file and check the hash of _the temp file_ against the
-#'   `bbi_config.json` hash. The second option actually runs the code and,
-#'   importantly, verifies that the input data to `-standata.R` has not changed
-#'   either.
+#' @param .build_data **Only relevant to Stan models.** If `TRUE`, the default,
+#'   run `-standata.R` and save the output to a temp file and check the hash of
+#'   _the temp file_ against the `bbi_config.json` hash. This option actually
+#'   runs the code and, importantly, verifies that the input data to
+#'   `-standata.R` has not changed either. If `FALSE`, check the hashes of the
+#'   `-standata.R` and `-standata.json` against the hashes in `bbi_config.json`
+#'   but do _not_ run the `-standata.R` script.
 #' @param ... Arguments passed through (currently none).
 #'
-#' @return `TRUE` if everything is up to date, `FALSE` if anything has changed.
-#'   Will also message the user about files that are out of date.
+#' @return A (named) logical vector of length 2. The first element (named
+#'   `"model"`) refers to the model files mentioned above. The second element
+#'   (named `"data"`) refers to the data files mentioned above. For both
+#'   elements, they will be `TRUE` if nothing has changed, `FALSE` if anything
+#'   has changed.
 #'
 #' @export
-check_model_up_to_date <- function(.mod, .build_data = FALSE, ...) {
+check_model_up_to_date <- function(.mod, .build_data, ...) {
   UseMethod("check_model_up_to_date")
 }
 
@@ -47,7 +50,7 @@ check_model_up_to_date <- function(.mod, .build_data = FALSE, ...) {
 #' @export
 check_model_up_to_date.bbi_nonmem_model <- function(.mod, .build_data = FALSE, ...) {
   if (!isFALSE(.build_data)) {
-    warning("`.build_data` arg in `check_model_up_to_date()` is invalid for NONMEM models. Ignoring passed value.")
+    message("`.build_data` arg in `check_model_up_to_date()` is invalid for NONMEM models. Ignoring passed value.")
   }
   check_model_up_to_date_nonmem(.mod)
 }
@@ -63,14 +66,14 @@ check_model_up_to_date.bbi_nonmem_summary <- function(.mod, .build_data = FALSE,
 
 #' @rdname check_model_up_to_date
 #' @export
-check_model_up_to_date.bbi_stan_model <- function(.mod, .build_data = FALSE, ...) {
-  any(check_model_up_to_date_stan(.mod, .build_data))
+check_model_up_to_date.bbi_stan_model <- function(.mod, .build_data = TRUE, ...) {
+  check_model_up_to_date_stan(.mod, .build_data)
 }
 
 #' @rdname check_model_up_to_date
 #' @export
-check_model_up_to_date.bbi_stan_summary <- function(.mod, .build_data = FALSE, ...) {
-  any(check_model_up_to_date_stan(.mod, .build_data))
+check_model_up_to_date.bbi_stan_summary <- function(.mod, .build_data = TRUE, ...) {
+  check_model_up_to_date_stan(.mod, .build_data)
 }
 
 
@@ -90,10 +93,6 @@ check_model_up_to_date.bbi_stan_summary <- function(.mod, .build_data = FALSE, .
 #'
 #' @inheritParams check_model_up_to_date
 #'
-#' @return A (named) logical vector of length 2. The first element (named
-#'   `"model"`) refers to the control stream. The second element (named
-#'   `"data"`) refers to the data file. For both elements, they will be `TRUE`
-#'   if nothing has changed, `FALSE` if anything has changed.
 #' @keywords internal
 check_model_up_to_date_nonmem <- function(.mod) {
   config_path <- file.path(get_output_dir(.mod, .check_exists = FALSE), "bbi_config.json")
@@ -182,8 +181,20 @@ check_model_up_to_date_stan <- function(.mod, .build_data = FALSE) {
 
   data_r_file <- build_path_from_model(.mod, STANDATA_R_SUFFIX)
   data_json_file <- build_path_from_model(.mod, STANDATA_JSON_SUFFIX)
+  temp_data_name <- as.character(glue("Running {basename(data_r_file)} produces different results"))
   if (isTRUE(.build_data)) {
-    stop("Not implemented")
+    # if building data, run -standata.R and write output to temp file, then check that file
+    temp_data_path <- tempfile()
+    suppressMessages(
+      standata_to_json(.mod, .out_path = temp_data_path)
+    )
+
+    changed_files <- c(
+      changed_files,
+      config[[CONFIG_DATA_MD5]] != tools::md5sum(data_json_file),
+      config[[CONFIG_DATA_MD5]] != tools::md5sum(temp_data_path)
+    )
+    names(changed_files)[length(changed_files)] <- temp_data_name
   } else {
     changed_files <- c(
       changed_files,
@@ -205,7 +216,7 @@ check_model_up_to_date_stan <- function(.mod, .build_data = FALSE) {
   # build return value
   res <- c(
     model = !any(changed_files[c(stan_file, init_file, args_file)]),
-    data = !any(changed_files[c(data_r_file, data_json_file)])
+    data = !any(changed_files[c(data_r_file, data_json_file, temp_data_name)], na.rm = TRUE)
   )
 
   return(res)

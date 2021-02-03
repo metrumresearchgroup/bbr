@@ -22,7 +22,7 @@
 #'    run. For example, if there was a large condition number or a parameter near
 #'    boundary. `TRUE` for a given element indicates that issue was detected.
 #'    `FALSE` can either mean it was not detected or it was not applicable for
-#'    that run.
+#'    that run. See Details in [summary_log()] for explanation of each heuristic.
 #'  * **parameters_data** -- Data about parameter estimates. This can be
 #'    accessed directly, but is much easier to look at with the
 #'    [param_estimates()] function (which parses this, and other related elements,

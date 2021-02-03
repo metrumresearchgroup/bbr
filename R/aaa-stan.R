@@ -17,11 +17,8 @@ STAN_RESERVED_ARGS <- c(
   "output_dir"
 )
 
-STANCFG_DATA_PATH <- "standata_script_path"
 STANCFG_DATA_MD5 <- "standata_script_md5"
-STANCFG_INIT_PATH <- "init_script_path"
 STANCFG_INIT_MD5 <- "init_script_md5"
-STANCFG_ARGS_PATH <- "stanargs_path"
 STANCFG_ARGS_MD5 <- "stanargs_md5"
 
 STAN_BBI_VERSION_STRING <- "STAN"
