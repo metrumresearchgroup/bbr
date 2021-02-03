@@ -25,9 +25,8 @@
 #'
 #'   * `model_md5`: the MD5 sum of the model file
 #'
-#'   * `data_path`: the path to the data file, relative to `absolute_model_path`
-#'
-#'   * `data_md5`: the MD5 sum of the data file
+#'   * `data_path`: the path to the data file, relative to the model's output directory
+#'     (which can be extracted via [get_output_dir()])
 #'
 #'   * `bbi_version`: the version of bbi last used to run the model
 #'
@@ -143,7 +142,8 @@ config_log_entry <- function(path,
   cfg_mod <- read_model_from_config(path)
   config <- jsonlite::fromJSON(path)
 
-  if (!is.null(config[['configuration']][['cmdstanr_version']])) {
+
+  if (inherits(cfg_mod, STAN_MOD_CLASS)) {
     config[['bbi_version']] <- STAN_BBI_VERSION_STRING
   }
 

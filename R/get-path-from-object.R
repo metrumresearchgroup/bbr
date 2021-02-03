@@ -170,7 +170,7 @@ get_data_path <- function(.mod, ...) {
   UseMethod("get_data_path")
 }
 
-#' @describeIn get_data_path Takes `bbi_nonmem_model` object
+#' @rdname get_data_path
 #' @export
 get_data_path.bbi_model <- function(.mod, ...) {
   cfg_path <- file.path(get_output_dir(.mod), "bbi_config.json")
@@ -312,7 +312,6 @@ get_output_dir_nonmem <- function(.bbi_object, .check_exists = TRUE) {
 
   return(.path)
 }
-
 
 #' @keywords internal
 get_stan_path_impl <- function(.bbi_object, .suffix, .check_exists = TRUE) {
