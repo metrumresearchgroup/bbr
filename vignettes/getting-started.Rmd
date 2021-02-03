@@ -42,7 +42,6 @@ MODEL_DIR <- system.file("model", "nonmem", "basic", package = "bbr")
 
 # delete old files
 cleanup <- function() {
-  if (fs::file_exists(file.path(MODEL_DIR, "1.yaml"))) fs::file_delete(file.path(MODEL_DIR, "1.yaml"))
   if (fs::file_exists(file.path(MODEL_DIR, "2.yaml"))) fs::file_delete(file.path(MODEL_DIR, "2.yaml"))
   if (fs::file_exists(file.path(MODEL_DIR, "3.yaml"))) fs::file_delete(file.path(MODEL_DIR, "3.yaml"))
   if (fs::file_exists(file.path(MODEL_DIR, "2.ctl"))) fs::file_delete(file.path(MODEL_DIR, "2.ctl"))
@@ -108,9 +107,13 @@ To begin modeling, first create a model object using `new_model()`. This is an S
 
 The first argument (`.path`) must be the path to your model control stream _without file extension_. For instance, the call below assumes you have a control stream named `1.ctl` or `1.mod` in the directory you just assigned to `MODEL_DIR` above. 
 
-```{r first model}
+```{r first model, eval = FALSE}
 mod1 <- new_model(file.path(MODEL_DIR, 1))
 ```
+```{r first model read from disk, include=FALSE}
+mod1 <- read_model(file.path(MODEL_DIR, 1))
+```
+
 
 This `new_model()` call will also create a `1.yaml` file in that same directory, which stores model metadata like description and tags (discussed below). If you ever need to recreate this model object in memory, just run `mod1 <- read_model(file.path(MODEL_DIR, 1))` to rebuild it from the YAML file on disk. 
 
@@ -146,13 +149,13 @@ See the docs for any of the functions just mentioned for more details on usage a
 
 ### Overwriting output from a previously run model
 
-It is common to run a model, make some tweaks to it, and then run it again. However, to avoid accidentally deleting model outputs, `bbr` will error by default if it sees existing output when trying to submit a model. To automatically overwrite any previous model output, just pass `overwrite = TRUE` to the `.bbi_args` argument described in the previous section. For example:
+It is common to run a model, make some tweaks to it, and then run it again. However, to avoid accidentally deleting model outputs, `bbr` will error by default if it sees existing output when trying to submit a model. To automatically overwrite any previous model output, just pass `.overwrite = TRUE` to `submit_model()`.
 
 ```{r overwrite true, eval = FALSE}
-mod1 %>% submit_model(.bbi_args = list(overwrite = TRUE))
+mod1 %>% submit_model(.overwrite = TRUE)
 ```
 
-You can also change this setting globally by setting `overwrite: true` in the `bbi.yaml` file for your project.
+You can also inherit this setting, either by attaching `overwrite = TRUE` to a model with `add_bbi_args()` or by setting it globally with `overwrite: true` in the `bbi.yaml` file for your project. However, either of these settings will be overridden by directly passing the argument as shown above.
 
 ## Summarize model
 Once the model run has completed, users can get a summary object containing much of the commonly used diagnostic information in a named list.
