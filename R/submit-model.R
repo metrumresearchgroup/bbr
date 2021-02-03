@@ -14,7 +14,12 @@
 #'   global YAML files).
 #' @param .mode Either `"sge"`, the default, to submit model(s) to the grid or
 #'   `"local"` for local execution.
-#' @param ... args passed through to `bbi_exec()`
+#' @param ... args passed through. For `bbi_stan_model` this is how you pass
+#'   arguments through to the `$sample()` method of your `cmdstanr` model
+#'   object. See [cmdstanr::sample()] for valid arguments and details. For
+#'   `bbi_nonmem_model` these are passed to `bbi_exec()`.
+#' @param .overwrite Controls whether or not to overwrite existing model output from
+#'   a previous run. If `NULL`, the default, will defer to setting in `.bbi_args`.
 #' @param .config_path Path to a bbi configuration file. If `NULL`, the
 #'   default, will attempt to use a `bbi.yaml` in the same directory as the
 #'   model.
@@ -30,6 +35,7 @@ submit_model <- function(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
+  .overwrite = NULL,
   .config_path = NULL,
   .wait = TRUE,
   .dry_run=FALSE
@@ -44,6 +50,7 @@ submit_model.bbi_nonmem_model <- function(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
+  .overwrite = NULL,
   .config_path = NULL,
   .wait = TRUE,
   .dry_run=FALSE
@@ -53,12 +60,36 @@ submit_model.bbi_nonmem_model <- function(
                              .bbi_args = .bbi_args,
                              .mode = .mode,
                              ...,
+                             .overwrite = .overwrite,
                              .config_path = .config_path,
                              .wait = .wait,
                              .dry_run = .dry_run)
   return(res)
 }
 
+
+#' @describeIn submit_model Takes a `bbi_stan_model` object. All arguments
+#'   passed through `...` will be passed to [cmdstanr::sample()] method.
+#' @export
+submit_model.bbi_stan_model <- function(
+  .mod,
+  .bbi_args = NULL,
+  .mode = c("local"),
+  ...,
+  .overwrite = NULL,
+  .config_path = NULL,
+  .wait = TRUE,
+  .dry_run=FALSE
+) {
+
+  res <- submit_stan_model_cmdstanr(
+    .mod,
+    .mode = .mode,
+    ...,
+    .overwrite = .overwrite,
+  )
+  return(res)
+}
 
 #####################################
 # Private implementation function(s)
@@ -70,12 +101,14 @@ submit_model.bbi_nonmem_model <- function(
 #' @param .mod An S3 object of class `bbi_nonmem_model`, for example from `new_model()`, `read_model()` or `copy_model_from()`
 #' @importFrom stringr str_detect
 #' @importFrom tools file_path_sans_ext
+#' @importFrom checkmate assert_logical
 #' @return An S3 object of class `bbi_process`
 #' @keywords internal
 submit_nonmem_model <- function(.mod,
                                 .bbi_args = NULL,
                                 .mode = c("sge", "local"),
                                 ...,
+                                .overwrite = NULL,
                                 .config_path = NULL,
                                 .wait = TRUE,
                                 .dry_run=FALSE) {
@@ -88,6 +121,11 @@ submit_nonmem_model <- function(.mod,
 
   # build command line args
   .bbi_args <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])
+  if (!is.null(.overwrite)) {
+    ##### TODO: Should add a unit test for `.overwrite = TRUE` in NONMEM runs
+    checkmate::assert_logical(.overwrite)
+    .bbi_args[["overwrite"]] <- .overwrite
+  }
   args_vec <- check_bbi_args(.bbi_args)
   cmd_args <- c("nonmem", "run", .mode, get_model_path(.mod), args_vec)
 
@@ -123,10 +161,10 @@ submit_nonmem_model <- function(.mod,
 #' @keywords internal
 submit_stan_model_cmdstanr <- function(.mod,
                                 #.bbi_args = NULL,
-                                .overwrite = FALSE, ######## HOW TO DO THIS? currently passed through .bbi_args but that feels weird...
                                 #.mode = c("sge", "local"),
                                 .mode = c("local"), ###### FOR DEV
                                 ...,
+                                .overwrite = NULL,
                                 #.config_path = NULL, ### NOT CLEAR THAT WE CAN USE THIS... but maybe for stuff like overwrite
                                 .wait = TRUE,
                                 .dry_run=FALSE) {

@@ -282,7 +282,7 @@ import_stan_init <- function(.mod, .standata) {
 
 #' Parse args to be passed to cmdstanr
 #'
-#' Any arguments destined for `cmdstanr::sample()` will be passed in
+#' Any arguments destined for [cmdstanr::sample()] will be passed in
 #' via `...`. This function checks that those are valid and then writes
 #' the resulting list of args to a file for reproducibility checking.
 #'
@@ -291,7 +291,7 @@ import_stan_init <- function(.mod, .standata) {
 #'
 #' @param .mod the `bbi_stan_model` object
 #' @param .valid_stanargs A character vector of valid arguments to pass
-#'   through to `cmdstanr::sample()`
+#'   through to [cmdstanr::sample()]
 #' @param ... The arguments to capture and check
 #'
 #' @return the named list of parsed and checked args
