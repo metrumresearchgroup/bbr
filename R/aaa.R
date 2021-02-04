@@ -151,7 +151,7 @@ PARAM_COUNT_COL <- "param_count"
 DETAILS_ELEMENTS <- c(
   "estimation_method",
   "problem_text",
-  "number_of_patients",
+  "number_of_subjects",
   "number_of_obs"
 )
 

@@ -111,7 +111,7 @@ sum_df %>%
     param_count, 
     estimation_method, 
     problem_text, 
-    number_of_patients, 
+    number_of_subjects, 
     number_of_obs, 
     condition_number
   )
