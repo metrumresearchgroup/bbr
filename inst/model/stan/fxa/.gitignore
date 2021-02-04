@@ -1,1 +1,2 @@
 fxa # ignore model binary
+fxa-output/*csv
