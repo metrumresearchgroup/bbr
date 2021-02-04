@@ -4,6 +4,9 @@
 \alias{check_output_dir}
 \alias{check_output_dir.character}
 \alias{check_output_dir.bbi_nonmem_model}
+\alias{check_output_dir.bbi_nonmem_summary}
+\alias{check_output_dir.bbi_stan_model}
+\alias{check_output_dir.bbi_stan_summary}
 \title{Check output directory}
 \usage{
 check_output_dir(.mod, ...)
@@ -11,6 +14,12 @@ check_output_dir(.mod, ...)
 \method{check_output_dir}{character}(.mod, ...)
 
 \method{check_output_dir}{bbi_nonmem_model}(.mod, ...)
+
+\method{check_output_dir}{bbi_nonmem_summary}(.mod, ...)
+
+\method{check_output_dir}{bbi_stan_model}(.mod, ...)
+
+\method{check_output_dir}{bbi_stan_summary}(.mod, ...)
 }
 \arguments{
 \item{.mod}{Either a \verb{bbi_\{.model_type\}_model} object or a file path to an output directory}
@@ -24,6 +33,12 @@ List files in the output directory to glance at where the process is
 \itemize{
 \item \code{character}: Takes a file path to the output directory.
 
-\item \code{bbi_nonmem_model}: Takes a \verb{bbi_\{.model_type\}_model} object.
+\item \code{bbi_nonmem_model}: Takes a \code{bbi_nonmem_model} object.
+
+\item \code{bbi_nonmem_summary}: Takes a \code{bbi_nonmem_summary} object.
+
+\item \code{bbi_stan_model}: Takes a \code{bbi_stan_model} object.
+
+\item \code{bbi_stan_summary}: Takes a \code{bbi_stan_summary} object.
 }}
 

@@ -3,6 +3,7 @@
 \name{submit_model}
 \alias{submit_model}
 \alias{submit_model.bbi_nonmem_model}
+\alias{submit_model.bbi_stan_model}
 \title{Submit a model to be run}
 \usage{
 submit_model(
@@ -10,6 +11,7 @@ submit_model(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
+  .overwrite = NULL,
   .config_path = NULL,
   .wait = TRUE,
   .dry_run = FALSE
@@ -20,6 +22,18 @@ submit_model(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
+  .overwrite = NULL,
+  .config_path = NULL,
+  .wait = TRUE,
+  .dry_run = FALSE
+)
+
+\method{submit_model}{bbi_stan_model}(
+  .mod,
+  .bbi_args = NULL,
+  .mode = c("local"),
+  ...,
+  .overwrite = NULL,
   .config_path = NULL,
   .wait = TRUE,
   .dry_run = FALSE
@@ -36,7 +50,13 @@ global YAML files).}
 \item{.mode}{Either \code{"sge"}, the default, to submit model(s) to the grid or
 \code{"local"} for local execution.}
 
-\item{...}{args passed through to \code{bbi_exec()}}
+\item{...}{args passed through. For \code{bbi_stan_model} this is how you pass
+arguments through to the \verb{$sample()} method of your \code{cmdstanr} model
+object. See \code{\link[cmdstanr:model-method-sample]{cmdstanr::sample()}} for valid arguments and details. For
+\code{bbi_nonmem_model} these are passed to \code{bbi_exec()}.}
+
+\item{.overwrite}{Controls whether or not to overwrite existing model output from
+a previous run. If \code{NULL}, the default, will defer to setting in \code{.bbi_args}.}
 
 \item{.config_path}{Path to a bbi configuration file. If \code{NULL}, the
 default, will attempt to use a \code{bbi.yaml} in the same directory as the
@@ -56,6 +76,9 @@ Submits a model to be run by calling out to \code{bbi}.
 \section{Methods (by class)}{
 \itemize{
 \item \code{bbi_nonmem_model}: Takes a \code{bbi_nonmem_model} object.
+
+\item \code{bbi_stan_model}: Takes a \code{bbi_stan_model} object. All arguments
+passed through \code{...} will be passed to \code{\link[cmdstanr:model-method-sample]{cmdstanr::sample()}} method.
 }}
 
 \seealso{

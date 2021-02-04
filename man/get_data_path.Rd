@@ -4,6 +4,8 @@
 \alias{get_data_path}
 \alias{get_data_path.bbi_nonmem_model}
 \alias{get_data_path.bbi_nonmem_summary}
+\alias{get_data_path.bbi_stan_model}
+\alias{get_data_path.bbi_stan_summary}
 \title{Get path to data file}
 \usage{
 get_data_path(.mod, ...)
@@ -11,6 +13,10 @@ get_data_path(.mod, ...)
 \method{get_data_path}{bbi_nonmem_model}(.mod, ...)
 
 \method{get_data_path}{bbi_nonmem_summary}(.mod, ...)
+
+\method{get_data_path}{bbi_stan_model}(.mod, ...)
+
+\method{get_data_path}{bbi_stan_summary}(.mod, ...)
 }
 \arguments{
 \item{.mod}{Model to use, either a \verb{bbi_\{.model_type\}_model} or
@@ -28,10 +34,3 @@ Helper to extract the path to the input data from a \code{bbi_nonmem_summary} or
 have been successfully run} because the path to the data is constructed
 during model submission.
 }
-\section{Methods (by class)}{
-\itemize{
-\item \code{bbi_nonmem_model}: Takes \code{bbi_nonmem_model} object
-
-\item \code{bbi_nonmem_summary}: Takes \code{bbi_nonmem_summary} object
-}}
-

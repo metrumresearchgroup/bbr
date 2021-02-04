@@ -37,7 +37,7 @@ more.
 run. For example, if there was a large condition number or a parameter near
 boundary. \code{TRUE} for a given element indicates that issue was detected.
 \code{FALSE} can either mean it was not detected or it was not applicable for
-that run.
+that run. See Details in \code{\link[=summary_log]{summary_log()}} for explanation of each heuristic.
 \item \strong{parameters_data} -- Data about parameter estimates. This can be
 accessed directly, but is much easier to look at with the
 \code{\link[=param_estimates]{param_estimates()}} function (which parses this, and other related elements,
