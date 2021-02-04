@@ -1,15 +1,11 @@
 {
   "output_dir": "/data/home/sethg/bbr/inst/model/stan/fxa/fxa-output",
-  "model_path": "/data/home/sethg/bbr/inst/model/stan/fxa/fxa.stan",
+  "data_path": "../fxa-standata.json",
   "model_md5": "5bbcd2ebfce97ac444a69d58fb8efda3",
-  "data_path": "/data/home/sethg/bbr/inst/model/stan/fxa/fxa-standata.json",
   "data_md5": "9624005a9870a0e38484fff0586a394d",
-  "standata_script_path": "/data/home/sethg/bbr/inst/model/stan/fxa/fxa-standata.R",
   "standata_script_md5": "563b5363c65a633b3c6294b50d43319e",
-  "init_script_path": "/data/home/sethg/bbr/inst/model/stan/fxa/fxa-init.R",
   "init_script_md5": "5fcd8b4e52341e9330e52e50a9dcba5d",
-  "stanargs_path": "/data/home/sethg/bbr/inst/model/stan/fxa/fxa-init.R",
-  "stanargs_md5": "5fcd8b4e52341e9330e52e50a9dcba5d",
+  "stanargs_md5": "db6c3c3f74af829f827f66dd5edb18ac",
   "configuration": {
     "cmdstan_version": "2.26.0",
     "cmdstanr_version": "0.3.0"
