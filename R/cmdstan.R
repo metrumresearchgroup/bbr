@@ -323,14 +323,21 @@ parse_stanargs <- function(.mod, valid_stanargs, ...) {
   return(stanargs)
 }
 
-#' Private helper to compile a stan model and save a gitignore that ignores the binary
+#' Private helper to compile a stan model and save a gitignore that ignores the
+#' binary and posterior csv's
 compile_stanmod <- function(.mod) {
   # compile model
   stanmod <- cmdstanr::cmdstan_model(build_path_from_model(.mod, STANMOD_SUFFIX))
 
   # add to gitignore, if not already present
   gitignore <- file.path(get_absolute_model_path(.mod), ".gitignore")
-  ignore_string <- paste(get_model_id(.mod), "# ignore model binary")
+  ignore_string <- paste(
+    "# ignore model binary",
+    get_model_id(.mod), "",
+    "# ignore csv posterior output",
+    as.character(glue("{get_model_id(.mod)}-output/*csv")),
+    sep = "\n"
+  )
   if (!fs::file_exists(gitignore)) {
     readr::write_lines(ignore_string, gitignore)
   } else {
