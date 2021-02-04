@@ -273,6 +273,27 @@ print_bbi_args <- function() {
 }
 
 
+#' Check what operating system R is running on
+#' @return String, either "linux", "darwin", "windows"
+#' @importFrom xfun is_macos is_windows is_linux
+#' @keywords internal
+check_os <- function() {
+  if (is_linux()) {
+    return("linux")
+  } else if (is_macos()) {
+    return("darwin")
+  } else if (is_windows()) {
+    return("windows")
+  } else {
+    dev_error("`xfun` failed to determine operating system.")
+  }
+}
+
+
+##################################
+# CHECKING MODEL CLASSES AND KEYS
+##################################
+
 check_required_keys <- function(.list, .req) {
   all(.req %in% names(.list))
 }

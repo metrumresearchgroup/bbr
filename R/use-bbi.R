@@ -12,15 +12,13 @@
 #' @export
 use_bbi <- function(.dir = "/data/apps", .version = "latest", .force = FALSE, .quiet = FALSE){
 
-  os <- c('linux','darwin','mingw')
+  this_os <- check_os()
 
   header <- glue::glue(
-    'Installing bbi on a {cli::col_red(R.version$os)} system',
+    'Installing bbi on a {this_os} system',
     cli::rule(),.sep = '\n')
 
   footer <- ' '
-
-  this_os <- os[sapply(os,grepl,x=R.version$os)]
 
   if(.version == "latest") {
     .bbi_url <- current_release(owner = 'metrumresearchgroup', repo = 'bbi', os = this_os)
