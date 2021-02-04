@@ -36,12 +36,12 @@ in the user's \verb{$PATH}. If one is found, ask the user if they wish to
 overwrite it and, if they confirm, install to that path.
 \item Third, attempt to install to a "default location" and add this location to
 the user's \verb{$PATH}. If \code{Sys.getenv("XDG_DATA_HOME")} is found, install to
-\code{{Sys.getenv("XDG_DATA_HOME")}/bbi/bbi}. Otherwise, install to OS dependent
-defaults:
+\code{{Sys.getenv("XDG_DATA_HOME")}/bbi/bbi} (per \href{https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html}{XGD specification}).
+Otherwise, install to OS dependent defaults:
 \itemize{
 \item Linux: \code{{Sys.getenv("HOME")}/.local/share/bbi/bbi}
 \item Mac: \verb{\{Sys.getenv("HOME")\}/Library/Application Support/bbi/bbi}
-\item Windows: \code{{Sys.getenv("APPDATA")}/bbi/bbi}
+\item Windows: \verb{\{Sys.getenv("APPDATA")\}\\bbi\\bbi}
 }
 }
 

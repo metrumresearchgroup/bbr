@@ -45,6 +45,7 @@ Imports:
     tibble,
     tidyr,
     tidyselect (>= 1.0.0),
+    xfun,
     yaml
 Suggests: 
     covr,

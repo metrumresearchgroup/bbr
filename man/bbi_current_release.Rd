@@ -4,10 +4,7 @@
 \alias{bbi_current_release}
 \title{Get version number of bbi current release}
 \usage{
-bbi_current_release(os = "linux")
-}
-\arguments{
-\item{os}{operating system, Default: \code{'linux'}}
+bbi_current_release()
 }
 \description{
 Helper function to get version number of most recent release of bbi from GitHub.
