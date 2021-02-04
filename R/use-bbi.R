@@ -1,51 +1,68 @@
 #' @title Installs most current release of bbi
-#' @description Identifies system running and pulls the relevant tarball for the current release of bbi from GitHub,
-#' and then installs it in the directory passed to `.dir`.
-#' If used in an interactive session, will open an installation menu confirming the installed version.
-#' @importFrom glue glue glue_collapse
+#' @description Identifies system running and pulls the relevant tarball for the
+#'   current release of bbi from GitHub, and then installs it in the directory
+#'   passed to `.dir`. If used in an interactive session, will open an
+#'   installation menu confirming the installed version.
+#'
+#' @details If nothing is passed to the `.path` argument, `use_bbi()` will
+#' attempt to find a valid path for installation. The following decision
+#' waterfall is used:
+#'
+#' * First, check `getOption("bbr.bbi_exe_path")`. If this is anything _other
+#' than_ `"bbi"` (the default value) then attempt to install to that path.
+#'
+#' * Second, check `Sys.which("bbi")` which will look for a `bbi` installation
+#' in the user's `$PATH`. If one is found, ask the user if they wish to
+#' overwrite it and, if they confirm, install to that path.
+#'
+#' * Third, attempt to install to a "default location" and add this location to
+#' the user's `$PATH`. If `Sys.getenv("XDG_DATA_HOME")` is found, install to
+#' `{Sys.getenv("XDG_DATA_HOME")}/bbi/bbi` (per [XGD
+#' specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)).
+#' Otherwise, install to OS dependent defaults:
+#'
+#'   * Linux: `{Sys.getenv("HOME")}/.local/share/bbi/bbi`
+#'
+#'   * Mac: `{Sys.getenv("HOME")}/Library/Application Support/bbi/bbi`
+#'
+#'   * Windows: `{Sys.getenv("APPDATA")}\bbi\bbi`
+#'
+#' If none of these are successful, the user will be prompted to set
+#' `options("bbr.bbi_exe_path")` and try again.
+#'
+#' @importFrom glue glue_collapse
 #' @importFrom cli rule
-#' @param .dir directory to install bbi to on linux
+#'
+#' @param .path absolute path to install bbi to. See Details section for defaults, if nothing is passed.
 #' @param .version version of bbi to install. Must pass a character scalar corresponding to a tag found in `https://github.com/metrumresearchgroup/bbi/releases`
 #' @param .force If `FALSE`, the default, skips installation if requested version and local version are the same. If `TRUE` forces installation if it will be the same version.
 #' @param .quiet If `TRUE`, suppresses output printed to the console. `FALSE` by default.
 #' @return character
 #' @export
-use_bbi <- function(.dir = "/data/apps", .version = "latest", .force = FALSE, .quiet = FALSE){
+use_bbi <- function(.path = NULL, .version = "latest", .force = FALSE, .quiet = FALSE){
 
   this_os <- check_os()
 
-  header <- glue::glue(
-    'Installing bbi on a {this_os} system',
-    cli::rule(),.sep = '\n')
+  header <- glue::glue('Installing bbi on a {this_os} system',
+                       cli::rule(), .sep = '\n')
 
   footer <- ' '
 
-  if(.version == "latest") {
-    .bbi_url <- current_release(owner = 'metrumresearchgroup', repo = 'bbi', os = this_os)
-  } else {
-    if (this_os == "linux") {
-      .bbi_url <- as.character(glue("https://github.com/metrumresearchgroup/bbi/releases/download/{.version}/bbi_linux_amd64.tar.gz"))
-    } else {
-      warning(glue("User passed `.version = {.version}` and but this argument is only valid on Linux and current OS is {this_os}. Latest version of bbi will be installed."))
-    }
+  if (is.null(.path)) {
+    .path <- build_bbi_install_path()
   }
 
-  body <-  switch(this_os,
-                  'darwin'  = {
-                    c('brew tap metrumresearchgroup/homebrew-tap',
-                      'brew install bbi')
+  if(.version == "latest") {
+    .bbi_url <- current_release(owner = 'metrumresearchgroup', repo = 'bbi')
+  } else {
+    .bbi_url <- as.character(glue("https://github.com/metrumresearchgroup/bbi/releases/download/{.version}/bbi_{this_os}_amd64.tar.gz"))
+  }
 
-                  },
-                  'linux' = {
-                    linux_install_commands(.dir = .dir, .bbi_url = .bbi_url)
-                  },
-                  {
-                    c('browse to: https://github.com/metrumresearchgroup/bbi#getting-started')
-                  })
+  body <-  build_bbi_install_commands(.path, .bbi_url)
 
-  glue_this <- c(header,body,footer)
+  glue_this <- c(header, body, footer)
 
-  on.exit(install_menu(body, this_os, .dir, .version, .force, .quiet), add = TRUE)
+  on.exit(install_menu(body, .path, .version, .force, .quiet), add = TRUE)
 
   if(isFALSE(.quiet)) print(glue::glue_collapse(glue_this, sep = '\n'))
 
@@ -58,9 +75,10 @@ use_bbi <- function(.dir = "/data/apps", .version = "latest", .force = FALSE, .q
 #' @importFrom utils download.file
 #' @param owner Repository owner/organization
 #' @param repo Repository name
-#' @param os Operating system user intends to install on
 #' @keywords internal
-current_release <- function(owner = 'metrumresearchgroup', repo = 'bbi', os = c('linux','darwin','windows')){
+current_release <- function(owner = 'metrumresearchgroup', repo = 'bbi'){
+
+  os <- check_os()
 
   tmp <- tempfile(fileext = '.json')
 
@@ -90,24 +108,24 @@ current_release <- function(owner = 'metrumresearchgroup', repo = 'bbi', os = c(
 
 #' @title Get version number of bbi current release
 #' @description Helper function to get version number of most recent release of bbi from GitHub.
-#' @param os operating system, Default: `'linux'`
 #' @importFrom stringr str_replace
 #' @export
-bbi_current_release <- function(os = "linux"){
-  str_replace(basename(dirname(current_release(owner = 'metrumresearchgroup', repo = 'bbi', os = os))), '^v', '')
+bbi_current_release <- function(){
+  str_replace(basename(dirname(
+    current_release(owner = 'metrumresearchgroup', repo = 'bbi')
+  )), '^v', '')
 }
 
 #' Private implementation function for installing bbi with interactive menu
 #' @param .body Character vector of installation commands to run with `system`
-#' @param .this_os Character scalar of OS
-#' @param .dir directory to install bbi to
+#' @param .path path to install bbi to
 #' @param .version version of bbi to install. Must pass a character scalar corresponding to a tag found in `https://github.com/metrumresearchgroup/bbi/releases`
 #' @param .force If `FALSE`, the default, skips installation if requested version and local version are the same. If `TRUE` forces installation if it will be the same version.
 #' @param .quiet If `TRUE`, suppresses output printed to the console. `FALSE` by default.
 #' @keywords internal
-install_menu <- function(.body, .this_os, .dir, .version, .force, .quiet){
+install_menu <- function(.body, .path, .version, .force, .quiet){
 
-  .dest_bbi_path <- normalizePath(file.path(.dir, "bbi"), mustWork = FALSE)
+  .dest_bbi_path <- normalizePath(.path, mustWork = FALSE)
   local_v <- bbi_version(.dest_bbi_path)
 
   if (.version == 'latest') {
@@ -116,51 +134,122 @@ install_menu <- function(.body, .this_os, .dir, .version, .force, .quiet){
     release_v <- .version
   }
 
-  if(!identical(release_v,local_v) || isTRUE(.force)){
+  if(!identical(release_v, local_v) || isTRUE(.force)){
 
-    if(.this_os%in%c('linux','darwin')){
+    # suppressing interactivity will allow for suppression in unit tests. This may be more general to name
+    # like specifiying its a test environment, but a user could also want to generally suppress interactivity for
+    # automatted build pipelines etc.
+    if (interactive() && is.null(getOption('bbr.suppress_interactivity'))) {
+      version_message(local_v = local_v, release_v = release_v)
 
-      # suppressing interactivity will allow for suppression in unit tests. This may be more general to name
-      # like specifiying its a test environment, but a user could also want to generally suppress interactivity for
-      # automatted build pipelines etc.
-      if (interactive() && is.null(getOption('bbr.suppress_interactivity'))) {
-        version_message(local_v = local_v, release_v = release_v)
+      print(glue::glue(cli::rule(left = cli::col_red('Do you want to install version {release_v} at {.dest_bbi_path}?'),line = 2)))
 
-        print(glue::glue(cli::rule(left = cli::col_red('Do you want to install version {release_v}?'),line = 2)))
-
-        if(utils::menu(choices = c('Yes','No'))==1){
-          map(.body, ~ system(.x, ignore.stdout = .quiet, ignore.stderr = .quiet))
-          local_v <- bbi_version(.dest_bbi_path)
-        }
-      } else {
+      if(utils::menu(choices = c('Yes','No'))==1){
         map(.body, ~ system(.x, ignore.stdout = .quiet, ignore.stderr = .quiet))
+        local_v <- bbi_version(.dest_bbi_path)
       }
-
+    } else {
+      map(.body, ~ system(.x, ignore.stdout = .quiet, ignore.stderr = .quiet))
     }
 
   }
 
+  add_bbi_to_path(.dest_bbi_path)
   version_message(local_v = local_v, release_v = release_v)
 }
 
 
-#' Private helper function for building commands to install bbi on Linux
-#' @param .dir Directory to install into
-#' @param .bbi_url Full url to download tarball from
+#' Build default path to install bbi to
 #' @keywords internal
-linux_install_commands <- function(.dir, .bbi_url) {
+build_bbi_install_path <- function() {
+  os <- check_os()
 
-  bbi_loc <- normalizePath(file.path(.dir, "bbi"), mustWork = FALSE)
+  # first check options
+  bbi_path <- getOption("bbr.bbi_exe_path")
+  if (!is.null(bbi_path) && bbi_path != BBI_DEFAULT_PATH) {
+    message(glue("Found options('bbr.bbi_exe_path' = '{bbi_path}')"))
+    return(bbi_path)
+  }
 
-  cmd_vec <- c(
-    glue::glue('wget {.bbi_url} -O /tmp/bbi.tar.gz  --timeout=15 --tries=2'),
-    'tar -xzf /tmp/bbi.tar.gz -C /tmp --overwrite',
-    glue::glue('mkdir -p {.dir}'),
-    glue::glue('mv /tmp/bbi_linux_amd64/bbi {bbi_loc}'),
-    glue::glue('chmod +x {bbi_loc}')
+  # next check which bbi to see if in PATH already
+  bbi_path <- Sys.which(BBI_DEFAULT_PATH)
+  if (bbi_path != "") {
+    message(glue("Found '{bbi_path}' in $PATH with Sys.which('{BBI_DEFAULT_PATH}')"))
+    return(bbi_path)
+  }
+
+  # next look for XDG dir
+  xdg_path_home <- Sys.getenv("XDG_DATA_HOME")
+  if (xdg_path_home != "") {
+    message(glue("Found '{xdg_path_home}' in $XDG_DATA_HOME')"))
+    return(file.path(xdg_path_home, "bbi", "bbi"))
+  }
+
+  # finally try for a default path
+  bbi_path <- switch(
+    os,
+    "linux" = {
+      home_dir <- Sys.getenv("HOME")
+      if (home_dir == "") dev_error("build_bbi_install_path() can't find $HOME")
+      file.path(home_dir, ".local", "share", "bbi", "bbi")
+    },
+    "darwin" = {
+      home_dir <- Sys.getenv("HOME")
+      if (home_dir == "") dev_error("build_bbi_install_path() can't find $HOME")
+      file.path(home_dir, "Library", "Application\ Support", "bbi", "bbi")
+    },
+    "windows" = {
+      app_dir <- Sys.getenv("APPDATA")
+      if (app_dir == "") dev_error("build_bbi_install_path() can't find $APPDATA")
+      file.path(app_dir, "bbi", "bbi")
+    },
+    {
+      dev_error(glue("build_bbi_install_path() got invalid operating system: {os}"))
+    }
   )
 
-  return(cmd_vec)
+  message(glue("Attempting to install bbi to default path: {bbi_path}"))
+  return(bbi_path)
+}
+
+#' Private helper function for building commands to install bbi on Linux or Unix
+#' @param .path Absolute path to install bbi to
+#' @param .bbi_url Full url to download tarball from
+#'
+#' @importFrom checkmate assert_string
+#' @importFrom fs is_absolute_path dir_exists dir_create
+#'
+#' @keywords internal
+build_bbi_install_commands <- function(.path, .bbi_url) {
+  checkmate::assert_string(.path)
+  if (!fs::is_absolute_path(.path)) {
+    stop(glue("Must pass an absolute path but got: `{.path}`"), call. = FALSE)
+  }
+
+  install_dir <- dirname(.path)
+  if (!fs::dir_exists(install_dir)) fs::dir_create(install_dir)
+
+  if (check_os() == "windows") {
+    stop("WINDOWS NOT IMPLEMENTED")
+  } else {
+    bbi_commands <- cli_install_commands(.path, .bbi_url)
+  }
+  return(bbi_commands)
+}
+
+
+#' Private helper function for building commands to install bbi on Linux or Unix
+#' @inheritParams build_bbi_install_commands
+#' @importFrom stringr str_replace
+#' @keywords internal
+cli_install_commands <- function(.path, .bbi_url) {
+  tar_basename <- stringr::str_replace(basename(.bbi_url), "\\..+$", "")
+  return(c(
+    glue('wget {.bbi_url} -O /tmp/bbi.tar.gz  --timeout=15 --tries=2'),
+    'tar -xzf /tmp/bbi.tar.gz -C /tmp --overwrite',
+    glue('mv /tmp/{tar_basename}/bbi {.path}'),
+    glue('chmod +x {.path}')
+  ))
 }
 
 
@@ -197,6 +286,24 @@ bbi_version <- function(.bbi_exe_path = getOption('bbr.bbi_exe_path')){
   )
 }
 
+#' Private helper to add bbi to $PATH
+#' @param .dest_bbi_path absolute path to bbi (`dirname(.dest_bbi_path)` will be added to the `$PATH`)
+#' @keywords internal
+add_bbi_to_path <- function(.dest_bbi_path) {
+
+  old_path <- Sys.getenv("PATH")
+  new_dir <- dirname(.dest_bbi_path)
+
+  if (check_os() == "windows") {
+    .sep = ";"
+  } else {
+    .sep = ":"
+  }
+
+  Sys.setenv(PATH = paste(new_dir, old_path, sep = .sep))
+  cli::cli_alert(glue("{new_dir} added to $PATH"))
+}
+
 #' Private helper to construct version comparison message
 #' @importFrom cli rule col_blue col_red
 #' @importFrom glue glue
@@ -216,3 +323,4 @@ version_message <- function(local_v, release_v){
 
   cat(glue::glue(cli::col_blue(' - Current release: {release_v}\n')))
 }
+

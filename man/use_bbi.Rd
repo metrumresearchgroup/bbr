@@ -4,15 +4,10 @@
 \alias{use_bbi}
 \title{Installs most current release of bbi}
 \usage{
-use_bbi(
-  .dir = "/data/apps",
-  .version = "latest",
-  .force = FALSE,
-  .quiet = FALSE
-)
+use_bbi(.path = NULL, .version = "latest", .force = FALSE, .quiet = FALSE)
 }
 \arguments{
-\item{.dir}{directory to install bbi to on linux}
+\item{.path}{absolute path to install bbi to. See Details section for defaults, if nothing is passed.}
 
 \item{.version}{version of bbi to install. Must pass a character scalar corresponding to a tag found in \verb{https://github.com/metrumresearchgroup/bbi/releases}}
 
@@ -24,7 +19,32 @@ use_bbi(
 character
 }
 \description{
-Identifies system running and pulls the relevant tarball for the current release of bbi from GitHub,
-and then installs it in the directory passed to \code{.dir}.
-If used in an interactive session, will open an installation menu confirming the installed version.
+Identifies system running and pulls the relevant tarball for the
+current release of bbi from GitHub, and then installs it in the directory
+passed to \code{.dir}. If used in an interactive session, will open an
+installation menu confirming the installed version.
+}
+\details{
+If nothing is passed to the \code{.path} argument, \code{use_bbi()} will
+attempt to find a valid path for installation. The following decision
+waterfall is used:
+\itemize{
+\item First, check \code{getOption("bbr.bbi_exe_path")}. If this is anything \emph{other
+than} \code{"bbi"} (the default value) then attempt to install to that path.
+\item Second, check \code{Sys.which("bbi")} which will look for a \code{bbi} installation
+in the user's \verb{$PATH}. If one is found, ask the user if they wish to
+overwrite it and, if they confirm, install to that path.
+\item Third, attempt to install to a "default location" and add this location to
+the user's \verb{$PATH}. If \code{Sys.getenv("XDG_DATA_HOME")} is found, install to
+\code{{Sys.getenv("XDG_DATA_HOME")}/bbi/bbi}. Otherwise, install to OS dependent
+defaults:
+\itemize{
+\item Linux: \code{{Sys.getenv("HOME")}/.local/share/bbi/bbi}
+\item Mac: \verb{\{Sys.getenv("HOME")\}/Library/Application Support/bbi/bbi}
+\item Windows: \code{{Sys.getenv("APPDATA")}/bbi/bbi}
+}
+}
+
+If none of these are successful, the user will be prompted to set
+\code{options("bbr.bbi_exe_path")} and try again.
 }
