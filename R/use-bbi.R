@@ -230,7 +230,8 @@ build_bbi_install_commands <- function(.path, .bbi_url) {
   if (!fs::dir_exists(install_dir)) fs::dir_create(install_dir)
 
   if (check_os() == "windows") {
-    stop("WINDOWS NOT IMPLEMENTED")
+    warning("WINDOWS NOT TESTED YET")
+    bbi_commands <- windows_install_commands(.path, .bbi_url)
   } else {
     bbi_commands <- nx_install_commands(.path, .bbi_url)
   }
@@ -252,6 +253,43 @@ nx_install_commands <- function(.path, .bbi_url) {
     glue('rm -rf /tmp/{tar_basename}'),
     'tar -xzf /tmp/bbi.tar.gz -C /tmp/',
     glue('mv /tmp/{tar_basename}/bbi {.path}'),
+    glue('chmod +x {.path}')
+  ))
+}
+
+#' Private helper function for building commands to install bbi on Windows
+#'
+#' THIS HAS NOT BEEN TESTED!!! Honestly, I have not idea if the file.path()
+#' will work or not, but passing backslashes around in strings in R is
+#' generally very shaky ground.
+#' @inheritParams build_bbi_install_commands
+#' @importFrom stringr str_replace
+#' @keywords internal
+windows_install_commands <- function(.path, .bbi_url) {
+  # check for wget, these people claim it's possible:
+  # https://builtvisible.com/download-your-website-with-wget/
+  if (Sys.which("wget") == "") {
+    stop("Must install `wget` to install with use_bbi() on Windows", call. = FALSE)
+  }
+  # same for tar
+  # https://wiki.haskell.org/How_to_unpack_a_tar_file_in_Windows
+  if (Sys.which("tar") == "") {
+    stop("Must install `tar` to install with use_bbi() on Windows", call. = FALSE)
+  }
+
+  # extract dir name that tar will unzip to
+  tar_basename <- stringr::str_replace(basename(.bbi_url), "\\..+$", "")
+
+  # construct commands
+  # WE USE ONLY THE install_dir, because I can't get a straight answer about Windows temp dirs
+  temp_dir <- file.path(dirname(.path), "TEMP")
+
+  return(c(
+    glue('wget {.bbi_url} -O {file.path(temp_dir, "bbi.tar.gz")}  --timeout=15 --tries=2'),
+    glue('rm -rf {file.path(temp_dir, tar_basename)}'),
+    glue('tar -xzf {file.path(temp_dir, "bbi.tar.gz")} -C {temp_dir}'),
+    glue('mv {file.path(temp_dir, tar_basename, "bbi")} {.path}'),
+    glue('rm -rf {temp_dir}'),
     glue('chmod +x {.path}')
   ))
 }
