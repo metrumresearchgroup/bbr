@@ -23,7 +23,7 @@
 #'
 #'   * Linux: `{Sys.getenv("HOME")}/.local/share/bbi/bbi`
 #'
-#'   * Mac: `{Sys.getenv("HOME")}/Library/Application Support/bbi/bbi`
+#'   * Mac: `/usr/local/bin/bbi`
 #'
 #'   * Windows: `{Sys.getenv("APPDATA")}\bbi\bbi`
 #'
@@ -154,7 +154,7 @@ install_menu <- function(.body, .path, .version, .force, .quiet){
 
   }
 
-  add_bbi_to_path(.dest_bbi_path)
+  add_to_path_message(.dest_bbi_path)
   version_message(local_v = local_v, release_v = release_v)
 }
 
@@ -196,7 +196,7 @@ build_bbi_install_path <- function() {
     "darwin" = {
       home_dir <- Sys.getenv("HOME")
       if (home_dir == "") dev_error("build_bbi_install_path() can't find $HOME")
-      file.path(home_dir, "Library", "Application\ Support", "bbi", "bbi")
+      "/usr/local/bin/bbi"
     },
     "windows" = {
       app_dir <- Sys.getenv("APPDATA")
@@ -232,7 +232,7 @@ build_bbi_install_commands <- function(.path, .bbi_url) {
   if (check_os() == "windows") {
     stop("WINDOWS NOT IMPLEMENTED")
   } else {
-    bbi_commands <- cli_install_commands(.path, .bbi_url)
+    bbi_commands <- nx_install_commands(.path, .bbi_url)
   }
   return(bbi_commands)
 }
@@ -242,11 +242,15 @@ build_bbi_install_commands <- function(.path, .bbi_url) {
 #' @inheritParams build_bbi_install_commands
 #' @importFrom stringr str_replace
 #' @keywords internal
-cli_install_commands <- function(.path, .bbi_url) {
+nx_install_commands <- function(.path, .bbi_url) {
+  # extract dir name that tar will unzip to
   tar_basename <- stringr::str_replace(basename(.bbi_url), "\\..+$", "")
+
+  # construct commands
   return(c(
     glue('wget {.bbi_url} -O /tmp/bbi.tar.gz  --timeout=15 --tries=2'),
-    'tar -xzf /tmp/bbi.tar.gz -C /tmp --overwrite',
+    glue('rm -rf /tmp/{tar_basename}'),
+    'tar -xzf /tmp/bbi.tar.gz -C /tmp/',
     glue('mv /tmp/{tar_basename}/bbi {.path}'),
     glue('chmod +x {.path}')
   ))
@@ -274,35 +278,18 @@ bbi_version <- function(.bbi_exe_path = getOption('bbr.bbi_exe_path')){
 
   tryCatch(
     {
-      res <- system(sprintf('%s version', bbi_path),intern = TRUE)
+      res <- system(sprintf('%s version', .bbi_exe_path),intern = TRUE)
       return(str_replace_all(res, '^v', ''))
     },
     error = function(e) {
       if (str_detect(e$message, "error in running command")) {
-        stop(glue("The executable at {bbi_path} does not appear to be a valid bbi installation. Use `use_bbi({dirname(bbi_path)})` to install bbi at that location."))
+        stop(glue("The executable at {bbi_path} does not appear to be a valid bbi installation. Use `use_bbi(.path = {bbi_path})` to install bbi at that location."))
       }
       stop(e$message)
     }
   )
 }
 
-#' Private helper to add bbi to $PATH
-#' @param .dest_bbi_path absolute path to bbi (`dirname(.dest_bbi_path)` will be added to the `$PATH`)
-#' @keywords internal
-add_bbi_to_path <- function(.dest_bbi_path) {
-
-  old_path <- Sys.getenv("PATH")
-  new_dir <- dirname(.dest_bbi_path)
-
-  if (check_os() == "windows") {
-    .sep = ";"
-  } else {
-    .sep = ":"
-  }
-
-  Sys.setenv(PATH = paste(new_dir, old_path, sep = .sep))
-  cli::cli_alert(glue("{new_dir} added to $PATH"))
-}
 
 #' Private helper to construct version comparison message
 #' @importFrom cli rule col_blue col_red
@@ -323,4 +310,35 @@ version_message <- function(local_v, release_v){
 
   cat(glue::glue(cli::col_blue(' - Current release: {release_v}\n')))
 }
+
+#' Helper to message user about adding the bbi directory to $PATH
+#'
+#' Will return invisibly if .bbi_path is the same as `getOption('bbr.bbi_exe_path')`
+#'  or if `dirname(.bbi_path)` is already in `$PATH`
+#' @param .bbi_path absolute path to the new bbi
+#' @importFrom cli cli_alert
+#' @keywords internal
+add_to_path_message <- function(.bbi_path) {
+  if (.bbi_path == getOption('bbr.bbi_exe_path')) {
+    return(invisible(NULL))
+  }
+
+  old_path <- Sys.getenv("PATH")
+
+  if (check_os() == "windows") {
+    .sep = ";"
+  } else {
+    .sep = ":"
+  }
+
+  old_path_dirs <- unlist(str_split(old_path, .sep))
+
+  new_dir <- dirname(.bbi_path)
+  if (new_dir %in% old_path_dirs) {
+    return(invisible(NULL))
+  }
+
+  cli::cli_alert(glue("Please either set `options('bbr.bbi_exe_path' = '{.bbi_path}')` in your .Rprofile, or add this location to $PATH in your .bash_profile"))
+}
+
 

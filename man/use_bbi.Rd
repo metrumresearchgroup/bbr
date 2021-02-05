@@ -40,7 +40,7 @@ the user's \verb{$PATH}. If \code{Sys.getenv("XDG_DATA_HOME")} is found, install
 Otherwise, install to OS dependent defaults:
 \itemize{
 \item Linux: \code{{Sys.getenv("HOME")}/.local/share/bbi/bbi}
-\item Mac: \verb{\{Sys.getenv("HOME")\}/Library/Application Support/bbi/bbi}
+\item Mac: \verb{/usr/local/bin/bbi}
 \item Windows: \verb{\{Sys.getenv("APPDATA")\}\\bbi\\bbi}
 }
 }
