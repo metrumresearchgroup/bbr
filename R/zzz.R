@@ -9,7 +9,7 @@
   }
   # set bbi executable path
   if (is.null(getOption("bbr.bbi_exe_path"))) {
-    options("bbr.bbi_exe_path" = "bbi")
+    options("bbr.bbi_exe_path" = BBI_DEFAULT_PATH)
   }
 
   # set bbi minimum version

@@ -1,4 +1,8 @@
-BBI_DEFAULT_PATH <- "/data/apps/bbi"
+BBI_DEFAULT_PATH <- if (.Platform$OS.type == "windows") {
+  "bbi.exe"
+} else {
+  "bbi"
+}
 
 CACHE_ENV <- new.env(parent = emptyenv())
 CACHE_ENV$bbi_exe_paths <- list()

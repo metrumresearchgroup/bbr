@@ -273,6 +273,27 @@ print_bbi_args <- function() {
 }
 
 
+#' Check what operating system R is running on
+#' @return String, either "linux", "darwin", "windows"
+#' @importFrom xfun is_macos is_windows is_linux
+#' @keywords internal
+check_os <- function() {
+  if (is_linux()) {
+    return("linux")
+  } else if (is_macos()) {
+    return("darwin")
+  } else if (is_windows()) {
+    return("windows")
+  } else {
+    dev_error("`xfun` failed to determine operating system.")
+  }
+}
+
+
+##################################
+# CHECKING MODEL CLASSES AND KEYS
+##################################
+
 check_required_keys <- function(.list, .req) {
   all(.req %in% names(.list))
 }
@@ -354,6 +375,19 @@ stop_get_scalar_msg <- function(.len) {
 #' @keywords internal
 stop_get_fail_msg <- function(.bbi_object, .key, .msg = "") {
   stop(glue("Cannot extract `{.key}` from object of class `{paste(class(.bbi_object), collapse = ', ')}` :\n{paste(.msg, collapse = ', ')}"), call. = FALSE)
+}
+
+
+#' Construct error message that users shouldn't see
+#'
+#' Contains a note to file an issue if ever encountered by a user.
+#' @keywords internal
+dev_error <- function(.msg) {
+  stop(paste(
+    .msg,
+    "USER SHOULD NEVER SEE THIS ERROR. If encountered, please file an issue at https://github.com/metrumresearchgroup/bbr/issues",
+    sep = "\n"
+  ))
 }
 
 
