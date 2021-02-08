@@ -4,14 +4,12 @@
 \alias{install_menu}
 \title{Private implementation function for installing bbi with interactive menu}
 \usage{
-install_menu(.body, .this_os, .dir, .version, .force, .quiet)
+install_menu(.body, .path, .version, .force, .quiet)
 }
 \arguments{
 \item{.body}{Character vector of installation commands to run with \code{system}}
 
-\item{.this_os}{Character scalar of OS}
-
-\item{.dir}{directory to install bbi to}
+\item{.path}{path to install bbi to}
 
 \item{.version}{version of bbi to install. Must pass a character scalar corresponding to a tag found in \verb{https://github.com/metrumresearchgroup/bbi/releases}}
 

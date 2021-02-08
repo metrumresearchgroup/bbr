@@ -96,14 +96,55 @@ for (.tc in .test_cases) {
   })
 }
 
-test_that(glue::glue("get_model_id parses model object"), {
+test_that("get_model_id parses model object", {
   expect_identical(get_model_id(MOD1), MOD_ID)
 })
 
-test_that(glue::glue("get_model_id parses summary object"), {
+test_that("get_model_id parses summary object", {
   skip_if_not_drone_or_metworx("get_model_id.bbi_nonmem_summary")
   expect_identical(get_model_id(SUM1), MOD_ID)
 })
+
+
+test_that("get_data_path parses model object", {
+  res_data_path <- get_data_path(MOD1)
+  expect_identical(res_data_path, DATA_TEST_FILE)
+  expect_identical(readLines(res_data_path, n = 1), DATA_TEST_FIRST_LINE)
+})
+
+test_that("get_data_path parses summary object", {
+  skip_if_not_drone_or_metworx("get_data_path.bbi_nonmem_summary")
+  res_data_path <- get_data_path(SUM1)
+  expect_identical(res_data_path, DATA_TEST_FILE)
+  expect_identical(readLines(res_data_path, n = 1), DATA_TEST_FIRST_LINE)
+})
+
+
+.test_cases <- c(
+  LST_TEST_FILE,
+  GRD_TEST_FILE,
+  EXT_TEST_FILE
+)
+for (.tc in .test_cases) {
+  test_that(glue::glue("build_path_from_model returns correct {tools::file_ext(.tc)} from model object"), {
+    expect_identical(build_path_from_model(MOD1, paste0(".", tools::file_ext(.tc))),
+                     normalizePath(.tc))
+  })
+
+  test_that(glue::glue("build_path_from_model returns correct {tools::file_ext(.tc)} from summary object"), {
+    skip_if_not_drone_or_metworx(glue::glue("build_path_from_model.bbi_nonmem_summary {tools::file_ext(.tc)}"))
+    expect_identical(build_path_from_model(SUM1, paste0(".", tools::file_ext(.tc))),
+                     normalizePath(.tc))
+  })
+}
+
+test_that("build_path_from_model works with period in extension", {
+  expect_identical(
+    build_path_from_model(MOD1, "par.tab"),
+    as.character(glue::glue("{MOD1_ABS_PATH}/{MOD_ID}par.tab"))
+  )
+})
+
 
 test_that("is_valid_nonmem_extension() works", {
   expect_true(is_valid_nonmem_extension(MOD_TEST_FILE))

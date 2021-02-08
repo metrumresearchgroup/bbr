@@ -71,6 +71,10 @@ test_that("bbi_init creates bbi.yaml", {
 
 })
 
+test_that("bbi_init errors with non-existent .dir", {
+  expect_error(bbi_init("naw", "."), regexp = "Cannot find.+naw")
+})
+
 test_that("bbi_init errors with invalid .nonmem_version", {
   # fails if don't specify anything
   expect_error(bbi_init(".", "."), regexp = "Must specify a `.nonmem_version`")

@@ -1,6 +1,6 @@
 Dataset: ../acop_iov.csv
 
-Records: 7566	 Observations: 6396	 Patients: 39
+Records: 7566	 Observations: 6396	 Subjects: 39
 
 Objective Function Value (final est. method): 44158.939
 

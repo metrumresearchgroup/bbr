@@ -46,12 +46,14 @@ reference:
   - add_description
   - add_bbi_args
   - add_decisions
+  - build_path_from_model
   - get_based_on
   - get_model_ancestry
   - get_model_id
   - get_model_path
   - get_output_dir
   - get_yaml_path
+  - get_data_path
   - print_bbi
 - title: bbi configuration
   contents:

@@ -1,6 +1,6 @@
 Dataset: ../example2.csv
 
-Records: 2400	 Observations: 2000	 Patients: 400
+Records: 2400	 Observations: 2000	 Subjects: 400
 
 Objective Function Value (final est. method): -10838.582
 

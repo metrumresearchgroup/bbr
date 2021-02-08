@@ -195,11 +195,11 @@ create_log_df_impl <- function(log_df, .class, .req_cols, .key) {
   }
 
   if(any(duplicated(log_df[[.key]]))) {
-    stop(paste(
+    err_msg <- paste(
       glue("`{.key}` column must contain unique values, but the following rows are duplicates:"),
-      paste(which(duplicated(log_df[[.key]])), collapse = ', '),
-      "-- USER PROBABLY SHOULDN'T SEE THIS ERROR. This is more of a failsafe."
-    ))
+      paste(which(duplicated(log_df[[.key]])), collapse = ', ')
+    )
+    dev_error(err_msg)
   }
 
   # assign class and return

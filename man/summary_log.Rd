@@ -41,7 +41,7 @@ If you would like more fields from the summary object, you can extract them manu
 \item \code{param_count} -- Count of (non-fixed) parameters estimated in final estimation method.
 \item \code{estimation_method} -- Character vector of estimation method(s) used. Extracted from \verb{$run_details}.
 \item \code{problem_text} -- Character vector of text from \verb{$PROB}. Extracted from \verb{$run_details}.
-\item \code{number_of_patients} -- Count of unique patients in the input data set, extracted from \verb{$run_details}.
+\item \code{number_of_subjects} -- Count of unique subjects in the input data set, extracted from \verb{$run_details}.
 \item \code{number_of_obs} -- Total count of observations in the input data set, extracted from \verb{$run_details}.
 \item \code{condition_number} -- The condition number for the final estimation method, if present.
 \item \code{any_heuristics} -- Logical indicating whether \emph{any} of the columns extracted from \verb{$run_heuristics} are \code{TRUE}. Duplicative information, but helpful for filtering.

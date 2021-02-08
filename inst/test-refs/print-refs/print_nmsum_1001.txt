@@ -1,6 +1,6 @@
 Dataset: ../tranNM_final.csv
 
-Records: 921	 Observations: 599	 Patients: 240
+Records: 921	 Observations: 599	 Subjects: 240
 
 Objective Function Value (final est. method): 3842.571
 
