@@ -1,6 +1,6 @@
 # bbr 1.0.0
 
-This release if fairly small in terms of changes, but it increments to a new major release version primarily because of the name change which happened in `bbr 0.12.0`. The most significant change, from a user perspective, is to the default behavior for where `bbr` looks for `bbi` on the system. This change is described in [issue #321](https://github.com/metrumresearchgroup/bbr/issues/321) and a bit more detail is given below.
+This release is fairly small in terms of changes, but it increments to a new major release version primarily because of the name change which happened in `bbr 0.12.0`. The most significant change, from a user perspective, is to the default behavior of where `bbr` looks for `bbi` on the system. This change is described in [issue #321](https://github.com/metrumresearchgroup/bbr/issues/321) and a bit more detail is given below.
 
 The `1.0.0` release also represents a stable feature set of basic NONMEM-related functionality. While there will be more features and development relevant to NONMEM in the future, for the immediate future we are shifting our attention towards building similar functionality to support Stan modeling with `bbr`.
 
