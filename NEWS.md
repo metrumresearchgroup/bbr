@@ -1,10 +1,42 @@
+# bbr 1.0.0
+
+This release is fairly small in terms of changes, but it increments to a new major release version primarily because of the name change which happened in `bbr 0.12.0`. The most significant change, from a user perspective, is to the default behavior of where `bbr` looks for `bbi` on the system. This change is described in [issue #321](https://github.com/metrumresearchgroup/bbr/issues/321) and a bit more detail is given below.
+
+The `1.0.0` release also represents a stable feature set of basic NONMEM-related functionality. While there will be more features and development relevant to NONMEM in the future, for the immediate future we are shifting our attention towards building similar functionality to support Stan modeling with `bbr`.
+
+## New features and changes
+
+* The minimum compatible version of `bbi` is increased to `3.0.2`. This is because there was a breaking change in `bbi 3.0.2` which changed all references to `"Patients"` in the `bbi nonmem summary` output to `"Patients"` (discussed further below). Also because there was a bug where `bbi` could not parse the summary output from NONMEM 7.5 and this bug was fixed in `bbi 3.0.1`. 
+
+* `options("bbr.bbi_exe_path")`, which tells `bbr` where to look for a `bbi` installation, now defaults to `"bbi"`. This means that, by default, `bbr` will look for a `bbi` installation in the user's `$PATH`. `options("bbr.bbi_exe_path")` can still be set manually by the user and, in fact, we encourage users to set this to an absolute path in their `.Rprofile` for their project because this explicitly guarantees the correct `bbi` installation is being used. (#322)
+
+* The `use_bbi()` installer function first tries to install to whatever path is set in `options("bbr.bbi_exe_path")`, falling back to the `bbi` in my `$PATH` (accessed via `Sys.which("bbi")`) and then an OS-dependent default, in that order. See `?use_bbi()` for more details. (#322)
+
+* Added print method for `bbi_nonmem_model` object. Similar to the `bbi_nonmem_summary` object, the `bbi_nonmem_model` object should print nicely in the console, and also look good in `.Rmd` chunks with the option `results = 'asis'`. (#307)
+
+* Added `get_data_path()` helper function to extract the absolute path to the input data file from `bbi_nonmem_model` and `bbi_nonmem_summary` objects. (#314)
+
+* Added `build_path_from_model()` helper function to extract the absolute path to various output files from `bbi_nonmem_model` and `bbi_nonmem_summary` objects. (#314)
+
+* The output from `model_summary()` (and `model_summaries()` and `summary_log()`) will now refer to individuals in the data set as `"Subjects"` instead of `"Patients"`, in accordance with the terminology widely used in scientific and medical literature. (#320)
+
+* Per guidance in `rbabylon 0.10.0` release, `replace_tags()`, `replace_bbi_args()`, `replace_based_on()`, `add_decisions()`, and `replace_decisions()` will now error instead of warn about their impending deprecation. These functions will be removed entirely in two more releases.
+
+## Developer-facing changes
+
+* We are no longer checking in either the `.Rprofile` or anything in the `renv` folder. As a result, the development workflow has changed slightly. This change is reflected in the README. (#307 and #308)
+
+* Added an option to suppress the minimum `bbi` version constraint. **This is intended only for developers** who want to try out development (unreleased) version of `bbi` while developing on `bbr`. (#305)
+
+* Our Drone CI system now uses a `.drone.yml` instead of `.drone.jsonette`. We have also switched the containers that we use for testing in CI to smaller containers which are more specialized for the purpose. (#309)
+
 # bbr 0.12.0
 
 **This package has been renamed to from `rbabylon` to `bbr`** and the accompanying command-line tool has been renamed from `babylon` to `bbi` (which was already its alias, used throughout the package). Any mentions of `babylon` and `rbabylon` throughout the package have been renamed accordingly. Mentions of either in the older parts of this `NEWS.md` document were left as is for historical purposes.
 
 ## New features and changes
 
-* The minimum compatible version of `bbi` is increased to 3.0.0.
+* The minimum compatible version of `bbi` is increased to `3.0.0`.
 
 # rbabylon 0.11.0
 

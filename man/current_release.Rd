@@ -4,18 +4,12 @@
 \alias{current_release}
 \title{Private helper function to most recent release version from repo}
 \usage{
-current_release(
-  owner = "metrumresearchgroup",
-  repo = "bbi",
-  os = c("linux", "darwin", "windows")
-)
+current_release(owner = "metrumresearchgroup", repo = "bbi")
 }
 \arguments{
 \item{owner}{Repository owner/organization}
 
 \item{repo}{Repository name}
-
-\item{os}{Operating system user intends to install on}
 }
 \description{
 Private helper function to most recent release version from repo

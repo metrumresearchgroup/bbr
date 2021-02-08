@@ -17,6 +17,7 @@ NULL
 #' @importFrom stringr str_split str_detect
 #' @importFrom fs path_norm
 #' @importFrom cli cat_line
+#' @export
 print.bbi_process <- function(x, ..., .call_limit = 250) {
   call_str <- glue("{x[[PROC_BBI]]} {paste(x[[PROC_CMD_ARGS]], collapse = ' ')}")
 
@@ -55,6 +56,93 @@ print.bbi_process <- function(x, ..., .call_limit = 250) {
 }
 
 
+#' @describeIn print_bbi Prints the information contained in the model object and whether the model has been run
+#' @importFrom cli cli_h1 cli_h2 cat_bullet style_italic col_blue col_green col_red cat_rule
+#' @importFrom purrr iwalk walk
+#' @export
+print.bbi_nonmem_model <- function(x, ...) {
+  is_valid_print <- function(.x) {
+    if (!is.null(.x)) {
+      length(.x) != 0
+    } else {
+      FALSE
+    }
+  }
+
+  heading <- cli_h1
+  subheading <- cli_h2
+  bullet_list <- cat_bullet
+
+  if (isTRUE(getOption('knitr.in.progress'))) {
+    is_asis <- knitr::opts_current$get("results") == 'asis'
+
+    heading <- function(x) {
+      # alphanumeric width = 1, line width = 2
+      # w = ncharacters in output to width = 80
+      cat('\n')
+      if (is_asis) {
+        w <- ceiling(nchar(x) + (80 - nchar(x)) / 2)
+        cat_rule(x, width = w)
+      } else {
+        cat_rule(x)
+      }
+    }
+
+    bullet_list <- subheading <- function(x) {
+      if (is_asis) {
+        cat("\n")
+      }
+      cat_bullet(x)
+    }
+  }
+
+  status <- col_red("Not Run")
+  output_dir <- get_output_dir(x, .check_exists = FALSE)
+
+  if (dir.exists(output_dir)) {
+    status <- col_green("Finished Running")
+    json_file <- file.path(output_dir, "bbi_config.json")
+
+    if (!fs::file_exists(json_file)) {
+      status <- col_red("Incomplete Run")
+    }
+
+  }
+
+  heading('Status')
+  subheading(status)
+
+  heading("Absolute Model Path")
+  bullet_list(x[[ABS_MOD_PATH]])
+
+  heading("YAML & Model Files")
+  bullet_list(get_yaml_path(x, .check_exists = FALSE))
+  bullet_list(get_model_path(x, .check_exists = FALSE))
+
+  if (is_valid_print(x[[YAML_DESCRIPTION]])) {
+    heading('Description')
+    bullet_list(style_italic(x[[YAML_DESCRIPTION]]))
+  }
+
+  if (is_valid_print(x[[YAML_TAGS]])) {
+    heading('Tags')
+    walk(x[[YAML_TAGS]], bullet_list)
+  }
+
+  if (is_valid_print(x[[YAML_NOTES]])) {
+    heading('Notes')
+    iwalk(x[[YAML_NOTES]],
+          ~ bullet_list(paste0(.y, ": ", style_italic(.x))))
+  }
+
+  if (is_valid_print(x[[YAML_BBI_ARGS]])) {
+    heading("BBI Args")
+    iwalk(x[[YAML_BBI_ARGS]],
+          ~ bullet_list(paste0(.y, ": ", col_blue(.x))))
+  }
+}
+
+
 #' @describeIn print_bbi Prints a high level summary of a model from a bbi_nonmem_summary object
 #' @importFrom purrr map_chr
 #' @importFrom cli cat_line
@@ -72,7 +160,7 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
   # print top line info
   .d <- x[[SUMMARY_DETAILS]]
   cat_line(glue("Dataset: {.d$data_set}\n\n"))
-  cat_line(glue("Records: {.d$number_of_data_records}\t Observations: {.d$number_of_obs}\t Patients: {.d$number_of_patients}\n\n"))
+  cat_line(glue("Records: {.d$number_of_data_records}\t Observations: {.d$number_of_obs}\t Subjects: {.d$number_of_subjects}\n\n"))
   cat_line(glue("Objective Function Value (final est. method): {extract_ofv(list(x))}\n\n"))
   cli::cat_line("Estimation Method(s):\n")
   purrr::walk(paste(.d$estimation_method, "\n"), cli::cat_bullet, bullet = "en_dash")
@@ -141,6 +229,9 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
   if (!is.null(.nrow)) cat_line(glue("... {orig_rows - .nrow} more rows"), col = "grey")
 }
 
+#####################
+# INTERNAL HELPERS
+#####################
 
 #' Format digits
 #'

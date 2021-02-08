@@ -1,7 +1,7 @@
 Type: Package
 Package: bbr
 Title: R package for bbi
-Version: 0.12.0
+Version: 1.0.0
 Authors@R: 
     c(person(given = "Devin",
              family = "Pastoor",
@@ -45,6 +45,7 @@ Imports:
     tibble,
     tidyr,
     tidyselect (>= 1.0.0),
+    xfun,
     yaml
 Suggests: 
     covr,
@@ -59,4 +60,4 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
-SystemRequirements: bbi (>= 3.0.0)
+SystemRequirements: bbi (>= 3.0.2)

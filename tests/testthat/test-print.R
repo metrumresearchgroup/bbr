@@ -6,6 +6,7 @@ model_dir <- ABS_MODEL_DIR
 mod_ctl_path <- file.path(model_dir, CTL_FILENAME)
 PRINT_REF_DIR <- file.path(REF_DIR, "print-refs")
 
+model_1 <- MOD1
 withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   test_that("print.bbi_process works with .wait = TRUE", {
@@ -45,6 +46,34 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_true(str_detect(call_str, read_bbi_path()))
     expect_false(str_detect(call_str, temp_dir))
     expect_true(str_detect(call_str, "--overwrite --threads=4"))
+  })
+
+  test_that("print.bbi_nonmem_model contains proper fields if all present", {
+    model_1[[YAML_NOTES]] <- c("x", "y")
+
+    fields <- c('Status',
+                'Absolute Model Path',
+                'Description',
+                'Tags',
+                'BBI Args',
+                'Notes')
+
+    bullets <- capture.output({ # these get thrown away, but we don't want them to print in the test output
+      purrr::walk(fields, ~ expect_message(print(model_1), regexp = .x))
+    })
+  })
+
+  test_that("print.bbi_nonmem_model run status functions properly", {
+    bullets <- capture.output({ # these get thrown away, but we don't want them to print in the test output
+      expect_message(print(model_1), regexp = "Finished Running")
+
+      model1_no_output_dir <- model_1
+      model1_no_output_dir[[ABS_MOD_PATH]] <- 'some/fake/path'
+      expect_message(print(model1_no_output_dir), regexp = "Not Run")
+
+      mod_no_config <- read_model(file.path(MODEL_DIR_X, "1001"))
+      expect_message(print(mod_no_config), regexp = "Incomplete Run")
+    })
   })
 
   test_that("print.bbi_nonmem_summary works basic FOCE model", {

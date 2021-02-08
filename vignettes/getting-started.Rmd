@@ -57,23 +57,32 @@ cleanup()
 
 ## Installing bbi
 
-The _first time_ you use `bbr` on a system or disk, you must first install `bbi`, often aliased as `bbi`. The `bbi` executable is a single binary file that can be easily installed with:
-
-```{r, eval = FALSE}
-bbr::use_bbi("/data/apps/")
-```
-
-The `use_bbi()` function takes the _directory_ into which you want to install `bbi`. Note that this can be pointed to anywhere on your system; installing to `/data/apps/bbi` is merely a convention used at Metrum Research Group, where `bbr` was developed.
+The _first time_ you use `bbr` on a system or disk, you must first install `bbi`.
 
 ### Setting bbi_exe_path
 
-Once `bbi` is installed, you will need to make sure `bbr` knows where to find it. This can be done by setting the `bbr.bbi_exe_path` option like so:
+The `bbi` executable is a single binary file, you just need to tell `bbr` where to find it. This can be done by setting the `bbr.bbi_exe_path` option like so:
 
 ```{r bbi_exe_path, eval = FALSE}
 options("bbr.bbi_exe_path" = "/data/apps/bbi")
 ```
 
 Please note that **this must be set for every new R session, so it's recommended to include the above snippet in your .Rprofile**, replacing the `"/data/apps/bbi"` with the absolute path from your system/project, if you have installed it somewhere different.
+
+Also note that this can be pointed to anywhere on your system; installing to `/data/apps/bbi` is merely a convention used at Metrum Research Group, where `bbr` was developed.
+
+### Installing with `use_bbi()`
+
+`bbr` provides an installer function named `use_bbi()` that makes it easy to install `bbi` from within R.
+
+```{r, eval = FALSE}
+bbr::use_bbi()
+```
+
+With no arguments passed, `use_bbi()` will default to installing `bbi` at the path you have set in `options("bbr.bbi_exe_path")`. This is why we recommend setting this first (and putting it in your `.Rprofile` so that it is sourced for every new R session). If this option is _not_ set, `use_bbi()` will fall back to the `bbi` in my `$PATH` (accessed via `Sys.which("bbi")`) and then an OS-dependent default, in that order. See `?use_bbi()` if you would like more details.
+
+The `use_bbi()` function also optionally takes the _absolute path_ where you want to install `bbi`, though we recommend most users to follow the pattern above: first specifying a path in `options("bbr.bbi_exe_path")`, and then letting `use_bbi()` install to that path by default.
+
 
 ### Updating bbi or checking if it's installed
 

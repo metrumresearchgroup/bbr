@@ -29,7 +29,7 @@
 #'
 #' @importFrom glue glue
 #' @importFrom rlang .data :=
-#' @importFrom lifecycle deprecate_warn
+#' @importFrom lifecycle deprecate_warn deprecate_stop
 #' @import fs
 NULL
 
@@ -175,10 +175,12 @@ check_bbi_exe <- function(.bbi_exe_path) {
 #'
 #' @importFrom stringr str_replace_all
 #' @inheritParams bbi_version
-#'
 #' @return `NULL` if `.bbi_exe_path` satisfies the constraint
 #' @keywords internal
-check_bbi_version_constraint <- function(.bbi_exe_path = getOption('bbr.bbi_exe_path')) {
+check_bbi_version_constraint <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')) {
+  if (isTRUE(getOption("rbabylon.DEV_no_min_version"))) {
+    return(invisible(TRUE))
+  }
   .bbi_exe_path <- Sys.which(.bbi_exe_path)
   if (.bbi_exe_path == "") {
     stop(glue("`{.bbi_exe_path}` was not found on the system."))
@@ -262,8 +264,18 @@ bbi_help <- function(.cmd_args=NULL) {
 #'   **no default NONMEM version**. `FALSE` by default, and using `TRUE` is
 #'   *not* encouraged.
 #' @importFrom yaml read_yaml write_yaml
+#' @importFrom fs dir_exists
 #' @export
 bbi_init <- function(.dir, .nonmem_dir, .nonmem_version = NULL, .no_default_version = FALSE) {
+  # check that destination directory exists
+  if (!fs::dir_exists(.dir)) {
+    stop(paste(
+      glue("Cannot find {file.path(getwd(), .dir)}"),
+      "Make sure you are in the correct working directory and have passed the correct path to bbi_init(.dir)",
+      sep = "\n"
+    ), call. = FALSE)
+  }
+
   # check for files in NONMEM directory
   nm_files <- list.files(.nonmem_dir)
   if (length(nm_files) == 0) {
