@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.12.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -149,7 +149,7 @@
     <p>Private implementation function for installing bbi with interactive menu</p>
     </div>
 
-    <pre class="usage"><span class='fu'>install_menu</span><span class='op'>(</span><span class='va'>.body</span>, <span class='va'>.this_os</span>, <span class='va'>.dir</span>, <span class='va'>.version</span>, <span class='va'>.force</span>, <span class='va'>.quiet</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>install_menu</span><span class='op'>(</span><span class='va'>.body</span>, <span class='va'>.path</span>, <span class='va'>.version</span>, <span class='va'>.force</span>, <span class='va'>.quiet</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -159,12 +159,8 @@
       <td><p>Character vector of installation commands to run with <code>system</code></p></td>
     </tr>
     <tr>
-      <th>.this_os</th>
-      <td><p>Character scalar of OS</p></td>
-    </tr>
-    <tr>
-      <th>.dir</th>
-      <td><p>directory to install bbi to</p></td>
+      <th>.path</th>
+      <td><p>path to install bbi to</p></td>
     </tr>
     <tr>
       <th>.version</th>

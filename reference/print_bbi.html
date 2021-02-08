@@ -84,7 +84,7 @@ will make for prettier formatting, especially of table outputs." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.12.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -160,6 +160,9 @@ will make for prettier formatting, especially of table outputs.</p>
     <pre class="usage"><span class='co'># S3 method for bbi_process</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span>, .call_limit <span class='op'>=</span> <span class='fl'>250</span><span class='op'>)</span>
 
+<span class='co'># S3 method for bbi_nonmem_model</span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
+
 <span class='co'># S3 method for bbi_nonmem_summary</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>x</span>, .digits <span class='op'>=</span> <span class='fl'>3</span>, .fixed <span class='op'>=</span> <span class='cn'>FALSE</span>, .off_diag <span class='op'>=</span> <span class='cn'>FALSE</span>, .nrow <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
@@ -202,6 +205,7 @@ Otherwise, prints only <code>.nrow</code> rows.</p></td>
     
 <ul>
 <li><p><code>print.bbi_process</code>: Prints the call made to bbi and whether the process is still running or has finished.</p></li>
+<li><p><code>print.bbi_nonmem_model</code>: Prints the information contained in the model object and whether the model has been run</p></li>
 <li><p><code>print.bbi_nonmem_summary</code>: Prints a high level summary of a model from a bbi_nonmem_summary object</p></li>
 </ul>
 

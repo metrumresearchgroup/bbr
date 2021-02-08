@@ -50,11 +50,10 @@
 <meta property="og:description" content="The decisions field has been deprecated as of bbr 0.10.0 and
 replaced by the notes field, to reflect the fact that users
 will want to use this field throughout the modeling process, not only at the end
-once some &quot;decisions&quot; have been reached. add_decisions() and
-replace_decisions() now print a warning telling the user that they will be
+once some &quot;decisions&quot; have been reached. As of bbr 1.0.0, add_decisions() and
+replace_decisions() now error telling the user that they will be
 deprecated in the future and encouraging use of their *_notes counterparts.
-They will begin erroring, instead of warning, in two releases, and then will be
-removed two releases after that." />
+The functions will be removed entirely two releases after that." />
 <meta property="og:image" content="https://metrumresearchgroup.github.io/bbr/logo.png" />
 
 
@@ -87,7 +86,7 @@ removed two releases after that." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.12.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -156,11 +155,10 @@ removed two releases after that." />
     <p>The <code>decisions</code> field has been deprecated as of <code>bbr 0.10.0</code> and
 replaced by the <code>notes</code> field, to reflect the fact that users
 will want to use this field throughout the modeling process, not only at the end
-once some "decisions" have been reached. <code>add_decisions()</code> and
-<code>replace_decisions()</code> now print a warning telling the user that they will be
+once some "decisions" have been reached. As of <code>bbr 1.0.0</code>, <code>add_decisions()</code> and
+<code>replace_decisions()</code> now error telling the user that they will be
 deprecated in the future and encouraging use of their <code>*_notes</code> counterparts.
-They will begin erroring, instead of warning, in two releases, and then will be
-removed two releases after that.</p>
+The functions will be removed entirely two releases after that.</p>
     </div>
 
     <pre class="usage"><span class='fu'>add_decisions</span><span class='op'>(</span><span class='va'>.mod</span>, <span class='va'>.decisions</span><span class='op'>)</span>

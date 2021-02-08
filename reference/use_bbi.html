@@ -47,9 +47,10 @@
 
 
 <meta property="og:title" content="Installs most current release of bbi — use_bbi" />
-<meta property="og:description" content="Identifies system running and pulls the relevant tarball for the current release of bbi from GitHub,
-and then installs it in the directory passed to .dir.
-If used in an interactive session, will open an installation menu confirming the installed version." />
+<meta property="og:description" content="Identifies system running and pulls the relevant tarball for the
+current release of bbi from GitHub, and then installs it in the directory
+passed to .dir. If used in an interactive session, will open an
+installation menu confirming the installed version." />
 <meta property="og:image" content="https://metrumresearchgroup.github.io/bbr/logo.png" />
 
 
@@ -82,7 +83,7 @@ If used in an interactive session, will open an installation menu confirming the
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.12.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -148,24 +149,20 @@ If used in an interactive session, will open an installation menu confirming the
     </div>
 
     <div class="ref-description">
-    <p>Identifies system running and pulls the relevant tarball for the current release of bbi from GitHub,
-and then installs it in the directory passed to <code>.dir</code>.
-If used in an interactive session, will open an installation menu confirming the installed version.</p>
+    <p>Identifies system running and pulls the relevant tarball for the
+current release of bbi from GitHub, and then installs it in the directory
+passed to <code>.dir</code>. If used in an interactive session, will open an
+installation menu confirming the installed version.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>use_bbi</span><span class='op'>(</span>
-  .dir <span class='op'>=</span> <span class='st'>"/data/apps"</span>,
-  .version <span class='op'>=</span> <span class='st'>"latest"</span>,
-  .force <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  .quiet <span class='op'>=</span> <span class='cn'>FALSE</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>use_bbi</span><span class='op'>(</span>.path <span class='op'>=</span> <span class='cn'>NULL</span>, .version <span class='op'>=</span> <span class='st'>"latest"</span>, .force <span class='op'>=</span> <span class='cn'>FALSE</span>, .quiet <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>.dir</th>
-      <td><p>directory to install bbi to on linux</p></td>
+      <th>.path</th>
+      <td><p>absolute path to install bbi to. See Details section for defaults, if nothing is passed.</p></td>
     </tr>
     <tr>
       <th>.version</th>
@@ -184,6 +181,28 @@ If used in an interactive session, will open an installation menu confirming the
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>character</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>If nothing is passed to the <code>.path</code> argument, <code>use_bbi()</code> will
+attempt to find a valid path for installation. The following decision
+waterfall is used:</p><ul>
+<li><p>First, check <code><a href='https://rdrr.io/r/base/options.html'>getOption("bbr.bbi_exe_path")</a></code>. If this is anything <em>other
+than</em> <code>"bbi"</code> (the default value) then attempt to install to that path.</p></li>
+<li><p>Second, check <code><a href='https://rdrr.io/r/base/Sys.which.html'>Sys.which("bbi")</a></code> which will look for a <code>bbi</code> installation
+in the user's <code>$PATH</code>. If one is found, ask the user if they wish to
+overwrite it and, if they confirm, install to that path.</p></li>
+<li><p>Third, attempt to install to a "default location" and add this location to
+the user's <code>$PATH</code>. If <code><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv("XDG_DATA_HOME")</a></code> is found, install to
+<code>{Sys.getenv("XDG_DATA_HOME")}/bbi/bbi</code> (per <a href='https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html'>XGD specification</a>).
+Otherwise, install to OS dependent defaults:</p><ul>
+<li><p>Linux: <code>{Sys.getenv("HOME")}/.local/share/bbi/bbi</code></p></li>
+<li><p>Mac: <code>/usr/local/bin/bbi</code></p></li>
+<li><p>Windows: <code>{Sys.getenv("APPDATA")}\bbi\bbi</code></p></li>
+</ul></li>
+</ul>
+
+<p>If none of these are successful, the user will be prompted to set
+<code><a href='https://rdrr.io/r/base/options.html'>options("bbr.bbi_exe_path")</a></code> and try again.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

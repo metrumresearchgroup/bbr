@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.12.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -95,7 +95,7 @@
 
       
 
-      </header><script src="getting-started_files/header-attrs-2.6/header-attrs.js"></script><script src="getting-started_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Getting Started with bbr</h1>
@@ -125,17 +125,25 @@
 <div id="installing-bbi" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installing-bbi" class="anchor"></a>Installing bbi</h2>
-<p>The <em>first time</em> you use <code>bbr</code> on a system or disk, you must first install <code>bbi</code>, often aliased as <code>bbi</code>. The <code>bbi</code> executable is a single binary file that can be easily installed with:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">bbr</span><span class="fu">::</span><span class="fu"><a href="../reference/use_bbi.html">use_bbi</a></span><span class="op">(</span><span class="st">"/data/apps/"</span><span class="op">)</span></code></pre></div>
-<p>The <code><a href="../reference/use_bbi.html">use_bbi()</a></code> function takes the <em>directory</em> into which you want to install <code>bbi</code>. Note that this can be pointed to anywhere on your system; installing to <code>/data/apps/bbi</code> is merely a convention used at Metrum Research Group, where <code>bbr</code> was developed.</p>
+<p>The <em>first time</em> you use <code>bbr</code> on a system or disk, you must first install <code>bbi</code>.</p>
 <div id="setting-bbi_exe_path" class="section level3">
 <h3 class="hasAnchor">
 <a href="#setting-bbi_exe_path" class="anchor"></a>Setting bbi_exe_path</h3>
-<p>Once <code>bbi</code> is installed, you will need to make sure <code>bbr</code> knows where to find it. This can be done by setting the <code>bbr.bbi_exe_path</code> option like so:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<p>The <code>bbi</code> executable is a single binary file, you just need to tell <code>bbr</code> where to find it. This can be done by setting the <code>bbr.bbi_exe_path</code> option like so:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span><span class="st">"bbr.bbi_exe_path"</span> <span class="op">=</span> <span class="st">"/data/apps/bbi"</span><span class="op">)</span></code></pre></div>
 <p>Please note that <strong>this must be set for every new R session, so it’s recommended to include the above snippet in your .Rprofile</strong>, replacing the <code>"/data/apps/bbi"</code> with the absolute path from your system/project, if you have installed it somewhere different.</p>
+<p>Also note that this can be pointed to anywhere on your system; installing to <code>/data/apps/bbi</code> is merely a convention used at Metrum Research Group, where <code>bbr</code> was developed.</p>
+</div>
+<div id="installing-with-use_bbi" class="section level3">
+<h3 class="hasAnchor">
+<a href="#installing-with-use_bbi" class="anchor"></a>Installing with <code>use_bbi()</code>
+</h3>
+<p><code>bbr</code> provides an installer function named <code><a href="../reference/use_bbi.html">use_bbi()</a></code> that makes it easy to install <code>bbi</code> from within R.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">bbr</span><span class="fu">::</span><span class="fu"><a href="../reference/use_bbi.html">use_bbi</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<p>With no arguments passed, <code><a href="../reference/use_bbi.html">use_bbi()</a></code> will default to installing <code>bbi</code> at the path you have set in <code><a href="https://rdrr.io/r/base/options.html">options("bbr.bbi_exe_path")</a></code>. This is why we recommend setting this first (and putting it in your <code>.Rprofile</code> so that it is sourced for every new R session). If this option is <em>not</em> set, <code><a href="../reference/use_bbi.html">use_bbi()</a></code> will fall back to the <code>bbi</code> in my <code>$PATH</code> (accessed via <code><a href="https://rdrr.io/r/base/Sys.which.html">Sys.which("bbi")</a></code>) and then an OS-dependent default, in that order. See <code>?use_bbi()</code> if you would like more details.</p>
+<p>The <code><a href="../reference/use_bbi.html">use_bbi()</a></code> function also optionally takes the <em>absolute path</em> where you want to install <code>bbi</code>, though we recommend most users to follow the pattern above: first specifying a path in <code><a href="https://rdrr.io/r/base/options.html">options("bbr.bbi_exe_path")</a></code>, and then letting <code><a href="../reference/use_bbi.html">use_bbi()</a></code> install to that path by default.</p>
 </div>
 <div id="updating-bbi-or-checking-if-its-installed" class="section level3">
 <h3 class="hasAnchor">
@@ -341,9 +349,9 @@
 <span class="co">#&gt; # A tibble: 3 x 10</span>
 <span class="co">#&gt;   absolute_model_… run   yaml_md5 model_type description bbi_args based_on tags </span>
 <span class="co">#&gt;   &lt;chr&gt;            &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;chr&gt;       &lt;list&gt;   &lt;list&gt;   &lt;lis&gt;</span>
-<span class="co">#&gt; 1 /Users/devinp/r… 1     c7486e7… nonmem     &lt;NA&gt;        &lt;list [… &lt;NULL&gt;   &lt;chr…</span>
-<span class="co">#&gt; 2 /Users/devinp/r… 2     bc60c6b… nonmem     &lt;NA&gt;        &lt;list [… &lt;chr [1… &lt;chr…</span>
-<span class="co">#&gt; 3 /Users/devinp/r… 3     cfceb67… nonmem     &lt;NA&gt;        &lt;list [… &lt;chr [1… &lt;chr…</span>
+<span class="co">#&gt; 1 /data/home/seth… 1     c7486e7… nonmem     &lt;NA&gt;        &lt;list [… &lt;NULL&gt;   &lt;chr…</span>
+<span class="co">#&gt; 2 /data/home/seth… 2     bc60c6b… nonmem     &lt;NA&gt;        &lt;list [… &lt;chr [1… &lt;chr…</span>
+<span class="co">#&gt; 3 /data/home/seth… 3     cfceb67… nonmem     &lt;NA&gt;        &lt;list [… &lt;chr [1… &lt;chr…</span>
 <span class="co">#&gt; # … with 2 more variables: notes &lt;list&gt;, decisions &lt;list&gt;</span></code></pre></div>
 <p>The <code><a href="../reference/run_log.html">run_log()</a></code> returns a tibble which can be manipulated like any other tibble. However, several of the columns (<code>tags</code>, <code>notes</code>, and <code>based_on</code> for example) are list columns, which complicates how you can interact with them. We provide some helper functions to more seamlessly interact with these log tibbles, as well as some sample <code>tidyverse</code> code below.</p>
 <div id="viewing-tags-example" class="section level2">

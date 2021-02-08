@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.12.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -95,7 +95,7 @@
 
       
 
-      </header><script src="using-summary-log_files/header-attrs-2.6/header-attrs.js"></script><script src="using-summary-log_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Creating a Model Summary Log</h1>
@@ -157,7 +157,7 @@
 <span class="co">#&gt;  $ mod_file              : chr "-999999999"</span>
 <span class="co">#&gt;  $ estimation_method     : chr "First Order Conditional Estimation"</span>
 <span class="co">#&gt;  $ data_set              : chr "../MixSim.csv"</span>
-<span class="co">#&gt;  $ number_of_patients    : int 300</span>
+<span class="co">#&gt;  $ number_of_subjects    : int 300</span>
 <span class="co">#&gt;  $ number_of_obs         : int 12600</span>
 <span class="co">#&gt;  $ number_of_data_records: int 13500</span>
 <span class="co">#&gt;  $ output_files_used     : chr [1:5] "iovmm.lst" "iovmm.cpu" "iovmm.ext" "iovmm.grd" ...</span></code></pre></div>
@@ -179,7 +179,7 @@
 <span class="co">#&gt;  [1] "absolute_model_path"     "run"                    </span>
 <span class="co">#&gt;  [3] "bbi_summary"             "error_msg"              </span>
 <span class="co">#&gt;  [5] "needed_fail_flags"       "estimation_method"      </span>
-<span class="co">#&gt;  [7] "problem_text"            "number_of_patients"     </span>
+<span class="co">#&gt;  [7] "problem_text"            "number_of_subjects"     </span>
 <span class="co">#&gt;  [9] "number_of_obs"           "ofv"                    </span>
 <span class="co">#&gt; [11] "param_count"             "condition_number"       </span>
 <span class="co">#&gt; [13] "any_heuristics"          "covariance_step_aborted"</span>
@@ -208,12 +208,12 @@
     <span class="va">param_count</span>, 
     <span class="va">estimation_method</span>, 
     <span class="va">problem_text</span>, 
-    <span class="va">number_of_patients</span>, 
+    <span class="va">number_of_subjects</span>, 
     <span class="va">number_of_obs</span>, 
     <span class="va">condition_number</span>
   <span class="op">)</span>
 <span class="co">#&gt; # A tibble: 4 x 8</span>
-<span class="co">#&gt;   run       ofv param_count estimation_meth… problem_text number_of_patie…</span>
+<span class="co">#&gt;   run       ofv param_count estimation_meth… problem_text number_of_subje…</span>
 <span class="co">#&gt;   &lt;chr&gt;   &lt;dbl&gt;       &lt;int&gt; &lt;chr&gt;            &lt;chr&gt;                   &lt;int&gt;</span>
 <span class="co">#&gt; 1 1001    3843.          15 MCMC Bayesian A… Run# 1001.1               240</span>
 <span class="co">#&gt; 2 acop…  44159.           9 First Order Con… LEM PK mode…               39</span>
