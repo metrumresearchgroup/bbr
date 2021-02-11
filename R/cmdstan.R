@@ -389,3 +389,35 @@ build_stan_bbi_config <- function(.mod, .write) {
 }
 
 
+#############
+# TEMPLATING
+#############
+
+#' @importFrom whisker whisker.render
+#' @keywords internal
+render_file <- function(.mod, .suffix, ...) {
+  .mod_path <- build_path_from_model(.mod, .suffix)
+
+  template <- readLines(.mod_path)
+  data <- list(...)
+  writeLines(whisker.render(template, data), .mod_path)
+
+  return(.mod)
+}
+
+#' @export
+render_model <- function(.mod, ...) {
+  render_file(.mod, STANMOD_SUFFIX, ...)
+}
+
+#' @export
+render_standata <- function(.mod, ...) {
+  render_file(.mod, STANDATA_R_SUFFIX, ...)
+}
+
+#' @export
+render_init <- function(.mod, ...) {
+  render_file(.mod, STANINIT_SUFFIX, ...)
+}
+
+
