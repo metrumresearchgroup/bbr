@@ -171,7 +171,7 @@
 <p>First, by using <code><a href="../reference/get_based_on.html">get_based_on()</a></code> you can retrieve the absolute path to all models in the <code>based_on</code> field.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mod6</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/get_based_on.html">get_based_on</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; [1] "/data/home/sethg/aadev/bbr/renv/library/R-3.6/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/5"</span></code></pre></div>
+<span class="co">#&gt; [1] "/data/home/sethg/R/x86_64-pc-linux-gnu-library/3.6/bbr/model/nonmem/basic/5"</span></code></pre></div>
 <p>This is useful because the path(s) retrieved will unambiguously identify the parent model(s) and can therefore be passed to things like <code><a href="../reference/read_model.html">read_model()</a></code> or <code><a href="../reference/model_summary.html">model_summary()</a></code> like so:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">parent_mod</span> <span class="op">&lt;-</span> <span class="va">mod6</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/get_based_on.html">get_based_on</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/read_model.html">read_model</a></span><span class="op">(</span><span class="op">)</span>
@@ -179,7 +179,7 @@
 <span class="co">#&gt; List of 5</span>
 <span class="co">#&gt;  $ model_type         : chr "nonmem"</span>
 <span class="co">#&gt;  $ based_on           : chr "2"</span>
-<span class="co">#&gt;  $ absolute_model_path: chr "/data/home/sethg/aadev/bbr/renv/library/R-3.6/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/5"</span>
+<span class="co">#&gt;  $ absolute_model_path: chr "/data/home/sethg/R/x86_64-pc-linux-gnu-library/3.6/bbr/model/nonmem/basic/5"</span>
 <span class="co">#&gt;  $ yaml_md5           : chr "ac0ba292b017a72bb316359f0df09bb2"</span>
 <span class="co">#&gt;  $ bbi_args           : list()</span>
 <span class="co">#&gt;  - attr(*, "class")= chr [1:2] "bbi_nonmem_model" "list"</span></code></pre></div>
@@ -190,9 +190,9 @@
 <p>The second helper function walks up the tree of inheritence by iteratively calling <code><a href="../reference/get_based_on.html">get_based_on()</a></code> on each parent model to determine the full set of models that led up to the current model.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mod6</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/get_based_on.html">get_model_ancestry</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; [1] "/data/home/sethg/aadev/bbr/renv/library/R-3.6/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/1"</span>
-<span class="co">#&gt; [2] "/data/home/sethg/aadev/bbr/renv/library/R-3.6/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/2"</span>
-<span class="co">#&gt; [3] "/data/home/sethg/aadev/bbr/renv/library/R-3.6/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/5"</span></code></pre></div>
+<span class="co">#&gt; [1] "/data/home/sethg/R/x86_64-pc-linux-gnu-library/3.6/bbr/model/nonmem/basic/1"</span>
+<span class="co">#&gt; [2] "/data/home/sethg/R/x86_64-pc-linux-gnu-library/3.6/bbr/model/nonmem/basic/2"</span>
+<span class="co">#&gt; [3] "/data/home/sethg/R/x86_64-pc-linux-gnu-library/3.6/bbr/model/nonmem/basic/5"</span></code></pre></div>
 <p>In this case, model <code>6</code> was based on <code>5</code>, which was based on <code>2</code>, which in turn was based on <code>1</code>. You will see one example of how this can be useful in the “Final model family” section below.</p>
 </div>
 </div>
@@ -221,7 +221,7 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">absolute_model_path</span><span class="op">)</span>
 
 <span class="va">final_model_path</span>
-<span class="co">#&gt; [1] "/data/home/sethg/aadev/bbr/renv/library/R-3.6/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/6"</span></code></pre></div>
+<span class="co">#&gt; [1] "/data/home/sethg/R/x86_64-pc-linux-gnu-library/3.6/bbr/model/nonmem/basic/6"</span></code></pre></div>
 <p>Next we can use the <code><a href="../reference/get_based_on.html">get_model_ancestry()</a></code> function to filter the tibble to only the models that led up to the final model.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">log_df</span> <span class="op">%&gt;%</span> 
