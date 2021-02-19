@@ -52,6 +52,10 @@ There are several other vignettes, and more are being added as new
 functionality is rolled out. A complete list can be found
 [here](https://metrumresearchgroup.github.io/bbr/articles/).
 
+### Cheat Sheet
+
+<a href="https://metrumresearchgroup.github.io/cheatsheets/bbr_nonmem_cheat_sheet.pdf"><img src="https://metrumresearchgroup.github.io/cheatsheets/thumbnails/bbr_nonmem_cheat_sheet_thumbnail.png" width="700" height="265"/></a>
+
 ### Featured Vignettes
 
   - [Getting Started with
