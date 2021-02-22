@@ -11,8 +11,7 @@
 \alias{get_output_dir.bbi_nonmem_summary}
 \alias{get_output_dir.bbi_log_df}
 \alias{get_yaml_path}
-\alias{get_yaml_path.bbi_nonmem_model}
-\alias{get_yaml_path.bbi_nonmem_summary}
+\alias{get_yaml_path.bbi_model}
 \alias{get_yaml_path.bbi_log_df}
 \title{Get path from bbi object}
 \usage{
@@ -34,9 +33,7 @@ get_output_dir(.bbi_object, .check_exists = TRUE)
 
 get_yaml_path(.bbi_object, .check_exists = TRUE)
 
-\method{get_yaml_path}{bbi_nonmem_model}(.bbi_object, .check_exists = TRUE)
-
-\method{get_yaml_path}{bbi_nonmem_summary}(.bbi_object, .check_exists = TRUE)
+\method{get_yaml_path}{bbi_model}(.bbi_object, .check_exists = TRUE)
 
 \method{get_yaml_path}{bbi_log_df}(.bbi_object, .check_exists = TRUE)
 }

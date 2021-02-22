@@ -2,15 +2,12 @@
 % Please edit documentation in R/get-path-from-object.R
 \name{build_path_from_model}
 \alias{build_path_from_model}
-\alias{build_path_from_model.bbi_nonmem_model}
-\alias{build_path_from_model.bbi_nonmem_summary}
+\alias{build_path_from_model.bbi_model}
 \title{Build path to output file}
 \usage{
 build_path_from_model(.mod, .suffix, ...)
 
-\method{build_path_from_model}{bbi_nonmem_model}(.mod, .suffix, ...)
-
-\method{build_path_from_model}{bbi_nonmem_summary}(.mod, .suffix, ...)
+\method{build_path_from_model}{bbi_model}(.mod, .suffix, ...)
 }
 \arguments{
 \item{.mod}{Model to use, either a \verb{bbi_\{.model_type\}_model} or \verb{bbi_\{.model_type\}_summary} object.}
