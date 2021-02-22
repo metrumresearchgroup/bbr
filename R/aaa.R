@@ -79,8 +79,7 @@ MODEL_REQ_INPUT_KEYS <- c(
 MODEL_REQ_KEYS <- c(
   ABS_MOD_PATH,
   YAML_YAML_MD5,
-  YAML_MOD_TYPE,
-  YAML_BBI_ARGS
+  YAML_MOD_TYPE
 )
 
 # columns required for a run log df
