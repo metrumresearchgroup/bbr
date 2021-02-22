@@ -8,12 +8,12 @@ Estimation Method(s):
 
 – First Order Conditional Estimation 
 
-**Heuristic Problem(s) Detected:**
-
-– parameter_near_boundary 
-
-– has_final_zero_gradient 
-
+[31m**Heuristic Problem(s) Detected:**
+[39m
+– [31mparameter_near_boundary 
+[39m
+– [31mhas_final_zero_gradient 
+[39m
 |parameter_names |estimate |stderr    |shrinkage |
 |:---------------|:--------|:---------|:---------|
 |THETA1          |14.4     |-1.00e+09 |          |

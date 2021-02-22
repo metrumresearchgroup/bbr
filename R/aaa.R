@@ -44,7 +44,7 @@ BBI_ARGS = list(
 # S3 classes
 BBI_PARENT_CLASS <- "bbi_model"
 NM_MOD_CLASS <- "bbi_nonmem_model"
-SUM_CLASS <- "bbi_nonmem_summary"
+NM_SUM_CLASS <- "bbi_nonmem_summary"
 SL_CLASS <- "bbi_summary_list"
 PROC_CLASS <- "bbi_process"
 RUN_LOG_CLASS <- "bbi_run_log_df"

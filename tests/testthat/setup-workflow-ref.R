@@ -66,11 +66,11 @@ NEW_TEXT2 <- c("all", "done")
 SUMMARY_REF_FILE <- file.path(REF_DIR, "1_summary_obj.R")
 PARAM_REF_FILE <-   file.path(REF_DIR, "1_param_table.R")
 
-SUM_CLASS_LIST <- c(SUM_CLASS, "list")
-MOD_CLASS_LIST <- c(NM_MOD_CLASS, "list")
+NM_SUM_CLASS_LIST <- c(NM_SUM_CLASS, BBI_PARENT_CLASS, "list")
+NM_MOD_CLASS_LIST <- c(NM_MOD_CLASS, BBI_PARENT_CLASS, "list")
 PROC_CLASS_LIST <- c(PROC_CLASS, "list")
 
-PROC_HELP_STR <- c("Running:", as.character(glue("  {read_bbi_path()} --help")), as.character(glue("In {getwd()}")))
+PROC_HELP_STR <- as.character(glue("  {read_bbi_path()} --help"))
 
 SUMS_LIST_NAMES_REF <- c("absolute_model_path", "bbi_summary", "error_msg", "needed_fail_flags")
 
@@ -112,7 +112,7 @@ REF_LIST_1 <- list(
   absolute_model_path = file.path(ABS_MODEL_DIR, "1"),
   yaml_md5 = MOD1_YAML_MD5
 )
-class(REF_LIST_1) <- MOD_CLASS_LIST
+class(REF_LIST_1) <- NM_MOD_CLASS_LIST
 
 
 REF_LIST_TMP <- list(
@@ -125,7 +125,7 @@ REF_LIST_TMP <- list(
   absolute_model_path = file.path(ABS_MODEL_DIR, "temp"),
   yaml_md5 = MOD1_YAML_MD5
 )
-class(REF_LIST_TMP) <- MOD_CLASS_LIST
+class(REF_LIST_TMP) <- NM_MOD_CLASS_LIST
 
 
 #####################

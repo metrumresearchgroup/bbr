@@ -8,10 +8,10 @@ Estimation Method(s):
 
 – MCMC Bayesian Analysis 
 
-**Heuristic Problem(s) Detected:**
-
-– large_condition_number 
-
-– prderr 
-
-**param_estimates() is not currently implemented for Bayesian methods.**
+[31m**Heuristic Problem(s) Detected:**
+[39m
+– [31mlarge_condition_number 
+[39m
+– [31mprderr 
+[39m
+[31m**param_estimates() is not currently implemented for Bayesian methods.**[39m

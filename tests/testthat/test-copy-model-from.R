@@ -13,7 +13,7 @@ test_that("copy_from_model creates accurate copy", {
   new_mod <- copy_model_from(MOD1, basename(NEW_MOD2), .add_tags = NEW_TAGS)
 
   # check that everything is copied through in the object
-  expect_identical(class(new_mod), MOD_CLASS_LIST)
+  expect_identical(class(new_mod), NM_MOD_CLASS_LIST)
   expect_identical(new_mod[[YAML_BASED_ON]], "1")
   expect_identical(new_mod[[YAML_TAGS]], NEW_TAGS)
   expect_equal(new_mod[[YAML_BBI_ARGS]], list(overwrite = TRUE, threads = 4L))

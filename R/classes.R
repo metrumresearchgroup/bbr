@@ -32,18 +32,19 @@ create_model_object <- function(res, save_yaml) {
     dev_error(glue("Invalid {YAML_MOD_TYPE} `{.model_type}`. Valid options include: `{paste(SUPPORTED_MOD_TYPES, collapse = ', ')}`"))
   }
 
-  # assign class and write YAML to disk
-  class(res) <- c(as.character(glue("bbi_{.model_type}_model"), BBI_PARENT_CLASS), class(res))
-  if(isTRUE(save_yaml)) {
-    res <- save_model_yaml(res)
-  }
+  # assign class
+  class(res) <- c(as.character(glue("bbi_{.model_type}_model")), BBI_PARENT_CLASS, class(res))
 
-  # look for appropriate model files on disk
+  # look for appropriate model files on disk and then write out YAML.
   # must be done AFTER assigning the class so that associated helpers can dispatch correctly
   if (.model_type == "nonmem") {
     # we won't know the model file extension, so we rely on this helper to check
     # the possible extensions and throw an error if none exists
     find_nonmem_model_file_path(res[[ABS_MOD_PATH]], .check_exists = TRUE)
+  }
+
+  if(isTRUE(save_yaml)) {
+    res <- save_model_yaml(res)
   }
 
   # check for required keys, just as an extra safety precaution before returning
@@ -81,7 +82,7 @@ create_summary_object <- function(res, .model_type = SUPPORTED_MOD_TYPES) {
   }
 
   # assign class and return
-  class(res) <- c(as.character(glue("bbi_{.model_type}_summary"), BBI_PARENT_CLASS), class(res))
+  class(res) <- c(as.character(glue("bbi_{.model_type}_summary")), BBI_PARENT_CLASS, class(res))
   return(res)
 }
 

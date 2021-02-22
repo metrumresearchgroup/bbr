@@ -37,7 +37,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     mods <- purrr::map(file.path(MODEL_DIR, seq(3)), read_model)
     expect_equal(length(mods), NUM_MODS)
     for (.m in mods) {
-      expect_equal(class(.m), MOD_CLASS_LIST)
+      expect_equal(class(.m), NM_MOD_CLASS_LIST)
     }
 
     mod_sums <- model_summaries(mods)
@@ -48,7 +48,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   test_that("model_summaries.list fails with bad list", {
     bad_mods <- list(read_model(file.path(MODEL_DIR, 1)), list(naw = "dawg"))
     expect_equal(length(bad_mods), 2)
-    expect_equal(class(bad_mods[[1]]), MOD_CLASS_LIST)
+    expect_equal(class(bad_mods[[1]]), NM_MOD_CLASS_LIST)
 
     expect_error(model_summaries(bad_mods), regexp = "must contain only model objects")
   })
