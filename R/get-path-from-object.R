@@ -352,35 +352,6 @@ yaml_ext <- function(.x) {
 ###################################
 
 
-#' Build absolute path from a directory and path
-#'
-#' Private helper that concatenates a directory and path, and uses normalizePath() to create an absolute path, with some specific rules:
-#' If .directory is NULL, set to working directory.
-#' If .path is an absolute path, ignore .directory and just return .path,
-#' otherwise return `file.path(.directory, .path)`.
-#' Also NOTE that `.directory` must point an already existing directory so that the absolute path can be reliably built.
-#' @param .directory Character scalar for the directory
-#' @param .path Character scalar for the path to the file (could be just the file name, or could be in a subdirectory)
-#' @keywords internal
-combine_directory_path <- function(.directory, .path) {
-  # If .directory is NULL, set to working directory
-  if (is.null(.directory)) {
-    .directory <- getwd()
-  }
-
-  # If .path is an absolute path, ignore .directory
-  if (!fs::is_absolute_path(.path)) {
-    # normalizePath and optionally check if it exists
-    .directory <- normalizePath(.directory, mustWork = TRUE)
-
-    # build file path
-    .path <- file.path(.directory, .path)
-  }
-
-  return(.path)
-}
-
-
 #' Find the path to a NONMEM model file
 #'
 #' NONMEM recognizes two model file extensions, `.ctl` and (less common) `.mod`.
