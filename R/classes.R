@@ -46,17 +46,6 @@ create_model_object <- function(res, save_yaml) {
     find_nonmem_model_file_path(res[[ABS_MOD_PATH]], .check_exists = TRUE)
   }
 
-  # check bbi args and add an empty list if missing
-  if (is.null(res[[YAML_BBI_ARGS]])) {
-    res[[YAML_BBI_ARGS]] <- list()
-  } else {
-    # check that unique named list was passed
-    tryCatch(
-      checkmate::assert_list(res[[YAML_BBI_ARGS]], names="unique"),
-      error = function(e) { stop(glue("`{YAML_BBI_ARGS}` must be a unique, named list: {e}")) }
-    )
-  }
-
   # check for required keys, just as an extra safety precaution before returning
   if (!check_required_keys(res, .req = MODEL_REQ_KEYS)) {
     err_msg <- paste0(
