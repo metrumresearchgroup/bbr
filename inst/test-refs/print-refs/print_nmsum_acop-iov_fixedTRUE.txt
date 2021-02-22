@@ -8,12 +8,12 @@ Estimation Method(s):
 
 – First Order Conditional Estimation with Interaction 
 
-**Heuristic Problem(s) Detected:**
-
-– hessian_reset 
-
-– eta_pval_significant 
-
+[31m**Heuristic Problem(s) Detected:**
+[39m
+– [31mhessian_reset 
+[39m
+– [31meta_pval_significant 
+[39m
 |parameter_names |estimate |stderr   |shrinkage |
 |:---------------|:--------|:--------|:---------|
 |THETA1          |1.96     |0.0189   |          |
@@ -30,7 +30,7 @@ Estimation Method(s):
 |OMEGA(7,7)      |0.223    |1.00e+10 |1.00e-10  |
 |OMEGA(8,8)      |0.223    |1.00e+10 |1.00e-10  |
 |OMEGA(9,9)      |0.223    |1.00e+10 |19.5      |
-|OMEGA(10,10)    |0.223    |1.00e+10 |31.2      |
+|OMEGA(10,10)    |0.223    |1.00e+10 |[31m31.2[39m      |
 |OMEGA(11,11)    |0.223    |1.00e+10 |1.00e-10  |
 |OMEGA(12,12)    |0.223    |1.00e+10 |23.5      |
 |OMEGA(13,13)    |0.223    |1.00e+10 |1.00e-10  |
@@ -78,7 +78,7 @@ Estimation Method(s):
 |OMEGA(55,55)    |0.309    |1.00e+10 |1.00e-10  |
 |OMEGA(56,56)    |0.309    |1.00e+10 |1.00e-10  |
 |OMEGA(57,57)    |0.309    |1.00e+10 |8.32      |
-|OMEGA(58,58)    |0.309    |1.00e+10 |32.7      |
+|OMEGA(58,58)    |0.309    |1.00e+10 |[31m32.7[39m      |
 |OMEGA(59,59)    |0.309    |1.00e+10 |0.598     |
 |OMEGA(60,60)    |0.309    |1.00e+10 |0.180     |
 |OMEGA(61,61)    |0.309    |1.00e+10 |9.97      |

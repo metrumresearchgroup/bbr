@@ -14,7 +14,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     sum1 <- MOD1 %>% model_summary()
 
     # check class
-    expect_identical(class(sum1), SUM_CLASS_LIST)
+    expect_identical(class(sum1), NM_SUM_CLASS_LIST)
 
     # compare to reference
     ref_sum <- dget(SUMMARY_REF_FILE)

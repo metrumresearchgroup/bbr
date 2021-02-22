@@ -1,9 +1,9 @@
 structure(list(
-  absolute_model_path = "/data/home/sethg/aadev/bbr/inst/model/nonmem/basic/1",
+  absolute_model_path = "/data/home/sethg/bbr/inst/model/nonmem/basic/1",
   run_details = list(
     version = "7.4.4", run_start = "-999999999",
-    run_end = "Tue Feb  2 15:24:27 EST 2021", estimation_time = 2.47,
-    cpu_time = 3.141, function_evaluations = 366L, significant_digits = 3.2,
+    run_end = "Mon Feb 22 16:53:58 EST 2021", estimation_time = 1.98,
+    cpu_time = 2.595, function_evaluations = 366L, significant_digits = 3.2,
     problem_text = "LEM PK model 1 cmt base", mod_file = "-999999999",
     estimation_method = "First Order Conditional Estimation with Interaction",
     data_set = "../../../../extdata/acop.csv", number_of_subjects = 40L,
@@ -72,5 +72,5 @@ structure(list(
   )
 ), class = c(
   "bbi_nonmem_summary",
-  "list"
+  "bbi_model", "list"
 ))
