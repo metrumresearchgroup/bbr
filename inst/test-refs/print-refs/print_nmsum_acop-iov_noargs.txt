@@ -8,12 +8,12 @@ Estimation Method(s):
 
 – First Order Conditional Estimation with Interaction 
 
-[31m**Heuristic Problem(s) Detected:**
-[39m
-– [31mhessian_reset 
-[39m
-– [31meta_pval_significant 
-[39m
+**Heuristic Problem(s) Detected:**
+
+– hessian_reset 
+
+– eta_pval_significant 
+
 |parameter_names |estimate |stderr  |shrinkage |
 |:---------------|:--------|:-------|:---------|
 |THETA1          |1.96     |0.0189  |          |
