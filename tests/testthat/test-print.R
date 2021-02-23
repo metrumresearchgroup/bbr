@@ -8,6 +8,7 @@ PRINT_REF_DIR <- file.path(REF_DIR, "print-refs")
 
 model_1 <- MOD1
 withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
+  withr::local_envvar(c("NO_COLOR" = "true"))
 
   test_that("print.bbi_process works with .wait = TRUE", {
     proc <- bbi_exec("--help", .wait = TRUE)
