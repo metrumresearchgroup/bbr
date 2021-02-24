@@ -136,7 +136,11 @@ SUMMARY_PARAM_DIAG <- "diag"
 SUMMARY_PARAM_SHRINKAGE <- "shrinkage"
 SUMMARY_SHRINKAGE_OMEGA <- "eta_sd"
 SUMMARY_SHRINKAGE_SIGMA <- "eps_sd"
+
+CONFIG_MODEL_PATH <- "model_path"
+CONFIG_MODEL_MD5 <- "model_md5"
 CONFIG_DATA_PATH <- "data_path"
+CONFIG_DATA_MD5 <- "data_md5"
 
 # keys required for a summary object to have
 SUMMARY_REQ_KEYS <- c(
