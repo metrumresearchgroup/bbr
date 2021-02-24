@@ -119,14 +119,18 @@ test_that("new_model() .based_on arg works", {
 })
 
 test_that("new_model() .based_on arg errors on fake model", {
+  temp_mod_path <- ctl_ext(tempfile())
+  writeLines("CREATED BY: new_model() .based_on arg errors on fake model", temp_mod_path)
+  on.exit(fs::file_delete(temp_mod_path))
+
   # create new model with args
   expect_error(
     new_model(
-      file.path(ABS_MODEL_DIR, "tmp"),
+      tools::file_path_sans_ext(temp_mod_path),
       .description = "original acop model",
       .based_on = c("1", "fake")
     ),
-    regexp = "cannot find .yaml files"
+    regexp = "based_on.+cannot find .yaml files"
   )
 })
 
