@@ -71,8 +71,8 @@ tags_diff.bbi_model <- function(.bbi_object, .mod2 = NULL, .print = TRUE, ...) {
   }
 
   # compare tags, print, and return
-  mod_diff     <- setdiff(mod_tags, compare_tags)
-  compare_diff <- setdiff(compare_tags, mod_tags)
+  mod_diff     <- setdiff(mod_tags, compare_tags) %||% ""
+  compare_diff <- setdiff(compare_tags, mod_tags) %||% ""
 
   if (isTRUE(.print)) {
     cat(paste(
@@ -99,34 +99,12 @@ tags_diff.bbi_run_log_df <- function(.bbi_object, .mod2 = NULL, .print = NULL, .
     warning("`.print` is not a valid argument for `tags_diff.bbi_run_log_df()` ignoring passed value.")
   }
 
-  # extract columns we need
-  .r <- .bbi_object[[RUN_ID_COL]]
-  .b <- .bbi_object[[YAML_BASED_ON]]
-  .t <- .bbi_object[[YAML_TAGS]]
-
-  parent_indices <- map(.b, ~which(.r %in% .x))
-
-  parent_tags <- map(parent_indices, function(.pi) {
-    if (length(.pi) == 0) {
-      return("")
-    }
-
-    # could have multiple parents so we map over each one
-    # and take the unique set of all of their tags
-    map(.pi, ~ .t[[.x]]) %>%
-      unlist() %>%
-      unique()
+  diff_list <- map(.bbi_object[[ABS_MOD_PATH]], function(.p) {
+    read_model(.p) %>%
+      tags_diff(.print = FALSE)
   })
 
-  # return a named list of lists
-  diff_list <- map2(.t, parent_tags, function(.x, .y) {
-    rlang::list2(
-      !!TAGS_ADD := setdiff(.x, .y),
-      !!TAGS_REM := setdiff(.y, .x)
-    )
-  })
-
-  names(diff_list) <- .r
+  names(diff_list) <- .bbi_object[[RUN_ID_COL]]
   return(diff_list)
 }
 
