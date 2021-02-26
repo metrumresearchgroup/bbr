@@ -34,7 +34,8 @@ test_that("tags_diff.bbi_model print works", {
 })
 
 test_that("tags_diff.bbi_model .mod2 works", {
-  new_mod <- create_temp_model() %>%
+  temp_mod_path <- create_temp_model()
+  new_mod <- temp_mod_path %>%
     read_model() %>%
     replace_all_tags(NEW_TAGS)
 
