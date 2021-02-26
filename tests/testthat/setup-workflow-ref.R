@@ -264,3 +264,11 @@ create_temp_model <- function(path = YAML_TEST_FILE,
   # normalizePath() needs to be called when the file actually exists
   fs::path_ext_remove(normalizePath(temp_yaml))
 }
+
+#' Delete a model object and all of it's accompanying files
+cleanup_model <- function(.mod) {
+  if (fs::file_exists(get_yaml_path(.mod, .check_exists = FALSE)))  fs::file_delete(get_yaml_path(.mod))
+  if (fs::file_exists(get_model_path(.mod, .check_exists = FALSE))) fs::file_delete(get_model_path(.mod))
+  if (fs::dir_exists(get_output_dir(.mod, .check_exists = FALSE)))  fs::dir_delete(get_output_dir(.mod))
+  rm(.mod)
+}
