@@ -30,6 +30,7 @@ build_print_bbi_nonmem_summary_refs <- function(.s, .args = list(), .suffix = ""
 ###################
 
 # To render refs, source this script.
+withr::local_envvar(c("NO_COLOR" = "true"))
 withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   .proj_root <- rprojroot::find_rstudio_root_file()
 
