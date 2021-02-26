@@ -1,3 +1,9 @@
+# bbr (development)
+
+## New features and changes
+
+* Added `tags_diff` function for comparing the tags between different models. (#337)
+
 # bbr 1.0.0
 
 This release is fairly small in terms of changes, but it increments to a new major release version primarily because of the name change which happened in `bbr 0.12.0`. The most significant change, from a user perspective, is to the default behavior of where `bbr` looks for `bbi` on the system. This change is described in [issue #321](https://github.com/metrumresearchgroup/bbr/issues/321) and a bit more detail is given below.
