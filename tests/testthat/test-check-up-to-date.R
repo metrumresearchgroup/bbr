@@ -19,6 +19,14 @@ test_that("check_up_to_date() with mismatched nonmem data", {
   expect_equal(check_up_to_date(MOD1), DATA_BAD)
 })
 
+test_that("check_up_to_date() with missing nonmem data", {
+  temp_mod_path <- create_temp_model()
+  new_mod <- read_model(temp_mod_path)
+  fs::dir_copy(get_output_dir(MOD1), get_output_dir(new_mod, .check_exists = F))
+  on.exit(fs::dir_delete(get_output_dir(new_mod)))
+  expect_equal(check_up_to_date(new_mod), ALL_BAD)
+})
+
 test_that("check_up_to_date() with mismatched nonmem both", {
   perturb_file(CTL_TEST_FILE)
   perturb_file(get_data_path(MOD1))

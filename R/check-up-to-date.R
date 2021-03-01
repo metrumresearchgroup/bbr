@@ -23,7 +23,9 @@
 #'   `"model"`) refers to the model files mentioned above. The second element
 #'   (named `"data"`) refers to the data files mentioned above. For both
 #'   elements, they will be `TRUE` if nothing has changed, `FALSE` if anything
-#'   has changed.
+#'   has changed. Note: _if no file exists_ at the specified path, `FALSE` will be
+#'   returned because that is technically a "change." The file used to exist and
+#'   now it does not.
 #'
 #' @export
 check_up_to_date <- function(.mod, ...) {
@@ -55,6 +57,7 @@ check_up_to_date.bbi_nonmem_summary <- function(.mod, ...) {
 #'
 #' @importFrom jsonlite fromJSON
 #' @importFrom fs file_exists
+#' @importFrom tidyr replace_na
 #'
 #' @inheritParams check_up_to_date
 #'
@@ -76,7 +79,6 @@ check_up_to_date_nonmem <- function(.mod) {
   )
 
   any_changes <- any(changed_files)
-
   if(isTRUE(any_changes)) {
     message(paste(
       glue("The following files have changed in {get_model_id(.mod)}"),
@@ -85,8 +87,17 @@ check_up_to_date_nonmem <- function(.mod) {
     ))
   }
 
+  na_files <- is.na(changed_files)
+  if(isTRUE(any(na_files))) {
+    message(paste(
+      glue("The following files in {get_model_id(.mod)} ARE NO LONGER PRESENT"),
+      paste("*", names(changed_files[na_files]), collapse = "\n"),
+      sep = "\n"
+    ))
+  }
+
   # build return value
-  res <- !changed_files
+  res <- replace_na(!changed_files, FALSE)
   names(res) <- c("model", "data")
 
   return(res)
