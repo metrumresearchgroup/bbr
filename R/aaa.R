@@ -229,3 +229,4 @@ NO_NONMEM_ERR_MSG <- "No version was supplied and no default value exists in the
 MOD_ALREADY_EXISTS_ERR_MSG <- "already exist, but we are configured not to overwrite"
 NO_STAN_ERR_MSG <- "stan support not yet implemented."
 PARAM_BAYES_ERR_MSG <- "param_estimates() is not currently implemented for Bayesian methods."
+CHECK_UP_TO_DATE_ERR_MSG <- "Cannot check if up-to-date because model has not been run yet."
