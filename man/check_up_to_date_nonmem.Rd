@@ -6,9 +6,6 @@
 \usage{
 check_up_to_date_nonmem(.mod)
 }
-\arguments{
-\item{.mod}{a \verb{bbi_\{.model_type\}_model} or \verb{bbi_\{.model_type\}_summary} object}
-}
 \description{
 Specifically, check that control stream and data file on disk have not
 changed since the model was run. This is accomplished by taking their md5
