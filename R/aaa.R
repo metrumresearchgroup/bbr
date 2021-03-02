@@ -199,6 +199,9 @@ CONFIG_LOG_REQ_COLS <- c(
   CONFIG_KEEPERS
 )
 
+TAGS_ADD <- "tags_added"
+TAGS_REM <- "tags_removed"
+
 # keys added when creating a process object
 PROC_PROCESS <- "process"
 PROC_STDOUT <- "stdout"
