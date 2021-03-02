@@ -4,7 +4,7 @@
 
 * Added `tags_diff()` function for comparing the tags between different models. (#337)
 
-* Added `model_diff()` function for comparing the model files between different models. (#341)
+* Added `model_diff()` function for comparing the model files between different models. (#342)
 
 * Added `check_up_to_date()` function for checking whether the model file(s) and data file(s) associated with a model have changed since the model was run.  (#338)
 

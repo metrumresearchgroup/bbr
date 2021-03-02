@@ -29,6 +29,7 @@ Imports:
     checkmate,
     cli,
     digest,
+    diffobj,
     dplyr (>= 0.8.0),
     forcats,
     fs,
