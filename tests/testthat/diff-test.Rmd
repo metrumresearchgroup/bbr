@@ -1,0 +1,64 @@
+---
+title: "diff-test.Rmd"
+output: 
+ - html_document
+ - pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+rmarkdown::all_output_formats(knitr::current_input())
+```
+
+```{r}
+knitr::is_html_output()
+```
+
+
+this is to test rendering model_diff in `.Rmd`.
+
+```{r message = F}
+devtools::load_all()
+source("setup-workflow-ref.R")
+cleanup()
+create_all_models()
+```
+
+## no args
+
+with no opts it renders but looks kinda ugly.
+
+```{r }
+# no opts
+model_diff(mod1, mod2)
+```
+
+with `results = "asis"` it renders nicely.
+```{r results = "asis"}
+# asis
+model_diff(mod1, mod2)
+```
+
+## .viewer = TRUE
+
+if you pass `.viewer = T` and _don't_ set `results = "asis"` then it renders nothing.
+```{r}
+# no opts
+model_diff(mod1, mod2, .viewer = T)
+```
+
+if you pass `.viewer = T` and set `results = "asis"` then it ignores the `.viewer` arg and renders as it should.
+
+```{r results = "asis"}
+# asis
+model_diff(mod1, mod2, .viewer = T)
+```
+
+
+```{r}
+cleanup()
+```
+
