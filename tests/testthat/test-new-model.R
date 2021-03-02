@@ -31,7 +31,7 @@ test_that("read_model() can read a model whose path has a period", {
   on.exit(fs::file_delete(c(temp_ctl, temp_yaml)))
 
   mod <- read_model(fs::path_ext_remove(temp_yaml))
-  expect_identical(class(mod), MOD_CLASS_LIST)
+  expect_identical(class(mod), NM_MOD_CLASS_LIST)
 })
 
 test_that("new_model() creates new YAML file", {
@@ -44,15 +44,15 @@ test_that("new_model() creates new YAML file", {
   mod1b <- read_model(temp_mod_path)
 
   # check class and keys are right
-  expect_identical(class(mod1a), MOD_CLASS_LIST)
-  expect_identical(class(mod1b), MOD_CLASS_LIST)
+  expect_identical(class(mod1a), NM_MOD_CLASS_LIST)
+  expect_identical(class(mod1b), NM_MOD_CLASS_LIST)
 
   expect_true(all(MODEL_REQ_KEYS %in% names(mod1a)))
   expect_true(all(MODEL_REQ_KEYS %in% names(mod1b)))
 })
 
 test_that("new_model() throws an error if the model file does not exist", {
-  expect_error(new_model("foo.yaml", "bar"), "No model file found")
+  expect_error(new_model("foo", "bar"), "No model file found")
 })
 
 test_that("compare read_model() and new_model() objects", {
@@ -72,8 +72,8 @@ test_that("compare read_model() and new_model() objects", {
   mod1b <- read_model(temp_mod_path)
 
   # check class and keys are right
-  expect_identical(class(mod1a), MOD_CLASS_LIST)
-  expect_identical(class(mod1b), MOD_CLASS_LIST)
+  expect_identical(class(mod1a), NM_MOD_CLASS_LIST)
+  expect_identical(class(mod1b), NM_MOD_CLASS_LIST)
 
   expect_true(all(MODEL_REQ_KEYS %in% names(mod1a)))
   expect_true(all(MODEL_REQ_KEYS %in% names(mod1b)))

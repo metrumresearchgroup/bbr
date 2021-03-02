@@ -55,7 +55,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       .tags = ORIG_TAGS,
       .bbi_args = list(overwrite = TRUE, threads = 4)
     )
-    expect_identical(class(mod1), MOD_CLASS_LIST)
+    expect_identical(class(mod1), NM_MOD_CLASS_LIST)
 
     # submit model
     proc1 <- submit_model(mod1, .mode = "local", .wait = TRUE)
@@ -66,7 +66,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
     # can't check against SUMMARY_REF_FILE because run time, etc. will be different
     # so we just check the structure
-    expect_identical(class(sum1), SUM_CLASS_LIST)
+    expect_identical(class(sum1), NM_SUM_CLASS_LIST)
     expect_identical(names(sum1), SUM_NAMES_REF)
 
     # check parameters table
@@ -83,7 +83,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
     # get summary from model object
     sum2 <- mod2 %>% model_summary()
-    expect_identical(class(sum2), SUM_CLASS_LIST)
+    expect_identical(class(sum2), NM_SUM_CLASS_LIST)
     expect_identical(names(sum2), SUM_NAMES_REF)
 
     # check parameters table

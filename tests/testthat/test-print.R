@@ -13,19 +13,23 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   test_that("print.bbi_process works with .wait = TRUE", {
     proc <- bbi_exec("--help", .wait = TRUE)
     res <- capture.output(print(proc))
-    expect_identical(res, c(PROC_HELP_STR, "Process finished."))
+    expect_true(any(str_detect(res, PROC_HELP_STR)))
+    expect_true(any(str_detect(res, "Process finished.")))
   })
 
   test_that("print.bbi_process works with .wait = FALSE", {
     proc <- bbi_exec("--help", .wait = FALSE)
     res <- capture.output(print(proc))
-    expect_identical(res, c(PROC_HELP_STR, "Not waiting for process to finish."))
+
+    expect_true(any(str_detect(res, PROC_HELP_STR)))
+    expect_true(any(str_detect(res, "Not waiting for process to finish.")))
   })
 
   test_that("print.bbi_process works with dry run", {
     proc <- bbi_dry_run("--help", ".")
     res <- capture.output(print(proc))
-    expect_identical(res, c(PROC_HELP_STR, "DRY RUN! Process not actually run."))
+    expect_true(any(str_detect(res, PROC_HELP_STR)))
+    expect_true(any(str_detect(res, "DRY RUN! Process not actually run.")))
   })
 
   test_that("print.bbi_process(.call_limit) works", {

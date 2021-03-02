@@ -37,13 +37,13 @@ get_model_path <- function(.bbi_object, .check_exists = TRUE) {
 #' @rdname get_path_from_object
 #' @export
 get_model_path.bbi_nonmem_model <- function(.bbi_object, .check_exists = TRUE) {
-  get_model_path_bbi(.bbi_object, .check_exists)
+  get_model_path_nonmem(.bbi_object, .check_exists)
 }
 
 #' @rdname get_path_from_object
 #' @export
 get_model_path.bbi_nonmem_summary <- function(.bbi_object, .check_exists = TRUE) {
-  get_model_path_bbi(.bbi_object, .check_exists)
+  get_model_path_nonmem(.bbi_object, .check_exists)
 }
 
 
@@ -62,13 +62,13 @@ get_output_dir <- function(.bbi_object, .check_exists = TRUE) {
 #' @rdname get_path_from_object
 #' @export
 get_output_dir.bbi_nonmem_model <- function(.bbi_object, .check_exists = TRUE) {
-  get_output_dir_bbi(.bbi_object, .check_exists)
+  get_output_dir_nonmem(.bbi_object, .check_exists)
 }
 
 #' @rdname get_path_from_object
 #' @export
 get_output_dir.bbi_nonmem_summary <- function(.bbi_object, .check_exists = TRUE) {
-  get_output_dir_bbi(.bbi_object, .check_exists)
+  get_output_dir_nonmem(.bbi_object, .check_exists)
 }
 
 #' @rdname get_path_from_object
@@ -86,14 +86,14 @@ get_yaml_path <- function(.bbi_object, .check_exists = TRUE) {
 
 #' @rdname get_path_from_object
 #' @export
-get_yaml_path.bbi_nonmem_model <- function(.bbi_object, .check_exists = TRUE) {
-  get_yaml_path_bbi(.bbi_object, .check_exists)
-}
+get_yaml_path.bbi_model <- function(.bbi_object, .check_exists = TRUE) {
+  .path <- paste0(.bbi_object[[ABS_MOD_PATH]], ".yaml")
 
-#' @rdname get_path_from_object
-#' @export
-get_yaml_path.bbi_nonmem_summary <- function(.bbi_object, .check_exists = TRUE) {
-  get_yaml_path_bbi(.bbi_object, .check_exists)
+  if (isTRUE(.check_exists)) {
+    checkmate::assert_file_exists(.path)
+  }
+
+  return(.path)
 }
 
 #' @rdname get_path_from_object
@@ -122,29 +122,23 @@ get_model_id.character <- function(.mod) {
   return(basename(tools::file_path_sans_ext(.mod)))
 }
 
-#' @describeIn get_model_id Takes `bbi_nonmem_model` object
+#' @describeIn get_model_id Takes `bbi_{.model_type}_model` or `bbi_{.model_type}_summary` object
 #' @export
-get_model_id.bbi_nonmem_model <- function(.mod) {
-  get_model_id_bbi(.mod)
-}
-
-#' @describeIn get_model_id Takes `bbi_nonmem_summary` object
-#' @export
-get_model_id.bbi_nonmem_summary <- function(.mod) {
-  get_model_id_bbi(.mod)
+get_model_id.bbi_model <- function(.mod) {
+  return(get_model_id(get_model_path(.mod)))
 }
 
 
 #' Get path to data file
 #'
-#' Helper to extract the path to the input data from a `bbi_nonmem_summary` or
-#' `bbi_nonmem_model` object. Note that **this function only works on models that
-#' have been successfully run** because the path to the data is constructed
-#' during model submission.
+#' Helper to extract the path to the input data from a
+#' `bbi_{.model_type}_summary` or `bbi_{.model_type}_model` object. Note that
+#' **this function only works on models that have been successfully run**
+#' because the path to the data is constructed during model submission.
 #' @param .mod Model to use, either a `bbi_{.model_type}_model` or
 #' `bbi_{.model_type}_summary` object.
-#' @param ... Arguments passed through to methods.
-#'   (Currently none, but will likely have some modifier arguments for `bbi_stan_model` objects.)
+#' @param ... Arguments passed through to methods. (Currently none, but may have
+#'   some modifier arguments other model types in the future.)
 #' @importFrom fs path_rel
 #' @return Absolute path to input data file
 #' @export
@@ -154,15 +148,28 @@ get_data_path <- function(.mod, ...) {
 
 #' @describeIn get_data_path Takes `bbi_nonmem_model` object
 #' @export
-get_data_path.bbi_nonmem_model <- function(.mod, ...) {
-  get_data_path_bbi(.mod)
+get_data_path.bbi_model <- function(.mod, ...) {
+  cfg_path <- file.path(get_output_dir(.mod), "bbi_config.json")
+
+  if (!fs::file_exists(cfg_path)) {
+    stop(paste(
+      glue("Cannot extract data path because no config file exists as {cfg_path}"),
+      "This likely means the model has not successfully been run yet.",
+      sep = "\n"
+    ))
+  }
+
+  cfg <- jsonlite::fromJSON(cfg_path)
+
+  fs::path_norm(
+    file.path(
+      get_output_dir(.mod),
+      cfg[[CONFIG_DATA_PATH]]
+    )
+  ) %>%
+    as.character()
 }
 
-#' @describeIn get_data_path Takes `bbi_nonmem_summary` object
-#' @export
-get_data_path.bbi_nonmem_summary <- function(.mod, ...) {
-  get_data_path_bbi(.mod)
-}
 
 #' Build path to output file
 #'
@@ -191,27 +198,26 @@ build_path_from_model <- function(.mod, .suffix, ...) {
 
 #' @rdname build_path_from_model
 #' @export
-build_path_from_model.bbi_nonmem_model <- function(.mod, .suffix, ...) {
-  build_path_from_model_bbi(.mod, .suffix)
+build_path_from_model.bbi_model <- function(.mod, .suffix, ...) {
+  file.path(
+    get_output_dir(.mod),
+    paste0(get_model_id(.mod), .suffix)
+  )
 }
 
-#' @rdname build_path_from_model
-#' @export
-build_path_from_model.bbi_nonmem_summary <- function(.mod, .suffix, ...) {
-  build_path_from_model_bbi(.mod, .suffix)
-}
 
-####################################################
-# Get path from bbi object implementation functions
-####################################################
+###################################################################
+# Model-specific get path from bbi object implementation functions
+###################################################################
 
 #' @keywords internal
-get_model_path_bbi <- function(.bbi_object, .check_exists = TRUE) {
+get_model_path_nonmem <- function(.bbi_object, .check_exists = TRUE) {
   find_nonmem_model_file_path(.bbi_object[[ABS_MOD_PATH]], .check_exists)
 }
 
+
 #' @keywords internal
-get_output_dir_bbi <- function(.bbi_object, .check_exists = TRUE) {
+get_output_dir_nonmem <- function(.bbi_object, .check_exists = TRUE) {
   .path <- .bbi_object[[ABS_MOD_PATH]]
 
   if (isTRUE(.check_exists)) {
@@ -221,53 +227,6 @@ get_output_dir_bbi <- function(.bbi_object, .check_exists = TRUE) {
   return(.path)
 }
 
-#' @keywords internal
-get_yaml_path_bbi <- function(.bbi_object, .check_exists = TRUE) {
-  .path <- paste0(.bbi_object[[ABS_MOD_PATH]], ".yaml")
-
-  if (isTRUE(.check_exists)) {
-    checkmate::assert_file_exists(.path)
-  }
-
-  return(.path)
-}
-
-#' @keywords internal
-get_model_id_bbi <- function(.bbi_object) {
-  return(basename(tools::file_path_sans_ext(get_model_path(.bbi_object))))
-}
-
-#' @keywords internal
-get_data_path_bbi <- function(.mod) {
-  cfg_path <- file.path(get_output_dir(.mod), "bbi_config.json")
-
-  if (!fs::file_exists(cfg_path)) {
-    stop(paste(
-      glue("Cannot extract data path because no config file exists as {cfg_path}"),
-      "This likely means the model has not successfully been run yet.",
-      sep = "\n"
-    ))
-  }
-
-  cfg <- jsonlite::fromJSON(cfg_path)
-
-  fs::path_norm(
-    file.path(
-      get_output_dir(.mod),
-      cfg[[CONFIG_DATA_PATH]]
-    )
-  ) %>%
-    as.character()
-
-}
-
-#' @keywords internal
-build_path_from_model_bbi <- function(.mod, .suffix) {
-  file.path(
-    get_output_dir(.mod),
-    paste0(get_model_id(.mod), .suffix)
-  )
-}
 
 ###########################
 # Get path private helpers
@@ -350,35 +309,6 @@ yaml_ext <- function(.x) {
 ###################################
 # Other Assorted file path helpers
 ###################################
-
-
-#' Build absolute path from a directory and path
-#'
-#' Private helper that concatenates a directory and path, and uses normalizePath() to create an absolute path, with some specific rules:
-#' If .directory is NULL, set to working directory.
-#' If .path is an absolute path, ignore .directory and just return .path,
-#' otherwise return `file.path(.directory, .path)`.
-#' Also NOTE that `.directory` must point an already existing directory so that the absolute path can be reliably built.
-#' @param .directory Character scalar for the directory
-#' @param .path Character scalar for the path to the file (could be just the file name, or could be in a subdirectory)
-#' @keywords internal
-combine_directory_path <- function(.directory, .path) {
-  # If .directory is NULL, set to working directory
-  if (is.null(.directory)) {
-    .directory <- getwd()
-  }
-
-  # If .path is an absolute path, ignore .directory
-  if (!fs::is_absolute_path(.path)) {
-    # normalizePath and optionally check if it exists
-    .directory <- normalizePath(.directory, mustWork = TRUE)
-
-    # build file path
-    .path <- file.path(.directory, .path)
-  }
-
-  return(.path)
-}
 
 
 #' Find the path to a NONMEM model file
