@@ -1,3 +1,13 @@
+# bbr (development)
+
+## New features and changes
+
+* Added `tags_diff` function for comparing the tags between different models. (#337)
+
+## Developer-facing changes
+
+* Added a `bbi_model` parent class to `bbi_nonmem_model` and `bbi_nonmem_summary` objects. Many of the helpers in `get-path-from-object.R` now dispatch on this class. This had been discussed in the past but was primarily done now in preparation for beginning development for Stan modeling, which will create `bbi_stan_model` and `bbi_stan_summary` objects that will also inherit from this parent class. (#332)
+
 # bbr 1.0.0
 
 This release is fairly small in terms of changes, but it increments to a new major release version primarily because of the name change which happened in `bbr 0.12.0`. The most significant change, from a user perspective, is to the default behavior of where `bbr` looks for `bbi` on the system. This change is described in [issue #321](https://github.com/metrumresearchgroup/bbr/issues/321) and a bit more detail is given below.
