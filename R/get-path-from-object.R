@@ -345,13 +345,15 @@ find_nonmem_model_file_path <- function(.path, .check_exists = TRUE) {
 
   if (!any(exists_idx)) {
     if (isTRUE(.check_exists)) {
-      stop(
-        glue::glue(
+      stop(paste(
+        glue(
           "No model file found at {maybe_paths[1L]} or {maybe_paths[2L]}.",
           "Please put relevant model file in that location.",
           .sep = " "
-        )
-      )
+        ),
+        "IF THIS IS NOT A NONMEM MODEL please pass the appropriate type to `.model_type`",
+        sep = "\n"
+      ))
     } else {
       res <- maybe_paths[1L]
     }

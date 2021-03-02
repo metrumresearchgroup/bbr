@@ -34,7 +34,8 @@ formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 
 into YAML file.}
 
 \item{.overwrite}{If \code{FALSE}, the default, error if a file already exists at
-\code{.yaml_path}. If \code{TRUE} overwrite existing file, if one exists.}
+\code{.yaml_path}. If \code{TRUE} overwrite existing file and output directory, if
+they exist.}
 
 \item{.model_type}{Character scaler to specify type of model being created
 (used for S3 class). Currently only \code{'nonmem'} is supported.}
