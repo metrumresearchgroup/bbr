@@ -82,7 +82,11 @@ model_diff_get_comp <- function(.mod, .mod2) {
     if (length(based_on_path) == 0) {
       stop(paste(glue("Model {mod_id} has no models in `based_on`."), MODEL_DIFF_ERR_MSG), call. = F)
     } else if (length(based_on_path) > 1) {
-      stop(paste(glue("Model {mod_id} has multiple models in `based_on`."), MODEL_DIFF_ERR_MSG), call. = F)
+      stop(paste(
+        glue("Model {mod_id} has multiple models in `based_on`."),
+        MODEL_DIFF_ERR_MSG,
+        glue("Models returned from `get_based_on(.mod)`: {paste(based_on_path, collapse = ', ')}")
+      ), call. = F)
     } else {
       .mod2 <- read_model(based_on_path)
     }
@@ -111,9 +115,27 @@ model_diff_impl <- function(model_A, model_B, .viewer) {
     ))
   }
 
-  suppressSpecificWarning({
+  # print some warnings if knitting
+  knitting <- isTRUE(getOption('knitr.in.progress'))
+  if (knitting) {
+    requireNamespace("knitr", quietly = TRUE) # technically this option could be set without knitr being installed
+    if (!knitr::is_html_output()) {
+      warning(paste(
+        "bbr::model_diff() may not render legibly in non-HTML knitr output.",
+        "Consider setting `output: html_document` if you want to use model_diff()."
+      ), call. = FALSE)
+    }
+    if (isTRUE(.viewer)) {
+      warning(paste(
+        "bbr::model_diff(.viewer = TRUE) is not supported when knitting an `.Rmd` or similar.",
+        "For best results remove this argument and set `results = 'asis'` in your chunk options."
+      ), call. = FALSE)
+    }
+  }
+
+  the_diff <- suppressSpecificWarning({
     # if knitting and `results = "asis"` set, render HTML
-    if (isTRUE(getOption('knitr.in.progress')) &&
+    if (knitting &&
         knitr::opts_current$get("results") == 'asis' &&
         knitr::is_html_output()
         ) {
@@ -135,4 +157,10 @@ model_diff_impl <- function(model_A, model_B, .viewer) {
       )
     }
   }, .regexpr = "incomplete final line")
+
+  # set the names in the diff
+  the_diff@etc@tar.exp <- get_model_id(model_A)
+  the_diff@etc@cur.exp <- get_model_id(model_B)
+
+  return(the_diff)
 }
