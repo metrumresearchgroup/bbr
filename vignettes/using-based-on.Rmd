@@ -76,10 +76,28 @@ From there, the iterative model development process proceeds. The `copy_model_fr
 ```{r copy_model 2}
 mod2 <- copy_model_from(.parent_mod = mod1, .new_model = 2)
 
-mod2$based_on
+get_based_on(mod2)
 ```
 
-*NOTE:* In a real model development process, these models would obviously be run and the diagnostics examined before moving on. For the sake of brevity, imagine that all happens "behind the curtain" in this example. In other words, _in between_ each of the calls to `copy_model_from()` you would be doing all of the normal iterative modeling work.
+## diff helpers
+
+There are several helper functions for comparing a model to its parent. `tags_diff()` compares the tags attached to the two models, while `model_diff()` compares the model files on disk.
+
+```{r}
+mod1 <- add_tags(mod1, c("the same tag", "an old tag"))
+mod2 <- add_tags(mod2, c("the same tag", "a new tag"))
+tags_diff(mod2)
+```
+
+```{r, results = "asis"}
+model_diff(mod2)
+```
+
+By default both functions compare the model to whatever model is returned from `get_based_on()`, but they also have a `.mod2` argument which can take any arbitrary model object and compare with that instead. See `?tags_diff` and `?model_diff` for more details on usage.
+
+## More iteration
+
+Now we continue iterating on our model. *NOTE:* In a real model development process, these models would obviously be run and the diagnostics examined before moving on. For the sake of brevity, imagine that all happens "behind the curtain" in this example. In other words, _in between_ each of the calls to `copy_model_from()` you would be doing all of the normal iterative modeling work.
 
 
 ```{r big copy}
@@ -166,13 +184,25 @@ log_df %>%
 
 As you can see, models 3 and 4 are discarded because they did not lead to the final model. Review "Modeling Process" section above if you are not sure why this is the case. We will use the two techniques together in the "Final model family" section below.
 
-## Checking if models are up-to-date with config_log()
+## Checking if models are up-to-date with `check_up_to_date()` and `config_log()`
 
 Now imagine you are coming back to this project some time later and want to make sure that all of the outputs you have are still up-to-date with the model files and data currently in the project.
 
-When `bbi` runs a model, it creates a file named `bbi_config.json` in the output directory. This file contains a lot of information about the state and configuration at the time when the model was run. Notably, it contains an md5 digest of both the model file _and_ the data file at execution time. 
+When `bbi` runs a model, it creates a file named `bbi_config.json` in the output directory. This file contains a lot of information about the state and configuration at the time when the model was run. Notably, it contains an md5 digest of both the model file _and_ the data file at execution time. The following functions compare the md5 digests (stored during model execution) against the model and data files _as they currently exist on disk_ at the time these functions are called.
 
-The `config_log()` function parses these `bbi_config.json` files and extracts some relevant information to a `bbi_config_log_df` tibble. The `model_has_changed` and `data_has_changed` columns compare the md5 digests (stored during model execution) against the model and data files _as they currently exist on disk_ at the time `config_log()` is called. This serves as a check that the outputs are up-to-date with the current model and data.
+### `check_up_to_date()` for a single model
+
+The `check_up_to_date()` function takes a model object and invisibly returns a two-element logical vector. The return is invisible because, if there are any changes, it will also print a message telling you which files have changed. Either way, you can also inspect the returned object like so.
+
+```{r}
+res <- check_up_to_date(mod1)
+print(res)
+```
+
+
+### `config_log()` for multiple models
+
+The `config_log()` function parses these `bbi_config.json` files and extracts some relevant information to a `bbi_config_log_df` tibble. It contains `model_has_changed` and `data_has_changed` columns that serve as a check that the outputs are up-to-date with the current model and data.
 
 You can call `config_log` directly, but it is often useful to join it to a run log automatically with `run_log() %>% add_config()`.
 
@@ -201,6 +231,7 @@ log_df <- log_df %>% add_config()
 log_df %>% select(run, model_has_changed, data_has_changed)
 ```
 
+One important note: `check_up_to_date()` and `config_log()` return opposite boolean values. `check_up_to_date()` returns `TRUE` if the files are _up to date_, whereas the `*_has_changed` columns contain `TRUE` if something _has changed_.
 
 ## Final model family
 
