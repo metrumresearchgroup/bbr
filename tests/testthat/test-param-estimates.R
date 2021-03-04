@@ -28,6 +28,16 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     )
   })
 
+  test_that("param_estimates correctly errors on Bayesian model with multiple estimation methods", {
+    sum1 <- file.path(MODEL_DIR_X, "acop-fake-bayes") %>%
+      read_model() %>%
+      model_summary()
+    expect_error(
+      param_estimates(sum1),
+      regexp = "not currently implemented for Bayesian methods"
+    )
+  })
+
   test_that("param_estimates correctly warns on mixture model", {
     mod1 <- read_model(file.path(MODEL_DIR_X, "iovmm"))
     sum1 <- model_summary(mod1)

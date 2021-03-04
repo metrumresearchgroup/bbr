@@ -1,0 +1,3 @@
+model_type: nonmem
+description: A copy of ../basic/1.ctl for testing when Bayes is not the first
+  or last estimation method
