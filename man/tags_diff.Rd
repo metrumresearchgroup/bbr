@@ -14,8 +14,8 @@ add_tags_diff(.log_df)
 \verb{bbi_\{.model_type\}_model} object or a
 tibble of class \code{bbi_run_log_df}.}
 
-\item{.mod2}{If a \code{bbi_model} object is passed, compare \code{.bbi_object} to
-\code{.mod2}. If \code{.mod2 = NULL}, the default, compare the \code{.bbi_object} model to
+\item{.mod2}{If a \verb{bbi_\{.model_type\}_model} object is passed, compare \code{.bbi_object}
+to \code{.mod2}. If \code{.mod2 = NULL}, the default, compare the \code{.bbi_object} model to
 any models in its \code{based_on} field. \strong{Only valid for \code{bbi_model}
 method.}}
 

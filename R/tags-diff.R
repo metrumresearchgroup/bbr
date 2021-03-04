@@ -33,8 +33,8 @@
 #' @param .bbi_object The object to compare. Could be a
 #'   `bbi_{.model_type}_model` object or a
 #'   tibble of class `bbi_run_log_df`.
-#' @param .mod2 If a `bbi_model` object is passed, compare `.bbi_object` to
-#'   `.mod2`. If `.mod2 = NULL`, the default, compare the `.bbi_object` model to
+#' @param .mod2 If a `bbi_{.model_type}_model` object is passed, compare `.bbi_object`
+#'   to `.mod2`. If `.mod2 = NULL`, the default, compare the `.bbi_object` model to
 #'   any models in its `based_on` field. **Only valid for `bbi_model`
 #'   method.**
 #' @param .print If `TRUE`, the default, will print a nicely formatted
@@ -50,7 +50,7 @@ tags_diff <- function(.bbi_object, .mod2 = NULL, .print = TRUE, ...) {
 #' @export
 tags_diff.bbi_model <- function(.bbi_object, .mod2 = NULL, .print = TRUE, ...) {
   # check that it's a model and not a summary, etc.
-  check_model_object(.bbi_object)
+  check_yaml_in_sync(.bbi_object)
   mod_name <- get_model_id(.bbi_object)
   mod_tags <- .bbi_object[[YAML_TAGS]]
 

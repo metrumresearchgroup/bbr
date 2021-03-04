@@ -230,3 +230,4 @@ MOD_ALREADY_EXISTS_ERR_MSG <- "already exist, but we are configured not to overw
 NO_STAN_ERR_MSG <- "stan support not yet implemented."
 PARAM_BAYES_ERR_MSG <- "param_estimates() is not currently implemented for Bayesian methods."
 CHECK_UP_TO_DATE_ERR_MSG <- "Cannot check if up-to-date because model has not been run yet."
+MODEL_DIFF_ERR_MSG <- "Please pass a single `bbi_model` object to the `.mod2` to compare models."

@@ -1,7 +1,7 @@
 Type: Package
 Package: bbr
 Title: R package for bbi
-Version: 1.0.0.8001
+Version: 1.0.0.8002
 Authors@R: 
     c(person(given = "Devin",
              family = "Pastoor",
@@ -29,6 +29,7 @@ Imports:
     checkmate,
     cli,
     digest,
+    diffobj,
     dplyr (>= 0.8.0),
     forcats,
     fs,
