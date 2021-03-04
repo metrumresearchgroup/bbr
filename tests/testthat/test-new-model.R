@@ -56,7 +56,7 @@ test_that("new_model() throws an error if the model file does not exist", {
 })
 
 test_that("compare read_model() and new_model() objects", {
-  temp_mod_path <- create_temp_model(YAML_TEST_FILE)
+  temp_mod_path <- create_temp_model()
   fs::file_delete(fs::path_ext_set(temp_mod_path, "yaml"))
 
   # create a new model with arguments known to match the reference model at
@@ -88,7 +88,7 @@ test_that("compare read_model() and new_model() objects", {
 })
 
 test_that("new_model() .overwrite arg works", {
-  temp_mod_path <- create_temp_model(YAML_TEST_FILE)
+  temp_mod_path <- create_temp_model()
 
   # error if file exists
   expect_error(
@@ -105,7 +105,7 @@ test_that("new_model() .overwrite arg works", {
 
 
 test_that("new_model() .based_on arg works", {
-  temp_mod_path <- create_temp_model(YAML_TEST_FILE)
+  temp_mod_path <- create_temp_model()
   parent_model_id <- get_model_id(create_temp_model())
   fs::file_delete(fs::path_ext_set(temp_mod_path, "yaml"))
 

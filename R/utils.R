@@ -260,6 +260,59 @@ na_to_null <- function(.obj) {
   .obj
 }
 
+#' Compare a file to an MD5 sum
+#'
+#' @param path String giving the path to the file.
+#' @param md5 String giving expected MD5 sum.
+#'
+#' @return `TRUE` if `path` matches `md5`, otherwise `FALSE` (including if
+#'   `path` doesn't exist).
+#'
+#' @keywords internal
+file_matches <- function(path, md5) {
+  checkmate::assert_string(path)
+  checkmate::assert_string(md5)
+
+  if (file.exists(path)) {
+    res <- tools::md5sum(path) == md5
+  } else {
+    res <- FALSE
+  }
+
+  res
+}
+
+#' Compare a file to a string
+#'
+#' Check whether the md5 digest of a string matches
+#' the digest of a file. In other words, are the
+#' contents of the string and the file the same.
+#'
+#' @details
+#' Similar to [file_matches] but takes a string that
+#' will be hashed to MD5 before comparing. By default
+#' it also appends a new line to the end of the string
+#' before hashing (because most file writer functions
+#' do this automatically).
+#'
+#' @param path String giving the path to the file.
+#' @param string Character scalar to hash and compare to hash of file
+#' @param append Character scalar to append to the end of string. Defaults
+#'   to `"\n"` because helpers like `writeLines()` and `readr::write_lines()`
+#'   automatically append a `"\n"` to a string when writing to a file.
+#'
+#' @return `TRUE` if `path` matches `string`, otherwise `FALSE` (including if
+#'   `path` doesn't exist).
+#'
+#' @keywords internal
+file_matches_string <- function(path, string, append = "\n") {
+  checkmate::assert_string(string)
+
+  test_string <- paste0(string, append)
+
+  file_matches(path, digest::digest(test_string, serialize = FALSE))
+}
+
 #' Print valid .bbi_args
 #'
 #' Prints all valid arguments to pass in to `.bbi_args=list()` argument of `submit_model()` or `model_summary()`

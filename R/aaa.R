@@ -136,7 +136,11 @@ SUMMARY_PARAM_DIAG <- "diag"
 SUMMARY_PARAM_SHRINKAGE <- "shrinkage"
 SUMMARY_SHRINKAGE_OMEGA <- "eta_sd"
 SUMMARY_SHRINKAGE_SIGMA <- "eps_sd"
+
+CONFIG_MODEL_PATH <- "model_path"
+CONFIG_MODEL_MD5 <- "model_md5"
 CONFIG_DATA_PATH <- "data_path"
+CONFIG_DATA_MD5 <- "data_md5"
 
 # keys required for a summary object to have
 SUMMARY_REQ_KEYS <- c(
@@ -225,3 +229,4 @@ NO_NONMEM_ERR_MSG <- "No version was supplied and no default value exists in the
 MOD_ALREADY_EXISTS_ERR_MSG <- "already exist, but we are configured not to overwrite"
 NO_STAN_ERR_MSG <- "stan support not yet implemented."
 PARAM_BAYES_ERR_MSG <- "param_estimates() is not currently implemented for Bayesian methods."
+CHECK_UP_TO_DATE_ERR_MSG <- "Cannot check if up-to-date because model has not been run yet."
