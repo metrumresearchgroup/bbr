@@ -133,7 +133,7 @@ model_diff_impl <- function(model_A, model_B, .viewer) {
     }
   }
 
-  the_diff <- suppressSpecificWarning({
+  suppressSpecificWarning({
     # if knitting and `results = "asis"` set, render HTML
     if (knitting &&
         knitr::opts_current$get("results") == 'asis' &&
@@ -143,6 +143,8 @@ model_diff_impl <- function(model_A, model_B, .viewer) {
         model_A,
         model_B,
         mode = "sidebyside",
+        tar.banner=get_model_id(model_A),
+        cur.banner=get_model_id(model_B),
         format = "html",
         style = list(html.output = "diff.w.style"),
         interactive = F
@@ -153,14 +155,10 @@ model_diff_impl <- function(model_A, model_B, .viewer) {
         model_A,
         model_B,
         mode = "sidebyside",
+        tar.banner=get_model_id(model_A),
+        cur.banner=get_model_id(model_B),
         interactive = .viewer
       )
     }
   }, .regexpr = "incomplete final line")
-
-  # set the names in the diff
-  the_diff@etc@tar.exp <- get_model_id(model_A)
-  the_diff@etc@cur.exp <- get_model_id(model_B)
-
-  return(the_diff)
 }
