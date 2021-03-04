@@ -19,10 +19,38 @@
 #'    method, numbers of subjects and records, significant digits, run time, and
 #'    more.
 #'  * **run_heuristics** -- Boolean flags indicating potential issues with the
-#'    run. For example, if there was a large condition number or a parameter near
-#'    boundary. `TRUE` for a given element indicates that issue was detected.
+#'    run. `TRUE` for a given element indicates that issue was detected.
 #'    `FALSE` can either mean it was not detected or it was not applicable for
 #'    that run.
+#'    * `covariance_step_aborted` --
+#'    * `large_condition_number` -- `TRUE` if `condition_number > 1000`. Could
+#'      indicate highly correlated parameters, overparameterization, or other
+#'      issues.
+#'    * `correlations_not_ok` -- Not currently implemented in `bbi`; will always
+#'      be `FALSE`.
+#'    * `parameter_near_boundary` --
+#'    * `hessian_reset` -- Indicates some problem during the search,
+#'      specifically that the approximation to the Hessian is no longer
+#'      acceptable, and must be “recomputed”. User should check the `.lst` file
+#'      (use [build_path_from_model()]) to see how many resets occur
+#'      and on which iterations. The message can be safely ignored, unless more
+#'      than just a couple of resets occur, or resets occur right before the end
+#'      of the search. In these cases a poor fit (judged by other means) can
+#'      result and the user should carefully regard their setup, and consider
+#'      possible reasons why a minimum, let alone one which corresponds to a good
+#'      estimate, was difficult to find. There could be many possible reasons.
+#'    * `has_final_zero_gradient` -- Could indicate a coding error, or that
+#'    there is not enough information for NONMEM to estimate the parameter. Use
+#'    [check_grd()] to see which parameters are having issues.
+#'    * `minimization_terminated` --
+#'    * `eta_pval_significant` -- `TRUE` if any of the ETA p-values are < 0.05
+#'      (extracted from `$shrinkage_details$pval`). This indicates large
+#'      deviations from zero, which violates the assumption that ETA has a mean of
+#'      zero with a variance of Omega. This could be consequence of asymmetric
+#'      shrinkage or a misfit model.
+#'    * `prderr` -- `TRUE` if a `PRDERR` file is present in the output folder.
+#'      This indicates that NONMEM is unable to compute a prediction for a given
+#'      data record with the current THETA and ETA values.
 #'  * **parameters_data** -- Data about parameter estimates. This can be
 #'    accessed directly, but is much easier to look at with the
 #'    [param_estimates()] function (which parses this, and other related elements,
@@ -51,7 +79,7 @@
 #' Additionally, if you have renamed the `.ext` file from its default of `<root>.ext` you will need to pass
 #' `ext_file = "NEWNAME"` to `.bbi_args`.
 #'
-#' @seealso [model_summaries()]
+#' @seealso [model_summaries()], [summary_log()]
 #' @param .mod Model to summarize.
 #' @param .bbi_args A named list specifying arguments to pass to bbi formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`.
 #' See [print_bbi_args()] for full list of options.

@@ -34,10 +34,40 @@ described in the \code{\link{get_path_from_object}} help page.
 method, numbers of subjects and records, significant digits, run time, and
 more.
 \item \strong{run_heuristics} -- Boolean flags indicating potential issues with the
-run. For example, if there was a large condition number or a parameter near
-boundary. \code{TRUE} for a given element indicates that issue was detected.
+run. \code{TRUE} for a given element indicates that issue was detected.
 \code{FALSE} can either mean it was not detected or it was not applicable for
 that run.
+\itemize{
+\item \code{covariance_step_aborted} --
+\item \code{large_condition_number} -- \code{TRUE} if \code{condition_number > 1000}. Could
+indicate highly correlated parameters, overparameterization, or other
+issues.
+\item \code{correlations_not_ok} -- Not currently implemented in \code{bbi}; will always
+be \code{FALSE}.
+\item \code{parameter_near_boundary} --
+\item \code{hessian_reset} -- Indicates some problem during the search,
+specifically that the approximation to the Hessian is no longer
+acceptable, and must be “recomputed”. User should check the \code{.lst} file
+(use \code{\link[=build_path_from_model]{build_path_from_model()}}) to see how many resets occur
+and on which iterations. The message can be safely ignored, unless more
+than just a couple of resets occur, or resets occur right before the end
+of the search. In these cases a poor fit (judged by other means) can
+result and the user should carefully regard their setup, and consider
+possible reasons why a minimum, let alone one which corresponds to a good
+estimate, was difficult to find. There could be many possible reasons.
+\item \code{has_final_zero_gradient} -- Could indicate a coding error, or that
+there is not enough information for NONMEM to estimate the parameter. Use
+\code{\link[=check_grd]{check_grd()}} to see which parameters are having issues.
+\item \code{minimization_terminated} --
+\item \code{eta_pval_significant} -- \code{TRUE} if any of the ETA p-values are < 0.05
+(extracted from \verb{$shrinkage_details$pval}). This indicates large
+deviations from zero, which violates the assumption that ETA has a mean of
+zero with a variance of Omega. This could be consequence of asymmetric
+shrinkage or a misfit model.
+\item \code{prderr} -- \code{TRUE} if a \code{PRDERR} file is present in the output folder.
+This indicates that NONMEM is unable to compute a prediction for a given
+data record with the current THETA and ETA values.
+}
 \item \strong{parameters_data} -- Data about parameter estimates. This can be
 accessed directly, but is much easier to look at with the
 \code{\link[=param_estimates]{param_estimates()}} function (which parses this, and other related elements,
@@ -75,5 +105,5 @@ Additionally, if you have renamed the \code{.ext} file from its default of \verb
 }}
 
 \seealso{
-\code{\link[=model_summaries]{model_summaries()}}
+\code{\link[=model_summaries]{model_summaries()}}, \code{\link[=summary_log]{summary_log()}}
 }

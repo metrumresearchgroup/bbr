@@ -75,5 +75,5 @@ Additionally, \strong{if you have renamed your \code{.ext} file, you will need t
 }}
 
 \seealso{
-\code{\link[=model_summary]{model_summary()}}
+\code{\link[=model_summary]{model_summary()}}, \code{\link[=summary_log]{summary_log()}}
 }
