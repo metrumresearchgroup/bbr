@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
       </span>
     </div>
 
@@ -95,7 +95,7 @@
 
       
 
-      </header><div class="row">
+      </header><script src="getting-started_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Getting Started with bbr</h1>
@@ -272,17 +272,17 @@
 <code class="sourceCode R"><span class="va">param_df1</span> <span class="op">&lt;-</span> <span class="va">sum1</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/param_estimates.html">param_estimates</a></span><span class="op">(</span><span class="op">)</span>
 <span class="va">param_df1</span>
 <span class="co">#&gt; # A tibble: 9 x 8</span>
-<span class="co">#&gt;   parameter_names estimate   stderr random_effect_sd random_effect_s… fixed</span>
-<span class="co">#&gt;   &lt;chr&gt;              &lt;dbl&gt;    &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt; &lt;lgl&gt;</span>
-<span class="co">#&gt; 1 THETA1            2.31   8.61e- 2           NA              NA      FALSE</span>
-<span class="co">#&gt; 2 THETA2           55.0    3.33e+ 0           NA              NA      FALSE</span>
-<span class="co">#&gt; 3 THETA3          465.     2.96e+ 1           NA              NA      FALSE</span>
-<span class="co">#&gt; 4 THETA4           -0.0806 5.55e- 2           NA              NA      FALSE</span>
-<span class="co">#&gt; 5 THETA5            4.13   1.36e+ 0           NA              NA      FALSE</span>
-<span class="co">#&gt; 6 OMEGA(1,1)        0.0964 2.00e- 2            0.311           0.0322 FALSE</span>
-<span class="co">#&gt; 7 OMEGA(2,1)        0      1.00e+10            0     10000000000      TRUE </span>
-<span class="co">#&gt; 8 OMEGA(2,2)        0.154  2.67e- 2            0.392           0.0341 FALSE</span>
-<span class="co">#&gt; 9 SIGMA(1,1)        1      1.00e+10            1     10000000000      TRUE </span>
+<span class="co">#&gt;   parameter_names estimate   stderr random_effect_sd random_effect_sdse fixed</span>
+<span class="co">#&gt;   &lt;chr&gt;              &lt;dbl&gt;    &lt;dbl&gt;            &lt;dbl&gt;              &lt;dbl&gt; &lt;lgl&gt;</span>
+<span class="co">#&gt; 1 THETA1            2.31   8.61e- 2           NA                NA      FALSE</span>
+<span class="co">#&gt; 2 THETA2           55.0    3.33e+ 0           NA                NA      FALSE</span>
+<span class="co">#&gt; 3 THETA3          465.     2.96e+ 1           NA                NA      FALSE</span>
+<span class="co">#&gt; 4 THETA4           -0.0806 5.55e- 2           NA                NA      FALSE</span>
+<span class="co">#&gt; 5 THETA5            4.13   1.36e+ 0           NA                NA      FALSE</span>
+<span class="co">#&gt; 6 OMEGA(1,1)        0.0964 2.00e- 2            0.311             0.0322 FALSE</span>
+<span class="co">#&gt; 7 OMEGA(2,1)        0      1.00e+10            0       10000000000      TRUE </span>
+<span class="co">#&gt; 8 OMEGA(2,2)        0.154  2.67e- 2            0.392             0.0341 FALSE</span>
+<span class="co">#&gt; 9 SIGMA(1,1)        1      1.00e+10            1       10000000000      TRUE </span>
 <span class="co">#&gt; # … with 2 more variables: diag &lt;lgl&gt;, shrinkage &lt;dbl&gt;</span></code></pre></div>
 <p>To see how to load summaries of multiple models to an easy-to-read tibble, see the <a href="https://metrumresearchgroup.github.io/bbr/articles/using-summary-log.html">Creating a Model Summary Log</a> vignette.</p>
 </div>
@@ -319,6 +319,7 @@
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="va">mod2</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="../reference/modify_notes.html">add_notes</a></span><span class="op">(</span><span class="st">"2 compartment model more appropriate than 1 compartment"</span><span class="op">)</span></code></pre></div>
+<p>The <code><a href="../reference/model_diff.html">model_diff()</a></code> and <code><a href="../reference/tags_diff.html">tags_diff()</a></code> function make it easy to compare models to their parent model. See the <a href="https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html">“Using based_on” vignette</a> for examples.</p>
 </div>
 <div id="continue-to-iterate" class="section level2">
 <h2 class="hasAnchor">
@@ -349,9 +350,9 @@
 <span class="co">#&gt; # A tibble: 3 x 10</span>
 <span class="co">#&gt;   absolute_model_… run   yaml_md5 model_type description bbi_args based_on tags </span>
 <span class="co">#&gt;   &lt;chr&gt;            &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;chr&gt;       &lt;list&gt;   &lt;list&gt;   &lt;lis&gt;</span>
-<span class="co">#&gt; 1 /data/home/seth… 1     c7486e7… nonmem     &lt;NA&gt;        &lt;list [… &lt;NULL&gt;   &lt;chr…</span>
-<span class="co">#&gt; 2 /data/home/seth… 2     bc60c6b… nonmem     &lt;NA&gt;        &lt;list [… &lt;chr [1… &lt;chr…</span>
-<span class="co">#&gt; 3 /data/home/seth… 3     cfceb67… nonmem     &lt;NA&gt;        &lt;list [… &lt;chr [1… &lt;chr…</span>
+<span class="co">#&gt; 1 /data/home/seth… 1     c7486e7… nonmem     &lt;NA&gt;        &lt;NULL&gt;   &lt;NULL&gt;   &lt;chr…</span>
+<span class="co">#&gt; 2 /data/home/seth… 2     bc60c6b… nonmem     &lt;NA&gt;        &lt;NULL&gt;   &lt;chr [1… &lt;chr…</span>
+<span class="co">#&gt; 3 /data/home/seth… 3     5a4970e… nonmem     &lt;NA&gt;        &lt;NULL&gt;   &lt;chr [1… &lt;chr…</span>
 <span class="co">#&gt; # … with 2 more variables: notes &lt;list&gt;, decisions &lt;list&gt;</span></code></pre></div>
 <p>The <code><a href="../reference/run_log.html">run_log()</a></code> returns a tibble which can be manipulated like any other tibble. However, several of the columns (<code>tags</code>, <code>notes</code>, and <code>based_on</code> for example) are list columns, which complicates how you can interact with them. We provide some helper functions to more seamlessly interact with these log tibbles, as well as some sample <code>tidyverse</code> code below.</p>
 <div id="viewing-tags-example" class="section level2">
@@ -391,7 +392,7 @@
 <p>Hopefully this has given you a good start on understanding the capabilities and basic workflow of <code>bbr</code>. Please see the other vignettes for demonstrations of more advanced or specific functionality.</p>
 <ul>
 <li>
-<a href="https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html">Using the based_on field</a> – How to use the <code>based_on</code> field to track a model’s ancestry through the model development process, as well how to leverage <code><a href="../reference/config_log.html">config_log()</a></code> to check whether older models are still up-to-date.</li>
+<a href="https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html">Using the based_on field</a> – How to use the <code>based_on</code> field to track a model’s ancestry through the model development process, as well as using <code><a href="../reference/model_diff.html">model_diff()</a></code> and <code><a href="../reference/tags_diff.html">tags_diff()</a></code> to compare models. Also demonstrates leveraging <code><a href="../reference/config_log.html">config_log()</a></code> to check whether older models are still up-to-date.</li>
 <li>
 <a href="https://metrumresearchgroup.github.io/bbr/articles/using-summary-log.html">Creating a Model Summary Log</a> – How to use <code><a href="../reference/summary_log.html">summary_log()</a></code> to extract model diagnostics like the objective function value, condition number, and parameter counts.</li>
 </ul>
@@ -409,7 +410,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson.</p>
+  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse.</p>
 </div>
 
 <div class="pkgdown">

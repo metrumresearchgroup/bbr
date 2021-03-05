@@ -79,7 +79,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
       </span>
     </div>
 
@@ -165,12 +165,6 @@
       <tr>
         
         <td>
-          <p><code><a href="copy_model_from.html">copy_model_from()</a></code> </p>
-        </td>
-        <td><p>Create new model by copying existing model</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="new_model.html">new_model()</a></code> </p>
         </td>
         <td><p>Create new model object</p></td>
@@ -183,9 +177,27 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="verify_model_yaml_integrity.html">reconcile_yaml()</a></code> <code><a href="verify_model_yaml_integrity.html">check_yaml_in_sync()</a></code> </p>
+          <p><code><a href="copy_model_from.html">copy_model_from()</a></code> </p>
         </td>
-        <td><p>Verify YAML file integrity</p></td>
+        <td><p>Create new model by copying existing model</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="model_diff.html">model_diff()</a></code> </p>
+        </td>
+        <td><p>Compare model files between models</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="tags_diff.html">tags_diff()</a></code> <code><a href="tags_diff.html">add_tags_diff()</a></code> </p>
+        </td>
+        <td><p>Compare tags between models</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="check_up_to_date.html">check_up_to_date()</a></code> </p>
+        </td>
+        <td><p>Check model and data up to date with outputs</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -233,24 +245,6 @@
       <tr>
         
         <td>
-          <p><code><a href="config_log.html">config_log()</a></code> <code><a href="config_log.html">add_config()</a></code> </p>
-        </td>
-        <td><p>Parse bbi configs to log</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="apply_indices.html">apply_indices()</a></code> <code><a href="apply_indices.html">block()</a></code> </p>
-        </td>
-        <td><p>Add parameter indices to a label tibble</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="extract_from_summary.html">extract_param_count()</a></code> <code><a href="extract_from_summary.html">extract_details()</a></code> <code><a href="extract_from_summary.html">extract_heuristics()</a></code> <code><a href="extract_from_summary.html">extract_ofv()</a></code> <code><a href="extract_from_summary.html">extract_condition_number()</a></code> </p>
-        </td>
-        <td><p>Extract from summary object</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="model_summary.html">model_summary()</a></code> </p>
         </td>
         <td><p>Summarize model outputs</p></td>
@@ -263,21 +257,9 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="as_summary_list.html">as_summary_list()</a></code> </p>
-        </td>
-        <td><p>Convert object to <code>bbi_summary_list</code></p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="param_estimates.html">param_estimates()</a></code> </p>
         </td>
         <td><p>Parses parameter estimates table</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="param_labels.html">param_labels()</a></code> </p>
-        </td>
-        <td><p>Extract parameter labels for report tables, etc.</p></td>
       </tr><tr>
         
         <td>
@@ -290,6 +272,30 @@
           <p><code><a href="summary_log.html">summary_log()</a></code> <code><a href="summary_log.html">add_summary()</a></code> </p>
         </td>
         <td><p>Create a tibble from <code>model_summaries()</code> data</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="config_log.html">config_log()</a></code> <code><a href="config_log.html">add_config()</a></code> </p>
+        </td>
+        <td><p>Parse bbi configs to log</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="as_summary_list.html">as_summary_list()</a></code> </p>
+        </td>
+        <td><p>Convert object to <code>bbi_summary_list</code></p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="param_labels.html">param_labels()</a></code> </p>
+        </td>
+        <td><p>Extract parameter labels for report tables, etc.</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="apply_indices.html">apply_indices()</a></code> <code><a href="apply_indices.html">block()</a></code> </p>
+        </td>
+        <td><p>Add parameter indices to a label tibble</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -391,15 +397,9 @@
       <tr>
         
         <td>
-          <p><code><a href="bbi_current_release.html">bbi_current_release()</a></code> </p>
+          <p><code><a href="use_bbi.html">use_bbi()</a></code> </p>
         </td>
-        <td><p>Get version number of bbi current release</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="bbi_help.html">bbi_help()</a></code> </p>
-        </td>
-        <td><p>Executes (<code>bbi --help</code>) and prints the output string</p></td>
+        <td><p>Installs most current release of bbi</p></td>
       </tr><tr>
         
         <td>
@@ -415,9 +415,15 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="use_bbi.html">use_bbi()</a></code> </p>
+          <p><code><a href="bbi_current_release.html">bbi_current_release()</a></code> </p>
         </td>
-        <td><p>Installs most current release of bbi</p></td>
+        <td><p>Get version number of bbi current release</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="bbi_help.html">bbi_help()</a></code> </p>
+        </td>
+        <td><p>Executes (<code>bbi --help</code>) and prints the output string</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -482,6 +488,12 @@
       </tr><tr>
         
         <td>
+          <p><code><a href="verify_model_yaml_integrity.html">reconcile_yaml()</a></code> <code><a href="verify_model_yaml_integrity.html">check_yaml_in_sync()</a></code> </p>
+        </td>
+        <td><p>Verify YAML file integrity</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="suppressSpecificWarning.html">suppressSpecificWarning()</a></code> </p>
         </td>
         <td><p>Suppress a warning that matches <code>.regexpr</code></p></td>
@@ -500,7 +512,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson.</p>
+  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse.</p>
 </div>
 
 <div class="pkgdown">

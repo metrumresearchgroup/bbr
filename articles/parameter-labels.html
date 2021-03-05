@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
       </span>
     </div>
 
@@ -95,7 +95,7 @@
 
       
 
-      </header><div class="row">
+      </header><script src="parameter-labels_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>bbr Parameter Labels</h1>
@@ -136,7 +136,7 @@
 
 <span class="va">mod1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_model.html">read_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, <span class="st">"510"</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/class.html">class</a></span><span class="op">(</span><span class="va">mod1</span><span class="op">)</span>
-<span class="co">#&gt; [1] "bbi_nonmem_model" "list"</span></code></pre></div>
+<span class="co">#&gt; [1] "bbi_nonmem_model" "bbi_model"        "list"</span></code></pre></div>
 <p>The model object you have just created can now be passed to the post-processing functions to create your tables.</p>
 </div>
 <div id="extract-parameter-labels" class="section level2">
@@ -197,18 +197,18 @@
   <span class="fu"><a href="../reference/param_estimates.html">param_estimates</a></span><span class="op">(</span><span class="op">)</span>
 <span class="va">param_df</span>
 <span class="co">#&gt; # A tibble: 10 x 8</span>
-<span class="co">#&gt;    parameter_names estimate  stderr random_effect_sd random_effect_s… fixed</span>
-<span class="co">#&gt;    &lt;chr&gt;              &lt;dbl&gt;   &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt; &lt;lgl&gt;</span>
-<span class="co">#&gt;  1 THETA1          12.3     0.961            NA              NA       FALSE</span>
-<span class="co">#&gt;  2 THETA2          90.7     4.94             NA              NA       FALSE</span>
-<span class="co">#&gt;  3 THETA3           0.163   0.335            NA              NA       FALSE</span>
-<span class="co">#&gt;  4 THETA4           0.567   1.57             NA              NA       FALSE</span>
-<span class="co">#&gt;  5 THETA5           0.403   0.342            NA              NA       FALSE</span>
-<span class="co">#&gt;  6 THETA6          -0.395   2.32             NA              NA       FALSE</span>
-<span class="co">#&gt;  7 OMEGA(1,1)       0.0517  0.0122            0.227           0.0269  FALSE</span>
-<span class="co">#&gt;  8 OMEGA(2,1)       0.00345 0.00946           0.0654          0.178   FALSE</span>
-<span class="co">#&gt;  9 OMEGA(2,2)       0.0538  0.0120            0.232           0.0259  FALSE</span>
-<span class="co">#&gt; 10 SIGMA(1,1)       0.0450  0.00388           0.212           0.00914 FALSE</span>
+<span class="co">#&gt;    parameter_names estimate  stderr random_effect_sd random_effect_sdse fixed</span>
+<span class="co">#&gt;    &lt;chr&gt;              &lt;dbl&gt;   &lt;dbl&gt;            &lt;dbl&gt;              &lt;dbl&gt; &lt;lgl&gt;</span>
+<span class="co">#&gt;  1 THETA1          12.3     0.961            NA                NA       FALSE</span>
+<span class="co">#&gt;  2 THETA2          90.7     4.94             NA                NA       FALSE</span>
+<span class="co">#&gt;  3 THETA3           0.163   0.335            NA                NA       FALSE</span>
+<span class="co">#&gt;  4 THETA4           0.567   1.57             NA                NA       FALSE</span>
+<span class="co">#&gt;  5 THETA5           0.403   0.342            NA                NA       FALSE</span>
+<span class="co">#&gt;  6 THETA6          -0.395   2.32             NA                NA       FALSE</span>
+<span class="co">#&gt;  7 OMEGA(1,1)       0.0517  0.0122            0.227             0.0269  FALSE</span>
+<span class="co">#&gt;  8 OMEGA(2,1)       0.00345 0.00946           0.0654            0.178   FALSE</span>
+<span class="co">#&gt;  9 OMEGA(2,2)       0.0538  0.0120            0.232             0.0259  FALSE</span>
+<span class="co">#&gt; 10 SIGMA(1,1)       0.0450  0.00388           0.212             0.00914 FALSE</span>
 <span class="co">#&gt; # … with 2 more variables: diag &lt;lgl&gt;, shrinkage &lt;dbl&gt;</span></code></pre></div>
 <p>These two tibbles can be joined together to create a table for including in reports.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -315,7 +315,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson.</p>
+  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse.</p>
 </div>
 
 <div class="pkgdown">

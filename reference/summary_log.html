@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
       </span>
     </div>
 
@@ -196,20 +196,12 @@ If you would like more fields from the summary object, you can extract them manu
 <li><p><code>number_of_obs</code> -- Total count of observations in the input data set, extracted from <code>$run_details</code>.</p></li>
 <li><p><code>condition_number</code> -- The condition number for the final estimation method, if present.</p></li>
 <li><p><code>any_heuristics</code> -- Logical indicating whether <em>any</em> of the columns extracted from <code>$run_heuristics</code> are <code>TRUE</code>. Duplicative information, but helpful for filtering.</p></li>
-<li><p><code>covariance_step_aborted</code> -- Extracted from <code>$run_heuristics</code>.</p></li>
-<li><p><code>large_condition_number</code> -- <code>TRUE</code> if <code>condition_number &gt; 1000</code>. Extracted from <code>$run_heuristics</code>.</p></li>
-<li><p><code>correlations_not_ok</code> -- Not currently implemented in <code>bbi</code>; will always be <code>FALSE</code>. Extracted from <code>$run_heuristics</code>.</p></li>
-<li><p><code>parameter_near_boundary</code> -- Extracted from <code>$run_heuristics</code>.</p></li>
-<li><p><code>hessian_reset</code> -- Extracted from <code>$run_heuristics</code>.</p></li>
-<li><p><code>has_final_zero_gradient</code> -- Extracted from <code>$run_heuristics</code>.</p></li>
-<li><p><code>minimization_terminated</code> -- Extracted from <code>$run_heuristics</code>.</p></li>
-<li><p><code>eta_pval_significant</code> -- <code>TRUE</code> if any of the ETA p-values are &lt; 0.05. Extracted from <code>$shrinkage_details$pval</code>.</p></li>
-<li><p><code>prderr</code> -- <code>TRUE</code> if a <code>PRDERR</code> file is present in the output folder.</p></li>
+<li><p><code>$run_heuristics</code> columns -- One logical column for each element extracted from <code>$run_heuristics</code>. These are named and described in the <code><a href='model_summary.html'>model_summary()</a></code> docs.</p></li>
 </ul>
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='run_log.html'>run_log()</a></code>, <code><a href='config_log.html'>config_log()</a></code></p></div>
+    <div class='dont-index'><p><code><a href='run_log.html'>run_log()</a></code>, <code><a href='config_log.html'>config_log()</a></code>, <code><a href='model_summary.html'>model_summary()</a></code>, <code><a href='model_summaries.html'>model_summaries()</a></code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -222,7 +214,7 @@ If you would like more fields from the summary object, you can extract them manu
 
       <footer>
       <div class="copyright">
-  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson.</p>
+  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse.</p>
 </div>
 
 <div class="pkgdown">

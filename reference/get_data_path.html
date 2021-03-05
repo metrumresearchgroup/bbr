@@ -47,10 +47,10 @@
 
 
 <meta property="og:title" content="Get path to data file — get_data_path" />
-<meta property="og:description" content="Helper to extract the path to the input data from a bbi_nonmem_summary or
-bbi_nonmem_model object. Note that this function only works on models that
-have been successfully run because the path to the data is constructed
-during model submission." />
+<meta property="og:description" content="Helper to extract the path to the input data from a
+bbi_{.model_type}_summary or bbi_{.model_type}_model object. Note that
+this function only works on models that have been successfully run
+because the path to the data is constructed during model submission." />
 <meta property="og:image" content="https://metrumresearchgroup.github.io/bbr/logo.png" />
 
 
@@ -83,7 +83,7 @@ during model submission." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
       </span>
     </div>
 
@@ -149,18 +149,15 @@ during model submission." />
     </div>
 
     <div class="ref-description">
-    <p>Helper to extract the path to the input data from a <code>bbi_nonmem_summary</code> or
-<code>bbi_nonmem_model</code> object. Note that <strong>this function only works on models that
-have been successfully run</strong> because the path to the data is constructed
-during model submission.</p>
+    <p>Helper to extract the path to the input data from a
+<code>bbi_{.model_type}_summary</code> or <code>bbi_{.model_type}_model</code> object. Note that
+<strong>this function only works on models that have been successfully run</strong>
+because the path to the data is constructed during model submission.</p>
     </div>
 
     <pre class="usage"><span class='fu'>get_data_path</span><span class='op'>(</span><span class='va'>.mod</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='co'># S3 method for bbi_nonmem_model</span>
-<span class='fu'>get_data_path</span><span class='op'>(</span><span class='va'>.mod</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S3 method for bbi_nonmem_summary</span>
+<span class='co'># S3 method for bbi_model</span>
 <span class='fu'>get_data_path</span><span class='op'>(</span><span class='va'>.mod</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -173,8 +170,8 @@ during model submission.</p>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Arguments passed through to methods.
-(Currently none, but will likely have some modifier arguments for <code>bbi_stan_model</code> objects.)</p></td>
+      <td><p>Arguments passed through to methods. (Currently none, but may have
+some modifier arguments other model types in the future.)</p></td>
     </tr>
     </table>
 
@@ -185,8 +182,7 @@ during model submission.</p>
 
     
 <ul>
-<li><p><code>bbi_nonmem_model</code>: Takes <code>bbi_nonmem_model</code> object</p></li>
-<li><p><code>bbi_nonmem_summary</code>: Takes <code>bbi_nonmem_summary</code> object</p></li>
+<li><p><code>bbi_model</code>: Takes <code>bbi_nonmem_model</code> object</p></li>
 </ul>
 
   </div>
@@ -200,7 +196,7 @@ during model submission.</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson.</p>
+  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse.</p>
 </div>
 
 <div class="pkgdown">

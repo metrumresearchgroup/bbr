@@ -1,4 +1,4 @@
-pandoc: 2.3.1
+pandoc: 2.11.2
 pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
@@ -6,7 +6,7 @@ articles:
   parameter-labels: parameter-labels.html
   using-based-on: using-based-on.html
   using-summary-log: using-summary-log.html
-last_built: 2021-02-19T17:11Z
+last_built: 2021-03-05T20:22Z
 urls:
   reference: https://metrumresearchgroup.github.io/bbr/reference
   article: https://metrumresearchgroup.github.io/bbr/articles
