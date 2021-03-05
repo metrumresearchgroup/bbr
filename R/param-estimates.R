@@ -43,17 +43,16 @@ param_estimates <- function(.summary) {
 #' @importFrom stringr str_detect
 #' @export
 param_estimates.bbi_nonmem_summary <- function(.summary) {
-  num_methods <- length(.summary[[SUMMARY_PARAM_DATA]])
   param_names <- .summary[[SUMMARY_PARAM_NAMES]]
 
   # if Bayesian method (includes NUTS) do not return df because it is incorrect and misleading
-  est_method <- .summary[[SUMMARY_DETAILS]][[SUMMARY_EST_METHOD]][[num_methods]]
-  if (str_detect(est_method, "Bayesian")) {
-    stop(glue("{PARAM_BAYES_ERR_MSG} `.summary` has final estimation method: {est_method}"), call. = FALSE)
+  est_methods <- .summary[[SUMMARY_DETAILS]][[SUMMARY_EST_METHOD]]
+  if (any(str_detect(est_methods, "Bayesian"))) {
+    stop(glue("{PARAM_BAYES_ERR_MSG} `.summary` has final estimation method: {est_methods}"), call. = FALSE)
   }
 
   summary_vars <- with(
-    .summary[[SUMMARY_PARAM_DATA]][[num_methods]],
+    .summary[[SUMMARY_PARAM_DATA]][[length(.summary[[SUMMARY_PARAM_DATA]])]],
     list(
       estimate = estimates,
       stderr = std_err,

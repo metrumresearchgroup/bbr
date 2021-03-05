@@ -10,6 +10,10 @@
 
 * Added more documentation about the heuristics returned from `model_summary.bbi_nonmem_model()` (#343)
 
+## Bug fixes
+
+* `param_estimates()` now correctly errors when a Bayesian method is used but is _not_ the final method. (#344)
+
 ## Developer-facing changes
 
 * Added a `bbi_model` parent class to `bbi_nonmem_model` and `bbi_nonmem_summary` objects. Many of the helpers in `get-path-from-object.R` now dispatch on this class. This had been discussed in the past but was primarily done now in preparation for beginning development for Stan modeling, which will create `bbi_stan_model` and `bbi_stan_summary` objects that will also inherit from this parent class. (#332)
