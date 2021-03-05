@@ -10,8 +10,8 @@ model_diff_get_comp(.mod, .mod2)
 \item{.mod}{The \verb{bbi_\{.model_type\}_model} to compare.}
 
 \item{.mod2}{If a \verb{bbi_\{.model_type\}_model} object is passed, compare \code{.mod} to
-\code{.mod2}. If \code{.mod2 = NULL}, the default, compare \code{.mod} to the model in
-\code{.mod$based_on}. See "\code{based_on} details" in Details section.}
+\code{.mod2}. If \code{.mod2 = NULL}, the default, compare \code{.mod} to the model at
+\code{get_based_on(.mod)}. See "\code{based_on} details" in Details section.}
 }
 \description{
 Private helper to get a valid comparison model

@@ -226,6 +226,8 @@ mod2 <- mod2 %>%
   add_notes("2 compartment model more appropriate than 1 compartment")
 ```
 
+The `model_diff()` and `tags_diff()` function make it easy to compare models to their parent model. See the ["Using based_on" vignette](https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html) for examples.
+
 ## Continue to iterate...
 
 Now the iteration process continues with a third model. Note that you can tell `copy_model_from()` to inherit the tags from the parent model and automatically add them to the new model.

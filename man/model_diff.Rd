@@ -13,8 +13,8 @@ model_diff(.mod, .mod2 = NULL, .file = "model", ..., .viewer = FALSE)
 \item{.mod}{The \verb{bbi_\{.model_type\}_model} to compare.}
 
 \item{.mod2}{If a \verb{bbi_\{.model_type\}_model} object is passed, compare \code{.mod} to
-\code{.mod2}. If \code{.mod2 = NULL}, the default, compare \code{.mod} to the model in
-\code{.mod$based_on}. See "\code{based_on} details" in Details section.}
+\code{.mod2}. If \code{.mod2 = NULL}, the default, compare \code{.mod} to the model at
+\code{get_based_on(.mod)}. See "\code{based_on} details" in Details section.}
 
 \item{.file}{Defaults to \code{"model"} which compares the default model file for
 that model type. Some model types have multiple files that can be compared.
@@ -28,7 +28,8 @@ will hold the console with \verb{Press ENTER to continue...} so it is only
 recommended for interactive use.}
 }
 \value{
-Returns a \code{"Diff"} object from the \code{diffobj} package.
+Returns a \code{"Diff"} object from the \code{diffobj} package that renders
+when printed or called in the console.
 }
 \description{
 By default, this compares a model's model file on disk to the model file of

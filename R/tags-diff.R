@@ -7,21 +7,6 @@
 #' ignoring the `based_on` field entirely.
 #'
 #' @return
-#' **`tags_diff.bbi_model()`** invisibly returns a list with two
-#' elements, the first named `tags_added` and the second named `tags_removed`.
-#' The list is returned invisibly because, by default, a nicely formatted
-#' version of the same information is printed to the console. User can pass
-#' `.print = FALSE` to turn this off.
-#'
-#' **`tags_diff.bbi_run_log_df()`** returns a named list of lists, with one
-#' element for each row in the input tibble, with the name corresponding to the
-#' value in the `run` column for that row. Each element of the list will contain
-#' the two-element list returned from `tags_diff.bbi_model()` (described above)
-#' for the relevant model.
-#'
-#' **`add_tags_diff()`** returns the same tibble that was passed to
-#' it, but with two additional columns named `tags_added` and `tags_removed`.
-#'
 #' **In all cases:**
 #'
 #' * `tags_added` contains any tags that are on the relevant model, but _not_ on
@@ -29,6 +14,21 @@
 #'
 #' * `tags_removed` contains any tags that are on at least one of the models it
 #'   is based on, but _not_ on the relevant model.
+#'
+#' **`tags_diff.bbi_model()`** invisibly returns a list with two elements:
+#'   `tags_added` and `tags_removed`. The list is returned invisibly because, by
+#'   default, a nicely formatted version of the same information is printed to the
+#'   console. User can pass `.print = FALSE` to turn this off.
+#'
+#' **`tags_diff.bbi_run_log_df()`** returns a named list of lists, with one
+#'   element for each row in the input tibble, with the name corresponding to the
+#'   value in the `run` column for that row. Each element of the list will contain
+#'   the two-element list returned from `tags_diff.bbi_model()` (described above)
+#'   for the relevant model.
+#'
+#' **`add_tags_diff()`** returns the same tibble that was passed to it, but
+#'   it, but with two additional columns `tags_added` and `tags_removed`
+#'   appended.
 #'
 #' @param .bbi_object The object to compare. Could be a
 #'   `bbi_{.model_type}_model` object or a

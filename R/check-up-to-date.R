@@ -23,10 +23,14 @@
 #' @param ... Arguments passed through (currently none).
 #'
 #' @return
+#' **The returned value is invisible because a message is printed** alerting the
+#' user of the specific files that have changed, if any. This facilitates
+#' calling the function for this side effect without explicitly handling the
+#' returned value.
 #'
 #' **`bbi_model`** method invisibly returns a logical vector of length 2. The
-#' first element (named `"model"`) refers to the model files mentioned above.
-#' The second element (named `"data"`) refers to the data files mentioned above.
+#' first element (named `"model"`) refers to the model files mentioned in Details.
+#' The second element (named `"data"`) refers to the data files mentioned in Details.
 #' For both elements, they will be `TRUE` if nothing has changed, `FALSE` if
 #' anything has changed. Note: _if no file exists_ at the specified path,
 #' `FALSE` will be returned because that is technically a "change." The file
@@ -43,11 +47,6 @@
 #' contains `model_has_changed` and `data_has_changed` columns. Please note:
 #' these contain the opposite boolean values (`check_up_to_date()` returns
 #' `TRUE` if up to date, `*_has_changed` returns `TRUE` if _changed_).
-#'
-#' **The returned value is invisible because a message is printed** alerting the
-#' user of the specific files that have changed, if any. This facilitates
-#' calling the function for this side effect without explicitly handling the
-#' returned value.
 #'
 #' @export
 check_up_to_date <- function(.bbi_object, ...) {

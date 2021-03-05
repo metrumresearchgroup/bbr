@@ -28,21 +28,6 @@ method.}}
 \item{.log_df}{a \code{bbi_run_log_df} tibble (the output of \code{\link[=run_log]{run_log()}})}
 }
 \value{
-\strong{\code{tags_diff.bbi_model()}} invisibly returns a list with two
-elements, the first named \code{tags_added} and the second named \code{tags_removed}.
-The list is returned invisibly because, by default, a nicely formatted
-version of the same information is printed to the console. User can pass
-\code{.print = FALSE} to turn this off.
-
-\strong{\code{tags_diff.bbi_run_log_df()}} returns a named list of lists, with one
-element for each row in the input tibble, with the name corresponding to the
-value in the \code{run} column for that row. Each element of the list will contain
-the two-element list returned from \code{tags_diff.bbi_model()} (described above)
-for the relevant model.
-
-\strong{\code{add_tags_diff()}} returns the same tibble that was passed to
-it, but with two additional columns named \code{tags_added} and \code{tags_removed}.
-
 \strong{In all cases:}
 \itemize{
 \item \code{tags_added} contains any tags that are on the relevant model, but \emph{not} on
@@ -50,6 +35,21 @@ any of the models it is based on.
 \item \code{tags_removed} contains any tags that are on at least one of the models it
 is based on, but \emph{not} on the relevant model.
 }
+
+\strong{\code{tags_diff.bbi_model()}} invisibly returns a list with two elements:
+\code{tags_added} and \code{tags_removed}. The list is returned invisibly because, by
+default, a nicely formatted version of the same information is printed to the
+console. User can pass \code{.print = FALSE} to turn this off.
+
+\strong{\code{tags_diff.bbi_run_log_df()}} returns a named list of lists, with one
+element for each row in the input tibble, with the name corresponding to the
+value in the \code{run} column for that row. Each element of the list will contain
+the two-element list returned from \code{tags_diff.bbi_model()} (described above)
+for the relevant model.
+
+\strong{\code{add_tags_diff()}} returns the same tibble that was passed to it, but
+it, but with two additional columns \code{tags_added} and \code{tags_removed}
+appended.
 }
 \description{
 By default, this compares a model's tags to the tags on any of its "parent"
