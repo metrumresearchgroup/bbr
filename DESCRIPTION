@@ -1,7 +1,7 @@
 Type: Package
 Package: bbr
 Title: R package for bbi
-Version: 1.0.0.8004
+Version: 1.1.0
 Authors@R: 
     c(person(given = "Devin",
              family = "Pastoor",
@@ -18,7 +18,15 @@ Authors@R:
       person(given = "Sean",
              family = "Wilson",
              role = "aut",
-             email = "copernican@gmail.com"))
+             email = "copernican@gmail.com"),
+      person(given = "Samuel",
+             family = "Callisto",
+             role = "aut",
+             email = "samc@metrumrg.com"),
+      person(given = "Tim",
+             family = "Waterhouse",
+             role = "aut",
+             email = "timw@metrumrg.com"))
 Description: R package for making calls to bbi for running
     NONMEM and other models. Also manages model metadata, workflow, and
     run logs.

@@ -20,7 +20,12 @@ See \code{\link[=print_bbi_args]{print_bbi_args()}} for full list of options.}
 \item{.dry_run}{show what the command would be without actually running it}
 }
 \description{
-Calls out to bbi and returns a named list of class \verb{bbi_\{.model_type\}_summary} with model outputs and diagnostics.
+Calls out to \code{bbi} and returns a named list of class
+\verb{bbi_\{.model_type\}_summary} with model outputs and diagnostics. If user wants
+to summarize multiple models, you can pass a list of
+\verb{bbi_\{.model_type\}_model} objects to \code{\link[=model_summaries]{model_summaries()}}, or pass a directory
+path to \code{\link[=summary_log]{summary_log()}} to summarize all models in that directory (and, by
+default, all directories below it).
 }
 \details{
 \strong{NONMEM}

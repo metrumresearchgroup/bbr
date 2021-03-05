@@ -6,9 +6,15 @@
 
 #' Summarize model outputs
 #'
-#' Calls out to bbi and returns a named list of class `bbi_{.model_type}_summary` with model outputs and diagnostics.
+#' Calls out to `bbi` and returns a named list of class
+#' `bbi_{.model_type}_summary` with model outputs and diagnostics. If user wants
+#' to summarize multiple models, you can pass a list of
+#' `bbi_{.model_type}_model` objects to [model_summaries()], or pass a directory
+#' path to [summary_log()] to summarize all models in that directory (and, by
+#' default, all directories below it).
 #'
 #' @details
+#'
 #' **NONMEM**
 #'
 #' The returned list for a NONMEM model will contain the following top-level elements:

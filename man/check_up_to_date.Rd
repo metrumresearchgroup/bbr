@@ -15,9 +15,14 @@ or a \code{bbi_log_df} tibble.}
 \item{...}{Arguments passed through (currently none).}
 }
 \value{
+\strong{The returned value is invisible because a message is printed} alerting the
+user of the specific files that have changed, if any. This facilitates
+calling the function for this side effect without explicitly handling the
+returned value.
+
 \strong{\code{bbi_model}} method invisibly returns a logical vector of length 2. The
-first element (named \code{"model"}) refers to the model files mentioned above.
-The second element (named \code{"data"}) refers to the data files mentioned above.
+first element (named \code{"model"}) refers to the model files mentioned in Details.
+The second element (named \code{"data"}) refers to the data files mentioned in Details.
 For both elements, they will be \code{TRUE} if nothing has changed, \code{FALSE} if
 anything has changed. Note: \emph{if no file exists} at the specified path,
 \code{FALSE} will be returned because that is technically a "change." The file
@@ -34,11 +39,6 @@ these columns to a \code{bbi_log_df} tibble} you can use \code{\link[=add_config
 contains \code{model_has_changed} and \code{data_has_changed} columns. Please note:
 these contain the opposite boolean values (\code{check_up_to_date()} returns
 \code{TRUE} if up to date, \verb{*_has_changed} returns \code{TRUE} if \emph{changed}).
-
-\strong{The returned value is invisible because a message is printed} alerting the
-user of the specific files that have changed, if any. This facilitates
-calling the function for this side effect without explicitly handling the
-returned value.
 }
 \description{
 Functions for checking that the model outputs on disk match the md5 hashes

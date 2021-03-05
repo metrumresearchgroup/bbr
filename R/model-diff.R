@@ -27,12 +27,13 @@
 #'   * `"model"` compares the control streams
 #' * Currently only NONMEM is implemented.
 #'
-#' @return Returns a `"Diff"` object from the `diffobj` package.
+#' @return Returns a `"Diff"` object from the `diffobj` package that renders
+#'   when printed or called in the console.
 #'
 #' @param .mod The `bbi_{.model_type}_model` to compare.
 #' @param .mod2 If a `bbi_{.model_type}_model` object is passed, compare `.mod` to
-#'   `.mod2`. If `.mod2 = NULL`, the default, compare `.mod` to the model in
-#'   `.mod$based_on`. See "`based_on` details" in Details section.
+#'   `.mod2`. If `.mod2 = NULL`, the default, compare `.mod` to the model at
+#'   `get_based_on(.mod)`. See "`based_on` details" in Details section.
 #' @param .file Defaults to `"model"` which compares the default model file for
 #'   that model type. Some model types have multiple files that can be compared.
 #'   See "`.file` argument" in Details section.
