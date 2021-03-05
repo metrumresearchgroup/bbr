@@ -31,7 +31,7 @@ test_that("read_model() can read a model whose path has a period", {
   on.exit(fs::file_delete(c(temp_ctl, temp_yaml)))
 
   mod <- read_model(fs::path_ext_remove(temp_yaml))
-  expect_identical(class(mod), MOD_CLASS_LIST)
+  expect_identical(class(mod), NM_MOD_CLASS_LIST)
 })
 
 test_that("new_model() creates new YAML file", {
@@ -44,19 +44,19 @@ test_that("new_model() creates new YAML file", {
   mod1b <- read_model(temp_mod_path)
 
   # check class and keys are right
-  expect_identical(class(mod1a), MOD_CLASS_LIST)
-  expect_identical(class(mod1b), MOD_CLASS_LIST)
+  expect_identical(class(mod1a), NM_MOD_CLASS_LIST)
+  expect_identical(class(mod1b), NM_MOD_CLASS_LIST)
 
   expect_true(all(MODEL_REQ_KEYS %in% names(mod1a)))
   expect_true(all(MODEL_REQ_KEYS %in% names(mod1b)))
 })
 
 test_that("new_model() throws an error if the model file does not exist", {
-  expect_error(new_model("foo.yaml", "bar"), "No model file found")
+  expect_error(new_model("foo", "bar"), "No model file found")
 })
 
 test_that("compare read_model() and new_model() objects", {
-  temp_mod_path <- create_temp_model(YAML_TEST_FILE)
+  temp_mod_path <- create_temp_model()
   fs::file_delete(fs::path_ext_set(temp_mod_path, "yaml"))
 
   # create a new model with arguments known to match the reference model at
@@ -72,8 +72,8 @@ test_that("compare read_model() and new_model() objects", {
   mod1b <- read_model(temp_mod_path)
 
   # check class and keys are right
-  expect_identical(class(mod1a), MOD_CLASS_LIST)
-  expect_identical(class(mod1b), MOD_CLASS_LIST)
+  expect_identical(class(mod1a), NM_MOD_CLASS_LIST)
+  expect_identical(class(mod1b), NM_MOD_CLASS_LIST)
 
   expect_true(all(MODEL_REQ_KEYS %in% names(mod1a)))
   expect_true(all(MODEL_REQ_KEYS %in% names(mod1b)))
@@ -88,7 +88,7 @@ test_that("compare read_model() and new_model() objects", {
 })
 
 test_that("new_model() .overwrite arg works", {
-  temp_mod_path <- create_temp_model(YAML_TEST_FILE)
+  temp_mod_path <- create_temp_model()
 
   # error if file exists
   expect_error(
@@ -105,7 +105,7 @@ test_that("new_model() .overwrite arg works", {
 
 
 test_that("new_model() .based_on arg works", {
-  temp_mod_path <- create_temp_model(YAML_TEST_FILE)
+  temp_mod_path <- create_temp_model()
   parent_model_id <- get_model_id(create_temp_model())
   fs::file_delete(fs::path_ext_set(temp_mod_path, "yaml"))
 
@@ -119,14 +119,18 @@ test_that("new_model() .based_on arg works", {
 })
 
 test_that("new_model() .based_on arg errors on fake model", {
+  temp_mod_path <- ctl_ext(tempfile())
+  writeLines("CREATED BY: new_model() .based_on arg errors on fake model", temp_mod_path)
+  on.exit(fs::file_delete(temp_mod_path))
+
   # create new model with args
   expect_error(
     new_model(
-      file.path(ABS_MODEL_DIR, "tmp"),
+      tools::file_path_sans_ext(temp_mod_path),
       .description = "original acop model",
       .based_on = c("1", "fake")
     ),
-    regexp = "cannot find .yaml files"
+    regexp = "based_on.+cannot find .yaml files"
   )
 })
 

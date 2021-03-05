@@ -118,7 +118,6 @@ config_log_impl <- function(.mods) {
 #'
 #' @param path A string giving the path to `bbi_config.json`.
 #' @param fields A character vector of fields to include.
-#' @param model_path_field A string giving the field name for the model path.
 #'
 #' @return A list whose elements include
 #'
@@ -137,28 +136,27 @@ config_log_impl <- function(.mods) {
 #'
 #' @keywords internal
 config_log_entry <- function(path,
-                             fields = CONFIG_KEEPERS,
-                             model_path_field = ABS_MOD_PATH) {
+                             fields = CONFIG_KEEPERS) {
   checkmate::assert_file_exists(path)
   checkmate::assert_character(fields)
-  checkmate::assert_string(model_path_field)
 
+  cfg_mod <- read_model_from_config(path)
   config <- jsonlite::fromJSON(path)
 
   if (!all(fields %in% names(config))) {
-    msg <- glue::glue(
-      glue::glue(
+    msg <- paste(
+      glue(
         "{path} is missing the required keys:",
         "`{paste(fields[!(fields %in% names(config))], collapse = ', ')}`",
         "and will be skipped.",
         .sep = " "
       ),
-      glue::glue(
+      glue(
         "This is likely because it was run with an old version of bbi.",
         "Model was run on version {config[['bbi_version']]}",
         .sep = " "
       ),
-      glue::glue(
+      glue(
         "User can call `bbi_current_release()` to see the most recent release",
         "version, and call `use_bbi(options('bbr.bbi_exe_path'))` to",
         "upgrade to the version.",
@@ -171,32 +169,16 @@ config_log_entry <- function(path,
     return(NULL)
   }
 
-  # the model_path field may not exist, e.g., it could be the home directory of
-  # the user who ran the model, so we cannot use it directly
-  output_dir <- dirname(path)
-  model_path <- fs::path_ext_set(output_dir, config[["model_extension"]])
+  matches <- suppressMessages(check_up_to_date(cfg_mod))
 
-  data_path <- fs::path_norm(
-    file.path(
-      output_dir,
-      config[["data_path"]]
-    )
-  )
-
-  matches <- purrr::map2_lgl(
-    c(model_path, data_path),
-    c(config[["model_md5"]], config[["data_md5"]]),
-    file_matches
-  )
-
-  config[["model_has_changed"]] <- !matches[1]
-  config[["data_has_changed"]] <- !matches[2]
-  config[["nm_version"]] <- resolve_nonmem_version(config)
-  config[[model_path_field]] <- output_dir
+  config[["model_has_changed"]] <- as.logical(!matches["model"]) # use as.logical to strip off names
+  config[["data_has_changed"]]  <- as.logical(!matches["data"])  # use as.logical to strip off names
+  config[["nm_version"]] <- resolve_nonmem_version(config) %||% NA_character_
+  config[[ABS_MOD_PATH]] <- cfg_mod[[ABS_MOD_PATH]]
 
   out_fields <- c(
+    ABS_MOD_PATH,
     fields,
-    model_path_field,
     "nm_version",
     "model_has_changed",
     "data_has_changed"
@@ -205,27 +187,6 @@ config_log_entry <- function(path,
   config[out_fields]
 }
 
-#' Compare a file to an MD5 sum
-#'
-#' @param path String giving the path to the file.
-#' @param md5 String giving expected MD5 sum.
-#'
-#' @return `TRUE` if `path` matches `md5`, otherwise `FALSE` (including if
-#'   `path` doesn't exist).
-#'
-#' @keywords internal
-file_matches <- function(path, md5) {
-  checkmate::assert_string(path)
-  checkmate::assert_string(md5)
-
-  if (file.exists(path)) {
-    res <- tools::md5sum(path) == md5
-  } else {
-    res <- FALSE
-  }
-
-  res
-}
 
 #' Determine the NONMEM version used
 #'
@@ -246,4 +207,42 @@ resolve_nonmem_version <- function(x) {
     ver <- names(purrr::compact(idx))
   }
   ver
+}
+
+#' Create a model object from a bbi_config.json path
+#'
+#' This is non-trivial because, while configs
+#' always sit in the ouput directory, for NONMEM models
+#' this is one dir deeper than the YAML and for Stan
+#' models this is two dirs deeper than the YAML.
+#' Hence, this is abstracted into an obnoxious private
+#' helper function.
+#' @importFrom fs path_norm path_ext_set file_exists
+#' @importFrom stringr str_detect
+#' @importFrom checkmate assert_file_exists assert_true
+#' @param .config_path The absolute path a `bbi_config.json` file
+#' @return a `bbi_{.model_type}_model` object
+#' @keywords internal
+read_model_from_config <- function(.config_path) {
+  checkmate::assert_true(stringr::str_detect(.config_path, "bbi_config\\.json$"))
+  checkmate::assert_file_exists(.config_path)
+
+  potential_nm_path   <- file.path(.config_path, "..") %>%
+    fs::path_norm() %>%
+    fs::path_ext_set("yaml")
+
+  potential_stan_path <- file.path(.config_path, "..", "..") %>%
+    fs::path_norm() %>%
+    fs::path_ext_set("yaml")
+
+  winner <- names(which(fs::file_exists(c(potential_nm_path, potential_stan_path))))
+
+  if (length(winner) != 1) {
+    dev_error(glue("read_model_from_config() checked {potential_nm_path} and {potential_stan_path} and the following exist: {paste(winner, collapse = ', ')}"))
+  }
+
+  mod <- suppressMessages(
+    read_model(tools::file_path_sans_ext(winner))
+  )
+  return(mod)
 }

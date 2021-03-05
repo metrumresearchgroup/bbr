@@ -42,8 +42,9 @@ BBI_ARGS = list(
 )
 
 # S3 classes
+BBI_PARENT_CLASS <- "bbi_model"
 NM_MOD_CLASS <- "bbi_nonmem_model"
-SUM_CLASS <- "bbi_nonmem_summary"
+NM_SUM_CLASS <- "bbi_nonmem_summary"
 SL_CLASS <- "bbi_summary_list"
 PROC_CLASS <- "bbi_process"
 RUN_LOG_CLASS <- "bbi_run_log_df"
@@ -78,8 +79,7 @@ MODEL_REQ_INPUT_KEYS <- c(
 MODEL_REQ_KEYS <- c(
   ABS_MOD_PATH,
   YAML_YAML_MD5,
-  YAML_MOD_TYPE,
-  YAML_BBI_ARGS
+  YAML_MOD_TYPE
 )
 
 # columns required for a run log df
@@ -136,7 +136,11 @@ SUMMARY_PARAM_DIAG <- "diag"
 SUMMARY_PARAM_SHRINKAGE <- "shrinkage"
 SUMMARY_SHRINKAGE_OMEGA <- "eta_sd"
 SUMMARY_SHRINKAGE_SIGMA <- "eps_sd"
+
+CONFIG_MODEL_PATH <- "model_path"
+CONFIG_MODEL_MD5 <- "model_md5"
 CONFIG_DATA_PATH <- "data_path"
+CONFIG_DATA_MD5 <- "data_md5"
 
 # keys required for a summary object to have
 SUMMARY_REQ_KEYS <- c(
@@ -199,6 +203,9 @@ CONFIG_LOG_REQ_COLS <- c(
   CONFIG_KEEPERS
 )
 
+TAGS_ADD <- "tags_added"
+TAGS_REM <- "tags_removed"
+
 # keys added when creating a process object
 PROC_PROCESS <- "process"
 PROC_STDOUT <- "stdout"
@@ -222,3 +229,5 @@ NO_NONMEM_ERR_MSG <- "No version was supplied and no default value exists in the
 MOD_ALREADY_EXISTS_ERR_MSG <- "already exist, but we are configured not to overwrite"
 NO_STAN_ERR_MSG <- "stan support not yet implemented."
 PARAM_BAYES_ERR_MSG <- "param_estimates() is not currently implemented for Bayesian methods."
+CHECK_UP_TO_DATE_ERR_MSG <- "Cannot check if up-to-date because model has not been run yet."
+MODEL_DIFF_ERR_MSG <- "Please pass a single `bbi_model` object to the `.mod2` to compare models."

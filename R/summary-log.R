@@ -25,17 +25,9 @@
 #' * `number_of_obs` -- Total count of observations in the input data set, extracted from `$run_details`.
 #' * `condition_number` -- The condition number for the final estimation method, if present.
 #' * `any_heuristics` -- Logical indicating whether _any_ of the columns extracted from `$run_heuristics` are `TRUE`. Duplicative information, but helpful for filtering.
-#' * `covariance_step_aborted` -- Extracted from `$run_heuristics`.
-#' * `large_condition_number` -- `TRUE` if `condition_number > 1000`. Extracted from `$run_heuristics`.
-#' * `correlations_not_ok` -- Not currently implemented in `bbi`; will always be `FALSE`. Extracted from `$run_heuristics`.
-#' * `parameter_near_boundary` -- Extracted from `$run_heuristics`.
-#' * `hessian_reset` -- Extracted from `$run_heuristics`.
-#' * `has_final_zero_gradient` -- Extracted from `$run_heuristics`.
-#' * `minimization_terminated` -- Extracted from `$run_heuristics`.
-#' * `eta_pval_significant` -- `TRUE` if any of the ETA p-values are < 0.05. Extracted from `$shrinkage_details$pval`.
-#' * `prderr` -- `TRUE` if a `PRDERR` file is present in the output folder.
+#' * `$run_heuristics` columns -- One logical column for each element extracted from `$run_heuristics`. These are named and described in the [model_summary()] docs.
 #'
-#' @seealso [run_log()], [config_log()]
+#' @seealso [run_log()], [config_log()], [model_summary()], [model_summaries()]
 #' @inheritParams run_log
 #' @param ... Arguments passed through to [model_summaries()].
 #' @importFrom dplyr mutate

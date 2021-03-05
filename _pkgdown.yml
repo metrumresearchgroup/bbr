@@ -13,11 +13,12 @@ navbar:
 reference:
 - title: Model management
   contents:
-  - copy_model_from
   - new_model
   - read_model
-  - reconcile_yaml
-  - check_yaml_in_sync
+  - copy_model_from
+  - model_diff
+  - tags_diff
+  - check_up_to_date
 - title: Model submission
   contents:
   - submit_model
@@ -25,19 +26,19 @@ reference:
   - print_bbi_args
 - title: Model summary
   contents:
-  - add_config
-  - apply_indices
-  - block
-  - config_log
-  - extract_from_summary
   - model_summary
   - model_summaries
-  - as_summary_list
   - param_estimates
-  - param_labels
   - run_log
   - summary_log
   - add_summary
+  - config_log
+  - add_config
+  - as_summary_list
+  - param_labels
+  - apply_indices
+  - block
+
 - title: Model object interactions
   contents:
   - add_tags
@@ -57,11 +58,12 @@ reference:
   - print_bbi
 - title: bbi configuration
   contents:
-  - bbi_current_release
-  - bbi_help
+  - use_bbi
   - bbi_init
   - bbi_version
-  - use_bbi
+  - bbi_current_release
+  - bbi_help
+
 - title: Assorted helpers
   contents:
   - check_file
@@ -81,4 +83,6 @@ reference:
   - plot_nonmem_table_df
   - plot_grd
   - plot_ext
+  - reconcile_yaml
+  - check_yaml_in_sync
   - suppressSpecificWarning

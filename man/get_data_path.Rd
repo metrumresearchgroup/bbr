@@ -2,36 +2,31 @@
 % Please edit documentation in R/get-path-from-object.R
 \name{get_data_path}
 \alias{get_data_path}
-\alias{get_data_path.bbi_nonmem_model}
-\alias{get_data_path.bbi_nonmem_summary}
+\alias{get_data_path.bbi_model}
 \title{Get path to data file}
 \usage{
 get_data_path(.mod, ...)
 
-\method{get_data_path}{bbi_nonmem_model}(.mod, ...)
-
-\method{get_data_path}{bbi_nonmem_summary}(.mod, ...)
+\method{get_data_path}{bbi_model}(.mod, ...)
 }
 \arguments{
 \item{.mod}{Model to use, either a \verb{bbi_\{.model_type\}_model} or
 \verb{bbi_\{.model_type\}_summary} object.}
 
-\item{...}{Arguments passed through to methods.
-(Currently none, but will likely have some modifier arguments for \code{bbi_stan_model} objects.)}
+\item{...}{Arguments passed through to methods. (Currently none, but may have
+some modifier arguments other model types in the future.)}
 }
 \value{
 Absolute path to input data file
 }
 \description{
-Helper to extract the path to the input data from a \code{bbi_nonmem_summary} or
-\code{bbi_nonmem_model} object. Note that \strong{this function only works on models that
-have been successfully run} because the path to the data is constructed
-during model submission.
+Helper to extract the path to the input data from a
+\verb{bbi_\{.model_type\}_summary} or \verb{bbi_\{.model_type\}_model} object. Note that
+\strong{this function only works on models that have been successfully run}
+because the path to the data is constructed during model submission.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{bbi_nonmem_model}: Takes \code{bbi_nonmem_model} object
-
-\item \code{bbi_nonmem_summary}: Takes \code{bbi_nonmem_summary} object
+\item \code{bbi_model}: Takes \code{bbi_nonmem_model} object
 }}
 

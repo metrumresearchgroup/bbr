@@ -66,11 +66,11 @@ NEW_TEXT2 <- c("all", "done")
 SUMMARY_REF_FILE <- file.path(REF_DIR, "1_summary_obj.R")
 PARAM_REF_FILE <-   file.path(REF_DIR, "1_param_table.R")
 
-SUM_CLASS_LIST <- c(SUM_CLASS, "list")
-MOD_CLASS_LIST <- c(NM_MOD_CLASS, "list")
+NM_SUM_CLASS_LIST <- c(NM_SUM_CLASS, BBI_PARENT_CLASS, "list")
+NM_MOD_CLASS_LIST <- c(NM_MOD_CLASS, BBI_PARENT_CLASS, "list")
 PROC_CLASS_LIST <- c(PROC_CLASS, "list")
 
-PROC_HELP_STR <- c("Running:", as.character(glue("  {read_bbi_path()} --help")), as.character(glue("In {getwd()}")))
+PROC_HELP_STR <- as.character(glue("  {read_bbi_path()} --help"))
 
 SUMS_LIST_NAMES_REF <- c("absolute_model_path", "bbi_summary", "error_msg", "needed_fail_flags")
 
@@ -96,9 +96,9 @@ CONFIG_MODEL_MD5 <- "9092189126b23a80bf91a67d1dd8973c"
 
 # yaml md5 hashes
 MOD1_YAML_MD5 <- "6ccf206e167485b5adf29bc135197929"
-MOD_LEVEL2_MD5 <- "a6e124ea392bd028ed7747eb67c46b03"
-ALL_MODS_YAML_MD5 <- c(MOD1_YAML_MD5, rep("49c9511a0a4325a5ea354b95b863ed85", 2), "0e4c259b9edce9dc2cdda60f624b2009")
-RUN_LOG_YAML_MD5 <- c(MOD1_YAML_MD5, "8af45a14df4b51efb641fda0434be63d", "086595d0f235d0c4fc789d44c103cac0")
+MOD_LEVEL2_MD5 <- "eb3cada879c886a98d30a18f06f14a68"
+ALL_MODS_YAML_MD5 <- c(MOD1_YAML_MD5, rep("cd3bd133e23d863f308b64c20e331d33", 2), "7eeb498c50d8ec72d85ec260cba5e40c")
+RUN_LOG_YAML_MD5 <- c(MOD1_YAML_MD5, "ac75f5771d66c9b55a1ec68c8789a043", "77525be36ddd665e1508c7ca7541882e")
 
 # model refs
 
@@ -112,7 +112,7 @@ REF_LIST_1 <- list(
   absolute_model_path = file.path(ABS_MODEL_DIR, "1"),
   yaml_md5 = MOD1_YAML_MD5
 )
-class(REF_LIST_1) <- MOD_CLASS_LIST
+class(REF_LIST_1) <- NM_MOD_CLASS_LIST
 
 
 REF_LIST_TMP <- list(
@@ -125,7 +125,7 @@ REF_LIST_TMP <- list(
   absolute_model_path = file.path(ABS_MODEL_DIR, "temp"),
   yaml_md5 = MOD1_YAML_MD5
 )
-class(REF_LIST_TMP) <- MOD_CLASS_LIST
+class(REF_LIST_TMP) <- NM_MOD_CLASS_LIST
 
 
 #####################
@@ -263,4 +263,12 @@ create_temp_model <- function(path = YAML_TEST_FILE,
   withr::defer(fs::file_delete(to_delete), envir)
   # normalizePath() needs to be called when the file actually exists
   fs::path_ext_remove(normalizePath(temp_yaml))
+}
+
+#' Delete a model object and all of it's accompanying files
+cleanup_model <- function(.mod) {
+  if (fs::file_exists(get_yaml_path(.mod, .check_exists = FALSE)))  fs::file_delete(get_yaml_path(.mod))
+  if (fs::file_exists(get_model_path(.mod, .check_exists = FALSE))) fs::file_delete(get_model_path(.mod))
+  if (fs::dir_exists(get_output_dir(.mod, .check_exists = FALSE)))  fs::dir_delete(get_output_dir(.mod))
+  rm(.mod)
 }

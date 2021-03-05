@@ -24,7 +24,8 @@
 #'   4)`. Run [print_bbi_args()] to see valid arguments. These will be written
 #'   into YAML file.
 #' @param .overwrite If `FALSE`, the default, error if a file already exists at
-#'   `.yaml_path`. If `TRUE` overwrite existing file, if one exists.
+#'   `.yaml_path`. If `TRUE` overwrite existing file and output directory, if
+#'   they exist.
 #' @param .model_type Character scaler to specify type of model being created
 #'   (used for S3 class). Currently only `'nonmem'` is supported.
 #'
@@ -43,18 +44,10 @@ new_model <- function(
   .model_type = c("nonmem")
 ) {
 
-  maybe_yaml_path <- paste0(.path, ".yaml")
-  # check if file already exists
-  if (fs::file_exists(maybe_yaml_path) && !isTRUE(.overwrite)) {
-    stop(
-      glue::glue(
-        "File already exists at {maybe_yaml_path}.",
-        "Either call `read_model()` to load model from YAML or use,",
-        "`new_model(.overwrite = TRUE)` to overwrite the existing YAML.",
-        .sep = " "
-      )
-    )
-  }
+  .model_type <- match.arg(.model_type)
+
+  # check if file already exists and decide whether to overwrite if it does
+  check_for_existing_model(.path, .overwrite)
 
   # construct the absolute model path in a way that avoids a warning from
   # normalizePath() if `.path` does not exist (we only require that the model
@@ -64,22 +57,17 @@ new_model <- function(
     basename(.path)
   )
 
-  # fill list from passed args
+  # create model object
   .mod <- list()
   .mod[[ABS_MOD_PATH]] <- abs_mod_path
   .mod[[YAML_MOD_TYPE]] <- .model_type
-  if (!is.null(.description)) {
-    checkmate::assert_scalar(.description)
-    .mod[[YAML_DESCRIPTION]] <- .description
-  }
-  if (!is.null(.based_on)) {
-    .mod[[YAML_BASED_ON]] <- safe_based_on(dirname(.path), .based_on)
-  }
-  if (!is.null(.tags)) .mod[[YAML_TAGS]] <- .tags
-  if (!is.null(.bbi_args)) .mod[[YAML_BBI_ARGS]] <- .bbi_args
-
-  # make list into S3 object
   .mod <- create_model_object(.mod, save_yaml = TRUE)
+
+  # update model from passed args
+  if (!is.null(.description)) .mod <- replace_description(.mod, .description)
+  if (!is.null(.tags))        .mod <- replace_all_tags(.mod, .tags)
+  if (!is.null(.bbi_args))    .mod <- replace_all_bbi_args(.mod, .bbi_args)
+  if (!is.null(.based_on))    .mod <- replace_all_based_on(.mod, .based_on)
 
   return(.mod)
 }
@@ -152,3 +140,23 @@ save_model_yaml <- function(.mod) {
   return(.mod)
 }
 
+
+#' Private helper to look for existing model and overwrite if necessary
+#' @inheritParams new_model
+#' @importFrom fs file_exists file_delete dir_exists dir_delete
+#' @keywords internal
+check_for_existing_model <- function(.path, .overwrite) {
+  maybe_yaml_path <- paste0(.path, ".yaml")
+  if (fs::file_exists(maybe_yaml_path)) {
+    if (isTRUE(.overwrite)) {
+      fs::file_delete(maybe_yaml_path)
+      if (fs::dir_exists(.path)) fs::dir_delete(.path)
+    } else {
+      stop(paste(
+        glue("File already exists at {maybe_yaml_path}."),
+        "Either call `read_model()` to load model from YAML or use,",
+        "`.overwrite = TRUE` to overwrite the existing YAML."
+      ))
+    }
+  }
+}

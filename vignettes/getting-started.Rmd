@@ -226,6 +226,8 @@ mod2 <- mod2 %>%
   add_notes("2 compartment model more appropriate than 1 compartment")
 ```
 
+The `model_diff()` and `tags_diff()` function make it easy to compare models to their parent model. See the ["Using based_on" vignette](https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html) for examples.
+
 ## Continue to iterate...
 
 Now the iteration process continues with a third model. Note that you can tell `copy_model_from()` to inherit the tags from the parent model and automatically add them to the new model.
@@ -295,5 +297,5 @@ cleanup()
 
 Hopefully this has given you a good start on understanding the capabilities and basic workflow of `bbr`. Please see the other vignettes for demonstrations of more advanced or specific functionality.
 
-* [Using the based_on field](https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html) -- How to use the `based_on` field to track a model's ancestry through the model development process, as well how to leverage `config_log()` to check whether older models are still up-to-date.
+* [Using the based_on field](https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html) -- How to use the `based_on` field to track a model's ancestry through the model development process, as well as using `model_diff()` and `tags_diff()` to compare models. Also demonstrates leveraging `config_log()` to check whether older models are still up-to-date.
 * [Creating a Model Summary Log](https://metrumresearchgroup.github.io/bbr/articles/using-summary-log.html) -- How to use `summary_log()` to extract model diagnostics like the objective function value, condition number, and parameter counts.
