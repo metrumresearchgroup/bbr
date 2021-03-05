@@ -34,10 +34,79 @@ described in the \code{\link{get_path_from_object}} help page.
 method, numbers of subjects and records, significant digits, run time, and
 more.
 \item \strong{run_heuristics} -- Boolean flags indicating potential issues with the
-run. For example, if there was a large condition number or a parameter near
-boundary. \code{TRUE} for a given element indicates that issue was detected.
-\code{FALSE} can either mean it was not detected or it was not applicable for
-that run.
+run. \code{TRUE} for a given element indicates that issue was detected. \code{FALSE}
+can either mean it was not detected or it was not applicable for that run.
+If any of these come up \code{TRUE} it is best to investigate the issue, likely
+by checking the \code{.lst} file. This can be done easily with
+\code{\link[=build_path_from_model]{build_path_from_model()}} like \code{build_path_from_model(.mod, ".lst")}. See
+below for details on each heuristic.
+\itemize{
+\item \code{covariance_step_aborted} -- It is possible for the Estimation Step to
+terminate successfully, but have the Covariance Step generate an error
+message. In general, successful completion of the Covariance Step
+requires a better defined minimum than does the successful completion of
+the Estimation Step. It is not necessarily an error but a warning, often
+due to the model being overparameterized. Look at the variance
+components of your model parameters (look for very small values e.g.
+10^-6) and consider removing some of them to simplify the model.
+\item \code{large_condition_number} -- \code{TRUE} if \code{condition_number > 1000}. Could
+indicate highly correlated parameters, overparameterization, or other
+issues. The condition number is the ratio of the largest eigenvalue to
+the smallest eigenvalue. If there is only one eigenvalue, condition
+number will be \code{1.0}.
+\item \code{correlations_not_ok} -- Not currently implemented in \code{bbi}; will always
+be \code{FALSE}.
+\item \code{parameter_near_boundary} -- At least one scaled parameter estimate is
+near the boundary of what was specified. This message indicates that one
+of your parameters is either too small or too large, which sometimes may
+be dealt with by changing your initial estimates. The boundary test is
+user-selectable.
+\item \code{hessian_reset} -- Indicates some problem during the search,
+specifically that the approximation to the Hessian is no longer
+acceptable, and must be “recomputed”. User should check the \code{.lst} file
+to see how many resets occur and on which iterations. This message can
+be safely ignored \emph{unless} more than just a couple of resets occur, or
+if resets occur right before the end of the search. In these cases a
+poor fit (judged by other means) can result and the user should
+carefully regard their setup and consider possible reasons why a
+minimum--let alone one which corresponds to a good estimate--was
+difficult to find. There could be many possible reasons. The appearance
+of the message can also explain why an unusually large number of
+function evaluations were used for the iteration (extra ones were needed
+to compute the new Hessian and perform a line search along the new
+direction) and why an unusually long CPU time was needed for the
+iteration (if intermediate output is being monitored). Its appearance
+suggests that the search is not going easily, and perhaps (thought not
+necessarily) that something is wrong with the model specification.
+\item \code{has_final_zero_gradient} -- Could indicate a coding error, or that
+there is not enough information for NONMEM to estimate the parameter.
+Use \code{\link[=check_grd]{check_grd()}} to see which parameters are having issues. A gradient
+of 0 at the start of the search indicates that there is a lack of
+information for NONMEM to use in order to determine the best estimate
+for that parameter. Zero gradient at the beginning of the iteration
+process could indicate lack of information for that parameter (e.g.
+adding gender effect and having a dataset with only males). The EM
+algorithms report if a gradient for one of the THETAs is zero,
+indicating improper model specification or coding.
+\item \code{minimization_terminated} -- The minimization was terminated. This may also
+involve considering posteriori non-identifiability because the data does not
+really let you estimate some parameter, for example between subject
+variability. In this case, consider simplifying the \emph{between subject variability} model.
+If minimization was terminated due to rounding errors (\code{error=134}) this
+message indicates that a sufficient number of digits were lost during
+estimation resulting in termination of the optimization. One solution could
+be to rerun the model with a new set of initial estimates and changing
+\code{SIGDIGITS} to a higher number. Also consider if the model is
+overparameterized.
+\item \code{eta_pval_significant} -- \code{TRUE} if any of the ETA p-values are < 0.05
+(extracted from \verb{$shrinkage_details$pval}). This indicates large
+deviations from zero, which violates the assumption that ETA has a mean of
+zero with a variance of OMEGA. This could be the consequence of asymmetric
+shrinkage or a misfit model.
+\item \code{prderr} -- \code{TRUE} if a \code{PRDERR} file is present in the output folder.
+This indicates that NONMEM is unable to compute a prediction for a given
+data record with the current THETA and ETA values.
+}
 \item \strong{parameters_data} -- Data about parameter estimates. This can be
 accessed directly, but is much easier to look at with the
 \code{\link[=param_estimates]{param_estimates()}} function (which parses this, and other related elements,
@@ -75,5 +144,5 @@ Additionally, if you have renamed the \code{.ext} file from its default of \verb
 }}
 
 \seealso{
-\code{\link[=model_summaries]{model_summaries()}}
+\code{\link[=model_summaries]{model_summaries()}}, \code{\link[=summary_log]{summary_log()}}
 }

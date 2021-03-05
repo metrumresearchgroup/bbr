@@ -45,17 +45,9 @@ If you would like more fields from the summary object, you can extract them manu
 \item \code{number_of_obs} -- Total count of observations in the input data set, extracted from \verb{$run_details}.
 \item \code{condition_number} -- The condition number for the final estimation method, if present.
 \item \code{any_heuristics} -- Logical indicating whether \emph{any} of the columns extracted from \verb{$run_heuristics} are \code{TRUE}. Duplicative information, but helpful for filtering.
-\item \code{covariance_step_aborted} -- Extracted from \verb{$run_heuristics}.
-\item \code{large_condition_number} -- \code{TRUE} if \code{condition_number > 1000}. Extracted from \verb{$run_heuristics}.
-\item \code{correlations_not_ok} -- Not currently implemented in \code{bbi}; will always be \code{FALSE}. Extracted from \verb{$run_heuristics}.
-\item \code{parameter_near_boundary} -- Extracted from \verb{$run_heuristics}.
-\item \code{hessian_reset} -- Extracted from \verb{$run_heuristics}.
-\item \code{has_final_zero_gradient} -- Extracted from \verb{$run_heuristics}.
-\item \code{minimization_terminated} -- Extracted from \verb{$run_heuristics}.
-\item \code{eta_pval_significant} -- \code{TRUE} if any of the ETA p-values are < 0.05. Extracted from \verb{$shrinkage_details$pval}.
-\item \code{prderr} -- \code{TRUE} if a \code{PRDERR} file is present in the output folder.
+\item \verb{$run_heuristics} columns -- One logical column for each element extracted from \verb{$run_heuristics}. These are named and described in the \code{\link[=model_summary]{model_summary()}} docs.
 }
 }
 \seealso{
-\code{\link[=run_log]{run_log()}}, \code{\link[=config_log]{config_log()}}
+\code{\link[=run_log]{run_log()}}, \code{\link[=config_log]{config_log()}}, \code{\link[=model_summary]{model_summary()}}, \code{\link[=model_summaries]{model_summaries()}}
 }

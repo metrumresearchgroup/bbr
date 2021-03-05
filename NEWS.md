@@ -8,6 +8,8 @@
 
 * Added `check_up_to_date()` function for checking whether the model file(s) and data file(s) associated with a model have changed since the model was run.  (#338)
 
+* Added more documentation about the heuristics returned from `model_summary.bbi_nonmem_model()` (#343)
+
 ## Bug fixes
 
 * `param_estimates()` now correctly errors when a Bayesian method is used but is _not_ the final method. (#344)
