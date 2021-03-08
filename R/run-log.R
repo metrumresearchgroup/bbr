@@ -81,9 +81,9 @@ find_models <- function(.base_dir, .recurse) {
 #' Private helper function that tries to call [read_model()] on a yaml path and
 #' returns NULL, with no error, if the YAML is not a valid model file. Also
 #' wraps [read_model()] in `suppressMessages()` so that things like the
-#' [check_stan_model()] messages will be suppressed. This is done primarily
-#' because this function is primarily used when mapping over a number of models
-#' and these messages can be very annoying and mostly pointless in that context.
+#' [check_stan_model()] messages will be suppressed. This is done because this
+#' function is primarily used when mapping over a number of models and these
+#' messages can be very annoying and mostly pointless in that context.
 #'
 #' @inheritParams read_model
 #'

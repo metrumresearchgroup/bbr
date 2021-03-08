@@ -2,10 +2,12 @@
 % Please edit documentation in R/cmdstan.R
 \name{compile_stanmod}
 \alias{compile_stanmod}
-\title{Private helper to compile a stan model and save a gitignore that ignores the binary}
+\title{Private helper to compile a stan model and save a gitignore that ignores the
+binary and posterior csv's}
 \usage{
 compile_stanmod(.mod)
 }
 \description{
-Private helper to compile a stan model and save a gitignore that ignores the binary
+Private helper to compile a stan model and save a gitignore that ignores the
+binary and posterior csv's
 }

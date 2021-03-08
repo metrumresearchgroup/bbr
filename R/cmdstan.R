@@ -330,7 +330,7 @@ compile_stanmod <- function(.mod) {
   stanmod <- cmdstanr::cmdstan_model(build_path_from_model(.mod, STANMOD_SUFFIX))
 
   # add to gitignore, if not already present
-  gitignore <- file.path(get_absolute_model_path(.mod), ".gitignore")
+  gitignore <- file.path(.mod[[ABS_MOD_PATH]], ".gitignore")
   ignore_string <- paste(
     "# ignore model binary",
     get_model_id(.mod), "",

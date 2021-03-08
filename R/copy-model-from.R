@@ -176,7 +176,7 @@ copy_model_from_impl <- function(
   if(!fs::is_absolute_path(.new_model)) {
     dev_error(".new_model argument to copy_model_from_impl() must be absolute.")
   }
-  .parent_based_on <- fs::path_rel(get_absolute_model_path(.parent_mod), start = dirname(.new_model))
+  .parent_based_on <- fs::path_rel(.parent_mod[[ABS_MOD_PATH]], start = dirname(.new_model))
 
   # build tags
   if (.inherit_tags && !is.null(.parent_mod[[YAML_TAGS]])) {

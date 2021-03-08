@@ -41,23 +41,15 @@ create_model_object <- function(res, save_yaml) {
     # we won't know the model file extension, so we rely on this helper to check
     # the possible extensions and throw an error if none exists
     find_nonmem_model_file_path(res[[ABS_MOD_PATH]], .check_exists = TRUE)
-  }
-
-  if(isTRUE(save_yaml)) {
-    res <- save_model_yaml(res)
-  }
-
-  # look for appropriate model files on disk
-  # must be done AFTER assigning the class so that associated helpers can dispatch correctly
-  if (.model_type == "nonmem") {
-    # we won't know the model file extension, so we rely on this helper to check
-    # the possible extensions and throw an error if none exists
-    find_nonmem_model_file_path(res[[ABS_MOD_PATH]], .check_exists = TRUE)
   } else if (.model_type == "stan") {
     # check for necessary files and
     # warn and scaffold if any are missing
     check_stan_model(res)
     scaffold_missing_stan_files(res)
+  }
+
+  if(isTRUE(save_yaml)) {
+    res <- save_model_yaml(res)
   }
 
   # check for required keys, just as an extra safety precaution before returning

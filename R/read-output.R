@@ -132,7 +132,7 @@ check_output_dir.character <- function(.mod, ...) {
   return(.out_files)
 }
 
-#' @describeIn check_output_dir Takes a `bbi_nonmem_model` object.
+#' @describeIn check_output_dir Takes a `bbi_model` object.
 #' @export
 check_output_dir.bbi_model <- function(.mod, ...) {
   .output_dir <- .mod %>% get_output_dir()
