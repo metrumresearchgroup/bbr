@@ -24,6 +24,6 @@ List files in the output directory to glance at where the process is
 \itemize{
 \item \code{character}: Takes a file path to the output directory.
 
-\item \code{bbi_model}: Takes a \verb{bbi_\{.model_type\}_model} object.
+\item \code{bbi_model}: Takes \verb{bbi_\{.model_type\}_model} or \verb{bbi_\{.model_type\}_summary} object
 }}
 
