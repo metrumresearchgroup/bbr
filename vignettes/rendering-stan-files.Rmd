@@ -1,0 +1,121 @@
+---
+title: "Rendering Stan files with bbr"
+output: html_document
+---
+
+# Introduction
+
+**WORK IN PROGRESS!!!** ...this is really beyond a work in progress... really just a sketch to show the proposed functionality.
+
+
+```{r load packages, results = 'hide', message=FALSE, warning=FALSE}
+devtools::load_all() # this is all still dev functionality
+#library(bbr)
+library(dplyr)
+library(purrr)
+library(glue)
+```
+
+The idea here is that you can use the whisker/mustache syntax to create a template of any of the necessary files (`.stan`, `-standata.R`, etc.) and then use `copy_model_from()` in combination with the `render_` helpers to create different models from your template.
+
+```{r set paths and define cleanup, include = FALSE}
+MODEL_DIR <- system.file("model", "stan", package = "bbr")
+
+COVS <- c("_weight", "_age", "_gender")
+
+# delete old files and create new ones
+setup <- function() {
+  # copy model
+  base <- copy_model_from(
+    read_model(file.path(MODEL_DIR, "fxa")),
+    "CovBase",
+    .overwrite = TRUE
+  ) %>%
+    add_standata_file(file.path(MODEL_DIR, "template-standata.R"))
+  
+  # delete new copied models entirely
+  purrr::walk(COVS, function(.c) {
+    if (fs::file_exists(file.path(MODEL_DIR, glue("Cov_{.c}.yaml")))) fs::file_delete(file.path(MODEL_DIR, glue("Cov_{.c}.yaml")))
+    if (fs::dir_exists(file.path(MODEL_DIR, glue("Cov_{.c}")))) fs::dir_delete(file.path(MODEL_DIR, glue("Cov_{.c}")))  
+  })
+}
+
+# delete all files
+cleanup <- function() {
+  # delete new copied models entirely
+  purrr::walk(c("Base", COVS), function(.c) {
+    if (fs::file_exists(file.path(MODEL_DIR, glue("Cov{.c}.yaml")))) fs::file_delete(file.path(MODEL_DIR, glue("Cov{.c}.yaml")))
+    if (fs::dir_exists(file.path(MODEL_DIR, glue("Cov{.c}")))) fs::dir_delete(file.path(MODEL_DIR, glue("Cov{.c}")))  
+  })
+}
+
+setup()
+```
+
+
+# Creating copies of a model with different covariates
+
+The first use case where this was proposed was a situation where you have your basic model structure, but you would like to create several versions of the same model that incorporate different covariates. 
+
+_In this code below we are just changing the script that builds the data, but you could extend this modify the `.stan` file, or whatever else, in the same way._
+
+## Load base model (template)
+
+This is our "base model" that we will be working from.  Notice how the `-standata.R` file contains `{{cov}}` in several places.
+
+```{r, comment = ""}
+base_mod <- read_model(file.path(MODEL_DIR, "CovBase"))
+
+build_path_from_model(base_mod, "-standata.R") %>%
+  readLines() %>%
+  cat(sep = "\n")
+```
+
+These `{{cov}}` sections will all be replaced by whatever is passed into the `render_` function below.
+
+## Create copies with different covariates
+
+Here is the use case: we want to create three different models, each incorporating a different covariate.
+
+This code maps over the `covs_to_test` vector, creates a new model with `copy_model_from()`, and then renders the new `-standata.R` file.
+
+```{r}
+covs_to_test <-  c("weight","age","gender")
+
+new_mods <- purrr::map(covs_to_test, function(.c) {
+ new_mod <- copy_model_from(
+   base_mod,
+   glue("Cov_{.c}"),
+   .overwrite= TRUE
+ ) %>%
+    render_standata(
+      cov = .c
+    )
+})
+```
+
+For each of the new models, the original template `-standata.R` has been copied through and rendered as real R code.
+
+Notice, for the first model, that now `{{cov}}` has been replaced by `weight`
+
+```{r, comment = ""}
+build_path_from_model(new_mods[[1]], "-standata.R") %>%
+  readLines() %>%
+  cat(sep = "\n")
+```
+
+And here `{{cov}}` has been replaced by `age`
+
+```{r, comment = ""}
+build_path_from_model(new_mods[[2]], "-standata.R") %>%
+  readLines() %>%
+  cat(sep = "\n")
+```
+
+### Extensibility
+There was also discussion how you could pass in either strings or the names of functions. These are both possible, but do require getting some particular syntax correct. The passing in functions is interesting... If you have something like `{{f}}(xdata)` in your template and then you pass `render_standata(f = "my_func")` it will correctly render as `my_func(xdata)`. This could be useful, especially if you're sourcing a file full of helper functions in your `-standata.R` code.
+
+```{r}
+cleanup()
+```
+

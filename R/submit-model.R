@@ -14,7 +14,12 @@
 #'   global YAML files).
 #' @param .mode Either `"sge"`, the default, to submit model(s) to the grid or
 #'   `"local"` for local execution.
-#' @param ... args passed through to `bbi_exec()`
+#' @param ... args passed through. For `bbi_stan_model` this is how you pass
+#'   arguments through to the `$sample()` method of your `cmdstanr` model
+#'   object. See [cmdstanr::sample()] for valid arguments and details. For
+#'   `bbi_nonmem_model` these are passed to `bbi_exec()`.
+#' @param .overwrite Controls whether or not to overwrite existing model output from
+#'   a previous run. If `NULL`, the default, will defer to setting in `.bbi_args`.
 #' @param .config_path Path to a bbi configuration file. If `NULL`, the
 #'   default, will attempt to use a `bbi.yaml` in the same directory as the
 #'   model.
@@ -30,6 +35,7 @@ submit_model <- function(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
+  .overwrite = NULL,
   .config_path = NULL,
   .wait = TRUE,
   .dry_run=FALSE
@@ -44,6 +50,7 @@ submit_model.bbi_nonmem_model <- function(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
+  .overwrite = NULL,
   .config_path = NULL,
   .wait = TRUE,
   .dry_run=FALSE
@@ -53,12 +60,36 @@ submit_model.bbi_nonmem_model <- function(
                              .bbi_args = .bbi_args,
                              .mode = .mode,
                              ...,
+                             .overwrite = .overwrite,
                              .config_path = .config_path,
                              .wait = .wait,
                              .dry_run = .dry_run)
   return(res)
 }
 
+
+#' @describeIn submit_model Takes a `bbi_stan_model` object. All arguments
+#'   passed through `...` will be passed to [cmdstanr::sample()] method.
+#' @export
+submit_model.bbi_stan_model <- function(
+  .mod,
+  .bbi_args = NULL,
+  .mode = c("local"),
+  ...,
+  .overwrite = NULL,
+  .config_path = NULL,
+  .wait = TRUE,
+  .dry_run=FALSE
+) {
+
+  res <- submit_stan_model_cmdstanr(
+    .mod,
+    .mode = .mode,
+    ...,
+    .overwrite = .overwrite,
+  )
+  return(res)
+}
 
 #####################################
 # Private implementation function(s)
@@ -70,12 +101,14 @@ submit_model.bbi_nonmem_model <- function(
 #' @param .mod An S3 object of class `bbi_nonmem_model`, for example from `new_model()`, `read_model()` or `copy_model_from()`
 #' @importFrom stringr str_detect
 #' @importFrom tools file_path_sans_ext
+#' @importFrom checkmate assert_logical
 #' @return An S3 object of class `bbi_process`
 #' @keywords internal
 submit_nonmem_model <- function(.mod,
                                 .bbi_args = NULL,
                                 .mode = c("sge", "local"),
                                 ...,
+                                .overwrite = NULL,
                                 .config_path = NULL,
                                 .wait = TRUE,
                                 .dry_run=FALSE) {
@@ -88,6 +121,11 @@ submit_nonmem_model <- function(.mod,
 
   # build command line args
   .bbi_args <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])
+  if (!is.null(.overwrite)) {
+    ##### TODO: Should add a unit test for `.overwrite = TRUE` in NONMEM runs
+    checkmate::assert_logical(.overwrite)
+    .bbi_args[["overwrite"]] <- .overwrite
+  }
   args_vec <- check_bbi_args(.bbi_args)
   cmd_args <- c("nonmem", "run", .mode, get_model_path(.mod), args_vec)
 
@@ -109,6 +147,98 @@ submit_nonmem_model <- function(.mod,
 
   # launch model
   res <- bbi_exec(cmd_args, .wait = .wait, .dir = model_dir, ...)
+
+  return(res)
+}
+
+
+#' Submit a Stan model via cmdstanr
+#'
+#' Private implementation function called by `submit_model()` dispatches.
+#' @param .mod An S3 object of class `bbi_stan_model`, for example from `new_model()`, `read_model()` or `copy_model_from()`
+#' @importFrom jsonlite toJSON
+#' @return An S3 object of class `bbi_process` MAYBE???? Maybe a cmdstanr model. Will there be a wait=F option?
+#' @keywords internal
+submit_stan_model_cmdstanr <- function(.mod,
+                                #.bbi_args = NULL,
+                                #.mode = c("sge", "local"),
+                                .mode = c("local"), ###### FOR DEV
+                                ...,
+                                .overwrite = NULL,
+                                #.config_path = NULL, ### NOT CLEAR THAT WE CAN USE THIS... but maybe for stuff like overwrite
+                                .wait = TRUE,
+                                .dry_run=FALSE) {
+
+  # check against YAML
+  check_yaml_in_sync(.mod)
+  check_stan_model(.mod, .error = TRUE)
+
+  # check for valid type arg
+  .mode <- match.arg(.mode) ##### currently does nothing. How do we submit to grid?
+
+  out_dir <- get_output_dir(.mod, .check_exists = FALSE)
+  if (fs::dir_exists(out_dir)) {
+    if (isTRUE(.overwrite)) {
+      fs::dir_delete(out_dir)
+      #### should we also delete stanargs here? or just are we going to try to pull them in?
+      fs::dir_create(out_dir)
+    } else {
+      stop(glue("{out_dir} already exists. Pass submit_model(..., .overwrite = TRUE) to delete it and re-run the model."), call. = FALSE)
+    }
+  } else {
+    fs::dir_create(out_dir)
+  }
+
+  ############################# NONMEM STUFF that may go away
+
+  # define working directory
+  # model_dir <- get_model_working_directory(.mod)
+
+  # # build command line args
+  # .bbi_args <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])
+  # args_vec <- check_bbi_args(.bbi_args)
+  # cmd_args <- c("nonmem", "run", .mode, get_model_path(.mod), args_vec)
+  #
+  # if (!is.null(.config_path)) {
+  #   checkmate::assert_file_exists(.config_path)
+  #   cmd_args <- c(
+  #     cmd_args,
+  #     sprintf("--config=%s", normalizePath(.config_path))
+  #   )
+  # }
+  #####################
+
+  stanmod <- compile_stanmod(.mod)
+  valid_stanargs <- formalArgs(stanmod$sample)
+
+  # capture args, maybe check against sample(), then write to stanargs.R
+  stanargs <- parse_stanargs(.mod, valid_stanargs, ...)
+
+  # construct input data set and initial estimates
+  standata_list <- standata_to_json(.mod)
+  stanargs[["data"]] <- build_path_from_model(.mod, STANDATA_JSON_SUFFIX)
+  stanargs[["init"]] <- import_stan_init(.mod, .standata = standata_list)
+  stanargs[["output_dir"]] <- get_output_dir(.mod)
+
+  # launch model
+
+  # if (.dry_run) {
+  #   # construct fake res object
+  #   return(bbi_dry_run(cmd_args, model_dir))
+  # }
+
+
+  res <- do.call(
+    stanmod$sample,
+    args = stanargs
+  )
+
+  # construct bbi_config.json
+  # * hash standata.json
+  # * hash init.R
+  # * hash stanargs.R
+  # * get cmdstan and cmdstanr versions
+  stan_config <- build_stan_bbi_config(.mod, .write = TRUE)
 
   return(res)
 }

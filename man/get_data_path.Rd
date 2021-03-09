@@ -25,8 +25,3 @@ Helper to extract the path to the input data from a
 \strong{this function only works on models that have been successfully run}
 because the path to the data is constructed during model submission.
 }
-\section{Methods (by class)}{
-\itemize{
-\item \code{bbi_model}: Takes \code{bbi_nonmem_model} object
-}}
-

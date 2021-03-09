@@ -1,7 +1,7 @@
 Type: Package
 Package: bbr
 Title: R package for bbi
-Version: 1.1.0
+Version: 1.1.0.9XXX
 Authors@R: 
     c(person(given = "Devin",
              family = "Pastoor",
@@ -34,11 +34,13 @@ License: MIT + file LICENSE
 Depends:
     R (>= 3.5)
 Imports: 
+    cmdstanr,
     checkmate,
     cli,
     digest,
     diffobj,
     dplyr (>= 0.8.0),
+    ellipsis,
     forcats,
     fs,
     ggplot2,
@@ -55,6 +57,7 @@ Imports:
     tidyr,
     tidyselect (>= 1.0.0),
     xfun,
+    whisker,
     yaml
 Suggests: 
     covr,

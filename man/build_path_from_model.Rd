@@ -3,7 +3,7 @@
 \name{build_path_from_model}
 \alias{build_path_from_model}
 \alias{build_path_from_model.bbi_model}
-\title{Build path to output file}
+\title{Build path to a model or output file}
 \usage{
 build_path_from_model(.mod, .suffix, ...)
 
@@ -19,11 +19,15 @@ See examples.}
 \item{...}{arguments passed through to methods. (Currently none.)}
 }
 \value{
-Returns an absolute path to \verb{\{output_dir\}/\{model_id\}\{.suffix\}}.
+Returns an absolute path to \verb{\{.mod$absolute_model_path\}/\{get_model_id(.mod)\}\{.suffix\}}.
 Does \emph{not} check whether the file exists.
 }
 \description{
-Builds the absolute path to a file in the output directory from components of the \verb{bbi_\{.model_type\}_model} object
+Builds the absolute path to a file in the model directory from components of
+the \verb{bbi_\{.model_type\}_model} object. For NONMEM models this is used to
+construct paths to files in the \emph{output} directory (i.e. the \code{.lst} or \code{.grd}
+files). For Stan models this is used to construct paths to the files that
+define the model (i.e. \code{-standata.R} or \code{-init.R}).
 }
 \examples{
 .mod <- read_model(

@@ -45,6 +45,10 @@ BBI_ARGS = list(
 BBI_PARENT_CLASS <- "bbi_model"
 NM_MOD_CLASS <- "bbi_nonmem_model"
 NM_SUM_CLASS <- "bbi_nonmem_summary"
+
+STAN_MOD_CLASS <- "bbi_stan_model"
+STAN_SUM_CLASS <- "bbi_stan_summary"
+
 SL_CLASS <- "bbi_summary_list"
 PROC_CLASS <- "bbi_process"
 RUN_LOG_CLASS <- "bbi_run_log_df"
@@ -81,6 +85,7 @@ MODEL_REQ_KEYS <- c(
   YAML_YAML_MD5,
   YAML_MOD_TYPE
 )
+
 
 # columns required for a run log df
 RUN_LOG_REQ_COLS <- c(
@@ -189,11 +194,9 @@ SUMMARY_LOG_REQ_COLS <- c(
   ANY_HEURISTICS
 )
 
-# define json keys to keep as from bbi_config.json
+# define json keys to keep in config_log() from bbi_config.json
 CONFIG_KEEPERS <- c(
-  "model_md5",
   CONFIG_DATA_PATH,
-  "data_md5",
   "bbi_version"
 )
 
