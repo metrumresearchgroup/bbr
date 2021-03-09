@@ -21,22 +21,23 @@
 #' The following fields from are extracted from `bbi_config.json`.
 #'
 #'   * `absolute_model_path`: the path to the model file, excluding the file
-#'   extension
-#'
-#'   * `model_md5`: the MD5 sum of the model file
+#'   extension.
 #'
 #'   * `data_path`: the path to the data file, relative to the model's output directory
-#'     (which can be extracted via [get_output_dir()])
+#'     (which can be extracted via [get_output_dir()]).
 #'
-#'   * `bbi_version`: the version of bbi last used to run the model
+#'   * `bbi_version`: the version of bbi last used to run the model.
 #'
-#'   * `nm_version`: the version of NONMEM last used to run the model
+#'   * `nm_version`: the version of NONMEM last used to run the model.
 #'
 #'   * `model_has_changed`: a logical indicating whether the model file has
-#'   changed since it was last run
+#'   changed since it was last run.
 #'
 #'   * `data_has_changed`: a logical indicating whether the data file has
-#'   changed since the model was last run
+#'   changed since the model was last run. Note that for Stan models, this
+#'   rebuilds the data file, which can be time consuming. If you do _not_
+#'   want to do this, consider using `check_up_to_date.bbi_log_df(.build_data = FALSE)`
+#'   instead. See [check_up_to_date()] for more details.
 #'
 #' @seealso [run_log()], [summary_log()]
 #' @inheritParams run_log
@@ -173,7 +174,7 @@ config_log_entry <- function(path,
     return(NULL)
   }
 
-  matches <- suppressMessages(check_up_to_date(cfg_mod))
+  matches <- suppressMessages(check_up_to_date(cfg_mod, .build_data = TRUE))
 
   config[["model_has_changed"]] <- as.logical(!matches["model"]) # use as.logical to strip off names
   config[["data_has_changed"]]  <- as.logical(!matches["data"])  # use as.logical to strip off names

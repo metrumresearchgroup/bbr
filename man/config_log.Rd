@@ -35,16 +35,18 @@ run.
 The following fields from are extracted from \code{bbi_config.json}.
 \itemize{
 \item \code{absolute_model_path}: the path to the model file, excluding the file
-extension
-\item \code{model_md5}: the MD5 sum of the model file
+extension.
 \item \code{data_path}: the path to the data file, relative to the model's output directory
-(which can be extracted via \code{\link[=get_output_dir]{get_output_dir()}})
-\item \code{bbi_version}: the version of bbi last used to run the model
-\item \code{nm_version}: the version of NONMEM last used to run the model
+(which can be extracted via \code{\link[=get_output_dir]{get_output_dir()}}).
+\item \code{bbi_version}: the version of bbi last used to run the model.
+\item \code{nm_version}: the version of NONMEM last used to run the model.
 \item \code{model_has_changed}: a logical indicating whether the model file has
-changed since it was last run
+changed since it was last run.
 \item \code{data_has_changed}: a logical indicating whether the data file has
-changed since the model was last run
+changed since the model was last run. Note that for Stan models, this
+rebuilds the data file, which can be time consuming. If you do \emph{not}
+want to do this, consider using \code{check_up_to_date.bbi_log_df(.build_data = FALSE)}
+instead. See \code{\link[=check_up_to_date]{check_up_to_date()}} for more details.
 }
 }
 \seealso{

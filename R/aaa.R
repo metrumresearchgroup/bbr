@@ -194,7 +194,7 @@ SUMMARY_LOG_REQ_COLS <- c(
   ANY_HEURISTICS
 )
 
-# define json keys to keep as from bbi_config.json
+# define json keys to keep in config_log() from bbi_config.json
 CONFIG_KEEPERS <- c(
   CONFIG_DATA_PATH,
   "bbi_version"
