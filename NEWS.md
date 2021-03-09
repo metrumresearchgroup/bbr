@@ -1,3 +1,7 @@
+# bbr 1.1.0.9000
+
+All releases tagged `1.1.0.9xxx` refer to "alpha" releases cut from the `bbr_stan_alpha` branch. The intention of this branch is to begin implementing support for Stan modeling with `bbr`. While this code should all be tested and working, the function names and API are considered experimental and may change with new releases. The plan is to merge this functionality into `bbr` proper once this has stabilized.
+
 # bbr 1.1.0
 
 ## New features and changes

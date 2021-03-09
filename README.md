@@ -10,12 +10,22 @@ Status](https://github-drone.metrumrg.com/api/badges/metrumresearchgroup/bbr/sta
 [![codecov](https://codecov.io/gh/metrumresearchgroup/bbr/branch/develop/graph/badge.svg)](https://codecov.io/gh/metrumresearchgroup/bbr)
 <!-- badges: end -->
 
+# bbr\_stan\_alpha
+
+All releases tagged `1.1.0.9xxx` refer to “alpha” releases cut from the
+`bbr_stan_alpha` branch. The intention of this branch is to begin
+implementing support for Stan modeling with `bbr`. While this code
+should all be tested and working, **the function names and API are
+considered experimental and may change with new releases.** The plan is
+to merge this functionality into `bbr` proper once this has stabilized.
+
+# Intro
+
 `bbr` is an R interface for running `bbi`. Together they provide a
 solution for managing projects involving modeling and simulation with a
 number of software solutions used in pharmaceutical sciences. Currently,
-only NONMEM modeling is supported, though we are in the process of Stan
-with plans for other modeling software as well. You can get more
-detailed information on `bbi` (the underlying CLI tool)
+NONMEM and Stan modeling are supported. You can get more detailed
+information on `bbi` (the underlying CLI tool)
 [here](https://github.com/metrumresearchgroup/bbi).
 
 `bbr` is intended to help scientists manage the entire modeling workflow
@@ -42,6 +52,14 @@ latest development version from [GitHub](https://github.com/) with:
 devtools::install_github("metrumresearchgroup/bbr", ref = "develop")
 ```
 
+### Stan modeling
+
+If you are modeling with Stan in `bbr` you don’t currently need `bbi`
+installed, though you *will* need `cmdstanr` and a working version of
+`cmdstan` installed. See the [“Getting Started with CmdStanR”
+vignette](https://mc-stan.org/cmdstanr/articles/cmdstanr.html) for more
+info.
+
 ## Documentation
 
 You can find documentation and a “Getting Started” vignette that shows
@@ -58,16 +76,16 @@ functionality is rolled out. A complete list can be found
 
 ### Featured Vignettes
 
-  - [Getting Started with
+-   [Getting Started with
     bbr](https://metrumresearchgroup.github.io/bbr/articles/getting-started.html)
     – Some basic scenarios for modeling with NONMEM using `bbr`,
     introducing you to its standard workflow and functionality.
-  - [Using the based\_on
+-   [Using the based\_on
     field](https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html)
     – How to use the `based_on` field to track a model’s ancestry
     through the model development process, as well how to leverage
     `config_log()` to check whether older models are still up-to-date.
-  - [Creating a Model Summary
+-   [Creating a Model Summary
     Log](https://metrumresearchgroup.github.io/bbr/articles/using-summary-log.html)
     – How to use `summary_log()` to extract model diagnostics like the
     objective function value, condition number, and parameter counts.
@@ -83,8 +101,8 @@ provide isolation. To replicate this environment,
 2.  install pkgr
 
 3.  open package in an R session and run `renv::init()`
-    
-      - install `renv` \> 0.8.3-4 into default `.libPaths()` if not
+
+    -   install `renv` &gt; 0.8.3-4 into default `.libPaths()` if not
         already installed
 
 4.  run `pkgr install` in terminal within package directory
