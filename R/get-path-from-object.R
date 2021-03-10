@@ -149,7 +149,7 @@ get_model_id.character <- function(.mod) {
 #' @describeIn get_model_id Takes `bbi_{.model_type}_model` or `bbi_{.model_type}_summary` object
 #' @export
 get_model_id.bbi_model <- function(.mod) {
-  return(get_model_id(get_model_path(.mod)))
+  return(get_model_id(.mod[[ABS_MOD_PATH]]))
 }
 
 
@@ -390,7 +390,7 @@ find_nonmem_model_file_path <- function(.path, .check_exists = TRUE) {
           "Please put relevant model file in that location.",
           .sep = " "
         ),
-        "IF THIS IS NOT A NONMEM MODEL please pass the appropriate type to `.model_type`",
+        NONMEM_MODEL_TYPE_ERR_MSG,
         sep = "\n"
       ))
     } else {
