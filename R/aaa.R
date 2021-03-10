@@ -45,6 +45,10 @@ BBI_ARGS = list(
 BBI_PARENT_CLASS <- "bbi_model"
 NM_MOD_CLASS <- "bbi_nonmem_model"
 NM_SUM_CLASS <- "bbi_nonmem_summary"
+
+STAN_MOD_CLASS <- "bbi_stan_model"
+STAN_SUM_CLASS <- "bbi_stan_summary"
+
 SL_CLASS <- "bbi_summary_list"
 PROC_CLASS <- "bbi_process"
 RUN_LOG_CLASS <- "bbi_run_log_df"
@@ -232,3 +236,4 @@ PARAM_BAYES_ERR_MSG <- "param_estimates() is not currently implemented for Bayes
 CHECK_UP_TO_DATE_ERR_MSG <- "Cannot check if up-to-date because model has not been run yet."
 MODEL_DIFF_ERR_MSG <- "Please pass a single `bbi_model` object to the `.mod2` to compare models."
 NONMEM_MODEL_TYPE_ERR_MSG <- "IF THIS IS NOT A NONMEM MODEL please pass the appropriate type to `.model_type`"
+MISSING_STAN_FILES_ERR_MSG <- "The following files, which are necessary to run a `bbi_stan_model` are missing"
