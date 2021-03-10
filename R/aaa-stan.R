@@ -44,21 +44,44 @@ model {
 STANMOD_SCAFFOLD_MD5 <- "cb1c31e0f34cd0c196b64b6cd5492669"
 
 
-STANDATA_SCAFFOLD_STRING <- "make_standata <- function(.dir) {
+STANDATA_SCAFFOLD_STRING <- "
+#' Create Stan data
+#'
+#' @return Must return the list that will be passed to `data` argument of
+#'   `cmdstanr::sample()`
+#'
+#' @param .dir The absolute path to the directory containing this file.
+#'  This is useful for building file paths to the input files you will load.
+#'  Note: you _don't_ need to pass anything to this argument, you only use it
+#'  within the function. `bbr` will pass in the correct path when it calls
+#'  `make_standata()` under the hood.
+make_standata <- function(.dir) {
   # read in any input data
   in_data <- readr::read_csv(file.path(.dir, '..', 'my_data.csv'))
   # do any transformations
   # return the list that can be passed to cmdstanr
 }"
 
-STANDATA_SCAFFOLD_MD5 <- "7cec129a8b1f124af1ca102feb64805a"
+STANDATA_SCAFFOLD_MD5 <- "b7bda7e67dd9416a609b006c351ba625"
 
 
-STANINIT_SCAFFOLD_STRING <- "make_init <- function(.data) {
+STANINIT_SCAFFOLD_STRING <- "
+#' Create Stan initial values
+#'
+#' @return Must return something that can be passed to the `init` argument of
+#' `cmdstanr::sample()`. There are several options; see `?cmdstanr::sample` for
+#' details.
+#'
+#' @param .data The data list returned from `make_standata()` for this model.
+#'   This is provided in case any of your initial values are dependant on some
+#'   aspect of the data (e.g. the number of rows). Note: you _don't_ need to pass
+#'   anything to this argument, you only use it within the function. `bbr` will
+#'   pass in the correct data when it calls `make_init()` under the hood.
+make_init <- function(.data) {
   # return list of initial estimates that can be passed to cmdstanr
 }"
 
-STANINIT_SCAFFOLD_MD5 <- "3a4f8bf61a135cb8c514f4814b729c14"
+STANINIT_SCAFFOLD_MD5 <- "b55878f2b17774159952252540360540"
 
 STAN_SCAFFOLD_MD5_VEC <- c(
   STANMOD_SCAFFOLD_MD5,

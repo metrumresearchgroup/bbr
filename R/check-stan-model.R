@@ -49,7 +49,7 @@ check_stan_model <- function(.mod, .error = FALSE) {
     if (any(scaffold_bool)) {
       problems <- paste(
         problems,
-        glue("The following files, which are necessary to run a `bbi_stan_model` are only scaffolds:"),
+        STAN_SCAFFOLD_ERR_MSG,
         paste(paste0(" * ", candidates[scaffold_bool]), collapse = "\n"),
         "Please add necessary code to the scaffolded files.\n",
         sep = "\n"
