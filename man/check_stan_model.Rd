@@ -14,7 +14,7 @@ missing. If \code{TRUE} will error instead.}
 }
 \description{
 Checks a \link{bbi_stan_model} object to make sure it can find all of the files
-necesssary to submit the model. (See \link{?bbi_stan_model} for details about
+necesssary to submit the model. (See \verb{?}\link{bbi_stan_model} for details about
 these files.)
 }
 \details{

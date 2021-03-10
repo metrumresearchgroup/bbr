@@ -1,7 +1,7 @@
 #' Checks a `bbi_stan_model` for necessary files
 #'
 #' Checks a [bbi_stan_model] object to make sure it can find all of the files
-#' necesssary to submit the model. (See [?bbi_stan_model] for details about
+#' necesssary to submit the model. (See `?`[bbi_stan_model] for details about
 #' these files.)
 #'
 #' @details
