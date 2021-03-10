@@ -33,9 +33,9 @@ check_config_ref <- function(log_df, run_nums, col_count, run_status) {
   expect_false(any(duplicated(log_df[[ABS_MOD_PATH]])))
 
   # these are the same because bbi_config.json was just copied through
-  expect_identical(log_df$data_md5, rep(CONFIG_DATA_MD5, run_count))
-  expect_identical(log_df$data_path, rep(CONFIG_DATA_PATH, run_count))
-  expect_identical(log_df$model_md5, rep(CONFIG_MODEL_MD5, run_count))
+  expect_identical(log_df$data_md5, rep(CONFIG_DATA_MD5_REF, run_count))
+  expect_identical(log_df$data_path, rep(CONFIG_DATA_PATH_REF, run_count))
+  expect_identical(log_df$model_md5, rep(CONFIG_MODEL_MD5_REF, run_count))
 
   base_path <- fs::path_common(log_df[["absolute_model_path"]])
 
@@ -164,15 +164,15 @@ test_that("add_config() works correctly with missing json", {
   # config log fields
   expect_identical(
     log_df[["data_md5"]],
-    rep_missing(CONFIG_DATA_MD5, missing_idx, 4L)
+    rep_missing(CONFIG_DATA_MD5_REF, missing_idx, 4L)
   )
   expect_identical(
     log_df[["data_path"]],
-    rep_missing(CONFIG_DATA_PATH, missing_idx, 4L)
+    rep_missing(CONFIG_DATA_PATH_REF, missing_idx, 4L)
   )
   expect_identical(
     log_df[["model_md5"]],
-    rep_missing(CONFIG_MODEL_MD5, missing_idx, 4L)
+    rep_missing(CONFIG_MODEL_MD5_REF, missing_idx, 4L)
   )
   expect_identical(
     log_df[["bbi_version"]],

@@ -154,8 +154,10 @@ install_menu <- function(.body, .path, .version, .force, .quiet){
 
   }
 
-  add_to_path_message(.dest_bbi_path)
-  version_message(local_v = local_v, release_v = release_v)
+  if (!isTRUE(.quiet)) {
+    add_to_path_message(.dest_bbi_path)
+    version_message(local_v = local_v, release_v = release_v)
+  }
 }
 
 

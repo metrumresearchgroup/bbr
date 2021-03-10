@@ -15,7 +15,6 @@ test_that("use-bbi works on linux pulling from options", {
     'bbr.bbi_exe_path' = bbi_tmp_path
   ),
   {
-
     use_bbi(.force = TRUE,
             .quiet = TRUE)
   })
