@@ -23,9 +23,9 @@
 #'   no need to include that here.
 #' @param .add_tags Character vector with any new tags(s) to be added to
 #'   `{.new_model}.yaml`
-#' @param .inherit_tags If `FALSE`, the default, new model will only have any
-#'   tags passed to `.add_tags` argument. If `TRUE` inherit any tags from
-#'   `.parent_mod`, with any tags passed to `.add_tags` appended.
+#' @param .inherit_tags If `TRUE`, the default, inherit any tags from
+#'   `.parent_mod`, with any tags passed to `.add_tags` appended. If `FALSE` new
+#'   model will only have any tags passed to `.add_tags` argument.
 #' @param .update_model_file **Only relevant to NONMEM models.** If `TRUE`, the
 #'   default, update the newly created model file. If `FALSE`, new model file
 #'   will be an exact copy of its parent. For a NONMEM model, this currently
@@ -59,7 +59,7 @@ copy_model_from <- function(
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
-  .inherit_tags = FALSE,
+  .inherit_tags = TRUE,
   .update_model_file = TRUE,
   .overwrite = FALSE
 ) {
@@ -74,7 +74,7 @@ copy_model_from.bbi_nonmem_model <- function(
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
-  .inherit_tags = FALSE,
+  .inherit_tags = TRUE,
   .update_model_file = TRUE,
   .overwrite = FALSE
 ) {
@@ -104,7 +104,7 @@ copy_model_from.bbi_stan_model <- function(
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
-  .inherit_tags = FALSE,
+  .inherit_tags = TRUE,
   .update_model_file = TRUE,
   .overwrite = FALSE
 ) {
@@ -158,7 +158,7 @@ copy_model_from_impl <- function(
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
-  .inherit_tags = FALSE,
+  .inherit_tags = TRUE,
   .update_model_file = TRUE,
   .overwrite = FALSE,
   .model_type = c("nonmem", "stan")
