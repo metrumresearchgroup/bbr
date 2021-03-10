@@ -75,8 +75,8 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   test_that("copying model works and new models run correctly", {
     mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
-    mod2 <- copy_model_from(mod1, 2)
-    mod3 <- copy_model_from(mod1, 3, .inherit_tags = TRUE) %>% add_bbi_args(list(clean_lvl=2, overwrite = FALSE))
+    mod2 <- copy_model_from(mod1, 2, .inherit_tags = FALSE)
+    mod3 <- copy_model_from(mod1, 3) %>% add_bbi_args(list(clean_lvl=2, overwrite = FALSE))
 
     # run new models
     list(mod2, mod3) %>% submit_models(.mode = "local", .wait = TRUE)

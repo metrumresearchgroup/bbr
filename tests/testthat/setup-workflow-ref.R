@@ -161,10 +161,10 @@ FAKE_CTL_PATH <- fs::path_norm(file.path(getwd(), MODEL_DIR, CTL_TEST_FILE)) %>%
 
 create_all_models <- function() {
   mod1 <- read_model(MOD1_PATH)
-  mod2 <- copy_model_from(mod1, basename(NEW_MOD2),   "level 1 copy of 1")
-  mod3 <- copy_model_from(mod1, basename(NEW_MOD3),   "level 1 copy of 1")
+  mod2 <- copy_model_from(mod1, basename(NEW_MOD2),   "level 1 copy of 1", .inherit_tags = FALSE)
+  mod3 <- copy_model_from(mod1, basename(NEW_MOD3),   "level 1 copy of 1", .inherit_tags = FALSE)
   fs::dir_create(LEVEL2_DIR)
-  mod4 <- copy_model_from(mod2, file.path(LEVEL2_SUBDIR, MOD_ID), "level 2 copy of 2")
+  mod4 <- copy_model_from(mod2, file.path(LEVEL2_SUBDIR, MOD_ID), "level 2 copy of 2", .inherit_tags = FALSE)
 
   # load or create models and assign model objects to global environment
   assign("mod1", mod1, pos = parent.frame())
@@ -183,12 +183,11 @@ copy_all_output_dirs <- function() {
 create_rlg_models <- function() {
   # copy models before creating run log
   mod1 <- read_model(MOD1_PATH)
-  copy_model_from(mod1, basename(NEW_MOD2), .add_tags = NEW_TAGS)
+  copy_model_from(mod1, basename(NEW_MOD2), .add_tags = NEW_TAGS, .inherit_tags = FALSE)
   copy_model_from(
     mod1,
     basename(NEW_MOD3),
     .based_on_additional = get_model_id(NEW_MOD2),
-    .inherit_tags = TRUE,
     .update_model_file = FALSE
   )
 }
