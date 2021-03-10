@@ -146,3 +146,39 @@ test_that("new_model() supports `.path` containing a period", {
   mod <- new_model(fs::path_ext_remove(temp_ctl), "path with period")
   expect_true(fs::file_exists(temp_yaml))
 })
+
+#############
+# Stan tests
+#############
+
+test_that("read_model() works for Stan model", {
+  skip_if_no_stan("read_model() works for Stan model")
+  .m <- read_model(STAN_MOD1_PATH)
+  expect_equal(.m[[YAML_MOD_TYPE]], "stan")
+  expect_equal(.m[[ABS_MOD_PATH]], file.path(STAN_ABS_MODEL_DIR, STAN_MOD_ID))
+  expect_s3_class(.m, STAN_MOD_CLASS)
+  expect_s3_class(.m, BBI_PARENT_CLASS)
+})
+
+test_that("new_model() errors for Stan model without .model_type", {
+  skip_if_no_stan("new_model() errors for Stan model without .model_type")
+  expect_error(
+    new_model(file.path(STAN_MODEL_DIR, "testmod")),
+    regexp = NONMEM_MODEL_TYPE_ERR_MSG
+  )
+})
+
+test_that("new_model() works for Stan model", {
+  skip_if_no_stan("new_model() works for Stan model")
+  expect_message(
+    .m <- new_model(file.path(STAN_MODEL_DIR, "testmod"), .model_type = "stan"),
+    regexp = MISSING_STAN_FILES_ERR_MSG
+  )
+  on.exit(cleanup_model(.m))
+
+  expect_equal(.m[[YAML_MOD_TYPE]], "stan")
+  expect_equal(.m[[ABS_MOD_PATH]], file.path(STAN_ABS_MODEL_DIR, "testmod"))
+  expect_s3_class(.m, STAN_MOD_CLASS)
+  expect_s3_class(.m, BBI_PARENT_CLASS)
+})
+
