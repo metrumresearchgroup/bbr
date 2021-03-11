@@ -86,3 +86,5 @@ STAN_SCAFFOLD_MD5_VEC <- c(
   STANDATA_SCAFFOLD_MD5,
   STANINIT_SCAFFOLD_MD5
 )
+
+utils::globalVariables("make_standata")
