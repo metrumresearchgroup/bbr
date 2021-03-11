@@ -55,7 +55,7 @@ withr::with_options(list(
       file.path(MODEL_DIR_BBI, "1"),
       .description = "original test-workflow-bbi model",
       .tags = ORIG_TAGS,
-      .bbi_args = list(overwrite = TRUE, threads = 4, parallel = TRUE)
+      .bbi_args = list(threads = 4, parallel = TRUE)
     )
     expect_identical(class(mod1), NM_MOD_CLASS_LIST)
 
@@ -78,7 +78,7 @@ withr::with_options(list(
   test_that("copying model works and new models run correctly [BBR-WRKF-002]", {
     mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
     mod2 <- copy_model_from(mod1) # should auto-increment to 2.ctl
-    mod3 <- copy_model_from(mod1, 3, .inherit_tags = TRUE) %>% add_bbi_args(list(clean_lvl=2, overwrite = FALSE))
+    mod3 <- copy_model_from(mod1, 3, .inherit_tags = TRUE) %>% add_bbi_args(list(clean_lvl=2))
 
     # run new models
     list(mod2, mod3) %>% submit_models(.mode = "local", .wait = TRUE)
@@ -93,13 +93,31 @@ withr::with_options(list(
 
     # add some tags to new model
     mod2 <- mod2 %>% add_tags(NEW_TAGS)
+  })
+
+  test_that(".overwrite argument works for submitting models", {
+    mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
+    mod2 <- read_model(file.path(MODEL_DIR_BBI, "2"))
+    mod3 <- read_model(file.path(MODEL_DIR_BBI, "3"))
 
     # check that overwrite error parses correctly
     expect_error(
-      submit_model(mod3, .mode = "local", .wait = TRUE),
+      submit_model(mod1, .mode = "local", .wait = TRUE),
+      regexp = "The target output directory already exists"
+    )
+    expect_error(
+      submit_models(list(mod2, mod3), .mode = "local", .wait = TRUE),
       regexp = "The target output directory already exists"
     )
 
+    # check that .overwrite works
+    submit_model(mod1, .mode = "local", .wait = TRUE, .overwrite = TRUE)
+    submit_models(list(mod2, mod3), .mode = "local", .wait = TRUE, .overwrite = TRUE)
+    log_df <- summary_log(MODEL_DIR_BBI)
+
+    # check that models finished successfully
+    expect_equal(nrow(log_df), 3)
+    expect_true(all(is.na(log_df$error_msg)))
   })
 
   test_that("config_log() works correctly [BBR-WRKF-003]", {
