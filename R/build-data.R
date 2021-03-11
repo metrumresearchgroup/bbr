@@ -43,7 +43,7 @@ build_data.bbi_stan_model <- function(.mod, .out_path = NULL, ...) {
   suppressSpecificWarning(rm(make_standata), .regexpr = "object 'make_standata' not found")
 
   # source and call function
-  source(build_path_from_model(.mod, STANDATA_R_SUFFIX))
+  source(build_path_from_model(.mod, STANDATA_R_SUFFIX), local = TRUE)
   model_dir <- dirname(get_output_dir(.mod, .check_exists = FALSE))
   standata_list <- make_standata(.dir = model_dir)
 
