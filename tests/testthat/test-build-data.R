@@ -9,7 +9,7 @@ test_that("build_data.bbi_stan_model returns correct list", {
 })
 
 test_that("build_data.bbi_stan_model write to disk", {
-  skip_if_no_stan("build_data.bbi_stan_model returns correct list")
+  skip_if_no_stan("build_data.bbi_stan_model write to disk")
 
   tmp_path <- tempfile()
 
