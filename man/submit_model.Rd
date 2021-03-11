@@ -10,6 +10,7 @@ submit_model(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
+  .overwrite = NULL,
   .config_path = NULL,
   .wait = TRUE,
   .dry_run = FALSE
@@ -20,6 +21,7 @@ submit_model(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
+  .overwrite = NULL,
   .config_path = NULL,
   .wait = TRUE,
   .dry_run = FALSE
@@ -37,6 +39,11 @@ global YAML files).}
 \code{"local"} for local execution.}
 
 \item{...}{args passed through to \code{bbi_exec()}}
+
+\item{.overwrite}{Logical to specify whether or not to overwrite existing
+model output from a previous run. If \code{NULL}, the default, will defer to
+setting in \code{.bbi_args} or \code{bbi.yaml}. If \emph{not} \code{NULL} will override any
+settings in \code{.bbi_args} or \code{bbi.yaml}.}
 
 \item{.config_path}{Path to a bbi configuration file. If \code{NULL}, the
 default, will attempt to use a \code{bbi.yaml} in the same directory as the

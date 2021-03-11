@@ -15,6 +15,10 @@
 #' @param .mode Either `"sge"`, the default, to submit model(s) to the grid or
 #'   `"local"` for local execution.
 #' @param ... args passed through to `bbi_exec()`
+#' @param .overwrite Logical to specify whether or not to overwrite existing
+#'   model output from a previous run. If `NULL`, the default, will defer to
+#'   setting in `.bbi_args` or `bbi.yaml`. If _not_ `NULL` will override any
+#'   settings in `.bbi_args` or `bbi.yaml`.
 #' @param .config_path Path to a bbi configuration file. If `NULL`, the
 #'   default, will attempt to use a `bbi.yaml` in the same directory as the
 #'   model.
@@ -30,6 +34,7 @@ submit_model <- function(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
+  .overwrite = NULL,
   .config_path = NULL,
   .wait = TRUE,
   .dry_run=FALSE
@@ -44,6 +49,7 @@ submit_model.bbi_nonmem_model <- function(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
+  .overwrite = NULL,
   .config_path = NULL,
   .wait = TRUE,
   .dry_run=FALSE
@@ -53,6 +59,7 @@ submit_model.bbi_nonmem_model <- function(
                              .bbi_args = .bbi_args,
                              .mode = .mode,
                              ...,
+                             .overwrite = .overwrite,
                              .config_path = .config_path,
                              .wait = .wait,
                              .dry_run = .dry_run)
@@ -70,12 +77,14 @@ submit_model.bbi_nonmem_model <- function(
 #' @param .mod An S3 object of class `bbi_nonmem_model`, for example from `new_model()`, `read_model()` or `copy_model_from()`
 #' @importFrom stringr str_detect
 #' @importFrom tools file_path_sans_ext
+#' @importFrom checkmate assert_logical
 #' @return An S3 object of class `bbi_process`
 #' @keywords internal
 submit_nonmem_model <- function(.mod,
                                 .bbi_args = NULL,
                                 .mode = c("sge", "local"),
                                 ...,
+                                .overwrite = NULL,
                                 .config_path = NULL,
                                 .wait = TRUE,
                                 .dry_run=FALSE) {
@@ -88,6 +97,10 @@ submit_nonmem_model <- function(.mod,
 
   # build command line args
   .bbi_args <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])
+  if (!is.null(.overwrite)) {
+    checkmate::assert_logical(.overwrite)
+    .bbi_args[["overwrite"]] <- .overwrite
+  }
   args_vec <- check_bbi_args(.bbi_args)
   cmd_args <- c("nonmem", "run", .mode, get_model_path(.mod), args_vec)
 

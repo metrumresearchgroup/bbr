@@ -9,6 +9,7 @@ submit_nonmem_model(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
+  .overwrite = NULL,
   .config_path = NULL,
   .wait = TRUE,
   .dry_run = FALSE

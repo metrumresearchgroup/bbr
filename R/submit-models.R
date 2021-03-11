@@ -21,6 +21,7 @@ submit_models <- function(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
+  .overwrite = NULL,
   .config_path = NULL,
   .wait = TRUE,
   .dry_run=FALSE
@@ -36,6 +37,7 @@ submit_models.list <- function(
   .bbi_args = NULL,
   .mode = c("sge", "local"),
   ...,
+  .overwrite = NULL,
   .config_path = NULL,
   .wait = TRUE,
   .dry_run=FALSE
@@ -60,6 +62,7 @@ submit_models.list <- function(
                                      .bbi_args = .bbi_args,
                                      .mode = .mode,
                                      ...,
+                                     .overwrite = .overwrite,
                                      .config_path = .config_path,
                                      .wait = .wait,
                                      .dry_run = .dry_run)
@@ -91,6 +94,7 @@ submit_nonmem_models <- function(.mods,
                                  .bbi_args = NULL,
                                  .mode = c("sge", "local"),
                                  ...,
+                                 .overwrite = NULL,
                                  .config_path = NULL,
                                  .wait = TRUE,
                                  .dry_run = FALSE) {
@@ -108,6 +112,10 @@ submit_nonmem_models <- function(.mods,
   .mode <- match.arg(.mode)
 
   # get unique sets of params
+  if (!is.null(.overwrite)) {
+    checkmate::assert_logical(.overwrite)
+    .bbi_args[["overwrite"]] <- .overwrite
+  }
   param_list <- build_bbi_param_list(.mods, .bbi_args)
 
   # a .run is a group of models that can be passed in a single bbi call
