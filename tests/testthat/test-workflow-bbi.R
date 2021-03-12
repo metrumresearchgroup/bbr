@@ -14,6 +14,7 @@ context("testing a composable workflow and running bbi")
 if (Sys.getenv("METWORX_VERSION") == "" || Sys.getenv("SKIP_BBI_TEST") == "true") {
   skip("test-workflow-composable-bbi only runs on Metworx")
 }
+skip_long_tests("skipping long-running bbi workflow tests")
 
 # define constants
 MODEL_DIR_BBI <- file.path(dirname(ABS_MODEL_DIR), "test-workflow-bbi-models")

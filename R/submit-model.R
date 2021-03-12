@@ -192,9 +192,9 @@ submit_stan_model_cmdstanr <- function(.mod,
   }
 
   stanmod <- compile_stanmod(.mod)
-  valid_stanargs <- formalArgs(stanmod$sample)
 
-  # capture args, maybe check against sample(), then write to stanargs.R
+  # capture args, check against sample(), then write to stanargs.R
+  valid_stanargs <- formalArgs(stanmod$sample)
   stanargs <- parse_stanargs(.mod, valid_stanargs, ...)
 
   # construct input data set and initial estimates
