@@ -39,17 +39,14 @@ build_data <- function(.mod, .out_path = NULL, ...) {
 #'
 #' @export
 build_data.bbi_stan_model <- function(.mod, .out_path = NULL, ...) {
-  # make sure the make_standata function doesn't exist in a parent environment
-  suppressSpecificWarning(rm(make_standata), .regexpr = "object 'make_standata' not found")
-
   # source and call function
   standata_r_path <- build_path_from_model(.mod, STANDATA_R_SUFFIX)
-  safe_source(standata_r_path, environment(), "make_standata")
+  make_standata <- safe_source_function(standata_r_path, "make_standata")
   standata_list <- safe_call_sourced(
-    make_standata,
-    list(.dir = dirname(get_output_dir(.mod, .check_exists = FALSE))),
-    standata_r_path,
-    "list"
+    .func = make_standata,
+    .args = list(.dir = dirname(get_output_dir(.mod, .check_exists = FALSE))),
+    .file = standata_r_path,
+    .expected_class = "list"
   )
 
   # optionally write to json
@@ -73,13 +70,16 @@ build_data.bbi_stan_model <- function(.mod, .out_path = NULL, ...) {
 # PRIVATE HELPER FUNCTIONS
 ###########################
 
-#' Private helper to safely source a file containing a single helper function
-#' @param .file file path to file to source
-#' @param .env environment into which to source the function. This is passed directly to
-#'   the `local` argument of `source()`.
-#' @param .func_name (Optional) name of function you are sourcing (for friendlier error message)
+#' Private helper to safely source a specific function from a file
+#' @param .file (String) file path to file to source.
+#' @param .func_name (String) name of function to return. A function with this
+#'   name must exist in `.file` or an error will be thrown.
 #' @keywords internal
-safe_source <- function(.file, .env, .func_name = NULL) {
+safe_source_function <- function(.file, .func_name) {
+  checkmate::assert_string(.file)
+  checkmate::assert_string(.func_name)
+
+  .env <- new.env()
   tryCatch(
     source(.file, local = .env),
     error = function(.e) {
@@ -90,13 +90,23 @@ safe_source <- function(.file, .env, .func_name = NULL) {
       stop(err_msg, call. = FALSE)
     }
   )
+
+  .func <- .env[[.func_name]]
+  if(is.null(.func)) {
+    stop(glue("{.file} must contain a function called `{.func_name}` but it does not."), call. = FALSE)
+  }
+
+  return(.func)
 }
 
 #' Private helper to safely call a function from a sourced file
 #' @param .func The function to call
 #' @param .args named list of args to call the function with (uses `do.call()`)
-#' @param .file (optional) file path to file that was sourced (for friendlier error message)
-#' @param .expected_class (optional) name of class that the result of calling `.func` should return
+#' @param .file (optional) file path to file that was sourced (for friendlier
+#'   error message)
+#' @param .expected_class (optional) name of class that the result of calling
+#'   `.func` should return. If _not_ `NULL` will error if the return value
+#'   doesn't inherit this class.
 #' @keywords internal
 safe_call_sourced <- function(.func, .args, .file = NULL, .expected_class = NULL) {
   .res <- tryCatch(

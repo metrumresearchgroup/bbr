@@ -11,9 +11,12 @@ safe_call_sourced(.func, .args, .file = NULL, .expected_class = NULL)
 
 \item{.args}{named list of args to call the function with (uses \code{do.call()})}
 
-\item{.file}{(optional) file path to file that was sourced (for friendlier error message)}
+\item{.file}{(optional) file path to file that was sourced (for friendlier
+error message)}
 
-\item{.expected_class}{(optional) name of class that the result of calling \code{.func} should return}
+\item{.expected_class}{(optional) name of class that the result of calling
+\code{.func} should return. If \emph{not} \code{NULL} will error if the return value
+doesn't inherit this class.}
 }
 \description{
 Private helper to safely call a function from a sourced file
