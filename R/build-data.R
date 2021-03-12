@@ -43,9 +43,14 @@ build_data.bbi_stan_model <- function(.mod, .out_path = NULL, ...) {
   suppressSpecificWarning(rm(make_standata), .regexpr = "object 'make_standata' not found")
 
   # source and call function
-  source(build_path_from_model(.mod, STANDATA_R_SUFFIX), local = TRUE)
-  model_dir <- dirname(get_output_dir(.mod, .check_exists = FALSE))
-  standata_list <- make_standata(.dir = model_dir)
+  standata_r_path <- build_path_from_model(.mod, STANDATA_R_SUFFIX)
+  safe_source(standata_r_path, environment(), "make_standata")
+  standata_list <- safe_call_sourced(
+    make_standata,
+    list(.dir = dirname(get_output_dir(.mod, .check_exists = FALSE))),
+    standata_r_path,
+    "list"
+  )
 
   # optionally write to json
   if (!is.null(.out_path)) {
@@ -61,4 +66,57 @@ build_data.bbi_stan_model <- function(.mod, .out_path = NULL, ...) {
   }
 
   return(invisible(standata_list))
+}
+
+
+###########################
+# PRIVATE HELPER FUNCTIONS
+###########################
+
+#' Private helper to safely source a file containing a single helper function
+#' @param .file file path to file to source
+#' @param .env environment into which to source the function. This is passed directly to
+#'   the `local` argument of `source()`.
+#' @param .func_name (Optional) name of function you are sourcing (for friendlier error message)
+#' @keywords internal
+safe_source <- function(.file, .env, .func_name = NULL) {
+  tryCatch(
+    source(.file, local = .env),
+    error = function(.e) {
+      err_msg <- paste(
+        glue("Loading `{.func_name}()` from {.file} FAILED with the following:"),
+        .e$message
+      )
+      stop(err_msg, call. = FALSE)
+    }
+  )
+}
+
+#' Private helper to safely call a function from a sourced file
+#' @param .func The function to call
+#' @param .args named list of args to call the function with (uses `do.call()`)
+#' @param .file (optional) file path to file that was sourced (for friendlier error message)
+#' @param .expected_class (optional) name of class that the result of calling `.func` should return
+#' @keywords internal
+safe_call_sourced <- function(.func, .args, .file = NULL, .expected_class = NULL) {
+  .res <- tryCatch(
+    do.call(.func, .args),
+    error = function(.e) {
+      err_msg <- paste(
+        glue("Calling `{as.character(substitute(.func))}()` from {.file} FAILED with the following:"),
+        .e$message
+      )
+      stop(err_msg, call. = FALSE)
+    }
+  )
+
+  if (!is.null(.expected_class) && !inherits(.res, .expected_class)) {
+    err_msg <- paste(
+      glue("The result of `{as.character(substitute(.func))}()` was expected to be {.expected_class} but got the following:"),
+      paste(class(.res), collapse = ", ")
+    )
+    stop(err_msg, call. = FALSE)
+  }
+
+  return(.res)
 }
