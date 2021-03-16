@@ -28,7 +28,7 @@ fs::file_copy(yaml_ext(STAN_MOD1_PATH), MODEL_DIR_STAN_TEST)
 # create model from R
 #######################
 
-test_that("step by step create_model to submit_model to model_summary works", {
+test_that("submit_model.bbi_stan_model works with copied model", {
   # create model
   mod1 <- read_model(file.path(MODEL_DIR_STAN_TEST, STAN_MOD_ID))
   mod2 <- copy_model_from(mod1, STAN_MOD_ID2, .add_tags = "child")
@@ -43,12 +43,12 @@ test_that("step by step create_model to submit_model to model_summary works", {
       iter_sampling = 100
     )
   )
-  expect_true(inherits(res2, "CmdStanMCMC"))
+  expect_true(inherits(res2, STAN_FIT_CLASS))
 
   # check sampler diagnostics returns draws array
   smp2 <- res2$sampler_diagnostics()
-  expect_true(inherits(smp2, "draws_array"))
-  expect_equal(dim(smp2), c(100, 4, 6))
+  expect_true(inherits(smp2, STAN_SMP_DIAG_CLASS))
+  expect_equal(dim(smp2), STAN_SMP_DIAG_DIM)
 
   # check the output for mention of all the chains
   expect_true(all(
@@ -65,21 +65,25 @@ test_that("step by step create_model to submit_model to model_summary works", {
 })
 
 test_that("cmdstanr fit object can be reloaded", {
-  res2 <- read_model(file.path(MODEL_DIR_STAN_TEST, STAN_MOD_ID2)) %>%
-    build_path_from_model(STAN_MODEL_FIT_RDS) %>%
-    readRDS()
-  expect_true(inherits(res2, "CmdStanMCMC"))
+  res2 <- read_fit_model(file.path(MODEL_DIR_STAN_TEST, STAN_MOD_ID2))
+  expect_true(inherits(res2, STAN_FIT_CLASS))
 
   # verify the sampler_diagnostics() method works
   smp2 <- res2$sampler_diagnostics()
-  expect_true(inherits(smp2, "draws_array"))
-  expect_equal(dim(smp2), c(100, 4, 6))
+  expect_true(inherits(smp2, STAN_SMP_DIAG_CLASS))
+  expect_equal(dim(smp2), STAN_SMP_DIAG_DIM)
 })
 
 test_that("run_log() captures runs correctly", {
-  # check run log for all models
   log_df <- run_log(MODEL_DIR_STAN_TEST)
   expect_equal(nrow(log_df), 2)
   expect_equal(ncol(log_df), RUN_LOG_COLS)
   expect_identical(basename(log_df[[ABS_MOD_PATH]]), c(STAN_MOD_ID, STAN_MOD_ID2))
+})
+
+test_that("summary_log() captures runs correctly", {
+  log_df <- summary_log(MODEL_DIR_STAN_TEST)
+  expect_equal(nrow(log_df), 2)
+  expect_identical(basename(log_df[[ABS_MOD_PATH]]), c(STAN_MOD_ID, STAN_MOD_ID2))
+  expect_true(all(purrr::map_lgl(log_df[[SL_SUMMARY]], ~inherits(.x, STAN_FIT_CLASS))))
 })

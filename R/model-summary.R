@@ -124,6 +124,15 @@
 #' Additionally, if you have renamed the `.ext` file from its default of `<root>.ext` you will need to pass
 #' `ext_file = "NEWNAME"` to `.bbi_args`.
 #'
+#' **Stan**
+#'
+#' There is currently no functionality for summarizing Stan outputs with `bbr`.
+#' Calling `model_summary()` on a `bbi_stan_model` instead calls
+#' [read_fit_model()] and return the resulting fit object, which has various
+#' methods for summarizing the outputs. See the `?cmdstanr::CmdStanMCMC` docs
+#' for methods and information on this object. A warning will also be printed to
+#' notify the user of this.
+#'
 #' @seealso [model_summaries()], [summary_log()]
 #' @param .mod Model to summarize.
 #' @param .bbi_args A named list specifying arguments to pass to bbi formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`.
@@ -158,6 +167,24 @@ model_summary.bbi_nonmem_model <- function(
   return(res_list)
 }
 
+
+#' @describeIn model_summary _Not fully implemented;_ calls [read_fit_model()]
+#'   instead. See "Details" section.
+#' @export
+model_summary.bbi_stan_model <- function(
+  .mod,
+  .bbi_args = NULL,
+  ...,
+  .dry_run = FALSE
+) {
+  warning(paste(
+    "model_summary.bbi_stan_model() is not fully implemented.",
+    glue("A `cmdstanr::CmdStanMCMC` object will be returned for {.mod[[ABS_MOD_PATH]]}"),
+    "Consider calling `read_fit_model()` directly instead.",
+    sep = "\n"
+  ), call. = FALSE)
+  read_fit_model(.mod)
+}
 
 ###################################
 # PRIVATE IMPLEMENTATION FUNCTIONS
