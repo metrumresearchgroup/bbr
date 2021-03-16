@@ -48,6 +48,7 @@ NM_SUM_CLASS <- "bbi_nonmem_summary"
 
 STAN_MOD_CLASS <- "bbi_stan_model"
 STAN_SUM_CLASS <- "bbi_stan_summary"
+STAN_FIT_CLASS <- "CmdStanMCMC"
 
 SL_CLASS <- "bbi_summary_list"
 PROC_CLASS <- "bbi_process"

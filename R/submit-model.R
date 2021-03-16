@@ -24,8 +24,8 @@
 #' **Stan**
 #' For Stan models, a `cmdstanr` fit object of class `"CmdStanMCMC"` is
 #' returned. See the `?cmdstanr::CmdStanMCMC` docs for methods and information
-#' on this object. This can be reloaded from disk later. Additionally, the
-#' following files are written to disk:
+#' on this object. This can be reloaded from disk later with [read_fit_model()].
+#' Additionally, the following files are written to disk:
 #'
 #' * In the model directory:
 #'   * `<run>-standata.json` -- This is the exact data that is passed to
@@ -36,8 +36,8 @@
 #'   * `<run>` -- The binary compiled Stan model. This is added to `.gitignore`
 #'   automatically.
 #' * In the output directory (`<run>-output/`):
-#'   * `fit.RDS` -- The `cmdstanr` fit object. Can be reloaded as described
-#'   above.
+#'   * `fit.RDS` -- The `cmdstanr` fit object. Can be reloaded with
+#'   [read_fit_model()] as described above.
 #'   * `bbi_config.json` -- stores information about the configuration of the run.
 #'   See [config_log()] for more details about this file.
 #'   * `<run>-<timestamp>-<chain>-<random_id>.csv` -- CSV files of the posteriors,
