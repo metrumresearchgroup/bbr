@@ -26,7 +26,10 @@ global YAML files).}
 \item{.mode}{Either \code{"sge"}, the default, to submit model(s) to the grid or
 \code{"local"} for local execution.}
 
-\item{...}{args passed through to \code{bbi_exec()}}
+\item{...}{args passed through. For \code{bbi_stan_model} this is how you pass
+arguments through to the \verb{$sample()} method of your \code{cmdstanr} model
+object. See \code{\link[cmdstanr:model-method-sample]{cmdstanr::sample()}} for valid arguments and details. For
+\code{bbi_nonmem_model} these are passed to \code{bbi_exec()}.}
 
 \item{.overwrite}{Logical to specify whether or not to overwrite existing
 model output from a previous run. If \code{NULL}, the default, will defer to

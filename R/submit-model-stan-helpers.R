@@ -116,7 +116,7 @@ compile_stanmod <- function(.mod) {
 #' @param .out_path path to save the model to. Within `submit_model()` we pass
 #'   `build_path_from_model(.mod, STAN_MODEL_FIT_RDS)` but could be anywhere.
 #' @keywords internal
-save_stanmod <- function(.stanmod, .out_path) {
+save_fit_stanmod <- function(.stanmod, .out_path) {
   try(.stanmod$sampler_diagnostics(), silent = TRUE)
   try(.stanmod$init(), silent = TRUE)
   saveRDS(.stanmod, file = .out_path)
@@ -147,7 +147,7 @@ build_stan_bbi_config <- function(.mod, .write) {
     !!STANCFG_ARGS_MD5   := tools::md5sum(build_path_from_model(.mod, STANARGS_SUFFIX)),
     "configuration" = rlang::list2(
       "cmdstan_version"     = cmdstanr::cmdstan_version(),
-      "cmdstanr_version"    = as.character(packageVersion('cmdstanr')),
+      "cmdstanr_version"    = as.character(utils::packageVersion('cmdstanr')),
     )
   )
 

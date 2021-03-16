@@ -5,6 +5,44 @@
 #' Submit a model to be run
 #'
 #' Submits a model to be run by calling out to `bbi`.
+#'
+#' @return While `submit_model()` _does_ return something, it is primarily
+#' called for its side effects, specifically that it runs the model and writes
+#' all model outputs to disk under `get_output_dir(.mod)`.
+#'
+#' **NONMEM**
+#' For NONMEM models, a `bbi_process` object is returned. The typical NONMEM
+#' output files are all written into `get_output_dir(.mod)`. A summary of the
+#' contents of these files can be accessed with [model_summary()], and the path
+#' to individual files can be easily constructed like
+#' `build_path_from_model(.mod, ".lst")`.
+#'
+#' A `bbi_config.json` file is also written, which stores information about the
+#' configuration of the run. See [config_log()] for more details about this
+#' file.
+#'
+#' **Stan**
+#' For Stan models, a `cmdstanr` fit object of class `"CmdStanMCMC"` is
+#' returned. See the `?cmdstanr::CmdStanMCMC` docs for methods and information
+#' on this object. This can be reloaded from disk later. Additionally, the
+#' following files are written to disk:
+#'
+#' * In the model directory:
+#'   * `<run>-standata.json` -- This is the exact data that is passed to
+#'   `cmdstanr`, written to disk automatically with
+#'   `cmdstanr::write_stan_json()`.
+#'   * `<run>-stanargs.R` -- This captures the arguments that were passed
+#'   through to `cmdstanr::sample()`, for later reproducibility of this run.
+#'   * `<run>` -- The binary compiled Stan model. This is added to `.gitignore`
+#'   automatically.
+#' * In the output directory (`<run>-output/`):
+#'   * `fit.RDS` -- The `cmdstanr` fit object. Can be reloaded as described
+#'   above.
+#'   * `bbi_config.json` -- stores information about the configuration of the run.
+#'   See [config_log()] for more details about this file.
+#'   * `<run>-<timestamp>-<chain>-<random_id>.csv` -- CSV files of the posteriors,
+#'   written out by `cmdstanr`. These are automatically added to `.gitignore`.
+#'
 #' @seealso [submit_models()]
 #' @param .mod The model object to submit.
 #' @param .bbi_args A named list specifying arguments to pass to bbi
@@ -194,7 +232,7 @@ submit_stan_model_cmdstanr <- function(.mod,
   stanmod <- compile_stanmod(.mod)
 
   # capture args, check against sample(), then write to stanargs.R
-  valid_stanargs <- formalArgs(stanmod$sample)
+  valid_stanargs <- methods::formalArgs(stanmod$sample)
   stanargs <- parse_stanargs(.mod, valid_stanargs, ...)
 
   # construct input data set and initial estimates
@@ -211,7 +249,7 @@ submit_stan_model_cmdstanr <- function(.mod,
   )
 
   # if successful, save model and write bbi_config.json to disk
-  save_stanmod(res, build_path_from_model(.mod, STAN_MODEL_FIT_RDS))
+  save_fit_stanmod(res, build_path_from_model(.mod, STAN_MODEL_FIT_RDS))
   build_stan_bbi_config(.mod)
 
   return(res)
