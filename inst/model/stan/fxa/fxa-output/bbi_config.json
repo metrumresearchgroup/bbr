@@ -1,11 +1,11 @@
 {
-  "output_dir": "/data/home/sethg/bbr/inst/model/stan/fxa/fxa-output",
+  "output_dir": "/data/home/sethg/bbrstan/inst/model/stan/fxa/fxa-output",
   "data_path": "../fxa-standata.json",
   "model_md5": "5bbcd2ebfce97ac444a69d58fb8efda3",
   "data_md5": "9624005a9870a0e38484fff0586a394d",
   "standata_script_md5": "563b5363c65a633b3c6294b50d43319e",
   "init_script_md5": "fe160407a2b1b49032179dade9c82f21",
-  "stanargs_md5": "db6c3c3f74af829f827f66dd5edb18ac",
+  "stanargs_md5": "6540104c1cb2a214fad3ca50b4a05fe7",
   "configuration": {
     "cmdstan_version": "2.26.0",
     "cmdstanr_version": "0.3.0"

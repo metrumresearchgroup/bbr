@@ -87,19 +87,24 @@ compile_stanmod <- function(.mod) {
 
   # add to gitignore, if not already present
   gitignore <- file.path(.mod[[ABS_MOD_PATH]], ".gitignore")
-  ignore_string <- paste(
-    "# ignore model binary",
-    get_model_id(.mod), "",
-    "# ignore csv posterior output",
-    as.character(glue("{get_model_id(.mod)}-output/*csv")),
-    sep = "\n"
-  )
+  out_dir_str <- as.character(glue("{get_model_id(.mod)}-output/*csv"))
+
   if (!fs::file_exists(gitignore)) {
-    readr::write_lines(ignore_string, gitignore)
+    readr::write_lines(paste(
+      "# ignore model binary",
+      get_model_id(.mod), "",
+      "# ignore csv posterior output",
+      out_dir_str,
+      sep = "\n"
+    ), gitignore)
   } else {
     gitignore_lines <- readr::read_lines(gitignore)
-    if (!any(stringr::str_detect(gitignore_lines, ignore_string))) {
-      readr::write_lines(ignore_string, gitignore, append = TRUE)
+    # if either line is missing, append it
+    if (!any(grepl(glue("^{get_model_id(.mod)}$"), gitignore_lines))) {
+      readr::write_lines(glue("\n\n# ignore model binary\n{get_model_id(.mod)}"), gitignore, append = TRUE)
+    }
+    if (!any(grepl(out_dir_str, gitignore_lines, fixed = TRUE))) {
+      readr::write_lines(glue("\n\n# ignore csv posterior output\n{out_dir_str}"), gitignore, append = TRUE)
     }
   }
 

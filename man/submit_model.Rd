@@ -91,8 +91,8 @@ file.
 \strong{Stan}
 For Stan models, a \code{cmdstanr} fit object of class \code{"CmdStanMCMC"} is
 returned. See the \code{?cmdstanr::CmdStanMCMC} docs for methods and information
-on this object. This can be reloaded from disk later. Additionally, the
-following files are written to disk:
+on this object. This can be reloaded from disk later with \code{\link[=read_fit_model]{read_fit_model()}}.
+Additionally, the following files are written to disk:
 \itemize{
 \item In the model directory:
 \itemize{
@@ -106,8 +106,8 @@ automatically.
 }
 \item In the output directory (\verb{<run>-output/}):
 \itemize{
-\item \code{fit.RDS} -- The \code{cmdstanr} fit object. Can be reloaded as described
-above.
+\item \code{fit.RDS} -- The \code{cmdstanr} fit object. Can be reloaded with
+\code{\link[=read_fit_model]{read_fit_model()}} as described above.
 \item \code{bbi_config.json} -- stores information about the configuration of the run.
 See \code{\link[=config_log]{config_log()}} for more details about this file.
 \item \verb{<run>-<timestamp>-<chain>-<random_id>.csv} -- CSV files of the posteriors,
