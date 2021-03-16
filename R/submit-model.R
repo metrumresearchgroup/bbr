@@ -210,7 +210,8 @@ submit_stan_model_cmdstanr <- function(.mod,
     args = stanargs
   )
 
-  # if successful, write bbi_config.json to disk
+  # if successful, save model and write bbi_config.json to disk
+  save_stanmod(res, build_path_from_model(.mod, STAN_MODEL_FIT_RDS))
   build_stan_bbi_config(.mod)
 
   return(res)

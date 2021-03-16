@@ -106,6 +106,22 @@ compile_stanmod <- function(.mod) {
   return(stanmod)
 }
 
+#' Private helper to save cmdstanr model fit object to RDS
+#'
+#' This intentionally does _not_ collect the posteriors with `$draws()` because
+#' those are also saved to disk separately. This _does_ allow a user to reload
+#' this object into memory though. (We will likely want a helper function to do
+#' that. Maybe that's what `model_summary()` should do?...)
+#' @param .stanmod a `cmdstanr` fit object of class `"CmdStanMCMC"`
+#' @param .out_path path to save the model to. Within `submit_model()` we pass
+#'   `build_path_from_model(.mod, STAN_MODEL_FIT_RDS)` but could be anywhere.
+#' @keywords internal
+save_stanmod <- function(.stanmod, .out_path) {
+  try(.stanmod$sampler_diagnostics(), silent = TRUE)
+  try(.stanmod$init(), silent = TRUE)
+  saveRDS(.stanmod, file = .out_path)
+}
+
 
 #' Build bbi_config.json for Stan models
 #'
