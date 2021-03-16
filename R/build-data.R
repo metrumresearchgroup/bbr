@@ -39,13 +39,15 @@ build_data <- function(.mod, .out_path = NULL, ...) {
 #'
 #' @export
 build_data.bbi_stan_model <- function(.mod, .out_path = NULL, ...) {
-  # make sure the make_standata function doesn't exist in a parent environment
-  suppressSpecificWarning(rm(make_standata), .regexpr = "object 'make_standata' not found")
-
   # source and call function
-  source(build_path_from_model(.mod, STANDATA_R_SUFFIX), local = TRUE)
-  model_dir <- dirname(get_output_dir(.mod, .check_exists = FALSE))
-  standata_list <- make_standata(.dir = model_dir)
+  standata_r_path <- build_path_from_model(.mod, STANDATA_R_SUFFIX)
+  make_standata <- safe_source_function(standata_r_path, "make_standata")
+  standata_list <- safe_call_sourced(
+    .func = make_standata,
+    .args = list(.dir = dirname(get_output_dir(.mod, .check_exists = FALSE))),
+    .file = standata_r_path,
+    .expected_class = "list"
+  )
 
   # optionally write to json
   if (!is.null(.out_path)) {

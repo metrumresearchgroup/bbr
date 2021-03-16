@@ -29,3 +29,36 @@ test_that("build_data.bbi_stan_model write to disk", {
     as.character(tools::md5sum(get_data_path(STAN_MOD1)))
   )
 })
+
+test_that("build_data.bbi_stan_model errors with flawed -standata.R", {
+  skip_if_no_stan("build_data.bbi_stan_model returns correct list")
+
+  new_mod <- copy_model_from(STAN_MOD1, tempfile())
+  on.exit(cleanup_model(new_mod))
+
+  # fails because it can't find the relative path to the data from the temp dir
+  expect_error(
+    build_data(new_mod),
+    regexp = "Calling.+FAILED.+fxa.data.csv' does not exist"
+  )
+
+  # replace -standata.R with non-working code
+  writeLines(
+    "naw <- function() {'naw'",
+    build_path_from_model(new_mod, STANDATA_R_SUFFIX)
+  )
+  expect_error(
+    build_data(new_mod),
+    regexp = "Loading.+FAILED.+unexpected end of input"
+  )
+
+  # replace -standata.R with dummy function
+  writeLines(
+    "naw <- function() {'naw'}",
+    build_path_from_model(new_mod, STANDATA_R_SUFFIX)
+  )
+  expect_error(
+    build_data(new_mod),
+    regexp = "must contain a function called `make_standata`"
+  )
+})
