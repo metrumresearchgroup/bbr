@@ -61,6 +61,7 @@ Suggests:
     covr,
     devtools,
     knitr,
+    methods,
     rmarkdown,
     testthat (>= 2.1.0),
     withr
