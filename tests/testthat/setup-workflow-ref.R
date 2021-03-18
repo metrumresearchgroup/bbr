@@ -223,10 +223,10 @@ cleanup <- function() {
 #'
 #' @param path string giving the file path
 #' @inheritParams withr::defer
-perturb_file <- function(path, envir = parent.frame()) {
+perturb_file <- function(path, envir = parent.frame(), content = "foo") {
   checkmate::assert_string(path)
   original <- readr::read_file(path)
-  readr::write_lines("foo", path, append = TRUE)
+  readr::write_lines(content, path, append = TRUE)
   withr::defer(readr::write_file(original, path), envir)
 }
 

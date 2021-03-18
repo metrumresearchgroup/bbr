@@ -2,9 +2,21 @@
 % Please edit documentation in R/check-up-to-date.R
 \name{check_up_to_date}
 \alias{check_up_to_date}
+\alias{check_up_to_date.bbi_nonmem_model}
+\alias{check_up_to_date.bbi_nonmem_summary}
+\alias{check_up_to_date.bbi_stan_model}
+\alias{check_up_to_date.bbi_stan_summary}
 \title{Check model and data up to date with outputs}
 \usage{
 check_up_to_date(.bbi_object, ...)
+
+\method{check_up_to_date}{bbi_nonmem_model}(.bbi_object, ...)
+
+\method{check_up_to_date}{bbi_nonmem_summary}(.bbi_object, ...)
+
+\method{check_up_to_date}{bbi_stan_model}(.bbi_object, .build_data = TRUE, ...)
+
+\method{check_up_to_date}{bbi_stan_summary}(.bbi_object, .build_data = TRUE, ...)
 }
 \arguments{
 \item{.bbi_object}{the object to check. Could be
@@ -13,6 +25,16 @@ a \verb{bbi_\{.model_type\}_summary} object,
 or a \code{bbi_log_df} tibble.}
 
 \item{...}{Arguments passed through (currently none).}
+
+\item{.build_data}{\strong{Only relevant to Stan models.} If \code{TRUE}, the default,
+run \code{-standata.R} and save the output to a temp file and check the hash of
+\emph{the temp file} against the \code{bbi_config.json} hash. This option actually
+runs the code and, importantly, verifies that the input data to
+\code{-standata.R} has not changed either. If \code{FALSE}, check the hashes of the
+\code{-standata.R} and \code{-standata.json} against the hashes in \code{bbi_config.json}
+but do \emph{not} run the \code{-standata.R} script. This option is less secure and
+primarily exists for quicker checking if building the data is time
+consuming for certain models.}
 }
 \value{
 \strong{The returned value is invisible because a message is printed} alerting the
@@ -55,5 +77,18 @@ Different files are checked depending on what type of model is being checked.
 \item The data file (referenced in \verb{$DATA} within the control stream)
 }
 
-\strong{Currently only NONMEM implemented.}
+\strong{For Stan models}
+\itemize{
+\item The model files:
+\itemize{
+\item \verb{<run>.stan}
+\item \verb{<run>-init.R}
+\item \verb{<run>-stanargs.R}
+}
+\item The data files (see \code{.build_data} argument):
+\itemize{
+\item \verb{<run>-standata.R}
+\item \verb{<run>-standata.json}
+}
+}
 }
