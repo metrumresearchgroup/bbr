@@ -39,6 +39,7 @@ Imports:
     digest,
     diffobj,
     dplyr (>= 0.8.0),
+    ellipsis,
     forcats,
     fs,
     ggplot2,

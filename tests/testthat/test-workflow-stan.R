@@ -7,17 +7,17 @@ skip_long_tests("skipping long-running Stan submit_model tests")
 MODEL_DIR_STAN_TEST <- file.path(dirname(STAN_ABS_MODEL_DIR), "test-workflow-stan-models")
 
 # cleanup function
-cleanup_bbi <- function(.recreate_dir = FALSE) {
+cleanup_stan <- function(.recreate_dir = FALSE) {
   if (fs::dir_exists(MODEL_DIR_STAN_TEST)) fs::dir_delete(MODEL_DIR_STAN_TEST)
   if (isTRUE(.recreate_dir)) fs::dir_create(MODEL_DIR_STAN_TEST)
 }
-cleanup_bbi(.recreate_dir = TRUE)
+cleanup_stan(.recreate_dir = TRUE)
 
 
 # cleanup when done
 on.exit({
   Sys.sleep(3) # wait for some Stan mess to delete itself
-  cleanup_bbi()
+  cleanup_stan()
 })
 
 # copy model file into new model dir
