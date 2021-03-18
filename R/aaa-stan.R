@@ -5,6 +5,7 @@ STANINIT_SUFFIX <- "-init.R"
 STANARGS_SUFFIX <- "-stanargs.R"
 STAN_OUTDIR_SUFFIX <- "-output"
 STAN_MODEL_FIT_RDS <- file.path(STAN_OUTDIR_SUFFIX, "fit.RDS")
+STAN_MODEL_SMP_OUT_TXT <- file.path(STAN_OUTDIR_SUFFIX, "sampling_output.txt")
 
 STAN_MODEL_REQ_FILES <- c(
   STANMOD_SUFFIX,

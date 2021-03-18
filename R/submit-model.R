@@ -117,20 +117,20 @@ submit_model.bbi_stan_model <- function(
   ...,
   .overwrite = NULL,
   .config_path = NULL,
-  .wait = NULL,
+  .wait = TRUE,
   .dry_run=NULL
 ) {
 
   if(!is.null(.bbi_args))    {warning(".bbi_args is not a valid argument for submit_model.bbi_stan_model. Ignoring...")}
   if(!is.null(.config_path)) {warning(".config_path is not a valid argument for submit_model.bbi_stan_model. Ignoring...")}
-  if(!is.null(.wait))        {warning(".wait is not a valid argument for submit_model.bbi_stan_model. Ignoring...")}
   if(!is.null(.dry_run))     {warning(".dry_run is not a valid argument for submit_model.bbi_stan_model. Ignoring...")}
 
   res <- submit_stan_model_cmdstanr(
     .mod,
     .mode = .mode,
     ...,
-    .overwrite = .overwrite
+    .overwrite = .overwrite,
+    .wait = .wait
   )
   return(res)
 }
@@ -203,7 +203,8 @@ submit_nonmem_model <- function(.mod,
 submit_stan_model_cmdstanr <- function(.mod,
                                        .mode = c("local"), # TODO: add sge mode for cmdstanr
                                        ...,
-                                       .overwrite = NULL) {
+                                       .overwrite = NULL,
+                                       .wait = TRUE) {
 
   # check against YAML
   check_yaml_in_sync(.mod)
@@ -243,10 +244,27 @@ submit_stan_model_cmdstanr <- function(.mod,
   rm(standata_list) # once we've passed this to import_stan_init() we don't need it in memory
 
   # launch model
-  res <- do.call(
-    stanmod$sample,
-    args = stanargs
-  )
+  checkmate::assert_logical(.wait, len = 1)
+  if(isTRUE(.wait)) {
+    res <- callr::r(
+      function(stanmod, stanargs) {
+        do.call(
+          stanmod$sample,
+          args = stanargs)
+      },
+      args = list(stanmod, stanargs),
+      show = TRUE,
+      stdout = build_path_from_model(.mod, STAN_MODEL_SMP_OUT_TXT),
+      stderr = "2>&1"
+    )
+  } else {
+    dev_error(".wait=FALSE Not implemented yet...")
+    # res <- callr::r_bg(
+    #   #... whatever calls we need here. The same as above, I think
+    #   stdout = build_path_from_model(.mod, STAN_MODEL_SMP_OUT_TXT),
+    #   stderr = "2>&1"
+    # )
+  }
 
   # if successful, save model and write bbi_config.json to disk
   save_fit_stanmod(res, build_path_from_model(.mod, STAN_MODEL_FIT_RDS))
