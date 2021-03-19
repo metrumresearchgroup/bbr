@@ -1,0 +1,338 @@
+---
+title: "Getting Started with bbr and Stan"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{getting-started-stan}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+This "Getting Started with bbr" vignette takes the user through some basic scenarios for modeling with Stan using `bbr`, introducing you to its standard workflow and functionality.
+
+```{r setup, include=FALSE}
+# NOTE: if running chunks interactively we need to load the package first
+#   because renv isolation prevents us from finding an bbr installation
+if (interactive()) {
+  devtools::load_all()
+}
+devtools::load_all()
+```
+```{r load packages, results = 'hide', message=FALSE, warning=FALSE}
+library(bbr)
+library(dplyr)
+library(purrr)
+```
+
+`bbr` is an R interface for running `bbi`. Together they provide a solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. Currently, only NONMEM and Stan are supported. For details on modeling in NONMEM, the ["Getting Started with bbr and NONMEM" vignette](https://metrumresearchgroup.github.io/bbr/articles/getting-started.html).
+
+# Setup
+
+```{r set paths and define cleanup, include = FALSE}
+#options('bbr.bbi_exe_path' = read_bbi_path())
+MODEL_DIR <- system.file("model", "stan", package = "bbr")
+# delete old files
+cleanup <- function() {
+  # delete new model entirely
+  if (fs::file_exists(file.path(MODEL_DIR, "mod1.yaml"))) fs::file_delete(file.path(MODEL_DIR, "mod1.yaml"))
+  if (fs::dir_exists(file.path(MODEL_DIR, "mod1"))) fs::dir_delete(file.path(MODEL_DIR, "mod1"))
+
+  # delete new copied model entirely
+  if (fs::file_exists(file.path(MODEL_DIR, "fxaNew.yaml"))) fs::file_delete(file.path(MODEL_DIR, "fxaNew.yaml"))
+  if (fs::dir_exists(file.path(MODEL_DIR, "fxaNew"))) fs::dir_delete(file.path(MODEL_DIR, "fxaNew"))
+
+  # set up incomplete model
+  if (fs::file_exists(file.path(MODEL_DIR, "fxaInc.yaml"))) {
+    fs::file_delete(file.path(MODEL_DIR, "fxaInc.yaml"))
+  }
+  fs::file_copy(
+    file.path(MODEL_DIR, "fxa.yaml"),
+    file.path(MODEL_DIR, "fxaInc.yaml")
+  )
+
+  if (fs::dir_exists(file.path(MODEL_DIR, "fxaInc"))) fs::dir_delete(file.path(MODEL_DIR, "fxaInc"))
+  fs::dir_create(file.path(MODEL_DIR, "fxaInc"))
+
+  writeLines(STANINIT_SCAFFOLD_STRING, file.path(MODEL_DIR, "fxaInc", "fxaInc-init.R"))
+  fs::file_copy(
+    file.path(MODEL_DIR, "fxa", "fxa.stan"),
+    file.path(MODEL_DIR, "fxaInc", "fxaInc.stan")
+  )
+  if (fs::file_exists(file.path(MODEL_DIR, "some_other_init.R"))) {
+    fs::file_delete(file.path(MODEL_DIR, "some_other_init.R"))
+  }
+  fs::file_copy(
+    file.path(MODEL_DIR, "fxa", "fxa-init.R"),
+    file.path(MODEL_DIR, "some_other_init.R")
+  )
+}
+cleanup()
+```
+
+
+## Installing bbi
+**DON'T NEED ANY OF THIS STUFF ABOUT BBI** but probably need a section about setting up `cmdstan`. Maybe just a little explanation and then link to [the `cmdstanr` docs](http://mc-stan.org/cmdstanr/articles/cmdstanr.html#installing-cmdstan-1).
+
+# Initial modeling run
+
+## Create model object
+To begin modeling, first create a model object using `new_model()`. This is an S3 object which you will pass to all of the other `bbr` functions that submit, summarize, or manipulate models.
+
+The first argument (`.path`) must be the path to the directory containing the necessary files. For Stan models, you will also have to add `.model_type = "stan"` to the the `new_model()` call.
+
+```{r first model}
+mod1 <- new_model(file.path(MODEL_DIR, "mod1"), .model_type = "stan")
+```
+
+The call above will look for a directory called `{MODEL_DIR}/mod1`. _Inside_ this directory it will expect to find files like `mod1.stan` and `mod1-standata.R`. These "required files" will be discussed in more detail below. For now notice that, if any of them are _not_ found when you initialize the model, `new_model()` will print a message to the console and create scaffolds (files with boilerplate non-working code) of the missing files.
+
+You can use the `bbr::build_path_from_model()` function to take a look at any of these scaffolded files.
+
+```{r, comment=""}
+mod1 %>%
+  build_path_from_model("-standata.R") %>%
+  readLines() %>%
+  cat(sep = "\n")
+```
+
+The purpose of this scaffold is to provide some helpful framework to begin writing the necessary code for submitting a model with `bbr`. Below (in the `copy_model_from()` section) you will see how, once you have defined a model or two, you can use those models as your starting point for new models, instead of relying on writing new code from scaffolds.
+
+```{r, include = FALSE}
+# clean up blank mod1 object and files
+rm(mod1)
+fs::file_delete(file.path(MODEL_DIR, "mod1.yaml"))
+fs::dir_delete(file.path(MODEL_DIR, "mod1"))
+```
+
+## The `bbr` YAML file
+
+This `new_model()` call will also create a `mod1.yaml` file that will sit next to this directory on disk. This YAML file  stores model metadata like description and tags (discussed below). For now the YAML file will look very bare, but hopefully its purpose will become more clear later.
+
+Note that if you already have the relevant code for your new model, you can manually create these files in the output directory _before_ calling `new_model()`. In that case, you won't see any of the messages shown above and the `new_model()` call will simply create the `.yaml` file next to your directory. Alternatively, you can create the model with the scaffolds and the helpers like `add_stan_file()`, as shown below, to add you files to the model directory.
+
+## Reading in an existing model
+
+Now assume that you have previously created a model and written all the necessary code. You can read this model into memory with `read_model()`.
+
+```{r}
+fxa <- read_model(file.path(MODEL_DIR, "fxa"))
+```
+
+If take a look at _this model's_ `-standata.R` file, you can see an example of how this script might look in a real model.
+
+```{r, comment=""}
+fxa %>%
+  build_path_from_model("-standata.R") %>%
+  readLines() %>%
+  cat(sep = "\n")
+```
+
+
+### An incomplete model
+
+Sometimes you will have created your model and begun writing code, but the model has not been fully defined. When you read in a model like this, you will see some messages that are similar to the ones we saw when we first called `new_model()` above.
+
+```{r}
+fxaInc <- read_model(file.path(MODEL_DIR, "fxaInc"))
+```
+
+In this (somewhat contrived) example, we see three different messages:
+
+* The first tells us that we are missing the `-standata.R` file and points to helpful documentation for creating one.
+* The second tells us that the `-init.R` file is only a scaffold and must be completed from the model can be submitted.
+* And finally we're told that a scaffold has been added for the missing file(s) mentioned in the first message.
+
+### Adding required files and using `check_stan_model()`
+
+The user can manually check whether all the required files are present at any time by calling the `check_stan_model()` function.
+
+```{r}
+check_stan_model(fxaInc)
+```
+
+Notice that now we see that we have all our files, but that two of them are still scaffolds. There are several helper functions designed to make it easy to add these files to the model. You can read about all of them in the `?add_file_to_model_dir` documentation page.
+
+By default, all of these functions will attempt to add a scaffold of the relevant file, erroring if there is already a (non-scaffold) file present. However, you can also supply a path to the `.source_file` argument, in order to copy a file from another location into a given model.
+
+```{r}
+fxaInc <- fxaInc %>%
+  add_stan_init(.source_file = file.path(MODEL_DIR, "some_other_init.R")) %>%    # copy from external file
+  add_standata_file(.source_file = build_path_from_model(fxa, "-standata.R")) # copy from another model
+```
+
+Now we run `check_stan_model()` we get a clean bill of health.
+
+```{r}
+check_stan_model(fxaInc)
+```
+
+
+
+## Submit model
+
+The submit a model to be run, you simply pass the model object to `bbr::submit_model()`. For Stan models, this wraps the `cmdstanr::sample` method. Any arguments that you would normally pass through to the `$sample()` method can be passed through `submit_model()` via `...`.
+
+```{r}
+# define some variables to pass in
+nChains <- 4
+nBurn <- 300
+nIter <- 300
+```
+
+Simply pass the named arguments as shown below. You can see a full list of valid arguments in the `?cmdstanr::sample` docs.
+
+```{r}
+fxa_res <- fxaInc %>%
+  submit_model(
+    seed = 123456,
+    chains = nChains,
+    iter_warmup = nBurn,
+    iter_sampling = nIter
+  )
+```
+
+
+### Overwriting output from a previously run model
+
+It is common to run a model, make some tweaks to it, and then run it again. However, to avoid accidentally deleting model outputs, `bbr` will error by default if it sees existing output when trying to submit a model. To automatically overwrite any previous model output, just pass `.overwrite = TRUE` to `submit_model()`.
+
+
+## Summarize model
+
+**WORK IN PROGRESS...** _We haven't yet implemented `model_summary()` for `bbi_stan_model` objects. We're still trying to figure out how that should work. In the mean time, you can access the cmdstanr diagnostics and output as shown below._
+
+```{r model_summary}
+#sum1 <- mod1 %>% model_summary()
+#print(names(sum1))
+```
+
+
+### diagnostics from cmdstanr
+
+```{r}
+# this is just diagnostics
+fxa_res$sampler_diagnostics() %>% str()
+```
+
+
+```{r}
+# this pulls in the the actual posteriors
+.s <- fxa_res$summary()
+print(dim(.s))
+```
+
+```{r}
+.s %>%
+  slice_head(n = 15) %>%
+  knitr::kable()
+```
+
+
+# Iteration
+
+Much of the benefit of `bbr` is leveraged in the model iteration workflow, and the run log summaries that can be created afterwards. For example, imagine you look at these model results and want to begin iterating on them with a new model.
+
+## Adding tags and notes
+
+After looking at these results, the user can add tags, which can later be used to organize your modeling runs.
+
+```{r add_tags 2}
+fxa <- fxa %>% add_tags(c("fxaInhibit1Ncp", "unif emax"))
+fxaInc <- fxaInc %>% add_tags(c("fxaInhibit1Ncp", "cauchy emax"))
+```
+
+Note that using free text for your tags is discouraged, for reasons mentioned in the `?modify_tags` help page. For simplicity's sake, we ignore that advice here, but please read it before using tags extensively in the wild.
+
+In addition to tags, the user can add notes that can be referenced later.
+
+```{r}
+fxaInc <- fxaInc %>%
+  add_notes("Changed emax from uniform to cauchy distribution")
+```
+
+Importantly, **you must reassign to the model object** when calling any of these functions that modify it (notice the `fxaInc <- fxaInc ...` above). You can see a list of similar functions in the "See Also" section of [?modify_tags](https://metrumresearchgroup.github.io/bbr/reference/modify_tags.html) or [?modify_notes](https://metrumresearchgroup.github.io/bbr/reference/modify_notes.html).
+
+## copy_model_from()
+
+Now the iteration process continues with a third model. With the `copy_model_from()` function, you can create another model object based on a parent model, copying and renaming the necessary files in the process. The `copy_model_from()` call below will create an `fxaNew` directory and fill it as described in the `new_model()` section above. _However,_ insteading of filling it with scaffolds, it will copy (and rename) all of the necessary files _from the parent model's directory_ into the new directory.
+
+```{r copy_model 2}
+fxaNew <- copy_model_from(
+  .parent_mod = fxa,
+  .new_model = "fxaNew",
+  .inherit_tags = TRUE
+)
+```
+
+Note that, while the `.path` argument in  `new_model()` and `read_model()` is relative to your working directory, the `.new_model` argument of `copy_model_from()` is _relative to the directory containing the parent model._ This means that, assuming you would like to create the new model in the same directory as its parent, you only have to pass a filename (without extension) for the new model.
+
+You can now open the relevant files and edit them with the desired changes, starting from where you left off with the parent model.
+
+### Inheriting tags
+
+Note in the call above that we told `copy_model_from()` to inherit the tags from the parent model and automatically add them to the new model. You can also manually add tags and notes to this model well.
+
+```{r add_tags 3}
+fxaNew <- fxaNew %>%
+        add_tags("new gamma") %>%
+        add_notes("Experimenting with different gamma distributions")
+print(fxaNew$tags)
+```
+
+We can see that `fxaNew` contains the `"new gamma"` tag that we added manually _and_ the two tags that we inherited from its parent model. `copy_model_from()` also stores the model's "ancestry" which can be useful later in the project, as shown in the [Using the based_on field](https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html) vignette.
+
+# Run log
+
+At any point, the user can easily construct a "run log" tibble to summarize all models run up to this point.
+
+Before we move on, note that you can get even more information about your models from the `config_log()` and `summary_log()` functions, as well as `add_config()` and `add_summary()` which automatically join the columns output from those functions against the tibble output from `run_log()`.  See the "Further Reading" section below for links to vignettes demonstrating those functions.
+
+```{r run_log}
+log_df <- run_log(MODEL_DIR)
+log_df
+```
+
+The `run_log()` returns a tibble which can be manipulated like any other tibble. However, several of the columns (`tags`, `notes`, and `based_on` for example) are list columns, which complicates how you can interact with them. We provide some helper functions to more seamlessly interact with these log tibbles, as well as some sample `tidyverse` code below.
+
+## Viewing tags example
+
+The `bbr::collapse_to_string()` function can collapse any list column into a string representation of its contents. It is specifically designed for collapsing columns like `tags`, `notes`, and `based_on` into a more human-readable format.
+
+```{r viewing tags new}
+log_df %>%
+  collapse_to_string(tags, notes) %>%
+  select(run, tags, notes)
+```
+
+
+## Filtering tags example
+
+This code uses `purrr::map_lgl` to filter the run log to only rows containing a specific tag (`"2 compartment"`).
+
+```{r filtering}
+log_df %>%
+  filter(map_lgl(tags, ~ "unif emax" %in% .x)) %>%
+  collapse_to_string(tags, notes) %>%
+  select(run, tags, notes)
+```
+
+
+```{r cleanup bottom, include=FALSE}
+# delete old files
+cleanup()
+```
+
+# Further reading
+
+Hopefully this has given you a good start on understanding the capabilities and basic workflow of `bbr`. Please see the other vignettes for demonstrations of more advanced or specific functionality.
+
+* [Using the based_on field](https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html) -- How to use the `based_on` field to track a model's ancestry through the model development process, as well how to leverage `config_log()` to check whether older models are still up-to-date.
+* [Creating a Model Summary Log](https://metrumresearchgroup.github.io/bbr/articles/using-summary-log.html) -- How to use `summary_log()` to extract model diagnostics like the objective function value, condition number, and parameter counts.
