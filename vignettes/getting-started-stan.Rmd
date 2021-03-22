@@ -78,8 +78,8 @@ cleanup()
 ```
 
 
-## Installing bbi
-**DON'T NEED ANY OF THIS STUFF ABOUT BBI** but probably need a section about setting up `cmdstan`. Maybe just a little explanation and then link to [the `cmdstanr` docs](http://mc-stan.org/cmdstanr/articles/cmdstanr.html#installing-cmdstan-1).
+## Installing cmdstan
+When modeling with Stan, `bbr` does _not_ currently use `bbi`, so you will not need it installed. However, you _will_ need `cmdstan` installed. Please see [the `cmdstanr` docs](http://mc-stan.org/cmdstanr/articles/cmdstanr.html#Installing_CmdStan) for instructions.
 
 # Initial modeling run
 
@@ -92,7 +92,7 @@ The first argument (`.path`) must be the path to the directory containing the ne
 mod1 <- new_model(file.path(MODEL_DIR, "mod1"), .model_type = "stan")
 ```
 
-The call above will look for a directory called `{MODEL_DIR}/mod1`. _Inside_ this directory it will expect to find files like `mod1.stan` and `mod1-standata.R`. These "required files" will be discussed in more detail below. For now notice that, if any of them are _not_ found when you initialize the model, `new_model()` will print a message to the console and create scaffolds (files with boilerplate non-working code) of the missing files.
+The call above will look for a directory called `{MODEL_DIR}/mod1`. _Inside_ this directory it will expect to find files like `mod1.stan` and `mod1-standata.R`. These "required files" will be discussed in more detail below. For now notice that, if any of them are _not_ found when you initialize the model, `new_model()` will create scaffolds (files with boilerplate non-working code) of the missing files, and print a message to the console telling you it has done so.
 
 You can use the `bbr::build_path_from_model()` function to take a look at any of these scaffolded files.
 
@@ -105,6 +105,8 @@ mod1 %>%
 
 The purpose of this scaffold is to provide some helpful framework to begin writing the necessary code for submitting a model with `bbr`. Below (in the `copy_model_from()` section) you will see how, once you have defined a model or two, you can use those models as your starting point for new models, instead of relying on writing new code from scaffolds.
 
+Note that **if you already have the relevant code for your new model**, you can manually create these files in the output directory _before_ calling `new_model()`. In that case, you won't see any of the messages shown above and the `new_model()` call will simply create the `.yaml` file (described below) next to your directory. Alternatively, you can create the model with the scaffolds and use helpers like `add_stan_file()` (described below) to add you files to the model directory.
+
 ```{r, include = FALSE}
 # clean up blank mod1 object and files
 rm(mod1)
@@ -115,8 +117,6 @@ fs::dir_delete(file.path(MODEL_DIR, "mod1"))
 ## The `bbr` YAML file
 
 This `new_model()` call will also create a `mod1.yaml` file that will sit next to this directory on disk. This YAML file  stores model metadata like description and tags (discussed below). For now the YAML file will look very bare, but hopefully its purpose will become more clear later.
-
-Note that if you already have the relevant code for your new model, you can manually create these files in the output directory _before_ calling `new_model()`. In that case, you won't see any of the messages shown above and the `new_model()` call will simply create the `.yaml` file next to your directory. Alternatively, you can create the model with the scaffolds and the helpers like `add_stan_file()`, as shown below, to add you files to the model directory.
 
 ## Reading in an existing model
 
@@ -178,27 +178,19 @@ check_stan_model(fxaInc)
 
 ## Submit model
 
-The submit a model to be run, you simply pass the model object to `bbr::submit_model()`. For Stan models, this wraps the `cmdstanr::sample` method. Any arguments that you would normally pass through to the `$sample()` method can be passed through `submit_model()` via `...`.
-
-```{r}
-# define some variables to pass in
-nChains <- 4
-nBurn <- 300
-nIter <- 300
-```
-
-Simply pass the named arguments as shown below. You can see a full list of valid arguments in the `?cmdstanr::sample` docs.
+To submit a model to be run, you simply pass the model object to `bbr::submit_model()`. For Stan models, this wraps the [cmdstanr::sample](https://mc-stan.org/cmdstanr/reference/model-method-sample.html) method. Any arguments that you would normally pass through to the `$sample()` method can be passed through `submit_model()` via `...`. Simply pass the named arguments as shown below. You can see a full list of valid arguments in [the `?cmdstanr::sample` docs](https://mc-stan.org/cmdstanr/reference/model-method-sample.html).
 
 ```{r}
 fxa_res <- fxaInc %>%
   submit_model(
     seed = 123456,
-    chains = nChains,
-    iter_warmup = nBurn,
-    iter_sampling = nIter
+    chains = 4,
+    iter_warmup = 300,
+    iter_sampling = 300
   )
 ```
 
+As you can see, this also prints all of the diagnostic output from `$sample()` as it runs.
 
 ### Overwriting output from a previously run model
 
@@ -207,13 +199,7 @@ It is common to run a model, make some tweaks to it, and then run it again. Howe
 
 ## Summarize model
 
-**WORK IN PROGRESS...** _We haven't yet implemented `model_summary()` for `bbi_stan_model` objects. We're still trying to figure out how that should work. In the mean time, you can access the cmdstanr diagnostics and output as shown below._
-
-```{r model_summary}
-#sum1 <- mod1 %>% model_summary()
-#print(names(sum1))
-```
-
+The `submit_model()` call will return the fit model object from `cmdstanr`. You can read all about this object in the [`CmdStanMCMC` object docs](https://mc-stan.org/cmdstanr/reference/CmdStanMCMC.html). It has several methods for diagnostics and model summaries.
 
 ### diagnostics from cmdstanr
 
@@ -229,10 +215,33 @@ fxa_res$sampler_diagnostics() %>% str()
 print(dim(.s))
 ```
 
-```{r}
+```{r, results = "asis"}
 .s %>%
   slice_head(n = 15) %>%
   knitr::kable()
+```
+
+### Using `read_fit_model()`
+
+The `submit_model()` call automatically saves this fit object to disk as well. You can pass either a path or model object to `bbr::read_fit_model()` and it will re-load the `CmdStanMCMC` object into memory.
+
+```{r}
+new_res <- read_fit_model(file.path(MODEL_DIR, "fxaInc"))
+new_res$sampler_diagnostics() %>% names()
+```
+
+
+### `model_summary()` function
+
+We have **not yet implemented** `bbr::model_summary()` for `bbi_stan_model` objects. This is a work in progress, but until it is done, `model_summary()` currently returns the same fit object that was just discussed.
+
+```{r model_summary}
+sum1 <- fxaInc %>% model_summary()
+class(sum1)
+```
+
+```{r}
+sum1$sampler_diagnostics() %>% names()
 ```
 
 
@@ -249,7 +258,7 @@ fxa <- fxa %>% add_tags(c("fxaInhibit1Ncp", "unif emax"))
 fxaInc <- fxaInc %>% add_tags(c("fxaInhibit1Ncp", "cauchy emax"))
 ```
 
-Note that using free text for your tags is discouraged, for reasons mentioned in the `?modify_tags` help page. For simplicity's sake, we ignore that advice here, but please read it before using tags extensively in the wild.
+Note that **using free text for your tags is discouraged**, for reasons mentioned in the `?modify_tags` help page. For simplicity's sake, we ignore that advice here, but please read it before using tags extensively in the wild.
 
 In addition to tags, the user can add notes that can be referenced later.
 
@@ -259,6 +268,22 @@ fxaInc <- fxaInc %>%
 ```
 
 Importantly, **you must reassign to the model object** when calling any of these functions that modify it (notice the `fxaInc <- fxaInc ...` above). You can see a list of similar functions in the "See Also" section of [?modify_tags](https://metrumresearchgroup.github.io/bbr/reference/modify_tags.html) or [?modify_notes](https://metrumresearchgroup.github.io/bbr/reference/modify_notes.html).
+
+### Comparing models
+
+The [`model_diff()`](https://metrumresearchgroup.github.io/bbr/reference/model_diff.html) and [`tags_diff()`](https://metrumresearchgroup.github.io/bbr/reference/tags_diff.html) functions make it easy to compare models to each other. The ["Using based_on" vignette](https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html) has general examples of using both functions.
+
+Specifically for Stan models, it's worth noting that the `model_diff()` defaults to comparing the `<run>.stan` files.
+
+```{r}
+model_diff(fxa, fxaInc)
+```
+
+However, you can also pass any of `c("standata", "init", "stanargs")` to have it compare the specified file instead.
+
+```{r}
+model_diff(fxa, fxaInc, .file = "init")
+```
 
 ## copy_model_from()
 
@@ -304,12 +329,13 @@ The `run_log()` returns a tibble which can be manipulated like any other tibble.
 
 ## Viewing tags example
 
-The `bbr::collapse_to_string()` function can collapse any list column into a string representation of its contents. It is specifically designed for collapsing columns like `tags`, `notes`, and `based_on` into a more human-readable format.
+The `bbr::collapse_to_string()` function can collapse any list column into a string representation of its contents. It is specifically designed for collapsing columns like `tags`, `notes`, and `based_on` into a more human-readable format. (We also use `knitr::kable()` here to render a prettier table in HTML, though this is _not_ necessary.)
 
-```{r viewing tags new}
+```{r viewing tags new, results = "asis"}
 log_df %>%
   collapse_to_string(tags, notes) %>%
-  select(run, tags, notes)
+  select(run, tags, notes) %>%
+  knitr::kable()
 ```
 
 
@@ -317,11 +343,12 @@ log_df %>%
 
 This code uses `purrr::map_lgl` to filter the run log to only rows containing a specific tag (`"2 compartment"`).
 
-```{r filtering}
+```{r filtering, results = "asis"}
 log_df %>%
   filter(map_lgl(tags, ~ "unif emax" %in% .x)) %>%
   collapse_to_string(tags, notes) %>%
-  select(run, tags, notes)
+  select(run, tags, notes) %>%
+  knitr::kable()
 ```
 
 
@@ -329,10 +356,3 @@ log_df %>%
 # delete old files
 cleanup()
 ```
-
-# Further reading
-
-Hopefully this has given you a good start on understanding the capabilities and basic workflow of `bbr`. Please see the other vignettes for demonstrations of more advanced or specific functionality.
-
-* [Using the based_on field](https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html) -- How to use the `based_on` field to track a model's ancestry through the model development process, as well how to leverage `config_log()` to check whether older models are still up-to-date.
-* [Creating a Model Summary Log](https://metrumresearchgroup.github.io/bbr/articles/using-summary-log.html) -- How to use `summary_log()` to extract model diagnostics like the objective function value, condition number, and parameter counts.
