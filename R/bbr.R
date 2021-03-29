@@ -75,7 +75,6 @@ bbi_exec <- function(.cmd_args,
   check_bbi_exe(.bbi_exe_path)
 
   stdout_file <- tempfile("bbi_exec_out_")
-  message(paste("logging to", stdout_file))
 
   p <- processx::process$new(
     .bbi_exe_path,

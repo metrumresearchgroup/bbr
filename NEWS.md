@@ -5,7 +5,7 @@
 * There was a bug where submitting more than roughly 250 models at time via `submit_models()` (e.g. for bootstrapping) 
 would hang indefinitely. This had something to do with [a bug in processx](https://github.com/r-lib/processx/issues/286).
 It was fixed (in `bbr`) by routing the stdout and stderr to a temp file and then reading from it when necessary, instead 
-of relying on `processx` to poll the process.
+of relying on `processx` to poll the process. (#374)
 
 # bbr 1.1.0
 
