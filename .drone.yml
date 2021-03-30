@@ -320,18 +320,6 @@ steps:
   - name: cache
     path: /ephemeral
 
-- name: "Publish package: latest_tag"
-  pull: if-not-exists
-  image: plugins/s3
-  settings:
-    bucket: mpn.metworx.dev
-    source: /ephemeral/${DRONE_TAG}/**/*
-    strip_prefix: /ephemeral/${DRONE_TAG}/
-    target: /releases/${DRONE_REPO_NAME}/latest_tag
-  volumes:
-  - name: cache
-    path: /ephemeral
-
 volumes:
 - name: docker.sock
   host:
