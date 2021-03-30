@@ -300,6 +300,7 @@ steps:
   - git config --global user.email drone@metrumrg.com
   - git config --global user.name Drony
   - git fetch --tags
+  - R -s -e 'devtools::install_deps(dependencies = TRUE, upgrade = '"'"'never'"'"')'
   - R -s -e 'pkgpub::create_tagged_repo(.dir = '"'"'/ephemeral'"'"')'
   environment:
     BBI_EXE_PATH: /ephemeral/bbi
