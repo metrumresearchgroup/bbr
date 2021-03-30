@@ -12,7 +12,7 @@ context("testing a composable workflow and running bbi")
 
 # can't run on Drone because there's no NONMEM
 if (Sys.getenv("METWORX_VERSION") == "" || Sys.getenv("SKIP_BBI_TEST") == "true") {
-  skip("test-workflow-composable-bbi only runs on Metworx")
+  skip("test-workflow-bbi only runs on Metworx because it needs NONMEM installed")
 }
 skip_long_tests("skipping long-running bbi workflow tests")
 

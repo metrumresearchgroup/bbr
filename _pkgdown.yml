@@ -19,11 +19,13 @@ reference:
   - model_diff
   - tags_diff
   - check_up_to_date
+
 - title: Model submission
   contents:
   - submit_model
   - submit_models
   - print_bbi_args
+
 - title: Model summary
   contents:
   - model_summary
@@ -56,6 +58,7 @@ reference:
   - get_yaml_path
   - get_data_path
   - print_bbi
+
 - title: bbi configuration
   contents:
   - use_bbi
@@ -63,6 +66,14 @@ reference:
   - bbi_version
   - bbi_current_release
   - bbi_help
+
+- title: Stan-specific helpers
+  - check_stan_model
+  - add_stan_file
+  - add_stan_init
+  - add_standata_file
+  - build_data
+  - read_fit_model
 
 - title: Assorted helpers
   contents:

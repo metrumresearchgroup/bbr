@@ -33,7 +33,7 @@ steps:
   pull: never
   image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:latest
   commands:
-  - R -s -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
+  - R -s -e 'devtools::install_deps(dependencies = TRUE, upgrade = '"'"'never'"'"')'
   - R -s -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
   environment:
     BBI_EXE_PATH: /ephemeral/bbi
@@ -46,7 +46,7 @@ steps:
   pull: never
   image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-3.6:latest
   commands:
-  - R -s -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
+  - R -s -e 'devtools::install_deps(dependencies = TRUE, upgrade = '"'"'never'"'"')'
   - R -s -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
   environment:
     BBI_EXE_PATH: /ephemeral/bbi
@@ -80,15 +80,15 @@ steps:
   image: omerxx/drone-ecr-auth
   commands:
   - $(aws ecr get-login --no-include-email --region us-east-1)
-  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:2020-04-18
-  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-3.6:2020-04-18
+  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:2020-12-21
+  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-3.6:2020-12-21
   volumes:
   - name: docker.sock
     path: /var/run/docker.sock
 
 - name: Install bbi
   pull: never
-  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:2020-04-18
+  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:2020-12-21
   commands:
   - chmod +x install_bbi.sh
   - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.0.2'
@@ -98,9 +98,9 @@ steps:
 
 - name: "Check package: R 4.0"
   pull: never
-  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:2020-04-18
+  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:2020-12-21
   commands:
-  - R -s -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
+  - R -s -e 'devtools::install_deps(dependencies = TRUE, upgrade = '"'"'never'"'"')'
   - R -s -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
   environment:
     BBI_EXE_PATH: /ephemeral/bbi
@@ -111,9 +111,9 @@ steps:
 
 - name: "Check package: R 3.6"
   pull: never
-  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-3.6:2020-04-18
+  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-3.6:2020-12-21
   commands:
-  - R -s -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
+  - R -s -e 'devtools::install_deps(dependencies = TRUE, upgrade = '"'"'never'"'"')'
   - R -s -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
   environment:
     BBI_EXE_PATH: /ephemeral/bbi
@@ -168,7 +168,7 @@ steps:
   pull: never
   image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:cran-latest
   commands:
-  - R -s -e 'devtools::install_deps(upgrade = '"'"'always'"'"')'
+  - R -s -e 'devtools::install_deps(dependencies = TRUE, upgrade = '"'"'always'"'"')'
   - R -s -e 'devtools::load_all(); sessioninfo::session_info()'
   - R -s -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
   environment:
@@ -183,7 +183,7 @@ steps:
   pull: never
   image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-3.6:cran-latest
   commands:
-  - R -s -e 'devtools::install_deps(upgrade = '"'"'always'"'"')'
+  - R -s -e 'devtools::install_deps(dependencies = TRUE, upgrade = '"'"'always'"'"')'
   - R -s -e 'devtools::load_all(); sessioninfo::session_info()'
   - R -s -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
   environment:
@@ -238,7 +238,7 @@ steps:
   pull: never
   image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:latest
   commands:
-  - R -s -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
+  - R -s -e 'devtools::install_deps(dependencies = TRUE, upgrade = '"'"'never'"'"')'
   - R -s -e 'covr::codecov()'
   environment:
     BBI_EXE_PATH: /ephemeral/bbi
