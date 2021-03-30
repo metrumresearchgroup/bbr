@@ -24,7 +24,6 @@ This "Getting Started with bbr" vignette takes you through some basic scenarios 
 if (interactive()) {
   devtools::load_all()
 }
-devtools::load_all()
 ```
 ```{r load packages, results = 'hide', message=FALSE, warning=FALSE}
 library(bbr)
@@ -64,7 +63,7 @@ setup <- function() {
 
   fs::dir_create(file.path(MODEL_DIR, "fxaInc"))
 
-  writeLines(STANINIT_SCAFFOLD_STRING, file.path(MODEL_DIR, "fxaInc", "fxaInc-init.R"))
+  writeLines(bbr:::STANINIT_SCAFFOLD_STRING, file.path(MODEL_DIR, "fxaInc", "fxaInc-init.R"))
   
   readLines(file.path(MODEL_DIR, "fxa", "fxa.stan")) %>%
     stringr::str_replace("uniform", "cauchy") %>%
