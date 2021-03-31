@@ -36,7 +36,8 @@ NULL
 
 #' Execute call to bbi
 #'
-#' Private implementation function that executes a bbi call (`bbi ...`) with processx::process$new()
+#' Private implementation function that executes a bbi call (`bbi ...`) with
+#' processx::process$new()
 #'
 #' @inheritParams bbi_version
 #' @param .cmd_args A character vector of command line arguments for the execution call
@@ -44,13 +45,26 @@ NULL
 #' @param .verbose Print stdout and stderr as process runs #### NOT IMPLEMENTED?
 #' @param .wait If true, don't return until process has exited.
 #' @param ... arguments to pass to processx::process$new()
-#' @return An S3 object of class `bbi_process`
-#'         process -- The process object (see ?processx::process$new for more details on what you can do with this).
-#'         stdout -- the stdout and stderr from the process, if `.wait = TRUE`. If `.wait = FALSE` this will be NULL.
-#'         bbi -- character scalar with the execution path used for bbi.
-#'         cmd_args -- character vector of all command arguments passed to the process.
-#'         working_dir -- the directory the command was run in, passed through from .dir argument.
+#'
+#' @return An S3 object of class `bbi_process` with the following elements
+#'
+#'   * process -- The process object (see ?processx::process$new for more
+#'   details on what you can do with this).
+#'
+#'   * stdout -- the stdout and stderr from the process, if `.wait = TRUE`. If
+#'   `.wait = FALSE` this contain a message with the tempfile path where stdout
+#'   and stderr have been redirected.
+#'
+#'   * bbi -- character scalar with the execution path used for bbi.
+#'
+#'   * cmd_args -- character vector of all command arguments passed to the
+#'   process.
+#'
+#'   * working_dir -- the directory the command was run in, passed through from
+#'   .dir argument.
+#'
 #' @importFrom processx process
+#' @importFrom readr read_lines
 #' @keywords internal
 bbi_exec <- function(.cmd_args,
                      .dir = ".",
@@ -60,12 +74,14 @@ bbi_exec <- function(.cmd_args,
                      ...) {
   check_bbi_exe(.bbi_exe_path)
 
+  stdout_file <- tempfile("bbi_exec_out_")
+
   p <- processx::process$new(
     .bbi_exe_path,
     .cmd_args,
     ...,
     wd = .dir,
-    stdout = "|",
+    stdout = stdout_file,
     stderr = "2>&1"
   )
   if (.wait) {
@@ -96,11 +112,11 @@ bbi_exec <- function(.cmd_args,
       p$wait()
     }
     # check output status code
-    output <- p$read_all_output_lines()
+    output <- read_lines(stdout_file)
     check_status_code(p$get_exit_status(), output, .cmd_args)
 
   } else {
-    output <- "NO STDOUT BECAUSE `.wait = FALSE`"
+    output <- paste("NO STDOUT BECAUSE `.wait = FALSE`. stdout and stderr redirected to", stdout_file)
   }
   # build result object
   res <- list()
