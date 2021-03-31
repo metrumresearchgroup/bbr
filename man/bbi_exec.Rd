@@ -27,14 +27,22 @@ bbi_exec(
 \item{...}{arguments to pass to processx::process$new()}
 }
 \value{
-An S3 object of class \code{bbi_process}
-process -- The process object (see ?processx::process$new for more details on what you can do with this).
-stdout -- the stdout and stderr from the process, if \code{.wait = TRUE}. If \code{.wait = FALSE} this will be NULL.
-bbi -- character scalar with the execution path used for bbi.
-cmd_args -- character vector of all command arguments passed to the process.
-working_dir -- the directory the command was run in, passed through from .dir argument.
+An S3 object of class \code{bbi_process} with the following elements
+\itemize{
+\item process -- The process object (see ?processx::process$new for more
+details on what you can do with this).
+\item stdout -- the stdout and stderr from the process, if \code{.wait = TRUE}. If
+\code{.wait = FALSE} this contain a message with the tempfile path where stdout
+and stderr have been redirected.
+\item bbi -- character scalar with the execution path used for bbi.
+\item cmd_args -- character vector of all command arguments passed to the
+process.
+\item working_dir -- the directory the command was run in, passed through from
+.dir argument.
+}
 }
 \description{
-Private implementation function that executes a bbi call (\verb{bbi ...}) with processx::process$new()
+Private implementation function that executes a bbi call (\verb{bbi ...}) with
+processx::process$new()
 }
 \keyword{internal}

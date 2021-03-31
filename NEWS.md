@@ -1,6 +1,24 @@
+# Stan alpha branch
+
+All releases tagged `1.x.x.9xxx` refer to "alpha" releases cut from the `bbr_stan_alpha` branch. The intention of this branch is to begin implementing support for Stan modeling with `bbr`. While this code should all be tested and working, the function names and API are considered experimental and may change with new releases. The plan is to merge this functionality into `bbr` proper once this has stabilized.
+
 # bbr 1.1.0.9000
 
-All releases tagged `1.1.0.9xxx` refer to "alpha" releases cut from the `bbr_stan_alpha` branch. The intention of this branch is to begin implementing support for Stan modeling with `bbr`. While this code should all be tested and working, the function names and API are considered experimental and may change with new releases. The plan is to merge this functionality into `bbr` proper once this has stabilized.
+This is the first Stan alpha releases. There is a ["Getting Started with bbr and Stan" vignette](https://github.com/metrumresearchgroup/bbr/blob/bbr_stan_alpha/vignettes/getting-started-stan.Rmd) that demonstrates the functionality available so far, including:
+
+* Creating a model object
+* Managing the necessary files associated with a model object
+* Submitting a model to be run
+* Checking if model outputs are up-to-date
+* Interacting with the `cmdstanr` fit object
+
+# bbr proper releases NEWS
+
+# bbr 1.1.1
+
+## Bug fixes
+
+* There was a bug where submitting more than roughly 250 models at time via `submit_models()` (e.g. for bootstrapping) would hang indefinitely. This had something to do with [a bug in processx](https://github.com/r-lib/processx/issues/286). It was fixed (in `bbr`) by routing the stdout and stderr to a temp file and then reading from it when necessary, instead of relying on `processx` to poll the process. (#374)
 
 # bbr 1.1.0
 
