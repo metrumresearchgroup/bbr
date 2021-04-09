@@ -19,7 +19,7 @@
 submit_models <- function(
   .mods,
   .bbi_args = NULL,
-  .mode = c("sge", "local"),
+  .mode = getOption("bbr.bbi_exe_mode"),
   ...,
   .config_path = NULL,
   .wait = TRUE,
@@ -34,7 +34,7 @@ submit_models <- function(
 submit_models.list <- function(
   .mods,
   .bbi_args = NULL,
-  .mode = c("sge", "local"),
+  .mode = getOption("bbr.bbi_exe_mode"),
   ...,
   .config_path = NULL,
   .wait = TRUE,
@@ -89,7 +89,7 @@ submit_models.list <- function(
 #' @keywords internal
 submit_nonmem_models <- function(.mods,
                                  .bbi_args = NULL,
-                                 .mode = c("sge", "local"),
+                                 .mode = getOption("bbr.bbi_exe_mode"),
                                  ...,
                                  .config_path = NULL,
                                  .wait = TRUE,
@@ -104,8 +104,8 @@ submit_nonmem_models <- function(.mods,
   # check against YAML
   for (.mod in .mods) { check_yaml_in_sync(.mod) }
 
-  # check for valid type arg
-  .mode <- match.arg(.mode)
+  # check for valid .mode arg
+  check_mode_argument(.mode)
 
   # get unique sets of params
   param_list <- build_bbi_param_list(.mods, .bbi_args)

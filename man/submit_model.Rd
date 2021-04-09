@@ -8,7 +8,7 @@
 submit_model(
   .mod,
   .bbi_args = NULL,
-  .mode = c("sge", "local"),
+  .mode = getOption("bbr.bbi_exe_mode"),
   ...,
   .config_path = NULL,
   .wait = TRUE,
@@ -18,7 +18,7 @@ submit_model(
 \method{submit_model}{bbi_nonmem_model}(
   .mod,
   .bbi_args = NULL,
-  .mode = c("sge", "local"),
+  .mode = getOption("bbr.bbi_exe_mode"),
   ...,
   .config_path = NULL,
   .wait = TRUE,
@@ -34,7 +34,8 @@ not support changing the output directory (including through the model or
 global YAML files).}
 
 \item{.mode}{Either \code{"sge"}, the default, to submit model(s) to the grid or
-\code{"local"} for local execution.}
+\code{"local"} for local execution. This can be passed directly to this argument
+or set globally with \code{options("bbr.bbi_exe_mode")}.}
 
 \item{...}{args passed through to \code{bbi_exec()}}
 

@@ -13,7 +13,8 @@
 #'   not support changing the output directory (including through the model or
 #'   global YAML files).
 #' @param .mode Either `"sge"`, the default, to submit model(s) to the grid or
-#'   `"local"` for local execution.
+#'   `"local"` for local execution. This can be passed directly to this argument
+#'   or set globally with `options("bbr.bbi_exe_mode")`.
 #' @param ... args passed through to `bbi_exec()`
 #' @param .config_path Path to a bbi configuration file. If `NULL`, the
 #'   default, will attempt to use a `bbi.yaml` in the same directory as the
@@ -28,7 +29,7 @@
 submit_model <- function(
   .mod,
   .bbi_args = NULL,
-  .mode = c("sge", "local"),
+  .mode = getOption("bbr.bbi_exe_mode"),
   ...,
   .config_path = NULL,
   .wait = TRUE,
@@ -42,7 +43,7 @@ submit_model <- function(
 submit_model.bbi_nonmem_model <- function(
   .mod,
   .bbi_args = NULL,
-  .mode = c("sge", "local"),
+  .mode = getOption("bbr.bbi_exe_mode"),
   ...,
   .config_path = NULL,
   .wait = TRUE,
@@ -74,7 +75,7 @@ submit_model.bbi_nonmem_model <- function(
 #' @keywords internal
 submit_nonmem_model <- function(.mod,
                                 .bbi_args = NULL,
-                                .mode = c("sge", "local"),
+                                .mode = getOption("bbr.bbi_exe_mode"),
                                 ...,
                                 .config_path = NULL,
                                 .wait = TRUE,
@@ -83,8 +84,8 @@ submit_nonmem_model <- function(.mod,
   # check against YAML
   check_yaml_in_sync(.mod)
 
-  # check for valid type arg
-  .mode <- match.arg(.mode)
+  # check for valid .mode arg
+  check_mode_argument(.mode)
 
   # build command line args
   .bbi_args <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])
@@ -111,4 +112,20 @@ submit_nonmem_model <- function(.mod,
   res <- bbi_exec(cmd_args, .wait = .wait, .dir = model_dir, ...)
 
   return(res)
+}
+
+
+#' Private helper to check if `.mode` arg to `submit_model()` is valid
+check_mode_argument <- function(.mode) {
+  if (is.null(.mode)) {
+    stop(BBI_EXE_MODE_NULL_ERR_MSG, call. = FALSE)
+  }
+
+  checkmate::assert_string(.mode)
+
+  if (!(.mode %in% BBI_VALID_MODES)) {
+    stop(BBI_EXE_MODE_INVALID_ERR_MSG, call. = FALSE)
+  }
+
+  return(invisible(TRUE))
 }
