@@ -6,6 +6,10 @@
 \usage{
 check_mode_argument(.mode)
 }
+\arguments{
+\item{.mode}{argument to be checked}
+}
 \description{
 Private helper to check if \code{.mode} arg to \code{submit_model()} is valid
 }
+\keyword{internal}

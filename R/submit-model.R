@@ -116,6 +116,8 @@ submit_nonmem_model <- function(.mod,
 
 
 #' Private helper to check if `.mode` arg to `submit_model()` is valid
+#' @param .mode argument to be checked
+#' @keywords internal
 check_mode_argument <- function(.mode) {
   if (is.null(.mode)) {
     stop(BBI_EXE_MODE_NULL_ERR_MSG, call. = FALSE)
