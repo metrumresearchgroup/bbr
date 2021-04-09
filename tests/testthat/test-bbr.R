@@ -61,14 +61,11 @@ test_that("bbi_init creates bbi.yaml", {
   withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     bbi_init(".", ".", .no_default_version=TRUE)
   })
+  on.exit(fs::file_delete("bbi.yaml"))
 
   # read in yaml and check that it has a bbi key
   bbi_yaml <- yaml::read_yaml("bbi.yaml")
   expect_true("bbi_binary" %in% names(bbi_yaml))
-
-  # delete yaml
-  fs::file_delete("bbi.yaml")
-
 })
 
 test_that("bbi_init errors with non-existent .dir", {
@@ -84,4 +81,18 @@ test_that("bbi_init errors with invalid .nonmem_version", {
     expect_error(bbi_init(".", ".", "naw"), regexp = "Must specify a valid `.nonmem_version`")
     fs::file_delete("bbi.yaml")
   })
+})
+
+test_that("bbi_init passes .bbi_args", {
+  # create yaml
+
+  withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
+    bbi_init(".", ".", .bbi_args = list(threads = 36, no_shk_file = TRUE), .no_default_version=TRUE)
+  })
+  on.exit(fs::file_delete("bbi.yaml"))
+
+  # read in yaml and check that it has a bbi key
+  bbi_yaml <- yaml::read_yaml("bbi.yaml")
+  expect_equal(bbi_yaml$threads, 36)
+  expect_true(bbi_yaml$no_shk_file)
 })
