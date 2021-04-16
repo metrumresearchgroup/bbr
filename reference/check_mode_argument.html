@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Check that bbi satisfies a version constraint — check_bbi_version_constraint • bbr</title>
+<title>Private helper to check if .mode arg to submit_model() is valid — check_mode_argument • bbr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="Check that bbi satisfies a version constraint — check_bbi_version_constraint" />
-<meta property="og:description" content="Check that bbi satisfies a version constraint" />
+<meta property="og:title" content="Private helper to check if .mode arg to submit_model() is valid — check_mode_argument" />
+<meta property="og:description" content="Private helper to check if .mode arg to submit_model() is valid" />
 <meta property="og:image" content="https://metrumresearchgroup.github.io/bbr/logo.png" />
 
 
@@ -140,31 +140,26 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Check that bbi satisfies a version constraint</h1>
+    <h1>Private helper to check if <code>.mode</code> arg to <code>submit_model()</code> is valid</h1>
     
-    <div class="hidden name"><code>check_bbi_version_constraint.Rd</code></div>
+    <div class="hidden name"><code>check_mode_argument.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Check that bbi satisfies a version constraint</p>
+    <p>Private helper to check if <code>.mode</code> arg to <code><a href='submit_model.html'>submit_model()</a></code> is valid</p>
     </div>
 
-    <pre class="usage"><span class='fu'>check_bbi_version_constraint</span><span class='op'>(</span>
-  .bbi_exe_path <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"rbabylon.bbi_exe_path"</span><span class='op'>)</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>check_mode_argument</span><span class='op'>(</span><span class='va'>.mode</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>.bbi_exe_path</th>
-      <td><p>Path to bbi executable</p></td>
+      <th>.mode</th>
+      <td><p>argument to be checked</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p><code>NULL</code> if <code>.bbi_exe_path</code> satisfies the constraint</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

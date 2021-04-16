@@ -47,7 +47,8 @@
 
 
 <meta property="og:title" content="Execute call to bbi — bbi_exec" />
-<meta property="og:description" content="Private implementation function that executes a bbi call (bbi ...) with processx::process$new()" />
+<meta property="og:description" content="Private implementation function that executes a bbi call (bbi ...) with
+processx::process$new()" />
 <meta property="og:image" content="https://metrumresearchgroup.github.io/bbr/logo.png" />
 
 
@@ -80,7 +81,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.2</span>
       </span>
     </div>
 
@@ -146,7 +147,8 @@
     </div>
 
     <div class="ref-description">
-    <p>Private implementation function that executes a bbi call (<code>bbi ...</code>) with processx::process$new()</p>
+    <p>Private implementation function that executes a bbi call (<code>bbi ...</code>) with
+processx::process$new()</p>
     </div>
 
     <pre class="usage"><span class='fu'>bbi_exec</span><span class='op'>(</span>
@@ -189,12 +191,19 @@
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An S3 object of class <code>bbi_process</code>
-process -- The process object (see ?processx::process$new for more details on what you can do with this).
-stdout -- the stdout and stderr from the process, if <code>.wait = TRUE</code>. If <code>.wait = FALSE</code> this will be NULL.
-bbi -- character scalar with the execution path used for bbi.
-cmd_args -- character vector of all command arguments passed to the process.
-working_dir -- the directory the command was run in, passed through from .dir argument.</p>
+    <p>An S3 object of class <code>bbi_process</code> with the following elements</p><ul>
+<li><p>process -- The process object (see ?processx::process$new for more
+details on what you can do with this).</p></li>
+<li><p>stdout -- the stdout and stderr from the process, if <code>.wait = TRUE</code>. If
+<code>.wait = FALSE</code> this contain a message with the tempfile path where stdout
+and stderr have been redirected.</p></li>
+<li><p>bbi -- character scalar with the execution path used for bbi.</p></li>
+<li><p>cmd_args -- character vector of all command arguments passed to the
+process.</p></li>
+<li><p>working_dir -- the directory the command was run in, passed through from
+.dir argument.</p></li>
+</ul>
+
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

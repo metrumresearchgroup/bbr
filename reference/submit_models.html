@@ -81,7 +81,7 @@ few external calls as possible (see &quot;Details&quot;)." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.2</span>
       </span>
     </div>
 
@@ -154,7 +154,7 @@ few external calls as possible (see "Details").</p>
     <pre class="usage"><span class='fu'>submit_models</span><span class='op'>(</span>
   <span class='va'>.mods</span>,
   .bbi_args <span class='op'>=</span> <span class='cn'>NULL</span>,
-  .mode <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"sge"</span>, <span class='st'>"local"</span><span class='op'>)</span>,
+  .mode <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"bbr.bbi_exe_mode"</span><span class='op'>)</span>,
   <span class='va'>...</span>,
   .config_path <span class='op'>=</span> <span class='cn'>NULL</span>,
   .wait <span class='op'>=</span> <span class='cn'>TRUE</span>,
@@ -165,7 +165,7 @@ few external calls as possible (see "Details").</p>
 <span class='fu'>submit_models</span><span class='op'>(</span>
   <span class='va'>.mods</span>,
   .bbi_args <span class='op'>=</span> <span class='cn'>NULL</span>,
-  .mode <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"sge"</span>, <span class='st'>"local"</span><span class='op'>)</span>,
+  .mode <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"bbr.bbi_exe_mode"</span><span class='op'>)</span>,
   <span class='va'>...</span>,
   .config_path <span class='op'>=</span> <span class='cn'>NULL</span>,
   .wait <span class='op'>=</span> <span class='cn'>TRUE</span>,
@@ -189,7 +189,8 @@ global YAML files).</p></td>
     <tr>
       <th>.mode</th>
       <td><p>Either <code>"sge"</code>, the default, to submit model(s) to the grid or
-<code>"local"</code> for local execution.</p></td>
+<code>"local"</code> for local execution. This can be passed directly to this argument
+or set globally with <code><a href='https://rdrr.io/r/base/options.html'>options("bbr.bbi_exe_mode")</a></code>.</p></td>
     </tr>
     <tr>
       <th>...</th>
