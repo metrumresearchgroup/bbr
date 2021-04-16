@@ -11,6 +11,10 @@
     options("bbr.bbi_exe_path" = BBI_DEFAULT_PATH)
   }
 
+  if (is.null(getOption("bbr.bbi_exe_mode"))) {
+    options("bbr.bbi_exe_mode" = BBI_DEFAULT_MODE)
+  }
+
   # set bbi minimum version
   if (is.null(getOption("bbr.bbi_min_version"))) {
     options("bbr.bbi_min_version" = package_version("3.0.2"))

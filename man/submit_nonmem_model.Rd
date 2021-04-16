@@ -7,7 +7,7 @@
 submit_nonmem_model(
   .mod,
   .bbi_args = NULL,
-  .mode = c("sge", "local"),
+  .mode = getOption("bbr.bbi_exe_mode"),
   ...,
   .config_path = NULL,
   .wait = TRUE,
