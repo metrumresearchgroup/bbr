@@ -62,7 +62,8 @@ check_bbi_args <- function(.args) {
   key_value_list <- imap(.args, function(.v, .n) {.v}) %>% set_names(key_value_flags)
 
   # format list to character vector
-  return(format_cmd_args(key_value_list))
+  cmd_args <- format_cmd_args(key_value_list)
+  return(invisible(cmd_args))
 }
 
 #' Formats command line args from a named list to a string as it would be passed on the command line
