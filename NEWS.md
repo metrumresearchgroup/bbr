@@ -1,4 +1,4 @@
-# bbr (development)
+# bbr 1.1.2
 
 ## New features and changes
 
