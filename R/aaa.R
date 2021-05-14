@@ -4,6 +4,9 @@ BBI_DEFAULT_PATH <- if (.Platform$OS.type == "windows") {
   "bbi"
 }
 
+BBI_DEFAULT_MODE <- "sge"
+BBI_VALID_MODES <- c("local", "sge")
+
 CACHE_ENV <- new.env(parent = emptyenv())
 CACHE_ENV$bbi_exe_paths <- list()
 
@@ -236,6 +239,14 @@ NO_STAN_ERR_MSG <- "stan support not yet implemented."
 PARAM_BAYES_ERR_MSG <- "param_estimates() is not currently implemented for Bayesian methods."
 CHECK_UP_TO_DATE_ERR_MSG <- "Cannot check if up-to-date because model has not been run yet."
 MODEL_DIFF_ERR_MSG <- "Please pass a single `bbi_model` object to the `.mod2` to compare models."
+BBI_EXE_MODE_NULL_ERR_MSG <- paste(
+  "Nothing was passed to `.mode` argument and `options('bbr.bbi_exe_mode')` is NULL. Please either pass or set to one of:",
+  paste(BBI_VALID_MODES, collapse = ", ")
+)
+BBI_EXE_MODE_INVALID_ERR_MSG <- paste(
+  "Invalid value passed to `.mode` argument. Please either pass or set `options('bbr.bbi_exe_mode')` to one of:",
+  paste(BBI_VALID_MODES, collapse = ", ")
+)
 NONMEM_MODEL_TYPE_ERR_MSG <- "IF THIS IS NOT A NONMEM MODEL please pass the appropriate type to `.model_type`"
 MISSING_STAN_FILES_ERR_MSG <- "The following files, which are necessary to run a `bbi_stan_model` are missing"
 STAN_SCAFFOLD_ERR_MSG <- "The following files, which are necessary to run a `bbi_stan_model` are only scaffolds:"

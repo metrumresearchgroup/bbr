@@ -81,5 +81,30 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       "is not a valid argument"
     )
   })
+
+  test_that("submit_model(.mode) inherits option", {
+    withr::with_options(list(bbr.bbi_exe_mode = "local"), {
+      expect_identical(
+        submit_model(MOD1, .dry_run = T)[[PROC_CALL]],
+        as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run local {mod_ctl_path} --overwrite --threads=4"))
+      )
+    })
+  })
+
+  test_that("submit_model(.mode) errors when NULL", {
+    withr::with_options(list(bbr.bbi_exe_mode = NULL), {
+      expect_error(
+        submit_model(MOD1, .dry_run = T),
+        regexp = "Nothing was passed.+mode"
+      )
+    })
+  })
+
+  test_that("submit_model(.mode) errors when invalid", {
+    expect_error(
+      submit_model(MOD1, .dry_run = T, .mode = "naw"),
+      regexp = "Invalid value passed.+mode"
+    )
+  })
 })
 

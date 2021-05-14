@@ -276,13 +276,19 @@ bbi_help <- function(.cmd_args=NULL) {
 #' @param .nonmem_version Character scalar for default version of NONMEM to use.
 #'   If left NULL, function will exit and tell you which versions were found in
 #'   `.nonmem_dir`
+#' @param .bbi_args A named list specifying options to set in the newly created
+#'   `bbi.yaml` file, formatted like `list("nm_version" = "nm74gf_nmfe", "json"
+#'   = T, "threads" = 4)`. Run [print_bbi_args()] to see valid options. Note
+#'   that bbr does not support changing the output directory (including through
+#'   the model or global YAML files).
 #' @param .no_default_version If `TRUE`, force creation of bbi.yaml with
 #'   **no default NONMEM version**. `FALSE` by default, and using `TRUE` is
 #'   *not* encouraged.
+#'
 #' @importFrom yaml read_yaml write_yaml
 #' @importFrom fs dir_exists
 #' @export
-bbi_init <- function(.dir, .nonmem_dir, .nonmem_version = NULL, .no_default_version = FALSE) {
+bbi_init <- function(.dir, .nonmem_dir, .nonmem_version = NULL, .bbi_args = NULL, .no_default_version = FALSE) {
   # check that destination directory exists
   if (!fs::dir_exists(.dir)) {
     stop(paste(
@@ -304,18 +310,26 @@ bbi_init <- function(.dir, .nonmem_dir, .nonmem_version = NULL, .no_default_vers
   res <- bbi_exec(c("init",  paste0("--dir=", .nonmem_dir)), .dir = .dir, .wait=TRUE)
 
   # set default NONMEM version
-  if (!is.null(.nonmem_version)) {
+  if (!is.null(.nonmem_version) || !is.null(.bbi_args)) {
     # load bbi.yaml
     bbi_yaml_path <- file.path(.dir, "bbi.yaml")
     bbi_yaml <- read_yaml(bbi_yaml_path)
 
-    # check for valid version
-    if (!(.nonmem_version %in% names(bbi_yaml$nonmem))) {
-      stop(glue("Must specify a valid `.nonmem_version` for bbi_init(). {bbi_yaml_path} contains the following options: `{paste(names(bbi_yaml$nonmem), collapse='`, `')}`"))
+    if (!is.null(.bbi_args)) {
+      check_bbi_args(.bbi_args)
+      bbi_yaml <- parse_args_list(.bbi_args, bbi_yaml)
     }
 
-    # set default version and write to disk
-    bbi_yaml[['nonmem']][[.nonmem_version]]['default'] <- TRUE
+    if (!is.null(.nonmem_version)) {
+      # check for valid version
+      if (!(.nonmem_version %in% names(bbi_yaml$nonmem))) {
+        stop(glue("Must specify a valid `.nonmem_version` for bbi_init(). {bbi_yaml_path} contains the following options: `{paste(names(bbi_yaml$nonmem), collapse='`, `')}`"))
+      }
+
+      # set default version
+      bbi_yaml[['nonmem']][[.nonmem_version]]['default'] <- TRUE
+    }
+
     write_yaml(bbi_yaml, bbi_yaml_path)
   }
 

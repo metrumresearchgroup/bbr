@@ -14,6 +14,14 @@ This is the first Stan alpha releases. There is a ["Getting Started with bbr and
 
 # bbr proper releases NEWS
 
+# bbr 1.1.2
+
+## New features and changes
+
+* Added `options(bbr.bbi_exe_mode)` for globally setting `.mode` argument to `submit_model()` and `submit_models()`. (#377)
+
+* Added `.bbi_args` argument to `bbi_init()` for passing through defaults to be stored in the created `bbi.yaml` file. (#378)
+
 # bbr 1.1.1
 
 ## Bug fixes

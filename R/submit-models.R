@@ -19,7 +19,7 @@
 submit_models <- function(
   .mods,
   .bbi_args = NULL,
-  .mode = c("sge", "local"),
+  .mode = getOption("bbr.bbi_exe_mode"),
   ...,
   .overwrite = NULL,
   .config_path = NULL,
@@ -35,7 +35,7 @@ submit_models <- function(
 submit_models.list <- function(
   .mods,
   .bbi_args = NULL,
-  .mode = c("sge", "local"),
+  .mode = getOption("bbr.bbi_exe_mode"),
   ...,
   .overwrite = NULL,
   .config_path = NULL,
@@ -92,7 +92,7 @@ submit_models.list <- function(
 #' @keywords internal
 submit_nonmem_models <- function(.mods,
                                  .bbi_args = NULL,
-                                 .mode = c("sge", "local"),
+                                 .mode = getOption("bbr.bbi_exe_mode"),
                                  ...,
                                  .overwrite = NULL,
                                  .config_path = NULL,
@@ -108,8 +108,8 @@ submit_nonmem_models <- function(.mods,
   # check against YAML
   for (.mod in .mods) { check_yaml_in_sync(.mod) }
 
-  # check for valid type arg
-  .mode <- match.arg(.mode)
+  # check for valid .mode arg
+  check_mode_argument(.mode)
 
   # get unique sets of params
   if (!is.null(.overwrite)) {

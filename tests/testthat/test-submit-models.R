@@ -173,5 +173,14 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       )
     )
   })
+
+  test_that("submit_models(.mode) inherits option", {
+    withr::with_options(list(bbr.bbi_exe_mode = "local"), {
+      expect_identical(
+        submit_models(list(MOD1), .dry_run = T)[[1]][[PROC_CALL]],
+        as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run local {ABS_CTL_PATH} --overwrite --threads=4"))
+      )
+    })
+  })
 }) # closing withr::with_options
 

@@ -8,6 +8,7 @@ bbi_init(
   .dir,
   .nonmem_dir,
   .nonmem_version = NULL,
+  .bbi_args = NULL,
   .no_default_version = FALSE
 )
 }
@@ -20,6 +21,11 @@ bbi_init(
 \item{.nonmem_version}{Character scalar for default version of NONMEM to use.
 If left NULL, function will exit and tell you which versions were found in
 \code{.nonmem_dir}}
+
+\item{.bbi_args}{A named list specifying options to set in the newly created
+\code{bbi.yaml} file, formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}. Run \code{\link[=print_bbi_args]{print_bbi_args()}} to see valid options. Note
+that bbr does not support changing the output directory (including through
+the model or global YAML files).}
 
 \item{.no_default_version}{If \code{TRUE}, force creation of bbi.yaml with
 \strong{no default NONMEM version}. \code{FALSE} by default, and using \code{TRUE} is

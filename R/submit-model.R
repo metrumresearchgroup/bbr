@@ -51,7 +51,8 @@
 #'   not support changing the output directory (including through the model or
 #'   global YAML files).
 #' @param .mode Either `"sge"`, the default, to submit model(s) to the grid or
-#'   `"local"` for local execution.
+#'   `"local"` for local execution. This can be passed directly to this argument
+#'   or set globally with `options("bbr.bbi_exe_mode")`.
 #' @param ... args passed through. For `bbi_stan_model` this is how you pass
 #'   arguments through to the `$sample()` method of your `cmdstanr` model
 #'   object. See [cmdstanr::sample()] for valid arguments and details. For
@@ -73,7 +74,7 @@
 submit_model <- function(
   .mod,
   .bbi_args = NULL,
-  .mode = c("sge", "local"),
+  .mode = getOption("bbr.bbi_exe_mode"),
   ...,
   .overwrite = NULL,
   .config_path = NULL,
@@ -88,7 +89,7 @@ submit_model <- function(
 submit_model.bbi_nonmem_model <- function(
   .mod,
   .bbi_args = NULL,
-  .mode = c("sge", "local"),
+  .mode = getOption("bbr.bbi_exe_mode"),
   ...,
   .overwrite = NULL,
   .config_path = NULL,
@@ -150,7 +151,7 @@ submit_model.bbi_stan_model <- function(
 #' @keywords internal
 submit_nonmem_model <- function(.mod,
                                 .bbi_args = NULL,
-                                .mode = c("sge", "local"),
+                                .mode = getOption("bbr.bbi_exe_mode"),
                                 ...,
                                 .overwrite = NULL,
                                 .config_path = NULL,
@@ -160,8 +161,8 @@ submit_nonmem_model <- function(.mod,
   # check against YAML
   check_yaml_in_sync(.mod)
 
-  # check for valid type arg
-  .mode <- match.arg(.mode)
+  # check for valid .mode arg
+  check_mode_argument(.mode)
 
   # build command line args
   .bbi_args <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])
@@ -253,4 +254,21 @@ submit_stan_model_cmdstanr <- function(.mod,
   build_stan_bbi_config(.mod)
 
   return(res)
+}
+
+#' Private helper to check if `.mode` arg to `submit_model()` is valid
+#' @param .mode argument to be checked
+#' @keywords internal
+check_mode_argument <- function(.mode) {
+  if (is.null(.mode)) {
+    stop(BBI_EXE_MODE_NULL_ERR_MSG, call. = FALSE)
+  }
+
+  checkmate::assert_string(.mode)
+
+  if (!(.mode %in% BBI_VALID_MODES)) {
+    stop(BBI_EXE_MODE_INVALID_ERR_MSG, call. = FALSE)
+  }
+
+  return(invisible(TRUE))
 }
