@@ -43,7 +43,8 @@ new_model <- function(
   .tags = NULL,
   .bbi_args = NULL,
   .overwrite = FALSE,
-  .model_type = c("nonmem", "stan")
+  .model_type = c("nonmem", "stan"),
+  ...
 ) {
 
   .model_type <- match.arg(.model_type)
@@ -58,6 +59,8 @@ new_model <- function(
     normalizePath(dirname(.path)),
     basename(.path)
   )
+
+  parse_new_model_dots(.model_type, abs_mod_path, ...)
 
   # create model object
   .mod <- list()
@@ -161,4 +164,76 @@ check_for_existing_model <- function(.path, .overwrite) {
       ))
     }
   }
+}
+
+#' Parse ... passed to new_model()
+#'
+#' @importFrom ellipsis check_dots_empty
+#' @keywords internal
+parse_new_model_dots <- function(.model_type, .path, ...) {
+  args <- list(...)
+
+  if (.model_type == "nonmem") {
+    if (length(args) > 0) {
+      stop(paste(
+        "You have passed extra arguments to `new_model()` via `...`, which is NOT valid for NONMEM models.",
+        NONMEM_MODEL_TYPE_ERR_MSG,
+        glue("The extra passed arguments are {paste(names(args), collapse = ', ')}"),
+        sep = "\n"), call. = FALSE)
+    }
+  } else if (.model_type == "stan") {
+    if (all(c("formula", "data") %in% names(args))) {
+      stan_files_from_brms(.path, args)
+    } else {
+      stop(paste(
+        "You have passed extra arguments to `new_model(.model_type = 'stan')` via `...`",
+        "This is used for constructing a `bbi_stan_model` with `brms` and REQUIRES both `formula` and `data` to be passed.",
+        glue("The extra passed arguments are {paste(names(args), collapse = ', ')}"),
+        sep = "\n"), call. = FALSE)
+    }
+  }
+}
+
+
+#' Write necessary stan files to disk from brms args
+#'
+#' @importFrom readr write_lines
+#'
+#' @param .path absolute model path (files will be created in this dir)
+#' @param args named list of arguments to pass to [brms::make_stancode] and [brms::make_standata]
+#' @keywords internal
+stan_files_from_brms <- function(.path, args) {
+  if (!requireNamespace("cmdstanr", quietly = TRUE)) {
+    stop("Must have cmdstanr installed to use create a `bbi_stan_model` with `brms`")
+  }
+  if (!requireNamespace("brms", quietly = TRUE)) {
+    stop("Must have brms installed to use create a `bbi_stan_model` with `brms`")
+  }
+  if (!fs::dir_exists(.path)) fs::dir_create(.path)
+
+  # write .stan file
+  stan_code <- do.call(brms::make_stancode, args)
+  write_lines(stan_code, build_path_from_model(.path, STANMOD_SUFFIX))
+
+  # write data file
+  stan_data <- do.call(brms::make_standata, args)
+  cmdstanr::write_stan_json(unclass(stan_data), build_path_from_model(.path, STANDATA_JSON_SUFFIX))
+
+  write_lines(
+    make_standata_r_from_brms_json(.path),
+    build_path_from_model(.path, STANDATA_R_SUFFIX)
+  )
+
+  # write inits?
+}
+
+#' Code gen make_standata() for data created by brms
+#' @param .path absolute model path
+#' @keywords internal
+make_standata_r_from_brms_json <- function(.path) {
+  paste0(
+    "# standata created by brms\n",
+    "make_standata <- function(.dir) {\n",
+    "  jsonlite::fromJSON(file.path(.dir, '", get_model_id(.path), STANDATA_JSON_SUFFIX, "'))\n",
+    "}")
 }

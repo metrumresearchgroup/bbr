@@ -1,0 +1,91 @@
+---
+title: "bbr-with-brms"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+This vignette demonstrates how to define and submit a model using `brms` and `bbr`. For more detail on modeling in Stan with `bbr`, see the ["Getting Started with bbr and Stan" vignette](https://metrumresearchgroup.github.io/bbr/articles/getting-started-stan.html).
+
+
+```{r, include=FALSE}
+# NOTE: if running chunks interactively we need to load the package first
+#   because renv isolation prevents us from finding an bbr installation
+if (interactive()) {
+  devtools::load_all()
+}
+```
+```{r load packages, results = 'hide', message=FALSE, warning=FALSE}
+library(bbr)
+library(brms)
+library(dplyr)
+library(purrr)
+```
+
+```{r define setup and cleanup}
+# TODO
+```
+
+# Define the model
+
+### Read in data
+```{r, message = F}
+redcard_data <- readr::read_csv(system.file("extdata", "redcard_sample.csv", package = "bbr"))
+head(redcard_data)
+```
+
+
+```{r}
+
+# define brms model
+formula <- brms::bf(
+  n_redcards | trials (n_games) ~ 0 + Intercept + rating,
+  family = binomial()
+)
+```
+
+
+### Add a prior
+
+```{r}
+brms::get_prior(formula, redcard_data)
+```
+
+```{r}
+prior <- c(
+  brms::set_prior("normal(0, 10)", coef = "Intercept"),
+  brms::set_prior("std_normal()", coef = "rating")
+)
+```
+
+### Create bbr model object
+
+```{r}
+# .path <- file.path(system.file("model", "stan", package = "bbr"), "redcard1")
+# 
+# args <- list(
+#   formula = formula,
+#   data = redcard_data,
+#   prior = prior
+# )
+# 
+# stan_code <- do.call(brms::make_standata, args)
+# stan_code
+```
+
+
+```{r}
+mod <- new_model(
+  "redcard1",
+  .model_type = "stan",
+  data = redcard_data,
+  formula = formula,
+  prior = prior
+)
+mod
+```
+

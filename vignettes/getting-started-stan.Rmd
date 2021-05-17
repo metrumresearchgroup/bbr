@@ -36,7 +36,6 @@ library(purrr)
 # Setup
 
 ```{r set paths and define cleanup, include = FALSE}
-#options('bbr.bbi_exe_path' = read_bbi_path())
 MODEL_DIR <- system.file("model", "stan", package = "bbr")
 # delete old files
 cleanup <- function() {
@@ -89,6 +88,7 @@ To begin modeling, first create a model object using `new_model()`. This is an S
 The first argument (`.path`) must be the path to the directory containing the necessary files. For Stan models, you will also have to add `.model_type = "stan"` to the the `new_model()` call.
 
 ```{r first model}
+MODEL_DIR <- system.file("model", "stan", package = "bbr")
 mod1 <- new_model(file.path(MODEL_DIR, "mod1"), .model_type = "stan")
 ```
 
