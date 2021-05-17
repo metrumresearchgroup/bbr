@@ -11,7 +11,6 @@ test_that("check_stan_object messages missing files", {
 
   fs::file_delete(get_model_path(.m))
   fs::file_delete(build_path_from_model(.m, STANDATA_R_SUFFIX))
-  fs::file_delete(build_path_from_model(.m, STANINIT_SUFFIX))
 
   for (.message in c(MISSING_STAN_FILES_ERR_MSG, STAN_MODEL_REQ_FILES)) {
     expect_message(

@@ -51,13 +51,23 @@ used to find data files for loading, for example \verb{read_csv(file.path(.dir, 
 submission or to compare the resulting data to previously saved data on disk.
 }
 
+\strong{Other Files and Directories}
+
+There will be several other things created in the model directory, as the
+model is run or as it prepares to run.
+
 \strong{\verb{<run>-init.R}} - This file contains all necessary R code to create the
-initial values passed to \code{cmdstanr::sample()}.
+initial values passed to \code{cmdstanr::sample()}. This file is a lot like
+\verb{<run>-standata.R} (discussed above) and a scaffold can be created with
+\code{\link[=add_stan_init]{add_stan_init()}}. However, this file is \emph{not} necessary. If it is missing,
+Stan will fall back to the \href{https://mc-stan.org/docs/2_25/reference-manual/initialization.html#random-initial-values}{default initial values}.
 \itemize{
 \item Contains only one function, called \code{make_init(.data)}, that takes a single
 argument and returns something that can be passed to the \code{init} argument of
 \code{cmdstanr::sample()}. There are several options; see \code{?cmdstanr::sample} for
 details.
+\item The object returned from \code{make_standata()} will be passed to the \code{.data}
+argument of \code{make_init()}.
 \item Will be called internally by \code{bbr} and the result passed to
 \code{cmdstanr::sample(init)}
 \item Note that one of the options \code{cmdstanr::sample(init)} is to pass \emph{"A
@@ -65,11 +75,6 @@ function that returns a single list..."}. If you intend to use this option,
 your \code{make_init()} function must return \emph{the function} described, \emph{not} the
 "single list...".
 }
-
-\strong{Other Files and Directories}
-
-There will be several other things created in the model directory, as the
-model is run or as it prepares to run.
 
 \strong{\verb{<run>-stanargs.R}} - A file to capture the arguments passed into
 \code{cmdstanr::sample()} (\code{nChains}, etc.) through \code{\link[=submit_model]{submit_model()}}. This

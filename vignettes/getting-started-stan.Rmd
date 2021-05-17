@@ -92,7 +92,7 @@ MODEL_DIR <- system.file("model", "stan", package = "bbr")
 mod1 <- new_model(file.path(MODEL_DIR, "mod1"), .model_type = "stan")
 ```
 
-The call above will look for a directory called `{MODEL_DIR}/mod1`. _Inside_ this directory it will expect to find files like `mod1.stan` and `mod1-standata.R`. These "required files" will be discussed in more detail below. For now notice that, if any of them are _not_ found when you initialize the model, `new_model()` will create scaffolds (files with boilerplate non-working code) of the missing files, and print a message to the console telling you it has done so.
+The call above will look for a directory called `{MODEL_DIR}/mod1`. _Inside_ this directory it will expect to find the files `mod1.stan` and `mod1-standata.R`. These "required files" will be discussed in more detail below. For now notice that, if either of them are _not_ found when you initialize the model, `new_model()` will create scaffolds (files with boilerplate non-working code) of the missing files, and print a message to the console telling you it has done so.
 
 You can use the `bbr::build_path_from_model()` function to take a look at any of these scaffolded files.
 
@@ -147,7 +147,7 @@ fxaInc <- read_model(file.path(MODEL_DIR, "fxaInc"))
 In this (somewhat contrived) example, we see three different messages:
 
 * The first tells us that we are missing the `-standata.R` file and points to helpful documentation for creating one.
-* The second tells us that the `-init.R` file is only a scaffold and must be completed from the model can be submitted.
+* The second tells us that the `-init.R` file is only a scaffold and must be completed before the model can be submitted.
 * And finally we're told that a scaffold has been added for the missing file(s) mentioned in the first message.
 
 ### Adding required files and using `check_stan_model()`
@@ -173,7 +173,6 @@ Now we run `check_stan_model()` we get a clean bill of health.
 ```{r}
 check_stan_model(fxaInc)
 ```
-
 
 
 ## Submit model
