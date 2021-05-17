@@ -58,7 +58,6 @@ test_that("add_stan_init() works correctly for scaffold", {
   on.exit(cleanup_model(.m))
 
   # check default
-  fs::file_delete(build_path_from_model(.m, STANINIT_SUFFIX))
   .m <- add_stan_init(.m)
   expect_equal(
     STANINIT_SCAFFOLD_MD5,

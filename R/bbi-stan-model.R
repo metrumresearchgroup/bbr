@@ -50,13 +50,25 @@
 #' * Can be called (by `bbr::build_data()`) to generate the data for model
 #' submission or to compare the resulting data to previously saved data on disk.
 #'
+#' **Other Files and Directories**
+#'
+#' There will be several other things created in the model directory, as the
+#' model is run or as it prepares to run.
+#'
 #' **`<run>-init.R`** - This file contains all necessary R code to create the
-#' initial values passed to `cmdstanr::sample()`.
+#' initial values passed to `cmdstanr::sample()`. This file is a lot like
+#' `<run>-standata.R` (discussed above) and a scaffold can be created with
+#' [add_stan_init()]. However, this file is _not_ necessary. If it is missing,
+#' Stan will fall back to the [default initial
+#' values](https://mc-stan.org/docs/2_25/reference-manual/initialization.html#random-initial-values).
 #'
 #' * Contains only one function, called `make_init(.data)`, that takes a single
 #' argument and returns something that can be passed to the `init` argument of
 #' `cmdstanr::sample()`. There are several options; see `?cmdstanr::sample` for
 #' details.
+#'
+#' * The object returned from `make_standata()` will be passed to the `.data`
+#' argument of `make_init()`.
 #'
 #' * Will be called internally by `bbr` and the result passed to
 #' `cmdstanr::sample(init)`
@@ -65,11 +77,6 @@
 #' function that returns a single list..."_. If you intend to use this option,
 #' your `make_init()` function must return _the function_ described, _not_ the
 #' "single list...".
-#'
-#' **Other Files and Directories**
-#'
-#' There will be several other things created in the model directory, as the
-#' model is run or as it prepares to run.
 #'
 #' **`<run>-stanargs.R`** - A file to capture the arguments passed into
 #' `cmdstanr::sample()` (`nChains`, etc.) through [bbr::submit_model()]. This

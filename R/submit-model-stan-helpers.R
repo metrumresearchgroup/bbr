@@ -14,8 +14,14 @@
 #'
 #' @keywords internal
 import_stan_init <- function(.mod, .standata) {
-  # source and call function
+  # check for <run>-init.R file
   staninit_path <- build_path_from_model(.mod, STANINIT_SUFFIX)
+  if (!fs::file_exists(staninit_path)) {
+    message(paste("Using default initial values because no file found at", staninit_path))
+    return(NULL)
+  }
+
+  # source and call function
   make_init <- safe_source_function(staninit_path, "make_init")
   init_res <- safe_call_sourced(
     .func = make_init,
