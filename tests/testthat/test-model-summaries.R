@@ -17,15 +17,14 @@ test_mod_sums <- function(mod_sums) {
   }
 }
 
-setup({
-  cleanup()
-  create_rlg_models()
-  fs::dir_copy(MOD1_PATH, NEW_MOD2)
-  fs::dir_copy(MOD1_PATH, NEW_MOD3)
-})
-teardown({
-  cleanup()
-})
+# setup
+cleanup()
+create_rlg_models()
+fs::dir_copy(MOD1_PATH, NEW_MOD2)
+fs::dir_copy(MOD1_PATH, NEW_MOD3)
+# teardown
+withr::defer(cleanup())
+
 
 withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
