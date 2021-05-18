@@ -282,11 +282,14 @@ copy_stan_files <- function(.parent_mod, .new_model, .overwrite) {
     )
   }
 
-  purrr::walk(STAN_MODEL_REQ_FILES, function(.s) {
-    fs::file_copy(
-      build_path_from_model(.parent_mod, .s),
-      build_path_from_new_model_path(.new_model, .s)
-    )
+  purrr::walk(STAN_MODEL_FILES_TO_CHECK, function(.s) {
+    parent_file <- build_path_from_model(.parent_mod, .s)
+    if (fs::file_exists(parent_file)) {
+      fs::file_copy(
+        parent_file,
+        build_path_from_new_model_path(.new_model, .s)
+      )
+    }
   })
 }
 

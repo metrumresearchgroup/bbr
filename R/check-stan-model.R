@@ -22,12 +22,8 @@ check_stan_model <- function(.mod, .error = FALSE) {
   if (!fs::dir_exists(model_dir)) fs::dir_create(model_dir)
 
   # check for files in output dir
-  files_to_check <- build_path_from_model(.mod, STAN_MODEL_REQ_FILES)
-  files_present <- fs::file_exists(files_to_check)
-  files_missing <- !files_present
-
+  files_missing <- !fs::file_exists(build_path_from_model(.mod, STAN_MODEL_REQ_FILES))
   problems <- NULL
-
   if (any(files_missing)) {
     problems <- paste(
       problems,
@@ -39,22 +35,19 @@ check_stan_model <- function(.mod, .error = FALSE) {
   }
 
   # checking if any of the files found are only scaffolds
-  if (any(files_present)) {
-    candidates <- names(which(files_present))
+  files_to_check <- build_path_from_model(.mod, STAN_MODEL_FILES_TO_CHECK)
+  scaffold_bool <- map_lgl(files_to_check, function(.f) {
+    tools::md5sum(.f) %in% STAN_SCAFFOLD_MD5_VEC
+  })
 
-    scaffold_bool <- map_lgl(candidates, function(.f) {
-      tools::md5sum(.f) %in% STAN_SCAFFOLD_MD5_VEC
-    })
-
-    if (any(scaffold_bool)) {
-      problems <- paste(
-        problems,
-        STAN_SCAFFOLD_ERR_MSG,
-        paste(paste0(" * ", candidates[scaffold_bool]), collapse = "\n"),
-        "Please add necessary code to the scaffolded files.\n",
-        sep = "\n"
-      )
-    }
+  if (any(scaffold_bool)) {
+    problems <- paste(
+      problems,
+      STAN_SCAFFOLD_ERR_MSG,
+      paste(paste0(" * ", files_to_check[scaffold_bool]), collapse = "\n"),
+      "Please add necessary code to the scaffolded files.\n",
+      sep = "\n"
+    )
   }
 
   if (!is.null(problems)) {
