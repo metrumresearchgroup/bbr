@@ -25,14 +25,12 @@ test_sum_df <- function(sum_df, .paths, .col_count) {
   expect_false(any(sum_df$minimization_terminated))
 }
 
-setup({
-  cleanup()
-  create_all_models()
-  copy_all_output_dirs()
-})
-teardown({
-  cleanup()
-})
+# setup
+cleanup()
+create_all_models()
+copy_all_output_dirs()
+# teardown
+withr::defer(cleanup())
 
 
 test_that("summary_log() returns NULL and warns when no YAML found", {

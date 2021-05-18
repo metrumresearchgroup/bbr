@@ -2,12 +2,9 @@ context("Test param_estimates functions")
 
 skip_if_not_drone_or_metworx("test-param-estimates")
 
-setup({
-  cleanup()
-})
-teardown({
-  cleanup()
-})
+# setup and teardown
+cleanup()
+withr::defer(cleanup())
 
 # build reference
 ref_df1 <- dget(PARAM_REF_FILE)

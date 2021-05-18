@@ -1,12 +1,10 @@
 context("model_diff() comparing models")
 
-setup({
-  cleanup()
-  create_all_models()
-})
-teardown({
-  cleanup()
-})
+# setup
+cleanup()
+create_all_models()
+# teardown
+withr::defer(cleanup())
 
 test_that("model_diff.bbi_nonmem_model happy path based_on", {
   res_object <- model_diff(read_model(MOD2_ABS_PATH))
