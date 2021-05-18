@@ -132,6 +132,11 @@ for (.tc in .test_cases) {
 test_that("check_nonmem_table_output() output matches ref df", {
   df <- check_nonmem_table_output(file.path(MOD1_PATH, paste0(MOD_ID, ".ext")), .x_var = "ITERATION")
   ref_df <- dget(EXT_REF_FLOOR_NULL)
+
+  # This mutate call is because of bug in testthat::expect_equal
+  # we can remove this when we switch to testthat 3e
+  df    <-      df %>% mutate(OBJ = round(OBJ, 5))
+  ref_df <- ref_df %>% mutate(OBJ = round(OBJ, 5))
   expect_equal(df, ref_df)
 
 })
@@ -139,6 +144,11 @@ test_that("check_nonmem_table_output() output matches ref df", {
 test_that("check_nonmem_table_output(.x_floor=0) works", {
   df <- check_nonmem_table_output(file.path(MOD1_PATH, paste0(MOD_ID, ".ext")), .x_var = "ITERATION", .x_floor = 0)
   ref_df <- dget(EXT_REF_FLOOR_0)
+
+  # This mutate call is because of bug in testthat::expect_equal
+  # we can remove this when we switch to testthat 3e
+  df    <-      df %>% mutate(OBJ = round(OBJ, 5))
+  ref_df <- ref_df %>% mutate(OBJ = round(OBJ, 5))
   expect_equal(df, ref_df)
 })
 
@@ -151,6 +161,11 @@ for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
     df <- check_ext(.tc[[".test_arg"]])
     ref_df <- dget(EXT_REF_FLOOR_0)
+
+    # This mutate call is because of bug in testthat::expect_equal
+    # we can remove this when we switch to testthat 3e
+    df    <-      df %>% mutate(OBJ = round(OBJ, 5))
+    ref_df <- ref_df %>% mutate(OBJ = round(OBJ, 5))
     expect_equal(df, ref_df)
 
     ref_df <- dget(EXT_REF_FLOOR_NULL)
@@ -162,6 +177,11 @@ test_that("check_ext() summary object", {
   skip_if_not_drone_or_metworx("check_ext() summary object")
   df <- check_ext(SUM1)
   ref_df <- dget(EXT_REF_FLOOR_0)
+
+  # This mutate call is because of bug in testthat::expect_equal
+  # we can remove this when we switch to testthat 3e
+  df    <-      df %>% mutate(OBJ = round(OBJ, 5))
+  ref_df <- ref_df %>% mutate(OBJ = round(OBJ, 5))
   expect_equal(df, ref_df)
 })
 
@@ -173,6 +193,11 @@ for (.tc in .test_cases) {
   test_that(.tc[[".test_name"]], {
     df <- check_ext(.tc[[".test_arg"]], .iter_floor = NULL)
     ref_df <- dget(EXT_REF_FLOOR_NULL)
+
+    # This mutate call is because of bug in testthat::expect_equal
+    # we can remove this when we switch to testthat 3e
+    df    <-      df %>% mutate(OBJ = round(OBJ, 5))
+    ref_df <- ref_df %>% mutate(OBJ = round(OBJ, 5))
     expect_equal(df, ref_df)
 
     ref_df <- dget(EXT_REF_FLOOR_0)
