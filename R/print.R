@@ -134,7 +134,10 @@ print.bbi_model <- function(x, ...) {
   bullet_list(get_model_path(x, .check_exists = FALSE))
   if (inherits(x, STAN_MOD_CLASS)) {
     bullet_list(build_path_from_model(x, STANDATA_R_SUFFIX))
-    bullet_list(build_path_from_model(x, STANINIT_SUFFIX))
+    for (.s in STAN_FILES_TO_PRINT) {
+      .f <- build_path_from_model(x, .s)
+      if (fs::file_exists(.f)) bullet_list(.f)
+    }
     check_stan_model(x)
   }
 
