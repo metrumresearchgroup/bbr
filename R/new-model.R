@@ -229,22 +229,5 @@ stan_files_from_brms <- function(.path, args) {
   # write data file
   stan_data <- do.call(brms::make_standata, args)
   cmdstanr::write_stan_json(unclass(stan_data), build_path_from_model(.path, STANDATA_JSON_SUFFIX))
-
-  write_lines(
-    make_standata_r_from_brms_json(.path),
-    build_path_from_model(.path, STANDATA_R_SUFFIX)
-  )
-
-  # write inits?
-}
-
-#' Code gen make_standata() for data created by brms
-#' @param .path absolute model path
-#' @keywords internal
-make_standata_r_from_brms_json <- function(.path) {
-  paste0(
-    "# standata created by brms\n",
-    "make_standata <- function(.dir) {\n",
-    "  jsonlite::fromJSON(file.path(.dir, '", get_model_id(.path), STANDATA_JSON_SUFFIX, "'))\n",
-    "}")
+  write_lines(STANDATA_BRMS_COMMENT, build_path_from_model(.path, STANDATA_R_SUFFIX))
 }

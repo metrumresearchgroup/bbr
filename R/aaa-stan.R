@@ -28,6 +28,8 @@ STANCFG_ARGS_MD5 <- "stanargs_md5"
 
 STAN_BBI_VERSION_STRING <- "STAN"
 
+STANDATA_BRMS_COMMENT <- "# standata created by brms"
+
 ############
 # SCAFFOLDS
 ############
