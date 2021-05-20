@@ -24,10 +24,19 @@ library(bbr)
 library(brms)
 library(dplyr)
 library(purrr)
+
+MODEL_DIR <- system.file("model", "stan", package = "bbr")
 ```
 
 ```{r define setup and cleanup}
-# TODO
+cleanup <- function() {
+  # delete demo model, if it exists
+  redcard_path <- file.path(MODEL_DIR, "redcard1")
+  if (fs::dir_exists(redcard_path)) fs::dir_delete(redcard_path)
+  if (fs::file_exists(yaml_ext(redcard_path))) fs::file_delete(yaml_ext(redcard_path))
+}
+
+cleanup()
 ```
 
 # Define the model
@@ -65,27 +74,79 @@ prior <- c(
 ### Create bbr model object
 
 ```{r}
-# .path <- file.path(system.file("model", "stan", package = "bbr"), "redcard1")
-# 
-# args <- list(
-#   formula = formula,
-#   data = redcard_data,
-#   prior = prior
-# )
-# 
-# stan_code <- do.call(brms::make_standata, args)
-# stan_code
-```
-
-
-```{r}
 mod <- new_model(
-  "redcard1",
+  file.path(MODEL_DIR, "redcard1"),
   .model_type = "stan",
   data = redcard_data,
   formula = formula,
   prior = prior
 )
 mod
+```
+
+### Submit the model to be run
+
+```{r}
+fit <- mod %>%
+  submit_model(
+    seed = 123,
+    chains = 4,
+    iter_warmup = 200,
+    iter_sampling = 200,
+    parallel_chains = 2
+  )
+```
+
+```{r}
+print(fit)
+```
+
+
+# Other options
+
+Showing some other stuff that can happen...
+
+```{r}
+mod2 <- copy_model_from(mod, "redcard2", .overwrite = T)
+```
+
+
+
+### Adding initial values
+
+This won't work.
+
+```{r}
+fit2 <- mod2 %>%
+  submit_model(
+    init = 0,
+    seed = 123,
+    chains = 4,
+    iter_warmup = 200,
+    iter_sampling = 200,
+    parallel_chains = 2
+  )
+```
+
+Instead do this:
+
+```{r}
+mod2 <- mod2 %>% 
+  add_stan_init(.source_file = file.path(MODEL_DIR, "fxa", "fxa-init.R"))
+
+fit2 <- mod2 %>%
+  submit_model(
+    seed = 123,
+    chains = 4,
+    iter_warmup = 200,
+    iter_sampling = 200,
+    parallel_chains = 2,
+    .overwrite = T
+  )
+```
+
+
+```{r}
+cleanup()
 ```
 
