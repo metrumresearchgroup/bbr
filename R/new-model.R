@@ -60,19 +60,28 @@ new_model <- function(
     basename(.path)
   )
 
-  parse_new_model_dots(.model_type, abs_mod_path, ...)
+  tryCatch({
+      parse_new_model_dots(.model_type, abs_mod_path, ...)
 
-  # create model object
-  .mod <- list()
-  .mod[[ABS_MOD_PATH]] <- abs_mod_path
-  .mod[[YAML_MOD_TYPE]] <- .model_type
-  .mod <- create_model_object(.mod, save_yaml = TRUE)
+      # create model object
+      .mod <- list()
+      .mod[[ABS_MOD_PATH]] <- abs_mod_path
+      .mod[[YAML_MOD_TYPE]] <- .model_type
+      .mod <- create_model_object(.mod, save_yaml = TRUE)
 
-  # update model from passed args
-  if (!is.null(.description)) .mod <- replace_description(.mod, .description)
-  if (!is.null(.tags))        .mod <- replace_all_tags(.mod, .tags)
-  if (!is.null(.bbi_args))    .mod <- replace_all_bbi_args(.mod, .bbi_args)
-  if (!is.null(.based_on))    .mod <- replace_all_based_on(.mod, .based_on)
+      # update model from passed args
+      if (!is.null(.description)) .mod <- replace_description(.mod, .description)
+      if (!is.null(.tags))        .mod <- replace_all_tags(.mod, .tags)
+      if (!is.null(.bbi_args))    .mod <- replace_all_bbi_args(.mod, .bbi_args)
+      if (!is.null(.based_on))    .mod <- replace_all_based_on(.mod, .based_on)
+    },
+    error = function(.e) {
+      if (fs::dir_exists(abs_mod_path)) fs::dir_delete(abs_mod_path)
+      files_to_kill <- c(yaml_ext(abs_mod_path), ctl_ext(abs_mod_path), mod_ext(abs_mod_path))
+      purrr::walk(files_to_kill, ~ {if (fs::file_exists(.x)) fs::file_delete(.x)})
+      stop(paste("new_model() failed for", abs_mod_path, "with the following error:\n", paste(.e, collapse = "\n")))
+    }
+  )
 
   return(.mod)
 }
@@ -182,14 +191,16 @@ parse_new_model_dots <- function(.model_type, .path, ...) {
         sep = "\n"), call. = FALSE)
     }
   } else if (.model_type == "stan") {
-    if (all(c("formula", "data") %in% names(args))) {
-      stan_files_from_brms(.path, args)
-    } else {
-      stop(paste(
-        "You have passed extra arguments to `new_model(.model_type = 'stan')` via `...`",
-        "This is used for constructing a `bbi_stan_model` with `brms` and REQUIRES both `formula` and `data` to be passed.",
-        glue("The extra passed arguments are {paste(names(args), collapse = ', ')}"),
-        sep = "\n"), call. = FALSE)
+    if (length(args) > 0) {
+      if (all(c("formula", "data") %in% names(args))) {
+        stan_files_from_brms(.path, args)
+      } else {
+        stop(paste(
+          "You have passed extra arguments to `new_model(.model_type = 'stan')` via `...`",
+          "This is used for constructing a `bbi_stan_model` with `brms` and REQUIRES both `formula` and `data` to be passed.",
+          glue("The extra passed arguments are {paste(names(args), collapse = ', ')}"),
+          sep = "\n"), call. = FALSE)
+      }
     }
   }
 }
