@@ -3,11 +3,14 @@
 \name{build_path_from_model}
 \alias{build_path_from_model}
 \alias{build_path_from_model.bbi_model}
+\alias{build_path_from_model.character}
 \title{Build path to output file}
 \usage{
 build_path_from_model(.mod, .suffix, ...)
 
 \method{build_path_from_model}{bbi_model}(.mod, .suffix, ...)
+
+\method{build_path_from_model}{character}(.mod, .suffix, ...)
 }
 \arguments{
 \item{.mod}{Model to use, either a \verb{bbi_\{.model_type\}_model} or \verb{bbi_\{.model_type\}_summary} object.}
@@ -25,6 +28,13 @@ Does \emph{not} check whether the file exists.
 \description{
 Builds the absolute path to a file in the output directory from components of the \verb{bbi_\{.model_type\}_model} object
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{bbi_model}: Takes any \code{bbi_model} object
+
+\item \code{character}: Takes an absolute model path (without file extension)
+}}
+
 \examples{
 .mod <- read_model(
   system.file("model", "nonmem", "basic", "1", package = "bbr")

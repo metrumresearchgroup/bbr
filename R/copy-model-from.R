@@ -291,6 +291,16 @@ copy_stan_files <- function(.parent_mod, .new_model, .overwrite) {
       )
     }
   })
+
+  # if -standata.R is a brms stub, copy through -standata.json
+  parent_standata_r_path <- build_path_from_model(.parent_mod, STANDATA_R_SUFFIX)
+  parent_standata_json_path <- build_path_from_model(.parent_mod, STANDATA_JSON_SUFFIX)
+  if (file_matches_string(parent_standata_r_path, STANDATA_BRMS_COMMENT)) {
+    fs::file_copy(
+      parent_standata_json_path,
+      build_path_from_new_model_path(.new_model, STANDATA_JSON_SUFFIX)
+    )
+  }
 }
 
 #' Private helper to build absolute path for [copy_model_from()].

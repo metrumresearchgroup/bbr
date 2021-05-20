@@ -16,6 +16,12 @@ STAN_MODEL_FILES_TO_CHECK <- c(
   STANINIT_SUFFIX
 )
 
+STAN_FILES_TO_PRINT <- c(
+  STANINIT_SUFFIX,
+  STANARGS_SUFFIX,
+  STAN_MODEL_FIT_RDS
+)
+
 STAN_RESERVED_ARGS <- c(
   "data",
   "init",
@@ -27,6 +33,8 @@ STANCFG_INIT_MD5 <- "init_script_md5"
 STANCFG_ARGS_MD5 <- "stanargs_md5"
 
 STAN_BBI_VERSION_STRING <- "STAN"
+
+STANDATA_BRMS_COMMENT <- "# standata created by brms"
 
 ############
 # SCAFFOLDS

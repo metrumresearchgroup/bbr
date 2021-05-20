@@ -62,8 +62,9 @@ parse_stanargs <- function(.mod, valid_stanargs, ...) {
   if (any(names(stanargs) %in% STAN_RESERVED_ARGS)) {
     stop(paste(
       "Cannot pass any of the following through submit_model() to cmdstanr",
-      glue("because they are parsed internally from the model object: {paste(STAN_RESERVED_ARGS, collapse = ', ')}")
-    ))
+      glue("because they are parsed internally from the model object: {paste(STAN_RESERVED_ARGS, collapse = ', ')} --\n"),
+      "Use add_standata_file() or add_stan_init() instead. See ?bbi_stan_model for more details."
+    ), call. = FALSE)
   }
 
   invalid_stanargs <- setdiff(names(stanargs), valid_stanargs)

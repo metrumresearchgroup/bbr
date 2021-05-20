@@ -1,7 +1,7 @@
 Type: Package
 Package: bbr
 Title: R package for bbi
-Version: 1.1.2.9000
+Version: 1.1.2.9001
 Authors@R: 
     c(person(given = "Devin",
              family = "Pastoor",
@@ -34,6 +34,7 @@ License: MIT + file LICENSE
 Depends:
     R (>= 3.5)
 Imports: 
+    brms,
     checkmate,
     cli,
     digest,

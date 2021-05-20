@@ -121,7 +121,7 @@ test_that("new_model() .based_on arg works", {
 test_that("new_model() .based_on arg errors on fake model", {
   temp_mod_path <- ctl_ext(tempfile())
   writeLines("CREATED BY: new_model() .based_on arg errors on fake model", temp_mod_path)
-  on.exit(fs::file_delete(temp_mod_path))
+  on.exit(if(fs::file_exists(temp_mod_path)) fs::file_delete(temp_mod_path))
 
   # create new model with args
   expect_error(

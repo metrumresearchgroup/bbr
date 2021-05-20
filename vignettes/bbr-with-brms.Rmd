@@ -1,0 +1,152 @@
+---
+title: "bbr-with-brms"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+This vignette demonstrates how to define and submit a model using `brms` and `bbr`. For more detail on modeling in Stan with `bbr`, see the ["Getting Started with bbr and Stan" vignette](https://metrumresearchgroup.github.io/bbr/articles/getting-started-stan.html).
+
+
+```{r, include=FALSE}
+# NOTE: if running chunks interactively we need to load the package first
+#   because renv isolation prevents us from finding an bbr installation
+if (interactive()) {
+  devtools::load_all()
+}
+```
+```{r load packages, results = 'hide', message=FALSE, warning=FALSE}
+library(bbr)
+library(brms)
+library(dplyr)
+library(purrr)
+
+MODEL_DIR <- system.file("model", "stan", package = "bbr")
+```
+
+```{r define setup and cleanup}
+cleanup <- function() {
+  # delete demo model, if it exists
+  redcard_path <- file.path(MODEL_DIR, "redcard1")
+  if (fs::dir_exists(redcard_path)) fs::dir_delete(redcard_path)
+  if (fs::file_exists(yaml_ext(redcard_path))) fs::file_delete(yaml_ext(redcard_path))
+}
+
+cleanup()
+```
+
+# Define the model
+
+### Read in data
+```{r, message = F}
+redcard_data <- readr::read_csv(system.file("extdata", "redcard_sample.csv", package = "bbr"))
+head(redcard_data)
+```
+
+
+```{r}
+
+# define brms model
+formula <- brms::bf(
+  n_redcards | trials (n_games) ~ 0 + Intercept + rating,
+  family = binomial()
+)
+```
+
+
+### Add a prior
+
+```{r}
+brms::get_prior(formula, redcard_data)
+```
+
+```{r}
+prior <- c(
+  brms::set_prior("normal(0, 10)", coef = "Intercept"),
+  brms::set_prior("std_normal()", coef = "rating")
+)
+```
+
+### Create bbr model object
+
+```{r}
+mod <- new_model(
+  file.path(MODEL_DIR, "redcard1"),
+  .model_type = "stan",
+  data = redcard_data,
+  formula = formula,
+  prior = prior
+)
+mod
+```
+
+### Submit the model to be run
+
+```{r}
+fit <- mod %>%
+  submit_model(
+    seed = 123,
+    chains = 4,
+    iter_warmup = 200,
+    iter_sampling = 200,
+    parallel_chains = 2
+  )
+```
+
+```{r}
+print(fit)
+```
+
+
+# Other options
+
+Showing some other stuff that can happen...
+
+```{r}
+mod2 <- copy_model_from(mod, "redcard2", .overwrite = T)
+```
+
+
+
+### Adding initial values
+
+This won't work.
+
+```{r}
+fit2 <- mod2 %>%
+  submit_model(
+    init = 0,
+    seed = 123,
+    chains = 4,
+    iter_warmup = 200,
+    iter_sampling = 200,
+    parallel_chains = 2
+  )
+```
+
+Instead do this:
+
+```{r}
+mod2 <- mod2 %>% 
+  add_stan_init(.source_file = file.path(MODEL_DIR, "fxa", "fxa-init.R"))
+
+fit2 <- mod2 %>%
+  submit_model(
+    seed = 123,
+    chains = 4,
+    iter_warmup = 200,
+    iter_sampling = 200,
+    parallel_chains = 2,
+    .overwrite = T
+  )
+```
+
+
+```{r}
+cleanup()
+```
+
