@@ -1,11 +1,10 @@
 context("Constructing run log from model yaml")
 
-setup({
-  cleanup()
-  create_rlg_models()
-})
-
-teardown({ cleanup() })
+# setup
+cleanup()
+create_rlg_models()
+# teardown
+withr::defer(cleanup())
 
 test_that("run_log() errors with malformed YAML", {
   temp_dir <- file.path(tempdir(), "run_log_malformed_yaml_test")

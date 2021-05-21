@@ -56,19 +56,16 @@ check_config_ref <- function(log_df, run_nums, col_count, run_status) {
   )
 }
 
-# TODO: replace setup() and teardown() with 3e test fixtures
-setup({
-  cleanup()
+# setup
+cleanup()
+create_rlg_models()
+# copy model 1 to level deeper
+fs::dir_create(LEVEL2_DIR)
+copy_model_from(MOD1, file.path(LEVEL2_SUBDIR, MOD_ID), "level 2 copy of 1.yaml", .inherit_tags = TRUE)
+copy_all_output_dirs()
 
-  create_rlg_models()
-
-  # copy model 1 to level deeper
-  fs::dir_create(LEVEL2_DIR)
-  copy_model_from(MOD1, file.path(LEVEL2_SUBDIR, MOD_ID), "level 2 copy of 1.yaml", .inherit_tags = TRUE)
-  copy_all_output_dirs()
-})
-
-teardown({ cleanup() })
+# teardown
+withr::defer(cleanup())
 
 test_that("config_log() returns NULL and warns when no YAML found", {
   log_df <- expect_warning(config_log("."), regexp = "Found no valid model YAML files in")

@@ -1,11 +1,10 @@
 context("Collapse columns to string representation")
 
-setup({
-  cleanup()
-  create_rlg_models()
-})
-
-teardown({ cleanup() })
+# setup
+cleanup()
+create_rlg_models()
+# teardown
+withr::defer(cleanup())
 
 test_that("collapse_to_string() works correctly", {
   # add a note to collapse
