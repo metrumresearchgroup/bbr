@@ -26,10 +26,6 @@ batch_param_estimates <- function(
   .dry_run = FALSE
 ){
 
-  if(.dry_run){
-    print('dry')
-  }
-
   if(!dir_exists(.path)){
     err_msg <- glue("batch_parameter_estimates('{.path}') failed; unable to locate {.path}")
     stop(err_msg, call. = FALSE)
