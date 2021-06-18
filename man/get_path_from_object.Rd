@@ -5,10 +5,14 @@
 \alias{get_model_path}
 \alias{get_model_path.bbi_nonmem_model}
 \alias{get_model_path.bbi_nonmem_summary}
+\alias{get_model_path.bbi_stan_model}
+\alias{get_model_path.bbi_stan_summary}
 \alias{get_model_path.bbi_log_df}
 \alias{get_output_dir}
 \alias{get_output_dir.bbi_nonmem_model}
 \alias{get_output_dir.bbi_nonmem_summary}
+\alias{get_output_dir.bbi_stan_model}
+\alias{get_output_dir.bbi_stan_summary}
 \alias{get_output_dir.bbi_log_df}
 \alias{get_yaml_path}
 \alias{get_yaml_path.bbi_model}
@@ -21,6 +25,10 @@ get_model_path(.bbi_object, .check_exists = TRUE)
 
 \method{get_model_path}{bbi_nonmem_summary}(.bbi_object, .check_exists = TRUE)
 
+\method{get_model_path}{bbi_stan_model}(.bbi_object, .check_exists = TRUE)
+
+\method{get_model_path}{bbi_stan_summary}(.bbi_object, .check_exists = TRUE)
+
 \method{get_model_path}{bbi_log_df}(.bbi_object, .check_exists = TRUE)
 
 get_output_dir(.bbi_object, .check_exists = TRUE)
@@ -28,6 +36,10 @@ get_output_dir(.bbi_object, .check_exists = TRUE)
 \method{get_output_dir}{bbi_nonmem_model}(.bbi_object, .check_exists = TRUE)
 
 \method{get_output_dir}{bbi_nonmem_summary}(.bbi_object, .check_exists = TRUE)
+
+\method{get_output_dir}{bbi_stan_model}(.bbi_object, .check_exists = TRUE)
+
+\method{get_output_dir}{bbi_stan_summary}(.bbi_object, .check_exists = TRUE)
 
 \method{get_output_dir}{bbi_log_df}(.bbi_object, .check_exists = TRUE)
 
@@ -51,7 +63,8 @@ provide an easy way to retrieve the absolute path to these files.
 }
 \details{
 \strong{\code{get_model_path()}} returns the path to the model definition file.
-For NONMEM models, this is the control stream.
+For NONMEM models, this is the control stream. For Stan models,
+this is the \code{.stan} file.
 
 \strong{\code{get_output_dir()}} returns the path to the directory containing
 output files created when the model is run.

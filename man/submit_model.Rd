@@ -3,6 +3,7 @@
 \name{submit_model}
 \alias{submit_model}
 \alias{submit_model.bbi_nonmem_model}
+\alias{submit_model.bbi_stan_model}
 \title{Submit a model to be run}
 \usage{
 submit_model(
@@ -10,6 +11,7 @@ submit_model(
   .bbi_args = NULL,
   .mode = getOption("bbr.bbi_exe_mode"),
   ...,
+  .overwrite = NULL,
   .config_path = NULL,
   .wait = TRUE,
   .dry_run = FALSE
@@ -20,9 +22,21 @@ submit_model(
   .bbi_args = NULL,
   .mode = getOption("bbr.bbi_exe_mode"),
   ...,
+  .overwrite = NULL,
   .config_path = NULL,
   .wait = TRUE,
   .dry_run = FALSE
+)
+
+\method{submit_model}{bbi_stan_model}(
+  .mod,
+  .bbi_args = NULL,
+  .mode = c("local"),
+  ...,
+  .overwrite = NULL,
+  .config_path = NULL,
+  .wait = NULL,
+  .dry_run = NULL
 )
 }
 \arguments{
@@ -37,7 +51,15 @@ global YAML files).}
 \code{"local"} for local execution. This can be passed directly to this argument
 or set globally with \code{options("bbr.bbi_exe_mode")}.}
 
-\item{...}{args passed through to \code{bbi_exec()}}
+\item{...}{args passed through. For \code{bbi_stan_model} this is how you pass
+arguments through to the \verb{$sample()} method of your \code{cmdstanr} model
+object. See \code{\link[cmdstanr:model-method-sample]{cmdstanr::sample()}} for valid arguments and details. For
+\code{bbi_nonmem_model} these are passed to \code{bbi_exec()}.}
+
+\item{.overwrite}{Logical to specify whether or not to overwrite existing
+model output from a previous run. If \code{NULL}, the default, will defer to
+setting in \code{.bbi_args} or \code{bbi.yaml}. If \emph{not} \code{NULL} will override any
+settings in \code{.bbi_args} or \code{bbi.yaml}.}
 
 \item{.config_path}{Path to a bbi configuration file. If \code{NULL}, the
 default, will attempt to use a \code{bbi.yaml} in the same directory as the
@@ -51,12 +73,58 @@ bbi process runs in the background.}
 insted of running it. This is primarily for testing but also a debugging
 tool.}
 }
+\value{
+While \code{submit_model()} \emph{does} return something, it is primarily
+called for its side effects, specifically that it runs the model and writes
+all model outputs to disk under \code{get_output_dir(.mod)}.
+
+\strong{NONMEM}
+For NONMEM models, a \code{bbi_process} object is returned. The typical NONMEM
+output files are all written into \code{get_output_dir(.mod)}. A summary of the
+contents of these files can be accessed with \code{\link[=model_summary]{model_summary()}}, and the path
+to individual files can be easily constructed like
+\code{build_path_from_model(.mod, ".lst")}.
+
+A \code{bbi_config.json} file is also written, which stores information about the
+configuration of the run. See \code{\link[=config_log]{config_log()}} for more details about this
+file.
+
+\strong{Stan}
+For Stan models, a \code{cmdstanr} fit object of class \code{"CmdStanMCMC"} is
+returned. See the \code{?cmdstanr::CmdStanMCMC} docs for methods and information
+on this object. This can be reloaded from disk later with \code{\link[=read_fit_model]{read_fit_model()}}.
+Additionally, the following files are written to disk:
+\itemize{
+\item In the model directory:
+\itemize{
+\item \verb{<run>-standata.json} -- This is the exact data that is passed to
+\code{cmdstanr}, written to disk automatically with
+\code{cmdstanr::write_stan_json()}.
+\item \verb{<run>-stanargs.R} -- This captures the arguments that were passed
+through to \code{cmdstanr::sample()}, for later reproducibility of this run.
+\item \verb{<run>} -- The binary compiled Stan model. This is added to \code{.gitignore}
+automatically.
+}
+\item In the output directory (\verb{<run>-output/}):
+\itemize{
+\item \code{fit.RDS} -- The \code{cmdstanr} fit object. Can be reloaded with
+\code{\link[=read_fit_model]{read_fit_model()}} as described above.
+\item \code{bbi_config.json} -- stores information about the configuration of the run.
+See \code{\link[=config_log]{config_log()}} for more details about this file.
+\item \verb{<run>-<timestamp>-<chain>-<random_id>.csv} -- CSV files of the posteriors,
+written out by \code{cmdstanr}. These are automatically added to \code{.gitignore}.
+}
+}
+}
 \description{
 Submits a model to be run by calling out to \code{bbi}.
 }
 \section{Methods (by class)}{
 \itemize{
 \item \code{bbi_nonmem_model}: Takes a \code{bbi_nonmem_model} object.
+
+\item \code{bbi_stan_model}: Takes a \code{bbi_stan_model} object. All arguments
+passed through \code{...} will be passed to \code{\link[cmdstanr:model-method-sample]{cmdstanr::sample()}} method.
 }}
 
 \seealso{

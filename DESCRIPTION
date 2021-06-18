@@ -1,7 +1,7 @@
 Type: Package
 Package: bbr
 Title: R package for bbi
-Version: 1.1.2.7000
+Version: 1.1.2.9000
 Authors@R: 
     c(person(given = "Devin",
              family = "Pastoor",
@@ -39,6 +39,7 @@ Imports:
     digest,
     diffobj,
     dplyr (>= 0.8.0),
+    ellipsis,
     forcats,
     fs,
     ggplot2,
@@ -57,9 +58,11 @@ Imports:
     xfun,
     yaml
 Suggests: 
+    cmdstanr,
     covr,
     devtools,
     knitr,
+    methods,
     rmarkdown,
     testthat (>= 2.1.0),
     withr

@@ -78,7 +78,12 @@ find_models <- function(.base_dir, .recurse) {
 
 #' Read in model YAML with error handling
 #'
-#' Private helper function that tries to call `read_model()` on a yaml path and returns NULL, with no error, if the YAML is not a valid model file.
+#' Private helper function that tries to call [read_model()] on a yaml path and
+#' returns NULL, with no error, if the YAML is not a valid model file. Also
+#' wraps [read_model()] in `suppressMessages()` so that things like the
+#' [check_stan_model()] messages will be suppressed. This is done because this
+#' function is primarily used when mapping over a number of models and these
+#' messages can be very annoying and mostly pointless in that context.
 #'
 #' @inheritParams read_model
 #'
@@ -86,7 +91,7 @@ find_models <- function(.base_dir, .recurse) {
 #' @keywords internal
 safe_read_model <- function(.path) {
   tryCatch(
-    read_model(.path),
+    suppressMessages(read_model(.path)),
     error = function(e) {
       if (stringr::str_detect(e$message, "Model list must have keys")) {
         return(NULL)

@@ -9,6 +9,7 @@ Packages:
 
 Repos:
   - CRAN: https://cran.rstudio.com
+  - MPN: https://mpn.metworx.com/snapshots/stable/2021-03-08
 
 Lockfile:
   Type: renv

@@ -33,9 +33,9 @@ check_config_ref <- function(log_df, run_nums, col_count, run_status) {
   expect_false(any(duplicated(log_df[[ABS_MOD_PATH]])))
 
   # these are the same because bbi_config.json was just copied through
-  expect_identical(log_df$data_md5, rep(CONFIG_DATA_MD5, run_count))
-  expect_identical(log_df$data_path, rep(CONFIG_DATA_PATH, run_count))
-  expect_identical(log_df$model_md5, rep(CONFIG_MODEL_MD5, run_count))
+  expect_identical(log_df$data_md5, rep(CONFIG_DATA_MD5_REF, run_count))
+  expect_identical(log_df$data_path, rep(CONFIG_DATA_PATH_REF, run_count))
+  expect_identical(log_df$model_md5, rep(CONFIG_MODEL_MD5_REF, run_count))
 
   base_path <- fs::path_common(log_df[["absolute_model_path"]])
 
@@ -161,15 +161,15 @@ test_that("add_config() works correctly with missing json", {
   # config log fields
   expect_identical(
     log_df[["data_md5"]],
-    rep_missing(CONFIG_DATA_MD5, missing_idx, 4L)
+    rep_missing(CONFIG_DATA_MD5_REF, missing_idx, 4L)
   )
   expect_identical(
     log_df[["data_path"]],
-    rep_missing(CONFIG_DATA_PATH, missing_idx, 4L)
+    rep_missing(CONFIG_DATA_PATH_REF, missing_idx, 4L)
   )
   expect_identical(
     log_df[["model_md5"]],
-    rep_missing(CONFIG_MODEL_MD5, missing_idx, 4L)
+    rep_missing(CONFIG_MODEL_MD5_REF, missing_idx, 4L)
   )
   expect_identical(
     log_df[["bbi_version"]],
@@ -214,3 +214,26 @@ test_that("add_config() works no json found", {
   expect_equal(nrow(log_df), 1)
   expect_true(all(c(ABS_MOD_PATH, RUN_ID_COL, YAML_TAGS) %in% names(log_df)))
 })
+
+test_that("config_log() works with Stan", {
+  skip_if_no_stan("config_log() works with Stan")
+  log_df <- config_log(STAN_ABS_MODEL_DIR)
+  expect_equal(log_df[[RUN_ID_COL]], STAN_MOD_ID)
+  expect_equal(log_df[['bbi_version']], STAN_BBI_VERSION_STRING)
+  expect_false(log_df[['model_has_changed']])
+  expect_false(log_df[['data_has_changed']])
+})
+
+test_that("config_log() builds Stan data", {
+  skip_if_no_stan("config_log() builds Stan data")
+  perturb_file(
+    system.file("extdata", "fxa.data.csv", package = "bbr"),
+    content = paste(rep(99, 8), collapse = ",")
+  )
+  log_df <- config_log(STAN_ABS_MODEL_DIR)
+  expect_equal(log_df[[RUN_ID_COL]], STAN_MOD_ID)
+  expect_equal(log_df[['bbi_version']], STAN_BBI_VERSION_STRING)
+  expect_false(log_df[['model_has_changed']])
+  expect_true(log_df[['data_has_changed']])
+})
+

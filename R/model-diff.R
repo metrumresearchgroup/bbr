@@ -25,7 +25,11 @@
 #'
 #' * `bbi_nonmem_model`
 #'   * `"model"` compares the control streams
-#' * Currently only NONMEM is implemented.
+#' * `bbi_stan_model`
+#'   * `"model"` (default) compares `<run>.stan` files
+#'   * `"standata"` compares `<run>-standata.R` files
+#'   * `"init"` compares `<run>-init.R` files
+#'   * `"stanargs"` compares `<run>-stanargs.R` files
 #'
 #' @return Returns a `"Diff"` object from the `diffobj` package that renders
 #'   when printed or called in the console.
@@ -66,6 +70,30 @@ model_diff.bbi_nonmem_model <- function(
   model_diff_impl(.file1, .file2, .viewer = .viewer)
 }
 
+#' @rdname model_diff
+#' @export
+model_diff.bbi_stan_model <- function(
+  .mod,
+  .mod2 = NULL,
+  .file = c("model", "standata", "init", "stanargs"),
+  ...,
+  .viewer = FALSE
+) {
+  .file <- match.arg(.file)
+
+  .mod2 <- model_diff_get_comp(.mod, .mod2)
+
+  diff_args <- map(list(.mod, .mod2), function(.m) {
+    if (.file == "model") {
+      return(build_path_from_model(.m, ".stan"))
+    } else {
+      return(build_path_from_model(.m, glue("-{.file}.R")))
+    }
+  })
+
+  diff_args[[".viewer"]] <- .viewer
+  do.call(model_diff_impl, diff_args)
+}
 
 ###################################
 # PRIVATE IMPLEMENTATION FUNCTIONS

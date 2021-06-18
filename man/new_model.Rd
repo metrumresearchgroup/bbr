@@ -11,7 +11,7 @@ new_model(
   .tags = NULL,
   .bbi_args = NULL,
   .overwrite = FALSE,
-  .model_type = c("nonmem")
+  .model_type = c("nonmem", "stan")
 )
 }
 \arguments{
@@ -38,7 +38,8 @@ into YAML file.}
 they exist.}
 
 \item{.model_type}{Character scaler to specify type of model being created
-(used for S3 class). Currently only \code{'nonmem'} is supported.}
+(used for S3 class). Currently only \code{'nonmem'} and \code{'stan'} are supported.
+Defaults to \code{'nonmem'} to preserve legacy API.}
 }
 \value{
 S3 object of class \verb{bbi_\{.model_type\}_model} that can be passed to

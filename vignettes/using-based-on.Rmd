@@ -93,7 +93,7 @@ tags_diff(mod2)
 model_diff(mod2)
 ```
 
-By default both functions compare the model to whatever model is returned from `get_based_on()`, but they also have a `.mod2` argument which can take any arbitrary model object and compare with that instead. See `?tags_diff` and `?model_diff` for more details on usage.
+By default both functions compare the model to whatever model is returned from `get_based_on()`, but they also have a `.mod2` argument which can take any arbitrary model object and compare with that instead. See [`?tags_diff`](https://metrumresearchgroup.github.io/bbr/reference/tags_diff.html) and [`?model_diff`](https://metrumresearchgroup.github.io/bbr/reference/model_diff.html) for more details on usage.
 
 ## More iteration
 

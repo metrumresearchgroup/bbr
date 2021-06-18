@@ -3,11 +3,20 @@
 \name{model_diff}
 \alias{model_diff}
 \alias{model_diff.bbi_nonmem_model}
+\alias{model_diff.bbi_stan_model}
 \title{Compare model files between models}
 \usage{
 model_diff(.mod, .mod2 = NULL, .file = "model", ..., .viewer = FALSE)
 
 \method{model_diff}{bbi_nonmem_model}(.mod, .mod2 = NULL, .file = c("model"), ..., .viewer = FALSE)
+
+\method{model_diff}{bbi_stan_model}(
+  .mod,
+  .mod2 = NULL,
+  .file = c("model", "standata", "init", "stanargs"),
+  ...,
+  .viewer = FALSE
+)
 }
 \arguments{
 \item{.mod}{The \verb{bbi_\{.model_type\}_model} to compare.}
@@ -58,6 +67,12 @@ the \code{.mod2} argument.
 \itemize{
 \item \code{"model"} compares the control streams
 }
-\item Currently only NONMEM is implemented.
+\item \code{bbi_stan_model}
+\itemize{
+\item \code{"model"} (default) compares \verb{<run>.stan} files
+\item \code{"standata"} compares \verb{<run>-standata.R} files
+\item \code{"init"} compares \verb{<run>-init.R} files
+\item \code{"stanargs"} compares \verb{<run>-stanargs.R} files
+}
 }
 }

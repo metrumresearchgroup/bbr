@@ -90,9 +90,9 @@ RUN_LOG_COLS <- 10L
 CONFIG_COLS <- 9L
 SUM_LOG_COLS <- 22L
 
-CONFIG_DATA_PATH <- "../../../../extdata/acop.csv"
-CONFIG_DATA_MD5 <- "4ddb44da897c26681d892aa7be99f74b"
-CONFIG_MODEL_MD5 <- "9092189126b23a80bf91a67d1dd8973c"
+CONFIG_DATA_PATH_REF <- "../../../../extdata/acop.csv"
+CONFIG_DATA_MD5_REF <- "4ddb44da897c26681d892aa7be99f74b"
+CONFIG_MODEL_MD5_REF <- "9092189126b23a80bf91a67d1dd8973c"
 
 # yaml md5 hashes
 MOD1_YAML_MD5 <- "6ccf206e167485b5adf29bc135197929"
@@ -128,6 +128,25 @@ REF_LIST_TMP <- list(
 class(REF_LIST_TMP) <- NM_MOD_CLASS_LIST
 
 
+#################
+# Stan constants
+#################
+
+if (requireNamespace("cmdstanr", quietly = TRUE) && Sys.getenv("SKIP_STAN_TESTS") != "true") {
+  STAN_ABS_MODEL_DIR <- system.file("model", "stan",   package = "bbr")
+
+  STAN_MOD_ID <- "fxa"
+  STAN_MODEL_DIR <-   fs::path_rel(STAN_ABS_MODEL_DIR, getwd()) %>% as.character()
+  STAN_MOD1_PATH <- file.path(STAN_MODEL_DIR, STAN_MOD_ID)
+  STAN_MOD1 <- read_model(STAN_MOD1_PATH)
+  STAN_MOD_ID2 <- paste0(STAN_MOD_ID, "2")
+
+  STAN_ABS_RUN_ROOT <- file.path(STAN_ABS_MODEL_DIR, STAN_MOD_ID, STAN_MOD_ID)
+
+  STAN_SMP_DIAG_CLASS <- "draws_array"
+  STAN_SMP_DIAG_DIM <- c(100, 4, 6)
+}
+
 #####################
 # utils.R constants
 #####################
@@ -146,10 +165,10 @@ FAKE_CTL_PATH <- fs::path_norm(file.path(getwd(), MODEL_DIR, CTL_TEST_FILE)) %>%
 
 create_all_models <- function() {
   mod1 <- read_model(MOD1_PATH)
-  mod2 <- copy_model_from(mod1, basename(NEW_MOD2),   "level 1 copy of 1")
-  mod3 <- copy_model_from(mod1, basename(NEW_MOD3),   "level 1 copy of 1")
+  mod2 <- copy_model_from(mod1, basename(NEW_MOD2),   "level 1 copy of 1", .inherit_tags = FALSE)
+  mod3 <- copy_model_from(mod1, basename(NEW_MOD3),   "level 1 copy of 1", .inherit_tags = FALSE)
   fs::dir_create(LEVEL2_DIR)
-  mod4 <- copy_model_from(mod2, file.path(LEVEL2_SUBDIR, MOD_ID), "level 2 copy of 2")
+  mod4 <- copy_model_from(mod2, file.path(LEVEL2_SUBDIR, MOD_ID), "level 2 copy of 2", .inherit_tags = FALSE)
 
   # load or create models and assign model objects to global environment
   assign("mod1", mod1, pos = parent.frame())
@@ -168,12 +187,11 @@ copy_all_output_dirs <- function() {
 create_rlg_models <- function() {
   # copy models before creating run log
   mod1 <- read_model(MOD1_PATH)
-  copy_model_from(mod1, basename(NEW_MOD2), .add_tags = NEW_TAGS)
+  copy_model_from(mod1, basename(NEW_MOD2), .add_tags = NEW_TAGS, .inherit_tags = FALSE)
   copy_model_from(
     mod1,
     basename(NEW_MOD3),
     .based_on_additional = get_model_id(NEW_MOD2),
-    .inherit_tags = TRUE,
     .update_model_file = FALSE
   )
 }
@@ -205,10 +223,10 @@ cleanup <- function() {
 #'
 #' @param path string giving the file path
 #' @inheritParams withr::defer
-perturb_file <- function(path, envir = parent.frame()) {
+perturb_file <- function(path, envir = parent.frame(), content = "foo") {
   checkmate::assert_string(path)
   original <- readr::read_file(path)
-  readr::write_lines("foo", path, append = TRUE)
+  readr::write_lines(content, path, append = TRUE)
   withr::defer(readr::write_file(original, path), envir)
 }
 
@@ -270,5 +288,6 @@ cleanup_model <- function(.mod) {
   if (fs::file_exists(get_yaml_path(.mod, .check_exists = FALSE)))  fs::file_delete(get_yaml_path(.mod))
   if (fs::file_exists(get_model_path(.mod, .check_exists = FALSE))) fs::file_delete(get_model_path(.mod))
   if (fs::dir_exists(get_output_dir(.mod, .check_exists = FALSE)))  fs::dir_delete(get_output_dir(.mod))
+  if (fs::dir_exists(.mod[[ABS_MOD_PATH]]))  fs::dir_delete(.mod[[ABS_MOD_PATH]])
   rm(.mod)
 }

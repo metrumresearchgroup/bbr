@@ -81,7 +81,10 @@ summary_log_impl <- function(.mods, ...) {
 
   check_model_object_list(.mods)
 
-  res_list <- model_summaries(.mods, ...)
+  res_list <- suppressSpecificWarning(
+    model_summaries(.mods, ...),
+    .regexpr = STAN_FIT_CLASS
+  )
 
   # create tibble from list of lists
   res_df <- res_list %>%
@@ -99,6 +102,12 @@ summary_log_impl <- function(.mods, ...) {
   if (all(!is.na(res_df[[SL_ERROR]]))) {
     warning(glue("ALL {nrow(res_df)} MODEL SUMMARIES FAILED in `summary_log()` call. Check `error_msg` column for details."))
     return(select(res_df, -.data[[SL_SUMMARY]], -.data[[SL_FAIL_FLAGS]]))
+  }
+
+  # if ALL models are Stan, the next section will error trying to unnest them,
+  # so we just return the objects here.
+  if (all(purrr::map_lgl(res_df[[SL_SUMMARY]], ~inherits(.x, STAN_FIT_CLASS)))) {
+    return(select(res_df, -.data[[SL_FAIL_FLAGS]]))
   }
 
   res_df <- mutate_at(

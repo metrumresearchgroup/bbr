@@ -60,7 +60,21 @@ print.bbi_process <- function(x, ..., .call_limit = 250) {
 #' @importFrom cli cli_h1 cli_h2 cat_bullet style_italic col_blue col_green col_red cat_rule
 #' @importFrom purrr iwalk walk
 #' @export
-print.bbi_nonmem_model <- function(x, ...) {
+print.bbi_model <- function(x, ...) {
+
+  # make sure a summary object doesn't slip through
+  tryCatch(
+    check_model_object(x),
+    error = function(.e) {
+      .error_msg <- paste(as.character(.e$message), collapse = " -- ")
+      if (grepl("Must pass a model object", .error_msg, fixed = TRUE)) {
+        dev_error(paste("print.bbi_model:", .error_msg))
+      } else {
+        stop(.e)
+      }
+    }
+  )
+
   is_valid_print <- function(.x) {
     if (!is.null(.x)) {
       length(.x) != 0
@@ -118,6 +132,11 @@ print.bbi_nonmem_model <- function(x, ...) {
   heading("YAML & Model Files")
   bullet_list(get_yaml_path(x, .check_exists = FALSE))
   bullet_list(get_model_path(x, .check_exists = FALSE))
+  if (inherits(x, STAN_MOD_CLASS)) {
+    bullet_list(build_path_from_model(x, STANDATA_R_SUFFIX))
+    bullet_list(build_path_from_model(x, STANINIT_SUFFIX))
+    check_stan_model(x)
+  }
 
   if (is_valid_print(x[[YAML_DESCRIPTION]])) {
     heading('Description')

@@ -1,0 +1,49 @@
+Compiling Stan program...
+
+Running MCMC with 4 sequential chains...
+
+Chain 1 Iteration:   1 / 600 [  0%]  (Warmup)
+Chain 1 Iteration: 100 / 600 [ 16%]  (Warmup)
+Chain 1 Iteration: 200 / 600 [ 33%]  (Warmup)
+Chain 1 Iteration: 300 / 600 [ 50%]  (Warmup)
+Chain 1 Iteration: 301 / 600 [ 50%]  (Sampling)
+Chain 1 Iteration: 400 / 600 [ 66%]  (Sampling)
+Chain 1 Iteration: 500 / 600 [ 83%]  (Sampling)
+Chain 1 Iteration: 600 / 600 [100%]  (Sampling)
+Chain 1 finished in 19.8 seconds.
+Chain 2 Iteration:   1 / 600 [  0%]  (Warmup)
+Chain 2 Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:
+  Chain 2 Exception: fxaInc_model_namespace::log_prob: fxaHat[sym1__] is -nan, but must be greater than or equal to 0 (in '/tmp/RtmpoWCmag/model-1e697474b655.stan', line 24, column 2 to column 33)
+Chain 2 If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,
+Chain 2 but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.
+Chain 2
+Chain 2 Iteration: 100 / 600 [ 16%]  (Warmup)
+Chain 2 Iteration: 200 / 600 [ 33%]  (Warmup)
+Chain 2 Iteration: 300 / 600 [ 50%]  (Warmup)
+Chain 2 Iteration: 301 / 600 [ 50%]  (Sampling)
+Chain 2 Iteration: 400 / 600 [ 66%]  (Sampling)
+Chain 2 Iteration: 500 / 600 [ 83%]  (Sampling)
+Chain 2 Iteration: 600 / 600 [100%]  (Sampling)
+Chain 2 finished in 15.8 seconds.
+Chain 3 Iteration:   1 / 600 [  0%]  (Warmup)
+Chain 3 Iteration: 100 / 600 [ 16%]  (Warmup)
+Chain 3 Iteration: 200 / 600 [ 33%]  (Warmup)
+Chain 3 Iteration: 300 / 600 [ 50%]  (Warmup)
+Chain 3 Iteration: 301 / 600 [ 50%]  (Sampling)
+Chain 3 Iteration: 400 / 600 [ 66%]  (Sampling)
+Chain 3 Iteration: 500 / 600 [ 83%]  (Sampling)
+Chain 3 Iteration: 600 / 600 [100%]  (Sampling)
+Chain 3 finished in 14.5 seconds.
+Chain 4 Iteration:   1 / 600 [  0%]  (Warmup)
+Chain 4 Iteration: 100 / 600 [ 16%]  (Warmup)
+Chain 4 Iteration: 200 / 600 [ 33%]  (Warmup)
+Chain 4 Iteration: 300 / 600 [ 50%]  (Warmup)
+Chain 4 Iteration: 301 / 600 [ 50%]  (Sampling)
+Chain 4 Iteration: 400 / 600 [ 66%]  (Sampling)
+Chain 4 Iteration: 500 / 600 [ 83%]  (Sampling)
+Chain 4 Iteration: 600 / 600 [100%]  (Sampling)
+Chain 4 finished in 13.7 seconds.
+
+All 4 chains finished successfully.
+Mean chain execution time: 15.9 seconds.
+Total execution time: 64.4 seconds.

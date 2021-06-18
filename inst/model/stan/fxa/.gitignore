@@ -1,0 +1,5 @@
+# ignore model binary
+fxa
+
+# ignore csv posterior output
+fxa-output/*csv
