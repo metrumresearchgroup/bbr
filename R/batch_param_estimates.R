@@ -20,21 +20,19 @@
 #' @param ... args passed through to [bbi_exec()]
 #' @param .dry_run show what the command would be without actually running it
 #' @export
-batch_param_estimates <- function(
-  .path,
-  ...,
-  .dry_run = FALSE
-){
-
-  if(!dir_exists(.path)){
-    err_msg <- glue("batch_parameter_estimates('{.path}') failed; unable to locate {.path}")
+batch_param_estimates <- function(.path,
+                                  ...,
+                                  .dry_run = FALSE) {
+  if (!dir_exists(.path)) {
+    err_msg <-
+      glue("batch_parameter_estimates('{.path}') failed; unable to locate {.path}")
     stop(err_msg, call. = FALSE)
   }
 
   # extract all .ext files found recursively in path
   ext_files_path <- check_batch_ext_file(.path)
 
-  purrr::map_dfr(ext_files_path, function(.x){
+  purrr::map_dfr(ext_files_path, function(.x) {
     get_fast_params(.x, ..., .dry_run = .dry_run)
   }) %>%
     as_tibble()
@@ -50,12 +48,9 @@ batch_param_estimates <- function(
 #' Private helper function to extract param estimates from .ext file in directory
 #' @param .x The full path to the ext file
 #' @keywords internal
-get_fast_params <- function(
-  .x,
-  ...,
-  .dry_run = FALSE
-){
-
+get_fast_params <- function(.x,
+                            ...,
+                            .dry_run = FALSE) {
   # for bbi nonmem params, need to pass the directory containing .ext
   # cd to the root directory cointaining directory with .ext
   .path <- dirname(dirname(.x))
@@ -77,14 +72,16 @@ get_fast_params <- function(
     error = function(e) {
       known_errors <- c('no ext file contents',
                         "no estimation output detected")
-      error_present <- purrr::map_lgl(known_errors, ~grepl(.x, e$message))
-      if(sum(error_present) == 1){
+      error_present <-
+        purrr::map_lgl(known_errors, ~ grepl(.x, e$message))
+      if (sum(error_present) == 1) {
         msg <- known_errors[error_present]
-        list(
-          stdout = c("dir,error_msg", glue("{.path},{msg}"))
-        )
+        list(stdout = c("dir,error_msg", glue("{.path},{msg}")))
       } else {
-        err_msg <- glue("batch_parameter_estimates('{.path}') failed with the following error. This may be because the modeling run has not finished successfully.\n\nERROR: \n{e}")
+        err_msg <-
+          glue(
+            "batch_parameter_estimates('{.path}') failed with the following error. This may be because the modeling run has not finished successfully.\n\nERROR: \n{e}"
+          )
         stop(err_msg, call. = FALSE)
       }
     }
@@ -93,13 +90,15 @@ get_fast_params <- function(
   tbl <- data.table::fread(text = res$stdout) %>%
     dplyr::rename('absolute_model_path' = 'dir')
 
-  tbl[['absolute_model_path']] <- tools::file_path_sans_ext(get_model_path(.mod))
+  tbl[['absolute_model_path']] <-
+    tools::file_path_sans_ext(get_model_path(.x))
 
-  if(!'error_msg' %in% names(tbl)){
+  if (!'error_msg' %in% names(tbl)) {
     tbl[['error_msg']] <- NA
   }
 
-  tbl <- tbl %>% dplyr::relocate('error_msg', .after = 'absolute_model_path')
+  tbl <-
+    tbl %>% dplyr::relocate('error_msg', .after = 'absolute_model_path')
 
   return(tbl)
 }
@@ -109,9 +108,17 @@ get_fast_params <- function(
 #' @param .x The directory path to look in for the ext file
 #' @keywords internal
 check_batch_ext_file <- function(.x) {
-  ext_file <- fs::dir_ls(.x, type = "file", glob = "*.ext", recurse = TRUE)
+  ext_file <-
+    fs::dir_ls(.x,
+               type = "file",
+               glob = "*.ext",
+               recurse = TRUE)
   if (length(ext_file) == 0) {
-    stop(glue("Unable to locate any `.ext` files in dir: {.x}. Check to be sure this is a NONMEM output folder, and that the run has finished successfully."))
+    stop(
+      glue(
+        "Unable to locate any `.ext` files in dir: {.x}. Check to be sure this is a NONMEM output folder, and that the run has finished successfully."
+      )
+    )
   }
   ext_file
 }
