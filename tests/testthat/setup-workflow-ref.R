@@ -29,6 +29,12 @@ if (!Sys.getenv("METWORX_VERSION") == "" || Sys.getenv("DRONE") == "true") {
 
 NEW_MOD2 <- file.path(MODEL_DIR, "2")
 NEW_MOD3 <- file.path(MODEL_DIR, "3")
+BATCH_PARAM_TEST_DIR <- file.path(MODEL_DIR, "test_batch_params")
+NEW_MOD4 <- file.path(BATCH_PARAM_TEST_DIR, '4')
+NEW_MOD5 <- file.path(BATCH_PARAM_TEST_DIR, '5')
+NEW_MOD6 <- file.path(BATCH_PARAM_TEST_DIR, '6')
+NEW_MOD7 <- file.path(BATCH_PARAM_TEST_DIR, '7')
+NEW_MOD8 <- file.path(BATCH_PARAM_TEST_DIR, '8')
 
 MODEL_DIR_X <- fs::path_rel(system.file("model", "nonmem", "complex",   package = "bbr"), getwd()) %>% as.character()
 
@@ -188,6 +194,12 @@ cleanup <- function() {
 
   if (fs::dir_exists(NEW_MOD2)) fs::dir_delete(NEW_MOD2)
   if (fs::dir_exists(NEW_MOD3)) fs::dir_delete(NEW_MOD3)
+  if (fs::dir_exists(NEW_MOD4)) fs::dir_delete(NEW_MOD4)
+  if (fs::dir_exists(NEW_MOD5)) fs::dir_delete(NEW_MOD5)
+  if (fs::dir_exists(NEW_MOD6)) fs::dir_delete(NEW_MOD6)
+  if (fs::dir_exists(NEW_MOD7)) fs::dir_delete(NEW_MOD7)
+  if (fs::dir_exists(NEW_MOD8)) fs::dir_delete(NEW_MOD8)
+  if (fs::dir_exists(BATCH_PARAM_TEST_DIR)) fs::dir_delete(BATCH_PARAM_TEST_DIR)
   if (fs::dir_exists(LEVEL2_DIR)) fs::dir_delete(LEVEL2_DIR)
 
   # delete model objects from memory
