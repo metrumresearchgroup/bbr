@@ -33,15 +33,16 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     # table should have two rows (for two model runs detected)
     expect_equal(nrow(param_tbl), 2)
 
-    # table should contain absolute_model_path & error_msg columns
+    # table should contain absolute_model_path, error_msg, and termination_code columns
     expect_true("absolute_model_path" %in% names(param_tbl))
     expect_true("error_msg" %in% names(param_tbl))
+    expect_true("termination_code" %in% names(param_tbl))
 
     # error_msg column should be NA for both model runs
     expect_identical(is.na(param_tbl$error_msg), c(TRUE, TRUE))
 
     # because these files are identical all param names detected should have values
-    without_error <- param_tbl %>% select(-"error_msg")
+    without_error <- param_tbl %>% select(-c("absolute_model_path", "error_msg", "termination_code"))
     expect_false(any(is.na(without_error)))
 
   })
@@ -75,7 +76,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
 
     # because these files do not have identical param names, some NAs should be present for values
-    without_error <- param_tbl %>% select(-"error_msg")
+    without_error <- param_tbl  %>% select(-c("absolute_model_path", "error_msg", "termination_code"))
     expect_true(any(is.na(without_error)))
 
     # error_msg column should be NA for both model runs
@@ -103,8 +104,8 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     # create parameter table
     param_tbl <- BATCH_PARAM_TEST_DIR %>% batch_param_estimates()
 
-    # only `absolute_model_path` & `error_msg` columns should be present
-    expect_identical(names(param_tbl), c("absolute_model_path", "error_msg"))
+    # only `absolute_model_path`, `error_msg`, and `termination_code` columns should be present
+    expect_identical(names(param_tbl), c("absolute_model_path", "error_msg", "termination_code"))
 
     # `error_msg` should not be `NA`
     expect_false(is.na(param_tbl$error_msg))
@@ -149,8 +150,8 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     # create parameter table
     param_tbl <- BATCH_PARAM_TEST_DIR %>% batch_param_estimates()
 
-    # only `absolute_model_path` & `error_msg` columns should be present
-    expect_identical(names(param_tbl), c("absolute_model_path", "error_msg"))
+    # only `absolute_model_path`, `error_msg`, and `termination_code` columns should be present
+    expect_identical(names(param_tbl), c("absolute_model_path", "error_msg", "termination_code"))
 
     # `error_msg` should not be `NA`
     expect_false(is.na(param_tbl$error_msg))
