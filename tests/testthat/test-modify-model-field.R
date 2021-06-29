@@ -358,10 +358,17 @@ test_that("add_tags(), add_notes() and friends check for character vector", {
   temp_mod_path <- create_temp_model()
   new_mod <- read_model(temp_mod_path)
 
+  # Accept a list value if it can be converted to a character vector.
+  new_mod <- new_mod %>%
+    add_tags(as.list(NEW_TAGS)) %>%
+    add_notes(as.list(NEW_NOTES))
+  expect_identical(new_mod[[YAML_TAGS]], c(ORIG_TAGS, NEW_TAGS))
+  expect_identical(new_mod[[YAML_NOTES]], c(NEW_NOTES))
+
+  # Otherwise passing a type other than a character vector leads to an error.
   fns <- c(add_tags, replace_all_tags, remove_tags,
            add_notes, replace_all_notes, remove_notes)
   for (fn in fns){
-    expect_error(new_mod %>% fn(list("a", "b")))
     expect_error(new_mod %>% fn(1:3))
     expect_error(new_mod %>% fn(list(1:3)))
   }
