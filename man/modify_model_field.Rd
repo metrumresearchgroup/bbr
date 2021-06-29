@@ -31,7 +31,7 @@ If \code{NULL} or \code{NA} is passed and \code{.append = FALSE} then \code{.fie
 
 \item{.unique}{If \code{TRUE}, the default, de-duplicate \code{.mod[[.field]]} after adding new values. If \code{FALSE} duplicate values will be kept.}
 
-\item{.char_value}{If \code{TRUE}, check that \code{.value} is a character vector.}
+\item{.char_value}{If \code{TRUE}, check that \code{.value} (after unlisting) is a character vector.}
 
 \item{.old_val}{The value to be replaced. If \code{.old_val} is not present in
 \code{.mod[[.field]]}, function will warn user and return \code{.mod} unchanged.}

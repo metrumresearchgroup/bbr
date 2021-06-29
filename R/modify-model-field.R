@@ -30,7 +30,7 @@
 #' @param .append If `TRUE`, the default, concatenate new values with currently present values. If `FALSE`, new values will overwrite old values.
 #' @param .remove If `TRUE`, `.value` with be removed from the `.field` instead of added. `FALSE` by default. Cannot have both `.append` and `.remove` be true in the same call.
 #' @param .unique If `TRUE`, the default, de-duplicate `.mod[[.field]]` after adding new values. If `FALSE` duplicate values will be kept.
-#' @param .char_value If `TRUE`, check that `.value` is a character vector.
+#' @param .char_value If `TRUE`, check that `.value` (after unlisting) is a character vector.
 #' @export
 modify_model_field <- function(.mod, .field, .value, .append = TRUE, .remove = FALSE, .unique = TRUE, .char_value = TRUE) {
 
@@ -42,6 +42,7 @@ modify_model_field <- function(.mod, .field, .value, .append = TRUE, .remove = F
   }
 
   if (isTRUE(.char_value)) {
+    .value <- unlist(.value)
     checkmate::assert_character(.value, null.ok = TRUE)
   }
 
