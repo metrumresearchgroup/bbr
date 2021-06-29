@@ -353,3 +353,16 @@ test_that("copy_model_from() fails YAML out of sync (testing check_yaml_in_sync)
   # try to submit_model and get error
   expect_error(copy_model_from(new_mod, "foo"), regexp = "Model NOT in sync with corresponding YAML file")
 })
+
+test_that("add_tags(), add_notes() and friends check for character vector", {
+  temp_mod_path <- create_temp_model()
+  new_mod <- read_model(temp_mod_path)
+
+  fns <- c(add_tags, replace_all_tags, remove_tags,
+           add_notes, replace_all_notes, remove_notes)
+  for (fn in fns){
+    expect_error(new_mod %>% fn(list("a", "b")))
+    expect_error(new_mod %>% fn(1:3))
+    expect_error(new_mod %>% fn(list(1:3)))
+  }
+})
