@@ -1,3 +1,11 @@
+# bbr develop
+
+## Bug fixes
+
+* Fixed a bug where submitting multiple models in a loop with `submit_model(.mode = "local", .wait = FALSE)` would cause the models to never finish because the `bbi` processes would get [killed by `processx`](https://processx.r-lib.org/reference/process.html#cleaning-up-background-processes) when the R objects were garbage collected. (#390)
+
+* `bbr` now checks for a valid configuration file _before_ calling out to `bbi` to avoid the situation where `.wait = FALSE` and the "no config file" error from `bbi` is swallowed. (#390)
+
 # bbr 1.1.2
 
 ## New features and changes
