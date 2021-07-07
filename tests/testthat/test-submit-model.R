@@ -5,7 +5,8 @@ context("submit_model(.dry_run=T)")
 ###################################
 
 # create fake bbi.yaml
-withr::local_file("bbi.yaml", writeLines("created_by: test-submit-model", "bbi.yaml"))
+readr::write_file("created_by: test-submit-model", "bbi.yaml")
+on.exit({ fs::file_delete("bbi.yaml")})
 
 model_dir <- ABS_MODEL_DIR
 mod_ctl_path <- file.path(model_dir, CTL_FILENAME)
