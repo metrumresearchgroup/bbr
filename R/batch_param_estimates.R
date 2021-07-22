@@ -55,7 +55,7 @@ batch_param_estimates <- function(.path,
     }
   )
 
-  data.table::fread(text = res$stdout) %>%
+  df <- data.table::fread(text = res$stdout) %>%
     tidyr::as_tibble() %>%
     dplyr::rename(
       'absolute_model_path' = 'dir',
@@ -65,4 +65,16 @@ batch_param_estimates <- function(.path,
     mutate(across(everything(), ~ ifelse(. == "", NA, .)),
            absolute_model_path = file.path(.path, absolute_model_path))
 
+  # ordering
+  ordered_cols <- c(which(startsWith(names(df), 'SIGMA')),
+                    which(startsWith(names(df), 'THETA')),
+                    which(startsWith(names(df), 'OMEGA')))
+
+  ordered_cols <- c(ordered_cols,
+                    seq(names(df))[!seq(names(df)) %in% ordered_cols])
+
+  df[ordered_cols] %>%
+    dplyr::relocate('absolute_model_path',
+                    'error_msg',
+                    'termination_code')
 }
