@@ -1,0 +1,330 @@
+---
+title: "Running NONMEM in Parallel: bbr Tips and Tricks"
+author: "Seth Green"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{nonmem-parallel}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  eval = FALSE
+)
+```
+
+## Introduction
+
+This file shows some helpful patterns for using `bbr` with NONMEM, mostly relating to running models with parallel execution, either multiple cores on a local machine (head node, laptop, etc.) or by executing on a grid.
+
+```{r message=FALSE}
+library(bbr)
+
+MODEL_DIR <- system.file("model", "nonmem" , "pk-parallel", package = "bbr")
+```
+
+
+```{r, include=F}
+# setup
+library(fs)
+ORIG_MODELS <- c(100, 200)
+COPIED_MODELS <- c(300, 400)
+
+# clear old bbi.yaml
+if (file_exists(file.path(MODEL_DIR, "bbi.yaml"))) file_delete(file.path(MODEL_DIR, "bbi.yaml"))
+
+# clear output dirs
+walk(c(ORIG_MODELS, COPIED_MODELS), ~{
+  if (dir_exists(file.path(MODEL_DIR, .x))) dir_delete(file.path(MODEL_DIR, .x))
+})
+
+# copy 200 a few times
+walk(COPIED_MODELS, ~{
+  if (file_exists(file.path(MODEL_DIR, paste0(.x, ".ctl")))) file_delete(file.path(MODEL_DIR, paste0(.x, ".ctl")))
+  if (file_exists(file.path(MODEL_DIR, paste0(.x, ".yaml")))) file_delete(file.path(MODEL_DIR, paste0(.x, ".yaml")))
+  file_copy(file.path(MODEL_DIR, paste0(200, ".ctl")), file.path(MODEL_DIR, paste0(.x, ".ctl")))
+  file_copy(file.path(MODEL_DIR, paste0(200, ".yaml")), file.path(MODEL_DIR, paste0(.x, ".yaml")))
+})
+
+```
+
+
+
+## Global settings in bbi.yaml
+
+The `bbi.yaml` file is created when `bbi_init()` is originally called. It usually lives in the same folder as your control streams. This file contains "global" settings for running `bbi`.
+
+* You can set a default number of `threads` (the number of cores `bbi` will use for each model) in this file. This will be used whenever you call `submit_model()`, but can be overriden by passing `submit_model(..., .bbi_args = list(threads = SOME_INTEGER))`.
+
+* It defaults to `parallel: false` so **you need to change to `parallel: true`** or you will need to pass `.bbi_args = list(parallel=TRUE)` to each of your `submit_model()` calls to make them respect the `threads` argument.
+
+* You can also pass through `.bbi_args` to `bbi_init()` to set the global defaults when you first create the `bbi.yaml`
+
+```{r}
+bbi_init(
+  .dir = MODEL_DIR,
+  .nonmem_dir = "/opt/NONMEM",
+  .nonmem_version = "nm75",
+  .bbi_args = list(
+    parallel = TRUE,
+    threads = 4
+  )
+)
+```
+
+
+
+## Local execution
+
+For small runs, use a 4-core or 8-core head node and just do `submit_model(..., .mode = "local")`.
+
+* This will execute the model on your head node, means you will _not_ have to wait for worker nodes to spin up.
+
+* This is especially nice for new models that are fairly simple and you just want a quick result back.
+
+```{r, eval = FALSE}
+mod <- read_model(file.path(MODEL_DIR, 100))
+submit_model(
+  mod,
+  .mode = "local",
+  .bbi_args = list(parallel = TRUE, threads = 4) # not needed if set in bbi.yaml
+)
+```
+
+
+## .wait = FALSE
+
+You can pass use `submit_model(..., .wait = FALSE)` to get you console back immediately.
+
+**This is only relevant for `.mode = "local"`** because grid jobs give you your console as soon as the job is _submitted_ to the grid (which typically takes less than a second).
+
+```{r, eval = FALSE}
+mod <- read_model(file.path(MODEL_DIR, 200))
+proc <- submit_model(
+  mod,
+  .mode = "local",
+  .wait = FALSE,        # this is what gets you your console back
+  .bbi_args = list(parallel = TRUE, threads = 8) # not needed if set in bbi.yaml
+)
+```
+
+There are a few ways to check on your model while it runs:
+
+* print model object
+
+```{r}
+mod
+```
+
+* `tail_*()` helpers (or `tail -f` in terminal to "follow" the file as it changes)
+
+```{r}
+tail_lst(mod)
+```
+
+
+```{r}
+tail_output(mod, .head = 0, .tail = 10)
+```
+
+* You can get the path to these files and use `tail -f` in the terminal to "follow" the files as they change.
+
+```{r}
+build_path_from_model(mod, ".lst")
+```
+
+
+
+* You can call methods of the `processx` object including in the `bbi_process` object.
+  * To do this, you need to remember to assign the output of `submit_model()` to a variable (`proc`, above)
+  * See [the `processx` docs](https://processx.r-lib.org/reference/process.html#methods) for details on available methods.
+
+```{r}
+proc$process$is_alive()
+```
+
+
+## Warm up the grid
+
+* You can submit a dummy job to the grid to get it to bring up a worker, while you finish preparing your run.
+
+```{r}
+system("echo 'sleep 10' | qsub")
+```
+```
+Unable to run job: warning: sethg's job is not allowed to run in any queue
+Your job 1 ("STDIN") has been submitted
+Exiting.
+```
+
+This message is just telling you that there are no worker nodes currently up, but one will begin to spin up now.
+
+## Try your model locally first
+
+If you have a long-running model, it is often nice to launch it locally first, just to see if it starts.
+
+* This avoids waiting for the grid to come up before seeing your model die with something like `DATASET ERROR` or some silly syntax error.
+
+```{r}
+mod <- read_model(file.path(MODEL_DIR, 300))
+proc <- submit_model(
+  mod,
+  .mode = "local",
+  .wait = FALSE        # this is what gets you your console back
+)
+```
+
+* Watch it until it gets to monitoring the search and then kill it and relaunch it on grid.
+
+```{r}
+tail_output(mod, .tail = 15)
+```
+
+
+Several ways to kill the process:
+
+* You can kill with the `kill()` method of the `processx` object (see above about how to get to this object).
+
+
+```{r}
+proc$process$kill()
+```
+
+* Use `killall nonmem` in the terminal (or with `system`) to kill _all_ NONMEM jobs running locally
+
+```{r}
+system("killall nonmem")
+```
+
+The relaunch the model on the grid, using `.bbi_args = list(overwrite = TRUE)` to overwrite the incomplete results.
+
+```{r, eval = FALSE}
+submit_model(
+  mod,
+  .bbi_args = list(
+    overwrite = TRUE,
+    parallel = TRUE,
+    threads = 8
+  )
+)
+```
+
+Note: `.mode = "sge"` (submit to the grid) is the default for `submit_model()` so there is no need to pass it as an argument.
+
+## Monitoring
+
+You can monitor your grid jobs with `tail_lst()` or `tail_output()` as above, or use `qstat -f` in the terminal, or the Grafana dashboard.
+
+```{r}
+system("qstat -f")
+```
+
+
+## Submit a batch of models to the grid
+
+You can use `submit_models()` to submit a batch of models to the grid.
+
+* Each model will be a separate grid job
+
+* The grid will "auto-scale"; bringing up new workers to handle all the jobs
+
+* This is also a very easy way to use **nested parallelism**:
+  * Each job (each model) will be executed in parallel on a worker node.
+  * If you pass `.bbi_args = list(parallel = TRUE, threads = SOME_INTEGER)` then _each model_ will use `SOME_INTEGER` cores on its worker node.
+
+```{r}
+mods <- map(c(200, 300, 400), ~ read_model(file.path(MODEL_DIR, .x)))
+
+submit_models(
+  mods,
+  .bbi_args = list(
+    overwrite = TRUE,
+    parallel = TRUE,
+    threads = 8
+  )
+)
+```
+
+* You can see all three jobs queuing up
+
+```{r}
+system("qstat -f")
+```
+
+* You can kill jobs running on the grid using `qdel` in the terminal (or with `system()` from R).
+  * `qdel SOME_NUMBER` kills the job specified by it's "job id" (the first column in the `qstat -f` output)
+  * `qdel -u YOUR_USERNAME` kills _all jobs_ launched by you
+
+## Testing different numbers of threads
+
+For a big model, try running a few iterations with different numbers of threads, and then see how much speedup you get from adding more threads.
+
+* First create some dummy copies of your model
+* Copy the model a few times with `copy_model_from()`
+* Cap the iterations to 10 or 20 by changing `MAX_EVAL` or `NITER` in your control stream
+* try with a few different threads options and see which is faster
+* then pick the real one and run for real
+
+```{r}
+#' Takes a model object and runs it with various threads values
+#'
+#' Returns a list of the model objects for the copied models.
+#' @param .mod bbi_model object to copy/test
+#' @param thread_opts Integer vector of threads values to test
+#' @param .mode Passed through to bbr::submit_models(.mode)
+test_threads <- function(.mod, threads_opts, .mode = "sge") {
+  mods <- map(threads_opts, ~ {
+    .m <- copy_model_from(
+      .mod,
+      paste0(get_model_id(.mod), "_", .x, "threads")
+    ) %>%
+      add_bbi_args(list(parallel = TRUE, threads = .x))
+  })
+
+  submit_models(mods, .mode = .mode, .wait = FALSE)
+
+  mods
+}
+
+# running it
+mods <- test_threads(mod, c(8, 16, 24))
+```
+
+* After they finish, tail the `.lst` files to see which finished fastest.
+
+```{r}
+#' Check estimation time for models run with various threads values
+#'
+#' @param mods list of bbi model objects created by `test_threads()`
+#'
+#' @return A tibble with columns `threads` (number of threads) and `time`
+#'   (elapsed estimation time in seconds for test models).
+check_threads <- function(mods) {
+  purrr::map_dfr(mods, ~ {
+    s <- model_summary(.x)
+    threads <- as.numeric(stringr::str_extract(s$absolute_model_path, "\\d+(?=threads$)"))
+    tibble::tibble(threads = threads, time = s$run_details$estimation_time)
+  })
+}
+
+check_threads(mods)
+```
+
+
+```{r, include=F}
+# cleanup
+walk(c(ORIG_MODELS, COPIED_MODELS), ~{
+  if (dir_exists(file.path(MODEL_DIR, .x))) dir_delete(file.path(MODEL_DIR, .x))
+})
+
+walk(COPIED_MODELS, ~{
+  if (file_exists(file.path(MODEL_DIR, paste0(.x, ".ctl")))) file_delete(file.path(MODEL_DIR, paste0(.x, ".ctl")))
+  if (file_exists(file.path(MODEL_DIR, paste0(.x, ".yaml")))) file_delete(file.path(MODEL_DIR, paste0(.x, ".yaml")))
+})
+
+### need to clean up threads models
+```
