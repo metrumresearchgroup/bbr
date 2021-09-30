@@ -1,11 +1,10 @@
 context("Collapse columns to string representation")
 
-setup({
-  cleanup()
-  create_rlg_models()
-})
-
-teardown({ cleanup() })
+# setup
+cleanup()
+create_rlg_models()
+# teardown
+withr::defer(cleanup())
 
 test_that("collapse_to_string() works correctly", {
   # add a note to collapse
@@ -90,4 +89,26 @@ test_that("collapse_to_string() renders dput for tibbles", {
   df <- collapse_to_string(df, tibby)
 
   expect_identical(ref_tib, df$tibby)
+})
+
+test_that("add_tags() converts lists upstream of collapse_to_string()", {
+  mod2 <- read_model(file.path(MODEL_DIR, 2))
+  tags_old <- mod2[[YAML_TAGS]]
+  # Note: The shape of the value here matters: it needs to be
+  # something that isn't unlisted by the write_yaml/read_yaml
+  # sequence.  For example, list("ab", "cd", "ef") won't work as a
+  # regression case because it will come back as c("ab", "cd", "ef").
+  tags_new <- list(c("ab", "cd"), c("ef"))
+  mod2 <- mod2 %>% replace_all_tags(NULL) %>% add_tags(tags_new)
+  on.exit(replace_all_tags(mod2, tags_old))
+
+  log_df <- run_log(MODEL_DIR) %>% collapse_to_string({{YAML_TAGS}})
+  expect_identical(
+    log_df[[YAML_TAGS]],
+    c(
+      paste(ORIG_TAGS, collapse = ", "),
+      paste(unlist(tags_new), collapse = ", "),
+      paste(ORIG_TAGS, collapse = ", ")
+    )
+  )
 })
