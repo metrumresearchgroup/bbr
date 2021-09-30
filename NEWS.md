@@ -6,7 +6,7 @@
 
 ## Bug fixes
 
-* Fixed bug where adding tags as a list instead of a character vector broke downstream functions like `collapse_to_string()` (#391)
+* Fixed bug where adding tags as a list instead of a character vector broke downstream functions like `collapse_to_string()` (#393)
 
 # bbr 1.1.3
 
