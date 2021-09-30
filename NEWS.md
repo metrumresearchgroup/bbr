@@ -1,3 +1,13 @@
+# bbr 1.1.4
+
+## Docs
+
+* Added "Running NONMEM in Parallel: bbr Tips and Tricks" vignette. (#407)
+
+## Bug fixes
+
+* Fixed bug where adding tags as a list instead of a character vector broke downstream functions like `collapse_to_string()` (#391)
+
 # bbr 1.1.3
 
 ## Bug fixes
