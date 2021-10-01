@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.4</span>
       </span>
     </div>
 
@@ -64,6 +64,9 @@
       <a href="../articles/getting-started.html">Getting Started with bbr</a>
     </li>
     <li>
+      <a href="../articles/nonmem-parallel.html">Running NONMEM in Parallel: bbr Tips and Tricks</a>
+    </li>
+    <li>
       <a href="../articles/parameter-labels.html">bbr Parameter Labels</a>
     </li>
     <li>
@@ -81,7 +84,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/metrumresearchgroup/bbr">
-    <span class="fas fa-github fa-lg"></span>
+    <span class="fa fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -95,7 +98,7 @@
 
       
 
-      </header><script src="getting-started_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
+      </header><script src="getting-started_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Getting Started with bbr</h1>
@@ -271,18 +274,18 @@
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">param_df1</span> <span class="op">&lt;-</span> <span class="va">sum1</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/param_estimates.html">param_estimates</a></span><span class="op">(</span><span class="op">)</span>
 <span class="va">param_df1</span>
-<span class="co">#&gt; # A tibble: 9 x 8</span>
+<span class="co">#&gt; # A tibble: 9 × 8</span>
 <span class="co">#&gt;   parameter_names estimate   stderr random_effect_sd random_effect_sdse fixed</span>
 <span class="co">#&gt;   &lt;chr&gt;              &lt;dbl&gt;    &lt;dbl&gt;            &lt;dbl&gt;              &lt;dbl&gt; &lt;lgl&gt;</span>
-<span class="co">#&gt; 1 THETA1            2.31   8.61e- 2           NA                NA      FALSE</span>
-<span class="co">#&gt; 2 THETA2           55.0    3.33e+ 0           NA                NA      FALSE</span>
-<span class="co">#&gt; 3 THETA3          465.     2.96e+ 1           NA                NA      FALSE</span>
-<span class="co">#&gt; 4 THETA4           -0.0806 5.55e- 2           NA                NA      FALSE</span>
-<span class="co">#&gt; 5 THETA5            4.13   1.36e+ 0           NA                NA      FALSE</span>
-<span class="co">#&gt; 6 OMEGA(1,1)        0.0964 2.00e- 2            0.311             0.0322 FALSE</span>
-<span class="co">#&gt; 7 OMEGA(2,1)        0      1.00e+10            0       10000000000      TRUE </span>
-<span class="co">#&gt; 8 OMEGA(2,2)        0.154  2.67e- 2            0.392             0.0341 FALSE</span>
-<span class="co">#&gt; 9 SIGMA(1,1)        1      1.00e+10            1       10000000000      TRUE </span>
+<span class="co">#&gt; 1 THETA1            2.31   8.61e- 2           NA              NA        FALSE</span>
+<span class="co">#&gt; 2 THETA2           55.0    3.33e+ 0           NA              NA        FALSE</span>
+<span class="co">#&gt; 3 THETA3          465.     2.96e+ 1           NA              NA        FALSE</span>
+<span class="co">#&gt; 4 THETA4           -0.0806 5.55e- 2           NA              NA        FALSE</span>
+<span class="co">#&gt; 5 THETA5            4.13   1.36e+ 0           NA              NA        FALSE</span>
+<span class="co">#&gt; 6 OMEGA(1,1)        0.0964 2.00e- 2            0.311           3.22e- 2 FALSE</span>
+<span class="co">#&gt; 7 OMEGA(2,1)        0      1   e+10            0               1   e+10 TRUE </span>
+<span class="co">#&gt; 8 OMEGA(2,2)        0.154  2.67e- 2            0.392           3.41e- 2 FALSE</span>
+<span class="co">#&gt; 9 SIGMA(1,1)        1      1   e+10            1               1   e+10 TRUE </span>
 <span class="co">#&gt; # … with 2 more variables: diag &lt;lgl&gt;, shrinkage &lt;dbl&gt;</span></code></pre></div>
 <p>To see how to load summaries of multiple models to an easy-to-read tibble, see the <a href="https://metrumresearchgroup.github.io/bbr/articles/using-summary-log.html">Creating a Model Summary Log</a> vignette.</p>
 </div>
@@ -347,7 +350,7 @@
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">log_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_log.html">run_log</a></span><span class="op">(</span><span class="va">MODEL_DIR</span><span class="op">)</span>
 <span class="va">log_df</span>
-<span class="co">#&gt; # A tibble: 3 x 10</span>
+<span class="co">#&gt; # A tibble: 3 × 10</span>
 <span class="co">#&gt;   absolute_model_… run   yaml_md5 model_type description bbi_args based_on tags </span>
 <span class="co">#&gt;   &lt;chr&gt;            &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;chr&gt;       &lt;list&gt;   &lt;list&gt;   &lt;lis&gt;</span>
 <span class="co">#&gt; 1 /data/home/seth… 1     c7486e7… nonmem     &lt;NA&gt;        &lt;NULL&gt;   &lt;NULL&gt;   &lt;chr…</span>
@@ -363,12 +366,12 @@
 <code class="sourceCode R"><span class="va">log_df</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="../reference/collapse_to_string.html">collapse_to_string</a></span><span class="op">(</span><span class="va">tags</span>, <span class="va">notes</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="va">tags</span>, <span class="va">notes</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 3 x 3</span>
-<span class="co">#&gt;   run   tags                       notes                                        </span>
-<span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;                      &lt;chr&gt;                                        </span>
-<span class="co">#&gt; 1 1     orig acop model            &lt;NA&gt;                                         </span>
-<span class="co">#&gt; 2 2     2 compartment              2 compartment model more appropriate than 1 …</span>
-<span class="co">#&gt; 3 3     2 compartment, combined R… Added combined error structure because it se…</span></code></pre></div>
+<span class="co">#&gt; # A tibble: 3 × 3</span>
+<span class="co">#&gt;   run   tags                                notes                               </span>
+<span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;                               &lt;chr&gt;                               </span>
+<span class="co">#&gt; 1 1     orig acop model                     &lt;NA&gt;                                </span>
+<span class="co">#&gt; 2 2     2 compartment                       2 compartment model more appropriat…</span>
+<span class="co">#&gt; 3 3     2 compartment, combined RUV, iiv CL Added combined error structure beca…</span></code></pre></div>
 </div>
 <div id="filtering-tags-example" class="section level2">
 <h2 class="hasAnchor">
@@ -379,11 +382,11 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map_lgl</a></span><span class="op">(</span><span class="va">tags</span>, <span class="op">~</span> <span class="st">"2 compartment"</span> <span class="op">%in%</span> <span class="va">.x</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/collapse_to_string.html">collapse_to_string</a></span><span class="op">(</span><span class="va">tags</span>, <span class="va">notes</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="va">tags</span>, <span class="va">notes</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 2 x 3</span>
-<span class="co">#&gt;   run   tags                       notes                                        </span>
-<span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;                      &lt;chr&gt;                                        </span>
-<span class="co">#&gt; 1 2     2 compartment              2 compartment model more appropriate than 1 …</span>
-<span class="co">#&gt; 2 3     2 compartment, combined R… Added combined error structure because it se…</span></code></pre></div>
+<span class="co">#&gt; # A tibble: 2 × 3</span>
+<span class="co">#&gt;   run   tags                                notes                               </span>
+<span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;                               &lt;chr&gt;                               </span>
+<span class="co">#&gt; 1 2     2 compartment                       2 compartment model more appropriat…</span>
+<span class="co">#&gt; 2 3     2 compartment, combined RUV, iiv CL Added combined error structure beca…</span></code></pre></div>
 </div>
 </div>
 <div id="further-reading" class="section level1">

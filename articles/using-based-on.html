@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.4</span>
       </span>
     </div>
 
@@ -64,6 +64,9 @@
       <a href="../articles/getting-started.html">Getting Started with bbr</a>
     </li>
     <li>
+      <a href="../articles/nonmem-parallel.html">Running NONMEM in Parallel: bbr Tips and Tricks</a>
+    </li>
+    <li>
       <a href="../articles/parameter-labels.html">bbr Parameter Labels</a>
     </li>
     <li>
@@ -81,7 +84,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/metrumresearchgroup/bbr">
-    <span class="fas fa-github fa-lg"></span>
+    <span class="fa fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -95,7 +98,7 @@
 
       
 
-      </header><script src="using-based-on_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
+      </header><script src="using-based-on_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Using the based_on field</h1>
@@ -465,7 +468,7 @@ DIV.diffobj-container.light.yb DIV.diffobj-line {
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">log_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_log.html">run_log</a></span><span class="op">(</span><span class="va">MODEL_DIR</span><span class="op">)</span>
 <span class="va">log_df</span>
-<span class="co">#&gt; # A tibble: 6 x 10</span>
+<span class="co">#&gt; # A tibble: 6 × 10</span>
 <span class="co">#&gt;   absolute_model_… run   yaml_md5 model_type description bbi_args based_on tags </span>
 <span class="co">#&gt;   &lt;chr&gt;            &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;chr&gt;       &lt;list&gt;   &lt;list&gt;   &lt;lis&gt;</span>
 <span class="co">#&gt; 1 /data/home/seth… 1     5ec8e22… nonmem     &lt;NA&gt;        &lt;NULL&gt;   &lt;NULL&gt;   &lt;chr…</span>
@@ -490,7 +493,7 @@ DIV.diffobj-container.light.yb DIV.diffobj-line {
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">absolute_model_path</span> <span class="op">%in%</span> <span class="fu"><a href="../reference/get_based_on.html">get_model_ancestry</a></span><span class="op">(</span><span class="va">final_model_path</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/collapse_to_string.html">collapse_to_string</a></span><span class="op">(</span><span class="va">based_on</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="co"># collapses list column for easier printing</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="va">based_on</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 3 x 2</span>
+<span class="co">#&gt; # A tibble: 3 × 2</span>
 <span class="co">#&gt;   run   based_on</span>
 <span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;   </span>
 <span class="co">#&gt; 1 1     &lt;NA&gt;    </span>
@@ -521,7 +524,7 @@ DIV.diffobj-container.light.yb DIV.diffobj-line {
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">log_df</span> <span class="op">&lt;-</span> <span class="va">log_df</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/config_log.html">add_config</a></span><span class="op">(</span><span class="op">)</span>
 <span class="va">log_df</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="va">model_has_changed</span>, <span class="va">data_has_changed</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 x 3</span>
+<span class="co">#&gt; # A tibble: 6 × 3</span>
 <span class="co">#&gt;   run   model_has_changed data_has_changed</span>
 <span class="co">#&gt;   &lt;chr&gt; &lt;lgl&gt;             &lt;lgl&gt;           </span>
 <span class="co">#&gt; 1 1     FALSE             FALSE           </span>
@@ -548,7 +551,7 @@ DIV.diffobj-container.light.yb DIV.diffobj-line {
 <span class="va">final_model_family</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="../reference/collapse_to_string.html">collapse_to_string</a></span><span class="op">(</span><span class="va">based_on</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="va">based_on</span>, <span class="va">description</span>, <span class="va">model_has_changed</span>, <span class="va">data_has_changed</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 4 x 5</span>
+<span class="co">#&gt; # A tibble: 4 × 5</span>
 <span class="co">#&gt;   run   based_on description model_has_changed data_has_changed</span>
 <span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;       &lt;lgl&gt;             &lt;lgl&gt;           </span>
 <span class="co">#&gt; 1 1     &lt;NA&gt;     &lt;NA&gt;        FALSE             FALSE           </span>

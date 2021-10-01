@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.4</span>
       </span>
     </div>
 
@@ -64,6 +64,9 @@
       <a href="../articles/getting-started.html">Getting Started with bbr</a>
     </li>
     <li>
+      <a href="../articles/nonmem-parallel.html">Running NONMEM in Parallel: bbr Tips and Tricks</a>
+    </li>
+    <li>
       <a href="../articles/parameter-labels.html">bbr Parameter Labels</a>
     </li>
     <li>
@@ -81,7 +84,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/metrumresearchgroup/bbr">
-    <span class="fas fa-github fa-lg"></span>
+    <span class="fa fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -95,7 +98,7 @@
 
       
 
-      </header><script src="using-summary-log_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
+      </header><script src="using-summary-log_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Creating a Model Summary Log</h1>
@@ -183,10 +186,11 @@
 <span class="co">#&gt;  [9] "number_of_obs"           "ofv"                    </span>
 <span class="co">#&gt; [11] "param_count"             "condition_number"       </span>
 <span class="co">#&gt; [13] "any_heuristics"          "covariance_step_aborted"</span>
-<span class="co">#&gt; [15] "large_condition_number"  "correlations_not_ok"    </span>
-<span class="co">#&gt; [17] "parameter_near_boundary" "hessian_reset"          </span>
-<span class="co">#&gt; [19] "has_final_zero_gradient" "minimization_terminated"</span>
-<span class="co">#&gt; [21] "eta_pval_significant"    "prderr"</span></code></pre></div>
+<span class="co">#&gt; [15] "large_condition_number"  "eigenvalue_issues"      </span>
+<span class="co">#&gt; [17] "correlations_not_ok"     "parameter_near_boundary"</span>
+<span class="co">#&gt; [19] "hessian_reset"           "has_final_zero_gradient"</span>
+<span class="co">#&gt; [21] "minimization_terminated" "eta_pval_significant"   </span>
+<span class="co">#&gt; [23] "prderr"</span></code></pre></div>
 <p>The specific columns returned are described below, though there is also a list of them, with brief definitions, in the <a href="https://metrumresearchgroup.github.io/bbr/reference/summary_log.html"><code>summary_log()</code> docs</a> that can be accessed any time with <code>?summary_log()</code> in the console.</p>
 <div id="housekeeping-columns" class="section level2">
 <h2 class="hasAnchor">
@@ -212,14 +216,14 @@
     <span class="va">number_of_obs</span>, 
     <span class="va">condition_number</span>
   <span class="op">)</span>
-<span class="co">#&gt; # A tibble: 5 x 8</span>
-<span class="co">#&gt;   run        ofv param_count estimation_method    problem_text  number_of_subje…</span>
-<span class="co">#&gt;   &lt;chr&gt;    &lt;dbl&gt;       &lt;int&gt; &lt;chr&gt;                &lt;chr&gt;                    &lt;int&gt;</span>
-<span class="co">#&gt; 1 1001     3843.          15 MCMC Bayesian Analy… Run# 1001.1                240</span>
-<span class="co">#&gt; 2 acop-…   2675.           7 First Order Conditi… LEM PK model…               40</span>
-<span class="co">#&gt; 3 acop-…  44159.           9 First Order Conditi… LEM PK model…               39</span>
-<span class="co">#&gt; 4 examp… -10839.          21 Stochastic Approxim… RUN# example…              400</span>
-<span class="co">#&gt; 5 iovmm   14722.          11 First Order Conditi… LEM 10 mixtu…              300</span>
+<span class="co">#&gt; # A tibble: 5 × 8</span>
+<span class="co">#&gt;   run                  ofv param_count estimation_meth… problem_text number_of_subje…</span>
+<span class="co">#&gt;   &lt;chr&gt;              &lt;dbl&gt;       &lt;int&gt; &lt;chr&gt;            &lt;chr&gt;                   &lt;int&gt;</span>
+<span class="co">#&gt; 1 1001               3843.          15 MCMC Bayesian A… Run# 1001.1               240</span>
+<span class="co">#&gt; 2 acop-fake-bayes    2675.           7 First Order Con… LEM PK mode…               40</span>
+<span class="co">#&gt; 3 acop-iov          44159.           9 First Order Con… LEM PK mode…               39</span>
+<span class="co">#&gt; 4 example2_saemimp -10839.          21 Stochastic Appr… RUN# exampl…              400</span>
+<span class="co">#&gt; 5 iovmm             14722.          11 First Order Con… LEM 10 mixt…              300</span>
 <span class="co">#&gt; # … with 2 more variables: number_of_obs &lt;int&gt;, condition_number &lt;dbl&gt;</span></code></pre></div>
 </div>
 <div id="run-heuristics-columns" class="section level2">
@@ -230,15 +234,15 @@
 <p>All of the heuristic flags are pivoted out to their own columns in the <code>bbi_summary_log_df</code> tibble. It’s useful to note that, except for <code>needed_fail_flags</code> (discussed above), these are the <em>only logical columns</em> in the tibble and can therefore be easily selected with <code><a href="https://tidyselect.r-lib.org/reference/where.html">tidyselect::where(is.logical)</a></code>. <em>(Note: <code><a href="https://tidyselect.r-lib.org/reference/where.html">where()</a></code> only became available in <code>tidyselect (&gt;= 1.1.0)</code>, released May 2020.)</em></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">sum_df</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/where.html">where</a></span><span class="op">(</span><span class="va">is.logical</span><span class="op">)</span>, <span class="op">-</span><span class="va">needed_fail_flags</span><span class="op">)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 5 x 12
-#&gt;   run       needed_fail_flags any_heuristics covariance_step_… large_condition_…
-#&gt;   &lt;chr&gt;     &lt;lgl&gt;             &lt;lgl&gt;          &lt;lgl&gt;             &lt;lgl&gt;            
-#&gt; 1 1001      TRUE              TRUE           FALSE             TRUE             
-#&gt; 2 acop-fak… FALSE             TRUE           FALSE             FALSE            
-#&gt; 3 acop-iov  FALSE             TRUE           FALSE             FALSE            
-#&gt; 4 example2… FALSE             FALSE          FALSE             FALSE            
-#&gt; 5 iovmm     FALSE             TRUE           FALSE             FALSE            
-#&gt; # … with 7 more variables: correlations_not_ok &lt;lgl&gt;,
+<pre><code>#&gt; # A tibble: 5 × 13
+#&gt;   run              needed_fail_fla… any_heuristics covariance_step… large_condition…
+#&gt;   &lt;chr&gt;            &lt;lgl&gt;            &lt;lgl&gt;          &lt;lgl&gt;            &lt;lgl&gt;           
+#&gt; 1 1001             TRUE             TRUE           FALSE            TRUE            
+#&gt; 2 acop-fake-bayes  FALSE            TRUE           FALSE            FALSE           
+#&gt; 3 acop-iov         FALSE            TRUE           FALSE            FALSE           
+#&gt; 4 example2_saemimp FALSE            FALSE          FALSE            FALSE           
+#&gt; 5 iovmm            FALSE            TRUE           FALSE            FALSE           
+#&gt; # … with 8 more variables: eigenvalue_issues &lt;lgl&gt;, correlations_not_ok &lt;lgl&gt;,
 #&gt; #   parameter_near_boundary &lt;lgl&gt;, hessian_reset &lt;lgl&gt;,
 #&gt; #   has_final_zero_gradient &lt;lgl&gt;, minimization_terminated &lt;lgl&gt;,
 #&gt; #   eta_pval_significant &lt;lgl&gt;, prderr &lt;lgl&gt;</code></pre>
@@ -258,7 +262,7 @@
 <span class="va">log_df</span> <span class="op">&lt;-</span> <span class="va">log_df</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/summary_log.html">add_summary</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="va">log_df</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="va">tags</span>, <span class="va">ofv</span>, <span class="va">param_count</span>, <span class="va">any_heuristics</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 2 x 5</span>
+<span class="co">#&gt; # A tibble: 2 × 5</span>
 <span class="co">#&gt;   run             tags      ofv param_count any_heuristics</span>
 <span class="co">#&gt;   &lt;chr&gt;           &lt;list&gt;  &lt;dbl&gt;       &lt;int&gt; &lt;lgl&gt;         </span>
 <span class="co">#&gt; 1 acop-fake-bayes &lt;NULL&gt;  2675.           7 TRUE          </span>
