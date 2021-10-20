@@ -55,7 +55,7 @@ batch_param_estimates <- function(.path,
     }
   )
 
-  df <- data.table::fread(text = res$stdout) %>%
+  df <- read.csv(text = res$stdout, header = TRUE) %>%
     tidyr::as_tibble() %>%
     dplyr::rename(
       'absolute_model_path' = 'dir',
