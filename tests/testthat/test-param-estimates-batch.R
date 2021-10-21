@@ -8,7 +8,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   # creating parameter summary tibble
   #########################################
 
-  test_that("batch_param_estimates produces expected output", {
+  test_that("param_estimates_batch produces expected output", {
 
     on.exit(cleanup())
 
@@ -17,7 +17,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     copy_to_batch_params(MOD1_PATH, "5")
 
     # get table of parameter estimates
-    param_tbl <- BATCH_PARAM_TEST_DIR %>% batch_param_estimates()
+    param_tbl <- BATCH_PARAM_TEST_DIR %>% param_estimates_batch()
 
     # table should have two rows (for two model runs detected)
     expect_equal(nrow(param_tbl), 2)
@@ -40,7 +40,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   # different number of params
   #####################
 
-  test_that("batch_param_estimates() works with varying number of param estimates", {
+  test_that("param_estimates_batch() works with varying number of param estimates", {
 
     on.exit(cleanup())
 
@@ -49,7 +49,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     copy_to_batch_params(file.path(MODEL_DIR_X, "iovmm"), "6")
 
     # get table of parameter estimates
-    param_tbl <- BATCH_PARAM_TEST_DIR %>% batch_param_estimates()
+    param_tbl <- BATCH_PARAM_TEST_DIR %>% param_estimates_batch()
 
     # because these files do not have identical param names, some NAs should be present for values
     without_error <- param_tbl  %>% select(-c("absolute_model_path", "error_msg", "termination_code"))
@@ -64,7 +64,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   # empty extension file
   #####################
 
-  test_that("batch_param_estimates() works if an .ext file detected is empty", {
+  test_that("param_estimates_batch() works if an .ext file detected is empty", {
 
     on.exit(cleanup())
 
@@ -75,7 +75,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     readr::write_file("", file.path(BATCH_PARAM_TEST_DIR, new_mod_id, paste0(new_mod_id, ".ext")))
 
     # create parameter table
-    param_tbl <- BATCH_PARAM_TEST_DIR %>% batch_param_estimates()
+    param_tbl <- BATCH_PARAM_TEST_DIR %>% param_estimates_batch()
 
     # only `absolute_model_path`, `error_msg`, and `termination_code` columns should be present
     expect_identical(names(param_tbl), c("absolute_model_path", "error_msg", "termination_code"))
@@ -93,7 +93,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   # missing termination line
   #####################
 
-  test_that("batch_param_estimates() works if the termination line is missing in an .ext file", {
+  test_that("param_estimates_batch() works if the termination line is missing in an .ext file", {
 
     on.exit(cleanup())
 
@@ -119,7 +119,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
  file.path(BATCH_PARAM_TEST_DIR, new_mod_id, paste0(new_mod_id, ".ext")))
 
     # create parameter table
-    param_tbl <- BATCH_PARAM_TEST_DIR %>% batch_param_estimates()
+    param_tbl <- BATCH_PARAM_TEST_DIR %>% param_estimates_batch()
 
     # only `absolute_model_path`, `error_msg`, and `termination_code` columns should be present
     expect_identical(names(param_tbl), c("absolute_model_path", "error_msg", "termination_code"))

@@ -20,7 +20,7 @@
 #' @param ... args passed through to [bbi_exec()]
 #' @param .dry_run show what the command would be without actually running it
 #' @export
-batch_param_estimates <- function(.path,
+param_estimates_batch <- function(.path,
                                   ...,
                                   .dry_run = FALSE) {
   if (!dir_exists(.path)) {
