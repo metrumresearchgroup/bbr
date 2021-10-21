@@ -88,7 +88,7 @@ MOD4_ABS_PATH <- fs::path_norm(file.path(getwd(), LEVEL2_MOD)) %>% as.character(
 RUN_LOG_ROWS <- 3L
 RUN_LOG_COLS <- 10L
 CONFIG_COLS <- 9L
-SUM_LOG_COLS <- 22L
+SUM_LOG_COLS <- 23L
 
 CONFIG_DATA_PATH <- "../../../../extdata/acop.csv"
 CONFIG_DATA_MD5 <- "4ddb44da897c26681d892aa7be99f74b"

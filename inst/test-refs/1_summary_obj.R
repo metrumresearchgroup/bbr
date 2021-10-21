@@ -14,7 +14,8 @@ structure(list(
     )
   ), run_heuristics = list(
     covariance_step_aborted = FALSE,
-    large_condition_number = FALSE, correlations_not_ok = FALSE,
+    large_condition_number = FALSE, eigenvalue_issues = FALSE,
+    correlations_not_ok = FALSE,
     parameter_near_boundary = FALSE, hessian_reset = FALSE,
     has_final_zero_gradient = FALSE, minimization_terminated = FALSE,
     eta_pval_significant = FALSE, prderr = FALSE
