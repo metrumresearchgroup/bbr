@@ -24,7 +24,7 @@ steps:
   image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:latest
   commands:
   - chmod +x install_bbi.sh
-  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.0.2'
+  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.0.3'
   volumes:
   - name: cache
     path: /ephemeral
@@ -91,7 +91,7 @@ steps:
   image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:2020-04-18
   commands:
   - chmod +x install_bbi.sh
-  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.0.2'
+  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.0.3'
   volumes:
   - name: cache
     path: /ephemeral
@@ -159,7 +159,7 @@ steps:
   image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:cran-latest
   commands:
   - chmod +x install_bbi.sh
-  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.0.2'
+  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.0.3'
   volumes:
   - name: cache
     path: /ephemeral
@@ -229,7 +229,7 @@ steps:
   image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:latest
   commands:
   - chmod +x install_bbi.sh
-  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.0.2'
+  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.0.3'
   volumes:
   - name: cache
     path: /ephemeral
@@ -288,7 +288,7 @@ steps:
   image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:latest
   commands:
   - chmod +x install_bbi.sh
-  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.0.2'
+  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.0.3'
   volumes:
   - name: cache
     path: /ephemeral
