@@ -3,14 +3,21 @@
 #' Batch Processing of Parameter Estimates
 #'
 #' Calls out to `bbi nonmem params` and returns a tibble of parameter estimates.
+#' The primary reason for this function is for things like bootstraps or
+#' simulations where parameter estimates for a large number of models (hundreds
+#' or thousands) need to be pulled in together. In those cases, this function is
+#' _much_ faster than using [model_summaries()] and [parameter_estimates()],
+#' because it does _not_ parse all of the other information contained in a
+#' `bbi_nonmem_summary` object.
+#'
+#' @details
+#'
 #' The tibble will always have columns `absolute_model_path`, `run`,
 #' `error_msg`, and `termination_code`. All other columns names are those of the
 #' parameter estimates found in the `.ext` files detected in the directory
 #' passed. Note: the passed directory is _not_ searched recursively. Passed
 #' directory will be searched for model files and output directories for found
 #' models will be searched for `.ext` files.
-#'
-#' @details
 #'
 #' `error_msg`: column will be `NA` if error is not detected. Column will contain message if known error is detected. The known errors
 #' are
@@ -24,8 +31,8 @@
 #' output tibble will show all parameter names across files and NA values for
 #' the files where a given parameter is missing.
 #'
-#' @importFrom dplyr rename select mutate everything
-#' @importFrom tidyr as_tibble
+#' @importFrom dplyr rename select mutate everything starts_with across
+#' @importFrom readr read_csv
 #'
 #' @param .path a path to a directory containing model sudirectories for batch parameter processing.
 #' @param ... args passed through to [bbi_exec()]
@@ -68,13 +75,8 @@ param_estimates_batch <- function(.path,
     }
   )
 
-  df <- read.csv(text = res$stdout, header = TRUE)
-
-  # if none succeeded, there will be an empty X column instead of params
-  if ("X" %in% names(df)) df <- select(df, -.data$X)
-
-  df %>%
-    as_tibble() %>%
+  readr::read_csv(I(res$stdout), col_types = readr::cols()) %>%
+    select(-dplyr::starts_with("...")) %>% # throw out unnamed column that gets created if no models succeeded
     rename(
       absolute_model_path = .data$dir,
       error_msg = .data$error,

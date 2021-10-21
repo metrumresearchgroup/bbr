@@ -15,14 +15,21 @@ param_estimates_batch(.path, ..., .dry_run = FALSE)
 }
 \description{
 Calls out to \verb{bbi nonmem params} and returns a tibble of parameter estimates.
+The primary reason for this function is for things like bootstraps or
+simulations where parameter estimates for a large number of models (hundreds
+or thousands) need to be pulled in together. In those cases, this function is
+\emph{much} faster than using \code{\link[=model_summaries]{model_summaries()}} and \code{\link[=parameter_estimates]{parameter_estimates()}},
+because it does \emph{not} parse all of the other information contained in a
+\code{bbi_nonmem_summary} object.
+}
+\details{
 The tibble will always have columns \code{absolute_model_path}, \code{run},
 \code{error_msg}, and \code{termination_code}. All other columns names are those of the
 parameter estimates found in the \code{.ext} files detected in the directory
 passed. Note: the passed directory is \emph{not} searched recursively. Passed
 directory will be searched for model files and output directories for found
 models will be searched for \code{.ext} files.
-}
-\details{
+
 \code{error_msg}: column will be \code{NA} if error is not detected. Column will contain message if known error is detected. The known errors
 are
 \itemize{
