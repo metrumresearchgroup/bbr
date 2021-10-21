@@ -101,6 +101,11 @@ submit_nonmem_model <- function(.mod,
       cmd_args,
       sprintf("--config=%s", normalizePath(.config_path))
     )
+  } else {
+    default_config_path <- file.path(model_dir, "bbi.yaml")
+    if (!fs::file_exists(default_config_path) && !isTRUE(.dry_run)) {
+      stop(glue("Looking for default configuration file at {default_config_path}: no such file or directory"), call. = F)
+    }
   }
 
   if (.dry_run) {

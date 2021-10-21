@@ -82,7 +82,9 @@ bbi_exec <- function(.cmd_args,
     ...,
     wd = .dir,
     stdout = stdout_file,
-    stderr = "2>&1"
+    stderr = "2>&1",
+    cleanup = .wait,
+    cleanup_tree = FALSE
   )
   if (.wait) {
     # wait for process and capture stdout and stderr

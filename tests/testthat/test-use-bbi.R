@@ -36,15 +36,6 @@ test_that("use-bbi works on linux with path specified", {
 })
 
 
-test_that("bbi_version and bbi_current_version match", {
-  skip_if_over_rate_limit()
-
-  withr::with_options(list("bbr.bbi_exe_path" = read_bbi_path()), {
-    expect_equal(bbi_version(), bbi_current_release())
-  })
-})
-
-
 test_that("bbi_version returns nothing with fake bbi", {
   withr::with_options(list("bbr.bbi_exe_path" = "/fake/path/bbi"), {
     expect_equal(bbi_version(), "")
