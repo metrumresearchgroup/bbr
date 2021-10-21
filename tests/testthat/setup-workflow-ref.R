@@ -30,11 +30,6 @@ if (!Sys.getenv("METWORX_VERSION") == "" || Sys.getenv("DRONE") == "true") {
 NEW_MOD2 <- file.path(MODEL_DIR, "2")
 NEW_MOD3 <- file.path(MODEL_DIR, "3")
 BATCH_PARAM_TEST_DIR <- file.path(MODEL_DIR, "test_batch_params")
-NEW_MOD4 <- file.path(BATCH_PARAM_TEST_DIR, '4')
-NEW_MOD5 <- file.path(BATCH_PARAM_TEST_DIR, '5')
-NEW_MOD6 <- file.path(BATCH_PARAM_TEST_DIR, '6')
-NEW_MOD7 <- file.path(BATCH_PARAM_TEST_DIR, '7')
-NEW_MOD8 <- file.path(BATCH_PARAM_TEST_DIR, '8')
 
 MODEL_DIR_X <- fs::path_rel(system.file("model", "nonmem", "complex",   package = "bbr"), getwd()) %>% as.character()
 
@@ -194,11 +189,6 @@ cleanup <- function() {
 
   if (fs::dir_exists(NEW_MOD2)) fs::dir_delete(NEW_MOD2)
   if (fs::dir_exists(NEW_MOD3)) fs::dir_delete(NEW_MOD3)
-  if (fs::dir_exists(NEW_MOD4)) fs::dir_delete(NEW_MOD4)
-  if (fs::dir_exists(NEW_MOD5)) fs::dir_delete(NEW_MOD5)
-  if (fs::dir_exists(NEW_MOD6)) fs::dir_delete(NEW_MOD6)
-  if (fs::dir_exists(NEW_MOD7)) fs::dir_delete(NEW_MOD7)
-  if (fs::dir_exists(NEW_MOD8)) fs::dir_delete(NEW_MOD8)
   if (fs::dir_exists(BATCH_PARAM_TEST_DIR)) fs::dir_delete(BATCH_PARAM_TEST_DIR)
   if (fs::dir_exists(LEVEL2_DIR)) fs::dir_delete(LEVEL2_DIR)
 
@@ -283,4 +273,31 @@ cleanup_model <- function(.mod) {
   if (fs::file_exists(get_model_path(.mod, .check_exists = FALSE))) fs::file_delete(get_model_path(.mod))
   if (fs::dir_exists(get_output_dir(.mod, .check_exists = FALSE)))  fs::dir_delete(get_output_dir(.mod))
   rm(.mod)
+}
+
+
+#' helper to copy a control stream and .ext file to
+#' BATCH_PARAM_TEST_DIR for testing
+#' @param orig_model_path Path that can load a model with `read_model()`
+#' @param new_name Name of new model (not full path)
+copy_to_batch_params <- function(orig_model_path, new_name) {
+
+  # sanitize new name
+  checkmate::assert_string(new_name)
+  new_name <- stringr::str_replace_all(new_name, "[^A-Za-z0-9]", "")
+
+  .mod <- read_model(orig_model_path)
+
+  new_dir <- file.path(BATCH_PARAM_TEST_DIR, new_name)
+  if (!fs::dir_exists(new_dir)) fs::dir_create(new_dir)
+
+  fs::file_copy(
+    get_model_path(.mod),
+    ctl_ext(new_dir)
+  )
+
+  fs::file_copy(
+    build_path_from_model(.mod, ".ext"),
+    file.path(new_dir, paste0(new_name, ".ext"))
+  )
 }

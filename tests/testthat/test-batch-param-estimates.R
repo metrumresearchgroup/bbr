@@ -10,22 +10,11 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   test_that("batch_param_estimates produces expected output", {
 
-    on.exit({
-      fs::dir_delete(NEW_MOD4)
-      fs::dir_delete(NEW_MOD5)
-      fs::dir_delete(BATCH_PARAM_TEST_DIR)
-    })
-
-    dir.create(BATCH_PARAM_TEST_DIR)
-    dir.create(NEW_MOD4)
-    dir.create(NEW_MOD5)
+    on.exit(cleanup())
 
     # copy .ext file two times (to simulate two model runs)
-    fs::file_copy(file.path(MOD1_PATH, "1.ext"), NEW_MOD4)
-    fs::file_move(file.path(NEW_MOD4, "1.ext"), file.path(NEW_MOD4, "4.ext"))
-
-    fs::file_copy(file.path(MOD1_PATH, "1.ext"), NEW_MOD5)
-    fs::file_move(file.path(NEW_MOD5, "1.ext"), file.path(NEW_MOD5, "5.ext"))
+    copy_to_batch_params(MOD1_PATH, "4")
+    copy_to_batch_params(MOD1_PATH, "5")
 
     # get table of parameter estimates
     param_tbl <- BATCH_PARAM_TEST_DIR %>% batch_param_estimates()
@@ -53,27 +42,14 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   test_that("batch_param_estimates() works with varying number of param estimates", {
 
-    on.exit({
-      fs::dir_delete(NEW_MOD4)
-      fs::dir_delete(NEW_MOD6)
-      fs::dir_delete(BATCH_PARAM_TEST_DIR)
-    })
-
-    dir.create(BATCH_PARAM_TEST_DIR)
-    dir.create(NEW_MOD4)
-    dir.create(NEW_MOD6)
+    on.exit(cleanup())
 
     # copy two different .ext file runs (to simulate two model runs with varying parameters)
-    fs::file_copy(file.path(MOD1_PATH, "1.ext"), NEW_MOD4)
-    fs::file_move(file.path(NEW_MOD4, "1.ext"), file.path(NEW_MOD4, "4.ext"))
-
-    fs::file_copy(file.path(MODEL_DIR_X, "iovmm", "iovmm.ext"), NEW_MOD6)
-    fs::file_move(file.path(NEW_MOD6, "iovmm.ext"), file.path(NEW_MOD6, "6.ext"))
-
+    copy_to_batch_params(MOD1_PATH, "4")
+    copy_to_batch_params(file.path(MODEL_DIR_X, "iovmm"), "6")
 
     # get table of parameter estimates
     param_tbl <- BATCH_PARAM_TEST_DIR %>% batch_param_estimates()
-
 
     # because these files do not have identical param names, some NAs should be present for values
     without_error <- param_tbl  %>% select(-c("absolute_model_path", "error_msg", "termination_code"))
@@ -90,16 +66,13 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   test_that("batch_param_estimates() works if an .ext file detected is empty", {
 
-    on.exit({
-      fs::dir_delete(NEW_MOD7)
-      fs::dir_delete(BATCH_PARAM_TEST_DIR)
-    })
+    on.exit(cleanup())
 
-    dir.create(BATCH_PARAM_TEST_DIR)
-    dir.create(NEW_MOD7)
+    new_mod_id <- "7"
+    copy_to_batch_params(MOD1_PATH, new_mod_id)
 
     # write an empty .ext file to path
-    readr::write_file("", file.path(NEW_MOD7, "7.ext"))
+    readr::write_file("", file.path(BATCH_PARAM_TEST_DIR, new_mod_id, paste0(new_mod_id, ".ext")))
 
     # create parameter table
     param_tbl <- BATCH_PARAM_TEST_DIR %>% batch_param_estimates()
@@ -122,13 +95,10 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   test_that("batch_param_estimates() works if the termination line is missing in an .ext file", {
 
-    on.exit({
-      fs::dir_delete(NEW_MOD8)
-      fs::dir_delete(BATCH_PARAM_TEST_DIR)
-    })
+    on.exit(cleanup())
 
-    dir.create(BATCH_PARAM_TEST_DIR)
-    dir.create(NEW_MOD8)
+    new_mod_id <- "8"
+    copy_to_batch_params(MOD1_PATH, new_mod_id)
 
     # write an .ext file that is missing line -1000000000
     readr::write_file("TABLE NO.     1: First Order Conditional Estimation with Interaction: Goal Function=MINIMUM VALUE OF OBJECTIVE FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0
@@ -145,7 +115,8 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   -1000000005  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  1.00000E+10  3.22245E-02  1.00000E+10  3.41085E-02    0.0000000000000000
   -1000000006  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  1.00000E+00  0.00000E+00  1.00000E+00  0.00000E+00    0.0000000000000000
   -1000000007  0.00000E+00  3.70000E+01  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00    0.0000000000000000
-  -1000000008 -3.39427E-03  1.00007E-04 -7.27007E-04 -1.46088E-01  2.43350E-03  0.00000E+00  4.84108E-02  0.00000E+00 -5.58021E-03    0.0000000000000000", file.path(NEW_MOD8, "8.ext"))
+  -1000000008 -3.39427E-03  1.00007E-04 -7.27007E-04 -1.46088E-01  2.43350E-03  0.00000E+00  4.84108E-02  0.00000E+00 -5.58021E-03    0.0000000000000000",
+ file.path(BATCH_PARAM_TEST_DIR, new_mod_id, paste0(new_mod_id, ".ext")))
 
     # create parameter table
     param_tbl <- BATCH_PARAM_TEST_DIR %>% batch_param_estimates()
