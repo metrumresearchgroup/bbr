@@ -55,7 +55,12 @@ batch_param_estimates <- function(.path,
     }
   )
 
-  df <- read.csv(text = res$stdout, header = TRUE) %>%
+  df <- read.csv(text = res$stdout, header = TRUE)
+
+  # if none succeeded, there will be an empty X column instead of params
+  if ("X" %in% names(df)) df <- select(df, -X)
+
+  df <- df %>%
     tidyr::as_tibble() %>%
     dplyr::rename(
       'absolute_model_path' = 'dir',
