@@ -78,7 +78,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     param_tbl <- BATCH_PARAM_TEST_DIR %>% param_estimates_batch()
 
     # only `absolute_model_path`, `error_msg`, and `termination_code` columns should be present
-    expect_identical(names(param_tbl), c("absolute_model_path", "error_msg", "termination_code"))
+    expect_identical(names(param_tbl), c("absolute_model_path", "run", "error_msg", "termination_code"))
 
     # `error_msg` should not be `NA`
     expect_false(is.na(param_tbl$error_msg))
@@ -122,7 +122,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     param_tbl <- BATCH_PARAM_TEST_DIR %>% param_estimates_batch()
 
     # only `absolute_model_path`, `error_msg`, and `termination_code` columns should be present
-    expect_identical(names(param_tbl), c("absolute_model_path", "error_msg", "termination_code"))
+    expect_identical(names(param_tbl), c("absolute_model_path", "run", "error_msg", "termination_code"))
 
     # `error_msg` should not be `NA`
     expect_false(is.na(param_tbl$error_msg))
