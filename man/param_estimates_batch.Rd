@@ -18,7 +18,7 @@ Calls out to \verb{bbi nonmem params} and returns a tibble of parameter estimate
 The primary reason for this function is for things like bootstraps or
 simulations where parameter estimates for a large number of models (hundreds
 or thousands) need to be pulled in together. In those cases, this function is
-\emph{much} faster than using \code{\link[=model_summaries]{model_summaries()}} and \code{\link[=parameter_estimates]{parameter_estimates()}},
+\emph{much} faster than using \code{\link[=model_summaries]{model_summaries()}} and \code{\link[=param_estimates]{param_estimates()}},
 because it does \emph{not} parse all of the other information contained in a
 \code{bbi_nonmem_summary} object.
 }

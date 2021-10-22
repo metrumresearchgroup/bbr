@@ -6,7 +6,7 @@
 #' The primary reason for this function is for things like bootstraps or
 #' simulations where parameter estimates for a large number of models (hundreds
 #' or thousands) need to be pulled in together. In those cases, this function is
-#' _much_ faster than using [model_summaries()] and [parameter_estimates()],
+#' _much_ faster than using [model_summaries()] and [param_estimates()],
 #' because it does _not_ parse all of the other information contained in a
 #' `bbi_nonmem_summary` object.
 #'
@@ -45,7 +45,7 @@ param_estimates_batch <- function(.path,
   .path <- fs::path_abs(.path)
   if (!dir_exists(.path)) {
     err_msg <-
-      glue("batch_parameter_estimates('{.path}') failed; unable to locate {.path}")
+      glue("param_estimates_batch('{.path}') failed; unable to locate {.path}")
     stop(err_msg, call. = FALSE)
   }
 
@@ -69,14 +69,18 @@ param_estimates_batch <- function(.path,
     error = function(e) {
       err_msg <-
         glue(
-          "batch_parameter_estimates('{.path}') failed with the following error. This may be because the modeling run has not finished successfully.\n\nERROR: \n{e}"
+          "param_estimates_batch('{.path}') failed with the following error. This may be because the modeling run has not finished successfully.\n\nERROR: \n{e}"
         )
       stop(err_msg, call. = FALSE)
     }
   )
 
-  readr::read_csv(I(res$stdout), col_types = readr::cols()) %>%
-    select(-dplyr::starts_with("...")) %>% # throw out unnamed column that gets created if no models succeeded
+  df <- suppressSpecificWarning({
+    readr::read_csv(I(res$stdout), col_types = readr::cols())
+  }, .regexpr = "Missing column names")
+
+  df %>%
+    select(-dplyr::starts_with(c("...", "X"))) %>% # throw out unnamed column that gets created if no models succeeded
     rename(
       absolute_model_path = .data$dir,
       error_msg = .data$error,

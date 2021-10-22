@@ -38,7 +38,7 @@ Imports:
     cli,
     digest,
     diffobj,
-    dplyr (>= 0.8.0),
+    dplyr (>= 1.0.0),
     forcats,
     fs,
     ggplot2,
