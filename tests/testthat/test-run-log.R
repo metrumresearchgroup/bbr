@@ -53,8 +53,7 @@ test_that("run_log matches reference", {
     !!YAML_DESCRIPTION  := "character",
     !!YAML_BBI_ARGS     := "list",
     !!YAML_BASED_ON     := "list",
-    !!YAML_TAGS         := "list",
-    !!YAML_DECISIONS    := "list",
+    !!YAML_TAGS         := "list"
   ) %>% as.list()
 
   for (.n in names(run_log_classes_ref)) {
