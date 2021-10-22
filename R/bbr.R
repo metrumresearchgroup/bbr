@@ -204,7 +204,7 @@ check_bbi_version_constraint <- function(
   .min_version = getOption("bbr.bbi_min_version"),
   .function = NULL
 ) {
-  if (isTRUE(getOption("rbabylon.DEV_no_min_version"))) {
+  if (isTRUE(getOption("bbr.DEV_no_min_version"))) {
     return(invisible(TRUE))
   }
   .bbi_exe_path <- Sys.which(.bbi_exe_path)
