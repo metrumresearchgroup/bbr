@@ -6,11 +6,11 @@
 \alias{cov_cor.bbi_nonmem_summary}
 \title{NONMEM Covariance and Correlation Matrices}
 \usage{
-cov_cor(.mod, .threshold = 0.95, ..., .dry_run = FALSE)
+cov_cor(.mod, .threshold = NULL, ..., .dry_run = FALSE)
 
-\method{cov_cor}{bbi_nonmem_model}(.mod, .threshold = 0.95, ..., .dry_run = FALSE)
+\method{cov_cor}{bbi_nonmem_model}(.mod, .threshold = NULL, ..., .dry_run = FALSE)
 
-\method{cov_cor}{bbi_nonmem_summary}(.mod, .threshold = 0.95, ..., .dry_run = FALSE)
+\method{cov_cor}{bbi_nonmem_summary}(.mod, .threshold = NULL, ..., .dry_run = FALSE)
 }
 \arguments{
 \item{.mod}{Model to check.}
@@ -38,5 +38,5 @@ If no \code{.cov} or \code{.cor} files are found for the relevant model, will er
 }}
 
 \seealso{
-\code{\link[=model_summary]{model_summary()}}
+\code{\link[=model_summary]{model_summary()}}, \code{\link[=check_cor_threshold]{check_cor_threshold()}}
 }

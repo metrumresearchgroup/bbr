@@ -3,7 +3,7 @@ skip_if_not_drone_or_metworx("test-cov-cor")
 withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   test_that("cov_cor() works basic model", {
-    .c <- cov_cor(MOD1, .threshold = NULL)
+    .c <- cov_cor(MOD1)
     expect_equal(length(.c), 2)
     expect_equal(dim(.c$cov_theta), c(5,5))
     expect_equal(dim(.c$cor_theta), c(5,5))
@@ -12,7 +12,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   test_that("cov_cor() works with two estimation methods", {
     .c <- file.path(MODEL_DIR_X, "example2_saemimp") %>%
       read_model() %>%
-      cov_cor(.threshold = NULL)
+      cov_cor()
     expect_equal(length(.c), 2)
     expect_equal(dim(.c$cov_theta), c(11,11))
     expect_equal(dim(.c$cor_theta), c(11,11))
@@ -22,7 +22,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   test_that("cov_cor() warns with correlations over threshold", {
     expect_warning({
-      .c <- cov_cor(MOD1)
+      .c <- cov_cor(MOD1, .threshold = 0.95)
     }, regexp = "correlations above specified threshold")
 
     expect_equal(length(.c), 2)
@@ -37,6 +37,16 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
         cov_cor()
     }, regexp = "[Nn]o file present.*\\.cov")
   })
+
+  test_that("check_cor_threshold() works correctly", {
+    .c <- cov_cor(MOD1)
+    expect_warning({
+      check_cor_threshold(.c$cov_theta)
+    }, regexp = "correlations above specified threshold")
+
+  })
+
+
 })
 
 

@@ -5,7 +5,7 @@
 #'
 #' @return A named list of matrices.
 #'
-#' @seealso [model_summary()]
+#' @seealso [model_summary()], [check_cor_threshold()]
 #' @param .mod Model to check.
 #' @param .threshold Numeric scalar between 0 and 1 (defaults to `0.95`). Will
 #'   print a warning if the absolute values of any of the _off-diagonals_ in the
@@ -15,7 +15,7 @@
 #' @export
 cov_cor <- function(
   .mod,
-  .threshold = 0.95,
+  .threshold = NULL,
   ...,
   .dry_run = FALSE
 ) {
@@ -27,7 +27,7 @@ cov_cor <- function(
 #' @export
 cov_cor.bbi_nonmem_model <- function(
   .mod,
-  .threshold = 0.95,
+  .threshold = NULL,
   ...,
   .dry_run = FALSE
 ) {
@@ -35,7 +35,6 @@ cov_cor.bbi_nonmem_model <- function(
 
   # check inputs
   check_yaml_in_sync(.mod)
-  checkmate::assert_numeric(.threshold, lower = 0, upper = 1, len = 1, null.ok = TRUE)
 
   # build args for bbi
   .path <- get_output_dir(.mod)
@@ -87,7 +86,7 @@ cov_cor.bbi_nonmem_model <- function(
 #' @export
 cov_cor.bbi_nonmem_summary <- function(
   .mod,
-  .threshold = 0.95,
+  .threshold = NULL,
   ...,
   .dry_run = FALSE
 ) {
@@ -101,11 +100,19 @@ cov_cor.bbi_nonmem_summary <- function(
 }
 
 
-#' Check if any correlations are over threshold and warn if so
-#' @keywords internal
-check_cor_threshold <- function(cor_mat, threshold) {
+#' Check for high correlations
+#'
+#' Issues a warning if the absolute value of any of the
+#'   _off-diagonal_ elements of `.cor_mat` exceed `.threshold`.
+#' @param .cor_mat Matrix of correlations to check
+#' @inheritParams cov_cor
+#' @seealso [cov_cor()]
+#' @export
+check_cor_threshold <- function(.cor_mat, .threshold = 0.95) {
 
-  bool_mat <- abs(cor_mat) > threshold
+  checkmate::assert_numeric(.threshold, lower = 0, upper = 1, len = 1, null.ok = TRUE)
+
+  bool_mat <- abs(.cor_mat) > .threshold
 
   # make all the diagonals (and upper triangle) FALSE because we only care about off-diagonals
   .dim <- nrow(bool_mat)

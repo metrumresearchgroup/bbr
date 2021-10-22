@@ -2,11 +2,21 @@
 % Please edit documentation in R/cov-cor.R
 \name{check_cor_threshold}
 \alias{check_cor_threshold}
-\title{Check if any correlations are over threshold and warn if so}
+\title{Check for high correlations}
 \usage{
-check_cor_threshold(cor_mat, threshold)
+check_cor_threshold(.cor_mat, .threshold = 0.95)
+}
+\arguments{
+\item{.cor_mat}{Matrix of correlations to check}
+
+\item{.threshold}{Numeric scalar between 0 and 1 (defaults to \code{0.95}). Will
+print a warning if the absolute values of any of the \emph{off-diagonals} in the
+correlation matrix are above this threshold.}
 }
 \description{
-Check if any correlations are over threshold and warn if so
+Issues a warning if the absolute value of any of the
+\emph{off-diagonal} elements of \code{.cor_mat} exceed \code{.threshold}.
 }
-\keyword{internal}
+\seealso{
+\code{\link[=cov_cor]{cov_cor()}}
+}
