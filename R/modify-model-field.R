@@ -168,13 +168,6 @@ replace_all_tags <- function(.mod, .tags) {
   )
 }
 
-#' @describeIn modify_tags **Deprecated** as of bbr 0.10.0, use `replace_all_tags()` instead.
-#' @export
-replace_tags <- function(.mod, .tags) {
-  deprecate_stop("1.0.0", "bbr::replace_tags()", "replace_all_tags()")
-  replace_all_tags(.mod, .tags)
-}
-
 #' @describeIn modify_tags Removes tags from a model object and corresponding YAML.
 #' @export
 remove_tags <- function(.mod, .tags) {
@@ -310,13 +303,6 @@ replace_all_based_on <- function(.mod, .based_on) {
   )
 }
 
-#' @describeIn modify_based_on **Deprecated** as of bbr 0.10.0, use `replace_all_based_on()` instead.
-#' @export
-replace_based_on <- function(.mod, .based_on) {
-  deprecate_stop("1.0.0", "bbr::replace_based_on()", "replace_all_based_on()")
-  replace_all_based_on(.mod, .based_on)
-}
-
 #' @describeIn modify_based_on Remove specified `based_on` identifier(s) from a model object and corresponding YAML.
 #' @export
 remove_based_on <- function(.mod, .based_on) {
@@ -445,13 +431,6 @@ replace_all_bbi_args <- function(.mod, .bbi_args) {
   .mod <- save_model_yaml(.mod)
 
   return(.mod)
-}
-
-#' @describeIn modify_bbi_args **Deprecated** as of bbr 0.10.0, use `replace_all_bbi_args()` instead.
-#' @export
-replace_bbi_args <- function(.mod, .bbi_args) {
-  deprecate_stop("1.0.0", "bbr::replace_bbi_args()", "replace_all_bbi_args()")
-  replace_all_bbi_args(.mod, .bbi_args)
 }
 
 
