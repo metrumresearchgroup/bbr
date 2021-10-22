@@ -15,9 +15,9 @@ cov_cor(.mod, .threshold = NULL, ..., .dry_run = FALSE)
 \arguments{
 \item{.mod}{Model to check.}
 
-\item{.threshold}{Numeric scalar between 0 and 1 (defaults to \code{0.95}). Will
-print a warning if the absolute values of any of the \emph{off-diagonals} in the
-correlation matrix are above this threshold.}
+\item{.threshold}{Numeric scalar between 0 and 1. Will print a warning if the
+absolute values of any of the \emph{off-diagonals} in the correlation matrix are
+above this threshold. If \code{NULL}, the default, skips this check.}
 
 \item{...}{args passed through to \code{\link[=bbi_exec]{bbi_exec()}}}
 

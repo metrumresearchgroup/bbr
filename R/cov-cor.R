@@ -7,9 +7,9 @@
 #'
 #' @seealso [model_summary()], [check_cor_threshold()]
 #' @param .mod Model to check.
-#' @param .threshold Numeric scalar between 0 and 1 (defaults to `0.95`). Will
-#'   print a warning if the absolute values of any of the _off-diagonals_ in the
-#'   correlation matrix are above this threshold.
+#' @param .threshold Numeric scalar between 0 and 1. Will print a warning if the
+#'   absolute values of any of the _off-diagonals_ in the correlation matrix are
+#'   above this threshold. If `NULL`, the default, skips this check.
 #' @param ... args passed through to [bbi_exec()]
 #' @param .dry_run show what the command would be without actually running it
 #' @export
@@ -46,7 +46,7 @@ cov_cor.bbi_nonmem_model <- function(
     return(res)
   }
 
-  # otherwise, execute
+  # parse thetas with bbi
   res <- tryCatch(
     bbi_exec(cmd_args, .dir = .path, ..., .wait = TRUE),
     error = function(e) {
@@ -60,7 +60,11 @@ cov_cor.bbi_nonmem_model <- function(
     jsonlite::fromJSON(simplifyDataFrame = FALSE)
 
   num_est <- length(res_list$covariance_theta)
+
+  # parse full matrices and assemble output
   out <- list(
+    cov = parse_cov_cor_full_file(.mod, ".cov"),
+    cor = parse_cov_cor_full_file(.mod, ".cor"),
     cov_theta = matrix(
       data = res_list$covariance_theta[[num_est]]$values,
       nrow = res_list$covariance_theta[[num_est]]$dim,
@@ -75,7 +79,7 @@ cov_cor.bbi_nonmem_model <- function(
 
   # warn if over threshold
   if (!is.null(.threshold)) {
-    check_cor_threshold(out$cor_theta, .threshold)
+    check_cor_threshold(out$cor, .threshold)
   }
 
   return(out)
@@ -133,4 +137,32 @@ check_cor_threshold <- function(.cor_mat, .threshold = 0.95) {
       paste(losers, collapse = "\n ")
     ), call. = FALSE)
   }
+}
+
+
+#' Helper to pull full matrix from final estimation method from `.cov` or `.cor` files
+#' @param .mod the model object
+#' @param .suffix either `.cov` or `.cor`
+#' @importFrom readr read_table read_lines cols
+#' @importFrom stringr str_detect
+#' @keywords internal
+parse_cov_cor_full_file <- function(.mod, .suffix) {
+  .suffix <- ".cov"
+
+  .f <- build_path_from_model(.mod, .suffix)
+  .lines <- read_lines(.f)
+
+  # get final estimation method only
+  .t <- which(str_detect(.lines, "^TABLE"))
+  .t <- .t[length(.t)]
+
+  df <- read_table(
+    I(.lines[(.t+1):length(.lines)]),
+    col_types = readr::cols()
+  ) %>%
+    select(-NAME)
+
+  df %>%
+    as.matrix() %>%
+    matrix(dimnames = list(names(df), names(df)), nrow = nrow(df))
 }

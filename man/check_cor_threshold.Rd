@@ -9,9 +9,9 @@ check_cor_threshold(.cor_mat, .threshold = 0.95)
 \arguments{
 \item{.cor_mat}{Matrix of correlations to check}
 
-\item{.threshold}{Numeric scalar between 0 and 1 (defaults to \code{0.95}). Will
-print a warning if the absolute values of any of the \emph{off-diagonals} in the
-correlation matrix are above this threshold.}
+\item{.threshold}{Numeric scalar between 0 and 1. Will print a warning if the
+absolute values of any of the \emph{off-diagonals} in the correlation matrix are
+above this threshold. If \code{NULL}, the default, skips this check.}
 }
 \description{
 Issues a warning if the absolute value of any of the
