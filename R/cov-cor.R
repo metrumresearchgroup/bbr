@@ -24,6 +24,8 @@ cov_cor <- function(
 
 #' @describeIn cov_cor Get cov and cor from `bbi_nonmem_model` object
 #' @importFrom checkmate assert_numeric
+#' @importFrom stringr str_subset
+#' @importFrom jsonlite fromJSON
 #' @export
 cov_cor.bbi_nonmem_model <- function(
   .mod,
@@ -64,17 +66,21 @@ cov_cor.bbi_nonmem_model <- function(
   # parse full matrices and assemble output
   out <- list(
     cov = parse_cov_cor_full_file(.mod, ".cov"),
-    cor = parse_cov_cor_full_file(.mod, ".cor"),
-    cov_theta = matrix(
-      data = res_list$covariance_theta[[num_est]]$values,
-      nrow = res_list$covariance_theta[[num_est]]$dim,
-      ncol = res_list$covariance_theta[[num_est]]$dim
-    ),
-    cor_theta = matrix(
-      data = res_list$correlation_theta[[num_est]]$values,
-      nrow = res_list$correlation_theta[[num_est]]$dim,
-      ncol = res_list$correlation_theta[[num_est]]$dim
-    )
+    cor = parse_cov_cor_full_file(.mod, ".cor")
+  )
+
+  theta_names <- str_subset(dimnames(out$cov)[[1]], "THETA")
+  out$cov_theta <- matrix(
+    data = res_list$covariance_theta[[num_est]]$values,
+    nrow = res_list$covariance_theta[[num_est]]$dim,
+    ncol = res_list$covariance_theta[[num_est]]$dim,
+    dimnames = list(theta_names, theta_names)
+  )
+  out$cor_theta <- matrix(
+    data = res_list$correlation_theta[[num_est]]$values,
+    nrow = res_list$correlation_theta[[num_est]]$dim,
+    ncol = res_list$correlation_theta[[num_est]]$dim,
+    dimnames = list(theta_names, theta_names)
   )
 
   # warn if over threshold
