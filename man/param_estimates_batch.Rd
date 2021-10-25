@@ -24,7 +24,7 @@ because it does \emph{not} parse all of the other information contained in a
 }
 \details{
 The tibble will always have columns \code{absolute_model_path}, \code{run},
-\code{error_msg}, and \code{termination_code}. All other columns names are those of the
+\code{error_msg}, and \code{termination_code}. All other column names are those of the
 parameter estimates found in the \code{.ext} files detected in the directory
 passed. Note: the passed directory is \emph{not} searched recursively. Passed
 directory will be searched for model files and output directories for found

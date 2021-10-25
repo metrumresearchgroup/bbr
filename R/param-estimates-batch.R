@@ -13,7 +13,7 @@
 #' @details
 #'
 #' The tibble will always have columns `absolute_model_path`, `run`,
-#' `error_msg`, and `termination_code`. All other columns names are those of the
+#' `error_msg`, and `termination_code`. All other column names are those of the
 #' parameter estimates found in the `.ext` files detected in the directory
 #' passed. Note: the passed directory is _not_ searched recursively. Passed
 #' directory will be searched for model files and output directories for found
@@ -55,7 +55,7 @@ param_estimates_batch <- function(.path,
   ext_file_dir <- basename(.path)
 
   # for bbi nonmem params, need to pass the directory containing .ext
-  # cd to the root directory cointaining directory with .ext files
+  # cd to the root directory containing directory with .ext files
   .path <- dirname(.path)
 
   cmd_args <- c("nonmem", "params", "--dir", ext_file_dir)
@@ -78,11 +78,11 @@ param_estimates_batch <- function(.path,
   )
 
   df <- suppressSpecificWarning({
-    readr::read_csv(I(res$stdout), col_types = readr::cols())
+    read_csv(I(res$stdout), col_types = readr::cols())
   }, .regexpr = "Missing column names")
 
   df %>%
-    select(-dplyr::starts_with(c("...", "X"))) %>% # throw out unnamed column that gets created if no models succeeded
+    select(-starts_with(c("...", "X"))) %>% # throw out unnamed column that gets created if no models succeeded
     rename(
       absolute_model_path = .data$dir,
       error_msg = .data$error,
