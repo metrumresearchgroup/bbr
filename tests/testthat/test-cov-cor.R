@@ -28,6 +28,11 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       expect_equal(dimnames(.c[[.x]])[[1]], names_to_check)
       expect_equal(dimnames(.c[[.x]])[[2]], names_to_check)
     })
+
+    # check values are equal
+    expect_equal(.c$cov[1:5, 1:5], .c$cov_theta)
+    expect_equal(.c$cor[1:5, 1:5], .c$cor_theta)
+
   })
 
   test_that("cov_cor() works with two estimation methods", {

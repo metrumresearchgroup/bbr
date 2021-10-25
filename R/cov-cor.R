@@ -153,7 +153,6 @@ check_cor_threshold <- function(.cor_mat, .threshold = 0.95) {
 #' @importFrom stringr str_detect
 #' @keywords internal
 parse_cov_cor_full_file <- function(.mod, .suffix) {
-  .suffix <- ".cov"
 
   .f <- build_path_from_model(.mod, .suffix)
   .lines <- read_lines(.f)
