@@ -62,13 +62,16 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   test_that("check_cor_threshold() works correctly", {
     .c <- cov_cor(MOD1)
-    expect_warning({
-      check_cor_threshold(.c$cov_theta)
-    }, regexp = "correlations above specified threshold")
     check_mat_dim(.c, 5, 9)
+
+    expect_warning({
+      check_cor_threshold(.c$cor_theta)
+    }, regexp = "correlations above specified threshold.+\\(5,4\\)$")
+
+    expect_warning({
+      check_cor_threshold(.c$cor_theta, 0.5)
+    }, regexp = "correlations above specified threshold.+\\(4,1\\).+\\(5,1\\).+\\(5,4\\)$")
   })
-
-
 })
 
 

@@ -126,21 +126,13 @@ check_cor_threshold <- function(.cor_mat, .threshold = 0.95) {
 
   # make all the diagonals (and upper triangle) FALSE because we only care about off-diagonals
   .dim <- nrow(bool_mat)
-  for (.i in 1:.dim) {
-    bool_mat[.i, .i:.dim] <- FALSE
-  }
+  bool_mat[upper.tri(bool_mat, diag = TRUE)] <- FALSE
 
   if (any(bool_mat)) {
-
-    losers <- map_chr(which(bool_mat), ~ {
-      .col <- ceiling(.x/.dim)
-      .row <- .x - ((.col-1)*.dim)
-      glue("({.row},{.col})")
-    })
-
+    .w <- which(bool_mat, arr.ind = TRUE)
     warning(paste(
       glue("Off-diagonal theta correlations above specified threshold of {.threshold}\n\n"),
-      paste(losers, collapse = "\n ")
+      paste(glue("({.w[,1]},{.w[,2]})"), collapse = "\n ")
     ), call. = FALSE)
   }
 }
