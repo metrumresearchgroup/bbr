@@ -5,11 +5,19 @@
 \title{Check that bbi satisfies a version constraint}
 \usage{
 check_bbi_version_constraint(
-  .bbi_exe_path = getOption("rbabylon.bbi_exe_path")
+  .bbi_exe_path = getOption("bbr.bbi_exe_path"),
+  .min_version = getOption("bbr.bbi_min_version"),
+  .function = NULL
 )
 }
 \arguments{
 \item{.bbi_exe_path}{Path to bbi executable}
+
+\item{.min_version}{The minimum allowed version. Defaults to
+\code{getOption("bbr.bbi_min_version")}.}
+
+\item{.function}{The relevant function that is version-constrained. If not
+\code{NULL}, notifies user in error message.}
 }
 \value{
 \code{NULL} if \code{.bbi_exe_path} satisfies the constraint

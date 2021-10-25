@@ -43,7 +43,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     fs::file_move(file.path(NEW_MOD2, "1.ext"), file.path(NEW_MOD2, "EXT"))
 
     # errors without the flag
-    expect_error(model_summary(mod2), "No file present at.*2/1\\.ext")
+    expect_error(model_summary(mod2), "[Nn]o file present at.*2/1\\.ext")
 
     # works correctly with ext_file flag added
     sum2 <- model_summary(mod2, .bbi_args = list(ext_file = "EXT"))
@@ -91,7 +91,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       fs::file_delete(file.path(NEW_MOD2, paste0("1.", .tc$ext)))
 
       # errors without the flag
-      expect_error(model_summary(mod2), glue::glue("No file present at.*2/1\\.{.tc$ext}"))
+      expect_error(model_summary(mod2), glue::glue("[Nn]o file present at.*2/1\\.{.tc$ext}"))
 
       # works correctly with flag added
       args_list <- list()
