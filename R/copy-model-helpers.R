@@ -16,38 +16,45 @@
 #' It will look for that parent model ID before all strings
 #' passed to `.suffixes` or `.additional_suffixes` (e.g. `{parent_mod}.MSF`, etc.)
 #' replace it with `get_model_id(.mod)` wherever found.
+#'
 #' `.suffixes` defaults to the following:
 #'
-#' * `.MSF`
-#' * `.EXT`
-#' * `.CHN`
+#' * `.msf`
+#' * `.ext`
+#' * `.chn`
 #' * `.tab`
 #' * `par.tab`
 #'
 #' All matches are _not_ case sensitive but replacements _are_. For example, if
-#' `.MSF` is passed as a suffix, `{parent_mod}.MSF` and
-#' `{parent_mod}.msf` would both be replaced, but the case of the suffix in
-#' the control stream will be maintained as is.
+#' `.msf` is passed as a suffix, `{parent_mod}.MSF` and `{parent_mod}.msf` would
+#' _both_ be replaced, but the case of the suffix in the control stream will be
+#' maintained as is.
 #'
-#' @return Invisibly returns `.mod`, to enable piping (i.e. from `copy_model_from()`)
+#' @return Invisibly returns `.mod`, to enable piping (i.e. from
+#'   `copy_model_from()`)
 #'
 #' @importFrom readr read_lines write_lines
 #' @importFrom checkmate assert_character
 #' @importFrom stringr str_replace_all fixed
 #'
-#' @param .mod The `bbi_nonmem_model` object associated with the control
-#'   stream that will be modified.
+#' @param .mod The `bbi_nonmem_model` object associated with the control stream
+#'   that will be modified.
 #' @param .suffixes Character vector of suffixes to be matched for replacement.
-#'   Matching is case insensitive (see Details).
+#'   Matching is case insensitive (see Details). Note that **if passed suffixes
+#'   are file extensions, you must include the leading period** (e.g. pass
+#'   `".tab"` instead of `"tab"`). This is to enable passing things like
+#'   `"par.tab"` which should (and will) match `{parent_mod}par.tab` but _not_
+#'   `{parent_mod}.par.tab`.
 #' @param .additional_suffixes Character vector of suffices to match _in
 #'   addition to_ those passed in `.suffixes`. `NULL` by default. This is useful
 #'   if you want to use the defaults for `.suffixes`, but also add new ones, as
-#'   opposed to replacing the defaults.
+#'   opposed to replacing the defaults. Also, see note in `.suffixes` about file
+#'   extensions.
 #' @export
 update_model_id <- function(
   .mod,
   .suffixes = c(
-    '.MSF',
+    '.msf',
     '.ext',
     '.tab',
     '.chn',
@@ -71,7 +78,7 @@ update_model_id <- function(
     c(.additional_suffixes) %>%
     str_replace_all(fixed("."), "\\.") %>%
     paste(collapse = "|") %>%
-    paste0("((", ., "))\\b")
+    paste0("(", ., ")\\b")
 
   ## edit text of new model file
   txt <- suppressSpecificWarning(

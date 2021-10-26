@@ -6,24 +6,30 @@
 \usage{
 update_model_id(
   .mod,
-  .suffixes = c(".MSF", ".ext", ".tab", ".chn", "par.tab"),
+  .suffixes = c(".msf", ".ext", ".tab", ".chn", "par.tab"),
   .additional_suffixes = NULL
 )
 }
 \arguments{
-\item{.mod}{The \code{bbi_nonmem_model} object associated with the control
-stream that will be modified.}
+\item{.mod}{The \code{bbi_nonmem_model} object associated with the control stream
+that will be modified.}
 
 \item{.suffixes}{Character vector of suffixes to be matched for replacement.
-Matching is case insensitive (see Details).}
+Matching is case insensitive (see Details). Note that \strong{if passed suffixes
+are file extensions, you must include the leading period} (e.g. pass
+\code{".tab"} instead of \code{"tab"}). This is to enable passing things like
+\code{"par.tab"} which should (and will) match \verb{\{parent_mod\}par.tab} but \emph{not}
+\verb{\{parent_mod\}.par.tab}.}
 
 \item{.additional_suffixes}{Character vector of suffices to match \emph{in
 addition to} those passed in \code{.suffixes}. \code{NULL} by default. This is useful
 if you want to use the defaults for \code{.suffixes}, but also add new ones, as
-opposed to replacing the defaults.}
+opposed to replacing the defaults. Also, see note in \code{.suffixes} about file
+extensions.}
 }
 \value{
-Invisibly returns \code{.mod}, to enable piping (i.e. from \code{copy_model_from()})
+Invisibly returns \code{.mod}, to enable piping (i.e. from
+\code{copy_model_from()})
 }
 \description{
 Helper to update the model ID (aka the "run number" if models are named
@@ -40,17 +46,18 @@ the first entry in \code{.mod$based_on}. This will be true if \code{.mod} was cr
 It will look for that parent model ID before all strings
 passed to \code{.suffixes} or \code{.additional_suffixes} (e.g. \verb{\{parent_mod\}.MSF}, etc.)
 replace it with \code{get_model_id(.mod)} wherever found.
+
 \code{.suffixes} defaults to the following:
 \itemize{
-\item \code{.MSF}
-\item \code{.EXT}
-\item \code{.CHN}
+\item \code{.msf}
+\item \code{.ext}
+\item \code{.chn}
 \item \code{.tab}
 \item \code{par.tab}
 }
 
 All matches are \emph{not} case sensitive but replacements \emph{are}. For example, if
-\code{.MSF} is passed as a suffix, \verb{\{parent_mod\}.MSF} and
-\verb{\{parent_mod\}.msf} would both be replaced, but the case of the suffix in
-the control stream will be maintained as is.
+\code{.msf} is passed as a suffix, \verb{\{parent_mod\}.MSF} and \verb{\{parent_mod\}.msf} would
+\emph{both} be replaced, but the case of the suffix in the control stream will be
+maintained as is.
 }

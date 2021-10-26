@@ -1,6 +1,6 @@
 
 DEFAULT_SUFFIXES <- c(
-  '.MSF',
+  '.msf',
   '.ext',
   '.tab',
   '.chn',
