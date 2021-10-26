@@ -1,6 +1,6 @@
 context("Extract model paths from based_on fields")
 
-test_that("get_based_on works happy path model object" , {
+test_that("get_based_on works happy path model object [BBR-GBO-001]" , {
   on.exit({ cleanup() })
 
   # create copy
@@ -9,7 +9,7 @@ test_that("get_based_on works happy path model object" , {
   expect_identical(get_based_on(mod2), MOD1_ABS_PATH)
 })
 
-test_that("get_based_on works happy path character" , {
+test_that("get_based_on works happy path character [BBR-GBO-002]" , {
   on.exit({ cleanup() })
 
   # create copy
@@ -18,11 +18,11 @@ test_that("get_based_on works happy path character" , {
   expect_identical(get_based_on(NEW_MOD2), MOD1_ABS_PATH)
 })
 
-test_that("get_based_on.character() fails with vector", {
+test_that("get_based_on.character() fails with vector [BBR-GBO-003]", {
   expect_error(get_based_on(c("naw", "dawg")), regexp = "only scalar values are permitted")
 })
 
-test_that("get_based_on works happy path run_log tibble" , {
+test_that("get_based_on works happy path run_log tibble [BBR-GBO-004]" , {
   on.exit({ cleanup() })
   create_all_models()
 
@@ -42,7 +42,7 @@ test_that("get_based_on works happy path run_log tibble" , {
   )
 })
 
-test_that("get_based_on constructs ancestry manually" , {
+test_that("get_based_on constructs ancestry manually [BBR-GBO-005]" , {
   on.exit({ cleanup() })
   create_all_models()
 
@@ -68,7 +68,7 @@ test_that("get_based_on constructs ancestry manually" , {
   }
 })
 
-test_that("get_based_on .check_exists=TRUE errors if model is gone" , {
+test_that("get_based_on .check_exists=TRUE errors if model is gone [BBR-GBO-006]" , {
   on.exit({ cleanup() })
   create_all_models()
 
@@ -85,7 +85,7 @@ test_that("get_based_on .check_exists=TRUE errors if model is gone" , {
   expect_error(get_based_on(mod3, .check_exists = TRUE), regexp = "but cannot find .yaml")
 })
 
-test_that("get_based_on() behaves correctly on missing keys", {
+test_that("get_based_on() behaves correctly on missing keys [BBR-GBO-007]", {
   # missing YAML_BASED_ON
   .test_list <- list()
   .test_list[[ABS_MOD_PATH]] <- "/fake/path"
@@ -100,7 +100,7 @@ test_that("get_based_on() behaves correctly on missing keys", {
 })
 
 
-test_that("get_model_ancestry works happy path model object" , {
+test_that("get_model_ancestry works happy path model object [BBR-GBO-008]" , {
   on.exit({ cleanup() })
   create_all_models()
 
@@ -119,7 +119,7 @@ test_that("get_model_ancestry works happy path model object" , {
   expect_equal(2, log_df %>% filter(absolute_model_path %in% get_model_ancestry(mod4)) %>% nrow())
 })
 
-test_that("get_model_ancestry works happy path character" , {
+test_that("get_model_ancestry works happy path character [BBR-GBO-009]" , {
   on.exit({ cleanup() })
   create_all_models()
 
@@ -133,11 +133,11 @@ test_that("get_model_ancestry works happy path character" , {
   )
 })
 
-test_that("get_model_ancestry.character() fails with vector", {
+test_that("get_model_ancestry.character() fails with vector [BBR-GBO-010]", {
   expect_error(get_model_ancestry(c("naw", "dawg")), regexp = "only scalar values are permitted")
 })
 
-test_that("get_model_ancestry works happy path run_log tibble" , {
+test_that("get_model_ancestry works happy path run_log tibble [BBR-GBO-011]" , {
   on.exit({ cleanup() })
   create_all_models()
 
@@ -157,7 +157,7 @@ test_that("get_model_ancestry works happy path run_log tibble" , {
   )
 })
 
-test_that("get_model_ancestry errors if model is gone" , {
+test_that("get_model_ancestry errors if model is gone [BBR-GBO-012]" , {
   on.exit({ cleanup() })
   create_all_models()
 
@@ -169,7 +169,7 @@ test_that("get_model_ancestry errors if model is gone" , {
   expect_error(get_model_ancestry(mod4), regexp = "Cannot load model object from path")
 })
 
-test_that("get_model_ancestry works on run_log tibble with more complicated ancestry" , {
+test_that("get_model_ancestry works on run_log tibble with more complicated ancestry [BBR-GBO-013]" , {
   on.exit({ cleanup() })
   create_all_models()
 

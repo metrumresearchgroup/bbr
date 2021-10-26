@@ -1,6 +1,6 @@
 context("Comparing tags between models")
 
-test_that("tags_diff.bbi_model default happy path works", {
+test_that("tags_diff.bbi_model default happy path works [BBR-TDF-001]", {
   new_mod <- copy_model_from(MOD1, "new_mod",
     .description = "tags_diff.bbi_model default happy path works",
     .inherit_tags = TRUE
@@ -14,7 +14,7 @@ test_that("tags_diff.bbi_model default happy path works", {
   expect_identical(diff_list[[TAGS_REM]], ORIG_TAGS[1])
 })
 
-test_that("tags_diff.bbi_model print works", {
+test_that("tags_diff.bbi_model print works [BBR-TDF-002]", {
   new_mod <- copy_model_from(MOD1, "new_mod",
    .description = "tags_diff.bbi_model print works",
    .inherit_tags = TRUE
@@ -33,7 +33,7 @@ test_that("tags_diff.bbi_model print works", {
   )
 })
 
-test_that("tags_diff.bbi_model .mod2 works", {
+test_that("tags_diff.bbi_model .mod2 works [BBR-TDF-003]", {
   temp_mod_path <- create_temp_model()
   new_mod <- temp_mod_path %>%
     read_model() %>%
@@ -54,7 +54,7 @@ test_that("tags_diff.bbi_model .mod2 works", {
   )
 })
 
-test_that("tags_diff.bbi_run_log_df works", {
+test_that("tags_diff.bbi_run_log_df works [BBR-TDF-004]", {
   # set up models for run log
   cleanup()
   create_rlg_models()

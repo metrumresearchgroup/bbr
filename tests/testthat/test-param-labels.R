@@ -18,7 +18,7 @@ MODEL_PICKS <- list(
 # test_that("parse_param_comment() parses correctly ...", {...})
 
 for (.tc in names(MAT_REF)) {
-  test_that(glue("build_matrix_indices() parses correctly for {.tc}"), {
+  test_that(glue("build_matrix_indices() parses correctly {.tc} [BBR-PLB-001]"), {
     ref_df <- MAT_REF[[.tc]]
 
     test_ind <- build_matrix_indices(ref_df$is_diag)
@@ -28,20 +28,20 @@ for (.tc in names(MAT_REF)) {
 
 
 for (i in length(BLOCK_REF)) {
-  test_that(glue("block() parses correctly {i}"), {
+  test_that(glue("block() parses correctly {i} [BBR-PLB-002]"), {
     expect_equal(block(i), BLOCK_REF[[i]])
   })
 }
 
 
-test_that("param_labels.character errors on vector", {
+test_that("param_labels.character errors on vector [BBR-PLB-003]", {
   expect_error(param_labels(c("naw", "dawg")), regexp = "character scalar of the raw control stream")
 })
 
 
 # test parsing labels from different OMEGA and SIGMA blocks
 for (.test_name in names(PARAM_BLOCK_REF)) {
-  test_that(glue("parse_param_comment() called internally on {.test_name}"), {
+  test_that(glue("parse_param_comment() called internally {.test_name} [BBR-PLB-004]"), {
     .tc <- PARAM_BLOCK_REF[[.test_name]]
     res_df <- .tc$ctl %>% param_labels() %>% apply_indices(.omega = .tc$omega, .sigma = .tc$sigma)
     expect_equal(res_df, .tc$ref)
@@ -53,7 +53,7 @@ for (.test_name in names(PARAM_BLOCK_REF)) {
 for (MODEL_PICK in MODEL_PICKS) {
   .mod_id <- MODEL_PICK$mod_id
 
-  test_that(glue("param_labels.character() %>% apply_indices() matches tidynm reference for {.mod_id}"), {
+  test_that(glue("param_labels.character() %>% apply_indices() matches tidynm reference {.mod_id} [BBR-PLB-005]"), {
     # get reference df from tidynm test data
     ref_df <- readRDS(file.path(REF_DIR, "param-labels", glue("{.mod_id}_PARAMTBL.rds")))[[1]]
     names(ref_df) <- names(ref_df) %>% tolower()
@@ -89,7 +89,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   for (MODEL_PICK in MODEL_PICKS) {
     .mod_id <- MODEL_PICK$mod_id
 
-    test_that(glue("param_labels.bbi_nonmem_model() %>% apply_indices() matches tidynm reference for {.mod_id}"), {
+    test_that(glue("param_labels.bbi_nonmem_model() %>% apply_indices() matches tidynm reference {.mod_id} [BBR-PLB-006]"), {
       # get reference df from tidynm test data
       ref_df <- readRDS(file.path(REF_DIR, "param-labels", glue("{.mod_id}_PARAMTBL.rds")))[[1]]
       names(ref_df) <- names(ref_df) %>% tolower()

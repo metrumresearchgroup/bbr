@@ -32,7 +32,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   # extracting things from summary object
   #########################################
 
-  test_that("model_summaries.list produces expected output", {
+  test_that("model_summaries.list produces expected output [BBR-SUM-006]", {
     mods <- purrr::map(file.path(MODEL_DIR, seq(3)), read_model)
     expect_equal(length(mods), NUM_MODS)
     for (.m in mods) {
@@ -44,7 +44,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   })
 
-  test_that("model_summaries.list fails with bad list", {
+  test_that("model_summaries.list fails with bad list [BBR-SUM-007]", {
     bad_mods <- list(read_model(file.path(MODEL_DIR, 1)), list(naw = "dawg"))
     expect_equal(length(bad_mods), 2)
     expect_equal(class(bad_mods[[1]]), NM_MOD_CLASS_LIST)
@@ -52,13 +52,13 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_error(model_summaries(bad_mods), regexp = "must contain only model objects")
   })
 
-  test_that("model_summaries.bbi_run_log_df produces expected output", {
+  test_that("model_summaries.bbi_run_log_df produces expected output [BBR-SUM-008]", {
     mod_sums <- run_log(MODEL_DIR) %>% model_summaries()
     test_mod_sums(mod_sums)
   })
 
 
-  test_that("as_summary_list.bbi_summary_log_df works", {
+  test_that("as_summary_list.bbi_summary_log_df works [BBR-SUM-009]", {
     mod_sums <- summary_log(MODEL_DIR) %>% as_summary_list()
     test_mod_sums(mod_sums)
   })
