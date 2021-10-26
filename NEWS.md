@@ -1,3 +1,17 @@
+# development
+
+This release adds a number of helper functions, primarily for use with NONMEM models.
+
+## New features and changes
+
+* `param_estimates_batch()` for extracting a tibble of parameter estimates from a batch of NONMEM runs. Especially useful for large batches of runs created by something like a bootstrap. (#386)
+
+* `cov_cor()` and `check_cor_threshold()` for pulling in covariance and correlation matrices from NONMEM `.cov` and `.cor` files. (#414)
+
+* `update_model_id()` for updating mentions of the parent model in the child model's control stream. (#417)
+
+* Per guidance in `bbr 1.0.0` release, `replace_tags()`, `replace_bbi_args()`, `replace_based_on()`, `add_decisions()`, and `replace_decisions()` have been removed.
+
 # bbr 1.1.4
 
 ## Docs
