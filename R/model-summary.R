@@ -11,7 +11,9 @@
 #' to summarize multiple models, you can pass a list of
 #' `bbi_{.model_type}_model` objects to [model_summaries()], or pass a directory
 #' path to [summary_log()] to summarize all models in that directory (and, by
-#' default, all directories below it).
+#' default, all directories below it). Note: the summary object does _not_
+#' contain the covariance or correlation matrices, but these can be retrieved
+#' with [cov_cor()].
 #'
 #' @details
 #'
@@ -124,7 +126,7 @@
 #' Additionally, if you have renamed the `.ext` file from its default of `<root>.ext` you will need to pass
 #' `ext_file = "NEWNAME"` to `.bbi_args`.
 #'
-#' @seealso [model_summaries()], [summary_log()]
+#' @seealso [model_summaries()], [summary_log()], [cov_cor()]
 #' @param .mod Model to summarize.
 #' @param .bbi_args A named list specifying arguments to pass to bbi formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`.
 #' See [print_bbi_args()] for full list of options.
