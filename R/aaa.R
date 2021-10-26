@@ -61,7 +61,6 @@ YAML_DESCRIPTION <- "description"
 YAML_BASED_ON <- "based_on"
 YAML_TAGS <- "tags"
 YAML_NOTES <- "notes"
-YAML_DECISIONS <- "decisions"
 YAML_BBI_ARGS <- "bbi_args"
 YAML_MOD_TYPE <- "model_type"
 
@@ -95,8 +94,7 @@ RUN_LOG_REQ_COLS <- c(
   YAML_BBI_ARGS,
   YAML_BASED_ON,
   YAML_TAGS,
-  YAML_NOTES,
-  YAML_DECISIONS
+  YAML_NOTES
 )
 
 
@@ -110,8 +108,7 @@ YAML_ERASE_OUT_KEYS <- c(
 YAML_SCALAR_TO_LIST_KEYS <- c(
   YAML_BASED_ON,
   YAML_TAGS,
-  YAML_NOTES,
-  YAML_DECISIONS
+  YAML_NOTES
 )
 
 

@@ -87,7 +87,7 @@ MOD3_ABS_PATH <- fs::path_norm(file.path(getwd(), NEW_MOD3)) %>% as.character()
 MOD4_ABS_PATH <- fs::path_norm(file.path(getwd(), LEVEL2_MOD)) %>% as.character()
 
 RUN_LOG_ROWS <- 3L
-RUN_LOG_COLS <- 10L
+RUN_LOG_COLS <- 9L
 CONFIG_COLS <- 9L
 SUM_LOG_COLS <- 23L
 
