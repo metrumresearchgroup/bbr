@@ -43,6 +43,7 @@
 #'   addition to_ those passed in `.suffixes`. `NULL` by default. This is useful
 #'   if you want to use the defaults for `.suffixes`, but also add new ones, as
 #'   opposed to replacing the defaults.
+#' @export
 update_model_id <- function(
   .mod,
   .suffixes = c(
