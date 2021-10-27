@@ -5,11 +5,11 @@ ALL_BAD <- c(model = FALSE, data = FALSE)
 MODEL_BAD <- c(model = FALSE, data = TRUE)
 DATA_BAD <- c(model = TRUE, data = FALSE)
 
-test_that("check_up_to_date.bbi_nonmem_model() happy path", {
+test_that("check_up_to_date.bbi_nonmem_model() happy path [BBR-CUTD-001]", {
   expect_equal(check_up_to_date(MOD1), ALL_GOOD)
 })
 
-test_that("check_up_to_date.bbi_nonmem_model() with mismatched model", {
+test_that("check_up_to_date.bbi_nonmem_model() with mismatched model [BBR-CUTD-002]", {
   perturb_file(CTL_TEST_FILE)
   expect_message(
     res <- check_up_to_date(MOD1),
@@ -18,7 +18,7 @@ test_that("check_up_to_date.bbi_nonmem_model() with mismatched model", {
   expect_equal(res, MODEL_BAD)
 })
 
-test_that("check_up_to_date.bbi_nonmem_model() with mismatched data", {
+test_that("check_up_to_date.bbi_nonmem_model() with mismatched data [BBR-CUTD-003]", {
   perturb_file(get_data_path(MOD1))
   expect_message(
     res <- check_up_to_date(MOD1),
@@ -27,7 +27,7 @@ test_that("check_up_to_date.bbi_nonmem_model() with mismatched data", {
   expect_equal(res, DATA_BAD)
 })
 
-test_that("check_up_to_date.bbi_nonmem_model() with missing data", {
+test_that("check_up_to_date.bbi_nonmem_model() with missing data [BBR-CUTD-004]", {
   temp_mod_path <- create_temp_model()
   new_mod <- read_model(temp_mod_path)
   fs::dir_copy(get_output_dir(MOD1), get_output_dir(new_mod, .check_exists = F))
@@ -39,7 +39,7 @@ test_that("check_up_to_date.bbi_nonmem_model() with missing data", {
   expect_equal(res, ALL_BAD)
 })
 
-test_that("check_up_to_date.bbi_nonmem_model() with mismatched both", {
+test_that("check_up_to_date.bbi_nonmem_model() with mismatched both [BBR-CUTD-005]", {
   perturb_file(CTL_TEST_FILE)
   perturb_file(get_data_path(MOD1))
   expect_message(
@@ -49,7 +49,7 @@ test_that("check_up_to_date.bbi_nonmem_model() with mismatched both", {
   expect_equal(res, ALL_BAD)
 })
 
-test_that("check_up_to_date.bbi_nonmem_summary() with mismatched model", {
+test_that("check_up_to_date.bbi_nonmem_summary() with mismatched model [BBR-CUTD-006]", {
   skip_if_not_drone_or_metworx("check_up_to_date.bbi_nonmem_summary")
   perturb_file(CTL_TEST_FILE)
   expect_message(
@@ -60,7 +60,7 @@ test_that("check_up_to_date.bbi_nonmem_summary() with mismatched model", {
 })
 
 
-test_that("check_up_to_date.bbi_log_df() works as expected", {
+test_that("check_up_to_date.bbi_log_df() works as expected [BBR-CUTD-007]", {
   # create models for the run log
   create_all_models()
   copy_all_output_dirs()

@@ -6,7 +6,7 @@ context("Copying model objects")
 
 cleanup()
 
-test_that("copy_from_model creates accurate copy", {
+test_that("copy_from_model creates accurate copy [BBR-CMF-001]", {
   on.exit({ cleanup() })
 
   # run copy_model_from
@@ -33,7 +33,7 @@ test_that("copy_from_model creates accurate copy", {
 })
 
 
-test_that("copy_from_model options work", {
+test_that("copy_from_model options work [BBR-CMF-002]", {
   on.exit({ cleanup() })
 
   # run copy_model_from
@@ -63,7 +63,7 @@ test_that("copy_from_model options work", {
   )
 })
 
-test_that("copy_from_model.bbi_nonmem_model works with numeric input", {
+test_that("copy_from_model.bbi_nonmem_model works with numeric input [BBR-CMF-003]", {
   on.exit({ cleanup() })
 
   # check that the model is not there already
@@ -83,7 +83,7 @@ test_that("copy_from_model.bbi_nonmem_model works with numeric input", {
 })
 
 
-test_that("copy_from_model .overwrite=TRUE works", {
+test_that("copy_from_model .overwrite=TRUE works [BBR-CMF-004]", {
   on.exit({ cleanup() })
 
   # set up model object
@@ -108,7 +108,7 @@ test_that("copy_from_model .overwrite=TRUE works", {
   expect_true(grepl(new_desc_pattern, new_mod_str))
 })
 
-test_that("copy_from_model .overwrite=FALSE works", {
+test_that("copy_from_model .overwrite=FALSE works [BBR-CMF-005]", {
   on.exit({ cleanup() })
 
   # set up model object
@@ -136,7 +136,7 @@ test_that("copy_from_model .overwrite=FALSE works", {
   expect_false(grepl(new_desc_pattern, new_mod_str))
 })
 
-test_that("copy_model_from() supports `.new_model` containing a period", {
+test_that("copy_model_from() supports `.new_model` containing a period [BBR-CMF-006]", {
   temp_mod_path <- create_temp_model()
   temp_mod <- read_model(temp_mod_path)
 

@@ -8,7 +8,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   # creating parameter summary tibble
   #########################################
 
-  test_that("param_estimates_batch produces expected output", {
+  test_that("param_estimates_batch produces expected output [BBR-PEST-005]", {
 
     on.exit(cleanup())
 
@@ -40,7 +40,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   # different number of params
   #####################
 
-  test_that("param_estimates_batch() works with varying number of param estimates", {
+  test_that("param_estimates_batch() works with varying number of param estimates [BBR-PEST-006]", {
 
     on.exit(cleanup())
 
@@ -64,7 +64,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   # empty extension file
   #####################
 
-  test_that("param_estimates_batch() works if an .ext file detected is empty", {
+  test_that("param_estimates_batch() works if an .ext file detected is empty [BBR-PEST-007]", {
 
     on.exit(cleanup())
 
@@ -93,7 +93,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   # missing termination line
   #####################
 
-  test_that("param_estimates_batch() works if the termination line is missing in an .ext file", {
+  test_that("param_estimates_batch() works if the termination line is missing in an .ext file [BBR-PEST-008]", {
 
     on.exit(cleanup())
 

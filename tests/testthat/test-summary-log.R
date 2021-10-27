@@ -33,7 +33,7 @@ copy_all_output_dirs()
 withr::defer(cleanup())
 
 
-test_that("summary_log() returns NULL and warns when no YAML found", {
+test_that("summary_log() returns NULL and warns when no YAML found [BBR-SMLG-001]", {
   log_df <- expect_warning(summary_log(file.path(REF_DIR, "read-output-refs")), regexp = "Found no valid model YAML files in")
   expect_true(inherits(log_df, "tbl"))
   expect_equal(nrow(log_df), 0)
@@ -46,24 +46,24 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   # extracting things from summary object
   #########################################
 
-  test_that("summary_log() works correctly with nested dirs", {
+  test_that("summary_log() works correctly with nested dirs [BBR-SMLG-002]", {
     sum_df <- summary_log(MODEL_DIR)
     test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3, LEVEL2_MOD), SUM_LOG_COLS)
   })
 
-  test_that("summary_log(.recurse = FALSE) works", {
+  test_that("summary_log(.recurse = FALSE) works [BBR-SMLG-003]", {
     sum_df <- summary_log(MODEL_DIR, .recurse = FALSE)
     test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3), SUM_LOG_COLS)
   })
 
-  test_that("add_summary() works correctly", {
+  test_that("add_summary() works correctly [BBR-SMLG-004]", {
     sum_df <- run_log(MODEL_DIR) %>% add_summary()
     test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3, LEVEL2_MOD), RUN_LOG_COLS+SUM_LOG_COLS-2)
     expect_identical(sum_df$model_type, rep("nonmem", RUN_LOG_ROWS+1))
     expect_identical(sum_df$yaml_md5, ALL_MODS_YAML_MD5)
   })
 
-  test_that("add_summary() has correct columns", {
+  test_that("add_summary() has correct columns [BBR-SMLG-005]", {
     sum_df <- summary_log(MODEL_DIR)
     log_df <- run_log(MODEL_DIR)
     add_df <- log_df %>% add_summary()
@@ -76,7 +76,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_identical(sum_df[[col_to_check]], add_df[[col_to_check]])
   })
 
-  test_that("summary_log() parses heuristics correctly", {
+  test_that("summary_log() parses heuristics correctly [BBR-SMLG-006]", {
     sum_df2 <- summary_log(MODEL_DIR_X, .fail_flags = list(ext_file = "1001.1.TXT"))
 
     expect_false(filter(sum_df2, run == "1001") %>% pull(minimization_terminated))
@@ -87,7 +87,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_true(filter(sum_df2, run == "iovmm") %>% pull(has_final_zero_gradient))
   })
 
-  test_that("summary_log() parses more complex flags and stats", {
+  test_that("summary_log() parses more complex flags and stats [BBR-SMLG-007]", {
     sum_df2 <- summary_log(MODEL_DIR_X, .fail_flags = list(ext_file = "1001.1.TXT"))
 
     # check fail flag parsed
@@ -103,7 +103,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   # THESE TESTS NEEDS TO BE LAST BECAUSE IT DELETES NECESSARY FILES
   fs::file_delete(file.path(LEVEL2_MOD, "1.grd"))
 
-  test_that("summary_log works some failed summaries", {
+  test_that("summary_log works some failed summaries [BBR-SMLG-008]", {
     sum_df <- summary_log(MODEL_DIR)
     expect_equal(is.na(sum_df$error_msg), c(TRUE, TRUE, TRUE, FALSE))
     expect_equal(ncol(sum_df), SUM_LOG_COLS)
@@ -112,7 +112,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3, LEVEL2_MOD), SUM_LOG_COLS)
   })
 
-  test_that("summary_log works all failed summaries", {
+  test_that("summary_log works all failed summaries [BBR-SMLG-009]", {
 
     expect_warning({
       sum_df <- summary_log(LEVEL2_DIR)
@@ -124,7 +124,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   })
 
-  test_that("add_summary works all failed summaries", {
+  test_that("add_summary works all failed summaries [BBR-SMLG-010]", {
 
     expect_warning({
       sum_df <- run_log(LEVEL2_DIR) %>% add_summary()

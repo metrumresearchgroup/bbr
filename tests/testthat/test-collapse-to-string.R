@@ -6,7 +6,7 @@ create_rlg_models()
 # teardown
 withr::defer(cleanup())
 
-test_that("collapse_to_string() works correctly", {
+test_that("collapse_to_string() works correctly [BBR-CTS-001]", {
   # add a note to collapse
   mod2 <- read_model(file.path(MODEL_DIR, 2)) %>% add_notes(NEW_NOTES)
   on.exit(replace_all_notes(mod2, NULL))
@@ -37,7 +37,7 @@ test_that("collapse_to_string() works correctly", {
   )
 })
 
-test_that("collapse_to_string() warns correctly", {
+test_that("collapse_to_string() warns correctly [BBR-CTS-002]", {
   log_df <- run_log(MODEL_DIR) %>%
     collapse_to_string({{YAML_TAGS}})
 
@@ -47,7 +47,7 @@ test_that("collapse_to_string() warns correctly", {
   )
 })
 
-test_that("collapse_to_string() errors correctly", {
+test_that("collapse_to_string() errors correctly [BBR-CTS-003]", {
   log_df <- run_log(MODEL_DIR) %>%
     collapse_to_string({{YAML_TAGS}})
 
@@ -57,7 +57,7 @@ test_that("collapse_to_string() errors correctly", {
   )
 })
 
-test_that("collapse_to_string() renders dput correctly", {
+test_that("collapse_to_string() renders dput correctly [BBR-CTS-004]", {
   log_df <- run_log(MODEL_DIR)
   ref_args <- purrr::map_chr(
     log_df[[YAML_BBI_ARGS]],
@@ -70,7 +70,7 @@ test_that("collapse_to_string() renders dput correctly", {
   expect_identical(ref_args, log_df[[YAML_BBI_ARGS]])
 })
 
-test_that("collapse_to_string() renders dput for tibbles", {
+test_that("collapse_to_string() renders dput for tibbles [BBR-CTS-005]", {
   nums <- seq_len(3)
   df <- tibble::tibble(
     row_num   = nums,
@@ -91,7 +91,7 @@ test_that("collapse_to_string() renders dput for tibbles", {
   expect_identical(ref_tib, df$tibby)
 })
 
-test_that("add_tags() converts lists upstream of collapse_to_string()", {
+test_that("add_tags() converts lists upstream of collapse_to_string() [BBR-CTS-006]", {
   mod2 <- read_model(file.path(MODEL_DIR, 2))
   tags_old <- mod2[[YAML_TAGS]]
   # Note: The shape of the value here matters: it needs to be
