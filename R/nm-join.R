@@ -4,7 +4,8 @@
 #' @param .join_col character column name to use to join tab files
 #' @param .files absolute paths to table files to try to join
 #' @param .more absolute paths to other files to try to join
-#' @param .verbose if TRUE, the default, messages are printed as files are read
+#' @param .verbose if TRUE, the default, messages are printed as files are read.
+#'   Can be controlled package-wide by setting `options(bbr.verbose)`.
 #' @param .superset if `FALSE`, the default, the data will be joined to the
 #'   NONMEM output and if `TRUE`, the NONMEM output will be joined to the data;
 #'   that is, if you use `.superset`, you will get the same number of rows as
@@ -26,9 +27,12 @@ nm_join <- function(
   .join_col = "NUM",
   .files = tabfiles(.mod),
   .more = NULL,
-  .verbose = TRUE,
+  .verbose = getOption("bbr.verbose"),
   .superset = FALSE,
-  .bbi_args = NULL
+  .bbi_args = list(
+    no_grd_file = TRUE,
+    no_shk_file = TRUE
+  )
 ) {
 
   if (!inherits(.mod, "bbi_nonmem_model")) {
@@ -40,11 +44,7 @@ nm_join <- function(
   checkmate::assert_character(.more, null.ok = TRUE)
   checkmate::assert_logical(.verbose, len = 1)
   checkmate::assert_logical(.superset, len = 1)
-  checkmate::assert_list(.bbi_args, null.ok = TRUE)
-
-  if (is.null(.bbi_args)) .bbi_args <- list()
-  if (is.null(.bbi_args$no_grd_file)) .bbi_args$no_grd_file <- TRUE
-  if (is.null(.bbi_args$no_shk_file)) .bbi_args$no_shk_file <- TRUE
+  checkmate::assert_list(.bbi_args)
 
   # We always do a left join; with .superset, the data is on the left but
   # with non-.superset, nonmem table is on the left
@@ -73,7 +73,7 @@ nm_join <- function(
   chk <- file.exists(.files)
   .files <- .files[chk]
   if(length(.files)==0) {
-    message("  zero table files found; returning")
+    if (.verbose) message("  zero table files found; returning")
     return(data)
   }
 
@@ -116,11 +116,13 @@ nm_join <- function(
       next;
     } # end ID join
     if(nrow(tab) != nrec) {
-      message("\ntable file: ", basename(p), " (skipped)")
-      message("  rows: ", nrow(tab))
-      message("  hasid: ", has_id)
-      message("  tabids: ", length(unique(tab[["ID"]])))
-      message("  runids: ", nid)
+      if (.verbose) {
+        message("\ntable file: ", basename(p), " (skipped)")
+        message("  rows: ", nrow(tab))
+        message("  hasid: ", has_id)
+        message("  tabids: ", length(unique(tab[["ID"]])))
+        message("  runids: ", nid)
+      }
       next;
     }
     if(.verbose) message("\ntable file: ", basename(p))
