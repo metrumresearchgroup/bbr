@@ -45,7 +45,7 @@ EXT_TEST_FILE <-  as.character(glue::glue("{MOD1_PATH}/{MOD_ID}.ext"))
 OUTPUT_FILE <-    file.path(MOD1_PATH, "OUTPUT")
 
 DATA_TEST_FILE <- as.character(fs::path_norm(file.path(REF_DIR, "..", "extdata", "acop.csv")))
-DATA_TEST_FIRST_LINE <- "id,time,mdv,evid,dv,amt,sex,wt,etn"
+DATA_TEST_FIRST_LINE <- "id,time,mdv,evid,dv,amt,sex,wt,etn,num"
 
 LEVEL2_SUBDIR <- "level2"
 LEVEL2_DIR <- file.path(MODEL_DIR, LEVEL2_SUBDIR)
@@ -92,8 +92,8 @@ CONFIG_COLS <- 9L
 SUM_LOG_COLS <- 23L
 
 CONFIG_DATA_PATH <- "../../../../extdata/acop.csv"
-CONFIG_DATA_MD5 <- "4ddb44da897c26681d892aa7be99f74b"
-CONFIG_MODEL_MD5 <- "9092189126b23a80bf91a67d1dd8973c"
+CONFIG_DATA_MD5 <- "14e53889c0b1c29db2ba02f2025bb62c"
+CONFIG_MODEL_MD5 <- "b9f8df25adfdeaf5db343e1f86185f43"
 
 # yaml md5 hashes
 MOD1_YAML_MD5 <- "6ccf206e167485b5adf29bc135197929"

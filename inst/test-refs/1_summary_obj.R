@@ -2,10 +2,10 @@ structure(list(
   absolute_model_path = "/data/home/sethg/bbr/inst/model/nonmem/basic/1",
   run_details = list(
     version = "7.4.4", run_start = "-999999999",
-    run_end = "Mon Feb 22 16:53:58 EST 2021", estimation_time = 1.98,
-    cpu_time = 2.595, function_evaluations = 366L, significant_digits = 3.2,
-    problem_text = "LEM PK model 1 cmt base", mod_file = "-999999999",
-    estimation_method = "First Order Conditional Estimation with Interaction",
+    run_end = "Wed Oct 27 14:03:21 EDT 2021", estimation_time = 3.29,
+    covariance_time = 0.41, cpu_time = 4.501, function_evaluations = 366L,
+    significant_digits = 3.2, problem_text = "LEM PK model 1 cmt base",
+    mod_file = "-999999999", estimation_method = "First Order Conditional Estimation with Interaction",
     data_set = "../../../../extdata/acop.csv", number_of_subjects = 40L,
     number_of_obs = 760L, number_of_data_records = 799L,
     output_files_used = c(
@@ -15,45 +15,44 @@ structure(list(
   ), run_heuristics = list(
     covariance_step_aborted = FALSE,
     large_condition_number = FALSE, eigenvalue_issues = FALSE,
-    correlations_not_ok = FALSE,
-    parameter_near_boundary = FALSE, hessian_reset = FALSE,
-    has_final_zero_gradient = FALSE, minimization_terminated = FALSE,
-    eta_pval_significant = FALSE, prderr = FALSE
-  ), parameters_data = list(
-    list(
-      method = "TABLE NO.     1: First Order Conditional Estimation with Interaction: Goal Function=MINIMUM VALUE OF OBJECTIVE FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
-      estimates = list(theta = c(
-        2.31034, 54.9596, 464.659,
-        -0.0805722, 4.1303
-      ), omega = c(0.0964407, 0, 0.153571), sigma = 1L), std_err = list(theta = c(
-        0.086147,
-        3.32914, 29.6177, 0.0555149, 1.35989
-      ), omega = c(
-        0.0200146,
-        1e+10, 0.026733
-      ), sigma = 1e+10), random_effect_sd = list(
-        omega = c(0.310549, 0, 0.391882), sigma = 1L
-      ),
-      random_effect_sdse = list(omega = c(
-        0.0322245, 1e+10,
-        0.0341085
-      ), sigma = 1e+10), fixed = list(theta = c(
-        0L,
-        0L, 0L, 0L, 0L
-      ), omega = c(0L, 1L, 0L), sigma = 1L)
-    )
-  ),
-  parameter_names = list(theta = c(
-    "THETA1", "THETA2", "THETA3",
-    "THETA4", "THETA5"
+    correlations_not_ok = FALSE, parameter_near_boundary = FALSE,
+    hessian_reset = FALSE, has_final_zero_gradient = FALSE,
+    minimization_terminated = FALSE, eta_pval_significant = FALSE,
+    prderr = FALSE
+  ), parameters_data = list(list(
+    method = "TABLE NO.     1: First Order Conditional Estimation with Interaction: Goal Function=MINIMUM VALUE OF OBJECTIVE FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
+    estimates = list(theta = c(
+      2.31034, 54.9596, 464.659,
+      -0.0805722, 4.1303
+    ), omega = c(0.0964407, 0, 0.153571), sigma = 1L), std_err = list(theta = c(
+      0.086147, 3.32914,
+      29.6177, 0.0555149, 1.35989
+    ), omega = c(
+      0.0200146, 1e+10,
+      0.026733
+    ), sigma = 1e+10), random_effect_sd = list(omega = c(
+      0.310549,
+      0, 0.391882
+    ), sigma = 1L), random_effect_sdse = list(
+      omega = c(0.0322245, 1e+10, 0.0341085), sigma = 1e+10
+    ),
+    fixed = list(theta = c(0L, 0L, 0L, 0L, 0L), omega = c(
+      0L,
+      1L, 0L
+    ), sigma = 1L)
+  )), parameter_names = list(theta = c(
+    "THETA1",
+    "THETA2", "THETA3", "THETA4", "THETA5"
   ), omega = c(
-    "OMEGA(1,1)", "OMEGA(2,1)",
-    "OMEGA(2,2)"
-  ), sigma = "SIGMA(1,1)"), ofv = list(list(
-    method = "First Order Conditional Estimation with Interaction",
-    ofv_no_constant = 2636.846, constant_to_ofv = 1396.7865704711,
-    ofv_with_constant = 4033.63234080018
-  )), condition_number = list(
+    "OMEGA(1,1)",
+    "OMEGA(2,1)", "OMEGA(2,2)"
+  ), sigma = "SIGMA(1,1)"), ofv = list(
+    list(
+      method = "First Order Conditional Estimation with Interaction",
+      ofv_no_constant = 2636.846, constant_to_ofv = 1396.7865704711,
+      ofv_with_constant = 4033.63234080018
+    )
+  ), condition_number = list(
     list(
       method = "First Order Conditional Estimation with Interaction",
       condition_number = -999999999L

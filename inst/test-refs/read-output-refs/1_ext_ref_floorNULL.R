@@ -82,5 +82,5 @@ structure(list(
   ))), default = structure(list(), class = c(
     "collector_guess",
     "collector"
-  )), skip = 2L
+  )), delim = NULL, skip = 2L
 ), class = "col_spec"))

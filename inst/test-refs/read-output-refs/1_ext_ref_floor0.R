@@ -67,4 +67,4 @@ structure(list(ITERATION = c(5, 10, 15, 20, 25, 28), THETA1 = c(
 ))), default = structure(list(), class = c(
   "collector_guess",
   "collector"
-)), skip = 2L), class = "col_spec"))
+)), delim = NULL, skip = 2L), class = "col_spec"))
