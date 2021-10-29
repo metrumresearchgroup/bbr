@@ -1,9 +1,17 @@
 #' Return a single data frame with model output and input data
 #'
-#' @param .mod the `bbi_nonmem_model` object or a path to a NONMEM run
-#' @param .join_col character column name to use to join tab files
-#' @param .files absolute paths to table files to try to join
-#' @param .more absolute paths to other files to try to join
+#' When a unique row identifier (e.g an integer numbering the rows) is included
+#' in the source data set and carried into each table output, `nm_join()` can read
+#' in all output table files and join back to the source data set. By default,
+#' the input data is joined to the table files so that the number of rows in the
+#' result will match the number of rows in the table files (or the number of
+#' rows not bypassed via `$IGNORE`). Use the `.superset` argument to join table
+#' outputs to the (complete) input data set.
+#'
+#' @param .mod the `bbi_nonmem_model` object or a path to a NONMEM run.
+#' @param .join_col character column name to use to join tab files. See Details.
+#' @param .files absolute paths to table files to try to join.
+#' @param .more absolute paths to other files to try to join.
 #' @param .verbose if TRUE, the default, messages are printed as files are read.
 #'   Can be controlled package-wide by setting `options(bbr.verbose)`.
 #' @param .superset if `FALSE`, the default, the data will be joined to the
@@ -15,7 +23,20 @@
 #'   [print_bbi_args()] for valid options.
 #'
 #' @details
-#' Note that you can get the absolute path to the model output directory with
+#' The `.join_col` is currently limited to a single column that should appear in
+#' both the source data set and any tables you want to join. We recommend you
+#' make `.join_col` a simple integer numbering the rows in the input data set
+#' (for example `NUM`). When this column is carried into the output table files,
+#' there will be unambiguous matching from the table file back to the source
+#' data set.
+#'
+#' Note also that, when `.join_col` is carried into table outputs, there is no
+#' need to table any other columns from the input data as long as the
+#' `nm_join()` approach is used; any column in the source data set, regardless
+#' of whether it is listed in `$INPUT` or not, will be available in the joined
+#' result.
+#'
+#' You can get the absolute path to the model output directory with
 #' [get_output_dir()] or [build_path_from_model()] if needed to build paths for
 #' passing to `.files` or `.more`.
 #'
