@@ -36,6 +36,8 @@
 #' of whether it is listed in `$INPUT` or not, will be available in the joined
 #' result.
 #'
+#' **NEED TO DISCUSS FIRSTONLY AND ID COL**
+#'
 #' You can get the absolute path to the model output directory with
 #' [get_output_dir()] or [build_path_from_model()] if needed to build paths for
 #' passing to `.files` or `.more`.
@@ -108,8 +110,8 @@ nm_join <- function(
     names(tab) <- toupper(names(tab))
     has_id <- "ID" %in% names(tab)
     if(!(nrow(tab) %in% c(nrec,nid))) {
+      warning(glue("table file: {basename(p)} skipped because nrow doesn't match number of records or IDs"))
       if(.verbose) {
-        message("\ntable file: ", basename(p), " (skipped)")
         message("  rows: ", nrow(tab))
         message("  hasid: ", has_id)
         message("  tabids: ", length(unique(tab[["ID"]])))
