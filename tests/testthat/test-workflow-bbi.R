@@ -75,7 +75,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   test_that("copying model works and new models run correctly [BBR-WRKF-002]", {
     mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
-    mod2 <- copy_model_from(mod1, 2)
+    mod2 <- copy_model_from(mod1) # should auto-increment to 2.ctl
     mod3 <- copy_model_from(mod1, 3, .inherit_tags = TRUE) %>% add_bbi_args(list(clean_lvl=2, overwrite = FALSE))
 
     # run new models
