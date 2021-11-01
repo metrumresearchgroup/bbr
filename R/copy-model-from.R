@@ -248,7 +248,7 @@ get_next_integer <- function(.parent_mod){
   .dir <- dirname(get_model_path(.parent_mod))
   .ext <- tools::file_ext(get_model_path(.parent_mod))
 
-  # find largest model in same dir with largest integer name
+  # find model in same dir with largest integer name
   mods <- fs::dir_ls(.dir, regexp=glue("\\.{.ext}$")) %>%
     basename() %>%
     tools::file_path_sans_ext()
@@ -256,7 +256,7 @@ get_next_integer <- function(.parent_mod){
   mods_int <- suppressSpecificWarning(as.integer(mods), .regexpr = "NAs introduced by coercion")
   if (all(is.na(mods_int))) {
     stop(paste(
-      glue("There are no models in {.dir} with integer names, so cannot increment to `.new_model` to next integer."),
+      glue("There are no models in {.dir} with integer names, so cannot increment `.new_model` to next integer."),
       "Please pass a valid name to `copy_model_from(.new_model)`."
     ))
   }

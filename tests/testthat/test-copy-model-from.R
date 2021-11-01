@@ -170,13 +170,13 @@ test_that("copy_model_from(.new_model=NULL) increments to next integer by defaul
 })
 
 
-test_that("copy_model_from(.new_model=NULL) increments to next integer highest [BBR-CMF-007]", {
+test_that("copy_model_from(.new_model=NULL) increments to next highest integer [BBR-CMF-007]", {
   withr::defer(cleanup())
   new_id <- "002"
   high_id <- "0100"
   bad_id <- "aaaaa10000aaaaa"
   new_mod1 <- copy_model_from(MOD1, file.path(basename(LEVEL2_DIR), new_id))
-  # write a fake ctlwith a higher number
+  # write a fake ctl with a higher number
   readr::write_file("naw", file.path(LEVEL2_DIR, paste0(high_id, ".ctl")))
   readr::write_file("naw", file.path(LEVEL2_DIR, paste0(bad_id, ".ctl")))
 
