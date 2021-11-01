@@ -157,7 +157,7 @@ test_that("copy_model_from() supports `.new_model` containing a period [BBR-CMF-
 })
 
 
-test_that("copy_model_from() increments to next integer by default [BBR-CMF-007]", {
+test_that("copy_model_from(.new_model=NULL) increments to next integer by default [BBR-CMF-007]", {
   withr::defer(cleanup())
   new_id <- "002"
   new_mod1 <- copy_model_from(MOD1, file.path(basename(LEVEL2_DIR), new_id))
@@ -166,11 +166,11 @@ test_that("copy_model_from() increments to next integer by default [BBR-CMF-007]
     as.integer(get_model_id(new_mod1)) + 1,
     as.integer(get_model_id(new_mod2))
   )
-  expect_equal(length(get_model_id(new_mod2)), !!nchar(new_id))
+  expect_equal(!!nchar(get_model_id(new_mod2)), !!nchar(new_id))
 })
 
 
-test_that("copy_model_from() increments to next integer highest [BBR-CMF-007]", {
+test_that("copy_model_from(.new_model=NULL) increments to next integer highest [BBR-CMF-007]", {
   withr::defer(cleanup())
   new_id <- "002"
   high_id <- "0100"
@@ -183,7 +183,18 @@ test_that("copy_model_from() increments to next integer highest [BBR-CMF-007]", 
   # copy and check it increments over the higher number
   new_mod2 <- copy_model_from(new_mod1)
   expect_equal(
-    as.integer(get_model_id(new_mod1)) + 1,
+    as.integer(high_id) + 1,
     as.integer(get_model_id(new_mod2))
   )
-  expect_equal(length(get_model_id(new_mod2)), !!nchar(new_id))})
+  expect_equal(!!nchar(high_id), !!nchar(get_model_id(new_mod2)))
+})
+
+test_that("copy_model_from(.new_model=NULL) errors when no models are valid integer [BBR-CMF-007]", {
+  withr::defer(cleanup())
+  new_id <- "AAA"
+  new_mod1 <- copy_model_from(MOD1, file.path(basename(LEVEL2_DIR), new_id))
+
+  expect_error({
+    new_mod2 <- copy_model_from(new_mod1)
+  }, regexp = "no models.+integer")
+})
