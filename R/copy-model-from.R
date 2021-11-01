@@ -186,6 +186,11 @@ copy_control_stream <- function(.parent_model_path, .new_model_path, .overwrite,
     stop(glue("File already exists at {.new_model_path} -- cannot copy new control stream. Either delete old file or use `new_model({yaml_ext(.new_model_path)})`"))
   }
 
+  # if copying to new dir, create the dir first
+  if(!fs::dir_exists(dirname(.new_model_path))) {
+    fs::dir_create(dirname(.new_model_path))
+  }
+
   if (.update_model_file) {
 
     # read parent control stream
@@ -218,4 +223,23 @@ build_new_model_path <- function(.parent_mod, .new_model) {
     .new_model <- fs::path_norm(.new_model)
   }
   return(.new_model)
+}
+
+#' Check directory for model files with integer names
+#' and return the next integer. Used by copy_model_from().
+#' @importFrom stringr str_extract_all
+#' @keywords internal
+get_next_integer <- function(.parent_mod){
+  .dir <- dirname(get_model_path(.parent_mod))
+  .ext <- tools::file_ext(get_model_path(.parent_mod))
+
+  mod.n <- fs::dir_ls(.dir, regexp=glue("\\.{.ext}$")) %>%
+    basename() %>%
+    tools::file_path_sans_ext() %>%
+    as.integer() %>%
+    max + 1
+
+  if(.padding > 0) mod.n <- stringr::str_pad(mod.n, .padding, pad = "0")
+
+  return(mod.n)
 }
