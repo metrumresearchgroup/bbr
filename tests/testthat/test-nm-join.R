@@ -2,18 +2,29 @@ context("Testing nm_join()")
 
 skip_if_not_drone_or_metworx("test-model-summary")
 
-withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
+withr::with_options(list(
+  bbr.bbi_exe_path = read_bbi_path(),
+  bbr.verbose = FALSE
+), {
 
   test_that("nm_join() defaults work correctly", {
-    expect_message({
-      test_df <- nm_join(MOD1)
-    }, regexp = "data file")
+    withr::with_options(list(bbr.verbose = TRUE), {
+      expect_message({
+        test_df <- nm_join(MOD1)
+      }, regexp = "data file")
+      expect_equal(nrow(test_df), 779)
+      expect_equal(ncol(test_df), 20)
+    })
+  })
+
+  test_that("nm_join() works correctly with file path", {
+    test_df <- nm_join(MOD1_ABS_PATH)
     expect_equal(nrow(test_df), 779)
     expect_equal(ncol(test_df), 20)
   })
 
   test_that("nm_join(.superset) works correctly", {
-    test_df <- nm_join(MOD1, .superset = TRUE, .verbose = FALSE)
+    test_df <- nm_join(MOD1, .superset = TRUE)
     expect_equal(nrow(test_df), 799)
     expect_equal(ncol(test_df), 20)
     expect_equal(sum(is.na(test_df$PRED)), 20)
@@ -22,8 +33,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   test_that("nm_join(.files) works correctly FIRSTONLY", {
     test_df <- nm_join(
       MOD1,
-      .files = build_path_from_model(MOD1, "first.tab"),
-      .verbose = FALSE
+      .files = build_path_from_model(MOD1, "first.tab")
     )
     expect_equal(nrow(test_df), 799)
     expect_equal(ncol(test_df), 10) # TODO: is this right?
@@ -32,8 +42,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   test_that("nm_join(.files) works correctly duplicate cols", {
     test_df <- nm_join(
       MOD1,
-      .files = build_path_from_model(MOD1, "cl.tab"),
-      .verbose = FALSE
+      .files = build_path_from_model(MOD1, "cl.tab")
     )
     expect_equal(nrow(test_df), 779)
     expect_equal(ncol(test_df), 11) # TODO: is this right?
@@ -43,8 +52,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     test_df <- nm_join(
       MOD1,
       .files = build_path_from_model(MOD1, ".tab"),
-      .more = build_path_from_model(MOD1, "cl.tab"),
-      .verbose = FALSE
+      .more = build_path_from_model(MOD1, "cl.tab")
     )
     expect_equal(nrow(test_df), 779)
     expect_equal(ncol(test_df), 17) # TODO: is this right?
@@ -56,4 +64,34 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     # TODO: what other col could we test joining on? ID?
   })
 
+  ########################
+  # warnings and messages
+
+  test_that("nm_join() warns on skipping table with wrong number of rows", {
+    .tf <- tempfile()
+    withr::defer(fs::file_delete(.tf))
+    readr::write_lines("a,b\n1,2\n3,4\n", .tf)
+
+    expect_warning({
+      test_df <- nm_join(MOD1, .files = .tf)
+    }, regexp = "skipped because nrow")
+    expect_equal(nrow(test_df), 799)
+    expect_equal(ncol(test_df), 10)
+  })
+
+  test_that("nm_join() warns on missing file", {
+    expect_warning({
+      test_df <- nm_join(MOD1, .more = "naw")
+    }, regexp = "table files do not exist")
+    expect_equal(nrow(test_df), 779)
+    expect_equal(ncol(test_df), 20)
+  })
+
+  test_that("nm_join() warns on no files found", {
+    expect_warning({
+      test_df <- nm_join(MOD1, .files = "naw")
+    }, regexp = "[Zz]ero table files found")
+    expect_equal(nrow(test_df), 799)
+    expect_equal(ncol(test_df), 10)
+  })
 })

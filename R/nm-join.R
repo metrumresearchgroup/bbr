@@ -79,38 +79,51 @@ nm_join <- function(
     join_fun <- left_join
   }
 
-  .files <- c(.files, .more)
+  # load input data
   summ <- model_summary(.mod, .bbi_args = .bbi_args)
   nid <-  summ$run_details$number_of_subjects
   nrec <- summ$run_details$number_of_data_records
   data_loc <- get_data_path(summ)
   if(.verbose) message("data file: ", basename(data_loc))
 
-  data <- read_csv(data_loc, na = ".", col_types = readr::cols())
-  names(data) <- toupper(names(data))
+  .d <- read_csv(data_loc, na = ".", col_types = readr::cols())
+  names(.d) <- toupper(names(.d))
   if(.verbose) {
-    message("  rows: ", nrow(data))
-    message("  cols: ", ncol(data))
+    message("  rows: ", nrow(.d))
+    message("  cols: ", ncol(.d))
   }
 
+  # check for table files
+  .files <- c(.files, .more)
   chk <- file.exists(.files)
+  skippers <- .files[!chk & !(.files %in% tabfiles(.mod))]
+  if (length(skippers) > 0) {
+    # warn about any non-default files that are missing
+    warning(paste(
+      "The following table files do not exist and will be skipped:",
+      paste(skippers, collapse = ", ")
+    ), call. = FALSE)
+  }
   .files <- .files[chk]
+
   if(length(.files)==0) {
-    if (.verbose) message("  zero table files found; returning")
-    return(data)
+    warning("Zero table files found; returning only input data.")
+    return(.d)
   }
 
   .join_col <- toupper(.join_col)
-  if(!all(.join_col %in% names(data))) {
-    stop(glue("couldn't find `.join_col` {.join_col} in data with cols: {paste(names(data), collapse = ', ')}"))
+  if(!(.join_col %in% names(.d))) {
+    stop(glue("couldn't find `.join_col` {.join_col} in data with cols: {paste(names(.d), collapse = ', ')}"))
   }
-  leading_cols <- names(data)
+  leading_cols <- names(.d)
   for(p in .files) {
     tab <- read_table(p, skip =1, na = ".", col_types = readr::cols())
     names(tab) <- toupper(names(tab))
     has_id <- "ID" %in% names(tab)
+
+    # skip table if nrow doesn't match number of records or ID's (TODO: WHY????, for future developers' sake)
     if(!(nrow(tab) %in% c(nrec,nid))) {
-      warning(glue("table file: {basename(p)} skipped because nrow doesn't match number of records or IDs"))
+      warning(glue("table file: {basename(p)} skipped because nrow doesn't match number of records or IDs"), call. = FALSE)
       if(.verbose) {
         message("  rows: ", nrow(tab))
         message("  hasid: ", has_id)
@@ -125,7 +138,7 @@ nm_join <- function(
         message("  rows: ", nrow(tab))
         message("  cols: ", ncol(tab))
       }
-      keep <- c("ID",setdiff(names(tab), names(data)))
+      keep <- c("ID",setdiff(names(tab), names(.d)))
       if((ncol(tab) - length(keep) - 1) > 0) {
         if(.verbose) {
           message(
@@ -135,7 +148,7 @@ nm_join <- function(
           )
         }
       }
-      data <- left_join(data, tab[,keep], by = "ID", suffix = c("", "y"))
+      .d <- left_join(.d, tab[,keep], by = "ID", suffix = c("", "y"))
       next;
     } # end ID join
     if(nrow(tab) != nrec) {
@@ -149,7 +162,7 @@ nm_join <- function(
       next;
     }
     if(.verbose) message("\ntable file: ", basename(p))
-    new_cols <- setdiff(names(tab), names(data))
+    new_cols <- setdiff(names(tab), names(.d))
     keep <- c(.join_col, new_cols)
     drop <- setdiff(names(tab), new_cols)
     drop <- drop[!(drop %in% .join_col)]
@@ -160,25 +173,23 @@ nm_join <- function(
         message("  drop: ", d,  " common")
       }
     }
-    data <- join_fun(tab[,keep], data, by = .join_col)
+    .d <- join_fun(tab[,keep], .d, by = .join_col)
   }
   if(.verbose) {
     message("\nfinal stats:")
-    message("  rows: ", nrow(data))
-    message("  cols: ", ncol(data))
+    message("  rows: ", nrow(.d))
+    message("  cols: ", ncol(.d))
   }
-  select(data, all_of(leading_cols), everything())
+  select(.d, all_of(leading_cols), everything())
 }
 
 
-#' Return a vector of absolute paths to table files to look for
-#'
+#' @describeIn nm_join Return a vector of absolute paths to table files to look
+#'   for by default.
 #' @param .mod the `bbi_nonmem_model` object
-#'
-#' @details
-#' Called by redataset
-#' @keywords internal
+#' @export
 tabfiles <- function(.mod) {
+  if (inherits(.mod, "character")) .mod <- read_model(.mod)
   output_dir <- get_output_dir(.mod)
   c(
     file.path(output_dir, "PAR_TAB"),
