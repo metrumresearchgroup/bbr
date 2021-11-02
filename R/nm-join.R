@@ -94,6 +94,8 @@ nm_join <- function(
   }
 
   # check for table files
+  ### TODO: consider letting people pass relative paths somehow
+  ### this is annoying: test_df <- nm_join(MOD1, .files = build_path_from_model(.mod, "cl.tab"))
   .files <- c(.files, .more)
   chk <- file.exists(.files)
   skippers <- .files[!chk & !(.files %in% tabfiles(.mod))]
@@ -115,14 +117,25 @@ nm_join <- function(
   if(!(.join_col %in% names(.d))) {
     stop(glue("couldn't find `.join_col` {.join_col} in data with cols: {paste(names(.d), collapse = ', ')}"))
   }
+
   leading_cols <- names(.d)
   for(p in .files) {
     tab <- read_table(p, skip =1, na = ".", col_types = readr::cols())
     names(tab) <- toupper(names(tab))
     has_id <- "ID" %in% names(tab)
 
-    # skip table if nrow doesn't match number of records or ID's (TODO: WHY????, for future developers' sake)
-    if(!(nrow(tab) %in% c(nrec,nid))) {
+    # suffix for duplicated columns
+    .tab_suf <- str_replace(basename(p), get_model_id(.mod), "")
+    .suffix <- if (isTRUE(.superset)) {
+      c("", .tab_suf)
+    } else {
+      c(.tab_suf, "")
+    }
+
+    # skip table if nrow doesn't match number of records or ID's
+    # because if neither is true than this is the wrong kind of file
+    # (or something is wrong with NONMEM output)
+    if(!(nrow(tab) %in% c(nrec, nid))) {
       warning(glue("table file: {basename(p)} skipped because nrow doesn't match number of records or IDs"), call. = FALSE)
       if(.verbose) {
         message("  rows: ", nrow(tab))
@@ -132,55 +145,65 @@ nm_join <- function(
       }
       next;
     }
-    if(nrow(tab) == nid && has_id) {
+
+    # first only tables (join on ID)
+    if(nrow(tab) == nid) {
       if(.verbose) {
         message("\nfirstonly file: ", basename(p))
         message("  rows: ", nrow(tab))
         message("  cols: ", ncol(tab))
       }
-      keep <- c("ID",setdiff(names(tab), names(.d)))
-      if((ncol(tab) - length(keep) - 1) > 0) {
-        if(.verbose) {
-          message(
-            "  droppping: ",
-            ncol(tab) - length(keep) - 1,
-            " columns in common"
-          )
-        }
+      # keep <- c("ID",setdiff(names(tab), names(.d)))
+      # if((ncol(tab) - length(keep) - 1) > 0) {
+      #   if(.verbose) {
+      #     message(
+      #       "  droppping: ",
+      #       ncol(tab) - length(keep) - 1,
+      #       " columns in common"
+      #     )
+      #   }
+      # }
+      # .d <- left_join(.d, tab[,keep], by = "ID")
+
+      # if ID is missing, get it from the data by using .join_col
+      if (!has_id) {
+        tab <- tab %>%
+          left_join(select(.d, .data$ID, !!.join_col), by = .join_col)
       }
-      .d <- left_join(.d, tab[,keep], by = "ID", suffix = c("", "y"))
+
+      tab[[.join_col]] <- NULL
+
+      .d <- join_fun(tab, .d, by = "ID", suffix = .suffix)
       next;
     } # end ID join
-    if(nrow(tab) != nrec) {
-      if (.verbose) {
-        message("\ntable file: ", basename(p), " (skipped)")
-        message("  rows: ", nrow(tab))
-        message("  hasid: ", has_id)
-        message("  tabids: ", length(unique(tab[["ID"]])))
-        message("  runids: ", nid)
-      }
-      next;
-    }
+
     if(.verbose) message("\ntable file: ", basename(p))
     new_cols <- setdiff(names(tab), names(.d))
-    keep <- c(.join_col, new_cols)
-    drop <- setdiff(names(tab), new_cols)
-    drop <- drop[!(drop %in% .join_col)]
+    # keep <- c(.join_col, new_cols)
+    # drop <- setdiff(names(tab), new_cols)
+    # drop <- drop[!(drop %in% .join_col)]
+    # if(.verbose) {
+    #   message("  rows: ", nrow(tab))
+    #   message("  cols: ", length(new_cols), " new")
+    #   for(d in drop) {
+    #     message("  drop: ", d,  " common")
+    #   }
+    # }
+    # .d <- join_fun(tab[,keep], .d, by = .join_col)
     if(.verbose) {
       message("  rows: ", nrow(tab))
       message("  cols: ", length(new_cols), " new")
-      for(d in drop) {
-        message("  drop: ", d,  " common")
-      }
     }
-    .d <- join_fun(tab[,keep], .d, by = .join_col)
+    .d <- join_fun(tab, .d, by = .join_col, suffix = .suffix)
   }
+
   if(.verbose) {
     message("\nfinal stats:")
     message("  rows: ", nrow(.d))
     message("  cols: ", ncol(.d))
   }
-  select(.d, all_of(leading_cols), everything())
+
+  return(select(.d, all_of(leading_cols), everything()))
 }
 
 

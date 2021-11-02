@@ -30,13 +30,33 @@ withr::with_options(list(
     expect_equal(sum(is.na(test_df$PRED)), 20)
   })
 
-  test_that("nm_join(.files) works correctly FIRSTONLY", {
+  #### first only tests
+
+  test_that("nm_join(.files) works correctly FIRSTONLY with ID col", {
     test_df <- nm_join(
       MOD1,
-      .files = build_path_from_model(MOD1, "first.tab")
+      .files = build_path_from_model(.mod, "first1.tab")
     )
-    expect_equal(nrow(test_df), 799)
-    expect_equal(ncol(test_df), 10) # TODO: is this right?
+    expect_equal(nrow(test_df), 779)
+    expect_equal(ncol(test_df), 11)
+  })
+
+  test_that("nm_join(.files) works correctly FIRSTONLY with no ID col", {
+    test_df <- nm_join(
+      MOD1,
+      .files = build_path_from_model(.mod, "first2.tab")
+    )
+    expect_equal(nrow(test_df), 779)
+    expect_equal(ncol(test_df), 11)
+  })
+
+  test_that("nm_join(.files) works correctly FIRSTONLY with both NUM and ID cols", {
+    test_df <- nm_join(
+      MOD1,
+      .files = build_path_from_model(.mod, "first3.tab")
+    )
+    expect_equal(nrow(test_df), 779)
+    expect_equal(ncol(test_df), 11)
   })
 
   test_that("nm_join(.files) works correctly duplicate cols", {
