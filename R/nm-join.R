@@ -38,6 +38,8 @@
 #'
 #' **NEED TO DISCUSS FIRSTONLY AND ID COL**
 #'
+#' **NEED TO DISCUSS DROPPING COLUMNS AND DV.DATA**
+#'
 #' You can get the absolute path to the model output directory with
 #' [get_output_dir()] or [build_path_from_model()] if needed to build paths for
 #' passing to `.files` or `.more`.
@@ -92,6 +94,7 @@ nm_join <- function(
     message("  rows: ", nrow(.d))
     message("  cols: ", ncol(.d))
   }
+  if ("DV" %in% names(.d)) .d <- rename(.d, DV.DATA = .data$DV)
 
   # check for table files
   ### TODO: consider letting people pass relative paths somehow
