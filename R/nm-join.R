@@ -124,14 +124,6 @@ nm_join <- function(
     names(tab) <- toupper(names(tab))
     has_id <- "ID" %in% names(tab)
 
-    # suffix for duplicated columns
-    .tab_suf <- str_replace(basename(p), get_model_id(.mod), "")
-    .suffix <- if (isTRUE(.superset)) {
-      c("", .tab_suf)
-    } else {
-      c(.tab_suf, "")
-    }
-
     # skip table if nrow doesn't match number of records or ID's
     # because if neither is true than this is the wrong kind of file
     # (or something is wrong with NONMEM output)
@@ -153,17 +145,6 @@ nm_join <- function(
         message("  rows: ", nrow(tab))
         message("  cols: ", ncol(tab))
       }
-      # keep <- c("ID",setdiff(names(tab), names(.d)))
-      # if((ncol(tab) - length(keep) - 1) > 0) {
-      #   if(.verbose) {
-      #     message(
-      #       "  droppping: ",
-      #       ncol(tab) - length(keep) - 1,
-      #       " columns in common"
-      #     )
-      #   }
-      # }
-      # .d <- left_join(.d, tab[,keep], by = "ID")
 
       # if ID is missing, get it from the data by using .join_col
       if (!has_id) {
@@ -174,28 +155,17 @@ nm_join <- function(
       # toss .join_col, if present, because we're joining on ID
       tab[[.join_col]] <- NULL
 
-      .d <- join_fun(tab, .d, by = "ID", suffix = .suffix)
+      .d <- tab %>%
+        drop_dups(.d, "ID", .verbose) %>%
+        join_fun(.d, by = "ID")
       next;
     } # end ID join
 
     if(.verbose) message("\ntable file: ", basename(p))
-    new_cols <- setdiff(names(tab), names(.d))
-    # keep <- c(.join_col, new_cols)
-    # drop <- setdiff(names(tab), new_cols)
-    # drop <- drop[!(drop %in% .join_col)]
-    # if(.verbose) {
-    #   message("  rows: ", nrow(tab))
-    #   message("  cols: ", length(new_cols), " new")
-    #   for(d in drop) {
-    #     message("  drop: ", d,  " common")
-    #   }
-    # }
-    # .d <- join_fun(tab[,keep], .d, by = .join_col)
-    if(.verbose) {
-      message("  rows: ", nrow(tab))
-      message("  cols: ", length(new_cols), " new")
-    }
-    .d <- join_fun(tab, .d, by = .join_col, suffix = .suffix)
+
+    .d <- tab %>%
+      drop_dups(.d, .join_col, .verbose) %>%
+      join_fun(.d, by = .join_col)
   }
 
   if(.verbose) {
@@ -222,4 +192,22 @@ tabfiles <- function(.mod) {
     build_path_from_model(.mod, ".tab")
 
   )
+}
+
+#' Drop duplicate rows to prepare for join
+#' @keywords internal
+drop_dups <- function(.new_table, .dest_table, .join_col, .verbose) {
+  new_cols <- c(setdiff(names(.new_table), names(.dest_table)))
+
+  keep <- c(.join_col, new_cols)
+  drop <- setdiff(names(.new_table), keep)
+
+  if(.verbose) {
+    message("  rows: ", nrow(.new_table))
+    message("  cols: ", length(new_cols), " new")
+    for(d in drop) {
+      message("  drop: ", d,  " common")
+    }
+  }
+  return(.new_table[keep])
 }

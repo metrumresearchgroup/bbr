@@ -1,4 +1,4 @@
-Tue Nov  2 15:54:10 EDT 2021
+Tue Nov  2 16:41:11 EDT 2021
 $PROBLEM PK model 1 cmt base
 
 $INPUT ID TIME MDV EVID DV AMT  SEX WT ETN NUM
@@ -36,15 +36,16 @@ W = IPRED*THETA(4) + THETA(5)
 IF (W.EQ.0) W = 1
 IWRES = IRES/W
 Y= IPRED+W*ERR(1)
+FAKE=1 ; for testing
 
 $EST METHOD=1 INTERACTION MAXEVAL=9999 SIG=3 PRINT=5 NOABORT POSTHOC
 $COV
 $TABLE NUM IPRED NPDE CWRES NOPRINT ONEHEADER FILE=1.tab
-$TABLE NUM CL V ETAS(1:LAST) NOAPPEND NOPRINT ONEHEADER FILE=1par.tab
+$TABLE NUM CL V KA ETAS(1:LAST) NOAPPEND NOPRINT ONEHEADER FILE=1par.tab
 $TABLE ID CL NOAPPEND NOPRINT ONEHEADER FIRSTONLY FILE=1first1.tab ; for testing firstonly
 $TABLE NUM CL NOAPPEND NOPRINT ONEHEADER FIRSTONLY FILE=1first2.tab ; for testing firstonly
 $TABLE NUM ID CL NOAPPEND NOPRINT ONEHEADER FIRSTONLY FILE=1first3.tab ; for testing firstonly
-$TABLE NUM CL NOAPPEND NOPRINT ONEHEADER FILE=1cl.tab ; for testing dropping duplicate columns
+$TABLE NUM CL KA FAKE NOAPPEND NOPRINT ONEHEADER FILE=1dups.tab ; for testing dropping duplicate columns
 $TABLE NUM CL NOAPPEND NOPRINT ONEHEADER FIRSTONLY FILE=1twotables.tab ; for testing two tables in one file
 $TABLE ID CL NOAPPEND NOPRINT ONEHEADER FIRSTONLY FILE=1twotables.tab ; for testing two tables in one file ^
 
@@ -79,7 +80,7 @@ Days until program expires : 257
 0LABELS FOR DATA ITEMS:
  ID TIME MDV EVID DV AMT SEX WT ETN NUM
 0(NONBLANK) LABELS FOR PRED-DEFINED ITEMS:
- CL V IPRED
+ KA CL V IPRED FAKE
 0FORMAT FOR DATA:
  (E3.0,E5.0,2E2.0,E21.0,E6.0,E2.0,E5.0,E2.0,E4.0)
 
@@ -151,7 +152,7 @@ Days until program expires : 257
  RFORMAT:
  FIXED_EFFECT_ETAS:
 0USER-CHOSEN ITEMS:
- NUM CL V ETA1 ETA2
+ NUM CL V KA ETA1 ETA2
 0-- TABLE   3 --
 0RECORDS ONLY:    FIRSTONLY
 04 COLUMNS APPENDED:    NO
@@ -199,7 +200,7 @@ Days until program expires : 257
  RFORMAT:
  FIXED_EFFECT_ETAS:
 0USER-CHOSEN ITEMS:
- NUM CL
+ NUM CL KA FAKE
 0-- TABLE   7 --
 0RECORDS ONLY:    FIRSTONLY
 04 COLUMNS APPENDED:    NO
@@ -404,9 +405,9 @@ Days until program expires : 257
  TOTAL EFFECTIVE ETAS (NIND*NETA):                            78
   
  #TERE:
- Elapsed estimation  time in seconds:     3.07
- Elapsed covariance  time in seconds:     0.80
- Elapsed postprocess time in seconds:     0.26
+ Elapsed estimation  time in seconds:     4.25
+ Elapsed covariance  time in seconds:     0.77
+ Elapsed postprocess time in seconds:     0.31
 1
  
  
@@ -684,6 +685,6 @@ Days until program expires : 257
 +       ......... ......... ......... ......... ......... ......... ......... ......... .........
  
  Elapsed finaloutput time in seconds:     0.05
- #CPUT: Total CPU Time in Seconds,        4.170
+ #CPUT: Total CPU Time in Seconds,        5.334
 Stop Time:
-Tue Nov  2 15:54:20 EDT 2021
+Tue Nov  2 16:41:23 EDT 2021

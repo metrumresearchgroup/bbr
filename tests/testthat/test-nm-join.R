@@ -76,7 +76,7 @@ withr::with_options(list(
   test_that("nm_join(.files) works correctly duplicate cols", {
     test_df <- nm_join(
       MOD1,
-      .files = build_path_from_model(MOD1, "cl.tab")
+      .more = build_path_from_model(MOD1, "dups.tab")
     )
     expect_equal(nrow(test_df), 779)
     expect_equal(ncol(test_df), 11) # TODO: is this right?
