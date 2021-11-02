@@ -59,6 +59,20 @@ withr::with_options(list(
     expect_equal(ncol(test_df), 11)
   })
 
+  test_that("nm_join(.files) works correctly FIRSTONLY then full table", {
+    test_df <- nm_join(
+      MOD1,
+      .files = c(
+        build_path_from_model(.mod, "first1.tab"),
+        build_path_from_model(.mod, ".tab")
+      )
+    )
+    expect_equal(nrow(test_df), 779)
+    expect_equal(ncol(test_df), 18)
+  })
+
+  #####
+
   test_that("nm_join(.files) works correctly duplicate cols", {
     test_df <- nm_join(
       MOD1,

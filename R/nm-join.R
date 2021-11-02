@@ -171,6 +171,7 @@ nm_join <- function(
           left_join(select(.d, .data$ID, !!.join_col), by = .join_col)
       }
 
+      # toss .join_col, if present, because we're joining on ID
       tab[[.join_col]] <- NULL
 
       .d <- join_fun(tab, .d, by = "ID", suffix = .suffix)
