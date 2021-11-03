@@ -1,57 +1,56 @@
-#' Read NONMEM output files
+#' Read NONMEM files
 #'
-#' Reads in a whitespace-delimited NONMEM output file, for example .grd or .ext
-#' or a table output.
+#' Reads in a whitespace-delimited NONMEM output file (for example .grd or .ext
+#' or a table output) or a NONMEM input data file.
+#'
+#' @return A tibble with the data from the specified file and estimation method.
+#'
 #' @param .mod Either a `bbi_nonmem_model`, `bbi_nonmem_summary`, or a path to a
 #'   file to read in. If passing model object to `nm_file()`, must also pass `.suffix` that
 #'   will be passed through to [build_path_from_model()].
+#' @param .est_method If `NULL`, the default, pulls the data from the final
+#'   estimation method. If an integer, pulls the data from that estimation
+#'   method.
 #' @inheritParams build_path_from_model
 #' @param ... arguments passed through to methods. (Currently none.)
 #' @export
-nm_file <- function(.mod, .suffix = NULL, ...) {
+nm_file <- function(.mod, .suffix = NULL, .est_method = NULL, ...) {
   UseMethod("nm_file")
 }
 
 #' @export
-nm_file.bbi_model <- function(.mod, .suffix = NULL, ...) {
+nm_file.bbi_model <- function(.mod, .suffix = NULL, .est_method = NULL, ...) {
   check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
   if (is.null(.suffix)) {
     stop("Must pass .suffix to use nm_file.bbi_model")
   }
   .path <- build_path_from_model(.mod, .suffix)
-  nm_file(.path)
+  nm_file(.path, .suffix = NULL, .est_method = .est_method)
 }
 
-#' @importFrom readr read_table read_table2 cols
 #' @export
-nm_file.character <- function(.mod, .suffix = NULL, ...) {
+nm_file.character <- function(.mod, .suffix = NULL, .est_method = NULL, ...) {
   checkmate::assert_string(.mod)
   if (!is.null(.suffix)) {
     stop("Cannot pass .suffix to use nm_file.character; pass only file path to .mod")
   }
-
-  # read file
-  if (packageVersion("readr") >= package_version("2.0.0")) {
-    read_table(.mod, skip=1, na = ".", col_types = cols())
-  } else {
-    read_table2(.mod, skip=1, na = ".", col_types = cols())
-  }
+  nm_file_impl(.mod, .est_method)
 }
 
 #' @describeIn nm_file Reads `.grd` file from a `bbi_nonmem_model` or
 #'   `bbi_nonmem_summary` object
 #' @export
-nm_grd <- function(.mod) {
+nm_grd <- function(.mod, .est_method = NULL) {
   check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
-  nm_file(.mod, ".grd")
+  nm_file(.mod, .suffix = ".grd", .est_method = .est_method)
 }
 
 #' @describeIn nm_file Reads `.ext` file from a `bbi_nonmem_model` or
 #'   `bbi_nonmem_summary` object
 #' @export
-nm_ext <- function(.mod) {
+nm_ext <- function(.mod, .est_method = NULL) {
   check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
-  nm_file(.mod, ".ext")
+  nm_file(.mod, .suffix = ".ext", .est_method = .est_method)
 }
 
 #' @describeIn nm_file Looks for `{get_model_id(.mod)}.tab` or `TAB` file in
@@ -93,6 +92,41 @@ nm_data <- function(.mod, .sep = ",") {
   .path <- get_data_path(.mod)
   verbose_msg(glue("Reading {.path}"))
   read_delim(.path, delim =.sep, na = ".", col_types = readr::cols())
+}
+
+
+#####################################
+# PRIVATE HELPERS AND IMPLEMENTATION
+
+#' Implementation function for reading NONMEM files
+#' @importFrom readr read_table read_table2 cols read_lines
+#' @importFrom stringr str_detect
+#' @keywords internal
+nm_file_impl <- function(.path, .est_method) {
+  checkmate::assert_integerish(.est_method, lower = 1, null.ok = TRUE)
+
+  # read file and find top of table
+  .txt <- read_lines(.path)
+  .est <- which(str_detect(.txt, "^ *TABLE NO"))
+  if (is.null(.est_method)) {
+    .est_method <- length(.est)
+  }
+  checkmate::assert_integerish(.est_method, lower = 1, upper = length(.est), len = 1, null.ok = TRUE)
+
+  # parse to tibble
+  .start <- .est[.est_method] + 1
+  .end <- if (.est_method == length(.est)) {
+    length(.txt) # end of file
+  } else {
+    .est[.est_method+1] - 1 # line before next estimation method
+  }
+
+  .est_lines <- .txt[.start:.end]
+  if (packageVersion("readr") >= package_version("2.0.0")) {
+    read_table(I(.est_lines), na = ".", col_types = cols())
+  } else {
+    read_table2(I(.est_lines), na = ".", col_types = cols())
+  }
 }
 
 #' Read in the file that exists

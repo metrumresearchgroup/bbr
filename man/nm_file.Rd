@@ -7,13 +7,13 @@
 \alias{nm_tab}
 \alias{nm_par_tab}
 \alias{nm_data}
-\title{Read NONMEM output files}
+\title{Read NONMEM files}
 \usage{
-nm_file(.mod, .suffix = NULL, ...)
+nm_file(.mod, .suffix = NULL, .est_method = NULL, ...)
 
-nm_grd(.mod)
+nm_grd(.mod, .est_method = NULL)
 
-nm_ext(.mod)
+nm_ext(.mod, .est_method = NULL)
 
 nm_tab(.mod)
 
@@ -30,14 +30,21 @@ will be passed through to \code{\link[=build_path_from_model]{build_path_from_mo
 Will be appended \emph{as is} so, if passing a file extension, be sure to included the leading \code{"."}.
 See examples.}
 
+\item{.est_method}{If \code{NULL}, the default, pulls the data from the final
+estimation method. If an integer, pulls the data from that estimation
+method.}
+
 \item{...}{arguments passed through to methods. (Currently none.)}
 
 \item{.sep}{Single character used to separate fields within a record. Passed
 through to \code{readr::read_delim()}. Defaults to \code{","}.}
 }
+\value{
+A tibble with the data from the specified file and estimation method.
+}
 \description{
-Reads in a whitespace-delimited NONMEM output file, for example .grd or .ext
-or a table output.
+Reads in a whitespace-delimited NONMEM output file (for example .grd or .ext
+or a table output) or a NONMEM input data file.
 }
 \section{Functions}{
 \itemize{
