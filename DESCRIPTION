@@ -39,9 +39,7 @@ Imports:
     digest,
     diffobj,
     dplyr (>= 1.0.0),
-    forcats,
     fs,
-    ggplot2,
     glue,
     jsonlite,
     lifecycle,
@@ -59,6 +57,8 @@ Imports:
 Suggests: 
     covr,
     devtools,
+    forcats,
+    ggplot2,
     knitr,
     rmarkdown,
     testthat (>= 2.1.0),

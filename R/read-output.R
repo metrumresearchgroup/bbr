@@ -154,6 +154,14 @@ check_nonmem_table_output <- function(
   .path,
   .x_var = NULL,
   .x_floor = NULL) {
+
+  deprecate_warn(
+    "1.5.0",
+    "check_nonmem_table_output()",
+    with = "nm_file()",
+    details = "All functions calling `check_nonmem_table_output()` are being replaced from `nm_*()` functions. See ?nm_file for details."
+  )
+
   # read file
   df <- read_table2(.path, skip=1, col_types = cols())
 
@@ -178,6 +186,19 @@ check_nonmem_table_output <- function(
 #' @importFrom forcats fct_inorder
 #' @export
 plot_nonmem_table_df <- function(.df, .x_var, .stat_name) {
+  deprecate_warn(
+    "1.5.0",
+    "plot_nonmem_table_df()",
+    details = paste(
+      "All functions calling `plot_nonmem_table_df()` are being deprecated to focus the scope of bbr.",
+      "Consider using https://github.com/metrumresearchgroup/pmplots instead."
+    )
+  )
+
+  if (!requireNamespace("ggplot2", quietly = TRUE) || !requireNamespace("forcats", quietly = TRUE)) {
+    stop(paste("must have both ggplot2 and forcats to use plot_nonmem_table_df"))
+  }
+
   p <- .df %>% gather("stat", "value", -.data[[.x_var]]) %>%
     mutate(stat = forcats::fct_inorder(.data$stat)) %>%
     ggplot(aes(x=.data[[.x_var]], y=.data$value, colour=.data$stat)) + geom_line() +
