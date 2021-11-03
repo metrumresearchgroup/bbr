@@ -6,6 +6,7 @@
 \alias{nm_ext}
 \alias{nm_tab}
 \alias{nm_par_tab}
+\alias{nm_data}
 \title{Read NONMEM output files}
 \usage{
 nm_file(.mod, .suffix = NULL, ...)
@@ -17,6 +18,8 @@ nm_ext(.mod)
 nm_tab(.mod)
 
 nm_par_tab(.mod)
+
+nm_data(.mod, .sep = ",")
 }
 \arguments{
 \item{.mod}{Either a \code{bbi_nonmem_model}, \code{bbi_nonmem_summary}, or a path to a
@@ -28,6 +31,9 @@ Will be appended \emph{as is} so, if passing a file extension, be sure to includ
 See examples.}
 
 \item{...}{arguments passed through to methods. (Currently none.)}
+
+\item{.sep}{Single character used to separate fields within a record. Passed
+through to \code{readr::read_delim()}. Defaults to \code{","}.}
 }
 \description{
 Reads in a whitespace-delimited NONMEM output file, for example .grd or .ext
@@ -46,5 +52,8 @@ NONMEM output folder and reads whichever is found.
 
 \item \code{nm_par_tab}: Looks for \verb{\{get_model_id(.mod)\}par.tab} or \code{PAR_TAB} file
 in NONMEM output folder and reads whichever is found.
+
+\item \code{nm_data}: Reads the input data file from a \code{bbi_nonmem_model} or
+\code{bbi_nonmem_summary} object
 }}
 

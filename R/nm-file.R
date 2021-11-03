@@ -82,6 +82,19 @@ nm_par_tab <- function(.mod) {
   )
 }
 
+#' @describeIn nm_file Reads the input data file from a `bbi_nonmem_model` or
+#'   `bbi_nonmem_summary` object
+#' @param .sep Single character used to separate fields within a record. Passed
+#'   through to `readr::read_delim()`. Defaults to `","`.
+#' @importFrom readr read_delim cols
+#' @export
+nm_data <- function(.mod, .sep = ",") {
+  check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
+  .path <- get_data_path(.mod)
+  verbose_msg(glue("Reading {.path}"))
+  read_delim(.path, delim =.sep, na = ".", col_types = readr::cols())
+}
+
 #' Read in the file that exists
 #'
 #' Helper for [nm_tab()] and [nm_par_tab()]. Looks for all files passed to
