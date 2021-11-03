@@ -20,6 +20,11 @@
     options("bbr.bbi_min_version" = package_version("3.0.2"))
   }
 
+  # controls printing extra informative messages in functions
+  if (is.null(getOption("bbr.verbose"))) {
+    options("bbr.verbose" = TRUE)
+  }
+
   # by default turn on strict mode to check for malformed objects and classes, etc.
   if (is.null(getOption("bbr.strict"))) {
     options("bbr.strict" = TRUE)
