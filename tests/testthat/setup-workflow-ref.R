@@ -45,7 +45,7 @@ EXT_TEST_FILE <-  as.character(glue::glue("{MOD1_PATH}/{MOD_ID}.ext"))
 OUTPUT_FILE <-    file.path(MOD1_PATH, "OUTPUT")
 
 DATA_TEST_FILE <- as.character(fs::path_norm(file.path(REF_DIR, "..", "extdata", "acop.csv")))
-DATA_TEST_FIRST_LINE <- "id,time,mdv,evid,dv,amt,sex,wt,etn"
+DATA_TEST_FIRST_LINE <- "id,time,mdv,evid,dv,amt,sex,wt,etn,num"
 
 LEVEL2_SUBDIR <- "level2"
 LEVEL2_DIR <- file.path(MODEL_DIR, LEVEL2_SUBDIR)
@@ -91,9 +91,15 @@ RUN_LOG_COLS <- 9L
 CONFIG_COLS <- 9L
 SUM_LOG_COLS <- 23L
 
-CONFIG_DATA_PATH <- "../../../../extdata/acop.csv"
-CONFIG_DATA_MD5 <- "4ddb44da897c26681d892aa7be99f74b"
-CONFIG_MODEL_MD5 <- "9092189126b23a80bf91a67d1dd8973c"
+ref_json <- jsonlite::fromJSON(system.file("test-refs", "ref_values.json", package = "bbr"))
+CONFIG_DATA_PATH <- ref_json$CONFIG_DATA_PATH
+CONFIG_DATA_MD5 <- ref_json$CONFIG_DATA_MD5
+CONFIG_MODEL_MD5 <- ref_json$CONFIG_MODEL_MD5
+MOD_BBI_VERSION <- ref_json$MOD_BBI_VERSION
+PARAM_COUNT_REF <- ref_json$PARAM_COUNT_REF
+OFV_REF <- ref_json$OFV_REF
+MOD_BBI_VERSION <- ref_json$MOD_BBI_VERSION
+MOD_NM_VERSION <- ref_json$MOD_NM_VERSION
 
 # yaml md5 hashes
 MOD1_YAML_MD5 <- "6ccf206e167485b5adf29bc135197929"

@@ -2,10 +2,6 @@ context("Test creating summary logs")
 
 skip_if_not_drone_or_metworx("test-summary-log")
 
-# references
-OFV_REF <- 2636.846
-PARAM_COUNT_REF <- 7
-
 # helper to run expectations
 test_sum_df <- function(sum_df, .paths, .col_count) {
   # check sum_df class

@@ -16,6 +16,10 @@ test_that("get_output_dir() builds the right path [BBR-GPFO-002]", {
   expect_identical(get_output_dir(MOD1), normalizePath(OUTPUT_DIR))
 })
 
+test_that("get_config_path() builds the right path [BBR-GPFO-026]", {
+  expect_identical(get_config_path(MOD1), normalizePath(file.path(OUTPUT_DIR, "bbi_config.json")))
+})
+
 test_that("get_yaml_path() builds the right path [BBR-GPFO-003]", {
   expect_identical(get_yaml_path(MOD1), normalizePath(YAML_TEST_FILE))
 })
@@ -28,6 +32,11 @@ test_that("get_model_path() builds the right path from summary object [BBR-GPFO-
 test_that("get_output_dir() builds the right path from summary object [BBR-GPFO-005]", {
   skip_if_not_drone_or_metworx("get_output_dir.bbi_nonmem_summary")
   expect_identical(get_output_dir(SUM1), normalizePath(OUTPUT_DIR))
+})
+
+test_that("get_config_path() builds the right path from summary object [BBR-GPFO-026]", {
+  skip_if_not_drone_or_metworx("get_config_path.bbi_nonmem_summary")
+  expect_identical(get_config_path(SUM1), normalizePath(file.path(OUTPUT_DIR, "bbi_config.json")))
 })
 
 test_that("get_yaml_path() builds the right path from summary object [BBR-GPFO-006]", {
@@ -47,6 +56,10 @@ test_that("get_model_path() works with bbi_*_log_df [BBR-GPFO-007]", {
 
 test_that("get_output_dir() works with bbi_*_log_df [BBR-GPFO-008]", {
   expect_identical(get_output_dir(run_log(MODEL_DIR)), normalizePath(OUTPUT_DIR))
+})
+
+test_that("get_config_path() works with bbi_*_log_df [BBR-GPFO-026]", {
+  expect_identical(get_config_path(run_log(MODEL_DIR)), normalizePath(file.path(OUTPUT_DIR, "bbi_config.json")))
 })
 
 test_that("get_yaml_path() works with bbi_*_log_df [BBR-GPFO-009]", {

@@ -1,6 +1,6 @@
 ...
  
- Elapsed finaloutput time in seconds:     0.00
- #CPUT: Total CPU Time in Seconds,        2.595
+ Elapsed finaloutput time in seconds:     0.06
+ #CPUT: Total CPU Time in Seconds,        4.936
 Stop Time:
-Mon Feb 22 16:53:58 EST 2021
+Thu Nov  4 10:11:14 EDT 2021
