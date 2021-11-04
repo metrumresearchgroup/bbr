@@ -48,7 +48,10 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
                                   "\\Q", temp_dir, "\\E", "/2\\.ctl.+")))
     expect_true(str_detect(call_str, "--overwrite --threads=4"))
 
-    # check that passing in .call_limit=30 has bbi path, NO model paths, but still has flags
+    # Check that passing in .call_limit=30 has bbi path, NO model paths, but
+    # still has flags. Note that 30 is sufficient to trigger truncation of the
+    # model arguments because "inst/model/nonmem/basic/print-test" alone is over
+    # 30 characters.
     call_str <- capture.output(print(proc[[1]], .call_limit=30))[2]
     expect_true(str_detect(call_str, fixed(read_bbi_path())))
     expect_false(str_detect(call_str, fixed(temp_dir)))
