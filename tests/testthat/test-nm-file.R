@@ -1,26 +1,24 @@
 
-MOD1_PARAMS <- 9
-
 # WIP: STILL NEED TO TEST
 # * nm_tab()
 # * nm_par_tab()
 
 test_that("nm_file() works with .cov", {
   .d <- nm_file(MOD1, ".cov")
-  expect_equal(ncol(.d), MOD1_PARAMS+1)
-  expect_equal(nrow(.d), MOD1_PARAMS)
+  expect_equal(ncol(.d), MOD1_PARAM_COUNT+1)
+  expect_equal(nrow(.d), MOD1_PARAM_COUNT)
 })
 
 test_that("nm_ext() works", {
   .d <- nm_ext(MOD1)
-  expect_equal(ncol(.d), MOD1_PARAMS+2)
-  expect_equal(nrow(.d), 14)
+  expect_equal(ncol(.d), MOD1_PARAM_COUNT+2)
+  expect_true(nrow(.d) > 5) # this changes enough, not worth testing exactly
 })
 
 test_that("nm_grd() works", {
   .d <- nm_grd(MOD1)
-  expect_equal(ncol(.d), 8)
-  expect_equal(nrow(.d), 7)
+  expect_equal(ncol(.d), MOD1_PARAM_COUNT_FIXED+1)
+  expect_true(nrow(.d) > 5) # this changes enough, not worth testing exactly
 })
 
 test_that("nm_file(.est_method) works", {
@@ -54,6 +52,6 @@ test_that("nm_data() works", {
     .d <- nm_data(MOD1)
   }, regexp = "Reading.+acop")
 
-  expect_equal(ncol(.d), 9)
+  expect_equal(ncol(.d), 10)
   expect_equal(nrow(.d), 799)
 })

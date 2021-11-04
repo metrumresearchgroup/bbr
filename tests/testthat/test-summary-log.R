@@ -16,8 +16,8 @@ test_sum_df <- function(sum_df, .paths, .col_count) {
   expect_equal(sum_df$absolute_model_path, purrr::map_chr(.paths, ~normalizePath(.x)))
   expect_true(all(is.na(sum_df$error_msg)))
   expect_false(any(sum_df$needed_fail_flags))
-  expect_equal(sum_df$ofv, rep(OFV_REF, num_mods))
-  expect_equal(sum_df$param_count, rep(PARAM_COUNT_REF, num_mods))
+  expect_equal(sum_df$ofv, rep(MOD1_OFV_REF, num_mods))
+  expect_equal(sum_df$param_count, rep(MOD1_PARAM_COUNT_FIXED, num_mods))
   expect_false(any(sum_df$minimization_terminated))
 }
 
