@@ -19,10 +19,12 @@ NULL
 #' @importFrom cli cat_line
 #' @export
 print.bbi_process <- function(x, ..., .call_limit = 250) {
-  call_str <- glue("{x[[PROC_BBI]]} {paste(x[[PROC_CMD_ARGS]], collapse = ' ')}")
+  exec_path <- x[[PROC_BBI]]
+  call_str <- paste(x[[PROC_CMD_ARGS]], collapse = " ")
+  len_call <- nchar(exec_path) + nchar(call_str) + 1  # +1 for space
 
   # truncate model list if too long, keeping flags at the end (if any present)
-  if (nchar(call_str) > .call_limit) {
+  if (len_call > .call_limit) {
     split_call_str <- str_split(call_str, " \\-\\-", n = 2)
     mod_str <- split_call_str[[1]][1]
     flag_str <- split_call_str[[1]][2]
@@ -32,6 +34,8 @@ print.bbi_process <- function(x, ..., .call_limit = 250) {
       call_str <- paste0(call_str, " --", flag_str)
     }
   }
+  # ... and keeping the executable path at the beginning.
+  call_str <- paste(exec_path, call_str)
 
   # print call string
   cat_line("Running:", col = "green")
