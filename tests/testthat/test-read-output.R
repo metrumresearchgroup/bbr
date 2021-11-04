@@ -1,6 +1,6 @@
 context("Reading NONMEM output files into R")
 
-withr::local_options(lifecycle_verbosity = "quiet")
+withr::local_options(list(lifecycle_verbosity = "quiet"))
 
 ################################################################################################
 # load reference character vectors for checking the contents of output files
