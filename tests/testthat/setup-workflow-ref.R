@@ -48,7 +48,7 @@ DATA_TEST_FILE <- as.character(fs::path_norm(file.path(REF_DIR, "..", "extdata",
 DATA_TEST_FIRST_LINE <- "id,time,mdv,evid,dv,amt,sex,wt,etn,num"
 DATA_TEST_COLS <- length(unlist(stringr::str_split(DATA_TEST_FIRST_LINE, ",")))
 DATA_TEST_ROWS <- 799
-DATA_TEST_ROWS_IGNORE <- 799 - 20
+DATA_TEST_ROWS_IGNORE <- DATA_TEST_ROWS - 20
 
 LEVEL2_SUBDIR <- "level2"
 LEVEL2_DIR <- file.path(MODEL_DIR, LEVEL2_SUBDIR)

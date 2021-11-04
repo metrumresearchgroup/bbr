@@ -143,6 +143,9 @@ check_output_dir.bbi_model <- function(.mod, ...) {
 
 #' Check NONMEM output files
 #'
+#' @description
+#' `r lifecycle::badge("deprecated")`
+#'
 #' Checks a NONMEM output file that's a whitespace-delimited file (for instance .grd or .ext)
 #' @param .path Character scalar path to the file
 #' @param .x_var name of variable to filter with `.x_floor`
@@ -176,6 +179,9 @@ check_nonmem_table_output <- function(
 
 
 #' Plot NONMEM output files
+#'
+#' @description
+#' `r lifecycle::badge("deprecated")`
 #'
 #' Creates a line plot of the wide-format tibble output from `check_nonmem_table_output()`
 #' @param .df the wide-format tibble output from `check_nonmem_table_output()`
