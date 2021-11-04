@@ -1,8 +1,5 @@
 context("Constructing config log from bbi_config.json")
 
-expected_bbi_version <- "v3.0.2"
-expected_nonmem_version <- "nm74gf"
-
 # to minimize changes to the existing tests, we define the model and data status
 # for each of the models any particular test might need
 run_status <- dplyr::tribble(
@@ -108,12 +105,12 @@ test_that("config_log() reflects data mismatch [BBR-CGLG-005]", {
 
 test_that("config_log() includes bbi version [BBR-CGLG-006]", {
   log_df <- config_log(MODEL_DIR)
-  expect_equal(log_df[["bbi_version"]][1], expected_bbi_version)
+  expect_equal(log_df[["bbi_version"]][1], MOD_BBI_VERSION)
 })
 
 test_that("config_log() includes NONMEM version [BBR-CGLG-007]", {
   log_df <- config_log(MODEL_DIR)
-  expect_equal(log_df[["nm_version"]][1], expected_nonmem_version)
+  expect_equal(log_df[["nm_version"]][1], MOD_NM_VERSION)
 })
 
 test_that("add_config() works correctly [BBR-CGLG-008]", {
@@ -173,11 +170,11 @@ test_that("add_config() works correctly with missing json [BBR-CGLG-010]", {
   )
   expect_identical(
     log_df[["bbi_version"]],
-    rep_missing(expected_bbi_version, missing_idx, 4L)
+    rep_missing(MOD_BBI_VERSION, missing_idx, 4L)
   )
   expect_identical(
     log_df[["nm_version"]],
-    rep_missing(expected_nonmem_version, missing_idx, 4L)
+    rep_missing(MOD_NM_VERSION, missing_idx, 4L)
   )
 })
 
