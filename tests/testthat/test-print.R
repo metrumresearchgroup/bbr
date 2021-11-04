@@ -40,8 +40,19 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     mods <- purrr::map(1:50, ~copy_model_from(MOD1, file.path("print-test", .x)))
     proc <- submit_models(mods, .dry_run = TRUE)
 
-    # check that default has bbi path, at least two model paths, and flags
-    call_str <- capture.output(print(proc[[1]]))[2]
+    # Check that default has bbi path, at least two model paths, and flags.
+    # While the intention is to check the _default_ behavior, increase
+    # .call_site if needed to avoid this test failing on a system where the
+    # model paths are longer than expected.
+    args <- list(proc[[1]])
+    len_mod <- sum(nchar(purrr::map_chr(mods[1:2], get_model_path)),
+                   # +1 for space in between
+                   1)
+    if (len_mod > 250) {
+      args <- c(args, .call_limit = len_mod)
+    }
+
+    call_str <- capture.output(do.call(print, args))[2]
     expect_true(str_detect(call_str, fixed(read_bbi_path())))
     expect_true(str_detect(call_str,
                            paste0("\\Q", temp_dir, "\\E", "/1\\.ctl.+",
