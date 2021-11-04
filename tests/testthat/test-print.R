@@ -13,7 +13,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   test_that("print.bbi_process works with .wait = TRUE [BBR-PRNT-001]", {
     proc <- bbi_exec("--help", .wait = TRUE)
     res <- capture.output(print(proc))
-    expect_true(any(str_detect(res, PROC_HELP_STR)))
+    expect_true(any(str_detect(res, fixed(PROC_HELP_STR))))
     expect_true(any(str_detect(res, "Process finished.")))
   })
 
@@ -21,14 +21,14 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     proc <- bbi_exec("--help", .wait = FALSE)
     res <- capture.output(print(proc))
 
-    expect_true(any(str_detect(res, PROC_HELP_STR)))
+    expect_true(any(str_detect(res, fixed(PROC_HELP_STR))))
     expect_true(any(str_detect(res, "Not waiting for process to finish.")))
   })
 
   test_that("print.bbi_process works with dry run [BBR-PRNT-001]", {
     proc <- bbi_dry_run("--help", ".")
     res <- capture.output(print(proc))
-    expect_true(any(str_detect(res, PROC_HELP_STR)))
+    expect_true(any(str_detect(res, fixed(PROC_HELP_STR))))
     expect_true(any(str_detect(res, "DRY RUN! Process not actually run.")))
   })
 
@@ -42,14 +42,16 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
     # check that default has bbi path, at least two model paths, and flags
     call_str <- capture.output(print(proc[[1]]))[2]
-    expect_true(str_detect(call_str, read_bbi_path()))
-    expect_true(str_detect(call_str, as.character(glue("{temp_dir}/1\\.ctl.+{temp_dir}/2\\.ctl"))))
+    expect_true(str_detect(call_str, fixed(read_bbi_path())))
+    expect_true(str_detect(call_str,
+                           paste0("\\Q", temp_dir, "\\E", "/1\\.ctl.+",
+                                  "\\Q", temp_dir, "\\E", "/2\\.ctl.+")))
     expect_true(str_detect(call_str, "--overwrite --threads=4"))
 
     # check that passing in .call_limit=30 has bbi path, NO model paths, but still has flags
     call_str <- capture.output(print(proc[[1]], .call_limit=30))[2]
-    expect_true(str_detect(call_str, read_bbi_path()))
-    expect_false(str_detect(call_str, temp_dir))
+    expect_true(str_detect(call_str, fixed(read_bbi_path())))
+    expect_false(str_detect(call_str, fixed(temp_dir)))
     expect_true(str_detect(call_str, "--overwrite --threads=4"))
   })
 
