@@ -58,19 +58,13 @@ test_that("nm_data() works", {
 
 
 test_that("nm_tab() works", {
-  expect_message({
-    .d <- nm_tab(MOD1)
-  }, regexp = "Reading.+tab")
-
+  .d <- nm_tab(MOD1)
   expect_equal(ncol(.d), 8)
   expect_equal(nrow(.d), DATA_TEST_ROWS_IGNORE)
 })
 
 test_that("nm_par_tab() works", {
-  expect_message({
-    .d <- nm_par_tab(MOD1)
-  }, regexp = "Reading.+par\\.tab")
-
+  .d <- nm_par_tab(MOD1)
   expect_equal(ncol(.d), 6)
   expect_equal(nrow(.d), DATA_TEST_ROWS_IGNORE)
 })

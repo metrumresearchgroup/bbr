@@ -32,7 +32,9 @@ See examples.}
 
 \item{.est_method}{If \code{NULL}, the default, pulls the data from the final
 estimation method. If an integer, pulls the data from that estimation
-method.}
+method. Note that, if more than one table is written to a given file, this
+will also mean it pulls the final table by default, and this argument can
+be used to pull a different table instead.}
 
 \item{...}{arguments passed through to methods. (Currently none.)}
 
@@ -54,11 +56,11 @@ or a table output) or a NONMEM input data file.
 \item \code{nm_ext}: Reads \code{.ext} file from a \code{bbi_nonmem_model} or
 \code{bbi_nonmem_summary} object
 
-\item \code{nm_tab}: Looks for \verb{\{get_model_id(.mod)\}.tab} or \code{TAB} file in
-NONMEM output folder and reads whichever is found.
+\item \code{nm_tab}: Reads \verb{\{get_model_id(.mod)\}.tab} file from a
+\code{bbi_nonmem_model} or \code{bbi_nonmem_summary} object
 
-\item \code{nm_par_tab}: Looks for \verb{\{get_model_id(.mod)\}par.tab} or \code{PAR_TAB} file
-in NONMEM output folder and reads whichever is found.
+\item \code{nm_par_tab}: Reads \verb{\{get_model_id(.mod)\}par.tab} file from a
+\code{bbi_nonmem_model} or \code{bbi_nonmem_summary} object
 
 \item \code{nm_data}: Reads the input data file from a \code{bbi_nonmem_model} or
 \code{bbi_nonmem_summary} object

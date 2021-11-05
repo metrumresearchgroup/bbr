@@ -10,7 +10,9 @@
 #'   will be passed through to [build_path_from_model()].
 #' @param .est_method If `NULL`, the default, pulls the data from the final
 #'   estimation method. If an integer, pulls the data from that estimation
-#'   method.
+#'   method. Note that, if more than one table is written to a given file, this
+#'   will also mean it pulls the final table by default, and this argument can
+#'   be used to pull a different table instead.
 #' @inheritParams build_path_from_model
 #' @param ... arguments passed through to methods. (Currently none.)
 #' @export
@@ -53,32 +55,20 @@ nm_ext <- function(.mod, .est_method = NULL) {
   nm_file(.mod, .suffix = ".ext", .est_method = .est_method)
 }
 
-#' @describeIn nm_file Looks for `{get_model_id(.mod)}.tab` or `TAB` file in
-#'   NONMEM output folder and reads whichever is found.
+#' @describeIn nm_file Reads `{get_model_id(.mod)}.tab` file from a
+#'   `bbi_nonmem_model` or `bbi_nonmem_summary` object
 #' @export
 nm_tab <- function(.mod) {
   check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
-  nm_candidates(
-    "nm_tab()",
-    c(
-      file.path(get_output_dir(.mod), "TAB"),
-      build_path_from_model(.mod, ".tab")
-    )
-  )
+  nm_file(.mod, .suffix = ".tab")
 }
 
-#' @describeIn nm_file Looks for `{get_model_id(.mod)}par.tab` or `PAR_TAB` file
-#'   in NONMEM output folder and reads whichever is found.
+#' @describeIn nm_file Reads `{get_model_id(.mod)}par.tab` file from a
+#'   `bbi_nonmem_model` or `bbi_nonmem_summary` object
 #' @export
 nm_par_tab <- function(.mod) {
   check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
-  nm_candidates(
-    "nm_par_tab()",
-    c(
-      file.path(get_output_dir(.mod), "PAR_TAB"),
-      build_path_from_model(.mod, "par.tab")
-    )
-  )
+  nm_file(.mod, .suffix = "par.tab")
 }
 
 #' @describeIn nm_file Reads the input data file from a `bbi_nonmem_model` or
@@ -128,29 +118,3 @@ nm_file_impl <- function(.path, .est_method) {
     read_table2(I(.est_lines), na = ".", col_types = cols())
   }
 }
-
-#' Read in the file that exists
-#'
-#' Helper for [nm_tab()] and [nm_par_tab()]. Looks for all files passed to
-#' `.candidates`. If only one of them exists, it reads that file. Otherwise it
-#' errors informatively.
-#' @param .func name of the calling function (for potential error message)
-#' @param .candidates Files to look for
-#' @keywords internal
-nm_candidates <- function(.func, .candidates) {
-
-  # check that only one of these exists
-  .fe <- fs::file_exists(.candidates)
-  if (all(.fe)) {
-    stop(glue("Cannot use `{.func}` because all of {paste(.candidates, collapse = ' and ')} exist."))
-  }
-  if (all(!.fe)) {
-    stop(glue("Cannot use `{.func}` because none of {paste(.candidates, collapse = ' or ')} exist."))
-  }
-
-  .path <- .candidates[which(.fe)]
-  verbose_msg(glue("Reading {.path}"))
-  nm_file(.path)
-}
-
-
