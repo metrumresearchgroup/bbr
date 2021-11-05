@@ -1,8 +1,4 @@
 
-# WIP: STILL NEED TO TEST
-# * nm_tab()
-# * nm_par_tab()
-
 test_that("nm_file() works with .cov", {
   .d <- nm_file(MOD1, ".cov")
   expect_equal(ncol(.d), MOD1_PARAM_COUNT+1)
@@ -19,6 +15,20 @@ test_that("nm_grd() works", {
   .d <- nm_grd(MOD1)
   expect_equal(ncol(.d), MOD1_PARAM_COUNT_FIXED+1)
   expect_true(nrow(.d) > 5) # this changes enough, not worth testing exactly
+  expect_true(all(
+    names(.d)[1] == "ITERATION",
+    stringr::str_detect(names(.d)[2:ncol(.d)], "THETA|SIGMA|OMEGA")
+  ))
+})
+
+test_that("nm_grd() works .rename=FALSE", {
+  .d <- nm_grd(MOD1, .rename = FALSE)
+  expect_equal(ncol(.d), MOD1_PARAM_COUNT_FIXED+1)
+  expect_true(nrow(.d) > 5) # this changes enough, not worth testing exactly
+  expect_true(all(
+    names(.d)[1] == "ITERATION",
+    stringr::str_detect(names(.d)[2:ncol(.d)], "GRD")
+  ))
 })
 
 test_that("nm_file(.est_method) works", {

@@ -41,10 +41,26 @@ nm_file.character <- function(.mod, .suffix = NULL, .est_method = NULL, ...) {
 
 #' @describeIn nm_file Reads `.grd` file from a `bbi_nonmem_model` or
 #'   `bbi_nonmem_summary` object
+#' @param .rename If `TRUE`, the default, will rename `.grd` columns to the
+#'   relevant parameter names. Otherwise will leave column names as is.
 #' @export
-nm_grd <- function(.mod, .est_method = NULL) {
+nm_grd <- function(.mod, .est_method = NULL, .rename = TRUE) {
   check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
-  nm_file(.mod, .suffix = ".grd", .est_method = .est_method)
+  grd_df <- nm_file(.mod, .suffix = ".grd", .est_method = .est_method)
+
+  if (isTRUE(.rename)) {
+    .s <- model_summary(.mod)
+
+    if (is.null(.est_method)) {
+      .est_method <- length(.s$parameters_data)
+    }
+
+    lbl <- c(.s$parameter_names$theta[.s$parameters_data[[.est_method]]$fixed$theta==0],
+             .s$parameter_names$sigma[.s$parameters_data[[.est_method]]$fixed$sigma==0],
+             .s$parameter_names$omega[.s$parameters_data[[.est_method]]$fixed$omega==0])
+    names(grd_df) <- c("ITERATION", lbl)
+  }
+  return(grd_df)
 }
 
 #' @describeIn nm_file Reads `.ext` file from a `bbi_nonmem_model` or
