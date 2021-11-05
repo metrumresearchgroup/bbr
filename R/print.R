@@ -13,25 +13,41 @@
 NULL
 
 #' @describeIn print_bbi Prints the call made to bbi and whether the process is still running or has finished.
-#' @param .call_limit Integer scalar for the max number of characters to print before truncating the call string.
+#' @param .call_limit Integer scalar for the max number of characters to print
+#'   before truncating the call string. This is compared with the entire length,
+#'   but only the positional arguments between the executable path and the first
+#'   long option will be truncated.
 #' @importFrom stringr str_split str_detect
 #' @importFrom fs path_norm
 #' @importFrom cli cat_line
 #' @export
 print.bbi_process <- function(x, ..., .call_limit = 250) {
-  call_str <- glue("{x[[PROC_BBI]]} {paste(x[[PROC_CMD_ARGS]], collapse = ' ')}")
+  exec_path <- x[[PROC_BBI]]
+  call_str <- paste(x[[PROC_CMD_ARGS]], collapse = " ")
+  len_call <- nchar(exec_path) + nchar(call_str) + 1  # +1 for space
+
+  trunc_marker <- " ... [truncated]"
+  # Adjust the .call_limit so that we don't "truncate" just to end up at the
+  # same length but with less information.
+  .call_limit <- .call_limit - nchar(trunc_marker)
 
   # truncate model list if too long, keeping flags at the end (if any present)
-  if (nchar(call_str) > .call_limit) {
+  if (len_call > .call_limit) {
     split_call_str <- str_split(call_str, " \\-\\-", n = 2)
     mod_str <- split_call_str[[1]][1]
     flag_str <- split_call_str[[1]][2]
 
-    call_str <- paste(substr(mod_str, 1, .call_limit), "... [truncated]")
-    if(!is.na(flag_str)) {
-      call_str <- paste0(call_str, " --", flag_str)
+    # The length check above looked at unsplit call string. Do a second length
+    # check to avoid marking an untruncated string as truncated.
+    if (nchar(mod_str) > .call_limit) {
+      call_str <- paste0(substr(mod_str, 1, .call_limit), trunc_marker)
+      if(!is.na(flag_str)) {
+        call_str <- paste0(call_str, " --", flag_str)
+      }
     }
   }
+  # ... and keeping the executable path at the beginning.
+  call_str <- paste(exec_path, call_str)
 
   # print call string
   cat_line("Running:", col = "green")
