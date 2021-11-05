@@ -1,7 +1,53 @@
 
 #' Read all tables and input data from NONMEM run
-#' @name nm_tables
-NULL
+#'
+#' Reads in the input data set and all tables files.
+#' @return A named list of tibbles. The first element will always be `data` and
+#'   subsequent elements will be named for the file from which they were loaded,
+#'   with `get_model_id(.mod)` removed from the beginning and end.
+#' @param .mod Either a `bbi_nonmem_model` or `bbi_nonmem_summary` object
+#' @param .files Character vector of file paths to table files to read in.
+#'   Defaults to calling [nm_table_files()] on `.mod`, which will parse all file
+#'   names from `$TABLE` blocks in the control stream.
+#' @importFrom purrr compact map_chr
+#' @importFrom stringr str_replace
+#' @export
+nm_tables <- function(
+  .mod,
+  .files = nm_table_files(.mod)
+) {
+  check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
+  checkmate::assert_character(.files)
+
+  # make paths absolute
+  .files <- map_chr(.files, ~{
+    if (fs::is_absolute_path(.x)) {
+      return(.x)
+    } else {
+      return(file.path(get_output_dir(.mod), .x))
+    }
+  })
+
+  # read in input data
+  res <- list(
+    data = nm_data(.mod)
+  )
+
+  # build names for table elements
+  .n <- .files %>%
+    basename() %>%
+    str_replace(glue("^{get_model_id(.mod)}"), "") %>%
+    str_replace(glue("{get_model_id(.mod)}$"), "") %>%
+    make.names() %>%
+    str_replace(glue("^\\Q.\\E"), "") %>%
+    str_replace(glue("\\Q.\\E$"), "")
+
+  # read in each table file
+  for (.i in 1:length(.files)) {
+    res[[.n[.i]]] <- nm_file(.files[.i], .est_method = "fail")
+  }
+  return(compact(res))
+}
 
 #' @describeIn nm_tables Extract paths to table output files from NONMEM control
 #'   stream, and optionally check if the files exist.

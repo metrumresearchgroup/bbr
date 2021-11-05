@@ -5,13 +5,26 @@
 \alias{nm_table_files}
 \title{Read all tables and input data from NONMEM run}
 \usage{
+nm_tables(.mod, .files = nm_table_files(.mod))
+
 nm_table_files(.mod, .check_exists = TRUE)
 }
 \arguments{
+\item{.mod}{Either a \code{bbi_nonmem_model} or \code{bbi_nonmem_summary} object}
+
+\item{.files}{Character vector of file paths to table files to read in.
+Defaults to calling \code{\link[=nm_table_files]{nm_table_files()}} on \code{.mod}, which will parse all file
+names from \verb{$TABLE} blocks in the control stream.}
+
 \item{.check_exists}{If \code{TRUE} check if files exist.}
 }
+\value{
+A named list of tibbles. The first element will always be \code{data} and
+subsequent elements will be named for the file from which they were loaded,
+with \code{get_model_id(.mod)} removed from the beginning and end.
+}
 \description{
-Read all tables and input data from NONMEM run
+Reads in the input data set and all tables files.
 }
 \section{Functions}{
 \itemize{
