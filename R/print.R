@@ -13,7 +13,10 @@
 NULL
 
 #' @describeIn print_bbi Prints the call made to bbi and whether the process is still running or has finished.
-#' @param .call_limit Integer scalar for the max number of characters to print before truncating the call string.
+#' @param .call_limit Integer scalar for the max number of characters to print
+#'   before truncating the call string. This is compared with the entire length,
+#'   but only the positional arguments between the executable path and the first
+#'   long option will be truncated.
 #' @importFrom stringr str_split str_detect
 #' @importFrom fs path_norm
 #' @importFrom cli cat_line
