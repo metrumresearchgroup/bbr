@@ -32,9 +32,13 @@ print.bbi_process <- function(x, ..., .call_limit = 250) {
     mod_str <- split_call_str[[1]][1]
     flag_str <- split_call_str[[1]][2]
 
-    call_str <- paste(substr(mod_str, 1, .call_limit), "... [truncated]")
-    if(!is.na(flag_str)) {
-      call_str <- paste0(call_str, " --", flag_str)
+    # The length check above looked at unsplit call string. Do a second length
+    # check to avoid marking an untruncated string as truncated.
+    if (nchar(mod_str) > .call_limit) {
+      call_str <- paste(substr(mod_str, 1, .call_limit), "... [truncated]")
+      if(!is.na(flag_str)) {
+        call_str <- paste0(call_str, " --", flag_str)
+      }
     }
   }
   # ... and keeping the executable path at the beginning.
