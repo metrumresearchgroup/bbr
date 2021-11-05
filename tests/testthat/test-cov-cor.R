@@ -10,7 +10,7 @@ check_mat_dim <- function(.mat, .theta_dim, .dim) {
 
 withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
-  test_that("cov_cor() works basic model", {
+  test_that("cov_cor() works basic model [BBR-CVCR-001]", {
     .c <- cov_cor(MOD1)
     check_mat_dim(.c, 5, 9)
 
@@ -35,7 +35,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   })
 
-  test_that("cov_cor() works with two estimation methods", {
+  test_that("cov_cor() works with two estimation methods [BBR-CVCR-002]", {
     .c <- file.path(MODEL_DIR_X, "example2_saemimp") %>%
       read_model() %>%
       cov_cor()
@@ -44,7 +44,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     # TODO: add a test that it's actually the second estimation method
   })
 
-  test_that("cov_cor() warns with correlations over threshold", {
+  test_that("cov_cor() warns with correlations over threshold [BBR-CVCR-003]", {
     expect_warning({
       .c <- cov_cor(MOD1, .threshold = 0.95)
     }, regexp = "correlations above specified threshold")
@@ -52,7 +52,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     check_mat_dim(.c, 5, 9)
   })
 
-  test_that("cov_cor() errors if no .cov file", {
+  test_that("cov_cor() errors if no .cov file [BBR-CVCR-004]", {
     expect_error({
       .c <- file.path(MODEL_DIR_X, "acop-fake-bayes") %>%
         read_model() %>%
@@ -60,7 +60,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     }, regexp = "[Nn]o file present.*\\.cov")
   })
 
-  test_that("check_cor_threshold() works correctly", {
+  test_that("check_cor_threshold() works correctly [BBR-CVCR-005]", {
     .c <- cov_cor(MOD1)
     check_mat_dim(.c, 5, 9)
 

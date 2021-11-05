@@ -16,7 +16,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     ~ file.path(model_dir, fs::path_ext_set(., "ctl"))
   )
 
-  test_that("submit_models(.dry_run=T) with list input simple",
+  test_that("submit_models(.dry_run=T) with list input simple [BBR-SBMT-008]",
             {
               # copy to two new models
               mod2 <- copy_model_from(MOD1, 2)
@@ -39,7 +39,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
               )
             })
 
-  test_that("submit_models(.dry_run=T) with list input, 2 arg sets",
+  test_that("submit_models(.dry_run=T) with list input, 2 arg sets [BBR-SBMT-010]",
             {
               # copy to two new models
               mod2 <- copy_model_from(MOD1, 2) %>% add_bbi_args(list(threads = 3))
@@ -71,7 +71,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
               )
             })
 
-  test_that("submit_models() works for models in different directories", {
+  test_that("submit_models() works for models in different directories [BBR-SBMT-011]", {
     new_dir <- "level2"
     fs::dir_create(file.path(MODEL_DIR, new_dir))
     on.exit(cleanup())
@@ -88,7 +88,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_equal(length(proc_list), 2L)
   })
 
-  test_that("submit_models(.dry_run=T) errors with bad input",
+  test_that("submit_models(.dry_run=T) errors with bad input [BBR-SBMT-012]",
             {
               # copy to two new models
               mod2 <- copy_model_from(MOD1, 2)
@@ -115,7 +115,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
               )
             })
 
-  test_that("submit_models() works with non-NULL .config_path", {
+  test_that("submit_models() works with non-NULL .config_path [BBR-SBMT-013]", {
     temp_config <- tempfile(fileext = ".yaml")
     readr::write_file("foo", temp_config)
     temp_config <- normalizePath(temp_config)
@@ -140,7 +140,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     )
   })
 
-  test_that("submit_models() works if .bbi_args is empty", {
+  test_that("submit_models() works if .bbi_args is empty [BBR-SBMT-014]", {
     # set existing arguments to NULL via `.bbi_args`
     res <- submit_models(
       list(MOD1),
@@ -174,7 +174,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     )
   })
 
-  test_that("submit_models(.mode) inherits option", {
+  test_that("submit_models(.mode) inherits option [BBR-SBMT-015]", {
     withr::with_options(list(bbr.bbi_exe_mode = "local"), {
       expect_identical(
         submit_models(list(MOD1), .dry_run = T)[[1]][[PROC_CALL]],

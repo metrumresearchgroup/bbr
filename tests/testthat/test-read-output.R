@@ -1,5 +1,7 @@
 context("Reading NONMEM output files into R")
 
+withr::local_options(list(lifecycle_verbosity = "quiet"))
+
 ################################################################################################
 # load reference character vectors for checking the contents of output files
 ################################################################################################
@@ -33,7 +35,7 @@ GRD_REF_FLOOR_NULL <- paste0(GRD_STEM, "floorNULL.R")
 # tests
 ################
 
-test_that("check_file returns correctly", {
+test_that("check_file returns correctly [BBR-ROT-001]", {
   # default is to print and return nothing
   null_output <- capture.output(
     expect_invisible(check_file(LST_TEST_FILE))
@@ -59,7 +61,7 @@ test_that("check_file returns correctly", {
   list(head_test = 100000, tail_test = 100000, ref = LST_FULL_VEC)
 )
 for (.tc in .test_cases) {
-  test_that(glue::glue("check_file head={.tc[['head_test']]} tail={.tc[['tail_test']]}"), {
+  test_that(glue::glue("check_file head={.tc[['head_test']]} tail={.tc[['tail_test']]} [BBR-ROT-002]"), {
     res <- check_file(LST_TEST_FILE, .print = FALSE, .return = TRUE, .head = .tc[['head_test']], .tail = .tc[['tail_test']])
     expect_identical(res, .tc[['ref']])
   })
@@ -75,7 +77,7 @@ withr::with_file(OUTPUT_FILE, {
     list(.test_arg = MOD1, .test_name = "tail_output() model object")
   )
   for (.tc in .test_cases) {
-    test_that(.tc[[".test_name"]], {
+    test_that(paste(.tc[[".test_name"]], "[BBR-ROT-003]"), {
       res <- tail_output(.tc[[".test_arg"]], .print = FALSE, .return = TRUE)
       expect_identical(res, LST_REF_DEFAULT)
     })
@@ -89,7 +91,7 @@ withr::with_file(OUTPUT_FILE, {
   list(.test_arg = MOD1, .test_name = "tail_lst() model object")
 )
 for (.tc in .test_cases) {
-  test_that(.tc[[".test_name"]], {
+  test_that(paste(.tc[[".test_name"]], "[BBR-ROT-004]"), {
     res <- tail_lst(.tc[[".test_arg"]], .print = FALSE, .return = TRUE)
     expect_identical(res, LST_REF_DEFAULT)
   })
@@ -106,7 +108,7 @@ for (.tc in .test_cases) {
   list(.test_arg = MOD1, .test_name = "check_output_dir() model object")
 )
 for (.tc in .test_cases) {
-  test_that(.tc[[".test_name"]], {
+  test_that(paste(.tc[[".test_name"]], "[BBR-ROT-005]"), {
     res <- check_output_dir(.tc[[".test_arg"]])
     expect_identical(basename(res), basename(OUTPUT_DIR_LS))
   })
@@ -118,7 +120,7 @@ for (.tc in .test_cases) {
   list(.test_arg = MOD1, .test_name = "check_output_dir() model object with filter")
 )
 for (.tc in .test_cases) {
-  test_that(.tc[[".test_name"]], {
+  test_that(paste(.tc[[".test_name"]], "[BBR-ROT-006]"), {
     res <- check_output_dir(.tc[[".test_arg"]], regexp = CTL_FILTER)
     expect_identical(basename(res), basename(CTL_FILTER_RES))
   })
@@ -129,7 +131,7 @@ for (.tc in .test_cases) {
 # check table functionality
 #######################################
 
-test_that("check_nonmem_table_output() output matches ref df", {
+test_that("check_nonmem_table_output() output matches ref df [BBR-ROT-007]", {
   df <- check_nonmem_table_output(file.path(MOD1_PATH, paste0(MOD_ID, ".ext")), .x_var = "ITERATION")
   ref_df <- dget(EXT_REF_FLOOR_NULL)
 
@@ -141,7 +143,7 @@ test_that("check_nonmem_table_output() output matches ref df", {
 
 })
 
-test_that("check_nonmem_table_output(.x_floor=0) works", {
+test_that("check_nonmem_table_output(.x_floor=0) works [BBR-ROT-008]", {
   df <- check_nonmem_table_output(file.path(MOD1_PATH, paste0(MOD_ID, ".ext")), .x_var = "ITERATION", .x_floor = 0)
   ref_df <- dget(EXT_REF_FLOOR_0)
 
@@ -158,7 +160,7 @@ test_that("check_nonmem_table_output(.x_floor=0) works", {
   list(.test_arg = MOD1, .test_name = "check_ext() model object default .iter_floor")
 )
 for (.tc in .test_cases) {
-  test_that(.tc[[".test_name"]], {
+  test_that(paste(.tc[[".test_name"]], "[BBR-ROT-009]"), {
     df <- check_ext(.tc[[".test_arg"]])
     ref_df <- dget(EXT_REF_FLOOR_0)
 
@@ -173,7 +175,7 @@ for (.tc in .test_cases) {
   })
 }
 
-test_that("check_ext() summary object", {
+test_that("check_ext() summary object [BBR-ROT-010]", {
   skip_if_not_drone_or_metworx("check_ext() summary object")
   df <- check_ext(SUM1)
   ref_df <- dget(EXT_REF_FLOOR_0)
@@ -190,7 +192,7 @@ test_that("check_ext() summary object", {
   list(.test_arg = MOD1, .test_name = "check_ext() model object .iter_floor NULL")
 )
 for (.tc in .test_cases) {
-  test_that(.tc[[".test_name"]], {
+  test_that(paste(.tc[[".test_name"]], "[BBR-ROT-011]"), {
     df <- check_ext(.tc[[".test_arg"]], .iter_floor = NULL)
     ref_df <- dget(EXT_REF_FLOOR_NULL)
 
@@ -211,7 +213,7 @@ for (.tc in .test_cases) {
   list(.test_arg = MOD1, .test_name = "check_grd() model object default .iter_floor")
 )
 for (.tc in .test_cases) {
-  test_that(.tc[[".test_name"]], {
+  test_that(paste(.tc[[".test_name"]], "[BBR-ROT-012]"), {
     df <- check_grd(.tc[[".test_arg"]])
     ref_df <- dget(GRD_REF_FLOOR_0)
     expect_equal(df, ref_df)
@@ -224,7 +226,7 @@ for (.tc in .test_cases) {
   })
 }
 
-test_that("check_grd() summary object", {
+test_that("check_grd() summary object [BBR-ROT-013]", {
   skip_if_not_drone_or_metworx("check_grd() summary object")
   df <- check_grd(SUM1)
   ref_df <- dget(GRD_REF_FLOOR_0)
@@ -236,7 +238,7 @@ test_that("check_grd() summary object", {
   list(.test_arg = MOD1, .test_name = "check_grd() model object .iter_floor 10")
 )
 for (.tc in .test_cases) {
-  test_that(.tc[[".test_name"]], {
+  test_that(paste(.tc[[".test_name"]], "[BBR-ROT-014]"), {
     df <- check_grd(.tc[[".test_arg"]], .iter_floor = 10)
     ref_df <- dget(GRD_REF_FLOOR_10)
     expect_equal(df, ref_df)
@@ -254,7 +256,7 @@ for (.tc in .test_cases) {
   list(.test_arg = MOD1, .test_name = "check_grd() model object .iter_floor NULL")
 )
 for (.tc in .test_cases) {
-  test_that(.tc[[".test_name"]], {
+  test_that(paste(.tc[[".test_name"]], "[BBR-ROT-015]"), {
     df <- check_grd(.tc[[".test_arg"]], .iter_floor = NULL)
     ref_df <- dget(GRD_REF_FLOOR_NULL)
     expect_equal(df, ref_df)

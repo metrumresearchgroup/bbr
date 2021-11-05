@@ -1,7 +1,7 @@
-Wed Oct 27 14:03:10 EDT 2021
+Thu Nov  4 10:43:51 EDT 2021
 $PROBLEM PK model 1 cmt base
 
 $INPUT ID TIME MDV EVID DV AMT  SEX WT ETN NUM
 $DATA ../../../../extdata/acop.csv IGNORE=@
 ...
-Wed Oct 27 14:03:21 EDT 2021
+Thu Nov  4 10:44:06 EDT 2021

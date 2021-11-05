@@ -102,6 +102,30 @@ get_yaml_path.bbi_log_df <- function(.bbi_object, .check_exists = TRUE) {
   get_path_from_log_df(.bbi_object, get_yaml_path, .check_exists = .check_exists)
 }
 
+#' @rdname get_path_from_object
+#' @export
+get_config_path <- function(.bbi_object, .check_exists = TRUE) {
+  UseMethod("get_config_path")
+}
+
+#' @rdname get_path_from_object
+#' @export
+get_config_path.bbi_model <- function(.bbi_object, .check_exists = TRUE) {
+  .path <- file.path(get_output_dir(.bbi_object), "bbi_config.json")
+
+  if (isTRUE(.check_exists)) {
+    checkmate::assert_file_exists(.path)
+  }
+
+  return(.path)
+}
+
+#' @rdname get_path_from_object
+#' @export
+get_config_path.bbi_log_df <- function(.bbi_object, .check_exists = TRUE) {
+  get_path_from_log_df(.bbi_object, get_config_path, .check_exists = .check_exists)
+}
+
 
 #' Get model identifier
 #'
@@ -149,7 +173,7 @@ get_data_path <- function(.mod, ...) {
 #' @describeIn get_data_path Takes `bbi_nonmem_model` object
 #' @export
 get_data_path.bbi_model <- function(.mod, ...) {
-  cfg_path <- file.path(get_output_dir(.mod), "bbi_config.json")
+  cfg_path <- get_config_path(.mod, .check_exists = FALSE)
 
   if (!fs::file_exists(cfg_path)) {
     stop(paste(
@@ -169,7 +193,6 @@ get_data_path.bbi_model <- function(.mod, ...) {
   ) %>%
     as.character()
 }
-
 
 #' Build path to output file
 #'

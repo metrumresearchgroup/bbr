@@ -2,12 +2,12 @@ structure(list(
   absolute_model_path = "/data/home/sethg/bbr/inst/model/nonmem/basic/1",
   run_details = list(
     version = "7.4.4", run_start = "-999999999",
-    run_end = "Wed Oct 27 14:03:21 EDT 2021", estimation_time = 3.29,
-    covariance_time = 0.41, cpu_time = 4.501, function_evaluations = 366L,
+    run_end = "Thu Nov  4 10:44:06 EDT 2021", estimation_time = 5.07,
+    covariance_time = 0.45, cpu_time = 6.218, function_evaluations = 447L,
     significant_digits = 3.2, problem_text = "LEM PK model 1 cmt base",
     mod_file = "-999999999", estimation_method = "First Order Conditional Estimation with Interaction",
-    data_set = "../../../../extdata/acop.csv", number_of_subjects = 40L,
-    number_of_obs = 760L, number_of_data_records = 799L,
+    data_set = "../../../../extdata/acop.csv", number_of_subjects = 39L,
+    number_of_obs = 741L, number_of_data_records = 779L,
     output_files_used = c(
       "1.lst", "1.cpu", "1.ext", "1.grd",
       "1.shk"
@@ -16,25 +16,25 @@ structure(list(
     covariance_step_aborted = FALSE,
     large_condition_number = FALSE, eigenvalue_issues = FALSE,
     correlations_not_ok = FALSE, parameter_near_boundary = FALSE,
-    hessian_reset = FALSE, has_final_zero_gradient = FALSE,
+    hessian_reset = TRUE, has_final_zero_gradient = FALSE,
     minimization_terminated = FALSE, eta_pval_significant = FALSE,
     prderr = FALSE
   ), parameters_data = list(list(
     method = "TABLE NO.     1: First Order Conditional Estimation with Interaction: Goal Function=MINIMUM VALUE OF OBJECTIVE FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
     estimates = list(theta = c(
-      2.31034, 54.9596, 464.659,
-      -0.0805722, 4.1303
-    ), omega = c(0.0964407, 0, 0.153571), sigma = 1L), std_err = list(theta = c(
-      0.086147, 3.32914,
-      29.6177, 0.0555149, 1.35989
+      2.31716, 54.6151, 462.514,
+      -0.0820082, 4.17959
+    ), omega = c(0.0985328, 0, 0.156825), sigma = 1L), std_err = list(theta = c(
+      0.087208, 3.37551,
+      30.2623, 0.0561272, 1.37796
     ), omega = c(
-      0.0200146, 1e+10,
-      0.026733
+      0.0203449, 1e+10,
+      0.0272401
     ), sigma = 1e+10), random_effect_sd = list(omega = c(
-      0.310549,
-      0, 0.391882
+      0.313899,
+      0, 0.396011
     ), sigma = 1L), random_effect_sdse = list(
-      omega = c(0.0322245, 1e+10, 0.0341085), sigma = 1e+10
+      omega = c(0.0324068, 1e+10, 0.0343931), sigma = 1e+10
     ),
     fixed = list(theta = c(0L, 0L, 0L, 0L, 0L), omega = c(
       0L,
@@ -49,8 +49,8 @@ structure(list(
   ), sigma = "SIGMA(1,1)"), ofv = list(
     list(
       method = "First Order Conditional Estimation with Interaction",
-      ofv_no_constant = 2636.846, constant_to_ofv = 1396.7865704711,
-      ofv_with_constant = 4033.63234080018
+      ofv_no_constant = 2583.311, constant_to_ofv = 1361.86690620932,
+      ofv_with_constant = 3945.17780715107
     )
   ), condition_number = list(
     list(
@@ -59,15 +59,15 @@ structure(list(
     )
   ), shrinkage_details = list(
     list(list(
-      sub_pop = 1L, eta_bar = c(0.00179673, -0.00738995), ebv_bar_se = c(0.0399941, 0.0599224), pval = c(
-        0.964167,
-        0.901849
-      ), eta_sd = c(17.5115, 2.05962), eps_sd = 4.09105,
-      ebv_sd = c(18.5247, 2.54114), num_subjects = c(
-        40L,
-        40L
-      ), eta_vr = c(31.9565, 4.07682), eps_vr = 8.01472,
-      ebv_vr = c(33.6177, 5.0177)
+      sub_pop = 1L, eta_bar = c(0.00197362, -0.00620906), ebv_bar_se = c(0.0409479, 0.0612968), pval = c(
+        0.961558,
+        0.919316
+      ), eta_sd = c(17.4695, 2.07276), eps_sd = 4.08455,
+      ebv_sd = c(18.5033, 2.56445), num_subjects = c(
+        39L,
+        39L
+      ), eta_vr = c(31.8872, 4.10256), eps_vr = 8.00227,
+      ebv_vr = c(33.5829, 5.06314)
     ))
   )
 ), class = c(

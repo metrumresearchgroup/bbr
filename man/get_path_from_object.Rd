@@ -13,6 +13,9 @@
 \alias{get_yaml_path}
 \alias{get_yaml_path.bbi_model}
 \alias{get_yaml_path.bbi_log_df}
+\alias{get_config_path}
+\alias{get_config_path.bbi_model}
+\alias{get_config_path.bbi_log_df}
 \title{Get path from bbi object}
 \usage{
 get_model_path(.bbi_object, .check_exists = TRUE)
@@ -36,6 +39,12 @@ get_yaml_path(.bbi_object, .check_exists = TRUE)
 \method{get_yaml_path}{bbi_model}(.bbi_object, .check_exists = TRUE)
 
 \method{get_yaml_path}{bbi_log_df}(.bbi_object, .check_exists = TRUE)
+
+get_config_path(.bbi_object, .check_exists = TRUE)
+
+\method{get_config_path}{bbi_model}(.bbi_object, .check_exists = TRUE)
+
+\method{get_config_path}{bbi_log_df}(.bbi_object, .check_exists = TRUE)
 }
 \arguments{
 \item{.bbi_object}{The object to query. Could be

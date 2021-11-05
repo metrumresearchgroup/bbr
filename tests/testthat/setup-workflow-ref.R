@@ -46,6 +46,9 @@ OUTPUT_FILE <-    file.path(MOD1_PATH, "OUTPUT")
 
 DATA_TEST_FILE <- as.character(fs::path_norm(file.path(REF_DIR, "..", "extdata", "acop.csv")))
 DATA_TEST_FIRST_LINE <- "id,time,mdv,evid,dv,amt,sex,wt,etn,num"
+DATA_TEST_COLS <- length(unlist(stringr::str_split(DATA_TEST_FIRST_LINE, ",")))
+DATA_TEST_ROWS <- 799
+DATA_TEST_ROWS_IGNORE <- DATA_TEST_ROWS - 20
 
 LEVEL2_SUBDIR <- "level2"
 LEVEL2_DIR <- file.path(MODEL_DIR, LEVEL2_SUBDIR)
@@ -91,9 +94,16 @@ RUN_LOG_COLS <- 9L
 CONFIG_COLS <- 9L
 SUM_LOG_COLS <- 23L
 
-CONFIG_DATA_PATH <- "../../../../extdata/acop.csv"
-CONFIG_DATA_MD5 <- "14e53889c0b1c29db2ba02f2025bb62c"
-CONFIG_MODEL_MD5 <- "b9f8df25adfdeaf5db343e1f86185f43"
+ref_json <- jsonlite::fromJSON(system.file("test-refs", "ref_values.json", package = "bbr"))
+CONFIG_DATA_PATH <- ref_json$CONFIG_DATA_PATH
+CONFIG_DATA_MD5 <- ref_json$CONFIG_DATA_MD5
+CONFIG_MODEL_MD5 <- ref_json$CONFIG_MODEL_MD5
+MOD_BBI_VERSION <- ref_json$MOD_BBI_VERSION
+MOD1_PARAM_COUNT <- ref_json$MOD1_PARAM_COUNT
+MOD1_PARAM_COUNT_FIXED <- ref_json$MOD1_PARAM_COUNT_FIXED
+MOD1_OFV_REF <- ref_json$MOD1_OFV_REF
+MOD_BBI_VERSION <- ref_json$MOD_BBI_VERSION
+MOD_NM_VERSION <- ref_json$MOD_NM_VERSION
 
 # yaml md5 hashes
 MOD1_YAML_MD5 <- "6ccf206e167485b5adf29bc135197929"
@@ -181,7 +191,7 @@ create_rlg_models <- function() {
 
 cleanup <- function() {
   # delete tmp files if they are leftover from previous test
-  mods_to_kill <- purrr::map_chr(seq(2,7), ~ file.path(MODEL_DIR, .x))
+  mods_to_kill <- purrr::map_chr(c(seq(2,7), "Parent", "Child"), ~ file.path(MODEL_DIR, .x))
   for (m in mods_to_kill) {
     if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
     if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))

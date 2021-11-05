@@ -101,7 +101,7 @@ print.bbi_nonmem_model <- function(x, ...) {
 
   if (dir.exists(output_dir)) {
     status <- col_green("Finished Running")
-    json_file <- file.path(output_dir, "bbi_config.json")
+    json_file <- get_config_path(x, .check_exists = FALSE)
 
     if (!fs::file_exists(json_file)) {
       status <- col_red("Incomplete Run")

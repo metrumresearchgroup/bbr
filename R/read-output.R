@@ -143,6 +143,9 @@ check_output_dir.bbi_model <- function(.mod, ...) {
 
 #' Check NONMEM output files
 #'
+#' @description
+#' `r lifecycle::badge("deprecated")`
+#'
 #' Checks a NONMEM output file that's a whitespace-delimited file (for instance .grd or .ext)
 #' @param .path Character scalar path to the file
 #' @param .x_var name of variable to filter with `.x_floor`
@@ -154,6 +157,14 @@ check_nonmem_table_output <- function(
   .path,
   .x_var = NULL,
   .x_floor = NULL) {
+
+  deprecate_warn(
+    "1.5.0",
+    "check_nonmem_table_output()",
+    with = "nm_file()",
+    details = "All functions calling `check_nonmem_table_output()` are being replaced from `nm_*()` functions. See ?nm_file for details."
+  )
+
   # read file
   df <- read_table2(.path, skip=1, col_types = cols())
 
@@ -169,19 +180,36 @@ check_nonmem_table_output <- function(
 
 #' Plot NONMEM output files
 #'
+#' @description
+#' `r lifecycle::badge("deprecated")`
+#'
 #' Creates a line plot of the wide-format tibble output from `check_nonmem_table_output()`
 #' @param .df the wide-format tibble output from `check_nonmem_table_output()`
 #' @param .x_var String of the variable name to use on the X-axis
 #' @param .stat_name String of the name of the stat the other columns represents (like "gradient" or "theta").
-#' @importFrom tidyr gather
-#' @importFrom ggplot2 ggplot aes geom_line xlab ylab scale_colour_discrete ggtitle
-#' @importFrom forcats fct_inorder
 #' @export
 plot_nonmem_table_df <- function(.df, .x_var, .stat_name) {
-  p <- .df %>% gather("stat", "value", -.data[[.x_var]]) %>%
+  deprecate_warn(
+    "1.5.0",
+    "plot_nonmem_table_df()",
+    details = paste(
+      "All functions calling `plot_nonmem_table_df()` are being deprecated to focus the scope of bbr.",
+      "Consider using https://github.com/metrumresearchgroup/pmplots instead."
+    )
+  )
+
+  if (!requireNamespace("ggplot2", quietly = TRUE) || !requireNamespace("forcats", quietly = TRUE)) {
+    stop(paste("must have both ggplot2 and forcats to use plot_nonmem_table_df"))
+  }
+
+  p <- .df %>% tidyr::gather("stat", "value", -.data[[.x_var]]) %>%
     mutate(stat = forcats::fct_inorder(.data$stat)) %>%
-    ggplot(aes(x=.data[[.x_var]], y=.data$value, colour=.data$stat)) + geom_line() +
-    xlab(.x_var) + ylab(paste(.stat_name, "value")) + scale_colour_discrete(name = .stat_name) + ggtitle(paste(.x_var, "x", .stat_name))
+    ggplot2::ggplot(ggplot2::aes(x=.data[[.x_var]], y=.data$value, colour=.data$stat)) +
+    ggplot2::geom_line() +
+    ggplot2::xlab(.x_var) +
+    ggplot2::ylab(paste(.stat_name, "value")) +
+    ggplot2::scale_colour_discrete(name = .stat_name) +
+    ggplot2::ggtitle(paste(.x_var, "x", .stat_name))
   return(p)
 }
 

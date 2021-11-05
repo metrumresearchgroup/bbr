@@ -10,14 +10,14 @@ model_1 <- MOD1
 withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   withr::local_envvar(c("NO_COLOR" = "true"))
 
-  test_that("print.bbi_process works with .wait = TRUE", {
+  test_that("print.bbi_process works with .wait = TRUE [BBR-PRNT-001]", {
     proc <- bbi_exec("--help", .wait = TRUE)
     res <- capture.output(print(proc))
     expect_true(any(str_detect(res, PROC_HELP_STR)))
     expect_true(any(str_detect(res, "Process finished.")))
   })
 
-  test_that("print.bbi_process works with .wait = FALSE", {
+  test_that("print.bbi_process works with .wait = FALSE [BBR-PRNT-001]", {
     proc <- bbi_exec("--help", .wait = FALSE)
     res <- capture.output(print(proc))
 
@@ -25,14 +25,14 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_true(any(str_detect(res, "Not waiting for process to finish.")))
   })
 
-  test_that("print.bbi_process works with dry run", {
+  test_that("print.bbi_process works with dry run [BBR-PRNT-001]", {
     proc <- bbi_dry_run("--help", ".")
     res <- capture.output(print(proc))
     expect_true(any(str_detect(res, PROC_HELP_STR)))
     expect_true(any(str_detect(res, "DRY RUN! Process not actually run.")))
   })
 
-  test_that("print.bbi_process(.call_limit) works", {
+  test_that("print.bbi_process(.call_limit) works [BBR-PRNT-001]", {
     # create a bunch of fake models
     temp_dir <- file.path(get_model_working_directory(MOD1), "print-test")
     fs::dir_create(temp_dir)
@@ -53,7 +53,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_true(str_detect(call_str, "--overwrite --threads=4"))
   })
 
-  test_that("print.bbi_nonmem_model contains proper fields if all present", {
+  test_that("print.bbi_nonmem_model contains proper fields if all present [BBR-PRNT-002]", {
     model_1[[YAML_NOTES]] <- c("x", "y")
 
     fields <- c('Status',
@@ -68,7 +68,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     })
   })
 
-  test_that("print.bbi_nonmem_model run status functions properly", {
+  test_that("print.bbi_nonmem_model run status functions properly [BBR-PRNT-002]", {
     bullets <- capture.output({ # these get thrown away, but we don't want them to print in the test output
       expect_message(print(model_1), regexp = "Finished Running")
 
@@ -81,7 +81,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     })
   })
 
-  test_that("print.bbi_nonmem_summary works basic FOCE model", {
+  test_that("print.bbi_nonmem_summary works basic FOCE model [BBR-PRNT-003]", {
     .s <- file.path(MODEL_DIR, 1) %>%
       read_model() %>%
       model_summary()
@@ -90,7 +90,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_equal(res_str, ref_str)
   })
 
-  test_that("print.bbi_nonmem_summary works mixture model", {
+  test_that("print.bbi_nonmem_summary works mixture model [BBR-PRNT-003]", {
     .s <- file.path(MODEL_DIR_X, "iovmm") %>%
         read_model() %>%
         model_summary()
@@ -101,7 +101,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_equal(res_str, ref_str)
   })
 
-  test_that("print.bbi_nonmem_summary works Bayes model", {
+  test_that("print.bbi_nonmem_summary works Bayes model [BBR-PRNT-003]", {
     .s <- file.path(MODEL_DIR_X, "1001") %>%
       read_model() %>%
       model_summary(.bbi_args = list(ext_file = "1001.1.TXT"))
@@ -110,7 +110,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_equal(res_str, ref_str)
   })
 
-  test_that("print.bbi_nonmem_summary works SAEM-IMP model", {
+  test_that("print.bbi_nonmem_summary works SAEM-IMP model [BBR-PRNT-003]", {
     .s <- file.path(MODEL_DIR_X, "example2_saemimp") %>%
       read_model() %>%
       model_summary()
@@ -119,7 +119,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_equal(res_str, ref_str)
   })
 
-  test_that("print.bbi_nonmem_summary works IOV model", {
+  test_that("print.bbi_nonmem_summary works IOV model [BBR-PRNT-003]", {
     # load a model summary
     .s <- file.path(MODEL_DIR_X, "acop-iov") %>%
       read_model() %>%
@@ -129,7 +129,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_equal(res_str, ref_str)
   })
 
-  test_that("print.bbi_nonmem_summary .fixed=TRUE", {
+  test_that("print.bbi_nonmem_summary .fixed=TRUE [BBR-PRNT-003]", {
     # check with IOV model
     .s <- file.path(MODEL_DIR_X, "acop-iov") %>%
       read_model() %>%
@@ -147,7 +147,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_equal(res_str, ref_str)
   })
 
-  test_that("print.bbi_nonmem_summary .nrow argument", {
+  test_that("print.bbi_nonmem_summary .nrow argument [BBR-PRNT-003]", {
     # load a model summary
     .s <- file.path(MODEL_DIR_X, "acop-iov") %>%
       read_model() %>%
@@ -158,7 +158,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   })
 
 
-  test_that("print.bbi_nonmem_summary .off_diag=TRUE", {
+  test_that("print.bbi_nonmem_summary .off_diag=TRUE [BBR-PRNT-003]", {
     .s <- file.path(MODEL_DIR_X, "example2_saemimp") %>%
       read_model() %>%
       model_summary()

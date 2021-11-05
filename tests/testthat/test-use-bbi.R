@@ -5,7 +5,7 @@ skip_if_offline()
 
 tdir <- normalizePath(tempdir())
 
-test_that("use-bbi works on linux pulling from options", {
+test_that("use-bbi works on linux pulling from options [BBR-UBI-001]", {
   bbi_tmp_path <- file.path(tdir, "bbi1")
   on.exit(unlink(bbi_tmp_path))
   skip_if_over_rate_limit()
@@ -23,7 +23,7 @@ test_that("use-bbi works on linux pulling from options", {
   expect_equal(as.character(f_info$mode), '755')
 })
 
-test_that("use-bbi works on linux with path specified", {
+test_that("use-bbi works on linux with path specified [BBR-UBI-002]", {
   bbi_tmp_path <- file.path(tdir, "bbi2")
   on.exit(unlink(bbi_tmp_path))
   skip_if_over_rate_limit()
@@ -36,14 +36,14 @@ test_that("use-bbi works on linux with path specified", {
 })
 
 
-test_that("bbi_version returns nothing with fake bbi", {
+test_that("bbi_version returns nothing with fake bbi [BBR-UBI-003]", {
   withr::with_options(list("bbr.bbi_exe_path" = "/fake/path/bbi"), {
     expect_equal(bbi_version(), "")
   })
 })
 
 
-test_that("use_bbi .version argument works", {
+test_that("use_bbi .version argument works [BBR-UBI-004]", {
 
   skip_if_over_rate_limit()
   bbi_tmp_path <- file.path(tdir, "bbi3")

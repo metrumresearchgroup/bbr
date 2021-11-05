@@ -29,7 +29,7 @@
 #'
 #' @importFrom glue glue
 #' @importFrom rlang .data :=
-#' @importFrom lifecycle deprecate_warn deprecate_stop
+#' @importFrom lifecycle deprecated deprecate_warn deprecate_stop
 #' @import fs
 NULL
 

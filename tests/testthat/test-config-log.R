@@ -1,8 +1,5 @@
 context("Constructing config log from bbi_config.json")
 
-expected_bbi_version <- "v3.1.0"
-expected_nonmem_version <- "nm74gf"
-
 # to minimize changes to the existing tests, we define the model and data status
 # for each of the models any particular test might need
 run_status <- dplyr::tribble(
@@ -67,14 +64,14 @@ copy_all_output_dirs()
 # teardown
 withr::defer(cleanup())
 
-test_that("config_log() returns NULL and warns when no YAML found", {
+test_that("config_log() returns NULL and warns when no YAML found [BBR-CGLG-001]", {
   log_df <- expect_warning(config_log("."), regexp = "Found no valid model YAML files in")
   expect_true(inherits(log_df, "tbl"))
   expect_equal(nrow(log_df), 0)
   expect_equal(ncol(log_df), 0)
 })
 
-test_that("config_log() works correctly with nested dirs", {
+test_that("config_log() works correctly with nested dirs [BBR-CGLG-002]", {
   log_df <- config_log(MODEL_DIR)
   check_config_ref(
     log_df,
@@ -84,7 +81,7 @@ test_that("config_log() works correctly with nested dirs", {
   )
 })
 
-test_that("config_log(.recurse = FALSE) works", {
+test_that("config_log(.recurse = FALSE) works [BBR-CGLG-003]", {
   log_df <- config_log(MODEL_DIR, .recurse = FALSE)
   check_config_ref(
     log_df,
@@ -94,29 +91,29 @@ test_that("config_log(.recurse = FALSE) works", {
   )
 })
 
-test_that("config_log() reflects model mismatch", {
+test_that("config_log() reflects model mismatch [BBR-CGLG-004]", {
   perturb_file(CTL_TEST_FILE)
   log_df <- config_log(MODEL_DIR)
   expect_equal(log_df[["model_has_changed"]][1], TRUE)
 })
 
-test_that("config_log() reflects data mismatch", {
+test_that("config_log() reflects data mismatch [BBR-CGLG-005]", {
   perturb_file(system.file("extdata", "acop.csv", package = "bbr"))
   log_df <- config_log(MODEL_DIR)
   expect_equal(log_df[["data_has_changed"]][1], TRUE)
 })
 
-test_that("config_log() includes bbi version", {
+test_that("config_log() includes bbi version [BBR-CGLG-006]", {
   log_df <- config_log(MODEL_DIR)
-  expect_equal(log_df[["bbi_version"]][1], expected_bbi_version)
+  expect_equal(log_df[["bbi_version"]][1], MOD_BBI_VERSION)
 })
 
-test_that("config_log() includes NONMEM version", {
+test_that("config_log() includes NONMEM version [BBR-CGLG-007]", {
   log_df <- config_log(MODEL_DIR)
-  expect_equal(log_df[["nm_version"]][1], expected_nonmem_version)
+  expect_equal(log_df[["nm_version"]][1], MOD_NM_VERSION)
 })
 
-test_that("add_config() works correctly", {
+test_that("add_config() works correctly [BBR-CGLG-008]", {
   log_df <- run_log(MODEL_DIR) %>% add_config()
   check_config_ref(
     log_df,
@@ -126,7 +123,7 @@ test_that("add_config() works correctly", {
   )
 })
 
-test_that("add_config() has correct columns", {
+test_that("add_config() has correct columns [BBR-CGLG-009]", {
   conf_df <- config_log(MODEL_DIR)
   log_df <- run_log(MODEL_DIR)
   add_df <- log_df %>% add_config()
@@ -144,7 +141,7 @@ fs::file_delete(file.path(NEW_MOD3, "bbi_config.json"))
 fs::file_delete(file.path(LEVEL2_MOD, "bbi_config.json"))
 missing_idx <- c(3L, 4L)
 
-test_that("add_config() works correctly with missing json", {
+test_that("add_config() works correctly with missing json [BBR-CGLG-010]", {
   log_df <- expect_warning(run_log(MODEL_DIR) %>% add_config(), regexp = "Found only 2 bbi_config.json files for 4 models")
   expect_equal(nrow(log_df), RUN_LOG_ROWS+1)
   expect_equal(ncol(log_df), RUN_LOG_COLS+CONFIG_COLS-2)
@@ -173,18 +170,18 @@ test_that("add_config() works correctly with missing json", {
   )
   expect_identical(
     log_df[["bbi_version"]],
-    rep_missing(expected_bbi_version, missing_idx, 4L)
+    rep_missing(MOD_BBI_VERSION, missing_idx, 4L)
   )
   expect_identical(
     log_df[["nm_version"]],
-    rep_missing(expected_nonmem_version, missing_idx, 4L)
+    rep_missing(MOD_NM_VERSION, missing_idx, 4L)
   )
 })
 
 fs::dir_delete(NEW_MOD3)
 fs::dir_delete(LEVEL2_MOD)
 
-test_that("config_log() works with missing output dirs", {
+test_that("config_log() works with missing output dirs [BBR-CGLG-011]", {
   log_df <- expect_warning(
     config_log(MODEL_DIR),
     regexp = "Found only 2 bbi_config.json files for 4 models"
@@ -195,7 +192,7 @@ test_that("config_log() works with missing output dirs", {
   expect_false(any(duplicated(log_df[[ABS_MOD_PATH]])))
 })
 
-test_that("config_log() works with no json found", {
+test_that("config_log() works with no json found [BBR-CGLG-012]", {
 
   expect_warning({
     log_df <- config_log(LEVEL2_DIR)
@@ -205,7 +202,7 @@ test_that("config_log() works with no json found", {
   expect_equal(names(log_df), c(ABS_MOD_PATH, RUN_ID_COL))
 })
 
-test_that("add_config() works no json found", {
+test_that("add_config() works no json found [BBR-CGLG-013]", {
 
   expect_warning({
     log_df <- run_log(LEVEL2_DIR) %>% add_config()
