@@ -128,7 +128,7 @@ nm_file_impl <- function(.path, .est_method) {
   }
 
   .est_lines <- .txt[.start:.end]
-  if (packageVersion("readr") >= package_version("2.0.0")) {
+  if (utils::packageVersion("readr") >= package_version("2.0.0")) {
     read_table(I(.est_lines), na = ".", col_types = cols())
   } else {
     read_table2(I(.est_lines), na = ".", col_types = cols())

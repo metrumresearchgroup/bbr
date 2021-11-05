@@ -11,7 +11,7 @@
 \usage{
 nm_file(.mod, .suffix = NULL, .est_method = NULL, ...)
 
-nm_grd(.mod, .est_method = NULL)
+nm_grd(.mod, .est_method = NULL, .rename = TRUE)
 
 nm_ext(.mod, .est_method = NULL)
 
@@ -37,6 +37,9 @@ will also mean it pulls the final table by default, and this argument can
 be used to pull a different table instead.}
 
 \item{...}{arguments passed through to methods. (Currently none.)}
+
+\item{.rename}{If \code{TRUE}, the default, will rename \code{.grd} columns to the
+relevant parameter names. Otherwise will leave column names as is.}
 
 \item{.sep}{Single character used to separate fields within a record. Passed
 through to \code{readr::read_delim()}. Defaults to \code{","}.}

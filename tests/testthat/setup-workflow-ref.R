@@ -50,6 +50,8 @@ DATA_TEST_COLS <- length(unlist(stringr::str_split(DATA_TEST_FIRST_LINE, ",")))
 DATA_TEST_ROWS <- 799
 DATA_TEST_ROWS_IGNORE <- DATA_TEST_ROWS - 20
 
+MOD1_TABLE_FILES <- c("1.tab", "1par.tab")
+
 LEVEL2_SUBDIR <- "level2"
 LEVEL2_DIR <- file.path(MODEL_DIR, LEVEL2_SUBDIR)
 LEVEL2_MOD <- file.path(LEVEL2_DIR, MOD_ID)
@@ -216,11 +218,12 @@ cleanup <- function() {
 #' environment specified by the caller.
 #'
 #' @param path string giving the file path
+#' @param txt string to temporarily append to file
 #' @inheritParams withr::defer
-perturb_file <- function(path, envir = parent.frame()) {
+perturb_file <- function(path, txt = "foo", envir = parent.frame()) {
   checkmate::assert_string(path)
   original <- readr::read_file(path)
-  readr::write_lines("foo", path, append = TRUE)
+  readr::write_lines(txt, path, append = TRUE)
   withr::defer(readr::write_file(original, path), envir)
 }
 
