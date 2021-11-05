@@ -58,7 +58,23 @@ test_that("nm_file(.est_method) works for nm_ext() [BBR-NMF-004]", {
 })
 
 test_that("nm_file(.est_method) errors with invalid .est_method [BBR-NMF-004]", {
+  .m <- read_model(file.path(MODEL_DIR_X,"example2_saemimp"))
   expect_error(nm_ext(.m, 3))
+})
+
+test_that("nm_file(.est_method) fails with two tables in a file [BBR-NMF-004]", {
+  withr::defer(cleanup())
+  new_mod <- copy_model_from(MOD1)
+  fs::dir_create(get_output_dir(new_mod, .check_exists = FALSE))
+
+  # create a double .tab file
+  .t <- readr::read_lines(build_path_from_model(MOD1, ".tab"))
+  readr::write_lines(.t, build_path_from_model(new_mod, ".tab"))
+  readr::write_lines(.t, build_path_from_model(new_mod, ".tab"), append = TRUE)
+  expect_warning({
+    .d <- nm_file(new_mod, .suffix = ".tab", .est_method = "fail")
+  }, regexp = "only one table per file")
+  expect_null(.d)
 })
 
 test_that("nm_data() works [BBR-NMF-005]", {
@@ -69,7 +85,6 @@ test_that("nm_data() works [BBR-NMF-005]", {
   expect_equal(ncol(.d), DATA_TEST_COLS)
   expect_equal(nrow(.d), DATA_TEST_ROWS)
 })
-
 
 test_that("nm_tab() works [BBR-NMF-006]", {
   .d <- nm_tab(MOD1)

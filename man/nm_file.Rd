@@ -32,9 +32,10 @@ See examples.}
 
 \item{.est_method}{If \code{NULL}, the default, pulls the data from the final
 estimation method. If an integer, pulls the data from that estimation
-method. Note that, if more than one table is written to a given file, this
-will also mean it pulls the final table by default, and this argument can
-be used to pull a different table instead.}
+method. Can also pass \code{"fail"} in which case a warning will be raised
+and \code{NULL} returned if more than one table is found in the file. This
+is useful for table outputs that should not have multiple tables in a
+single file.}
 
 \item{...}{arguments passed through to methods. (Currently none.)}
 
