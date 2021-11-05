@@ -1,9 +1,9 @@
-Thu Nov  4 10:43:51 EDT 2021
+Fri Nov  5 13:20:54 EDT 2021
 $PROBLEM PK model 1 cmt base
 
 ...
  
- Elapsed finaloutput time in seconds:     0.05
- #CPUT: Total CPU Time in Seconds,        6.218
+ Elapsed finaloutput time in seconds:     0.07
+ #CPUT: Total CPU Time in Seconds,        6.381
 Stop Time:
-Thu Nov  4 10:44:06 EDT 2021
+Fri Nov  5 13:21:08 EDT 2021

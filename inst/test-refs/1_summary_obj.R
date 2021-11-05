@@ -2,8 +2,8 @@ structure(list(
   absolute_model_path = "/data/home/sethg/bbr/inst/model/nonmem/basic/1",
   run_details = list(
     version = "7.4.4", run_start = "-999999999",
-    run_end = "Thu Nov  4 10:44:06 EDT 2021", estimation_time = 5.07,
-    covariance_time = 0.45, cpu_time = 6.218, function_evaluations = 447L,
+    run_end = "Fri Nov  5 13:21:08 EDT 2021", estimation_time = 4.98,
+    covariance_time = 0.43, cpu_time = 6.381, function_evaluations = 447L,
     significant_digits = 3.2, problem_text = "LEM PK model 1 cmt base",
     mod_file = "-999999999", estimation_method = "First Order Conditional Estimation with Interaction",
     data_set = "../../../../extdata/acop.csv", number_of_subjects = 39L,
