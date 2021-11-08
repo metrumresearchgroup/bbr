@@ -120,6 +120,9 @@ nm_file_impl <- function(.path, .est_method) {
   verbose_msg(glue("Reading {basename(.path)}"))
   .txt <- read_lines(.path)
   .est <- which(str_detect(.txt, "^ *TABLE NO"))
+  if (length(.est) == 0) {
+    stop("Found no 'TABLE NO...' lines in file. Not a NONMEM output file.")
+  }
 
   if (is.null(.est_method)) {
     .est_method <- length(.est)

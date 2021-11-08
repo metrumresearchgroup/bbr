@@ -97,3 +97,16 @@ test_that("nm_par_tab() works [BBR-NMF-007]", {
   expect_equal(ncol(.d), 6)
   expect_equal(nrow(.d), DATA_TEST_ROWS_IGNORE)
 })
+
+test_that("nm_file() error with no 'TABLE NO' found [BBR-NMF-008]", {
+  .tf <- tempfile()
+  withr::defer(fs::file_delete(.tf))
+  readr::write_lines("a,b\n1,2\n3,4\n", .tf)
+
+  expect_error(
+    nm_file(.tf),
+    regexp = stringr::fixed("Found no 'TABLE NO...' lines in file")
+  )
+})
+
+
