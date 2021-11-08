@@ -371,7 +371,8 @@ check_model_object <- function(.mod, .mod_types = VALID_MOD_CLASSES) {
   if (!inherits(.mod, .mod_types)) {
     stop(paste(
       glue("Must pass a model object with one of the following classes: `{paste(.mod_types, collapse = ', ')}`"),
-      glue("Got object of class: `{paste(class(.mod), collapse = ', ')}`")
+      glue("Got object of class: `{paste(class(.mod), collapse = ', ')}`"),
+      sep = "\n"
     ))
   }
   return(invisible(TRUE))

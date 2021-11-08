@@ -98,7 +98,7 @@ nm_data <- function(.mod, .sep = ",") {
   check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
   .path <- get_data_path(.mod)
   verbose_msg(glue("Reading {.path}"))
-  read_delim(.path, delim =.sep, na = ".", col_types = readr::cols())
+  read_delim(.path, delim =.sep, na = ".", col_types = cols())
 }
 
 
