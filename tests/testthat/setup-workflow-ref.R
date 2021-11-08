@@ -50,7 +50,10 @@ DATA_TEST_COLS <- length(unlist(stringr::str_split(DATA_TEST_FIRST_LINE, ",")))
 DATA_TEST_ROWS <- 799
 DATA_TEST_ROWS_IGNORE <- DATA_TEST_ROWS - 20
 
-MOD1_TABLE_FILES <- c("1.tab", "1par.tab")
+TAB_FILE <- "1.tab"
+MOD1_TABLE_FILES <- c(TAB_FILE, "1par.tab", "1first1.tab", "1first2.tab", "1first3.tab", "1dups.tab")
+TAB_NEW_COLS <- 7
+PARTAB_NEW_COLS <- 5
 
 LEVEL2_SUBDIR <- "level2"
 LEVEL2_DIR <- file.path(MODEL_DIR, LEVEL2_SUBDIR)
