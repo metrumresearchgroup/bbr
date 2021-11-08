@@ -50,7 +50,9 @@ A tibble with the data from the specified file and estimation method.
 }
 \description{
 Reads in a whitespace-delimited NONMEM output file (for example .grd or .ext
-or a table output) or a NONMEM input data file.
+or a table output) or a NONMEM input data file. Will print the number of rows
+and columns when the file is loaded. This printing can be suppressed by
+setting \code{options(bbr.verbose = FALSE)}.
 }
 \section{Functions}{
 \itemize{

@@ -1,10 +1,13 @@
 
-#' Read all tables and input data from NONMEM run
+#' Read all tables and input data
 #'
-#' Reads in the input data set and all tables files.
-#' @return A named list of tibbles. The first element will always be `data` and
-#'   subsequent elements will be named for the file from which they were loaded,
-#'   with `get_model_id(.mod)` removed from the beginning and end.
+#' Reads in the input data set and all table output files from a NONMEM run.
+#' @return A named list of tibbles. The first element will always be named
+#'   `data` and will contain the input data set. Subsequent elements will be
+#'   named for the file from which they were loaded, with `get_model_id(.mod)`
+#'   (and `.`) removed from the beginning and end, if present. For example, a
+#'   model named `001.ctl` that generated a table named `001.tab` will have the
+#'   relevant element named `tab`.
 #' @param .mod Either a `bbi_nonmem_model` or `bbi_nonmem_summary` object
 #' @param .files Character vector of file paths to table files to read in.
 #'   Defaults to calling [nm_table_files()] on `.mod`, which will parse all file

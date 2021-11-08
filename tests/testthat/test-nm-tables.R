@@ -3,10 +3,17 @@ withr::local_options(list("bbr.verbose" = FALSE))
 
 test_that("nm_tables() works", {
   res <- nm_tables(MOD1)
-  expect_equal(length(res), length(MOD1_TABLE_FILES)+1)
+  expect_equal(length(res), length(MOD1_TABLE_FILES) + 1)
   expect_equal(res$data, nm_data(MOD1))
   expect_equal(res$tab, nm_tab(MOD1))
   expect_equal(res$par.tab, nm_par_tab(MOD1))
+})
+
+test_that("nm_tables() works with .files argument [BBR-NMT-001]", {
+  res <- nm_tables(MOD1, .files = "1.tab")
+  expect_equal(length(res), 2)
+  expect_equal(res$data, nm_data(MOD1))
+  expect_equal(res$tab, nm_tab(MOD1))
 })
 
 test_that("nm_table_files() works", {

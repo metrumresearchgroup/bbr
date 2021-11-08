@@ -3,7 +3,7 @@
 \name{nm_tables}
 \alias{nm_tables}
 \alias{nm_table_files}
-\title{Read all tables and input data from NONMEM run}
+\title{Read all tables and input data}
 \usage{
 nm_tables(.mod, .files = nm_table_files(.mod))
 
@@ -19,12 +19,15 @@ names from \verb{$TABLE} blocks in the control stream.}
 \item{.check_exists}{If \code{TRUE} check if files exist.}
 }
 \value{
-A named list of tibbles. The first element will always be \code{data} and
-subsequent elements will be named for the file from which they were loaded,
-with \code{get_model_id(.mod)} removed from the beginning and end.
+A named list of tibbles. The first element will always be named
+\code{data} and will contain the input data set. Subsequent elements will be
+named for the file from which they were loaded, with \code{get_model_id(.mod)}
+(and \code{.}) removed from the beginning and end, if present. For example, a
+model named \verb{001.ctl} that generated a table named \verb{001.tab} will have the
+relevant element named \code{tab}.
 }
 \description{
-Reads in the input data set and all tables files.
+Reads in the input data set and all table output files from a NONMEM run.
 }
 \section{Functions}{
 \itemize{

@@ -1,7 +1,9 @@
 #' Read NONMEM files
 #'
 #' Reads in a whitespace-delimited NONMEM output file (for example .grd or .ext
-#' or a table output) or a NONMEM input data file.
+#' or a table output) or a NONMEM input data file. Will print the number of rows
+#' and columns when the file is loaded. This printing can be suppressed by
+#' setting `options(bbr.verbose = FALSE)`.
 #'
 #' @return A tibble with the data from the specified file and estimation method.
 #'
@@ -97,8 +99,11 @@ nm_par_tab <- function(.mod) {
 nm_data <- function(.mod, .sep = ",") {
   check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
   .path <- get_data_path(.mod)
-  verbose_msg(glue("Reading {.path}"))
-  read_delim(.path, delim =.sep, na = ".", col_types = cols())
+  verbose_msg(glue("Reading data file: {basename(.path)}"))
+  .d <- read_delim(.path, delim =.sep, na = ".", col_types = cols())
+  verbose_msg(glue("  rows: {nrow(.d)}"))
+  verbose_msg(glue("  cols: {ncol(.d)}"))
+  return(.d)
 }
 
 
@@ -111,6 +116,7 @@ nm_data <- function(.mod, .sep = ",") {
 #' @keywords internal
 nm_file_impl <- function(.path, .est_method) {
   # read file and find top of table
+  verbose_msg(glue("Reading {basename(.path)}"))
   .txt <- read_lines(.path)
   .est <- which(str_detect(.txt, "^ *TABLE NO"))
 
@@ -137,9 +143,12 @@ nm_file_impl <- function(.path, .est_method) {
   }
 
   .est_lines <- .txt[.start:.end]
-  if (utils::packageVersion("readr") >= package_version("2.0.0")) {
+  .d <- if (utils::packageVersion("readr") >= package_version("2.0.0")) {
     read_table(I(.est_lines), na = ".", col_types = cols())
   } else {
     read_table2(I(.est_lines), na = ".", col_types = cols())
   }
+  verbose_msg(glue("  rows: {nrow(.d)}"))
+  verbose_msg(glue("  cols: {ncol(.d)}"))
+  return(.d)
 }
