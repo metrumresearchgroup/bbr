@@ -47,11 +47,12 @@ through to \code{readr::read_delim()}. Defaults to \code{","}.}
 }
 \value{
 A tibble with the data from the specified file and estimation method.
+All column names will be converted to uppercase.
 }
 \description{
 Reads in a whitespace-delimited NONMEM output file (for example .grd or .ext
 or a table output) or a NONMEM input data file. Will print the number of rows
-and columns when the file is loaded. This printing can be suppressed by
+and columns when the file is loaded. This \strong{printing can be suppressed} by
 setting \code{options(bbr.verbose = FALSE)}.
 }
 \section{Functions}{

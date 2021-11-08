@@ -2,10 +2,11 @@
 #'
 #' Reads in a whitespace-delimited NONMEM output file (for example .grd or .ext
 #' or a table output) or a NONMEM input data file. Will print the number of rows
-#' and columns when the file is loaded. This printing can be suppressed by
+#' and columns when the file is loaded. This **printing can be suppressed** by
 #' setting `options(bbr.verbose = FALSE)`.
 #'
 #' @return A tibble with the data from the specified file and estimation method.
+#'   All column names will be converted to uppercase.
 #'
 #' @param .mod Either a `bbi_nonmem_model`, `bbi_nonmem_summary`, or a path to a
 #'   file to read in. If passing model object to `nm_file()`, must also pass `.suffix` that
@@ -102,8 +103,10 @@ nm_data <- function(.mod, .sep = ",") {
   .path <- get_data_path(.mod)
   verbose_msg(glue("Reading data file: {basename(.path)}"))
   .d <- read_delim(.path, delim =.sep, na = ".", col_types = cols())
+  names(.d) <- toupper(names(.d))
   verbose_msg(glue("  rows: {nrow(.d)}"))
   verbose_msg(glue("  cols: {ncol(.d)}"))
+  verbose_msg("") # for newline
   return(.d)
 }
 
@@ -152,7 +155,9 @@ nm_file_impl <- function(.path, .est_method) {
   } else {
     read_table2(I(.est_lines), na = ".", col_types = cols())
   }
+  names(.d) <- toupper(names(.d))
   verbose_msg(glue("  rows: {nrow(.d)}"))
   verbose_msg(glue("  cols: {ncol(.d)}"))
+  verbose_msg("") # for newline
   return(.d)
 }
