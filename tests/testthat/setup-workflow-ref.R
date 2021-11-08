@@ -46,6 +46,9 @@ OUTPUT_FILE <-    file.path(MOD1_PATH, "OUTPUT")
 
 DATA_TEST_FILE <- as.character(fs::path_norm(file.path(REF_DIR, "..", "extdata", "acop.csv")))
 DATA_TEST_FIRST_LINE <- "id,time,mdv,evid,dv,amt,sex,wt,etn,num"
+DATA_TEST_COLS <- length(unlist(stringr::str_split(DATA_TEST_FIRST_LINE, ",")))
+DATA_TEST_ROWS <- 799
+DATA_TEST_ROWS_IGNORE <- DATA_TEST_ROWS - 20
 
 LEVEL2_SUBDIR <- "level2"
 LEVEL2_DIR <- file.path(MODEL_DIR, LEVEL2_SUBDIR)
@@ -96,8 +99,9 @@ CONFIG_DATA_PATH <- ref_json$CONFIG_DATA_PATH
 CONFIG_DATA_MD5 <- ref_json$CONFIG_DATA_MD5
 CONFIG_MODEL_MD5 <- ref_json$CONFIG_MODEL_MD5
 MOD_BBI_VERSION <- ref_json$MOD_BBI_VERSION
-PARAM_COUNT_REF <- ref_json$PARAM_COUNT_REF
-OFV_REF <- ref_json$OFV_REF
+MOD1_PARAM_COUNT <- ref_json$MOD1_PARAM_COUNT
+MOD1_PARAM_COUNT_FIXED <- ref_json$MOD1_PARAM_COUNT_FIXED
+MOD1_OFV_REF <- ref_json$MOD1_OFV_REF
 MOD_BBI_VERSION <- ref_json$MOD_BBI_VERSION
 MOD_NM_VERSION <- ref_json$MOD_NM_VERSION
 

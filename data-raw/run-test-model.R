@@ -38,12 +38,17 @@ run_test_model <- function(
 
     # update reference values
     ref_json_path <- file.path(ref_out_dir, "ref_values.json")
-    ref_json <- jsonlite::fromJSON(ref_json_path)
+    ref_json <- if (fs::file_exists(ref_json_path)) {
+      jsonlite::fromJSON(ref_json_path)
+    } else {
+      list()
+    }
 
     .s <- model_summary(.m)
     .fp <- unlist(.s$parameters_data[[1]]$fixed)
-    ref_json$PARAM_COUNT_REF <- length(.fp) - sum(.fp) # count of non-fixed parameters
-    ref_json$OFV_REF <- .s$ofv[[1]]$ofv_no_constant
+    ref_json$MOD1_PARAM_COUNT <- length(.fp)
+    ref_json$MOD1_PARAM_COUNT_FIXED <- length(.fp) - sum(.fp) # count of non-fixed parameters
+    ref_json$MOD1_OFV_REF <- .s$ofv[[1]]$ofv_no_constant
 
     .c <- jsonlite::fromJSON(get_config_path(.m))
     ref_json$CONFIG_DATA_PATH <- .c$data_path

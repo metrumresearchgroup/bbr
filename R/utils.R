@@ -343,6 +343,17 @@ check_os <- function() {
   }
 }
 
+#' Prints message(s) if `isTRUE(getOption("bbr.verbose"))`
+#' @keywords internal
+verbose_msg <- function(.msg) {
+  checkmate::assert_character(.msg)
+  if(isTRUE(getOption("bbr.verbose"))) {
+    for (.m in .msg) {
+      message(.m)
+    }
+  }
+}
+
 
 ##################################
 # CHECKING MODEL CLASSES AND KEYS
@@ -358,7 +369,11 @@ check_required_keys <- function(.list, .req) {
 #' @keywords internal
 check_model_object <- function(.mod, .mod_types = VALID_MOD_CLASSES) {
   if (!inherits(.mod, .mod_types)) {
-    stop(glue("Must pass a model object, but got object of class: `{paste(class(.mod), collapse = ', ')}`"))
+    stop(paste(
+      glue("Must pass a model object with one of the following classes: `{paste(.mod_types, collapse = ', ')}`"),
+      glue("Got object of class: `{paste(class(.mod), collapse = ', ')}`"),
+      sep = "\n"
+    ))
   }
   return(invisible(TRUE))
 }
