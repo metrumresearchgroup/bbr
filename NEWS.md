@@ -14,15 +14,11 @@ This release adds a number of helper functions, primarily for use with NONMEM mo
 
 * Added `nm_file()`, `nm_grd()`, `nm_ext()`, `nm_tab()`, `nm_par_tab()`, and `nm_data()` for reading in NONMEM files more easily. (#426)
 
-* Deprecated `check_nonmem_table_output()`, `check_grd()`, and `check_ext()` and
-replaced them with `nm_file()` variants. These functions will warn about this
-for two more releases and then begin to error for two more releases before being
-removed altogether. (#426)
+* Added `nm_join()`, `nm_tables()`, and `nm_table_files()` for reading in NONMEM tables more easily. (#429 and #430)
 
-* Deprecated `plot_nonmem_table_df()`, `plot_grd()`, and `plot_ext()` in an
-effort to more tightly define the scope of `bbr`. These functions will warn
-about this for two more releases and then begin to error for two more releases
-before being removed altogether. (#426)
+* Deprecated `check_nonmem_table_output()`, `check_grd()`, and `check_ext()` and replaced them with `nm_file()` variants. These functions will warn about this for two more releases and then begin to error for two more releases before being removed altogether. (#426)
+
+* Deprecated `plot_nonmem_table_df()`, `plot_grd()`, and `plot_ext()` in an effort to more tightly define the scope of `bbr`. These functions will warn about this for two more releases and then begin to error for two more releases before being removed altogether. (#426)
 
 # bbr 1.1.4
 
