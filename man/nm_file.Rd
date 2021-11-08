@@ -72,3 +72,6 @@ setting \code{options(bbr.verbose = FALSE)}.
 \code{bbi_nonmem_summary} object
 }}
 
+\seealso{
+\code{\link[=nm_tables]{nm_tables()}}, \code{\link[=nm_table_files]{nm_table_files()}}, \code{\link[=nm_join]{nm_join()}}
+}

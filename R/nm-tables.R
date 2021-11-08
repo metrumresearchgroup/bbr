@@ -2,6 +2,9 @@
 #' Read all tables and input data
 #'
 #' Reads in the input data set and all table output files from a NONMEM run.
+#' This function will return a named list with all the relevant tibbles. To return
+#' a _single tibble_ with the input data joined to the relevant table outputs, use
+#' the related [nm_join()] function.
 #' @return A named list of tibbles. The first element will always be named
 #'   `data` and will contain the input data set. Subsequent elements will be
 #'   named for the file from which they were loaded, with `get_model_id(.mod)`
@@ -14,6 +17,7 @@
 #'   names from `$TABLE` blocks in the control stream.
 #' @importFrom purrr compact map_chr
 #' @importFrom stringr str_replace
+#' @seealso [nm_join()], [nm_file()]
 #' @export
 nm_tables <- function(
   .mod,

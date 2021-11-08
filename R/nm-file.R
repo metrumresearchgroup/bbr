@@ -18,6 +18,7 @@
 #'   single file.
 #' @inheritParams build_path_from_model
 #' @param ... arguments passed through to methods. (Currently none.)
+#' @seealso [nm_tables()], [nm_table_files()], [nm_join()]
 #' @export
 nm_file <- function(.mod, .suffix = NULL, .est_method = NULL, ...) {
   UseMethod("nm_file")

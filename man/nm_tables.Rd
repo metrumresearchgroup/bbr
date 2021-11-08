@@ -28,6 +28,9 @@ relevant element named \code{tab}.
 }
 \description{
 Reads in the input data set and all table output files from a NONMEM run.
+This function will return a named list with all the relevant tibbles. To return
+a \emph{single tibble} with the input data joined to the relevant table outputs, use
+the related \code{\link[=nm_join]{nm_join()}} function.
 }
 \section{Functions}{
 \itemize{
@@ -35,3 +38,6 @@ Reads in the input data set and all table output files from a NONMEM run.
 stream, and optionally check if the files exist.
 }}
 
+\seealso{
+\code{\link[=nm_join]{nm_join()}}, \code{\link[=nm_file]{nm_file()}}
+}
