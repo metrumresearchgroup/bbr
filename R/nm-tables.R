@@ -37,13 +37,14 @@ nm_tables <- function(
   )
 
   # build names for table elements
+  mod_id <- get_model_id(.mod)
   .n <- .files %>%
     basename() %>%
-    str_replace(glue("^{get_model_id(.mod)}"), "") %>%
-    str_replace(glue("{get_model_id(.mod)}$"), "") %>%
+    str_replace(glue("^{mod_id}"), "") %>%
+    str_replace(glue("{mod_id}$"), "") %>%
     make.names() %>%
-    str_replace(glue("^\\Q.\\E"), "") %>%
-    str_replace(glue("\\Q.\\E$"), "")
+    str_replace(glue("^\\."), "") %>%
+    str_replace(glue("\\.$"), "")
 
   # read in each table file
   for (.i in 1:length(.files)) {
@@ -61,14 +62,15 @@ nm_tables <- function(
 nm_table_files <- function(.mod, .check_exists = TRUE) {
   .p <- get_model_path(.mod)
   .l <- parse_ctl_to_list(.p)
+  out_dir <- get_output_dir(.mod, .check_exists = .check_exists)
 
   # get file names from table statements and construct paths
   .f <- .l[names(.l) == "TABLE"] %>%
     map_chr(~paste(.x, collapse = " ")) %>%
     str_extract("\\bFILE\\s*=\\s*([^ ]+)") %>%
     str_replace("\\bFILE\\s*=\\s*", "") %>%
-    str_replace("^\\Q./\\E", "") %>%
-    file.path(get_output_dir(.mod, .check_exists = .check_exists), .)
+    str_replace("^\\.\\/", "") %>%
+    file.path(out_dir, .)
 
   if(isTRUE(.check_exists)) {
     .fe <- fs::file_exists(.f)

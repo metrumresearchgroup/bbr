@@ -1,7 +1,7 @@
 
 withr::local_options(list("bbr.verbose" = FALSE))
 
-test_that("nm_tables() works", {
+test_that("nm_tables() works [BBR-NMT-001]", {
   res <- nm_tables(MOD1)
   expect_equal(length(res), length(MOD1_TABLE_FILES) + 1)
   expect_equal(res$data, nm_data(MOD1))
@@ -16,13 +16,13 @@ test_that("nm_tables() works with .files argument [BBR-NMT-001]", {
   expect_equal(res$tab, nm_tab(MOD1))
 })
 
-test_that("nm_table_files() works", {
+test_that("nm_table_files() works [BBR-NMT-002]", {
   res <- nm_table_files(MOD1)
   expect_true(all(fs::is_absolute_path(res)))
   expect_equal(basename(res), MOD1_TABLE_FILES)
 })
 
-test_that("nm_table_files() works with multiline table statement", {
+test_that("nm_table_files() works with multiline table statement [BBR-NMT-002]", {
   perturb_file(get_model_path(MOD1), txt = "\n\n$TABLE\n\nFILE=./fake\n")
 
   res <- nm_table_files(MOD1, .check_exists = FALSE)
@@ -30,7 +30,7 @@ test_that("nm_table_files() works with multiline table statement", {
   expect_equal(basename(res), c(MOD1_TABLE_FILES, "fake"))
 })
 
-test_that("nm_table_files() errors with non-existent file", {
+test_that("nm_table_files() errors with non-existent file [BBR-NMT-002]", {
   perturb_file(get_model_path(MOD1), txt = "\n$TABLE FILE=./fake\n")
   expect_error(
     nm_table_files(MOD1),
