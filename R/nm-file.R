@@ -1,7 +1,9 @@
 #' Read NONMEM files
 #'
 #' Reads in a whitespace-delimited NONMEM output file (for example .grd or .ext
-#' or a table output) or a NONMEM input data file.
+#' or a table output) or a NONMEM input data file. Will print the number of rows
+#' and columns when the file is loaded. This printing can be suppressed by
+#' setting `options(bbr.verbose = FALSE)`.
 #'
 #' @return A tibble with the data from the specified file and estimation method.
 #'
@@ -10,9 +12,10 @@
 #'   will be passed through to [build_path_from_model()].
 #' @param .est_method If `NULL`, the default, pulls the data from the final
 #'   estimation method. If an integer, pulls the data from that estimation
-#'   method. Note that, if more than one table is written to a given file, this
-#'   will also mean it pulls the final table by default, and this argument can
-#'   be used to pull a different table instead.
+#'   method. Can also pass `"fail"` in which case a warning will be raised
+#'   and `NULL` returned if more than one table is found in the file. This
+#'   is useful for table outputs that should not have multiple tables in a
+#'   single file.
 #' @inheritParams build_path_from_model
 #' @param ... arguments passed through to methods. (Currently none.)
 #' @export
@@ -76,7 +79,7 @@ nm_ext <- function(.mod, .est_method = NULL) {
 #' @export
 nm_tab <- function(.mod) {
   check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
-  nm_file(.mod, .suffix = ".tab")
+  nm_file(.mod, .suffix = ".tab", .est_method = "fail")
 }
 
 #' @describeIn nm_file Reads `{get_model_id(.mod)}par.tab` file from a
@@ -84,7 +87,7 @@ nm_tab <- function(.mod) {
 #' @export
 nm_par_tab <- function(.mod) {
   check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
-  nm_file(.mod, .suffix = "par.tab")
+  nm_file(.mod, .suffix = "par.tab", .est_method = "fail")
 }
 
 #' @describeIn nm_file Reads the input data file from a `bbi_nonmem_model` or
@@ -96,8 +99,11 @@ nm_par_tab <- function(.mod) {
 nm_data <- function(.mod, .sep = ",") {
   check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
   .path <- get_data_path(.mod)
-  verbose_msg(glue("Reading {.path}"))
-  read_delim(.path, delim =.sep, na = ".", col_types = cols())
+  verbose_msg(glue("Reading data file: {basename(.path)}"))
+  .d <- read_delim(.path, delim =.sep, na = ".", col_types = cols())
+  verbose_msg(glue("  rows: {nrow(.d)}"))
+  verbose_msg(glue("  cols: {ncol(.d)}"))
+  return(.d)
 }
 
 
@@ -110,11 +116,22 @@ nm_data <- function(.mod, .sep = ",") {
 #' @keywords internal
 nm_file_impl <- function(.path, .est_method) {
   # read file and find top of table
+  verbose_msg(glue("Reading {basename(.path)}"))
   .txt <- read_lines(.path)
   .est <- which(str_detect(.txt, "^ *TABLE NO"))
+
   if (is.null(.est_method)) {
     .est_method <- length(.est)
   }
+  if (.est_method == "fail") {
+    if (length(.est) > 1) {
+      warning(glue("{.path} has {length(.est)} tables in it, but .est_method='fail' expects only one table per file."), call. = FALSE)
+      return(invisible(NULL))
+    } else {
+      .est_method <- 1
+    }
+  }
+
   checkmate::assert_integerish(.est_method, lower = 1, upper = length(.est), len = 1, null.ok = TRUE)
 
   # parse to tibble
@@ -126,9 +143,12 @@ nm_file_impl <- function(.path, .est_method) {
   }
 
   .est_lines <- .txt[.start:.end]
-  if (packageVersion("readr") >= package_version("2.0.0")) {
+  .d <- if (utils::packageVersion("readr") >= package_version("2.0.0")) {
     read_table(I(.est_lines), na = ".", col_types = cols())
   } else {
     read_table2(I(.est_lines), na = ".", col_types = cols())
   }
+  verbose_msg(glue("  rows: {nrow(.d)}"))
+  verbose_msg(glue("  cols: {ncol(.d)}"))
+  return(.d)
 }
