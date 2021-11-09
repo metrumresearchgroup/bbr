@@ -92,7 +92,11 @@ tail_output.bbi_nonmem_model <- function(.mod, .head = 3, .tail = 5, .print = TR
       status <- bbi_nonmem_model_status(.mod)
       if (status == "Finished Running") {
         message("Model already finished running")
+      } else if (status == "Incomplete Run") {
+        message("Model running but OUTPUT file doesn't exist (check back)")
       } else {
+        # Given the get_output_dir() call upstream, "Not Run" state should be
+        # inaccessible. Treat it as a bug.
         stop(err)
       }
     }
