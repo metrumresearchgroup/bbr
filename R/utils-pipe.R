@@ -9,3 +9,8 @@
 #' @importFrom magrittr %>%
 #' @usage lhs \%>\% rhs
 NULL
+
+if (getRversion() >= "2.15.1") {
+  # Prevent 'R CMD check' from complaining about "." argument used in pipes.
+  utils::globalVariables(".")
+}

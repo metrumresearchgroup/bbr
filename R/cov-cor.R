@@ -157,7 +157,7 @@ parse_cov_cor_full_file <- function(.mod, .suffix) {
     I(.lines[(.t+1):length(.lines)]),
     col_types = readr::cols()
   ) %>%
-    select(-NAME)
+    select(-.data$NAME)
 
   df %>%
     as.matrix() %>%
