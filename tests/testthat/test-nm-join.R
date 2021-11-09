@@ -16,11 +16,9 @@ test_that("nm_join() works correctly with defaults and model object [BBR-NMJ-001
 })
 
 test_that("nm_join() works correctly summary object [BBR-NMJ-001]", {
-  withr::with_options(list(bbr.verbose = TRUE), {
-    test_df <- nm_join(SUM1)
-    expect_equal(nrow(test_df), DATA_TEST_ROWS_IGNORE)
-    expect_equal(ncol(test_df), DATA_TEST_COLS + TAB_NEW_COLS + PARTAB_NEW_COLS + 1)
-  })
+  test_df <- nm_join(SUM1, .files = TAB_FILE)
+  expect_equal(nrow(test_df), DATA_TEST_ROWS_IGNORE)
+  expect_equal(ncol(test_df), DATA_TEST_COLS + TAB_NEW_COLS)
 })
 
 test_that("nm_join() works correctly file path [BBR-NMJ-001]", {
@@ -29,7 +27,7 @@ test_that("nm_join() works correctly file path [BBR-NMJ-001]", {
   expect_equal(ncol(test_df), DATA_TEST_COLS + TAB_NEW_COLS)
 })
 
-test_that("nm_join(.superset) works correctly", {
+test_that("nm_join(.superset) works correctly [BBR-NMJ-002]", {
   test_df <- nm_join(MOD1, .files = TAB_FILE, .superset = TRUE)
   expect_equal(nrow(test_df), DATA_TEST_ROWS)
   expect_equal(ncol(test_df), DATA_TEST_COLS + TAB_NEW_COLS)
@@ -39,7 +37,7 @@ test_that("nm_join(.superset) works correctly", {
 ####################
 # first only tests
 
-test_that("nm_join(.files) works correctly FIRSTONLY with ID col", {
+test_that("nm_join(.files) works correctly FIRSTONLY with ID col [BBR-NMJ-003]", {
   test_df <- nm_join(
     MOD1,
     .files = "1first1.tab"
@@ -48,7 +46,7 @@ test_that("nm_join(.files) works correctly FIRSTONLY with ID col", {
   expect_equal(ncol(test_df), DATA_TEST_COLS + 1)
 })
 
-test_that("nm_join(.files) works correctly FIRSTONLY with no ID col", {
+test_that("nm_join(.files) works correctly FIRSTONLY with no ID col [BBR-NMJ-003]", {
   test_df <- nm_join(
     MOD1,
     .files = "1first2.tab"
@@ -57,7 +55,7 @@ test_that("nm_join(.files) works correctly FIRSTONLY with no ID col", {
   expect_equal(ncol(test_df), DATA_TEST_COLS + 1)
 })
 
-test_that("nm_join(.files) works correctly FIRSTONLY with both NUM and ID cols", {
+test_that("nm_join(.files) works correctly FIRSTONLY with both NUM and ID cols [BBR-NMJ-003]", {
   test_df <- nm_join(
     MOD1,
     .files = "1first3.tab"
@@ -66,7 +64,7 @@ test_that("nm_join(.files) works correctly FIRSTONLY with both NUM and ID cols",
   expect_equal(ncol(test_df), DATA_TEST_COLS + 1)
 })
 
-test_that("nm_join(.files) works correctly FIRSTONLY then full table", {
+test_that("nm_join(.files) works correctly FIRSTONLY then full table [BBR-NMJ-003]", {
   test_df <- nm_join(
     MOD1,
     .files = c(
@@ -81,7 +79,7 @@ test_that("nm_join(.files) works correctly FIRSTONLY then full table", {
 ######################
 # duplicate columns tests
 
-test_that("nm_join() works correctly duplicate cols", {
+test_that("nm_join() works correctly duplicate cols [BBR-NMJ-004]", {
   test_df <- nm_join(
     MOD1,
     .files = c(
@@ -95,7 +93,7 @@ test_that("nm_join() works correctly duplicate cols", {
   expect_equal(test_df$DV.DATA, test_df$DV)
 })
 
-test_that("nm_join(.join_col) works correctly", {
+test_that("nm_join(.join_col) works correctly [BBR-NMJ-005]", {
   # this test is annoyingly complex to set up because of the
   # mechanics of how the data is pulled and the internal checks
   # on row number. Just an explanation of why it's so long.
@@ -145,7 +143,7 @@ test_that("nm_join(.join_col) works correctly", {
 ########################
 # warnings and messages
 
-test_that("nm_join() warns on skipping table with wrong number of rows", {
+test_that("nm_join() warns on skipping table with wrong number of rows [BBR-NMJ-006]", {
   .tf <- tempfile()
   withr::defer(fs::file_delete(.tf))
   readr::write_lines("TABLE NO 1\na,b\n1,2\n3,4\n", .tf)
