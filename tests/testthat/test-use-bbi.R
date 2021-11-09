@@ -3,6 +3,10 @@ context("test-use-bbi")
 skip_if_not(R.version$os == "linux-gnu")
 skip_if_offline()
 
+withr::local_options(list(
+  "bbr.verbose" = FALSE
+))
+
 tdir <- normalizePath(tempdir())
 
 test_that("use-bbi works on linux pulling from options [BBR-UBI-001]", {

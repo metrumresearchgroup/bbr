@@ -336,6 +336,7 @@ bbi_version <- function(.bbi_exe_path = getOption('bbr.bbi_exe_path')){
 #' @param release_v Character scalar for version number of current release
 #' @keywords internal
 version_message <- function(local_v, release_v){
+  if (!isTRUE(getOption("bbr.verbose"))) return(invisible(NULL))
 
   if (local_v == "") {
     cat(cli::col_red("No version currently installed "))
