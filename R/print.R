@@ -112,17 +112,11 @@ print.bbi_nonmem_model <- function(x, ...) {
     }
   }
 
-  status <- col_red("Not Run")
-  output_dir <- get_output_dir(x, .check_exists = FALSE)
-
-  if (dir.exists(output_dir)) {
-    status <- col_green("Finished Running")
-    json_file <- get_config_path(x, .check_exists = FALSE)
-
-    if (!fs::file_exists(json_file)) {
-      status <- col_red("Incomplete Run")
-    }
-
+  status <- bbi_nonmem_model_status(x)
+  if (status == "Finished Running") {
+    status <- col_green(status)
+  } else {
+    status <- col_red(status)
   }
 
   heading('Status')
