@@ -14,7 +14,8 @@
 #'   model named `001.ctl` that generated a table named `001.tab` will have the
 #'   relevant element named `tab`. Column names in all tibbles will be converted
 #'   to uppercase.
-#' @param .mod Either a `bbi_nonmem_model` or `bbi_nonmem_summary` object
+#' @param .mod A `bbi_nonmem_model` or `bbi_nonmem_summary` object, or a path to
+#'   a NONMEM run.
 #' @param .files Character vector of file paths to table files to read in.
 #'   Defaults to calling [nm_table_files()] on `.mod`, which will parse all file
 #'   names from `$TABLE` blocks in the control stream. If passing manually,
@@ -27,6 +28,10 @@ nm_tables <- function(
   .mod,
   .files = nm_table_files(.mod)
 ) {
+  if (inherits(.mod, "character")) {
+    checkmate::assert_string(.mod)
+    .mod <- read_model(.mod)
+  }
   check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
   checkmate::assert_character(.files)
 

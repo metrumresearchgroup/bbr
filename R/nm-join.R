@@ -12,8 +12,6 @@
 #' joins. This **printing can be suppressed** by setting `options(bbr.verbose =
 #' FALSE)`.
 #'
-#' @param .mod A `bbi_nonmem_model` or `bbi_nonmem_summary` object, or a path to
-#'   a NONMEM run.
 #' @inheritParams nm_tables
 #' @param .join_col Character column name to use to join table files. Defaults to
 #'   `NUM`. See Details.

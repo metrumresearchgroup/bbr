@@ -10,15 +10,23 @@ test_that("nm_tables() works model object [BBR-NMT-001]", {
 })
 
 test_that("nm_tables() works summary object [BBR-NMT-001]", {
-  res <- nm_tables(SUM1)
-  expect_equal(length(res), length(MOD1_TABLE_FILES) + 1)
+  res <- nm_tables(SUM1, .files = TAB_FILE)
+  expect_equal(length(res), 2)
   expect_equal(res$data, nm_data(MOD1))
   expect_equal(res$tab, nm_tab(MOD1))
-  expect_equal(res$par.tab, nm_par_tab(MOD1))
+})
+
+test_that("nm_tables() works file path [BBR-NMT-001]", {
+  res <- nm_tables(MOD1_ABS_PATH, .files = TAB_FILE)
+  expect_equal(length(res), 2)
+  expect_equal(res$data, nm_data(MOD1))
+  expect_equal(res$tab, nm_tab(MOD1))
 })
 
 test_that("nm_tables() works with .files argument [BBR-NMT-001]", {
-  res <- nm_tables(MOD1, .files = "1.tab")
+  # this test is duplicative because others use the .files arg
+  # but none test it explicitly
+  res <- nm_tables(MOD1, .files = TAB_FILE)
   expect_equal(length(res), 2)
   expect_equal(res$data, nm_data(MOD1))
   expect_equal(res$tab, nm_tab(MOD1))

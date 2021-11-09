@@ -10,7 +10,8 @@ nm_tables(.mod, .files = nm_table_files(.mod))
 nm_table_files(.mod, .check_exists = TRUE)
 }
 \arguments{
-\item{.mod}{Either a \code{bbi_nonmem_model} or \code{bbi_nonmem_summary} object}
+\item{.mod}{A \code{bbi_nonmem_model} or \code{bbi_nonmem_summary} object, or a path to
+a NONMEM run.}
 
 \item{.files}{Character vector of file paths to table files to read in.
 Defaults to calling \code{\link[=nm_table_files]{nm_table_files()}} on \code{.mod}, which will parse all file
