@@ -5,7 +5,7 @@ withr::local_options(list(
   bbr.verbose = FALSE
 ))
 
-test_that("nm_join() works correctly with defaults and model object [BBR-NMJ-001]", {
+test_that("nm_join() works correctly: defaults and model object [BBR-NMJ-001]", {
   withr::with_options(list(bbr.verbose = TRUE), {
     expect_message({
       test_df <- nm_join(MOD1)
@@ -15,13 +15,13 @@ test_that("nm_join() works correctly with defaults and model object [BBR-NMJ-001
   })
 })
 
-test_that("nm_join() works correctly summary object [BBR-NMJ-001]", {
+test_that("nm_join() works correctly: summary object [BBR-NMJ-001]", {
   test_df <- nm_join(SUM1, .files = TAB_FILE)
   expect_equal(nrow(test_df), DATA_TEST_ROWS_IGNORE)
   expect_equal(ncol(test_df), DATA_TEST_COLS + TAB_NEW_COLS)
 })
 
-test_that("nm_join() works correctly file path [BBR-NMJ-001]", {
+test_that("nm_join() works correctly: file path [BBR-NMJ-001]", {
   test_df <- nm_join(MOD1_ABS_PATH, .files = TAB_FILE)
   expect_equal(nrow(test_df), DATA_TEST_ROWS_IGNORE)
   expect_equal(ncol(test_df), DATA_TEST_COLS + TAB_NEW_COLS)
@@ -37,7 +37,7 @@ test_that("nm_join(.superset) works correctly [BBR-NMJ-002]", {
 ####################
 # first only tests
 
-test_that("nm_join(.files) works correctly FIRSTONLY with ID col [BBR-NMJ-003]", {
+test_that("nm_join(.files) works correctly FIRSTONLY: with ID col [BBR-NMJ-003]", {
   test_df <- nm_join(
     MOD1,
     .files = "1first1.tab"
@@ -46,7 +46,7 @@ test_that("nm_join(.files) works correctly FIRSTONLY with ID col [BBR-NMJ-003]",
   expect_equal(ncol(test_df), DATA_TEST_COLS + 1)
 })
 
-test_that("nm_join(.files) works correctly FIRSTONLY with no ID col [BBR-NMJ-003]", {
+test_that("nm_join(.files) works correctly FIRSTONLY: no ID col [BBR-NMJ-003]", {
   test_df <- nm_join(
     MOD1,
     .files = "1first2.tab"
@@ -55,7 +55,7 @@ test_that("nm_join(.files) works correctly FIRSTONLY with no ID col [BBR-NMJ-003
   expect_equal(ncol(test_df), DATA_TEST_COLS + 1)
 })
 
-test_that("nm_join(.files) works correctly FIRSTONLY with both NUM and ID cols [BBR-NMJ-003]", {
+test_that("nm_join(.files) works correctly FIRSTONLY: both NUM and ID cols [BBR-NMJ-003]", {
   test_df <- nm_join(
     MOD1,
     .files = "1first3.tab"
@@ -64,7 +64,7 @@ test_that("nm_join(.files) works correctly FIRSTONLY with both NUM and ID cols [
   expect_equal(ncol(test_df), DATA_TEST_COLS + 1)
 })
 
-test_that("nm_join(.files) works correctly FIRSTONLY then full table [BBR-NMJ-003]", {
+test_that("nm_join(.files) works correctly FIRSTONLY: then full table [BBR-NMJ-003]", {
   test_df <- nm_join(
     MOD1,
     .files = c(
@@ -79,7 +79,7 @@ test_that("nm_join(.files) works correctly FIRSTONLY then full table [BBR-NMJ-00
 ######################
 # duplicate columns tests
 
-test_that("nm_join() works correctly duplicate cols [BBR-NMJ-004]", {
+test_that("nm_join() works correctly: duplicate cols [BBR-NMJ-004]", {
   test_df <- nm_join(
     MOD1,
     .files = c(

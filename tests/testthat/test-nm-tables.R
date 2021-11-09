@@ -1,7 +1,7 @@
 
 withr::local_options(list("bbr.verbose" = FALSE))
 
-test_that("nm_tables() works model object [BBR-NMT-001]", {
+test_that("nm_tables() works: model object [BBR-NMT-001]", {
   res <- nm_tables(MOD1)
   expect_equal(length(res), length(MOD1_TABLE_FILES) + 1)
   expect_equal(res$data, nm_data(MOD1))
@@ -9,21 +9,21 @@ test_that("nm_tables() works model object [BBR-NMT-001]", {
   expect_equal(res$par.tab, nm_par_tab(MOD1))
 })
 
-test_that("nm_tables() works summary object [BBR-NMT-001]", {
+test_that("nm_tables() works: summary object [BBR-NMT-001]", {
   res <- nm_tables(SUM1, .files = TAB_FILE)
   expect_equal(length(res), 2)
   expect_equal(res$data, nm_data(MOD1))
   expect_equal(res$tab, nm_tab(MOD1))
 })
 
-test_that("nm_tables() works file path [BBR-NMT-001]", {
+test_that("nm_tables() works: file path [BBR-NMT-001]", {
   res <- nm_tables(MOD1_ABS_PATH, .files = TAB_FILE)
   expect_equal(length(res), 2)
   expect_equal(res$data, nm_data(MOD1))
   expect_equal(res$tab, nm_tab(MOD1))
 })
 
-test_that("nm_tables() works with .files argument [BBR-NMT-001]", {
+test_that("nm_tables() works: .files argument [BBR-NMT-001]", {
   # this test is duplicative because others use the .files arg
   # but none test it explicitly
   res <- nm_tables(MOD1, .files = TAB_FILE)
@@ -59,7 +59,7 @@ test_that("nm_table_files() works [BBR-NMT-003]", {
   expect_equal(basename(res), MOD1_TABLE_FILES)
 })
 
-test_that("nm_table_files() works with multiline table statement [BBR-NMT-003]", {
+test_that("nm_table_files() works: multiline table statement [BBR-NMT-003]", {
   perturb_file(get_model_path(MOD1), txt = "\n\n$TABLE\n\nFILE=./fake\n")
 
   res <- nm_table_files(MOD1, .check_exists = FALSE)

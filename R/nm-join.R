@@ -62,7 +62,7 @@
 #' data will be renamed to `DV.DATA` and the column from the table file kept as
 #' `DV`.
 #'
-#' @importFrom dplyr left_join select
+#' @importFrom dplyr left_join right_join select
 #' @seealso [nm_tables()], [nm_table_files()], [nm_file()]
 #' @export
 nm_join <- function(
@@ -103,7 +103,7 @@ nm_join <- function(
   }
 
   if (.superset) {
-    join_fun <- function(x, y, ...) left_join(y, x, ...)
+    join_fun <- right_join
   } else {
     join_fun <- left_join
   }
@@ -122,15 +122,13 @@ nm_join <- function(
     tab <- .tbls[[.n]]
     has_id <- "ID" %in% names(tab)
 
-    # skip table if nrow doesn't match number of records or ID's
-    # because if neither is true than this is the wrong kind of file
-    # (or something is wrong with NONMEM output)
     if (!(nrow(tab) %in% c(nrec, nid))) {
+      # skip table if nrow doesn't match number of records or ID's
+      # because if neither is true than this is the wrong kind of file
+      # (or something is wrong with NONMEM output)
       warning(glue("{.n} skipped because number of rows ({nrow(tab)}) doesn't match number of records ({nrec}) or IDs ({nid})"), call. = FALSE)
-    }
-
-    # if FIRSTONLY table join on ID
-    if (nrow(tab) == nid) {
+    } else if (nrow(tab) == nid) {
+      # if FIRSTONLY table join on ID
       verbose_msg(glue("{.n} is FIRSTONLY table"))
 
       # if ID is missing, get it from the data by using .join_col
@@ -146,9 +144,8 @@ nm_join <- function(
       tab <- drop_dups(tab, .d, "ID", .n)
       col_order <- union(col_order, names(tab))
       .d <- join_fun(tab, .d, by = "ID")
-    }
-
-    if (nrow(tab) == nrec) {
+    } else if (nrow(tab) == nrec) {
+      # otherwise, join on .join_col
       tab <- drop_dups(tab, .d, .join_col, .n)
       col_order <- union(col_order, names(tab))
       .d <- join_fun(tab, .d, by = .join_col)
@@ -168,7 +165,7 @@ nm_join <- function(
 #' Drop duplicate columns to prepare for join
 #' @keywords internal
 drop_dups <- function(.new_table, .dest_table, .join_col, .table_name) {
-  new_cols <- c(setdiff(names(.new_table), names(.dest_table)))
+  new_cols <- setdiff(names(.new_table), names(.dest_table))
   keep <- c(.join_col, new_cols)
   drop <- setdiff(names(.new_table), keep)
 
