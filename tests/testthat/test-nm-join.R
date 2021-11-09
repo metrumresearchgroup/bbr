@@ -5,7 +5,7 @@ withr::local_options(list(
   bbr.verbose = FALSE
 ))
 
-test_that("nm_join() defaults work correctly", {
+test_that("nm_join() works correctly with defaults and model object [BBR-NMJ-001]", {
   withr::with_options(list(bbr.verbose = TRUE), {
     expect_message({
       test_df <- nm_join(MOD1)
@@ -15,7 +15,15 @@ test_that("nm_join() defaults work correctly", {
   })
 })
 
-test_that("nm_join() works correctly with file path", {
+test_that("nm_join() works correctly summary object [BBR-NMJ-001]", {
+  withr::with_options(list(bbr.verbose = TRUE), {
+    test_df <- nm_join(SUM1)
+    expect_equal(nrow(test_df), DATA_TEST_ROWS_IGNORE)
+    expect_equal(ncol(test_df), DATA_TEST_COLS + TAB_NEW_COLS + PARTAB_NEW_COLS + 1)
+  })
+})
+
+test_that("nm_join() works correctly file path [BBR-NMJ-001]", {
   test_df <- nm_join(MOD1_ABS_PATH, .files = TAB_FILE)
   expect_equal(nrow(test_df), DATA_TEST_ROWS_IGNORE)
   expect_equal(ncol(test_df), DATA_TEST_COLS + TAB_NEW_COLS)

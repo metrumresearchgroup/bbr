@@ -110,7 +110,11 @@ nm_join <- function(
   }
 
   # get number of ID's and records
-  .s <- model_summary(.mod, .bbi_args = .bbi_args)
+  .s <- if (!inherits(.mod, NM_SUM_CLASS)) {
+    model_summary(.mod, .bbi_args = .bbi_args)
+  } else {
+    .mod
+  }
   nid <-  .s$run_details$number_of_subjects
   nrec <- .s$run_details$number_of_data_records
 
