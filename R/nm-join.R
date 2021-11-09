@@ -36,12 +36,13 @@
 #' `NUM`). When this column is carried into the output table files, there will
 #' be unambiguous matching from the table file back to the input data set.
 #'
-#' The one exception to this are `$FIRSTONLY` tables. If a table file has the
-#' same number of rows as the there are individuals in the input data set, it
-#' will assumed to be a `$FIRSTONLY` table. In this case, the table will be
-#' joined to the input data by the `ID` column. If `ID` is not present in the
-#' table, it will be using `.join_col`. Note that if _neither_ `ID` or the
-#' column passed to `.join_col` are present in the table, the join will fail.
+#' The one exception to this are `FIRSTONLY` tables. If a table file has the
+#' same number of rows as the there are individuals in the input data set
+#' (accounting for any filtering of data in the NONMEM control stream), it will
+#' assumed to be a `FIRSTONLY` table. In this case, the table will be joined to
+#' the input data by the `ID` column. If `ID` is not present in the table, it
+#' will be using `.join_col`. Note that if _neither_ `ID` or the column passed
+#' to `.join_col` are present in the table, the join will fail.
 #'
 #' Note also that, when `.join_col` is carried into table outputs, **there is no
 #' need to table any other columns from the input data** as long as the
@@ -128,9 +129,9 @@ nm_join <- function(
       warning(glue("{.n} skipped because number of rows ({nrow(tab)}) doesn't match number of records ({nrec}) or IDs ({nid})"), call. = FALSE)
     }
 
-    # if $FIRSTONLY table join on ID
+    # if FIRSTONLY table join on ID
     if (nrow(tab) == nid) {
-      verbose_msg(glue("{.n} is $FIRSTONLY table"))
+      verbose_msg(glue("{.n} is FIRSTONLY table"))
 
       # if ID is missing, get it from the data by using .join_col
       if (!has_id) {

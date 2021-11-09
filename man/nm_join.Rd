@@ -56,12 +56,13 @@ column a simple integer numbering the rows in the input data set (for example
 \code{NUM}). When this column is carried into the output table files, there will
 be unambiguous matching from the table file back to the input data set.
 
-The one exception to this are \verb{$FIRSTONLY} tables. If a table file has the
-same number of rows as the there are individuals in the input data set, it
-will assumed to be a \verb{$FIRSTONLY} table. In this case, the table will be
-joined to the input data by the \code{ID} column. If \code{ID} is not present in the
-table, it will be using \code{.join_col}. Note that if \emph{neither} \code{ID} or the
-column passed to \code{.join_col} are present in the table, the join will fail.
+The one exception to this are \code{FIRSTONLY} tables. If a table file has the
+same number of rows as the there are individuals in the input data set
+(accounting for any filtering of data in the NONMEM control stream), it will
+assumed to be a \code{FIRSTONLY} table. In this case, the table will be joined to
+the input data by the \code{ID} column. If \code{ID} is not present in the table, it
+will be using \code{.join_col}. Note that if \emph{neither} \code{ID} or the column passed
+to \code{.join_col} are present in the table, the join will fail.
 
 Note also that, when \code{.join_col} is carried into table outputs, \strong{there is no
 need to table any other columns from the input data} as long as the
