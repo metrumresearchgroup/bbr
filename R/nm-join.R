@@ -90,7 +90,12 @@ nm_join <- function(
   df_list <- nm_tables(.mod, .files = .files)
   .d <- df_list$data
   .tbls <- df_list[2:length(df_list)]
-  if ("DV" %in% unlist(map(.tbls, names))) .d <- rename(.d, DV.DATA = .data$DV)
+  if (
+    "DV" %in% names(.d) &&
+    "DV" %in% unlist(map(.tbls, names))
+  ) {
+    .d <- rename(.d, DV.DATA = .data$DV)
+  }
   col_order <- names(.d)
 
   .join_col <- toupper(.join_col)
