@@ -88,8 +88,50 @@ test_that("nm_join() works correctly duplicate cols", {
 })
 
 test_that("nm_join(.join_col) works correctly", {
-  expect_true(1 == 1)
-  # TODO: what other col could we test joining on? ID?
+  # this test is annoyingly complex to set up because of the
+  # mechanics of how the data is pulled and the internal checks
+  # on row number. Just an explanation of why it's so long.
+  new_mod <- copy_model_from(MOD1)
+  new_mod_out <- get_output_dir(new_mod, .check_exists = F)
+  fs::dir_copy(MOD1_PATH, new_mod_out)
+
+  data_path <- "fake_data.csv"
+  full_data_path <- file.path(get_model_working_directory(MOD1), data_path)
+
+  withr::defer({
+    cleanup()
+    if(fs::file_exists(full_data_path)) fs::file_delete(full_data_path)
+  })
+
+  # create fake data
+  fake_data_df <- new_mod %>%
+    nm_data() %>%
+    mutate(BUM = .data$NUM)
+  readr::write_csv(
+    fake_data_df,
+    full_data_path
+  )
+
+  # rewrite config to point to fake data
+  readr::write_lines(
+    paste0('{"data_path":"../', data_path, '"}'),
+    get_config_path(new_mod)
+  )
+
+  # create fake table
+  new_tab <- "fake.tab"
+  readr::write_lines(c(
+    "TABLE NO. 1",
+    "bum tum",
+    paste(1:DATA_TEST_ROWS_IGNORE, "A")
+  ), file.path(new_mod_out, new_tab))
+
+  # join and check
+  test_df <- nm_join(new_mod, .files = new_tab, .join_col = "bum")
+  expect_equal(nrow(test_df), DATA_TEST_ROWS_IGNORE)
+  expect_equal(ncol(test_df), DATA_TEST_COLS + 2)
+  expect_equal(test_df$NUM, test_df$BUM)
+
 })
 
 ########################
