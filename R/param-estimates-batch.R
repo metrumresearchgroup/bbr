@@ -78,10 +78,6 @@ param_estimates_batch <- function(.path,
     }
   )
 
-  # df <- suppressSpecificWarning({
-  #   read_csv(I(res$stdout), col_types = readr::cols())
-  # }, .regexpr = "Missing column names")
-
   df <- as_tibble(fread(text = res$stdout))
 
   # throw out extra column that gets created if no models succeeded
