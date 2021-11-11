@@ -102,15 +102,14 @@ nm_par_tab <- function(.mod) {
 
 #' @describeIn nm_file Reads the input data file from a `bbi_nonmem_model` or
 #'   `bbi_nonmem_summary` object
-#' @param .sep Single character used to separate fields within a record. Passed
-#'   through to `readr::read_delim()`. Defaults to `","`.
-#' @importFrom readr read_delim cols
+#' @importFrom data.table fread
+#' @importFrom tibble as_tibble
 #' @export
-nm_data <- function(.mod, .sep = ",") {
+nm_data <- function(.mod) {
   check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
   .path <- get_data_path(.mod)
   verbose_msg(glue("Reading data file: {basename(.path)}"))
-  .d <- read_delim(.path, delim =.sep, na = ".", col_types = cols())
+  .d <- as_tibble(fread(.path, na.strings = ".", verbose = FALSE))
   names(.d) <- toupper(names(.d))
   verbose_msg(glue("  rows: {nrow(.d)}"))
   verbose_msg(glue("  cols: {ncol(.d)}"))
