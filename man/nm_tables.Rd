@@ -10,11 +10,13 @@ nm_tables(.mod, .files = nm_table_files(.mod))
 nm_table_files(.mod, .check_exists = TRUE)
 }
 \arguments{
-\item{.mod}{Either a \code{bbi_nonmem_model} or \code{bbi_nonmem_summary} object}
+\item{.mod}{A \code{bbi_nonmem_model} or \code{bbi_nonmem_summary} object, or a path to
+a NONMEM run.}
 
 \item{.files}{Character vector of file paths to table files to read in.
 Defaults to calling \code{\link[=nm_table_files]{nm_table_files()}} on \code{.mod}, which will parse all file
-names from \verb{$TABLE} blocks in the control stream.}
+names from \verb{$TABLE} blocks in the control stream. If passing manually,
+paths should be either absolute, or relative to \code{get_output_dir(.mod)}.}
 
 \item{.check_exists}{If \code{TRUE} check if files exist.}
 }
@@ -24,10 +26,16 @@ A named list of tibbles. The first element will always be named
 named for the file from which they were loaded, with \code{get_model_id(.mod)}
 (and \code{.}) removed from the beginning and end, if present. For example, a
 model named \verb{001.ctl} that generated a table named \verb{001.tab} will have the
-relevant element named \code{tab}.
+relevant element named \code{tab}. Column names in all tibbles will be converted
+to uppercase.
 }
 \description{
 Reads in the input data set and all table output files from a NONMEM run.
+This function will return a named list with all the relevant tibbles. To return
+a \emph{single tibble} with the input data joined to the relevant table outputs, use
+the related \code{\link[=nm_join]{nm_join()}} function. This function will print the number of rows
+and columns when each file is loaded. This \strong{printing can be suppressed} by
+setting \code{options(bbr.verbose = FALSE)}.
 }
 \section{Functions}{
 \itemize{
@@ -35,3 +43,6 @@ Reads in the input data set and all table output files from a NONMEM run.
 stream, and optionally check if the files exist.
 }}
 
+\seealso{
+\code{\link[=nm_join]{nm_join()}}, \code{\link[=nm_file]{nm_file()}}
+}

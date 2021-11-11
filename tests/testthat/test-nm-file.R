@@ -1,6 +1,18 @@
 
-test_that("nm_file() works [BBR-NMF-001]", {
+test_that("nm_file() works: model object [BBR-NMF-001]", {
   .d <- nm_file(MOD1, ".cov")
+  expect_equal(ncol(.d), MOD1_PARAM_COUNT+1)
+  expect_equal(nrow(.d), MOD1_PARAM_COUNT)
+})
+
+test_that("nm_file() works: summary object [BBR-NMF-001]", {
+  .d <- nm_file(SUM1, ".cov")
+  expect_equal(ncol(.d), MOD1_PARAM_COUNT+1)
+  expect_equal(nrow(.d), MOD1_PARAM_COUNT)
+})
+
+test_that("nm_file() works: file path [BBR-NMF-001]", {
+  .d <- nm_file(build_path_from_model(MOD1, ".cov"))
   expect_equal(ncol(.d), MOD1_PARAM_COUNT+1)
   expect_equal(nrow(.d), MOD1_PARAM_COUNT)
 })
@@ -25,7 +37,7 @@ test_that("nm_grd() works [BBR-NMF-003]", {
   })
 })
 
-test_that("nm_grd() works .rename=FALSE [BBR-NMF-003]", {
+test_that("nm_grd() works: .rename=FALSE [BBR-NMF-003]", {
   .d <- nm_grd(MOD1, .rename = FALSE)
   expect_equal(ncol(.d), MOD1_PARAM_COUNT_FIXED+1)
   expect_true(nrow(.d) > 5) # this changes enough, not worth testing exactly
@@ -97,3 +109,16 @@ test_that("nm_par_tab() works [BBR-NMF-007]", {
   expect_equal(ncol(.d), 6)
   expect_equal(nrow(.d), DATA_TEST_ROWS_IGNORE)
 })
+
+test_that("nm_file() errors with no 'TABLE NO' found [BBR-NMF-008]", {
+  .tf <- tempfile()
+  withr::defer(fs::file_delete(.tf))
+  readr::write_lines("a,b\n1,2\n3,4\n", .tf)
+
+  expect_error(
+    nm_file(.tf),
+    regexp = stringr::fixed("Found no 'TABLE NO...' lines in file")
+  )
+})
+
+

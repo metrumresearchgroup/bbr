@@ -47,11 +47,12 @@ through to \code{readr::read_delim()}. Defaults to \code{","}.}
 }
 \value{
 A tibble with the data from the specified file and estimation method.
+All column names will be converted to uppercase.
 }
 \description{
 Reads in a whitespace-delimited NONMEM output file (for example .grd or .ext
 or a table output) or a NONMEM input data file. Will print the number of rows
-and columns when the file is loaded. This printing can be suppressed by
+and columns when the file is loaded. This \strong{printing can be suppressed} by
 setting \code{options(bbr.verbose = FALSE)}.
 }
 \section{Functions}{
@@ -72,3 +73,6 @@ setting \code{options(bbr.verbose = FALSE)}.
 \code{bbi_nonmem_summary} object
 }}
 
+\seealso{
+\code{\link[=nm_tables]{nm_tables()}}, \code{\link[=nm_table_files]{nm_table_files()}}, \code{\link[=nm_join]{nm_join()}}
+}

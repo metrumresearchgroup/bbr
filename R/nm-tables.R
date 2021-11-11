@@ -2,23 +2,36 @@
 #' Read all tables and input data
 #'
 #' Reads in the input data set and all table output files from a NONMEM run.
+#' This function will return a named list with all the relevant tibbles. To return
+#' a _single tibble_ with the input data joined to the relevant table outputs, use
+#' the related [nm_join()] function. This function will print the number of rows
+#' and columns when each file is loaded. This **printing can be suppressed** by
+#' setting `options(bbr.verbose = FALSE)`.
 #' @return A named list of tibbles. The first element will always be named
 #'   `data` and will contain the input data set. Subsequent elements will be
 #'   named for the file from which they were loaded, with `get_model_id(.mod)`
 #'   (and `.`) removed from the beginning and end, if present. For example, a
 #'   model named `001.ctl` that generated a table named `001.tab` will have the
-#'   relevant element named `tab`.
-#' @param .mod Either a `bbi_nonmem_model` or `bbi_nonmem_summary` object
+#'   relevant element named `tab`. Column names in all tibbles will be converted
+#'   to uppercase.
+#' @param .mod A `bbi_nonmem_model` or `bbi_nonmem_summary` object, or a path to
+#'   a NONMEM run.
 #' @param .files Character vector of file paths to table files to read in.
 #'   Defaults to calling [nm_table_files()] on `.mod`, which will parse all file
-#'   names from `$TABLE` blocks in the control stream.
+#'   names from `$TABLE` blocks in the control stream. If passing manually,
+#'   paths should be either absolute, or relative to `get_output_dir(.mod)`.
 #' @importFrom purrr compact map_chr
 #' @importFrom stringr str_replace
+#' @seealso [nm_join()], [nm_file()]
 #' @export
 nm_tables <- function(
   .mod,
   .files = nm_table_files(.mod)
 ) {
+  if (inherits(.mod, "character")) {
+    checkmate::assert_string(.mod)
+    .mod <- read_model(.mod)
+  }
   check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
   checkmate::assert_character(.files)
 
