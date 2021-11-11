@@ -32,7 +32,8 @@
 #' the files where a given parameter is missing.
 #'
 #' @importFrom dplyr rename select mutate everything starts_with across
-#' @importFrom readr read_csv
+#' @importFrom data.table fread
+#' @importFrom tibble as_tibble
 #'
 #' @param .path a path to a directory containing model sudirectories for batch parameter processing.
 #' @param ... args passed through to [bbi_exec()]
@@ -77,12 +78,17 @@ param_estimates_batch <- function(.path,
     }
   )
 
-  df <- suppressSpecificWarning({
-    read_csv(I(res$stdout), col_types = readr::cols())
-  }, .regexpr = "Missing column names")
+  # df <- suppressSpecificWarning({
+  #   read_csv(I(res$stdout), col_types = readr::cols())
+  # }, .regexpr = "Missing column names")
 
+  df <- as_tibble(fread(text = res$stdout))
+
+  # throw out extra column that gets created if no models succeeded
+  if ("V4" %in% names(df)) df <- select(df, -.data$V4)
+
+  # format and return
   df %>%
-    select(-starts_with(c("...", "X"))) %>% # throw out unnamed column that gets created if no models succeeded
     rename(
       absolute_model_path = .data$dir,
       error_msg = .data$error,

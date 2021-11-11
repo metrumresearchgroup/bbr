@@ -19,7 +19,7 @@ nm_tab(.mod)
 
 nm_par_tab(.mod)
 
-nm_data(.mod, .sep = ",")
+nm_data(.mod)
 }
 \arguments{
 \item{.mod}{Either a \code{bbi_nonmem_model}, \code{bbi_nonmem_summary}, or a path to a
@@ -41,9 +41,6 @@ single file.}
 
 \item{.rename}{If \code{TRUE}, the default, will rename \code{.grd} columns to the
 relevant parameter names. Otherwise will leave column names as is.}
-
-\item{.sep}{Single character used to separate fields within a record. Passed
-through to \code{readr::read_delim()}. Defaults to \code{","}.}
 }
 \value{
 A tibble with the data from the specified file and estimation method.
