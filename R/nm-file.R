@@ -178,7 +178,7 @@ nm_file_impl <- function(.path, .est_method) {
       .path,
       na.strings = ".",
       skip = .start,
-      nrows = .end - .start - 2, # if there's a header this should be -2 but see note below
+      nrows = .end - .start - 1, # if there's a header this should be -2 but see note below
       verbose = FALSE
     ))},
     .regexpr = "Stopped early.+TABLE NO"

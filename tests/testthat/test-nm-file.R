@@ -122,4 +122,17 @@ test_that("nm_file() errors with no 'TABLE NO' found [BBR-NMF-008]", {
   )
 })
 
+test_that("nm_file() works with no header [BBR-NMF-001]", {
+  .tf <- tempfile()
+  withr::defer(fs::file_delete(.tf))
+  readr::write_lines("TABLE NO. 1\n1 2\n3 4\nTABLE NO. 2\n5 6\n7 8\n", .tf)
+
+  res1 <- nm_file(.tf, .est_method = 1)
+  res2 <- nm_file(.tf) # defaults to last
+
+  expect_equal(res1$V1, c(1,3))
+  expect_equal(res1$V2, c(2,4))
+  expect_equal(res2$V1, c(5,7))
+  expect_equal(res2$V2, c(6,8))
+})
 
