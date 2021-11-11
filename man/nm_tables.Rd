@@ -37,6 +37,15 @@ the related \code{\link[=nm_join]{nm_join()}} function. This function will print
 and columns when each file is loaded. This \strong{printing can be suppressed} by
 setting \code{options(bbr.verbose = FALSE)}.
 }
+\details{
+As described in Value, \code{nm_tables()} returns a named list of tibble. To
+return a single tibble will all of this data joined together, see
+\code{\link[=nm_join]{nm_join()}}.
+
+Because \code{nm_tables()} calls \code{\link[=nm_file]{nm_file()}} internally (and \code{\link[=nm_file]{nm_file()}} looks for
+\verb{TABLE NO} to find the beginning of the requested table), \code{nm_tables()} is
+\emph{not} compatible with the \code{NOHEADER} or \code{NOTITLE} options in \verb{$TABLE}.
+}
 \section{Functions}{
 \itemize{
 \item \code{nm_table_files}: Extract paths to table output files from NONMEM control

@@ -56,6 +56,7 @@ test_that("nm_file(.est_method) works [BBR-NMF-004]", {
   expect_equal(.d, .d2)
   expect_true(ncol(.d) == ncol(.d1))
   expect_false(nrow(.d) == nrow(.d1))
+  expect_equal(nrow(.d1), 251) # hard coded rows here
 })
 
 test_that("nm_file(.est_method) works for nm_ext() [BBR-NMF-004]", {

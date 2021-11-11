@@ -7,6 +7,16 @@
 #' the related [nm_join()] function. This function will print the number of rows
 #' and columns when each file is loaded. This **printing can be suppressed** by
 #' setting `options(bbr.verbose = FALSE)`.
+#'
+#' @details
+#' As described in Value, `nm_tables()` returns a named list of tibble. To
+#' return a single tibble will all of this data joined together, see
+#' [nm_join()].
+#'
+#' Because `nm_tables()` calls [nm_file()] internally (and [nm_file()] looks for
+#' `TABLE NO` to find the beginning of the requested table), `nm_tables()` is
+#' _not_ compatible with the `NOHEADER` or `NOTITLE` options in `$TABLE`.
+#'
 #' @return A named list of tibbles. The first element will always be named
 #'   `data` and will contain the input data set. Subsequent elements will be
 #'   named for the file from which they were loaded, with `get_model_id(.mod)`

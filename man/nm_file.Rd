@@ -55,6 +55,14 @@ or a table output) or a NONMEM input data file. Will print the number of rows
 and columns when the file is loaded. This \strong{printing can be suppressed} by
 setting \code{options(bbr.verbose = FALSE)}.
 }
+\details{
+\code{nm_file()} is called internally by the family of functions in this help doc,
+as well as by \code{\link[=nm_tables]{nm_tables()}} and \code{\link[=nm_join]{nm_join()}}.
+
+\code{nm_file()} looks for \verb{TABLE NO} to find the beginning of the requested
+table. For this reason, \code{nm_file()} (and family) are \emph{not} compatible with
+the \code{NOHEADER} or \code{NOTITLE} options in \verb{$TABLE}.
+}
 \section{Functions}{
 \itemize{
 \item \code{nm_grd}: Reads \code{.grd} file from a \code{bbi_nonmem_model} or
