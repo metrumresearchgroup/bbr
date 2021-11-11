@@ -5,6 +5,14 @@
 #' and columns when the file is loaded. This **printing can be suppressed** by
 #' setting `options(bbr.verbose = FALSE)`.
 #'
+#' @details
+#' `nm_file()` is called internally by the family of functions in this help doc,
+#' as well as by [nm_tables()] and [nm_join()].
+#'
+#' `nm_file()` looks for `TABLE NO` to find the beginning of the requested
+#' table. For this reason, `nm_file()` (and family) are _not_ compatible with
+#' the `NOHEADER` or `NOTITLE` options in `$TABLE`.
+#'
 #' @return A tibble with the data from the specified file and estimation method.
 #'   All column names will be converted to uppercase.
 #'
@@ -115,16 +123,33 @@ nm_data <- function(.mod, .sep = ",") {
 # PRIVATE HELPERS AND IMPLEMENTATION
 
 #' Implementation function for reading NONMEM files
-#' @importFrom readr read_table read_table2 cols read_lines
+#' @importFrom tibble as_tibble
+#' @importFrom data.table fread
 #' @importFrom stringr str_detect
 #' @keywords internal
 nm_file_impl <- function(.path, .est_method) {
   # read file and find top of table
   verbose_msg(glue("Reading {basename(.path)}"))
-  .txt <- read_lines(.path)
-  .est <- which(str_detect(.txt, "^ *TABLE NO"))
+
+  # get line numbers of TABLE lines
+  checkmate::assert_file_exists(.path)
+  .est <- processx::run(
+      "grep",
+      c("-n", "^ *TABLE NO", .path),
+      error_on_status = FALSE # grep returns 1 if line not found
+    )$stdout %>%
+    str_split("\n") %>%
+    unlist() %>%
+    str_replace("\\:.*", "") %>%
+    as.integer()
+  .est <- .est[!is.na(.est)]
+
   if (length(.est) == 0) {
-    stop("Found no 'TABLE NO...' lines in file. Not a NONMEM output file.")
+    stop(paste(
+      "Found no 'TABLE NO...' lines in file. Perhaps not a NONMEM output file?",
+      "Note: using NOHEADER or NOTITLE in table files can cause this. bbr::nm_file() is NOT compatible with these options.",
+      sep = "\n"
+    ))
   }
 
   if (is.null(.est_method)) {
@@ -142,19 +167,28 @@ nm_file_impl <- function(.path, .est_method) {
   checkmate::assert_integerish(.est_method, lower = 1, upper = length(.est), len = 1, null.ok = TRUE)
 
   # parse to tibble
-  .start <- .est[.est_method] + 1
+  .start <- .est[.est_method]
   .end <- if (.est_method == length(.est)) {
-    length(.txt) # end of file
+    Inf
   } else {
-    .est[.est_method+1] - 1 # line before next estimation method
+    .est[.est_method+1] # line before next estimation method
   }
 
-  .est_lines <- .txt[.start:.end]
-  .d <- if (utils::packageVersion("readr") >= package_version("2.0.0")) {
-    read_table(I(.est_lines), na = ".", col_types = cols())
-  } else {
-    read_table2(I(.est_lines), na = ".", col_types = cols())
-  }
+  .d <- suppressSpecificWarning({
+    as_tibble(fread(
+      .path,
+      na.strings = ".",
+      skip = .start,
+      nrows = .end - .start - 2, # if there's a header this should be -2 but see note below
+      verbose = FALSE
+    ))},
+    .regexpr = "Stopped early.+TABLE NO"
+  )
+  # Note: we don't check for a header, but fread handles that either way
+  # however, doing -1 above means we'll never lose a row by accident (if there's no header)
+  # and we just catch the warning that you get for doing -1 when there is a header.
+  # Note also that NOHEADER breaks nm_file() (see error ^) so this is just for NOLABEL
+
   names(.d) <- toupper(names(.d))
   verbose_msg(glue("  rows: {nrow(.d)}"))
   verbose_msg(glue("  cols: {ncol(.d)}"))
