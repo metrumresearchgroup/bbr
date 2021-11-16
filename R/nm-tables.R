@@ -13,9 +13,9 @@
 #' return a single tibble will all of this data joined together, see
 #' [nm_join()].
 #'
-#' Because `nm_tables()` calls [nm_file()] internally (and [nm_file()] looks for
-#' `TABLE NO` to find the beginning of the requested table), `nm_tables()` is
-#' _not_ compatible with the `NOHEADER` or `NOTITLE` options in `$TABLE`.
+#' Because `nm_tables()` calls [nm_file()] internally, it is _not_ compatible
+#' with multiple tables written to a single file. See "Details" in [nm_file()]
+#' for alternatives.
 #'
 #' @return A named list of tibbles. The first element will always be named
 #'   `data` and will contain the input data set. Subsequent elements will be
@@ -71,7 +71,7 @@ nm_tables <- function(
 
   # read in each table file
   for (.i in 1:length(.files)) {
-    res[[.n[.i]]] <- nm_file(.files[.i], .est_method = "fail")
+    res[[.n[.i]]] <- nm_file(.files[.i])
   }
   return(compact(res))
 }

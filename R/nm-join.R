@@ -62,11 +62,11 @@
 #' data will be renamed to `DV.DATA` and the column from the table file kept as
 #' `DV`.
 #'
-#' **`NOHEADER` and `NOTITLE` incompatibility**
+#' **Multiple tables per file incompatibility**
 #'
-#' Because `nm_join()` calls [nm_file()] internally (and [nm_file()] looks for
-#' `TABLE NO` to find the beginning of the requested table), `nm_join()` is
-#' _not_ compatible with the `NOHEADER` or `NOTITLE` options in `$TABLE`.
+#' Because `nm_tables()` calls [nm_file()] internally, it is _not_ compatible
+#' with multiple tables written to a single file. See "Details" in [nm_file()]
+#' for alternatives.
 #'
 #' @importFrom dplyr left_join right_join select
 #' @seealso [nm_tables()], [nm_table_files()], [nm_file()]

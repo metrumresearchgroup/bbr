@@ -42,9 +42,9 @@ As described in Value, \code{nm_tables()} returns a named list of tibble. To
 return a single tibble will all of this data joined together, see
 \code{\link[=nm_join]{nm_join()}}.
 
-Because \code{nm_tables()} calls \code{\link[=nm_file]{nm_file()}} internally (and \code{\link[=nm_file]{nm_file()}} looks for
-\verb{TABLE NO} to find the beginning of the requested table), \code{nm_tables()} is
-\emph{not} compatible with the \code{NOHEADER} or \code{NOTITLE} options in \verb{$TABLE}.
+Because \code{nm_tables()} calls \code{\link[=nm_file]{nm_file()}} internally, it is \emph{not} compatible
+with multiple tables written to a single file. See "Details" in \code{\link[=nm_file]{nm_file()}}
+for alternatives.
 }
 \section{Functions}{
 \itemize{

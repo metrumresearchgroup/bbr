@@ -82,11 +82,11 @@ data \emph{and} at least one of the table files, the \code{DV} column from the i
 data will be renamed to \code{DV.DATA} and the column from the table file kept as
 \code{DV}.
 
-\strong{\code{NOHEADER} and \code{NOTITLE} incompatibility}
+\strong{Multiple tables per file incompatibility}
 
-Because \code{nm_join()} calls \code{\link[=nm_file]{nm_file()}} internally (and \code{\link[=nm_file]{nm_file()}} looks for
-\verb{TABLE NO} to find the beginning of the requested table), \code{nm_join()} is
-\emph{not} compatible with the \code{NOHEADER} or \code{NOTITLE} options in \verb{$TABLE}.
+Because \code{nm_tables()} calls \code{\link[=nm_file]{nm_file()}} internally, it is \emph{not} compatible
+with multiple tables written to a single file. See "Details" in \code{\link[=nm_file]{nm_file()}}
+for alternatives.
 }
 \seealso{
 \code{\link[=nm_tables]{nm_tables()}}, \code{\link[=nm_table_files]{nm_table_files()}}, \code{\link[=nm_file]{nm_file()}}
