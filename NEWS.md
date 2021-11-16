@@ -12,7 +12,7 @@ This release adds a number of helper functions, primarily for use with NONMEM mo
 
 * Per guidance in `bbr 1.0.0` release, `replace_tags()`, `replace_bbi_args()`, `replace_based_on()`, `add_decisions()`, and `replace_decisions()` have been removed.
 
-* Added `nm_file()`, `nm_grd()`, `nm_ext()`, `nm_tab()`, `nm_par_tab()`, and `nm_data()` for reading in NONMEM files more easily. (#426)
+* Added `nm_file()`, `nm_grd()`, `nm_tab()`, `nm_par_tab()`, and `nm_data()` for reading in NONMEM files more easily. (#426)
 
 * Added `nm_join()`, `nm_tables()`, and `nm_table_files()` for reading in NONMEM tables more easily. (#429 and #430)
 

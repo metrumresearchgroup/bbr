@@ -4,7 +4,7 @@
 \alias{nm_file_impl}
 \title{Implementation function for reading NONMEM files}
 \usage{
-nm_file_impl(.path, .est_method)
+nm_file_impl(.path)
 }
 \description{
 Implementation function for reading NONMEM files

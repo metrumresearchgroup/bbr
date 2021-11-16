@@ -17,12 +17,6 @@ test_that("nm_file() works: file path [BBR-NMF-001]", {
   expect_equal(nrow(.d), MOD1_PARAM_COUNT)
 })
 
-test_that("nm_ext() works [BBR-NMF-002]", {
-  .d <- nm_ext(MOD1)
-  expect_equal(ncol(.d), MOD1_PARAM_COUNT+2)
-  expect_true(nrow(.d) > 5) # this changes enough, not worth testing exactly
-})
-
 test_that("nm_grd() works [BBR-NMF-003]", {
   skip_if_not_drone_or_metworx("test-model-summary")
 
@@ -47,47 +41,41 @@ test_that("nm_grd() works: .rename=FALSE [BBR-NMF-003]", {
   ))
 })
 
-test_that("nm_file(.est_method) works [BBR-NMF-004]", {
+test_that("nm_file() with multiple tables warns and returns NULL [BBR-NMF-004]", {
   .m <- read_model(file.path(MODEL_DIR_X,"example2_saemimp"))
-  .d <- nm_file(.m, ".ext")
-  .d1 <- nm_file(.m, ".ext", 1)
-  .d2 <- nm_file(.m, ".ext", 2)
-
-  expect_equal(.d, .d2)
-  expect_true(ncol(.d) == ncol(.d1))
-  expect_false(nrow(.d) == nrow(.d1))
-})
-
-test_that("nm_file(.est_method) works for nm_ext() [BBR-NMF-004]", {
-  .m <- read_model(file.path(MODEL_DIR_X,"example2_saemimp"))
-  .d <- nm_ext(.m)
-  .d1 <- nm_ext(.m, 1)
-  .d2 <- nm_ext(.m, 2)
-
-  expect_equal(.d, .d2)
-  expect_true(ncol(.d) == ncol(.d1))
-  expect_false(nrow(.d) == nrow(.d1))
-})
-
-test_that("nm_file(.est_method) errors with invalid .est_method [BBR-NMF-004]", {
-  .m <- read_model(file.path(MODEL_DIR_X,"example2_saemimp"))
-  expect_error(nm_ext(.m, 3))
-})
-
-test_that("nm_file(.est_method) fails with two tables in a file [BBR-NMF-004]", {
-  withr::defer(cleanup())
-  new_mod <- copy_model_from(MOD1)
-  fs::dir_create(get_output_dir(new_mod, .check_exists = FALSE))
-
-  # create a double .tab file
-  .t <- readr::read_lines(build_path_from_model(MOD1, ".tab"))
-  readr::write_lines(.t, build_path_from_model(new_mod, ".tab"))
-  readr::write_lines(.t, build_path_from_model(new_mod, ".tab"), append = TRUE)
-  expect_warning({
-    .d <- nm_file(new_mod, .suffix = ".tab", .est_method = "fail")
-  }, regexp = "only one table per file")
+  expect_warning(
+    .d <- nm_file(.m, ".ext"),
+    regexp = "does not support files with multiple tables"
+  )
   expect_null(.d)
 })
+
+test_that("nm_file() with multiple tables swallows fread cleanup warning [BBR-NMF-004]", {
+  .m <- read_model(file.path(MODEL_DIR_X,"example2_saemimp"))
+  expect_warning(
+    .d <- nm_file(.m, ".ext"),
+    regexp = "does not support files with multiple tables"
+  )
+  expect_null(.d)
+
+  # run again on a different file to check that fread() _doesn't_ raise cleanup warning
+  .d <- nm_file(MOD1, ".cov")
+  expect_equal(ncol(.d), MOD1_PARAM_COUNT+1)
+  expect_equal(nrow(.d), MOD1_PARAM_COUNT)
+
+  # run again to see that other warnings come through
+  .ff <- build_path_from_model(MOD1, ".fake")
+  readr::write_lines("TABLE NO. 1\na b\n1 2 3\n", .ff)
+  withr::defer(if(fs::file_exists(.ff)) fs::file_delete(.ff))
+  expect_warning(
+    .d <- nm_file(.ff),
+    regexp = "Detected 2 column names but the data has 3 columns"
+  )
+  expect_equal(ncol(.d), 3)
+  expect_equal(nrow(.d), 1)
+})
+
+
 
 test_that("nm_data() works [BBR-NMF-005]", {
   expect_message({
@@ -109,16 +97,3 @@ test_that("nm_par_tab() works [BBR-NMF-007]", {
   expect_equal(ncol(.d), 6)
   expect_equal(nrow(.d), DATA_TEST_ROWS_IGNORE)
 })
-
-test_that("nm_file() errors with no 'TABLE NO' found [BBR-NMF-008]", {
-  .tf <- tempfile()
-  withr::defer(fs::file_delete(.tf))
-  readr::write_lines("a,b\n1,2\n3,4\n", .tf)
-
-  expect_error(
-    nm_file(.tf),
-    regexp = stringr::fixed("Found no 'TABLE NO...' lines in file")
-  )
-})
-
-

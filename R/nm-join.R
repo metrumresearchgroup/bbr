@@ -62,6 +62,12 @@
 #' data will be renamed to `DV.DATA` and the column from the table file kept as
 #' `DV`.
 #'
+#' **Multiple tables per file incompatibility**
+#'
+#' Because `nm_tables()` calls [nm_file()] internally, it is _not_ compatible
+#' with multiple tables written to a single file. See "Details" in [nm_file()]
+#' for alternatives.
+#'
 #' @importFrom dplyr left_join right_join select
 #' @seealso [nm_tables()], [nm_table_files()], [nm_file()]
 #' @export

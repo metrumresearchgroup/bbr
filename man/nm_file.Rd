@@ -3,23 +3,20 @@
 \name{nm_file}
 \alias{nm_file}
 \alias{nm_grd}
-\alias{nm_ext}
 \alias{nm_tab}
 \alias{nm_par_tab}
 \alias{nm_data}
 \title{Read NONMEM files}
 \usage{
-nm_file(.mod, .suffix = NULL, .est_method = NULL, ...)
+nm_file(.mod, .suffix = NULL, ...)
 
-nm_grd(.mod, .est_method = NULL, .rename = TRUE)
-
-nm_ext(.mod, .est_method = NULL)
+nm_grd(.mod, .rename = TRUE)
 
 nm_tab(.mod)
 
 nm_par_tab(.mod)
 
-nm_data(.mod, .sep = ",")
+nm_data(.mod)
 }
 \arguments{
 \item{.mod}{Either a \code{bbi_nonmem_model}, \code{bbi_nonmem_summary}, or a path to a
@@ -30,20 +27,10 @@ will be passed through to \code{\link[=build_path_from_model]{build_path_from_mo
 Will be appended \emph{as is} so, if passing a file extension, be sure to included the leading \code{"."}.
 See examples.}
 
-\item{.est_method}{If \code{NULL}, the default, pulls the data from the final
-estimation method. If an integer, pulls the data from that estimation
-method. Can also pass \code{"fail"} in which case a warning will be raised
-and \code{NULL} returned if more than one table is found in the file. This
-is useful for table outputs that should not have multiple tables in a
-single file.}
-
 \item{...}{arguments passed through to methods. (Currently none.)}
 
 \item{.rename}{If \code{TRUE}, the default, will rename \code{.grd} columns to the
 relevant parameter names. Otherwise will leave column names as is.}
-
-\item{.sep}{Single character used to separate fields within a record. Passed
-through to \code{readr::read_delim()}. Defaults to \code{","}.}
 }
 \value{
 A tibble with the data from the specified file and estimation method.
@@ -55,12 +42,20 @@ or a table output) or a NONMEM input data file. Will print the number of rows
 and columns when the file is loaded. This \strong{printing can be suppressed} by
 setting \code{options(bbr.verbose = FALSE)}.
 }
+\details{
+\code{nm_file()} is called internally by the family of functions in this help doc,
+as well as by \code{\link[=nm_tables]{nm_tables()}} and \code{\link[=nm_join]{nm_join()}}.
+
+\code{nm_file()} assumes there is only one table per file and therefore
+\code{nm_file()} (and family) are \emph{not} compatible with files that have multiple
+tables, for example an \code{.ext} file for a model with multiple estimation
+methods or a table file from a model using \verb{$SIM}. For these kinds of files,
+consider using
+\href{https://metrumresearchgroup.github.io/PKPDmisc/reference/read_nonmem.html}{PKPDmisc::read_nonmem}.
+}
 \section{Functions}{
 \itemize{
 \item \code{nm_grd}: Reads \code{.grd} file from a \code{bbi_nonmem_model} or
-\code{bbi_nonmem_summary} object
-
-\item \code{nm_ext}: Reads \code{.ext} file from a \code{bbi_nonmem_model} or
 \code{bbi_nonmem_summary} object
 
 \item \code{nm_tab}: Reads \verb{\{get_model_id(.mod)\}.tab} file from a

@@ -7,6 +7,16 @@
 #' the related [nm_join()] function. This function will print the number of rows
 #' and columns when each file is loaded. This **printing can be suppressed** by
 #' setting `options(bbr.verbose = FALSE)`.
+#'
+#' @details
+#' As described in Value, `nm_tables()` returns a named list of tibble(s). To
+#' return a single tibble will all of this data joined together, see
+#' [nm_join()].
+#'
+#' Because `nm_tables()` calls [nm_file()] internally, it is _not_ compatible
+#' with multiple tables written to a single file. See "Details" in [nm_file()]
+#' for alternatives.
+#'
 #' @return A named list of tibbles. The first element will always be named
 #'   `data` and will contain the input data set. Subsequent elements will be
 #'   named for the file from which they were loaded, with `get_model_id(.mod)`
@@ -61,7 +71,7 @@ nm_tables <- function(
 
   # read in each table file
   for (.i in 1:length(.files)) {
-    res[[.n[.i]]] <- nm_file(.files[.i], .est_method = "fail")
+    res[[.n[.i]]] <- nm_file(.files[.i])
   }
   return(compact(res))
 }
