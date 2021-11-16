@@ -38,7 +38,7 @@ and columns when each file is loaded. This \strong{printing can be suppressed} b
 setting \code{options(bbr.verbose = FALSE)}.
 }
 \details{
-As described in Value, \code{nm_tables()} returns a named list of tibble. To
+As described in Value, \code{nm_tables()} returns a named list of tibble(s). To
 return a single tibble will all of this data joined together, see
 \code{\link[=nm_join]{nm_join()}}.
 

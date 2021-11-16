@@ -9,7 +9,7 @@
 #' setting `options(bbr.verbose = FALSE)`.
 #'
 #' @details
-#' As described in Value, `nm_tables()` returns a named list of tibble. To
+#' As described in Value, `nm_tables()` returns a named list of tibble(s). To
 #' return a single tibble will all of this data joined together, see
 #' [nm_join()].
 #'

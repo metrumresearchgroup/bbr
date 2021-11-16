@@ -137,10 +137,10 @@ nm_file_impl <- function(.path) {
         glue("{.path} appears to contain multiple tables and will be skipped."),
         sep = "\n"
       )
-      invokeRestart("muffleWarning")
     } else {
       warning(.w)
     }
+    invokeRestart("muffleWarning")
   })
 
   # if found multiple tables, raise custom warning and return NULL
