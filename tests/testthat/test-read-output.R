@@ -84,6 +84,10 @@ withr::with_file(OUTPUT_FILE, {
   }
 })
 
+test_that("tail_output() doesn't error with finished NONMEM run [BBR-ROT-003]", {
+  expect_message(tail_output(MOD1), regexp = "already finished running")
+})
+
 # check .lst
 .test_cases <- list(
   list(.test_arg = OUTPUT_DIR, .test_name = "tail_lst() character dir"),

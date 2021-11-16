@@ -82,7 +82,25 @@ tail_output.character <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .re
 #' @export
 tail_output.bbi_nonmem_model <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE, ...) {
   .file <- file.path(get_output_dir(.mod), "OUTPUT")
-  check_file(.file, .head, .tail, .print, .return, ...)
+  tryCatch(
+    check_file(.file, .head, .tail, .print, .return, ...),
+    error = function(err) {
+      if (!stringr::str_detect(err$message, "does not exist")) {
+        stop(err)
+      }
+
+      status <- bbi_nonmem_model_status(.mod)
+      if (status == "Finished Running") {
+        message("Model already finished running")
+      } else if (status == "Incomplete Run") {
+        message("Model running but OUTPUT file doesn't exist (check back)")
+      } else {
+        # Given the get_output_dir() call upstream, "Not Run" state should be
+        # inaccessible. Treat it as a bug.
+        stop(err)
+      }
+    }
+  )
 }
 
 
