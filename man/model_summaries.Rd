@@ -50,7 +50,10 @@ See details section for more info on these flags.}
 All dispatches will return a list of \verb{bbi_\{.model_type\}_summary} objects.
 }
 \description{
-Run multiple \code{\link[=model_summary]{model_summary()}} calls in batch.
+Run multiple \code{\link[=model_summary]{model_summary()}} calls in batch. Note: if you need to pull in
+\emph{only} the parameter estimates for a large number of NONMEM models, consider
+using \code{\link[=param_estimates_batch]{param_estimates_batch()}} instead, as it will be faster than
+\code{model_summaries()} for this purpose.
 }
 \details{
 The summary call will error if it does not find certain files in the output folder.
@@ -75,5 +78,5 @@ Additionally, \strong{if you have renamed your \code{.ext} file, you will need t
 }}
 
 \seealso{
-\code{\link[=model_summary]{model_summary()}}, \code{\link[=summary_log]{summary_log()}}
+\code{\link[=model_summary]{model_summary()}}, \code{\link[=summary_log]{summary_log()}}, \code{\link[=param_estimates_batch]{param_estimates_batch()}}
 }

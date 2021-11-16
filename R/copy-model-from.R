@@ -56,6 +56,7 @@
 #' # create model file at /path/to/100.1.ctl and YAML at /path/to/100.1.yaml
 #' copy_model_from(mod1, 100.1, "a period is okay")
 #' }
+#' @seealso [new_model()], [update_model_id()]
 #' @export
 copy_model_from <- function(
   .parent_mod,

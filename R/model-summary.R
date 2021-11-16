@@ -13,7 +13,9 @@
 #' path to [summary_log()] to summarize all models in that directory (and, by
 #' default, all directories below it). Note: the summary object does _not_
 #' contain the covariance or correlation matrices, but these can be retrieved
-#' with [cov_cor()].
+#' with [cov_cor()]. Also, if you need to pull in _only_ the parameter estimates
+#' for a large number of NONMEM models, consider using
+#' [param_estimates_batch()].
 #'
 #' @details
 #'
@@ -126,7 +128,7 @@
 #' Additionally, if you have renamed the `.ext` file from its default of `<root>.ext` you will need to pass
 #' `ext_file = "NEWNAME"` to `.bbi_args`.
 #'
-#' @seealso [model_summaries()], [summary_log()], [cov_cor()]
+#' @seealso [model_summaries()], [summary_log()], [cov_cor()], [param_estimates()]
 #' @param .mod Model to summarize.
 #' @param .bbi_args A named list specifying arguments to pass to bbi formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`.
 #' See [print_bbi_args()] for full list of options.

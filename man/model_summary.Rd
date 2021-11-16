@@ -27,7 +27,9 @@ to summarize multiple models, you can pass a list of
 path to \code{\link[=summary_log]{summary_log()}} to summarize all models in that directory (and, by
 default, all directories below it). Note: the summary object does \emph{not}
 contain the covariance or correlation matrices, but these can be retrieved
-with \code{\link[=cov_cor]{cov_cor()}}.
+with \code{\link[=cov_cor]{cov_cor()}}. Also, if you need to pull in \emph{only} the parameter estimates
+for a large number of NONMEM models, consider using
+\code{\link[=param_estimates_batch]{param_estimates_batch()}}.
 }
 \details{
 \strong{NONMEM}
@@ -151,5 +153,5 @@ Additionally, if you have renamed the \code{.ext} file from its default of \verb
 }}
 
 \seealso{
-\code{\link[=model_summaries]{model_summaries()}}, \code{\link[=summary_log]{summary_log()}}, \code{\link[=cov_cor]{cov_cor()}}
+\code{\link[=model_summaries]{model_summaries()}}, \code{\link[=summary_log]{summary_log()}}, \code{\link[=cov_cor]{cov_cor()}}, \code{\link[=param_estimates]{param_estimates()}}
 }

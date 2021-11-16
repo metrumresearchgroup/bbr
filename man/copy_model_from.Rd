@@ -94,3 +94,6 @@ copy_model_from(mod1, 3, "numeric input works")
 copy_model_from(mod1, 100.1, "a period is okay")
 }
 }
+\seealso{
+\code{\link[=new_model]{new_model()}}, \code{\link[=update_model_id]{update_model_id()}}
+}
