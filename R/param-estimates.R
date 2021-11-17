@@ -5,8 +5,11 @@
 
 #' Parses parameter estimates table
 #'
-#' Returns a tibble containing parameter estimates from a `bbi_{.model_type}_summary` object.
-#' Details about the tibble that is returned are in the return value section below.
+#' Returns a tibble containing parameter estimates from a
+#' `bbi_{.model_type}_summary` object. Details about the tibble that is returned
+#' are in the return value section below. Note: if you need to pull in the
+#' parameter estimates for a large number of NONMEM models at once, consider
+#' using [param_estimates_batch()] instead.
 #'
 #' @details
 #' Note that **Bayesian methods are not yet supported** by this function. Creating a parameter table
@@ -29,7 +32,7 @@
 #' can be found in `bbi_nonmem_summary$shrinkage_details`.
 #'
 #'
-#' @seealso [param_labels()] [apply_indices()]
+#' @seealso [param_estimates_batch()], [model_summary()], [param_labels()], [apply_indices()]
 #' @param .summary A `bbi_{.model_type}_summary` object.
 #' @export
 param_estimates <- function(.summary) {
