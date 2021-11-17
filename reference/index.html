@@ -186,6 +186,12 @@
       </tr><tr>
         
         <td>
+          <p><code><a href="update_model_id.html">update_model_id()</a></code> </p>
+        </td>
+        <td><p>Update model ID (run number) in the control stream</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="model_diff.html">model_diff()</a></code> </p>
         </td>
         <td><p>Compare model files between models</p></td>
@@ -236,7 +242,7 @@
     </tbody><tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-model-summary" class="hasAnchor"><a href="#section-model-summary" class="anchor"></a>Model summary</h2>
+          <h2 id="section-model-summary-and-outputs" class="hasAnchor"><a href="#section-model-summary-and-outputs" class="anchor"></a>Model summary and outputs</h2>
           <p class="section-desc"></p>
         </th>
       </tr>
@@ -266,21 +272,39 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="run_log.html">run_log()</a></code> </p>
+          <p><code><a href="param_estimates_batch.html">param_estimates_batch()</a></code> </p>
         </td>
-        <td><p>Create tibble summarizing all model runs</p></td>
+        <td><p>Batch Processing of Parameter Estimates</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="summary_log.html">summary_log()</a></code> <code><a href="summary_log.html">add_summary()</a></code> </p>
+          <p><code><a href="nm_file.html">nm_file()</a></code> <code><a href="nm_file.html">nm_grd()</a></code> <code><a href="nm_file.html">nm_tab()</a></code> <code><a href="nm_file.html">nm_par_tab()</a></code> <code><a href="nm_file.html">nm_data()</a></code> </p>
         </td>
-        <td><p>Create a tibble from <code>model_summaries()</code> data</p></td>
+        <td><p>Read NONMEM files</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="config_log.html">config_log()</a></code> <code><a href="config_log.html">add_config()</a></code> </p>
+          <p><code><a href="nm_join.html">nm_join()</a></code> </p>
         </td>
-        <td><p>Parse bbi configs to log</p></td>
+        <td><p>Return a single data frame with model output and input data</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="nm_tables.html">nm_tables()</a></code> <code><a href="nm_tables.html">nm_table_files()</a></code> </p>
+        </td>
+        <td><p>Read all tables and input data</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="cov_cor.html">cov_cor()</a></code> </p>
+        </td>
+        <td><p>NONMEM Covariance and Correlation Matrices</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="check_cor_threshold.html">check_cor_threshold()</a></code> </p>
+        </td>
+        <td><p>Check for high correlations</p></td>
       </tr><tr>
         
         <td>
@@ -299,6 +323,37 @@
           <p><code><a href="apply_indices.html">apply_indices()</a></code> <code><a href="apply_indices.html">block()</a></code> </p>
         </td>
         <td><p>Add parameter indices to a label tibble</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-summary-log-tables" class="hasAnchor"><a href="#section-summary-log-tables" class="anchor"></a>Summary log tables</h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="run_log.html">run_log()</a></code> </p>
+        </td>
+        <td><p>Create tibble summarizing all model runs</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="summary_log.html">summary_log()</a></code> <code><a href="summary_log.html">add_summary()</a></code> </p>
+        </td>
+        <td><p>Create a tibble from <code>model_summaries()</code> data</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="config_log.html">config_log()</a></code> <code><a href="config_log.html">add_config()</a></code> </p>
+        </td>
+        <td><p>Parse bbi configs to log</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -342,6 +397,12 @@
           <p><code><a href="modify_bbi_args.html">add_bbi_args()</a></code> <code><a href="modify_bbi_args.html">replace_all_bbi_args()</a></code> </p>
         </td>
         <td><p>Modify bbi_args on a model object</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="modify_model_field.html">modify_model_field()</a></code> <code><a href="modify_model_field.html">replace_model_field()</a></code> </p>
+        </td>
+        <td><p>Modify field in model object</p></td>
       </tr><tr>
         
         <td>
@@ -449,12 +510,6 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="check_nonmem_table_output.html">check_nonmem_table_output()</a></code> <code><a href="check_nonmem_table_output.html">check_grd()</a></code> <code><a href="check_nonmem_table_output.html">check_ext()</a></code> </p>
-        </td>
-        <td><p>Check NONMEM output files</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="check_output_dir.html">check_output_dir()</a></code> </p>
         </td>
         <td><p>Check output directory</p></td>
@@ -476,12 +531,6 @@
           <p><code><a href="new_ext.html">new_ext()</a></code> <code><a href="new_ext.html">ctl_ext()</a></code> <code><a href="new_ext.html">mod_ext()</a></code> <code><a href="new_ext.html">yaml_ext()</a></code> </p>
         </td>
         <td><p>Change file extension</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="plot_nonmem_table_df.html">plot_nonmem_table_df()</a></code> <code><a href="plot_nonmem_table_df.html">plot_grd()</a></code> <code><a href="plot_nonmem_table_df.html">plot_ext()</a></code> </p>
-        </td>
-        <td><p>Plot NONMEM output files</p></td>
       </tr><tr>
         
         <td>

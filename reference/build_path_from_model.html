@@ -185,10 +185,11 @@ Does <em>not</em> check whether the file exists.</p>
     <pre class="examples"><span class='r-in'><span class='va'>.mod</span> <span class='op'>&lt;-</span> <span class='fu'><a href='read_model.html'>read_model</a></span><span class='op'>(</span></span>
 <span class='r-in'>  <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"model"</span>, <span class='st'>"nonmem"</span>, <span class='st'>"basic"</span>, <span class='st'>"1"</span>, package <span class='op'>=</span> <span class='st'>"bbr"</span><span class='op'>)</span></span>
 <span class='r-in'><span class='op'>)</span></span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in read_model(system.file("model", "nonmem", "basic", "1", package = "bbr")):</span> Assertion on 'yaml_path' failed: File does not exist: '/data/home/sethg/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/1.yaml'.</span>
 <span class='r-in'><span class='fu'>build_path_from_model</span><span class='op'>(</span><span class='va'>.mod</span>, <span class='st'>".lst"</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "/data/home/sethg/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/1/1.lst"</span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in build_path_from_model(.mod, ".lst"):</span> object '.mod' not found</span>
 <span class='r-in'><span class='fu'>build_path_from_model</span><span class='op'>(</span><span class='va'>.mod</span>, <span class='st'>"-standata.R"</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "/data/home/sethg/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/1/1-standata.R"</span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in build_path_from_model(.mod, "-standata.R"):</span> object '.mod' not found</span>
 <span class='r-in'></span>
 </pre>
   </div>
