@@ -12,7 +12,7 @@ This release adds a number of helper functions, primarily for use with NONMEM mo
 
 * `cov_cor()` and `check_cor_threshold()` for pulling in covariance and correlation matrices from NONMEM `.cov` and `.cor` files. (#414)
 
-* `copy_model_from(.new_model)` is now an optional argument. By default, it now tries to increment to the next available integer in the destination directory. (#424)
+* Passing the `.new_model` argument to `copy_model_from()` is now optional. By default, it now tries to increment to the next available integer in the destination directory (the directory containing the parent model). (#424)
 
 * `update_model_id()` for updating mentions of the parent model in the child model's control stream. (#417)
 
