@@ -2,7 +2,9 @@
 #' @description Identifies system running and pulls the relevant tarball for the
 #'   current release of bbi from GitHub, and then installs it in the directory
 #'   passed to `.dir`. If used in an interactive session, will open an
-#'   installation menu confirming the installed version.
+#'   installation menu confirming the installed version. This function will
+#'   print information about the installed version. This **printing can be
+#'   suppressed** by setting `options(bbr.verbose = FALSE)`.
 #'
 #' @details If nothing is passed to the `.path` argument, `use_bbi()` will
 #' attempt to find a valid path for installation. The following decision
@@ -33,13 +35,27 @@
 #' @importFrom glue glue_collapse
 #' @importFrom cli rule
 #'
-#' @param .path absolute path to install bbi to. See Details section for defaults, if nothing is passed.
-#' @param .version version of bbi to install. Must pass a character scalar corresponding to a tag found in `https://github.com/metrumresearchgroup/bbi/releases`
-#' @param .force If `FALSE`, the default, skips installation if requested version and local version are the same. If `TRUE` forces installation if it will be the same version.
-#' @param .quiet If `TRUE`, suppresses output printed to the console. `FALSE` by default.
+#' @param .path absolute path to install bbi to. See Details section for
+#'   defaults, if nothing is passed.
+#' @param .version version of bbi to install. Must pass a character scalar
+#'   corresponding to a tag found in
+#'   `https://github.com/metrumresearchgroup/bbi/releases`
+#' @param .force If `FALSE`, the default, skips installation if requested
+#'   version and local version are the same. If `TRUE` forces installation if it
+#'   will be the same version.
+#' @param .quiet **Deprecated.** Use `options("bbr.verbose")` instead to control
+#'   printing. Defaults to `NULL`, which reads `!getOption("bbr.verbose")`. If
+#'   `TRUE`, suppresses output printed to the console.
 #' @return character
 #' @export
-use_bbi <- function(.path = NULL, .version = "latest", .force = FALSE, .quiet = FALSE){
+use_bbi <- function(.path = NULL, .version = "latest", .force = FALSE, .quiet = NULL){
+
+  if (!is.null(.quiet)) {
+    deprecate_warn("1.5.0", "use_bbi(.quiet)", details = "Please set `options('bbr.verbose' = FALSE)` instead.")
+    checkmate::assert_logical(.quiet, len = 1)
+  } else {
+    .quiet <- !getOption("bbr.verbose")
+  }
 
   this_os <- check_os()
 
@@ -118,10 +134,7 @@ bbi_current_release <- function(){
 
 #' Private implementation function for installing bbi with interactive menu
 #' @param .body Character vector of installation commands to run with `system`
-#' @param .path path to install bbi to
-#' @param .version version of bbi to install. Must pass a character scalar corresponding to a tag found in `https://github.com/metrumresearchgroup/bbi/releases`
-#' @param .force If `FALSE`, the default, skips installation if requested version and local version are the same. If `TRUE` forces installation if it will be the same version.
-#' @param .quiet If `TRUE`, suppresses output printed to the console. `FALSE` by default.
+#' @inheritParams use_bbi
 #' @keywords internal
 install_menu <- function(.body, .path, .version, .force, .quiet){
 
@@ -140,7 +153,7 @@ install_menu <- function(.body, .path, .version, .force, .quiet){
     # like specifiying its a test environment, but a user could also want to generally suppress interactivity for
     # automatted build pipelines etc.
     if (interactive() && is.null(getOption('bbr.suppress_interactivity'))) {
-      version_message(local_v = local_v, release_v = release_v)
+      if (!isTRUE(.quiet)) version_message(local_v = local_v, release_v = release_v)
 
       print(glue::glue(cli::rule(left = cli::col_red('Do you want to install version {release_v} at {.dest_bbi_path}?'),line = 2)))
 
@@ -155,7 +168,7 @@ install_menu <- function(.body, .path, .version, .force, .quiet){
   }
 
   add_to_path_message(.dest_bbi_path)
-  version_message(local_v = local_v, release_v = release_v)
+  if (!isTRUE(.quiet)) version_message(local_v = local_v, release_v = release_v)
 }
 
 
@@ -336,7 +349,6 @@ bbi_version <- function(.bbi_exe_path = getOption('bbr.bbi_exe_path')){
 #' @param release_v Character scalar for version number of current release
 #' @keywords internal
 version_message <- function(local_v, release_v){
-
   if (local_v == "") {
     cat(cli::col_red("No version currently installed "))
   } else{

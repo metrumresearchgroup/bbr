@@ -6,7 +6,7 @@ create_rlg_models()
 # teardown
 withr::defer(cleanup())
 
-test_that("run_log() errors with malformed YAML", {
+test_that("run_log() errors with malformed YAML [BBR-RNLG-001]", {
   temp_dir <- file.path(tempdir(), "run_log_malformed_yaml_test")
   fs::dir_create(temp_dir)
   temp_yaml <- fs::file_copy(file.path(REF_DIR, "test-yaml", "zz_fail_no_modtype.yaml"), temp_dir)
@@ -22,14 +22,14 @@ test_that("run_log() errors with malformed YAML", {
   )
 })
 
-test_that("run_log returns NULL and warns when no YAML found", {
+test_that("run_log returns NULL and warns when no YAML found [BBR-RNLG-002]", {
   log_df <- expect_warning(run_log(file.path(REF_DIR, "read-output-refs")), regexp = "Found no valid model YAML files in")
   expect_true(inherits(log_df, "tbl"))
   expect_equal(nrow(log_df), 0)
   expect_equal(ncol(log_df), 0)
 })
 
-test_that("run_log matches reference", {
+test_that("run_log matches reference [BBR-RNLG-003]", {
   log_df <- run_log(MODEL_DIR)
   expect_equal(nrow(log_df), RUN_LOG_ROWS)
   expect_equal(ncol(log_df), RUN_LOG_COLS)
@@ -53,8 +53,7 @@ test_that("run_log matches reference", {
     !!YAML_DESCRIPTION  := "character",
     !!YAML_BBI_ARGS     := "list",
     !!YAML_BASED_ON     := "list",
-    !!YAML_TAGS         := "list",
-    !!YAML_DECISIONS    := "list",
+    !!YAML_TAGS         := "list"
   ) %>% as.list()
 
   for (.n in names(run_log_classes_ref)) {
@@ -72,7 +71,7 @@ fs::dir_create(LEVEL2_DIR)
 copy_model_from(MOD1, file.path(LEVEL2_SUBDIR, MOD_ID), "level 2 copy of 1.yaml", .inherit_tags = TRUE)
 fs::dir_copy(MOD1_PATH, LEVEL2_MOD)
 
-test_that("run_log() works correctly with nested dirs", {
+test_that("run_log() works correctly with nested dirs [BBR-RNLG-004]", {
   log_df <- run_log(MODEL_DIR)
   expect_equal(nrow(log_df), RUN_LOG_ROWS+1)
   expect_equal(ncol(log_df), RUN_LOG_COLS)

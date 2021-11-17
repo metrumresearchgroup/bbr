@@ -18,7 +18,10 @@
 
 \item{...}{Other arguments passed on to individual methods.}
 
-\item{.call_limit}{Integer scalar for the max number of characters to print before truncating the call string.}
+\item{.call_limit}{Integer scalar for the max number of characters to print
+before truncating the call string. This is compared with the entire length,
+but only the positional arguments between the executable path and the first
+long option will be truncated.}
 
 \item{.digits}{Number of significant digits to use for parameter table. Defaults to 3.}
 

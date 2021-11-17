@@ -8,7 +8,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   # extracting things from summary object
   #########################################
 
-  test_that("model_summary.bbi_nonmem_model produces expected output", {
+  test_that("model_summary.bbi_nonmem_model produces expected output [BBR-SUM-001]", {
 
     # get summary
     sum1 <- MOD1 %>% model_summary()
@@ -26,7 +26,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   # passing file flags
   #####################
 
-  test_that("model_summary() works with custom .ext file", {
+  test_that("model_summary() works with custom .ext file [BBR-SUM-002]", {
     on.exit({
       fs::dir_delete(NEW_MOD2)
       fs::file_delete(ctl_ext(NEW_MOD2))
@@ -43,7 +43,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     fs::file_move(file.path(NEW_MOD2, "1.ext"), file.path(NEW_MOD2, "EXT"))
 
     # errors without the flag
-    expect_error(model_summary(mod2), "No file present at.*2/1\\.ext")
+    expect_error(model_summary(mod2), "[Nn]o file present at.*2/1\\.ext")
 
     # works correctly with ext_file flag added
     sum2 <- model_summary(mod2, .bbi_args = list(ext_file = "EXT"))
@@ -75,7 +75,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     list(ext = "shk", missing = "shrinkage_details")
   )
   for (.tc in TEST_CASES) {
-    test_that(glue::glue("model_summary() works with no .{.tc$ext} file"), {
+    test_that(glue::glue("model_summary() works with no .{.tc$ext} file [BBR-SUM-003]"), {
       on.exit({
         fs::dir_delete(NEW_MOD2)
         fs::file_delete(ctl_ext(NEW_MOD2))
@@ -91,7 +91,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       fs::file_delete(file.path(NEW_MOD2, paste0("1.", .tc$ext)))
 
       # errors without the flag
-      expect_error(model_summary(mod2), glue::glue("No file present at.*2/1\\.{.tc$ext}"))
+      expect_error(model_summary(mod2), glue::glue("[Nn]o file present at.*2/1\\.{.tc$ext}"))
 
       # works correctly with flag added
       args_list <- list()
@@ -130,7 +130,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   # errors when expected
   #######################
 
-  test_that("model_summary() fails predictably if it can't find some parts (i.e. model isn't finished)", {
+  test_that("model_summary() fails predictably if it can't find some parts (i.e. model isn't finished) [BBR-SUM-004]", {
     on.exit({
       fs::dir_delete(NEW_MOD2)
       fs::file_delete(ctl_ext(NEW_MOD2))
@@ -150,7 +150,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_error(model_summary(mod2), regexp = NOT_FINISHED_ERR_MSG)
   })
 
-  test_that("model_summary() fails predictably if no .lst file present", {
+  test_that("model_summary() fails predictably if no .lst file present [BBR-SUM-005]", {
     on.exit({
       fs::dir_delete(NEW_MOD2)
       fs::file_delete(ctl_ext(NEW_MOD2))

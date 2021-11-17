@@ -1,6 +1,9 @@
 #' Summarize multiple models in batch
 #'
-#' Run multiple [model_summary()] calls in batch.
+#' Run multiple [model_summary()] calls in batch. Note: if you need to pull in
+#' _only_ the parameter estimates for a large number of NONMEM models, consider
+#' using [param_estimates_batch()] instead, as it will be faster than
+#' `model_summaries()` for this purpose.
 #'
 #' @details
 #' The summary call will error if it does not find certain files in the output folder.
@@ -23,7 +26,7 @@
 #' @param .fail_flags Same as `.bbi_args` except these are used _only_ when a [model_summary()] call fails.
 #' In that case, flags are appended to anything in `.bbi_args` and the summary is tried again.
 #' See details section for more info on these flags.
-#' @seealso [model_summary()], [summary_log()]
+#' @seealso [model_summary()], [summary_log()], [param_estimates_batch()]
 #' @inheritParams model_summary
 #' @export
 model_summaries <- function(

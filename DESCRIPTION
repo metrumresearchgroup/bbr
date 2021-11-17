@@ -1,7 +1,7 @@
 Type: Package
 Package: bbr
 Title: R package for bbi
-Version: 1.1.4
+Version: 1.2.0
 Authors@R: 
     c(person(given = "Devin",
              family = "Pastoor",
@@ -26,7 +26,11 @@ Authors@R:
       person(given = "Tim",
              family = "Waterhouse",
              role = "aut",
-             email = "timw@metrumrg.com"))
+             email = "timw@metrumrg.com"),
+      person(given = "Kyle T",
+           family = "Baron",
+           role = c("aut"),
+           email = "kyleb@metrumrg.com"))
 Description: R package for making calls to bbi for running
     NONMEM and other models. Also manages model metadata, workflow, and
     run logs.
@@ -36,12 +40,11 @@ Depends:
 Imports: 
     checkmate,
     cli,
+    data.table,
     digest,
     diffobj,
-    dplyr (>= 0.8.0),
-    forcats,
+    dplyr (>= 1.0.0),
     fs,
-    ggplot2,
     glue,
     jsonlite,
     lifecycle,
@@ -59,6 +62,8 @@ Imports:
 Suggests: 
     covr,
     devtools,
+    forcats,
+    ggplot2,
     knitr,
     rmarkdown,
     testthat (>= 2.1.0),
@@ -68,5 +73,5 @@ VignetteBuilder:
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 SystemRequirements: bbi (>= 3.0.2)

@@ -9,13 +9,20 @@ install_menu(.body, .path, .version, .force, .quiet)
 \arguments{
 \item{.body}{Character vector of installation commands to run with \code{system}}
 
-\item{.path}{path to install bbi to}
+\item{.path}{absolute path to install bbi to. See Details section for
+defaults, if nothing is passed.}
 
-\item{.version}{version of bbi to install. Must pass a character scalar corresponding to a tag found in \verb{https://github.com/metrumresearchgroup/bbi/releases}}
+\item{.version}{version of bbi to install. Must pass a character scalar
+corresponding to a tag found in
+\verb{https://github.com/metrumresearchgroup/bbi/releases}}
 
-\item{.force}{If \code{FALSE}, the default, skips installation if requested version and local version are the same. If \code{TRUE} forces installation if it will be the same version.}
+\item{.force}{If \code{FALSE}, the default, skips installation if requested
+version and local version are the same. If \code{TRUE} forces installation if it
+will be the same version.}
 
-\item{.quiet}{If \code{TRUE}, suppresses output printed to the console. \code{FALSE} by default.}
+\item{.quiet}{\strong{Deprecated.} Use \code{options("bbr.verbose")} instead to control
+printing. Defaults to \code{NULL}, which reads \code{!getOption("bbr.verbose")}. If
+\code{TRUE}, suppresses output printed to the console.}
 }
 \description{
 Private implementation function for installing bbi with interactive menu

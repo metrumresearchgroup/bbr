@@ -1,6 +1,6 @@
 context("read_bbi_path() helper function")
 
-test_that("read_bbi_path() looks for environment variable", {
+test_that("read_bbi_path() looks for environment variable [BBR-RBP-001]", {
   withr::with_envvar(
     c("BBI_EXE_PATH" = "foo"),
     expect_equal(read_bbi_path(), "foo")

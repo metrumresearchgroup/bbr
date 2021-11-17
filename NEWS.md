@@ -1,3 +1,27 @@
+# bbr 1.2.0
+
+This release adds a number of helper functions, primarily for use with NONMEM models.
+
+## New features and changes
+
+* Added `nm_file()`, `nm_grd()`, `nm_tab()`, `nm_par_tab()`, and `nm_data()` for reading in NONMEM files more easily. (#426)
+
+* Added `nm_join()`, `nm_tables()`, and `nm_table_files()` for reading in NONMEM tables more easily. Notably, `nm_join()` can be used to get a single tibble containing your NONMEM input data joined against all of your table outputs. (#429 and #430)
+
+* `param_estimates_batch()` for extracting a tibble of parameter estimates from a batch of NONMEM runs. Especially useful for large batches of runs created by something like a bootstrap. (#386)
+
+* `cov_cor()` and `check_cor_threshold()` for pulling in covariance and correlation matrices from NONMEM `.cov` and `.cor` files. (#414)
+
+* Passing the `.new_model` argument to `copy_model_from()` is now optional. By default, it now tries to increment to the next available integer in the destination directory (the directory containing the parent model). (#424)
+
+* `update_model_id()` for updating mentions of the parent model in the child model's control stream. (#417)
+
+* Per guidance in `bbr 1.0.0` release, `replace_tags()`, `replace_bbi_args()`, `replace_based_on()`, `add_decisions()`, and `replace_decisions()` have been removed.
+
+* Deprecated `check_nonmem_table_output()`, `check_grd()`, and `check_ext()` and replaced them with `nm_file()` variants. These functions will warn about this for two more releases and then begin to error for two more releases before being removed altogether. (#426)
+
+* Deprecated `plot_nonmem_table_df()`, `plot_grd()`, and `plot_ext()` in an effort to more tightly define the scope of `bbr`. These functions will warn about this for two more releases and then begin to error for two more releases before being removed altogether. (#426)
+
 # bbr 1.1.4
 
 ## Docs

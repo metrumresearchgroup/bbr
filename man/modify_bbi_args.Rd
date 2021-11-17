@@ -4,14 +4,11 @@
 \alias{modify_bbi_args}
 \alias{add_bbi_args}
 \alias{replace_all_bbi_args}
-\alias{replace_bbi_args}
 \title{Modify bbi_args on a model object}
 \usage{
 add_bbi_args(.mod, .bbi_args)
 
 replace_all_bbi_args(.mod, .bbi_args)
-
-replace_bbi_args(.mod, .bbi_args)
 }
 \arguments{
 \item{.mod}{The \verb{bbi_\{.model_type\}_model} object to modify}
@@ -49,8 +46,6 @@ already present with the new values.
 
 \item \code{replace_all_bbi_args}: Modifies model object and corresponding YAML
 by replacing all \code{bbi_args} with named list passed to \code{.bbi_args}.
-
-\item \code{replace_bbi_args}: \strong{Deprecated} as of bbr 0.10.0, use \code{replace_all_bbi_args()} instead.
 }}
 
 \seealso{

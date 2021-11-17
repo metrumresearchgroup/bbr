@@ -47,7 +47,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   # create model from R
   #######################
 
-  test_that("step by step create_model to submit_model to model_summary works", {
+  test_that("step by step create_model to submit_model to model_summary works [BBR-WRKF-001]", {
     # create model
     mod1 <- new_model(
       file.path(MODEL_DIR_BBI, "1"),
@@ -73,9 +73,9 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_equal(param_estimates(sum1), dget(PARAM_REF_FILE))
   })
 
-  test_that("copying model works and new models run correctly", {
+  test_that("copying model works and new models run correctly [BBR-WRKF-002]", {
     mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
-    mod2 <- copy_model_from(mod1, 2)
+    mod2 <- copy_model_from(mod1) # should auto-increment to 2.ctl
     mod3 <- copy_model_from(mod1, 3, .inherit_tags = TRUE) %>% add_bbi_args(list(clean_lvl=2, overwrite = FALSE))
 
     # run new models
@@ -100,7 +100,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   })
 
-  test_that("config_log() works correctly", {
+  test_that("config_log() works correctly [BBR-WRKF-003]", {
     # check config log for all models so far
     log_df <- config_log(MODEL_DIR_BBI)
     expect_equal(nrow(log_df), 3)
@@ -110,14 +110,14 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_false(any(is.na(log_df$data_path)))
   })
 
-  test_that(".wait = FALSE returns correctly", {
+  test_that(".wait = FALSE returns correctly [BBR-WRKF-004]", {
     # launch a model but don't wait for it to finish
     mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
     proc <- copy_model_from(mod1, 4, .inherit_tags = TRUE) %>% submit_model(.mode = "local", .wait = FALSE)
     expect_true(stringr::str_detect(proc[[PROC_STDOUT]], ".wait = FALSE"))
   })
 
-  test_that("run_log() captures runs correctly", {
+  test_that("run_log() captures runs correctly [BBR-WRKF-005]", {
     # check run log for all models
     log_df <- run_log(MODEL_DIR_BBI)
     expect_equal(nrow(log_df), 4)
@@ -127,7 +127,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS, ORIG_TAGS))
   })
 
-  test_that("add_config() works with in progress model run", {
+  test_that("add_config() works with in progress model run [BBR-WRKF-006]", {
     # add config log to run log
     log_df <- expect_warning(
       run_log(MODEL_DIR_BBI) %>% add_config(),
@@ -141,7 +141,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   })
 
 
-  test_that("submit_model() works with non-NULL .config_path", {
+  test_that("submit_model() works with non-NULL .config_path [BBR-WRKF-007]", {
     if (requireNamespace("withr", quietly = TRUE) &&
         utils::packageVersion("withr") < "2.2.0") {
       skip("must have withr >= 2.2.0 to run this test")

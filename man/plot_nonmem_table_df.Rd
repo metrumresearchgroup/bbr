@@ -20,6 +20,8 @@ plot_ext(.df)
 \item{.stat_name}{String of the name of the stat the other columns represents (like "gradient" or "theta").}
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+
 Creates a line plot of the wide-format tibble output from \code{check_nonmem_table_output()}
 }
 \section{Functions}{

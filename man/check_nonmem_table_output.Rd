@@ -42,6 +42,8 @@ check_ext(.mod, .iter_floor = 0)
 \item{.iter_floor}{Filters file to only rows with \code{ITERATION} GREATER THAN this value.}
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+
 Checks a NONMEM output file that's a whitespace-delimited file (for instance .grd or .ext)
 }
 \section{Methods (by generic)}{

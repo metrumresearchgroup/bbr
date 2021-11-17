@@ -3,7 +3,7 @@ context("bbr exec functions")
 # constants
 BBI_EXE_PATH <- read_bbi_path()
 
-test_that("check_status_code works as expected", {
+test_that("check_status_code works as expected [BBR-BBR-001]", {
   # nothing happens on status 0
   expect_equal(check_status_code(0, "stdout...", c("arg1", "arg2")), NULL)
 
@@ -13,7 +13,7 @@ test_that("check_status_code works as expected", {
   expect_error(check_status_code(225, "stdout...", c("arg1", "arg2")))
 })
 
-test_that("bbi_dry_run() correctly returns object", {
+test_that("bbi_dry_run() correctly returns object [BBR-BBR-002]", {
   PROC_CLASS_LIST <- c("bbi_process", "list")
   cmd_args <- c("naw", "dawg")
   dir <- "fake/dir"
@@ -33,7 +33,7 @@ test_that("bbi_dry_run() correctly returns object", {
 
 skip_if_not_drone_or_metworx("bbi_init")
 
-test_that("check_bbi_exe() correctly errors or finds paths", {
+test_that("check_bbi_exe() correctly errors or finds paths [BBR-BBR-003]", {
   FAKE_BBI_PATH <- "/tmp/fake/bbi"
 
   # should fail because path doesn't exist
@@ -43,9 +43,9 @@ test_that("check_bbi_exe() correctly errors or finds paths", {
   expect_invisible(check_bbi_exe(BBI_EXE_PATH))
 })
 
-test_that("check_bbi_exe() errors on too low version", {
+test_that("check_bbi_exe() errors on too low version [BBR-BBR-004]", {
   skip_if_over_rate_limit()
-  skip_if(getOption("rbabylon.DEV_no_min_version"))
+  skip_if(getOption("bbr.DEV_no_min_version"))
 
   withr::with_options(list("bbr.bbi_min_version" = package_version("100.0.0")), {
     # should fail because version number is less than 100.0.0
@@ -55,7 +55,7 @@ test_that("check_bbi_exe() errors on too low version", {
   })
 })
 
-test_that("bbi_init creates bbi.yaml", {
+test_that("bbi_init creates bbi.yaml [BBR-BBR-005]", {
   # create yaml
 
   withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
@@ -68,11 +68,11 @@ test_that("bbi_init creates bbi.yaml", {
   expect_true("bbi_binary" %in% names(bbi_yaml))
 })
 
-test_that("bbi_init errors with non-existent .dir", {
+test_that("bbi_init errors with non-existent .dir [BBR-BBR-006]", {
   expect_error(bbi_init("naw", "."), regexp = "Cannot find.+naw")
 })
 
-test_that("bbi_init errors with invalid .nonmem_version", {
+test_that("bbi_init errors with invalid .nonmem_version [BBR-BBR-007]", {
   # fails if don't specify anything
   expect_error(bbi_init(".", "."), regexp = "Must specify a `.nonmem_version`")
 
@@ -83,7 +83,7 @@ test_that("bbi_init errors with invalid .nonmem_version", {
   })
 })
 
-test_that("bbi_init passes .bbi_args", {
+test_that("bbi_init passes .bbi_args [BBR-BBR-008]", {
   # create yaml
 
   withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
