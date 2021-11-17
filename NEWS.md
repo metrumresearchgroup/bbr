@@ -1,4 +1,4 @@
-# development
+# bbr 1.2.0
 
 This release adds a number of helper functions, primarily for use with NONMEM models.
 
