@@ -79,7 +79,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
       </span>
     </div>
 
@@ -146,6 +146,26 @@
       
     </div>
 
+    <div id="bbr-120" class="section level1">
+<h1 class="page-header" data-toc-text="1.2.0">
+<a href="#bbr-120" class="anchor"></a>bbr 1.2.0</h1>
+<p>This release adds a number of helper functions, primarily for use with NONMEM models.</p>
+<div id="new-features-and-changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-features-and-changes" class="anchor"></a>New features and changes</h2>
+<ul>
+<li><p>Added <code><a href="../reference/nm_file.html">nm_file()</a></code>, <code><a href="../reference/nm_file.html">nm_grd()</a></code>, <code><a href="../reference/nm_file.html">nm_tab()</a></code>, <code><a href="../reference/nm_file.html">nm_par_tab()</a></code>, and <code><a href="../reference/nm_file.html">nm_data()</a></code> for reading in NONMEM files more easily. (#426)</p></li>
+<li><p>Added <code><a href="../reference/nm_join.html">nm_join()</a></code>, <code><a href="../reference/nm_tables.html">nm_tables()</a></code>, and <code><a href="../reference/nm_tables.html">nm_table_files()</a></code> for reading in NONMEM tables more easily. Notably, <code><a href="../reference/nm_join.html">nm_join()</a></code> can be used to get a single tibble containing your NONMEM input data joined against all of your table outputs. (#429 and #430)</p></li>
+<li><p><code><a href="../reference/param_estimates_batch.html">param_estimates_batch()</a></code> for extracting a tibble of parameter estimates from a batch of NONMEM runs. Especially useful for large batches of runs created by something like a bootstrap. (#386)</p></li>
+<li><p><code><a href="../reference/cov_cor.html">cov_cor()</a></code> and <code><a href="../reference/check_cor_threshold.html">check_cor_threshold()</a></code> for pulling in covariance and correlation matrices from NONMEM <code>.cov</code> and <code>.cor</code> files. (#414)</p></li>
+<li><p>Passing the <code>.new_model</code> argument to <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> is now optional. By default, it now tries to increment to the next available integer in the destination directory (the directory containing the parent model). (#424)</p></li>
+<li><p><code><a href="../reference/update_model_id.html">update_model_id()</a></code> for updating mentions of the parent model in the child model’s control stream. (#417)</p></li>
+<li><p>Per guidance in <code>bbr 1.0.0</code> release, <code>replace_tags()</code>, <code>replace_bbi_args()</code>, <code>replace_based_on()</code>, <code>add_decisions()</code>, and <code>replace_decisions()</code> have been removed.</p></li>
+<li><p>Deprecated <code><a href="../reference/check_nonmem_table_output.html">check_nonmem_table_output()</a></code>, <code><a href="../reference/check_nonmem_table_output.html">check_grd()</a></code>, and <code><a href="../reference/check_nonmem_table_output.html">check_ext()</a></code> and replaced them with <code><a href="../reference/nm_file.html">nm_file()</a></code> variants. These functions will warn about this for two more releases and then begin to error for two more releases before being removed altogether. (#426)</p></li>
+<li><p>Deprecated <code><a href="../reference/plot_nonmem_table_df.html">plot_nonmem_table_df()</a></code>, <code><a href="../reference/plot_nonmem_table_df.html">plot_grd()</a></code>, and <code><a href="../reference/plot_nonmem_table_df.html">plot_ext()</a></code> in an effort to more tightly define the scope of <code>bbr</code>. These functions will warn about this for two more releases and then begin to error for two more releases before being removed altogether. (#426)</p></li>
+</ul>
+</div>
+</div>
     <div id="bbr-114" class="section level1">
 <h1 class="page-header" data-toc-text="1.1.4">
 <a href="#bbr-114" class="anchor"></a>bbr 1.1.4</h1>
@@ -171,7 +191,7 @@
 <h2 class="hasAnchor">
 <a href="#bug-fixes-1" class="anchor"></a>Bug fixes</h2>
 <ul>
-<li><p>Fixed a bug where submitting multiple models in a loop with <code><a href="../reference/submit_model.html">submit_model(.mode = "local", .wait = FALSE)</a></code> would cause the models to never finish because the <code>bbi</code> processes would get <a href="https://processx.r-lib.org/reference/process.html#cleaning-up-background-processes">killed by <code>processx</code></a> when the R objects were garbage collected. (#390)</p></li>
+<li><p>Fixed a bug where submitting multiple models in a loop with <code>submit_model(.mode = "local", .wait = FALSE)</code> would cause the models to never finish because the <code>bbi</code> processes would get <a href="https://processx.r-lib.org/reference/process.html#cleaning-up-background-processes">killed by <code>processx</code></a> when the R objects were garbage collected. (#390)</p></li>
 <li><p><code>bbr</code> now checks for a valid configuration file <em>before</em> calling out to <code>bbi</code> to avoid the situation where <code>.wait = FALSE</code> and the “no config file” error from <code>bbi</code> is swallowed. Note, this check is skipped if <code>.dry_run = TRUE</code>. (#390)</p></li>
 </ul>
 </div>
@@ -179,11 +199,11 @@
     <div id="bbr-112" class="section level1">
 <h1 class="page-header" data-toc-text="1.1.2">
 <a href="#bbr-112" class="anchor"></a>bbr 1.1.2</h1>
-<div id="new-features-and-changes" class="section level2">
+<div id="new-features-and-changes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-and-changes" class="anchor"></a>New features and changes</h2>
+<a href="#new-features-and-changes-1" class="anchor"></a>New features and changes</h2>
 <ul>
-<li><p>Added <code><a href="https://rdrr.io/r/base/options.html">options(bbr.bbi_exe_mode)</a></code> for globally setting <code>.mode</code> argument to <code><a href="../reference/submit_model.html">submit_model()</a></code> and <code><a href="../reference/submit_models.html">submit_models()</a></code>. (#377)</p></li>
+<li><p>Added <code>options(bbr.bbi_exe_mode)</code> for globally setting <code>.mode</code> argument to <code><a href="../reference/submit_model.html">submit_model()</a></code> and <code><a href="../reference/submit_models.html">submit_models()</a></code>. (#377)</p></li>
 <li><p>Added <code>.bbi_args</code> argument to <code><a href="../reference/bbi_init.html">bbi_init()</a></code> for passing through defaults to be stored in the created <code>bbi.yaml</code> file. (#378)</p></li>
 </ul>
 </div>
@@ -202,9 +222,9 @@
     <div id="bbr-110" class="section level1">
 <h1 class="page-header" data-toc-text="1.1.0">
 <a href="#bbr-110" class="anchor"></a>bbr 1.1.0</h1>
-<div id="new-features-and-changes-1" class="section level2">
+<div id="new-features-and-changes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-and-changes-1" class="anchor"></a>New features and changes</h2>
+<a href="#new-features-and-changes-2" class="anchor"></a>New features and changes</h2>
 <ul>
 <li><p>Added <code><a href="../reference/tags_diff.html">tags_diff()</a></code> function for comparing the tags between different models. (#337)</p></li>
 <li><p>Added <code><a href="../reference/model_diff.html">model_diff()</a></code> function for comparing the model files between different models. (#342)</p></li>
@@ -233,18 +253,18 @@
 <a href="#bbr-100" class="anchor"></a>bbr 1.0.0</h1>
 <p>This release is fairly small in terms of changes, but it increments to a new major release version primarily because of the name change which happened in <code>bbr 0.12.0</code>. The most significant change, from a user perspective, is to the default behavior of where <code>bbr</code> looks for <code>bbi</code> on the system. This change is described in <a href="https://github.com/metrumresearchgroup/bbr/issues/321">issue #321</a> and a bit more detail is given below.</p>
 <p>The <code>1.0.0</code> release also represents a stable feature set of basic NONMEM-related functionality. While there will be more features and development relevant to NONMEM in the future, for the immediate future we are shifting our attention towards building similar functionality to support Stan modeling with <code>bbr</code>.</p>
-<div id="new-features-and-changes-2" class="section level2">
+<div id="new-features-and-changes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-and-changes-2" class="anchor"></a>New features and changes</h2>
+<a href="#new-features-and-changes-3" class="anchor"></a>New features and changes</h2>
 <ul>
 <li><p>The minimum compatible version of <code>bbi</code> is increased to <code>3.0.2</code>. This is because there was a breaking change in <code>bbi 3.0.2</code> which changed all references to <code>"Patients"</code> in the <code>bbi nonmem summary</code> output to <code>"Patients"</code> (discussed further below). Also because there was a bug where <code>bbi</code> could not parse the summary output from NONMEM 7.5 and this bug was fixed in <code>bbi 3.0.1</code>.</p></li>
-<li><p><code><a href="https://rdrr.io/r/base/options.html">options("bbr.bbi_exe_path")</a></code>, which tells <code>bbr</code> where to look for a <code>bbi</code> installation, now defaults to <code>"bbi"</code>. This means that, by default, <code>bbr</code> will look for a <code>bbi</code> installation in the user’s <code>$PATH</code>. <code><a href="https://rdrr.io/r/base/options.html">options("bbr.bbi_exe_path")</a></code> can still be set manually by the user and, in fact, we encourage users to set this to an absolute path in their <code>.Rprofile</code> for their project because this explicitly guarantees the correct <code>bbi</code> installation is being used. (#322)</p></li>
-<li><p>The <code><a href="../reference/use_bbi.html">use_bbi()</a></code> installer function first tries to install to whatever path is set in <code><a href="https://rdrr.io/r/base/options.html">options("bbr.bbi_exe_path")</a></code>, falling back to the <code>bbi</code> in my <code>$PATH</code> (accessed via <code><a href="https://rdrr.io/r/base/Sys.which.html">Sys.which("bbi")</a></code>) and then an OS-dependent default, in that order. See <code>?use_bbi()</code> for more details. (#322)</p></li>
+<li><p><code>options("bbr.bbi_exe_path")</code>, which tells <code>bbr</code> where to look for a <code>bbi</code> installation, now defaults to <code>"bbi"</code>. This means that, by default, <code>bbr</code> will look for a <code>bbi</code> installation in the user’s <code>$PATH</code>. <code>options("bbr.bbi_exe_path")</code> can still be set manually by the user and, in fact, we encourage users to set this to an absolute path in their <code>.Rprofile</code> for their project because this explicitly guarantees the correct <code>bbi</code> installation is being used. (#322)</p></li>
+<li><p>The <code><a href="../reference/use_bbi.html">use_bbi()</a></code> installer function first tries to install to whatever path is set in <code>options("bbr.bbi_exe_path")</code>, falling back to the <code>bbi</code> in my <code>$PATH</code> (accessed via <code>Sys.which("bbi")</code>) and then an OS-dependent default, in that order. See <code>?use_bbi()</code> for more details. (#322)</p></li>
 <li><p>Added print method for <code>bbi_nonmem_model</code> object. Similar to the <code>bbi_nonmem_summary</code> object, the <code>bbi_nonmem_model</code> object should print nicely in the console, and also look good in <code>.Rmd</code> chunks with the option <code>results = 'asis'</code>. (#307)</p></li>
 <li><p>Added <code><a href="../reference/get_data_path.html">get_data_path()</a></code> helper function to extract the absolute path to the input data file from <code>bbi_nonmem_model</code> and <code>bbi_nonmem_summary</code> objects. (#314)</p></li>
 <li><p>Added <code><a href="../reference/build_path_from_model.html">build_path_from_model()</a></code> helper function to extract the absolute path to various output files from <code>bbi_nonmem_model</code> and <code>bbi_nonmem_summary</code> objects. (#314)</p></li>
 <li><p>The output from <code><a href="../reference/model_summary.html">model_summary()</a></code> (and <code><a href="../reference/model_summaries.html">model_summaries()</a></code> and <code><a href="../reference/summary_log.html">summary_log()</a></code>) will now refer to individuals in the data set as <code>"Subjects"</code> instead of <code>"Patients"</code>, in accordance with the terminology widely used in scientific and medical literature. (#320)</p></li>
-<li><p>Per guidance in <code>rbabylon 0.10.0</code> release, <code><a href="../reference/modify_tags.html">replace_tags()</a></code>, <code><a href="../reference/modify_bbi_args.html">replace_bbi_args()</a></code>, <code><a href="../reference/modify_based_on.html">replace_based_on()</a></code>, <code><a href="../reference/modify_decisions.html">add_decisions()</a></code>, and <code><a href="../reference/modify_decisions.html">replace_decisions()</a></code> will now error instead of warn about their impending deprecation. These functions will be removed entirely in two more releases.</p></li>
+<li><p>Per guidance in <code>rbabylon 0.10.0</code> release, <code>replace_tags()</code>, <code>replace_bbi_args()</code>, <code>replace_based_on()</code>, <code>add_decisions()</code>, and <code>replace_decisions()</code> will now error instead of warn about their impending deprecation. These functions will be removed entirely in two more releases.</p></li>
 </ul>
 </div>
 <div id="developer-facing-changes-1" class="section level2">
@@ -261,9 +281,9 @@
 <h1 class="page-header" data-toc-text="0.12.0">
 <a href="#bbr-0120" class="anchor"></a>bbr 0.12.0</h1>
 <p><strong>This package has been renamed to from <code>rbabylon</code> to <code>bbr</code></strong> and the accompanying command-line tool has been renamed from <code>babylon</code> to <code>bbi</code> (which was already its alias, used throughout the package). Any mentions of <code>babylon</code> and <code>rbabylon</code> throughout the package have been renamed accordingly. Mentions of either in the older parts of this <code>NEWS.md</code> document were left as is for historical purposes.</p>
-<div id="new-features-and-changes-3" class="section level2">
+<div id="new-features-and-changes-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-and-changes-3" class="anchor"></a>New features and changes</h2>
+<a href="#new-features-and-changes-4" class="anchor"></a>New features and changes</h2>
 <ul>
 <li>The minimum compatible version of <code>bbi</code> is increased to <code>3.0.0</code>.</li>
 </ul>
@@ -272,9 +292,9 @@
     <div id="rbabylon-0110" class="section level1">
 <h1 class="page-header" data-toc-text="0.11.0">
 <a href="#rbabylon-0110" class="anchor"></a>rbabylon 0.11.0</h1>
-<div id="new-features-and-changes-4" class="section level2">
+<div id="new-features-and-changes-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-and-changes-4" class="anchor"></a>New features and changes</h2>
+<a href="#new-features-and-changes-5" class="anchor"></a>New features and changes</h2>
 <ul>
 <li><p>Added print methods for <code>bbi_nonmem_summary</code> and <code>bbi_process</code> objects. The <code>bbi_nonmem_summary</code> object should print nicely in the console, and also look good in <code>.Rmd</code> chunks with the option <code>results = 'asis'</code>. (#298 and #294)</p></li>
 <li><p>The <code>bbi_nonmem_summary</code> object now contains the <code>absolute_model_path</code> and we have added the following methods to work on that object (these previously only worked on <code>bbi_nonmem_model</code> objects): <code><a href="../reference/get_model_id.html">get_model_id()</a></code>, <code><a href="../reference/get_path_from_object.html">get_model_path()</a></code>, <code><a href="../reference/get_path_from_object.html">get_output_dir()</a></code>, <code><a href="../reference/get_path_from_object.html">get_yaml_path()</a></code>, <code><a href="../reference/check_nonmem_table_output.html">check_grd()</a></code>, <code><a href="../reference/check_nonmem_table_output.html">check_ext()</a></code>. (#297)</p></li>
@@ -294,15 +314,15 @@
     <div id="rbabylon-0100" class="section level1">
 <h1 class="page-header" data-toc-text="0.10.0">
 <a href="#rbabylon-0100" class="anchor"></a>rbabylon 0.10.0</h1>
-<div id="new-features-and-changes-5" class="section level2">
+<div id="new-features-and-changes-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-and-changes-5" class="anchor"></a>New features and changes</h2>
+<a href="#new-features-and-changes-6" class="anchor"></a>New features and changes</h2>
 <ul>
-<li><p>Deprecated <code><a href="../reference/modify_tags.html">replace_tags()</a></code>, <code><a href="../reference/modify_bbi_args.html">replace_bbi_args()</a></code>, and <code><a href="../reference/modify_based_on.html">replace_based_on()</a></code> and replaced them with <code>replace_all_</code> variants. These functions will warn about this for two more releases and then begin to error for two more releases before being removed altogether. (#264)</p></li>
+<li><p>Deprecated <code>replace_tags()</code>, <code>replace_bbi_args()</code>, and <code>replace_based_on()</code> and replaced them with <code>replace_all_</code> variants. These functions will warn about this for two more releases and then begin to error for two more releases before being removed altogether. (#264)</p></li>
 <li><p>Added <code><a href="../reference/modify_tags.html">replace_tag()</a></code> (singular) which replaces a single tag with a new tag. <code><a href="../reference/modify_notes.html">replace_note()</a></code> (mentioned below) functions the same way. (#264)</p></li>
-<li><p>Added <code><a href="../reference/collapse_to_string.html">collapse_to_string()</a></code> which collapses a list column in a tibble to a character column containing a string representation of the column’s previous contents. For list columns containing character, numeric, or logical vectors, this means collapsing with <code><a href="https://rdrr.io/r/base/paste.html">paste(collapse = ', ')</a></code>. For other types <code><a href="https://rdrr.io/r/base/dput.html">dput()</a></code> is used. (#260)</p></li>
-<li><p>Added <code>run</code> column to all <code>bbi_log_df</code> tibbles. This is always the second column and is equivalent to <code><a href="https://rdrr.io/r/base/basename.html">basename(absolute_model_path)</a></code>. While, <code>absolute_model_path</code> remains the primary key for the tibble, <code>run</code> is useful for displaying tables when <code>absolute_model_path</code> becomes long and difficult to look at. (#259)</p></li>
-<li><p>Added <code>notes</code> field to model object (and <code>bbi_run_log_df</code>) and associated helpers <code><a href="../reference/modify_notes.html">add_notes()</a></code>, <code><a href="../reference/modify_notes.html">replace_note()</a></code>, <code><a href="../reference/modify_notes.html">replace_all_notes()</a></code>, <code><a href="../reference/modify_notes.html">remove_notes()</a></code>. This will replace <code>decisions</code>, to reflect the fact that users will want to use this field throughout the modeling process, not only at the end once some “decisions” have been reached. <code><a href="../reference/modify_decisions.html">add_decisions()</a></code> and <code><a href="../reference/modify_decisions.html">replace_decisions()</a></code> now print a warning telling the user that they will be deprecated in the future and encouraging use of their <code>_notes</code> counterparts. (#258)</p></li>
+<li><p>Added <code><a href="../reference/collapse_to_string.html">collapse_to_string()</a></code> which collapses a list column in a tibble to a character column containing a string representation of the column’s previous contents. For list columns containing character, numeric, or logical vectors, this means collapsing with <code>paste(collapse = ', ')</code>. For other types <code><a href="https://rdrr.io/r/base/dput.html">dput()</a></code> is used. (#260)</p></li>
+<li><p>Added <code>run</code> column to all <code>bbi_log_df</code> tibbles. This is always the second column and is equivalent to <code>basename(absolute_model_path)</code>. While, <code>absolute_model_path</code> remains the primary key for the tibble, <code>run</code> is useful for displaying tables when <code>absolute_model_path</code> becomes long and difficult to look at. (#259)</p></li>
+<li><p>Added <code>notes</code> field to model object (and <code>bbi_run_log_df</code>) and associated helpers <code><a href="../reference/modify_notes.html">add_notes()</a></code>, <code><a href="../reference/modify_notes.html">replace_note()</a></code>, <code><a href="../reference/modify_notes.html">replace_all_notes()</a></code>, <code><a href="../reference/modify_notes.html">remove_notes()</a></code>. This will replace <code>decisions</code>, to reflect the fact that users will want to use this field throughout the modeling process, not only at the end once some “decisions” have been reached. <code>add_decisions()</code> and <code>replace_decisions()</code> now print a warning telling the user that they will be deprecated in the future and encouraging use of their <code>_notes</code> counterparts. (#258)</p></li>
 <li><p><code>.description</code> is no longer a required argument for <code><a href="../reference/new_model.html">new_model()</a></code> or <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code>, nor is it a required element of a model object or YAML file. The helper function <code><a href="../reference/modify_description.html">add_description()</a></code> has been added to fill the <code>description</code> field. (#267)</p></li>
 <li><p>The <code>.update_model_file</code> argument to <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> no longer updates the <code>$PROB</code> in the new control stream with the <code>.description</code> argument. Instead it puts the following in <code>$PROB</code>: <code>From rbabylon: see {get_model_id(.new_model)}.yaml for details</code> (#265)</p></li>
 <li><p>Added <code><a href="../reference/modify_tags.html">remove_tags()</a></code>, <code><a href="../reference/modify_notes.html">remove_notes()</a></code>, and <code><a href="../reference/modify_based_on.html">remove_based_on()</a></code> functions for removing specific strings from the relevant model object field. (#252)</p></li>
@@ -383,7 +403,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse.</p>
+  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">

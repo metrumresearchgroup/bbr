@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
       </span>
     </div>
 
@@ -153,7 +153,9 @@
     </div>
 
     <pre class="usage"><span class='fu'>check_bbi_version_constraint</span><span class='op'>(</span>
-  .bbi_exe_path <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"rbabylon.bbi_exe_path"</span><span class='op'>)</span>
+  .bbi_exe_path <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"bbr.bbi_exe_path"</span><span class='op'>)</span>,
+  .min_version <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"bbr.bbi_min_version"</span><span class='op'>)</span>,
+  .function <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -162,6 +164,16 @@
     <tr>
       <th>.bbi_exe_path</th>
       <td><p>Path to bbi executable</p></td>
+    </tr>
+    <tr>
+      <th>.min_version</th>
+      <td><p>The minimum allowed version. Defaults to
+<code>getOption("bbr.bbi_min_version")</code>.</p></td>
+    </tr>
+    <tr>
+      <th>.function</th>
+      <td><p>The relevant function that is version-constrained. If not
+<code>NULL</code>, notifies user in error message.</p></td>
     </tr>
     </table>
 
@@ -180,7 +192,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse.</p>
+  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">

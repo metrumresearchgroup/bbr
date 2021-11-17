@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
       </span>
     </div>
 
@@ -154,9 +154,7 @@
 
     <pre class="usage"><span class='fu'>add_bbi_args</span><span class='op'>(</span><span class='va'>.mod</span>, <span class='va'>.bbi_args</span><span class='op'>)</span>
 
-<span class='fu'>replace_all_bbi_args</span><span class='op'>(</span><span class='va'>.mod</span>, <span class='va'>.bbi_args</span><span class='op'>)</span>
-
-<span class='fu'>replace_bbi_args</span><span class='op'>(</span><span class='va'>.mod</span>, <span class='va'>.bbi_args</span><span class='op'>)</span></pre>
+<span class='fu'>replace_all_bbi_args</span><span class='op'>(</span><span class='va'>.mod</span>, <span class='va'>.bbi_args</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -182,7 +180,7 @@ list of arguments that will be passed through to <code>bbi</code> to modify how 
 is processed (for instance, when it is submitted to be run with
 <code><a href='submit_model.html'>submit_model()</a></code>). In many cases, it is preferable to store these arguments
 with the model object, as opposed to passing them to
-<code><a href='submit_model.html'>submit_model(.bbi_args)</a></code> because then they will be applied every time that
+<code>submit_model(.bbi_args)</code> because then they will be applied every time that
 model is run, for example if you need to re-run the model later.</p>
 <p>The options for what can be included in this list (and a brief description of
 what each does) can be seen by calling <code><a href='print_bbi_args.html'>print_bbi_args()</a></code>.</p>
@@ -198,7 +196,6 @@ by adding named list passed to <code>.bbi_args</code>, overwriting any args that
 already present with the new values.</p></li>
 <li><p><code>replace_all_bbi_args</code>: Modifies model object and corresponding YAML
 by replacing all <code>bbi_args</code> with named list passed to <code>.bbi_args</code>.</p></li>
-<li><p><code>replace_bbi_args</code>: <strong>Deprecated</strong> as of bbr 0.10.0, use <code>replace_all_bbi_args()</code> instead.</p></li>
 </ul>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
@@ -216,7 +213,7 @@ by replacing all <code>bbi_args</code> with named list passed to <code>.bbi_args
 
       <footer>
       <div class="copyright">
-  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse.</p>
+  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">

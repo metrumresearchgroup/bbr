@@ -47,7 +47,10 @@
 
 
 <meta property="og:title" content="Summarize multiple models in batch — model_summaries" />
-<meta property="og:description" content="Run multiple model_summary() calls in batch." />
+<meta property="og:description" content="Run multiple model_summary() calls in batch. Note: if you need to pull in
+only the parameter estimates for a large number of NONMEM models, consider
+using param_estimates_batch() instead, as it will be faster than
+model_summaries() for this purpose." />
 <meta property="og:image" content="https://metrumresearchgroup.github.io/bbr/logo.png" />
 
 
@@ -80,7 +83,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
       </span>
     </div>
 
@@ -149,7 +152,10 @@
     </div>
 
     <div class="ref-description">
-    <p>Run multiple <code><a href='model_summary.html'>model_summary()</a></code> calls in batch.</p>
+    <p>Run multiple <code><a href='model_summary.html'>model_summary()</a></code> calls in batch. Note: if you need to pull in
+<em>only</em> the parameter estimates for a large number of NONMEM models, consider
+using <code><a href='param_estimates_batch.html'>param_estimates_batch()</a></code> instead, as it will be faster than
+<code>model_summaries()</code> for this purpose.</p>
     </div>
 
     <pre class="usage"><span class='fu'>model_summaries</span><span class='op'>(</span>
@@ -189,7 +195,7 @@ a list of <code>bbi_{.model_type}_model</code> objects.</p></td>
     </tr>
     <tr>
       <th>.bbi_args</th>
-      <td><p>A named list specifying arguments to pass to bbi formatted like <code><a href='https://rdrr.io/r/base/list.html'>list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)</a></code>.
+      <td><p>A named list specifying arguments to pass to bbi formatted like <code>list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)</code>.
 See <code><a href='print_bbi_args.html'>print_bbi_args()</a></code> for full list of options.</p></td>
     </tr>
     <tr>
@@ -233,7 +239,7 @@ or they are missing for some other legitimate reason, pass the appropriate flags
 </ul>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='model_summary.html'>model_summary()</a></code>, <code><a href='summary_log.html'>summary_log()</a></code></p></div>
+    <div class='dont-index'><p><code><a href='model_summary.html'>model_summary()</a></code>, <code><a href='summary_log.html'>summary_log()</a></code>, <code><a href='param_estimates_batch.html'>param_estimates_batch()</a></code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -246,7 +252,7 @@ or they are missing for some other legitimate reason, pass the appropriate flags
 
       <footer>
       <div class="copyright">
-  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse.</p>
+  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">

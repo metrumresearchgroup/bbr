@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
       </span>
     </div>
 
@@ -145,8 +145,8 @@
 <p><code>bbr</code> provides an installer function named <code><a href="../reference/use_bbi.html">use_bbi()</a></code> that makes it easy to install <code>bbi</code> from within R.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">bbr</span><span class="fu">::</span><span class="fu"><a href="../reference/use_bbi.html">use_bbi</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<p>With no arguments passed, <code><a href="../reference/use_bbi.html">use_bbi()</a></code> will default to installing <code>bbi</code> at the path you have set in <code><a href="https://rdrr.io/r/base/options.html">options("bbr.bbi_exe_path")</a></code>. This is why we recommend setting this first (and putting it in your <code>.Rprofile</code> so that it is sourced for every new R session). If this option is <em>not</em> set, <code><a href="../reference/use_bbi.html">use_bbi()</a></code> will fall back to the <code>bbi</code> in my <code>$PATH</code> (accessed via <code><a href="https://rdrr.io/r/base/Sys.which.html">Sys.which("bbi")</a></code>) and then an OS-dependent default, in that order. See <code>?use_bbi()</code> if you would like more details.</p>
-<p>The <code><a href="../reference/use_bbi.html">use_bbi()</a></code> function also optionally takes the <em>absolute path</em> where you want to install <code>bbi</code>, though we recommend most users to follow the pattern above: first specifying a path in <code><a href="https://rdrr.io/r/base/options.html">options("bbr.bbi_exe_path")</a></code>, and then letting <code><a href="../reference/use_bbi.html">use_bbi()</a></code> install to that path by default.</p>
+<p>With no arguments passed, <code><a href="../reference/use_bbi.html">use_bbi()</a></code> will default to installing <code>bbi</code> at the path you have set in <code>options("bbr.bbi_exe_path")</code>. This is why we recommend setting this first (and putting it in your <code>.Rprofile</code> so that it is sourced for every new R session). If this option is <em>not</em> set, <code><a href="../reference/use_bbi.html">use_bbi()</a></code> will fall back to the <code>bbi</code> in my <code>$PATH</code> (accessed via <code>Sys.which("bbi")</code>) and then an OS-dependent default, in that order. See <code>?use_bbi()</code> if you would like more details.</p>
+<p>The <code><a href="../reference/use_bbi.html">use_bbi()</a></code> function also optionally takes the <em>absolute path</em> where you want to install <code>bbi</code>, though we recommend most users to follow the pattern above: first specifying a path in <code>options("bbr.bbi_exe_path")</code>, and then letting <code><a href="../reference/use_bbi.html">use_bbi()</a></code> install to that path by default.</p>
 </div>
 <div id="updating-bbi-or-checking-if-its-installed" class="section level3">
 <h3 class="hasAnchor">
@@ -191,7 +191,7 @@
 <h2 class="hasAnchor">
 <a href="#submit-model" class="anchor"></a>Submit model</h2>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mod1</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/submit_model.html">submit_model</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">mod1</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> <span class="fu"><a href="../reference/submit_model.html">submit_model</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p>This will return a process object. We won’t discuss this object in this vignette, but it contains some information about the submission call. Please note that <strong>checking on a model run in progress is not fully implemented.</strong> For now, users should check on their runs manually (by looking at the output directory) and only proceed to the next steps once it has successfully completed.</p>
 <div id="passing-arguments-to-bbi" class="section level3">
 <h3 class="hasAnchor">
@@ -232,7 +232,7 @@
 <span class="co">#&gt; verbose (logical) -- verbose output (sets CLI flag `--verbose`)</span></code></pre></div>
 <p>As discussed in “Setup” above, these can be set globally in the <code>bbi.yaml</code> file, and you can see the default values of them in that file. However, <strong>specific arguments can also be set or changed for each model.</strong> This can be done in two ways:</p>
 <ul>
-<li>Attaching them to a model object with <code><a href="../reference/modify_bbi_args.html">add_bbi_args()</a></code> or <code><a href="../reference/modify_bbi_args.html">replace_bbi_args()</a></code>
+<li>Attaching them to a model object with <code><a href="../reference/modify_bbi_args.html">add_bbi_args()</a></code> or <code>replace_bbi_args()</code>
 </li>
 <li>Passing them as a named list to the <code>.bbi_args</code> argument of one of the following functions
 <ul>
@@ -256,7 +256,7 @@
 <a href="#overwriting-output-from-a-previously-run-model" class="anchor"></a>Overwriting output from a previously run model</h3>
 <p>It is common to run a model, make some tweaks to it, and then run it again. However, to avoid accidentally deleting model outputs, <code>bbr</code> will error by default if it sees existing output when trying to submit a model. To automatically overwrite any previous model output, just pass <code>overwrite = TRUE</code> to the <code>.bbi_args</code> argument described in the previous section. For example:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mod1</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/submit_model.html">submit_model</a></span><span class="op">(</span>.bbi_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">mod1</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> <span class="fu"><a href="../reference/submit_model.html">submit_model</a></span><span class="op">(</span>.bbi_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>You can also change this setting globally by setting <code>overwrite: true</code> in the <code>bbi.yaml</code> file for your project.</p>
 </div>
 </div>
@@ -265,29 +265,48 @@
 <a href="#summarize-model" class="anchor"></a>Summarize model</h2>
 <p>Once the model run has completed, users can get a summary object containing much of the commonly used diagnostic information in a named list.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sum1</span> <span class="op">&lt;-</span> <span class="va">mod1</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/model_summary.html">model_summary</a></span><span class="op">(</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">sum1</span> <span class="op">&lt;-</span> <span class="va">mod1</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> <span class="fu"><a href="../reference/model_summary.html">model_summary</a></span><span class="op">(</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">sum1</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; [1] "absolute_model_path" "run_details"         "run_heuristics"     </span>
 <span class="co">#&gt; [4] "parameters_data"     "parameter_names"     "ofv"                </span>
 <span class="co">#&gt; [7] "condition_number"    "shrinkage_details"</span></code></pre></div>
 <p>These elements can be accessed manually or extracted with built-in helper functions like so:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">param_df1</span> <span class="op">&lt;-</span> <span class="va">sum1</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/param_estimates.html">param_estimates</a></span><span class="op">(</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">param_df1</span> <span class="op">&lt;-</span> <span class="va">sum1</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> <span class="fu"><a href="../reference/param_estimates.html">param_estimates</a></span><span class="op">(</span><span class="op">)</span>
 <span class="va">param_df1</span>
 <span class="co">#&gt; # A tibble: 9 × 8</span>
 <span class="co">#&gt;   parameter_names estimate   stderr random_effect_sd random_effect_sdse fixed</span>
 <span class="co">#&gt;   &lt;chr&gt;              &lt;dbl&gt;    &lt;dbl&gt;            &lt;dbl&gt;              &lt;dbl&gt; &lt;lgl&gt;</span>
-<span class="co">#&gt; 1 THETA1            2.31   8.61e- 2           NA              NA        FALSE</span>
-<span class="co">#&gt; 2 THETA2           55.0    3.33e+ 0           NA              NA        FALSE</span>
-<span class="co">#&gt; 3 THETA3          465.     2.96e+ 1           NA              NA        FALSE</span>
-<span class="co">#&gt; 4 THETA4           -0.0806 5.55e- 2           NA              NA        FALSE</span>
-<span class="co">#&gt; 5 THETA5            4.13   1.36e+ 0           NA              NA        FALSE</span>
-<span class="co">#&gt; 6 OMEGA(1,1)        0.0964 2.00e- 2            0.311           3.22e- 2 FALSE</span>
+<span class="co">#&gt; 1 THETA1            2.32   8.72e- 2           NA              NA        FALSE</span>
+<span class="co">#&gt; 2 THETA2           54.6    3.38e+ 0           NA              NA        FALSE</span>
+<span class="co">#&gt; 3 THETA3          463.     3.03e+ 1           NA              NA        FALSE</span>
+<span class="co">#&gt; 4 THETA4           -0.0820 5.61e- 2           NA              NA        FALSE</span>
+<span class="co">#&gt; 5 THETA5            4.18   1.38e+ 0           NA              NA        FALSE</span>
+<span class="co">#&gt; 6 OMEGA(1,1)        0.0985 2.03e- 2            0.314           3.24e- 2 FALSE</span>
 <span class="co">#&gt; 7 OMEGA(2,1)        0      1   e+10            0               1   e+10 TRUE </span>
-<span class="co">#&gt; 8 OMEGA(2,2)        0.154  2.67e- 2            0.392           3.41e- 2 FALSE</span>
+<span class="co">#&gt; 8 OMEGA(2,2)        0.157  2.72e- 2            0.396           3.44e- 2 FALSE</span>
 <span class="co">#&gt; 9 SIGMA(1,1)        1      1   e+10            1               1   e+10 TRUE </span>
 <span class="co">#&gt; # … with 2 more variables: diag &lt;lgl&gt;, shrinkage &lt;dbl&gt;</span></code></pre></div>
 <p>To see how to load summaries of multiple models to an easy-to-read tibble, see the <a href="https://metrumresearchgroup.github.io/bbr/articles/using-summary-log.html">Creating a Model Summary Log</a> vignette.</p>
+<p>You can also use the <a href="https://metrumresearchgroup.github.io/bbr/reference/nm_join.html"><code>nm_join()</code></a> function to load the input data and any output tables from your model into a single tibble.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">join_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nm_join.html">nm_join</a></span><span class="op">(</span><span class="va">mod1</span><span class="op">)</span> 
+<span class="va">join_df</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">ID</span>, <span class="va">TIME</span>, <span class="va">DV</span>, <span class="va">CL</span>, <span class="va">V</span>, <span class="va">NPDE</span>, <span class="va">CWRES</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 779 × 7</span>
+<span class="co">#&gt;       ID  TIME    DV    CL     V  NPDE CWRES</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
+<span class="co">#&gt;  1     1  0     1.22  43.4  463. 0.185 0.291</span>
+<span class="co">#&gt;  2     1  0.25 12.6   43.4  463. 2.47  3.01 </span>
+<span class="co">#&gt;  3     1  0.5  11.2   43.4  463. 2.71  2.68 </span>
+<span class="co">#&gt;  4     1  0.75 17.7   43.4  463. 2.94  4.24 </span>
+<span class="co">#&gt;  5     1  1    21.9   43.4  463. 2.94  5.25 </span>
+<span class="co">#&gt;  6     1  1.25 16.2   43.4  463. 2.94  3.88 </span>
+<span class="co">#&gt;  7     1  1.5  18.7   43.4  463. 2.94  4.47 </span>
+<span class="co">#&gt;  8     1  1.75 23.8   43.4  463. 2.94  5.69 </span>
+<span class="co">#&gt;  9     1  2    16.5   43.4  463. 2.94  3.94 </span>
+<span class="co">#&gt; 10     1  2.25 17.3   43.4  463. 2.94  4.15 </span>
+<span class="co">#&gt; # … with 769 more rows</span></code></pre></div>
 </div>
 </div>
 <div id="iteration" class="section level1">
@@ -295,32 +314,36 @@
 <a href="#iteration" class="anchor"></a>Iteration</h1>
 <p>Much of the benefit of <code>bbr</code> is leveraged in the model iteration workflow, and the run log summaries that can be created afterwards. For example, imagine you look at these model results and want to begin iterating on them with a new model.</p>
 <p>If you are now in a new R session and no longer have your <code>mod1</code> object in memory, you can easily rebuild it from the YAML file on disk with <code><a href="../reference/read_model.html">read_model()</a></code>:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mod1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_model.html">read_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <div id="copy_model_from" class="section level2">
 <h2 class="hasAnchor">
 <a href="#copy_model_from" class="anchor"></a>copy_model_from()</h2>
-<p>Now you can create a new model object, based on the original, copying and renaming the control stream in the process. The <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> call below will create both <code>2.ctl</code> and <code>2.yaml</code> files in the same directory as the parent model, and return the model object corresponding to them. (<code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> also stores the model’s “ancestry” which can be useful later in the project, as shown in the <a href="https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html">Using the based_on field</a> vignette.)</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span><span class="va">mod1</span>, <span class="fl">2</span><span class="op">)</span></code></pre></div>
-<p>Note that, while the <code>.path</code> argument in <code><a href="../reference/new_model.html">new_model()</a></code> and <code><a href="../reference/read_model.html">read_model()</a></code> is relative to your working directory, the <code>.new_model</code> argument of <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> is <em>relative to the directory containing the parent model.</em> This means that, assuming you would like to create the new model in the same directory as its parent, you only have to pass a filename (without extension) for the new model. Since, by convention, scientists often name their models numerically, you can also pass a number, which will be coerced to the relevant file names internally.</p>
-<p>The new control stream file <code>2.ctl</code> can now be edited with the desired changes and then submitted and summarized exactly as above.</p>
+<p>Now you can create a new model object, based on the original, copying and renaming the control stream in the process. By default, the <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> function will increment the name of the new model to the next available integer in your modeling directory, but you can also pass a custom name to the <code>.new_model</code> argument. See <a href="https://metrumresearchgroup.github.io/bbr/reference/copy_model_from.html"><code>?copy_model_from</code></a> for more details this, and other optional arguments.</p>
+<p>The <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> call below will create both <code>2.ctl</code> and <code>2.yaml</code> files in the same directory as the parent model, and return the model object corresponding to them. (<code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> also stores the model’s “ancestry” which can be useful later in the project, as shown in the <a href="https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html">Using the based_on field</a> vignette.)</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span><span class="va">mod1</span><span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
+  <span class="fu"><a href="../reference/update_model_id.html">update_model_id</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; replacing 1 with 2 in /data/home/sethg/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/2.ctl</span></code></pre></div>
+<p>The new control stream file <code>2.ctl</code> will be identical to its parent model, though you can use <a href="https://metrumresearchgroup.github.io/bbr/reference/update_model_id.html"><code>update_model_id()</code></a> (as above) to update to the new model ID in places like <code>$TABLE</code> statements.</p>
+<p>Your new control stream can now be edited with any desired changes and then submitted and summarized exactly as above. At any time, you can also see the difference between a model and its parent using <a href="https://metrumresearchgroup.github.io/bbr/reference/model_diff.html"><code>model_diff()</code></a>.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># manually edit control stream, then...</span>
-<span class="va">mod2</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/submit_model.html">submit_model</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">mod2</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/model_summary.html">model_summary</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="../reference/model_diff.html">model_diff</a></span><span class="op">(</span><span class="va">mod2</span><span class="op">)</span>
+<span class="va">mod2</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> <span class="fu"><a href="../reference/submit_model.html">submit_model</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">mod2</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> <span class="fu"><a href="../reference/model_summary.html">model_summary</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="adding-tags-and-notes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#adding-tags-and-notes" class="anchor"></a>Adding tags and notes</h2>
 <p>After looking at these results, the user can add tags, which can later be used to organize your modeling runs.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mod1</span> <span class="op">&lt;-</span> <span class="va">mod1</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/modify_tags.html">add_tags</a></span><span class="op">(</span><span class="st">"orig acop model"</span><span class="op">)</span>
-<span class="va">mod2</span> <span class="op">&lt;-</span> <span class="va">mod2</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/modify_tags.html">add_tags</a></span><span class="op">(</span><span class="st">"2 compartment"</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">mod1</span> <span class="op">&lt;-</span> <span class="va">mod1</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> <span class="fu"><a href="../reference/modify_tags.html">add_tags</a></span><span class="op">(</span><span class="st">"orig acop model"</span><span class="op">)</span>
+<span class="va">mod2</span> <span class="op">&lt;-</span> <span class="va">mod2</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> <span class="fu"><a href="../reference/modify_tags.html">add_tags</a></span><span class="op">(</span><span class="st">"2 compartment"</span><span class="op">)</span></code></pre></div>
 <p>Note that using free text for your tags is discouraged, for reasons mentioned in the <code><a href="../reference/modify_tags.html">?modify_tags</a></code> help page. For simplicity’s sake, we ignore that advice here, but please read it before using tags extensively in the wild.</p>
 <p>In addition to tags, the user can add notes that can be referenced later.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="va">mod2</span> <span class="op">%&gt;%</span> 
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="va">mod2</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> 
   <span class="fu"><a href="../reference/modify_notes.html">add_notes</a></span><span class="op">(</span><span class="st">"2 compartment model more appropriate than 1 compartment"</span><span class="op">)</span></code></pre></div>
 <p>The <code><a href="../reference/model_diff.html">model_diff()</a></code> and <code><a href="../reference/tags_diff.html">tags_diff()</a></code> function make it easy to compare models to their parent model. See the <a href="https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html">“Using based_on” vignette</a> for examples.</p>
 </div>
@@ -328,17 +351,17 @@
 <h2 class="hasAnchor">
 <a href="#continue-to-iterate" class="anchor"></a>Continue to iterate…</h2>
 <p>Now the iteration process continues with a third model. Note that you can tell <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> to inherit the tags from the parent model and automatically add them to the new model.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mod3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span><span class="va">mod2</span>, <span class="fl">3</span>, .inherit_tags <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p>Submit and summarize as before.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># manually edit control stream, then...</span>
-<span class="va">mod3</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/submit_model.html">submit_model</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">mod3</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/model_summary.html">model_summary</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<p>Add tags and notes for filtering in run log, described next.</p>
+<code class="sourceCode R"><span class="va">mod3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span><span class="va">mod2</span>, .inherit_tags <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p>Submit and summarize as before.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mod3</span> <span class="op">&lt;-</span> <span class="va">mod3</span> <span class="op">%&gt;%</span> 
-        <span class="fu"><a href="../reference/modify_tags.html">add_tags</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"combined RUV"</span>, <span class="st">"iiv CL"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="co"># manually edit control stream, then...</span>
+<span class="va">mod3</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> <span class="fu"><a href="../reference/submit_model.html">submit_model</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">mod3</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> <span class="fu"><a href="../reference/model_summary.html">model_summary</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<p>Add tags and notes for filtering in run log, described next.</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">mod3</span> <span class="op">&lt;-</span> <span class="va">mod3</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> 
+        <span class="fu"><a href="../reference/modify_tags.html">add_tags</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"combined RUV"</span>, <span class="st">"iiv CL"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
         <span class="fu"><a href="../reference/modify_notes.html">add_notes</a></span><span class="op">(</span><span class="st">"Added combined error structure because it seemed like a good idea"</span><span class="op">)</span></code></pre></div>
 </div>
 </div>
@@ -347,24 +370,24 @@
 <a href="#run-log" class="anchor"></a>Run log</h1>
 <p>At any point, the user can easily construct a “run log” tibble to summarize all models run up to this point.</p>
 <p>Before we move on, note that you can get even more information about your models from the <code><a href="../reference/config_log.html">config_log()</a></code> and <code><a href="../reference/summary_log.html">summary_log()</a></code> functions, as well as <code><a href="../reference/config_log.html">add_config()</a></code> and <code><a href="../reference/summary_log.html">add_summary()</a></code> which automatically join the columns output from those functions against the tibble output from <code><a href="../reference/run_log.html">run_log()</a></code>. See the “Further Reading” section below for links to vignettes demonstrating those functions.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">log_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_log.html">run_log</a></span><span class="op">(</span><span class="va">MODEL_DIR</span><span class="op">)</span>
 <span class="va">log_df</span>
-<span class="co">#&gt; # A tibble: 3 × 10</span>
+<span class="co">#&gt; # A tibble: 3 × 9</span>
 <span class="co">#&gt;   absolute_model_… run   yaml_md5 model_type description bbi_args based_on tags </span>
 <span class="co">#&gt;   &lt;chr&gt;            &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;chr&gt;       &lt;list&gt;   &lt;list&gt;   &lt;lis&gt;</span>
 <span class="co">#&gt; 1 /data/home/seth… 1     c7486e7… nonmem     &lt;NA&gt;        &lt;NULL&gt;   &lt;NULL&gt;   &lt;chr…</span>
 <span class="co">#&gt; 2 /data/home/seth… 2     bc60c6b… nonmem     &lt;NA&gt;        &lt;NULL&gt;   &lt;chr [1… &lt;chr…</span>
 <span class="co">#&gt; 3 /data/home/seth… 3     5a4970e… nonmem     &lt;NA&gt;        &lt;NULL&gt;   &lt;chr [1… &lt;chr…</span>
-<span class="co">#&gt; # … with 2 more variables: notes &lt;list&gt;, decisions &lt;list&gt;</span></code></pre></div>
+<span class="co">#&gt; # … with 1 more variable: notes &lt;list&gt;</span></code></pre></div>
 <p>The <code><a href="../reference/run_log.html">run_log()</a></code> returns a tibble which can be manipulated like any other tibble. However, several of the columns (<code>tags</code>, <code>notes</code>, and <code>based_on</code> for example) are list columns, which complicates how you can interact with them. We provide some helper functions to more seamlessly interact with these log tibbles, as well as some sample <code>tidyverse</code> code below.</p>
 <div id="viewing-tags-example" class="section level2">
 <h2 class="hasAnchor">
 <a href="#viewing-tags-example" class="anchor"></a>Viewing tags example</h2>
 <p>The <code><a href="../reference/collapse_to_string.html">bbr::collapse_to_string()</a></code> function can collapse any list column into a string representation of its contents. It is specifically designed for collapsing columns like <code>tags</code>, <code>notes</code>, and <code>based_on</code> into a more human-readable format.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">log_df</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="../reference/collapse_to_string.html">collapse_to_string</a></span><span class="op">(</span><span class="va">tags</span>, <span class="va">notes</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">log_df</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> 
+  <span class="fu"><a href="../reference/collapse_to_string.html">collapse_to_string</a></span><span class="op">(</span><span class="va">tags</span>, <span class="va">notes</span><span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="va">tags</span>, <span class="va">notes</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 3 × 3</span>
 <span class="co">#&gt;   run   tags                                notes                               </span>
@@ -377,10 +400,10 @@
 <h2 class="hasAnchor">
 <a href="#filtering-tags-example" class="anchor"></a>Filtering tags example</h2>
 <p>This code uses <code><a href="https://purrr.tidyverse.org/reference/map.html">purrr::map_lgl</a></code> to filter the run log to only rows containing a specific tag (<code>"2 compartment"</code>).</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">log_df</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map_lgl</a></span><span class="op">(</span><span class="va">tags</span>, <span class="op">~</span> <span class="st">"2 compartment"</span> <span class="op">%in%</span> <span class="va">.x</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="../reference/collapse_to_string.html">collapse_to_string</a></span><span class="op">(</span><span class="va">tags</span>, <span class="va">notes</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">log_df</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map_lgl</a></span><span class="op">(</span><span class="va">tags</span>, <span class="op">~</span> <span class="st">"2 compartment"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="va">.x</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
+  <span class="fu"><a href="../reference/collapse_to_string.html">collapse_to_string</a></span><span class="op">(</span><span class="va">tags</span>, <span class="va">notes</span><span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="va">tags</span>, <span class="va">notes</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 2 × 3</span>
 <span class="co">#&gt;   run   tags                                notes                               </span>
@@ -413,7 +436,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse.</p>
+  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">

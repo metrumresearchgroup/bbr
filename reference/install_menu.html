@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
       </span>
     </div>
 
@@ -163,19 +163,26 @@
     </tr>
     <tr>
       <th>.path</th>
-      <td><p>path to install bbi to</p></td>
+      <td><p>absolute path to install bbi to. See Details section for
+defaults, if nothing is passed.</p></td>
     </tr>
     <tr>
       <th>.version</th>
-      <td><p>version of bbi to install. Must pass a character scalar corresponding to a tag found in <code>https://github.com/metrumresearchgroup/bbi/releases</code></p></td>
+      <td><p>version of bbi to install. Must pass a character scalar
+corresponding to a tag found in
+<code>https://github.com/metrumresearchgroup/bbi/releases</code></p></td>
     </tr>
     <tr>
       <th>.force</th>
-      <td><p>If <code>FALSE</code>, the default, skips installation if requested version and local version are the same. If <code>TRUE</code> forces installation if it will be the same version.</p></td>
+      <td><p>If <code>FALSE</code>, the default, skips installation if requested
+version and local version are the same. If <code>TRUE</code> forces installation if it
+will be the same version.</p></td>
     </tr>
     <tr>
       <th>.quiet</th>
-      <td><p>If <code>TRUE</code>, suppresses output printed to the console. <code>FALSE</code> by default.</p></td>
+      <td><p><strong>Deprecated.</strong> Use <code>options("bbr.verbose")</code> instead to control
+printing. Defaults to <code>NULL</code>, which reads <code>!getOption("bbr.verbose")</code>. If
+<code>TRUE</code>, suppresses output printed to the console.</p></td>
     </tr>
     </table>
 
@@ -191,7 +198,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse.</p>
+  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">

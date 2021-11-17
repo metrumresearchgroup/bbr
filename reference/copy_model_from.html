@@ -82,7 +82,7 @@ ancestry. See &quot;Using based_on field&quot; vignette for details." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
       </span>
     </div>
 
@@ -158,7 +158,7 @@ ancestry. See <a href='../articles/using-based-on.html'>"Using based_on field" v
 
     <pre class="usage"><span class='fu'>copy_model_from</span><span class='op'>(</span>
   <span class='va'>.parent_mod</span>,
-  <span class='va'>.new_model</span>,
+  .new_model <span class='op'>=</span> <span class='cn'>NULL</span>,
   .description <span class='op'>=</span> <span class='cn'>NULL</span>,
   .based_on_additional <span class='op'>=</span> <span class='cn'>NULL</span>,
   .add_tags <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -170,7 +170,7 @@ ancestry. See <a href='../articles/using-based-on.html'>"Using based_on field" v
 <span class='co'># S3 method for bbi_nonmem_model</span>
 <span class='fu'>copy_model_from</span><span class='op'>(</span>
   <span class='va'>.parent_mod</span>,
-  <span class='va'>.new_model</span>,
+  .new_model <span class='op'>=</span> <span class='cn'>NULL</span>,
   .description <span class='op'>=</span> <span class='cn'>NULL</span>,
   .based_on_additional <span class='op'>=</span> <span class='cn'>NULL</span>,
   .add_tags <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -192,7 +192,8 @@ ancestry. See <a href='../articles/using-based-on.html'>"Using based_on field" v
 path to <code>.parent_mod</code>. Represents an absolute model path, which is the path
 to the YAML file and model file, both without extension, and the output
 directory (once the model is run). Numeric values will be coerced to
-character. See examples for usage.</p></td>
+character. If <code>NULL</code>, the default, will try to increment to the next integer
+in the destination directory. See examples for usage.</p></td>
     </tr>
     <tr>
       <th>.description</th>
@@ -239,26 +240,32 @@ file at <code>.new_model</code> will be overwritten silently.</p></td>
 <ul>
 <li><p><code>bbi_nonmem_model</code>: <code>.parent_mod</code> takes a <code>bbi_nonmem_model</code> object to use as a basis for the copy.</p></li>
 </ul>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><code><a href='new_model.html'>new_model()</a></code>, <code><a href='update_model_id.html'>update_model_id()</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='va'>parent</span> <span class='op'>&lt;-</span> <span class='fu'><a href='read_model.html'>read_model</a></span><span class='op'>(</span><span class='st'>"/foo/parent"</span><span class='op'>)</span>
-
-<span class='co'># create model file at /bar/child.ctl and YAML at /bar/child.yaml</span>
-<span class='fu'>copy_model_from</span><span class='op'>(</span><span class='va'>parent</span>, <span class='st'>"/bar/child"</span>, <span class='st'>"child model with absolute path"</span><span class='op'>)</span>
-
-<span class='co'># create model file at /foo/child.ctl and YAML at /foo/child.yaml</span>
-<span class='fu'>copy_model_from</span><span class='op'>(</span><span class='va'>parent</span>, <span class='st'>"child"</span>, <span class='st'>"relative to parent model path"</span><span class='op'>)</span>
-
-<span class='va'>mod1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='read_model.html'>read_model</a></span><span class='op'>(</span><span class='st'>"/path/to/1"</span><span class='op'>)</span>
-
-<span class='co'># create model file at /path/to/2.ctl and YAML at /path/to/2.yaml</span>
-<span class='fu'>copy_model_from</span><span class='op'>(</span><span class='va'>mod1</span>, <span class='fl'>2</span>, <span class='st'>"numeric input works"</span><span class='op'>)</span>
-
-<span class='co'># create model file at /path/to/100.1.ctl and YAML at /path/to/100.1.yaml</span>
-<span class='fu'>copy_model_from</span><span class='op'>(</span><span class='va'>mod1</span>, <span class='fl'>100.1</span>, <span class='st'>"a period is okay"</span><span class='op'>)</span>
-<span class='op'>}</span>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'><span class='va'>parent</span> <span class='op'>&lt;-</span> <span class='fu'><a href='read_model.html'>read_model</a></span><span class='op'>(</span><span class='st'>"/foo/parent"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># create model file at /bar/child.ctl and YAML at /bar/child.yaml</span></span>
+<span class='r-in'><span class='fu'>copy_model_from</span><span class='op'>(</span><span class='va'>parent</span>, <span class='st'>"/bar/child"</span>, <span class='st'>"child model with absolute path"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># create model file at /foo/child.ctl and YAML at /foo/child.yaml</span></span>
+<span class='r-in'><span class='fu'>copy_model_from</span><span class='op'>(</span><span class='va'>parent</span>, <span class='st'>"child"</span>, <span class='st'>"relative to parent model path"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>mod1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='read_model.html'>read_model</a></span><span class='op'>(</span><span class='st'>"/path/to/1"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># create model file at /path/to/2.ctl and YAML at /path/to/2.yaml</span></span>
+<span class='r-in'><span class='fu'>copy_model_from</span><span class='op'>(</span><span class='va'>mod1</span>, <span class='st'>"increments to next integer by default"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># create model file at /path/to/3.ctl and YAML at /path/to/3.yaml</span></span>
+<span class='r-in'><span class='fu'>copy_model_from</span><span class='op'>(</span><span class='va'>mod1</span>, <span class='fl'>3</span>, <span class='st'>"numeric input works"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># create model file at /path/to/100.1.ctl and YAML at /path/to/100.1.yaml</span></span>
+<span class='r-in'><span class='fu'>copy_model_from</span><span class='op'>(</span><span class='va'>mod1</span>, <span class='fl'>100.1</span>, <span class='st'>"a period is okay"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -270,7 +277,7 @@ file at <code>.new_model</code> will be overwritten silently.</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse.</p>
+  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">

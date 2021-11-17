@@ -50,7 +50,9 @@
 <meta property="og:description" content="Identifies system running and pulls the relevant tarball for the
 current release of bbi from GitHub, and then installs it in the directory
 passed to .dir. If used in an interactive session, will open an
-installation menu confirming the installed version." />
+installation menu confirming the installed version. This function will
+print information about the installed version. This printing can be
+suppressed by setting options(bbr.verbose = FALSE)." />
 <meta property="og:image" content="https://metrumresearchgroup.github.io/bbr/logo.png" />
 
 
@@ -83,7 +85,7 @@ installation menu confirming the installed version." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
       </span>
     </div>
 
@@ -155,29 +157,38 @@ installation menu confirming the installed version." />
     <p>Identifies system running and pulls the relevant tarball for the
 current release of bbi from GitHub, and then installs it in the directory
 passed to <code>.dir</code>. If used in an interactive session, will open an
-installation menu confirming the installed version.</p>
+installation menu confirming the installed version. This function will
+print information about the installed version. This <strong>printing can be
+suppressed</strong> by setting <code>options(bbr.verbose = FALSE)</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>use_bbi</span><span class='op'>(</span>.path <span class='op'>=</span> <span class='cn'>NULL</span>, .version <span class='op'>=</span> <span class='st'>"latest"</span>, .force <span class='op'>=</span> <span class='cn'>FALSE</span>, .quiet <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>use_bbi</span><span class='op'>(</span>.path <span class='op'>=</span> <span class='cn'>NULL</span>, .version <span class='op'>=</span> <span class='st'>"latest"</span>, .force <span class='op'>=</span> <span class='cn'>FALSE</span>, .quiet <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>.path</th>
-      <td><p>absolute path to install bbi to. See Details section for defaults, if nothing is passed.</p></td>
+      <td><p>absolute path to install bbi to. See Details section for
+defaults, if nothing is passed.</p></td>
     </tr>
     <tr>
       <th>.version</th>
-      <td><p>version of bbi to install. Must pass a character scalar corresponding to a tag found in <code>https://github.com/metrumresearchgroup/bbi/releases</code></p></td>
+      <td><p>version of bbi to install. Must pass a character scalar
+corresponding to a tag found in
+<code>https://github.com/metrumresearchgroup/bbi/releases</code></p></td>
     </tr>
     <tr>
       <th>.force</th>
-      <td><p>If <code>FALSE</code>, the default, skips installation if requested version and local version are the same. If <code>TRUE</code> forces installation if it will be the same version.</p></td>
+      <td><p>If <code>FALSE</code>, the default, skips installation if requested
+version and local version are the same. If <code>TRUE</code> forces installation if it
+will be the same version.</p></td>
     </tr>
     <tr>
       <th>.quiet</th>
-      <td><p>If <code>TRUE</code>, suppresses output printed to the console. <code>FALSE</code> by default.</p></td>
+      <td><p><strong>Deprecated.</strong> Use <code>options("bbr.verbose")</code> instead to control
+printing. Defaults to <code>NULL</code>, which reads <code>!getOption("bbr.verbose")</code>. If
+<code>TRUE</code>, suppresses output printed to the console.</p></td>
     </tr>
     </table>
 
@@ -189,13 +200,13 @@ installation menu confirming the installed version.</p>
     <p>If nothing is passed to the <code>.path</code> argument, <code>use_bbi()</code> will
 attempt to find a valid path for installation. The following decision
 waterfall is used:</p><ul>
-<li><p>First, check <code><a href='https://rdrr.io/r/base/options.html'>getOption("bbr.bbi_exe_path")</a></code>. If this is anything <em>other
+<li><p>First, check <code>getOption("bbr.bbi_exe_path")</code>. If this is anything <em>other
 than</em> <code>"bbi"</code> (the default value) then attempt to install to that path.</p></li>
-<li><p>Second, check <code><a href='https://rdrr.io/r/base/Sys.which.html'>Sys.which("bbi")</a></code> which will look for a <code>bbi</code> installation
+<li><p>Second, check <code>Sys.which("bbi")</code> which will look for a <code>bbi</code> installation
 in the user's <code>$PATH</code>. If one is found, ask the user if they wish to
 overwrite it and, if they confirm, install to that path.</p></li>
 <li><p>Third, attempt to install to a "default location" and add this location to
-the user's <code>$PATH</code>. If <code><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv("XDG_DATA_HOME")</a></code> is found, install to
+the user's <code>$PATH</code>. If <code>Sys.getenv("XDG_DATA_HOME")</code> is found, install to
 <code>{Sys.getenv("XDG_DATA_HOME")}/bbi/bbi</code> (per <a href='https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html'>XGD specification</a>).
 Otherwise, install to OS dependent defaults:</p><ul>
 <li><p>Linux: <code>{Sys.getenv("HOME")}/.local/share/bbi/bbi</code></p></li>
@@ -205,7 +216,7 @@ Otherwise, install to OS dependent defaults:</p><ul>
 </ul>
 
 <p>If none of these are successful, the user will be prompted to set
-<code><a href='https://rdrr.io/r/base/options.html'>options("bbr.bbi_exe_path")</a></code> and try again.</p>
+<code>options("bbr.bbi_exe_path")</code> and try again.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -218,7 +229,7 @@ Otherwise, install to OS dependent defaults:</p><ul>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse.</p>
+  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">

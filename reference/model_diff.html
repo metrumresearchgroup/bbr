@@ -84,7 +84,7 @@ field entirely." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
       </span>
     </div>
 
@@ -176,7 +176,7 @@ field entirely.</p>
       <th>.mod2</th>
       <td><p>If a <code>bbi_{.model_type}_model</code> object is passed, compare <code>.mod</code> to
 <code>.mod2</code>. If <code>.mod2 = NULL</code>, the default, compare <code>.mod</code> to the model at
-<code><a href='get_based_on.html'>get_based_on(.mod)</a></code>. See "<code>based_on</code> details" in Details section.</p></td>
+<code>get_based_on(.mod)</code>. See "<code>based_on</code> details" in Details section.</p></td>
     </tr>
     <tr>
       <th>.file</th>
@@ -210,7 +210,7 @@ output.</strong> If you are are rendering to a different format (PDF, DOCX, etc.
 you can still use <code>model_diff()</code> <em>without</em> <code>results = "asis"</code> and it will
 render, although it won't look particularly nice.</p>
 <p><strong><code>based_on</code> details:</strong> As described above, if <code>.mod2</code> is <code>NULL</code> (the default),
-then the <code>.mod</code> will be compared to the model returned by <code><a href='get_based_on.html'>get_based_on(.mod)</a></code>.
+then the <code>.mod</code> will be compared to the model returned by <code>get_based_on(.mod)</code>.
 However, <em>if there is more than one model</em> (or no models) in <code>.mod$based_on</code>, then user
 will be prompted to explicitly pass the model they want to compare against to
 the <code>.mod2</code> argument.</p>
@@ -233,7 +233,7 @@ the <code>.mod2</code> argument.</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse.</p>
+  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">

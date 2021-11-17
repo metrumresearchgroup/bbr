@@ -82,7 +82,7 @@ Also fills in necessary YAML fields for using run_log() later." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
       </span>
     </div>
 
@@ -180,7 +180,8 @@ Also fills in necessary YAML fields for using <code><a href='run_log.html'>run_l
 path to <code>.parent_mod</code>. Represents an absolute model path, which is the path
 to the YAML file and model file, both without extension, and the output
 directory (once the model is run). Numeric values will be coerced to
-character. See examples for usage.</p></td>
+character. If <code>NULL</code>, the default, will try to increment to the next integer
+in the destination directory. See examples for usage.</p></td>
     </tr>
     <tr>
       <th>.description</th>
@@ -233,7 +234,7 @@ file at <code>.new_model</code> will be overwritten silently.</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse.</p>
+  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
