@@ -16,28 +16,40 @@ reference:
   - new_model
   - read_model
   - copy_model_from
+  - update_model_id
   - model_diff
   - tags_diff
   - check_up_to_date
+
 - title: Model submission
   contents:
   - submit_model
   - submit_models
   - print_bbi_args
-- title: Model summary
+
+- title: Model summary and outputs
   contents:
   - model_summary
   - model_summaries
   - param_estimates
+  - param_estimates_batch
+  - nm_file
+  - nm_join
+  - nm_tables
+  - cov_cor
+  - check_cor_threshold
+  - as_summary_list
+  - param_labels
+  - apply_indices
+  - block
+
+- title: Summary log tables
+  contents:
   - run_log
   - summary_log
   - add_summary
   - config_log
   - add_config
-  - as_summary_list
-  - param_labels
-  - apply_indices
-  - block
 
 - title: Model object interactions
   contents:
@@ -46,7 +58,7 @@ reference:
   - add_based_on
   - add_description
   - add_bbi_args
-  - add_decisions
+  - modify_model_field
   - build_path_from_model
   - get_based_on
   - get_model_ancestry
@@ -56,6 +68,7 @@ reference:
   - get_yaml_path
   - get_data_path
   - print_bbi
+
 - title: bbi configuration
   contents:
   - use_bbi
