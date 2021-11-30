@@ -190,4 +190,15 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_equal(res_str, ref_str)
   })
 
+  test_that("print.bbi_nonmem_summary ONLYSIM [BBR-PRNT-003]", {
+    skip_if_old_bbi("3.1.0")
+
+    .s <- file.path(MODEL_DIR_X, "acop-onlysim") %>%
+      read_model() %>%
+      model_summary()
+
+    res_str <- capture.output(print(.s))
+    expect_true("No Estimation Methods (ONLYSIM)" %in% res_str)
+  })
+
 })
