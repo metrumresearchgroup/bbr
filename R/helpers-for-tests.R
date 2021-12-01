@@ -35,3 +35,19 @@ skip_if_not_drone_or_metworx <- function(.test_name) {
     testthat::skip(paste(.test_name, "only runs on Metworx or Drone"))
   }
 }
+
+#' Skip test if bbi version is as old or older than the given version.
+#'
+#' If the version string starts with "develop", the test is never skipped.
+#'
+#' @param v a package version or a string that can be converted to one
+skip_if_old_bbi <- function(v) {
+    v_bbi <- bbi_version()
+    if (isFALSE(stringr::str_starts(v_bbi, "develop"))) {
+      v_bbi <- package_version(v_bbi)
+      if (v_bbi <= package_version(v)) {
+        testthat::skip(
+          glue("bbi version is  {v_bbi}. Test requires bbi version > {v}"))
+      }
+    }
+}
