@@ -35,6 +35,17 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     )
   })
 
+  test_that("param_estimates correctly errors on ONLYSIM models [BBR-PEST-003]", {
+    skip_if_old_bbi("3.1.0")
+    sum1 <- file.path(MODEL_DIR_X, "acop-onlysim") %>%
+      read_model() %>%
+      model_summary()
+    expect_error(
+      param_estimates(sum1),
+      regexp = "no estimation method \\(ONLYSIM\\)"
+    )
+  })
+
   test_that("param_estimates correctly warns on mixture model [BBR-PEST-004]", {
     mod1 <- read_model(file.path(MODEL_DIR_X, "iovmm"))
     sum1 <- model_summary(mod1)
