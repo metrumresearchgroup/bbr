@@ -1,7 +1,5 @@
 context("Test creating summary logs")
 
-suppressPackageStartupMessages(library(dplyr))
-
 skip_if_not_drone_or_metworx("test-summary-log")
 
 # helper to run expectations
