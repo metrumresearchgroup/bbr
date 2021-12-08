@@ -96,3 +96,10 @@ test_that("bbi_init passes .bbi_args [BBR-BBR-008]", {
   expect_equal(bbi_yaml$threads, 36)
   expect_true(bbi_yaml$no_shk_file)
 })
+
+test_that("bbi_help captures and relays bbi output [BBR-BBR-009]", {
+  withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
+    res <- paste(capture.output(bbi_help()), collapse = "\n")
+  })
+  expect_true(stringr::str_detect(res, "bbi cli version"))
+})
