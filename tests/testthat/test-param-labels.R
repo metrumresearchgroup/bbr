@@ -65,9 +65,10 @@ for (MODEL_PICK in MODEL_PICKS) {
       select(-param_type)
 
     # join against reference to make sure they're the same
-    ref_df <- ref_df %>% dplyr::mutate(!!SUMMARY_PARAM_NAMES := ifelse(param == "THETA",
-                                                                paste0(param, var1),
-                                                                paste0(param, "(", var1, ",", var2, ")")))
+    ref_df <- ref_df %>% dplyr::mutate(
+      !!SUMMARY_PARAM_NAMES := ifelse(param == "THETA",
+                                      paste0(param, var1),
+                                      paste0(param, "(", var1, ",", var2, ")")))
 
     join_df <- ref_df %>%
       dplyr::full_join(.label_df, by = names(.label_df))
@@ -106,15 +107,19 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
       # join to constuct full parameter table
       suppressSpecificWarning({
-        .new_df <- dplyr::inner_join(.param_df,
-                              .label_df %>% apply_indices(.omega = MODEL_PICK$omega, .sigma = MODEL_PICK$sigma) %>% dplyr::select(-param_type),
-                              by = SUMMARY_PARAM_NAMES)
+        .new_df <- dplyr::inner_join(
+          .param_df,
+          .label_df %>%
+            apply_indices(.omega = MODEL_PICK$omega, .sigma = MODEL_PICK$sigma) %>%
+            dplyr::select(-param_type),
+          by = SUMMARY_PARAM_NAMES)
       }, .regexpr = "Column .+ has different attributes on LHS and RHS of join")
 
       # join against reference to make sure they're the same
-      ref_df <- ref_df %>% dplyr::mutate(!!SUMMARY_PARAM_NAMES := ifelse(param == "THETA",
-                                                                  paste0(param, var1),
-                                                                  paste0(param, "(", var1, ",", var2, ")")))
+      ref_df <- ref_df %>% dplyr::mutate(
+        !!SUMMARY_PARAM_NAMES := ifelse(param == "THETA",
+                                        paste0(param, var1),
+                                        paste0(param, "(", var1, ",", var2, ")")))
 
       join_df <- ref_df %>%
         dplyr::full_join(.new_df, by = names(.label_df))
