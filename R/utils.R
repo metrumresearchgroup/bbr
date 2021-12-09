@@ -491,3 +491,16 @@ suppressSpecificWarning <- function(.expr, .regexpr) {
   })
 }
 
+#' Call `utils::download.file()`, retrying once on failure.
+#'
+#' @param ... arguments to pass to `utils::download.file()`
+#' @keywords internal
+download_with_retry <- function(...) {
+  rc <- 1
+  tryCatch(rc <- utils::download.file(...))
+  if (rc != 0) {
+    Sys.sleep(1)
+    rc <- utils::download.file(...)
+  }
+  return(rc)
+}
