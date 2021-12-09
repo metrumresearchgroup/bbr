@@ -267,7 +267,7 @@ download_bbi <- function(.bbi_url, .path){
 
 #' @title Get version of installed bbi
 #'
-#' @importFrom stringr str_detect str_replace_all
+#' @importFrom stringr str_detect str_replace_all str_trim
 #' @param .bbi_exe_path Path to bbi executable
 #' @return String giving the version of the bbi binary installed at `.bbi_exe_path`
 #' @examples
@@ -286,8 +286,8 @@ bbi_version <- function(.bbi_exe_path = getOption('bbr.bbi_exe_path')){
 
   tryCatch(
     {
-      res <- system(sprintf('%s version', .bbi_exe_path),intern = TRUE)
-      return(str_replace_all(res, '^v', ''))
+      res <- processx::run(.bbi_exe_path, "version", error_on_status = TRUE)
+      return(str_replace_all(str_trim(res$stdout, side = "right"), '^v', ''))
     },
     error = function(e) {
       if (str_detect(e$message, "error in running command")) {
