@@ -170,4 +170,17 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_error(model_summary(mod2), regexp = NO_LST_ERR_MSG)
   })
 
+  test_that("model_summary() fails if multiple .lst files are present [BBR-SUM-005]", {
+    on.exit({
+      fs::dir_delete(NEW_MOD2)
+      fs::file_delete(ctl_ext(NEW_MOD2))
+      fs::file_delete(yaml_ext(NEW_MOD2))
+    })
+
+    mod2 <- MOD1 %>% copy_model_from(basename(NEW_MOD2))
+    fs::dir_copy(MOD1_PATH, NEW_MOD2)
+    fs::file_copy(file.path(NEW_MOD2, "1.lst"), file.path(NEW_MOD2, "2.lst"))
+
+    expect_error(model_summary(mod2), regexp = "More than one `\\.lst` file")
+  })
 }) # closing withr::with_options
