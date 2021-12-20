@@ -10,5 +10,6 @@ skip_if_old_bbi(v)
 \item{v}{a package version or a string that can be converted to one}
 }
 \description{
-If the version string starts with "develop", the test is never skipped.
+If the version can't be parsed by \code{\link[=package_version]{package_version()}}, the test is never
+skipped.
 }
