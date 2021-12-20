@@ -74,13 +74,14 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   test_that("summary_log() parses heuristics correctly [BBR-SMLG-006]", {
     sum_df2 <- summary_log(MODEL_DIR_X, .fail_flags = list(ext_file = "1001.1.TXT"))
-
-    expect_false(filter(sum_df2, run == "1001") %>% pull(minimization_terminated))
-    expect_true(filter(sum_df2, run == "1001") %>% pull(large_condition_number))
-    expect_true(filter(sum_df2, run == "1001") %>% pull(prderr))
-    expect_true(filter(sum_df2, run == "1001") %>% pull(!!ANY_HEURISTICS))
-    expect_true(filter(sum_df2, run == "acop-fake-bayes") %>% pull(eigenvalue_issues))
-    expect_true(filter(sum_df2, run == "iovmm") %>% pull(has_final_zero_gradient))
+    
+    run1001 <- filter(sum_df2, run == "1001")
+    expect_false(run1001$minimization_terminated)
+    expect_true(run1001$large_condition_number)
+    expect_true(run1001$prderr)
+    expect_true(run1001[[ANY_HEURISTICS]])
+    expect_true(filter(sum_df2, run == "acop-fake-bayes")$eigenvalue_issues)
+    expect_true(filter(sum_df2, run == "iovmm")$has_final_zero_gradient)
   })
 
   test_that("summary_log() parses more complex flags and stats [BBR-SMLG-007]", {
