@@ -67,7 +67,7 @@ use_bbi <- function(.path = NULL, .version = "latest", .force = FALSE, .quiet = 
   }
 
   if(.version == "latest") {
-    .bbi_url <- current_release(owner = 'metrumresearchgroup', repo = 'bbi')
+    .bbi_url <- current_release_url(owner = 'metrumresearchgroup', repo = 'bbi')
   } else {
     .bbi_url <- as.character(glue("https://github.com/metrumresearchgroup/bbi/releases/download/{.version}/bbi_{this_os}_amd64.tar.gz"))
   }
@@ -86,7 +86,7 @@ use_bbi <- function(.path = NULL, .version = "latest", .force = FALSE, .quiet = 
 #' @param owner Repository owner/organization
 #' @param repo Repository name
 #' @keywords internal
-current_release <- function(owner = 'metrumresearchgroup', repo = 'bbi'){
+current_release_url <- function(owner = 'metrumresearchgroup', repo = 'bbi'){
 
   os <- check_os()
 
@@ -100,7 +100,7 @@ current_release <- function(owner = 'metrumresearchgroup', repo = 'bbi'){
     },
     error = function(e) {
       if (str_detect(e$message, "HTTP error 403")) {
-        stop(glue('`current_release({owner}, {repo})` failed, possibly because this IP is over the public Github rate limit of 60/hour.'))
+        stop(glue('`current_release_url({owner}, {repo})` failed, possibly because this IP is over the public Github rate limit of 60/hour.'))
       }
     }
   )
@@ -118,12 +118,17 @@ current_release <- function(owner = 'metrumresearchgroup', repo = 'bbi'){
 
 #' @title Get version number of bbi current release
 #' @description Helper function to get version number of most recent release of bbi from GitHub.
+#' @param .bbi_url (Optional) URL for a bbi release artifact to strip version
+#'   number out of. If `NULL`, the default, will fetch the URL with
+#'   `current_release_url()`.
 #' @importFrom stringr str_replace
 #' @export
-bbi_current_release <- function(){
-  str_replace(basename(dirname(
-    current_release(owner = 'metrumresearchgroup', repo = 'bbi')
-  )), '^v', '')
+bbi_current_release <- function(.bbi_url = NULL){
+  checkmate::assert_string(.bbi_url, null.ok = TRUE)
+  if (is.null(.bbi_url)) {
+    .bbi_url <- current_release_url(owner = 'metrumresearchgroup', repo = 'bbi')
+  }
+  str_replace(basename(dirname(.bbi_url)), '^v', '')
 }
 
 #' Private implementation function for installing bbi with interactive menu
