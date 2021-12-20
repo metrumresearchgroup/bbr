@@ -274,7 +274,7 @@ bbi_help <- function(.cmd_args=NULL) {
     .cmd_args <- c(.cmd_args, "--help")
   }
   res <- bbi_exec(.cmd_args, .wait=TRUE)
-  cat(paste(res$output, collapse = "\n"))
+  cat(paste(res[[PROC_STDOUT]], collapse = "\n"))
 }
 
 
@@ -353,5 +353,5 @@ bbi_init <- function(.dir, .nonmem_dir, .nonmem_version = NULL, .bbi_args = NULL
     write_yaml(bbi_yaml, bbi_yaml_path)
   }
 
-  cat(paste(res$output, collapse = "\n"))
+  cat(paste(res[[PROC_STDOUT]], collapse = "\n"))
 }
