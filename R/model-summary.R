@@ -237,11 +237,16 @@ nonmem_summary <- function(
 
 #' Private helper function to look for .lst function in a directory
 #' @param .x The directory path to look in for the lst file
+#' @importFrom glue glue
 #' @keywords internal
 check_lst_file <- function(.x) {
   lst_file <- fs::dir_ls(.x, type = "file", glob = "*.lst")
-  if (!length(lst_file)) {
+
+  nfiles <- length(lst_file)
+  if (!nfiles) {
     stop(glue("Unable to locate `.lst` file in dir: {.x}. Check to be sure this is a NONMEM output folder, and that the run has finished successfully."))
+  } else if (nfiles > 1) {
+    stop(glue("More than one `.lst` file found in dir: {.x}"))
   }
   lst_file
 }
