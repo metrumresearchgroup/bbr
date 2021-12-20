@@ -47,7 +47,7 @@ skip_if_old_bbi <- function(v) {
     if (!is.na(v_bbi)) {
       if (v_bbi <= package_version(v)) {
         testthat::skip(
-          glue("bbi version is  {v_bbi}. Test requires bbi version > {v}"))
+          glue("bbi version is {v_bbi}. Test requires bbi version > {v}"))
       }
     }
 }
