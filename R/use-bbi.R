@@ -229,7 +229,7 @@ build_bbi_install_path <- function() {
 download_bbi <- function(.bbi_url, .path){
   checkmate::assert_string(.path)
   if (!fs::is_absolute_path(.path)) {
-    stop(glue("Must pass an absolute path but got: `{.path}`"), call. = FALSE)
+    dev_error(glue("Must pass an absolute path but got: `{.path}`"))
   }
   tmpdir <- tempfile()
   dir.create(tmpdir)
