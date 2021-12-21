@@ -57,22 +57,14 @@ use_bbi <- function(.path = NULL, .version = "latest", .force = FALSE, .quiet = 
     .quiet <- !getOption("bbr.verbose")
   }
 
-  this_os <- check_os()
-
-  header <- glue::glue('Installing bbi on a {this_os} system',
+  header <- glue::glue('Installing bbi on a {check_os()} system',
                        cli::rule(), .sep = '\n')
 
   if (is.null(.path)) {
     .path <- build_bbi_install_path()
   }
 
-  if(.version == "latest") {
-    .bbi_url <- current_release(owner = 'metrumresearchgroup', repo = 'bbi')
-  } else {
-    .bbi_url <- as.character(glue("https://github.com/metrumresearchgroup/bbi/releases/download/{.version}/bbi_{this_os}_amd64.tar.gz"))
-  }
-
-  on.exit(install_menu(.bbi_url, .path, .version, .force, .quiet), add = TRUE)
+  on.exit(install_menu(.path, .version, .force, .quiet), add = TRUE)
 
   if(isFALSE(.quiet)) print(header)
 
@@ -86,7 +78,7 @@ use_bbi <- function(.path = NULL, .version = "latest", .force = FALSE, .quiet = 
 #' @param owner Repository owner/organization
 #' @param repo Repository name
 #' @keywords internal
-current_release <- function(owner = 'metrumresearchgroup', repo = 'bbi'){
+current_release_url <- function(owner = 'metrumresearchgroup', repo = 'bbi'){
 
   os <- check_os()
 
@@ -100,7 +92,7 @@ current_release <- function(owner = 'metrumresearchgroup', repo = 'bbi'){
     },
     error = function(e) {
       if (str_detect(e$message, "HTTP error 403")) {
-        stop(glue('`current_release({owner}, {repo})` failed, possibly because this IP is over the public Github rate limit of 60/hour.'))
+        stop(glue('`current_release_url({owner}, {repo})` failed, possibly because this IP is over the public Github rate limit of 60/hour.'))
       }
     }
   )
@@ -118,51 +110,59 @@ current_release <- function(owner = 'metrumresearchgroup', repo = 'bbi'){
 
 #' @title Get version number of bbi current release
 #' @description Helper function to get version number of most recent release of bbi from GitHub.
+#' @param .bbi_url (Optional) URL for a bbi release artifact to strip version
+#'   number out of. If `NULL`, the default, will fetch the URL with
+#'   `current_release_url()`.
 #' @importFrom stringr str_replace
 #' @export
-bbi_current_release <- function(){
-  str_replace(basename(dirname(
-    current_release(owner = 'metrumresearchgroup', repo = 'bbi')
-  )), '^v', '')
+bbi_current_release <- function(.bbi_url = NULL){
+  checkmate::assert_string(.bbi_url, null.ok = TRUE)
+  if (is.null(.bbi_url)) {
+    .bbi_url <- current_release_url(owner = 'metrumresearchgroup', repo = 'bbi')
+  }
+  str_replace(basename(dirname(.bbi_url)), '^v', '')
 }
 
 #' Private implementation function for installing bbi with interactive menu
-#' @param .bbi_url URL to pass to `utils::download.file()`
 #' @inheritParams use_bbi
 #' @keywords internal
-install_menu <- function(.bbi_url, .path, .version, .force, .quiet){
+install_menu <- function(.path, .version, .force, .quiet){
 
   .dest_bbi_path <- normalizePath(.path, mustWork = FALSE)
   local_v <- bbi_version(.dest_bbi_path)
 
+  current_bbi_url <- current_release_url(owner = 'metrumresearchgroup', repo = 'bbi')
+  current_v <- bbi_current_release(current_bbi_url)
+
   if (.version == 'latest') {
-    release_v <- bbi_current_release()
+    .bbi_url <- current_bbi_url
+    requested_v <- current_v
   } else {
-    release_v <- .version
+    .bbi_url <- as.character(glue("https://github.com/metrumresearchgroup/bbi/releases/download/{.version}/bbi_{check_os()}_amd64.tar.gz"))
+    requested_v <- .version
   }
 
-  if(!identical(release_v, local_v) || isTRUE(.force)){
+  if(!identical(requested_v, local_v) || isTRUE(.force)){
 
     # suppressing interactivity will allow for suppression in unit tests. This may be more general to name
     # like specifiying its a test environment, but a user could also want to generally suppress interactivity for
     # automatted build pipelines etc.
     if (interactive() && is.null(getOption('bbr.suppress_interactivity'))) {
-      if (!isTRUE(.quiet)) version_message(local_v = local_v, release_v = release_v)
+      if (!isTRUE(.quiet)) version_message(local_v = local_v, current_v = current_v)
 
-      print(glue::glue(cli::rule(left = cli::col_red('Do you want to install version {release_v} at {.dest_bbi_path}?'),line = 2)))
+      print(glue::glue(cli::rule(left = cli::col_red('Do you want to install version {requested_v} at {.dest_bbi_path}?'),line = 2)))
 
       if(utils::menu(choices = c('Yes','No'))==1){
         download_bbi(.bbi_url, .dest_bbi_path)
-        local_v <- bbi_version(.dest_bbi_path)
       }
     } else {
       download_bbi(.bbi_url, .dest_bbi_path)
     }
-
+    local_v <- bbi_version(.dest_bbi_path)
   }
 
   add_to_path_message(.dest_bbi_path)
-  if (!isTRUE(.quiet)) version_message(local_v = local_v, release_v = release_v)
+  if (!isTRUE(.quiet)) version_message(local_v = local_v, current_v = current_v)
 }
 
 
@@ -229,7 +229,7 @@ build_bbi_install_path <- function() {
 download_bbi <- function(.bbi_url, .path){
   checkmate::assert_string(.path)
   if (!fs::is_absolute_path(.path)) {
-    stop(glue("Must pass an absolute path but got: `{.path}`"), call. = FALSE)
+    dev_error(glue("Must pass an absolute path but got: `{.path}`"))
   }
   tmpdir <- tempfile()
   dir.create(tmpdir)
@@ -303,19 +303,19 @@ bbi_version <- function(.bbi_exe_path = getOption('bbr.bbi_exe_path')){
 #' @importFrom cli rule col_blue col_red
 #' @importFrom glue glue
 #' @param local_v Character scalar for version number on local installation
-#' @param release_v Character scalar for version number of current release
+#' @param current_v Character scalar for version number of current release
 #' @keywords internal
-version_message <- function(local_v, release_v){
+version_message <- function(local_v, current_v){
   if (local_v == "") {
     cat(cli::col_red("No version currently installed "))
   } else{
     cat(glue::glue(cli::col_blue(' - Installed Version: {local_v} ')))
-    if (!identical(release_v,local_v)) {
+    if (!identical(current_v,local_v)) {
       cat(cli::col_red(" (Not Current Release) "))
     }
   }
 
-  cat(glue::glue(cli::col_blue(' - Current release: {release_v}\n')))
+  cat(glue::glue(cli::col_blue(' - Current release: {current_v}\n')))
 }
 
 #' Helper to message user about adding the bbi directory to $PATH
