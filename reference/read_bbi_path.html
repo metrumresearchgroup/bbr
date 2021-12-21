@@ -87,7 +87,7 @@ to a default path if unset." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1</span>
       </span>
     </div>
 
@@ -160,7 +160,7 @@ to a default path if unset." />
 the bbi executable. The test suite will fail if this path does not exist,
 which limits flexibility across environments, e.g., in continuous
 integration. Any solution that decouples the <code>with_options()</code> pattern from a
-particular default path must work with <code><a href='https://devtools.r-lib.org//reference/check.html'>devtools::check()</a></code>, which runs in a
+particular default path must work with <code><a href='https://devtools.r-lib.org/reference/check.html'>devtools::check()</a></code>, which runs in a
 separate process. We can inject environment variables into <code><a href='https://rdrr.io/r/utils/PkgUtils.html'>check()</a></code>, so the
 default behavior is to rely on such a variable to set the path, falling back
 to a default path if unset.</p>
@@ -189,9 +189,8 @@ to a default path if unset.</p>
     <p><code>path</code> if not <code>NA</code>, else <code>default</code></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='r-in'><span class='fu'>read_bbi_path</span><span class='op'>(</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "bbi"</span>
-</pre>
+    <pre class="examples"><div class='input'><span class='fu'>read_bbi_path</span><span class='op'>(</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] "/data/home/kylem/src/github/metrumresearchgroup/bbr/bin/bbi"</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

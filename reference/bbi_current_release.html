@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1</span>
       </span>
     </div>
 
@@ -152,8 +152,18 @@
     <p>Helper function to get version number of most recent release of bbi from GitHub.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>bbi_current_release</span><span class='op'>(</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>bbi_current_release</span><span class='op'>(</span>.bbi_url <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>.bbi_url</th>
+      <td><p>(Optional) URL for a bbi release artifact to strip version
+number out of. If <code>NULL</code>, the default, will fetch the URL with
+<code><a href='current_release_url.html'>current_release_url()</a></code>.</p></td>
+    </tr>
+    </table>
 
 
   </div>

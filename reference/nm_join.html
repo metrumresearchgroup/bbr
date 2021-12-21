@@ -89,7 +89,7 @@ joins. This printing can be suppressed by setting options(bbr.verbose = FALSE)."
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1</span>
       </span>
     </div>
 
@@ -167,7 +167,7 @@ the number of rows in the table files (i.e. the number of rows <em>not</em> bypa
 <code>$IGNORE</code>). Use the <code>.superset</code> argument to join table outputs to the
 (complete) input data set. This function will print the number of rows and
 columns when each file is loaded, as well as some information about the
-joins. This <strong>printing can be suppressed</strong> by setting <code>options(bbr.verbose = FALSE)</code>.</p>
+joins. This <strong>printing can be suppressed</strong> by setting <code><a href='https://rdrr.io/r/base/options.html'>options(bbr.verbose = FALSE)</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>nm_join</span><span class='op'>(</span>
@@ -196,7 +196,7 @@ a NONMEM run.</p></td>
       <td><p>Character vector of file paths to table files to read in.
 Defaults to calling <code><a href='nm_tables.html'>nm_table_files()</a></code> on <code>.mod</code>, which will parse all file
 names from <code>$TABLE</code> blocks in the control stream. If passing manually,
-paths should be either absolute, or relative to <code>get_output_dir(.mod)</code>.</p></td>
+paths should be either absolute, or relative to <code><a href='get_path_from_object.html'>get_output_dir(.mod)</a></code>.</p></td>
     </tr>
     <tr>
       <th>.superset</th>
@@ -208,8 +208,8 @@ you have in the input data and NONMEM output columns like <code>PRED</code> and
     </tr>
     <tr>
       <th>.bbi_args</th>
-      <td><p>Named list passed to <code>model_summary(.bbi_args)</code>. See
-<code><a href='print_bbi_args.html'>print_bbi_args()</a></code> for valid options. Defaults to <code>list(no_grd_file = TRUE, no_shk_file = TRUE)</code> because <code><a href='model_summary.html'>model_summary()</a></code> is only called internally to
+      <td><p>Named list passed to <code><a href='model_summary.html'>model_summary(.bbi_args)</a></code>. See
+<code><a href='print_bbi_args.html'>print_bbi_args()</a></code> for valid options. Defaults to <code><a href='https://rdrr.io/r/base/list.html'>list(no_grd_file = TRUE, no_shk_file = TRUE)</a></code> because <code><a href='model_summary.html'>model_summary()</a></code> is only called internally to
 extract the number of records and individuals, so those files are
 irrelevant.</p></td>
     </tr>

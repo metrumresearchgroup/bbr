@@ -85,7 +85,7 @@ setting options(bbr.verbose = FALSE)." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1</span>
       </span>
     </div>
 
@@ -159,7 +159,7 @@ This function will return a named list with all the relevant tibbles. To return
 a <em>single tibble</em> with the input data joined to the relevant table outputs, use
 the related <code><a href='nm_join.html'>nm_join()</a></code> function. This function will print the number of rows
 and columns when each file is loaded. This <strong>printing can be suppressed</strong> by
-setting <code>options(bbr.verbose = FALSE)</code>.</p>
+setting <code><a href='https://rdrr.io/r/base/options.html'>options(bbr.verbose = FALSE)</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>nm_tables</span><span class='op'>(</span><span class='va'>.mod</span>, .files <span class='op'>=</span> <span class='fu'>nm_table_files</span><span class='op'>(</span><span class='va'>.mod</span><span class='op'>)</span><span class='op'>)</span>
@@ -179,7 +179,7 @@ a NONMEM run.</p></td>
       <td><p>Character vector of file paths to table files to read in.
 Defaults to calling <code>nm_table_files()</code> on <code>.mod</code>, which will parse all file
 names from <code>$TABLE</code> blocks in the control stream. If passing manually,
-paths should be either absolute, or relative to <code>get_output_dir(.mod)</code>.</p></td>
+paths should be either absolute, or relative to <code><a href='get_path_from_object.html'>get_output_dir(.mod)</a></code>.</p></td>
     </tr>
     <tr>
       <th>.check_exists</th>
@@ -191,7 +191,7 @@ paths should be either absolute, or relative to <code>get_output_dir(.mod)</code
 
     <p>A named list of tibbles. The first element will always be named
 <code>data</code> and will contain the input data set. Subsequent elements will be
-named for the file from which they were loaded, with <code>get_model_id(.mod)</code>
+named for the file from which they were loaded, with <code><a href='get_model_id.html'>get_model_id(.mod)</a></code>
 (and <code>.</code>) removed from the beginning and end, if present. For example, a
 model named <code>001.ctl</code> that generated a table named <code>001.tab</code> will have the
 relevant element named <code>tab</code>. Column names in all tibbles will be converted

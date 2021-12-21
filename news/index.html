@@ -79,7 +79,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1</span>
       </span>
     </div>
 
@@ -146,6 +146,36 @@
       
     </div>
 
+    <div id="bbr-121" class="section level1">
+<h1 class="page-header" data-toc-text="1.2.1">
+<a href="#bbr-121" class="anchor"></a>bbr 1.2.1</h1>
+<div id="docs" class="section level2">
+<h2 class="hasAnchor">
+<a href="#docs" class="anchor"></a>Docs</h2>
+<ul>
+<li>New functions from the 1.2.0 release are now mentioned in the docs. (#440)</li>
+</ul>
+</div>
+<div id="changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#changes" class="anchor"></a>Changes</h2>
+<ul>
+<li>
+<code><a href="../reference/use_bbi.html">use_bbi()</a></code> no longer depends on external tools such as <code>wget</code> and <code>tar</code>, hopefully improving its reliability across different systems. (#448)</li>
+</ul>
+</div>
+<div id="bug-fixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes" class="anchor"></a>Bug fixes</h2>
+<ul>
+<li><p><code><a href="../reference/use_bbi.html">use_bbi()</a></code> printed the wrong current release when an older version was requested. (#144)</p></li>
+<li><p><code><a href="../reference/use_bbi.html">use_bbi()</a></code> and <code><a href="../reference/bbi_version.html">bbi_version()</a></code> crashed if the bbi executable path contained spaces. (#409)</p></li>
+<li><p><code><a href="../reference/model_summary.html">model_summary()</a></code> failed with an unclear error message when a caller accidentally placed more than one <code>.lst</code> file in the model directory. (#449)</p></li>
+<li><p><code><a href="../reference/bbi_help.html">bbi_help()</a></code> had a longstanding regression that prevented it from emitting any output. (#447)</p></li>
+<li><p><code>bbi nonmem summary</code> used to fail with an out-of-bounds error when fed <code>ONLYSIM</code> output, but, as of bbi v3.1.1, it sets the “only_sim” field. <code><a href="../reference/print_bbi.html">print.bbi_nonmem_summary()</a></code> and <code><a href="../reference/param_estimates.html">param_estimates.bbi_nonmem_summary()</a></code> have been updated to check for the new field. (#443)</p></li>
+</ul>
+</div>
+</div>
     <div id="bbr-120" class="section level1">
 <h1 class="page-header" data-toc-text="1.2.0">
 <a href="#bbr-120" class="anchor"></a>bbr 1.2.0</h1>
@@ -169,16 +199,16 @@
     <div id="bbr-114" class="section level1">
 <h1 class="page-header" data-toc-text="1.1.4">
 <a href="#bbr-114" class="anchor"></a>bbr 1.1.4</h1>
-<div id="docs" class="section level2">
+<div id="docs-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#docs" class="anchor"></a>Docs</h2>
+<a href="#docs-1" class="anchor"></a>Docs</h2>
 <ul>
 <li>Added “Running NONMEM in Parallel: bbr Tips and Tricks” vignette. (#407)</li>
 </ul>
 </div>
-<div id="bug-fixes" class="section level2">
+<div id="bug-fixes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-1" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li>Fixed bug where adding tags as a list instead of a character vector broke downstream functions like <code><a href="../reference/collapse_to_string.html">collapse_to_string()</a></code> (#393)</li>
 </ul>
@@ -187,11 +217,11 @@
     <div id="bbr-113" class="section level1">
 <h1 class="page-header" data-toc-text="1.1.3">
 <a href="#bbr-113" class="anchor"></a>bbr 1.1.3</h1>
-<div id="bug-fixes-1" class="section level2">
+<div id="bug-fixes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-1" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-2" class="anchor"></a>Bug fixes</h2>
 <ul>
-<li><p>Fixed a bug where submitting multiple models in a loop with <code>submit_model(.mode = "local", .wait = FALSE)</code> would cause the models to never finish because the <code>bbi</code> processes would get <a href="https://processx.r-lib.org/reference/process.html#cleaning-up-background-processes">killed by <code>processx</code></a> when the R objects were garbage collected. (#390)</p></li>
+<li><p>Fixed a bug where submitting multiple models in a loop with <code><a href="../reference/submit_model.html">submit_model(.mode = "local", .wait = FALSE)</a></code> would cause the models to never finish because the <code>bbi</code> processes would get <a href="https://processx.r-lib.org/reference/process.html#cleaning-up-background-processes">killed by <code>processx</code></a> when the R objects were garbage collected. (#390)</p></li>
 <li><p><code>bbr</code> now checks for a valid configuration file <em>before</em> calling out to <code>bbi</code> to avoid the situation where <code>.wait = FALSE</code> and the “no config file” error from <code>bbi</code> is swallowed. Note, this check is skipped if <code>.dry_run = TRUE</code>. (#390)</p></li>
 </ul>
 </div>
@@ -203,7 +233,7 @@
 <h2 class="hasAnchor">
 <a href="#new-features-and-changes-1" class="anchor"></a>New features and changes</h2>
 <ul>
-<li><p>Added <code>options(bbr.bbi_exe_mode)</code> for globally setting <code>.mode</code> argument to <code><a href="../reference/submit_model.html">submit_model()</a></code> and <code><a href="../reference/submit_models.html">submit_models()</a></code>. (#377)</p></li>
+<li><p>Added <code><a href="https://rdrr.io/r/base/options.html">options(bbr.bbi_exe_mode)</a></code> for globally setting <code>.mode</code> argument to <code><a href="../reference/submit_model.html">submit_model()</a></code> and <code><a href="../reference/submit_models.html">submit_models()</a></code>. (#377)</p></li>
 <li><p>Added <code>.bbi_args</code> argument to <code><a href="../reference/bbi_init.html">bbi_init()</a></code> for passing through defaults to be stored in the created <code>bbi.yaml</code> file. (#378)</p></li>
 </ul>
 </div>
@@ -211,9 +241,9 @@
     <div id="bbr-111" class="section level1">
 <h1 class="page-header" data-toc-text="1.1.1">
 <a href="#bbr-111" class="anchor"></a>bbr 1.1.1</h1>
-<div id="bug-fixes-2" class="section level2">
+<div id="bug-fixes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-2" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-3" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li>There was a bug where submitting more than roughly 250 models at time via <code><a href="../reference/submit_models.html">submit_models()</a></code> (e.g. for bootstrapping) would hang indefinitely. This had something to do with <a href="https://github.com/r-lib/processx/issues/286">a bug in processx</a>. It was fixed (in <code>bbr</code>) by routing the stdout and stderr to a temp file and then reading from it when necessary, instead of relying on <code>processx</code> to poll the process. (#374)</li>
 </ul>
@@ -232,9 +262,9 @@
 <li><p>Added more documentation about the heuristics returned from <code><a href="../reference/model_summary.html">model_summary.bbi_nonmem_model()</a></code> (#343)</p></li>
 </ul>
 </div>
-<div id="bug-fixes-3" class="section level2">
+<div id="bug-fixes-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-3" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-4" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li>
 <code><a href="../reference/param_estimates.html">param_estimates()</a></code> now correctly errors when a Bayesian method is used but is <em>not</em> the final method. (#344)</li>
@@ -258,8 +288,8 @@
 <a href="#new-features-and-changes-3" class="anchor"></a>New features and changes</h2>
 <ul>
 <li><p>The minimum compatible version of <code>bbi</code> is increased to <code>3.0.2</code>. This is because there was a breaking change in <code>bbi 3.0.2</code> which changed all references to <code>"Patients"</code> in the <code>bbi nonmem summary</code> output to <code>"Patients"</code> (discussed further below). Also because there was a bug where <code>bbi</code> could not parse the summary output from NONMEM 7.5 and this bug was fixed in <code>bbi 3.0.1</code>.</p></li>
-<li><p><code>options("bbr.bbi_exe_path")</code>, which tells <code>bbr</code> where to look for a <code>bbi</code> installation, now defaults to <code>"bbi"</code>. This means that, by default, <code>bbr</code> will look for a <code>bbi</code> installation in the user’s <code>$PATH</code>. <code>options("bbr.bbi_exe_path")</code> can still be set manually by the user and, in fact, we encourage users to set this to an absolute path in their <code>.Rprofile</code> for their project because this explicitly guarantees the correct <code>bbi</code> installation is being used. (#322)</p></li>
-<li><p>The <code><a href="../reference/use_bbi.html">use_bbi()</a></code> installer function first tries to install to whatever path is set in <code>options("bbr.bbi_exe_path")</code>, falling back to the <code>bbi</code> in my <code>$PATH</code> (accessed via <code>Sys.which("bbi")</code>) and then an OS-dependent default, in that order. See <code>?use_bbi()</code> for more details. (#322)</p></li>
+<li><p><code><a href="https://rdrr.io/r/base/options.html">options("bbr.bbi_exe_path")</a></code>, which tells <code>bbr</code> where to look for a <code>bbi</code> installation, now defaults to <code>"bbi"</code>. This means that, by default, <code>bbr</code> will look for a <code>bbi</code> installation in the user’s <code>$PATH</code>. <code><a href="https://rdrr.io/r/base/options.html">options("bbr.bbi_exe_path")</a></code> can still be set manually by the user and, in fact, we encourage users to set this to an absolute path in their <code>.Rprofile</code> for their project because this explicitly guarantees the correct <code>bbi</code> installation is being used. (#322)</p></li>
+<li><p>The <code><a href="../reference/use_bbi.html">use_bbi()</a></code> installer function first tries to install to whatever path is set in <code><a href="https://rdrr.io/r/base/options.html">options("bbr.bbi_exe_path")</a></code>, falling back to the <code>bbi</code> in my <code>$PATH</code> (accessed via <code><a href="https://rdrr.io/r/base/Sys.which.html">Sys.which("bbi")</a></code>) and then an OS-dependent default, in that order. See <code>?use_bbi()</code> for more details. (#322)</p></li>
 <li><p>Added print method for <code>bbi_nonmem_model</code> object. Similar to the <code>bbi_nonmem_summary</code> object, the <code>bbi_nonmem_model</code> object should print nicely in the console, and also look good in <code>.Rmd</code> chunks with the option <code>results = 'asis'</code>. (#307)</p></li>
 <li><p>Added <code><a href="../reference/get_data_path.html">get_data_path()</a></code> helper function to extract the absolute path to the input data file from <code>bbi_nonmem_model</code> and <code>bbi_nonmem_summary</code> objects. (#314)</p></li>
 <li><p>Added <code><a href="../reference/build_path_from_model.html">build_path_from_model()</a></code> helper function to extract the absolute path to various output files from <code>bbi_nonmem_model</code> and <code>bbi_nonmem_summary</code> objects. (#314)</p></li>
@@ -302,9 +332,9 @@
 <li><p>Also for developers, we are now using <code>pkgr</code> and <code>renv</code> to isolate dependencies when developing. The <code>README</code> has been updated with instructions for how to use this when developing. (#276)</p></li>
 </ul>
 </div>
-<div id="bug-fixes-4" class="section level2">
+<div id="bug-fixes-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-4" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-5" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li><p>Previously <code><a href="../reference/modify_model_field.html">replace_model_field()</a></code>, which is called under the hood by <code><a href="../reference/modify_tags.html">replace_tag()</a></code> and <code><a href="../reference/modify_notes.html">replace_note()</a></code> did <em>not</em> modify the YAML file as it should have. That has been fixed. (#281)</p></li>
 <li><p>Previously the <code><a href="../reference/summary_log.html">add_summary()</a></code> function would error if all the model summaries errored. Now it will return, passing through the model summary errors to the tibble, as it should. (#282)</p></li>
@@ -320,17 +350,17 @@
 <ul>
 <li><p>Deprecated <code>replace_tags()</code>, <code>replace_bbi_args()</code>, and <code>replace_based_on()</code> and replaced them with <code>replace_all_</code> variants. These functions will warn about this for two more releases and then begin to error for two more releases before being removed altogether. (#264)</p></li>
 <li><p>Added <code><a href="../reference/modify_tags.html">replace_tag()</a></code> (singular) which replaces a single tag with a new tag. <code><a href="../reference/modify_notes.html">replace_note()</a></code> (mentioned below) functions the same way. (#264)</p></li>
-<li><p>Added <code><a href="../reference/collapse_to_string.html">collapse_to_string()</a></code> which collapses a list column in a tibble to a character column containing a string representation of the column’s previous contents. For list columns containing character, numeric, or logical vectors, this means collapsing with <code>paste(collapse = ', ')</code>. For other types <code><a href="https://rdrr.io/r/base/dput.html">dput()</a></code> is used. (#260)</p></li>
-<li><p>Added <code>run</code> column to all <code>bbi_log_df</code> tibbles. This is always the second column and is equivalent to <code>basename(absolute_model_path)</code>. While, <code>absolute_model_path</code> remains the primary key for the tibble, <code>run</code> is useful for displaying tables when <code>absolute_model_path</code> becomes long and difficult to look at. (#259)</p></li>
+<li><p>Added <code><a href="../reference/collapse_to_string.html">collapse_to_string()</a></code> which collapses a list column in a tibble to a character column containing a string representation of the column’s previous contents. For list columns containing character, numeric, or logical vectors, this means collapsing with <code><a href="https://rdrr.io/r/base/paste.html">paste(collapse = ', ')</a></code>. For other types <code><a href="https://rdrr.io/r/base/dput.html">dput()</a></code> is used. (#260)</p></li>
+<li><p>Added <code>run</code> column to all <code>bbi_log_df</code> tibbles. This is always the second column and is equivalent to <code><a href="https://rdrr.io/r/base/basename.html">basename(absolute_model_path)</a></code>. While, <code>absolute_model_path</code> remains the primary key for the tibble, <code>run</code> is useful for displaying tables when <code>absolute_model_path</code> becomes long and difficult to look at. (#259)</p></li>
 <li><p>Added <code>notes</code> field to model object (and <code>bbi_run_log_df</code>) and associated helpers <code><a href="../reference/modify_notes.html">add_notes()</a></code>, <code><a href="../reference/modify_notes.html">replace_note()</a></code>, <code><a href="../reference/modify_notes.html">replace_all_notes()</a></code>, <code><a href="../reference/modify_notes.html">remove_notes()</a></code>. This will replace <code>decisions</code>, to reflect the fact that users will want to use this field throughout the modeling process, not only at the end once some “decisions” have been reached. <code>add_decisions()</code> and <code>replace_decisions()</code> now print a warning telling the user that they will be deprecated in the future and encouraging use of their <code>_notes</code> counterparts. (#258)</p></li>
 <li><p><code>.description</code> is no longer a required argument for <code><a href="../reference/new_model.html">new_model()</a></code> or <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code>, nor is it a required element of a model object or YAML file. The helper function <code><a href="../reference/modify_description.html">add_description()</a></code> has been added to fill the <code>description</code> field. (#267)</p></li>
 <li><p>The <code>.update_model_file</code> argument to <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> no longer updates the <code>$PROB</code> in the new control stream with the <code>.description</code> argument. Instead it puts the following in <code>$PROB</code>: <code>From rbabylon: see {get_model_id(.new_model)}.yaml for details</code> (#265)</p></li>
 <li><p>Added <code><a href="../reference/modify_tags.html">remove_tags()</a></code>, <code><a href="../reference/modify_notes.html">remove_notes()</a></code>, and <code><a href="../reference/modify_based_on.html">remove_based_on()</a></code> functions for removing specific strings from the relevant model object field. (#252)</p></li>
 </ul>
 </div>
-<div id="bug-fixes-5" class="section level2">
+<div id="bug-fixes-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-5" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-6" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li><p><code><a href="../reference/submit_models.html">submit_models()</a></code> correctly handles the case where bbi arguments are neither present in the YAML file nor passed at runtime (#248).</p></li>
 <li><p><code><a href="../reference/config_log.html">config_log()</a></code> and <code><a href="../reference/config_log.html">add_config()</a></code> are supposed to warn a user if models are found that do <em>not</em> have a corresponding <code>bbi_config.json</code> file (i.e. have not yet been run, or did not finish successfully). However, if there is no output directory at all for a given model (it has never been run) then these functions would error. Now they correctly warn in that scenario. (#253)</p></li>

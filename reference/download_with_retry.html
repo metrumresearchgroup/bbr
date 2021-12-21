@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Check that bbi is installed — check_bbi_exe • bbr</title>
+<title>Call utils::download.file(), retrying once on failure. — download_with_retry • bbr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="Check that bbi is installed — check_bbi_exe" />
-<meta property="og:description" content="Raises an error if a bbi executable is not found at .bbi_exe_path." />
+<meta property="og:title" content="Call utils::download.file(), retrying once on failure. — download_with_retry" />
+<meta property="og:description" content="Call utils::download.file(), retrying once on failure." />
 <meta property="og:image" content="https://metrumresearchgroup.github.io/bbr/logo.png" />
 
 
@@ -143,29 +143,26 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Check that bbi is installed</h1>
+    <h1>Call <code>utils::download.file()</code>, retrying once on failure.</h1>
     
-    <div class="hidden name"><code>check_bbi_exe.Rd</code></div>
+    <div class="hidden name"><code>download_with_retry.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Raises an error if a bbi executable is not found at <code>.bbi_exe_path</code>.</p>
+    <p>Call <code><a href='https://rdrr.io/r/utils/download.file.html'>utils::download.file()</a></code>, retrying once on failure.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>check_bbi_exe</span><span class='op'>(</span><span class='va'>.bbi_exe_path</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>download_with_retry</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>.bbi_exe_path</th>
-      <td><p>Path to bbi executable</p></td>
+      <th>...</th>
+      <td><p>arguments to pass to <code><a href='https://rdrr.io/r/utils/download.file.html'>utils::download.file()</a></code></p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p><code>NULL</code>, invisibly</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

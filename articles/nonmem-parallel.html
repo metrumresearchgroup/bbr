@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1</span>
       </span>
     </div>
 
@@ -128,7 +128,7 @@
 <a href="#global-settings-in-bbi-yaml" class="anchor"></a>Global settings in bbi.yaml</h2>
 <p>The <code>bbi.yaml</code> file is created when <code><a href="../reference/bbi_init.html">bbi_init()</a></code> is originally called. It usually lives in the same folder as your control streams. This file contains “global” settings for running <code>bbi</code>.</p>
 <ul>
-<li><p>You can set a default number of <code>threads</code> (the number of cores <code>bbi</code> will use for each model) in this file. This will be used whenever you call <code><a href="../reference/submit_model.html">submit_model()</a></code>, but can be overriden by passing <code>submit_model(..., .bbi_args = list(threads = SOME_INTEGER))</code>.</p></li>
+<li><p>You can set a default number of <code>threads</code> (the number of cores <code>bbi</code> will use for each model) in this file. This will be used whenever you call <code><a href="../reference/submit_model.html">submit_model()</a></code>, but can be overriden by passing <code><a href="../reference/submit_model.html">submit_model(..., .bbi_args = list(threads = SOME_INTEGER))</a></code>.</p></li>
 <li><p>It defaults to <code>parallel: false</code> so <strong>you need to change to <code>parallel: true</code></strong> or you will need to pass <code>.bbi_args = list(parallel=TRUE)</code> to each of your <code><a href="../reference/submit_model.html">submit_model()</a></code> calls to make them respect the <code>threads</code> argument.</p></li>
 <li><p>You can also pass through <code>.bbi_args</code> to <code><a href="../reference/bbi_init.html">bbi_init()</a></code> to set the global defaults when you first create the <code>bbi.yaml</code></p></li>
 </ul>
@@ -146,7 +146,7 @@
 <div id="local-execution" class="section level2">
 <h2 class="hasAnchor">
 <a href="#local-execution" class="anchor"></a>Local execution</h2>
-<p>For small runs, use a 4-core or 8-core head node and just do <code>submit_model(..., .mode = "local")</code>.</p>
+<p>For small runs, use a 4-core or 8-core head node and just do <code><a href="../reference/submit_model.html">submit_model(..., .mode = "local")</a></code>.</p>
 <ul>
 <li><p>This will execute the model on your head node, means you will <em>not</em> have to wait for worker nodes to spin up.</p></li>
 <li><p>This is especially nice for new models that are fairly simple and you just want a quick result back.</p></li>
@@ -162,12 +162,12 @@
   bbi nonmem run local /data/home/sethg/bbr/inst/model/nonmem/pk-parallel/100.ctl --overwrite --threads=4 --parallel
 In /data/home/sethg/bbr/inst/model/nonmem/pk-parallel
 Process finished.</code></pre>
-<p>You can also set <code>options("bbr.bbi_exe_mode" = "local")</code> to default to local execution for all models, though this will reset with each new R session.</p>
+<p>You can also set <code><a href="https://rdrr.io/r/base/options.html">options("bbr.bbi_exe_mode" = "local")</a></code> to default to local execution for all models, though this will reset with each new R session.</p>
 </div>
 <div id="wait-false" class="section level2">
 <h2 class="hasAnchor">
 <a href="#wait-false" class="anchor"></a>.wait = FALSE</h2>
-<p>You can pass use <code>submit_model(..., .wait = FALSE)</code> to get you console back immediately.</p>
+<p>You can pass use <code><a href="../reference/submit_model.html">submit_model(..., .wait = FALSE)</a></code> to get you console back immediately.</p>
 <p><strong>This is only relevant for <code>.mode = "local"</code></strong> because grid jobs give you your console as soon as the job is <em>submitted</em> to the grid (which typically takes less than a second).</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_model.html">read_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, <span class="fl">200</span><span class="op">)</span><span class="op">)</span>
@@ -415,7 +415,7 @@ Process finished.</code></pre>
     <span class="va">.m</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span>
       <span class="va">.mod</span>,
       <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="fu"><a href="../reference/get_model_id.html">get_model_id</a></span><span class="op">(</span><span class="va">.mod</span><span class="op">)</span>, <span class="st">"_"</span>, <span class="va">.x</span>, <span class="st">"threads"</span><span class="op">)</span>
-    <span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
+    <span class="op">)</span> <span class="op">%&gt;%</span>
       <span class="fu"><a href="../reference/modify_bbi_args.html">add_bbi_args</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>parallel <span class="op">=</span> <span class="cn">TRUE</span>, threads <span class="op">=</span> <span class="va">.x</span><span class="op">)</span><span class="op">)</span>
   <span class="op">}</span><span class="op">)</span>
 

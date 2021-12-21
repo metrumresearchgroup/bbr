@@ -85,7 +85,7 @@ suppressed by setting options(bbr.verbose = FALSE)." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1</span>
       </span>
     </div>
 
@@ -159,7 +159,7 @@ current release of bbi from GitHub, and then installs it in the directory
 passed to <code>.dir</code>. If used in an interactive session, will open an
 installation menu confirming the installed version. This function will
 print information about the installed version. This <strong>printing can be
-suppressed</strong> by setting <code>options(bbr.verbose = FALSE)</code>.</p>
+suppressed</strong> by setting <code><a href='https://rdrr.io/r/base/options.html'>options(bbr.verbose = FALSE)</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>use_bbi</span><span class='op'>(</span>.path <span class='op'>=</span> <span class='cn'>NULL</span>, .version <span class='op'>=</span> <span class='st'>"latest"</span>, .force <span class='op'>=</span> <span class='cn'>FALSE</span>, .quiet <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
@@ -186,7 +186,7 @@ will be the same version.</p></td>
     </tr>
     <tr>
       <th>.quiet</th>
-      <td><p><strong>Deprecated.</strong> Use <code>options("bbr.verbose")</code> instead to control
+      <td><p><strong>Deprecated.</strong> Use <code><a href='https://rdrr.io/r/base/options.html'>options("bbr.verbose")</a></code> instead to control
 printing. Defaults to <code>NULL</code>, which reads <code>!getOption("bbr.verbose")</code>. If
 <code>TRUE</code>, suppresses output printed to the console.</p></td>
     </tr>
@@ -200,13 +200,13 @@ printing. Defaults to <code>NULL</code>, which reads <code>!getOption("bbr.verbo
     <p>If nothing is passed to the <code>.path</code> argument, <code>use_bbi()</code> will
 attempt to find a valid path for installation. The following decision
 waterfall is used:</p><ul>
-<li><p>First, check <code>getOption("bbr.bbi_exe_path")</code>. If this is anything <em>other
+<li><p>First, check <code><a href='https://rdrr.io/r/base/options.html'>getOption("bbr.bbi_exe_path")</a></code>. If this is anything <em>other
 than</em> <code>"bbi"</code> (the default value) then attempt to install to that path.</p></li>
-<li><p>Second, check <code>Sys.which("bbi")</code> which will look for a <code>bbi</code> installation
+<li><p>Second, check <code><a href='https://rdrr.io/r/base/Sys.which.html'>Sys.which("bbi")</a></code> which will look for a <code>bbi</code> installation
 in the user's <code>$PATH</code>. If one is found, ask the user if they wish to
 overwrite it and, if they confirm, install to that path.</p></li>
 <li><p>Third, attempt to install to a "default location" and add this location to
-the user's <code>$PATH</code>. If <code>Sys.getenv("XDG_DATA_HOME")</code> is found, install to
+the user's <code>$PATH</code>. If <code><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv("XDG_DATA_HOME")</a></code> is found, install to
 <code>{Sys.getenv("XDG_DATA_HOME")}/bbi/bbi</code> (per <a href='https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html'>XGD specification</a>).
 Otherwise, install to OS dependent defaults:</p><ul>
 <li><p>Linux: <code>{Sys.getenv("HOME")}/.local/share/bbi/bbi</code></p></li>
@@ -216,7 +216,7 @@ Otherwise, install to OS dependent defaults:</p><ul>
 </ul>
 
 <p>If none of these are successful, the user will be prompted to set
-<code>options("bbr.bbi_exe_path")</code> and try again.</p>
+<code><a href='https://rdrr.io/r/base/options.html'>options("bbr.bbi_exe_path")</a></code> and try again.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

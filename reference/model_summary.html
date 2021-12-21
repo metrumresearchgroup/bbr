@@ -89,7 +89,7 @@ param_estimates_batch()." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1</span>
       </span>
     </div>
 
@@ -184,7 +184,7 @@ for a large number of NONMEM models, consider using
     </tr>
     <tr>
       <th>.bbi_args</th>
-      <td><p>A named list specifying arguments to pass to bbi formatted like <code>list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)</code>.
+      <td><p>A named list specifying arguments to pass to bbi formatted like <code><a href='https://rdrr.io/r/base/list.html'>list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)</a></code>.
 See <code><a href='print_bbi_args.html'>print_bbi_args()</a></code> for full list of options.</p></td>
     </tr>
     <tr>
@@ -212,7 +212,7 @@ run. <code>TRUE</code> for a given element indicates that issue was detected. <c
 can either mean it was not detected or it was not applicable for that run.
 If any of these come up <code>TRUE</code> it is best to investigate the issue, likely
 by checking the <code>.lst</code> file. This can be done easily with
-<code><a href='build_path_from_model.html'>build_path_from_model()</a></code> like <code>build_path_from_model(.mod, ".lst")</code>. See
+<code><a href='build_path_from_model.html'>build_path_from_model()</a></code> like <code><a href='build_path_from_model.html'>build_path_from_model(.mod, ".lst")</a></code>. See
 below for details on each heuristic.</p><ul>
 <li><p><code>covariance_step_aborted</code> -- It is possible for the Estimation Step to
 terminate successfully, but have the Covariance Step generate an error

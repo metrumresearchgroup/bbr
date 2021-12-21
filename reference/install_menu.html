@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1</span>
       </span>
     </div>
 
@@ -152,15 +152,11 @@
     <p>Private implementation function for installing bbi with interactive menu</p>
     </div>
 
-    <pre class="usage"><span class='fu'>install_menu</span><span class='op'>(</span><span class='va'>.body</span>, <span class='va'>.path</span>, <span class='va'>.version</span>, <span class='va'>.force</span>, <span class='va'>.quiet</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>install_menu</span><span class='op'>(</span><span class='va'>.path</span>, <span class='va'>.version</span>, <span class='va'>.force</span>, <span class='va'>.quiet</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>.body</th>
-      <td><p>Character vector of installation commands to run with <code>system</code></p></td>
-    </tr>
     <tr>
       <th>.path</th>
       <td><p>absolute path to install bbi to. See Details section for
@@ -180,7 +176,7 @@ will be the same version.</p></td>
     </tr>
     <tr>
       <th>.quiet</th>
-      <td><p><strong>Deprecated.</strong> Use <code>options("bbr.verbose")</code> instead to control
+      <td><p><strong>Deprecated.</strong> Use <code><a href='https://rdrr.io/r/base/options.html'>options("bbr.verbose")</a></code> instead to control
 printing. Defaults to <code>NULL</code>, which reads <code>!getOption("bbr.verbose")</code>. If
 <code>TRUE</code>, suppresses output printed to the console.</p></td>
     </tr>

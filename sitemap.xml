@@ -46,9 +46,6 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/bbr.html</loc>
   </url>
   <url>
-    <loc>https://metrumresearchgroup.github.io/bbr/reference/build_bbi_install_commands.html</loc>
-  </url>
-  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/build_bbi_install_path.html</loc>
   </url>
   <url>
@@ -151,10 +148,16 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/create_bbi_object.html</loc>
   </url>
   <url>
-    <loc>https://metrumresearchgroup.github.io/bbr/reference/current_release.html</loc>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/current_release_url.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/dev_error.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/download_bbi.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/download_with_retry.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/drop_dups.html</loc>
@@ -271,9 +274,6 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/nonmem_summary.html</loc>
   </url>
   <url>
-    <loc>https://metrumresearchgroup.github.io/bbr/reference/nx_install_commands.html</loc>
-  </url>
-  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/param_estimates.html</loc>
   </url>
   <url>
@@ -340,6 +340,9 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/skip_if_not_drone_or_metworx.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/skip_if_old_bbi.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/skip_if_over_rate_limit.html</loc>
   </url>
   <url>
@@ -389,9 +392,6 @@
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/version_message.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/bbr/reference/windows_install_commands.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/articles/getting-started.html</loc>
