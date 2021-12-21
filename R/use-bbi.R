@@ -62,8 +62,6 @@ use_bbi <- function(.path = NULL, .version = "latest", .force = FALSE, .quiet = 
   header <- glue::glue('Installing bbi on a {this_os} system',
                        cli::rule(), .sep = '\n')
 
-  footer <- ' '
-
   if (is.null(.path)) {
     .path <- build_bbi_install_path()
   }
@@ -74,13 +72,9 @@ use_bbi <- function(.path = NULL, .version = "latest", .force = FALSE, .quiet = 
     .bbi_url <- as.character(glue("https://github.com/metrumresearchgroup/bbi/releases/download/{.version}/bbi_{this_os}_amd64.tar.gz"))
   }
 
-  body <-  build_bbi_install_commands(.path, .bbi_url)
+  on.exit(install_menu(.bbi_url, .path, .version, .force, .quiet), add = TRUE)
 
-  glue_this <- c(header, body, footer)
-
-  on.exit(install_menu(body, .path, .version, .force, .quiet), add = TRUE)
-
-  if(isFALSE(.quiet)) print(glue::glue_collapse(glue_this, sep = '\n'))
+  if(isFALSE(.quiet)) print(header)
 
 }
 
@@ -133,10 +127,10 @@ bbi_current_release <- function(){
 }
 
 #' Private implementation function for installing bbi with interactive menu
-#' @param .body Character vector of installation commands to run with `system`
+#' @param .bbi_url URL to pass to `utils::download.file()`
 #' @inheritParams use_bbi
 #' @keywords internal
-install_menu <- function(.body, .path, .version, .force, .quiet){
+install_menu <- function(.bbi_url, .path, .version, .force, .quiet){
 
   .dest_bbi_path <- normalizePath(.path, mustWork = FALSE)
   local_v <- bbi_version(.dest_bbi_path)
@@ -158,11 +152,11 @@ install_menu <- function(.body, .path, .version, .force, .quiet){
       print(glue::glue(cli::rule(left = cli::col_red('Do you want to install version {release_v} at {.dest_bbi_path}?'),line = 2)))
 
       if(utils::menu(choices = c('Yes','No'))==1){
-        map(.body, ~ system(.x, ignore.stdout = .quiet, ignore.stderr = .quiet))
+        download_bbi(.bbi_url, .dest_bbi_path)
         local_v <- bbi_version(.dest_bbi_path)
       }
     } else {
-      map(.body, ~ system(.x, ignore.stdout = .quiet, ignore.stderr = .quiet))
+      download_bbi(.bbi_url, .dest_bbi_path)
     }
 
   }
@@ -225,92 +219,55 @@ build_bbi_install_path <- function() {
   return(bbi_path)
 }
 
-#' Private helper function for building commands to install bbi on Linux or Unix
-#' @param .path Absolute path to install bbi to
-#' @param .bbi_url Full url to download tarball from
+#' Download bbi executable to the specified path.
 #'
-#' @importFrom checkmate assert_string
-#' @importFrom fs is_absolute_path dir_exists dir_create
+#' @param .bbi_url URL pointing to the tar.gz for a particular release
+#' @param .path the final destination of bbi executable
 #'
+#' @importFrom glue glue
 #' @keywords internal
-build_bbi_install_commands <- function(.path, .bbi_url) {
+download_bbi <- function(.bbi_url, .path){
   checkmate::assert_string(.path)
   if (!fs::is_absolute_path(.path)) {
     stop(glue("Must pass an absolute path but got: `{.path}`"), call. = FALSE)
   }
+  tmpdir <- tempfile()
+  dir.create(tmpdir)
+  orig_wd <- setwd(dir = tmpdir)
+  on.exit(setwd(orig_wd), add = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
 
-  install_dir <- dirname(.path)
-  if (!fs::dir_exists(install_dir)) fs::dir_create(install_dir)
+  download_target <- file.path(tmpdir, "bbi.tar.gz")
+  be_verbose <- isTRUE(getOption("bbr.verbose"))
 
-  if (check_os() == "windows") {
-    warning("WINDOWS NOT TESTED YET")
-    bbi_commands <- windows_install_commands(.path, .bbi_url)
-  } else {
-    bbi_commands <- nx_install_commands(.path, .bbi_url)
-  }
-  return(bbi_commands)
-}
-
-
-#' Private helper function for building commands to install bbi on Linux or Unix
-#' @inheritParams build_bbi_install_commands
-#' @importFrom stringr str_replace
-#' @keywords internal
-nx_install_commands <- function(.path, .bbi_url) {
-  # extract dir name that tar will unzip to
-  tar_basename <- stringr::str_replace(basename(.bbi_url), "\\..+$", "")
-
-  # construct commands
-  return(c(
-    glue('wget {.bbi_url} -O /tmp/bbi.tar.gz  --timeout=15 --tries=2'),
-    glue('rm -rf /tmp/{tar_basename}'),
-    'tar -xzf /tmp/bbi.tar.gz -C /tmp/',
-    glue('mv /tmp/{tar_basename}/bbi {.path}'),
-    glue('chmod +x {.path}')
-  ))
-}
-
-#' Private helper function for building commands to install bbi on Windows
-#'
-#' THIS HAS NOT BEEN TESTED!!! Honestly, I have not idea if the file.path()
-#' will work or not, but passing backslashes around in strings in R is
-#' generally very shaky ground.
-#' @inheritParams build_bbi_install_commands
-#' @importFrom stringr str_replace
-#' @keywords internal
-windows_install_commands <- function(.path, .bbi_url) {
-  # check for wget, these people claim it's possible:
-  # https://builtvisible.com/download-your-website-with-wget/
-  if (Sys.which("wget") == "") {
-    stop("Must install `wget` to install with use_bbi() on Windows", call. = FALSE)
-  }
-  # same for tar
-  # https://wiki.haskell.org/How_to_unpack_a_tar_file_in_Windows
-  if (Sys.which("tar") == "") {
-    stop("Must install `tar` to install with use_bbi() on Windows", call. = FALSE)
+  rc <- download_with_retry(
+    .bbi_url, destfile = download_target, mode = "wb",
+    quiet = isFALSE(be_verbose))
+  if (rc != 0) {
+    stop(glue("Non-zero exit ({rc}) for download of {.bbi_url}"))
   }
 
-  # extract dir name that tar will unzip to
-  tar_basename <- stringr::str_replace(basename(.bbi_url), "\\..+$", "")
+  utils::untar(tarfile = download_target, verbose = be_verbose)
 
-  # construct commands
-  # WE USE ONLY THE install_dir, because I can't get a straight answer about Windows temp dirs
-  temp_dir <- file.path(dirname(.path), "TEMP")
+  # The extracted directory should have only one directory...
+  d_extracted <-  list.dirs(tmpdir, recursive = FALSE)
+  checkmate::assert_string(d_extracted, min.chars = 1)
+  # ... with one executable inside.
+  exe <- list.files(d_extracted, full.names = TRUE)
+  checkmate::assert_string(exe, min.chars = 1)
 
-  return(c(
-    glue('wget {.bbi_url} -O {file.path(temp_dir, "bbi.tar.gz")}  --timeout=15 --tries=2'),
-    glue('rm -rf {file.path(temp_dir, tar_basename)}'),
-    glue('tar -xzf {file.path(temp_dir, "bbi.tar.gz")} -C {temp_dir}'),
-    glue('mv {file.path(temp_dir, tar_basename, "bbi")} {.path}'),
-    glue('rm -rf {temp_dir}'),
-    glue('chmod +x {.path}')
-  ))
+  Sys.chmod(exe, mode = "0755", use_umask = FALSE)
+  if (be_verbose) {
+    message(glue("Copying bbi to '{.path}'"))
+  }
+  file.copy(exe, .path, overwrite = TRUE)
+
+  return(NULL)
 }
-
 
 #' @title Get version of installed bbi
 #'
-#' @importFrom stringr str_detect str_replace_all
+#' @importFrom stringr str_detect str_replace_all str_trim
 #' @param .bbi_exe_path Path to bbi executable
 #' @return String giving the version of the bbi binary installed at `.bbi_exe_path`
 #' @examples
@@ -329,8 +286,8 @@ bbi_version <- function(.bbi_exe_path = getOption('bbr.bbi_exe_path')){
 
   tryCatch(
     {
-      res <- system(sprintf('%s version', .bbi_exe_path),intern = TRUE)
-      return(str_replace_all(res, '^v', ''))
+      res <- processx::run(.bbi_exe_path, "version", error_on_status = TRUE)
+      return(str_replace_all(str_trim(res$stdout, side = "right"), '^v', ''))
     },
     error = function(e) {
       if (str_detect(e$message, "error in running command")) {
