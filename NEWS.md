@@ -1,3 +1,26 @@
+# bbr 1.2.1
+
+## Docs
+
+* New functions from the 1.2.0 release are now mentioned in the docs. (#440)
+
+## Changes
+
+* `use_bbi()` no longer depends on external tools such as `wget` and `tar`, hopefully improving its reliability across different systems. (#448)
+
+## Bug fixes
+
+* `use_bbi()` printed the wrong current release when an older version was requested. (#144)
+
+* `use_bbi()` and `bbi_version()` crashed if the bbi executable path contained spaces. (#409)
+
+* `model_summary()` failed with an unclear error message when a caller accidentally placed more than one `.lst` file in the model directory. (#449)
+
+* `bbi_help()` had a longstanding regression that prevented it from emitting any output. (#447)
+
+* `bbi nonmem summary` used to fail with an out-of-bounds error when fed `ONLYSIM` output, but, as of bbi v3.1.1, it sets the "only_sim" field.  `print.bbi_nonmem_summary()` and `param_estimates.bbi_nonmem_summary()` have been updated to check for the new field. (#443)
+
+
 # bbr 1.2.0
 
 This release adds a number of helper functions, primarily for use with NONMEM models.
