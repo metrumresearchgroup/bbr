@@ -171,9 +171,15 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
   .d <- x[[SUMMARY_DETAILS]]
   cat_line(glue("Dataset: {.d$data_set}\n\n"))
   cat_line(glue("Records: {.d$number_of_data_records}\t Observations: {.d$number_of_obs}\t Subjects: {.d$number_of_subjects}\n\n"))
-  cat_line(glue("Objective Function Value (final est. method): {extract_ofv(list(x))}\n\n"))
-  cli::cat_line("Estimation Method(s):\n")
-  purrr::walk(paste(.d$estimation_method, "\n"), cli::cat_bullet, bullet = "en_dash")
+
+  only_sim <- isTRUE(.d$only_sim)
+  if (only_sim) {
+    cat_line("No Estimation Methods (ONLYSIM)\n")
+  } else {
+    cat_line(glue("Objective Function Value (final est. method): {extract_ofv(list(x))}\n\n"))
+    cli::cat_line("Estimation Method(s):\n")
+    purrr::walk(paste(.d$estimation_method, "\n"), cli::cat_bullet, bullet = "en_dash")
+  }
 
   # check heuristics
   .h <- unlist(x[[SUMMARY_HEURISTICS]])
@@ -185,6 +191,10 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
     purrr::walk(paste(names(which(.h)), "\n"), cli::cat_bullet, bullet = "en_dash", col = "red")
   } else {
     cat_line("No Heuristic Problems Detected\n\n")
+  }
+
+  if (only_sim) {
+    return(invisible(NULL))
   }
 
   # build parameter table (catch Bayesian error)

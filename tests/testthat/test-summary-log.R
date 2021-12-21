@@ -74,26 +74,32 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   test_that("summary_log() parses heuristics correctly [BBR-SMLG-006]", {
     sum_df2 <- summary_log(MODEL_DIR_X, .fail_flags = list(ext_file = "1001.1.TXT"))
-
-    expect_false(filter(sum_df2, run == "1001") %>% pull(minimization_terminated))
-    expect_true(filter(sum_df2, run == "1001") %>% pull(large_condition_number))
-    expect_true(filter(sum_df2, run == "1001") %>% pull(prderr))
-    expect_true(filter(sum_df2, run == "1001") %>% pull(!!ANY_HEURISTICS))
-    expect_true(filter(sum_df2, run == "acop-fake-bayes") %>% pull(eigenvalue_issues))
-    expect_true(filter(sum_df2, run == "iovmm") %>% pull(has_final_zero_gradient))
+    
+    run1001 <- filter(sum_df2, run == "1001")
+    expect_false(run1001$minimization_terminated)
+    expect_true(run1001$large_condition_number)
+    expect_true(run1001$prderr)
+    expect_true(run1001[[ANY_HEURISTICS]])
+    expect_true(filter(sum_df2, run == "acop-fake-bayes")$eigenvalue_issues)
+    expect_true(filter(sum_df2, run == "iovmm")$has_final_zero_gradient)
   })
 
   test_that("summary_log() parses more complex flags and stats [BBR-SMLG-007]", {
     sum_df2 <- summary_log(MODEL_DIR_X, .fail_flags = list(ext_file = "1001.1.TXT"))
 
     # check fail flag parsed
-    expect_equal(sum_df2[[SL_FAIL_FLAGS]], c(TRUE, FALSE, FALSE, FALSE, FALSE))
+    expect_equal(sum_df2[[SL_FAIL_FLAGS]],
+                 c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE))
 
     # check multiple estimation methods
     num_est_methods <- map_int(sum_df2[["estimation_method"]], length)
-    expect_equal(num_est_methods, c(1, 3, 1, 2, 1))
-    expect_equal(sum_df2[[OFV_COL]], c(3842.571, 2675.293, 44158.939, -10838.582, 14722.149), tolerance = 0.01)
-    expect_equal(sum_df2[[SUMMARY_COND_NUM]], c(4352.941, NA_real_, NA_real_, NA_real_, NA_real_), tolerance = 0.01)
+    expect_equal(num_est_methods, c(1, 3, 1, 0, 2, 1))
+    expect_equal(sum_df2[[OFV_COL]],
+                 c(3842.571, 2675.293, 44158.939, NA_real_, -10838.582, 14722.149),
+                 tolerance = 0.01)
+    expect_equal(sum_df2[[SUMMARY_COND_NUM]],
+                 c(4352.941, NA_real_, NA_real_, NA_real_, NA_real_, NA_real_),
+                 tolerance = 0.01)
   })
 
   # THESE TESTS NEEDS TO BE LAST BECAUSE IT DELETES NECESSARY FILES

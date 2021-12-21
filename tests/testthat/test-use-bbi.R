@@ -58,3 +58,17 @@ test_that("use_bbi .version argument works [BBR-UBI-004]", {
 
 })
 
+test_that("use-bbi and bbi_version handle path with spaces [BBR-UBI-005]", {
+  skip_if_over_rate_limit()
+
+  dir_with_space <- tempfile(pattern = "foo bar")
+  dir.create(dir_with_space, recursive = TRUE)
+  on.exit(fs::dir_delete(dir_with_space))
+
+  bbi_path <- file.path(dir_with_space, "bbi")
+  v <- "3.1.0"
+
+  use_bbi(.path = bbi_path, .version = paste0("v", v))
+  expect_true(file.exists(bbi_path))
+  expect_equal(bbi_version(bbi_path), v)
+})

@@ -4,11 +4,9 @@
 \alias{install_menu}
 \title{Private implementation function for installing bbi with interactive menu}
 \usage{
-install_menu(.body, .path, .version, .force, .quiet)
+install_menu(.path, .version, .force, .quiet)
 }
 \arguments{
-\item{.body}{Character vector of installation commands to run with \code{system}}
-
 \item{.path}{absolute path to install bbi to. See Details section for
 defaults, if nothing is passed.}
 
