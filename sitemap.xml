@@ -1,40 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://metrumresearchgroup.github.io/bbr/404.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/bbr/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/bbr/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/bbr/articles/getting-started.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/bbr/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/bbr/articles/nonmem-parallel.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/bbr/articles/parameter-labels.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/bbr/articles/using-summary-log.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/bbr/authors.html</loc>
-  </url>
-  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/index.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/bbr/news/index.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/add_log_impl.html</loc>
@@ -238,9 +205,6 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/highlight_cell.html</loc>
   </url>
   <url>
-    <loc>https://metrumresearchgroup.github.io/bbr/reference/index.html</loc>
-  </url>
-  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/install_menu.html</loc>
   </url>
   <url>
@@ -428,5 +392,20 @@
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/version_message.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/articles/getting-started.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/articles/nonmem-parallel.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/articles/parameter-labels.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/articles/using-summary-log.html</loc>
   </url>
 </urlset>
