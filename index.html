@@ -28,6 +28,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container">
@@ -40,18 +42,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.1</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
@@ -85,7 +81,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/metrumresearchgroup/bbr">
+  <a href="https://github.com/metrumresearchgroup/bbr" class="external-link">
     <span class="fa fa-github fa-lg"></span>
      
   </a>
@@ -102,36 +98,36 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="bbr-" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#bbr-" class="anchor"></a>bbr <a href="https:/metrumresearchgroup.github.io/bbr"><img src="reference/figures/logo.png" align="right" height="120"></a>
+<div class="section level1">
+<div class="page-header"><h1 id="bbr-">bbr <a href="https:/metrumresearchgroup.github.io/bbr"><img src="reference/figures/logo.png" align="right" height="120"></a>
+<a class="anchor" aria-label="anchor" href="#bbr-"></a>
 </h1></div>
 <!-- badges: start -->
 
-<p><code>bbr</code> is an R interface for running <code>bbi</code>. Together they provide a solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. Currently, only NONMEM modeling is supported, though we are in the process of Stan with plans for other modeling software as well. You can get more detailed information on <code>bbi</code> (the underlying CLI tool) <a href="https://github.com/metrumresearchgroup/bbi">here</a>.</p>
+<p><code>bbr</code> is an R interface for running <code>bbi</code>. Together they provide a solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. Currently, only NONMEM modeling is supported, though we are in the process of Stan with plans for other modeling software as well. You can get more detailed information on <code>bbi</code> (the underlying CLI tool) <a href="https://github.com/metrumresearchgroup/bbi" class="external-link">here</a>.</p>
 <p><code>bbr</code> is intended to help scientists manage the entire modeling workflow from within R. Users can submit models, consume outputs and diagnostics, and iterate on models. Furthermore, workflow tools–like simple tagging of models and model inheritence trees–make reproducibility and external review much more streamlined.</p>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
-<p>You can install the latest released version of <code>bbr</code> via <a href="https://mpn.metworx.com/docs/snapshots">MPN snapshots</a> from any snapshot date in 2021 or later. (An earlier version of this package was available under the name <code>rbabylon</code> in snapshot dates 2020-03-07 through 2020-12-21.)</p>
-<p>You can also install development versions of <code>bbr</code> by downloading the source files for the latest version from <code>https://s3.amazonaws.com/mpn.metworx.dev/releases/bbr/</code> or get the latest development version from <a href="https://github.com/">GitHub</a> with:</p>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p>You can install the latest released version of <code>bbr</code> via <a href="https://mpn.metworx.com/docs/snapshots" class="external-link">MPN snapshots</a> from any snapshot date in 2021 or later. (An earlier version of this package was available under the name <code>rbabylon</code> in snapshot dates 2020-03-07 through 2020-12-21.)</p>
+<p>You can also install development versions of <code>bbr</code> by downloading the source files for the latest version from <code>https://s3.amazonaws.com/mpn.metworx.dev/releases/bbr/</code> or get the latest development version from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># install.packages("devtools")</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">"metrumresearchgroup/bbr"</span>, ref <span class="op">=</span> <span class="st">"develop"</span><span class="op">)</span></code></pre></div>
+<span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"metrumresearchgroup/bbr"</span>, ref <span class="op">=</span> <span class="st">"develop"</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="documentation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#documentation" class="anchor"></a>Documentation</h2>
-<p>You can find documentation and a “Getting Started” vignette that shows users how to set up <code>bbr</code> and demonstrates the basic modeling workflow <a href="http://metrumresearchgroup.github.io/bbr/">here</a>.</p>
+<div class="section level2">
+<h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
+</h2>
+<p>You can find documentation and a “Getting Started” vignette that shows users how to set up <code>bbr</code> and demonstrates the basic modeling workflow <a href="http://metrumresearchgroup.github.io/bbr/" class="external-link">here</a>.</p>
 <p>There are several other vignettes, and more are being added as new functionality is rolled out. A complete list can be found <a href="https://metrumresearchgroup.github.io/bbr/articles/">here</a>.</p>
-<div id="cheat-sheet" class="section level3">
-<h3 class="hasAnchor">
-<a href="#cheat-sheet" class="anchor"></a>Cheat Sheet</h3>
-<p><a href="https://metrumresearchgroup.github.io/cheatsheets/bbr_nonmem_cheat_sheet.pdf"><img src="https://metrumresearchgroup.github.io/cheatsheets/thumbnails/bbr_nonmem_cheat_sheet_thumbnail.png" width="700" height="265"></a></p>
+<div class="section level3">
+<h3 id="cheat-sheet">Cheat Sheet<a class="anchor" aria-label="anchor" href="#cheat-sheet"></a>
+</h3>
+<p><a href="https://metrumresearchgroup.github.io/cheatsheets/bbr_nonmem_cheat_sheet.pdf" class="external-link"><img src="https://metrumresearchgroup.github.io/cheatsheets/thumbnails/bbr_nonmem_cheat_sheet_thumbnail.png" width="700" height="265"></a></p>
 </div>
-<div id="featured-vignettes" class="section level3">
-<h3 class="hasAnchor">
-<a href="#featured-vignettes" class="anchor"></a>Featured Vignettes</h3>
+<div class="section level3">
+<h3 id="featured-vignettes">Featured Vignettes<a class="anchor" aria-label="anchor" href="#featured-vignettes"></a>
+</h3>
 <ul>
 <li>
 <a href="https://metrumresearchgroup.github.io/bbr/articles/getting-started.html">Getting Started with bbr</a> – Some basic scenarios for modeling with NONMEM using <code>bbr</code>, introducing you to its standard workflow and functionality.</li>
@@ -142,17 +138,17 @@
 </ul>
 </div>
 </div>
-<div id="development" class="section level2">
-<h2 class="hasAnchor">
-<a href="#development" class="anchor"></a>Development</h2>
-<p><code>bbr</code> uses <a href="https://github.com/metrumresearchgroup/pkgr">pkgr</a> to manage development dependencies and <a href="https://rstudio.github.io/renv/">renv</a> to provide isolation. To replicate this environment,</p>
-<ol>
+<div class="section level2">
+<h2 id="development">Development<a class="anchor" aria-label="anchor" href="#development"></a>
+</h2>
+<p><code>bbr</code> uses <a href="https://github.com/metrumresearchgroup/pkgr" class="external-link">pkgr</a> to manage development dependencies and <a href="https://rstudio.github.io/renv/" class="external-link">renv</a> to provide isolation. To replicate this environment,</p>
+<ol style="list-style-type: decimal">
 <li><p>clone the repo</p></li>
 <li><p>install pkgr</p></li>
 <li>
-<p>open package in an R session and run <code><a href="https://rstudio.github.io/renv/reference/init.html">renv::init()</a></code></p>
+<p>open package in an R session and run <code><a href="https://rstudio.github.io/renv/reference/init.html" class="external-link">renv::init()</a></code></p>
 <ul>
-<li>install <code>renv</code> &gt; 0.8.3-4 into default <code><a href="https://rdrr.io/r/base/libPaths.html">.libPaths()</a></code> if not already installed</li>
+<li>install <code>renv</code> &gt; 0.8.3-4 into default <code><a href="https://rdrr.io/r/base/libPaths.html" class="external-link">.libPaths()</a></code> if not already installed</li>
 </ul>
 </li>
 <li><p>run <code>pkgr install</code> in terminal within package directory</p></li>
@@ -165,17 +161,27 @@
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>
-<li><small><a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
+<li><small><a href="https://opensource.org/licenses/mit-license.php" class="external-link">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
 </ul>
 </div>
-<div class="developers">
-<h2>Developers</h2>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li>Devin Pastoor <br><small class="roles"> Author, maintainer </small>  </li>
+<li><a href="authors.html#citation">Citing bbr</a></li>
+</ul>
+</div>
+
+<div class="developers">
+<h2 data-toc-skip>Developers</h2>
+<ul class="list-unstyled">
 <li>Seth Green <br><small class="roles"> Author </small>  </li>
+<li>Kyle Meyer <br><small class="roles"> Author </small>  </li>
+<li>Devin Pastoor <br><small class="roles"> Author </small>  </li>
 <li>Anna-Christina Nevison <br><small class="roles"> Author </small>  </li>
 <li>Sean Wilson <br><small class="roles"> Author </small>  </li>
 <li>Samuel Callisto <br><small class="roles"> Author </small>  </li>
@@ -184,23 +190,26 @@
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://github-drone.metrumrg.com/metrumresearchgroup/bbr"><img src="https://github-drone.metrumrg.com/api/badges/metrumresearchgroup/bbr/status.svg" alt="Build Status"></a></li>
-<li><a href="https://codecov.io/gh/metrumresearchgroup/bbr"><img src="https://codecov.io/gh/metrumresearchgroup/bbr/branch/develop/graph/badge.svg" alt="codecov"></a></li>
+<li><a href="https://github-drone.metrumrg.com/metrumresearchgroup/bbr" class="external-link"><img src="https://github-drone.metrumrg.com/api/badges/metrumresearchgroup/bbr/status.svg" alt="Build Status"></a></li>
+<li><a href="https://codecov.io/gh/metrumresearchgroup/bbr" class="external-link"><img src="https://codecov.io/gh/metrumresearchgroup/bbr/branch/develop/graph/badge.svg" alt="codecov"></a></li>
 </ul>
 </div>
-</div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Devin Pastoor, Seth Green, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p>
+<p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -208,6 +217,8 @@
 
   
 
+
+  
 
   </body>
 </html>
