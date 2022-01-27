@@ -121,6 +121,10 @@ parse_ctl_to_list <- function(.path) {
   checkmate::assert_string(.path)
   txt <- read_lines(.path)
 
+  comm_pos <- as.integer(regexpr(";", txt, fixed = TRUE))
+  comm_line <- comment_pos > 0
+  txt[comm_line] <- substr(txt[comm_line], 1, comm_pos[comm_line]-1)
+
   block_re <- "^\\s*\\$[A-Za-z]\\w*"
 
   # Look for block lines
