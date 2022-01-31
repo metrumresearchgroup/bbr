@@ -120,4 +120,66 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_true(grepl('no estimation output detected', param_tbl$error_msg))
   })
 
+  ###################
+  # compare to model
+  ###################
+
+  test_that("param_estimates_compare() works on same model [BBR-PEST-009]", {
+
+    on.exit(cleanup())
+
+    # copy 6 .ext files (to simulate model runs)
+    walk(4:9, ~copy_to_batch_params(MOD1_PATH, as.character(.x)))
+
+    # get table of parameter estimates
+    param_tbl <- BATCH_PARAM_TEST_DIR %>% param_estimates_batch()
+
+    # multiply by arbitrary value to get confidence intervals for testing
+    jitter <- seq(0.95, 1.05, 0.02)
+    param_tbl <- param_tbl %>%
+      mutate(across(5:ncol(param_tbl), ~(.x*jitter)))
+
+    # compare
+    res <- param_estimates_compare(SUM1, param_tbl)
+    expect_equal(ncol(res), 5)
+    expect_equal(nrow(res), nrow(param_estimates(SUM1)))
+
+    # quantiles should be less or more than median, respectively
+    expect_true(all(
+      (res$`2.5%` < res$`50%`) | res$`50%` == 0
+    ))
+
+    expect_true(all(
+      (res$`97.5%` > res$`50%`) | res$`50%` == 0
+    ))
+
+    # note: this is only true because of the jitter we specify
+    expect_equal(
+      res$original_estimate,
+      res$`50%`
+    )
+  })
+
+  test_that("param_estimates_compare() works .quantile argument [BBR-PEST-009]", {
+    res <- param_estimates_compare(
+      SUM1,
+      param_estimates_batch(MODEL_DIR),
+      .probs = c(.3, .4, .6)
+    )
+    expect_true(all(c("30%", "40%", "60%") %in% names(res)))
+  })
+
+  test_that("param_estimates_compare() errors with different models [BBR-PEST-010]", {
+
+    # compare
+    expect_error({
+      res <- param_estimates_compare(
+        SUM1,
+        param_estimates_batch(MODEL_DIR_X)
+      )
+    }, regexp = "do not have the same parameters")
+
+  })
+
 }) # closing withr::with_options
+

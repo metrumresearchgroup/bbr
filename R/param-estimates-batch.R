@@ -83,6 +83,9 @@ param_estimates_batch <- function(.path,
   # throw out extra column that gets created if no models succeeded
   if ("V4" %in% names(df)) df <- select(df, -.data$V4)
 
+  # reformat parameter names to conform with `param_estimates()` output
+  names(df) <- gsub("\\(([0-9])_([0-9])\\)", "(\\1,\\2)", names(df))
+
   # format and return
   df %>%
     rename(
@@ -103,3 +106,65 @@ param_estimates_batch <- function(.path,
       everything()
     )
 }
+
+
+#' Compare parameter estimates
+#'
+#' Let's you compare the parameter estimates from  a single model
+#' against those in tibble like what's returned from
+#' [param_estimates_batch()].
+#'
+#' @param .mod `bbi_model` object
+#' @param .comp A tibble with columns for each parameter and rows for each model (like what's returned from
+#' [param_estimates_batch()])
+#' @param .probs Numeric vector with between 0 and 1 to be passed through to `quantile`.
+#' Represents the quantiles to calculate for parameter estimates in `.comp`.
+#'
+#' @importFrom tibble rownames_to_column
+#' @importFrom dplyr summarise across select rename left_join
+#' @export
+param_estimates_compare <- function(.mod, .comp, .probs = c(0.025, .5, 0.975)) {
+
+  if (!inherits(.mod, NM_SUM_CLASS)) {
+    .mod <- model_summary(.mod)
+  }
+  mod_df <- param_estimates(.mod)
+
+  comp_df <- .comp %>%
+    select(-.data$absolute_model_path, -.data$run, -.data$error_msg, -.data$termination_code)
+
+  # check that param names match
+  n1 <- sort(mod_df$parameter_names)
+  n2 <- sort(names(comp_df))
+  .same <- suppressSpecificWarning(
+    all(n1 == n2),
+    "is not a multiple"
+  )
+  if (!.same) {
+    stop(paste(
+      glue("The models passed to `.mod` and `.comp` do not have the same parameters."),
+      glue("  `.mod` parameter names: {paste(n1, collapse = ', ')}"),
+      glue("  `.comp` parameter names: {paste(n2, collapse = ', ')}"),
+      sep = "\n"
+    ))
+  }
+
+  # summarize comp to quantiles
+  comp_df <- comp_df %>%
+    summarise(across(
+      .fns = quantile,
+      probs = .probs
+    )) %>%
+    t() %>%
+    as.data.frame() %>%
+    rownames_to_column()
+  colnames(comp_df) <- c("parameter_names", paste0(.probs * 100, "%"))
+
+  # join quantiles to original
+  mod_df %>%
+    select(parameter_names, estimate) %>%
+    rename(original_estimate = estimate) %>%
+    left_join(comp_df, by = "parameter_names")
+
+}
+
