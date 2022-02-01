@@ -112,7 +112,8 @@ param_estimates_batch <- function(.path,
 #'
 #' Let's you compare the parameter estimates from  a single model
 #' against those in tibble like what's returned from
-#' [param_estimates_batch()].
+#' [param_estimates_batch()]. Useful for comparing a model to multiple
+#' runs of the "same" model, for example in a bootstrap or simulation.
 #'
 #' @param .mod `bbi_model` object
 #' @param .comp A tibble with columns for each parameter and rows for each model (like what's returned from

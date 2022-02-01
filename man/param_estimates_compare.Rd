@@ -18,5 +18,6 @@ Represents the quantiles to calculate for parameter estimates in \code{.comp}.}
 \description{
 Let's you compare the parameter estimates from  a single model
 against those in tibble like what's returned from
-\code{\link[=param_estimates_batch]{param_estimates_batch()}}.
+\code{\link[=param_estimates_batch]{param_estimates_batch()}}. Useful for comparing a model to multiple
+runs of the "same" model, for example in a bootstrap or simulation.
 }
