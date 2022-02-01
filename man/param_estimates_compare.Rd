@@ -4,20 +4,40 @@
 \alias{param_estimates_compare}
 \title{Compare parameter estimates}
 \usage{
-param_estimates_compare(.mod, .comp, .probs = c(0.025, 0.5, 0.975))
+param_estimates_compare(
+  .param_df,
+  .orig_mod = NULL,
+  probs = c(0.5, 0.025, 0.975),
+  na.rm = FALSE
+)
 }
 \arguments{
-\item{.mod}{\code{bbi_model} object}
+\item{.param_df}{A tibble with columns for each parameter and rows for each
+model (like what's returned from \code{\link[=param_estimates_batch]{param_estimates_batch()}})}
 
-\item{.comp}{A tibble with columns for each parameter and rows for each model (like what's returned from
-\code{\link[=param_estimates_batch]{param_estimates_batch()}})}
+\item{.orig_mod}{\code{bbi_model} object to compare \code{.param_df} against. If
+\code{NULL}, the default, only returns quantiles from \code{.param_df}. If passed,
+will display an additional \code{original_estimate} column.}
 
-\item{.probs}{Numeric vector with between 0 and 1 to be passed through to \code{quantile}.
-Represents the quantiles to calculate for parameter estimates in \code{.comp}.}
+\item{probs}{Numeric vector with between 0 and 1 to be passed through to
+\code{\link[stats:quantile]{stats::quantile()}}. Represents the quantiles to calculate for parameter
+estimates in \code{.param_df}.}
+
+\item{na.rm}{Logical scalar, passed through to \code{\link[stats:quantile]{stats::quantile()}}.}
+}
+\value{
+A tibble with the first column containing the parameter names (that
+were column names in \code{.param_df}), the second column optionally containing
+original parameter estimates (if \code{.orig_mod} is passed), and subsequent
+columns containing the quantiles specified in \code{probs}. You can think of
+this as essentially \code{.param_df}, summarized by quantiles across all rows,
+and then pivoted.
 }
 \description{
-Let's you compare the parameter estimates from  a single model
-against those in tibble like what's returned from
-\code{\link[=param_estimates_batch]{param_estimates_batch()}}. Useful for comparing a model to multiple
-runs of the "same" model, for example in a bootstrap or simulation.
+Summarizes the parameter estimates from tibble like what's returned from
+\code{\link[=param_estimates_batch]{param_estimates_batch()}}, showing you the quantiles passed to \code{probs},
+likely interpretted as confidence intervals for your parameter estimates.
+Optionally takes an "original model" to compare these quantiles against.
+Originally conceived for comparing a model to multiple runs of the "same"
+model, for example in a bootstrap or simulation.
 }

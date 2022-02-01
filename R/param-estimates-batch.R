@@ -31,7 +31,7 @@
 #' output tibble will show all parameter names across files and NA values for
 #' the files where a given parameter is missing.
 #'
-#' @importFrom dplyr rename select mutate everything starts_with across
+#' @importFrom dplyr rename select mutate everything across
 #' @importFrom data.table fread
 #' @importFrom tibble as_tibble
 #'
@@ -110,62 +110,89 @@ param_estimates_batch <- function(.path,
 
 #' Compare parameter estimates
 #'
-#' Let's you compare the parameter estimates from  a single model
-#' against those in tibble like what's returned from
-#' [param_estimates_batch()]. Useful for comparing a model to multiple
-#' runs of the "same" model, for example in a bootstrap or simulation.
+#' Summarizes the parameter estimates from tibble like what's returned from
+#' [param_estimates_batch()], showing you the quantiles passed to `probs`,
+#' likely interpretted as confidence intervals for your parameter estimates.
+#' Optionally takes an "original model" to compare these quantiles against.
+#' Originally conceived for comparing a model to multiple runs of the "same"
+#' model, for example in a bootstrap or simulation.
 #'
-#' @param .mod `bbi_model` object
-#' @param .comp A tibble with columns for each parameter and rows for each model (like what's returned from
-#' [param_estimates_batch()])
-#' @param .probs Numeric vector with between 0 and 1 to be passed through to `quantile`.
-#' Represents the quantiles to calculate for parameter estimates in `.comp`.
+#' @return A tibble with the first column containing the parameter names (that
+#'   were column names in `.param_df`), the second column optionally containing
+#'   original parameter estimates (if `.orig_mod` is passed), and subsequent
+#'   columns containing the quantiles specified in `probs`. You can think of
+#'   this as essentially `.param_df`, summarized by quantiles across all rows,
+#'   and then pivoted.
+#'
+#'
+#' @param .param_df A tibble with columns for each parameter and rows for each
+#'   model (like what's returned from [param_estimates_batch()])
+#' @param .orig_mod `bbi_model` object to compare `.param_df` against. If
+#'   `NULL`, the default, only returns quantiles from `.param_df`. If passed,
+#'   will display an additional `original_estimate` column.
+#' @param probs Numeric vector with between 0 and 1 to be passed through to
+#'   [stats::quantile()]. Represents the quantiles to calculate for parameter
+#'   estimates in `.param_df`.
+#' @param na.rm Logical scalar, passed through to [stats::quantile()].
 #'
 #' @importFrom tibble rownames_to_column
-#' @importFrom dplyr summarise across select rename left_join
+#' @importFrom dplyr summarise across starts_with select rename left_join
+#' @importFrom stats quantile
 #' @export
-param_estimates_compare <- function(.mod, .comp, .probs = c(0.025, .5, 0.975)) {
+param_estimates_compare <- function(
+  .param_df,
+  .orig_mod = NULL,
+  probs = c(.5, 0.025, 0.975),
+  na.rm = FALSE
+) {
 
-  if (!inherits(.mod, NM_SUM_CLASS)) {
-    .mod <- model_summary(.mod)
-  }
-  mod_df <- param_estimates(.mod)
+  comp_df <- .param_df %>%
+    select(starts_with(c("THETA", "SIGMA", "OMEGA")))
 
-  comp_df <- .comp %>%
-    select(-.data$absolute_model_path, -.data$run, -.data$error_msg, -.data$termination_code)
+  if (!is.null(.orig_mod)) {
+    if (!inherits(.orig_mod, NM_SUM_CLASS)) {
+      .orig_mod <- model_summary(.orig_mod)
+    }
+    mod_df <- param_estimates(.orig_mod)
 
-  # check that param names match
-  n1 <- sort(mod_df$parameter_names)
-  n2 <- sort(names(comp_df))
-  .same <- suppressSpecificWarning(
-    all(n1 == n2),
-    "is not a multiple"
-  )
-  if (!.same) {
-    stop(paste(
-      glue("The models passed to `.mod` and `.comp` do not have the same parameters."),
-      glue("  `.mod` parameter names: {paste(n1, collapse = ', ')}"),
-      glue("  `.comp` parameter names: {paste(n2, collapse = ', ')}"),
-      sep = "\n"
-    ))
+
+    # check that param names match
+    n1 <- sort(mod_df$parameter_names)
+    n2 <- sort(names(comp_df))
+    .same <- suppressSpecificWarning(
+      all(n1 == n2),
+      "is not a multiple"
+    )
+    if (!.same) {
+      stop(paste(
+        glue("The models passed to `.param_df` and `.orig_mod` do not have the same parameters."),
+        glue("  `.param_df` parameter names: {paste(n2, collapse = ', ')}"),
+        glue("  `.orig_mod` parameter names: {paste(n1, collapse = ', ')}"),
+        sep = "\n"
+      ))
+    }
   }
 
   # summarize comp to quantiles
   comp_df <- comp_df %>%
     summarise(across(
       .fns = quantile,
-      probs = .probs
+      probs = probs,
+      na.rm = na.rm
     )) %>%
     t() %>%
     as.data.frame() %>%
     rownames_to_column()
-  colnames(comp_df) <- c("parameter_names", paste0(.probs * 100, "%"))
+  colnames(comp_df) <- c("parameter_names", paste0(probs * 100, "%"))
 
   # join quantiles to original
-  mod_df %>%
-    select(parameter_names, estimate) %>%
-    rename(original_estimate = estimate) %>%
-    left_join(comp_df, by = "parameter_names")
+  if (!is.null(.orig_mod)) {
+    comp_df <- mod_df %>%
+      select(parameter_names, estimate) %>%
+      rename(original_estimate = estimate) %>%
+      left_join(comp_df, by = "parameter_names")
+  }
 
+  return(comp_df)
 }
 

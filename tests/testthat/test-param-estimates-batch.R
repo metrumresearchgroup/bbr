@@ -121,7 +121,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   })
 
   ###################
-  # compare to model
+  # compare tests
   ###################
 
   test_that("param_estimates_compare() works on same model [BBR-PEST-009]", {
@@ -139,8 +139,13 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     param_tbl <- param_tbl %>%
       mutate(across(5:ncol(param_tbl), ~(.x*jitter)))
 
-    # compare
-    res <- param_estimates_compare(SUM1, param_tbl)
+    # get quantiles without orig model
+    res <- param_estimates_compare(param_tbl)
+    expect_equal(ncol(res), 4)
+    expect_equal(nrow(res), nrow(param_estimates(SUM1)))
+
+    # compare to orig model
+    res <- param_estimates_compare(param_tbl, SUM1)
     expect_equal(ncol(res), 5)
     expect_equal(nrow(res), nrow(param_estimates(SUM1)))
 
@@ -173,30 +178,44 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
     # compare
     res <- param_estimates_compare(
-      .s,
-      param_estimates_batch(BATCH_PARAM_TEST_DIR)
+      param_estimates_batch(BATCH_PARAM_TEST_DIR),
+      .s
     )
     expect_equal(ncol(res), 5)
     expect_equal(nrow(res), nrow(param_estimates(.s)))
 
   })
 
-  test_that("param_estimates_compare() works .quantile argument [BBR-PEST-009]", {
+  test_that("param_estimates_compare() works probs argument [BBR-PEST-009]", {
     res <- param_estimates_compare(
-      SUM1,
       param_estimates_batch(MODEL_DIR),
-      .probs = c(.3, .4, .6)
+      probs = c(.3, .4, .6)
     )
     expect_true(all(c("30%", "40%", "60%") %in% names(res)))
   })
 
-  test_that("param_estimates_compare() errors with different models [BBR-PEST-010]", {
+  test_that("param_estimates_compare() works na.rm argument [BBR-PEST-009]", {
 
-    # compare
     expect_error({
       res <- param_estimates_compare(
-        SUM1,
         param_estimates_batch(MODEL_DIR_X)
+      )
+    }, regexp = "missing values")
+
+    res <- param_estimates_compare(
+      param_estimates_batch(MODEL_DIR_X),
+      na.rm = TRUE
+    )
+    expect_equal(ncol(res), 4)
+    expect_true(nrow(res) > 10) # somewhat arbitrary, but just need to be sure it returns rows
+  })
+
+  test_that("param_estimates_compare() errors with different models [BBR-PEST-010]", {
+
+    expect_error({
+      res <- param_estimates_compare(
+        param_estimates_batch(MODEL_DIR_X),
+        SUM1
       )
     }, regexp = "do not have the same parameters")
 
