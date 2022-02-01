@@ -84,7 +84,7 @@ param_estimates_batch <- function(.path,
   if ("V4" %in% names(df)) df <- select(df, -.data$V4)
 
   # reformat parameter names to conform with `param_estimates()` output
-  names(df) <- gsub("\\(([0-9])_([0-9])\\)", "(\\1,\\2)", names(df))
+  names(df) <- gsub("\\(([0-9]+)_([0-9]+)\\)", "(\\1,\\2)", names(df))
 
   # format and return
   df %>%

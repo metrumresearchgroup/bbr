@@ -160,6 +160,27 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     )
   })
 
+
+  test_that("param_estimates_compare() works on lots of params [BBR-PEST-009]", {
+
+    on.exit(cleanup())
+
+    # copy 6 .ext files (to simulate model runs)
+    walk(4:9, ~copy_to_batch_params(file.path(MODEL_DIR_X, "acop-iov"), as.character(.x)))
+    .s <- file.path(MODEL_DIR_X, "acop-iov") %>%
+      read_model() %>%
+      model_summary()
+
+    # compare
+    res <- param_estimates_compare(
+      .s,
+      param_estimates_batch(BATCH_PARAM_TEST_DIR)
+    )
+    expect_equal(ncol(res), 5)
+    expect_equal(nrow(res), nrow(param_estimates(.s)))
+
+  })
+
   test_that("param_estimates_compare() works .quantile argument [BBR-PEST-009]", {
     res <- param_estimates_compare(
       SUM1,
