@@ -130,7 +130,7 @@ param_estimates_batch <- function(.path,
 #' @param .orig_mod `bbi_model` object to compare `.param_df` against. If
 #'   `NULL`, the default, only returns quantiles from `.param_df`. If passed,
 #'   will display an additional `original_estimate` column.
-#' @param probs Numeric vector with between 0 and 1 to be passed through to
+#' @param probs Numeric vector with values between 0 and 1 to be passed through to
 #'   [stats::quantile()]. Represents the quantiles to calculate for parameter
 #'   estimates in `.param_df`.
 #' @param na.rm Logical scalar, passed through to [stats::quantile()].

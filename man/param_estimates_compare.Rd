@@ -19,7 +19,7 @@ model (like what's returned from \code{\link[=param_estimates_batch]{param_estim
 \code{NULL}, the default, only returns quantiles from \code{.param_df}. If passed,
 will display an additional \code{original_estimate} column.}
 
-\item{probs}{Numeric vector with between 0 and 1 to be passed through to
+\item{probs}{Numeric vector with values between 0 and 1 to be passed through to
 \code{\link[stats:quantile]{stats::quantile()}}. Represents the quantiles to calculate for parameter
 estimates in \code{.param_df}.}
 
