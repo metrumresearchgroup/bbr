@@ -7,6 +7,7 @@
 param_estimates_compare(
   .param_df,
   .orig_mod = NULL,
+  .compare_cols = starts_with(c("THETA", "SIGMA", "OMEGA")),
   probs = c(0.5, 0.025, 0.975),
   na.rm = FALSE
 )
@@ -18,6 +19,14 @@ model (like what's returned from \code{\link[=param_estimates_batch]{param_estim
 \item{.orig_mod}{\code{bbi_model} object to compare \code{.param_df} against. If
 \code{NULL}, the default, only returns quantiles from \code{.param_df}. If passed,
 will display an additional \code{original_estimate} column.}
+
+\item{.compare_cols}{An expression that can be passed to \code{\link[dplyr:select]{dplyr::select()}} to
+select which columns in \code{.param_df} will be pivoted and summarized.
+Defaults to \code{dplyr::starts_with(c("THETA", "SIGMA", "OMEGA"))} (designed
+for NONMEM runs), but consider using \code{\link[dplyr:reexports]{dplyr::matches()}} to select columns
+using regex. Also see
+\href{https://tidyselect.r-lib.org/reference/language.html}{?tidyselect::language}
+for more details and options.}
 
 \item{probs}{Numeric vector with values between 0 and 1 to be passed through to
 \code{\link[stats:quantile]{stats::quantile()}}. Represents the quantiles to calculate for parameter
@@ -36,7 +45,7 @@ and then pivoted.
 \description{
 Summarizes the parameter estimates from tibble like what's returned from
 \code{\link[=param_estimates_batch]{param_estimates_batch()}}, showing you the quantiles passed to \code{probs},
-likely interpretted as confidence intervals for your parameter estimates.
+likely interpreted as confidence intervals for your parameter estimates.
 Optionally takes an "original model" to compare these quantiles against.
 Originally conceived for comparing a model to multiple runs of the "same"
 model, for example in a bootstrap or simulation.

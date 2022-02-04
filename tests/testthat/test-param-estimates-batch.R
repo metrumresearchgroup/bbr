@@ -186,7 +186,24 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   })
 
-  test_that("param_estimates_compare() works probs argument [BBR-PEST-009]", {
+  test_that("param_estimates_compare() works .compare_cols argument [BBR-PEST-010]", {
+    param_df <- param_estimates_batch(MODEL_DIR)
+
+    orig_names <- names(param_df)
+    names(param_df) <- stringr::str_replace(orig_names, "^THETA", "naw")
+
+    res <- param_estimates_compare(
+      param_df,
+      .compare_cols = dplyr::matches("^naw")
+    )
+
+    expect_equal(
+      nrow(res),
+      sum(stringr::str_detect(orig_names, "^THETA"))
+    )
+  })
+
+  test_that("param_estimates_compare() works probs argument [BBR-PEST-011]", {
     res <- param_estimates_compare(
       param_estimates_batch(MODEL_DIR),
       probs = c(.3, .4, .6)
@@ -194,7 +211,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_true(all(c("30%", "40%", "60%") %in% names(res)))
   })
 
-  test_that("param_estimates_compare() works na.rm argument [BBR-PEST-009]", {
+  test_that("param_estimates_compare() works na.rm argument [BBR-PEST-011]", {
 
     expect_error({
       res <- param_estimates_compare(
@@ -210,7 +227,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_true(nrow(res) > 10) # somewhat arbitrary, but just need to be sure it returns rows
   })
 
-  test_that("param_estimates_compare() errors with different models [BBR-PEST-010]", {
+  test_that("param_estimates_compare() errors with different models [BBR-PEST-012]", {
 
     expect_error({
       res <- param_estimates_compare(

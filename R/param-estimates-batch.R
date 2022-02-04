@@ -112,7 +112,7 @@ param_estimates_batch <- function(.path,
 #'
 #' Summarizes the parameter estimates from tibble like what's returned from
 #' [param_estimates_batch()], showing you the quantiles passed to `probs`,
-#' likely interpretted as confidence intervals for your parameter estimates.
+#' likely interpreted as confidence intervals for your parameter estimates.
 #' Optionally takes an "original model" to compare these quantiles against.
 #' Originally conceived for comparing a model to multiple runs of the "same"
 #' model, for example in a bootstrap or simulation.
@@ -130,6 +130,13 @@ param_estimates_batch <- function(.path,
 #' @param .orig_mod `bbi_model` object to compare `.param_df` against. If
 #'   `NULL`, the default, only returns quantiles from `.param_df`. If passed,
 #'   will display an additional `original_estimate` column.
+#' @param .compare_cols An expression that can be passed to [dplyr::select()] to
+#'   select which columns in `.param_df` will be pivoted and summarized.
+#'   Defaults to `dplyr::starts_with(c("THETA", "SIGMA", "OMEGA"))` (designed
+#'   for NONMEM runs), but consider using [dplyr::matches()] to select columns
+#'   using regex. Also see
+#'   [?tidyselect::language](https://tidyselect.r-lib.org/reference/language.html)
+#'    for more details and options.
 #' @param probs Numeric vector with values between 0 and 1 to be passed through to
 #'   [stats::quantile()]. Represents the quantiles to calculate for parameter
 #'   estimates in `.param_df`.
@@ -142,12 +149,13 @@ param_estimates_batch <- function(.path,
 param_estimates_compare <- function(
   .param_df,
   .orig_mod = NULL,
+  .compare_cols = starts_with(c("THETA", "SIGMA", "OMEGA")),
   probs = c(.5, 0.025, 0.975),
   na.rm = FALSE
 ) {
 
   comp_df <- .param_df %>%
-    select(starts_with(c("THETA", "SIGMA", "OMEGA")))
+    select(.compare_cols)
 
   if (!is.null(.orig_mod)) {
     if (!inherits(.orig_mod, NM_SUM_CLASS)) {
@@ -188,8 +196,8 @@ param_estimates_compare <- function(
   # join quantiles to original
   if (!is.null(.orig_mod)) {
     comp_df <- mod_df %>%
-      select(parameter_names, estimate) %>%
-      rename(original_estimate = estimate) %>%
+      select(.data$parameter_names, .data$estimate) %>%
+      rename(original_estimate = .data$estimate) %>%
       left_join(comp_df, by = "parameter_names")
   }
 
