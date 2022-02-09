@@ -120,4 +120,134 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_true(grepl('no estimation output detected', param_tbl$error_msg))
   })
 
+  ###################
+  # compare tests
+  ###################
+
+  test_that("param_estimates_compare() works on same model [BBR-PEST-009]", {
+
+    on.exit(cleanup())
+
+    # copy 6 .ext files (to simulate model runs)
+    walk(4:9, ~copy_to_batch_params(MOD1_PATH, as.character(.x)))
+
+    # get table of parameter estimates
+    param_tbl <- BATCH_PARAM_TEST_DIR %>% param_estimates_batch()
+
+    # multiply by arbitrary value to get confidence intervals for testing
+    jitter <- seq(0.95, 1.05, 0.02)
+    param_tbl <- param_tbl %>%
+      mutate(across(5:ncol(param_tbl), ~(.x*jitter)))
+
+    # get quantiles without orig model
+    res <- param_estimates_compare(param_tbl)
+    expect_equal(ncol(res), 4)
+    expect_equal(nrow(res), nrow(param_estimates(SUM1)))
+
+    # compare to orig model
+    res <- param_estimates_compare(param_tbl, SUM1)
+    expect_equal(ncol(res), 5)
+    expect_equal(nrow(res), nrow(param_estimates(SUM1)))
+
+    # quantiles should be less or more than median, respectively
+    expect_true(all(
+      (res$`2.5%` < res$`50%`) | res$`50%` == 0
+    ))
+
+    expect_true(all(
+      (res$`97.5%` > res$`50%`) | res$`50%` == 0
+    ))
+
+    # note: this is only true because of the jitter we specify
+    expect_equal(
+      res$original_estimate,
+      res$`50%`
+    )
+  })
+
+
+  test_that("param_estimates_compare() works on lots of params [BBR-PEST-009]", {
+
+    on.exit(cleanup())
+
+    # copy 6 .ext files (to simulate model runs)
+    walk(4:9, ~copy_to_batch_params(file.path(MODEL_DIR_X, "acop-iov"), as.character(.x)))
+    .s <- file.path(MODEL_DIR_X, "acop-iov") %>%
+      read_model() %>%
+      model_summary()
+
+    # compare
+    res <- param_estimates_compare(
+      param_estimates_batch(BATCH_PARAM_TEST_DIR),
+      .s
+    )
+    expect_equal(ncol(res), 5)
+    expect_equal(nrow(res), nrow(param_estimates(.s)))
+
+  })
+
+  test_that("param_estimates_compare() works .compare_cols argument [BBR-PEST-010]", {
+    param_df <- param_estimates_batch(MODEL_DIR)
+
+    orig_names <- names(param_df)
+    names(param_df) <- stringr::str_replace(orig_names, "^THETA", "naw")
+
+    res <- param_estimates_compare(
+      param_df,
+      .compare_cols = dplyr::matches("^naw")
+    )
+
+    expect_equal(
+      nrow(res),
+      sum(stringr::str_detect(orig_names, "^THETA"))
+    )
+
+    # test more complicated expression
+    res <- param_estimates_compare(
+      param_df,
+      .compare_cols = !dplyr::matches("naw|_|run")
+    )
+
+    expect_equal(
+      nrow(res),
+      sum(stringr::str_detect(orig_names, "^(SIGMA|OMEGA)"))
+    )
+  })
+
+  test_that("param_estimates_compare() works probs argument [BBR-PEST-011]", {
+    res <- param_estimates_compare(
+      param_estimates_batch(MODEL_DIR),
+      probs = c(.3, .4, .6)
+    )
+    expect_true(all(c("30%", "40%", "60%") %in% names(res)))
+  })
+
+  test_that("param_estimates_compare() works na.rm argument [BBR-PEST-011]", {
+
+    expect_error({
+      res <- param_estimates_compare(
+        param_estimates_batch(MODEL_DIR_X)
+      )
+    }, regexp = "missing values")
+
+    res <- param_estimates_compare(
+      param_estimates_batch(MODEL_DIR_X),
+      na.rm = TRUE
+    )
+    expect_equal(ncol(res), 4)
+    expect_true(nrow(res) > 10) # somewhat arbitrary, but just need to be sure it returns rows
+  })
+
+  test_that("param_estimates_compare() errors with different models [BBR-PEST-012]", {
+
+    expect_error({
+      res <- param_estimates_compare(
+        param_estimates_batch(MODEL_DIR_X),
+        SUM1
+      )
+    }, regexp = "do not have the same parameters")
+
+  })
+
 }) # closing withr::with_options
+
