@@ -201,6 +201,17 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       nrow(res),
       sum(stringr::str_detect(orig_names, "^THETA"))
     )
+
+    # test more complicated expression
+    res <- param_estimates_compare(
+      param_df,
+      .compare_cols = !dplyr::matches("naw|_|run")
+    )
+
+    expect_equal(
+      nrow(res),
+      sum(stringr::str_detect(orig_names, "^(SIGMA|OMEGA)"))
+    )
   })
 
   test_that("param_estimates_compare() works probs argument [BBR-PEST-011]", {

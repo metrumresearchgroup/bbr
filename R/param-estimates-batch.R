@@ -155,7 +155,7 @@ param_estimates_compare <- function(
 ) {
 
   comp_df <- .param_df %>%
-    select(.compare_cols)
+    select({{ .compare_cols }})
 
   if (!is.null(.orig_mod)) {
     if (!inherits(.orig_mod, NM_SUM_CLASS)) {
