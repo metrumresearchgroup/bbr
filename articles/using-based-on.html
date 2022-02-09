@@ -26,6 +26,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container">
@@ -38,18 +40,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -83,7 +79,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/metrumresearchgroup/bbr">
+  <a href="https://github.com/metrumresearchgroup/bbr" class="external-link">
     <span class="fa fa-github fa-lg"></span>
      
   </a>
@@ -98,11 +94,11 @@
 
       
 
-      </header><script src="using-based-on_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Using the based_on field</h1>
-                        <h4 class="author">Seth Green</h4>
+                        <h4 data-toc-skip class="author">Seth Green</h4>
             
       
       
@@ -112,42 +108,42 @@
 
     
     
-<div id="introduction" class="section level1">
-<h1 class="hasAnchor">
-<a href="#introduction" class="anchor"></a>Introduction</h1>
+<div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
 <p>This vignette demonstrates how to use the <code>based_on</code> field to track a model’s ancestry through the model development process. You will also see one common use for this: using the tibble output from <code><a href="../reference/config_log.html">config_log()</a></code> to check that your models are up-to-date. By “up-to-date” we mean that none of the model files or data files have changed since the model was run.</p>
 <p>If you are new to <code>bbr</code>, the <a href="https://metrumresearchgroup.github.io/bbr/articles/getting-started.html">“Getting Started with bbr”</a> vignette will take you through some basic scenarios for modeling with NONMEM using <code>bbr</code>, introducing you to its standard workflow and functionality.</p>
-<div id="setup" class="section level2">
-<h2 class="hasAnchor">
-<a href="#setup" class="anchor"></a>Setup</h2>
+<div class="section level3">
+<h3 id="setup">Setup<a class="anchor" aria-label="anchor" href="#setup"></a>
+</h3>
 <p>There is some initial set up necessary for using <code>bbr</code>. Please refer to the <a href="https://metrumresearchgroup.github.io/bbr/articles/getting-started.html#setup">“Getting Started”</a> vignette, mentioned above, if you have not done this yet. Once this is done, load the library.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">bbr</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://purrr.tidyverse.org">purrr</a></span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">bbr</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://purrr.tidyverse.org" class="external-link">purrr</a></span><span class="op">)</span></code></pre></div>
 </div>
 </div>
-<div id="modeling-process" class="section level1">
-<h1 class="hasAnchor">
-<a href="#modeling-process" class="anchor"></a>Modeling process</h1>
+<div class="section level2">
+<h2 id="modeling-process">Modeling process<a class="anchor" aria-label="anchor" href="#modeling-process"></a>
+</h2>
 <p>The modeling process will always start with an initial model, which we create with the <code><a href="../reference/new_model.html">new_model()</a></code> call.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">MODEL_DIR</span> <span class="op">&lt;-</span> <span class="st">"../nonmem"</span></code></pre></div>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mod1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_model.html">new_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">mod1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_model.html">new_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>From there, the iterative model development process proceeds. The <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> function will do several things, including creating a new model file and filling in some relevant metadata. Notably, it will also add the model that you copied <em>from</em> into the <code>based_on</code> field for the new model.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span>.parent_mod <span class="op">=</span> <span class="va">mod1</span>, .new_model <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
 
 <span class="fu"><a href="../reference/get_based_on.html">get_based_on</a></span><span class="op">(</span><span class="va">mod2</span><span class="op">)</span>
-<span class="co">#&gt; [1] "/data/home/sethg/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/1"</span></code></pre></div>
-<div id="diff-helpers" class="section level2">
-<h2 class="hasAnchor">
-<a href="#diff-helpers" class="anchor"></a>diff helpers</h2>
+<span class="co">#&gt; [1] "/data/home/kylem/src/github/metrumresearchgroup/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/1"</span></code></pre></div>
+<div class="section level3">
+<h3 id="diff-helpers">diff helpers<a class="anchor" aria-label="anchor" href="#diff-helpers"></a>
+</h3>
 <p>There are several helper functions for comparing a model to its parent. <code><a href="../reference/tags_diff.html">tags_diff()</a></code> compares the tags attached to the two models, while <code><a href="../reference/model_diff.html">model_diff()</a></code> compares the model files on disk.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mod1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/modify_tags.html">add_tags</a></span><span class="op">(</span><span class="va">mod1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"the same tag"</span>, <span class="st">"an old tag"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">mod2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/modify_tags.html">add_tags</a></span><span class="op">(</span><span class="va">mod2</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"the same tag"</span>, <span class="st">"a new tag"</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">mod1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/modify_tags.html">add_tags</a></span><span class="op">(</span><span class="va">mod1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"the same tag"</span>, <span class="st">"an old tag"</span><span class="op">)</span><span class="op">)</span>
+<span class="va">mod2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/modify_tags.html">add_tags</a></span><span class="op">(</span><span class="va">mod2</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"the same tag"</span>, <span class="st">"a new tag"</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="../reference/tags_diff.html">tags_diff</a></span><span class="op">(</span><span class="va">mod2</span><span class="op">)</span>
 <span class="co">#&gt; In 2 but not parent(s):  a new tag</span>
 <span class="co">#&gt; In parent(s) but not 2:  an old tag</span></code></pre></div>
@@ -400,9 +396,9 @@ DIV.diffobj-container.light.yb DIV.diffobj-line {
 </div>
 <p>By default both functions compare the model to whatever model is returned from <code><a href="../reference/get_based_on.html">get_based_on()</a></code>, but they also have a <code>.mod2</code> argument which can take any arbitrary model object and compare with that instead. See <code><a href="../reference/tags_diff.html">?tags_diff</a></code> and <code><a href="../reference/model_diff.html">?model_diff</a></code> for more details on usage.</p>
 </div>
-<div id="more-iteration" class="section level2">
-<h2 class="hasAnchor">
-<a href="#more-iteration" class="anchor"></a>More iteration</h2>
+<div class="section level3">
+<h3 id="more-iteration">More iteration<a class="anchor" aria-label="anchor" href="#more-iteration"></a>
+</h3>
 <p>Now we continue iterating on our model. <em>NOTE:</em> In a real model development process, these models would obviously be run and the diagnostics examined before moving on. For the sake of brevity, imagine that all happens “behind the curtain” in this example. In other words, <em>in between</em> each of the calls to <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> you would be doing all of the normal iterative modeling work.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># ...submit mod2...look at diagnostics...decide on changes for next iteration...</span>
@@ -424,140 +420,141 @@ DIV.diffobj-container.light.yb DIV.diffobj-line {
 <span class="co"># ...submit mod6...look at diagnostics...decide you're done!</span></code></pre></div>
 <p>Now that you have arrived at your final model, you can add a description to identify it, which will be used shortly for filtering the <code><a href="../reference/run_log.html">run_log()</a></code> tibble.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mod6</span> <span class="op">&lt;-</span> <span class="va">mod6</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> <span class="fu"><a href="../reference/modify_description.html">add_description</a></span><span class="op">(</span><span class="st">"Final model"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">mod6</span> <span class="op">&lt;-</span> <span class="va">mod6</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/modify_description.html">add_description</a></span><span class="op">(</span><span class="st">"Final model"</span><span class="op">)</span></code></pre></div>
 </div>
 </div>
-<div id="operating-on-a-model-object" class="section level1">
-<h1 class="hasAnchor">
-<a href="#operating-on-a-model-object" class="anchor"></a>Operating on a model object</h1>
+<div class="section level2">
+<h2 id="operating-on-a-model-object">Operating on a model object<a class="anchor" aria-label="anchor" href="#operating-on-a-model-object"></a>
+</h2>
 <p>As seen above, you can simply use <code>mod$based_on</code> to see what is stored in the <code>based_on</code> field of a given model. However, there are two additional helper functions that are useful to know.</p>
-<div id="get_based_on" class="section level2">
-<h2 class="hasAnchor">
-<a href="#get_based_on" class="anchor"></a>get_based_on</h2>
+<div class="section level3">
+<h3 id="get_based_on">get_based_on<a class="anchor" aria-label="anchor" href="#get_based_on"></a>
+</h3>
 <p>First, by using <code><a href="../reference/get_based_on.html">get_based_on()</a></code> you can retrieve the absolute path to all models in the <code>based_on</code> field.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mod6</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> <span class="fu"><a href="../reference/get_based_on.html">get_based_on</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; [1] "/data/home/sethg/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/5"</span></code></pre></div>
+<code class="sourceCode R"><span class="va">mod6</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/get_based_on.html">get_based_on</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; [1] "/data/home/kylem/src/github/metrumresearchgroup/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/5"</span></code></pre></div>
 <p>This is useful because the path(s) retrieved will unambiguously identify the parent model(s) and can therefore be passed to things like <code><a href="../reference/read_model.html">read_model()</a></code> or <code><a href="../reference/model_summary.html">model_summary()</a></code> like so:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">parent_mod</span> <span class="op">&lt;-</span> <span class="va">mod6</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> <span class="fu"><a href="../reference/get_based_on.html">get_based_on</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> <span class="fu"><a href="../reference/read_model.html">read_model</a></span><span class="op">(</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">parent_mod</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">parent_mod</span> <span class="op">&lt;-</span> <span class="va">mod6</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/get_based_on.html">get_based_on</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/read_model.html">read_model</a></span><span class="op">(</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">parent_mod</span><span class="op">)</span>
 <span class="co">#&gt; List of 4</span>
 <span class="co">#&gt;  $ model_type         : chr "nonmem"</span>
 <span class="co">#&gt;  $ based_on           : chr "2"</span>
-<span class="co">#&gt;  $ absolute_model_path: chr "/data/home/sethg/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/5"</span>
+<span class="co">#&gt;  $ absolute_model_path: chr "/data/home/kylem/src/github/metrumresearchgroup/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/5"</span>
 <span class="co">#&gt;  $ yaml_md5           : chr "ac0ba292b017a72bb316359f0df09bb2"</span>
 <span class="co">#&gt;  - attr(*, "class")= chr [1:3] "bbi_nonmem_model" "bbi_model" "list"</span></code></pre></div>
 </div>
-<div id="get_model_ancestry" class="section level2">
-<h2 class="hasAnchor">
-<a href="#get_model_ancestry" class="anchor"></a>get_model_ancestry</h2>
+<div class="section level3">
+<h3 id="get_model_ancestry">get_model_ancestry<a class="anchor" aria-label="anchor" href="#get_model_ancestry"></a>
+</h3>
 <p>The second helper function walks up the tree of inheritence by iteratively calling <code><a href="../reference/get_based_on.html">get_based_on()</a></code> on each parent model to determine the full set of models that led up to the current model.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mod6</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> <span class="fu"><a href="../reference/get_based_on.html">get_model_ancestry</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; [1] "/data/home/sethg/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/1"</span>
-<span class="co">#&gt; [2] "/data/home/sethg/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/2"</span>
-<span class="co">#&gt; [3] "/data/home/sethg/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/5"</span></code></pre></div>
+<code class="sourceCode R"><span class="va">mod6</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/get_based_on.html">get_model_ancestry</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; [1] "/data/home/kylem/src/github/metrumresearchgroup/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/1"</span>
+<span class="co">#&gt; [2] "/data/home/kylem/src/github/metrumresearchgroup/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/2"</span>
+<span class="co">#&gt; [3] "/data/home/kylem/src/github/metrumresearchgroup/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/5"</span></code></pre></div>
 <p>In this case, model <code>6</code> was based on <code>5</code>, which was based on <code>2</code>, which in turn was based on <code>1</code>. You will see one example of how this can be useful in the “Final model family” section below.</p>
 </div>
 </div>
-<div id="using-the-run-log" class="section level1">
-<h1 class="hasAnchor">
-<a href="#using-the-run-log" class="anchor"></a>Using the run log</h1>
+<div class="section level2">
+<h2 id="using-the-run-log">Using the run log<a class="anchor" aria-label="anchor" href="#using-the-run-log"></a>
+</h2>
 <p>While it may be useful to look at the ancestry of a single model object, it may be even more useful to use the <code>based_on</code> field later in the modeling process when you are looking back and trying to summarize the model activities as a whole. The <code><a href="../reference/run_log.html">run_log()</a></code> function is helpful for this. It returns a tibble with metadata about each model.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">log_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_log.html">run_log</a></span><span class="op">(</span><span class="va">MODEL_DIR</span><span class="op">)</span>
 <span class="va">log_df</span>
-<span class="co">#&gt; # A tibble: 6 × 9</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 9</span></span>
 <span class="co">#&gt;   absolute_model_… run   yaml_md5 model_type description bbi_args based_on tags </span>
-<span class="co">#&gt;   &lt;chr&gt;            &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;chr&gt;       &lt;list&gt;   &lt;list&gt;   &lt;lis&gt;</span>
-<span class="co">#&gt; 1 /data/home/seth… 1     5ec8e22… nonmem     &lt;NA&gt;        &lt;NULL&gt;   &lt;NULL&gt;   &lt;chr…</span>
-<span class="co">#&gt; 2 /data/home/seth… 2     9adbb90… nonmem     &lt;NA&gt;        &lt;NULL&gt;   &lt;chr [1… &lt;chr…</span>
-<span class="co">#&gt; 3 /data/home/seth… 3     ac0ba29… nonmem     &lt;NA&gt;        &lt;NULL&gt;   &lt;chr [1… &lt;NUL…</span>
-<span class="co">#&gt; 4 /data/home/seth… 4     6818db1… nonmem     &lt;NA&gt;        &lt;NULL&gt;   &lt;chr [1… &lt;NUL…</span>
-<span class="co">#&gt; 5 /data/home/seth… 5     ac0ba29… nonmem     &lt;NA&gt;        &lt;NULL&gt;   &lt;chr [1… &lt;NUL…</span>
-<span class="co">#&gt; 6 /data/home/seth… 6     feb9bf3… nonmem     Final model &lt;NULL&gt;   &lt;chr [1… &lt;NUL…</span>
-<span class="co">#&gt; # … with 1 more variable: notes &lt;list&gt;</span></code></pre></div>
-<p>Among other things, the run log contains any descriptions that have been assigned to each model. Here we use <code><a href="https://dplyr.tidyverse.org/reference/filter.html">dplyr::filter()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/pull.html">dplyr::pull()</a></code> to get the path to the final model.</p>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lis&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> /data/home/kyle… 1     5ec8e22… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;chr</span>…</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> /data/home/kyle… 2     9adbb90… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;chr [1</span>… <span style="color: #949494;">&lt;chr</span>…</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> /data/home/kyle… 3     ac0ba29… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;chr [1</span>… <span style="color: #949494;">&lt;NUL</span>…</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> /data/home/kyle… 4     6818db1… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;chr [1</span>… <span style="color: #949494;">&lt;NUL</span>…</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> /data/home/kyle… 5     ac0ba29… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;chr [1</span>… <span style="color: #949494;">&lt;NUL</span>…</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> /data/home/kyle… 6     feb9bf3… nonmem     Final model <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;chr [1</span>… <span style="color: #949494;">&lt;NUL</span>…</span>
+<span class="co">#&gt; <span style="color: #949494;"># … with 1 more variable: notes &lt;list&gt;</span></span></code></pre></div>
+<p>Among other things, the run log contains any descriptions that have been assigned to each model. Here we use <code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">dplyr::filter()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">dplyr::pull()</a></code> to get the path to the final model.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">final_model_path</span> <span class="op">&lt;-</span> 
-  <span class="va">log_df</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">description</span> <span class="op">==</span> <span class="st">"Final model"</span><span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">absolute_model_path</span><span class="op">)</span>
+  <span class="va">log_df</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">description</span> <span class="op">==</span> <span class="st">"Final model"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">absolute_model_path</span><span class="op">)</span>
 
 <span class="va">final_model_path</span>
-<span class="co">#&gt; [1] "/data/home/sethg/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/6"</span></code></pre></div>
+<span class="co">#&gt; [1] "/data/home/kylem/src/github/metrumresearchgroup/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/6"</span></code></pre></div>
 <p>Next we can use the <code><a href="../reference/get_based_on.html">get_model_ancestry()</a></code> function to filter the tibble to only the models that led up to the final model.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">log_df</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">absolute_model_path</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="../reference/get_based_on.html">get_model_ancestry</a></span><span class="op">(</span><span class="va">final_model_path</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
-  <span class="fu"><a href="../reference/collapse_to_string.html">collapse_to_string</a></span><span class="op">(</span><span class="va">based_on</span><span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> <span class="co"># collapses list column for easier printing</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="va">based_on</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 3 × 2</span>
+<code class="sourceCode R"><span class="va">log_df</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">absolute_model_path</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="../reference/get_based_on.html">get_model_ancestry</a></span><span class="op">(</span><span class="va">final_model_path</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="../reference/collapse_to_string.html">collapse_to_string</a></span><span class="op">(</span><span class="va">based_on</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># collapses list column for easier printing</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="va">based_on</span><span class="op">)</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 2</span></span>
 <span class="co">#&gt;   run   based_on</span>
-<span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;   </span>
-<span class="co">#&gt; 1 1     &lt;NA&gt;    </span>
-<span class="co">#&gt; 2 2     1       </span>
-<span class="co">#&gt; 3 5     2</span></code></pre></div>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1     <span style="color: #BB0000;">NA</span>      </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2     1       </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 5     2</span></code></pre></div>
 <p>As you can see, models 3 and 4 are discarded because they did not lead to the final model. Review “Modeling Process” section above if you are not sure why this is the case. We will use the two techniques together in the “Final model family” section below.</p>
-<div id="checking-if-models-are-up-to-date-with-check_up_to_date-and-config_log" class="section level2">
-<h2 class="hasAnchor">
-<a href="#checking-if-models-are-up-to-date-with-check_up_to_date-and-config_log" class="anchor"></a>Checking if models are up-to-date with <code>check_up_to_date()</code> and <code>config_log()</code>
-</h2>
+<div class="section level3">
+<h3 id="checking-if-models-are-up-to-date-with-check_up_to_date-and-config_log">Checking if models are up-to-date with <code>check_up_to_date()</code> and <code>config_log()</code><a class="anchor" aria-label="anchor" href="#checking-if-models-are-up-to-date-with-check_up_to_date-and-config_log"></a>
+</h3>
 <p>Now imagine you are coming back to this project some time later and want to make sure that all of the outputs you have are still up-to-date with the model files and data currently in the project.</p>
 <p>When <code>bbi</code> runs a model, it creates a file named <code>bbi_config.json</code> in the output directory. This file contains a lot of information about the state and configuration at the time when the model was run. Notably, it contains an md5 digest of both the model file <em>and</em> the data file at execution time. The following functions compare the md5 digests (stored during model execution) against the model and data files <em>as they currently exist on disk</em> at the time these functions are called.</p>
-<div id="check_up_to_date-for-a-single-model" class="section level3">
-<h3 class="hasAnchor">
-<a href="#check_up_to_date-for-a-single-model" class="anchor"></a><code>check_up_to_date()</code> for a single model</h3>
+<div class="section level4">
+<h4 id="check_up_to_date-for-a-single-model">
+<code>check_up_to_date()</code> for a single model<a class="anchor" aria-label="anchor" href="#check_up_to_date-for-a-single-model"></a>
+</h4>
 <p>The <code><a href="../reference/check_up_to_date.html">check_up_to_date()</a></code> function takes a model object and invisibly returns a two-element logical vector. The return is invisible because, if there are any changes, it will also print a message telling you which files have changed. Either way, you can also inspect the returned object like so.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/check_up_to_date.html">check_up_to_date</a></span><span class="op">(</span><span class="va">mod1</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span>
 <span class="co">#&gt; model  data </span>
 <span class="co">#&gt;  TRUE  TRUE</span></code></pre></div>
 </div>
-<div id="config_log-for-multiple-models" class="section level3">
-<h3 class="hasAnchor">
-<a href="#config_log-for-multiple-models" class="anchor"></a><code>config_log()</code> for multiple models</h3>
+<div class="section level4">
+<h4 id="config_log-for-multiple-models">
+<code>config_log()</code> for multiple models<a class="anchor" aria-label="anchor" href="#config_log-for-multiple-models"></a>
+</h4>
 <p>The <code><a href="../reference/config_log.html">config_log()</a></code> function parses these <code>bbi_config.json</code> files and extracts some relevant information to a <code>bbi_config_log_df</code> tibble. It contains <code>model_has_changed</code> and <code>data_has_changed</code> columns that serve as a check that the outputs are up-to-date with the current model and data.</p>
 <p>You can call <code>config_log</code> directly, but it is often useful to join it to a run log automatically with <code>run_log() %&gt;% add_config()</code>.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">log_df</span> <span class="op">&lt;-</span> <span class="va">log_df</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> <span class="fu"><a href="../reference/config_log.html">add_config</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">log_df</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="va">model_has_changed</span>, <span class="va">data_has_changed</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 × 3</span>
+<code class="sourceCode R"><span class="va">log_df</span> <span class="op">&lt;-</span> <span class="va">log_df</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/config_log.html">add_config</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">log_df</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="va">model_has_changed</span>, <span class="va">data_has_changed</span><span class="op">)</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span>
 <span class="co">#&gt;   run   model_has_changed data_has_changed</span>
-<span class="co">#&gt;   &lt;chr&gt; &lt;lgl&gt;             &lt;lgl&gt;           </span>
-<span class="co">#&gt; 1 1     FALSE             FALSE           </span>
-<span class="co">#&gt; 2 2     FALSE             FALSE           </span>
-<span class="co">#&gt; 3 3     TRUE              FALSE           </span>
-<span class="co">#&gt; 4 4     TRUE              FALSE           </span>
-<span class="co">#&gt; 5 5     FALSE             FALSE           </span>
-<span class="co">#&gt; 6 6     FALSE             FALSE</span></code></pre></div>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>           </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1     FALSE             FALSE           </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2     FALSE             FALSE           </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 3     TRUE              FALSE           </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 4     TRUE              FALSE           </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 5     FALSE             FALSE           </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 6     FALSE             FALSE</span></code></pre></div>
 <p>One important note: <code><a href="../reference/check_up_to_date.html">check_up_to_date()</a></code> and <code><a href="../reference/config_log.html">config_log()</a></code> return opposite boolean values. <code><a href="../reference/check_up_to_date.html">check_up_to_date()</a></code> returns <code>TRUE</code> if the files are <em>up to date</em>, whereas the <code>*_has_changed</code> columns contain <code>TRUE</code> if something <em>has changed</em>.</p>
 </div>
 </div>
-<div id="final-model-family" class="section level2">
-<h2 class="hasAnchor">
-<a href="#final-model-family" class="anchor"></a>Final model family</h2>
+<div class="section level3">
+<h3 id="final-model-family">Final model family<a class="anchor" aria-label="anchor" href="#final-model-family"></a>
+</h3>
 <p>From the <code>model_has_changed</code> column in the previous example, you can see that some of the model files have changed since they were run. However, you may only care about your final model and the models that led to it. You can use the <code>description</code> and <code>based_on</code> columns from the <code><a href="../reference/run_log.html">run_log()</a></code> to filter to only those models.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">final_model_family</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind.html">bind_rows</a></span><span class="op">(</span>
-  <span class="va">log_df</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> 
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">absolute_model_path</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="../reference/get_based_on.html">get_model_ancestry</a></span><span class="op">(</span><span class="va">final_model_path</span><span class="op">)</span><span class="op">)</span>, <span class="co"># the ancestors of the final model</span>
-  <span class="va">log_df</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> 
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">description</span> <span class="op">==</span> <span class="st">"Final model"</span><span class="op">)</span> <span class="co"># the final model itself</span>
+<code class="sourceCode R"><span class="va">final_model_family</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind.html" class="external-link">bind_rows</a></span><span class="op">(</span>
+  <span class="va">log_df</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">absolute_model_path</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="../reference/get_based_on.html">get_model_ancestry</a></span><span class="op">(</span><span class="va">final_model_path</span><span class="op">)</span><span class="op">)</span>, <span class="co"># the ancestors of the final model</span>
+  <span class="va">log_df</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">description</span> <span class="op">==</span> <span class="st">"Final model"</span><span class="op">)</span> <span class="co"># the final model itself</span>
 <span class="op">)</span>
 
-<span class="va">final_model_family</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> 
-  <span class="fu"><a href="../reference/collapse_to_string.html">collapse_to_string</a></span><span class="op">(</span><span class="va">based_on</span><span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="va">based_on</span>, <span class="va">description</span>, <span class="va">model_has_changed</span>, <span class="va">data_has_changed</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 4 × 5</span>
+<span class="va">final_model_family</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="../reference/collapse_to_string.html">collapse_to_string</a></span><span class="op">(</span><span class="va">based_on</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="va">based_on</span>, <span class="va">description</span>, <span class="va">model_has_changed</span>, <span class="va">data_has_changed</span><span class="op">)</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 5</span></span>
 <span class="co">#&gt;   run   based_on description model_has_changed data_has_changed</span>
-<span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;       &lt;lgl&gt;             &lt;lgl&gt;           </span>
-<span class="co">#&gt; 1 1     &lt;NA&gt;     &lt;NA&gt;        FALSE             FALSE           </span>
-<span class="co">#&gt; 2 2     1        &lt;NA&gt;        FALSE             FALSE           </span>
-<span class="co">#&gt; 3 5     2        &lt;NA&gt;        FALSE             FALSE           </span>
-<span class="co">#&gt; 4 6     5        Final model FALSE             FALSE</span></code></pre></div>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>           </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1     <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>          FALSE             FALSE           </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2     1        <span style="color: #BB0000;">NA</span>          FALSE             FALSE           </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 5     2        <span style="color: #BB0000;">NA</span>          FALSE             FALSE           </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 6     5        Final model FALSE             FALSE</span></code></pre></div>
 <p>When we filter to only those models, you can see that they are all still up-to-date. Great news.</p>
 </div>
 </div>
@@ -574,11 +571,13 @@ DIV.diffobj-container.light.yb DIV.diffobj-line {
 
 
       <footer><div class="copyright">
-  <p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p>
+<p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>
@@ -586,6 +585,8 @@ DIV.diffobj-container.light.yb DIV.diffobj-line {
 
   
 
+
+  
 
   </body>
 </html>

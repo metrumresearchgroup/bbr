@@ -26,6 +26,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container">
@@ -38,18 +40,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -83,7 +79,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/metrumresearchgroup/bbr">
+  <a href="https://github.com/metrumresearchgroup/bbr" class="external-link">
     <span class="fa fa-github fa-lg"></span>
      
   </a>
@@ -98,11 +94,11 @@
 
       
 
-      </header><script src="using-summary-log_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Creating a Model Summary Log</h1>
-                        <h4 class="author">Seth Green</h4>
+                        <h4 data-toc-skip class="author">Seth Green</h4>
             
       
       
@@ -112,41 +108,41 @@
 
     
     
-<div id="introduction" class="section level1">
-<h1 class="hasAnchor">
-<a href="#introduction" class="anchor"></a>Introduction</h1>
+<div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
 <p>This vignette demonstrates how to use <code><a href="../reference/summary_log.html">summary_log()</a></code> to extract model diagnostics like the objective function value, condition number, and parameter counts.</p>
 <p>If you are new to <code>bbr</code>, the <a href="https://metrumresearchgroup.github.io/bbr/articles/getting-started.html">“Getting Started with bbr”</a> vignette will take you through some basic scenarios for modeling with NONMEM using <code>bbr</code>, introducing you to its standard workflow and functionality.</p>
 <p>There is a lot of information in the <code>bbi_summary_log_df</code> tibble that is output from <code><a href="../reference/summary_log.html">summary_log()</a></code>. However, it is important to note that all of this, and quite a bit more, is contained in the <code>bbi_nonmem_summary</code> object output from <code><a href="../reference/model_summary.html">model_summary()</a></code>. If you are trying to dig deep into the outputs of a small number of models, see the <a href="https://metrumresearchgroup.github.io/bbr/articles/getting-started.html#summarize-model">Summarize section</a> of the “Getting Started” vignette for an introduction to that functionality.</p>
 <p><code><a href="../reference/summary_log.html">summary_log()</a></code> is more useful for getting a slightly higher-level view of a larger batch of models; potentially all the models in a given project, or something like a large group of bootstrapped runs.</p>
-<div id="setup" class="section level2">
-<h2 class="hasAnchor">
-<a href="#setup" class="anchor"></a>Setup</h2>
+<div class="section level3">
+<h3 id="setup">Setup<a class="anchor" aria-label="anchor" href="#setup"></a>
+</h3>
 <p>There is some initial set up necessary for using <code>bbr</code>. Please refer to the <a href="https://metrumresearchgroup.github.io/bbr/articles/getting-started.html#setup">“Getting Started”</a> vignette, mentioned above, if you have not done this yet. Once this is done, load the library.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">bbr</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyselect.r-lib.org">tidyselect</a></span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">bbr</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyselect.r-lib.org" class="external-link">tidyselect</a></span><span class="op">)</span></code></pre></div>
 </div>
 </div>
-<div id="whats-in-a-model-summary" class="section level1">
-<h1 class="hasAnchor">
-<a href="#whats-in-a-model-summary" class="anchor"></a>What’s in a Model Summary?</h1>
+<div class="section level2">
+<h2 id="whats-in-a-model-summary">What’s in a Model Summary?<a class="anchor" aria-label="anchor" href="#whats-in-a-model-summary"></a>
+</h2>
 <p>As mentioned above, the <code>bbi_summary_log_df</code> tibble contains a lot of information, which is a subset of what is contained in the <code>bbi_nonmem_summary</code> object returned from <code><a href="../reference/model_summary.html">model_summary()</a></code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">MODEL_DIR</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"model"</span>, <span class="st">"nonmem"</span>, <span class="st">"complex"</span>, package <span class="op">=</span> <span class="st">"bbr"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">MODEL_DIR</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"model"</span>, <span class="st">"nonmem"</span>, <span class="st">"complex"</span>, package <span class="op">=</span> <span class="st">"bbr"</span><span class="op">)</span>
 
 <span class="va">sum1</span> <span class="op">&lt;-</span> 
-  <span class="fu"><a href="../reference/read_model.html">read_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, <span class="st">"iovmm"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
+  <span class="fu"><a href="../reference/read_model.html">read_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, <span class="st">"iovmm"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="../reference/model_summary.html">model_summary</a></span><span class="op">(</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">sum1</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sum1</span><span class="op">)</span>
 <span class="co">#&gt; [1] "absolute_model_path" "run_details"         "run_heuristics"     </span>
 <span class="co">#&gt; [4] "parameters_data"     "parameter_names"     "ofv"                </span>
 <span class="co">#&gt; [7] "condition_number"    "shrinkage_details"</span></code></pre></div>
 <p>For example, the <code>run_details</code> section alone contains wealth of information about this model run:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">sum1</span><span class="op">$</span><span class="va">run_details</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">sum1</span><span class="op">$</span><span class="va">run_details</span><span class="op">)</span>
 <span class="co">#&gt; List of 16</span>
 <span class="co">#&gt;  $ version               : chr "7.4.4"</span>
 <span class="co">#&gt;  $ run_start             : chr "-999999999"</span>
@@ -166,9 +162,9 @@
 <span class="co">#&gt;  $ output_files_used     : chr [1:5] "iovmm.lst" "iovmm.cpu" "iovmm.ext" "iovmm.grd" ...</span></code></pre></div>
 <p>Much of this is very useful, but it’s also a bit intimidating, and it can take some work to unpack it all and find the bits and pieces you’re looking for.</p>
 </div>
-<div id="whats-in-the-summary-log" class="section level1">
-<h1 class="hasAnchor">
-<a href="#whats-in-the-summary-log" class="anchor"></a>What’s in the Summary Log?</h1>
+<div class="section level2">
+<h2 id="whats-in-the-summary-log">What’s in the Summary Log?<a class="anchor" aria-label="anchor" href="#whats-in-the-summary-log"></a>
+</h2>
 <p>The <code><a href="../reference/summary_log.html">summary_log()</a></code> function is designed to extract some of the most relevant diagnostics and model outputs from a batch of model summaries and organize them into a more easily digestible tibble. Like <code><a href="../reference/run_log.html">run_log()</a></code> and <code><a href="../reference/config_log.html">config_log()</a></code>, it takes two arguments:</p>
 <ul>
 <li>
@@ -178,7 +174,7 @@
 </ul>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">sum_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/summary_log.html">summary_log</a></span><span class="op">(</span><span class="va">MODEL_DIR</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">sum_df</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sum_df</span><span class="op">)</span>
 <span class="co">#&gt;  [1] "absolute_model_path"     "run"                    </span>
 <span class="co">#&gt;  [3] "bbi_summary"             "error_msg"              </span>
 <span class="co">#&gt;  [5] "needed_fail_flags"       "estimation_method"      </span>
@@ -192,21 +188,21 @@
 <span class="co">#&gt; [21] "minimization_terminated" "eta_pval_significant"   </span>
 <span class="co">#&gt; [23] "prderr"</span></code></pre></div>
 <p>The specific columns returned are described below, though there is also a list of them, with brief definitions, in the <a href="https://metrumresearchgroup.github.io/bbr/reference/summary_log.html"><code>summary_log()</code> docs</a> that can be accessed any time with <code>?summary_log()</code> in the console.</p>
-<div id="housekeeping-columns" class="section level2">
-<h2 class="hasAnchor">
-<a href="#housekeeping-columns" class="anchor"></a>Housekeeping Columns</h2>
+<div class="section level3">
+<h3 id="housekeeping-columns">Housekeeping Columns<a class="anchor" aria-label="anchor" href="#housekeeping-columns"></a>
+</h3>
 <p>The first column is <code>absolute_model_path</code> which contains an absolute path that unambiguously identifies each model. This serves as the primary key for the tibble. The second column is simply the <code>basename</code> of this path, which is just a convenience for printing and viewing.</p>
 <p>The third column contains the <code>bbi_nonmem_summary</code> object, discussed above, for each model. This can be extracted and manipulated if you would like more detailed data from it.</p>
 <p>The <code>error_msg</code> and <code>needed_fail_flags</code> columns describe whether <code>bbi</code> had any trouble parsing the model outputs. These won’t be discussed in detail here. Refer to the <a href="https://metrumresearchgroup.github.io/bbr/reference/summary_log.html"><code>summary_log()</code> docs</a> for more information.</p>
 </div>
-<div id="run-details-columns" class="section level2">
-<h2 class="hasAnchor">
-<a href="#run-details-columns" class="anchor"></a>Run Details Columns</h2>
+<div class="section level3">
+<h3 id="run-details-columns">Run Details Columns<a class="anchor" aria-label="anchor" href="#run-details-columns"></a>
+</h3>
 <p>The next batch of columns contain the core diagnostics and model outputs. As mentioned above, descriptions of what each column contains can be found in the <a href="https://metrumresearchgroup.github.io/bbr/reference/summary_log.html"><code>summary_log()</code> docs</a>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sum_df</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> 
-  <span class="fu"><a href="../reference/collapse_to_string.html">collapse_to_string</a></span><span class="op">(</span><span class="va">estimation_method</span><span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span>
+<code class="sourceCode R"><span class="va">sum_df</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="../reference/collapse_to_string.html">collapse_to_string</a></span><span class="op">(</span><span class="va">estimation_method</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span>
     <span class="va">run</span>,
     <span class="va">ofv</span>, 
     <span class="va">param_count</span>, 
@@ -216,42 +212,44 @@
     <span class="va">number_of_obs</span>, 
     <span class="va">condition_number</span>
   <span class="op">)</span>
-<span class="co">#&gt; # A tibble: 5 × 8</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 8</span></span>
 <span class="co">#&gt;   run        ofv param_count estimation_method    problem_text  number_of_subje…</span>
-<span class="co">#&gt;   &lt;chr&gt;    &lt;dbl&gt;       &lt;int&gt; &lt;chr&gt;                &lt;chr&gt;                    &lt;int&gt;</span>
-<span class="co">#&gt; 1 1001     3843.          15 MCMC Bayesian Analy… Run# 1001.1                240</span>
-<span class="co">#&gt; 2 acop-…   2675.           7 First Order Conditi… LEM PK model…               40</span>
-<span class="co">#&gt; 3 acop-…  44159.           9 First Order Conditi… LEM PK model…               39</span>
-<span class="co">#&gt; 4 examp… -10839.          21 Stochastic Approxim… RUN# example…              400</span>
-<span class="co">#&gt; 5 iovmm   14722.          11 First Order Conditi… LEM 10 mixtu…              300</span>
-<span class="co">#&gt; # … with 2 more variables: number_of_obs &lt;int&gt;, condition_number &lt;dbl&gt;</span></code></pre></div>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1001     <span style="text-decoration: underline;">3</span>843.          15 MCMC Bayesian Analy… Run# 1001.1                240</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> acop-…   <span style="text-decoration: underline;">2</span>675.           7 First Order Conditi… LEM PK model…               40</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> acop-…  <span style="text-decoration: underline;">44</span>159.           9 First Order Conditi… LEM PK model…               39</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> acop-…     <span style="color: #BB0000;">NA</span>           <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>                   LEM PK model…               40</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> examp… -<span style="color: #BB0000; text-decoration: underline;">10</span><span style="color: #BB0000;">839.</span>          21 Stochastic Approxim… RUN# example…              400</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> iovmm   <span style="text-decoration: underline;">14</span>722.          11 First Order Conditi… LEM 10 mixtu…              300</span>
+<span class="co">#&gt; <span style="color: #949494;"># … with 2 more variables: number_of_obs &lt;int&gt;, condition_number &lt;dbl&gt;</span></span></code></pre></div>
 </div>
-<div id="run-heuristics-columns" class="section level2">
-<h2 class="hasAnchor">
-<a href="#run-heuristics-columns" class="anchor"></a>Run Heuristics Columns</h2>
+<div class="section level3">
+<h3 id="run-heuristics-columns">Run Heuristics Columns<a class="anchor" aria-label="anchor" href="#run-heuristics-columns"></a>
+</h3>
 <p>The <code>run_heuristics</code> element of the <code>bbi_nonmem_summary</code> object contains a number of logical values indicating whether particular heuristic issues were found in the model. Note that these are not necessarily <em>errors</em> with the model run, but are closer to warning flags that should possibly be investigated. Each heuristic is described in more detail in the <a href="https://metrumresearchgroup.github.io/bbr/reference/summary_log.html"><code>summary_log()</code> docs</a>.</p>
 <p>Note that <strong>all heuristics will be <code>FALSE</code> by default (and <em>never</em> <code>NA</code>) and will only be <code>TRUE</code> if they are explicitly triggered.</strong> For example, <code>large_condition_number</code> will be <code>FALSE</code> even in the case when a condition number was not calculated at all.</p>
-<p>All of the heuristic flags are pivoted out to their own columns in the <code>bbi_summary_log_df</code> tibble. It’s useful to note that, except for <code>needed_fail_flags</code> (discussed above), these are the <em>only logical columns</em> in the tibble and can therefore be easily selected with <code>tidyselect::where(is.logical)</code>. <em>(Note: <code><a href="https://tidyselect.r-lib.org/reference/where.html">where()</a></code> only became available in <code>tidyselect (&gt;= 1.1.0)</code>, released May 2020.)</em></p>
+<p>All of the heuristic flags are pivoted out to their own columns in the <code>bbi_summary_log_df</code> tibble. It’s useful to note that, except for <code>needed_fail_flags</code> (discussed above), these are the <em>only logical columns</em> in the tibble and can therefore be easily selected with <code>tidyselect::where(is.logical)</code>. <em>(Note: <code><a href="https://tidyselect.r-lib.org/reference/where.html" class="external-link">where()</a></code> only became available in <code>tidyselect (&gt;= 1.1.0)</code>, released May 2020.)</em></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sum_df</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/where.html">where</a></span><span class="op">(</span><span class="va">is.logical</span><span class="op">)</span>, <span class="op">-</span><span class="va">needed_fail_flags</span><span class="op">)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 5 × 13
-#&gt;   run       needed_fail_flags any_heuristics covariance_step_… large_condition_…
-#&gt;   &lt;chr&gt;     &lt;lgl&gt;             &lt;lgl&gt;          &lt;lgl&gt;             &lt;lgl&gt;            
-#&gt; 1 1001      TRUE              TRUE           FALSE             TRUE             
-#&gt; 2 acop-fak… FALSE             TRUE           FALSE             FALSE            
-#&gt; 3 acop-iov  FALSE             TRUE           FALSE             FALSE            
-#&gt; 4 example2… FALSE             FALSE          FALSE             FALSE            
-#&gt; 5 iovmm     FALSE             TRUE           FALSE             FALSE            
-#&gt; # … with 8 more variables: eigenvalue_issues &lt;lgl&gt;, correlations_not_ok &lt;lgl&gt;,
-#&gt; #   parameter_near_boundary &lt;lgl&gt;, hessian_reset &lt;lgl&gt;,
-#&gt; #   has_final_zero_gradient &lt;lgl&gt;, minimization_terminated &lt;lgl&gt;,
-#&gt; #   eta_pval_significant &lt;lgl&gt;, prderr &lt;lgl&gt;</code></pre>
+<code class="sourceCode R"><span class="va">sum_df</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/where.html" class="external-link">where</a></span><span class="op">(</span><span class="va">is.logical</span><span class="op">)</span>, <span class="op">-</span><span class="va">needed_fail_flags</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 13</span></span>
+<span class="co">#&gt;   run       needed_fail_flags any_heuristics covariance_step_… large_condition_…</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>            </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1001      TRUE              TRUE           FALSE             TRUE             </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> acop-fak… FALSE             TRUE           FALSE             FALSE            </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> acop-iov  FALSE             TRUE           FALSE             FALSE            </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> acop-onl… FALSE             FALSE          FALSE             FALSE            </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> example2… FALSE             FALSE          FALSE             FALSE            </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> iovmm     FALSE             TRUE           FALSE             FALSE            </span>
+<span class="co">#&gt; <span style="color: #949494;"># … with 8 more variables: eigenvalue_issues &lt;lgl&gt;, correlations_not_ok &lt;lgl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   parameter_near_boundary &lt;lgl&gt;, hessian_reset &lt;lgl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   has_final_zero_gradient &lt;lgl&gt;, minimization_terminated &lt;lgl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   eta_pval_significant &lt;lgl&gt;, prderr &lt;lgl&gt;</span></span></code></pre>
 <p>Notice that there is also an <strong>any_heuristics column</strong>, which can easily be used to filter to only runs that had at least one heuristic flag triggered.</p>
 </div>
 </div>
-<div id="add-summary" class="section level1">
-<h1 class="hasAnchor">
-<a href="#add-summary" class="anchor"></a>Add Summary</h1>
+<div class="section level2">
+<h2 id="add-summary">Add Summary<a class="anchor" aria-label="anchor" href="#add-summary"></a>
+</h2>
 <p>Just like <a href="https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html#checking-if-models-are-up-to-date-with-config_log"><code>config_log()</code> has <code>add_config()</code></a>, you can also use <code><a href="../reference/summary_log.html">add_summary()</a></code> to join all of these columns onto an existing <code>bbi_run_log_df</code> (the tibble output from <code><a href="../reference/run_log.html">run_log()</a></code>). This can be useful if you have a run log that you have previously filtered on something like the <a href="https://metrumresearchgroup.github.io/bbr/articles/getting-started.html#filtering-tags-example"><code>tags</code></a> or <a href="https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html#filtering-tags-example"><code>based_on</code></a> columns, and you would like to append some simple diagnostics.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># contrived example: in real life this would be filtering on tags, based_on, etc.</span>
@@ -259,14 +257,14 @@
 <span class="va">log_df</span> <span class="op">&lt;-</span> <span class="va">log_df</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fl">3</span>, <span class="op">]</span>
 
 <span class="co"># add summary columns</span>
-<span class="va">log_df</span> <span class="op">&lt;-</span> <span class="va">log_df</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> <span class="fu"><a href="../reference/summary_log.html">add_summary</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">log_df</span> <span class="op">&lt;-</span> <span class="va">log_df</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/summary_log.html">add_summary</a></span><span class="op">(</span><span class="op">)</span>
 
-<span class="va">log_df</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="va">tags</span>, <span class="va">ofv</span>, <span class="va">param_count</span>, <span class="va">any_heuristics</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 2 × 5</span>
+<span class="va">log_df</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="va">tags</span>, <span class="va">ofv</span>, <span class="va">param_count</span>, <span class="va">any_heuristics</span><span class="op">)</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 5</span></span>
 <span class="co">#&gt;   run             tags      ofv param_count any_heuristics</span>
-<span class="co">#&gt;   &lt;chr&gt;           &lt;list&gt;  &lt;dbl&gt;       &lt;int&gt; &lt;lgl&gt;         </span>
-<span class="co">#&gt; 1 acop-fake-bayes &lt;NULL&gt;  2675.           7 TRUE          </span>
-<span class="co">#&gt; 2 acop-iov        &lt;NULL&gt; 44159.           9 TRUE</span></code></pre></div>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>         </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> acop-fake-bayes <span style="color: #949494;">&lt;NULL&gt;</span>  <span style="text-decoration: underline;">2</span>675.           7 TRUE          </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> acop-iov        <span style="color: #949494;">&lt;NULL&gt;</span> <span style="text-decoration: underline;">44</span>159.           9 TRUE</span></code></pre></div>
 </div>
   </div>
 
@@ -281,11 +279,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p>
+<p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>
@@ -293,6 +293,8 @@
 
   
 
+
+  
 
   </body>
 </html>

@@ -26,6 +26,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container">
@@ -38,18 +40,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -83,7 +79,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/metrumresearchgroup/bbr">
+  <a href="https://github.com/metrumresearchgroup/bbr" class="external-link">
     <span class="fa fa-github fa-lg"></span>
      
   </a>
@@ -98,11 +94,11 @@
 
       
 
-      </header><script src="nonmem-parallel_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Running NONMEM in Parallel: bbr Tips and Tricks</h1>
-                        <h4 class="author">Seth Green</h4>
+                        <h4 data-toc-skip class="author">Seth Green</h4>
             
       
       
@@ -112,20 +108,20 @@
 
     
     
-<div id="section" class="section level1">
-<h1></h1>
-<div id="introduction" class="section level2">
-<h2 class="hasAnchor">
-<a href="#introduction" class="anchor"></a>Introduction</h2>
+<div class="section level2">
+<h2 id="section"></h2>
+<div class="section level3">
+<h3 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h3>
 <p>This file shows some helpful patterns for using <code>bbr</code> with NONMEM, mostly relating to running models with parallel execution, either multiple cores on a local machine (head node, laptop, etc.) or by executing on a grid.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">bbr</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">bbr</span><span class="op">)</span>
 
-<span class="va">MODEL_DIR</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"model"</span>, <span class="st">"nonmem"</span> , <span class="st">"pk-parallel"</span>, package <span class="op">=</span> <span class="st">"bbr"</span><span class="op">)</span></code></pre></div>
+<span class="va">MODEL_DIR</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"model"</span>, <span class="st">"nonmem"</span> , <span class="st">"pk-parallel"</span>, package <span class="op">=</span> <span class="st">"bbr"</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="global-settings-in-bbi-yaml" class="section level2">
-<h2 class="hasAnchor">
-<a href="#global-settings-in-bbi-yaml" class="anchor"></a>Global settings in bbi.yaml</h2>
+<div class="section level3">
+<h3 id="global-settings-in-bbi-yaml">Global settings in bbi.yaml<a class="anchor" aria-label="anchor" href="#global-settings-in-bbi-yaml"></a>
+</h3>
 <p>The <code>bbi.yaml</code> file is created when <code><a href="../reference/bbi_init.html">bbi_init()</a></code> is originally called. It usually lives in the same folder as your control streams. This file contains “global” settings for running <code>bbi</code>.</p>
 <ul>
 <li><p>You can set a default number of <code>threads</code> (the number of cores <code>bbi</code> will use for each model) in this file. This will be used whenever you call <code><a href="../reference/submit_model.html">submit_model()</a></code>, but can be overriden by passing <code>submit_model(..., .bbi_args = list(threads = SOME_INTEGER))</code>.</p></li>
@@ -137,26 +133,26 @@
   .dir <span class="op">=</span> <span class="va">MODEL_DIR</span>,
   .nonmem_dir <span class="op">=</span> <span class="st">"/opt/NONMEM"</span>,
   .nonmem_version <span class="op">=</span> <span class="st">"nm75"</span>,
-  .bbi_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+  .bbi_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>
     parallel <span class="op">=</span> <span class="cn">TRUE</span>,
     threads <span class="op">=</span> <span class="fl">4</span>
   <span class="op">)</span>
 <span class="op">)</span></code></pre></div>
 </div>
-<div id="local-execution" class="section level2">
-<h2 class="hasAnchor">
-<a href="#local-execution" class="anchor"></a>Local execution</h2>
+<div class="section level3">
+<h3 id="local-execution">Local execution<a class="anchor" aria-label="anchor" href="#local-execution"></a>
+</h3>
 <p>For small runs, use a 4-core or 8-core head node and just do <code>submit_model(..., .mode = "local")</code>.</p>
 <ul>
 <li><p>This will execute the model on your head node, means you will <em>not</em> have to wait for worker nodes to spin up.</p></li>
 <li><p>This is especially nice for new models that are fairly simple and you just want a quick result back.</p></li>
 </ul>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_model.html">read_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_model.html">read_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="../reference/submit_model.html">submit_model</a></span><span class="op">(</span>
   <span class="va">mod</span>,
   .mode <span class="op">=</span> <span class="st">"local"</span>,
-  .bbi_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>parallel <span class="op">=</span> <span class="cn">TRUE</span>, threads <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="co"># not needed if set in bbi.yaml</span>
+  .bbi_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>parallel <span class="op">=</span> <span class="cn">TRUE</span>, threads <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="co"># not needed if set in bbi.yaml</span>
 <span class="op">)</span></code></pre></div>
 <pre><code>Running:
   bbi nonmem run local /data/home/sethg/bbr/inst/model/nonmem/pk-parallel/100.ctl --overwrite --threads=4 --parallel
@@ -164,18 +160,18 @@ In /data/home/sethg/bbr/inst/model/nonmem/pk-parallel
 Process finished.</code></pre>
 <p>You can also set <code>options("bbr.bbi_exe_mode" = "local")</code> to default to local execution for all models, though this will reset with each new R session.</p>
 </div>
-<div id="wait-false" class="section level2">
-<h2 class="hasAnchor">
-<a href="#wait-false" class="anchor"></a>.wait = FALSE</h2>
+<div class="section level3">
+<h3 id="wait-false">.wait = FALSE<a class="anchor" aria-label="anchor" href="#wait-false"></a>
+</h3>
 <p>You can pass use <code>submit_model(..., .wait = FALSE)</code> to get you console back immediately.</p>
 <p><strong>This is only relevant for <code>.mode = "local"</code></strong> because grid jobs give you your console as soon as the job is <em>submitted</em> to the grid (which typically takes less than a second).</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_model.html">read_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, <span class="fl">200</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_model.html">read_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, <span class="fl">200</span><span class="op">)</span><span class="op">)</span>
 <span class="va">proc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/submit_model.html">submit_model</a></span><span class="op">(</span>
   <span class="va">mod</span>,
   .mode <span class="op">=</span> <span class="st">"local"</span>,
   .wait <span class="op">=</span> <span class="cn">FALSE</span>,        <span class="co"># this is what gets you your console back</span>
-  .bbi_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>parallel <span class="op">=</span> <span class="cn">TRUE</span>, threads <span class="op">=</span> <span class="fl">8</span><span class="op">)</span> <span class="co"># not needed if set in bbi.yaml</span>
+  .bbi_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>parallel <span class="op">=</span> <span class="cn">TRUE</span>, threads <span class="op">=</span> <span class="fl">8</span><span class="op">)</span> <span class="co"># not needed if set in bbi.yaml</span>
 <span class="op">)</span></code></pre></div>
 <p>There are a few ways to check on your model while it runs:</p>
 <ul>
@@ -235,40 +231,40 @@ $PROBLEM From bbr: see 107.yaml for details
 </ul>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">lst_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/build_path_from_model.html">build_path_from_model</a></span><span class="op">(</span><span class="va">mod</span>, <span class="st">".lst"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"tail -f"</span>, <span class="va">lst_path</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"tail -f"</span>, <span class="va">lst_path</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>tail -f /data/home/sethg/bbr/inst/model/nonmem/pk-parallel/200/200.lst</code></pre>
 <ul>
 <li>You can call methods of the <code>processx</code> object including in the <code>bbi_process</code> object.
 <ul>
 <li>To do this, you need to remember to assign the output of <code><a href="../reference/submit_model.html">submit_model()</a></code> to a variable (<code>proc</code>, above)</li>
-<li>See <a href="https://processx.r-lib.org/reference/process.html#methods">the <code>processx</code> docs</a> for details on available methods.</li>
+<li>See <a href="https://processx.r-lib.org/reference/process.html#methods" class="external-link">the <code>processx</code> docs</a> for details on available methods.</li>
 </ul>
 </li>
 </ul>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">proc</span><span class="op">$</span><span class="va">process</span><span class="op">$</span><span class="fu">is_alive</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>TRUE</code></pre>
+<pre><code><span class="cn">TRUE</span></code></pre>
 </div>
-<div id="warm-up-the-grid" class="section level2">
-<h2 class="hasAnchor">
-<a href="#warm-up-the-grid" class="anchor"></a>Warm up the grid</h2>
+<div class="section level3">
+<h3 id="warm-up-the-grid">Warm up the grid<a class="anchor" aria-label="anchor" href="#warm-up-the-grid"></a>
+</h3>
 <p>You can submit a dummy job to the grid to get it to bring up a worker, while you finish preparing your run. For SGE, this is done with <code>qsub</code>.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/system.html">system</a></span><span class="op">(</span><span class="st">"echo 'sleep 10' | qsub"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/system.html" class="external-link">system</a></span><span class="op">(</span><span class="st">"echo 'sleep 10' | qsub"</span><span class="op">)</span></code></pre></div>
 <pre><code>Unable to run job: warning: sethg's job is not allowed to run in any queue
 Your job 1 ("STDIN") has been submitted
 Exiting.</code></pre>
 <p>This message is just telling you that there are no worker nodes currently up, but one will begin to spin up now.</p>
 </div>
-<div id="try-your-model-locally-first" class="section level2">
-<h2 class="hasAnchor">
-<a href="#try-your-model-locally-first" class="anchor"></a>Try your model locally first</h2>
+<div class="section level3">
+<h3 id="try-your-model-locally-first">Try your model locally first<a class="anchor" aria-label="anchor" href="#try-your-model-locally-first"></a>
+</h3>
 <p>If you have a long-running model, it is often nice to launch it locally first, just to see if it starts.</p>
 <ul>
 <li>This avoids waiting for the grid to come up before seeing your model die with something like <code>DATASET ERROR</code> or some silly syntax error.</li>
 </ul>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_model.html">read_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, <span class="fl">300</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_model.html">read_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, <span class="fl">300</span><span class="op">)</span><span class="op">)</span>
 <span class="va">proc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/submit_model.html">submit_model</a></span><span class="op">(</span>
   <span class="va">mod</span>,
   .mode <span class="op">=</span> <span class="st">"local"</span>,
@@ -303,7 +299,7 @@ Current Date:       27 SEP 2021
 <li>Use <code>killall nonmem</code> in the terminal (or with <code>system</code>) to kill <em>all</em> NONMEM jobs running locally.</li>
 </ul>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/system.html">system</a></span><span class="op">(</span><span class="st">"killall nonmem"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/system.html" class="external-link">system</a></span><span class="op">(</span><span class="st">"killall nonmem"</span><span class="op">)</span></code></pre></div>
 <ul>
 <li>You can kill with the <code>kill()</code> method of the <code>processx</code> object (see above about how to get to this object).</li>
 </ul>
@@ -313,7 +309,7 @@ Current Date:       27 SEP 2021
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/submit_model.html">submit_model</a></span><span class="op">(</span>
   <span class="va">mod</span>,
-  .bbi_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+  .bbi_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>
     overwrite <span class="op">=</span> <span class="cn">TRUE</span>,
     parallel <span class="op">=</span> <span class="cn">TRUE</span>,
     threads <span class="op">=</span> <span class="fl">8</span>
@@ -325,20 +321,20 @@ In /data/home/sethg/bbr/inst/model/nonmem/pk-parallel
 Process finished.</code></pre>
 <p>Note: <code>.mode = "sge"</code> (submit to the grid) is the default for <code><a href="../reference/submit_model.html">submit_model()</a></code> so there is no need to pass it as an argument.</p>
 </div>
-<div id="monitoring" class="section level2">
-<h2 class="hasAnchor">
-<a href="#monitoring" class="anchor"></a>Monitoring</h2>
+<div class="section level3">
+<h3 id="monitoring">Monitoring<a class="anchor" aria-label="anchor" href="#monitoring"></a>
+</h3>
 <p>You can monitor your grid jobs with <code><a href="../reference/check_file.html">tail_lst()</a></code> or <code><a href="../reference/check_file.html">tail_output()</a></code> as above, or use <code>qstat -f</code> in the terminal, or with the Grafana dashboard (if you are on Metworx).</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/system.html">system</a></span><span class="op">(</span><span class="st">"qstat -f"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/system.html" class="external-link">system</a></span><span class="op">(</span><span class="st">"qstat -f"</span><span class="op">)</span></code></pre></div>
 <pre><code>############################################################################
  - PENDING JOBS - PENDING JOBS - PENDING JOBS - PENDING JOBS - PENDING JOBS
 ############################################################################
       7 0.55500 Run_300    sethg        qw    09/27/2021 12:53:10     8  </code></pre>
 </div>
-<div id="submit-a-batch-of-models-to-the-grid" class="section level2">
-<h2 class="hasAnchor">
-<a href="#submit-a-batch-of-models-to-the-grid" class="anchor"></a>Submit a batch of models to the grid</h2>
+<div class="section level3">
+<h3 id="submit-a-batch-of-models-to-the-grid">Submit a batch of models to the grid<a class="anchor" aria-label="anchor" href="#submit-a-batch-of-models-to-the-grid"></a>
+</h3>
 <p>You can use <code><a href="../reference/submit_models.html">submit_models()</a></code> to submit a batch of models to the grid.</p>
 <ul>
 <li><p>Each model will be a separate grid job</p></li>
@@ -352,11 +348,11 @@ Process finished.</code></pre>
 </li>
 </ul>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mods</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">200</span>, <span class="fl">300</span>, <span class="fl">400</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="../reference/read_model.html">read_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, <span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">mods</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">200</span>, <span class="fl">300</span>, <span class="fl">400</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="../reference/read_model.html">read_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, <span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 
 <span class="fu"><a href="../reference/submit_models.html">submit_models</a></span><span class="op">(</span>
   <span class="va">mods</span>,
-  .bbi_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+  .bbi_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>
     overwrite <span class="op">=</span> <span class="cn">TRUE</span>,
     parallel <span class="op">=</span> <span class="cn">TRUE</span>,
     threads <span class="op">=</span> <span class="fl">8</span>
@@ -366,7 +362,7 @@ Process finished.</code></pre>
 <li>You can see all three jobs queuing up</li>
 </ul>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/system.html">system</a></span><span class="op">(</span><span class="st">"qstat -f"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/system.html" class="external-link">system</a></span><span class="op">(</span><span class="st">"qstat -f"</span><span class="op">)</span></code></pre></div>
 <pre><code>############################################################################
  - PENDING JOBS - PENDING JOBS - PENDING JOBS - PENDING JOBS - PENDING JOBS
 ############################################################################
@@ -374,7 +370,7 @@ Process finished.</code></pre>
       9 0.55500 Run_300    sethg        qw    09/27/2021 12:56:18     8        
      10 0.55500 Run_400    sethg        qw    09/27/2021 12:56:18     8 </code></pre>
 <ul>
-<li>You can kill jobs running on the grid using <code>qdel</code> in the terminal (or with <code><a href="https://rdrr.io/r/base/system.html">system()</a></code> from R).
+<li>You can kill jobs running on the grid using <code>qdel</code> in the terminal (or with <code><a href="https://rdrr.io/r/base/system.html" class="external-link">system()</a></code> from R).
 <ul>
 <li>
 <code>qdel SOME_NUMBER</code> kills the job specified by it’s “job id” (the first column in the <code>qstat -f</code> output)</li>
@@ -384,12 +380,12 @@ Process finished.</code></pre>
 </li>
 </ul>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">this_user</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html">Sys.getenv</a></span><span class="op">(</span><span class="st">"USER"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/system.html">system</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"qdel -u"</span>, <span class="va">this_user</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">this_user</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"USER"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/system.html" class="external-link">system</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"qdel -u"</span>, <span class="va">this_user</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="testing-different-numbers-of-threads" class="section level2">
-<h2 class="hasAnchor">
-<a href="#testing-different-numbers-of-threads" class="anchor"></a>Testing different numbers of threads</h2>
+<div class="section level3">
+<h3 id="testing-different-numbers-of-threads">Testing different numbers of threads<a class="anchor" aria-label="anchor" href="#testing-different-numbers-of-threads"></a>
+</h3>
 <p>For a big model, try running a few iterations with different numbers of threads. This way you can see the gains from adding more threads and decide how many to use as you continue to work on this model.</p>
 <ul>
 <li>First create a dummy copy of your model, and <strong>cap the iterations to 10 or 20</strong> by changing <code>MAX_EVAL</code> or <code>NITER</code> in your control stream, so that it finishes fairly quickly</li>
@@ -411,12 +407,12 @@ Process finished.</code></pre>
 <span class="co">#'</span>
 <span class="co">#' @return A list of the model objects for the submitted models.</span>
 <span class="va">test_threads</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">.mod</span>, <span class="va">threads_opts</span>, <span class="va">.mode</span> <span class="op">=</span> <span class="st">"sge"</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">mods</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span><span class="va">threads_opts</span>, <span class="op">~</span> <span class="op">{</span>
+  <span class="va">mods</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">threads_opts</span>, <span class="op">~</span> <span class="op">{</span>
     <span class="va">.m</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span>
       <span class="va">.mod</span>,
-      <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="fu"><a href="../reference/get_model_id.html">get_model_id</a></span><span class="op">(</span><span class="va">.mod</span><span class="op">)</span>, <span class="st">"_"</span>, <span class="va">.x</span>, <span class="st">"threads"</span><span class="op">)</span>
-    <span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
-      <span class="fu"><a href="../reference/modify_bbi_args.html">add_bbi_args</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>parallel <span class="op">=</span> <span class="cn">TRUE</span>, threads <span class="op">=</span> <span class="va">.x</span><span class="op">)</span><span class="op">)</span>
+      <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="../reference/get_model_id.html">get_model_id</a></span><span class="op">(</span><span class="va">.mod</span><span class="op">)</span>, <span class="st">"_"</span>, <span class="va">.x</span>, <span class="st">"threads"</span><span class="op">)</span>
+    <span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
+      <span class="fu"><a href="../reference/modify_bbi_args.html">add_bbi_args</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>parallel <span class="op">=</span> <span class="cn">TRUE</span>, threads <span class="op">=</span> <span class="va">.x</span><span class="op">)</span><span class="op">)</span>
   <span class="op">}</span><span class="op">)</span>
 
   <span class="fu"><a href="../reference/submit_models.html">submit_models</a></span><span class="op">(</span><span class="va">mods</span>, .mode <span class="op">=</span> <span class="va">.mode</span>, .wait <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
@@ -425,8 +421,8 @@ Process finished.</code></pre>
 <span class="op">}</span>
 
 <span class="co"># running it</span>
-<span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_model.html">read_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, <span class="fl">200</span><span class="op">)</span><span class="op">)</span> <span class="co"># this should be the copy with capped iterations</span>
-<span class="va">mods</span> <span class="op">&lt;-</span> <span class="fu">test_threads</span><span class="op">(</span><span class="va">mod</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">16</span>, <span class="fl">24</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_model.html">read_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, <span class="fl">200</span><span class="op">)</span><span class="op">)</span> <span class="co"># this should be the copy with capped iterations</span>
+<span class="va">mods</span> <span class="op">&lt;-</span> <span class="fu">test_threads</span><span class="op">(</span><span class="va">mod</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">16</span>, <span class="fl">24</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>Submitting 3 models with 3 unique configurations.</code></pre>
 <p>After the models all finish, use this <code>check_threads()</code> function to see how long each took to run.</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
@@ -437,10 +433,10 @@ Process finished.</code></pre>
 <span class="co">#' @return A tibble with columns `threads` (number of threads) and `time`</span>
 <span class="co">#'   (elapsed estimation time in seconds for test models).</span>
 <span class="va">check_threads</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">mods</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map_dfr</a></span><span class="op">(</span><span class="va">mods</span>, <span class="op">~</span> <span class="op">{</span>
+  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_dfr</a></span><span class="op">(</span><span class="va">mods</span>, <span class="op">~</span> <span class="op">{</span>
     <span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/model_summary.html">model_summary</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span>
-    <span class="va">threads</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_extract.html">str_extract</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">absolute_model_path</span>, <span class="st">"\\d+(?=threads$)"</span><span class="op">)</span><span class="op">)</span>
-    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>threads <span class="op">=</span> <span class="va">threads</span>, time <span class="op">=</span> <span class="va">s</span><span class="op">$</span><span class="va">run_details</span><span class="op">$</span><span class="va">estimation_time</span><span class="op">)</span>
+    <span class="va">threads</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_extract.html" class="external-link">str_extract</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">absolute_model_path</span>, <span class="st">"\\d+(?=threads$)"</span><span class="op">)</span><span class="op">)</span>
+    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>threads <span class="op">=</span> <span class="va">threads</span>, time <span class="op">=</span> <span class="va">s</span><span class="op">$</span><span class="va">run_details</span><span class="op">$</span><span class="va">estimation_time</span><span class="op">)</span>
   <span class="op">}</span><span class="op">)</span>
 <span class="op">}</span>
 
@@ -466,11 +462,13 @@ Process finished.</code></pre>
 
 
       <footer><div class="copyright">
-  <p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p>
+<p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>
@@ -478,6 +476,8 @@ Process finished.</code></pre>
 
   
 
+
+  
 
   </body>
 </html>
