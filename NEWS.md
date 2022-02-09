@@ -1,3 +1,14 @@
+# bbr 1.3.0
+
+## New features
+
+- Added `param_estimates_compare()` for comparing the result of `param_estimates_batch()` to a single model (or, more generally, for comparing a set of parameter estimates). (#457)
+
+## Bug fixes
+
+- `param_estimates_batch()` now transforms the parameter names that come from `bbi nonmem params ...`, replacing `_` with `,` to match the format that is used elsewhere and expected by downstream tools. (#457)
+
+
 # bbr 1.2.1
 
 ## Docs
