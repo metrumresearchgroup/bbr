@@ -33,6 +33,7 @@ reference:
   - model_summaries
   - param_estimates
   - param_estimates_batch
+  - param_estimates_compare
   - nm_file
   - nm_join
   - nm_tables
