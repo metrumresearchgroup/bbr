@@ -4,7 +4,7 @@ Descriptions:
 
 Packages:
   - devtools
-  - renv
+  - pkgdown
   - styler
 
 Repos:
