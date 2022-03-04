@@ -1,7 +1,7 @@
 #' Checks that all passed NONMEM command line args are valid and formats
 #' @param .args A named list of .args to check
 #' @importFrom checkmate assert_list
-#' @importFrom rlang is_bare_character is_bare_numeric is_bare_logical
+#' @importFrom rlang is_bare_character is_bare_numeric is_bare_logical is_empty
 #' @importFrom purrr imap set_names
 #' @return character string, output from format_cmd_args()
 #' @keywords internal

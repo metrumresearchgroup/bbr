@@ -95,6 +95,10 @@ nm_table_files <- function(.mod, .check_exists = TRUE) {
     str_replace("^\\.\\/", "") %>%
     file.path(out_dir, .)
 
+  if(rlang::is_empty(.f)){
+    stop("No table files were found")
+  }
+
   if(isTRUE(.check_exists)) {
     .fe <- fs::file_exists(.f)
     if (any(!.fe)) {
