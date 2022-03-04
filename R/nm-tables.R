@@ -88,7 +88,7 @@ nm_table_files <- function(.mod, .check_exists = TRUE) {
   out_dir <- get_output_dir(.mod, .check_exists = .check_exists)
 
   # get file names from table statements and construct paths
-  .f <- .l[names(.l) == "TABLE"] %>%
+  .f <- .l[grep("TAB", names(.l))] %>%
     map_chr(~paste(.x, collapse = " ")) %>%
     str_extract("\\bFILE\\s*=\\s*([^ ]+)") %>%
     str_replace("\\bFILE\\s*=\\s*", "") %>%
