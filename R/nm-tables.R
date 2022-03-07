@@ -96,7 +96,7 @@ nm_table_files <- function(.mod, .check_exists = TRUE) {
     file.path(out_dir, .)
 
   if(rlang::is_empty(.f)){
-    stop("No table files were found")
+    stop(glue("No table files were found in {.p}"))
   }
 
   if(isTRUE(.check_exists)) {
