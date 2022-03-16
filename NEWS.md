@@ -1,3 +1,13 @@
+# bbr 1.3.1
+
+## Bug fixes
+
+- Added support for `$TAB` syntax in `nm_table_files()`. (#466)
+
+## Developer-facing changes
+
+- Added YAML file and script in `inst/validation/` for creating validation documents with `mrgvalidate`. (#469) 
+
 # bbr 1.3.0
 
 ## New features
