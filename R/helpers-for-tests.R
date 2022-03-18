@@ -42,6 +42,7 @@ skip_if_not_drone_or_metworx <- function(.test_name) {
 #' skipped.
 #'
 #' @param v a package version or a string that can be converted to one
+#' @keywords internal
 skip_if_old_bbi <- function(v) {
     v_bbi <- package_version(bbi_version(), strict = FALSE)
     if (!is.na(v_bbi)) {
