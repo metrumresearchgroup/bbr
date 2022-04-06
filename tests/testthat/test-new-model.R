@@ -183,3 +183,17 @@ test_that("new_model() works for Stan model", {
   expect_s3_class(.m, BBI_PARENT_CLASS)
 })
 
+test_that("new_model() works for Stan model", {
+  skip_if_no_stan("new_model() works for Stan model")
+  mod_name <- "testmod_new_model2"
+  expect_message(
+    .m <- new_model(file.path(STAN_MODEL_DIR, mod_name), .model_type = "stan"),
+    regexp = MISSING_STAN_FILES_ERR_MSG
+  )
+  on.exit(cleanup_model(.m))
+
+  expect_equal(.m[[YAML_MOD_TYPE]], "stan")
+  expect_equal(.m[[ABS_MOD_PATH]], file.path(STAN_ABS_MODEL_DIR, mod_name))
+  expect_s3_class(.m, STAN_MOD_CLASS)
+  expect_s3_class(.m, BBI_PARENT_CLASS)
+})
