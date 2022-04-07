@@ -1,13 +1,15 @@
 test_threads <- function(.mod,
-                            threads = c(2,4),
-                            .bbi_args = list(nm_version = "nm74"))
+                         threads = c(2,4),
+                         .mode = "sge",
+                         .bbi_args = list(nm_version = "nm74"))
 {
 
   assertthat::assert_that(is.list(.bbi_args))
 
-  .mods <- imap(threads, ~ copy_model_from(.mod, .y+1) %>%
+  .mods <- map(threads, ~ copy_model_from(.mod, paste0(get_model_id(.mod), ".", .x, "_threads")) %>%
                   add_bbi_args(.bbi_args = c(threads = .x,
                                              .bbi_args,
+                                             parallel = TRUE,
                                              overwrite = TRUE)))
 
   mod_paths <- lapply(.mods, function(mod.x){mod.x$absolute_model_path}) %>% unlist()
@@ -20,7 +22,7 @@ test_threads <- function(.mod,
     }
   })
 
-  proc_list <- submit_models(.mods)
+  proc_list <- submit_models(.mods, .mode = .mode, .wait = FALSE)
 
 }
 
