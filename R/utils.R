@@ -504,3 +504,71 @@ download_with_retry <- function(...) {
   }
   return(rc)
 }
+
+#' Checks if NONMEM run is done by looking for "Stop Time" in .lst file
+#'
+#' Returns `TRUE` if the model appears to be finished running and `FALSE` otherwise.
+#' @param mod either a bbi_nonmem_model object or a path to an .lst file
+#' @export
+check_nonmem_finished <- function(mod) {
+  UseMethod("check_nonmem_finished")
+}
+
+
+#' Check if NONMEM is finished (character)
+#' @param mod character string of NONMEM model
+#'
+#' @importFrom checkmate assert_string
+#' @importFrom readr read_lines
+#'
+#' @describeIn check_nonmem_finished takes a file path (character string) of `NONMEM` `.lst` file.
+#' @export
+check_nonmem_finished.character <- function(mod) {
+  assert_string(mod)
+
+  # look for model to be finished and then test output
+  model_finished <- try({suppressWarnings({
+    read_lines(mod) %>%
+      str_detect("Stop Time") %>%
+      any()
+  })})
+  return(isTRUE(model_finished))
+}
+
+#' Check if NONMEM is finished (bbi model)
+#' @param mod bbi model object
+#'
+#' @describeIn check_nonmem_finished takes a `bbi_nonmem_model` object.
+#' @export
+check_nonmem_finished.bbi_nonmem_model <- function(mod) {
+  # check that output dir was created (should happen as soon as model is submitted)
+  if (!fs::dir_exists(get_output_dir(mod, .check_exists = FALSE))) {
+    return(TRUE) # if missing then this failed right away, likely for some bbi reason
+  }
+
+  # pass .lst path to character dispatch
+  build_path_from_model(mod, ".lst") %>%
+    check_nonmem_finished()
+}
+
+#' Wait for NONMEM models to finish
+#' @param model_list a list of `bbi_nonmem_model` objects
+#' @param time_limit integer for maximum number of seconds in total to wait before continuing (exiting function)
+#' @param interval integer for number of seconds to wait between each check
+#'
+#' @importFrom purrr map_lgl
+#'
+#' @description Calling `wait_for_nonmem()` will freeze the user's console until the model(s) have finished running.
+#'
+#' @export
+wait_for_nonmem <- function(model_list, time_limit, interval = 5) {
+  expiration <- Sys.time() + time_limit
+
+  while ((expiration - Sys.time()) > 0) {
+    res <- map_lgl(model_list, ~check_nonmem_finished(.x))
+    if (all(res)) {
+      break
+    }
+    Sys.sleep(interval)
+  }
+}
