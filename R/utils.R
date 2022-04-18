@@ -552,20 +552,50 @@ check_nonmem_finished.bbi_nonmem_model <- function(mod) {
 }
 
 #' Wait for NONMEM models to finish
-#' @param model_list a list of `bbi_nonmem_model` objects
+#' @param mod a `bbi_nonmem_model` object, or list of `bbi_nonmem_model` objects.
 #' @param time_limit integer for maximum number of seconds in total to wait before continuing (exiting function)
 #' @param interval integer for number of seconds to wait between each check
 #'
-#' @importFrom purrr map_lgl
 #'
 #' @description Calling `wait_for_nonmem()` will freeze the user's console until the model(s) have finished running.
 #'
 #' @export
-wait_for_nonmem <- function(model_list, time_limit, interval = 5) {
+wait_for_nonmem <- function(mod, time_limit = 200, interval = 5) {
+  UseMethod("wait_for_nonmem")
+}
+
+
+#' Wait for NONMEM models to finish  (bbi model)
+#' @param mod a `bbi_nonmem_model` object, or list of `bbi_nonmem_model` objects.
+#' @param time_limit integer for maximum number of seconds in total to wait before continuing (exiting function)
+#' @param interval integer for number of seconds to wait between each check
+#'
+#' @describeIn wait_for_nonmem takes a `bbi_nonmem_model` object.
+#' @export
+wait_for_nonmem.bbi_nonmem_model <- function(mod, time_limit = 200, interval = 5) {
+  wait_for_nonmem(list(mod), time_limit = time_limit, interval = interval)
+}
+
+
+#' Wait for NONMEM models to finish  (list of bbi models)
+#' @param mod a `bbi_nonmem_model` object, or list of `bbi_nonmem_model` objects.
+#' @param time_limit integer for maximum number of seconds in total to wait before continuing (exiting function)
+#' @param interval integer for number of seconds to wait between each check
+#'
+#' @importFrom purrr map_lgl
+#' @importFrom checkmate assert_list
+#'
+#'
+#' @describeIn wait_for_nonmem takes a `list` of `bbi_nonmem_model` objects.
+#' @export
+wait_for_nonmem.list <- function(mod, time_limit = 200, interval = 5) {
+
+  assert_list(mod)
+
   expiration <- Sys.time() + time_limit
 
   while ((expiration - Sys.time()) > 0) {
-    res <- map_lgl(model_list, ~check_nonmem_finished(.x))
+    res <- map_lgl(mod, ~check_nonmem_finished(.x))
     if (all(res)) {
       break
     }

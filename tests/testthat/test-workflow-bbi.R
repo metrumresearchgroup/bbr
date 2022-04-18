@@ -177,5 +177,21 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     })
   })
 
+  test_that("wait_for_nonmem() correctly reads in stop time [BBR-UTL-012]", {
+    # create model
+    mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
+    submit_model(mod1, .mode = "local", .wait = FALSE)
+    wait_for_nonmem(list(mod1), 100, interval = 5)
+    expect_true(!rlang::is_empty(read_table(file.path(MODEL_DIR_BBI, 1, "1.tab"), skip = 1)))
+  })
+
+  test_that("wait_for_nonmem() correctly reads in stop time [BBR-UTL-013]", {
+    # create model
+    mod_fail <- read_model(file.path(MODEL_DIR_BBI, "failure1"))
+    # submit_model(mod_fail, .mode = "sge", .wait = FALSE)
+    wait_for_nonmem(list(mod_fail), 2, interval = 1) # dont need high wait time since we know it failed
+    # expect_true(rlang::is_empty(read_table(file.path(MODEL_DIR_BBI, "failure1", "1first1.tab"), skip = 1)))
+  })
+
 }) # closing withr::with_options
 
