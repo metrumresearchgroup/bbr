@@ -1,10 +1,22 @@
+#' Takes a model object and runs it with various threads values
+#'
+#' @param .mod bbi_model object to copy/test
+#' @param threads Integer vector of threads values to test
+#' @param .mode Passed through to bbr::submit_models(.mode)
+#' @param .bbi_args a named list.
+#'
+#' @importFrom assertthat assert_that
+#'
+#' @return A list of the model objects for the submitted models.
+#'
+#' @export
 test_threads <- function(.mod,
                          threads = c(2,4),
                          .mode = getOption("bbr.bbi_exe_mode"),
                          .bbi_args = list())
 {
 
-  assertthat::assert_that(is.list(.bbi_args))
+  assert_that(is.list(.bbi_args))
 
   .mods <- map(threads, ~ copy_model_from(.mod, paste0(get_model_id(.mod), "_", .x, "_threads")) %>%
                  add_bbi_args(.bbi_args = c(threads = .x,
@@ -26,6 +38,8 @@ test_threads <- function(.mod,
 #'
 #' @return A tibble with columns `threads` (number of threads) and `time`
 #'   (elapsed estimation time in seconds for test models).
+#'
+#' @export
 check_threads <- function(mods) {
   purrr::map_dfr(mods, ~ {
     s <- model_summary(.x)
@@ -38,9 +52,10 @@ check_threads <- function(mods) {
 #'
 #' @param mods list of bbi model objects created by `test_threads()`
 #'
+#' @export
 cleanup_mods <- function(mods){
   # Only remove mods with correct tag
-  mod_paths <- lapply(mods, function(mod.x){mod.x$absolute_model_path})# %>% unlist()
+  mod_paths <- lapply(mods, function(mod.x){mod.x$absolute_model_path})
   mod_threads <- lapply(mods, function(mod.x){mod.x$bbi_args$threads})
   mod_tags <- lapply(mods, function(mod.x){mod.x$tags})
 
