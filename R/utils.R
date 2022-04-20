@@ -602,3 +602,51 @@ wait_for_nonmem.list <- function(mod, time_limit = 200, interval = 5) {
     Sys.sleep(interval)
   }
 }
+
+
+
+#' R wrapper for qstat. Returns a dataframe
+#'
+#'
+#' @export
+fetch_model_runs <- function(){
+  command <- "qstat -xml | tr '\n' ' ' | sed 's#<job_list[^>]*>#new_line#g' | sed 's#<[^>]*>##g' | grep ' ' | column -t"
+  running_models <- system(command, intern = TRUE)
+
+  if(is_empty(running_models)) return(data.frame())
+
+  runs <- strsplit(running_models, "new_line")[[1]][-1] %>%
+    str_trim()
+  one_space <- gsub("\\s+"," ",runs,fixed = F)
+
+  runs_df <- as.data.frame(one_space) %>%
+    tidyr::separate(col = "one_space",
+                    into = c("job-ID", "prior", "name", "user", "state",
+                             "submit/start at", "queue", "slots"),
+                    sep = " ")
+
+  return(runs_df)
+}
+
+#' Crash a specific job
+#'
+#' @param run_name character vector. The `name` (or names) of the job(s) you want to end. Run qstat in your terminal to confirm.
+#'
+#' @importFrom rlang abort
+#' @export
+crash_model_run <- function(run_name){
+
+  # warning message occurs if slots are NA (only jobs in the queue)
+  runs <- suppressWarnings(fetch_model_runs())
+
+  if(is_empty(runs)){
+    stop("No jobs running at this time")
+  }else{
+    assert_true(run_name %in% runs$name)
+    runs_to_end <- runs %>% filter(runs$name %in% run_name)
+    commands <- paste0("qdel ", runs_to_end$`job-ID`)
+    for(cmd.i in commands){
+      system(cmd.i)
+    }
+  }
+}

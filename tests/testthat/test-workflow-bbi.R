@@ -177,18 +177,33 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     })
   })
 
+
   test_that("wait_for_nonmem() correctly reads in stop time [BBR-UTL-012]", {
     # create model
     mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
     submit_model(mod1, .mode = "local", .wait = FALSE)
     wait_for_nonmem(list(mod1), 100, interval = 5)
-    expect_true(!rlang::is_empty(read_table(file.path(MODEL_DIR_BBI, 1, "1.tab"), skip = 1)))
+    expect_true(suppressMessages(!rlang::is_empty(read_table(file.path(MODEL_DIR_BBI, 1, "1.tab"), skip = 1))))
   })
 
-  test_that("wait_for_nonmem() correctly reads in stop time [BBR-UTL-013]", {
+  test_that("wait_for_nonmem() doesn't error out if no stop time found [BBR-UTL-013]", {
+    # model setup
+    MOD_FAIL_PATH <- file.path(MODEL_DIR_BBI, "failure.ctl")
+    fs::file_copy(CTL_TEST_FILE, MOD_FAIL_PATH)
+
     # create model
-    mod_fail <- read_model(file.path(MODEL_DIR_BBI, "failure1"))
-    # submit_model(mod_fail, .mode = "sge", .wait = FALSE)
+    mod_fail <- new_model(
+      file.path(MODEL_DIR_BBI, "failure"),
+      .description = "original test-failure",
+      .tags = ORIG_TAGS,
+      .bbi_args = list(overwrite = TRUE, threads = 4)
+    )
+
+    # run model
+    submit_model(mod_fail, .mode = "sge", .wait = FALSE)
+    # submit_model(mod1, .mode = "sge", .wait = FALSE)
+
+    crash_model_run("Run_failure")
     wait_for_nonmem(list(mod_fail), 2, interval = 1) # dont need high wait time since we know it failed
     # expect_true(rlang::is_empty(read_table(file.path(MODEL_DIR_BBI, "failure1", "1first1.tab"), skip = 1)))
   })
