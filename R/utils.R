@@ -642,7 +642,7 @@ crash_model_run <- function(run_name){
   if(is_empty(runs)){
     stop("No jobs running at this time")
   }else{
-    assert_true(run_name %in% runs$name)
+    assert_true(all(run_name %in% runs$name))
     runs_to_end <- runs %>% filter(runs$name %in% run_name)
     commands <- paste0("qdel ", runs_to_end$`job-ID`)
     for(cmd.i in commands){
