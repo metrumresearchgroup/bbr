@@ -593,6 +593,7 @@ wait_for_nonmem.list <- function(mod, time_limit = 200, interval = 5) {
   assert_list(mod)
 
   expiration <- Sys.time() + time_limit
+  Sys.sleep(1) # wait for lst file to be created
 
   while ((expiration - Sys.time()) > 0) {
     res <- map_lgl(mod, ~check_nonmem_finished(.x))
@@ -606,7 +607,6 @@ wait_for_nonmem.list <- function(mod, time_limit = 200, interval = 5) {
 
 
 #' R wrapper for qstat. Returns a dataframe
-#'
 #'
 #' @export
 fetch_model_runs <- function(){

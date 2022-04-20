@@ -201,11 +201,13 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
     # run model
     submit_model(mod_fail, .mode = "sge", .wait = FALSE)
-    # submit_model(mod1, .mode = "sge", .wait = FALSE)
+    Sys.sleep(10) # wait for lst file to be created before crashing (this needs improvement - doesnt always work (but tests still pass))
 
     crash_model_run("Run_failure")
-    wait_for_nonmem(list(mod_fail), 2, interval = 1) # dont need high wait time since we know it failed
-    # expect_true(rlang::is_empty(read_table(file.path(MODEL_DIR_BBI, "failure1", "1first1.tab"), skip = 1)))
+    wait_for_nonmem(mod_fail, 2, interval = 1) # dont need high wait time since we know it failed
+    expect_error(
+      wait_for_nonmem(mod_fail, 2, interval = 1),
+      NA)
   })
 
 }) # closing withr::with_options
