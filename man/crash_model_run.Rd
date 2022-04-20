@@ -15,3 +15,10 @@ Wrapper for \code{qdel}
 \details{
 It is advised to run \code{\link[=fetch_model_runs]{fetch_model_runs()}} (or \code{qstat} in your terminal) before calling this function to avoid accidentally deleting the wrong job.
 }
+\examples{
+\dontrun{
+crash_model_run("Run_1")
+crash_model_run(c("Run_1", "Run_4"))
+}
+
+}

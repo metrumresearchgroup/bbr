@@ -651,6 +651,12 @@ fetch_model_runs <- function(){
 #'
 #' @param run_name character vector. The `name(s)` of the job(s) you want to end.
 #'
+#' @examples
+#' \dontrun{
+#' crash_model_run("Run_1")
+#' crash_model_run(c("Run_1", "Run_4"))
+#' }
+#'
 #' @importFrom rlang abort
 #'
 #' @export
