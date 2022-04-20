@@ -2,13 +2,16 @@
 % Please edit documentation in R/utils.R
 \name{crash_model_run}
 \alias{crash_model_run}
-\title{Crash a specific job}
+\title{Crash a specific job on the grid}
 \usage{
 crash_model_run(run_name)
 }
 \arguments{
-\item{run_name}{character vector. The \code{name} (or names) of the job(s) you want to end. Run qstat in your terminal to confirm.}
+\item{run_name}{character vector. The \code{name(s)} of the job(s) you want to end.}
 }
 \description{
-Crash a specific job
+Wrapper for \code{qdel}
+}
+\details{
+It is advised to run \code{\link[=fetch_model_runs]{fetch_model_runs()}} (or \code{qstat} in your terminal) before calling this function to avoid accidentally deleting the wrong job.
 }

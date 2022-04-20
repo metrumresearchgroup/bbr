@@ -2,10 +2,20 @@
 % Please edit documentation in R/utils.R
 \name{fetch_model_runs}
 \alias{fetch_model_runs}
-\title{R wrapper for qstat. Returns a dataframe}
+\title{R wrapper for \code{qstat}}
 \usage{
 fetch_model_runs()
 }
+\value{
+A dataframe
+}
 \description{
-R wrapper for qstat. Returns a dataframe
+R wrapper for \code{qstat}
+}
+\details{
+Note: This function was designed to be utilized on \code{Metworx}. Functionality is not guaranteed if running on another platform.
+
+The returned dataframe will look identical to what you see in \code{qstat}, minus the last column (\code{ja-task-ID}).
+
+if all jobs are in the queue (i.e. no running jobs), the \code{slots} column will appear as \code{NA} and a warning will be thrown.
 }

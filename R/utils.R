@@ -606,8 +606,20 @@ wait_for_nonmem.list <- function(mod, time_limit = 200, interval = 5) {
 
 
 
-#' R wrapper for qstat. Returns a dataframe
+#' R wrapper for `qstat`
 #'
+#' @details
+#'
+#' Note: This function was designed to be utilized on `Metworx`. Functionality is not guaranteed if running on another platform.
+#'
+#' The returned dataframe will look identical to what you see in `qstat`, minus the last column (`ja-task-ID`).
+#'
+#' if all jobs are in the queue (i.e. no running jobs), the `slots` column will appear as `NA` and a warning will be thrown.
+#'
+#'
+#' @returns A dataframe
+#'
+#' @importFrom tidyr separate
 #' @export
 fetch_model_runs <- function(){
   command <- "qstat -xml | tr '\n' ' ' | sed 's#<job_list[^>]*>#new_line#g' | sed 's#<[^>]*>##g' | grep ' ' | column -t"
@@ -620,7 +632,7 @@ fetch_model_runs <- function(){
   one_space <- gsub("\\s+"," ",runs,fixed = F)
 
   runs_df <- as.data.frame(one_space) %>%
-    tidyr::separate(col = "one_space",
+    separate(col = "one_space",
                     into = c("job-ID", "prior", "name", "user", "state",
                              "submit/start at", "queue", "slots"),
                     sep = " ")
@@ -628,11 +640,19 @@ fetch_model_runs <- function(){
   return(runs_df)
 }
 
-#' Crash a specific job
+#' Crash a specific job on the grid
 #'
-#' @param run_name character vector. The `name` (or names) of the job(s) you want to end. Run qstat in your terminal to confirm.
+#' @description
+#' Wrapper for `qdel`
+#'
+#' @details
+#'
+#' It is advised to run [fetch_model_runs()] (or `qstat` in your terminal) before calling this function to avoid accidentally deleting the wrong job.
+#'
+#' @param run_name character vector. The `name(s)` of the job(s) you want to end.
 #'
 #' @importFrom rlang abort
+#'
 #' @export
 crash_model_run <- function(run_name){
 
