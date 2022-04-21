@@ -204,6 +204,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     Sys.sleep(10) # wait for lst file to be created before crashing (this needs improvement - doesnt always work (but tests still pass))
 
     crash_model_run("Run_failure")
+    wait_for_nonmem(mod_fail, 2, interval = 1)
 
     expect_error(
       wait_for_nonmem(mod_fail, 2, interval = 1), # dont need high wait time since we know it failed
