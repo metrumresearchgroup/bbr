@@ -15,9 +15,10 @@ wait_for_nonmem(mod, time_limit = 200, interval = 5)
 \arguments{
 \item{mod}{a \code{bbi_nonmem_model} object, or list of \code{bbi_nonmem_model} objects.}
 
-\item{time_limit}{integer for maximum number of seconds in total to wait before continuing (exiting function)}
+\item{time_limit}{integer for maximum number of seconds in total to wait before continuing
+(will exit after this time even if the run does not appear to have finished).}
 
-\item{interval}{integer for number of seconds to wait between each check}
+\item{interval}{integer for number of seconds to wait between each check.}
 }
 \description{
 Calling \code{wait_for_nonmem()} will freeze the user's console until the model(s) have finished running.

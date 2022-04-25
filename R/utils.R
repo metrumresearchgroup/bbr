@@ -509,55 +509,42 @@ download_with_retry <- function(...) {
 #'
 #' Returns `TRUE` if the model appears to be finished running and `FALSE` otherwise.
 #' @param mod either a bbi_nonmem_model object or a path to an .lst file
-#' @export
-check_nonmem_finished <- function(mod) {
-  UseMethod("check_nonmem_finished")
-}
-
-
-#' Check if NONMEM is finished (character)
-#' @param mod character string of NONMEM model
 #'
-#' @importFrom checkmate assert_string
 #' @importFrom readr read_lines
 #'
-#' @describeIn check_nonmem_finished takes a file path (character string) of `NONMEM` `.lst` file.
 #' @export
-check_nonmem_finished.character <- function(mod) {
-  assert_string(mod)
+check_nonmem_finished <- function(mod) {
 
-  # look for model to be finished and then test output
-  model_finished <- try({suppressWarnings({
-    read_lines(mod) %>%
-      str_detect("Stop Time") %>%
-      any()
-  })})
-  return(isTRUE(model_finished))
-}
-
-#' Check if NONMEM is finished (bbi model)
-#' @param mod bbi model object
-#'
-#' @describeIn check_nonmem_finished takes a `bbi_nonmem_model` object.
-#' @export
-check_nonmem_finished.bbi_nonmem_model <- function(mod) {
-  # check that output dir was created (should happen as soon as model is submitted)
   if (!fs::dir_exists(get_output_dir(mod, .check_exists = FALSE))) {
     return(TRUE) # if missing then this failed right away, likely for some bbi reason
   }
 
-  # pass .lst path to character dispatch
-  build_path_from_model(mod, ".lst") %>%
-    check_nonmem_finished()
+  mod_path <- build_path_from_model(mod, ".lst")
+
+  # look for model to be finished and then test output
+  model_finished <- if(file.exists(mod_path)){
+    read_lines(mod_path) %>%
+      str_detect("Stop Time") %>%
+      any()
+  }else{
+    FALSE
+  }
+
+  return(isTRUE(model_finished))
 }
+
 
 #' Wait for NONMEM models to finish
 #' @param mod a `bbi_nonmem_model` object, or list of `bbi_nonmem_model` objects.
-#' @param time_limit integer for maximum number of seconds in total to wait before continuing (exiting function)
-#' @param interval integer for number of seconds to wait between each check
+#' @param time_limit integer for maximum number of seconds in total to wait before continuing
+#'        (will exit after this time even if the run does not appear to have finished).
+#' @param interval integer for number of seconds to wait between each check.
 #'
 #'
 #' @description Calling `wait_for_nonmem()` will freeze the user's console until the model(s) have finished running.
+#'
+#' @importFrom purrr map_lgl
+#' @importFrom checkmate assert_list
 #'
 #' @export
 wait_for_nonmem <- function(mod, time_limit = 200, interval = 5) {
@@ -566,9 +553,6 @@ wait_for_nonmem <- function(mod, time_limit = 200, interval = 5) {
 
 
 #' Wait for NONMEM models to finish  (bbi model)
-#' @param mod a `bbi_nonmem_model` object, or list of `bbi_nonmem_model` objects.
-#' @param time_limit integer for maximum number of seconds in total to wait before continuing (exiting function)
-#' @param interval integer for number of seconds to wait between each check
 #'
 #' @describeIn wait_for_nonmem takes a `bbi_nonmem_model` object.
 #' @export
@@ -578,101 +562,39 @@ wait_for_nonmem.bbi_nonmem_model <- function(mod, time_limit = 200, interval = 5
 
 
 #' Wait for NONMEM models to finish  (list of bbi models)
-#' @param mod a `bbi_nonmem_model` object, or list of `bbi_nonmem_model` objects.
-#' @param time_limit integer for maximum number of seconds in total to wait before continuing (exiting function)
-#' @param interval integer for number of seconds to wait between each check
-#'
-#' @importFrom purrr map_lgl
-#' @importFrom checkmate assert_list
-#'
 #'
 #' @describeIn wait_for_nonmem takes a `list` of `bbi_nonmem_model` objects.
 #' @export
 wait_for_nonmem.list <- function(mod, time_limit = 200, interval = 5) {
 
   assert_list(mod)
+  check_model_object_list(mod)
+  verbose_msg(glue("Waiting for {length(mod)} model(s) to finish..."))
 
-  expiration <- Sys.time() + time_limit
   Sys.sleep(1) # wait for lst file to be created
-
+  expiration <- Sys.time() + time_limit
+  n_interval <- 0
   while ((expiration - Sys.time()) > 0) {
     res <- map_lgl(mod, ~check_nonmem_finished(.x))
     if (all(res)) {
       break
+    }else{
+      n_interval = n_interval + 1
+      # print message every 10 intervals
+      if(n_interval %% 10 == 0){
+        verbose_msg(glue("Waiting for {length(res[!res])} model(s) to finish..."))
+      }
     }
     Sys.sleep(interval)
   }
-}
 
-
-
-#' R wrapper for `qstat`
-#'
-#' @details
-#'
-#' Note: This function was designed to be utilized on `Metworx`. Functionality is not guaranteed if running on another platform.
-#'
-#' The returned dataframe will look identical to what you see in `qstat`, minus the last column (`ja-task-ID`).
-#'
-#' if all jobs are in the queue (i.e. no running jobs), the `slots` column will appear as `NA` and a warning will be thrown.
-#'
-#'
-#' @returns A dataframe
-#'
-#' @importFrom tidyr separate
-#' @export
-fetch_model_runs <- function(){
-  command <- "qstat -xml | tr '\n' ' ' | sed 's#<job_list[^>]*>#new_line#g' | sed 's#<[^>]*>##g' | grep ' ' | column -t"
-  running_models <- system(command, intern = TRUE)
-
-  if(is_empty(running_models)) return(data.frame())
-
-  runs <- strsplit(running_models, "new_line")[[1]][-1] %>%
-    str_trim()
-  one_space <- gsub("\\s+"," ",runs,fixed = F)
-
-  runs_df <- as.data.frame(one_space) %>%
-    separate(col = "one_space",
-                    into = c("job-ID", "prior", "name", "user", "state",
-                             "submit/start at", "queue", "slots"),
-                    sep = " ")
-
-  return(runs_df)
-}
-
-#' Crash a specific job on the grid
-#'
-#' @description
-#' Wrapper for `qdel`
-#'
-#' @details
-#'
-#' It is advised to run [fetch_model_runs()] (or `qstat` in your terminal) before calling this function to avoid accidentally deleting the wrong job.
-#'
-#' @param run_name character vector. The `name(s)` of the job(s) you want to end.
-#'
-#' @examples
-#' \dontrun{
-#' crash_model_run("Run_1")
-#' crash_model_run(c("Run_1", "Run_4"))
-#' }
-#'
-#' @importFrom rlang abort
-#'
-#' @export
-crash_model_run <- function(run_name){
-
-  # warning message occurs if slots are NA (only jobs in the queue)
-  runs <- suppressWarnings(fetch_model_runs())
-
-  if(is_empty(runs)){
-    stop("No jobs running at this time")
+  if(expiration < Sys.time() & !map_lgl(mod, ~check_nonmem_finished(.x))){
+    res <- map_lgl(mod, ~check_nonmem_finished(.x))
+    warning(glue("Expiration was reached, but {length(res[!res])} model(s) haven't finished"),
+            call. = FALSE, immediate. = TRUE)
   }else{
-    assert_true(all(run_name %in% runs$name))
-    runs_to_end <- runs %>% filter(runs$name %in% run_name)
-    commands <- paste0("qdel ", runs_to_end$`job-ID`)
-    for(cmd.i in commands){
-      system(cmd.i)
-    }
+    verbose_msg(glue("\n{length(mod)} model(s) have finished"))
   }
+
 }
+

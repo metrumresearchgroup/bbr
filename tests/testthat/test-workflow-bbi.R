@@ -26,7 +26,9 @@ cleanup_bbi <- function(.recreate_dir = FALSE) {
 cleanup_bbi(.recreate_dir = TRUE)
 
 # set options and run tests
-withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
+withr::with_options(list(
+  bbr.bbi_exe_path = read_bbi_path(),
+  bbr.verbose = FALSE), {
 
   # cleanup when done
   on.exit({
@@ -182,33 +184,28 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     # create model
     mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
     submit_model(mod1, .mode = "local", .wait = FALSE)
-    wait_for_nonmem(list(mod1), 100, interval = 5)
-    expect_true(suppressMessages(!rlang::is_empty(read_table(file.path(MODEL_DIR_BBI, 1, "1.tab"), skip = 1))))
+    wait_for_nonmem(mod1, 100, interval = 5)
+    expect_true(suppressMessages(nrow(nm_tab(mod1)) > 1))
   })
 
   test_that("wait_for_nonmem() doesn't error out if no stop time found [BBR-UTL-013]", {
     # model setup
-    MOD_FAIL_PATH <- file.path(MODEL_DIR_BBI, "failure.ctl")
-    fs::file_copy(CTL_TEST_FILE, MOD_FAIL_PATH)
-
-    # create model
-    mod_fail <- new_model(
-      file.path(MODEL_DIR_BBI, "failure"),
-      .description = "original test-failure",
-      .tags = ORIG_TAGS,
-      .bbi_args = list(overwrite = TRUE, threads = 4)
+    mod_fail <- copy_model_from(
+      read_model(file.path(MODEL_DIR_BBI, "1")),
+      "failure"
     )
 
     # run model
-    submit_model(mod_fail, .mode = "sge", .wait = FALSE)
-    Sys.sleep(10) # wait for lst file to be created before crashing (this needs improvement - doesnt always work (but tests still pass))
+    .p <- submit_model(mod_fail, .mode = "local", .wait = FALSE)
+    Sys.sleep(0.5)
+    .p$process$kill()
 
-    crash_model_run("Run_failure")
-    wait_for_nonmem(mod_fail, 2, interval = 1)
+    # dont need high wait time since we know it failed
+    expect_warning(
+      wait_for_nonmem(mod_fail, 2, interval = 1),
+        "Expiration was reached"
+    )
 
-    expect_error(
-      wait_for_nonmem(mod_fail, 2, interval = 1), # dont need high wait time since we know it failed
-      NA)
   })
 
 }) # closing withr::with_options
