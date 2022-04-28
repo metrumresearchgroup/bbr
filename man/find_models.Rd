@@ -4,7 +4,7 @@
 \alias{find_models}
 \title{Search for model YAML files and read them}
 \usage{
-find_models(.base_dir, .recurse)
+find_models(.base_dir, .recurse, .filter = 0)
 }
 \arguments{
 \item{.base_dir}{Directory to search for model YAML files.}

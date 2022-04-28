@@ -81,3 +81,30 @@ test_that("run_log() works correctly with nested dirs [BBR-RNLG-004]", {
   expect_identical(log_df$yaml_md5, c(RUN_LOG_YAML_MD5, MOD_LEVEL2_MD5))
   expect_identical(log_df$based_on, list(NULL, "1", c("1", "2"), "../1"))
 })
+
+##########################################
+# Testing Additional Parameters Passed
+##########################################
+test_that("run_log() works with filtering parameter added" , {
+  log_df <- list(df = run_log(MODEL_DIR), length = run_log(MODEL_DIR) %>% nrow())
+  class(log) <- "log"
+  expect_equal(run_log(MODEL_DIR, .filter = 1:log_df$length) %>% nrow(), 0)
+  expect_equal(run_log(MODEL_DIR, .filter = 1:(log_df$length - 2)) %>% nrow(), 1)
+  expect_equal(run_log(MODEL_DIR, .filter = (log_df$length - 2):1) %>% nrow(), 1)
+})
+
+#Check that the filtering parameter with YAML parsing
+test_that("summary_log() works with filtering parameter added" , {
+  # browser()
+  log_df <- list(df = summary_log(MODEL_DIR), length = summary_log(MODEL_DIR) %>% nrow())
+  print(log_df$df)
+  val <- summary_log(MODEL_DIR, .filter = 1:log_df$length)
+  print(val)
+  expect_equal(nrow(val), 0)
+
+
+})
+
+
+
+#summary_log(MODEL_DIR, .filter = 4:5)

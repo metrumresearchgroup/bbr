@@ -74,7 +74,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   test_that("summary_log() parses heuristics correctly [BBR-SMLG-006]", {
     sum_df2 <- summary_log(MODEL_DIR_X, .fail_flags = list(ext_file = "1001.1.TXT"))
-    
+
     run1001 <- filter(sum_df2, run == "1001")
     expect_false(run1001$minimization_terminated)
     expect_true(run1001$large_condition_number)
@@ -139,3 +139,6 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   })
 
 }) # closing withr::with_options
+
+
+
