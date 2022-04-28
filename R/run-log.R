@@ -11,12 +11,12 @@
 #'
 #' @param .base_dir Base directory to look in for models.
 #' @param .recurse If `TRUE`, the default, search recursively in all subdirectories. Passed through to `fs::dir_ls()` -- If a positive number, the number of levels to recurse.
-#'
+#' @param .filter Provides filter for runs based on numeric labeling. Filters inclusively
 #' @importFrom purrr map_df
 #' @importFrom tibble tibble
 #' @return A tibble of class `bbi_run_log_df` with information on each model, or an empty tibble if no models are found.
 #' @export
-run_log <- function(.base_dir, .recurse = TRUE) {
+run_log <- function(.base_dir, .recurse = TRUE, .filter = 0:0) {
   checkmate::assert_string(.base_dir)
 
   mod_list <- find_models(.base_dir, .recurse)
@@ -27,6 +27,8 @@ run_log <- function(.base_dir, .recurse = TRUE) {
   df <- mod_list %>% map_df(run_log_entry)
 
   df <- create_run_log_object(df)
+
+  df <- df %>% subset(!(run %in% {{.filter}}))
 
   return(df)
 }
@@ -46,10 +48,12 @@ run_log <- function(.base_dir, .recurse = TRUE) {
 #' @importFrom purrr map_lgl map compact
 #' @importFrom fs dir_ls
 #' @keywords internal
-find_models <- function(.base_dir, .recurse) {
+find_models <- function(.base_dir, .recurse , .filter = 0:0) {
 
   # get yaml files
   yaml_files <- dir_ls(.base_dir, recurse = .recurse)
+  yaml_files <- subset(yaml_files, !(stringr::str_extract(yaml_files, "\\d+")
+                                     %>% as.numeric() %>% as.vector() %in% {{.filter}}))
   yaml_files <- str_subset(yaml_files, "\\.ya?ml$")
   yaml_files <- str_subset(yaml_files, "bbi\\.ya?ml$", negate = TRUE)
 
