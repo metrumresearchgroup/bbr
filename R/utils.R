@@ -535,7 +535,7 @@ check_nonmem_finished <- function(mod) {
 
 
 #' Wait for NONMEM models to finish
-#' @param mod a `bbi_nonmem_model` object, or list of `bbi_nonmem_model` objects.
+#' @param .mod a `bbi_nonmem_model` object, or list of `bbi_nonmem_model` objects.
 #' @param time_limit integer for maximum number of seconds in total to wait before continuing
 #'        (will exit after this time even if the run does not appear to have finished).
 #' @param interval integer for number of seconds to wait between each check.
