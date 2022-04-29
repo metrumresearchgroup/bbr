@@ -547,7 +547,7 @@ check_nonmem_finished <- function(mod) {
 #' @importFrom checkmate assert_list
 #'
 #' @export
-wait_for_nonmem <- function(mod, time_limit = 200, interval = 5) {
+wait_for_nonmem <- function(.mod, time_limit = 200, interval = 5) {
   UseMethod("wait_for_nonmem")
 }
 
@@ -556,8 +556,8 @@ wait_for_nonmem <- function(mod, time_limit = 200, interval = 5) {
 #'
 #' @describeIn wait_for_nonmem takes a `bbi_nonmem_model` object.
 #' @export
-wait_for_nonmem.bbi_nonmem_model <- function(mod, time_limit = 200, interval = 5) {
-  wait_for_nonmem(list(mod), time_limit = time_limit, interval = interval)
+wait_for_nonmem.bbi_nonmem_model <- function(.mod, time_limit = 200, interval = 5) {
+  wait_for_nonmem(list(.mod), time_limit = time_limit, interval = interval)
 }
 
 
@@ -565,17 +565,17 @@ wait_for_nonmem.bbi_nonmem_model <- function(mod, time_limit = 200, interval = 5
 #'
 #' @describeIn wait_for_nonmem takes a `list` of `bbi_nonmem_model` objects.
 #' @export
-wait_for_nonmem.list <- function(mod, time_limit = 200, interval = 5) {
+wait_for_nonmem.list <- function(.mod, time_limit = 200, interval = 5) {
 
-  assert_list(mod)
-  check_model_object_list(mod)
-  verbose_msg(glue("Waiting for {length(mod)} model(s) to finish..."))
+  assert_list(.mod)
+  check_model_object_list(.mod)
+  verbose_msg(glue("Waiting for {length(.mod)} model(s) to finish..."))
 
   Sys.sleep(1) # wait for lst file to be created
   expiration <- Sys.time() + time_limit
   n_interval <- 0
   while ((expiration - Sys.time()) > 0) {
-    res <- map_lgl(mod, ~check_nonmem_finished(.x))
+    res <- map_lgl(.mod, ~check_nonmem_finished(.x))
     if (all(res)) {
       break
     }else{
@@ -588,12 +588,12 @@ wait_for_nonmem.list <- function(mod, time_limit = 200, interval = 5) {
     Sys.sleep(interval)
   }
 
-  if(expiration < Sys.time() & !map_lgl(mod, ~check_nonmem_finished(.x))){
-    res <- map_lgl(mod, ~check_nonmem_finished(.x))
+  if(expiration < Sys.time() && !map_lgl(.mod, ~check_nonmem_finished(.x))){
+    res <- map_lgl(.mod, ~check_nonmem_finished(.x))
     warning(glue("Expiration was reached, but {length(res[!res])} model(s) haven't finished"),
             call. = FALSE, immediate. = TRUE)
   }else{
-    verbose_msg(glue("\n{length(mod)} model(s) have finished"))
+    verbose_msg(glue("\n{length(.mod)} model(s) have finished"))
   }
 
 }
