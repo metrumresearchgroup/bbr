@@ -141,4 +141,14 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 }) # closing withr::with_options
 
 
+cleanup()
+create_rlg_models()
 
+test_that("run_log() works with filtering parameter [BBR-SMLG-010]",
+{
+
+            log_df <- list(df = run_log(MODEL_DIR), length = run_log(MODEL_DIR) %>% nrow())
+            expect_equal(run_log(MODEL_DIR, .filter = 1:log_df$length - 1 ) %>% nrow(), 1)
+            expect_equal(run_log(MODEL_DIR, .filter = 1:(log_df$length - 2)) %>% nrow(), 2)
+
+})
