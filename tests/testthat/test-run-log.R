@@ -85,26 +85,36 @@ test_that("run_log() works correctly with nested dirs [BBR-RNLG-004]", {
 ##########################################
 # Testing Additional Parameters Passed
 ##########################################
-test_that("run_log() works with filtering parameter added" , {
-  log_df <- list(df = run_log(MODEL_DIR), length = run_log(MODEL_DIR) %>% nrow())
-  class(log) <- "log"
-  expect_equal(run_log(MODEL_DIR, .filter = 1:log_df$length) %>% nrow(), 0)
-  expect_equal(run_log(MODEL_DIR, .filter = 1:(log_df$length - 2)) %>% nrow(), 1)
-  expect_equal(run_log(MODEL_DIR, .filter = (log_df$length - 2):1) %>% nrow(), 1)
-})
 
-#Check that the filtering parameter with YAML parsing
-test_that("summary_log() works with filtering parameter added" , {
-  # browser()
-  log_df <- list(df = summary_log(MODEL_DIR), length = summary_log(MODEL_DIR) %>% nrow())
-  print(log_df$df)
-  val <- summary_log(MODEL_DIR, .filter = 1:log_df$length)
-  print(val)
-  expect_equal(nrow(val), 0)
+cleanup()
+create_rlg_models()
 
+ test_that("un_log() works with filtering parameter[BBR-RNLG-005]",
+ {
 
-})
+   log_df <- list(df = run_log(MODEL_DIR), length = run_log(MODEL_DIR) %>% nrow())
+   expect_equal(run_log(MODEL_DIR, .filter = 1:log_df$length - 1 ) %>% nrow(), 1)
+   expect_equal(run_log(MODEL_DIR, .filter = 1:(log_df$length - 2)) %>% nrow(), 2)
+   expect_equal(run_log(MODEL_DIR, .filter = (log_df$length - 2):1) %>% nrow(), 2)
+ })
 
+#test_that("run_log() works with filtering parameter added" , {
+#  log_df <- list(df = run_log(MODEL_DIR), length = run_log(MODEL_DIR) %>% nrow())
+#  class(log) <- "log"
+  #expect_equal(run_log(MODEL_DIR, .filter = 1:log_df$length - 1) %>% nrow(), 1)
+  #expect_equal(run_log(MODEL_DIR, .filter = 1:(log_df$length - 2)) %>% nrow(), 2)
+  #expect_equal(run_log(MODEL_DIR, .filter = (log_df$length - 2):1) %>% nrow(), 2)
+#})
 
+# #Check that the filtering parameter with YAML parsing
+# test_that("summary_log() works with filtering parameter added" , {
+#   # browser()
+#   log_df <- list(df = summary_log(MODEL_DIR), length = summary_log(MODEL_DIR) %>% nrow())
+#   print(log_df$df)
+#   val <- summary_log(MODEL_DIR, .filter = 1:log_df$length)
+#   print(val)
+#   expect_equal(nrow(val), 0)
+#
+#
+# })
 
-#summary_log(MODEL_DIR, .filter = 4:5)

@@ -54,6 +54,7 @@ find_models <- function(.base_dir, .recurse , .filter = 0:0) {
   yaml_files <- str_subset(yaml_files, "\\.ya?ml$")
   yaml_files <- str_subset(yaml_files, "bbi\\.ya?ml$", negate = TRUE)
 
+
   # read in all candidate yaml's
   all_yaml <-
     yaml_files %>%
