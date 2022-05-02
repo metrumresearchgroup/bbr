@@ -19,7 +19,7 @@
 run_log <- function(.base_dir, .recurse = TRUE, .filter = 0:0) {
   checkmate::assert_string(.base_dir)
 
-  mod_list <- find_models(.base_dir, .recurse)
+  mod_list <- find_models(.base_dir, .recurse, .filter)
   if(length(mod_list) == 0) {
     return(tibble())
   }
@@ -27,8 +27,6 @@ run_log <- function(.base_dir, .recurse = TRUE, .filter = 0:0) {
   df <- mod_list %>% map_df(run_log_entry)
 
   df <- create_run_log_object(df)
-
-  df <- df %>% subset(!(run %in% {{.filter}}))
 
   return(df)
 }
@@ -52,8 +50,7 @@ find_models <- function(.base_dir, .recurse , .filter = 0:0) {
 
   # get yaml files
   yaml_files <- dir_ls(.base_dir, recurse = .recurse)
-  yaml_files <- subset(yaml_files, !(stringr::str_extract(yaml_files, "\\d+")
-                                     %>% as.numeric() %>% as.vector() %in% {{.filter}}))
+  yaml_files <- subset(yaml_files, !(yaml_files %>% basename() %>% stringr::str_remove(".yaml") %in% {{.filter}}))
   yaml_files <- str_subset(yaml_files, "\\.ya?ml$")
   yaml_files <- str_subset(yaml_files, "bbi\\.ya?ml$", negate = TRUE)
 
