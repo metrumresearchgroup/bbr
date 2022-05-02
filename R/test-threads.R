@@ -1,22 +1,24 @@
 #' Takes a model object and runs it with various threads values
 #'
-#' @param .mod bbi_model object to copy/test
-#' @param threads Integer vector of threads values to test
-#' @param .mode Passed through to bbr::submit_models(.mode)
+#' @param .mod bbi_model object to copy/test.
+#' @param threads Integer vector of threads values to test.
+#' @param .mode Passed through to bbr::submit_models(.mode).
 #' @param .bbi_args a named list.
 #'
-#' @importFrom assertthat assert_that
+#' @importFrom checkmate assert_list
 #'
 #' @return A list of the model objects for the submitted models.
 #'
 #' @export
-test_threads <- function(.mod,
-                         threads = c(2,4),
-                         .mode = getOption("bbr.bbi_exe_mode"),
-                         .bbi_args = list())
-{
+test_threads <- function(
+  .mod,
+  threads = c(2,4),
+  .mode = getOption("bbr.bbi_exe_mode"),
+  .bbi_args = list()
+) {
 
-  assert_that(is.list(.bbi_args))
+  check_model_object(.mod)
+  assert_list(.bbi_args)
 
   .mods <- map(threads, ~ copy_model_from(.mod, paste0(get_model_id(.mod), "_", .x, "_threads")) %>%
                  add_bbi_args(.bbi_args = c(threads = .x,
@@ -34,34 +36,96 @@ test_threads <- function(.mod,
 
 #' Check estimation time for models run with various threads values
 #'
-#' @param mods list of bbi model objects created by `test_threads()`
+#' @param .mods list of bbi model objects created by `test_threads()`.
+#' @param return_times character vector denoting which times from `model_summary()` you want to return.
+#'        See details for more information.
+#' @param wait logical. If TRUE, pass `.mods` to `wait_for_nonmem()` before returning results.
+#' @param ... args passed through to `wait_for_nonmem()`.
 #'
+#' @details
+#' `return_times` can be any subset of `c("estimation_time", "covariance_time", "cpu_time")`.
+#' Users can also specify `all`, which is the shorthand method for selecting all 3 of those columns
+#'
+#' @examples
+#' \dontrun{
+#' mods <- test_threads(mod, threads = c(2, 4))
+#'
+#' If models have not finished:
+#' check_threads(mods, wait = TRUE, time_limit = 300)
+#' check_threads(mods, wait = TRUE, return_times = c("estimation_time", "covariance_time"))
+#'
+#' If models have already finished:
+#' check_threads(mods, wait = FALSE)
+#' check_threads(mods, wait = FALSE, return_times = "All")
+#' }
 #' @return A tibble with columns `threads` (number of threads) and `time`
 #'   (elapsed estimation time in seconds for test models).
 #'
+#' @importFrom tidyselect all_of
+#'
 #' @export
-check_threads <- function(mods) {
-  purrr::map_dfr(mods, ~ {
-    s <- model_summary(.x)
-    threads <- as.numeric(stringr::str_extract(s$absolute_model_path, "\\d+(?=_threads$)"))
-    tibble::tibble(threads = threads, estimation_time = s$run_details$estimation_time)
-  })
+check_threads <- function(
+  .mods,
+  return_times = "estimation_time",
+  wait = TRUE,
+  ...
+) {
+
+  if("all" %in% return_times){
+    return_times <- c("estimation_time", "covariance_time", "cpu_time")
+  }else{
+    assert_true(all(return_times %in% c("estimation_time", "covariance_time", "cpu_time")))
+  }
+
+  tryCatch({
+    if(wait) wait_for_nonmem(.mods, ...)
+
+    purrr::map_dfr(.mods, ~ {
+      s <- model_summary(.x)
+      threads <- as.numeric(.x$bbi_args$threads)
+      tibble::tibble(threads = threads,
+                     estimation_time = s$run_details$estimation_time,
+                     covariance_time = s$run_details$covariance_time,
+                     cpu_time = s$run_details$cpu_time) %>%
+        select(threads, all_of(return_times))
+    })
+  }, error = function(cond){
+    return(NA)
+  }, warning = function(cond){
+    message(cond)
+    message("\nConsider setting/increasing the `time_limit` in `wait_for_nonmem()`. See ?check_threads for details")
+    return(NA)
+  }
+  )
 }
 
-#' Remove model files created via [test_threads()]
+#' Remove model files associated with the specified tags
 #'
-#' @param mods list of bbi model objects created by `test_threads()`
+#' @param .mods a bbi model object or list of model objects.
+#' @param .tags a character vector identifying the tags of the models you want to delete.
+#'              If set to NULL, delete all associated model files.
+#'
+#' @importFrom checkmate check_character
 #'
 #' @export
-cleanup_mods <- function(mods){
+cleanup_mods <- function(.mods, .tags = NULL){
+  if(!is.null(.tags)) check_character(.tags)
   # Only remove mods with correct tag
-  mod_paths <- lapply(mods, function(mod.x){mod.x$absolute_model_path})
-  mod_threads <- lapply(mods, function(mod.x){mod.x$bbi_args$threads})
-  mod_tags <- lapply(mods, function(mod.x){mod.x$tags})
+  mod_paths <- lapply(.mods, function(mod.x){mod.x$absolute_model_path})
+  mod_threads <- lapply(.mods, function(mod.x){mod.x$bbi_args$threads})
+  mod_tags <- lapply(.mods, function(mod.x){mod.x$tags})
 
-  mods_remove <- map2(mod_tags, mod_threads, function(tag.x, thread.y){
-    grepl(paste("test", thread.y, "threads"), tag.x)
-  }) %>% unlist()
+  mods_remove <- if(is.null(.tags)){
+    rep(TRUE, length(mod_tags))
+  }else{
+    map2(mod_tags, .tags, function(tag.x, .tag){
+      grepl(.tag, tag.x)
+    }) %>% unlist()
+  }
+
+  if(!all(mods_remove)){
+    stop("None of specified tags were found")
+  }
 
   mod_paths <- mod_paths[mods_remove] %>% unlist()
 
@@ -70,7 +134,7 @@ cleanup_mods <- function(mods){
     if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
     if (fs::dir_exists(m)) fs::dir_delete(m)
   }
-  message("Removed models with the following tags:\n", paste("-",unlist(mod_tags), collapse = "\n"))
+  message("Removed models with the following tags:\n", paste("-",unlist(mod_tags[mods_remove]), collapse = "\n"))
 }
 
 

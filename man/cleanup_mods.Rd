@@ -2,13 +2,16 @@
 % Please edit documentation in R/test-threads.R
 \name{cleanup_mods}
 \alias{cleanup_mods}
-\title{Remove model files created via \code{\link[=test_threads]{test_threads()}}}
+\title{Remove model files associated with the specified tags}
 \usage{
-cleanup_mods(mods)
+cleanup_mods(.mods, .tags = NULL)
 }
 \arguments{
-\item{mods}{list of bbi model objects created by \code{test_threads()}}
+\item{.mods}{a bbi model object or list of model objects.}
+
+\item{.tags}{a character vector identifying the tags of the models you want to delete.
+If set to NULL, delete all associated model files.}
 }
 \description{
-Remove model files created via \code{\link[=test_threads]{test_threads()}}
+Remove model files associated with the specified tags
 }

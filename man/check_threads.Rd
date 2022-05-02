@@ -4,10 +4,17 @@
 \alias{check_threads}
 \title{Check estimation time for models run with various threads values}
 \usage{
-check_threads(mods)
+check_threads(.mods, return_times = "estimation_time", wait = TRUE, ...)
 }
 \arguments{
-\item{mods}{list of bbi model objects created by \code{test_threads()}}
+\item{.mods}{list of bbi model objects created by \code{test_threads()}.}
+
+\item{return_times}{character vector denoting which times from \code{model_summary()} you want to return.
+See details for more information.}
+
+\item{wait}{logical. If TRUE, pass \code{.mods} to \code{wait_for_nonmem()} before returning results.}
+
+\item{...}{args passed through to \code{wait_for_nonmem()}.}
 }
 \value{
 A tibble with columns \code{threads} (number of threads) and \code{time}
@@ -15,4 +22,21 @@ A tibble with columns \code{threads} (number of threads) and \code{time}
 }
 \description{
 Check estimation time for models run with various threads values
+}
+\details{
+\code{return_times} can be any subset of \code{c("estimation_time", "covariance_time", "cpu_time")}.
+Users can also specify \code{all}, which is the shorthand method for selecting all 3 of those columns
+}
+\examples{
+\dontrun{
+mods <- test_threads(mod, threads = c(2, 4))
+
+If models have not finished:
+check_threads(mods, wait = TRUE, time_limit = 300)
+check_threads(mods, wait = TRUE, return_times = c("estimation_time", "covariance_time"))
+
+If models have already finished:
+check_threads(mods, wait = FALSE)
+check_threads(mods, wait = FALSE, return_times = "All")
+}
 }
