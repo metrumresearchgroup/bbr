@@ -11,7 +11,7 @@
 #'
 #' @param .base_dir Base directory to look in for models.
 #' @param .recurse If `TRUE`, the default, search recursively in all subdirectories. Passed through to `fs::dir_ls()` -- If a positive number, the number of levels to recurse.
-#' @param .filter Provides filter for runs based on numeric labeling. Filters inclusively
+#' @param .filter Provides filter for runs based on an input vector
 #' @importFrom purrr map_df
 #' @importFrom tibble tibble
 #' @return A tibble of class `bbi_run_log_df` with information on each model, or an empty tibble if no models are found.
@@ -54,6 +54,11 @@ find_models <- function(.base_dir, .recurse , .filter = 0:0) {
   yaml_files <- str_subset(yaml_files, "\\.ya?ml$")
   yaml_files <- str_subset(yaml_files, "bbi\\.ya?ml$", negate = TRUE)
 
+
+  if(length(yaml_files) == 0)
+  {
+    warning("All models not selected by filter. Please adjust filter vector." %>% glue::glue())
+  }
 
   # read in all candidate yaml's
   all_yaml <-
