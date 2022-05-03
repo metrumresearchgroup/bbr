@@ -57,7 +57,7 @@ find_models <- function(.base_dir, .recurse , .filter = 0:0) {
 
   if(length(yaml_files) == 0)
   {
-    warning("All models not selected by filter. Please adjust filter vector." %>% glue::glue())
+    warning("All models not selected by filter. Please adjust filter vector" %>% glue::glue())
   }
 
   # read in all candidate yaml's
