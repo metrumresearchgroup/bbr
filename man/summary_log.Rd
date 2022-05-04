@@ -14,7 +14,7 @@ add_summary(.log_df, ...)
 
 \item{.recurse}{If \code{TRUE}, the default, search recursively in all subdirectories. Passed through to \code{fs::dir_ls()} -- If a positive number, the number of levels to recurse.}
 
-\item{.filter}{Provides filter for runs based on numeric labeling. Filters inclusively}
+\item{.filter}{Provides filter for runs based on an input vector}
 
 \item{...}{Arguments passed through to \code{\link[=model_summaries]{model_summaries()}}}
 

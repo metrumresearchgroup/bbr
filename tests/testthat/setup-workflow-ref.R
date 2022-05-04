@@ -194,6 +194,15 @@ create_rlg_models <- function() {
   )
 }
 
+clean_test_enviroment <- function(.f, env = parent.frame())
+{
+  cleanup()
+  .f()
+  withr::defer(cleanup(), envir = env)
+}
+
+
+
 cleanup <- function() {
   # delete tmp files if they are leftover from previous test
   mods_to_kill <- purrr::map_chr(c(seq(2,7), "Parent", "Child"), ~ file.path(MODEL_DIR, .x))

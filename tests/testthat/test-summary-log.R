@@ -141,14 +141,55 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 }) # closing withr::with_options
 
 
-cleanup()
-create_rlg_models()
 
-test_that("run_log() works with filtering parameter [BBR-SMLG-010]",
-{
+# ##########################################
+# # Testing Additional Parameters Passed
+# ##########################################
 
-            log_df <- list(df = run_log(MODEL_DIR), length = run_log(MODEL_DIR) %>% nrow())
-            expect_equal(run_log(MODEL_DIR, .filter = 1:log_df$length - 1 ) %>% nrow(), 1)
-            expect_equal(run_log(MODEL_DIR, .filter = 1:(log_df$length - 2)) %>% nrow(), 2)
+test_that("summary_log() works with filtering parameter numeric [BBR-SMLG-011]",
+          {
+            create_directories <- function(.file)
+            {
+              dir.create('{MODEL_DIR}/.file' %>% glue()) %>% expect_warning()
+              system("cp -r {MODEL_DIR}/1/  {MODEL_DIR}/{.file}/" %>% glue())
+            }
 
-})
+
+            clean_test_enviroment(create_rlg_models)
+            lapply(c("2", "3"), create_directories)
+            log_df <- list(df = summary_log(MODEL_DIR), length = summary_log(MODEL_DIR) %>% nrow())
+
+            expect_equal(summary_log(MODEL_DIR, .filter = 1:(log_df$length - 1)) %>% nrow(), 1)
+            expect_equal(summary_log(MODEL_DIR, .filter = 1:(log_df$length - 2)) %>% nrow(), 2)
+            expect_equal(summary_log(MODEL_DIR, .filter = (log_df$length - 2):1) %>% nrow(), 2)
+
+
+          })
+
+test_that("summary_log() works with filtering parameter string [BBR-SMLG-011]",
+          {
+            setup_this_test <- function() {
+              create_rlg_models()
+              .m <- copy_model_from(MOD1, "Child")
+              .m1 <- copy_model_from(MOD1, "Parent")
+              }
+
+          create_directories <- function(.file)
+          {
+            dir.create('{MODEL_DIR}/.file' %>% glue()) %>% expect_warning()
+            system("cp -r {MODEL_DIR}/1/  {MODEL_DIR}/{.file}/" %>% glue())
+          }
+
+          clean_test_enviroment(setup_this_test)
+          lapply(c("2", "3", "Child", "Parent"), create_directories)
+
+          log_df <- list(df = summary_log(MODEL_DIR), length = summary_log(MODEL_DIR) %>% nrow())
+
+          expect_equal(summary_log(MODEL_DIR, .filter = c(1:2, "Child")) %>% nrow(),2)
+          expect_equal(summary_log(MODEL_DIR, .filter = c(2:1, "Child")) %>% nrow() ,2)
+          expect_equal(summary_log(MODEL_DIR, .filter = c("Child", 1, 2, 3)) %>% nrow() ,1)
+          expect_equal(summary_log(MODEL_DIR, .filter = c(1:2, "Parent")) %>% nrow() ,2)
+
+          dir_delete("{MODEL_DIR}/Parent" %>% glue())
+          dir_delete("{MODEL_DIR}/Child" %>% glue())
+        })
