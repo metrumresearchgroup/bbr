@@ -90,8 +90,6 @@ test_that("run_log() works correctly with nested dirs [BBR-RNLG-004]", {
 # # Testing Additional Parameters Passed
 # ##########################################
 
-#cleanup()
-#create_rlg_models()
 
  test_that("run_log() works with filtering parameter numeric [BBR-RNLG-005]",
  {
