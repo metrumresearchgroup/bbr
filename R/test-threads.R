@@ -41,10 +41,10 @@ test_threads <- function(
     str_loc <- grepl(search_str, str_values)
 
     if(length(str_loc[str_loc]) > 1){
-      stop("Both MAXITER and NITER were found in the ctl file. Please ensure only one is provided.")
+      stop("Both MAXEVAL and NITER were found in the ctl file. Please ensure only one is provided.")
     }
     if(length(str_loc[str_loc]) == 0){
-      stop("Neither MAXITER or NITER were found in the ctl file. Please ensure one is provided.")
+      stop("Neither MAXEVAL or NITER were found in the ctl file. Please ensure one is provided.")
     }
 
     str_update <- paste0(gsub('[[:digit:]]+', '', str_values[str_loc]),.maxEval)
