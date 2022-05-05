@@ -43,6 +43,9 @@ test_threads <- function(
     if(length(str_loc[str_loc]) > 1){
       stop("Both MAXITER and NITER were found in the ctl file. Please ensure only one is provided.")
     }
+    if(length(str_loc[str_loc]) == 0){
+      stop("Neither MAXITER or NITER were found in the ctl file. Please ensure one is provided.")
+    }
 
     str_update <- paste0(gsub('[[:digit:]]+', '', str_values[str_loc]),.maxEval)
     str_line_update <- paste(paste(str_values[!str_loc], collapse = " "), str_update, sep = " ")
