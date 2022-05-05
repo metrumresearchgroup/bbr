@@ -4,6 +4,8 @@
 #' @param .threads Integer vector of threads values to test.
 #' @param .mode Passed through to bbr::submit_models(.mode).
 #' @param .bbi_args a named list.
+#' @param .maxEval Max number of iterations for NONMEM to run.
+#'         Will update `MAXITER` or `NITER` (whichever is specified) in generated models.
 #'
 #' @importFrom checkmate assert_list
 #'

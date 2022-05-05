@@ -20,6 +20,9 @@ test_threads(
 \item{.mode}{Passed through to bbr::submit_models(.mode).}
 
 \item{.bbi_args}{a named list.}
+
+\item{.maxEval}{Max number of iterations for NONMEM to run.
+Will update \code{MAXITER} or \code{NITER} (whichever is specified) in generated models.}
 }
 \value{
 A list of the model objects for the submitted models.
