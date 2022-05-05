@@ -1,6 +1,0 @@
-model_type: nonmem
-bbi_args:
-  overwrite: yes
-  threads: 4.0
-based_on:
-- '1'

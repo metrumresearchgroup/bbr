@@ -1,4 +1,4 @@
-Thu May  5 10:52:34 EDT 2022
+Thu May  5 11:10:34 EDT 2022
 $PROBLEM PK model 1 cmt base
 
 $INPUT ID TIME MDV EVID DV AMT  SEX WT ETN NUM
@@ -379,9 +379,9 @@ Days until program expires :  69
  TOTAL EFFECTIVE ETAS (NIND*NETA):                            78
   
  #TERE:
- Elapsed estimation  time in seconds:     2.50
- Elapsed covariance  time in seconds:     0.57
- Elapsed postprocess time in seconds:     0.22
+ Elapsed estimation  time in seconds:     2.60
+ Elapsed covariance  time in seconds:     0.55
+ Elapsed postprocess time in seconds:     0.21
 1
  
  
@@ -659,6 +659,6 @@ Days until program expires :  69
 +       ......... ......... ......... ......... ......... ......... ......... ......... .........
  
  Elapsed finaloutput time in seconds:     0.14
- #CPUT: Total CPU Time in Seconds,        3.333
+ #CPUT: Total CPU Time in Seconds,        3.372
 Stop Time:
-Thu May  5 10:52:44 EDT 2022
+Thu May  5 11:10:46 EDT 2022
