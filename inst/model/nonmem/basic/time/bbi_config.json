@@ -1,0 +1,53 @@
+{
+    "bbi_version": "v3.1.1",
+    "model_name": "time.ctl",
+    "original_model": "time.ctl",
+    "model_path": "/data/Projects/package-dev/bbr/inst/model/nonmem/basic/time/time.ctl",
+    "data_path": "../../../../extdata/acop.csv",
+    "data_md5": "14e53889c0b1c29db2ba02f2025bb62c",
+    "model_md5": "c06da9472bb14f1bffe21f14e69624c8",
+    "model_filename": "time",
+    "model_extension": "ctl",
+    "original_path": "/data/Projects/package-dev/bbr/inst/model/nonmem/basic/time",
+    "output_dir": "/data/Projects/package-dev/bbr/inst/model/nonmem/basic/time",
+    "configuration": {
+        "clean_lvl": 1,
+        "git": true,
+        "bbi_binary": "/data/apps/bbi",
+        "output_dir": "{{ .Name }}",
+        "threads": 4,
+        "local": {},
+        "nonmem": {
+            "nm73gf": {
+                "home": "/opt/NONMEM/nm73gf",
+                "executable": "nmfe73",
+                "nmqual": true
+            },
+            "nm73gf_nmfe": {
+                "home": "/opt/NONMEM/nm73gf_nmfe",
+                "executable": "nmfe73"
+            },
+            "nm74gf": {
+                "home": "/opt/NONMEM/nm74gf",
+                "executable": "nmfe74",
+                "nmqual": true,
+                "default": true
+            },
+            "nm74gf_nmfe": {
+                "home": "/opt/NONMEM/nm74gf_nmfe",
+                "executable": "nmfe74"
+            },
+            "nm75": {
+                "home": "/opt/NONMEM/nm75",
+                "executable": "nmfe75"
+            }
+        },
+        "parallel": false,
+        "nmfe_options": {
+            "maxlim": 100
+        },
+        "mpi_exec_path": "/usr/local/mpich3/bin/mpiexec",
+        "parallel_timeout": 2147483647
+    },
+    "error": null
+}

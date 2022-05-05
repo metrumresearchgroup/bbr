@@ -1,5 +1,5 @@
-Thu May  5 10:52:34 EDT 2022
-$PROBLEM PK model 1 cmt base
+Thu May  5 10:52:49 EDT 2022
+$PROBLEM From bbr: see time.yaml for details
 
 $INPUT ID TIME MDV EVID DV AMT  SEX WT ETN NUM
 $DATA ../../../../extdata/acop.csv IGNORE=@
@@ -64,7 +64,7 @@ Days until program expires :  69
  PERFORMED BY NOUS INFOSYSTEMS.
 
  PROBLEM NO.:         1
- PK model 1 cmt base
+ From bbr: see time.yaml for details
 0DATA CHECKOUT RUN:              NO
  DATA SET LOCATED ON UNIT NO.:    2
  THIS UNIT TO BE REWOUND:        NO
@@ -269,7 +269,7 @@ Days until program expires :  69
  EXCLUDE NON-INFLUENTIAL (NON-INFL.) ETAS
        IN SHRINKAGE (ETASTYPE):             NO
  NON-INFL. ETA CORRECTION (NONINFETA):      OFF
- RAW OUTPUT FILE (FILE): 1.ext
+ RAW OUTPUT FILE (FILE): time.ext
  EXCLUDE TITLE (NOTITLE):                   NO
  EXCLUDE COLUMN LABELS (NOLABEL):           NO
  FORMAT FOR ADDITIONAL FILES (FORMAT):      S1PE12.5
@@ -379,9 +379,9 @@ Days until program expires :  69
  TOTAL EFFECTIVE ETAS (NIND*NETA):                            78
   
  #TERE:
- Elapsed estimation  time in seconds:     2.50
- Elapsed covariance  time in seconds:     0.57
- Elapsed postprocess time in seconds:     0.22
+ Elapsed estimation  time in seconds:     2.68
+ Elapsed covariance  time in seconds:     0.59
+ Elapsed postprocess time in seconds:     0.23
 1
  
  
@@ -658,7 +658,7 @@ Days until program expires :  69
  SG11
 +       ......... ......... ......... ......... ......... ......... ......... ......... .........
  
- Elapsed finaloutput time in seconds:     0.14
- #CPUT: Total CPU Time in Seconds,        3.333
+ Elapsed finaloutput time in seconds:     0.12
+ #CPUT: Total CPU Time in Seconds,        3.516
 Stop Time:
-Thu May  5 10:52:44 EDT 2022
+Thu May  5 10:53:01 EDT 2022
