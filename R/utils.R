@@ -508,18 +508,18 @@ download_with_retry <- function(...) {
 #' Checks if NONMEM run is done by looking for "Stop Time" in .lst file
 #'
 #' Returns `TRUE` if the model appears to be finished running and `FALSE` otherwise.
-#' @param mod either a bbi_nonmem_model object or a path to an .lst file
+#' @param .mod either a bbi_nonmem_model object or a path to an .lst file
 #'
 #' @importFrom readr read_lines
 #'
 #' @export
-check_nonmem_finished <- function(mod) {
+check_nonmem_finished <- function(.mod) {
 
-  if (!fs::dir_exists(get_output_dir(mod, .check_exists = FALSE))) {
+  if (!fs::dir_exists(get_output_dir(.mod, .check_exists = FALSE))) {
     return(TRUE) # if missing then this failed right away, likely for some bbi reason
   }
 
-  mod_path <- build_path_from_model(mod, ".lst")
+  mod_path <- build_path_from_model(.mod, ".lst")
 
   # look for model to be finished and then test output
   model_finished <- if(file.exists(mod_path)){
@@ -536,9 +536,9 @@ check_nonmem_finished <- function(mod) {
 
 #' Wait for NONMEM models to finish
 #' @param .mod a `bbi_nonmem_model` object, or list of `bbi_nonmem_model` objects.
-#' @param time_limit integer for maximum number of seconds in total to wait before continuing
+#' @param .time_limit integer for maximum number of seconds in total to wait before continuing
 #'        (will exit after this time even if the run does not appear to have finished).
-#' @param interval integer for number of seconds to wait between each check.
+#' @param .interval integer for number of seconds to wait between each check.
 #'
 #'
 #' @description Calling `wait_for_nonmem()` will freeze the user's console until the model(s) have finished running.
@@ -547,7 +547,7 @@ check_nonmem_finished <- function(mod) {
 #' @importFrom checkmate assert_list
 #'
 #' @export
-wait_for_nonmem <- function(.mod, time_limit = 200, interval = 5) {
+wait_for_nonmem <- function(.mod, .time_limit = 200, .interval = 5) {
   UseMethod("wait_for_nonmem")
 }
 
@@ -556,8 +556,8 @@ wait_for_nonmem <- function(.mod, time_limit = 200, interval = 5) {
 #'
 #' @describeIn wait_for_nonmem takes a `bbi_nonmem_model` object.
 #' @export
-wait_for_nonmem.bbi_nonmem_model <- function(.mod, time_limit = 200, interval = 5) {
-  wait_for_nonmem(list(.mod), time_limit = time_limit, interval = interval)
+wait_for_nonmem.bbi_nonmem_model <- function(.mod, .time_limit = 200, .interval = 5) {
+  wait_for_nonmem(list(.mod), .time_limit = .time_limit, .interval = .interval)
 }
 
 
@@ -565,14 +565,14 @@ wait_for_nonmem.bbi_nonmem_model <- function(.mod, time_limit = 200, interval = 
 #'
 #' @describeIn wait_for_nonmem takes a `list` of `bbi_nonmem_model` objects.
 #' @export
-wait_for_nonmem.list <- function(.mod, time_limit = 200, interval = 5) {
+wait_for_nonmem.list <- function(.mod, .time_limit = 200, .interval = 5) {
 
   assert_list(.mod)
   check_model_object_list(.mod)
   verbose_msg(glue("Waiting for {length(.mod)} model(s) to finish..."))
 
   Sys.sleep(1) # wait for lst file to be created
-  expiration <- Sys.time() + time_limit
+  expiration <- Sys.time() + .time_limit
   n_interval <- 0
   while ((expiration - Sys.time()) > 0) {
     res <- map_lgl(.mod, ~check_nonmem_finished(.x))
@@ -585,7 +585,7 @@ wait_for_nonmem.list <- function(.mod, time_limit = 200, interval = 5) {
         verbose_msg(glue("Waiting for {length(res[!res])} model(s) to finish..."))
       }
     }
-    Sys.sleep(interval)
+    Sys.sleep(.interval)
   }
 
   if(expiration < Sys.time() && !map_lgl(.mod, ~check_nonmem_finished(.x))){

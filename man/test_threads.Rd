@@ -6,15 +6,16 @@
 \usage{
 test_threads(
   .mod,
-  threads = c(2, 4),
+  .threads = c(2, 4),
   .mode = getOption("bbr.bbi_exe_mode"),
-  .bbi_args = list()
+  .bbi_args = list(),
+  .maxEval = 10
 )
 }
 \arguments{
 \item{.mod}{bbi_model object to copy/test.}
 
-\item{threads}{Integer vector of threads values to test.}
+\item{.threads}{Integer vector of threads values to test.}
 
 \item{.mode}{Passed through to bbr::submit_models(.mode).}
 

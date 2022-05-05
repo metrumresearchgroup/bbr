@@ -4,15 +4,15 @@
 \alias{check_threads}
 \title{Check estimation time for models run with various threads values}
 \usage{
-check_threads(.mods, return_times = "estimation_time", wait = TRUE, ...)
+check_threads(.mods, .return_times = "estimation_time", .wait = TRUE, ...)
 }
 \arguments{
 \item{.mods}{list of bbi model objects created by \code{test_threads()}.}
 
-\item{return_times}{character vector denoting which times from \code{model_summary()} you want to return.
+\item{.return_times}{character vector denoting which times from \code{model_summary()} you want to return.
 See details for more information.}
 
-\item{wait}{logical. If TRUE, pass \code{.mods} to \code{wait_for_nonmem()} before returning results.}
+\item{.wait}{logical. If TRUE, pass \code{.mods} to \code{wait_for_nonmem()} before returning results.}
 
 \item{...}{args passed through to \code{wait_for_nonmem()}.}
 }
@@ -24,7 +24,7 @@ A tibble with columns \code{threads} (number of threads) and \code{time}
 Check estimation time for models run with various threads values
 }
 \details{
-\code{return_times} can be any subset of \code{c("estimation_time", "covariance_time", "cpu_time")}.
+\code{.return_times} can be any subset of \code{c("estimation_time", "covariance_time", "cpu_time")}.
 Users can also specify \code{all}, which is the shorthand method for selecting all 3 of those columns
 }
 \examples{

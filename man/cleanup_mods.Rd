@@ -4,7 +4,7 @@
 \alias{cleanup_mods}
 \title{Remove model files associated with the specified tags}
 \usage{
-cleanup_mods(.mods, .tags = NULL)
+cleanup_mods(.mods, .tags = "test threads")
 }
 \arguments{
 \item{.mods}{a bbi model object or list of model objects.}

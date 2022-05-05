@@ -1,7 +1,7 @@
 #' Takes a model object and runs it with various threads values
 #'
 #' @param .mod bbi_model object to copy/test.
-#' @param threads Integer vector of threads values to test.
+#' @param .threads Integer vector of threads values to test.
 #' @param .mode Passed through to bbr::submit_models(.mode).
 #' @param .bbi_args a named list.
 #'
@@ -12,22 +12,41 @@
 #' @export
 test_threads <- function(
   .mod,
-  threads = c(2,4),
+  .threads = c(2,4),
   .mode = getOption("bbr.bbi_exe_mode"),
-  .bbi_args = list()
+  .bbi_args = list(),
+  .maxEval = 10
 ) {
 
   check_model_object(.mod)
   assert_list(.bbi_args)
 
-  .mods <- map(threads, ~ copy_model_from(.mod, paste0(get_model_id(.mod), "_", .x, "_threads")) %>%
+  # Duplicate model for each thread scenario
+  .mods <- map(.threads, ~ copy_model_from(.mod, paste0(get_model_id(.mod), "_", .x, "_threads")) %>%
                  add_bbi_args(.bbi_args = c(threads = .x,
                                             .bbi_args,
                                             parallel = TRUE,
                                             overwrite = TRUE)) %>%
-                 add_tags(paste("test",.x,"threads")))
+                 add_tags(paste("test threads")))
 
-  mod_paths <- lapply(.mods, function(mod.x){mod.x$absolute_model_path}) %>% unlist()
+  # Modify MAXEVAL or NITER
+  search_str <- "MAXEVAL|NITER"
+  map(.mods, function(.mod){
+    mod_path <- get_model_path(.mod)
+    mod_lines <- mod_path %>% readLines()
+    str_line_loc <- which(grepl(search_str, mod_lines))
+    str_values <- str_split(mod_lines[str_line_loc], " ")[[1]]
+    str_loc <- grepl(search_str, str_values)
+
+    if(length(str_loc[str_loc]) > 1){
+      stop("Both MAXITER and NITER were found in the ctl file. Please ensure only one is provided.")
+    }
+
+    str_update <- glue("{gsub('[[:digit:]]+', '', str_values[str_loc])}{.maxEval}")
+    str_line_update <- paste(paste(str_values[!str_loc], collapse = " "), str_update, sep = " ")
+    mod_lines[str_line_loc] <- str_line_update
+    writeLines(mod_lines, mod_path)
+  })
 
   submit_models(.mods, .mode = .mode, .wait = FALSE)
 
@@ -37,13 +56,13 @@ test_threads <- function(
 #' Check estimation time for models run with various threads values
 #'
 #' @param .mods list of bbi model objects created by `test_threads()`.
-#' @param return_times character vector denoting which times from `model_summary()` you want to return.
+#' @param .return_times character vector denoting which times from `model_summary()` you want to return.
 #'        See details for more information.
-#' @param wait logical. If TRUE, pass `.mods` to `wait_for_nonmem()` before returning results.
+#' @param .wait logical. If TRUE, pass `.mods` to `wait_for_nonmem()` before returning results.
 #' @param ... args passed through to `wait_for_nonmem()`.
 #'
 #' @details
-#' `return_times` can be any subset of `c("estimation_time", "covariance_time", "cpu_time")`.
+#' `.return_times` can be any subset of `c("estimation_time", "covariance_time", "cpu_time")`.
 #' Users can also specify `all`, which is the shorthand method for selecting all 3 of those columns
 #'
 #' @examples
@@ -62,32 +81,33 @@ test_threads <- function(
 #'   (elapsed estimation time in seconds for test models).
 #'
 #' @importFrom tidyselect all_of
+#' @importFrom purrr map_dfr
 #'
 #' @export
 check_threads <- function(
   .mods,
-  return_times = "estimation_time",
-  wait = TRUE,
+  .return_times = "estimation_time",
+  .wait = TRUE,
   ...
 ) {
 
-  if("all" %in% return_times){
-    return_times <- c("estimation_time", "covariance_time", "cpu_time")
+  if("all" %in% .return_times){
+    .return_times <- c("estimation_time", "covariance_time", "cpu_time")
   }else{
-    assert_true(all(return_times %in% c("estimation_time", "covariance_time", "cpu_time")))
+    assert_true(all(.return_times %in% c("estimation_time", "covariance_time", "cpu_time")))
   }
 
   tryCatch({
-    if(wait) wait_for_nonmem(.mods, ...)
+    if(.wait) wait_for_nonmem(.mods, ...)
 
-    purrr::map_dfr(.mods, ~ {
+    map_dfr(.mods, ~ {
       s <- model_summary(.x)
       threads <- as.numeric(.x$bbi_args$threads)
       tibble::tibble(threads = threads,
                      estimation_time = s$run_details$estimation_time,
                      covariance_time = s$run_details$covariance_time,
                      cpu_time = s$run_details$cpu_time) %>%
-        select(threads, all_of(return_times))
+        select(threads, all_of(.return_times))
     })
   }, error = function(cond){
     return(NA)
@@ -108,7 +128,7 @@ check_threads <- function(
 #' @importFrom checkmate check_character
 #'
 #' @export
-cleanup_mods <- function(.mods, .tags = NULL){
+cleanup_mods <- function(.mods, .tags = "test threads"){
   if(!is.null(.tags)) check_character(.tags)
   # Only remove mods with correct tag
   mod_paths <- lapply(.mods, function(mod.x){mod.x$absolute_model_path})

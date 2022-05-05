@@ -4,10 +4,10 @@
 \alias{check_nonmem_finished}
 \title{Checks if NONMEM run is done by looking for "Stop Time" in .lst file}
 \usage{
-check_nonmem_finished(mod)
+check_nonmem_finished(.mod)
 }
 \arguments{
-\item{mod}{either a bbi_nonmem_model object or a path to an .lst file}
+\item{.mod}{either a bbi_nonmem_model object or a path to an .lst file}
 }
 \description{
 Returns \code{TRUE} if the model appears to be finished running and \code{FALSE} otherwise.
