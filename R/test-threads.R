@@ -42,7 +42,7 @@ test_threads <- function(
       stop("Both MAXITER and NITER were found in the ctl file. Please ensure only one is provided.")
     }
 
-    str_update <- glue("{gsub('[[:digit:]]+', '', str_values[str_loc])}{.maxEval}")
+    str_update <- paste0(gsub('[[:digit:]]+', '', str_values[str_loc]),.maxEval)
     str_line_update <- paste(paste(str_values[!str_loc], collapse = " "), str_update, sep = " ")
     mod_lines[str_line_loc] <- str_line_update
     writeLines(mod_lines, mod_path)
