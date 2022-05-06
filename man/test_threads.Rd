@@ -9,7 +9,7 @@ test_threads(
   .threads = c(2, 4),
   .mode = getOption("bbr.bbi_exe_mode"),
   .bbi_args = list(),
-  .maxEval = 10
+  .max_eval = 10
 )
 }
 \arguments{
