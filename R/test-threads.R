@@ -147,12 +147,12 @@ check_threads <- function(
       s <- model_summary(.x)
       threads <- as.numeric(.x$bbi_args$threads)
       tibble::tibble(
-        `model name` = basename(.x$absolute_model_path),
+        model_name = basename(.x$absolute_model_path),
         threads = threads,
         estimation_time = s$run_details$estimation_time,
         covariance_time = s$run_details$covariance_time,
         cpu_time = s$run_details$cpu_time) %>%
-        select(threads, all_of(.return_times))
+        select(model_name, threads, all_of(.return_times))
     })
   }, error = function(cond){
     return(NA)
