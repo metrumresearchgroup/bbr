@@ -177,38 +177,46 @@ check_run_times <- function(
 #' @export
 cleanup_mods <- function(.mods, .tags = "test threads", .force = FALSE){
   if(!is.null(.tags)) check_character(.tags)
-  # Only remove mods with correct tag
-  mod_paths <- lapply(.mods, function(mod.x){mod.x$absolute_model_path})
-  mod_threads <- lapply(.mods, function(mod.x){mod.x$bbi_args$threads})
-  mod_tags <- lapply(.mods, function(mod.x){mod.x$tags})
+
+  mod_info <- map_dfr(.mods, function(mod.x){
+    mod_tags <- mod.x$tags
+    mod_tags <- paste(mod_tags, collapse = ", ")
+    mod_tags <- ifelse(mod_tags == "", "NA", mod_tags)
+    tibble::tibble(
+      mod_paths = mod.x$absolute_model_path,
+      mod_thread = mod.x$bbi_args$threads,
+      mod_tags = mod_tags
+    )
+  })
 
   tag_groups <- if(is.null(.tags)){
-    tidyr::crossing(mod_tags = unlist(mod_tags), .tags = NA, mod_paths = unlist(mod_paths), found = TRUE)
+    crossing(mod_tags = mod_info$mod_tags, .tags = "NA", found = TRUE) %>% left_join(mod_info)
   }else{
-    tag_groups <- tidyr::crossing(mod_tags = unlist(mod_tags), .tags, mod_paths = unlist(mod_paths))
+    tag_groups <- crossing(mod_tags = mod_info$mod_tags, .tags) %>% left_join(mod_info)
     found <- map2(tag_groups$mod_tags, tag_groups$.tags, function(tag.x, .tag){
       grepl(.tag, tag.x)
     }) %>% unlist()
+
     tag_groups$found <- found
-    if(!all(tag_groups$found)){
+
+    if(!any(tag_groups$found)){
       message("The following tags were not found:\n",
               paste("-",unique(unlist(tag_groups[found==FALSE,".tags"])),"\n"))
     }
     tag_groups[found,]
   }
 
-  mod_paths <- tag_groups$mod_paths
+  mod_paths <- unique(tag_groups$mod_paths)
 
   if(length(mod_paths)==0){
     stop("None of specified tags were found")
   }
 
-
-  mods_removed <- tag_groups$mod_tags
+  mods_removed <- unique(tag_groups$mod_tags)
 
   msg_remove <- paste0(
-    paste("Removed", length(mods_removed), "models with the following tags:\n"),
-    paste("-",unique(mods_removed), collapse = "\n")
+    paste("Removed", length(mod_paths), "models with the following tags:\n"),
+    paste("-",mods_removed, collapse = "\n")
   )
 
   if(.force){
@@ -220,8 +228,8 @@ cleanup_mods <- function(.mods, .tags = "test threads", .force = FALSE){
     message(msg_remove)
   }else{
     msg_prompt <- paste0(
-      paste("Are you sure you want to remove", length(mods_removed), "models with the following tags?: "),
-      paste0("`",unique(mods_removed),"`", collapse = ", ")
+      paste("Are you sure you want to remove", length(mod_paths), "models with the following tags?: "),
+      paste0("`",mods_removed,"`", collapse = ", ")
     )
     delete_prompt <- askYesNo(msg_prompt)
     if(delete_prompt){
