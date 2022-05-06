@@ -233,7 +233,6 @@ test_that("config_log() works with filtering parameter numeric [BBR-CGLG-014]",
             lapply(c("2", "3"), create_directories)
 
             log_df <- list(df = config_log(MODEL_DIR), length = config_log(MODEL_DIR) %>% nrow())
-            test <<- log_df
             expect_equal(config_log(MODEL_DIR, .filter = 1:(log_df$length - 1) ) %>% nrow(), 1)
             expect_equal(config_log(MODEL_DIR, .filter = 1:(log_df$length - 2)) %>% nrow(), 2)
             expect_equal(config_log(MODEL_DIR, .filter = (log_df$length - 2):1) %>% nrow(), 2)
