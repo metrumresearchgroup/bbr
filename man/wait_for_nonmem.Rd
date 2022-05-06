@@ -6,11 +6,11 @@
 \alias{wait_for_nonmem.list}
 \title{Wait for NONMEM models to finish}
 \usage{
-wait_for_nonmem(.mod, .time_limit = 200, .interval = 5)
+wait_for_nonmem(.mod, .time_limit = 300, .interval = 5)
 
-\method{wait_for_nonmem}{bbi_nonmem_model}(.mod, .time_limit = 200, .interval = 5)
+\method{wait_for_nonmem}{bbi_nonmem_model}(.mod, .time_limit = 300, .interval = 5)
 
-\method{wait_for_nonmem}{list}(.mod, .time_limit = 200, .interval = 5)
+\method{wait_for_nonmem}{list}(.mod, .time_limit = 300, .interval = 5)
 }
 \arguments{
 \item{.mod}{a \code{bbi_nonmem_model} object, or list of \code{bbi_nonmem_model} objects.}

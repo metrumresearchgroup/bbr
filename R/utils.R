@@ -547,7 +547,7 @@ check_nonmem_finished <- function(.mod) {
 #' @importFrom checkmate assert_list
 #'
 #' @export
-wait_for_nonmem <- function(.mod, .time_limit = 200, .interval = 5) {
+wait_for_nonmem <- function(.mod, .time_limit = 300, .interval = 5) {
   UseMethod("wait_for_nonmem")
 }
 
@@ -556,7 +556,7 @@ wait_for_nonmem <- function(.mod, .time_limit = 200, .interval = 5) {
 #'
 #' @describeIn wait_for_nonmem takes a `bbi_nonmem_model` object.
 #' @export
-wait_for_nonmem.bbi_nonmem_model <- function(.mod, .time_limit = 200, .interval = 5) {
+wait_for_nonmem.bbi_nonmem_model <- function(.mod, .time_limit = 300, .interval = 5) {
   wait_for_nonmem(list(.mod), .time_limit = .time_limit, .interval = .interval)
 }
 
@@ -565,7 +565,7 @@ wait_for_nonmem.bbi_nonmem_model <- function(.mod, .time_limit = 200, .interval 
 #'
 #' @describeIn wait_for_nonmem takes a `list` of `bbi_nonmem_model` objects.
 #' @export
-wait_for_nonmem.list <- function(.mod, .time_limit = 200, .interval = 5) {
+wait_for_nonmem.list <- function(.mod, .time_limit = 300, .interval = 5) {
 
   assert_list(.mod)
   check_model_object_list(.mod)

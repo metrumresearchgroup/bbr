@@ -4,8 +4,9 @@
 #' @param .threads Integer vector of threads values to test.
 #' @param .mode Passed through to bbr::submit_models(.mode).
 #' @param .bbi_args a named list.
-#' @param .maxEval Max number of iterations for NONMEM to run.
+#' @param .max_eval Max number of iterations for NONMEM to run.
 #'         Will update `MAXITER` or `NITER` (whichever is specified) in generated models.
+#' @param ... args passed through to submit_models()
 #'
 #' @importFrom checkmate assert_list
 #'
@@ -17,7 +18,8 @@ test_threads <- function(
   .threads = c(2,4),
   .mode = getOption("bbr.bbi_exe_mode"),
   .bbi_args = list(),
-  .max_eval = 10
+  .max_eval = 10,
+  ...
 ) {
 
   check_model_object(.mod)
@@ -57,7 +59,7 @@ test_threads <- function(
     writeLines(mod_lines, mod_path)
   })
 
-  submit_models(.mods, .mode = .mode, .wait = FALSE)
+  submit_models(.mods, .mode = .mode, .wait = FALSE, ... = ...)
 
   .mods
 }

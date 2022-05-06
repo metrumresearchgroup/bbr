@@ -9,7 +9,8 @@ test_threads(
   .threads = c(2, 4),
   .mode = getOption("bbr.bbi_exe_mode"),
   .bbi_args = list(),
-  .max_eval = 10
+  .max_eval = 10,
+  ...
 )
 }
 \arguments{
@@ -21,8 +22,10 @@ test_threads(
 
 \item{.bbi_args}{a named list.}
 
-\item{.maxEval}{Max number of iterations for NONMEM to run.
+\item{.max_eval}{Max number of iterations for NONMEM to run.
 Will update \code{MAXITER} or \code{NITER} (whichever is specified) in generated models.}
+
+\item{...}{args passed through to submit_models()}
 }
 \value{
 A list of the model objects for the submitted models.
