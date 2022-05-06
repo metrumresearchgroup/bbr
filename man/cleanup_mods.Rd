@@ -10,7 +10,7 @@ cleanup_mods(.mods, .tags = "test threads")
 \item{.mods}{a bbi model object or list of model objects.}
 
 \item{.tags}{a character vector identifying the tags of the models you want to delete.
-If set to NULL, delete all associated model files.}
+If set to \code{NULL}, no filtering will be performed and all associated model files will be deleted.}
 }
 \description{
 Remove model files associated with the specified tags

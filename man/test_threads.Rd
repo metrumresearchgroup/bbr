@@ -33,3 +33,27 @@ A list of the model objects for the submitted models.
 \description{
 Takes a model object and runs it with various threads values
 }
+\examples{
+\dontrun{
+
+mod <- read_model(file.path(MODEL_DIR, 1))
+
+
+mods <- test_threads(.mod = mod, .threads = c(2, 4), .max_eval = 10,
+                     .mode = "local")
+
+
+check_threads(mods, .wait = TRUE, .time_limit = 100)
+check_threads(mods, .wait = FALSE, .return_times = "all")
+
+cleanup_mods(.mods = mods)
+
+
+# Dry Run:
+mods <- test_threads(.mod = mod, .threads = c(2, 4), .max_eval = 10,
+                     .mode = "local", .dry_run = TRUE)
+
+cleanup_mods(.mods = mods)
+}
+
+}
