@@ -47,6 +47,7 @@ test_threads <- function(
     str_loc <- grepl(search_str, str_values)
 
     if(length(str_loc[str_loc]) > 1){
+      cleanup_mods(.mods = .mods) %>% suppressMessages()
       stop("Both MAXEVAL and NITER were found in the ctl file. Please ensure only one is provided.")
     }
 
