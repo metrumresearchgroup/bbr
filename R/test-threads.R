@@ -21,8 +21,8 @@
 #'                      .mode = "local")
 #'
 #'
-#' check_threads(mods, .wait = TRUE, .time_limit = 100)
-#' check_threads(mods, .wait = FALSE, .return_times = "all")
+#' check_run_times(mods, .wait = TRUE, .time_limit = 100)
+#' check_run_times(mods, .wait = FALSE, .return_times = "all")
 #'
 #' cleanup_mods(.mods = mods)
 #'
@@ -105,12 +105,12 @@ test_threads <- function(
 #' mods <- test_threads(mod, .threads = c(2, 4))
 #'
 #' If models have not finished:
-#' check_threads(mods, .wait = TRUE, .time_limit = 300)
-#' check_threads(mods, .wait = TRUE, .return_times = c("estimation_time", "covariance_time"))
+#' check_run_times(mods, .wait = TRUE, .time_limit = 300)
+#' check_run_times(mods, .wait = TRUE, .return_times = c("estimation_time", "covariance_time"))
 #'
 #' If models have already finished:
-#' check_threads(mods, .wait = FALSE)
-#' check_threads(mods, .wait = FALSE, .return_times = "All")
+#' check_run_times(mods, .wait = FALSE)
+#' check_run_times(mods, .wait = FALSE, .return_times = "All")
 #' }
 #' @return A tibble with columns `threads` (number of threads) and `time`
 #'   (elapsed estimation time in seconds for test models).
@@ -119,7 +119,7 @@ test_threads <- function(
 #' @importFrom purrr map_dfr
 #'
 #' @export
-check_threads <- function(
+check_run_times <- function(
   .mods,
   .return_times = "estimation_time",
   .wait = TRUE,
@@ -147,18 +147,18 @@ check_threads <- function(
       s <- model_summary(.x)
       threads <- as.numeric(.x$bbi_args$threads)
       tibble::tibble(
-        model_name = basename(.x$absolute_model_path),
+        model_run = basename(.x$absolute_model_path),
         threads = threads,
         estimation_time = s$run_details$estimation_time,
         covariance_time = s$run_details$covariance_time,
         cpu_time = s$run_details$cpu_time) %>%
-        select(model_name, threads, all_of(.return_times))
+        select(model_run, threads, all_of(.return_times))
     })
   }, error = function(cond){
     return(NA)
   }, warning = function(cond){
     message(cond)
-    message("\nConsider setting/increasing the `time_limit` in `wait_for_nonmem()`. See ?check_threads for details")
+    message("\nConsider setting/increasing the `time_limit` in `wait_for_nonmem()`. See ?check_run_times for details")
     return(NA)
   }
   )
@@ -171,6 +171,7 @@ check_threads <- function(
 #'              If set to `NULL`, no filtering will be performed and all associated model files will be deleted.
 #'
 #' @importFrom checkmate check_character
+#' @importFrom tidyr crossing
 #'
 #' @export
 cleanup_mods <- function(.mods, .tags = "test threads"){
@@ -180,26 +181,37 @@ cleanup_mods <- function(.mods, .tags = "test threads"){
   mod_threads <- lapply(.mods, function(mod.x){mod.x$bbi_args$threads})
   mod_tags <- lapply(.mods, function(mod.x){mod.x$tags})
 
-  mods_remove <- if(is.null(.tags)){
-    rep(TRUE, length(mod_tags))
+  tag_groups <- if(is.null(.tags)){
+    tidyr::crossing(mod_tags = unlist(mod_tags), .tags = NA, mod_paths = unlist(mod_paths), found = TRUE)
   }else{
-    map2(mod_tags, .tags, function(tag.x, .tag){
+    tag_groups <- tidyr::crossing(mod_tags = unlist(mod_tags), .tags, mod_paths = unlist(mod_paths))
+    found <- map2(tag_groups$mod_tags, tag_groups$.tags, function(tag.x, .tag){
       grepl(.tag, tag.x)
     }) %>% unlist()
+    tag_groups$found <- found
+    if(!all(tag_groups$found)){
+      message("The following tags were not found:\n",
+              paste("-",unique(unlist(tag_groups[found==FALSE,".tags"])),"\n"))
+    }
+    tag_groups[found,]
   }
 
-  if(!all(mods_remove)){
+  mod_paths <- tag_groups$mod_paths
+
+  if(length(mod_paths)==0){
     stop("None of specified tags were found")
   }
-
-  mod_paths <- mod_paths[mods_remove] %>% unlist()
 
   for (m in mod_paths) {
     if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
     if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
     if (fs::dir_exists(m)) fs::dir_delete(m)
   }
-  message("Removed models with the following tags:\n", paste("-",unlist(mod_tags[mods_remove]), collapse = "\n"))
+  mods_removed <- tag_groups$mod_tags
+  message(
+    paste("Removed", length(mods_removed), "models with the following tags:\n"),
+    paste("-",unique(mods_removed), collapse = "\n")
+  )
 }
 
 

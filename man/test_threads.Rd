@@ -43,8 +43,8 @@ mods <- test_threads(.mod = mod, .threads = c(2, 4), .max_eval = 10,
                      .mode = "local")
 
 
-check_threads(mods, .wait = TRUE, .time_limit = 100)
-check_threads(mods, .wait = FALSE, .return_times = "all")
+check_run_times(mods, .wait = TRUE, .time_limit = 100)
+check_run_times(mods, .wait = FALSE, .return_times = "all")
 
 cleanup_mods(.mods = mods)
 
