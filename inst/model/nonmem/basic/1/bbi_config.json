@@ -1,22 +1,26 @@
 {
-    "bbi_version": "v3.1.1",
+    "bbi_version": "v3.1.0",
     "model_name": "1.ctl",
     "original_model": "1.ctl",
-    "model_path": "/data/Projects/package-dev/bbr/inst/model/nonmem/basic/1/1.ctl",
+    "model_path": "/data/home/sethg/bbr/inst/model/nonmem/basic/1.ctl",
     "data_path": "../../../../extdata/acop.csv",
     "data_md5": "14e53889c0b1c29db2ba02f2025bb62c",
     "model_md5": "bf80e40b7db83a3b98383235124e3e28",
     "model_filename": "1",
     "model_extension": "ctl",
-    "original_path": "/data/Projects/package-dev/bbr/inst/model/nonmem/basic/1",
-    "output_dir": "/data/Projects/package-dev/bbr/inst/model/nonmem/basic/1",
+    "original_path": "/data/home/sethg/bbr/inst/model/nonmem/basic",
+    "output_dir": "/data/home/sethg/bbr/inst/model/nonmem/basic/1",
     "configuration": {
+        "overwrite": true,
         "clean_lvl": 1,
         "git": true,
         "bbi_binary": "/data/apps/bbi",
+        "save_config": true,
         "output_dir": "{{ .Name }}",
         "threads": 4,
-        "local": {},
+        "local": {
+            "create_child_dirs": true
+        },
         "nonmem": {
             "nm73gf": {
                 "home": "/opt/NONMEM/nm73gf",
