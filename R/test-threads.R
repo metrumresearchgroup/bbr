@@ -17,7 +17,7 @@ test_threads <- function(
   .threads = c(2,4),
   .mode = getOption("bbr.bbi_exe_mode"),
   .bbi_args = list(),
-  .maxEval = 10
+  .max_eval = 10
 ) {
 
   check_model_object(.mod)
@@ -37,14 +37,17 @@ test_threads <- function(
     mod_path <- get_model_path(.mod)
     mod_lines <- mod_path %>% readLines()
     str_line_loc <- which(grepl(search_str, mod_lines))
+
+    if(is_empty(str_line_loc)){
+      cleanup_mods(.mods = .mods) %>% suppressMessages()
+      stop("Neither MAXEVAL or NITER were found in the ctl file. Please ensure one is provided.")
+    }
+
     str_values <- str_split(mod_lines[str_line_loc], " ")[[1]]
     str_loc <- grepl(search_str, str_values)
 
     if(length(str_loc[str_loc]) > 1){
       stop("Both MAXEVAL and NITER were found in the ctl file. Please ensure only one is provided.")
-    }
-    if(length(str_loc[str_loc]) == 0){
-      stop("Neither MAXEVAL or NITER were found in the ctl file. Please ensure one is provided.")
     }
 
     str_update <- paste0(gsub('[[:digit:]]+', '', str_values[str_loc]),.maxEval)
