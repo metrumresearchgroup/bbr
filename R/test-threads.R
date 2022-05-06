@@ -178,6 +178,13 @@ check_run_times <- function(
 cleanup_mods <- function(.mods, .tags = "test threads", .force = FALSE){
   if(!is.null(.tags)) check_character(.tags)
 
+  if(!inherits(.mods, "bbi_nonmem_model")){
+    check_model_object_list(.mods)
+  }else{
+    check_model_object(.mods)
+    .mods <- list(.mods)
+  }
+
   mod_info <- map_dfr(.mods, function(mod.x){
     mod_tags <- mod.x$tags
     mod_tags <- paste(mod_tags, collapse = ", ")
@@ -190,16 +197,16 @@ cleanup_mods <- function(.mods, .tags = "test threads", .force = FALSE){
   })
 
   tag_groups <- if(is.null(.tags)){
-    crossing(mod_tags = mod_info$mod_tags, .tags = "NA", found = TRUE) %>% left_join(mod_info)
+    crossing(mod_tags = mod_info$mod_tags, .tags = "NA", found = TRUE) %>% left_join(mod_info, by = "mod_tags")
   }else{
-    tag_groups <- crossing(mod_tags = mod_info$mod_tags, .tags) %>% left_join(mod_info)
+    tag_groups <- crossing(mod_tags = mod_info$mod_tags, .tags) %>% left_join(mod_info, by = "mod_tags")
     found <- map2(tag_groups$mod_tags, tag_groups$.tags, function(tag.x, .tag){
       grepl(.tag, tag.x)
     }) %>% unlist()
 
     tag_groups$found <- found
 
-    if(!any(tag_groups$found)){
+    if(any(tag_groups$found==FALSE)){
       message("The following tags were not found:\n",
               paste("-",unique(unlist(tag_groups[found==FALSE,".tags"])),"\n"))
     }
