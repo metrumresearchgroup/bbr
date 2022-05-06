@@ -169,12 +169,13 @@ check_run_times <- function(
 #' @param .mods a bbi model object or list of model objects.
 #' @param .tags a character vector identifying the tags of the models you want to delete.
 #'              If set to `NULL`, no filtering will be performed and all associated model files will be deleted.
+#' @param .force logical (T/F). If `TRUE`, do not prompt the user if they want to delete the models.
 #'
 #' @importFrom checkmate check_character
 #' @importFrom tidyr crossing
 #'
 #' @export
-cleanup_mods <- function(.mods, .tags = "test threads"){
+cleanup_mods <- function(.mods, .tags = "test threads", .force = FALSE){
   if(!is.null(.tags)) check_character(.tags)
   # Only remove mods with correct tag
   mod_paths <- lapply(.mods, function(mod.x){mod.x$absolute_model_path})
@@ -202,16 +203,37 @@ cleanup_mods <- function(.mods, .tags = "test threads"){
     stop("None of specified tags were found")
   }
 
-  for (m in mod_paths) {
-    if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
-    if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
-    if (fs::dir_exists(m)) fs::dir_delete(m)
-  }
+
   mods_removed <- tag_groups$mod_tags
-  message(
+
+  msg_remove <- paste0(
     paste("Removed", length(mods_removed), "models with the following tags:\n"),
     paste("-",unique(mods_removed), collapse = "\n")
   )
+
+  if(.force){
+    for (m in mod_paths) {
+      if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
+      if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
+      if (fs::dir_exists(m)) fs::dir_delete(m)
+    }
+    message(msg_remove)
+  }else{
+    msg_prompt <- paste0(
+      paste("Are you sure you want to remove", length(mods_removed), "models with the following tags?: "),
+      paste0("`",unique(mods_removed),"`", collapse = ", ")
+    )
+    delete_prompt <- askYesNo(msg_prompt)
+    if(delete_prompt){
+      for (m in mod_paths) {
+        if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
+        if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
+        if (fs::dir_exists(m)) fs::dir_delete(m)
+      }
+      message(msg_remove)
+    }
+
+  }
 }
 
 
