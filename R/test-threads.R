@@ -9,6 +9,7 @@
 #' @param ... args passed through to submit_models()
 #'
 #' @importFrom checkmate assert_list
+#' @importFrom rlang is_empty
 #'
 #' @examples
 #' \dontrun{
@@ -89,7 +90,7 @@ test_threads <- function(
 
 #' Check estimation time for models run with various threads values
 #'
-#' @param .mods list of bbi model objects created by `test_threads()`.
+#' @param .mods a bbi model object or list of model objects. Generally created by `test_threads()`.
 #' @param .return_times character vector denoting which times from `model_summary()` you want to return.
 #'        See details for more information.
 #' @param .wait logical. If TRUE, pass `.mods` to `wait_for_nonmem()` before returning results.
@@ -97,19 +98,19 @@ test_threads <- function(
 #'
 #' @details
 #' `.return_times` can be any subset of `c("estimation_time", "covariance_time", "cpu_time")`.
-#' Users can also specify `all`, which is the shorthand method for selecting all 3 of those columns
+#' Users can also specify `all`, which is the shorthand method for selecting all 3 of those columns.
 #'
 #' @examples
 #' \dontrun{
-#' mods <- test_threads(mod, threads = c(2, 4))
+#' mods <- test_threads(mod, .threads = c(2, 4))
 #'
 #' If models have not finished:
-#' check_threads(mods, wait = TRUE, time_limit = 300)
-#' check_threads(mods, wait = TRUE, return_times = c("estimation_time", "covariance_time"))
+#' check_threads(mods, .wait = TRUE, .time_limit = 300)
+#' check_threads(mods, .wait = TRUE, .return_times = c("estimation_time", "covariance_time"))
 #'
 #' If models have already finished:
-#' check_threads(mods, wait = FALSE)
-#' check_threads(mods, wait = FALSE, return_times = "All")
+#' check_threads(mods, .wait = FALSE)
+#' check_threads(mods, .wait = FALSE, .return_times = "All")
 #' }
 #' @return A tibble with columns `threads` (number of threads) and `time`
 #'   (elapsed estimation time in seconds for test models).
@@ -131,16 +132,26 @@ check_threads <- function(
     assert_true(all(.return_times %in% c("estimation_time", "covariance_time", "cpu_time")))
   }
 
+  if(!inherits(.mods, "bbi_nonmem_model")){
+    check_model_object_list(.mods)
+  }else{
+    check_model_object(.mods)
+    .mods <- list(.mods)
+  }
+
+
   tryCatch({
     if(.wait) wait_for_nonmem(.mods, ...)
 
     map_dfr(.mods, ~ {
       s <- model_summary(.x)
       threads <- as.numeric(.x$bbi_args$threads)
-      tibble::tibble(threads = threads,
-                     estimation_time = s$run_details$estimation_time,
-                     covariance_time = s$run_details$covariance_time,
-                     cpu_time = s$run_details$cpu_time) %>%
+      tibble::tibble(
+        `model name` = basename(.x$absolute_model_path),
+        threads = threads,
+        estimation_time = s$run_details$estimation_time,
+        covariance_time = s$run_details$covariance_time,
+        cpu_time = s$run_details$cpu_time) %>%
         select(threads, all_of(.return_times))
     })
   }, error = function(cond){

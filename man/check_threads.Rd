@@ -7,7 +7,7 @@
 check_threads(.mods, .return_times = "estimation_time", .wait = TRUE, ...)
 }
 \arguments{
-\item{.mods}{list of bbi model objects created by \code{test_threads()}.}
+\item{.mods}{a bbi model object or list of model objects. Generally created by \code{test_threads()}.}
 
 \item{.return_times}{character vector denoting which times from \code{model_summary()} you want to return.
 See details for more information.}
@@ -25,18 +25,18 @@ Check estimation time for models run with various threads values
 }
 \details{
 \code{.return_times} can be any subset of \code{c("estimation_time", "covariance_time", "cpu_time")}.
-Users can also specify \code{all}, which is the shorthand method for selecting all 3 of those columns
+Users can also specify \code{all}, which is the shorthand method for selecting all 3 of those columns.
 }
 \examples{
 \dontrun{
-mods <- test_threads(mod, threads = c(2, 4))
+mods <- test_threads(mod, .threads = c(2, 4))
 
 If models have not finished:
-check_threads(mods, wait = TRUE, time_limit = 300)
-check_threads(mods, wait = TRUE, return_times = c("estimation_time", "covariance_time"))
+check_threads(mods, .wait = TRUE, .time_limit = 300)
+check_threads(mods, .wait = TRUE, .return_times = c("estimation_time", "covariance_time"))
 
 If models have already finished:
-check_threads(mods, wait = FALSE)
-check_threads(mods, wait = FALSE, return_times = "All")
+check_threads(mods, .wait = FALSE)
+check_threads(mods, .wait = FALSE, .return_times = "All")
 }
 }
