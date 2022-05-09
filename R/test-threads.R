@@ -65,7 +65,7 @@ test_threads <- function(
     str_line_loc <- which(grepl(search_str, mod_lines))
 
     if(is_empty(str_line_loc)){
-      cleanup_mods(.mods = .mods) %>% suppressMessages()
+      cleanup_mods(.mods = .mods, .force = TRUE) %>% suppressMessages()
       stop("Neither MAXEVAL or NITER were found in the ctl file. Please ensure one is provided.")
     }
 
@@ -73,7 +73,7 @@ test_threads <- function(
     str_loc <- grepl(search_str, str_values)
 
     if(length(str_loc[str_loc]) > 1){
-      cleanup_mods(.mods = .mods) %>% suppressMessages()
+      cleanup_mods(.mods = .mods, .force = TRUE) %>% suppressMessages()
       stop("Both MAXEVAL and NITER were found in the ctl file. Please ensure only one is provided.")
     }
 
@@ -173,6 +173,7 @@ check_run_times <- function(
 #'
 #' @importFrom checkmate check_character
 #' @importFrom tidyr crossing
+#' @importFrom dplyr arrange
 #'
 #' @export
 cleanup_mods <- function(.mods, .tags = "test threads", .force = FALSE){
@@ -199,7 +200,9 @@ cleanup_mods <- function(.mods, .tags = "test threads", .force = FALSE){
   tag_groups <- if(is.null(.tags)){
     crossing(mod_tags = mod_info$mod_tags, .tags = "NA", found = TRUE) %>% left_join(mod_info, by = "mod_tags")
   }else{
-    tag_groups <- crossing(mod_tags = mod_info$mod_tags, .tags) %>% left_join(mod_info, by = "mod_tags")
+    tag_levels <- unique(.tags) # message in order of tags
+    tag_groups <- crossing(mod_tags = mod_info$mod_tags, .tags) %>% left_join(mod_info, by = "mod_tags") %>%
+      mutate(.tags = ordered(.tags, levels = tag_levels)) %>% arrange(.tags)
     found <- map2(tag_groups$mod_tags, tag_groups$.tags, function(tag.x, .tag){
       grepl(.tag, tag.x)
     }) %>% unlist()
@@ -207,8 +210,17 @@ cleanup_mods <- function(.mods, .tags = "test threads", .force = FALSE){
     tag_groups$found <- found
 
     if(any(tag_groups$found==FALSE)){
-      message("The following tags were not found:\n",
-              paste("-",unique(unlist(tag_groups[found==FALSE,".tags"])),"\n"))
+      not_found <- c()
+      for(tag.x in .tags){
+        tag.found <- tag_groups$found[tag_groups$.tags==tag.x]
+        if(all(tag.found==FALSE)){
+          not_found <- c(not_found, tag.x)
+        }
+      }
+      if(length(not_found) > 0){
+        message("The following tags were not found:\n",
+                paste("-",unique(not_found),"\n"))
+      }
     }
     tag_groups[found,]
   }
