@@ -173,16 +173,17 @@ test_that("summary_log() works with filtering parameter string [BBR-SMLG-011]",
           {
             setup_this_test <- function() {
               create_rlg_models()
+              .m <- copy_model_from(MOD1, "Child")
+              .m1 <- copy_model_from(MOD1, "Parent")
               purrr::walk(
                 c("2", "3", "Child", "Parent"),
                 ~system("cp -r {MODEL_DIR}/1/  {MODEL_DIR}/{.x}/" %>% glue())
               )
-            }
-
+              }
 
 
           clean_test_enviroment(setup_this_test)
-          #lapply(c("2", "3", "Child", "Parent"), create_directories)
+
 
           log_df <- list(df = summary_log(MODEL_DIR), length = summary_log(MODEL_DIR) %>% nrow())
 
