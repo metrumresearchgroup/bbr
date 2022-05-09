@@ -174,6 +174,7 @@ check_run_times <- function(
 #' @importFrom checkmate check_character
 #' @importFrom tidyr crossing
 #' @importFrom dplyr arrange
+#' @importFrom utils askYesNo
 #'
 #' @export
 cleanup_mods <- function(.mods, .tags = "test threads", .force = FALSE){
