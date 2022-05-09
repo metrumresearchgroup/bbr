@@ -221,16 +221,16 @@ test_that("config_log() works with filtering parameter numeric [BBR-CGLG-014]",
           {
             setup_this_test <- function() {
               create_rlg_models()
+              purrr::walk(
+                c(2, 3),
+                ~system("cp -r {MODEL_DIR}/1/  {MODEL_DIR}/{.x}/" %>% glue())
+              )
             }
 
-            create_directories <- function(.file)
-            {
-              fs::dir_create('{MODEL_DIR}/.file' %>% glue())
-              system("cp -r {MODEL_DIR}/1/  {MODEL_DIR}/{.file}/" %>% glue())
-            }
+
 
             clean_test_enviroment(setup_this_test)
-            lapply(c("2", "3"), create_directories)
+
 
             log_df <- list(df = config_log(MODEL_DIR), length = config_log(MODEL_DIR) %>% nrow())
             expect_equal(config_log(MODEL_DIR, .filter = 1:(log_df$length - 1) ) %>% nrow(), 1)
@@ -244,16 +244,16 @@ test_that("config_log() works with filtering parameter string [BBR-CGLG-014]",
               create_rlg_models()
               .m <- copy_model_from(MOD1, "Child")
               .m1 <- copy_model_from(MOD1, "Parent")
+              purrr::walk(
+                c("2", "3", "Child", "Parent"),
+                ~system("cp -r {MODEL_DIR}/1/  {MODEL_DIR}/{.x}/" %>% glue())
+              )
+
             }
 
-            create_directories <- function(.file)
-            {
-              fs::dir_create('{MODEL_DIR}/.file' %>% glue())
-              system("cp -r {MODEL_DIR}/1/  {MODEL_DIR}/{.file}/" %>% glue())
-            }
 
             clean_test_enviroment(setup_this_test)
-            lapply(c("2", "3", "Child", "Parent"), create_directories)
+
 
             log_df <- list(df = run_log(MODEL_DIR), length = config_log(MODEL_DIR) %>% nrow())
             expect_equal(config_log(MODEL_DIR, .filter = c(1:2, "Child")) %>% nrow() ,2)
