@@ -248,7 +248,7 @@ test_that("config_log() works with filtering parameter string [BBR-CGLG-014]",
 
             create_directories <- function(.file)
             {
-              dir.create('{MODEL_DIR}/.file' %>% glue()) %>% expect_warning()
+              dir.create('{MODEL_DIR}/.file' %>% glue())
               system("cp -r {MODEL_DIR}/1/  {MODEL_DIR}/{.file}/" %>% glue())
             }
 
