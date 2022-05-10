@@ -66,7 +66,6 @@ find_models <- function(.base_dir, .recurse) {
     not_mod <- yaml_files[which(null_idx)]
     warning(glue("Found {length(not_mod)} YAML files that do not contain required keys for a model YAML. Ignoring the following files: `{paste(not_mod, collapse='`, `')}`"))
   }
-
   # warn if no valid model YAML found
   if (length(mod_list) == 0) {
     warning(glue("Found no valid model YAML files in {.base_dir}"))
@@ -151,10 +150,14 @@ run_log_entry <- function(.mod) {
     !!YAML_BBI_ARGS     := .mod[[YAML_BBI_ARGS]] %>% list(),
     !!YAML_BASED_ON     := .mod[[YAML_BASED_ON]] %>% list(),
     !!YAML_TAGS         := .mod[[YAML_TAGS]] %>% list(),
-    !!YAML_NOTES        := .mod[[YAML_NOTES]] %>% list()
+    !!YAML_NOTES        := .mod[[YAML_NOTES]] %>% list(),
+    !!YAML_STAR        := .mod[[YAML_STAR]] %>% list(),
   )
 
   entry_df <- add_run_id_col(entry_df)
+
+  print(entry_df)
+  print(entry_df %>% class())
 
   # check that it is only one row
   if (nrow(entry_df) != 1) {

@@ -41,6 +41,7 @@ new_model <- function(
   .tags = NULL,
   .bbi_args = NULL,
   .overwrite = FALSE,
+  .starred = FALSE,
   .model_type = c("nonmem")
 ) {
 
@@ -68,7 +69,7 @@ new_model <- function(
   if (!is.null(.tags))        .mod <- replace_all_tags(.mod, .tags)
   if (!is.null(.bbi_args))    .mod <- replace_all_bbi_args(.mod, .bbi_args)
   if (!is.null(.based_on))    .mod <- replace_all_based_on(.mod, .based_on)
-
+  if (!is.null(.starred))     .mod <- replace_star(.mod, .starred)
   return(.mod)
 }
 

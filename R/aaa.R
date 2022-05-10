@@ -63,6 +63,7 @@ YAML_TAGS <- "tags"
 YAML_NOTES <- "notes"
 YAML_BBI_ARGS <- "bbi_args"
 YAML_MOD_TYPE <- "model_type"
+YAML_STAR <- 'starred'
 
 YAML_REQ_INPUT_KEYS <- c(
   YAML_MOD_TYPE
@@ -94,7 +95,8 @@ RUN_LOG_REQ_COLS <- c(
   YAML_BBI_ARGS,
   YAML_BASED_ON,
   YAML_TAGS,
-  YAML_NOTES
+  YAML_NOTES,
+  YAML_STAR
 )
 
 
@@ -108,7 +110,8 @@ YAML_ERASE_OUT_KEYS <- c(
 YAML_SCALAR_TO_LIST_KEYS <- c(
   YAML_BASED_ON,
   YAML_TAGS,
-  YAML_NOTES
+  YAML_NOTES,
+  YAML_STAR
 )
 
 

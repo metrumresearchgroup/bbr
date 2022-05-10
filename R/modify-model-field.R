@@ -182,6 +182,76 @@ remove_tags <- function(.mod, .tags) {
 }
 
 
+
+#' @name add_star
+#' @title Star a model
+#'
+#' @description Add or remove star on a model object and corresponding YAML.
+#' Tags can be modified at any time (i.e. before _or_ after a model is submitted).
+#'
+#' @details
+#' The `starred` fields on a `bbi_{.model_type}_model` object contains a boolean variable if model is starred
+#'
+#'
+
+#' @return The modified `bbi_{.model_type}_model` object
+#'
+#' @seealso [run_log()] [collapse_to_string()] [modify_notes()] [modify_based_on()] [modify_description()] [modify_bbi_args()]
+NULL
+
+#' @describeIn modify_starred Add star to a model object and corresponding YAML.
+#' @inheritParams modify_model_field
+#' @param .starred boolean variable to indicate significance
+#' @export
+add_star <- function(.mod, .starred) {
+
+  if(stringr::str_detect(.starred, "al") || stringr::str_detect(.starred, "AL") || stringr::str_detect(.starred, "no")
+     || stringr::str_detect(.starred, "NO"))
+  {
+    .starred <- ""
+  }
+
+  if(.starred %>% is.na() == F)
+  {
+    .starred <- "*"
+  }
+
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_STAR,
+    .value = .starred,
+    .append = TRUE,
+    .char_value = FALSE
+  )
+}
+
+
+
+#' @describeIn  Replaces all starred status on a model object and corresponding YAML with new tags.
+#' @export
+replace_star <- function(.mod, .starred) {
+
+  if(stringr::str_detect(.starred, "al") || stringr::str_detect(.starred, "AL") || stringr::str_detect(.starred, "no")
+     || stringr::str_detect(.starred, "NO"))
+  {
+    .starred <- ""
+  }
+
+  else(.starred %>% is.na() == F)
+  {
+    .starred <- "*"
+  }
+
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_STAR,
+    .value = .starred,
+    .append = FALSE,
+    .char_value = TRUE
+  )
+}
+
+
 #' @name modify_notes
 #' @title Modify notes on a model object
 #'
