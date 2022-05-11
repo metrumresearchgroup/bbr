@@ -5,7 +5,7 @@
 \alias{add_summary}
 \title{Create a tibble from \code{model_summaries()} data}
 \usage{
-summary_log(.base_dir, .recurse = TRUE, .filter = 0:0, ...)
+summary_log(.base_dir, .recurse = TRUE, .exclude = vector(), ...)
 
 add_summary(.log_df, ...)
 }
@@ -14,7 +14,7 @@ add_summary(.log_df, ...)
 
 \item{.recurse}{If \code{TRUE}, the default, search recursively in all subdirectories. Passed through to \code{fs::dir_ls()} -- If a positive number, the number of levels to recurse.}
 
-\item{.filter}{Provides filter for runs based on an input vector}
+\item{.exclude}{Provides filter for runs based on an input vector.}
 
 \item{...}{Arguments passed through to \code{\link[=model_summaries]{model_summaries()}}}
 
