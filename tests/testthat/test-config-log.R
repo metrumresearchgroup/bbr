@@ -245,8 +245,8 @@ test_that("config_log() works with filtering parameter string [BBR-CGLG-014]",
           {
             setup_this_test <- function() {
               create_rlg_models()
-              .m <- copy_model_from(MOD1, "Child")
-              .m1 <- copy_model_from(MOD1, "Parent")
+              copy_model_from(MOD1, "Child")
+              copy_model_from(MOD1, "Parent")
               purrr::walk(
                 c("2", "3", "Child", "Parent"),
                 ~system("cp -r {MODEL_DIR}/1/  {MODEL_DIR}/{.x}/" %>% glue())

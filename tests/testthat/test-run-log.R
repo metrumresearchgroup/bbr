@@ -104,8 +104,8 @@ test_that("run_log() works with filtering parameter string [BBR-RNLG-005]",
 {
             setup_this_test <- function() {
               create_rlg_models()
-              .m <- copy_model_from(MOD1, "Child")
-              .m1 <- copy_model_from(MOD1, "Parent")
+              copy_model_from(MOD1, "Child")
+              copy_model_from(MOD1, "Parent")
             }
 
             clean_test_enviroment(setup_this_test)

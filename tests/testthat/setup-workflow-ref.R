@@ -203,7 +203,7 @@ clean_test_enviroment <- function(.f, env = parent.frame())
 
 
 
-cleanup <- function() {
+cleanup <- function(env = parent.frame()) {
   # delete tmp files if they are leftover from previous test
   mods_to_kill <- purrr::map_chr(c(seq(2,7), "Parent", "Child"), ~ file.path(MODEL_DIR, .x))
   for (m in mods_to_kill) {
