@@ -42,10 +42,10 @@
 #' @seealso [run_log()], [summary_log()]
 #' @inheritParams run_log
 #' @export
-config_log <- function(.base_dir, .recurse = TRUE, .filter = 0:0) {
+config_log <- function(.base_dir, .recurse = TRUE, .exclude = vector()) {
   checkmate::assert_string(.base_dir)
 
-  mod_list <- find_models(.base_dir, .recurse, .filter)
+  mod_list <- find_models(.base_dir, .recurse, .exclude)
 
   df <- config_log_impl(mod_list)
   return(df)
