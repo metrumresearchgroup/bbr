@@ -50,7 +50,8 @@ find_models <- function(.base_dir, .recurse , .exclude = vector()) {
 
   # get yaml files
   yaml_files <- dir_ls(.base_dir, recurse = .recurse)
-  yaml_files <- subset(yaml_files, !(yaml_files %>% basename() %>% stringr::str_remove(".yaml") %in% {{.exclude}}))
+  #yaml_files <- subset(yaml_files, !(yaml_files %>% basename() %>% stringr::str_remove(".yaml|.yml") %in% {{.exclude}}))
+  yaml_files <- purrr::discard(yaml_files, (yaml_files %>% basename() %>% stringr::str_remove(".yaml|.yml") %in% .exclude))
   yaml_files <- str_subset(yaml_files, "\\.ya?ml$")
   yaml_files <- str_subset(yaml_files, "bbi\\.ya?ml$", negate = TRUE)
 
