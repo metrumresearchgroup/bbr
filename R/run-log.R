@@ -46,14 +46,13 @@ run_log <- function(.base_dir, .recurse = TRUE, .exclude = vector()) {
 #' @importFrom purrr map_lgl map compact
 #' @importFrom fs dir_ls
 #' @keywords internal
-find_models <- function(.base_dir, .recurse , .exclude = vector()) {
+find_models <- function(.base_dir, .recurse , .exclude = NULL) {
 
   # get yaml files
   yaml_files <- dir_ls(.base_dir, recurse = .recurse)
-  yaml_files <- purrr::discard(yaml_files, (yaml_files %>% basename() %>% stringr::str_remove(".yaml|.yml") %in% .exclude))
   yaml_files <- str_subset(yaml_files, "\\.ya?ml$")
   yaml_files <- str_subset(yaml_files, "bbi\\.ya?ml$", negate = TRUE)
-
+  yaml_files <- purrr::discard(yaml_files, (yaml_files %>% basename()  %>% stringr::str_remove(".yaml|.yml") %in% .exclude))
 
   if(length(yaml_files) == 0)
   {
