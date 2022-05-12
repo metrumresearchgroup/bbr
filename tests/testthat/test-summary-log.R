@@ -176,8 +176,8 @@ test_that("summary_log() works with filtering parameter string [BBR-SMLG-011]",
               copy_model_from(MOD1, "Child")
               copy_model_from(MOD1, "Parent")
               purrr::walk(
-                c("2", "3", "Child", "Parent"),
-                ~system("cp -r {MODEL_DIR}/1/  {MODEL_DIR}/{.x}/" %>% glue())
+                c(2, 3, "Child", "Parent"),
+                ~fs::dir_copy("{MODEL_DIR}/1/" %>% glue(), "{MODEL_DIR}/{.x}/" %>% glue())
               )
               }
 

@@ -110,9 +110,9 @@ test_that("run_log() works with filtering parameter string [BBR-RNLG-005]",
 
             clean_test_enviroment(setup_this_test)
             log_df <- list(df = run_log(MODEL_DIR), length = run_log(MODEL_DIR) %>% nrow())
-            expect_equal(run_log(MODEL_DIR, .exclude = c(1:2, "Child")) %>% nrow() ,2)
-            expect_equal(run_log(MODEL_DIR, .exclude = c(2:1, "Child")) %>% nrow() ,2)
-            expect_equal(run_log(MODEL_DIR, .exclude = c("Child", 1, 2, 3)) %>% nrow() ,1)
-            expect_equal(run_log(MODEL_DIR, .exclude = c(1:2, "Parent")) %>% nrow() ,2)
+            expect_equal(run_log(MODEL_DIR, .exclude = c(1:2, "Child")) %>% nrow(), 2)
+            expect_equal(run_log(MODEL_DIR, .exclude = c(2:1, "Child")) %>% nrow(), 2)
+            expect_equal(run_log(MODEL_DIR, .exclude = c("Child", 1, 2, 3)) %>% nrow(), 1)
+            expect_equal(run_log(MODEL_DIR, .exclude = c(1:2, "Parent")) %>% nrow(), 2)
 })
 
