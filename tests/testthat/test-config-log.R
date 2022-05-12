@@ -260,10 +260,10 @@ test_that("config_log() works with filtering parameter string [BBR-CGLG-014]",
 
 
             log_df <- list(df = run_log(MODEL_DIR), length = config_log(MODEL_DIR) %>% nrow())
-            expect_equal(config_log(MODEL_DIR, .exclude  = c(1:2, "Child")) %>% nrow() ,2)
-            expect_equal(config_log(MODEL_DIR, .exclude = c(2:1, "Child")) %>% nrow() ,2)
-            expect_equal(config_log(MODEL_DIR, .exclude = c("Child", 1, 2, 3)) %>% nrow() ,1)
-            expect_equal(config_log(MODEL_DIR, .exclude =  c(1:2, "Parent")) %>% nrow() ,2)
+            expect_equal(config_log(MODEL_DIR, .exclude  = c(1:2, "Child")) %>% nrow(), 2)
+            expect_equal(config_log(MODEL_DIR, .exclude = c(2:1, "Child")) %>% nrow(), 2)
+            expect_equal(config_log(MODEL_DIR, .exclude = c("Child", 1, 2, 3)) %>% nrow(), 1)
+            expect_equal(config_log(MODEL_DIR, .exclude =  c(1:2, "Parent")) %>% nrow(), 2)
 
             dir_delete(file.path("{MODEL_DIR}" %>% glue(), "Parent"))
             dir_delete(file.path("{MODEL_DIR}" %>% glue(), "Child"))

@@ -187,10 +187,10 @@ test_that("summary_log() works with filtering parameter string [BBR-SMLG-011]",
 
           log_df <- list(df = summary_log(MODEL_DIR), length = summary_log(MODEL_DIR) %>% nrow())
 
-          expect_equal(summary_log(MODEL_DIR, .exclude = c(1:2, "Child")) %>% nrow(),2)
-          expect_equal(summary_log(MODEL_DIR, .exclude = c(2:1, "Child")) %>% nrow() ,2)
-          expect_equal(summary_log(MODEL_DIR, .exclude = c("Child", 1, 2, 3)) %>% nrow() ,1)
-          expect_equal(summary_log(MODEL_DIR, .exclude = c(1:2, "Parent")) %>% nrow() ,2)
+          expect_equal(summary_log(MODEL_DIR, .exclude = c(1:2, "Child")) %>% nrow(), 2)
+          expect_equal(summary_log(MODEL_DIR, .exclude = c(2:1, "Child")) %>% nrow(), 2)
+          expect_equal(summary_log(MODEL_DIR, .exclude = c("Child", 1, 2, 3)) %>% nrow(), 1)
+          expect_equal(summary_log(MODEL_DIR, .exclude = c(1:2, "Parent")) %>% nrow(), 2)
 
           dir_delete(file.path("{MODEL_DIR}" %>% glue(), "Parent"))
           dir_delete(file.path("{MODEL_DIR}" %>% glue(), "Child"))
