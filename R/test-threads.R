@@ -2,14 +2,27 @@
 #'
 #' @param .mod bbi_model object to copy/test.
 #' @param .threads Integer vector of threads values to test.
-#' @param .mode Passed through to bbr::submit_models(.mode).
 #' @param .bbi_args a named list.
 #' @param .max_eval Max number of iterations for NONMEM to run.
 #'         Will update `MAXITER` or `NITER` (whichever is specified) in generated models.
+#'         The best number for this is model-dependent. Typically, something between 10 and
+#'         100 is good, depending on how long each iteration takes. You want something that
+#'         will run for 3-5 minutes total.
 #' @param ... args passed through to submit_models()
 #'
 #' @importFrom checkmate assert_list
 #' @importFrom rlang is_empty
+#'
+#' @details
+#' Unfortunately, there is no easy way to know how many threads are ideal for a given NONMEM model.
+#' It is dependent on many factors, including model complexity and the structure of the input data.
+#' Typically, the best way to find the ideal number of threads for a given model is to test it empirically.
+#' This function is intended to help the user do this.
+#'
+#' The function will create copies of your model, cap the number of evaluation iterations, and then
+#' run these copies with the specified number of threads. The [check_run_times()] helper can then
+#' be used to easily see how long each test model ran for, giving you a good sense of what the ideal
+#' number of threads might be.
 #'
 #' @examples
 #' \dontrun{
@@ -24,14 +37,14 @@
 #' check_run_times(mods, .wait = TRUE, .time_limit = 100)
 #' check_run_times(mods, .wait = FALSE, .return_times = "all")
 #'
-#' cleanup_mods(.mods = mods)
+#' delete_models(.mods = mods)
 #'
 #'
 #' # Dry Run:
 #' mods <- test_threads(.mod = mod, .threads = c(2, 4), .max_eval = 10,
 #'                      .mode = "local", .dry_run = TRUE)
 #'
-#' cleanup_mods(.mods = mods)
+#' delete_models(.mods = mods)
 #' }
 #'
 #' @return A list of the model objects for the submitted models.
@@ -40,7 +53,6 @@
 test_threads <- function(
   .mod,
   .threads = c(2,4),
-  .mode = getOption("bbr.bbi_exe_mode"),
   .bbi_args = list(),
   .max_eval = 10,
   ...
@@ -65,7 +77,7 @@ test_threads <- function(
     str_line_loc <- which(grepl(search_str, mod_lines))
 
     if(is_empty(str_line_loc)){
-      cleanup_mods(.mods = .mods, .force = TRUE) %>% suppressMessages()
+      delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
       stop("Neither MAXEVAL or NITER were found in the ctl file. Please ensure one is provided.")
     }
 
@@ -73,7 +85,7 @@ test_threads <- function(
     str_loc <- grepl(search_str, str_values)
 
     if(length(str_loc[str_loc]) > 1){
-      cleanup_mods(.mods = .mods, .force = TRUE) %>% suppressMessages()
+      delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
       stop("Both MAXEVAL and NITER were found in the ctl file. Please ensure only one is provided.")
     }
 
@@ -83,7 +95,7 @@ test_threads <- function(
     writeLines(mod_lines, mod_path)
   })
 
-  submit_models(.mods, .mode = .mode, .wait = FALSE, ... = ...)
+  submit_models(.mods, .wait = FALSE, ...)
 
   .mods
 }
@@ -132,12 +144,10 @@ check_run_times <- function(
     assert_true(all(.return_times %in% c("estimation_time", "covariance_time", "cpu_time")))
   }
 
-  if(!inherits(.mods, "bbi_nonmem_model")){
-    check_model_object_list(.mods)
-  }else{
-    check_model_object(.mods)
+  if (inherits(.mods, "bbi_model")) {
     .mods <- list(.mods)
   }
+  check_model_object_list(.mods, .mod_types = c(NM_MOD_CLASS, NM_SUM_CLASS))
 
 
   tryCatch({
@@ -171,21 +181,20 @@ check_run_times <- function(
 #'              If set to `NULL`, no filtering will be performed and all associated model files will be deleted.
 #' @param .force logical (T/F). If `TRUE`, do not prompt the user if they want to delete the models.
 #'
-#' @importFrom checkmate check_character
+#' @importFrom checkmate check_character assert_logical
 #' @importFrom tidyr crossing
 #' @importFrom dplyr arrange
 #' @importFrom utils askYesNo
 #'
 #' @export
-cleanup_mods <- function(.mods, .tags = "test threads", .force = FALSE){
+delete_models <- function(.mods, .tags = "test threads", .force = FALSE){
   if(!is.null(.tags)) check_character(.tags)
 
-  if(!inherits(.mods, "bbi_nonmem_model")){
-    check_model_object_list(.mods)
-  }else{
-    check_model_object(.mods)
+  if (inherits(.mods, "bbi_model")) {
     .mods <- list(.mods)
   }
+  check_model_object_list(.mods, .mod_types = c(NM_MOD_CLASS, NM_SUM_CLASS))
+  assert_logical(.force, len = 1)
 
   mod_info <- map_dfr(.mods, function(mod.x){
     mod_tags <- mod.x$tags
@@ -234,34 +243,27 @@ cleanup_mods <- function(.mods, .tags = "test threads", .force = FALSE){
 
   mods_removed <- unique(tag_groups$mod_tags)
 
-  msg_remove <- paste0(
-    paste("Removed", length(mod_paths), "models with the following tags:\n"),
-    paste("-",mods_removed, collapse = "\n")
-  )
-
-  if(.force){
-    for (m in mod_paths) {
-      if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
-      if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
-      if (fs::dir_exists(m)) fs::dir_delete(m)
-    }
-    message(msg_remove)
-  }else{
+  if (!isTRUE(.force)) {
     msg_prompt <- paste0(
       paste("Are you sure you want to remove", length(mod_paths), "models with the following tags?: "),
       paste0("`",mods_removed,"`", collapse = ", ")
     )
     delete_prompt <- askYesNo(msg_prompt)
-    if(delete_prompt){
-      for (m in mod_paths) {
-        if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
-        if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
-        if (fs::dir_exists(m)) fs::dir_delete(m)
-      }
-      message(msg_remove)
-    }
-
+    if (!isTRUE(delete_prompt)) return(invisible(NULL))
   }
+
+  msg_remove <- paste0(
+    paste("Removed", length(mod_paths), "models with the following tags:\n"),
+    paste("-",mods_removed, collapse = "\n")
+  )
+
+  for (m in mod_paths) {
+    if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
+    if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
+    if (fs::dir_exists(m)) fs::dir_delete(m)
+  }
+  message(msg_remove)
+
 }
 
 

@@ -209,43 +209,36 @@ withr::with_options(list(
 
   test_that("check_run_times() works with one model [BBR-CRT-001]", {
     run_times <- check_run_times(mod1, .wait = FALSE)
-    expect_output(str(run_times), "tibble [1 × 3]", fixed = TRUE)
-    expect_output(str(run_times), " $ model_run", fixed = TRUE)
-    expect_output(str(run_times), " $ threads", fixed = TRUE)
-    expect_output(str(run_times), " $ estimation_time", fixed = TRUE)
+    expected_cols <- c("model_run", "threads", "estimation_time")
+    expect_true(all(res_cols %in% names(run_times)))
+    expect_equal(dim(run_times), c(1, 3))
   })
 
   test_that("check_run_times() works with multiple models [BBR-CRT-002]", {
     run_times <- check_run_times(list(mod1, mod2, mod3), .wait = FALSE)
-    expect_output(str(run_times), "tibble [3 × 3]", fixed = TRUE)
-    expect_output(str(run_times), " $ model_run", fixed = TRUE)
-    expect_output(str(run_times), " $ threads", fixed = TRUE)
-    expect_output(str(run_times), " $ estimation_time", fixed = TRUE)
+    expected_cols <- c("model_run", "threads", "estimation_time")
+    expect_true(all(res_cols %in% names(run_times)))
+    expect_equal(dim(run_times), c(3, 3))
   })
 
   test_that("check_run_times() .return_times arg [BBR-CRT-003]", {
     run_times <- check_run_times(mod1, .wait = FALSE, .return_times = "all")
-    expect_output(str(run_times), "tibble [1 × 5]", fixed = TRUE)
-    expect_output(str(run_times), " $ model_run", fixed = TRUE)
-    expect_output(str(run_times), " $ threads", fixed = TRUE)
-    expect_output(str(run_times), " $ estimation_time", fixed = TRUE)
-    expect_output(str(run_times), " $ covariance_time", fixed = TRUE)
-    expect_output(str(run_times), " $ cpu_time", fixed = TRUE)
+    expected_cols <- c("model_run", "threads", "estimation_time", "covariance_time", "cpu_time")
+    expect_true(all(res_cols %in% names(run_times)))
+    expect_equal(dim(run_times), c(1, 5))
 
     run_times <- check_run_times(list(mod1, mod2), .wait = FALSE,
                                  .return_times = c("estimation_time", "covariance_time"))
-    expect_output(str(run_times), "tibble [2 × 4]", fixed = TRUE)
-    expect_output(str(run_times), " $ model_run", fixed = TRUE)
-    expect_output(str(run_times), " $ threads", fixed = TRUE)
-    expect_output(str(run_times), " $ estimation_time", fixed = TRUE)
-    expect_output(str(run_times), " $ covariance_time", fixed = TRUE)
+    expected_cols <- c("model_run", "threads", "estimation_time", "covariance_time")
+    expect_true(all(res_cols %in% names(run_times)))
+    expect_equal(dim(run_times), c(2, 4))
   })
 
   test_that("check_run_times() waits for models to complete [BBR-CRT-004]", {
     mod_threads <- test_threads(mod1, .threads = c(2, 4), .max_eval = 100, .mode = "local")
     run_times <- check_run_times(mod_threads, .wait = TRUE, .time_limit = 100)
     # This will error if .wait didnt work
-    expect_output(str(run_times), "tibble [2 × 3]", fixed = TRUE)
+    expect_equal(dim(run_times), c(2, 3))
   })
 
 }) # closing withr::with_options

@@ -211,7 +211,7 @@ MGMT-S015:
   - BBR-CMH-005
   - BBR-CMH-006
 MGMT-S016:
-  name: cleanup model files
+  name: Cleanup model files
   description: As a user, I want to be able to easily delete all model files associated
     the identified model objects.
   ProductRisk: Medium

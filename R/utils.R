@@ -568,7 +568,7 @@ wait_for_nonmem.bbi_nonmem_model <- function(.mod, .time_limit = 300, .interval 
 wait_for_nonmem.list <- function(.mod, .time_limit = 300, .interval = 5) {
 
   assert_list(.mod)
-  check_model_object_list(.mod)
+  check_model_object_list(.mod, .mod_types = NM_MOD_CLASS)
   verbose_msg(glue("Waiting for {length(.mod)} model(s) to finish..."))
 
   Sys.sleep(1) # wait for lst file to be created

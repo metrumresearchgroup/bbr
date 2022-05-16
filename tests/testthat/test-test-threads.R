@@ -116,7 +116,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_equal(check_run_times(mod1, .wait = F), NA)
   })
 
-  test_that("cleanup_mods() works for models created by test_threads by default [BBR-CLM-001]", {
+  test_that("delete_models() works for models created by test_threads by default [BBR-CLM-001]", {
 
     mod_ctls <- lapply(mods, function(mod.x){get_model_path(mod.x)}) %>% unlist()
     mod_yamls <- lapply(mods, function(mod.x){mod.x$absolute_model_path}) %>% yaml_ext()
@@ -126,17 +126,14 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       paste("-","test threads", collapse = "\n")
     )
     expect_message(
-      cleanup_mods(mods, .force = T),
+      delete_models(mods, .force = T),
       msg_remove
     )
-
-    for(i in 1:length(mod_ctls)){
-      expect_false(fs::file_exists(mod_ctls[i]))
-      expect_false(fs::file_exists(mod_yamls[i]))
-    }
+    expect_false(any(fs::file_exists(mod_ctls)))
+    expect_false(any(fs::file_exists(mod_yamls)))
   })
 
-  test_that("cleanup_mods() with .tags [BBR-CLM-002]", {
+  test_that("delete_models() with .tags [BBR-CLM-002]", {
 
     fake_mod_tags <- lapply(mods_fake, function(mod.x){mod.x$tags}) %>% unlist()
     msg_remove <- paste0(
@@ -148,19 +145,17 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     mod_yamls <- lapply(mods_fake, function(mod.x){mod.x$absolute_model_path}) %>% yaml_ext()
 
     expect_message(
-      cleanup_mods(mods_fake, .tags = fake_mod_tags, .force = T),
+      delete_models(mods_fake, .tags = fake_mod_tags, .force = T),
       msg_remove
     )
 
-    for(i in 1:length(mod_ctls)){
-      expect_false(fs::file_exists(mod_ctls[i]))
-      expect_false(fs::file_exists(mod_yamls[i]))
-    }
+    expect_false(any(fs::file_exists(mod_ctls)))
+    expect_false(any(fs::file_exists(mod_yamls)))
   })
 
 
 
-  test_that("cleanup_mods() with models with multiple tags [BBR-CLM-003]", {
+  test_that("delete_models() with models with multiple tags [BBR-CLM-003]", {
     mod_two_tags <- copy_model_from(read_model(file.path(MODEL_DIR_BBI, "1")), "two_tags") %>%
       add_tags("some tag") %>% add_tags("another tag")
     mod_one_tag <- copy_model_from(read_model(file.path(MODEL_DIR_BBI, "1")), "one_tag") %>%
@@ -179,17 +174,15 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     mod_yamls <- lapply(mods, function(mod.x){mod.x$absolute_model_path}) %>% yaml_ext()
 
     expect_message(
-      cleanup_mods(mods, .tags = mod_tags, .force = T),
+      delete_models(mods, .tags = mod_tags, .force = T),
       msg_remove
     )
 
-    for(i in 1:length(mod_ctls)){
-      expect_false(fs::file_exists(mod_ctls[i]))
-      expect_false(fs::file_exists(mod_yamls[i]))
-    }
+    expect_false(any(fs::file_exists(mod_ctls)))
+    expect_false(any(fs::file_exists(mod_yamls)))
   })
 
-  test_that("cleanup_mods() with .tags=NULL [BBR-CLM-004]", {
+  test_that("delete_models() with .tags=NULL [BBR-CLM-004]", {
     mods_threads <- test_threads(mod1, .threads = c(2, 4), .max_eval = 100, .mode = "local", .dry_run = TRUE)
     mod_new <- copy_model_from(read_model(file.path(MODEL_DIR_BBI, "1")), "one_tag") %>%
       add_tags("some tag")
@@ -207,14 +200,12 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     mod_yamls <- lapply(mods, function(mod.x){mod.x$absolute_model_path}) %>% yaml_ext()
 
     expect_message(
-      cleanup_mods(mods, .tags = NULL, .force = T),
+      delete_models(mods, .tags = NULL, .force = T),
       msg_remove
     )
 
-    for(i in 1:length(mod_ctls)){
-      expect_false(fs::file_exists(mod_ctls[i]))
-      expect_false(fs::file_exists(mod_yamls[i]))
-    }
+    expect_false(any(fs::file_exists(mod_ctls)))
+    expect_false(any(fs::file_exists(mod_yamls)))
   })
 
 })
