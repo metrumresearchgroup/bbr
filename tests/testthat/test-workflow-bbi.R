@@ -184,7 +184,7 @@ withr::with_options(list(
     # create model
     mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
     submit_model(mod1, .mode = "local", .wait = FALSE)
-    wait_for_nonmem(mod1, 100, interval = 5)
+    wait_for_nonmem(mod1, 100, .interval = 5)
     expect_true(suppressMessages(nrow(nm_tab(mod1)) > 1))
   })
 
@@ -202,12 +202,13 @@ withr::with_options(list(
 
     # dont need high wait time since we know it failed
     expect_warning(
-      wait_for_nonmem(mod_fail, 2, interval = 1),
+      wait_for_nonmem(mod_fail, 2, .interval = 1),
         "Expiration was reached"
     )
   })
 
   test_that("check_run_times() works with one model [BBR-CRT-001]", {
+    mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
     run_times <- check_run_times(mod1, .wait = FALSE)
     expected_cols <- c("model_run", "threads", "estimation_time")
     expect_true(all(res_cols %in% names(run_times)))
@@ -215,19 +216,24 @@ withr::with_options(list(
   })
 
   test_that("check_run_times() works with multiple models [BBR-CRT-002]", {
-    run_times <- check_run_times(list(mod1, mod2, mod3), .wait = FALSE)
+
+    mods <- purrr::map(file.path(MODEL_DIR_BBI, 1:3), ~ read_model(.x))
+    run_times <- check_run_times(mods, .wait = FALSE)
+
     expected_cols <- c("model_run", "threads", "estimation_time")
     expect_true(all(res_cols %in% names(run_times)))
     expect_equal(dim(run_times), c(3, 3))
   })
 
   test_that("check_run_times() .return_times arg [BBR-CRT-003]", {
+    mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
     run_times <- check_run_times(mod1, .wait = FALSE, .return_times = "all")
     expected_cols <- c("model_run", "threads", "estimation_time", "covariance_time", "cpu_time")
     expect_true(all(res_cols %in% names(run_times)))
     expect_equal(dim(run_times), c(1, 5))
 
-    run_times <- check_run_times(list(mod1, mod2), .wait = FALSE,
+    mods <- purrr::map(file.path(MODEL_DIR_BBI, 1:2), ~ read_model(.x))
+    run_times <- check_run_times(mods, .wait = FALSE,
                                  .return_times = c("estimation_time", "covariance_time"))
     expected_cols <- c("model_run", "threads", "estimation_time", "covariance_time")
     expect_true(all(res_cols %in% names(run_times)))
@@ -235,6 +241,7 @@ withr::with_options(list(
   })
 
   test_that("check_run_times() waits for models to complete [BBR-CRT-004]", {
+    mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
     mod_threads <- test_threads(mod1, .threads = c(2, 4), .max_eval = 100, .mode = "local")
     run_times <- check_run_times(mod_threads, .wait = TRUE, .time_limit = 100)
     # This will error if .wait didnt work
