@@ -211,7 +211,7 @@ withr::with_options(list(
     mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
     run_times <- check_run_times(mod1, .wait = FALSE)
     expected_cols <- c("model_run", "threads", "estimation_time")
-    expect_true(all(res_cols %in% names(run_times)))
+    expect_true(all(expected_cols %in% names(run_times)))
     expect_equal(dim(run_times), c(1, 3))
   })
 
@@ -221,7 +221,7 @@ withr::with_options(list(
     run_times <- check_run_times(mods, .wait = FALSE)
 
     expected_cols <- c("model_run", "threads", "estimation_time")
-    expect_true(all(res_cols %in% names(run_times)))
+    expect_true(all(expected_cols %in% names(run_times)))
     expect_equal(dim(run_times), c(3, 3))
   })
 
@@ -229,14 +229,14 @@ withr::with_options(list(
     mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
     run_times <- check_run_times(mod1, .wait = FALSE, .return_times = "all")
     expected_cols <- c("model_run", "threads", "estimation_time", "covariance_time", "cpu_time")
-    expect_true(all(res_cols %in% names(run_times)))
+    expect_true(all(expected_cols %in% names(run_times)))
     expect_equal(dim(run_times), c(1, 5))
 
     mods <- purrr::map(file.path(MODEL_DIR_BBI, 1:2), ~ read_model(.x))
     run_times <- check_run_times(mods, .wait = FALSE,
                                  .return_times = c("estimation_time", "covariance_time"))
     expected_cols <- c("model_run", "threads", "estimation_time", "covariance_time")
-    expect_true(all(res_cols %in% names(run_times)))
+    expect_true(all(expected_cols %in% names(run_times)))
     expect_equal(dim(run_times), c(2, 4))
   })
 
