@@ -196,9 +196,9 @@ create_rlg_models <- function() {
 
 clean_test_enviroment <- function(.f, env = parent.frame())
 {
-  cleanup()
+  cleanup(env)
   .f()
-  withr::defer(cleanup(), envir = env)
+  withr::defer(cleanup(env), envir = env)
 }
 
 
