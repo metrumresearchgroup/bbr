@@ -42,12 +42,12 @@ run_log <- function(.base_dir, .recurse = TRUE, .exclude = vector()) {
 #' and attempts to read them to a model object with [safe_read_model()].
 #' @param .base_dir Directory to search for model YAML files.
 #' @param .recurse If `TRUE` search recursively in subdirectories as well.
-#' @param .exclude Provides filter for runs based on an input vector.
+#' @inheritParams run_log
 #' @importFrom stringr str_subset
 #' @importFrom purrr map_lgl map compact
 #' @importFrom fs dir_ls
 #' @keywords internal
-find_models <- function(.base_dir, .recurse , .exclude = NULL) {
+find_models <- function(.base_dir, .recurse , .exclude) {
 
   # get yaml files
   yaml_files <- dir_ls(.base_dir, recurse = .recurse)

@@ -177,7 +177,7 @@ test_that("summary_log() works with filtering parameter string [BBR-SMLG-011]",
               copy_model_from(MOD1, "Parent")
               purrr::walk(
                 c(2, 3, "Child", "Parent"),
-                ~fs::dir_copy("{MODEL_DIR}/1/" %>% glue(), "{MODEL_DIR}/{.x}/" %>% glue())
+                ~fs::dir_copy(file.path(MODEL_DIR,"1/"), file.path(MODEL_DIR,"{.x}" %>% glue()))
               )
               }
 
@@ -192,6 +192,4 @@ test_that("summary_log() works with filtering parameter string [BBR-SMLG-011]",
           expect_equal(summary_log(MODEL_DIR, .exclude = c("Child", 1, 2, 3)) %>% nrow(), 1)
           expect_equal(summary_log(MODEL_DIR, .exclude = c(1:2, "Parent")) %>% nrow(), 2)
 
-          dir_delete(file.path("{MODEL_DIR}" %>% glue(), "Parent"))
-          dir_delete(file.path("{MODEL_DIR}" %>% glue(), "Child"))
         })
