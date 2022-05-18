@@ -196,9 +196,18 @@ create_rlg_models <- function() {
 
 clean_test_enviroment <- function(.f, env = parent.frame())
 {
-  cleanup(env)
-  .f()
-  withr::defer(cleanup(env), envir = env)
+  if(missing(.f))
+  {
+    cleanup(env)
+    withr::defer(cleanup(env), envir = env)
+  }
+
+  else
+  {
+    cleanup(env)
+    .f()
+    withr::defer(cleanup(env), envir = env)
+  }
 }
 
 
@@ -219,11 +228,11 @@ cleanup <- function(env = parent.frame()) {
   if (file.path(MODEL_DIR, "Child") %>% dir_exists()) dir_delete(file.path(MODEL_DIR, "Child"))
 
   # delete model objects from memory
-  suppressSpecificWarning(rm(mod1, env = parent.frame()), .regexpr = "object.+not found")
-  suppressSpecificWarning(rm(mod2, env = parent.frame()), .regexpr = "object.+not found")
-  suppressSpecificWarning(rm(mod3, env = parent.frame()), .regexpr = "object.+not found")
-  suppressSpecificWarning(rm(mod4, env = parent.frame()), .regexpr = "object.+not found")
-  suppressSpecificWarning(rm(log_df, env = parent.frame()),.regexpr = "object.+not found")
+  suppressSpecificWarning(rm(mod1, pos = env), .regexpr = "object.+not found")
+  suppressSpecificWarning(rm(mod2, pos = env), .regexpr = "object.+not found")
+  suppressSpecificWarning(rm(mod3, pos = env), .regexpr = "object.+not found")
+  suppressSpecificWarning(rm(mod4, pos = env), .regexpr = "object.+not found")
+  suppressSpecificWarning(rm(log_df, pos = env),.regexpr = "object.+not found")
 }
 
 #' Temporarily perturb a file
