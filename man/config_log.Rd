@@ -5,7 +5,7 @@
 \alias{add_config}
 \title{Parse bbi configs to log}
 \usage{
-config_log(.base_dir, .recurse = TRUE, .exclude = vector())
+config_log(.base_dir, .recurse = TRUE, .include = NULL)
 
 add_config(.log_df)
 }
@@ -14,7 +14,7 @@ add_config(.log_df)
 
 \item{.recurse}{If \code{TRUE}, the default, search recursively in all subdirectories. Passed through to \code{fs::dir_ls()} -- If a positive number, the number of levels to recurse.}
 
-\item{.exclude}{Provides filter for runs based on an input vector.}
+\item{.include}{Provides filter for runs based on an input vector.}
 
 \item{.log_df}{A \code{bbi_run_log_df} tibble (the output of \code{\link[=run_log]{run_log()}}).}
 }

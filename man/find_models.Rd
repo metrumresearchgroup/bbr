@@ -4,14 +4,14 @@
 \alias{find_models}
 \title{Search for model YAML files and read them}
 \usage{
-find_models(.base_dir, .recurse, .exclude)
+find_models(.base_dir, .recurse, .include)
 }
 \arguments{
 \item{.base_dir}{Directory to search for model YAML files.}
 
 \item{.recurse}{If \code{TRUE} search recursively in subdirectories as well.}
 
-\item{.exclude}{Provides filter for runs based on an input vector.}
+\item{.include}{Provides filter for runs based on an input vector.}
 }
 \description{
 Private helper function that searches from a base directory for any YAML files (excluding \code{bbi.yaml})

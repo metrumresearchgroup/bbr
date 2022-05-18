@@ -54,6 +54,8 @@ find_models <- function(.base_dir, .recurse , .include) {
   yaml_files <- str_subset(yaml_files, "\\.ya?ml$")
   yaml_files <- str_subset(yaml_files, "bbi\\.ya?ml$", negate = TRUE)
 
+  #If models are not specified to be kept, it keeps all models
+  # Filters only to models specified
   if(!is.null(.include))
   {
     yaml_files <- purrr::keep(yaml_files, (yaml_files %>% basename()  %>% stringr::str_remove(".yaml|.yml") %in% .include))
