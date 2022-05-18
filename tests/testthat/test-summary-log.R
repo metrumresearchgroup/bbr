@@ -164,9 +164,9 @@ test_that("summary_log() works with filtering parameter numeric [BBR-SMLG-011]",
             copy_all_output_dirs()
             log_df <- list(df = summary_log(MODEL_DIR), length = summary_log(MODEL_DIR) %>% nrow())
 
-            expect_equal(summary_log(MODEL_DIR, .exclude = 1:(log_df$length - 1)) %>% nrow(), 1)
-            expect_equal(summary_log(MODEL_DIR, .exclude = 1:(log_df$length - 2)) %>% nrow(), 2)
-            expect_equal(summary_log(MODEL_DIR, .exclude = (log_df$length - 2):1) %>% nrow(), 2)
+            expect_equal(summary_log(MODEL_DIR, .include = 1:(log_df$length - 1)) %>% nrow(), 2)
+            expect_equal(summary_log(MODEL_DIR, .include = 1:(log_df$length - 2)) %>% nrow(), 1)
+            expect_equal(summary_log(MODEL_DIR, .include = (log_df$length - 1):1) %>% nrow(), 2)
           })
 
 test_that("summary_log() works with filtering parameter string [BBR-SMLG-011]",
@@ -187,9 +187,9 @@ test_that("summary_log() works with filtering parameter string [BBR-SMLG-011]",
 
           log_df <- list(df = summary_log(MODEL_DIR), length = summary_log(MODEL_DIR) %>% nrow())
 
-          expect_equal(summary_log(MODEL_DIR, .exclude = c(1:2, "Child")) %>% nrow(), 2)
-          expect_equal(summary_log(MODEL_DIR, .exclude = c(2:1, "Child")) %>% nrow(), 2)
-          expect_equal(summary_log(MODEL_DIR, .exclude = c("Child", 1, 2, 3)) %>% nrow(), 1)
-          expect_equal(summary_log(MODEL_DIR, .exclude = c(1:2, "Parent")) %>% nrow(), 2)
+          expect_equal(summary_log(MODEL_DIR, .include = c(1:2, "Child")) %>% nrow(), 3)
+          expect_equal(summary_log(MODEL_DIR, .include = c(2:1, "Child")) %>% nrow(), 3)
+          expect_equal(summary_log(MODEL_DIR, .include = c("Child", 1, 2, 3)) %>% nrow(), 4)
+          expect_equal(summary_log(MODEL_DIR, .include = c(1:2, "Parent")) %>% nrow(), 3)
 
         })

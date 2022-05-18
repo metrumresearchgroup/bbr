@@ -11,15 +11,15 @@
 #'
 #' @param .base_dir Base directory to look in for models.
 #' @param .recurse If `TRUE`, the default, search recursively in all subdirectories. Passed through to `fs::dir_ls()` -- If a positive number, the number of levels to recurse.
-#' @param .exclude Provides filter for runs based on an input vector.
+#' @param .include Provides filter for runs based on an input vector.
 #' @importFrom purrr map_df
 #' @importFrom tibble tibble
 #' @return A tibble of class `bbi_run_log_df` with information on each model, or an empty tibble if no models are found.
 #' @export
-run_log <- function(.base_dir, .recurse = TRUE, .exclude = vector()) {
+run_log <- function(.base_dir, .recurse = TRUE, .include = NULL) {
   checkmate::assert_string(.base_dir)
 
-  mod_list <- find_models(.base_dir, .recurse, .exclude)
+  mod_list <- find_models(.base_dir, .recurse, .include)
   if(length(mod_list) == 0) {
     return(tibble())
   }
@@ -47,13 +47,17 @@ run_log <- function(.base_dir, .recurse = TRUE, .exclude = vector()) {
 #' @importFrom purrr map_lgl map compact
 #' @importFrom fs dir_ls
 #' @keywords internal
-find_models <- function(.base_dir, .recurse , .exclude) {
+find_models <- function(.base_dir, .recurse , .include) {
 
   # get yaml files
   yaml_files <- dir_ls(.base_dir, recurse = .recurse)
   yaml_files <- str_subset(yaml_files, "\\.ya?ml$")
   yaml_files <- str_subset(yaml_files, "bbi\\.ya?ml$", negate = TRUE)
-  yaml_files <- purrr::discard(yaml_files, (yaml_files %>% basename()  %>% stringr::str_remove(".yaml|.yml") %in% .exclude))
+
+  if(!is.null(.include))
+  {
+    yaml_files <- purrr::keep(yaml_files, (yaml_files %>% basename()  %>% stringr::str_remove(".yaml|.yml") %in% .include))
+  }
 
   if(length(yaml_files) == 0)
   {
@@ -73,7 +77,6 @@ find_models <- function(.base_dir, .recurse , .exclude) {
     not_mod <- yaml_files[which(null_idx)]
     warning(glue("Found {length(not_mod)} YAML files that do not contain required keys for a model YAML. Ignoring the following files: `{paste(not_mod, collapse='`, `')}`"))
   }
-
   # warn if no valid model YAML found
   if (length(mod_list) == 0) {
     warning(glue("Found no valid model YAML files in {.base_dir}"))
