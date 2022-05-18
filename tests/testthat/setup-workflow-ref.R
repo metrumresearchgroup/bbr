@@ -194,20 +194,12 @@ create_rlg_models <- function() {
   )
 }
 
-clean_test_enviroment <- function(.f, env = parent.frame())
+clean_test_enviroment <- function(.f = NULL , env = parent.frame())
 {
-  if(missing(.f))
-  {
     cleanup(env)
+    if(!is.null(.f)) .f()
     withr::defer(cleanup(env), envir = env)
-  }
 
-  else
-  {
-    cleanup(env)
-    .f()
-    withr::defer(cleanup(env), envir = env)
-  }
 }
 
 

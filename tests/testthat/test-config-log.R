@@ -223,8 +223,8 @@ test_that("config_log() works with filtering parameter numeric [BBR-CGLG-014]",
               create_rlg_models()
 
               purrr::walk(
-               c(2, 3),
-               ~fs::dir_copy("{MODEL_DIR}/1/" %>% glue(), "{MODEL_DIR}/{.x}/" %>% glue())
+                c(2, 3, "Child", "Parent"),
+                ~fs::dir_copy(file.path(MODEL_DIR,"1"), file.path(MODEL_DIR,"{.x}" %>% glue()))
               )
 
             }
@@ -251,7 +251,7 @@ test_that("config_log() works with filtering parameter string [BBR-CGLG-014]",
               copy_model_from(MOD1, "Parent")
               purrr::walk(
                 c(2, 3, "Child", "Parent"),
-                ~fs::dir_copy(file.path(MODEL_DIR,"1/"), file.path(MODEL_DIR,"{.x}" %>% glue()))
+                ~fs::dir_copy(file.path(MODEL_DIR,"1"), file.path(MODEL_DIR,"{.x}" %>% glue()))
               )
 
             }
