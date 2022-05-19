@@ -159,12 +159,11 @@ check_run_times <- function(
     map_dfr(.mods, ~ {
       if(inherits(.x, NM_SUM_CLASS) | (inherits(.x, "list") && !inherits(.x, NM_MOD_CLASS))){
         .sum <- .x
-        # bbi_summary_list
         run_details <-
           if(inherits(.x, "bbi_nonmem_summary")){
             .sum$run_details
           }else{
-            .sum$bbi_summary$run_details
+            .sum$bbi_summary$run_details # bbi_summary_list
           }
         .mod <- read_model(.sum$absolute_model_path)
         threads <- as.numeric(.mod$bbi_args$threads)
@@ -189,7 +188,7 @@ check_run_times <- function(
   }, warning = function(cond){
     message(cond)
     message("\nConsider setting/increasing the `time_limit` in `wait_for_nonmem()`. See ?check_run_times for details")
-    return(NA)
+    return(invisible(TRUE))
   }
   )
 }
