@@ -211,3 +211,60 @@ test_that("add_config() works no json found [BBR-CGLG-013]", {
   expect_equal(nrow(log_df), 1)
   expect_true(all(c(ABS_MOD_PATH, RUN_ID_COL, YAML_TAGS) %in% names(log_df)))
 })
+
+# ##########################################
+# # Testing Additional Parameters Passed
+# ##########################################
+
+
+test_that("config_log() works with filtering parameter numeric [BBR-CGLG-014]",
+          {
+            setup_this_test <- function() {
+              create_rlg_models()
+
+              purrr::walk(
+                c(2, 3, "Child", "Parent"),
+                ~fs::dir_copy(file.path(MODEL_DIR,"1"), file.path(MODEL_DIR,"{.x}" %>% glue()))
+              )
+
+            }
+
+
+
+            clean_test_enviroment(setup_this_test)
+
+
+            log_df <- list(df = config_log(MODEL_DIR), length = config_log(MODEL_DIR) %>% nrow())
+
+
+            expect_equal(config_log(MODEL_DIR, .include  = 1:(log_df$length - 1) ) %>% nrow(), 2)
+            expect_equal(config_log(MODEL_DIR, .include = 1:(log_df$length - 1)) %>% nrow(), 2)
+            expect_equal(config_log(MODEL_DIR, .include = (log_df$length - 2):1) %>% nrow(), 1)
+
+          })
+
+test_that("config_log() works with filtering parameter string [BBR-CGLG-014]",
+          {
+            setup_this_test <- function() {
+              create_rlg_models()
+              copy_model_from(MOD1, "Child")
+              copy_model_from(MOD1, "Parent")
+              purrr::walk(
+                c(2, 3, "Child", "Parent"),
+                ~fs::dir_copy(file.path(MODEL_DIR,"1"), file.path(MODEL_DIR,"{.x}" %>% glue()))
+              )
+
+            }
+
+
+            clean_test_enviroment(setup_this_test)
+
+
+            log_df <- list(df = run_log(MODEL_DIR), length = config_log(MODEL_DIR) %>% nrow())
+            expect_equal(config_log(MODEL_DIR, .include  = c(1:2, "Child")) %>% nrow(), 3)
+            expect_equal(config_log(MODEL_DIR, .include = c(2:1, "Child")) %>% nrow(), 3)
+            expect_equal(config_log(MODEL_DIR, .include = c("Child", 1, 2, 3)) %>% nrow(), 4)
+            expect_equal(config_log(MODEL_DIR, .include =  c(1:2, "Parent")) %>% nrow(), 3)
+
+          })
+
