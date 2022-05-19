@@ -146,22 +146,42 @@ check_run_times <- function(
 
   if (inherits(.mods, "bbi_model")) {
     .mods <- list(.mods)
+    check_model_object_list(.mods, .mod_types = c(NM_MOD_CLASS, NM_SUM_CLASS))
+  }else if(inherits(.mods, "bbi_summary_list")){
+    check_model_object(.mods, .mod_types = c("bbi_summary_list"))
   }
-  check_model_object_list(.mods, .mod_types = c(NM_MOD_CLASS, NM_SUM_CLASS))
+
 
 
   tryCatch({
     if(.wait) wait_for_nonmem(.mods, ...)
 
     map_dfr(.mods, ~ {
-      s <- model_summary(.x)
-      threads <- as.numeric(.x$bbi_args$threads)
+      if(inherits(.x, NM_SUM_CLASS) | (inherits(.x, "list") && !inherits(.x, NM_MOD_CLASS))){
+        .sum <- .x
+        # bbi_summary_list
+        run_details <-
+          if(inherits(.x, "bbi_nonmem_summary")){
+            .sum$run_details
+          }else{
+            .sum$bbi_summary$run_details
+          }
+        .mod <- read_model(.sum$absolute_model_path)
+        threads <- as.numeric(.mod$bbi_args$threads)
+        model_run <- basename(.sum$absolute_model_path)
+      }else{
+        .sum <- model_summary(.x)
+        threads <- as.numeric(.x$bbi_args$threads)
+        model_run <- basename(.x$absolute_model_path)
+        run_details <- .sum$run_details
+      }
+
       tibble::tibble(
-        model_run = basename(.x$absolute_model_path),
+        model_run = model_run,
         threads = threads,
-        estimation_time = s$run_details$estimation_time,
-        covariance_time = s$run_details$covariance_time,
-        cpu_time = s$run_details$cpu_time) %>%
+        estimation_time = run_details$estimation_time,
+        covariance_time = run_details$covariance_time,
+        cpu_time = run_details$cpu_time) %>%
         select(model_run, threads, all_of(.return_times))
     })
   }, error = function(cond){
