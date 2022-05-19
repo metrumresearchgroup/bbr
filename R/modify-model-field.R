@@ -32,7 +32,7 @@
 #' @param .unique If `TRUE`, the default, de-duplicate `.mod[[.field]]` after adding new values. If `FALSE` duplicate values will be kept.
 #' @param .char_value If `TRUE`, check that `.value` (after unlisting) is a character vector.
 #' @export
-modify_model_field <- function(.mod, .field, .value, .append = TRUE, .remove = FALSE, .unique = TRUE, .char_value = TRUE) {
+modify_model_field <- function(.mod, .field, .value, .append = TRUE, .remove = FALSE, .unique = TRUE, .char_value = TRUE, .bool_value = TRUE) {
 
   # update .mod with any changes from yaml on disk
   check_yaml_in_sync(.mod)
@@ -44,6 +44,11 @@ modify_model_field <- function(.mod, .field, .value, .append = TRUE, .remove = F
   if (isTRUE(.char_value)) {
     .value <- unlist(.value)
     checkmate::assert_character(.value, null.ok = TRUE)
+  }
+
+  if (isTRUE(.bool_value)) {
+    .value <- unlist(.value)
+    checkmate::assertLogical(.value, null.ok = TRUE)
   }
 
   if (isTRUE(.append)) {
@@ -164,7 +169,8 @@ replace_all_tags <- function(.mod, .tags) {
     .field = YAML_TAGS,
     .value = .tags,
     .append = FALSE,
-    .char_value = TRUE
+    .char_value = TRUE,
+    .bool_value = FALSE
   )
 }
 
@@ -178,6 +184,7 @@ remove_tags <- function(.mod, .tags) {
     .append = FALSE,
     .remove = TRUE,
     .char_value = TRUE,
+    .bool_value = FALSE
   )
 }
 
@@ -205,48 +212,42 @@ NULL
 #' @export
 add_star <- function(.mod, .starred) {
 
-  if(stringr::str_detect(.starred, "al") || stringr::str_detect(.starred, "AL") || stringr::str_detect(.starred, "no")
-     || stringr::str_detect(.starred, "NO"))
-  {
-    .starred <- ""
-  }
-
-  if(.starred %>% is.na() == F)
-  {
-    .starred <- "*"
-  }
-
-  modify_model_field(
-    .mod = .mod,
-    .field = YAML_STAR,
-    .value = .starred,
-    .append = TRUE,
-    .char_value = FALSE
-  )
-}
-
-
-
-#' @describeIn  Replaces all starred status on a model object and corresponding YAML with new tags.
-#' @export
-replace_star <- function(.mod, .starred) {
-
-  if(stringr::str_detect(.starred, "al") || stringr::str_detect(.starred, "AL") || stringr::str_detect(.starred, "no")
-     || stringr::str_detect(.starred, "NO"))
-  {
-    .starred <- ""
-  }
-
-  else(.starred %>% is.na() == F)
-  {
-    .starred <- "*"
-  }
-
   modify_model_field(
     .mod = .mod,
     .field = YAML_STAR,
     .value = .starred,
     .append = FALSE,
+    .char_value = FALSE,
+    .bool_value = TRUE
+  )
+}
+
+
+#' @describeIn replace_star update star to a model object and corresponding YAML.
+#' @inheritParams modify_model_field
+#' @param .starred boolean variable to indicate significance
+#' @export
+replace_star <- function(.mod, .starred) {
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_STAR,
+    .value = .starred,
+    .append = FALSE,
+    .bool_value = TRUE,
+    .char_value = FALSE
+  )
+}
+
+
+#' @describeIn remove_star removes star from a model object and corresponding YAML.
+#' @export
+remove_star <- function(.mod, .starred) {
+  modify_model_field(
+    .mod = .mod,
+    .field = YAML_STAR,
+    .value = .starred,
+    .append = FALSE,
+    .remove = TRUE,
     .char_value = TRUE
   )
 }
@@ -286,7 +287,8 @@ add_notes <- function(.mod, .notes) {
     .field = YAML_NOTES,
     .value = .notes,
     .append = TRUE,
-    .char_value = TRUE
+    .char_value = TRUE,
+    .bool_value = FALSE
   )
 }
 
@@ -433,7 +435,8 @@ replace_description <- function(.mod, .description) {
     .mod = .mod,
     .field = YAML_DESCRIPTION,
     .value = .description,
-    .append = FALSE
+    .append = FALSE,
+    .bool_value = FALSE
   )
 }
 

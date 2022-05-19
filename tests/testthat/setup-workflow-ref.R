@@ -125,6 +125,7 @@ REF_LIST_1 <- list(
   bbi_args = list(
     overwrite = TRUE,
     threads = 4L),
+  .starred = FALSE,
   absolute_model_path = file.path(ABS_MODEL_DIR, "1"),
   yaml_md5 = MOD1_YAML_MD5
 )
@@ -138,6 +139,7 @@ REF_LIST_TMP <- list(
   bbi_args = list(
     overwrite = TRUE,
     threads = 4L),
+  .starred = FALSE,
   absolute_model_path = file.path(ABS_MODEL_DIR, "temp"),
   yaml_md5 = MOD1_YAML_MD5
 )
