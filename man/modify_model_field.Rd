@@ -12,7 +12,8 @@ modify_model_field(
   .append = TRUE,
   .remove = FALSE,
   .unique = TRUE,
-  .char_value = TRUE
+  .char_value = TRUE,
+  .bool_value = FALSE
 )
 
 replace_model_field(.mod, .field, .old_val, .new_val)

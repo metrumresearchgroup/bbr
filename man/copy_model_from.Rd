@@ -11,6 +11,7 @@ copy_model_from(
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
+  .starred = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE
@@ -22,6 +23,7 @@ copy_model_from(
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
+  .starred = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE

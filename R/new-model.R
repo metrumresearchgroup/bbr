@@ -28,6 +28,7 @@
 #'   they exist.
 #' @param .model_type Character scaler to specify type of model being created
 #'   (used for S3 class). Currently only `'nonmem'` is supported.
+#'
 #'@param .starred boolean variable to demonstrate the signifcance of a model
 #' @return S3 object of class `bbi_{.model_type}_model` that can be passed to
 #'   `submit_model()`, `model_summary()`, etc.
