@@ -64,6 +64,7 @@ copy_model_from <- function(
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
+  .starred = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE
@@ -79,6 +80,7 @@ copy_model_from.bbi_nonmem_model <- function(
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
+  .starred = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE
@@ -92,6 +94,7 @@ copy_model_from.bbi_nonmem_model <- function(
     .description = .description,
     .based_on_additional = .based_on_additional,
     .add_tags = .add_tags,
+    .starred = .starred,
     .inherit_tags = .inherit_tags,
     .update_model_file = .update_model_file,
     .overwrite = .overwrite
@@ -126,6 +129,7 @@ copy_nonmem_model_from <- function(
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
+  .starred = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE
@@ -140,6 +144,7 @@ copy_nonmem_model_from <- function(
   }
 
   # check parent against YAML
+  check_yaml_in_sync(.parent_mod)
   check_yaml_in_sync(.parent_mod)
 
   # build based_on
@@ -167,6 +172,7 @@ copy_nonmem_model_from <- function(
     .description = .description,
     .based_on = c(.parent_based_on, .based_on_additional),
     .tags = new_tags,
+    .starred = ,
     .bbi_args = .parent_mod[[YAML_BBI_ARGS]],
     .overwrite = .overwrite,
     .model_type = "nonmem"

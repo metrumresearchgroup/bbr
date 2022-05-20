@@ -32,7 +32,7 @@
 #' @param .unique If `TRUE`, the default, de-duplicate `.mod[[.field]]` after adding new values. If `FALSE` duplicate values will be kept.
 #' @param .char_value If `TRUE`, check that `.value` (after unlisting) is a character vector.
 #' @export
-modify_model_field <- function(.mod, .field, .value, .append = TRUE, .remove = FALSE, .unique = TRUE, .char_value = TRUE, .bool_value = TRUE) {
+modify_model_field <- function(.mod, .field, .value, .append = TRUE, .remove = FALSE, .unique = TRUE, .char_value = TRUE, .bool_value = FALSE) {
 
   # update .mod with any changes from yaml on disk
   check_yaml_in_sync(.mod)

@@ -156,8 +156,6 @@ run_log_entry <- function(.mod) {
 
   entry_df <- add_run_id_col(entry_df)
 
-  print(entry_df)
-  print(entry_df %>% class())
 
   # check that it is only one row
   if (nrow(entry_df) != 1) {
