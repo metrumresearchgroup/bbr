@@ -3,6 +3,14 @@
 \name{add_star}
 \alias{add_star}
 \title{Star a model}
+\usage{
+add_star(.mod, .starred)
+}
+\arguments{
+\item{.mod}{The \verb{bbi_\{.model_type\}_model} object to modify}
+
+\item{.starred}{boolean variable to indicate significance}
+}
 \value{
 The modified \verb{bbi_\{.model_type\}_model} object
 }
@@ -15,4 +23,5 @@ The \code{starred} fields on a \verb{bbi_\{.model_type\}_model} object contains 
 }
 \seealso{
 \code{\link[=run_log]{run_log()}} \code{\link[=collapse_to_string]{collapse_to_string()}} \code{\link[=modify_notes]{modify_notes()}} \code{\link[=modify_based_on]{modify_based_on()}} \code{\link[=modify_description]{modify_description()}} \code{\link[=modify_bbi_args]{modify_bbi_args()}}
+NULL
 }
