@@ -41,7 +41,7 @@ new_model <- function(
   .tags = NULL,
   .bbi_args = NULL,
   .overwrite = FALSE,
-  .starred = FALSE,
+  .starred = NULL,
   .model_type = c("nonmem")
 ) {
 
