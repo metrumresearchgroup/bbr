@@ -34,6 +34,8 @@ If \code{NULL} or \code{NA} is passed and \code{.append = FALSE} then \code{.fie
 
 \item{.char_value}{If \code{TRUE}, check that \code{.value} (after unlisting) is a character vector.}
 
+\item{.bool_value}{If \code{TRUE}, check that \code{.value} (after unlisting) is a boolean vector.}
+
 \item{.old_val}{The value to be replaced. If \code{.old_val} is not present in
 \code{.mod[[.field]]}, function will warn user and return \code{.mod} unchanged.}
 
