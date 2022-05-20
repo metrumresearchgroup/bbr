@@ -248,5 +248,16 @@ withr::with_options(list(
     expect_equal(dim(run_times), c(2, 3))
   })
 
+  test_that("check_run_times() works with a bbi_nonmem_summary object [BBR-CRT-005]", {
+    mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
+    run_times <- model_summary(mod1)  %>% check_run_times(.wait = FALSE)
+    expect_equal(dim(run_times), c(1, 3))
+  })
+
+  test_that("check_run_times() works with a bbi_summary_list object [BBR-CRT-006]", {
+    mods <- purrr::map(file.path(MODEL_DIR_BBI, 1:3), ~ read_model(.x))
+    run_times <- model_summaries(mods) %>% check_run_times(.wait = FALSE)
+    expect_equal(dim(run_times), c(3, 3))
+  })
 }) # closing withr::with_options
 
