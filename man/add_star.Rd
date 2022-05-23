@@ -15,7 +15,7 @@ add_star(.mod, .starred)
 The modified \verb{bbi_\{.model_type\}_model} object
 }
 \description{
-Add or remove star on a model object and corresponding YAML.
+Adds star  on a model object and corresponding YAML.
 Tags can be modified at any time (i.e. before \emph{or} after a model is submitted).
 }
 \details{

@@ -2,7 +2,7 @@
 % Please edit documentation in R/modify-model-field.R
 \name{replace_star}
 \alias{replace_star}
-\title{replace boolean variable}
+\title{replace_star}
 \usage{
 replace_star(.mod, .starred)
 }
@@ -10,7 +10,7 @@ replace_star(.mod, .starred)
 \item{.starred}{boolean variable to indicate significance}
 }
 \description{
-replace boolean variable
+replace_star
 }
 \section{Functions}{
 \itemize{
