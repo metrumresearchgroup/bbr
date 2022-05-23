@@ -222,6 +222,7 @@ add_star <- function(.mod, .starred) {
 
 #' @title replace_star
 #' @param .starred boolean variable to indicate significance
+#' @param .mod list object of model data
 #' @describeIn Add or remove star on a model object and corresponding YAML.
 #' Tags can be modified at any time (i.e. before _or_ after a model is submitted).
 #' @export
@@ -237,6 +238,8 @@ replace_star <- function(.mod, .starred) {
 }
 
 #' @title remove_star
+#' @param .mod list object of model data
+#' @param .starred boolean variable to indicate significance
 #' @description remove_star removes starring from a model object and corresponding YAML.
 #' @export
 remove_star <- function(.mod, .starred) {

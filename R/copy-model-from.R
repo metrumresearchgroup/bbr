@@ -22,6 +22,7 @@
 #'   and ancestry. **Paths must be relative to `.new_model` path.** Note that
 #'   the `.parent_model` will automatically be added to the `based_on` field, so
 #'   no need to include that here.
+#' @param .starred boolean variable to denote significance
 #' @param .add_tags Character vector with any new tags(s) to be added to
 #'   `{.new_model}.yaml`
 #' @param .inherit_tags If `FALSE`, the default, new model will only have any

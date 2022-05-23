@@ -6,6 +6,11 @@
 \usage{
 remove_star(.mod, .starred)
 }
+\arguments{
+\item{.mod}{list object of model data}
+
+\item{.starred}{boolean variable to indicate significance}
+}
 \description{
 remove_star removes starring from a model object and corresponding YAML.
 }
