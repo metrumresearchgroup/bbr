@@ -249,7 +249,8 @@ remove_star <- function(.mod, .starred) {
     .value = .starred,
     .append = FALSE,
     .remove = TRUE,
-    .char_value = TRUE
+    .char_value = FALSE,
+    .bool_value = TRUE
   )
 }
 

@@ -354,3 +354,50 @@ test_that("remove_tags() works correctly [BBR-MMF-022]", {
   )
   expect_identical(new_mod[[YAML_TAGS]], ref_tags)
 })
+
+test_that("Checking that the star_add function is adding boolean data to YAML[BBR-MMF-023]", {
+  temp_mod_path <- create_temp_model()
+
+  # make a model object and check YAML
+  new_mod <- read_model(temp_mod_path)
+  new_mod <- add_star(new_mod, TRUE)
+
+  expect_true(new_mod$starred)
+
+
+})
+
+test_that("Checking that the star_remove function is removing boolean data from YAML[BBR-MMF-023]", {
+  temp_mod_path <- create_temp_model()
+
+
+  # make a model object and replace the tags
+  new_mod <- read_model(temp_mod_path)
+  new_mod <- add_star(new_mod, TRUE)
+
+
+  new_mod <- remove_star(new_mod, FALSE) %>% suppressWarnings()
+  expect_true(new_mod$starred)
+
+  new_mod <- remove_star(new_mod, TRUE)
+  expect_failure(expect_true(new_mod$starred))
+
+})
+
+
+test_that("Checking that the star_replace function is replacing data from YAML[BBR-MMF-023]", {
+  temp_mod_path <- create_temp_model()
+
+
+  # make a model object and replace the tags
+  new_mod <- read_model(temp_mod_path)
+  new_mod <- replace_star(new_mod, TRUE)
+
+  expect_true(new_mod$starred)
+
+  new_mod <- replace_star(new_mod, FALSE)
+
+  expect_false(new_mod$starred)
+
+
+})
