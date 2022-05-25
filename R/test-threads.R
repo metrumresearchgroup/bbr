@@ -73,7 +73,7 @@ test_threads <- function(
   search_str <- "MAXEVAL|NITER"
   map(.mods, function(.mod){
     mod_path <- get_model_path(.mod)
-    mod_lines <- mod_path %>% readLines()
+    mod_lines <- mod_path %>% readLines() %>% suppressSpecificWarning("incomplete final line found")
     str_line_loc <- which(grepl(search_str, mod_lines))
 
     if(is_empty(str_line_loc)){
@@ -151,14 +151,23 @@ check_run_times <- function(
     check_model_object(.mods, .mod_types = c("bbi_summary_list"))
   }
 
+  if(.wait){
+    tryCatch({
+      wait_for_nonmem(.mods, ...)
+    }, error = function(cond){
+      return(invisible(TRUE))
+    }, warning = function(cond){
+      message(cond)
+      message("\nConsider setting/increasing the `time_limit` in `wait_for_nonmem()`. See ?check_run_times for details")
+      return(invisible(TRUE))
+    })
+  }
 
-
-  tryCatch({
-    if(.wait) wait_for_nonmem(.mods, ...)
-
-    map_dfr(.mods, ~ {
+  map_dfr(.mods, ~ {
+    tryCatch({
       if(inherits(.x, NM_SUM_CLASS) | (inherits(.x, "list") && !inherits(.x, NM_MOD_CLASS))){
         .sum <- .x
+        model_run <- basename(.sum$absolute_model_path)
         run_details <-
           if(inherits(.x, "bbi_nonmem_summary")){
             .sum$run_details
@@ -166,31 +175,55 @@ check_run_times <- function(
             .sum$bbi_summary$run_details # bbi_summary_list
           }
         .mod <- read_model(.sum$absolute_model_path)
-        threads <- as.numeric(.mod$bbi_args$threads)
-        model_run <- basename(.sum$absolute_model_path)
+        threads <- if(is.null(.mod$bbi_args$threads)){
+          para <- read_yaml(file.path(.x$absolute_model_path, "bbi.yaml"))$parallel
+          if(isTRUE(para)){
+            read_yaml(file.path(.mod$absolute_model_path, "bbi.yaml"))$threads
+          }else{
+            1
+          }
+        }else{
+          as.numeric(.mod$bbi_args$threads)
+        }
       }else{
-        .sum <- model_summary(.x)
-        threads <- as.numeric(.x$bbi_args$threads)
         model_run <- basename(.x$absolute_model_path)
+        .sum <- model_summary(.x, .bbi_args = list(no_grd_file = TRUE, no_ext_file = TRUE, no_shk_file = TRUE))
+        threads <- if(is.null(.x$bbi_args$threads)){
+          para <- read_yaml(file.path(.x$absolute_model_path, "bbi.yaml"))$parallel
+          if(isTRUE(para)){
+            read_yaml(file.path(.x$absolute_model_path, "bbi.yaml"))$threads
+          }else{
+            1
+          }
+        }else{
+          as.numeric(.x$bbi_args$threads)
+        }
         run_details <- .sum$run_details
       }
 
-      tibble::tibble(
-        model_run = model_run,
+      data <- tibble::tibble(
+        run = model_run,
         threads = threads,
         estimation_time = run_details$estimation_time,
         covariance_time = run_details$covariance_time,
         cpu_time = run_details$cpu_time) %>%
-        select(model_run, threads, all_of(.return_times))
+        select(run, threads, all_of(.return_times))
+      return(data)
+    }, error = function(cond){
+      data <- data.frame(matrix(ncol = length(.return_times) + 2, nrow = 1)) %>% as_tibble
+      colnames(data) <- c('run', 'threads', .return_times)
+      data$run <- model_run
+      message("Could not access data for ", model_run)
+      return(data)
+    }, warning = function(cond){
+      data <- data.frame(matrix(ncol = length(.return_times) + 2, nrow = 1)) %>% as_tibble
+      colnames(data) <- c('run', 'threads', .return_times)
+      data$run <- model_run
+      message(cond)
+      return(data)
     })
-  }, error = function(cond){
-    return(NA)
-  }, warning = function(cond){
-    message(cond)
-    message("\nConsider setting/increasing the `time_limit` in `wait_for_nonmem()`. See ?check_run_times for details")
-    return(invisible(TRUE))
-  }
-  )
+  })
+
 }
 
 #' Remove model files associated with the specified tags
