@@ -113,7 +113,14 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
 
   test_that("check_run_times() returns NA for dry runs [BBR-TSTT-005]", {
-    expect_equal(check_run_times(mod1, .wait = F), NA)
+    expect_message(
+      check_run_times(mod1, .wait = F),
+      "Could not access data for 1"
+    )
+    run_times <- check_run_times(mod1, .wait = F) %>% suppressMessages()
+    expect_equal(run_times$run, "1")
+    expect_true(is.na(run_times$threads))
+    expect_true(is.na(run_times$estimation_time))
   })
 
   test_that("delete_models() works for models created by test_threads by default [BBR-CLM-001]", {
