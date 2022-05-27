@@ -170,8 +170,7 @@ replace_all_tags <- function(.mod, .tags) {
     .field = YAML_TAGS,
     .value = .tags,
     .append = FALSE,
-    .char_value = TRUE,
-    .bool_value = FALSE
+    .char_value = TRUE
   )
 }
 
@@ -184,8 +183,7 @@ remove_tags <- function(.mod, .tags) {
     .value = .tags,
     .append = FALSE,
     .remove = TRUE,
-    .char_value = TRUE,
-    .bool_value = FALSE
+    .char_value = TRUE
   )
 }
 
@@ -241,7 +239,6 @@ add_notes <- function(.mod, .notes) {
     .value = .notes,
     .append = TRUE,
     .char_value = TRUE,
-    .bool_value = FALSE
   )
 }
 
@@ -510,7 +507,6 @@ safe_based_on <- function(.start, .based_on) {
 #' to keep track of any changes made to the YAML that are _not_ reflected in the object held in memory.
 #' @name verify_model_yaml_integrity
 #' @param .mod `bbi_{.model_type}_model` object
-
 #' @describeIn verify_model_yaml_integrity Use to manually reconcile model object in memory with its YAML file.
 #' Extracts YAML path from model object and pulls in YAML file.
 #' Any shared keys are overwritten with the values from the YAML and new keys in YAML are added to the model object.
