@@ -63,7 +63,7 @@ YAML_TAGS <- "tags"
 YAML_NOTES <- "notes"
 YAML_BBI_ARGS <- "bbi_args"
 YAML_MOD_TYPE <- "model_type"
-YAML_STAR <- 'starred'
+YAML_STAR <- 'star'
 
 YAML_REQ_INPUT_KEYS <- c(
   YAML_MOD_TYPE

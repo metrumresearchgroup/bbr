@@ -362,10 +362,10 @@ test_that("Checking that set_star_status is reflecting boolean data correctly YA
   new_mod <- read_model(temp_mod_path)
   new_mod <- set_star_status(new_mod, TRUE)
 
-  expect_true(new_mod$starred)
+  expect_true(new_mod$star)
 
   new_mod <- set_star_status(new_mod, FALSE)
-  expect_false(new_mod$starred)
+  expect_false(new_mod$star)
 
 
 })

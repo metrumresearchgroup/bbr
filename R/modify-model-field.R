@@ -194,11 +194,11 @@ remove_tags <- function(.mod, .tags) {
 #' @param .mod list object of model data
 #' @describeIn Add or remove star on a model object and corresponding YAML.
 #' @export
-set_star_status <- function(.mod, .starred) {
+set_star_status <- function(.mod, .star) {
   modify_model_field(
     .mod = .mod,
     .field = YAML_STAR,
-    .value = .starred,
+    .value = .star,
     .append = FALSE,
     .bool_value = TRUE,
     .char_value = FALSE
