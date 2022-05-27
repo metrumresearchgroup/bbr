@@ -190,7 +190,7 @@ remove_tags <- function(.mod, .tags) {
 }
 
 #' @title  set_star_status
-#' @param .starred boolean variable to indicate significance
+#' @param .star boolean variable to indicate significance
 #' @param .mod list object of model data
 #' @describeIn Add or remove star on a model object and corresponding YAML.
 #' @export
@@ -510,7 +510,6 @@ safe_based_on <- function(.start, .based_on) {
 #' to keep track of any changes made to the YAML that are _not_ reflected in the object held in memory.
 #' @name verify_model_yaml_integrity
 #' @param .mod `bbi_{.model_type}_model` object
-NULL
 
 #' @describeIn verify_model_yaml_integrity Use to manually reconcile model object in memory with its YAML file.
 #' Extracts YAML path from model object and pulls in YAML file.

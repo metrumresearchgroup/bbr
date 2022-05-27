@@ -9,7 +9,7 @@ set_star_status(.mod, .star)
 \arguments{
 \item{.mod}{list object of model data}
 
-\item{.starred}{boolean variable to indicate significance}
+\item{.star}{boolean variable to indicate significance}
 }
 \description{
 set_star_status
