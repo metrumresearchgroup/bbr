@@ -49,7 +49,7 @@ modify_model_field <- function(.mod, .field, .value, .append = TRUE, .remove = F
 
   if (isTRUE(.bool_value)) {
     .value <- unlist(.value)
-    checkmate::assertLogical(.value, null.ok = TRUE)
+    checkmate::assertLogical(.value)
   }
 
   if (isTRUE(.append)) {
