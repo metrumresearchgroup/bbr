@@ -4,7 +4,7 @@
 \alias{set_star_status}
 \title{set_star_status}
 \usage{
-set_star_status(.mod, .starred)
+set_star_status(.mod, .star)
 }
 \arguments{
 \item{.mod}{list object of model data}
