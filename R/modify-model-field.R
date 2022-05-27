@@ -189,9 +189,7 @@ remove_tags <- function(.mod, .tags) {
   )
 }
 
-
-
-#' @name add_star
+#' @name add_starÏ
 #' @title Star a model
 #'
 #' @description Adds star  on a model object and corresponding YAML.
@@ -204,7 +202,6 @@ remove_tags <- function(.mod, .tags) {
 #' @return The modified `bbi_{.model_type}_model` object
 #'
 #' @seealso [run_log()] [collapse_to_string()] [modify_notes()] [modify_based_on()] [modify_description()] [modify_bbi_args()]
-#' NULL
 #' @inheritParams modify_model_field
 #' @param .starred boolean variable to indicate significance
 #' @export
@@ -224,7 +221,6 @@ add_star <- function(.mod, .starred) {
 #' @param .starred boolean variable to indicate significance
 #' @param .mod list object of model data
 #' @describeIn Add or remove star on a model object and corresponding YAML.
-#' Tags can be modified at any time (i.e. before _or_ after a model is submitted).
 #' @export
 replace_star <- function(.mod, .starred) {
   modify_model_field(

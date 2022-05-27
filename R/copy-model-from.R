@@ -22,7 +22,7 @@
 #'   and ancestry. **Paths must be relative to `.new_model` path.** Note that
 #'   the `.parent_model` will automatically be added to the `based_on` field, so
 #'   no need to include that here.
-#' @param .starred boolean variable to denote significance
+#' @param .starred marks model to indicate special interest level
 #' @param .add_tags Character vector with any new tags(s) to be added to
 #'   `{.new_model}.yaml`
 #' @param .inherit_tags If `FALSE`, the default, new model will only have any
@@ -145,7 +145,6 @@ copy_nonmem_model_from <- function(
   }
 
   # check parent against YAML
-  check_yaml_in_sync(.parent_mod)
   check_yaml_in_sync(.parent_mod)
 
   # build based_on
