@@ -189,40 +189,12 @@ remove_tags <- function(.mod, .tags) {
   )
 }
 
-#' @name add_starÏ
-#' @title Star a model
-#'
-#' @description Adds star  on a model object and corresponding YAML.
-#' Tags can be modified at any time (i.e. before _or_ after a model is submitted).
-#'
-#' @details
-#' The `starred` fields on a `bbi_{.model_type}_model` object contains a boolean variable if model is starred
-#'
-#'
-#' @return The modified `bbi_{.model_type}_model` object
-#'
-#' @seealso [run_log()] [collapse_to_string()] [modify_notes()] [modify_based_on()] [modify_description()] [modify_bbi_args()]
-#' @inheritParams modify_model_field
-#' @param .starred boolean variable to indicate significance
-#' @export
-add_star <- function(.mod, .starred) {
-
-  modify_model_field(
-    .mod = .mod,
-    .field = YAML_STAR,
-    .value = .starred,
-    .append = FALSE,
-    .char_value = FALSE,
-    .bool_value = TRUE
-  )
-}
-
-#' @title replace_star
+#' @title  set_star_status
 #' @param .starred boolean variable to indicate significance
 #' @param .mod list object of model data
 #' @describeIn Add or remove star on a model object and corresponding YAML.
 #' @export
-replace_star <- function(.mod, .starred) {
+set_star_status <- function(.mod, .starred) {
   modify_model_field(
     .mod = .mod,
     .field = YAML_STAR,
@@ -230,23 +202,6 @@ replace_star <- function(.mod, .starred) {
     .append = FALSE,
     .bool_value = TRUE,
     .char_value = FALSE
-  )
-}
-
-#' @title remove_star
-#' @param .mod list object of model data
-#' @param .starred boolean variable to indicate significance
-#' @description remove_star removes starring from a model object and corresponding YAML.
-#' @export
-remove_star <- function(.mod, .starred) {
-  modify_model_field(
-    .mod = .mod,
-    .field = YAML_STAR,
-    .value = .starred,
-    .append = FALSE,
-    .remove = TRUE,
-    .char_value = FALSE,
-    .bool_value = TRUE
   )
 }
 
