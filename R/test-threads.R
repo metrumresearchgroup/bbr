@@ -176,9 +176,10 @@ check_run_times <- function(
           }
         .mod <- read_model(.sum$absolute_model_path)
         threads <- if(is.null(.mod$bbi_args$threads)){
-          para <- read_yaml(file.path(.x$absolute_model_path, "bbi.yaml"))$parallel
+          config <- jsonlite::fromJSON(file.path(.x$absolute_model_path, "bbi_config.json"))
+          para <- config$configuration$parallel
           if(isTRUE(para)){
-            read_yaml(file.path(.mod$absolute_model_path, "bbi.yaml"))$threads
+            config$configuration$threads
           }else{
             1
           }
@@ -189,9 +190,10 @@ check_run_times <- function(
         model_run <- basename(.x$absolute_model_path)
         .sum <- model_summary(.x, .bbi_args = list(no_grd_file = TRUE, no_ext_file = TRUE, no_shk_file = TRUE))
         threads <- if(is.null(.x$bbi_args$threads)){
-          para <- read_yaml(file.path(.x$absolute_model_path, "bbi.yaml"))$parallel
+          config <- jsonlite::fromJSON(file.path(.x$absolute_model_path, "bbi_config.json"))
+          para <- config$configuration$parallel
           if(isTRUE(para)){
-            read_yaml(file.path(.x$absolute_model_path, "bbi.yaml"))$threads
+            config$configuration$threads
           }else{
             1
           }
