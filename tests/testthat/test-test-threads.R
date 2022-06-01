@@ -6,7 +6,7 @@ context("test_threads(.dry_run=T)")
 
 
 # define constants
-MODEL_DIR_BBI <- file.path(dirname(ABS_MODEL_DIR), "test-workflow-bbi-models")
+MODEL_DIR_BBI <- file.path(dirname(ABS_MODEL_DIR), "test-test-threads-models")
 
 # cleanup function
 cleanup_bbi <- function(.recreate_dir = FALSE) {

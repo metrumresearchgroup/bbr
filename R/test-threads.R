@@ -62,7 +62,9 @@ test_threads <- function(
   assert_list(.bbi_args)
 
   # Duplicate model for each thread scenario
-  .mods <- map(.threads, ~ copy_model_from(.mod, paste0(get_model_id(.mod), "_", .x, "_threads")) %>%
+  .mods <- map(.threads, ~ copy_model_from(.mod,
+                                           paste0(get_model_id(.mod), "_", .x, "_threads"),
+                                           .overwrite = TRUE) %>%
                  add_bbi_args(.bbi_args = c(threads = .x,
                                             .bbi_args,
                                             parallel = TRUE,
@@ -154,9 +156,8 @@ check_run_times <- function(
   if(.wait){
     tryCatch({
       wait_for_nonmem(.mods, ...)
-    }, error = function(cond){
-      return(invisible(TRUE))
-    }, warning = function(cond){
+    },
+    warning = function(cond){
       message(cond)
       message("\nConsider setting/increasing the `time_limit` in `wait_for_nonmem()`. See ?check_run_times for details")
       return(invisible(TRUE))
@@ -165,50 +166,29 @@ check_run_times <- function(
 
   map_dfr(.mods, ~ {
     tryCatch({
-      if(inherits(.x, NM_SUM_CLASS) | (inherits(.x, "list") && !inherits(.x, NM_MOD_CLASS))){
-        .sum <- .x
-        model_run <- basename(.sum$absolute_model_path)
-        run_details <-
-          if(inherits(.x, "bbi_nonmem_summary")){
-            .sum$run_details
-          }else{
-            .sum$bbi_summary$run_details # bbi_summary_list
-          }
-        .mod <- read_model(.sum$absolute_model_path)
-        threads <- if(is.null(.mod$bbi_args$threads)){
-          config <- jsonlite::fromJSON(file.path(.x$absolute_model_path, "bbi_config.json"))
-          para <- config$configuration$parallel
-          if(isTRUE(para)){
-            config$configuration$threads
-          }else{
-            1
-          }
-        }else{
-          as.numeric(.mod$bbi_args$threads)
-        }
-      }else{
-        model_run <- basename(.x$absolute_model_path)
-        .sum <- model_summary(.x, .bbi_args = list(no_grd_file = TRUE, no_ext_file = TRUE, no_shk_file = TRUE))
-        threads <- if(is.null(.x$bbi_args$threads)){
-          config <- jsonlite::fromJSON(file.path(.x$absolute_model_path, "bbi_config.json"))
-          para <- config$configuration$parallel
-          if(isTRUE(para)){
-            config$configuration$threads
-          }else{
-            1
-          }
-        }else{
-          as.numeric(.x$bbi_args$threads)
-        }
-        run_details <- .sum$run_details
+      # unpack bbi_summary_list element
+      if (!is.null(.x$bbi_summary)) .x <- .x$bbi_summary
+
+      # get model id and convert to summary object if necessary
+      model_run <- get_model_id(.x)
+      if (inherits(.x, NM_MOD_CLASS)) {
+        .x <- model_summary(.x, .bbi_args = list(no_grd_file = TRUE, no_ext_file = TRUE, no_shk_file = TRUE))
       }
+
+      # get number of threads from bbi_config.json
+      config <- jsonlite::fromJSON(file.path(.x[[ABS_MOD_PATH]], "bbi_config.json"))
+      threads <- ifelse(
+        config$configuration$parallel,
+        config$configuration$threads,
+        1
+      )
 
       data <- tibble::tibble(
         run = model_run,
         threads = threads,
-        estimation_time = run_details$estimation_time,
-        covariance_time = run_details$covariance_time,
-        cpu_time = run_details$cpu_time) %>%
+        estimation_time = .x$run_details$estimation_time,
+        covariance_time = .x$run_details$covariance_time,
+        cpu_time = .x$run_details$cpu_time) %>%
         select(run, threads, all_of(.return_times))
       return(data)
     }, error = function(cond){
