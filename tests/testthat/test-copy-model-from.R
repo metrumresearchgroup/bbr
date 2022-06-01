@@ -10,12 +10,12 @@ test_that("copy_from_model creates accurate copy [BBR-CMF-001]", {
   on.exit({ cleanup() })
 
   # run copy_model_from
-  new_mod <- copy_model_from(MOD1, basename(NEW_MOD2))
+  new_mod <- copy_model_from(MOD1, basename(NEW_MOD2), .add_tags = NEW_TAGS)
 
   # check that everything is copied through in the object
   expect_identical(class(new_mod), NM_MOD_CLASS_LIST)
   expect_identical(new_mod[[YAML_BASED_ON]], "1")
-  expect_identical(new_mod[[YAML_TAGS]], ORIG_TAGS)
+  expect_identical(new_mod[[YAML_TAGS]], NEW_TAGS)
   expect_equal(new_mod[[YAML_BBI_ARGS]], list(overwrite = TRUE, threads = 4L))
   expect_null(new_mod[[YAML_DESCRIPTION]])
 
@@ -23,7 +23,7 @@ test_that("copy_from_model creates accurate copy [BBR-CMF-001]", {
   new_yaml <- yaml::read_yaml(yaml_ext(NEW_MOD2))
 
   expect_identical(new_yaml[[YAML_BASED_ON]], "1")
-  expect_identical(new_yaml[[YAML_TAGS]], ORIG_TAGS)
+  expect_identical(new_yaml[[YAML_TAGS]], NEW_TAGS)
   expect_equal(new_yaml[[YAML_BBI_ARGS]], list(overwrite = TRUE, threads = 4L))
 
   # check the control stream is modified
@@ -42,16 +42,15 @@ test_that("copy_from_model options work [BBR-CMF-002]", {
                   basename(NEW_MOD3),
                   NEW_DESC,
                   .based_on_additional = get_model_id(NEW_MOD2),
-                  .inherit_tags = FALSE,
-                  .update_model_file = FALSE,
-                  .add_tags = NEW_TAGS)
+                  .inherit_tags = TRUE,
+                  .update_model_file = FALSE)
 
   # check that everything is copied through
   new_yaml <- yaml::read_yaml(yaml_ext(NEW_MOD3))
 
   expect_identical(new_yaml[[YAML_DESCRIPTION]], NEW_DESC)
   expect_identical(new_yaml[[YAML_BASED_ON]], c("1", get_model_id(NEW_MOD2)))
-  expect_identical(new_yaml[[YAML_TAGS]], NEW_TAGS)
+  expect_identical(new_yaml[[YAML_TAGS]], ORIG_TAGS)
   expect_equal(new_yaml[[YAML_BBI_ARGS]], list(overwrite = TRUE, threads = 4L))
 
   # check the control stream is not modified
@@ -200,10 +199,10 @@ test_that("copy_model_from(.new_model=NULL) errors when no models are valid inte
 })
 
 test_that("copy_from_model.bbi_stan_model creates accurate copy", {
-  skip_if_no_stan("copy_from_model.bbi_stan_model")
+  skip_if_no_stan("copy_model_from.bbi_stan_model")
 
   mod_name <- "testmod_copy_stan1"
-  new_mod <- copy_model_from(STAN_MOD1, mod_name, .add_tags = NEW_TAGS)
+  new_mod <- copy_model_from(STAN_MOD1, mod_name, .inherit_tags = TRUE, .add_tags = NEW_TAGS)
   on.exit(cleanup_model(new_mod))
 
   # check that everything is copied through in the object
