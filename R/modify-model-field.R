@@ -188,7 +188,6 @@ remove_tags <- function(.mod, .tags) {
 }
 
 #' @title  add_star
-#' @param .star boolean variable to indicate significance
 #' @param .mod list object of model data
 #' @describeIn Add tar on a model object and corresponding YAML.
 #' @export
@@ -204,7 +203,6 @@ add_star <- function(.mod) {
 }
 
 #' @title  remove_star
-#' @param .star boolean variable to indicate significance
 #' @param .mod list object of model data
 #' @describeIn remove star on a model object and corresponding YAML.
 #' @export
