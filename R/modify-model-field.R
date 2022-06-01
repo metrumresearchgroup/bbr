@@ -274,6 +274,7 @@ remove_notes <- function(.mod, .notes) {
   )
 }
 
+#' @title add_star
 #' @describeIn add_star marks model to indicate special interest level
 #' @param .mod list object of model data
 #' @export
@@ -281,6 +282,7 @@ add_star <- function(.mod) {
   modify_model_field_lgl(.mod, YAML_STAR, "add")
 }
 
+#' @title remove_star
 #' @describeIn remove_star helper function to clear marked models
 #' @param .mod list object of model data
 #' @export
