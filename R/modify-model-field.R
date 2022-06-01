@@ -202,23 +202,6 @@ add_star <- function(.mod) {
   )
 }
 
-#' @title  remove_star
-#' @param .mod list object of model data
-#' @describeIn remove star on a model object and corresponding YAML.
-#' @export
-remove_star <- function(.mod) {
-
-  # update .mod with any changes from yaml on disk
-  check_yaml_in_sync(.mod)
-
-  .mod[[YAML_STAR]] <- NULL
-
-  # overwrite the yaml on disk with modified model
-  .mod <- save_model_yaml(.mod)
-
-  return(.mod)
-}
-
 #' @name modify_notes
 #' @title Modify notes on a model object
 #'
@@ -241,7 +224,7 @@ remove_star <- function(.mod) {
 #' @return The modified `bbi_{.model_type}_model` object
 #'
 #' @seealso [run_log()] [collapse_to_string()] [modify_tags()] [modify_based_on()] [modify_description()] [modify_bbi_args()]
-NULL
+
 
 #' @describeIn modify_notes Add notes to a model object and corresponding YAML.
 #' @inheritParams modify_model_field
@@ -291,6 +274,19 @@ remove_notes <- function(.mod, .notes) {
   )
 }
 
+#' @describeIn add_star marks model to indicate special interest level
+#' @param .mod list object of model data
+#' @export
+add_star <- function(.mod) {
+  modify_model_field_lgl(.mod, YAML_STAR, "add")
+}
+
+#' @describeIn remove_star helper function to clear marked models
+#' @param .mod list object of model data
+#' @export
+remove_star <- function(.mod) {
+  modify_model_field_lgl(.mod, YAML_STAR, "remove")
+}
 
 #' @name modify_based_on
 #' @title Modify based_on field in a model object
@@ -511,6 +507,30 @@ safe_based_on <- function(.start, .based_on) {
   return(tools::file_path_sans_ext(.based_on))
 }
 
+
+#' @param .mod list object of model data
+#' @param .field boolean attribute to be set
+#' @param .action list of boolean variables to be set
+#' @keywords internal
+modify_model_field_lgl <- function(.mod, .field, .action = c("add", "remove")) {
+
+  # update .mod with any changes from yaml on disk
+  check_yaml_in_sync(.mod)
+
+  # check action and modify model
+  .action <- match.arg(.action)
+  if (.action == "add") {
+    .mod[[.field]] <- TRUE
+  }
+  if (.action == "remove") {
+    .mod[[.field]] <- NULL
+  }
+
+  # overwrite the yaml on disk with modified model
+  .mod <- save_model_yaml(.mod)
+
+  return(.mod)
+}
 
 ################
 # synching YAML

@@ -40,8 +40,6 @@ which demonstrates the motivation and usage of this field.
 }
 \section{Functions}{
 \itemize{
-\item \code{add_based_on}: Append new \code{based_on} identifiers to a model object and corresponding YAML.
-
 \item \code{replace_all_based_on}: Replaces entire \code{based_on} field in a model object and corresponding YAML with new values.
 
 \item \code{remove_based_on}: Remove specified \code{based_on} identifier(s) from a model object and corresponding YAML.

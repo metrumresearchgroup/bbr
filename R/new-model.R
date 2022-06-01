@@ -28,7 +28,7 @@
 #'   they exist.
 #' @param .model_type Character scaler to specify type of model being created
 #'   (used for S3 class). Currently only `'nonmem'` is supported.
-#' @param .star marks model to indiccate special interest level
+#' @param .star marks model to indicate special interest level
 #' @return S3 object of class `bbi_{.model_type}_model` that can be passed to
 #'   `submit_model()`, `model_summary()`, etc.
 #' @seealso [copy_model_from()], [read_model()]

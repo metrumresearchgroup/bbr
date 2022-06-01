@@ -8,8 +8,6 @@ add_star(.mod)
 }
 \arguments{
 \item{.mod}{list object of model data}
-
-\item{.star}{boolean variable to indicate significance}
 }
 \description{
 add_star

@@ -47,8 +47,6 @@ for an example of this.
 }
 \section{Functions}{
 \itemize{
-\item \code{add_notes}: Add notes to a model object and corresponding YAML.
-
 \item \code{replace_note}: Replaces a specific \code{.old_note} with \code{.new_note} on a model object and corresponding YAML.
 Warns and does nothing if \code{.old_note} is not present.
 

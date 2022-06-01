@@ -172,7 +172,7 @@ copy_nonmem_model_from <- function(
     .description = .description,
     .based_on = c(.parent_based_on, .based_on_additional),
     .tags = new_tags,
-    .star = ,
+    .star = .star,
     .bbi_args = .parent_mod[[YAML_BBI_ARGS]],
     .overwrite = .overwrite,
     .model_type = "nonmem"
