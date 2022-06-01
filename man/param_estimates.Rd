@@ -28,8 +28,11 @@ can be found in \code{bbi_nonmem_summary$shrinkage_details}.
 }
 }
 \description{
-Returns a tibble containing parameter estimates from a \verb{bbi_\{.model_type\}_summary} object.
-Details about the tibble that is returned are in the return value section below.
+Returns a tibble containing parameter estimates from a
+\verb{bbi_\{.model_type\}_summary} object. Details about the tibble that is returned
+are in the return value section below. Note: if you need to pull in the
+parameter estimates for a large number of NONMEM models at once, consider
+using \code{\link[=param_estimates_batch]{param_estimates_batch()}} instead.
 }
 \details{
 Note that \strong{Bayesian methods are not yet supported} by this function. Creating a parameter table
@@ -43,5 +46,5 @@ error will be thrown.
 }}
 
 \seealso{
-\code{\link[=param_labels]{param_labels()}} \code{\link[=apply_indices]{apply_indices()}}
+\code{\link[=param_estimates_batch]{param_estimates_batch()}}, \code{\link[=model_summary]{model_summary()}}, \code{\link[=param_labels]{param_labels()}}, \code{\link[=apply_indices]{apply_indices()}}
 }

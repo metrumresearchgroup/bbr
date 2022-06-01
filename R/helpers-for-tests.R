@@ -65,4 +65,19 @@ skip_long_tests <- function(.explanation = "Skipping long running tests") {
   }
 }
 
-
+#' Skip test if bbi version is as old or older than the given version.
+#'
+#' If the version can't be parsed by [package_version()], the test is never
+#' skipped.
+#'
+#' @param v a package version or a string that can be converted to one
+#' @keywords internal
+skip_if_old_bbi <- function(v) {
+    v_bbi <- package_version(bbi_version(), strict = FALSE)
+    if (!is.na(v_bbi)) {
+      if (v_bbi <= package_version(v)) {
+        testthat::skip(
+          glue("bbi version is {v_bbi}. Test requires bbi version > {v}"))
+      }
+    }
+}

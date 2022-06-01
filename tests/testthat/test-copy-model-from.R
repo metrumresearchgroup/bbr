@@ -6,7 +6,7 @@ context("Copying model objects")
 
 cleanup()
 
-test_that("copy_from_model creates accurate copy", {
+test_that("copy_from_model creates accurate copy [BBR-CMF-001]", {
   on.exit({ cleanup() })
 
   # run copy_model_from
@@ -33,7 +33,7 @@ test_that("copy_from_model creates accurate copy", {
 })
 
 
-test_that("copy_from_model options work", {
+test_that("copy_from_model options work [BBR-CMF-002]", {
   on.exit({ cleanup() })
 
   # run copy_model_from
@@ -64,7 +64,7 @@ test_that("copy_from_model options work", {
   )
 })
 
-test_that("copy_from_model.bbi_nonmem_model works with numeric input", {
+test_that("copy_from_model.bbi_nonmem_model works with numeric input [BBR-CMF-003]", {
   on.exit({ cleanup() })
 
   # check that the model is not there already
@@ -84,7 +84,7 @@ test_that("copy_from_model.bbi_nonmem_model works with numeric input", {
 })
 
 
-test_that("copy_from_model .overwrite=TRUE works", {
+test_that("copy_from_model .overwrite=TRUE works [BBR-CMF-004]", {
   on.exit({ cleanup() })
 
   # set up model object
@@ -109,7 +109,7 @@ test_that("copy_from_model .overwrite=TRUE works", {
   expect_true(grepl(new_desc_pattern, new_mod_str))
 })
 
-test_that("copy_from_model .overwrite=FALSE works", {
+test_that("copy_from_model .overwrite=FALSE works [BBR-CMF-005]", {
   on.exit({ cleanup() })
 
   # set up model object
@@ -137,7 +137,7 @@ test_that("copy_from_model .overwrite=FALSE works", {
   expect_false(grepl(new_desc_pattern, new_mod_str))
 })
 
-test_that("copy_model_from() supports `.new_model` containing a period", {
+test_that("copy_model_from() supports `.new_model` containing a period [BBR-CMF-006]", {
   temp_mod_path <- create_temp_model()
   temp_mod <- read_model(temp_mod_path)
 
@@ -155,6 +155,48 @@ test_that("copy_model_from() supports `.new_model` containing a period", {
   expect_true(fs::file_exists(new_ctl))
   expect_true(fs::file_exists(new_yaml))
 
+})
+
+test_that("copy_model_from(.new_model=NULL) increments to next integer by default [BBR-CMF-007]", {
+  withr::defer(cleanup())
+  new_id <- "002"
+  new_mod1 <- copy_model_from(MOD1, file.path(basename(LEVEL2_DIR), new_id))
+  new_mod2 <- copy_model_from(new_mod1)
+  expect_equal(
+    as.integer(get_model_id(new_mod1)) + 1,
+    as.integer(get_model_id(new_mod2))
+  )
+  expect_equal(!!nchar(get_model_id(new_mod2)), !!nchar(new_id))
+})
+
+
+test_that("copy_model_from(.new_model=NULL) increments to next highest integer [BBR-CMF-007]", {
+  withr::defer(cleanup())
+  new_id <- "002"
+  high_id <- "0100"
+  bad_id <- "aaaaa10000aaaaa"
+  new_mod1 <- copy_model_from(MOD1, file.path(basename(LEVEL2_DIR), new_id))
+  # write a fake ctl with a higher number
+  readr::write_file("naw", file.path(LEVEL2_DIR, paste0(high_id, ".ctl")))
+  readr::write_file("naw", file.path(LEVEL2_DIR, paste0(bad_id, ".ctl")))
+
+  # copy and check it increments over the higher number
+  new_mod2 <- copy_model_from(new_mod1)
+  expect_equal(
+    as.integer(high_id) + 1,
+    as.integer(get_model_id(new_mod2))
+  )
+  expect_equal(!!nchar(high_id), !!nchar(get_model_id(new_mod2)))
+})
+
+test_that("copy_model_from(.new_model=NULL) errors when no models are valid integer [BBR-CMF-007]", {
+  withr::defer(cleanup())
+  new_id <- "AAA"
+  new_mod1 <- copy_model_from(MOD1, file.path(basename(LEVEL2_DIR), new_id))
+
+  expect_error({
+    new_mod2 <- copy_model_from(new_mod1)
+  }, regexp = "no models.+integer")
 })
 
 test_that("copy_from_model.bbi_stan_model creates accurate copy", {

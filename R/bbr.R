@@ -29,7 +29,7 @@
 #'
 #' @importFrom glue glue
 #' @importFrom rlang .data :=
-#' @importFrom lifecycle deprecate_warn deprecate_stop
+#' @importFrom lifecycle deprecated deprecate_warn deprecate_stop
 #' @import fs
 NULL
 
@@ -82,7 +82,9 @@ bbi_exec <- function(.cmd_args,
     ...,
     wd = .dir,
     stdout = stdout_file,
-    stderr = "2>&1"
+    stderr = "2>&1",
+    cleanup = .wait,
+    cleanup_tree = FALSE
   )
   if (.wait) {
     # wait for process and capture stdout and stderr
@@ -191,10 +193,18 @@ check_bbi_exe <- function(.bbi_exe_path) {
 #'
 #' @importFrom stringr str_replace_all
 #' @inheritParams bbi_version
+#' @param .min_version The minimum allowed version. Defaults to
+#'   `getOption("bbr.bbi_min_version")`.
+#' @param .function The relevant function that is version-constrained. If not
+#'   `NULL`, notifies user in error message.
 #' @return `NULL` if `.bbi_exe_path` satisfies the constraint
 #' @keywords internal
-check_bbi_version_constraint <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')) {
-  if (isTRUE(getOption("rbabylon.DEV_no_min_version"))) {
+check_bbi_version_constraint <- function(
+  .bbi_exe_path = getOption('bbr.bbi_exe_path'),
+  .min_version = getOption("bbr.bbi_min_version"),
+  .function = NULL
+) {
+  if (isTRUE(getOption("bbr.DEV_no_min_version"))) {
     return(invisible(TRUE))
   }
   .bbi_exe_path <- Sys.which(.bbi_exe_path)
@@ -205,12 +215,22 @@ check_bbi_version_constraint <- function(.bbi_exe_path = getOption('rbabylon.bbi
   this_version <- bbi_version(.bbi_exe_path)
   test_version_test <- package_version(str_replace_all(this_version, "[^0-9\\.]", ""))
 
-  if (test_version_test < getOption("bbr.bbi_min_version")) {
-    strict_mode_error(paste(
-      glue("The executable at `{.bbi_exe_path}` is version {this_version} but the minimum supported version of bbi is {getOption('bbr.bbi_min_version')}"),
+  if (test_version_test < .min_version) {
+    err_msg <- paste(
+      glue("The executable at `{.bbi_exe_path}` is version {this_version} but the minimum supported version of bbi is {.min_version}"),
       glue("Call `use_bbi('{dirname(.bbi_exe_path)}')` to update to the most recent release."),
       sep = "\n"
-    ))
+    )
+
+    if (!is.null(.function)) {
+      err_msg <- paste(
+        glue("{.function}() requires a newer version of bbi:"),
+        err_msg,
+        sep = "\n"
+      )
+    }
+
+    strict_mode_error(err_msg)
   }
 }
 
@@ -254,7 +274,7 @@ bbi_help <- function(.cmd_args=NULL) {
     .cmd_args <- c(.cmd_args, "--help")
   }
   res <- bbi_exec(.cmd_args, .wait=TRUE)
-  cat(paste(res$output, collapse = "\n"))
+  cat(paste(res[[PROC_STDOUT]], collapse = "\n"))
 }
 
 
@@ -333,5 +353,5 @@ bbi_init <- function(.dir, .nonmem_dir, .nonmem_version = NULL, .bbi_args = NULL
     write_yaml(bbi_yaml, bbi_yaml_path)
   }
 
-  cat(paste(res$output, collapse = "\n"))
+  cat(paste(res[[PROC_STDOUT]], collapse = "\n"))
 }

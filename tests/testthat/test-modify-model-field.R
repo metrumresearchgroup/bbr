@@ -4,7 +4,7 @@ context("Modify attributes of model object")
 # modify_model_field and its wrappers
 ######################################
 
-test_that("modify_model_field() works correctly", {
+test_that("modify_model_field() works correctly [BBR-MMF-001]", {
   temp_mod_path <- create_temp_model()
 
   # make a spec from it
@@ -20,7 +20,7 @@ test_that("modify_model_field() works correctly", {
   expect_identical(rogue_spec[[YAML_TAGS]], c(ORIG_TAGS, NEW_TAGS))
 })
 
-test_that("modify_model_field() de-duplication works", {
+test_that("modify_model_field() de-duplication works [BBR-MMF-002]", {
   dupe_tags <- c("ha", "hey", "ha")
   uniq_tags <- c("ha", "hey")
 
@@ -38,14 +38,14 @@ test_that("modify_model_field() de-duplication works", {
   expect_identical(new_mod[[YAML_TAGS]], c(ORIG_TAGS, uniq_tags))
 })
 
-test_that("modify_model_field() errors with .append=T and .remove=T", {
+test_that("modify_model_field() errors with .append=T and .remove=T [BBR-MMF-003]", {
   expect_error(
     modify_model_field(MOD1, YAML_TAGS, ORIG_TAGS, .append = TRUE, .remove = TRUE),
     regexp = "cannot have both"
   )
 })
 
-test_that("add_tags() and replace_all_tags() work correctly", {
+test_that("add_tags() and replace_all_tags() work correctly [BBR-MMF-004]", {
   temp_mod_path <- create_temp_model()
 
   # make a spec from it
@@ -61,7 +61,7 @@ test_that("add_tags() and replace_all_tags() work correctly", {
   expect_identical(new_mod[[YAML_TAGS]], NEW_TAGS)
 })
 
-test_that("replace_model_field() works correctly", {
+test_that("replace_model_field() works correctly [BBR-MMF-005]", {
   temp_mod_path <- create_temp_model()
 
   # make a spec from it
@@ -78,26 +78,7 @@ test_that("replace_model_field() works correctly", {
 })
 
 
-test_that("remove_tags() works correctly", {
-  temp_mod_path <- create_temp_model()
-  test_tags <- c("one", "two", "three", "four", "five")
-  rem_tags <- c("two", "four", "bad")
-  ref_tags <- c("one", "three", "five")
-
-  # make a model object and replace the tags
-  new_mod <- read_model(temp_mod_path)
-  new_mod <- replace_all_tags(new_mod, test_tags)
-  expect_identical(new_mod[[YAML_TAGS]], test_tags)
-
-  # test removing
-  new_mod <- expect_warning(
-    remove_tags(new_mod, rem_tags),
-    regexp = "does not contain any of the following.+bad"
-  )
-  expect_identical(new_mod[[YAML_TAGS]], ref_tags)
-})
-
-test_that("add_notes() and replace_all_notes() work correctly", {
+test_that("add_notes() and replace_all_notes() work correctly [BBR-MMF-006]", {
   temp_mod_path <- create_temp_model()
   new_mod <- read_model(temp_mod_path)
   expect_null(new_mod[[YAML_NOTES]])
@@ -111,7 +92,7 @@ test_that("add_notes() and replace_all_notes() work correctly", {
   expect_identical(new_mod[[YAML_NOTES]], NEW_NOTES)
 })
 
-test_that("remove_notes() works correctly", {
+test_that("remove_notes() works correctly [BBR-MMF-007]", {
   temp_mod_path <- create_temp_model()
 
   # make a model object and replace the notes
@@ -127,26 +108,7 @@ test_that("remove_notes() works correctly", {
   expect_identical(new_mod[[YAML_NOTES]], NEW_NOTES)
 })
 
-test_that("add_decisions() and replace_decisions() error", {
-  temp_mod_path <- create_temp_model()
-
-  # make a spec from it
-  new_mod <- read_model(temp_mod_path)
-
-  # test adding
-  new_mod <- expect_error(
-    add_decisions(new_mod, NEW_TEXT1),
-    regexp = "has been replaced by"
-  )
-
-  # test_replacing
-  new_mod <- expect_error(
-    replace_decisions(new_mod, NEW_TEXT2),
-    regexp = "has been replaced by"
-  )
-})
-
-test_that("replace_description() works correctly", {
+test_that("replace_description() works correctly [BBR-MMF-008]", {
   temp_mod_path <- create_temp_model()
 
   # make a spec from it
@@ -158,7 +120,7 @@ test_that("replace_description() works correctly", {
   expect_identical(new_mod[[YAML_DESCRIPTION]], NEW_DESC)
 })
 
-test_that("replace_description() can use NULL", {
+test_that("replace_description() can use NULL [BBR-MMF-009]", {
   temp_mod_path <- create_temp_model()
 
   # make a spec from it
@@ -170,7 +132,7 @@ test_that("replace_description() can use NULL", {
   expect_null(new_mod[[YAML_DESCRIPTION]])
 })
 
-test_that("replace_description() can use NA", {
+test_that("replace_description() can use NA [BBR-MMF-010]", {
   temp_mod_path <- create_temp_model()
 
   # make a spec from it
@@ -182,7 +144,7 @@ test_that("replace_description() can use NA", {
   expect_null(new_mod[[YAML_DESCRIPTION]])
 })
 
-test_that("add_bbi_args() and replace_all_bbi_args() work correctly", {
+test_that("add_bbi_args() and replace_all_bbi_args() work correctly [BBR-MMF-011]", {
   temp_mod_path <- create_temp_model()
 
   # make a spec from it
@@ -201,7 +163,7 @@ test_that("add_bbi_args() and replace_all_bbi_args() work correctly", {
 })
 
 
-test_that("add_tags etc. can be chained", {
+test_that("add_tags etc. can be chained [BBR-MMF-012]", {
   temp_mod_path <- create_temp_model()
 
   # make a spec from it
@@ -219,7 +181,7 @@ test_that("add_tags etc. can be chained", {
   expect_identical(new_mod[[YAML_DESCRIPTION]], NEW_DESC)
 })
 
-test_that("add_based_on() and replace_all_based_on() work correctly", {
+test_that("add_based_on() and replace_all_based_on() work correctly [BBR-MMF-013]", {
   temp_mod_path <- create_temp_model()
   parent_model_id <- get_model_id(create_temp_model())
   child_model_id <- get_model_id(temp_mod_path)
@@ -249,7 +211,7 @@ test_that("add_based_on() and replace_all_based_on() work correctly", {
 # check_yaml_in_sync gets triggered when it should
 ####################################################
 
-test_that("reconcile_yaml() pulls in new tags", {
+test_that("reconcile_yaml() pulls in new tags [BBR-MMF-014]", {
   temp_mod_path <- create_temp_model()
   temp_yaml <- fs::path_ext_set(temp_mod_path, "yaml")
 
@@ -268,11 +230,11 @@ test_that("reconcile_yaml() pulls in new tags", {
 })
 
 
-test_that("check_yaml_in_sync() passes when nothing has changed", {
+test_that("check_yaml_in_sync() passes when nothing has changed [BBR-MMF-015]", {
   expect_invisible(check_yaml_in_sync(MOD1))
 })
 
-test_that("check_yaml_in_sync() fails when YAML has changed and passes after reconciled", {
+test_that("check_yaml_in_sync() fails when YAML has changed and passes after reconciled [BBR-MMF-016]", {
   temp_mod_path <- create_temp_model()
   temp_yaml <- fs::path_ext_set(temp_mod_path, "yaml")
 
@@ -294,7 +256,7 @@ test_that("check_yaml_in_sync() fails when YAML has changed and passes after rec
   expect_identical(new_mod[[YAML_TAGS]], c(ORIG_TAGS, NEW_TAGS))
 })
 
-test_that("add_tags fails if it wasn't re-assigned previously (testing check_yaml_in_sync)", {
+test_that("add_tags fails if it wasn't re-assigned previously (testing check_yaml_in_sync) [BBR-MMF-017]", {
   temp_mod_path <- create_temp_model()
 
   # make a spec from it
@@ -312,7 +274,7 @@ test_that("add_tags fails if it wasn't re-assigned previously (testing check_yam
   expect_error(new_mod %>% replace_description(NEW_DESC), regexp = "Model NOT in sync with corresponding YAML file")
 })
 
-test_that("submit_model() fails YAML out of sync (testing check_yaml_in_sync)", {
+test_that("submit_model() fails YAML out of sync (testing check_yaml_in_sync) [BBR-MMF-018]", {
   temp_mod_path <- create_temp_model()
   temp_yaml <- fs::path_ext_set(temp_mod_path, "yaml")
 
@@ -326,7 +288,7 @@ test_that("submit_model() fails YAML out of sync (testing check_yaml_in_sync)", 
   expect_error(submit_model(new_mod, .dry_run = T), regexp = "Model NOT in sync with corresponding YAML file")
 })
 
-test_that("model_summary() fails YAML out of sync (testing check_yaml_in_sync)", {
+test_that("model_summary() fails YAML out of sync (testing check_yaml_in_sync) [BBR-MMF-019]", {
   temp_mod_path <- create_temp_model()
   temp_yaml <- fs::path_ext_set(temp_mod_path, "yaml")
 
@@ -340,7 +302,7 @@ test_that("model_summary() fails YAML out of sync (testing check_yaml_in_sync)",
   expect_error(model_summary(new_mod, .dry_run = T), regexp = "Model NOT in sync with corresponding YAML file")
 })
 
-test_that("copy_model_from() fails YAML out of sync (testing check_yaml_in_sync)", {
+test_that("copy_model_from() fails YAML out of sync (testing check_yaml_in_sync) [BBR-MMF-020]", {
   temp_mod_path <- create_temp_model()
   temp_yaml <- fs::path_ext_set(temp_mod_path, "yaml")
 
@@ -352,4 +314,43 @@ test_that("copy_model_from() fails YAML out of sync (testing check_yaml_in_sync)
 
   # try to submit_model and get error
   expect_error(copy_model_from(new_mod, "foo"), regexp = "Model NOT in sync with corresponding YAML file")
+})
+
+test_that("add_tags(), add_notes() and friends check for character vector [BBR-MMF-021]", {
+  temp_mod_path <- create_temp_model()
+  new_mod <- read_model(temp_mod_path)
+
+  # Accept a list value if it can be converted to a character vector.
+  new_mod <- new_mod %>%
+    add_tags(as.list(NEW_TAGS)) %>%
+    add_notes(as.list(NEW_NOTES))
+  expect_identical(new_mod[[YAML_TAGS]], c(ORIG_TAGS, NEW_TAGS))
+  expect_identical(new_mod[[YAML_NOTES]], c(NEW_NOTES))
+
+  # Otherwise passing a type other than a character vector leads to an error.
+  fns <- c(add_tags, replace_all_tags, remove_tags,
+           add_notes, replace_all_notes, remove_notes)
+  for (fn in fns){
+    expect_error(new_mod %>% fn(1:3))
+    expect_error(new_mod %>% fn(list(1:3)))
+  }
+})
+
+test_that("remove_tags() works correctly [BBR-MMF-022]", {
+  temp_mod_path <- create_temp_model()
+  test_tags <- c("one", "two", "three", "four", "five")
+  rem_tags <- c("two", "four", "bad")
+  ref_tags <- c("one", "three", "five")
+
+  # make a model object and replace the tags
+  new_mod <- read_model(temp_mod_path)
+  new_mod <- replace_all_tags(new_mod, test_tags)
+  expect_identical(new_mod[[YAML_TAGS]], test_tags)
+
+  # test removing
+  new_mod <- expect_warning(
+    remove_tags(new_mod, rem_tags),
+    regexp = "does not contain any of the following.+bad"
+  )
+  expect_identical(new_mod[[YAML_TAGS]], ref_tags)
 })

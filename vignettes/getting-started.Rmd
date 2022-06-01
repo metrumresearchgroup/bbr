@@ -36,7 +36,10 @@ library(purrr)
 # Setup
 
 ```{r set paths and define cleanup, include = FALSE}
-options('bbr.bbi_exe_path' = read_bbi_path())
+options(
+  'bbr.bbi_exe_path' = read_bbi_path(),
+  'bbr.verbose' = FALSE
+)
 MODEL_DIR <- system.file("model", "nonmem", "basic", package = "bbr")
 # delete old files
 cleanup <- function() {
@@ -179,6 +182,14 @@ param_df1
 
 To see how to load summaries of multiple models to an easy-to-read tibble, see the [Creating a Model Summary Log](https://metrumresearchgroup.github.io/bbr/articles/using-summary-log.html) vignette.
 
+You can also use the [`nm_join()`](https://metrumresearchgroup.github.io/bbr/reference/nm_join.html) function to load the input data and any output tables from your model into a single tibble.
+
+```{r nm_join()}
+join_df <- nm_join(mod1) 
+join_df %>% 
+  select(ID, TIME, DV, CL, V, NPDE, CWRES)
+```
+
 # Iteration
 
 Much of the benefit of `bbr` is leveraged in the model iteration workflow, and the run log summaries that can be created afterwards. For example, imagine you look at these model results and want to begin iterating on them with a new model. 
@@ -191,18 +202,22 @@ mod1 <- read_model(file.path(MODEL_DIR, 1))
 
 ## copy_model_from()
 
-Now you can create a new model object, based on the original, copying and renaming the control stream in the process. The `copy_model_from()` call below will create both `2.ctl` and `2.yaml` files in the same directory as the parent model, and return the model object corresponding to them. (`copy_model_from()` also stores the model's "ancestry" which can be useful later in the project, as shown in the [Using the based_on field](https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html) vignette.)
+Now you can create a new model object, based on the original, copying and renaming the control stream in the process. By default, the `copy_model_from()` function will increment the name of the new model to the next available integer in your modeling directory, but you can also pass a custom name to the `.new_model` argument. See [`?copy_model_from`](https://metrumresearchgroup.github.io/bbr/reference/copy_model_from.html) for more details this, and other optional arguments.
+
+The `copy_model_from()` call below will create both `2.ctl` and `2.yaml` files in the same directory as the parent model, and return the model object corresponding to them. (`copy_model_from()` also stores the model's "ancestry" which can be useful later in the project, as shown in the [Using the based_on field](https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html) vignette.)
 
 ```{r copy_model 2}
-mod2 <- copy_model_from(mod1, 2)
+mod2 <- copy_model_from(mod1) %>%
+  update_model_id()
 ```
 
-Note that, while the `.path` argument in  `new_model()` and `read_model()` is relative to your working directory, the `.new_model` argument of `copy_model_from()` is _relative to the directory containing the parent model._ This means that, assuming you would like to create the new model in the same directory as its parent, you only have to pass a filename (without extension) for the new model. Since, by convention, scientists often name their models numerically, you can also pass a number, which will be coerced to the relevant file names internally.
+The new control stream file `2.ctl` will be identical to its parent model, though you can use [`update_model_id()`](https://metrumresearchgroup.github.io/bbr/reference/update_model_id.html) (as above) to update to the new model ID in places like `$TABLE` statements. 
 
-The new control stream file `2.ctl` can now be edited with the desired changes and then submitted and summarized exactly as above.
+Your new control stream can now be edited with any desired changes and then submitted and summarized exactly as above. At any time, you can also see the difference between a model and its parent using [`model_diff()`](https://metrumresearchgroup.github.io/bbr/reference/model_diff.html).
 
 ```{r submit 2, eval = FALSE}
 # manually edit control stream, then...
+model_diff(mod2)
 mod2 %>% submit_model()
 mod2 %>% model_summary()
 ```
@@ -232,7 +247,7 @@ The `model_diff()` and `tags_diff()` function make it easy to compare models to 
 Now the iteration process continues with a third model. Note that you can tell `copy_model_from()` to inherit the tags from the parent model and automatically add them to the new model.
 
 ```{r copy_model 3}
-mod3 <- copy_model_from(mod2, 3, .inherit_tags = TRUE)
+mod3 <- copy_model_from(mod2, .inherit_tags = TRUE)
 ```
 
 Submit and summarize as before.

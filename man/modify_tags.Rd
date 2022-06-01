@@ -5,7 +5,6 @@
 \alias{add_tags}
 \alias{replace_tag}
 \alias{replace_all_tags}
-\alias{replace_tags}
 \alias{remove_tags}
 \title{Modify tags on a model object}
 \usage{
@@ -14,8 +13,6 @@ add_tags(.mod, .tags)
 replace_tag(.mod, .old_tag, .new_tag)
 
 replace_all_tags(.mod, .tags)
-
-replace_tags(.mod, .tags)
 
 remove_tags(.mod, .tags)
 }
@@ -64,8 +61,6 @@ for an example of this.
 Warns and does nothing if \code{.old_tag} is not present.
 
 \item \code{replace_all_tags}: Replaces all tags on a model object and corresponding YAML with new tags.
-
-\item \code{replace_tags}: \strong{Deprecated} as of bbr 0.10.0, use \code{replace_all_tags()} instead.
 
 \item \code{remove_tags}: Removes tags from a model object and corresponding YAML.
 }}

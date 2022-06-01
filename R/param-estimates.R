@@ -5,8 +5,11 @@
 
 #' Parses parameter estimates table
 #'
-#' Returns a tibble containing parameter estimates from a `bbi_{.model_type}_summary` object.
-#' Details about the tibble that is returned are in the return value section below.
+#' Returns a tibble containing parameter estimates from a
+#' `bbi_{.model_type}_summary` object. Details about the tibble that is returned
+#' are in the return value section below. Note: if you need to pull in the
+#' parameter estimates for a large number of NONMEM models at once, consider
+#' using [param_estimates_batch()] instead.
 #'
 #' @details
 #' Note that **Bayesian methods are not yet supported** by this function. Creating a parameter table
@@ -29,7 +32,7 @@
 #' can be found in `bbi_nonmem_summary$shrinkage_details`.
 #'
 #'
-#' @seealso [param_labels()] [apply_indices()]
+#' @seealso [param_estimates_batch()], [model_summary()], [param_labels()], [apply_indices()]
 #' @param .summary A `bbi_{.model_type}_summary` object.
 #' @export
 param_estimates <- function(.summary) {
@@ -46,9 +49,13 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
   param_names <- .summary[[SUMMARY_PARAM_NAMES]]
 
   # if Bayesian method (includes NUTS) do not return df because it is incorrect and misleading
-  est_methods <- .summary[[SUMMARY_DETAILS]][[SUMMARY_EST_METHOD]]
+  details <- .summary[[SUMMARY_DETAILS]]
+  est_methods <- details[[SUMMARY_EST_METHOD]]
   if (any(str_detect(est_methods, "Bayesian"))) {
     stop(glue("{PARAM_BAYES_ERR_MSG} `.summary` has final estimation method: {est_methods}"), call. = FALSE)
+  }
+  if (isTRUE(details$only_sim)) {
+    stop(glue(".summary has no estimation method (ONLYSIM)"), call. = FALSE)
   }
 
   summary_vars <- with(

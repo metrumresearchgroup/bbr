@@ -36,10 +36,10 @@
 #' @importFrom glue glue
 #' @importFrom tidyr unnest_wider
 #' @export
-summary_log <- function(.base_dir, .recurse = TRUE, ...) {
+summary_log <- function(.base_dir, .recurse = TRUE, .include = NULL , ...) {
   checkmate::assert_string(.base_dir)
 
-  mod_list <- find_models(.base_dir, .recurse)
+  mod_list <- find_models(.base_dir, .recurse, .include)
 
   res_df <- summary_log_impl(mod_list, ...)
 

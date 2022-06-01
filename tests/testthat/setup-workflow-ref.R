@@ -29,6 +29,7 @@ if (!Sys.getenv("METWORX_VERSION") == "" || Sys.getenv("DRONE") == "true") {
 
 NEW_MOD2 <- file.path(MODEL_DIR, "2")
 NEW_MOD3 <- file.path(MODEL_DIR, "3")
+BATCH_PARAM_TEST_DIR <- file.path(MODEL_DIR, "test_batch_params")
 
 MODEL_DIR_X <- fs::path_rel(system.file("model", "nonmem", "complex",   package = "bbr"), getwd()) %>% as.character()
 
@@ -44,7 +45,15 @@ EXT_TEST_FILE <-  as.character(glue::glue("{MOD1_PATH}/{MOD_ID}.ext"))
 OUTPUT_FILE <-    file.path(MOD1_PATH, "OUTPUT")
 
 DATA_TEST_FILE <- as.character(fs::path_norm(file.path(REF_DIR, "..", "extdata", "acop.csv")))
-DATA_TEST_FIRST_LINE <- "id,time,mdv,evid,dv,amt,sex,wt,etn"
+DATA_TEST_FIRST_LINE <- "id,time,mdv,evid,dv,amt,sex,wt,etn,num"
+DATA_TEST_COLS <- length(unlist(stringr::str_split(DATA_TEST_FIRST_LINE, ",")))
+DATA_TEST_ROWS <- 799
+DATA_TEST_ROWS_IGNORE <- DATA_TEST_ROWS - 20
+
+TAB_FILE <- "1.tab"
+MOD1_TABLE_FILES <- c(TAB_FILE, "1par.tab", "1first1.tab", "1first2.tab", "1first3.tab", "1dups.tab")
+TAB_NEW_COLS <- 7
+PARTAB_NEW_COLS <- 5
 
 LEVEL2_SUBDIR <- "level2"
 LEVEL2_DIR <- file.path(MODEL_DIR, LEVEL2_SUBDIR)
@@ -86,13 +95,20 @@ MOD3_ABS_PATH <- fs::path_norm(file.path(getwd(), NEW_MOD3)) %>% as.character()
 MOD4_ABS_PATH <- fs::path_norm(file.path(getwd(), LEVEL2_MOD)) %>% as.character()
 
 RUN_LOG_ROWS <- 3L
-RUN_LOG_COLS <- 10L
+RUN_LOG_COLS <- 9L
 CONFIG_COLS <- 9L
-SUM_LOG_COLS <- 22L
+SUM_LOG_COLS <- 23L
 
-CONFIG_DATA_PATH_REF <- "../../../../extdata/acop.csv"
-CONFIG_DATA_MD5_REF <- "4ddb44da897c26681d892aa7be99f74b"
-CONFIG_MODEL_MD5_REF <- "9092189126b23a80bf91a67d1dd8973c"
+ref_json <- jsonlite::fromJSON(system.file("test-refs", "ref_values.json", package = "bbr"))
+CONFIG_DATA_PATH_REF <- ref_json$CONFIG_DATA_PATH
+CONFIG_DATA_MD5_REF <- ref_json$CONFIG_DATA_MD5
+CONFIG_MODEL_MD5_REF <- ref_json$CONFIG_MODEL_MD5
+MOD_BBI_VERSION <- ref_json$MOD_BBI_VERSION
+MOD1_PARAM_COUNT <- ref_json$MOD1_PARAM_COUNT
+MOD1_PARAM_COUNT_FIXED <- ref_json$MOD1_PARAM_COUNT_FIXED
+MOD1_OFV_REF <- ref_json$MOD1_OFV_REF
+MOD_BBI_VERSION <- ref_json$MOD_BBI_VERSION
+MOD_NM_VERSION <- ref_json$MOD_NM_VERSION
 
 # yaml md5 hashes
 MOD1_YAML_MD5 <- "6ccf206e167485b5adf29bc135197929"
@@ -196,9 +212,19 @@ create_rlg_models <- function() {
   )
 }
 
-cleanup <- function() {
+clean_test_enviroment <- function(.f = NULL , env = parent.frame())
+{
+    cleanup(env)
+    if(!is.null(.f)) .f()
+    withr::defer(cleanup(env), envir = env)
+
+}
+
+
+
+cleanup <- function(env = parent.frame()) {
   # delete tmp files if they are leftover from previous test
-  mods_to_kill <- purrr::map_chr(seq(2,7), ~ file.path(MODEL_DIR, .x))
+  mods_to_kill <- purrr::map_chr(c(seq(2,7), "Parent", "Child"), ~ file.path(MODEL_DIR, .x))
   for (m in mods_to_kill) {
     if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
     if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
@@ -206,14 +232,17 @@ cleanup <- function() {
 
   if (fs::dir_exists(NEW_MOD2)) fs::dir_delete(NEW_MOD2)
   if (fs::dir_exists(NEW_MOD3)) fs::dir_delete(NEW_MOD3)
+  if (fs::dir_exists(BATCH_PARAM_TEST_DIR)) fs::dir_delete(BATCH_PARAM_TEST_DIR)
   if (fs::dir_exists(LEVEL2_DIR)) fs::dir_delete(LEVEL2_DIR)
+  if (file.path(MODEL_DIR, "Parent") %>% dir_exists()) dir_delete(file.path(MODEL_DIR, "Parent"))
+  if (file.path(MODEL_DIR, "Child") %>% dir_exists()) dir_delete(file.path(MODEL_DIR, "Child"))
 
   # delete model objects from memory
-  suppressSpecificWarning(rm(mod1, pos = parent.frame()), .regexpr = "object.+not found")
-  suppressSpecificWarning(rm(mod2, pos = parent.frame()), .regexpr = "object.+not found")
-  suppressSpecificWarning(rm(mod3, pos = parent.frame()), .regexpr = "object.+not found")
-  suppressSpecificWarning(rm(mod4, pos = parent.frame()), .regexpr = "object.+not found")
-  suppressSpecificWarning(rm(log_df, pos = parent.frame()),.regexpr = "object.+not found")
+  suppressSpecificWarning(rm(mod1, pos = env), .regexpr = "object.+not found")
+  suppressSpecificWarning(rm(mod2, pos = env), .regexpr = "object.+not found")
+  suppressSpecificWarning(rm(mod3, pos = env), .regexpr = "object.+not found")
+  suppressSpecificWarning(rm(mod4, pos = env), .regexpr = "object.+not found")
+  suppressSpecificWarning(rm(log_df, pos = env),.regexpr = "object.+not found")
 }
 
 #' Temporarily perturb a file
@@ -222,11 +251,12 @@ cleanup <- function() {
 #' environment specified by the caller.
 #'
 #' @param path string giving the file path
+#' @param txt string to temporarily append to file
 #' @inheritParams withr::defer
-perturb_file <- function(path, envir = parent.frame(), content = "foo") {
+perturb_file <- function(path, txt = "foo", envir = parent.frame()) {
   checkmate::assert_string(path)
   original <- readr::read_file(path)
-  readr::write_lines(content, path, append = TRUE)
+  readr::write_lines(txt, path, append = TRUE)
   withr::defer(readr::write_file(original, path), envir)
 }
 
@@ -290,4 +320,31 @@ cleanup_model <- function(.mod) {
   if (fs::dir_exists(get_output_dir(.mod, .check_exists = FALSE)))  fs::dir_delete(get_output_dir(.mod))
   if (fs::dir_exists(.mod[[ABS_MOD_PATH]]))  fs::dir_delete(.mod[[ABS_MOD_PATH]])
   rm(.mod)
+}
+
+
+#' helper to copy a control stream and .ext file to
+#' BATCH_PARAM_TEST_DIR for testing
+#' @param orig_model_path Path that can load a model with `read_model()`
+#' @param new_name Name of new model (not full path)
+copy_to_batch_params <- function(orig_model_path, new_name) {
+
+  # sanitize new name
+  checkmate::assert_string(new_name)
+  new_name <- stringr::str_replace_all(new_name, "[^A-Za-z0-9]", "")
+
+  .mod <- read_model(orig_model_path)
+
+  new_dir <- file.path(BATCH_PARAM_TEST_DIR, new_name)
+  if (!fs::dir_exists(new_dir)) fs::dir_create(new_dir)
+
+  fs::file_copy(
+    get_model_path(.mod),
+    ctl_ext(new_dir)
+  )
+
+  fs::file_copy(
+    build_path_from_model(.mod, ".ext"),
+    file.path(new_dir, paste0(new_name, ".ext"))
+  )
 }

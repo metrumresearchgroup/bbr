@@ -13,25 +13,41 @@
 NULL
 
 #' @describeIn print_bbi Prints the call made to bbi and whether the process is still running or has finished.
-#' @param .call_limit Integer scalar for the max number of characters to print before truncating the call string.
+#' @param .call_limit Integer scalar for the max number of characters to print
+#'   before truncating the call string. This is compared with the entire length,
+#'   but only the positional arguments between the executable path and the first
+#'   long option will be truncated.
 #' @importFrom stringr str_split str_detect
 #' @importFrom fs path_norm
 #' @importFrom cli cat_line
 #' @export
 print.bbi_process <- function(x, ..., .call_limit = 250) {
-  call_str <- glue("{x[[PROC_BBI]]} {paste(x[[PROC_CMD_ARGS]], collapse = ' ')}")
+  exec_path <- x[[PROC_BBI]]
+  call_str <- paste(x[[PROC_CMD_ARGS]], collapse = " ")
+  len_call <- nchar(exec_path) + nchar(call_str) + 1  # +1 for space
+
+  trunc_marker <- " ... [truncated]"
+  # Adjust the .call_limit so that we don't "truncate" just to end up at the
+  # same length but with less information.
+  .call_limit <- .call_limit - nchar(trunc_marker)
 
   # truncate model list if too long, keeping flags at the end (if any present)
-  if (nchar(call_str) > .call_limit) {
+  if (len_call > .call_limit) {
     split_call_str <- str_split(call_str, " \\-\\-", n = 2)
     mod_str <- split_call_str[[1]][1]
     flag_str <- split_call_str[[1]][2]
 
-    call_str <- paste(substr(mod_str, 1, .call_limit), "... [truncated]")
-    if(!is.na(flag_str)) {
-      call_str <- paste0(call_str, " --", flag_str)
+    # The length check above looked at unsplit call string. Do a second length
+    # check to avoid marking an untruncated string as truncated.
+    if (nchar(mod_str) > .call_limit) {
+      call_str <- paste0(substr(mod_str, 1, .call_limit), trunc_marker)
+      if(!is.na(flag_str)) {
+        call_str <- paste0(call_str, " --", flag_str)
+      }
     }
   }
+  # ... and keeping the executable path at the beginning.
+  call_str <- paste(exec_path, call_str)
 
   # print call string
   cat_line("Running:", col = "green")
@@ -110,17 +126,11 @@ print.bbi_model <- function(x, ...) {
     }
   }
 
-  status <- col_red("Not Run")
-  output_dir <- get_output_dir(x, .check_exists = FALSE)
-
-  if (dir.exists(output_dir)) {
-    status <- col_green("Finished Running")
-    json_file <- file.path(output_dir, "bbi_config.json")
-
-    if (!fs::file_exists(json_file)) {
-      status <- col_red("Incomplete Run")
-    }
-
+  status <- bbi_nonmem_model_status(x)
+  if (status == "Finished Running") {
+    status <- col_green(status)
+  } else {
+    status <- col_red(status)
   }
 
   heading('Status')
@@ -180,9 +190,15 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
   .d <- x[[SUMMARY_DETAILS]]
   cat_line(glue("Dataset: {.d$data_set}\n\n"))
   cat_line(glue("Records: {.d$number_of_data_records}\t Observations: {.d$number_of_obs}\t Subjects: {.d$number_of_subjects}\n\n"))
-  cat_line(glue("Objective Function Value (final est. method): {extract_ofv(list(x))}\n\n"))
-  cli::cat_line("Estimation Method(s):\n")
-  purrr::walk(paste(.d$estimation_method, "\n"), cli::cat_bullet, bullet = "en_dash")
+
+  only_sim <- isTRUE(.d$only_sim)
+  if (only_sim) {
+    cat_line("No Estimation Methods (ONLYSIM)\n")
+  } else {
+    cat_line(glue("Objective Function Value (final est. method): {extract_ofv(list(x))}\n\n"))
+    cli::cat_line("Estimation Method(s):\n")
+    purrr::walk(paste(.d$estimation_method, "\n"), cli::cat_bullet, bullet = "en_dash")
+  }
 
   # check heuristics
   .h <- unlist(x[[SUMMARY_HEURISTICS]])
@@ -194,6 +210,10 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
     purrr::walk(paste(names(which(.h)), "\n"), cli::cat_bullet, bullet = "en_dash", col = "red")
   } else {
     cat_line("No Heuristic Problems Detected\n\n")
+  }
+
+  if (only_sim) {
+    return(invisible(NULL))
   }
 
   # build parameter table (catch Bayesian error)

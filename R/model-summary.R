@@ -11,7 +11,11 @@
 #' to summarize multiple models, you can pass a list of
 #' `bbi_{.model_type}_model` objects to [model_summaries()], or pass a directory
 #' path to [summary_log()] to summarize all models in that directory (and, by
-#' default, all directories below it).
+#' default, all directories below it). Note: the summary object does _not_
+#' contain the covariance or correlation matrices, but these can be retrieved
+#' with [cov_cor()]. Also, if you need to pull in _only_ the parameter estimates
+#' for a large number of NONMEM models, consider using
+#' [param_estimates_batch()].
 #'
 #' @details
 #'
@@ -133,7 +137,7 @@
 #' for methods and information on this object. A warning will also be printed to
 #' notify the user of this.
 #'
-#' @seealso [model_summaries()], [summary_log()]
+#' @seealso [model_summaries()], [summary_log()], [cov_cor()], [param_estimates()]
 #' @param .mod Model to summarize.
 #' @param .bbi_args A named list specifying arguments to pass to bbi formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`.
 #' See [print_bbi_args()] for full list of options.
@@ -260,11 +264,16 @@ nonmem_summary <- function(
 
 #' Private helper function to look for .lst function in a directory
 #' @param .x The directory path to look in for the lst file
+#' @importFrom glue glue
 #' @keywords internal
 check_lst_file <- function(.x) {
   lst_file <- fs::dir_ls(.x, type = "file", glob = "*.lst")
-  if (!length(lst_file)) {
+
+  nfiles <- length(lst_file)
+  if (!nfiles) {
     stop(glue("Unable to locate `.lst` file in dir: {.x}. Check to be sure this is a NONMEM output folder, and that the run has finished successfully."))
+  } else if (nfiles > 1) {
+    stop(glue("More than one `.lst` file found in dir: {.x}"))
   }
   lst_file
 }

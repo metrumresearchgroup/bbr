@@ -4,12 +4,12 @@
 \alias{version_message}
 \title{Private helper to construct version comparison message}
 \usage{
-version_message(local_v, release_v)
+version_message(local_v, current_v)
 }
 \arguments{
 \item{local_v}{Character scalar for version number on local installation}
 
-\item{release_v}{Character scalar for version number of current release}
+\item{current_v}{Character scalar for version number of current release}
 }
 \description{
 Private helper to construct version comparison message

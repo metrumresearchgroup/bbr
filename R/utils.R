@@ -1,7 +1,7 @@
 #' Checks that all passed NONMEM command line args are valid and formats
 #' @param .args A named list of .args to check
 #' @importFrom checkmate assert_list
-#' @importFrom rlang is_bare_character is_bare_numeric is_bare_logical
+#' @importFrom rlang is_bare_character is_bare_numeric is_bare_logical is_empty
 #' @importFrom purrr imap set_names
 #' @return character string, output from format_cmd_args()
 #' @keywords internal
@@ -343,6 +343,17 @@ check_os <- function() {
   }
 }
 
+#' Prints message(s) if `isTRUE(getOption("bbr.verbose"))`
+#' @keywords internal
+verbose_msg <- function(.msg) {
+  checkmate::assert_character(.msg)
+  if(isTRUE(getOption("bbr.verbose"))) {
+    for (.m in .msg) {
+      message(.m)
+    }
+  }
+}
+
 
 ##################################
 # CHECKING MODEL CLASSES AND KEYS
@@ -358,7 +369,11 @@ check_required_keys <- function(.list, .req) {
 #' @keywords internal
 check_model_object <- function(.mod, .mod_types = VALID_MOD_CLASSES) {
   if (!inherits(.mod, .mod_types)) {
-    stop(glue("Must pass a model object, but got object of class: `{paste(class(.mod), collapse = ', ')}`"))
+    stop(paste(
+      glue("Must pass a model object with one of the following classes: `{paste(.mod_types, collapse = ', ')}`"),
+      glue("Got object of class: `{paste(class(.mod), collapse = ', ')}`"),
+      sep = "\n"
+    ))
   }
   return(invisible(TRUE))
 }
@@ -389,6 +404,23 @@ check_bbi_run_log_df_object <- function(.df) {
   return(invisible(TRUE))
 }
 
+
+#' Return status of a model: "Not Run", "Finished Running", or "Incomplete Run".
+#' @param .mod bbi_nonmem_model object
+#' @keywords internal
+bbi_nonmem_model_status <- function(.mod) {
+  status <- "Not Run"
+  output_dir <- get_output_dir(.mod, .check_exists = FALSE)
+  if (dir.exists(output_dir)) {
+    json_file <- get_config_path(.mod, .check_exists = FALSE)
+    if (fs::file_exists(json_file)) {
+      status <- "Finished Running"
+    } else {
+      status <- "Incomplete Run"
+    }
+  }
+  return(status)
+}
 
 ############################
 # Error handlers
@@ -457,5 +489,112 @@ suppressSpecificWarning <- function(.expr, .regexpr) {
     if (stringr::str_detect(w$message, .regexpr))
       invokeRestart("muffleWarning")
   })
+}
+
+#' Call `utils::download.file()`, retrying once on failure.
+#'
+#' @param ... arguments to pass to `utils::download.file()`
+#' @keywords internal
+download_with_retry <- function(...) {
+  rc <- 1
+  tryCatch(rc <- utils::download.file(...))
+  if (rc != 0) {
+    Sys.sleep(1)
+    rc <- utils::download.file(...)
+  }
+  return(rc)
+}
+
+#' Checks if NONMEM run is done by looking for "Stop Time" in .lst file
+#'
+#' Returns `TRUE` if the model appears to be finished running and `FALSE` otherwise.
+#' @param .mod either a bbi_nonmem_model object or a path to an .lst file
+#'
+#' @importFrom readr read_lines
+#'
+#' @export
+check_nonmem_finished <- function(.mod) {
+
+  if (!fs::dir_exists(get_output_dir(.mod, .check_exists = FALSE))) {
+    return(TRUE) # if missing then this failed right away, likely for some bbi reason
+  }
+
+  mod_path <- build_path_from_model(.mod, ".lst")
+
+  # look for model to be finished and then test output
+  model_finished <- if(file.exists(mod_path)){
+    read_lines(mod_path) %>%
+      str_detect("Stop Time") %>%
+      any()
+  }else{
+    FALSE
+  }
+
+  return(isTRUE(model_finished))
+}
+
+
+#' Wait for NONMEM models to finish
+#' @param .mod a `bbi_nonmem_model` object, or list of `bbi_nonmem_model` objects.
+#' @param .time_limit integer for maximum number of seconds in total to wait before continuing
+#'        (will exit after this time even if the run does not appear to have finished).
+#' @param .interval integer for number of seconds to wait between each check.
+#'
+#'
+#' @description Calling `wait_for_nonmem()` will freeze the user's console until the model(s) have finished running.
+#'
+#' @importFrom purrr map_lgl
+#' @importFrom checkmate assert_list
+#'
+#' @export
+wait_for_nonmem <- function(.mod, .time_limit = 300, .interval = 5) {
+  UseMethod("wait_for_nonmem")
+}
+
+
+#' Wait for NONMEM models to finish  (bbi model)
+#'
+#' @describeIn wait_for_nonmem takes a `bbi_nonmem_model` object.
+#' @export
+wait_for_nonmem.bbi_nonmem_model <- function(.mod, .time_limit = 300, .interval = 5) {
+  wait_for_nonmem(list(.mod), .time_limit = .time_limit, .interval = .interval)
+}
+
+
+#' Wait for NONMEM models to finish  (list of bbi models)
+#'
+#' @describeIn wait_for_nonmem takes a `list` of `bbi_nonmem_model` objects.
+#' @export
+wait_for_nonmem.list <- function(.mod, .time_limit = 300, .interval = 5) {
+
+  assert_list(.mod)
+  check_model_object_list(.mod, .mod_types = NM_MOD_CLASS)
+  verbose_msg(glue("Waiting for {length(.mod)} model(s) to finish..."))
+
+  Sys.sleep(1) # wait for lst file to be created
+  expiration <- Sys.time() + .time_limit
+  n_interval <- 0
+  while ((expiration - Sys.time()) > 0) {
+    res <- map_lgl(.mod, ~check_nonmem_finished(.x))
+    if (all(res)) {
+      break
+    }else{
+      n_interval = n_interval + 1
+      # print message every 10 intervals
+      if(n_interval %% 10 == 0){
+        verbose_msg(glue("Waiting for {length(res[!res])} model(s) to finish..."))
+      }
+    }
+    Sys.sleep(.interval)
+  }
+
+  if(expiration < Sys.time() && !map_lgl(.mod, ~check_nonmem_finished(.x))){
+    res <- map_lgl(.mod, ~check_nonmem_finished(.x))
+    warning(glue("Expiration was reached, but {length(res[!res])} model(s) haven't finished"),
+            call. = FALSE, immediate. = TRUE)
+  }else{
+    verbose_msg(glue("\n{length(.mod)} model(s) have finished"))
+  }
+
 }
 

@@ -28,7 +28,11 @@ Calls out to \code{bbi} and returns a named list of class
 to summarize multiple models, you can pass a list of
 \verb{bbi_\{.model_type\}_model} objects to \code{\link[=model_summaries]{model_summaries()}}, or pass a directory
 path to \code{\link[=summary_log]{summary_log()}} to summarize all models in that directory (and, by
-default, all directories below it).
+default, all directories below it). Note: the summary object does \emph{not}
+contain the covariance or correlation matrices, but these can be retrieved
+with \code{\link[=cov_cor]{cov_cor()}}. Also, if you need to pull in \emph{only} the parameter estimates
+for a large number of NONMEM models, consider using
+\code{\link[=param_estimates_batch]{param_estimates_batch()}}.
 }
 \details{
 \strong{NONMEM}
@@ -164,5 +168,5 @@ instead. See "Details" section.
 }}
 
 \seealso{
-\code{\link[=model_summaries]{model_summaries()}}, \code{\link[=summary_log]{summary_log()}}
+\code{\link[=model_summaries]{model_summaries()}}, \code{\link[=summary_log]{summary_log()}}, \code{\link[=cov_cor]{cov_cor()}}, \code{\link[=param_estimates]{param_estimates()}}
 }

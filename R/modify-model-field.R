@@ -30,14 +30,20 @@
 #' @param .append If `TRUE`, the default, concatenate new values with currently present values. If `FALSE`, new values will overwrite old values.
 #' @param .remove If `TRUE`, `.value` with be removed from the `.field` instead of added. `FALSE` by default. Cannot have both `.append` and `.remove` be true in the same call.
 #' @param .unique If `TRUE`, the default, de-duplicate `.mod[[.field]]` after adding new values. If `FALSE` duplicate values will be kept.
+#' @param .char_value If `TRUE`, check that `.value` (after unlisting) is a character vector.
 #' @export
-modify_model_field <- function(.mod, .field, .value, .append = TRUE, .remove = FALSE, .unique = TRUE) {
+modify_model_field <- function(.mod, .field, .value, .append = TRUE, .remove = FALSE, .unique = TRUE, .char_value = TRUE) {
 
   # update .mod with any changes from yaml on disk
   check_yaml_in_sync(.mod)
 
   if (isTRUE(.append) & isTRUE(.remove)) {
     stop("modify_model_field() cannot have both `.append` and `.remove` be true in the same call.")
+  }
+
+  if (isTRUE(.char_value)) {
+    .value <- unlist(.value)
+    checkmate::assert_character(.value, null.ok = TRUE)
   }
 
   if (isTRUE(.append)) {
@@ -136,7 +142,8 @@ add_tags <- function(.mod, .tags) {
     .mod = .mod,
     .field = YAML_TAGS,
     .value = .tags,
-    .append = TRUE
+    .append = TRUE,
+    .char_value = TRUE
   )
 }
 
@@ -156,15 +163,9 @@ replace_all_tags <- function(.mod, .tags) {
     .mod = .mod,
     .field = YAML_TAGS,
     .value = .tags,
-    .append = FALSE
+    .append = FALSE,
+    .char_value = TRUE
   )
-}
-
-#' @describeIn modify_tags **Deprecated** as of bbr 0.10.0, use `replace_all_tags()` instead.
-#' @export
-replace_tags <- function(.mod, .tags) {
-  deprecate_stop("1.0.0", "bbr::replace_tags()", "replace_all_tags()")
-  replace_all_tags(.mod, .tags)
 }
 
 #' @describeIn modify_tags Removes tags from a model object and corresponding YAML.
@@ -175,7 +176,8 @@ remove_tags <- function(.mod, .tags) {
     .field = YAML_TAGS,
     .value = .tags,
     .append = FALSE,
-    .remove = TRUE
+    .remove = TRUE,
+    .char_value = TRUE,
   )
 }
 
@@ -213,7 +215,8 @@ add_notes <- function(.mod, .notes) {
     .mod = .mod,
     .field = YAML_NOTES,
     .value = .notes,
-    .append = TRUE
+    .append = TRUE,
+    .char_value = TRUE
   )
 }
 
@@ -233,7 +236,8 @@ replace_all_notes <- function(.mod, .notes) {
     .mod = .mod,
     .field = YAML_NOTES,
     .value = .notes,
-    .append = FALSE
+    .append = FALSE,
+    .char_value = TRUE
   )
 }
 
@@ -245,7 +249,8 @@ remove_notes <- function(.mod, .notes) {
     .field = YAML_NOTES,
     .value = .notes,
     .append = FALSE,
-    .remove = TRUE
+    .remove = TRUE,
+    .char_value = TRUE
   )
 }
 
@@ -296,13 +301,6 @@ replace_all_based_on <- function(.mod, .based_on) {
     .value = safe_based_on(get_model_working_directory(.mod), .based_on),
     .append = FALSE
   )
-}
-
-#' @describeIn modify_based_on **Deprecated** as of bbr 0.10.0, use `replace_all_based_on()` instead.
-#' @export
-replace_based_on <- function(.mod, .based_on) {
-  deprecate_stop("1.0.0", "bbr::replace_based_on()", "replace_all_based_on()")
-  replace_all_based_on(.mod, .based_on)
 }
 
 #' @describeIn modify_based_on Remove specified `based_on` identifier(s) from a model object and corresponding YAML.
@@ -435,55 +433,6 @@ replace_all_bbi_args <- function(.mod, .bbi_args) {
   return(.mod)
 }
 
-#' @describeIn modify_bbi_args **Deprecated** as of bbr 0.10.0, use `replace_all_bbi_args()` instead.
-#' @export
-replace_bbi_args <- function(.mod, .bbi_args) {
-  deprecate_stop("1.0.0", "bbr::replace_bbi_args()", "replace_all_bbi_args()")
-  replace_all_bbi_args(.mod, .bbi_args)
-}
-
-
-#' @name modify_decisions
-#' @title Deprecated: Modify decisions on a model object
-#'
-#' @description The `decisions` field has been deprecated as of `bbr 0.10.0` and
-#' replaced by the `notes` field, to reflect the fact that users
-#' will want to use this field throughout the modeling process, not only at the end
-#' once some "decisions" have been reached. As of `bbr 1.0.0`, `add_decisions()` and
-#' `replace_decisions()` now error telling the user that they will be
-#' deprecated in the future and encouraging use of their `*_notes` counterparts.
-#' The functions will be removed entirely two releases after that.
-#'
-#' @return The modified `bbi_{.model_type}_model` object
-#'
-#' @seealso [modify_notes()]
-NULL
-
-#' @describeIn modify_decisions **Deprecated**  Append new decisions to the one(s) in a model object and corresponding YAML.
-#' @inheritParams modify_model_field
-#' @param .decisions Character vector to add to `decisions` field
-#' @export
-add_decisions <- function(.mod, .decisions) {
-  stop("The `decisions` field has been replaced by `notes` as of bbr 0.10.0 and will be removed in a future release. Please use `add_notes()` going forward.", call. = FALSE)
-  modify_model_field(
-    .mod = .mod,
-    .field = YAML_DECISIONS,
-    .value = .decisions,
-    .append = TRUE
-  )
-}
-
-#' @describeIn modify_decisions **Deprecated** Replaces `decisions` field in a model object and corresponding YAML with new values.
-#' @export
-replace_decisions <- function(.mod, .decisions) {
-  stop("The `decisions` field has been replaced by `notes` as of bbr 0.10.0 and will be removed in a future release. Please use `replace_all_notes()` going forward.", call. = FALSE)
-  modify_model_field(
-    .mod = .mod,
-    .field = YAML_DECISIONS,
-    .value = .decisions,
-    .append = FALSE
-  )
-}
 
 ###########################
 # private helper functions

@@ -23,7 +23,8 @@ copy_model_from_impl(
 path to \code{.parent_mod}. Represents an absolute model path, which is the path
 to the YAML file and model file, both without extension, and the output
 directory (once the model is run). Numeric values will be coerced to
-character. See examples for usage.}
+character. If \code{NULL}, the default, will try to increment to the next integer
+in the destination directory. See examples for usage.}
 
 \item{.description}{Character scalar description of new model run. This will
 be stored in the yaml (and can be viewed later in \code{run_log()}).}

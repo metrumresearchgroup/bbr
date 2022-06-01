@@ -14,6 +14,101 @@ This is the first Stan alpha releases. There is a ["Getting Started with bbr and
 
 # bbr proper releases NEWS
 
+# Development
+
+## New features
+
+- Added `test_threads()` for benchmarking simulation run times with various threads values.
+- Added `check_run_times()` for checking the estimation times of model runs.
+- Added `delete_models()` for removing all model files associated with specified model tags.
+
+
+# bbr 1.3.1
+
+## Bug fixes
+
+- Added support for `$TAB` syntax in `nm_table_files()`. (#466)
+
+## Developer-facing changes
+
+- Added YAML file and script in `inst/validation/` for creating validation documents with `mrgvalidate`. (#469) 
+
+# bbr 1.3.0
+
+## New features
+
+- Added `param_estimates_compare()` for comparing the result of `param_estimates_batch()` to a single model (or, more generally, for comparing a set of parameter estimates). (#457)
+
+## Bug fixes
+
+- `param_estimates_batch()` now transforms the parameter names that come from `bbi nonmem params ...`, replacing `_` with `,` to match the format that is used elsewhere and expected by downstream tools. (#457)
+
+
+# bbr 1.2.1
+
+## Docs
+
+* New functions from the 1.2.0 release are now mentioned in the docs. (#440)
+
+## Changes
+
+* `use_bbi()` no longer depends on external tools such as `wget` and `tar`, hopefully improving its reliability across different systems. (#448)
+
+## Bug fixes
+
+* `use_bbi()` printed the wrong current release when an older version was requested. (#144)
+
+* `use_bbi()` and `bbi_version()` crashed if the bbi executable path contained spaces. (#409)
+
+* `model_summary()` failed with an unclear error message when a caller accidentally placed more than one `.lst` file in the model directory. (#449)
+
+* `bbi_help()` had a longstanding regression that prevented it from emitting any output. (#447)
+
+* `bbi nonmem summary` used to fail with an out-of-bounds error when fed `ONLYSIM` output, but, as of bbi v3.1.1, it sets the "only_sim" field.  `print.bbi_nonmem_summary()` and `param_estimates.bbi_nonmem_summary()` have been updated to check for the new field. (#443)
+
+
+# bbr 1.2.0
+
+This release adds a number of helper functions, primarily for use with NONMEM models.
+
+## New features and changes
+
+* Added `nm_file()`, `nm_grd()`, `nm_tab()`, `nm_par_tab()`, and `nm_data()` for reading in NONMEM files more easily. (#426)
+
+* Added `nm_join()`, `nm_tables()`, and `nm_table_files()` for reading in NONMEM tables more easily. Notably, `nm_join()` can be used to get a single tibble containing your NONMEM input data joined against all of your table outputs. (#429 and #430)
+
+* `param_estimates_batch()` for extracting a tibble of parameter estimates from a batch of NONMEM runs. Especially useful for large batches of runs created by something like a bootstrap. (#386)
+
+* `cov_cor()` and `check_cor_threshold()` for pulling in covariance and correlation matrices from NONMEM `.cov` and `.cor` files. (#414)
+
+* Passing the `.new_model` argument to `copy_model_from()` is now optional. By default, it now tries to increment to the next available integer in the destination directory (the directory containing the parent model). (#424)
+
+* `update_model_id()` for updating mentions of the parent model in the child model's control stream. (#417)
+
+* Per guidance in `bbr 1.0.0` release, `replace_tags()`, `replace_bbi_args()`, `replace_based_on()`, `add_decisions()`, and `replace_decisions()` have been removed.
+
+* Deprecated `check_nonmem_table_output()`, `check_grd()`, and `check_ext()` and replaced them with `nm_file()` variants. These functions will warn about this for two more releases and then begin to error for two more releases before being removed altogether. (#426)
+
+* Deprecated `plot_nonmem_table_df()`, `plot_grd()`, and `plot_ext()` in an effort to more tightly define the scope of `bbr`. These functions will warn about this for two more releases and then begin to error for two more releases before being removed altogether. (#426)
+
+# bbr 1.1.4
+
+## Docs
+
+* Added "Running NONMEM in Parallel: bbr Tips and Tricks" vignette. (#407)
+
+## Bug fixes
+
+* Fixed bug where adding tags as a list instead of a character vector broke downstream functions like `collapse_to_string()` (#393)
+
+# bbr 1.1.3
+
+## Bug fixes
+
+* Fixed a bug where submitting multiple models in a loop with `submit_model(.mode = "local", .wait = FALSE)` would cause the models to never finish because the `bbi` processes would get [killed by `processx`](https://processx.r-lib.org/reference/process.html#cleaning-up-background-processes) when the R objects were garbage collected. (#390)
+
+* `bbr` now checks for a valid configuration file _before_ calling out to `bbi` to avoid the situation where `.wait = FALSE` and the "no config file" error from `bbi` is swallowed. Note, this check is skipped if `.dry_run = TRUE`. (#390)
+
 # bbr 1.1.2
 
 ## New features and changes
