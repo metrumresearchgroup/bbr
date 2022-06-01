@@ -70,7 +70,7 @@ test_that("copy_from_model options work [BBR-CMF-002]", {
 
   #Checking that star is written out to the yaml
   model_yml <- paste0(temp_mod_path, ".yaml") %>% read_yaml() %>% names()
-  expect_equal( model_yml[5],"star")
+  expect_identical(model_yml[5],"star")
 
   #Checking the yaml is correctly specified with true
   model_yml <- paste0(temp_mod_path, ".yaml") %>% read_yaml()
