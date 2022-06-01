@@ -187,22 +187,39 @@ remove_tags <- function(.mod, .tags) {
   )
 }
 
-#' @title  set_star_status
+#' @title  add_star
 #' @param .star boolean variable to indicate significance
 #' @param .mod list object of model data
-#' @describeIn Add or remove star on a model object and corresponding YAML.
+#' @describeIn Add tar on a model object and corresponding YAML.
 #' @export
-set_star_status <- function(.mod, .star) {
+add_star <- function(.mod) {
   modify_model_field(
     .mod = .mod,
     .field = YAML_STAR,
-    .value = .star,
+    .value = TRUE,
     .append = FALSE,
     .bool_value = TRUE,
     .char_value = FALSE
   )
 }
 
+#' @title  remove_star
+#' @param .star boolean variable to indicate significance
+#' @param .mod list object of model data
+#' @describeIn remove star on a model object and corresponding YAML.
+#' @export
+remove_star <- function(.mod) {
+
+  # update .mod with any changes from yaml on disk
+  check_yaml_in_sync(.mod)
+
+  .mod[[YAML_STAR]] <- NULL
+
+  # overwrite the yaml on disk with modified model
+  .mod <- save_model_yaml(.mod)
+
+  return(.mod)
+}
 
 #' @name modify_notes
 #' @title Modify notes on a model object
@@ -299,7 +316,7 @@ remove_notes <- function(.mod, .notes) {
 #' @return The modified `bbi_{.model_type}_model` object
 #'
 #' @seealso [copy_model_from()] [modify_tags()] [modify_notes()] [modify_description()] [modify_bbi_args()]
-NULL
+
 
 #' @describeIn modify_based_on Append new `based_on` identifiers to a model object and corresponding YAML.
 #' @inheritParams modify_model_field
@@ -507,7 +524,7 @@ safe_based_on <- function(.start, .based_on) {
 #' to keep track of any changes made to the YAML that are _not_ reflected in the object held in memory.
 #' @name verify_model_yaml_integrity
 #' @param .mod `bbi_{.model_type}_model` object
-#' @describeIn verify_model_yaml_integrity Use to manually reconcile model object in memory with its YAML file.
+#' verify_model_yaml_integrity Use to manually reconcile model object in memory with its YAML file.
 #' Extracts YAML path from model object and pulls in YAML file.
 #' Any shared keys are overwritten with the values from the YAML and new keys in YAML are added to the model object.
 #' The md5 digest is then updated to reflect the new state.

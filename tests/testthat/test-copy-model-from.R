@@ -66,7 +66,7 @@ test_that("copy_from_model options work [BBR-CMF-002]", {
   #Editing YAML to add star status is true from clean model
   temp_mod_path <- create_temp_model()
   new_mod <- read_model(temp_mod_path)
-  new_mod <- set_star_status(new_mod, TRUE)
+  new_mod <- add_star(new_mod)
 
   #Checking that star is written out to the yaml
   model_yml <- paste0(temp_mod_path, ".yaml") %>% read_yaml() %>% names()
