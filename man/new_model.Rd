@@ -38,7 +38,7 @@ into YAML file.}
 \code{.yaml_path}. If \code{TRUE} overwrite existing file and output directory, if
 they exist.}
 
-\item{.star}{marks model to indicate special interest level}
+\item{.star}{Boolean, marks model to indicate special interest level.}
 
 \item{.model_type}{Character scaler to specify type of model being created
 (used for S3 class). Currently only \code{'nonmem'} is supported.}
