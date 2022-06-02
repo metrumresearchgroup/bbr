@@ -28,11 +28,11 @@
 #'   they exist.
 #' @param .model_type Character scaler to specify type of model being created
 #'   (used for S3 class). Currently only `'nonmem'` is supported.
-#' @param .star marks model to indicate special interest level
+#' @param .star Boolean, marks model to indicate special interest level.
 #' @return S3 object of class `bbi_{.model_type}_model` that can be passed to
 #'   `submit_model()`, `model_summary()`, etc.
 #' @seealso [copy_model_from()], [read_model()]
-#' @importFrom checkmate assert_scalar
+#' @importFrom checkmate assert_scalar assert_logical
 #' @export
 new_model <- function(
   .path,
@@ -46,6 +46,7 @@ new_model <- function(
 ) {
 
   .model_type <- match.arg(.model_type)
+  assert_logical(.star, len = 1, null.ok = TRUE)
 
   # check if file already exists and decide whether to overwrite if it does
   check_for_existing_model(.path, .overwrite)
@@ -69,7 +70,7 @@ new_model <- function(
   if (!is.null(.tags))        .mod <- replace_all_tags(.mod, .tags)
   if (!is.null(.bbi_args))    .mod <- replace_all_bbi_args(.mod, .bbi_args)
   if (!is.null(.based_on))    .mod <- replace_all_based_on(.mod, .based_on)
-  if (isTRUE(.star))         .mod <- add_star(.mod)
+  if (isTRUE(.star))          .mod <- add_star(.mod)
   return(.mod)
 }
 
