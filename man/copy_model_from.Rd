@@ -12,7 +12,7 @@ copy_model_from(
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
-  .inherit_tags = TRUE,
+  .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE
 )
@@ -23,7 +23,7 @@ copy_model_from(
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
-  .inherit_tags = TRUE,
+  .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE
 )
@@ -34,7 +34,7 @@ copy_model_from(
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
-  .inherit_tags = TRUE,
+  .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE
 )
@@ -61,9 +61,9 @@ no need to include that here.}
 \item{.add_tags}{Character vector with any new tags(s) to be added to
 \verb{\{.new_model\}.yaml}}
 
-\item{.inherit_tags}{If \code{TRUE}, the default, inherit any tags from
-\code{.parent_mod}, with any tags passed to \code{.add_tags} appended. If \code{FALSE} new
-model will only have any tags passed to \code{.add_tags} argument.}
+\item{.inherit_tags}{If \code{FALSE}, the default, new model will only have any
+tags passed to \code{.add_tags} argument. If \code{TRUE} inherit any tags from
+\code{.parent_mod}, with any tags passed to \code{.add_tags} appended.}
 
 \item{.update_model_file}{\strong{Only relevant to NONMEM models.} If \code{TRUE}, the
 default, update the newly created model file. If \code{FALSE}, new model file
