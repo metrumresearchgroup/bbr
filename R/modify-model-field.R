@@ -21,7 +21,7 @@
 #'   [add_notes()] [replace_note()] [replace_all_notes()] [remove_notes()]
 #'   [add_based_on()] [replace_all_based_on()] [remove_based_on()]
 #'   [add_description()] [replace_description()] [add_bbi_args()]
-#'   [replace_all_bbi_args()]
+#'   [replace_all_bbi_args()] [modify_star()]
 #'
 #' @param .mod The `bbi_{.model_type}_model` object to modify
 #' @param .field Character scalar of the name of the component to modify
@@ -31,9 +31,8 @@
 #' @param .remove If `TRUE`, `.value` with be removed from the `.field` instead of added. `FALSE` by default. Cannot have both `.append` and `.remove` be true in the same call.
 #' @param .unique If `TRUE`, the default, de-duplicate `.mod[[.field]]` after adding new values. If `FALSE` duplicate values will be kept.
 #' @param .char_value If `TRUE`, check that `.value` (after unlisting) is a character vector.
-#' @param .bool_value If `TRUE`, check that `.value` (after unlisting) is a boolean vector.
 #' @export
-modify_model_field <- function(.mod, .field, .value, .append = TRUE, .remove = FALSE, .unique = TRUE, .char_value = TRUE, .bool_value = FALSE) {
+modify_model_field <- function(.mod, .field, .value, .append = TRUE, .remove = FALSE, .unique = TRUE, .char_value = TRUE) {
 
   # update .mod with any changes from yaml on disk
   check_yaml_in_sync(.mod)
@@ -45,11 +44,6 @@ modify_model_field <- function(.mod, .field, .value, .append = TRUE, .remove = F
   if (isTRUE(.char_value)) {
     .value <- unlist(.value)
     checkmate::assert_character(.value, null.ok = TRUE)
-  }
-
-  if (isTRUE(.bool_value)) {
-    .value <- unlist(.value)
-    checkmate::assertLogical(.value)
   }
 
   if (isTRUE(.append)) {
@@ -136,7 +130,7 @@ replace_model_field <- function(.mod, .field, .old_val, .new_val) {
 #'
 #' @return The modified `bbi_{.model_type}_model` object
 #'
-#' @seealso [run_log()] [collapse_to_string()] [modify_notes()] [modify_based_on()] [modify_description()] [modify_bbi_args()]
+#' @seealso [run_log()] [collapse_to_string()] [modify_notes()] [modify_based_on()] [modify_description()] [modify_bbi_args()] [modify_star()]
 NULL
 
 #' @describeIn modify_tags Add tags to a model object and corresponding YAML.
@@ -183,24 +177,10 @@ remove_tags <- function(.mod, .tags) {
     .value = .tags,
     .append = FALSE,
     .remove = TRUE,
-    .char_value = TRUE
+    .char_value = TRUE,
   )
 }
 
-#' @title  add_star
-#' @param .mod list object of model data
-#' @describeIn Add tar on a model object and corresponding YAML.
-#' @export
-add_star <- function(.mod) {
-  modify_model_field(
-    .mod = .mod,
-    .field = YAML_STAR,
-    .value = TRUE,
-    .append = FALSE,
-    .bool_value = TRUE,
-    .char_value = FALSE
-  )
-}
 
 #' @name modify_notes
 #' @title Modify notes on a model object
@@ -223,8 +203,8 @@ add_star <- function(.mod) {
 #'
 #' @return The modified `bbi_{.model_type}_model` object
 #'
-#' @seealso [run_log()] [collapse_to_string()] [modify_tags()] [modify_based_on()] [modify_description()] [modify_bbi_args()]
-
+#' @seealso [run_log()] [collapse_to_string()] [modify_tags()] [modify_based_on()] [modify_description()] [modify_bbi_args()] [modify_star()]
+NULL
 
 #' @describeIn modify_notes Add notes to a model object and corresponding YAML.
 #' @inheritParams modify_model_field
@@ -236,7 +216,7 @@ add_notes <- function(.mod, .notes) {
     .field = YAML_NOTES,
     .value = .notes,
     .append = TRUE,
-    .char_value = TRUE,
+    .char_value = TRUE
   )
 }
 
@@ -274,21 +254,6 @@ remove_notes <- function(.mod, .notes) {
   )
 }
 
-#' @title add_star
-#' @describeIn add_star marks model to indicate special interest level
-#' @param .mod list object of model data
-#' @export
-add_star <- function(.mod) {
-  modify_model_field_lgl(.mod, YAML_STAR, "add")
-}
-
-#' @title remove_star
-#' @describeIn remove_star helper function to clear marked models
-#' @param .mod list object of model data
-#' @export
-remove_star <- function(.mod) {
-  modify_model_field_lgl(.mod, YAML_STAR, "remove")
-}
 
 #' @name modify_based_on
 #' @title Modify based_on field in a model object
@@ -311,8 +276,8 @@ remove_star <- function(.mod) {
 #'
 #' @return The modified `bbi_{.model_type}_model` object
 #'
-#' @seealso [copy_model_from()] [modify_tags()] [modify_notes()] [modify_description()] [modify_bbi_args()]
-
+#' @seealso [copy_model_from()] [modify_tags()] [modify_notes()] [modify_description()] [modify_bbi_args()] [modify_star()]
+NULL
 
 #' @describeIn modify_based_on Append new `based_on` identifiers to a model object and corresponding YAML.
 #' @inheritParams modify_model_field
@@ -350,6 +315,32 @@ remove_based_on <- function(.mod, .based_on) {
   )
 }
 
+#' @name modify_star
+#' @title Modify star attribute on a model object
+#'
+#' @description Add, or remove a "star" to a model to indicate special interest level for this model.
+#' This is typically used for highlighting models that are of some importance to the final analyis.
+#'
+#' @return The modified `bbi_{.model_type}_model` object
+#'
+#' @inheritParams modify_model_field
+#'
+#' @seealso [run_log()] [collapse_to_string()] [modify_tags()] [modify_notes()]
+#'   [modify_based_on()] [modify_description()] [modify_bbi_args()]
+#'   [modify_star()]
+NULL
+
+#' @describeIn modify_star Adds a star to the model.
+#' @export
+add_star <- function(.mod) {
+  modify_model_field_lgl(.mod, YAML_STAR, "add")
+}
+
+#' @describeIn modify_star Removes a star from the model.
+#' @export
+remove_star <- function(.mod) {
+  modify_model_field_lgl(.mod, YAML_STAR, "remove")
+}
 
 #' @name modify_description
 #' @title Modify description on a model object
@@ -371,7 +362,7 @@ remove_based_on <- function(.mod, .based_on) {
 #'
 #' @return The modified `bbi_{.model_type}_model` object
 #'
-#' @seealso [run_log()] [modify_tags()] [modify_notes()] [modify_based_on()] [modify_bbi_args()]
+#' @seealso [run_log()] [modify_tags()] [modify_notes()] [modify_based_on()] [modify_bbi_args()] [modify_star()]
 NULL
 
 #' @describeIn modify_description Fills the description field in a model object and corresponding YAML, if it is currently empty.
@@ -398,8 +389,7 @@ replace_description <- function(.mod, .description) {
     .mod = .mod,
     .field = YAML_DESCRIPTION,
     .value = .description,
-    .append = FALSE,
-    .bool_value = FALSE
+    .append = FALSE
   )
 }
 
@@ -428,7 +418,7 @@ replace_description <- function(.mod, .description) {
 #' @return The modified `bbi_{.model_type}_model` object
 #'
 #' @seealso [submit_model()] [model_summary()] [print_bbi_args()]
-#'   [modify_tags()] [modify_notes()] [modify_based_on()] [modify_description()]
+#'   [modify_tags()] [modify_notes()] [modify_based_on()] [modify_description()] [modify_star()]
 NULL
 
 #' @describeIn modify_bbi_args Modifies model object and corresponding YAML
@@ -509,7 +499,7 @@ safe_based_on <- function(.start, .based_on) {
   return(tools::file_path_sans_ext(.based_on))
 }
 
-
+#' Adds or removes boolean attribute from model object and YAML
 #' @param .mod list object of model data
 #' @param .field boolean attribute to be set
 #' @param .action list of boolean variables to be set
@@ -544,7 +534,9 @@ modify_model_field_lgl <- function(.mod, .field, .action = c("add", "remove")) {
 #' to keep track of any changes made to the YAML that are _not_ reflected in the object held in memory.
 #' @name verify_model_yaml_integrity
 #' @param .mod `bbi_{.model_type}_model` object
-#' verify_model_yaml_integrity Use to manually reconcile model object in memory with its YAML file.
+NULL
+
+#' @describeIn verify_model_yaml_integrity Use to manually reconcile model object in memory with its YAML file.
 #' Extracts YAML path from model object and pulls in YAML file.
 #' Any shared keys are overwritten with the values from the YAML and new keys in YAML are added to the model object.
 #' The md5 digest is then updated to reflect the new state.
@@ -586,5 +578,4 @@ check_yaml_in_sync <- function(.mod) {
     strict_mode_error(check_yaml_err_msg)
   }
 }
-
 
