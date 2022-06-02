@@ -38,6 +38,7 @@ test_that("run_log matches reference [BBR-RNLG-003]", {
   expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS))
   expect_identical(log_df$yaml_md5, RUN_LOG_YAML_MD5)
   expect_identical(log_df$based_on, list(NULL, "1", c("1", "2")))
+  expect_identical(log_df$star, rep(FALSE, nrow(log_df)))
 
   # check log_df class
   expect_true(inherits(log_df, RUN_LOG_CLASS))
@@ -53,12 +54,25 @@ test_that("run_log matches reference [BBR-RNLG-003]", {
     !!YAML_DESCRIPTION  := "character",
     !!YAML_BBI_ARGS     := "list",
     !!YAML_BASED_ON     := "list",
-    !!YAML_TAGS         := "list"
+    !!YAML_TAGS         := "list",
+    !!YAML_STAR         := "logical"
   ) %>% as.list()
 
   for (.n in names(run_log_classes_ref)) {
     expect_identical(log_classes[[.n]], run_log_classes_ref[[.n]])
   }
+})
+
+test_that("run_log works with star attribute [BBR-RNLG-005]", {
+  MOD1 <- add_star(MOD1)
+  withr::defer({
+    MOD1 <- remove_star(MOD1)
+  })
+  log_df <- run_log(MODEL_DIR)
+  expect_identical(log_df$star, c(TRUE, FALSE, FALSE))
+
+  star_df <- filter(log_df, star)
+  expect_identical(nrow(star_df), 1L)
 })
 
 ##########################################

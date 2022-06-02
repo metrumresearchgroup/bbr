@@ -151,7 +151,7 @@ run_log_entry <- function(.mod) {
     !!YAML_BASED_ON     := .mod[[YAML_BASED_ON]] %>% list(),
     !!YAML_TAGS         := .mod[[YAML_TAGS]] %>% list(),
     !!YAML_NOTES        := .mod[[YAML_NOTES]] %>% list(),
-    !!YAML_STAR         := .mod[[YAML_STAR]] %>% list(),
+    !!YAML_STAR         := .mod[[YAML_STAR]] %||% FALSE,
   )
 
   entry_df <- add_run_id_col(entry_df)
