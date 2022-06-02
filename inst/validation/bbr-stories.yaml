@@ -210,6 +210,16 @@ MGMT-S015:
   - BBR-CMH-004
   - BBR-CMH-005
   - BBR-CMH-006
+MGMT-S016:
+  name: Cleanup model files
+  description: As a user, I want to be able to easily delete all model files associated
+    the identified model objects.
+  ProductRisk: Medium
+  tests:
+  - BBR-CLM-001
+  - BBR-CLM-002
+  - BBR-CLM-003
+  - BBR-CLM-004
 RUN-S001:
   name: Submit model to be run
   description: As a user, I want to be able to submit a model object to have bbi execute
@@ -233,6 +243,7 @@ RUN-S002:
   - BBR-SBMT-011
   - BBR-SBMT-012
   - BBR-WRKF-002
+  - BBR-TSTT-001
 RUN-S003:
   name: Print method for bbi process
   description: As a user, I want to be able to print the babylon_process object and
@@ -249,6 +260,9 @@ SUM-S001:
   - BBR-SUM-006
   - BBR-WRKF-001
   - BBR-WRKF-002
+  - BBR-CRT-001
+  - BBR-CRT-002
+  - BBR-CRT-003
 SUM-S002:
   name: Read NONMEM parameter table
   description: As a user, I want to be able to load the parameter estimates from the

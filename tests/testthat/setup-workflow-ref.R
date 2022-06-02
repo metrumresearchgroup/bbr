@@ -194,7 +194,17 @@ create_rlg_models <- function() {
   )
 }
 
-cleanup <- function() {
+clean_test_enviroment <- function(.f = NULL , env = parent.frame())
+{
+    cleanup(env)
+    if(!is.null(.f)) .f()
+    withr::defer(cleanup(env), envir = env)
+
+}
+
+
+
+cleanup <- function(env = parent.frame()) {
   # delete tmp files if they are leftover from previous test
   mods_to_kill <- purrr::map_chr(c(seq(2,7), "Parent", "Child"), ~ file.path(MODEL_DIR, .x))
   for (m in mods_to_kill) {
@@ -206,13 +216,15 @@ cleanup <- function() {
   if (fs::dir_exists(NEW_MOD3)) fs::dir_delete(NEW_MOD3)
   if (fs::dir_exists(BATCH_PARAM_TEST_DIR)) fs::dir_delete(BATCH_PARAM_TEST_DIR)
   if (fs::dir_exists(LEVEL2_DIR)) fs::dir_delete(LEVEL2_DIR)
+  if (file.path(MODEL_DIR, "Parent") %>% dir_exists()) dir_delete(file.path(MODEL_DIR, "Parent"))
+  if (file.path(MODEL_DIR, "Child") %>% dir_exists()) dir_delete(file.path(MODEL_DIR, "Child"))
 
   # delete model objects from memory
-  suppressSpecificWarning(rm(mod1, pos = parent.frame()), .regexpr = "object.+not found")
-  suppressSpecificWarning(rm(mod2, pos = parent.frame()), .regexpr = "object.+not found")
-  suppressSpecificWarning(rm(mod3, pos = parent.frame()), .regexpr = "object.+not found")
-  suppressSpecificWarning(rm(mod4, pos = parent.frame()), .regexpr = "object.+not found")
-  suppressSpecificWarning(rm(log_df, pos = parent.frame()),.regexpr = "object.+not found")
+  suppressSpecificWarning(rm(mod1, pos = env), .regexpr = "object.+not found")
+  suppressSpecificWarning(rm(mod2, pos = env), .regexpr = "object.+not found")
+  suppressSpecificWarning(rm(mod3, pos = env), .regexpr = "object.+not found")
+  suppressSpecificWarning(rm(mod4, pos = env), .regexpr = "object.+not found")
+  suppressSpecificWarning(rm(log_df, pos = env),.regexpr = "object.+not found")
 }
 
 #' Temporarily perturb a file

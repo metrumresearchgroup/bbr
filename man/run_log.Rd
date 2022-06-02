@@ -4,12 +4,14 @@
 \alias{run_log}
 \title{Create tibble summarizing all model runs}
 \usage{
-run_log(.base_dir, .recurse = TRUE)
+run_log(.base_dir, .recurse = TRUE, .include = NULL)
 }
 \arguments{
 \item{.base_dir}{Base directory to look in for models.}
 
 \item{.recurse}{If \code{TRUE}, the default, search recursively in all subdirectories. Passed through to \code{fs::dir_ls()} -- If a positive number, the number of levels to recurse.}
+
+\item{.include}{Provides filter for runs based on an input vector.}
 }
 \value{
 A tibble of class \code{bbi_run_log_df} with information on each model, or an empty tibble if no models are found.

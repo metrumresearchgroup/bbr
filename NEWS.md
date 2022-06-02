@@ -1,3 +1,12 @@
+# Development
+
+## New features
+
+- Added `test_threads()` for benchmarking simulation run times with various threads values.
+- Added `check_run_times()` for checking the estimation times of model runs.
+- Added `delete_models()` for removing all model files associated with specified model tags.
+
+
 # bbr 1.3.1
 
 ## Bug fixes
