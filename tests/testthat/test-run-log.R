@@ -64,6 +64,7 @@ test_that("run_log matches reference [BBR-RNLG-003]", {
 })
 
 test_that("run_log works with star attribute [BBR-RNLG-005]", {
+  clean_test_enviroment(create_rlg_models)
   MOD1 <- add_star(MOD1)
   withr::defer({
     MOD1 <- remove_star(MOD1)
