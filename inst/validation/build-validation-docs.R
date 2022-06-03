@@ -12,7 +12,7 @@
 #######################################################
 
 PKGNAME <- "bbr"
-PKGVERSION <- "1.3.0"
+PKGVERSION <- "1.3.1.9001"
 STYLE_REF_DIR <- "docx-ref-header-image" # set to NULL if not using style ref
 
 # set up directories and clear existing output dirs, if they exist
@@ -53,7 +53,10 @@ mrgvalprep::get_sys_info(
 )
 
 # read in stories
-spec <- mrgvalprep::read_spec_yaml(file.path(val_dir, paste0(PKGNAME, "-stories.yaml")))
+spec <- mrgvalprep::read_spec_yaml(
+  file.path(val_dir, paste0(PKGNAME, "-stories.yaml")),
+  file.path(val_dir, paste0(PKGNAME, "-requirements.yaml"))
+)
 
 # make docs
 mrgvalidate::create_validation_docs(
