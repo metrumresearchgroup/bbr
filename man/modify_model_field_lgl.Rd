@@ -11,7 +11,7 @@ modify_model_field_lgl(.mod, .field, .action = c("add", "remove"))
 
 \item{.field}{boolean attribute to be set}
 
-\item{.action}{list of boolean variables to be set}
+\item{.action}{character scalar denoting the action to take. Can be either "add" or "remove".}
 }
 \description{
 Adds or removes boolean attribute from model object and YAML

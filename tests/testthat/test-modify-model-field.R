@@ -360,6 +360,8 @@ test_that("Checking that add_star is adding star to model object [BBR-MMF-023]",
 
   # make a model object and check YAML
   new_mod <- read_model(temp_mod_path)
+
+  expect_null(new_mod$star)
   new_mod <- add_star(new_mod)
 
   expect_true(new_mod$star)
@@ -373,6 +375,7 @@ test_that("Checking that remove_star is removing star from model object [BBR-MMF
   # make a model object and check YAML
   new_mod <- read_model(temp_mod_path)
 
+  expect_null(new_mod$star)
   new_mod <- remove_star(new_mod)
   expect_null(new_mod$star)
 

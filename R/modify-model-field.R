@@ -502,7 +502,7 @@ safe_based_on <- function(.start, .based_on) {
 #' Adds or removes boolean attribute from model object and YAML
 #' @param .mod list object of model data
 #' @param .field boolean attribute to be set
-#' @param .action list of boolean variables to be set
+#' @param .action character scalar denoting the action to take. Can be either "add" or "remove".
 #' @keywords internal
 modify_model_field_lgl <- function(.mod, .field, .action = c("add", "remove")) {
 
