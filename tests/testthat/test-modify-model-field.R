@@ -379,5 +379,4 @@ test_that("Checking that remove_star is removing star from model object [BBR-MMF
   new_mod <- remove_star(new_mod)
   expect_null(new_mod$star)
 
-
 })

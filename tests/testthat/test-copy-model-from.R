@@ -75,7 +75,6 @@ test_that("copy_from_model options work [BBR-CMF-002]", {
   expect_true("star" %in% yaml_fields)
 
   #Checking the yaml is correctly specified with true
-  model_yml <- paste0(temp_mod_path, ".yaml") %>% read_yaml()
   expect_true(model_yml$star)
 
 })
