@@ -61,6 +61,22 @@ test_that("copy_from_model options work [BBR-CMF-002]", {
     stringr::str_extract(orig_mod_str, prob_pattern),
     stringr::str_extract(new_mod_str, prob_pattern)
   )
+
+
+  #Editing YAML to add star status is true from clean model
+  temp_mod_path <- create_temp_model()
+  new_mod <- read_model(temp_mod_path)
+  expect_null(new_mod$star)
+  new_mod <- add_star(new_mod)
+
+  #Checking that star is written out to the yaml
+  model_yml <- paste0(temp_mod_path, ".yaml") %>% read_yaml()
+  yaml_fields <- model_yml %>% names()
+  expect_true("star" %in% yaml_fields)
+
+  #Checking the yaml is correctly specified with true
+  expect_true(model_yml$star)
+
 })
 
 test_that("copy_from_model.bbi_nonmem_model works with numeric input [BBR-CMF-003]", {

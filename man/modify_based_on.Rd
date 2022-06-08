@@ -48,5 +48,5 @@ which demonstrates the motivation and usage of this field.
 }}
 
 \seealso{
-\code{\link[=copy_model_from]{copy_model_from()}} \code{\link[=modify_tags]{modify_tags()}} \code{\link[=modify_notes]{modify_notes()}} \code{\link[=modify_description]{modify_description()}} \code{\link[=modify_bbi_args]{modify_bbi_args()}}
+\code{\link[=copy_model_from]{copy_model_from()}} \code{\link[=modify_tags]{modify_tags()}} \code{\link[=modify_notes]{modify_notes()}} \code{\link[=modify_description]{modify_description()}} \code{\link[=modify_bbi_args]{modify_bbi_args()}} \code{\link[=modify_star]{modify_star()}}
 }
