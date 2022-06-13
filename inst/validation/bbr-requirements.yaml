@@ -666,6 +666,7 @@ PEST-R012:
 PEST-R013 :
   description: param_estimates() can optionally append the p-value to the output, and calculate whether it is below a specified alpha
   tests:
+  - BBR-PEST-013
 PLB-R001:
   description: build_matrix_indices() parses correctly ref
   tests:
