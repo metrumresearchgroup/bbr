@@ -99,6 +99,7 @@ test_threads <- function(
 
   bbi_yaml <- file.path(dirname(.mod$absolute_model_path), "bbi") %>% yaml_ext()
   if(!file_exists(bbi_yaml)){
+    delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
     stop("No bbi.yaml file found in the run directory")
   }
 

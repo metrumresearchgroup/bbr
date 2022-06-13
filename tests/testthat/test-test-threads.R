@@ -134,6 +134,10 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
     # re-create yaml file
     readr::write_file("created_by: test-test-threads", file.path(MODEL_DIR_BBI, "bbi.yaml"))
+
+    # re-create `mods` for subsequent tests
+    mods <- test_threads(mod1, .threads = c(2, 4), .max_eval = 100, .mode = "local", .dry_run = TRUE)
+
   })
 
   test_that("delete_models() works for models created by test_threads by default [BBR-CLM-001]", {
