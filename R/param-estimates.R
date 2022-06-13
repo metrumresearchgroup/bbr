@@ -34,8 +34,10 @@
 #'
 #' @seealso [param_estimates_batch()], [model_summary()], [param_labels()], [apply_indices()]
 #' @param .summary A `bbi_{.model_type}_summary` object.
+#' @param .alpha numeric. If specified, return the p-value for each eta value on the diagonal,
+#'         as well as whether they are below the specified value of alpha. Defaults to NULL.s
 #' @export
-param_estimates <- function(.summary) {
+param_estimates <- function(.summary, .alpha) {
   UseMethod("param_estimates")
 }
 
@@ -44,8 +46,9 @@ param_estimates <- function(.summary) {
 #' @importFrom purrr map_at map_depth map_lgl
 #' @importFrom rlang list2
 #' @importFrom stringr str_detect
+#' @importFrom dplyr bind_cols
 #' @export
-param_estimates.bbi_nonmem_summary <- function(.summary) {
+param_estimates.bbi_nonmem_summary <- function(.summary, .alpha = NULL) {
   param_names <- .summary[[SUMMARY_PARAM_NAMES]]
 
   # if Bayesian method (includes NUTS) do not return df because it is incorrect and misleading
@@ -94,6 +97,18 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
   param_df[[SUMMARY_PARAM_DIAG]] <- map_lgl(param_df[[SUMMARY_PARAM_NAMES]], is_diag)
 
   param_df <- add_param_shrinkage(param_df, .summary)
+
+  # Add p-value
+  if(!is.null(.alpha)){
+    assert_numeric(.alpha)
+    pval_df <-
+      param_df %>%
+      filter(str_detect(parameter_names, "OMEGA") & diag == TRUE) %>%
+      bind_cols(data.frame(pval=.summary$shrinkage_details[length(.summary$shrinkage_details)][[1]][[1]]$pval)) %>%
+      mutate(ETASIG = pval < .alpha)
+    param_df <- param_df %>% left_join(pval_df) %>% suppressMessages()
+  }
+
 
   return(param_df)
 }

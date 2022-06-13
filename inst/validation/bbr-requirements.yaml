@@ -663,6 +663,9 @@ PEST-R012:
   description: param_estimates_compare() errors with different models
   tests:
   - BBR-PEST-012
+PEST-R013 :
+  description: param_estimates() can optionally append the p-value to the output, and calculate whether it is below a specified alpha
+  tests:
 PLB-R001:
   description: build_matrix_indices() parses correctly ref
   tests:

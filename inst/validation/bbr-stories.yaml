@@ -270,6 +270,7 @@ SUM-S002:
   ProductRisk: Low
   requirements:
   - PEST-R001
+  - PEST-R013
   - WRKF-R001
   - WRKF-R002
 SUM-S003:
