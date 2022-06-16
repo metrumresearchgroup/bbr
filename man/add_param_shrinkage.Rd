@@ -4,7 +4,7 @@
 \alias{add_param_shrinkage}
 \title{Add shrinkage details to param table}
 \usage{
-add_param_shrinkage(.param_df, .summary)
+add_param_shrinkage(.param_df, .summary, .add_pval = FALSE)
 }
 \arguments{
 \item{.param_df}{The parameter estimates table containing, at minimum \code{parameter_names} and \code{diag} columns.}

@@ -65,4 +65,23 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_true(all(is.na(par_df[[SUMMARY_PARAM_SHRINKAGE]])))
   })
 
+  test_that("param_estimates can optionally return p-value [BBR-PEST-013]", {
+    clean_test_enviroment()
+    sum1 <- model_summary(MOD1)
+
+    par_df <- sum1 %>% param_estimates(.alpha = 0.05)
+    expect_true(all(c("pval", "ETASIG") %in% names(par_df)))
+
+    par_df_pvalue_only <- par_df %>% filter(str_detect(parameter_names, "OMEGA") & diag == TRUE)
+
+    expect_equal(round(par_df_pvalue_only$pval, 3) , c(0.962, 0.919))
+    expect_equal(par_df_pvalue_only$ETASIG , rep(FALSE, 2))
+
+    par_df_rest <- par_df %>% filter(!(str_detect(parameter_names, "OMEGA") & diag == TRUE))
+
+    expect_true(all(is.na(par_df_rest[["pval"]])))
+    expect_true(all(is.na(par_df_rest[["ETASIG"]])))
+  })
+
+
 }) # closing withr::with_options
