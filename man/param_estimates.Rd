@@ -13,7 +13,7 @@ param_estimates(.summary, .alpha)
 \item{.summary}{A \verb{bbi_\{.model_type\}_summary} object.}
 
 \item{.alpha}{numeric. If specified, return the p-value for each eta value on the diagonal,
-as well as whether they are below the specified value of alpha. Defaults to NULL.s}
+as well as whether they are below the specified value of alpha. Defaults to NULL.}
 }
 \value{
 Returns a tibble with the following columns:
