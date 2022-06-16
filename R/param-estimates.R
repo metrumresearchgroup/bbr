@@ -47,7 +47,6 @@ param_estimates <- function(.summary, .alpha) {
 #' @importFrom rlang list2
 #' @importFrom stringr str_detect
 #' @importFrom checkmate assert_numeric
-#' @importFrom dplyr bind_cols
 #' @export
 param_estimates.bbi_nonmem_summary <- function(.summary, .alpha = NULL) {
   param_names <- .summary[[SUMMARY_PARAM_NAMES]]
