@@ -169,7 +169,7 @@ add_tags_diff <- function(.log_df, .collapse = FALSE, .format = NULL) {
         tags_diff = paste0(tags_added, "; <s>", tags_removed, "</s>") %>%
           str_replace("; <s></s>","") %>%
           str_replace("^; ", "")
-      )
+      ) %>% select(-c(TAGS_ADD, TAGS_REM))
   }
   return(.log_df)
 }
