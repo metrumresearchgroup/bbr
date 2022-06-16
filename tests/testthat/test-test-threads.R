@@ -123,23 +123,6 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_true(is.na(run_times$estimation_time))
   })
 
-  test_that("test_threads(.dry_run=T) errors if no bbi.yaml file is found [BBR-TSTT-006]", {
-    bbi_yaml <- file.path(dirname(mod1$absolute_model_path), "bbi") %>% yaml_ext()
-    fs::file_delete(bbi_yaml)
-
-    expect_error(
-      test_threads(mod1, .threads = c(2, 4), .max_eval = 100, .mode = "local", .dry_run = TRUE),
-      "No bbi.yaml file found in the run directory"
-    )
-
-    # re-create yaml file
-    readr::write_file("created_by: test-test-threads", file.path(MODEL_DIR_BBI, "bbi.yaml"))
-
-    # re-create `mods` for subsequent tests
-    mods <- test_threads(mod1, .threads = c(2, 4), .max_eval = 100, .mode = "local", .dry_run = TRUE)
-
-  })
-
   test_that("delete_models() works for models created by test_threads by default [BBR-CLM-001]", {
 
     mod_ctls <- lapply(mods, function(mod.x){get_model_path(mod.x)}) %>% unlist()
