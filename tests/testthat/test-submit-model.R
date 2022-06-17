@@ -4,16 +4,19 @@ context("submit_model(.dry_run=T)")
 # testing single model submission
 ###################################
 
-# create fake bbi.yaml
-readr::write_file("created_by: test-submit-model", "bbi.yaml")
-on.exit({ fs::file_delete("bbi.yaml")})
+
 
 model_dir <- ABS_MODEL_DIR
 mod_ctl_path <- file.path(model_dir, CTL_FILENAME)
 
+# create fake bbi.yaml
+readr::write_file("created_by: test-submit-model", file.path(model_dir, "bbi.yaml"))
+on.exit({ fs::file_delete(file.path(model_dir, "bbi.yaml"))})
+
 withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   test_that("submit_model(.dry_run=T) returns correct command string [BBR-SBMT-001]",
             {
+
               # correctly parsing yaml
               expect_identical(
                 submit_model(MOD1, .dry_run = T)[[PROC_CALL]],
