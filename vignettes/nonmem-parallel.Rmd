@@ -379,40 +379,26 @@ Once ran, you can use `check_run_times()` to inspect various run times for each 
 ```{r}
 # running it
 mod <- read_model(file.path(MODEL_DIR, 200)) # this should be the copy with capped iterations
-mods <- test_threads(mod, c(8, 16, 24))
+mods <- test_threads(mod, .threads = c(2, 4, 8))
+
+
 ```
 ```
 Submitting 3 models with 3 unique configurations.
 ```
 
-
-After the models all finish, use this `check_threads()` function to see how long each took to run.
+You can use `check_run_times()` to see how long each took to run. If you specify `.wait = TRUE`, your R console will be frozen until the model run has finished.
 
 ```{r}
-#' Check estimation time for models run with various threads values
-#'
-#' @param mods list of bbi model objects created by `test_threads()`
-#'
-#' @return A tibble with columns `threads` (number of threads) and `time`
-#'   (elapsed estimation time in seconds for test models).
-check_threads <- function(mods) {
-  purrr::map_dfr(mods, ~ {
-    s <- model_summary(.x)
-    threads <- as.numeric(stringr::str_extract(s$absolute_model_path, "\\d+(?=threads$)"))
-    tibble::tibble(threads = threads, time = s$run_details$estimation_time)
-  })
-}
 
-check_threads(mods)
+check_run_times(mods, .wait = TRUE, .return_times = "all")
 ```
+
+As outlined above, you can easily delete these dummy models via `delete_models()`. The default `.tags` argument is "test threads", meaning only model objects with that tag will be deleted. In addition, the default behavior is to prompt you if you're sure you want to delete the associated model files.
+```{r}
+delete_models(mods, .tags = "test threads")
 ```
-# A tibble: 3 x 2
-  threads    time
-    <int>   <dbl>
-1       8   149.5
-2      16    88.2
-3      24    65.9
-```
+
 
 
 
