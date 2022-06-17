@@ -92,8 +92,8 @@ test_that("add_tags_diff() can append a new column with html formatting [BBR-TDF
   log_df <- run_log(MODEL_DIR)
   log_html <- add_tags_diff(log_df, .format = "html")
   expect_true("tags_diff" %in% names(log_html))
-  expect_true(all(str_detect(log_html$tags_diff, "<s>") == c(FALSE, rep(TRUE, 5))))
-  expect_true(all(str_detect(log_html$tags_diff, "</s>") == c(FALSE, rep(TRUE, 5))))
+  expect_true(all(str_detect(log_html$tags_diff, "<s>") == c(FALSE, rep(TRUE, 2))))
+  expect_true(all(str_detect(log_html$tags_diff, "</s>") == c(FALSE, rep(TRUE, 2))))
 
 })
 
