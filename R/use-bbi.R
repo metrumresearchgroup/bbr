@@ -64,6 +64,8 @@ use_bbi <- function(.path = NULL, .version = "latest", .force = FALSE, .quiet = 
     .path <- build_bbi_install_path()
   }
 
+  dir_create(dirname(.path))
+
   on.exit(install_menu(.path, .version, .force, .quiet), add = TRUE)
 
   if(isFALSE(.quiet)) print(header)
