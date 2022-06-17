@@ -368,35 +368,15 @@ system(paste("qdel -u", this_user))
 
 ## Testing different numbers of threads
 
-For a big model, try running a few iterations with different numbers of threads. This way you can see the gains from adding more threads and decide how many to use as you continue to work on this model.
+For a big model, try running a few iterations with different numbers of threads. This way you can see the gains from adding more threads and decide how many to use as you continue to work on this model. This can be done via `test_threads()`, which will do the following things:
 
-* First create a dummy copy of your model, and **cap the iterations to 10 or 20** by changing `MAX_EVAL` or `NITER` in your control stream, so that it finishes fairly quickly
-* Use the `test_threads()` function below to:
-  * Copy the model a few times with `copy_model_from()`
-  * Submit the model to run with a few different options for `threads`
+* Create a dummy copy of your model
+* **Cap the iterations** by changing `MAX_EVAL` or `NITER` in your control stream (default is 10), so that it finishes fairly quickly
+* Assign the tag 'test threads' to the newly created models, which makes for easy deletion via `delete_models(.tags = "test threads")`
+
+Once ran, you can use `check_run_times()` to inspect various run times for each of the thread options you are benchmarking
 
 ```{r}
-#' Takes a model object and runs it with various threads values
-#'
-#' @param .mod bbi_model object to copy/test
-#' @param thread_opts Integer vector of threads values to test
-#' @param .mode Passed through to bbr::submit_models(.mode)
-#'
-#' @return A list of the model objects for the submitted models.
-test_threads <- function(.mod, threads_opts, .mode = "sge") {
-  mods <- map(threads_opts, ~ {
-    .m <- copy_model_from(
-      .mod,
-      paste0(get_model_id(.mod), "_", .x, "threads")
-    ) %>%
-      add_bbi_args(list(parallel = TRUE, threads = .x))
-  })
-
-  submit_models(mods, .mode = .mode, .wait = FALSE)
-
-  mods
-}
-
 # running it
 mod <- read_model(file.path(MODEL_DIR, 200)) # this should be the copy with capped iterations
 mods <- test_threads(mod, c(8, 16, 24))
