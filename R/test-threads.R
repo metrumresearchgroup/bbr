@@ -97,7 +97,15 @@ test_threads <- function(
     writeLines(mod_lines, mod_path)
   })
 
-  submit_models(.mods, .wait = FALSE, ...)
+
+  tryCatch({
+    submit_models(.mods, .wait = FALSE, ...)
+  },
+  error = function(cond){
+    delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
+    message(cond)
+    return(invisible(TRUE))
+  })
 
   .mods
 }
