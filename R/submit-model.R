@@ -101,8 +101,8 @@ submit_nonmem_model <- function(.mod,
     .config_path %||% file.path(model_dir, "bbi.yaml"),
     add = coll)
   if(!coll$isEmpty()){
-    stop(paste("No bbi.yaml file was found in the execution directory.",
-               "Please run `bbi_init()` in the appropriate directory to continue."))
+    stop(paste("No bbi configuration was found in the execution directory.",
+               "Please run `bbi_init()` with the appropriate directory to continue."))
   }
 
   if (!is.null(.config_path)) {
