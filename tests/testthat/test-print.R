@@ -37,6 +37,11 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     temp_dir <- file.path(get_model_working_directory(MOD1), "print-test")
     fs::dir_create(temp_dir)
     on.exit(fs::dir_delete(temp_dir))
+
+    withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
+      bbi_init(temp_dir, ".", .no_default_version = TRUE)
+    })
+
     mods <- purrr::map(1:50, ~copy_model_from(MOD1, file.path("print-test", .x)))
     proc <- submit_models(mods, .dry_run = TRUE)
 

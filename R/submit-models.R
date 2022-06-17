@@ -84,7 +84,8 @@ submit_models.list <- function(
 #' @importFrom stringr str_detect
 #' @importFrom tools file_path_sans_ext
 #' @importFrom purrr map
-#' @importFrom rlang is_bare_list
+#' @importFrom rlang %||% is_bare_list
+#' @importFrom checkmate assert_file_exists makeAssertCollection
 #' @return A list of S3 objects of class `bbi_process`
 #' @keywords internal
 submit_nonmem_models <- function(.mods,
@@ -122,21 +123,25 @@ submit_nonmem_models <- function(.mods,
 
     model_dir <- get_model_working_directory(.run[["models"]][[1L]])
 
+    coll = makeAssertCollection()
+    assert_file_exists(
+      .config_path %||% file.path(model_dir, "bbi.yaml"),
+      add = coll)
+    if(!coll$isEmpty()){
+      stop(paste("No bbi.yaml file was found in the execution directory.",
+                  "Please run `bbi_init()` in the appropriate directory to continue."))
+    }
+
     if (!is.null(.config_path)) {
-      checkmate::assert_file_exists(.config_path)
       cmd_args <- c(
         cmd_args,
         sprintf("--config=%s", normalizePath(.config_path))
       )
-    } else {
-      default_config_path <- file.path(model_dir, "bbi.yaml")
-      if (!fs::file_exists(default_config_path) && !isTRUE(.dry_run)) {
-        stop(glue("Looking for default configuration file at {default_config_path}: no such file or directory"), call. = F)
-      }
     }
 
     return(list(cmd_args = cmd_args, model_dir = model_dir))
   })
+
   message(glue("Submitting {length(.mods)} models with {length(cmd_args_list)} unique configurations."))
 
   if (.dry_run) {

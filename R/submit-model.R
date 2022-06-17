@@ -71,6 +71,7 @@ submit_model.bbi_nonmem_model <- function(
 #' @param .mod An S3 object of class `bbi_nonmem_model`, for example from `new_model()`, `read_model()` or `copy_model_from()`
 #' @importFrom stringr str_detect
 #' @importFrom tools file_path_sans_ext
+#' @importFrom checkmate assert_file_exists makeAssertCollection
 #' @return An S3 object of class `bbi_process`
 #' @keywords internal
 submit_nonmem_model <- function(.mod,
@@ -95,17 +96,20 @@ submit_nonmem_model <- function(.mod,
   # define working directory
   model_dir <- get_model_working_directory(.mod)
 
+  coll = makeAssertCollection()
+  assert_file_exists(
+    .config_path %||% file.path(model_dir, "bbi.yaml"),
+    add = coll)
+  if(!coll$isEmpty()){
+    stop(paste("No bbi.yaml file was found in the execution directory.",
+               "Please run `bbi_init()` in the appropriate directory to continue."))
+  }
+
   if (!is.null(.config_path)) {
-    checkmate::assert_file_exists(.config_path)
     cmd_args <- c(
       cmd_args,
       sprintf("--config=%s", normalizePath(.config_path))
     )
-  } else {
-    default_config_path <- file.path(model_dir, "bbi.yaml")
-    if (!fs::file_exists(default_config_path) && !isTRUE(.dry_run)) {
-      stop(glue("Looking for default configuration file at {default_config_path}: no such file or directory"), call. = F)
-    }
   }
 
   if (.dry_run) {

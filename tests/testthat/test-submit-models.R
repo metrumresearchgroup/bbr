@@ -72,9 +72,13 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
             })
 
   test_that("submit_models() works for models in different directories [BBR-SBMT-011]", {
-    new_dir <- "level2"
-    fs::dir_create(file.path(MODEL_DIR, new_dir))
+    new_dir <- file.path(ABS_MODEL_DIR, "level2")
+    fs::dir_create(new_dir)
     on.exit(cleanup())
+
+    withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
+      bbi_init(new_dir, ".", .no_default_version = TRUE)
+    })
 
     # TODO: use test helper functions, e.g., create_all_models(), once the
     # model_directory option is deprecated
@@ -159,6 +163,10 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     temp_mod_path <- create_temp_model()
     mod <- read_model(temp_mod_path)
     mod <- replace_all_bbi_args(mod, NULL)
+
+    withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
+      bbi_init(dirname(temp_mod_path), ".", .no_default_version = TRUE)
+    })
 
     res <- submit_models(list(mod), .dry_run = TRUE)
 
