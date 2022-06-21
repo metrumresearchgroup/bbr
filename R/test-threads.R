@@ -97,9 +97,16 @@ test_threads <- function(
     writeLines(mod_lines, mod_path)
   })
 
-  submit_models(.mods, .wait = FALSE, ...)
 
-  .mods
+  tryCatch({
+    submit_models(.mods, .wait = FALSE, ...)
+    return(.mods)
+  },
+  error = function(cond){
+    delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
+    stop(cond)
+  })
+
 }
 
 #' Check estimation time for models run with various threads values
