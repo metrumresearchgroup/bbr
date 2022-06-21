@@ -85,7 +85,6 @@ submit_models.list <- function(
 #' @importFrom tools file_path_sans_ext
 #' @importFrom purrr map
 #' @importFrom rlang %||% is_bare_list
-#' @importFrom checkmate test_file_exists
 #' @return A list of S3 objects of class `bbi_process`
 #' @keywords internal
 submit_nonmem_models <- function(.mods,
