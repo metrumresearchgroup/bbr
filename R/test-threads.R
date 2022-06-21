@@ -104,8 +104,7 @@ test_threads <- function(
   },
   error = function(cond){
     delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
-    message(cond)
-    return(invisible(NULL))
+    stop(cond)
   })
 
 }
