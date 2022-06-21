@@ -123,9 +123,7 @@ submit_nonmem_models <- function(.mods,
 
     model_dir <- get_model_working_directory(.run[["models"]][[1L]])
 
-    .path_exists <- test_file_exists(
-      .config_path %||% file.path(model_dir, "bbi.yaml"),
-      access = "rw")
+    .path_exists <- file_exists(.config_path %||% file.path(model_dir, "bbi.yaml"))
     if(!.path_exists){
       stop(paste("No bbi configuration was found in the execution directory.",
                  "Please run `bbi_init()` with the appropriate directory to continue."))
