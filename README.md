@@ -7,7 +7,7 @@
 
 [![Build
 Status](https://github-drone.metrumrg.com/api/badges/metrumresearchgroup/bbr/status.svg)](https://github-drone.metrumrg.com/metrumresearchgroup/bbr)
-[![codecov](https://codecov.io/gh/metrumresearchgroup/bbr/branch/develop/graph/badge.svg)](https://codecov.io/gh/metrumresearchgroup/bbr)
+[![codecov](https://codecov.io/gh/metrumresearchgroup/bbr/branch/main/graph/badge.svg)](https://codecov.io/gh/metrumresearchgroup/bbr)
 <!-- badges: end -->
 
 `bbr` is an R interface for running `bbi`. Together they provide a
@@ -39,7 +39,7 @@ latest development version from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("metrumresearchgroup/bbr", ref = "develop")
+devtools::install_github("metrumresearchgroup/bbr", ref = "main")
 ```
 
 ## Documentation
