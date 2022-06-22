@@ -82,7 +82,7 @@ provide isolation. To replicate this environment,
 
 2.  install pkgr
 
-3.  open package in an R session and run `renv::init()`
+3.  open package in an R session and run `renv::init(bare = TRUE)`
 
     -   install `renv` \> 0.8.3-4 into default `.libPaths()` if not
         already installed
