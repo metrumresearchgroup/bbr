@@ -619,7 +619,7 @@ PEST-R001:
   tests:
   - BBR-PEST-001
 PEST-R002:
-  description: param_estimates correctly errors on: Bayesian model, Bayesian model with multiple estimation methods, ONLYSIM models
+  description: param_estimates correctly errors on unsupported models
   tests:
   - BBR-PEST-002
 PEST-R004:
