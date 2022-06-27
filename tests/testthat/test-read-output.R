@@ -61,7 +61,9 @@ test_that("check_file returns correctly [BBR-ROT-001]", {
   list(head_test = 100000, tail_test = 100000, ref = LST_FULL_VEC)
 )
 for (.tc in .test_cases) {
-  test_that(glue::glue("check_file head={.tc[['head_test']]} tail={.tc[['tail_test']]} [BBR-ROT-002]"), {
+  # Note: The odd VALUE=head order avoids mrgvalprep generating a rolled-up
+  # description that includes "head=" at the end.
+  test_that(glue::glue("check_file works: {.tc[['head_test']]}=head {.tc[['tail_test']]}=tail [BBR-ROT-002]"), {
     res <- check_file(LST_TEST_FILE, .print = FALSE, .return = TRUE, .head = .tc[['head_test']], .tail = .tc[['tail_test']])
     expect_identical(res, .tc[['ref']])
   })
