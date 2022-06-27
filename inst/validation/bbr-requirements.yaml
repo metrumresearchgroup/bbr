@@ -644,16 +644,10 @@ PEST-R008:
   tests:
   - BBR-PEST-008
 PEST-R009:
-  description: param_estimates_compare() works on
-  tests:
-  - BBR-PEST-009
-PEST-R010:
-  description: param_estimates_compare() works .compare_cols argument
-  tests:
-  - BBR-PEST-010
-PEST-R011:
   description: param_estimates_compare() works
   tests:
+  - BBR-PEST-009
+  - BBR-PEST-010
   - BBR-PEST-011
 PEST-R012:
   description: param_estimates_compare() errors with different models
