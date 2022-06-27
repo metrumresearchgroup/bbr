@@ -736,11 +736,11 @@ ROT-R004:
   tests:
   - BBR-ROT-004
 ROT-R005:
-  description: check_output_dir()
+  description: check_output_dir() works
   tests:
   - BBR-ROT-005
 ROT-R006:
-  description: check_output_dir()
+  description: check_output_dir() works with filter
   tests:
   - BBR-ROT-006
 ROT-R007:
@@ -752,31 +752,31 @@ ROT-R008:
   tests:
   - BBR-ROT-008
 ROT-R009:
-  description: check_ext()
+  description: check_ext() works with character directory and model object
   tests:
   - BBR-ROT-009
 ROT-R010:
-  description: check_ext() summary object
+  description: check_ext() works with summary object
   tests:
   - BBR-ROT-010
 ROT-R011:
-  description: check_ext()
+  description: check_ext() works when .iter_floor argument is NULL
   tests:
   - BBR-ROT-011
 ROT-R012:
-  description: check_grd()
+  description: check_grd() works with character directory and model object
   tests:
   - BBR-ROT-012
 ROT-R013:
-  description: check_grd() summary object
+  description: check_grd() works with summary object
   tests:
   - BBR-ROT-013
 ROT-R014:
-  description: check_grd()
+  description: check_grd() works when .iter_floor argument is non-zero integer
   tests:
   - BBR-ROT-014
 ROT-R015:
-  description: check_grd()
+  description: check_grd() when .iter_floor argument is NULL
   tests:
   - BBR-ROT-015
 SBMT-R001:
