@@ -375,11 +375,11 @@ GPFO-R017:
   tests:
   - BBR-GPFO-017
 GPFO-R018:
-  description: build_path_from_model returns correct
+  description: build_path_from_model returns correct file from model object
   tests:
   - BBR-GPFO-018
 GPFO-R019:
-  description: build_path_from_model returns correct
+  description: build_path_from_model returns correct file from summary object
   tests:
   - BBR-GPFO-019
 GPFO-R020:
