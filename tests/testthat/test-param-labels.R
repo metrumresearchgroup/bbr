@@ -24,7 +24,7 @@ for (.tc in names(MAT_REF)) {
 }
 
 
-for (i in length(BLOCK_REF)) {
+for (i in seq_along(BLOCK_REF)) {
   test_that(glue::glue("block() parses correctly {i} [BBR-PLB-002]"), {
     expect_equal(block(i), BLOCK_REF[[i]])
   })
