@@ -139,14 +139,15 @@ test_that("get_data_path parses summary object [BBR-GPFO-017]", {
   EXT_TEST_FILE
 )
 for (.tc in .test_cases) {
-  test_that(glue::glue("build_path_from_model returns correct {tools::file_ext(.tc)} from model object [BBR-GPFO-018]"), {
-    expect_identical(build_path_from_model(MOD1, paste0(".", tools::file_ext(.tc))),
+  ext <- tools::file_ext(.tc)
+  test_that(glue::glue("build_path_from_model returns correct {ext} from model object [BBR-GPFO-018]"), {
+    expect_identical(build_path_from_model(MOD1, paste0(".", ext)),
                      normalizePath(.tc))
   })
 
-  test_that(glue::glue("build_path_from_model returns correct {tools::file_ext(.tc)} from summary object [BBR-GPFO-019]"), {
-    skip_if_not_drone_or_metworx(glue::glue("build_path_from_model.bbi_nonmem_summary {tools::file_ext(.tc)}"))
-    expect_identical(build_path_from_model(SUM1, paste0(".", tools::file_ext(.tc))),
+  test_that(glue::glue("build_path_from_model returns correct {ext} from summary object [BBR-GPFO-019]"), {
+    skip_if_not_drone_or_metworx(glue::glue("build_path_from_model.bbi_nonmem_summary {ext}"))
+    expect_identical(build_path_from_model(SUM1, paste0(".", ext)),
                      normalizePath(.tc))
   })
 }
