@@ -917,6 +917,10 @@ SUM-R009:
   description: as_summary_list.bbi_summary_log_df works
   tests:
   - BBR-SUM-009
+SUM-R010:
+  description: model_summary() handles NA objective function values
+  tests:
+  - BBR-SUM-011
 TDF-R001:
   description: tags_diff.bbi_model default happy path works
   tests:

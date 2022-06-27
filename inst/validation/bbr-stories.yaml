@@ -258,6 +258,7 @@ SUM-S001:
   requirements:
   - SUM-R001
   - SUM-R006
+  - SUM-R010
   - WRKF-R001
   - WRKF-R002
   - CRT-R001
