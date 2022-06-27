@@ -74,12 +74,13 @@ withr::with_file(OUTPUT_FILE, {
   readr::write_lines(LST_FULL_VEC, OUTPUT_FILE)
 
   .test_cases <- list(
-    list(.test_arg = OUTPUT_DIR, .test_name = "tail_output() character dir"),
-    list(.test_arg = OUTPUT_FILE, .test_name = "tail_output() character file"),
-    list(.test_arg = MOD1, .test_name = "tail_output() model object")
+    list(.test_arg = OUTPUT_DIR, .test_label = "character dir"),
+    list(.test_arg = OUTPUT_FILE, .test_label = "character file"),
+    list(.test_arg = MOD1, .test_label = "model object")
   )
   for (.tc in .test_cases) {
-    test_that(paste(.tc[[".test_name"]], "[BBR-ROT-003]"), {
+    test_that(paste("tail_output() works:",
+                    .tc[[".test_label"]], "[BBR-ROT-003]"), {
       res <- tail_output(.tc[[".test_arg"]], .print = FALSE, .return = TRUE)
       expect_identical(res, LST_REF_DEFAULT)
     })
@@ -92,12 +93,13 @@ test_that("tail_output() doesn't error with finished NONMEM run [BBR-ROT-003]", 
 
 # check .lst
 .test_cases <- list(
-  list(.test_arg = OUTPUT_DIR, .test_name = "tail_lst() character dir"),
-  list(.test_arg = LST_TEST_FILE, .test_name = "tail_lst() character file"),
-  list(.test_arg = MOD1, .test_name = "tail_lst() model object")
+  list(.test_arg = OUTPUT_DIR, .test_label = "character dir"),
+  list(.test_arg = LST_TEST_FILE, .test_label = "character file"),
+  list(.test_arg = MOD1, .test_label = "model object")
 )
 for (.tc in .test_cases) {
-  test_that(paste(.tc[[".test_name"]], "[BBR-ROT-004]"), {
+  test_that(paste("tail_lst() works:",
+                  .tc[[".test_label"]], "[BBR-ROT-004]"), {
     res <- tail_lst(.tc[[".test_arg"]], .print = FALSE, .return = TRUE)
     expect_identical(res, LST_REF_DEFAULT)
   })
@@ -110,11 +112,12 @@ for (.tc in .test_cases) {
 
 # test regular output functionality
 .test_cases <- list(
-  list(.test_arg = OUTPUT_DIR, .test_name = "check_output_dir() character dir"),
-  list(.test_arg = MOD1, .test_name = "check_output_dir() model object")
+  list(.test_arg = OUTPUT_DIR, .test_label = "character dir"),
+  list(.test_arg = MOD1, .test_label = "model object")
 )
 for (.tc in .test_cases) {
-  test_that(paste(.tc[[".test_name"]], "[BBR-ROT-005]"), {
+  test_that(paste("check_output_dir() works:",
+                  .tc[[".test_label"]], "[BBR-ROT-005]"), {
     res <- check_output_dir(.tc[[".test_arg"]])
     expect_identical(basename(res), basename(OUTPUT_DIR_LS))
   })
@@ -122,11 +125,12 @@ for (.tc in .test_cases) {
 
 # test output functionality with regexpr passed through to dir_ls
 .test_cases <- list(
-  list(.test_arg = OUTPUT_DIR, .test_name = "check_output_dir() character dir with filter"),
-  list(.test_arg = MOD1, .test_name = "check_output_dir() model object with filter")
+  list(.test_arg = OUTPUT_DIR, .test_label = "character dir"),
+  list(.test_arg = MOD1, .test_label = "model object")
 )
 for (.tc in .test_cases) {
-  test_that(paste(.tc[[".test_name"]], "[BBR-ROT-006]"), {
+  test_that(paste("check_output_dir() works with filter:",
+                  .tc[[".test_label"]], "[BBR-ROT-006]"), {
     res <- check_output_dir(.tc[[".test_arg"]], regexp = CTL_FILTER)
     expect_identical(basename(res), basename(CTL_FILTER_RES))
   })
@@ -162,11 +166,12 @@ test_that("check_nonmem_table_output(.x_floor=0) works [BBR-ROT-008]", {
 
 # test check_ext
 .test_cases <- list(
-  list(.test_arg = OUTPUT_DIR, .test_name = "check_ext() character dir default .iter_floor"),
-  list(.test_arg = MOD1, .test_name = "check_ext() model object default .iter_floor")
+  list(.test_arg = OUTPUT_DIR, .test_label = "character dir"),
+  list(.test_arg = MOD1, .test_label = "model object")
 )
 for (.tc in .test_cases) {
-  test_that(paste(.tc[[".test_name"]], "[BBR-ROT-009]"), {
+  test_that(paste("check_ext() works with default .iter_floor:",
+                  .tc[[".test_label"]], "[BBR-ROT-009]"), {
     df <- check_ext(.tc[[".test_arg"]])
     ref_df <- dget(EXT_REF_FLOOR_0)
 
@@ -194,11 +199,12 @@ test_that("check_ext() summary object [BBR-ROT-010]", {
 })
 
 .test_cases <- list(
-  list(.test_arg = OUTPUT_DIR, .test_name = "check_ext() character dir default .iter_floor NULL"),
-  list(.test_arg = MOD1, .test_name = "check_ext() model object .iter_floor NULL")
+  list(.test_arg = OUTPUT_DIR, .test_label = "character dir"),
+  list(.test_arg = MOD1, .test_label = "model object")
 )
 for (.tc in .test_cases) {
-  test_that(paste(.tc[[".test_name"]], "[BBR-ROT-011]"), {
+  test_that(paste("check_ext() works when .iter_floor is NULL:",
+                  .tc[[".test_label"]], "[BBR-ROT-011]"), {
     df <- check_ext(.tc[[".test_arg"]], .iter_floor = NULL)
     ref_df <- dget(EXT_REF_FLOOR_NULL)
 
@@ -215,11 +221,12 @@ for (.tc in .test_cases) {
 
 # test check_grd
 .test_cases <- list(
-  list(.test_arg = OUTPUT_DIR, .test_name = "check_grd() character dir default .iter_floor"),
-  list(.test_arg = MOD1, .test_name = "check_grd() model object default .iter_floor")
+  list(.test_arg = OUTPUT_DIR, .test_label = "character dir"),
+  list(.test_arg = MOD1, .test_label = "model object")
 )
 for (.tc in .test_cases) {
-  test_that(paste(.tc[[".test_name"]], "[BBR-ROT-012]"), {
+  test_that(paste("check_grd() works with default .iter_floor:",
+                  .tc[[".test_label"]], "[BBR-ROT-012]"), {
     df <- check_grd(.tc[[".test_arg"]])
     ref_df <- dget(GRD_REF_FLOOR_0)
     expect_equal(df, ref_df)
@@ -240,11 +247,12 @@ test_that("check_grd() summary object [BBR-ROT-013]", {
 })
 
 .test_cases <- list(
-  list(.test_arg = OUTPUT_DIR, .test_name = "check_grd() character dir .iter_floor 10"),
-  list(.test_arg = MOD1, .test_name = "check_grd() model object .iter_floor 10")
+  list(.test_arg = OUTPUT_DIR, .test_label = "character dir"),
+  list(.test_arg = MOD1, .test_label = "model object")
 )
 for (.tc in .test_cases) {
-  test_that(paste(.tc[[".test_name"]], "[BBR-ROT-014]"), {
+  test_that(paste("check_grd() works when .iter_floor is non-zero integer:",
+                  .tc[[".test_label"]], "[BBR-ROT-014]"), {
     df <- check_grd(.tc[[".test_arg"]], .iter_floor = 10)
     ref_df <- dget(GRD_REF_FLOOR_10)
     expect_equal(df, ref_df)
@@ -258,11 +266,12 @@ for (.tc in .test_cases) {
 }
 
 .test_cases <- list(
-  list(.test_arg = OUTPUT_DIR, .test_name = "check_grd() character dir .iter_floor NULL"),
-  list(.test_arg = MOD1, .test_name = "check_grd() model object .iter_floor NULL")
+  list(.test_arg = OUTPUT_DIR, .test_label = "character dir"),
+  list(.test_arg = MOD1, .test_label = "model object")
 )
 for (.tc in .test_cases) {
-  test_that(paste(.tc[[".test_name"]], "[BBR-ROT-015]"), {
+  test_that(paste("check_grd() works when .iter_floor is NULL:",
+                  .tc[[".test_label"]], "[BBR-ROT-015]"), {
     df <- check_grd(.tc[[".test_arg"]], .iter_floor = NULL)
     ref_df <- dget(GRD_REF_FLOOR_NULL)
     expect_equal(df, ref_df)
