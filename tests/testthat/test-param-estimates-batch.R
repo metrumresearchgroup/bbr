@@ -222,7 +222,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_true(all(c("30%", "40%", "60%") %in% names(res)))
   })
 
-  test_that("param_estimates_compare() works: na.rm argument [BBR-PEST-011]", {
+  test_that("param_estimates_compare() works: na.rm argument [BBR-PEST-014]", {
 
     expect_error({
       res <- param_estimates_compare(

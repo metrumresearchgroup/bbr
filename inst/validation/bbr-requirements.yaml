@@ -649,6 +649,7 @@ PEST-R009:
   - BBR-PEST-009
   - BBR-PEST-010
   - BBR-PEST-011
+  - BBR-PEST-014
 PEST-R012:
   description: param_estimates_compare() errors with different models
   tests:
