@@ -407,7 +407,7 @@ GPFO-R025:
   tests:
   - BBR-GPFO-025
 GPFO-R026:
-  description: get_config_path()
+  description: get_config_path() works
   tests:
   - BBR-GPFO-026
 MDF-R001:
@@ -571,7 +571,7 @@ NMT-R002:
   tests:
   - BBR-NMT-002
 NMT-R003:
-  description: nm_table_files()
+  description: nm_table_files() works
   tests:
   - BBR-NMT-003
 NWMD-R001:
@@ -684,15 +684,15 @@ PLB-R006:
   tests:
   - BBR-PLB-006
 PRNT-R001:
-  description: print.bbi_process
+  description: print.bbi_process works
   tests:
   - BBR-PRNT-001
 PRNT-R002:
-  description: print.bbi_nonmem_model
+  description: print.bbi_nonmem_model works
   tests:
   - BBR-PRNT-002
 PRNT-R003:
-  description: print.bbi_nonmem_summary
+  description: print.bbi_nonmem_summary works
   tests:
   - BBR-PRNT-003
 RBP-R001:
@@ -728,11 +728,11 @@ ROT-R002:
   tests:
   - BBR-ROT-002
 ROT-R003:
-  description: tail_output()
+  description: tail_output() works
   tests:
   - BBR-ROT-003
 ROT-R004:
-  description: tail_lst()
+  description: tail_lst() works
   tests:
   - BBR-ROT-004
 ROT-R005:
