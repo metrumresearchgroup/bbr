@@ -724,7 +724,7 @@ ROT-R001:
   tests:
   - BBR-ROT-001
 ROT-R002:
-  description: check_file head=
+  description: check_file supports head and tail arguments
   tests:
   - BBR-ROT-002
 ROT-R003:
