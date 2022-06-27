@@ -25,13 +25,16 @@ This file shows some helpful patterns for using `bbr` with NONMEM, mostly relati
 library(bbr)
 
 MODEL_DIR <- system.file("model", "nonmem" , "pk-parallel", package = "bbr")
+DATA_DIR <- system.file("extdata" , package = "bbr")
 ```
 
 
 ```{r, include=F}
 # setup
 library(fs)
-ORIG_MODELS <- c(100, 200)
+library(dplyr)
+library(readr)
+ORIG_MODELS <- c(200)
 COPIED_MODELS <- c(300, 400)
 
 # clear old bbi.yaml
@@ -56,6 +59,50 @@ walk(COPIED_MODELS, ~{
   file_copy(file.path(MODEL_DIR, paste0(200, ".yaml")), file.path(MODEL_DIR, paste0(.x, ".yaml")))
 })
 
+
+# Generate new dataset with necessary columns (ranges, means, and sds taken from example project)
+acop_baseline <- read_csv(file.path(DATA_DIR, "acop.csv"))
+
+# Create distributions from original data
+# egfr_range <- c(15.42, 126.07)
+egfr_dist <- rnorm(n_distinct(acop_baseline$id), mean = 88.67535, sd = 27.42009) 
+egfr_dist <- egfr_dist[egfr_dist > 0]
+# alb_range <- c(1.28, 5.39)
+alb_dist <- rnorm(n_distinct(acop_baseline$id), mean = 4.295211, sd = 0.7071837) 
+alb_dist <- alb_dist[alb_dist > 0]
+# age_range <- c(18.92, 49.53)
+age_dist <- rnorm(n_distinct(acop_baseline$id), mean = 33.81955, sd = 8.603712) 
+age_dist <- age_dist[age_dist > 0]
+
+# Randomly assign sampled values to unique patients
+acop_adjusted <- acop_baseline %>%
+  group_by(id) %>%
+  mutate(
+    EGFR = sample(egfr_dist, 1),
+    ALB = sample(alb_dist, 1),
+    AGE = sample(age_dist, 1)) %>%
+  ungroup() 
+
+# First id is missing evid/amt
+# Also need to change compartment and dosing information
+missing_row <- acop_adjusted[1,] %>% mutate(dv = 0, evid = 1, amt = 10000, mdv = 1)
+acop_adjusted <- bind_rows(missing_row, acop_adjusted) %>%
+  mutate(CMT = if_else(evid == 1, 1, 2),
+         amt = if_else(amt == 10000, "5", "."),
+         SEQ = if_else(evid == 1, 0, 1),
+         C = ".") %>%
+  filter(!(time == 0 & evid == 0)) %>%
+  mutate(num = 1:n())
+
+names(acop_adjusted) <- toupper(names(acop_adjusted))
+acop_adjusted <- acop_adjusted %>%
+  relocate("C", "NUM", "ID", "TIME", "SEQ", "CMT", "EVID", "AMT", "DV", "AGE", "WT", "EGFR", "ALB")
+
+
+
+analysis3_path <- file.path(DATA_DIR, "acop_adjusted.csv")
+write_csv(acop_adjusted, analysis3_path)
+on.exit(fs::file_delete(analysis3_path))
 ```
 
 
@@ -93,11 +140,11 @@ For small runs, use a 4-core or 8-core head node and just do `submit_model(..., 
 * This is especially nice for new models that are fairly simple and you just want a quick result back.
 
 ```{r}
-mod <- read_model(file.path(MODEL_DIR, 100))
+mod <- read_model(file.path(MODEL_DIR, 200))
 submit_model(
   mod,
   .mode = "local",
-  .bbi_args = list(parallel = TRUE, threads = 4) # not needed if set in bbi.yaml
+  .bbi_args = list(parallel = TRUE, threads = 4, overwrite = TRUE) # not needed if set in bbi.yaml
 )
 ```
 ```
@@ -356,6 +403,7 @@ system("qstat -f")
      10 0.55500 Run_400    sethg        qw    09/27/2021 12:56:18     8 
 ```
 
+
 * You can kill jobs running on the grid using `qdel` in the terminal (or with `system()` from R).
   * `qdel SOME_NUMBER` kills the job specified by it's "job id" (the first column in the `qstat -f` output)
   * `qdel -u YOUR_USERNAME` kills _all jobs_ launched by you
@@ -380,26 +428,52 @@ Once ran, you can use `check_run_times()` to inspect various run times for each 
 # running it
 mod <- read_model(file.path(MODEL_DIR, 200)) # this should be the copy with capped iterations
 mods <- test_threads(mod, .threads = c(2, 4, 8))
-
-
 ```
 ```
 Submitting 3 models with 3 unique configurations.
 ```
 
-You can use `check_run_times()` to see how long each took to run. If you specify `.wait = TRUE`, your R console will be frozen until the model run has finished.
+* We can see that 3 models have been created and submitted to the grid
 
 ```{r}
-
-check_run_times(mods, .wait = TRUE, .return_times = "all")
+system("qstat -f")
+```
+```
+############################################################################
+ - PENDING JOBS - PENDING JOBS - PENDING JOBS - PENDING JOBS - PENDING JOBS
+############################################################################
+      4 0.60500 Run_200_8_ barrettk     qw    06/27/2022 15:31:54     8        
+      3 0.53833 Run_200_4_ barrettk     qw    06/27/2022 15:31:54     4        
+      2 0.50500 Run_200_2_ barrettk     qw    06/27/2022 15:31:54     2  
 ```
 
-As outlined above, you can easily delete these dummy models via `delete_models()`. The default `.tags` argument is "test threads", meaning only model objects with that tag will be deleted. In addition, the default behavior is to prompt you if you're sure you want to delete the associated model files.
+
+* You can also use `check_run_times()` to see how long each took to run. If you specify `.wait = TRUE`, your R console will be frozen until the model run has finished, regardless of whether you submitted them to the grid or not.
+
+```{r}
+check_run_times(mods, .wait = TRUE, .return_times = "all")
+```
+```
+Waiting for 3 model(s) to finish...
+3 model(s) have finished                                                                                                                                                                               
+# A tibble: 3 × 5                                                                                                                                                                                      
+  run           threads estimation_time covariance_time cpu_time
+  <chr>           <int>           <dbl>           <dbl>    <dbl>
+1 200_2_threads       2            2.38            2.7      5.94
+2 200_4_threads       4            0.72            1.03     5.71
+3 200_8_threads       8            0.73            0.66     6.18
+```
+
+* As outlined above, you can easily delete these dummy models via `delete_models()`. The default `.tags` argument is "test threads", meaning only model objects with that tag will be deleted. In addition, the default behavior is to prompt you if you're sure you want to delete the associated model files.
+
 ```{r}
 delete_models(mods, .tags = "test threads")
 ```
-
-
+```
+Are you sure you want to remove 3 models with the following tags?: `test threads` (Yes/no/cancel) y
+Removed 3 models with the following tags:
+- test threads
+```
 
 
 ```{r, include=F}
@@ -417,8 +491,10 @@ walk(COPIED_MODELS, ~{
     if (file_exists(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads.yaml")))) file_delete(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads.yaml")))
     if (dir_exists(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads")))) dir_delete(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads")))    
   }
-
 })
+
+# clear old bbi.yaml
+if (file_exists(file.path(MODEL_DIR, "bbi.yaml"))) file_delete(file.path(MODEL_DIR, "bbi.yaml"))
 
 ```
 
