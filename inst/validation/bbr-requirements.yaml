@@ -902,7 +902,7 @@ SUM-R004:
   tests:
   - BBR-SUM-004
 SUM-R005:
-  description: model_summary() fails
+  description: model_summary() fails on .lst input
   tests:
   - BBR-SUM-005
 SUM-R006:
