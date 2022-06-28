@@ -102,10 +102,9 @@ acop_adjusted <- acop_adjusted %>%
 
 analysis3_path <- file.path(DATA_DIR, "acop_adjusted.csv")
 write_csv(acop_adjusted, analysis3_path)
-on.exit(fs::file_delete(analysis3_path))
 ```
 
-## Passing arguments to `submit_model()`
+## Running a model in parallel
 
 If you would like to set the parallelization for a specific model, you can do this by setting `parallel = TRUE` and `threads=SOME_INTEGER` where `SOME_INTEGER` is the number of cores that you would like the model to use. This can be done in two ways:
 
@@ -437,20 +436,24 @@ system(paste("qdel -u", this_user))
 
 For a big model, try running a few iterations with different numbers of threads. This way you can see the gains from adding more threads and decide how many to use as you continue to work on this model. This can be done via `test_threads()`, which will do the following things:
 
-* Create a dummy copy of your model
-* **Cap the iterations** by changing `MAX_EVAL` or `NITER` in your control stream (default is 10), so that it finishes fairly quickly
-* Assign the tag 'test threads' to the newly created models, which makes for easy deletion via `delete_models(.tags = "test threads")`
+* Create a dummy copy of your model.
+* Assign the tag 'test threads' to the newly created models, which makes for easy deletion via `delete_models()` (shown below).
+* Cap the iterations by changing `MAX_EVAL` or `NITER` in your control stream so that it finishes fairly quickly. Typically, something between 10 (the default) and 100 is good, depending on how long each iteration takes. Ideally, you want something that will run for 3-5 minutes total to give you the most accurate estimates.
 
 ```{r}
 # running it
 mod <- read_model(file.path(MODEL_DIR, 200)) 
-mods <- test_threads(mod, .threads = c(2, 4, 8))
+mods_test <- test_threads(
+  mod, 
+  .threads = c(2, 4, 8),
+  .max_eval = 200
+)
 ```
 ```
 Submitting 3 models with 3 unique configurations.
 ```
 
-We can see that 3 models have been created and submitted to the grid
+We can see that 3 models have been created and submitted to the grid.
 
 ```{r}
 system("qstat -f")
@@ -459,32 +462,34 @@ system("qstat -f")
 ############################################################################
  - PENDING JOBS - PENDING JOBS - PENDING JOBS - PENDING JOBS - PENDING JOBS
 ############################################################################
-      4 0.60500 Run_200_8_ barrettk     qw    06/27/2022 15:31:54     8        
-      3 0.53833 Run_200_4_ barrettk     qw    06/27/2022 15:31:54     4        
-      2 0.50500 Run_200_2_ barrettk     qw    06/27/2022 15:31:54     2  
+      1 0.00000 Run_200_2_ sethg        qw    06/28/2022 15:52:36     2        
+      2 0.00000 Run_200_4_ sethg        qw    06/28/2022 15:52:36     4        
+      3 0.00000 Run_200_8_ sethg        qw    06/28/2022 15:52:36     8  
 ```
 
 
-Once run, you can use `check_run_times()` to inspect the run times for each of the thread options you are benchmarking. If you specify `.wait = TRUE`, your R console will be frozen until the model run has finished, regardless of whether you submitted them to the grid or not.
+Once run, you can use `check_run_times()` to inspect the run times for each of the thread options you are benchmarking. By default, your R console with be frozen until the model runs have finished. You can pass `.wait = FALSE` to disable this, in which case you will get `NA` in the rows corresponding to models that have not yet finished.
 
 ```{r}
-check_run_times(mods, .wait = TRUE, .return_times = "all")
+check_run_times(mods_test)
 ```
 ```
 Waiting for 3 model(s) to finish...
 3 model(s) have finished                                                                                                                                                                               
 # A tibble: 3 × 5                                                                                                                                                                                      
-  run           threads estimation_time covariance_time cpu_time
-  <chr>           <int>           <dbl>           <dbl>    <dbl>
-1 200_2_threads       2            2.38            2.7      5.94
-2 200_4_threads       4            0.72            1.03     5.71
-3 200_8_threads       8            0.73            0.66     6.18
+  run           threads estimation_time
+  <chr>           <int>           <dbl>
+1 200_2_threads       2            4.43
+2 200_4_threads       4            2.59
+3 200_8_threads       8            2.01
 ```
+
+This tibble has one row for each test run and a column showing the time for each (in seconds). By default it returns the estimation time, but you can pass `.return_times`
 
 As outlined above, you can easily delete these dummy models via `delete_models()`. The default `.tags` argument is "test threads", meaning only model objects with that tag will be deleted. In addition, the default behavior is to prompt you if you're sure you want to delete the associated model files.
 
 ```{r}
-delete_models(mods, .tags = "test threads")
+delete_models(mods_test)
 ```
 ```
 Are you sure you want to remove 3 models with the following tags?: `test threads` (Yes/no/cancel) y
@@ -503,12 +508,14 @@ walk(COPIED_MODELS, ~{
   if (file_exists(file.path(MODEL_DIR, paste0(.x, ".ctl")))) file_delete(file.path(MODEL_DIR, paste0(.x, ".ctl")))
   if (file_exists(file.path(MODEL_DIR, paste0(.x, ".yaml")))) file_delete(file.path(MODEL_DIR, paste0(.x, ".yaml")))
   
-  for (.n in c(8, 16, 24)) {
+  for (.n in c(2, 4, 8, 16, 24)) {
     if (file_exists(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads.ctl")))) file_delete(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads.ctl")))
     if (file_exists(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads.yaml")))) file_delete(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads.yaml")))
     if (dir_exists(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads")))) dir_delete(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads")))    
   }
 })
+
+if (fs::file_exists(analysis3_path)) fs::file_delete(analysis3_path)
 
 # clear old bbi.yaml
 if (file_exists(file.path(MODEL_DIR, "bbi.yaml"))) file_delete(file.path(MODEL_DIR, "bbi.yaml"))
