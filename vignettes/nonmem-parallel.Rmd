@@ -40,6 +40,12 @@ COPIED_MODELS <- c(300, 400)
 # clear old bbi.yaml
 if (file_exists(file.path(MODEL_DIR, "bbi.yaml"))) file_delete(file.path(MODEL_DIR, "bbi.yaml"))
 
+bbi_init(
+  .dir = MODEL_DIR,
+  .nonmem_dir = "/opt/NONMEM",
+  .nonmem_version = "nm75"
+)
+
 # clear output dirs
 walk(c(ORIG_MODELS, COPIED_MODELS), ~{
   if (dir_exists(file.path(MODEL_DIR, .x))) dir_delete(file.path(MODEL_DIR, .x))
@@ -443,11 +449,7 @@ For a big model, try running a few iterations with different numbers of threads.
 ```{r}
 # running it
 mod <- read_model(file.path(MODEL_DIR, 200)) 
-mods_test <- test_threads(
-  mod, 
-  .threads = c(2, 4, 8),
-  .max_eval = 200
-)
+mods_test <- test_threads(mod, .threads = c(2, 4, 8))
 ```
 ```
 Submitting 3 models with 3 unique configurations.
@@ -479,9 +481,9 @@ Waiting for 3 model(s) to finish...
 # A tibble: 3 × 5                                                                                                                                                                                      
   run           threads estimation_time
   <chr>           <int>           <dbl>
-1 200_2_threads       2            4.43
-2 200_4_threads       4            2.59
-3 200_8_threads       8            2.01
+1 200_2_threads       2            14.04
+2 200_4_threads       4             9.59
+3 200_8_threads       8             5.64
 ```
 
 This tibble has one row for each test run and a column showing the time for each (in seconds). By default it returns the estimation time, but you can pass `.return_times`
