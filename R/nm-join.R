@@ -69,6 +69,7 @@
 #' for alternatives.
 #'
 #' @importFrom dplyr left_join right_join select
+#' @importFrom rlang sym
 #' @seealso [nm_tables()], [nm_table_files()], [nm_file()]
 #' @export
 nm_join <- function(
