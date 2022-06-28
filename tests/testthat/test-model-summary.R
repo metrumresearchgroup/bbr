@@ -150,7 +150,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_error(model_summary(mod2), regexp = NOT_FINISHED_ERR_MSG)
   })
 
-  test_that("model_summary() fails predictably if no .lst file present [BBR-SUM-005]", {
+  test_that("model_summary() fails on bad .lst input: no file [BBR-SUM-005]", {
     on.exit({
       fs::dir_delete(NEW_MOD2)
       fs::file_delete(ctl_ext(NEW_MOD2))
@@ -170,7 +170,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_error(model_summary(mod2), regexp = NO_LST_ERR_MSG)
   })
 
-  test_that("model_summary() fails if multiple .lst files are present [BBR-SUM-005]", {
+  test_that("model_summary() fails on bad .lst input: multiple files [BBR-SUM-005]", {
     on.exit({
       fs::dir_delete(NEW_MOD2)
       fs::file_delete(ctl_ext(NEW_MOD2))

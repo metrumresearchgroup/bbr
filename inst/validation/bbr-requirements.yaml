@@ -375,11 +375,11 @@ GPFO-R017:
   tests:
   - BBR-GPFO-017
 GPFO-R018:
-  description: build_path_from_model returns correct
+  description: build_path_from_model returns correct file from model object
   tests:
   - BBR-GPFO-018
 GPFO-R019:
-  description: build_path_from_model returns correct
+  description: build_path_from_model returns correct file from summary object
   tests:
   - BBR-GPFO-019
 GPFO-R020:
@@ -407,7 +407,7 @@ GPFO-R025:
   tests:
   - BBR-GPFO-025
 GPFO-R026:
-  description: get_config_path()
+  description: get_config_path() works
   tests:
   - BBR-GPFO-026
 MDF-R001:
@@ -571,7 +571,7 @@ NMT-R002:
   tests:
   - BBR-NMT-002
 NMT-R003:
-  description: nm_table_files()
+  description: nm_table_files() works
   tests:
   - BBR-NMT-003
 NWMD-R001:
@@ -619,13 +619,9 @@ PEST-R001:
   tests:
   - BBR-PEST-001
 PEST-R002:
-  description: param_estimates correctly errors on Bayesian model
+  description: param_estimates correctly errors on unsupported models
   tests:
   - BBR-PEST-002
-PEST-R003:
-  description: param_estimates correctly errors on
-  tests:
-  - BBR-PEST-003
 PEST-R004:
   description: param_estimates correctly warns on mixture model
   tests:
@@ -648,17 +644,12 @@ PEST-R008:
   tests:
   - BBR-PEST-008
 PEST-R009:
-  description: param_estimates_compare() works on
-  tests:
-  - BBR-PEST-009
-PEST-R010:
-  description: param_estimates_compare() works .compare_cols argument
-  tests:
-  - BBR-PEST-010
-PEST-R011:
   description: param_estimates_compare() works
   tests:
+  - BBR-PEST-009
+  - BBR-PEST-010
   - BBR-PEST-011
+  - BBR-PEST-014
 PEST-R012:
   description: param_estimates_compare() errors with different models
   tests:
@@ -668,11 +659,11 @@ PEST-R013 :
   tests:
   - BBR-PEST-013
 PLB-R001:
-  description: build_matrix_indices() parses correctly ref
+  description: build_matrix_indices() parses correctly
   tests:
   - BBR-PLB-001
 PLB-R002:
-  description: block() parses correctly 5
+  description: block() parses correctly
   tests:
   - BBR-PLB-002
 PLB-R003:
@@ -680,7 +671,7 @@ PLB-R003:
   tests:
   - BBR-PLB-003
 PLB-R004:
-  description: parse_param_comment() called internally PEX
+  description: parse_param_comment() called internally
   tests:
   - BBR-PLB-004
 PLB-R005:
@@ -693,15 +684,15 @@ PLB-R006:
   tests:
   - BBR-PLB-006
 PRNT-R001:
-  description: print.bbi_process
+  description: print.bbi_process works
   tests:
   - BBR-PRNT-001
 PRNT-R002:
-  description: print.bbi_nonmem_model
+  description: print.bbi_nonmem_model works
   tests:
   - BBR-PRNT-002
 PRNT-R003:
-  description: print.bbi_nonmem_summary
+  description: print.bbi_nonmem_summary works
   tests:
   - BBR-PRNT-003
 RBP-R001:
@@ -733,23 +724,23 @@ ROT-R001:
   tests:
   - BBR-ROT-001
 ROT-R002:
-  description: check_file head=
+  description: check_file supports head and tail arguments
   tests:
   - BBR-ROT-002
 ROT-R003:
-  description: tail_output()
+  description: tail_output() works
   tests:
   - BBR-ROT-003
 ROT-R004:
-  description: tail_lst()
+  description: tail_lst() works
   tests:
   - BBR-ROT-004
 ROT-R005:
-  description: check_output_dir()
+  description: check_output_dir() works
   tests:
   - BBR-ROT-005
 ROT-R006:
-  description: check_output_dir()
+  description: check_output_dir() works with filter
   tests:
   - BBR-ROT-006
 ROT-R007:
@@ -761,31 +752,31 @@ ROT-R008:
   tests:
   - BBR-ROT-008
 ROT-R009:
-  description: check_ext()
+  description: check_ext() works with character directory and model object
   tests:
   - BBR-ROT-009
 ROT-R010:
-  description: check_ext() summary object
+  description: check_ext() works with summary object
   tests:
   - BBR-ROT-010
 ROT-R011:
-  description: check_ext()
+  description: check_ext() works when .iter_floor argument is NULL
   tests:
   - BBR-ROT-011
 ROT-R012:
-  description: check_grd()
+  description: check_grd() works with character directory and model object
   tests:
   - BBR-ROT-012
 ROT-R013:
-  description: check_grd() summary object
+  description: check_grd() works with summary object
   tests:
   - BBR-ROT-013
 ROT-R014:
-  description: check_grd()
+  description: check_grd() works when .iter_floor argument is non-zero integer
   tests:
   - BBR-ROT-014
 ROT-R015:
-  description: check_grd()
+  description: check_grd() when .iter_floor argument is NULL
   tests:
   - BBR-ROT-015
 SBMT-R001:
@@ -906,7 +897,7 @@ SUM-R004:
   tests:
   - BBR-SUM-004
 SUM-R005:
-  description: model_summary() fails
+  description: model_summary() fails on .lst input
   tests:
   - BBR-SUM-005
 SUM-R006:
