@@ -25,23 +25,32 @@ This file shows some helpful patterns for using `bbr` with NONMEM, mostly relati
 library(bbr)
 
 MODEL_DIR <- system.file("model", "nonmem" , "pk-parallel", package = "bbr")
+DATA_DIR <- system.file("extdata" , package = "bbr")
 ```
 
 
 ```{r, include=F}
 # setup
 library(fs)
-ORIG_MODELS <- c(100, 200)
+library(dplyr)
+library(readr)
+ORIG_MODELS <- c(200)
 COPIED_MODELS <- c(300, 400)
 
 # clear old bbi.yaml
 if (file_exists(file.path(MODEL_DIR, "bbi.yaml"))) file_delete(file.path(MODEL_DIR, "bbi.yaml"))
 
+bbi_init(
+  .dir = MODEL_DIR,
+  .nonmem_dir = "/opt/NONMEM",
+  .nonmem_version = "nm75"
+)
+
 # clear output dirs
 walk(c(ORIG_MODELS, COPIED_MODELS), ~{
   if (dir_exists(file.path(MODEL_DIR, .x))) dir_delete(file.path(MODEL_DIR, .x))
   
-    for (.n in c(8, 16, 24)) {
+    for (.n in c(2, 4, 8, 16, 24)) {
     if (file_exists(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads.ctl")))) file_delete(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads.ctl")))
     if (file_exists(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads.yaml")))) file_delete(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads.yaml")))
     if (dir_exists(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads")))) dir_delete(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads")))    
@@ -56,9 +65,72 @@ walk(COPIED_MODELS, ~{
   file_copy(file.path(MODEL_DIR, paste0(200, ".yaml")), file.path(MODEL_DIR, paste0(.x, ".yaml")))
 })
 
+
+# Generate new dataset with necessary columns (ranges, means, and sds taken from example project)
+acop_baseline <- read_csv(file.path(DATA_DIR, "acop.csv"))
+
+# Create distributions from original data
+# egfr_range <- c(15.42, 126.07)
+egfr_dist <- rnorm(n_distinct(acop_baseline$id), mean = 88.67535, sd = 27.42009) 
+egfr_dist <- egfr_dist[egfr_dist > 0]
+# alb_range <- c(1.28, 5.39)
+alb_dist <- rnorm(n_distinct(acop_baseline$id), mean = 4.295211, sd = 0.7071837) 
+alb_dist <- alb_dist[alb_dist > 0]
+# age_range <- c(18.92, 49.53)
+age_dist <- rnorm(n_distinct(acop_baseline$id), mean = 33.81955, sd = 8.603712) 
+age_dist <- age_dist[age_dist > 0]
+
+# Randomly assign sampled values to unique patients
+acop_adjusted <- acop_baseline %>%
+  group_by(id) %>%
+  mutate(
+    EGFR = sample(egfr_dist, 1),
+    ALB = sample(alb_dist, 1),
+    AGE = sample(age_dist, 1)) %>%
+  ungroup() 
+
+# First id is missing evid/amt
+# Also need to change compartment and dosing information
+missing_row <- acop_adjusted[1,] %>% mutate(dv = 0, evid = 1, amt = 10000, mdv = 1)
+acop_adjusted <- bind_rows(missing_row, acop_adjusted) %>%
+  mutate(CMT = if_else(evid == 1, 1, 2),
+         amt = if_else(amt == 10000, "5", "."),
+         SEQ = if_else(evid == 1, 0, 1),
+         C = ".") %>%
+  filter(!(time == 0 & evid == 0)) %>%
+  mutate(num = 1:n())
+
+names(acop_adjusted) <- toupper(names(acop_adjusted))
+acop_adjusted <- acop_adjusted %>%
+  relocate("C", "NUM", "ID", "TIME", "SEQ", "CMT", "EVID", "AMT", "DV", "AGE", "WT", "EGFR", "ALB")
+
+
+
+analysis3_path <- file.path(DATA_DIR, "acop_adjusted.csv")
+write_csv(acop_adjusted, analysis3_path)
 ```
 
+## Running a model in parallel
 
+If you would like to set the parallelization for a specific model, you can do this by setting `parallel = TRUE` and `threads=SOME_INTEGER` where `SOME_INTEGER` is the number of cores that you would like the model to use. This can be done in two ways:
+
+You can pass these settings directly to `submit_model(.bbi_args)`. This will make the model execute in parallel _for this submission_.
+
+```{r}
+mod <- read_model(file.path(MODEL_DIR, 200))
+submit_model(
+  mod,
+  .bbi_args = list(parallel = TRUE, threads = 4)
+)
+```
+
+You can attach them to the model object. This will make the model execute in parallel _for all future submissions_. 
+
+```{r}
+mod <- add_bbi_args(mod, list(parallel = TRUE, threads = 4))
+```
+
+Note that anything passed to `submit_model(.bbi_args)` will override any attached `bbi_args` of the same name.
 
 ## Global settings in bbi.yaml
 
@@ -82,7 +154,7 @@ bbi_init(
 )
 ```
 
-
+Note that anything passed to `submit_model(.bbi_args)` and `bbi_args` attached to model objects will override default global settings of the same name.
 
 ## Local execution
 
@@ -93,11 +165,10 @@ For small runs, use a 4-core or 8-core head node and just do `submit_model(..., 
 * This is especially nice for new models that are fairly simple and you just want a quick result back.
 
 ```{r}
-mod <- read_model(file.path(MODEL_DIR, 100))
 submit_model(
   mod,
   .mode = "local",
-  .bbi_args = list(parallel = TRUE, threads = 4) # not needed if set in bbi.yaml
+  .bbi_args = list(parallel = TRUE, threads = 4, overwrite = TRUE) # not needed if set in bbi.yaml
 )
 ```
 ```
@@ -356,6 +427,7 @@ system("qstat -f")
      10 0.55500 Run_400    sethg        qw    09/27/2021 12:56:18     8 
 ```
 
+
 * You can kill jobs running on the grid using `qdel` in the terminal (or with `system()` from R).
   * `qdel SOME_NUMBER` kills the job specified by it's "job id" (the first column in the `qstat -f` output)
   * `qdel -u YOUR_USERNAME` kills _all jobs_ launched by you
@@ -368,72 +440,64 @@ system(paste("qdel -u", this_user))
 
 ## Testing different numbers of threads
 
-For a big model, try running a few iterations with different numbers of threads. This way you can see the gains from adding more threads and decide how many to use as you continue to work on this model.
+For a big model, try running a few iterations with different numbers of threads. This way you can see the gains from adding more threads and decide how many to use as you continue to work on this model. This can be done via `test_threads()`, which will do the following things:
 
-* First create a dummy copy of your model, and **cap the iterations to 10 or 20** by changing `MAX_EVAL` or `NITER` in your control stream, so that it finishes fairly quickly
-* Use the `test_threads()` function below to:
-  * Copy the model a few times with `copy_model_from()`
-  * Submit the model to run with a few different options for `threads`
+* Create a dummy copy of your model.
+* Assign the tag 'test threads' to the newly created models, which makes for easy deletion via `delete_models()` (shown below).
+* Cap the iterations by changing `MAX_EVAL` or `NITER` in your control stream so that it finishes fairly quickly. Typically, something between 10 (the default) and 100 is good, depending on how long each iteration takes. Ideally, you want something that will run for 3-5 minutes total to give you the most accurate estimates.
 
 ```{r}
-#' Takes a model object and runs it with various threads values
-#'
-#' @param .mod bbi_model object to copy/test
-#' @param thread_opts Integer vector of threads values to test
-#' @param .mode Passed through to bbr::submit_models(.mode)
-#'
-#' @return A list of the model objects for the submitted models.
-test_threads <- function(.mod, threads_opts, .mode = "sge") {
-  mods <- map(threads_opts, ~ {
-    .m <- copy_model_from(
-      .mod,
-      paste0(get_model_id(.mod), "_", .x, "threads")
-    ) %>%
-      add_bbi_args(list(parallel = TRUE, threads = .x))
-  })
-
-  submit_models(mods, .mode = .mode, .wait = FALSE)
-
-  mods
-}
-
 # running it
-mod <- read_model(file.path(MODEL_DIR, 200)) # this should be the copy with capped iterations
-mods <- test_threads(mod, c(8, 16, 24))
+mod <- read_model(file.path(MODEL_DIR, 200)) 
+mods_test <- test_threads(mod, .threads = c(2, 4, 8))
 ```
 ```
 Submitting 3 models with 3 unique configurations.
 ```
 
-
-After the models all finish, use this `check_threads()` function to see how long each took to run.
+We can see that 3 models have been created and submitted to the grid.
 
 ```{r}
-#' Check estimation time for models run with various threads values
-#'
-#' @param mods list of bbi model objects created by `test_threads()`
-#'
-#' @return A tibble with columns `threads` (number of threads) and `time`
-#'   (elapsed estimation time in seconds for test models).
-check_threads <- function(mods) {
-  purrr::map_dfr(mods, ~ {
-    s <- model_summary(.x)
-    threads <- as.numeric(stringr::str_extract(s$absolute_model_path, "\\d+(?=threads$)"))
-    tibble::tibble(threads = threads, time = s$run_details$estimation_time)
-  })
-}
-
-check_threads(mods)
+system("qstat -f")
 ```
 ```
-# A tibble: 3 x 2
-  threads    time
-    <int>   <dbl>
-1       8   149.5
-2      16    88.2
-3      24    65.9
+############################################################################
+ - PENDING JOBS - PENDING JOBS - PENDING JOBS - PENDING JOBS - PENDING JOBS
+############################################################################
+      1 0.00000 Run_200_2_ sethg        qw    06/28/2022 15:52:36     2        
+      2 0.00000 Run_200_4_ sethg        qw    06/28/2022 15:52:36     4        
+      3 0.00000 Run_200_8_ sethg        qw    06/28/2022 15:52:36     8  
 ```
 
+
+Once run, you can use `check_run_times()` to inspect the run times for each of the thread options you are benchmarking. By default, your R console with be frozen until the model runs have finished. You can pass `.wait = FALSE` to disable this, in which case you will get `NA` in the rows corresponding to models that have not yet finished.
+
+```{r}
+check_run_times(mods_test)
+```
+```
+Waiting for 3 model(s) to finish...
+3 model(s) have finished                                                                                                                                                                               
+# A tibble: 3 × 5                                                                                                                                                                                      
+  run           threads estimation_time
+  <chr>           <int>           <dbl>
+1 200_2_threads       2            14.04
+2 200_4_threads       4             9.59
+3 200_8_threads       8             5.64
+```
+
+This tibble has one row for each test run and a column showing the time for each (in seconds). By default it returns the estimation time, but you can pass `.return_times`
+
+As outlined above, you can easily delete these dummy models via `delete_models()`. The default `.tags` argument is "test threads", meaning only model objects with that tag will be deleted. In addition, the default behavior is to prompt you if you're sure you want to delete the associated model files.
+
+```{r}
+delete_models(mods_test)
+```
+```
+Are you sure you want to remove 3 models with the following tags?: `test threads` (Yes/no/cancel) y
+Removed 3 models with the following tags:
+- test threads
+```
 
 
 ```{r, include=F}
@@ -446,13 +510,17 @@ walk(COPIED_MODELS, ~{
   if (file_exists(file.path(MODEL_DIR, paste0(.x, ".ctl")))) file_delete(file.path(MODEL_DIR, paste0(.x, ".ctl")))
   if (file_exists(file.path(MODEL_DIR, paste0(.x, ".yaml")))) file_delete(file.path(MODEL_DIR, paste0(.x, ".yaml")))
   
-  for (.n in c(8, 16, 24)) {
+  for (.n in c(2, 4, 8, 16, 24)) {
     if (file_exists(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads.ctl")))) file_delete(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads.ctl")))
     if (file_exists(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads.yaml")))) file_delete(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads.yaml")))
     if (dir_exists(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads")))) dir_delete(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads")))    
   }
-
 })
+
+if (fs::file_exists(analysis3_path)) fs::file_delete(analysis3_path)
+
+# clear old bbi.yaml
+if (file_exists(file.path(MODEL_DIR, "bbi.yaml"))) file_delete(file.path(MODEL_DIR, "bbi.yaml"))
 
 ```
 
