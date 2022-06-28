@@ -44,7 +44,7 @@ if (file_exists(file.path(MODEL_DIR, "bbi.yaml"))) file_delete(file.path(MODEL_D
 walk(c(ORIG_MODELS, COPIED_MODELS), ~{
   if (dir_exists(file.path(MODEL_DIR, .x))) dir_delete(file.path(MODEL_DIR, .x))
   
-    for (.n in c(8, 16, 24)) {
+    for (.n in c(2, 4, 8, 16, 24)) {
     if (file_exists(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads.ctl")))) file_delete(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads.ctl")))
     if (file_exists(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads.yaml")))) file_delete(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads.yaml")))
     if (dir_exists(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads")))) dir_delete(file.path(MODEL_DIR, paste0(.x, "_", .n, "threads")))    
@@ -105,7 +105,27 @@ write_csv(acop_adjusted, analysis3_path)
 on.exit(fs::file_delete(analysis3_path))
 ```
 
+## Passing arguments to `submit_model()`
 
+If you would like to set the parallelization for a specific model, you can do this by setting `parallel = TRUE` and `threads=SOME_INTEGER` where `SOME_INTEGER` is the number of cores that you would like the model to use. This can be done in two ways:
+
+You can pass these settings directly to `submit_model(.bbi_args)`. This will make the model execute in parallel _for this submission_.
+
+```{r}
+mod <- read_model(file.path(MODEL_DIR, 200))
+submit_model(
+  mod,
+  .bbi_args = list(parallel = TRUE, threads = 4)
+)
+```
+
+You can attach them to the model object. This will make the model execute in parallel _for all future submissions_. 
+
+```{r}
+mod <- add_bbi_args(mod, list(parallel = TRUE, threads = 4))
+```
+
+Note that anything passed to `submit_model(.bbi_args)` will override any attached `bbi_args` of the same name.
 
 ## Global settings in bbi.yaml
 
@@ -129,7 +149,7 @@ bbi_init(
 )
 ```
 
-
+Note that anything passed to `submit_model(.bbi_args)` and `bbi_args` attached to model objects will override default global settings of the same name.
 
 ## Local execution
 
@@ -140,7 +160,6 @@ For small runs, use a 4-core or 8-core head node and just do `submit_model(..., 
 * This is especially nice for new models that are fairly simple and you just want a quick result back.
 
 ```{r}
-mod <- read_model(file.path(MODEL_DIR, 200))
 submit_model(
   mod,
   .mode = "local",
@@ -422,18 +441,16 @@ For a big model, try running a few iterations with different numbers of threads.
 * **Cap the iterations** by changing `MAX_EVAL` or `NITER` in your control stream (default is 10), so that it finishes fairly quickly
 * Assign the tag 'test threads' to the newly created models, which makes for easy deletion via `delete_models(.tags = "test threads")`
 
-Once ran, you can use `check_run_times()` to inspect various run times for each of the thread options you are benchmarking
-
 ```{r}
 # running it
-mod <- read_model(file.path(MODEL_DIR, 200)) # this should be the copy with capped iterations
+mod <- read_model(file.path(MODEL_DIR, 200)) 
 mods <- test_threads(mod, .threads = c(2, 4, 8))
 ```
 ```
 Submitting 3 models with 3 unique configurations.
 ```
 
-* We can see that 3 models have been created and submitted to the grid
+We can see that 3 models have been created and submitted to the grid
 
 ```{r}
 system("qstat -f")
@@ -448,7 +465,7 @@ system("qstat -f")
 ```
 
 
-* You can also use `check_run_times()` to see how long each took to run. If you specify `.wait = TRUE`, your R console will be frozen until the model run has finished, regardless of whether you submitted them to the grid or not.
+Once run, you can use `check_run_times()` to inspect the run times for each of the thread options you are benchmarking. If you specify `.wait = TRUE`, your R console will be frozen until the model run has finished, regardless of whether you submitted them to the grid or not.
 
 ```{r}
 check_run_times(mods, .wait = TRUE, .return_times = "all")
@@ -464,7 +481,7 @@ Waiting for 3 model(s) to finish...
 3 200_8_threads       8            0.73            0.66     6.18
 ```
 
-* As outlined above, you can easily delete these dummy models via `delete_models()`. The default `.tags` argument is "test threads", meaning only model objects with that tag will be deleted. In addition, the default behavior is to prompt you if you're sure you want to delete the associated model files.
+As outlined above, you can easily delete these dummy models via `delete_models()`. The default `.tags` argument is "test threads", meaning only model objects with that tag will be deleted. In addition, the default behavior is to prompt you if you're sure you want to delete the associated model files.
 
 ```{r}
 delete_models(mods, .tags = "test threads")
