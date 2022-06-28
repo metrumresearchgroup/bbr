@@ -149,12 +149,12 @@ nm_join <- function(
       # do the join
       tab <- drop_dups(tab, .d, "ID", .n)
       col_order <- union(col_order, names(tab))
-      .d <- join_fun(tab, .d, by = "ID")
+      .d <- join_fun(tab, .d, by = "ID") %>% arrange(ID)
     } else if (nrow(tab) == nrec) {
       # otherwise, join on .join_col
       tab <- drop_dups(tab, .d, .join_col, .n)
       col_order <- union(col_order, names(tab))
-      .d <- join_fun(tab, .d, by = .join_col)
+      .d <- join_fun(tab, .d, by = .join_col) %>% arrange(!!sym(.join_col))
     }
   }
 
