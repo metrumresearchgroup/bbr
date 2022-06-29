@@ -68,8 +68,7 @@
 #' with multiple tables written to a single file. See "Details" in [nm_file()]
 #' for alternatives.
 #'
-#' @importFrom dplyr left_join right_join select
-#' @importFrom rlang sym
+#' @importFrom dplyr left_join right_join select arrange
 #' @importFrom checkmate assert_string assert_character assert_logical assert_list
 #' @seealso [nm_tables()], [nm_table_files()], [nm_file()]
 #' @export
@@ -111,7 +110,7 @@ nm_join <- function(
   }
 
   if (.superset) {
-    join_fun <- right_join
+    join_fun <- function(x, y, ...) left_join(y, x, ...)
   } else {
     join_fun <- left_join
   }
@@ -151,12 +150,12 @@ nm_join <- function(
       # do the join
       tab <- drop_dups(tab, .d, "ID", .n)
       col_order <- union(col_order, names(tab))
-      .d <- join_fun(tab, .d, by = "ID") %>% arrange(ID)
+      .d <- join_fun(tab, .d, by = "ID") %>% arrange(.data$ID)
     } else if (nrow(tab) == nrec) {
       # otherwise, join on .join_col
       tab <- drop_dups(tab, .d, .join_col, .n)
       col_order <- union(col_order, names(tab))
-      .d <- join_fun(tab, .d, by = .join_col) %>% arrange(!!sym(.join_col))
+      .d <- join_fun(tab, .d, by = .join_col) %>% arrange(.data[[.join_col]])
     }
   }
 
