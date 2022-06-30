@@ -190,6 +190,8 @@ nonmem_summary <- function(
   # extract output path
   .path <- get_output_dir(.mod)
 
+
+
   # lst file can both be the check for whether the dir is a nonmem output dir
   # and also the output always should be runname.lst so we can determine the model name
   # this is definitely better checking for .mod as there are temporary files with that extension

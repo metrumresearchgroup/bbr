@@ -57,14 +57,15 @@ new_model <- function(
   abs_mod_path <- file.path(
     normalizePath(dirname(.path)),
     basename(.path)
-  )
+  ) %>% sanitize_file_extension()
 
   # create model object
   .mod <- list()
   .mod[[ABS_MOD_PATH]] <- abs_mod_path
   .mod[[YAML_MOD_TYPE]] <- .model_type
-   test <<-.mod
   .mod <- create_model_object(.mod, save_yaml = TRUE)
+
+
 
   # update model from passed args
   if (!is.null(.description)) .mod <- replace_description(.mod, .description)
@@ -116,10 +117,6 @@ save_model_yaml <- function(.mod) {
 
   .out_path <- get_yaml_path(.mod, .check_exists = FALSE)
 
-  if(stringr::str_detect(.out_path, "\\.ctl|\\.mod") == TRUE)
-  {
-    .out_path <- stringr::str_remove(.out_path, "\\.ctl|\\.mod")
-  }
 
   # create copy to save out
   .out_mod <- .mod
@@ -139,15 +136,19 @@ save_model_yaml <- function(.mod) {
   # throw out empty and null keys
   .out_mod <- purrr::compact(.out_mod)
 
+
+  if(stringr::str_detect(.out_path, "\\.ctl|\\.mod") == TRUE)
+  {
+    .out_path <- stringr::str_remove(.out_path, "\\.\\w+")
+  }
+
   # write to disk
   yaml::write_yaml(.out_mod, .out_path)
 
   # update md5 after writing new yaml
   .mod[[YAML_YAML_MD5]] <- digest(file = .out_path, algo = "md5")
-
   return(.mod)
 }
-
 
 #' Private helper to look for existing model and overwrite if necessary
 #' @inheritParams new_model
