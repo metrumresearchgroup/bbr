@@ -89,6 +89,12 @@ get_yaml_path <- function(.bbi_object, .check_exists = TRUE) {
 get_yaml_path.bbi_model <- function(.bbi_object, .check_exists = TRUE) {
   .path <- paste0(.bbi_object[[ABS_MOD_PATH]], ".yaml")
 
+  if(stringr::str_detect(.path, "\\.ctl|\\.mod") == TRUE)
+  {
+    .path <- stringr::str_remove(.path, "\\ctl|\\mod")
+  }
+
+
   if (isTRUE(.check_exists)) {
     checkmate::assert_file_exists(.path)
   }
@@ -354,6 +360,7 @@ yaml_ext <- function(.x) {
 find_nonmem_model_file_path <- function(.path, .check_exists = TRUE) {
   checkmate::assert_string(.path)
   checkmate::assert_logical(.check_exists, any.missing = FALSE, len = 1L)
+  .path <- sanitize_file_extension(.path)
 
   maybe_paths <- paste0(.path, c(".ctl", ".mod"))
   exists_idx <- purrr::map_lgl(maybe_paths, fs::file_exists)
@@ -388,3 +395,22 @@ find_nonmem_model_file_path <- function(.path, .check_exists = TRUE) {
     fs::path_norm() %>%
     as.character()
 }
+
+sanitize_file_extension <- function(.path)
+{
+  # if(fs::file_exists(.path) == FALSE)
+  # {
+  #   stop("File does not exist")
+  # }
+
+  if(stringr::str_detect(.path, "\\.ctl|\\.mod") == TRUE) .path <- stringr::str_remove(.path, "\\.ctl|\\.mod")
+
+  if(stringr::str_detect(.path, "\\.\\w+") == TRUE && stringr::str_detect(.path, "\\.ctl|\\.mod") == FALSE)
+  {
+    stop('File extension is not supported')
+  }
+
+  return(.path)
+}
+
+

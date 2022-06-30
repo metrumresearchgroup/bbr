@@ -63,6 +63,7 @@ new_model <- function(
   .mod <- list()
   .mod[[ABS_MOD_PATH]] <- abs_mod_path
   .mod[[YAML_MOD_TYPE]] <- .model_type
+   test <<-.mod
   .mod <- create_model_object(.mod, save_yaml = TRUE)
 
   # update model from passed args
@@ -114,6 +115,11 @@ read_model <- function(.path) {
 save_model_yaml <- function(.mod) {
 
   .out_path <- get_yaml_path(.mod, .check_exists = FALSE)
+
+  if(stringr::str_detect(.out_path, "\\.ctl|\\.mod") == TRUE)
+  {
+    .out_path <- stringr::str_remove(.out_path, "\\.ctl|\\.mod")
+  }
 
   # create copy to save out
   .out_mod <- .mod
