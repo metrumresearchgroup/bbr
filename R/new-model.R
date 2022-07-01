@@ -56,7 +56,7 @@ new_model <- function(
   # file exist at `.path`)
   abs_mod_path <- file.path(
     normalizePath(dirname(.path)),
-    basename(.path)
+    basename(.path) %>% sanitize_file_extension()
   )
 
   # create model object
@@ -90,7 +90,7 @@ new_model <- function(
 #' @seealso [copy_model_from()], [new_model()]
 #' @export
 read_model <- function(.path) {
-  yaml_path <- paste0(.path, ".yaml")
+  yaml_path <- paste0(.path %>% sanitize_file_extension(), ".yaml")
   checkmate::assert_file_exists(yaml_path)
 
   yaml_list <- yaml::read_yaml(yaml_path)
@@ -162,3 +162,29 @@ check_for_existing_model <- function(.path, .overwrite) {
     }
   }
 }
+
+sanitize_file_extension <- function(.path)
+{
+  .path_extension <- stringr::str_sub(.path, -4)
+
+  #If file has a name that contains period, do not allow
+  if(stringr::str_detect(.path, "\\.\\w+\\.") == TRUE)
+  {
+    stop("Invalid path")
+  }
+
+  #If file has a .ctl or .mod extension remove the extension. No extension is expected as input in package logic.
+  if(stringr::str_detect(.path, "\\.ctl|\\.mod") == TRUE){
+
+    .path <- stringr::str_remove(.path, "\\.ctl|\\.mod")
+  }
+
+  #If there is a file extension that is not .ctl or .mod
+  if((stringr::str_detect(.path_extension, "\\.\\w+") == TRUE) && (stringr::str_detect(.path, "\\.ctl|\\.mod") == FALSE))
+  {
+    #stop('File extension is not supported')
+  }
+
+  return(.path)
+}
+
