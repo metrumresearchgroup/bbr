@@ -146,3 +146,8 @@ test_that("new_model() supports `.path` containing a period [BBR-NWMD-010]", {
   mod <- new_model(fs::path_ext_remove(temp_ctl), "path with period")
   expect_true(fs::file_exists(temp_yaml))
 })
+
+test_that("new_model accepts .ctl file extension when passed", {
+  temp_ctl <- tempfile(pattern = "file.", fileext = ".ctl")
+  new_model(temp_ctl)
+})

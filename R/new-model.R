@@ -168,7 +168,7 @@ sanitize_file_extension <- function(.path)
   .path_extension <- stringr::str_sub(.path, -4)
 
   #If file has a name that contains period, do not allow
-  if(stringr::str_detect(.path, "\\.\\w+\\.") == TRUE)
+  if(stringr::str_detect(.path, "^\\.\\w+\\.$") == TRUE)
   {
     stop("Invalid path")
   }
