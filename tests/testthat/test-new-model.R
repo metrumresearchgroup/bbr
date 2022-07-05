@@ -148,6 +148,11 @@ test_that("new_model() supports `.path` containing a period [BBR-NWMD-010]", {
 })
 
 test_that("new_model accepts .ctl file extension when passed", {
-  temp_ctl <- tempfile(pattern = "file.", fileext = ".ctl")
-  new_model(temp_ctl)
+  clean_test_enviroment(create_rlg_models)
+
+  mod_ctl <- new_model(file.path(system.file("model", package = "bbr", mustWork = TRUE), "nonmem", "basic", "1.ctl"))
+
+  expect_identical(mod_ctl$absolute_model_path, file.path(system.file("model", package = "bbr", mustWork = TRUE), "nonmem", "basic", "1"))
+  expect_identical(mod_ctl$model_type,"nonmem")
+  expect_identical(mod_ctl$yaml_md5,"3e3e686b9ece227293c74ca0375820ed")
 })
