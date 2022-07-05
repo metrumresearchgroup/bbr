@@ -147,7 +147,7 @@ test_that("new_model() supports `.path` containing a period [BBR-NWMD-010]", {
   expect_true(fs::file_exists(temp_yaml))
 })
 
-test_that("new_model accepts .ctl file extension when passed", {
+test_that("new_model accepts .ctl file extension when passed [BBR-CLM-005]", {
   clean_test_enviroment(create_rlg_models)
   mod_ctl <- new_model(file.path(system.file("model", package = "bbr", mustWork = TRUE), "nonmem", "basic", "1.ctl"),
     .description = "original acop model",
@@ -159,7 +159,7 @@ test_that("new_model accepts .ctl file extension when passed", {
   expect_identical(mod_ctl$yaml_md5,"6ccf206e167485b5adf29bc135197929")
 })
 
-test_that("new_model accepts .mod file extension when passed", {
+test_that("new_model accepts .mod file extension when passed [BBR-CLM-006]", {
   clean_test_enviroment(create_rlg_models)
 
     #Make a copy of the .ctl to test for .mod and remove .ctl file

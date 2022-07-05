@@ -179,11 +179,6 @@ sanitize_file_extension <- function(.path)
     .path <- stringr::str_remove(.path, "\\.ctl|\\.mod")
   }
 
-  #If there is a file extension that is not .ctl or .mod
-  if((stringr::str_detect(.path_extension, "\\.\\w+") == TRUE) && (stringr::str_detect(.path, "\\.ctl|\\.mod") == FALSE))
-  {
-    #stop('File extension is not supported')
-  }
 
   return(.path)
 }
