@@ -24,8 +24,8 @@ A tibble with columns \code{threads} (number of threads) and \code{time}
 Check estimation time for models run with various threads values
 }
 \details{
-\code{.return_times} can be any subset of \code{c("estimation_time", "covariance_time", "cpu_time")}.
-Users can also specify \code{all}, which is the shorthand method for selecting all 3 of those columns.
+\code{.return_times} can be any subset of \code{c("estimation_time", "covariance_time", "postprocess_time", "cpu_time")}.
+Users can also specify \code{"all"}, which is the shorthand method for selecting all 4 of those columns.
 }
 \examples{
 \dontrun{
