@@ -111,7 +111,7 @@ MOD_BBI_VERSION <- ref_json$MOD_BBI_VERSION
 MOD_NM_VERSION <- ref_json$MOD_NM_VERSION
 
 # yaml md5 hashes
-MOD1_YAML_MD5 <- "6ccf206e167485b5adf29bc135197929"
+MOD1_YAML_MD5 <- "b5f22ae85c9c0c22405c0e99587f3ed9"
 MOD_LEVEL2_MD5 <- "eb3cada879c886a98d30a18f06f14a68"
 ALL_MODS_YAML_MD5 <- c(MOD1_YAML_MD5, rep("cd3bd133e23d863f308b64c20e331d33", 2), "7eeb498c50d8ec72d85ec260cba5e40c")
 RUN_LOG_YAML_MD5 <- c(MOD1_YAML_MD5, "ac75f5771d66c9b55a1ec68c8789a043", "77525be36ddd665e1508c7ca7541882e")
@@ -124,7 +124,8 @@ REF_LIST_1 <- list(
   tags = ORIG_TAGS,
   bbi_args = list(
     overwrite = TRUE,
-    threads = 4L),
+    threads = 4L,
+    parallel = TRUE),
   absolute_model_path = file.path(ABS_MODEL_DIR, "1"),
   yaml_md5 = MOD1_YAML_MD5
 )
@@ -137,7 +138,8 @@ REF_LIST_TMP <- list(
   tags = ORIG_TAGS,
   bbi_args = list(
     overwrite = TRUE,
-    threads = 4L),
+    threads = 4L,
+    parallel = TRUE),
   absolute_model_path = file.path(ABS_MODEL_DIR, "temp"),
   yaml_md5 = MOD1_YAML_MD5
 )

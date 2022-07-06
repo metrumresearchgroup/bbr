@@ -51,6 +51,9 @@ new_model <- function(
   # check if file already exists and decide whether to overwrite if it does
   check_for_existing_model(.path, .overwrite)
 
+  if(.bbi_args[["threads"]] > 1 && is.null(.bbi_args[["parallel"]]) == TRUE) .bbi_args <- c(.bbi_args, parallel = TRUE)
+
+
   # construct the absolute model path in a way that avoids a warning from
   # normalizePath() if `.path` does not exist (we only require that the model
   # file exist at `.path`)

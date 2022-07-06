@@ -46,7 +46,7 @@
                 "executable": "nmfe75"
             }
         },
-        "parallel": false,
+        "parallel": true,
         "nmfe_options": {
             "maxlim": 100
         },
