@@ -226,6 +226,7 @@ withr::with_options(list(
   })
 
   test_that("check_run_times() .return_times arg [BBR-CRT-003]", {
+    skip_if_old_bbi('3.1.1')
     mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
     run_times <- check_run_times(mod1, .wait = FALSE, .return_times = "all")
     expected_cols <- c("run", "threads", "estimation_time", "covariance_time", "postprocess_time", "cpu_time")

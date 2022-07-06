@@ -9,7 +9,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   #########################################
 
   test_that("model_summary.bbi_nonmem_model produces expected output [BBR-SUM-001]", {
-
+    skip_if_old_bbi('3.1.1')
     # get summary
     sum1 <- MOD1 %>% model_summary()
 
@@ -50,7 +50,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
     # some things will be a little different, most will be the same
     ref_sum <- dget(SUMMARY_REF_FILE)
-
+    skip_if_old_bbi('3.1.1')
     for (.d in names(ref_sum$run_details)) {
       if (.d == "output_files_used") {
         expect_false(all(sum2$run_details$output_files_used == ref_sum$run_details$output_files_used))
@@ -105,6 +105,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
       for (.d in names(ref_sum$run_details)) {
         if (.d != "output_files_used") {
+          skip_if_old_bbi('3.1.1')
           expect_equal(sum2$run_details[[.d]], ref_sum$run_details[[.d]])
         }
       }
