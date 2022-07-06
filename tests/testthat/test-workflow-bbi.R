@@ -228,9 +228,9 @@ withr::with_options(list(
   test_that("check_run_times() .return_times arg [BBR-CRT-003]", {
     mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
     run_times <- check_run_times(mod1, .wait = FALSE, .return_times = "all")
-    expected_cols <- c("run", "threads", "estimation_time", "covariance_time", "cpu_time")
+    expected_cols <- c("run", "threads", "estimation_time", "covariance_time", "postprocess_time", "cpu_time")
     expect_true(all(expected_cols %in% names(run_times)))
-    expect_equal(dim(run_times), c(1, 5))
+    expect_equal(dim(run_times), c(1, 6))
 
     mods <- purrr::map(file.path(MODEL_DIR_BBI, 1:2), ~ read_model(.x))
     run_times <- check_run_times(mods, .wait = FALSE,
