@@ -147,8 +147,22 @@ check_run_times <- function(
   ...
 ) {
 
+  # This function only works for bbi versions -greater- than 3.1.1
+  v_bbi <- package_version(bbi_version(), strict = FALSE)
+  if (!is.na(v_bbi)) {
+    if (v_bbi <= package_version("3.1.1")) {
+      warning("This function is only compatible with bbi versions -greater than- 3.1.1")
+    }
+  }
+
   if("all" %in% .return_times){
     .return_times <- c("estimation_time", "covariance_time", "postprocess_time", "cpu_time")
+    if (!is.na(v_bbi)) {
+      if (v_bbi <= package_version("3.1.1")) {
+        # This allows the function to work with lower versions of bbi (despite covariance_time being incorrect)
+        .return_times <- c("estimation_time", "covariance_time", "cpu_time")
+      }
+    }
   }else{
     assert_true(all(.return_times %in% c("estimation_time", "covariance_time", "postprocess_time", "cpu_time")))
   }
