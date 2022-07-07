@@ -118,7 +118,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       check_run_times(mod1, .wait = F),
       "Could not access data for 1"
     )
-    run_times <- check_run_times(mod1, .wait = F) %>% suppressMessages() %>% suppressWarnings()
+    run_times <- check_run_times(mod1, .wait = F) %>% suppressMessages()
     expect_equal(run_times$run, "1")
     expect_true(is.na(run_times$threads))
     expect_true(is.na(run_times$estimation_time))
