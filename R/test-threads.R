@@ -118,8 +118,8 @@ test_threads <- function(
 #' @param ... args passed through to `wait_for_nonmem()`.
 #'
 #' @details
-#' `.return_times` can be any subset of `c("estimation_time", "covariance_time", "cpu_time")`.
-#' Users can also specify `all`, which is the shorthand method for selecting all 3 of those columns.
+#' `.return_times` can be any subset of `c("estimation_time", "covariance_time", "postprocess_time", "cpu_time")`.
+#' Users can also specify `"all"`, which is the shorthand method for selecting all 4 of those columns.
 #'
 #' @examples
 #' \dontrun{
@@ -147,10 +147,24 @@ check_run_times <- function(
   ...
 ) {
 
+  # This function only works for bbi versions -greater- than 3.1.1
+  v_bbi <- package_version(bbi_version(), strict = FALSE)
+  is_old_bbi <- FALSE
+  if (!is.na(v_bbi)) {
+    if(v_bbi <= package_version("3.1.1")) {
+      is_old_bbi <- TRUE
+      warning("This function is only compatible with bbi versions -greater than- 3.1.1")
+    }
+  }
+
   if("all" %in% .return_times){
-    .return_times <- c("estimation_time", "covariance_time", "cpu_time")
+    .return_times <- c("estimation_time", "covariance_time", "postprocess_time", "cpu_time")
+    if(is_old_bbi){
+        # This allows the function to work with lower versions of bbi (despite covariance_time being incorrect)
+        .return_times <- c("estimation_time", "covariance_time", "cpu_time")
+    }
   }else{
-    assert_true(all(.return_times %in% c("estimation_time", "covariance_time", "cpu_time")))
+    assert_true(all(.return_times %in% c("estimation_time", "covariance_time", "postprocess_time", "cpu_time")))
   }
 
   if (inherits(.mods, "bbi_model")) {
@@ -193,8 +207,9 @@ check_run_times <- function(
       data <- tibble::tibble(
         run = model_run,
         threads = threads,
-        estimation_time = .x$run_details$estimation_time,
-        covariance_time = .x$run_details$covariance_time,
+        estimation_time = sum(.x$run_details$estimation_time),
+        covariance_time = sum(.x$run_details$covariance_time),
+        postprocess_time = .x$run_details$postprocess_time,
         cpu_time = .x$run_details$cpu_time) %>%
         select(run, threads, all_of(.return_times))
       return(data)
@@ -214,6 +229,7 @@ check_run_times <- function(
   })
 
 }
+
 
 #' Remove model files associated with the specified tags
 #'

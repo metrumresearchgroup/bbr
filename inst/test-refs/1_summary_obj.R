@@ -3,7 +3,9 @@ structure(list(
   run_details = list(
     version = "7.4.4", run_start = "-999999999",
     run_end = "Mon Nov  8 11:35:08 EST 2021", estimation_time = 5.28,
-    covariance_time = 0.46, cpu_time = 6.816, function_evaluations = 447L,
+    # NOTE: covariance time was technically -incorrect- in bbi 3.1.1 and lower
+    # (was reported as 0.46 instead of 1.29 - i.e. used the post processing time)
+    covariance_time = 1.29, postprocess_time = 0.46, cpu_time = 6.816, function_evaluations = 447L,
     significant_digits = 3.2, problem_text = "LEM PK model 1 cmt base",
     mod_file = "-999999999", estimation_method = "First Order Conditional Estimation with Interaction",
     data_set = "../../../../extdata/acop.csv", number_of_subjects = 39L,

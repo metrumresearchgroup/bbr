@@ -21,16 +21,16 @@ test_sum_df <- function(sum_df, .paths, .col_count) {
   expect_false(any(sum_df$minimization_terminated))
 }
 
- test_that("summary_log() returns NULL and warns when no YAML found [BBR-SMLG-001]", {
-   clean_test_enviroment(create_all_models)
-   copy_all_output_dirs()
-   log_df <- expect_warning(summary_log(file.path(REF_DIR, "read-output-refs")), regexp = "Found no valid model YAML files in")
-   expect_true(inherits(log_df, "tbl"))
-   expect_equal(nrow(log_df), 0)
-   expect_equal(ncol(log_df), 0)
- })
+test_that("summary_log() returns NULL and warns when no YAML found [BBR-SMLG-001]", {
+  clean_test_enviroment(create_all_models)
+  copy_all_output_dirs()
+  log_df <- expect_warning(summary_log(file.path(REF_DIR, "read-output-refs")), regexp = "Found no valid model YAML files in")
+  expect_true(inherits(log_df, "tbl"))
+  expect_equal(nrow(log_df), 0)
+  expect_equal(ncol(log_df), 0)
+})
 
- withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
+withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   #########################################
   # extracting things from summary object
@@ -43,12 +43,12 @@ test_sum_df <- function(sum_df, .paths, .col_count) {
     test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3, LEVEL2_MOD), SUM_LOG_COLS)
   })
 
-   test_that("summary_log(.recurse = FALSE) works [BBR-SMLG-003]", {
-   clean_test_enviroment(create_all_models)
-   copy_all_output_dirs()
-   sum_df <- summary_log(MODEL_DIR, .recurse = FALSE)
-   test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3), SUM_LOG_COLS)
-   })
+  test_that("summary_log(.recurse = FALSE) works [BBR-SMLG-003]", {
+    clean_test_enviroment(create_all_models)
+    copy_all_output_dirs()
+    sum_df <- summary_log(MODEL_DIR, .recurse = FALSE)
+    test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3), SUM_LOG_COLS)
+  })
 
 
   test_that("add_summary() works correctly [BBR-SMLG-004]", {
@@ -179,17 +179,17 @@ test_that("summary_log() works with filtering parameter string [BBR-SMLG-011]",
                 c(2, 3, "Child", "Parent"),
                 ~fs::dir_copy(file.path(MODEL_DIR,"1"), file.path(MODEL_DIR,"{.x}" %>% glue()))
               )
-              }
+            }
 
 
-          clean_test_enviroment(setup_this_test)
+            clean_test_enviroment(setup_this_test)
 
 
-          log_df <- list(df = summary_log(MODEL_DIR), length = summary_log(MODEL_DIR) %>% nrow())
+            log_df <- list(df = summary_log(MODEL_DIR), length = summary_log(MODEL_DIR) %>% nrow())
 
-          expect_equal(summary_log(MODEL_DIR, .include = c(1:2, "Child")) %>% nrow(), 3)
-          expect_equal(summary_log(MODEL_DIR, .include = c(2:1, "Child")) %>% nrow(), 3)
-          expect_equal(summary_log(MODEL_DIR, .include = c("Child", 1, 2, 3)) %>% nrow(), 4)
-          expect_equal(summary_log(MODEL_DIR, .include = c(1:2, "Parent")) %>% nrow(), 3)
+            expect_equal(summary_log(MODEL_DIR, .include = c(1:2, "Child")) %>% nrow(), 3)
+            expect_equal(summary_log(MODEL_DIR, .include = c(2:1, "Child")) %>% nrow(), 3)
+            expect_equal(summary_log(MODEL_DIR, .include = c("Child", 1, 2, 3)) %>% nrow(), 4)
+            expect_equal(summary_log(MODEL_DIR, .include = c(1:2, "Parent")) %>% nrow(), 3)
 
-        })
+          })

@@ -883,6 +883,7 @@ SUM-R001:
   description: model_summary.bbi_nonmem_model produces expected output
   tests:
   - BBR-SUM-001
+  - BBR-SUM-010
 SUM-R002:
   description: model_summary() works with custom .ext file
   tests:

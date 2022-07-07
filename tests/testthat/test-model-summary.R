@@ -9,7 +9,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   #########################################
 
   test_that("model_summary.bbi_nonmem_model produces expected output [BBR-SUM-001]", {
-
+    skip_if_old_bbi('3.1.1')
     # get summary
     sum1 <- MOD1 %>% model_summary()
 
@@ -50,7 +50,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
     # some things will be a little different, most will be the same
     ref_sum <- dget(SUMMARY_REF_FILE)
-
+    skip_if_old_bbi('3.1.1')
     for (.d in names(ref_sum$run_details)) {
       if (.d == "output_files_used") {
         expect_false(all(sum2$run_details$output_files_used == ref_sum$run_details$output_files_used))
@@ -103,6 +103,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
       expect_equal(length(ref_sum), length(sum2) + length(.tc$missing))
 
+      skip_if_old_bbi('3.1.1')
       for (.d in names(ref_sum$run_details)) {
         if (.d != "output_files_used") {
           expect_equal(sum2$run_details[[.d]], ref_sum$run_details[[.d]])
@@ -183,4 +184,18 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
     expect_error(model_summary(mod2), regexp = "More than one `\\.lst` file")
   })
+
+  test_that("model_summary works with multiple estimation methods [BBR-SUM-010]", {
+    skip_if_old_bbi('3.1.1')
+    mod_complex <- read_model(file.path(MODEL_DIR_X, "acop-fake-bayes"))
+    mod_sum <- mod_complex %>% model_summary()
+    expect_equal(length(mod_sum$run_details$estimation_time), 3)
+    expect_equal(length(mod_sum$run_details$covariance_time), 2)
+  })
+
 }) # closing withr::with_options
+
+
+
+
+
