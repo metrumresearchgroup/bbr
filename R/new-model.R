@@ -51,7 +51,21 @@ new_model <- function(
   # check if file already exists and decide whether to overwrite if it does
   check_for_existing_model(.path, .overwrite)
 
-  if(.bbi_args[["threads"]] > 1 && is.null(.bbi_args[["parallel"]]) == TRUE) .bbi_args <- c(.bbi_args, parallel = TRUE)
+  if(!is.null(.bbi_args))
+  {
+      if(.bbi_args[["threads"]] > 1 && is.null(.bbi_args[["parallel"]]) == TRUE)
+    {
+      .bbi_args <- c(.bbi_args, parallel = TRUE)
+    }
+  }
+
+  if(is.null(.bbi_args[["threads"]] == TRUE))
+  {
+    .bbi_args <- c(.bbi_args, parallel = FALSE)
+     bbi <- yaml::read_yaml(file.path(system.file("model", "nonmem", "basic", package = "bbr"), "bbi.yaml"))
+     bbi$parallel <- FALSE
+     yaml::write_yaml(file.path(system.file("model", "nonmem", "basic", package = "bbr"), "bbi.yaml"))
+  }
 
 
   # construct the absolute model path in a way that avoids a warning from

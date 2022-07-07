@@ -16,7 +16,7 @@ test_that("copy_from_model creates accurate copy [BBR-CMF-001]", {
   expect_identical(class(new_mod), NM_MOD_CLASS_LIST)
   expect_identical(new_mod[[YAML_BASED_ON]], "1")
   expect_identical(new_mod[[YAML_TAGS]], NEW_TAGS)
-  expect_equal(new_mod[[YAML_BBI_ARGS]], list(overwrite = TRUE, threads = 4L, parallel: TRUE))
+  expect_equal(new_mod[[YAML_BBI_ARGS]], list(overwrite = TRUE, threads = 4L, parallel = TRUE))
   expect_null(new_mod[[YAML_DESCRIPTION]])
 
   # check that everything is copied through in the YAML
@@ -24,7 +24,7 @@ test_that("copy_from_model creates accurate copy [BBR-CMF-001]", {
 
   expect_identical(new_yaml[[YAML_BASED_ON]], "1")
   expect_identical(new_yaml[[YAML_TAGS]], NEW_TAGS)
-  expect_equal(new_yaml[[YAML_BBI_ARGS]], list(overwrite = TRUE, threads = 4L, parallel: TRUE))
+  expect_equal(new_yaml[[YAML_BBI_ARGS]], list(overwrite = TRUE, threads = 4L, parallel = TRUE))
 
   # check the control stream is modified
   new_mod_str <- ctl_ext(NEW_MOD2) %>% readr::read_file()
