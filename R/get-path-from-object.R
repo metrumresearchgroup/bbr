@@ -396,21 +396,4 @@ find_nonmem_model_file_path <- function(.path, .check_exists = TRUE) {
     as.character()
 }
 
-sanitize_file_extension <- function(.path)
-{
-  # if(fs::file_exists(.path) == FALSE)
-  # {
-  #   stop("File does not exist")
-  # }
-
-  if(stringr::str_detect(.path, "\\.ctl|\\.mod") == TRUE) .path <- stringr::str_remove(.path, "\\.ctl|\\.mod")
-
-  if(stringr::str_detect(.path, "\\.\\w+") == TRUE && stringr::str_detect(.path, "\\.ctl|\\.mod") == FALSE)
-  {
-    stop('File extension is not supported')
-  }
-
-  return(.path)
-}
-
 

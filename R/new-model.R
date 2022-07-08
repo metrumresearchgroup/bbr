@@ -50,13 +50,13 @@ new_model <- function(
 
   # check if file already exists and decide whether to overwrite if it does
   check_for_existing_model(.path, .overwrite)
-
+  .path <- sanitize_file_extension(.path)
   # construct the absolute model path in a way that avoids a warning from
   # normalizePath() if `.path` does not exist (we only require that the model
   # file exist at `.path`)
   abs_mod_path <- file.path(
     normalizePath(dirname(.path)),
-    basename(.path) %>% sanitize_file_extension()
+    basename(.path)
   )
 
   # create model object
@@ -165,20 +165,11 @@ check_for_existing_model <- function(.path, .overwrite) {
 
 sanitize_file_extension <- function(.path)
 {
-  .path_extension <- stringr::str_sub(.path, -4)
 
-  #If file has a name that contains period, do not allow
-  if(stringr::str_detect(.path, "^\\.\\w+\\.$") == TRUE)
+  if(.path %>% fs::path_ext() == "ctl" ||  .path %>% fs::path_ext() == "mod")
   {
-    stop("Invalid path")
+    .path <- fs::path_ext_remove(.path)
   }
-
-  #If file has a .ctl or .mod extension remove the extension. No extension is expected as input in package logic.
-  if(stringr::str_detect(.path, "\\.ctl|\\.mod") == TRUE){
-
-    .path <- stringr::str_remove(.path, "\\.ctl|\\.mod")
-  }
-
 
   return(.path)
 }
