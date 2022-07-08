@@ -51,6 +51,7 @@ new_model <- function(
   # check if file already exists and decide whether to overwrite if it does
   check_for_existing_model(.path, .overwrite)
   .path <- sanitize_file_extension(.path)
+
   # construct the absolute model path in a way that avoids a warning from
   # normalizePath() if `.path` does not exist (we only require that the model
   # file exist at `.path`)
@@ -163,14 +164,15 @@ check_for_existing_model <- function(.path, .overwrite) {
   }
 }
 
+#' Private helper to remove file extensions to match expected input to new model.
+#' @inheritParams new_model
+#' @keywords internal
 sanitize_file_extension <- function(.path)
 {
-
-  if(.path %>% fs::path_ext() == "ctl" ||  .path %>% fs::path_ext() == "mod")
+  if(fs::is_file(.path))
   {
     .path <- fs::path_ext_remove(.path)
   }
-
   return(.path)
 }
 

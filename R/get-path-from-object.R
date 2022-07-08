@@ -360,7 +360,6 @@ yaml_ext <- function(.x) {
 find_nonmem_model_file_path <- function(.path, .check_exists = TRUE) {
   checkmate::assert_string(.path)
   checkmate::assert_logical(.check_exists, any.missing = FALSE, len = 1L)
-  .path <- sanitize_file_extension(.path)
 
   maybe_paths <- paste0(.path, c(".ctl", ".mod"))
   exists_idx <- purrr::map_lgl(maybe_paths, fs::file_exists)
