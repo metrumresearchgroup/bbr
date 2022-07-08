@@ -89,7 +89,6 @@ get_yaml_path <- function(.bbi_object, .check_exists = TRUE) {
 get_yaml_path.bbi_model <- function(.bbi_object, .check_exists = TRUE) {
   .path <- paste0(.bbi_object[[ABS_MOD_PATH]], ".yaml")
 
-
   if (isTRUE(.check_exists)) {
     checkmate::assert_file_exists(.path)
   }
@@ -389,5 +388,3 @@ find_nonmem_model_file_path <- function(.path, .check_exists = TRUE) {
     fs::path_norm() %>%
     as.character()
 }
-
-
