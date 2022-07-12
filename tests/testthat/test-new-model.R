@@ -147,40 +147,28 @@ test_that("new_model() supports `.path` containing a period [BBR-NWMD-010]", {
   expect_true(fs::file_exists(temp_yaml))
 })
 
-test_that("new_model accepts .ctl file extension when passed [BBR-CLM-005]", {
-  clean_test_enviroment(create_rlg_models)
+test_that("new_model ignores file extension: .ctl [BBR-NWMD-011]", {
   mod_ctl <- new_model(file.path(system.file("model", package = "bbr", mustWork = TRUE), "nonmem", "basic", "1.ctl"),
-    .description = "original acop model",
-    .tags = ORIG_TAGS,
-    .bbi_args = list(overwrite = TRUE, threads = 4)
+                       .description = "original acop model",
+                       .tags = ORIG_TAGS,
+                       .bbi_args = list(overwrite = TRUE, threads = 4)
   )
   expect_identical(mod_ctl$absolute_model_path, file.path(system.file("model", package = "bbr", mustWork = TRUE), "nonmem", "basic", "1"))
   expect_identical(mod_ctl$model_type,"nonmem")
   expect_identical(mod_ctl$yaml_md5,"6ccf206e167485b5adf29bc135197929")
 })
 
-test_that("new_model accepts .mod file extension when passed [BBR-CLM-006]", {
-  clean_test_enviroment(create_rlg_models)
-
-    #Make a copy of the .ctl to test for .mod and remove .ctl file
-    file.copy(file.path(system.file("model", package = "bbr", mustWork = TRUE),"nonmem", "basic","1.ctl"),
-    file.path(system.file("model", package = "bbr", mustWork = TRUE), "nonmem","basic", "1.mod" ))
-    file.remove(file.path(system.file("model", package = "bbr", mustWork = TRUE),"nonmem","basic","1.ctl"))
-
-
+test_that("new_model ignores file extension: .mod [BBR-NWMD-011]", {
+  fs::file_move(file.path(system.file("model", package = "bbr", mustWork = TRUE),"nonmem","basic","1.ctl"),
+                file.path(system.file("model", package = "bbr", mustWork = TRUE),"nonmem","basic","1.mod"))
   mod <- new_model(file.path(system.file("model", package = "bbr", mustWork = TRUE), "nonmem", "basic", "1.mod"),
-                       .description = "original acop model",
-                       .tags = ORIG_TAGS,
-                       .bbi_args = list(overwrite = TRUE, threads = 4)
+                   .description = "original acop model",
+                   .tags = ORIG_TAGS,
+                   .bbi_args = list(overwrite = TRUE, threads = 4)
   )
   expect_identical(mod$absolute_model_path, file.path(system.file("model", package = "bbr", mustWork = TRUE), "nonmem", "basic", "1"))
   expect_identical(mod$model_type,"nonmem")
   expect_identical(mod$yaml_md5,"6ccf206e167485b5adf29bc135197929")
-
-  #Copy .ctl back from .mod
-  file.copy(file.path(system.file("model", package = "bbr", mustWork = TRUE),"nonmem","basic","1.mod"),
-  file.path(system.file("model", package = "bbr", mustWork = TRUE), "nonmem","basic","1.ctl"))
-
-  file.remove(file.path(system.file("model", package = "bbr", mustWork = TRUE),"nonmem","basic","1.mod"))
-
+  on.exit({fs::file_move(file.path(system.file("model", package = "bbr", mustWork = TRUE),"nonmem","basic","1.mod"),
+                         file.path(system.file("model", package = "bbr", mustWork = TRUE),"nonmem","basic","1.ctl"))})
 })

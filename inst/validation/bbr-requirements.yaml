@@ -106,14 +106,6 @@ CLM-R004:
   description: delete_models() with .tags=NULL
   tests:
   - BBR-CLM-004
-CLM-R005:
-  description: accept '.ctl' file extension when calling new_model
-  tests:
-  - BBR-CLM-005
-CLM-R006:
-  description: accept '.mod' file extension when calling new_model
-  tests:
-  - BBR-CLM-006
 CMF-R001:
   description: copy_from_model creates accurate copy
   tests:
@@ -622,6 +614,10 @@ NWMD-R010:
   description: new_model() supports `.path` containing a period
   tests:
   - BBR-NWMD-010
+NWMD-R011:
+    description: valid model extensions may be passed into new_model
+  tests:
+  - BBR-NWMD-011
 PEST-R001:
   description: param_estimates.bbi_model_summary gets expected table
   tests:

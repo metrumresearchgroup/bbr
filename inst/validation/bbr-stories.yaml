@@ -222,7 +222,7 @@ MGMT-S016:
   - CLM-R004
 MGMT-S017:
   name: Passing model file extensions
-  description: As a user, I want to be able to pass '.ctl' and '.mod' file extensions when making a new model.
+  description: As a user, I want to be able to pass valid file extensions for new models.
   ProductRisk: Low
   requirements:
   - CLM-R005
