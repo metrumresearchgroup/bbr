@@ -7,7 +7,8 @@
 #'         Will update `MAXITER` or `NITER` (whichever is specified) in generated models.
 #'         The best number for this is model-dependent. Typically, something between 10 and
 #'         100 is good, depending on how long each iteration takes. You want something that
-#'         will run for 3-5 minutes total.
+#'         will run for 3-5 minutes total. You can set this argument to `NULL` to run with the
+#'         same settings as the original model.
 #' @param ... args passed through to submit_models()
 #'
 #' @importFrom checkmate assert_list
@@ -72,30 +73,38 @@ test_threads <- function(
                  add_tags(paste("test threads")))
 
   # Modify MAXEVAL or NITER
-  search_str <- "MAXEVAL|NITER"
-  map(.mods, function(.mod){
-    mod_path <- get_model_path(.mod)
-    mod_lines <- mod_path %>% readLines() %>% suppressSpecificWarning("incomplete final line found")
-    str_line_loc <- which(grepl(search_str, mod_lines))
+  if(!is.null(.max_eval)){
+    assert_numeric(.max_eval, lower = 1, upper = 9999, typed.missing = TRUE)
+    search_str <- "MAXEVAL|NITER"
+    map(.mods, function(.mod){
+      mod_path <- get_model_path(.mod)
+      mod_lines <- mod_path %>% readLines() %>% suppressSpecificWarning("incomplete final line found")
+      str_line_loc <- which(grepl(search_str, mod_lines))
 
-    if(is_empty(str_line_loc)){
-      delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
-      stop("Neither MAXEVAL or NITER were found in the ctl file. Please ensure one is provided.")
-    }
+      if(is_empty(str_line_loc)){
+        delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
+        stop("Neither MAXEVAL or NITER were found in the ctl file. Please ensure one is provided.")
+      }
 
-    str_values <- str_split(mod_lines[str_line_loc], " ")[[1]]
-    str_loc <- grepl(search_str, str_values)
+      str_values <- str_split(mod_lines[str_line_loc], " ")
+      for(i in 1:length(str_values)){
+        str_loc <- grepl(search_str, str_values[[i]])
 
-    if(length(str_loc[str_loc]) > 1){
-      delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
-      stop("Both MAXEVAL and NITER were found in the ctl file. Please ensure only one is provided.")
-    }
+        if(length(str_loc[str_loc]) > 1){
+          delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
+          stop("Both MAXEVAL and NITER were found in the ctl file. Please ensure only one is provided.")
+        }
 
-    str_update <- paste0(gsub('[[:digit:]]+', '', str_values[str_loc]), .max_eval)
-    str_line_update <- paste(paste(str_values[!str_loc], collapse = " "), str_update, sep = " ")
-    mod_lines[str_line_loc] <- str_line_update
-    writeLines(mod_lines, mod_path)
-  })
+        str_update <- paste0(gsub('[[:digit:]]+', '', str_values[[i]][str_loc]), .max_eval)
+        str_line_update <- paste(paste(str_values[[i]][!str_loc], collapse = " "), str_update, sep = " ")
+
+        mod_lines[str_line_loc][i] <- str_line_update
+      }
+
+      writeLines(mod_lines, mod_path)
+    })
+  }
+
 
 
   tryCatch({
