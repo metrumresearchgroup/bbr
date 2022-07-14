@@ -86,17 +86,20 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       str_values <- str_split(mod_lines[str_line_loc], " ")
 
       values <- map(1:length(str_values), ~ {
+        est_loc <- grepl("METHOD", str_values[[.x]])
+        est_method <- str_values[[.x]][est_loc]
         str_loc <- grepl(search_str, str_values[[.x]])
-        est_method <- gsub('[[:digit:]]+|=', '', str_values[[.x]][str_loc])
+        eval_method <- gsub('[[:digit:]]+|=', '', str_values[[.x]][str_loc])
         value <- as.numeric(gsub('MAXEVAL|NITER|=', '', str_values[[.x]][str_loc]))
-        names(value) = est_method
+        names(value) = paste0(est_method, ", ",eval_method)
         value
       }) %>% unlist()
     })
 
     for(i in 1:length(max_evals)){
       expect_equal(unname(max_evals[[i]]), c(100, 100))
-      expect_equal(names(max_evals[[i]]), c("MAXEVAL", "NITER"))
+      # Confirm that estimation method didnt change, and that MAXEVAL/NITER was preserved
+      expect_equal(names(max_evals[[i]]), c("METHOD=1, MAXEVAL", "METHOD=BAYES, NITER"))
     }
   })
 
