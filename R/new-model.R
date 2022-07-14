@@ -49,8 +49,8 @@ new_model <- function(
   assert_logical(.star, len = 1, null.ok = TRUE)
 
   # check if file already exists and decide whether to overwrite if it does
-  check_for_existing_model(.path, .overwrite)
   .path <- sanitize_file_extension(.path)
+  check_for_existing_model(.path, .overwrite)
 
   # construct the absolute model path in a way that avoids a warning from
   # normalizePath() if `.path` does not exist (we only require that the model
@@ -91,7 +91,7 @@ new_model <- function(
 #' @seealso [copy_model_from()], [new_model()]
 #' @export
 read_model <- function(.path) {
-  yaml_path <- paste0(.path %>% sanitize_file_extension(), ".yaml")
+  yaml_path <- paste0(.path, ".yaml")
   checkmate::assert_file_exists(yaml_path)
 
   yaml_list <- yaml::read_yaml(yaml_path)

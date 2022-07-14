@@ -222,11 +222,10 @@ MGMT-S016:
   - CLM-R004
 MGMT-S017:
   name: Passing model file extensions
-  description: As a user, I want to be able to pass valid file extensions for new models.
+  description: As a user, I want new_model to ignore file extensions.
   ProductRisk: Low
   requirements:
-  - CLM-R005
-  - CLM-R006
+  - NWMD-R011
 RUN-S001:
   name: Submit model to be run
   description: As a user, I want to be able to submit a model object to have bbi execute

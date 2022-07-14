@@ -615,7 +615,7 @@ NWMD-R010:
   tests:
   - BBR-NWMD-010
 NWMD-R011:
-    description: valid model extensions may be passed into new_model
+    description: new_model() ignores files' extensions
   tests:
   - BBR-NWMD-011
 PEST-R001:
