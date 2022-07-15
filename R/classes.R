@@ -62,6 +62,7 @@ create_model_object <- function(res, save_yaml) {
 
 #' @describeIn create_bbi_object Create list object of `bbi_{.model_type}_summary` class, first checking that all the required keys are present.
 #' @param .model_type Character scalar of a valid model type (currently either `nonmem` or `stan`)
+#' @importFrom purrr map map_if
 #' @keywords internal
 create_summary_object <- function(res, .model_type = SUPPORTED_MOD_TYPES) {
 
@@ -79,6 +80,13 @@ create_summary_object <- function(res, .model_type = SUPPORTED_MOD_TYPES) {
       "`\nObject has the following keys: ", paste(names(res) %||% "NO NAMES", collapse=", ")
     )
     strict_mode_error(err_msg)
+  }
+
+  ofvs <- res[[OFV_COL]]
+  if (!is.null(ofvs)) {
+    res[[OFV_COL]] <- map(
+      ofvs,
+      function(xs) map_if(xs, ~ .x == BBI_NULL_NUM, ~ NA_real_))
   }
 
   # assign class and return
