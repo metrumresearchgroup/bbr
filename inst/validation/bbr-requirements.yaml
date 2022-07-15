@@ -614,6 +614,10 @@ NWMD-R010:
   description: new_model() supports `.path` containing a period
   tests:
   - BBR-NWMD-010
+NWMD-R011:
+    description: new_model() ignores files' extensions
+  tests:
+  - BBR-NWMD-011
 PEST-R001:
   description: param_estimates.bbi_model_summary gets expected table
   tests:

@@ -49,6 +49,7 @@ new_model <- function(
   assert_logical(.star, len = 1, null.ok = TRUE)
 
   # check if file already exists and decide whether to overwrite if it does
+  .path <- sanitize_file_extension(.path)
   check_for_existing_model(.path, .overwrite)
 
   # construct the absolute model path in a way that avoids a warning from
@@ -162,3 +163,16 @@ check_for_existing_model <- function(.path, .overwrite) {
     }
   }
 }
+
+#' Private helper to remove file extensions to match expected input to new model.
+#' @inheritParams new_model
+#' @keywords internal
+sanitize_file_extension <- function(.path)
+{
+  if(fs::is_file(.path))
+  {
+    .path <- fs::path_ext_remove(.path)
+  }
+  return(.path)
+}
+
