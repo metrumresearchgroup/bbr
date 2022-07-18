@@ -118,9 +118,12 @@ format_matrix <- function(.values, .labels, .type = c("OMEGA", "SIGMA")){
   }
 
   # Assign row and column names
+
+
+
   dimnames(.mat) <- list(
-    sprintf(paste0("%s(",seq(1,max(.cols)),",1)"), .type),
-    sprintf(paste0("%s(1,",seq(1,max(.rows)),")"), .type)
+    sprintf(paste0("%s_",seq(1,max(.cols)),""), .type),
+    sprintf(paste0("%s_",seq(1,max(.rows)),""), .type)
   )
 
   return(.mat)

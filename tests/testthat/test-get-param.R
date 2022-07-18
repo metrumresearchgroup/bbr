@@ -42,14 +42,23 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   })
 
 
-  # test_that("format_matrix()  [BBR-PEST-017]", {
-  #   clean_test_enviroment()
-  #   sum <- MOD1 %>% model_summary()
-  #   par_df <- MOD1 %>% model_summary() %>% param_estimates() %>% filter(grepl("OMEGA", parameter_names))
-  #
-  #   expect_equal(par_df$parameter_names, names(thetas))
-  #   expect_equal(par_df$estimate, unname(thetas))
-  # })
+  test_that("format_matrix()  [BBR-PEST-017]", {
+    clean_test_enviroment()
+    mod <- read_model(file.path(MODEL_DIR_X, "example2_saemimp"))
+    sum <- mod %>% model_summary()
+    values <- sum$parameters_data[[2]]$estimates$omega
+    labels <- sum$parameter_names$omega
+    matrix <- format_matrix(values, labels, .type = "OMEGA")
+
+    expect_true(isSymmetric(matrix))
+
+    par_df <- mod %>% model_summary() %>% param_estimates() %>% filter(grepl("OMEGA", parameter_names))
+
+    expect_equal(matrix[lower.tri(matrix, diag = TRUE)], par_df$estimate)
+
+    expect_equal(par_df$parameter_names, names(thetas))
+    expect_equal(par_df$estimate, unname(thetas))
+  })
 
 
   test_that("get_omega() returns correct values and labels [BBR-PEST-018]", {
