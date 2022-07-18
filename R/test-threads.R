@@ -12,6 +12,7 @@
 #' @param ... args passed through to submit_models()
 #'
 #' @importFrom checkmate assert_list assert_int
+#' @importFrom stringr str_split
 #' @importFrom rlang is_empty
 #'
 #' @details
