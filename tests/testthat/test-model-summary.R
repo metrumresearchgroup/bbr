@@ -193,6 +193,28 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_equal(length(mod_sum$run_details$covariance_time), 2)
   })
 
+  test_that("model_summary() maps objective function fallback to NA [BBR-SUM-011]", {
+    skip_if_old_bbi("3.1.1")
+    withr::with_tempdir({
+      fs::dir_copy(MOD1_ABS_PATH, "tmpmod")
+      mod <- copy_model_from(read_model(MOD1_ABS_PATH),
+                             file.path(getwd(), "tmpmod"))
+
+      lst_file <- file.path("tmpmod", "1.lst")
+      lst_lines <- readr::read_lines(lst_file)
+      stringr::str_replace(lst_lines,
+                           "^( OBJECTIVE FUNCTION VALUE .*: +)[0-9.]+\\s*$",
+                           "\\1NaN")  %>%
+        stringr::str_replace("^( #OBJV:\\*+ +)[0-9.]+( +\\*+\\s*)$",
+                             "\\1NaN\\2")  %>%
+        readr::write_lines(lst_file)
+
+      ofvs <- model_summary(mod)[[OFV_COL]]
+      ofv <- ofvs[[length(ofvs)]]
+      expect_identical(ofv[["ofv_no_constant"]], NA_real_)
+      expect_identical(ofv[["ofv_with_constant"]], NA_real_)
+    })
+  })
 }) # closing withr::with_options
 
 

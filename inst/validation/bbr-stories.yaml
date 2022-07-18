@@ -220,6 +220,12 @@ MGMT-S016:
   - CLM-R002
   - CLM-R003
   - CLM-R004
+MGMT-S017:
+  name: Passing model file extensions
+  description: As a user, I want new_model to ignore file extensions.
+  ProductRisk: Low
+  requirements:
+  - NWMD-R011
 RUN-S001:
   name: Submit model to be run
   description: As a user, I want to be able to submit a model object to have bbi execute
@@ -258,6 +264,7 @@ SUM-S001:
   requirements:
   - SUM-R001
   - SUM-R006
+  - SUM-R010
   - WRKF-R001
   - WRKF-R002
   - CRT-R001
