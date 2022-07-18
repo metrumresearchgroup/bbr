@@ -2,7 +2,7 @@ context("Test get_omega, get_sigma, and get_theta functions")
 
 skip_if_not_drone_or_metworx("test-get-param")
 
-mod_complex <- read_model(file.path(MODEL_DIR_X, "acop-fake-bayes"))
+mod_complex <- read_model(file.path(MODEL_DIR_X, "example2_saemimp"))
 
 
 # matches values reported in parameter estimates to location in matrix
@@ -62,7 +62,6 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   test_that("format_matrix() creates symmetrical matrix from labels correctly [BBR-PEST-016]", {
     clean_test_enviroment()
-    mod_complex <- read_model(file.path(MODEL_DIR_X, "example2_saemimp"))
     sum <- mod_complex %>% model_summary()
     values <- sum$parameters_data[[2]]$estimates$omega
     labels <- sum$parameter_names$omega
