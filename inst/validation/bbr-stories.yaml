@@ -330,6 +330,14 @@ SUM-S009:
   - CVCR-R002
   - CVCR-R003
   - CVCR-R004
+SUM-S010:
+  name: Format parameter estimates as matrix or labeled vector
+  description: As a user, I want to be able to pull specific parameter estimates,
+    and format them properly in either a symmetrical matrix (OMEGA, SIGMA),
+    or labeled vector (THETA).
+  ProductRisk: Low
+  requirements:
+  - PEST-R014
 OUT-S001:
   name: Read NONMEM output files
   description: As a user, I want to be able to read NONMEM output files into a tibble

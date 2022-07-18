@@ -4,9 +4,27 @@ skip_if_not_drone_or_metworx("test-get-param")
 
 mod_complex <- read_model(file.path(MODEL_DIR_X, "acop-fake-bayes"))
 
+
+# matches values reported in parameter estimates to location in matrix
+# does not check symmetry
+check_matrix <- function(matrix, par_df, .type = "OMEGA"){
+  for(name.i in unique(par_df$parameter_names)){
+    # message("spot checking ", name.i)
+    spot_chk <- par_df$estimate[par_df$parameter_names == name.i]
+    # Get positions from labels
+    matrix_pos <- gsub(.type, "",name.i)
+    matrix_pos <- gsub("[()]", "", matrix_pos)
+    matrix_pos <- strsplit(matrix_pos, ",")
+    row.i <- matrix_pos[[1]][1] %>% as.numeric()
+    col.i <- matrix_pos[[1]][2] %>% as.numeric()
+
+    expect_identical(matrix[row.i,col.i], spot_chk)
+  }
+}
+
 withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
-  test_that("get_theta() returns correct values and labels (model_summary) [BBR-PEST-015]", {
+  test_that("get_theta() returns correct values and labels: model_summary [BBR-PEST-015]", {
     clean_test_enviroment()
     thetas <- MOD1 %>% model_summary() %>% get_theta()
     par_df <- MOD1 %>% model_summary() %>% param_estimates() %>% filter(grepl("THETA", parameter_names))
@@ -15,7 +33,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_equal(par_df$estimate, unname(thetas))
   })
 
-  test_that("get_theta() returns correct values and labels (model_summaries) [BBR-PEST-016]", {
+  test_that("get_theta() returns correct values and labels: model_summaries [BBR-PEST-015]", {
     clean_test_enviroment()
 
     on.exit({
@@ -42,26 +60,23 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   })
 
 
-  test_that("format_matrix()  [BBR-PEST-017]", {
+  test_that("format_matrix() creates symmetrical matrix from labels correctly [BBR-PEST-016]", {
     clean_test_enviroment()
-    mod <- read_model(file.path(MODEL_DIR_X, "example2_saemimp"))
-    sum <- mod %>% model_summary()
+    mod_complex <- read_model(file.path(MODEL_DIR_X, "example2_saemimp"))
+    sum <- mod_complex %>% model_summary()
     values <- sum$parameters_data[[2]]$estimates$omega
     labels <- sum$parameter_names$omega
     matrix <- format_matrix(values, labels, .type = "OMEGA")
 
-    expect_true(isSymmetric(matrix))
+    expect_true(isSymmetric(matrix)) # only confirmed in this test
 
-    par_df <- mod %>% model_summary() %>% param_estimates() %>% filter(grepl("OMEGA", parameter_names))
+    par_df <- mod_complex %>% model_summary() %>% param_estimates() %>% filter(grepl("OMEGA", parameter_names))
 
-    expect_equal(matrix[lower.tri(matrix, diag = TRUE)], par_df$estimate)
-
-    expect_equal(par_df$parameter_names, names(thetas))
-    expect_equal(par_df$estimate, unname(thetas))
+    check_matrix(matrix, par_df, .type = "OMEGA")
   })
 
 
-  test_that("get_omega() returns correct values and labels [BBR-PEST-018]", {
+  test_that("get_omega() returns correct values and labels: model_summary [BBR-PEST-017]", {
     clean_test_enviroment()
     omegas <- MOD1 %>% model_summary() %>% get_omega()
     par_df <- MOD1 %>% model_summary() %>% param_estimates() %>% filter(grepl("OMEGA", parameter_names))
@@ -70,13 +85,43 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_equal(par_df$estimate, unique(as.vector(omegas)))
   })
 
-  test_that("get_sigma() returns correct values and labels [BBR-PEST-019]", {
+  test_that("get_omega() returns correct values and labels: model_summaries [BBR-PEST-017]", {
+    clean_test_enviroment()
+    mods <- list(MOD1, mod_complex)
+    sums <- mods %>% model_summaries()
+    omegas <- sums %>% get_omega()
+
+    expect_true(is.list(omegas))
+    par_df1 <- MOD1 %>% model_summary() %>% param_estimates() %>% filter(grepl("OMEGA", parameter_names))
+    par_df2 <- mod_complex %>% model_summary() %>% param_estimates() %>% filter(grepl("OMEGA", parameter_names))
+
+    # order is preserved, and duplicate coviarances are dropped
+    check_matrix(omegas[[1]], par_df1, .type = "OMEGA")
+    check_matrix(omegas[[2]], par_df2, .type = "OMEGA")
+  })
+
+  test_that("get_sigma() returns correct values and labels: model_summary [BBR-PEST-018]", {
     clean_test_enviroment()
     sigmas <- MOD1 %>% model_summary() %>% get_sigma()
     par_df <- MOD1 %>% model_summary() %>% param_estimates() %>% filter(grepl("SIGMA", parameter_names))
 
     # order is preserved, and duplicate coviarances are dropped
     expect_equal(par_df$estimate, unique(as.vector(sigmas)))
+  })
+
+  test_that("get_sigma() returns correct values and labels: model_summaries [BBR-PEST-018]", {
+    clean_test_enviroment()
+    mods <- list(MOD1, mod_complex)
+    sums <- mods %>% model_summaries()
+    sigmas <- sums %>% get_sigma()
+
+    expect_true(is.list(sigmas))
+    par_df1 <- MOD1 %>% model_summary() %>% param_estimates() %>% filter(grepl("SIGMA", parameter_names))
+    par_df2 <- mod_complex %>% model_summary() %>% param_estimates() %>% filter(grepl("SIGMA", parameter_names))
+
+    # order is preserved, and duplicate coviarances are dropped
+    check_matrix(sigmas[[1]], par_df1, .type = "SIGMA")
+    check_matrix(sigmas[[2]], par_df2, .type = "SIGMA")
   })
 })
 
