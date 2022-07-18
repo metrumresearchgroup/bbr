@@ -55,7 +55,7 @@ withr::with_options(list(
       file.path(MODEL_DIR_BBI, "1"),
       .description = "original test-workflow-bbi model",
       .tags = ORIG_TAGS,
-      .bbi_args = list(overwrite = TRUE, threads = 4)
+      .bbi_args = list(overwrite = TRUE, threads = 1)
     )
     expect_identical(class(mod1), NM_MOD_CLASS_LIST)
 

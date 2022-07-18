@@ -7,9 +7,9 @@ context("Utility functions for building args, etc.")
 test_that("check_bbi_args parses correctly [BBR-UTL-001]", {
   # check some that should parse correctly
   .arg_list <- list(
-    list(list("json" = T, "threads" = 4, "nm_version" = "nm74"), c("--json", "--threads=4", "--nm_version=nm74")), # check flag conversion
-    list(list("json" = T, "threads" = 4, debug=F), c("--json", "--threads=4")), # check bool=F not passed through
-    list(list("json" = T, "threads" = 4, debug=T), c("--json", "--threads=4", "--debug"))  # check same bool=T is passed through
+    list(list("json" = T, "threads" = 4, "nm_version" = "nm74", "parallel" = T), c("--json", "--threads=4", "--nm_version=nm74", "--parallel")), # check flag conversion
+    list(list("json" = T, "threads" = 4, debug=F, "parallel" = T), c("--json", "--threads=4","--parallel")), # check bool=F not passed through
+    list(list("json" = T, "threads" = 4, debug=T, "parallel" = T), c("--json", "--threads=4", "--debug", "--parallel"))  # check same bool=T is passed through
   )
 
   for (.a in .arg_list) {
@@ -97,7 +97,6 @@ test_that("combine_list_objects() correctly fails if .func_args isn't named [BBR
   expect_error(combine_list_objects(list(4,5,6), LIST2))
   expect_error(combine_list_objects(LIST1, list(4,5,6)))
 })
-
 
 ######################
 # assorted utilities
