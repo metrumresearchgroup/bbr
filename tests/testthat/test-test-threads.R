@@ -58,7 +58,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   })
 
 
-  test_that("test_threads(.dry_run=T) correctly changes maxeval/niter [BBR-TSTT-002]", {
+  test_that("test_threads(.dry_run=T) correctly changes maxeval/niter: changes only one method [BBR-TSTT-002]", {
 
     search_str <- "MAXEVAL|NITER"
     max_evals <- map(mods, function(.mod){
@@ -74,7 +74,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   })
 
 
-  test_that("test_threads(.dry_run=T) correctly changes maxeval/niter for multiple estimation methods [BBR-TSTT-002]", {
+  test_that("test_threads(.dry_run=T) correctly changes maxeval/niter: changes multiple methods [BBR-TSTT-002]", {
 
     mods_complex <- test_threads(mod_complex, .threads = c(2, 4), .max_eval = 100, .mode = "local", .dry_run = TRUE)
 
@@ -96,14 +96,14 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       }) %>% unlist()
     })
 
-    for(i in 1:length(max_evals)){
-      expect_equal(unname(max_evals[[i]]), c(100, 100))
+    for(i in seq_along(max_evals)){
+      expect_identical(unname(max_evals[[i]]), c(100, 100))
       # Confirm that estimation method didnt change, and that MAXEVAL/NITER was preserved
-      expect_equal(names(max_evals[[i]]), c("METHOD=1, MAXEVAL", "METHOD=BAYES, NITER"))
+      expect_identical(names(max_evals[[i]]), c("METHOD=1, MAXEVAL", "METHOD=BAYES, NITER"))
     }
   })
 
-  test_that("test_threads(.dry_run=T) keeps original maxeval/niter if .max_eval = NULL [BBR-TSTT-002]", {
+  test_that("test_threads(.dry_run=T) correctly changes maxeval/niter: keeps original if .max_eval = NULL [BBR-TSTT-002]", {
 
     mods_complex <- test_threads(mod_complex, .threads = c(2, 4), .max_eval = NULL, .mode = "local", .dry_run = TRUE)
 

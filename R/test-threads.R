@@ -11,7 +11,7 @@
 #'         same settings as the original model.
 #' @param ... args passed through to submit_models()
 #'
-#' @importFrom checkmate assert_list
+#' @importFrom checkmate assert_list assert_int
 #' @importFrom rlang is_empty
 #'
 #' @details
@@ -74,7 +74,7 @@ test_threads <- function(
 
   # Modify MAXEVAL or NITER
   if(!is.null(.max_eval)){
-    assert_numeric(.max_eval, lower = 1, upper = 9999)
+    assert_int(.max_eval, lower = 1, upper = 9999)
     search_str <- "MAXEVAL|NITER"
     map(.mods, function(.mod){
       mod_path <- get_model_path(.mod)
@@ -87,7 +87,7 @@ test_threads <- function(
       }
 
       str_values <- str_split(mod_lines[str_line_loc], " ")
-      for(i in 1:length(str_values)){
+      for(i in seq_along(str_values)){
         str_loc <- grepl(search_str, str_values[[i]])
 
         if(length(str_loc[str_loc]) > 1){
