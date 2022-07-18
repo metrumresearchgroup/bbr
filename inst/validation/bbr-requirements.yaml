@@ -614,6 +614,10 @@ NWMD-R010:
   description: new_model() supports `.path` containing a period
   tests:
   - BBR-NWMD-010
+NWMD-R011:
+    description: new_model() ignores files' extensions
+  tests:
+  - BBR-NWMD-011
 PEST-R001:
   description: param_estimates.bbi_model_summary gets expected table
   tests:
@@ -883,6 +887,7 @@ SUM-R001:
   description: model_summary.bbi_nonmem_model produces expected output
   tests:
   - BBR-SUM-001
+  - BBR-SUM-010
 SUM-R002:
   description: model_summary() works with custom .ext file
   tests:
@@ -916,6 +921,10 @@ SUM-R009:
   description: as_summary_list.bbi_summary_log_df works
   tests:
   - BBR-SUM-009
+SUM-R010:
+  description: model_summary() handles NA objective function values
+  tests:
+  - BBR-SUM-011
 TDF-R001:
   description: tags_diff.bbi_model default happy path works
   tests:

@@ -7,10 +7,12 @@
 #'         Will update `MAXITER` or `NITER` (whichever is specified) in generated models.
 #'         The best number for this is model-dependent. Typically, something between 10 and
 #'         100 is good, depending on how long each iteration takes. You want something that
-#'         will run for 3-5 minutes total.
+#'         will run for 3-5 minutes total. You can set this argument to `NULL` to run with the
+#'         same settings as the original model.
 #' @param ... args passed through to submit_models()
 #'
-#' @importFrom checkmate assert_list
+#' @importFrom checkmate assert_list assert_int
+#' @importFrom stringr str_split
 #' @importFrom rlang is_empty
 #'
 #' @details
@@ -72,30 +74,38 @@ test_threads <- function(
                  add_tags(paste("test threads")))
 
   # Modify MAXEVAL or NITER
-  search_str <- "MAXEVAL|NITER"
-  map(.mods, function(.mod){
-    mod_path <- get_model_path(.mod)
-    mod_lines <- mod_path %>% readLines() %>% suppressSpecificWarning("incomplete final line found")
-    str_line_loc <- which(grepl(search_str, mod_lines))
+  if(!is.null(.max_eval)){
+    assert_int(.max_eval, lower = 1)
+    search_str <- "MAXEVAL|NITER"
+    map(.mods, function(.mod){
+      mod_path <- get_model_path(.mod)
+      mod_lines <- mod_path %>% readLines() %>% suppressSpecificWarning("incomplete final line found")
+      str_line_loc <- which(grepl(search_str, mod_lines))
 
-    if(is_empty(str_line_loc)){
-      delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
-      stop("Neither MAXEVAL or NITER were found in the ctl file. Please ensure one is provided.")
-    }
+      if(is_empty(str_line_loc)){
+        delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
+        stop("Neither MAXEVAL or NITER were found in the ctl file. Please ensure one is provided.")
+      }
 
-    str_values <- str_split(mod_lines[str_line_loc], " ")[[1]]
-    str_loc <- grepl(search_str, str_values)
+      str_values <- str_split(mod_lines[str_line_loc], " ")
+      for(i in seq_along(str_values)){
+        str_loc <- grepl(search_str, str_values[[i]])
 
-    if(length(str_loc[str_loc]) > 1){
-      delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
-      stop("Both MAXEVAL and NITER were found in the ctl file. Please ensure only one is provided.")
-    }
+        if(length(str_loc[str_loc]) > 1){
+          delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
+          stop("Both MAXEVAL and NITER were found in the ctl file. Please ensure only one is provided.")
+        }
 
-    str_update <- paste0(gsub('[[:digit:]]+', '', str_values[str_loc]), .max_eval)
-    str_line_update <- paste(paste(str_values[!str_loc], collapse = " "), str_update, sep = " ")
-    mod_lines[str_line_loc] <- str_line_update
-    writeLines(mod_lines, mod_path)
-  })
+        str_update <- paste0(gsub('[[:digit:]]+', '', str_values[[i]][str_loc]), .max_eval)
+        str_line_update <- paste(paste(str_values[[i]][!str_loc], collapse = " "), str_update, sep = " ")
+
+        mod_lines[str_line_loc][i] <- str_line_update
+      }
+
+      writeLines(mod_lines, mod_path)
+    })
+  }
+
 
 
   tryCatch({
@@ -118,8 +128,8 @@ test_threads <- function(
 #' @param ... args passed through to `wait_for_nonmem()`.
 #'
 #' @details
-#' `.return_times` can be any subset of `c("estimation_time", "covariance_time", "cpu_time")`.
-#' Users can also specify `all`, which is the shorthand method for selecting all 3 of those columns.
+#' `.return_times` can be any subset of `c("estimation_time", "covariance_time", "postprocess_time", "cpu_time")`.
+#' Users can also specify `"all"`, which is the shorthand method for selecting all 4 of those columns.
 #'
 #' @examples
 #' \dontrun{
@@ -147,10 +157,24 @@ check_run_times <- function(
   ...
 ) {
 
+  # This function only works for bbi versions -greater- than 3.1.1
+  v_bbi <- package_version(bbi_version(), strict = FALSE)
+  is_old_bbi <- FALSE
+  if (!is.na(v_bbi)) {
+    if(v_bbi <= package_version("3.1.1")) {
+      is_old_bbi <- TRUE
+      warning("This function is only compatible with bbi versions -greater than- 3.1.1")
+    }
+  }
+
   if("all" %in% .return_times){
-    .return_times <- c("estimation_time", "covariance_time", "cpu_time")
+    .return_times <- c("estimation_time", "covariance_time", "postprocess_time", "cpu_time")
+    if(is_old_bbi){
+        # This allows the function to work with lower versions of bbi (despite covariance_time being incorrect)
+        .return_times <- c("estimation_time", "covariance_time", "cpu_time")
+    }
   }else{
-    assert_true(all(.return_times %in% c("estimation_time", "covariance_time", "cpu_time")))
+    assert_true(all(.return_times %in% c("estimation_time", "covariance_time", "postprocess_time", "cpu_time")))
   }
 
   if (inherits(.mods, "bbi_model")) {
@@ -193,8 +217,9 @@ check_run_times <- function(
       data <- tibble::tibble(
         run = model_run,
         threads = threads,
-        estimation_time = .x$run_details$estimation_time,
-        covariance_time = .x$run_details$covariance_time,
+        estimation_time = sum(.x$run_details$estimation_time),
+        covariance_time = sum(.x$run_details$covariance_time),
+        postprocess_time = .x$run_details$postprocess_time,
         cpu_time = .x$run_details$cpu_time) %>%
         select(run, threads, all_of(.return_times))
       return(data)
@@ -214,6 +239,7 @@ check_run_times <- function(
   })
 
 }
+
 
 #' Remove model files associated with the specified tags
 #'
