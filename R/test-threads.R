@@ -74,7 +74,7 @@ test_threads <- function(
 
   # Modify MAXEVAL or NITER
   if(!is.null(.max_eval)){
-    assert_int(.max_eval, lower = 1, upper = 9999)
+    assert_int(.max_eval, lower = 1)
     search_str <- "MAXEVAL|NITER"
     map(.mods, function(.mod){
       mod_path <- get_model_path(.mod)
