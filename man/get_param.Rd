@@ -18,7 +18,7 @@ get_sigma(.summary)
 \arguments{
 \item{.summary}{a \code{bbi_nonmem_summary} or \code{bbi_summary_list} object.}
 
-\item{.param}{the parameter to retrieve and format. One of \code{c("omega", "sigma", "theta")}}
+\item{.param}{the parameter(s) to retrieve and format. Any subset of \code{c("omega", "sigma", "theta")}}
 }
 \description{
 Return a formatted object for a given parameter

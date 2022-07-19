@@ -2,8 +2,9 @@
 #' Return a formatted object for a given parameter
 #'
 #' @param .summary a `bbi_nonmem_summary` or `bbi_summary_list` object.
-#' @param .param the parameter to retrieve and format. One of `c("omega", "sigma", "theta")`
+#' @param .param the parameter(s) to retrieve and format. Any subset of `c("omega", "sigma", "theta")`
 #'
+#' @importFrom stats setNames
 #' @export
 get_param <- function(.summary, .param = c("omega", "sigma", "theta")){
 
@@ -16,34 +17,39 @@ get_param <- function(.summary, .param = c("omega", "sigma", "theta")){
     stop("Please pass in a `", NM_SUM_CLASS, "` or `", SL_CLASS, "` type object.")
   }
 
-  .param <- match.arg(.param)
+  assert_true(all(.param %in% c("omega", "sigma", "theta")))
 
-  if(.param %in% c("omega", "sigma")){
-    param_obj <- map(.summary, ~ {
-      # unpack bbi_summary_list element
-      if (!is.null(.x$bbi_summary)) .x <- .x$bbi_summary
 
-      param_names <- .x[[SUMMARY_PARAM_NAMES]]
-      matrix <- with(
-        .x[[SUMMARY_PARAM_DATA]][[length(.x[[SUMMARY_PARAM_DATA]])]],
-        format_matrix(estimates[[.param]], param_names[[.param]], .type = toupper(.param))
-      )
-      matrix
-    })
+  param_obj <- map(.param, function(param.i){
 
-  }else if(.param %in% c("theta")){
-    param_obj <- map(.summary, ~ {
-      # unpack bbi_summary_list element
-      if (!is.null(.x$bbi_summary)) .x <- .x$bbi_summary
+    if(param.i %in% c("omega", "sigma")){
+      param_obj_i <- map(.summary, ~ {
+        # unpack bbi_summary_list element
+        if (!is.null(.x$bbi_summary)) .x <- .x$bbi_summary
 
-      param_names <- .x[[SUMMARY_PARAM_NAMES]]
-      theta <- .x[[SUMMARY_PARAM_DATA]][[length(.x[[SUMMARY_PARAM_DATA]])]]$estimates$theta
-      names(theta) <- param_names$theta
-      theta
-    })
-  }
+        param_names <- .x[[SUMMARY_PARAM_NAMES]]
+        matrix <- with(
+          .x[[SUMMARY_PARAM_DATA]][[length(.x[[SUMMARY_PARAM_DATA]])]],
+          format_matrix(estimates[[param.i]], param_names[[param.i]], .type = toupper(param.i))
+        )
+        matrix
+      })
 
-  if(length(param_obj) == 1) param_obj <- param_obj[[1]]
+    }else if(param.i %in% c("theta")){
+      param_obj_i <- map(.summary, ~ {
+        # unpack bbi_summary_list element
+        if (!is.null(.x$bbi_summary)) .x <- .x$bbi_summary
+
+        param_names <- .x[[SUMMARY_PARAM_NAMES]]
+        theta <- .x[[SUMMARY_PARAM_DATA]][[length(.x[[SUMMARY_PARAM_DATA]])]]$estimates$theta
+        names(theta) <- param_names$theta
+        theta
+      })
+    }
+
+    if(length(param_obj_i) == 1) param_obj_i <- param_obj_i[[1]]
+    param_obj[[param.i]] <- param_obj_i
+  }) %>% setNames(.param)
 
   return(param_obj)
 }
