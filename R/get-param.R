@@ -59,7 +59,7 @@ get_param <- function(.summary, .param = c("omega", "sigma", "theta")){
 #' @export
 get_theta <- function(.summary){
 
-  thetas <- get_param(.summary, "theta")
+  thetas <- get_param(.summary, "theta")$theta
 
   return(thetas)
 }
@@ -70,7 +70,7 @@ get_theta <- function(.summary){
 #' @export
 get_omega <- function(.summary){
 
-  omegas <- get_param(.summary, "omega")
+  omegas <- get_param(.summary, "omega")$omega
 
   return(omegas)
 }
@@ -80,7 +80,7 @@ get_omega <- function(.summary){
 #' @export
 get_sigma <- function(.summary){
 
-  sigmas <- get_param(.summary, "sigma")
+  sigmas <- get_param(.summary, "sigma")$sigma
 
   return(sigmas)
 }
