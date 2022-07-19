@@ -128,6 +128,7 @@ test_that("suppressSpecificWarning() works [BBR-UTL-011]", {
 })
 
 test_that("warning raised when threads > 1 and parallel is FALSE [BBR-UTL-014]", {
+  skip("In development")
 
   withr::with_tempdir({
 
