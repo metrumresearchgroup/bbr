@@ -8,6 +8,8 @@ mod_complex <- read_model(file.path(MODEL_DIR_X, "example2_saemimp"))
 # matches values reported in parameter estimates to location in matrix
 # does not check symmetry
 check_matrix <- function(matrix, par_df, .type = "OMEGA"){
+  expect_true(isSymmetric(matrix))
+
   for(name.i in unique(par_df$parameter_names)){
     # message("spot checking ", name.i)
     spot_chk <- par_df$estimate[par_df$parameter_names == name.i]
@@ -60,28 +62,13 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   })
 
 
-  test_that("format_matrix() creates symmetrical matrix from labels correctly [BBR-PEST-016]", {
-    clean_test_enviroment()
-    sum <- mod_complex %>% model_summary()
-    values <- sum$parameters_data[[2]]$estimates$omega
-    labels <- sum$parameter_names$omega
-    matrix <- format_matrix(values, labels, .type = "OMEGA")
-
-    expect_true(isSymmetric(matrix)) # only confirmed in this test
-
-    par_df <- mod_complex %>% model_summary() %>% param_estimates() %>% filter(grepl("OMEGA", parameter_names))
-
-    check_matrix(matrix, par_df, .type = "OMEGA")
-  })
-
-
   test_that("get_omega() returns correct values and labels: model_summary [BBR-PEST-017]", {
     clean_test_enviroment()
     omegas <- MOD1 %>% model_summary() %>% get_omega()
     par_df <- MOD1 %>% model_summary() %>% param_estimates() %>% filter(grepl("OMEGA", parameter_names))
 
     # order is preserved, and duplicate coviarances are dropped
-    expect_equal(par_df$estimate, unique(as.vector(omegas)))
+    check_matrix(omegas, par_df, .type = "OMEGA")
   })
 
   test_that("get_omega() returns correct values and labels: model_summaries [BBR-PEST-017]", {
@@ -105,7 +92,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     par_df <- MOD1 %>% model_summary() %>% param_estimates() %>% filter(grepl("SIGMA", parameter_names))
 
     # order is preserved, and duplicate coviarances are dropped
-    expect_equal(par_df$estimate, unique(as.vector(sigmas)))
+    check_matrix(sigmas, par_df, .type = "SIGMA")
   })
 
   test_that("get_sigma() returns correct values and labels: model_summaries [BBR-PEST-018]", {

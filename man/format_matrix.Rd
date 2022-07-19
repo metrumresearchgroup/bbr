@@ -10,6 +10,8 @@ format_matrix(.values, .labels, .type = c("OMEGA", "SIGMA"))
 \item{.values}{vector of values. Values should be in the same order presented in model_summary}
 
 \item{.labels}{parameter names corresponding to the values. Order matters here as well.}
+
+\item{.type}{matrix type. Either "OMEGA" or "SIGMA"}
 }
 \description{
 Format vector into matrix using positional vector
