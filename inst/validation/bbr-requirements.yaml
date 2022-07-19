@@ -1034,6 +1034,10 @@ UTL-R013:
   description: wait_for_nonmem() doesn't error out if no stop time found
   tests:
   - BBR-UTL-013
+UTL-R014:
+  description: check_bbi_args() provides warning when `threads > 1` and parallel is `FALSE`
+  tests:
+  - BBR-UTL-014
 WRKF-R001:
   description: step by step create_model to submit_model to model_summary works
   tests:

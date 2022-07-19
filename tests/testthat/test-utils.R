@@ -121,9 +121,46 @@ test_that("strict_mode_error() works correctly [BBR-UTL-010]", {
   })
 })
 
-
 test_that("suppressSpecificWarning() works [BBR-UTL-011]", {
   # log() of a negative number raises a warning
   x <- suppressSpecificWarning(log(-1), "NaNs produced")
   expect_true(is.nan(x))
 })
+
+test_that("warning raised when threads > 1 and parallel is FALSE [BBR-UTL-014]", {
+
+  withr::with_tempdir({
+
+    fs::dir_create(tempdir(), "test_path")
+    files_to_copy <- file.path(ABS_MODEL_DIR, c("1.ctl"))
+    fs::file_copy(file.path("inst", "extdata", "acop.csv"), file.path(tempdir(), "test_path"))
+    purrr::walk(files_to_copy, fs::file_copy, file.path(tempdir(), "test_path"))
+    fs::dir_copy(file.path(ABS_MODEL_DIR, "1"), file.path(tempdir(), "test_path"))
+    ctl <- read_lines(file.path(tempdir(),"test_path", "1.ctl")) %>%  stringr::str_remove("../../../../extdata/")
+    write_lines(ctl, file.path(tempdir(),"test_path", "1.ctl"))
+
+    mod1 <-  new_model(file.path(tempdir(), "test_path", "1"), .description = "original test-workflow-bbi model",
+      .tags = ORIG_TAGS,.bbi_args = list(overwrite = TRUE, threads = 2))
+
+    bbi_init(file.path(tempdir(), "test_path" ), "/opt/NONMEM", "nm74gf")
+
+    sink(file.path(tempdir(), "test_path", "test.txt")); submit_model(mod1); sink()
+
+    mod_result <- read_file(file.path(tempdir(), "test_path", "test.txt"))
+
+    #Testing that check_bbi_args is appending -parallel when not passed
+    expect_true(stringr::str_detect(mod_result, "--parallel") )
+    fs::file_delete(file.path(tempdir(), "test_path", "1.yaml"))
+
+
+    mod1 <-  new_model(file.path(tempdir(), "test_path", "1"), .description = "original test-workflow-bbi model",
+                       .tags = ORIG_TAGS,.bbi_args = list(overwrite = TRUE, threads = 2, parallel = FALSE))
+
+    #When `threads` > 1 and parallel is False raise a warning
+    expect_warning(submit_model(mod1))
+
+  })
+})
+
+
+
