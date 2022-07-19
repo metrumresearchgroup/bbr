@@ -48,7 +48,7 @@ get_param <- function(.summary, .param = c("omega", "sigma", "theta")){
     }
 
     if(length(param_obj_i) == 1) param_obj_i <- param_obj_i[[1]]
-    param_obj[[param.i]] <- param_obj_i
+    param_obj_i
   }) %>% setNames(.param)
 
   return(param_obj)
