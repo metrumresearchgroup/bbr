@@ -66,6 +66,7 @@ get_param <- function(.summary, .param = c("omega", "sigma", "theta")){
 #'
 #' ```{r, include = FALSE}
 #' knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+#' options('bbr.bbi_exe_path' = read_bbi_path())
 #' MODEL_DIR <- system.file("model", "nonmem", "complex",   package = "bbr")
 #' mod <- read_model(file.path(MODEL_DIR, "example2_saemimp"))
 #' ```
