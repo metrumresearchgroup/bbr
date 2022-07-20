@@ -91,7 +91,7 @@ submit_nonmem_model <- function(.mod,
   .bbi_args <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])
   args_vec <- check_bbi_args(.bbi_args)
   cmd_args <- c("nonmem", "run", .mode, get_model_path(.mod), args_vec)
-  check_yaml_in_sync(.mod)
+  mod <- reconcile_yaml(.mod)
 
   # define working directory
   model_dir <- get_model_working_directory(.mod)
