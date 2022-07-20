@@ -426,6 +426,10 @@ MDF-R004:
   description: model_diff.bbi_nonmem_model errors with multiple based_on
   tests:
   - BBR-MDF-004
+MDF-R005:
+  description: model_diff() hides content of identical models
+  tests:
+  - BBR-MDF-005
 MMF-R001:
   description: modify_model_field() works correctly
   tests:

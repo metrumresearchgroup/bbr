@@ -116,6 +116,11 @@ model_diff_impl <- function(model_A, model_B, .viewer) {
     ))
   }
 
+  if (tools::md5sum(model_A) == tools::md5sum(model_B)) {
+    message("Models are identical")
+    return(invisible(NULL))
+  }
+
   # print some warnings if knitting
   knitting <- isTRUE(getOption('knitr.in.progress'))
   if (knitting) {
