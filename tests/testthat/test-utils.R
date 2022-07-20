@@ -128,29 +128,30 @@ test_that("suppressSpecificWarning() works [BBR-UTL-011]", {
 })
 
 test_that("warning raised when threads > 1 and parallel is FALSE [BBR-UTL-014]", {
-  skip("In development")
-
   withr::with_tempdir({
-
     fs::dir_create(tempdir(), "test_path")
     files_to_copy <- file.path(ABS_MODEL_DIR, c("1.ctl"))
-    fs::file_copy(file.path("inst", "extdata", "acop.csv"), file.path(tempdir(), "test_path"))
+
+    fs::file_copy(system.file("extdata", "acop.csv", package = "bbr"), file.path(tempdir(), "test_path"))
     purrr::walk(files_to_copy, fs::file_copy, file.path(tempdir(), "test_path"))
     fs::dir_copy(file.path(ABS_MODEL_DIR, "1"), file.path(tempdir(), "test_path"))
     ctl <- read_lines(file.path(tempdir(),"test_path", "1.ctl")) %>%  stringr::str_remove("../../../../extdata/")
     write_lines(ctl, file.path(tempdir(),"test_path", "1.ctl"))
 
     mod1 <-  new_model(file.path(tempdir(), "test_path", "1"), .description = "original test-workflow-bbi model",
-      .tags = ORIG_TAGS,.bbi_args = list(overwrite = TRUE, threads = 2))
+                       .tags = ORIG_TAGS,.bbi_args = list(overwrite = TRUE, threads = 2))
 
     bbi_init(file.path(tempdir(), "test_path" ), "/opt/NONMEM", "nm74gf")
 
-    sink(file.path(tempdir(), "test_path", "test.txt")); submit_model(mod1); sink()
+    #Appends --parallel to bbi_args when submitted
+    submit_model(mod1)
 
-    mod_result <- read_file(file.path(tempdir(), "test_path", "test.txt"))
+    #Gets model yaml in synch with command args.
+    #Submitted model does not update model yaml otherwise
+    reconcile_yaml(mod1)
 
-    #Testing that check_bbi_args is appending -parallel when not passed
-    expect_true(stringr::str_detect(mod_result, "--parallel") )
+    #Testing that check_bbi_args is appending --parallel when not passed
+    expect_true(read_model(file.path(tempdir(),"test_path", "1")) %>% purrr::pluck("bbi_args") %>% purrr::pluck("parallel"))
     fs::file_delete(file.path(tempdir(), "test_path", "1.yaml"))
 
 
