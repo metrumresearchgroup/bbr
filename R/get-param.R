@@ -62,26 +62,30 @@ get_param <- function(.summary, .param = c("omega", "sigma", "theta")){
 #'
 #' @param .summary a `bbi_nonmem_summary` or `bbi_summary_list` object.
 #'
-#' @section Examples:
+#' @examples
 #'
-#' ```{r, include = FALSE}
-#' knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-#' options('bbr.bbi_exe_path' = read_bbi_path())
-#' MODEL_DIR <- system.file("model", "nonmem", "complex",   package = "bbr")
-#' mod <- read_model(file.path(MODEL_DIR, "example2_saemimp"))
-#' ```
-#' ```{r, comment = "#>", collapse = TRUE}
+#' \dontrun{
 #' sum <- mod %>% model_summary()
 #'
+#'
 #' sum %>% get_omega()
+#'               OMEGA_1     OMEGA_2     OMEGA_3      OMEGA_4
+#'  OMEGA_1  0.010410500 0.000319542 0.001977200 -0.000189864
+#'  OMEGA_2  0.000319542 0.008278020 0.000872168  0.001005720
+#'  OMEGA_3  0.001977200 0.000872168 0.013139700  0.004040370
+#'  OMEGA_4 -0.000189864 0.001005720 0.004040370  0.010987300
 #'
 #'
 #' sum %>% get_sigma()
+#'          SIGMA_1
+#'  SIGMA_1       1
 #'
 #'
 #' sum %>% get_theta()
-#' ```
+#'     THETA1     THETA2     THETA3     THETA4     THETA5     THETA6     THETA7     THETA8     THETA9    THETA10    THETA11
+#'  3.3005000  3.2519700 -0.6122190 -0.2080120  0.7372940  1.1359900  0.3346290  0.1923520  0.6916970  2.2993700  0.0991684
 #'
+#' }
 #'
 #' @export
 get_omega <- function(.summary){
