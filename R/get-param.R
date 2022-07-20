@@ -119,6 +119,9 @@ get_theta <- function(.summary){
 #' @param .values vector of values. Values should be in the same order presented in model_summary
 #' @param .labels parameter names corresponding to the values. Order matters here as well.
 #' @param .type matrix type. Either "OMEGA" or "SIGMA"
+#'
+#' @importFrom glue glue
+#'
 #' @keywords internal
 format_matrix <- function(.values, .labels, .type = c("OMEGA", "SIGMA")){
 
@@ -140,10 +143,9 @@ format_matrix <- function(.values, .labels, .type = c("OMEGA", "SIGMA")){
 
   # Assign row and column names
   dimnames(.mat) <- list(
-    sprintf(paste0("%s_",seq(1,max(.cols)),""), .type),
-    sprintf(paste0("%s_",seq(1,max(.rows)),""), .type)
+    glue("{.type}_{seq(1,max(.cols))}"),
+    glue("{.type}_{seq(1,max(.rows))}")
   )
 
   return(.mat)
 }
-
