@@ -143,7 +143,7 @@ test_that("warning raised when threads > 1 and parallel is FALSE [BBR-UTL-014]",
 
     bbi_init(file.path(tempdir(), "test_path" ), "/opt/NONMEM", "nm74gf")
 
-    #Appends --parallel to bbi_args when submitted
+
     res <- capture.output(submit_model(mod1))
 
     #Testing that check_bbi_args is appending --parallel when not passed
