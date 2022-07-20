@@ -57,6 +57,8 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     sum_df <- run_log(MODEL_DIR) %>% add_summary()
     test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3, LEVEL2_MOD), RUN_LOG_COLS+SUM_LOG_COLS-2)
     expect_identical(sum_df$model_type, rep("nonmem", RUN_LOG_ROWS+1))
+
+
     expect_identical(sum_df$yaml_md5, ALL_MODS_YAML_MD5)
   })
 

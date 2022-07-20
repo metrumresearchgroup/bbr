@@ -38,7 +38,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
                                "nm_version" = "nm74"
                              ),
                              .dry_run = T)[[PROC_CALL]],
-                as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path} --overwrite --threads=2 --parallel --json --nm_version=nm74"))
+                as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path} --overwrite --threads=2 --json --nm_version=nm74 --parallel"))
               )
             })
 

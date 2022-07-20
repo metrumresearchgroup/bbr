@@ -162,7 +162,7 @@ test_that("new_model ignores file extension: .ctl [BBR-NWMD-011]", {
   )
   expect_identical(mod_ctl$absolute_model_path, file.path(path, "1"))
   expect_identical(mod_ctl$model_type, "nonmem")
-  expect_identical(mod_ctl$yaml_md5, "b5f22ae85c9c0c22405c0e99587f3ed9")
+  expect_identical(mod_ctl$yaml_md5, "6ccf206e167485b5adf29bc135197929")
 })
 
 test_that("new_model ignores file extension: .mod [BBR-NWMD-011]", {
@@ -183,6 +183,6 @@ test_that("new_model ignores file extension: .mod [BBR-NWMD-011]", {
   )
   expect_identical(mod$absolute_model_path, file.path(path, "1"))
   expect_identical(mod$model_type, "nonmem")
-  expect_identical(mod$yaml_md5, "b5f22ae85c9c0c22405c0e99587f3ed9")
+  expect_identical(mod$yaml_md5, "6ccf206e167485b5adf29bc135197929")
 
 })

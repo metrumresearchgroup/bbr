@@ -52,31 +52,6 @@ new_model <- function(
   .path <- sanitize_file_extension(.path)
   check_for_existing_model(.path, .overwrite)
 
-  #if there are bbi argumrnts
-  if(!is.null(.bbi_args))
-  {
-    # If number of threads not set, then set parallel to FALSE
-    # If threads is set to greater than 1, then set parallel to TRUE
-    # If one thread is set, set parallel to FALSE
-    if(is.null(.bbi_args[["threads"]]) == TRUE)
-     {
-      .bbi_args <- c(.bbi_args, parallel = FALSE)
-    }
-
-    if(.bbi_args[["threads"]] == 1 && is.null(.bbi_args[["threads"]]) == FALSE)
-    {
-      .bbi_args <- c(.bbi_args, parallel = FALSE)
-    }
-
-    if(.bbi_args[["threads"]] > 1 && is.null(.bbi_args[["parallel"]]) == TRUE)
-    {
-      .bbi_args <- c(.bbi_args, parallel = TRUE)
-    }
-  }
-
-
-
-
   # construct the absolute model path in a way that avoids a warning from
   # normalizePath() if `.path` does not exist (we only require that the model
   # file exist at `.path`)

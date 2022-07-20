@@ -138,20 +138,16 @@ test_that("warning raised when threads > 1 and parallel is FALSE [BBR-UTL-014]",
     ctl <- read_lines(file.path(tempdir(),"test_path", "1.ctl")) %>%  stringr::str_remove("../../../../extdata/")
     write_lines(ctl, file.path(tempdir(),"test_path", "1.ctl"))
 
-    mod1 <-  new_model(file.path(tempdir(), "test_path", "1"), .description = "original test-workflow-bbi model",
-                       .tags = ORIG_TAGS,.bbi_args = list(overwrite = TRUE, threads = 2))
+    mod1 <- new_model(file.path(tempdir(), "test_path", "1"), .description = "original test-workflow-bbi model",
+                      .tags = ORIG_TAGS,.bbi_args = list(overwrite = TRUE, threads = 2))
 
     bbi_init(file.path(tempdir(), "test_path" ), "/opt/NONMEM", "nm74gf")
 
     #Appends --parallel to bbi_args when submitted
-    submit_model(mod1)
-
-    #Gets model yaml in synch with command args.
-    #Submitted model does not update model yaml otherwise
-    reconcile_yaml(mod1)
+    res <- capture.output(submit_model(mod1))
 
     #Testing that check_bbi_args is appending --parallel when not passed
-    expect_true(read_model(file.path(tempdir(),"test_path", "1")) %>% purrr::pluck("bbi_args") %>% purrr::pluck("parallel"))
+    expect_identical("--parallel", str_subset(res,"--parallel") %>% str_extract("--parallel"))
     fs::file_delete(file.path(tempdir(), "test_path", "1.yaml"))
 
 

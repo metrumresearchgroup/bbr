@@ -111,10 +111,10 @@ MOD_BBI_VERSION <- ref_json$MOD_BBI_VERSION
 MOD_NM_VERSION <- ref_json$MOD_NM_VERSION
 
 # yaml md5 hashes
-MOD1_YAML_MD5 <- "b5f22ae85c9c0c22405c0e99587f3ed9"
-MOD_LEVEL2_MD5 <- "773c0dd01c61a13ffa968b07d5c3af3e"
+MOD1_YAML_MD5 <- "6ccf206e167485b5adf29bc135197929"
+MOD_LEVEL2_MD5 <- "eb3cada879c886a98d30a18f06f14a68"
 ALL_MODS_YAML_MD5 <- c(MOD1_YAML_MD5, rep("56ed64eaa4b500bb6b3f1cc64025aded", 2), "2042dddaefe8bfaa878e713acd7f0eff")
-RUN_LOG_YAML_MD5 <- c(MOD1_YAML_MD5, "1136d125d996f9e26e24014fc001222f", "bab31e99532eb615919d1d72fff94fb7")
+RUN_LOG_YAML_MD5 <- c(MOD1_YAML_MD5, "ac75f5771d66c9b55a1ec68c8789a043", "77525be36ddd665e1508c7ca7541882e")
 
 
 
@@ -126,8 +126,7 @@ REF_LIST_1 <- list(
   tags = ORIG_TAGS,
   bbi_args = list(
     overwrite = TRUE,
-    threads = 4L,
-    parallel = TRUE),
+    threads = 4L),
   absolute_model_path = file.path(ABS_MODEL_DIR, "1"),
   yaml_md5 = MOD1_YAML_MD5
 )
@@ -140,8 +139,7 @@ REF_LIST_TMP <- list(
   tags = ORIG_TAGS,
   bbi_args = list(
     overwrite = TRUE,
-    threads = 4L,
-    parallel = TRUE),
+    threads = 4L),
   absolute_model_path = file.path(ABS_MODEL_DIR, "temp"),
   yaml_md5 = MOD1_YAML_MD5
 )
@@ -176,6 +174,11 @@ create_all_models <- function() {
   assign("mod2", mod2, pos = parent.frame())
   assign("mod3", mod3, pos = parent.frame())
   assign("mod4", mod4, pos = parent.frame())
+
+  ALL_MODS_YAML_MD5 <<- c(system.file("model","nonmem", "basic", "1.yaml", package = "bbr") %>% tools::md5sum(),
+                         system.file("model","nonmem", "basic", "2.yaml", package = "bbr") %>% tools::md5sum(),
+                         system.file("model","nonmem", "basic", "3.yaml", package = "bbr") %>% tools::md5sum(),
+                         system.file("model","nonmem", "basic", "level2", "1.yaml", package = "bbr") %>% tools::md5sum()) %>% unname()
 
 }
 

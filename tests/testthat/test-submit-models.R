@@ -60,14 +60,14 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
                 proc_list[[1]][[PROC_CALL]],
                 as.character(
                   glue(
-                    "cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path[1]} {mod_ctl_path[2]} --overwrite --parallel --threads=1"
+                    "cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path[1]} {mod_ctl_path[2]} --overwrite --threads=1"
                   )
                 )
               )
               expect_identical(
                 proc_list[[2]][[PROC_CALL]],
                 as.character(
-                  glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path[3]} --clean_lvl=2 --overwrite --parallel --threads=1"))
+                  glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path[3]} --clean_lvl=2 --overwrite --threads=1"))
               )
             })
 
@@ -148,7 +148,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     # set existing arguments to NULL via `.bbi_args`
     res <- submit_models(
       list(MOD1),
-      .bbi_args = list(overwrite = NULL, threads = NULL),
+      .bbi_args = list(overwrite = NULL, threads = NULL, parallel = TRUE),
       .dry_run = TRUE
     )
 
