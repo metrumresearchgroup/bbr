@@ -63,5 +63,5 @@ digest of the newly written YAML.
 \code{\link[=add_notes]{add_notes()}} \code{\link[=replace_note]{replace_note()}} \code{\link[=replace_all_notes]{replace_all_notes()}} \code{\link[=remove_notes]{remove_notes()}}
 \code{\link[=add_based_on]{add_based_on()}} \code{\link[=replace_all_based_on]{replace_all_based_on()}} \code{\link[=remove_based_on]{remove_based_on()}}
 \code{\link[=add_description]{add_description()}} \code{\link[=replace_description]{replace_description()}} \code{\link[=add_bbi_args]{add_bbi_args()}}
-\code{\link[=replace_all_bbi_args]{replace_all_bbi_args()}}
+\code{\link[=replace_all_bbi_args]{replace_all_bbi_args()}} \code{\link[=modify_star]{modify_star()}}
 }

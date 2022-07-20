@@ -22,6 +22,7 @@
 #'   and ancestry. **Paths must be relative to `.new_model` path.** Note that
 #'   the `.parent_model` will automatically be added to the `based_on` field, so
 #'   no need to include that here.
+#' @param .star Boolean, marks model to indicate special interest level.
 #' @param .add_tags Character vector with any new tags(s) to be added to
 #'   `{.new_model}.yaml`
 #' @param .inherit_tags If `FALSE`, the default, new model will only have any
@@ -64,6 +65,7 @@ copy_model_from <- function(
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
+  .star = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE
@@ -79,6 +81,7 @@ copy_model_from.bbi_nonmem_model <- function(
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
+  .star = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE
@@ -92,6 +95,7 @@ copy_model_from.bbi_nonmem_model <- function(
     .description = .description,
     .based_on_additional = .based_on_additional,
     .add_tags = .add_tags,
+    .star = .star,
     .inherit_tags = .inherit_tags,
     .update_model_file = .update_model_file,
     .overwrite = .overwrite,
@@ -109,6 +113,7 @@ copy_model_from.bbi_stan_model <- function(
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
+  .star = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE
@@ -124,6 +129,7 @@ copy_model_from.bbi_stan_model <- function(
     .description = .description,
     .based_on_additional = .based_on_additional,
     .add_tags = .add_tags,
+    .star = .star,
     .inherit_tags = .inherit_tags,
     .update_model_file = .update_model_file,
     .overwrite = .overwrite,
@@ -163,6 +169,7 @@ copy_model_from_impl <- function(
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
+  .star = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE,
@@ -210,6 +217,7 @@ copy_model_from_impl <- function(
     .description = .description,
     .based_on = c(.parent_based_on, .based_on_additional),
     .tags = new_tags,
+    .star = .star,
     .bbi_args = .parent_mod[[YAML_BBI_ARGS]],
     .overwrite = FALSE, # will have already overwritten if necessary
     .model_type = .model_type

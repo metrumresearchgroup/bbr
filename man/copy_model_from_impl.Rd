@@ -10,6 +10,7 @@ copy_model_from_impl(
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
+  .star = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE,
@@ -37,6 +38,8 @@ no need to include that here.}
 
 \item{.add_tags}{Character vector with any new tags(s) to be added to
 \verb{\{.new_model\}.yaml}}
+
+\item{.star}{Boolean, marks model to indicate special interest level.}
 
 \item{.inherit_tags}{If \code{FALSE}, the default, new model will only have any
 tags passed to \code{.add_tags} argument. If \code{TRUE} inherit any tags from

@@ -176,17 +176,17 @@ submit_nonmem_model <- function(.mod,
   # define working directory
   model_dir <- get_model_working_directory(.mod)
 
+  .path_exists <- file_exists(.config_path %||% file.path(model_dir, "bbi.yaml"))
+  if(!.path_exists){
+    stop(paste("No bbi configuration was found in the execution directory.",
+               "Please run `bbi_init()` with the appropriate directory to continue."))
+  }
+
   if (!is.null(.config_path)) {
-    checkmate::assert_file_exists(.config_path)
     cmd_args <- c(
       cmd_args,
       sprintf("--config=%s", normalizePath(.config_path))
     )
-  } else {
-    default_config_path <- file.path(model_dir, "bbi.yaml")
-    if (!fs::file_exists(default_config_path) && !isTRUE(.dry_run)) {
-      stop(glue("Looking for default configuration file at {default_config_path}: no such file or directory"), call. = F)
-    }
   }
 
   if (.dry_run) {

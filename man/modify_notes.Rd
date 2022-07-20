@@ -58,5 +58,5 @@ Warns and does nothing if \code{.old_note} is not present.
 }}
 
 \seealso{
-\code{\link[=run_log]{run_log()}} \code{\link[=collapse_to_string]{collapse_to_string()}} \code{\link[=modify_tags]{modify_tags()}} \code{\link[=modify_based_on]{modify_based_on()}} \code{\link[=modify_description]{modify_description()}} \code{\link[=modify_bbi_args]{modify_bbi_args()}}
+\code{\link[=run_log]{run_log()}} \code{\link[=collapse_to_string]{collapse_to_string()}} \code{\link[=modify_tags]{modify_tags()}} \code{\link[=modify_based_on]{modify_based_on()}} \code{\link[=modify_description]{modify_description()}} \code{\link[=modify_bbi_args]{modify_bbi_args()}} \code{\link[=modify_star]{modify_star()}}
 }

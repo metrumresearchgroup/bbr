@@ -68,7 +68,8 @@
 #' with multiple tables written to a single file. See "Details" in [nm_file()]
 #' for alternatives.
 #'
-#' @importFrom dplyr left_join right_join select
+#' @importFrom dplyr left_join select
+#' @importFrom checkmate assert_string assert_character assert_logical assert_list
 #' @seealso [nm_tables()], [nm_table_files()], [nm_file()]
 #' @export
 nm_join <- function(
@@ -87,10 +88,10 @@ nm_join <- function(
     .mod <- read_model(.mod)
   }
   check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
-  checkmate::assert_string(.join_col)
-  checkmate::assert_character(.files)
-  checkmate::assert_logical(.superset, len = 1)
-  checkmate::assert_list(.bbi_args)
+  assert_string(.join_col)
+  assert_character(.files)
+  assert_logical(.superset, len = 1)
+  assert_list(.bbi_args)
 
   df_list <- nm_tables(.mod, .files = .files)
   .d <- df_list$data
@@ -109,7 +110,7 @@ nm_join <- function(
   }
 
   if (.superset) {
-    join_fun <- right_join
+    join_fun <- function(x, y, ...) left_join(y, x, ...)
   } else {
     join_fun <- left_join
   }

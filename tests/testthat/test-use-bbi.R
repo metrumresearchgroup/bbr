@@ -24,7 +24,7 @@ test_that("use-bbi works on linux pulling from options [BBR-UBI-001]", {
 })
 
 test_that("use-bbi works on linux with path specified [BBR-UBI-002]", {
-  bbi_tmp_path <- file.path(tdir, "bbi2")
+  bbi_tmp_path <- file.path(tdir, "to_be_created","bbi2")
   on.exit(unlink(bbi_tmp_path))
   skip_if_over_rate_limit()
 

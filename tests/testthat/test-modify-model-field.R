@@ -354,3 +354,36 @@ test_that("remove_tags() works correctly [BBR-MMF-022]", {
   )
   expect_identical(new_mod[[YAML_TAGS]], ref_tags)
 })
+
+test_that("Checking that add_star is adding star to model object [BBR-MMF-023]", {
+  temp_mod_path <- create_temp_model()
+
+  # make a model object and check YAML
+  new_mod <- read_model(temp_mod_path)
+
+  expect_null(new_mod$star)
+  new_mod <- add_star(new_mod)
+
+  expect_true(new_mod$star)
+
+
+})
+
+test_that("Checking that remove_star is removing star from model object [BBR-MMF-024]", {
+  temp_mod_path <- create_temp_model()
+
+  # make a model object and check YAML
+  new_mod <- read_model(temp_mod_path)
+
+  #remove_star is called on a model without a star, the end result is a model without a star
+  expect_null(new_mod$star)
+  new_mod <- remove_star(new_mod)
+  expect_null(new_mod$star)
+
+  #remove_star is called on a model with a star, the end result is a model without a star
+  new_mod <- add_star(new_mod)
+  expect_identical(new_mod$star, TRUE)
+  new_mod <- remove_star(new_mod)
+  expect_null(new_mod$star)
+
+})

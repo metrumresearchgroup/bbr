@@ -7,10 +7,12 @@
 #'         Will update `MAXITER` or `NITER` (whichever is specified) in generated models.
 #'         The best number for this is model-dependent. Typically, something between 10 and
 #'         100 is good, depending on how long each iteration takes. You want something that
-#'         will run for 3-5 minutes total.
+#'         will run for 3-5 minutes total. You can set this argument to `NULL` to run with the
+#'         same settings as the original model.
 #' @param ... args passed through to submit_models()
 #'
-#' @importFrom checkmate assert_list
+#' @importFrom checkmate assert_list assert_int
+#' @importFrom stringr str_split
 #' @importFrom rlang is_empty
 #'
 #' @details
@@ -62,7 +64,9 @@ test_threads <- function(
   assert_list(.bbi_args)
 
   # Duplicate model for each thread scenario
-  .mods <- map(.threads, ~ copy_model_from(.mod, paste0(get_model_id(.mod), "_", .x, "_threads")) %>%
+  .mods <- map(.threads, ~ copy_model_from(.mod,
+                                           paste0(get_model_id(.mod), "_", .x, "_threads"),
+                                           .overwrite = TRUE) %>%
                  add_bbi_args(.bbi_args = c(threads = .x,
                                             .bbi_args,
                                             parallel = TRUE,
@@ -70,34 +74,49 @@ test_threads <- function(
                  add_tags(paste("test threads")))
 
   # Modify MAXEVAL or NITER
-  search_str <- "MAXEVAL|NITER"
-  map(.mods, function(.mod){
-    mod_path <- get_model_path(.mod)
-    mod_lines <- mod_path %>% readLines()
-    str_line_loc <- which(grepl(search_str, mod_lines))
+  if(!is.null(.max_eval)){
+    assert_int(.max_eval, lower = 1)
+    search_str <- "MAXEVAL|NITER"
+    map(.mods, function(.mod){
+      mod_path <- get_model_path(.mod)
+      mod_lines <- mod_path %>% readLines() %>% suppressSpecificWarning("incomplete final line found")
+      str_line_loc <- which(grepl(search_str, mod_lines))
 
-    if(is_empty(str_line_loc)){
-      delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
-      stop("Neither MAXEVAL or NITER were found in the ctl file. Please ensure one is provided.")
-    }
+      if(is_empty(str_line_loc)){
+        delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
+        stop("Neither MAXEVAL or NITER were found in the ctl file. Please ensure one is provided.")
+      }
 
-    str_values <- str_split(mod_lines[str_line_loc], " ")[[1]]
-    str_loc <- grepl(search_str, str_values)
+      str_values <- str_split(mod_lines[str_line_loc], " ")
+      for(i in seq_along(str_values)){
+        str_loc <- grepl(search_str, str_values[[i]])
 
-    if(length(str_loc[str_loc]) > 1){
-      delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
-      stop("Both MAXEVAL and NITER were found in the ctl file. Please ensure only one is provided.")
-    }
+        if(length(str_loc[str_loc]) > 1){
+          delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
+          stop("Both MAXEVAL and NITER were found in the ctl file. Please ensure only one is provided.")
+        }
 
-    str_update <- paste0(gsub('[[:digit:]]+', '', str_values[str_loc]), .max_eval)
-    str_line_update <- paste(paste(str_values[!str_loc], collapse = " "), str_update, sep = " ")
-    mod_lines[str_line_loc] <- str_line_update
-    writeLines(mod_lines, mod_path)
+        str_update <- paste0(gsub('[[:digit:]]+', '', str_values[[i]][str_loc]), .max_eval)
+        str_line_update <- paste(paste(str_values[[i]][!str_loc], collapse = " "), str_update, sep = " ")
+
+        mod_lines[str_line_loc][i] <- str_line_update
+      }
+
+      writeLines(mod_lines, mod_path)
+    })
+  }
+
+
+
+  tryCatch({
+    submit_models(.mods, .wait = FALSE, ...)
+    return(.mods)
+  },
+  error = function(cond){
+    delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
+    stop(cond)
   })
 
-  submit_models(.mods, .wait = FALSE, ...)
-
-  .mods
 }
 
 #' Check estimation time for models run with various threads values
@@ -109,8 +128,8 @@ test_threads <- function(
 #' @param ... args passed through to `wait_for_nonmem()`.
 #'
 #' @details
-#' `.return_times` can be any subset of `c("estimation_time", "covariance_time", "cpu_time")`.
-#' Users can also specify `all`, which is the shorthand method for selecting all 3 of those columns.
+#' `.return_times` can be any subset of `c("estimation_time", "covariance_time", "postprocess_time", "cpu_time")`.
+#' Users can also specify `"all"`, which is the shorthand method for selecting all 4 of those columns.
 #'
 #' @examples
 #' \dontrun{
@@ -138,10 +157,24 @@ check_run_times <- function(
   ...
 ) {
 
+  # This function only works for bbi versions -greater- than 3.1.1
+  v_bbi <- package_version(bbi_version(), strict = FALSE)
+  is_old_bbi <- FALSE
+  if (!is.na(v_bbi)) {
+    if(v_bbi <= package_version("3.1.1")) {
+      is_old_bbi <- TRUE
+      warning("This function is only compatible with bbi versions -greater than- 3.1.1")
+    }
+  }
+
   if("all" %in% .return_times){
-    .return_times <- c("estimation_time", "covariance_time", "cpu_time")
+    .return_times <- c("estimation_time", "covariance_time", "postprocess_time", "cpu_time")
+    if(is_old_bbi){
+        # This allows the function to work with lower versions of bbi (despite covariance_time being incorrect)
+        .return_times <- c("estimation_time", "covariance_time", "cpu_time")
+    }
   }else{
-    assert_true(all(.return_times %in% c("estimation_time", "covariance_time", "cpu_time")))
+    assert_true(all(.return_times %in% c("estimation_time", "covariance_time", "postprocess_time", "cpu_time")))
   }
 
   if (inherits(.mods, "bbi_model")) {
@@ -151,47 +184,62 @@ check_run_times <- function(
     check_model_object(.mods, .mod_types = c("bbi_summary_list"))
   }
 
+  if(.wait){
+    tryCatch({
+      wait_for_nonmem(.mods, ...)
+    },
+    warning = function(cond){
+      message(cond)
+      message("\nConsider setting/increasing the `time_limit` in `wait_for_nonmem()`. See ?check_run_times for details")
+      return(invisible(TRUE))
+    })
+  }
 
+  map_dfr(.mods, ~ {
+    tryCatch({
+      # unpack bbi_summary_list element
+      if (!is.null(.x$bbi_summary)) .x <- .x$bbi_summary
 
-  tryCatch({
-    if(.wait) wait_for_nonmem(.mods, ...)
-
-    map_dfr(.mods, ~ {
-      if(inherits(.x, NM_SUM_CLASS) | (inherits(.x, "list") && !inherits(.x, NM_MOD_CLASS))){
-        .sum <- .x
-        run_details <-
-          if(inherits(.x, "bbi_nonmem_summary")){
-            .sum$run_details
-          }else{
-            .sum$bbi_summary$run_details # bbi_summary_list
-          }
-        .mod <- read_model(.sum$absolute_model_path)
-        threads <- as.numeric(.mod$bbi_args$threads)
-        model_run <- basename(.sum$absolute_model_path)
-      }else{
-        .sum <- model_summary(.x)
-        threads <- as.numeric(.x$bbi_args$threads)
-        model_run <- basename(.x$absolute_model_path)
-        run_details <- .sum$run_details
+      # get model id and convert to summary object if necessary
+      model_run <- get_model_id(.x)
+      if (inherits(.x, NM_MOD_CLASS)) {
+        .x <- model_summary(.x, .bbi_args = list(no_grd_file = TRUE, no_ext_file = TRUE, no_shk_file = TRUE))
       }
 
-      tibble::tibble(
-        model_run = model_run,
+      # get number of threads from bbi_config.json
+      config <- jsonlite::fromJSON(file.path(.x[[ABS_MOD_PATH]], "bbi_config.json"))
+      threads <- ifelse(
+        config$configuration$parallel,
+        config$configuration$threads,
+        1
+      )
+
+      data <- tibble::tibble(
+        run = model_run,
         threads = threads,
-        estimation_time = run_details$estimation_time,
-        covariance_time = run_details$covariance_time,
-        cpu_time = run_details$cpu_time) %>%
-        select(model_run, threads, all_of(.return_times))
+        estimation_time = sum(.x$run_details$estimation_time),
+        covariance_time = sum(.x$run_details$covariance_time),
+        postprocess_time = .x$run_details$postprocess_time,
+        cpu_time = .x$run_details$cpu_time) %>%
+        select(run, threads, all_of(.return_times))
+      return(data)
+    }, error = function(cond){
+      data <- data.frame(matrix(ncol = length(.return_times) + 2, nrow = 1)) %>% as_tibble
+      colnames(data) <- c('run', 'threads', .return_times)
+      data$run <- model_run
+      message("Could not access data for ", model_run)
+      return(data)
+    }, warning = function(cond){
+      data <- data.frame(matrix(ncol = length(.return_times) + 2, nrow = 1)) %>% as_tibble
+      colnames(data) <- c('run', 'threads', .return_times)
+      data$run <- model_run
+      message(cond)
+      return(data)
     })
-  }, error = function(cond){
-    return(NA)
-  }, warning = function(cond){
-    message(cond)
-    message("\nConsider setting/increasing the `time_limit` in `wait_for_nonmem()`. See ?check_run_times for details")
-    return(invisible(TRUE))
-  }
-  )
+  })
+
 }
+
 
 #' Remove model files associated with the specified tags
 #'

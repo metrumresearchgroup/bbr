@@ -147,6 +147,45 @@ test_that("new_model() supports `.path` containing a period [BBR-NWMD-010]", {
   expect_true(fs::file_exists(temp_yaml))
 })
 
+test_that("new_model ignores file extension: .ctl [BBR-NWMD-011]", {
+  path <-
+    file.path(system.file("model", package = "bbr", mustWork = TRUE),
+              "nonmem",
+              "basic")
+  fs::file_delete(file.path(path, "1.yaml"))
+  mod_ctl <- new_model(
+    file.path(path, "1.ctl"),
+    .description = "original acop model",
+    .tags = ORIG_TAGS,
+    .bbi_args = list(overwrite = TRUE, threads = 4)
+  )
+  expect_identical(mod_ctl$absolute_model_path, file.path(path, "1"))
+  expect_identical(mod_ctl$model_type, "nonmem")
+  expect_identical(mod_ctl$yaml_md5, "6ccf206e167485b5adf29bc135197929")
+})
+
+test_that("new_model ignores file extension: .mod [BBR-NWMD-011]", {
+  path <-
+    file.path(system.file("model", package = "bbr", mustWork = TRUE),
+              "nonmem",
+              "basic")
+  fs::file_delete(file.path(path, "1.yaml"))
+  fs::file_move(file.path(path, "1.ctl"),
+                file.path(path, "1.mod"))
+  on.exit(fs::file_move(file.path(path, "1.mod"),
+                        file.path(path, "1.ctl")))
+  mod <- new_model(
+    file.path(path, "1.mod"),
+    .description = "original acop model",
+    .tags = ORIG_TAGS,
+    .bbi_args = list(overwrite = TRUE, threads = 4)
+  )
+  expect_identical(mod$absolute_model_path, file.path(path, "1"))
+  expect_identical(mod$model_type, "nonmem")
+  expect_identical(mod$yaml_md5, "6ccf206e167485b5adf29bc135197929")
+
+})
+
 #############
 # Stan tests
 #############
@@ -182,4 +221,3 @@ test_that("new_model() works for Stan model", {
   expect_s3_class(.m, STAN_MOD_CLASS)
   expect_s3_class(.m, BBI_PARENT_CLASS)
 })
-

@@ -27,6 +27,12 @@ test_that("nm_join() works correctly: file path [BBR-NMJ-001]", {
   expect_equal(ncol(test_df), DATA_TEST_COLS + TAB_NEW_COLS)
 })
 
+test_that("nm_join works correctly: .join_col is in the same order as original data [BBR-NMJ-001]", {
+  test_df <- nm_join(MOD1, .files = TAB_FILE)
+  left_df <- nm_tables(MOD1, .files = TAB_FILE)$tab
+  expect_equal(test_df$NUM, left_df$NUM)
+})
+
 test_that("nm_join(.superset) works correctly [BBR-NMJ-002]", {
   test_df <- nm_join(MOD1, .files = TAB_FILE, .superset = TRUE)
   expect_equal(nrow(test_df), DATA_TEST_ROWS)
@@ -34,6 +40,11 @@ test_that("nm_join(.superset) works correctly [BBR-NMJ-002]", {
   expect_equal(sum(is.na(test_df$IPRED)), 20)
 })
 
+test_that("nm_join(.superset) works correctly: .join_col is in the same order as original data [BBR-NMJ-002]", {
+  test_df <- nm_join(MOD1, .files = TAB_FILE, .superset = TRUE)
+  left_df <- nm_tables(MOD1, .files = TAB_FILE)$data
+  expect_equal(test_df$NUM, left_df$NUM)
+})
 ####################
 # first only tests
 

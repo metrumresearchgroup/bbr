@@ -15,7 +15,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_equal(par_df, ref_df1)
   })
 
-  test_that("param_estimates correctly errors on Bayesian model [BBR-PEST-002]", {
+  test_that("param_estimates correctly errors on: Bayesian model [BBR-PEST-002]", {
     clean_test_enviroment()
 
     mod1 <- read_model(file.path(MODEL_DIR_X, "1001"))
@@ -26,7 +26,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     )
   })
 
-  test_that("param_estimates correctly errors on Bayesian model with multiple estimation methods [BBR-PEST-003]", {
+  test_that("param_estimates correctly errors on: Bayesian model with multiple estimation methods [BBR-PEST-002]", {
     clean_test_enviroment()
 
     sum1 <- file.path(MODEL_DIR_X, "acop-fake-bayes") %>%
@@ -38,7 +38,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     )
   })
 
-  test_that("param_estimates correctly errors on ONLYSIM models [BBR-PEST-003]", {
+  test_that("param_estimates correctly errors on: ONLYSIM models [BBR-PEST-002]", {
     clean_test_enviroment()
 
     skip_if_old_bbi("3.1.0")
@@ -64,5 +64,24 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
     expect_true(all(is.na(par_df[[SUMMARY_PARAM_SHRINKAGE]])))
   })
+
+  test_that("param_estimates can optionally return p-value [BBR-PEST-013]", {
+    clean_test_enviroment()
+    sum1 <- model_summary(MOD1)
+
+    par_df <- sum1 %>% param_estimates(.alpha = 0.05)
+    expect_true(all(c("pval", "ETASIG") %in% names(par_df)))
+
+    par_df_pvalue_only <- par_df %>% filter(str_detect(parameter_names, "OMEGA") & diag == TRUE)
+
+    expect_equal(round(par_df_pvalue_only$pval, 3) , c(0.962, 0.919))
+    expect_equal(par_df_pvalue_only$ETASIG , rep(FALSE, 2))
+
+    par_df_rest <- par_df %>% filter(!(str_detect(parameter_names, "OMEGA") & diag == TRUE))
+
+    expect_true(all(is.na(par_df_rest[["pval"]])))
+    expect_true(all(is.na(par_df_rest[["ETASIG"]])))
+  })
+
 
 }) # closing withr::with_options
