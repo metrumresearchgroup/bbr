@@ -2,18 +2,9 @@
 % Please edit documentation in R/get-param.R
 \name{get_param}
 \alias{get_param}
-\alias{get_theta}
-\alias{get_omega}
-\alias{get_sigma}
 \title{Return a formatted object for a given parameter}
 \usage{
 get_param(.summary, .param = c("omega", "sigma", "theta"))
-
-get_theta(.summary)
-
-get_omega(.summary)
-
-get_sigma(.summary)
 }
 \arguments{
 \item{.summary}{a \code{bbi_nonmem_summary} or \code{bbi_summary_list} object.}
@@ -23,12 +14,4 @@ get_sigma(.summary)
 \description{
 Return a formatted object for a given parameter
 }
-\section{Functions}{
-\itemize{
-\item \code{get_theta}: Return theta values as a named vector
-
-\item \code{get_omega}: Return omega values as a labeled symmetric matrix
-
-\item \code{get_sigma}: Return sigma values as a labeled symmetric matrix
-}}
-
+\keyword{internal}

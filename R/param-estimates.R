@@ -61,16 +61,15 @@ param_estimates.bbi_nonmem_summary <- function(.summary, .alpha = NULL) {
     stop(glue(".summary has no estimation method (ONLYSIM)"), call. = FALSE)
   }
 
-  summary_vars <- with(
-    .summary[[SUMMARY_PARAM_DATA]][[length(.summary[[SUMMARY_PARAM_DATA]])]],
+  param_data <- .summary[[SUMMARY_PARAM_DATA]][[length(.summary[[SUMMARY_PARAM_DATA]])]]
+  summary_vars <-
     list(
-      estimate = estimates,
-      stderr = std_err,
-      random_effect_sd = random_effect_sd,
-      random_effect_sdse = random_effect_sdse,
-      fixed = fixed
+      estimate = param_data$estimates,
+      stderr = param_data$std_err,
+      random_effect_sd = param_data$random_effect_sd,
+      random_effect_sdse = param_data$random_effect_sdse,
+      fixed = param_data$fixed
     )
-  )
 
   # left-pad the random effect variables with NAs
   summary_vars_padded <- purrr::map_at(

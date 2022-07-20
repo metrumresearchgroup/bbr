@@ -5,7 +5,7 @@
 #' @param .param the parameter(s) to retrieve and format. Any subset of `c("omega", "sigma", "theta")`
 #'
 #' @importFrom stats setNames
-#' @export
+#' @keywords internal
 get_param <- function(.summary, .param = c("omega", "sigma", "theta")){
 
   if (inherits(.summary, NM_SUM_CLASS)) {
@@ -19,7 +19,6 @@ get_param <- function(.summary, .param = c("omega", "sigma", "theta")){
 
   assert_true(all(.param %in% c("omega", "sigma", "theta")))
 
-
   param_obj <- map(.param, function(param.i){
 
     if(param.i %in% c("omega", "sigma")){
@@ -28,11 +27,8 @@ get_param <- function(.summary, .param = c("omega", "sigma", "theta")){
         if (!is.null(.x$bbi_summary)) .x <- .x$bbi_summary
 
         param_names <- .x[[SUMMARY_PARAM_NAMES]]
-        matrix <- with(
-          .x[[SUMMARY_PARAM_DATA]][[length(.x[[SUMMARY_PARAM_DATA]])]],
-          format_matrix(estimates[[param.i]], param_names[[param.i]], .type = toupper(param.i))
-        )
-        matrix
+        estimates <- .x[[SUMMARY_PARAM_DATA]][[length(.x[[SUMMARY_PARAM_DATA]])]]$estimates
+        format_matrix(estimates[[param.i]], param_names[[param.i]], .type = toupper(param.i))
       })
 
     }else if(param.i %in% c("theta")){
@@ -55,18 +51,37 @@ get_param <- function(.summary, .param = c("omega", "sigma", "theta")){
 }
 
 
-#' @describeIn get_param Return theta values as a named vector
-#' @export
-get_theta <- function(.summary){
 
-  thetas <- get_param(.summary, "theta")$theta
-
-  return(thetas)
-}
-
-
-
-#' @describeIn get_param Return omega values as a labeled symmetric matrix
+#' Return a formatted object for a given parameter
+#'
+#' @description
+#'
+#' * [get_omega()]: Return omega values as a labeled symmetric matrix
+#' * [get_sigma()]: Return sigma values as a labeled symmetric matrix
+#' * [get_theta()]: Return theta values as a named vector
+#'
+#' @param .summary a `bbi_nonmem_summary` or `bbi_summary_list` object.
+#'
+#' @section Examples:
+#'
+#' ```{r, include = FALSE}
+#' knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+#' MODEL_DIR <- system.file("model", "nonmem", "complex",   package = "bbr")
+#' mod <- read_model(file.path(MODEL_DIR, "example2_saemimp"))
+#' ```
+#' ```{r, comment = "#>", collapse = TRUE}
+#' sum <- mod %>% model_summary()
+#'
+#' sum %>% get_omega()
+#'
+#'
+#' sum %>% get_sigma()
+#'
+#'
+#' sum %>% get_theta()
+#' ```
+#'
+#'
 #' @export
 get_omega <- function(.summary){
 
@@ -76,13 +91,22 @@ get_omega <- function(.summary){
 }
 
 
-#' @describeIn get_param Return sigma values as a labeled symmetric matrix
+#' @rdname get_omega
 #' @export
 get_sigma <- function(.summary){
 
   sigmas <- get_param(.summary, "sigma")$sigma
 
   return(sigmas)
+}
+
+#' @rdname get_omega
+#' @export
+get_theta <- function(.summary){
+
+  thetas <- get_param(.summary, "theta")$theta
+
+  return(thetas)
 }
 
 
