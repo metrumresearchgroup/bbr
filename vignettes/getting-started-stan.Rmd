@@ -21,7 +21,7 @@ This "Getting Started with bbr" vignette takes you through some basic scenarios 
 ```{r setup, include=FALSE}
 # NOTE: if running chunks interactively we need to load the package first
 #   because renv isolation prevents us from finding an bbr installation
-if (interactive() || isTRUE(getOption('knitr.in.progress'))) {
+if (interactive() || (isTRUE(getOption('knitr.in.progress') && Sys.getenv("DRONE") != "true"))) {
   devtools::load_all()
 }
 ```
