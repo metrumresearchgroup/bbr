@@ -658,10 +658,17 @@ PEST-R012:
   description: param_estimates_compare() errors with different models
   tests:
   - BBR-PEST-012
-PEST-R013 :
+PEST-R013:
   description: param_estimates() can optionally append the p-value to the output, and calculate whether it is below a specified alpha
   tests:
   - BBR-PEST-013
+PEST-R014:
+  description: get_omega(), get_sigma(), and get_theta() label and format values from model_summary() objects
+  tests:
+  - BBR-PEST-015
+  - BBR-PEST-016
+  - BBR-PEST-017
+  - BBR-PEST-018
 PLB-R001:
   description: build_matrix_indices() parses correctly
   tests:
