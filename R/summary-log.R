@@ -218,7 +218,7 @@ extract_condition_number <- function(.s) {
   })
   .out <- map_dbl(.ofv, function(.x) {
     .cn <- .x[[SUMMARY_COND_NUM]]
-    if (is.null(.cn) || .cn == BBI_NULL_NUM) {
+    if (is.null(.cn) || .cn == BBI_NULL_NUM || is.na(.cn)) {
       .cn <- NA_real_
     }
     return(.cn)
