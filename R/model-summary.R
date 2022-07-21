@@ -230,6 +230,8 @@ nonmem_summary <- function(
 
   res_list <- combine_list_objects(res_list, bbi_list)
 
+  res_list <- map_list_recursive(res_list, set_bbi_null)
+
   res_list <- create_summary_object(res_list)
 
   return(res_list)

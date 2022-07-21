@@ -211,8 +211,8 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
       ofvs <- model_summary(mod)[[OFV_COL]]
       ofv <- ofvs[[length(ofvs)]]
-      expect_identical(ofv[["ofv_no_constant"]], NA_real_)
-      expect_identical(ofv[["ofv_with_constant"]], NA_real_)
+      expect_identical(ofv[["ofv_no_constant"]], NA_integer_)
+      expect_identical(ofv[["ofv_with_constant"]], NA_integer_)
     })
   })
 }) # closing withr::with_options

@@ -1,13 +1,14 @@
 structure(list(
   absolute_model_path = "/data/home/sethg/bbr/inst/model/nonmem/basic/1",
   run_details = list(
-    version = "7.4.4", run_start = "-999999999",
+    version = "7.4.4", run_start = NA_character_, #"-999999999",
     run_end = "Mon Nov  8 11:35:08 EST 2021", estimation_time = 5.28,
     # NOTE: covariance time was technically -incorrect- in bbi 3.1.1 and lower
     # (was reported as 0.46 instead of 1.29 - i.e. used the post processing time)
     covariance_time = 1.29, postprocess_time = 0.46, cpu_time = 6.816, function_evaluations = 447L,
     significant_digits = 3.2, problem_text = "LEM PK model 1 cmt base",
-    mod_file = "-999999999", estimation_method = "First Order Conditional Estimation with Interaction",
+    mod_file = NA_character_, #"-999999999",
+    estimation_method = "First Order Conditional Estimation with Interaction",
     data_set = "../../../../extdata/acop.csv", number_of_subjects = 39L,
     number_of_obs = 741L, number_of_data_records = 779L,
     output_files_used = c(
@@ -57,7 +58,7 @@ structure(list(
   ), condition_number = list(
     list(
       method = "First Order Conditional Estimation with Interaction",
-      condition_number = -999999999L
+      condition_number = NA_integer_ #-999999999L
     )
   ), shrinkage_details = list(
     list(list(
