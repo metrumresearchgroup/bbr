@@ -36,15 +36,6 @@ sum \%>\% get_omega()
  OMEGA_4 -0.000189864 0.001005720 0.004040370  0.010987300
 
 
-sum \%>\% get_sigma()
-         SIGMA_1
- SIGMA_1       1
-
-
-sum \%>\% get_theta()
-    THETA1     THETA2     THETA3     THETA4     THETA5     THETA6     THETA7     THETA8     THETA9    THETA10    THETA11
- 3.3005000  3.2519700 -0.6122190 -0.2080120  0.7372940  1.1359900  0.3346290  0.1923520  0.6916970  2.2993700  0.0991684
-
 }
 
 }

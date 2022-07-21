@@ -5,16 +5,14 @@
 #' @param .param the parameter(s) to retrieve and format. Any subset of `c("omega", "sigma", "theta")`
 #'
 #' @importFrom stats setNames
+#' @importFrom purrr map
 #' @keywords internal
 get_param <- function(.summary, .param = c("omega", "sigma", "theta")){
 
+  check_model_object(.summary, .mod_types = c(SL_CLASS, NM_SUM_CLASS))
+
   if (inherits(.summary, NM_SUM_CLASS)) {
     .summary <- list(.summary)
-    check_model_object_list(.summary, .mod_types = c(NM_SUM_CLASS))
-  }else if(inherits(.summary, SL_CLASS)){
-    check_model_object(.summary, .mod_types = c(SL_CLASS))
-  }else{
-    stop("Please pass in a `", NM_SUM_CLASS, "` or `", SL_CLASS, "` type object.")
   }
 
   assert_true(all(.param %in% c("omega", "sigma", "theta")))
@@ -76,15 +74,6 @@ get_param <- function(.summary, .param = c("omega", "sigma", "theta")){
 #'  OMEGA_4 -0.000189864 0.001005720 0.004040370  0.010987300
 #'
 #'
-#' sum %>% get_sigma()
-#'          SIGMA_1
-#'  SIGMA_1       1
-#'
-#'
-#' sum %>% get_theta()
-#'     THETA1     THETA2     THETA3     THETA4     THETA5     THETA6     THETA7     THETA8     THETA9    THETA10    THETA11
-#'  3.3005000  3.2519700 -0.6122190 -0.2080120  0.7372940  1.1359900  0.3346290  0.1923520  0.6916970  2.2993700  0.0991684
-#'
 #' }
 #'
 #' @export
@@ -125,6 +114,7 @@ get_theta <- function(.summary){
 #' @param .type matrix type. Either "OMEGA" or "SIGMA"
 #'
 #' @importFrom glue glue
+#' @importFrom purrr map
 #'
 #' @keywords internal
 format_matrix <- function(.values, .labels, .type = c("OMEGA", "SIGMA")){

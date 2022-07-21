@@ -6,7 +6,7 @@ mod_complex <- read_model(file.path(MODEL_DIR_X, "example2_saemimp"))
 
 
 # matches values reported in parameter estimates to location in matrix
-# does not check symmetry
+# and checks symmetry (along the diagonal)
 check_matrix <- function(matrix, par_df, .type = "OMEGA"){
   expect_true(isSymmetric(matrix))
 
@@ -67,7 +67,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     omegas <- MOD1 %>% model_summary() %>% get_omega()
     par_df <- MOD1 %>% model_summary() %>% param_estimates() %>% filter(grepl("OMEGA", parameter_names))
 
-    # order is preserved, and duplicate coviarances are dropped
+    # order is preserved, and duplicate covariances are dropped
     check_matrix(omegas, par_df, .type = "OMEGA")
   })
 
@@ -81,7 +81,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     par_df1 <- MOD1 %>% model_summary() %>% param_estimates() %>% filter(grepl("OMEGA", parameter_names))
     par_df2 <- mod_complex %>% model_summary() %>% param_estimates() %>% filter(grepl("OMEGA", parameter_names))
 
-    # order is preserved, and duplicate coviarances are dropped
+    # order is preserved, and duplicate covariances are dropped
     check_matrix(omegas[[1]], par_df1, .type = "OMEGA")
     check_matrix(omegas[[2]], par_df2, .type = "OMEGA")
   })
@@ -91,7 +91,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     sigmas <- MOD1 %>% model_summary() %>% get_sigma()
     par_df <- MOD1 %>% model_summary() %>% param_estimates() %>% filter(grepl("SIGMA", parameter_names))
 
-    # order is preserved, and duplicate coviarances are dropped
+    # order is preserved, and duplicate covariances are dropped
     check_matrix(sigmas, par_df, .type = "SIGMA")
   })
 
@@ -105,7 +105,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     par_df1 <- MOD1 %>% model_summary() %>% param_estimates() %>% filter(grepl("SIGMA", parameter_names))
     par_df2 <- mod_complex %>% model_summary() %>% param_estimates() %>% filter(grepl("SIGMA", parameter_names))
 
-    # order is preserved, and duplicate coviarances are dropped
+    # order is preserved, and duplicate covariances are dropped
     check_matrix(sigmas[[1]], par_df1, .type = "SIGMA")
     check_matrix(sigmas[[2]], par_df2, .type = "SIGMA")
   })
