@@ -129,7 +129,13 @@ test_that("suppressSpecificWarning() works [BBR-UTL-011]", {
 
 test_that("warning raised when threads > 1 and parallel is FALSE [BBR-UTL-014]", {
   withr::with_tempdir({
-    fs::dir_create(tempdir(), "test_path")
+    fs::dir_create(file.path(tempdir(), "test_path"))
+
+    on.exit(if(fs::dir_exists(file.path(tempdir(),"test_path")))
+    {
+       fs::dir_delete(file.path(tempdir(),"test_path"))
+    })
+
     files_to_copy <- file.path(ABS_MODEL_DIR, c("1.ctl"))
 
     fs::file_copy(system.file("extdata", "acop.csv", package = "bbr"), file.path(tempdir(), "test_path"))
