@@ -147,10 +147,10 @@ test_that("warning raised when threads > 1 and parallel is FALSE [BBR-UTL-014]",
     mod1 <- new_model(file.path(tempdir(), "test_path", "1"), .description = "original test-workflow-bbi model",
                       .tags = ORIG_TAGS,.bbi_args = list(overwrite = TRUE, threads = 2))
 
-    bbi_init(file.path(tempdir(), "test_path" ), "/opt/NONMEM", "nm74gf")
+    readr::write_file("created_by: test-utils", file.path(tempdir(), "test_path", "bbi.yaml"))
 
 
-    res <- capture.output(submit_model(mod1))
+    res <- capture.output(submit_model(mod1, .dry_run = TRUE))
 
     #Testing that check_bbi_args is appending --parallel when not passed
     expect_identical("--parallel", str_subset(res,"--parallel") %>% str_extract("--parallel"))
