@@ -6,4 +6,3 @@ tags:
 bbi_args:
   overwrite: yes
   threads: 4.0
-  parallel: yes
