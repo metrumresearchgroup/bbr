@@ -162,7 +162,7 @@ test_that("warning raised when threads > 1 and parallel is FALSE [BBR-UTL-014]",
                          .tags = ORIG_TAGS,.bbi_args = list(overwrite = TRUE, threads = 2, parallel = FALSE))
 
       #When `threads` > 1 and parallel is False raise a warning
-      expect_warning(submit_model(mod1))
+      expect_warning(submit_model(mod1, .dry_run = TRUE))
 
     })
   })
