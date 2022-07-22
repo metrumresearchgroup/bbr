@@ -65,6 +65,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     on.exit(fs::file_delete(temp_config))
 
     res <- submit_model(MOD1, .config_path = temp_config, .dry_run = TRUE)
+    res <- reconcile_yaml(res)
     expect_identical(
       res[[PROC_CALL]],
       as.character(
