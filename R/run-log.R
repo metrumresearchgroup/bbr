@@ -43,7 +43,8 @@ run_log <- function(.base_dir, .recurse = TRUE, .include = NULL) {
 #' @param .base_dir Directory to search for model YAML files.
 #' @param .recurse If `TRUE` search recursively in subdirectories as well.
 #' @inheritParams run_log
-#' @importFrom stringr str_subset
+#' @importFrom dplyr filter
+#' @importFrom stringr str_subset str_remove
 #' @importFrom purrr map_lgl map compact
 #' @importFrom fs dir_ls
 #' @keywords internal
@@ -58,7 +59,9 @@ find_models <- function(.base_dir, .recurse , .include) {
   # Filters only to models specified
   if(!is.null(.include))
   {
-    yaml_files <- purrr::keep(yaml_files, (yaml_files %>% basename()  %>% stringr::str_remove(".yaml|.yml") %in% .include))
+    yaml_df <- yaml_files %>% map(safe_read_yaml) %>% bind_rows()
+    yaml_df <- yaml_df %>% filter(yaml %>% basename()  %>% stringr::str_remove(".yaml|.yml") %in% .include | tags %in% .include)
+    yaml_files <- unique(yaml_df$yaml)
   }
 
   if(length(yaml_files) == 0)
@@ -69,13 +72,13 @@ find_models <- function(.base_dir, .recurse , .include) {
   # read in all candidate yaml's
   all_yaml <-
     yaml_files %>%
-    purrr::map(fs::path_ext_remove) %>%
-    purrr::map(safe_read_model)
+    map(fs::path_ext_remove) %>%
+    map(safe_read_model)
 
   # filter to only model yaml's
-  mod_list <- purrr::compact(all_yaml)
+  mod_list <- compact(all_yaml)
   if (length(mod_list) != length(all_yaml)) {
-    null_idx <- purrr::map_lgl(all_yaml, is.null)
+    null_idx <- map_lgl(all_yaml, is.null)
     not_mod <- yaml_files[which(null_idx)]
     warning(glue("Found {length(not_mod)} YAML files that do not contain required keys for a model YAML. Ignoring the following files: `{paste(not_mod, collapse='`, `')}`"))
   }
@@ -88,9 +91,9 @@ find_models <- function(.base_dir, .recurse , .include) {
 }
 
 
-#' Read in model YAML with error handling
+#' Read in model with error handling
 #'
-#' Private helper function that tries to call `read_model()` on a yaml path and returns NULL, with no error, if the YAML is not a valid model file.
+#' Private helper function that tries to call `read_model()` on a model path and returns NULL, with no error, if the YAML is not a valid model file.
 #'
 #' @inheritParams read_model
 #'
@@ -111,6 +114,41 @@ safe_read_model <- function(.path) {
   )
 }
 
+#' Read in YAML tags with error handling
+#'
+#' @param .path path of yaml file
+#'
+#' @return dataframe with yaml path and tags
+#' @keywords internal
+safe_read_yaml <- function(.path){
+  tryCatch({
+    .yaml_lines <- read_yaml(.path)
+    if("tags" %in% names(.yaml_lines)){
+      return(data.frame(yaml = .path, tags = .yaml_lines$tags))
+    }else{
+      return(data.frame(yaml = .path, tags = NA_character_))
+    }
+    },
+    error = function(cond) {
+      if (stringr::str_detect(cond$message, "cannot open the connection")) {
+        return(NULL)
+      } else {
+        stop(
+          glue("Unexpected error trying to read yaml `{.path}`: {cond$message}")
+        )
+      }
+    },
+    warning = function(cond) {
+      if (stringr::str_detect(cond$message, "No such file or directory")) {
+        return(NULL)
+      } else {
+        stop(
+          glue("Unexpected warning trying to read yaml `{.path}`: {cond$message}")
+        )
+      }
+    }
+  )
+}
 
 #' Add columns to log df
 #'
