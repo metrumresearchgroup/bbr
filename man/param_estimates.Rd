@@ -45,9 +45,9 @@ error will be thrown.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{bbi_nonmem_summary}: Takes \code{bbi_nonmem_summary} object, the output of \code{\link[=model_summary.bbi_nonmem_model]{model_summary.bbi_nonmem_model()}}.
-}}
+\item \code{param_estimates(bbi_nonmem_summary)}: Takes \code{bbi_nonmem_summary} object, the output of \code{\link[=model_summary.bbi_nonmem_model]{model_summary.bbi_nonmem_model()}}.
 
+}}
 \seealso{
 \code{\link[=param_estimates_batch]{param_estimates_batch()}}, \code{\link[=model_summary]{model_summary()}}, \code{\link[=param_labels]{param_labels()}}, \code{\link[=apply_indices]{apply_indices()}}
 }

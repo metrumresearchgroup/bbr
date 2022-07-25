@@ -149,9 +149,9 @@ Additionally, if you have renamed the \code{.ext} file from its default of \verb
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{bbi_nonmem_model}: Get model summary from \code{bbi_nonmem_model} object
-}}
+\item \code{model_summary(bbi_nonmem_model)}: Get model summary from \code{bbi_nonmem_model} object
 
+}}
 \seealso{
 \code{\link[=model_summaries]{model_summaries()}}, \code{\link[=summary_log]{summary_log()}}, \code{\link[=cov_cor]{cov_cor()}}, \code{\link[=param_estimates]{param_estimates()}}
 }
