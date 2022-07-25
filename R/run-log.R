@@ -69,7 +69,7 @@ find_models <- function(.base_dir, .recurse , .include) {
       .tag <- if(is.null(.x$tags)) NA_character_ else .x$tags
       data.frame(yaml = .x$absolute_model_path, tags = .tag)
       }) %>% bind_rows()
-    yaml_df <- yaml_df %>% filter(yaml %>% basename()  %>% stringr::str_remove(".yaml|.yml") %in% .include | tags %in% .include)
+    yaml_df <- yaml_df %>% filter(yaml %>% basename() %>% stringr::str_remove(".yaml|.yml") %in% .include | tags %in% .include)
     yaml_files <- unique(yaml_df$yaml)
     all_yaml <- all_yaml[map(all_yaml, ~ .x$absolute_model_path %in% yaml_files) %>% unlist()]
   }
