@@ -55,25 +55,28 @@ find_models <- function(.base_dir, .recurse , .include) {
   yaml_files <- str_subset(yaml_files, "\\.ya?ml$")
   yaml_files <- str_subset(yaml_files, "bbi\\.ya?ml$", negate = TRUE)
 
-  #If models are not specified to be kept, it keeps all models
-  # Filters only to models specified
-  if(!is.null(.include))
-  {
-    yaml_df <- yaml_files %>% map(safe_read_yaml) %>% bind_rows()
-    yaml_df <- yaml_df %>% filter(yaml %>% basename()  %>% stringr::str_remove(".yaml|.yml") %in% .include | tags %in% .include)
-    yaml_files <- unique(yaml_df$yaml)
-  }
-
-  if(length(yaml_files) == 0)
-  {
-    warning("All models excluded by filter.")
-  }
 
   # read in all candidate yaml's
   all_yaml <-
     yaml_files %>%
     map(fs::path_ext_remove) %>%
     map(safe_read_model)
+
+  #If models are not specified to be kept, it keeps all models
+  # Filters only to models specified
+  if(!is.null(.include)){
+    yaml_df <- map(all_yaml, ~ {
+      .tag <- if(is.null(.x$tags)) NA_character_ else .x$tags
+      data.frame(yaml = .x$absolute_model_path, tags = .tag)
+      }) %>% bind_rows()
+    yaml_df <- yaml_df %>% filter(yaml %>% basename()  %>% stringr::str_remove(".yaml|.yml") %in% .include | tags %in% .include)
+    yaml_files <- unique(yaml_df$yaml)
+    all_yaml <- all_yaml[map(all_yaml, ~ .x$absolute_model_path %in% yaml_files) %>% unlist()]
+  }
+
+  if(length(all_yaml) == 0){
+    warning("All models excluded by filter.")
+  }
 
   # filter to only model yaml's
   mod_list <- compact(all_yaml)
@@ -114,41 +117,7 @@ safe_read_model <- function(.path) {
   )
 }
 
-#' Read in YAML tags with error handling
-#'
-#' @param .path path of yaml file
-#'
-#' @return dataframe with yaml path and tags
-#' @keywords internal
-safe_read_yaml <- function(.path){
-  tryCatch({
-    .yaml_lines <- read_yaml(.path)
-    if("tags" %in% names(.yaml_lines)){
-      return(data.frame(yaml = .path, tags = .yaml_lines$tags))
-    }else{
-      return(data.frame(yaml = .path, tags = NA_character_))
-    }
-    },
-    error = function(cond) {
-      if (stringr::str_detect(cond$message, "cannot open the connection")) {
-        return(NULL)
-      } else {
-        stop(
-          glue("Unexpected error trying to read yaml `{.path}`: {cond$message}")
-        )
-      }
-    },
-    warning = function(cond) {
-      if (stringr::str_detect(cond$message, "No such file or directory")) {
-        return(NULL)
-      } else {
-        stop(
-          glue("Unexpected warning trying to read yaml `{.path}`: {cond$message}")
-        )
-      }
-    }
-  )
-}
+
 
 #' Add columns to log df
 #'
