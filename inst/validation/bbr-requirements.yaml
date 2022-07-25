@@ -727,9 +727,10 @@ RNLG-R004:
   tests:
   - BBR-RNLG-004
 RNLG-R005:
-  description: run_log() works with filtering parameter
+  description: run_log() can be filtered
   tests:
   - BBR-RNLG-005
+  - BBR-RNLG-006
 ROT-R001:
   description: check_file returns correctly
   tests:
