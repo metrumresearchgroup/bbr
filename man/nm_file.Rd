@@ -55,19 +55,19 @@ consider using
 }
 \section{Functions}{
 \itemize{
-\item \code{nm_grd}: Reads \code{.grd} file from a \code{bbi_nonmem_model} or
+\item \code{nm_grd()}: Reads \code{.grd} file from a \code{bbi_nonmem_model} or
 \code{bbi_nonmem_summary} object
 
-\item \code{nm_tab}: Reads \verb{\{get_model_id(.mod)\}.tab} file from a
+\item \code{nm_tab()}: Reads \verb{\{get_model_id(.mod)\}.tab} file from a
 \code{bbi_nonmem_model} or \code{bbi_nonmem_summary} object
 
-\item \code{nm_par_tab}: Reads \verb{\{get_model_id(.mod)\}par.tab} file from a
+\item \code{nm_par_tab()}: Reads \verb{\{get_model_id(.mod)\}par.tab} file from a
 \code{bbi_nonmem_model} or \code{bbi_nonmem_summary} object
 
-\item \code{nm_data}: Reads the input data file from a \code{bbi_nonmem_model} or
+\item \code{nm_data()}: Reads the input data file from a \code{bbi_nonmem_model} or
 \code{bbi_nonmem_summary} object
+
 }}
-
 \seealso{
 \code{\link[=nm_tables]{nm_tables()}}, \code{\link[=nm_table_files]{nm_table_files()}}, \code{\link[=nm_join]{nm_join()}}
 }

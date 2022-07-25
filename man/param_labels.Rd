@@ -63,8 +63,8 @@ and transform the estimates accordingly. None of that processing is done automat
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{bbi_nonmem_model}: Takes a \code{bbi_nonmem_model} object
+\item \code{param_labels(bbi_nonmem_model)}: Takes a \code{bbi_nonmem_model} object
 
-\item \code{character}: Takes a character scalar of the raw control stream with newline character separating lines
+\item \code{param_labels(character)}: Takes a character scalar of the raw control stream with newline character separating lines
+
 }}
-

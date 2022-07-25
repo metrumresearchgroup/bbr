@@ -25,8 +25,8 @@ Helper to strip path and extension from model file to get only model identifier
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{character}: Takes file path to model.
+\item \code{get_model_id(character)}: Takes file path to model.
 
-\item \code{bbi_model}: Takes \verb{bbi_\{.model_type\}_model} or \verb{bbi_\{.model_type\}_summary} object
+\item \code{get_model_id(bbi_model)}: Takes \verb{bbi_\{.model_type\}_model} or \verb{bbi_\{.model_type\}_summary} object
+
 }}
-
