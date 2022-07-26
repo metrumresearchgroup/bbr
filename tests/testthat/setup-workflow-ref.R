@@ -85,6 +85,9 @@ SUMS_LIST_NAMES_REF <- c("absolute_model_path", "bbi_summary", "error_msg", "nee
 
 SUM_NAMES_REF <- c("absolute_model_path", "run_details", "run_heuristics", "parameters_data",
                    "parameter_names", "ofv", "condition_number", "shrinkage_details")
+if (test_bbi_version(read_bbi_path(), .min_version = "3.2.0")) {
+  SUM_NAMES_REF <- c(SUM_NAMES_REF, "success")
+}
 
 NOT_FINISHED_ERR_MSG <- "nonmem_summary.*modeling run has not finished"
 NO_LST_ERR_MSG <- "Unable to locate `.lst` file.*NONMEM output folder"
