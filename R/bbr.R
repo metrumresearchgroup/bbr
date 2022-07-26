@@ -180,7 +180,7 @@ check_bbi_exe <- function(.bbi_exe_path) {
     }
 
     # if version too low, reject it
-    check_bbi_version_constraint(.bbi_exe_path)
+    assert_bbi_version(.bbi_exe_path)
 
     # if found, and passes version constraint, add it to cache
     CACHE_ENV$bbi_exe_paths[[.bbi_exe_path]] <- TRUE
@@ -199,7 +199,7 @@ check_bbi_exe <- function(.bbi_exe_path) {
 #'   `NULL`, notifies user in error message.
 #' @return The value of `.bbi_exe_path`.
 #' @keywords internal
-check_bbi_version_constraint <- function(
+assert_bbi_version <- function(
   .bbi_exe_path = getOption('bbr.bbi_exe_path'),
   .min_version = getOption("bbr.bbi_min_version"),
   .function = NULL
