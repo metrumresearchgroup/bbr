@@ -207,18 +207,18 @@ check_bbi_version_constraint <- function(
   if (isTRUE(getOption("bbr.DEV_no_min_version"))) {
     return(invisible(TRUE))
   }
-  .bbi_exe_path <- Sys.which(.bbi_exe_path)
-  if (.bbi_exe_path == "") {
+  bbi_path <- Sys.which(.bbi_exe_path)
+  if (bbi_path == "") {
     stop(glue("`{.bbi_exe_path}` was not found on the system."))
   }
 
-  this_version <- bbi_version(.bbi_exe_path)
+  this_version <- bbi_version(bbi_path)
   test_version_test <- package_version(str_replace_all(this_version, "[^0-9\\.]", ""))
 
   if (test_version_test < .min_version) {
     err_msg <- paste(
-      glue("The executable at `{.bbi_exe_path}` is version {this_version} but the minimum supported version of bbi is {.min_version}"),
-      glue("Call `use_bbi('{dirname(.bbi_exe_path)}')` to update to the most recent release."),
+      glue("The executable at `{bbi_path}` is version {this_version} but the minimum supported version of bbi is {.min_version}"),
+      glue("Call `use_bbi('{dirname(bbi_path)}')` to update to the most recent release."),
       sep = "\n"
     )
 
