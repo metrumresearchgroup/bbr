@@ -39,6 +39,9 @@ model_summaries <- function(
   UseMethod("model_summaries")
 }
 
+# model_summaries_serial() can go away once bbr.bbi_min_version is 3.2.0 or
+# later.
+
 #' @importFrom purrr map
 model_summaries_serial <- function(.mods, .bbi_args, .fail_flags) {
   map(.mods, function(.m) {
@@ -73,6 +76,85 @@ model_summaries_serial <- function(.mods, .bbi_args, .fail_flags) {
   })
 }
 
+bbi_exec_model_summaries <- function(args, paths) {
+  args <- c(args %||% list(), json = TRUE)
+  cmd <- bbi_exec(c("nonmem", "summary", check_bbi_args(args), paths),
+                  .wait = TRUE, .check_status = FALSE)
+  res <- jsonlite::fromJSON(paste(cmd[["stdout"]], collapse = ""),
+                            simplifyDataFrame = FALSE)
+  if (length(paths) == 1) {
+    # If passed a single model, bbi will output a single object rather than a
+    # list of objects. Reshape it into the same form for downstream code.
+    res <- list(Results = list(res),
+                Errors = if (res$success) list() else 0)
+  }
+
+  return(res)
+}
+
+#' Summarize multiple models via single call to bbi
+#'
+#' `bbi nonmem summary` accepts more than one model as of v2.3.0, and v3.2.0
+#' reworked the output so that the errors are included in the JSON structure.
+#' This function consumes the v3.2.0 output, returning an object that can be
+#' passed to [create_summary_list()].
+#'
+#' @importFrom purrr map map_chr walk
+#' @keywords internal
+model_summaries_concurrent <- function(.mods, .bbi_args, .fail_flags) {
+  walk(.mods, check_yaml_in_sync)
+  paths <- map_chr(
+    .mods,
+    # Take relative paths to minimize argument length.
+    ~ fs::path_rel(check_lst_file(get_output_dir(.x))))
+
+  summaries <- bbi_exec_model_summaries(.bbi_args, paths)
+  if (length(summaries$Errors) > 0) {
+    idx_failed <- summaries$Errors + 1
+    args_retry <- .fail_flags
+    if (!is.null(.bbi_args)) {
+      args_retry <- combine_list_objects(args_retry, .bbi_args)
+    }
+    summaries_retry <- bbi_exec_model_summaries(args_retry, paths[idx_failed])
+    summaries_retry$Results <- map(summaries_retry$Results,
+                                   ~ c(.x, needed_fail_flags = TRUE))
+
+    if (length(summaries_retry$Errors) > 0) {
+      idx_retry_failed <- summaries_retry$Errors + 1
+      summaries_retry$Results[idx_retry_failed] <- map(
+        summaries_retry$Results[idx_retry_failed],
+        ~ {
+          # As of bbi v3.2.0, we get the errors from the JSON returned `bbi
+          # nonmem summary`, and that includes a default-value object for
+          # run_details and run_heuristics. Set it to the value that downstream
+          # code expects.
+          .x[[SUMMARY_DETAILS]] <- NA
+          .x[[SUMMARY_HEURISTICS]] <- NA
+          .x
+        })
+    }
+    summaries$Results[idx_failed] <- summaries_retry$Results
+    summaries$Errors <- summaries_retry$Errors
+  }
+
+  # Reshape the results into the form expected by create_summary_list().
+  n_results <- length(.mods)
+  results <- vector(mode = "list", length = n_results)
+  for (i in seq_len(n_results)) {
+    s <- summaries$Results[[i]]
+    res <- list()
+    res[[ABS_MOD_PATH]] <- tools::file_path_sans_ext(get_model_path(.mods[[i]]))
+    results[[i]] <- c(
+      res,
+      rlang::list2(
+        !!SL_SUMMARY := create_summary_object(c(res, s)),
+        !!SL_FAIL_FLAGS := s$needed_fail_flags %||% FALSE,
+        !!SL_ERROR := if (s$success) NA_character_ else s$error_msg))
+  }
+
+  return(results)
+}
+
 #' @describeIn model_summaries Summarize a list of `bbi_{.model_type}_model` objects.
 #' @export
 model_summaries.list <- function(
@@ -84,7 +166,12 @@ model_summaries.list <- function(
 ) {
   # check that each element is a model object
   check_model_object_list(.mods)
-  res_list <- model_summaries_serial(.mods, .bbi_args, .fail_flags)
+  res_list <- if (test_bbi_version(.min_version = "3.2.0")) {
+    model_summaries_concurrent(.mods, .bbi_args, .fail_flags)
+  } else {
+    model_summaries_serial(.mods, .bbi_args, .fail_flags)
+  }
+
   return(create_summary_list(res_list))
 }
 
