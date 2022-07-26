@@ -157,14 +157,10 @@ check_run_times <- function(
   ...
 ) {
 
-  # This function only works for bbi versions -greater- than 3.1.1
-  v_bbi <- package_version(bbi_version(), strict = FALSE)
   is_old_bbi <- FALSE
-  if (!is.na(v_bbi)) {
-    if(v_bbi <= package_version("3.1.1")) {
-      is_old_bbi <- TRUE
-      warning("This function is only compatible with bbi versions -greater than- 3.1.1")
-    }
+  if (!test_bbi_version(.min_version = "3.2.0")) {
+    is_old_bbi <- TRUE
+    warning("This function is only compatible with bbi 3.2.0 or later")
   }
 
   if("all" %in% .return_times){
