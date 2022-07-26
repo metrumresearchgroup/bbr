@@ -188,24 +188,10 @@ check_bbi_exe <- function(.bbi_exe_path) {
   return(invisible())
 }
 
-
-#' Check that bbi satisfies a version constraint
-#'
-#' @importFrom stringr str_replace_all
-#' @inheritParams bbi_version
-#' @param .min_version The minimum allowed version. Defaults to
-#'   `getOption("bbr.bbi_min_version")`.
-#' @param .function The relevant function that is version-constrained. If not
-#'   `NULL`, notifies user in error message.
-#' @return The value of `.bbi_exe_path`.
-#' @keywords internal
-assert_bbi_version <- function(
-  .bbi_exe_path = getOption('bbr.bbi_exe_path'),
-  .min_version = getOption("bbr.bbi_min_version"),
-  .function = NULL
-) {
+compare_bbi_version <- function(.bbi_exe_path, .min_version,
+                                fail = TRUE, .function = NULL) {
   if (isTRUE(getOption("bbr.DEV_no_min_version"))) {
-    return(.bbi_exe_path)
+    return(TRUE)
   }
   bbi_path <- Sys.which(.bbi_exe_path)
   if (bbi_path == "") {
@@ -216,6 +202,10 @@ assert_bbi_version <- function(
   parsed <- package_version(str_replace_all(this_version, "[^0-9\\.]", ""))
 
   if (parsed < .min_version) {
+    if (!fail) {
+      return(FALSE)
+    }
+
     err_msg <- paste(
       glue("The executable at `{bbi_path}` is version {this_version} but the minimum supported version of bbi is {.min_version}"),
       glue("Call `use_bbi('{dirname(bbi_path)}')` to update to the most recent release."),
@@ -233,9 +223,37 @@ assert_bbi_version <- function(
     strict_mode_error(err_msg)
   }
 
+  return(TRUE)
+}
+
+#' Check that bbi satisfies a version constraint
+#'
+#' @importFrom stringr str_replace_all
+#' @inheritParams bbi_version
+#' @param .min_version The minimum allowed version. Defaults to
+#'   `getOption("bbr.bbi_min_version")`.
+#' @param .function The relevant function that is version-constrained. If not
+#'   `NULL`, notifies user in error message.
+#' @return
+#' * `assert_bbi_version()` returns the value of `.bbi_exe_path`.
+#'
+#' * `test_bbi_version()` returns `TRUE` if the installed bbi satisfies the
+#'   constraint and `FALSE` otherwise.
+#' @keywords internal
+assert_bbi_version <- function(
+  .bbi_exe_path = getOption('bbr.bbi_exe_path'),
+  .min_version = getOption("bbr.bbi_min_version"),
+  .function = NULL
+) {
+  compare_bbi_version(.bbi_exe_path, .min_version, .function = .function)
   return(.bbi_exe_path)
 }
 
+#' @rdname assert_bbi_version
+test_bbi_version <- function(.bbi_exe_path = getOption("bbr.bbi_exe_path"),
+                             .min_version = getOption("bbr.bbi_min_version")) {
+  compare_bbi_version(.bbi_exe_path, .min_version, fail = FALSE)
+}
 
 #' Checks status code from processx process
 #' @param .status_code numerical status code from the process

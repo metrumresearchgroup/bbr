@@ -2,12 +2,18 @@
 % Please edit documentation in R/bbr.R
 \name{assert_bbi_version}
 \alias{assert_bbi_version}
+\alias{test_bbi_version}
 \title{Check that bbi satisfies a version constraint}
 \usage{
 assert_bbi_version(
   .bbi_exe_path = getOption("bbr.bbi_exe_path"),
   .min_version = getOption("bbr.bbi_min_version"),
   .function = NULL
+)
+
+test_bbi_version(
+  .bbi_exe_path = getOption("bbr.bbi_exe_path"),
+  .min_version = getOption("bbr.bbi_min_version")
 )
 }
 \arguments{
@@ -20,7 +26,11 @@ assert_bbi_version(
 \code{NULL}, notifies user in error message.}
 }
 \value{
-The value of \code{.bbi_exe_path}.
+\itemize{
+\item \code{assert_bbi_version()} returns the value of \code{.bbi_exe_path}.
+\item \code{test_bbi_version()} returns \code{TRUE} if the installed bbi satisfies the
+constraint and \code{FALSE} otherwise.
+}
 }
 \description{
 Check that bbi satisfies a version constraint
