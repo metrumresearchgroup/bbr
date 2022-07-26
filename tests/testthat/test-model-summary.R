@@ -98,12 +98,12 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       args_list[[as.character(glue::glue("no_{.tc$ext}_file"))]] <- TRUE
       sum2 <- model_summary(mod2, .bbi_args = args_list)
 
+      skip_if_old_bbi("3.2.0")
       # some things will be a little different, most will be the same
       ref_sum <- dget(SUMMARY_REF_FILE)
 
       expect_equal(length(ref_sum), length(sum2) + length(.tc$missing))
 
-      skip_if_old_bbi("3.2.0")
       for (.d in names(ref_sum$run_details)) {
         if (.d != "output_files_used") {
           expect_equal(sum2$run_details[[.d]], ref_sum$run_details[[.d]])
