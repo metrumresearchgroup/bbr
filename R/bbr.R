@@ -44,6 +44,8 @@ NULL
 #' @param .dir The working directory to run command in. Defaults to "."
 #' @param .verbose Print stdout and stderr as process runs #### NOT IMPLEMENTED?
 #' @param .wait If true, don't return until process has exited.
+#' @param .check_status Whether to signal an error if the command has a non-zero
+#'   exit code.
 #' @param ... arguments to pass to processx::process$new()
 #'
 #' @return An S3 object of class `bbi_process` with the following elements
@@ -71,6 +73,7 @@ bbi_exec <- function(.cmd_args,
                      .verbose = FALSE,
                      .wait = FALSE,
                      .bbi_exe_path = getOption("bbr.bbi_exe_path"),
+                     .check_status = TRUE,
                      ...) {
   check_bbi_exe(.bbi_exe_path)
 
@@ -115,7 +118,9 @@ bbi_exec <- function(.cmd_args,
     }
     # check output status code
     output <- read_lines(stdout_file)
-    check_status_code(p$get_exit_status(), output, .cmd_args)
+    if (isTRUE(.check_status)) {
+      check_status_code(p$get_exit_status(), output, .cmd_args)
+    }
 
   } else {
     output <- paste("NO STDOUT BECAUSE `.wait = FALSE`. stdout and stderr redirected to", stdout_file)
