@@ -82,8 +82,7 @@ model_summaries.list <- function(
     return(res)
   })
 
-  res_list <- create_summary_list(res_list)
-  return(res_list)
+  return(create_summary_list(res_list))
 }
 
 #' @describeIn model_summaries Takes a `bbi_run_log_df` tibble and summarizes all models in it.
