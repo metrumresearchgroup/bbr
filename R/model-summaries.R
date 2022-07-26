@@ -39,19 +39,9 @@ model_summaries <- function(
   UseMethod("model_summaries")
 }
 
-#' @describeIn model_summaries Summarize a list of `bbi_{.model_type}_model` objects.
-#' @export
-model_summaries.list <- function(
-  .mods,
-  .bbi_args = NULL,
-  .fail_flags = NULL,
-  ...,
-  .dry_run = FALSE
-) {
-  # check that each element is a model object
-  check_model_object_list(.mods)
-
-  res_list <- map(.mods, function(.m) {
+#' @importFrom purrr map
+model_summaries_serial <- function(.mods, .bbi_args, .fail_flags) {
+  map(.mods, function(.m) {
     .s <- tryCatch(
       {
         model_summary(.m, .bbi_args = .bbi_args)
@@ -81,7 +71,20 @@ model_summaries.list <- function(
 
     return(res)
   })
+}
 
+#' @describeIn model_summaries Summarize a list of `bbi_{.model_type}_model` objects.
+#' @export
+model_summaries.list <- function(
+  .mods,
+  .bbi_args = NULL,
+  .fail_flags = NULL,
+  ...,
+  .dry_run = FALSE
+) {
+  # check that each element is a model object
+  check_model_object_list(.mods)
+  res_list <- model_summaries_serial(.mods, .bbi_args, .fail_flags)
   return(create_summary_list(res_list))
 }
 
