@@ -20,7 +20,7 @@ check_bbi_version_constraint(
 \code{NULL}, notifies user in error message.}
 }
 \value{
-\code{NULL} if \code{.bbi_exe_path} satisfies the constraint
+The value of \code{.bbi_exe_path}.
 }
 \description{
 Check that bbi satisfies a version constraint

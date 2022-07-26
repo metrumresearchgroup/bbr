@@ -197,7 +197,7 @@ check_bbi_exe <- function(.bbi_exe_path) {
 #'   `getOption("bbr.bbi_min_version")`.
 #' @param .function The relevant function that is version-constrained. If not
 #'   `NULL`, notifies user in error message.
-#' @return `NULL` if `.bbi_exe_path` satisfies the constraint
+#' @return The value of `.bbi_exe_path`.
 #' @keywords internal
 check_bbi_version_constraint <- function(
   .bbi_exe_path = getOption('bbr.bbi_exe_path'),
@@ -205,7 +205,7 @@ check_bbi_version_constraint <- function(
   .function = NULL
 ) {
   if (isTRUE(getOption("bbr.DEV_no_min_version"))) {
-    return(invisible(TRUE))
+    return(.bbi_exe_path)
   }
   bbi_path <- Sys.which(.bbi_exe_path)
   if (bbi_path == "") {
@@ -232,6 +232,8 @@ check_bbi_version_constraint <- function(
 
     strict_mode_error(err_msg)
   }
+
+  return(.bbi_exe_path)
 }
 
 
