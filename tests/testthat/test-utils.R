@@ -153,8 +153,23 @@ test_that("warning raised when threads > 1 and parallel is FALSE [BBR-UTL-014]",
 
       res <- capture.output(submit_model(mod1, .dry_run = TRUE))
 
-      #Testing that check_bbi_args is appending --parallel when not passed
+      #Testing that check_bbi_args is appending --parallel when not passed and threads > 1
       expect_identical("--parallel", str_subset(res,"--parallel") %>% str_extract("--parallel"))
+      fs::file_delete(file.path(tempdir(), "test_path", "1.yaml"))
+
+      #Testing that check_bbi_args is appending --parallel when not passed and threads = 1
+      mod1 <- new_model(file.path(tempdir(), "test_path", "1"), .description = "original test-workflow-bbi model",
+                        .tags = ORIG_TAGS,.bbi_args = list(overwrite = TRUE, threads = 1))
+      res <- capture.output(submit_model(mod1, .dry_run = TRUE))
+      expect_false(str_detect(res, "--parallel") %>% unique())
+      fs::file_delete(file.path(tempdir(), "test_path", "1.yaml"))
+
+
+      #Checking arguments passed when parallel is set to FALSE and threads = 1
+      mod1 <- new_model(file.path(tempdir(), "test_path", "1"), .description = "original test-workflow-bbi model",
+                        .tags = ORIG_TAGS,.bbi_args = list(overwrite = TRUE, threads = 1, parallel = FALSE ))
+      res <- capture.output(submit_model(mod1, .dry_run = TRUE))
+      expect_false(str_detect(res,"--parallel") %>% unique())
       fs::file_delete(file.path(tempdir(), "test_path", "1.yaml"))
 
 
@@ -162,7 +177,7 @@ test_that("warning raised when threads > 1 and parallel is FALSE [BBR-UTL-014]",
                          .tags = ORIG_TAGS,.bbi_args = list(overwrite = TRUE, threads = 2, parallel = FALSE))
 
       #When `threads` > 1 and parallel is False raise a warning
-      expect_warning(submit_model(mod1, .dry_run = TRUE))
+      expect_warning(submit_model(mod1, .dry_run = TRUE), "threads > 1` but model will not run in parallel because `parallel = FALSE")
     })
   })
 })
