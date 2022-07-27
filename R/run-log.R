@@ -62,21 +62,6 @@ find_models <- function(.base_dir, .recurse , .include) {
     map(fs::path_ext_remove) %>%
     map(safe_read_model)
 
-  #If models are not specified to be kept, it keeps all models
-  # Filters only to models specified
-  if(!is.null(.include)){
-    yaml_df <- map(all_yaml, ~ {
-      .tag <- if(is.null(.x$tags)) NA_character_ else .x$tags
-      data.frame(yaml = .x$absolute_model_path, tags = .tag)
-      }) %>% bind_rows()
-    yaml_df <- yaml_df %>% filter(yaml %>% basename() %>% stringr::str_remove(".yaml|.yml") %in% .include | tags %in% .include)
-    yaml_files <- unique(yaml_df$yaml)
-    all_yaml <- all_yaml[map(all_yaml, ~ .x$absolute_model_path %in% yaml_files) %>% unlist()]
-  }
-
-  if(length(all_yaml) == 0){
-    warning("All models excluded by filter.")
-  }
 
   # filter to only model yaml's
   mod_list <- compact(all_yaml)
@@ -88,6 +73,22 @@ find_models <- function(.base_dir, .recurse , .include) {
   # warn if no valid model YAML found
   if (length(mod_list) == 0) {
     warning(glue("Found no valid model YAML files in {.base_dir}"))
+  }
+
+  #If models are not specified to be kept, it keeps all models
+  # Filters only to models specified
+  if(!is.null(.include)){
+    yaml_df <- map(mod_list, ~ {
+      .tag <- if(is.null(.x$tags)) NA_character_ else .x$tags
+      data.frame(yaml = .x$absolute_model_path, tags = .tag)
+    }) %>% bind_rows()
+    yaml_df <- yaml_df %>% filter(yaml %>% basename() %>% stringr::str_remove(".yaml|.yml") %in% .include | tags %in% .include)
+    yaml_files <- unique(yaml_df$yaml)
+    mod_list <- mod_list[map(mod_list, ~ .x$absolute_model_path %in% yaml_files) %>% unlist()]
+  }
+
+  if(length(mod_list) == 0){
+    warning("All models excluded by filter.")
   }
 
   return(mod_list)
