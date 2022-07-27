@@ -1038,6 +1038,7 @@ UTL-R014:
   description: check_bbi_args() provides warning when `threads > 1` and parallel is `FALSE`
   tests:
   - BBR-UTL-014
+  - BBR-UTL-015
 WRKF-R001:
   description: step by step create_model to submit_model to model_summary works
   tests:

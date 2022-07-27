@@ -157,14 +157,6 @@ test_that("warning raised when threads > 1 and parallel is FALSE [BBR-UTL-014]",
       expect_identical("--parallel", str_subset(res,"--parallel") %>% str_extract("--parallel"))
       fs::file_delete(file.path(tempdir(), "test_path", "1.yaml"))
 
-      #Testing that check_bbi_args is appending --parallel when not passed and threads = 1
-      mod1 <- new_model(file.path(tempdir(), "test_path", "1"), .description = "original test-workflow-bbi model",
-                        .tags = ORIG_TAGS,.bbi_args = list(overwrite = TRUE, threads = 1))
-      res <- capture.output(submit_model(mod1, .dry_run = TRUE))
-      expect_false(str_detect(res, "--parallel") %>% unique())
-      fs::file_delete(file.path(tempdir(), "test_path", "1.yaml"))
-
-
       #Checking arguments passed when parallel is set to FALSE and threads = 1
       mod1 <- new_model(file.path(tempdir(), "test_path", "1"), .description = "original test-workflow-bbi model",
                         .tags = ORIG_TAGS,.bbi_args = list(overwrite = TRUE, threads = 1, parallel = FALSE ))
@@ -182,5 +174,48 @@ test_that("warning raised when threads > 1 and parallel is FALSE [BBR-UTL-014]",
   })
 })
 
+test_that("Confirms if threads = 1, parallel is not set [BBR-UTL-015]", {
+  withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
+    withr::with_tempdir({
+      fs::dir_create(file.path(tempdir(), "test_path"))
 
+      on.exit(if (fs::dir_exists(file.path(tempdir(), "test_path")))
+      {
+        fs::dir_delete(file.path(tempdir(), "test_path"))
+      })
+
+      files_to_copy <- file.path(ABS_MODEL_DIR, c("1.ctl"))
+
+      fs::file_copy(
+        system.file("extdata", "acop.csv", package = "bbr"),
+        file.path(tempdir(), "test_path")
+      )
+      purrr::walk(files_to_copy,
+                  fs::file_copy,
+                  file.path(tempdir(), "test_path"))
+      fs::dir_copy(file.path(ABS_MODEL_DIR, "1"),
+                   file.path(tempdir(), "test_path"))
+      ctl <-
+        read_lines(file.path(tempdir(), "test_path", "1.ctl")) %>% stringr::str_remove("../../../../extdata/")
+      write_lines(ctl, file.path(tempdir(), "test_path", "1.ctl"))
+
+      readr::write_file("created_by: test-utils",
+                        file.path(tempdir(), "test_path", "bbi.yaml"))
+
+
+      #Testing that check_bbi_args is appending --parallel when not passed and threads = 1
+      mod1 <-
+        new_model(
+          file.path(tempdir(), "test_path", "1"),
+          .description = "original test-workflow-bbi model",
+          .tags = ORIG_TAGS,
+          .bbi_args = list(overwrite = TRUE, threads = 1)
+        )
+      res <- capture.output(submit_model(mod1, .dry_run = TRUE))
+      expect_false(str_detect(res, "--parallel") %>% unique())
+      fs::file_delete(file.path(tempdir(), "test_path", "1.yaml"))
+
+    })
+  })
+})
 
