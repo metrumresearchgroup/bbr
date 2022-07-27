@@ -130,10 +130,22 @@ test_that("run_log() can be filtered via model run: character name [BBR-RNLG-005
   }
 
   clean_test_enviroment(setup_this_test)
-  expect_equal(run_log(MODEL_DIR, .include = c(1:2, "Child")) %>% nrow(), 3)
-  expect_equal(run_log(MODEL_DIR, .include = c(2:1, "Child")) %>% nrow(), 3)
-  expect_equal(run_log(MODEL_DIR, .include = c("Child", 1, 2, 3)) %>% nrow(), 4)
-  expect_equal(run_log(MODEL_DIR, .include = c(1:2, "Parent")) %>% nrow(), 3)
+  log_df <- run_log(MODEL_DIR, .include = c(1:2, "Child"))
+  expect_equal(nrow(log_df), 3)
+  expect_equal(unique(log_df$run), c("1", "2", "Child"))
+
+  # Reverse order of above test
+  log_df <- run_log(MODEL_DIR, .include = c(2:1, "Child"))
+  expect_equal(nrow(log_df), 3)
+  expect_equal(unique(log_df$run), c("1", "2", "Child"))
+
+  log_df <- run_log(MODEL_DIR, .include = c("Child", 1, 2, 3))
+  expect_equal(nrow(log_df), 4)
+  expect_equal(unique(log_df$run), c("1", "2", "3", "Child"))
+
+  log_df <- run_log(MODEL_DIR, .include = c(1:2, "Parent"))
+  expect_equal(nrow(log_df), 3)
+  expect_equal(unique(log_df$run), c("1", "2", "Parent"))
 })
 
 test_that("run_log() can be filtered via tags: tags only [BBR-RNLG-006]", {
