@@ -26,8 +26,8 @@ Creates a line plot of the wide-format tibble output from \code{check_nonmem_tab
 }
 \section{Functions}{
 \itemize{
-\item \code{plot_grd}: Plot the .grd file
+\item \code{plot_grd()}: Plot the .grd file
 
-\item \code{plot_ext}: Plot the .ext file
+\item \code{plot_ext()}: Plot the .ext file
+
 }}
-

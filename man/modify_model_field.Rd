@@ -55,9 +55,9 @@ digest of the newly written YAML.
 }
 \section{Functions}{
 \itemize{
-\item \code{replace_model_field}: Replace a single item in a model field
-}}
+\item \code{replace_model_field()}: Replace a single item in a model field
 
+}}
 \seealso{
 \code{\link[=add_tags]{add_tags()}} \code{\link[=replace_tag]{replace_tag()}} \code{\link[=replace_all_tags]{replace_all_tags()}} \code{\link[=remove_tags]{remove_tags()}}
 \code{\link[=add_notes]{add_notes()}} \code{\link[=replace_note]{replace_note()}} \code{\link[=replace_all_notes]{replace_all_notes()}} \code{\link[=remove_notes]{remove_notes()}}

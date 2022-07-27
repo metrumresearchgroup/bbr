@@ -55,16 +55,16 @@ for an example of this.
 }
 \section{Functions}{
 \itemize{
-\item \code{add_tags}: Add tags to a model object and corresponding YAML.
+\item \code{add_tags()}: Add tags to a model object and corresponding YAML.
 
-\item \code{replace_tag}: Replaces a specific \code{.old_tag} with \code{.new_tag} on a model object and corresponding YAML.
+\item \code{replace_tag()}: Replaces a specific \code{.old_tag} with \code{.new_tag} on a model object and corresponding YAML.
 Warns and does nothing if \code{.old_tag} is not present.
 
-\item \code{replace_all_tags}: Replaces all tags on a model object and corresponding YAML with new tags.
+\item \code{replace_all_tags()}: Replaces all tags on a model object and corresponding YAML with new tags.
 
-\item \code{remove_tags}: Removes tags from a model object and corresponding YAML.
+\item \code{remove_tags()}: Removes tags from a model object and corresponding YAML.
+
 }}
-
 \seealso{
 \code{\link[=run_log]{run_log()}} \code{\link[=collapse_to_string]{collapse_to_string()}} \code{\link[=modify_notes]{modify_notes()}} \code{\link[=modify_based_on]{modify_based_on()}} \code{\link[=modify_description]{modify_description()}} \code{\link[=modify_bbi_args]{modify_bbi_args()}} \code{\link[=modify_star]{modify_star()}}
 }
