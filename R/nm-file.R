@@ -144,7 +144,7 @@ nm_file_impl <- function(.path) {
       dup_id <- c(which(duplicated(names(data))) -1, which(duplicated(names(data)))) %>% sort()
       # use ids above to compare if they are equal (19, 20, 26, 27) - you'll likely need a for loop
       # or map call to jump every {length(dup_cols)} (2 in this case - i.e. 19 and 20, 26 and 27) for comparing
-      warning(glue("{basename(.path)} had the following duplicated columns: {dup_cols_str}")) # something like this, and then say if they're equal
+      warning(glue("{basename(.path)} had the following duplicated columns: {dup_cols_str}\n  Duplicate names will be repaired with `make.unique()`")) # something like this, and then say if they're equal
       colnames(data) <- make.unique(colnames(data) )
     }
 
