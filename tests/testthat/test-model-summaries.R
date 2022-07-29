@@ -12,7 +12,11 @@ test_mod_sums <- function(mod_sums) {
   ref_sum <- dget(SUMMARY_REF_FILE)
 
   for (.s in mod_sums) {
+    # replace incidental differences
     ref_sum[[ABS_MOD_PATH]] <- .s$bbi_summary[[ABS_MOD_PATH]]
+    ref_sum$run_details$output_files_used <- NULL
+    .s$bbi_summary$run_details$output_files_used <- NULL
+
     expect_equal(ref_sum, .s$bbi_summary)
   }
 }
@@ -20,8 +24,8 @@ test_mod_sums <- function(mod_sums) {
 # setup
 cleanup()
 create_rlg_models()
-fs::dir_copy(MOD1_PATH, NEW_MOD2)
-fs::dir_copy(MOD1_PATH, NEW_MOD3)
+copy_output_dir(MOD1, NEW_MOD2)
+copy_output_dir(MOD1, NEW_MOD3)
 # teardown
 withr::defer(cleanup())
 

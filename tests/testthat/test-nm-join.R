@@ -110,7 +110,7 @@ test_that("nm_join(.join_col) works correctly [BBR-NMJ-005]", {
   # on row number. Just an explanation of why it's so long.
   new_mod <- copy_model_from(MOD1)
   new_mod_out <- get_output_dir(new_mod, .check_exists = F)
-  fs::dir_copy(MOD1_PATH, new_mod_out)
+  copy_output_dir(MOD1, new_mod_out)
 
   data_path <- "fake_data.csv"
   full_data_path <- file.path(get_model_working_directory(MOD1), data_path)
