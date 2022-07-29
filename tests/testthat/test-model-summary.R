@@ -37,13 +37,13 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     mod2 <- MOD1 %>% copy_model_from(basename(NEW_MOD2))
 
     # copy output directory (to simulate model run)
-    fs::dir_copy(MOD1_PATH, NEW_MOD2)
+    copy_output_dir(MOD1, NEW_MOD2)
 
     # move .ext file
-    fs::file_move(file.path(NEW_MOD2, "1.ext"), file.path(NEW_MOD2, "EXT"))
+    fs::file_move(build_path_from_model(mod2, ".ext"), file.path(NEW_MOD2, "EXT"))
 
     # errors without the flag
-    expect_error(model_summary(mod2), "[Nn]o file present at.*2/1\\.ext")
+    expect_error(model_summary(mod2), "[Nn]o file present at.*2/2\\.ext")
 
     # works correctly with ext_file flag added
     sum2 <- model_summary(mod2, .bbi_args = list(ext_file = "EXT"))
@@ -86,12 +86,11 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       mod2 <- MOD1 %>% copy_model_from(basename(NEW_MOD2))
 
       # copy output directory (to simulate model run)
-      fs::dir_copy(MOD1_PATH, NEW_MOD2)
-
-      fs::file_delete(file.path(NEW_MOD2, paste0("1.", .tc$ext)))
+      copy_output_dir(MOD1, NEW_MOD2)
+      fs::file_delete(build_path_from_model(mod2, glue::glue(".{.tc$ext}")))
 
       # errors without the flag
-      expect_error(model_summary(mod2), glue::glue("[Nn]o file present at.*2/1\\.{.tc$ext}"))
+      expect_error(model_summary(mod2), glue::glue("[Nn]o file present at.*2/2\\.{.tc$ext}"))
 
       # works correctly with flag added
       args_list <- list()
@@ -162,27 +161,13 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     mod2 <- MOD1 %>% copy_model_from(basename(NEW_MOD2))
 
     # copy output directory (to simulate model run)
-    fs::dir_copy(MOD1_PATH, NEW_MOD2)
+    copy_output_dir(MOD1, NEW_MOD2)
 
     # delete a necessary file
-    fs::file_delete(file.path(NEW_MOD2, "1.lst"))
+    fs::file_delete(build_path_from_model(mod2, ".lst"))
 
-    # try to run and expect error with NO_LST_ERR_MSG
-    expect_error(model_summary(mod2), regexp = NO_LST_ERR_MSG)
-  })
-
-  test_that("model_summary() fails on bad .lst input: multiple files [BBR-SUM-005]", {
-    on.exit({
-      fs::dir_delete(NEW_MOD2)
-      fs::file_delete(ctl_ext(NEW_MOD2))
-      fs::file_delete(yaml_ext(NEW_MOD2))
-    })
-
-    mod2 <- MOD1 %>% copy_model_from(basename(NEW_MOD2))
-    fs::dir_copy(MOD1_PATH, NEW_MOD2)
-    fs::file_copy(file.path(NEW_MOD2, "1.lst"), file.path(NEW_MOD2, "2.lst"))
-
-    expect_error(model_summary(mod2), regexp = "More than one `\\.lst` file")
+    # try to run and expect error with NOT_FINISHED_ERR_MSG
+    expect_error(model_summary(mod2), regexp = NOT_FINISHED_ERR_MSG)
   })
 
   test_that("model_summary works with multiple estimation methods [BBR-SUM-010]", {
@@ -196,11 +181,10 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   test_that("model_summary() maps objective function fallback to NA [BBR-SUM-011]", {
     skip_if_old_bbi("3.2.0")
     withr::with_tempdir({
-      fs::dir_copy(MOD1_ABS_PATH, "tmpmod")
-      mod <- copy_model_from(read_model(MOD1_ABS_PATH),
-                             file.path(getwd(), "tmpmod"))
-
-      lst_file <- file.path("tmpmod", "1.lst")
+      new_mod_path <- file.path(getwd(), "tmpmod")
+      mod <- copy_model_from(MOD1, new_mod_path)
+      copy_output_dir(MOD1, new_mod_path)
+      lst_file <- build_path_from_model(mod, ".lst")
       lst_lines <- readr::read_lines(lst_file)
       stringr::str_replace(lst_lines,
                            "^( OBJECTIVE FUNCTION VALUE .*: +)[0-9.]+\\s*$",
