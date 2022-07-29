@@ -99,6 +99,7 @@ test_that("nm_par_tab() works [BBR-NMF-007]", {
 })
 
 withr::with_tempdir{
+  withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   fs::dir_copy(system.file("model", "nonmem", "basic", package = "bbr"), tempdir())
   fs::file_delete(file.path(tempdir(),"basic","1", "1.ctl"))
 
@@ -145,8 +146,11 @@ withr::with_tempdir{
   write_file(lst_file, file.path(tempdir(), "basic", "1", "1.lst"))
 
 
-  nm_join(mod1, .files = "1.tab", .join_col = "ID")
+  res <- capture_warning(nm_join(mod1, .files = "1.tab", .join_col = "ID"))
+
+  expect_true(res$message)
 
 
-}
+  }
+
 
