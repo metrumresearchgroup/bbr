@@ -97,3 +97,56 @@ test_that("nm_par_tab() works [BBR-NMF-007]", {
   expect_equal(ncol(.d), 6)
   expect_equal(nrow(.d), DATA_TEST_ROWS_IGNORE)
 })
+
+withr::with_tempdir{
+  fs::dir_copy(system.file("model", "nonmem", "basic", package = "bbr"), tempdir())
+  fs::file_delete(file.path(tempdir(),"basic","1", "1.ctl"))
+
+  fs::file_copy(system.file("extdata", "acop.csv", package = "bbr"), file.path(tempdir(), "basic"))
+
+
+  mod1 <- new_model(file.path(tempdir(), "basic", "1"), .overwrite = TRUE)
+  fs::dir_copy(system.file("model", "nonmem", "basic", "1", package = "bbr"), file.path(tempdir(), "basic"))
+
+  ctl_file <- read_lines(file.path(tempdir(), "basic", "1.ctl")) %>% stringr::str_replace("../../../../extdata/acop.csv", "acop.csv" )
+  write_lines(ctl_file, file.path(tempdir(), "basic", "1.ctl"))
+
+  bbi <- jsonlite::read_json(file.path(tempdir(), "basic", "1", "bbi_config.json"))
+  bbi$data_path <- "/acop.csv"
+  jsonlite::write_json(bbi, file.path(tempdir(), "basic", "1", "bbi_config.json"))
+  fs::file_move(file.path(tempdir(), "basic", "acop.csv"), file.path(tempdir(), "basic", "1", "acop.csv"))
+  fs::file_delete(file.path(tempdir(), "basic","1", "1.ctl"))
+
+  # Generates Example Data
+  set.seed(123)
+  test_row <- sample(1.5:20, size = 52, replace = TRUE)
+  test_row <- matrix(unlist(test_row), ncol = 52, nrow = 1) %>% as_tibble()
+  colnames(test_row) <- c("C","NUM","STUDYN","ID","TIME","TAD","TAFD","EVID","AMT","RATE", "BLQF",
+                         "ALQF","QNSF", "DV", "LDV", "DISID","FORM", "AGE" ,"SEX","RACE","WTT","WTBL"  ,
+                         "EGFRBL", "AS401TBL", "PiADAC34","MDV","TADN","DOSE" ,"LDOS"  ,"DOSEN" ,"dur","DOSEGRP", "CYCLEN",
+                         "DAYN","VISITN"  , "PCDY", "PCTPTNUM", "EXIDTFL"  ,"EXIINTFL" ,"HPNC1D1","HIMC1D1", "MHPC1D1","HPNC1D35",
+                         "HIMC1D35","MHPC1D35", "CMT" ,"SUBJ", "VISITC", "EPOCH","CYCDAY" ,"PCTPT" ,"DATETIME")
+  test_row$ID <- 1
+
+  #Generates Table File
+  tab <- "TABLE NO.  1
+ ID          TIME        TAD         AMT         RATE        EVID        DV          IPRED       CWRESI      NPDE        V           CL          F1          LOGTVCL     ETA1        HFLF        ADAna       ADA1        ADA8        ADA8        ADA800      ADA8K       ADA80K      ADA800K     ADA8M       AS401TBL    DV          PRED        RES         WRES
+  1.0000E+00  0.0000E+00  0.0000E+00  1.0200E+03  4.0800E+03  1.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  6.1779E+00  1.8436E+01  8.1040E-02  1.3000E+00  1.3097E-01  2.3222E-01  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  1.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  8.0000E+03  0.0000E+00         NaN  0.0000E+00  0.0000E+00
+
+
+"
+  write_file(tab, file.path(tempdir(), "basic", "1", "1.tab"))
+
+  readr::write_csv(test_row, file = file.path(tempdir(), "basic", "1","acop.csv"))
+
+  lst_file <- read_lines(file.path(tempfile(), "basic", "1", "1.lst"))
+
+
+  write_file(lst_file, file.path(tempdir(), "basic", "1", "1.lst"))
+
+
+  nm_join(mod1, .files = "1.tab", .join_col = "ID")
+
+
+}
+
