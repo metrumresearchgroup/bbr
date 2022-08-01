@@ -1046,7 +1046,7 @@ UTL-R013:
   tests:
   - BBR-UTL-013
 UTL-R014:
-  description: check_bbi_args() provides warning when `threads > 1` and parallel is `FALSE`
+  description: confirming check_bbi_args() is passing correct parameters
   tests:
   - BBR-UTL-014
   - BBR-UTL-015

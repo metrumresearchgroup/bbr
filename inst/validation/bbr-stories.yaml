@@ -55,6 +55,7 @@ CFG-S006:
   - SBMT-R006
   - SBMT-R007
   - SBMT-R015
+  - UTL-R014
 MGMT-S001:
   name: Create new model object
   description: As a user, I want to be able to create a new bbr model object by pointing
