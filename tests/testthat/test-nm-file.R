@@ -141,12 +141,7 @@ withr::with_tempdir({
 "
     write_file(tab, file.path(tempdir(), "basic", "1", "1.tab"))
 
-    readr::write_csv(test_row, file = file.path(tempdir(), "basic", "1","acop.csv"))
-
-    lst_file <- read_lines(file.path(tempdir(), "basic", "1", "1.lst"))
-
-
-    write_lines(lst_file, file.path(tempdir(), "basic", "1", "1.lst"))
+    readr::write_csv(test_row, file.path(tempdir(), "basic", "1","acop.csv"))
 
 
     res <- capture_warning(nm_join(mod1, .files = "1.tab", .join_col = "ID"))
