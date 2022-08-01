@@ -22,11 +22,11 @@ This is typically used for highlighting models that are of some importance to th
 }
 \section{Functions}{
 \itemize{
-\item \code{add_star}: Adds a star to the model.
+\item \code{add_star()}: Adds a star to the model.
 
-\item \code{remove_star}: Removes a star from the model.
+\item \code{remove_star()}: Removes a star from the model.
+
 }}
-
 \seealso{
 \code{\link[=run_log]{run_log()}} \code{\link[=collapse_to_string]{collapse_to_string()}} \code{\link[=modify_tags]{modify_tags()}} \code{\link[=modify_notes]{modify_notes()}}
 \code{\link[=modify_based_on]{modify_based_on()}} \code{\link[=modify_description]{modify_description()}} \code{\link[=modify_bbi_args]{modify_bbi_args()}}

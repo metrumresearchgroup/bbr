@@ -46,18 +46,18 @@ check_ext(.mod, .iter_floor = 0)
 
 Checks a NONMEM output file that's a whitespace-delimited file (for instance .grd or .ext)
 }
-\section{Methods (by generic)}{
+\section{Functions}{
 \itemize{
-\item \code{check_grd}: Checks .grd file from a file path
+\item \code{check_grd(character)}: Checks .grd file from a file path
 
-\item \code{check_grd}: Checks .grd file from a \code{bbi_nonmem_model}
+\item \code{check_grd(bbi_nonmem_model)}: Checks .grd file from a \code{bbi_nonmem_model}
 
-\item \code{check_grd}: Checks .grd file from a \code{bbi_nonmem_summary}
+\item \code{check_grd(bbi_nonmem_summary)}: Checks .grd file from a \code{bbi_nonmem_summary}
 
-\item \code{check_ext}: Checks .ext file from a file path
+\item \code{check_ext(character)}: Checks .ext file from a file path
 
-\item \code{check_ext}: Checks .ext file from a \code{bbi_nonmem_model} object
+\item \code{check_ext(bbi_nonmem_model)}: Checks .ext file from a \code{bbi_nonmem_model} object
 
-\item \code{check_ext}: Checks .ext file from a \code{bbi_nonmem_summary} object
+\item \code{check_ext(bbi_nonmem_summary)}: Checks .ext file from a \code{bbi_nonmem_summary} object
+
 }}
-

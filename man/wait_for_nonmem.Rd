@@ -25,8 +25,8 @@ Calling \code{wait_for_nonmem()} will freeze the user's console until the model(
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{bbi_nonmem_model}: takes a \code{bbi_nonmem_model} object.
+\item \code{wait_for_nonmem(bbi_nonmem_model)}: takes a \code{bbi_nonmem_model} object.
 
-\item \code{list}: takes a \code{list} of \code{bbi_nonmem_model} objects.
+\item \code{wait_for_nonmem(list)}: takes a \code{list} of \code{bbi_nonmem_model} objects.
+
 }}
-

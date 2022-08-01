@@ -19,12 +19,12 @@ to keep track of any changes made to the YAML that are \emph{not} reflected in t
 }
 \section{Functions}{
 \itemize{
-\item \code{reconcile_yaml}: Use to manually reconcile model object in memory with its YAML file.
+\item \code{reconcile_yaml()}: Use to manually reconcile model object in memory with its YAML file.
 Extracts YAML path from model object and pulls in YAML file.
 Any shared keys are overwritten with the values from the YAML and new keys in YAML are added to the model object.
 The md5 digest is then updated to reflect the new state.
 
-\item \code{check_yaml_in_sync}: Checks that model YAML file is the same as when it was last read into the model object.
+\item \code{check_yaml_in_sync()}: Checks that model YAML file is the same as when it was last read into the model object.
 Errors if the md5 digests are not identical. This is called internally in most functions that interact with a model object.
-}}
 
+}}

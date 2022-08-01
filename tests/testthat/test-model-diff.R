@@ -48,3 +48,8 @@ test_that("model_diff.bbi_nonmem_model errors with multiple based_on [BBR-MDF-00
     regexp = paste0("multiple models.+", MODEL_DIFF_ERR_MSG)
   )
 })
+
+test_that("model_diff() hides content of identical models [BBR-MDF-005]", {
+  mod <- read_model(MOD1_ABS_PATH)
+  expect_message(model_diff(mod, mod), "identical")
+})
