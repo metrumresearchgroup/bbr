@@ -73,9 +73,9 @@ ancestry. See \href{../articles/using-based-on.html}{"Using based_on field" vign
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{bbi_nonmem_model}: \code{.parent_mod} takes a \code{bbi_nonmem_model} object to use as a basis for the copy.
-}}
+\item \code{copy_model_from(bbi_nonmem_model)}: \code{.parent_mod} takes a \code{bbi_nonmem_model} object to use as a basis for the copy.
 
+}}
 \examples{
 \dontrun{
 parent <- read_model("/foo/parent")

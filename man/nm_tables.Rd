@@ -48,10 +48,10 @@ for alternatives.
 }
 \section{Functions}{
 \itemize{
-\item \code{nm_table_files}: Extract paths to table output files from NONMEM control
+\item \code{nm_table_files()}: Extract paths to table output files from NONMEM control
 stream, and optionally check if the files exist.
-}}
 
+}}
 \seealso{
 \code{\link[=nm_join]{nm_join()}}, \code{\link[=nm_file]{nm_file()}}
 }

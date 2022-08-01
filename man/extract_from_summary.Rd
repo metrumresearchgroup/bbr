@@ -27,15 +27,15 @@ These are all helper functions to extract a specific field or sub-field from a \
 }
 \section{Functions}{
 \itemize{
-\item \code{extract_param_count}: Extract count of non-fixed parameters
+\item \code{extract_param_count()}: Extract count of non-fixed parameters
 
-\item \code{extract_details}: Extract \code{run_details} field
+\item \code{extract_details()}: Extract \code{run_details} field
 
-\item \code{extract_heuristics}: Extract \code{run_heuristics} field
+\item \code{extract_heuristics()}: Extract \code{run_heuristics} field
 
-\item \code{extract_ofv}: Extract objective function value (without constant) for the final estimation method
+\item \code{extract_ofv()}: Extract objective function value (without constant) for the final estimation method
 
-\item \code{extract_condition_number}: Extract condition number for the final estimation method
+\item \code{extract_condition_number()}: Extract condition number for the final estimation method
+
 }}
-
 \keyword{internal}

@@ -48,21 +48,21 @@ Constructor functions for objects of fundamental bbr classes.
 }
 \section{Functions}{
 \itemize{
-\item \code{create_model_object}: Creates list object of class \verb{bbi_\{.model_type\}_model} from named list with \code{MODEL_REQ_INPUT_KEYS}
+\item \code{create_model_object()}: Creates list object of class \verb{bbi_\{.model_type\}_model} from named list with \code{MODEL_REQ_INPUT_KEYS}
 
-\item \code{create_summary_object}: Create list object of \verb{bbi_\{.model_type\}_summary} class, first checking that all the required keys are present.
+\item \code{create_summary_object()}: Create list object of \verb{bbi_\{.model_type\}_summary} class, first checking that all the required keys are present.
 
-\item \code{create_summary_list}: Create list output from \code{\link[=model_summaries]{model_summaries()}}. Each element will contain a \verb{bbi_\{.model_type\}_summary} object, as well as some metadata about possible errors.
+\item \code{create_summary_list()}: Create list output from \code{\link[=model_summaries]{model_summaries()}}. Each element will contain a \verb{bbi_\{.model_type\}_summary} object, as well as some metadata about possible errors.
 
-\item \code{create_process_object}: Create list object of \code{bbi_process} class, first checking that all the required keys are present.
+\item \code{create_process_object()}: Create list object of \code{bbi_process} class, first checking that all the required keys are present.
 
-\item \code{create_run_log_object}: Create tibble object of \code{bbi_run_log_df} class, first checking that all the required columns are present.
+\item \code{create_run_log_object()}: Create tibble object of \code{bbi_run_log_df} class, first checking that all the required columns are present.
 
-\item \code{create_config_log_object}: Create tibble object of \code{bbi_config_log_df} class, first checking that all the required columns are present.
+\item \code{create_config_log_object()}: Create tibble object of \code{bbi_config_log_df} class, first checking that all the required columns are present.
 
-\item \code{create_summary_log_object}: Create tibble object of \code{bbi_summary_log_df} class, first checking that all the required columns are present.
+\item \code{create_summary_log_object()}: Create tibble object of \code{bbi_summary_log_df} class, first checking that all the required columns are present.
 
-\item \code{create_log_df_impl}: Implementation function used to create objects of class \code{bbi_summary_log_df}, \code{bbi_config_log_df}, and \code{bbi_summary_log_df}
+\item \code{create_log_df_impl()}: Implementation function used to create objects of class \code{bbi_summary_log_df}, \code{bbi_config_log_df}, and \code{bbi_summary_log_df}
+
 }}
-
 \keyword{internal}

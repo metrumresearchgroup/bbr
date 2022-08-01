@@ -43,14 +43,14 @@ tail_lst(.mod, ...)
 Reads the head and tail of specified file and prints it the console and/or returns it as a character vector.
 This is called internally in several S3 methods described below.
 }
-\section{Methods (by generic)}{
+\section{Functions}{
 \itemize{
-\item \code{tail_output}: Tail the OUTPUT file from a file path to a model.
+\item \code{tail_output(character)}: Tail the OUTPUT file from a file path to a model.
 
-\item \code{tail_output}: Tail the OUTPUT file from a \code{bbi_nonmem_model} object.
+\item \code{tail_output(bbi_nonmem_model)}: Tail the OUTPUT file from a \code{bbi_nonmem_model} object.
 
-\item \code{tail_lst}: Tail the .lst file from a file path to a model.
+\item \code{tail_lst(character)}: Tail the .lst file from a file path to a model.
 
-\item \code{tail_lst}: Tail the .lst file from a \code{bbi_nonmem_model} object.
+\item \code{tail_lst(bbi_nonmem_model)}: Tail the .lst file from a \code{bbi_nonmem_model} object.
+
 }}
-

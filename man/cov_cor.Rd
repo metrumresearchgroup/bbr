@@ -32,11 +32,11 @@ If no \code{.cov} or \code{.cor} files are found for the relevant model, will er
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{bbi_nonmem_model}: Get cov and cor from \code{bbi_nonmem_model} object
+\item \code{cov_cor(bbi_nonmem_model)}: Get cov and cor from \code{bbi_nonmem_model} object
 
-\item \code{bbi_nonmem_summary}: Get cov and cor from \code{bbi_nonmem_summary} object (output of \code{model_summary()})
+\item \code{cov_cor(bbi_nonmem_summary)}: Get cov and cor from \code{bbi_nonmem_summary} object (output of \code{model_summary()})
+
 }}
-
 \seealso{
 \code{\link[=model_summary]{model_summary()}}, \code{\link[=check_cor_threshold]{check_cor_threshold()}}
 }
