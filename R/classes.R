@@ -82,13 +82,6 @@ create_summary_object <- function(res, .model_type = SUPPORTED_MOD_TYPES) {
     strict_mode_error(err_msg)
   }
 
-  ofvs <- res[[OFV_COL]]
-  # if (!is.null(ofvs)) {
-  #   res[[OFV_COL]] <- map(
-  #     ofvs,
-  #     function(xs) map_if(xs, ~ .x == BBI_NULL_NUM, ~ NA_real_))
-  # }
-
   # assign class and return
   class(res) <- c(as.character(glue("bbi_{.model_type}_summary")), BBI_PARENT_CLASS, class(res))
   return(res)

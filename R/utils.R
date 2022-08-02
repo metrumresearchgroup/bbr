@@ -607,12 +607,8 @@ wait_for_nonmem.list <- function(.mod, .time_limit = 300, .interval = 5) {
 #' @keywords internal
 set_bbi_null <- function(.vals){
   map(.vals, function(.val){
-    if(inherits(.val, "character") && .val == BBI_NULL_STR){
-      return(NA_character_)
-    }else if(inherits(.val, "numeric") && .val == BBI_NULL_NUM){
+    if(inherits(.val, c("integer", "numeric", "character")) && (.val == BBI_NULL_NUM)){
       return(NA_real_)
-    }else if(inherits(.val, "integer") && .val == BBI_NULL_NUM){
-      return(NA_integer_)
     }else{
       return(.val)
     }
