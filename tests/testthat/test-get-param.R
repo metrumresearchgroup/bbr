@@ -48,7 +48,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     mod2 <- MOD1 %>% copy_model_from(basename(NEW_MOD2))
 
     # copy output directory (to simulate model run)
-    fs::dir_copy(MOD1_PATH, NEW_MOD2)
+    copy_output_dir(MOD1, NEW_MOD2)
 
     thetas <- list(MOD1, mod2) %>% model_summaries() %>% get_theta()
     par_df <- MOD1 %>% model_summary() %>% param_estimates() %>% filter(grepl("THETA", parameter_names))

@@ -106,7 +106,7 @@ model_summaries_concurrent <- function(.mods, .bbi_args, .fail_flags) {
   paths <- map_chr(
     .mods,
     # Take relative paths to minimize argument length.
-    ~ fs::path_rel(check_lst_file(get_output_dir(.x))))
+    ~ fs::path_rel(build_path_from_model(.x, ".lst")))
 
   summaries <- bbi_exec_model_summaries(.bbi_args, paths)
   if (length(summaries$Errors) > 0) {

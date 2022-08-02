@@ -190,12 +190,6 @@ nonmem_summary <- function(
   # extract output path
   .path <- get_output_dir(.mod)
 
-  # lst file can both be the check for whether the dir is a nonmem output dir
-  # and also the output always should be runname.lst so we can determine the model name
-  # this is definitely better checking for .mod as there are temporary files with that extension
-  # as well
-  lst_file_path <- check_lst_file(.path)
-
   # build command line args
   if (is.null(.bbi_args)) {
     .bbi_args <- list()
@@ -203,7 +197,7 @@ nonmem_summary <- function(
   .bbi_args <- purrr::list_modify(.bbi_args, json = TRUE)
 
   args_vec <- check_bbi_args(.bbi_args)
-  cmd_args <- c("nonmem", "summary", get_model_id(lst_file_path), args_vec)
+  cmd_args <- c("nonmem", "summary", get_model_id(.mod), args_vec)
 
   # if .dry_run return output call
   if (.dry_run) {
@@ -212,13 +206,7 @@ nonmem_summary <- function(
   }
 
   # otherwise, execute
-  res <- tryCatch(
-    bbi_exec(cmd_args, .dir = .path, ..., .wait = TRUE),
-    error = function(e) {
-      err_msg <- glue("nonmem_summary('{.path}') failed with the following error. This may be because the modeling run has not finished successfully.\n\nERROR: \n{e}")
-      stop(err_msg, call. = FALSE)
-    }
-  )
+  res <- bbi_exec(cmd_args, .dir = .path, ..., .wait = TRUE, .check_status = FALSE)
 
   res_list <- list2(
     !!ABS_MOD_PATH := tools::file_path_sans_ext(get_model_path(.mod))
@@ -228,26 +216,14 @@ nonmem_summary <- function(
     paste(collapse="") %>%
     jsonlite::fromJSON(simplifyDataFrame = FALSE)
 
+  if (!is.null(bbi_list$error_msg)) {
+    err_msg <- glue("model_summary({get_model_id(.mod)}) failed with the following error. This may be because the modeling run has not finished successfully.\n\nERROR: \n{bbi_list$error_msg}")
+    stop(err_msg, call. = FALSE)
+  }
+
   res_list <- combine_list_objects(res_list, bbi_list)
 
   res_list <- create_summary_object(res_list)
 
   return(res_list)
 }
-
-#' Private helper function to look for .lst function in a directory
-#' @param .x The directory path to look in for the lst file
-#' @importFrom glue glue
-#' @keywords internal
-check_lst_file <- function(.x) {
-  lst_file <- fs::dir_ls(.x, type = "file", glob = "*.lst")
-
-  nfiles <- length(lst_file)
-  if (!nfiles) {
-    stop(glue("Unable to locate `.lst` file in dir: {.x}. Check to be sure this is a NONMEM output folder, and that the run has finished successfully."))
-  } else if (nfiles > 1) {
-    stop(glue("More than one `.lst` file found in dir: {.x}"))
-  }
-  lst_file
-}
-
