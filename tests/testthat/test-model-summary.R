@@ -166,8 +166,12 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     # delete a necessary file
     fs::file_delete(build_path_from_model(mod2, ".lst"))
 
-    # try to run and expect error with NOT_FINISHED_ERR_MSG
-    expect_error(model_summary(mod2), regexp = NOT_FINISHED_ERR_MSG)
+    regexp <- if (test_bbi_version(read_bbi_path(), .min_version = "3.2.0")) {
+      NOT_FINISHED_ERR_MSG
+    } else {
+      NO_LST_ERR_MSG
+    }
+    expect_error(model_summary(mod2), regexp = regexp)
   })
 
   test_that("model_summary works with multiple estimation methods [BBR-SUM-010]", {

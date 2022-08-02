@@ -190,6 +190,11 @@ nonmem_summary <- function(
   # extract output path
   .path <- get_output_dir(.mod)
 
+  # Everything under old_bbi conditions can be removed once bbr.bbi_min_version
+  # is at least v3.2.0.
+  old_bbi <- !test_bbi_version(.min_version = "3.2.0")
+  mod_arg <- if (old_bbi) check_lst_file(.path) else .mod
+
   # build command line args
   if (is.null(.bbi_args)) {
     .bbi_args <- list()
@@ -197,7 +202,7 @@ nonmem_summary <- function(
   .bbi_args <- purrr::list_modify(.bbi_args, json = TRUE)
 
   args_vec <- check_bbi_args(.bbi_args)
-  cmd_args <- c("nonmem", "summary", get_model_id(.mod), args_vec)
+  cmd_args <- c("nonmem", "summary", get_model_id(mod_arg), args_vec)
 
   # if .dry_run return output call
   if (.dry_run) {
@@ -206,7 +211,17 @@ nonmem_summary <- function(
   }
 
   # otherwise, execute
-  res <- bbi_exec(cmd_args, .dir = .path, ..., .wait = TRUE, .check_status = FALSE)
+  res <- if (old_bbi) {
+    tryCatch(
+      bbi_exec(cmd_args, .dir = .path, ..., .wait = TRUE),
+      error = function(e) {
+        err_msg <- glue("nonmem_summary('{.path}') failed with the following error. This may be because the modeling run has not finished successfully.\n\nERROR: \n{e}")
+        stop(err_msg, call. = FALSE)
+      }
+    )
+  } else {
+    bbi_exec(cmd_args, .dir = .path, ..., .wait = TRUE, .check_status = FALSE)
+  }
 
   res_list <- list2(
     !!ABS_MOD_PATH := tools::file_path_sans_ext(get_model_path(.mod))
@@ -216,7 +231,7 @@ nonmem_summary <- function(
     paste(collapse="") %>%
     jsonlite::fromJSON(simplifyDataFrame = FALSE)
 
-  if (!is.null(bbi_list$error_msg)) {
+  if (!(old_bbi || is.null(bbi_list$error_msg))) {
     err_msg <- glue("model_summary({get_model_id(.mod)}) failed with the following error. This may be because the modeling run has not finished successfully.\n\nERROR: \n{bbi_list$error_msg}")
     stop(err_msg, call. = FALSE)
   }
@@ -227,3 +242,22 @@ nonmem_summary <- function(
 
   return(res_list)
 }
+
+# check_lst_file() can be removed once bbr.bbi_min_version is at least 3.2.0.
+
+#' Private helper function to look for .lst function in a directory
+#' @param .x The directory path to look in for the lst file
+#' @importFrom glue glue
+#' @keywords internal
+check_lst_file <- function(.x) {
+  lst_file <- fs::dir_ls(.x, type = "file", glob = "*.lst")
+
+  nfiles <- length(lst_file)
+  if (!nfiles) {
+    stop(glue("Unable to locate `.lst` file in dir: {.x}. Check to be sure this is a NONMEM output folder, and that the run has finished successfully."))
+  } else if (nfiles > 1) {
+    stop(glue("More than one `.lst` file found in dir: {.x}"))
+  }
+  lst_file
+}
+

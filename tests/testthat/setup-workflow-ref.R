@@ -89,7 +89,12 @@ if (test_bbi_version(read_bbi_path(), .min_version = "3.2.0")) {
   SUM_NAMES_REF <- c(SUM_NAMES_REF, "success")
 }
 
-NOT_FINISHED_ERR_MSG <- "model_summary.*modeling run has not finished"
+NO_LST_ERR_MSG <- "Unable to locate `.lst` file.*NONMEM output folder"
+NOT_FINISHED_ERR_MSG <- if (test_bbi_version(read_bbi_path(), .min_version = "3.2.0")) {
+  "model_summary.*modeling run has not finished"
+} else {
+  "nonmem_summary.*modeling run has not finished"
+}
 
 MOD1_ABS_PATH <- fs::path_norm(file.path(getwd(), tools::file_path_sans_ext(YAML_TEST_FILE))) %>% as.character()
 MOD2_ABS_PATH <- fs::path_norm(file.path(getwd(), NEW_MOD2)) %>% as.character()
