@@ -11,7 +11,20 @@
 #'
 #' @param .base_dir Base directory to look in for models.
 #' @param .recurse If `TRUE`, the default, search recursively in all subdirectories. Passed through to `fs::dir_ls()` -- If a positive number, the number of levels to recurse.
-#' @param .include Provides filter for runs based on an input vector.
+#' @param .include A character vector specifying which runs or model tags to include in the log
+#' Provides filter for runs based on an input vector.
+#'
+#' @details
+#' `.include` can contain both run names and tags (in any order). Only models having a tag or run name that include those strings will be returned
+#'
+#' @examples
+#' \dontrun{
+#' run_log(MODEL_DIR, .include = c(1, "new tag 1"))
+#'
+#' run_log(MODEL_DIR, .include = c("acop tag", 2, 3))
+#'
+#' }
+#'
 #' @importFrom purrr map_df
 #' @importFrom tibble tibble
 #' @return A tibble of class `bbi_run_log_df` with information on each model, or an empty tibble if no models are found.
@@ -84,7 +97,7 @@ find_models <- function(.base_dir, .recurse , .include) {
     }) %>% bind_rows()
     yaml_df <- yaml_df %>% filter(.data$yaml %>% basename() %>% stringr::str_remove(".yaml|.yml") %in% .include | .data$tags %in% .include)
     yaml_files <- unique(yaml_df$yaml)
-    mod_list <- mod_list[map(mod_list, ~ .x$absolute_model_path %in% yaml_files) %>% unlist()]
+    mod_list <- mod_list[map_lgl(mod_list, ~ .x$absolute_model_path %in% yaml_files)]
   }
 
   if(length(mod_list) == 0){
