@@ -44,12 +44,20 @@ model_summaries <- function(
 
 #' @importFrom purrr map
 model_summaries_serial <- function(.mods, .bbi_args, .fail_flags) {
+  format_error <- function(err) {
+    return(list(error_msg = paste(as.character(err$message),
+                                  collapse = " -- ")))
+  }
+
   map(.mods, function(.m) {
     .s <- tryCatch(
       {
         model_summary(.m, .bbi_args = .bbi_args)
       },
       error = function(.e) {
+        if (is.null(.fail_flags)) {
+          return(format_error(.e))
+        }
         # if fails, try again with flags
         tryCatch({
           if (!is.null(.bbi_args)) {
@@ -59,10 +67,7 @@ model_summaries_serial <- function(.mods, .bbi_args, .fail_flags) {
           .retry$needed_fail_flags <- TRUE
           return(.retry)
         },
-        error = function(.e) {
-          .error_msg <- paste(as.character(.e$message), collapse = " -- ")
-          return(list(error_msg = .error_msg))
-        })
+        error = format_error)
       }
     )
 
@@ -109,7 +114,7 @@ model_summaries_concurrent <- function(.mods, .bbi_args, .fail_flags) {
     ~ fs::path_rel(build_path_from_model(.x, ".lst")))
 
   summaries <- bbi_exec_model_summaries(.bbi_args, paths)
-  if (length(summaries$Errors) > 0) {
+  if (length(summaries$Errors) > 0 && !is.null(.fail_flags)) {
     idx_failed <- summaries$Errors + 1
     args_retry <- .fail_flags
     if (!is.null(.bbi_args)) {
@@ -120,21 +125,25 @@ model_summaries_concurrent <- function(.mods, .bbi_args, .fail_flags) {
                                    ~ c(.x, needed_fail_flags = TRUE))
 
     if (length(summaries_retry$Errors) > 0) {
-      idx_retry_failed <- summaries_retry$Errors + 1
-      summaries_retry$Results[idx_retry_failed] <- map(
-        summaries_retry$Results[idx_retry_failed],
-        ~ {
-          # As of bbi v3.2.0, we get the errors from the JSON returned `bbi
-          # nonmem summary`, and that includes a default-value object for
-          # run_details and run_heuristics. Set it to the value that downstream
-          # code expects.
-          .x[[SUMMARY_DETAILS]] <- NA
-          .x[[SUMMARY_HEURISTICS]] <- NA
-          .x
-        })
+      summaries$Errors <- summaries$Errors[summaries_retry$Errors + 1]
+    } else {
+      summaries$Errors <- list()
     }
     summaries$Results[idx_failed] <- summaries_retry$Results
-    summaries$Errors <- summaries_retry$Errors
+  }
+
+  if (length(summaries$Errors) > 0) {
+    idx_failed <- summaries$Errors + 1
+    summaries$Results[idx_failed] <- map(
+      summaries$Results[idx_failed],
+      ~ {
+        # As of bbi v3.2.0, we get the errors from the JSON returned `bbi nonmem
+        # summary`, and that includes a default-value object for run_details and
+        # run_heuristics. Set it to the value that downstream code expects.
+        .x[[SUMMARY_DETAILS]] <- NA
+        .x[[SUMMARY_HEURISTICS]] <- NA
+        .x
+      })
   }
 
   # Reshape the results into the form expected by create_summary_list().
