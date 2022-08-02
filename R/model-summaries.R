@@ -104,7 +104,7 @@ bbi_exec_model_summaries <- function(args, paths) {
 #' This function consumes the v3.2.0 output, returning an object that can be
 #' passed to [create_summary_list()].
 #'
-#' @importFrom purrr map map_chr modify_if walk
+#' @importFrom purrr map_chr modify_at modify_if walk
 #' @keywords internal
 model_summaries_concurrent <- function(.mods, .bbi_args, .fail_flags) {
   walk(.mods, check_yaml_in_sync)
@@ -133,9 +133,9 @@ model_summaries_concurrent <- function(.mods, .bbi_args, .fail_flags) {
   }
 
   if (length(summaries$Errors) > 0) {
-    idx_failed <- summaries$Errors + 1
-    summaries$Results[idx_failed] <- map(
-      summaries$Results[idx_failed],
+    summaries$Results <- modify_at(
+      summaries$Results,
+      .at = summaries$Errors + 1,
       ~ {
         # As of bbi v3.2.0, we get the errors from the JSON returned `bbi nonmem
         # summary`, and that includes a default-value object for run_details and
