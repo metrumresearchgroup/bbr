@@ -104,7 +104,7 @@ bbi_exec_model_summaries <- function(args, paths) {
 #' This function consumes the v3.2.0 output, returning an object that can be
 #' passed to [create_summary_list()].
 #'
-#' @importFrom purrr map map_chr walk
+#' @importFrom purrr map map_chr modify_if walk
 #' @keywords internal
 model_summaries_concurrent <- function(.mods, .bbi_args, .fail_flags) {
   walk(.mods, check_yaml_in_sync)
@@ -121,9 +121,9 @@ model_summaries_concurrent <- function(.mods, .bbi_args, .fail_flags) {
       args_retry <- combine_list_objects(args_retry, .bbi_args)
     }
     summaries_retry <- bbi_exec_model_summaries(args_retry, paths[idx_failed])
-    summaries_retry$Results <- map(summaries_retry$Results,
-                                   ~ c(.x, needed_fail_flags = TRUE))
-
+    summaries_retry$Results <- modify_if(summaries_retry$Results,
+                                         ~ .x$success,
+                                         ~ c(.x, needed_fail_flags = TRUE))
     if (length(summaries_retry$Errors) > 0) {
       summaries$Errors <- summaries$Errors[summaries_retry$Errors + 1]
     } else {

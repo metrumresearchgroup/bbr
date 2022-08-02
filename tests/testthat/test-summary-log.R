@@ -117,6 +117,7 @@ test_that("summary_log works some failed summaries [BBR-SMLG-008]", {
   sum_df <- summary_log(MODEL_DIR)
   expect_equal(is.na(sum_df$error_msg), c(TRUE, TRUE, TRUE, FALSE))
   expect_equal(ncol(sum_df), SUM_LOG_COLS)
+  expect_equal(sum_df[[SL_FAIL_FLAGS]], c(FALSE, FALSE, FALSE, FALSE))
 
   sum_df <- summary_log(MODEL_DIR, .bbi_args = list(no_grd_file = TRUE))
   test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3, LEVEL2_MOD), SUM_LOG_COLS)
@@ -131,7 +132,7 @@ test_that("summary_log works some failed summaries [BBR-SMLG-008]", {
   sum_df <- summary_log(MODEL_DIR, .fail_flags = list(no_grd_file = TRUE))
   expect_equal(is.na(sum_df$error_msg), c(TRUE, FALSE, TRUE, TRUE))
   expect_equal(ncol(sum_df), SUM_LOG_COLS)
-  expect_equal(sum_df[[SL_FAIL_FLAGS]], c(FALSE, TRUE, FALSE, TRUE))
+  expect_equal(sum_df[[SL_FAIL_FLAGS]], c(FALSE, FALSE, FALSE, TRUE))
 })
 
 test_that("summary_log works all failed summaries [BBR-SMLG-009]", {
