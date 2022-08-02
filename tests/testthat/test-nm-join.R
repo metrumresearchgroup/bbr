@@ -165,3 +165,28 @@ test_that("nm_join() warns on skipping table with wrong number of rows [BBR-NMJ-
   expect_equal(nrow(test_df), DATA_TEST_ROWS)
   expect_equal(ncol(test_df), DATA_TEST_COLS)
 })
+
+test_that("Checking .join col is unique",{
+  withr::with_tempdir({
+    fs::dir_copy(system.file("model","nonmem", "basic",package = "bbr"), tempdir())
+
+    on.exit(if( fs::dir_exists(file.path(tempdir(), "basic"))) fs::dir_delete(file.path(tempdir(), "basic")))
+
+    #Edit Table File to Create Duplicate NUM Row
+    file.path(tempdir(), "basic", "1", "1.tab") %>% read_lines() %>%
+      str_replace("2.0000E","1.0000E") %>% write_lines(file.path(tempdir(), "basic", "1", "1.tab"))
+
+    fs::file_copy(system.file("extdata", "acop.csv", package = "bbr"), file.path(tempdir(), "basic", "1"))
+
+    json <- jsonlite::read_json(file.path(tempdir(), "basic", "1", "bbi_config.json"))
+    json$data_path <- "acop.csv"
+    jsonlite::write_json(json,file.path(tempdir(), "basic", "1", "bbi_config.json"))
+
+    expect_error(file.path(tempdir(), "basic", "1") %>% nm_join(.files = "1.tab"))
+
+
+
+
+  })
+
+})

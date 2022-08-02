@@ -180,5 +180,18 @@ drop_dups <- function(.new_table, .dest_table, .join_col, .table_name) {
   if (length(drop) > 0) verbose_msg(glue("  dropping {length(drop)} duplicate cols: {paste(drop, collapse = ', ')}"))
   verbose_msg("") # for newline
 
+  if(.new_table[.join_col] %>% anyDuplicated() != 0)
+  {
+    dup_row <- .new_table[.join_col][duplicated( .new_table[.join_col]) %>% which(),]
+    stop(verbose_msg(glue("Duplicate rows in {.join_col}: {dup_row}")))
+  }
+
+  if(.dest_table[.join_col] %>% anyDuplicated() != 0)
+  {
+    dup_row <- .dest_table[.join_col][duplicated( .dest_table[.join_col]) %>% which(),]
+    stop(verbose_msg(glue("Duplicate rows in {.join_col}: {dup_row}")))
+  }
+
+
   return(.new_table[keep])
 }
