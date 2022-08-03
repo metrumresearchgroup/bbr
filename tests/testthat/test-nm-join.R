@@ -166,7 +166,7 @@ test_that("nm_join() warns on skipping table with wrong number of rows [BBR-NMJ-
   expect_equal(ncol(test_df), DATA_TEST_COLS)
 })
 
-test_that("Checking .join col is unique",{
+test_that("Checking .join_col for tab file",{
   withr::with_tempdir({
     fs::dir_copy(system.file("model","nonmem", "basic",package = "bbr"), tempdir())
     on.exit(if( fs::dir_exists(file.path(tempdir(), "basic"))) fs::dir_delete(file.path(tempdir(), "basic")))
@@ -184,6 +184,6 @@ test_that("Checking .join col is unique",{
 
     jsonlite::write_json(json,file.path(tempdir(), "basic", "1", "bbi_config.json"))
 
-    file.path(tempdir(), "basic", "1") %>% nm_join(.files = "1.tab")
+    expect_error(file.path(tempdir(), "basic", "1") %>% nm_join(.files = "1.tab"))
 
   })})
