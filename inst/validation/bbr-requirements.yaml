@@ -567,7 +567,7 @@ NMJ-R006:
   tests:
   - BBR-NMJ-006
 NMJ-R007:
-   description: nm_join() errors on duplicate join columns
+   description: nm_join() errors on duplicate rows in join columns
    tests:
   - BBR-NMJ-007
 NMT-R001:
