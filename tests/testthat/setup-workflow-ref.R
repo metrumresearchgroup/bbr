@@ -85,9 +85,16 @@ SUMS_LIST_NAMES_REF <- c("absolute_model_path", "bbi_summary", "error_msg", "nee
 
 SUM_NAMES_REF <- c("absolute_model_path", "run_details", "run_heuristics", "parameters_data",
                    "parameter_names", "ofv", "condition_number", "shrinkage_details")
+if (test_bbi_version(read_bbi_path(), .min_version = "3.2.0")) {
+  SUM_NAMES_REF <- c(SUM_NAMES_REF, "success")
+}
 
-NOT_FINISHED_ERR_MSG <- "nonmem_summary.*modeling run has not finished"
 NO_LST_ERR_MSG <- "Unable to locate `.lst` file.*NONMEM output folder"
+NOT_FINISHED_ERR_MSG <- if (test_bbi_version(read_bbi_path(), .min_version = "3.2.0")) {
+  "model_summary.*modeling run has not finished"
+} else {
+  "nonmem_summary.*modeling run has not finished"
+}
 
 MOD1_ABS_PATH <- fs::path_norm(file.path(getwd(), tools::file_path_sans_ext(YAML_TEST_FILE))) %>% as.character()
 MOD2_ABS_PATH <- fs::path_norm(file.path(getwd(), NEW_MOD2)) %>% as.character()
@@ -160,6 +167,32 @@ FAKE_CTL_PATH <- fs::path_norm(file.path(getwd(), MODEL_DIR, CTL_TEST_FILE)) %>%
 # test helper functions
 ########################
 
+copy_output_dir <- function(orig_mod, new_dir_path) {
+  fs::dir_copy(
+    orig_mod[[ABS_MOD_PATH]],
+    new_dir_path
+  )
+
+  # replace file names with new model ID
+  orig_mod_id <- get_model_id(orig_mod)
+  new_mod_id <- basename(new_dir_path)
+  purrr::walk(fs::dir_ls(new_dir_path), ~ {
+    if (stringr::str_detect(basename(.x), glue("^{orig_mod_id}"))) {
+      fs::file_move(
+        .x,
+        file.path(
+          dirname(.x),
+          stringr::str_replace(
+            basename(.x),
+            glue("^{orig_mod_id}"),
+            new_mod_id
+          )
+        )
+      )
+    }
+  })
+}
+
 create_all_models <- function() {
   mod1 <- read_model(MOD1_PATH)
   mod2 <- copy_model_from(mod1, basename(NEW_MOD2),   "level 1 copy of 1")
@@ -176,9 +209,9 @@ create_all_models <- function() {
 
 copy_all_output_dirs <- function() {
   if (!fs::dir_exists(LEVEL2_DIR)) { fs::dir_create(LEVEL2_DIR) }
-  fs::dir_copy(MOD1_PATH, NEW_MOD2)
-  fs::dir_copy(MOD1_PATH, NEW_MOD3)
-  fs::dir_copy(MOD1_PATH, LEVEL2_MOD)
+  copy_output_dir(MOD1, NEW_MOD2)
+  copy_output_dir(MOD1, NEW_MOD3)
+  copy_output_dir(MOD1, LEVEL2_MOD)
 }
 
 create_rlg_models <- function() {
@@ -192,6 +225,7 @@ create_rlg_models <- function() {
     .inherit_tags = TRUE,
     .update_model_file = FALSE
   )
+  return(invisible(NULL))
 }
 
 clean_test_enviroment <- function(.f = NULL , env = parent.frame())

@@ -2,15 +2,15 @@
 % Please edit documentation in R/helpers-for-tests.R
 \name{skip_if_old_bbi}
 \alias{skip_if_old_bbi}
-\title{Skip test if bbi version is as old or older than the given version.}
+\title{Skip test if current bbi version is below specified one.}
 \usage{
 skip_if_old_bbi(v)
 }
 \arguments{
-\item{v}{a package version or a string that can be converted to one}
+\item{v}{a package version (or a string that can be converted to one) to pass
+as the .min_version argument of \code{test_bbi_version()}.}
 }
 \description{
-If the version can't be parsed by \code{\link[=package_version]{package_version()}}, the test is never
-skipped.
+Skip test if current bbi version is below specified one.
 }
 \keyword{internal}
