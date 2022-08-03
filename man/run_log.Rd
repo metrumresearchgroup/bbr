@@ -11,8 +11,7 @@ run_log(.base_dir, .recurse = TRUE, .include = NULL)
 
 \item{.recurse}{If \code{TRUE}, the default, search recursively in all subdirectories. Passed through to \code{fs::dir_ls()} -- If a positive number, the number of levels to recurse.}
 
-\item{.include}{A character vector specifying which runs or model tags to include in the log
-Provides filter for runs based on an input vector.}
+\item{.include}{A character vector specifying which runs or model tags to include in the run log.}
 }
 \value{
 A tibble of class \code{bbi_run_log_df} with information on each model, or an empty tibble if no models are found.

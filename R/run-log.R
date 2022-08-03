@@ -11,8 +11,7 @@
 #'
 #' @param .base_dir Base directory to look in for models.
 #' @param .recurse If `TRUE`, the default, search recursively in all subdirectories. Passed through to `fs::dir_ls()` -- If a positive number, the number of levels to recurse.
-#' @param .include A character vector specifying which runs or model tags to include in the log
-#' Provides filter for runs based on an input vector.
+#' @param .include A character vector specifying which runs or model tags to include in the run log.
 #'
 #' @details
 #' `.include` can contain both run names and tags (in any order). Only models having a tag or run name that include those strings will be returned
