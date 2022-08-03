@@ -72,6 +72,9 @@ create_summary_object <- function(res, .model_type = SUPPORTED_MOD_TYPES) {
 
   .model_type <- match.arg(.model_type)
 
+  # Overwrite cases of BBI_NULL_NUM to NA_real_
+  res <- map_list_recursive(res, set_bbi_null)
+
   # check for required keys, just as an extra safety precaution
   if (!check_required_keys(res, .req = SUMMARY_REQ_KEYS)) {
     err_msg <- paste0(
@@ -80,13 +83,6 @@ create_summary_object <- function(res, .model_type = SUPPORTED_MOD_TYPES) {
       "`\nObject has the following keys: ", paste(names(res) %||% "NO NAMES", collapse=", ")
     )
     strict_mode_error(err_msg)
-  }
-
-  ofvs <- res[[OFV_COL]]
-  if (!is.null(ofvs)) {
-    res[[OFV_COL]] <- map(
-      ofvs,
-      function(xs) map_if(xs, ~ .x == BBI_NULL_NUM, ~ NA_real_))
   }
 
   # assign class and return

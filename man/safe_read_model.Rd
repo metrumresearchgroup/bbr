@@ -2,7 +2,7 @@
 % Please edit documentation in R/run-log.R
 \name{safe_read_model}
 \alias{safe_read_model}
-\title{Read in model YAML with error handling}
+\title{Read in model with error handling}
 \usage{
 safe_read_model(.path)
 }
@@ -15,6 +15,6 @@ without extension, and (possibly) the output directory.}
 A model object, if \code{.path} represents a valid model.
 }
 \description{
-Private helper function that tries to call \code{read_model()} on a yaml path and returns NULL, with no error, if the YAML is not a valid model file.
+Private helper function that tries to call \code{read_model()} on a model path and returns NULL, with no error, if the YAML is not a valid model file.
 }
 \keyword{internal}
