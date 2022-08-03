@@ -599,7 +599,7 @@ wait_for_nonmem.list <- function(.mod, .time_limit = 300, .interval = 5) {
 }
 
 
-#' Replace BBI_NULL_NUM and BBI_NULL_STR with NA_real_ or NA_character_
+#' Replace BBI_NULL_NUM and BBI_NULL_STR with NA_real_
 #'
 #' @param .vals a numeric or character vector
 #'

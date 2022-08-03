@@ -72,6 +72,9 @@ create_summary_object <- function(res, .model_type = SUPPORTED_MOD_TYPES) {
 
   .model_type <- match.arg(.model_type)
 
+  # Overwrite cases of BBI_NULL_NUM to NA_real_
+  res <- map_list_recursive(res, set_bbi_null)
+
   # check for required keys, just as an extra safety precaution
   if (!check_required_keys(res, .req = SUMMARY_REQ_KEYS)) {
     err_msg <- paste0(
