@@ -166,17 +166,17 @@ test_that("nm_join() warns on skipping table with wrong number of rows [BBR-NMJ-
   expect_equal(ncol(test_df), DATA_TEST_COLS)
 })
 
-test_that("Checking .join_col for tab file",{
+test_that("Checking .join_col for files",{
+  withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   withr::with_tempdir({
-    fs::dir_copy(system.file("model","nonmem", "basic",package = "bbr"), tempdir())
+    fs::dir_copy(system.file("model","nonmem", "basic",package = "bbr"), file.path(tempdir(),"basic"))
     on.exit(if( fs::dir_exists(file.path(tempdir(), "basic"))) fs::dir_delete(file.path(tempdir(), "basic")))
+    fs::file_copy(system.file("extdata", "acop.csv", package = "bbr"), file.path(tempdir(), "basic", "1"), overwrite = TRUE)
 
 
     #Edit Table File to Create Duplicate NUM Row
     file.path(tempdir(), "basic", "1", "1.tab") %>% read_lines() %>%
       str_replace("2.0000E","1.0000E") %>% write_lines(file.path(tempdir(), "basic", "1", "1.tab"))
-
-    fs::file_copy(system.file("extdata", "acop.csv", package = "bbr"), file.path(tempdir(), "basic", "1"))
 
     json <- jsonlite::read_json(file.path(tempdir(), "basic", "1", "bbi_config.json"))
 
@@ -186,4 +186,12 @@ test_that("Checking .join_col for tab file",{
 
     expect_error(file.path(tempdir(), "basic", "1") %>% nm_join(.files = "1.tab"))
 
-  })})
+    fs::file_copy(system.file("model","nonmem", "basic","1", "1.tab",package = "bbr"),
+                  file.path(tempdir(), "basic", "1", "1.tab"), overwrite = TRUE)
+    .d <- readr::read_csv(file.path(tempdir(), "basic", "1", "acop.csv"))
+    .d$num[2] <- 1
+    readr::write_csv(.d, file.path(tempdir(), "basic", "1", "acop.csv"))
+
+    expect_error(file.path(tempdir(), "basic", "1") %>% nm_join(.files = "1.tab"))
+
+  })})})
