@@ -55,6 +55,11 @@ CFG-S006:
   - SBMT-R006
   - SBMT-R007
   - SBMT-R015
+CFG-S007:
+  name: Set execution mode globally
+  description: As a user, I want parallel to be set to TRUE if threads are specified to be greater than 1.
+  ProductRisk: Low
+  requirements:
   - UTL-R014
 MGMT-S001:
   name: Create new model object
