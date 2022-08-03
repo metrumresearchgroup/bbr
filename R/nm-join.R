@@ -112,7 +112,7 @@ nm_join <- function(
   if(.d[.join_col] %>% anyDuplicated() != 0)
   {
    dup_row <- .d[.join_col][duplicated( .d[.join_col]) %>% which(),]
-   stop(verbose_msg(glue("Duplicate rows in data in {.join_col}: {dup_row}")))
+   stop(glue("Duplicate rows in data in {.join_col}: {dup_row}"))
   }
 
   if (.superset) {
@@ -189,14 +189,8 @@ drop_dups <- function(.new_table, .dest_table, .join_col, .table_name) {
   if(.new_table[.join_col] %>% anyDuplicated() != 0)
   {
     dup_row <- .new_table[.join_col][duplicated( .new_table[.join_col]) %>% which(),]
-    stop(verbose_msg(glue("Duplicate rows in {.join_col}: {dup_row}")))
+    stop(glue("Duplicate rows in {.join_col}: {dup_row}"))
   }
-
-   #if(.dest_table[.join_col] %>% anyDuplicated() != 0)
-   #{
-   #   dup_row <- .dest_table[.join_col][duplicated( .dest_table[.join_col]) %>% which(),]
-   #   stop(verbose_msg(glue("Duplicate rows in {.join_col}: {dup_row}")))
-   # }
 
 
   return(.new_table[keep])
