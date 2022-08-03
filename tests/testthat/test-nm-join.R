@@ -166,7 +166,7 @@ test_that("nm_join() warns on skipping table with wrong number of rows [BBR-NMJ-
   expect_equal(ncol(test_df), DATA_TEST_COLS)
 })
 
-test_that("Checking .join_col for files",{
+test_that("Confirming unduplicates rows on .join_col [BBR-NMJ-007]",{
   withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   withr::with_tempdir({
     fs::dir_copy(system.file("model","nonmem", "basic",package = "bbr"), file.path(tempdir(),"basic"))
