@@ -65,7 +65,7 @@ test_that("bbi_init creates bbi.yaml [BBR-BBR-005]", {
 
   # read in yaml and check that it has a bbi key
   bbi_yaml <- yaml::read_yaml("bbi.yaml")
-  expect_true("bbi_binary" %in% names(bbi_yaml))
+  expect_true("clean_lvl" %in% names(bbi_yaml))
 })
 
 test_that("bbi_init errors with non-existent .dir [BBR-BBR-006]", {
