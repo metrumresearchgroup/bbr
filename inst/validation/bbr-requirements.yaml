@@ -567,7 +567,7 @@ NMJ-R006:
   tests:
   - BBR-NMJ-006
 NMJ-R007:
-   description: nm_join() errors on duplicate rows in join columns
+   description: nm_join() informatively errors if .join_col has duplicate values in any of the input tables
    tests:
   - BBR-NMJ-007
 NMT-R001:
