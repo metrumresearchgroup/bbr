@@ -97,7 +97,7 @@ nm_data <- function(.mod) {
   .path <- get_data_path(.mod)
   verbose_msg(glue("Reading data file: {basename(.path)}"))
   .d <- fread(.path, na.strings = ".", verbose = FALSE)
-  colnames(.d) <- make.unique(.d %>% colnames(), sep="_")
+  .d <- remove_dup_cols(.d)
   .d <- as_tibble(.d)
   names(.d) <- toupper(names(.d))
   verbose_msg(glue("  rows: {nrow(.d)}"))
@@ -131,23 +131,7 @@ nm_file_impl <- function(.path) {
       skip = 1,
       verbose = FALSE
     )
-    # browser()
-    # if duplicated columns
-    # get column index of duplicates
-    # test if duplicate columns are equal, i.e. get index and then all(data[,7] == data[,27])
-    # if duplicates: warning: duplicates came from same table file (ref table file and duplicate cols)
-    # in warning: say whether duplicate cols are equal or not, and mention that they are made unique
-    # then make columns unique..
-    if(any(duplicated(names(data)))){
-      dup_cols <- names(data)[duplicated(names(data))]
-      dup_cols_str <- paste(dup_cols, collapse = ", ")
-      dup_id <- c(which(duplicated(names(data))) -1, which(duplicated(names(data)))) %>% sort()
-      # use ids above to compare if they are equal (19, 20, 26, 27) - you'll likely need a for loop
-      # or map call to jump every {length(dup_cols)} (2 in this case - i.e. 19 and 20, 26 and 27) for comparing
-      warning(glue("{basename(.path)} had the following duplicated columns: {dup_cols_str}\n  Duplicate names will be repaired with `make.unique()`")) # something like this, and then say if they're equal
-      colnames(data) <- make.unique(colnames(data) )
-    }
-
+    data <- remove_dup_cols(data)
     data <- as_tibble(data)
     data
   },
