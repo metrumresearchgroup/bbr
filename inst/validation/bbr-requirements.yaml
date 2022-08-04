@@ -555,7 +555,7 @@ NMJ-R003:
   tests:
   - BBR-NMJ-003
 NMJ-R004:
-  description: 'nm_join() works correctly: duplicate cols'
+  description: nm_join() works correctly: duplicate cols
   tests:
   - BBR-NMJ-004
 NMJ-R005:
@@ -566,6 +566,10 @@ NMJ-R006:
   description: nm_join() warns on skipping table with wrong number of rows
   tests:
   - BBR-NMJ-006
+NMJ-R007:
+   description: nm_join() informatively errors if .join_col has duplicate values in any of the input tables
+   tests:
+  - BBR-NMJ-007
 NMT-R001:
   description: nm_tables() works
   tests:
