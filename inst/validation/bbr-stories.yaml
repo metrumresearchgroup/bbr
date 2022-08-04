@@ -265,6 +265,16 @@ RUN-S003:
     get a top-level summary of what is going on with the process.
   ProductRisk: Low
   requirements: PRNT-R001
+RUN-S004:
+  name: Test threads
+  description: As a user, I want to be able to test variations of parallelization on a given model by specifying the number of
+    threads and max number of iterations (MAXEVAL or NITER)
+  ProductRisk: Low
+  requirements:
+  - TSTT-R001
+  - TSTT-R002
+  - TSTT-R003
+  - TSTT-R004
 SUM-S001:
   name: Summarize model outputs
   description: As a user, I want to be able to load outputs and diagnostics from a
@@ -277,9 +287,6 @@ SUM-S001:
   - SUM-R011
   - WRKF-R001
   - WRKF-R002
-  - CRT-R001
-  - CRT-R002
-  - CRT-R003
 SUM-S002:
   name: Read NONMEM parameter table
   description: As a user, I want to be able to load the parameter estimates from the
@@ -355,6 +362,16 @@ SUM-S010:
   ProductRisk: Low
   requirements:
   - PEST-R014
+SUM-S011:
+  name: check run times
+  description: As a user, I want to be able to retrieve run time information from any bbr model or summary object
+  ProductRisk: Medium
+  Requirements:
+     - CRT-R001
+     - CRT-R002
+     - CRT-R003
+     - CRT-R004
+     - CRT-R005
 OUT-S001:
   name: Read NONMEM output files
   description: As a user, I want to be able to read NONMEM output files into a tibble

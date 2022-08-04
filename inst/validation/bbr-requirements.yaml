@@ -159,29 +159,27 @@ CMH-R006:
   tests:
   - BBR-CMH-006
 CRT-R001:
-  description: check_run_times() works with one model
+  description: check_run_times() works with any number of models
   tests:
   - BBR-CRT-001
-CRT-R002:
-  description: check_run_times() works with multiple models
-  tests:
   - BBR-CRT-002
-CRT-R003:
+CRT-R002:
   description: check_run_times() .return_times arg
   tests:
   - BBR-CRT-003
-CRT-R004:
+CRT-R003:
   description: check_run_times() waits for models to complete
   tests:
   - BBR-CRT-004
-CRT-R005:
-  description: check_run_times() works with a bbi_nonmem_summary object
+CRT-R004:
+  description: check_run_times() works with bbi_nonmem_summary and bbi_summary_list objects
   tests:
   - BBR-CRT-005
-CRT-R006:
-  description: check_run_times() works with a bbi_summary_list object
-  tests:
   - BBR-CRT-006
+CRT-R005:
+  description: check_run_times() returns NA for dry runs
+  tests:
+  - BBR-CRT-007
 CTS-R001:
   description: collapse_to_string() works correctly
   tests:
@@ -981,10 +979,6 @@ TSTT-R004:
     maxeval and niter are provided
   tests:
   - BBR-TSTT-004
-TSTT-R005:
-  description: check_run_times() returns NA for dry runs
-  tests:
-  - BBR-TSTT-005
 STAR-R001:
   description: Model object and YAML should have a boolean star attribute
   tests:
