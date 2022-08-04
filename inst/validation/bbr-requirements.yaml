@@ -619,7 +619,7 @@ NWMD-R010:
   tests:
   - BBR-NWMD-010
 NWMD-R011:
-    description: new_model() ignores files' extensions
+  description: new_model() ignores files' extensions
   tests:
   - BBR-NWMD-011
 PEST-R001:
@@ -985,6 +985,21 @@ TSTT-R005:
   description: check_run_times() returns NA for dry runs
   tests:
   - BBR-TSTT-005
+STAR-R001:
+  description: Model object and YAML should have a boolean star attribute
+  tests:
+  - BBR-CMF-002
+  - BBR-MMF-023
+STAR-R002:
+  description: `add_star()` and `remove_star()` helpers for modifying model object
+  tests:
+  - BBR-MMF-023
+  - BBR-MMF-024
+STAR-R003:
+  description: Star attribute should be parsed into `run_log()` tibble
+  tests:
+  - BBR-RNLG-003
+  - BBR-RNLG-005
 UBI-R001:
   description: use-bbi works on linux pulling from options
   tests:

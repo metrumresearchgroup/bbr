@@ -227,6 +227,14 @@ MGMT-S017:
   ProductRisk: Low
   requirements:
   - NWMD-R011
+MGMT-S018:
+  name: Starred models
+  description: As a user, I want to be able to star certain models to indicate special interest level.
+  ProductRisk: Medium
+  requirements:
+  - STAR-R001
+  - STAR-R002
+  - STAR-R003
 RUN-S001:
   name: Submit model to be run
   description: As a user, I want to be able to submit a model object to have bbi execute
