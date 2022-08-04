@@ -14,16 +14,16 @@ Estimation Method(s):
 
 – has_final_zero_gradient 
 
-|parameter_names |estimate |stderr    |shrinkage |
-|:---------------|:--------|:---------|:---------|
-|THETA1          |14.4     |-1.00e+09 |          |
-|THETA2          |101      |-1.00e+09 |          |
-|THETA3          |0.823    |-1.00e+09 |          |
-|THETA4          |1.04     |-1.00e+09 |          |
-|THETA5          |1.68     |-1.00e+09 |          |
-|THETA6          |0.857    |-1.00e+09 |          |
-|OMEGA(1,1)      |0.0484   |-1.00e+09 |          |
-|OMEGA(2,2)      |0.0438   |-1.00e+09 |          |
-|OMEGA(3,3)      |0.0385   |-1.00e+09 |          |
-|SIGMA(1,1)      |0.0482   |-1.00e+09 |          |
-|SIGMA(2,2)      |0.00100  |-1.00e+09 |          |
+|parameter_names |estimate |stderr |shrinkage |
+|:---------------|:--------|:------|:---------|
+|THETA1          |14.4     |       |          |
+|THETA2          |101      |       |          |
+|THETA3          |0.823    |       |          |
+|THETA4          |1.04     |       |          |
+|THETA5          |1.68     |       |          |
+|THETA6          |0.857    |       |          |
+|OMEGA(1,1)      |0.0484   |       |          |
+|OMEGA(2,2)      |0.0438   |       |          |
+|OMEGA(3,3)      |0.0385   |       |          |
+|SIGMA(1,1)      |0.0482   |       |          |
+|SIGMA(2,2)      |0.00100  |       |          |

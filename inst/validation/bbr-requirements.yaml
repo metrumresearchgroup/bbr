@@ -558,7 +558,7 @@ NMJ-R003:
   tests:
   - BBR-NMJ-003
 NMJ-R004:
-  description: 'nm_join() works correctly: duplicate cols'
+  description: nm_join() works correctly: duplicate cols
   tests:
   - BBR-NMJ-004
 NMJ-R005:
@@ -569,6 +569,10 @@ NMJ-R006:
   description: nm_join() warns on skipping table with wrong number of rows
   tests:
   - BBR-NMJ-006
+NMJ-R007:
+   description: nm_join() informatively errors if .join_col has duplicate values in any of the input tables
+   tests:
+  - BBR-NMJ-007
 NMT-R001:
   description: nm_tables() works
   tests:
@@ -734,9 +738,10 @@ RNLG-R004:
   tests:
   - BBR-RNLG-004
 RNLG-R005:
-  description: run_log() works with filtering parameter
+  description: run_log() can be filtered
   tests:
   - BBR-RNLG-005
+  - BBR-RNLG-006
 ROT-R001:
   description: check_file returns correctly
   tests:
@@ -939,6 +944,17 @@ SUM-R010:
   description: model_summary() handles NA objective function values
   tests:
   - BBR-SUM-011
+SUM-R011:
+  description: model_summaries() uses bbi's concurrency
+  tests:
+  - BBR-SUM-006
+  - BBR-SUM-007
+  - BBR-SUM-008
+  - BBR-SUM-009
+  - BBR-SMLG-007
+  - BBR-SMLG-008
+  - BBR-SMLG-009
+  - BBR-SMLG-010
 TDF-R001:
   description: tags_diff.bbi_model default happy path works
   tests:
