@@ -33,8 +33,6 @@ cov_cor.bbi_nonmem_model <- function(
   ...,
   .dry_run = FALSE
 ) {
-  check_bbi_version_constraint(.min_version = "2.3.0", .function = "cov_cor")
-
   # check inputs
   check_yaml_in_sync(.mod)
 

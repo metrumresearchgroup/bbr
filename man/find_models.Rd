@@ -11,7 +11,7 @@ find_models(.base_dir, .recurse, .include)
 
 \item{.recurse}{If \code{TRUE} search recursively in subdirectories as well.}
 
-\item{.include}{Provides filter for runs based on an input vector.}
+\item{.include}{A character vector specifying which runs or model tags to include in the run log.}
 }
 \description{
 Private helper function that searches from a base directory for any YAML files (excluding \code{bbi.yaml})

@@ -12,7 +12,11 @@ test_mod_sums <- function(mod_sums) {
   ref_sum <- dget(SUMMARY_REF_FILE)
 
   for (.s in mod_sums) {
+    # replace incidental differences
     ref_sum[[ABS_MOD_PATH]] <- .s$bbi_summary[[ABS_MOD_PATH]]
+    ref_sum$run_details$output_files_used <- NULL
+    .s$bbi_summary$run_details$output_files_used <- NULL
+
     expect_equal(ref_sum, .s$bbi_summary)
   }
 }
@@ -20,8 +24,8 @@ test_mod_sums <- function(mod_sums) {
 # setup
 cleanup()
 create_rlg_models()
-fs::dir_copy(MOD1_PATH, NEW_MOD2)
-fs::dir_copy(MOD1_PATH, NEW_MOD3)
+copy_output_dir(MOD1, NEW_MOD2)
+copy_output_dir(MOD1, NEW_MOD3)
 # teardown
 withr::defer(cleanup())
 
@@ -38,7 +42,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     for (.m in mods) {
       expect_equal(class(.m), NM_MOD_CLASS_LIST)
     }
-    skip_if_old_bbi('3.1.1')
+    skip_if_old_bbi("3.2.0")
     mod_sums <- model_summaries(mods)
     test_mod_sums(mod_sums)
 
@@ -53,14 +57,14 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   })
 
   test_that("model_summaries.bbi_run_log_df produces expected output [BBR-SUM-008]", {
-    skip_if_old_bbi('3.1.1')
+    skip_if_old_bbi("3.2.0")
     mod_sums <- run_log(MODEL_DIR) %>% model_summaries()
     test_mod_sums(mod_sums)
   })
 
 
   test_that("as_summary_list.bbi_summary_log_df works [BBR-SUM-009]", {
-    skip_if_old_bbi('3.1.1')
+    skip_if_old_bbi("3.2.0")
     mod_sums <- summary_log(MODEL_DIR) %>% as_summary_list()
     test_mod_sums(mod_sums)
   })

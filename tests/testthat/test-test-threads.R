@@ -175,7 +175,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
 
   test_that("check_run_times() returns NA for dry runs [BBR-TSTT-005]", {
-    skip_if_old_bbi('3.1.1')
+    skip_if_old_bbi("3.2.0")
     expect_message(
       check_run_times(mod1, .wait = F),
       "Could not access data for 1"

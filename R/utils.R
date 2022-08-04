@@ -615,3 +615,46 @@ wait_for_nonmem.list <- function(.mod, .time_limit = 300, .interval = 5) {
 
 }
 
+
+#' Replace BBI_NULL_NUM and BBI_NULL_STR with NA_real_
+#'
+#' @param .vals a numeric or character vector
+#'
+#' @importFrom purrr map
+#' @keywords internal
+set_bbi_null <- function(.vals){
+  map(.vals, function(.val){
+    if(inherits(.val, c("integer", "numeric", "character")) && (.val == BBI_NULL_NUM)){
+      return(NA_real_)
+    }else{
+      return(.val)
+    }
+  }) %>% unlist()
+}
+
+#' Recursively apply a function to each list element
+#'
+#' @importFrom checkmate assert_function
+#'
+#' @param .list a list. Can be recursive
+#' @param .func a function to apply to a list element
+#' @param .overwrite whether or not to overwrite the list element with the specified function (otherwise just print)
+#'
+#' @keywords internal
+map_list_recursive <- function(.list, .func, .overwrite = TRUE) {
+  assert_function(.func)
+  for (i in seq_along(.list)) {
+    value <- .list[[i]]
+    if (is.list(value)) {
+      .list[[i]] <- map_list_recursive(value, .func, .overwrite)
+    } else {
+      if(.overwrite){
+        .list[[i]] <- .func(.list[[i]])
+      }else{
+        print(.func(.list[[i]]))
+      }
+    }
+  }
+  .list
+}
+
