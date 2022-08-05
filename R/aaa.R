@@ -74,7 +74,7 @@ BBI_ARGS = list(
   maxlim = list(
     type = "numeric",
     flag = "--maxlim",
-    description = "RAW NMFE OPTION - Set the maximum values set for the buffers used by Nonmem (default 100)"
+    description = "RAW NMFE OPTION - Set the maximum values for the buffers used by Nonmem (if 0, don't pass -maxlim to nmfe) (default 2)"
   ),
   mpi_exec_path = list(
     type = "character",
@@ -89,7 +89,7 @@ BBI_ARGS = list(
   nm_qual = list(
     type = "logical",
     flag = "--nmqual",
-    description = "Whether or not to execute with nmqual (autolog.pl"
+    description = "Whether or not to execute with nmqual (autolog.pl)"
   ),
   nobuild = list(
     type = "logical",
@@ -141,6 +141,11 @@ BBI_ARGS = list(
     flag = "--prcompile",
     description = "RAW NMFE OPTION - Forces PREDPP compilation"
   ),
+  prdefault = list(
+    type = "logical",
+    flag = "--prdefault",
+    description = "RAW NMFE OPTION - Do not recompile any routines other than FSUBS"
+  ),
   prsame = list(
     type = "logical",
     flag = "--prsame",
@@ -159,7 +164,12 @@ BBI_ARGS = list(
   threads = list(
     type = "numeric",
     flag = "--threads",
-    description = "number of threads to execute with (default 4)"
+    description = "number of threads to execute with locally or nodes to execute on in parallel (default 4)"
+  ),
+  tprdefault = list(
+    type = "logical",
+    flag = "--tprdefault",
+    description = "RAW NMFE OPTION - Test if is okay to do -prdefault"
   ),
   verbose = list(
     type = "logical",
