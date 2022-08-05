@@ -49,19 +49,19 @@ test_that("model_diff.bbi_nonmem_model errors with multiple based_on [BBR-MDF-00
   )
 })
 
+test_that("model_diff() hides content of identical models [BBR-MDF-005]", {
+  mod <- read_model(MOD1_ABS_PATH)
+  expect_message(model_diff(mod, mod), "identical")
+})
+
 test_that("model_diff.bbi_stan_model happy path based_on", {
   skip_if_no_stan("model_diff.bbi_stan_model happy path based_on")
   new_mod_name <- "model_diff_stan1"
   mod2 <- copy_model_from(STAN_MOD1, new_mod_name)
   on.exit(cleanup_model(mod2))
-  res_object <- model_diff(mod2)
-  expect_true(inherits(res_object, "Diff"))
-
-  res_string <- capture.output(print(res_object))
-  expect_true(grepl(
-    glue("No visible differences.+{new_mod_name}.+{STAN_MOD_ID}.+parameters"),
-    paste(res_string, collapse = "\n")
-  ))
+  expect_message(res_object <- model_diff(mod2),
+                 "identical")
+  expect_null(res_object)
 })
 
 test_that("model_diff.bbi_stan_model happy path .mod2 arg", {
@@ -69,14 +69,9 @@ test_that("model_diff.bbi_stan_model happy path .mod2 arg", {
   new_mod_name <- "model_diff_stan2"
   mod2 <- copy_model_from(STAN_MOD1, new_mod_name)
   on.exit(cleanup_model(mod2))
-  res_object <- model_diff(STAN_MOD1, .mod2 = mod2)
-  expect_true(inherits(res_object, "Diff"))
-
-  res_string <- capture.output(print(res_object))
-  expect_true(grepl(
-    glue("No visible differences.+{STAN_MOD_ID}.+{new_mod_name}.+parameters"),
-    paste(res_string, collapse = "\n")
-  ))
+  expect_message(res_object <- model_diff(STAN_MOD1, .mod2 = mod2),
+                 "identical")
+  expect_null(res_object)
 })
 
 test_that("model_diff.bbi_stan_model works with other files", {
@@ -96,13 +91,8 @@ test_that("model_diff.bbi_stan_model works with other files", {
   )
 
   for (.tc in .test_cases) {
-    res_object <- model_diff(mod2, .file = .tc$file)
-    expect_true(inherits(res_object, "Diff"))
-
-    res_string <- capture.output(print(res_object))
-    expect_true(grepl(
-      glue("No visible differences.+{new_mod_name}.+{STAN_MOD_ID}.+{.tc$content}"),
-      paste(res_string, collapse = "\n")
-    ))
+    expect_message(res_object <- model_diff(mod2, .file = .tc$file),
+                   "identical")
+    expect_null(res_object)
   }
 })

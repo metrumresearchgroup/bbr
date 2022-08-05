@@ -40,14 +40,14 @@ overwrite any previous value stored for that argument.
 }
 \section{Functions}{
 \itemize{
-\item \code{add_bbi_args}: Modifies model object and corresponding YAML
+\item \code{add_bbi_args()}: Modifies model object and corresponding YAML
 by adding named list passed to \code{.bbi_args}, overwriting any args that are
 already present with the new values.
 
-\item \code{replace_all_bbi_args}: Modifies model object and corresponding YAML
+\item \code{replace_all_bbi_args()}: Modifies model object and corresponding YAML
 by replacing all \code{bbi_args} with named list passed to \code{.bbi_args}.
-}}
 
+}}
 \seealso{
 \code{\link[=submit_model]{submit_model()}} \code{\link[=model_summary]{model_summary()}} \code{\link[=print_bbi_args]{print_bbi_args()}}
 \code{\link[=modify_tags]{modify_tags()}} \code{\link[=modify_notes]{modify_notes()}} \code{\link[=modify_based_on]{modify_based_on()}} \code{\link[=modify_description]{modify_description()}} \code{\link[=modify_star]{modify_star()}}

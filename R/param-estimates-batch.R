@@ -43,7 +43,7 @@ param_estimates_batch <- function(.path,
                                   ...,
                                   .dry_run = FALSE) {
 
-  check_bbi_version_constraint(.min_version = "3.1.0", .function = "param_estimates_batch")
+  assert_bbi_version(.min_version = "3.1.0", .function = "param_estimates_batch")
 
   .path <- fs::path_abs(.path)
   if (!dir_exists(.path)) {

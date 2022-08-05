@@ -41,7 +41,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   test_that("param_estimates correctly errors on: ONLYSIM models [BBR-PEST-002]", {
     clean_test_enviroment()
 
-    skip_if_old_bbi("3.1.0")
+    skip_if_old_bbi("3.1.1")
     sum1 <- file.path(MODEL_DIR_X, "acop-onlysim") %>%
       read_model() %>%
       model_summary()

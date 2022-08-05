@@ -161,12 +161,12 @@ notify the user of this.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{bbi_nonmem_model}: Get model summary from \code{bbi_nonmem_model} object
+\item \code{model_summary(bbi_nonmem_model)}: Get model summary from \code{bbi_nonmem_model} object
 
-\item \code{bbi_stan_model}: \emph{Not fully implemented;} calls \code{\link[=read_fit_model]{read_fit_model()}}
+\item \code{model_summary(bbi_stan_model)}: \emph{Not fully implemented;} calls \code{\link[=read_fit_model]{read_fit_model()}}
 instead. See "Details" section.
-}}
 
+}}
 \seealso{
 \code{\link[=model_summaries]{model_summaries()}}, \code{\link[=summary_log]{summary_log()}}, \code{\link[=cov_cor]{cov_cor()}}, \code{\link[=param_estimates]{param_estimates()}}
 }
