@@ -74,7 +74,8 @@ BBI_ARGS = list(
   maxlim = list(
     type = "numeric",
     flag = "--maxlim",
-    description = "RAW NMFE OPTION - Set the maximum values for the buffers used by Nonmem (if 0, don't pass -maxlim to nmfe) (default 2)"
+    description = "RAW NMFE OPTION - Set the maximum values for the buffers used by Nonmem (if 0, don't pass -maxlim to nmfe) (default 2)",
+    compatibility_note = "Default changed from unset to 2 with bbi v3.2.0"
   ),
   mpi_exec_path = list(
     type = "character",
@@ -144,7 +145,8 @@ BBI_ARGS = list(
   prdefault = list(
     type = "logical",
     flag = "--prdefault",
-    description = "RAW NMFE OPTION - Do not recompile any routines other than FSUBS"
+    description = "RAW NMFE OPTION - Do not recompile any routines other than FSUBS",
+    compatibility_note = "This option isn't available in bbi until v3.2.0"
   ),
   prsame = list(
     type = "logical",
@@ -169,7 +171,8 @@ BBI_ARGS = list(
   tprdefault = list(
     type = "logical",
     flag = "--tprdefault",
-    description = "RAW NMFE OPTION - Test if is okay to do -prdefault"
+    description = "RAW NMFE OPTION - Test if is okay to do -prdefault",
+    compatibility_note = "This option isn't available in bbi until v3.2.0"
   ),
   verbose = list(
     type = "logical",

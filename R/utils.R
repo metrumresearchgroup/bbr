@@ -343,8 +343,14 @@ print_bbi_args <- function() {
     desc <- str_squish(v$description) %>%
       str_replace("RAW NMFE OPTION", cli::col_cyan("RAW NMFE OPTION")) %>%
       str_remove("\\.$")
+    note <- if (is.null(v$compatibility_note)) {
+      ""
+    } else {
+      paste0(". ", cli::col_red("Compatibility note"), ": ",
+             v$compatibility_note,  ".")
+    }
 
-    out <- glue("{bname} ({v$type}): {desc}. Command-line option: {v$flag}")
+    out <- glue("{bname} ({v$type}): {desc}. Command-line option: {v$flag}{note}")
     # ansi_strwrap isn't available until cli v2.3.0. This condition can be
     # dropped once our minimum supported MPN is 2021-02-01 or later.
     tryCatch(out <- cli::ansi_strwrap(out, exdent = 2),
