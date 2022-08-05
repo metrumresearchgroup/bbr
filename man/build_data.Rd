@@ -40,9 +40,9 @@ data.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{bbi_stan_model}: executes the function in \verb{<run>-standata.R} and
+\item \code{build_data(bbi_stan_model)}: executes the function in \verb{<run>-standata.R} and
 returns the list that will be passed to the \code{data} argument of
 \code{cmdstanr::sample()}. Also optionally writes the returned data list to json
 with \code{\link[cmdstanr:write_stan_json]{cmdstanr::write_stan_json()}} if an \code{.out_path} is passed.
-}}
 
+}}

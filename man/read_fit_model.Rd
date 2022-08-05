@@ -32,10 +32,10 @@ into memory and return it. \strong{Note: this is currently only implemented for
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{character}: Takes a file path that will be passed to
+\item \code{read_fit_model(character)}: Takes a file path that will be passed to
 \code{\link[=read_model]{read_model()}}. The loaded model is then passed directly to the relevant
 \code{read_fit_model()} dispatch.
 
-\item \code{bbi_stan_model}: Returns a \code{cmdstanr::CmdStanMCMC} object.
-}}
+\item \code{read_fit_model(bbi_stan_model)}: Returns a \code{cmdstanr::CmdStanMCMC} object.
 
+}}

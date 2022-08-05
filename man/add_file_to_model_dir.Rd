@@ -32,10 +32,10 @@ see if any of these files are missing.
 }
 \section{Functions}{
 \itemize{
-\item \code{add_stan_file}: Adds a \verb{<run>.stan} model file.
+\item \code{add_stan_file()}: Adds a \verb{<run>.stan} model file.
 
-\item \code{add_standata_file}: Adds a \verb{<run>-standata.R} file for building the data. See \verb{?}\link{bbi_stan_model} for details.
+\item \code{add_standata_file()}: Adds a \verb{<run>-standata.R} file for building the data. See \verb{?}\link{bbi_stan_model} for details.
 
-\item \code{add_stan_init}: Adds a \verb{<run>-init.R} file for building the initial values. See \verb{?}\link{bbi_stan_model} for details.
+\item \code{add_stan_init()}: Adds a \verb{<run>-init.R} file for building the initial values. See \verb{?}\link{bbi_stan_model} for details.
+
 }}
-
