@@ -334,13 +334,22 @@ file_matches_string <- function(path, string, append = "\n") {
 #' Print valid .bbi_args
 #'
 #' Prints all valid arguments to pass in to `.bbi_args=list()` argument of `submit_model()` or `model_summary()`
-#' @importFrom purrr imap
+#' @importFrom purrr iwalk
+#' @importFrom stringr str_remove str_squish
 #' @export
 print_bbi_args <- function() {
-  doc_list <- imap(BBI_ARGS, function(.v, .n) {
-    paste0(.n, " (", .v$type, ") -- ", .v$description, " (sets CLI flag `", .v$flag, "`)")
+  iwalk(BBI_ARGS, function(v, name) {
+    bname <- cli::style_bold(name)
+    desc <- str_squish(v$description) %>%
+      str_remove("\\.$")
+
+    out <- glue("{bname} ({v$type}): {desc}. Command-line option: {v$flag}")
+    # ansi_strwrap isn't available until cli v2.3.0. This condition can be
+    # dropped once our minimum supported MPN is 2021-02-01 or later.
+    tryCatch(out <- cli::ansi_strwrap(out, exdent = 2),
+             error = function(e) NULL)
+    cli::cat_line(out)
   })
-  cat(paste(doc_list, collapse = "\n"))
 }
 
 
