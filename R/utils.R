@@ -335,12 +335,13 @@ file_matches_string <- function(path, string, append = "\n") {
 #'
 #' Prints all valid arguments to pass in to `.bbi_args=list()` argument of `submit_model()` or `model_summary()`
 #' @importFrom purrr iwalk
-#' @importFrom stringr str_remove str_squish
+#' @importFrom stringr str_remove str_replace str_squish
 #' @export
 print_bbi_args <- function() {
   iwalk(BBI_ARGS, function(v, name) {
     bname <- cli::style_bold(name)
     desc <- str_squish(v$description) %>%
+      str_replace("RAW NMFE OPTION", cli::col_cyan("RAW NMFE OPTION")) %>%
       str_remove("\\.$")
 
     out <- glue("{bname} ({v$type}): {desc}. Command-line option: {v$flag}")
