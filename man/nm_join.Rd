@@ -82,6 +82,12 @@ data \emph{and} at least one of the table files, the \code{DV} column from the i
 data will be renamed to \code{DV.DATA} and the column from the table file kept as
 \code{DV}.
 
+\strong{Duplicate Rows Warning for Join Column}
+
+If there are duplicate rows found in the specified \code{join_col}, a warning will be raised specifying a subset of the repeated rows.
+Duplicates may be caused by lack of output width. \code{FORMAT} may be need to be stated in control stream to have sufficient
+width to avoid truncating \code{join_col}.
+
 \strong{Multiple tables per file incompatibility}
 
 Because \code{nm_tables()} calls \code{\link[=nm_file]{nm_file()}} internally, it is \emph{not} compatible
