@@ -36,10 +36,10 @@
 #' @importFrom glue glue
 #' @importFrom tidyr unnest_wider
 #' @export
-summary_log <- function(.base_dir, .recurse = TRUE, ...) {
+summary_log <- function(.base_dir, .recurse = TRUE, .include = NULL , ...) {
   checkmate::assert_string(.base_dir)
 
-  mod_list <- find_models(.base_dir, .recurse)
+  mod_list <- find_models(.base_dir, .recurse, .include)
 
   res_df <- summary_log_impl(mod_list, ...)
 
@@ -227,7 +227,7 @@ extract_condition_number <- function(.s) {
   })
   .out <- map_dbl(.ofv, function(.x) {
     .cn <- .x[[SUMMARY_COND_NUM]]
-    if (is.null(.cn) || .cn == BBI_NULL_NUM) {
+    if (is.null(.cn)) {
       .cn <- NA_real_
     }
     return(.cn)

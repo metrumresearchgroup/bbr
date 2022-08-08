@@ -8,8 +8,8 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   # extracting things from summary object
   #########################################
 
-  test_that("model_summary.bbi_nonmem_model produces expected output", {
-
+  test_that("model_summary.bbi_nonmem_model produces expected output [BBR-SUM-001]", {
+    skip_if_old_bbi("3.2.0")
     # get summary
     sum1 <- MOD1 %>% model_summary()
 
@@ -26,7 +26,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   # passing file flags
   #####################
 
-  test_that("model_summary() works with custom .ext file", {
+  test_that("model_summary() works with custom .ext file [BBR-SUM-002]", {
     on.exit({
       fs::dir_delete(NEW_MOD2)
       fs::file_delete(ctl_ext(NEW_MOD2))
@@ -37,20 +37,20 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     mod2 <- MOD1 %>% copy_model_from(basename(NEW_MOD2))
 
     # copy output directory (to simulate model run)
-    fs::dir_copy(MOD1_PATH, NEW_MOD2)
+    copy_output_dir(MOD1, NEW_MOD2)
 
     # move .ext file
-    fs::file_move(file.path(NEW_MOD2, "1.ext"), file.path(NEW_MOD2, "EXT"))
+    fs::file_move(build_path_from_model(mod2, ".ext"), file.path(NEW_MOD2, "EXT"))
 
     # errors without the flag
-    expect_error(model_summary(mod2), "No file present at.*2/1\\.ext")
+    expect_error(model_summary(mod2), "[Nn]o file present at.*2/2\\.ext")
 
     # works correctly with ext_file flag added
     sum2 <- model_summary(mod2, .bbi_args = list(ext_file = "EXT"))
 
     # some things will be a little different, most will be the same
     ref_sum <- dget(SUMMARY_REF_FILE)
-
+    skip_if_old_bbi("3.2.0")
     for (.d in names(ref_sum$run_details)) {
       if (.d == "output_files_used") {
         expect_false(all(sum2$run_details$output_files_used == ref_sum$run_details$output_files_used))
@@ -75,7 +75,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     list(ext = "shk", missing = "shrinkage_details")
   )
   for (.tc in TEST_CASES) {
-    test_that(glue::glue("model_summary() works with no .{.tc$ext} file"), {
+    test_that(glue::glue("model_summary() works with no .{.tc$ext} file [BBR-SUM-003]"), {
       on.exit({
         fs::dir_delete(NEW_MOD2)
         fs::file_delete(ctl_ext(NEW_MOD2))
@@ -86,18 +86,18 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       mod2 <- MOD1 %>% copy_model_from(basename(NEW_MOD2))
 
       # copy output directory (to simulate model run)
-      fs::dir_copy(MOD1_PATH, NEW_MOD2)
-
-      fs::file_delete(file.path(NEW_MOD2, paste0("1.", .tc$ext)))
+      copy_output_dir(MOD1, NEW_MOD2)
+      fs::file_delete(build_path_from_model(mod2, glue::glue(".{.tc$ext}")))
 
       # errors without the flag
-      expect_error(model_summary(mod2), glue::glue("No file present at.*2/1\\.{.tc$ext}"))
+      expect_error(model_summary(mod2), glue::glue("[Nn]o file present at.*2/2\\.{.tc$ext}"))
 
       # works correctly with flag added
       args_list <- list()
       args_list[[as.character(glue::glue("no_{.tc$ext}_file"))]] <- TRUE
       sum2 <- model_summary(mod2, .bbi_args = args_list)
 
+      skip_if_old_bbi("3.2.0")
       # some things will be a little different, most will be the same
       ref_sum <- dget(SUMMARY_REF_FILE)
 
@@ -130,7 +130,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   # errors when expected
   #######################
 
-  test_that("model_summary() fails predictably if it can't find some parts (i.e. model isn't finished)", {
+  test_that("model_summary() fails predictably if it can't find some parts (i.e. model isn't finished) [BBR-SUM-004]", {
     on.exit({
       fs::dir_delete(NEW_MOD2)
       fs::file_delete(ctl_ext(NEW_MOD2))
@@ -150,7 +150,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_error(model_summary(mod2), regexp = NOT_FINISHED_ERR_MSG)
   })
 
-  test_that("model_summary() fails predictably if no .lst file present", {
+  test_that("model_summary() fails on bad .lst input: no file [BBR-SUM-005]", {
     on.exit({
       fs::dir_delete(NEW_MOD2)
       fs::file_delete(ctl_ext(NEW_MOD2))
@@ -161,15 +161,48 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     mod2 <- MOD1 %>% copy_model_from(basename(NEW_MOD2))
 
     # copy output directory (to simulate model run)
-    fs::dir_copy(MOD1_PATH, NEW_MOD2)
+    copy_output_dir(MOD1, NEW_MOD2)
 
     # delete a necessary file
-    fs::file_delete(file.path(NEW_MOD2, "1.lst"))
+    fs::file_delete(build_path_from_model(mod2, ".lst"))
 
-    # try to run and expect error with NO_LST_ERR_MSG
-    expect_error(model_summary(mod2), regexp = NO_LST_ERR_MSG)
+    regexp <- if (test_bbi_version(read_bbi_path(), .min_version = "3.2.0")) {
+      NOT_FINISHED_ERR_MSG
+    } else {
+      NO_LST_ERR_MSG
+    }
+    expect_error(model_summary(mod2), regexp = regexp)
   })
 
+  test_that("model_summary works with multiple estimation methods [BBR-SUM-010]", {
+    skip_if_old_bbi("3.2.0")
+    mod_complex <- read_model(file.path(MODEL_DIR_X, "acop-fake-bayes"))
+    mod_sum <- mod_complex %>% model_summary()
+    expect_equal(length(mod_sum$run_details$estimation_time), 3)
+    expect_equal(length(mod_sum$run_details$covariance_time), 2)
+  })
+
+  test_that("model_summary() maps objective function fallback to NA [BBR-SUM-011]", {
+    skip_if_old_bbi("3.2.0")
+    withr::with_tempdir({
+      new_mod_path <- file.path(getwd(), "tmpmod")
+      mod <- copy_model_from(MOD1, new_mod_path)
+      copy_output_dir(MOD1, new_mod_path)
+      lst_file <- build_path_from_model(mod, ".lst")
+      lst_lines <- readr::read_lines(lst_file)
+      stringr::str_replace(lst_lines,
+                           "^( OBJECTIVE FUNCTION VALUE .*: +)[0-9.]+\\s*$",
+                           "\\1NaN")  %>%
+        stringr::str_replace("^( #OBJV:\\*+ +)[0-9.]+( +\\*+\\s*)$",
+                             "\\1NaN\\2")  %>%
+        readr::write_lines(lst_file)
+
+      ofvs <- model_summary(mod)[[OFV_COL]]
+      ofv <- ofvs[[length(ofvs)]]
+      expect_identical(ofv[["ofv_no_constant"]], NA_real_)
+      expect_identical(ofv[["ofv_with_constant"]], NA_real_)
+    })
+  })
 }) # closing withr::with_options
 
 test_that("model_summary.bbi_stan_model correctly calls read_fit_model", {

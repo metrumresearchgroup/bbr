@@ -22,8 +22,8 @@ List files in the output directory to glance at where the process is
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{character}: Takes a file path to the output directory.
+\item \code{check_output_dir(character)}: Takes a file path to the output directory.
 
-\item \code{bbi_model}: Takes \verb{bbi_\{.model_type\}_model} or \verb{bbi_\{.model_type\}_summary} object
+\item \code{check_output_dir(bbi_model)}: Takes \verb{bbi_\{.model_type\}_model} or \verb{bbi_\{.model_type\}_summary} object
+
 }}
-

@@ -8,22 +8,24 @@
 \usage{
 copy_model_from(
   .parent_mod,
-  .new_model,
+  .new_model = NULL,
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
-  .inherit_tags = TRUE,
+  .star = NULL,
+  .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE
 )
 
 \method{copy_model_from}{bbi_nonmem_model}(
   .parent_mod,
-  .new_model,
+  .new_model = NULL,
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
-  .inherit_tags = TRUE,
+  .star = NULL,
+  .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE
 )
@@ -34,7 +36,8 @@ copy_model_from(
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
-  .inherit_tags = TRUE,
+  .star = NULL,
+  .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE
 )
@@ -46,7 +49,8 @@ copy_model_from(
 path to \code{.parent_mod}. Represents an absolute model path, which is the path
 to the YAML file and model file, both without extension, and the output
 directory (once the model is run). Numeric values will be coerced to
-character. See examples for usage.}
+character. If \code{NULL}, the default, will try to increment to the next integer
+in the destination directory. See examples for usage.}
 
 \item{.description}{Character scalar description of new model run. This will
 be stored in the yaml (and can be viewed later in \code{run_log()}).}
@@ -60,9 +64,11 @@ no need to include that here.}
 \item{.add_tags}{Character vector with any new tags(s) to be added to
 \verb{\{.new_model\}.yaml}}
 
-\item{.inherit_tags}{If \code{TRUE}, the default, inherit any tags from
-\code{.parent_mod}, with any tags passed to \code{.add_tags} appended. If \code{FALSE} new
-model will only have any tags passed to \code{.add_tags} argument.}
+\item{.star}{Boolean, marks model to indicate special interest level.}
+
+\item{.inherit_tags}{If \code{FALSE}, the default, new model will only have any
+tags passed to \code{.add_tags} argument. If \code{TRUE} inherit any tags from
+\code{.parent_mod}, with any tags passed to \code{.add_tags} appended.}
 
 \item{.update_model_file}{\strong{Only relevant to NONMEM models.} If \code{TRUE}, the
 default, update the newly created model file. If \code{FALSE}, new model file
@@ -81,11 +87,11 @@ ancestry. See \href{../articles/using-based-on.html}{"Using based_on field" vign
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{bbi_nonmem_model}: \code{.parent_mod} takes a \code{bbi_nonmem_model} object to use as a basis for the copy.
+\item \code{copy_model_from(bbi_nonmem_model)}: \code{.parent_mod} takes a \code{bbi_nonmem_model} object to use as a basis for the copy.
 
-\item \code{bbi_stan_model}: \code{.parent_mod} takes a \code{bbi_stan_model} object to use as a basis for the copy.
+\item \code{copy_model_from(bbi_stan_model)}: \code{.parent_mod} takes a \code{bbi_stan_model} object to use as a basis for the copy.
+
 }}
-
 \examples{
 \dontrun{
 parent <- read_model("/foo/parent")
@@ -99,9 +105,15 @@ copy_model_from(parent, "child", "relative to parent model path")
 mod1 <- read_model("/path/to/1")
 
 # create model file at /path/to/2.ctl and YAML at /path/to/2.yaml
-copy_model_from(mod1, 2, "numeric input works")
+copy_model_from(mod1, "increments to next integer by default")
+
+# create model file at /path/to/3.ctl and YAML at /path/to/3.yaml
+copy_model_from(mod1, 3, "numeric input works")
 
 # create model file at /path/to/100.1.ctl and YAML at /path/to/100.1.yaml
 copy_model_from(mod1, 100.1, "a period is okay")
 }
+}
+\seealso{
+\code{\link[=new_model]{new_model()}}, \code{\link[=update_model_id]{update_model_id()}}
 }

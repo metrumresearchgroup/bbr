@@ -171,13 +171,20 @@ submit_nonmem_model <- function(.mod,
     .bbi_args[["overwrite"]] <- .overwrite
   }
   args_vec <- check_bbi_args(.bbi_args)
+
+
   cmd_args <- c("nonmem", "run", .mode, get_model_path(.mod), args_vec)
 
   # define working directory
   model_dir <- get_model_working_directory(.mod)
 
+  .path_exists <- file_exists(.config_path %||% file.path(model_dir, "bbi.yaml"))
+  if(!.path_exists){
+    stop(paste("No bbi configuration was found in the execution directory.",
+               "Please run `bbi_init()` with the appropriate directory to continue."))
+  }
+
   if (!is.null(.config_path)) {
-    checkmate::assert_file_exists(.config_path)
     cmd_args <- c(
       cmd_args,
       sprintf("--config=%s", normalizePath(.config_path))

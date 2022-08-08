@@ -21,7 +21,7 @@
 #'   [add_notes()] [replace_note()] [replace_all_notes()] [remove_notes()]
 #'   [add_based_on()] [replace_all_based_on()] [remove_based_on()]
 #'   [add_description()] [replace_description()] [add_bbi_args()]
-#'   [replace_all_bbi_args()]
+#'   [replace_all_bbi_args()] [modify_star()]
 #'
 #' @param .mod The `bbi_{.model_type}_model` object to modify
 #' @param .field Character scalar of the name of the component to modify
@@ -30,14 +30,20 @@
 #' @param .append If `TRUE`, the default, concatenate new values with currently present values. If `FALSE`, new values will overwrite old values.
 #' @param .remove If `TRUE`, `.value` with be removed from the `.field` instead of added. `FALSE` by default. Cannot have both `.append` and `.remove` be true in the same call.
 #' @param .unique If `TRUE`, the default, de-duplicate `.mod[[.field]]` after adding new values. If `FALSE` duplicate values will be kept.
+#' @param .char_value If `TRUE`, check that `.value` (after unlisting) is a character vector.
 #' @export
-modify_model_field <- function(.mod, .field, .value, .append = TRUE, .remove = FALSE, .unique = TRUE) {
+modify_model_field <- function(.mod, .field, .value, .append = TRUE, .remove = FALSE, .unique = TRUE, .char_value = TRUE) {
 
   # update .mod with any changes from yaml on disk
   check_yaml_in_sync(.mod)
 
   if (isTRUE(.append) & isTRUE(.remove)) {
     stop("modify_model_field() cannot have both `.append` and `.remove` be true in the same call.")
+  }
+
+  if (isTRUE(.char_value)) {
+    .value <- unlist(.value)
+    checkmate::assert_character(.value, null.ok = TRUE)
   }
 
   if (isTRUE(.append)) {
@@ -124,7 +130,7 @@ replace_model_field <- function(.mod, .field, .old_val, .new_val) {
 #'
 #' @return The modified `bbi_{.model_type}_model` object
 #'
-#' @seealso [run_log()] [collapse_to_string()] [modify_notes()] [modify_based_on()] [modify_description()] [modify_bbi_args()]
+#' @seealso [run_log()] [collapse_to_string()] [modify_notes()] [modify_based_on()] [modify_description()] [modify_bbi_args()] [modify_star()]
 NULL
 
 #' @describeIn modify_tags Add tags to a model object and corresponding YAML.
@@ -136,7 +142,8 @@ add_tags <- function(.mod, .tags) {
     .mod = .mod,
     .field = YAML_TAGS,
     .value = .tags,
-    .append = TRUE
+    .append = TRUE,
+    .char_value = TRUE
   )
 }
 
@@ -156,15 +163,9 @@ replace_all_tags <- function(.mod, .tags) {
     .mod = .mod,
     .field = YAML_TAGS,
     .value = .tags,
-    .append = FALSE
+    .append = FALSE,
+    .char_value = TRUE
   )
-}
-
-#' @describeIn modify_tags **Deprecated** as of bbr 0.10.0, use `replace_all_tags()` instead.
-#' @export
-replace_tags <- function(.mod, .tags) {
-  deprecate_stop("1.0.0", "bbr::replace_tags()", "replace_all_tags()")
-  replace_all_tags(.mod, .tags)
 }
 
 #' @describeIn modify_tags Removes tags from a model object and corresponding YAML.
@@ -175,7 +176,8 @@ remove_tags <- function(.mod, .tags) {
     .field = YAML_TAGS,
     .value = .tags,
     .append = FALSE,
-    .remove = TRUE
+    .remove = TRUE,
+    .char_value = TRUE,
   )
 }
 
@@ -201,7 +203,7 @@ remove_tags <- function(.mod, .tags) {
 #'
 #' @return The modified `bbi_{.model_type}_model` object
 #'
-#' @seealso [run_log()] [collapse_to_string()] [modify_tags()] [modify_based_on()] [modify_description()] [modify_bbi_args()]
+#' @seealso [run_log()] [collapse_to_string()] [modify_tags()] [modify_based_on()] [modify_description()] [modify_bbi_args()] [modify_star()]
 NULL
 
 #' @describeIn modify_notes Add notes to a model object and corresponding YAML.
@@ -213,7 +215,8 @@ add_notes <- function(.mod, .notes) {
     .mod = .mod,
     .field = YAML_NOTES,
     .value = .notes,
-    .append = TRUE
+    .append = TRUE,
+    .char_value = TRUE
   )
 }
 
@@ -233,7 +236,8 @@ replace_all_notes <- function(.mod, .notes) {
     .mod = .mod,
     .field = YAML_NOTES,
     .value = .notes,
-    .append = FALSE
+    .append = FALSE,
+    .char_value = TRUE
   )
 }
 
@@ -245,7 +249,8 @@ remove_notes <- function(.mod, .notes) {
     .field = YAML_NOTES,
     .value = .notes,
     .append = FALSE,
-    .remove = TRUE
+    .remove = TRUE,
+    .char_value = TRUE
   )
 }
 
@@ -271,7 +276,7 @@ remove_notes <- function(.mod, .notes) {
 #'
 #' @return The modified `bbi_{.model_type}_model` object
 #'
-#' @seealso [copy_model_from()] [modify_tags()] [modify_notes()] [modify_description()] [modify_bbi_args()]
+#' @seealso [copy_model_from()] [modify_tags()] [modify_notes()] [modify_description()] [modify_bbi_args()] [modify_star()]
 NULL
 
 #' @describeIn modify_based_on Append new `based_on` identifiers to a model object and corresponding YAML.
@@ -298,13 +303,6 @@ replace_all_based_on <- function(.mod, .based_on) {
   )
 }
 
-#' @describeIn modify_based_on **Deprecated** as of bbr 0.10.0, use `replace_all_based_on()` instead.
-#' @export
-replace_based_on <- function(.mod, .based_on) {
-  deprecate_stop("1.0.0", "bbr::replace_based_on()", "replace_all_based_on()")
-  replace_all_based_on(.mod, .based_on)
-}
-
 #' @describeIn modify_based_on Remove specified `based_on` identifier(s) from a model object and corresponding YAML.
 #' @export
 remove_based_on <- function(.mod, .based_on) {
@@ -317,6 +315,32 @@ remove_based_on <- function(.mod, .based_on) {
   )
 }
 
+#' @name modify_star
+#' @title Modify star attribute on a model object
+#'
+#' @description Add, or remove a "star" to a model to indicate special interest level for this model.
+#' This is typically used for highlighting models that are of some importance to the final analyis.
+#'
+#' @return The modified `bbi_{.model_type}_model` object
+#'
+#' @inheritParams modify_model_field
+#'
+#' @seealso [run_log()] [collapse_to_string()] [modify_tags()] [modify_notes()]
+#'   [modify_based_on()] [modify_description()] [modify_bbi_args()]
+#'   [modify_star()]
+NULL
+
+#' @describeIn modify_star Adds a star to the model.
+#' @export
+add_star <- function(.mod) {
+  modify_model_field_lgl(.mod, YAML_STAR, "add")
+}
+
+#' @describeIn modify_star Removes a star from the model.
+#' @export
+remove_star <- function(.mod) {
+  modify_model_field_lgl(.mod, YAML_STAR, "remove")
+}
 
 #' @name modify_description
 #' @title Modify description on a model object
@@ -338,7 +362,7 @@ remove_based_on <- function(.mod, .based_on) {
 #'
 #' @return The modified `bbi_{.model_type}_model` object
 #'
-#' @seealso [run_log()] [modify_tags()] [modify_notes()] [modify_based_on()] [modify_bbi_args()]
+#' @seealso [run_log()] [modify_tags()] [modify_notes()] [modify_based_on()] [modify_bbi_args()] [modify_star()]
 NULL
 
 #' @describeIn modify_description Fills the description field in a model object and corresponding YAML, if it is currently empty.
@@ -394,7 +418,7 @@ replace_description <- function(.mod, .description) {
 #' @return The modified `bbi_{.model_type}_model` object
 #'
 #' @seealso [submit_model()] [model_summary()] [print_bbi_args()]
-#'   [modify_tags()] [modify_notes()] [modify_based_on()] [modify_description()]
+#'   [modify_tags()] [modify_notes()] [modify_based_on()] [modify_description()] [modify_star()]
 NULL
 
 #' @describeIn modify_bbi_args Modifies model object and corresponding YAML
@@ -435,55 +459,6 @@ replace_all_bbi_args <- function(.mod, .bbi_args) {
   return(.mod)
 }
 
-#' @describeIn modify_bbi_args **Deprecated** as of bbr 0.10.0, use `replace_all_bbi_args()` instead.
-#' @export
-replace_bbi_args <- function(.mod, .bbi_args) {
-  deprecate_stop("1.0.0", "bbr::replace_bbi_args()", "replace_all_bbi_args()")
-  replace_all_bbi_args(.mod, .bbi_args)
-}
-
-
-#' @name modify_decisions
-#' @title Deprecated: Modify decisions on a model object
-#'
-#' @description The `decisions` field has been deprecated as of `bbr 0.10.0` and
-#' replaced by the `notes` field, to reflect the fact that users
-#' will want to use this field throughout the modeling process, not only at the end
-#' once some "decisions" have been reached. As of `bbr 1.0.0`, `add_decisions()` and
-#' `replace_decisions()` now error telling the user that they will be
-#' deprecated in the future and encouraging use of their `*_notes` counterparts.
-#' The functions will be removed entirely two releases after that.
-#'
-#' @return The modified `bbi_{.model_type}_model` object
-#'
-#' @seealso [modify_notes()]
-NULL
-
-#' @describeIn modify_decisions **Deprecated**  Append new decisions to the one(s) in a model object and corresponding YAML.
-#' @inheritParams modify_model_field
-#' @param .decisions Character vector to add to `decisions` field
-#' @export
-add_decisions <- function(.mod, .decisions) {
-  stop("The `decisions` field has been replaced by `notes` as of bbr 0.10.0 and will be removed in a future release. Please use `add_notes()` going forward.", call. = FALSE)
-  modify_model_field(
-    .mod = .mod,
-    .field = YAML_DECISIONS,
-    .value = .decisions,
-    .append = TRUE
-  )
-}
-
-#' @describeIn modify_decisions **Deprecated** Replaces `decisions` field in a model object and corresponding YAML with new values.
-#' @export
-replace_decisions <- function(.mod, .decisions) {
-  stop("The `decisions` field has been replaced by `notes` as of bbr 0.10.0 and will be removed in a future release. Please use `replace_all_notes()` going forward.", call. = FALSE)
-  modify_model_field(
-    .mod = .mod,
-    .field = YAML_DECISIONS,
-    .value = .decisions,
-    .append = FALSE
-  )
-}
 
 ###########################
 # private helper functions
@@ -524,6 +499,30 @@ safe_based_on <- function(.start, .based_on) {
   return(tools::file_path_sans_ext(.based_on))
 }
 
+#' Adds or removes boolean attribute from model object and YAML
+#' @param .mod list object of model data
+#' @param .field boolean attribute to be set
+#' @param .action character scalar denoting the action to take. Can be either "add" or "remove".
+#' @keywords internal
+modify_model_field_lgl <- function(.mod, .field, .action = c("add", "remove")) {
+
+  # update .mod with any changes from yaml on disk
+  check_yaml_in_sync(.mod)
+
+  # check action and modify model
+  .action <- match.arg(.action)
+  if (.action == "add") {
+    .mod[[.field]] <- TRUE
+  }
+  if (.action == "remove") {
+    .mod[[.field]] <- NULL
+  }
+
+  # overwrite the yaml on disk with modified model
+  .mod <- save_model_yaml(.mod)
+
+  return(.mod)
+}
 
 ################
 # synching YAML
@@ -579,5 +578,4 @@ check_yaml_in_sync <- function(.mod) {
     strict_mode_error(check_yaml_err_msg)
   }
 }
-
 

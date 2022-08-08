@@ -4,15 +4,12 @@
 \alias{modify_based_on}
 \alias{add_based_on}
 \alias{replace_all_based_on}
-\alias{replace_based_on}
 \alias{remove_based_on}
 \title{Modify based_on field in a model object}
 \usage{
 add_based_on(.mod, .based_on)
 
 replace_all_based_on(.mod, .based_on)
-
-replace_based_on(.mod, .based_on)
 
 remove_based_on(.mod, .based_on)
 }
@@ -43,15 +40,13 @@ which demonstrates the motivation and usage of this field.
 }
 \section{Functions}{
 \itemize{
-\item \code{add_based_on}: Append new \code{based_on} identifiers to a model object and corresponding YAML.
+\item \code{add_based_on()}: Append new \code{based_on} identifiers to a model object and corresponding YAML.
 
-\item \code{replace_all_based_on}: Replaces entire \code{based_on} field in a model object and corresponding YAML with new values.
+\item \code{replace_all_based_on()}: Replaces entire \code{based_on} field in a model object and corresponding YAML with new values.
 
-\item \code{replace_based_on}: \strong{Deprecated} as of bbr 0.10.0, use \code{replace_all_based_on()} instead.
+\item \code{remove_based_on()}: Remove specified \code{based_on} identifier(s) from a model object and corresponding YAML.
 
-\item \code{remove_based_on}: Remove specified \code{based_on} identifier(s) from a model object and corresponding YAML.
 }}
-
 \seealso{
-\code{\link[=copy_model_from]{copy_model_from()}} \code{\link[=modify_tags]{modify_tags()}} \code{\link[=modify_notes]{modify_notes()}} \code{\link[=modify_description]{modify_description()}} \code{\link[=modify_bbi_args]{modify_bbi_args()}}
+\code{\link[=copy_model_from]{copy_model_from()}} \code{\link[=modify_tags]{modify_tags()}} \code{\link[=modify_notes]{modify_notes()}} \code{\link[=modify_description]{modify_description()}} \code{\link[=modify_bbi_args]{modify_bbi_args()}} \code{\link[=modify_star]{modify_star()}}
 }

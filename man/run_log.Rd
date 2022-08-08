@@ -4,12 +4,14 @@
 \alias{run_log}
 \title{Create tibble summarizing all model runs}
 \usage{
-run_log(.base_dir, .recurse = TRUE)
+run_log(.base_dir, .recurse = TRUE, .include = NULL)
 }
 \arguments{
 \item{.base_dir}{Base directory to look in for models.}
 
 \item{.recurse}{If \code{TRUE}, the default, search recursively in all subdirectories. Passed through to \code{fs::dir_ls()} -- If a positive number, the number of levels to recurse.}
+
+\item{.include}{A character vector specifying which runs or model tags to include in the run log.}
 }
 \value{
 A tibble of class \code{bbi_run_log_df} with information on each model, or an empty tibble if no models are found.
@@ -18,6 +20,18 @@ A tibble of class \code{bbi_run_log_df} with information on each model, or an em
 Parses all model YAML files and outputs into a tibble that serves as a run log for the project.
 Future releases will incorporate more diagnostics and parameter estimates, etc. from the runs into this log.
 Users can also use \code{\link[=add_config]{add_config()}} or \code{\link[=add_summary]{add_summary()}} to append additional output about the model run.
+}
+\details{
+\code{.include} can contain both run names and tags (in any order). Only models having a tag or run name that include those strings will be returned
+}
+\examples{
+\dontrun{
+run_log(MODEL_DIR, .include = c(1, "new tag 1"))
+
+run_log(MODEL_DIR, .include = c("acop tag", 2, 3))
+
+}
+
 }
 \seealso{
 \code{\link[=config_log]{config_log()}}, \code{\link[=summary_log]{summary_log()}}

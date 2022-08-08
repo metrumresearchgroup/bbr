@@ -11,7 +11,8 @@ modify_model_field(
   .value,
   .append = TRUE,
   .remove = FALSE,
-  .unique = TRUE
+  .unique = TRUE,
+  .char_value = TRUE
 )
 
 replace_model_field(.mod, .field, .old_val, .new_val)
@@ -29,6 +30,8 @@ If \code{NULL} or \code{NA} is passed and \code{.append = FALSE} then \code{.fie
 \item{.remove}{If \code{TRUE}, \code{.value} with be removed from the \code{.field} instead of added. \code{FALSE} by default. Cannot have both \code{.append} and \code{.remove} be true in the same call.}
 
 \item{.unique}{If \code{TRUE}, the default, de-duplicate \code{.mod[[.field]]} after adding new values. If \code{FALSE} duplicate values will be kept.}
+
+\item{.char_value}{If \code{TRUE}, check that \code{.value} (after unlisting) is a character vector.}
 
 \item{.old_val}{The value to be replaced. If \code{.old_val} is not present in
 \code{.mod[[.field]]}, function will warn user and return \code{.mod} unchanged.}
@@ -52,13 +55,13 @@ digest of the newly written YAML.
 }
 \section{Functions}{
 \itemize{
-\item \code{replace_model_field}: Replace a single item in a model field
-}}
+\item \code{replace_model_field()}: Replace a single item in a model field
 
+}}
 \seealso{
 \code{\link[=add_tags]{add_tags()}} \code{\link[=replace_tag]{replace_tag()}} \code{\link[=replace_all_tags]{replace_all_tags()}} \code{\link[=remove_tags]{remove_tags()}}
 \code{\link[=add_notes]{add_notes()}} \code{\link[=replace_note]{replace_note()}} \code{\link[=replace_all_notes]{replace_all_notes()}} \code{\link[=remove_notes]{remove_notes()}}
 \code{\link[=add_based_on]{add_based_on()}} \code{\link[=replace_all_based_on]{replace_all_based_on()}} \code{\link[=remove_based_on]{remove_based_on()}}
 \code{\link[=add_description]{add_description()}} \code{\link[=replace_description]{replace_description()}} \code{\link[=add_bbi_args]{add_bbi_args()}}
-\code{\link[=replace_all_bbi_args]{replace_all_bbi_args()}}
+\code{\link[=replace_all_bbi_args]{replace_all_bbi_args()}} \code{\link[=modify_star]{modify_star()}}
 }

@@ -1,11 +1,12 @@
 context("Testing function to create or read in model object")
 
 
-test_that("read_model() returns expected object", {
+test_that("read_model() returns expected object [BBR-NWMD-001]", {
+
   expect_equal(read_model(MOD1_PATH), REF_LIST_1)
 })
 
-test_that("read_model() returns expected object from no ext specified", {
+test_that("read_model() returns expected object from no ext specified [BBR-NWMD-002]", {
   temp_path <- file.path(ABS_MODEL_DIR, "temp.yaml")
   ctl_path <- fs::path_ext_set(temp_path, "ctl")
 
@@ -21,7 +22,7 @@ test_that("read_model() returns expected object from no ext specified", {
   expect_equal(mod2, REF_LIST_TMP)
 })
 
-test_that("read_model() can read a model whose path has a period", {
+test_that("read_model() can read a model whose path has a period [BBR-NWMD-003]", {
   temp_ctl <- tempfile(pattern = "file.", fileext = ".ctl")
   # ensure that `temp_ctl` exists
   readr::write_file("foo", temp_ctl)
@@ -34,7 +35,7 @@ test_that("read_model() can read a model whose path has a period", {
   expect_identical(class(mod), NM_MOD_CLASS_LIST)
 })
 
-test_that("new_model() creates new YAML file", {
+test_that("new_model() creates new YAML file [BBR-NWMD-004]", {
   temp_mod_path <- create_temp_model()
   fs::file_delete(fs::path_ext_set(temp_mod_path, "yaml"))
 
@@ -51,11 +52,11 @@ test_that("new_model() creates new YAML file", {
   expect_true(all(MODEL_REQ_KEYS %in% names(mod1b)))
 })
 
-test_that("new_model() throws an error if the model file does not exist", {
+test_that("new_model() throws an error if the model file does not exist [BBR-NWMD-005]", {
   expect_error(new_model("foo", "bar"), "No model file found")
 })
 
-test_that("compare read_model() and new_model() objects", {
+test_that("compare read_model() and new_model() objects [BBR-NWMD-006]", {
   temp_mod_path <- create_temp_model()
   fs::file_delete(fs::path_ext_set(temp_mod_path, "yaml"))
 
@@ -87,7 +88,7 @@ test_that("compare read_model() and new_model() objects", {
   }
 })
 
-test_that("new_model() .overwrite arg works", {
+test_that("new_model() .overwrite arg works [BBR-NWMD-007]", {
   temp_mod_path <- create_temp_model()
 
   # error if file exists
@@ -104,7 +105,7 @@ test_that("new_model() .overwrite arg works", {
 })
 
 
-test_that("new_model() .based_on arg works", {
+test_that("new_model() .based_on arg works [BBR-NWMD-008]", {
   temp_mod_path <- create_temp_model()
   parent_model_id <- get_model_id(create_temp_model())
   fs::file_delete(fs::path_ext_set(temp_mod_path, "yaml"))
@@ -118,7 +119,7 @@ test_that("new_model() .based_on arg works", {
   expect_equal(mod1a[[YAML_BASED_ON]], parent_model_id)
 })
 
-test_that("new_model() .based_on arg errors on fake model", {
+test_that("new_model() .based_on arg errors on fake model [BBR-NWMD-009]", {
   temp_mod_path <- ctl_ext(tempfile())
   writeLines("CREATED BY: new_model() .based_on arg errors on fake model", temp_mod_path)
   on.exit(if(fs::file_exists(temp_mod_path)) fs::file_delete(temp_mod_path))
@@ -134,7 +135,7 @@ test_that("new_model() .based_on arg errors on fake model", {
   )
 })
 
-test_that("new_model() supports `.path` containing a period", {
+test_that("new_model() supports `.path` containing a period [BBR-NWMD-010]", {
   temp_ctl <- tempfile(pattern = "file.", fileext = ".ctl")
   # ensure that `temp_ctl` exists
   readr::write_file("foo", temp_ctl)
@@ -145,6 +146,45 @@ test_that("new_model() supports `.path` containing a period", {
 
   mod <- new_model(fs::path_ext_remove(temp_ctl), "path with period")
   expect_true(fs::file_exists(temp_yaml))
+})
+
+test_that("new_model ignores file extension: .ctl [BBR-NWMD-011]", {
+  path <-
+    file.path(system.file("model", package = "bbr", mustWork = TRUE),
+              "nonmem",
+              "basic")
+  fs::file_delete(file.path(path, "1.yaml"))
+  mod_ctl <- new_model(
+    file.path(path, "1.ctl"),
+    .description = "original acop model",
+    .tags = ORIG_TAGS,
+    .bbi_args = list(overwrite = TRUE, threads = 4)
+  )
+  expect_identical(mod_ctl$absolute_model_path, file.path(path, "1"))
+  expect_identical(mod_ctl$model_type, "nonmem")
+  expect_identical(mod_ctl$yaml_md5, "6ccf206e167485b5adf29bc135197929")
+})
+
+test_that("new_model ignores file extension: .mod [BBR-NWMD-011]", {
+  path <-
+    file.path(system.file("model", package = "bbr", mustWork = TRUE),
+              "nonmem",
+              "basic")
+  fs::file_delete(file.path(path, "1.yaml"))
+  fs::file_move(file.path(path, "1.ctl"),
+                file.path(path, "1.mod"))
+  on.exit(fs::file_move(file.path(path, "1.mod"),
+                        file.path(path, "1.ctl")))
+  mod <- new_model(
+    file.path(path, "1.mod"),
+    .description = "original acop model",
+    .tags = ORIG_TAGS,
+    .bbi_args = list(overwrite = TRUE, threads = 4)
+  )
+  expect_identical(mod$absolute_model_path, file.path(path, "1"))
+  expect_identical(mod$model_type, "nonmem")
+  expect_identical(mod$yaml_md5, "6ccf206e167485b5adf29bc135197929")
+
 })
 
 #############

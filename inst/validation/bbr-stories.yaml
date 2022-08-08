@@ -1,0 +1,450 @@
+CFG-S001:
+  name: Create bbi.yaml from within R
+  description: As a user, I can create a default bbi.yaml file in a specified directory.
+    The function that creates this should check that it points to a valid NONMEM directory.
+  ProductRisk: Low
+  requirements:
+  - BBR-R005
+  - BBR-R006
+  - BBR-R007
+CFG-S002:
+  name: Version constrain bbi
+  description: As a user, I want to be prevented from using a version of bbi that
+    is incompatible with the version of bbr I am using.
+  ProductRisk: Medium
+  requirements:
+  - BBR-R003
+  - BBR-R004
+CFG-S003:
+  name: Find bbi.yaml
+  description: As a user, I want any calls that need the bbi.yaml configuration file
+    to, by default, look for it in the same directory as the relevant model, and to
+    be able to override this by passing a path to an alternative configuration file.
+  ProductRisk: Low
+  requirements:
+  - SBMT-R001
+  - SBMT-R003
+  - SBMT-R008
+  - SBMT-R013
+  - WRKF-R007
+CFG-S004:
+  name: Find bbi installation
+  description: As a user, I want to have bbr look for bbi in my `$PATH` by default.
+    I would also like the `use_bbi()` installer function to first try to install to
+    whatever path I have set in `options("bbr.bbi_exe_path")`, falling back to the
+    bbi in my `$PATH`, and then an OS-dependent default, in that order.
+  ProductRisk: Low
+  requirements:
+  - UBI-R001
+  - UBI-R002
+CFG-S005:
+  name: Pass .bbi_args to bbi_init()
+  description: As a user, I want to be able to pass in `.bbi_args` to the `bbi_init()`
+    function that creates a bbi.yaml file. These arguments/options would then get
+    persisted in the newly created bbi.yaml to serve as the "defaults".
+  ProductRisk: Low
+  requirements: BBR-R008
+CFG-S006:
+  name: Set execution mode globally
+  description: As a user, I want to be able globally set the .mode argument to submit_model()
+    and submit_models() by using options("bbr.bbi_exe_mode"). This should be able
+    to be overriden by passing something to the .mode argument directly.
+  ProductRisk: Low
+  requirements:
+  - SBMT-R005
+  - SBMT-R006
+  - SBMT-R007
+  - SBMT-R015
+CFG-S007:
+  name: Set execution mode globally
+  description: As a user, I want parallel to be set to TRUE if threads are specified to be greater than 1.
+  ProductRisk: Low
+  requirements:
+  - UTL-R014
+MGMT-S001:
+  name: Create new model object
+  description: As a user, I want to be able to create a new bbr model object by pointing
+    to a model file (e.g. NONMEM control stream) on disk.
+  ProductRisk: High
+  requirements:
+  - NWMD-R004
+  - NWMD-R005
+MGMT-S002:
+  name: Read model object
+  description: As a user, I want to be able to create a bbr model object by reading
+    a previously created model YAML file on disk.
+  ProductRisk: High
+  requirements:
+  - NWMD-R001
+  - NWMD-R006
+MGMT-S003:
+  name: Create new model by inheriting from parent model
+  description: As a user, I want to be able to create a new model object and relevant
+    files on disk by passing a "parent model" that the new model should be based on.
+  ProductRisk: Medium
+  requirements:
+  - CMF-R001
+  - CMF-R002
+MGMT-S004:
+  name: Keep YAML and object in sync
+  description: As a user, I want bbr to enforce keeping the model object in R and
+    the model YAML file on disk in sync with each other.
+  ProductRisk: Medium
+  requirements:
+  - MMF-R014
+  - MMF-R015
+  - MMF-R016
+MGMT-S005:
+  name: Copying models doesn't overwrite by default
+  description: As a user, I want to be able to copy and create models without accidentally
+    overwriting existing models.
+  ProductRisk: Low
+  requirements:
+  - NWMD-R007
+  - CMF-R004
+  - CMF-R005
+  - WRKF-R002
+MGMT-S006:
+  name: Capture model ancestry
+  description: As a user, I want to be able to record what models a given model is
+    "based on" and be recorded automatically when using the `copy_model_from()` function.
+  ProductRisk: Low
+  requirements:
+  - NWMD-R008
+  - MMF-R013
+  - RNLG-R003
+  - CMF-R001
+  - CMF-R002
+  - GBO-R001
+MGMT-S007:
+  name: Model object contains unambiguous absolute model path
+  description: 'As a user, I want to be able to unambiguously find the following things,
+    from the "absolute model path" stored in the model object: The model file (e.g.
+    the NONMEM control stream), the bbr-created YAML file, the directory containing
+    model output.'
+  ProductRisk: Low
+  requirements:
+  - GPFO-R001
+  - GPFO-R002
+  - GPFO-R003
+  - NWMD-R004
+MGMT-S008:
+  name: Add and replace tags
+  description: As a user, I want to be able to add, delete, and replace tags on a
+    model object. Tags should be persisted in the model YAML file.
+  ProductRisk: Low
+  requirements:
+  - MMF-R004
+  - MMF-R022
+  - TDF-R001
+  - CMF-R001
+  - WRKF-R002
+MGMT-S009:
+  name: Add and replace notes
+  description: As a user, I want to be able to add, delete, and replace notes on a
+    model object. Notes should be persisted in the model YAML file.
+  ProductRisk: Low
+  requirements:
+  - MMF-R006
+  - MMF-R007
+  - CTS-R001
+MGMT-S010:
+  name: Print method for model object
+  description: As a user, I want to be able to print the `bbi_nonmem_model` object
+    to the console and have it show the path to the model files on disk, as well as
+    any attached metadata like tags, notes, etc.
+  ProductRisk: Low
+  requirements: PRNT-R002
+MGMT-S011:
+  name: Model diff
+  description: As a user, I want to be able to see a rendered diff between two model
+    files, either printed to the console or rendered in Rmd files.
+  ProductRisk: Low
+  requirements:
+  - MDF-R001
+  - MDF-R002
+  - MDF-R003
+  - MDF-R004
+  - MDF-R005
+MGMT-S012:
+  name: Check up to date
+  description: As a user, I want a function to check whether the model file or data
+    file associated with a model have changed since the model was run and be able
+    to pass a bbi_log_df tibble to check this same thing for all of the models it
+    contains.
+  ProductRisk: Low
+  requirements:
+  - CUTD-R001
+  - CUTD-R002
+  - CUTD-R003
+  - CUTD-R004
+  - CUTD-R005
+  - CUTD-R006
+  - CUTD-R007
+MGMT-S013:
+  name: Tags diff
+  description: As a user, I want to be able to see the difference in the tags element
+    of different models. Be able to either compare two models directly, or compare
+    all models in a `bbi_run_log_df` to their "parent models" (i.e. the models in
+    that same tibble that match their `based_on`).
+  ProductRisk: Low
+  requirements:
+  - TDF-R001
+  - TDF-R002
+  - TDF-R003
+  - TDF-R004
+MGMT-S014:
+  name: Copying models increments to next integer by default
+  description: As a user, I want when passing a parent model that is named numerically
+    to the `copy_model_from()` function, to increment the new model name to the next
+    available integer in the parent model directory. This behavior should happen by
+    default, and be able to be overriden by passing a custom name to the `.new_model`
+    argument.
+  ProductRisk: Low
+  requirements:
+  - CMF-R007
+  - WRKF-R002
+MGMT-S015:
+  name: Update model ID in control stream
+  description: As a user, I want to be able to update all occurrences of the model
+    ID from a parent model and replace them with model ID from the new model in the
+    new model's control stream.
+  ProductRisk: Low
+  requirements:
+  - CMH-R001
+  - CMH-R002
+  - CMH-R003
+  - CMH-R004
+  - CMH-R005
+  - CMH-R006
+MGMT-S016:
+  name: Cleanup model files
+  description: As a user, I want to be able to easily delete all model files associated
+    the identified model objects.
+  ProductRisk: Medium
+  requirements:
+  - CLM-R001
+  - CLM-R002
+  - CLM-R003
+  - CLM-R004
+MGMT-S017:
+  name: Passing model file extensions
+  description: As a user, I want new_model to ignore file extensions.
+  ProductRisk: Low
+  requirements:
+  - NWMD-R011
+RUN-S001:
+  name: Submit model to be run
+  description: As a user, I want to be able to submit a model object to have bbi execute
+    the relevant model.
+  ProductRisk: High
+  requirements:
+  - SBMT-R001
+  - SBMT-R002
+  - SBMT-R005
+  - WRKF-R001
+  - WRKF-R002
+RUN-S002:
+  name: Submit multiple models to be run
+  description: As a user, I want to be able to submit multiple models for execution,
+    as a batch. This should be done in as few bbi calls as possible, in order to leverage
+    bbi's queueing and batch execution capabilities.
+  ProductRisk: Medium
+  requirements:
+  - SBMT-R008
+  - SBMT-R010
+  - SBMT-R011
+  - SBMT-R012
+  - WRKF-R002
+  - TSTT-R001
+RUN-S003:
+  name: Print method for bbi process
+  description: As a user, I want to be able to print the babylon_process object and
+    get a top-level summary of what is going on with the process.
+  ProductRisk: Low
+  requirements: PRNT-R001
+SUM-S001:
+  name: Summarize model outputs
+  description: As a user, I want to be able to load outputs and diagnostics from a
+    finished NONMEM model into an R object.
+  ProductRisk: High
+  requirements:
+  - SUM-R001
+  - SUM-R006
+  - SUM-R010
+  - SUM-R011
+  - WRKF-R001
+  - WRKF-R002
+  - CRT-R001
+  - CRT-R002
+  - CRT-R003
+SUM-S002:
+  name: Read NONMEM parameter table
+  description: As a user, I want to be able to load the parameter estimates from the
+    final estimation method of a NONMEM model into a tibble in R.
+  ProductRisk: Low
+  requirements:
+  - PEST-R001
+  - PEST-R013
+  - WRKF-R001
+  - WRKF-R002
+SUM-S003:
+  name: Parse parameter labels from control stream
+  description: As a user, I want to be able to parse parameter names from comments
+    in a NONMEM control stream, when they are in a specified format.
+  ProductRisk: Low
+  requirements:
+  - PLB-R005
+  - PLB-R006
+SUM-S004:
+  name: Parse .ext file with custom name
+  description: As a user, I want to be able to pass a custom name for the NONMEM .ext
+    file to the `model_summary()` call.
+  ProductRisk: Low
+  requirements: SUM-R002
+SUM-S005:
+  name: Get data path helper
+  description: As a user, I want to have a function that extracts the path to the
+    model's input data file from the model object or summary object.
+  ProductRisk: Low
+  requirements:
+  - GPFO-R015
+  - GPFO-R016
+SUM-S006:
+  name: Build path helper
+  description: As a user, I want a helper function that can build a path to an arbitrary
+    NONMEM output file given a model or summary object and that file's extension.
+  ProductRisk: Low
+  requirements:
+  - GPFO-R018
+  - GPFO-R019
+SUM-S007:
+  name: Print method for model summary
+  description: As a user, I want to be able to print the `bbi_nonmem_summary` object
+    and get a top-line summary of what happened in the associated NONMEM run. To be
+    plain text and resemble the output from `bbi nonmem summary` on the command line.
+  ProductRisk: Low
+  requirements: PRNT-R003
+SUM-S008:
+  name: Read NONMEM parameter table batch
+  description: As a user, I want to be able to quickly read in the parameter estimates
+    for all NONMEM models in a given directory into a single tibble in R.
+  ProductRisk: Low
+  requirements:
+  - PEST-R005
+  - PEST-R006
+  - PEST-R007
+  - PEST-R008
+SUM-S009:
+  name: Read NONMEM .cov and .cor
+  description: As a user I want to be able to pull in the contents of the .cov and
+    .cor NONMEM output files.
+  ProductRisk: Low
+  requirements:
+  - CVCR-R001
+  - CVCR-R002
+  - CVCR-R003
+  - CVCR-R004
+SUM-S010:
+  name: Format parameter estimates as matrix or labeled vector
+  description: As a user, I want to be able to pull specific parameter estimates,
+    and format them properly in either a symmetrical matrix (OMEGA, SIGMA),
+    or labeled vector (THETA).
+  ProductRisk: Low
+  requirements:
+  - PEST-R014
+OUT-S001:
+  name: Read NONMEM output files
+  description: As a user, I want to be able to read NONMEM output files into a tibble
+    in R.
+  ProductRisk: Low
+  requirements: NMF-R001
+OUT-S002:
+  name: Read NONMEM tables and data
+  description: As a user, I want to be able to pass a model object and have bbr extract
+    the input data path and path to any table outputs from the control stream and
+    read those files into tibbles.
+  ProductRisk: Low
+  requirements:
+  - NMT-R001
+  - NMT-R002
+  - NMT-R003
+OUT-S003:
+  name: Join NONMEM tables to input data
+  description: As a user, I want to be able to pass a model object and have bbr extract
+    the input data path and path to any table outputs from the control stream and
+    join the contents of those files together into a single tibble.
+  ProductRisk: Low
+  requirements:
+  - NMJ-R001
+  - NMJ-R007
+LOG-S001:
+  name: Parse model YAML files into run log table
+  description: As a user, I want parse all model YAML files in a directory (and optionally
+    subdirectories) into a run log table. The table should contain all required YAML
+    fields.
+  ProductRisk: Low
+  requirements:
+  - WRKF-R005
+  - RNLG-R001
+  - RNLG-R003
+LOG-S002:
+  name: Working directory and paths in run log tibble are correct
+  description: As a user, I want to be able to use the paths included in the run_log()
+    output to unambiguously find model input and output files. A user should be able
+    to do this, even when the models were run on a different machine or in a different
+    directory than the one in which they are currently being read (by run_log()).
+  ProductRisk: Low
+  requirements:
+  - RNLG-R004
+  - SMLG-R002
+  - CGLG-R002
+  - WRKF-R003
+  - WRKF-R005
+LOG-S003:
+  name: Config log
+  description: As a user, I want to be able to load a log table that captures the
+    configuration (i.e. the information stored bbi in bbi_config.json files) for all
+    models in a given directory. This should include the version of bbi and the version
+    of NONMEM (if applicable) used to run the model.
+  ProductRisk: Medium
+  requirements:
+  - WRKF-R003
+  - CGLG-R002
+  - CGLG-R003
+  - CGLG-R006
+  - CGLG-R007
+LOG-S004:
+  name: Check if models are up-to-date using config log
+  description: As a user, I want the config log to contain two columns which verify
+    (using the md5 digests and file paths already present in that tibble) whether
+    the file at the relevant file path matches the md5 digest stored in the tibble.
+  ProductRisk: Medium
+  requirements:
+  - CGLG-R004
+  - CGLG-R005
+LOG-S005:
+  name: Summary log
+  description: As a user, I want to be able to extract a portion of the information
+    summarized by `model_summaries()` into a log table, and to be able to append this
+    information to the "run log" table created by `run_log()`.
+  ProductRisk: Low
+  requirements:
+  - SMLG-R002
+  - SMLG-R003
+  - SMLG-R004
+  - SMLG-R005
+  - SMLG-R006
+  - SMLG-R007
+LOG-S006:
+  name: Collapse list columns to character
+  description: As a user, I want to have a function that can take a tibble and the
+    names of some list columns, and collapse the list columns to a single string per
+    row.
+  ProductRisk: Low
+  requirements:
+  - CTS-R001
+  - CTS-R002
+  - CTS-R003
+  - CTS-R004
+  - CTS-R005

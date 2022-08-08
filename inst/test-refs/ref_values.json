@@ -1,0 +1,10 @@
+{
+  "CONFIG_DATA_MD5": "14e53889c0b1c29db2ba02f2025bb62c",
+  "CONFIG_MODEL_MD5": "bf80e40b7db83a3b98383235124e3e28",
+  "MOD_BBI_VERSION": "v3.1.0",
+  "CONFIG_DATA_PATH": "../../../../extdata/acop.csv",
+  "MOD_NM_VERSION": "nm74gf",
+  "MOD1_PARAM_COUNT": 9,
+  "MOD1_PARAM_COUNT_FIXED": 7,
+  "MOD1_OFV_REF": 2583.311
+}

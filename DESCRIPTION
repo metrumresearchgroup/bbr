@@ -1,16 +1,20 @@
 Type: Package
 Package: bbr
 Title: R package for bbi
-Version: 1.1.2.9001
+Version: 1.3.1.9001
 Authors@R: 
-    c(person(given = "Devin",
-             family = "Pastoor",
-             role = c("aut", "cre"),
-             email = "devin.pastoor@gmail.com"),
-      person(given = "Seth",
+    c(person(given = "Seth",
              family = "Green",
+             role = c("aut", "cre"),
+             email = "sethg@metrumrg.com"),
+      person(given = "Kyle",
+             family = "Meyer",
              role = "aut",
-             email = "seth127@gmail.com"),
+             email = "kylem@metrumrg.com"),
+      person(given = "Devin",
+             family = "Pastoor",
+             role = "aut",
+             email = "devin.pastoor@gmail.com"),
       person(given = "Anna-Christina",
              family = "Nevison",
              role = "aut",
@@ -26,7 +30,11 @@ Authors@R:
       person(given = "Tim",
              family = "Waterhouse",
              role = "aut",
-             email = "timw@metrumrg.com"))
+             email = "timw@metrumrg.com"),
+      person(given = "Kyle T",
+           family = "Baron",
+           role = c("aut"),
+           email = "kyleb@metrumrg.com"))
 Description: R package for making calls to bbi for running
     NONMEM and other models. Also manages model metadata, workflow, and
     run logs.
@@ -37,13 +45,12 @@ Imports:
     brms,
     checkmate,
     cli,
+    data.table,
     digest,
     diffobj,
-    dplyr (>= 0.8.0),
+    dplyr (>= 1.0.0),
     ellipsis,
-    forcats,
     fs,
-    ggplot2,
     glue,
     jsonlite,
     lifecycle,
@@ -62,15 +69,19 @@ Suggests:
     cmdstanr,
     covr,
     devtools,
+    forcats,
+    ggplot2,
     knitr,
     methods,
     rmarkdown,
     testthat (>= 2.1.0),
-    withr
+    withr,
+    mrgvalidate,
+    mrgvalprep (>= 0.0.4)
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.1
 SystemRequirements: bbi (>= 3.0.2)

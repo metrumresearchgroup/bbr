@@ -13,11 +13,11 @@ knitr::opts_chunk$set(
 )
 ```
 
-# bbr 
+# bbr <a href='https:/metrumresearchgroup.github.io/bbr'><img src='man/figures/logo.png' align="right" height="120" /></a>
 
 <!-- badges: start -->
 [![Build Status](https://github-drone.metrumrg.com/api/badges/metrumresearchgroup/bbr/status.svg)](https://github-drone.metrumrg.com/metrumresearchgroup/bbr)
-[![codecov](https://codecov.io/gh/metrumresearchgroup/bbr/branch/develop/graph/badge.svg)](https://codecov.io/gh/metrumresearchgroup/bbr)
+[![codecov](https://codecov.io/gh/metrumresearchgroup/bbr/branch/main/graph/badge.svg)](https://codecov.io/gh/metrumresearchgroup/bbr)
 <!-- badges: end -->
 
 # bbr_stan_alpha
@@ -37,7 +37,7 @@ You can also install development versions of `bbr` by downloading the source fil
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("metrumresearchgroup/bbr", ref = "develop")
+devtools::install_github("metrumresearchgroup/bbr", ref = "main")
 ```
 
 ### Stan modeling
@@ -69,7 +69,7 @@ isolation. To replicate this environment,
 
 2. install pkgr
 
-3. open package in an R session and run `renv::init()` 
+3. open package in an R session and run `renv::init(bare = TRUE)`
    - install `renv` > 0.8.3-4 into default `.libPaths()` if not already installed
 
 3. run `pkgr install` in terminal within package directory

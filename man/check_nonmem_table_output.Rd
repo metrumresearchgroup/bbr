@@ -42,20 +42,22 @@ check_ext(.mod, .iter_floor = 0)
 \item{.iter_floor}{Filters file to only rows with \code{ITERATION} GREATER THAN this value.}
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+
 Checks a NONMEM output file that's a whitespace-delimited file (for instance .grd or .ext)
 }
-\section{Methods (by generic)}{
+\section{Functions}{
 \itemize{
-\item \code{check_grd}: Checks .grd file from a file path
+\item \code{check_grd(character)}: Checks .grd file from a file path
 
-\item \code{check_grd}: Checks .grd file from a \code{bbi_nonmem_model}
+\item \code{check_grd(bbi_nonmem_model)}: Checks .grd file from a \code{bbi_nonmem_model}
 
-\item \code{check_grd}: Checks .grd file from a \code{bbi_nonmem_summary}
+\item \code{check_grd(bbi_nonmem_summary)}: Checks .grd file from a \code{bbi_nonmem_summary}
 
-\item \code{check_ext}: Checks .ext file from a file path
+\item \code{check_ext(character)}: Checks .ext file from a file path
 
-\item \code{check_ext}: Checks .ext file from a \code{bbi_nonmem_model} object
+\item \code{check_ext(bbi_nonmem_model)}: Checks .ext file from a \code{bbi_nonmem_model} object
 
-\item \code{check_ext}: Checks .ext file from a \code{bbi_nonmem_summary} object
+\item \code{check_ext(bbi_nonmem_summary)}: Checks .ext file from a \code{bbi_nonmem_summary} object
+
 }}
-

@@ -11,6 +11,7 @@ new_model(
   .tags = NULL,
   .bbi_args = NULL,
   .overwrite = FALSE,
+  .star = NULL,
   .model_type = c("nonmem", "stan")
 )
 }
@@ -36,6 +37,8 @@ into YAML file.}
 \item{.overwrite}{If \code{FALSE}, the default, error if a file already exists at
 \code{.yaml_path}. If \code{TRUE} overwrite existing file and output directory, if
 they exist.}
+
+\item{.star}{Boolean, marks model to indicate special interest level.}
 
 \item{.model_type}{Character scaler to specify type of model being created
 (used for S3 class). Currently only \code{'nonmem'} and \code{'stan'} are supported.

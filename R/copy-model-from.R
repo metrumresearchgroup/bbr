@@ -13,7 +13,8 @@
 #'   path to `.parent_mod`. Represents an absolute model path, which is the path
 #'   to the YAML file and model file, both without extension, and the output
 #'   directory (once the model is run). Numeric values will be coerced to
-#'   character. See examples for usage.
+#'   character. If `NULL`, the default, will try to increment to the next integer
+#'   in the destination directory. See examples for usage.
 #' @param .description Character scalar description of new model run. This will
 #'   be stored in the yaml (and can be viewed later in `run_log()`).
 #' @param .based_on_additional Character vector of path(s) to other models that
@@ -21,11 +22,12 @@
 #'   and ancestry. **Paths must be relative to `.new_model` path.** Note that
 #'   the `.parent_model` will automatically be added to the `based_on` field, so
 #'   no need to include that here.
+#' @param .star Boolean, marks model to indicate special interest level.
 #' @param .add_tags Character vector with any new tags(s) to be added to
 #'   `{.new_model}.yaml`
-#' @param .inherit_tags If `TRUE`, the default, inherit any tags from
-#'   `.parent_mod`, with any tags passed to `.add_tags` appended. If `FALSE` new
-#'   model will only have any tags passed to `.add_tags` argument.
+#' @param .inherit_tags If `FALSE`, the default, new model will only have any
+#'   tags passed to `.add_tags` argument. If `TRUE` inherit any tags from
+#'   `.parent_mod`, with any tags passed to `.add_tags` appended.
 #' @param .update_model_file **Only relevant to NONMEM models.** If `TRUE`, the
 #'   default, update the newly created model file. If `FALSE`, new model file
 #'   will be an exact copy of its parent. For a NONMEM model, this currently
@@ -47,19 +49,24 @@
 #' mod1 <- read_model("/path/to/1")
 #'
 #' # create model file at /path/to/2.ctl and YAML at /path/to/2.yaml
-#' copy_model_from(mod1, 2, "numeric input works")
+#' copy_model_from(mod1, "increments to next integer by default")
+#'
+#' # create model file at /path/to/3.ctl and YAML at /path/to/3.yaml
+#' copy_model_from(mod1, 3, "numeric input works")
 #'
 #' # create model file at /path/to/100.1.ctl and YAML at /path/to/100.1.yaml
 #' copy_model_from(mod1, 100.1, "a period is okay")
 #' }
+#' @seealso [new_model()], [update_model_id()]
 #' @export
 copy_model_from <- function(
   .parent_mod,
-  .new_model,
+  .new_model = NULL,
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
-  .inherit_tags = TRUE,
+  .star = NULL,
+  .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE
 ) {
@@ -70,11 +77,12 @@ copy_model_from <- function(
 #' @export
 copy_model_from.bbi_nonmem_model <- function(
   .parent_mod,
-  .new_model,
+  .new_model = NULL,
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
-  .inherit_tags = TRUE,
+  .star = NULL,
+  .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE
 ) {
@@ -87,6 +95,7 @@ copy_model_from.bbi_nonmem_model <- function(
     .description = .description,
     .based_on_additional = .based_on_additional,
     .add_tags = .add_tags,
+    .star = .star,
     .inherit_tags = .inherit_tags,
     .update_model_file = .update_model_file,
     .overwrite = .overwrite,
@@ -104,7 +113,8 @@ copy_model_from.bbi_stan_model <- function(
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
-  .inherit_tags = TRUE,
+  .star = NULL,
+  .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE
 ) {
@@ -119,6 +129,7 @@ copy_model_from.bbi_stan_model <- function(
     .description = .description,
     .based_on_additional = .based_on_additional,
     .add_tags = .add_tags,
+    .star = .star,
     .inherit_tags = .inherit_tags,
     .update_model_file = .update_model_file,
     .overwrite = .overwrite,
@@ -158,7 +169,8 @@ copy_model_from_impl <- function(
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
-  .inherit_tags = TRUE,
+  .star = NULL,
+  .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE,
   .model_type = c("nonmem", "stan")
@@ -205,6 +217,7 @@ copy_model_from_impl <- function(
     .description = .description,
     .based_on = c(.parent_based_on, .based_on_additional),
     .tags = new_tags,
+    .star = .star,
     .bbi_args = .parent_mod[[YAML_BBI_ARGS]],
     .overwrite = FALSE, # will have already overwritten if necessary
     .model_type = .model_type
@@ -232,6 +245,11 @@ copy_control_stream <- function(.parent_model_path, .new_model_path, .overwrite,
       stop(glue("File already exists at {.new_model_path} -- cannot copy new control stream. Either pass `.overwrite = TRUE` or use `new_model({tools::file_path_sans_ext(.new_model_path)})`"))
     }
 
+  }
+
+  # if copying to new dir, create the dir first
+  if(!fs::dir_exists(dirname(.new_model_path))) {
+    fs::dir_create(dirname(.new_model_path))
   }
 
   if (.update_model_file) {
@@ -310,10 +328,53 @@ copy_stan_files <- function(.parent_mod, .new_model, .overwrite) {
 #' @return absolute file path to save new model to (without file extension)
 #' @keywords internal
 build_new_model_path <- function(.parent_mod, .new_model) {
+  if (is.null(.new_model)){
+    .new_model <- get_next_integer(.parent_mod)
+  }
+
+  if (length(.new_model) != 1) {
+    stop(paste(
+      glue("copy_model_from(.new_model) must be either a string or numeric, but got length {length(.new_model)}:\n\n"),
+      paste(.new_model, collapse = ", ")
+    ))
+  }
+
   if (!fs::is_absolute_path(.new_model)) {
     .new_model <- as.character(.new_model)
     .new_model <- file.path(get_model_working_directory(.parent_mod), .new_model)
     .new_model <- fs::path_norm(.new_model)
   }
   return(.new_model)
+}
+
+#' Check directory for model files with integer names
+#' and return the next integer. Used by copy_model_from().
+#' @importFrom stringr str_extract_all str_pad
+#' @keywords internal
+get_next_integer <- function(.parent_mod){
+  .dir <- dirname(get_model_path(.parent_mod))
+  .ext <- tools::file_ext(get_model_path(.parent_mod))
+
+  # find model in same dir with largest integer name
+  mods <- fs::dir_ls(.dir, regexp=glue("\\.{.ext}$")) %>%
+    basename() %>%
+    tools::file_path_sans_ext()
+
+  mods_int <- suppressSpecificWarning(as.integer(mods), .regexpr = "NAs introduced by coercion")
+  if (all(is.na(mods_int))) {
+    stop(paste(
+      glue("There are no models in {.dir} with integer names, so cannot increment `.new_model` to next integer."),
+      "Please pass a valid name to `copy_model_from(.new_model)`."
+    ))
+  }
+  largest_mod <- which(mods_int == max(mods_int, na.rm = TRUE))
+  pick <- as.character(mods_int[largest_mod] + 1)
+
+  # pad if necessary
+  .nc <- nchar(mods[largest_mod])
+  if(nchar(pick) < .nc) {
+    pick <- str_pad(pick, .nc, side = "left", pad = "0")
+  }
+
+  return(pick)
 }

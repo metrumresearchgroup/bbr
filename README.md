@@ -1,16 +1,16 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# bbr
+# bbr <a href='https:/metrumresearchgroup.github.io/bbr'><img src='man/figures/logo.png' align="right" height="120" /></a>
 
 <!-- badges: start -->
 
 [![Build
 Status](https://github-drone.metrumrg.com/api/badges/metrumresearchgroup/bbr/status.svg)](https://github-drone.metrumrg.com/metrumresearchgroup/bbr)
-[![codecov](https://codecov.io/gh/metrumresearchgroup/bbr/branch/develop/graph/badge.svg)](https://codecov.io/gh/metrumresearchgroup/bbr)
+[![codecov](https://codecov.io/gh/metrumresearchgroup/bbr/branch/main/graph/badge.svg)](https://codecov.io/gh/metrumresearchgroup/bbr)
 <!-- badges: end -->
 
-# bbr\_stan\_alpha
+# bbr_stan_alpha
 
 All releases tagged `1.1.0.9xxx` refer to “alpha” releases cut from the
 `bbr_stan_alpha` branch. The intention of this branch is to begin
@@ -49,7 +49,7 @@ latest development version from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("metrumresearchgroup/bbr", ref = "develop")
+devtools::install_github("metrumresearchgroup/bbr", ref = "main")
 ```
 
 ### Stan modeling
@@ -80,7 +80,7 @@ functionality is rolled out. A complete list can be found
     bbr](https://metrumresearchgroup.github.io/bbr/articles/getting-started.html)
     – Some basic scenarios for modeling with NONMEM using `bbr`,
     introducing you to its standard workflow and functionality.
--   [Using the based\_on
+-   [Using the based_on
     field](https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html)
     – How to use the `based_on` field to track a model’s ancestry
     through the model development process, as well how to leverage
@@ -100,9 +100,9 @@ provide isolation. To replicate this environment,
 
 2.  install pkgr
 
-3.  open package in an R session and run `renv::init()`
+3.  open package in an R session and run `renv::init(bare = TRUE)`
 
-    -   install `renv` &gt; 0.8.3-4 into default `.libPaths()` if not
+    -   install `renv` \> 0.8.3-4 into default `.libPaths()` if not
         already installed
 
 4.  run `pkgr install` in terminal within package directory

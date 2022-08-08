@@ -47,16 +47,16 @@ for an example of this.
 }
 \section{Functions}{
 \itemize{
-\item \code{add_notes}: Add notes to a model object and corresponding YAML.
+\item \code{add_notes()}: Add notes to a model object and corresponding YAML.
 
-\item \code{replace_note}: Replaces a specific \code{.old_note} with \code{.new_note} on a model object and corresponding YAML.
+\item \code{replace_note()}: Replaces a specific \code{.old_note} with \code{.new_note} on a model object and corresponding YAML.
 Warns and does nothing if \code{.old_note} is not present.
 
-\item \code{replace_all_notes}: Replaces all notes on a model object and corresponding YAML with new notes.
+\item \code{replace_all_notes()}: Replaces all notes on a model object and corresponding YAML with new notes.
 
-\item \code{remove_notes}: Removes notes from a model object and corresponding YAML.
+\item \code{remove_notes()}: Removes notes from a model object and corresponding YAML.
+
 }}
-
 \seealso{
-\code{\link[=run_log]{run_log()}} \code{\link[=collapse_to_string]{collapse_to_string()}} \code{\link[=modify_tags]{modify_tags()}} \code{\link[=modify_based_on]{modify_based_on()}} \code{\link[=modify_description]{modify_description()}} \code{\link[=modify_bbi_args]{modify_bbi_args()}}
+\code{\link[=run_log]{run_log()}} \code{\link[=collapse_to_string]{collapse_to_string()}} \code{\link[=modify_tags]{modify_tags()}} \code{\link[=modify_based_on]{modify_based_on()}} \code{\link[=modify_description]{modify_description()}} \code{\link[=modify_bbi_args]{modify_bbi_args()}} \code{\link[=modify_star]{modify_star()}}
 }

@@ -36,11 +36,11 @@ example to look at only the most important models by calling
 }
 \section{Functions}{
 \itemize{
-\item \code{add_description}: Fills the description field in a model object and corresponding YAML, if it is currently empty.
+\item \code{add_description()}: Fills the description field in a model object and corresponding YAML, if it is currently empty.
 
-\item \code{replace_description}: Replaces description field in a model object and corresponding YAML with new description.
+\item \code{replace_description()}: Replaces description field in a model object and corresponding YAML with new description.
+
 }}
-
 \seealso{
-\code{\link[=run_log]{run_log()}} \code{\link[=modify_tags]{modify_tags()}} \code{\link[=modify_notes]{modify_notes()}} \code{\link[=modify_based_on]{modify_based_on()}} \code{\link[=modify_bbi_args]{modify_bbi_args()}}
+\code{\link[=run_log]{run_log()}} \code{\link[=modify_tags]{modify_tags()}} \code{\link[=modify_notes]{modify_notes()}} \code{\link[=modify_based_on]{modify_based_on()}} \code{\link[=modify_bbi_args]{modify_bbi_args()}} \code{\link[=modify_star]{modify_star()}}
 }

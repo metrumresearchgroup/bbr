@@ -5,7 +5,7 @@
 \alias{add_config}
 \title{Parse bbi configs to log}
 \usage{
-config_log(.base_dir, .recurse = TRUE)
+config_log(.base_dir, .recurse = TRUE, .include = NULL)
 
 add_config(.log_df)
 }
@@ -13,6 +13,8 @@ add_config(.log_df)
 \item{.base_dir}{Base directory to look in for models.}
 
 \item{.recurse}{If \code{TRUE}, the default, search recursively in all subdirectories. Passed through to \code{fs::dir_ls()} -- If a positive number, the number of levels to recurse.}
+
+\item{.include}{A character vector specifying which runs or model tags to include in the run log.}
 
 \item{.log_df}{A \code{bbi_run_log_df} tibble (the output of \code{\link[=run_log]{run_log()}}).}
 }

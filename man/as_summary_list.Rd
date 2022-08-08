@@ -20,6 +20,6 @@ Note this is primarily intended as a developer function, though it was exposed b
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{bbi_summary_log_df}: Convert a \code{bbi_summary_log_df} into a \code{bbi_summary_list}
-}}
+\item \code{as_summary_list(bbi_summary_log_df)}: Convert a \code{bbi_summary_log_df} into a \code{bbi_summary_list}
 
+}}

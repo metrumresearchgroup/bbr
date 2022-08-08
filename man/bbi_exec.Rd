@@ -10,6 +10,7 @@ bbi_exec(
   .verbose = FALSE,
   .wait = FALSE,
   .bbi_exe_path = getOption("bbr.bbi_exe_path"),
+  .check_status = TRUE,
   ...
 )
 }
@@ -23,6 +24,9 @@ bbi_exec(
 \item{.wait}{If true, don't return until process has exited.}
 
 \item{.bbi_exe_path}{Path to bbi executable}
+
+\item{.check_status}{Whether to signal an error if the command has a non-zero
+exit code.}
 
 \item{...}{arguments to pass to processx::process$new()}
 }

@@ -10,7 +10,8 @@ copy_model_from_impl(
   .description = NULL,
   .based_on_additional = NULL,
   .add_tags = NULL,
-  .inherit_tags = TRUE,
+  .star = NULL,
+  .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE,
   .model_type = c("nonmem", "stan")
@@ -23,7 +24,8 @@ copy_model_from_impl(
 path to \code{.parent_mod}. Represents an absolute model path, which is the path
 to the YAML file and model file, both without extension, and the output
 directory (once the model is run). Numeric values will be coerced to
-character. See examples for usage.}
+character. If \code{NULL}, the default, will try to increment to the next integer
+in the destination directory. See examples for usage.}
 
 \item{.description}{Character scalar description of new model run. This will
 be stored in the yaml (and can be viewed later in \code{run_log()}).}
@@ -37,9 +39,11 @@ no need to include that here.}
 \item{.add_tags}{Character vector with any new tags(s) to be added to
 \verb{\{.new_model\}.yaml}}
 
-\item{.inherit_tags}{If \code{TRUE}, the default, inherit any tags from
-\code{.parent_mod}, with any tags passed to \code{.add_tags} appended. If \code{FALSE} new
-model will only have any tags passed to \code{.add_tags} argument.}
+\item{.star}{Boolean, marks model to indicate special interest level.}
+
+\item{.inherit_tags}{If \code{FALSE}, the default, new model will only have any
+tags passed to \code{.add_tags} argument. If \code{TRUE} inherit any tags from
+\code{.parent_mod}, with any tags passed to \code{.add_tags} appended.}
 
 \item{.update_model_file}{\strong{Only relevant for NONMEM models.} If \code{TRUE}, the
 default, update the \verb{$PROBLEM} line in the new control stream. If \code{FALSE},

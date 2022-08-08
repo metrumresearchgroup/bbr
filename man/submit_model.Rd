@@ -121,12 +121,12 @@ Submits a model to be run by calling out to \code{bbi}.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{bbi_nonmem_model}: Takes a \code{bbi_nonmem_model} object.
+\item \code{submit_model(bbi_nonmem_model)}: Takes a \code{bbi_nonmem_model} object.
 
-\item \code{bbi_stan_model}: Takes a \code{bbi_stan_model} object. All arguments
+\item \code{submit_model(bbi_stan_model)}: Takes a \code{bbi_stan_model} object. All arguments
 passed through \code{...} will be passed to \code{\link[cmdstanr:model-method-sample]{cmdstanr::sample()}} method.
-}}
 
+}}
 \seealso{
 \code{\link[=submit_models]{submit_models()}}
 }

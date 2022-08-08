@@ -5,8 +5,11 @@
 
 #' Parses parameter estimates table
 #'
-#' Returns a tibble containing parameter estimates from a `bbi_{.model_type}_summary` object.
-#' Details about the tibble that is returned are in the return value section below.
+#' Returns a tibble containing parameter estimates from a
+#' `bbi_{.model_type}_summary` object. Details about the tibble that is returned
+#' are in the return value section below. Note: if you need to pull in the
+#' parameter estimates for a large number of NONMEM models at once, consider
+#' using [param_estimates_batch()] instead.
 #'
 #' @details
 #' Note that **Bayesian methods are not yet supported** by this function. Creating a parameter table
@@ -29,10 +32,12 @@
 #' can be found in `bbi_nonmem_summary$shrinkage_details`.
 #'
 #'
-#' @seealso [param_labels()] [apply_indices()]
+#' @seealso [param_estimates_batch()], [model_summary()], [param_labels()], [apply_indices()]
 #' @param .summary A `bbi_{.model_type}_summary` object.
+#' @param .alpha numeric. If specified, return the p-value for each eta value on the diagonal,
+#'         as well as whether they are below the specified value of alpha. Defaults to NULL.
 #' @export
-param_estimates <- function(.summary) {
+param_estimates <- function(.summary, .alpha) {
   UseMethod("param_estimates")
 }
 
@@ -41,26 +46,30 @@ param_estimates <- function(.summary) {
 #' @importFrom purrr map_at map_depth map_lgl
 #' @importFrom rlang list2
 #' @importFrom stringr str_detect
+#' @importFrom checkmate assert_numeric
 #' @export
-param_estimates.bbi_nonmem_summary <- function(.summary) {
+param_estimates.bbi_nonmem_summary <- function(.summary, .alpha = NULL) {
   param_names <- .summary[[SUMMARY_PARAM_NAMES]]
 
   # if Bayesian method (includes NUTS) do not return df because it is incorrect and misleading
-  est_methods <- .summary[[SUMMARY_DETAILS]][[SUMMARY_EST_METHOD]]
+  details <- .summary[[SUMMARY_DETAILS]]
+  est_methods <- details[[SUMMARY_EST_METHOD]]
   if (any(str_detect(est_methods, "Bayesian"))) {
     stop(glue("{PARAM_BAYES_ERR_MSG} `.summary` has final estimation method: {est_methods}"), call. = FALSE)
   }
+  if (isTRUE(details$only_sim)) {
+    stop(glue(".summary has no estimation method (ONLYSIM)"), call. = FALSE)
+  }
 
-  summary_vars <- with(
-    .summary[[SUMMARY_PARAM_DATA]][[length(.summary[[SUMMARY_PARAM_DATA]])]],
+  param_data <- .summary[[SUMMARY_PARAM_DATA]][[length(.summary[[SUMMARY_PARAM_DATA]])]]
+  summary_vars <-
     list(
-      estimate = estimates,
-      stderr = std_err,
-      random_effect_sd = random_effect_sd,
-      random_effect_sdse = random_effect_sdse,
-      fixed = fixed
+      estimate = param_data$estimates,
+      stderr = param_data$std_err,
+      random_effect_sd = param_data$random_effect_sd,
+      random_effect_sdse = param_data$random_effect_sdse,
+      fixed = param_data$fixed
     )
-  )
 
   # left-pad the random effect variables with NAs
   summary_vars_padded <- purrr::map_at(
@@ -86,7 +95,15 @@ param_estimates.bbi_nonmem_summary <- function(.summary) {
   param_df[["fixed"]] <- param_df[["fixed"]] == 1 # convert from 1/0 to T/F
   param_df[[SUMMARY_PARAM_DIAG]] <- map_lgl(param_df[[SUMMARY_PARAM_NAMES]], is_diag)
 
-  param_df <- add_param_shrinkage(param_df, .summary)
+  # Add p-value
+  add_pval <- !is.null(.alpha)
+
+  param_df <- add_param_shrinkage(param_df, .summary, add_pval)
+
+  if (add_pval){
+    assert_numeric(.alpha, lower = 0, upper = 1, len = 1)
+    param_df[[SUMMARY_PARAM_ETASIG]] <- param_df[[SUMMARY_PARAM_PVAL]] < .alpha
+  }
 
   return(param_df)
 }
@@ -120,7 +137,7 @@ is_diag <- function(.name) {
 #' @importFrom dplyr select filter left_join bind_rows
 #' @importFrom stringr str_detect
 #' @keywords internal
-add_param_shrinkage <- function(.param_df, .summary) {
+add_param_shrinkage <- function(.param_df, .summary, .add_pval = FALSE) {
 
   # extract shrinkage for final estimation method
   shk <- .summary[[SUMMARY_SHRINKAGE]]
@@ -137,7 +154,7 @@ add_param_shrinkage <- function(.param_df, .summary) {
       glue("When using `param_estimates()` with a mixture model (multiple subpops) the `{SUMMARY_PARAM_SHRINKAGE}` column will be all `NA`."),
       glue("Users can manually extract shrinkage for each subpop from the `{SUMMARY_SHRINKAGE}` element of the `bbi_nonmem_summary` object."),
       sep = "\n"
-      ))
+    ))
     .param_df[[SUMMARY_PARAM_SHRINKAGE]] <- NA_real_
     return(.param_df)
   }
@@ -147,8 +164,8 @@ add_param_shrinkage <- function(.param_df, .summary) {
 
   # filter to only omega and sigma diagonal elements
   diag_df <- .param_df %>%
-                filter(.data[[SUMMARY_PARAM_DIAG]]) %>%
-                select({{ SUMMARY_PARAM_NAMES }}, {{ SUMMARY_PARAM_DIAG }})
+    filter(.data[[SUMMARY_PARAM_DIAG]]) %>%
+    select({{ SUMMARY_PARAM_NAMES }}, {{ SUMMARY_PARAM_DIAG }})
 
   # parse shrinkage for OMEGA diagonals
   omega_df <- filter(diag_df, str_detect(.data[[SUMMARY_PARAM_NAMES]], "OMEGA"))
@@ -157,9 +174,13 @@ add_param_shrinkage <- function(.param_df, .summary) {
     stop(paste(
       glue("Found {nrow(omega_df)} OMEGA diagonals in parameter table and {length(omega_shk)} elements in `.summary[['{SUMMARY_SHRINKAGE}']][['{SUMMARY_SHRINKAGE_OMEGA}']]`."),
       "Summary object may be malformed."
-      ))
+    ))
   }
   omega_df[[SUMMARY_PARAM_SHRINKAGE]] <- omega_shk
+
+  if (isTRUE(.add_pval)) {
+    omega_df[[SUMMARY_PARAM_PVAL]] <- shk[[SUMMARY_SHRINKAGE_PVAL]]
+  }
 
   # parse shrinkage for SIGMA diagonals
   sigma_df <- filter(diag_df, str_detect(.data[[SUMMARY_PARAM_NAMES]], "SIGMA"))

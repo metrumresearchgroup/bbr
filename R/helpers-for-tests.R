@@ -65,4 +65,14 @@ skip_long_tests <- function(.explanation = "Skipping long running tests") {
   }
 }
 
-
+#' Skip test if current bbi version is below specified one.
+#'
+#' @param v a package version (or a string that can be converted to one) to pass
+#'   as the .min_version argument of `test_bbi_version()`.
+#' @keywords internal
+skip_if_old_bbi <- function(v) {
+  if (!test_bbi_version(read_bbi_path(), v)) {
+    testthat::skip(
+      glue("bbi version is {bbi_version()}. Test requires version {v} or later"))
+  }
+}

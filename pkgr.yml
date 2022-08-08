@@ -4,12 +4,12 @@ Descriptions:
 
 Packages:
   - devtools
-  - renv
+  - pkgdown
   - styler
 
 Repos:
   - CRAN: https://cran.rstudio.com
-  - MPN: https://mpn.metworx.com/snapshots/stable/2021-03-08
+  - MPN: https://mpn.metworx.com/snapshots/stable/2022-06-15 # cmdstanr and mrgval
 
 Lockfile:
   Type: renv

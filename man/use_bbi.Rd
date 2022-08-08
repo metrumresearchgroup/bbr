@@ -4,16 +4,23 @@
 \alias{use_bbi}
 \title{Installs most current release of bbi}
 \usage{
-use_bbi(.path = NULL, .version = "latest", .force = FALSE, .quiet = FALSE)
+use_bbi(.path = NULL, .version = "latest", .force = FALSE, .quiet = NULL)
 }
 \arguments{
-\item{.path}{absolute path to install bbi to. See Details section for defaults, if nothing is passed.}
+\item{.path}{absolute path to install bbi to. See Details section for
+defaults, if nothing is passed.}
 
-\item{.version}{version of bbi to install. Must pass a character scalar corresponding to a tag found in \verb{https://github.com/metrumresearchgroup/bbi/releases}}
+\item{.version}{version of bbi to install. Must pass a character scalar
+corresponding to a tag found in
+\verb{https://github.com/metrumresearchgroup/bbi/releases}}
 
-\item{.force}{If \code{FALSE}, the default, skips installation if requested version and local version are the same. If \code{TRUE} forces installation if it will be the same version.}
+\item{.force}{If \code{FALSE}, the default, skips installation if requested
+version and local version are the same. If \code{TRUE} forces installation if it
+will be the same version.}
 
-\item{.quiet}{If \code{TRUE}, suppresses output printed to the console. \code{FALSE} by default.}
+\item{.quiet}{\strong{Deprecated.} Use \code{options("bbr.verbose")} instead to control
+printing. Defaults to \code{NULL}, which reads \code{!getOption("bbr.verbose")}. If
+\code{TRUE}, suppresses output printed to the console.}
 }
 \value{
 character
@@ -22,7 +29,9 @@ character
 Identifies system running and pulls the relevant tarball for the
 current release of bbi from GitHub, and then installs it in the directory
 passed to \code{.dir}. If used in an interactive session, will open an
-installation menu confirming the installed version.
+installation menu confirming the installed version. This function will
+print information about the installed version. This \strong{printing can be
+suppressed} by setting \code{options(bbr.verbose = FALSE)}.
 }
 \details{
 If nothing is passed to the \code{.path} argument, \code{use_bbi()} will

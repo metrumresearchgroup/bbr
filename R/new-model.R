@@ -30,10 +30,11 @@
 #'   (used for S3 class). Currently only `'nonmem'` and `'stan'` are supported.
 #'   Defaults to `'nonmem'` to preserve legacy API.
 #'
+#' @param .star Boolean, marks model to indicate special interest level.
 #' @return S3 object of class `bbi_{.model_type}_model` that can be passed to
 #'   `submit_model()`, `model_summary()`, etc.
 #' @seealso [copy_model_from()], [read_model()]
-#' @importFrom checkmate assert_scalar
+#' @importFrom checkmate assert_scalar assert_logical
 #' @importFrom fs file_exists file_delete dir_exists dir_delete
 #' @export
 new_model <- function(
@@ -43,13 +44,16 @@ new_model <- function(
   .tags = NULL,
   .bbi_args = NULL,
   .overwrite = FALSE,
+  .star = NULL,
   .model_type = c("nonmem", "stan"),
   ...
 ) {
 
   .model_type <- match.arg(.model_type)
+  assert_logical(.star, len = 1, null.ok = TRUE)
 
   # check if file already exists and decide whether to overwrite if it does
+  .path <- sanitize_file_extension(.path)
   check_for_existing_model(.path, .overwrite)
 
   # construct the absolute model path in a way that avoids a warning from
@@ -74,6 +78,7 @@ new_model <- function(
       if (!is.null(.tags))        .mod <- replace_all_tags(.mod, .tags)
       if (!is.null(.bbi_args))    .mod <- replace_all_bbi_args(.mod, .bbi_args)
       if (!is.null(.based_on))    .mod <- replace_all_based_on(.mod, .based_on)
+      if (isTRUE(.star))          .mod <- add_star(.mod)
     },
     error = function(.e) {
       if (fs::dir_exists(abs_mod_path)) fs::dir_delete(abs_mod_path)
@@ -230,4 +235,16 @@ stan_files_from_brms <- function(.path, args) {
   stan_data <- do.call(brms::make_standata, args)
   cmdstanr::write_stan_json(unclass(stan_data), build_path_from_model(.path, STANDATA_JSON_SUFFIX))
   write_lines(STANDATA_BRMS_COMMENT, build_path_from_model(.path, STANDATA_R_SUFFIX))
+}
+
+#' Private helper to remove file extensions to match expected input to new model.
+#' @inheritParams new_model
+#' @keywords internal
+sanitize_file_extension <- function(.path)
+{
+  if(fs::is_file(.path))
+  {
+    .path <- fs::path_ext_remove(.path)
+  }
+  return(.path)
 }

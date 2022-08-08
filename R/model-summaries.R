@@ -1,6 +1,9 @@
 #' Summarize multiple models in batch
 #'
-#' Run multiple [model_summary()] calls in batch.
+#' Run multiple [model_summary()] calls in batch. Note: if you need to pull in
+#' _only_ the parameter estimates for a large number of NONMEM models, consider
+#' using [param_estimates_batch()] instead, as it will be faster than
+#' `model_summaries()` for this purpose.
 #'
 #' @details
 #' The summary call will error if it does not find certain files in the output folder.
@@ -23,7 +26,7 @@
 #' @param .fail_flags Same as `.bbi_args` except these are used _only_ when a [model_summary()] call fails.
 #' In that case, flags are appended to anything in `.bbi_args` and the summary is tried again.
 #' See details section for more info on these flags.
-#' @seealso [model_summary()], [summary_log()]
+#' @seealso [model_summary()], [summary_log()], [param_estimates_batch()]
 #' @inheritParams model_summary
 #' @export
 model_summaries <- function(
@@ -34,6 +37,131 @@ model_summaries <- function(
   .dry_run = FALSE
 ) {
   UseMethod("model_summaries")
+}
+
+# model_summaries_serial() can go away once bbr.bbi_min_version is 3.2.0 or
+# later.
+
+#' @importFrom purrr map
+model_summaries_serial <- function(.mods, .bbi_args, .fail_flags) {
+  format_error <- function(err) {
+    return(list(error_msg = paste(as.character(err$message),
+                                  collapse = " -- ")))
+  }
+
+  map(.mods, function(.m) {
+    .s <- tryCatch(
+      {
+        model_summary(.m, .bbi_args = .bbi_args)
+      },
+      error = function(.e) {
+        if (is.null(.fail_flags)) {
+          return(format_error(.e))
+        }
+        # if fails, try again with flags
+        tryCatch({
+          if (!is.null(.bbi_args)) {
+            .fail_flags <- combine_list_objects(.fail_flags, .bbi_args)
+          }
+          .retry <- bbr::model_summary(.m, .bbi_args = .fail_flags)
+          .retry$needed_fail_flags <- TRUE
+          return(.retry)
+        },
+        error = format_error)
+      }
+    )
+
+    res <- list()
+    res[[ABS_MOD_PATH]] = tools::file_path_sans_ext(get_model_path(.m))
+    res[[SL_SUMMARY]] = .s
+    res[[SL_ERROR]] = .s$error_msg %||% NA_character_
+    res[[SL_FAIL_FLAGS]] = .s$needed_fail_flags %||% FALSE
+
+    return(res)
+  })
+}
+
+bbi_exec_model_summaries <- function(args, paths) {
+  args <- c(args %||% list(), json = TRUE)
+  cmd <- bbi_exec(c("nonmem", "summary", check_bbi_args(args), paths),
+                  .wait = TRUE, .check_status = FALSE)
+  res <- jsonlite::fromJSON(paste(cmd[["stdout"]], collapse = ""),
+                            simplifyDataFrame = FALSE)
+  if (length(paths) == 1) {
+    # If passed a single model, bbi will output a single object rather than a
+    # list of objects. Reshape it into the same form for downstream code.
+    res <- list(Results = list(res),
+                Errors = if (res$success) list() else 0)
+  }
+
+  return(res)
+}
+
+#' Summarize multiple models via single call to bbi
+#'
+#' `bbi nonmem summary` accepts more than one model as of v2.3.0, and v3.2.0
+#' reworked the output so that the errors are included in the JSON structure.
+#' This function consumes the v3.2.0 output, returning an object that can be
+#' passed to [create_summary_list()].
+#'
+#' @importFrom purrr map_chr modify_at modify_if walk
+#' @keywords internal
+model_summaries_concurrent <- function(.mods, .bbi_args, .fail_flags) {
+  walk(.mods, check_yaml_in_sync)
+  paths <- map_chr(
+    .mods,
+    # Take relative paths to minimize argument length.
+    ~ fs::path_rel(build_path_from_model(.x, ".lst")))
+
+  summaries <- bbi_exec_model_summaries(.bbi_args, paths)
+  if (length(summaries$Errors) > 0 && !is.null(.fail_flags)) {
+    idx_failed <- summaries$Errors + 1
+    args_retry <- .fail_flags
+    if (!is.null(.bbi_args)) {
+      args_retry <- combine_list_objects(args_retry, .bbi_args)
+    }
+    summaries_retry <- bbi_exec_model_summaries(args_retry, paths[idx_failed])
+    summaries_retry$Results <- modify_if(summaries_retry$Results,
+                                         ~ .x$success,
+                                         ~ c(.x, needed_fail_flags = TRUE))
+    if (length(summaries_retry$Errors) > 0) {
+      summaries$Errors <- summaries$Errors[summaries_retry$Errors + 1]
+    } else {
+      summaries$Errors <- list()
+    }
+    summaries$Results[idx_failed] <- summaries_retry$Results
+  }
+
+  if (length(summaries$Errors) > 0) {
+    summaries$Results <- modify_at(
+      summaries$Results,
+      .at = summaries$Errors + 1,
+      ~ {
+        # As of bbi v3.2.0, we get the errors from the JSON returned `bbi nonmem
+        # summary`, and that includes a default-value object for run_details and
+        # run_heuristics. Set it to the value that downstream code expects.
+        .x[[SUMMARY_DETAILS]] <- NA
+        .x[[SUMMARY_HEURISTICS]] <- NA
+        .x
+      })
+  }
+
+  # Reshape the results into the form expected by create_summary_list().
+  n_results <- length(.mods)
+  results <- vector(mode = "list", length = n_results)
+  for (i in seq_len(n_results)) {
+    s <- summaries$Results[[i]]
+    res <- list()
+    res[[ABS_MOD_PATH]] <- tools::file_path_sans_ext(get_model_path(.mods[[i]]))
+    results[[i]] <- c(
+      res,
+      rlang::list2(
+        !!SL_SUMMARY := create_summary_object(c(res, s)),
+        !!SL_FAIL_FLAGS := s$needed_fail_flags %||% FALSE,
+        !!SL_ERROR := if (s$success) NA_character_ else s$error_msg))
+  }
+
+  return(results)
 }
 
 #' @describeIn model_summaries Summarize a list of `bbi_{.model_type}_model` objects.
@@ -47,40 +175,13 @@ model_summaries.list <- function(
 ) {
   # check that each element is a model object
   check_model_object_list(.mods)
+  res_list <- if (test_bbi_version(.min_version = "3.2.0")) {
+    model_summaries_concurrent(.mods, .bbi_args, .fail_flags)
+  } else {
+    model_summaries_serial(.mods, .bbi_args, .fail_flags)
+  }
 
-  res_list <- map(.mods, function(.m) {
-    .s <- tryCatch(
-      {
-        model_summary(.m, .bbi_args = .bbi_args)
-      },
-      error = function(.e) {
-        # if fails, try again with flags
-        tryCatch({
-          if (!is.null(.bbi_args)) {
-            .fail_flags <- combine_list_objects(.fail_flags, .bbi_args)
-          }
-          .retry <- bbr::model_summary(.m, .bbi_args = .fail_flags)
-          .retry$needed_fail_flags <- TRUE
-          return(.retry)
-        },
-        error = function(.e) {
-          .error_msg <- paste(as.character(.e$message), collapse = " -- ")
-          return(list(error_msg = .error_msg))
-        })
-      }
-    )
-
-    res <- list()
-    res[[ABS_MOD_PATH]] = tools::file_path_sans_ext(get_model_path(.m))
-    res[[SL_SUMMARY]] = .s
-    res[[SL_ERROR]] = .s$error_msg %||% NA_character_
-    res[[SL_FAIL_FLAGS]] = .s$needed_fail_flags %||% FALSE
-
-    return(res)
-  })
-
-  res_list <- create_summary_list(res_list)
-  return(res_list)
+  return(create_summary_list(res_list))
 }
 
 #' @describeIn model_summaries Takes a `bbi_run_log_df` tibble and summarizes all models in it.

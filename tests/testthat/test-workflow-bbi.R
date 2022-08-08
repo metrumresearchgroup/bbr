@@ -27,7 +27,9 @@ cleanup_bbi <- function(.recreate_dir = FALSE) {
 cleanup_bbi(.recreate_dir = TRUE)
 
 # set options and run tests
-withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
+withr::with_options(list(
+  bbr.bbi_exe_path = read_bbi_path(),
+  bbr.verbose = FALSE), {
 
   # cleanup when done
   on.exit({
@@ -48,13 +50,13 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   # create model from R
   #######################
 
-  test_that("step by step create_model to submit_model to model_summary works", {
+  test_that("step by step create_model to submit_model to model_summary works [BBR-WRKF-001]", {
     # create model
     mod1 <- new_model(
       file.path(MODEL_DIR_BBI, "1"),
       .description = "original test-workflow-bbi model",
       .tags = ORIG_TAGS,
-      .bbi_args = list(threads = 4)
+      .bbi_args = list(threads = 4, parallel = TRUE)
     )
     expect_identical(class(mod1), NM_MOD_CLASS_LIST)
 
@@ -74,10 +76,10 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_equal(param_estimates(sum1), dget(PARAM_REF_FILE))
   })
 
-  test_that("copying model works and new models run correctly", {
+  test_that("copying model works and new models run correctly [BBR-WRKF-002]", {
     mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
-    mod2 <- copy_model_from(mod1, 2, .inherit_tags = FALSE)
-    mod3 <- copy_model_from(mod1, 3) %>% add_bbi_args(list(clean_lvl=2))
+    mod2 <- copy_model_from(mod1) # should auto-increment to 2.ctl
+    mod3 <- copy_model_from(mod1, 3, .inherit_tags = TRUE) %>% add_bbi_args(list(clean_lvl=2))
 
     # run new models
     list(mod2, mod3) %>% submit_models(.mode = "local", .wait = TRUE)
@@ -119,7 +121,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_true(all(is.na(log_df$error_msg)))
   })
 
-  test_that("config_log() works correctly", {
+  test_that("config_log() works correctly [BBR-WRKF-003]", {
     # check config log for all models so far
     log_df <- config_log(MODEL_DIR_BBI)
     expect_equal(nrow(log_df), 3)
@@ -129,14 +131,14 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_false(any(is.na(log_df$data_path)))
   })
 
-  test_that(".wait = FALSE returns correctly", {
+  test_that(".wait = FALSE returns correctly [BBR-WRKF-004]", {
     # launch a model but don't wait for it to finish
     mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
     proc <- copy_model_from(mod1, 4, .inherit_tags = TRUE) %>% submit_model(.mode = "local", .wait = FALSE)
     expect_true(stringr::str_detect(proc[[PROC_STDOUT]], ".wait = FALSE"))
   })
 
-  test_that("run_log() captures runs correctly", {
+  test_that("run_log() captures runs correctly [BBR-WRKF-005]", {
     # check run log for all models
     log_df <- run_log(MODEL_DIR_BBI)
     expect_equal(nrow(log_df), 4)
@@ -146,7 +148,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_identical(log_df$tags, list(ORIG_TAGS, NEW_TAGS, ORIG_TAGS, ORIG_TAGS))
   })
 
-  test_that("add_config() works with in progress model run", {
+  test_that("add_config() works with in progress model run [BBR-WRKF-006]", {
     # add config log to run log
     log_df <- expect_warning(
       run_log(MODEL_DIR_BBI) %>% add_config(),
@@ -160,7 +162,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   })
 
 
-  test_that("submit_model() works with non-NULL .config_path", {
+  test_that("submit_model() works with non-NULL .config_path [BBR-WRKF-007]", {
     if (requireNamespace("withr", quietly = TRUE) &&
         utils::packageVersion("withr") < "2.2.0") {
       skip("must have withr >= 2.2.0 to run this test")
@@ -196,5 +198,87 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     })
   })
 
+
+  test_that("wait_for_nonmem() correctly reads in stop time [BBR-UTL-012]", {
+    # create model
+    mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
+    submit_model(mod1, .mode = "local", .wait = FALSE)
+    wait_for_nonmem(mod1, 100, .interval = 5)
+    expect_true(suppressMessages(nrow(nm_tab(mod1)) > 1))
+  })
+
+  test_that("wait_for_nonmem() doesn't error out if no stop time found [BBR-UTL-013]", {
+    # model setup
+    mod_fail <- copy_model_from(
+      read_model(file.path(MODEL_DIR_BBI, "1")),
+      "failure"
+    )
+
+    # run model
+    .p <- submit_model(mod_fail, .mode = "local", .wait = FALSE)
+    Sys.sleep(0.5)
+    .p$process$kill()
+
+    # dont need high wait time since we know it failed
+    expect_warning(
+      wait_for_nonmem(mod_fail, 2, .interval = 1),
+        "Expiration was reached"
+    )
+  })
+
+  test_that("check_run_times() works with one model [BBR-CRT-001]", {
+    mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
+    # warnings will trigger for bbi <= 3.1.1, but we still want to test this
+    run_times <- check_run_times(mod1, .wait = FALSE) %>% suppressWarnings()
+    expected_cols <- c("run", "threads", "estimation_time")
+    expect_true(all(expected_cols %in% names(run_times)))
+    expect_equal(dim(run_times), c(1, 3))
+  })
+
+  test_that("check_run_times() works with multiple models [BBR-CRT-002]", {
+
+    mods <- purrr::map(file.path(MODEL_DIR_BBI, 1:3), ~ read_model(.x))
+    run_times <- check_run_times(mods, .wait = FALSE) %>% suppressWarnings()
+
+    expected_cols <- c("run", "threads", "estimation_time")
+    expect_true(all(expected_cols %in% names(run_times)))
+    expect_equal(dim(run_times), c(3, 3))
+  })
+
+  test_that("check_run_times() .return_times arg [BBR-CRT-003]", {
+    skip_if_old_bbi("3.2.0")
+    mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
+    run_times <- check_run_times(mod1, .wait = FALSE, .return_times = "all")
+    expected_cols <- c("run", "threads", "estimation_time", "covariance_time", "postprocess_time", "cpu_time")
+    expect_true(all(expected_cols %in% names(run_times)))
+    expect_equal(dim(run_times), c(1, 6))
+
+    mods <- purrr::map(file.path(MODEL_DIR_BBI, 1:2), ~ read_model(.x))
+    run_times <- check_run_times(mods, .wait = FALSE,
+                                 .return_times = c("estimation_time", "covariance_time"))
+    expected_cols <- c("run", "threads", "estimation_time", "covariance_time")
+    expect_true(all(expected_cols %in% names(run_times)))
+    expect_equal(dim(run_times), c(2, 4))
+  })
+
+  test_that("check_run_times() waits for models to complete [BBR-CRT-004]", {
+    mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
+    mod_threads <- test_threads(mod1, .threads = c(2, 4), .max_eval = 100, .mode = "local")
+    run_times <- check_run_times(mod_threads, .wait = TRUE, .time_limit = 100) %>% suppressWarnings()
+    # This will error if .wait didnt work
+    expect_equal(dim(run_times), c(2, 3))
+  })
+
+  test_that("check_run_times() works with a bbi_nonmem_summary object [BBR-CRT-005]", {
+    mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
+    run_times <- model_summary(mod1)  %>% check_run_times(.wait = FALSE) %>% suppressWarnings()
+    expect_equal(dim(run_times), c(1, 3))
+  })
+
+  test_that("check_run_times() works with a bbi_summary_list object [BBR-CRT-006]", {
+    mods <- purrr::map(file.path(MODEL_DIR_BBI, 1:3), ~ read_model(.x))
+    run_times <- model_summaries(mods) %>% check_run_times(.wait = FALSE) %>% suppressWarnings()
+    expect_equal(dim(run_times), c(3, 3))
+  })
 }) # closing withr::with_options
 

@@ -18,7 +18,10 @@
 
 \item{...}{Other arguments passed on to individual methods.}
 
-\item{.call_limit}{Integer scalar for the max number of characters to print before truncating the call string.}
+\item{.call_limit}{Integer scalar for the max number of characters to print
+before truncating the call string. This is compared with the entire length,
+but only the positional arguments between the executable path and the first
+long option will be truncated.}
 
 \item{.digits}{Number of significant digits to use for parameter table. Defaults to 3.}
 
@@ -38,10 +41,10 @@ will make for prettier formatting, especially of table outputs.
 }
 \section{Functions}{
 \itemize{
-\item \code{print.bbi_process}: Prints the call made to bbi and whether the process is still running or has finished.
+\item \code{print(bbi_process)}: Prints the call made to bbi and whether the process is still running or has finished.
 
-\item \code{print.bbi_model}: Prints the information contained in the model object and whether the model has been run
+\item \code{print(bbi_model)}: Prints the information contained in the model object and whether the model has been run
 
-\item \code{print.bbi_nonmem_summary}: Prints a high level summary of a model from a bbi_nonmem_summary object
+\item \code{print(bbi_nonmem_summary)}: Prints a high level summary of a model from a bbi_nonmem_summary object
+
 }}
-

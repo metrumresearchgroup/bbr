@@ -29,7 +29,7 @@
 #'
 #' @importFrom glue glue
 #' @importFrom rlang .data :=
-#' @importFrom lifecycle deprecate_warn deprecate_stop
+#' @importFrom lifecycle deprecated deprecate_warn deprecate_stop
 #' @import fs
 NULL
 
@@ -44,6 +44,8 @@ NULL
 #' @param .dir The working directory to run command in. Defaults to "."
 #' @param .verbose Print stdout and stderr as process runs #### NOT IMPLEMENTED?
 #' @param .wait If true, don't return until process has exited.
+#' @param .check_status Whether to signal an error if the command has a non-zero
+#'   exit code.
 #' @param ... arguments to pass to processx::process$new()
 #'
 #' @return An S3 object of class `bbi_process` with the following elements
@@ -71,6 +73,7 @@ bbi_exec <- function(.cmd_args,
                      .verbose = FALSE,
                      .wait = FALSE,
                      .bbi_exe_path = getOption("bbr.bbi_exe_path"),
+                     .check_status = TRUE,
                      ...) {
   check_bbi_exe(.bbi_exe_path)
 
@@ -82,7 +85,9 @@ bbi_exec <- function(.cmd_args,
     ...,
     wd = .dir,
     stdout = stdout_file,
-    stderr = "2>&1"
+    stderr = "2>&1",
+    cleanup = .wait,
+    cleanup_tree = FALSE
   )
   if (.wait) {
     # wait for process and capture stdout and stderr
@@ -113,7 +118,9 @@ bbi_exec <- function(.cmd_args,
     }
     # check output status code
     output <- read_lines(stdout_file)
-    check_status_code(p$get_exit_status(), output, .cmd_args)
+    if (isTRUE(.check_status)) {
+      check_status_code(p$get_exit_status(), output, .cmd_args)
+    }
 
   } else {
     output <- paste("NO STDOUT BECAUSE `.wait = FALSE`. stdout and stderr redirected to", stdout_file)
@@ -178,7 +185,7 @@ check_bbi_exe <- function(.bbi_exe_path) {
     }
 
     # if version too low, reject it
-    check_bbi_version_constraint(.bbi_exe_path)
+    assert_bbi_version(.bbi_exe_path)
 
     # if found, and passes version constraint, add it to cache
     CACHE_ENV$bbi_exe_paths[[.bbi_exe_path]] <- TRUE
@@ -186,34 +193,72 @@ check_bbi_exe <- function(.bbi_exe_path) {
   return(invisible())
 }
 
+compare_bbi_version <- function(.bbi_exe_path, .min_version,
+                                fail = TRUE, .function = NULL) {
+  if (isTRUE(getOption("bbr.DEV_no_min_version"))) {
+    return(TRUE)
+  }
+  bbi_path <- Sys.which(.bbi_exe_path)
+  if (bbi_path == "") {
+    stop(glue("`{.bbi_exe_path}` was not found on the system."))
+  }
+
+  this_version <- bbi_version(bbi_path)
+  parsed <- package_version(str_replace_all(this_version, "[^0-9\\.]", ""))
+
+  if (parsed < .min_version) {
+    if (!fail) {
+      return(FALSE)
+    }
+
+    err_msg <- paste(
+      glue("The executable at `{bbi_path}` is version {this_version} but the minimum supported version of bbi is {.min_version}"),
+      glue("Call `use_bbi('{dirname(bbi_path)}')` to update to the most recent release."),
+      sep = "\n"
+    )
+
+    if (!is.null(.function)) {
+      err_msg <- paste(
+        glue("{.function}() requires a newer version of bbi:"),
+        err_msg,
+        sep = "\n"
+      )
+    }
+
+    strict_mode_error(err_msg)
+  }
+
+  return(TRUE)
+}
 
 #' Check that bbi satisfies a version constraint
 #'
 #' @importFrom stringr str_replace_all
 #' @inheritParams bbi_version
-#' @return `NULL` if `.bbi_exe_path` satisfies the constraint
+#' @param .min_version The minimum allowed version. Defaults to
+#'   `getOption("bbr.bbi_min_version")`.
+#' @param .function The relevant function that is version-constrained. If not
+#'   `NULL`, notifies user in error message.
+#' @return
+#' * `assert_bbi_version()` returns the value of `.bbi_exe_path`.
+#'
+#' * `test_bbi_version()` returns `TRUE` if the installed bbi satisfies the
+#'   constraint and `FALSE` otherwise.
 #' @keywords internal
-check_bbi_version_constraint <- function(.bbi_exe_path = getOption('rbabylon.bbi_exe_path')) {
-  if (isTRUE(getOption("rbabylon.DEV_no_min_version"))) {
-    return(invisible(TRUE))
-  }
-  .bbi_exe_path <- Sys.which(.bbi_exe_path)
-  if (.bbi_exe_path == "") {
-    stop(glue("`{.bbi_exe_path}` was not found on the system."))
-  }
-
-  this_version <- bbi_version(.bbi_exe_path)
-  test_version_test <- package_version(str_replace_all(this_version, "[^0-9\\.]", ""))
-
-  if (test_version_test < getOption("bbr.bbi_min_version")) {
-    strict_mode_error(paste(
-      glue("The executable at `{.bbi_exe_path}` is version {this_version} but the minimum supported version of bbi is {getOption('bbr.bbi_min_version')}"),
-      glue("Call `use_bbi('{dirname(.bbi_exe_path)}')` to update to the most recent release."),
-      sep = "\n"
-    ))
-  }
+assert_bbi_version <- function(
+  .bbi_exe_path = getOption('bbr.bbi_exe_path'),
+  .min_version = getOption("bbr.bbi_min_version"),
+  .function = NULL
+) {
+  compare_bbi_version(.bbi_exe_path, .min_version, .function = .function)
+  return(.bbi_exe_path)
 }
 
+#' @rdname assert_bbi_version
+test_bbi_version <- function(.bbi_exe_path = getOption("bbr.bbi_exe_path"),
+                             .min_version = getOption("bbr.bbi_min_version")) {
+  compare_bbi_version(.bbi_exe_path, .min_version, fail = FALSE)
+}
 
 #' Checks status code from processx process
 #' @param .status_code numerical status code from the process
@@ -254,7 +299,7 @@ bbi_help <- function(.cmd_args=NULL) {
     .cmd_args <- c(.cmd_args, "--help")
   }
   res <- bbi_exec(.cmd_args, .wait=TRUE)
-  cat(paste(res$output, collapse = "\n"))
+  cat(paste(res[[PROC_STDOUT]], collapse = "\n"))
 }
 
 
@@ -333,5 +378,5 @@ bbi_init <- function(.dir, .nonmem_dir, .nonmem_version = NULL, .bbi_args = NULL
     write_yaml(bbi_yaml, bbi_yaml_path)
   }
 
-  cat(paste(res$output, collapse = "\n"))
+  cat(paste(res[[PROC_STDOUT]], collapse = "\n"))
 }

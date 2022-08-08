@@ -6,16 +6,16 @@ context("Copying model objects")
 
 cleanup()
 
-test_that("copy_from_model creates accurate copy", {
+test_that("copy_from_model creates accurate copy [BBR-CMF-001]", {
   on.exit({ cleanup() })
 
   # run copy_model_from
-  new_mod <- copy_model_from(MOD1, basename(NEW_MOD2))
+  new_mod <- copy_model_from(MOD1, basename(NEW_MOD2), .add_tags = NEW_TAGS)
 
   # check that everything is copied through in the object
   expect_identical(class(new_mod), NM_MOD_CLASS_LIST)
   expect_identical(new_mod[[YAML_BASED_ON]], "1")
-  expect_identical(new_mod[[YAML_TAGS]], ORIG_TAGS)
+  expect_identical(new_mod[[YAML_TAGS]], NEW_TAGS)
   expect_equal(new_mod[[YAML_BBI_ARGS]], list(overwrite = TRUE, threads = 4L))
   expect_null(new_mod[[YAML_DESCRIPTION]])
 
@@ -23,7 +23,7 @@ test_that("copy_from_model creates accurate copy", {
   new_yaml <- yaml::read_yaml(yaml_ext(NEW_MOD2))
 
   expect_identical(new_yaml[[YAML_BASED_ON]], "1")
-  expect_identical(new_yaml[[YAML_TAGS]], ORIG_TAGS)
+  expect_identical(new_yaml[[YAML_TAGS]], NEW_TAGS)
   expect_equal(new_yaml[[YAML_BBI_ARGS]], list(overwrite = TRUE, threads = 4L))
 
   # check the control stream is modified
@@ -33,7 +33,7 @@ test_that("copy_from_model creates accurate copy", {
 })
 
 
-test_that("copy_from_model options work", {
+test_that("copy_from_model options work [BBR-CMF-002]", {
   on.exit({ cleanup() })
 
   # run copy_model_from
@@ -42,16 +42,15 @@ test_that("copy_from_model options work", {
                   basename(NEW_MOD3),
                   NEW_DESC,
                   .based_on_additional = get_model_id(NEW_MOD2),
-                  .inherit_tags = FALSE,
-                  .update_model_file = FALSE,
-                  .add_tags = NEW_TAGS)
+                  .inherit_tags = TRUE,
+                  .update_model_file = FALSE)
 
   # check that everything is copied through
   new_yaml <- yaml::read_yaml(yaml_ext(NEW_MOD3))
 
   expect_identical(new_yaml[[YAML_DESCRIPTION]], NEW_DESC)
   expect_identical(new_yaml[[YAML_BASED_ON]], c("1", get_model_id(NEW_MOD2)))
-  expect_identical(new_yaml[[YAML_TAGS]], NEW_TAGS)
+  expect_identical(new_yaml[[YAML_TAGS]], ORIG_TAGS)
   expect_equal(new_yaml[[YAML_BBI_ARGS]], list(overwrite = TRUE, threads = 4L))
 
   # check the control stream is not modified
@@ -62,9 +61,25 @@ test_that("copy_from_model options work", {
     stringr::str_extract(orig_mod_str, prob_pattern),
     stringr::str_extract(new_mod_str, prob_pattern)
   )
+
+
+  #Editing YAML to add star status is true from clean model
+  temp_mod_path <- create_temp_model()
+  new_mod <- read_model(temp_mod_path)
+  expect_null(new_mod$star)
+  new_mod <- add_star(new_mod)
+
+  #Checking that star is written out to the yaml
+  model_yml <- paste0(temp_mod_path, ".yaml") %>% read_yaml()
+  yaml_fields <- model_yml %>% names()
+  expect_true("star" %in% yaml_fields)
+
+  #Checking the yaml is correctly specified with true
+  expect_true(model_yml$star)
+
 })
 
-test_that("copy_from_model.bbi_nonmem_model works with numeric input", {
+test_that("copy_from_model.bbi_nonmem_model works with numeric input [BBR-CMF-003]", {
   on.exit({ cleanup() })
 
   # check that the model is not there already
@@ -84,7 +99,7 @@ test_that("copy_from_model.bbi_nonmem_model works with numeric input", {
 })
 
 
-test_that("copy_from_model .overwrite=TRUE works", {
+test_that("copy_from_model .overwrite=TRUE works [BBR-CMF-004]", {
   on.exit({ cleanup() })
 
   # set up model object
@@ -109,7 +124,7 @@ test_that("copy_from_model .overwrite=TRUE works", {
   expect_true(grepl(new_desc_pattern, new_mod_str))
 })
 
-test_that("copy_from_model .overwrite=FALSE works", {
+test_that("copy_from_model .overwrite=FALSE works [BBR-CMF-005]", {
   on.exit({ cleanup() })
 
   # set up model object
@@ -137,7 +152,7 @@ test_that("copy_from_model .overwrite=FALSE works", {
   expect_false(grepl(new_desc_pattern, new_mod_str))
 })
 
-test_that("copy_model_from() supports `.new_model` containing a period", {
+test_that("copy_model_from() supports `.new_model` containing a period [BBR-CMF-006]", {
   temp_mod_path <- create_temp_model()
   temp_mod <- read_model(temp_mod_path)
 
@@ -157,11 +172,53 @@ test_that("copy_model_from() supports `.new_model` containing a period", {
 
 })
 
+test_that("copy_model_from(.new_model=NULL) increments to next integer by default [BBR-CMF-007]", {
+  withr::defer(cleanup())
+  new_id <- "002"
+  new_mod1 <- copy_model_from(MOD1, file.path(basename(LEVEL2_DIR), new_id))
+  new_mod2 <- copy_model_from(new_mod1)
+  expect_equal(
+    as.integer(get_model_id(new_mod1)) + 1,
+    as.integer(get_model_id(new_mod2))
+  )
+  expect_equal(!!nchar(get_model_id(new_mod2)), !!nchar(new_id))
+})
+
+
+test_that("copy_model_from(.new_model=NULL) increments to next highest integer [BBR-CMF-007]", {
+  withr::defer(cleanup())
+  new_id <- "002"
+  high_id <- "0100"
+  bad_id <- "aaaaa10000aaaaa"
+  new_mod1 <- copy_model_from(MOD1, file.path(basename(LEVEL2_DIR), new_id))
+  # write a fake ctl with a higher number
+  readr::write_file("naw", file.path(LEVEL2_DIR, paste0(high_id, ".ctl")))
+  readr::write_file("naw", file.path(LEVEL2_DIR, paste0(bad_id, ".ctl")))
+
+  # copy and check it increments over the higher number
+  new_mod2 <- copy_model_from(new_mod1)
+  expect_equal(
+    as.integer(high_id) + 1,
+    as.integer(get_model_id(new_mod2))
+  )
+  expect_equal(!!nchar(high_id), !!nchar(get_model_id(new_mod2)))
+})
+
+test_that("copy_model_from(.new_model=NULL) errors when no models are valid integer [BBR-CMF-007]", {
+  withr::defer(cleanup())
+  new_id <- "AAA"
+  new_mod1 <- copy_model_from(MOD1, file.path(basename(LEVEL2_DIR), new_id))
+
+  expect_error({
+    new_mod2 <- copy_model_from(new_mod1)
+  }, regexp = "no models.+integer")
+})
+
 test_that("copy_from_model.bbi_stan_model creates accurate copy", {
-  skip_if_no_stan("copy_from_model.bbi_stan_model")
+  skip_if_no_stan("copy_model_from.bbi_stan_model")
 
   mod_name <- "testmod_copy_stan1"
-  new_mod <- copy_model_from(STAN_MOD1, mod_name, .add_tags = NEW_TAGS)
+  new_mod <- copy_model_from(STAN_MOD1, mod_name, .inherit_tags = TRUE, .add_tags = NEW_TAGS)
   on.exit(cleanup_model(new_mod))
 
   # check that everything is copied through in the object

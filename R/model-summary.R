@@ -11,7 +11,11 @@
 #' to summarize multiple models, you can pass a list of
 #' `bbi_{.model_type}_model` objects to [model_summaries()], or pass a directory
 #' path to [summary_log()] to summarize all models in that directory (and, by
-#' default, all directories below it).
+#' default, all directories below it). Note: the summary object does _not_
+#' contain the covariance or correlation matrices, but these can be retrieved
+#' with [cov_cor()]. Also, if you need to pull in _only_ the parameter estimates
+#' for a large number of NONMEM models, consider using
+#' [param_estimates_batch()].
 #'
 #' @details
 #'
@@ -133,7 +137,7 @@
 #' for methods and information on this object. A warning will also be printed to
 #' notify the user of this.
 #'
-#' @seealso [model_summaries()], [summary_log()]
+#' @seealso [model_summaries()], [summary_log()], [cov_cor()], [param_estimates()]
 #' @param .mod Model to summarize.
 #' @param .bbi_args A named list specifying arguments to pass to bbi formatted like `list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)`.
 #' See [print_bbi_args()] for full list of options.
@@ -213,11 +217,10 @@ nonmem_summary <- function(
   # extract output path
   .path <- get_output_dir(.mod)
 
-  # lst file can both be the check for whether the dir is a nonmem output dir
-  # and also the output always should be runname.lst so we can determine the model name
-  # this is definitely better checking for .mod as there are temporary files with that extension
-  # as well
-  lst_file_path <- check_lst_file(.path)
+  # Everything under old_bbi conditions can be removed once bbr.bbi_min_version
+  # is at least v3.2.0.
+  old_bbi <- !test_bbi_version(.min_version = "3.2.0")
+  mod_arg <- if (old_bbi) check_lst_file(.path) else .mod
 
   # build command line args
   if (is.null(.bbi_args)) {
@@ -226,7 +229,7 @@ nonmem_summary <- function(
   .bbi_args <- purrr::list_modify(.bbi_args, json = TRUE)
 
   args_vec <- check_bbi_args(.bbi_args)
-  cmd_args <- c("nonmem", "summary", get_model_id(lst_file_path), args_vec)
+  cmd_args <- c("nonmem", "summary", get_model_id(mod_arg), args_vec)
 
   # if .dry_run return output call
   if (.dry_run) {
@@ -235,13 +238,17 @@ nonmem_summary <- function(
   }
 
   # otherwise, execute
-  res <- tryCatch(
-    bbi_exec(cmd_args, .dir = .path, ..., .wait = TRUE),
-    error = function(e) {
-      err_msg <- glue("nonmem_summary('{.path}') failed with the following error. This may be because the modeling run has not finished successfully.\n\nERROR: \n{e}")
-      stop(err_msg, call. = FALSE)
-    }
-  )
+  res <- if (old_bbi) {
+    tryCatch(
+      bbi_exec(cmd_args, .dir = .path, ..., .wait = TRUE),
+      error = function(e) {
+        err_msg <- glue("nonmem_summary('{.path}') failed with the following error. This may be because the modeling run has not finished successfully.\n\nERROR: \n{e}")
+        stop(err_msg, call. = FALSE)
+      }
+    )
+  } else {
+    bbi_exec(cmd_args, .dir = .path, ..., .wait = TRUE, .check_status = FALSE)
+  }
 
   res_list <- list2(
     !!ABS_MOD_PATH := tools::file_path_sans_ext(get_model_path(.mod))
@@ -251,6 +258,11 @@ nonmem_summary <- function(
     paste(collapse="") %>%
     jsonlite::fromJSON(simplifyDataFrame = FALSE)
 
+  if (!(old_bbi || is.null(bbi_list$error_msg))) {
+    err_msg <- glue("model_summary({get_model_id(.mod)}) failed with the following error. This may be because the modeling run has not finished successfully.\n\nERROR: \n{bbi_list$error_msg}")
+    stop(err_msg, call. = FALSE)
+  }
+
   res_list <- combine_list_objects(res_list, bbi_list)
 
   res_list <- create_summary_object(res_list)
@@ -258,13 +270,20 @@ nonmem_summary <- function(
   return(res_list)
 }
 
+# check_lst_file() can be removed once bbr.bbi_min_version is at least 3.2.0.
+
 #' Private helper function to look for .lst function in a directory
 #' @param .x The directory path to look in for the lst file
+#' @importFrom glue glue
 #' @keywords internal
 check_lst_file <- function(.x) {
   lst_file <- fs::dir_ls(.x, type = "file", glob = "*.lst")
-  if (!length(lst_file)) {
+
+  nfiles <- length(lst_file)
+  if (!nfiles) {
     stop(glue("Unable to locate `.lst` file in dir: {.x}. Check to be sure this is a NONMEM output folder, and that the run has finished successfully."))
+  } else if (nfiles > 1) {
+    stop(glue("More than one `.lst` file found in dir: {.x}"))
   }
   lst_file
 }
