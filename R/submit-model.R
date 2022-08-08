@@ -94,7 +94,6 @@ submit_model.bbi_nonmem_model <- function(
 #' @param .mod An S3 object of class `bbi_nonmem_model`, for example from `new_model()`, `read_model()` or `copy_model_from()`
 #' @importFrom stringr str_detect
 #' @importFrom tools file_path_sans_ext
-#' @importFrom checkmate assert_logical
 #' @return An S3 object of class `bbi_process`
 #' @keywords internal
 submit_nonmem_model <- function(.mod,
