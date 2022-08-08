@@ -171,6 +171,8 @@ submit_nonmem_model <- function(.mod,
     .bbi_args[["overwrite"]] <- .overwrite
   }
   args_vec <- check_bbi_args(.bbi_args)
+
+
   cmd_args <- c("nonmem", "run", .mode, get_model_path(.mod), args_vec)
 
   # define working directory

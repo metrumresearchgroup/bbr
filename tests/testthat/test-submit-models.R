@@ -35,7 +35,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
               # check call
               expect_identical(
                 proc_list[[1]][[PROC_CALL]],
-                as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {paste(mod_ctl_path, collapse = ' ')} --overwrite --threads=4"))
+                as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {paste(mod_ctl_path, collapse = ' ')} --overwrite --parallel --threads=4"))
               )
             })
 
@@ -136,7 +136,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       as.character(
         glue::glue(
           "cd {model_dir} ;",
-          "{read_bbi_path()} nonmem run sge {mod_ctl_path[[1L]]} --overwrite --threads=4",
+          "{read_bbi_path()} nonmem run sge {mod_ctl_path[[1L]]} --overwrite --parallel --threads=4",
           "--config={temp_config}",
           .sep = " "
         )
@@ -148,14 +148,14 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     # set existing arguments to NULL via `.bbi_args`
     res <- submit_models(
       list(MOD1),
-      .bbi_args = list(overwrite = NULL, threads = NULL),
+      .bbi_args = list(overwrite = NULL, threads = NULL, parallel = TRUE),
       .dry_run = TRUE
     )
 
     expect_identical(
       res[[1L]][[PROC_CALL]],
       as.character(
-        glue::glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path[[1L]]}")
+        glue::glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path[[1L]]} --parallel")
       )
     )
 
@@ -186,7 +186,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     withr::with_options(list(bbr.bbi_exe_mode = "local"), {
       expect_identical(
         submit_models(list(MOD1), .dry_run = T)[[1]][[PROC_CALL]],
-        as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run local {ABS_CTL_PATH} --overwrite --threads=4"))
+        as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run local {ABS_CTL_PATH} --overwrite --parallel --threads=4"))
       )
     })
   })

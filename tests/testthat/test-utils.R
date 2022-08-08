@@ -7,9 +7,9 @@ context("Utility functions for building args, etc.")
 test_that("check_bbi_args parses correctly [BBR-UTL-001]", {
   # check some that should parse correctly
   .arg_list <- list(
-    list(list("json" = T, "threads" = 4, "nm_version" = "nm74"), c("--json", "--threads=4", "--nm_version=nm74")), # check flag conversion
-    list(list("json" = T, "threads" = 4, debug=F), c("--json", "--threads=4")), # check bool=F not passed through
-    list(list("json" = T, "threads" = 4, debug=T), c("--json", "--threads=4", "--debug"))  # check same bool=T is passed through
+    list(list("json" = T, "threads" = 4, "nm_version" = "nm74", "parallel" = T), c("--json", "--threads=4", "--nm_version=nm74", "--parallel")), # check flag conversion
+    list(list("json" = T, "threads" = 4, debug=F, "parallel" = T), c("--json", "--threads=4","--parallel")), # check bool=F not passed through
+    list(list("json" = T, "threads" = 4, debug=T, "parallel" = T), c("--json", "--threads=4", "--debug", "--parallel"))  # check same bool=T is passed through
   )
 
   for (.a in .arg_list) {
@@ -98,7 +98,6 @@ test_that("combine_list_objects() correctly fails if .func_args isn't named [BBR
   expect_error(combine_list_objects(LIST1, list(4,5,6)))
 })
 
-
 ######################
 # assorted utilities
 ######################
@@ -122,9 +121,101 @@ test_that("strict_mode_error() works correctly [BBR-UTL-010]", {
   })
 })
 
-
 test_that("suppressSpecificWarning() works [BBR-UTL-011]", {
   # log() of a negative number raises a warning
   x <- suppressSpecificWarning(log(-1), "NaNs produced")
   expect_true(is.nan(x))
 })
+
+test_that("warning raised when threads > 1 and parallel is FALSE [BBR-UTL-014]", {
+  withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()),{
+    withr::with_tempdir({
+      fs::dir_create(file.path(tempdir(), "test_path"))
+
+      on.exit(if(fs::dir_exists(file.path(tempdir(),"test_path")))
+      {
+        fs::dir_delete(file.path(tempdir(),"test_path"))
+      })
+
+      files_to_copy <- file.path(ABS_MODEL_DIR, c("1.ctl"))
+
+      fs::file_copy(system.file("extdata", "acop.csv", package = "bbr"), file.path(tempdir(), "test_path"))
+      purrr::walk(files_to_copy, fs::file_copy, file.path(tempdir(), "test_path"))
+      fs::dir_copy(file.path(ABS_MODEL_DIR, "1"), file.path(tempdir(), "test_path"))
+      ctl <- read_lines(file.path(tempdir(),"test_path", "1.ctl")) %>%  stringr::str_remove("../../../../extdata/")
+      write_lines(ctl, file.path(tempdir(),"test_path", "1.ctl"))
+
+      mod1 <- new_model(file.path(tempdir(), "test_path", "1"), .description = "original test-workflow-bbi model",
+                        .tags = ORIG_TAGS,.bbi_args = list(overwrite = TRUE, threads = 2))
+
+      readr::write_file("created_by: test-utils", file.path(tempdir(), "test_path", "bbi.yaml"))
+
+
+      res <- capture.output(submit_model(mod1, .dry_run = TRUE))
+
+      #Testing that check_bbi_args is appending --parallel when not passed and threads > 1
+      expect_identical("--parallel", str_subset(res,"--parallel") %>% str_extract("--parallel"))
+      fs::file_delete(file.path(tempdir(), "test_path", "1.yaml"))
+
+      #Checking arguments passed when parallel is set to FALSE and threads = 1
+      mod1 <- new_model(file.path(tempdir(), "test_path", "1"), .description = "original test-workflow-bbi model",
+                        .tags = ORIG_TAGS,.bbi_args = list(overwrite = TRUE, threads = 1, parallel = FALSE ))
+      res <- capture.output(submit_model(mod1, .dry_run = TRUE))
+      expect_false(str_detect(res,"--parallel") %>% unique())
+      fs::file_delete(file.path(tempdir(), "test_path", "1.yaml"))
+
+
+      mod1 <-  new_model(file.path(tempdir(), "test_path", "1"), .description = "original test-workflow-bbi model",
+                         .tags = ORIG_TAGS,.bbi_args = list(overwrite = TRUE, threads = 2, parallel = FALSE))
+
+      #When `threads` > 1 and parallel is False raise a warning
+      expect_warning(submit_model(mod1, .dry_run = TRUE), "threads > 1` but model will not run in parallel because `parallel = FALSE")
+    })
+  })
+})
+
+test_that("Confirms if threads = 1, parallel is not set [BBR-UTL-015]", {
+  withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
+    withr::with_tempdir({
+      fs::dir_create(file.path(tempdir(), "test_path"))
+
+      on.exit(if (fs::dir_exists(file.path(tempdir(), "test_path")))
+      {
+        fs::dir_delete(file.path(tempdir(), "test_path"))
+      })
+
+      files_to_copy <- file.path(ABS_MODEL_DIR, c("1.ctl"))
+
+      fs::file_copy(
+        system.file("extdata", "acop.csv", package = "bbr"),
+        file.path(tempdir(), "test_path")
+      )
+      purrr::walk(files_to_copy,
+                  fs::file_copy,
+                  file.path(tempdir(), "test_path"))
+      fs::dir_copy(file.path(ABS_MODEL_DIR, "1"),
+                   file.path(tempdir(), "test_path"))
+      ctl <-
+        read_lines(file.path(tempdir(), "test_path", "1.ctl")) %>% stringr::str_remove("../../../../extdata/")
+      write_lines(ctl, file.path(tempdir(), "test_path", "1.ctl"))
+
+      readr::write_file("created_by: test-utils",
+                        file.path(tempdir(), "test_path", "bbi.yaml"))
+
+
+      #Testing that check_bbi_args is appending --parallel when not passed and threads = 1
+      mod1 <-
+        new_model(
+          file.path(tempdir(), "test_path", "1"),
+          .description = "original test-workflow-bbi model",
+          .tags = ORIG_TAGS,
+          .bbi_args = list(overwrite = TRUE, threads = 1)
+        )
+      res <- capture.output(submit_model(mod1, .dry_run = TRUE))
+      expect_false(str_detect(res, "--parallel") %>% unique())
+      fs::file_delete(file.path(tempdir(), "test_path", "1.yaml"))
+
+    })
+  })
+})
+

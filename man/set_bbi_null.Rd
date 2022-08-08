@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{set_bbi_null}
 \alias{set_bbi_null}
-\title{Replace BBI_NULL_NUM and BBI_NULL_STR with NA_real_ or NA_character_}
+\title{Replace BBI_NULL_NUM and BBI_NULL_STR with NA_real_}
 \usage{
 set_bbi_null(.vals)
 }
@@ -10,6 +10,6 @@ set_bbi_null(.vals)
 \item{.vals}{a numeric or character vector}
 }
 \description{
-Replace BBI_NULL_NUM and BBI_NULL_STR with NA_real_ or NA_character_
+Replace BBI_NULL_NUM and BBI_NULL_STR with NA_real_
 }
 \keyword{internal}
