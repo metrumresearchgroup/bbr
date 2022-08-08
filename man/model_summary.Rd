@@ -3,14 +3,11 @@
 \name{model_summary}
 \alias{model_summary}
 \alias{model_summary.bbi_nonmem_model}
-\alias{model_summary.bbi_stan_model}
 \title{Summarize model outputs}
 \usage{
 model_summary(.mod, .bbi_args = NULL, ..., .dry_run = FALSE)
 
 \method{model_summary}{bbi_nonmem_model}(.mod, .bbi_args = NULL, ..., .dry_run = FALSE)
-
-\method{model_summary}{bbi_stan_model}(.mod, .bbi_args = NULL, ..., .dry_run = FALSE)
 }
 \arguments{
 \item{.mod}{Model to summarize.}
@@ -149,22 +146,10 @@ For example, if have asked to skip the \verb{$COV} step, you would call \code{mo
 
 Additionally, if you have renamed the \code{.ext} file from its default of \verb{<root>.ext} you will need to pass
 \code{ext_file = "NEWNAME"} to \code{.bbi_args}.
-
-\strong{Stan}
-
-There is currently no functionality for summarizing Stan outputs with \code{bbr}.
-Calling \code{model_summary()} on a \code{bbi_stan_model} instead calls
-\code{\link[=read_fit_model]{read_fit_model()}} and return the resulting fit object, which has various
-methods for summarizing the outputs. See the \code{?cmdstanr::CmdStanMCMC} docs
-for methods and information on this object. A warning will also be printed to
-notify the user of this.
 }
 \section{Methods (by class)}{
 \itemize{
 \item \code{model_summary(bbi_nonmem_model)}: Get model summary from \code{bbi_nonmem_model} object
-
-\item \code{model_summary(bbi_stan_model)}: \emph{Not fully implemented;} calls \code{\link[=read_fit_model]{read_fit_model()}}
-instead. See "Details" section.
 
 }}
 \seealso{

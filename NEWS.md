@@ -1,19 +1,3 @@
-# Stan alpha branch
-
-All releases tagged `1.x.x.9xxx` refer to "alpha" releases cut from the `bbr_stan_alpha` branch. The intention of this branch is to begin implementing support for Stan modeling with `bbr`. While this code should all be tested and working, the function names and API are considered experimental and may change with new releases. The plan is to merge this functionality into `bbr` proper once this has stabilized.
-
-# bbr 1.1.0.9000
-
-This is the first Stan alpha releases. There is a ["Getting Started with bbr and Stan" vignette](https://github.com/metrumresearchgroup/bbr/blob/bbr_stan_alpha/vignettes/getting-started-stan.Rmd) that demonstrates the functionality available so far, including:
-
-* Creating a model object
-* Managing the necessary files associated with a model object
-* Submitting a model to be run
-* Checking if model outputs are up-to-date
-* Interacting with the `cmdstanr` fit object
-
-# bbr proper releases NEWS
-
 # Development
 
 ## New features

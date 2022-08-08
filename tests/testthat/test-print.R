@@ -102,18 +102,6 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     })
   })
 
-  test_that("print.bbi_stan_model contains proper fields", {
-    skip_if_no_stan("print.bbi_stan_model")
-    fields <- c('Status',
-                'Absolute Model Path',
-                'YAML & Model Files',
-                'Tags')
-
-    bullets <- capture.output({ # these get thrown away, but we don't want them to print in the test output
-      purrr::walk(fields, ~ expect_message(print(STAN_MOD1), regexp = .x))
-    })
-  })
-
   test_that("print.bbi_nonmem_summary works basic FOCE model [BBR-PRNT-003]", {
     .s <- file.path(MODEL_DIR, 1) %>%
       read_model() %>%

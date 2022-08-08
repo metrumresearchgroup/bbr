@@ -48,11 +48,6 @@ BBI_ARGS = list(
 BBI_PARENT_CLASS <- "bbi_model"
 NM_MOD_CLASS <- "bbi_nonmem_model"
 NM_SUM_CLASS <- "bbi_nonmem_summary"
-
-STAN_MOD_CLASS <- "bbi_stan_model"
-STAN_SUM_CLASS <- "bbi_stan_summary"
-STAN_FIT_CLASS <- "CmdStanMCMC"
-
 SL_CLASS <- "bbi_summary_list"
 PROC_CLASS <- "bbi_process"
 RUN_LOG_CLASS <- "bbi_run_log_df"
@@ -251,5 +246,3 @@ BBI_EXE_MODE_INVALID_ERR_MSG <- paste(
   paste(BBI_VALID_MODES, collapse = ", ")
 )
 NONMEM_MODEL_TYPE_ERR_MSG <- "IF THIS IS NOT A NONMEM MODEL please pass the appropriate type to `.model_type`"
-MISSING_STAN_FILES_ERR_MSG <- "The following files, which are necessary to run a `bbi_stan_model` are missing"
-STAN_SCAFFOLD_ERR_MSG <- "The following files, which are necessary to run a `bbi_stan_model` are only scaffolds:"

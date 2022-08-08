@@ -38,10 +38,7 @@
 #'   changed since it was last run
 #'
 #'   * `data_has_changed`: a logical indicating whether the data file has
-#'   changed since the model was last run. Note that for Stan models, this
-#'   rebuilds the data file, which can be time consuming. If you do _not_
-#'   want to do this, consider using `check_up_to_date.bbi_log_df(.build_data = FALSE)`
-#'   instead. See [check_up_to_date()] for more details.
+#'   changed since the model was last run
 #'
 #' @seealso [run_log()], [summary_log()]
 #' @inheritParams run_log

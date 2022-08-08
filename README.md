@@ -10,22 +10,12 @@ Status](https://github-drone.metrumrg.com/api/badges/metrumresearchgroup/bbr/sta
 [![codecov](https://codecov.io/gh/metrumresearchgroup/bbr/branch/main/graph/badge.svg)](https://codecov.io/gh/metrumresearchgroup/bbr)
 <!-- badges: end -->
 
-# bbr_stan_alpha
-
-All releases tagged `1.1.0.9xxx` refer to “alpha” releases cut from the
-`bbr_stan_alpha` branch. The intention of this branch is to begin
-implementing support for Stan modeling with `bbr`. While this code
-should all be tested and working, **the function names and API are
-considered experimental and may change with new releases.** The plan is
-to merge this functionality into `bbr` proper once this has stabilized.
-
-# Intro
-
 `bbr` is an R interface for running `bbi`. Together they provide a
 solution for managing projects involving modeling and simulation with a
 number of software solutions used in pharmaceutical sciences. Currently,
-NONMEM and Stan modeling are supported. You can get more detailed
-information on `bbi` (the underlying CLI tool)
+only NONMEM modeling is supported, though we are in the process of Stan
+with plans for other modeling software as well. You can get more
+detailed information on `bbi` (the underlying CLI tool)
 [here](https://github.com/metrumresearchgroup/bbi).
 
 `bbr` is intended to help scientists manage the entire modeling workflow
@@ -51,14 +41,6 @@ latest development version from [GitHub](https://github.com/) with:
 # install.packages("devtools")
 devtools::install_github("metrumresearchgroup/bbr", ref = "main")
 ```
-
-### Stan modeling
-
-If you are modeling with Stan in `bbr` you don’t currently need `bbi`
-installed, though you *will* need `cmdstanr` and a working version of
-`cmdstan` installed. See the [“Getting Started with CmdStanR”
-vignette](https://mc-stan.org/cmdstanr/articles/cmdstanr.html) for more
-info.
 
 ## Documentation
 

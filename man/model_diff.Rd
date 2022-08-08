@@ -3,20 +3,11 @@
 \name{model_diff}
 \alias{model_diff}
 \alias{model_diff.bbi_nonmem_model}
-\alias{model_diff.bbi_stan_model}
 \title{Compare model files between models}
 \usage{
 model_diff(.mod, .mod2 = NULL, .file = "model", ..., .viewer = FALSE)
 
 \method{model_diff}{bbi_nonmem_model}(.mod, .mod2 = NULL, .file = c("model"), ..., .viewer = FALSE)
-
-\method{model_diff}{bbi_stan_model}(
-  .mod,
-  .mod2 = NULL,
-  .file = c("model", "standata", "init", "stanargs"),
-  ...,
-  .viewer = FALSE
-)
 }
 \arguments{
 \item{.mod}{The \verb{bbi_\{.model_type\}_model} to compare.}
@@ -26,8 +17,10 @@ model_diff(.mod, .mod2 = NULL, .file = "model", ..., .viewer = FALSE)
 \code{get_based_on(.mod)}. See "\code{based_on} details" in Details section.}
 
 \item{.file}{Defaults to \code{"model"} which compares the default model file for
-that model type. Some model types have multiple files that can be compared.
-See "\code{.file} argument" in Details section.}
+that model type. For NONMEM models, the control stream is compared. Other
+model types may accept additional values and support comparing multiple
+files that can be compared. See "\code{.file} argument" of the specific S3
+method for details.}
 
 \item{...}{arguments passed through to methods. (Currently none.)}
 
@@ -60,19 +53,4 @@ then the \code{.mod} will be compared to the model returned by \code{get_based_o
 However, \emph{if there is more than one model} (or no models) in \code{.mod$based_on}, then user
 will be prompted to explicitly pass the model they want to compare against to
 the \code{.mod2} argument.
-
-\strong{\code{.file} argument:} The following options are available for \code{.file}
-\itemize{
-\item \code{bbi_nonmem_model}
-\itemize{
-\item \code{"model"} compares the control streams
-}
-\item \code{bbi_stan_model}
-\itemize{
-\item \code{"model"} (default) compares \verb{<run>.stan} files
-\item \code{"standata"} compares \verb{<run>-standata.R} files
-\item \code{"init"} compares \verb{<run>-init.R} files
-\item \code{"stanargs"} compares \verb{<run>-stanargs.R} files
-}
-}
 }

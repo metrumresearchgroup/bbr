@@ -21,16 +21,6 @@
 #' will be prompted to explicitly pass the model they want to compare against to
 #' the `.mod2` argument.
 #'
-#' **`.file` argument:** The following options are available for `.file`
-#'
-#' * `bbi_nonmem_model`
-#'   * `"model"` compares the control streams
-#' * `bbi_stan_model`
-#'   * `"model"` (default) compares `<run>.stan` files
-#'   * `"standata"` compares `<run>-standata.R` files
-#'   * `"init"` compares `<run>-init.R` files
-#'   * `"stanargs"` compares `<run>-stanargs.R` files
-#'
 #' @return Returns a `"Diff"` object from the `diffobj` package that renders
 #'   when printed or called in the console.
 #'
@@ -39,8 +29,10 @@
 #'   `.mod2`. If `.mod2 = NULL`, the default, compare `.mod` to the model at
 #'   `get_based_on(.mod)`. See "`based_on` details" in Details section.
 #' @param .file Defaults to `"model"` which compares the default model file for
-#'   that model type. Some model types have multiple files that can be compared.
-#'   See "`.file` argument" in Details section.
+#'   that model type. For NONMEM models, the control stream is compared. Other
+#'   model types may accept additional values and support comparing multiple
+#'   files that can be compared. See "`.file` argument" of the specific S3
+#'   method for details.
 #' @param ... arguments passed through to methods. (Currently none.)
 #' @param .viewer If `FALSE`, the default, prints diff to console or renders in
 #'   Rmd. If `TRUE`, render the diff in the Viewer window. Note: this option
@@ -70,30 +62,6 @@ model_diff.bbi_nonmem_model <- function(
   model_diff_impl(.file1, .file2, .viewer = .viewer)
 }
 
-#' @rdname model_diff
-#' @export
-model_diff.bbi_stan_model <- function(
-  .mod,
-  .mod2 = NULL,
-  .file = c("model", "standata", "init", "stanargs"),
-  ...,
-  .viewer = FALSE
-) {
-  .file <- match.arg(.file)
-
-  .mod2 <- model_diff_get_comp(.mod, .mod2)
-
-  diff_args <- map(list(.mod, .mod2), function(.m) {
-    if (.file == "model") {
-      return(build_path_from_model(.m, ".stan"))
-    } else {
-      return(build_path_from_model(.m, glue("-{.file}.R")))
-    }
-  })
-
-  diff_args[[".viewer"]] <- .viewer
-  do.call(model_diff_impl, diff_args)
-}
 
 ###################################
 # PRIVATE IMPLEMENTATION FUNCTIONS

@@ -78,14 +78,6 @@ reference:
   - bbi_current_release
   - bbi_help
 
-- title: Stan-specific helpers
-  - check_stan_model
-  - add_stan_file
-  - add_stan_init
-  - add_standata_file
-  - build_data
-  - read_fit_model
-
 - title: Assorted helpers
   contents:
   - check_file

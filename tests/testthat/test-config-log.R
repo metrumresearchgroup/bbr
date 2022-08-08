@@ -268,24 +268,3 @@ test_that("config_log() works with filtering parameter string [BBR-CGLG-014]",
 
           })
 
-test_that("config_log() works with Stan", {
-  skip_if_no_stan("config_log() works with Stan")
-  log_df <- config_log(STAN_ABS_MODEL_DIR)
-  expect_equal(log_df[[RUN_ID_COL]], STAN_MOD_ID)
-  expect_equal(log_df[['bbi_version']], STAN_BBI_VERSION_STRING)
-  expect_false(log_df[['model_has_changed']])
-  expect_false(log_df[['data_has_changed']])
-})
-
-test_that("config_log() builds Stan data", {
-  skip_if_no_stan("config_log() builds Stan data")
-  perturb_file(
-    system.file("extdata", "fxa.data.csv", package = "bbr"),
-    txt = paste(rep(99, 8), collapse = ",")
-  )
-  log_df <- config_log(STAN_ABS_MODEL_DIR)
-  expect_equal(log_df[[RUN_ID_COL]], STAN_MOD_ID)
-  expect_equal(log_df[['bbi_version']], STAN_BBI_VERSION_STRING)
-  expect_false(log_df[['model_has_changed']])
-  expect_true(log_df[['data_has_changed']])
-})

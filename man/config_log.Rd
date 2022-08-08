@@ -47,10 +47,7 @@ extension
 \item \code{model_has_changed}: a logical indicating whether the model file has
 changed since it was last run
 \item \code{data_has_changed}: a logical indicating whether the data file has
-changed since the model was last run. Note that for Stan models, this
-rebuilds the data file, which can be time consuming. If you do \emph{not}
-want to do this, consider using \code{check_up_to_date.bbi_log_df(.build_data = FALSE)}
-instead. See \code{\link[=check_up_to_date]{check_up_to_date()}} for more details.
+changed since the model was last run
 }
 }
 \seealso{

@@ -48,7 +48,6 @@ Imports:
     digest,
     diffobj,
     dplyr (>= 1.0.0),
-    ellipsis,
     fs,
     glue,
     jsonlite,
@@ -65,13 +64,11 @@ Imports:
     xfun,
     yaml
 Suggests: 
-    cmdstanr,
     covr,
     devtools,
     forcats,
     ggplot2,
     knitr,
-    methods,
     rmarkdown,
     testthat (>= 2.1.0),
     withr,
