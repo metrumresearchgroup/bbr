@@ -90,6 +90,8 @@ submit_nonmem_model <- function(.mod,
   # build command line args
   .bbi_args <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])
   args_vec <- check_bbi_args(.bbi_args)
+
+
   cmd_args <- c("nonmem", "run", .mode, get_model_path(.mod), args_vec)
 
   # define working directory

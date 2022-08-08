@@ -1009,58 +1009,11 @@ UBI-R005:
   description: use-bbi and bbi_version handle path with spaces
   tests:
   - BBR-UBI-005
-UTL-R001:
-  description: check_bbi_args parses correctly
+UTL-R014:
+  description: confirming check_bbi_args() is passing correct parameters
   tests:
-  - BBR-UTL-001
-UTL-R002:
-  description: format_cmd_args parses correctly
-  tests:
-  - BBR-UTL-002
-UTL-R003:
-  description: parse_args_list() merges lists as expected
-  tests:
-  - BBR-UTL-003
-UTL-R004:
-  description: parse_args_list() handles NULL as expected
-  tests:
-  - BBR-UTL-004
-UTL-R005:
-  description: parse_args_list() correctly fails if .func_args isn't named
-  tests:
-  - BBR-UTL-005
-UTL-R006:
-  description: combine_list_objects() merges lists as expected
-  tests:
-  - BBR-UTL-006
-UTL-R007:
-  description: combine_list_objects() merges with append=TRUE
-  tests:
-  - BBR-UTL-007
-UTL-R008:
-  description: combine_list_objects() correctly fails if .func_args isn't named
-  tests:
-  - BBR-UTL-008
-UTL-R009:
-  description: check_required_keys() works correctly
-  tests:
-  - BBR-UTL-009
-UTL-R010:
-  description: strict_mode_error() works correctly
-  tests:
-  - BBR-UTL-010
-UTL-R011:
-  description: suppressSpecificWarning() works
-  tests:
-  - BBR-UTL-011
-UTL-R012:
-  description: wait_for_nonmem() correctly reads in stop time
-  tests:
-  - BBR-UTL-012
-UTL-R013:
-  description: wait_for_nonmem() doesn't error out if no stop time found
-  tests:
-  - BBR-UTL-013
+  - BBR-UTL-014
+  - BBR-UTL-015
 WRKF-R001:
   description: step by step create_model to submit_model to model_summary works
   tests:
