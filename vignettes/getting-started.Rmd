@@ -1,5 +1,6 @@
 ---
-title: "Getting Started with bbr and NONMEM"
+title: "Getting Started with bbr"
+author: "Seth Green"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{getting-started}
@@ -31,7 +32,7 @@ library(dplyr)
 library(purrr)
 ```
 
-`bbr` is an R interface for running `bbi`. Together they provide a solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. Currently, only NONMEM and Stan are supported. For details on modeling in Stan, the ["Getting Started with bbr and Stan" vignette](https://metrumresearchgroup.github.io/bbr/articles/getting-started-stan.html).
+`bbr` is an R interface for running `bbi`. Together they provide a solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. Currently, only NONMEM is supported, so this vignette will only address that. 
 
 # Setup
 
