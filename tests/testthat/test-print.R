@@ -67,7 +67,6 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     # model arguments because "inst/model/nonmem/basic/print-test" alone is over
     # 30 characters.
     call_str <- capture.output(print(proc[[1]], .call_limit=30))[2]
-    print(call_str)
     expect_true(str_detect(call_str, fixed(read_bbi_path())))
     expect_false(str_detect(call_str, fixed(temp_dir)))
     expect_true(str_detect(call_str, "--overwrite --parallel --threads=4"))
