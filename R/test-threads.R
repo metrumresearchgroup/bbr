@@ -4,11 +4,11 @@
 #' @param .threads Integer vector of threads values to test.
 #' @param .bbi_args a named list.
 #' @param .max_eval Max number of iterations for NONMEM to run.
-#'         Will update `MAXITER` or `NITER` (whichever is specified) in generated models.
+#'         Will update `MAXITER`, `NITER`, and `NBURN` (whichever is specified/found) in generated models.
 #'         The best number for this is model-dependent. Typically, something between 10 and
 #'         100 is good, depending on how long each iteration takes. You want something that
 #'         will run for 3-5 minutes total. You can set this argument to `NULL` to run with the
-#'         same settings as the original model.
+#'         same settings as the original model. Any option set to `0` will not be overwritten.
 #' @param ... args passed through to submit_models()
 #'
 #' @importFrom checkmate assert_list assert_int
@@ -73,40 +73,8 @@ test_threads <- function(
                                             overwrite = TRUE)) %>%
                  add_tags(paste("test threads")))
 
-  # Modify MAXEVAL or NITER
-  if(!is.null(.max_eval)){
-    assert_int(.max_eval, lower = 1)
-    search_str <- "MAXEVAL|NITER"
-    map(.mods, function(.mod){
-      mod_path <- get_model_path(.mod)
-      mod_lines <- mod_path %>% readLines() %>% suppressSpecificWarning("incomplete final line found")
-      str_line_loc <- which(grepl(search_str, mod_lines))
-
-      if(is_empty(str_line_loc)){
-        delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
-        stop("Neither MAXEVAL or NITER were found in the ctl file. Please ensure one is provided.")
-      }
-
-      str_values <- str_split(mod_lines[str_line_loc], " ")
-      for(i in seq_along(str_values)){
-        str_loc <- grepl(search_str, str_values[[i]])
-
-        if(length(str_loc[str_loc]) > 1){
-          delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
-          stop("Both MAXEVAL and NITER were found in the ctl file. Please ensure only one is provided.")
-        }
-
-        str_update <- paste0(gsub('[[:digit:]]+', '', str_values[[i]][str_loc]), .max_eval)
-        str_line_update <- paste(paste(str_values[[i]][!str_loc], collapse = " "), str_update, sep = " ")
-
-        mod_lines[str_line_loc][i] <- str_line_update
-      }
-
-      writeLines(mod_lines, mod_path)
-    })
-  }
-
-
+  # Modify Estimation Options
+  adjust_estimation_options(.mods, .max_eval)
 
   tryCatch({
     submit_models(.mods, .wait = FALSE, ...)
@@ -330,4 +298,63 @@ delete_models <- function(.mods, .tags = "test threads", .force = FALSE){
 }
 
 
+#' Parse model files and overwrite estimation iterations
+#'
+#' @param .mods a bbi model object or list of model objects. Generally created by `test_threads()`.
+#' @param .max_eval Max number of iterations for NONMEM to run.
+#' @param .detect Estimation options that will be set to `.max_eval` if found.
+#'
+#' @importFrom readr parse_number
+#'
+#' @keywords internal
+adjust_estimation_options <- function(.mods, .max_eval, .detect = c("MAXEVAL", "NITER", "NBURN", "MAX")){
 
+  assert_true(all(.detect %in% c("MAXEVAL", "NITER", "NBURN", "MAX")))
+
+  if(!is.null(.max_eval)){
+    assert_int(.max_eval, lower = 1)
+    search_str <- paste(.detect, collapse = "|")
+    map(.mods, function(.mod){
+      mod_path <- get_model_path(.mod)
+      mod_lines <- mod_path %>% readLines() %>% suppressSpecificWarning("incomplete final line found")
+      str_line_loc <- which(grepl(search_str, mod_lines))
+
+      if(is_empty(str_line_loc)){
+        delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
+        stop("Neither MAXEVAL or NITER were found in the ctl file. Please ensure one is provided.")
+      }
+
+      str_values <- str_split(mod_lines[str_line_loc], " ")
+      for(i in seq_along(str_values)){
+
+        prevent <- c("MAXEVAL|NITER", "MAXEVAL|MAX", "MAX|NITER") # options that cant be set for the same estimation method
+        for(j in seq_along(prevent)){
+          prevent_loc <- grepl(prevent[j], str_values[[i]])
+          if(length(prevent_loc[prevent_loc]) > 1){
+            delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
+            options_drop <- str_split(prevent[j], "\\|")[[1]]
+            stop(glue("Both {options_drop[1]} and {options_drop[2]} were set for the same estimation method. Please ensure only one is set"))
+          }
+        }
+
+        str_loc <- grepl(search_str, str_values[[i]])
+        str_current <- str_values[[i]][str_loc]
+
+        # We dont want to overwrite values that were originally 0
+        if(any(parse_number(str_current) != 0)){
+          option_values <- readr::parse_number(str_values[[i]]) %>% as.vector() %>%
+            suppressSpecificWarning("parsing failures")
+          str_loc[which(option_values==0)] <- FALSE
+          str_current <- str_current[readr::parse_number(str_current) != 0]
+        }
+
+        str_update <- paste0(gsub('[[:digit:]]+', '', str_current), .max_eval)
+        str_line_update <- paste(paste(str_values[[i]][!str_loc], collapse = " "), paste(str_update, collapse = " "), sep = " ")
+
+        mod_lines[str_line_loc][i] <- str_line_update
+      }
+
+      writeLines(mod_lines, mod_path)
+    })
+  }
+}
