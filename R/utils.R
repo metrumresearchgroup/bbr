@@ -344,7 +344,7 @@ file_matches_string <- function(path, string, append = "\n") {
 #' @export
 print_bbi_args <- function() {
   iwalk(BBI_ARGS, function(v, name) {
-    bname <- cli::style_bold(name)
+    bname <- cli::style_bold(cli::col_blue(name))
     desc <- str_squish(v$description) %>%
       str_replace("RAW NMFE OPTION", cli::col_cyan("RAW NMFE OPTION")) %>%
       str_remove("\\.$")
