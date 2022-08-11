@@ -9,3 +9,8 @@ print_bbi_args()
 \description{
 Prints all valid arguments to pass in to \code{.bbi_args=list()} argument of \code{submit_model()} or \code{model_summary()}
 }
+\details{
+Note that this function is simply rendering information that is available in
+the list \code{BBI_ARGS}, which is exported. Rather than calling this function,
+RStudio users may prefer to inspect the result of \code{View(bbr::BBI_ARGS)}.
+}

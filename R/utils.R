@@ -334,6 +334,11 @@ file_matches_string <- function(path, string, append = "\n") {
 #' Print valid .bbi_args
 #'
 #' Prints all valid arguments to pass in to `.bbi_args=list()` argument of `submit_model()` or `model_summary()`
+#'
+#' Note that this function is simply rendering information that is available in
+#' the list `BBI_ARGS`, which is exported. Rather than calling this function,
+#' RStudio users may prefer to inspect the result of `View(bbr::BBI_ARGS)`.
+#'
 #' @importFrom purrr iwalk
 #' @importFrom stringr str_remove str_replace str_squish
 #' @export

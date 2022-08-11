@@ -10,6 +10,14 @@ BBI_VALID_MODES <- c("local", "sge")
 CACHE_ENV <- new.env(parent = emptyenv())
 CACHE_ENV$bbi_exe_paths <- list()
 
+#' List of valid arguments bbi arguments
+#'
+#' These values can be passed via the `.bbi_args` argument of [submit_model()]
+#' or [model_summary()]. This is exported for the benefit of RStudio users that
+#' may prefer to inspect `View(bbr::BBI_ARGS)` instead of the [print_bbi_args()]
+#' output.
+#'
+#' @export
 BBI_ARGS = list(
   additional_post_work_envs = list(
     type = "character",
