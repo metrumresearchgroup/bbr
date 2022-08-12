@@ -4,12 +4,12 @@
 \alias{check_model_object_list}
 \title{Private helper to check if a list of objects all inherit a model class and error if not}
 \usage{
-check_model_object_list(.mods, .mod_types = VALID_MOD_CLASSES)
+check_model_object_list(.mods, .mod_types = BBI_BASE_MODEL_CLASS)
 }
 \arguments{
 \item{.mods}{The list of objects to check}
 
-\item{.mod_types}{Character vector of acceptable classes, defaulting to \code{VALID_MOD_CLASSES}}
+\item{.mod_types}{Character vector of acceptable classes, defaulting to \code{BBI_BASE_MODEL_CLASS}}
 }
 \description{
 Private helper to check if a list of objects all inherit a model class and error if not

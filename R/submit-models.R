@@ -29,7 +29,7 @@ submit_models <- function(
   UseMethod("submit_models")
 }
 
-#' @describeIn submit_models Takes a list of `bbi_nonmem_model` objects.
+#' @describeIn submit_models Takes a list of `bbi_base_model` objects.
 #' @importFrom purrr map map_lgl
 #' @export
 submit_models.list <- function(
@@ -57,52 +57,35 @@ submit_models.list <- function(
   .model_type <- uniq_model_types
 
   # submit models
-  if (.model_type == "nonmem") {
-    res_list <- submit_nonmem_models(.mods,
-                                     .bbi_args = .bbi_args,
-                                     .mode = .mode,
-                                     ...,
-                                     .overwrite = .overwrite,
-                                     .config_path = .config_path,
-                                     .wait = .wait,
-                                     .dry_run = .dry_run)
-  } else if (.model_type == "stan") {
-    stop(NO_STAN_ERR_MSG)
-  } else {
-    stop(glue("Passed `{.model_type}`. Valid options: `{paste(SUPPORTED_MOD_TYPES, collapse = ', ')}`"))
-  }
-  return(res_list)
+  class(.mods) <- paste0("bbi_", .model_type, "_models")
+  submit_models(.mods,
+                .bbi_args = .bbi_args,
+                .mode = .mode,
+                ...,
+                .overwrite = .overwrite,
+                .config_path = .config_path,
+                .wait = .wait,
+                .dry_run = .dry_run)
 }
 
+#' @export
+submit_models.default <- function(.mods, ...) {
+  stop("Unsupported model type: ", class(.mods))
+}
 
-#####################################
-# Private implementation function(s)
-#####################################
-
-#' Submit multiple NONMEM models in batch via bbi
-#'
-#' Private implementation function called by `submit_models()` dispatches.
-#' @param .mods A list of S3 objects of class `bbi_nonmem_model`
-#' @inheritParams submit_models
 #' @importFrom stringr str_detect
 #' @importFrom tools file_path_sans_ext
 #' @importFrom purrr map
-#' @importFrom rlang %||% is_bare_list
-#' @return A list of S3 objects of class `bbi_process`
-#' @keywords internal
-submit_nonmem_models <- function(.mods,
-                                 .bbi_args = NULL,
-                                 .mode = getOption("bbr.bbi_exe_mode"),
-                                 ...,
-                                 .overwrite = NULL,
-                                 .config_path = NULL,
-                                 .wait = TRUE,
-                                 .dry_run = FALSE) {
-
-  # check input list (this is a private method so if these fail there is a bug somewhere that calls this)
-  if (!is_bare_list(.mods)) {
-    dev_error(glue("Can only pass a list of {NM_MOD_CLASS} objects to submit_nonmem_models. Passed object of class {paste(class(.mods), collapse = ', ')}"))
-  }
+#' @importFrom rlang %||%
+#' @export
+submit_models.bbi_nonmem_models <- function(.mods,
+                                            .bbi_args = NULL,
+                                            .mode = getOption("bbr.bbi_exe_mode"),
+                                            ...,
+                                            .overwrite = NULL,
+                                            .config_path = NULL,
+                                            .wait = TRUE,
+                                            .dry_run = FALSE) {
   check_model_object_list(.mods, NM_MOD_CLASS)
 
   # check against YAML

@@ -7,7 +7,7 @@
 build_bbi_param_list(.mods, .bbi_args = NULL)
 }
 \arguments{
-\item{.mods}{A list of S3 objects of class \code{bbi_nonmem_model}}
+\item{.mods}{The model objects to submit.}
 
 \item{.bbi_args}{A named list specifying arguments to pass to bbi
 formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)}. Run \code{\link[=print_bbi_args]{print_bbi_args()}} to see valid arguments. Note that bbr does

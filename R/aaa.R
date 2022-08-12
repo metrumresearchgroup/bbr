@@ -120,14 +120,6 @@ YAML_SCALAR_TO_LIST_KEYS <- c(
   YAML_STAR
 )
 
-
-SUPPORTED_MOD_TYPES <- c("nonmem", "stan")
-
-VALID_MOD_CLASSES <- purrr::map_chr(SUPPORTED_MOD_TYPES,
-                                    function(.model_type) {
-                                      as.character(glue::glue("bbi_{.model_type}_model"))
-                                    })
-
 SUMMARY_DETAILS <- "run_details"
 SUMMARY_HEURISTICS <- "run_heuristics"
 SUMMARY_COND_NUM <- "condition_number"
