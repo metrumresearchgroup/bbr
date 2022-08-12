@@ -64,11 +64,11 @@ check_up_to_date.bbi_nonmem_summary <- function(.bbi_object, ...) {
 }
 
 #' @export
-check_up_to_date.bbi_log_df <- function(.bbi_object, .build_data = TRUE, ...) {
+check_up_to_date.bbi_log_df <- function(.bbi_object, ...) {
 
   check_list <- map(.bbi_object[[ABS_MOD_PATH]], function(.p) {
     tryCatch(
-      check_up_to_date(read_model(.p), .build_data = .build_data),
+      check_up_to_date(read_model(.p), ...),
       error = function(.e) {
         .error_msg <- paste(as.character(.e$message), collapse = " -- ")
         if (grepl(CHECK_UP_TO_DATE_ERR_MSG, .error_msg, fixed = TRUE)) {
