@@ -556,6 +556,8 @@ reconcile_yaml <- function(.mod) {
   return(.new_mod)
 }
 
+# SHARED: check_yaml_in_sync() is used by bbr.bayes, so any changes here should
+# be compatible with its use there.
 
 #' @describeIn verify_model_yaml_integrity Checks that model YAML file is the same as when it was last read into the model object.
 #' Errors if the md5 digests are not identical. This is called internally in most functions that interact with a model object.

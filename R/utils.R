@@ -300,6 +300,9 @@ file_matches <- function(path, md5) {
   res
 }
 
+# SHARED: file_matches_string() is used by bbr.bayes, so any changes here should
+# be compatible with its use there.
+
 #' Compare a file to a string
 #'
 #' Check whether the md5 digest of a string matches

@@ -67,6 +67,9 @@ model_diff.bbi_nonmem_model <- function(
 # PRIVATE IMPLEMENTATION FUNCTIONS
 ###################################
 
+# SHARED: model_diff_get_comp() is used by bbr.bayes, so any changes here should
+# be compatible with its use there.
+
 #' Private helper to get a valid comparison model
 #' @inheritParams model_diff
 #' @keywords internal
@@ -91,6 +94,9 @@ model_diff_get_comp <- function(.mod, .mod2) {
   check_yaml_in_sync(.mod2)
   return(.mod2)
 }
+
+# SHARED: model_diff_impl() is used by bbr.bayes, so any changes here should be
+# compatible with its use there.
 
 #' Private helper to diff two model files
 #' @importFrom diffobj diffFile

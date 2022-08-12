@@ -118,6 +118,9 @@ copy_model_from.bbi_nonmem_model <- function(
 # Private implementation function(s)
 #####################################
 
+# SHARED: copy_model_from_impl() is used by bbr.bayes, so any changes here
+# should be compatible with its use there.
+
 #' Copy model from an existing model
 #'
 #' Private implementation function called by `copy_model_from()` dispatches.
@@ -235,6 +238,9 @@ copy_control_stream <- function(.parent_model_path, .new_model_path, .overwrite,
     fs::file_copy(.parent_model_path, .new_model_path)
   }
 }
+
+# SHARED: build_new_model_path() is used by bbr.bayes, so any changes here
+# should be compatible with its use there.
 
 #' Private helper to build absolute path for [copy_model_from()].
 #' Importantly, if the input `.new_model` is _not_ absolute, it will
