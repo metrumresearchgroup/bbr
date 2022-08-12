@@ -18,7 +18,7 @@ A model object, if \code{.path} represents a valid model.
 Private helper function that tries to call \code{\link[=read_model]{read_model()}} on a model path and
 returns NULL, with no error, if the path is not a valid model file. Also
 wraps \code{\link[=read_model]{read_model()}} in \code{suppressMessages()} so that things like the
-\code{\link[=check_stan_model]{check_stan_model()}} messages will be suppressed. This is done because this
+check_stan_model() messages will be suppressed. This is done because this
 function is primarily used when mapping over a number of models and these
 messages can be very annoying and mostly pointless in that context.
 }
