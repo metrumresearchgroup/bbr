@@ -122,12 +122,6 @@ VALID_MOD_CLASSES <- purrr::map_chr(SUPPORTED_MOD_TYPES,
                                       as.character(glue::glue("bbi_{.model_type}_model"))
                                     })
 
-VALID_SUM_CLASSES <- purrr::map_chr(SUPPORTED_MOD_TYPES,
-                                    function(.model_type) {
-                                      as.character(glue::glue("bbi_{.model_type}_summary"))
-                                    })
-
-
 SUMMARY_DETAILS <- "run_details"
 SUMMARY_HEURISTICS <- "run_heuristics"
 SUMMARY_COND_NUM <- "condition_number"
