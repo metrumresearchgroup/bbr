@@ -228,8 +228,6 @@ submit_stan_model_cmdstanr <- function(.mod,
     if (isTRUE(.overwrite)) {
       fs::dir_delete(out_dir)
       fs::dir_create(out_dir)
-      if(fs::file_exists(standata_json_path)) { fs::file_delete(standata_json_path) }
-      if(fs::file_exists(stanargs_path)) { fs::file_delete(stanargs_path) }
     } else {
       stop(glue("{out_dir} already exists. Pass submit_model(..., .overwrite = TRUE) to delete it and re-run the model."), call. = FALSE)
     }

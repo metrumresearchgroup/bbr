@@ -271,6 +271,7 @@ cleanup <- function(env = parent.frame()) {
   for (m in mods_to_kill) {
     if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
     if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
+    if (fs::dir_exists(m)) fs::dir_delete(m)
   }
 
   if (fs::dir_exists(NEW_MOD2)) fs::dir_delete(NEW_MOD2)

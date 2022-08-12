@@ -21,7 +21,7 @@
 #' @param .mod a `bbi_{.model_type}_model` object.
 #' @param .out_path If `NULL`, the default, does not write any data to disk.
 #'   Otherwise, pass a file path where the resulting data object should be
-#'   written.
+#'   written. If a file already exists at this path, it will be overwritten.
 #' @param ... Arguments passed through to methods (currently none).
 #'
 #' @importFrom checkmate assert_string
@@ -39,18 +39,31 @@ build_data <- function(.mod, .out_path = NULL, ...) {
 #'
 #' @export
 build_data.bbi_stan_model <- function(.mod, .out_path = NULL, ...) {
-  # source and call function
   standata_r_path <- build_path_from_model(.mod, STANDATA_R_SUFFIX)
-  make_standata <- safe_source_function(standata_r_path, "make_standata")
-  standata_list <- safe_call_sourced(
-    .func = make_standata,
-    .args = list(.dir = dirname(get_output_dir(.mod, .check_exists = FALSE))),
-    .file = standata_r_path,
-    .expected_class = "list"
-  )
+  standata_json_path <- build_path_from_model(.mod, STANDATA_JSON_SUFFIX)
+
+  # check if it's a placeholder from brms
+  brmsbool <- FALSE
+  if (file_matches_string(standata_r_path, STANDATA_BRMS_COMMENT)) {
+    brmsbool <- TRUE
+    message("standata constructed with brms. Loading directly from json.")
+    if (!fs::file_exists(standata_json_path)) {
+      stop(glue("{basename(standata_r_path)} was constructed by brms, but no data file exists at {standata_json_path}"), call. = F)
+    }
+    standata_list <- jsonlite::fromJSON(standata_json_path)
+  } else {
+    # source and call function
+    make_standata <- safe_source_function(standata_r_path, "make_standata")
+    standata_list <- safe_call_sourced(
+      .func = make_standata,
+      .args = list(.dir = dirname(get_output_dir(.mod, .check_exists = FALSE))),
+      .file = standata_r_path,
+      .expected_class = "list"
+    )
+  }
 
   # optionally write to json
-  if (!is.null(.out_path)) {
+  if (!is.null(.out_path) && !all(brmsbool, .out_path == standata_json_path)) {
     if (!requireNamespace("cmdstanr", quietly = TRUE)) {
       stop("Must have cmdstanr installed to use build_data.bbi_stan_model()")
     }
@@ -59,6 +72,8 @@ build_data.bbi_stan_model <- function(.mod, .out_path = NULL, ...) {
     if (!str_detect(.out_path, ".json$")) {
       stop(glue("build_data.bbi_stan_model(.out_path) must end in '.json' because a JSON file will be written. Got {.out_path}"), .call = FALSE)
     }
+
+    if (fs::file_exists(.out_path)) fs::file_delete(.out_path)
     cmdstanr::write_stan_json(standata_list, .out_path)
   }
 

@@ -45,7 +45,8 @@ new_model <- function(
   .bbi_args = NULL,
   .overwrite = FALSE,
   .star = NULL,
-  .model_type = c("nonmem", "stan")
+  .model_type = c("nonmem", "stan"),
+  ...
 ) {
 
   .model_type <- match.arg(.model_type)
@@ -63,18 +64,30 @@ new_model <- function(
     basename(.path)
   )
 
-  # create model object
-  .mod <- list()
-  .mod[[ABS_MOD_PATH]] <- abs_mod_path
-  .mod[[YAML_MOD_TYPE]] <- .model_type
-  .mod <- create_model_object(.mod, save_yaml = TRUE)
+  tryCatch({
+      parse_new_model_dots(.model_type, abs_mod_path, ...)
 
-  # update model from passed args
-  if (!is.null(.description)) .mod <- replace_description(.mod, .description)
-  if (!is.null(.tags))        .mod <- replace_all_tags(.mod, .tags)
-  if (!is.null(.bbi_args))    .mod <- replace_all_bbi_args(.mod, .bbi_args)
-  if (!is.null(.based_on))    .mod <- replace_all_based_on(.mod, .based_on)
-  if (isTRUE(.star))          .mod <- add_star(.mod)
+      # create model object
+      .mod <- list()
+      .mod[[ABS_MOD_PATH]] <- abs_mod_path
+      .mod[[YAML_MOD_TYPE]] <- .model_type
+      .mod <- create_model_object(.mod, save_yaml = TRUE)
+
+      # update model from passed args
+      if (!is.null(.description)) .mod <- replace_description(.mod, .description)
+      if (!is.null(.tags))        .mod <- replace_all_tags(.mod, .tags)
+      if (!is.null(.bbi_args))    .mod <- replace_all_bbi_args(.mod, .bbi_args)
+      if (!is.null(.based_on))    .mod <- replace_all_based_on(.mod, .based_on)
+      if (isTRUE(.star))          .mod <- add_star(.mod)
+    },
+    error = function(.e) {
+      if (fs::dir_exists(abs_mod_path)) fs::dir_delete(abs_mod_path)
+      files_to_kill <- c(yaml_ext(abs_mod_path), ctl_ext(abs_mod_path), mod_ext(abs_mod_path))
+      purrr::walk(files_to_kill, ~ {if (fs::file_exists(.x)) fs::file_delete(.x)})
+      stop(paste("new_model() failed for", abs_mod_path, "with the following error:\n", paste(.e, collapse = "\n")))
+    }
+  )
+
   return(.mod)
 }
 
@@ -167,6 +180,63 @@ check_for_existing_model <- function(.path, .overwrite) {
   }
 }
 
+#' Parse ... passed to new_model()
+#'
+#' @importFrom ellipsis check_dots_empty
+#' @keywords internal
+parse_new_model_dots <- function(.model_type, .path, ...) {
+  args <- list(...)
+
+  if (.model_type == "nonmem") {
+    if (length(args) > 0) {
+      stop(paste(
+        "You have passed extra arguments to `new_model()` via `...`, which is NOT valid for NONMEM models.",
+        NONMEM_MODEL_TYPE_ERR_MSG,
+        glue("The extra passed arguments are {paste(names(args), collapse = ', ')}"),
+        sep = "\n"), call. = FALSE)
+    }
+  } else if (.model_type == "stan") {
+    if (length(args) > 0) {
+      if (all(c("formula", "data") %in% names(args))) {
+        stan_files_from_brms(.path, args)
+      } else {
+        stop(paste(
+          "You have passed extra arguments to `new_model(.model_type = 'stan')` via `...`",
+          "This is used for constructing a `bbi_stan_model` with `brms` and REQUIRES both `formula` and `data` to be passed.",
+          glue("The extra passed arguments are {paste(names(args), collapse = ', ')}"),
+          sep = "\n"), call. = FALSE)
+      }
+    }
+  }
+}
+
+
+#' Write necessary stan files to disk from brms args
+#'
+#' @importFrom readr write_lines
+#'
+#' @param .path absolute model path (files will be created in this dir)
+#' @param args named list of arguments to pass to [brms::make_stancode] and [brms::make_standata]
+#' @keywords internal
+stan_files_from_brms <- function(.path, args) {
+  if (!requireNamespace("cmdstanr", quietly = TRUE)) {
+    stop("Must have cmdstanr installed to use create a `bbi_stan_model` with `brms`")
+  }
+  if (!requireNamespace("brms", quietly = TRUE)) {
+    stop("Must have brms installed to use create a `bbi_stan_model` with `brms`")
+  }
+  if (!fs::dir_exists(.path)) fs::dir_create(.path)
+
+  # write .stan file
+  stan_code <- do.call(brms::make_stancode, args)
+  write_lines(stan_code, build_path_from_model(.path, STANMOD_SUFFIX))
+
+  # write data file
+  stan_data <- do.call(brms::make_standata, args)
+  cmdstanr::write_stan_json(unclass(stan_data), build_path_from_model(.path, STANDATA_JSON_SUFFIX))
+  write_lines(STANDATA_BRMS_COMMENT, build_path_from_model(.path, STANDATA_R_SUFFIX))
+}
+
 #' Private helper to remove file extensions to match expected input to new model.
 #' @inheritParams new_model
 #' @keywords internal
@@ -178,4 +248,3 @@ sanitize_file_extension <- function(.path)
   }
   return(.path)
 }
-

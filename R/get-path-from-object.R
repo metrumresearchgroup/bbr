@@ -243,11 +243,25 @@ build_path_from_model <- function(.mod, .suffix, ...) {
   UseMethod("build_path_from_model")
 }
 
-#' @rdname build_path_from_model
+#' @describeIn build_path_from_model Takes any `bbi_model` object
 #' @export
 build_path_from_model.bbi_model <- function(.mod, .suffix, ...) {
   file.path(
     .mod[[ABS_MOD_PATH]],
+    paste0(get_model_id(.mod), .suffix)
+  )
+}
+
+#' @describeIn build_path_from_model Takes an absolute model path (without file extension)
+#' @importFrom checkmate assert_string
+#' @importFrom fs is_absolute_path
+#' @export
+build_path_from_model.character <- function(.mod, .suffix, ...) {
+  checkmate::assert_string(.mod)
+  if (!fs::is_absolute_path(.mod)) stop(paste("Can only pass a `bbi_model` object or an absolute path to `build_path_from_model(). Passed", .mod))
+
+  file.path(
+    .mod,
     paste0(get_model_id(.mod), .suffix)
   )
 }

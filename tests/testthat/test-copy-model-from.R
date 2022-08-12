@@ -227,3 +227,11 @@ test_that("copy_from_model.bbi_stan_model creates accurate copy", {
   expect_identical(new_mod[[YAML_TAGS]], c(STAN_MOD1$tags, NEW_TAGS))
   expect_null(new_mod[[YAML_DESCRIPTION]])
 })
+
+
+test_that("copy_from_model.bbi_stan_model from brms copies through json", {
+  skip_if_no_stan("copy_from_model.bbi_stan_model")
+
+
+  expect_equal(1,1)
+})
