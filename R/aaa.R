@@ -50,7 +50,7 @@ BBI_ARGS = list(
 # unfortunate. BBI_PARENT_CLASS ("bbi_model") came first and is used for regular
 # models _and_ summary objects. BBI_BASE_MODEL_CLASS ("bbi_base_model") came
 # later and applies only to regular models, not summary objects.
-BBI_PARENT_CLASS <- "bbi_model"
+BBI_PARENT_CLASS <- "bbi_model" # SHARED with bbr.bayes
 BBI_BASE_MODEL_CLASS <- "bbi_base_model"
 NM_MOD_CLASS <- "bbi_nonmem_model"
 NM_SUM_CLASS <- "bbi_nonmem_summary"
@@ -63,20 +63,20 @@ LOG_DF_CLASS <- "bbi_log_df"
 
 # YAML keys that are hard-coded
 YAML_YAML_MD5 <- "yaml_md5"
-YAML_DESCRIPTION <- "description"
-YAML_BASED_ON <- "based_on"
-YAML_TAGS <- "tags"
+YAML_DESCRIPTION <- "description" # SHARED with bbr.bayes
+YAML_BASED_ON <- "based_on" # SHARED with bbr.bayes
+YAML_TAGS <- "tags" # SHARED with bbr.bayes
 YAML_NOTES <- "notes"
 YAML_BBI_ARGS <- "bbi_args"
-YAML_MOD_TYPE <- "model_type"
+YAML_MOD_TYPE <- "model_type" # SHARED with bbr.bayes
 YAML_STAR <- 'star'
 
 YAML_REQ_INPUT_KEYS <- c(
   YAML_MOD_TYPE
 )
 
-ABS_MOD_PATH <- "absolute_model_path"
-RUN_ID_COL <- "run"
+ABS_MOD_PATH <- "absolute_model_path" # SHARED with bbr.bayes
+RUN_ID_COL <- "run" # SHARED with bbr.bayes
 
 # keys required to create a model object
 MODEL_REQ_INPUT_KEYS <- c(
@@ -136,9 +136,9 @@ SUMMARY_SHRINKAGE_PVAL <- "pval"
 SUMMARY_PARAM_ETASIG <- "ETASIG"
 
 CONFIG_MODEL_PATH <- "model_path"
-CONFIG_MODEL_MD5 <- "model_md5"
-CONFIG_DATA_PATH <- "data_path"
-CONFIG_DATA_MD5 <- "data_md5"
+CONFIG_MODEL_MD5 <- "model_md5" # SHARED with bbr.bayes
+CONFIG_DATA_PATH <- "data_path" # SHARED with bbr.bayes
+CONFIG_DATA_MD5 <- "data_md5" # SHARED with bbr.bayes
 
 # keys required for a summary object to have
 SUMMARY_REQ_KEYS <- c(
@@ -163,7 +163,7 @@ ANY_HEURISTICS <- "any_heuristics"
 BBI_NULL_NUM <- -999999999
 BBI_NULL_STR <- "-999999999"
 
-SL_SUMMARY <- "bbi_summary"
+SL_SUMMARY <- "bbi_summary" # SHARED with bbr.bayes
 SL_ERROR <- "error_msg"
 SL_FAIL_FLAGS <- "needed_fail_flags"
 
