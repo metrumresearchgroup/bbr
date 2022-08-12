@@ -45,7 +45,13 @@ BBI_ARGS = list(
 )
 
 # S3 classes
+#
+# The underlying names for BBI_PARENT_CLASS and BBI_BASE_MODEL_CLASS are
+# unfortunate. BBI_PARENT_CLASS ("bbi_model") came first and is used for regular
+# models _and_ summary objects. BBI_BASE_MODEL_CLASS ("bbi_base_model") came
+# later and applies only to regular models, not summary objects.
 BBI_PARENT_CLASS <- "bbi_model"
+BBI_BASE_MODEL_CLASS <- "bbi_base_model"
 NM_MOD_CLASS <- "bbi_nonmem_model"
 NM_SUM_CLASS <- "bbi_nonmem_summary"
 SL_CLASS <- "bbi_summary_list"

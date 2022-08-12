@@ -76,7 +76,7 @@ SUMMARY_REF_FILE <- file.path(REF_DIR, "1_summary_obj.R")
 PARAM_REF_FILE <-   file.path(REF_DIR, "1_param_table.R")
 
 NM_SUM_CLASS_LIST <- c(NM_SUM_CLASS, BBI_PARENT_CLASS, "list")
-NM_MOD_CLASS_LIST <- c(NM_MOD_CLASS, BBI_PARENT_CLASS, "list")
+NM_MOD_CLASS_LIST <- c(NM_MOD_CLASS, BBI_BASE_MODEL_CLASS, BBI_PARENT_CLASS, "list")
 PROC_CLASS_LIST <- c(PROC_CLASS, "list")
 
 PROC_HELP_STR <- as.character(glue("  {read_bbi_path()} --help"))

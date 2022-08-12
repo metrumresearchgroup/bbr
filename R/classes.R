@@ -33,7 +33,8 @@ create_model_object <- function(res, save_yaml) {
   }
 
   # assign class
-  class(res) <- c(as.character(glue("bbi_{.model_type}_model")), BBI_PARENT_CLASS, class(res))
+  class(res) <- c(as.character(glue("bbi_{.model_type}_model")),
+                  BBI_BASE_MODEL_CLASS, BBI_PARENT_CLASS, class(res))
 
   # look for appropriate model files on disk and then write out YAML.
   # must be done AFTER assigning the class so that associated helpers can dispatch correctly
