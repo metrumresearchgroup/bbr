@@ -27,8 +27,8 @@
 #'   `.yaml_path`. If `TRUE` overwrite existing file and output directory, if
 #'   they exist.
 #' @param .model_type Character scaler to specify type of model being created
-#'   (used for S3 class). Currently only `'nonmem'` and `'stan'` are supported.
-#'   Defaults to `'nonmem'` to preserve legacy API.
+#'   (used for S3 class). Currently only `'nonmem'` is supported by bbr itself,
+#'   although other types may be implemented by other packages.
 #'
 #' @param .star Boolean, marks model to indicate special interest level.
 #' @return S3 object of class `bbi_{.model_type}_model` that can be passed to
@@ -44,10 +44,9 @@ new_model <- function(
   .bbi_args = NULL,
   .overwrite = FALSE,
   .star = NULL,
-  .model_type = c("nonmem", "stan")
+  .model_type = c("nonmem")
 ) {
 
-  .model_type <- match.arg(.model_type)
   assert_logical(.star, len = 1, null.ok = TRUE)
 
   # check if file already exists and decide whether to overwrite if it does

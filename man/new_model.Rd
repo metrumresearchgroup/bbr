@@ -12,7 +12,7 @@ new_model(
   .bbi_args = NULL,
   .overwrite = FALSE,
   .star = NULL,
-  .model_type = c("nonmem", "stan")
+  .model_type = c("nonmem")
 )
 }
 \arguments{
@@ -41,8 +41,8 @@ they exist.}
 \item{.star}{Boolean, marks model to indicate special interest level.}
 
 \item{.model_type}{Character scaler to specify type of model being created
-(used for S3 class). Currently only \code{'nonmem'} and \code{'stan'} are supported.
-Defaults to \code{'nonmem'} to preserve legacy API.}
+(used for S3 class). Currently only \code{'nonmem'} is supported by bbr itself,
+although other types may be implemented by other packages.}
 }
 \value{
 S3 object of class \verb{bbi_\{.model_type\}_model} that can be passed to
