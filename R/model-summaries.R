@@ -156,7 +156,7 @@ model_summaries_concurrent <- function(.mods, .bbi_args, .fail_flags) {
     results[[i]] <- c(
       res,
       rlang::list2(
-        !!SL_SUMMARY := create_summary_object(c(res, s)),
+        !!SL_SUMMARY := create_summary_object(c(res, s), "nonmem"),
         !!SL_FAIL_FLAGS := s$needed_fail_flags %||% FALSE,
         !!SL_ERROR := if (s$success) NA_character_ else s$error_msg))
   }

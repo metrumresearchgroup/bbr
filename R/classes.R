@@ -67,16 +67,14 @@ create_model_object <- function(res, save_yaml) {
 }
 
 #' @describeIn create_bbi_object Create list object of `bbi_{.model_type}_summary` class, first checking that all the required keys are present.
-#' @param .model_type Character scalar of a valid model type (currently either `nonmem` or `stan`)
+#' @param .model_type Character scalar of a valid model type
 #' @importFrom purrr map map_if
 #' @keywords internal
-create_summary_object <- function(res, .model_type = SUPPORTED_MOD_TYPES) {
+create_summary_object <- function(res, .model_type) {
 
   if(!inherits(res, "list")) {
     stop(glue("Can only summary object from a named list. Passed object has classes {paste(class(res), collapse = ', ')}"))
   }
-
-  .model_type <- match.arg(.model_type)
 
   # Overwrite cases of BBI_NULL_NUM to NA_real_
   res <- map_list_recursive(res, set_bbi_null)
