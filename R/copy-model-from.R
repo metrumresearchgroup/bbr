@@ -89,6 +89,14 @@ copy_model_from.bbi_nonmem_model <- function(
 
   .new_model <- build_new_model_path(.parent_mod, .new_model)
 
+  copy_ctl <- function() {
+    .parent_model_path <- get_model_path(.parent_mod)
+    parent_ext <- fs::path_ext(.parent_model_path)
+    .new_model_path <- paste(.new_model, parent_ext, sep = ".")
+    copy_control_stream(.parent_model_path, .new_model_path, .overwrite,
+                        .update_model_file)
+  }
+
   .mod <- copy_model_from_impl(
     .parent_mod = .parent_mod,
     .new_model = .new_model,
@@ -99,7 +107,8 @@ copy_model_from.bbi_nonmem_model <- function(
     .inherit_tags = .inherit_tags,
     .update_model_file = .update_model_file,
     .overwrite = .overwrite,
-    .model_type = "nonmem"
+    .model_type = "nonmem",
+    setup_fn = copy_ctl
   )
 
   return(.mod)
@@ -120,6 +129,9 @@ copy_model_from.bbi_nonmem_model <- function(
 #'   default, update the `$PROBLEM` line in the new control stream. If `FALSE`,
 #'   `{.new_model}.[mod|ctl]` will be an exact copy of its parent control
 #'   stream.
+#' @param .model_type Model type to pass to [new_model()].
+#' @param setup_fn A function to call (with no arguments) before creating the
+#'   model with [new_model()].
 #' @inheritParams copy_model_from
 #' @importFrom fs file_copy path_rel is_absolute_path
 #' @importFrom readr read_file write_file
@@ -139,11 +151,9 @@ copy_model_from_impl <- function(
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE,
-  .model_type = c("nonmem", "stan")
+  .model_type = "nonmem",
+  setup_fn = NULL
 ) {
-
-  .model_type <- match.arg(.model_type)
-
   check_for_existing_model(.new_model, .overwrite)
 
   # check parent
@@ -162,19 +172,8 @@ copy_model_from_impl <- function(
     new_tags <- .add_tags
   }
 
-  if (inherits(.parent_mod, NM_MOD_CLASS)) {
-    # copy control steam to new path
-    .parent_model_path <- get_model_path(.parent_mod)
-    parent_ext <- fs::path_ext(.parent_model_path)
-    .new_model_path <- paste(.new_model, parent_ext, sep = ".")
-    copy_control_stream(.parent_model_path, .new_model_path, .overwrite, .update_model_file)
-  } else if (inherits(.parent_mod, STAN_MOD_CLASS)) {
-    copy_stan_files(.parent_mod, .new_model, .overwrite)
-  } else {
-    dev_error(paste(
-      "Unsupported object passed to copy_model_from_impl(). Classes: ",
-      paste(class(.parent_mod), collapse = ", ")
-    ))
+  if (!is.null(setup_fn)) {
+    setup_fn()
   }
 
   # create new model
