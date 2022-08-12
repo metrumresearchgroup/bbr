@@ -4,7 +4,7 @@
 \alias{config_log_entry}
 \title{Parse a bbi config file}
 \usage{
-config_log_entry(path, fields = CONFIG_KEEPERS)
+config_log_entry(path, fields = NULL)
 }
 \arguments{
 \item{path}{A string giving the path to \code{bbi_config.json}.}
