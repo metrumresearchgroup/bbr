@@ -104,9 +104,9 @@ summary_log_impl <- function(.mods, ...) {
     return(select(res_df, -.data[[SL_SUMMARY]], -.data[[SL_FAIL_FLAGS]]))
   }
 
-  # if ALL models are Stan, the next section will error trying to unnest them,
-  # so we just return the objects here.
-  if (all(purrr::map_lgl(res_df[[SL_SUMMARY]], ~inherits(.x, STAN_FIT_CLASS)))) {
+  # If none of the models are nonmem, the next section will error trying to
+  # unnest them, so we just return the objects here.
+  if (purrr::none(.mods, ~ inherits(.x, NM_MOD_CLASS))) {
     return(select(res_df, -.data[[SL_FAIL_FLAGS]]))
   }
 
