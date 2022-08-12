@@ -211,6 +211,8 @@ config_log_entry <- function(path, fields = NULL) {
   config <- res$config
   fields <- res$fields
 
+  # bbr.bayes kludge: .build_data is passed for
+  # check_up_to_date.bbi_stan_{model,summary}.
   matches <- suppressMessages(check_up_to_date(cfg_mod, .build_data = TRUE))
 
   config[["model_has_changed"]] <- as.logical(!matches["model"]) # use as.logical to strip off names
