@@ -197,7 +197,5 @@ drop_dups <- function(.new_table, .dest_table, .join_col, .table_name) {
     dup_row <- .new_table[.join_col][duplicated( .new_table[.join_col]) %>% which(),]
     stop(glue("Duplicate rows in {.join_col}: {dup_row}"))
   }
-
-
   return(.new_table[keep])
 }
