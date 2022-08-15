@@ -4,16 +4,15 @@
 #' @param .threads Integer vector of threads values to test.
 #' @param .bbi_args a named list.
 #' @param .max_eval Max number of iterations for NONMEM to run.
-#'         Will update `MAXITER`, `NITER`, and `NBURN` (whichever is specified/found) in generated models.
+#'         Will update `MAXEVAL`, `NITER`, and `NBURN` (whichever is specified/found) in generated models.
 #'         The best number for this is model-dependent. Typically, something between 10 and
 #'         100 is good, depending on how long each iteration takes. You want something that
 #'         will run for 3-5 minutes total. You can set this argument to `NULL` to run with the
 #'         same settings as the original model. Any option set to `0` will not be overwritten.
 #' @param ... args passed through to submit_models()
 #'
-#' @importFrom checkmate assert_list assert_int
+#' @importFrom checkmate assert_list
 #' @importFrom stringr str_split
-#' @importFrom rlang is_empty
 #'
 #' @details
 #' Unfortunately, there is no easy way to know how many threads are ideal for a given NONMEM model.
@@ -300,11 +299,13 @@ delete_models <- function(.mods, .tags = "test threads", .force = FALSE){
 
 #' Parse model files and overwrite estimation iterations
 #'
-#' @param .mods a bbi model object or list of model objects. Generally created by `test_threads()`.
+#' @param .mods a list of model objects. Generally created by `test_threads()`.
 #' @param .max_eval Max number of iterations for NONMEM to run.
 #' @param .detect Estimation options that will be set to `.max_eval` if found.
 #'
 #' @importFrom readr parse_number
+#' @importFrom checkmate assert_int
+#' @importFrom rlang is_empty
 #'
 #' @keywords internal
 adjust_estimation_options <- function(.mods, .max_eval, .detect = c("MAXEVAL", "NITER", "NBURN", "MAX")){
@@ -342,10 +343,10 @@ adjust_estimation_options <- function(.mods, .max_eval, .detect = c("MAXEVAL", "
 
         # We dont want to overwrite values that were originally 0
         if(any(parse_number(str_current) != 0)){
-          option_values <- readr::parse_number(str_values[[i]]) %>% as.vector() %>%
+          option_values <- parse_number(str_values[[i]]) %>% as.vector() %>%
             suppressSpecificWarning("parsing failures")
           str_loc[which(option_values==0)] <- FALSE
-          str_current <- str_current[readr::parse_number(str_current) != 0]
+          str_current <- str_current[parse_number(str_current) != 0]
         }
 
         str_update <- paste0(gsub('[[:digit:]]+', '', str_current), .max_eval)

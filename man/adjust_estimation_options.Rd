@@ -11,7 +11,7 @@ adjust_estimation_options(
 )
 }
 \arguments{
-\item{.mods}{a bbi model object or list of model objects. Generally created by \code{test_threads()}.}
+\item{.mods}{a list of model objects. Generally created by \code{test_threads()}.}
 
 \item{.max_eval}{Max number of iterations for NONMEM to run.}
 
