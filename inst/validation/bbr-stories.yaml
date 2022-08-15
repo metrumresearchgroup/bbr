@@ -55,6 +55,12 @@ CFG-S006:
   - SBMT-R006
   - SBMT-R007
   - SBMT-R015
+CFG-S007:
+  name: Set execution mode globally
+  description: As a user, I want parallel to be set to TRUE if threads are specified to be greater than 1.
+  ProductRisk: Low
+  requirements:
+  - UTL-R014
 MGMT-S001:
   name: Create new model object
   description: As a user, I want to be able to create a new bbr model object by pointing
@@ -401,7 +407,10 @@ OUT-S003:
     the input data path and path to any table outputs from the control stream and
     join the contents of those files together into a single tibble.
   ProductRisk: Low
-  requirements: NMJ-R001
+  requirements:
+  - NMJ-R001
+  - NMJ-R007
+  - NMF-R008
 LOG-S001:
   name: Parse model YAML files into run log table
   description: As a user, I want parse all model YAML files in a directory (and optionally

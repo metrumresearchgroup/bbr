@@ -2,6 +2,7 @@ context("Testing function to create or read in model object")
 
 
 test_that("read_model() returns expected object [BBR-NWMD-001]", {
+
   expect_equal(read_model(MOD1_PATH), REF_LIST_1)
 })
 

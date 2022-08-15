@@ -62,6 +62,12 @@
 #' data will be renamed to `DV.DATA` and the column from the table file kept as
 #' `DV`.
 #'
+#' **Duplicate Rows Warning for Join Column**
+#'
+#' If there are duplicate rows found in the specified `.join_col`, a warning will be raised specifying a subset of the repeated rows.
+#' Duplicates may be caused by lack of output width. `FORMAT` may be need to be stated in control stream to have sufficient
+#' width to avoid truncating `.join_col`.
+#'
 #' **Multiple tables per file incompatibility**
 #'
 #' Because `nm_tables()` calls [nm_file()] internally, it is _not_ compatible
@@ -107,6 +113,12 @@ nm_join <- function(
   .join_col <- toupper(.join_col)
   if (!(.join_col %in% names(.d))) {
     stop(glue("couldn't find `.join_col` {.join_col} in data with cols: {paste(names(.d), collapse = ', ')}"))
+  }
+
+  if(anyDuplicated(.d[.join_col]) != 0)
+  {
+   dup_row <- .d[.join_col][duplicated( .d[.join_col]) %>% which(),]
+   stop(glue("Duplicate rows were found in {.join_col}. Please see `?nm_join` for more details"))
   }
 
   if (.superset) {
@@ -180,5 +192,10 @@ drop_dups <- function(.new_table, .dest_table, .join_col, .table_name) {
   if (length(drop) > 0) verbose_msg(glue("  dropping {length(drop)} duplicate cols: {paste(drop, collapse = ', ')}"))
   verbose_msg("") # for newline
 
+  if(.new_table[.join_col] %>% anyDuplicated() != 0)
+  {
+    dup_row <- .new_table[.join_col][duplicated( .new_table[.join_col]) %>% which(),]
+    stop(glue("Duplicate rows in {.join_col}: {dup_row}"))
+  }
   return(.new_table[keep])
 }

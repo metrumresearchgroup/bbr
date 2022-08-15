@@ -60,7 +60,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_true(str_detect(call_str,
                            paste0("\\Q", temp_dir, "\\E", "/1\\.ctl.+",
                                   "\\Q", temp_dir, "\\E", "/2\\.ctl.+")))
-    expect_true(str_detect(call_str, "--overwrite --threads=4"))
+    expect_true(str_detect(call_str, "--overwrite --parallel --threads=4"))
 
     # Check that passing in .call_limit=30 has bbi path, NO model paths, but
     # still has flags. Note that 30 is sufficient to trigger truncation of the
@@ -69,7 +69,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     call_str <- capture.output(print(proc[[1]], .call_limit=30))[2]
     expect_true(str_detect(call_str, fixed(read_bbi_path())))
     expect_false(str_detect(call_str, fixed(temp_dir)))
-    expect_true(str_detect(call_str, "--overwrite --threads=4"))
+    expect_true(str_detect(call_str, "--overwrite --parallel --threads=4"))
   })
 
   test_that("print.bbi_nonmem_model contains proper fields if all present [BBR-PRNT-002]", {

@@ -5,7 +5,7 @@ structure(list(
     run_end = "Mon Nov  8 11:35:08 EST 2021", estimation_time = 5.28,
     covariance_time = 1.29, postprocess_time = 0.46, cpu_time = 6.816,
     function_evaluations = 447L, significant_digits = 3.2,
-    problem_text = "LEM PK model 1 cmt base", mod_file = NA_real_,
+    problem_text = "PK model 1 cmt base", mod_file = NA_real_,
     estimation_method = "First Order Conditional Estimation with Interaction",
     data_set = "../../../../extdata/acop.csv", number_of_subjects = 39L,
     number_of_obs = 741L, number_of_data_records = 779L,
