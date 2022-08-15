@@ -97,3 +97,32 @@ test_that("nm_par_tab() works [BBR-NMF-007]", {
   expect_equal(ncol(.d), 6)
   expect_equal(nrow(.d), DATA_TEST_ROWS_IGNORE)
 })
+
+test_that("nm-file has handling for  duplicate columns [BBR-NMF-008]", {
+  withr::with_tempdir({
+    withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
+
+      on.exit(if(file.path(tempdir(),"basic") %>% dir.exists()) fs::dir_delete(file.path(tempdir(),"basic") ))
+
+      fs::dir_copy(system.file("model", "nonmem", "basic", package = "bbr"), tempdir())
+
+      ctl_file <- read_file(file.path(tempdir(), "basic", "1.ctl"))
+
+      ctl_file <- str_replace(ctl_file,"CWRES", "CWRES CWRES")
+
+      write_file(ctl_file, file.path(tempdir(), "basic", "1.ctl"))
+
+      read_lines(file.path(tempdir(),"basic","1", "1.tab")) %>%
+        stringr::str_replace("DV", "CWRES") %>%
+        write_lines(file.path(tempdir(),"basic","1", "1.tab"))
+
+      expect_warning((nm_file(read_model(file.path(tempdir(), "basic", "1")), .suffix = ".tab")),
+                     'Duplicate names will be repaired')
+
+    }
+    )
+  })
+})
+
+
+

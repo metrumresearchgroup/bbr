@@ -378,6 +378,7 @@ OUT-S003:
   requirements:
   - NMJ-R001
   - NMJ-R007
+  - NMF-R008
 LOG-S001:
   name: Parse model YAML files into run log table
   description: As a user, I want parse all model YAML files in a directory (and optionally
