@@ -650,7 +650,7 @@ remove_dup_cols <- function(data){
     dup_cols <- names(data)[duplicated(names(data))]
     dup_cols_str <- paste(dup_cols, collapse = ", ")
     dup_id <- c(which(duplicated(names(data))) -1, which(duplicated(names(data)))) %>% sort()
-    warning(glue("Following duplicated columns: {dup_cols_str}\n  Duplicate names will be repaired with `make.unique()`")) # If colnames are equal, throw warning
+    warning(glue("Following duplicated columns: {dup_cols_str}\n  Duplicate names will be repaired with `make.unique()`")) # Warns if column names are equal.
     colnames(data) <- make.unique(colnames(data) )
   }
   return(data)
