@@ -64,9 +64,9 @@
 #'
 #' **Duplicate Rows Warning for Join Column**
 #'
-#' If there are duplicate rows found in the specified `join_col`, a warning will be raised specifying a subset of the repeated rows.
+#' If there are duplicate rows found in the specified `.join_col`, a warning will be raised specifying a subset of the repeated rows.
 #' Duplicates may be caused by lack of output width. `FORMAT` may be need to be stated in control stream to have sufficient
-#' width to avoid truncating `join_col`.
+#' width to avoid truncating `.join_col`.
 #'
 #' **Multiple tables per file incompatibility**
 #'
@@ -118,7 +118,7 @@ nm_join <- function(
   if(anyDuplicated(.d[.join_col]) != 0)
   {
    dup_row <- .d[.join_col][duplicated( .d[.join_col]) %>% which(),]
-   stop(glue("Duplicate rows in data in {.join_col}: {dup_row %>% head()}"))
+   stop(glue("Duplicate rows were found in {.join_col}. Please see `?nm_join` for more details"))
   }
 
   if (.superset) {
