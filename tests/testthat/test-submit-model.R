@@ -20,13 +20,13 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
               # correctly parsing yaml
               expect_identical(
                 submit_model(MOD1, .dry_run = T)[[PROC_CALL]],
-                as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path} --overwrite --threads=4"))
+                as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path} --overwrite --threads=4 --parallel"))
               )
 
               # switch to local mode
               expect_identical(
                 submit_model(MOD1, .mode = "local", .dry_run = T)[[PROC_CALL]],
-                as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run local {mod_ctl_path} --overwrite --threads=4"))
+                as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run local {mod_ctl_path} --overwrite --threads=4 --parallel"))
               )
 
               # over-riding yaml arg with passed args
@@ -38,7 +38,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
                                "nm_version" = "nm74"
                              ),
                              .dry_run = T)[[PROC_CALL]],
-                as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path} --overwrite --threads=2 --json --nm_version=nm74"))
+                as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path} --overwrite --threads=2 --json --nm_version=nm74 --parallel"))
               )
             })
 
@@ -47,13 +47,13 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
               # correctly parsing yaml
               expect_identical(
                 submit_model(MOD1, .dry_run = T)[[PROC_CALL]],
-                as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path} --overwrite --threads=4"))
+                as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path} --overwrite --threads=4 --parallel"))
               )
 
               # over-riding yaml arg with passed arg
               expect_identical(
                 submit_model(MOD1, list(threads=2), .dry_run = T)[[PROC_CALL]],
-                as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path} --overwrite --threads=2"))
+                as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path} --overwrite --threads=2 --parallel"))
               )
             })
 
@@ -70,7 +70,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       as.character(
         glue::glue(
           "cd {model_dir} ;",
-          "{read_bbi_path()} nonmem run sge {mod_ctl_path} --overwrite --threads=4",
+          "{read_bbi_path()} nonmem run sge {mod_ctl_path} --overwrite --threads=4 --parallel",
           "--config={temp_config}",
           .sep = " "
         )
@@ -89,7 +89,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     withr::with_options(list(bbr.bbi_exe_mode = "local"), {
       expect_identical(
         submit_model(MOD1, .dry_run = T)[[PROC_CALL]],
-        as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run local {mod_ctl_path} --overwrite --threads=4"))
+        as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run local {mod_ctl_path} --overwrite --threads=4 --parallel"))
       )
     })
   })
