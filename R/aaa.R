@@ -10,38 +10,183 @@ BBI_VALID_MODES <- c("local", "sge")
 CACHE_ENV <- new.env(parent = emptyenv())
 CACHE_ENV$bbi_exe_paths <- list()
 
+#' List of valid arguments bbi arguments
+#'
+#' These values can be passed via the `.bbi_args` argument of [submit_model()]
+#' or [model_summary()]. This is exported for the benefit of RStudio users that
+#' may prefer to inspect `View(bbr::BBI_ARGS)` instead of the [print_bbi_args()]
+#' output.
+#'
+#' @export
 BBI_ARGS = list(
-  additional_post_work_envs = list(type = "character", flag="--additional_post_work_envs", description = "Any additional values (as ENV KEY=VALUE) to provide for the post execution environment"),
-  background = list(type = "logical", flag="--background", description = "RAW NMFE OPTION - Tells nonmem not to scan StdIn for control characters"),
-  clean_lvl = list(type = "numeric", flag="--clean_lvl", description = "clean level used for file output from a given (set of) runs (default 1)"),
-  config = list(type = "character", flag="--config", description = "Path (relative or absolute) to another bbi.yaml to load"),
-  copy_lvl = list(type = "numeric", flag="--copy_lvl", description = "copy level used for file output from a given (set of) runs"),
-  debug = list(type = "logical", flag="--debug", description = "debug mode"),
-  delay = list(type = "numeric", flag="--delay", description = "Selects a random number of seconds between 1 and this value to stagger / jitter job execution. Assists in dealing with large volumes of work dealing with the same data set. May avoid NMTRAN issues about not being able read / close files"),
-  ext_file = list(type = "character", flag="--ext-file", description = "name of custom ext-file"),
-  git = list(type = "logical", flag="--git", description = "whether git is used"),
-  json = list(type = "logical", flag="--json", description = "json tree of output, if possible"),
-  licfile = list(type = "character", flag="--licfile", description = "RAW NMFE OPTION - Specify a license file to use with NMFE (Nonmem)"),
-  log_file = list(type = "character", flag="--log_file", description = "If populated, specifies the file into which to store the output / logging details from bbi"),
-  maxlim = list(type = "numeric", flag="--maxlim", description = "RAW NMFE OPTION - Set the maximum values set for the buffers used by Nonmem (default 100)"),
-  mpi_exec_path = list(type = "character", flag="--mpi_exec_path", description = "The fully qualified path to mpiexec. Used for nonmem parallel operations (default '/usr/local/mpich3/bin/mpiexec')"),
-  nm_version = list(type = "character", flag="--nm_version", description = "Version of nonmem from the configuration list to use"),
-  nm_qual = list(type = "logical", flag="--nmqual", description = "Whether or not to execute with nmqual (autolog.pl"),
-  nobuild = list(type = "logical", flag="--nobuild", description = "RAW NMFE OPTION - Skips recompiling and rebuilding on nonmem executable"),
-  no_ext_file = list(type = "logical", flag="--no-ext-file", description = "do not use ext file"),
-  no_grd_file = list(type = "logical", flag="--no-grd-file", description = "do not use grd file"),
-  no_shk_file = list(type = "logical", flag="--no-shk-file", description = "do not use shk file"),
-  overwrite = list(type = "logical", flag="--overwrite", description = "Whether or not to remove existing output directories if they are present"),
-  parafile = list(type = "character", flag="--parafile", description = "Location of a user-provided parafile to use for parallel execution"),
-  parallel = list(type = "logical", flag="--parallel", description = "Whether or not to run nonmem in parallel mode"),
-  parallel_timeout = list(type = "numeric", flag="--parallel_timeout", description = "The amount of time to wait for parallel operations in nonmem before timing out (default 2147483647)"),
-  post_work_executable = list(type = "character", flag="--post_work_executable", description = "A script or binary to run when job execution completes or fails"),
-  prcompile = list(type = "logical", flag="--prcompile", description = "RAW NMFE OPTION - Forces PREDPP compilation"),
-  prsame = list(type = "logical", flag="--prsame", description = "RAW NMFE OPTION - Indicates to nonmem that the PREDPP compilation step should be skipped"),
-  preview = list(type = "logical", flag="--preview", description = "preview action, but don't actually run command"),
-  save_config = list(type = "logical", flag="--save_config", description = "Whether or not to save the existing configuration to a file with the model (default true)"),
-  threads = list(type = "numeric", flag="--threads", description = "number of threads to execute with (default 4)"),
-  verbose = list(type = "logical", flag="--verbose", description = "verbose output")
+  additional_post_work_envs = list(
+    type = "character",
+    flag = "--additional_post_work_envs",
+    description = "Any additional values (as ENV KEY=VALUE) to provide for the post execution environment"
+  ),
+  background = list(
+    type = "logical",
+    flag = "--background",
+    description = "RAW NMFE OPTION - Tells nonmem not to scan StdIn for control characters"
+  ),
+  clean_lvl = list(
+    type = "numeric",
+    flag = "--clean_lvl",
+    description = "clean level used for file output from a given (set of) runs (default 1)"
+  ),
+  config = list(
+    type = "character",
+    flag = "--config",
+    description = "Path (relative or absolute) to another bbi.yaml to load"
+  ),
+  copy_lvl = list(
+    type = "numeric",
+    flag = "--copy_lvl",
+    description = "copy level used for file output from a given (set of) runs"
+  ),
+  debug = list(
+    type = "logical",
+    flag = "--debug",
+    description = "debug mode"
+  ),
+  delay = list(
+    type = "numeric",
+    flag = "--delay",
+    description = "Selects a random number of seconds between 1 and this value to stagger / jitter job execution. Assists in dealing with large volumes of work dealing with the same data set. May avoid NMTRAN issues about not being able read / close files"
+  ),
+  ext_file = list(
+    type = "character",
+    flag = "--ext-file",
+    description = "name of custom ext-file"
+  ),
+  git = list(
+    type = "logical",
+    flag = "--git",
+    description = "whether git is used"
+  ),
+  json = list(
+    type = "logical",
+    flag = "--json",
+    description = "json tree of output, if possible"
+  ),
+  licfile = list(
+    type = "character",
+    flag = "--licfile",
+    description = "RAW NMFE OPTION - Specify a license file to use with NMFE (Nonmem)"
+  ),
+  log_file = list(
+    type = "character",
+    flag = "--log_file",
+    description = "If populated, specifies the file into which to store the output / logging details from bbi"
+  ),
+  maxlim = list(
+    type = "numeric",
+    flag = "--maxlim",
+    description = "RAW NMFE OPTION - Set the maximum values for the buffers used by Nonmem (if 0, don't pass -maxlim to nmfe) (default 2)",
+    compatibility_note = "Default changed from unset to 2 with bbi v3.2.0"
+  ),
+  mpi_exec_path = list(
+    type = "character",
+    flag = "--mpi_exec_path",
+    description = "The fully qualified path to mpiexec. Used for nonmem parallel operations (default '/usr/local/mpich3/bin/mpiexec')"
+  ),
+  nm_version = list(
+    type = "character",
+    flag = "--nm_version",
+    description = "Version of nonmem from the configuration list to use"
+  ),
+  nm_qual = list(
+    type = "logical",
+    flag = "--nmqual",
+    description = "Whether or not to execute with nmqual (autolog.pl)"
+  ),
+  nobuild = list(
+    type = "logical",
+    flag = "--nobuild",
+    description = "RAW NMFE OPTION - Skips recompiling and rebuilding on nonmem executable"
+  ),
+  no_ext_file = list(
+    type = "logical",
+    flag = "--no-ext-file",
+    description = "do not use ext file"
+  ),
+  no_grd_file = list(
+    type = "logical",
+    flag = "--no-grd-file",
+    description = "do not use grd file"
+  ),
+  no_shk_file = list(
+    type = "logical",
+    flag = "--no-shk-file",
+    description = "do not use shk file"
+  ),
+  overwrite = list(
+    type = "logical",
+    flag = "--overwrite",
+    description = "Whether or not to remove existing output directories if they are present"
+  ),
+  parafile = list(
+    type = "character",
+    flag = "--parafile",
+    description = "Location of a user-provided parafile to use for parallel execution"
+  ),
+  parallel = list(
+    type = "logical",
+    flag = "--parallel",
+    description = "Whether or not to run nonmem in parallel mode"
+  ),
+  parallel_timeout = list(
+    type = "numeric",
+    flag = "--parallel_timeout",
+    description = "The amount of time to wait for parallel operations in nonmem before timing out (default 2147483647)"
+  ),
+  post_work_executable = list(
+    type = "character",
+    flag = "--post_work_executable",
+    description = "A script or binary to run when job execution completes or fails"
+  ),
+  prcompile = list(
+    type = "logical",
+    flag = "--prcompile",
+    description = "RAW NMFE OPTION - Forces PREDPP compilation"
+  ),
+  prdefault = list(
+    type = "logical",
+    flag = "--prdefault",
+    description = "RAW NMFE OPTION - Do not recompile any routines other than FSUBS",
+    compatibility_note = "This option isn't available in bbi until v3.2.0"
+  ),
+  prsame = list(
+    type = "logical",
+    flag = "--prsame",
+    description = "RAW NMFE OPTION - Indicates to nonmem that the PREDPP compilation step should be skipped"
+  ),
+  preview = list(
+    type = "logical",
+    flag = "--preview",
+    description = "preview action, but don't actually run command"
+  ),
+  save_config = list(
+    type = "logical",
+    flag = "--save_config",
+    description = "Whether or not to save the existing configuration to a file with the model (default true)"
+  ),
+  threads = list(
+    type = "numeric",
+    flag = "--threads",
+    description = "number of threads to execute with locally or nodes to execute on in parallel (default 4)"
+  ),
+  tprdefault = list(
+    type = "logical",
+    flag = "--tprdefault",
+    description = "RAW NMFE OPTION - Test if is okay to do -prdefault",
+    compatibility_note = "This option isn't available in bbi until v3.2.0"
+  ),
+  verbose = list(
+    type = "logical",
+    flag = "--verbose",
+    description = "verbose output"
+  )
 )
 
 # S3 classes
