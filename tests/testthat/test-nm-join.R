@@ -184,7 +184,7 @@ test_that("Confirming unduplicates rows on .join_col [BBR-NMJ-007]",{
 
     jsonlite::write_json(json,file.path(tempdir(), "basic", "1", "bbi_config.json"))
 
-    expect_error(file.path(tempdir(), "basic", "1") %>% nm_join(.files = "1.tab"), "Duplicate rows in NUM")
+    expect_error(file.path(tempdir(), "basic", "1") %>% nm_join(.files = "1.tab"), "Duplicate rows")
 
     fs::file_copy(system.file("model","nonmem", "basic","1", "1.tab",package = "bbr"),
                   file.path(tempdir(), "basic", "1", "1.tab"), overwrite = TRUE)
@@ -192,6 +192,6 @@ test_that("Confirming unduplicates rows on .join_col [BBR-NMJ-007]",{
     .d$num[2] <- 1
     readr::write_csv(.d, file.path(tempdir(), "basic", "1", "acop.csv"))
 
-    expect_error(file.path(tempdir(), "basic", "1") %>% nm_join(.files = "1.tab"), "Duplicate rows in data")
+    expect_error(file.path(tempdir(), "basic", "1") %>% nm_join(.files = "1.tab"), "Duplicate rows")
 
   })})})
