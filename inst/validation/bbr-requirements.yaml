@@ -542,7 +542,8 @@ NMF-R007:
   - BBR-NMF-007
 NMF-R008:
   description: nm_file() repairs duplicate column names that are present in input file
-  tests:BBR-NMF-008
+  tests:
+  - BBR-NMF-008
 NMJ-R001:
   description: nm_join() works correctly
   tests:
@@ -556,20 +557,17 @@ NMJ-R003:
   tests:
   - BBR-NMJ-003
 NMJ-R004:
-  description: nm_join() works correctly: duplicate cols
+  description: nm_join() works correctly with duplicate cols
   tests:
   - BBR-NMJ-004
-NMJ-R005:
-  description: nm_join(.join_col) works correctly
-  tests:
   - BBR-NMJ-005
-NMJ-R006:
+NMJ-R005:
   description: nm_join() warns on skipping table with wrong number of rows
   tests:
   - BBR-NMJ-006
-NMJ-R007:
-   description: nm_join() informatively errors if .join_col has duplicate values in any of the input tables
-   tests:
+NMJ-R006:
+  description: nm_join() informatively errors if .join_col has duplicate values in any of the input tables
+  tests:
   - BBR-NMJ-007
 NMT-R001:
   description: nm_tables() works
@@ -677,7 +675,6 @@ PEST-R014:
   - BBR-PEST-015
   - BBR-PEST-016
   - BBR-PEST-017
-  - BBR-PEST-018
 PLB-R001:
   description: build_matrix_indices() parses correctly
   tests:
@@ -992,7 +989,7 @@ STAR-R001:
   - BBR-CMF-002
   - BBR-MMF-023
 STAR-R002:
-  description: `add_star()` and `remove_star()` helpers for modifying model object
+  description: add_star() and remove_star() helpers for modifying model object
   tests:
   - BBR-MMF-023
   - BBR-MMF-024

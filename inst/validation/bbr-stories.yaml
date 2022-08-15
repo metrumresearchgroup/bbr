@@ -409,7 +409,11 @@ OUT-S003:
   ProductRisk: Low
   requirements:
   - NMJ-R001
-  - NMJ-R007
+  - NMJ-R002
+  - NMJ-R003
+  - NMJ-R004
+  - NMJ-R005
+  - NMJ-R006
   - NMF-R008
 LOG-S001:
   name: Parse model YAML files into run log table
