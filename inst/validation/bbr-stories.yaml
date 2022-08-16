@@ -40,6 +40,10 @@ CFG-S004:
   requirements:
   - UBI-R001
   - UBI-R002
+  - UBI-R003
+  - UBI-R004
+  - UBI-R005
+  - RBP-R001
 CFG-S005:
   name: Pass .bbi_args to bbi_init()
   description: As a user, I want to be able to pass in `.bbi_args` to the `bbi_init()`
@@ -65,6 +69,13 @@ CFG-S007:
   ProductRisk: Low
   requirements:
   - UTL-R014
+CFG-S008:
+  name: bbi_help returns available bbi commands
+  description: As a user, I want to be able to see what bbi commands I have access to, and how to use them,
+    from the R console.
+  ProductRisk: Low
+  requirements:
+  - BBR-R009
 MGMT-S001:
   name: Create new model object
   description: As a user, I want to be able to create a new bbr model object by pointing
@@ -340,11 +351,15 @@ RUN-S001:
     the relevant model.
   ProductRisk: High
   requirements:
+  - BBR-R002
   - SBMT-R001
   - SBMT-R002
+  - SBMT-R004
   - SBMT-R005
+  - SBMT-R014
   - WRKF-R001
   - WRKF-R002
+  - WRKF-R004
 RUN-S002:
   name: Submit multiple models to be run
   description: As a user, I want to be able to submit multiple models for execution,
@@ -381,7 +396,13 @@ SUM-S001:
   ProductRisk: High
   requirements:
   - SUM-R001
+  - SUM-R003
+  - SUM-R004
+  - SUM-R005
   - SUM-R006
+  - SUM-R007
+  - SUM-R008
+  - SUM-R009
   - SUM-R010
   - SUM-R011
   - WRKF-R001
@@ -404,10 +425,8 @@ SUM-S003:
     in a NONMEM control stream, when they are in a specified format.
   ProductRisk: Low
   requirements:
-  - PLB-R001
   - PLB-R002
   - PLB-R003
-  - PLB-R004
   - PLB-R005
   - PLB-R006
 SUM-S004:
@@ -521,6 +540,25 @@ OUT-S003:
   - NMJ-R005
   - NMJ-R006
   - NMF-R008
+OUT-S004:
+  name: Inspect model output files
+  description: As a user, I want to be able pass a model object to
+    list files in the output directory and to inspect the beginning and
+    end of key output files.
+  requirements:
+  - ROT-R001
+  - ROT-R002
+  - ROT-R003
+  - ROT-R004
+  - ROT-R005
+  - ROT-R006
+  - ROT-R009
+  - ROT-R010
+  - ROT-R011
+  - ROT-R012
+  - ROT-R013
+  - ROT-R014
+  - ROT-R015
 LOG-S001:
   name: Parse model YAML files into run log table
   description: As a user, I want parse all model YAML files in a directory (and optionally
@@ -530,7 +568,10 @@ LOG-S001:
   requirements:
   - WRKF-R005
   - RNLG-R001
+  - RNLG-R002
   - RNLG-R003
+  - RNLG-R004
+  - RNLG-R005
 LOG-S002:
   name: Working directory and paths in run log tibble are correct
   description: As a user, I want to be able to use the paths included in the run_log()
@@ -553,6 +594,7 @@ LOG-S003:
   ProductRisk: Medium
   requirements:
   - WRKF-R003
+  - WRKF-R006
   - CGLG-R001
   - CGLG-R002
   - CGLG-R003
@@ -581,12 +623,17 @@ LOG-S005:
     information to the "run log" table created by `run_log()`.
   ProductRisk: Low
   requirements:
+  - SMLG-R001
   - SMLG-R002
   - SMLG-R003
   - SMLG-R004
   - SMLG-R005
   - SMLG-R006
   - SMLG-R007
+  - SMLG-R008
+  - SMLG-R009
+  - SMLG-R010
+  - SMLG-R011
 LOG-S006:
   name: Collapse list columns to character
   description: As a user, I want to have a function that can take a tibble and the

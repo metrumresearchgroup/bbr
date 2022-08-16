@@ -675,10 +675,6 @@ PEST-R014:
   - BBR-PEST-015
   - BBR-PEST-016
   - BBR-PEST-017
-PLB-R001:
-  description: build_matrix_indices() parses correctly
-  tests:
-  - BBR-PLB-001
 PLB-R002:
   description: block() parses correctly
   tests:
@@ -687,10 +683,6 @@ PLB-R003:
   description: param_labels.character errors on vector
   tests:
   - BBR-PLB-003
-PLB-R004:
-  description: parse_param_comment() called internally
-  tests:
-  - BBR-PLB-004
 PLB-R005:
   description: param_labels.character() %>% apply_indices() matches tidynm reference
   tests:
@@ -761,14 +753,6 @@ ROT-R006:
   description: check_output_dir() works with filter
   tests:
   - BBR-ROT-006
-ROT-R007:
-  description: check_nonmem_table_output() output matches ref df
-  tests:
-  - BBR-ROT-007
-ROT-R008:
-  description: check_nonmem_table_output(.x_floor=0) works
-  tests:
-  - BBR-ROT-008
 ROT-R009:
   description: check_ext() works with character directory and model object
   tests:
@@ -907,7 +891,7 @@ SUM-R002:
   tests:
   - BBR-SUM-002
 SUM-R003:
-  description: model_summary() works with no .
+  description: model_summary() works without `.ext`, `.grd`, and `.shk` files
   tests:
   - BBR-SUM-003
 SUM-R004:
