@@ -198,7 +198,8 @@ MGMT-S011:
     to the console and have it show the path to the model files on disk, as well as
     any attached metadata like tags, notes, etc.
   ProductRisk: Low
-  requirements: PRNT-R002
+  requirements:
+  - PRNT-R002
 MGMT-S012:
   name: Model diff
   description: As a user, I want to be able to see a rendered diff between two model
@@ -378,7 +379,8 @@ RUN-S003:
   description: As a user, I want to be able to print the babylon_process object and
     get a top-level summary of what is going on with the process.
   ProductRisk: Low
-  requirements: PRNT-R001
+  requirements:
+  - PRNT-R001
 RUN-S004:
   name: Test threads
   description: As a user, I want to be able to test variations of parallelization on a given model by specifying the number of
