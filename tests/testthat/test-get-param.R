@@ -62,7 +62,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   })
 
 
-  test_that("get_omega() returns correct values and labels: model_summary [BBR-PEST-017]", {
+  test_that("get_omega() returns correct values and labels: model_summary [BBR-PEST-016]", {
     clean_test_enviroment()
     omegas <- MOD1 %>% model_summary() %>% get_omega()
     par_df <- MOD1 %>% model_summary() %>% param_estimates() %>% filter(grepl("OMEGA", parameter_names))
@@ -71,7 +71,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     check_matrix(omegas, par_df, .type = "OMEGA")
   })
 
-  test_that("get_omega() returns correct values and labels: model_summaries [BBR-PEST-017]", {
+  test_that("get_omega() returns correct values and labels: model_summaries [BBR-PEST-016]", {
     clean_test_enviroment()
     mods <- list(MOD1, mod_complex)
     sums <- mods %>% model_summaries()
@@ -86,7 +86,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     check_matrix(omegas[[2]], par_df2, .type = "OMEGA")
   })
 
-  test_that("get_sigma() returns correct values and labels: model_summary [BBR-PEST-018]", {
+  test_that("get_sigma() returns correct values and labels: model_summary [BBR-PEST-017]", {
     clean_test_enviroment()
     sigmas <- MOD1 %>% model_summary() %>% get_sigma()
     par_df <- MOD1 %>% model_summary() %>% param_estimates() %>% filter(grepl("SIGMA", parameter_names))
@@ -95,7 +95,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     check_matrix(sigmas, par_df, .type = "SIGMA")
   })
 
-  test_that("get_sigma() returns correct values and labels: model_summaries [BBR-PEST-018]", {
+  test_that("get_sigma() returns correct values and labels: model_summaries [BBR-PEST-017]", {
     clean_test_enviroment()
     mods <- list(MOD1, mod_complex)
     sums <- mods %>% model_summaries()

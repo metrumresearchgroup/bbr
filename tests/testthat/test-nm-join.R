@@ -90,7 +90,7 @@ test_that("nm_join(.files) works correctly FIRSTONLY: then full table [BBR-NMJ-0
 ######################
 # duplicate columns tests
 
-test_that("nm_join() works correctly: duplicate cols [BBR-NMJ-004]", {
+test_that("nm_join() works correctly with duplicate cols [BBR-NMJ-004]", {
   test_df <- nm_join(
     MOD1,
     .files = c(
@@ -104,7 +104,7 @@ test_that("nm_join() works correctly: duplicate cols [BBR-NMJ-004]", {
   expect_equal(test_df$DV.DATA, test_df$DV)
 })
 
-test_that("nm_join(.join_col) works correctly [BBR-NMJ-005]", {
+test_that("nm_join(.join_col) works correctly with duplicate cols  [BBR-NMJ-005]", {
   # this test is annoyingly complex to set up because of the
   # mechanics of how the data is pulled and the internal checks
   # on row number. Just an explanation of why it's so long.

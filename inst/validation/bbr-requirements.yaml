@@ -159,29 +159,27 @@ CMH-R006:
   tests:
   - BBR-CMH-006
 CRT-R001:
-  description: check_run_times() works with one model
+  description: check_run_times() works with any number of models
   tests:
   - BBR-CRT-001
-CRT-R002:
-  description: check_run_times() works with multiple models
-  tests:
   - BBR-CRT-002
-CRT-R003:
+CRT-R002:
   description: check_run_times() .return_times arg
   tests:
   - BBR-CRT-003
-CRT-R004:
+CRT-R003:
   description: check_run_times() waits for models to complete
   tests:
   - BBR-CRT-004
-CRT-R005:
-  description: check_run_times() works with a bbi_nonmem_summary object
+CRT-R004:
+  description: check_run_times() works with bbi_nonmem_summary and bbi_summary_list objects
   tests:
   - BBR-CRT-005
-CRT-R006:
-  description: check_run_times() works with a bbi_summary_list object
-  tests:
   - BBR-CRT-006
+CRT-R005:
+  description: check_run_times() returns NA for dry runs
+  tests:
+  - BBR-CRT-007
 CTS-R001:
   description: collapse_to_string() works correctly
   tests:
@@ -522,29 +520,30 @@ NMF-R001:
   description: nm_file() works
   tests:
   - BBR-NMF-001
-NMF-R003:
+NMF-R002:
   description: nm_grd() works
   tests:
   - BBR-NMF-003
-NMF-R004:
+NMF-R003:
   description: nm_file() with multiple tables
   tests:
   - BBR-NMF-004
-NMF-R005:
+NMF-R004:
   description: nm_data() works
   tests:
   - BBR-NMF-005
-NMF-R006:
+NMF-R005:
   description: nm_tab() works
   tests:
   - BBR-NMF-006
-NMF-R007:
+NMF-R006:
   description: nm_par_tab() works
   tests:
   - BBR-NMF-007
-NMF-R008:
+NMF-R007:
   description: nm_file() repairs duplicate column names that are present in input file
-  tests:BBR-NMF-008
+  tests:
+  - BBR-NMF-008
 NMJ-R001:
   description: nm_join() works correctly
   tests:
@@ -558,20 +557,17 @@ NMJ-R003:
   tests:
   - BBR-NMJ-003
 NMJ-R004:
-  description: nm_join() works correctly: duplicate cols
+  description: nm_join() works correctly with duplicate cols
   tests:
   - BBR-NMJ-004
-NMJ-R005:
-  description: nm_join(.join_col) works correctly
-  tests:
   - BBR-NMJ-005
-NMJ-R006:
+NMJ-R005:
   description: nm_join() warns on skipping table with wrong number of rows
   tests:
   - BBR-NMJ-006
-NMJ-R007:
-   description: nm_join() informatively errors if .join_col has duplicate values in any of the input tables
-   tests:
+NMJ-R006:
+  description: nm_join() informatively errors if .join_col has duplicate values in any of the input tables
+  tests:
   - BBR-NMJ-007
 NMT-R001:
   description: nm_tables() works
@@ -626,7 +622,7 @@ NWMD-R010:
   tests:
   - BBR-NWMD-010
 NWMD-R011:
-    description: new_model() ignores files' extensions
+  description: new_model() ignores files' extensions
   tests:
   - BBR-NWMD-011
 PEST-R001:
@@ -637,70 +633,61 @@ PEST-R002:
   description: param_estimates correctly errors on unsupported models
   tests:
   - BBR-PEST-002
-PEST-R004:
+PEST-R003:
   description: param_estimates correctly warns on mixture model
   tests:
   - BBR-PEST-004
-PEST-R005:
+PEST-R004:
   description: param_estimates_batch produces expected output
   tests:
   - BBR-PEST-005
-PEST-R006:
+PEST-R005:
   description: param_estimates_batch() works with varying number of param estimates
   tests:
   - BBR-PEST-006
-PEST-R007:
+PEST-R006:
   description: param_estimates_batch() works if an .ext file detected is empty
   tests:
   - BBR-PEST-007
-PEST-R008:
+PEST-R007:
   description: param_estimates_batch() works if the termination line is missing in
     an .ext file
   tests:
   - BBR-PEST-008
-PEST-R009:
+PEST-R008:
   description: param_estimates_compare() works
   tests:
   - BBR-PEST-009
   - BBR-PEST-010
   - BBR-PEST-011
   - BBR-PEST-014
-PEST-R012:
+PEST-R009:
   description: param_estimates_compare() errors with different models
   tests:
   - BBR-PEST-012
-PEST-R013:
+PEST-R010:
   description: param_estimates() can optionally append the p-value to the output, and calculate whether it is below a specified alpha
   tests:
   - BBR-PEST-013
-PEST-R014:
+PEST-R011:
   description: get_omega(), get_sigma(), and get_theta() label and format values from model_summary() objects
   tests:
   - BBR-PEST-015
   - BBR-PEST-016
   - BBR-PEST-017
-  - BBR-PEST-018
 PLB-R001:
-  description: build_matrix_indices() parses correctly
-  tests:
-  - BBR-PLB-001
-PLB-R002:
   description: block() parses correctly
   tests:
   - BBR-PLB-002
-PLB-R003:
+PLB-R002:
   description: param_labels.character errors on vector
   tests:
   - BBR-PLB-003
-PLB-R004:
-  description: parse_param_comment() called internally
-  tests:
-  - BBR-PLB-004
-PLB-R005:
+PLB-R003:
   description: param_labels.character() %>% apply_indices() matches tidynm reference
   tests:
   - BBR-PLB-005
-PLB-R006:
+PLB-R004:
   description: param_labels.bbi_nonmem_model() %>% apply_indices() matches tidynm
     reference
   tests:
@@ -767,38 +754,30 @@ ROT-R006:
   tests:
   - BBR-ROT-006
 ROT-R007:
-  description: check_nonmem_table_output() output matches ref df
-  tests:
-  - BBR-ROT-007
-ROT-R008:
-  description: check_nonmem_table_output(.x_floor=0) works
-  tests:
-  - BBR-ROT-008
-ROT-R009:
   description: check_ext() works with character directory and model object
   tests:
   - BBR-ROT-009
-ROT-R010:
+ROT-R008:
   description: check_ext() works with summary object
   tests:
   - BBR-ROT-010
-ROT-R011:
+ROT-R009:
   description: check_ext() works when .iter_floor argument is NULL
   tests:
   - BBR-ROT-011
-ROT-R012:
+ROT-R010:
   description: check_grd() works with character directory and model object
   tests:
   - BBR-ROT-012
-ROT-R013:
+ROT-R011:
   description: check_grd() works with summary object
   tests:
   - BBR-ROT-013
-ROT-R014:
+ROT-R012:
   description: check_grd() works when .iter_floor argument is non-zero integer
   tests:
   - BBR-ROT-014
-ROT-R015:
+ROT-R013:
   description: check_grd() when .iter_floor argument is NULL
   tests:
   - BBR-ROT-015
@@ -834,27 +813,27 @@ SBMT-R008:
   description: submit_models(.dry_run=T) with list input simple
   tests:
   - BBR-SBMT-008
-SBMT-R010:
+SBMT-R009:
   description: submit_models(.dry_run=T) with list input, 2 arg sets
   tests:
   - BBR-SBMT-010
-SBMT-R011:
+SBMT-R010:
   description: submit_models() works for models in different directories
   tests:
   - BBR-SBMT-011
-SBMT-R012:
+SBMT-R011:
   description: submit_models(.dry_run=T) errors with bad input
   tests:
   - BBR-SBMT-012
-SBMT-R013:
+SBMT-R012:
   description: submit_models() works with non-NULL .config_path
   tests:
   - BBR-SBMT-013
-SBMT-R014:
+SBMT-R013:
   description: submit_models() works if .bbi_args is empty
   tests:
   - BBR-SBMT-014
-SBMT-R015:
+SBMT-R014:
   description: submit_models(.mode) inherits option
   tests:
   - BBR-SBMT-015
@@ -912,7 +891,7 @@ SUM-R002:
   tests:
   - BBR-SUM-002
 SUM-R003:
-  description: model_summary() works with no .
+  description: model_summary() works without `.ext`, `.grd`, and `.shk` files
   tests:
   - BBR-SUM-003
 SUM-R004:
@@ -988,10 +967,21 @@ TSTT-R004:
     maxeval and niter are provided
   tests:
   - BBR-TSTT-004
-TSTT-R005:
-  description: check_run_times() returns NA for dry runs
+STAR-R001:
+  description: Model object and YAML should have a boolean star attribute
   tests:
-  - BBR-TSTT-005
+  - BBR-CMF-002
+  - BBR-MMF-023
+STAR-R002:
+  description: add_star() and remove_star() helpers for modifying model object
+  tests:
+  - BBR-MMF-023
+  - BBR-MMF-024
+STAR-R003:
+  description: Star attribute should be parsed into `run_log()` tibble
+  tests:
+  - BBR-RNLG-003
+  - BBR-RNLG-005
 UBI-R001:
   description: use-bbi works on linux pulling from options
   tests:
@@ -1012,7 +1002,15 @@ UBI-R005:
   description: use-bbi and bbi_version handle path with spaces
   tests:
   - BBR-UBI-005
-UTL-R014:
+UTL-R001:
+  description: wait_for_nonmem() correctly reads in stop time
+  tests:
+  - BBR-UTL-012
+UTL-R002:
+  description: wait_for_nonmem() doesn't error out if no stop time found
+  tests:
+  - BBR-UTL-013
+UTL-R003:
   description: confirming check_bbi_args() is passing correct parameters
   tests:
   - BBR-UTL-014
