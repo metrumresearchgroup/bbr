@@ -87,7 +87,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     .bbi_args = list(overwrite = TRUE, threads = 2)
   )
 
-  mods <- test_threads(mod1, .threads = c(2, 4), .max_eval = 100, .mode = "local", .dry_run = TRUE)
+  mods <- test_threads(mod1, .threads = c(2, 4), .cap_iterations = 100, .mode = "local", .dry_run = TRUE)
 
   test_that("test_threads(.dry_run=T) creates copy models [BBR-TSTT-001]", {
     mod_ctls <- lapply(mods, function(mod.x){get_model_path(mod.x)}) %>% unlist()
@@ -104,7 +104,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_true(all(max_evals == 100))
 
     # Test that MAX works
-    mods_complex3 <- test_threads(mod_complex3, .threads = c(2, 4), .max_eval = 100, .mode = "local", .dry_run = TRUE)
+    mods_complex3 <- test_threads(mod_complex3, .threads = c(2, 4), .cap_iterations = 100, .mode = "local", .dry_run = TRUE)
 
     max_evals <- get_est_options("MAXEVAL|NITER|NBURN|MAX", mods_complex3) # No estimation method provided here
 
@@ -114,7 +114,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   test_that("test_threads(.dry_run=T) correctly changes maxeval/niter: changes multiple methods [BBR-TSTT-002]", {
 
-    mods_complex <- test_threads(mod_complex, .threads = c(2, 4), .max_eval = 100, .mode = "local", .dry_run = TRUE)
+    mods_complex <- test_threads(mod_complex, .threads = c(2, 4), .cap_iterations = 100, .mode = "local", .dry_run = TRUE)
 
     # Dont overwrite NBURN if set to 0
     max_evals <- get_est_options("MAXEVAL|NITER|NBURN", mods_complex)
@@ -128,21 +128,22 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   test_that("test_threads(.dry_run=T) correctly changes maxeval/niter: nburn is handled correctly [BBR-TSTT-002]", {
 
-    mods_complex2 <- test_threads(mod_complex2, .threads = c(2, 4), .max_eval = 100, .mode = "local", .dry_run = TRUE)
+    mods_complex2 <- test_threads(mod_complex2, .threads = c(2, 4), .cap_iterations = 100, .mode = "local", .dry_run = TRUE)
 
     # Overwrite NBURN since was set to value other than 0
     max_evals <- get_est_options("MAXEVAL|NITER|NBURN", mods_complex2)
 
     for(i in seq_along(max_evals)){
-      expect_identical(unname(max_evals[[i]]), c(100, 100, 100))
+      expect_identical(unname(max_evals[[i]]), c(100, 100, 100, 100))
       # Confirm that estimation method didnt change, and that MAXEVAL/NITER was preserved
-      expect_identical(names(max_evals[[i]]), c("METHOD=SAEM, NBURN", "METHOD=SAEM, NITER", "METHOD=IMP, NITER"))
+      # This also confirms that NBURN is added when only NITER is specified (recursive test)
+      expect_identical(names(max_evals[[i]]), c("METHOD=SAEM, NBURN", "METHOD=SAEM, NITER", "METHOD=IMP, NITER", "METHOD=IMP, NBURN"))
     }
   })
 
-  test_that("test_threads(.dry_run=T) correctly changes maxeval/niter: keeps original if .max_eval = NULL [BBR-TSTT-002]", {
+  test_that("test_threads(.dry_run=T) correctly changes maxeval/niter: keeps original if .cap_iterations = NULL [BBR-TSTT-002]", {
 
-    mods_complex <- test_threads(mod_complex, .threads = c(2, 4), .max_eval = NULL, .mode = "local", .dry_run = TRUE)
+    mods_complex <- test_threads(mod_complex, .threads = c(2, 4), .cap_iterations = NULL, .mode = "local", .dry_run = TRUE)
 
     max_evals <- get_est_options("MAXEVAL|NITER|NBURN", mods_complex)
 
@@ -159,23 +160,25 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   })
 
 
-  mod_none <- copy_model_from(
-    read_model(file.path(MODEL_DIR_BBI, "1")),
-    "none"
-  ) %>% add_tags("no maxeval")
-
   mod_both <- copy_model_from(
     read_model(file.path(MODEL_DIR_BBI, "1")),
-    "both"
+    "none",
+    .overwrite = TRUE
+  ) %>% add_tags("maxeval and max")
+
+  mod_both2 <- copy_model_from(
+    read_model(file.path(MODEL_DIR_BBI, "1")),
+    "both",
+    .overwrite = TRUE
   ) %>% add_tags("maxeval and niter")
 
-  mods_fake <- list(mod_none, mod_both)
+  mods_fake <- list(mod_both, mod_both2)
 
 
-  test_that("test_threads(.dry_run=T) correctly errors out if no maxeval, or both maxeval and niter are provided [BBR-TSTT-004]", {
+  test_that("test_threads(.dry_run=T) correctly errors out if both maxeval and niter are provided [BBR-TSTT-004]", {
 
-    search_str <- "MAXEVAL|NITER"
-    str_replacements <- c("", "MAXEVAL=10 NITER=10")
+    search_str <- "MAX(EVAL)?|NITER"
+    str_replacements <- c("MAXEVAL=10 MAX=10", "MAXEVAL=10 NITER=10")
 
     map2(mods_fake, str_replacements, function(.mod, str_replace){
       mod_path <- get_model_path(.mod)
@@ -189,10 +192,10 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     })
 
     expect_error(
-      test_threads(mod_none, .threads = c(2, 4), .max_eval = 100, .mode = "local", .dry_run = TRUE),
-      "Neither MAXEVAL or NITER were found in the ctl file. Please ensure one is provided")
+      test_threads(mod_both, .threads = c(2, 4), .cap_iterations = 100, .mode = "local", .dry_run = TRUE),
+      "Both MAXEVAL and MAX were set for the same estimation method. Please ensure only one is set")
     expect_error(
-      test_threads(mod_both, .threads = c(2, 4), .max_eval = 100, .mode = "local", .dry_run = TRUE),
+      test_threads(mod_both2, .threads = c(2, 4), .cap_iterations = 100, .mode = "local", .dry_run = TRUE),
       "Both MAXEVAL and NITER were set for the same estimation method. Please ensure only one is set")
   })
 
@@ -277,7 +280,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   })
 
   test_that("delete_models() with .tags=NULL [BBR-CLM-004]", {
-    mods_threads <- test_threads(mod1, .threads = c(2, 4), .max_eval = 100, .mode = "local", .dry_run = TRUE)
+    mods_threads <- test_threads(mod1, .threads = c(2, 4), .cap_iterations = 100, .mode = "local", .dry_run = TRUE)
     mod_new <- copy_model_from(read_model(file.path(MODEL_DIR_BBI, "1")), "one_tag") %>%
       add_tags("some tag")
     mod_no_tag <- copy_model_from(read_model(file.path(MODEL_DIR_BBI, "1")), "no_tag")

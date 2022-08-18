@@ -4,7 +4,13 @@
 \alias{test_threads}
 \title{Takes a model object and runs it with various threads values}
 \usage{
-test_threads(.mod, .threads = c(2, 4), .bbi_args = list(), .max_eval = 10, ...)
+test_threads(
+  .mod,
+  .threads = c(2, 4),
+  .bbi_args = list(),
+  .cap_iterations = 10,
+  ...
+)
 }
 \arguments{
 \item{.mod}{bbi_model object to copy/test.}
@@ -13,7 +19,7 @@ test_threads(.mod, .threads = c(2, 4), .bbi_args = list(), .max_eval = 10, ...)
 
 \item{.bbi_args}{a named list.}
 
-\item{.max_eval}{Max number of iterations for NONMEM to run.
+\item{.cap_iterations}{Max number of iterations for NONMEM to run.
 Will update \code{MAXEVAL}, \code{NITER}, and \code{NBURN} (whichever is specified/found) in generated models.
 The best number for this is model-dependent. Typically, something between 10 and
 100 is good, depending on how long each iteration takes. You want something that
@@ -45,7 +51,7 @@ number of threads might be.
 mod <- read_model(file.path(MODEL_DIR, 1))
 
 
-mods <- test_threads(.mod = mod, .threads = c(2, 4), .max_eval = 10,
+mods <- test_threads(.mod = mod, .threads = c(2, 4), .cap_iterations = 10,
                      .mode = "local")
 
 
@@ -56,7 +62,7 @@ delete_models(.mods = mods)
 
 
 # Dry Run:
-mods <- test_threads(.mod = mod, .threads = c(2, 4), .max_eval = 10,
+mods <- test_threads(.mod = mod, .threads = c(2, 4), .cap_iterations = 10,
                      .mode = "local", .dry_run = TRUE)
 
 delete_models(.mods = mods)

@@ -3,7 +3,7 @@
 #' @param .mod bbi_model object to copy/test.
 #' @param .threads Integer vector of threads values to test.
 #' @param .bbi_args a named list.
-#' @param .max_eval Max number of iterations for NONMEM to run.
+#' @param .cap_iterations Max number of iterations for NONMEM to run.
 #'         Will update `MAXEVAL`, `NITER`, and `NBURN` (whichever is specified/found) in generated models.
 #'         The best number for this is model-dependent. Typically, something between 10 and
 #'         100 is good, depending on how long each iteration takes. You want something that
@@ -31,7 +31,7 @@
 #' mod <- read_model(file.path(MODEL_DIR, 1))
 #'
 #'
-#' mods <- test_threads(.mod = mod, .threads = c(2, 4), .max_eval = 10,
+#' mods <- test_threads(.mod = mod, .threads = c(2, 4), .cap_iterations = 10,
 #'                      .mode = "local")
 #'
 #'
@@ -42,7 +42,7 @@
 #'
 #'
 #' # Dry Run:
-#' mods <- test_threads(.mod = mod, .threads = c(2, 4), .max_eval = 10,
+#' mods <- test_threads(.mod = mod, .threads = c(2, 4), .cap_iterations = 10,
 #'                      .mode = "local", .dry_run = TRUE)
 #'
 #' delete_models(.mods = mods)
@@ -55,7 +55,7 @@ test_threads <- function(
   .mod,
   .threads = c(2,4),
   .bbi_args = list(),
-  .max_eval = 10,
+  .cap_iterations = 10,
   ...
 ) {
 
@@ -73,7 +73,7 @@ test_threads <- function(
                  add_tags(paste("test threads")))
 
   # Modify Estimation Options
-  adjust_estimation_options(.mods, .max_eval)
+  adjust_estimation_options(.mods, .cap_iterations)
 
   tryCatch({
     submit_models(.mods, .wait = FALSE, ...)
@@ -133,8 +133,8 @@ check_run_times <- function(
   if("all" %in% .return_times){
     .return_times <- c("estimation_time", "covariance_time", "postprocess_time", "cpu_time")
     if(is_old_bbi){
-        # This allows the function to work with lower versions of bbi (despite covariance_time being incorrect)
-        .return_times <- c("estimation_time", "covariance_time", "cpu_time")
+      # This allows the function to work with lower versions of bbi (despite covariance_time being incorrect)
+      .return_times <- c("estimation_time", "covariance_time", "cpu_time")
     }
   }else{
     assert_true(all(.return_times %in% c("estimation_time", "covariance_time", "postprocess_time", "cpu_time")))
@@ -300,37 +300,52 @@ delete_models <- function(.mods, .tags = "test threads", .force = FALSE){
 #' Parse model files and overwrite estimation iterations
 #'
 #' @param .mods a list of model objects. Generally created by `test_threads()`.
-#' @param .max_eval Max number of iterations for NONMEM to run.
-#' @param .detect Estimation options that will be set to `.max_eval` if found.
+#' @param .cap_iterations Max number of iterations for NONMEM to run.
 #'
 #' @importFrom readr parse_number
 #' @importFrom checkmate assert_int
 #' @importFrom rlang is_empty
 #'
 #' @keywords internal
-adjust_estimation_options <- function(.mods, .max_eval, .detect = c("MAXEVAL", "NITER", "NBURN", "MAX")){
+adjust_estimation_options <- function(.mods, .cap_iterations){
 
-  assert_true(all(.detect %in% c("MAXEVAL", "NITER", "NBURN", "MAX")))
-
-  if(!is.null(.max_eval)){
-    assert_int(.max_eval, lower = 1)
+  if(!is.null(.cap_iterations)){
+    assert_int(.cap_iterations, lower = 1)
+    .detect = c("MAXEVAL", "NITER", "NBURN", "MAX")
     search_str <- paste(.detect, collapse = "|")
     map(.mods, function(.mod){
-      mod_path <- get_model_path(.mod)
-      mod_lines <- mod_path %>% readLines() %>% suppressSpecificWarning("incomplete final line found")
-      str_line_loc <- which(grepl(search_str, mod_lines))
 
-      if(is_empty(str_line_loc)){
-        delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
-        stop("Neither MAXEVAL or NITER were found in the ctl file. Please ensure one is provided.")
+      mod_path <- get_model_path(.mod)
+      mod_lines <- mod_path %>% readLines() %>%
+        suppressSpecificWarning("incomplete final line found")
+
+      # Identify Model Blocks
+      section_starts <- which(stringr::str_detect(mod_lines, "\\$"))
+      ends <- c(section_starts[2:length(section_starts)] - 1,
+                length(mod_lines))
+
+      sections <- purrr::map2(section_starts, ends, `:`)
+
+      # Identify EST Blocks
+      est_sections <- stringr::str_detect(mod_lines[section_starts], "^\\$EST")
+      est_block <- map(seq_along(sections[est_sections]), ~{
+        mod_lines[sections[est_sections][[.x]]]
+      })
+      est_idxs <- unlist(sections[est_sections])
+
+      if(is.null(est_idxs)){
+        warning(glue("No Estimation line found in {basename(mod_path)}, so there are no options to cap"))
+        return(NULL)
       }
 
-      str_values <- str_split(mod_lines[str_line_loc], " ")
-      for(i in seq_along(str_values)){
+      for(i in seq_along(est_block)){
+        est_block.i <- est_block[[i]]
 
+        # Check for cases where options cannot be declared for the same EST method
         prevent <- c("MAXEVAL|NITER", "MAXEVAL|MAX", "MAX|NITER") # options that cant be set for the same estimation method
         for(j in seq_along(prevent)){
-          prevent_loc <- grepl(prevent[j], str_values[[i]])
+          est_line <- str_split(est_block.i, " ")[[1]]
+          prevent_loc <- grepl(prevent[j], est_line)
           if(length(prevent_loc[prevent_loc]) > 1){
             delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
             options_drop <- str_split(prevent[j], "\\|")[[1]]
@@ -338,24 +353,50 @@ adjust_estimation_options <- function(.mods, .max_eval, .detect = c("MAXEVAL", "
           }
         }
 
-        str_loc <- grepl(search_str, str_values[[i]])
-        str_current <- str_values[[i]][str_loc]
 
-        # We dont want to overwrite values that were originally 0
-        if(any(parse_number(str_current) != 0)){
-          option_values <- parse_number(str_values[[i]]) %>% as.vector() %>%
-            suppressSpecificWarning("parsing failures")
-          str_loc[which(option_values==0)] <- FALSE
-          str_current <- str_current[parse_number(str_current) != 0]
+        max_match <- "MAX(EVAL(S)?)?=\\d+" ## need to vet this regex
+        max_detect <- str_detect(est_block.i, max_match)
+        niter_detect <- str_detect(est_block.i, "NITER=\\d+")
+        nburn_detect <- str_detect(est_block.i, "NBURN=\\d+")
+        if (any(max_detect)) {
+          est_block.i[max_detect] <- replace_est_opt(est_block.i[max_detect], max_match, .cap_iterations)
+        } else if(any(niter_detect)) {
+          est_block.i[niter_detect] <- replace_est_opt(est_block.i[niter_detect], "NITER=\\d+", .cap_iterations)
+          if (any(nburn_detect) && !any(str_detect(est_block.i, "NBURN=0\\b"))) {
+            est_block.i[nburn_detect] <- replace_est_opt(est_block.i[nburn_detect], "NBURN=\\d+", .cap_iterations)
+          }else if(!any(nburn_detect)){
+            # NITER was specified, but NBURN wasn't (which means the default is being relied on). Force specification to cap.
+            message(glue("Adding NBURN declaration to {est_block.i[niter_detect]} in {basename(mod_path)}"))
+            est_block.i[niter_detect] <- glue("{est_block.i[niter_detect]} NBURN={.cap_iterations}")
+            message(glue("New: {est_block.i[niter_detect]}"))
+          }
         }
+        est_block[[i]] <- est_block.i
 
-        str_update <- paste0(gsub('[[:digit:]]+', '', str_current), .max_eval)
-        str_line_update <- paste(paste(str_values[[i]][!str_loc], collapse = " "), paste(str_update, collapse = " "), sep = " ")
-
-        mod_lines[str_line_loc][i] <- str_line_update
       }
-
+      mod_lines[est_idxs] <- unlist(est_block)
       writeLines(mod_lines, mod_path)
     })
   }
+}
+
+
+#' Helper function for replacing estimation options
+#'
+#' @details
+#' This is specifically for updating the number of iterations for
+#' parameters such as `MAXEVAL`, `NITER`, etc.
+#'
+#' @param .est_line the estimation line containing the `.match`
+#' @param .match regex for the estimation option to be updated
+#' @param .cap_iterations
+#'
+#' @importFrom stringr str_replace str_split
+#'
+#' @keywords internal
+replace_est_opt <- function(.est_line, .match, .cap_iterations){
+  str_values <- str_split(.est_line, " ")[[1]]
+  est_opt <- str_values[grep(.match, str_values)]
+  est_opt <- paste0(gsub('[[:digit:]]+', '', est_opt), .cap_iterations)
+  str_replace(.est_line, .match, est_opt)
 }

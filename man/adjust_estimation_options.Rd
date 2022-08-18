@@ -4,18 +4,12 @@
 \alias{adjust_estimation_options}
 \title{Parse model files and overwrite estimation iterations}
 \usage{
-adjust_estimation_options(
-  .mods,
-  .max_eval,
-  .detect = c("MAXEVAL", "NITER", "NBURN", "MAX")
-)
+adjust_estimation_options(.mods, .cap_iterations)
 }
 \arguments{
 \item{.mods}{a list of model objects. Generally created by \code{test_threads()}.}
 
-\item{.max_eval}{Max number of iterations for NONMEM to run.}
-
-\item{.detect}{Estimation options that will be set to \code{.max_eval} if found.}
+\item{.cap_iterations}{Max number of iterations for NONMEM to run.}
 }
 \description{
 Parse model files and overwrite estimation iterations
