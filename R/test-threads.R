@@ -304,6 +304,7 @@ delete_models <- function(.mods, .tags = "test threads", .force = FALSE){
 #'
 #' @importFrom readr parse_number
 #' @importFrom checkmate assert_int
+#' @importFrom stringr str_detect
 #' @importFrom rlang is_empty
 #'
 #' @keywords internal
@@ -320,7 +321,7 @@ adjust_estimation_options <- function(.mods, .cap_iterations){
         suppressSpecificWarning("incomplete final line found")
 
       # Identify Model Blocks
-      section_starts <- which(stringr::str_detect(mod_lines, "^\\$"))
+      section_starts <- which(str_detect(mod_lines, "^\\$"))
 
       ends <- c(section_starts[2:length(section_starts)] - 1,
                 length(mod_lines))
@@ -328,7 +329,7 @@ adjust_estimation_options <- function(.mods, .cap_iterations){
       sections <- purrr::map2(section_starts, ends, `:`)
 
       # Identify EST Blocks
-      est_sections <- stringr::str_detect(mod_lines[section_starts], "^\\$EST")
+      est_sections <- str_detect(mod_lines[section_starts], "^\\$EST")
       est_block <- map(seq_along(sections[est_sections]), ~{
         mod_lines[sections[est_sections][[.x]]]
       })
