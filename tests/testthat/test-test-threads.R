@@ -8,6 +8,9 @@ context("test_threads(.dry_run=T)")
 # define constants
 MODEL_DIR_BBI <- file.path(dirname(ABS_MODEL_DIR), "test-test-threads-models")
 CTL_TEST_COMPLEX_FILE <- file.path(MODEL_DIR_X, "acop-fake-bayes.ctl")
+CTL_TEST_COMPLEX_FILE2 <- file.path(MODEL_DIR_X, "example2_saemimp.ctl")
+CTL_TEST_COMPLEX_FILE3 <- file.path(MODEL_DIR_X, "iovmm.mod")
+CTL_TEST_COMPLEX_FILE4 <- file.path(MODEL_DIR_X, "acop-onlysim.ctl")
 
 # cleanup function
 cleanup_bbi <- function(.recreate_dir = FALSE) {
@@ -15,6 +18,28 @@ cleanup_bbi <- function(.recreate_dir = FALSE) {
   if (isTRUE(.recreate_dir)) fs::dir_create(MODEL_DIR_BBI)
 }
 cleanup_bbi(.recreate_dir = TRUE)
+
+
+get_est_options <- function(search_str = "MAXEVAL|NITER|NBURN", mods){
+
+  max_evals <- map(mods, function(.mod){
+    mod_path <- get_model_path(.mod)
+    mod_lines <- mod_path %>% readLines()
+    str_line_loc <- which(grepl(search_str, mod_lines))
+    str_values <- str_split(mod_lines[str_line_loc], " ")
+
+    values <- map(1:length(str_values), ~ {
+      est_loc <- grepl("METHOD", str_values[[.x]])
+      est_method <- str_values[[.x]][est_loc]
+      str_loc <- grepl(search_str, str_values[[.x]])
+      eval_method <- gsub('[[:digit:]]+|=', '', str_values[[.x]][str_loc])
+      value <- as.numeric(gsub(glue('{search_str}|='), '', str_values[[.x]][str_loc]))
+      names(value) = paste0(est_method, ", ",eval_method)
+      value
+    }) %>% unlist()
+  })
+  max_evals
+}
 
 withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
@@ -32,6 +57,10 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   # copy model files into new model dir
   fs::file_copy(CTL_TEST_FILE, MODEL_DIR_BBI)
   fs::file_copy(CTL_TEST_COMPLEX_FILE, MODEL_DIR_BBI)
+  fs::file_copy(CTL_TEST_COMPLEX_FILE2, MODEL_DIR_BBI)
+  fs::file_copy(CTL_TEST_COMPLEX_FILE3, MODEL_DIR_BBI)
+  fs::file_copy(CTL_TEST_COMPLEX_FILE4, MODEL_DIR_BBI)
+
 
   mod1 <- new_model(
     file.path(MODEL_DIR_BBI, "1"),
@@ -47,7 +76,28 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     .bbi_args = list(overwrite = TRUE, threads = 2)
   )
 
-  mods <- test_threads(mod1, .threads = c(2, 4), .max_eval = 100, .mode = "local", .dry_run = TRUE)
+  mod_complex2 <- new_model(
+    file.path(MODEL_DIR_BBI, "example2_saemimp"),
+    .description = "complex2 test-test-threads model",
+    .tags = ORIG_TAGS,
+    .bbi_args = list(overwrite = TRUE, threads = 2)
+  )
+
+  mod_complex3 <- new_model(
+    file.path(MODEL_DIR_BBI, "iovmm"),
+    .description = "complex3 test-test-threads model",
+    .tags = ORIG_TAGS,
+    .bbi_args = list(overwrite = TRUE, threads = 2)
+  )
+
+  mod_complex4 <- new_model(
+    file.path(MODEL_DIR_BBI, "acop-onlysim"),
+    .description = "complex4 test-test-threads model",
+    .tags = ORIG_TAGS,
+    .bbi_args = list(overwrite = TRUE, threads = 2)
+  )
+
+  mods <- test_threads(mod1, .threads = c(2, 4), .cap_iterations = 100, .mode = "local", .dry_run = TRUE)
 
   test_that("test_threads(.dry_run=T) creates copy models [BBR-TSTT-001]", {
     mod_ctls <- lapply(mods, function(mod.x){get_model_path(mod.x)}) %>% unlist()
@@ -60,15 +110,13 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   test_that("test_threads(.dry_run=T) correctly changes maxeval/niter: changes only one method [BBR-TSTT-002]", {
 
-    search_str <- "MAXEVAL|NITER"
-    max_evals <- map(mods, function(.mod){
-      mod_path <- get_model_path(.mod)
-      mod_lines <- mod_path %>% readLines()
-      str_line_loc <- which(grepl(search_str, mod_lines))
-      str_values <- str_split(mod_lines[str_line_loc], " ")[[1]]
-      str_loc <- grepl(search_str, str_values)
-      as.numeric(gsub('MAXEVAL=', '', str_values[str_loc]))
-    }) %>% unlist()
+    max_evals <- get_est_options("MAXEVAL|NITER|NBURN", mods)
+    expect_true(all(max_evals == 100))
+
+    # Test that MAX works
+    mods_complex3 <- test_threads(mod_complex3, .threads = c(2, 4), .cap_iterations = 100, .mode = "local", .dry_run = TRUE)
+
+    max_evals <- get_est_options("MAXEVAL|NITER|NBURN|MAX", mods_complex3) # No estimation method provided here
 
     expect_true(all(max_evals == 100))
   })
@@ -76,57 +124,53 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   test_that("test_threads(.dry_run=T) correctly changes maxeval/niter: changes multiple methods [BBR-TSTT-002]", {
 
-    mods_complex <- test_threads(mod_complex, .threads = c(2, 4), .max_eval = 100, .mode = "local", .dry_run = TRUE)
+    mods_complex <- test_threads(mod_complex, .threads = c(2, 4), .cap_iterations = 100, .mode = "local", .dry_run = TRUE)
 
-    search_str <- "MAXEVAL|NITER"
-    max_evals <- map(mods_complex, function(.mod){
-      mod_path <- get_model_path(.mod)
-      mod_lines <- mod_path %>% readLines()
-      str_line_loc <- which(grepl(search_str, mod_lines))
-      str_values <- str_split(mod_lines[str_line_loc], " ")
-
-      values <- map(1:length(str_values), ~ {
-        est_loc <- grepl("METHOD", str_values[[.x]])
-        est_method <- str_values[[.x]][est_loc]
-        str_loc <- grepl(search_str, str_values[[.x]])
-        eval_method <- gsub('[[:digit:]]+|=', '', str_values[[.x]][str_loc])
-        value <- as.numeric(gsub('MAXEVAL|NITER|=', '', str_values[[.x]][str_loc]))
-        names(value) = paste0(est_method, ", ",eval_method)
-        value
-      }) %>% unlist()
-    })
+    # Dont overwrite NBURN if set to 0
+    max_evals <- get_est_options("MAXEVAL|NITER|NBURN", mods_complex)
 
     for(i in seq_along(max_evals)){
-      expect_identical(unname(max_evals[[i]]), c(100, 100))
+      expect_identical(unname(max_evals[[i]]), c(100, 0, 100))
       # Confirm that estimation method didnt change, and that MAXEVAL/NITER was preserved
-      expect_identical(names(max_evals[[i]]), c("METHOD=1, MAXEVAL", "METHOD=BAYES, NITER"))
+      expect_identical(names(max_evals[[i]]), c("METHOD=1, MAXEVAL", "METHOD=BAYES, NBURN", "METHOD=BAYES, NITER"))
     }
   })
 
-  test_that("test_threads(.dry_run=T) correctly changes maxeval/niter: keeps original if .max_eval = NULL [BBR-TSTT-002]", {
+  test_that("test_threads(.dry_run=T) correctly changes maxeval/niter: nburn is handled correctly [BBR-TSTT-002]", {
 
-    mods_complex <- test_threads(mod_complex, .threads = c(2, 4), .max_eval = NULL, .mode = "local", .dry_run = TRUE)
+    expect_message(
+      mods_complex2 <- test_threads(mod_complex2, .threads = c(2, 4), .cap_iterations = 100, .mode = "local", .dry_run = TRUE),
+      "Adding NBURN declaration"
+    )
 
-    search_str <- "MAXEVAL|NITER"
-    max_evals <- map(mods_complex, function(.mod){
-      mod_path <- get_model_path(.mod)
-      mod_lines <- mod_path %>% readLines()
-      str_line_loc <- which(grepl(search_str, mod_lines))
-      str_values <- str_split(mod_lines[str_line_loc], " ")
+    # Overwrite NBURN since was set to value other than 0
+    max_evals <- get_est_options("MAXEVAL|NITER|NBURN", mods_complex2)
 
-      values <- map(1:length(str_values), ~ {
-        str_loc <- grepl(search_str, str_values[[.x]])
-        est_method <- gsub('[[:digit:]]+|=', '', str_values[[.x]][str_loc])
-        value <- as.numeric(gsub('MAXEVAL|NITER|=', '', str_values[[.x]][str_loc]))
-        names(value) = est_method
-        value
-      }) %>% unlist()
-    })
+    for(i in seq_along(max_evals)){
+      expect_identical(unname(max_evals[[i]]), c(100, 100, 100, 100))
+      # Confirm that estimation method didnt change, and that MAXEVAL/NITER was preserved
+      # This also confirms that NBURN is added when only NITER is specified (recursive test)
+      expect_identical(names(max_evals[[i]]), c("METHOD=SAEM, NBURN", "METHOD=SAEM, NITER", "METHOD=IMP, NITER", "METHOD=IMP, NBURN"))
+    }
+  })
+
+  test_that("test_threads(.dry_run=T) correctly changes maxeval/niter: keeps original if .cap_iterations = NULL [BBR-TSTT-002]", {
+
+    mods_complex <- test_threads(mod_complex, .threads = c(2, 4), .cap_iterations = NULL, .mode = "local", .dry_run = TRUE)
+
+    max_evals <- get_est_options("MAXEVAL|NITER|NBURN", mods_complex)
 
     for(i in 1:length(max_evals)){
-      expect_equal(unname(max_evals[[i]]), c(9999, 10))
-      expect_equal(names(max_evals[[i]]), c("MAXEVAL", "NITER"))
+      expect_equal(unname(max_evals[[i]]), c(9999, 0, 10))
+      expect_equal(names(max_evals[[i]]), c("METHOD=1, MAXEVAL", "METHOD=BAYES, NBURN", "METHOD=BAYES, NITER"))
     }
+  })
+
+  test_that("test_threads(.dry_run=T) correctly changes maxeval/niter: warns if no $EST line found [BBR-TSTT-002]", {
+    expect_warning(
+      mods_complex4 <- test_threads(mod_complex4, .threads = c(2, 4), .cap_iterations = 4, .mode = "local", .dry_run = TRUE),
+      glue("No Estimation line found")
+    )
   })
 
   test_that("test_threads(.dry_run=T) threads are set correctly [BBR-TSTT-003]", {
@@ -136,41 +180,47 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   })
 
 
-  mod_none <- copy_model_from(
-    read_model(file.path(MODEL_DIR_BBI, "1")),
-    "none"
-  ) %>% add_tags("no maxeval")
+  test_that("get_est_idx() works correctly: models [BBR-TSTT-004]", {
+    mod_lines <- mod_complex %>% get_model_path() %>% readLines()
+    expect_equal(get_est_idx(mod_lines) %>% unlist(), c(38, 39, 40))
 
-  mod_both <- copy_model_from(
-    read_model(file.path(MODEL_DIR_BBI, "1")),
-    "both"
-  ) %>% add_tags("maxeval and niter")
+    mod_lines <- mod_complex2 %>% get_model_path() %>% readLines()
+    expect_equal(get_est_idx(mod_lines) %>% unlist(), c(111:115))
+    expect_equal(get_est_idx(mod_lines)[[1]], c(111:113))
+    expect_equal(get_est_idx(mod_lines)[[2]], c(114:115))
 
-  mods_fake <- list(mod_none, mod_both)
+    mod_lines <- mod_complex3 %>% get_model_path() %>% readLines()
+    expect_equal(get_est_idx(mod_lines)[[1]], 50)
 
+  })
 
-  test_that("test_threads(.dry_run=T) correctly errors out if no maxeval, or both maxeval and niter are provided [BBR-TSTT-004]", {
+  test_that("get_est_idx() works correctly: custom text [BBR-TSTT-004]", {
+    # Multiple lines per $EST, without leading spaces
+    mod_lines <- c(
+      "$EST METHOD=SAEM NBURN=3000 NITER=2000 PRINT=10 ISAMPLE=2",
+      "ISAMPLE_M1=1 ISAMPLE_M2=1 ISAMPLE_M3=1",
+      "CTYPE=3 CITER=10 CALPHA=0.05",
+      "$EST METHOD=IMP INTERACTION EONLY=1 NITER=5 ISAMPLE=3000 PRINT=1 SIGL=8 SEED=123334",
+      "CTYPE=3 CITER=10 CALPHA=0.05"
+    )
+    est_idxs <- get_est_idx(mod_lines)
+    expect_equal(est_idxs %>% unlist(), c(1:5))
+    expect_equal(est_idxs[[1]], c(1:3))
+    expect_equal(est_idxs[[2]], c(4:5))
 
-    search_str <- "MAXEVAL|NITER"
-    str_replacements <- c("", "MAXEVAL=10 NITER=10")
+    # Multiple lines per $EST, with variable amount of leading spaces
+    mod_lines <- c(
+      " $EST METHOD=SAEM NBURN=3000 NITER=2000 PRINT=10 ISAMPLE=2",
+      "  ISAMPLE_M1=1 ISAMPLE_M2=1 ISAMPLE_M3=1",
+      "   CTYPE=3 CITER=10 CALPHA=0.05",
+      "    $EST METHOD=IMP INTERACTION EONLY=1 NITER=5 ISAMPLE=3000 PRINT=1 SIGL=8 SEED=123334",
+      "     CTYPE=3 CITER=10 CALPHA=0.05"
+    )
+    est_idxs <- get_est_idx(mod_lines)
+    expect_equal(est_idxs %>% unlist(), c(1:5))
+    expect_equal(est_idxs[[1]], c(1:3))
+    expect_equal(est_idxs[[2]], c(4:5))
 
-    map2(mods_fake, str_replacements, function(.mod, str_replace){
-      mod_path <- get_model_path(.mod)
-      mod_lines <- mod_path %>% readLines()
-      str_line_loc <- which(grepl(search_str, mod_lines))
-      str_values <- str_split(mod_lines[str_line_loc], " ")[[1]]
-      str_loc <- grepl(search_str, str_values)
-      str_line_update <- paste(paste(str_values[!str_loc], collapse = " "), str_replace, sep = " ")
-      mod_lines[str_line_loc] <- str_line_update
-      writeLines(mod_lines, mod_path)
-    })
-
-    expect_error(
-      test_threads(mod_none, .threads = c(2, 4), .max_eval = 100, .mode = "local", .dry_run = TRUE),
-      "Neither MAXEVAL or NITER were found in the ctl file. Please ensure one is provided")
-    expect_error(
-      test_threads(mod_both, .threads = c(2, 4), .max_eval = 100, .mode = "local", .dry_run = TRUE),
-      "Both MAXEVAL and NITER were found in the ctl file. Please ensure only one is provided")
   })
 
 
@@ -206,6 +256,20 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   test_that("delete_models() with .tags [BBR-CLM-002]", {
 
+    mod_fake1 <- copy_model_from(
+      read_model(file.path(MODEL_DIR_BBI, "1")),
+      "none",
+      .overwrite = TRUE
+    ) %>% add_tags("fake1")
+
+    mod_fake2 <- copy_model_from(
+      read_model(file.path(MODEL_DIR_BBI, "1")),
+      "both",
+      .overwrite = TRUE
+    ) %>% add_tags("fake2")
+
+    mods_fake <- list(mod_fake1, mod_fake2)
+
     fake_mod_tags <- lapply(mods_fake, function(mod.x){mod.x$tags}) %>% unlist()
     msg_remove <- paste0(
       paste("Removed", length(mods_fake), "models with the following tags:\n"),
@@ -223,7 +287,6 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_false(any(fs::file_exists(mod_ctls)))
     expect_false(any(fs::file_exists(mod_yamls)))
   })
-
 
 
   test_that("delete_models() with models with multiple tags [BBR-CLM-003]", {
@@ -254,7 +317,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   })
 
   test_that("delete_models() with .tags=NULL [BBR-CLM-004]", {
-    mods_threads <- test_threads(mod1, .threads = c(2, 4), .max_eval = 100, .mode = "local", .dry_run = TRUE)
+    mods_threads <- test_threads(mod1, .threads = c(2, 4), .cap_iterations = 100, .mode = "local", .dry_run = TRUE)
     mod_new <- copy_model_from(read_model(file.path(MODEL_DIR_BBI, "1")), "one_tag") %>%
       add_tags("some tag")
     mod_no_tag <- copy_model_from(read_model(file.path(MODEL_DIR_BBI, "1")), "no_tag")

@@ -963,8 +963,7 @@ TSTT-R003:
   tests:
   - BBR-TSTT-003
 TSTT-R004:
-  description: test_threads(.dry_run=T) correctly errors out if no maxeval, or both
-    maxeval and niter are provided
+  description: get_est_idx() works correctly
   tests:
   - BBR-TSTT-004
 STAR-R001:
