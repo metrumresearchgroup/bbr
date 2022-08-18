@@ -223,6 +223,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   })
 
+
   test_that("check_run_times() returns NA for dry runs [BBR-CRT-007]", {
     skip_if_old_bbi("3.2.0")
     expect_message(
