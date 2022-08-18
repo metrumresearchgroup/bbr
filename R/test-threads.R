@@ -320,7 +320,10 @@ adjust_estimation_options <- function(.mods, .cap_iterations){
         suppressSpecificWarning("incomplete final line found")
 
       # Identify Model Blocks
-      section_starts <- which(stringr::str_detect(mod_lines, "\\$"))
+      line_starts <- which(stringr::str_detect(mod_lines, "^\\S"))
+      section_starts <- which(stringr::str_detect(mod_lines, "^\\$"))
+      section_starts <- intersect(line_starts, section_starts)
+
       ends <- c(section_starts[2:length(section_starts)] - 1,
                 length(mod_lines))
 
