@@ -320,20 +320,15 @@ adjust_estimation_options <- function(.mods, .cap_iterations){
       mod_lines <- mod_path %>% readLines() %>%
         suppressSpecificWarning("incomplete final line found")
 
-      # Identify Model Blocks
-      section_starts <- which(str_detect(mod_lines, "^\\$"))
-
-      ends <- c(section_starts[2:length(section_starts)] - 1,
-                length(mod_lines))
-
-      sections <- purrr::map2(section_starts, ends, `:`)
 
       # Identify EST Blocks
-      est_sections <- str_detect(mod_lines[section_starts], "^\\$EST")
-      est_block <- map(seq_along(sections[est_sections]), ~{
-        mod_lines[sections[est_sections][[.x]]]
+      est_idxs <- get_est_idx(mod_lines)
+
+      est_block <- map(seq_along(est_idxs), ~{
+        mod_lines[est_idxs[[.x]]]
       })
-      est_idxs <- unlist(sections[est_sections])
+
+      est_idxs <- unlist(est_idxs)
 
       if(is.null(est_idxs)){
         warning(glue("No Estimation line found in {basename(mod_path)}, so there are no options to cap"))
@@ -400,4 +395,25 @@ replace_est_opt <- function(.est_line, .match, .cap_iterations){
   est_opt <- str_values[grep(.match, str_values)]
   est_opt <- paste0(gsub('[[:digit:]]+', '', est_opt), .cap_iterations)
   str_replace(.est_line, .match, est_opt)
+}
+
+
+#' Get location of $EST blocks
+#'
+#' @param .mod_lines ctl lines returned from readLines
+#'
+#' @keywords internal
+get_est_idx <- function(.mod_lines){
+  # Identify Model Blocks
+  section_starts <- which(str_detect(.mod_lines, "^\\$"))
+
+  ends <- c(section_starts[2:length(section_starts)] - 1,
+            length(.mod_lines))
+
+  sections <- purrr::map2(section_starts, ends, `:`)
+
+  # Identify EST Blocks
+  est_sections <- str_detect(.mod_lines[section_starts], "^\\$EST")
+
+  sections[est_sections]
 }

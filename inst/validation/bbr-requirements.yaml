@@ -182,6 +182,10 @@ CRT-R006:
   description: check_run_times() works with a bbi_summary_list object
   tests:
   - BBR-CRT-006
+CRT-R007:
+  description: check_run_times() returns NA for dry runs
+  tests:
+  - BBR-CRT-007
 CTS-R001:
   description: collapse_to_string() works correctly
   tests:
@@ -985,7 +989,7 @@ TSTT-R004:
   tests:
   - BBR-TSTT-004
 TSTT-R005:
-  description: check_run_times() returns NA for dry runs
+  description: test_threads(.dry_run=T) warns if no $EST line found
   tests:
   - BBR-TSTT-005
 UBI-R001:

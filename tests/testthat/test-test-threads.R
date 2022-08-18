@@ -10,6 +10,7 @@ MODEL_DIR_BBI <- file.path(dirname(ABS_MODEL_DIR), "test-test-threads-models")
 CTL_TEST_COMPLEX_FILE <- file.path(MODEL_DIR_X, "acop-fake-bayes.ctl")
 CTL_TEST_COMPLEX_FILE2 <- file.path(MODEL_DIR_X, "example2_saemimp.ctl")
 CTL_TEST_COMPLEX_FILE3 <- file.path(MODEL_DIR_X, "iovmm.mod")
+CTL_TEST_COMPLEX_FILE4 <- file.path(MODEL_DIR_X, "acop-onlysim.ctl")
 
 # cleanup function
 cleanup_bbi <- function(.recreate_dir = FALSE) {
@@ -58,6 +59,8 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   fs::file_copy(CTL_TEST_COMPLEX_FILE, MODEL_DIR_BBI)
   fs::file_copy(CTL_TEST_COMPLEX_FILE2, MODEL_DIR_BBI)
   fs::file_copy(CTL_TEST_COMPLEX_FILE3, MODEL_DIR_BBI)
+  fs::file_copy(CTL_TEST_COMPLEX_FILE4, MODEL_DIR_BBI)
+
 
   mod1 <- new_model(
     file.path(MODEL_DIR_BBI, "1"),
@@ -83,6 +86,13 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   mod_complex3 <- new_model(
     file.path(MODEL_DIR_BBI, "iovmm"),
     .description = "complex3 test-test-threads model",
+    .tags = ORIG_TAGS,
+    .bbi_args = list(overwrite = TRUE, threads = 2)
+  )
+
+  mod_complex4 <- new_model(
+    file.path(MODEL_DIR_BBI, "acop-onlysim"),
+    .description = "complex4 test-test-threads model",
     .tags = ORIG_TAGS,
     .bbi_args = list(overwrite = TRUE, threads = 2)
   )
@@ -202,8 +212,14 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       "Both MAXEVAL and NITER were set for the same estimation method. Please ensure only one is set")
   })
 
+  test_that("test_threads(.dry_run=T) warns if no $EST line found [BBR-TSTT-005]", {
+    expect_warning(
+      mods_complex4 <- test_threads(mod_complex4, .threads = c(2, 4), .cap_iterations = 4, .mode = "local", .dry_run = TRUE),
+      glue("No Estimation line found")
+    )
+  })
 
-  test_that("check_run_times() returns NA for dry runs [BBR-TSTT-005]", {
+  test_that("check_run_times() returns NA for dry runs [BBR-CRT-007]", {
     skip_if_old_bbi("3.2.0")
     expect_message(
       check_run_times(mod1, .wait = F),
