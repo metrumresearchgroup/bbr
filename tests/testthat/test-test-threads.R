@@ -180,46 +180,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   })
 
 
-  mod_both <- copy_model_from(
-    read_model(file.path(MODEL_DIR_BBI, "1")),
-    "none",
-    .overwrite = TRUE
-  ) %>% add_tags("maxeval and max")
-
-  mod_both2 <- copy_model_from(
-    read_model(file.path(MODEL_DIR_BBI, "1")),
-    "both",
-    .overwrite = TRUE
-  ) %>% add_tags("maxeval and niter")
-
-  mods_fake <- list(mod_both, mod_both2)
-
-
-  test_that("test_threads(.dry_run=T) correctly errors out if both maxeval and niter are provided [BBR-TSTT-004]", {
-
-    search_str <- "MAX(EVAL)?|NITER"
-    str_replacements <- c("MAXEVAL=10 MAX=10", "MAXEVAL=10 NITER=10")
-
-    map2(mods_fake, str_replacements, function(.mod, str_replace){
-      mod_path <- get_model_path(.mod)
-      mod_lines <- mod_path %>% readLines()
-      str_line_loc <- which(grepl(search_str, mod_lines))
-      str_values <- str_split(mod_lines[str_line_loc], " ")[[1]]
-      str_loc <- grepl(search_str, str_values)
-      str_line_update <- paste(paste(str_values[!str_loc], collapse = " "), str_replace, sep = " ")
-      mod_lines[str_line_loc] <- str_line_update
-      writeLines(mod_lines, mod_path)
-    })
-
-    expect_error(
-      test_threads(mod_both, .threads = c(2, 4), .cap_iterations = 100, .mode = "local", .dry_run = TRUE),
-      "Both MAXEVAL and MAX were set for the same estimation method. Please ensure only one is set")
-    expect_error(
-      test_threads(mod_both2, .threads = c(2, 4), .cap_iterations = 100, .mode = "local", .dry_run = TRUE),
-      "Both MAXEVAL and NITER were set for the same estimation method. Please ensure only one is set")
-  })
-
-  test_that("get_est_idx() works correctly: models [BBR-TSTT-005]", {
+  test_that("get_est_idx() works correctly: models [BBR-TSTT-004]", {
     mod_lines <- mod_complex %>% get_model_path() %>% readLines()
     expect_equal(get_est_idx(mod_lines) %>% unlist(), c(38, 39, 40))
 
@@ -233,7 +194,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   })
 
-  test_that("get_est_idx() works correctly: custom text [BBR-TSTT-005]", {
+  test_that("get_est_idx() works correctly: custom text [BBR-TSTT-004]", {
     # Multiple lines per $EST, without leading spaces
     mod_lines <- c(
       "$EST METHOD=SAEM NBURN=3000 NITER=2000 PRINT=10 ISAMPLE=2",

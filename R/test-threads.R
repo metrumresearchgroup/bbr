@@ -312,8 +312,7 @@ adjust_estimation_options <- function(.mods, .cap_iterations){
 
   if(!is.null(.cap_iterations)){
     assert_int(.cap_iterations, lower = 1)
-    .detect = c("MAXEVAL", "NITER", "NBURN", "MAX")
-    search_str <- paste(.detect, collapse = "|")
+
     map(.mods, function(.mod){
 
       mod_path <- get_model_path(.mod)
@@ -337,19 +336,6 @@ adjust_estimation_options <- function(.mods, .cap_iterations){
 
       for(i in seq_along(est_block)){
         est_block.i <- est_block[[i]]
-
-        # Check for cases where options cannot be declared for the same EST method
-        prevent <- c("MAXEVAL|NITER", "MAXEVAL|MAX", "MAX|NITER") # options that cant be set for the same estimation method
-        for(j in seq_along(prevent)){
-          est_line <- str_split(est_block.i, " ")[[1]]
-          prevent_loc <- grepl(prevent[j], est_line)
-          if(length(prevent_loc[prevent_loc]) > 1){
-            delete_models(.mods = .mods, .force = TRUE) %>% suppressMessages()
-            options_drop <- str_split(prevent[j], "\\|")[[1]]
-            stop(glue("Both {options_drop[1]} and {options_drop[2]} were set for the same estimation method. Please ensure only one is set"))
-          }
-        }
-
 
         max_match <- "MAX(EVAL(S)?)?=\\d+" ## need to vet this regex
         max_detect <- str_detect(est_block.i, max_match)
