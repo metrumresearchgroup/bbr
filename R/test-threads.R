@@ -3,8 +3,8 @@
 #' @param .mod bbi_model object to copy/test.
 #' @param .threads Integer vector of threads values to test.
 #' @param .bbi_args a named list.
-#' @param .cap_iterations Max number of iterations for NONMEM to run.
-#'         Will update `MAXEVAL`, `NITER`, and `NBURN` (whichever is specified/found) in generated models.
+#' @param .cap_iterations Maximum number of iterations for NONMEM to run in test models.
+#'         Will update `MAXEVAL`, `NITER`, and `NBURN`, whichever is relevant for each estimation method.
 #'         The best number for this is model-dependent. Typically, something between 10 and
 #'         100 is good, depending on how long each iteration takes. You want something that
 #'         will run for 3-5 minutes total. You can set this argument to `NULL` to run with the

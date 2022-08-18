@@ -19,8 +19,8 @@ test_threads(
 
 \item{.bbi_args}{a named list.}
 
-\item{.cap_iterations}{Max number of iterations for NONMEM to run.
-Will update \code{MAXEVAL}, \code{NITER}, and \code{NBURN} (whichever is specified/found) in generated models.
+\item{.cap_iterations}{Maximum number of iterations for NONMEM to run in test models.
+Will update \code{MAXEVAL}, \code{NITER}, and \code{NBURN}, whichever is relevant for each estimation method.
 The best number for this is model-dependent. Typically, something between 10 and
 100 is good, depending on how long each iteration takes. You want something that
 will run for 3-5 minutes total. You can set this argument to \code{NULL} to run with the
