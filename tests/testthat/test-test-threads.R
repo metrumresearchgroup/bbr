@@ -128,7 +128,10 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   test_that("test_threads(.dry_run=T) correctly changes maxeval/niter: nburn is handled correctly [BBR-TSTT-002]", {
 
-    mods_complex2 <- test_threads(mod_complex2, .threads = c(2, 4), .cap_iterations = 100, .mode = "local", .dry_run = TRUE)
+    expect_message(
+      mods_complex2 <- test_threads(mod_complex2, .threads = c(2, 4), .cap_iterations = 100, .mode = "local", .dry_run = TRUE),
+      "Adding NBURN declaration"
+    )
 
     # Overwrite NBURN since was set to value other than 0
     max_evals <- get_est_options("MAXEVAL|NITER|NBURN", mods_complex2)

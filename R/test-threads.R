@@ -320,9 +320,7 @@ adjust_estimation_options <- function(.mods, .cap_iterations){
         suppressSpecificWarning("incomplete final line found")
 
       # Identify Model Blocks
-      line_starts <- which(stringr::str_detect(mod_lines, "^\\S"))
       section_starts <- which(stringr::str_detect(mod_lines, "^\\$"))
-      section_starts <- intersect(line_starts, section_starts)
 
       ends <- c(section_starts[2:length(section_starts)] - 1,
                 length(mod_lines))
@@ -369,9 +367,8 @@ adjust_estimation_options <- function(.mods, .cap_iterations){
             est_block.i[nburn_detect] <- replace_est_opt(est_block.i[nburn_detect], "NBURN=\\d+", .cap_iterations)
           }else if(!any(nburn_detect)){
             # NITER was specified, but NBURN wasn't (which means the default is being relied on). Force specification to cap.
-            message(glue("Adding NBURN declaration to {est_block.i[niter_detect]} in {basename(mod_path)}"))
+            message(glue("     Adding NBURN declaration to {est_block.i[niter_detect]} in {basename(mod_path)}"))
             est_block.i[niter_detect] <- glue("{est_block.i[niter_detect]} NBURN={.cap_iterations}")
-            message(glue("New: {est_block.i[niter_detect]}"))
           }
         }
         est_block[[i]] <- est_block.i
