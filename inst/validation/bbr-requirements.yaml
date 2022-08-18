@@ -520,27 +520,27 @@ NMF-R001:
   description: nm_file() works
   tests:
   - BBR-NMF-001
-NMF-R003:
+NMF-R002:
   description: nm_grd() works
   tests:
   - BBR-NMF-003
-NMF-R004:
+NMF-R003:
   description: nm_file() with multiple tables
   tests:
   - BBR-NMF-004
-NMF-R005:
+NMF-R004:
   description: nm_data() works
   tests:
   - BBR-NMF-005
-NMF-R006:
+NMF-R005:
   description: nm_tab() works
   tests:
   - BBR-NMF-006
-NMF-R007:
+NMF-R006:
   description: nm_par_tab() works
   tests:
   - BBR-NMF-007
-NMF-R008:
+NMF-R007:
   description: nm_file() repairs duplicate column names that are present in input file
   tests:
   - BBR-NMF-008
@@ -633,43 +633,43 @@ PEST-R002:
   description: param_estimates correctly errors on unsupported models
   tests:
   - BBR-PEST-002
-PEST-R004:
+PEST-R003:
   description: param_estimates correctly warns on mixture model
   tests:
   - BBR-PEST-004
-PEST-R005:
+PEST-R004:
   description: param_estimates_batch produces expected output
   tests:
   - BBR-PEST-005
-PEST-R006:
+PEST-R005:
   description: param_estimates_batch() works with varying number of param estimates
   tests:
   - BBR-PEST-006
-PEST-R007:
+PEST-R006:
   description: param_estimates_batch() works if an .ext file detected is empty
   tests:
   - BBR-PEST-007
-PEST-R008:
+PEST-R007:
   description: param_estimates_batch() works if the termination line is missing in
     an .ext file
   tests:
   - BBR-PEST-008
-PEST-R009:
+PEST-R008:
   description: param_estimates_compare() works
   tests:
   - BBR-PEST-009
   - BBR-PEST-010
   - BBR-PEST-011
   - BBR-PEST-014
-PEST-R012:
+PEST-R009:
   description: param_estimates_compare() errors with different models
   tests:
   - BBR-PEST-012
-PEST-R013:
+PEST-R010:
   description: param_estimates() can optionally append the p-value to the output, and calculate whether it is below a specified alpha
   tests:
   - BBR-PEST-013
-PEST-R014:
+PEST-R011:
   description: get_omega(), get_sigma(), and get_theta() label and format values from model_summary() objects
   tests:
   - BBR-PEST-015
@@ -753,31 +753,31 @@ ROT-R006:
   description: check_output_dir() works with filter
   tests:
   - BBR-ROT-006
-ROT-R009:
+ROT-R007:
   description: check_ext() works with character directory and model object
   tests:
   - BBR-ROT-009
-ROT-R010:
+ROT-R008:
   description: check_ext() works with summary object
   tests:
   - BBR-ROT-010
-ROT-R011:
+ROT-R009:
   description: check_ext() works when .iter_floor argument is NULL
   tests:
   - BBR-ROT-011
-ROT-R012:
+ROT-R010:
   description: check_grd() works with character directory and model object
   tests:
   - BBR-ROT-012
-ROT-R013:
+ROT-R011:
   description: check_grd() works with summary object
   tests:
   - BBR-ROT-013
-ROT-R014:
+ROT-R012:
   description: check_grd() works when .iter_floor argument is non-zero integer
   tests:
   - BBR-ROT-014
-ROT-R015:
+ROT-R013:
   description: check_grd() when .iter_floor argument is NULL
   tests:
   - BBR-ROT-015
@@ -813,27 +813,27 @@ SBMT-R008:
   description: submit_models(.dry_run=T) with list input simple
   tests:
   - BBR-SBMT-008
-SBMT-R010:
+SBMT-R009:
   description: submit_models(.dry_run=T) with list input, 2 arg sets
   tests:
   - BBR-SBMT-010
-SBMT-R011:
+SBMT-R010:
   description: submit_models() works for models in different directories
   tests:
   - BBR-SBMT-011
-SBMT-R012:
+SBMT-R011:
   description: submit_models(.dry_run=T) errors with bad input
   tests:
   - BBR-SBMT-012
-SBMT-R013:
+SBMT-R012:
   description: submit_models() works with non-NULL .config_path
   tests:
   - BBR-SBMT-013
-SBMT-R014:
+SBMT-R013:
   description: submit_models() works if .bbi_args is empty
   tests:
   - BBR-SBMT-014
-SBMT-R015:
+SBMT-R014:
   description: submit_models(.mode) inherits option
   tests:
   - BBR-SBMT-015
@@ -1002,15 +1002,15 @@ UBI-R005:
   description: use-bbi and bbi_version handle path with spaces
   tests:
   - BBR-UBI-005
-UTL-R012:
+UTL-R001:
   description: wait_for_nonmem() correctly reads in stop time
   tests:
   - BBR-UTL-012
-UTL-R013:
+UTL-R002:
   description: wait_for_nonmem() doesn't error out if no stop time found
   tests:
   - BBR-UTL-013
-UTL-R014:
+UTL-R003:
   description: confirming check_bbi_args() is passing correct parameters
   tests:
   - BBR-UTL-014

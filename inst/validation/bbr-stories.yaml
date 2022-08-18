@@ -28,7 +28,7 @@ CFG-S003:
   - SBMT-R001
   - SBMT-R003
   - SBMT-R008
-  - SBMT-R013
+  - SBMT-R012
   - WRKF-R007
 CFG-S004:
   name: Find bbi installation
@@ -62,13 +62,13 @@ CFG-S006:
   - SBMT-R005
   - SBMT-R006
   - SBMT-R007
-  - SBMT-R015
+  - SBMT-R014
 CFG-S007:
   name: Set execution mode globally
   description: As a user, I want parallel to be set to TRUE if threads are specified to be greater than 1.
   ProductRisk: Low
   requirements:
-  - UTL-R014
+  - UTL-R003
 CFG-S008:
   name: bbi_help returns available bbi commands
   description: As a user, I want to be able to see what bbi commands I have access to, and how to use them,
@@ -291,8 +291,8 @@ MGMT-S020:
   description: As a user, I want to be able to freeze my R console while a model is executing on the grid or otherwise
   ProductRisk: Low
   requirements:
-  - UTL-R012
-  - UTL-R013
+  - UTL-R001
+  - UTL-R002
 MGMT-S021:
   name: get path from bbi object
   description: As a user, I want to be able to quickly retrieve the absolute paths for bbi model objects.
@@ -357,7 +357,7 @@ RUN-S001:
   - SBMT-R002
   - SBMT-R004
   - SBMT-R005
-  - SBMT-R014
+  - SBMT-R013
   - WRKF-R001
   - WRKF-R002
   - WRKF-R004
@@ -369,9 +369,9 @@ RUN-S002:
   ProductRisk: Medium
   requirements:
   - SBMT-R008
+  - SBMT-R009
   - SBMT-R010
   - SBMT-R011
-  - SBMT-R012
   - WRKF-R002
   - TSTT-R001
 RUN-S003:
@@ -417,8 +417,8 @@ SUM-S002:
   requirements:
   - PEST-R001
   - PEST-R002
-  - PEST-R004
-  - PEST-R013
+  - PEST-R003
+  - PEST-R010
   - WRKF-R001
   - WRKF-R002
 SUM-S003:
@@ -470,12 +470,12 @@ SUM-S008:
     to be able to summarize these estimates across model runs (i.e. for bootstrap or simulation)
   ProductRisk: Low
   requirements:
+  - PEST-R004
   - PEST-R005
   - PEST-R006
   - PEST-R007
   - PEST-R008
   - PEST-R009
-  - PEST-R012
 SUM-S009:
   name: Read NONMEM .cov and .cor
   description: As a user I want to be able to pull in the contents of the .cov and
@@ -494,7 +494,7 @@ SUM-S010:
     or labeled vector (THETA).
   ProductRisk: Low
   requirements:
-  - PEST-R014
+  - PEST-R011
 SUM-S011:
   name: check run times
   description: As a user, I want to be able to retrieve run time information from any bbr model or summary object
@@ -512,12 +512,12 @@ OUT-S001:
   ProductRisk: Low
   requirements:
   - NMF-R001
+  - NMF-R002
   - NMF-R003
   - NMF-R004
   - NMF-R005
   - NMF-R006
   - NMF-R007
-  - NMF-R008
 OUT-S002:
   name: Read NONMEM tables and data
   description: As a user, I want to be able to pass a model object and have bbr extract
@@ -541,7 +541,7 @@ OUT-S003:
   - NMJ-R004
   - NMJ-R005
   - NMJ-R006
-  - NMF-R008
+  - NMF-R007
 OUT-S004:
   name: Inspect model output files
   description: As a user, I want to be able pass a model object to
@@ -554,13 +554,13 @@ OUT-S004:
   - ROT-R004
   - ROT-R005
   - ROT-R006
+  - ROT-R007
+  - ROT-R008
   - ROT-R009
   - ROT-R010
   - ROT-R011
   - ROT-R012
   - ROT-R013
-  - ROT-R014
-  - ROT-R015
 LOG-S001:
   name: Parse model YAML files into run log table
   description: As a user, I want parse all model YAML files in a directory (and optionally
