@@ -675,19 +675,19 @@ PEST-R014:
   - BBR-PEST-015
   - BBR-PEST-016
   - BBR-PEST-017
-PLB-R002:
+PLB-R001:
   description: block() parses correctly
   tests:
   - BBR-PLB-002
-PLB-R003:
+PLB-R002:
   description: param_labels.character errors on vector
   tests:
   - BBR-PLB-003
-PLB-R005:
+PLB-R003:
   description: param_labels.character() %>% apply_indices() matches tidynm reference
   tests:
   - BBR-PLB-005
-PLB-R006:
+PLB-R004:
   description: param_labels.bbi_nonmem_model() %>% apply_indices() matches tidynm
     reference
   tests:

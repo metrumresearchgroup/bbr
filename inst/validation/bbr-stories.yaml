@@ -425,10 +425,10 @@ SUM-S003:
     in a NONMEM control stream, when they are in a specified format.
   ProductRisk: Low
   requirements:
+  - PLB-R001
   - PLB-R002
   - PLB-R003
-  - PLB-R005
-  - PLB-R006
+  - PLB-R004
 SUM-S004:
   name: Parse .ext file with custom name
   description: As a user, I want to be able to pass a custom name for the NONMEM .ext
