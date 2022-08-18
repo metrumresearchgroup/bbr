@@ -989,7 +989,7 @@ TSTT-R004:
   tests:
   - BBR-TSTT-004
 TSTT-R005:
-  description: test_threads(.dry_run=T) warns if no $EST line found
+  description: get_est_idx() works correctly
   tests:
   - BBR-TSTT-005
 UBI-R001:

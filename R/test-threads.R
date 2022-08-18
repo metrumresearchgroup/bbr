@@ -405,7 +405,7 @@ replace_est_opt <- function(.est_line, .match, .cap_iterations){
 #' @keywords internal
 get_est_idx <- function(.mod_lines){
   # Identify Model Blocks
-  section_starts <- which(str_detect(.mod_lines, "^\\$"))
+  section_starts <- which(str_detect(.mod_lines, "^\\s*\\$"))
 
   ends <- c(section_starts[2:length(section_starts)] - 1,
             length(.mod_lines))
@@ -413,7 +413,7 @@ get_est_idx <- function(.mod_lines){
   sections <- purrr::map2(section_starts, ends, `:`)
 
   # Identify EST Blocks
-  est_sections <- str_detect(.mod_lines[section_starts], "^\\$EST")
+  est_sections <- str_detect(.mod_lines[section_starts], "^\\s*\\$EST")
 
   sections[est_sections]
 }
