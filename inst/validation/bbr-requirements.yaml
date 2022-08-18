@@ -1002,6 +1002,14 @@ UBI-R005:
   description: use-bbi and bbi_version handle path with spaces
   tests:
   - BBR-UBI-005
+UTL-R012:
+  description: wait_for_nonmem() correctly reads in stop time
+  tests:
+  - BBR-UTL-012
+UTL-R013:
+  description: wait_for_nonmem() doesn't error out if no stop time found
+  tests:
+  - BBR-UTL-013
 UTL-R014:
   description: confirming check_bbi_args() is passing correct parameters
   tests:
