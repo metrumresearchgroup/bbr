@@ -255,6 +255,20 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   test_that("delete_models() with .tags [BBR-CLM-002]", {
 
+    mod_fake1 <- copy_model_from(
+      read_model(file.path(MODEL_DIR_BBI, "1")),
+      "none",
+      .overwrite = TRUE
+    ) %>% add_tags("fake1")
+
+    mod_fake2 <- copy_model_from(
+      read_model(file.path(MODEL_DIR_BBI, "1")),
+      "both",
+      .overwrite = TRUE
+    ) %>% add_tags("fake2")
+
+    mods_fake <- list(mod_fake1, mod_fake2)
+
     fake_mod_tags <- lapply(mods_fake, function(mod.x){mod.x$tags}) %>% unlist()
     msg_remove <- paste0(
       paste("Removed", length(mods_fake), "models with the following tags:\n"),
@@ -272,7 +286,6 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_false(any(fs::file_exists(mod_ctls)))
     expect_false(any(fs::file_exists(mod_yamls)))
   })
-
 
 
   test_that("delete_models() with models with multiple tags [BBR-CLM-003]", {
