@@ -35,6 +35,9 @@
 - Added `delete_models()` for removing all model files associated with
   specified model tags.  (#473)
 
+- Updated parallel tips and tricks vignette to reference new `test_threads()`
+  function and related helpers.  (#503)
+
 - bbi encodes "unspecified" and `NA` values as `-999999999`.  bbr now maps all
   occurrences of this value to `NA` when creating a model summary object.
   (#524)
