@@ -34,6 +34,7 @@ reference:
   - param_estimates
   - param_estimates_batch
   - param_estimates_compare
+  - get_omega
   - nm_file
   - nm_join
   - nm_tables
@@ -58,6 +59,7 @@ reference:
   - add_notes
   - add_based_on
   - add_description
+  - modify_star
   - add_bbi_args
   - modify_model_field
   - build_path_from_model
@@ -100,3 +102,8 @@ reference:
   - reconcile_yaml
   - check_yaml_in_sync
   - suppressSpecificWarning
+  - test_threads
+  - check_run_times
+  - delete_models
+  - check_nonmem_finished
+  - wait_for_nonmem
