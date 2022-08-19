@@ -20,7 +20,7 @@ disk and throw an error if it doesn't find one."><meta property="og:image" conte
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -29,7 +29,7 @@ disk and throw an error if it doesn't find one."><meta property="og:image" conte
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -81,15 +81,16 @@ disk and throw an error if it doesn't find one.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">new_model</span><span class="op">(</span>
-  <span class="va">.path</span>,
-  .description <span class="op">=</span> <span class="cn">NULL</span>,
-  .based_on <span class="op">=</span> <span class="cn">NULL</span>,
-  .tags <span class="op">=</span> <span class="cn">NULL</span>,
-  .bbi_args <span class="op">=</span> <span class="cn">NULL</span>,
-  .overwrite <span class="op">=</span> <span class="cn">FALSE</span>,
-  .model_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nonmem"</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">new_model</span><span class="op">(</span></span>
+<span>  <span class="va">.path</span>,</span>
+<span>  .description <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  .based_on <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  .tags <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  .bbi_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  .overwrite <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  .star <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  .model_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nonmem"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -98,31 +99,50 @@ disk and throw an error if it doesn't find one.</p>
 <dd><p>Path to save the new model. Will be the path to the model file
 and YAML file (both without extension), and the path to the output
 directory.</p></dd>
+
+
 <dt>.description</dt>
 <dd><p>Character scalar description of new model run. This will
 be stored in the yaml (and can be viewed later in <code><a href="run_log.html">run_log()</a></code>).</p></dd>
+
+
 <dt>.based_on</dt>
 <dd><p>Character scalar or vector of paths to other models that
 this model was "based on." These are used to reconstuct model developement
 and ancestry. <strong>Paths must be relative to <code>.yaml_path</code>.</strong></p></dd>
+
+
 <dt>.tags</dt>
 <dd><p>A character scalar or vector with any user tags to be added to
 the YAML file</p></dd>
+
+
 <dt>.bbi_args</dt>
 <dd><p>A named list specifying arguments to pass to bbi
 formatted like <code>list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)</code>. Run <code><a href="print_bbi_args.html">print_bbi_args()</a></code> to see valid arguments. These will be written
 into YAML file.</p></dd>
+
+
 <dt>.overwrite</dt>
 <dd><p>If <code>FALSE</code>, the default, error if a file already exists at
 <code>.yaml_path</code>. If <code>TRUE</code> overwrite existing file and output directory, if
 they exist.</p></dd>
+
+
+<dt>.star</dt>
+<dd><p>Boolean, marks model to indicate special interest level.</p></dd>
+
+
 <dt>.model_type</dt>
 <dd><p>Character scaler to specify type of model being created
 (used for S3 class). Currently only <code>'nonmem'</code> is supported.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>S3 object of class <code>bbi_{.model_type}_model</code> that can be passed to
+    
+
+<p>S3 object of class <code>bbi_{.model_type}_model</code> that can be passed to
 <code><a href="submit_model.html">submit_model()</a></code>, <code><a href="model_summary.html">model_summary()</a></code>, etc.</p>
     </div>
     <div id="see-also">
@@ -138,11 +158,11 @@ they exist.</p></dd>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

@@ -18,7 +18,7 @@ Note that any file existing at .new_model_path will be overwritten."><meta prope
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -27,7 +27,7 @@ Note that any file existing at .new_model_path will be overwritten."><meta prope
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -77,24 +77,31 @@ Note that any file existing at <code>.new_model_path</code> will be overwritten.
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">copy_control_stream</span><span class="op">(</span>
-  <span class="va">.parent_model_path</span>,
-  <span class="va">.new_model_path</span>,
-  <span class="va">.overwrite</span>,
-  .update_model_file <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">copy_control_stream</span><span class="op">(</span></span>
+<span>  <span class="va">.parent_model_path</span>,</span>
+<span>  <span class="va">.new_model_path</span>,</span>
+<span>  <span class="va">.overwrite</span>,</span>
+<span>  .update_model_file <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>.parent_model_path</dt>
 <dd><p>Path to the control stream to copy</p></dd>
+
+
 <dt>.new_model_path</dt>
 <dd><p>Path to copy the new control stream to</p></dd>
+
+
 <dt>.overwrite</dt>
 <dd><p>If <code>TRUE</code>, overwrite existing file at <code>.new_model_path</code>. If <code>FALSE</code> and file exists at <code>.new_model_path</code> error.</p></dd>
+
+
 <dt>.update_model_file</dt>
 <dd><p>If <code>TRUE</code>, the default, update the <code>$PROBLEM</code> line in the new control stream. If <code>FALSE</code>, <code>{.new_model}.[mod|ctl]</code> will be an exact copy of its parent control stream.</p></dd>
+
 </dl></div>
 
   </div>
@@ -105,11 +112,11 @@ Note that any file existing at <code>.new_model_path</code> will be overwritten.
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

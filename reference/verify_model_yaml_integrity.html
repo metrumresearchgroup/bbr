@@ -18,7 +18,7 @@ to keep track of any changes made to the YAML that are not reflected in the obje
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -27,7 +27,7 @@ to keep track of any changes made to the YAML that are not reflected in the obje
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -77,24 +77,25 @@ to keep track of any changes made to the YAML that are <em>not</em> reflected in
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">reconcile_yaml</span><span class="op">(</span><span class="va">.mod</span><span class="op">)</span>
-
-<span class="fu">check_yaml_in_sync</span><span class="op">(</span><span class="va">.mod</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">reconcile_yaml</span><span class="op">(</span><span class="va">.mod</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">check_yaml_in_sync</span><span class="op">(</span><span class="va">.mod</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>.mod</dt>
 <dd><p><code>bbi_{.model_type}_model</code> object</p></dd>
+
 </dl></div>
     <div id="functions">
     <h2>Functions</h2>
     
-<ul><li><p><code>reconcile_yaml</code>: Use to manually reconcile model object in memory with its YAML file.
+<ul><li><p><code>reconcile_yaml()</code>: Use to manually reconcile model object in memory with its YAML file.
 Extracts YAML path from model object and pulls in YAML file.
 Any shared keys are overwritten with the values from the YAML and new keys in YAML are added to the model object.
 The md5 digest is then updated to reflect the new state.</p></li>
-<li><p><code>check_yaml_in_sync</code>: Checks that model YAML file is the same as when it was last read into the model object.
+<li><p><code>check_yaml_in_sync()</code>: Checks that model YAML file is the same as when it was last read into the model object.
 Errors if the md5 digests are not identical. This is called internally in most functions that interact with a model object.</p></li>
 </ul></div>
 
@@ -106,11 +107,11 @@ Errors if the md5 digests are not identical. This is called internally in most f
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

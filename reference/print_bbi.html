@@ -21,7 +21,7 @@ will make for prettier formatting, especially of table outputs."><meta property=
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -30,7 +30,7 @@ will make for prettier formatting, especially of table outputs."><meta property=
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -83,43 +83,56 @@ will make for prettier formatting, especially of table outputs.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S3 method for bbi_process</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, .call_limit <span class="op">=</span> <span class="fl">250</span><span class="op">)</span>
-
-<span class="co"># S3 method for bbi_nonmem_model</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for bbi_nonmem_summary</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, .digits <span class="op">=</span> <span class="fl">3</span>, .fixed <span class="op">=</span> <span class="cn">FALSE</span>, .off_diag <span class="op">=</span> <span class="cn">FALSE</span>, .nrow <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for bbi_process</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, .call_limit <span class="op">=</span> <span class="fl">250</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bbi_nonmem_model</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bbi_nonmem_summary</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, .digits <span class="op">=</span> <span class="fl">3</span>, .fixed <span class="op">=</span> <span class="cn">FALSE</span>, .off_diag <span class="op">=</span> <span class="cn">FALSE</span>, .nrow <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p>Object to format or print.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Other arguments passed on to individual methods.</p></dd>
+
+
 <dt>.call_limit</dt>
 <dd><p>Integer scalar for the max number of characters to print
 before truncating the call string. This is compared with the entire length,
 but only the positional arguments between the executable path and the first
 long option will be truncated.</p></dd>
+
+
 <dt>.digits</dt>
 <dd><p>Number of significant digits to use for parameter table. Defaults to 3.</p></dd>
+
+
 <dt>.fixed</dt>
 <dd><p>If <code>FALSE</code>, the default, omits fixed parameters from the parameter table.</p></dd>
+
+
 <dt>.off_diag</dt>
 <dd><p>If <code>FALSE</code>, the default, omits off-diagonals of OMEGA and SIGMA matrices from the parameter table.</p></dd>
+
+
 <dt>.nrow</dt>
 <dd><p>If <code>NULL</code>, the default, print all rows of the parameter table.
 Otherwise, prints only <code>.nrow</code> rows.</p></dd>
+
 </dl></div>
     <div id="functions">
     <h2>Functions</h2>
     
-<ul><li><p><code>print.bbi_process</code>: Prints the call made to bbi and whether the process is still running or has finished.</p></li>
-<li><p><code>print.bbi_nonmem_model</code>: Prints the information contained in the model object and whether the model has been run</p></li>
-<li><p><code>print.bbi_nonmem_summary</code>: Prints a high level summary of a model from a bbi_nonmem_summary object</p></li>
+<ul><li><p><code>print(bbi_process)</code>: Prints the call made to bbi and whether the process is still running or has finished.</p></li>
+<li><p><code>print(bbi_nonmem_model)</code>: Prints the information contained in the model object and whether the model has been run</p></li>
+<li><p><code>print(bbi_nonmem_summary)</code>: Prints a high level summary of a model from a bbi_nonmem_summary object</p></li>
 </ul></div>
 
   </div>
@@ -130,11 +143,11 @@ Otherwise, prints only <code>.nrow</code> rows.</p></dd>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

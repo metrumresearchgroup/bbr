@@ -19,7 +19,7 @@ modified at any time (i.e. before or after a model is submitted)."><meta propert
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -28,7 +28,7 @@ modified at any time (i.e. before or after a model is submitted)."><meta propert
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -79,23 +79,28 @@ modified at any time (i.e. before <em>or</em> after a model is submitted).</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">add_based_on</span><span class="op">(</span><span class="va">.mod</span>, <span class="va">.based_on</span><span class="op">)</span>
-
-<span class="fu">replace_all_based_on</span><span class="op">(</span><span class="va">.mod</span>, <span class="va">.based_on</span><span class="op">)</span>
-
-<span class="fu">remove_based_on</span><span class="op">(</span><span class="va">.mod</span>, <span class="va">.based_on</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">add_based_on</span><span class="op">(</span><span class="va">.mod</span>, <span class="va">.based_on</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">replace_all_based_on</span><span class="op">(</span><span class="va">.mod</span>, <span class="va">.based_on</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">remove_based_on</span><span class="op">(</span><span class="va">.mod</span>, <span class="va">.based_on</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>.mod</dt>
 <dd><p>The <code>bbi_{.model_type}_model</code> object to modify</p></dd>
+
+
 <dt>.based_on</dt>
 <dd><p>Character vector of relative paths to add or remove</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>The modified <code>bbi_{.model_type}_model</code> object</p>
+    
+
+<p>The modified <code>bbi_{.model_type}_model</code> object</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -111,13 +116,13 @@ which demonstrates the motivation and usage of this field.</p>
     <div id="functions">
     <h2>Functions</h2>
     
-<ul><li><p><code>add_based_on</code>: Append new <code>based_on</code> identifiers to a model object and corresponding YAML.</p></li>
-<li><p><code>replace_all_based_on</code>: Replaces entire <code>based_on</code> field in a model object and corresponding YAML with new values.</p></li>
-<li><p><code>remove_based_on</code>: Remove specified <code>based_on</code> identifier(s) from a model object and corresponding YAML.</p></li>
+<ul><li><p><code>add_based_on()</code>: Append new <code>based_on</code> identifiers to a model object and corresponding YAML.</p></li>
+<li><p><code>replace_all_based_on()</code>: Replaces entire <code>based_on</code> field in a model object and corresponding YAML with new values.</p></li>
+<li><p><code>remove_based_on()</code>: Remove specified <code>based_on</code> identifier(s) from a model object and corresponding YAML.</p></li>
 </ul></div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p><code><a href="copy_model_from.html">copy_model_from()</a></code> <code><a href="modify_tags.html">modify_tags()</a></code> <code><a href="modify_notes.html">modify_notes()</a></code> <code><a href="modify_description.html">modify_description()</a></code> <code><a href="modify_bbi_args.html">modify_bbi_args()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="copy_model_from.html">copy_model_from()</a></code> <code><a href="modify_tags.html">modify_tags()</a></code> <code><a href="modify_notes.html">modify_notes()</a></code> <code><a href="modify_description.html">modify_description()</a></code> <code><a href="modify_bbi_args.html">modify_bbi_args()</a></code> <code><a href="modify_star.html">modify_star()</a></code></p></div>
     </div>
 
   </div>
@@ -128,11 +133,11 @@ which demonstrates the motivation and usage of this field.</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

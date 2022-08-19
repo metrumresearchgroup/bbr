@@ -19,7 +19,7 @@ The syntax for the labeling is described in "Details" below.'><meta property="og
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -28,7 +28,7 @@ The syntax for the labeling is described in "Details" below.'><meta property="og
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -79,21 +79,24 @@ The syntax for the labeling is described in "Details" below.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">param_labels</span><span class="op">(</span><span class="va">.mod</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for bbi_nonmem_model</span>
-<span class="fu">param_labels</span><span class="op">(</span><span class="va">.mod</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for character</span>
-<span class="fu">param_labels</span><span class="op">(</span><span class="va">.mod</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">param_labels</span><span class="op">(</span><span class="va">.mod</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bbi_nonmem_model</span></span>
+<span><span class="fu">param_labels</span><span class="op">(</span><span class="va">.mod</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for character</span></span>
+<span><span class="fu">param_labels</span><span class="op">(</span><span class="va">.mod</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>.mod</dt>
 <dd><p>generic model input</p></dd>
+
+
 <dt>...</dt>
 <dd><p>arguments passed through (currently to nowhere)</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -129,8 +132,8 @@ and transform the estimates accordingly. None of that processing is done automat
     <div id="methods-by-class-">
     <h2>Methods (by class)</h2>
     
-<ul><li><p><code>bbi_nonmem_model</code>: Takes a <code>bbi_nonmem_model</code> object</p></li>
-<li><p><code>character</code>: Takes a character scalar of the raw control stream with newline character separating lines</p></li>
+<ul><li><p><code>param_labels(bbi_nonmem_model)</code>: Takes a <code>bbi_nonmem_model</code> object</p></li>
+<li><p><code>param_labels(character)</code>: Takes a character scalar of the raw control stream with newline character separating lines</p></li>
 </ul></div>
 
   </div>
@@ -141,11 +144,11 @@ and transform the estimates accordingly. None of that processing is done automat
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

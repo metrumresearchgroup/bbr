@@ -22,7 +22,7 @@ model, for example in a bootstrap or simulation."><meta property="og:image" cont
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -31,7 +31,7 @@ model, for example in a bootstrap or simulation."><meta property="og:image" cont
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -85,13 +85,13 @@ model, for example in a bootstrap or simulation.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">param_estimates_compare</span><span class="op">(</span>
-  <span class="va">.param_df</span>,
-  .orig_mod <span class="op">=</span> <span class="cn">NULL</span>,
-  .compare_cols <span class="op">=</span> <span class="fu">starts_with</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"THETA"</span>, <span class="st">"SIGMA"</span>, <span class="st">"OMEGA"</span><span class="op">)</span><span class="op">)</span>,
-  probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.025</span>, <span class="fl">0.975</span><span class="op">)</span>,
-  na.rm <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">param_estimates_compare</span><span class="op">(</span></span>
+<span>  <span class="va">.param_df</span>,</span>
+<span>  .orig_mod <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  .compare_cols <span class="op">=</span> <span class="fu">starts_with</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"THETA"</span>, <span class="st">"SIGMA"</span>, <span class="st">"OMEGA"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.025</span>, <span class="fl">0.975</span><span class="op">)</span>,</span>
+<span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -99,28 +99,39 @@ model, for example in a bootstrap or simulation.</p>
     <dl><dt>.param_df</dt>
 <dd><p>A tibble with columns for each parameter and rows for each
 model (like what's returned from <code><a href="param_estimates_batch.html">param_estimates_batch()</a></code>)</p></dd>
+
+
 <dt>.orig_mod</dt>
 <dd><p><code>bbi_model</code> object to compare <code>.param_df</code> against. If
 <code>NULL</code>, the default, only returns quantiles from <code>.param_df</code>. If passed,
 will display an additional <code>original_estimate</code> column.</p></dd>
+
+
 <dt>.compare_cols</dt>
 <dd><p>An expression that can be passed to <code><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">dplyr::select()</a></code> to
 select which columns in <code>.param_df</code> will be pivoted and summarized.
 Defaults to <code>dplyr::starts_with(c("THETA", "SIGMA", "OMEGA"))</code> (designed
-for NONMEM runs), but consider using <code><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">dplyr::matches()</a></code> to select columns
+for NONMEM runs), but consider using <code><a href="https://dplyr.tidyverse.org/reference/reexports.html" class="external-link">dplyr::matches()</a></code> to select columns
 using regex. Also see
 <a href="https://tidyselect.r-lib.org/reference/language.html" class="external-link">?tidyselect::language</a>
 for more details and options.</p></dd>
+
+
 <dt>probs</dt>
 <dd><p>Numeric vector with values between 0 and 1 to be passed through to
 <code><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">stats::quantile()</a></code>. Represents the quantiles to calculate for parameter
 estimates in <code>.param_df</code>.</p></dd>
+
+
 <dt>na.rm</dt>
 <dd><p>Logical scalar, passed through to <code><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">stats::quantile()</a></code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A tibble with the first column containing the parameter names (that
+    
+
+<p>A tibble with the first column containing the parameter names (that
 were column names in <code>.param_df</code>), the second column optionally containing
 original parameter estimates (if <code>.orig_mod</code> is passed), and subsequent
 columns containing the quantiles specified in <code>probs</code>. You can think of
@@ -136,11 +147,11 @@ and then pivoted.</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

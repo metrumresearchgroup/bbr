@@ -18,7 +18,7 @@ working directory and a set of CLI arguments."><meta property="og:image" content
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -27,7 +27,7 @@ working directory and a set of CLI arguments."><meta property="og:image" content
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -77,22 +77,27 @@ working directory and a set of CLI arguments.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">build_bbi_param_list</span><span class="op">(</span><span class="va">.mods</span>, .bbi_args <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">build_bbi_param_list</span><span class="op">(</span><span class="va">.mods</span>, .bbi_args <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>.mods</dt>
 <dd><p>A list of S3 objects of class <code>bbi_nonmem_model</code></p></dd>
+
+
 <dt>.bbi_args</dt>
 <dd><p>A named list specifying arguments to pass to bbi
 formatted like <code>list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)</code>. Run <code><a href="print_bbi_args.html">print_bbi_args()</a></code> to see valid arguments. Note that bbr does
 not support changing the output directory (including through the model or
 global YAML files).</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A list whose elements correspond to groups of models that can be
+    
+
+<p>A list whose elements correspond to groups of models that can be
 submitted in a single bbi call. Each element is itself a list with elements</p><ul><li><p><code>bbi_args</code>: a set of CLI arguments</p></li>
 <li><p><code>models</code>: a list of the elements of <code>.mods</code> in the group</p></li>
 </ul></div>
@@ -105,11 +110,11 @@ submitted in a single bbi call. Each element is itself a list with elements</p><
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

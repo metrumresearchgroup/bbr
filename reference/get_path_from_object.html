@@ -18,7 +18,7 @@ provide an easy way to retrieve the absolute path to these files."><meta propert
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -27,7 +27,7 @@ provide an easy way to retrieve the absolute path to these files."><meta propert
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -77,43 +77,43 @@ provide an easy way to retrieve the absolute path to these files.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">get_model_path</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="co"># S3 method for bbi_nonmem_model</span>
-<span class="fu">get_model_path</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="co"># S3 method for bbi_nonmem_summary</span>
-<span class="fu">get_model_path</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="co"># S3 method for bbi_log_df</span>
-<span class="fu">get_model_path</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="fu">get_output_dir</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="co"># S3 method for bbi_nonmem_model</span>
-<span class="fu">get_output_dir</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="co"># S3 method for bbi_nonmem_summary</span>
-<span class="fu">get_output_dir</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="co"># S3 method for bbi_log_df</span>
-<span class="fu">get_output_dir</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="fu">get_yaml_path</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="co"># S3 method for bbi_model</span>
-<span class="fu">get_yaml_path</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="co"># S3 method for bbi_log_df</span>
-<span class="fu">get_yaml_path</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="fu">get_config_path</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="co"># S3 method for bbi_model</span>
-<span class="fu">get_config_path</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="co"># S3 method for bbi_log_df</span>
-<span class="fu">get_config_path</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_model_path</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bbi_nonmem_model</span></span>
+<span><span class="fu">get_model_path</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bbi_nonmem_summary</span></span>
+<span><span class="fu">get_model_path</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bbi_log_df</span></span>
+<span><span class="fu">get_model_path</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">get_output_dir</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bbi_nonmem_model</span></span>
+<span><span class="fu">get_output_dir</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bbi_nonmem_summary</span></span>
+<span><span class="fu">get_output_dir</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bbi_log_df</span></span>
+<span><span class="fu">get_output_dir</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">get_yaml_path</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bbi_model</span></span>
+<span><span class="fu">get_yaml_path</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bbi_log_df</span></span>
+<span><span class="fu">get_yaml_path</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">get_config_path</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bbi_model</span></span>
+<span><span class="fu">get_config_path</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bbi_log_df</span></span>
+<span><span class="fu">get_config_path</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -123,8 +123,11 @@ provide an easy way to retrieve the absolute path to these files.</p>
 a <code>bbi_{.model_type}_model</code> object,
 <code>bbi_{.model_type}_summary</code> object,
 or a tibble of class <code>bbi_log_df</code>.</p></dd>
+
+
 <dt>.check_exists</dt>
 <dd><p>If <code>TRUE</code>, the default, will throw an error if the file does not exist</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -152,11 +155,11 @@ different interface and implementation and so are documented separately.</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

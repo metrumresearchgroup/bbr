@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -26,7 +26,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -75,7 +75,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">install_menu</span><span class="op">(</span><span class="va">.path</span>, <span class="va">.version</span>, <span class="va">.force</span>, <span class="va">.quiet</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">install_menu</span><span class="op">(</span><span class="va">.path</span>, <span class="va">.version</span>, <span class="va">.force</span>, <span class="va">.quiet</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -83,18 +83,25 @@
     <dl><dt>.path</dt>
 <dd><p>absolute path to install bbi to. See Details section for
 defaults, if nothing is passed.</p></dd>
+
+
 <dt>.version</dt>
 <dd><p>version of bbi to install. Must pass a character scalar
 corresponding to a tag found in
 <code>https://github.com/metrumresearchgroup/bbi/releases</code></p></dd>
+
+
 <dt>.force</dt>
 <dd><p>If <code>FALSE</code>, the default, skips installation if requested
 version and local version are the same. If <code>TRUE</code> forces installation if it
 will be the same version.</p></dd>
+
+
 <dt>.quiet</dt>
 <dd><p><strong>Deprecated.</strong> Use <code>options("bbr.verbose")</code> instead to control
 printing. Defaults to <code>NULL</code>, which reads <code>!getOption("bbr.verbose")</code>. If
 <code>TRUE</code>, suppresses output printed to the console.</p></dd>
+
 </dl></div>
 
   </div>
@@ -105,11 +112,11 @@ printing. Defaults to <code>NULL</code>, which reads <code>!getOption("bbr.verbo
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

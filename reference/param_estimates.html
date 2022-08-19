@@ -21,7 +21,7 @@ using param_estimates_batch() instead."><meta property="og:image" content="https
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -30,7 +30,7 @@ using param_estimates_batch() instead."><meta property="og:image" content="https
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -83,20 +83,28 @@ using <code><a href="param_estimates_batch.html">param_estimates_batch()</a></co
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">param_estimates</span><span class="op">(</span><span class="va">.summary</span><span class="op">)</span>
-
-<span class="co"># S3 method for bbi_nonmem_summary</span>
-<span class="fu">param_estimates</span><span class="op">(</span><span class="va">.summary</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">param_estimates</span><span class="op">(</span><span class="va">.summary</span>, <span class="va">.alpha</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bbi_nonmem_summary</span></span>
+<span><span class="fu">param_estimates</span><span class="op">(</span><span class="va">.summary</span>, .alpha <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>.summary</dt>
 <dd><p>A <code>bbi_{.model_type}_summary</code> object.</p></dd>
+
+
+<dt>.alpha</dt>
+<dd><p>numeric. If specified, return the p-value for each eta value on the diagonal,
+as well as whether they are below the specified value of alpha. Defaults to NULL.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>Returns a tibble with the following columns:</p><ul><li><p>parameter_names -- Parameter name ("THETA1", "THETA2", etc.)</p></li>
+    
+
+<p>Returns a tibble with the following columns:</p><ul><li><p>parameter_names -- Parameter name ("THETA1", "THETA2", etc.)</p></li>
 <li><p>estimate -- Parameter estimate</p></li>
 <li><p>stderr -- Standard Error</p></li>
 <li><p>random_effect_sd -- OMEGA and SIGMA elements in standard deviation/correlation format</p></li>
@@ -117,7 +125,7 @@ error will be thrown.</p>
     <div id="methods-by-class-">
     <h2>Methods (by class)</h2>
     
-<ul><li><p><code>bbi_nonmem_summary</code>: Takes <code>bbi_nonmem_summary</code> object, the output of <code><a href="model_summary.html">model_summary.bbi_nonmem_model()</a></code>.</p></li>
+<ul><li><p><code>param_estimates(bbi_nonmem_summary)</code>: Takes <code>bbi_nonmem_summary</code> object, the output of <code><a href="model_summary.html">model_summary.bbi_nonmem_model()</a></code>.</p></li>
 </ul></div>
     <div id="see-also">
     <h2>See also</h2>
@@ -132,11 +140,11 @@ error will be thrown.</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

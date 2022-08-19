@@ -18,7 +18,7 @@ processx::process$new()"><meta property="og:image" content="https://metrumresear
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -27,7 +27,7 @@ processx::process$new()"><meta property="og:image" content="https://metrumresear
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -77,34 +77,53 @@ processx::process$new()</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">bbi_exec</span><span class="op">(</span>
-  <span class="va">.cmd_args</span>,
-  .dir <span class="op">=</span> <span class="st">"."</span>,
-  .verbose <span class="op">=</span> <span class="cn">FALSE</span>,
-  .wait <span class="op">=</span> <span class="cn">FALSE</span>,
-  .bbi_exe_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"bbr.bbi_exe_path"</span><span class="op">)</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bbi_exec</span><span class="op">(</span></span>
+<span>  <span class="va">.cmd_args</span>,</span>
+<span>  .dir <span class="op">=</span> <span class="st">"."</span>,</span>
+<span>  .verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  .wait <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  .bbi_exe_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"bbr.bbi_exe_path"</span><span class="op">)</span>,</span>
+<span>  .check_status <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>.cmd_args</dt>
 <dd><p>A character vector of command line arguments for the execution call</p></dd>
+
+
 <dt>.dir</dt>
 <dd><p>The working directory to run command in. Defaults to "."</p></dd>
+
+
 <dt>.verbose</dt>
 <dd><p>Print stdout and stderr as process runs #### NOT IMPLEMENTED?</p></dd>
+
+
 <dt>.wait</dt>
 <dd><p>If true, don't return until process has exited.</p></dd>
+
+
 <dt>.bbi_exe_path</dt>
 <dd><p>Path to bbi executable</p></dd>
+
+
+<dt>.check_status</dt>
+<dd><p>Whether to signal an error if the command has a non-zero
+exit code.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>arguments to pass to processx::process$new()</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An S3 object of class <code>bbi_process</code> with the following elements</p><ul><li><p>process -- The process object (see ?processx::process$new for more
+    
+
+<p>An S3 object of class <code>bbi_process</code> with the following elements</p><ul><li><p>process -- The process object (see ?processx::process$new for more
 details on what you can do with this).</p></li>
 <li><p>stdout -- the stdout and stderr from the process, if <code>.wait = TRUE</code>. If
 <code>.wait = FALSE</code> this contain a message with the tempfile path where stdout
@@ -124,11 +143,11 @@ process.</p></li>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

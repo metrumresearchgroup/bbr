@@ -19,7 +19,7 @@ that directory."><meta property="og:image" content="https://metrumresearchgroup.
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -28,7 +28,7 @@ that directory."><meta property="og:image" content="https://metrumresearchgroup.
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -79,13 +79,13 @@ that directory.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">bbi_init</span><span class="op">(</span>
-  <span class="va">.dir</span>,
-  <span class="va">.nonmem_dir</span>,
-  .nonmem_version <span class="op">=</span> <span class="cn">NULL</span>,
-  .bbi_args <span class="op">=</span> <span class="cn">NULL</span>,
-  .no_default_version <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bbi_init</span><span class="op">(</span></span>
+<span>  <span class="va">.dir</span>,</span>
+<span>  <span class="va">.nonmem_dir</span>,</span>
+<span>  .nonmem_version <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  .bbi_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  .no_default_version <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -93,21 +93,30 @@ that directory.</p>
     <dl><dt>.dir</dt>
 <dd><p>Path to directory to run <code>init</code> in (and put the resulting
 <code>bbi.yaml</code> file)</p></dd>
+
+
 <dt>.nonmem_dir</dt>
 <dd><p>Path to directory with the NONMEM installation.</p></dd>
+
+
 <dt>.nonmem_version</dt>
 <dd><p>Character scalar for default version of NONMEM to use.
 If left NULL, function will exit and tell you which versions were found in
 <code>.nonmem_dir</code></p></dd>
+
+
 <dt>.bbi_args</dt>
 <dd><p>A named list specifying options to set in the newly created
 <code>bbi.yaml</code> file, formatted like <code>list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)</code>. Run <code><a href="print_bbi_args.html">print_bbi_args()</a></code> to see valid options. Note
 that bbr does not support changing the output directory (including through
 the model or global YAML files).</p></dd>
+
+
 <dt>.no_default_version</dt>
 <dd><p>If <code>TRUE</code>, force creation of bbi.yaml with
 <strong>no default NONMEM version</strong>. <code>FALSE</code> by default, and using <code>TRUE</code> is
 <em>not</em> encouraged.</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -126,11 +135,11 @@ configuration file via the <code>.config_path</code> argument.</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

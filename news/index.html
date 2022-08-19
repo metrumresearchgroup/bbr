@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -26,7 +26,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -70,28 +70,63 @@
     </div>
 
     <div class="section level2">
+<h2 class="page-header" data-toc-text="1.4.0" id="bbr-140">bbr 1.4.0<a class="anchor" aria-label="anchor" href="#bbr-140"></a></h2>
+<div class="section level3">
+<h3 id="new-features-and-changes-1-4-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-1-4-0"></a></h3>
+<ul><li><p>The new <code>.include</code> argument of <code><a href="../reference/config_log.html">config_log()</a></code>, <code><a href="../reference/run_log.html">run_log()</a></code>, and <code><a href="../reference/summary_log.html">summary_log()</a></code> limits the result to the specified run names or tags. (#484, #526)</p></li>
+<li><p>Models can now be starred. See <code><a href="../reference/modify_star.html">add_star()</a></code> and <code><a href="../reference/modify_star.html">remove_star()</a></code>. (#487)</p></li>
+<li><p>New convenience functions <code><a href="../reference/get_omega.html">get_omega()</a></code>, <code><a href="../reference/get_omega.html">get_sigma()</a></code>, and <code><a href="../reference/get_omega.html">get_theta()</a></code> return labeled values, with the <code>OMEGA</code> and <code>SIGMA</code> values expanded to a full matrix. (#515)</p></li>
+<li><p><code>param_estimates</code> gained an <code>.alpha</code> argument that’s useful for identifying the ETAs flagged by the <code>eta_pval_significant</code> heuristic. (#497)</p></li>
+<li><p><code><a href="../reference/nm_join.html">nm_join()</a></code> now aborts if the join column has duplicate values, suggesting to the caller that the table format probably needs to be widened to prevent NONMEM from truncating the values. (#533)</p></li>
+<li><p>If the caller specifies a <code>threads</code> value above one in <code>.bbi_args</code> but does <em>not</em> specify <code>parallel</code>, <code>parallel = TRUE</code> is added so that the <code>threads</code> value is in effect. (#514)</p></li>
+<li><p>New functions <code><a href="../reference/check_nonmem_finished.html">check_nonmem_finished()</a></code> and <code><a href="../reference/wait_for_nonmem.html">wait_for_nonmem()</a></code> enable checking and waiting on models submitted to the grid. (#480)</p></li>
+<li><p>Added <code><a href="../reference/test_threads.html">test_threads()</a></code> for benchmarking simulation run times with various threads values. (#473, #489, #519, #542)</p></li>
+<li><p>Added <code><a href="../reference/check_run_times.html">check_run_times()</a></code> for checking the estimation times of model runs. (#473, #489, #511)</p></li>
+<li><p>Added <code><a href="../reference/delete_models.html">delete_models()</a></code> for removing all model files associated with specified model tags. (#473)</p></li>
+<li><p>Updated parallel tips and tricks vignette to reference new <code><a href="../reference/test_threads.html">test_threads()</a></code> function and related helpers. (#503)</p></li>
+<li><p>bbi encodes “unspecified” and <code>NA</code> values as <code>-999999999</code>. bbr now maps all occurrences of this value to <code>NA</code> when creating a model summary object. (#524)</p></li>
+<li><p>When bbi v3.2.0 or later is available, <code><a href="../reference/model_summaries.html">model_summaries()</a></code> now uses bbi’s concurrency rather than calling <code><a href="../reference/model_summary.html">model_summary()</a></code> on each model, leading to a speed up when many models are passed. (#527)</p></li>
+<li><p><code><a href="../reference/model_diff.html">model_diff()</a></code> learned to print a message rather than call <code><a href="https://rdrr.io/pkg/diffobj/man/diffFile.html" class="external-link">diffobj::diffFile()</a></code> when there are no changes to avoid confusingly displaying the entire file. (#522)</p></li>
+<li><p><code>use_bbi</code> now creates leading directories if needed. (#499)</p></li>
+<li><p><code>new_model</code> now ignores the extension of the supplied path. (#510)</p></li>
+<li><p>The output of <code>print_bbi_args</code> has been reworked to make it easier to digest. (#537)</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-1-4-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-4-0"></a></h3>
+<ul><li><p><code><a href="../reference/nm_join.html">nm_join()</a></code> did not reliably sort the resulting data frame when passed <code>.superset = TRUE</code>. (#508)</p></li>
+<li><p><code><a href="../reference/nm_file.html">nm_file()</a></code> and friends now detect duplicate column names and make them unique. (#530, #539)</p></li>
+<li><p>Unlike <code><a href="../reference/submit_model.html">submit_model()</a></code>, <code><a href="../reference/submit_models.html">submit_models()</a></code> didn’t abort when <code>bbi.yaml</code> was missing. (#496)</p></li>
+<li><p>In combination with a change in bbi v3.2.0, <code><a href="../reference/model_summary.html">model_summary()</a></code> can now handle <code>.lst</code> files that have <code>NaN</code> objective function values. (#506)</p></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="1.3.1" id="bbr-131">bbr 1.3.1<a class="anchor" aria-label="anchor" href="#bbr-131"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-1-3-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-3-1"></a></h3>
+<ul><li>Added support for <code>$TAB</code> syntax in <code><a href="../reference/nm_tables.html">nm_table_files()</a></code>. (#466)</li></ul></div>
+<div class="section level3">
+<h3 id="developer-facing-changes-1-3-1">Developer-facing changes<a class="anchor" aria-label="anchor" href="#developer-facing-changes-1-3-1"></a></h3>
+<ul><li>Added YAML file and script in <code>inst/validation/</code> for creating validation documents with <code>mrgvalidate</code>. (#469)</li></ul></div>
+</div>
+    <div class="section level2">
 <h2 class="page-header" data-toc-text="1.3.0" id="bbr-130">bbr 1.3.0<a class="anchor" aria-label="anchor" href="#bbr-130"></a></h2>
 <div class="section level3">
 <h3 id="new-features-1-3-0">New features<a class="anchor" aria-label="anchor" href="#new-features-1-3-0"></a></h3>
-<ul><li>Added <code><a href="../reference/param_estimates_compare.html">param_estimates_compare()</a></code> for comparing the result of <code><a href="../reference/param_estimates_batch.html">param_estimates_batch()</a></code> to a single model (or, more generally, for comparing a set of parameter estimates). (#457)</li>
-</ul></div>
+<ul><li>Added <code><a href="../reference/param_estimates_compare.html">param_estimates_compare()</a></code> for comparing the result of <code><a href="../reference/param_estimates_batch.html">param_estimates_batch()</a></code> to a single model (or, more generally, for comparing a set of parameter estimates). (#457)</li></ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-1-3-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-3-0"></a></h3>
 <ul><li>
-<code><a href="../reference/param_estimates_batch.html">param_estimates_batch()</a></code> now transforms the parameter names that come from <code>bbi nonmem params ...</code>, replacing <code>_</code> with <code>,</code> to match the format that is used elsewhere and expected by downstream tools. (#457)</li>
-</ul></div>
+<code><a href="../reference/param_estimates_batch.html">param_estimates_batch()</a></code> now transforms the parameter names that come from <code>bbi nonmem params ...</code>, replacing <code>_</code> with <code>,</code> to match the format that is used elsewhere and expected by downstream tools. (#457)</li></ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="1.2.1" id="bbr-121">bbr 1.2.1<a class="anchor" aria-label="anchor" href="#bbr-121"></a></h2>
 <div class="section level3">
 <h3 id="docs-1-2-1">Docs<a class="anchor" aria-label="anchor" href="#docs-1-2-1"></a></h3>
-<ul><li>New functions from the 1.2.0 release are now mentioned in the docs. (#440)</li>
-</ul></div>
+<ul><li>New functions from the 1.2.0 release are now mentioned in the docs. (#440)</li></ul></div>
 <div class="section level3">
 <h3 id="changes-1-2-1">Changes<a class="anchor" aria-label="anchor" href="#changes-1-2-1"></a></h3>
 <ul><li>
-<code><a href="../reference/use_bbi.html">use_bbi()</a></code> no longer depends on external tools such as <code>wget</code> and <code>tar</code>, hopefully improving its reliability across different systems. (#448)</li>
-</ul></div>
+<code><a href="../reference/use_bbi.html">use_bbi()</a></code> no longer depends on external tools such as <code>wget</code> and <code>tar</code>, hopefully improving its reliability across different systems. (#448)</li></ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-1-2-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-2-1"></a></h3>
 <ul><li><p><code><a href="../reference/use_bbi.html">use_bbi()</a></code> printed the wrong current release when an older version was requested. (#144)</p></li>
@@ -121,12 +156,10 @@
 <h2 class="page-header" data-toc-text="1.1.4" id="bbr-114">bbr 1.1.4<a class="anchor" aria-label="anchor" href="#bbr-114"></a></h2>
 <div class="section level3">
 <h3 id="docs-1-1-4">Docs<a class="anchor" aria-label="anchor" href="#docs-1-1-4"></a></h3>
-<ul><li>Added “Running NONMEM in Parallel: bbr Tips and Tricks” vignette. (#407)</li>
-</ul></div>
+<ul><li>Added “Running NONMEM in Parallel: bbr Tips and Tricks” vignette. (#407)</li></ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-1-1-4">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-1-4"></a></h3>
-<ul><li>Fixed bug where adding tags as a list instead of a character vector broke downstream functions like <code><a href="../reference/collapse_to_string.html">collapse_to_string()</a></code> (#393)</li>
-</ul></div>
+<ul><li>Fixed bug where adding tags as a list instead of a character vector broke downstream functions like <code><a href="../reference/collapse_to_string.html">collapse_to_string()</a></code> (#393)</li></ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="1.1.3" id="bbr-113">bbr 1.1.3<a class="anchor" aria-label="anchor" href="#bbr-113"></a></h2>
@@ -148,8 +181,7 @@
 <h2 class="page-header" data-toc-text="1.1.1" id="bbr-111">bbr 1.1.1<a class="anchor" aria-label="anchor" href="#bbr-111"></a></h2>
 <div class="section level3">
 <h3 id="bug-fixes-1-1-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-1-1"></a></h3>
-<ul><li>There was a bug where submitting more than roughly 250 models at time via <code><a href="../reference/submit_models.html">submit_models()</a></code> (e.g. for bootstrapping) would hang indefinitely. This had something to do with <a href="https://github.com/r-lib/processx/issues/286" class="external-link">a bug in processx</a>. It was fixed (in <code>bbr</code>) by routing the stdout and stderr to a temp file and then reading from it when necessary, instead of relying on <code>processx</code> to poll the process. (#374)</li>
-</ul></div>
+<ul><li>There was a bug where submitting more than roughly 250 models at time via <code><a href="../reference/submit_models.html">submit_models()</a></code> (e.g. for bootstrapping) would hang indefinitely. This had something to do with <a href="https://github.com/r-lib/processx/issues/286" class="external-link">a bug in processx</a>. It was fixed (in <code>bbr</code>) by routing the stdout and stderr to a temp file and then reading from it when necessary, instead of relying on <code>processx</code> to poll the process. (#374)</li></ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="1.1.0" id="bbr-110">bbr 1.1.0<a class="anchor" aria-label="anchor" href="#bbr-110"></a></h2>
@@ -163,12 +195,10 @@
 <div class="section level3">
 <h3 id="bug-fixes-1-1-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-1-0"></a></h3>
 <ul><li>
-<code><a href="../reference/param_estimates.html">param_estimates()</a></code> now correctly errors when a Bayesian method is used but is <em>not</em> the final method. (#344)</li>
-</ul></div>
+<code><a href="../reference/param_estimates.html">param_estimates()</a></code> now correctly errors when a Bayesian method is used but is <em>not</em> the final method. (#344)</li></ul></div>
 <div class="section level3">
 <h3 id="developer-facing-changes-1-1-0">Developer-facing changes<a class="anchor" aria-label="anchor" href="#developer-facing-changes-1-1-0"></a></h3>
-<ul><li>Added a <code>bbi_model</code> parent class to <code>bbi_nonmem_model</code> and <code>bbi_nonmem_summary</code> objects. Many of the helpers in <code>get-path-from-object.R</code> now dispatch on this class. This had been discussed in the past but was primarily done now in preparation for beginning development for Stan modeling, which will create <code>bbi_stan_model</code> and <code>bbi_stan_summary</code> objects that will also inherit from this parent class. (#332)</li>
-</ul></div>
+<ul><li>Added a <code>bbi_model</code> parent class to <code>bbi_nonmem_model</code> and <code>bbi_nonmem_summary</code> objects. Many of the helpers in <code>get-path-from-object.R</code> now dispatch on this class. This had been discussed in the past but was primarily done now in preparation for beginning development for Stan modeling, which will create <code>bbi_stan_model</code> and <code>bbi_stan_summary</code> objects that will also inherit from this parent class. (#332)</li></ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="1.0.0" id="bbr-100">bbr 1.0.0<a class="anchor" aria-label="anchor" href="#bbr-100"></a></h2>
@@ -197,8 +227,7 @@
 <p><strong>This package has been renamed to from <code>rbabylon</code> to <code>bbr</code></strong> and the accompanying command-line tool has been renamed from <code>babylon</code> to <code>bbi</code> (which was already its alias, used throughout the package). Any mentions of <code>babylon</code> and <code>rbabylon</code> throughout the package have been renamed accordingly. Mentions of either in the older parts of this <code>NEWS.md</code> document were left as is for historical purposes.</p>
 <div class="section level3">
 <h3 id="new-features-and-changes-0-12-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-12-0"></a></h3>
-<ul><li>The minimum compatible version of <code>bbi</code> is increased to <code>3.0.0</code>.</li>
-</ul></div>
+<ul><li>The minimum compatible version of <code>bbi</code> is increased to <code>3.0.0</code>.</li></ul></div>
 </div>
   </div>
 
@@ -210,11 +239,11 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

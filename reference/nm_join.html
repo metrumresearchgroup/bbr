@@ -26,7 +26,7 @@ joins. This printing can be suppressed by setting options(bbr.verbose = FALSE)."
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@ joins. This printing can be suppressed by setting options(bbr.verbose = FALSE)."
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -93,13 +93,13 @@ joins. This <strong>printing can be suppressed</strong> by setting <code>options
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">nm_join</span><span class="op">(</span>
-  <span class="va">.mod</span>,
-  .join_col <span class="op">=</span> <span class="st">"NUM"</span>,
-  .files <span class="op">=</span> <span class="fu"><a href="nm_tables.html">nm_table_files</a></span><span class="op">(</span><span class="va">.mod</span><span class="op">)</span>,
-  .superset <span class="op">=</span> <span class="cn">FALSE</span>,
-  .bbi_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>no_grd_file <span class="op">=</span> <span class="cn">TRUE</span>, no_shk_file <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">nm_join</span><span class="op">(</span></span>
+<span>  <span class="va">.mod</span>,</span>
+<span>  .join_col <span class="op">=</span> <span class="st">"NUM"</span>,</span>
+<span>  .files <span class="op">=</span> <span class="fu"><a href="nm_tables.html">nm_table_files</a></span><span class="op">(</span><span class="va">.mod</span><span class="op">)</span>,</span>
+<span>  .superset <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  .bbi_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>no_grd_file <span class="op">=</span> <span class="cn">TRUE</span>, no_shk_file <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -107,25 +107,34 @@ joins. This <strong>printing can be suppressed</strong> by setting <code>options
     <dl><dt>.mod</dt>
 <dd><p>A <code>bbi_nonmem_model</code> or <code>bbi_nonmem_summary</code> object, or a path to
 a NONMEM run.</p></dd>
+
+
 <dt>.join_col</dt>
 <dd><p>Character column name to use to join table files. Defaults to
 <code>NUM</code>. See Details.</p></dd>
+
+
 <dt>.files</dt>
 <dd><p>Character vector of file paths to table files to read in.
 Defaults to calling <code><a href="nm_tables.html">nm_table_files()</a></code> on <code>.mod</code>, which will parse all file
 names from <code>$TABLE</code> blocks in the control stream. If passing manually,
 paths should be either absolute, or relative to <code>get_output_dir(.mod)</code>.</p></dd>
+
+
 <dt>.superset</dt>
 <dd><p>If <code>FALSE</code>, the default, the data will be joined to the
 NONMEM output and if <code>TRUE</code>, the NONMEM output will be joined to the data;
 that is, if you use <code>.superset</code>, you will get the same number of rows as
 you have in the input data and NONMEM output columns like <code>PRED</code> and
 <code>CWRES</code> will be filled with <code>NA</code>.</p></dd>
+
+
 <dt>.bbi_args</dt>
 <dd><p>Named list passed to <code>model_summary(.bbi_args)</code>. See
 <code><a href="print_bbi_args.html">print_bbi_args()</a></code> for valid options. Defaults to <code>list(no_grd_file = TRUE, no_shk_file = TRUE)</code> because <code><a href="model_summary.html">model_summary()</a></code> is only called internally to
 extract the number of records and individuals, so those files are
 irrelevant.</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -156,6 +165,10 @@ printed about any columns dropped this way.</p>
 data <em>and</em> at least one of the table files, the <code>DV</code> column from the input
 data will be renamed to <code>DV.DATA</code> and the column from the table file kept as
 <code>DV</code>.</p>
+<p><strong>Duplicate Rows Warning for Join Column</strong></p>
+<p>If there are duplicate rows found in the specified <code>.join_col</code>, a warning will be raised specifying a subset of the repeated rows.
+Duplicates may be caused by lack of output width. <code>FORMAT</code> may be need to be stated in control stream to have sufficient
+width to avoid truncating <code>.join_col</code>.</p>
 <p><strong>Multiple tables per file incompatibility</strong></p>
 <p>Because <code><a href="nm_tables.html">nm_tables()</a></code> calls <code><a href="nm_file.html">nm_file()</a></code> internally, it is <em>not</em> compatible
 with multiple tables written to a single file. See "Details" in <code><a href="nm_file.html">nm_file()</a></code>
@@ -174,11 +187,11 @@ for alternatives.</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

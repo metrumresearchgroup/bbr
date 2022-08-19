@@ -20,7 +20,7 @@ If neither exists and .check_exists = TRUE, throw an error."><meta property="og:
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -29,7 +29,7 @@ If neither exists and .check_exists = TRUE, throw an error."><meta property="og:
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -81,7 +81,7 @@ If neither exists and <code>.check_exists = TRUE</code>, throw an error.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">find_nonmem_model_file_path</span><span class="op">(</span><span class="va">.path</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">find_nonmem_model_file_path</span><span class="op">(</span><span class="va">.path</span>, .check_exists <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -89,13 +89,21 @@ If neither exists and <code>.check_exists = TRUE</code>, throw an error.</p>
     <dl><dt>.path</dt>
 <dd><p>File path to a NONMEM model file (control stream) with either
 <code>.ctl</code> or <code>.mod</code> extension.</p></dd>
+
+
 <dt>.check_exists</dt>
 <dd><p>If <code>TRUE</code>, the default, will throw an error if the file does not exist</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>The path to the model file, if it exists. If the model file does not
-exist and <code>.check_exists = FALSE</code>, a string that is <code>.path</code> with the <code>.ctl</code>extension.</p>
+    
+
+<p>The path to the model file, if it exists. If the model file does not
+exist and <code>.check_exists = FALSE</code>, a string that is <code>.path</code> with the <code>.ctl</code></p>
+
+
+<p>extension.</p>
     </div>
 
   </div>
@@ -106,11 +114,11 @@ exist and <code>.check_exists = FALSE</code>, a string that is <code>.path</code
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

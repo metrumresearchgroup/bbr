@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -26,7 +26,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -75,27 +75,27 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">get_based_on</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="co"># S3 method for default</span>
-<span class="fu">get_based_on</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="co"># S3 method for character</span>
-<span class="fu">get_based_on</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="co"># S3 method for bbi_run_log_df</span>
-<span class="fu">get_based_on</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="fu">get_model_ancestry</span><span class="op">(</span><span class="va">.bbi_object</span><span class="op">)</span>
-
-<span class="co"># S3 method for default</span>
-<span class="fu">get_model_ancestry</span><span class="op">(</span><span class="va">.bbi_object</span><span class="op">)</span>
-
-<span class="co"># S3 method for character</span>
-<span class="fu">get_model_ancestry</span><span class="op">(</span><span class="va">.bbi_object</span><span class="op">)</span>
-
-<span class="co"># S3 method for bbi_run_log_df</span>
-<span class="fu">get_model_ancestry</span><span class="op">(</span><span class="va">.bbi_object</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_based_on</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for default</span></span>
+<span><span class="fu">get_based_on</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for character</span></span>
+<span><span class="fu">get_based_on</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bbi_run_log_df</span></span>
+<span><span class="fu">get_based_on</span><span class="op">(</span><span class="va">.bbi_object</span>, .check_exists <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">get_model_ancestry</span><span class="op">(</span><span class="va">.bbi_object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for default</span></span>
+<span><span class="fu">get_model_ancestry</span><span class="op">(</span><span class="va">.bbi_object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for character</span></span>
+<span><span class="fu">get_model_ancestry</span><span class="op">(</span><span class="va">.bbi_object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bbi_run_log_df</span></span>
+<span><span class="fu">get_model_ancestry</span><span class="op">(</span><span class="va">.bbi_object</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -106,9 +106,12 @@ a <code>bbi_{.model_type}_model</code> object,
 a  file path to a model,
 a tibble of class <code>bbi_run_log_df</code>,
 or some other custom object containing model data.</p></dd>
+
+
 <dt>.check_exists</dt>
 <dd><p>If <code>FALSE</code>, the default, function will return all paths in <code>based_on</code> regardless of whether they point to an existing file.
 If <code>TRUE</code>, function will check if a file exists at each path in <code>based_on</code> and error if one does not.</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -125,10 +128,10 @@ As long as the YAML has not moved since it was read into memory, these paths wil
     <div id="methods-by-class-">
     <h2>Methods (by class)</h2>
     
-<ul><li><p><code>default</code>: The default method attempts to extract the path from any object passed to it,
+<ul><li><p><code>get_based_on(default)</code>: The default method attempts to extract the path from any object passed to it,
 but is designed for a list of class <code>bbi_{.model_type}_model</code> or something similar.</p></li>
-<li><p><code>character</code>: Takes a character scalar of a path to a model that can be loaded with <code>read_model(.bbi_object)</code>.</p></li>
-<li><p><code>bbi_run_log_df</code>: Takes a tibble of class <code>bbi_run_log_df</code> and returns a list containing one character vector of paths for each row of the tibble.</p></li>
+<li><p><code>get_based_on(character)</code>: Takes a character scalar of a path to a model that can be loaded with <code>read_model(.bbi_object)</code>.</p></li>
+<li><p><code>get_based_on(bbi_run_log_df)</code>: Takes a tibble of class <code>bbi_run_log_df</code> and returns a list containing one character vector of paths for each row of the tibble.</p></li>
 </ul></div>
 
   </div>
@@ -139,11 +142,11 @@ but is designed for a list of class <code>bbi_{.model_type}_model</code> or some
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

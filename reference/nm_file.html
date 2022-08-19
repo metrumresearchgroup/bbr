@@ -20,7 +20,7 @@ setting options(bbr.verbose = FALSE)."><meta property="og:image" content="https:
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -29,7 +29,7 @@ setting options(bbr.verbose = FALSE)."><meta property="og:image" content="https:
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -81,15 +81,15 @@ setting <code>options(bbr.verbose = FALSE)</code>.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">nm_file</span><span class="op">(</span><span class="va">.mod</span>, .suffix <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">nm_grd</span><span class="op">(</span><span class="va">.mod</span>, .rename <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="fu">nm_tab</span><span class="op">(</span><span class="va">.mod</span><span class="op">)</span>
-
-<span class="fu">nm_par_tab</span><span class="op">(</span><span class="va">.mod</span><span class="op">)</span>
-
-<span class="fu">nm_data</span><span class="op">(</span><span class="va">.mod</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">nm_file</span><span class="op">(</span><span class="va">.mod</span>, .suffix <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">nm_grd</span><span class="op">(</span><span class="va">.mod</span>, .rename <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">nm_tab</span><span class="op">(</span><span class="va">.mod</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">nm_par_tab</span><span class="op">(</span><span class="va">.mod</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">nm_data</span><span class="op">(</span><span class="va">.mod</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -98,19 +98,28 @@ setting <code>options(bbr.verbose = FALSE)</code>.</p>
 <dd><p>Either a <code>bbi_nonmem_model</code>, <code>bbi_nonmem_summary</code>, or a path to a
 file to read in. If passing model object to <code>nm_file()</code>, must also pass <code>.suffix</code> that
 will be passed through to <code><a href="build_path_from_model.html">build_path_from_model()</a></code>.</p></dd>
+
+
 <dt>.suffix</dt>
 <dd><p>Character vector to append the end of the absolute model path.
 Will be appended <em>as is</em> so, if passing a file extension, be sure to included the leading <code>"."</code>.
 See examples.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>arguments passed through to methods. (Currently none.)</p></dd>
+
+
 <dt>.rename</dt>
 <dd><p>If <code>TRUE</code>, the default, will rename <code>.grd</code> columns to the
 relevant parameter names. Otherwise will leave column names as is.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A tibble with the data from the specified file and estimation method.
+    
+
+<p>A tibble with the data from the specified file and estimation method.
 All column names will be converted to uppercase.</p>
     </div>
     <div id="details">
@@ -127,13 +136,13 @@ consider using
     <div id="functions">
     <h2>Functions</h2>
     
-<ul><li><p><code>nm_grd</code>: Reads <code>.grd</code> file from a <code>bbi_nonmem_model</code> or
+<ul><li><p><code>nm_grd()</code>: Reads <code>.grd</code> file from a <code>bbi_nonmem_model</code> or
 <code>bbi_nonmem_summary</code> object</p></li>
-<li><p><code>nm_tab</code>: Reads <code>{get_model_id(.mod)}.tab</code> file from a
+<li><p><code>nm_tab()</code>: Reads <code>{get_model_id(.mod)}.tab</code> file from a
 <code>bbi_nonmem_model</code> or <code>bbi_nonmem_summary</code> object</p></li>
-<li><p><code>nm_par_tab</code>: Reads <code>{get_model_id(.mod)}par.tab</code> file from a
+<li><p><code>nm_par_tab()</code>: Reads <code>{get_model_id(.mod)}par.tab</code> file from a
 <code>bbi_nonmem_model</code> or <code>bbi_nonmem_summary</code> object</p></li>
-<li><p><code>nm_data</code>: Reads the input data file from a <code>bbi_nonmem_model</code> or
+<li><p><code>nm_data()</code>: Reads the input data file from a <code>bbi_nonmem_model</code> or
 <code>bbi_nonmem_summary</code> object</p></li>
 </ul></div>
     <div id="see-also">
@@ -149,11 +158,11 @@ consider using
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

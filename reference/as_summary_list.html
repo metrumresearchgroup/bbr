@@ -20,7 +20,7 @@ Note this is primarily intended as a developer function, though it was exposed b
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -29,7 +29,7 @@ Note this is primarily intended as a developer function, though it was exposed b
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -81,21 +81,22 @@ Note this is primarily intended as a developer function, though it was exposed b
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">as_summary_list</span><span class="op">(</span><span class="va">.sums</span><span class="op">)</span>
-
-<span class="co"># S3 method for bbi_summary_log_df</span>
-<span class="fu">as_summary_list</span><span class="op">(</span><span class="va">.sums</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">as_summary_list</span><span class="op">(</span><span class="va">.sums</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bbi_summary_log_df</span></span>
+<span><span class="fu">as_summary_list</span><span class="op">(</span><span class="va">.sums</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>.sums</dt>
 <dd><p>Object to convert.</p></dd>
+
 </dl></div>
     <div id="methods-by-class-">
     <h2>Methods (by class)</h2>
     
-<ul><li><p><code>bbi_summary_log_df</code>: Convert a <code>bbi_summary_log_df</code> into a <code>bbi_summary_list</code></p></li>
+<ul><li><p><code>as_summary_list(bbi_summary_log_df)</code>: Convert a <code>bbi_summary_log_df</code> into a <code>bbi_summary_list</code></p></li>
 </ul></div>
 
   </div>
@@ -106,11 +107,11 @@ Note this is primarily intended as a developer function, though it was exposed b
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

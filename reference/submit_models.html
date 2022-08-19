@@ -18,7 +18,7 @@ few external calls as possible (see "Details").'><meta property="og:image" conte
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -27,7 +27,7 @@ few external calls as possible (see "Details").'><meta property="og:image" conte
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -77,55 +77,68 @@ few external calls as possible (see "Details").</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">submit_models</span><span class="op">(</span>
-  <span class="va">.mods</span>,
-  .bbi_args <span class="op">=</span> <span class="cn">NULL</span>,
-  .mode <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"bbr.bbi_exe_mode"</span><span class="op">)</span>,
-  <span class="va">...</span>,
-  .config_path <span class="op">=</span> <span class="cn">NULL</span>,
-  .wait <span class="op">=</span> <span class="cn">TRUE</span>,
-  .dry_run <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for list</span>
-<span class="fu">submit_models</span><span class="op">(</span>
-  <span class="va">.mods</span>,
-  .bbi_args <span class="op">=</span> <span class="cn">NULL</span>,
-  .mode <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"bbr.bbi_exe_mode"</span><span class="op">)</span>,
-  <span class="va">...</span>,
-  .config_path <span class="op">=</span> <span class="cn">NULL</span>,
-  .wait <span class="op">=</span> <span class="cn">TRUE</span>,
-  .dry_run <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">submit_models</span><span class="op">(</span></span>
+<span>  <span class="va">.mods</span>,</span>
+<span>  .bbi_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  .mode <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"bbr.bbi_exe_mode"</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  .config_path <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  .wait <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  .dry_run <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for list</span></span>
+<span><span class="fu">submit_models</span><span class="op">(</span></span>
+<span>  <span class="va">.mods</span>,</span>
+<span>  .bbi_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  .mode <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"bbr.bbi_exe_mode"</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  .config_path <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  .wait <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  .dry_run <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>.mods</dt>
 <dd><p>The model objects to submit.</p></dd>
+
+
 <dt>.bbi_args</dt>
 <dd><p>A named list specifying arguments to pass to bbi
 formatted like <code>list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 4)</code>. Run <code><a href="print_bbi_args.html">print_bbi_args()</a></code> to see valid arguments. Note that bbr does
 not support changing the output directory (including through the model or
 global YAML files).</p></dd>
+
+
 <dt>.mode</dt>
 <dd><p>Either <code>"sge"</code>, the default, to submit model(s) to the grid or
 <code>"local"</code> for local execution. This can be passed directly to this argument
 or set globally with <code>options("bbr.bbi_exe_mode")</code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>args passed through to <code><a href="bbi_exec.html">bbi_exec()</a></code></p></dd>
+
+
 <dt>.config_path</dt>
 <dd><p>Path to a bbi configuration file. If <code>NULL</code>, the
 default, will attempt to use a <code>bbi.yaml</code> in the same directory as the
 model.</p></dd>
+
+
 <dt>.wait</dt>
 <dd><p>If <code>TRUE</code>, the default, wait for the bbi process to return
 before this function call returns. If <code>FALSE</code> function will return while
 bbi process runs in the background.</p></dd>
+
+
 <dt>.dry_run</dt>
 <dd><p>Returns an object detailing the command that would be run,
 insted of running it. This is primarily for testing but also a debugging
 tool.</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -137,7 +150,7 @@ model YAML, or specified globally in <code>bbi.yaml</code>.</p>
     <div id="methods-by-class-">
     <h2>Methods (by class)</h2>
     
-<ul><li><p><code>list</code>: Takes a list of <code>bbi_nonmem_model</code> objects.</p></li>
+<ul><li><p><code>submit_models(list)</code>: Takes a list of <code>bbi_nonmem_model</code> objects.</p></li>
 </ul></div>
     <div id="see-also">
     <h2>See also</h2>
@@ -152,11 +165,11 @@ model YAML, or specified globally in <code>bbi.yaml</code>.</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

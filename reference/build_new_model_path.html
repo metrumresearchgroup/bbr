@@ -23,7 +23,7 @@ be treated as relative to the working directory of .parent_mod."><meta property=
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -32,7 +32,7 @@ be treated as relative to the working directory of .parent_mod."><meta property=
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -85,13 +85,15 @@ be treated as relative to the working directory of <code>.parent_mod</code>.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">build_new_model_path</span><span class="op">(</span><span class="va">.parent_mod</span>, <span class="va">.new_model</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">build_new_model_path</span><span class="op">(</span><span class="va">.parent_mod</span>, <span class="va">.new_model</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>.parent_mod</dt>
 <dd><p>Model to copy from</p></dd>
+
+
 <dt>.new_model</dt>
 <dd><p>Path to the new model, either absolute or relative to the
 path to <code>.parent_mod</code>. Represents an absolute model path, which is the path
@@ -99,10 +101,13 @@ to the YAML file and model file, both without extension, and the output
 directory (once the model is run). Numeric values will be coerced to
 character. If <code>NULL</code>, the default, will try to increment to the next integer
 in the destination directory. See examples for usage.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>absolute file path to save new model to (without file extension)</p>
+    
+
+<p>absolute file path to save new model to (without file extension)</p>
     </div>
 
   </div>
@@ -113,11 +118,11 @@ in the destination directory. See examples for usage.</p></dd>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

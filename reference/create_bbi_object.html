@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -26,7 +26,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -75,51 +75,64 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">create_model_object</span><span class="op">(</span><span class="va">res</span>, <span class="va">save_yaml</span><span class="op">)</span>
-
-<span class="fu">create_summary_object</span><span class="op">(</span><span class="va">res</span>, .model_type <span class="op">=</span> <span class="va">SUPPORTED_MOD_TYPES</span><span class="op">)</span>
-
-<span class="fu">create_summary_list</span><span class="op">(</span><span class="va">res</span><span class="op">)</span>
-
-<span class="fu">create_process_object</span><span class="op">(</span><span class="va">res</span><span class="op">)</span>
-
-<span class="fu">create_run_log_object</span><span class="op">(</span><span class="va">log_df</span><span class="op">)</span>
-
-<span class="fu">create_config_log_object</span><span class="op">(</span><span class="va">log_df</span><span class="op">)</span>
-
-<span class="fu">create_summary_log_object</span><span class="op">(</span><span class="va">log_df</span><span class="op">)</span>
-
-<span class="fu">create_log_df_impl</span><span class="op">(</span><span class="va">log_df</span>, <span class="va">.class</span>, <span class="va">.req_cols</span>, <span class="va">.key</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">create_model_object</span><span class="op">(</span><span class="va">res</span>, <span class="va">save_yaml</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">create_summary_object</span><span class="op">(</span><span class="va">res</span>, .model_type <span class="op">=</span> <span class="va">SUPPORTED_MOD_TYPES</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">create_summary_list</span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">create_process_object</span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">create_run_log_object</span><span class="op">(</span><span class="va">log_df</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">create_config_log_object</span><span class="op">(</span><span class="va">log_df</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">create_summary_log_object</span><span class="op">(</span><span class="va">log_df</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">create_log_df_impl</span><span class="op">(</span><span class="va">log_df</span>, <span class="va">.class</span>, <span class="va">.req_cols</span>, <span class="va">.key</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>res</dt>
 <dd><p>List to attempt to assign the class to</p></dd>
+
+
 <dt>save_yaml</dt>
 <dd><p>Logical scalar for whether to save the newly created model object to its corresponding YAML file and update the md5 hash.</p></dd>
+
+
 <dt>.model_type</dt>
 <dd><p>Character scalar of a valid model type (currently either <code>nonmem</code> or <code>stan</code>)</p></dd>
+
+
 <dt>log_df</dt>
 <dd><p>data.frame or tibble to attempt to assign the class to</p></dd>
+
+
 <dt>.class</dt>
 <dd><p>Character scalar of the class to assign</p></dd>
+
+
 <dt>.req_cols</dt>
 <dd><p>Character vector of required columns</p></dd>
+
+
 <dt>.key</dt>
 <dd><p>Character scalar of column name that will be treated as a primary key. Must be a type character, unique, and have no NA's or NULL's.</p></dd>
+
 </dl></div>
     <div id="functions">
     <h2>Functions</h2>
     
-<ul><li><p><code>create_model_object</code>: Creates list object of class <code>bbi_{.model_type}_model</code> from named list with <code>MODEL_REQ_INPUT_KEYS</code></p></li>
-<li><p><code>create_summary_object</code>: Create list object of <code>bbi_{.model_type}_summary</code> class, first checking that all the required keys are present.</p></li>
-<li><p><code>create_summary_list</code>: Create list output from <code><a href="model_summaries.html">model_summaries()</a></code>. Each element will contain a <code>bbi_{.model_type}_summary</code> object, as well as some metadata about possible errors.</p></li>
-<li><p><code>create_process_object</code>: Create list object of <code>bbi_process</code> class, first checking that all the required keys are present.</p></li>
-<li><p><code>create_run_log_object</code>: Create tibble object of <code>bbi_run_log_df</code> class, first checking that all the required columns are present.</p></li>
-<li><p><code>create_config_log_object</code>: Create tibble object of <code>bbi_config_log_df</code> class, first checking that all the required columns are present.</p></li>
-<li><p><code>create_summary_log_object</code>: Create tibble object of <code>bbi_summary_log_df</code> class, first checking that all the required columns are present.</p></li>
-<li><p><code>create_log_df_impl</code>: Implementation function used to create objects of class <code>bbi_summary_log_df</code>, <code>bbi_config_log_df</code>, and <code>bbi_summary_log_df</code></p></li>
+<ul><li><p><code>create_model_object()</code>: Creates list object of class <code>bbi_{.model_type}_model</code> from named list with <code>MODEL_REQ_INPUT_KEYS</code></p></li>
+<li><p><code>create_summary_object()</code>: Create list object of <code>bbi_{.model_type}_summary</code> class, first checking that all the required keys are present.</p></li>
+<li><p><code>create_summary_list()</code>: Create list output from <code><a href="model_summaries.html">model_summaries()</a></code>. Each element will contain a <code>bbi_{.model_type}_summary</code> object, as well as some metadata about possible errors.</p></li>
+<li><p><code>create_process_object()</code>: Create list object of <code>bbi_process</code> class, first checking that all the required keys are present.</p></li>
+<li><p><code>create_run_log_object()</code>: Create tibble object of <code>bbi_run_log_df</code> class, first checking that all the required columns are present.</p></li>
+<li><p><code>create_config_log_object()</code>: Create tibble object of <code>bbi_config_log_df</code> class, first checking that all the required columns are present.</p></li>
+<li><p><code>create_summary_log_object()</code>: Create tibble object of <code>bbi_summary_log_df</code> class, first checking that all the required columns are present.</p></li>
+<li><p><code>create_log_df_impl()</code>: Implementation function used to create objects of class <code>bbi_summary_log_df</code>, <code>bbi_config_log_df</code>, and <code>bbi_summary_log_df</code></p></li>
 </ul></div>
 
   </div>
@@ -130,11 +143,11 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

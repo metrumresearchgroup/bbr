@@ -18,7 +18,7 @@ Checks a NONMEM output file that's a whitespace-delimited file (for instance .gr
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -27,7 +27,7 @@ Checks a NONMEM output file that's a whitespace-delimited file (for instance .gr
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -77,53 +77,62 @@ Checks a NONMEM output file that's a whitespace-delimited file (for instance .gr
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">check_nonmem_table_output</span><span class="op">(</span><span class="va">.path</span>, .x_var <span class="op">=</span> <span class="cn">NULL</span>, .x_floor <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">check_grd</span><span class="op">(</span><span class="va">.mod</span>, .iter_floor <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-
-<span class="co"># S3 method for character</span>
-<span class="fu">check_grd</span><span class="op">(</span><span class="va">.mod</span>, .iter_floor <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-
-<span class="co"># S3 method for bbi_nonmem_model</span>
-<span class="fu">check_grd</span><span class="op">(</span><span class="va">.mod</span>, .iter_floor <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-
-<span class="co"># S3 method for bbi_nonmem_summary</span>
-<span class="fu">check_grd</span><span class="op">(</span><span class="va">.mod</span>, .iter_floor <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-
-<span class="fu">check_ext</span><span class="op">(</span><span class="va">.mod</span>, .iter_floor <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-
-<span class="co"># S3 method for character</span>
-<span class="fu">check_ext</span><span class="op">(</span><span class="va">.mod</span>, .iter_floor <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-
-<span class="co"># S3 method for bbi_nonmem_model</span>
-<span class="fu">check_ext</span><span class="op">(</span><span class="va">.mod</span>, .iter_floor <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-
-<span class="co"># S3 method for bbi_nonmem_summary</span>
-<span class="fu">check_ext</span><span class="op">(</span><span class="va">.mod</span>, .iter_floor <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">check_nonmem_table_output</span><span class="op">(</span><span class="va">.path</span>, .x_var <span class="op">=</span> <span class="cn">NULL</span>, .x_floor <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">check_grd</span><span class="op">(</span><span class="va">.mod</span>, .iter_floor <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for character</span></span>
+<span><span class="fu">check_grd</span><span class="op">(</span><span class="va">.mod</span>, .iter_floor <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bbi_nonmem_model</span></span>
+<span><span class="fu">check_grd</span><span class="op">(</span><span class="va">.mod</span>, .iter_floor <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bbi_nonmem_summary</span></span>
+<span><span class="fu">check_grd</span><span class="op">(</span><span class="va">.mod</span>, .iter_floor <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">check_ext</span><span class="op">(</span><span class="va">.mod</span>, .iter_floor <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for character</span></span>
+<span><span class="fu">check_ext</span><span class="op">(</span><span class="va">.mod</span>, .iter_floor <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bbi_nonmem_model</span></span>
+<span><span class="fu">check_ext</span><span class="op">(</span><span class="va">.mod</span>, .iter_floor <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bbi_nonmem_summary</span></span>
+<span><span class="fu">check_ext</span><span class="op">(</span><span class="va">.mod</span>, .iter_floor <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>.path</dt>
 <dd><p>Character scalar path to the file</p></dd>
+
+
 <dt>.x_var</dt>
 <dd><p>name of variable to filter with <code>.x_floor</code></p></dd>
+
+
 <dt>.x_floor</dt>
 <dd><p>Filters file to only rows with <code>.x_var</code> GREATER THAN this value.</p></dd>
+
+
 <dt>.mod</dt>
 <dd><p>Model to check. Either a <code>bbi_nonmem_model</code> object or a file path.</p></dd>
+
+
 <dt>.iter_floor</dt>
 <dd><p>Filters file to only rows with <code>ITERATION</code> GREATER THAN this value.</p></dd>
+
 </dl></div>
-    <div id="methods-by-generic-">
-    <h2>Methods (by generic)</h2>
+    <div id="functions">
+    <h2>Functions</h2>
     
-<ul><li><p><code>check_grd</code>: Checks .grd file from a file path</p></li>
-<li><p><code>check_grd</code>: Checks .grd file from a <code>bbi_nonmem_model</code></p></li>
-<li><p><code>check_grd</code>: Checks .grd file from a <code>bbi_nonmem_summary</code></p></li>
-<li><p><code>check_ext</code>: Checks .ext file from a file path</p></li>
-<li><p><code>check_ext</code>: Checks .ext file from a <code>bbi_nonmem_model</code> object</p></li>
-<li><p><code>check_ext</code>: Checks .ext file from a <code>bbi_nonmem_summary</code> object</p></li>
+<ul><li><p><code>check_grd(character)</code>: Checks .grd file from a file path</p></li>
+<li><p><code>check_grd(bbi_nonmem_model)</code>: Checks .grd file from a <code>bbi_nonmem_model</code></p></li>
+<li><p><code>check_grd(bbi_nonmem_summary)</code>: Checks .grd file from a <code>bbi_nonmem_summary</code></p></li>
+<li><p><code>check_ext(character)</code>: Checks .ext file from a file path</p></li>
+<li><p><code>check_ext(bbi_nonmem_model)</code>: Checks .ext file from a <code>bbi_nonmem_model</code> object</p></li>
+<li><p><code>check_ext(bbi_nonmem_summary)</code>: Checks .ext file from a <code>bbi_nonmem_summary</code> object</p></li>
 </ul></div>
 
   </div>
@@ -134,11 +143,11 @@ Checks a NONMEM output file that's a whitespace-delimited file (for instance .gr
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

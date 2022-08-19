@@ -19,7 +19,7 @@ contents of the string and the file the same."><meta property="og:image" content
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -28,7 +28,7 @@ contents of the string and the file the same."><meta property="og:image" content
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -79,23 +79,30 @@ contents of the string and the file the same.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">file_matches_string</span><span class="op">(</span><span class="va">path</span>, <span class="va">string</span>, append <span class="op">=</span> <span class="st">"\n"</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">file_matches_string</span><span class="op">(</span><span class="va">path</span>, <span class="va">string</span>, append <span class="op">=</span> <span class="st">"\n"</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>path</dt>
 <dd><p>String giving the path to the file.</p></dd>
+
+
 <dt>string</dt>
 <dd><p>Character scalar to hash and compare to hash of file</p></dd>
+
+
 <dt>append</dt>
 <dd><p>Character scalar to append to the end of string. Defaults
 to <code>"\n"</code> because helpers like <code><a href="https://rdrr.io/r/base/writeLines.html" class="external-link">writeLines()</a></code> and <code><a href="https://readr.tidyverse.org/reference/read_lines.html" class="external-link">readr::write_lines()</a></code>
 automatically append a <code>"\n"</code> to a string when writing to a file.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>TRUE</code> if <code>path</code> matches <code>string</code>, otherwise <code>FALSE</code> (including if
+    
+
+<p><code>TRUE</code> if <code>path</code> matches <code>string</code>, otherwise <code>FALSE</code> (including if
 <code>path</code> doesn't exist).</p>
     </div>
     <div id="details">
@@ -115,11 +122,11 @@ do this automatically).</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

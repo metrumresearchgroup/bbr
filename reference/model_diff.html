@@ -21,7 +21,7 @@ field entirely."><meta property="og:image" content="https://metrumresearchgroup.
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -30,7 +30,7 @@ field entirely."><meta property="og:image" content="https://metrumresearchgroup.
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -83,35 +83,46 @@ field entirely.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">model_diff</span><span class="op">(</span><span class="va">.mod</span>, .mod2 <span class="op">=</span> <span class="cn">NULL</span>, .file <span class="op">=</span> <span class="st">"model"</span>, <span class="va">...</span>, .viewer <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="co"># S3 method for bbi_nonmem_model</span>
-<span class="fu">model_diff</span><span class="op">(</span><span class="va">.mod</span>, .mod2 <span class="op">=</span> <span class="cn">NULL</span>, .file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"model"</span><span class="op">)</span>, <span class="va">...</span>, .viewer <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">model_diff</span><span class="op">(</span><span class="va">.mod</span>, .mod2 <span class="op">=</span> <span class="cn">NULL</span>, .file <span class="op">=</span> <span class="st">"model"</span>, <span class="va">...</span>, .viewer <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bbi_nonmem_model</span></span>
+<span><span class="fu">model_diff</span><span class="op">(</span><span class="va">.mod</span>, .mod2 <span class="op">=</span> <span class="cn">NULL</span>, .file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"model"</span><span class="op">)</span>, <span class="va">...</span>, .viewer <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>.mod</dt>
 <dd><p>The <code>bbi_{.model_type}_model</code> to compare.</p></dd>
+
+
 <dt>.mod2</dt>
 <dd><p>If a <code>bbi_{.model_type}_model</code> object is passed, compare <code>.mod</code> to
 <code>.mod2</code>. If <code>.mod2 = NULL</code>, the default, compare <code>.mod</code> to the model at
 <code>get_based_on(.mod)</code>. See "<code>based_on</code> details" in Details section.</p></dd>
+
+
 <dt>.file</dt>
 <dd><p>Defaults to <code>"model"</code> which compares the default model file for
 that model type. Some model types have multiple files that can be compared.
 See "<code>.file</code> argument" in Details section.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>arguments passed through to methods. (Currently none.)</p></dd>
+
+
 <dt>.viewer</dt>
 <dd><p>If <code>FALSE</code>, the default, prints diff to console or renders in
 Rmd. If <code>TRUE</code>, render the diff in the Viewer window. Note: this option
 will hold the console with <code>Press ENTER to continue...</code> so it is only
 recommended for interactive use.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>Returns a <code>"Diff"</code> object from the <code>diffobj</code> package that renders
+    
+
+<p>Returns a <code>"Diff"</code> object from the <code>diffobj</code> package that renders
 when printed or called in the console.</p>
     </div>
     <div id="details">
@@ -140,11 +151,11 @@ the <code>.mod2</code> argument.</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

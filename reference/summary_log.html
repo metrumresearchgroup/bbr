@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -26,7 +26,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -75,29 +75,46 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">summary_log</span><span class="op">(</span><span class="va">.base_dir</span>, .recurse <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">add_summary</span><span class="op">(</span><span class="va">.log_df</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">summary_log</span><span class="op">(</span><span class="va">.base_dir</span>, .recurse <span class="op">=</span> <span class="cn">TRUE</span>, .include <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">add_summary</span><span class="op">(</span><span class="va">.log_df</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>.base_dir</dt>
 <dd><p>Base directory to look in for models.</p></dd>
+
+
 <dt>.recurse</dt>
 <dd><p>If <code>TRUE</code>, the default, search recursively in all subdirectories. Passed through to <code><a href="https://fs.r-lib.org/reference/dir_ls.html" class="external-link">fs::dir_ls()</a></code> -- If a positive number, the number of levels to recurse.</p></dd>
+
+
+<dt>.include</dt>
+<dd><p>A character vector specifying which runs or model tags to include in the run log.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Arguments passed through to <code><a href="model_summaries.html">model_summaries()</a></code></p></dd>
+
+
 <dt>.log_df</dt>
 <dd><p>a <code>bbi_run_log_df</code> tibble (the output of <code><a href="run_log.html">run_log()</a></code>)</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An object of class <code>bbi_summary_log_df</code>, which includes the fields described below. If <em>all</em> model summaries
-fail, the returned tibble will only contain the <code>absolute_model_path</code>, <code>run</code>, and <code>error_msg</code> columns.
-<code>summary_log()</code> creates a new tibble with one row per model
-found in <code>.base_dir</code> (and subdirectories, if <code>.recurse = TRUE</code>).
-<code>add_summary()</code> adds these fields to the tibble passed to <code>.log_df</code>.</p>
+    
+
+<p>An object of class <code>bbi_summary_log_df</code>, which includes the fields described below. If <em>all</em> model summaries
+fail, the returned tibble will only contain the <code>absolute_model_path</code>, <code>run</code>, and <code>error_msg</code> columns.</p>
+
+
+<p><code>summary_log()</code> creates a new tibble with one row per model
+found in <code>.base_dir</code> (and subdirectories, if <code>.recurse = TRUE</code>).</p>
+
+
+<p><code>add_summary()</code> adds these fields to the tibble passed to <code>.log_df</code>.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -128,11 +145,11 @@ If you would like more fields from the summary object, you can extract them manu
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

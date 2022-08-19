@@ -19,7 +19,7 @@ to the output of the param_labels() function and are instead added with the  app
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -28,7 +28,7 @@ to the output of the param_labels() function and are instead added with the  app
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -79,21 +79,28 @@ to the output of the <code><a href="param_labels.html">param_labels()</a></code>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">apply_indices</span><span class="op">(</span><span class="va">.label_df</span>, .omega <span class="op">=</span> <span class="cn">NULL</span>, .sigma <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">block</span><span class="op">(</span><span class="va">.n</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">apply_indices</span><span class="op">(</span><span class="va">.label_df</span>, .omega <span class="op">=</span> <span class="cn">NULL</span>, .sigma <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">block</span><span class="op">(</span><span class="va">.n</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>.label_df</dt>
 <dd><p>A tibble like the output of <code><a href="param_labels.html">param_labels()</a></code>, containing columns <code>parameter_names, label, unit, type</code></p></dd>
+
+
 <dt>.omega</dt>
 <dd><p>A logical vector indicating whether each Omega parameter is a diagonal. If <code>NULL</code> function assumes all are diagonal. Alternatively you can pass <code>block(.n)</code> or pass a custom vector if control stream has both block and non-block.</p></dd>
+
+
 <dt>.sigma</dt>
 <dd><p>A logical vector indicating whether each Sigma parameter is a diagonal. If <code>NULL</code> function assumes all are diagonal. Alternatively you can pass <code>block(.n)</code> or pass a custom vector if control stream has both block and non-block.</p></dd>
+
+
 <dt>.n</dt>
 <dd><p>The size of the block</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -112,11 +119,11 @@ of an <code>.n</code>-sized block with diagonal or not.</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

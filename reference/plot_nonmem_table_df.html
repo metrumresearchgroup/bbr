@@ -18,7 +18,7 @@ Creates a line plot of the wide-format tibble output from check_nonmem_table_out
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -27,7 +27,7 @@ Creates a line plot of the wide-format tibble output from check_nonmem_table_out
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -77,27 +77,32 @@ Creates a line plot of the wide-format tibble output from check_nonmem_table_out
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">plot_nonmem_table_df</span><span class="op">(</span><span class="va">.df</span>, <span class="va">.x_var</span>, <span class="va">.stat_name</span><span class="op">)</span>
-
-<span class="fu">plot_grd</span><span class="op">(</span><span class="va">.df</span><span class="op">)</span>
-
-<span class="fu">plot_ext</span><span class="op">(</span><span class="va">.df</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_nonmem_table_df</span><span class="op">(</span><span class="va">.df</span>, <span class="va">.x_var</span>, <span class="va">.stat_name</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">plot_grd</span><span class="op">(</span><span class="va">.df</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">plot_ext</span><span class="op">(</span><span class="va">.df</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>.df</dt>
 <dd><p>the wide-format tibble output from <code><a href="check_nonmem_table_output.html">check_nonmem_table_output()</a></code></p></dd>
+
+
 <dt>.x_var</dt>
 <dd><p>String of the variable name to use on the X-axis</p></dd>
+
+
 <dt>.stat_name</dt>
 <dd><p>String of the name of the stat the other columns represents (like "gradient" or "theta").</p></dd>
+
 </dl></div>
     <div id="functions">
     <h2>Functions</h2>
     
-<ul><li><p><code>plot_grd</code>: Plot the .grd file</p></li>
-<li><p><code>plot_ext</code>: Plot the .ext file</p></li>
+<ul><li><p><code>plot_grd()</code>: Plot the .grd file</p></li>
+<li><p><code>plot_ext()</code>: Plot the .ext file</p></li>
 </ul></div>
 
   </div>
@@ -108,11 +113,11 @@ Creates a line plot of the wide-format tibble output from check_nonmem_table_out
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

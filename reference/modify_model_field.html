@@ -21,7 +21,7 @@ friendlier helpers listed below in "See also" whenever possible.'><meta property
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -30,7 +30,7 @@ friendlier helpers listed below in "See also" whenever possible.'><meta property
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -83,42 +83,59 @@ friendlier helpers listed below in "See also"</strong> whenever possible.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">modify_model_field</span><span class="op">(</span>
-  <span class="va">.mod</span>,
-  <span class="va">.field</span>,
-  <span class="va">.value</span>,
-  .append <span class="op">=</span> <span class="cn">TRUE</span>,
-  .remove <span class="op">=</span> <span class="cn">FALSE</span>,
-  .unique <span class="op">=</span> <span class="cn">TRUE</span>,
-  .char_value <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span>
-
-<span class="fu">replace_model_field</span><span class="op">(</span><span class="va">.mod</span>, <span class="va">.field</span>, <span class="va">.old_val</span>, <span class="va">.new_val</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">modify_model_field</span><span class="op">(</span></span>
+<span>  <span class="va">.mod</span>,</span>
+<span>  <span class="va">.field</span>,</span>
+<span>  <span class="va">.value</span>,</span>
+<span>  .append <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  .remove <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  .unique <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  .char_value <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">replace_model_field</span><span class="op">(</span><span class="va">.mod</span>, <span class="va">.field</span>, <span class="va">.old_val</span>, <span class="va">.new_val</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>.mod</dt>
 <dd><p>The <code>bbi_{.model_type}_model</code> object to modify</p></dd>
+
+
 <dt>.field</dt>
 <dd><p>Character scalar of the name of the component to modify</p></dd>
+
+
 <dt>.value</dt>
 <dd><p>Whatever is to be added to <code>.mod[[.field]]</code>, typically a character vector (or a named list in the case of <code>*_bbi_args()</code>).
 If <code>NULL</code> or <code>NA</code> is passed and <code>.append = FALSE</code> then <code>.field</code> with be deleted from the object and corresponding YAML.</p></dd>
+
+
 <dt>.append</dt>
 <dd><p>If <code>TRUE</code>, the default, concatenate new values with currently present values. If <code>FALSE</code>, new values will overwrite old values.</p></dd>
+
+
 <dt>.remove</dt>
 <dd><p>If <code>TRUE</code>, <code>.value</code> with be removed from the <code>.field</code> instead of added. <code>FALSE</code> by default. Cannot have both <code>.append</code> and <code>.remove</code> be true in the same call.</p></dd>
+
+
 <dt>.unique</dt>
 <dd><p>If <code>TRUE</code>, the default, de-duplicate <code>.mod[[.field]]</code> after adding new values. If <code>FALSE</code> duplicate values will be kept.</p></dd>
+
+
 <dt>.char_value</dt>
 <dd><p>If <code>TRUE</code>, check that <code>.value</code> (after unlisting) is a character vector.</p></dd>
+
+
 <dt>.old_val</dt>
 <dd><p>The value to be replaced. If <code>.old_val</code> is not present in
 <code>.mod[[.field]]</code>, function will warn user and return <code>.mod</code> unchanged.</p></dd>
+
+
 <dt>.new_val</dt>
 <dd><p>The value to insert in place of <code>.old_val</code> in
 <code>.mod[[.field]]</code>.</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -131,7 +148,7 @@ digest of the newly written YAML.</p>
     <div id="functions">
     <h2>Functions</h2>
     
-<ul><li><p><code>replace_model_field</code>: Replace a single item in a model field</p></li>
+<ul><li><p><code>replace_model_field()</code>: Replace a single item in a model field</p></li>
 </ul></div>
     <div id="see-also">
     <h2>See also</h2>
@@ -139,7 +156,7 @@ digest of the newly written YAML.</p>
 <code><a href="modify_notes.html">add_notes()</a></code> <code><a href="modify_notes.html">replace_note()</a></code> <code><a href="modify_notes.html">replace_all_notes()</a></code> <code><a href="modify_notes.html">remove_notes()</a></code>
 <code><a href="modify_based_on.html">add_based_on()</a></code> <code><a href="modify_based_on.html">replace_all_based_on()</a></code> <code><a href="modify_based_on.html">remove_based_on()</a></code>
 <code><a href="modify_description.html">add_description()</a></code> <code><a href="modify_description.html">replace_description()</a></code> <code><a href="modify_bbi_args.html">add_bbi_args()</a></code>
-<code><a href="modify_bbi_args.html">replace_all_bbi_args()</a></code></p></div>
+<code><a href="modify_bbi_args.html">replace_all_bbi_args()</a></code> <code><a href="modify_star.html">modify_star()</a></code></p></div>
     </div>
 
   </div>
@@ -150,11 +167,11 @@ digest of the newly written YAML.</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

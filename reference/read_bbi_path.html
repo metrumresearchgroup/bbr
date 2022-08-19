@@ -24,7 +24,7 @@ to a default path if unset."><meta property="og:image" content="https://metrumre
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -33,7 +33,7 @@ to a default path if unset."><meta property="og:image" content="https://metrumre
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -83,34 +83,41 @@ the bbi executable. The test suite will fail if this path does not exist,
 which limits flexibility across environments, e.g., in continuous
 integration. Any solution that decouples the <code>with_options()</code> pattern from a
 particular default path must work with <code><a href="https://devtools.r-lib.org/reference/check.html" class="external-link">devtools::check()</a></code>, which runs in a
-separate process. We can inject environment variables into <code><a href="https://rdrr.io/r/utils/PkgUtils.html" class="external-link">check()</a></code>, so the
+separate process. We can inject environment variables into <code>check()</code>, so the
 default behavior is to rely on such a variable to set the path, falling back
 to a default path if unset.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">read_bbi_path</span><span class="op">(</span>
-  path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"BBI_EXE_PATH"</span>, <span class="cn">NA</span><span class="op">)</span>,
-  default <span class="op">=</span> <span class="va">BBI_DEFAULT_PATH</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">read_bbi_path</span><span class="op">(</span></span>
+<span>  path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"BBI_EXE_PATH"</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
+<span>  default <span class="op">=</span> <span class="va">BBI_DEFAULT_PATH</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>path</dt>
 <dd><p>path to the bbi executable</p></dd>
+
+
 <dt>default</dt>
 <dd><p>a default path if <code>path</code> is <code>NA</code></p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>path</code> if not <code>NA</code>, else <code>default</code></p>
+    
+
+<p><code>path</code> if not <code>NA</code>, else <code>default</code></p>
+
+
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu">read_bbi_path</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "bbi"</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">read_bbi_path</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "/data/home/kylem/src/github/metrumresearchgroup/bbr/bin/bbi"</span>
 </code></pre></div>
     </div>
   </div>
@@ -121,11 +128,11 @@ to a default path if unset.</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

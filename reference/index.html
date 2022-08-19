@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -26,7 +26,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -141,6 +141,10 @@
         </td>
         <td><p>Compare parameter estimates</p></td>
       </tr><tr><td>
+          <p><code><a href="get_omega.html">get_omega()</a></code> <code><a href="get_omega.html">get_sigma()</a></code> <code><a href="get_omega.html">get_theta()</a></code> </p>
+        </td>
+        <td><p>Return a formatted object for a given parameter</p></td>
+      </tr><tr><td>
           <p><code><a href="nm_file.html">nm_file()</a></code> <code><a href="nm_file.html">nm_grd()</a></code> <code><a href="nm_file.html">nm_tab()</a></code> <code><a href="nm_file.html">nm_par_tab()</a></code> <code><a href="nm_file.html">nm_data()</a></code> </p>
         </td>
         <td><p>Read NONMEM files</p></td>
@@ -208,6 +212,10 @@
           <p><code><a href="modify_description.html">add_description()</a></code> <code><a href="modify_description.html">replace_description()</a></code> </p>
         </td>
         <td><p>Modify description on a model object</p></td>
+      </tr><tr><td>
+          <p><code><a href="modify_star.html">add_star()</a></code> <code><a href="modify_star.html">remove_star()</a></code> </p>
+        </td>
+        <td><p>Modify star attribute on a model object</p></td>
       </tr><tr><td>
           <p><code><a href="modify_bbi_args.html">add_bbi_args()</a></code> <code><a href="modify_bbi_args.html">replace_all_bbi_args()</a></code> </p>
         </td>
@@ -308,6 +316,26 @@
           <p><code><a href="suppressSpecificWarning.html">suppressSpecificWarning()</a></code> </p>
         </td>
         <td><p>Suppress a warning that matches <code>.regexpr</code></p></td>
+      </tr><tr><td>
+          <p><code><a href="test_threads.html">test_threads()</a></code> </p>
+        </td>
+        <td><p>Takes a model object and runs it with various threads values</p></td>
+      </tr><tr><td>
+          <p><code><a href="check_run_times.html">check_run_times()</a></code> </p>
+        </td>
+        <td><p>Check estimation time for models run with various threads values</p></td>
+      </tr><tr><td>
+          <p><code><a href="delete_models.html">delete_models()</a></code> </p>
+        </td>
+        <td><p>Remove model files associated with the specified tags</p></td>
+      </tr><tr><td>
+          <p><code><a href="check_nonmem_finished.html">check_nonmem_finished()</a></code> </p>
+        </td>
+        <td><p>Checks if NONMEM run is done by looking for "Stop Time" in .lst file</p></td>
+      </tr><tr><td>
+          <p><code><a href="wait_for_nonmem.html">wait_for_nonmem()</a></code> </p>
+        </td>
+        <td><p>Wait for NONMEM models to finish</p></td>
       </tr></tbody></table></div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -317,11 +345,11 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

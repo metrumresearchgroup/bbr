@@ -20,7 +20,7 @@ Details section for what specific files are checked."><meta property="og:image" 
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
       </span>
     </div>
 
@@ -29,7 +29,7 @@ Details section for what specific files are checked."><meta property="og:image" 
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -81,7 +81,7 @@ Details section for what specific files are checked.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">check_up_to_date</span><span class="op">(</span><span class="va">.bbi_object</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">check_up_to_date</span><span class="op">(</span><span class="va">.bbi_object</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -91,28 +91,39 @@ Details section for what specific files are checked.</p>
 a <code>bbi_{.model_type}_model</code> object,
 a <code>bbi_{.model_type}_summary</code> object,
 or a <code>bbi_log_df</code> tibble.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Arguments passed through (currently none).</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><strong>The returned value is invisible because a message is printed</strong> alerting the
+    
+
+<p><strong>The returned value is invisible because a message is printed</strong> alerting the
 user of the specific files that have changed, if any. This facilitates
 calling the function for this side effect without explicitly handling the
-returned value.
-<strong><code>bbi_model</code></strong> method invisibly returns a logical vector of length 2. The
+returned value.</p>
+
+
+<p><strong><code>bbi_model</code></strong> method invisibly returns a logical vector of length 2. The
 first element (named <code>"model"</code>) refers to the model files mentioned in Details.
 The second element (named <code>"data"</code>) refers to the data files mentioned in Details.
 For both elements, they will be <code>TRUE</code> if nothing has changed, <code>FALSE</code> if
 anything has changed. Note: <em>if no file exists</em> at the specified path,
 <code>FALSE</code> will be returned because that is technically a "change." The file
-used to exist and now it does not.
-<strong><code>bbi_log_df</code></strong> method invisibly returns a named list of lists, with one
+used to exist and now it does not.</p>
+
+
+<p><strong><code>bbi_log_df</code></strong> method invisibly returns a named list of lists, with one
 element for each row in the input tibble, with the name corresponding to the
 value in the <code>run</code> column for that row. Each element of the list will contain
 the two-element list returned from the <code>bbi_model</code> method (described above)
-for the relevant model.
-There is no <code>add_up_to_date()</code> function because <strong>if you would like to add
+for the relevant model.</p>
+
+
+<p>There is no <code>add_up_to_date()</code> function because <strong>if you would like to add
 these columns to a <code>bbi_log_df</code> tibble</strong> you can use <code><a href="config_log.html">add_config()</a></code>, which
 contains <code>model_has_changed</code> and <code>data_has_changed</code> columns. Please note:
 these contain the opposite boolean values (<code>check_up_to_date()</code> returns
@@ -134,11 +145,11 @@ these contain the opposite boolean values (<code>check_up_to_date()</code> retur
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Seth Green, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
+  <p></p><p>Developed by Seth Green, Kyle Barrett, Ryan Marinelli, Kyle Meyer, Devin Pastoor, Anna-Christina Nevison, Sean Wilson, Samuel Callisto, Tim Waterhouse, Kyle T Baron.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>
