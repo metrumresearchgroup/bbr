@@ -31,11 +31,11 @@ Users can also specify \code{"all"}, which is the shorthand method for selecting
 \dontrun{
 mods <- test_threads(mod, .threads = c(2, 4))
 
-If models have not finished:
+# If models have not finished:
 check_run_times(mods, .wait = TRUE, .time_limit = 300)
 check_run_times(mods, .wait = TRUE, .return_times = c("estimation_time", "covariance_time"))
 
-If models have already finished:
+# If models have already finished:
 check_run_times(mods, .wait = FALSE)
 check_run_times(mods, .wait = FALSE, .return_times = "All")
 }

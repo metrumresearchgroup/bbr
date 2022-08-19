@@ -1,12 +1,20 @@
 Type: Package
 Package: bbr
 Title: R package for bbi
-Version: 1.3.1.9001
+Version: 1.4.0
 Authors@R: 
     c(person(given = "Seth",
              family = "Green",
              role = c("aut", "cre"),
              email = "sethg@metrumrg.com"),
+      person(given = "Kyle",
+             family = "Barrett",
+             role = c("aut"),
+             email = "barrettk@metrumrg.com"),
+      person(given = "Ryan",
+             family = "Marinelli",
+             role = c("aut"),
+             email = "ram478@drexel.edu"),
       person(given = "Kyle",
              family = "Meyer",
              role = "aut",

@@ -32,3 +32,4 @@ metadata, information, and diagnostics about the models. See the following
 help pages for more information: \code{\link[=run_log]{run_log()}} \code{\link[=summary_log]{summary_log()}} \code{\link[=config_log]{config_log()}}
 }
 }
+\keyword{internal}

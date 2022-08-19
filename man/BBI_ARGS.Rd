@@ -16,4 +16,4 @@ or \code{\link[=model_summary]{model_summary()}}. This is exported for the benef
 may prefer to inspect \code{View(bbr::BBI_ARGS)} instead of the \code{\link[=print_bbi_args]{print_bbi_args()}}
 output.
 }
-\keyword{datasets}
+\keyword{internal}

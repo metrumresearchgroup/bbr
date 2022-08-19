@@ -18,6 +18,7 @@ CACHE_ENV$bbi_exe_paths <- list()
 #' output.
 #'
 #' @export
+#' @keywords internal
 BBI_ARGS = list(
   additional_post_work_envs = list(
     type = "character",
