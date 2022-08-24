@@ -184,15 +184,6 @@ MGMT-S009:
   - MMF-R021
   - CTS-R001
 MGMT-S010:
-  name: Add and replace description
-  description: As a user, I want to be able to add, delete, and replace descriptions on a
-    model object. Descriptions should be persisted in the model YAML file.
-  ProductRisk: Low
-  requirements:
-  - MMF-R008
-  - MMF-R009
-  - MMF-R010
-MGMT-S011:
   name: Print method for model object
   description: As a user, I want to be able to print the `bbi_nonmem_model` object
     to the console and have it show the path to the model files on disk, as well as
@@ -200,7 +191,7 @@ MGMT-S011:
   ProductRisk: Low
   requirements:
   - PRNT-R002
-MGMT-S012:
+MGMT-S011:
   name: Model diff
   description: As a user, I want to be able to see a rendered diff between two model
     files, either printed to the console or rendered in Rmd files.
@@ -211,7 +202,7 @@ MGMT-S012:
   - MDF-R003
   - MDF-R004
   - MDF-R005
-MGMT-S013:
+MGMT-S012:
   name: Check up to date
   description: As a user, I want a function to check whether the model file or data
     file associated with a model have changed since the model was run and be able
@@ -226,7 +217,7 @@ MGMT-S013:
   - CUTD-R005
   - CUTD-R006
   - CUTD-R007
-MGMT-S014:
+MGMT-S013:
   name: Tags diff
   description: As a user, I want to be able to see the difference in the tags element
     of different models. Be able to either compare two models directly, or compare
@@ -238,7 +229,7 @@ MGMT-S014:
   - TDF-R002
   - TDF-R003
   - TDF-R004
-MGMT-S015:
+MGMT-S014:
   name: Copying models increments to next integer by default
   description: As a user, I want when passing a parent model that is named numerically
     to the `copy_model_from()` function, to increment the new model name to the next
@@ -249,7 +240,7 @@ MGMT-S015:
   requirements:
   - CMF-R007
   - WRKF-R002
-MGMT-S016:
+MGMT-S015:
   name: Update model ID in control stream
   description: As a user, I want to be able to update all occurrences of the model
     ID from a parent model and replace them with model ID from the new model in the
@@ -262,6 +253,15 @@ MGMT-S016:
   - CMH-R004
   - CMH-R005
   - CMH-R006
+MGMT-S016:
+  name: Add and replace description
+  description: As a user, I want to be able to add, delete, and replace descriptions on a
+    model object. Descriptions should be persisted in the model YAML file.
+  ProductRisk: Low
+  requirements:
+  - MMF-R008
+  - MMF-R009
+  - MMF-R010
 MGMT-S017:
   name: Cleanup model files
   description: As a user, I want to be able to easily delete all model files associated
