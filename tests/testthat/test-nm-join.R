@@ -90,7 +90,7 @@ test_that("nm_join(.files) works correctly FIRSTONLY: then full table [BBR-NMJ-0
 ######################
 # duplicate columns tests
 
-test_that("nm_join() works correctly: duplicate cols [BBR-NMJ-004]", {
+test_that("nm_join() works correctly with duplicate cols [BBR-NMJ-004]", {
   test_df <- nm_join(
     MOD1,
     .files = c(
@@ -104,7 +104,7 @@ test_that("nm_join() works correctly: duplicate cols [BBR-NMJ-004]", {
   expect_equal(test_df$DV.DATA, test_df$DV)
 })
 
-test_that("nm_join(.join_col) works correctly [BBR-NMJ-005]", {
+test_that("nm_join(.join_col) works correctly with duplicate cols  [BBR-NMJ-005]", {
   # this test is annoyingly complex to set up because of the
   # mechanics of how the data is pulled and the internal checks
   # on row number. Just an explanation of why it's so long.
@@ -184,7 +184,7 @@ test_that("Confirming unduplicates rows on .join_col [BBR-NMJ-007]",{
 
     jsonlite::write_json(json,file.path(tempdir(), "basic", "1", "bbi_config.json"))
 
-    expect_error(file.path(tempdir(), "basic", "1") %>% nm_join(.files = "1.tab"), "Duplicate rows in NUM")
+    expect_error(file.path(tempdir(), "basic", "1") %>% nm_join(.files = "1.tab"), "Duplicate rows")
 
     fs::file_copy(system.file("model","nonmem", "basic","1", "1.tab",package = "bbr"),
                   file.path(tempdir(), "basic", "1", "1.tab"), overwrite = TRUE)
@@ -192,6 +192,6 @@ test_that("Confirming unduplicates rows on .join_col [BBR-NMJ-007]",{
     .d$num[2] <- 1
     readr::write_csv(.d, file.path(tempdir(), "basic", "1", "acop.csv"))
 
-    expect_error(file.path(tempdir(), "basic", "1") %>% nm_join(.files = "1.tab"), "Duplicate rows in data")
+    expect_error(file.path(tempdir(), "basic", "1") %>% nm_join(.files = "1.tab"), "Duplicate rows")
 
   })})})

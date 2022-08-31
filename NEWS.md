@@ -1,10 +1,75 @@
-# Development
+# bbr 1.4.0
 
-## New features
+## New features and changes
 
-- Added `test_threads()` for benchmarking simulation run times with various threads values.
+- The new `.include` argument of `config_log()`, `run_log()`, and
+  `summary_log()` limits the result to the specified run names or tags.  (#484,
+  #526)
+
+- Models can now be starred.  See `add_star()` and `remove_star()`.  (#487)
+
+- New convenience functions `get_omega()`, `get_sigma()`, and `get_theta()`
+  return labeled values, with the `OMEGA` and `SIGMA` values expanded to a full
+  matrix.  (#515)
+
+- `param_estimates` gained an `.alpha` argument that's useful for identifying
+  the ETAs flagged by the `eta_pval_significant` heuristic.  (#497)
+
+- `nm_join()` now aborts if the join column has duplicate values, suggesting to
+  the caller that the table format probably needs to be widened to prevent
+  NONMEM from truncating the values.  (#533)
+
+- If the caller specifies a `threads` value above one in `.bbi_args` but does
+  _not_ specify `parallel`, `parallel = TRUE` is added so that the `threads`
+  value is in effect.  (#514)
+
+- New functions `check_nonmem_finished()` and `wait_for_nonmem()` enable
+  checking and waiting on models submitted to the grid.  (#480)
+
+- Added `test_threads()` for benchmarking simulation run times with various
+  threads values.  (#473, #489, #519, #542)
+
 - Added `check_run_times()` for checking the estimation times of model runs.
-- Added `delete_models()` for removing all model files associated with specified model tags.
+  (#473, #489, #511)
+
+- Added `delete_models()` for removing all model files associated with
+  specified model tags.  (#473)
+
+- Updated parallel tips and tricks vignette to reference new `test_threads()`
+  function and related helpers.  (#503)
+
+- bbi encodes "unspecified" and `NA` values as `-999999999`.  bbr now maps all
+  occurrences of this value to `NA` when creating a model summary object.
+  (#524)
+
+- When bbi v3.2.0 or later is available, `model_summaries()` now uses bbi's
+  concurrency rather than calling `model_summary()` on each model, leading to a
+  speed up when many models are passed.  (#527)
+
+- `model_diff()` learned to print a message rather than call
+  `diffobj::diffFile()` when there are no changes to avoid confusingly
+  displaying the entire file.  (#522)
+
+- `use_bbi` now creates leading directories if needed.  (#499)
+
+- `new_model` now ignores the extension of the supplied path.  (#510)
+
+- The output of `print_bbi_args` has been reworked to make it easier to digest.
+  (#537)
+
+## Bug fixes
+
+- `nm_join()` did not reliably sort the resulting data frame when passed
+  `.superset = TRUE`.  (#508)
+
+- `nm_file()` and friends now detect duplicate column names and make them
+  unique.  (#530, #539)
+
+- Unlike `submit_model()`, `submit_models()` didn't abort when `bbi.yaml` was
+  missing.  (#496)
+
+- In combination with a change in bbi v3.2.0, `model_summary()` can now handle
+  `.lst` files that have `NaN` objective function values.  (#506)
 
 
 # bbr 1.3.1

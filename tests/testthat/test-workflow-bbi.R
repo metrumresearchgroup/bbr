@@ -263,7 +263,7 @@ withr::with_options(list(
 
   test_that("check_run_times() waits for models to complete [BBR-CRT-004]", {
     mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
-    mod_threads <- test_threads(mod1, .threads = c(2, 4), .max_eval = 100, .mode = "local")
+    mod_threads <- test_threads(mod1, .threads = c(2, 4), .cap_iterations = 100, .mode = "local")
     run_times <- check_run_times(mod_threads, .wait = TRUE, .time_limit = 100) %>% suppressWarnings()
     # This will error if .wait didnt work
     expect_equal(dim(run_times), c(2, 3))

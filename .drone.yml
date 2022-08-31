@@ -24,7 +24,7 @@ steps:
   image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.1:latest
   commands:
   - chmod +x install_bbi.sh
-  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.2.0-rc.1'
+  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.2.0'
   volumes:
   - name: cache
     path: /ephemeral
@@ -69,7 +69,7 @@ trigger:
 ---
 kind: pipeline
 type: docker
-name: mpn:oldest
+name: oldest
 
 platform:
   os: linux
@@ -90,7 +90,7 @@ steps:
   image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:2020-06-08
   commands:
   - chmod +x install_bbi.sh
-  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.2.0-rc.1'
+  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.0.2'
   volumes:
   - name: cache
     path: /ephemeral
@@ -145,7 +145,7 @@ steps:
   image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.1:cran-latest
   commands:
   - chmod +x install_bbi.sh
-  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.2.0-rc.1'
+  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.2.0'
   volumes:
   - name: cache
     path: /ephemeral
@@ -215,7 +215,7 @@ steps:
   image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.1:latest
   commands:
   - chmod +x install_bbi.sh
-  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.2.0-rc.1'
+  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.2.0'
   volumes:
   - name: cache
     path: /ephemeral
@@ -274,7 +274,7 @@ steps:
   image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.1:latest
   commands:
   - chmod +x install_bbi.sh
-  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.2.0-rc.1'
+  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.2.0'
   volumes:
   - name: cache
     path: /ephemeral
@@ -331,5 +331,5 @@ trigger:
 
 depends_on:
 - mpn:latest
-- mpn:oldest
+- oldest
 - cran-latest

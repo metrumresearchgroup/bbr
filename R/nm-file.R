@@ -96,7 +96,9 @@ nm_data <- function(.mod) {
   check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
   .path <- get_data_path(.mod)
   verbose_msg(glue("Reading data file: {basename(.path)}"))
-  .d <- as_tibble(fread(.path, na.strings = ".", verbose = FALSE))
+  .d <- fread(.path, na.strings = ".", verbose = FALSE)
+  .d <- remove_dup_cols(.d)
+  .d <- as_tibble(.d)
   names(.d) <- toupper(names(.d))
   verbose_msg(glue("  rows: {nrow(.d)}"))
   verbose_msg(glue("  cols: {ncol(.d)}"))
@@ -123,12 +125,15 @@ nm_file_impl <- function(.path) {
   # read the file, but catch warning that tells us there are multiple tables
   W <- NULL
   .d <- withCallingHandlers({
-    as_tibble(fread(
+    data <- fread(
       .path,
       na.strings = ".",
       skip = 1,
       verbose = FALSE
-    ))
+    )
+    data <- remove_dup_cols(data)
+    data <- as_tibble(data)
+    data
   },
   warning = function(.w) {
     if (str_detect(.w$message, "Stopped early.+TABLE NO")) {

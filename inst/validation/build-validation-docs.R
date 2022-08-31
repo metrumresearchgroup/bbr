@@ -12,7 +12,7 @@
 #######################################################
 
 PKGNAME <- "bbr"
-PKGVERSION <- "1.3.1.9001"
+PKGVERSION <- "1.4.0"
 STYLE_REF_DIR <- "docx-ref-header-image" # set to NULL if not using style ref
 
 # set up directories and clear existing output dirs, if they exist

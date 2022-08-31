@@ -104,7 +104,12 @@ MOD4_ABS_PATH <- fs::path_norm(file.path(getwd(), LEVEL2_MOD)) %>% as.character(
 RUN_LOG_ROWS <- 3L
 RUN_LOG_COLS <- 10L
 CONFIG_COLS <- 9L
-SUM_LOG_COLS <- 23L
+SUM_LOG_COLS <- if (test_bbi_version(read_bbi_path(), .min_version = "3.0.3")) {
+  23L
+} else {
+  # eigenvalue_issue isn't present yet.
+  22L
+}
 
 ref_json <- jsonlite::fromJSON(system.file("test-refs", "ref_values.json", package = "bbr"))
 CONFIG_DATA_PATH_REF <- ref_json$CONFIG_DATA_PATH

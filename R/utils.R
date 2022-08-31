@@ -337,13 +337,34 @@ file_matches_string <- function(path, string, append = "\n") {
 #' Print valid .bbi_args
 #'
 #' Prints all valid arguments to pass in to `.bbi_args=list()` argument of `submit_model()` or `model_summary()`
-#' @importFrom purrr imap
+#'
+#' Note that this function is simply rendering information that is available in
+#' the list `BBI_ARGS`, which is exported. Rather than calling this function,
+#' RStudio users may prefer to inspect the result of `View(bbr::BBI_ARGS)`.
+#'
+#' @importFrom purrr iwalk
+#' @importFrom stringr str_remove str_replace str_squish
 #' @export
 print_bbi_args <- function() {
-  doc_list <- imap(BBI_ARGS, function(.v, .n) {
-    paste0(.n, " (", .v$type, ") -- ", .v$description, " (sets CLI flag `", .v$flag, "`)")
+  iwalk(BBI_ARGS, function(v, name) {
+    bname <- cli::style_bold(cli::col_blue(name))
+    desc <- str_squish(v$description) %>%
+      str_replace("RAW NMFE OPTION", cli::col_cyan("RAW NMFE OPTION")) %>%
+      str_remove("\\.$")
+    note <- if (is.null(v$compatibility_note)) {
+      ""
+    } else {
+      paste0(". ", cli::col_red("Compatibility note"), ": ",
+             v$compatibility_note,  ".")
+    }
+
+    out <- glue("{bname} ({v$type}): {desc}. Command-line option: {v$flag}{note}")
+    # ansi_strwrap isn't available until cli v2.3.0. This condition can be
+    # dropped once our minimum supported MPN is 2021-02-01 or later.
+    tryCatch(out <- cli::ansi_strwrap(out, exdent = 2),
+             error = function(e) NULL)
+    cli::cat_line(out)
   })
-  cat(paste(doc_list, collapse = "\n"))
 }
 
 
@@ -661,3 +682,17 @@ map_list_recursive <- function(.list, .func, .overwrite = TRUE) {
   .list
 }
 
+#' Removes duplicate col names
+#'
+#' @param data dataframe
+#' @keywords internal
+remove_dup_cols <- function(data){
+  if(any(duplicated(names(data)))){
+    dup_cols <- names(data)[duplicated(names(data))]
+    dup_cols_str <- paste(dup_cols, collapse = ", ")
+    dup_id <- c(which(duplicated(names(data))) -1, which(duplicated(names(data)))) %>% sort()
+    warning(glue("Following duplicated columns: {dup_cols_str}\n  Duplicate names will be repaired with `make.unique()`")) # Warns if column names are equal.
+    colnames(data) <- make.unique(colnames(data))
+  }
+  return(data)
+}
