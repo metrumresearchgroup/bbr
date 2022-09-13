@@ -155,7 +155,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_identical(
       res[[1L]][[PROC_CALL]],
       as.character(
-        glue::glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path[[1L]]} --parallel")
+        glue::glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path[[1L]]} --parallel --threads=1")
       )
     )
 

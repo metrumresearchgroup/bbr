@@ -219,3 +219,35 @@ test_that("Confirms if threads = 1, parallel is not set [BBR-UTL-015]", {
   })
 })
 
+test_that("confirms handling of default parameters [BBR-UTL-016]", {
+  withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()),{
+    withr::with_tempdir({
+      fs::dir_create(file.path(tempdir(), "test_path"))
+
+      on.exit(if(fs::dir_exists(file.path(tempdir(),"test_path")))
+      {
+        fs::dir_delete(file.path(tempdir(),"test_path"))
+      })
+
+      files_to_copy <- file.path(ABS_MODEL_DIR, c("1.ctl"))
+
+      fs::file_copy(system.file("extdata", "acop.csv", package = "bbr"), file.path(tempdir(), "test_path"))
+      purrr::walk(files_to_copy, fs::file_copy, file.path(tempdir(), "test_path"))
+      fs::dir_copy(file.path(ABS_MODEL_DIR, "1"), file.path(tempdir(), "test_path"))
+      ctl <- read_lines(file.path(tempdir(),"test_path", "1.ctl")) %>%  stringr::str_remove("../../../../extdata/")
+      write_lines(ctl, file.path(tempdir(),"test_path", "1.ctl"))
+
+      mod1 <- new_model(file.path(tempdir(), "test_path", "1"), .description = "original test-workflow-bbi model",
+                        .tags = ORIG_TAGS,.bbi_args = list(parallel = FALSE, threads = NULL))
+
+      readr::write_file("created_by: test-utils", file.path(tempdir(), "test_path", "bbi.yaml"))
+
+
+      res <- capture.output(submit_model(mod1, .dry_run = TRUE))
+      expect_setequal(TRUE %in% str_detect(res, "--threads=1"),TRUE)
+      fs::file_delete(file.path(tempdir(), "test_path", "1.yaml"))
+
+    })
+  })
+})
+
