@@ -237,10 +237,11 @@ test_that("confirms handling of default parameters [BBR-UTL-016]", {
       ctl <- read_lines(file.path(tempdir(),"test_path", "1.ctl")) %>%  stringr::str_remove("../../../../extdata/")
       write_lines(ctl, file.path(tempdir(),"test_path", "1.ctl"))
 
-      mod1 <- new_model(file.path(tempdir(), "test_path", "1"), .description = "original test-workflow-bbi model",
-                        .tags = ORIG_TAGS,.bbi_args = list(parallel = FALSE, threads = NULL))
+      readr::write_file("threads:  ", file.path(tempdir(), "test_path", "bbi.yaml"))
 
-      readr::write_file("created_by: test-utils", file.path(tempdir(), "test_path", "bbi.yaml"))
+
+      mod1 <- new_model(file.path(tempdir(), "test_path", "1"), .description = "original test-workflow-bbi model",
+                        .bbi_args = list(parallel = FALSE, threads = NULL))
 
 
       res <- capture.output(submit_model(mod1, .dry_run = TRUE))

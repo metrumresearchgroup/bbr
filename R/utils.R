@@ -76,25 +76,8 @@ check_bbi_args <- function(.args) {
   #If parallel is passed
   else if(is.null(.args$parallel) && is.null(.args$threads))
   {
-    .args$parallel <- FALSE
     cmd_args <- c(cmd_args, "--threads=1")
-
   }
-
-  else if(!is.null(.args$parallel) && is.null(.args$threads))
-  {
-    .args$parallel <- FALSE
-    cmd_args <- c(cmd_args, "--threads=1")
-
-  }
-
-  else if(is.null(.args$parallel) && is.null(.args$threads))
-  {
-    .args$parallel <- FALSE
-    cmd_args <- c(cmd_args, "--threads=1")
-
-  }
-
   else{
     if (.args$threads > 1 &&
         isFALSE(.args$parallel))
