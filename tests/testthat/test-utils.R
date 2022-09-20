@@ -240,12 +240,12 @@ test_that("confirms handling of default parameters [BBR-UTL-016]", {
       readr::write_file("threads:  ", file.path(tempdir(), "test_path", "bbi.yaml"))
 
 
-      mod1 <- new_model(file.path(tempdir(), "test_path", "1"), .description = "original test-workflow-bbi model",
-                        .bbi_args = list(parallel = FALSE, threads = NULL))
+      mod1 <- new_model(file.path(tempdir(), "test_path", "1"), .description = "original test-workflow-bbi model", .bbi_args = list(parallel = F, overwrite = T))
 
+      res <- submit_model(mod1, .dry_run = TRUE)
 
-      res <- capture.output(submit_model(mod1, .dry_run = TRUE))
-      expect_setequal(TRUE %in% str_detect(res, "--threads=1"),TRUE)
+      #warning is: `argument is not an atomic vector; coercing`
+      expect_false(str_detect(res, "--parallel") %>% unique()) %>% suppressWarnings()
       fs::file_delete(file.path(tempdir(), "test_path", "1.yaml"))
 
     })
