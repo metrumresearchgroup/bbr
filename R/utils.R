@@ -65,21 +65,13 @@ check_bbi_args <- function(.args) {
   # format list to character vector
   cmd_args <- format_cmd_args(key_value_list)
 
-  #If parallel not passed
-  if (is.null(.args$parallel) && !is.null(.args$threads))
-  {
-    if (.args$threads > 1)
-    {
+  if (!is.null(.args$threads) && .args$threads > 1) {
+    if (is.null(.args$parallel)) {
       cmd_args <- c(cmd_args, "--parallel")
+    } else if (isFALSE(.args$parallel)) {
+      warning("`threads > 1` but model will not run in parallel because `parallel = FALSE`")
     }
   }
-  #If parallel is passed
-  else{
-    if (.args$threads > 1 &&
-        isFALSE(.args$parallel))
-      warning("`threads > 1` but model will not run in parallel because `parallel = FALSE`")
-  }
-
   return(invisible(cmd_args))
 }
 
@@ -693,3 +685,56 @@ remove_dup_cols <- function(data){
   }
   return(data)
 }
+
+
+#' Removes duplicate col names
+#'
+#' @param obj takes either a model object or bbi_args as list object
+#' @keywords internal
+sanitize_null_bbi_args <- function(obj)
+{
+  #If is a model object
+  if(is(obj, "bbi_model") == TRUE)
+  {
+    temp_mod <- obj
+    obj <- temp_mod$bbi_args
+    yml <- temp_mod %>% get_yaml_path() %>% read_yaml()
+  }
+
+  #If is .bbi_args list and not model object
+  if(is(obj, "bbi_model") == FALSE && is(obj, "list") == TRUE)
+  {
+    # Finds the names of bbi args that are null and places in list
+    # threads must be specified, so it is set to 1, otherwise nulls are removed
+
+    .args <- map(obj,is.null)
+    null_elements <- unlist(lapply(.args, function(x) x[isTRUE(x)])) %>% names()
+    null_elements <- as.list(strsplit(null_elements, '\\s+'))
+
+    for(i in 1:length(null_elements))
+    {
+      if("threads" %in% null_elements == TRUE)
+      {
+        obj$threads <- NULL
+        obj <- c(obj, threads = 1)
+        null_elements <- null_elements[-c(str_detect(null_elements, "threads") %>% which())]
+        try(yml$bbi_args$threads <- 1)
+      }
+
+      else{
+        obj[which(names(obj)%in%c(null_elements[[i - 1]]))]  <- NULL
+      }
+    }
+  }
+
+  if(exists("temp_mod"))
+  {
+    temp_mod$bbi_args <- obj
+    write_yaml(temp_mod, file = temp_mod %>% get_yaml_path())
+    return(temp_mod)
+  }
+  else{
+    return(obj)
+  }
+}
+

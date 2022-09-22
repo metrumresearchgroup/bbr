@@ -72,6 +72,8 @@ new_model <- function(
   if (!is.null(.bbi_args))    .mod <- replace_all_bbi_args(.mod, .bbi_args)
   if (!is.null(.based_on))    .mod <- replace_all_based_on(.mod, .based_on)
   if (isTRUE(.star))          .mod <- add_star(.mod)
+
+  .mod <- sanitize_null_bbi_args(.mod)
   return(.mod)
 }
 
