@@ -687,7 +687,7 @@ remove_dup_cols <- function(data){
 }
 
 
-#' Removes duplicate col names
+#' Removes null values in bbr
 #'
 #' @param obj takes either a model object or bbi_args as list object
 #' @keywords internal
