@@ -709,6 +709,9 @@ sanitize_null_bbi_args <- function(obj)
 
     .args <- map(obj,is.null)
     null_elements <- unlist(lapply(.args, function(x) x[isTRUE(x)])) %>% names()
+
+    if(exists("null_elements") == FALSE || (is.null(null_elements) == TRUE)) return(obj)
+
     null_elements <- as.list(strsplit(null_elements, '\\s+'))
 
     for(i in 1:length(null_elements))

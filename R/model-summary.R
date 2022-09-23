@@ -185,6 +185,9 @@ nonmem_summary <- function(
 ) {
 
   # check against YAML
+  .mod <- sanitize_null_bbi_args(.mod)
+
+  # check against YAML
   check_yaml_in_sync(.mod)
 
   # extract output path
