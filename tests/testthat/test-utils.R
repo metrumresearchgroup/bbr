@@ -220,35 +220,11 @@ test_that("Confirms if threads = 1, parallel is not set [BBR-UTL-015]", {
 })
 
 test_that("confirms handling of default parameters [BBR-UTL-016]", {
-  withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()),{
-    withr::with_tempdir({
-      fs::dir_create(file.path(tempdir(), "test_path"))
-
-      on.exit(if(fs::dir_exists(file.path(tempdir(),"test_path")))
-      {
-        fs::dir_delete(file.path(tempdir(),"test_path"))
-      })
-
-      files_to_copy <- file.path(ABS_MODEL_DIR, c("1.ctl"))
-
-      fs::file_copy(system.file("extdata", "acop.csv", package = "bbr"), file.path(tempdir(), "test_path"))
-      purrr::walk(files_to_copy, fs::file_copy, file.path(tempdir(), "test_path"))
-      fs::dir_copy(file.path(ABS_MODEL_DIR, "1"), file.path(tempdir(), "test_path"))
-      ctl <- read_lines(file.path(tempdir(),"test_path", "1.ctl")) %>%  stringr::str_remove("../../../../extdata/")
-      write_lines(ctl, file.path(tempdir(),"test_path", "1.ctl"))
-
-      readr::write_file("threads:  ", file.path(tempdir(), "test_path", "bbi.yaml"))
-
-
-      mod1 <- new_model(file.path(tempdir(), "test_path", "1"), .description = "original test-workflow-bbi model", .bbi_args = list(parallel = F, overwrite = T))
-
-      res <- submit_model(mod1, .dry_run = TRUE)
-
-      #warning is: `argument is not an atomic vector; coercing`
-      expect_false(str_detect(res, "--parallel") %>% unique()) %>% suppressWarnings()
-      fs::file_delete(file.path(tempdir(), "test_path", "1.yaml"))
-
-    })
+  withr::with_tempdir({
+    fs::file_copy(file.path(ABS_MODEL_DIR, "1.ctl"), ".")
+    cat("", file = "bbi.yaml")
+    mod1 <- new_model("1", .bbi_args = list(parallel = FALSE, overwrite = TRUE))
+    res <- submit_model(mod1, .dry_run = TRUE)
+    expect_false(all(str_detect(res$cmd_args, "--parallel")))
   })
 })
-

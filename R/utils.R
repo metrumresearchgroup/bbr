@@ -65,42 +65,13 @@ check_bbi_args <- function(.args) {
   # format list to character vector
   cmd_args <- format_cmd_args(key_value_list)
 
-  #If parallel not passed
-  if (is.null(.args$parallel) && !is.null(.args$threads))
-  {
-    if (.args$threads > 1)
-    {
+  if (!is.null(.args$threads) && .args$threads > 1) {
+    if (is.null(.args$parallel)) {
       cmd_args <- c(cmd_args, "--parallel")
+    } else if (isFALSE(.args$parallel)) {
+      warning("`threads > 1` but model will not run in parallel because `parallel = FALSE`")
     }
   }
-  #If parallel is passed
-  else if(is.null(.args$parallel) && is.null(.args$threads))
-  {
-    .args$parallel <- FALSE
-    cmd_args <- c(cmd_args, "--threads=1")
-
-  }
-
-  else if(!is.null(.args$parallel) && is.null(.args$threads))
-  {
-    .args$parallel <- FALSE
-    cmd_args <- c(cmd_args, "--threads=1")
-
-  }
-
-  else if(is.null(.args$parallel) && is.null(.args$threads))
-  {
-    .args$parallel <- FALSE
-    cmd_args <- c(cmd_args, "--threads=1")
-
-  }
-
-  else{
-    if (.args$threads > 1 &&
-        isFALSE(.args$parallel))
-      warning("`threads > 1` but model will not run in parallel because `parallel = FALSE`")
-  }
-
   return(invisible(cmd_args))
 }
 
