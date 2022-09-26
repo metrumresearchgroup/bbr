@@ -112,7 +112,12 @@ format_cmd_args <- function(.args, .collapse = FALSE) {
   if (.collapse) {
     return(paste0(arg_vec, collapse = " "))
   } else {
-    return(arg_vec %>% set_names(NULL))
+    res <- if (length(arg_vec) > 0) {
+      arg_vec %>% set_names(NULL)
+    } else {
+      arg_vec
+    }
+    return(res)
   }
 }
 

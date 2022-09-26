@@ -223,7 +223,7 @@ test_that("confirms handling of default parameters [BBR-UTL-016]", {
   withr::with_tempdir({
     fs::file_copy(file.path(ABS_MODEL_DIR, "1.ctl"), ".")
     cat("", file = "bbi.yaml")
-    mod1 <- new_model("1", .bbi_args = list(parallel = FALSE, overwrite = TRUE))
+    mod1 <- new_model("1", .bbi_args = list(parallel = FALSE))
     res <- submit_model(mod1, .dry_run = TRUE)
     expect_false(all(str_detect(res$cmd_args, "--parallel")))
   })
