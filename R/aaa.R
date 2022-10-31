@@ -198,8 +198,8 @@ BBI_ARGS = list(
 # later and applies only to regular models, not summary objects.
 BBI_PARENT_CLASS <- "bbi_model" # SHARED with bbr.bayes
 BBI_BASE_MODEL_CLASS <- "bbi_base_model"
-NM_MOD_CLASS <- "bbi_nonmem_model"
-NM_SUM_CLASS <- "bbi_nonmem_summary"
+NM_MOD_CLASS <- "bbi_nonmem_model" # SHARED with bbr.bayes
+NM_SUM_CLASS <- "bbi_nonmem_summary" # SHARED with bbr.bayes
 SL_CLASS <- "bbi_summary_list"
 PROC_CLASS <- "bbi_process"
 RUN_LOG_CLASS <- "bbi_run_log_df"
