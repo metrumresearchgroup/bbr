@@ -1014,6 +1014,7 @@ UTL-R003:
   tests:
   - BBR-UTL-014
   - BBR-UTL-015
+  - BBR-UTL-016
 WRKF-R001:
   description: step by step create_model to submit_model to model_summary works
   tests:
