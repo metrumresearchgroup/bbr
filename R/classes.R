@@ -61,7 +61,6 @@ create_model_object <- function(res, save_yaml) {
   # assign class and write YAML to disk
   .model_type <- res[[YAML_MOD_TYPE]]
 
-  # assign class
   class(res) <- c(as.character(glue("bbi_{.model_type}_model")),
                   BBI_BASE_MODEL_CLASS, BBI_PARENT_CLASS, class(res))
 
@@ -109,7 +108,6 @@ create_summary_object <- function(res, .model_type) {
     strict_mode_error(err_msg)
   }
 
-  # assign class and return
   class(res) <- c(as.character(glue("bbi_{.model_type}_summary")), BBI_PARENT_CLASS, class(res))
   return(res)
 }
