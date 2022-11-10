@@ -67,9 +67,10 @@ add_summary <- function(
 #' @importFrom stringr str_subset
 #' @importFrom fs dir_ls file_exists
 #' @importFrom purrr map_df map_chr
-#' @importFrom dplyr select everything mutate mutate_at vars
+#' @importFrom dplyr across select everything mutate
 #' @importFrom jsonlite fromJSON
 #' @importFrom tibble tibble
+#' @importFrom tidyselect all_of
 #' @param .mods List of model objects that will be passed to [model_summaries()].
 #' @param ... Arguments passed through to [model_summaries()]
 #' @keywords internal
@@ -101,16 +102,16 @@ summary_log_impl <- function(.mods, ...) {
     return(select(res_df, -all_of(c(SL_SUMMARY, SL_FAIL_FLAGS))))
   }
 
-  res_df <- mutate_at(
+  res_df <- mutate(
     res_df,
-    vars(SL_SUMMARY),
-    list(
-      d = extract_details,
-      ofv = extract_ofv,
-      param_count = extract_param_count,
-      condition_number = extract_condition_number,
-      h = extract_heuristics
-    ))
+    across(all_of(SL_SUMMARY),
+           .fns = list(
+             d = extract_details,
+             ofv = extract_ofv,
+             param_count = extract_param_count,
+             condition_number = extract_condition_number,
+             h = extract_heuristics),
+           .names = "{fn}"))
 
   res_df <- res_df %>% unnest_wider("d") %>% unnest_wider("h")
 
