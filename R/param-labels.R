@@ -70,6 +70,7 @@ param_labels.bbi_nonmem_model <- function(.mod, ...) {
 #' @importFrom tidyr replace_na
 #' @importFrom dplyr select everything
 #' @importFrom purrr map_df
+#' @importFrom tidyselect all_of
 #' @export
 param_labels.character <- function(.mod, ...) {
   if(length(.mod) != 1) {
@@ -90,7 +91,7 @@ param_labels.character <- function(.mod, ...) {
       .theta = (.pick == "THETA")
     )
     .pick_labels[[SUMMARY_PARAM_NAMES]] <- rep(.pick, nrow(.pick_labels))
-     return(select(.pick_labels, .data[[SUMMARY_PARAM_NAMES]], everything()))
+     return(select(.pick_labels, all_of(SUMMARY_PARAM_NAMES), everything()))
   }) %>%
     tidyr::replace_na(list(label="", unit="", type=""))
 

@@ -98,7 +98,7 @@ summary_log_impl <- function(.mods, ...) {
   # and everything else will be NULL/NA anyway, so we just return the errors here.
   if (all(!is.na(res_df[[SL_ERROR]]))) {
     warning(glue("ALL {nrow(res_df)} MODEL SUMMARIES FAILED in `summary_log()` call. Check `error_msg` column for details."))
-    return(select(res_df, -.data[[SL_SUMMARY]], -.data[[SL_FAIL_FLAGS]]))
+    return(select(res_df, -all_of(c(SL_SUMMARY, SL_FAIL_FLAGS))))
   }
 
   res_df <- mutate_at(
