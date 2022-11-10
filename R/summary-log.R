@@ -112,7 +112,7 @@ summary_log_impl <- function(.mods, ...) {
       h = extract_heuristics
     ))
 
-  res_df <- res_df %>% unnest_wider(.data$d) %>% unnest_wider(.data$h)
+  res_df <- res_df %>% unnest_wider("d") %>% unnest_wider("h")
 
   res_df <- create_summary_log_object(res_df)
 

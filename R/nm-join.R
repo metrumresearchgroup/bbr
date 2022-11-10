@@ -106,7 +106,7 @@ nm_join <- function(
     "DV" %in% names(.d) &&
     "DV" %in% unlist(map(.tbls, names))
   ) {
-    .d <- rename(.d, DV.DATA = .data$DV)
+    .d <- rename(.d, DV.DATA = "DV")
   }
   col_order <- names(.d)
 
@@ -153,7 +153,7 @@ nm_join <- function(
       # if ID is missing, get it from the data by using .join_col
       if (!has_id) {
         tab <- tab %>%
-          left_join(select(.d, .data$ID, !!.join_col), by = .join_col)
+          left_join(select(.d, "ID", !!.join_col), by = .join_col)
       }
 
       # toss .join_col, if present, because we're joining on ID

@@ -81,7 +81,7 @@ param_estimates_batch <- function(.path,
   df <- as_tibble(fread(text = res$stdout))
 
   # throw out extra column that gets created if no models succeeded
-  if ("V4" %in% names(df)) df <- select(df, -.data$V4)
+  if ("V4" %in% names(df)) df <- select(df, -"V4")
 
   # reformat parameter names to conform with `param_estimates()` output
   names(df) <- gsub("\\(([0-9]+)_([0-9]+)\\)", "(\\1,\\2)", names(df))
@@ -89,9 +89,9 @@ param_estimates_batch <- function(.path,
   # format and return
   df %>%
     rename(
-      absolute_model_path = .data$dir,
-      error_msg = .data$error,
-      termination_code = .data$termination
+      absolute_model_path = "dir",
+      error_msg = "error",
+      termination_code = "termination"
     ) %>%
     mutate(
       across(everything(), ~ ifelse(. == "", NA, .)),
@@ -99,10 +99,10 @@ param_estimates_batch <- function(.path,
       run = basename(.data$absolute_model_path)
     ) %>%
     select(
-      .data$absolute_model_path,
-      .data$run,
-      .data$error_msg,
-      .data$termination_code,
+      "absolute_model_path",
+      "run",
+      "error_msg",
+      "termination_code",
       everything()
     )
 }
@@ -196,8 +196,8 @@ param_estimates_compare <- function(
   # join quantiles to original
   if (!is.null(.orig_mod)) {
     comp_df <- mod_df %>%
-      select(.data$parameter_names, .data$estimate) %>%
-      rename(original_estimate = .data$estimate) %>%
+      select("parameter_names", "estimate") %>%
+      rename(original_estimate = "estimate") %>%
       left_join(comp_df, by = "parameter_names")
   }
 
