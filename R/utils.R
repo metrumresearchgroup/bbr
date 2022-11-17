@@ -255,11 +255,12 @@ combine_list_objects <- function(.new_list, .old_list, .append = FALSE) {
 #' add run col to bbi_log_df
 #' @param df tibble to modify
 #' @importFrom dplyr mutate select everything
+#' @importFrom tidyselect all_of
 #' @keywords internal
 add_run_id_col <- function(df) {
   df %>%
     mutate(!!RUN_ID_COL := basename(.data[[ABS_MOD_PATH]])) %>%
-    select(ABS_MOD_PATH, RUN_ID_COL, everything())
+    select(all_of(c(ABS_MOD_PATH, RUN_ID_COL)), everything())
 }
 
 #' Convert an object containing entirely NA's to NULL
