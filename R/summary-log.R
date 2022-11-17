@@ -110,7 +110,7 @@ summary_log_impl <- function(.mods, ...) {
   # If none of the models are nonmem, the next section will error trying to
   # unnest them, so we just return the objects here.
   if (purrr::none(.mods, ~ inherits(.x, NM_MOD_CLASS))) {
-    return(select(res_df, -.data[[SL_FAIL_FLAGS]]))
+    return(select(res_df, -all_of(SL_FAIL_FLAGS)))
   }
 
   res_df <- mutate(
