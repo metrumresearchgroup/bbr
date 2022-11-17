@@ -240,7 +240,7 @@ as_summary_list.bbi_summary_log_df <- function(.sums) {
   # create list of lists
   .sum_list <- group_split(.sums, rn = row_number())
   .sum_list <- map(.sum_list, function(.row) {
-    .row <- select(.row, -.data$rn)
+    .row <- select(.row, -"rn")
     .row <- as.list(.row)
     .row[[SL_SUMMARY]] <- .row[[SL_SUMMARY]][[1]] # this gets buried one level deep by the as.list call
     return(.row)

@@ -229,7 +229,7 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
   }
 
   param_df <- param_df %>%
-    select(.data$parameter_names, .data$estimate, .data$stderr, .data$shrinkage) %>%
+    select("parameter_names", "estimate", "stderr", "shrinkage") %>%
     mutate_if(is.numeric, sig, .digits = .digits)
 
   if (requireNamespace("knitr", quietly = TRUE)) {
