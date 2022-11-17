@@ -125,12 +125,14 @@ nm_file_impl <- function(.path) {
   # read the file, but catch warning that tells us there are multiple tables
   W <- NULL
   .d <- withCallingHandlers({
-    data <- fread(
-      .path,
-      na.strings = ".",
-      skip = 1,
-      verbose = FALSE
-    )
+    withr::with_options(list(warn = 1), {
+      data <- fread(
+        .path,
+        na.strings = ".",
+        skip = 1,
+        verbose = FALSE
+      )
+    })
     data <- remove_dup_cols(data)
     data <- as_tibble(data)
     data
