@@ -1043,3 +1043,7 @@ WRKF-R007:
   description: submit_model() works with non-NULL .config_path
   tests:
   - BBR-WRKF-007
+WRKF-R008:
+  description: submit_model() overwrites existing model when .overwrite=TRUE
+  tests:
+  - BBR-WRKF-008
