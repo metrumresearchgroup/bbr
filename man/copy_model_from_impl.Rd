@@ -14,7 +14,6 @@ copy_model_from_impl(
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE,
-  .model_type = "nonmem",
   setup_fn = NULL
 )
 }
@@ -54,8 +53,6 @@ stream.}
 \item{.overwrite}{If \code{FALSE}, the default,  function will error if a model
 file already exists at specified \code{.new_model} path. If \code{TRUE} any existing
 file at \code{.new_model} will be overwritten silently.}
-
-\item{.model_type}{Model type to pass to \code{\link[=new_model]{new_model()}}.}
 
 \item{setup_fn}{A function to call (with no arguments) before creating the
 model with \code{\link[=new_model]{new_model()}}.}

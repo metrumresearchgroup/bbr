@@ -102,6 +102,8 @@ read_model <- function(.path) {
   create_model_object(yaml_list, save_yaml = FALSE)
 }
 
+# SHARED: save_model_yaml() is used by bbr.bayes, so any changes here should be
+# compatible with its use there.
 
 #' Saves a model object to a yaml file
 #'

@@ -107,7 +107,6 @@ copy_model_from.bbi_nonmem_model <- function(
     .inherit_tags = .inherit_tags,
     .update_model_file = .update_model_file,
     .overwrite = .overwrite,
-    .model_type = "nonmem",
     setup_fn = copy_ctl
   )
 
@@ -132,7 +131,6 @@ copy_model_from.bbi_nonmem_model <- function(
 #'   default, update the `$PROBLEM` line in the new control stream. If `FALSE`,
 #'   `{.new_model}.[mod|ctl]` will be an exact copy of its parent control
 #'   stream.
-#' @param .model_type Model type to pass to [new_model()].
 #' @param setup_fn A function to call (with no arguments) before creating the
 #'   model with [new_model()].
 #' @inheritParams copy_model_from
@@ -154,7 +152,6 @@ copy_model_from_impl <- function(
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE,
-  .model_type = "nonmem",
   setup_fn = NULL
 ) {
   check_for_existing_model(.new_model, .overwrite)
@@ -179,6 +176,8 @@ copy_model_from_impl <- function(
     setup_fn()
   }
 
+  mtype <- stringr::str_replace(
+    class(.parent_mod)[1], "^bbi_(.*)_model$", "\\1")
   # create new model
   .new_mod <- new_model(
     .new_model,
@@ -188,7 +187,7 @@ copy_model_from_impl <- function(
     .star = .star,
     .bbi_args = .parent_mod[[YAML_BBI_ARGS]],
     .overwrite = FALSE, # will have already overwritten if necessary
-    .model_type = .model_type
+    .model_type = mtype
   )
 
   return(.new_mod)

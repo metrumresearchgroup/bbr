@@ -270,6 +270,9 @@ get_path_from_log_df <- function(.log_df, .get_func, .check_exists) {
   return(.out_paths)
 }
 
+# SHARED: get_model_working_directory() is used by bbr.bayes, so any changes
+# here should be compatible with its use there.
+
 #' Get the working directory of a model object
 #'
 #' The working directory of a model object is the parent directory of the
