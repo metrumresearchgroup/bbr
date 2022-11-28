@@ -29,7 +29,7 @@ test_that("get_based_on works happy path run_log tibble [BBR-GBO-004]" , {
   mod3 <- mod3 %>% add_based_on("2")
 
   # build log_df and check get_based_on
-  log_df <- run_log(MODEL_DIR)
+  log_df <- run_log(MODEL_DIR, .recurse = TRUE)
 
   expect_identical(
     get_based_on(log_df),
@@ -144,7 +144,7 @@ test_that("get_model_ancestry works happy path run_log tibble [BBR-GBO-011]" , {
   mod3 <- mod3 %>% add_based_on("2")
 
   # build log_df and check get_based_on
-  log_df <- run_log(MODEL_DIR)
+  log_df <- run_log(MODEL_DIR, .recurse = TRUE)
 
   expect_identical(
     get_model_ancestry(log_df),
@@ -182,7 +182,7 @@ test_that("get_model_ancestry works on run_log tibble with more complicated ance
   mod10 <- mod10 %>% add_based_on(get_model_path(mod4))
 
   # build log_df and check get_based_on
-  log_df <- run_log(MODEL_DIR)
+  log_df <- run_log(MODEL_DIR, .recurse = TRUE)
 
   expect_identical(
     get_model_ancestry(log_df),

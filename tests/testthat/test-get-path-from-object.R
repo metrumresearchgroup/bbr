@@ -49,7 +49,7 @@ test_that("get_model_path() works with bbi_*_log_df [BBR-GPFO-007]", {
   on.exit(cleanup())
 
   ref_mod_paths <- as.character(fs::path_ext_set(c(MOD1_ABS_PATH, MOD2_ABS_PATH, MOD3_ABS_PATH, MOD4_ABS_PATH), ".ctl"))
-  res_mod_paths <- get_model_path(run_log(MODEL_DIR))
+  res_mod_paths <- get_model_path(run_log(MODEL_DIR, .recurse = TRUE))
 
   expect_identical(ref_mod_paths, res_mod_paths)
 })

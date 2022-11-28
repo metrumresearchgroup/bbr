@@ -90,8 +90,12 @@ test_that("run_log() works correctly with nested dirs [BBR-RNLG-004]", {
   copy_model_from(MOD1, file.path(LEVEL2_SUBDIR, MOD_ID), "level 2 copy of 1.yaml", .inherit_tags = TRUE)
   fs::dir_copy(MOD1_PATH, LEVEL2_MOD)
 
-
+  # test default
   log_df <- run_log(MODEL_DIR)
+  expect_equal(nrow(log_df), RUN_LOG_ROWS)
+
+  # test with .recurse = TRUE
+  log_df <- run_log(MODEL_DIR, .recurse = TRUE)
   expect_equal(nrow(log_df), RUN_LOG_ROWS+1)
   expect_equal(ncol(log_df), RUN_LOG_COLS)
   expect_false(any(duplicated(log_df[[ABS_MOD_PATH]])))
