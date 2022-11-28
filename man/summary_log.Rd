@@ -5,14 +5,16 @@
 \alias{add_summary}
 \title{Create a tibble from \code{model_summaries()} data}
 \usage{
-summary_log(.base_dir, .recurse = TRUE, .include = NULL, ...)
+summary_log(.base_dir, .recurse = FALSE, .include = NULL, ...)
 
 add_summary(.log_df, ...)
 }
 \arguments{
 \item{.base_dir}{Base directory to look in for models.}
 
-\item{.recurse}{If \code{TRUE}, the default, search recursively in all subdirectories. Passed through to \code{fs::dir_ls()} -- If a positive number, the number of levels to recurse.}
+\item{.recurse}{If \code{FALSE}, the default, only include models in \code{.base_dir}
+but \emph{not} subdirectories. This is passed through to \code{fs::dir_ls()} --
+If \code{TRUE} recurse fully, if a positive number the number of levels to recurse.}
 
 \item{.include}{A character vector specifying which runs or model tags to include in the run log.}
 
