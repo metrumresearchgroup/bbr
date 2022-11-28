@@ -361,6 +361,7 @@ RUN-S001:
   - WRKF-R001
   - WRKF-R002
   - WRKF-R004
+  - WRKF-R008
 RUN-S002:
   name: Submit multiple models to be run
   description: As a user, I want to be able to submit multiple models for execution,
