@@ -17,7 +17,6 @@
 #' [PKPDmisc::read_nonmem](https://metrumresearchgroup.github.io/PKPDmisc/reference/read_nonmem.html).
 #'
 #' @return A tibble with the data from the specified file and estimation method.
-#'   All column names will be converted to uppercase.
 #'
 #' @param .mod Either a `bbi_nonmem_model`, `bbi_nonmem_summary`, or a path to a
 #'   file to read in. If passing model object to `nm_file()`, must also pass `.suffix` that
@@ -157,7 +156,6 @@ nm_file_impl <- function(.path) {
   }
 
   # format, message, and return
-  names(.d) <- toupper(names(.d))
   verbose_msg(glue("  rows: {nrow(.d)}"))
   verbose_msg(glue("  cols: {ncol(.d)}"))
   verbose_msg("") # for newline

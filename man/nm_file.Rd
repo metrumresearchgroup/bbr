@@ -34,7 +34,6 @@ relevant parameter names. Otherwise will leave column names as is.}
 }
 \value{
 A tibble with the data from the specified file and estimation method.
-All column names will be converted to uppercase.
 }
 \description{
 Reads in a whitespace-delimited NONMEM output file (for example .grd or .ext

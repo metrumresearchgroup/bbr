@@ -124,5 +124,20 @@ test_that("nm-file has handling for  duplicate columns [BBR-NMF-008]", {
   })
 })
 
+test_that("nm_file() preserves column casing [BBR-NMF-009]", {
+  cov_path <- build_path_from_model(MOD1, ".cov")
+  tmp_path <- tempfile()
+  withr::defer({
+    unlink(tmp_path)
+  })
 
+  # lowercase one of the column names
+  cov_lines <- readr::read_lines(cov_path) %>% stringr::str_replace("NAME", "name")
+  readr::write_lines(cov_lines, tmp_path)
+
+  .d <- nm_file(tmp_path)
+  expect_equal(ncol(.d), MOD1_PARAM_COUNT+1)
+  expect_equal(nrow(.d), MOD1_PARAM_COUNT)
+  expect_equal(names(.d)[1], "name")
+})
 

@@ -544,6 +544,10 @@ NMF-R007:
   description: nm_file() repairs duplicate column names that are present in input file
   tests:
   - BBR-NMF-008
+NMF-R008:
+  description: nm_file() preserves column casing
+  tests:
+  - BBR-NMF-009
 NMJ-R001:
   description: nm_join() works correctly
   tests:
