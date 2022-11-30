@@ -139,7 +139,7 @@ test_that("nm_join(.join_col) works correctly with duplicate cols  [BBR-NMJ-005]
   new_tab <- "fake.tab"
   readr::write_lines(c(
     "TABLE NO. 1",
-    "bum tum",
+    "BUM TUM",
     paste(1:DATA_TEST_ROWS_IGNORE, "A")
   ), file.path(new_mod_out, new_tab))
 

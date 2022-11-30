@@ -519,6 +519,7 @@ OUT-S001:
   - NMF-R005
   - NMF-R006
   - NMF-R007
+  - NMF-R008
 OUT-S002:
   name: Read NONMEM tables and data
   description: As a user, I want to be able to pass a model object and have bbr extract
