@@ -39,14 +39,14 @@ test_that("summary_log() returns NULL and warns when no YAML found [BBR-SMLG-001
 test_that("summary_log() works correctly with nested dirs [BBR-SMLG-002]", {
   clean_test_enviroment(create_all_models)
   copy_all_output_dirs()
-  sum_df <- summary_log(MODEL_DIR)
+  sum_df <- summary_log(MODEL_DIR, .recurse = TRUE)
   test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3, LEVEL2_MOD), SUM_LOG_COLS)
 })
 
-test_that("summary_log(.recurse = FALSE) works [BBR-SMLG-003]", {
+test_that("summary_log() defaults to .recurse = FALSE [BBR-SMLG-003]", {
   clean_test_enviroment(create_all_models)
   copy_all_output_dirs()
-  sum_df <- summary_log(MODEL_DIR, .recurse = FALSE)
+  sum_df <- summary_log(MODEL_DIR)
   test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3), SUM_LOG_COLS)
 })
 
@@ -54,7 +54,7 @@ test_that("summary_log(.recurse = FALSE) works [BBR-SMLG-003]", {
 test_that("add_summary() works correctly [BBR-SMLG-004]", {
   clean_test_enviroment(create_all_models)
   copy_all_output_dirs()
-  sum_df <- run_log(MODEL_DIR) %>% add_summary()
+  sum_df <- run_log(MODEL_DIR, .recurse = TRUE) %>% add_summary()
   test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3, LEVEL2_MOD), RUN_LOG_COLS+SUM_LOG_COLS-2)
   expect_identical(sum_df$model_type, rep("nonmem", RUN_LOG_ROWS+1))
   expect_identical(sum_df$yaml_md5, ALL_MODS_YAML_MD5)
@@ -115,22 +115,22 @@ test_that("summary_log works some failed summaries [BBR-SMLG-008]", {
   copy_all_output_dirs()
   fs::file_delete(file.path(LEVEL2_MOD, "1.grd"))
 
-  sum_df <- summary_log(MODEL_DIR)
+  sum_df <- summary_log(MODEL_DIR, .recurse = TRUE)
   expect_equal(is.na(sum_df$error_msg), c(TRUE, TRUE, TRUE, FALSE))
   expect_equal(ncol(sum_df), SUM_LOG_COLS)
   expect_equal(sum_df[[SL_FAIL_FLAGS]], c(FALSE, FALSE, FALSE, FALSE))
 
-  sum_df <- summary_log(MODEL_DIR, .bbi_args = list(no_grd_file = TRUE))
+  sum_df <- summary_log(MODEL_DIR, .recurse = TRUE, .bbi_args = list(no_grd_file = TRUE))
   test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3, LEVEL2_MOD), SUM_LOG_COLS)
 
   # Add a failure that isn't covered by .bbi_args...
   fs::file_delete(file.path(NEW_MOD2, "2.ext"))
-  sum_df <- summary_log(MODEL_DIR, .bbi_args = list(no_grd_file = TRUE))
+  sum_df <- summary_log(MODEL_DIR, .recurse = TRUE, .bbi_args = list(no_grd_file = TRUE))
   expect_equal(is.na(sum_df$error_msg), c(TRUE, FALSE, TRUE, TRUE))
   expect_equal(ncol(sum_df), SUM_LOG_COLS)
   expect_equal(sum_df[[SL_FAIL_FLAGS]], c(FALSE, FALSE, FALSE, FALSE))
   # ... or .fail_flags
-  sum_df <- summary_log(MODEL_DIR, .fail_flags = list(no_grd_file = TRUE))
+  sum_df <- summary_log(MODEL_DIR, .recurse = TRUE, .fail_flags = list(no_grd_file = TRUE))
   expect_equal(is.na(sum_df$error_msg), c(TRUE, FALSE, TRUE, TRUE))
   expect_equal(ncol(sum_df), SUM_LOG_COLS)
   expect_equal(sum_df[[SL_FAIL_FLAGS]], c(FALSE, FALSE, FALSE, TRUE))

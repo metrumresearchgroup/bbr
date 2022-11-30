@@ -67,7 +67,7 @@ test_that("check_up_to_date.bbi_log_df() works as expected [BBR-CUTD-007]", {
   fs::dir_delete(get_output_dir(mod3)) # for testing missing output dir
   on.exit(cleanup())
 
-  log_df <- run_log(MODEL_DIR)
+  log_df <- run_log(MODEL_DIR, .recurse = TRUE)
   expect_message(
     res <- check_up_to_date(log_df),
     regexp = "Cannot check"

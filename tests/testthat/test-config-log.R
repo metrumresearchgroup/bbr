@@ -72,7 +72,7 @@ test_that("config_log() returns NULL and warns when no YAML found [BBR-CGLG-001]
 })
 
 test_that("config_log() works correctly with nested dirs [BBR-CGLG-002]", {
-  log_df <- config_log(MODEL_DIR)
+  log_df <- config_log(MODEL_DIR, .recurse = TRUE)
   check_config_ref(
     log_df,
     c("1", "2", "3", "1"),
@@ -81,8 +81,8 @@ test_that("config_log() works correctly with nested dirs [BBR-CGLG-002]", {
   )
 })
 
-test_that("config_log(.recurse = FALSE) works [BBR-CGLG-003]", {
-  log_df <- config_log(MODEL_DIR, .recurse = FALSE)
+test_that("config_log() defaults to .recurse = FALSE [BBR-CGLG-003]", {
+  log_df <- config_log(MODEL_DIR)
   check_config_ref(
     log_df,
     c("1", "2", "3"),
@@ -117,7 +117,7 @@ test_that("add_config() works correctly [BBR-CGLG-008]", {
   log_df <- run_log(MODEL_DIR) %>% add_config()
   check_config_ref(
     log_df,
-    c("1", "2", "3", "1"),
+    c("1", "2", "3"),
     RUN_LOG_COLS + CONFIG_COLS-2,
     run_status
   )
@@ -142,7 +142,7 @@ fs::file_delete(file.path(LEVEL2_MOD, "bbi_config.json"))
 missing_idx <- c(3L, 4L)
 
 test_that("add_config() works correctly with missing json [BBR-CGLG-010]", {
-  log_df <- expect_warning(run_log(MODEL_DIR) %>% add_config(), regexp = "Found only 2 bbi_config.json files for 4 models")
+  log_df <- expect_warning(run_log(MODEL_DIR, .recurse = TRUE) %>% add_config(), regexp = "Found only 2 bbi_config.json files for 4 models")
   expect_equal(nrow(log_df), RUN_LOG_ROWS+1)
   expect_equal(ncol(log_df), RUN_LOG_COLS+CONFIG_COLS-2)
   expect_false(any(duplicated(log_df[[ABS_MOD_PATH]])))
@@ -183,7 +183,7 @@ fs::dir_delete(LEVEL2_MOD)
 
 test_that("config_log() works with missing output dirs [BBR-CGLG-011]", {
   log_df <- expect_warning(
-    config_log(MODEL_DIR),
+    config_log(MODEL_DIR, .recurse = TRUE),
     regexp = "Found only 2 bbi_config.json files for 4 models"
   )
   expect_true(inherits(log_df, CONF_LOG_CLASS))

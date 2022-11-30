@@ -1,7 +1,7 @@
 Type: Package
 Package: bbr
 Title: R package for bbi
-Version: 1.4.0
+Version: 1.4.0.8000
 Authors@R: 
     c(person(given = "Seth",
              family = "Green",
@@ -87,5 +87,5 @@ VignetteBuilder:
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.2
 SystemRequirements: bbi (>= 3.0.2)

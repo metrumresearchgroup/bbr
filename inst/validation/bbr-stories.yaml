@@ -576,6 +576,7 @@ LOG-S001:
   - RNLG-R003
   - RNLG-R004
   - RNLG-R005
+  - RNLG-R006
 LOG-S002:
   name: Working directory and paths in run log tibble are correct
   description: As a user, I want to be able to use the paths included in the run_log()
@@ -611,6 +612,7 @@ LOG-S003:
   - CGLG-R012
   - CGLG-R013
   - CGLG-R014
+  - CGLG-R015
 LOG-S004:
   name: Check if models are up-to-date using config log
   description: As a user, I want the config log to contain two columns which verify
@@ -638,6 +640,7 @@ LOG-S005:
   - SMLG-R009
   - SMLG-R010
   - SMLG-R011
+  - SMLG-R012
 LOG-S006:
   name: Collapse list columns to character
   description: As a user, I want to have a function that can take a tibble and the

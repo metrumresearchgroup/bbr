@@ -90,6 +90,10 @@ CGLG-R014:
   description: config_log() works with filtering parameter
   tests:
   - BBR-CGLG-014
+CGLG-R015:
+  description: config_log() defaults to .recurse = FALSE
+  tests:
+  - BBR-CGLG-003
 CLM-R001:
   description: delete_models() works for models created by test_threads by default
   tests:
@@ -733,6 +737,10 @@ RNLG-R005:
   tests:
   - BBR-RNLG-005
   - BBR-RNLG-006
+RNLG-R006:
+  description: run_log() defaults to .recurse=FALSE
+  tests:
+  - BBR-RNLG-004
 ROT-R001:
   description: check_file returns correctly
   tests:
@@ -885,6 +893,10 @@ SMLG-R011:
   description: summary_log() works with filtering parameter
   tests:
   - BBR-SMLG-011
+SMLG-R012:
+  description: summary_log() defaults to .recurse = FALSE
+  tests:
+  - BBR-SMLG-003
 SUM-R001:
   description: model_summary.bbi_nonmem_model produces expected output
   tests:
