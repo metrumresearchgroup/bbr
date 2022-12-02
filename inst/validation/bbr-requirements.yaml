@@ -1017,6 +1017,11 @@ UBI-R005:
   description: use-bbi and bbi_version handle path with spaces
   tests:
   - BBR-UBI-005
+UBI-R006:
+  description: use_bbi should take a path to the intended location of the executable file
+  tests:
+  - BBR-UBI-002
+  - BBR-UBI-006
 UTL-R001:
   description: wait_for_nonmem() correctly reads in stop time
   tests:

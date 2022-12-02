@@ -8,7 +8,10 @@ use_bbi(.path = NULL, .version = "latest", .force = FALSE, .quiet = NULL)
 }
 \arguments{
 \item{.path}{absolute path to install bbi to. See Details section for
-defaults, if nothing is passed.}
+defaults, if nothing is passed. Note that this should be the path where you
+would like the bbi executable to be installed, \emph{not} the path to the
+directory in which you want to install it. For example, you should pass
+\code{"/some/dir/bbi"} and \emph{not} \code{"/some/dir"}.}
 
 \item{.version}{version of bbi to install. Must pass a character scalar
 corresponding to a tag found in
@@ -27,9 +30,9 @@ character
 }
 \description{
 Identifies system running and pulls the relevant tarball for the
-current release of bbi from GitHub, and then installs it in the directory
-passed to \code{.dir}. If used in an interactive session, will open an
-installation menu confirming the installed version. This function will
+current release of bbi from GitHub, and then installs it at \code{.path} (see
+Details section for defaults). If used in an interactive session, will open
+an installation menu confirming the installed version. This function will
 print information about the installed version. This \strong{printing can be
 suppressed} by setting \code{options(bbr.verbose = FALSE)}.
 }
