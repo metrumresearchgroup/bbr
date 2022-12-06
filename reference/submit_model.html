@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.5.0</span>
       </span>
     </div>
 
@@ -80,6 +80,7 @@
 <span>  .bbi_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  .mode <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"bbr.bbi_exe_mode"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span>,</span>
+<span>  .overwrite <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  .config_path <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  .wait <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  .dry_run <span class="op">=</span> <span class="cn">FALSE</span></span>
@@ -91,6 +92,7 @@
 <span>  .bbi_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  .mode <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"bbr.bbi_exe_mode"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span>,</span>
+<span>  .overwrite <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  .config_path <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  .wait <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  .dry_run <span class="op">=</span> <span class="cn">FALSE</span></span>
@@ -118,6 +120,13 @@ or set globally with <code>options("bbr.bbi_exe_mode")</code>.</p></dd>
 
 <dt>...</dt>
 <dd><p>args passed through to <code><a href="bbi_exec.html">bbi_exec()</a></code></p></dd>
+
+
+<dt>.overwrite</dt>
+<dd><p>Logical to specify whether or not to overwrite existing
+model output from a previous run. If <code>NULL</code>, the default, will defer to
+setting in <code>.bbi_args</code> or <code>bbi.yaml</code>. If <em>not</em> <code>NULL</code> will override any
+settings in <code>.bbi_args</code> or <code>bbi.yaml</code>.</p></dd>
 
 
 <dt>.config_path</dt>

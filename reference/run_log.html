@@ -19,7 +19,7 @@ Users can also use add_config() or add_summary() to append additional output abo
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.5.0</span>
       </span>
     </div>
 
@@ -79,7 +79,7 @@ Users can also use <code><a href="config_log.html">add_config()</a></code> or <c
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">run_log</span><span class="op">(</span><span class="va">.base_dir</span>, .recurse <span class="op">=</span> <span class="cn">TRUE</span>, .include <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">run_log</span><span class="op">(</span><span class="va">.base_dir</span>, .recurse <span class="op">=</span> <span class="cn">FALSE</span>, .include <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -89,7 +89,9 @@ Users can also use <code><a href="config_log.html">add_config()</a></code> or <c
 
 
 <dt>.recurse</dt>
-<dd><p>If <code>TRUE</code>, the default, search recursively in all subdirectories. Passed through to <code><a href="https://fs.r-lib.org/reference/dir_ls.html" class="external-link">fs::dir_ls()</a></code> -- If a positive number, the number of levels to recurse.</p></dd>
+<dd><p>If <code>FALSE</code>, the default, only include models in <code>.base_dir</code>
+but <em>not</em> subdirectories. This is passed through to <code><a href="https://fs.r-lib.org/reference/dir_ls.html" class="external-link">fs::dir_ls()</a></code> --
+If <code>TRUE</code> recurse fully, if a positive number the number of levels to recurse.</p></dd>
 
 
 <dt>.include</dt>
