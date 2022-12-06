@@ -1,3 +1,19 @@
+# bbr 1.5.0
+
+## New features and changes
+
+* `submit_model()` now has an `.overwrite` argument (similar to how `new_model()` and `copy_model_from()` have one). Previously, the user had to pass this through as `.bbi_args = list(overwrite = TRUE)` in order to overwrite output from a previous model execution. (#547)
+
+* Functions `run_log()`, `summary_log()`, and `config_log()` all previously defaulted to searching for models recursively in sub-directories. This has been changed so that now users will need to pass `.recurse = TRUE` to search recursively. The primary reason for the change is user feedback indicating that, more often than not, sub-directories under a model directory contain something like a bootstrap, which would consist of a large number of models that _shouldn't_ be included in the log table. Additionally, these sub-directories sometimes contain enough models (5000+) to make the `*_log()` call take quite some time to complete. (#492) 
+
+## Bugs addressed
+
+* Previously, `nm_file()` (and, as a result, functions like `nm_join()` and `nm_tables()` that use `nm_file()`) was upper-casing all columns in the table that was loaded. This was _not_ part of the original specification and ended up causing problems with some users' downstream code, which expected the column names to remain intact. Going forward `nm_file()` does not modify any column names. (#564)
+
+* Previously, a user could pass a directory path to `use_bbi()` and have the executable installed _inside_ that directory. That behavior was undocumented and, more importantly, led to problems when the same directory path was set as `options("bbr.bbi_exe_path")`, because that option needs to contain a path to the actual executable. This was fixed so that now `use_bbi()` explicitly accepts only a path to the desired location of the executable, erroring if it receives a path to an existing directory instead. (#552)
+
+* `bbi 1.4.0` (specifically #514) made the change that users no longer have to specify `parallel = TRUE` to have `submit_model()` respect the number passed to `threads`. Unfortunately, it also introduced a bug where passing `parallel = FALSE` _without_ passing `threads` causes an error. This has been corrected so that passing `parallel = FALSE` without passing `threads` will disable parallelization for that run. (#554)
+
 # bbr 1.4.0
 
 ## New features and changes

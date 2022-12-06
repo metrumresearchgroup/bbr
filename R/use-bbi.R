@@ -1,8 +1,8 @@
 #' @title Installs most current release of bbi
 #' @description Identifies system running and pulls the relevant tarball for the
-#'   current release of bbi from GitHub, and then installs it in the directory
-#'   passed to `.dir`. If used in an interactive session, will open an
-#'   installation menu confirming the installed version. This function will
+#'   current release of bbi from GitHub, and then installs it at `.path` (see
+#'   Details section for defaults). If used in an interactive session, will open
+#'   an installation menu confirming the installed version. This function will
 #'   print information about the installed version. This **printing can be
 #'   suppressed** by setting `options(bbr.verbose = FALSE)`.
 #'
@@ -36,7 +36,10 @@
 #' @importFrom cli rule
 #'
 #' @param .path absolute path to install bbi to. See Details section for
-#'   defaults, if nothing is passed.
+#'   defaults, if nothing is passed. Note that this should be the path where you
+#'   would like the bbi executable to be installed, _not_ the path to the
+#'   directory in which you want to install it. For example, you should pass
+#'   `"/some/dir/bbi"` and _not_ `"/some/dir"`.
 #' @param .version version of bbi to install. Must pass a character scalar
 #'   corresponding to a tag found in
 #'   `https://github.com/metrumresearchgroup/bbi/releases`
@@ -62,6 +65,17 @@ use_bbi <- function(.path = NULL, .version = "latest", .force = FALSE, .quiet = 
 
   if (is.null(.path)) {
     .path <- build_bbi_install_path()
+  }
+
+  if (fs::is_dir(.path)) {
+    err_msg <- glue(
+      "{.path} is an existing directory. `use_bbi(.path)` needs a path the destination for the `bbi` executable _file_.",
+      "Did you mean to install to `{file.path(.path, 'bbi')}`?", .sep = "\n"
+    )
+    if(.path == getOption("bbr.bbi_exe_path")) {
+      err_msg <- paste(err_msg, "Make this change wherever you are setting `options('bbr.bbi_exe_path')`, potentially in your .Rprofile")
+    }
+    stop(err_msg)
   }
 
   dir_create(dirname(.path))

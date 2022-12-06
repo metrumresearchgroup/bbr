@@ -10,7 +10,9 @@
 #' @seealso [config_log()], [summary_log()]
 #'
 #' @param .base_dir Base directory to look in for models.
-#' @param .recurse If `TRUE`, the default, search recursively in all subdirectories. Passed through to `fs::dir_ls()` -- If a positive number, the number of levels to recurse.
+#' @param .recurse If `FALSE`, the default, only include models in `.base_dir`
+#'   but _not_ subdirectories. This is passed through to `fs::dir_ls()` --
+#'   If `TRUE` recurse fully, if a positive number the number of levels to recurse.
 #' @param .include A character vector specifying which runs or model tags to include in the run log.
 #'
 #' @details
@@ -28,7 +30,7 @@
 #' @importFrom tibble tibble
 #' @return A tibble of class `bbi_run_log_df` with information on each model, or an empty tibble if no models are found.
 #' @export
-run_log <- function(.base_dir, .recurse = TRUE, .include = NULL) {
+run_log <- function(.base_dir, .recurse = FALSE, .include = NULL) {
   checkmate::assert_string(.base_dir)
 
   mod_list <- find_models(.base_dir, .recurse, .include)

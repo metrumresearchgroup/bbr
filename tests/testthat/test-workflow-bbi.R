@@ -96,7 +96,7 @@ withr::with_options(list(
     mod2 <- mod2 %>% add_tags(NEW_TAGS)
   })
 
-  test_that(".overwrite argument works for submitting models", {
+  test_that(".overwrite argument works for submitting models [BBR-WRKF-008]", {
     mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
     mod2 <- read_model(file.path(MODEL_DIR_BBI, "2"))
     mod3 <- read_model(file.path(MODEL_DIR_BBI, "3"))

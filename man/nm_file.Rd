@@ -34,7 +34,6 @@ relevant parameter names. Otherwise will leave column names as is.}
 }
 \value{
 A tibble with the data from the specified file and estimation method.
-All column names will be converted to uppercase.
 }
 \description{
 Reads in a whitespace-delimited NONMEM output file (for example .grd or .ext
@@ -50,8 +49,7 @@ as well as by \code{\link[=nm_tables]{nm_tables()}} and \code{\link[=nm_join]{nm
 \code{nm_file()} (and family) are \emph{not} compatible with files that have multiple
 tables, for example an \code{.ext} file for a model with multiple estimation
 methods or a table file from a model using \verb{$SIM}. For these kinds of files,
-consider using
-\href{https://metrumresearchgroup.github.io/PKPDmisc/reference/read_nonmem.html}{PKPDmisc::read_nonmem}.
+consider using \code{data.table::fread()} with the \code{skip} and \code{nrows} arguments.
 }
 \section{Functions}{
 \itemize{

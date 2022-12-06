@@ -13,11 +13,9 @@
 #' `nm_file()` (and family) are _not_ compatible with files that have multiple
 #' tables, for example an `.ext` file for a model with multiple estimation
 #' methods or a table file from a model using `$SIM`. For these kinds of files,
-#' consider using
-#' [PKPDmisc::read_nonmem](https://metrumresearchgroup.github.io/PKPDmisc/reference/read_nonmem.html).
+#' consider using `data.table::fread()` with the `skip` and `nrows` arguments.
 #'
 #' @return A tibble with the data from the specified file and estimation method.
-#'   All column names will be converted to uppercase.
 #'
 #' @param .mod Either a `bbi_nonmem_model`, `bbi_nonmem_summary`, or a path to a
 #'   file to read in. If passing model object to `nm_file()`, must also pass `.suffix` that
@@ -157,7 +155,6 @@ nm_file_impl <- function(.path) {
   }
 
   # format, message, and return
-  names(.d) <- toupper(names(.d))
   verbose_msg(glue("  rows: {nrow(.d)}"))
   verbose_msg(glue("  cols: {ncol(.d)}"))
   verbose_msg("") # for newline

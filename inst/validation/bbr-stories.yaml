@@ -43,6 +43,7 @@ CFG-S004:
   - UBI-R003
   - UBI-R004
   - UBI-R005
+  - UBI-R006
   - RBP-R001
 CFG-S005:
   name: Pass .bbi_args to bbi_init()
@@ -361,6 +362,7 @@ RUN-S001:
   - WRKF-R001
   - WRKF-R002
   - WRKF-R004
+  - WRKF-R008
 RUN-S002:
   name: Submit multiple models to be run
   description: As a user, I want to be able to submit multiple models for execution,
@@ -518,6 +520,7 @@ OUT-S001:
   - NMF-R005
   - NMF-R006
   - NMF-R007
+  - NMF-R008
 OUT-S002:
   name: Read NONMEM tables and data
   description: As a user, I want to be able to pass a model object and have bbr extract
@@ -574,6 +577,7 @@ LOG-S001:
   - RNLG-R003
   - RNLG-R004
   - RNLG-R005
+  - RNLG-R006
 LOG-S002:
   name: Working directory and paths in run log tibble are correct
   description: As a user, I want to be able to use the paths included in the run_log()
@@ -609,6 +613,7 @@ LOG-S003:
   - CGLG-R012
   - CGLG-R013
   - CGLG-R014
+  - CGLG-R015
 LOG-S004:
   name: Check if models are up-to-date using config log
   description: As a user, I want the config log to contain two columns which verify
@@ -636,6 +641,7 @@ LOG-S005:
   - SMLG-R009
   - SMLG-R010
   - SMLG-R011
+  - SMLG-R012
 LOG-S006:
   name: Collapse list columns to character
   description: As a user, I want to have a function that can take a tibble and the

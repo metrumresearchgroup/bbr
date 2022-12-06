@@ -43,7 +43,7 @@
 #' @seealso [run_log()], [summary_log()]
 #' @inheritParams run_log
 #' @export
-config_log <- function(.base_dir, .recurse = TRUE, .include = NULL) {
+config_log <- function(.base_dir, .recurse = FALSE, .include = NULL) {
   checkmate::assert_string(.base_dir)
 
   mod_list <- find_models(.base_dir, .recurse, .include)

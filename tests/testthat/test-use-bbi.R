@@ -72,3 +72,12 @@ test_that("use-bbi and bbi_version handle path with spaces [BBR-UBI-005]", {
   expect_true(file.exists(bbi_path))
   expect_equal(bbi_version(bbi_path), v)
 })
+
+test_that("use_bbi errors when passed a directory [BBR-UBI-006]", {
+  expect_error(use_bbi(.path = REF_DIR), regexp = "existing directory")
+
+  withr::with_options(
+    list('bbr.bbi_exe_path' = REF_DIR),
+    expect_error(use_bbi(.path = REF_DIR), regexp = "bbi_exe_path")
+  )
+})
