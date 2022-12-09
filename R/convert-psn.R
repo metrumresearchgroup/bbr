@@ -99,6 +99,10 @@ convert_psn <- function(.psn_mod_dir,
   if (!is.null(.based_on))    .mod <- replace_all_based_on(.mod, .based_on)
   if (isTRUE(.star))          .mod <- add_star(.mod)
 
+
+  # Cleanup
+  # Cant just keep .bbr_mod_dir, as that could also be equivalent to .psn_mod_dir
+  # Compile list of specific files to keep
   if(isTRUE(.cleanup_psn)){
     files_keep <- c(.mod_path,
                     psn_run_files,
