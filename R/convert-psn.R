@@ -47,7 +47,7 @@ convert_psn <- function(.psn_mod_dir,
 
   if(length(.mod_file) > 1) stop("Can only have one file with a `.mod` or `.ctl` extension in `.psn_mod_dir`")
 
-  # Make sure file exists and
+  # Make sure model file exists in directory
   current_mod_path <- file.path(.psn_mod_dir, .mod_file)
   checkmate::assert_file_exists(current_mod_path)
 
