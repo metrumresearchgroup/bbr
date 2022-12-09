@@ -25,7 +25,7 @@ Note that the model file must have a \code{.mod} or \code{.ctl} file extension.}
 
 \item{.bbr_mod_dir}{Directory to copy the generated bbr model to. If \code{NULL}, defaults to \code{.psn_mod_dir}.}
 
-\item{.method}{How the model was run. Only \code{'execute'} is currently supported}
+\item{.method}{How the model was run. Only \code{'execute'} is currently supported.}
 
 \item{.description}{Character scalar description of new model run. This will
 be stored in the yaml (and can be viewed later in \code{run_log()}).}
@@ -39,10 +39,13 @@ the YAML file}
 
 \item{.star}{Boolean, marks model to indicate special interest level.}
 
-\item{.cleanup_psn}{logical (T/F). Whether to delete relevant PsN files after the bbr model is created}
+\item{.cleanup_psn}{logical (T/F). Whether to delete relevant PsN files after the bbr model is created.}
 
-\item{.overwrite}{logical (T/F). Whether to overwrite files in \code{.bbr_mod_dir}}
+\item{.overwrite}{logical (T/F). Whether to overwrite files if they already exist.}
 }
 \description{
 Convert the output of a PsN run to a bbr model
+}
+\details{
+\code{.psn_run_dir} should point to the latest fit (e.g., \code{modelfit_dir1}, \code{modelfit_dir2})
 }
