@@ -7,7 +7,7 @@
 convert_psn_data_path(.mod_path, .psn_mod_dir, .bbr_run_dir)
 }
 \arguments{
-\item{.mod_path}{path to a bbr model object}
+\item{.mod_path}{Path to a NONMEM control stream file.}
 
 \item{.psn_mod_dir}{Directory containing where the model and table files exist.
 Note that the model file must have a \code{.mod} or \code{.ctl} file extension.}

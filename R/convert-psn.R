@@ -117,7 +117,7 @@ convert_psn <- function(.psn_mod_dir,
 
 #' Create a fake bbi_config.json file for a previous PsN model submission
 #'
-#' @param .mod_path path to a bbr model object
+#' @param .mod_path Path to a NONMEM control stream file.
 #' @inheritParams copy_psn_run_files
 #'
 #' @keywords internal
@@ -186,7 +186,7 @@ create_psn_json <- function(.mod_path,
 
 #' Convert data path during conversion of PsN to bbr model submission
 #'
-#' @param .mod_path path to a bbr model object
+#' @param .mod_path Path to a NONMEM control stream file.
 #' @inheritParams copy_psn_run_files
 #'
 #' @keywords internal
@@ -278,7 +278,7 @@ copy_psn_run_files <- function(.psn_mod_dir,
 
 #' Get NONMEM table files from control file
 #'
-#' @param .mod_path path to a bbr model object
+#' @param .mod_path Path to a NONMEM control stream file.
 #' @inheritParams copy_psn_run_files
 #'
 #' @returns a vector of file paths
