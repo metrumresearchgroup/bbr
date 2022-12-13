@@ -4,22 +4,14 @@
 \alias{copy_psn_run_files}
 \title{Copy PsN run files from control from model and run directory}
 \usage{
-copy_psn_run_files(
-  .psn_mod_dir,
-  .psn_run_dir,
-  .bbr_run_dir,
-  .overwrite = FALSE
-)
+copy_psn_run_files(.psn_run_dir, .bbr_run_dir, .overwrite = FALSE)
 }
 \arguments{
-\item{.psn_mod_dir}{Directory containing where the model and table files exist.
-Note that the model file must have a \code{.mod} or \code{.ctl} file extension.}
+\item{.psn_run_dir}{PsN execution directory where the model was run (e.g., \code{modelfit_dir/NM_run1}).}
 
-\item{.psn_run_dir}{Directory containing where the model was run (i.e. the generated \code{modelfit_dir}).}
+\item{.bbr_run_dir}{Directory to copy the \strong{generated bbr run files} to. Subdirectory of \code{.bbr_dir}}
 
-\item{.bbr_run_dir}{Directory to copy the generated bbr run files to.}
-
-\item{.overwrite}{logical (T/F). Whether to overwrite files if they already exist.}
+\item{.overwrite}{Logical (T/F). Whether to overwrite files if they already exist.}
 }
 \description{
 Copy PsN run files from control from model and run directory
@@ -29,7 +21,7 @@ Following a PsN run, some run files are stored in the upper level "model" direct
 as \code{run.cov}, \code{run.cor}, etc. However, some important run files only exist in the \code{NM_run} subdirectory, such as
 \code{psn.shk} or \code{psn.grd}.
 
-All these files will be copied to \code{.bbr_run_dir}, though run files in the \code{NM_run} subdirectory will be renamed to have the
-model name be part of the file name.
+All these files exist in \code{NM_run}, so we only need that directory. These files will be copied to \code{.bbr_run_dir},
+and will be renamed to have the model name be part of the file path.
 }
 \keyword{internal}

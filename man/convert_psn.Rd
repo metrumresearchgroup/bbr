@@ -5,10 +5,9 @@
 \title{Convert the output of a PsN run to a bbr model}
 \usage{
 convert_psn(
-  .psn_mod_dir,
-  .psn_run_dir,
-  .bbr_mod_dir = NULL,
-  .method = c("execute", "bootstrap", "scm"),
+  .modelfit_dir,
+  .bbr_dir = dirname(.modelfit_dir),
+  .psn_model_file = NULL,
   .description = NULL,
   .based_on = NULL,
   .tags = NULL,
@@ -18,14 +17,11 @@ convert_psn(
 )
 }
 \arguments{
-\item{.psn_mod_dir}{Directory containing where the model and table files exist.
-Note that the model file must have a \code{.mod} or \code{.ctl} file extension.}
+\item{.modelfit_dir}{Directory containing where the model was run (i.e. the generated \code{modelfit_dir}).}
 
-\item{.psn_run_dir}{Directory containing where the model was run (i.e. the generated \code{modelfit_dir}).}
+\item{.bbr_dir}{Directory to copy the generated bbr model to. If \code{NULL}, defaults to \code{.psn_mod_dir}.}
 
-\item{.bbr_mod_dir}{Directory to copy the generated bbr model to. If \code{NULL}, defaults to \code{.psn_mod_dir}.}
-
-\item{.method}{How the model was run. Only \code{'execute'} is currently supported.}
+\item{.psn_model_file}{Model file used during PsN execution. Note that the model file must have a \code{.mod} or \code{.ctl} file extension.}
 
 \item{.description}{Character scalar description of new model run. This will
 be stored in the yaml (and can be viewed later in \code{run_log()}).}
@@ -39,13 +35,16 @@ the YAML file}
 
 \item{.star}{Boolean, marks model to indicate special interest level.}
 
-\item{.cleanup_psn}{logical (T/F). Whether to delete relevant PsN files after the bbr model is created.}
+\item{.cleanup_psn}{Logical (T/F). Whether to delete relevant PsN files after the bbr model is created.}
 
-\item{.overwrite}{logical (T/F). Whether to overwrite files if they already exist.}
+\item{.overwrite}{Logical (T/F). Whether to overwrite files if they already exist.}
+}
+\value{
+a bbr model object
 }
 \description{
 Convert the output of a PsN run to a bbr model
 }
 \details{
-\code{.psn_run_dir} should point to the latest fit (e.g., \code{modelfit_dir1}, \code{modelfit_dir2})
+\code{.modelfit_dir} should point to the latest fit (e.g., \code{modelfit_dir1}, \code{modelfit_dir2})
 }

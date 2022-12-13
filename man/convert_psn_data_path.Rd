@@ -4,15 +4,12 @@
 \alias{convert_psn_data_path}
 \title{Convert data path during conversion of PsN to bbr model submission}
 \usage{
-convert_psn_data_path(.mod_path, .psn_mod_dir, .bbr_run_dir)
+convert_psn_data_path(.mod_path, .bbr_run_dir)
 }
 \arguments{
 \item{.mod_path}{Path to a NONMEM control stream file.}
 
-\item{.psn_mod_dir}{Directory containing where the model and table files exist.
-Note that the model file must have a \code{.mod} or \code{.ctl} file extension.}
-
-\item{.bbr_run_dir}{Directory to copy the generated bbr run files to.}
+\item{.bbr_run_dir}{Directory to copy the \strong{generated bbr run files} to. Subdirectory of \code{.bbr_dir}}
 }
 \description{
 Convert data path during conversion of PsN to bbr model submission

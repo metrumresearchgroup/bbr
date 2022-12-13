@@ -4,17 +4,16 @@
 \alias{copy_psn_tables}
 \title{Get NONMEM table files from control file}
 \usage{
-copy_psn_tables(.mod_path, .psn_mod_dir, .bbr_run_dir, .overwrite = FALSE)
+copy_psn_tables(.mod_path, .psn_run_dir, .bbr_run_dir, .overwrite = FALSE)
 }
 \arguments{
 \item{.mod_path}{Path to a NONMEM control stream file.}
 
-\item{.psn_mod_dir}{Directory containing where the model and table files exist.
-Note that the model file must have a \code{.mod} or \code{.ctl} file extension.}
+\item{.psn_run_dir}{PsN execution directory where the model was run (e.g., \code{modelfit_dir/NM_run1}).}
 
-\item{.bbr_run_dir}{Directory to copy the generated bbr run files to.}
+\item{.bbr_run_dir}{Directory to copy the \strong{generated bbr run files} to. Subdirectory of \code{.bbr_dir}}
 
-\item{.overwrite}{logical (T/F). Whether to overwrite files if they already exist.}
+\item{.overwrite}{Logical (T/F). Whether to overwrite files if they already exist.}
 }
 \value{
 a vector of file paths

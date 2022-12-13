@@ -3,24 +3,23 @@
 
 #' Convert the output of a PsN run to a bbr model
 #'
-#' @param .psn_mod_dir Directory containing where the model and table files exist.
-#'        Note that the model file must have a `.mod` or `.ctl` file extension.
-#' @param .psn_run_dir Directory containing where the model was run (i.e. the generated `modelfit_dir`).
-#' @param .bbr_mod_dir Directory to copy the generated bbr model to. If `NULL`, defaults to `.psn_mod_dir`.
-#' @param .method How the model was run. Only `'execute'` is currently supported.
+#' @param .modelfit_dir Directory containing where the model was run (i.e. the generated `modelfit_dir`).
+#' @param .bbr_dir Directory to copy the generated bbr model to. If `NULL`, defaults to `.psn_mod_dir`.
+#' @param .psn_model_file Model file used during PsN execution. Note that the model file must have a `.mod` or `.ctl` file extension.
 #' @inheritParams new_model
-#' @param .cleanup_psn logical (T/F). Whether to delete relevant PsN files after the bbr model is created.
-#' @param .overwrite logical (T/F). Whether to overwrite files if they already exist.
+#' @param .cleanup_psn Logical (T/F). Whether to delete relevant PsN files after the bbr model is created.
+#' @param .overwrite Logical (T/F). Whether to overwrite files if they already exist.
 #'
 #'
 #' @details
-#' `.psn_run_dir` should point to the latest fit (e.g., `modelfit_dir1`, `modelfit_dir2`)
+#' `.modelfit_dir` should point to the latest fit (e.g., `modelfit_dir1`, `modelfit_dir2`)
+#'
+#' @returns a bbr model object
 #'
 #' @export
-convert_psn <- function(.psn_mod_dir,
-                        .psn_run_dir,
-                        .bbr_mod_dir = NULL,
-                        .method = c("execute", "bootstrap", "scm"), # Doesn't do anything at the moment
+convert_psn <- function(.modelfit_dir,
+                        .bbr_dir = dirname(.modelfit_dir),
+                        .psn_model_file = NULL,
                         .description = NULL,
                         .based_on = NULL,
                         .tags = NULL,
@@ -28,7 +27,6 @@ convert_psn <- function(.psn_mod_dir,
                         .cleanup_psn = FALSE,
                         .overwrite = FALSE){
 
-  .method <- match.arg(.method)
 
   # TODO: Make sure bbi path is set BEFORE copying any files
   # this is needed to create a fake bbi json, and we dont want to
@@ -38,54 +36,67 @@ convert_psn <- function(.psn_mod_dir,
   }
 
   # Normalize paths
-  .psn_mod_dir <- normalizePath(.psn_mod_dir)
-  .psn_run_dir <- normalizePath(.psn_run_dir)
+  .modelfit_dir <- normalizePath(.modelfit_dir)
 
-  # Get model path
-  mod_files <- list.files(.psn_mod_dir)
-  .mod_file <- mod_files[grep(".mod|.ctl", mod_files)]
+  # Find Run folder within fit directory
+  # Assumption: get the -lastest run- from the specified run (e.g., `NM_run1`, `NM_run2`)
+  run_folders <- list.dirs(.modelfit_dir, recursive = FALSE)
+  .psn_run_dir <- run_folders[grep("NM_run", run_folders)]
+  if(length(.psn_run_dir) > 1){
+    .psn_run_dir <- max(.psn_run_dir)
+  }
 
-  if(length(.mod_file) > 1) stop("Can only have one file with a `.mod` or `.ctl` extension in `.psn_mod_dir`")
+  # Get submission attributes
+  .psn_info <- yaml::read_yaml(file.path(.modelfit_dir, "meta.yaml"))
+
+  # Get model path - could be multiple - can get from model_fit1
+  if(!is.null(.psn_model_file)){
+    .psn_mod_path <- normalizePath(.psn_model_file)
+    .mod_name <- basename(.psn_mod_path)
+  }else{
+    mod_files <- .psn_info$model_files
+    .psn_mod_path <- mod_files[grep(".mod|.ctl", mod_files)]
+    if(length(.psn_mod_path) > 1) stop("Multiple model files found:\n", paste(.psn_mod_path, collapse = "\n"))
+    .mod_name <- basename(.psn_mod_path)
+  }
 
   # Make sure model file exists in directory
-  current_mod_path <- file.path(.psn_mod_dir, .mod_file)
-  checkmate::assert_file_exists(current_mod_path)
+  checkmate::assert_file_exists(.psn_mod_path)
+
 
   # Create new model location (if specified)
-  if(is.null(.bbr_mod_dir)){
-    .bbr_mod_dir <- .psn_mod_dir
+  if(is.null(.bbr_dir)){
+    .bbr_dir <- .modelfit_dir
   }else{
-    if(!fs::dir_exists(.bbr_mod_dir)) fs::dir_create(.bbr_mod_dir)
-    .bbr_mod_dir <- normalizePath(.bbr_mod_dir)
+    if(!fs::dir_exists(.bbr_dir)) fs::dir_create(.bbr_dir)
+    .bbr_dir <- normalizePath(.bbr_dir)
 
-    # Copy model to new -model- directory - force .ctl extension to normalize data paths in control file
-    fs::file_copy(current_mod_path, ctl_ext(file.path(.bbr_mod_dir, .mod_file)), overwrite = .overwrite)
+    # Copy model to new -model- directory
+    fs::file_copy(.psn_mod_path, file.path(.bbr_dir, .mod_name), overwrite = .overwrite)
   }
 
   # Create new run directory
-  .bbr_run_dir <- file.path(.bbr_mod_dir, fs::path_ext_remove(.mod_file))
+  .bbr_run_dir <- file.path(.bbr_dir, fs::path_ext_remove(.mod_name))
   if(!fs::dir_exists(.bbr_run_dir)) fs::dir_create(.bbr_run_dir)
 
-  # Copy model to new -run- directory - force .ctl extension to normalize data paths in control file
-  fs::file_copy(current_mod_path, ctl_ext(file.path(.bbr_run_dir, .mod_file)), overwrite = .overwrite)
+  # New Model Paths (to be referenced by bbr)
+  .bbr_mod_path <- file.path(.bbr_dir, .mod_name)
+  .bbr_mod_run_path <- file.path(.bbr_run_dir, .mod_name)
 
-  # Model Path
-  .mod_path <- ctl_ext(file.path(.bbr_mod_dir, .mod_file))
+  # Copy model to new -run- directory
+  fs::file_copy(.psn_mod_path, .bbr_mod_run_path, overwrite = .overwrite)
 
   # Absolute Model Path (no extension)
-  .absolute_mod_path <- sanitize_file_extension(.mod_path)
+  .absolute_mod_path <- sanitize_file_extension(.bbr_mod_path)
 
   # Copy all run files
-  psn_run_files <- copy_psn_run_files(.psn_mod_dir, .psn_run_dir, .bbr_run_dir, .overwrite = .overwrite)
+  psn_run_files <- copy_psn_run_files(.psn_run_dir, .bbr_run_dir, .overwrite = .overwrite)
 
   # Copy and rename table files
-  table_paths <- copy_psn_tables(.mod_path, .psn_mod_dir, .bbr_run_dir, .overwrite = .overwrite)
-
-  # Get submission attributes
-  .psn_info <- yaml::read_yaml(file.path(.psn_run_dir, "meta.yaml"))
+  table_paths <- copy_psn_tables(.psn_mod_path, .psn_run_dir, .bbr_run_dir, .overwrite = .overwrite)
 
   # Create fake PsN bbi_config.json
-  json_file <- create_psn_json(.mod_path, .psn_mod_dir, .bbr_run_dir, .psn_info)
+  json_file <- create_psn_json(.psn_mod_path, .bbr_run_dir, .psn_info)
 
   # create model object
   .mod <- list()
@@ -101,10 +112,10 @@ convert_psn <- function(.psn_mod_dir,
 
 
   # Cleanup
-  # Cant just keep .bbr_mod_dir, as that could also be equivalent to .psn_mod_dir
+  # Cant just keep .bbr_dir, as that could also be equivalent to .psn_mod_dir
   # Compile list of specific files to keep
   if(isTRUE(.cleanup_psn)){
-    files_keep <- c(.mod_path,
+    files_keep <- c(.bbr_mod_path,
                     psn_run_files,
                     table_paths,
                     json_file)
@@ -115,6 +126,91 @@ convert_psn <- function(.psn_mod_dir,
   return(.mod)
 }
 
+
+
+#' Copy PsN run files from control from model and run directory
+#'
+#' @inheritParams convert_psn
+#' @param .psn_run_dir PsN execution directory where the model was run (e.g., `modelfit_dir/NM_run1`).
+#' @param .bbr_run_dir Directory to copy the \strong{generated bbr run files} to. Subdirectory of `.bbr_dir`
+#'
+#' @details
+#' Following a PsN run, some run files are stored in the upper level "model" directory (`.psn_mod_dir`), such
+#' as `run.cov`, `run.cor`, etc. However, some important run files only exist in the `NM_run` subdirectory, such as
+#' `psn.shk` or `psn.grd`.
+#'
+#' All these files exist in `NM_run`, so we only need that directory. These files will be copied to `.bbr_run_dir`,
+#' and will be renamed to have the model name be part of the file path.
+#'
+#' @keywords internal
+copy_psn_run_files <- function(.psn_run_dir,
+                               .bbr_run_dir,
+                               .overwrite = FALSE){
+
+  exts_to_copy <- c("coi", "cor", "cov", "ext", "lst", "phi", "grd", "shk", "shm", "xml")
+  collapsed_exts <- paste(exts_to_copy, collapse = "|")
+
+  run_files <- list.files(.psn_run_dir, full.names = TRUE)
+  files_to_copy <- run_files[grep(collapsed_exts, fs::path_ext(run_files))]
+
+  # Rename run files to correspond to model name
+  mod_name <- basename(.bbr_run_dir)
+  files_to_rename <- purrr::map_chr(files_to_copy, ~{
+    file_split <- strsplit(basename(.x), '[.]')[[1]]
+    paste(mod_name, file_split[2], sep='.')
+  })
+
+  new_file_paths <- file.path(.bbr_run_dir, files_to_rename)
+
+  if(!rlang::is_empty(files_to_copy)){
+    purrr::iwalk(files_to_copy, ~{
+      fs::file_copy(.x, new_file_paths[.y], overwrite = .overwrite)
+    })
+  }
+  return(new_file_paths)
+}
+
+
+
+#' Get NONMEM table files from control file
+#'
+#' @param .mod_path Path to a NONMEM control stream file.
+#' @inheritParams copy_psn_run_files
+#'
+#' @returns a vector of file paths
+#'
+#' @keywords internal
+copy_psn_tables <- function(.mod_path,
+                            .psn_run_dir,
+                            .bbr_run_dir,
+                            .overwrite = FALSE){
+  .l <- parse_ctl_to_list(.mod_path)
+
+  # get file names from table statements and construct paths
+  table_paths <- .l[grep("^TAB", names(.l))] %>%
+    map_chr(~paste(.x, collapse = " ")) %>%
+    str_extract("\\bFILE\\s*=\\s*([^ ]+)") %>%
+    str_replace("\\bFILE\\s*=\\s*", "") %>%
+    str_replace("^\\.\\/", "") %>%
+    file.path(.psn_run_dir, .)
+
+  if(rlang::is_empty(table_paths)){
+    return(NULL)
+  }else{
+    new_tab_names <- purrr::map_chr(table_paths, ~{
+      new_tab_name <- ifelse(fs::path_ext(basename(.x)) == "", paste0(basename(.x), ".tab"), basename(.x))
+      file.path(.bbr_run_dir, new_tab_name)
+    })
+    purrr::iwalk(table_paths, ~{
+      fs::file_copy(.x, new_tab_names[.y], overwrite = .overwrite)
+    })
+  }
+
+  return(new_tab_names)
+}
+
+
+
 #' Create a fake bbi_config.json file for a previous PsN model submission
 #'
 #' @param .mod_path Path to a NONMEM control stream file.
@@ -122,12 +218,11 @@ convert_psn <- function(.psn_mod_dir,
 #'
 #' @keywords internal
 create_psn_json <- function(.mod_path,
-                            .psn_mod_dir,
                             .bbr_run_dir,
                             .psn_info){
 
-  # TODO: confirm if we should also change the data path of the ctl file
-  data_path <- convert_psn_data_path(.mod_path, .psn_mod_dir, .bbr_run_dir)
+  # Change datapath after copying to new location
+  data_path <- convert_psn_data_path(.mod_path, .bbr_run_dir)
   data_path_absolute <- fs::path_abs(file.path(.bbr_run_dir, data_path))
 
   checkmate::assert_file_exists(data_path_absolute)
@@ -184,6 +279,8 @@ create_psn_json <- function(.mod_path,
   return(new_json_file)
 }
 
+
+
 #' Convert data path during conversion of PsN to bbr model submission
 #'
 #' @param .mod_path Path to a NONMEM control stream file.
@@ -191,7 +288,6 @@ create_psn_json <- function(.mod_path,
 #'
 #' @keywords internal
 convert_psn_data_path <- function(.mod_path,
-                                  .psn_mod_dir,
                                   .bbr_run_dir){
 
   # Get Datapath from ctl file and remove any attributes
@@ -199,6 +295,7 @@ convert_psn_data_path <- function(.mod_path,
   data_path <- strsplit(data_path, " ")[[1]][1]
 
   # Adjust file path for new bbr run directory
+  .psn_mod_dir <- dirname(.mod_path)
   path_diff <- fs::path_rel(.bbr_run_dir, .psn_mod_dir)
   num_folders <- length(strsplit(path_diff, "/")[[1]])
   if(num_folders != 0){
@@ -214,104 +311,4 @@ convert_psn_data_path <- function(.mod_path,
   }
   return(data_path)
 }
-
-
-#' Copy PsN run files from control from model and run directory
-#'
-#' @inheritParams convert_psn
-#' @param .bbr_run_dir Directory to copy the generated bbr run files to.
-#'
-#' @details
-#' Following a PsN run, some run files are stored in the upper level "model" directory (`.psn_mod_dir`), such
-#' as `run.cov`, `run.cor`, etc. However, some important run files only exist in the `NM_run` subdirectory, such as
-#' `psn.shk` or `psn.grd`.
-#'
-#' All these files will be copied to `.bbr_run_dir`, though run files in the `NM_run` subdirectory will be renamed to have the
-#' model name be part of the file name.
-#'
-#' @keywords internal
-copy_psn_run_files <- function(.psn_mod_dir,
-                               .psn_run_dir,
-                               .bbr_run_dir,
-                               .overwrite = FALSE){
-
-  exts_to_copy <- c("coi", "cor", "cov", "ext", "lst", "phi", "grd", "shk", "shm", "xml")
-  collapsed_exts <- paste(exts_to_copy, collapse = "|")
-
-  main_files <- list.files(.psn_mod_dir, full.names = TRUE)
-  main_files_to_copy <- main_files[grep(collapsed_exts, fs::path_ext(main_files))]
-  main_exts_copied <- fs::path_ext(main_files_to_copy)
-
-  # Assumption: get the lastest run from the specified fit (cant do in reality)
-  run_folders <- list.dirs(.psn_run_dir, recursive = FALSE)
-  run_folders <- run_folders[grep("NM_run", run_folders)]
-  # TODO: provide handling for multiple runs within a fit (less common, but not uncommon)
-  # (e.g., `NM_run1`, `NM_run2`)
-  if(length(run_folders) > 1){
-    run_folders <- max(run_folders)
-    # stop("multiple runs are not yet supported")
-  }
-
-  run_files <- list.files(run_folders, full.names = TRUE)
-  run_exts_to_copy <- setdiff(exts_to_copy, main_exts_copied)
-  collapsed_exts <- paste(run_exts_to_copy, collapse = "|")
-  run_files_to_copy <- run_files[grep(collapsed_exts, fs::path_ext(run_files))]
-
-  files_to_copy <- c(main_files_to_copy, run_files_to_copy)
-
-  # Rename run files to correspond to model name
-  mod_name <- basename(.bbr_run_dir)
-  files_to_rename <- purrr::map_chr(run_files_to_copy, ~{
-    file_split <- strsplit(basename(.x), '[.]')[[1]]
-    paste(mod_name, file_split[2], sep='.')
-  })
-
-  new_file_paths <- file.path(.bbr_run_dir, c(basename(main_files_to_copy), files_to_rename))
-
-  if(!rlang::is_empty(files_to_copy)){
-    purrr::iwalk(files_to_copy, ~{
-      fs::file_copy(.x, new_file_paths[.y], overwrite = .overwrite)
-    })
-  }
-  return(new_file_paths)
-}
-
-#' Get NONMEM table files from control file
-#'
-#' @param .mod_path Path to a NONMEM control stream file.
-#' @inheritParams copy_psn_run_files
-#'
-#' @returns a vector of file paths
-#'
-#' @keywords internal
-copy_psn_tables <- function(.mod_path,
-                            .psn_mod_dir,
-                            .bbr_run_dir,
-                            .overwrite = FALSE){
-  .l <- parse_ctl_to_list(.mod_path)
-
-  # get file names from table statements and construct paths
-  table_paths <- .l[grep("^TAB", names(.l))] %>%
-    map_chr(~paste(.x, collapse = " ")) %>%
-    str_extract("\\bFILE\\s*=\\s*([^ ]+)") %>%
-    str_replace("\\bFILE\\s*=\\s*", "") %>%
-    str_replace("^\\.\\/", "") %>%
-    file.path(.psn_mod_dir, .)
-
-  if(rlang::is_empty(table_paths)){
-    return(NULL)
-  }else{
-    new_tab_names <- purrr::map_chr(table_paths, ~{
-      new_tab_name <- ifelse(fs::path_ext(basename(.x)) == "", paste0(basename(.x), ".tab"), basename(.x))
-      file.path(.bbr_run_dir, new_tab_name)
-    })
-    purrr::iwalk(table_paths, ~{
-      fs::file_copy(.x, new_tab_names[.y], overwrite = .overwrite)
-    })
-  }
-
-  return(new_tab_names)
-}
-
-
 
