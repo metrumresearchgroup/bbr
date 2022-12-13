@@ -14,6 +14,11 @@
 #' @details
 #' `.modelfit_dir` should point to the latest fit (e.g., `modelfit_dir1`, `modelfit_dir2`)
 #'
+#' `.psn_model_file` must be specified if the model was run with `PsN < 4.8.0` and the model was executed
+#' on a different machine or in a directory that no longer exists.
+#'
+#' If PsN > 4.8.0
+#'
 #' @returns a bbr model object
 #'
 #' @export
@@ -46,19 +51,22 @@ convert_psn <- function(.modelfit_dir,
     .psn_run_dir <- .psn_run_dir[which.max(readr::parse_number(basename(.psn_run_dir)))]
   }
 
-  # Get submission attributes
-  .psn_info <- yaml::read_yaml(file.path(.modelfit_dir, "meta.yaml"))
+  # Get submission attributes - model path is updated if provided
+  .psn_info <- get_psn_submission_info(.modelfit_dir, .psn_model_file)
 
-  # Get model path - could be multiple - can get from model_fit1
-  if(!is.null(.psn_model_file)){
-    .psn_mod_path <- normalizePath(.psn_model_file)
-    .mod_name <- basename(.psn_mod_path)
-  }else{
-    mod_files <- .psn_info$model_files
-    .psn_mod_path <- mod_files[grep(".mod|.ctl", mod_files)]
-    if(length(.psn_mod_path) > 1) stop("Multiple model files found:\n", paste(.psn_mod_path, collapse = "\n"))
-    .mod_name <- basename(.psn_mod_path)
-  }
+  # Get model path
+  .psn_mod_path <- .psn_info$model_files
+  .mod_name <- basename(.psn_mod_path)
+
+  # if(!is.null(.psn_model_file)){
+  #   .psn_mod_path <- normalizePath(.psn_model_file)
+  #   .mod_name <- basename(.psn_mod_path)
+  # }else{
+  #   mod_files <- .psn_info$model_files
+  #   .psn_mod_path <- mod_files[grep(".mod|.ctl", mod_files)]
+  #   if(length(.psn_mod_path) > 1) stop("Multiple model files found:\n", paste(.psn_mod_path, collapse = "\n"))
+  #   .mod_name <- basename(.psn_mod_path)
+  # }
 
   # Make sure model file exists in directory
   checkmate::assert_file_exists(.psn_mod_path)
@@ -124,6 +132,115 @@ convert_psn <- function(.modelfit_dir,
   }
 
   return(.mod)
+}
+
+
+#' Get PsN execution information
+#'
+#' Retrieves PsN model execution information from either "version_and_option_info.txt" or "meta.yaml" depending on the version
+#' of PsN the user has installed
+#'
+#' @inheritParams convert_psn
+#'
+#' @keywords internal
+get_psn_submission_info <- function(.modelfit_dir, .psn_model_file = NULL){
+
+  .yaml_file <- file.path(.modelfit_dir, "meta.yaml")
+
+  if(fs::file_exists(.yaml_file)){
+    # If PsN version >= 4.8.0
+    .psn_info <- yaml::read_yaml(.yaml_file)
+
+    # Overwrite model_files in psn info to .psn_model_file if provided
+    # If model was executed on a different machine, the path listed in the yaml is meaningless
+    if(!is.null(.psn_model_file)){
+      .psn_info$model_files <- normalizePath(.psn_model_file)
+    }else{
+      .psn_mod_path <- .psn_info$model_files[grep(".mod|.ctl", .psn_info$model_files)]
+      if(length(.psn_mod_path) > 1) stop("Multiple model files referenced in ",.yaml_file, ":\n", paste(.psn_mod_path, collapse = "\n"))
+      .psn_info$model_files <- .psn_mod_path
+    }
+
+    # Ensure model files still exist
+    if(!any(fs::file_exists(.psn_info$model_files))){
+      stop("The model path does not exist: ", .psn_info$model_files)
+    }
+  }else{
+    # If PsN version <= 4.8.0
+    submission_file <- file.path(.modelfit_dir, "version_and_option_info.txt")
+    .psn_info <- parse_psn_submission_info(submission_file, .psn_model_file)
+  }
+  return(.psn_info)
+}
+
+
+#' Parse `version_and_option_info.txt` submission file
+#'
+#' @param .submission_file file path to a `"version_and_option_info.txt"` file.
+#' @inheritParams convert_psn
+#'
+#' @keywords internal
+parse_psn_submission_info <- function(.submission_file, .psn_model_file){
+
+  .sub_info <- readLines(submission_file)
+  .psn_info <- list()
+
+  # Helper functions
+  rm_dash <- function(txt) sub("-", "", txt) # Remove first dash for readr::parse_number to work
+  parse_option <- function(txt, sep = "=") stringr::str_trim(strsplit(txt, sep)[[1]])
+
+  # Get NONMEM installation (2 lines)
+  cmd_line <- grep("(?i)nonmem", .sub_info)
+  .psn_info$NONMEM_directory <- .sub_info[cmd_line[2]]
+
+  # Get PsN version (1 line)
+  cmd_line <- grep("(?i)PsN version", .sub_info)
+  .psn_info$PsN_version <- parse_option(.sub_info[cmd_line], sep = ":")[2]
+
+  # Get command (2 lines)
+  cmd_line <- grep("(?i)command", .sub_info)
+  .psn_info$command_line <- .sub_info[cmd_line+1]
+
+  # Get model file(s)
+  if(!is.null(.psn_model_file)){
+    .psn_mod_path <- normalizePath(.psn_model_file)
+    .psn_info$model_files <- .psn_mod_path
+  }else{
+    run_dir <- .sub_info[grep("(?i)directory=", .sub_info)]
+    run_dir <- parse_option(rm_dash(run_dir))[2]
+    mod_name <- parse_option(.psn_info$command_line, " ")[2]
+    # Check if run directory still exists
+    if(!fs::dir_exists(run_dir)){
+      msg <- paste0("The version info for ", mod_name, " indicates the model was run at ", run_dir, ". This Directory does not exist.\n",
+                   "If the model was run on another machine, please specify the model path via `.psn_model_file`")
+      stop(msg)
+    }else{
+      # If directory exists, check if model file can be found one directory up
+      mod_dir <- fs::path_abs(file.path(run_dir, ".."))
+      maybe_mod_path <- file.path(mod_dir, mod_name)
+      if(fs::file_exists(maybe_mod_path)){
+        .psn_info$model_files <- maybe_mod_path
+      }else{
+        msg <- paste0("No model file was passed in. Checked for ", mod_name, " in ", mod_dir, ", but no model was found.")
+        stop(msg)
+      }
+    }
+  }
+
+
+  # Get threads
+  cmd_lines <- c(grep("Actual values optional PsN \\(common\\) options", .sub_info), length(.sub_info))
+  sub_options <- .sub_info[(cmd_lines[1]+1):cmd_lines[2]]
+  sub_option_names <- purrr::map_chr(sub_options, ~{parse_option(rm_dash(.x))[1]})
+
+  common_options <- purrr::map(sub_options, ~{
+    opt_val <- parse_option(rm_dash(.x))[2]
+    if(is.na(suppressWarnings(as.numeric(opt_val)))) opt_val else readr::parse_number(opt_val)
+  }) %>% stats::setNames(sub_option_names)
+
+  .psn_info$common_options <- common_options
+
+  return(.psn_info)
 }
 
 
