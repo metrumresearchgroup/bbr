@@ -43,7 +43,7 @@ convert_psn <- function(.modelfit_dir,
   run_folders <- list.dirs(.modelfit_dir, recursive = FALSE)
   .psn_run_dir <- run_folders[grep("NM_run", run_folders)]
   if(length(.psn_run_dir) > 1){
-    .psn_run_dir <- max(.psn_run_dir)
+    .psn_run_dir <- .psn_run_dir[which.max(readr::parse_number(basename(.psn_run_dir)))]
   }
 
   # Get submission attributes
