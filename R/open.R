@@ -12,6 +12,9 @@ open_model_file <- function(.mod) {
   file_edit(get_model_path(.mod))
 }
 
+# SHARED: file_edit() is used by bbr.bayes, so any changes here should be
+# compatible with its use there.
+
 # Under RStudio, there is a distinction between a plain file.edit() and
 # utils::file.edit(). RStudio overrides file.edit() so that it opens up a tab.
 # utils::file.edit(), on the other hand, pops up a window that the user must
