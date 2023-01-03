@@ -4,6 +4,10 @@
 # utils::file.edit(), on the other hand, pops up a window that the user must
 # save before returning to RStudio.
 file_edit <- function(...) {
+  if (!interactive()) {
+    return(invisible(NULL))
+  }
+
   fn <- if (exists("file.edit", envir = globalenv())) {
     get("file.edit", envir = globalenv())
   } else {
