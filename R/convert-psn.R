@@ -103,8 +103,11 @@ convert_psn <- function(.modelfit_dir,
   # Copy and rename table files
   table_paths <- copy_psn_tables(.psn_mod_path, .psn_run_dir, .bbr_run_dir, .overwrite = .overwrite)
 
+  # Change datapath after copying to new location
+  .data_path <- convert_psn_data_path(.psn_mod_path, .bbr_run_dir)
+
   # Create fake PsN bbi_config.json
-  json_file <- create_psn_json(.psn_mod_path, .bbr_run_dir, .psn_info)
+  json_file <- create_psn_json(.psn_mod_path, .data_path, .bbr_run_dir, .psn_info)
 
   # create model object
   .mod <- list()
@@ -182,7 +185,7 @@ get_psn_submission_info <- function(.modelfit_dir, .psn_model_file = NULL){
 #' @keywords internal
 parse_psn_submission_info <- function(.submission_file, .psn_model_file){
 
-  .sub_info <- readLines(submission_file)
+  .sub_info <- readLines(.submission_file)
   .psn_info <- list()
 
   # Helper functions
@@ -330,20 +333,17 @@ copy_psn_tables <- function(.mod_path,
 
 #' Create a fake bbi_config.json file for a previous PsN model submission
 #'
-#' @param .mod_path Path to a NONMEM control stream file.
+#' @param .mod_path Path to **original** NONMEM control stream file (when ran with PsN).
+#' @param .data_path Path to dataset described in $DATA of control stream file.
 #' @inheritParams copy_psn_run_files
 #'
 #' @keywords internal
 create_psn_json <- function(.mod_path,
+                            .data_path,
                             .bbr_run_dir,
                             .psn_info){
 
-  # Change datapath after copying to new location
-  data_path <- convert_psn_data_path(.mod_path, .bbr_run_dir)
-  data_path_absolute <- fs::path_abs(file.path(.bbr_run_dir, data_path))
-
-  checkmate::assert_file_exists(data_path_absolute)
-
+  .bbr_mod_path <- file.path(dirname(.bbr_run_dir), basename(.mod_path))
   n_threads <- as.numeric(.psn_info$common_options$threads) # confirm this is accurate (cant be)
 
   # Cant assume they're on metworx, or the system used when the PsN call was run
@@ -377,13 +377,13 @@ create_psn_json <- function(.mod_path,
     bbi_version = bbi_version(),
     model_name = basename(.mod_path),
     original_model = basename(.mod_path),
-    model_path = .mod_path,
+    model_path = .bbr_mod_path,
     data_path = data_path,
     data_md5 = tools::md5sum(data_path_absolute),
-    model_md5 = tools::md5sum(.mod_path),
+    model_md5 = tools::md5sum(.bbr_mod_path),
     model_filename = basename(.bbr_run_dir),
     model_extension = fs::path_ext(.mod_path),
-    original_path = dirname(.mod_path),
+    original_path = dirname(.mod_path), # where it was copied from (differs from bbr)
     output_dir = .bbr_run_dir,
     configuration = configuration_list,
     error = NULL
@@ -400,7 +400,7 @@ create_psn_json <- function(.mod_path,
 
 #' Convert data path during conversion of PsN to bbr model submission
 #'
-#' @param .mod_path Path to a NONMEM control stream file.
+#' @param .mod_path Path to **original** NONMEM control stream file (when ran with PsN).
 #' @inheritParams copy_psn_run_files
 #'
 #' @keywords internal
@@ -408,24 +408,53 @@ convert_psn_data_path <- function(.mod_path,
                                   .bbr_run_dir){
 
   # Get Datapath from ctl file and remove any attributes
-  data_path <- parse_ctl_to_list(.mod_path)$DATA
-  data_path <- strsplit(data_path, " ")[[1]][1]
+  data_line <- parse_ctl_to_list(.mod_path)$DATA
+  data_line_args <- strsplit(data_line, " ")[[1]]
+  data_path_rel <- data_line_args[1]
+
 
   # Adjust file path for new bbr run directory
   .psn_mod_dir <- dirname(.mod_path)
   path_diff <- fs::path_rel(.bbr_run_dir, .psn_mod_dir)
   num_folders <- length(strsplit(path_diff, "/")[[1]])
   if(num_folders != 0){
-    if(any(grepl("..", path_diff))){
-      # If the difference grew
-      path_diff <- paste(rep("../",num_folders), collapse = "")
-      data_path <- paste0(path_diff, data_path)
+    if(any(grepl("..", path_diff, fixed = TRUE))){
+      # If in an outer directory - need absolute data path to calculate relative path
+      data_path_absolute <- fs::path_abs(file.path(dirname(.mod_path), data_path_rel))
+      data_path_mod <- fs::path_rel(data_path_absolute, .bbr_run_dir)
+      # path_diff <- paste(rep("../",num_folders), collapse = "")
+      # if(substring(data_path_absolute, 1, 1) == "/"){
+      #   data_path_rel <- paste0(path_diff, substring(data_path_absolute, 2))
+      # }else{
+      #   data_path_rel <- paste0(path_diff, data_path_absolute)
+      # }
     }else{
-      # If the difference shrank
-      data_path_parts <- strsplit(data_path, "/")[[1]][-(1:num_folders)]
-      data_path <- paste(data_path_parts, collapse = "/")
+      # If in a subdirectory - only need relative path
+      data_path_parts <- strsplit(data_path_rel, "/")[[1]][-(1:num_folders)]
+      data_path_rel <- paste(data_path_parts, collapse = "/")
+      data_path_absolute <- fs::path_abs(file.path(.bbr_run_dir, data_path_rel))
     }
   }
-  return(data_path)
+
+  # Overwrite $DATA block in new model with new path
+  .bbr_mod_path <- file.path(dirname(.bbr_run_dir), basename(.mod_path))
+
+  mod_lines <- readLines(.bbr_mod_path) %>%
+    suppressSpecificWarning("incomplete final line found")
+
+  # Identify DATA path location and update with new one
+  data_line_loc <- which(str_detect(mod_lines, "^\\s*\\$DATA"))
+  data_path_loc <- grep("(?i)csv", data_line_args)
+  data_line_args[data_path_loc] <- data_path_mod
+  new_data_line <- paste("$DATA", paste(data_line_args, collapse = " "))
+  mod_lines[data_line_loc] <- new_data_line
+
+  # If dataset is not found, tell the user that the overwritten path is incorrect
+  if(!fs::file_exists(data_path_absolute)){
+    warning(glue::glue("Expected to find data at {data_path_absolute}, but no file is there. Please adjust the `$DATA` block in {.bbr_mod_path}"))
+  }
+
+
+  return(data_path_absolute)
 }
 

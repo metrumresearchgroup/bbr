@@ -4,10 +4,12 @@
 \alias{create_psn_json}
 \title{Create a fake bbi_config.json file for a previous PsN model submission}
 \usage{
-create_psn_json(.mod_path, .bbr_run_dir, .psn_info)
+create_psn_json(.mod_path, .data_path, .bbr_run_dir, .psn_info)
 }
 \arguments{
-\item{.mod_path}{Path to a NONMEM control stream file.}
+\item{.mod_path}{Path to \strong{original} NONMEM control stream file (when ran with PsN).}
+
+\item{.data_path}{Path to dataset described in $DATA of control stream file.}
 
 \item{.bbr_run_dir}{Directory to copy the \strong{generated bbr run files} to. Subdirectory of \code{.bbr_dir}}
 }

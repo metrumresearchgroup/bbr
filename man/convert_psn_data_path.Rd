@@ -7,7 +7,7 @@
 convert_psn_data_path(.mod_path, .bbr_run_dir)
 }
 \arguments{
-\item{.mod_path}{Path to a NONMEM control stream file.}
+\item{.mod_path}{Path to \strong{original} NONMEM control stream file (when ran with PsN).}
 
 \item{.bbr_run_dir}{Directory to copy the \strong{generated bbr run files} to. Subdirectory of \code{.bbr_dir}}
 }

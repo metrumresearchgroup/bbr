@@ -47,4 +47,9 @@ Convert the output of a PsN run to a bbr model
 }
 \details{
 \code{.modelfit_dir} should point to the latest fit (e.g., \code{modelfit_dir1}, \code{modelfit_dir2})
+
+\code{.psn_model_file} must be specified if the model was run with \verb{PsN < 4.8.0} and the model was executed
+on a different machine or in a directory that no longer exists.
+
+If PsN > 4.8.0
 }
