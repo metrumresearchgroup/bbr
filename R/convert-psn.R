@@ -58,19 +58,8 @@ convert_psn <- function(.modelfit_dir,
   .psn_mod_path <- .psn_info$model_files
   .mod_name <- basename(.psn_mod_path)
 
-  # if(!is.null(.psn_model_file)){
-  #   .psn_mod_path <- normalizePath(.psn_model_file)
-  #   .mod_name <- basename(.psn_mod_path)
-  # }else{
-  #   mod_files <- .psn_info$model_files
-  #   .psn_mod_path <- mod_files[grep(".mod|.ctl", mod_files)]
-  #   if(length(.psn_mod_path) > 1) stop("Multiple model files found:\n", paste(.psn_mod_path, collapse = "\n"))
-  #   .mod_name <- basename(.psn_mod_path)
-  # }
-
   # Make sure model file exists in directory
   checkmate::assert_file_exists(.psn_mod_path)
-
 
   # Create new model location (if specified)
   if(is.null(.bbr_dir)){
@@ -412,29 +401,11 @@ convert_psn_data_path <- function(.mod_path,
   data_line_args <- strsplit(data_line, " ")[[1]]
   data_path_rel <- data_line_args[1]
 
+  # Get absolute path
+  data_path_absolute <- fs::path_abs(file.path(dirname(.mod_path), data_path_rel))
 
   # Adjust file path for new bbr run directory
-  .psn_mod_dir <- dirname(.mod_path)
-  path_diff <- fs::path_rel(.bbr_run_dir, .psn_mod_dir)
-  num_folders <- length(strsplit(path_diff, "/")[[1]])
-  if(num_folders != 0){
-    if(any(grepl("..", path_diff, fixed = TRUE))){
-      # If in an outer directory - need absolute data path to calculate relative path
-      data_path_absolute <- fs::path_abs(file.path(dirname(.mod_path), data_path_rel))
-      data_path_mod <- fs::path_rel(data_path_absolute, .bbr_run_dir)
-      # path_diff <- paste(rep("../",num_folders), collapse = "")
-      # if(substring(data_path_absolute, 1, 1) == "/"){
-      #   data_path_rel <- paste0(path_diff, substring(data_path_absolute, 2))
-      # }else{
-      #   data_path_rel <- paste0(path_diff, data_path_absolute)
-      # }
-    }else{
-      # If in a subdirectory - only need relative path
-      data_path_parts <- strsplit(data_path_rel, "/")[[1]][-(1:num_folders)]
-      data_path_rel <- paste(data_path_parts, collapse = "/")
-      data_path_absolute <- fs::path_abs(file.path(.bbr_run_dir, data_path_rel))
-    }
-  }
+  data_path_mod <- fs::path_rel(data_path_absolute, .bbr_run_dir)
 
   # Overwrite $DATA block in new model with new path
   .bbr_mod_path <- file.path(dirname(.bbr_run_dir), basename(.mod_path))
