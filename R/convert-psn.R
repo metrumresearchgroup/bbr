@@ -198,24 +198,34 @@ parse_psn_submission_info <- function(.submission_file, .psn_model_file){
     .psn_mod_path <- normalizePath(.psn_model_file)
     .psn_info$model_files <- .psn_mod_path
   }else{
+    # Check run directory and nearby directory possible locations
     run_dir <- .sub_info[grep("(?i)directory=", .sub_info)]
     run_dir <- parse_option(rm_dash(run_dir))[2]
-    mod_name <- parse_option(.psn_info$command_line, " ")[2]
-    # Check if run directory still exists
-    if(!fs::dir_exists(run_dir)){
-      msg <- paste0("The version info for ", mod_name, " indicates the model was run at ", run_dir, ". This Directory does not exist.\n",
-                   "If the model was run on another machine, please specify the model path via `.psn_model_file`")
-      stop(msg)
-    }else{
-      # If directory exists, check if model file can be found one directory up
+    mod_name_cmd <- parse_option(.psn_info$command_line, " ")
+    mod_name <- mod_name_cmd[grep("(?i)mod|ctl", mod_name_cmd)] # this could be a file path too
+
+    # If run directory exists, check if model file can be found one directory up
+    if(fs::dir_exists(run_dir)){
       mod_dir <- fs::path_abs(file.path(run_dir, ".."))
       maybe_mod_path <- file.path(mod_dir, mod_name)
       if(fs::file_exists(maybe_mod_path)){
         .psn_info$model_files <- maybe_mod_path
-      }else{
-        msg <- paste0("No model file was passed in. Checked for ", mod_name, " in ", mod_dir, ", but no model was found.")
-        stop(msg)
       }
+    }
+
+    # Check directory containing modelfit folder (2 folders up)
+    nearby_dir <- dirname(dirname(.submission_file))
+    maybe_mod_path <- fs::path_abs(file.path(nearby_dir, mod_name))
+    # if(length(maybe_mod_path)>1) browser()
+    if(fs::file_exists(maybe_mod_path)){
+      .psn_info$model_files <- maybe_mod_path
+    }
+
+    # If the model file cant be found and .psn_model_file was not provided, error out
+    if(is.null(.psn_info$model_files)){
+      msg <- paste0("The version info for ", mod_name, " indicates the model was run at ", run_dir, ". That Directory does not exist on this machine.\n\n",
+                   "The nearby directory, ", nearby_dir, " also did not contain the model. Please specify the model path via `.psn_model_file` to proceed.")
+      stop(msg)
     }
   }
 
@@ -367,8 +377,8 @@ create_psn_json <- function(.mod_path,
     model_name = basename(.mod_path),
     original_model = basename(.mod_path),
     model_path = .bbr_mod_path,
-    data_path = data_path,
-    data_md5 = tools::md5sum(data_path_absolute),
+    data_path = .data_path,
+    data_md5 = tools::md5sum(.data_path),
     model_md5 = tools::md5sum(.bbr_mod_path),
     model_filename = basename(.bbr_run_dir),
     model_extension = fs::path_ext(.mod_path),
