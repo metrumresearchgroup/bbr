@@ -1,6 +1,4 @@
 
-
-
 #' Convert the output of a PsN run to a bbr model
 #'
 #' @param .modelfit_dir Directory containing where the model was run (i.e. the generated `modelfit_dir`).
@@ -34,8 +32,8 @@ convert_psn <- function(.modelfit_dir,
 
 
   # TODO: Make sure bbi path is set BEFORE copying any files
-  # this is needed to create a fake bbi json, and we dont want to
-  # copy everything just to fail at the end
+  # this is needed to create a fake bbi json, and we dont want to copy everything just to fail at the end
+  # is_empty wont capture all cases - revisit how to properly address this concern
   if(rlang::is_empty(bbi_version())){
     stop("Make sure your bbi path is set before running this function.\n`options('bbr.bbi_exe_path' = '/path/to/bbi')`")
   }
@@ -43,12 +41,34 @@ convert_psn <- function(.modelfit_dir,
   # Normalize paths
   .modelfit_dir <- normalizePath(.modelfit_dir)
 
+
   # Find Run folder within fit directory
-  # Assumption: get the -lastest run- from the specified run (e.g., `NM_run1`, `NM_run2`)
-  run_folders <- list.dirs(.modelfit_dir, recursive = FALSE)
-  .psn_run_dir <- run_folders[grep("NM_run", run_folders)]
-  if(length(.psn_run_dir) > 1){
-    .psn_run_dir <- .psn_run_dir[which.max(readr::parse_number(basename(.psn_run_dir)))]
+  trans_res <- read_translation_file(.modelfit_dir)
+  mod_files <- unique(names(trans_res))
+
+  if(length(mod_files) == 1){ # this when there's only one .mod file & .psn_model_file isnt provided (we're not sure this can happen)
+    .psn_run_dirs <- unlist(unname(trans_res))
+    # Assumption: get the -lastest (max) run- from the specified run (e.g., `NM_run2` in c(`NM_run1`, `NM_run2`))
+    .psn_run_dir <- .psn_run_dirs[which.max(readr::parse_number(.psn_run_dirs))]
+    .psn_run_dir <- file.path(.modelfit_dir, .psn_run_dir)
+  }else if(length(mod_files) > 1){
+    if (is.null(.psn_model_file)) {
+      # Error and ask them to pass .psn_model_file
+      mod_files_txt <- paste(mod_files, collapse = ", ")
+      stop(glue::glue("More that one model submission was found in {.modelfit_dir}: {mod_files_txt}
+                      Please specify `.psn_model_file` to identify which model you're trying to convert"))
+    }else{
+      .psn_run_dir <- trans_res[[basename(.psn_model_file)]]
+      # if this is NULL we'll need to error... hopefully that won't happen but it could (e.g., specifying the wrong model)
+      if(is.null(.psn_run_dir)){
+        stop(glue::glue("Something went wrong. Make sure {.psn_model_file} corresponds to {.modelfit_dir}"))
+      }
+      .psn_run_dir <- file.path(.modelfit_dir, .psn_run_dir)
+    }
+
+  }else{
+    trans_file <- file.path(.modelfit_dir, "model_NMrun_translation.txt")
+    stop(glue::glue("The required model translation script, {trans_file}, was not found"))
   }
 
   # Get submission attributes - model path is updated if provided
@@ -81,7 +101,7 @@ convert_psn <- function(.modelfit_dir,
   .bbr_mod_run_path <- file.path(.bbr_run_dir, .mod_name)
 
   # Copy model to new -run- directory
-  fs::file_copy(.psn_mod_path, .bbr_mod_run_path, overwrite = .overwrite)
+  # fs::file_copy(.psn_mod_path, .bbr_mod_run_path, overwrite = .overwrite)
 
   # Absolute Model Path (no extension)
   .absolute_mod_path <- sanitize_file_extension(.bbr_mod_path)
@@ -173,7 +193,7 @@ get_psn_submission_info <- function(.modelfit_dir, .psn_model_file = NULL){
 #'
 #' @keywords internal
 parse_psn_submission_info <- function(.submission_file, .psn_model_file){
-
+# browser()
   .sub_info <- readLines(.submission_file)
   .psn_info <- list()
 
@@ -415,7 +435,12 @@ convert_psn_data_path <- function(.mod_path,
   data_path_absolute <- fs::path_abs(file.path(dirname(.mod_path), data_path_rel))
 
   # Adjust file path for new bbr run directory
-  data_path_mod <- fs::path_rel(data_path_absolute, .bbr_run_dir)
+  data_path_mod <- if(fs::path_ext(.mod_path) == "mod"){
+    fs::path_rel(data_path_absolute, dirname(.bbr_run_dir))
+  }else{
+    # ctl extension points to the run directory
+    fs::path_rel(data_path_absolute, .bbr_run_dir)
+  }
 
   # Overwrite $DATA block in new model with new path
   .bbr_mod_path <- file.path(dirname(.bbr_run_dir), basename(.mod_path))
@@ -430,6 +455,9 @@ convert_psn_data_path <- function(.mod_path,
   new_data_line <- paste("$DATA", paste(data_line_args, collapse = " "))
   mod_lines[data_line_loc] <- new_data_line
 
+  # Overwrite model (mod_lines) to .bbr_mod_path
+  writeLines(mod_lines, .bbr_mod_path)
+
   # If dataset is not found, tell the user that the overwritten path is incorrect
   if(!fs::file_exists(data_path_absolute)){
     warning(glue::glue("Expected to find data at {data_path_absolute}, but no file is there. Please adjust the `$DATA` block in {.bbr_mod_path}"))
@@ -439,3 +467,14 @@ convert_psn_data_path <- function(.mod_path,
   return(data_path_absolute)
 }
 
+#' Read `model_NMrun_translation.txt` text file from `NM_run` directory
+#'
+#' @inheritParams convert_psn
+#'
+#' @keywords internal
+read_translation_file <- function(.modelfit_dir){
+  trans_file <- file.path(.modelfit_dir, "model_NMrun_translation.txt")
+  trans_res <- readr::read_table(trans_file, col_names = FALSE, show_col_types = FALSE) %>%
+    stats::setNames(c("mod", "run_dir"))
+  trans_res$run_dir %>% as.list() %>% stats::setNames(trans_res$mod)
+}
