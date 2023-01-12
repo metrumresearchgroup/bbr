@@ -51,10 +51,17 @@ mod_sum %>% get_theta()
 # mod <- bbr::read_model(file.path(.bbr_dir, "run101"))
 
 
-# pmplots....
-# https://merge.metrumrg.com/expo/expo1-nonmem-foce/posts/intro-to-pmplots.html
+# one of the nice things about bbr is how it integrates with other MeRGE packages
+# here we show how to make simple diagnositic plots with the pmplots package
+#   see more here: https://merge.metrumrg.com/expo/expo1-nonmem-foce/posts/intro-to-pmplots.html
+if (!nzchar(packageVersion("pmplots"))) remotes::install_github("metrumresearchgroup/pmplots")
 library(pmplots)
-mod_tables <- nm_tables(mod) # say something about this...
+
+# bbr::nm_tables() will pull your input data and all of your table files into R as tibbles
+mod_tables <- nm_tables(mod)
+View(mod_tables)
+
+# make some plots...
 dv_pred(mod_tables$sdtab101)
 dv_ipred(mod_tables$sdtab101)
 res_time(mod_tables$sdtab101)
