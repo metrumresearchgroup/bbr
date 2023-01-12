@@ -1,11 +1,11 @@
 # Install development version of package
-if (packageVersion("bbr") != package_version("1.5.0.8001")) {
-  remotes::install_github("metrumresearchgroup/bbr", ref = "1.5.0.8001")
+if (packageVersion("bbr") != package_version("1.5.0.8002")) {
+  remotes::install_github("metrumresearchgroup/bbr", ref = "1.5.0.8002")
 }
 
 library(bbr)
 packageVersion("bbr")
-# this should say ‘1.5.0.8001’
+# this should say ‘1.5.0.8002’
 # if not, try restarting R and trying again, or try the install again
 
 # If you dont have bbi installed, install before proceeding
@@ -54,7 +54,10 @@ mod_sum %>% get_theta()
 # one of the nice things about bbr is how it integrates with other MeRGE packages
 # here we show how to make simple diagnositic plots with the pmplots package
 #   see more here: https://merge.metrumrg.com/expo/expo1-nonmem-foce/posts/intro-to-pmplots.html
-if (!nzchar(packageVersion("pmplots"))) remotes::install_github("metrumresearchgroup/pmplots")
+if(require(pmplots)){
+  remotes::install_github("metrumresearchgroup/pmplots")
+}
+
 library(pmplots)
 
 # bbr::nm_tables() will pull your input data and all of your table files into R as tibbles

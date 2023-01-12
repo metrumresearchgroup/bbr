@@ -2,10 +2,9 @@
 #' Convert the output of a PsN run to a bbr model
 #'
 #' @param .modelfit_dir Directory containing where the model was run (i.e. the generated `modelfit_dir`).
-#' @param .bbr_dir Directory to copy the generated bbr model to. If `NULL`, defaults to `.psn_mod_dir`.
+#' @param .bbr_dir Directory to copy the generated bbr model to.
 #' @param .psn_model_file Model file used during PsN execution. Note that the model file must have a `.mod` or `.ctl` file extension.
 #' @inheritParams new_model
-#' @param .cleanup_psn Logical (T/F). Whether to delete relevant PsN files after the bbr model is created.
 #' @param .overwrite Logical (T/F). Whether to overwrite files if they already exist.
 #'
 #'
@@ -21,20 +20,23 @@
 #'
 #' @export
 convert_psn <- function(.modelfit_dir,
-                        .bbr_dir = dirname(.modelfit_dir),
+                        .bbr_dir,
                         .psn_model_file = NULL,
                         .description = NULL,
                         .based_on = NULL,
                         .tags = NULL,
                         .star = NULL,
-                        .cleanup_psn = FALSE,
                         .overwrite = FALSE){
 
+  # Make sure .bbr_dir is not set to .modelfit_dir
+  if(normalizePath(.modelfit_dir) == normalizePath(.bbr_dir)){
+    stop("`.bbr_dir` cannot be set to the same location as `.modelfit_dir`")
+  }
 
-  # TODO: Make sure bbi path is set BEFORE copying any files
+
+  # Make sure bbi path is set BEFORE copying any files
   # this is needed to create a fake bbi json, and we dont want to copy everything just to fail at the end
-  # is_empty wont capture all cases - revisit how to properly address this concern
-  if(rlang::is_empty(bbi_version())){
+  if(!nzchar(bbi_version())){
     stop("Make sure your bbi path is set before running this function.\n`options('bbr.bbi_exe_path' = '/path/to/bbi')`")
   }
 
@@ -130,19 +132,6 @@ convert_psn <- function(.modelfit_dir,
   if (!is.null(.based_on))    .mod <- replace_all_based_on(.mod, .based_on)
   if (isTRUE(.star))          .mod <- add_star(.mod)
 
-
-  # Cleanup
-  # Cant just keep .bbr_dir, as that could also be equivalent to .psn_mod_dir
-  # Compile list of specific files to keep
-  if(isTRUE(.cleanup_psn)){
-    files_keep <- c(.bbr_mod_path,
-                    psn_run_files,
-                    table_paths,
-                    json_file)
-    # TODO: remove all other files
-    # Figure out what other files we need (besides the ones I already added)
-  }
-
   return(.mod)
 }
 
@@ -193,7 +182,7 @@ get_psn_submission_info <- function(.modelfit_dir, .psn_model_file = NULL){
 #'
 #' @keywords internal
 parse_psn_submission_info <- function(.submission_file, .psn_model_file){
-# browser()
+  # browser()
   .sub_info <- readLines(.submission_file)
   .psn_info <- list()
 
@@ -244,7 +233,7 @@ parse_psn_submission_info <- function(.submission_file, .psn_model_file){
     # If the model file cant be found and .psn_model_file was not provided, error out
     if(is.null(.psn_info$model_files)){
       msg <- paste0("The version info for ", mod_name, " indicates the model was run at ", run_dir, ". That Directory does not exist on this machine.\n\n",
-                   "The nearby directory, ", nearby_dir, " also did not contain the model. Please specify the model path via `.psn_model_file` to proceed.")
+                    "The nearby directory, ", nearby_dir, " also did not contain the model. Please specify the model path via `.psn_model_file` to proceed.")
       stop(msg)
     }
   }
@@ -337,11 +326,16 @@ copy_psn_tables <- function(.mod_path,
     return(NULL)
   }else{
     new_tab_names <- purrr::map_chr(table_paths, ~{
-      new_tab_name <- ifelse(fs::path_ext(basename(.x)) == "", paste0(basename(.x), ".tab"), basename(.x))
-      file.path(.bbr_run_dir, new_tab_name)
+      file.path(.bbr_run_dir, basename(.x))
     })
+
     purrr::iwalk(table_paths, ~{
-      fs::file_copy(.x, new_tab_names[.y], overwrite = .overwrite)
+      if(fs::file_exists(.x)){
+        fs::file_copy(.x, new_tab_names[.y], overwrite = .overwrite)
+      }else{
+        warning(glue::glue("Referenced table file, {basename(.x)}, was not found in {.psn_run_dir}.
+                           Some bbr functionality may not work for this model. Consider resubmitting the model to regenerate the table files"))
+      }
     })
   }
 
@@ -397,7 +391,7 @@ create_psn_json <- function(.mod_path,
     model_name = basename(.mod_path),
     original_model = basename(.mod_path),
     model_path = .bbr_mod_path,
-    data_path = .data_path,
+    data_path = fs::path_rel(.data_path, .bbr_run_dir),
     data_md5 = tools::md5sum(.data_path),
     model_md5 = tools::md5sum(.bbr_mod_path),
     model_filename = basename(.bbr_run_dir),
