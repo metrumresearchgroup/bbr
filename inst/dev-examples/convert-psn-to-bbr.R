@@ -1,11 +1,11 @@
 # Install development version of package
-if (packageVersion("bbr") != package_version("1.5.0.8003")) {
-  remotes::install_github("metrumresearchgroup/bbr", ref = "1.5.0.8003")
+if (packageVersion("bbr") != package_version("1.5.0.8002")) {
+  remotes::install_github("metrumresearchgroup/bbr", ref = "1.5.0.8002")
 }
 
 library(bbr)
 packageVersion("bbr")
-# this should say ‘1.5.0.8003’
+# this should say ‘1.5.0.8002’
 # if not, try restarting R and trying again, or try the install again
 
 # If you dont have bbi installed, install before proceeding
