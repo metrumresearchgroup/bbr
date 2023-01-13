@@ -54,7 +54,7 @@ mod_sum %>% get_theta()
 # one of the nice things about bbr is how it integrates with other MeRGE packages
 # here we show how to make simple diagnositic plots with the pmplots package
 #   see more here: https://merge.metrumrg.com/expo/expo1-nonmem-foce/posts/intro-to-pmplots.html
-if(require(pmplots)){
+if(!require(pmplots)){
   remotes::install_github("metrumresearchgroup/pmplots")
 }
 
