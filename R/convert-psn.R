@@ -28,8 +28,15 @@ convert_psn <- function(.modelfit_dir,
                         .star = NULL,
                         .overwrite = FALSE){
 
+  # Create new model location
+  if(!fs::dir_exists(.bbr_dir)) fs::dir_create(.bbr_dir)
+
+  # Normalize paths
+  .modelfit_dir <- normalizePath(.modelfit_dir)
+  .bbr_dir <- normalizePath(.bbr_dir)
+
   # Make sure .bbr_dir is not set to .modelfit_dir
-  if(normalizePath(.modelfit_dir) == normalizePath(.bbr_dir)){
+  if(.modelfit_dir == .bbr_dir){
     stop("`.bbr_dir` cannot be set to the same location as `.modelfit_dir`")
   }
 
@@ -83,16 +90,9 @@ convert_psn <- function(.modelfit_dir,
   # Make sure model file exists in directory
   checkmate::assert_file_exists(.psn_mod_path)
 
-  # Create new model location (if specified)
-  if(is.null(.bbr_dir)){
-    .bbr_dir <- .modelfit_dir
-  }else{
-    if(!fs::dir_exists(.bbr_dir)) fs::dir_create(.bbr_dir)
-    .bbr_dir <- normalizePath(.bbr_dir)
+  # Copy model to new -model- directory
+  fs::file_copy(.psn_mod_path, file.path(.bbr_dir, .mod_name), overwrite = .overwrite)
 
-    # Copy model to new -model- directory
-    fs::file_copy(.psn_mod_path, file.path(.bbr_dir, .mod_name), overwrite = .overwrite)
-  }
 
   # Create new run directory
   .bbr_run_dir <- file.path(.bbr_dir, fs::path_ext_remove(.mod_name))
