@@ -6,20 +6,19 @@
 \usage{
 convert_psn(
   .modelfit_dir,
-  .bbr_dir = dirname(.modelfit_dir),
+  .bbr_dir,
   .psn_model_file = NULL,
   .description = NULL,
   .based_on = NULL,
   .tags = NULL,
   .star = NULL,
-  .cleanup_psn = FALSE,
   .overwrite = FALSE
 )
 }
 \arguments{
 \item{.modelfit_dir}{Directory containing where the model was run (i.e. the generated \code{modelfit_dir}).}
 
-\item{.bbr_dir}{Directory to copy the generated bbr model to. If \code{NULL}, defaults to \code{.psn_mod_dir}.}
+\item{.bbr_dir}{Directory to copy the generated bbr model to.}
 
 \item{.psn_model_file}{Model file used during PsN execution. Note that the model file must have a \code{.mod} or \code{.ctl} file extension.}
 
@@ -34,8 +33,6 @@ and ancestry. \strong{Paths must be relative to \code{.yaml_path}.}}
 the YAML file}
 
 \item{.star}{Boolean, marks model to indicate special interest level.}
-
-\item{.cleanup_psn}{Logical (T/F). Whether to delete relevant PsN files after the bbr model is created.}
 
 \item{.overwrite}{Logical (T/F). Whether to overwrite files if they already exist.}
 }
