@@ -26,6 +26,9 @@ test_that("get_config_path: .check_exists=FALSE works [BBR-GPFO-028]", {
   mod_path <- file.path(tdir, "mod")
   mod <- new_model(mod_path)
 
+  expect_identical(get_config_path(mod, .check_exists = FALSE),
+                   file.path(normalizePath(tdir), "mod", "bbi_config.json"))
+
   fs::dir_create(mod_path)
   expect_identical(get_config_path(mod, .check_exists = FALSE),
                    file.path(normalizePath(mod_path), "bbi_config.json"))

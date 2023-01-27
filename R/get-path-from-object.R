@@ -111,7 +111,9 @@ get_config_path <- function(.bbi_object, .check_exists = TRUE) {
 #' @rdname get_path_from_object
 #' @export
 get_config_path.bbi_model <- function(.bbi_object, .check_exists = TRUE) {
-  .path <- file.path(get_output_dir(.bbi_object), "bbi_config.json")
+  .path <- file.path(
+    get_output_dir(.bbi_object, .check_exists = .check_exists),
+    "bbi_config.json")
 
   if (isTRUE(.check_exists)) {
     checkmate::assert_file_exists(.path)
