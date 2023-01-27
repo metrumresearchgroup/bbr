@@ -457,6 +457,7 @@ SUM-S006:
   - GPFO-R018
   - GPFO-R019
   - GPFO-R020
+  - GPFO-R027
 SUM-S007:
   name: Print method for model summary
   description: As a user, I want to be able to print the `bbi_nonmem_summary` object

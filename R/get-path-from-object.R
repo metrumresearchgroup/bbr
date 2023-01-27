@@ -223,7 +223,7 @@ build_path_from_model <- function(.mod, .suffix, ...) {
 #' @export
 build_path_from_model.bbi_model <- function(.mod, .suffix, ...) {
   file.path(
-    get_output_dir(.mod),
+    get_output_dir(.mod, .check_exists = FALSE),
     paste0(get_model_id(.mod), .suffix)
   )
 }

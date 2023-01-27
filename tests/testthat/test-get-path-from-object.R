@@ -159,6 +159,13 @@ test_that("build_path_from_model works with period in extension [BBR-GPFO-020]",
   )
 })
 
+test_that("build_path_from_model works when output directory is missing [BBR-GPFO-027]", {
+  tdir <- withr::local_tempdir("bbr-tests-")
+  fs::file_copy(CTL_TEST_FILE, file.path(tdir, "mod.ctl"))
+  mod <- new_model(file.path(tdir, "mod"))
+  expect_identical(build_path_from_model(mod, "-foo"),
+                   file.path(normalizePath(tdir), "mod", "mod-foo"))
+})
 
 test_that("is_valid_nonmem_extension() works [BBR-GPFO-021]", {
   expect_true(is_valid_nonmem_extension(MOD_TEST_FILE))
