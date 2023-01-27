@@ -50,6 +50,9 @@ run_log <- function(.base_dir, .recurse = FALSE, .include = NULL) {
 # PRIVATE HELPERS
 ##################
 
+# SHARED: find_models() is used by bbr.bayes, so any changes here should be
+# compatible with its use there.
+
 #' Search for model YAML files and read them
 #'
 #' Private helper function that searches from a base directory for any YAML files (excluding `bbi.yaml`)
