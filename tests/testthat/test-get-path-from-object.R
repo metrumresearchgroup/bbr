@@ -20,6 +20,17 @@ test_that("get_config_path() builds the right path [BBR-GPFO-026]", {
   expect_identical(get_config_path(MOD1), normalizePath(file.path(OUTPUT_DIR, "bbi_config.json")))
 })
 
+test_that("get_config_path: .check_exists=FALSE works [BBR-GPFO-028]", {
+  tdir <- withr::local_tempdir("bbr-tests-")
+  fs::file_copy(CTL_TEST_FILE, file.path(tdir, "mod.ctl"))
+  mod_path <- file.path(tdir, "mod")
+  mod <- new_model(mod_path)
+
+  fs::dir_create(mod_path)
+  expect_identical(get_config_path(mod, .check_exists = FALSE),
+                   file.path(normalizePath(mod_path), "bbi_config.json"))
+})
+
 test_that("get_yaml_path() builds the right path [BBR-GPFO-003]", {
   expect_identical(get_yaml_path(MOD1), normalizePath(YAML_TEST_FILE))
 })

@@ -412,6 +412,7 @@ GPFO-R026:
   description: get_config_path() works
   tests:
   - BBR-GPFO-026
+  - BBR-GPFO-028
 GPFO-R027:
   description: build_path_from_model works when output directory is missing
   tests:
