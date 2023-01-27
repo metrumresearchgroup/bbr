@@ -176,7 +176,13 @@ extract_details <- function(.s) {
       return(NULL)
     }
 
-    return(.x[DETAILS_ELEMENTS])
+    # Only index with existing names to avoid $<NA> items, which will make the
+    # downstream unnest_wider() call fail.
+    idx <- intersect(names(.x), DETAILS_ELEMENTS)
+    if (!length(idx)) {
+      return(NULL)
+    }
+    return(.x[idx])
   })
 
   return(.out)
