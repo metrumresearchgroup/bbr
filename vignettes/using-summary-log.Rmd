@@ -139,16 +139,15 @@ Notice that there is also an **any_heuristics column**, which can easily be used
 
 # Add Summary
 
-Just like [`config_log()` has `add_config()`](https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html#checking-if-models-are-up-to-date-with-config_log), you can also use `add_summary()` to join all of these columns onto an existing `bbi_run_log_df` (the tibble output from `run_log()`). This can be useful if you have a run log that you have previously filtered on something like the [`tags`](https://metrumresearchgroup.github.io/bbr/articles/getting-started.html#filtering-tags-example) or [`based_on`](https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html#filtering-tags-example) columns, and you would like to append some simple diagnostics.
+Just like [`config_log()` has `add_config()`](https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html#checking-if-models-are-up-to-date-with-config_log), you can also use `add_summary()` to join all of these columns onto an existing `bbi_run_log_df` (the tibble output from `run_log()`). This can be useful if you have a run log that you have previously filtered on something like the [`tags`](https://metrumresearchgroup.github.io/bbr/articles/getting-started.html#filtering-tags-example) or [`based_on`](https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html#using-the-run-log) columns, and you would like to append some simple diagnostics.
 
 
 ```{r add summary}
-# contrived example: in real life this would be filtering on tags, based_on, etc.
-log_df <- run_log(MODEL_DIR)
-log_df <- log_df[2:3, ]
+# filter to two specific runs
+log_df <- run_log(MODEL_DIR, .include = c("acop-iov", "iovmm"))
 
 # add summary columns
 log_df <- log_df %>% add_summary()
 
-log_df %>% select(run, tags, ofv, param_count, any_heuristics)
+log_df %>% select(run, ofv, param_count, any_heuristics)
 ```
