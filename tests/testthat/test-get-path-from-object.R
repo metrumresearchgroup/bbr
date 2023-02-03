@@ -20,6 +20,23 @@ test_that("get_config_path() builds the right path [BBR-GPFO-026]", {
   expect_identical(get_config_path(MOD1), normalizePath(file.path(OUTPUT_DIR, "bbi_config.json")))
 })
 
+test_that("get_config_path: .check_exists=FALSE works [BBR-GPFO-028]", {
+  ctl_file <- fs::path_abs(CTL_TEST_FILE)
+  withr::with_tempdir({
+    fs::file_copy(ctl_file, "mod.ctl")
+    mod_path <- file.path(getwd(), "mod")
+    mod <- new_model(mod_path)
+
+    expect_identical(get_config_path(mod, .check_exists = FALSE),
+                     file.path(normalizePath(getwd()),
+                               "mod", "bbi_config.json"))
+
+    fs::dir_create(mod_path)
+    expect_identical(get_config_path(mod, .check_exists = FALSE),
+                     file.path(normalizePath(mod_path), "bbi_config.json"))
+  })
+})
+
 test_that("get_yaml_path() builds the right path [BBR-GPFO-003]", {
   expect_identical(get_yaml_path(MOD1), normalizePath(YAML_TEST_FILE))
 })
@@ -159,6 +176,15 @@ test_that("build_path_from_model works with period in extension [BBR-GPFO-020]",
   )
 })
 
+test_that("build_path_from_model works when output directory is missing [BBR-GPFO-027]", {
+  ctl_file <- fs::path_abs(CTL_TEST_FILE)
+  withr::with_tempdir({
+    fs::file_copy(ctl_file, "mod.ctl")
+    mod <- new_model("mod")
+    expect_identical(build_path_from_model(mod, "-foo"),
+                     file.path(normalizePath(getwd()), "mod", "mod-foo"))
+  })
+})
 
 test_that("is_valid_nonmem_extension() works [BBR-GPFO-021]", {
   expect_true(is_valid_nonmem_extension(MOD_TEST_FILE))
