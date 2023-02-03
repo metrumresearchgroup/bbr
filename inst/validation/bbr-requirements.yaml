@@ -902,6 +902,10 @@ SMLG-R012:
   description: summary_log() defaults to .recurse = FALSE
   tests:
   - BBR-SMLG-003
+SMLG-R013:
+  description: summary_log() works when model output directory doesn't exist
+  tests:
+  - BBR-SMLG-012
 SUM-R001:
   description: model_summary.bbi_nonmem_model produces expected output
   tests:

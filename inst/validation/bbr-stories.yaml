@@ -643,6 +643,7 @@ LOG-S005:
   - SMLG-R010
   - SMLG-R011
   - SMLG-R012
+  - SMLG-R013
 LOG-S006:
   name: Collapse list columns to character
   description: As a user, I want to have a function that can take a tibble and the
