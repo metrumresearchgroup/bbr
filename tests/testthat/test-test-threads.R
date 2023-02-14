@@ -254,7 +254,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_false(any(fs::file_exists(mod_yamls)))
   })
 
-  test_that("delete_models() default: errors informatively when test_threads found [BBR-CLM-001]", {
+  test_that("delete_models() default: errors informatively when no test_threads tag found [BBR-CLM-001]", {
 
     mod_fake1 <- copy_model_from(
       read_model(file.path(MODEL_DIR_BBI, "1")),
