@@ -237,7 +237,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   })
 
 
-  test_that("delete_models() works for models created by test_threads by default [BBR-CLM-001]", {
+  test_that("delete_models() default: works for models created by test_threads [BBR-CLM-001]", {
 
     mod_ctls <- lapply(mods, function(mod.x){get_model_path(mod.x)}) %>% unlist()
     mod_yamls <- lapply(mods, function(mod.x){mod.x$absolute_model_path}) %>% yaml_ext()
@@ -252,6 +252,28 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     )
     expect_false(any(fs::file_exists(mod_ctls)))
     expect_false(any(fs::file_exists(mod_yamls)))
+  })
+
+  test_that("delete_models() default: errors informatively when test_threads found [BBR-CLM-001]", {
+
+    mod_fake1 <- copy_model_from(
+      read_model(file.path(MODEL_DIR_BBI, "1")),
+      "none",
+      .overwrite = TRUE,
+      .inherit_tags = FALSE
+    )
+    on.exit({
+      .yp <- get_yaml_path(mod_fake1)
+      .mp <- get_model_path(mod_fake1)
+      unlink(.yp)
+      unlink(.mp)
+    })
+
+    expect_error(
+      delete_models(mod_fake1, .force = T),
+      regexp = "defaults to.+test threads.+tags = NULL"
+    )
+
   })
 
   test_that("delete_models() with .tags [BBR-CLM-002]", {

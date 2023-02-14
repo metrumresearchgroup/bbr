@@ -268,7 +268,15 @@ delete_models <- function(.mods, .tags = "test threads", .force = FALSE){
   mod_paths <- unique(tag_groups$mod_paths)
 
   if(length(mod_paths)==0){
-    stop("None of specified tags were found")
+    err_msg <- "None of specified tags were found"
+    if (.tags == "test threads") {
+      err_msg <- paste0(
+        err_msg,
+        '. bbr::delete_models() defaults to deleting only models with the "test threads" tag.\n',
+        "Pass delete_models(..., .tags = NULL) to delete passed models, regardless of tags."
+      )
+    }
+    stop(err_msg)
   }
 
   mods_removed <- unique(tag_groups$mod_tags)
