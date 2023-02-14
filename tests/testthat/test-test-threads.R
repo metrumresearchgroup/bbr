@@ -350,7 +350,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     # When using NULL, models are not necessarily deleted in order
     # Only test that correct number of models are deleted
     msg_remove <- paste0(
-      paste("Removed", length(mods), "models with the following tags:"))
+      paste("Removed", length(mods), "models \\(ignoring tags\\)"))
 
     mod_ctls <- lapply(mods, function(mod.x){get_model_path(mod.x)}) %>% unlist()
     mod_yamls <- lapply(mods, function(mod.x){mod.x$absolute_model_path}) %>% yaml_ext()

@@ -290,10 +290,14 @@ delete_models <- function(.mods, .tags = "test threads", .force = FALSE){
     if (!isTRUE(delete_prompt)) return(invisible(NULL))
   }
 
-  msg_remove <- paste0(
-    paste("Removed", length(mod_paths), "models with the following tags:\n"),
-    paste("-",mods_removed, collapse = "\n")
-  )
+  msg_remove <- if (is.null(.tags)) {
+      paste("Removed", length(mod_paths), "models (ignoring tags)")
+    } else {
+      paste0(
+        paste("Removed", length(mod_paths), "models with the following tags:\n"),
+        paste("-",mods_removed, collapse = "\n")
+      )
+    }
 
   for (m in mod_paths) {
     if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
