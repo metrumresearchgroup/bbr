@@ -268,7 +268,15 @@ delete_models <- function(.mods, .tags = "test threads", .force = FALSE){
   mod_paths <- unique(tag_groups$mod_paths)
 
   if(length(mod_paths)==0){
-    stop("None of specified tags were found")
+    err_msg <- "None of specified tags were found"
+    if (.tags == "test threads") {
+      err_msg <- paste0(
+        err_msg,
+        '. bbr::delete_models() defaults to deleting only models with the "test threads" tag.\n',
+        "Pass delete_models(..., .tags = NULL) to delete passed models, regardless of tags."
+      )
+    }
+    stop(err_msg)
   }
 
   mods_removed <- unique(tag_groups$mod_tags)
@@ -282,10 +290,14 @@ delete_models <- function(.mods, .tags = "test threads", .force = FALSE){
     if (!isTRUE(delete_prompt)) return(invisible(NULL))
   }
 
-  msg_remove <- paste0(
-    paste("Removed", length(mod_paths), "models with the following tags:\n"),
-    paste("-",mods_removed, collapse = "\n")
-  )
+  msg_remove <- if (is.null(.tags)) {
+      paste("Removed", length(mod_paths), "models (ignoring tags)")
+    } else {
+      paste0(
+        paste("Removed", length(mod_paths), "models with the following tags:\n"),
+        paste("-",mods_removed, collapse = "\n")
+      )
+    }
 
   for (m in mod_paths) {
     if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
