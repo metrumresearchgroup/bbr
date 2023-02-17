@@ -182,13 +182,13 @@ param_estimates_compare <- function(
   }
 
   # summarize comp to quantiles
+
+  quantile_fn <- function(x)  {
+    quantile(x, probs = probs, na.rm = na.rm)
+  }
+
   comp_df <- comp_df %>%
-    reframe(across(
-      .cols = everything(),
-      .fns = quantile,
-      probs = probs,
-      na.rm = na.rm
-    )) %>%
+    reframe(across(.cols = everything(), .fns = quantile_fn)) %>%
     t() %>%
     as.data.frame() %>%
     rownames_to_column()
