@@ -183,7 +183,7 @@ param_estimates_compare <- function(
 
   # summarize comp to quantiles
   comp_df <- comp_df %>%
-    summarise(across(
+    reframe(across(
       .cols = everything(),
       .fns = quantile,
       probs = probs,
