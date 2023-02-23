@@ -149,6 +149,7 @@ install_menu <- function(.path, .version, .force, .quiet){
 
   current_bbi_url <- current_release_url(owner = 'metrumresearchgroup', repo = 'bbi')
   current_v <- bbi_current_release(current_bbi_url)
+  aborted <- FALSE
 
   if (.version == 'latest') {
     .bbi_url <- current_bbi_url
@@ -170,6 +171,8 @@ install_menu <- function(.path, .version, .force, .quiet){
 
       if(utils::menu(choices = c('Yes','No'))==1){
         download_bbi(.bbi_url, .dest_bbi_path)
+      } else {
+        aborted <- TRUE
       }
     } else {
       download_bbi(.bbi_url, .dest_bbi_path)
@@ -177,8 +180,12 @@ install_menu <- function(.path, .version, .force, .quiet){
     local_v <- bbi_version(.dest_bbi_path)
   }
 
-  add_to_path_message(.dest_bbi_path)
-  if (!isTRUE(.quiet)) version_message(local_v = local_v, current_v = current_v)
+  if (!aborted) {
+    add_to_path_message(.dest_bbi_path)
+    if (!isTRUE(.quiet)) {
+      version_message(local_v = local_v, current_v = current_v)
+    }
+  }
 }
 
 
