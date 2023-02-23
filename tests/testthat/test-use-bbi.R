@@ -31,6 +31,12 @@ test_that("use-bbi works on linux with path specified [BBR-UBI-002]", {
   use_bbi(.path = bbi_tmp_path, .force = TRUE)
   f_info <- file.info(bbi_tmp_path)
   expect_equal(as.character(f_info$mode), '755')
+
+  withr::with_tempdir({
+    relpath <- file.path("bin", "bbi")
+    use_bbi(.path = relpath, .force = TRUE)
+    checkmate::expect_file_exists(relpath, access = "x")
+  })
 })
 
 

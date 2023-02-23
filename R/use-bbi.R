@@ -35,10 +35,10 @@
 #' @importFrom glue glue_collapse
 #' @importFrom cli rule
 #'
-#' @param .path absolute path to install bbi to. See Details section for
-#'   defaults, if nothing is passed. Note that this should be the path where you
-#'   would like the bbi executable to be installed, _not_ the path to the
-#'   directory in which you want to install it. For example, you should pass
+#' @param .path path to install bbi to. See Details section for defaults, if
+#'   nothing is passed. Note that this should be the path where you would like
+#'   the bbi executable to be installed, _not_ the path to the directory in
+#'   which you want to install it. For example, you should pass
 #'   `"/some/dir/bbi"` and _not_ `"/some/dir"`.
 #' @param .version version of bbi to install. Must pass a character scalar
 #'   corresponding to a tag found in
@@ -143,8 +143,7 @@ bbi_current_release <- function(.bbi_url = NULL){
 #' @inheritParams use_bbi
 #' @keywords internal
 install_menu <- function(.path, .version, .force, .quiet){
-
-  .dest_bbi_path <- normalizePath(.path, mustWork = FALSE)
+  .dest_bbi_path <- fs::path_abs(.path)
   local_v <- bbi_version(.dest_bbi_path)
 
   current_bbi_url <- current_release_url(owner = 'metrumresearchgroup', repo = 'bbi')
