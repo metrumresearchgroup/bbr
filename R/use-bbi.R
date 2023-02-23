@@ -230,7 +230,7 @@ build_bbi_install_path <- function() {
     "windows" = {
       app_dir <- Sys.getenv("APPDATA")
       if (app_dir == "") dev_error("build_bbi_install_path() can't find $APPDATA")
-      file.path(app_dir, "bbi", "bbi")
+      file.path(app_dir, "bbi", "bbi.exe")
     },
     {
       dev_error(glue("build_bbi_install_path() got invalid operating system: {os}"))
