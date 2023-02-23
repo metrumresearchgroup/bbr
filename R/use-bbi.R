@@ -78,6 +78,10 @@ use_bbi <- function(.path = NULL, .version = "latest", .force = FALSE, .quiet = 
     stop(err_msg)
   }
 
+  if (ON_WINDOWS && !identical(fs::path_ext(.path), "exe")) {
+    stop("Path must end with '.exe' on Windows. Got ", .path)
+  }
+
   dir_create(dirname(.path))
 
   on.exit(install_menu(.path, .version, .force, .quiet), add = TRUE)
