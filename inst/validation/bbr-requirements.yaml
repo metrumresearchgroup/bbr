@@ -1031,6 +1031,10 @@ UBI-R006:
   tests:
   - BBR-UBI-002
   - BBR-UBI-006
+UBI-R007:
+  description: use_bbi reports if additional setup is required
+  tests:
+  - BBR-UBI-007
 UTL-R001:
   description: wait_for_nonmem() correctly reads in stop time
   tests:
