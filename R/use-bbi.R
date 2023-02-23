@@ -341,6 +341,11 @@ version_message <- function(local_v, current_v){
   cat(glue::glue(cli::col_blue(' - Current release: {current_v}\n')))
 }
 
+try_path_real <- function(...) {
+  tryCatch(fs::path_real(...),
+           ENOENT = function(e) NULL)
+}
+
 #' Helper to message user about adding the bbi directory to $PATH
 #'
 #' Will return invisibly if .bbi_path is the same as `getOption('bbr.bbi_exe_path')`
@@ -349,7 +354,13 @@ version_message <- function(local_v, current_v){
 #' @importFrom cli cli_alert
 #' @keywords internal
 add_to_path_message <- function(.bbi_path) {
-  if (.bbi_path == getOption('bbr.bbi_exe_path')) {
+  resolved_bbi_path <- try_path_real(.bbi_path)
+  if (is.null(resolved_bbi_path)) {
+    stop("Downloaded bbi unexpectedly does not exist at ",
+         .bbi_path)
+  }
+  if (identical(resolved_bbi_path,
+                try_path_real(getOption("bbr.bbi_exe_path")))) {
     return(invisible(NULL))
   }
 

@@ -83,6 +83,8 @@ test_that("use_bbi errors when passed a directory [BBR-UBI-006]", {
 })
 
 test_that("add_to_path_message() reports needed setup [BBR-UBI-007]", {
+  expect_error(add_to_path_message("idontexist"),
+               "unexpectedly does not exist")
   withr::with_tempdir({
     fs::file_touch("bbi")
     fs::file_chmod("bbi", mode = "755")
@@ -91,6 +93,9 @@ test_that("add_to_path_message() reports needed setup [BBR-UBI-007]", {
     # Target path in effect via option.
     withr::with_options(
       list(bbr.bbi_exe_path = path),
+      expect_silent(add_to_path_message(path)))
+    withr::with_options(
+      list(bbr.bbi_exe_path = "./bbi"),
       expect_silent(add_to_path_message(path)))
     withr::with_options(list(bbr.bbi_exe_path = "foo"), {
       # Target path not in effect via option or PATH.
