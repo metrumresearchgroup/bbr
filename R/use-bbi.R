@@ -341,9 +341,18 @@ version_message <- function(local_v, current_v){
                  .trim = FALSE))
 }
 
-try_path_real <- function(...) {
-  tryCatch(fs::path_real(...),
-           ENOENT = function(e) NULL)
+if (utils::packageVersion("fs") < "1.4.2") {
+  try_path_real <- function(path) {
+    if (!all(fs::file_exists(path))) {
+      return(NULL)
+    }
+    fs::path_real(path)
+  }
+} else {
+  try_path_real <- function(path) {
+    tryCatch(fs::path_real(path),
+             ENOENT = function(e) NULL)
+  }
 }
 
 #' Helper to message user about adding the bbi directory to $PATH
