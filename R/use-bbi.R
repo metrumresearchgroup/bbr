@@ -337,7 +337,8 @@ version_message <- function(local_v, current_v){
     }
   }
 
-  cat(glue::glue(cli::col_blue(' - Current release: {current_v}\n')))
+  cat(glue::glue(cli::col_blue(' - Current release: {current_v}\n'),
+                 .trim = FALSE))
 }
 
 try_path_real <- function(...) {
