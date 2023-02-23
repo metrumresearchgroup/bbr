@@ -222,11 +222,7 @@ build_bbi_install_path <- function() {
       if (home_dir == "") dev_error("build_bbi_install_path() can't find $HOME")
       file.path(home_dir, ".local", "share", "bbi", "bbi")
     },
-    "darwin" = {
-      home_dir <- Sys.getenv("HOME")
-      if (home_dir == "") dev_error("build_bbi_install_path() can't find $HOME")
-      "/usr/local/bin/bbi"
-    },
+    "darwin" = "/usr/local/bin/bbi",
     "windows" = {
       app_dir <- Sys.getenv("APPDATA")
       if (app_dir == "") dev_error("build_bbi_install_path() can't find $APPDATA")
