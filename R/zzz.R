@@ -12,7 +12,11 @@
   }
 
   if (is.null(getOption("bbr.bbi_exe_mode"))) {
-    options("bbr.bbi_exe_mode" = BBI_DEFAULT_MODE)
+    if (identical(check_os(), "linux")) {
+      options("bbr.bbi_exe_mode" = "sge")
+    } else {
+      options("bbr.bbi_exe_mode" = "local")
+    }
   }
 
   # set bbi minimum version

@@ -4,7 +4,6 @@ BBI_DEFAULT_PATH <- if (.Platform$OS.type == "windows") {
   "bbi"
 }
 
-BBI_DEFAULT_MODE <- "sge"
 BBI_VALID_MODES <- c("local", "sge")
 
 CACHE_ENV <- new.env(parent = emptyenv())
