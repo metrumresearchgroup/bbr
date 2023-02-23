@@ -368,7 +368,13 @@ add_to_path_message <- function(.bbi_path) {
     return(invisible(NULL))
   }
 
-  cli::cli_alert(glue("Please either set `options('bbr.bbi_exe_path' = '{.bbi_path}')` in your .Rprofile, or add this location to $PATH in your .bash_profile"))
+  parent_dir <- fs::path_dir(.bbi_path)
+  path <- deparse(as.character(.bbi_path))
+  cli::cli_alert(
+    c("Please either set\n\n",
+      "  options(bbr.bbi_exe_path = {path})\n\n",
+      "in your .Rprofile, or put {parent_dir}\n",
+      "at the front of your environment's `PATH`"))
 }
 
 
