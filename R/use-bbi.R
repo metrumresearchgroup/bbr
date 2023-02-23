@@ -363,19 +363,8 @@ add_to_path_message <- function(.bbi_path) {
                 try_path_real(getOption("bbr.bbi_exe_path")))) {
     return(invisible(NULL))
   }
-
-  old_path <- Sys.getenv("PATH")
-
-  if (check_os() == "windows") {
-    .sep = ";"
-  } else {
-    .sep = ":"
-  }
-
-  old_path_dirs <- unlist(str_split(old_path, .sep))
-
-  new_dir <- dirname(.bbi_path)
-  if (new_dir %in% old_path_dirs) {
+  if (identical(try_path_real(Sys.which(basename(.bbi_path))),
+                resolved_bbi_path)) {
     return(invisible(NULL))
   }
 

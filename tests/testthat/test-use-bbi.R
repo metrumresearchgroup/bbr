@@ -104,6 +104,14 @@ test_that("add_to_path_message() reports needed setup [BBR-UBI-007]", {
       withr::with_envvar(new = c("PATH" = paste0(getwd(), ":")),
                          action = "prefix",
                          expect_silent(add_to_path_message(path)))
+      # Target path is in PATH but shadowed.
+      fs::dir_create("sub")
+      fs::file_copy(path, file.path("sub", "bbi"))
+      newpath <- paste0(fs::path_abs("sub"), ":", Sys.getenv("PATH"),
+                        ":", getwd())
+      withr::with_envvar(new = c("PATH" = newpath), action = "replace",
+                         expect_message(add_to_path_message(path),
+                                        "Please either set"))
     })
   })
 })
