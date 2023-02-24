@@ -14,13 +14,17 @@ readr::write_file("created_by: test-submit-model", file.path(model_dir, "bbi.yam
 on.exit({ fs::file_delete(file.path(model_dir, "bbi.yaml"))})
 
 withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
+  default_mode <- getOption("bbr.bbi_exe_mode")
+  cmd_prefix <- paste("cd", model_dir, ";",
+                      read_bbi_path(), "nonmem", "run",
+                      default_mode)
   test_that("submit_model(.dry_run=T) returns correct command string [BBR-SBMT-001]",
             {
 
               # correctly parsing yaml
               expect_identical(
                 submit_model(MOD1, .dry_run = T)[[PROC_CALL]],
-                as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path} --overwrite --threads=4 --parallel"))
+                as.character(glue("{cmd_prefix} {mod_ctl_path} --overwrite --threads=4 --parallel"))
               )
 
               # switch to local mode
@@ -38,7 +42,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
                                "nm_version" = "nm74"
                              ),
                              .dry_run = T)[[PROC_CALL]],
-                as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path} --overwrite --threads=2 --json --nm_version=nm74 --parallel"))
+                as.character(glue("{cmd_prefix} {mod_ctl_path} --overwrite --threads=2 --json --nm_version=nm74 --parallel"))
               )
             })
 
@@ -47,13 +51,13 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
               # correctly parsing yaml
               expect_identical(
                 submit_model(MOD1, .dry_run = T)[[PROC_CALL]],
-                as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path} --overwrite --threads=4 --parallel"))
+                as.character(glue("{cmd_prefix} {mod_ctl_path} --overwrite --threads=4 --parallel"))
               )
 
               # over-riding yaml arg with passed arg
               expect_identical(
                 submit_model(MOD1, list(threads=2), .dry_run = T)[[PROC_CALL]],
-                as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path} --overwrite --threads=2 --parallel"))
+                as.character(glue("{cmd_prefix} {mod_ctl_path} --overwrite --threads=2 --parallel"))
               )
             })
 
@@ -69,8 +73,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       res[[PROC_CALL]],
       as.character(
         glue::glue(
-          "cd {model_dir} ;",
-          "{read_bbi_path()} nonmem run sge {mod_ctl_path} --overwrite --threads=4 --parallel",
+          "{cmd_prefix} {mod_ctl_path} --overwrite --threads=4 --parallel",
           "--config={temp_config}",
           .sep = " "
         )
@@ -86,10 +89,11 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   })
 
   test_that("submit_model(.mode) inherits option [BBR-SBMT-005]", {
-    withr::with_options(list(bbr.bbi_exe_mode = "local"), {
+    other_mode <- switch(default_mode, sge = "local", "sge")
+    withr::with_options(list(bbr.bbi_exe_mode = other_mode), {
       expect_identical(
         submit_model(MOD1, .dry_run = T)[[PROC_CALL]],
-        as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run local {mod_ctl_path} --overwrite --threads=4 --parallel"))
+        as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run {other_mode} {mod_ctl_path} --overwrite --threads=4 --parallel"))
       )
     })
   })
