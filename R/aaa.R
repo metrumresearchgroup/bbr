@@ -5,7 +5,6 @@ BBI_DEFAULT_PATH <- if (ON_WINDOWS) {
   "bbi"
 }
 
-BBI_DEFAULT_MODE <- "sge"
 BBI_VALID_MODES <- c("local", "sge")
 
 CACHE_ENV <- new.env(parent = emptyenv())
