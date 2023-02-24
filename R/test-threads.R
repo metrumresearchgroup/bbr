@@ -238,10 +238,12 @@ delete_models <- function(.mods, .tags = "test threads", .force = FALSE){
   })
 
   tag_groups <- if(is.null(.tags)){
-    crossing(mod_tags = mod_info$mod_tags, .tags = "NA", found = TRUE) %>% left_join(mod_info, by = "mod_tags")
+    crossing(mod_tags = mod_info$mod_tags, .tags = "NA", found = TRUE) %>%
+      left_join_all(mod_info, by = "mod_tags")
   }else{
     tag_levels <- unique(.tags) # message in order of tags
-    tag_groups <- crossing(mod_tags = mod_info$mod_tags, .tags) %>% left_join(mod_info, by = "mod_tags") %>%
+    tag_groups <- crossing(mod_tags = mod_info$mod_tags, .tags) %>%
+      left_join_all(mod_info, by = "mod_tags") %>%
       mutate(.tags = ordered(.tags, levels = tag_levels)) %>% arrange(.tags)
     found <- map2(tag_groups$mod_tags, tag_groups$.tags, function(tag.x, .tag){
       grepl(.tag, tag.x)
