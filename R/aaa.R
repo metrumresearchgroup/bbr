@@ -1,4 +1,5 @@
-BBI_DEFAULT_PATH <- if (.Platform$OS.type == "windows") {
+ON_WINDOWS <- identical(.Platform$OS.type, "windows")
+BBI_DEFAULT_PATH <- if (ON_WINDOWS) {
   "bbi.exe"
 } else {
   "bbi"
