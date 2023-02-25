@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.5.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.6.0</span>
       </span>
     </div>
 
@@ -400,7 +400,7 @@ list.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sum1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "absolute_model_path" "run_details"         "run_heuristics"     </span></span>
 <span><span class="co">#&gt; [4] "parameters_data"     "parameter_names"     "ofv"                </span></span>
-<span><span class="co">#&gt; [7] "condition_number"    "shrinkage_details"</span></span></code></pre></div>
+<span><span class="co">#&gt; [7] "condition_number"    "shrinkage_details"   "success"</span></span></code></pre></div>
 <p>These elements can be accessed manually or extracted with built-in
 helper functions like so:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
@@ -477,7 +477,7 @@ the based_on field</a> vignette.)</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span><span class="va">mod1</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/update_model_id.html">update_model_id</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; replacing 1 with 2 in /data/home/sethg/metrumresearchgroup/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/2.ctl</span></span></code></pre></div>
+<span><span class="co">#&gt; replacing 1 with 2 in /data/home/kylem/.cache/R/renv/library/bbr-e43ce16f/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/2.ctl</span></span></code></pre></div>
 <p>The new control stream file <code>2.ctl</code> will be identical to
 its parent model, though you can use <a href="https://metrumresearchgroup.github.io/bbr/reference/update_model_id.html"><code>update_model_id()</code></a>
 (as above) to update to the new model ID in places like
@@ -550,9 +550,9 @@ section below for links to vignettes demonstrating those functions.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 10</span></span></span>
 <span><span class="co">#&gt;   absolute_mo…¹ run   yaml_…² model…³ descr…⁴ bbi_a…⁵ based…⁶ tags  notes  star </span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;lis&gt;</span> <span style="color: #949494; font-style: italic;">&lt;list&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> /data/home/s… 1     c7486e… nonmem  <span style="color: #BB0000;">NA</span>      <span style="color: #949494;">&lt;NULL&gt;</span>  <span style="color: #949494;">&lt;NULL&gt;</span>  &lt;chr&gt; <span style="color: #949494;">&lt;NULL&gt;</span> FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> /data/home/s… 2     bc60c6… nonmem  <span style="color: #BB0000;">NA</span>      <span style="color: #949494;">&lt;NULL&gt;</span>  &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;  FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> /data/home/s… 3     5a4970… nonmem  <span style="color: #BB0000;">NA</span>      <span style="color: #949494;">&lt;NULL&gt;</span>  &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;  FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> /data/home/k… 1     c7486e… nonmem  <span style="color: #BB0000;">NA</span>      <span style="color: #949494;">&lt;NULL&gt;</span>  <span style="color: #949494;">&lt;NULL&gt;</span>  &lt;chr&gt; <span style="color: #949494;">&lt;NULL&gt;</span> FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> /data/home/k… 2     bc60c6… nonmem  <span style="color: #BB0000;">NA</span>      <span style="color: #949494;">&lt;NULL&gt;</span>  &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;  FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> /data/home/k… 3     5a4970… nonmem  <span style="color: #BB0000;">NA</span>      <span style="color: #949494;">&lt;NULL&gt;</span>  &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;  FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># … with abbreviated variable names ¹​absolute_model_path, ²​yaml_md5,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   ³​model_type, ⁴​description, ⁵​bbi_args, ⁶​based_on</span></span></span></code></pre></div>
 <p>The <code><a href="../reference/run_log.html">run_log()</a></code> returns a tibble which can be manipulated
@@ -584,11 +584,12 @@ format.</p>
 <div class="section level3">
 <h3 id="filtering-tags-example">Filtering tags example<a class="anchor" aria-label="anchor" href="#filtering-tags-example"></a>
 </h3>
-<p>This code uses <code><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">purrr::map_lgl</a></code> to filter the run log to
-only rows containing a specific tag (<code>"2 compartment"</code>).</p>
+<p>All <code>*_log()</code> functions have in <code>.include</code>
+argument that will filter the resulting log. Only models that contain a
+tag or name (<code>run</code>) that matches an element of the vector
+passed to <code>.include</code> will be included.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">log_df</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_lgl</a></span><span class="op">(</span><span class="va">tags</span>, <span class="op">~</span> <span class="st">"2 compartment"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">.x</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/run_log.html">run_log</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, .include <span class="op">=</span> <span class="st">"2 compartment"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/collapse_to_string.html">collapse_to_string</a></span><span class="op">(</span><span class="va">tags</span>, <span class="va">notes</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="va">tags</span>, <span class="va">notes</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 3</span></span></span>
@@ -639,7 +640,7 @@ number, and parameter counts.</li>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

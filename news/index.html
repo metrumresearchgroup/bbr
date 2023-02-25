@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.5.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.6.0</span>
       </span>
     </div>
 
@@ -69,6 +69,24 @@
       
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="1.6.0" id="bbr-160">bbr 1.6.0<a class="anchor" aria-label="anchor" href="#bbr-160"></a></h2>
+<div class="section level3">
+<h3 id="new-features-and-changes-1-6-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-1-6-0"></a></h3>
+<ul><li><p>New <code><a href="../reference/open_model_file.html">open_model_file()</a></code> function opens the model definition file (the control stream for NONMEM models) in RStudio or any other editor supported by <code><a href="https://rdrr.io/r/utils/file.edit.html" class="external-link">utils::file.edit()</a></code>. (#570)</p></li>
+<li><p>The vignettes now include examples of calling <code><a href="../reference/run_log.html">run_log()</a></code> with the <code>.include</code> argument (added in bbr 1.4.0). (#575)</p></li>
+<li><p><code><a href="../reference/delete_models.html">delete_models()</a></code> messages have been improved. (#577)</p></li>
+<li><p><code><a href="../reference/use_bbi.html">use_bbi()</a></code> now allows a relative path and, on Windows, aborts if the path doesn’t end with “.exe”. (#579)</p></li>
+<li><p><code>bbr.bbi_exe_mode</code> now defaults to “local” when not on Linux (where the default remains “sge”). (#580)</p></li>
+<li><p>Display a warning on Windows users if bbi version is below 3.2.2. (#581)</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bugs-addressed-1-6-0">Bugs addressed<a class="anchor" aria-label="anchor" href="#bugs-addressed-1-6-0"></a></h3>
+<ul><li><p>Various updates for compatibility with tidyr 1.3.0 and dplyr 1.1.0 (#572, #578).</p></li>
+<li><p><code><a href="../reference/model_summaries.html">model_summaries()</a></code>, <code><a href="../reference/build_path_from_model.html">build_path_from_model()</a></code>, and <code><a href="../reference/get_path_from_object.html">get_config_path()</a></code> unintentionally signaled an error when the output directory of a model didn’t exist. (#573)</p></li>
+<li><p><code><a href="../reference/use_bbi.html">use_bbi()</a></code> now does a better job of deciding when to message the user about further setup that’s needed. (#579)</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="1.5.0" id="bbr-150">bbr 1.5.0<a class="anchor" aria-label="anchor" href="#bbr-150"></a></h2>
 <div class="section level3">
@@ -269,7 +287,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

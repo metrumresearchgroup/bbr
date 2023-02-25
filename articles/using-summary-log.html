@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.5.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.6.0</span>
       </span>
     </div>
 
@@ -160,7 +160,7 @@ the <code>bbi_nonmem_summary</code> object returned from
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sum1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "absolute_model_path" "run_details"         "run_heuristics"     </span></span>
 <span><span class="co">#&gt; [4] "parameters_data"     "parameter_names"     "ofv"                </span></span>
-<span><span class="co">#&gt; [7] "condition_number"    "shrinkage_details"</span></span></code></pre></div>
+<span><span class="co">#&gt; [7] "condition_number"    "shrinkage_details"   "success"</span></span></code></pre></div>
 <p>For example, the <code>run_details</code> section alone contains
 wealth of information about this model run:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -170,11 +170,11 @@ wealth of information about this model run:</p>
 <span><span class="co">#&gt;  $ run_start             : num NA</span></span>
 <span><span class="co">#&gt;  $ run_end               : chr "Tue Aug 25 16:50:27 EDT 2020"</span></span>
 <span><span class="co">#&gt;  $ estimation_time       : num 132</span></span>
-<span><span class="co">#&gt;  $ covariance_time       : num 1.04</span></span>
+<span><span class="co">#&gt;  $ postprocess_time      : num 1.04</span></span>
 <span><span class="co">#&gt;  $ cpu_time              : num 134</span></span>
 <span><span class="co">#&gt;  $ function_evaluations  : int 380</span></span>
 <span><span class="co">#&gt;  $ significant_digits    : int 3</span></span>
-<span><span class="co">#&gt;  $ problem_text          : chr "LEM 10 mixture model and IOV on CL"</span></span>
+<span><span class="co">#&gt;  $ problem_text          : chr "10 mixture model and IOV on CL"</span></span>
 <span><span class="co">#&gt;  $ mod_file              : num NA</span></span>
 <span><span class="co">#&gt;  $ estimation_method     : chr "First Order Conditional Estimation"</span></span>
 <span><span class="co">#&gt;  $ data_set              : chr "../MixSim.csv"</span></span>
@@ -204,21 +204,19 @@ default.</li>
 </ul>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sum_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/summary_log.html">summary_log</a></span><span class="op">(</span><span class="va">MODEL_DIR</span><span class="op">)</span></span>
-<span><span class="co">#&gt; New names:</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> `` -&gt; `...1`</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sum_df</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  [1] "absolute_model_path"     "run"                    </span></span>
-<span><span class="co">#&gt;  [3] "bbi_summary"             "error_msg"              </span></span>
-<span><span class="co">#&gt;  [5] "needed_fail_flags"       "estimation_method"      </span></span>
-<span><span class="co">#&gt;  [7] "problem_text"            "number_of_subjects"     </span></span>
-<span><span class="co">#&gt;  [9] "number_of_obs"           "...1"                   </span></span>
-<span><span class="co">#&gt; [11] "ofv"                     "param_count"            </span></span>
-<span><span class="co">#&gt; [13] "condition_number"        "any_heuristics"         </span></span>
-<span><span class="co">#&gt; [15] "covariance_step_aborted" "large_condition_number" </span></span>
-<span><span class="co">#&gt; [17] "eigenvalue_issues"       "correlations_not_ok"    </span></span>
-<span><span class="co">#&gt; [19] "parameter_near_boundary" "hessian_reset"          </span></span>
-<span><span class="co">#&gt; [21] "has_final_zero_gradient" "minimization_terminated"</span></span>
-<span><span class="co">#&gt; [23] "eta_pval_significant"    "prderr"</span></span></code></pre></div>
+<span><span class="co">#&gt;  [3] "bbi_summary"             "needed_fail_flags"      </span></span>
+<span><span class="co">#&gt;  [5] "error_msg"               "problem_text"           </span></span>
+<span><span class="co">#&gt;  [7] "estimation_method"       "number_of_subjects"     </span></span>
+<span><span class="co">#&gt;  [9] "number_of_obs"           "ofv"                    </span></span>
+<span><span class="co">#&gt; [11] "param_count"             "condition_number"       </span></span>
+<span><span class="co">#&gt; [13] "any_heuristics"          "covariance_step_aborted"</span></span>
+<span><span class="co">#&gt; [15] "large_condition_number"  "eigenvalue_issues"      </span></span>
+<span><span class="co">#&gt; [17] "correlations_not_ok"     "parameter_near_boundary"</span></span>
+<span><span class="co">#&gt; [19] "hessian_reset"           "has_final_zero_gradient"</span></span>
+<span><span class="co">#&gt; [21] "minimization_terminated" "eta_pval_significant"   </span></span>
+<span><span class="co">#&gt; [23] "prderr"</span></span></code></pre></div>
 <p>The specific columns returned are described below, though there is
 also a list of them, with brief definitions, in the <a href="https://metrumresearchgroup.github.io/bbr/reference/summary_log.html"><code>summary_log()</code>
 docs</a> that can be accessed any time with <code>?summary_log()</code>
@@ -263,11 +261,11 @@ docs</a>.</p>
 <span><span class="co">#&gt;   run                  ofv param_count estimat…¹ probl…² numbe…³ numbe…⁴ condi…⁵</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1001               <span style="text-decoration: underline;">3</span>843.          15 MCMC Bay… Run# 1…     240     599   <span style="text-decoration: underline;">4</span>353.</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> acop-fake-bayes    <span style="text-decoration: underline;">2</span>675.           7 First Or… LEM PK…      40     760     <span style="color: #BB0000;">NA</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> acop-iov          <span style="text-decoration: underline;">44</span>159.           9 First Or… LEM PK…      39    <span style="text-decoration: underline;">6</span>396     <span style="color: #BB0000;">NA</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> acop-onlysim         <span style="color: #BB0000;">NA</span>           <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>        LEM PK…      40     760     <span style="color: #BB0000;">NA</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> acop-fake-bayes    <span style="text-decoration: underline;">2</span>675.           7 First Or… PK mod…      40     760     <span style="color: #BB0000;">NA</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> acop-iov          <span style="text-decoration: underline;">44</span>159.           9 First Or… PK mod…      39    <span style="text-decoration: underline;">6</span>396     <span style="color: #BB0000;">NA</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> acop-onlysim         <span style="color: #BB0000;">NA</span>           <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>        PK mod…      40     760     <span style="color: #BB0000;">NA</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> example2_saemimp -<span style="color: #BB0000; text-decoration: underline;">10</span><span style="color: #BB0000;">839.</span>          21 Stochast… RUN# e…     400    <span style="text-decoration: underline;">2</span>000     <span style="color: #BB0000;">NA</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> iovmm             <span style="text-decoration: underline;">14</span>722.          11 First Or… LEM 10…     300   <span style="text-decoration: underline;">12</span>600     <span style="color: #BB0000;">NA</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> iovmm             <span style="text-decoration: underline;">14</span>722.          11 First Or… 10 mix…     300   <span style="text-decoration: underline;">12</span>600     <span style="color: #BB0000;">NA</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># … with abbreviated variable names ¹​estimation_method, ²​problem_text,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   ³​number_of_subjects, ⁴​number_of_obs, ⁵​condition_number</span></span></span></code></pre></div>
 </div>
@@ -295,20 +293,20 @@ easily selected with <code>tidyselect::where(is.logical)</code>.
 <code>tidyselect (&gt;= 1.1.0)</code>, released May 2020.)</em></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sum_df</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/where.html" class="external-link">where</a></span><span class="op">(</span><span class="va">is.logical</span><span class="op">)</span>, <span class="op">-</span><span class="va">needed_fail_flags</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 14</span></span></span>
-<span><span class="co">#&gt;   run      neede…¹ ...1  any_h…² covar…³ large…⁴ eigen…⁵ corre…⁶ param…⁷ hessi…⁸</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1001     TRUE    <span style="color: #BB0000;">NA</span>    TRUE    FALSE   TRUE    FALSE   FALSE   FALSE   FALSE  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> acop-fa… FALSE   <span style="color: #BB0000;">NA</span>    TRUE    FALSE   FALSE   TRUE    FALSE   FALSE   FALSE  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> acop-iov FALSE   <span style="color: #BB0000;">NA</span>    TRUE    FALSE   FALSE   FALSE   FALSE   FALSE   TRUE   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> acop-on… FALSE   <span style="color: #BB0000;">NA</span>    FALSE   FALSE   FALSE   FALSE   FALSE   FALSE   FALSE  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> example… FALSE   <span style="color: #BB0000;">NA</span>    FALSE   FALSE   FALSE   FALSE   FALSE   FALSE   FALSE  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> iovmm    FALSE   <span style="color: #BB0000;">NA</span>    TRUE    FALSE   FALSE   FALSE   FALSE   TRUE    FALSE  </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 4 more variables: has_final_zero_gradient &lt;lgl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   minimization_terminated &lt;lgl&gt;, eta_pval_significant &lt;lgl&gt;, prderr &lt;lgl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   and abbreviated variable names ¹​needed_fail_flags, ²​any_heuristics,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   ³​covariance_step_aborted, ⁴​large_condition_number, ⁵​eigenvalue_issues,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   ⁶​correlations_not_ok, ⁷​parameter_near_boundary, ⁸​hessian_reset</span></span></span></code></pre>
+<pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 13</span></span></span>
+<span><span class="co">#&gt;   run    neede…¹ any_h…² covar…³ large…⁴ eigen…⁵ corre…⁶ param…⁷ hessi…⁸ has_f…⁹</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1001   TRUE    TRUE    FALSE   TRUE    FALSE   FALSE   FALSE   FALSE   FALSE  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> acop-… FALSE   TRUE    FALSE   FALSE   TRUE    FALSE   FALSE   FALSE   FALSE  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> acop-… FALSE   TRUE    FALSE   FALSE   FALSE   FALSE   FALSE   TRUE    FALSE  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> acop-… FALSE   FALSE   FALSE   FALSE   FALSE   FALSE   FALSE   FALSE   FALSE  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> examp… FALSE   FALSE   FALSE   FALSE   FALSE   FALSE   FALSE   FALSE   FALSE  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> iovmm  FALSE   TRUE    FALSE   FALSE   FALSE   FALSE   TRUE    FALSE   TRUE   </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># … with 3 more variables: minimization_terminated &lt;lgl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   eta_pval_significant &lt;lgl&gt;, prderr &lt;lgl&gt;, and abbreviated variable names</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   ¹​needed_fail_flags, ²​any_heuristics, ³​covariance_step_aborted,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   ⁴​large_condition_number, ⁵​eigenvalue_issues, ⁶​correlations_not_ok,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   ⁷​parameter_near_boundary, ⁸​hessian_reset, ⁹​has_final_zero_gradient</span></span></span></code></pre>
 <p>Notice that there is also an <strong>any_heuristics column</strong>,
 which can easily be used to filter to only runs that had at least one
 heuristic flag triggered.</p>
@@ -323,22 +321,21 @@ has <code>add_config()</code></a>, you can also use
 <code>bbi_run_log_df</code> (the tibble output from
 <code><a href="../reference/run_log.html">run_log()</a></code>). This can be useful if you have a run log that
 you have previously filtered on something like the <a href="https://metrumresearchgroup.github.io/bbr/articles/getting-started.html#filtering-tags-example"><code>tags</code></a>
-or <a href="https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html#filtering-tags-example"><code>based_on</code></a>
+or <a href="https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html#using-the-run-log"><code>based_on</code></a>
 columns, and you would like to append some simple diagnostics.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># contrived example: in real life this would be filtering on tags, based_on, etc.</span></span>
-<span><span class="va">log_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_log.html">run_log</a></span><span class="op">(</span><span class="va">MODEL_DIR</span><span class="op">)</span></span>
-<span><span class="va">log_df</span> <span class="op">&lt;-</span> <span class="va">log_df</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fl">3</span>, <span class="op">]</span></span>
+<code class="sourceCode R"><span><span class="co"># filter to two specific runs</span></span>
+<span><span class="va">log_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_log.html">run_log</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, .include <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"acop-iov"</span>, <span class="st">"iovmm"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># add summary columns</span></span>
 <span><span class="va">log_df</span> <span class="op">&lt;-</span> <span class="va">log_df</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/summary_log.html">add_summary</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">log_df</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="va">tags</span>, <span class="va">ofv</span>, <span class="va">param_count</span>, <span class="va">any_heuristics</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 5</span></span></span>
-<span><span class="co">#&gt;   run             tags      ofv param_count any_heuristics</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> acop-fake-bayes <span style="color: #949494;">&lt;NULL&gt;</span>  <span style="text-decoration: underline;">2</span>675.           7 TRUE          </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> acop-iov        <span style="color: #949494;">&lt;NULL&gt;</span> <span style="text-decoration: underline;">44</span>159.           9 TRUE</span></span></code></pre></div>
+<span><span class="va">log_df</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="va">ofv</span>, <span class="va">param_count</span>, <span class="va">any_heuristics</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 4</span></span></span>
+<span><span class="co">#&gt;   run         ofv param_count any_heuristics</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>         </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> acop-iov <span style="text-decoration: underline;">44</span>159.           9 TRUE          </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> iovmm    <span style="text-decoration: underline;">14</span>722.          11 TRUE</span></span></code></pre></div>
 </div>
   </div>
 
@@ -359,7 +356,7 @@ columns, and you would like to append some simple diagnostics.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
