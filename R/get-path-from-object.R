@@ -226,6 +226,9 @@ build_path_from_model <- function(.mod, .suffix, ...) {
 #' @export
 build_path_from_model.bbi_model <- function(.mod, .suffix, ...) {
   file.path(
+    # Note: Avoid using get_output_dir() here so that get_output_dir() methods
+    # can use build_path_from_model() without triggering infinite recursion
+    # (see, for example, get_output_dir.bbi_stan_model() in bbr.bayes).
     .mod[[ABS_MOD_PATH]],
     paste0(get_model_id(.mod), .suffix)
   )
