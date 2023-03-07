@@ -4,10 +4,12 @@
 \alias{inherit_param_estimates}
 \title{Inherit parameter estimates}
 \usage{
-inherit_param_estimates(.mod)
+inherit_param_estimates(.mod, .parent_mod = get_based_on(.mod))
 }
 \arguments{
-\item{.mod}{}
+\item{.mod}{New model object to overwrite}
+
+\item{.parent_mod}{model path to inherit properties from}
 }
 \description{
 Inherit parameter estimates

@@ -1,12 +1,13 @@
 
 #' Inherit parameter estimates
 #'
-#' @param .mod
+#' @param .mod New model object to overwrite
+#' @param .parent_mod model path to inherit properties from
 #'
 #' @export
-inherit_param_estimates <- function(.mod){
+inherit_param_estimates <- function(.mod, .parent_mod = get_based_on(.mod)){
 
-  based_on_path <- .mod %>% get_based_on() # TODO: make this an argument that can be overwritten with a filepath or model object
+  based_on_path <- .parent_mod
 
   if(is.null(based_on_path) || !fs::file_exists(based_on_path)){
     msg_prefix <- if(is.null(based_on_path)){
@@ -30,31 +31,52 @@ inherit_param_estimates <- function(.mod){
   theta_specs <- get_param_block(based_on_mod_lines, .block = "THETA")
   theta_idxs <- theta_specs$param_idxs
   theta_block <- theta_specs$param_block
-  # Extract numerical values from theta_block - except first element (which contains $THETA)
-  # theta_values <- lapply(theta_block[-1], function(x) as.numeric(readr::parse_number(x))) %>% unlist()
-
-  # Update THETA values
-  new_thetas <- based_on_sum %>% get_theta() %>% unname()
-
-  for (i in seq_along(new_thetas)) {
-    theta_block[i+1] <- gsub("\\b[-+]?\\d+\\.?\\d*\\b", new_thetas[i], theta_block[i+1])
-  }
-  based_on_mod_lines[theta_idxs] <- theta_block
 
   # Identify OMEGA Blocks
   omega_specs <- get_param_block(based_on_mod_lines, .block = "OMEGA")
   omega_idxs <- omega_specs$param_idxs
   omega_block <- omega_specs$param_block
-  new_omegas <- based_on_sum %>% get_omega()
 
   # Identify SIGMA Blocks
   sigma_specs <- get_param_block(based_on_mod_lines, .block = "SIGMA")
   sigma_idxs <- sigma_specs$param_idxs
   sigma_block <- sigma_specs$param_block
+
+
+  # Update THETA Block
+  new_thetas <- based_on_sum %>% get_theta() %>% unname()
+
+  # Base case
+  for (i in seq_along(new_thetas)) {
+    theta_block[i+1] <- gsub("\\b[-+]?\\d+\\.?\\d*\\b", new_thetas[i], theta_block[i+1])
+  }
+  based_on_mod_lines[theta_idxs] <- theta_block
+
+
+  # Update OMEGA Block
+  new_omegas <- based_on_sum %>% get_omega()
+
+  # Base case - single omega block
+  new_omegas <- new_omegas[upper.tri(new_omegas, diag = TRUE)]
+  for (i in seq_along(new_omegas)) {
+    omega_block[i+1] <- gsub("\\b[-+]?\\d+\\.?\\d*\\b", new_omegas[i], omega_block[i+1])
+  }
+  based_on_mod_lines[omega_idxs] <- omega_block
+
+  # Update SIGMA Block
   new_sigmas <- based_on_sum %>% get_sigma()
+  # Base case - single omega block
+  new_sigmas <- new_sigmas[upper.tri(new_sigmas, diag = TRUE)]
+  for (i in seq_along(new_sigmas)) {
+    sigma_block[i+1] <- gsub("\\b[-+]?\\d+\\.?\\d*\\b", new_sigmas[i], sigma_block[i+1])
+  }
+  based_on_mod_lines[sigma_idxs] <- sigma_block
 
-  # use string manipulation to paste back in
 
+  # Overwrite control stream
+  .mod_path <- get_model_path(.mod) # might do something else with this.
+  # writeLines(based_on_mod_lines, .mod_path)
+  return(.mod)
 }
 
 
@@ -99,6 +121,7 @@ get_param_block <- function(.mod_lines, .block = c("THETA", "OMEGA", "SIGMA")){
   block_labels <- get_block_label(param_block) %>% unlist()
 
   # multiple blocks with -same name- is old method for specifying priors. Only copy over main block
+  # this logic is not enough and does not properly discern whether the other matrix is a prior or not
   if(length(block_labels) > 1 & n_distinct(block_labels) == 1){
     param_idxs <- param_idxs[[1]]
     param_block <- param_block[[1]]
