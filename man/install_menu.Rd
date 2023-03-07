@@ -7,10 +7,10 @@
 install_menu(.path, .version, .force, .quiet)
 }
 \arguments{
-\item{.path}{absolute path to install bbi to. See Details section for
-defaults, if nothing is passed. Note that this should be the path where you
-would like the bbi executable to be installed, \emph{not} the path to the
-directory in which you want to install it. For example, you should pass
+\item{.path}{path to install bbi to. See Details section for defaults, if
+nothing is passed. Note that this should be the path where you would like
+the bbi executable to be installed, \emph{not} the path to the directory in
+which you want to install it. For example, you should pass
 \code{"/some/dir/bbi"} and \emph{not} \code{"/some/dir"}.}
 
 \item{.version}{version of bbi to install. Must pass a character scalar

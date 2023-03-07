@@ -412,6 +412,11 @@ GPFO-R026:
   description: get_config_path() works
   tests:
   - BBR-GPFO-026
+  - BBR-GPFO-028
+GPFO-R027:
+  description: build_path_from_model works when output directory is missing
+  tests:
+  - BBR-GPFO-027
 MDF-R001:
   description: model_diff.bbi_nonmem_model happy path based_on
   tests:
@@ -897,6 +902,10 @@ SMLG-R012:
   description: summary_log() defaults to .recurse = FALSE
   tests:
   - BBR-SMLG-003
+SMLG-R013:
+  description: summary_log() works when model output directory doesn't exist
+  tests:
+  - BBR-SMLG-012
 SUM-R001:
   description: model_summary.bbi_nonmem_model produces expected output
   tests:
@@ -1022,6 +1031,10 @@ UBI-R006:
   tests:
   - BBR-UBI-002
   - BBR-UBI-006
+UBI-R007:
+  description: use_bbi reports if additional setup is required
+  tests:
+  - BBR-UBI-007
 UTL-R001:
   description: wait_for_nonmem() correctly reads in stop time
   tests:

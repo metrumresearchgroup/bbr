@@ -187,6 +187,11 @@ check_bbi_exe <- function(.bbi_exe_path) {
 
     # if version too low, reject it
     assert_bbi_version(.bbi_exe_path)
+    if (ON_WINDOWS && !test_bbi_version(.min_version = "3.2.2")) {
+      warning("Your version of bbi is ", bbi_version(), ".\n",
+              "Please update to v3.2.2 or later to fix several known issues.\n",
+              "Install latest version with `bbr::use_bbi()`.")
+    }
 
     # if found, and passes version constraint, add it to cache
     CACHE_ENV$bbi_exe_paths[[.bbi_exe_path]] <- TRUE

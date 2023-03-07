@@ -123,8 +123,12 @@ nm_join <- function(
 
   if (.superset) {
     join_fun <- function(x, y, ...) left_join(y, x, ...)
+    join_first_only_fun <- join_fun
   } else {
     join_fun <- left_join
+    # For the FIRSTONLY case, joining the data to the table is expected to match
+    # multiple table rows; use left_join_all() to avoid a warning.
+    join_first_only_fun <- left_join_all
   }
 
   # get number of ID's and records
@@ -162,7 +166,7 @@ nm_join <- function(
       # do the join
       tab <- drop_dups(tab, .d, "ID", .n)
       col_order <- union(col_order, names(tab))
-      .d <- join_fun(tab, .d, by = "ID")
+      .d <- join_first_only_fun(tab, .d, by = "ID")
     } else if (nrow(tab) == nrec) {
       # otherwise, join on .join_col
       tab <- drop_dups(tab, .d, .join_col, .n)

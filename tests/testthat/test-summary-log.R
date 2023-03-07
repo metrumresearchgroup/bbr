@@ -110,6 +110,18 @@ test_that("summary_log() parses more complex flags and stats [BBR-SMLG-007]", {
                tolerance = 0.01)
 })
 
+test_that("summary_log() doesn't fail on missing model output directory [BBR-SMLG-012]", {
+  ctl_file <- fs::path_abs(CTL_TEST_FILE)
+  withr::with_tempdir({
+    fs::file_copy(ctl_file, "mod.ctl")
+    new_model("mod")
+    expect_warning(res <- summary_log("."), "FAILED")
+    expect_identical(nrow(res), 1L)
+    expect_identical(res$run, "mod")
+    checkmate::expect_string(res$error_msg, min.chars = 1)
+  })
+})
+
 test_that("summary_log works some failed summaries [BBR-SMLG-008]", {
   clean_test_enviroment(create_all_models)
   copy_all_output_dirs()

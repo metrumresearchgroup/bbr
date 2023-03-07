@@ -293,11 +293,10 @@ log_df %>%
 
 ## Filtering tags example
 
-This code uses `purrr::map_lgl` to filter the run log to only rows containing a specific tag (`"2 compartment"`).
+All `*_log()` functions have in `.include` argument that will filter the resulting log. Only models that contain a tag or name (`run`) that matches an element of the vector passed to `.include` will be included.
 
 ```{r filtering}
-log_df %>% 
-  filter(map_lgl(tags, ~ "2 compartment" %in% .x)) %>%
+run_log(MODEL_DIR, .include = "2 compartment") %>%
   collapse_to_string(tags, notes) %>%
   select(run, tags, notes)
 ```

@@ -44,6 +44,7 @@ CFG-S004:
   - UBI-R004
   - UBI-R005
   - UBI-R006
+  - UBI-R007
   - RBP-R001
 CFG-S005:
   name: Pass .bbi_args to bbi_init()
@@ -457,6 +458,7 @@ SUM-S006:
   - GPFO-R018
   - GPFO-R019
   - GPFO-R020
+  - GPFO-R027
 SUM-S007:
   name: Print method for model summary
   description: As a user, I want to be able to print the `bbi_nonmem_summary` object
@@ -642,6 +644,7 @@ LOG-S005:
   - SMLG-R010
   - SMLG-R011
   - SMLG-R012
+  - SMLG-R013
 LOG-S006:
   name: Collapse list columns to character
   description: As a user, I want to have a function that can take a tibble and the

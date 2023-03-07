@@ -16,6 +16,11 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     ~ file.path(model_dir, fs::path_ext_set(., "ctl"))
   )
 
+  default_mode <- getOption("bbr.bbi_exe_mode")
+  cmd_prefix <- paste("cd", model_dir, ";",
+                      read_bbi_path(), "nonmem", "run",
+                      default_mode)
+
   test_that("submit_models(.dry_run=T) with list input simple [BBR-SBMT-008]",
             {
               # copy to two new models
@@ -35,7 +40,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
               # check call
               expect_identical(
                 proc_list[[1]][[PROC_CALL]],
-                as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {paste(mod_ctl_path, collapse = ' ')} --overwrite --parallel --threads=4"))
+                as.character(glue("{cmd_prefix} {paste(mod_ctl_path, collapse = ' ')} --overwrite --parallel --threads=4"))
               )
             })
 
@@ -60,14 +65,14 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
                 proc_list[[1]][[PROC_CALL]],
                 as.character(
                   glue(
-                    "cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path[1]} {mod_ctl_path[2]} --overwrite --threads=1"
+                    "{cmd_prefix} {mod_ctl_path[1]} {mod_ctl_path[2]} --overwrite --threads=1"
                   )
                 )
               )
               expect_identical(
                 proc_list[[2]][[PROC_CALL]],
                 as.character(
-                  glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path[3]} --clean_lvl=2 --overwrite --threads=1"))
+                  glue("{cmd_prefix} {mod_ctl_path[3]} --clean_lvl=2 --overwrite --threads=1"))
               )
             })
 
@@ -135,8 +140,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       res[[1L]][[PROC_CALL]],
       as.character(
         glue::glue(
-          "cd {model_dir} ;",
-          "{read_bbi_path()} nonmem run sge {mod_ctl_path[[1L]]} --overwrite --parallel --threads=4",
+          "{cmd_prefix} {mod_ctl_path[[1L]]} --overwrite --parallel --threads=4",
           "--config={temp_config}",
           .sep = " "
         )
@@ -155,7 +159,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_identical(
       res[[1L]][[PROC_CALL]],
       as.character(
-        glue::glue("cd {model_dir} ; {read_bbi_path()} nonmem run sge {mod_ctl_path[[1L]]} --parallel")
+        glue::glue("{cmd_prefix} {mod_ctl_path[[1L]]} --parallel")
       )
     )
 
@@ -175,7 +179,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       as.character(
         glue::glue(
           "cd {dirname(temp_mod_path)} ;",
-          "{read_bbi_path()} nonmem run sge {fs::path_ext_set(temp_mod_path, 'ctl')}",
+          "{read_bbi_path()} nonmem run {default_mode} {fs::path_ext_set(temp_mod_path, 'ctl')}",
           .sep = " "
         )
       )
@@ -183,10 +187,11 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   })
 
   test_that("submit_models(.mode) inherits option [BBR-SBMT-015]", {
-    withr::with_options(list(bbr.bbi_exe_mode = "local"), {
+    other_mode <- switch(default_mode, sge = "local", "sge")
+    withr::with_options(list(bbr.bbi_exe_mode = other_mode), {
       expect_identical(
         submit_models(list(MOD1), .dry_run = T)[[1]][[PROC_CALL]],
-        as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run local {ABS_CTL_PATH} --overwrite --parallel --threads=4"))
+        as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run {other_mode} {ABS_CTL_PATH} --overwrite --parallel --threads=4"))
       )
     })
   })

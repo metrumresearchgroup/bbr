@@ -35,10 +35,10 @@
 #' @importFrom glue glue_collapse
 #' @importFrom cli rule
 #'
-#' @param .path absolute path to install bbi to. See Details section for
-#'   defaults, if nothing is passed. Note that this should be the path where you
-#'   would like the bbi executable to be installed, _not_ the path to the
-#'   directory in which you want to install it. For example, you should pass
+#' @param .path path to install bbi to. See Details section for defaults, if
+#'   nothing is passed. Note that this should be the path where you would like
+#'   the bbi executable to be installed, _not_ the path to the directory in
+#'   which you want to install it. For example, you should pass
 #'   `"/some/dir/bbi"` and _not_ `"/some/dir"`.
 #' @param .version version of bbi to install. Must pass a character scalar
 #'   corresponding to a tag found in
@@ -76,6 +76,10 @@ use_bbi <- function(.path = NULL, .version = "latest", .force = FALSE, .quiet = 
       err_msg <- paste(err_msg, "Make this change wherever you are setting `options('bbr.bbi_exe_path')`, potentially in your .Rprofile")
     }
     stop(err_msg)
+  }
+
+  if (ON_WINDOWS && !identical(fs::path_ext(.path), "exe")) {
+    stop("Path must end with '.exe' on Windows. Got ", .path)
   }
 
   dir_create(dirname(.path))
@@ -143,12 +147,12 @@ bbi_current_release <- function(.bbi_url = NULL){
 #' @inheritParams use_bbi
 #' @keywords internal
 install_menu <- function(.path, .version, .force, .quiet){
-
-  .dest_bbi_path <- normalizePath(.path, mustWork = FALSE)
+  .dest_bbi_path <- fs::path_abs(.path)
   local_v <- bbi_version(.dest_bbi_path)
 
   current_bbi_url <- current_release_url(owner = 'metrumresearchgroup', repo = 'bbi')
   current_v <- bbi_current_release(current_bbi_url)
+  aborted <- FALSE
 
   if (.version == 'latest') {
     .bbi_url <- current_bbi_url
@@ -170,6 +174,8 @@ install_menu <- function(.path, .version, .force, .quiet){
 
       if(utils::menu(choices = c('Yes','No'))==1){
         download_bbi(.bbi_url, .dest_bbi_path)
+      } else {
+        aborted <- TRUE
       }
     } else {
       download_bbi(.bbi_url, .dest_bbi_path)
@@ -177,8 +183,12 @@ install_menu <- function(.path, .version, .force, .quiet){
     local_v <- bbi_version(.dest_bbi_path)
   }
 
-  add_to_path_message(.dest_bbi_path)
-  if (!isTRUE(.quiet)) version_message(local_v = local_v, current_v = current_v)
+  if (!aborted) {
+    add_to_path_message(.dest_bbi_path)
+    if (!isTRUE(.quiet)) {
+      version_message(local_v = local_v, current_v = current_v)
+    }
+  }
 }
 
 
@@ -216,15 +226,11 @@ build_bbi_install_path <- function() {
       if (home_dir == "") dev_error("build_bbi_install_path() can't find $HOME")
       file.path(home_dir, ".local", "share", "bbi", "bbi")
     },
-    "darwin" = {
-      home_dir <- Sys.getenv("HOME")
-      if (home_dir == "") dev_error("build_bbi_install_path() can't find $HOME")
-      "/usr/local/bin/bbi"
-    },
+    "darwin" = "/usr/local/bin/bbi",
     "windows" = {
       app_dir <- Sys.getenv("APPDATA")
       if (app_dir == "") dev_error("build_bbi_install_path() can't find $APPDATA")
-      file.path(app_dir, "bbi", "bbi")
+      file.path(app_dir, "bbi", "bbi.exe")
     },
     {
       dev_error(glue("build_bbi_install_path() got invalid operating system: {os}"))
@@ -331,7 +337,22 @@ version_message <- function(local_v, current_v){
     }
   }
 
-  cat(glue::glue(cli::col_blue(' - Current release: {current_v}\n')))
+  cat(glue::glue(cli::col_blue(' - Current release: {current_v}\n'),
+                 .trim = FALSE))
+}
+
+if (utils::packageVersion("fs") < "1.4.2") {
+  try_path_real <- function(path) {
+    if (!all(fs::file_exists(path))) {
+      return(NULL)
+    }
+    fs::path_real(path)
+  }
+} else {
+  try_path_real <- function(path) {
+    tryCatch(fs::path_real(path),
+             ENOENT = function(e) NULL)
+  }
 }
 
 #' Helper to message user about adding the bbi directory to $PATH
@@ -342,26 +363,27 @@ version_message <- function(local_v, current_v){
 #' @importFrom cli cli_alert
 #' @keywords internal
 add_to_path_message <- function(.bbi_path) {
-  if (.bbi_path == getOption('bbr.bbi_exe_path')) {
+  resolved_bbi_path <- try_path_real(.bbi_path)
+  if (is.null(resolved_bbi_path)) {
+    stop("Downloaded bbi unexpectedly does not exist at ",
+         .bbi_path)
+  }
+  if (identical(resolved_bbi_path,
+                try_path_real(getOption("bbr.bbi_exe_path")))) {
+    return(invisible(NULL))
+  }
+  if (identical(try_path_real(Sys.which(basename(.bbi_path))),
+                resolved_bbi_path)) {
     return(invisible(NULL))
   }
 
-  old_path <- Sys.getenv("PATH")
-
-  if (check_os() == "windows") {
-    .sep = ";"
-  } else {
-    .sep = ":"
-  }
-
-  old_path_dirs <- unlist(str_split(old_path, .sep))
-
-  new_dir <- dirname(.bbi_path)
-  if (new_dir %in% old_path_dirs) {
-    return(invisible(NULL))
-  }
-
-  cli::cli_alert(glue("Please either set `options('bbr.bbi_exe_path' = '{.bbi_path}')` in your .Rprofile, or add this location to $PATH in your .bash_profile"))
+  parent_dir <- fs::path_dir(.bbi_path)
+  path <- deparse(as.character(.bbi_path))
+  cli::cli_alert(
+    c("Please either set\n\n",
+      "  options(bbr.bbi_exe_path = {path})\n\n",
+      "in your .Rprofile, or put {parent_dir}\n",
+      "at the front of your environment's `PATH`"))
 }
 
 

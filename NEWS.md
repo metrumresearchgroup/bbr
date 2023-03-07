@@ -1,3 +1,37 @@
+# bbr 1.6.0
+
+## New features and changes
+
+* New `open_model_file()` function opens the model definition file (the control
+  stream for NONMEM models) in RStudio or any other editor supported by
+  `utils::file.edit()`. (#570)
+
+* The vignettes now include examples of calling `run_log()` with the `.include`
+  argument (added in bbr 1.4.0). (#575)
+
+* `delete_models()` messages have been improved. (#577)
+
+* `use_bbi()` now allows a relative path and, on Windows, aborts if the path
+  doesn't end with ".exe". (#579)
+
+* `bbr.bbi_exe_mode` now defaults to "local" when not on Linux (where the
+  default remains "sge"). (#580)
+
+* Display a warning on Windows users if bbi version is below 3.2.2. (#581)
+
+## Bugs addressed
+
+* Various updates for compatibility with tidyr 1.3.0 and dplyr 1.1.0 (#572,
+  #578).
+
+* `model_summaries()`, `build_path_from_model()`, and `get_config_path()`
+  unintentionally signaled an error when the output directory of a model didn't
+  exist. (#573)
+
+* `use_bbi()` now does a better job of deciding when to message the user about
+  further setup that's needed. (#579)
+
+
 # bbr 1.5.0
 
 ## New features and changes

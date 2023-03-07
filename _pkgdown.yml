@@ -96,6 +96,7 @@ reference:
   - ctl_ext
   - mod_ext
   - yaml_ext
+  - open_model_file
   - plot_nonmem_table_df
   - plot_grd
   - plot_ext
