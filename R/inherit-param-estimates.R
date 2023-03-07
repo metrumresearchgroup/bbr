@@ -6,7 +6,7 @@
 #' @export
 inherit_param_estimates <- function(.mod){
 
-  based_on_path <- .mod %>% get_based_on()
+  based_on_path <- .mod %>% get_based_on() # TODO: make this an argument that can be overwritten with a filepath or model object
 
   if(is.null(based_on_path) || !fs::file_exists(based_on_path)){
     msg_prefix <- if(is.null(based_on_path)){
@@ -30,7 +30,16 @@ inherit_param_estimates <- function(.mod){
   theta_specs <- get_param_block(based_on_mod_lines, .block = "THETA")
   theta_idxs <- theta_specs$param_idxs
   theta_block <- theta_specs$param_block
-  new_thetas <- based_on_sum %>% get_theta()
+  # Extract numerical values from theta_block - except first element (which contains $THETA)
+  # theta_values <- lapply(theta_block[-1], function(x) as.numeric(readr::parse_number(x))) %>% unlist()
+
+  # Update THETA values
+  new_thetas <- based_on_sum %>% get_theta() %>% unname()
+
+  for (i in seq_along(new_thetas)) {
+    theta_block[i+1] <- gsub("\\b[-+]?\\d+\\.?\\d*\\b", new_thetas[i], theta_block[i+1])
+  }
+  based_on_mod_lines[theta_idxs] <- theta_block
 
   # Identify OMEGA Blocks
   omega_specs <- get_param_block(based_on_mod_lines, .block = "OMEGA")
@@ -56,6 +65,8 @@ inherit_param_estimates <- function(.mod){
 #' additional filtering rules:
 #'
 #'  - Handles old and new method for specifying priors. These are filtered out
+#'  - Will filter out any comments (as in they wont be overwritten)
+#'  - Will remove any empty lines
 #'
 #' @param .mod_lines ctl lines returned from readLines
 #' @param .block character string defining which block in the control stream you are trying to parse
@@ -68,12 +79,23 @@ get_param_block <- function(.mod_lines, .block = c("THETA", "OMEGA", "SIGMA")){
   .block <- match.arg(.block)
 
   # Identify parameter blocks
-  param_idxs <- get_block_idx(.mod_lines, .block = .block)
+  param_idxs <- get_block_idx(.mod_lines, .block = .block) # always a list
 
   param_block <- map(seq_along(param_idxs), ~{
     .mod_lines[param_idxs[[.x]]]
   })
 
+  # Filter out any comments (';') and empty lines
+  keep_idxs <- lapply(param_block, function(block){
+    idxs <- grep("^\\s*;[^\\s]", block, invert = TRUE)
+    idxs[nchar(block[idxs]) > 0]
+  })
+  # Subset param_idxs and param_block to remove the elements beginning with a comment
+  param_idxs <- lapply(seq_along(param_idxs), function(i) param_idxs[[i]][keep_idxs[[i]]])
+  param_block <- lapply(seq_along(param_block), function(i) param_block[[i]][keep_idxs[[i]]])
+
+
+  # Remove any priors, as these dont need to be copied over
   block_labels <- get_block_label(param_block) %>% unlist()
 
   # multiple blocks with -same name- is old method for specifying priors. Only copy over main block
@@ -89,6 +111,7 @@ get_param_block <- function(.mod_lines, .block = c("THETA", "OMEGA", "SIGMA")){
     param_block <- param_block[!has_P_or_PV]
   }
 
+  # Returning a list should mean there are multiple parameter blocks, and none are priors (e.g., OMEGA blocks with covariance)
   if (length(param_block) == 1) {
     param_block <- unlist(param_block)
     param_idxs <- unlist(param_idxs)

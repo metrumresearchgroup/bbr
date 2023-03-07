@@ -19,6 +19,8 @@ This function is used in \code{inherit_param_estimates}, and therefore contains 
 additional filtering rules:
 \itemize{
 \item Handles old and new method for specifying priors. These are filtered out
+\item Will filter out any comments (as in they wont be overwritten)
+\item Will remove any empty lines
 }
 }
 \keyword{internal}
