@@ -988,7 +988,7 @@ TSTT-R003:
   tests:
   - BBR-TSTT-003
 TSTT-R004:
-  description: get_est_idx() works correctly
+  description: get_block_idx() works correctly
   tests:
   - BBR-TSTT-004
 STAR-R001:
