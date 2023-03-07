@@ -4,10 +4,16 @@
 \alias{get_block_idx}
 \title{Get location of specific code blocks in a ctl file}
 \usage{
-get_block_idx(.mod_lines, .block = "EST")
+get_block_idx(
+  .mod_lines,
+  .block = c("EST", "OMEGA", "THETA", "SIGMA", "PARAM", "TABLE", "ERROR", "COV", "INPUT",
+    "DATA", "PK", "PRIOR")
+)
 }
 \arguments{
 \item{.mod_lines}{ctl lines returned from readLines}
+
+\item{.block}{character string defining which block in the control stream you are trying to parse}
 }
 \description{
 Get location of specific code blocks in a ctl file

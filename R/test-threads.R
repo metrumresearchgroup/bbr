@@ -52,11 +52,11 @@
 #'
 #' @export
 test_threads <- function(
-  .mod,
-  .threads = c(2,4),
-  .bbi_args = list(),
-  .cap_iterations = 10,
-  ...
+    .mod,
+    .threads = c(2,4),
+    .bbi_args = list(),
+    .cap_iterations = 10,
+    ...
 ) {
 
   check_model_object(.mod)
@@ -118,10 +118,10 @@ test_threads <- function(
 #'
 #' @export
 check_run_times <- function(
-  .mods,
-  .return_times = "estimation_time",
-  .wait = TRUE,
-  ...
+    .mods,
+    .return_times = "estimation_time",
+    .wait = TRUE,
+    ...
 ) {
 
   is_old_bbi <- FALSE
@@ -293,13 +293,13 @@ delete_models <- function(.mods, .tags = "test threads", .force = FALSE){
   }
 
   msg_remove <- if (is.null(.tags)) {
-      paste("Removed", length(mod_paths), "models (ignoring tags)")
-    } else {
-      paste0(
-        paste("Removed", length(mod_paths), "models with the following tags:\n"),
-        paste("-",mods_removed, collapse = "\n")
-      )
-    }
+    paste("Removed", length(mod_paths), "models (ignoring tags)")
+  } else {
+    paste0(
+      paste("Removed", length(mod_paths), "models with the following tags:\n"),
+      paste("-",mods_removed, collapse = "\n")
+    )
+  }
 
   for (m in mod_paths) {
     if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
@@ -401,9 +401,17 @@ replace_est_opt <- function(.est_line, .match, .cap_iterations){
 #' Get location of specific code blocks in a ctl file
 #'
 #' @param .mod_lines ctl lines returned from readLines
+#' @param .block character string defining which block in the control stream you are trying to parse
 #'
 #' @keywords internal
-get_block_idx <- function(.mod_lines, .block = "EST"){
+get_block_idx <- function(.mod_lines,
+                          .block = c("EST", "OMEGA", "THETA", "SIGMA",
+                                     "PARAM", "TABLE", "ERROR", "COV",
+                                     "INPUT", "DATA", "PK", "PRIOR")
+){
+
+  .block <- match.arg(.block)
+
   # Identify Model Blocks
   section_starts <- which(str_detect(.mod_lines, "^\\s*\\$"))
 
