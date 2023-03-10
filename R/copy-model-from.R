@@ -123,7 +123,7 @@ copy_model_from.bbi_nonmem_model <- function(
 #' Copy model from an existing model
 #'
 #' Private implementation function called by `copy_model_from()` dispatches.
-#' Create new new .yaml and other necessary files based on a previous model.
+#' Create new .yaml and other necessary files based on a previous model.
 #' Used for iterating on model development. Also fills in necessary YAML fields
 #' for using `run_log()` later.
 #' @param .parent_mod S3 object of class `bbi_{.model_type}_model` to be used as the basis for copy.

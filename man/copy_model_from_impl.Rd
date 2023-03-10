@@ -62,7 +62,7 @@ S3 object with the same class as \code{.parent_mod}
 }
 \description{
 Private implementation function called by \code{copy_model_from()} dispatches.
-Create new new .yaml and other necessary files based on a previous model.
+Create new .yaml and other necessary files based on a previous model.
 Used for iterating on model development. Also fills in necessary YAML fields
 for using \code{run_log()} later.
 }
