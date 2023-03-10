@@ -65,7 +65,7 @@ create_model_object <- function(res, save_yaml) {
 
   # look for appropriate model files on disk and then write out YAML.
   # must be done AFTER assigning the class so that associated helpers can dispatch correctly
-  create_model_hook(res, save_yaml)
+  create_model_hook(res)
 
   if(isTRUE(save_yaml)) {
     res <- save_model_yaml(res)
