@@ -19,6 +19,21 @@ default mapping of \code{{type}} to \verb{bbi_\{type\}_model} or \verb{bbi_\{typ
 won't do. The primary use for this function is registering custom parent
 types.
 }
+\details{
+\code{\link[=create_model_object]{create_model_object()}} and \code{\link[=create_summary_object]{create_summary_object()}} are responsible for
+creating model and summary objects for different model types (e.g.,
+"bbi_nonmem_model" and "bbi_nonmem_summary" for "nonmem" model types). These
+functions get the class name from \code{model_type_to_classes()}, which by default
+constructs the class from the model type (e.g., "nonmem" is mapped to
+\code{c("bbi_nonmem_model", ...)}).
+
+That default value doesn't work if you want to define custom parents. For
+example, \code{bbr.bayes} package wants to map "nmbayes" model type to
+\code{c("bbi_nmbayes_model", "bbi_nonmem_model", ...)} so that \code{bbi_nmbayes_model}
+objects can fall back to \code{.bbi_nonmem_model} methods where appropriate. In
+these cases, a package can call \code{register_model_type()} within its
+\code{\link[=.onLoad]{.onLoad()}} to "register" the custom classes.
+}
 \examples{
 \dontrun{
 register_model_type("foo",

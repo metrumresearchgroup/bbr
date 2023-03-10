@@ -19,6 +19,22 @@ select_registry <- function(class_type) {
 #' won't do. The primary use for this function is registering custom parent
 #' types.
 #'
+#' @details
+#'
+#' [create_model_object()] and [create_summary_object()] are responsible for
+#' creating model and summary objects for different model types (e.g.,
+#' "bbi_nonmem_model" and "bbi_nonmem_summary" for "nonmem" model types). These
+#' functions get the class name from `model_type_to_classes()`, which by default
+#' constructs the class from the model type (e.g., "nonmem" is mapped to
+#' `c("bbi_nonmem_model", ...)`).
+#'
+#' That default value doesn't work if you want to define custom parents. For
+#' example, `bbr.bayes` package wants to map "nmbayes" model type to
+#' `c("bbi_nmbayes_model", "bbi_nonmem_model", ...)` so that `bbi_nmbayes_model`
+#' objects can fall back to `.bbi_nonmem_model` methods where appropriate. In
+#' these cases, a package can call `register_model_type()` within its
+#' [.onLoad()] to "register" the custom classes.
+#'
 #' @examples
 #' \dontrun{
 #' register_model_type("foo",
