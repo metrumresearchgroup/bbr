@@ -31,8 +31,7 @@
 #' @param .file Defaults to `"model"` which compares the default model file for
 #'   that model type. For NONMEM models, the control stream is compared. Other
 #'   model types may accept additional values and support comparing multiple
-#'   files that can be compared. See "`.file` argument" of the specific S3
-#'   method for details.
+#'   files. See "`.file` argument" of the specific S3 method for details.
 #' @param ... arguments passed through to methods. (Currently none.)
 #' @param .viewer If `FALSE`, the default, prints diff to console or renders in
 #'   Rmd. If `TRUE`, render the diff in the Viewer window. Note: this option

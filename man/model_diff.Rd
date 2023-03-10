@@ -19,8 +19,7 @@ model_diff(.mod, .mod2 = NULL, .file = "model", ..., .viewer = FALSE)
 \item{.file}{Defaults to \code{"model"} which compares the default model file for
 that model type. For NONMEM models, the control stream is compared. Other
 model types may accept additional values and support comparing multiple
-files that can be compared. See "\code{.file} argument" of the specific S3
-method for details.}
+files. See "\code{.file} argument" of the specific S3 method for details.}
 
 \item{...}{arguments passed through to methods. (Currently none.)}
 
