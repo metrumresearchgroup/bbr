@@ -15,6 +15,11 @@ without extension, and (possibly) the output directory.}
 A model object, if \code{.path} represents a valid model.
 }
 \description{
-Private helper function that tries to call \code{read_model()} on a model path and returns NULL, with no error, if the YAML is not a valid model file.
+Private helper function that tries to call \code{\link[=read_model]{read_model()}} on a model path and
+returns NULL, with no error, if the path is not a valid model file. Also
+wraps \code{\link[=read_model]{read_model()}} in \code{suppressMessages()} so that things like the
+check_stan_model() messages will be suppressed. This is done because this
+function is primarily used when mapping over a number of models and these
+messages can be very annoying and mostly pointless in that context.
 }
 \keyword{internal}

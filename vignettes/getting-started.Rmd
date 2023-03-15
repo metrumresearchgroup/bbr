@@ -42,10 +42,8 @@ options(
   'bbr.verbose' = FALSE
 )
 MODEL_DIR <- system.file("model", "nonmem", "basic", package = "bbr")
-
 # delete old files
 cleanup <- function() {
-  if (fs::file_exists(file.path(MODEL_DIR, "1.yaml"))) fs::file_delete(file.path(MODEL_DIR, "1.yaml"))
   if (fs::file_exists(file.path(MODEL_DIR, "2.yaml"))) fs::file_delete(file.path(MODEL_DIR, "2.yaml"))
   if (fs::file_exists(file.path(MODEL_DIR, "3.yaml"))) fs::file_delete(file.path(MODEL_DIR, "3.yaml"))
   if (fs::file_exists(file.path(MODEL_DIR, "2.ctl"))) fs::file_delete(file.path(MODEL_DIR, "2.ctl"))
@@ -103,7 +101,6 @@ The `bbi_init()` function will create a `bbi.yaml`, with the default settings, i
 
 ```{r configure bbi fake, eval = FALSE}
 MODEL_DIR <- "../model/nonmem/basic"  # this should be relative to your working directory
-
 bbi_init(.dir = MODEL_DIR,            # the directory to create the bbi.yaml in
          .nonmem_dir = "/opt/NONMEM", # location of NONMEM installation
          .nonmem_version = "nm74gf")  # default NONMEM version to use
@@ -120,8 +117,11 @@ To begin modeling, first create a model object using `new_model()`. This is an S
 
 The first argument (`.path`) must be the path to your model control stream _without file extension_. For instance, the call below assumes you have a control stream named `1.ctl` or `1.mod` in the directory you just assigned to `MODEL_DIR` above. 
 
-```{r first model}
+```{r first model, eval = FALSE}
 mod1 <- new_model(file.path(MODEL_DIR, 1))
+```
+```{r first model read from disk, include=FALSE}
+mod1 <- read_model(file.path(MODEL_DIR, 1))
 ```
 
 This `new_model()` call will also create a `1.yaml` file in that same directory, which stores model metadata like description and tags (discussed below). If you ever need to recreate this model object in memory, just run `mod1 <- read_model(file.path(MODEL_DIR, 1))` to rebuild it from the YAML file on disk. 

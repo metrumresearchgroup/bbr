@@ -150,7 +150,7 @@ check_output_dir.character <- function(.mod, ...) {
   return(.out_files)
 }
 
-#' @describeIn check_output_dir Takes a `bbi_{.model_type}_model` object.
+#' @describeIn check_output_dir Takes `bbi_{.model_type}_model` or `bbi_{.model_type}_summary` object
 #' @export
 check_output_dir.bbi_model <- function(.mod, ...) {
   .output_dir <- .mod %>% get_output_dir()

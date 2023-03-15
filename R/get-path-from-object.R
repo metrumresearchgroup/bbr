@@ -6,7 +6,8 @@
 #'
 #' @details
 #' **`get_model_path()`** returns the path to the model definition file.
-#'   For NONMEM models, this is the control stream.
+#'   For NONMEM models, this is the control stream. For Stan models,
+#'   this is the `.stan` file.
 #'
 #' **`get_output_dir()`** returns the path to the directory containing
 #'   output files created when the model is run.
@@ -151,7 +152,7 @@ get_model_id.character <- function(.mod) {
 #' @describeIn get_model_id Takes `bbi_{.model_type}_model` or `bbi_{.model_type}_summary` object
 #' @export
 get_model_id.bbi_model <- function(.mod) {
-  return(get_model_id(get_model_path(.mod)))
+  return(get_model_id(.mod[[ABS_MOD_PATH]]))
 }
 
 
@@ -172,7 +173,7 @@ get_data_path <- function(.mod, ...) {
   UseMethod("get_data_path")
 }
 
-#' @describeIn get_data_path Takes `bbi_nonmem_model` object
+#' @describeIn get_data_path Takes `bbi_{.model_type}_model` or `bbi_{.model_type}_summary` object
 #' @export
 get_data_path.bbi_model <- function(.mod, ...) {
   cfg_path <- get_config_path(.mod, .check_exists = FALSE)
@@ -200,7 +201,7 @@ get_data_path.bbi_model <- function(.mod, ...) {
 #'
 #' Builds the absolute path to a file in the output directory from components of the `bbi_{.model_type}_model` object
 #'
-#' @return Returns an absolute path to `{output_dir}/{model_id}{.suffix}`.
+#' @return Returns an absolute path to `{.mod$absolute_model_path}/{get_model_id(.mod)}{.suffix}`.
 #'   Does _not_ check whether the file exists.
 #'
 #' @param .mod Model to use, either a `bbi_{.model_type}_model` or `bbi_{.model_type}_summary` object.
@@ -225,7 +226,10 @@ build_path_from_model <- function(.mod, .suffix, ...) {
 #' @export
 build_path_from_model.bbi_model <- function(.mod, .suffix, ...) {
   file.path(
-    get_output_dir(.mod, .check_exists = FALSE),
+    # Note: Avoid using get_output_dir() here so that get_output_dir() methods
+    # can use build_path_from_model() without triggering infinite recursion
+    # (see, for example, get_output_dir.bbi_stan_model() in bbr.bayes).
+    .mod[[ABS_MOD_PATH]],
     paste0(get_model_id(.mod), .suffix)
   )
 }
@@ -270,6 +274,9 @@ get_path_from_log_df <- function(.log_df, .get_func, .check_exists) {
   })
   return(.out_paths)
 }
+
+# SHARED: get_model_working_directory() is used by bbr.bayes, so any changes
+# here should be compatible with its use there.
 
 #' Get the working directory of a model object
 #'
@@ -376,7 +383,7 @@ find_nonmem_model_file_path <- function(.path, .check_exists = TRUE) {
           "Please put relevant model file in that location.",
           .sep = " "
         ),
-        "IF THIS IS NOT A NONMEM MODEL please pass the appropriate type to `.model_type`",
+        NONMEM_MODEL_TYPE_ERR_MSG,
         sep = "\n"
       ))
     } else {

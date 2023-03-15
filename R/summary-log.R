@@ -82,7 +82,12 @@ summary_log_impl <- function(.mods, ...) {
 
   check_model_object_list(.mods)
 
-  res_list <- model_summaries(.mods, ...)
+  # bbr.bayes kludge: this is sneaking in information about a warning from
+  # model_summary.bbi_stan_model().
+  res_list <- suppressSpecificWarning(
+    model_summaries(.mods, ...),
+    .regexpr = "CmdStanMCMC"
+  )
 
   # create tibble from list of lists
   res_df <- res_list %>%
@@ -100,6 +105,12 @@ summary_log_impl <- function(.mods, ...) {
   if (all(!is.na(res_df[[SL_ERROR]]))) {
     warning(glue("ALL {nrow(res_df)} MODEL SUMMARIES FAILED in `summary_log()` call. Check `error_msg` column for details."))
     return(select(res_df, -all_of(c(SL_SUMMARY, SL_FAIL_FLAGS))))
+  }
+
+  # If none of the models are nonmem, the next section will error trying to
+  # unnest them, so we just return the objects here.
+  if (purrr::none(.mods, ~ inherits(.x, NM_MOD_CLASS))) {
+    return(select(res_df, -all_of(SL_FAIL_FLAGS)))
   }
 
   res_df <- mutate(

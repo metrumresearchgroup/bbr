@@ -70,7 +70,7 @@ model YAML, or specified globally in \code{bbi.yaml}.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{submit_models(list)}: Takes a list of \code{bbi_nonmem_model} objects.
+\item \code{submit_models(list)}: Takes a list of \code{bbi_base_model} objects.
 
 }}
 \seealso{

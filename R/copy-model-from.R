@@ -28,11 +28,11 @@
 #' @param .inherit_tags If `FALSE`, the default, new model will only have any
 #'   tags passed to `.add_tags` argument. If `TRUE` inherit any tags from
 #'   `.parent_mod`, with any tags passed to `.add_tags` appended.
-#' @param .update_model_file If `TRUE`, the default, update the newly created
-#'   model file. If `FALSE`, new model file will be an exact copy of its parent.
-#'   For a NONMEM model, this currently means only the `$PROBLEM` line in the
-#'   new control stream will be updated to read `See {.new_model}.yaml. Created
-#'   by bbr.`.
+#' @param .update_model_file **Only relevant to NONMEM models.** If `TRUE`, the
+#'   default, update the newly created model file. If `FALSE`, new model file
+#'   will be an exact copy of its parent. For a NONMEM model, this currently
+#'   means only the `$PROBLEM` line in the new control stream will be updated to
+#'   read `See {.new_model}.yaml. Created by bbr.`.
 #' @param .overwrite If `FALSE`, the default,  function will error if a model
 #'   file already exists at specified `.new_model` path. If `TRUE` any existing
 #'   file at `.new_model` will be overwritten silently.
@@ -89,7 +89,15 @@ copy_model_from.bbi_nonmem_model <- function(
 
   .new_model <- build_new_model_path(.parent_mod, .new_model)
 
-  .mod <- copy_nonmem_model_from(
+  copy_ctl <- function() {
+    .parent_model_path <- get_model_path(.parent_mod)
+    parent_ext <- fs::path_ext(.parent_model_path)
+    .new_model_path <- paste(.new_model, parent_ext, sep = ".")
+    copy_control_stream(.parent_model_path, .new_model_path, .overwrite,
+                        .update_model_file)
+  }
+
+  .mod <- copy_model_from_impl(
     .parent_mod = .parent_mod,
     .new_model = .new_model,
     .description = .description,
@@ -98,7 +106,8 @@ copy_model_from.bbi_nonmem_model <- function(
     .star = .star,
     .inherit_tags = .inherit_tags,
     .update_model_file = .update_model_file,
-    .overwrite = .overwrite
+    .overwrite = .overwrite,
+    setup_fn = copy_ctl
   )
 
   return(.mod)
@@ -108,13 +117,22 @@ copy_model_from.bbi_nonmem_model <- function(
 # Private implementation function(s)
 #####################################
 
-#' Copy model from an existing NONMEM model
+# SHARED: copy_model_from_impl() is used by bbr.bayes, so any changes here
+# should be compatible with its use there.
+
+#' Copy model from an existing model
 #'
 #' Private implementation function called by `copy_model_from()` dispatches.
-#' Create new .mod/ctl and new .yaml files based on a previous model. Used for iterating on model development.
-#' Also fills in necessary YAML fields for using `run_log()` later.
-#' @param .parent_mod S3 object of class `bbi_nonmem_model` to be used as the basis for copy.
-#' @param .update_model_file If `TRUE`, the default, update the `$PROBLEM` line in the new control stream. If `FALSE`, `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.
+#' Create new .yaml and other necessary files based on a previous model.
+#' Used for iterating on model development. Also fills in necessary YAML fields
+#' for using `run_log()` later.
+#' @param .parent_mod S3 object of class `bbi_{.model_type}_model` to be used as the basis for copy.
+#' @param .update_model_file **Only relevant for NONMEM models.** If `TRUE`, the
+#'   default, update the `$PROBLEM` line in the new control stream. If `FALSE`,
+#'   `{.new_model}.[mod|ctl]` will be an exact copy of its parent control
+#'   stream.
+#' @param setup_fn A function to call (with no arguments) before creating the
+#'   model with [new_model()].
 #' @inheritParams copy_model_from
 #' @importFrom fs file_copy path_rel is_absolute_path
 #' @importFrom readr read_file write_file
@@ -122,9 +140,9 @@ copy_model_from.bbi_nonmem_model <- function(
 #' @importFrom yaml write_yaml
 #' @importFrom purrr list_modify
 #' @importFrom digest digest
-#' @return S3 object of class `bbi_nonmem_model` that can be passed to `submit_nonmem_model()`
+#' @return S3 object with the same class as `.parent_mod`
 #' @keywords internal
-copy_nonmem_model_from <- function(
+copy_model_from_impl <- function(
   .parent_mod,
   .new_model,
   .description = NULL,
@@ -133,25 +151,19 @@ copy_nonmem_model_from <- function(
   .star = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
-  .overwrite = FALSE
+  .overwrite = FALSE,
+  setup_fn = NULL
 ) {
-  # Check model for correct class
-  if (!inherits(.parent_mod, NM_MOD_CLASS)) {
-    stop(paste(
-      "copy_nonmem_model_from() requires a model object of class `bbi_nonmem_model`. Passed object has the following classes:",
-      paste(class(.parent_mod), collapse = ", "),
-      "Consider creating a model with `new_model()` or `read_model()`",
-      sep = "\n"))
-  }
+  check_for_existing_model(.new_model, .overwrite)
 
-  # check parent against YAML
+  # check parent
   check_yaml_in_sync(.parent_mod)
 
   # build based_on
   if(!fs::is_absolute_path(.new_model)) {
-    dev_error(".new_model argument to copy_nonmem_model_from() must be absolute.")
+    dev_error(".new_model argument to copy_model_from_impl() must be absolute.")
   }
-  .parent_based_on <- fs::path_rel(get_model_path(.parent_mod), start = dirname(.new_model))
+  .parent_based_on <- fs::path_rel(.parent_mod[[ABS_MOD_PATH]], start = dirname(.new_model))
 
   # build tags
   if (.inherit_tags && !is.null(.parent_mod[[YAML_TAGS]])) {
@@ -160,12 +172,12 @@ copy_nonmem_model_from <- function(
     new_tags <- .add_tags
   }
 
-  # copy control steam to new path
-  .parent_model_path <- get_model_path(.parent_mod)
-  parent_ext <- fs::path_ext(.parent_model_path)
-  .new_model_path <- paste(.new_model, parent_ext, sep = ".")
-  copy_control_stream(.parent_model_path, .new_model_path, .overwrite, .update_model_file)
+  if (!is.null(setup_fn)) {
+    setup_fn()
+  }
 
+  mtype <- stringr::str_replace(
+    class(.parent_mod)[1], "^bbi_(.*)_model$", "\\1")
   # create new model
   .new_mod <- new_model(
     .new_model,
@@ -174,8 +186,8 @@ copy_nonmem_model_from <- function(
     .tags = new_tags,
     .star = .star,
     .bbi_args = .parent_mod[[YAML_BBI_ARGS]],
-    .overwrite = .overwrite,
-    .model_type = "nonmem"
+    .overwrite = FALSE, # will have already overwritten if necessary
+    .model_type = mtype
   )
 
   return(.new_mod)
@@ -193,8 +205,13 @@ copy_nonmem_model_from <- function(
 #' @keywords internal
 copy_control_stream <- function(.parent_model_path, .new_model_path, .overwrite, .update_model_file = FALSE) {
 
-  if (fs::file_exists(.new_model_path) && !isTRUE(.overwrite)) {
-    stop(glue("File already exists at {.new_model_path} -- cannot copy new control stream. Either delete old file or use `new_model({yaml_ext(.new_model_path)})`"))
+  if (fs::file_exists(.new_model_path)) {
+    if (isTRUE(.overwrite)) {
+      fs::file_delete(.new_model_path)
+    } else {
+      stop(glue("File already exists at {.new_model_path} -- cannot copy new control stream. Either pass `.overwrite = TRUE` or use `new_model({tools::file_path_sans_ext(.new_model_path)})`"))
+    }
+
   }
 
   # if copying to new dir, create the dir first
@@ -220,6 +237,9 @@ copy_control_stream <- function(.parent_model_path, .new_model_path, .overwrite,
     fs::file_copy(.parent_model_path, .new_model_path)
   }
 }
+
+# SHARED: build_new_model_path() is used by bbr.bayes, so any changes here
+# should be compatible with its use there.
 
 #' Private helper to build absolute path for [copy_model_from()].
 #' Importantly, if the input `.new_model` is _not_ absolute, it will

@@ -36,6 +36,17 @@ skip_if_not_drone_or_metworx <- function(.test_name) {
   }
 }
 
+#' Skip long-running tests
+#'
+#' For example, tests that actual submit models to be run.
+#' @param .explanation Reason for skipping tests, or description of tests being skipped
+#' @keywords internal
+skip_long_tests <- function(.explanation = "Skipping long running tests") {
+  if (Sys.getenv("SKIP_LONG_TESTS") == "true") {
+    testthat::skip(.explanation)
+  }
+}
+
 #' Skip test if current bbi version is below specified one.
 #'
 #' @param v a package version (or a string that can be converted to one) to pass

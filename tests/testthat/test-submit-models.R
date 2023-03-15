@@ -114,8 +114,8 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
               )
 
               # testing two different kinds of models
-              class(fake) <- c("bbi_stan_model", class(fake))
-              fake[[YAML_MOD_TYPE]] <- "stan"
+              class(fake) <- c(BBI_BASE_MODEL_CLASS, class(fake))
+              fake[[YAML_MOD_TYPE]] <- "fake"
               .mods <- list(MOD1, mod2, mod3, fake)
 
               expect_error(

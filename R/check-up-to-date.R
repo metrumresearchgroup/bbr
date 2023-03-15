@@ -14,8 +14,6 @@
 #'
 #' * The data file (referenced in `$DATA` within the control stream)
 #'
-#' **Currently only NONMEM implemented.**
-#'
 #' @param .bbi_object the object to check. Could be
 #'   a `bbi_{.model_type}_model` object,
 #'   a `bbi_{.model_type}_summary` object,
@@ -53,11 +51,13 @@ check_up_to_date <- function(.bbi_object, ...) {
   UseMethod("check_up_to_date")
 }
 
+#' @rdname check_up_to_date
 #' @export
 check_up_to_date.bbi_nonmem_model <- function(.bbi_object, ...) {
   check_up_to_date_nonmem(.bbi_object)
 }
 
+#' @rdname check_up_to_date
 #' @export
 check_up_to_date.bbi_nonmem_summary <- function(.bbi_object, ...) {
   check_up_to_date_nonmem(.bbi_object)
@@ -68,7 +68,7 @@ check_up_to_date.bbi_log_df <- function(.bbi_object, ...) {
 
   check_list <- map(.bbi_object[[ABS_MOD_PATH]], function(.p) {
     tryCatch(
-      check_up_to_date(read_model(.p)),
+      check_up_to_date(read_model(.p), ...),
       error = function(.e) {
         .error_msg <- paste(as.character(.e$message), collapse = " -- ")
         if (grepl(CHECK_UP_TO_DATE_ERR_MSG, .error_msg, fixed = TRUE)) {

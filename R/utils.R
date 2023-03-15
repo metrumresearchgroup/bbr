@@ -126,7 +126,7 @@ format_cmd_args <- function(.args, .collapse = FALSE) {
 #' Multiple models can be submitted in a single bbi call if those models share a
 #' working directory and a set of CLI arguments.
 #'
-#' @inheritParams submit_nonmem_models
+#' @inheritParams submit_models
 #'
 #' @return A list whose elements correspond to groups of models that can be
 #'   submitted in a single bbi call. Each element is itself a list with elements
@@ -298,6 +298,9 @@ file_matches <- function(path, md5) {
   res
 }
 
+# SHARED: file_matches_string() is used by bbr.bayes, so any changes here should
+# be compatible with its use there.
+
 #' Compare a file to a string
 #'
 #' Check whether the md5 digest of a string matches
@@ -401,9 +404,9 @@ check_required_keys <- function(.list, .req) {
 
 #' Private helper to check if an object inherits a model class and error if not
 #' @param .mod The object to check
-#' @param .mod_types Character vector of acceptable classes, defaulting to `VALID_MOD_CLASSES`
+#' @param .mod_types Character vector of acceptable classes, defaulting to `BBI_BASE_MODEL_CLASS`
 #' @keywords internal
-check_model_object <- function(.mod, .mod_types = VALID_MOD_CLASSES) {
+check_model_object <- function(.mod, .mod_types = BBI_BASE_MODEL_CLASS) {
   if (!inherits(.mod, .mod_types)) {
     stop(paste(
       glue("Must pass a model object with one of the following classes: `{paste(.mod_types, collapse = ', ')}`"),
@@ -416,9 +419,9 @@ check_model_object <- function(.mod, .mod_types = VALID_MOD_CLASSES) {
 
 #' Private helper to check if a list of objects all inherit a model class and error if not
 #' @param .mods The list of objects to check
-#' @param .mod_types Character vector of acceptable classes, defaulting to `VALID_MOD_CLASSES`
+#' @param .mod_types Character vector of acceptable classes, defaulting to `BBI_BASE_MODEL_CLASS`
 #' @keywords internal
-check_model_object_list <- function(.mods, .mod_types = VALID_MOD_CLASSES) {
+check_model_object_list <- function(.mods, .mod_types = BBI_BASE_MODEL_CLASS) {
   all_models_bool <- map_lgl(.mods, function(.x) { inherits(.x, .mod_types) })
   if (isFALSE(all(all_models_bool))) {
     losers <- which(!all_models_bool)

@@ -172,7 +172,6 @@ test_that("copy_model_from() supports `.new_model` containing a period [BBR-CMF-
 
 })
 
-
 test_that("copy_model_from(.new_model=NULL) increments to next integer by default [BBR-CMF-007]", {
   withr::defer(cleanup())
   new_id <- "002"

@@ -5,6 +5,22 @@
 #' Submit a model to be run
 #'
 #' Submits a model to be run by calling out to `bbi`.
+#'
+#' @return While `submit_model()` _does_ return something, it is primarily
+#' called for its side effects, specifically that it runs the model and writes
+#' all model outputs to disk under `get_output_dir(.mod)`.
+#'
+#' **NONMEM**
+#' For NONMEM models, a `bbi_process` object is returned. The typical NONMEM
+#' output files are all written into `get_output_dir(.mod)`. A summary of the
+#' contents of these files can be accessed with [model_summary()], and the path
+#' to individual files can be easily constructed like
+#' `build_path_from_model(.mod, ".lst")`.
+#'
+#' A `bbi_config.json` file is also written, which stores information about the
+#' configuration of the run. See [config_log()] for more details about this
+#' file.
+#'
 #' @seealso [submit_models()]
 #' @param .mod The model object to submit.
 #' @param .bbi_args A named list specifying arguments to pass to bbi

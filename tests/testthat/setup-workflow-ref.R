@@ -76,7 +76,7 @@ SUMMARY_REF_FILE <- file.path(REF_DIR, "1_summary_obj.R")
 PARAM_REF_FILE <-   file.path(REF_DIR, "1_param_table.R")
 
 NM_SUM_CLASS_LIST <- c(NM_SUM_CLASS, BBI_PARENT_CLASS, "list")
-NM_MOD_CLASS_LIST <- c(NM_MOD_CLASS, BBI_PARENT_CLASS, "list")
+NM_MOD_CLASS_LIST <- c(NM_MOD_CLASS, BBI_BASE_MODEL_CLASS, BBI_PARENT_CLASS, "list")
 PROC_CLASS_LIST <- c(PROC_CLASS, "list")
 
 PROC_HELP_STR <- as.character(glue("  {read_bbi_path()} --help"))
@@ -112,9 +112,9 @@ SUM_LOG_COLS <- if (test_bbi_version(read_bbi_path(), .min_version = "3.0.3")) {
 }
 
 ref_json <- jsonlite::fromJSON(system.file("test-refs", "ref_values.json", package = "bbr"))
-CONFIG_DATA_PATH <- ref_json$CONFIG_DATA_PATH
-CONFIG_DATA_MD5 <- ref_json$CONFIG_DATA_MD5
-CONFIG_MODEL_MD5 <- ref_json$CONFIG_MODEL_MD5
+CONFIG_DATA_PATH_REF <- ref_json$CONFIG_DATA_PATH
+CONFIG_DATA_MD5_REF <- ref_json$CONFIG_DATA_MD5
+CONFIG_MODEL_MD5_REF <- ref_json$CONFIG_MODEL_MD5
 MOD_BBI_VERSION <- ref_json$MOD_BBI_VERSION
 MOD1_PARAM_COUNT <- ref_json$MOD1_PARAM_COUNT
 MOD1_PARAM_COUNT_FIXED <- ref_json$MOD1_PARAM_COUNT_FIXED
@@ -347,6 +347,7 @@ cleanup_model <- function(.mod) {
   if (fs::file_exists(get_yaml_path(.mod, .check_exists = FALSE)))  fs::file_delete(get_yaml_path(.mod))
   if (fs::file_exists(get_model_path(.mod, .check_exists = FALSE))) fs::file_delete(get_model_path(.mod))
   if (fs::dir_exists(get_output_dir(.mod, .check_exists = FALSE)))  fs::dir_delete(get_output_dir(.mod))
+  if (fs::dir_exists(.mod[[ABS_MOD_PATH]]))  fs::dir_delete(.mod[[ABS_MOD_PATH]])
   rm(.mod)
 }
 

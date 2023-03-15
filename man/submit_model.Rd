@@ -58,6 +58,22 @@ bbi process runs in the background.}
 insted of running it. This is primarily for testing but also a debugging
 tool.}
 }
+\value{
+While \code{submit_model()} \emph{does} return something, it is primarily
+called for its side effects, specifically that it runs the model and writes
+all model outputs to disk under \code{get_output_dir(.mod)}.
+
+\strong{NONMEM}
+For NONMEM models, a \code{bbi_process} object is returned. The typical NONMEM
+output files are all written into \code{get_output_dir(.mod)}. A summary of the
+contents of these files can be accessed with \code{\link[=model_summary]{model_summary()}}, and the path
+to individual files can be easily constructed like
+\code{build_path_from_model(.mod, ".lst")}.
+
+A \code{bbi_config.json} file is also written, which stores information about the
+configuration of the run. See \code{\link[=config_log]{config_log()}} for more details about this
+file.
+}
 \description{
 Submits a model to be run by calling out to \code{bbi}.
 }

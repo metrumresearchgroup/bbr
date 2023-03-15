@@ -27,6 +27,6 @@ because the path to the data is constructed during model submission.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{get_data_path(bbi_model)}: Takes \code{bbi_nonmem_model} object
+\item \code{get_data_path(bbi_model)}: Takes \verb{bbi_\{.model_type\}_model} or \verb{bbi_\{.model_type\}_summary} object
 
 }}

@@ -156,7 +156,7 @@ model_summaries_concurrent <- function(.mods, .bbi_args, .fail_flags) {
     results[[i]] <- c(
       res,
       rlang::list2(
-        !!SL_SUMMARY := create_summary_object(c(res, s)),
+        !!SL_SUMMARY := create_summary_object(c(res, s), "nonmem"),
         !!SL_FAIL_FLAGS := s$needed_fail_flags %||% FALSE,
         !!SL_ERROR := if (s$success) NA_character_ else s$error_msg))
   }
@@ -175,7 +175,8 @@ model_summaries.list <- function(
 ) {
   # check that each element is a model object
   check_model_object_list(.mods)
-  res_list <- if (test_bbi_version(.min_version = "3.2.0")) {
+  res_list <- if (test_bbi_version(.min_version = "3.2.0") &&
+                    purrr::every(.mods, ~ inherits(.x, NM_MOD_CLASS))) {
     model_summaries_concurrent(.mods, .bbi_args, .fail_flags)
   } else {
     model_summaries_serial(.mods, .bbi_args, .fail_flags)

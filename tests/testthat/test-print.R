@@ -77,6 +77,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
     fields <- c('Status',
                 'Absolute Model Path',
+                'YAML & Model Files',
                 'Description',
                 'Tags',
                 'BBI Args',

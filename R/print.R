@@ -71,12 +71,42 @@ print.bbi_process <- function(x, ..., .call_limit = 250) {
 
 }
 
+#' Print a list of files.
+#'
+#' [print.bbi_model()] calls this after printing the YAML and model path to
+#' allow specific model types to display additional files.
+#'
+#' @param .mod Model object.
+#' @param print_fn A function that this method should call to print each file.
+#' @export
+print_model_files <- function(.mod, print_fn) {
+  UseMethod("print_model_files")
+}
+
+#' @export
+print_model_files.default <- function(.mod, print_fn) {
+  return(invisible(NULL))
+}
 
 #' @describeIn print_bbi Prints the information contained in the model object and whether the model has been run
 #' @importFrom cli cli_h1 cli_h2 cat_bullet style_italic col_blue col_green col_red cat_rule
 #' @importFrom purrr iwalk walk
 #' @export
-print.bbi_nonmem_model <- function(x, ...) {
+print.bbi_model <- function(x, ...) {
+
+  # make sure a summary object doesn't slip through
+  tryCatch(
+    check_model_object(x),
+    error = function(.e) {
+      .error_msg <- paste(as.character(.e$message), collapse = " -- ")
+      if (grepl("Must pass a model object", .error_msg, fixed = TRUE)) {
+        dev_error(paste("print.bbi_model:", .error_msg))
+      } else {
+        stop(.e)
+      }
+    }
+  )
+
   is_valid_print <- function(.x) {
     if (!is.null(.x)) {
       length(.x) != 0
@@ -128,6 +158,7 @@ print.bbi_nonmem_model <- function(x, ...) {
   heading("YAML & Model Files")
   bullet_list(get_yaml_path(x, .check_exists = FALSE))
   bullet_list(get_model_path(x, .check_exists = FALSE))
+  print_model_files(x, bullet_list)
 
   if (is_valid_print(x[[YAML_DESCRIPTION]])) {
     heading('Description')

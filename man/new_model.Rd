@@ -41,7 +41,8 @@ they exist.}
 \item{.star}{Boolean, marks model to indicate special interest level.}
 
 \item{.model_type}{Character scaler to specify type of model being created
-(used for S3 class). Currently only \code{'nonmem'} is supported.}
+(used for S3 class). Currently only \code{'nonmem'} is supported by bbr itself,
+although other types may be implemented by other packages.}
 }
 \value{
 S3 object of class \verb{bbi_\{.model_type\}_model} that can be passed to

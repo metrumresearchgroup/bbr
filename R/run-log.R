@@ -50,6 +50,9 @@ run_log <- function(.base_dir, .recurse = FALSE, .include = NULL) {
 # PRIVATE HELPERS
 ##################
 
+# SHARED: find_models() is used by bbr.bayes, so any changes here should be
+# compatible with its use there.
+
 #' Search for model YAML files and read them
 #'
 #' Private helper function that searches from a base directory for any YAML files (excluding `bbi.yaml`)
@@ -111,7 +114,12 @@ find_models <- function(.base_dir, .recurse , .include) {
 
 #' Read in model with error handling
 #'
-#' Private helper function that tries to call `read_model()` on a model path and returns NULL, with no error, if the YAML is not a valid model file.
+#' Private helper function that tries to call [read_model()] on a model path and
+#' returns NULL, with no error, if the path is not a valid model file. Also
+#' wraps [read_model()] in `suppressMessages()` so that things like the
+#' check_stan_model() messages will be suppressed. This is done because this
+#' function is primarily used when mapping over a number of models and these
+#' messages can be very annoying and mostly pointless in that context.
 #'
 #' @inheritParams read_model
 #'
@@ -119,7 +127,7 @@ find_models <- function(.base_dir, .recurse , .include) {
 #' @keywords internal
 safe_read_model <- function(.path) {
   tryCatch(
-    read_model(.path),
+    suppressMessages(read_model(.path)),
     error = function(e) {
       if (stringr::str_detect(e$message, "Model list must have keys")) {
         return(NULL)

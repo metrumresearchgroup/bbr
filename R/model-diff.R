@@ -21,12 +21,6 @@
 #' will be prompted to explicitly pass the model they want to compare against to
 #' the `.mod2` argument.
 #'
-#' **`.file` argument:** The following options are available for `.file`
-#'
-#' * `bbi_nonmem_model`
-#'   * `"model"` compares the control streams
-#' * Currently only NONMEM is implemented.
-#'
 #' @return Returns a `"Diff"` object from the `diffobj` package that renders
 #'   when printed or called in the console.
 #'
@@ -35,8 +29,9 @@
 #'   `.mod2`. If `.mod2 = NULL`, the default, compare `.mod` to the model at
 #'   `get_based_on(.mod)`. See "`based_on` details" in Details section.
 #' @param .file Defaults to `"model"` which compares the default model file for
-#'   that model type. Some model types have multiple files that can be compared.
-#'   See "`.file` argument" in Details section.
+#'   that model type. For NONMEM models, the control stream is compared. Other
+#'   model types may accept additional values and support comparing multiple
+#'   files. See "`.file` argument" of the specific S3 method for details.
 #' @param ... arguments passed through to methods. (Currently none.)
 #' @param .viewer If `FALSE`, the default, prints diff to console or renders in
 #'   Rmd. If `TRUE`, render the diff in the Viewer window. Note: this option
@@ -71,6 +66,9 @@ model_diff.bbi_nonmem_model <- function(
 # PRIVATE IMPLEMENTATION FUNCTIONS
 ###################################
 
+# SHARED: model_diff_get_comp() is used by bbr.bayes, so any changes here should
+# be compatible with its use there.
+
 #' Private helper to get a valid comparison model
 #' @inheritParams model_diff
 #' @keywords internal
@@ -95,6 +93,9 @@ model_diff_get_comp <- function(.mod, .mod2) {
   check_yaml_in_sync(.mod2)
   return(.mod2)
 }
+
+# SHARED: model_diff_impl() is used by bbr.bayes, so any changes here should be
+# compatible with its use there.
 
 #' Private helper to diff two model files
 #' @importFrom diffobj diffFile

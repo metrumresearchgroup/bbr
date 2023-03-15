@@ -19,7 +19,7 @@ See examples.}
 \item{...}{arguments passed through to methods. (Currently none.)}
 }
 \value{
-Returns an absolute path to \verb{\{output_dir\}/\{model_id\}\{.suffix\}}.
+Returns an absolute path to \verb{\{.mod$absolute_model_path\}/\{get_model_id(.mod)\}\{.suffix\}}.
 Does \emph{not} check whether the file exists.
 }
 \description{

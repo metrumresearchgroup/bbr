@@ -25,7 +25,8 @@
 #'
 #'   * `model_md5`: the MD5 sum of the model file
 #'
-#'   * `data_path`: the path to the data file, relative to `absolute_model_path`
+#'   * `data_path`: the path to the data file, relative to the model's output directory
+#'     (which can be extracted via [get_output_dir()])
 #'
 #'   * `data_md5`: the MD5 sum of the data file
 #'
@@ -114,36 +115,37 @@ config_log_impl <- function(.mods) {
   return(res_df)
 }
 
-#' Parse a bbi config file
+#' Prepare a model-specific config log entry
 #'
-#' @param path A string giving the path to `bbi_config.json`.
-#' @param fields A character vector of fields to include.
+#' [config_log()] relies on [config_log_entry()] to create a entry.
+#' [config_log_entry()] reads in configuration and relies on this method to
+#' prepare and tailor the config object for a given model type.
 #'
-#' @return A list whose elements include
-#'
-#'   * the path to the model file (minus extension)
-#'
-#'   * `fields`
-#'
-#'   * whether the model file has changed
-#'
-#'   * whether the data file has changed
-#'
-#'   * the version of NONMEM
-#'
-#'   The return value is `NULL` if any element of `fields` is not found in
-#'   `path`.
-#'
-#' @keywords internal
-config_log_entry <- function(path,
-                             fields = CONFIG_KEEPERS) {
-  checkmate::assert_file_exists(path)
-  checkmate::assert_character(fields)
+#' @param .mod A model object.
+#' @param config The raw configuration read from `bbi_config.json`.
+#' @param fields Requested fields to include in the config. If `NULL`, a default
+#'   set of fields for the particular model type should be used.
+#' @return A two element list. The first element is named "config" and contains
+#'   the prepared config object. The second is named "fields" and is a character
+#'   vector of fields that includes those specified via the `fields` parameter
+#'   as well as any additional fields that were automatically tacked on.
+#' @export
+config_log_make_entry <- function(.mod, config, fields = NULL) {
+  UseMethod("config_log_make_entry")
+}
 
-  cfg_mod <- read_model_from_config(path)
-  config <- jsonlite::fromJSON(path)
+#' @rdname config_log_make_entry
+#' @export
+config_log_make_entry.default <- function(.mod, config, fields = NULL) {
+  stop("No method for type ", .mod)
+}
 
+#' @rdname config_log_make_entry
+#' @export
+config_log_make_entry.bbi_nonmem_model <- function(.mod, config, fields = NULL) {
+  fields <- fields %||% CONFIG_KEEPERS
   if (!all(fields %in% names(config))) {
+    path <- get_config_path(.mod, .check_exists = FALSE)
     msg <- paste(
       glue(
         "{path} is missing the required keys:",
@@ -168,18 +170,58 @@ config_log_entry <- function(path,
     warning(msg)
     return(NULL)
   }
+  config[["nm_version"]] <- resolve_nonmem_version(config) %||% NA_character_
 
-  matches <- suppressMessages(check_up_to_date(cfg_mod))
+  return(list(config = config, fields = c(fields, "nm_version")))
+}
+
+#' Parse a bbi config file
+#'
+#' @param path A string giving the path to `bbi_config.json`.
+#' @param fields A character vector of fields to include.
+#'
+#' @return A list whose elements include
+#'
+#'   * the path to the model file (minus extension)
+#'
+#'   * `fields`
+#'
+#'   * whether the model file has changed
+#'
+#'   * whether the data file has changed
+#'
+#'   * the version of NONMEM
+#'
+#'   The return value is `NULL` if any element of `fields` is not found in
+#'   `path`.
+#'
+#' @keywords internal
+config_log_entry <- function(path, fields = NULL) {
+  checkmate::assert_file_exists(path)
+  checkmate::assert_character(fields, null.ok = TRUE)
+
+  cfg_mod <- read_model_from_config(path)
+  config <- jsonlite::fromJSON(path)
+
+  res <- config_log_make_entry(cfg_mod, config, fields)
+  if (is.null(res$config)) {
+    return(NULL)
+  }
+
+  config <- res$config
+  fields <- res$fields
+
+  # bbr.bayes kludge: .build_data is passed for
+  # check_up_to_date.bbi_stan_{model,summary}.
+  matches <- suppressMessages(check_up_to_date(cfg_mod, .build_data = TRUE))
 
   config[["model_has_changed"]] <- as.logical(!matches["model"]) # use as.logical to strip off names
   config[["data_has_changed"]]  <- as.logical(!matches["data"])  # use as.logical to strip off names
-  config[["nm_version"]] <- resolve_nonmem_version(config) %||% NA_character_
   config[[ABS_MOD_PATH]] <- cfg_mod[[ABS_MOD_PATH]]
 
   out_fields <- c(
     ABS_MOD_PATH,
     fields,
-    "nm_version",
     "model_has_changed",
     "data_has_changed"
   )

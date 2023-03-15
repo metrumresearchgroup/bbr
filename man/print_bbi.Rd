@@ -3,13 +3,13 @@
 \name{print_bbi}
 \alias{print_bbi}
 \alias{print.bbi_process}
-\alias{print.bbi_nonmem_model}
+\alias{print.bbi_model}
 \alias{print.bbi_nonmem_summary}
 \title{Print methods for bbr objects}
 \usage{
 \method{print}{bbi_process}(x, ..., .call_limit = 250)
 
-\method{print}{bbi_nonmem_model}(x, ...)
+\method{print}{bbi_model}(x, ...)
 
 \method{print}{bbi_nonmem_summary}(x, .digits = 3, .fixed = FALSE, .off_diag = FALSE, .nrow = NULL, ...)
 }
@@ -43,7 +43,7 @@ will make for prettier formatting, especially of table outputs.
 \itemize{
 \item \code{print(bbi_process)}: Prints the call made to bbi and whether the process is still running or has finished.
 
-\item \code{print(bbi_nonmem_model)}: Prints the information contained in the model object and whether the model has been run
+\item \code{print(bbi_model)}: Prints the information contained in the model object and whether the model has been run
 
 \item \code{print(bbi_nonmem_summary)}: Prints a high level summary of a model from a bbi_nonmem_summary object
 

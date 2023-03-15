@@ -41,7 +41,8 @@ The following fields from are extracted from \code{bbi_config.json}.
 \item \code{absolute_model_path}: the path to the model file, excluding the file
 extension
 \item \code{model_md5}: the MD5 sum of the model file
-\item \code{data_path}: the path to the data file, relative to \code{absolute_model_path}
+\item \code{data_path}: the path to the data file, relative to the model's output directory
+(which can be extracted via \code{\link[=get_output_dir]{get_output_dir()}})
 \item \code{data_md5}: the MD5 sum of the data file
 \item \code{bbi_version}: the version of bbi last used to run the model
 \item \code{nm_version}: the version of NONMEM last used to run the model

@@ -4,6 +4,38 @@
 #' @name create_bbi_object
 NULL
 
+#' Perform model-type specific setup
+#'
+#' This method is called by `create_model_object()` after it has created an
+#' object of type `bbi_{type}_model`, and, if the caller requested writing the
+#' model yaml to disk, this method will be called before that.
+#'
+#' Every `bbi_{type}_model` should define a `create_model_hook.bbi_{type}_model`
+#' method, even if no model-specific setup is required.
+#'
+#' @param .mod Model object.
+#' @param ... All but the first argument that was passed to
+#'   `create_model_object()`.
+#'
+#' @export
+create_model_hook <- function(.mod, ...) {
+  UseMethod("create_model_hook")
+}
+
+#' @rdname create_model_hook
+#' @export
+create_model_hook.default <- function(.mod, ...) {
+  stop("Not a valid model type: ", .mod[[YAML_MOD_TYPE]])
+}
+
+#' @rdname create_model_hook
+#' @export
+create_model_hook.bbi_nonmem_model <- function(.mod, ...) {
+  # we won't know the model file extension, so we rely on this helper to check
+  # the possible extensions and throw an error if none exists
+  find_nonmem_model_file_path(.mod[[ABS_MOD_PATH]], .check_exists = TRUE)
+}
+
 #' @describeIn create_bbi_object Creates list object of class `bbi_{.model_type}_model` from named list with `MODEL_REQ_INPUT_KEYS`
 #' @param res List to attempt to assign the class to
 #' @param save_yaml Logical scalar for whether to save the newly created model object to its corresponding YAML file and update the md5 hash.
@@ -28,20 +60,12 @@ create_model_object <- function(res, save_yaml) {
 
   # assign class and write YAML to disk
   .model_type <- res[[YAML_MOD_TYPE]]
-  if (!(.model_type %in% SUPPORTED_MOD_TYPES)) {
-    dev_error(glue("Invalid {YAML_MOD_TYPE} `{.model_type}`. Valid options include: `{paste(SUPPORTED_MOD_TYPES, collapse = ', ')}`"))
-  }
-
-  # assign class
-  class(res) <- c(as.character(glue("bbi_{.model_type}_model")), BBI_PARENT_CLASS, class(res))
+  class(res) <- c(model_type_to_classes(.model_type, "model"),
+                  BBI_BASE_MODEL_CLASS, BBI_PARENT_CLASS, class(res))
 
   # look for appropriate model files on disk and then write out YAML.
   # must be done AFTER assigning the class so that associated helpers can dispatch correctly
-  if (.model_type == "nonmem") {
-    # we won't know the model file extension, so we rely on this helper to check
-    # the possible extensions and throw an error if none exists
-    find_nonmem_model_file_path(res[[ABS_MOD_PATH]], .check_exists = TRUE)
-  }
+  create_model_hook(res)
 
   if(isTRUE(save_yaml)) {
     res <- save_model_yaml(res)
@@ -61,16 +85,14 @@ create_model_object <- function(res, save_yaml) {
 }
 
 #' @describeIn create_bbi_object Create list object of `bbi_{.model_type}_summary` class, first checking that all the required keys are present.
-#' @param .model_type Character scalar of a valid model type (currently either `nonmem` or `stan`)
+#' @param .model_type Character scalar of a valid model type
 #' @importFrom purrr map map_if
 #' @keywords internal
-create_summary_object <- function(res, .model_type = SUPPORTED_MOD_TYPES) {
+create_summary_object <- function(res, .model_type) {
 
   if(!inherits(res, "list")) {
     stop(glue("Can only summary object from a named list. Passed object has classes {paste(class(res), collapse = ', ')}"))
   }
-
-  .model_type <- match.arg(.model_type)
 
   # Overwrite cases of BBI_NULL_NUM to NA_real_
   res <- map_list_recursive(res, set_bbi_null)
@@ -85,8 +107,8 @@ create_summary_object <- function(res, .model_type = SUPPORTED_MOD_TYPES) {
     strict_mode_error(err_msg)
   }
 
-  # assign class and return
-  class(res) <- c(as.character(glue("bbi_{.model_type}_summary")), BBI_PARENT_CLASS, class(res))
+  class(res) <- c(model_type_to_classes(.model_type, "summary"),
+                  BBI_PARENT_CLASS, class(res))
   return(res)
 }
 
