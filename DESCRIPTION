@@ -47,6 +47,8 @@ Description: R package for making calls to bbi for running
     NONMEM and other models. Also manages model metadata, workflow, and
     run logs.
 License: MIT + file LICENSE
+URL: https://github.com/metrumresearchgroup/bbr
+BugReports: https://github.com/metrumresearchgroup/bbr/issues
 Depends:
     R (>= 3.5)
 Imports: 
