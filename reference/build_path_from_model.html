@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.7.0</span>
       </span>
     </div>
 
@@ -66,7 +66,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Build path to output file</h1>
-    
+    <small class="dont-index">Source: <a href="https://github.com/metrumresearchgroup/bbr/blob/HEAD/R/get-path-from-object.R" class="external-link"><code>R/get-path-from-object.R</code></a></small>
     <div class="hidden name"><code>build_path_from_model.Rd</code></div>
     </div>
 
@@ -101,7 +101,7 @@ See examples.</p></dd>
     <h2>Value</h2>
     
 
-<p>Returns an absolute path to <code>{output_dir}/{model_id}{.suffix}</code>.
+<p>Returns an absolute path to <code>{.mod$absolute_model_path}/{get_model_id(.mod)}{.suffix}</code>.
 Does <em>not</em> check whether the file exists.</p>
     </div>
 

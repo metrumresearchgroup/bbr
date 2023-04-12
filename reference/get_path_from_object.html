@@ -18,7 +18,7 @@ provide an easy way to retrieve the absolute path to these files."><meta propert
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.7.0</span>
       </span>
     </div>
 
@@ -67,7 +67,7 @@ provide an easy way to retrieve the absolute path to these files."><meta propert
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Get path from bbi object</h1>
-    
+    <small class="dont-index">Source: <a href="https://github.com/metrumresearchgroup/bbr/blob/HEAD/R/get-path-from-object.R" class="external-link"><code>R/get-path-from-object.R</code></a></small>
     <div class="hidden name"><code>get_path_from_object.Rd</code></div>
     </div>
 
@@ -132,7 +132,8 @@ or a tibble of class <code>bbi_log_df</code>.</p></dd>
     <div id="details">
     <h2>Details</h2>
     <p><strong><code>get_model_path()</code></strong> returns the path to the model definition file.
-For NONMEM models, this is the control stream.</p>
+For NONMEM models, this is the control stream. For Stan models,
+this is the <code>.stan</code> file.</p>
 <p><strong><code>get_output_dir()</code></strong> returns the path to the directory containing
 output files created when the model is run.</p>
 <p><strong><code>get_yaml_path()</code></strong> returns the path to the YAML file created by bbr.

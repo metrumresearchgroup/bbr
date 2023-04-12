@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.7.0</span>
       </span>
     </div>
 
@@ -66,7 +66,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Create bbi object</h1>
-    
+    <small class="dont-index">Source: <a href="https://github.com/metrumresearchgroup/bbr/blob/HEAD/R/classes.R" class="external-link"><code>R/classes.R</code></a></small>
     <div class="hidden name"><code>create_bbi_object.Rd</code></div>
     </div>
 
@@ -77,7 +77,7 @@
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">create_model_object</span><span class="op">(</span><span class="va">res</span>, <span class="va">save_yaml</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">create_summary_object</span><span class="op">(</span><span class="va">res</span>, .model_type <span class="op">=</span> <span class="va">SUPPORTED_MOD_TYPES</span><span class="op">)</span></span>
+<span><span class="fu">create_summary_object</span><span class="op">(</span><span class="va">res</span>, <span class="va">.model_type</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">create_summary_list</span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span>
 <span></span>
@@ -103,7 +103,7 @@
 
 
 <dt>.model_type</dt>
-<dd><p>Character scalar of a valid model type (currently either <code>nonmem</code> or <code>stan</code>)</p></dd>
+<dd><p>Character scalar of a valid model type</p></dd>
 
 
 <dt>log_df</dt>

@@ -20,7 +20,7 @@ Details section for what specific files are checked."><meta property="og:image" 
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.7.0</span>
       </span>
     </div>
 
@@ -69,7 +69,7 @@ Details section for what specific files are checked."><meta property="og:image" 
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Check model and data up to date with outputs</h1>
-    
+    <small class="dont-index">Source: <a href="https://github.com/metrumresearchgroup/bbr/blob/HEAD/R/check-up-to-date.R" class="external-link"><code>R/check-up-to-date.R</code></a></small>
     <div class="hidden name"><code>check_up_to_date.Rd</code></div>
     </div>
 
@@ -81,7 +81,13 @@ Details section for what specific files are checked.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">check_up_to_date</span><span class="op">(</span><span class="va">.bbi_object</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">check_up_to_date</span><span class="op">(</span><span class="va">.bbi_object</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bbi_nonmem_model</span></span>
+<span><span class="fu">check_up_to_date</span><span class="op">(</span><span class="va">.bbi_object</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bbi_nonmem_summary</span></span>
+<span><span class="fu">check_up_to_date</span><span class="op">(</span><span class="va">.bbi_object</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -134,8 +140,7 @@ these contain the opposite boolean values (<code>check_up_to_date()</code> retur
     <p>Different files are checked depending on what type of model is being checked.</p>
 <p><strong>For NONMEM models</strong></p><ul><li><p>The model file (control stream)</p></li>
 <li><p>The data file (referenced in <code>$DATA</code> within the control stream)</p></li>
-</ul><p><strong>Currently only NONMEM implemented.</strong></p>
-    </div>
+</ul></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

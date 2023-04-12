@@ -178,19 +178,25 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/config_log_impl.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/config_log_make_entry.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/copy_control_stream.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/copy_model_from.html</loc>
   </url>
   <url>
-    <loc>https://metrumresearchgroup.github.io/bbr/reference/copy_nonmem_model_from.html</loc>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/copy_model_from_impl.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/cov_cor.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/create_bbi_object.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/create_model_hook.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/current_release_url.html</loc>
@@ -388,6 +394,9 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/print_bbi_args.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/print_model_files.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/read_bbi_path.html</loc>
   </url>
   <url>
@@ -395,6 +404,9 @@
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/read_model_from_config.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/register_model_type.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/remove_dup_cols.html</loc>
@@ -439,6 +451,9 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/skip_if_over_rate_limit.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/skip_long_tests.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/stop_get_fail_msg.html</loc>
   </url>
   <url>
@@ -455,9 +470,6 @@
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/submit_nonmem_model.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/bbr/reference/submit_nonmem_models.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/summary_log.html</loc>

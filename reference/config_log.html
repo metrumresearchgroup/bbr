@@ -19,7 +19,7 @@ run."><meta property="og:image" content="https://metrumresearchgroup.github.io/b
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.7.0</span>
       </span>
     </div>
 
@@ -68,7 +68,7 @@ run."><meta property="og:image" content="https://metrumresearchgroup.github.io/b
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Parse bbi configs to log</h1>
-    
+    <small class="dont-index">Source: <a href="https://github.com/metrumresearchgroup/bbr/blob/HEAD/R/config-log.R" class="external-link"><code>R/config-log.R</code></a></small>
     <div class="hidden name"><code>config_log.Rd</code></div>
     </div>
 
@@ -128,7 +128,8 @@ If <em>no</em></p>
     <p>The following fields from are extracted from <code>bbi_config.json</code>.</p><ul><li><p><code>absolute_model_path</code>: the path to the model file, excluding the file
 extension</p></li>
 <li><p><code>model_md5</code>: the MD5 sum of the model file</p></li>
-<li><p><code>data_path</code>: the path to the data file, relative to <code>absolute_model_path</code></p></li>
+<li><p><code>data_path</code>: the path to the data file, relative to the model's output directory
+(which can be extracted via <code><a href="get_path_from_object.html">get_output_dir()</a></code>)</p></li>
 <li><p><code>data_md5</code>: the MD5 sum of the data file</p></li>
 <li><p><code>bbi_version</code>: the version of bbi last used to run the model</p></li>
 <li><p><code>nm_version</code>: the version of NONMEM last used to run the model</p></li>

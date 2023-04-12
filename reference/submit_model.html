@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.7.0</span>
       </span>
     </div>
 
@@ -66,7 +66,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Submit a model to be run</h1>
-    
+    <small class="dont-index">Source: <a href="https://github.com/metrumresearchgroup/bbr/blob/HEAD/R/submit-model.R" class="external-link"><code>R/submit-model.R</code></a></small>
     <div class="hidden name"><code>submit_model.Rd</code></div>
     </div>
 
@@ -147,6 +147,31 @@ insted of running it. This is primarily for testing but also a debugging
 tool.</p></dd>
 
 </dl></div>
+    <div id="value">
+    <h2>Value</h2>
+    
+
+<p>While <code>submit_model()</code></p>
+<p></p>
+<p><em>does</em> return something, it is primarily
+called for its side effects, specifically that it runs the model and writes
+all model outputs to disk under <code>get_output_dir(.mod)</code>.</p>
+
+
+<p><strong>NONMEM</strong></p>
+
+
+<p>For NONMEM models, a <code>bbi_process</code> object is returned. The typical NONMEM
+output files are all written into <code>get_output_dir(.mod)</code>. A summary of the
+contents of these files can be accessed with <code><a href="model_summary.html">model_summary()</a></code>, and the path
+to individual files can be easily constructed like
+<code>build_path_from_model(.mod, ".lst")</code>.</p>
+
+
+<p>A <code>bbi_config.json</code> file is also written, which stores information about the
+configuration of the run. See <code><a href="config_log.html">config_log()</a></code> for more details about this
+file.</p>
+    </div>
     <div id="methods-by-class-">
     <h2>Methods (by class)</h2>
     

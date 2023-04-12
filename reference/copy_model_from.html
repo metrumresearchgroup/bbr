@@ -19,7 +19,7 @@ ancestry. See "Using based_on field" vignette for details.'><meta property="og:i
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.7.0</span>
       </span>
     </div>
 
@@ -68,7 +68,7 @@ ancestry. See "Using based_on field" vignette for details.'><meta property="og:i
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Create new model by copying existing model</h1>
-    
+    <small class="dont-index">Source: <a href="https://github.com/metrumresearchgroup/bbr/blob/HEAD/R/copy-model-from.R" class="external-link"><code>R/copy-model-from.R</code></a></small>
     <div class="hidden name"><code>copy_model_from.Rd</code></div>
     </div>
 
@@ -149,10 +149,11 @@ tags passed to <code>.add_tags</code> argument. If <code>TRUE</code> inherit any
 
 
 <dt>.update_model_file</dt>
-<dd><p>If <code>TRUE</code>, the default, update the newly created
-model file. If <code>FALSE</code>, new model file will be an exact copy of its parent.
-For a NONMEM model, this currently means only the <code>$PROBLEM</code> line in the
-new control stream will be updated to read <code>See {.new_model}.yaml. Created by bbr.</code>.</p></dd>
+<dd><p><strong>Only relevant to NONMEM models.</strong> If <code>TRUE</code>, the
+default, update the newly created model file. If <code>FALSE</code>, new model file
+will be an exact copy of its parent. For a NONMEM model, this currently
+means only the <code>$PROBLEM</code> line in the new control stream will be updated to
+read <code>See {.new_model}.yaml. Created by bbr.</code>.</p></dd>
 
 
 <dt>.overwrite</dt>
