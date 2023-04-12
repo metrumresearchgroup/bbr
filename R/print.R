@@ -78,6 +78,7 @@ print.bbi_process <- function(x, ..., .call_limit = 250) {
 #'
 #' @param .mod Model object.
 #' @param print_fn A function that this method should call to print each file.
+#' @keywords internal
 #' @export
 print_model_files <- function(.mod, print_fn) {
   UseMethod("print_model_files")

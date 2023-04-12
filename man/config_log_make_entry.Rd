@@ -31,3 +31,4 @@ as well as any additional fields that were automatically tacked on.
 \code{\link[=config_log_entry]{config_log_entry()}} reads in configuration and relies on this method to
 prepare and tailor the config object for a given model type.
 }
+\keyword{internal}
