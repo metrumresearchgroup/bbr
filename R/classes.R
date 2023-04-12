@@ -18,6 +18,7 @@ NULL
 #'   `create_model_object()`.
 #'
 #' @export
+#' @keywords internal
 create_model_hook <- function(.mod, ...) {
   UseMethod("create_model_hook")
 }

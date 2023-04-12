@@ -27,3 +27,4 @@ model yaml to disk, this method will be called before that.
 Every \verb{bbi_\{type\}_model} should define a \verb{create_model_hook.bbi_\{type\}_model}
 method, even if no model-specific setup is required.
 }
+\keyword{internal}

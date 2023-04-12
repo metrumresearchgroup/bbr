@@ -129,6 +129,7 @@ config_log_impl <- function(.mods) {
 #'   the prepared config object. The second is named "fields" and is a character
 #'   vector of fields that includes those specified via the `fields` parameter
 #'   as well as any additional fields that were automatically tacked on.
+#' @keywords internal
 #' @export
 config_log_make_entry <- function(.mod, config, fields = NULL) {
   UseMethod("config_log_make_entry")

@@ -15,3 +15,4 @@ print_model_files(.mod, print_fn)
 \code{\link[=print.bbi_model]{print.bbi_model()}} calls this after printing the YAML and model path to
 allow specific model types to display additional files.
 }
+\keyword{internal}
