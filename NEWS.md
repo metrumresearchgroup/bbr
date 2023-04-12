@@ -1,3 +1,14 @@
+# bbr 1.7.0
+
+## Changes
+
+All of the code changes in this release focus on enabling third-party
+packages to introduce new model types and were motivated by the
+soon-to-be-released bbr.bayes package.  Aside from three new generics,
+these changes are internal and should not affect any user-facing
+behavior on the bbr side.  (#543)
+
+
 # bbr 1.6.0
 
 ## New features and changes
