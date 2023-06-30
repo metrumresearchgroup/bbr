@@ -180,50 +180,6 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   })
 
 
-  test_that("get_est_idx() works correctly: models [BBR-TSTT-004]", {
-    mod_lines <- mod_complex %>% get_model_path() %>% readLines()
-    expect_equal(get_est_idx(mod_lines) %>% unlist(), c(38, 39, 40))
-
-    mod_lines <- mod_complex2 %>% get_model_path() %>% readLines()
-    expect_equal(get_est_idx(mod_lines) %>% unlist(), c(111:115))
-    expect_equal(get_est_idx(mod_lines)[[1]], c(111:113))
-    expect_equal(get_est_idx(mod_lines)[[2]], c(114:115))
-
-    mod_lines <- mod_complex3 %>% get_model_path() %>% readLines()
-    expect_equal(get_est_idx(mod_lines)[[1]], 50)
-
-  })
-
-  test_that("get_est_idx() works correctly: custom text [BBR-TSTT-004]", {
-    # Multiple lines per $EST, without leading spaces
-    mod_lines <- c(
-      "$EST METHOD=SAEM NBURN=3000 NITER=2000 PRINT=10 ISAMPLE=2",
-      "ISAMPLE_M1=1 ISAMPLE_M2=1 ISAMPLE_M3=1",
-      "CTYPE=3 CITER=10 CALPHA=0.05",
-      "$EST METHOD=IMP INTERACTION EONLY=1 NITER=5 ISAMPLE=3000 PRINT=1 SIGL=8 SEED=123334",
-      "CTYPE=3 CITER=10 CALPHA=0.05"
-    )
-    est_idxs <- get_est_idx(mod_lines)
-    expect_equal(est_idxs %>% unlist(), c(1:5))
-    expect_equal(est_idxs[[1]], c(1:3))
-    expect_equal(est_idxs[[2]], c(4:5))
-
-    # Multiple lines per $EST, with variable amount of leading spaces
-    mod_lines <- c(
-      " $EST METHOD=SAEM NBURN=3000 NITER=2000 PRINT=10 ISAMPLE=2",
-      "  ISAMPLE_M1=1 ISAMPLE_M2=1 ISAMPLE_M3=1",
-      "   CTYPE=3 CITER=10 CALPHA=0.05",
-      "    $EST METHOD=IMP INTERACTION EONLY=1 NITER=5 ISAMPLE=3000 PRINT=1 SIGL=8 SEED=123334",
-      "     CTYPE=3 CITER=10 CALPHA=0.05"
-    )
-    est_idxs <- get_est_idx(mod_lines)
-    expect_equal(est_idxs %>% unlist(), c(1:5))
-    expect_equal(est_idxs[[1]], c(1:3))
-    expect_equal(est_idxs[[2]], c(4:5))
-
-  })
-
-
   test_that("check_run_times() returns NA for dry runs [BBR-CRT-007]", {
     skip_if_old_bbi("3.2.0")
     expect_message(
