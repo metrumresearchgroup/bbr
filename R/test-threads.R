@@ -330,90 +330,59 @@ adjust_estimation_options <- function(.mods, .cap_iterations){
     map(.mods, function(.mod){
 
       mod_path <- get_model_path(.mod)
-      mod_lines <- mod_path %>% readLines() %>%
-        suppressSpecificWarning("incomplete final line found")
-
+      ctl <- nmrec::read_ctl(mod_path)
 
       # Identify EST Blocks
-      est_idxs <- get_est_idx(mod_lines)
+      ests <- nmrec::select_records(ctl, "est")
 
-      est_block <- map(seq_along(est_idxs), ~{
-        mod_lines[est_idxs[[.x]]]
-      })
-
-      est_idxs <- unlist(est_idxs)
-
-      if(is.null(est_idxs)){
+      if(rlang::is_empty(ests)){
         warning(glue("No Estimation line found in {basename(mod_path)}, so there are no options to cap"))
         return(NULL)
       }
 
-      for(i in seq_along(est_block)){
-        est_block.i <- est_block[[i]]
+      for(i in seq_along(ests)){
+        est_block.i <- ests[[i]]
+        est_block.i$parse()
 
-        max_match <- "MAX(EVAL(S)?)?=\\d+" ## need to vet this regex
-        max_detect <- str_detect(est_block.i, max_match)
-        niter_detect <- str_detect(est_block.i, "NITER=\\d+")
-        nburn_detect <- str_detect(est_block.i, "NBURN=\\d+")
-        if (any(max_detect)) {
-          est_block.i[max_detect] <- replace_est_opt(est_block.i[max_detect], max_match, .cap_iterations)
-        } else if(any(niter_detect)) {
-          est_block.i[niter_detect] <- replace_est_opt(est_block.i[niter_detect], "NITER=\\d+", .cap_iterations)
-          if (any(nburn_detect) && !any(str_detect(est_block.i, "NBURN=0\\b"))) {
-            est_block.i[nburn_detect] <- replace_est_opt(est_block.i[nburn_detect], "NBURN=\\d+", .cap_iterations)
-          }else if(!any(nburn_detect)){
+        max_detect <- any(purrr::map_lgl(est_block.i$get_options(), ~ .x$name == "maxevals"))
+        niter_detect <- any(purrr::map_lgl(est_block.i$get_options(), ~ .x$name == "niter"))
+        nburn_detect <- any(purrr::map_lgl(est_block.i$get_options(), ~ .x$name == "nburn"))
+
+        if(max_detect){
+          nmrec::set_record_option(est_block.i, "maxevals", .cap_iterations)
+        }else if(niter_detect){
+          nmrec::set_record_option(est_block.i, "niter", .cap_iterations)
+          if(nburn_detect && !check_record_val(est_block.i, "nburn", 0)) {
+            # We don't want to overwrite NBURN if it was set to 0
+            nmrec::set_record_option(est_block.i, "nburn", .cap_iterations)
+          }else if(!nburn_detect){
             # NITER was specified, but NBURN wasn't (which means the default is being relied on). Force specification to cap.
-            message(glue("     Adding NBURN declaration to {est_block.i[niter_detect]} in {basename(mod_path)}"))
-            est_block.i[niter_detect] <- glue("{est_block.i[niter_detect]} NBURN={.cap_iterations}")
+            message(glue("Adding NBURN={.cap_iterations} declaration to {basename(mod_path)} to avoid using the default value"))
+            nmrec::set_record_option(est_block.i, "nburn", .cap_iterations)
           }
         }
-        est_block[[i]] <- est_block.i
-
       }
-      mod_lines[est_idxs] <- unlist(est_block)
-      writeLines(mod_lines, mod_path)
+      nmrec::write_ctl(ctl, mod_path)
     })
   }
 }
 
 
-#' Helper function for replacing estimation options
+#' Check if a record option matches a specific value
 #'
-#' @details
-#' This is specifically for updating the number of iterations for
-#' parameters such as `MAXEVAL`, `NITER`, etc.
-#'
-#' @param .est_line the estimation line containing the `.match`
-#' @param .match regex for the estimation option to be updated
-#' @param .cap_iterations
-#'
-#' @importFrom stringr str_replace str_split
+#' @param .record an `nmrec` record object
+#' @param .name Name of option to select. Any valid spelling of the option name
+#'   is allowed.
+#' @param .value Value of option to check for. For value options, the specified value is anything
+#' that can be formatted to a string (i.e. `10` in `NBURN=10`). For included flag options, the
+#' default value is `TRUE` (`NOABORT`).
 #'
 #' @keywords internal
-replace_est_opt <- function(.est_line, .match, .cap_iterations){
-  str_values <- str_split(.est_line, " ")[[1]]
-  est_opt <- str_values[grep(.match, str_values)]
-  est_opt <- paste0(gsub('[[:digit:]]+', '', est_opt), .cap_iterations)
-  str_replace(.est_line, .match, est_opt)
-}
-
-
-#' Get location of $EST blocks
-#'
-#' @param .mod_lines ctl lines returned from readLines
-#'
-#' @keywords internal
-get_est_idx <- function(.mod_lines){
-  # Identify Model Blocks
-  section_starts <- which(str_detect(.mod_lines, "^\\s*\\$"))
-
-  ends <- c(section_starts[2:length(section_starts)] - 1,
-            length(.mod_lines))
-
-  sections <- purrr::map2(section_starts, ends, `:`)
-
-  # Identify EST Blocks
-  est_sections <- str_detect(.mod_lines[section_starts], "^\\s*\\$EST")
-
-  sections[est_sections]
+check_record_val <- function(.record, .name, .value){
+  opt <- nmrec::get_record_option(.record, .name)
+  if(!is.null(opt)){
+    opt$value == .value
+  }else{
+    FALSE
+  }
 }
