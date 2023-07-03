@@ -200,6 +200,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
     mod_complex_edit <- new_model(
       file.path(MODEL_DIR_BBI, basename(new_mod_name)),
+      .tags = c("test threads"), # for deletion purposes
       .bbi_args = list(overwrite = TRUE, threads = 2),
     )
 
@@ -219,6 +220,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
         expect_equal(names(max_evals_i), c("MAXEVAL", "NITER", "nburn"))
       }
     }
+    delete_models(c(list(mod_complex_edit), mods_fake), .force = T)
   })
 
   test_that("test_threads(.dry_run=T) threads are set correctly [BBR-TSTT-003]", {
