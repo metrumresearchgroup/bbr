@@ -358,7 +358,7 @@ adjust_estimation_options <- function(.mods, .cap_iterations){
           }else if(!nburn_detect){
             # NITER was specified, but NBURN wasn't (which means the default is being relied on). Force specification to cap.
             message(glue("Adding NBURN={.cap_iterations} declaration to {basename(mod_path)} to avoid using the default value"))
-            nmrec::set_record_option(est_block.i, "nburn", .cap_iterations)
+            nmrec::set_record_option(est_block.i, "NBURN", .cap_iterations)
           }
         }
       }
