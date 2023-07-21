@@ -222,17 +222,16 @@ copy_control_stream <- function(.parent_model_path, .new_model_path, .overwrite,
   if (.update_model_file) {
 
     # read parent control stream
-    mod_str <- .parent_model_path %>% read_file()
+    mod_str <- nmrec::read_ctl(.parent_model_path)
 
     # replace the $PROBLEM line(s)
     new_mod_id <- get_model_id(.new_model_path)
-    mod_str <- str_replace(mod_str,
-                           "\\$PROB(.|\n)*?\\$",
-                           as.character(glue("$PROBLEM From bbr: see {new_mod_id}.yaml for details\n\n$")))
-    glue("")
+    prob_rec <- nmrec::select_records(mod_str, "prob")[[1]]
+    prob_str <- nmrec::get_record_option(prob_rec, "text")
+    prob_str$value <- as.character(glue("From bbr: see {new_mod_id}.yaml for details"))
 
-    # read parent control stream
-    write_file(mod_str, .new_model_path)
+    # write parent control stream
+    nmrec::write_ctl(mod_str, .new_model_path)
   } else {
     fs::file_copy(.parent_model_path, .new_model_path)
   }
