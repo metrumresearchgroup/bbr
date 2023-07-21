@@ -84,14 +84,14 @@ nm_tables <- function(
 #' @export
 nm_table_files <- function(.mod, .check_exists = TRUE) {
   .p <- get_model_path(.mod)
-  .l <- parse_ctl_to_list(.p)
+  .p <- get_model_path(.mod)
+  .l <- nmrec::read_ctl(.p)
   out_dir <- get_output_dir(.mod, .check_exists = .check_exists)
 
   # get file names from table statements and construct paths
-  .f <- .l[grep("^TAB", names(.l))] %>%
-    map_chr(~paste(.x, collapse = " ")) %>%
-    str_extract("\\bFILE\\s*=\\s*([^ ]+)") %>%
-    str_replace("\\bFILE\\s*=\\s*", "") %>%
+  .f <- nmrec::select_records(.l, "table") %>%
+    purrr::map(~nmrec::get_record_option(.x, "file")$value) %>%
+    purrr::list_c() %>%
     str_replace("^\\.\\/", "") %>%
     file.path(out_dir, .)
 
