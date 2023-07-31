@@ -153,7 +153,8 @@ test_that("copy_from_model .overwrite=FALSE works [BBR-CMF-005]", {
 })
 
 test_that("copy_model_from() supports `.new_model` containing a period [BBR-CMF-006]", {
-  temp_mod_path <- create_temp_model()
+  mod_content <- readLines(ctl_ext(MOD1_PATH)) %>% paste(collapse = "\n")
+  temp_mod_path <- create_temp_model(mod_content = mod_content)
   temp_mod <- read_model(temp_mod_path)
 
   temp_dir <- normalizePath(tempdir())
@@ -169,7 +170,6 @@ test_that("copy_model_from() supports `.new_model` containing a period [BBR-CMF-
   expect_true(inherits(new_mod, NM_MOD_CLASS))
   expect_true(fs::file_exists(new_ctl))
   expect_true(fs::file_exists(new_yaml))
-
 })
 
 test_that("copy_model_from(.new_model=NULL) increments to next integer by default [BBR-CMF-007]", {
