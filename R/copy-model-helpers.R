@@ -80,21 +80,25 @@ update_model_id <- function(
     paste(collapse = "|") %>%
     paste0("(", ., ")\\b")
 
-  ## edit text of new model file
-  txt <- suppressSpecificWarning(
-    read_lines(modelfile),
-    .regexpr = "incomplete final line"
-  )
+  ## parse table records
+  mod_str <- nmrec::read_ctl(modelfile)
+  table_recs <- nmrec::select_records(mod_str, "table")
 
-  txt <- gsub(
-    paste0(based_on, .suffixes),
-    paste0(mod_id, "\\1"),
-    txt,
-    ignore.case = TRUE
-  )
+  ## edit records with new model file
+  purrr::walk(table_recs, function(tbl_rec){
+    tbl_file <- nmrec::get_record_option(tbl_rec, "file")
+    txt <- gsub(
+      paste0(based_on, .suffixes),
+      paste0(mod_id, "\\1"),
+      tbl_file$value,
+      ignore.case = TRUE
+    )
+    tbl_file$value <- txt
+  })
+
 
   ## write updated model file
-  write_lines(txt, modelfile)
+  nmrec::write_ctl(mod_str, modelfile)
 
   ## return model to make this a pipeable function
   return(invisible(.mod))
