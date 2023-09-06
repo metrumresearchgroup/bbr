@@ -89,9 +89,12 @@ nm_table_files <- function(.mod, .check_exists = TRUE) {
 
   # get file names from table statements and construct paths
   .f <- nmrec::select_records(.l, "table") %>%
-    purrr::map_chr(function(.x) nmrec::get_record_option(.x, "file")$value) %>%
-    str_replace("^\\.\\/", "") %>%
+    purrr::map(function(.x) nmrec::get_record_option(.x, "file")$value) %>%
+    unlist() %>% str_replace("^\\.\\/", "") %>%
     file.path(out_dir, .)
+
+  # Coerce to the same type of quote
+  .f <- sub("^'(.*)'$", "\\1", .f) %>% sub('^"(.*)"$', "\\1", .)
 
   if(rlang::is_empty(.f)){
     stop(glue("No table files were found in {.p}"))
