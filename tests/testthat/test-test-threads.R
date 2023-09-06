@@ -43,7 +43,7 @@ get_est_options <- function(mods, search_opts = c("maxeval", "niter", "nburn")){
       }) %>% purrr::flatten_dbl()
 
       if(!rlang::is_empty(opts)) opts else NULL
-    })  #%>% purrr::flatten_dbl()
+    })
     mod_est_opts %>% stats::setNames(rec_names) %>% purrr::compact()
   })
   est_opts %>% stats::setNames(mod_names)
@@ -137,7 +137,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     # Dont overwrite NBURN if set to 0
     max_evals <- get_est_options(mods_complex)
 
-    # Confirm that estimation method didnt change, and that MAXEVAL/NITER was preserved
+    # Confirm that MAXEVAL/NITER was preserved
     for(i in seq_along(max_evals)){
       max_evals_i <- unlist(max_evals[[i]])
       is_nburn_opt <- grep("(?i)nburn", names(max_evals_i))
@@ -160,7 +160,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     for(i in seq_along(max_evals)){
       max_evals_i <- unlist(unname(max_evals[[i]]))
       expect_identical(unname(max_evals_i), c(100, 100, 100, 100))
-      # Confirm that estimation method didnt change, and that MAXEVAL/NITER was preserved
+      # Confirm that MAXEVAL/NITER was preserved
       # This also confirms that NBURN is added when only NITER is specified (EST record 2) (recursive test)
       expect_identical(names(max_evals_i), c("NITER", "NBURN", "NITER", "NBURN"))
     }
@@ -188,7 +188,8 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
 
   test_that("test_threads(.dry_run=T) correctly changes maxeval/niter: handles different spelling [BBR-TSTT-002]", {
-    # recursive test from adding `nmrec` dependency - lower case and different spellings previously not supported
+    # Prior to adding the `nmrec` dependency, lower case and different spellings were not supported
+    # Test that expected variations (defined within nmrec) are now supported
     mod_complex_path <- mod_complex$absolute_model_path
     mod_lines <- get_model_path(mod_complex) %>% readLines()
 
@@ -220,7 +221,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
         expect_equal(names(max_evals_i), c("MAXEVAL", "NITER", "nburn"))
       }
     }
-    delete_models(c(list(mod_complex_edit), mods_fake), .force = T)
+    delete_models(c(list(mod_complex_edit), mods_fake), .force = TRUE)
   })
 
   test_that("test_threads(.dry_run=T) threads are set correctly [BBR-TSTT-003]", {
