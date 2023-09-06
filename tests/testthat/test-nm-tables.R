@@ -75,3 +75,21 @@ test_that("nm_table_files() errors with non-existent file [BBR-NMT-003]", {
   )
 })
 
+test_that("nm_table_files() works with indirect filename set (no equals sign) [BBR-NMT-003]", {
+  # This tests that "TABLE FILE {filename}" is valid, rather than "TABLE FILE={filename}"
+  # Support for this was added via the nmrec dependency
+  perturb_file(get_model_path(MOD1), txt = "\n$TABLE NUM CL KA FILE ./fake\n")
+
+  res <- nm_table_files(MOD1, .check_exists = FALSE)
+  expect_true(all(fs::is_absolute_path(res)))
+  expect_equal(basename(res), c(MOD1_TABLE_FILES, "fake"))
+})
+
+test_that("nm_table_files() works if no filename is present [BBR-NMT-003]", {
+  # Table records with no specified filename will be filtered out
+  perturb_file(get_model_path(MOD1), txt = "\n$TABLE NUM CL KA\n")
+
+  res <- nm_table_files(MOD1, .check_exists = FALSE)
+  expect_true(all(fs::is_absolute_path(res)))
+  expect_equal(basename(res), MOD1_TABLE_FILES)
+})
