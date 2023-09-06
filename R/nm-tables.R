@@ -89,7 +89,7 @@ nm_table_files <- function(.mod, .check_exists = TRUE) {
 
   # get file names from table statements and construct paths
   .f <- nmrec::select_records(.l, "table") %>%
-    purrr::map_chr(~nmrec::get_record_option(.x, "file")$value) %>%
+    purrr::map_chr(function(.x) nmrec::get_record_option(.x, "file")$value) %>%
     str_replace("^\\.\\/", "") %>%
     file.path(out_dir, .)
 
