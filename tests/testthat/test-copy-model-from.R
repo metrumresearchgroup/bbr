@@ -213,3 +213,39 @@ test_that("copy_model_from(.new_model=NULL) errors when no models are valid inte
     new_mod2 <- copy_model_from(new_mod1)
   }, regexp = "no models.+integer")
 })
+
+test_that("copy_model_from works with various PROBLEM declarations [BBR-CMF-007]", {
+  withr::defer(cleanup())
+
+  get_prob_statement <- function(.mod){
+    ctl <- nmrec::read_ctl(get_model_path(.mod))
+    prob_rec <- nmrec::select_records(ctl, "prob")[[1]]
+    gsub("\n", "", prob_rec$format())
+  }
+
+  # Test $PROB{newline}
+  mod_content <- readLines(ctl_ext(MOD1_PATH))
+  mod_content[1] <- "$PROBLEM"
+  mod_content <- mod_content %>% paste(collapse = "\n")
+  temp_mod_path <- create_temp_model(mod_content = mod_content)
+  temp_mod <- read_model(temp_mod_path)
+
+  new_mod_path <- "newline"
+  new_mod <- copy_model_from(temp_mod, new_mod_path, .overwrite = TRUE)
+  expect_equal(
+    get_prob_statement(new_mod),
+    sprintf("$PROBLEM From bbr: see %s.yaml for details", new_mod_path)
+  )
+
+  # Test no PROBLEM line
+  mod_content <- readLines(ctl_ext(MOD1_PATH))
+  mod_content <- mod_content[-1] %>% paste(collapse = "\n")
+  temp_mod_path <- create_temp_model(mod_content = mod_content)
+  temp_mod <- read_model(temp_mod_path)
+
+  new_mod_path <- "no_prob"
+  expect_warning(
+    new_mod <- copy_model_from(temp_mod, new_mod_path, .overwrite = TRUE),
+    regexp = ".update_model_file = TRUE was not performed"
+  )
+})
