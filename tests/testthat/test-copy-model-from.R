@@ -223,6 +223,20 @@ test_that("copy_model_from works with various PROBLEM declarations [BBR-CMF-007]
     gsub("\n", "", prob_rec$format())
   }
 
+  # Test lower case ($prob)
+  mod_content <- readLines(ctl_ext(MOD1_PATH))
+  mod_content[1] <- gsub("PROBLEM", "problem", mod_content[1])
+  mod_content <- mod_content %>% paste(collapse = "\n")
+  temp_mod_path <- create_temp_model(mod_content = mod_content)
+  temp_mod <- read_model(temp_mod_path)
+
+  new_mod_path <- "lowercase"
+  new_mod <- copy_model_from(temp_mod, new_mod_path, .overwrite = TRUE)
+  expect_equal(
+    get_prob_statement(new_mod),
+    sprintf("$problem From bbr: see %s.yaml for details", new_mod_path)
+  )
+
   # Test $PROB{newline}
   mod_content <- readLines(ctl_ext(MOD1_PATH))
   mod_content[1] <- "$PROBLEM"
