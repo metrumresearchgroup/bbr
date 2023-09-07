@@ -84,16 +84,19 @@ nm_tables <- function(
 #' @export
 nm_table_files <- function(.mod, .check_exists = TRUE) {
   .p <- get_model_path(.mod)
-  .l <- parse_ctl_to_list(.p)
+  .l <- nmrec::read_ctl(.p)
   out_dir <- get_output_dir(.mod, .check_exists = .check_exists)
 
   # get file names from table statements and construct paths
-  .f <- .l[grep("^TAB", names(.l))] %>%
-    map_chr(~paste(.x, collapse = " ")) %>%
-    str_extract("\\bFILE\\s*=\\s*([^ ]+)") %>%
-    str_replace("\\bFILE\\s*=\\s*", "") %>%
-    str_replace("^\\.\\/", "") %>%
-    file.path(out_dir, .)
+  .f <- nmrec::select_records(.l, "table") %>%
+    purrr::map(function(.x) nmrec::get_record_option(.x, "file")$value) %>%
+    unlist() %>% str_replace("^\\.\\/", "")
+
+  # Unquote file paths
+  .f <- unquote_filename(.f)
+
+  # Absolute paths
+  .f <- .f %>% file.path(out_dir, .)
 
   if(rlang::is_empty(.f)){
     stop(glue("No table files were found in {.p}"))
@@ -157,4 +160,17 @@ parse_ctl_to_list <- function(.path) {
   names(spec) <- labs
 
   return(spec)
+}
+
+#' Unquote file paths for inclusion within a NONMEM control file
+#'
+#' @param .files vector of file paths
+#'
+#' @keywords internal
+unquote_filename <- function(.files){
+  quoted <- grepl("^'.*'$", .files) | grepl('^".*"$', .files)
+  if (any(quoted)) {
+    .files[quoted] <- stringr::str_sub(.files[quoted], 2, -2)
+  }
+  return(.files)
 }
