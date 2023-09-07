@@ -20,25 +20,33 @@ cleanup_bbi <- function(.recreate_dir = FALSE) {
 cleanup_bbi(.recreate_dir = TRUE)
 
 
-get_est_options <- function(search_str = "MAXEVAL|NITER|NBURN", mods){
+get_est_options <- function(mods, search_opts = c("maxeval", "niter", "nburn")){
 
-  max_evals <- map(mods, function(.mod){
+  mod_names <- purrr::map_chr(mods, ~ basename(.x$absolute_model_path))
+  est_opts <- map(mods, function(.mod){
     mod_path <- get_model_path(.mod)
     mod_lines <- mod_path %>% readLines()
-    str_line_loc <- which(grepl(search_str, mod_lines))
-    str_values <- str_split(mod_lines[str_line_loc], " ")
+    ctl <- nmrec::parse_ctl(mod_lines)
+    ests <- nmrec::select_records(ctl, "est")
 
-    values <- map(1:length(str_values), ~ {
-      est_loc <- grepl("METHOD", str_values[[.x]])
-      est_method <- str_values[[.x]][est_loc]
-      str_loc <- grepl(search_str, str_values[[.x]])
-      eval_method <- gsub('[[:digit:]]+|=', '', str_values[[.x]][str_loc])
-      value <- as.numeric(gsub(glue('{search_str}|='), '', str_values[[.x]][str_loc]))
-      names(value) = paste0(est_method, ", ",eval_method)
-      value
-    }) %>% unlist()
+    rec_names <- paste0("est_rec_", seq_along(ests))
+    mod_est_opts <- purrr::map(ests, function(est_i){
+      opts <- purrr::map(search_opts, ~{
+        opt <- nmrec::get_record_option(est_i, .x)
+        if(!is.null(opt)){
+          val <- as.numeric(opt$value)
+          names(val) <- opt$name_raw
+          val
+        } else{
+          NULL
+        }
+      }) %>% purrr::flatten_dbl()
+
+      if(!rlang::is_empty(opts)) opts else NULL
+    })
+    mod_est_opts %>% stats::setNames(rec_names) %>% purrr::compact()
   })
-  max_evals
+  est_opts %>% stats::setNames(mod_names)
 }
 
 withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
@@ -110,15 +118,15 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   test_that("test_threads(.dry_run=T) correctly changes maxeval/niter: changes only one method [BBR-TSTT-002]", {
 
-    max_evals <- get_est_options("MAXEVAL|NITER|NBURN", mods)
-    expect_true(all(max_evals == 100))
+    max_evals <- get_est_options(mods)
+    expect_true(all(unlist(max_evals) == 100))
 
     # Test that MAX works
     mods_complex3 <- test_threads(mod_complex3, .threads = c(2, 4), .cap_iterations = 100, .mode = "local", .dry_run = TRUE)
 
-    max_evals <- get_est_options("MAXEVAL|NITER|NBURN|MAX", mods_complex3) # No estimation method provided here
+    max_evals <- get_est_options(mods_complex3) # No estimation method provided here
 
-    expect_true(all(max_evals == 100))
+    expect_true(all(unlist(max_evals) == 100))
   })
 
 
@@ -127,12 +135,15 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     mods_complex <- test_threads(mod_complex, .threads = c(2, 4), .cap_iterations = 100, .mode = "local", .dry_run = TRUE)
 
     # Dont overwrite NBURN if set to 0
-    max_evals <- get_est_options("MAXEVAL|NITER|NBURN", mods_complex)
+    max_evals <- get_est_options(mods_complex)
 
+    # Confirm that MAXEVAL/NITER was preserved
     for(i in seq_along(max_evals)){
-      expect_identical(unname(max_evals[[i]]), c(100, 0, 100))
-      # Confirm that estimation method didnt change, and that MAXEVAL/NITER was preserved
-      expect_identical(names(max_evals[[i]]), c("METHOD=1, MAXEVAL", "METHOD=BAYES, NBURN", "METHOD=BAYES, NITER"))
+      max_evals_i <- unlist(max_evals[[i]])
+      is_nburn_opt <- grep("(?i)nburn", names(max_evals_i))
+      expect_true(all(max_evals_i[is_nburn_opt] == 0))
+      expect_true(length(is_nburn_opt) == 1)
+      expect_true(all(max_evals_i[!is_nburn_opt] == 100))
     }
   })
 
@@ -140,17 +151,18 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
     expect_message(
       mods_complex2 <- test_threads(mod_complex2, .threads = c(2, 4), .cap_iterations = 100, .mode = "local", .dry_run = TRUE),
-      "Adding NBURN declaration"
+      "Adding NBURN"
     )
 
     # Overwrite NBURN since was set to value other than 0
-    max_evals <- get_est_options("MAXEVAL|NITER|NBURN", mods_complex2)
+    max_evals <- get_est_options(mods_complex2)
 
     for(i in seq_along(max_evals)){
-      expect_identical(unname(max_evals[[i]]), c(100, 100, 100, 100))
-      # Confirm that estimation method didnt change, and that MAXEVAL/NITER was preserved
-      # This also confirms that NBURN is added when only NITER is specified (recursive test)
-      expect_identical(names(max_evals[[i]]), c("METHOD=SAEM, NBURN", "METHOD=SAEM, NITER", "METHOD=IMP, NITER", "METHOD=IMP, NBURN"))
+      max_evals_i <- unlist(unname(max_evals[[i]]))
+      expect_identical(unname(max_evals_i), c(100, 100, 100, 100))
+      # Confirm that MAXEVAL/NITER was preserved
+      # This also confirms that NBURN is added when only NITER is specified (EST record 2) (recursive test)
+      expect_identical(names(max_evals_i), c("NITER", "NBURN", "NITER", "NBURN"))
     }
   })
 
@@ -158,11 +170,12 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
     mods_complex <- test_threads(mod_complex, .threads = c(2, 4), .cap_iterations = NULL, .mode = "local", .dry_run = TRUE)
 
-    max_evals <- get_est_options("MAXEVAL|NITER|NBURN", mods_complex)
+    max_evals <- get_est_options(mods_complex)
 
     for(i in 1:length(max_evals)){
-      expect_equal(unname(max_evals[[i]]), c(9999, 0, 10))
-      expect_equal(names(max_evals[[i]]), c("METHOD=1, MAXEVAL", "METHOD=BAYES, NBURN", "METHOD=BAYES, NITER"))
+      max_evals_i <- unlist(unname(max_evals[[i]]))
+      expect_equal(unname(max_evals_i), c(9999, 10, 0))
+      expect_equal(names(max_evals_i), c("MAXEVAL", "NITER", "NBURN"))
     }
   })
 
@@ -173,56 +186,49 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     )
   })
 
+
+  test_that("test_threads(.dry_run=T) correctly changes maxeval/niter: handles different spelling [BBR-TSTT-002]", {
+    # Prior to adding the `nmrec` dependency, lower case and different spellings were not supported
+    # Test that expected variations (defined within nmrec) are now supported
+    mod_complex_path <- mod_complex$absolute_model_path
+    mod_lines <- get_model_path(mod_complex) %>% readLines()
+
+    # replace NBURN=0 with nburn=10 (0 wont be overwritten by test_threads)
+    nburn_loc <- grep("(?i)NBURN", mod_lines)
+    mod_lines[nburn_loc] <- gsub("NBURN=0", "nburn=10", mod_lines[nburn_loc])
+    new_mod_name <- paste0(mod_complex_path, "_fake")
+    writeLines(mod_lines, ctl_ext(new_mod_name))
+
+    mod_complex_edit <- new_model(
+      file.path(MODEL_DIR_BBI, basename(new_mod_name)),
+      .tags = c("test threads"), # for deletion purposes
+      .bbi_args = list(overwrite = TRUE, threads = 2),
+    )
+
+    mods_fake <- test_threads(mod_complex_edit, .threads = c(2, 4), .cap_iterations = 5, .mode = "local", .dry_run = TRUE)
+    max_evals <- get_est_options(c(list(mod_complex, mod_complex_edit), mods_fake))
+
+    for(i in 1:length(max_evals)){
+      max_evals_i <- unlist(unname(max_evals[[i]]))
+      if(i == 1){ # Original model (for clarity)
+        expect_equal(unname(max_evals_i), c(9999, 10, 0))
+        expect_equal(names(max_evals_i), c("MAXEVAL", "NITER", "NBURN"))
+      }else if (i==2){ # modified model (NBURN=0 --> nburn=10)
+        expect_equal(unname(max_evals_i), c(9999, 10, 10))
+        expect_equal(names(max_evals_i), c("MAXEVAL", "NITER", "nburn"))
+      }else{ # created with test_threads (capped iterations)
+        expect_equal(unname(max_evals_i), c(5, 5, 5))
+        expect_equal(names(max_evals_i), c("MAXEVAL", "NITER", "nburn"))
+      }
+    }
+    delete_models(c(list(mod_complex_edit), mods_fake), .force = TRUE)
+  })
+
   test_that("test_threads(.dry_run=T) threads are set correctly [BBR-TSTT-003]", {
     mod_threads <- lapply(mods, function(mod.x){mod.x$bbi_args$threads}) %>% unlist()
     expect_equal(mod_threads[1], 2)
     expect_equal(mod_threads[2], 4)
   })
-
-
-  test_that("get_est_idx() works correctly: models [BBR-TSTT-004]", {
-    mod_lines <- mod_complex %>% get_model_path() %>% readLines()
-    expect_equal(get_est_idx(mod_lines) %>% unlist(), c(38, 39, 40))
-
-    mod_lines <- mod_complex2 %>% get_model_path() %>% readLines()
-    expect_equal(get_est_idx(mod_lines) %>% unlist(), c(111:115))
-    expect_equal(get_est_idx(mod_lines)[[1]], c(111:113))
-    expect_equal(get_est_idx(mod_lines)[[2]], c(114:115))
-
-    mod_lines <- mod_complex3 %>% get_model_path() %>% readLines()
-    expect_equal(get_est_idx(mod_lines)[[1]], 50)
-
-  })
-
-  test_that("get_est_idx() works correctly: custom text [BBR-TSTT-004]", {
-    # Multiple lines per $EST, without leading spaces
-    mod_lines <- c(
-      "$EST METHOD=SAEM NBURN=3000 NITER=2000 PRINT=10 ISAMPLE=2",
-      "ISAMPLE_M1=1 ISAMPLE_M2=1 ISAMPLE_M3=1",
-      "CTYPE=3 CITER=10 CALPHA=0.05",
-      "$EST METHOD=IMP INTERACTION EONLY=1 NITER=5 ISAMPLE=3000 PRINT=1 SIGL=8 SEED=123334",
-      "CTYPE=3 CITER=10 CALPHA=0.05"
-    )
-    est_idxs <- get_est_idx(mod_lines)
-    expect_equal(est_idxs %>% unlist(), c(1:5))
-    expect_equal(est_idxs[[1]], c(1:3))
-    expect_equal(est_idxs[[2]], c(4:5))
-
-    # Multiple lines per $EST, with variable amount of leading spaces
-    mod_lines <- c(
-      " $EST METHOD=SAEM NBURN=3000 NITER=2000 PRINT=10 ISAMPLE=2",
-      "  ISAMPLE_M1=1 ISAMPLE_M2=1 ISAMPLE_M3=1",
-      "   CTYPE=3 CITER=10 CALPHA=0.05",
-      "    $EST METHOD=IMP INTERACTION EONLY=1 NITER=5 ISAMPLE=3000 PRINT=1 SIGL=8 SEED=123334",
-      "     CTYPE=3 CITER=10 CALPHA=0.05"
-    )
-    est_idxs <- get_est_idx(mod_lines)
-    expect_equal(est_idxs %>% unlist(), c(1:5))
-    expect_equal(est_idxs[[1]], c(1:3))
-    expect_equal(est_idxs[[2]], c(4:5))
-
-  })
-
 
   test_that("check_run_times() returns NA for dry runs [BBR-CRT-007]", {
     skip_if_old_bbi("3.2.0")

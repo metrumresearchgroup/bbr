@@ -987,10 +987,6 @@ TSTT-R003:
   description: test_threads(.dry_run=T) threads are set correctly
   tests:
   - BBR-TSTT-003
-TSTT-R004:
-  description: get_est_idx() works correctly
-  tests:
-  - BBR-TSTT-004
 STAR-R001:
   description: Model object and YAML should have a boolean star attribute
   tests:
