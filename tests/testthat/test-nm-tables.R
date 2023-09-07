@@ -93,3 +93,22 @@ test_that("nm_table_files() works if no filename is present [BBR-NMT-003]", {
   expect_true(all(fs::is_absolute_path(res)))
   expect_equal(basename(res), MOD1_TABLE_FILES)
 })
+
+test_that("nm_table_files() works with quoted file paths [BBR-NMT-003]", {
+  new_files <- c("'\"1fake.tab\"'", "\"'2fake.tab'\"")
+  new_tables <- paste0(
+    glue::glue("\n\n$TABLE NUM CL KA FILE={new_files[1]}\n\n"),
+    glue::glue("$TABLE NUM CL KA FILE={new_files[2]}\n\n")
+    )
+  perturb_file(get_model_path(MOD1), txt = new_tables)
+
+  res <- nm_table_files(MOD1, .check_exists = FALSE)
+  expect_true(all(fs::is_absolute_path(res)))
+  new_paths <- res[-grep(paste(MOD1_TABLE_FILES, collapse = "|"), res)]
+
+  expect_equal(
+    basename(new_paths),
+    c("\"1fake.tab\"", "'2fake.tab'")
+  )
+
+})
