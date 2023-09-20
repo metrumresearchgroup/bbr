@@ -6,16 +6,16 @@
 \usage{
 inherit_param_estimates(
   .mod,
-  .parent_mod = get_based_on(.mod),
+  .mod_inherit_path = get_based_on(.mod),
   .inherit = c("theta", "sigma")
 )
 }
 \arguments{
 \item{.mod}{new model object to overwrite.}
 
-\item{.parent_mod}{model path to inherit properties from.}
+\item{.mod_inherit_path}{model path to inherit properties from.}
 
-\item{.inherit}{vector of estimates to inherit from parent model.}
+\item{.inherit}{type of estimates to inherit from parent model.}
 }
 \description{
 Inherit parameter estimates
