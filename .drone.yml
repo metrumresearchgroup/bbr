@@ -34,8 +34,6 @@ steps:
   image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:latest
   commands:
   - R -s -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
-  - git clone --depth 1 https://github.com/metrumresearchgroup/nmrec.git /tmp/nmrec
-  - R -s -e 'devtools::install("/tmp/nmrec", upgrade = "never")'
   - R -s -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
   environment:
     BBI_EXE_PATH: /ephemeral/bbi
@@ -49,8 +47,6 @@ steps:
   image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.1:latest
   commands:
   - R -s -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
-  - git clone --depth 1 https://github.com/metrumresearchgroup/nmrec.git /tmp/nmrec
-  - R -s -e 'devtools::install("/tmp/nmrec", upgrade = "never")'
   - R -s -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
   environment:
     BBI_EXE_PATH: /ephemeral/bbi
@@ -104,6 +100,7 @@ steps:
   image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:2020-06-08
   commands:
   - R -s -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
+  # nmrec isn't available until the 2023-09-19 snapshot.
   - git clone --depth 1 https://github.com/metrumresearchgroup/nmrec.git /tmp/nmrec
   - R -s -e 'devtools::install("/tmp/nmrec", upgrade = "never")'
   - R -s -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
@@ -161,8 +158,6 @@ steps:
   image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:cran-latest
   commands:
   - R -s -e 'devtools::install_deps(upgrade = '"'"'always'"'"')'
-  - git clone --depth 1 https://github.com/metrumresearchgroup/nmrec.git /tmp/nmrec
-  - R -s -e 'devtools::install("/tmp/nmrec", upgrade = "never")'
   - R -s -e 'devtools::load_all(); sessioninfo::session_info()'
   - R -s -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
   environment:
@@ -178,8 +173,6 @@ steps:
   image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.1:cran-latest
   commands:
   - R -s -e 'devtools::install_deps(upgrade = '"'"'always'"'"')'
-  - git clone --depth 1 https://github.com/metrumresearchgroup/nmrec.git /tmp/nmrec
-  - R -s -e 'devtools::install("/tmp/nmrec", upgrade = "never")'
   - R -s -e 'devtools::load_all(); sessioninfo::session_info()'
   - R -s -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
   environment:
@@ -235,8 +228,6 @@ steps:
   image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.1:latest
   commands:
   - R -s -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
-  - git clone --depth 1 https://github.com/metrumresearchgroup/nmrec.git /tmp/nmrec
-  - R -s -e 'devtools::install("/tmp/nmrec", upgrade = "never")'
   - R -s -e 'covr::codecov()'
   environment:
     BBI_EXE_PATH: /ephemeral/bbi
