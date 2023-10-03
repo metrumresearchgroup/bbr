@@ -7,7 +7,9 @@
 inherit_param_estimates(
   .mod,
   .mod_inherit_path = get_based_on(.mod),
-  .inherit = c("theta", "sigma")
+  .inherit = c("theta", "sigma"),
+  .bounds_opts = c("starting_val"),
+  .digits = 3
 )
 }
 \arguments{

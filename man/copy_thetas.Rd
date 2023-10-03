@@ -4,12 +4,10 @@
 \alias{copy_thetas}
 \title{Copy theta records from one model to another}
 \usage{
-copy_thetas(.mod_inherit_path, .mod_path, .new_thetas)
+copy_thetas(.mod_lines, .new_thetas)
 }
 \arguments{
-\item{.mod_inherit_path}{model path to inherit properties from.}
-
-\item{.mod_path}{model path to overwrite}
+\item{.mod_lines}{lines of ctl file. Must be an \code{nmrec} \code{nmrec_ctl_records} object.}
 
 \item{.new_thetas}{list of new theta vectors, or a single theta vector}
 }

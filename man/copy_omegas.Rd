@@ -4,12 +4,10 @@
 \alias{copy_omegas}
 \title{Copy omega records from one model to another}
 \usage{
-copy_omegas(.mod_inherit_path, .mod_path, .new_omegas)
+copy_omegas(.mod_lines, .new_omegas)
 }
 \arguments{
-\item{.mod_inherit_path}{model path to inherit properties from.}
-
-\item{.mod_path}{model path to overwrite}
+\item{.mod_lines}{lines of ctl file. Must be an \code{nmrec} \code{nmrec_ctl_records} object.}
 
 \item{.new_omegas}{list of new omega matrices, or a single omega matrix}
 }

@@ -4,12 +4,10 @@
 \alias{copy_sigmas}
 \title{Copy sigma records from one model to another}
 \usage{
-copy_sigmas(.mod_inherit_path, .mod_path, .new_sigmas)
+copy_sigmas(.mod_lines, .new_sigmas)
 }
 \arguments{
-\item{.mod_inherit_path}{model path to inherit properties from.}
-
-\item{.mod_path}{model path to overwrite}
+\item{.mod_lines}{lines of ctl file. Must be an \code{nmrec} \code{nmrec_ctl_records} object.}
 
 \item{.new_sigmas}{list of new sigma matrices, or a single sigma matrix}
 }

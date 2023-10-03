@@ -10,7 +10,13 @@ BBR_ESTIMATES_INHERIT <- c("theta", "sigma", "omega")
 #' @param .inherit type of estimates to inherit from parent model.
 #'
 #' @export
-inherit_param_estimates <- function(.mod, .mod_inherit_path = get_based_on(.mod), .inherit = c("theta", "sigma")){
+inherit_param_estimates <- function(
+    .mod,
+    .mod_inherit_path = get_based_on(.mod),
+    .inherit = c("theta", "sigma"),
+    .bounds_opts = c("starting_val"),
+    .digits = 3
+){
 
   checkmate::assert_true(all(.inherit %in% BBR_ESTIMATES_INHERIT))
 
@@ -32,30 +38,33 @@ inherit_param_estimates <- function(.mod, .mod_inherit_path = get_based_on(.mod)
   # Parent model objects
   based_on_mod <- read_model(.mod_inherit_path)
   based_on_sum <- model_summary(based_on_mod)
+  inherit_mod_lines <- nmrec::read_ctl(ctl_ext(.mod_inherit_path))
 
   # TODO: new_thetas, new_omegas, and new_sigmas will have to be formatted
   # if more than one record is being replaced (list)
+  # `setup_param_records` will ensure the replacement is of the required length
 
-  # TODO: each update block resets inheriting model (only the last update will render)
-  # refactor for all updates to work.
 
   # Update THETA Block
   if("theta" %in% .inherit){
-    new_thetas <- based_on_sum %>% get_theta() %>% unname()
-    copy_thetas(.mod_inherit_path, .mod_path, .new_thetas = new_thetas)
+    new_thetas <- based_on_sum %>% get_theta() %>% signif(digits = .digits) %>% unname()
+    copy_thetas(inherit_mod_lines, .new_thetas = new_thetas)
   }
 
   # Update OMEGA Block
   if("omega" %in% .inherit){
-    new_omegas <- based_on_sum %>% get_omega()
-    copy_omegas(.mod_inherit_path, .mod_path, .new_omegas = new_omegas)
+    new_omegas <- based_on_sum %>% get_omega() %>% signif(digits = .digits)
+    copy_omegas(inherit_mod_lines, .new_omegas = new_omegas)
   }
 
   # Update SIGMA Block
   if("sigma" %in% .inherit){
-    new_sigmas <- based_on_sum %>% get_sigma()
-    copy_sigmas(.mod_inherit_path, .mod_path, .new_sigmas = new_sigmas)
+    new_sigmas <- based_on_sum %>% get_sigma() %>% signif(digits = .digits)
+    copy_sigmas(inherit_mod_lines, .new_sigmas = new_sigmas)
   }
+
+  # Write out updated model
+  nmrec::write_ctl(inherit_mod_lines, ctl_ext(.mod_path))
 
   return(invisible(.mod_inherit_path))
 }
@@ -63,18 +72,15 @@ inherit_param_estimates <- function(.mod, .mod_inherit_path = get_based_on(.mod)
 
 #' Copy theta records from one model to another
 #'
-#' @inheritParams inherit_param_estimates
-#' @param .mod_path model path to overwrite
+#' @param .mod_lines lines of ctl file. Must be an `nmrec` `nmrec_ctl_records` object.
 #' @param .new_thetas list of new theta vectors, or a single theta vector
 #'
 #' @keywords internal
-copy_thetas <- function(.mod_inherit_path, .mod_path, .new_thetas){
-
-  inherit_mod_lines <- ctl_ext(.mod_inherit_path) %>% nmrec::read_ctl()
+copy_thetas <- function(.mod_lines, .new_thetas){
 
   # Pull records and format replacement values
   param_setup <- setup_param_records(
-    inherit_mod_lines, .new_params = .new_thetas, .rec_type = "theta"
+    .mod_lines, .new_params = .new_thetas, .rec_type = "theta"
   )
   theta_recs <- param_setup$param_recs
   new_thetas <- param_setup$new_params
@@ -100,24 +106,20 @@ copy_thetas <- function(.mod_inherit_path, .mod_path, .new_thetas){
       })
     })
   })
-  nmrec::write_ctl(inherit_mod_lines, ctl_ext(.mod_path))
 }
 
 
 #' Copy sigma records from one model to another
 #'
-#' @inheritParams inherit_param_estimates
-#' @param .mod_path model path to overwrite
+#' @inheritParams copy_thetas
 #' @param .new_sigmas list of new sigma matrices, or a single sigma matrix
 #'
 #' @keywords internal
-copy_sigmas <- function(.mod_inherit_path, .mod_path, .new_sigmas){
-
-  inherit_mod_lines <- ctl_ext(.mod_inherit_path) %>% nmrec::read_ctl()
+copy_sigmas <- function(.mod_lines, .new_sigmas){
 
   # Pull records and format replacement values
   param_setup <- setup_param_records(
-    inherit_mod_lines, .new_params = .new_sigmas, .rec_type = "sigma"
+    .mod_lines, .new_params = .new_sigmas, .rec_type = "sigma"
   )
   sigma_recs <- param_setup$param_recs
   new_sigmas <- param_setup$new_params
@@ -143,24 +145,20 @@ copy_sigmas <- function(.mod_inherit_path, .mod_path, .new_sigmas){
       })
     })
   })
-  nmrec::write_ctl(inherit_mod_lines, ctl_ext(.mod_path))
 }
 
 
 #' Copy omega records from one model to another
 #'
-#' @inheritParams inherit_param_estimates
-#' @param .mod_path model path to overwrite
+#' @inheritParams copy_thetas
 #' @param .new_omegas list of new omega matrices, or a single omega matrix
 #'
 #' @keywords internal
-copy_omegas <- function(.mod_inherit_path, .mod_path, .new_omegas){
-
-  inherit_mod_lines <- ctl_ext(.mod_inherit_path) %>% nmrec::read_ctl()
+copy_omegas <- function(.mod_lines, .new_omegas){
 
   # Pull records and format replacement values
   param_setup <- setup_param_records(
-    inherit_mod_lines, .new_params = .new_omegas, .rec_type = "omega"
+    .mod_lines, .new_params = .new_omegas, .rec_type = "omega"
   )
   omega_recs <- param_setup$param_recs
   new_omegas <- param_setup$new_params
@@ -186,7 +184,6 @@ copy_omegas <- function(.mod_inherit_path, .mod_path, .new_omegas){
       })
     })
   })
-  nmrec::write_ctl(inherit_mod_lines, ctl_ext(.mod_path))
 }
 
 
@@ -196,7 +193,7 @@ copy_omegas <- function(.mod_inherit_path, .mod_path, .new_omegas){
 #' Extract records of a given type and filter out prior blocks. Replacement values
 #' and extracted records are formatted to be lists of equal length
 #'
-#' @param .inherit_mod_lines model lines as returned by `nmrec::read_ctl()`
+#' @param .mod_lines lines of ctl file. Must be an `nmrec` `nmrec_ctl_records` object
 #' @param .new_params Either a list for multiple replacements, or one of the following:
 #'        \describe{
 #'        \item{`.rec_type = 'theta'`}{a `vector` of replacement values}
@@ -205,12 +202,12 @@ copy_omegas <- function(.mod_inherit_path, .mod_path, .new_omegas){
 #' @param .rec_type Record type. One of `c("theta", "sigma", "omega")`
 #'
 #' @keywords internal
-setup_param_records <- function(.inherit_mod_lines, .new_params, .rec_type = BBR_ESTIMATES_INHERIT){
+setup_param_records <- function(.mod_lines, .new_params, .rec_type = BBR_ESTIMATES_INHERIT){
 
   .rec_type <- match.arg(.rec_type)
 
   # Get parameter records
-  param_recs <- nmrec::select_records(.inherit_mod_lines, .rec_type)
+  param_recs <- nmrec::select_records(.mod_lines, .rec_type)
 
   # Filter out prior records
   param_recs <- filter_prior_records(param_recs)
@@ -222,13 +219,17 @@ setup_param_records <- function(.inherit_mod_lines, .new_params, .rec_type = BBR
   # TODO: determine relevant specs of for each type that set the inheritance procedure
 
   # Matrix handling
+  cov_specified <- FALSE # TODO: determine if covariance is specified in ctl
   if(.rec_type %in% c("sigma", "omega")){
     matrix_types <- get_matrix_types(param_recs)
     .new_params <- purrr::map2(.new_params, matrix_types, function(new_params_i, mat_type){
-      if(is.null(mat_type)) return(new_params_i)
-      if(mat_type == "block"){
+      if(is.null(mat_type) || (mat_type == "block" && isFALSE(cov_specified))){
         # Grab diagonals for block matrices
+        new_params_i <- unname(diag(new_params_i))
+      }else if(mat_type == "block" & isTRUE(cov_specified)){
         new_params_i <- new_params_i[upper.tri(new_params_i, diag = TRUE)]
+      }else{
+        stop("add support")
       }
     })
   }
