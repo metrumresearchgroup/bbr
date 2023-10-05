@@ -202,46 +202,12 @@ make_fake_ctl <- function(
     .block = NULL
 ){
 
-  template_lines <- glue::glue("$PROBLEM {.prob}
+  template_lines <- glue::glue("$PROBLEM {.prob}\n\n{.block}") %>%
+    as.character() %>% strsplit("\n") %>% unlist()
 
-$INPUT ID TIME MDV EVID DV AMT  SEX WT ETN NUM
-$DATA ../../../../extdata/acop.csv IGNORE=@
-IGNORE(ID.EQ.2)
+  ctl <- nmrec::parse_ctl(template_lines)
 
-$SUBROUTINES ADVAN2 TRANS2
-$PK
-ET=1
-IF(ETN.EQ.3) ET=1.3
-KA = THETA(1)
-CL = THETA(2)*((WT/70)**0.75)* EXP(ETA(1))
-V = THETA(3)*EXP(ETA(2))
-SC=V
-
-{.block}
-
-$OMEGA
-0.05    ; iiv CL
-0.2     ; iiv V2
-
-$SIGMA
-1 FIX
-
-$ERROR
-IPRED = F
-IRES = DV-IPRED
-W = IPRED*THETA(4) + THETA(5)
-IF (W.EQ.0) W = 1
-IWRES = IRES/W
-Y= IPRED+W*ERR(1)
-FAKE=1 ; for testing
-
-$EST METHOD=1 INTERACTION MAXEVAL=9999 SIG=3 PRINT=5 NOABORT POSTHOC
-$COV
-$TABLE NUM IPRED NPDE CWRES NOPRINT ONEHEADER FILE=1.tab
-")
-
-  # Return nmrec object
-  return(nmrec::parse_ctl(template_lines))
+  return(ctl)
 }
 
 
@@ -293,6 +259,3 @@ get_example_record <- function(
   }
 }
 
-
-
-nmrec::select_records(PARSED_BLOCKS$ctl[[1]], "theta")
