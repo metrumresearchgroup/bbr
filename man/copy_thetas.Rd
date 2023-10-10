@@ -4,7 +4,7 @@
 \alias{copy_thetas}
 \title{Copy theta records from one model to another}
 \usage{
-copy_thetas(.mod_lines, .new_thetas)
+copy_thetas(.mod_lines, .new_thetas, .bounds_opts)
 }
 \arguments{
 \item{.mod_lines}{lines of ctl file. Must be an \code{nmrec} \code{nmrec_ctl_records} object.}

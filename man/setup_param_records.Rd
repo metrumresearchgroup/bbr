@@ -4,14 +4,10 @@
 \alias{setup_param_records}
 \title{Set up parameter records and replacement values}
 \usage{
-setup_param_records(
-  .inherit_mod_lines,
-  .new_params,
-  .rec_type = BBR_ESTIMATES_INHERIT
-)
+setup_param_records(.mod_lines, .new_params, .rec_type = BBR_ESTIMATES_INHERIT)
 }
 \arguments{
-\item{.inherit_mod_lines}{model lines as returned by \code{nmrec::read_ctl()}}
+\item{.mod_lines}{lines of ctl file. Must be an \code{nmrec} \code{nmrec_ctl_records} object}
 
 \item{.new_params}{Either a list for multiple replacements, or one of the following:
 \describe{

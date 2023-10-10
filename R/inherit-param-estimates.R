@@ -14,9 +14,11 @@ inherit_param_estimates <- function(
     .mod,
     .mod_inherit_path = get_based_on(.mod),
     .inherit = c("theta", "sigma"),
-    .bounds_opts = c("starting_val"),
+    .bounds_opts = c("maintain_bounds", "single_value"),
     .digits = 3
 ){
+
+  .bounds_opts <- match.arg(.bounds_opts)
 
   checkmate::assert_true(all(.inherit %in% BBR_ESTIMATES_INHERIT))
 
@@ -48,7 +50,7 @@ inherit_param_estimates <- function(
   # Update THETA Block
   if("theta" %in% .inherit){
     new_thetas <- based_on_sum %>% get_theta() %>% signif(digits = .digits) %>% unname()
-    copy_thetas(inherit_mod_lines, .new_thetas = new_thetas)
+    copy_thetas(inherit_mod_lines, .new_thetas = new_thetas, .bounds_opts = .bounds_opts)
   }
 
   # Update OMEGA Block
@@ -76,7 +78,7 @@ inherit_param_estimates <- function(
 #' @param .new_thetas list of new theta vectors, or a single theta vector
 #'
 #' @keywords internal
-copy_thetas <- function(.mod_lines, .new_thetas){
+copy_thetas <- function(.mod_lines, .new_thetas, .bounds_opts){
 
   # Pull records and format replacement values
   param_setup <- setup_param_records(
@@ -96,15 +98,7 @@ copy_thetas <- function(.mod_lines, .new_thetas){
 
     # Ensure replacement lengths are the same (TODO: handle this differently)
     checkmate::assert_true(length(new_thetas_i) == length(val_recs))
-
-    purrr::walk2(val_recs, new_thetas_i, function(rec_opt_i, theta_i){
-      # Inspect the position of each record, replace the value
-      purrr::walk(rec_opt_i$values, function(rec_opt_values){
-        if(inherits(rec_opt_values, "nmrec_option")){
-          rec_opt_values$value <- theta_i
-        }
-      })
-    })
+    modify_record_opt(val_recs, new_thetas_i, .bounds_opts)
   })
 }
 
@@ -135,15 +129,7 @@ copy_sigmas <- function(.mod_lines, .new_sigmas){
 
     # Ensure replacement lengths are the same (TODO: handle this differently)
     checkmate::assert_true(length(new_sigmas_i) == length(val_recs))
-
-    purrr::walk2(val_recs, new_sigmas_i, function(rec_opt_i, sigma_i){
-      # Inspect the position of each record, replace the value
-      purrr::walk(rec_opt_i$values, function(rec_opt_values){
-        if(inherits(rec_opt_values, "nmrec_option") && inherits(rec_opt_values, "nmrec_option_pos")){
-          rec_opt_values$value <- sigma_i
-        }
-      })
-    })
+    modify_record_opt(val_recs, new_sigmas_i, .bounds_opts)
   })
 }
 
@@ -169,7 +155,8 @@ copy_omegas <- function(.mod_lines, .new_omegas){
 
     # inspect each record - filter to value options
     val_recs <- purrr::keep(omega_rec$values, function(rec_opt){
-      inherits(rec_opt, "nmrec_option") && !inherits(rec_opt, c("nmrec_option_record_name", "nmrec_option_value"))
+      inherits(rec_opt, "nmrec_option") && !inherits(rec_opt, c("nmrec_option_record_name")) &&
+        !inherits(rec_opt, c("nmrec_option_value"))
     })
 
     # Ensure replacement lengths are the same (TODO: handle this differently)
@@ -332,3 +319,151 @@ get_matrix_types <- function(.blocks){
     }
   })
 }
+
+
+#' Determine the type of bounds (or fixed parameter) for model parameters
+#'
+#' This function determines the type of bounds specified for model parameters,
+#' limited to THETA, OMEGA, and SIGMA records in a NONMEM control stream file.
+#'
+#' @param .record_opt an `nmrec_option_nested` object to check
+#'
+#' @keywords internal
+get_param_bound_type <- function(.record_opt){
+
+  correct_str <- inherits(.record_opt, "nmrec_option_nested") &&
+    inherits(.record_opt, "nmrec_option_pos")
+  if(!correct_str){
+    cli::cli_abort(c("x" = "{.code .record_opt} is not in the correct format",
+                     "i" = "Record option should inherit {.code nmrec_option_nested}
+                     and {.code nmrec_option_pos}"))
+  }
+
+  # Check if option is bounded: in format (low, hi), or (low, start, hi)
+  is_bounded <- inspect_option_class(.record_opt, "nmrec_paren_open") &&
+    inspect_option_class(.record_opt, "nmrec_paren_close") &&
+    inspect_option_class(.record_opt, "nmrec_comma")
+
+  if(isFALSE(is_bounded)){
+    type <- "fixed"
+  }else{
+    num_vals <- inspect_option_class(.record_opt, "nmrec_option_pos", "count")
+    type <- dplyr::case_when(
+      num_vals == 2 ~ "bounds",
+      num_vals == 3 ~ "bounds_with_starting",
+      TRUE ~ NA_character_
+    )
+    if(is.na(type)) dev_error("unexpected record format")
+  }
+
+  return(type)
+}
+
+
+#' Determine if record option contains a specific class (count if desired)
+#' @param .record_opt an `nmrec_option_pos` object to check. *Can be* nested
+#'        (inherit class `nmrec_option_nested`).
+#' @param .class class or vector of classes to look for.
+#' @param .operation which operation to perform (i.e. what to return)
+#'     \describe{
+#'      \item{`'any'`}{Returns Logical (`TRUE`/`FALSE`): whether the `.class` is found in the record at all}
+#'      \item{`'count'`}{Returns Numeric: frequency(ies) of `.class`}
+#'      \item{`'index'`}{Returns Numeric: index(es) of `.class`}
+#'      }
+#' @param .inherits Either `'all'` or `'any'`. Only relevant if `class` is a vector.
+#'        If `.inherits = 'all'`, the classes must correspond to the same element.
+#'        If `.inherits = 'any'`, the classes can correspond to different elements.
+#'
+#' @keywords internal
+inspect_option_class <- function(
+    .record_opt,
+    .class,
+    .operation = c("any", "count", "index"),
+    .inherits = c("all", "any")
+){
+
+  .operation <- match.arg(.operation)
+  .inherits <- match.arg(.inherits)
+  is_nested <- inherits(.record_opt, "nmrec_option_nested")
+
+  check_class <- if(isTRUE(is_nested)){
+    purrr::map_lgl(.record_opt$values, \(.x){
+      checks <- purrr::map_lgl(.class, \(class_i) inherits(.x, class_i))
+      if(.inherits == "all") all(checks) else any(checks)
+    })
+  }else{
+    purrr::map_lgl(.class, \(class_i) inherits(.record_opt, class_i))
+  }
+
+
+  if(.operation == "any"){
+    any(check_class)
+  }else if(.operation == "count"){
+    length(check_class[check_class])
+  }else if(.operation == "index"){
+    which(check_class)
+  }
+}
+
+
+
+#' Modify an `nmrec` record option
+#'
+#' @inheritParams get_param_bound_type
+#'
+#' @keywords internal
+modify_record_opt <- function(val_recs, new_values, .bounds_opts){
+
+  # Iterate over a single record object (e.g., a THETA block)
+  purrr::walk2(val_recs, new_thetas_i, function(rec_opt_i, replacement_i){
+    # Get bound type
+    bound_type <- get_param_bound_type(rec_opt_i)
+
+    # Get location of values
+    val_locs <- inspect_option_class(rec_opt_i, c("nmrec_option_pos", "nmrec_option"), "index")
+
+    # Replace single value
+    if(bound_type == "fixed"){
+      rec_opt_i$values[[val_locs]] <- replacement_i
+    }else{
+      if(.bounds_opts == "single_value"){
+        # Remove bounds, replace with single value
+        index_keep <- c(
+          val_locs[1], # keep first value
+          # keep parentheses if present
+          inspect_option_class(
+            rec_opt_i, .class = c("nmrec_paren_open", "nmrec_paren_close"),
+            .operation = "index", .inherits = "any"
+          )
+        ) %>% sort()
+
+        rec_opt_i$values <- rec_opt_i$values[index_keep]
+        # Get new location of value and replace
+        val_loc_new <- inspect_option_class(rec_opt_i, c("nmrec_option_pos", "nmrec_option"), "index")
+        rec_opt_i$values[[val_loc_new]] <- replacement_i
+      }else if(.bounds_opts == "maintain_bounds"){
+        # Add starting value to bounds
+        if(bound_type == "bounds_with_starting"){
+          # If starting value already exists, overwrite it (middle value)
+          checkmate::assert_true(length(val_locs) == 3)
+          rec_opt_i$values[[val_locs[2]]] <- replacement_i
+        }else if(bound_type =="bounds"){
+          # If starting value does not exist, append it
+          checkmate::assert_true(length(val_locs) == 2)
+          # Create template position option
+          # TODO: much of this code may move to nmrec
+          new_opt_lst <- list(
+            nmrec:::elem_comma(), nmrec:::elem_whitespace(" "),
+            rec_opt_i$values[[val_locs[1]]]
+            )
+          rec_opt_i$values <- append(rec_opt_i$values, new_opt_lst, after = val_locs[1])
+          val_loc_new <- inspect_option_class(rec_opt_i, c("nmrec_option_pos", "nmrec_option"), "index")
+          rec_opt_i$values[[val_locs[2]]] <- replacement_i
+        }
+      }
+    }
+  })
+
+}
+
+
