@@ -153,7 +153,8 @@ test_that("copy_from_model .overwrite=FALSE works [BBR-CMF-005]", {
 })
 
 test_that("copy_model_from() supports `.new_model` containing a period [BBR-CMF-006]", {
-  temp_mod_path <- create_temp_model()
+  mod_content <- readLines(ctl_ext(MOD1_PATH)) %>% paste(collapse = "\n")
+  temp_mod_path <- create_temp_model(mod_content = mod_content)
   temp_mod <- read_model(temp_mod_path)
 
   temp_dir <- normalizePath(tempdir())
@@ -169,7 +170,6 @@ test_that("copy_model_from() supports `.new_model` containing a period [BBR-CMF-
   expect_true(inherits(new_mod, NM_MOD_CLASS))
   expect_true(fs::file_exists(new_ctl))
   expect_true(fs::file_exists(new_yaml))
-
 })
 
 test_that("copy_model_from(.new_model=NULL) increments to next integer by default [BBR-CMF-007]", {
@@ -212,4 +212,54 @@ test_that("copy_model_from(.new_model=NULL) errors when no models are valid inte
   expect_error({
     new_mod2 <- copy_model_from(new_mod1)
   }, regexp = "no models.+integer")
+})
+
+test_that("copy_model_from works with various PROBLEM declarations [BBR-CMF-007]", {
+  withr::defer(cleanup())
+
+  get_prob_statement <- function(.mod){
+    ctl <- nmrec::read_ctl(get_model_path(.mod))
+    prob_rec <- nmrec::select_records(ctl, "prob")[[1]]
+    gsub("\n", "", prob_rec$format())
+  }
+
+  # Test lower case ($prob)
+  mod_content <- readLines(ctl_ext(MOD1_PATH))
+  mod_content[1] <- gsub("PROBLEM", "problem", mod_content[1])
+  mod_content <- mod_content %>% paste(collapse = "\n")
+  temp_mod_path <- create_temp_model(mod_content = mod_content)
+  temp_mod <- read_model(temp_mod_path)
+
+  new_mod_path <- "lowercase"
+  new_mod <- copy_model_from(temp_mod, new_mod_path, .overwrite = TRUE)
+  expect_equal(
+    get_prob_statement(new_mod),
+    sprintf("$problem From bbr: see %s.yaml for details", new_mod_path)
+  )
+
+  # Test $PROB{newline}
+  mod_content <- readLines(ctl_ext(MOD1_PATH))
+  mod_content[1] <- "$PROBLEM"
+  mod_content <- mod_content %>% paste(collapse = "\n")
+  temp_mod_path <- create_temp_model(mod_content = mod_content)
+  temp_mod <- read_model(temp_mod_path)
+
+  new_mod_path <- "newline"
+  new_mod <- copy_model_from(temp_mod, new_mod_path, .overwrite = TRUE)
+  expect_equal(
+    get_prob_statement(new_mod),
+    sprintf("$PROBLEM From bbr: see %s.yaml for details", new_mod_path)
+  )
+
+  # Test no PROBLEM line
+  mod_content <- readLines(ctl_ext(MOD1_PATH))
+  mod_content <- mod_content[-1] %>% paste(collapse = "\n")
+  temp_mod_path <- create_temp_model(mod_content = mod_content)
+  temp_mod <- read_model(temp_mod_path)
+
+  new_mod_path <- "no_prob"
+  expect_warning(
+    new_mod <- copy_model_from(temp_mod, new_mod_path, .overwrite = TRUE),
+    regexp = ".update_model_file = TRUE was not performed"
+  )
 })

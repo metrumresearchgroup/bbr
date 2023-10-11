@@ -60,15 +60,15 @@
 #' @seealso [new_model()], [update_model_id()]
 #' @export
 copy_model_from <- function(
-  .parent_mod,
-  .new_model = NULL,
-  .description = NULL,
-  .based_on_additional = NULL,
-  .add_tags = NULL,
-  .star = NULL,
-  .inherit_tags = FALSE,
-  .update_model_file = TRUE,
-  .overwrite = FALSE
+    .parent_mod,
+    .new_model = NULL,
+    .description = NULL,
+    .based_on_additional = NULL,
+    .add_tags = NULL,
+    .star = NULL,
+    .inherit_tags = FALSE,
+    .update_model_file = TRUE,
+    .overwrite = FALSE
 ) {
   UseMethod("copy_model_from")
 }
@@ -76,15 +76,15 @@ copy_model_from <- function(
 #' @describeIn copy_model_from `.parent_mod` takes a `bbi_nonmem_model` object to use as a basis for the copy.
 #' @export
 copy_model_from.bbi_nonmem_model <- function(
-  .parent_mod,
-  .new_model = NULL,
-  .description = NULL,
-  .based_on_additional = NULL,
-  .add_tags = NULL,
-  .star = NULL,
-  .inherit_tags = FALSE,
-  .update_model_file = TRUE,
-  .overwrite = FALSE
+    .parent_mod,
+    .new_model = NULL,
+    .description = NULL,
+    .based_on_additional = NULL,
+    .add_tags = NULL,
+    .star = NULL,
+    .inherit_tags = FALSE,
+    .update_model_file = TRUE,
+    .overwrite = FALSE
 ) {
 
   .new_model <- build_new_model_path(.parent_mod, .new_model)
@@ -143,16 +143,16 @@ copy_model_from.bbi_nonmem_model <- function(
 #' @return S3 object with the same class as `.parent_mod`
 #' @keywords internal
 copy_model_from_impl <- function(
-  .parent_mod,
-  .new_model,
-  .description = NULL,
-  .based_on_additional = NULL,
-  .add_tags = NULL,
-  .star = NULL,
-  .inherit_tags = FALSE,
-  .update_model_file = TRUE,
-  .overwrite = FALSE,
-  setup_fn = NULL
+    .parent_mod,
+    .new_model,
+    .description = NULL,
+    .based_on_additional = NULL,
+    .add_tags = NULL,
+    .star = NULL,
+    .inherit_tags = FALSE,
+    .update_model_file = TRUE,
+    .overwrite = FALSE,
+    setup_fn = NULL
 ) {
   check_for_existing_model(.new_model, .overwrite)
 
@@ -222,17 +222,42 @@ copy_control_stream <- function(.parent_model_path, .new_model_path, .overwrite,
   if (.update_model_file) {
 
     # read parent control stream
-    mod_str <- .parent_model_path %>% read_file()
+    mod_str <- tryCatch(nmrec::read_ctl(.parent_model_path), error = identity)
 
-    # replace the $PROBLEM line(s)
-    new_mod_id <- get_model_id(.new_model_path)
-    mod_str <- str_replace(mod_str,
-                           "\\$PROB(.|\n)*?\\$",
-                           as.character(glue("$PROBLEM From bbr: see {new_mod_id}.yaml for details\n\n$")))
-    glue("")
+    if(inherits(mod_str, "error")){
+      warning(
+        glue::glue(".update_model_file = TRUE was not performed. Reason: {mod_str$message}")
+      )
+      fs::file_copy(.parent_model_path, .new_model_path)
+    }else{
+      # replace the $PROBLEM line(s)
+      new_mod_id <- get_model_id(.new_model_path)
+      prob_recs <- nmrec::select_records(mod_str, "prob")
+      if (length(prob_recs) != 1) {
+        dev_error("select_records should always return a single $PROBLEM record")
+      }
+      prob_rec <- prob_recs[[1]]
+      prob_str <- nmrec::get_record_option(prob_rec, "text")
+      new_prob_text <- as.character(glue("From bbr: see {new_mod_id}.yaml for details"))
+      if(is.null(prob_str)){
+        # NONMEM permits a bare "$PROB{newline}", in which case there won't be a text option.
+        prob_rec$parse()
+        idx <- purrr::detect_index(
+          prob_rec$values,
+          function(x) inherits(x, "nmrec_option_record_name")
+        )
+        if(idx == 0){
+          dev_error("Unsupported $PROBLEM record format")
+        }
+        prob_rec$values <- append(prob_rec$values, paste0(" ", new_prob_text), idx)
+      }else{
+        prob_str$value <- new_prob_text
+      }
 
-    # read parent control stream
-    write_file(mod_str, .new_model_path)
+      # write parent control stream
+      nmrec::write_ctl(mod_str, .new_model_path)
+    }
+
   } else {
     fs::file_copy(.parent_model_path, .new_model_path)
   }

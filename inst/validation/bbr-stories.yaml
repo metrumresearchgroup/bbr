@@ -393,7 +393,6 @@ RUN-S004:
   - TSTT-R001
   - TSTT-R002
   - TSTT-R003
-  - TSTT-R004
 SUM-S001:
   name: Summarize model outputs
   description: As a user, I want to be able to load outputs and diagnostics from a
