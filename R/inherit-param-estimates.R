@@ -13,7 +13,7 @@ BBR_ESTIMATES_INHERIT <- c("theta", "sigma", "omega")
 inherit_param_estimates <- function(
     .mod,
     .mod_inherit_path = get_based_on(.mod),
-    .inherit = c("theta", "sigma"),
+    .inherit = c("theta", "sigma", "omega"),
     .bounds_opts = c("maintain_bounds", "single_value"),
     .digits = 3
 ){
@@ -96,9 +96,9 @@ copy_thetas <- function(.mod_lines, .new_thetas, .bounds_opts){
       inherits(rec_opt, "nmrec_option") && !inherits(rec_opt, "nmrec_option_record_name")
     })
 
-    # Ensure replacement lengths are the same (TODO: handle this differently)
-    checkmate::assert_true(length(new_thetas_i) == length(val_recs))
-    modify_record_opt(val_recs, new_thetas_i, .bounds_opts)
+    # Ensure replacement lengths are the same
+    check_record_replacements(val_recs, new_thetas_i)
+    copy_record_opt(val_recs, new_thetas_i, .bounds_opts)
   })
 }
 
@@ -127,9 +127,9 @@ copy_sigmas <- function(.mod_lines, .new_sigmas){
       inherits(rec_opt, "nmrec_option") && !inherits(rec_opt, "nmrec_option_record_name")
     })
 
-    # Ensure replacement lengths are the same (TODO: handle this differently)
-    checkmate::assert_true(length(new_sigmas_i) == length(val_recs))
-    modify_record_opt(val_recs, new_sigmas_i, .bounds_opts)
+    # Ensure replacement lengths are the same
+    check_record_replacements(val_recs, new_sigmas_i)
+    copy_record_opt(val_recs, new_sigmas_i, .bounds_opts)
   })
 }
 
@@ -159,17 +159,9 @@ copy_omegas <- function(.mod_lines, .new_omegas){
         !inherits(rec_opt, c("nmrec_option_value"))
     })
 
-    # Ensure replacement lengths are the same (TODO: handle this differently)
-    checkmate::assert_true(length(new_omegas_i) == length(val_recs))
-
-    purrr::walk2(val_recs, new_omegas_i, function(rec_opt_i, omega_i){
-      # Inspect the position of each record, replace the value
-      purrr::walk(rec_opt_i$values, function(rec_opt_values){
-        if(inherits(rec_opt_values, "nmrec_option") && inherits(rec_opt_values, "nmrec_option_pos")){
-          rec_opt_values$value <- omega_i
-        }
-      })
-    })
+    # Ensure replacement lengths are the same
+    check_record_replacements(val_recs, new_omegas_i)
+    copy_record_opt(val_recs, new_omegas_i, .bounds_opts)
   })
 }
 
@@ -340,6 +332,7 @@ get_param_bound_type <- function(.record_opt){
   }
 
   # Check if option is bounded: in format (low, hi), or (low, start, hi)
+  # TODO: confirm that this approach is valid
   is_bounded <- inspect_option_class(.record_opt, "nmrec_paren_open") &&
     inspect_option_class(.record_opt, "nmrec_paren_close") &&
     inspect_option_class(.record_opt, "nmrec_comma")
@@ -407,15 +400,18 @@ inspect_option_class <- function(
 
 
 
-#' Modify an `nmrec` record option
+#' Overwrite an `nmrec` record option
 #'
-#' @inheritParams get_param_bound_type
+#' @param val_recs list of `nmrec` record options.
+#' @param new_values vector of replacement values. Should be the same length as
+#'        `val_recs`
+#' @inheritParams inherit_param_estimates
 #'
 #' @keywords internal
-modify_record_opt <- function(val_recs, new_values, .bounds_opts){
+copy_record_opt <- function(val_recs, new_values, .bounds_opts){
 
   # Iterate over a single record object (e.g., a THETA block)
-  purrr::walk2(val_recs, new_thetas_i, function(rec_opt_i, replacement_i){
+  purrr::walk2(val_recs, new_values, function(rec_opt_i, replacement_i){
     # Get bound type
     bound_type <- get_param_bound_type(rec_opt_i)
 
@@ -451,11 +447,13 @@ modify_record_opt <- function(val_recs, new_values, .bounds_opts){
           # If starting value does not exist, append it
           checkmate::assert_true(length(val_locs) == 2)
           # Create template position option
-          # TODO: much of this code may move to nmrec
+          # TODO: much of this code may move to nmrec:
+          # It doesn't really matter too much, but ideally `rec_opt_i$values[[val_locs[1]]]`
+          # should be replaced with actual `nmrec` building blocks
           new_opt_lst <- list(
             nmrec:::elem_comma(), nmrec:::elem_whitespace(" "),
             rec_opt_i$values[[val_locs[1]]]
-            )
+          )
           rec_opt_i$values <- append(rec_opt_i$values, new_opt_lst, after = val_locs[1])
           val_loc_new <- inspect_option_class(rec_opt_i, c("nmrec_option_pos", "nmrec_option"), "index")
           rec_opt_i$values[[val_locs[2]]] <- replacement_i
@@ -463,7 +461,24 @@ modify_record_opt <- function(val_recs, new_values, .bounds_opts){
       }
     }
   })
-
 }
 
 
+#' Check that the replacement values are the same length as the record
+#'
+#' @inheritParams copy_record_opt
+#'
+#' @keywords internal
+check_record_replacements <- function(val_recs, new_values){
+  # This should never return FALSE. FALSE likely indicates a bug or lack of
+  # support for a particular record format
+  if(length(new_values) != length(val_recs)){
+    val_recs_fmt <- purrr::map(val_recs, \(.x) .x$format())
+    msg <- glue::glue("Record and/or replacement is in an unsupported format:
+                      \nRecord:\n{glue_collapse(val_recs_fmt,  sep = ', ')}
+                      \nReplacement:\n{glue_collapse(new_values,  sep = ', ')}\n\n")
+    dev_error(msg)
+  }else{
+    return(invisible(TRUE))
+  }
+}

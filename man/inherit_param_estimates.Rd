@@ -7,7 +7,7 @@
 inherit_param_estimates(
   .mod,
   .mod_inherit_path = get_based_on(.mod),
-  .inherit = c("theta", "sigma"),
+  .inherit = c("theta", "sigma", "omega"),
   .bounds_opts = c("maintain_bounds", "single_value"),
   .digits = 3
 )
