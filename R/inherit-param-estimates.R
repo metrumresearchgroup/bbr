@@ -248,9 +248,11 @@ filter_prior_records <- function(.records){
   # Get record labels
   block_labels <- get_block_labels(.records) %>% unlist()
 
-  ### Remove any priors, as these dont need to be copied over ###
+  ### Remove any priors or starting blocks, as these dont need to be copied over ###
   # multiple blocks with -same name- is old method for specifying priors. Only copy over main block
   # this logic is likely not enough and does not properly discern whether the other matrix is a prior or not
+  # Selecting the first record is likely incorrect for older methods of specifying priors
+  # - I think we can look for a $PRIOR block in these cases though
   if(length(block_labels) > 1 & dplyr::n_distinct(block_labels) == 1){
     .records <- list(.records[[1]])
   }

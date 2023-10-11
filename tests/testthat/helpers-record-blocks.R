@@ -10,7 +10,7 @@ theta_block_lst <- list(
 (0.02)  ; RUVp
 (1)     ; RUVa",
 
-"priors (P/PV not specified)" = "$THETA
+"fix theta block" = "$THETA
 ( 0.7 ) ;[LCLM]
 ( 0.7 ) ;[LCLF]
 ( 2 )   ;[CLAM]
@@ -220,16 +220,16 @@ PARSED_BLOCKS <- all_blocks %>% dplyr::mutate(
 get_example_record <- function(
     .prob_name = NULL,
     .id = NULL,
-    .record = c("any", "theta", "omega", "sigma", "combine"),
+    .record_name = c("any", "theta", "omega", "sigma", "combine"),
     .pull_record = TRUE,
     .record_blocks_df = PARSED_BLOCKS
 ){
 
-  .record <- match.arg(.record)
+  .record_name <- match.arg(.record_name)
   records <- .record_blocks_df
 
-  if(.record != "any"){
-    records <- records %>% dplyr::filter(.record_type == .record)
+  if(.record_name != "any"){
+    records <- records %>% dplyr::filter(.record_type == .record_name)
   }
 
   if(!is.null(.id)){
@@ -238,7 +238,7 @@ get_example_record <- function(
   }
 
   if(!is.null(.prob_name)){
-    records <- records %>% dplyr::filter(grepl(.prob_name, .prob))
+    records <- records %>% dplyr::filter(grepl(.prob_name, .prob, fixed = TRUE))
   }
 
   cli::cli_div(theme = list(span.emph = list(color = "red"), span.code = list(color = "blue")))
@@ -246,11 +246,11 @@ get_example_record <- function(
   if(isTRUE(.pull_record) && nrow(records) == 1){
     records %>% dplyr::pull("ctl")
   }else if(isTRUE(.pull_record) && nrow(records) < 1 && !is.null(.prob_name)){
-    msg <- glue::glue("No records matching {.emph '{{.prob_name}}'} for {.code {{.record}}} records",
+    msg <- glue::glue("No records matching {.emph '{{.prob_name}}'} for {.code {{.record_name}}} records",
                       .open = "{{", .close = "}}")
     cli::cli_abort(c("x" = msg))
   }else if(isTRUE(.pull_record) && nrow(records) > 1 && !is.null(.prob_name)){
-    msg <- glue::glue("Multiple records matching {.emph '{{.prob_name}}'} for {.code {{.record}}} records",
+    msg <- glue::glue("Multiple records matching {.emph '{{.prob_name}}'} for {.code {{.record_name}}} records",
                       .open = "{{", .close = "}}")
     cli::cli_warn(c("!" = msg))
     return(records)
@@ -259,3 +259,35 @@ get_example_record <- function(
   }
 }
 
+
+#' Helper function for getting record lengths
+#'
+#' Helpful for setting arbitrary replacements of the same length
+example_rec_lengths <- function(
+    .record,
+    .record_name = "theta",
+    .return_replacement = TRUE
+){
+  rec <- nmrec::select_records(.record[[1]], .record_name)
+
+  rec_lengths <- purrr::map(rec, function(rec_block){
+    rec_block$parse()
+    if(.record_name != "omega"){
+      val_recs <- purrr::keep(rec_block$values, function(rec_opt){
+        inherits(rec_opt, "nmrec_option") && !inherits(rec_opt, "nmrec_option_record_name")
+      })
+    }else{
+      val_recs <- purrr::keep(omega_rec$values, function(rec_opt){
+        inherits(rec_opt, "nmrec_option") && !inherits(rec_opt, c("nmrec_option_record_name")) &&
+          !inherits(rec_opt, c("nmrec_option_value"))
+      })
+    }
+    length(val_recs)
+  })
+
+  if(isTRUE(.return_replacement)){
+    return(purrr::map(rec_lengths, \(len) seq(1:len)))
+  }else{
+    return(rec_lengths)
+  }
+}

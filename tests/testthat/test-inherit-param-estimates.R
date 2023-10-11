@@ -5,32 +5,41 @@ describe("inherit_param_estimates: inherit thetas", {
 
   it("base case", {
 
-    new_thetas <- c(1,2,3,4,5)
+    # starting record
+    theta_rec <- get_example_record("base case", .record_name = "theta")
 
-    theta_rec <- get_example_record("base case", .record = "theta")
-
-    nmrec::select_records(theta_rec[[1]], "theta")
+    # replacement values
+    new_thetas <- example_rec_lengths(theta_rec, "theta")
 
     # Copy Thetas
-    copy_thetas(.mod_lines = theta_rec[[1]], .new_thetas = new_thetas)
+    copy_thetas(
+      .mod_lines = theta_rec[[1]], .new_thetas = new_thetas,
+      .bounds_opts = "maintain_bounds"
+    )
 
-    # Read in ctl
-    ctl_lines <- nmrec::read_ctl(ctl_ext(new_mod_path))
-    recs <- nmrec::select_records(ctl_lines, "theta")
+    # Inspect record
+    recs <- nmrec::select_records(theta_rec[[1]], "theta")
 
+    #expect_equal(recs[[1]]$format(), expected_string)
   })
 
-  it("different format one", {
-    new_thetas <- c(1,2,3,4,5)
+  it("Second block for fixing theta value", {
+
+    # starting record
+    theta_rec <- get_example_record("fix theta block", .record_name = "theta")
+
+    # replacement values
+    new_thetas <- example_rec_lengths(theta_rec, "theta")
+    new_thetas <- new_thetas[[1]] # second block isn't used
 
     # Copy Thetas
-    new_mod_path <- file.path(tempdir(), "fake_new")
-    copy_thetas(mod_lines = starting_mod_path,
-                .new_thetas = new_thetas)
+    copy_thetas(
+      .mod_lines = theta_rec[[1]], .new_thetas = new_thetas,
+      .bounds_opts = "maintain_bounds"
+    )
 
-    # Read in ctl
-    ctl_lines <- nmrec::read_ctl(ctl_ext(new_mod_path))
-    recs <- nmrec::select_records(ctl_lines, "theta")
+    # Inspect record
+    recs <- nmrec::select_records(theta_rec[[1]], "theta")
   })
 
 })
