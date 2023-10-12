@@ -1,5 +1,44 @@
 
 
+#' Function for making an example matrix for replacement
+#'
+#' @param n size of the matrix (n x n)
+#' @param values vector of values to set. All others will be 0.
+#' @param block_loc vector indicating the location of the values. Should be the
+#'        same length as `values` and created with `block()`
+#'
+#' @example
+#' \dontrun{
+#' make_matrix(
+#'  n = 30,
+#'  values = c(c(0.1, 0.01, 0.1), c(0, 0), c(0.1, 0.01, 0.12), rep(0.1, 12), rep(0, 12)) + 1,
+#'  block_loc = c(block(2), rep(block(1), 2), block(2), rep(block(1), 12), rep(block(1), 12))
+#' )
+#' }
+#'
+make_matrix <- function(n, values, block_loc) {
+
+  if(length(values) != length(block_loc)){
+    stop("`values` and `block_loc` should have the same length")
+  }
+
+  index_strings <- build_matrix_indices(block_loc)
+
+  # matrix setup and spec
+  mat <- matrix(0, n, n)
+  mat_spec <- purrr::map2_dfr(index_strings, values, function(index_str, val) {
+    indices <- as.numeric(unlist(strsplit(gsub("\\(|\\)", "", index_str), ",")))
+    return(tibble::tibble(row=indices[1], col=indices[2], value = val))
+  })
+
+  # Iterate through the rows of mat_spec and assign values to the matrix
+  for (i in 1:nrow(mat_spec)) {
+    mat[mat_spec$row[i], mat_spec$col[i]] <- mat_spec$value[i]
+  }
+
+  return(mat)
+}
+
 # THETA -------------------------------------------------------------------
 
 theta_block_lst <- list(
