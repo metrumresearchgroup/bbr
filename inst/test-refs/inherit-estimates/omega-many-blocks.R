@@ -4,7 +4,8 @@
 # since they reference ETA values
 
 list(
-  input_ctl = "$ABBR REPLACE ETA(OCC_F1)=ETA(7,8,9, 10, 11, 12, 13, 14, 15, 16, 17, 18)
+  input_ctl = "$PROBLEM omega many blocks
+$ABBR REPLACE ETA(OCC_F1)=ETA(7,8,9, 10, 11, 12, 13, 14, 15, 16, 17, 18)
 $ABBR REPLACE ETA(OCC_D1)=ETA(19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30)
 
 $OMEGA BLOCK(2)
@@ -50,7 +51,8 @@ replacement = make_matrix(
   block_loc = c(block(2), rep(block(1), 2), block(2), rep(block(1), 12), rep(block(1), 12))
 ),
 input_args = list(.bounds_opts = "maintain_bounds"),
-result_ctl = "$ABBR REPLACE ETA(OCC_F1)=ETA(7,8,9, 10, 11, 12, 13, 14, 15, 16, 17, 18)
+result_ctl = "$PROBLEM omega many blocks
+$ABBR REPLACE ETA(OCC_F1)=ETA(7,8,9, 10, 11, 12, 13, 14, 15, 16, 17, 18)
 $ABBR REPLACE ETA(OCC_D1)=ETA(19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30)
 
 $OMEGA BLOCK(2)

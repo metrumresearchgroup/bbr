@@ -1,6 +1,7 @@
 
 list(
-  input_ctl = "$ABBR REPLACE ETA(OCC_CL) = ETA(,3:32)
+  input_ctl = "$PROBLEM omega mixed block
+$ABBR REPLACE ETA(OCC_CL) = ETA(,3:32)
 $ABBR REPLACE ETA(OCC_V)  = ETA(,33:62)
 
 $OMEGA
@@ -17,7 +18,8 @@ replacement = make_matrix(
   block_loc = c(rep(block(1), 6))
 ),
 input_args = list(.bounds_opts = "maintain_bounds"),
-result_ctl = "$ABBR REPLACE ETA(OCC_CL) = ETA(,3:32)
+result_ctl = "$PROBLEM omega mixed block
+$ABBR REPLACE ETA(OCC_CL) = ETA(,3:32)
 $ABBR REPLACE ETA(OCC_V)  = ETA(,33:62)
 
 $OMEGA

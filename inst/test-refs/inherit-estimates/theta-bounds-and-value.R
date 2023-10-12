@@ -1,6 +1,7 @@
 
 list(
-  input_ctl = "$THETA
+  input_ctl = "$PROBLEM theta bounds and value
+$THETA
 (-10, 2.1, 10)    ; CL LOGD 1
 (-10, 3.3, 10)    ; V2 LOGD 2
 (-10, 1.4, 10)    ; Q LOGD 3
@@ -21,7 +22,8 @@ list(
 (-0.3)            ; CTPB_CL 20",
 replacement = seq(1, 18, by = 1),
 input_args = list(.bounds_opts = "maintain_bounds"),
-result_ctl = "$THETA
+result_ctl = "$PROBLEM theta bounds and value
+$THETA
 (-10, 1, 10)    ; CL LOGD 1
 (-10, 2, 10)    ; V2 LOGD 2
 (-10, 3, 10)    ; Q LOGD 3

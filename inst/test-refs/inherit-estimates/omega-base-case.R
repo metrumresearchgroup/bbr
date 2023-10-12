@@ -1,6 +1,7 @@
 
 list(
-  input_ctl = "$OMEGA
+  input_ctl = "$PROBLEM omega base case
+$OMEGA
 0.05    ; iiv CL
 0.2     ; iiv V2",
 replacement = make_matrix(
@@ -9,7 +10,8 @@ replacement = make_matrix(
   block_loc = c(rep(block(1), 2))
 ),
 input_args = list(.bounds_opts = "maintain_bounds"),
-result_ctl = "$OMEGA
+result_ctl = "$PROBLEM omega base case
+$OMEGA
 1.05    ; iiv CL
 1.2     ; iiv V2"
 )

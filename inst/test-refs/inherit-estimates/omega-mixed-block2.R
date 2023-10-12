@@ -1,6 +1,7 @@
 
 list(
-  input_ctl = "$OMEGA
+  input_ctl = "$PROBLEM omega mixed block
+$OMEGA
 (0.04) ;1. CL VAR
 (0.04) ;2. V VAR
 
@@ -14,7 +15,8 @@ replacement = make_matrix(
   block_loc = c(rep(block(1), 5))
 ),
 input_args = list(.bounds_opts = "maintain_bounds"),
-result_ctl = "$OMEGA
+result_ctl = "$PROBLEM omega mixed block
+$OMEGA
 (1.04) ;1. CL VAR
 (1.04) ;2. V VAR
 

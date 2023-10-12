@@ -3,7 +3,8 @@
 # PRIOR block is included for consistency
 
 list(
-  input_ctl = "$PRIOR NWPRI NTHETA=11, NETA=4, NTHP=0, NETP=4, NPEXP=1
+  input_ctl = "$PROBLEM theta fix
+$PRIOR NWPRI NTHETA=11, NETA=4, NTHP=0, NETP=4, NPEXP=1
 
 $THETA
 ( 0.7 ) ;[LCLM]
@@ -22,7 +23,8 @@ $THETA
 $THETA 4 FIX",
 replacement = seq(1, 11, by = 1),
 input_args = list(.bounds_opts = "maintain_bounds"),
-result_ctl = "$PRIOR NWPRI NTHETA=11, NETA=4, NTHP=0, NETP=4, NPEXP=1
+result_ctl = "$PROBLEM theta fix
+$PRIOR NWPRI NTHETA=11, NETA=4, NTHP=0, NETP=4, NPEXP=1
 
 $THETA
 ( 1 ) ;[LCLM]

@@ -1,6 +1,8 @@
 
 list(
-  input_ctl = "$PRIOR NWPRI NTHETA=6, NETA=4, NEPS=2, NTHP=6, NETP=4, NEPP=0
+  input_ctl = "$PROBLEM omega priors complex
+$PRIOR NWPRI NTHETA=6, NETA=4, NEPS=2, NTHP=6, NETP=4, NEPP=0
+
 $OMEGA
 0.09          ;[P] KOUThealthy
 
@@ -27,7 +29,9 @@ replacement = make_matrix(
   block_loc = c(block(1), block(3))
 ),
 input_args = list(.bounds_opts = "maintain_bounds"),
-result_ctl = "$PRIOR NWPRI NTHETA=6, NETA=4, NEPS=2, NTHP=6, NETP=4, NEPP=0
+result_ctl = "$PROBLEM omega priors complex
+$PRIOR NWPRI NTHETA=6, NETA=4, NEPS=2, NTHP=6, NETP=4, NEPP=0
+
 $OMEGA
 1.09          ;[P] KOUThealthy
 
