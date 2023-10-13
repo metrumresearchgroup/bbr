@@ -1,6 +1,7 @@
 
 list(
-  input_ctl = "$PROBLEM omega priors complex
+  case = "omega priors complex",
+  input_ctl = "
 $PRIOR NWPRI NTHETA=6, NETA=4, NEPS=2, NTHP=6, NETP=4, NEPP=0
 
 $OMEGA
@@ -29,7 +30,7 @@ replacement = make_matrix(
   block_loc = c(block(1), block(3))
 ),
 input_args = list(.bounds_opts = "maintain_bounds"),
-result_ctl = "$PROBLEM omega priors complex
+result_ctl = "
 $PRIOR NWPRI NTHETA=6, NETA=4, NEPS=2, NTHP=6, NETP=4, NEPP=0
 
 $OMEGA

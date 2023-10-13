@@ -1,6 +1,7 @@
 
 list(
-  input_ctl = "$PROBLEM theta priors complex
+  case = "theta priors complex",
+  input_ctl = "
 $PRIOR NWPRI NTHETA=6, NETA=4, NEPS=2, NTHP=6, NETP=4, NEPP=0
 $THETA
 -0.574 ;[1/year]
@@ -27,7 +28,7 @@ $THETAPV BLOCK(6) ;var-cov for prior on thetas --> uncertainty for thetas
 0  0  0  0  0  2",
 replacement = seq(1, 6, by = 1),
 input_args = list(.bounds_opts = "maintain_bounds"),
-result_ctl = "$PROBLEM theta priors complex
+result_ctl = "
 $PRIOR NWPRI NTHETA=6, NETA=4, NEPS=2, NTHP=6, NETP=4, NEPP=0
 $THETA
 1 ;[1/year]

@@ -1,6 +1,7 @@
 
 list(
-  input_ctl = "$PROBLEM sigma base case
+  case = "sigma base case",
+  input_ctl = "
 $SIGMA
 0.2 ; [P]",
 replacement = make_matrix(
@@ -9,7 +10,7 @@ replacement = make_matrix(
   block_loc = block(1)
 ),
 input_args = list(.bounds_opts = "maintain_bounds"),
-result_ctl = "$PROBLEM sigma base case
+result_ctl = "
 $SIGMA
 1.2 ; [P]"
 )

@@ -3,7 +3,8 @@
 # there is a total of 4 prior ETA values
 
 list(
-  input_ctl = "$PROBLEM omega priors old method (P/PV not specified)
+  case = "omega priors old method (P/PV not specified)",
+  input_ctl = "
 $PRIOR NWPRI NTHETA=11, NETA=4, NTHP=0, NETP=4, NPEXP=1
 
 $OMEGA BLOCK(4)
@@ -30,7 +31,7 @@ replacement = make_matrix(
   block_loc = block(4)
 ),
 input_args = list(.bounds_opts = "maintain_bounds"),
-result_ctl = "$PROBLEM omega priors old method (P/PV not specified)
+result_ctl = "
 $PRIOR NWPRI NTHETA=11, NETA=4, NTHP=0, NETP=4, NPEXP=1
 
 $OMEGA BLOCK(4)

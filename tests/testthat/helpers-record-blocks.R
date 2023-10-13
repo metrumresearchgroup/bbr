@@ -55,23 +55,46 @@ read_and_extract_list <- function(file_path) {
   file_content <- readLines(file.path(record_example_dir, file_path))
   list_object <- eval(parse(text = paste(file_content, collapse = "\n")))
 
+  # Remove leading newlines from strings (if any)
+  # (trailing new lines would be part of the nmrec record)
+  list_object$result_ctl <- gsub("^\n+", "", list_object$result_ctl)
+  list_object$input_ctl <- gsub("^\n+", "", list_object$input_ctl)
+
   # Function to create nmrec object
-  make_fake_ctl <- function(input_ctl = NULL){
-    template_lines <- glue::glue("{input_ctl}") %>%
+  make_fake_ctl <- function(case = NULL, input_ctl = NULL){
+
+    template_lines <- glue::glue("$PROBLEM {case}\n\n{input_ctl}") %>%
       as.character() %>% strsplit("\n") %>% unlist()
 
     ctl <- nmrec::parse_ctl(template_lines)
     return(ctl)
   }
 
-  # Create nmrec object and sort
-  list_object$input_nmrec <- make_fake_ctl(list_object$input_ctl)
+  # Create nmrec object
+  list_object$input_nmrec <- make_fake_ctl(
+    case = list_object$case,
+    input_ctl = list_object$input_ctl
+  )
+  # Sort list
   list_object <- list_object[sort(names(list_object))]
+
+  # *parse_ctl() adds newline to record* - add newline to expected output
+  list_object$result_ctl <- paste0(list_object$result_ctl, "\n")
 
   return(list_object)
 }
 
 
+#' Format `nmrec_ctl_records`
+#'
+#' Removes PROBLEM record and returns a formatted string
+format_record <- function(input_nmrec){
+  # Remove problem statement
+  input_nmrec$records <- Filter(
+    function(x) !grepl("^\\$PROBLEM", x$format()), input_nmrec$records
+  )
+  format(input_nmrec)
+}
 
 # Compile Examples --------------------------------------------------------
 

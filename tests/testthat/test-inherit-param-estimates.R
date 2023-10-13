@@ -16,17 +16,13 @@ describe("inherit_param_estimates: inherit thetas", {
 
     # Inspect record
     recs <- nmrec::select_records(test_case$input_nmrec, "theta")
-    expect_equal(recs[[1]]$format(), test_case$result_ctl)
+    expect_equal(format_record(test_case$input_nmrec), test_case$result_ctl)
   })
 
-  it("Second block for fixing theta value", {
+  it("fixing theta value (df for OMEGA matrix)", {
 
     # starting record
-    theta_rec <- get_example_record("theta-fix-estimate")
-
-    # replacement values
-    new_thetas <- example_rec_lengths(theta_rec, "theta")
-    new_thetas <- new_thetas[[1]] # second block isn't used
+    test_case <- get_example_record("theta-fix-estimate")
 
     # Copy Thetas
     copy_thetas(
@@ -35,7 +31,8 @@ describe("inherit_param_estimates: inherit thetas", {
     )
 
     # Inspect record
-    recs <- nmrec::select_records(theta_rec[[1]], "theta")
+    recs <- nmrec::select_records(test_case$input_nmrec, "theta")
+    expect_equal(format_record(test_case$input_nmrec), test_case$result_ctl)
   })
 
 })

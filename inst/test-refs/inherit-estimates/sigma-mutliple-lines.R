@@ -1,6 +1,7 @@
 
 list(
-  input_ctl = "$PROBLEM sigma multiple lines
+  case = "sigma multiple lines",
+  input_ctl = "
 $SIGMA
 0.04
 10",
@@ -10,7 +11,7 @@ replacement = make_matrix(
   block_loc = c(rep(block(1), 2))
 ),
 input_args = list(.bounds_opts = "maintain_bounds"),
-result_ctl = "$PROBLEM sigma multiple lines
+result_ctl = "
 $SIGMA
 0.04
 10"

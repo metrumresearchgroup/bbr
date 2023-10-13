@@ -1,6 +1,7 @@
 
 list(
-  input_ctl = "$PROBLEM theta base case
+  case = "theta base case",
+  input_ctl = "
 $THETA
 (0.65)  ; KA
 (0.3)  ; CL
@@ -9,7 +10,7 @@ $THETA
 (1)     ; RUVa",
 replacement = c(1,2,3,4,5),
 input_args = list(.bounds_opts = "maintain_bounds"),
-result_ctl = "$PROBLEM theta base case
+result_ctl = "
 $THETA
 (1)  ; KA
 (2)  ; CL
