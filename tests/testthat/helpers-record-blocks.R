@@ -103,7 +103,7 @@ record_example_dir <- system.file(
   file.path("test-refs", "inherit-estimates"), package = "bbr", mustWork = TRUE
 )
 
-# Group and load examples
+# Group and set up examples
 example_paths <- list.files(record_example_dir)
 example_spec <- example_paths %>%
   purrr::map_chr(\(.x) str_extract(.x, "^[^-]+")) %>%
@@ -111,21 +111,26 @@ example_spec <- example_paths %>%
   purrr::map(\(.x) example_paths[str_detect(example_paths, paste0("^", .x, "-"))]) %>%
   tibble::enframe(name = "record_type", value = "file_path") %>%
   tidyr::unnest(cols = "file_path") %>%
-  dplyr::mutate(record_name = fs::path_ext_remove(file_path)) %>%
-  dplyr::rowwise() %>%
-  dplyr::mutate(list_object = list(read_and_extract_list(file_path))) %>%
-  dplyr::ungroup() %>% dplyr::relocate("record_type", "record_name")
+  dplyr::mutate(record_name = fs::path_ext_remove(file_path))
 
 
 get_example_record <- function(
     .case = NULL,
     .record_type = c("any", "theta", "omega", "sigma"),
     .pull_record = TRUE,
-    .record_blocks_df = example_spec
+    .example_spec = example_spec
 ){
 
   .record_type <- match.arg(.record_type)
-  records <- .record_blocks_df
+
+  # load examples - this should be done every time `get_example_record` is
+  # called to refresh the example. Otherwise changes to the example will persist
+  .example_spec <- .example_spec %>%
+    dplyr::rowwise() %>%
+    dplyr::mutate(list_object = list(read_and_extract_list(file_path))) %>%
+    dplyr::ungroup() %>% dplyr::relocate("record_type", "record_name")
+
+  records <- .example_spec
 
   if(.record_type != "any"){
     records <- records %>% dplyr::filter(record_type == .record_type)

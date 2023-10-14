@@ -56,13 +56,13 @@ inherit_param_estimates <- function(
   # Update OMEGA Block
   if("omega" %in% .inherit){
     new_omegas <- based_on_sum %>% get_omega() %>% signif(digits = .digits)
-    copy_omegas(inherit_mod_lines, .new_omegas = new_omegas)
+    copy_omegas(inherit_mod_lines, .new_omegas = new_omegas, .bounds_opts = .bounds_opts)
   }
 
   # Update SIGMA Block
   if("sigma" %in% .inherit){
     new_sigmas <- based_on_sum %>% get_sigma() %>% signif(digits = .digits)
-    copy_sigmas(inherit_mod_lines, .new_sigmas = new_sigmas)
+    copy_sigmas(inherit_mod_lines, .new_sigmas = new_sigmas, .bounds_opts = .bounds_opts)
   }
 
   # Write out updated model
@@ -92,9 +92,7 @@ copy_thetas <- function(.mod_lines, .new_thetas, .bounds_opts){
     theta_rec$parse()
 
     # inspect each record - filter to value options
-    val_recs <- purrr::keep(theta_rec$values, function(rec_opt){
-      inherits(rec_opt, "nmrec_option") && !inherits(rec_opt, "nmrec_option_record_name")
-    })
+    val_recs <- extract_record_values(theta_rec)
 
     # Ensure replacement lengths are the same
     check_record_replacements(val_recs, new_thetas_i)
@@ -109,7 +107,7 @@ copy_thetas <- function(.mod_lines, .new_thetas, .bounds_opts){
 #' @param .new_sigmas list of new sigma matrices, or a single sigma matrix
 #'
 #' @keywords internal
-copy_sigmas <- function(.mod_lines, .new_sigmas){
+copy_sigmas <- function(.mod_lines, .new_sigmas, .bounds_opts){
 
   # Pull records and format replacement values
   param_setup <- setup_param_records(
@@ -123,9 +121,7 @@ copy_sigmas <- function(.mod_lines, .new_sigmas){
     sigma_rec$parse()
 
     # inspect each record - filter to value options
-    val_recs <- purrr::keep(sigma_rec$values, function(rec_opt){
-      inherits(rec_opt, "nmrec_option") && !inherits(rec_opt, "nmrec_option_record_name")
-    })
+    val_recs <- extract_record_values(sigma_rec)
 
     # Ensure replacement lengths are the same
     check_record_replacements(val_recs, new_sigmas_i)
@@ -140,7 +136,7 @@ copy_sigmas <- function(.mod_lines, .new_sigmas){
 #' @param .new_omegas list of new omega matrices, or a single omega matrix
 #'
 #' @keywords internal
-copy_omegas <- function(.mod_lines, .new_omegas){
+copy_omegas <- function(.mod_lines, .new_omegas, .bounds_opts){
 
   # Pull records and format replacement values
   param_setup <- setup_param_records(
@@ -154,10 +150,7 @@ copy_omegas <- function(.mod_lines, .new_omegas){
     omega_rec$parse()
 
     # inspect each record - filter to value options
-    val_recs <- purrr::keep(omega_rec$values, function(rec_opt){
-      inherits(rec_opt, "nmrec_option") && !inherits(rec_opt, c("nmrec_option_record_name")) &&
-        !inherits(rec_opt, c("nmrec_option_value"))
-    })
+    val_recs <- extract_record_values(omega_rec)
 
     # Ensure replacement lengths are the same
     check_record_replacements(val_recs, new_omegas_i)
@@ -166,6 +159,16 @@ copy_omegas <- function(.mod_lines, .new_omegas){
 }
 
 
+
+extract_record_values <- function(.record){
+  .record$parse()
+  val_recs <- purrr::keep(.record$values, function(rec_opt){
+    inherits(rec_opt, "nmrec_option") && !inherits(rec_opt, "nmrec_option_record_name") &&
+      !inherits(rec_opt, c("nmrec_option_value")) && !inherits(rec_opt, c("nmrec_option_flag"))
+  })
+
+  return(val_recs)
+}
 
 #' Set up parameter records and replacement values
 #'
@@ -188,8 +191,13 @@ setup_param_records <- function(.mod_lines, .new_params, .rec_type = BBR_ESTIMAT
   # Get parameter records
   param_recs <- nmrec::select_records(.mod_lines, .rec_type)
 
-  # Filter out prior records
-  param_recs <- filter_prior_records(param_recs)
+  # Get attributes for each record
+  param_recs_spec <- get_record_attr(param_recs)
+
+  # Filter out prior records specified without P/PV/PD
+  # Priors specified with P/PV/PD are auto filtered out via `select_records`
+  prior_rec <- nmrec::select_records(.mod_lines, "prior")
+  param_recs <- filter_prior_records(param_recs, prior_rec)
 
   # coerce .new_params to list if not already
   # vectors/matricies are allowed for a replacement of 1:1 (n_theta_blocks:n_replacements)
@@ -232,11 +240,36 @@ setup_param_records <- function(.mod_lines, .new_params, .rec_type = BBR_ESTIMAT
 }
 
 
+#' Parse values per block
+#'
+#' @param .param_recs list of `nmrec` record objects specific to the parameter
+#'
+#' @keywords internal
+get_record_attr <- function(.param_recs){
+  checkmate::assert_list(.param_recs)
+
+  purrr::map(.param_recs, function(.record){
+    # Get record labels
+    .label <- get_block_labels(.record)[[1]]
+
+    if(nzchar(.label) && grepl("(?i)block", .label)){
+      # Block handling
+      mat_size <- as.numeric(gsub("[^0-9]+", "", .label))
+      is_diag <- block(mat_size)
+      block_length <- length(is_diag[is_diag])
+    }else if(isFALSE(nzchar(.label))){
+      # Single/diagonal values
+      block_length <- length(extract_record_values(.record))
+    }
+    list(block_label = block_label, block_length = block_length)
+  })
+}
+
 
 
 #' Filter out prior records
 #'
-#' @param .records list of `nmrec` record objects
+#' @param .param_recs list of `nmrec` record objects specific to the parameter
 #'
 #' @details
 #' `bbr` does not support the inheritance of priors at this time. To simplify
@@ -244,26 +277,37 @@ setup_param_records <- function(.mod_lines, .new_params, .rec_type = BBR_ESTIMAT
 #' and ensure the returned object is still a list of records.
 #'
 #' @keywords internal
-filter_prior_records <- function(.records){
-  # Get record labels
-  block_labels <- get_block_labels(.records) %>% unlist()
+filter_prior_records <- function(.param_recs, .prior_rec){
+  checkmate::assert_list(.param_recs)
 
-  ### Remove any priors or starting blocks, as these dont need to be copied over ###
-  # multiple blocks with -same name- is old method for specifying priors. Only copy over main block
-  # this logic is likely not enough and does not properly discern whether the other matrix is a prior or not
-  # Selecting the first record is likely incorrect for older methods of specifying priors
-  # - I think we can look for a $PRIOR block in these cases though
-  if(length(block_labels) > 1 & dplyr::n_distinct(block_labels) == 1){
-    .records <- list(.records[[1]])
+  if(rlang::is_empty(.prior_rec)){
+    # Handling if no prior record is found
+    return(.param_recs)
+  }else{
+    .prior_rec <- .prior_rec[[1]]
+
+    # Get record labels
+    block_labels <- get_block_labels(.param_recs) %>% unlist()
+
+    ### Remove any priors or starting blocks, as these dont need to be copied over ###
+    # multiple blocks with -same name- is old method for specifying priors. Only copy over main block
+    # this logic is likely not enough and does not properly discern whether the other matrix is a prior or not
+    # Selecting the first record is likely incorrect for older methods of specifying priors
+    # - I think we can look for a $PRIOR block in these cases though
+    # TODO: use tabulated blocks instead of this if-statement
+    if(length(block_labels) > 1 & dplyr::n_distinct(block_labels) == 1){
+      .param_recs <- list(.param_recs[[1]])
+    }
+
+    # TODO: This is likely not necessary, as `select_records` should filter these out
+    # new method for priors uses a 'P', 'PV', or 'PD' at the end of the block label. Filter those out
+    has_P_or_PV <- grepl("P$|PV$|PD$", block_labels) # search for "P$" or "PV$"
+    if(any(has_P_or_PV)){
+      .param_recs <- .param_recs[has_P_or_PV]
+    }
+
+    return(.param_recs)
   }
-
-  # new method for priors uses a 'P' or 'PV' at the end of the block label. Filter those out
-  has_P_or_PV <- grepl("P$|PV$", block_labels) # search for "P$" or "PV$"
-  if(any(has_P_or_PV)){
-    .records <- .records[has_P_or_PV]
-  }
-
-  return(.records)
 }
 
 
@@ -280,11 +324,11 @@ get_block_labels <- function(.blocks){
   purrr::map(.blocks, function(.block){
     .block$parse()
     block_label <- purrr::keep(.block$values, function(rec_opt){
-      inherits(rec_opt, "nmrec_option_record_name")
+      inspect_option_class(rec_opt, c("nmrec_option_value"))
     })
 
     if(rlang::is_empty(block_label)){
-      return(NULL)
+      return("")
     }else{
       gsub("\\$", "", block_label[[1]]$format())
     }
