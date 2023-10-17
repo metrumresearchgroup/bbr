@@ -261,7 +261,7 @@ get_record_attr <- function(.param_recs){
       # Single/diagonal values
       block_length <- length(extract_record_values(.record))
     }
-    list(block_label = block_label, block_length = block_length)
+    list(block_label = .label, block_length = block_length)
   })
 }
 

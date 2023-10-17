@@ -18,6 +18,36 @@ describe("inherit_param_estimates: inherit thetas", {
     expect_equal(format_record(test_case$input_nmrec), test_case$result_ctl)
   })
 
+  it("with bounds - maintain_bounds", {
+
+    # starting records
+    test_case <- get_example_record("theta-bounds-maintain")
+
+    # Copy Thetas
+    copy_thetas(
+      .mod_lines = test_case$input_nmrec, .new_thetas = test_case$replacement,
+      .bounds_opts = test_case$input_args$.bounds_opts
+    )
+
+    # Inspect record
+    expect_equal(format_record(test_case$input_nmrec), test_case$result_ctl)
+  })
+
+  it("with bounds - single_value", {
+
+    # starting records
+    test_case <- get_example_record("theta-bounds-single-value")
+
+    # Copy Thetas
+    copy_thetas(
+      .mod_lines = test_case$input_nmrec, .new_thetas = test_case$replacement,
+      .bounds_opts = test_case$input_args$.bounds_opts
+    )
+
+    # Inspect record
+    expect_equal(format_record(test_case$input_nmrec), test_case$result_ctl)
+  })
+
   it("fixing theta value (df for OMEGA matrix)", {
 
     # starting record
