@@ -160,6 +160,7 @@ copy_omegas <- function(.mod_lines, .new_omegas, .bounds_opts){
 
 
 
+#' Extract the values from a record
 extract_record_values <- function(.record){
   .record$parse()
   val_recs <- purrr::keep(.record$values, function(rec_opt){
@@ -169,6 +170,7 @@ extract_record_values <- function(.record){
 
   return(val_recs)
 }
+
 
 #' Set up parameter records and replacement values
 #'
@@ -188,6 +190,10 @@ setup_param_records <- function(.mod_lines, .new_params, .rec_type = BBR_ESTIMAT
 
   .rec_type <- match.arg(.rec_type)
 
+  # coerce .new_params to list if not already
+  # vectors/matricies are allowed for a replacement of 1:1 (n_theta_blocks:n_replacements)
+  # if(!inherits(.new_params, "list")) .new_params <- list(.new_params)
+
   # Get parameter records
   param_recs <- nmrec::select_records(.mod_lines, .rec_type)
 
@@ -197,36 +203,43 @@ setup_param_records <- function(.mod_lines, .new_params, .rec_type = BBR_ESTIMAT
   # Filter out prior records specified without P/PV/PD
   # Priors specified with P/PV/PD are auto filtered out via `select_records`
   prior_rec <- nmrec::select_records(.mod_lines, "prior")
-  param_recs <- filter_prior_records(param_recs, prior_rec)
+  param_recs <- filter_prior_records(param_recs, prior_rec, param_recs_spec)
+  # Remove any filtered out records from spec
+  param_recs_spec <- param_recs_spec[1:length(param_recs)]
 
-  # coerce .new_params to list if not already
-  # vectors/matricies are allowed for a replacement of 1:1 (n_theta_blocks:n_replacements)
-  if(!inherits(.new_params, "list")) .new_params <- list(.new_params)
-
-  # TODO: determine relevant specs of for each type that set the inheritance procedure
 
   # Matrix handling
-  cov_specified <- FALSE # TODO: determine if covariance is specified in ctl
   if(.rec_type %in% c("sigma", "omega")){
-    matrix_types <- get_matrix_types(param_recs)
-    .new_params <- purrr::map2(.new_params, matrix_types, function(new_params_i, mat_type){
-      if(is.null(mat_type) || (mat_type == "block" && isFALSE(cov_specified))){
-        # Grab diagonals for block matrices
-        new_params_i <- unname(diag(new_params_i))
-      }else if(mat_type == "block" & isTRUE(cov_specified)){
-        new_params_i <- new_params_i[upper.tri(new_params_i, diag = TRUE)]
+    new_params_lst <- purrr::map(param_recs_spec, function(rec_spec){
+      cov_specified <- isTRUE(rec_spec$is_block) && rec_spec$record_length >= 3
+      if(isFALSE(cov_specified) && isFALSE(rec_spec$is_same)){
+        # Get diagonals if no covariance was specified
+        rec_replacement <- unname(diag(.new_params))[rec_spec$index]
+      }else if(isTRUE(cov_specified) && isFALSE(rec_spec$is_same)){
+        # Get values of upper triangular matrix
+        mat_subset <- .new_params[rec_spec$index, rec_spec$index]
+        rec_replacement <- mat_subset[upper.tri(mat_subset, diag = TRUE)]
+      }else if(isTRUE(rec_spec$is_same)){
+        # Ignore SAME records
+        rec_replacement <- NULL
       }else{
         stop("add support")
       }
+      return(rec_replacement)
+    })
+  }else{
+    # Theta handling
+    new_params_lst <- purrr::map(param_recs_spec, function(rec_spec){
+      .new_params[rec_spec$index]
     })
   }
 
 
-  # `param_recs` and `.new_params` should both be lists of the same length when replacing
-  if(length(.new_params) != length(param_recs)){
+  # `param_recs` and `new_params_lst` should both be lists of the same length when replacing
+  if(length(new_params_lst) != length(param_recs)){
     msg <- paste(
       glue::glue("Found {length(param_recs)} {.rec_type} records, which does not"),
-      glue::glue("match up with the assumed length of `.new_params` ({length(.new_params)})")
+      glue::glue("match up with the assumed length of `new_params_lst` ({length(new_params_lst)})")
     )
     stop(msg)
   }
@@ -234,216 +247,11 @@ setup_param_records <- function(.mod_lines, .new_params, .rec_type = BBR_ESTIMAT
   return(
     list(
       param_recs = param_recs,
-      new_params = .new_params
+      new_params = new_params_lst,
+      param_recs_spec = param_recs_spec
     )
   )
 }
-
-
-#' Parse values per block
-#'
-#' @param .param_recs list of `nmrec` record objects specific to the parameter
-#'
-#' @keywords internal
-get_record_attr <- function(.param_recs){
-  checkmate::assert_list(.param_recs)
-
-  purrr::map(.param_recs, function(.record){
-    # Get record labels
-    .label <- get_block_labels(.record)[[1]]
-
-    if(nzchar(.label) && grepl("(?i)block", .label)){
-      # Block handling
-      mat_size <- as.numeric(gsub("[^0-9]+", "", .label))
-      is_diag <- block(mat_size)
-      block_length <- length(is_diag[is_diag])
-    }else if(isFALSE(nzchar(.label))){
-      # Single/diagonal values
-      block_length <- length(extract_record_values(.record))
-    }
-    list(block_label = .label, block_length = block_length)
-  })
-}
-
-
-
-#' Filter out prior records
-#'
-#' @param .param_recs list of `nmrec` record objects specific to the parameter
-#'
-#' @details
-#' `bbr` does not support the inheritance of priors at this time. To simplify
-#' the inheritance of previous parameter estimates, filter prior blocks out,
-#' and ensure the returned object is still a list of records.
-#'
-#' @keywords internal
-filter_prior_records <- function(.param_recs, .prior_rec){
-  checkmate::assert_list(.param_recs)
-
-  if(rlang::is_empty(.prior_rec)){
-    # Handling if no prior record is found
-    return(.param_recs)
-  }else{
-    .prior_rec <- .prior_rec[[1]]
-
-    # Get record labels
-    block_labels <- get_block_labels(.param_recs) %>% unlist()
-
-    ### Remove any priors or starting blocks, as these dont need to be copied over ###
-    # multiple blocks with -same name- is old method for specifying priors. Only copy over main block
-    # this logic is likely not enough and does not properly discern whether the other matrix is a prior or not
-    # Selecting the first record is likely incorrect for older methods of specifying priors
-    # - I think we can look for a $PRIOR block in these cases though
-    # TODO: use tabulated blocks instead of this if-statement
-    if(length(block_labels) > 1 & dplyr::n_distinct(block_labels) == 1){
-      .param_recs <- list(.param_recs[[1]])
-    }
-
-    # TODO: This is likely not necessary, as `select_records` should filter these out
-    # new method for priors uses a 'P', 'PV', or 'PD' at the end of the block label. Filter those out
-    has_P_or_PV <- grepl("P$|PV$|PD$", block_labels) # search for "P$" or "PV$"
-    if(any(has_P_or_PV)){
-      .param_recs <- .param_recs[has_P_or_PV]
-    }
-
-    return(.param_recs)
-  }
-}
-
-
-
-#' Get block label from parsed control stream file
-#'
-#' @param .block character vector or list of vectors containing the lines of the control stream file.
-#'         Must contain a block header (e.g. $OMEGA)
-#'
-#' @keywords internal
-get_block_labels <- function(.blocks){
-  if(!inherits(.blocks, "list")) .blocks <- list(.blocks)
-
-  purrr::map(.blocks, function(.block){
-    .block$parse()
-    block_label <- purrr::keep(.block$values, function(rec_opt){
-      inspect_option_class(rec_opt, c("nmrec_option_value"))
-    })
-
-    if(rlang::is_empty(block_label)){
-      return("")
-    }else{
-      gsub("\\$", "", block_label[[1]]$format())
-    }
-  })
-}
-
-
-#' Get matrix type for omega and sigma records
-#'
-#' @inheritParams get_block_labels
-#'
-#' @keywords internal
-get_matrix_types <- function(.blocks){
-  if(!inherits(.blocks, "list")) .blocks <- list(.blocks)
-
-  purrr::map(.blocks, function(.block){
-    .block$parse()
-    block_label <- purrr::keep(.block$values, function(rec_opt){
-      inherits(rec_opt, "nmrec_option_value")
-    })
-
-    if(rlang::is_empty(block_label)){
-      return(NULL)
-    }else{
-      block_label[[1]]$name
-    }
-  })
-}
-
-
-#' Determine the type of bounds (or fixed parameter) for model parameters
-#'
-#' This function determines the type of bounds specified for model parameters,
-#' limited to THETA, OMEGA, and SIGMA records in a NONMEM control stream file.
-#'
-#' @param .record_opt an `nmrec_option_nested` object to check
-#'
-#' @keywords internal
-get_param_bound_type <- function(.record_opt){
-
-  correct_str <- inherits(.record_opt, "nmrec_option_nested") &&
-    inherits(.record_opt, "nmrec_option_pos")
-  if(!correct_str){
-    cli::cli_abort(c("x" = "{.code .record_opt} is not in the correct format",
-                     "i" = "Record option should inherit {.code nmrec_option_nested}
-                     and {.code nmrec_option_pos}"))
-  }
-
-  # Check if option is bounded: in format (low, hi), or (low, start, hi)
-  # TODO: confirm that this approach is valid
-  is_bounded <- inspect_option_class(.record_opt, "nmrec_paren_open") &&
-    inspect_option_class(.record_opt, "nmrec_paren_close") &&
-    inspect_option_class(.record_opt, "nmrec_comma")
-
-  if(isFALSE(is_bounded)){
-    type <- "fixed"
-  }else{
-    num_vals <- inspect_option_class(.record_opt, "nmrec_option_pos", "count")
-    type <- dplyr::case_when(
-      num_vals == 2 ~ "bounds",
-      num_vals == 3 ~ "bounds_with_starting",
-      TRUE ~ NA_character_
-    )
-    if(is.na(type)) dev_error("unexpected record format")
-  }
-
-  return(type)
-}
-
-
-#' Determine if record option contains a specific class (count if desired)
-#' @param .record_opt an `nmrec_option_pos` object to check. *Can be* nested
-#'        (inherit class `nmrec_option_nested`).
-#' @param .class class or vector of classes to look for.
-#' @param .operation which operation to perform (i.e. what to return)
-#'     \describe{
-#'      \item{`'any'`}{Returns Logical (`TRUE`/`FALSE`): whether the `.class` is found in the record at all}
-#'      \item{`'count'`}{Returns Numeric: frequency(ies) of `.class`}
-#'      \item{`'index'`}{Returns Numeric: index(es) of `.class`}
-#'      }
-#' @param .inherits Either `'all'` or `'any'`. Only relevant if `class` is a vector.
-#'        If `.inherits = 'all'`, the classes must correspond to the same element.
-#'        If `.inherits = 'any'`, the classes can correspond to different elements.
-#'
-#' @keywords internal
-inspect_option_class <- function(
-    .record_opt,
-    .class,
-    .operation = c("any", "count", "index"),
-    .inherits = c("all", "any")
-){
-
-  .operation <- match.arg(.operation)
-  .inherits <- match.arg(.inherits)
-  is_nested <- inherits(.record_opt, "nmrec_option_nested")
-
-  check_class <- if(isTRUE(is_nested)){
-    purrr::map_lgl(.record_opt$values, \(.x){
-      checks <- purrr::map_lgl(.class, \(class_i) inherits(.x, class_i))
-      if(.inherits == "all") all(checks) else any(checks)
-    })
-  }else{
-    purrr::map_lgl(.class, \(class_i) inherits(.record_opt, class_i))
-  }
-
-
-  if(.operation == "any"){
-    any(check_class)
-  }else if(.operation == "count"){
-    length(check_class[check_class])
-  }else if(.operation == "index"){
-    which(check_class)
-  }
-}
-
 
 
 #' Overwrite an `nmrec` record option
@@ -508,6 +316,242 @@ copy_record_opt <- function(val_recs, new_values, .bounds_opts){
     }
   })
 }
+
+
+
+#' Parse values per block
+#'
+#' @param .param_recs list of `nmrec` record objects specific to the parameter
+#'
+#' @keywords internal
+get_record_attr <- function(.param_recs){
+  checkmate::assert_list(.param_recs)
+  # Get record labels
+  record_labels <- purrr::imap(.param_recs, function(.record, .index){
+    .record$parse()
+
+    # Get value and flag options
+    # SAME with no number is an nmrec_option_flag
+    # SAME(value) is an nmrec_option_value
+    rec_label <- purrr::keep(.record$values, function(rec_opt){
+      inspect_option_class(
+        rec_opt, c("nmrec_option_value", "nmrec_option_flag"), .inherits = "any"
+      ) && !inherits(rec_opt, "nmrec_option_record_name") # drop record name
+    })
+
+    if(rlang::is_empty(rec_label)){
+      tibble::tibble(index = .index, name = NA_character_, value = NA_real_)
+    }else{
+      purrr::map_dfr(rec_label, \(.x){
+        if(inherits(.x, "nmrec_option_nested")){
+          # If nested option (e.g, $THETA 4 FIX), the value is irrelevant
+          tibble::tibble(index = .index, name = .x$format(), value = NA_real_)
+        }else{
+          # $OMEGA BLOCK(1) SAME(3) --> name = c('block', 'same'); value = c(1, 3)
+          tibble::tibble(
+            index = .index, name = .x$name, value = as.numeric(gsub("[^0-9]+", "", .x$value))
+          )
+        }
+      })
+    }
+  })
+
+  param_recs_spec <- purrr::map2(.param_recs, record_labels, \(.record, .label_df){
+    labels <- .label_df$name
+
+    # Determine length of each record
+    if(nzchar(labels) && any(grepl("(?i)block", labels))){
+      if(any(grepl("(?i)same", labels))){
+        # Block handling with SAME(value)
+        record_length <- .label_df$value[.label_df$name=="same"]
+        # NA means a number of repeats wasn't defined, which means repeat once
+        if(is.na(record_length)) record_length <- 1
+      }else{
+        # Default Block handling
+        mat_size <- .label_df$value[.label_df$name=="block"]
+        record_length <- mat_size #length(block(mat_size))
+      }
+    }else{
+      # Single/diagonal values
+      record_length <- length(extract_record_values(.record))
+    }
+
+    list(
+      record_type = .record$values[[1]]$name,
+      record_length = record_length,
+      is_block = any(grepl("(?i)block", labels)),
+      is_same = any(grepl("(?i)same", labels))
+    )
+  })
+
+  # Determine index for each record
+  purrr::imap(param_recs_spec, ~{
+    record_length <- .x$record_length
+    if (.y > 1) {
+      end <- sum(purrr::map_dbl(param_recs_spec[1:.y], "record_length"))
+      prev_end <- sum(purrr::map_dbl(param_recs_spec[1:(.y-1)], "record_length"))
+      rec_range <- unique(c((prev_end + 1), end))
+    }else{
+      rec_range <- c(1, .x$record_length)
+    }
+
+    index <- if(length(rec_range) > 1){
+      c(rec_range[1] : rec_range[2])
+    }else{
+      rec_range
+    }
+
+    c(.x, list(index = index))
+  })
+}
+
+
+
+
+#' Determine if record option contains a specific class (count if desired)
+#' @param .record_opt an `nmrec_option_pos` object to check. *Can be* nested
+#'        (inherit class `nmrec_option_nested`).
+#' @param .class class or vector of classes to look for.
+#' @param .operation which operation to perform (i.e. what to return)
+#'     \describe{
+#'      \item{`'any'`}{Returns Logical (`TRUE`/`FALSE`): whether the `.class` is found in the record at all}
+#'      \item{`'count'`}{Returns Numeric: frequency(ies) of `.class`}
+#'      \item{`'index'`}{Returns Numeric: index(es) of `.class`}
+#'      }
+#' @param .inherits Either `'all'` or `'any'`. Only relevant if `class` is a vector.
+#'        If `.inherits = 'all'`, the classes must correspond to the same element.
+#'        If `.inherits = 'any'`, the classes can correspond to different elements.
+#'
+#' @keywords internal
+inspect_option_class <- function(
+    .record_opt,
+    .class,
+    .operation = c("any", "count", "index"),
+    .inherits = c("all", "any")
+){
+
+  .operation <- match.arg(.operation)
+  .inherits <- match.arg(.inherits)
+  is_nested <- inherits(.record_opt, "nmrec_option_nested")
+
+  check_class <- if(isTRUE(is_nested)){
+    purrr::map_lgl(.record_opt$values, \(.x){
+      checks <- purrr::map_lgl(.class, \(class_i) inherits(.x, class_i))
+      if(.inherits == "all") all(checks) else any(checks)
+    })
+  }else{
+    purrr::map_lgl(.class, \(class_i) inherits(.record_opt, class_i))
+  }
+
+
+  if(.operation == "any"){
+    any(check_class)
+  }else if(.operation == "count"){
+    length(check_class[check_class])
+  }else if(.operation == "index"){
+    which(check_class)
+  }
+}
+
+
+
+
+
+#' Determine the type of bounds (or fixed parameter) for model parameters
+#'
+#' This function determines the type of bounds specified for model parameters,
+#' limited to THETA, OMEGA, and SIGMA records in a NONMEM control stream file.
+#'
+#' @param .record_opt an `nmrec_option_nested` object to check
+#'
+#' @keywords internal
+get_param_bound_type <- function(.record_opt){
+
+  correct_str <- inherits(.record_opt, "nmrec_option_nested") &&
+    inherits(.record_opt, "nmrec_option_pos")
+  if(!correct_str){
+    cli::cli_abort(c("x" = "{.code .record_opt} is not in the correct format",
+                     "i" = "Record option should inherit {.code nmrec_option_nested}
+                     and {.code nmrec_option_pos}"))
+  }
+
+  # Check if option is bounded: in format (low, hi), or (low, start, hi)
+  # TODO: confirm that this approach is valid
+  is_bounded <- inspect_option_class(.record_opt, "nmrec_paren_open") &&
+    inspect_option_class(.record_opt, "nmrec_paren_close") &&
+    inspect_option_class(.record_opt, "nmrec_comma")
+
+  if(isFALSE(is_bounded)){
+    type <- "fixed"
+  }else{
+    num_vals <- inspect_option_class(.record_opt, "nmrec_option_pos", "count")
+    type <- dplyr::case_when(
+      num_vals == 2 ~ "bounds",
+      num_vals == 3 ~ "bounds_with_starting",
+      TRUE ~ NA_character_
+    )
+    if(is.na(type)) dev_error("unexpected record format")
+  }
+
+  return(type)
+}
+
+
+#' Filter out prior records
+#'
+#' @param .param_recs list of `nmrec` record objects specific to the parameter
+#' @param .prior_rec list of `nmrec` record objects specifying priors
+#'        (should be of length 1).
+#' @param .spec list of record specifications for each element of `.param_recs`
+#'
+#' @details
+#' `bbr` does not support the inheritance of priors. To simplify
+#' the inheritance of previous parameter estimates, filter prior blocks out,
+#' and ensure the returned object is still a list of records.
+#'
+#' multiple blocks with -same name- is older method for specifying priors.
+#' We only copy over main blocks, so we have to check the $PRIOR record to
+#' determine the expected number of initial values
+#'
+#' @keywords internal
+filter_prior_records <- function(.param_recs, .prior_rec, .spec){
+  checkmate::assert_list(.param_recs)
+
+  if(rlang::is_empty(.prior_rec)){
+    # Handling if no prior record is found (skip)
+    return(.param_recs)
+  }else{
+    # Number of parameters found across all records of a given type
+    n_params_found <- max(.spec[[length(.spec)]]$index)
+
+    # Determine total number of expected records using the prior record
+    .prior_rec <- .prior_rec[[1]]
+
+    # Get relevant PRIOR option
+    rec_type <- purrr::map_chr(.spec, \(.x) .x$record_type) %>% unique()
+    prior_opt <- switch (rec_type,
+      "theta" = "NTHETA",
+      "omega" = "NETA",
+      "sigma" = NA_character_ # not yet supported (not sure what the string is)
+    )
+    prior_opt_rec <- nmrec::get_record_option(.prior_rec, prior_opt)
+
+    if(!is.null(prior_opt_rec)){
+      n_params_expected <- as.numeric(prior_opt_rec$value)
+
+      # Filter out priors
+      if(n_params_expected < n_params_found){
+        recs_include <- purrr::map_lgl(.spec, \(.x) max(.x$index) <= n_params_expected)
+        .param_recs <- .param_recs[recs_include]
+      }else if(n_params_expected != n_params_found){
+        dev_error("Unable to filter out prior records")
+      }
+    }
+
+    return(.param_recs)
+  }
+}
+
 
 
 #' Check that the replacement values are the same length as the record

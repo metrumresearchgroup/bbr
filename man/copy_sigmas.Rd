@@ -4,7 +4,7 @@
 \alias{copy_sigmas}
 \title{Copy sigma records from one model to another}
 \usage{
-copy_sigmas(.mod_lines, .new_sigmas)
+copy_sigmas(.mod_lines, .new_sigmas, .bounds_opts)
 }
 \arguments{
 \item{.mod_lines}{lines of ctl file. Must be an \code{nmrec} \code{nmrec_ctl_records} object.}

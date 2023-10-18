@@ -4,17 +4,26 @@
 \alias{filter_prior_records}
 \title{Filter out prior records}
 \usage{
-filter_prior_records(.records)
+filter_prior_records(.param_recs, .prior_rec, .spec)
 }
 \arguments{
-\item{.records}{list of \code{nmrec} record objects}
+\item{.param_recs}{list of \code{nmrec} record objects specific to the parameter}
+
+\item{.prior_rec}{list of \code{nmrec} record objects specifying priors
+(should be of length 1).}
+
+\item{.spec}{list of record specifications for each element of \code{.param_recs}}
 }
 \description{
 Filter out prior records
 }
 \details{
-\code{bbr} does not support the inheritance of priors at this time. To simplify
+\code{bbr} does not support the inheritance of priors. To simplify
 the inheritance of previous parameter estimates, filter prior blocks out,
 and ensure the returned object is still a list of records.
+
+multiple blocks with -same name- is older method for specifying priors.
+We only copy over main blocks, so we have to check the $PRIOR record to
+determine the expected number of initial values
 }
 \keyword{internal}

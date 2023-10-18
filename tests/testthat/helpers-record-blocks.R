@@ -40,6 +40,9 @@ make_matrix <- function(n, values, block_loc) {
     mat[mat_spec$row[i], mat_spec$col[i]] <- mat_spec$value[i]
   }
 
+  # Make upper-triangular matrix
+  mat <- t(mat)
+
   return(mat)
 }
 
@@ -94,6 +97,11 @@ format_record <- function(input_nmrec){
     function(x) !grepl("^\\$PROBLEM", x$format()), input_nmrec$records
   )
   format(input_nmrec)
+}
+
+
+diff_record <- function(test_case) {
+  diffobj::diffChr(format_record(test_case$input_nmrec), test_case$result_ctl)
 }
 
 # Compile Examples --------------------------------------------------------
