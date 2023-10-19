@@ -211,12 +211,11 @@ setup_param_records <- function(.mod_lines, .new_params, .rec_type = BBR_ESTIMAT
   # Matrix handling
   if(.rec_type %in% c("sigma", "omega")){
     new_params_lst <- purrr::map(param_recs_spec, function(rec_spec){
-      cov_specified <- isTRUE(rec_spec$is_block) && rec_spec$record_length >= 3
-      if(isFALSE(cov_specified) && isFALSE(rec_spec$is_same)){
+      if(isTRUE(rec_spec$diag_matrix)){
         # Get diagonals if no covariance was specified
         rec_replacement <- unname(diag(.new_params))[rec_spec$index]
-      }else if(isTRUE(cov_specified) && isFALSE(rec_spec$is_same)){
-        # Get values of upper triangular matrix
+      }else if(isTRUE(rec_spec$cov_matrix)){
+        # Get values of upper triangular matrix if covariance is specified
         mat_subset <- .new_params[rec_spec$index, rec_spec$index]
         rec_replacement <- mat_subset[upper.tri(mat_subset, diag = TRUE)]
       }else if(isTRUE(rec_spec$is_same)){
@@ -359,9 +358,13 @@ get_record_attr <- function(.param_recs){
   param_recs_spec <- purrr::map2(.param_recs, record_labels, \(.record, .label_df){
     labels <- .label_df$name
 
+    # Get basic record attributes
+    is_block <- nzchar(labels) && any(grepl("(?i)block", labels))
+    is_same <- nzchar(labels) && any(grepl("(?i)same", labels))
+
     # Determine length of each record
-    if(nzchar(labels) && any(grepl("(?i)block", labels))){
-      if(any(grepl("(?i)same", labels))){
+    if(isTRUE(is_block)){
+      if(isTRUE(is_same)){
         # Block handling with SAME(value)
         record_length <- .label_df$value[.label_df$name=="same"]
         # NA means a number of repeats wasn't defined, which means repeat once
@@ -376,11 +379,16 @@ get_record_attr <- function(.param_recs){
       record_length <- length(extract_record_values(.record))
     }
 
+    # Determine if covariance was specified for matrices - Must be at least `BLOCK(2)`
+    cov_matrix <- isTRUE(is_block) && record_length >= 2 && isFALSE(is_same)
+    diag_matrix <- (isFALSE(is_block) || record_length == 1) && isFALSE(is_same)
+
     list(
       record_type = .record$values[[1]]$name,
       record_length = record_length,
-      is_block = any(grepl("(?i)block", labels)),
-      is_same = any(grepl("(?i)same", labels))
+      cov_matrix = cov_matrix,
+      diag_matrix = diag_matrix,
+      is_same = is_same
     )
   })
 
