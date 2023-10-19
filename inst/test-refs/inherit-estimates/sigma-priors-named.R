@@ -1,16 +1,16 @@
 
-# $OMEGAP for OMEGA prior
-# $OMEGAPD for degrees of freedom (or dispersion factor) for OMEGA prior
+# $SIGMAP for SIGMA prior
+# $SIGMAPD for degrees of freedom (or dispersion factor) for SIGMA prior
 
 list(
-  case = "omega priors with named records",
+  case = "sigma priors with named records",
   input_ctl = "
-$PRIOR NWPRI NTHETA=6, NETA=4, NEPS=2, NTHP=6, NETP=4, NEPP=0
+$PRIOR NWPRI NTHETA=6, NETA=4, NEPS=4, NTHP=6, NETP=4, NEPP=0
 
-$OMEGA
+$SIGMA
 0.09          ;[P] KOUThealthy
 
-$OMEGA BLOCK (3)
+$SIGMA BLOCK (3)
     0.09          ;[P] KOUTdmd
     0.01          ;[P] cov21
     0.09          ;[P] KINdmd
@@ -18,15 +18,15 @@ $OMEGA BLOCK (3)
     0.01          ;[P] cov32
     0.09          ;[P] SCALAR
 
-$OMEGAP
+$SIGMAP
   0.09 FIX
 
-$OMEGAP BLOCK(3)
+$SIGMAP BLOCK(3)
   0.09 FIX
   0.01 0.09
   0.01 0.01 0.09
 
-$OMEGAPD (1 FIX)(3 FIX); df for each $omega block",
+$SIGMAPD (1 FIX)(3 FIX); df for each $sigma block",
 replacement = make_matrix(
   n = 4,
   values = c(c(0.09), c(0.09, 0.01, 0.09, 0.01, 0.01, 0.09)) + 1, # add 1 to original
@@ -34,12 +34,12 @@ replacement = make_matrix(
 ),
 input_args = list(.bounds_opts = "maintain_bounds"),
 result_ctl = "
-$PRIOR NWPRI NTHETA=6, NETA=4, NEPS=2, NTHP=6, NETP=4, NEPP=0
+$PRIOR NWPRI NTHETA=6, NETA=4, NEPS=4, NTHP=6, NETP=4, NEPP=0
 
-$OMEGA
+$SIGMA
 1.09          ;[P] KOUThealthy
 
-$OMEGA BLOCK (3)
+$SIGMA BLOCK (3)
     1.09          ;[P] KOUTdmd
     1.01          ;[P] cov21
     1.09          ;[P] KINdmd
@@ -47,13 +47,13 @@ $OMEGA BLOCK (3)
     1.01          ;[P] cov32
     1.09          ;[P] SCALAR
 
-$OMEGAP
+$SIGMAP
   0.09 FIX
 
-$OMEGAP BLOCK(3)
+$SIGMAP BLOCK(3)
   0.09 FIX
   0.01 0.09
   0.01 0.01 0.09
 
-$OMEGAPD (1 FIX)(3 FIX); df for each $omega block"
+$SIGMAPD (1 FIX)(3 FIX); df for each $sigma block"
 )

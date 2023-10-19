@@ -113,6 +113,21 @@ describe("inherit_param_estimates: inherit omegas", {
     expect_equal(format_record(test_case$input_nmrec), test_case$result_ctl)
   })
 
+  it("covariance matrix", {
+
+    # starting record
+    test_case <- get_example_record("omega-covariance-block")
+
+    # Copy Thetas
+    copy_omegas(
+      .mod_lines = test_case$input_nmrec, .new_omegas = test_case$replacement,
+      .bounds_opts = test_case$input_args$.bounds_opts
+    )
+
+    # Inspect record
+    expect_equal(format_record(test_case$input_nmrec), test_case$result_ctl)
+  })
+
   it("Multiple blocks with SAME(val)", {
 
     # starting record
@@ -181,6 +196,70 @@ describe("inherit_param_estimates: inherit omegas", {
     # Copy Thetas
     copy_omegas(
       .mod_lines = test_case$input_nmrec, .new_omegas = test_case$replacement,
+      .bounds_opts = test_case$input_args$.bounds_opts
+    )
+
+    # Inspect record
+    expect_equal(format_record(test_case$input_nmrec), test_case$result_ctl)
+  })
+})
+
+
+describe("inherit_param_estimates: inherit sigmas", {
+
+  it("base case", {
+
+    # starting record
+    test_case <- get_example_record("sigma-base-case")
+
+    # Copy Thetas
+    copy_sigmas(
+      .mod_lines = test_case$input_nmrec, .new_sigmas = test_case$replacement,
+      .bounds_opts = test_case$input_args$.bounds_opts
+    )
+
+    # Inspect record
+    expect_equal(format_record(test_case$input_nmrec), test_case$result_ctl)
+  })
+
+  it("multiple lines", {
+
+    # starting record
+    test_case <- get_example_record("sigma-multiple-lines")
+
+    # Copy Thetas
+    copy_sigmas(
+      .mod_lines = test_case$input_nmrec, .new_sigmas = test_case$replacement,
+      .bounds_opts = test_case$input_args$.bounds_opts
+    )
+
+    # Inspect record
+    expect_equal(format_record(test_case$input_nmrec), test_case$result_ctl)
+  })
+
+  it("covariance matrix", {
+
+    # starting record
+    test_case <- get_example_record("sigma-covariance-block")
+
+    # Copy Thetas
+    copy_sigmas(
+      .mod_lines = test_case$input_nmrec, .new_sigmas = test_case$replacement,
+      .bounds_opts = test_case$input_args$.bounds_opts
+    )
+
+    # Inspect record
+    expect_equal(format_record(test_case$input_nmrec), test_case$result_ctl)
+  })
+
+  it("With Priors that are explicity defined (P/PV/PD)", {
+
+    # starting record
+    test_case <- get_example_record("sigma-priors-named")
+
+    # Copy Thetas
+    copy_sigmas(
+      .mod_lines = test_case$input_nmrec, .new_sigmas = test_case$replacement,
       .bounds_opts = test_case$input_args$.bounds_opts
     )
 

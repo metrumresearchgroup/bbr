@@ -1,6 +1,6 @@
 
 list(
-  case = "theta bounds replace with single value",
+  case = "theta bounds - replace with single value",
   input_ctl = "
 $THETA
 (0, 2)      ; KA
@@ -8,8 +8,9 @@ $THETA
 (0, 10)     ; V2
 (0.02)      ; RUVp
 (1)         ; RUVa
-(0, 0.5, 1) ; F",
-replacement = c(1, 2, 3, 4, 5, 6),
+(0, 0.5, 1) ; F
+(-10, -3.92E+00, 10)",
+replacement = c(1, 2, 3, 4, 5, 6, 7),
 input_args = list(.bounds_opts = "single_value"),
 result_ctl = "
 $THETA
@@ -18,6 +19,7 @@ $THETA
 (3)     ; V2
 (4)      ; RUVp
 (5)         ; RUVa
-(6) ; F"
+(6) ; F
+(7)"
 )
 

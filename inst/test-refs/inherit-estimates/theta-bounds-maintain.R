@@ -1,6 +1,6 @@
 
 list(
-  case = "theta bounds maintain",
+  case = "theta bounds - maintain bounds; add starting value if not present",
   input_ctl = "
 $THETA
 (0, 2)      ; KA
@@ -8,8 +8,9 @@ $THETA
 (0, 10)     ; V2
 (0.02)      ; RUVp
 (1)         ; RUVa
-(0, 0.5, 1) ; F",
-replacement = c(1, 2, 3, 4, 5, 6),
+(0, 0.5, 1) ; F
+(-10, -3.92E+00, 10)",
+replacement = c(1, 2, 3, 4, 5, 6, 7),
 input_args = list(.bounds_opts = "maintain_bounds"),
 result_ctl = "
 $THETA
@@ -18,6 +19,7 @@ $THETA
 (0, 3, 10)     ; V2
 (4)      ; RUVp
 (5)         ; RUVa
-(0, 6, 1) ; F"
+(0, 6, 1) ; F
+(-10, 7, 10)"
 )
 

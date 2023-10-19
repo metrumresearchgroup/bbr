@@ -393,7 +393,7 @@ get_record_attr <- function(.param_recs){
   })
 
   # Determine index for each record
-  purrr::imap(param_recs_spec, ~{
+  purrr::imap(param_recs_spec, \(.x, .y){
     record_length <- .x$record_length
     if (.y > 1) {
       end <- sum(purrr::map_dbl(param_recs_spec[1:.y], "record_length"))
@@ -540,7 +540,7 @@ filter_prior_records <- function(.param_recs, .prior_rec, .spec){
     prior_opt <- switch (rec_type,
       "theta" = "NTHETA",
       "omega" = "NETA",
-      "sigma" = NA_character_ # not yet supported (not sure what the string is)
+      "sigma" = "NEPS"
     )
     prior_opt_rec <- nmrec::get_record_option(.prior_rec, prior_opt)
 

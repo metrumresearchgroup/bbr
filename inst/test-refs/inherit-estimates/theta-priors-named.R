@@ -1,4 +1,7 @@
 
+# $THETAP for THETA priors
+# $THETAPV for variance-covariance matrix for THETA’s
+
 list(
   case = "theta priors complex",
   input_ctl = "
