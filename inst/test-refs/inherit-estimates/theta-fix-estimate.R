@@ -1,6 +1,11 @@
 
 # In this example, only the OMEGAs have a prior distribution, the THETAS do not.
-# PRIOR block is included for consistency
+# PRIOR block is included for consistency, though it is also needed to filter out
+# the second THETA block (using `$PRIOR NTHETA=11`)
+
+# Here, the second THETA block is treated as a prior (filtered out), despite the
+# fact it's actually used to define the degrees of freedom of the OMEGA priors
+# (equivalent to $OMEGAPD)
 
 list(
   case = "theta fix",

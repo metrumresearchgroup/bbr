@@ -246,8 +246,7 @@ setup_param_records <- function(.mod_lines, .new_params, .rec_type = BBR_ESTIMAT
   return(
     list(
       param_recs = param_recs,
-      new_params = new_params_lst,
-      param_recs_spec = param_recs_spec
+      new_params = new_params_lst
     )
   )
 }
@@ -301,15 +300,16 @@ copy_record_opt <- function(val_recs, new_values, .bounds_opts){
           checkmate::assert_true(length(val_locs) == 2)
           # Create template position option
           # TODO: much of this code may move to nmrec:
-          # It doesn't really matter too much, but ideally `rec_opt_i$values[[val_locs[1]]]`
+          # It doesn't matter -too- much, but ideally `rec_opt_i$values[[val_locs[1]]]`
           # should be replaced with actual `nmrec` building blocks
           new_opt_lst <- list(
             nmrec:::elem_comma(), nmrec:::elem_whitespace(" "),
-            rec_opt_i$values[[val_locs[1]]]
+            rec_opt_i$values[[val_locs[1]]] # use existing value to maintain class
           )
           rec_opt_i$values <- append(rec_opt_i$values, new_opt_lst, after = val_locs[1])
           val_loc_new <- inspect_option_class(rec_opt_i, c("nmrec_option_pos", "nmrec_option"), "index")
-          rec_opt_i$values[[val_locs[2]]] <- replacement_i
+          # `val_loc_new` returns 3 indices (low, start, hi) - replace start value
+          rec_opt_i$values[[val_loc_new[2]]] <- replacement_i
         }
       }
     }

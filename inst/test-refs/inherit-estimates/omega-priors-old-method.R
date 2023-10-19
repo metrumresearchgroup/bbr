@@ -1,6 +1,6 @@
 
 # The second OMEGA matrix includes the priors. The PRIOR block indicates
-# there is a total of 4 prior ETA values
+# there is a total of 4 ETA values
 
 list(
   case = "omega priors old method (P/PV not specified)",
