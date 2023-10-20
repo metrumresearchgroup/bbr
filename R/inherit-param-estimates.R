@@ -75,7 +75,9 @@ inherit_param_estimates <- function(
 #' Copy theta records from one model to another
 #'
 #' @param .mod_lines lines of ctl file. Must be an `nmrec` `nmrec_ctl_records` object.
-#' @param .new_thetas list of new theta vectors, or a single theta vector
+#' @param .new_thetas single theta vector
+#' @param .bounds_opts options for handling bounded parameters. Only relevant for
+#'        THETA records
 #'
 #' @keywords internal
 copy_thetas <- function(.mod_lines, .new_thetas, .bounds_opts){
@@ -87,7 +89,7 @@ copy_thetas <- function(.mod_lines, .new_thetas, .bounds_opts){
   theta_recs <- param_setup$param_recs
   new_thetas <- param_setup$new_params
 
-  # Base case (copy over values, no unique blocks)
+  # Walk over each record and replacement vector
   purrr::walk2(theta_recs, new_thetas, function(theta_rec, new_thetas_i){
     theta_rec$parse()
 
@@ -96,44 +98,17 @@ copy_thetas <- function(.mod_lines, .new_thetas, .bounds_opts){
 
     # Ensure replacement lengths are the same
     check_record_replacements(val_recs, new_thetas_i)
+    # Copy over values
     copy_record_opt(val_recs, new_thetas_i, .bounds_opts)
   })
 }
 
 
-#' Copy sigma records from one model to another
-#'
-#' @inheritParams copy_thetas
-#' @param .new_sigmas list of new sigma matrices, or a single sigma matrix
-#'
-#' @keywords internal
-copy_sigmas <- function(.mod_lines, .new_sigmas, .bounds_opts){
-
-  # Pull records and format replacement values
-  param_setup <- setup_param_records(
-    .mod_lines, .new_params = .new_sigmas, .rec_type = "sigma"
-  )
-  sigma_recs <- param_setup$param_recs
-  new_sigmas <- param_setup$new_params
-
-  # Base case (copy over values, no unique blocks)
-  purrr::walk2(sigma_recs, new_sigmas, function(sigma_rec, new_sigmas_i){
-    sigma_rec$parse()
-
-    # inspect each record - filter to value options
-    val_recs <- extract_record_values(sigma_rec)
-
-    # Ensure replacement lengths are the same
-    check_record_replacements(val_recs, new_sigmas_i)
-    copy_record_opt(val_recs, new_sigmas_i, .bounds_opts)
-  })
-}
-
 
 #' Copy omega records from one model to another
 #'
 #' @inheritParams copy_thetas
-#' @param .new_omegas list of new omega matrices, or a single omega matrix
+#' @param .new_omegas single omega matrix
 #'
 #' @keywords internal
 copy_omegas <- function(.mod_lines, .new_omegas, .bounds_opts){
@@ -145,7 +120,7 @@ copy_omegas <- function(.mod_lines, .new_omegas, .bounds_opts){
   omega_recs <- param_setup$param_recs
   new_omegas <- param_setup$new_params
 
-  # Base case (copy over values, no unique blocks)
+  # Walk over each record and replacement matrix
   purrr::walk2(omega_recs, new_omegas, function(omega_rec, new_omegas_i){
     omega_rec$parse()
 
@@ -154,11 +129,40 @@ copy_omegas <- function(.mod_lines, .new_omegas, .bounds_opts){
 
     # Ensure replacement lengths are the same
     check_record_replacements(val_recs, new_omegas_i)
+    # Copy over values
     copy_record_opt(val_recs, new_omegas_i, .bounds_opts)
   })
 }
 
 
+#' Copy sigma records from one model to another
+#'
+#' @inheritParams copy_thetas
+#' @param .new_sigmas single sigma matrix
+#'
+#' @keywords internal
+copy_sigmas <- function(.mod_lines, .new_sigmas, .bounds_opts){
+
+  # Pull records and format replacement values
+  param_setup <- setup_param_records(
+    .mod_lines, .new_params = .new_sigmas, .rec_type = "sigma"
+  )
+  sigma_recs <- param_setup$param_recs
+  new_sigmas <- param_setup$new_params
+
+  # Walk over each record and replacement matrix
+  purrr::walk2(sigma_recs, new_sigmas, function(sigma_rec, new_sigmas_i){
+    sigma_rec$parse()
+
+    # inspect each record - filter to value options
+    val_recs <- extract_record_values(sigma_rec)
+
+    # Ensure replacement lengths are the same
+    check_record_replacements(val_recs, new_sigmas_i)
+    # Copy over values
+    copy_record_opt(val_recs, new_sigmas_i, .bounds_opts)
+  })
+}
 
 #' Extract the values from a record
 extract_record_values <- function(.record){
@@ -189,10 +193,6 @@ extract_record_values <- function(.record){
 setup_param_records <- function(.mod_lines, .new_params, .rec_type = BBR_ESTIMATES_INHERIT){
 
   .rec_type <- match.arg(.rec_type)
-
-  # coerce .new_params to list if not already
-  # vectors/matricies are allowed for a replacement of 1:1 (n_theta_blocks:n_replacements)
-  # if(!inherits(.new_params, "list")) .new_params <- list(.new_params)
 
   # Get parameter records
   param_recs <- nmrec::select_records(.mod_lines, .rec_type)

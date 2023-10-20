@@ -9,7 +9,10 @@ copy_omegas(.mod_lines, .new_omegas, .bounds_opts)
 \arguments{
 \item{.mod_lines}{lines of ctl file. Must be an \code{nmrec} \code{nmrec_ctl_records} object.}
 
-\item{.new_omegas}{list of new omega matrices, or a single omega matrix}
+\item{.new_omegas}{single omega matrix}
+
+\item{.bounds_opts}{options for handling bounded parameters. Only relevant for
+THETA records}
 }
 \description{
 Copy omega records from one model to another

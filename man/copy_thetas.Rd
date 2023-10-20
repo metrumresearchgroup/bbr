@@ -9,7 +9,10 @@ copy_thetas(.mod_lines, .new_thetas, .bounds_opts)
 \arguments{
 \item{.mod_lines}{lines of ctl file. Must be an \code{nmrec} \code{nmrec_ctl_records} object.}
 
-\item{.new_thetas}{list of new theta vectors, or a single theta vector}
+\item{.new_thetas}{single theta vector}
+
+\item{.bounds_opts}{options for handling bounded parameters. Only relevant for
+THETA records}
 }
 \description{
 Copy theta records from one model to another

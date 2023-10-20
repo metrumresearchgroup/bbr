@@ -1,4 +1,39 @@
 
+get_param_recs <- function(.mod, .format = TRUE){
+  ctl <- nmrec::read_ctl(ctl_ext(.mod$absolute_model_path))
+
+  recs <- list(
+    thetas = nmrec::select_records(ctl, "theta"),
+    omegas = nmrec::select_records(ctl, "omega"),
+    sigmas = nmrec::select_records(ctl, "sigma")
+  )
+
+  if(.format){
+    recs <- purrr::pmap(recs, \(thetas, omegas, sigmas){
+      list(
+        thetas = thetas$format(),
+        omegas = omegas$format(),
+        sigmas = sigmas$format()
+      )
+    })
+  }
+  return(recs)
+}
+
+describe("inherit_param_estimates: integration", {
+
+  it("base model", {
+    mod2 <- copy_model_from(MOD1, "mod2", "Test inherit estimates", .overwrite = TRUE)
+    on.exit(delete_models(mod2, .tags = NULL, .force = TRUE))
+
+    inherit_param_estimates(mod2)
+    param_recs <- get_param_recs(mod2)
+
+  })
+})
+
+# Unit Tests - THETA ------------------------------------------------------
+
 # Use the helper function below to compare outputs
 # diff_record(test_case)
 
@@ -111,6 +146,11 @@ describe("inherit_param_estimates: inherit thetas", {
 })
 
 
+# Unit Tests - OMEGA ------------------------------------------------------
+
+# Use the helper function below to compare outputs
+# diff_record(test_case)
+
 describe("inherit_param_estimates: inherit omegas", {
 
   it("base case", {
@@ -219,6 +259,11 @@ describe("inherit_param_estimates: inherit omegas", {
   })
 })
 
+
+# Unit Tests - SIGMA ------------------------------------------------------
+
+# Use the helper function below to compare outputs
+# diff_record(test_case)
 
 describe("inherit_param_estimates: inherit sigmas", {
 

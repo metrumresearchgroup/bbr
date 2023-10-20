@@ -9,7 +9,10 @@ copy_sigmas(.mod_lines, .new_sigmas, .bounds_opts)
 \arguments{
 \item{.mod_lines}{lines of ctl file. Must be an \code{nmrec} \code{nmrec_ctl_records} object.}
 
-\item{.new_sigmas}{list of new sigma matrices, or a single sigma matrix}
+\item{.new_sigmas}{single sigma matrix}
+
+\item{.bounds_opts}{options for handling bounded parameters. Only relevant for
+THETA records}
 }
 \description{
 Copy sigma records from one model to another
