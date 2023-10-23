@@ -363,19 +363,24 @@ get_record_attr <- function(.param_recs){
     is_same <- nzchar(labels) && any(grepl("(?i)same", labels))
 
     # Determine length of each record
+    # TODO: Confirm if block(n) required for `same` (have only seen this case)
     if(isTRUE(is_block)){
       if(isTRUE(is_same)){
-        # Block handling with SAME(value)
-        record_length <- .label_df$value[.label_df$name=="same"]
+        ## Block handling with SAME(value)
+        # Get same length
+        same_length <- .label_df$value[.label_df$name=="same"]
         # NA means a number of repeats wasn't defined, which means repeat once
-        if(is.na(record_length)) record_length <- 1
-      }else{
-        # Default Block handling
+        if(is.na(same_length)) same_length <- 1
         mat_size <- .label_df$value[.label_df$name=="block"]
-        record_length <- mat_size #length(block(mat_size))
+        # record length equal to block(n) * same(m) --> n * m
+        record_length <- mat_size * same_length
+      }else{
+        ## Default Block handling
+        mat_size <- .label_df$value[.label_df$name=="block"]
+        record_length <- mat_size
       }
     }else{
-      # Single/diagonal values
+      ## Single/diagonal values
       record_length <- length(extract_record_values(.record))
     }
 
