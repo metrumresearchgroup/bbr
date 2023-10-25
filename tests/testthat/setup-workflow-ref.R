@@ -241,6 +241,17 @@ create_rlg_models <- function() {
   return(invisible(NULL))
 }
 
+create_tree_models <- function() {
+  # copy models before creating model tree
+  mod1 <- read_model(MOD1_PATH)
+  mod2 <- copy_model_from(mod1, "2", .add_tags = NEW_TAGS)
+  mod3 <- copy_model_from(mod2, "3")
+  mod4 <- copy_model_from(mod2, "4")
+  mod5 <- copy_model_from(mod4, "5")
+  mod6 <- copy_model_from(mod5, "6", .based_on_additional = "3")
+  return(invisible(NULL))
+}
+
 clean_test_enviroment <- function(.f = NULL , env = parent.frame())
 {
     cleanup(env)
