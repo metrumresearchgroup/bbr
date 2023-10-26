@@ -20,23 +20,41 @@ REQUIRED_TREE_PKGS <- c("collapsibleTree", "manipulateWidget","kableExtra",
 #' Create a tree diagram of a modeling directory
 #'
 #' @inheritParams run_log
+#' @param .info vector of [run_log()] columns to include in the tooltip or
+#'        appended table.
+#' @param .add_summary Logical (`TRUE`/`FALSE`). If `TRUE`, include key columns
+#'        from [model_summary()] output.
+#' @param .append_table Logical (`TRUE`/`FALSE`). If `TRUE`, append the info
+#'        included in the tooltips as a table below the model tree. Mainly useful
+#'        for non-interactive diagrams (tooltips wont show).
+#' @param .static_plot Logical (`TRUE`/`FALSE`). If `TRUE`, render the plot as a
+#'        static image. This takes a little longer, as the interactive plot must
+#'        be saved as a PNG and loaded into the viewer.
 #'
 #' @details
-#' Uses the `based_on` attribute of each model to determine the tree network
+#' Uses the `based_on` attribute of each model to determine the tree network.
+#'  - Additional `based_on` flags will be shown in the tooltip, using the first one
+#' to create the tree network
 #'
-#' Note: This will not (currently) work if `.based_on_additional` was set when
-#'  `copy_model_from()` was used (i.e. it can only be based on one model)
+#' Setting `.append_table` to `TRUE` can useful when `.static_plot = TRUE`, which
+#' captures the information stored in would-be tooltips for non-interactive diagrams.
 #'
 #' @export
 model_tree <- function(.base_dir,
                        .recurse = FALSE,
                        .include = NULL,
+                       .info = c("description","star", "tags"),
                        .add_summary = TRUE,
-                       .static_plot = FALSE,
-                       .append_table = FALSE
+                       .append_table = FALSE,
+                       .static_plot = FALSE
 ){
+  # Base Run log
   log_df <- run_log(.base_dir, .recurse, .include) %>%
     suppressSpecificWarning("incomplete final line")
+
+  # Default tooltip columns
+  checkmate::assert_true(all(.info %in% colnames(log_df)))
+  attr_cols <- .info
 
   # Replace NULL based_on elements with NA to preserve rows when unnesting
   full_log <- log_df %>% dplyr::mutate(
@@ -44,12 +62,32 @@ model_tree <- function(.base_dir,
     tags = purrr::map(tags, \(.x){if(is.null(.x)) "" else paste(.x, collapse = ", ")})
   ) %>% tidyr::unnest(c("based_on", "tags"))
 
+  # Handling for multiple based_on flags
+  dup_rows <- duplicated(full_log[[ABS_MOD_PATH]])
+  if(any(dup_rows)){
+    addl_based_on <- full_log[dup_rows,] %>%
+      dplyr::select(all_of(c(ABS_MOD_PATH, "based_on"))) %>%
+      tidyr::nest("based_on" = "based_on") %>%
+      dplyr::mutate(
+        based_on = purrr::map(based_on, \(.x){ paste(.x$based_on, collapse = ", ")})
+      ) %>% tidyr::unnest("based_on")
+
+    # Remove duplicate rows
+    full_log <- full_log[!dup_rows,]
+
+    # Add additional based_on flags to new column
+    full_log$addl_based_on <- NA_character_
+    full_log$addl_based_on[full_log[[ABS_MOD_PATH]] %in% addl_based_on[[ABS_MOD_PATH]]] <- addl_based_on$based_on
+    # Add column to tooltip
+    attr_cols <- c(attr_cols, "addl_based_on")
+  }
+
   # Truncate tags
   full_log <- full_log %>% dplyr::mutate(
     tags = stringr::str_trunc(tags, 30)
   )
 
-  attr_cols <- c("description","star", "tags")
+
   # Optionally append model summary information
   if(isTRUE(.add_summary)){
     sum_cols <- c("status", "number_of_subjects",
@@ -62,6 +100,7 @@ model_tree <- function(.base_dir,
     ) %>% dplyr::select("absolute_model_path", all_of(sum_cols))
 
     full_log <- left_join(full_log, sums_df, by = ABS_MOD_PATH)
+    # Add summary columns to tooltip
     attr_cols <- c(attr_cols, sum_cols)
   }
 
@@ -74,10 +113,9 @@ model_tree <- function(.base_dir,
 
   # Add attributes
   # TODO: add support for multiple based_on
-  hierarchy_df <- left_join(hierarchy_df, full_log, by = c("to" = "run"),
-                            relationship = "many-to-many") %>%
-    dplyr::select(all_of(c("from", "to", "absolute_model_path", attr_cols))) %>%
-    dplyr::distinct()
+  # Note: 'many-to-many' is used when multiple based_on are set for a model
+  hierarchy_df <- left_join(hierarchy_df, full_log, by = c("to" = "run")) %>%
+    dplyr::select(all_of(c("from", "to", "absolute_model_path", attr_cols)))
 
   # Color by star (potentially user-specified variable)
   hierarchy_df$col <- factor(hierarchy_df$star)
@@ -97,7 +135,8 @@ model_tree <- function(.base_dir,
 
   if(isTRUE(.append_table)){
     # Format attributes as standalone table if static
-    tooltip_df <- hierarchy_df %>% dplyr::select("Model" = "to", all_of(attr_cols))
+    tooltip_df <- hierarchy_df %>% dplyr::select("Model" = "to", all_of(attr_cols)) %>%
+      dplyr::mutate(dplyr::across(everything(), ~ ifelse(is.na(.x), "", .x)))
     html_table <- kableExtra::kbl(tooltip_df, format = "html") %>%
       kableExtra::kable_styling(font_size = 10)
     pl_tree <- manipulateWidget::combineWidgets(pl_tree, html_table)
@@ -122,8 +161,16 @@ make_tree_tooltip <- function(.hierarchy_df){
   # Tooltip from run log
   tooltip <- purrr::imap_chr(.hierarchy_df$to, \(.x, .y){
     mod_html <- paste0(
-      "<span style='font-size:14px; color:#538b01; font-weight:bold'>", .x,
+      "<span style='font-size:14px; color:#538b01; font-weight:bold;'>", .x,
       "</span><br>")
+
+    # Additional based_on flags: NULL if column doesnt exist, or NA for specific
+    # models with only one based_on flag
+    based_on_addl_html <- ifelse(
+      is.null(.hierarchy_df$addl_based_on) || is.na(.hierarchy_df$addl_based_on[.y]), "",
+      paste0("<span style='font-weight:bold;'>", "Additional Based on: ",
+             .hierarchy_df$addl_based_on[.y], "</span><br>")
+    )
     desc_html <- ifelse(
       is.na(.hierarchy_df$description[.y]), "",
       paste0("<span style='font-style:italic;'>", .hierarchy_df$description[.y],
@@ -138,7 +185,7 @@ make_tree_tooltip <- function(.hierarchy_df){
       paste0("<span style='color: #87CEEB'>Starred</span><br>"), ""
     )
 
-    paste0(mod_html, desc_html, star_html, tags_html)
+    paste0(mod_html, based_on_addl_html, desc_html, star_html, tags_html)
   })
 
   # Tooltip from model summary
@@ -185,6 +232,7 @@ model_tree_png <- function(widget) {
   )
   # Load and plot PNG
   png_file <- png::readPNG(temp_png)
+  grid::grid.newpage()
   grid::grid.raster(png_file)
 }
 

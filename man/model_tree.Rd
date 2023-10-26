@@ -8,7 +8,9 @@ model_tree(
   .base_dir,
   .recurse = FALSE,
   .include = NULL,
+  .info = c("description", "star", "tags"),
   .add_summary = TRUE,
+  .append_table = FALSE,
   .static_plot = FALSE
 )
 }
@@ -20,7 +22,31 @@ but \emph{not} subdirectories. This is passed through to \code{fs::dir_ls()} --
 If \code{TRUE} recurse fully, if a positive number the number of levels to recurse.}
 
 \item{.include}{A character vector specifying which runs or model tags to include in the run log.}
+
+\item{.info}{vector of \code{\link[=run_log]{run_log()}} columns to include in the tooltip or
+appended table.}
+
+\item{.add_summary}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, include key columns
+from \code{\link[=model_summary]{model_summary()}} output.}
+
+\item{.append_table}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, append the info
+included in the tooltips as a table below the model tree. Mainly useful
+for non-interactive diagrams (tooltips wont show).}
+
+\item{.static_plot}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, render the plot as a
+static image. This takes a little longer, as the interactive plot must
+be saved as a PNG and loaded into the viewer.}
 }
 \description{
 Create a tree diagram of a modeling directory
+}
+\details{
+Uses the \code{based_on} attribute of each model to determine the tree network.
+\itemize{
+\item Additional \code{based_on} flags will be shown in the tooltip, using the first one
+to create the tree network
+}
+
+Setting \code{.append_table} to \code{TRUE} can useful when \code{.static_plot = TRUE}, which
+captures the information stored in would-be tooltips for non-interactive diagrams.
 }

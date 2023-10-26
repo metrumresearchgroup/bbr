@@ -1,10 +1,31 @@
 context("Constructing model tree")
 
-test_that("model_tree() works", {
+test_that("model_tree() default behavior", {
   skip_if_tree_missing_deps()
   clean_test_enviroment(create_tree_models)
 
   pl_tree <- model_tree(MODEL_DIR)
 
-  withr::deferred_run()
+  # Confirm number of expected nodes
+  expect_equal(
+    length(pl_tree$x$options$hierarchy) + 1,
+    nrow(run_log(MODEL_DIR))
+  )
+
+  # Confirm hierarchy
+  expect_equal(pl_tree$x$options$hierarchy, seq(1,6))
+
+  # Confirm order of nodes (hierarchy doesnt track where child nodes are)
+  # (requires dealing with a nested list)
+
+
+  # withr::deferred_run()
+})
+
+
+test_that("make_tree_tooltip()", {
+  skip_if_tree_missing_deps()
+  clean_test_enviroment(create_tree_models)
+
+
 })

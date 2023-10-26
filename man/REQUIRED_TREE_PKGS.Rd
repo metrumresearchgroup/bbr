@@ -5,7 +5,7 @@
 \alias{REQUIRED_TREE_PKGS}
 \title{Required packages for running \code{\link[=model_tree]{model_tree()}}}
 \format{
-An object of class \code{character} of length 5.
+An object of class \code{character} of length 7.
 }
 \usage{
 REQUIRED_TREE_PKGS
@@ -14,11 +14,16 @@ REQUIRED_TREE_PKGS
 Required packages for running \code{\link[=model_tree]{model_tree()}}
 }
 \details{
-\code{collapsibleTree} is the only package needed for creating an interactive plot.
+The packages below are required for both interactive and static viewing:
+\itemize{
+\item \code{collapsibleTree} for the core plot
+\item \code{kableExtra} and \code{manipulateWidget} for creating and adding a table
+respectively
+}
 
 The packages below are all used for rendering the model tree as a static image:
 \itemize{
-\item \code{htmlwidgets} is a dependency of \code{collapsibleTree}, so it is a 'free' import
+\item \code{htmlwidgets} is a dependency of \code{collapsibleTree}, so it's a 'free' import
 \item \code{grid} is a built-in R package
 \item \code{webshot} is needed for taking a screenshot
 \item \code{png} is needed for reading in a PNG file in order to plot it in Rstudio
