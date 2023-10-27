@@ -50,7 +50,7 @@ model_tree <- function(.base_dir,
 ){
   # Base Run log
   log_df <- run_log(.base_dir, .recurse, .include) %>%
-    suppressSpecificWarning("incomplete final line")
+    suppressWarnings()
 
   # Default tooltip columns
   checkmate::assert_true(all(.info %in% colnames(log_df)))
@@ -104,38 +104,18 @@ model_tree <- function(.base_dir,
     attr_cols <- c(attr_cols, sum_cols)
   }
 
-  # Create Network
-  noref <- data.frame(from = NA,
-                      to = full_log$run[full_log$based_on==""])
-  refs <- data.frame(from = full_log$based_on[full_log$based_on!=""],
-                     to = full_log$run[full_log$based_on!=""])
-  hierarchy_df <- rbind(noref, refs)
+  # Create model network and add tooltips
+  network_df <- make_model_network(full_log, attr_cols)
 
-  # Add attributes
-  # TODO: add support for multiple based_on
-  # Note: 'many-to-many' is used when multiple based_on are set for a model
-  hierarchy_df <- left_join(hierarchy_df, full_log, by = c("to" = "run")) %>%
-    dplyr::select(all_of(c("from", "to", "absolute_model_path", attr_cols)))
-
-  # Color by star (potentially user-specified variable)
-  hierarchy_df$col <- factor(hierarchy_df$star)
-  levels(hierarchy_df$col) <- c("#edf8fb","#810f7c")
-
-  # Compile attributes into tooltip
-  hierarchy_df$tooltip <- make_tree_tooltip(hierarchy_df)
-
-  # TODO: perform checks regarding whether a tree can be made. If models
-  # were deleted, or links otherwise cannot be determined, a tree cannot be made
-  # If check fails --> do we filter those out and warn?
-
+  # Create model tree
   pl_tree <- collapsibleTree::collapsibleTreeNetwork(
-    hierarchy_df, zoomable = FALSE, attribute = c("star"),
+    network_df, zoomable = FALSE, attribute = c("star"),
     fill="col", collapsed = FALSE, nodeSize = "leafCount",
     tooltipHtml = "tooltip")
 
   if(isTRUE(.append_table)){
-    # Format attributes as standalone table if static
-    tooltip_df <- hierarchy_df %>% dplyr::select("Model" = "to", all_of(attr_cols)) %>%
+    # Format attributes as standalone table
+    tooltip_df <- network_df %>% dplyr::select("Model" = "to", all_of(attr_cols)) %>%
       dplyr::mutate(dplyr::across(everything(), ~ ifelse(is.na(.x), "", .x)))
     html_table <- kableExtra::kbl(tooltip_df, format = "html") %>%
       kableExtra::kable_styling(font_size = 10)
@@ -149,17 +129,81 @@ model_tree <- function(.base_dir,
   }
 }
 
+
+make_model_network <- function(.full_log, .attr_cols){
+
+  # Create Network
+  noref <- data.frame(from = NA,
+                      to = .full_log$run[.full_log$based_on==""])
+  refs <- data.frame(from = .full_log$based_on[.full_log$based_on!=""],
+                     to = .full_log$run[.full_log$based_on!=""])
+  network_df <- rbind(noref, refs)
+
+  # Add attributes
+  network_df <- left_join(network_df, .full_log, by = c("to" = "run")) %>%
+    dplyr::select(all_of(c("from", "to", .attr_cols)))
+
+  # Color by star (potentially user-specified variable)
+  network_df$col <- factor(network_df$star)
+  levels(network_df$col) <- c("#edf8fb","#810f7c")
+
+  # Check network links - remove any unlinked models
+  network_df <- check_model_tree(network_df)
+
+  # Compile attributes into tooltip
+  network_df$tooltip <- make_tree_tooltip(network_df)
+
+  return(network_df)
+}
+
+
+#' Perform checks regarding whether a tree can be made
+#'
+check_model_tree <- function(.network_df){
+
+  find_roots <- function(.network_df){
+    children <- .network_df[ , 2]
+    parents <- .network_df[ , 1]
+    root_name <- unique(parents[!(parents %in% children)])
+    if (length(root_name) != 1){
+      # Remove expected NA root
+      unlinked_models <- root_name[!is.na(root_name)]
+      return(unlinked_models)
+    }
+    return(NULL)
+  }
+
+  # Check network links - remove any unlinked models, and warn at the end
+  unlinked_models <- NULL
+  if(!is.null(find_roots(.network_df))){
+    while(!is.null(find_roots(.network_df))){
+      unlinked_models <- c(unlinked_models, find_roots(.network_df))
+      .network_df <- .network_df %>% dplyr::filter(!(from %in% unlinked_models))
+    }
+    unlinked_model_txt <- paste0("{.code ", unlinked_models, "}", collapse = ", ")
+    msg <- glue::glue("The following models could not be linked: {{unlinked_model_txt}}",
+                      .open = "{{", .close = "}}")
+    cli::cli_warn(c(
+      "!" = msg,
+      "i" = "Check the yaml files or run {.code bbr::run_log} to make sure all
+      `based_on` models exist"
+    ))
+  }
+
+  return(.network_df)
+}
+
 #' Create tooltip for interactive [model_tree()]
 #'
 #' @keywords internal
-make_tree_tooltip <- function(.hierarchy_df){
+make_tree_tooltip <- function(.network_df){
 
   style_html <- function(txt, color, ...){
     paste0(glue::glue("<span style='color:{color};"), ...,"'>" ,txt,"</span>")
   }
 
   # Tooltip from run log
-  tooltip <- purrr::imap_chr(.hierarchy_df$to, \(.x, .y){
+  tooltip <- purrr::imap_chr(.network_df$to, \(.x, .y){
     mod_html <- paste0(
       "<span style='font-size:14px; color:#538b01; font-weight:bold;'>", .x,
       "</span><br>")
@@ -167,21 +211,21 @@ make_tree_tooltip <- function(.hierarchy_df){
     # Additional based_on flags: NULL if column doesnt exist, or NA for specific
     # models with only one based_on flag
     based_on_addl_html <- ifelse(
-      is.null(.hierarchy_df$addl_based_on) || is.na(.hierarchy_df$addl_based_on[.y]), "",
+      is.null(.network_df$addl_based_on) || is.na(.network_df$addl_based_on[.y]), "",
       paste0("<span style='font-weight:bold;'>", "Additional Based on: ",
-             .hierarchy_df$addl_based_on[.y], "</span><br>")
+             .network_df$addl_based_on[.y], "</span><br>")
     )
     desc_html <- ifelse(
-      is.na(.hierarchy_df$description[.y]), "",
-      paste0("<span style='font-style:italic;'>", .hierarchy_df$description[.y],
+      is.na(.network_df$description[.y]), "",
+      paste0("<span style='font-style:italic;'>", .network_df$description[.y],
              "</span><br>")
     )
     tags_html <- ifelse(
-      .hierarchy_df$tags[.y] =="", "",
-      paste0("Tags: ", .hierarchy_df$tags[.y], "<br>")
+      .network_df$tags[.y] =="", "",
+      paste0("Tags: ", .network_df$tags[.y], "<br>")
     )
     star_html <- ifelse(
-      isTRUE(.hierarchy_df$star[.y]),
+      isTRUE(.network_df$star[.y]),
       paste0("<span style='color: #87CEEB'>Starred</span><br>"), ""
     )
 
@@ -189,16 +233,16 @@ make_tree_tooltip <- function(.hierarchy_df){
   })
 
   # Tooltip from model summary
-  add_summary <- "status" %in% names(.hierarchy_df)
+  add_summary <- "status" %in% names(.network_df)
   if(isTRUE(add_summary)){
-    sum_tooltip <- purrr::imap_chr(.hierarchy_df$status, \(mod_status, .y){
+    sum_tooltip <- purrr::imap_chr(.network_df$status, \(mod_status, .y){
       if(grepl("Finished", mod_status)){
         paste0(
           "<br>",
           "<span style='color:#538b01; font-weight:bold'>", mod_status,"</span><br>",
-          "OFV: ", style_html(.hierarchy_df$ofv[.y],color = "#A30000"), "<br>",
-          "N Subjects: ", style_html(.hierarchy_df$number_of_subjects[.y], color = "#A30000"), "<br>",
-          "N Obs: ", style_html(.hierarchy_df$number_of_obs[.y], color = "#A30000")
+          "OFV: ", style_html(.network_df$ofv[.y],color = "#A30000"), "<br>",
+          "N Subjects: ", style_html(.network_df$number_of_subjects[.y], color = "#A30000"), "<br>",
+          "N Obs: ", style_html(.network_df$number_of_obs[.y], color = "#A30000")
         )
       }else{
         paste0(

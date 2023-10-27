@@ -4,7 +4,7 @@
 \alias{make_tree_tooltip}
 \title{Create tooltip for interactive \code{\link[=model_tree]{model_tree()}}}
 \usage{
-make_tree_tooltip(.hierarchy_df)
+make_tree_tooltip(.network_df)
 }
 \description{
 Create tooltip for interactive \code{\link[=model_tree]{model_tree()}}
