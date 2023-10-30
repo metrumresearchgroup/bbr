@@ -133,11 +133,16 @@ model_tree <- function(.base_dir,
 make_model_network <- function(.full_log, .attr_cols){
 
   # Create Network
-  noref <- data.frame(from = NA,
+  start <- "Modeling Directory" # TODO: maybe replace directory with dirname?
+  noref <- data.frame(from = NA, to = start)
+  parent_mods <- data.frame(from = start,
                       to = .full_log$run[.full_log$based_on==""])
-  refs <- data.frame(from = .full_log$based_on[.full_log$based_on!=""],
+  child_mods <- data.frame(from = .full_log$based_on[.full_log$based_on!=""],
                      to = .full_log$run[.full_log$based_on!=""])
-  network_df <- rbind(noref, refs)
+  network_df <- rbind(noref, parent_mods, child_mods)
+
+  # Check network links - remove any unlinked models
+  network_df <- check_model_tree(network_df)
 
   # Add attributes
   network_df <- left_join(network_df, .full_log, by = c("to" = "run")) %>%
@@ -147,8 +152,6 @@ make_model_network <- function(.full_log, .attr_cols){
   network_df$col <- factor(network_df$star)
   levels(network_df$col) <- c("#edf8fb","#810f7c")
 
-  # Check network links - remove any unlinked models
-  network_df <- check_model_tree(network_df)
 
   # Compile attributes into tooltip
   network_df$tooltip <- make_tree_tooltip(network_df)
@@ -173,21 +176,14 @@ check_model_tree <- function(.network_df){
     return(NULL)
   }
 
-  # Check network links - remove any unlinked models, and warn at the end
-  unlinked_models <- NULL
+  # Check network links
   if(!is.null(find_roots(.network_df))){
-    while(!is.null(find_roots(.network_df))){
-      unlinked_models <- c(unlinked_models, find_roots(.network_df))
-      .network_df <- .network_df %>% dplyr::filter(!(from %in% unlinked_models))
-    }
-    unlinked_model_txt <- paste0("{.code ", unlinked_models, "}", collapse = ", ")
-    msg <- glue::glue("The following models could not be linked: {{unlinked_model_txt}}",
-                      .open = "{{", .close = "}}")
-    cli::cli_warn(c(
-      "!" = msg,
-      "i" = "Check the yaml files or run {.code bbr::run_log} to make sure all
-      `based_on` models exist"
-    ))
+    # Connect other roots to directory. Point all un-networked models to base directory
+    start <- .network_df$to[is.na(.network_df$from)]
+    missing_roots <- purrr::map_dfr(find_roots(.network_df), \(.x){
+      data.frame(from = start, to = .x)
+    })
+    .network_df <- rbind(.network_df, missing_roots)
   }
 
   return(.network_df)
