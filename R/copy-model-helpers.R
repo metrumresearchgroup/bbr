@@ -66,6 +66,7 @@ update_model_id <- function(
   mod_id <- get_model_id(.mod)
   modelfile <- get_model_path(.mod)
   based_on <- get_based_on(.mod)
+
   if (is.null(based_on)) {
     stop(glue("Cannot call update_model_id() because .mod$based_on is empty for model {mod_id}"))
   }else{
@@ -89,7 +90,7 @@ update_model_id <- function(
   )
 
   txt <- gsub(
-    paste0(based_on_id, .suffixes),
+    paste0("\\Q",based_on_id,"\\E", .suffixes),
     paste0(mod_id, "\\1"),
     txt,
     ignore.case = TRUE

@@ -135,3 +135,20 @@ test_that("update_model_id() works with models in different directories", {
     paste0(get_model_id(new_mod), c(DEFAULT_SUFFIXES, new_suff))
   )
 })
+
+
+test_that("update_model_id() protects regex characters in parent model ID", {
+  withr::with_tempdir({
+    mod1a <- copy_model_from(MOD1, file.path(getwd(), "1+"))
+    mod2 <- copy_model_from(mod1a, 2)
+
+    mod2_path <- get_model_path(mod2)
+    readr::write_lines(c("1+.tab", "11.tab"), mod2_path)
+
+    update_model_id(mod2)
+    expect_identical(
+      readr::read_lines(mod2_path),
+      c("2.tab", "11.tab")
+    )
+  })
+})
