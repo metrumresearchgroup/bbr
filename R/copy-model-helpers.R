@@ -65,11 +65,13 @@ update_model_id <- function(
   check_yaml_in_sync(.mod)
   mod_id <- get_model_id(.mod)
   modelfile <- get_model_path(.mod)
-  based_on <- .mod$based_on[1]
+  based_on <- get_based_on(.mod)
   if (is.null(based_on)) {
     stop(glue("Cannot call update_model_id() because .mod$based_on is empty for model {mod_id}"))
+  }else{
+    based_on_id <- get_model_id(based_on)
   }
-  message(glue("replacing {based_on} with {mod_id} in {modelfile}"))
+  message(glue("replacing {based_on_id} with {mod_id} in {modelfile}"))
 
   ## construct suffixes regex string
   assert_character(.suffixes)
@@ -87,7 +89,7 @@ update_model_id <- function(
   )
 
   txt <- gsub(
-    paste0(based_on, .suffixes),
+    paste0(based_on_id, .suffixes),
     paste0(mod_id, "\\1"),
     txt,
     ignore.case = TRUE

@@ -108,3 +108,30 @@ test_that("update_model_id() errors with no based_on [BBR-CMH-006]", {
     regexp = "based_on is empty"
   )
 })
+
+
+test_that("update_model_id() works with models in different directories", {
+
+  # create to child directory
+  child_dir <- file.path(MODEL_DIR, "child_dir")
+  fs::dir_create(child_dir)
+  on.exit(fs::dir_delete(child_dir), add = TRUE)
+
+  # copy model and write strings with parent id to control stream
+  new_mod <- copy_model_from(
+    MOD1,
+    file.path(basename(child_dir), basename(NEW_MOD2))
+  )
+  new_suff <- "-1.msf"
+
+  readr::write_lines(
+    paste0(get_model_id(MOD1), c(DEFAULT_SUFFIXES, new_suff)),
+    get_model_path(new_mod)
+  )
+
+  update_model_id(new_mod, .additional_suffixes = new_suff)
+  expect_equal(
+    readr::read_lines(get_model_path(new_mod)),
+    paste0(get_model_id(new_mod), c(DEFAULT_SUFFIXES, new_suff))
+  )
+})
