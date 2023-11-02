@@ -48,6 +48,47 @@ model_tree <- function(.base_dir,
                        .append_table = FALSE,
                        .static_plot = FALSE
 ){
+
+  # Make tree data
+  tree_data <- make_tree_data(.base_dir, .recurse, .include, .info, .add_summary)
+  network_df <- tree_data$network_df
+  attr_cols <- tree_data$attr_cols
+
+  # Create model tree
+  pl_tree <- collapsibleTree::collapsibleTreeNetwork(
+    network_df, zoomable = FALSE, attribute = c("star"),
+    fill="col", collapsed = FALSE, nodeSize = "leafCount",
+    tooltipHtml = "tooltip")
+
+  if(isTRUE(.append_table)){
+    # Format attributes as standalone table
+    tooltip_df <- network_df %>% dplyr::select("Model" = "to", all_of(attr_cols)) %>%
+      dplyr::mutate(dplyr::across(everything(), ~ ifelse(is.na(.x), "", .x)))
+    html_table <- kableExtra::kbl(tooltip_df, format = "html") %>%
+      kableExtra::kable_styling(font_size = 10)
+    pl_tree <- manipulateWidget::combineWidgets(pl_tree, html_table)
+  }
+
+  if(isTRUE(.static_plot)){
+    model_tree_png(pl_tree)
+  }else{
+    return(pl_tree)
+  }
+}
+
+
+#' Construct dataset for use in `model_tree`
+#'
+#' @inheritParams model_tree
+#'
+#' @keywords internal
+make_tree_data <- function(
+    .base_dir,
+    .recurse = FALSE,
+    .include = NULL,
+    .info = c("description","star", "tags"),
+    .add_summary = TRUE
+){
   # Base Run log
   log_df <- run_log(.base_dir, .recurse, .include) %>%
     suppressWarnings()
@@ -107,38 +148,29 @@ model_tree <- function(.base_dir,
   # Create model network and add tooltips
   network_df <- make_model_network(full_log, attr_cols)
 
-  # Create model tree
-  pl_tree <- collapsibleTree::collapsibleTreeNetwork(
-    network_df, zoomable = FALSE, attribute = c("star"),
-    fill="col", collapsed = FALSE, nodeSize = "leafCount",
-    tooltipHtml = "tooltip")
-
-  if(isTRUE(.append_table)){
-    # Format attributes as standalone table
-    tooltip_df <- network_df %>% dplyr::select("Model" = "to", all_of(attr_cols)) %>%
-      dplyr::mutate(dplyr::across(everything(), ~ ifelse(is.na(.x), "", .x)))
-    html_table <- kableExtra::kbl(tooltip_df, format = "html") %>%
-      kableExtra::kable_styling(font_size = 10)
-    pl_tree <- manipulateWidget::combineWidgets(pl_tree, html_table)
-  }
-
-  if(isTRUE(.static_plot)){
-    model_tree_png(pl_tree)
-  }else{
-    return(pl_tree)
-  }
+  return(
+    list(
+      network_df = network_df,
+      attr_cols = attr_cols
+    )
+  )
 }
 
-
+#' Make model network for use in `model_tree`
+#'
+#' @param .full_log full log including model run and summary information
+#' @param .attr_cols attribute columns to include in tooltip or table
+#'
+#' @keywords internal
 make_model_network <- function(.full_log, .attr_cols){
 
   # Create Network
-  start <- "Modeling Directory" # TODO: maybe replace directory with dirname?
+  start <- "Start" # TODO: maybe replace directory with dirname?
   noref <- data.frame(from = NA, to = start)
   parent_mods <- data.frame(from = start,
-                      to = .full_log$run[.full_log$based_on==""])
+                            to = .full_log$run[.full_log$based_on==""])
   child_mods <- data.frame(from = .full_log$based_on[.full_log$based_on!=""],
-                     to = .full_log$run[.full_log$based_on!=""])
+                           to = .full_log$run[.full_log$based_on!=""])
   network_df <- rbind(noref, parent_mods, child_mods)
 
   # Check network links - remove any unlinked models
@@ -160,8 +192,12 @@ make_model_network <- function(.full_log, .attr_cols){
 }
 
 
-#' Perform checks regarding whether a tree can be made
+#' Perform checks regarding whether a tree can be made. Will set models as
+#' base models if referenced `based_on` model cannot be found
 #'
+#' @param .network_df dataframe indicating how models are related
+#'
+#' @keywords internal
 check_model_tree <- function(.network_df){
 
   find_roots <- function(.network_df){
@@ -180,10 +216,21 @@ check_model_tree <- function(.network_df){
   if(!is.null(find_roots(.network_df))){
     # Connect other roots to directory. Point all un-networked models to base directory
     start <- .network_df$to[is.na(.network_df$from)]
-    missing_roots <- purrr::map_dfr(find_roots(.network_df), \(.x){
+    unlinked_roots <- find_roots(.network_df)
+    missing_roots <- purrr::map_dfr(unlinked_roots, \(.x){
       data.frame(from = start, to = .x)
     })
     .network_df <- rbind(.network_df, missing_roots)
+
+    unlinked_model_txt <- paste0("{.code ", unlinked_roots, "}", collapse = ", ")
+    msg <- glue::glue("The following models could not be linked properly: {{unlinked_model_txt}}",
+                      .open = "{{", .close = "}}")
+    cli::cli_warn(c(
+      "!" = msg,
+      "i" = "Setting these as base models in tree diagram.",
+      "i" = "Check the yaml files or run {.code bbr::run_log} to make sure all
+      `based_on` models still exist"
+    ))
   }
 
   return(.network_df)
@@ -277,6 +324,72 @@ model_tree_png <- function(widget) {
 }
 
 
+
+model_tree_igraph <- function(
+    .base_dir,
+    .recurse = FALSE,
+    .include = NULL,
+    .info = c("description","star", "tags"),
+    .add_summary = TRUE,
+    .append_table = FALSE,
+    .static_plot = FALSE
+){
+  tree_data <- make_tree_data(.base_dir, .recurse, .include, .info, .add_summary)
+  network_df <- tree_data$network_df %>% dplyr::filter(!is.na(from))
+
+  edges <- network_df %>% dplyr::select("from", "to") %>%
+    dplyr::mutate(length = 100)
+  nodes <- data.frame(
+    id = unique(c(as.character(edges$from), as.character(edges$to)))
+  ) %>% dplyr::left_join(network_df %>% select(-"from"), by = c("id" = "to")) %>%
+    dplyr::transmute(
+      id,
+      label = id,
+      title = tooltip,
+      group = tags, # group column determines color
+      font.size = 25,
+      # shape = "circle", # puts label inside circle
+      shadow = TRUE,
+      value = 10
+    )
+
+  # layout settings
+  igraph_network <- igraph::graph_from_data_frame(edges, vertices = nodes)
+  layout_matrix <- igraph::layout_as_tree(igraph_network, root = 1, flip.y=FALSE)
+
+  # layout_matrix[,2] <- layout_matrix[,2] * 2
+  # layout_matrix[1,1] <- layout_matrix[1,1] + 2
+
+  # search button style
+  search_style <- 'width: 200px; height: 26px;  color: darkblue;
+      outline:none; padding: 0px;'
+  # make tree
+  visNetwork::visNetwork(
+    nodes, edges#,
+    # main = list(text = "Model Tree",
+    #             style = "color:#007319;font-size:18px;text-align:center;"),
+    # submain = list(text = .base_dir,
+    #                style = "color:#00544f;font-size:13px;text-align:center;")
+  ) %>%
+    visNetwork::visIgraphLayout(
+      layout='layout.norm', layoutMatrix=layout_matrix, type="full",
+      smooth = TRUE
+    ) %>%
+    visNetwork::visHierarchicalLayout(sortMethod = "directed", nodeSpacing = 100) %>%
+    visNetwork::visInteraction(
+      dragNodes = FALSE, dragView = FALSE, zoomView = FALSE
+    ) %>%
+    visNetwork::visOptions(
+      highlightNearest = list(enabled = TRUE),
+      selectedBy = list(variable = "group", style = search_style),
+      nodesIdSelection = list(enabled = TRUE, style = search_style)
+    )
+
+}
+
+
+
+
 #' Checks if all packages needed for [model_tree()] are present
 #'
 #' Returns a vector with the missing packages, or returns NULL if all are
@@ -320,3 +433,7 @@ stop_if_tree_missing_deps <- function() {
     rlang::abort(msg, call. = FALSE)
   }
 }
+
+
+
+
