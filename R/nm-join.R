@@ -62,6 +62,10 @@
 #' data will be renamed to `DV.DATA` and the column from the table file kept as
 #' `DV`.
 #'
+#' The origin of each column is attached to the return value via the
+#' "nm_join_origin" attribute, a list that maps each source (as named by
+#' [nm_tables()]) to the columns that came from that source.
+#'
 #' **Duplicate Rows Warning for Join Column**
 #'
 #' If there are duplicate rows found in the specified `.join_col`, a warning will be raised specifying a subset of the repeated rows.
@@ -109,6 +113,11 @@ nm_join <- function(
     .d <- rename(.d, DV.DATA = "DV")
   }
   col_order <- names(.d)
+
+  # Keep track of where each column came from.
+  origin <- vector(mode = "list", length = length(df_list))
+  names(origin) <- names(df_list)
+  origin$data <- col_order
 
   .join_col <- toupper(.join_col)
   if (!(.join_col %in% names(.d))) {
@@ -173,6 +182,7 @@ nm_join <- function(
       col_order <- union(col_order, names(tab))
       .d <- join_fun(tab, .d, by = .join_col)
     }
+    origin[[.n]] <- names(tab)
   }
 
   verbose_msg(c(
@@ -181,7 +191,10 @@ nm_join <- function(
     glue("  cols: {ncol(.d)}")
   ))
 
-  return(select(.d, !!col_order))
+  res <- select(.d, !!col_order)
+  attr(res, "nm_join_origin") <- origin
+
+  return(res)
 }
 
 

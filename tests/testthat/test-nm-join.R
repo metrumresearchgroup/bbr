@@ -104,6 +104,21 @@ test_that("nm_join() works correctly with duplicate cols [BBR-NMJ-004]", {
   expect_equal(test_df$DV.DATA, test_df$DV)
 })
 
+test_that("nm_join() records origin of columns in attribute", {
+  res <- nm_join(MOD1, .files = c("1.tab", "1par.tab", "1dups.tab"))
+  origin <- attr(res, "nm_join_origin")
+  sources <- c("data", "tab", "par.tab", "dups.tab")
+  for (source in sources) {
+    expect_true("NUM" %in% origin[[source]])
+  }
+
+  data <- nm_data(MOD1)
+  expect_identical(setdiff(origin[["data"]], names(data)), "DV.DATA")
+
+  expect_identical(origin[["par.tab"]], c("NUM", "CL", "V", "KA", "ETA1", "ETA2"))
+  expect_identical(origin[["dups.tab"]], c("NUM", "FAKE"))
+})
+
 test_that("nm_join(.join_col) works correctly with duplicate cols  [BBR-NMJ-005]", {
   # this test is annoyingly complex to set up because of the
   # mechanics of how the data is pulled and the internal checks
