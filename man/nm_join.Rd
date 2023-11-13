@@ -82,6 +82,10 @@ data \emph{and} at least one of the table files, the \code{DV} column from the i
 data will be renamed to \code{DV.DATA} and the column from the table file kept as
 \code{DV}.
 
+The origin of each column is attached to the return value via the
+"nm_join_origin" attribute, a list that maps each source (as named by
+\code{\link[=nm_tables]{nm_tables()}}) to the columns that came from that source.
+
 \strong{Duplicate Rows Warning for Join Column}
 
 If there are duplicate rows found in the specified \code{.join_col}, a warning will be raised specifying a subset of the repeated rows.
