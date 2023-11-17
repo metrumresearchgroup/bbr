@@ -975,6 +975,11 @@ TDF-R004:
   description: tags_diff.bbi_run_log_df works
   tests:
   - BBR-TDF-004
+TDF-R005:
+  description: add_tags_diff() can optionally append a new column with html formatting
+  tests:
+  - BBR-TDF-005
+  - BBR-TDF-006
 TSTT-R001:
   description: test_threads(.dry_run=T) creates copy models
   tests:

@@ -7,7 +7,7 @@
 \usage{
 tags_diff(.bbi_object, .mod2 = NULL, .print = TRUE, ...)
 
-add_tags_diff(.log_df)
+add_tags_diff(.log_df, .collapse = FALSE, .format = NULL)
 }
 \arguments{
 \item{.bbi_object}{The object to compare. Could be a
@@ -26,6 +26,10 @@ method.}}
 \item{...}{arguments passed through to methods. (Currently none.)}
 
 \item{.log_df}{a \code{bbi_run_log_df} tibble (the output of \code{\link[=run_log]{run_log()}})}
+
+\item{.collapse}{logical. Whether or not to collapse the new columns into a character string}
+
+\item{.format}{Can either be \code{NULL} or \code{'html'}. If set to \code{'html'}, return an additional column formatted for html rendering. See @details.}
 }
 \value{
 \strong{In all cases:}
@@ -57,4 +61,20 @@ models. A parent model is any model referenced in the relevant model's
 \code{based_on} field.  The \code{bbi_model} dispatch can optionally take a second
 model, in which case it will compare the first model to the second model,
 ignoring the \code{based_on} field entirely.
+}
+\details{
+If \code{.format} is set to \code{'html'}, a new column (\code{tags_diff}), will be added that combines \code{tags_added} and \code{tags_removed}.
+This new column will surround the removed tags with strikethrough html (\verb{<s>}/\verb{</s>}). For this to take effect when rendering the table
+as html, you \emph{must} specify \strong{\code{escape = FALSE}} in the knitr call (see @examples).
+Additionally, \code{.collapse} will automatically be set to \code{TRUE} if \code{.format} is set to \code{'html'}.
+}
+\examples{
+\dontrun{
+log_df <- bbr::run_log("inst/model/nonmem/basic")
+
+log_html <- log_df \%>\% add_tags_diff(.format = "html") \%>\% dplyr::relocate(tags_diff)
+
+log_html \%>\% knitr::kable(escape = F) \%>\% kableExtra::kable_styling()
+}
+
 }

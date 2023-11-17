@@ -84,3 +84,26 @@ test_that("tags_diff.bbi_run_log_df works [BBR-TDF-004]", {
   expect_equal(log_df$tags_removed, map(DIFF_REF, ~ .x$tags_removed))
 
 })
+
+test_that("add_tags_diff() can append a new column with html formatting [BBR-TDF-005]", {
+  cleanup()
+  create_rlg_models()
+
+  log_df <- run_log(MODEL_DIR)
+  log_html <- add_tags_diff(log_df, .format = "html")
+  expect_true("tags_diff" %in% names(log_html))
+  expect_true(all(str_detect(log_html$tags_diff, "<s>") == c(FALSE, rep(TRUE, 2))))
+  expect_true(all(str_detect(log_html$tags_diff, "</s>") == c(FALSE, rep(TRUE, 2))))
+
+})
+
+test_that("add_tags_diff() can collapse tag columns to string [BBR-TDF-006]", {
+  cleanup()
+  create_rlg_models()
+
+  log_df <- run_log(MODEL_DIR)
+  expect_false(inherits(log_df[[TAGS_ADD]], "character"))
+  log_df <- add_tags_diff(log_df, .collapse = TRUE)
+  expect_true(inherits(log_df[[TAGS_ADD]], "character"))
+
+})

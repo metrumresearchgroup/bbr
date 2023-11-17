@@ -110,18 +110,67 @@ tags_diff.bbi_run_log_df <- function(.bbi_object, .mod2 = NULL, .print = NULL, .
 
 #' @rdname tags_diff
 #' @importFrom purrr map
+#' @importFrom checkmate assert_logical assert_true makeAssertCollection
 #' @param .log_df a `bbi_run_log_df` tibble (the output of [run_log()])
+#' @param .collapse logical. Whether or not to collapse the new columns into a character string
+#' @param .format Can either be `NULL` or `'html'`. If set to `'html'`, return an additional column formatted for html rendering. See @details.
+#'
+#' @details
+#'
+#' If `.format` is set to `'html'`, a new column (`tags_diff`), will be added that combines `tags_added` and `tags_removed`.
+#' This new column will surround the removed tags with strikethrough html (`<s>`/`</s>`). For this to take effect when rendering the table
+#' as html, you *must* specify **`escape = FALSE`** in the knitr call (see @examples).
+#' Additionally, `.collapse` will automatically be set to `TRUE` if `.format` is set to `'html'`.
+#'
+#' @examples
+#' \dontrun{
+#' log_df <- bbr::run_log("inst/model/nonmem/basic")
+#'
+#' log_html <- log_df %>% add_tags_diff(.format = "html") %>% dplyr::relocate(tags_diff)
+#'
+#' log_html %>% knitr::kable(escape = F) %>% kableExtra::kable_styling()
+#' }
+#'
 #' @export
-add_tags_diff <- function(.log_df) {
+add_tags_diff <- function(.log_df, .collapse = FALSE, .format = NULL) {
 
   check_bbi_run_log_df_object(.log_df)
 
   diff_list <- tags_diff(.log_df)
 
-  .log_df %>%
+  .log_df <- .log_df %>%
     mutate(
       !!TAGS_ADD := map(diff_list, ~ .x[[TAGS_ADD]]),
       !!TAGS_REM := map(diff_list, ~ .x[[TAGS_REM]])
     )
+
+
+  assert_logical(.collapse)
+
+  if(!is.null(.format)){
+    coll = makeAssertCollection()
+    assert_true(.format == "html", add = coll)
+    if(!coll$isEmpty()){
+      stop("`.format` can only be NULL or 'html'")
+    }
+    .collapse <- TRUE # must be TRUE if .format is not NULL
+  }
+
+  if(.collapse){
+    .log_df <- bbr::suppressSpecificWarning(
+      collapse_to_string(.log_df, tags_added, tags_removed),
+      .regexpr = "collapse_to_string\\(\\) only works on list columns"
+    )
+  }
+
+  if("html" %in% .format){
+    .log_df <- .log_df %>%
+      mutate(
+        tags_diff = paste0(tags_added, "; <s>", tags_removed, "</s>") %>%
+          str_replace("; <s></s>","") %>%
+          str_replace("^; ", "")
+      ) %>% select(-c(TAGS_ADD, TAGS_REM))
+  }
+  return(.log_df)
 }
 
