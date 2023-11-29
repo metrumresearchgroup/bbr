@@ -48,6 +48,8 @@
 #'      issues. The condition number is the ratio of the largest eigenvalue to
 #'      the smallest eigenvalue. If there is only one eigenvalue, condition
 #'      number will be `1.0`.
+#'    * `eigenvalue_issues` -- Triggered when any of the of the eigenvalues <=
+#'      0, or if NONMEM needs to force them to be positive.
 #'    * `correlations_not_ok` -- Not currently implemented in `bbi`; will always
 #'      be `FALSE`.
 #'    * `parameter_near_boundary` -- At least one scaled parameter estimate is
