@@ -63,6 +63,8 @@ indicate highly correlated parameters, overparameterization, or other
 issues. The condition number is the ratio of the largest eigenvalue to
 the smallest eigenvalue. If there is only one eigenvalue, condition
 number will be \code{1.0}.
+\item \code{eigenvalue_issues} -- Triggered when any of the of the eigenvalues <=
+0, or if NONMEM needs to force them to be positive.
 \item \code{correlations_not_ok} -- Not currently implemented in \code{bbi}; will always
 be \code{FALSE}.
 \item \code{parameter_near_boundary} -- At least one scaled parameter estimate is
