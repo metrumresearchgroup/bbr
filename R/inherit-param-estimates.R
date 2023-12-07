@@ -42,6 +42,8 @@ inherit_param_estimates <- function(
     .digits = 3
 ){
 
+  test_nmrec_version(.min_version = "0.2.0.8000")
+
   .bounds <- match.arg(.bounds)
 
   checkmate::assert_true(all(.inherit %in% BBR_ESTIMATES_INHERIT))
@@ -133,3 +135,4 @@ validate_parent_mod <- function(.parent_mod){
 
   return(invisible(TRUE))
 }
+

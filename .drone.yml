@@ -101,7 +101,7 @@ steps:
   commands:
   - R -s -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
   # nmrec isn't available until the 2023-09-19 snapshot.
-  - git clone --branch 0.2.0 --depth 1 https://github.com/metrumresearchgroup/nmrec.git /tmp/nmrec
+  - git clone --branch 0.2.0.8000 --depth 1 https://github.com/metrumresearchgroup/nmrec.git /tmp/nmrec
   - R -s -e 'devtools::install("/tmp/nmrec", upgrade = "never")'
   - R -s -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
   environment:
