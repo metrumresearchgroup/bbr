@@ -89,7 +89,7 @@ describe("inherit_param_estimates: integration", {
 
     expect_error(inherit_param_estimates(mod3), "has not been executed")
 
-    mod3 <- inherit_param_estimates(mod3, MOD1$absolute_model_path)
+    mod3 <- inherit_param_estimates(mod3, .parent_mod = MOD1$absolute_model_path)
 
     mod1_params_final <- list(
       thetas = SUM1 %>% get_theta() %>% sprintf("%.3G", .),
@@ -103,6 +103,9 @@ describe("inherit_param_estimates: integration", {
     expect_equal(mod1_params_final$thetas, mod2_inits_inherit$thetas[[1]])
     expect_equal(mod1_params_final$omegas, mod2_inits_inherit$omegas[[1]])
     expect_equal(mod1_params_final$sigmas, mod2_inits_inherit$sigmas[[1]])
+
+    # Ensure model objects can also be passed
+    expect_no_error(inherit_param_estimates(mod3, .parent_mod = MOD1))
   })
 
   it("Inheriting only some parameters", {

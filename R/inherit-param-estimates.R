@@ -1,12 +1,7 @@
-
-#' Supported parameter estimates to inherit from parent model
-BBR_ESTIMATES_INHERIT <- c("theta", "sigma", "omega")
-
-
 #' Inherit parameter estimates
 #'
 #' @param .mod new model object to overwrite.
-#' @param .mod_inherit_path model path to inherit properties from.
+#' @param .parent_mod Either a model object, or path to a model to inherit properties from.
 #' @param .inherit type of estimates to inherit from parent model.
 #' @param .bounds Whether to keep or discard the existing bounds when setting
 #'   the initial estimates in THETA records.
@@ -40,7 +35,7 @@ BBR_ESTIMATES_INHERIT <- c("theta", "sigma", "omega")
 #' @export
 inherit_param_estimates <- function(
     .mod,
-    .mod_inherit_path = get_based_on(.mod),
+    .parent_mod = get_based_on(.mod),
     .inherit = c("theta", "sigma", "omega"),
     .bounds = c("keep", "discard"),
     .representation = c("keep", "reset"),
@@ -51,41 +46,21 @@ inherit_param_estimates <- function(
 
   checkmate::assert_true(all(.inherit %in% BBR_ESTIMATES_INHERIT))
 
-  # Confirm .mod_inherit_path is valid and error informatively if not
-  if(is.null(.mod_inherit_path) || !fs::file_exists(.mod_inherit_path)){
-    mod_exists <- fs::file_exists(ctl_ext(.mod_inherit_path)) ||
-      fs::file_exists(mod_ext(.mod_inherit_path))
-
-    msg_info <- c("i" = "To inherit parameter estimates from a parent model, {.code .mod_inherit_path}
-        must be a file path to a previously executed model.")
-    if(is.null(.mod_inherit_path)){
-      # If the model wasnt created via copy_model_from, or the `based_on` field
-      # is otherwise empty
-      msg_prefix <- glue::glue("{.code get_based_on(.mod)} did not return any parent models.
-                 Please specify {.code .mod_inherit_path} directly, or update the {.emph based_on}
-                 attribute of `.mod`. See {.code ?add_based_on} for details.",
-                 .open = "{{", .close = "}}")
-      msg <- c("x" = msg_prefix)
-    }else if(mod_exists && !fs::dir_exists(.mod_inherit_path)){
-      msg_prefix <- glue::glue("Parent model ({.code {{basename(ctl_ext(.mod_inherit_path))}}}) exists,
-                 but {.emph has not been executed.}", .open = "{{", .close = "}}")
-      msg <- c("x" = msg_prefix, msg_info)
-    }else{
-      msg_prefix <- glue::glue("Parent model does not exist at: {.emph {{.mod_inherit_path}}}", .open = "{{", .close = "}}")
-      msg <- c("x" = msg_prefix, msg_info)
-    }
-
-    cli::cli_div(theme = list(span.emph = list(color = "red"), span.code = list(color = "blue")))
-    cli::cli_abort(msg)
+  if(inherits(.parent_mod, "bbi_nonmem_model")){
+    parent_mod_path <- .parent_mod$absolute_model_path
+  }else{
+    parent_mod_path <- .parent_mod
+    # Confirm .parent_mod path is valid
+    validate_parent_mod(parent_mod_path)
+    .parent_mod <- read_model(parent_mod_path)
   }
 
   # Inherit model objects
   .mod_path <- .mod$absolute_model_path
 
   # Parent model objects
-  based_on_mod <- read_model(.mod_inherit_path)
-  based_on_sum <- model_summary(based_on_mod)
-  based_on_lines <- nmrec::read_ctl(ctl_ext(.mod_inherit_path))
+  based_on_sum <- model_summary(.parent_mod)
+  based_on_lines <- nmrec::read_ctl(ctl_ext(parent_mod_path))
 
   fmt_digits <- paste0("%.",.digits,"G")
 
@@ -116,8 +91,45 @@ inherit_param_estimates <- function(
     )
   }
 
-  # Write out updated model and return
+  # Write out based_on_lines to new model
   nmrec::write_ctl(based_on_lines, ctl_ext(.mod_path))
 
   return(.mod)
+}
+
+
+#' Confirm parent model path is valid, and error informatively if not
+#'
+#' @param .parent_mod Path to a parent model to inherit properties from.
+#'
+#' @keywords internal
+validate_parent_mod <- function(.parent_mod){
+  if(is.null(.parent_mod) || !fs::file_exists(.parent_mod)){
+    mod_exists <- fs::file_exists(ctl_ext(.parent_mod)) ||
+      fs::file_exists(mod_ext(.parent_mod))
+
+    msg_info <- c("i" = "To inherit parameter estimates from a parent model, {.code .parent_mod}
+        must be a file path to a previously executed model.")
+    if(is.null(.parent_mod)){
+      # If the model wasnt created via copy_model_from, or the `based_on` field
+      # is otherwise empty
+      msg_prefix <- glue::glue("{.code get_based_on(.mod)} did not return any parent models.
+                 Please specify {.code .parent_mod} directly, or update the {.emph based_on}
+                 attribute of `.mod`. See {.code ?add_based_on} for details.",
+                 .open = "{{", .close = "}}")
+      msg <- c("x" = msg_prefix)
+    }else if(mod_exists && !fs::dir_exists(.parent_mod)){
+      msg_prefix <- glue::glue("Parent model ({.code {{basename(ctl_ext(.parent_mod))}}}) exists,
+                 but {.emph has not been executed.}", .open = "{{", .close = "}}")
+      msg <- c("x" = msg_prefix, msg_info)
+    }else{
+      msg_prefix <- glue::glue("Parent model does not exist at: {.emph {{.parent_mod}}}", .open = "{{", .close = "}}")
+      msg <- c("x" = msg_prefix, msg_info)
+    }
+
+    cli::cli_div(theme = list(span.emph = list(color = "red"), span.code = list(color = "blue")))
+    cli::cli_abort(msg)
+  }
+
+  return(invisible(TRUE))
 }
