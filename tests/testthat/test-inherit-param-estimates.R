@@ -18,20 +18,20 @@ get_param_inits <- function(.mod, init_only = TRUE){
 
     # Only grab initial values for theta bounds
     if(init_only){
-      val_recs <- purrr::map_chr(val_recs, \(.x){
+      val_recs <- purrr::map_chr(val_recs, function(.x){
         val <- purrr::keep(.x$values, function(x_vals){
           inherits(x_vals, "nmrec_option") && x_vals$name == "init"
         })
         val[[1]]$format()
       })
     }else{
-      val_recs <- purrr::map_chr(val_recs, \(.x) .x$format())
+      val_recs <- purrr::map_chr(val_recs, function(.x) .x$format())
     }
 
     return(val_recs)
   }
 
-  recs <- purrr::map(recs, \(.rec) purrr::map(.rec, extract_record_values))
+  recs <- purrr::map(recs, function(.rec) purrr::map(.rec, extract_record_values))
 
   return(recs)
 }

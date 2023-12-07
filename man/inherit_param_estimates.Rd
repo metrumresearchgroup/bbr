@@ -32,9 +32,12 @@ off-diagonal initial estimates in a different representation than the
 default, variance and covariance. If \code{values} are the final estimates from
 a previous NONMEM run, the alternative representation options should be
 discarded because NONMEM always outputs variances and covariances.}
+
+\item{.digits}{Number of significant digits to round estimates to.}
 }
 \description{
-Inherit parameter estimates
+Set the initial parameter estimates of a model using the estimates of a
+previously executed model.
 }
 \details{
 \subsection{Constraints and limitations}{

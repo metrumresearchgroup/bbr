@@ -1,5 +1,8 @@
 #' Inherit parameter estimates
 #'
+#' Set the initial parameter estimates of a model using the estimates of a
+#' previously executed model.
+#'
 #' @param .mod new model object to overwrite.
 #' @param .parent_mod Either a model object, or path to a model to inherit properties from.
 #' @param .inherit type of estimates to inherit from parent model.
@@ -14,6 +17,7 @@
 #'   default, variance and covariance. If `values` are the final estimates from
 #'   a previous NONMEM run, the alternative representation options should be
 #'   discarded because NONMEM always outputs variances and covariances.
+#' @param .digits Number of significant digits to round estimates to.
 #'
 #'
 #' @details

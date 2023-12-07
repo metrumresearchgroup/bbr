@@ -277,7 +277,7 @@ test_bbi_version <- function(.bbi_exe_path = getOption("bbr.bbi_exe_path"),
 #'
 #' @keywords internal
 test_nmrec_version <- function(.min_version = getOption("bbr.nmrec_min_version")){
-  test_nmrec <- packageVersion("nmrec") >= .min_version
+  test_nmrec <- utils::packageVersion("nmrec") >= .min_version
 
   if(!test_nmrec){
     err_msg <- glue::glue("This function requires at least {.code nmrec {{.min_version}}}.",
