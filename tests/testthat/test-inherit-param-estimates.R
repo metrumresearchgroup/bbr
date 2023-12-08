@@ -72,6 +72,8 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     it("base model - revert theta bounds", {
       mod_est <- copy_model_from(MOD1, "mod_est", "Inherit estimates", .overwrite = TRUE) %>%
         inherit_param_estimates(.bounds = "discard")
+
+      mod_est <- inherit_param_estimates(mod_est, .bounds = "discard")
       on.exit(delete_models(mod_est, .tags = NULL, .force = TRUE))
 
       mod1_params_final <- list(
@@ -139,6 +141,18 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
         inherit_param_estimates(mod_est),
         "If you're using THETA records for priors"
       )
+
+      # substitute THETA for THETAPV
+      mod_lines <- readLines(get_model_path(mod_est))
+      mod_lines <- stringr::str_replace(mod_lines, "THETA 4 FIX",  "THETAPV 4 FIX")
+
+      # substitute second OMEGA block for OMEGAP
+      omega_prior_block <- max(grep("; Prior OMEGA matrix", mod_lines, fixed = TRUE)) + 1
+      mod_lines[omega_prior_block] <- stringr::str_replace(mod_lines[omega_prior_block], "OMEGA", "OMEGAP")
+
+      # ensure it works now
+      writeLines(mod_lines, get_model_path(mod_est))
+      expect_no_error(inherit_param_estimates(mod_est))
     })
   })
 
