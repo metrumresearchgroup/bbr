@@ -111,7 +111,7 @@ inherit_param_estimates <- function(
 #'
 #' @keywords internal
 validate_parent_mod <- function(.parent_mod){
-  fmt_error <- \(msg) gsub("\n", " ", stringr::str_wrap(msg, width = 100))
+  fmt_error <- function(msg) gsub("\n", " ", stringr::str_wrap(msg, width = 100))
   if(is.null(.parent_mod) || !fs::file_exists(.parent_mod)){
     mod_exists <- fs::file_exists(ctl_ext(.parent_mod)) ||
       fs::file_exists(mod_ext(.parent_mod))
