@@ -276,14 +276,12 @@ test_bbi_version <- function(.bbi_exe_path = getOption("bbr.bbi_exe_path"),
 #'   constraint. Otherwise error out.
 #'
 #' @keywords internal
-test_nmrec_version <- function(.min_version = getOption("bbr.nmrec_min_version")){
+test_nmrec_version <- function(.min_version){
   test_nmrec <- utils::packageVersion("nmrec") >= .min_version
 
   if(!test_nmrec){
-    err_msg <- glue::glue("This function requires at least {.code nmrec {{.min_version}}}.",
-                          .open = "{{", .close = "}}")
-    cli::cli_div(theme = list(span.code = list(color = "blue")))
-    cli::cli_abort(err_msg)
+    err_msg <- glue::glue("This function requires at least `nmrec {.min_version}`.")
+    rlang::abort(err_msg)
   }
   return(TRUE)
 }

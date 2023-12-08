@@ -53,7 +53,7 @@ Depends:
     R (>= 3.5)
 Imports: 
     checkmate,
-    cli (>= 3.0.0),
+    cli,
     data.table,
     digest,
     diffobj,

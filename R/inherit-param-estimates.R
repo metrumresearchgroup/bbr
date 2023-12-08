@@ -110,31 +110,30 @@ inherit_param_estimates <- function(
 #'
 #' @keywords internal
 validate_parent_mod <- function(.parent_mod){
+  fmt_error <- \(msg) gsub("\n", " ", stringr::str_wrap(msg, width = 100))
   if(is.null(.parent_mod) || !fs::file_exists(.parent_mod)){
     mod_exists <- fs::file_exists(ctl_ext(.parent_mod)) ||
       fs::file_exists(mod_ext(.parent_mod))
 
-    msg_info <- c("i" = "To inherit parameter estimates from a parent model, {.code .parent_mod}
-        must be a file path to a previously executed model.")
+    msg_info <- c("i" = "To inherit parameter estimates from a parent model,
+                  `.parent_mod` must be a file path to a previously executed model.")
     if(is.null(.parent_mod)){
       # If the model wasnt created via copy_model_from, or the `based_on` field
       # is otherwise empty
-      msg_prefix <- glue::glue("{.code get_based_on(.mod)} did not return any parent models.
-                 Please specify {.code .parent_mod} directly, or update the {.emph based_on}
-                 attribute of `.mod`. See {.code ?add_based_on} for details.",
-                 .open = "{{", .close = "}}")
+      msg_prefix <- glue::glue("`get_based_on(.mod)` did not return any parent models.
+                 Please specify `.parent_mod` directly, or update the `based_on`
+                 attribute of .mod. See ?add_based_on for more details.")
       msg <- c("x" = msg_prefix)
     }else if(mod_exists && !fs::dir_exists(.parent_mod)){
-      msg_prefix <- glue::glue("Parent model ({.code {{basename(ctl_ext(.parent_mod))}}}) exists,
-                 but {.emph has not been executed.}", .open = "{{", .close = "}}")
+      msg_prefix <- glue::glue("Parent model ({basename(ctl_ext(.parent_mod))}) exists,
+                 but has not been executed.")
       msg <- c("x" = msg_prefix, msg_info)
     }else{
-      msg_prefix <- glue::glue("Parent model does not exist at: {.emph {{.parent_mod}}}", .open = "{{", .close = "}}")
+      msg_prefix <- glue::glue("Parent model does not exist at: {.parent_mod}")
       msg <- c("x" = msg_prefix, msg_info)
     }
 
-    cli::cli_div(theme = list(span.emph = list(color = "red"), span.code = list(color = "blue")))
-    cli::cli_abort(msg)
+    rlang::abort(fmt_error(msg))
   }
 
   return(invisible(TRUE))

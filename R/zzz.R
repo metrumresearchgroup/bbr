@@ -37,12 +37,6 @@
     options("bbr.strict" = TRUE)
   }
 
-  # Set minimum nmrec version
-  # Note: If you're updating this value, also update the version installed in
-  # the "oldest" build of .drone.yml.
-  if (is.null(getOption("bbr.nmrec_min_version"))) {
-    options("bbr.nmrec_min_version" = package_version("0.2.0.8000"))
-  }
 }
 
 .onAttach <- function(libname, pkgname) {
