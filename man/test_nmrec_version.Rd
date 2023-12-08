@@ -4,11 +4,10 @@
 \alias{test_nmrec_version}
 \title{Check that nmrec satisfies a version constraint}
 \usage{
-test_nmrec_version(.min_version = getOption("bbr.nmrec_min_version"))
+test_nmrec_version(.min_version)
 }
 \arguments{
-\item{.min_version}{The minimum allowed version. Defaults to
-\code{getOption("bbr.nmrec_min_version")}.}
+\item{.min_version}{The minimum allowed version.}
 }
 \value{
 returns \code{TRUE} if the installed nmrec version satisfies the

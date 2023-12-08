@@ -63,10 +63,11 @@ inherit_param_estimates <- function(
 
   # Inherit model objects
   .mod_path <- .mod$absolute_model_path
+  mod_lines <- nmrec::read_ctl(ctl_ext(.mod_path))
 
   # Parent model objects
   based_on_sum <- model_summary(.parent_mod)
-  based_on_lines <- nmrec::read_ctl(ctl_ext(parent_mod_path))
+
 
   fmt_digits <- paste0("%.",.digits,"G")
 
@@ -74,7 +75,7 @@ inherit_param_estimates <- function(
   if("theta" %in% .inherit){
     new_thetas <- based_on_sum %>% get_theta() %>% signif(digits = .digits) %>% unname()
     nmrec::set_theta(
-      based_on_lines, values = new_thetas, bounds = .bounds,
+      mod_lines, values = new_thetas, bounds = .bounds,
       fmt = fmt_digits
     )
   }
@@ -83,7 +84,7 @@ inherit_param_estimates <- function(
   if("omega" %in% .inherit){
     new_omegas <- based_on_sum %>% get_omega() %>% signif(digits = .digits)
     nmrec::set_omega(
-      based_on_lines, values = new_omegas, representation = .representation,
+      mod_lines, values = new_omegas, representation = .representation,
       fmt = fmt_digits
     )
   }
@@ -92,13 +93,13 @@ inherit_param_estimates <- function(
   if("sigma" %in% .inherit){
     new_sigmas <- based_on_sum %>% get_sigma() %>% signif(digits = .digits)
     nmrec::set_sigma(
-      based_on_lines, values = new_sigmas, representation = .representation,
+      mod_lines, values = new_sigmas, representation = .representation,
       fmt = fmt_digits
     )
   }
 
-  # Write out based_on_lines to new model
-  nmrec::write_ctl(based_on_lines, ctl_ext(.mod_path))
+  # Write out mod_lines to new model
+  nmrec::write_ctl(mod_lines, ctl_ext(.mod_path))
 
   return(.mod)
 }
@@ -110,30 +111,31 @@ inherit_param_estimates <- function(
 #'
 #' @keywords internal
 validate_parent_mod <- function(.parent_mod){
-  fmt_error <- \(msg) gsub("\n", " ", stringr::str_wrap(msg, width = 100))
   if(is.null(.parent_mod) || !fs::file_exists(.parent_mod)){
     mod_exists <- fs::file_exists(ctl_ext(.parent_mod)) ||
       fs::file_exists(mod_ext(.parent_mod))
 
-    msg_info <- c("i" = "To inherit parameter estimates from a parent model,
-                  `.parent_mod` must be a file path to a previously executed model.")
+    msg_info <- c("i" = "To inherit parameter estimates from a parent model, {.code .parent_mod}
+        must be a file path to a previously executed model.")
     if(is.null(.parent_mod)){
       # If the model wasnt created via copy_model_from, or the `based_on` field
       # is otherwise empty
-      msg_prefix <- glue::glue("`get_based_on(.mod)` did not return any parent models.
-                 Please specify `.parent_mod` directly, or update the `based_on`
-                 attribute of .mod. See ?add_based_on for more details.")
+      msg_prefix <- glue::glue("{.code get_based_on(.mod)} did not return any parent models.
+                 Please specify {.code .parent_mod} directly, or update the {.emph based_on}
+                 attribute of `.mod`. See {.code ?add_based_on} for details.",
+                 .open = "{{", .close = "}}")
       msg <- c("x" = msg_prefix)
     }else if(mod_exists && !fs::dir_exists(.parent_mod)){
-      msg_prefix <- glue::glue("Parent model ({basename(ctl_ext(.parent_mod))}) exists,
-                 but has not been executed.")
+      msg_prefix <- glue::glue("Parent model ({.code {{basename(ctl_ext(.parent_mod))}}}) exists,
+                 but {.emph has not been executed.}", .open = "{{", .close = "}}")
       msg <- c("x" = msg_prefix, msg_info)
     }else{
-      msg_prefix <- glue::glue("Parent model does not exist at: {.parent_mod}")
+      msg_prefix <- glue::glue("Parent model does not exist at: {.emph {{.parent_mod}}}", .open = "{{", .close = "}}")
       msg <- c("x" = msg_prefix, msg_info)
     }
 
-    rlang::abort(fmt_error(msg))
+    cli::cli_div(theme = list(span.emph = list(color = "red"), span.code = list(color = "blue")))
+    cli::cli_abort(msg)
   }
 
   return(invisible(TRUE))

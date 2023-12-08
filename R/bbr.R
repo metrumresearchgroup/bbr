@@ -268,8 +268,7 @@ test_bbi_version <- function(.bbi_exe_path = getOption("bbr.bbi_exe_path"),
 
 #' Check that nmrec satisfies a version constraint
 #'
-#' @param .min_version The minimum allowed version. Defaults to
-#'   `getOption("bbr.nmrec_min_version")`.
+#' @param .min_version The minimum allowed version.
 #'
 #' @return
 #' returns `TRUE` if the installed nmrec version satisfies the
