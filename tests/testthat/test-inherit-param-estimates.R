@@ -108,7 +108,9 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       expect_equal(mod1_params_final$sigmas, mod2_inits_inherit$sigmas[[1]])
 
       # Ensure model objects can also be passed
-      expect_no_error(inherit_param_estimates(mod_est2, .parent_mod = MOD1))
+      mod_est2 <- inherit_param_estimates(mod_est2, .parent_mod = MOD1)
+      mod2_inits_inherit <- get_param_inits(mod_est2)
+      expect_equal(mod1_params_final$thetas, mod2_inits_inherit$thetas[[1]])
     })
 
     it("Inheriting only some parameters", {
@@ -152,7 +154,21 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
       # ensure it works now
       writeLines(mod_lines, get_model_path(mod_est))
-      expect_no_error(inherit_param_estimates(mod_est))
+      mod_est <- inherit_param_estimates(mod_est)
+
+      based_on_sum <- model_summary(read_model(get_based_on(mod_est)))
+      omegas <- get_omega(based_on_sum)
+      mod_params_final <- list(
+        thetas = based_on_sum %>% get_theta() %>% sprintf("%.3G", .),
+        # Only grab diagonals since no block matrices used
+        omegas = omegas[upper.tri(omegas, diag = TRUE)] %>% sprintf("%.3G", .),
+        sigmas = diag(based_on_sum %>% get_sigma()) %>% sprintf("%.3G", .)
+      )
+      mod_inits_inherit <- get_param_inits(mod_est)
+
+      expect_equal(mod_params_final$thetas, mod_inits_inherit$thetas[[1]])
+      expect_equal(mod_params_final$omegas, mod_inits_inherit$omegas[[1]])
+      expect_equal(mod_params_final$sigmas, mod_inits_inherit$sigmas[[1]])
     })
   })
 
