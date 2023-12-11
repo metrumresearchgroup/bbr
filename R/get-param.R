@@ -127,7 +127,7 @@ format_matrix <- function(.values, .labels, .type = c("OMEGA", "SIGMA")){
   .cols <- map(matrix_pos, 2) %>% unlist() %>% as.numeric()
 
   # Assign values to corresponding location
-  .mat <- matrix(rep(0,max(.rows, .cols)*2), nrow = max(.rows), ncol = max(.cols))
+  .mat <- matrix(0, nrow = max(.rows), ncol = max(.cols))
   for(i in seq_along(.rows)){
     .mat[.rows[i],.cols[i]] <- .values[i]
     .mat[.cols[i],.rows[i]] <- .values[i]
