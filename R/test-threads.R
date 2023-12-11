@@ -232,7 +232,6 @@ delete_models <- function(.mods, .tags = "test threads", .force = FALSE){
     mod_tags <- ifelse(mod_tags == "", "NA", mod_tags)
     tibble::tibble(
       mod_paths = mod.x$absolute_model_path,
-      mod_thread = mod.x$bbi_args$threads,
       mod_tags = mod_tags
     )
   })
