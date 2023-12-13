@@ -321,9 +321,22 @@ bbi_help <- function(.cmd_args=NULL) {
 #'   model. `submit_model()` and `submit_models()` also support passing a
 #'   configuration file via the `.config_path` argument.
 #'
+#'  **Notes on `.nonmem_dir`**
+#'
+#'   `bbi` tries to detect subdirectories for different NONMEM versions, along
+#'   with a license file and executable within the subdirectory. `.nonmem_dir`
+#'   should therefore point to the *parent* directory containing the executable.
+#'
+#'   If your NONMEM executable exists in the the location `/opt/NONMEM/nm75/run`,
+#'   `.nonmem_dir` should point to `/opt/NONMEM/`, rather than the subdirectory
+#'   `/opt/NONMEM/nm75`. You would then denote the preferred NONMEM version by
+#'   specifying `.nonmem_version = 'nm75'`
+#'
 #' @param .dir Path to directory to run `init` in (and put the resulting
 #'   `bbi.yaml` file)
-#' @param .nonmem_dir Path to directory with the NONMEM installation.
+#' @param .nonmem_dir Path to directory with the NONMEM installation. This
+#'   should be the **parent** directory that contains that installation. See
+#'   details for more information.
 #' @param .nonmem_version Character scalar for default version of NONMEM to use.
 #'   If left NULL, function will exit and tell you which versions were found in
 #'   `.nonmem_dir`
@@ -338,6 +351,18 @@ bbi_help <- function(.cmd_args=NULL) {
 #'
 #' @importFrom yaml read_yaml write_yaml
 #' @importFrom fs dir_exists
+#'
+#' @examples
+#' \dontrun{
+#'
+#' # NONMEM executable found at `/opt/NONMEM/nm75/run`:
+#'
+#' bbi_init(
+#'    .dir = "inst/model/nonmem/basic",
+#'    .nonmem_dir = "/opt/NONMEM",
+#'    .nonmem_version = "nm75"
+#' )
+#' }
 #' @export
 bbi_init <- function(.dir, .nonmem_dir, .nonmem_version = NULL, .bbi_args = NULL, .no_default_version = FALSE) {
   # check that destination directory exists

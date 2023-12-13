@@ -16,7 +16,9 @@ bbi_init(
 \item{.dir}{Path to directory to run \code{init} in (and put the resulting
 \code{bbi.yaml} file)}
 
-\item{.nonmem_dir}{Path to directory with the NONMEM installation.}
+\item{.nonmem_dir}{Path to directory with the NONMEM installation. This
+should be the \strong{parent} directory that contains that installation. See
+details for more information.}
 
 \item{.nonmem_version}{Character scalar for default version of NONMEM to use.
 If left NULL, function will exit and tell you which versions were found in
@@ -42,4 +44,27 @@ For \code{bbr} to make any calls out to \code{bbi} (for example in
 The default behavior is to look for this file in the same directory as the
 model. \code{submit_model()} and \code{submit_models()} also support passing a
 configuration file via the \code{.config_path} argument.
+
+\strong{Notes on \code{.nonmem_dir}}
+
+\code{bbi} tries to detect subdirectories for different NONMEM versions, along
+with a license file and executable within the subdirectory. \code{.nonmem_dir}
+should therefore point to the \emph{parent} directory containing the executable.
+
+If your NONMEM executable exists in the the location \verb{/opt/NONMEM/nm75/run},
+\code{.nonmem_dir} should point to \verb{/opt/NONMEM/}, rather than the subdirectory
+\verb{/opt/NONMEM/nm75}. You would then denote the preferred NONMEM version by
+specifying \code{.nonmem_version = 'nm75'}
+}
+\examples{
+\dontrun{
+
+# NONMEM executable found at `/opt/NONMEM/nm75/run`:
+
+bbi_init(
+   .dir = "inst/model/nonmem/basic",
+   .nonmem_dir = "/opt/NONMEM",
+   .nonmem_version = "nm75"
+)
+}
 }
