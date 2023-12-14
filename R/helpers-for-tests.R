@@ -58,3 +58,15 @@ skip_if_old_bbi <- function(v) {
       glue("bbi version is {bbi_version()}. Test requires version {v} or later"))
   }
 }
+
+#' Skip test if current nmrec version is below specified one.
+#'
+#' @param v a package version (or a string that can be converted to one)
+#' @keywords internal
+skip_if_old_nmrec <- function(v) {
+  test_nmrec <- utils::packageVersion("nmrec") >= v
+  if (!test_nmrec) {
+    testthat::skip(
+      glue("nmrec version is {utils::packageVersion('nmrec')}. Test requires version {v} or later"))
+  }
+}

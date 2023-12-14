@@ -1,6 +1,6 @@
 
 get_param_inits <- function(.mod, init_only = TRUE){
-  ctl <- nmrec::read_ctl(ctl_ext(.mod$absolute_model_path))
+  ctl <- nmrec::read_ctl(get_model_path(.mod))
 
   recs <- list(
     thetas = nmrec::select_records(ctl, "theta"),
@@ -38,7 +38,7 @@ get_param_inits <- function(.mod, init_only = TRUE){
 
 withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   describe("inherit_param_estimates: integration", {
-
+    skip_if_old_nmrec("0.3.0")
     it("base model", {
       # errors if no based_on field
       expect_error(inherit_param_estimates(MOD1), "did not return any parent models")
