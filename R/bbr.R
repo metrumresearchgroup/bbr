@@ -324,13 +324,32 @@ bbi_help <- function(.cmd_args=NULL) {
 #'  **Notes on `.nonmem_dir`**
 #'
 #'   `bbi` tries to detect subdirectories for different NONMEM versions, along
-#'   with a license file and executable within the subdirectory. `.nonmem_dir`
-#'   should therefore point to the *parent* directory containing the executable.
+#'   with a license file and executable within the subdirectory.
 #'
-#'   If your NONMEM executable exists in the the location `/opt/NONMEM/nm75/run`,
-#'   `.nonmem_dir` should point to `/opt/NONMEM/`, rather than the subdirectory
-#'   `/opt/NONMEM/nm75`. You would then denote the preferred NONMEM version by
-#'   specifying `.nonmem_version = 'nm75'`
+#'   `.nonmem_dir` should point to the **parent** directory that contains one
+#'   or more NONMEM installations.  It should *not* point to the installation
+#'   directory itself.  Here is an example:
+#'
+#' ```
+#'     /opt/NONMEM/
+#'     |-- nm74
+#'     |   |-- license
+#'     |   |-- run
+#'     |   |-- source
+#'     |   | ...
+#'     |   `-- util
+#'     `-- nm75
+#'         |-- license
+#'         |-- run
+#'         |-- source
+#'         | ...
+#'         `-- util
+#' ```
+#'
+#'   `/opt/NONMEM/` contains two NONMEM installations, one for NONMEM 7.5
+#'   and one for NONMEM 7.4.  In this case, you should pass `"/opt/NONMEM"`
+#'   as `.nonmem_dir` and either `"nm74"` or `"nm75"` as `.nonmem_version`.
+#'
 #'
 #' @param .dir Path to directory to run `init` in (and put the resulting
 #'   `bbi.yaml` file)
@@ -355,10 +374,10 @@ bbi_help <- function(.cmd_args=NULL) {
 #' @examples
 #' \dontrun{
 #'
-#' # NONMEM executable found at `/opt/NONMEM/nm75/run`:
+#' # Top-level of NONMEM 7.5 installation is at `/opt/NONMEM/nm75`:
 #'
 #' bbi_init(
-#'    .dir = "inst/model/nonmem/basic",
+#'    .dir = MODEL_DIR,
 #'    .nonmem_dir = "/opt/NONMEM",
 #'    .nonmem_version = "nm75"
 #' )

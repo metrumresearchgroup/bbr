@@ -48,21 +48,38 @@ configuration file via the \code{.config_path} argument.
 \strong{Notes on \code{.nonmem_dir}}
 
 \code{bbi} tries to detect subdirectories for different NONMEM versions, along
-with a license file and executable within the subdirectory. \code{.nonmem_dir}
-should therefore point to the \emph{parent} directory containing the executable.
+with a license file and executable within the subdirectory.
 
-If your NONMEM executable exists in the the location \verb{/opt/NONMEM/nm75/run},
-\code{.nonmem_dir} should point to \verb{/opt/NONMEM/}, rather than the subdirectory
-\verb{/opt/NONMEM/nm75}. You would then denote the preferred NONMEM version by
-specifying \code{.nonmem_version = 'nm75'}
+\code{.nonmem_dir} should point to the \strong{parent} directory that contains one
+or more NONMEM installations.  It should \emph{not} point to the installation
+directory itself.  Here is an example:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{    /opt/NONMEM/
+    |-- nm74
+    |   |-- license
+    |   |-- run
+    |   |-- source
+    |   | ...
+    |   `-- util
+    `-- nm75
+        |-- license
+        |-- run
+        |-- source
+        | ...
+        `-- util
+}\if{html}{\out{</div>}}
+
+\verb{/opt/NONMEM/} contains two NONMEM installations, one for NONMEM 7.5
+and one for NONMEM 7.4.  In this case, you should pass \code{"/opt/NONMEM"}
+as \code{.nonmem_dir} and either \code{"nm74"} or \code{"nm75"} as \code{.nonmem_version}.
 }
 \examples{
 \dontrun{
 
-# NONMEM executable found at `/opt/NONMEM/nm75/run`:
+# Top-level of NONMEM 7.5 installation is at `/opt/NONMEM/nm75`:
 
 bbi_init(
-   .dir = "inst/model/nonmem/basic",
+   .dir = MODEL_DIR,
    .nonmem_dir = "/opt/NONMEM",
    .nonmem_version = "nm75"
 )
