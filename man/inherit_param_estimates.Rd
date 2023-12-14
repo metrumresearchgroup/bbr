@@ -9,35 +9,28 @@ inherit_param_estimates(
   .parent_mod = get_based_on(.mod),
   .inherit = c("theta", "sigma", "omega"),
   .bounds = c("keep", "discard"),
-  .representation = c("keep", "reset"),
   .digits = 3
 )
 }
 \arguments{
-\item{.mod}{new model object to overwrite.}
+\item{.mod}{model object to update.}
 
-\item{.parent_mod}{Either a model object, or path to a model to inherit properties from.}
+\item{.parent_mod}{Either a model object, or path to a model to inherit
+properties from.}
 
-\item{.inherit}{type of estimates to inherit from parent model.}
+\item{.inherit}{type of estimates to inherit from parent model. Defaults to
+replacing all of THETA, SIGMA, and OMEGA}
 
 \item{.bounds}{Whether to keep or discard the existing bounds when setting
 the initial estimates in THETA records.}
-
-\item{.representation}{Whether to keep alternative representation options like
-SD and CORRELATION or reset to the default representation (variance and
-covariance).
-
-For \code{OMEGA} and \code{SIGMA} records, \code{NONMEM} supports specifying diagonal and
-off-diagonal initial estimates in a different representation than the
-default, variance and covariance. If \code{values} are the final estimates from
-a previous NONMEM run, the alternative representation options should be
-discarded because NONMEM always outputs variances and covariances.}
 
 \item{.digits}{Number of significant digits to round estimates to.}
 }
 \description{
 Set the initial parameter estimates of a model using the estimates of a
-previously executed model.
+previously executed model. Often this is used to carry forward the final
+estimates of a "parent" model to be used as the initial estimates of the
+"child" model, for example a model created with \code{\link[=copy_model_from]{copy_model_from()}}.
 }
 \details{
 \subsection{Constraints and limitations}{
@@ -53,5 +46,15 @@ return a result of \verb{(5)x4}.
 lead to a size mismatch between the parameter and its records. Instead use
 informative prior record names (such as \code{THETAP} and \code{THETAPV}).
 }
+}
+}
+\examples{
+
+\dontrun{
+base_mod <- read_model(file.path(MODEL_DIR, "1"))
+
+mod2 <- copy_model_from(base_mod, "mod2") \%>\%
+  inherit_param_estimates()
+
 }
 }

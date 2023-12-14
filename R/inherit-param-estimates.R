@@ -1,22 +1,17 @@
 #' Inherit parameter estimates
 #'
 #' Set the initial parameter estimates of a model using the estimates of a
-#' previously executed model.
+#' previously executed model. Often this is used to carry forward the final
+#' estimates of a "parent" model to be used as the initial estimates of the
+#' "child" model, for example a model created with [copy_model_from()].
 #'
-#' @param .mod new model object to overwrite.
-#' @param .parent_mod Either a model object, or path to a model to inherit properties from.
-#' @param .inherit type of estimates to inherit from parent model.
+#' @param .mod model object to update.
+#' @param .parent_mod Either a model object, or path to a model to inherit
+#'   properties from.
+#' @param .inherit type of estimates to inherit from parent model. Defaults to
+#'   replacing all of THETA, SIGMA, and OMEGA
 #' @param .bounds Whether to keep or discard the existing bounds when setting
 #'   the initial estimates in THETA records.
-#' @param .representation Whether to keep alternative representation options like
-#'   SD and CORRELATION or reset to the default representation (variance and
-#'   covariance).
-#'
-#'   For `OMEGA` and `SIGMA` records, `NONMEM` supports specifying diagonal and
-#'   off-diagonal initial estimates in a different representation than the
-#'   default, variance and covariance. If `values` are the final estimates from
-#'   a previous NONMEM run, the alternative representation options should be
-#'   discarded because NONMEM always outputs variances and covariances.
 #' @param .digits Number of significant digits to round estimates to.
 #'
 #'
@@ -35,35 +30,40 @@
 #'   lead to a size mismatch between the parameter and its records. Instead use
 #'   informative prior record names (such as `THETAP` and `THETAPV`).
 #'
+#' @examples
 #'
+#' \dontrun{
+#' base_mod <- read_model(file.path(MODEL_DIR, "1"))
+#'
+#' mod2 <- copy_model_from(base_mod, "mod2") %>%
+#'   inherit_param_estimates()
+#'
+#' }
 #' @export
 inherit_param_estimates <- function(
     .mod,
     .parent_mod = get_based_on(.mod),
     .inherit = c("theta", "sigma", "omega"),
     .bounds = c("keep", "discard"),
-    .representation = c("keep", "reset"),
     .digits = 3
 ){
 
-  test_nmrec_version(.min_version = "0.2.0.8000")
+  test_nmrec_version(.min_version = "0.3.0")
 
   .bounds <- match.arg(.bounds)
 
+  check_model_object(.mod, "bbi_nonmem_model")
   checkmate::assert_true(all(.inherit %in% BBR_ESTIMATES_INHERIT))
 
-  if(inherits(.parent_mod, "bbi_nonmem_model")){
-    parent_mod_path <- .parent_mod$absolute_model_path
-  }else{
-    parent_mod_path <- .parent_mod
+  if(!inherits(.parent_mod, "bbi_nonmem_model")){
     # Confirm .parent_mod path is valid
-    validate_parent_mod(parent_mod_path)
-    .parent_mod <- read_model(parent_mod_path)
+    validate_parent_mod(.parent_mod)
+    .parent_mod <- read_model(.parent_mod)
   }
 
   # Inherit model objects
-  .mod_path <- .mod$absolute_model_path
-  mod_lines <- nmrec::read_ctl(ctl_ext(.mod_path))
+  mod_path <- get_model_path(.mod)
+  mod_lines <- nmrec::read_ctl(mod_path)
 
   # Parent model objects
   based_on_sum <- model_summary(.parent_mod)
@@ -84,7 +84,7 @@ inherit_param_estimates <- function(
   if("omega" %in% .inherit){
     new_omegas <- based_on_sum %>% get_omega() %>% signif(digits = .digits)
     nmrec::set_omega(
-      mod_lines, values = new_omegas, representation = .representation,
+      mod_lines, values = new_omegas, representation = "reset",
       fmt = fmt_digits
     )
   }
@@ -93,13 +93,13 @@ inherit_param_estimates <- function(
   if("sigma" %in% .inherit){
     new_sigmas <- based_on_sum %>% get_sigma() %>% signif(digits = .digits)
     nmrec::set_sigma(
-      mod_lines, values = new_sigmas, representation = .representation,
+      mod_lines, values = new_sigmas, representation = "reset",
       fmt = fmt_digits
     )
   }
 
   # Write out mod_lines to new model
-  nmrec::write_ctl(mod_lines, ctl_ext(.mod_path))
+  nmrec::write_ctl(mod_lines, mod_path)
 
   return(.mod)
 }
