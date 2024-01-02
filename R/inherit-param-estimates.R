@@ -7,7 +7,8 @@
 #'
 #' @param .mod model object to update.
 #' @param .parent_mod Either a model object, or path to a model to inherit
-#'   properties from.
+#'   properties from. Defaults to the "parent" model of `.mod` (i.e. the first
+#'   entry in `get_based_on(.mod)`)
 #' @param inherit type of estimates to inherit from parent model. Defaults to
 #'   replacing all of THETA, SIGMA, and OMEGA
 #' @param bounds Whether to keep or discard the existing bounds when setting

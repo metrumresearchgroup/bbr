@@ -16,7 +16,8 @@ inherit_param_estimates(
 \item{.mod}{model object to update.}
 
 \item{.parent_mod}{Either a model object, or path to a model to inherit
-properties from.}
+properties from. Defaults to the "parent" model of \code{.mod} (i.e. the first
+entry in \code{get_based_on(.mod)})}
 
 \item{inherit}{type of estimates to inherit from parent model. Defaults to
 replacing all of THETA, SIGMA, and OMEGA}
