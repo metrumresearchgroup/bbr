@@ -321,9 +321,37 @@ bbi_help <- function(.cmd_args=NULL) {
 #'   model. `submit_model()` and `submit_models()` also support passing a
 #'   configuration file via the `.config_path` argument.
 #'
+#'  **Notes on `.nonmem_dir`**
+#'
+#'   `.nonmem_dir` should point to the **parent** directory that contains one
+#'   or more NONMEM installations.  It should *not* point to the installation
+#'   directory itself.  Here is an example:
+#'
+#' ```
+#'     /opt/NONMEM/
+#'     |-- nm74
+#'     |   |-- license
+#'     |   |-- run
+#'     |   |-- source
+#'     |   | ...
+#'     |   `-- util
+#'     `-- nm75
+#'         |-- license
+#'         |-- run
+#'         |-- source
+#'         | ...
+#'         `-- util
+#' ```
+#'
+#'   `/opt/NONMEM/` contains two NONMEM installations, one for NONMEM 7.5
+#'   and one for NONMEM 7.4.  In this case, you should pass `"/opt/NONMEM"`
+#'   as `.nonmem_dir` and either `"nm74"` or `"nm75"` as `.nonmem_version`.
+#'
+#'
 #' @param .dir Path to directory to run `init` in (and put the resulting
 #'   `bbi.yaml` file)
-#' @param .nonmem_dir Path to directory with the NONMEM installation.
+#' @param .nonmem_dir Path to **parent** directory containing one or more NONMEM
+#'  installations. See details for more information.
 #' @param .nonmem_version Character scalar for default version of NONMEM to use.
 #'   If left NULL, function will exit and tell you which versions were found in
 #'   `.nonmem_dir`
@@ -338,6 +366,18 @@ bbi_help <- function(.cmd_args=NULL) {
 #'
 #' @importFrom yaml read_yaml write_yaml
 #' @importFrom fs dir_exists
+#'
+#' @examples
+#' \dontrun{
+#'
+#' # Top-level of NONMEM 7.5 installation is at `/opt/NONMEM/nm75`:
+#'
+#' bbi_init(
+#'    .dir = MODEL_DIR,
+#'    .nonmem_dir = "/opt/NONMEM",
+#'    .nonmem_version = "nm75"
+#' )
+#' }
 #' @export
 bbi_init <- function(.dir, .nonmem_dir, .nonmem_version = NULL, .bbi_args = NULL, .no_default_version = FALSE) {
   # check that destination directory exists

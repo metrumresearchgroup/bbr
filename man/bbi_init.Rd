@@ -16,7 +16,8 @@ bbi_init(
 \item{.dir}{Path to directory to run \code{init} in (and put the resulting
 \code{bbi.yaml} file)}
 
-\item{.nonmem_dir}{Path to directory with the NONMEM installation.}
+\item{.nonmem_dir}{Path to \strong{parent} directory containing one or more NONMEM
+installations. See details for more information.}
 
 \item{.nonmem_version}{Character scalar for default version of NONMEM to use.
 If left NULL, function will exit and tell you which versions were found in
@@ -42,4 +43,41 @@ For \code{bbr} to make any calls out to \code{bbi} (for example in
 The default behavior is to look for this file in the same directory as the
 model. \code{submit_model()} and \code{submit_models()} also support passing a
 configuration file via the \code{.config_path} argument.
+
+\strong{Notes on \code{.nonmem_dir}}
+
+\code{.nonmem_dir} should point to the \strong{parent} directory that contains one
+or more NONMEM installations.  It should \emph{not} point to the installation
+directory itself.  Here is an example:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{    /opt/NONMEM/
+    |-- nm74
+    |   |-- license
+    |   |-- run
+    |   |-- source
+    |   | ...
+    |   `-- util
+    `-- nm75
+        |-- license
+        |-- run
+        |-- source
+        | ...
+        `-- util
+}\if{html}{\out{</div>}}
+
+\verb{/opt/NONMEM/} contains two NONMEM installations, one for NONMEM 7.5
+and one for NONMEM 7.4.  In this case, you should pass \code{"/opt/NONMEM"}
+as \code{.nonmem_dir} and either \code{"nm74"} or \code{"nm75"} as \code{.nonmem_version}.
+}
+\examples{
+\dontrun{
+
+# Top-level of NONMEM 7.5 installation is at `/opt/NONMEM/nm75`:
+
+bbi_init(
+   .dir = MODEL_DIR,
+   .nonmem_dir = "/opt/NONMEM",
+   .nonmem_version = "nm75"
+)
+}
 }
