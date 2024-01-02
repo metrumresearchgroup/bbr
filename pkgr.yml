@@ -9,7 +9,7 @@ Packages:
 
 Repos:
   - CRAN: https://cran.rstudio.com
-  - MPN: https://mpn.metworx.com/snapshots/stable/2023-09-19 # used for mrgval
+  - MPN: https://mpn.metworx.com/snapshots/stable/2023-09-19 # update once nmrec 0.3.0 is available on MPN
 
 Lockfile:
   Type: renv

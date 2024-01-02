@@ -384,3 +384,6 @@ BBI_EXE_MODE_INVALID_ERR_MSG <- paste(
   paste(BBI_VALID_MODES, collapse = ", ")
 )
 NONMEM_MODEL_TYPE_ERR_MSG <- "IF THIS IS NOT A NONMEM MODEL please pass the appropriate type to `.model_type`"
+
+# Supported parameter estimates to inherit from parent model
+BBR_ESTIMATES_INHERIT <- c("theta", "sigma", "omega")

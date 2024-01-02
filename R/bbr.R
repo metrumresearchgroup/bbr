@@ -266,6 +266,25 @@ test_bbi_version <- function(.bbi_exe_path = getOption("bbr.bbi_exe_path"),
   compare_bbi_version(.bbi_exe_path, .min_version, fail = FALSE)
 }
 
+#' Check that nmrec satisfies a version constraint
+#'
+#' @param .min_version The minimum allowed version.
+#'
+#' @return
+#' returns `TRUE` if the installed nmrec version satisfies the
+#'   constraint. Otherwise error out.
+#'
+#' @keywords internal
+test_nmrec_version <- function(.min_version){
+  test_nmrec <- utils::packageVersion("nmrec") >= .min_version
+
+  if(!test_nmrec){
+    err_msg <- glue::glue("This function requires at least `nmrec {.min_version}`.")
+    rlang::abort(err_msg)
+  }
+  return(TRUE)
+}
+
 #' Checks status code from processx process
 #' @param .status_code numerical status code from the process
 #' @param .output character scalar of output from the process. Used only for error printing.

@@ -36,6 +36,7 @@
   if (is.null(getOption("bbr.strict"))) {
     options("bbr.strict" = TRUE)
   }
+
 }
 
 .onAttach <- function(libname, pkgname) {
