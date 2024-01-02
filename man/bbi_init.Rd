@@ -16,9 +16,8 @@ bbi_init(
 \item{.dir}{Path to directory to run \code{init} in (and put the resulting
 \code{bbi.yaml} file)}
 
-\item{.nonmem_dir}{Path to directory with the NONMEM installation. This
-should be the \strong{parent} directory that contains that installation. See
-details for more information.}
+\item{.nonmem_dir}{Path to \strong{parent} directory containing one or more NONMEM
+installations. See details for more information.}
 
 \item{.nonmem_version}{Character scalar for default version of NONMEM to use.
 If left NULL, function will exit and tell you which versions were found in
@@ -46,9 +45,6 @@ model. \code{submit_model()} and \code{submit_models()} also support passing a
 configuration file via the \code{.config_path} argument.
 
 \strong{Notes on \code{.nonmem_dir}}
-
-\code{bbi} tries to detect subdirectories for different NONMEM versions, along
-with a license file and executable within the subdirectory.
 
 \code{.nonmem_dir} should point to the \strong{parent} directory that contains one
 or more NONMEM installations.  It should \emph{not} point to the installation

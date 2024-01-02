@@ -323,9 +323,6 @@ bbi_help <- function(.cmd_args=NULL) {
 #'
 #'  **Notes on `.nonmem_dir`**
 #'
-#'   `bbi` tries to detect subdirectories for different NONMEM versions, along
-#'   with a license file and executable within the subdirectory.
-#'
 #'   `.nonmem_dir` should point to the **parent** directory that contains one
 #'   or more NONMEM installations.  It should *not* point to the installation
 #'   directory itself.  Here is an example:
@@ -353,9 +350,8 @@ bbi_help <- function(.cmd_args=NULL) {
 #'
 #' @param .dir Path to directory to run `init` in (and put the resulting
 #'   `bbi.yaml` file)
-#' @param .nonmem_dir Path to directory with the NONMEM installation. This
-#'   should be the **parent** directory that contains that installation. See
-#'   details for more information.
+#' @param .nonmem_dir Path to **parent** directory containing one or more NONMEM
+#'  installations. See details for more information.
 #' @param .nonmem_version Character scalar for default version of NONMEM to use.
 #'   If left NULL, function will exit and tell you which versions were found in
 #'   `.nonmem_dir`
