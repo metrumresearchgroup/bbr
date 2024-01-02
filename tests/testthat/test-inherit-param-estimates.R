@@ -31,7 +31,7 @@ get_param_inits <- function(.mod, init_only = TRUE){
     return(val_recs)
   }
 
-  recs <- purrr::map(recs, function(.rec) purrr::map(.rec, extract_record_values))
+  recs <- purrr::map(recs, function(.rec) unlist(purrr::map(.rec, extract_record_values)))
 
   return(recs)
 }
@@ -57,23 +57,22 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
       mod2_inits_inherit <- get_param_inits(mod_est)
 
-      expect_equal(mod1_params_final$thetas, mod2_inits_inherit$thetas[[1]])
-      expect_equal(mod1_params_final$omegas, mod2_inits_inherit$omegas[[1]])
-      expect_equal(mod1_params_final$sigmas, mod2_inits_inherit$sigmas[[1]])
+      expect_equal(mod1_params_final$thetas, mod2_inits_inherit$thetas)
+      expect_equal(mod1_params_final$omegas, mod2_inits_inherit$omegas)
+      expect_equal(mod1_params_final$sigmas, mod2_inits_inherit$sigmas)
 
       # Confirm theta bounds
       mod2_params_inherit <- get_param_inits(mod_est, init_only = FALSE)
-      expect_equal(
-        mod2_params_inherit$thetas[[1]][1:3],
-        c("(0, 2.32)", "(0, 54.6)", "(0, 463)")
-      )
+      expect_true(all(stringr::str_detect(
+        mod2_params_inherit$thetas[1:3],
+        paste0("(0, ", mod2_inits_inherit$thetas[1:3], ")")
+      )))
     })
 
     it("base model - revert theta bounds", {
       mod_est <- copy_model_from(MOD1, "mod_est", "Inherit estimates", .overwrite = TRUE) %>%
-        inherit_param_estimates(.bounds = "discard")
+        inherit_param_estimates(bounds = "discard")
 
-      mod_est <- inherit_param_estimates(mod_est, .bounds = "discard")
       on.exit(delete_models(mod_est, .tags = NULL, .force = TRUE))
 
       mod1_params_final <- list(
@@ -82,7 +81,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
       # Confirm theta bounds - parens removed where bounds are removed
       mod2_params_inherit <- get_param_inits(mod_est, init_only = FALSE)
-      expect_equal(mod1_params_final$thetas[1:3], mod2_params_inherit$thetas[[1]][1:3])
+      expect_equal(mod1_params_final$thetas[1:3], mod2_params_inherit$thetas[1:3])
     })
 
     it("pass a different model", {
@@ -92,7 +91,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
       expect_error(inherit_param_estimates(mod_est2), "has not been executed")
 
-      mod_est2 <- inherit_param_estimates(mod_est2, .parent_mod = MOD1$absolute_model_path)
+      mod_est2 <- inherit_param_estimates(mod_est2, .parent_mod = MOD1)
 
       mod1_params_final <- list(
         thetas = SUM1 %>% get_theta() %>% sprintf("%.3G", .),
@@ -103,19 +102,14 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
       mod2_inits_inherit <- get_param_inits(mod_est2)
 
-      expect_equal(mod1_params_final$thetas, mod2_inits_inherit$thetas[[1]])
-      expect_equal(mod1_params_final$omegas, mod2_inits_inherit$omegas[[1]])
-      expect_equal(mod1_params_final$sigmas, mod2_inits_inherit$sigmas[[1]])
-
-      # Ensure model objects can also be passed
-      mod_est2 <- inherit_param_estimates(mod_est2, .parent_mod = MOD1)
-      mod2_inits_inherit <- get_param_inits(mod_est2)
-      expect_equal(mod1_params_final$thetas, mod2_inits_inherit$thetas[[1]])
+      expect_equal(mod1_params_final$thetas, mod2_inits_inherit$thetas)
+      expect_equal(mod1_params_final$omegas, mod2_inits_inherit$omegas)
+      expect_equal(mod1_params_final$sigmas, mod2_inits_inherit$sigmas)
     })
 
     it("Inheriting only some parameters", {
       mod_est <- copy_model_from(MOD1, "mod_est", "Inherit estimates", .overwrite = TRUE) %>%
-        inherit_param_estimates(.inherit = c("theta"))
+        inherit_param_estimates(inherit = c("theta"))
       on.exit(delete_models(mod_est, .tags = NULL, .force = TRUE))
 
       mod1_params_final <- list(
@@ -125,13 +119,13 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
         sigmas = diag(SUM1 %>% get_sigma()) %>% sprintf("%.3G", .)
       )
 
+      mod1_inits <- get_param_inits(MOD1)
       mod2_inits_inherit <- get_param_inits(mod_est)
 
       # thetas changed
-      expect_equal(mod1_params_final$thetas, mod2_inits_inherit$thetas[[1]])
+      expect_equal(mod1_params_final$thetas, mod2_inits_inherit$thetas)
       # Confirm omegas didnt change
-      expect_equal(mod1_params_final$omegas, c("0.0985", "0.157"))
-      expect_equal(mod2_inits_inherit$omegas[[1]], c("0.05", "0.2"))
+      expect_equal(mod1_inits$omegas, mod2_inits_inherit$omegas)
     })
 
     it("fails with old method of using priors", {
@@ -160,15 +154,28 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       omegas <- get_omega(based_on_sum)
       mod_params_final <- list(
         thetas = based_on_sum %>% get_theta() %>% sprintf("%.3G", .),
-        # Only grab diagonals since no block matrices used
+        # Grab upper triangular matrix values since block matrix is used
         omegas = omegas[upper.tri(omegas, diag = TRUE)] %>% sprintf("%.3G", .),
         sigmas = diag(based_on_sum %>% get_sigma()) %>% sprintf("%.3G", .)
       )
       mod_inits_inherit <- get_param_inits(mod_est)
 
-      expect_equal(mod_params_final$thetas, mod_inits_inherit$thetas[[1]])
-      expect_equal(mod_params_final$omegas, mod_inits_inherit$omegas[[1]])
-      expect_equal(mod_params_final$sigmas, mod_inits_inherit$sigmas[[1]])
+      expect_equal(mod_params_final$thetas, mod_inits_inherit$thetas)
+      expect_equal(mod_params_final$omegas, mod_inits_inherit$omegas)
+      expect_equal(mod_params_final$sigmas, mod_inits_inherit$sigmas)
+    })
+
+    it("works with multiple based_on models", {
+      mod_est <- copy_model_from(MOD1, "mod_est", "Inherit estimates", .overwrite = TRUE) %>%
+        add_based_on("../complex/acop-iov") %>%
+        inherit_param_estimates()
+      on.exit(delete_models(mod_est, .tags = NULL, .force = TRUE))
+
+      expect_equal(length(get_based_on(mod_est)), 2L)
+
+      mod1_params_final <- list(thetas = SUM1 %>% get_theta() %>% sprintf("%.3G", .))
+      mod2_inits_inherit <- get_param_inits(mod_est)
+      expect_equal(mod1_params_final$thetas, mod2_inits_inherit$thetas)
     })
   })
 

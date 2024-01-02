@@ -8,11 +8,11 @@
 #' @param .mod model object to update.
 #' @param .parent_mod Either a model object, or path to a model to inherit
 #'   properties from.
-#' @param .inherit type of estimates to inherit from parent model. Defaults to
+#' @param inherit type of estimates to inherit from parent model. Defaults to
 #'   replacing all of THETA, SIGMA, and OMEGA
-#' @param .bounds Whether to keep or discard the existing bounds when setting
+#' @param bounds Whether to keep or discard the existing bounds when setting
 #'   the initial estimates in THETA records.
-#' @param .digits Number of significant digits to round estimates to.
+#' @param digits Number of significant digits to round estimates to.
 #'
 #'
 #' @details
@@ -42,18 +42,18 @@
 #' @export
 inherit_param_estimates <- function(
     .mod,
-    .parent_mod = get_based_on(.mod),
-    .inherit = c("theta", "sigma", "omega"),
-    .bounds = c("keep", "discard"),
-    .digits = 3
+    .parent_mod = get_based_on(.mod)[1],
+    inherit = c("theta", "sigma", "omega"),
+    bounds = c("keep", "discard"),
+    digits = 3
 ){
 
   test_nmrec_version(.min_version = "0.3.0")
 
-  .bounds <- match.arg(.bounds)
+  bounds <- match.arg(bounds)
 
   check_model_object(.mod, "bbi_nonmem_model")
-  checkmate::assert_true(all(.inherit %in% BBR_ESTIMATES_INHERIT))
+  checkmate::assert_true(all(inherit %in% BBR_ESTIMATES_INHERIT))
 
   if(!inherits(.parent_mod, "bbi_nonmem_model")){
     # Confirm .parent_mod path is valid
@@ -69,20 +69,20 @@ inherit_param_estimates <- function(
   based_on_sum <- model_summary(.parent_mod)
 
 
-  fmt_digits <- paste0("%.",.digits,"G")
+  fmt_digits <- paste0("%.",digits,"G")
 
   # Update THETA Block
-  if("theta" %in% .inherit){
-    new_thetas <- based_on_sum %>% get_theta() %>% signif(digits = .digits) %>% unname()
+  if("theta" %in% inherit){
+    new_thetas <- based_on_sum %>% get_theta() %>% signif(digits = digits) %>% unname()
     nmrec::set_theta(
-      mod_lines, values = new_thetas, bounds = .bounds,
+      mod_lines, values = new_thetas, bounds = bounds,
       fmt = fmt_digits
     )
   }
 
   # Update OMEGA Block
-  if("omega" %in% .inherit){
-    new_omegas <- based_on_sum %>% get_omega() %>% signif(digits = .digits)
+  if("omega" %in% inherit){
+    new_omegas <- based_on_sum %>% get_omega() %>% signif(digits = digits)
     nmrec::set_omega(
       mod_lines, values = new_omegas, representation = "reset",
       fmt = fmt_digits
@@ -90,8 +90,8 @@ inherit_param_estimates <- function(
   }
 
   # Update SIGMA Block
-  if("sigma" %in% .inherit){
-    new_sigmas <- based_on_sum %>% get_sigma() %>% signif(digits = .digits)
+  if("sigma" %in% inherit){
+    new_sigmas <- based_on_sum %>% get_sigma() %>% signif(digits = digits)
     nmrec::set_sigma(
       mod_lines, values = new_sigmas, representation = "reset",
       fmt = fmt_digits

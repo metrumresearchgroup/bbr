@@ -6,10 +6,10 @@
 \usage{
 inherit_param_estimates(
   .mod,
-  .parent_mod = get_based_on(.mod),
-  .inherit = c("theta", "sigma", "omega"),
-  .bounds = c("keep", "discard"),
-  .digits = 3
+  .parent_mod = get_based_on(.mod)[1],
+  inherit = c("theta", "sigma", "omega"),
+  bounds = c("keep", "discard"),
+  digits = 3
 )
 }
 \arguments{
@@ -18,13 +18,13 @@ inherit_param_estimates(
 \item{.parent_mod}{Either a model object, or path to a model to inherit
 properties from.}
 
-\item{.inherit}{type of estimates to inherit from parent model. Defaults to
+\item{inherit}{type of estimates to inherit from parent model. Defaults to
 replacing all of THETA, SIGMA, and OMEGA}
 
-\item{.bounds}{Whether to keep or discard the existing bounds when setting
+\item{bounds}{Whether to keep or discard the existing bounds when setting
 the initial estimates in THETA records.}
 
-\item{.digits}{Number of significant digits to round estimates to.}
+\item{digits}{Number of significant digits to round estimates to.}
 }
 \description{
 Set the initial parameter estimates of a model using the estimates of a
