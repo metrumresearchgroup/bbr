@@ -223,7 +223,7 @@ mod1 <- read_model(file.path(MODEL_DIR, 1))
 
 ## copy_model_from()
 
-Now you can create a new model object, based on the original, copying and renaming the control stream in the process. By default, the `copy_model_from()` function will increment the name of the new model to the next available integer in your modeling directory, but you can also pass a custom name to the `.new_model` argument. See [`?copy_model_from`](https://metrumresearchgroup.github.io/bbr/reference/copy_model_from.html) for more details this, and other optional arguments.
+Now you can create a new model object, based on the original, copying and renaming the control stream in the process. By default, the `copy_model_from()` function will increment the name of the new model to the next available integer in your modeling directory, but you can also pass a custom name to the `.new_model` argument. See [`?copy_model_from`](https://metrumresearchgroup.github.io/bbr/reference/copy_model_from.html) for more details and other optional arguments.
 
 The `copy_model_from()` call below will create both `2.ctl` and `2.yaml` files in the same directory as the parent model, and return the model object corresponding to them. (`copy_model_from()` also stores the model's "ancestry" which can be useful later in the project, as shown in the [Using the based_on field](https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html) vignette.)
 
@@ -288,6 +288,7 @@ mod3 <- mod3 %>%
 ```
 
 ## Inheriting parameter estimates
+
 As suggested above, the typical iteration process involves using `copy_model_from()` to create a new model object, followed by *manually* editing the control stream file. However, in some instances it can be valuable to set the *initial* parameter estimates of a model using the *final* estimates of a **previously executed** model. Often this is used to carry forward the final estimates of a "parent" model to be used as the initial estimates of the "child" model; for example a model created with `copy_model_from()`. 
 
 This is supported via `inherit_param_estimates()`, which automates the overwriting of the control steam file of your *new model*, using the model summary of the previously executed *parent* model. If no parent model is specified, it will default to using the first entry in `get_based_on(.mod)`. You also have the option to keep or discard existing bounds when setting the initial estimates for THETA records specifically.
