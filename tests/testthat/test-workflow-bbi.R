@@ -41,7 +41,12 @@ withr::with_options(list(
   if (fs::file_exists(file.path(MODEL_DIR_BBI, "bbi.yaml"))) fs::file_delete(file.path(MODEL_DIR_BBI, "bbi.yaml"))
 
   # create new bbi.yaml
-  bbi_init(MODEL_DIR_BBI, "/opt/NONMEM", "nm74gf")
+  bbi_init(
+    MODEL_DIR_BBI,
+    .nonmem_dir = Sys.getenv("BBR_TESTS_NONMEM_DIR", "/opt/NONMEM"),
+    .nonmem_version = Sys.getenv("BBR_TESTS_NONMEM_VERSION", "nm74gf"),
+    .bbi_args = list(mpi_exec_path = get_mpiexec_path())
+  )
 
   # copy model file into new model dir
   fs::file_copy(CTL_TEST_FILE, MODEL_DIR_BBI)
