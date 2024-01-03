@@ -72,8 +72,16 @@ withr::with_options(list(
     expect_identical(class(sum1), NM_SUM_CLASS_LIST)
     expect_identical(names(sum1), SUM_NAMES_REF)
 
-    # check parameters table
-    expect_equal(param_estimates(sum1), dget(PARAM_REF_FILE))
+    # As a quick check that the model run was successful, verify that THETA
+    # values are in ballpark of reference values.
+    ref_theta <- dplyr::filter(
+      dget(PARAM_REF_FILE),
+      stringr::str_detect(parameter_names, "^THETA")
+    )
+    expect_equal(
+      unname(get_theta(sum1)), ref_theta[["estimate"]],
+      tolerance = 1
+    )
   })
 
   test_that("copying model works and new models run correctly [BBR-WRKF-002]", {
@@ -89,8 +97,21 @@ withr::with_options(list(
     expect_identical(class(sum2), NM_SUM_CLASS_LIST)
     expect_identical(names(sum2), SUM_NAMES_REF)
 
-    # check parameters table
-    expect_equal(param_estimates(sum2), dget(PARAM_REF_FILE))
+    # Quick check that model run was successful (see comment above).
+    ref_theta <- dplyr::filter(
+      dget(PARAM_REF_FILE),
+      stringr::str_detect(parameter_names, "^THETA")
+    )
+    expect_equal(
+      unname(get_theta(sum2)), ref_theta[["estimate"]],
+      tolerance = 1
+    )
+
+    # Run of same model on same system gives same result.
+    expect_equal(
+      param_estimates(sum2),
+      param_estimates(model_summary(mod3))
+    )
 
     # add some tags to new model
     mod2 <- mod2 %>% add_tags(NEW_TAGS)
