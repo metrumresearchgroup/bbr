@@ -151,9 +151,9 @@ As discussed in "Setup" above, these can be set globally in the `bbi.yaml` file,
 
 * Attaching them to a model object with `add_bbi_args()` or `replace_bbi_args()`
 * Passing them as a named list to the `.bbi_args` argument of one of the following functions
-* `new_model()` or `copy_model_from()`
-* `submit_model()` or `submit_models()`
-* `model_summary()` or `model_summaries()`
+  * `new_model()` or `copy_model_from()`
+  * `submit_model()` or `submit_models()`
+  * `model_summary()` or `model_summaries()`
 
 Note that any `bbi_args` attached to a model object will override the relevant settings in `bbi.yaml`, and that `.bbi_args` passed into a `submit_` or `_summary` call will override the relevant settings in both `bbi.yaml` _and_ `bbi_args` attached to the model object.
 
@@ -291,7 +291,7 @@ mod3 <- mod3 %>%
 
 As suggested above, the typical iteration process involves using `copy_model_from()` to create a new model object, followed by *manually* editing the control stream file. However, in some instances it can be valuable to set the *initial* parameter estimates of a model using the *final* estimates of a **previously executed** model. Often this is used to carry forward the final estimates of a "parent" model to be used as the initial estimates of the "child" model; for example a model created with `copy_model_from()`. 
 
-This is supported via `inherit_param_estimates()`, which automates the overwriting of the control steam file of your *new model*, using the model summary of the previously executed *parent* model. If no parent model is specified, it will default to using the first entry in `get_based_on(.mod)`. You also have the option to keep or discard existing bounds when setting the initial estimates for THETA records specifically.
+This is supported via `inherit_param_estimates()`, which automates the overwriting of the control steam file of your *new model*, using the final parameter estimates from the previously executed *parent* model. If no parent model is specified, it will default to using the first entry in `get_based_on(.mod)`. You also have the option to keep or discard existing bounds when setting the initial estimates for THETA records specifically.
 
 ```{r inherit_param_estimates}
 mod4 <- copy_model_from(mod1, "4") %>%
