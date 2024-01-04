@@ -70,3 +70,19 @@ skip_if_old_nmrec <- function(v) {
       glue("nmrec version is {utils::packageVersion('nmrec')}. Test requires version {v} or later"))
   }
 }
+
+#' Return path to mpiexec executable to use in tests.
+#'
+#' @noRd
+get_mpiexec_path <- function() {
+  res <- Sys.getenv(
+    "BBR_TESTS_MPIEXEC_PATH",
+    unset = unname(Sys.which("mpiexec"))
+  )
+  if (nchar(res)) {
+    return(res)
+  }
+
+  # Fall back to bbi default.
+  return("/usr/local/mpich3/bin/mpiexec")
+}
