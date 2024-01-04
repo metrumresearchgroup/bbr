@@ -46,10 +46,13 @@ MODEL_DIR <- system.file("model", "nonmem", "basic", package = "bbr")
 cleanup <- function() {
   if (fs::file_exists(file.path(MODEL_DIR, "2.yaml"))) fs::file_delete(file.path(MODEL_DIR, "2.yaml"))
   if (fs::file_exists(file.path(MODEL_DIR, "3.yaml"))) fs::file_delete(file.path(MODEL_DIR, "3.yaml"))
+  if (fs::file_exists(file.path(MODEL_DIR, "4.yaml"))) fs::file_delete(file.path(MODEL_DIR, "4.yaml"))
   if (fs::file_exists(file.path(MODEL_DIR, "2.ctl"))) fs::file_delete(file.path(MODEL_DIR, "2.ctl"))
   if (fs::file_exists(file.path(MODEL_DIR, "3.ctl"))) fs::file_delete(file.path(MODEL_DIR, "3.ctl"))
+  if (fs::file_exists(file.path(MODEL_DIR, "4.ctl"))) fs::file_delete(file.path(MODEL_DIR, "4.ctl"))
   if (fs::dir_exists(file.path(MODEL_DIR, "2"))) fs::dir_delete(file.path(MODEL_DIR, "2"))
   if (fs::dir_exists(file.path(MODEL_DIR, "3"))) fs::dir_delete(file.path(MODEL_DIR, "3"))
+  if (fs::dir_exists(file.path(MODEL_DIR, "4"))) fs::dir_delete(file.path(MODEL_DIR, "4"))
   if (fs::file_exists(file.path(MODEL_DIR, "bbi.yaml"))) fs::file_delete(file.path(MODEL_DIR, "bbi.yaml"))
 }
 cleanup()
@@ -181,6 +184,23 @@ param_df1 <- sum1 %>% param_estimates()
 param_df1
 ```
 
+Specific parameter estimates can also be extracted and formatted using the `get_omega()`, `get_theta()`, and `get_sigma()` helpers:
+
+```{r get_param fake, eval=FALSE}
+sum1 %>% get_theta()
+sum1 %>% get_omega()
+sum1 %>% get_sigma()
+```
+
+```{r get_param real}
+sum1 %>% get_theta()
+cat("\n")
+sum1 %>% get_omega()
+cat("\n")
+sum1 %>% get_sigma()
+```
+
+
 To see how to load summaries of multiple models to an easy-to-read tibble, see the [Creating a Model Summary Log](https://metrumresearchgroup.github.io/bbr/articles/using-summary-log.html) vignette.
 
 You can also use the [`nm_join()`](https://metrumresearchgroup.github.io/bbr/reference/nm_join.html) function to load the input data and any output tables from your model into a single tibble.
@@ -203,7 +223,7 @@ mod1 <- read_model(file.path(MODEL_DIR, 1))
 
 ## copy_model_from()
 
-Now you can create a new model object, based on the original, copying and renaming the control stream in the process. By default, the `copy_model_from()` function will increment the name of the new model to the next available integer in your modeling directory, but you can also pass a custom name to the `.new_model` argument. See [`?copy_model_from`](https://metrumresearchgroup.github.io/bbr/reference/copy_model_from.html) for more details this, and other optional arguments.
+Now you can create a new model object, based on the original, copying and renaming the control stream in the process. By default, the `copy_model_from()` function will increment the name of the new model to the next available integer in your modeling directory, but you can also pass a custom name to the `.new_model` argument. See [`?copy_model_from`](https://metrumresearchgroup.github.io/bbr/reference/copy_model_from.html) for more details and other optional arguments.
 
 The `copy_model_from()` call below will create both `2.ctl` and `2.yaml` files in the same directory as the parent model, and return the model object corresponding to them. (`copy_model_from()` also stores the model's "ancestry" which can be useful later in the project, as shown in the [Using the based_on field](https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html) vignette.)
 
@@ -263,8 +283,20 @@ Add tags and notes for filtering in run log, described next.
 
 ```{r add_tags 3}
 mod3 <- mod3 %>% 
-        add_tags(c("combined RUV", "iiv CL")) %>%
-        add_notes("Added combined error structure because it seemed like a good idea")
+  add_tags(c("combined RUV", "iiv CL")) %>%
+  add_notes("Added combined error structure because it seemed like a good idea")
+```
+
+## Inheriting parameter estimates
+
+As suggested above, the typical iteration process involves using `copy_model_from()` to create a new model object, followed by *manually* editing the control stream file. However, in some instances it can be valuable to set the *initial* parameter estimates of a model using the *final* estimates of a **previously executed** model. Often this is used to carry forward the final estimates of a "parent" model to be used as the initial estimates of the "child" model; for example a model created with `copy_model_from()`. 
+
+This is supported via `inherit_param_estimates()`, which automates the overwriting of the control steam file of your *new model*, using the final parameter estimates from the previously executed *parent* model. If no parent model is specified, it will default to using the first entry in `get_based_on(.mod)`. You also have the option to keep or discard existing bounds when setting the initial estimates for THETA records specifically.
+
+```{r inherit_param_estimates}
+mod4 <- copy_model_from(mod1, "4") %>%
+  inherit_param_estimates(bounds = "keep", digits = 3) %>%
+  add_notes("Initial estimates inherited from mod1 results")
 ```
 
 # Run log
@@ -305,6 +337,8 @@ run_log(MODEL_DIR, .include = "2 compartment") %>%
 ```{r cleanup bottom, include=FALSE}
 # delete old files
 cleanup()
+# remove new tag from mod1
+mod1 <- mod1 %>% remove_tags("orig acop model")
 ```
 
 # Further reading

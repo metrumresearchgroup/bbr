@@ -16,6 +16,7 @@ reference:
   - new_model
   - read_model
   - copy_model_from
+  - inherit_param_estimates
   - update_model_id
   - model_diff
   - tags_diff
