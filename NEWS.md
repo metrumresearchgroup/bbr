@@ -6,8 +6,8 @@
   estimates of a model using the final estimates of a previously executed model. 
   (#623)
 * Improved documentation and vignettes. (#622, #627, #631)
-* Some internal functions now rely on `nmrec` for parsing control stream files,
-  rather than regex/string manipulation. (#600, #603, #604, #606, #612)
+* Some functions now rely on `nmrec` for parsing control stream files, rather 
+  than regex/string manipulation. (#600, #603, #604, #606, #612)
 * `nm_join` now tracks the origin of each column and stores it as an attribute 
   of the return value (mostly important for `bbr.bayes`). (#617)
 
@@ -17,7 +17,6 @@
   relative file path rather than a model id. In other words, this function did 
   not support child models created in sub-directories (or otherwise a different 
   directory than the parent model). (#614)
-* Various test fixes and improvements (#621, #630)
 * `delete_models()` previously ran into issues when using `R 4.0` and an older 
   version of `tibble`. (#625)
 
