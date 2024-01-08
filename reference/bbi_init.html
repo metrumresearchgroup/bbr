@@ -19,7 +19,7 @@ that directory."><meta property="og:image" content="https://metrumresearchgroup.
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.7.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.8.0</span>
       </span>
     </div>
 
@@ -96,7 +96,8 @@ that directory.</p>
 
 
 <dt>.nonmem_dir</dt>
-<dd><p>Path to directory with the NONMEM installation.</p></dd>
+<dd><p>Path to <strong>parent</strong> directory containing one or more NONMEM
+installations. See details for more information.</p></dd>
 
 
 <dt>.nonmem_version</dt>
@@ -125,8 +126,42 @@ the model or global YAML files).</p></dd>
 The default behavior is to look for this file in the same directory as the
 model. <code><a href="submit_model.html">submit_model()</a></code> and <code><a href="submit_models.html">submit_models()</a></code> also support passing a
 configuration file via the <code>.config_path</code> argument.</p>
+<p><strong>Notes on <code>.nonmem_dir</code></strong></p>
+<p><code>.nonmem_dir</code> should point to the <strong>parent</strong> directory that contains one
+or more NONMEM installations.  It should <em>not</em> point to the installation
+directory itself.  Here is an example:</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>    <span class="sc">/</span>opt<span class="sc">/</span>NONMEM<span class="sc">/</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="er">|</span><span class="sc">--</span> nm74</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="sc">|</span>   <span class="er">|</span><span class="sc">--</span> license</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">|</span>   <span class="er">|</span><span class="sc">--</span> run</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">|</span>   <span class="er">|</span><span class="sc">--</span> source</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="sc">|</span>   <span class="er">|</span> ...</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="sc">|</span>   <span class="st">`</span><span class="at">-- util</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="st">`</span><span class="sc">--</span> nm75</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        <span class="sc">|--</span> license</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        <span class="sc">|--</span> run</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="sc">|--</span> source</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="sc">|</span> ...</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">-- util</span></span></code></pre><p></p></div>
+<p><code>/opt/NONMEM/</code> contains two NONMEM installations, one for NONMEM 7.5
+and one for NONMEM 7.4.  In this case, you should pass <code>"/opt/NONMEM"</code>
+as <code>.nonmem_dir</code> and either <code>"nm74"</code> or <code>"nm75"</code> as <code>.nonmem_version</code>.</p>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Top-level of NONMEM 7.5 installation is at `/opt/NONMEM/nm75`:</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">bbi_init</span><span class="op">(</span></span></span>
+<span class="r-in"><span>   .dir <span class="op">=</span> <span class="va">MODEL_DIR</span>,</span></span>
+<span class="r-in"><span>   .nonmem_dir <span class="op">=</span> <span class="st">"/opt/NONMEM"</span>,</span></span>
+<span class="r-in"><span>   .nonmem_version <span class="op">=</span> <span class="st">"nm75"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>

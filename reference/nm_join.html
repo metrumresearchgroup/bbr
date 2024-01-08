@@ -26,7 +26,7 @@ joins. This printing can be suppressed by setting options(bbr.verbose = FALSE)."
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.7.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.8.0</span>
       </span>
     </div>
 
@@ -165,6 +165,9 @@ printed about any columns dropped this way.</p>
 data <em>and</em> at least one of the table files, the <code>DV</code> column from the input
 data will be renamed to <code>DV.DATA</code> and the column from the table file kept as
 <code>DV</code>.</p>
+<p>The origin of each column is attached to the return value via the
+"nm_join_origin" attribute, a list that maps each source (as named by
+<code><a href="nm_tables.html">nm_tables()</a></code>) to the columns that came from that source.</p>
 <p><strong>Duplicate Rows Warning for Join Column</strong></p>
 <p>If there are duplicate rows found in the specified <code>.join_col</code>, a warning will be raised specifying a subset of the repeated rows.
 Duplicates may be caused by lack of output width. <code>FORMAT</code> may be need to be stated in control stream to have sufficient

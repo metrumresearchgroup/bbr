@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.7.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.8.0</span>
       </span>
     </div>
 
@@ -129,7 +129,7 @@ Please refer to the <a href="https://metrumresearchgroup.github.io/bbr/articles/
 Started”</a> vignette, mentioned above, if you have not done this yet.
 Once this is done, load the library.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/metrumresearchgroup/bbr" class="external-link">bbr</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://metrumresearchgroup.github.io/bbr">bbr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -153,7 +153,7 @@ model.</p>
 <code class="sourceCode R"><span><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span>.parent_mod <span class="op">=</span> <span class="va">mod1</span>, .new_model <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/get_based_on.html">get_based_on</a></span><span class="op">(</span><span class="va">mod2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/data/home/kylem/.cache/R/renv/library/bbr-e43ce16f/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/1"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "/data/Projects/package_dev/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/1"</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="diff-helpers">diff helpers<a class="anchor" aria-label="anchor" href="#diff-helpers"></a>
 </h3>
@@ -469,7 +469,7 @@ know.</p>
 absolute path to all models in the <code>based_on</code> field.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod6</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/get_based_on.html">get_based_on</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/data/home/kylem/.cache/R/renv/library/bbr-e43ce16f/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/5"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "/data/Projects/package_dev/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/5"</span></span></code></pre></div>
 <p>This is useful because the path(s) retrieved will unambiguously
 identify the parent model(s) and can therefore be passed to things like
 <code><a href="../reference/read_model.html">read_model()</a></code> or <code><a href="../reference/model_summary.html">model_summary()</a></code> like so:</p>
@@ -479,7 +479,7 @@ identify the parent model(s) and can therefore be passed to things like
 <span><span class="co">#&gt; List of 4</span></span>
 <span><span class="co">#&gt;  $ model_type         : chr "nonmem"</span></span>
 <span><span class="co">#&gt;  $ based_on           : chr "2"</span></span>
-<span><span class="co">#&gt;  $ absolute_model_path: chr "/data/home/kylem/.cache/R/renv/library/bbr-e43ce16f/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/5"</span></span>
+<span><span class="co">#&gt;  $ absolute_model_path: chr "/data/Projects/package_dev/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/5"</span></span>
 <span><span class="co">#&gt;  $ yaml_md5           : chr "ac0ba292b017a72bb316359f0df09bb2"</span></span>
 <span><span class="co">#&gt;  - attr(*, "class")= chr [1:4] "bbi_nonmem_model" "bbi_base_model" "bbi_model" "list"</span></span></code></pre></div>
 </div>
@@ -491,9 +491,9 @@ iteratively calling <code><a href="../reference/get_based_on.html">get_based_on(
 determine the full set of models that led up to the current model.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod6</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/get_based_on.html">get_model_ancestry</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/data/home/kylem/.cache/R/renv/library/bbr-e43ce16f/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/1"</span></span>
-<span><span class="co">#&gt; [2] "/data/home/kylem/.cache/R/renv/library/bbr-e43ce16f/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/2"</span></span>
-<span><span class="co">#&gt; [3] "/data/home/kylem/.cache/R/renv/library/bbr-e43ce16f/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/5"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "/data/Projects/package_dev/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/1"</span></span>
+<span><span class="co">#&gt; [2] "/data/Projects/package_dev/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/2"</span></span>
+<span><span class="co">#&gt; [3] "/data/Projects/package_dev/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/5"</span></span></code></pre></div>
 <p>In this case, model <code>6</code> was based on <code>5</code>, which
 was based on <code>2</code>, which in turn was based on <code>1</code>.
 You will see one example of how this can be useful in the “Final model
@@ -513,16 +513,15 @@ each model.</p>
 <code class="sourceCode R"><span><span class="va">log_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_log.html">run_log</a></span><span class="op">(</span><span class="va">MODEL_DIR</span><span class="op">)</span></span>
 <span><span class="va">log_df</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 10</span></span></span>
-<span><span class="co">#&gt;   absolute_m…¹ run   yaml_…² model…³ descr…⁴ bbi_a…⁵ based…⁶ tags   notes  star </span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;list&gt;</span> <span style="color: #949494; font-style: italic;">&lt;list&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> /data/home/… 1     5ec8e2… nonmem  <span style="color: #BB0000;">NA</span>      <span style="color: #949494;">&lt;NULL&gt;</span>  <span style="color: #949494;">&lt;NULL&gt;</span>  &lt;chr&gt;  <span style="color: #949494;">&lt;NULL&gt;</span> FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> /data/home/… 2     9adbb9… nonmem  <span style="color: #BB0000;">NA</span>      <span style="color: #949494;">&lt;NULL&gt;</span>  &lt;chr&gt;   &lt;chr&gt;  <span style="color: #949494;">&lt;NULL&gt;</span> FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> /data/home/… 3     ac0ba2… nonmem  <span style="color: #BB0000;">NA</span>      <span style="color: #949494;">&lt;NULL&gt;</span>  &lt;chr&gt;   <span style="color: #949494;">&lt;NULL&gt;</span> <span style="color: #949494;">&lt;NULL&gt;</span> FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> /data/home/… 4     6818db… nonmem  <span style="color: #BB0000;">NA</span>      <span style="color: #949494;">&lt;NULL&gt;</span>  &lt;chr&gt;   <span style="color: #949494;">&lt;NULL&gt;</span> <span style="color: #949494;">&lt;NULL&gt;</span> FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> /data/home/… 5     ac0ba2… nonmem  <span style="color: #BB0000;">NA</span>      <span style="color: #949494;">&lt;NULL&gt;</span>  &lt;chr&gt;   <span style="color: #949494;">&lt;NULL&gt;</span> <span style="color: #949494;">&lt;NULL&gt;</span> FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> /data/home/… 6     feb9bf… nonmem  Final … <span style="color: #949494;">&lt;NULL&gt;</span>  &lt;chr&gt;   <span style="color: #949494;">&lt;NULL&gt;</span> <span style="color: #949494;">&lt;NULL&gt;</span> FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with abbreviated variable names ¹​absolute_model_path, ²​yaml_md5,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   ³​model_type, ⁴​description, ⁵​bbi_args, ⁶​based_on</span></span></span></code></pre></div>
+<span><span class="co">#&gt;   absolute_model_path    run   yaml_md5 model_type description bbi_args based_on</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> /data/Projects/packag… 1     5ec8e22… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;NULL&gt;</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> /data/Projects/packag… 2     9adbb90… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;chr&gt;</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> /data/Projects/packag… 3     ac0ba29… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;chr&gt;</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> /data/Projects/packag… 4     6818db1… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;chr&gt;</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> /data/Projects/packag… 5     ac0ba29… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;chr&gt;</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> /data/Projects/packag… 6     feb9bf3… nonmem     Final model <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;chr&gt;</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 3 more variables: tags &lt;list&gt;, notes &lt;list&gt;, star &lt;lgl&gt;</span></span></span></code></pre></div>
 <p>Among other things, the run log contains any descriptions that have
 been assigned to each model. Here we use <code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">dplyr::filter()</a></code>
 and <code><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">dplyr::pull()</a></code> to get the path to the final model.</p>
@@ -533,7 +532,7 @@ and <code><a href="https://dplyr.tidyverse.org/reference/pull.html" class="exter
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">absolute_model_path</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">final_model_path</span></span>
-<span><span class="co">#&gt; [1] "/data/home/kylem/.cache/R/renv/library/bbr-e43ce16f/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/6"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "/data/Projects/package_dev/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/6"</span></span></code></pre></div>
 <p>Next we can use the <code><a href="../reference/get_based_on.html">get_model_ancestry()</a></code> function to
 filter the tibble to only the models that led up to the final model.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">

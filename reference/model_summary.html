@@ -26,7 +26,7 @@ param_estimates_batch()."><meta property="og:image" content="https://metrumresea
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.7.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.8.0</span>
       </span>
     </div>
 
@@ -146,6 +146,8 @@ indicate highly correlated parameters, overparameterization, or other
 issues. The condition number is the ratio of the largest eigenvalue to
 the smallest eigenvalue. If there is only one eigenvalue, condition
 number will be <code>1.0</code>.</p></li>
+<li><p><code>eigenvalue_issues</code> -- Triggered when any of the of the eigenvalues &lt;=
+0, or if NONMEM needs to force them to be positive.</p></li>
 <li><p><code>correlations_not_ok</code> -- Not currently implemented in <code>bbi</code>; will always
 be <code>FALSE</code>.</p></li>
 <li><p><code>parameter_near_boundary</code> -- At least one scaled parameter estimate is

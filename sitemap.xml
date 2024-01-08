@@ -148,6 +148,9 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/check_output_dir.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/check_record_val.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/check_run_times.html</loc>
   </url>
   <url>
@@ -244,9 +247,6 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/get_data_path.html</loc>
   </url>
   <url>
-    <loc>https://metrumresearchgroup.github.io/bbr/reference/get_est_idx.html</loc>
-  </url>
-  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/get_model_id.html</loc>
   </url>
   <url>
@@ -272,6 +272,9 @@
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/inherit_param_estimates.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/install_menu.html</loc>
@@ -412,9 +415,6 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/remove_dup_cols.html</loc>
   </url>
   <url>
-    <loc>https://metrumresearchgroup.github.io/bbr/reference/replace_est_opt.html</loc>
-  </url>
-  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/resolve_nonmem_version.html</loc>
   </url>
   <url>
@@ -446,6 +446,9 @@
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/skip_if_old_bbi.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/skip_if_old_nmrec.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/skip_if_over_rate_limit.html</loc>
@@ -484,13 +487,22 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/tags_diff.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/test_nmrec_version.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/test_threads.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/unquote_filename.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/update_model_id.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/use_bbi.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/validate_parent_mod.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/verbose_msg.html</loc>

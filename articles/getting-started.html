@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.7.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.8.0</span>
       </span>
     </div>
 
@@ -115,7 +115,7 @@
 basic scenarios for modeling with NONMEM using <code>bbr</code>,
 introducing you to its standard workflow and functionality.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/metrumresearchgroup/bbr" class="external-link">bbr</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://metrumresearchgroup.github.io/bbr">bbr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span></code></pre></div>
 <p><code>bbr</code> is an R interface for running <code>bbi</code>.
@@ -399,33 +399,52 @@ list.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sum1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "absolute_model_path" "run_details"         "run_heuristics"     </span></span>
 <span><span class="co">#&gt; [4] "parameters_data"     "parameter_names"     "ofv"                </span></span>
-<span><span class="co">#&gt; [7] "condition_number"    "shrinkage_details"   "success"</span></span></code></pre></div>
+<span><span class="co">#&gt; [7] "condition_number"    "shrinkage_details"</span></span></code></pre></div>
 <p>These elements can be accessed manually or extracted with built-in
 helper functions like so:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">param_df1</span> <span class="op">&lt;-</span> <span class="va">sum1</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/param_estimates.html">param_estimates</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">param_df1</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 9 × 8</span></span></span>
-<span><span class="co">#&gt;   parameter_names estimate   stderr random_effec…¹ random_…² fixed diag  shrin…³</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> THETA1            2.32   8.72<span style="color: #949494;">e</span><span style="color: #BB0000;">- 2</span>         <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>    FALSE <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> THETA2           54.6    3.38<span style="color: #949494;">e</span>+ 0         <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>    FALSE <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> THETA3          463.     3.03<span style="color: #949494;">e</span>+ 1         <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>    FALSE <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> THETA4           -<span style="color: #BB0000;">0.082</span><span style="color: #BB0000; text-decoration: underline;">0</span> 5.61<span style="color: #949494;">e</span><span style="color: #BB0000;">- 2</span>         <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>    FALSE <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> THETA5            4.18   1.38<span style="color: #949494;">e</span>+ 0         <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>    FALSE <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> OMEGA(1,1)        0.098<span style="text-decoration: underline;">5</span> 2.03<span style="color: #949494;">e</span><span style="color: #BB0000;">- 2</span>          0.314  3.24<span style="color: #949494;">e</span><span style="color: #BB0000;">- 2</span> FALSE TRUE    17.5 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> OMEGA(2,1)        0      1   <span style="color: #949494;">e</span>+10          0      1   <span style="color: #949494;">e</span>+10 TRUE  FALSE   <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> OMEGA(2,2)        0.157  2.72<span style="color: #949494;">e</span><span style="color: #BB0000;">- 2</span>          0.396  3.44<span style="color: #949494;">e</span><span style="color: #BB0000;">- 2</span> FALSE TRUE     2.07</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span> SIGMA(1,1)        1      1   <span style="color: #949494;">e</span>+10          1      1   <span style="color: #949494;">e</span>+10 TRUE  TRUE     4.08</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with abbreviated variable names ¹​random_effect_sd, ²​random_effect_sdse,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   ³​shrinkage</span></span></span></code></pre></div>
+<span><span class="co">#&gt;   parameter_names estimate   stderr random_effect_sd random_effect_sdse fixed</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> THETA1            2.32   8.72<span style="color: #949494;">e</span><span style="color: #BB0000;">- 2</span>           <span style="color: #BB0000;">NA</span>              <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>    FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> THETA2           54.6    3.38<span style="color: #949494;">e</span>+ 0           <span style="color: #BB0000;">NA</span>              <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>    FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> THETA3          463.     3.03<span style="color: #949494;">e</span>+ 1           <span style="color: #BB0000;">NA</span>              <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>    FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> THETA4           -<span style="color: #BB0000;">0.082</span><span style="color: #BB0000; text-decoration: underline;">0</span> 5.61<span style="color: #949494;">e</span><span style="color: #BB0000;">- 2</span>           <span style="color: #BB0000;">NA</span>              <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>    FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> THETA5            4.18   1.38<span style="color: #949494;">e</span>+ 0           <span style="color: #BB0000;">NA</span>              <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>    FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> OMEGA(1,1)        0.098<span style="text-decoration: underline;">5</span> 2.03<span style="color: #949494;">e</span><span style="color: #BB0000;">- 2</span>            0.314           3.24<span style="color: #949494;">e</span><span style="color: #BB0000;">- 2</span> FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> OMEGA(2,1)        0      1   <span style="color: #949494;">e</span>+10            0               1   <span style="color: #949494;">e</span>+10 TRUE </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> OMEGA(2,2)        0.157  2.72<span style="color: #949494;">e</span><span style="color: #BB0000;">- 2</span>            0.396           3.44<span style="color: #949494;">e</span><span style="color: #BB0000;">- 2</span> FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span> SIGMA(1,1)        1      1   <span style="color: #949494;">e</span>+10            1               1   <span style="color: #949494;">e</span>+10 TRUE </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: diag &lt;lgl&gt;, shrinkage &lt;dbl&gt;</span></span></span></code></pre></div>
+<p>Specific parameter estimates can also be extracted and formatted
+using the <code><a href="../reference/get_omega.html">get_omega()</a></code>, <code><a href="../reference/get_omega.html">get_theta()</a></code>, and
+<code><a href="../reference/get_omega.html">get_sigma()</a></code> helpers:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sum1</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/get_omega.html">get_theta</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">sum1</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/get_omega.html">get_omega</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">sum1</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/get_omega.html">get_sigma</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sum1</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/get_omega.html">get_theta</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt;      THETA1      THETA2      THETA3      THETA4      THETA5 </span></span>
+<span><span class="co">#&gt;   2.3171600  54.6151000 462.5140000  -0.0820082   4.1795900</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"\n"</span><span class="op">)</span></span>
+<span><span class="va">sum1</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/get_omega.html">get_omega</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt;           OMEGA_1  OMEGA_2</span></span>
+<span><span class="co">#&gt; OMEGA_1 0.0985328 0.000000</span></span>
+<span><span class="co">#&gt; OMEGA_2 0.0000000 0.156825</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"\n"</span><span class="op">)</span></span>
+<span><span class="va">sum1</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/get_omega.html">get_sigma</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt;         SIGMA_1</span></span>
+<span><span class="co">#&gt; SIGMA_1       1</span></span></code></pre></div>
 <p>To see how to load summaries of multiple models to an easy-to-read
 tibble, see the <a href="https://metrumresearchgroup.github.io/bbr/articles/using-summary-log.html">Creating
 a Model Summary Log</a> vignette.</p>
 <p>You can also use the <a href="https://metrumresearchgroup.github.io/bbr/reference/nm_join.html"><code>nm_join()</code></a>
 function to load the input data and any output tables from your model
 into a single tibble.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">join_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nm_join.html">nm_join</a></span><span class="op">(</span><span class="va">mod1</span><span class="op">)</span> </span>
 <span><span class="va">join_df</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">ID</span>, <span class="va">TIME</span>, <span class="va">DV</span>, <span class="va">CL</span>, <span class="va">V</span>, <span class="va">NPDE</span>, <span class="va">CWRES</span><span class="op">)</span></span>
@@ -442,7 +461,7 @@ into a single tibble.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     1  1.75 23.8   43.4  463. 2.94  5.69 </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     1  2    16.5   43.4  463. 2.94  3.94 </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     1  2.25 17.3   43.4  463. 2.94  4.15 </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 769 more rows</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 769 more rows</span></span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -455,7 +474,7 @@ want to begin iterating on them with a new model.</p>
 <p>If you are now in a new R session and no longer have your
 <code>mod1</code> object in memory, you can easily rebuild it from the
 YAML file on disk with <code><a href="../reference/read_model.html">read_model()</a></code>:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_model.html">read_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="copy_model_from">copy_model_from()<a class="anchor" aria-label="anchor" href="#copy_model_from"></a>
@@ -466,17 +485,17 @@ and renaming the control stream in the process. By default, the
 new model to the next available integer in your modeling directory, but
 you can also pass a custom name to the <code>.new_model</code> argument.
 See <a href="https://metrumresearchgroup.github.io/bbr/reference/copy_model_from.html"><code>?copy_model_from</code></a>
-for more details this, and other optional arguments.</p>
+for more details and other optional arguments.</p>
 <p>The <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> call below will create both
 <code>2.ctl</code> and <code>2.yaml</code> files in the same directory
 as the parent model, and return the model object corresponding to them.
 (<code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> also stores the model’s “ancestry” which
 can be useful later in the project, as shown in the <a href="https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html">Using
 the based_on field</a> vignette.)</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span><span class="va">mod1</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/update_model_id.html">update_model_id</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; replacing 1 with 2 in /data/home/kylem/.cache/R/renv/library/bbr-e43ce16f/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/2.ctl</span></span></code></pre></div>
+<span><span class="co">#&gt; replacing 1 with 2 in /data/Projects/package_dev/bbr/renv/library/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/2.ctl</span></span></code></pre></div>
 <p>The new control stream file <code>2.ctl</code> will be identical to
 its parent model, though you can use <a href="https://metrumresearchgroup.github.io/bbr/reference/update_model_id.html"><code>update_model_id()</code></a>
 (as above) to update to the new model ID in places like
@@ -484,7 +503,7 @@ its parent model, though you can use <a href="https://metrumresearchgroup.github
 <p>Your new control stream can now be edited with any desired changes
 and then submitted and summarized exactly as above. At any time, you can
 also see the difference between a model and its parent using <a href="https://metrumresearchgroup.github.io/bbr/reference/model_diff.html"><code>model_diff()</code></a>.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># manually edit control stream, then...</span></span>
 <span><span class="fu"><a href="../reference/model_diff.html">model_diff</a></span><span class="op">(</span><span class="va">mod2</span><span class="op">)</span></span>
 <span><span class="va">mod2</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/submit_model.html">submit_model</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -495,7 +514,7 @@ also see the difference between a model and its parent using <a href="https://me
 </h3>
 <p>After looking at these results, the user can add tags, which can
 later be used to organize your modeling runs.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod1</span> <span class="op">&lt;-</span> <span class="va">mod1</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/modify_tags.html">add_tags</a></span><span class="op">(</span><span class="st">"orig acop model"</span><span class="op">)</span></span>
 <span><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="va">mod2</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/modify_tags.html">add_tags</a></span><span class="op">(</span><span class="st">"2 compartment"</span><span class="op">)</span></span></code></pre></div>
 <p>Note that using free text for your tags is discouraged, for reasons
@@ -504,7 +523,7 @@ sake, we ignore that advice here, but please read it before using tags
 extensively in the wild.</p>
 <p>In addition to tags, the user can add notes that can be referenced
 later.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="va">mod2</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="../reference/modify_notes.html">add_notes</a></span><span class="op">(</span><span class="st">"2 compartment model more appropriate than 1 compartment"</span><span class="op">)</span></span></code></pre></div>
 <p>The <code><a href="../reference/model_diff.html">model_diff()</a></code> and <code><a href="../reference/tags_diff.html">tags_diff()</a></code> function
@@ -517,18 +536,42 @@ based_on” vignette</a> for examples.</p>
 <p>Now the iteration process continues with a third model. Note that you
 can tell <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> to inherit the tags from the
 parent model and automatically add them to the new model.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span><span class="va">mod2</span>, .inherit_tags <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>Submit and summarize as before.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># manually edit control stream, then...</span></span>
 <span><span class="va">mod3</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/submit_model.html">submit_model</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">mod3</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/model_summary.html">model_summary</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Add tags and notes for filtering in run log, described next.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod3</span> <span class="op">&lt;-</span> <span class="va">mod3</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
-<span>        <span class="fu"><a href="../reference/modify_tags.html">add_tags</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"combined RUV"</span>, <span class="st">"iiv CL"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>        <span class="fu"><a href="../reference/modify_notes.html">add_notes</a></span><span class="op">(</span><span class="st">"Added combined error structure because it seemed like a good idea"</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/modify_tags.html">add_tags</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"combined RUV"</span>, <span class="st">"iiv CL"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/modify_notes.html">add_notes</a></span><span class="op">(</span><span class="st">"Added combined error structure because it seemed like a good idea"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="inheriting-parameter-estimates">Inheriting parameter estimates<a class="anchor" aria-label="anchor" href="#inheriting-parameter-estimates"></a>
+</h3>
+<p>As suggested above, the typical iteration process involves using
+<code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> to create a new model object, followed by
+<em>manually</em> editing the control stream file. However, in some
+instances it can be valuable to set the <em>initial</em> parameter
+estimates of a model using the <em>final</em> estimates of a
+<strong>previously executed</strong> model. Often this is used to carry
+forward the final estimates of a “parent” model to be used as the
+initial estimates of the “child” model; for example a model created with
+<code><a href="../reference/copy_model_from.html">copy_model_from()</a></code>.</p>
+<p>This is supported via <code><a href="../reference/inherit_param_estimates.html">inherit_param_estimates()</a></code>, which
+automates the overwriting of the control steam file of your <em>new
+model</em>, using the final parameter estimates from the previously
+executed <em>parent</em> model. If no parent model is specified, it will
+default to using the first entry in <code>get_based_on(.mod)</code>. You
+also have the option to keep or discard existing bounds when setting the
+initial estimates for THETA records specifically.</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mod4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span><span class="va">mod1</span>, <span class="st">"4"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/inherit_param_estimates.html">inherit_param_estimates</a></span><span class="op">(</span>bounds <span class="op">=</span> <span class="st">"keep"</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/modify_notes.html">add_notes</a></span><span class="op">(</span><span class="st">"Initial estimates inherited from mod1 results"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -543,17 +586,17 @@ your models from the <code><a href="../reference/config_log.html">config_log()</
 automatically join the columns output from those functions against the
 tibble output from <code><a href="../reference/run_log.html">run_log()</a></code>. See the “Further Reading”
 section below for links to vignettes demonstrating those functions.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">log_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_log.html">run_log</a></span><span class="op">(</span><span class="va">MODEL_DIR</span><span class="op">)</span></span>
 <span><span class="va">log_df</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 10</span></span></span>
-<span><span class="co">#&gt;   absolu…¹ run   yaml_…² model…³ descr…⁴ bbi_args     based…⁵ tags  notes  star </span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;lis&gt;</span> <span style="color: #949494; font-style: italic;">&lt;list&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> /data/h… 1     3ff175… nonmem  origin… &lt;named list&gt; <span style="color: #949494;">&lt;NULL&gt;</span>  &lt;chr&gt; <span style="color: #949494;">&lt;NULL&gt;</span> FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> /data/h… 2     41f8d4… nonmem  <span style="color: #BB0000;">NA</span>      &lt;named list&gt; &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;  FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> /data/h… 3     03a1f9… nonmem  <span style="color: #BB0000;">NA</span>      &lt;named list&gt; &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;  FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with abbreviated variable names ¹​absolute_model_path, ²​yaml_md5,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   ³​model_type, ⁴​description, ⁵​based_on</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 10</span></span></span>
+<span><span class="co">#&gt;   absolute_model_path         run   yaml_md5 model_type description bbi_args    </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> /data/Projects/package_dev… 1     3ff1756… nonmem     original a… <span style="color: #949494;">&lt;named list&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> /data/Projects/package_dev… 2     41f8d47… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> /data/Projects/package_dev… 3     03a1f9d… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> /data/Projects/package_dev… 4     09bed41… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 more variables: based_on &lt;list&gt;, tags &lt;list&gt;, notes &lt;list&gt;, star &lt;lgl&gt;</span></span></span></code></pre></div>
 <p>The <code><a href="../reference/run_log.html">run_log()</a></code> returns a tibble which can be manipulated
 like any other tibble. However, several of the columns
 (<code>tags</code>, <code>notes</code>, and <code>based_on</code> for
@@ -569,16 +612,17 @@ list column into a string representation of its contents. It is
 specifically designed for collapsing columns like <code>tags</code>,
 <code>notes</code>, and <code>based_on</code> into a more human-readable
 format.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">log_df</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="../reference/collapse_to_string.html">collapse_to_string</a></span><span class="op">(</span><span class="va">tags</span>, <span class="va">notes</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="va">tags</span>, <span class="va">notes</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 3</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 3</span></span></span>
 <span><span class="co">#&gt;   run   tags                                 notes                              </span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                              </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1     acop tag, other tag, orig acop model <span style="color: #BB0000;">NA</span>                                 </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2     2 compartment                        2 compartment model more appropria…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 3     2 compartment, combined RUV, iiv CL  Added combined error structure bec…</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 3     2 compartment, combined RUV, iiv CL  Added combined error structure bec…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 4     <span style="color: #BB0000;">NA</span>                                   Initial estimates inherited from m…</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="filtering-tags-example">Filtering tags example<a class="anchor" aria-label="anchor" href="#filtering-tags-example"></a>
@@ -587,7 +631,7 @@ format.</p>
 argument that will filter the resulting log. Only models that contain a
 tag or name (<code>run</code>) that matches an element of the vector
 passed to <code>.include</code> will be included.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/run_log.html">run_log</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, .include <span class="op">=</span> <span class="st">"2 compartment"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/collapse_to_string.html">collapse_to_string</a></span><span class="op">(</span><span class="va">tags</span>, <span class="va">notes</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="va">tags</span>, <span class="va">notes</span><span class="op">)</span></span>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.7.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.8.0</span>
       </span>
     </div>
 
@@ -69,6 +69,24 @@
       <small>Source: <a href="https://github.com/metrumresearchgroup/bbr/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="1.8.0" id="bbr-180">bbr 1.8.0<a class="anchor" aria-label="anchor" href="#bbr-180"></a></h2>
+<div class="section level3">
+<h3 id="new-features-and-changes-1-8-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-1-8-0"></a></h3>
+<ul><li>New <code><a href="../reference/inherit_param_estimates.html">inherit_param_estimates()</a></code> function for setting the initial parameter estimates of a model using the final estimates of a previously executed model. (<a href="https://github.com/metrumresearchgroup/bbr/issues/623" class="external-link">#623</a>)</li>
+<li>Improved documentation and vignettes. (<a href="https://github.com/metrumresearchgroup/bbr/issues/622" class="external-link">#622</a>, <a href="https://github.com/metrumresearchgroup/bbr/issues/627" class="external-link">#627</a>, <a href="https://github.com/metrumresearchgroup/bbr/issues/631" class="external-link">#631</a>)</li>
+<li>Some functions now rely on <code>nmrec</code> for parsing control stream files, rather than regex/string manipulation. (<a href="https://github.com/metrumresearchgroup/bbr/issues/600" class="external-link">#600</a>, <a href="https://github.com/metrumresearchgroup/bbr/issues/603" class="external-link">#603</a>, <a href="https://github.com/metrumresearchgroup/bbr/issues/604" class="external-link">#604</a>, <a href="https://github.com/metrumresearchgroup/bbr/issues/606" class="external-link">#606</a>, <a href="https://github.com/metrumresearchgroup/bbr/issues/612" class="external-link">#612</a>)</li>
+<li>
+<code>nm_join</code> now tracks the origin of each column and stores it as an attribute of the return value (mostly important for <code>bbr.bayes</code>). (<a href="https://github.com/metrumresearchgroup/bbr/issues/617" class="external-link">#617</a>)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bugs-addressed-1-8-0">Bugs addressed<a class="anchor" aria-label="anchor" href="#bugs-addressed-1-8-0"></a></h3>
+<ul><li>
+<code>update_model_id</code> would replace the id with the <code>based_on</code> field, which was a relative file path rather than a model id. In other words, this function did not support child models created in sub-directories (or otherwise a different directory than the parent model). (<a href="https://github.com/metrumresearchgroup/bbr/issues/614" class="external-link">#614</a>)</li>
+<li>
+<code><a href="../reference/delete_models.html">delete_models()</a></code> previously ran into issues when using <code>R 4.0</code> and an older version of <code>tibble</code>. (<a href="https://github.com/metrumresearchgroup/bbr/issues/625" class="external-link">#625</a>)</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="1.7.0" id="bbr-170">bbr 1.7.0<a class="anchor" aria-label="anchor" href="#bbr-170"></a></h2>
 <div class="section level3">

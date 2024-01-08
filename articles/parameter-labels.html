@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.7.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.8.0</span>
       </span>
     </div>
 
@@ -126,7 +126,7 @@ Please refer to the <a href="https://metrumresearchgroup.github.io/bbr/articles/
 Started”</a> vignette, mentioned above, if you have not done this yet.
 Once this is done, load the library.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/metrumresearchgroup/bbr" class="external-link">bbr</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://metrumresearchgroup.github.io/bbr">bbr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://readr.tidyverse.org" class="external-link">readr</a></span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -213,20 +213,19 @@ functions.</p>
 <span>  <span class="fu"><a href="../reference/param_estimates.html">param_estimates</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">param_df</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 8</span></span></span>
-<span><span class="co">#&gt;    parameter_names estimate  stderr random_effect…¹ random…² fixed diag  shrin…³</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> THETA1          12.3     0.961           <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>       FALSE <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> THETA2          90.7     4.94            <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>       FALSE <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> THETA3           0.163   0.335           <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>       FALSE <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> THETA4           0.567   1.57            <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>       FALSE <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> THETA5           0.403   0.342           <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>       FALSE <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> THETA6          -<span style="color: #BB0000;">0.395</span>   2.32            <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>       FALSE <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> OMEGA(1,1)       0.051<span style="text-decoration: underline;">7</span>  0.012<span style="text-decoration: underline;">2</span>           0.227   0.026<span style="text-decoration: underline;">9</span>  FALSE TRUE     3.50</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> OMEGA(2,1)       0.003<span style="text-decoration: underline;">45</span> 0.009<span style="text-decoration: underline;">46</span>          0.065<span style="text-decoration: underline;">4</span>  0.178   FALSE FALSE   <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> OMEGA(2,2)       0.053<span style="text-decoration: underline;">8</span>  0.012<span style="text-decoration: underline;">0</span>           0.232   0.025<span style="text-decoration: underline;">9</span>  FALSE TRUE     7.55</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> SIGMA(1,1)       0.045<span style="text-decoration: underline;">0</span>  0.003<span style="text-decoration: underline;">88</span>          0.212   0.009<span style="text-decoration: underline;">14</span> FALSE TRUE     6.58</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with abbreviated variable names ¹​random_effect_sd, ²​random_effect_sdse,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   ³​shrinkage</span></span></span></code></pre></div>
+<span><span class="co">#&gt;    parameter_names estimate  stderr random_effect_sd random_effect_sdse fixed</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> THETA1          12.3     0.961            <span style="color: #BB0000;">NA</span>                <span style="color: #BB0000;">NA</span>       FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> THETA2          90.7     4.94             <span style="color: #BB0000;">NA</span>                <span style="color: #BB0000;">NA</span>       FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> THETA3           0.163   0.335            <span style="color: #BB0000;">NA</span>                <span style="color: #BB0000;">NA</span>       FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> THETA4           0.567   1.57             <span style="color: #BB0000;">NA</span>                <span style="color: #BB0000;">NA</span>       FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> THETA5           0.403   0.342            <span style="color: #BB0000;">NA</span>                <span style="color: #BB0000;">NA</span>       FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> THETA6          -<span style="color: #BB0000;">0.395</span>   2.32             <span style="color: #BB0000;">NA</span>                <span style="color: #BB0000;">NA</span>       FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> OMEGA(1,1)       0.051<span style="text-decoration: underline;">7</span>  0.012<span style="text-decoration: underline;">2</span>            0.227             0.026<span style="text-decoration: underline;">9</span>  FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> OMEGA(2,1)       0.003<span style="text-decoration: underline;">45</span> 0.009<span style="text-decoration: underline;">46</span>           0.065<span style="text-decoration: underline;">4</span>            0.178   FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> OMEGA(2,2)       0.053<span style="text-decoration: underline;">8</span>  0.012<span style="text-decoration: underline;">0</span>            0.232             0.025<span style="text-decoration: underline;">9</span>  FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> SIGMA(1,1)       0.045<span style="text-decoration: underline;">0</span>  0.003<span style="text-decoration: underline;">88</span>           0.212             0.009<span style="text-decoration: underline;">14</span> FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: diag &lt;lgl&gt;, shrinkage &lt;dbl&gt;</span></span></span></code></pre></div>
 <p>These two tibbles can be joined together to create a table for
 including in reports.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
