@@ -304,6 +304,9 @@ steps:
   - git config --global user.email drone@metrumrg.com
   - git config --global user.name Drony
   - git fetch --tags
+  # clone nmrec from main branch for building package
+  - git clone --depth 1 https://github.com/metrumresearchgroup/nmrec.git /tmp/nmrec
+  - R -s -e 'devtools::install("/tmp/nmrec", upgrade = "never")'
   - R -s -e 'pkgpub::create_tagged_repo(.dir = '"'"'/ephemeral'"'"')'
   environment:
     BBI_EXE_PATH: /ephemeral/bbi
