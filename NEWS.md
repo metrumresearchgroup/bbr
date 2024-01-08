@@ -1,3 +1,26 @@
+# bbr 1.8.0
+
+## New features and changes
+
+* New `inherit_param_estimates()` function for setting the initial parameter 
+  estimates of a model using the final estimates of a previously executed model. 
+  (#623)
+* Improved documentation and vignettes. (#622, #627, #631)
+* Some functions now rely on `nmrec` for parsing control stream files, rather 
+  than regex/string manipulation. (#600, #603, #604, #606, #612)
+* `nm_join` now tracks the origin of each column and stores it as an attribute 
+  of the return value (mostly important for `bbr.bayes`). (#617)
+
+## Bugs addressed
+
+* `update_model_id` would replace the id with the `based_on` field, which was a 
+  relative file path rather than a model id. In other words, this function did 
+  not support child models created in sub-directories (or otherwise a different 
+  directory than the parent model). (#614)
+* `delete_models()` previously ran into issues when using `R 4.0` and an older 
+  version of `tibble`. (#625)
+
+
 # bbr 1.7.0
 
 ## Changes
