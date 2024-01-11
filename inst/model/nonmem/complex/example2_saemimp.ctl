@@ -65,8 +65,9 @@ IWRES=(DV-F)/W
 
 ;Initial THETAs
 $THETA
-( 0.7 ) ;[LCLM]
-( 0.7 ) ;[LCLF]
+(0,,1) ;[LCLM2]
+( 0.7 FIX) ;[LCLM]
+(0.67, 0.7, 0.72) ;[LCLF]
 ( 2 )   ;[CLAM]
 ( 2.0);[CLAF]
 ( 0.7 ) ;[LV1M]
