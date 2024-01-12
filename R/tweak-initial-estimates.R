@@ -6,18 +6,19 @@ tweak_initial_estimates <- function(
     digits = 2
 ){
 
+  test_nmrec_version(.min_version = "0.3.0") # TODO: increment version
   check_model_object(.mod, "bbi_nonmem_model")
   checkmate::assert_true(all(tweak %in% BBR_ESTIMATES_INHERIT))
 
   # Get initial estimates
-  initial_est <- get_param_inits(.mod, flag_fixed = TRUE)
+  initial_est <- get_initial_est(.mod, flag_fixed = TRUE)
 
   # Rounding
   fmt_digits <- paste0("%.",digits,"G")
 
   # Tweak THETA
   init_thetas <- initial_est$thetas
-  tweak_perc <- runif(length(init_thetas$init), -.p, .p)
+  tweak_perc <- stats::runif(length(init_thetas$init), -.p, .p)
   init_thetas$new <- init_thetas$init + (init_thetas$init * tweak_perc)
 
   # Respect THETA bounds (if any) and FIXED estimates
