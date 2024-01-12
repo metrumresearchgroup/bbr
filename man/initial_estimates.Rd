@@ -4,7 +4,7 @@
 \alias{initial_estimates}
 \title{Retrieve and format initial parameter estimates}
 \usage{
-initial_estimates(.mod, flag_fixed = TRUE)
+initial_estimates(.mod, flag_fixed = FALSE)
 }
 \arguments{
 \item{.mod}{a \code{bbr} model object}
@@ -15,8 +15,21 @@ parameters are fixed.}
 \description{
 Retrieve and format initial parameter estimates
 }
-\note{
+\details{
 \code{NA} values indicate that they were not specified in the control stream file.
-This is true for the initial estimate, \code{THETA} bounds, and whether a given
-parameter is \code{FIXED} or not.
+This is true for \code{THETA} bounds and whether a given parameter is \code{FIXED} or not.
+
+If you would like to format \code{OMEGA} or \code{SIGMA} records as \emph{full matrices},
+they are stored as attributes:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{ initial_est <- initial_estimates(.mod)
+ attr(initial_est, "omega_mat")
+ attr(initial_est, "sigma_mat")
+}\if{html}{\out{</div>}}
+}
+\examples{
+\dontrun{
+initial_estimates(.mod)
+}
+
 }

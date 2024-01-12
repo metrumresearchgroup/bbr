@@ -4,10 +4,22 @@
 #' @param flag_fixed Logical (`TRUE`/`FALSE`). If `TRUE`, return which
 #'        parameters are fixed.
 #'
-#' @note
+#' @details
 #' `NA` values indicate that they were not specified in the control stream file.
-#' This is true for the initial estimate, `THETA` bounds, and whether a given
-#' parameter is `FIXED` or not.
+#' This is true for `THETA` bounds and whether a given parameter is `FIXED` or not.
+#'
+#' If you would like to format `OMEGA` or `SIGMA` records as *full matrices*,
+#' they are stored as attributes:
+#' ```
+#'  initial_est <- initial_estimates(.mod)
+#'  attr(initial_est, "omega_mat")
+#'  attr(initial_est, "sigma_mat")
+#' ```
+#'
+#' @examples
+#' \dontrun{
+#' initial_estimates(.mod)
+#' }
 #'
 #' @export
 initial_estimates <- function(.mod, flag_fixed = FALSE){
@@ -39,14 +51,21 @@ initial_estimates <- function(.mod, flag_fixed = FALSE){
     )
   }
 
+  # Combine
   initial_est_df <- dplyr::bind_rows(
     theta_inits %>% dplyr::mutate(record_type = "theta"),
     omega_inits %>% dplyr::mutate(record_type = "omega"),
     sigma_inits %>% dplyr::mutate(record_type = "sigma")
   ) %>% dplyr::relocate(parameter_names, record_type)
 
-  return(initial_est_df)
+  # Filter out NA values, as these were not specified in the control stream file
+  initial_est_df <- initial_est_df %>%dplyr::filter(!is.na(init))
 
+  # Add original matrices as attributes if needed
+  attr(initial_est_df, "omega_mat") <- get_initial_est(.mod) %>% purrr::pluck("omegas")
+  attr(initial_est_df, "sigma_mat") <- get_initial_est(.mod) %>% purrr::pluck("sigmas")
+
+  return(initial_est_df)
 }
 
 

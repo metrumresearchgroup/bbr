@@ -5,7 +5,7 @@
 \title{Helper function for getting the initial theta values, including bounds and
 the presence of \code{FIXED} parameters.}
 \usage{
-get_theta_inits(ctl, mark_flags)
+get_theta_inits(ctl, mark_flags = NULL)
 }
 \arguments{
 \item{ctl}{an \code{nmrec} ctl object.}

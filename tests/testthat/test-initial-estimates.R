@@ -21,7 +21,7 @@ describe("initial_estimates", {
     expect_true(isFALSE(all(theta_inits$fixed)))
   })
 
-  it("integration base case", {
+  it("initial_estimates: integration", {
     initial_est_df <- initial_estimates(MOD1, flag_fixed = TRUE)
     initial_est <- get_initial_est(MOD1, flag_fixed = TRUE)
 
@@ -30,15 +30,18 @@ describe("initial_estimates", {
       initial_est_df %>% dplyr::filter(record_type == "theta") %>% dplyr::pull(init)
     )
 
+    lower_tri_omegas <- matrix_to_df(initial_est$omegas, type = "omega") %>%
+      dplyr::pull(init)
     expect_equal(
-      matrix_to_df(initial_est$omegas, type = "omega") %>% dplyr::pull(init),
+      lower_tri_omegas[!is.na(lower_tri_omegas)], # Filter out non-specified values
       initial_est_df %>% dplyr::filter(record_type == "omega") %>% dplyr::pull(init)
     )
 
+    lower_tri_sigmas <- matrix_to_df(initial_est$sigmas, type = "sigma") %>%
+      dplyr::pull(init)
     expect_equal(
-      matrix_to_df(initial_est$sigmas, type = "sigma") %>% dplyr::pull(init),
+      lower_tri_sigmas[!is.na(lower_tri_sigmas)], # Filter out non-specified values
       initial_est_df %>% dplyr::filter(record_type == "sigma") %>% dplyr::pull(init)
     )
   })
-
 })
