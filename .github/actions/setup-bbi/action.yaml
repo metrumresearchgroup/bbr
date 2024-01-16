@@ -1,0 +1,25 @@
+name: Setup bbi
+description: >
+  Install bbi at the specified version to $HOME/bin/bbi, and point the
+  BBI_EXE_PATH environment variable to this location.
+inputs:
+  # TODO: At some point, it'd be nice if the default was to
+  # automatically detect new versions (gh-620).
+  version:
+    description: Version of bbi to install
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Install bbi
+      shell: bash
+      env:
+        BBI_VERSION: ${{ inputs.version }}
+      run: |
+        mkdir -p $HOME/bin
+        url=https://github.com/metrumresearchgroup/bbi/releases/download
+        curl -fSsL "$url/$BBI_VERSION/bbi_linux_amd64.tar.gz" |
+        tar -z --extract --to-stdout >"$HOME/bin/bbi"
+        chmod +x "$HOME/bin/bbi"
+        $HOME/bin/bbi version
+        echo "BBI_EXE_PATH=$HOME/bin/bbi" >>$GITHUB_ENV

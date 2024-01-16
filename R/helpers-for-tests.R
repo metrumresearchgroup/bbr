@@ -23,6 +23,8 @@ skip_if_over_rate_limit <- function(by = 5) {
 }
 
 
+# TODO
+
 #' Skip test if not on Metworx or Drone
 #'
 #' Checks for Metworx and Drone environment variables and skips the test if neither are found.
@@ -31,8 +33,8 @@ skip_if_over_rate_limit <- function(by = 5) {
 #'   This is printed in the skip message
 #' @keywords internal
 skip_if_not_drone_or_metworx <- function(.test_name) {
-  if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
-    testthat::skip(paste(.test_name, "only runs on Metworx or Drone"))
+  if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("CI") != "true") {
+    testthat::skip(paste(.test_name, "only runs on Metworx or CI"))
   }
 }
 
