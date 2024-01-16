@@ -3,9 +3,10 @@ tweak_initial_estimates <- function(
     .mod,
     .p = 0.1,
     tweak = c("theta", "sigma", "omega"),
-    digits = 2
+    digits = 3
 ){
 
+  # Assertions
   test_nmrec_version(.min_version = "0.3.0") # TODO: increment version
   check_model_object(.mod, "bbi_nonmem_model")
   checkmate::assert_true(all(tweak %in% BBR_ESTIMATES_INHERIT))
@@ -18,8 +19,7 @@ tweak_initial_estimates <- function(
 
   # Tweak THETA
   init_thetas <- initial_est$thetas
-  tweak_perc <- stats::runif(length(init_thetas$init), -.p, .p)
-  init_thetas$new <- init_thetas$init + (init_thetas$init * tweak_perc)
+  init_thetas$new <- withr::with_preserve_seed(tweak_values(init_thetas$init, .p))
 
   # Respect THETA bounds (if any) and FIXED estimates
   init_thetas <- init_thetas %>% mutate(
@@ -41,8 +41,8 @@ tweak_initial_estimates <- function(
   fixed_omegas <- attr(init_omegas, "nmrec_flags")$fixed
   fixed_omegas[is.na(fixed_omegas)] <- TRUE
   new_omegas <- init_omegas[!fixed_omegas]
-  tweak_perc <- runif(length(new_omegas), -.p, .p)
-  new_omegas <- new_omegas + (new_omegas * tweak_perc)
+  # Tweak values
+  new_omegas <- withr::with_preserve_seed(tweak_values(new_omegas, .p))
   init_omegas[!fixed_omegas] <- new_omegas %>% signif(digits)
 
 
@@ -51,8 +51,8 @@ tweak_initial_estimates <- function(
   fixed_sigmas <- attr(init_sigmas, "nmrec_flags")$fixed
   fixed_sigmas[is.na(fixed_sigmas)] <- TRUE
   new_sigmas <- init_sigmas[!fixed_sigmas]
-  tweak_perc <- runif(length(new_sigmas), -.p, .p)
-  new_sigmas <- new_sigmas + (new_sigmas * tweak_perc)
+  # Tweak values
+  new_sigmas <- withr::with_preserve_seed(tweak_values(new_sigmas, .p))
   init_sigmas[!fixed_sigmas] <- new_sigmas %>% signif(digits)
 
 
@@ -61,7 +61,7 @@ tweak_initial_estimates <- function(
   mod_lines <- nmrec::read_ctl(mod_path)
 
   # Update THETA Block
-  if("theta" %in% tweak){
+  if("theta" %in% tweak && !rlang::is_empty(new_thetas)){
     nmrec::set_theta(
       mod_lines, values = new_thetas, bounds = "keep",
       fmt = fmt_digits
@@ -69,7 +69,7 @@ tweak_initial_estimates <- function(
   }
 
   # Update OMEGA Block
-  if("omega" %in% tweak){
+  if("omega" %in% tweak && !rlang::is_empty(init_omegas)){
     nmrec::set_omega(
       mod_lines, values = init_omegas, representation = "reset",
       fmt = fmt_digits
@@ -77,7 +77,7 @@ tweak_initial_estimates <- function(
   }
 
   # Update SIGMA Block
-  if("sigma" %in% tweak){
+  if("sigma" %in% tweak && !rlang::is_empty(init_sigmas)){
     nmrec::set_sigma(
       mod_lines, values = init_sigmas, representation = "reset",
       fmt = fmt_digits
@@ -88,4 +88,16 @@ tweak_initial_estimates <- function(
   nmrec::write_ctl(mod_lines, mod_path)
 
   return(.mod)
+}
+
+
+tweak_values <- function(values, .p){
+
+  # Sample percentages & Preserve seed if set
+  tweak_perc <- stats::runif(length(values), -.p, .p)
+
+  # Return new values
+  new_values <- values + (values * tweak_perc)
+
+  return(new_values)
 }
