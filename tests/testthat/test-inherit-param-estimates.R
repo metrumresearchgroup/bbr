@@ -205,9 +205,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
         # works correctly with flag added
         args_list <- list()
         args_list[[as.character(glue::glue("no_{.tc$ext}_file"))]] <- TRUE
-        expect_no_error(
-          mod3 <- inherit_param_estimates(mod3, .bbi_args = args_list)
-        )
+        mod3 <- inherit_param_estimates(mod3, .bbi_args = args_list)
 
         delete_models(list(mod2, mod3), .tags = NULL, .force = TRUE)
       }
