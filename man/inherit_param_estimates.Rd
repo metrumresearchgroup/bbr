@@ -9,7 +9,8 @@ inherit_param_estimates(
   .parent_mod = get_based_on(.mod)[1],
   inherit = c("theta", "sigma", "omega"),
   bounds = c("keep", "discard"),
-  digits = 3
+  digits = 3,
+  .bbi_args = list(no_grd_file = TRUE, no_shk_file = TRUE)
 )
 }
 \arguments{
@@ -26,6 +27,10 @@ replacing all of THETA, SIGMA, and OMEGA}
 the initial estimates in THETA records.}
 
 \item{digits}{Number of significant digits to round estimates to.}
+
+\item{.bbi_args}{Named list passed to \code{model_summary(.bbi_args)}. See
+\code{\link[=print_bbi_args]{print_bbi_args()}} for valid options. Defaults to \code{list(no_grd_file = TRUE, no_shk_file = TRUE)} because \code{\link[=model_summary]{model_summary()}} is only called internally to
+extract the parameter estimates, so those files are irrelevant.}
 }
 \description{
 Set the initial parameter estimates of a model using the estimates of a

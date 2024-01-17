@@ -177,6 +177,41 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       mod2_inits_inherit <- get_param_inits(mod_est)
       expect_equal(mod1_params_final$thetas, mod2_inits_inherit$thetas)
     })
+
+    it("works with missing grd and shk files", {
+
+      TEST_CASES <- list(
+        list(ext = "grd", missing = NULL),
+        list(ext = "shk", missing = "shrinkage_details")
+      )
+
+      for (.tc in TEST_CASES) {
+        # create new model to inherit estimates from
+        mod2 <- MOD1 %>% copy_model_from(basename(NEW_MOD2))
+        # copy output directory (to simulate model run)
+        copy_output_dir(MOD1, NEW_MOD2)
+        # delete relevant file from summarized (parent) model
+        fs::file_delete(build_path_from_model(mod2, glue::glue(".{.tc$ext}")))
+
+        # create new model to copy estimates to
+        mod3 <- mod2 %>% copy_model_from(basename(NEW_MOD3))
+
+        # errors without the flag
+        expect_error(
+          inherit_param_estimates(mod3, .bbi_args = list()),
+          glue::glue("[Nn]o file present at.*2/2\\.{.tc$ext}")
+        )
+
+        # works correctly with flag added
+        args_list <- list()
+        args_list[[as.character(glue::glue("no_{.tc$ext}_file"))]] <- TRUE
+        expect_no_error(
+          mod3 <- inherit_param_estimates(mod3, .bbi_args = args_list)
+        )
+
+        delete_models(list(mod2, mod3), .tags = NULL, .force = TRUE)
+      }
+    })
   })
 
 })
