@@ -33,9 +33,14 @@ describe("tweak_initial_estimates", {
     initial_est <- get_initial_est(mod_tweak, flag_fixed = FALSE)
 
     # Tweak initial estimates with set seed
-    mod_tweak_new <- withr::with_seed(1234, {
-      tweak_initial_estimates(mod_tweak, .p = 0.2)
+    withr::with_seed(1234, {
+      mod_tweak_new <- tweak_initial_estimates(mod_tweak, .p = 0.2)
+      # Ensure seed was captured within this context
+      expect_true(all(attr(mod_tweak_new, "seed") == .Random.seed))
     })
+    # Utilized seed *is not* equal to session .Random.seed
+    expect_false(all(attr(mod_tweak_new, "seed") == .Random.seed))
+
     est_tweaked <- get_initial_est(mod_tweak_new, flag_fixed = FALSE)
 
     # Expect all values to be tweaked
@@ -151,5 +156,4 @@ describe("tweak_initial_estimates", {
     expect_equal(tweaked_omegas[c(2, 4:6)], init_omegas[c(2, 4:6)]) # Fixed
     expect_true(all(tweaked_omegas[c(1, 3)] != init_omegas[c(1, 3)])) # Tweaked
   })
-
 })

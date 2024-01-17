@@ -69,5 +69,13 @@ mod2 <- copy_model_from(base_mod, "mod2") \%>\%
 # This function may be paired with `inherit_param_estimates()`:
 mod2 <- copy_model_from(base_mod, "mod2") \%>\%
   inherit_param_estimates() \%>\% tweak_initial_estimates(.p = 0.2)
+
+# If you want to set the seed for reproducible results:
+mod2 <- withr::with_seed(1234, {
+   tweak_initial_estimates(mod2, .p = 0.2, digits = 3)
+})
+
+# The utilized `.Random.seed` is appended to the model object as an attribute:
+head(attr(mod2, "seed"))
 }
 }

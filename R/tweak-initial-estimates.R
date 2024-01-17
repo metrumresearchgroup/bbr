@@ -29,6 +29,7 @@
 #'     - e.g., `(0, 0.5, 1)` --> tweak initially, falls outside bound (`(0, 1.2, 1)`)
 #'     --> set to upper bound (`(0, 1, 1)`)
 #'
+#'
 #' @examples
 #' \dontrun{
 #' base_mod <- read_model(file.path(MODEL_DIR, "1"))
@@ -39,6 +40,14 @@
 #' # This function may be paired with `inherit_param_estimates()`:
 #' mod2 <- copy_model_from(base_mod, "mod2") %>%
 #'   inherit_param_estimates() %>% tweak_initial_estimates(.p = 0.2)
+#'
+#' # If you want to set the seed for reproducible results:
+#' mod2 <- withr::with_seed(1234, {
+#'    tweak_initial_estimates(mod2, .p = 0.2, digits = 3)
+#' })
+#'
+#' # The utilized `.Random.seed` is appended to the model object as an attribute:
+#' head(attr(mod2, "seed"))
 #' }
 #' @export
 tweak_initial_estimates <- function(
@@ -47,6 +56,10 @@ tweak_initial_estimates <- function(
     tweak = c("theta", "sigma", "omega"),
     digits = 3
 ){
+
+  # Initialize .Random.seed
+  # (.Random.seed does not exist until some randomness is used in R session)
+  if(!exists(".Random.seed")) set.seed(NULL)
 
   # Assertions
   test_nmrec_version(.min_version = "0.4.0")
@@ -128,6 +141,10 @@ tweak_initial_estimates <- function(
 
   # Write out mod_lines to model
   nmrec::write_ctl(mod_lines, mod_path)
+
+  # Capture seed for traceability
+  seed <- .Random.seed
+  attr(.mod, "seed") <- seed
 
   return(.mod)
 }
