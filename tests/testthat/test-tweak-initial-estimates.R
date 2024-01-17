@@ -36,10 +36,10 @@ describe("tweak_initial_estimates", {
     withr::with_seed(1234, {
       mod_tweak_new <- tweak_initial_estimates(mod_tweak, .p = 0.2)
       # Ensure seed was captured within this context
-      expect_true(all(attr(mod_tweak_new, "seed") == .Random.seed))
+      expect_true(all(attr(mod_tweak_new, "tweak_estimates.seed") == .Random.seed))
     })
     # Utilized seed *is not* equal to session .Random.seed
-    expect_false(all(attr(mod_tweak_new, "seed") == .Random.seed))
+    expect_false(all(attr(mod_tweak_new, "tweak_estimates.seed") == .Random.seed))
 
     est_tweaked <- get_initial_est(mod_tweak_new, flag_fixed = FALSE)
 

@@ -47,7 +47,7 @@
 #' })
 #'
 #' # The utilized `.Random.seed` is appended to the model object as an attribute:
-#' head(attr(mod2, "seed"))
+#' head(attr(mod2, "tweak_estimates.seed"))
 #' }
 #' @export
 tweak_initial_estimates <- function(
@@ -144,7 +144,7 @@ tweak_initial_estimates <- function(
 
   # Capture seed for traceability
   seed <- .Random.seed
-  attr(.mod, "seed") <- seed
+  attr(.mod, "tweak_estimates.seed") <- seed
 
   return(.mod)
 }
