@@ -17,9 +17,11 @@
 #' ```
 #'
 #' @examples
-#' \dontrun{
-#' initial_estimates(.mod)
-#' }
+#' mod1 <- read_model(
+#'   system.file("model", "nonmem", "basic", "1", package = "bbr")
+#' )
+#'
+#' initial_estimates(mod1)
 #'
 #' @export
 initial_estimates <- function(.mod, flag_fixed = FALSE){
@@ -59,7 +61,7 @@ initial_estimates <- function(.mod, flag_fixed = FALSE){
   ) %>% dplyr::relocate(parameter_names, record_type)
 
   # Filter out NA values, as these were not specified in the control stream file
-  initial_est_df <- initial_est_df %>%dplyr::filter(!is.na(init))
+  initial_est_df <- initial_est_df %>% dplyr::filter(!is.na(init))
 
   # Add original matrices as attributes if needed
   attr(initial_est_df, "omega_mat") <- get_initial_est(.mod) %>% purrr::pluck("omegas")

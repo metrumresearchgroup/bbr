@@ -28,8 +28,10 @@ they are stored as attributes:
 }\if{html}{\out{</div>}}
 }
 \examples{
-\dontrun{
-initial_estimates(.mod)
-}
+mod1 <- read_model(
+  system.file("model", "nonmem", "basic", "1", package = "bbr")
+)
+
+initial_estimates(mod1)
 
 }

@@ -1,4 +1,46 @@
 
+#' Tweak the initial parameter estimates
+#'
+#' @param .mod model object to update.
+#' @param .p Percent to tweak the initial parameter estimates by. Represented as
+#'   a fraction.
+#' @param tweak type of estimates to tweak in the model. Defaults to
+#'   updating all of THETA, SIGMA, and OMEGA records.
+#' @param digits Number of significant digits to round estimates to.
+#'
+#' @details
+#'
+#' In the following cases, the initial estimate will *not* be updated:
+#'  - **Individual** `FIXED` `THETA` parameters
+#'     - e.g., `$THETA 1.2 FIX 1.5 0.2` --> would only skip the first value
+#'  - **Individual** `FIXED` `OMEGA` & `SIGMA` parameters for *diagonal* matrices
+#'     - e.g., `$OMEGA 0 FIX 1` --> would only skip the first value
+#'  - **Full** `FIXED` `OMEGA` & `SIGMA` *block* matrices
+#'     - e.g., `$OMEGA BLOCK(2) 0.1 0.001 0.1 FIX` --> would skip the full `OMEGA` record
+#'  - `THETA` parameters with no initial estimate
+#'     - e.g., `$THETA (0,,1)`
+#'
+#'  For bounded `THETA` estimates:
+#'   - If an initial `THETA` has bounds **and** an initial estimate
+#'  (e.g., `(0, 0.5, 1)`, `(0,1)`), the bounds will be respected when sampling
+#'  a percent to tweak by. If the tweaked value would fall below the lower bound,
+#'  the initial estimate will be set to the lower bound. The same is true for
+#'  upper bounds.
+#'     - e.g., `(0, 0.5, 1)` --> tweak initially, falls outside bound (`(0, 1.2, 1)`)
+#'     --> set to upper bound (`(0, 1, 1)`)
+#'
+#' @examples
+#' \dontrun{
+#' base_mod <- read_model(file.path(MODEL_DIR, "1"))
+#'
+#' mod2 <- copy_model_from(base_mod, "mod2") %>%
+#'   tweak_initial_estimates(.p = 0.2)
+#'
+#' # This function may be paired with `inherit_param_estimates()`:
+#' mod2 <- copy_model_from(base_mod, "mod2") %>%
+#'   inherit_param_estimates() %>% tweak_initial_estimates(.p = 0.2)
+#' }
+#' @export
 tweak_initial_estimates <- function(
     .mod,
     .p = 0.1,
