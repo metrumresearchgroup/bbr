@@ -1,7 +1,6 @@
 
 
 describe("initial_estimates", {
-  skip_if_old_nmrec("0.3.0") # TODO: increment version
 
   it("matrix_to_df", {
     initial_est <- get_initial_est(MOD1)
@@ -14,6 +13,7 @@ describe("initial_estimates", {
   })
 
   it("get_theta_inits", {
+    skip_if_old_nmrec("0.4.0")
     ctl <- nmrec::read_ctl(get_model_path(MOD1))
     theta_inits <- get_theta_inits(ctl, mark_flags = "fix")
 
@@ -22,6 +22,7 @@ describe("initial_estimates", {
   })
 
   it("initial_estimates: integration", {
+    skip_if_old_nmrec("0.4.0")
     initial_est_df <- initial_estimates(MOD1, flag_fixed = TRUE)
     initial_est <- get_initial_est(MOD1, flag_fixed = TRUE)
 
