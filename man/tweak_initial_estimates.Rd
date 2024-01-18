@@ -76,6 +76,6 @@ mod2 <- withr::with_seed(1234, {
 })
 
 # The utilized `.Random.seed` is appended to the model object as an attribute:
-head(attr(mod2, "seed"))
+head(attr(mod2, "tweak_estimates.seed"))
 }
 }
