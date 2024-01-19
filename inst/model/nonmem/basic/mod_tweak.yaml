@@ -1,7 +1,0 @@
-model_type: nonmem
-description: Tweak estimates
-bbi_args:
-  overwrite: yes
-  threads: 4.0
-based_on:
-- '1'
