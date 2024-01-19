@@ -7,7 +7,7 @@
 # of the bounds.
 
 describe("tweak_initial_estimates", {
-  skip_if_old_nmrec("0.4.0")
+  skip_if_old_nmrec("0.3.0.8000")
 
   it("base case - tweaking initial value works", {
     test_case <- list(
