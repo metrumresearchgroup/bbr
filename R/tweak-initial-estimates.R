@@ -3,7 +3,7 @@
 #'
 #' @param .mod model object to update.
 #' @param .p Percent to tweak the initial parameter estimates by. Represented as
-#'   a fraction.
+#'   a decimal.
 #' @param tweak type of estimates to tweak in the model. Defaults to
 #'   updating all of THETA, SIGMA, and OMEGA records.
 #' @param digits Number of significant digits to round estimates to.
@@ -46,8 +46,6 @@
 #'    tweak_initial_estimates(mod2, .p = 0.2, digits = 3)
 #' })
 #'
-#' # The utilized `.Random.seed` is appended to the model object as an attribute:
-#' head(attr(mod2, "tweak_estimates.seed"))
 #' }
 #' @export
 tweak_initial_estimates <- function(
@@ -141,10 +139,6 @@ tweak_initial_estimates <- function(
 
   # Write out mod_lines to model
   nmrec::write_ctl(mod_lines, mod_path)
-
-  # Capture seed for traceability
-  seed <- .Random.seed
-  attr(.mod, "tweak_estimates.seed") <- seed
 
   return(.mod)
 }
