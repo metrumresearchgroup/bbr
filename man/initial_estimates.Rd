@@ -19,7 +19,7 @@ Retrieve and format initial parameter estimates
 \code{NA} values indicate that they were not specified in the control stream file.
 This is true for \code{THETA} bounds and whether a given parameter is \code{FIXED} or not.
 
-If you would like to format \code{OMEGA} or \code{SIGMA} records as \emph{full matrices},
+If you would like the \code{OMEGA} or \code{SIGMA} records formatted as \emph{full matrices},
 they are stored as attributes:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{ initial_est <- initial_estimates(.mod)

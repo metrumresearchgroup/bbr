@@ -15,7 +15,7 @@ tweak_initial_estimates(
 \item{.mod}{model object to update.}
 
 \item{.p}{Percent to tweak the initial parameter estimates by. Represented as
-a fraction.}
+a decimal.}
 
 \item{tweak}{type of estimates to tweak in the model. Defaults to
 updating all of THETA, SIGMA, and OMEGA records.}
@@ -51,11 +51,13 @@ For bounded \code{THETA} estimates:
 \item If an initial \code{THETA} has bounds \strong{and} an initial estimate
 (e.g., \verb{(0, 0.5, 1)}, \verb{(0,1)}), the bounds will be respected when sampling
 a percent to tweak by. If the tweaked value would fall below the lower bound,
-the initial estimate will be set to the lower bound. The same is true for
-upper bounds.
+the initial estimate will be set to 90\% of the way between the initial value
+and lower bound. If \emph{after rounding}, the value would still not be within the
+bounds, the difference between the initial value and the bound will be
+iteratively reduced  until it is. The same is true for upper bounds.
 \itemize{
 \item e.g., \verb{(0, 0.5, 1)} --> tweak initially, falls outside bound (\verb{(0, 1.2, 1)})
---> set to upper bound (\verb{(0, 1, 1)})
+--> set to value within bounds (first iteration: \verb{(1-0.5)*0.9)}:  (\verb{(0, 0.45, 1)})
 }
 }
 }
@@ -75,7 +77,5 @@ mod2 <- withr::with_seed(1234, {
    tweak_initial_estimates(mod2, .p = 0.2, digits = 3)
 })
 
-# The utilized `.Random.seed` is appended to the model object as an attribute:
-head(attr(mod2, "tweak_estimates.seed"))
 }
 }

@@ -50,7 +50,11 @@ describe("tweak_initial_estimates", {
       case = "theta bounds; tweaked value falls outside",
       input_ctl = "
       $THETA
-      (1.99, 2, 2.01) ; KA
+      (1.98, 2, 2.02)
+      (1.999, 2, 2.001)
+      (1.95, 2, 2.05)
+      (0, 1)
+      (0, 3, 5)
       "
     )
 
@@ -64,17 +68,51 @@ describe("tweak_initial_estimates", {
     # Ensure initial value starts off within the bounds
     expect_true(thetas_init$low < thetas_init$init && thetas_init$init < thetas_init$up)
 
-    # Tweak initial estimates with set seed
-    mod_tweak_new <- withr::with_seed(1234, {
-      tweak_initial_estimates(mod_tweak, .p = 0.2, tweak = "theta")
-    })
+    # Tweak initial estimates - dont set seed, as these tests should always pass
+    mod_tweak_new <- tweak_initial_estimates(mod_tweak, .p = 0.2, tweak = "theta")
     thetas_tweaked <- get_initial_est(mod_tweak_new, flag_fixed = TRUE)$thetas
 
-    # Expect initial value to be set to lower bound, since it fell outside one
-    # of the bounds
-    expect_equal(thetas_tweaked$low, thetas_tweaked$init)
+    # All values should be within bounds
+    init_within_bounds <- (thetas_tweaked$init < thetas_tweaked$up) &
+      (thetas_tweaked$init > thetas_tweaked$low)
+    expect_true(all(init_within_bounds[!is.na(init_within_bounds)]))
   })
 
+  it("theta bounds - adjust_tweaked_theta()", {
+    test_case <- list(
+      case = "theta bounds; tweaked value falls outside",
+      input_ctl = "
+      $THETA
+      (1.98, 2, 2.02) ; Should be 50% between init and upper bound
+      (1.999, 2, 2.001) ; Should be set to the init value
+      (1.95, 2, 2.05) ; Should be set to 90% between init and upper bound
+      (0, 1); lower bound only
+      (0, 3, 5); 'regular' bound
+      "
+    )
+    # Create fake model with bounds
+    mod_tweak <- do.call(make_fake_mod, test_case)
+    on.exit(delete_models(mod_tweak, .tags = NULL, .force = TRUE))
+
+    # Get initial estimates
+    thetas_init <- get_initial_est(mod_tweak, flag_fixed = TRUE)$thetas
+
+    for(digits.i in c(2, 3, 4, 5)){
+      for(perc.i in c(0.1, 0.2, 0.3)){
+        thetas_init$new <- tweak_values(thetas_init$init, .p = perc.i)
+        thetas_init_adj <- adjust_tweaked_theta(thetas_init, digits = digits.i)
+        # Round new values
+        thetas_init_adj$new <- signif(thetas_init_adj$new, digits.i)
+
+        # All values should be within bounds
+        init_within_bounds <- (thetas_init_adj$new < thetas_init_adj$up) &
+          (thetas_init_adj$new > thetas_init_adj$low)
+        expect_true(all(init_within_bounds[!is.na(init_within_bounds)]))
+      }
+    }
+
+
+  })
   it("theta bounds - no initial value (ignore)", {
     test_case <- list(
       case = "theta bounds; no initial value",
