@@ -185,6 +185,12 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
         list(ext = "shk", missing = "shrinkage_details")
       )
 
+      # Ensure models get deleted if tests fail
+      on.exit({
+        try(delete_models(mod2, .tags = NULL, .force = TRUE))
+        try(delete_models(mod3, .tags = NULL, .force = TRUE))
+      })
+
       for (.tc in TEST_CASES) {
         # create new model to inherit estimates from
         mod2 <- MOD1 %>% copy_model_from(basename(NEW_MOD2))
@@ -202,10 +208,14 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
           glue::glue("[Nn]o file present at.*2/2\\.{.tc$ext}")
         )
 
-        # works correctly with flag added
-        args_list <- list()
-        args_list[[as.character(glue::glue("no_{.tc$ext}_file"))]] <- TRUE
-        mod3 <- inherit_param_estimates(mod3, .bbi_args = args_list)
+        # works correctly with flag added (the default)
+        mod3 <- inherit_param_estimates(mod3)
+        sum2 <- model_summary(mod2, .bbi_args = list(no_grd_file = TRUE, no_shk_file = TRUE))
+
+
+        mod3_params_final <- list(thetas = sum2 %>% get_theta() %>% sprintf("%.3G", .))
+        mod3_inits_inherit <- get_param_inits(mod3)
+        expect_equal(mod3_params_final$thetas, mod3_inits_inherit$thetas)
 
         delete_models(list(mod2, mod3), .tags = NULL, .force = TRUE)
       }
