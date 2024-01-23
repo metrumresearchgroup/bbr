@@ -31,14 +31,14 @@ initial_estimates <- function(.mod, flag_fixed = FALSE){
   theta_inits <- initial_est$thetas
   theta_inits$parameter_names <- sprintf("THETA(%d)", 1:nrow(theta_inits))
   theta_inits <- theta_inits %>%
-    dplyr::rename(lower_bound = low, upper_bound = up)
+    dplyr::rename("lower_bound" = "low", "upper_bound" = "up")
 
   # Format OMEGA
   omega_inits <- matrix_to_df(initial_est$omegas, type = "omega")
   if(isTRUE(flag_fixed)){
     omega_inits <- omega_inits %>% dplyr::left_join(
       matrix_to_df(attr(initial_est$omegas, "nmrec_flags")$fixed, type = "omega") %>%
-        dplyr::rename(fixed=init),
+        dplyr::rename("fixed"="init"),
       by = c("parameter_names")
     )
   }
@@ -48,7 +48,7 @@ initial_estimates <- function(.mod, flag_fixed = FALSE){
   if(isTRUE(flag_fixed)){
     sigma_inits <- sigma_inits %>% dplyr::left_join(
       matrix_to_df(attr(initial_est$sigmas, "nmrec_flags")$fixed, type = "sigma") %>%
-        dplyr::rename(fixed=init),
+        dplyr::rename("fixed"="init"),
       by = c("parameter_names")
     )
   }
@@ -58,10 +58,10 @@ initial_estimates <- function(.mod, flag_fixed = FALSE){
     theta_inits %>% dplyr::mutate(record_type = "theta"),
     omega_inits %>% dplyr::mutate(record_type = "omega"),
     sigma_inits %>% dplyr::mutate(record_type = "sigma")
-  ) %>% dplyr::relocate(parameter_names, record_type)
+  ) %>% dplyr::relocate("parameter_names", "record_type")
 
   # Filter out NA values, as these were not specified in the control stream file
-  initial_est_df <- initial_est_df %>% dplyr::filter(!is.na(init))
+  initial_est_df <- initial_est_df %>% dplyr::filter(!is.na(.data$init))
 
   # Add original matrices as attributes if needed
   attr(initial_est_df, "omega_mat") <- get_initial_est(.mod) %>% purrr::pluck("omegas")

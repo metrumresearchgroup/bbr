@@ -73,7 +73,7 @@ tweak_initial_estimates <- function(
   init_thetas$new <- withr::with_preserve_seed(tweak_values(init_thetas$init, .p))
   # Ignore fixed values
   init_thetas <- init_thetas %>% dplyr::mutate(
-    new = ifelse(fixed == TRUE, init, new)
+    new = ifelse(fixed == TRUE, .data$init, .data$new)
   )
   # Respect THETA bounds (if any)
   init_thetas <- adjust_tweaked_theta(init_thetas, digits)
@@ -164,9 +164,9 @@ adjust_tweaked_theta <- function(init_thetas, digits){
 
   # Initialize formatted version of initial value and bounds
   init_thetas_adj <- init_thetas %>% mutate(
-    new_fmt = sprintf(fmt_digits, new),
-    up_fmt = sprintf(fmt_digits, up),
-    low_fmt = sprintf(fmt_digits, low)
+    new_fmt = sprintf(fmt_digits, .data$new),
+    up_fmt = sprintf(fmt_digits, .data$up),
+    low_fmt = sprintf(fmt_digits, .data$low)
   )
 
   # Set to `bound_perc` (e.g, 90%) of the way between init and bound
@@ -177,9 +177,9 @@ adjust_tweaked_theta <- function(init_thetas, digits){
         !is.na(low) & new_fmt <= low_fmt ~ (init - lower_diff*bound_perc),
         TRUE ~ new
       ),
-      new_fmt = sprintf(fmt_digits, new),
-      up_fmt = sprintf(fmt_digits, up),
-      low_fmt = sprintf(fmt_digits, low)
+      new_fmt = sprintf(fmt_digits, .data$new),
+      up_fmt = sprintf(fmt_digits, .data$up),
+      low_fmt = sprintf(fmt_digits, .data$low)
     )
     return(init_thetas_adj)
   }

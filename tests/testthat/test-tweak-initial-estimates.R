@@ -66,7 +66,9 @@ describe("tweak_initial_estimates", {
     thetas_init <- get_initial_est(mod_tweak, flag_fixed = TRUE)$thetas
 
     # Ensure initial value starts off within the bounds
-    expect_true(thetas_init$low < thetas_init$init && thetas_init$init < thetas_init$up)
+    init_within_bounds_start <- (thetas_init$low < thetas_init$init) &
+      (thetas_init$init < thetas_init$up)
+    expect_true(all(init_within_bounds_start[!is.na(init_within_bounds_start)]))
 
     # Tweak initial estimates - dont set seed, as these tests should always pass
     mod_tweak_new <- tweak_initial_estimates(mod_tweak, .p = 0.2, tweak = "theta")
