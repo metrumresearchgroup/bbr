@@ -39,6 +39,7 @@ get_param_inits <- function(.mod, init_only = TRUE){
 withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   describe("inherit_param_estimates: integration", {
     skip_if_old_nmrec("0.3.0")
+    skip_if_not_drone_or_metworx("inherit_param_estimates() summary object")
     it("base model", {
       # errors if no based_on field
       expect_error(inherit_param_estimates(MOD1), "did not return any parent models")
