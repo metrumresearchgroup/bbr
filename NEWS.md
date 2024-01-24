@@ -1,3 +1,12 @@
+# bbr 1.8.1
+
+## Bugs addressed
+
+* `inherit_param_estimates()` would occasionally fail during the `model_summary()`
+call if the previous model had not converged correctly or `$COV` has not been 
+evaluated (no `.grd` file). Added `.bbi_args` argument (similar to `nm_join()`),
+that defaults to *not* looking for `.shk` and `.grd` files. (#638)
+
 # bbr 1.8.0
 
 ## New features and changes
