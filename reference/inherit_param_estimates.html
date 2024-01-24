@@ -20,7 +20,7 @@ estimates of a "parent" model to be used as the initial estimates of the
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.8.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.8.1</span>
       </span>
     </div>
 
@@ -86,7 +86,8 @@ estimates of a "parent" model to be used as the initial estimates of the
 <span>  .parent_mod <span class="op">=</span> <span class="fu"><a href="get_based_on.html">get_based_on</a></span><span class="op">(</span><span class="va">.mod</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
 <span>  inherit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"theta"</span>, <span class="st">"sigma"</span>, <span class="st">"omega"</span><span class="op">)</span>,</span>
 <span>  bounds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"keep"</span>, <span class="st">"discard"</span><span class="op">)</span>,</span>
-<span>  digits <span class="op">=</span> <span class="fl">3</span></span>
+<span>  digits <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  .bbi_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>no_grd_file <span class="op">=</span> <span class="cn">TRUE</span>, no_shk_file <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -114,6 +115,12 @@ the initial estimates in THETA records.</p></dd>
 
 <dt>digits</dt>
 <dd><p>Number of significant digits to round estimates to.</p></dd>
+
+
+<dt>.bbi_args</dt>
+<dd><p>Named list passed to <code>model_summary(.bbi_args)</code>. See
+<code><a href="print_bbi_args.html">print_bbi_args()</a></code> for valid options. Defaults to <code>list(no_grd_file = TRUE, no_shk_file = TRUE)</code> because <code><a href="model_summary.html">model_summary()</a></code> is only called internally to
+extract the parameter estimates, so those files are irrelevant.</p></dd>
 
 </dl></div>
     <div id="details">

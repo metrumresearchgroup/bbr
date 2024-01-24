@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.8.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.8.1</span>
       </span>
     </div>
 
@@ -69,6 +69,14 @@
       <small>Source: <a href="https://github.com/metrumresearchgroup/bbr/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="1.8.1" id="bbr-181">bbr 1.8.1<a class="anchor" aria-label="anchor" href="#bbr-181"></a></h2>
+<div class="section level3">
+<h3 id="bugs-addressed-1-8-1">Bugs addressed<a class="anchor" aria-label="anchor" href="#bugs-addressed-1-8-1"></a></h3>
+<ul><li>
+<code><a href="../reference/inherit_param_estimates.html">inherit_param_estimates()</a></code> calls <code><a href="../reference/model_summary.html">model_summary()</a></code> underneath and that failed when the parent model did not have <code>.grd</code> or <code>.shk</code> files. <code><a href="../reference/inherit_param_estimates.html">inherit_param_estimates()</a></code> now has a <code>.bbi_args</code> argument (similar to <code><a href="../reference/nm_join.html">nm_join()</a></code>) that defaults to <em>not</em> looking for <code>.shk</code> and <code>.grd</code> files. (<a href="https://github.com/metrumresearchgroup/bbr/issues/638" class="external-link">#638</a>)</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="1.8.0" id="bbr-180">bbr 1.8.0<a class="anchor" aria-label="anchor" href="#bbr-180"></a></h2>
 <div class="section level3">
