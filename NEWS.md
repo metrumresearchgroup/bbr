@@ -1,3 +1,12 @@
+# bbr 1.8.1
+
+## Bugs addressed
+
+* `inherit_param_estimates()` calls `model_summary()` underneath and that failed
+when the parent model did not have `.grd` or `.shk` files. `inherit_param_estimates()`
+now has a `.bbi_args` argument (similar to `nm_join()`) that defaults to *not* 
+looking for `.shk` and `.grd` files. (#638)
+
 # bbr 1.8.0
 
 ## New features and changes
