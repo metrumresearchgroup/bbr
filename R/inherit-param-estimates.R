@@ -14,6 +14,10 @@
 #' @param bounds Whether to keep or discard the existing bounds when setting
 #'   the initial estimates in THETA records.
 #' @param digits Number of significant digits to round estimates to.
+#' @param .bbi_args Named list passed to `model_summary(.bbi_args)`. See
+#'   [print_bbi_args()] for valid options. Defaults to `list(no_grd_file = TRUE,
+#'   no_shk_file = TRUE)` because [model_summary()] is only called internally to
+#'   extract the parameter estimates, so those files are irrelevant.
 #'
 #'
 #' @details
@@ -46,7 +50,9 @@ inherit_param_estimates <- function(
     .parent_mod = get_based_on(.mod)[1],
     inherit = c("theta", "sigma", "omega"),
     bounds = c("keep", "discard"),
-    digits = 3
+    digits = 3,
+    .bbi_args = list(no_grd_file = TRUE,
+                     no_shk_file = TRUE)
 ){
 
   test_nmrec_version(.min_version = "0.3.0")
@@ -67,7 +73,7 @@ inherit_param_estimates <- function(
   mod_lines <- nmrec::read_ctl(mod_path)
 
   # Parent model objects
-  based_on_sum <- model_summary(.parent_mod)
+  based_on_sum <- model_summary(.parent_mod, .bbi_args = .bbi_args)
 
 
   fmt_digits <- paste0("%.",digits,"G")

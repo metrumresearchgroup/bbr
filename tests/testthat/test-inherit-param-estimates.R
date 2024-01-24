@@ -39,6 +39,7 @@ get_param_inits <- function(.mod, init_only = TRUE){
 withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   describe("inherit_param_estimates: integration", {
     skip_if_old_nmrec("0.3.0")
+    skip_if_not_drone_or_metworx("inherit_param_estimates() summary object")
     it("base model", {
       # errors if no based_on field
       expect_error(inherit_param_estimates(MOD1), "did not return any parent models")
@@ -176,6 +177,49 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       mod1_params_final <- list(thetas = SUM1 %>% get_theta() %>% sprintf("%.3G", .))
       mod2_inits_inherit <- get_param_inits(mod_est)
       expect_equal(mod1_params_final$thetas, mod2_inits_inherit$thetas)
+    })
+
+    it("works with missing grd and shk files", {
+
+      TEST_CASES <- list(
+        list(ext = "grd", missing = NULL),
+        list(ext = "shk", missing = "shrinkage_details")
+      )
+
+      # Ensure models get deleted if tests fail
+      on.exit({
+        try(delete_models(mod2, .tags = NULL, .force = TRUE))
+        try(delete_models(mod3, .tags = NULL, .force = TRUE))
+      })
+
+      for (.tc in TEST_CASES) {
+        # create new model to inherit estimates from
+        mod2 <- MOD1 %>% copy_model_from(basename(NEW_MOD2))
+        # copy output directory (to simulate model run)
+        copy_output_dir(MOD1, NEW_MOD2)
+        # delete relevant file from summarized (parent) model
+        fs::file_delete(build_path_from_model(mod2, glue::glue(".{.tc$ext}")))
+
+        # create new model to copy estimates to
+        mod3 <- mod2 %>% copy_model_from(basename(NEW_MOD3))
+
+        # errors without the flag
+        expect_error(
+          inherit_param_estimates(mod3, .bbi_args = list()),
+          glue::glue("[Nn]o file present at.*2/2\\.{.tc$ext}")
+        )
+
+        # works correctly with flag added (the default)
+        mod3 <- inherit_param_estimates(mod3)
+        sum2 <- model_summary(mod2, .bbi_args = list(no_grd_file = TRUE, no_shk_file = TRUE))
+
+
+        mod3_params_final <- list(thetas = sum2 %>% get_theta() %>% sprintf("%.3G", .))
+        mod3_inits_inherit <- get_param_inits(mod3)
+        expect_equal(mod3_params_final$thetas, mod3_inits_inherit$thetas)
+
+        delete_models(list(mod2, mod3), .tags = NULL, .force = TRUE)
+      }
     })
   })
 
