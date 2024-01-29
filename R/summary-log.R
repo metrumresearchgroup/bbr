@@ -113,16 +113,17 @@ summary_log_impl <- function(.mods, ...) {
     return(select(res_df, -all_of(SL_FAIL_FLAGS)))
   }
 
+  fns <- list(
+    d = do_if_bbi_sum(extract_details, "list"),
+    ofv = do_if_bbi_sum(extract_ofv, "numeric"),
+    param_count = do_if_bbi_sum(extract_param_count, "integer"),
+    condition_number = do_if_bbi_sum(extract_condition_number, "integer"),
+    h = do_if_bbi_sum(extract_heuristics, "list")
+  )
   res_df <- mutate(
     res_df,
-    across(all_of(SL_SUMMARY),
-           .fns = list(
-             d = extract_details,
-             ofv = extract_ofv,
-             param_count = extract_param_count,
-             condition_number = extract_condition_number,
-             h = extract_heuristics),
-           .names = "{fn}"))
+    across(all_of(SL_SUMMARY), .fns = fns, .names = "{fn}")
+  )
 
   res_df <- res_df %>% unnest_wider("d") %>% unnest_wider("h")
 
@@ -244,3 +245,24 @@ extract_condition_number <- function(.s) {
   return(.out)
 }
 
+#' Wrap summary extractor so that only `bbi_nonmem_summary` objects are passed
+#'
+#' @param fn An `extract_from_summary` function that takes a list of
+#'   `bbi_nonmem_summary` values.
+#' @param mode Mode of result that will be returned by `fn`: "list", "integer",
+#'   or "numeric".
+#' @return A function that takes a list of `model_summary()` results and calls
+#'   `fn` with the subset that are `bbi_nonmem_summary` objects.
+#'
+#' @noRd
+do_if_bbi_sum <- function(fn, mode) {
+  function(s) {
+    is_sum <- purrr::map_lgl(s, function(x) inherits(x, NM_SUM_CLASS))
+    res <- vector(mode = mode, length = length(s))
+    res[is_sum] <- fn(s[is_sum])
+    if (!identical(mode, "list")) {
+      res[!is_sum] <- NA
+    }
+    return(res)
+  }
+}
