@@ -159,6 +159,32 @@ model_summaries_concurrent <- function(.mods, .bbi_args, .fail_flags) {
   return(results)
 }
 
+#' Map `model_summary()` over models, without retry on failure
+#'
+#' Like `model_summaries_serial()`, this calls `model_summary` on a set of
+#' models. However, it's intended for models that are _not_ being passed to `bbi
+#' nonmem summary`. As such, it does not have the `.bbi_args` and does not retry
+#' the call with `.fail_flags` on failures.
+#'
+#' @noRd
+model_summaries_onetry <- function(.mods) {
+  purrr::map(.mods, function(m) {
+    s <- tryCatch(model_summary(m), error = identity)
+    if (inherits(s, "error")) {
+      err <- format_model_summary_error(s)
+      s <- NULL
+    } else {
+      err <- NA_character_
+    }
+    rlang::list2(
+      !!ABS_MOD_PATH := m[[ABS_MOD_PATH]],
+      !!SL_SUMMARY := s,
+      !!SL_ERROR := err,
+      !!SL_FAIL_FLAGS := FALSE
+    )
+  })
+}
+
 format_model_summary_error <- function(err) {
   return(list(error_msg = paste(conditionMessage(err), collapse = " -- ")))
 }
@@ -180,10 +206,17 @@ model_summaries.list <- function(
   } else {
     model_summaries_serial
   }
-  is_nm <- purrr::map_lgl(.mods, function(m) inherits(m, NM_MOD_CLASS))
+  for_bbi <- purrr::map_lgl(
+    .mods,
+    # Note: Avoid inherit() here because for derived classes need to have the
+    # chance to go through their own model_summary() methods; there's no reason
+    # to think bbi can handle them.
+    function(m) identical(class(m)[[1]], NM_MOD_CLASS)
+  )
 
-  res_list <- bbi_summary_fn(.mods[is_nm], .bbi_args, .fail_flags)
-  res_list[!is_nm] <- model_summaries_serial(.mods[!is_nm], .bbi_args, .fail_flags)
+  res_list <- vector("list", length = length(.mods))
+  res_list[for_bbi] <- bbi_summary_fn(.mods[for_bbi], .bbi_args, .fail_flags)
+  res_list[!for_bbi] <- model_summaries_onetry(.mods[!for_bbi])
 
   return(create_summary_list(res_list))
 }
