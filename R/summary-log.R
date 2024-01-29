@@ -102,9 +102,14 @@ summary_log_impl <- function(.mods, ...) {
     return(select(res_df, -all_of(c(SL_SUMMARY, SL_FAIL_FLAGS))))
   }
 
-  # If none of the models are nonmem, the next section will error trying to
-  # unnest them, so we just return the objects here.
-  if (purrr::none(.mods, ~ inherits(.x, NM_MOD_CLASS))) {
+  # If none of the summary objects are bbi_nonmem_summary objects, the next
+  # section will error trying to unnest them, so we just return the objects
+  # here.
+  no_bbi_sum <- purrr::none(
+    res_df[["bbi_summary"]],
+    function(x) inherits(x, NM_SUM_CLASS)
+  )
+  if (no_bbi_sum) {
     return(select(res_df, -all_of(SL_FAIL_FLAGS)))
   }
 
