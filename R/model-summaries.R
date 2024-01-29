@@ -44,11 +44,6 @@ model_summaries <- function(
 
 #' @importFrom purrr map
 model_summaries_serial <- function(.mods, .bbi_args, .fail_flags) {
-  format_error <- function(err) {
-    return(list(error_msg = paste(as.character(err$message),
-                                  collapse = " -- ")))
-  }
-
   map(.mods, function(.m) {
     .s <- tryCatch(
       {
@@ -56,7 +51,7 @@ model_summaries_serial <- function(.mods, .bbi_args, .fail_flags) {
       },
       error = function(.e) {
         if (is.null(.fail_flags)) {
-          return(format_error(.e))
+          return(format_model_summary_error(.e))
         }
         # if fails, try again with flags
         tryCatch({
@@ -67,7 +62,7 @@ model_summaries_serial <- function(.mods, .bbi_args, .fail_flags) {
           .retry$needed_fail_flags <- TRUE
           return(.retry)
         },
-        error = format_error)
+        error = format_model_summary_error)
       }
     )
 
@@ -162,6 +157,10 @@ model_summaries_concurrent <- function(.mods, .bbi_args, .fail_flags) {
   }
 
   return(results)
+}
+
+format_model_summary_error <- function(err) {
+  return(list(error_msg = paste(conditionMessage(err), collapse = " -- ")))
 }
 
 #' @describeIn model_summaries Summarize a list of `bbi_{.model_type}_model` objects.
