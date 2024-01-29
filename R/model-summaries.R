@@ -39,11 +39,11 @@ model_summaries <- function(
   UseMethod("model_summaries")
 }
 
-# model_summaries_serial() can go away once bbr.bbi_min_version is 3.2.0 or
+# model_summaries_bbi_serial() can go away once bbr.bbi_min_version is 3.2.0 or
 # later.
 
 #' @importFrom purrr map
-model_summaries_serial <- function(.mods, .bbi_args, .fail_flags) {
+model_summaries_bbi_serial <- function(.mods, .bbi_args, .fail_flags) {
   map(.mods, function(.m) {
     .s <- tryCatch(
       {
@@ -101,7 +101,7 @@ bbi_exec_model_summaries <- function(args, paths) {
 #'
 #' @importFrom purrr map_chr modify_at modify_if walk
 #' @noRd
-model_summaries_concurrent <- function(.mods, .bbi_args, .fail_flags) {
+model_summaries_bbi_concurrent <- function(.mods, .bbi_args, .fail_flags) {
   walk(.mods, check_yaml_in_sync)
   paths <- map_chr(
     .mods,
@@ -161,7 +161,7 @@ model_summaries_concurrent <- function(.mods, .bbi_args, .fail_flags) {
 
 #' Map `model_summary()` over models, without retry on failure
 #'
-#' Like `model_summaries_serial()`, this calls `model_summary` on a set of
+#' Like `model_summaries_bbi_serial()`, this calls `model_summary` on a set of
 #' models. However, it's intended for models that are _not_ being passed to `bbi
 #' nonmem summary`. As such, it does not have the `.bbi_args` and does not retry
 #' the call with `.fail_flags` on failures.
@@ -202,9 +202,9 @@ model_summaries.list <- function(
   check_model_object_list(.mods)
 
   bbi_summary_fn <- if (test_bbi_version(.min_version = "3.2.0")) {
-    model_summaries_concurrent
+    model_summaries_bbi_concurrent
   } else {
-    model_summaries_serial
+    model_summaries_bbi_serial
   }
   for_bbi <- purrr::map_lgl(
     .mods,
