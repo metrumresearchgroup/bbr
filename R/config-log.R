@@ -81,8 +81,10 @@ config_log_impl <- function(.mods) {
 
   check_model_object_list(.mods)
 
-  out_dirs <- map_chr(.mods, get_output_dir, .check_exists = FALSE)
-  json_files <- file.path(out_dirs, "bbi_config.json")
+  json_files <- map_chr(
+    .mods,
+    function(m) get_config_path(m, .check_exists = FALSE)
+  )
 
   # check for files that don't exist
   missing <- !fs::file_exists(json_files)
@@ -98,7 +100,7 @@ config_log_impl <- function(.mods) {
     warning(paste(
       glue("Found only {sum(!missing)} bbi_config.json files for {length(.mods)} models."),
       "The following models may have failed or still be in progress:",
-      paste(out_dirs[missing], collapse = "\n"),
+      paste(map_chr(.mods[missing], ABS_MOD_PATH), collapse = "\n"),
       sep = "\n"
     ), call. = FALSE)
 
