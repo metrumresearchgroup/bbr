@@ -105,7 +105,7 @@ bbi_exec_model_summaries <- function(args, paths) {
 #' passed to [create_summary_list()].
 #'
 #' @importFrom purrr map_chr modify_at modify_if walk
-#' @keywords internal
+#' @noRd
 model_summaries_concurrent <- function(.mods, .bbi_args, .fail_flags) {
   walk(.mods, check_yaml_in_sync)
   paths <- map_chr(
