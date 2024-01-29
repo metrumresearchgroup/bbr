@@ -82,12 +82,7 @@ summary_log_impl <- function(.mods, ...) {
 
   check_model_object_list(.mods)
 
-  # bbr.bayes kludge: this is sneaking in information about a warning from
-  # model_summary.bbi_stan_model().
-  res_list <- suppressSpecificWarning(
-    model_summaries(.mods, ...),
-    .regexpr = "CmdStanMCMC"
-  )
+  res_list <- model_summaries(.mods, ...)
 
   # create tibble from list of lists
   res_df <- res_list %>%
