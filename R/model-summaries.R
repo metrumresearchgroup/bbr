@@ -174,12 +174,16 @@ model_summaries.list <- function(
 ) {
   # check that each element is a model object
   check_model_object_list(.mods)
-  res_list <- if (test_bbi_version(.min_version = "3.2.0") &&
-                    purrr::every(.mods, ~ inherits(.x, NM_MOD_CLASS))) {
-    model_summaries_concurrent(.mods, .bbi_args, .fail_flags)
+
+  bbi_summary_fn <- if (test_bbi_version(.min_version = "3.2.0")) {
+    model_summaries_concurrent
   } else {
-    model_summaries_serial(.mods, .bbi_args, .fail_flags)
+    model_summaries_serial
   }
+  is_nm <- purrr::map_lgl(.mods, function(m) inherits(m, NM_MOD_CLASS))
+
+  res_list <- bbi_summary_fn(.mods[is_nm], .bbi_args, .fail_flags)
+  res_list[!is_nm] <- model_summaries_serial(.mods[!is_nm], .bbi_args, .fail_flags)
 
   return(create_summary_list(res_list))
 }
