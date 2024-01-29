@@ -104,11 +104,12 @@ config_log_impl <- function(.mods) {
       sep = "\n"
     ), call. = FALSE)
 
-    # throw out missing files
+    # Throw out models that are missing bbi_config.json files.
+    .mods <- .mods[!missing]
     json_files <- json_files[!missing]
   }
 
-  res_df <- purrr::map_dfr(json_files, config_log_entry)
+  res_df <- purrr::map2_dfr(.mods, json_files, config_log_entry)
 
   res_df <- add_run_id_col(res_df)
 
@@ -180,7 +181,8 @@ config_log_make_entry.bbi_nonmem_model <- function(.mod, config, fields = NULL) 
 
 #' Parse a bbi config file
 #'
-#' @param path A string giving the path to `bbi_config.json`.
+#' @param cfg_mod A model object.
+#' @param path A string giving the path to `bbi_config.json` for `cfg_mod`.
 #' @param fields A character vector of fields to include.
 #'
 #' @return A list whose elements include
@@ -199,11 +201,10 @@ config_log_make_entry.bbi_nonmem_model <- function(.mod, config, fields = NULL) 
 #'   `path`.
 #'
 #' @keywords internal
-config_log_entry <- function(path, fields = NULL) {
+config_log_entry <- function(cfg_mod, path, fields = NULL) {
   checkmate::assert_file_exists(path)
   checkmate::assert_character(fields, null.ok = TRUE)
 
-  cfg_mod <- read_model_from_config(path)
   config <- jsonlite::fromJSON(path)
 
   res <- config_log_make_entry(cfg_mod, config, fields)
@@ -252,42 +253,4 @@ resolve_nonmem_version <- function(x) {
     ver <- names(purrr::compact(idx))
   }
   ver
-}
-
-#' Create a model object from a bbi_config.json path
-#'
-#' This is non-trivial because, while configs
-#' always sit in the ouput directory, for NONMEM models
-#' this is one dir deeper than the YAML and for Stan
-#' models this is two dirs deeper than the YAML.
-#' Hence, this is abstracted into an obnoxious private
-#' helper function.
-#' @importFrom fs path_norm path_ext_set file_exists
-#' @importFrom stringr str_detect
-#' @importFrom checkmate assert_file_exists assert_true
-#' @param .config_path The absolute path a `bbi_config.json` file
-#' @return a `bbi_{.model_type}_model` object
-#' @keywords internal
-read_model_from_config <- function(.config_path) {
-  checkmate::assert_true(stringr::str_detect(.config_path, "bbi_config\\.json$"))
-  checkmate::assert_file_exists(.config_path)
-
-  potential_nm_path   <- file.path(.config_path, "..") %>%
-    fs::path_norm() %>%
-    fs::path_ext_set("yaml")
-
-  potential_stan_path <- file.path(.config_path, "..", "..") %>%
-    fs::path_norm() %>%
-    fs::path_ext_set("yaml")
-
-  winner <- names(which(fs::file_exists(c(potential_nm_path, potential_stan_path))))
-
-  if (length(winner) != 1) {
-    dev_error(glue("read_model_from_config() checked {potential_nm_path} and {potential_stan_path} and the following exist: {paste(winner, collapse = ', ')}"))
-  }
-
-  mod <- suppressMessages(
-    read_model(tools::file_path_sans_ext(winner))
-  )
-  return(mod)
 }

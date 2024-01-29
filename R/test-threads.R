@@ -113,6 +113,7 @@ test_threads <- function(
 #' @return A tibble with columns `threads` (number of threads) and `time`
 #'   (elapsed estimation time in seconds for test models).
 #'
+#' @importFrom checkmate assert_true
 #' @importFrom tidyselect all_of
 #' @importFrom purrr map_dfr
 #'
