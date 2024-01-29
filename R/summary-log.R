@@ -139,7 +139,7 @@ summary_log_impl <- function(.mods, ...) {
 #'
 #' These are all helper functions to extract a specific field or sub-field from a `bbi_{.model_type}_summary` object.
 #' @name extract_from_summary
-#' @param .s The summary object to extract from
+#' @param .s A list of `bbi_nonmem_summary` objects to extract from.
 #' @keywords internal
 NULL
 
