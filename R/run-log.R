@@ -71,7 +71,7 @@ find_models <- function(.base_dir, .recurse , .include) {
   yaml_files <- dir_ls(.base_dir, recurse = .recurse)
   yaml_files <- str_subset(yaml_files, "\\.ya?ml$")
   yaml_files <- str_subset(yaml_files, "bbi\\.ya?ml$", negate = TRUE)
-
+  yaml_files <- prune_nested_models(yaml_files)
 
   # read in all candidate yaml's
   all_yaml <-
@@ -109,6 +109,48 @@ find_models <- function(.base_dir, .recurse , .include) {
   }
 
   return(mod_list)
+}
+
+#' Remove nested models from model paths
+#'
+#' For example, given a set of paths
+#'
+#'     path/to/foo.yaml
+#'     path/to/foo/inner1.yaml
+#'     path/to/bar.yaml
+#'     path/to/foo/inner2.yaml
+#'
+#' return
+#'
+#'     path/to/bar.yaml
+#'     path/to/foo.yaml
+#'
+#' @param yamls Character vector of model YAML files.
+#' @return Sorted character vector without nested models.
+#'
+#' @noRd
+prune_nested_models <- function(yamls) {
+  n <- length(yamls)
+  if (n < 2) {
+    return(yamls)
+  }
+
+  paths <- sort(yamls)
+  paths_noext <- fs::path_ext_remove(paths)
+
+  is_nested <- vector(mode = "logical", length = n)
+  is_nested[1] <- FALSE
+  last_nonnested <- paths_noext[1]
+  for (i in 2:n) {
+    path <- paths_noext[i]
+    nested <- fs::path_has_parent(path, parent = last_nonnested)
+    is_nested[i] <- nested
+    if (!nested) {
+      last_nonnested <- path
+    }
+  }
+
+  return(paths[!is_nested])
 }
 
 
