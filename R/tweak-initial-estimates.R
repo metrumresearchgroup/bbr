@@ -69,35 +69,13 @@ tweak_initial_estimates <- function(
   fmt_digits <- paste0("%.",digits,"G")
 
   # Tweak THETA
-  init_thetas <- initial_est$thetas
-  init_thetas$new <- withr::with_preserve_seed(tweak_values(init_thetas$init, .p))
-  # Ignore fixed values
-  init_thetas <- init_thetas %>% dplyr::mutate(
-    new = ifelse(fixed == TRUE, .data$init, .data$new)
-  )
-  # Respect THETA bounds (if any)
-  init_thetas <- adjust_tweaked_theta(init_thetas, digits)
-  new_thetas <- init_thetas$new %>% signif(digits)
-
+  new_thetas <- tweak_thetas(initial_est$thetas, .p, digits)
 
   # Tweak OMEGA
-  init_omegas <- initial_est$omegas
-  fixed_omegas <- attr(init_omegas, "nmrec_flags")$fixed
-  fixed_omegas[is.na(fixed_omegas)] <- TRUE
-  new_omegas <- init_omegas[!fixed_omegas]
-  # Tweak values
-  new_omegas <- withr::with_preserve_seed(tweak_values(new_omegas, .p))
-  init_omegas[!fixed_omegas] <- new_omegas %>% signif(digits)
-
+  new_omegas <- tweak_matrix(initial_est$omegas, .p, digits)
 
   # Tweak SIGMA
-  init_sigmas <- initial_est$sigmas
-  fixed_sigmas <- attr(init_sigmas, "nmrec_flags")$fixed
-  fixed_sigmas[is.na(fixed_sigmas)] <- TRUE
-  new_sigmas <- init_sigmas[!fixed_sigmas]
-  # Tweak values
-  new_sigmas <- withr::with_preserve_seed(tweak_values(new_sigmas, .p))
-  init_sigmas[!fixed_sigmas] <- new_sigmas %>% signif(digits)
+  new_sigmas <- tweak_matrix(initial_est$sigmas, .p, digits)
 
 
   # nmrec model objects
@@ -113,17 +91,17 @@ tweak_initial_estimates <- function(
   }
 
   # Update OMEGA Block
-  if("omega" %in% tweak && !rlang::is_empty(init_omegas)){
+  if("omega" %in% tweak && !rlang::is_empty(new_omegas)){
     nmrec::set_omega(
-      mod_lines, values = init_omegas, representation = "reset",
+      mod_lines, values = new_omegas, representation = "reset",
       fmt = fmt_digits
     )
   }
 
   # Update SIGMA Block
-  if("sigma" %in% tweak && !rlang::is_empty(init_sigmas)){
+  if("sigma" %in% tweak && !rlang::is_empty(new_sigmas)){
     nmrec::set_sigma(
-      mod_lines, values = init_sigmas, representation = "reset",
+      mod_lines, values = new_sigmas, representation = "reset",
       fmt = fmt_digits
     )
   }
@@ -134,7 +112,7 @@ tweak_initial_estimates <- function(
   return(.mod)
 }
 
-
+#' Tweak values
 tweak_values <- function(values, .p){
 
   # Sample percentages & Preserve seed if set
@@ -148,16 +126,44 @@ tweak_values <- function(values, .p){
 }
 
 
-#' Adjust initial theta estimates to be within bounds
+#' Tweak an `OMEGA` or `SIGMA` record
 #'
-#' @param init_thetas table of theta estimates and bounds
-#' @param digits number of significant figures to round to
+#' @param init_mat matrix of initial `OMEGA` or `SIGMA` estimates. Should include
+#' several attributes, including `nmrec_flags` and `nmrec_record_size`.
 #'
 #' @keywords internal
-adjust_tweaked_theta <- function(init_thetas, digits){
+tweak_matrix <- function(init_mat, .p, digits){
+  fixed_omegas <- attr(init_mat, "nmrec_flags")$fixed
+  fixed_omegas[is.na(fixed_omegas)] <- TRUE
+  new_values <- init_mat[!fixed_omegas]
+  # Tweak values
+  new_values <- withr::with_preserve_seed(tweak_values(new_values, .p))
+  init_mat[!fixed_omegas] <- new_values %>% signif(digits)
+
+  return(init_mat)
+}
+
+
+
+
+#' Tweak theta estimates while respecting bounds
+#'
+#' @param init_thetas table of theta estimates and bounds
+#' @inheritParams tweak_initial_estimates
+#'
+#' @keywords internal
+tweak_thetas <- function(init_thetas, .p, digits){
+
+  init_thetas$new <- withr::with_preserve_seed(tweak_values(init_thetas$init, .p))
+
+  # Ignore fixed values
+  init_thetas <- init_thetas %>% dplyr::mutate(
+    new = ifelse(fixed == TRUE, .data$init, .data$new)
+  )
 
   fmt_digits <- paste0("%.",digits,"G")
 
+  ### Respect Bounds ###
   # Calculate range of the bounds
   init_thetas$upper_diff <- init_thetas$up - init_thetas$init
   init_thetas$lower_diff <- init_thetas$init - init_thetas$low
@@ -216,9 +222,7 @@ adjust_tweaked_theta <- function(init_thetas, digits){
     )
   }
 
-  # Remove extra columns
-  init_thetas_adj <- init_thetas_adj %>%
-    dplyr::select(-tidyselect::ends_with(c("_fmt", "_diff")))
+  new_thetas <- init_thetas_adj$new %>% signif(digits)
 
-  return(init_thetas_adj)
+  return(new_thetas)
 }
