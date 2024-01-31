@@ -92,6 +92,9 @@ tweak_initial_estimates <- function(
 }
 
 #' Tweak values
+#'
+#' @param values vector of values to tweak
+#' @inheritParams tweak_initial_estimates
 tweak_values <- function(values, .p){
 
   # Sample percentages & Preserve seed if set

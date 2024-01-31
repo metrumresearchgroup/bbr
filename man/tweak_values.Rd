@@ -6,6 +6,12 @@
 \usage{
 tweak_values(values, .p)
 }
+\arguments{
+\item{values}{vector of values to tweak}
+
+\item{.p}{Percent to tweak the initial parameter estimates by. Represented as
+a decimal.}
+}
 \description{
 Tweak values
 }

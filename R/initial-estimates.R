@@ -245,7 +245,8 @@ using_old_priors <- function(ctl) {
   informative_priors <- purrr::map(prior_names, function(.x){
     recs <- nmrec::select_records(ctl, .x)
     if(length(recs) == 0) return(NULL) else return(recs)
-  }) %>% purrr::list_c()
+  })
+  informative_priors <- Filter(Negate(is.null), informative_priors)
 
   # If priors are specified AND _not_ using informative style, then assume using old style
   if ((length(prior_recs) > 0 || isTRUE(prior_subs)) && length(informative_priors) == 0){

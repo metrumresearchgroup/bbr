@@ -63,6 +63,7 @@ Imports:
     jsonlite,
     lifecycle,
     magrittr,
+    Matrix,
     nmrec,
     processx,
     purrr,
