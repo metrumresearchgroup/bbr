@@ -99,22 +99,17 @@ describe("tweak_initial_estimates", {
     # Get initial estimates
     thetas_init <- get_initial_est(mod_tweak, flag_fixed = TRUE)$thetas
 
-    for(digits.i in c(2, 3, 4, 5)){
+    for(digits.i in c(1, 2, 3, 4, 5)){
       for(perc.i in c(0.1, 0.2, 0.3)){
-        thetas_init$new <- tweak_values(thetas_init$init, .p = perc.i)
-        thetas_init_adj <- adjust_tweaked_theta(thetas_init, digits = digits.i)
-        # Round new values
-        thetas_init_adj$new <- signif(thetas_init_adj$new, digits.i)
-
+        thetas_init$new <- tweak_thetas(thetas_init, .p = perc.i, digits = digits.i)
         # All values should be within bounds
-        init_within_bounds <- (thetas_init_adj$new < thetas_init_adj$up) &
-          (thetas_init_adj$new > thetas_init_adj$low)
+        init_within_bounds <- (thetas_init$new < thetas_init$up) &
+          (thetas_init$new > thetas_init$low)
         expect_true(all(init_within_bounds[!is.na(init_within_bounds)]))
       }
     }
-
-
   })
+
   it("theta bounds - no initial value (ignore)", {
     test_case <- list(
       case = "theta bounds; no initial value",

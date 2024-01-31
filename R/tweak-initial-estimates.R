@@ -68,38 +68,40 @@ tweak_initial_estimates <- function(
   # Rounding
   fmt_digits <- paste0("%.",digits,"G")
 
-  # Tweak THETA
-  new_thetas <- tweak_thetas(initial_est$thetas, .p, digits)
-
-  # Tweak OMEGA
-  new_omegas <- tweak_matrix(initial_est$omegas, .p, digits)
-
-  # Tweak SIGMA
-  new_sigmas <- tweak_matrix(initial_est$sigmas, .p, digits)
-
-
   # nmrec model objects
   mod_path <- get_model_path(.mod)
   mod_lines <- nmrec::read_ctl(mod_path)
 
-  # Update THETA Block
-  if("theta" %in% tweak && !rlang::is_empty(new_thetas)){
+  # Tweak each record type
+  # Note: the `is_empty` check is mainly for models that dont specify SIGMA
+  # records. This allows users to not need to change the `tweak` argument if the
+  # record type is missing from the control stream file.
+  # It is also useful for testing.
+
+  if("theta" %in% tweak && !rlang::is_empty(initial_est$thetas)){
+    # Tweak THETA
+    new_thetas <- tweak_thetas(initial_est$thetas, .p, digits)
+    # Update THETA Block
     nmrec::set_theta(
       mod_lines, values = new_thetas, bounds = "keep",
       fmt = fmt_digits
     )
   }
 
-  # Update OMEGA Block
-  if("omega" %in% tweak && !rlang::is_empty(new_omegas)){
+  if("omega" %in% tweak && !rlang::is_empty(initial_est$omegas)){
+    # Tweak OMEGA
+    new_omegas <- tweak_matrix(initial_est$omegas, .p, digits)
+    # Update OMEGA Block
     nmrec::set_omega(
       mod_lines, values = new_omegas, representation = "reset",
       fmt = fmt_digits
     )
   }
 
-  # Update SIGMA Block
-  if("sigma" %in% tweak && !rlang::is_empty(new_sigmas)){
+  if("sigma" %in% tweak && !rlang::is_empty(initial_est$sigmas)){
+    # Tweak SIGMA
+    new_sigmas <- tweak_matrix(initial_est$sigmas, .p, digits)
+    # Update SIGMA Block
     nmrec::set_sigma(
       mod_lines, values = new_sigmas, representation = "reset",
       fmt = fmt_digits

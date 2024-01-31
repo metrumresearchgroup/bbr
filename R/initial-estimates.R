@@ -93,9 +93,9 @@ get_initial_est <- function(.mod, flag_fixed = FALSE){
   if (isTRUE(using_old_priors(ctl))) {
     rlang::warn(
       c(
-      "!" = "This model appears to be using the old 'non-informative' method of specifying priors.",
-      "i" = " - That will cause this function to extract and display priors *as if* they are initial parameter estimates.",
-      "i" = " - Consider changing the model to use informative prior record names (such as THETAP and THETAPV)."
+      "!" = "This model appears to be using $THETA, $OMEGA, and/or $SIGMA to specify priors.",
+      "i" = " - That will cause this function to extract and display priors as if they are initial parameter estimates.",
+      "i" = " - Consider changing the model to use the more specific prior record names (such as $THETAP and $THETAPV)."
     ))
   }
 
