@@ -4,6 +4,7 @@
 #' @param .summary a `bbi_nonmem_summary` or `bbi_summary_list` object.
 #' @param .param the parameter(s) to retrieve and format. Any subset of `c("omega", "sigma", "theta")`
 #'
+#' @importFrom checkmate assert_true
 #' @importFrom stats setNames
 #' @importFrom purrr map
 #' @keywords internal

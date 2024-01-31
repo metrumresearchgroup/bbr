@@ -4,10 +4,12 @@
 \alias{config_log_entry}
 \title{Parse a bbi config file}
 \usage{
-config_log_entry(path, fields = NULL)
+config_log_entry(cfg_mod, path, fields = NULL)
 }
 \arguments{
-\item{path}{A string giving the path to \code{bbi_config.json}.}
+\item{cfg_mod}{A model object.}
+
+\item{path}{A string giving the path to \code{bbi_config.json} for \code{cfg_mod}.}
 
 \item{fields}{A character vector of fields to include.}
 }
