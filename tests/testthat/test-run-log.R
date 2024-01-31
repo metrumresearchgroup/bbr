@@ -177,3 +177,86 @@ test_that("run_log() can be filtered via tags: tags and model run [BBR-RNLG-006]
   expect_equal(nrow(log_df), 3)
   expect_equal(unique(log_df$run), c("1", "2", "3"))
 })
+
+test_that("prune_nested_models() works", {
+  cases <- list(
+    list(
+      input = c(),
+      want = c()
+    ),
+    list(
+      input = "path/to/foo.yaml",
+      want = "path/to/foo.yaml"
+    ),
+    list(
+      input = c(
+        "path/to/foo.yaml",
+        "path/to/bar.yaml"
+      ),
+      want = c(
+        "path/to/bar.yaml",
+        "path/to/foo.yaml"
+      )
+    ),
+    list(
+      input = c(
+        "path/to/foo/inner1.yaml",
+        "path/to/foo.yaml",
+        "path/to/bar.yaml",
+        "path/to/foo/inner2.yaml"
+      ),
+      want = c(
+        "path/to/bar.yaml",
+        "path/to/foo.yaml"
+      )
+    ),
+    list(
+      input = c(
+        "path/to/foo.yaml",
+        "path/to/foomore.yaml",
+        "path/to/foo/inner2.yaml"
+      ),
+      want = c(
+        "path/to/foo.yaml",
+        "path/to/foomore.yaml"
+      )
+    ),
+    list(
+      input = c(
+        "path/to/foo.yaml",
+        "path/to/bar.yaml",
+        "path/to/foo/inner1.yaml",
+        "path/to/foo/inner1/inner3.yaml",
+        "path/to/foo/inner2.yaml",
+        "path/to/a/b/c/baz.yaml"
+      ),
+      want = c(
+        "path/to/a/b/c/baz.yaml",
+        "path/to/bar.yaml",
+        "path/to/foo.yaml"
+      )
+    )
+  )
+  for (case in cases) {
+    expect_identical(prune_nested_models(case$input), case$want)
+  }
+})
+
+test_that("run_log() ignores nested models", {
+  ctl_file <- fs::path_abs(CTL_TEST_FILE)
+  withr::with_tempdir({
+    fs::file_copy(ctl_file, "a.ctl")
+    new_model("a")
+    fs::file_copy(ctl_file, "b.ctl")
+    new_model("b")
+    fs::dir_create("b")
+
+    fs::file_copy(ctl_file, file.path("b", "b1.ctl"))
+    new_model(file.path("b", "b1"))
+    fs::file_copy(ctl_file, file.path("b", "b2.ctl"))
+    new_model(file.path("b", "b2"))
+
+    res <- run_log(".", .recurse = TRUE)
+    expect_identical(res[["run"]], c("a", "b"))
+  })
+})
