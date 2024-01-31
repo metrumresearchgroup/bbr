@@ -85,7 +85,7 @@ initial_estimates <- function(.mod, flag_fixed = FALSE){
 #' @keywords internal
 get_initial_est <- function(.mod, flag_fixed = FALSE){
 
-  test_nmrec_version(.min_version = "0.3.0.8000")
+  test_nmrec_version(.min_version = "0.3.0.8001")
   check_model_object(.mod, "bbi_nonmem_model")
 
 
