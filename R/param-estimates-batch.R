@@ -78,7 +78,7 @@ param_estimates_batch <- function(.path,
     }
   )
 
-  df <- as_tibble(fread(text = res$stdout))
+  df <- as_tibble(fread(text = res$stdout, header = TRUE))
 
   # throw out extra column that gets created if no models succeeded
   if ("V4" %in% names(df)) df <- select(df, -"V4")
