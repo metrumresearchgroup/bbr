@@ -4,7 +4,12 @@
 \alias{tweak_initial_estimates}
 \title{Tweak the initial parameter estimates}
 \usage{
-tweak_initial_estimates(.mod, .p = 0.1, tweak = c("theta"), digits = 3)
+tweak_initial_estimates(
+  .mod,
+  .p = 0.1,
+  tweak = c("theta", "omega", "sigma"),
+  digits = 3
+)
 }
 \arguments{
 \item{.mod}{model object to update.}
@@ -12,8 +17,8 @@ tweak_initial_estimates(.mod, .p = 0.1, tweak = c("theta"), digits = 3)
 \item{.p}{Percent to tweak the initial parameter estimates by. Represented as
 a decimal.}
 
-\item{tweak}{type of estimates to tweak in the model. Only \code{"theta"} is
-currently supported, though omega and sigma will be options at a later date.}
+\item{tweak}{type of estimates to tweak in the model. Defaults to
+updating all of THETA, SIGMA, and OMEGA records.}
 
 \item{digits}{Number of significant digits to round estimates to.}
 }
@@ -26,6 +31,14 @@ In the following cases, the initial estimate will \emph{not} be updated:
 \item \strong{Individual} \code{FIXED} \code{THETA} parameters
 \itemize{
 \item e.g., \verb{$THETA 1.2 FIX 1.5 0.2} --> would only skip the first value
+}
+\item \strong{Individual} \code{FIXED} \code{OMEGA} & \code{SIGMA} parameters for \emph{diagonal} matrices
+\itemize{
+\item e.g., \verb{$OMEGA 0 FIX 1} --> would only skip the first value
+}
+\item \strong{Full} \code{FIXED} \code{OMEGA} & \code{SIGMA} \emph{block} matrices
+\itemize{
+\item e.g., \verb{$OMEGA BLOCK(2) 0.1 0.001 0.1 FIX} --> would skip the full \code{OMEGA} record
 }
 \item \code{THETA} parameters with no initial estimate
 \itemize{
