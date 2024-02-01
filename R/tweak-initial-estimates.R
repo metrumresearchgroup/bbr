@@ -103,7 +103,7 @@ tweak_values <- function(values, .p){
   # Tweak values
   new_values <- values + (values * tweak_perc)
 
-  # Return rounded values
+  # Return tweaked values
   return(new_values)
 }
 
