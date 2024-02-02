@@ -39,16 +39,11 @@ model_summaries <- function(
   UseMethod("model_summaries")
 }
 
-# model_summaries_serial() can go away once bbr.bbi_min_version is 3.2.0 or
+# model_summaries_bbi_serial() can go away once bbr.bbi_min_version is 3.2.0 or
 # later.
 
 #' @importFrom purrr map
-model_summaries_serial <- function(.mods, .bbi_args, .fail_flags) {
-  format_error <- function(err) {
-    return(list(error_msg = paste(as.character(err$message),
-                                  collapse = " -- ")))
-  }
-
+model_summaries_bbi_serial <- function(.mods, .bbi_args, .fail_flags) {
   map(.mods, function(.m) {
     .s <- tryCatch(
       {
@@ -56,7 +51,7 @@ model_summaries_serial <- function(.mods, .bbi_args, .fail_flags) {
       },
       error = function(.e) {
         if (is.null(.fail_flags)) {
-          return(format_error(.e))
+          return(format_model_summary_error(.e))
         }
         # if fails, try again with flags
         tryCatch({
@@ -67,7 +62,7 @@ model_summaries_serial <- function(.mods, .bbi_args, .fail_flags) {
           .retry$needed_fail_flags <- TRUE
           return(.retry)
         },
-        error = format_error)
+        error = format_model_summary_error)
       }
     )
 
@@ -105,8 +100,8 @@ bbi_exec_model_summaries <- function(args, paths) {
 #' passed to [create_summary_list()].
 #'
 #' @importFrom purrr map_chr modify_at modify_if walk
-#' @keywords internal
-model_summaries_concurrent <- function(.mods, .bbi_args, .fail_flags) {
+#' @noRd
+model_summaries_bbi_concurrent <- function(.mods, .bbi_args, .fail_flags) {
   walk(.mods, check_yaml_in_sync)
   paths <- map_chr(
     .mods,
@@ -164,6 +159,36 @@ model_summaries_concurrent <- function(.mods, .bbi_args, .fail_flags) {
   return(results)
 }
 
+#' Map `model_summary()` over models, without retry on failure
+#'
+#' Like `model_summaries_bbi_serial()`, this calls `model_summary` on a set of
+#' models. However, it's intended for models that are _not_ being passed to `bbi
+#' nonmem summary`. As such, it does not have the `.bbi_args` and does not retry
+#' the call with `.fail_flags` on failures.
+#'
+#' @noRd
+model_summaries_onetry <- function(.mods) {
+  purrr::map(.mods, function(m) {
+    s <- tryCatch(model_summary(m), error = identity)
+    if (inherits(s, "error")) {
+      err <- format_model_summary_error(s)
+      s <- NULL
+    } else {
+      err <- NA_character_
+    }
+    rlang::list2(
+      !!ABS_MOD_PATH := m[[ABS_MOD_PATH]],
+      !!SL_SUMMARY := s,
+      !!SL_ERROR := err,
+      !!SL_FAIL_FLAGS := FALSE
+    )
+  })
+}
+
+format_model_summary_error <- function(err) {
+  return(list(error_msg = paste(conditionMessage(err), collapse = " -- ")))
+}
+
 #' @describeIn model_summaries Summarize a list of `bbi_{.model_type}_model` objects.
 #' @export
 model_summaries.list <- function(
@@ -175,12 +200,23 @@ model_summaries.list <- function(
 ) {
   # check that each element is a model object
   check_model_object_list(.mods)
-  res_list <- if (test_bbi_version(.min_version = "3.2.0") &&
-                    purrr::every(.mods, ~ inherits(.x, NM_MOD_CLASS))) {
-    model_summaries_concurrent(.mods, .bbi_args, .fail_flags)
+
+  bbi_summary_fn <- if (test_bbi_version(.min_version = "3.2.0")) {
+    model_summaries_bbi_concurrent
   } else {
-    model_summaries_serial(.mods, .bbi_args, .fail_flags)
+    model_summaries_bbi_serial
   }
+  for_bbi <- purrr::map_lgl(
+    .mods,
+    # Note: Avoid inherit() here because for derived classes need to have the
+    # chance to go through their own model_summary() methods; there's no reason
+    # to think bbi can handle them.
+    function(m) identical(class(m)[[1]], NM_MOD_CLASS)
+  )
+
+  res_list <- vector("list", length = length(.mods))
+  res_list[for_bbi] <- bbi_summary_fn(.mods[for_bbi], .bbi_args, .fail_flags)
+  res_list[!for_bbi] <- model_summaries_onetry(.mods[!for_bbi])
 
   return(create_summary_list(res_list))
 }
