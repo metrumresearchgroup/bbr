@@ -254,16 +254,16 @@ using_old_priors <- function(ctl) {
     prior_subs <- FALSE
   }
 
-  # Check if INFORMATIVE style is present
+  # Check if SPECIFIC style is present
   prior_names <- c("thetap", "thetapv", "omegap", "omegapd", "sigmap", "sigmapd")
-  informative_priors <- purrr::map(prior_names, function(.x){
+  specific_priors <- purrr::map(prior_names, function(.x){
     recs <- nmrec::select_records(ctl, .x)
     if(length(recs) == 0) return(NULL) else return(recs)
   })
-  informative_priors <- Filter(Negate(is.null), informative_priors)
+  specific_priors <- Filter(Negate(is.null), specific_priors)
 
-  # If priors are specified AND _not_ using informative style, then assume using old style
-  if ((length(prior_recs) > 0 || isTRUE(prior_subs)) && length(informative_priors) == 0){
+  # If priors are specified AND _not_ using specific style, then assume using old style
+  if ((length(prior_recs) > 0 || isTRUE(prior_subs)) && length(specific_priors) == 0){
     return(TRUE)
   }
 
