@@ -65,8 +65,8 @@ tweak_initial_estimates <- function(
   # Get initial estimates
   initial_est <- get_initial_est(.mod, flag_fixed = TRUE)
 
-  # Get matrix types
-  mat_types <- get_matrix_types(.mod)
+  # Get matrix types and options
+  mat_opts <- get_matrix_opts(.mod)
 
   # Rounding
   fmt_digits <- paste0("%.",digits,"G")
@@ -94,7 +94,7 @@ tweak_initial_estimates <- function(
   if("omega" %in% tweak && !rlang::is_empty(initial_est$omegas)){
     # Set key attributes
     attr(initial_est$omegas, "record_type") <- "omega"
-    attr(initial_est$omegas, "mat_types") <- mat_types %>% filter(record_type == "omega")
+    attr(initial_est$omegas, "mat_opts") <- mat_opts %>% filter(record_type == "omega")
     # Tweak OMEGA
     new_omegas <- tweak_matrix(initial_est$omegas, .p, digits)
     # Update OMEGA Block
@@ -107,7 +107,7 @@ tweak_initial_estimates <- function(
   if("sigma" %in% tweak && !rlang::is_empty(initial_est$sigmas)){
     # Set key attributes
     attr(initial_est$sigmas, "record_type") <- "sigma"
-    attr(initial_est$sigmas, "mat_types") <- mat_types %>% filter(record_type == "sigma")
+    attr(initial_est$sigmas, "mat_opts") <- mat_opts %>% filter(record_type == "sigma")
     # Tweak SIGMA
     new_sigmas <- tweak_matrix(initial_est$sigmas, .p, digits)
     # Update SIGMA Block

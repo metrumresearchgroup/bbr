@@ -13,6 +13,7 @@
 validate_matrix_pd <- function(full_mat, digits){
 
   record_type <- attr(full_mat, "record_type")
+  mat_opts <- attr(full_mat, "mat_opts")
 
   # Separate full matrix into sub-matrices per record
   sub_mats <- get_sub_mat(full_mat)
@@ -181,20 +182,40 @@ mat_is_symmetric <- function(mat){
 
 
 
-get_matrix_types <- function(.mod){
+get_matrix_opts <- function(.mod){
 
   check_model_object(.mod, "bbi_nonmem_model")
   ctl <- nmrec::read_ctl(get_model_path(.mod))
 
-  extract_mat_types <- function(ctl, type = c("omega", "sigma")){
+  # Function to grab flags
+  get_flag_opts <- function(rec){
+    purrr::keep(rec$values, function(opt){
+      inherits(opt, "nmrec_option_flag") &&
+        !inherits(opt, "nmrec_option_record_name")
+    })
+  }
+
+  # Handling for nested options (diagonal matrix-type records)
+  get_nested <- function(rec){
+    purrr::keep(rec$values, function(opt){
+      inherits(opt, "nmrec_option_nested")
+    })
+  }
+
+  extract_mat_opts <- function(ctl, type = c("omega", "sigma")){
     type <- match.arg(type)
     recs <- nmrec::select_records(ctl, type)
+    mat_types <- get_matrix_types(recs)
 
     purrr::imap_dfr(recs, function(rec, rec_num){
-      rec$parse()
-      rec_flags <- purrr::keep(rec$values, function(opts){
-        inherits(opts, "nmrec_option_flag") && !inherits(opts, "nmrec_option_record_name")
-      })
+      mat_type <- mat_types[rec_num]
+      if(mat_type == "block"){
+        rec_flags <- get_flag_opts(rec)
+      }else if(mat_type == "diagonal"){
+        rec$parse()
+        nested_recs <- get_nested(rec)
+        rec_flags <- unlist(purrr::map(nested_recs, get_flag_opts))
+      }
 
       rec_flag_names <- purrr::map_chr(rec_flags, function(rec_flag){
         rec_flag$name
@@ -202,30 +223,104 @@ get_matrix_types <- function(.mod){
 
       # If no flags found, return defaults
       if(length(rec_flag_names) == 0){
-        mat_types <- c("diag" = "variance", "off_diag" = "covariance")
+        mat_opts <- c("diag" = "variance", "off_diag" = "covariance")
       }else{
         # Handle diagonal
-        if(str_detect(rec_flag_names, "standard")){
-          mat_types <- c("diag" = "standard")
+        if(any(str_detect(rec_flag_names, "standard"))){
+          mat_opts <- c("diag" = "standard")
         }else{
-          mat_types <- c("diag" = "variance")
+          mat_opts <- c("diag" = "variance")
         }
 
         # Handle off-diagonal
-        if(str_detect(rec_flag_names, "correlation")){
-          mat_types <- c(mat_types, "off_diag" = "correlation")
+        if(any(str_detect(rec_flag_names, "correlation"))){
+          mat_opts <- c(mat_opts, "off_diag" = "correlation")
         }else{
-          mat_types <- c(mat_types, "off_diag" = "covariance")
+          mat_opts <- c(mat_opts, "off_diag" = "covariance")
         }
       }
 
-      c(record_type = type, record_number = rec_num, mat_types)
+      c(record_type = type, record_number = rec_num, mat_type = mat_type, mat_opts)
     })
   }
 
   bind_rows(
-    extract_mat_types(ctl, "omega"),
-    extract_mat_types(ctl, "sigma")
+    extract_mat_opts(ctl, "omega"),
+    extract_mat_opts(ctl, "sigma")
   )
 }
+
+
+#' Get matrix type for omega and sigma records
+#'
+#' @param records Either a list of records, or a single `nmrec_record` object
+#'
+#' @keywords internal
+get_matrix_types <- function(records){
+  if(!inherits(records, "list")) records <- list(records)
+
+  purrr::map_chr(records, function(rec){
+    rec$parse()
+    rec_label <- purrr::keep(rec$values, function(rec_opt){
+      inherits(rec_opt, "nmrec_option_value")
+    })
+
+    if(rlang::is_empty(rec_label)){
+      return("diagonal")
+    }else{
+      rec_label[[1]]$name
+    }
+  })
+}
+
+
+#' Modify a matrix to be a variance-covariance matrix, or the inverse operation
+#'
+#' @param mat a matrix
+#' @param mat_opts tibble of matrix options
+#' @param inverse Logical. If `TRUE`, perform the inverse operation. This assumes
+#'  the matrix is currently a variance-covariance matrix.
+#'
+#' @keywords internal
+mod_matrix <- function(mat, mat_opts, inverse = FALSE){
+  # Make sure only one record was passed in
+  checkmate::assert_true(nrow(mat_opts) == 1)
+  mat_mod <- mat
+
+  diag_std_devs <- if(!inverse){
+    if(mat_opts$diag == "standard") diag(mat) else sqrt(diag(mat))
+  }else{
+    if(mat_opts$diag == "standard") sqrt(diag(mat)) else diag(mat)
+  }
+
+  # Modify diagonal values between standard deviation and variance
+  if(mat_opts$diag == "standard"){
+    if(!inverse){
+      diag(mat_mod) <- sqrt(diag(mat_mod))
+    }else{
+      diag(mat_mod) <- diag(mat_mod)^2
+    }
+  }
+
+  # Modify off-diagonal values between covariance and correlation
+  if(mat_opts$off_diag == "correlation"){
+    if(!inverse){
+      # convert correlation to covariance
+      mat_zero_spec <- fmt_mat_zeros(mat_mod)
+      # cov_matrix = diag(stdDevs)*corr_matrix*diag(stdDevs)
+      mat_mod <- diag(diag_std_devs) %*% mat_zero_spec$mat %*% diag(diag_std_devs)
+      # revert NAs
+      mat_mod[mat_zero_spec$na_indices] <- NA
+    }else{
+      # convert covariance to correlation
+      cov_mat <- stats::cov2cor(mat_mod)
+      # only take the off-diagonals, since diagonals are never specified as correlation
+      mat_mod[lower.tri(mat_mod)] <- cov_mat[lower.tri(cov_mat)]
+    }
+  }
+
+  return(mat_mod)
+}
+
+
 
