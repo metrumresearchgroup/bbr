@@ -37,11 +37,14 @@ initial_estimates <- function(.mod, flag_fixed = FALSE){
   omega_inits <- matrix_to_df(initial_est$omegas, type = "omega")
   # Append record number
   omega_inits$record_number <- fmt_record_num(initial_est$omegas)
+  # Order by row, column (must happen after `fmt_record_num`)
+  omega_inits <- omega_inits %>% dplyr::arrange(.data$row, .data$col)
+  # Optionally append fix column
   if(isTRUE(flag_fixed)){
     omega_inits <- omega_inits %>% dplyr::left_join(
       matrix_to_df(attr(initial_est$omegas, "nmrec_flags")$fixed, type = "omega") %>%
         dplyr::rename("fixed"="init"),
-      by = c("parameter_names")
+      by = c("parameter_names", "row", "col")
     )
   }
 
@@ -49,11 +52,14 @@ initial_estimates <- function(.mod, flag_fixed = FALSE){
   sigma_inits <- matrix_to_df(initial_est$sigmas, type = "sigma")
   # Append record number
   sigma_inits$record_number <- fmt_record_num(initial_est$sigmas)
+  # Order by row, column (must happen after `fmt_record_num`)
+  sigma_inits <- sigma_inits %>% dplyr::arrange(.data$row, .data$col)
+  # Optionally append fix column
   if(isTRUE(flag_fixed)){
     sigma_inits <- sigma_inits %>% dplyr::left_join(
       matrix_to_df(attr(initial_est$sigmas, "nmrec_flags")$fixed, type = "sigma") %>%
         dplyr::rename("fixed"="init"),
-      by = c("parameter_names")
+      by = c("parameter_names", "row", "col")
     )
   }
 
@@ -62,17 +68,16 @@ initial_estimates <- function(.mod, flag_fixed = FALSE){
     theta_inits %>% dplyr::mutate(record_type = "theta"),
     omega_inits %>% dplyr::mutate(record_type = "omega"),
     sigma_inits %>% dplyr::mutate(record_type = "sigma")
-  ) %>% dplyr::relocate("parameter_names") %>%
+  )  %>% dplyr::select(-c("row", "col")) %>%
+    dplyr::relocate("parameter_names") %>%
     dplyr::relocate("record_number", .after = "record_type")
 
   # Filter out NA values, as these were not specified in the control stream file
   initial_est_df <- initial_est_df %>% dplyr::filter(!is.na(.data$init))
 
   # Add original matrices as attributes if needed
-  attr(initial_est_df, "omega_mat") <- suppressWarnings(get_initial_est(.mod)) %>%
-    purrr::pluck("omegas")
-  attr(initial_est_df, "sigma_mat") <- suppressWarnings(get_initial_est(.mod)) %>%
-    purrr::pluck("sigmas")
+  attr(initial_est_df, "omega_mat") <- initial_est$omegas
+  attr(initial_est_df, "sigma_mat") <- initial_est$sigmas
 
   return(initial_est_df)
 }
@@ -82,7 +87,7 @@ initial_estimates <- function(.mod, flag_fixed = FALSE){
 #'
 #' @inheritParams initial_estimates
 #'
-#' @keywords internal
+#' @noRd
 get_initial_est <- function(.mod, flag_fixed = FALSE){
 
   test_nmrec_version(.min_version = "0.3.0.8001")
@@ -124,7 +129,11 @@ get_initial_est <- function(.mod, flag_fixed = FALSE){
 #' the presence of `FIXED` parameters.
 #'
 #' @param ctl an `nmrec` ctl object.
-#' @param mark_flags TODO
+#' @param mark_flags 	A vector of NONMEM flags (i.e. valueless options such as
+#'   FIXED or SD). For each specified flag, construct a boolean vector (for THETA)
+#'   or matrix (for OMEGA and SIGMA) indicating whether the flag is "active" for
+#'   the value. Any valid spelling of the flag name is allowed.
+#'   See `?nmrec::extract_theta` for more details.
 #'
 #' @keywords internal
 get_theta_inits <- function(ctl, mark_flags = NULL){
@@ -152,7 +161,7 @@ get_theta_inits <- function(ctl, mark_flags = NULL){
 #' @param mat a matrix
 #' @param type one of `c("omega","sigma")`
 #'
-#' @keywords internal
+#' @noRd
 matrix_to_df <- function(mat, type = c("omega","sigma")) {
   type <- toupper(match.arg(type))
 
@@ -168,7 +177,9 @@ matrix_to_df <- function(mat, type = c("omega","sigma")) {
 
   result_df <- tibble::tibble(
     parameter_names = parameter_names,
-    init = values
+    init = values,
+    row = row_indices,
+    col = col_indices
   )
 
   return(result_df)
@@ -183,7 +194,7 @@ matrix_to_df <- function(mat, type = c("omega","sigma")) {
 #' @details
 #' `attr(inits, "nmrec_record_size")` stores a vector of sizes, one for each
 #' occurrence of a given record type.
-#' This function creates a vector indicating the which record the initial
+#' This function creates a vector indicating which record the initial
 #' estimate belongs to, and correlates to the order of the initial estimates.
 #' - For `THETA` records, this is simply `rep(seq_along(sizes), sizes)`
 #' - For `OMEGA` or `SIGMA` records, it's a bit more complicated. Here we need
@@ -216,7 +227,10 @@ fmt_record_num <- function(inits){
 }
 
 
-#' Check if *non-informative* priors are being used
+#' Check if *non-specific* priors are being used.
+#'
+#' The *non-specific* method of priors means using `$THETA` instead of `$THETAPV`
+#' to specify `prior` records.
 #'
 #' @param ctl An `nmrec_ctl_records` object.
 #'
@@ -240,16 +254,16 @@ using_old_priors <- function(ctl) {
     prior_subs <- FALSE
   }
 
-  # Check if INFORMATIVE style is present
+  # Check if SPECIFIC style is present
   prior_names <- c("thetap", "thetapv", "omegap", "omegapd", "sigmap", "sigmapd")
-  informative_priors <- purrr::map(prior_names, function(.x){
+  specific_priors <- purrr::map(prior_names, function(.x){
     recs <- nmrec::select_records(ctl, .x)
     if(length(recs) == 0) return(NULL) else return(recs)
   })
-  informative_priors <- Filter(Negate(is.null), informative_priors)
+  specific_priors <- Filter(Negate(is.null), specific_priors)
 
-  # If priors are specified AND _not_ using informative style, then assume using old style
-  if ((length(prior_recs) > 0 || isTRUE(prior_subs)) && length(informative_priors) == 0){
+  # If priors are specified AND _not_ using specific style, then assume using old style
+  if ((length(prior_recs) > 0 || isTRUE(prior_subs)) && length(specific_priors) == 0){
     return(TRUE)
   }
 

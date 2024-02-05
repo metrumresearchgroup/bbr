@@ -19,7 +19,7 @@ Get record number of initial estimates
 \details{
 \code{attr(inits, "nmrec_record_size")} stores a vector of sizes, one for each
 occurrence of a given record type.
-This function creates a vector indicating the which record the initial
+This function creates a vector indicating which record the initial
 estimate belongs to, and correlates to the order of the initial estimates.
 \itemize{
 \item For \code{THETA} records, this is simply \code{rep(seq_along(sizes), sizes)}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/initial-estimates.R
 \name{using_old_priors}
 \alias{using_old_priors}
-\title{Check if \emph{non-informative} priors are being used}
+\title{Check if \emph{non-specific} priors are being used.}
 \usage{
 using_old_priors(ctl)
 }
@@ -10,6 +10,7 @@ using_old_priors(ctl)
 \item{ctl}{An \code{nmrec_ctl_records} object.}
 }
 \description{
-Check if \emph{non-informative} priors are being used
+The \emph{non-specific} method of priors means using \verb{$THETA} instead of \verb{$THETAPV}
+to specify \code{prior} records.
 }
 \keyword{internal}

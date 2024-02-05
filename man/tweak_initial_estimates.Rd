@@ -57,7 +57,7 @@ bounds, the difference between the initial value and the bound will be
 iteratively reduced  until it is. The same is true for upper bounds.
 \itemize{
 \item e.g., \verb{(0, 0.5, 1)} --> tweak initially, falls outside bound (\verb{(0, 1.2, 1)})
---> set to value within bounds (first iteration: \verb{(1-0.5)*0.9)}:  (\verb{(0, 0.45, 1)})
+--> set to value within bounds (first iteration: \code{0.5 + (1-0.5)*0.9}:  (\verb{(0, 0.95, 1)})
 }
 }
 }
