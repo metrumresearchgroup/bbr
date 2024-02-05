@@ -13,7 +13,7 @@ tweak_initial_estimates(.mod, .p = 0.1, tweak = c("theta"), digits = 3)
 a decimal.}
 
 \item{tweak}{type of estimates to tweak in the model. Only \code{"theta"} is
-currently supported, though omega and sigma will be options at a later date.}
+currently supported, though \code{"omega"} and \code{"sigma"} will be options at a later date.}
 
 \item{digits}{Number of significant digits to round estimates to.}
 }
@@ -44,7 +44,7 @@ bounds, the difference between the initial value and the bound will be
 iteratively reduced  until it is. The same is true for upper bounds.
 \itemize{
 \item e.g., \verb{(0, 0.5, 1)} --> tweak initially, falls outside bound (\verb{(0, 1.2, 1)})
---> set to value within bounds (first iteration: \verb{(1-0.5)*0.9)}:  (\verb{(0, 0.45, 1)})
+--> set to value within bounds (first iteration: \code{0.5 + (1-0.5)*0.9}:  (\verb{(0, 0.95, 1)})
 }
 }
 }

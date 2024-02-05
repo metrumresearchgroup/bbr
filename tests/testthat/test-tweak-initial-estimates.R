@@ -44,41 +44,12 @@ describe("tweak_initial_estimates", {
   })
 
   it("theta bounds - value falls outside one of the bounds", {
-    test_case <- list(
-      case = "theta bounds; tweaked value falls outside",
-      input_ctl = "
-      $THETA
-      (1.98, 2, 2.02)
-      (1.999, 2, 2.001)
-      (1.95, 2, 2.05)
-      (0, 1)
-      (0, 3, 5)
-      "
-    )
 
-    # Create fake model with bounds
-    mod_tweak <- do.call(make_fake_mod, test_case)
-    on.exit(delete_models(mod_tweak, .tags = NULL, .force = TRUE))
-
-    # Get initial estimates
-    thetas_init <- get_initial_est(mod_tweak, flag_fixed = TRUE)$thetas
-
-    # Ensure initial value starts off within the bounds
-    init_within_bounds_start <- (thetas_init$low < thetas_init$init) &
-      (thetas_init$init < thetas_init$up)
-    expect_true(all(init_within_bounds_start[!is.na(init_within_bounds_start)]))
-
-    # Tweak initial estimates - dont set seed, as these tests should always pass
-    mod_tweak_new <- tweak_initial_estimates(mod_tweak, .p = 0.2, tweak = "theta")
-    thetas_tweaked <- get_initial_est(mod_tweak_new, flag_fixed = TRUE)$thetas
-
-    # All values should be within bounds
-    init_within_bounds <- (thetas_tweaked$init < thetas_tweaked$up) &
-      (thetas_tweaked$init > thetas_tweaked$low)
-    expect_true(all(init_within_bounds[!is.na(init_within_bounds)]))
-  })
-
-  it("theta bounds - adjust_tweaked_theta()", {
+    # Note: the comments next to each theta record do not necessarily need to
+    # be true. The purpose of this test is to ensure the tweaked value is always
+    # within the bounds, taking rounding into account. If it cannot be placed within
+    # the bounds, the original value is used, and no tweaking will be done for that
+    # option
     test_case <- list(
       case = "theta bounds; tweaked value falls outside",
       input_ctl = "
@@ -97,6 +68,7 @@ describe("tweak_initial_estimates", {
     # Get initial estimates
     thetas_init <- get_initial_est(mod_tweak, flag_fixed = TRUE)$thetas
 
+    # Test that tweaked values are always within bounds, regardless of rounding
     for(digits.i in c(1, 2, 3, 4, 5)){
       for(perc.i in c(0.1, 0.2, 0.3)){
         thetas_init$new <- tweak_thetas(thetas_init, .p = perc.i, digits = digits.i)

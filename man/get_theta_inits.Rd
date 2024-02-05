@@ -10,7 +10,11 @@ get_theta_inits(ctl, mark_flags = NULL)
 \arguments{
 \item{ctl}{an \code{nmrec} ctl object.}
 
-\item{mark_flags}{TODO}
+\item{mark_flags}{A vector of NONMEM flags (i.e. valueless options such as
+FIXED or SD). For each specified flag, construct a boolean vector (for THETA)
+or matrix (for OMEGA and SIGMA) indicating whether the flag is "active" for
+the value. Any valid spelling of the flag name is allowed.
+See \code{?nmrec::extract_theta} for more details.}
 }
 \description{
 Helper function for getting the initial theta values, including bounds and

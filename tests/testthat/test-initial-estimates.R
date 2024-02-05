@@ -62,8 +62,9 @@ describe("initial_estimates", {
 
   it("initial_estimates: integration", {
     skip_if_old_nmrec("0.3.0.8001")
-    initial_est_df <- initial_estimates(MOD1, flag_fixed = TRUE)
-    initial_est <- get_initial_est(MOD1, flag_fixed = TRUE)
+    mod_c <- read_model(file.path(MODEL_DIR_X, "1001"))
+    initial_est_df <- initial_estimates(mod_c, flag_fixed = TRUE)
+    initial_est <- get_initial_est(mod_c, flag_fixed = TRUE)
 
     expect_equal(
       as.vector(initial_est$thetas$init),
@@ -71,17 +72,50 @@ describe("initial_estimates", {
     )
 
     lower_tri_omegas <- matrix_to_df(initial_est$omegas, type = "omega") %>%
-      dplyr::pull(init)
+      dplyr::arrange(.data$row, .data$col) %>% dplyr::pull(init)
     expect_equal(
       lower_tri_omegas[!is.na(lower_tri_omegas)], # Filter out non-specified values
       initial_est_df %>% dplyr::filter(record_type == "omega") %>% dplyr::pull(init)
     )
 
     lower_tri_sigmas <- matrix_to_df(initial_est$sigmas, type = "sigma") %>%
-      dplyr::pull(init)
+      dplyr::arrange(.data$row, .data$col) %>% dplyr::pull(init)
     expect_equal(
       lower_tri_sigmas[!is.na(lower_tri_sigmas)], # Filter out non-specified values
       initial_est_df %>% dplyr::filter(record_type == "sigma") %>% dplyr::pull(init)
+    )
+  })
+
+  it("initial_estimates: SAME blocks", {
+    skip_if_old_nmrec("0.3.0.8001")
+    mod_c <- read_model(file.path(MODEL_DIR_X, "acop-iov"))
+    initial_est_df <- initial_estimates(mod_c, flag_fixed = TRUE)
+    initial_est <- get_initial_est(mod_c, flag_fixed = TRUE)
+
+    # Check dimensions and NA values
+    expect_equal(dim(initial_est$omegas), c(62, 62))
+    # only 4 values are actually specified in ctl file
+    expect_equal(sum(!is.na(diag(initial_est$omegas))), 4)
+    expect_equal(sum(is.na(diag(initial_est$omegas))), 58)
+    # same check for exported functions (NAs already filtered out)
+    expect_equal(nrow(initial_est_df %>% dplyr::filter(record_type == "omega")), 4)
+    # Check record numbers found (skips 3 and 5, which are SAME blocks)
+    expect_equal(unique(initial_est_df$record_number), c(1,2,4))
+
+    # Check values
+    lower_tri_omegas <- matrix_to_df(initial_est$omegas, type = "omega") %>%
+      dplyr::arrange(.data$row, .data$col) %>% dplyr::pull(init)
+    expect_equal(
+      lower_tri_omegas[!is.na(lower_tri_omegas)], # Filter out non-specified values
+      initial_est_df %>% dplyr::filter(record_type == "omega") %>% dplyr::pull(init)
+    )
+  })
+
+  it("initial_estimates: warns when using old priors", {
+    mod_c <- read_model(file.path(MODEL_DIR_X, "example2_saemimp"))
+    expect_warning(
+      initial_estimates(mod_c),
+      "This model appears to be using"
     )
   })
 })

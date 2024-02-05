@@ -5,7 +5,7 @@
 #' @param .p Percent to tweak the initial parameter estimates by. Represented as
 #'   a decimal.
 #' @param tweak type of estimates to tweak in the model. Only `"theta"` is
-#'   currently supported, though omega and sigma will be options at a later date.
+#'   currently supported, though `"omega"` and `"sigma"` will be options at a later date.
 #' @param digits Number of significant digits to round estimates to.
 #'
 #' @details
@@ -25,7 +25,7 @@
 #'  bounds, the difference between the initial value and the bound will be
 #'  iteratively reduced  until it is. The same is true for upper bounds.
 #'     - e.g., `(0, 0.5, 1)` --> tweak initially, falls outside bound (`(0, 1.2, 1)`)
-#'     --> set to value within bounds (first iteration: `(1-0.5)*0.9)`:  (`(0, 0.45, 1)`)
+#'     --> set to value within bounds (first iteration: `0.5 + (1-0.5)*0.9`:  (`(0, 0.95, 1)`)
 #'
 #'
 #' @examples
@@ -139,24 +139,27 @@ tweak_thetas <- function(init_thetas, .p, digits){
     low_fmt = sprintf(fmt_digits, .data$low)
   )
 
-  # Set to `bound_perc` (e.g, 90%) of the way between init and bound
-  adjust_theta_bounds <- function(init_thetas, bound_perc = 0.9, fmt_digits){
-    init_thetas_adj <- init_thetas_adj %>% mutate(
+  # Function that attempts to set to `bound_perc` (e.g, 90%) of the way between
+  # init and bound, while respecting user-specified `digits` (rounding).
+  # This is used when the tweaked value falls outside, or is equal to the bounds.
+  adjust_theta_bounds <- function(thetas_df, bound_perc, fmt){
+    thetas_df <- thetas_df %>% mutate(
       new = dplyr::case_when(
         !is.na(up) & new_fmt >= up_fmt ~ (init + upper_diff*bound_perc),
         !is.na(low) & new_fmt <= low_fmt ~ (init - lower_diff*bound_perc),
         TRUE ~ new
       ),
-      new_fmt = sprintf(fmt_digits, .data$new),
-      up_fmt = sprintf(fmt_digits, .data$up),
-      low_fmt = sprintf(fmt_digits, .data$low)
+      new_fmt = sprintf(fmt, .data$new),
+      up_fmt = sprintf(fmt, .data$up),
+      low_fmt = sprintf(fmt, .data$low)
     )
-    return(init_thetas_adj)
+    return(thetas_df)
   }
 
-  check_bounds <- function(init_thetas_adj){
-    any(init_thetas_adj$new_fmt <= init_thetas_adj$low_fmt) ||
-      any(init_thetas_adj$new_fmt >= init_thetas_adj$up_fmt)
+  # Function to check if the tweaked value is within the bounds
+  check_bounds <- function(thetas_df){
+    any(thetas_df$new_fmt <= thetas_df$low_fmt) ||
+      any(thetas_df$new_fmt >= thetas_df$up_fmt)
   }
 
   # Pull back initial value until it's:
@@ -165,7 +168,7 @@ tweak_thetas <- function(init_thetas, .p, digits){
   for(perc.i in c(0.9, 0.7, 0.5, 0.3)){
     if(check_bounds(init_thetas_adj)){
       init_thetas_adj <- adjust_theta_bounds(
-        init_thetas_adj, bound_perc = perc.i, fmt_digits = fmt_digits
+        init_thetas_adj, bound_perc = perc.i, fmt = fmt_digits
       )
       # Exit loop when values are within bounds
       if(!check_bounds(init_thetas_adj)) break
