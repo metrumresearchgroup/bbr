@@ -9,7 +9,7 @@
 #'   `bbi.yaml` file in the same directory as the model.
 #' @param delete_on_exit Logical. If `FALSE`, don't delete the temporary folder
 #'   containing the `NMTRAN` run.
-#' @param ... additional arguments passed to `system()` (`shell()` for windows).
+#' @param ... additional arguments passed to `system()`
 #'
 #' @examples
 #' \dontrun{
@@ -59,7 +59,7 @@ run_nmtran <- function(
   # Run NMTRAN
   message(glue("Running NMTRAN with executable: `{nmtran_exe}`"))
   if(!is.null(nm_ver)) message(glue("NONMEM version: `{nm_ver}`"))
-  system_nm(cmd, dir = tempdir0, wait = TRUE, ...)
+  system_with_dir(cmd, dir = tempdir0, wait = TRUE, ...)
 
   if(isFALSE(delete_on_exit)) return(tempdir0)
 }
@@ -121,59 +121,25 @@ locate_nmtran <- function(.mod = NULL, .config_path = NULL, nmtran_exe = NULL){
 }
 
 
-#' Wrapper for `system()`, meant to allow windows operating systems
-#'
-#' @param cmd System command
-#' @param ... additional arguments passed to `system()` or `shell()`
-#'
-#' @details
-#' Taken from `NMproject`
-#'
-#' @noRd
-system_nm_default <- function(cmd, ...) {
-  if (.Platform$OS.type == "windows") {
-    local_env_vars <- Sys.getenv()
-    stdout_unit_vars <- local_env_vars[grepl("STDOUT_UNIT|STDERR_UNIT", names(local_env_vars))]
-    for (i in seq_along(stdout_unit_vars)) {
-      Sys.unsetenv(names(stdout_unit_vars)[i])
-    }
-    on.exit({
-      if (length(stdout_unit_vars) > 0) {
-        do.call(Sys.setenv, as.list(stdout_unit_vars))
-      }
-    })
-    args <- list(...)
-    if (!"wait" %in% names(args)) wait <- FALSE else wait <- args$wait
-    if (wait == FALSE) {
-      shell(paste("START CMD /C", cmd), ...)
-    } else {
-      shell(cmd, ...)
-    }
-  } else {
-    system(cmd, ...)
-  }
-}
-
 #' Run a system command in a given directory
 #'
-#' @details
-#' Taken from `NMproject`
-#'
-#' @inheritParams system_nm_default
+#' @param cmd System command
 #' @param dir Directory in which to execute the command
+#' @param ... additional arguments passed to `system()`
 #'
 #' @noRd
-system_nm <- function(cmd, dir = NULL, ...) {
+system_with_dir <- function(cmd, dir = NULL, ...) {
   if (is.null(dir) || !file.exists(dir)) dir <- "."
+
   if (file.exists(dir)) {
-    currentwd <- getwd()
+    wd <- getwd()
     setwd(dir)
-    on.exit(setwd(currentwd))
+    on.exit(setwd(wd))
   } else {
-    stop(paste0("Directory \"", dir, "\" doesn't exist."))
+    stop(glue("Directory `{dir}` doesn't exist."))
   }
 
-  system_nm_default(cmd, ...)
+  system(cmd, ...)
 }
 
 #' Get the specified data path from a control stream file
@@ -354,7 +320,7 @@ compare_nmtran <- function(
   cmd <- paste("cmp", nmtran_mod_fcon, nmtran_compare_fcon)
 
   # Warnings occur when files are different
-  output <- system_nm(cmd, intern = TRUE, input = tempdir()) %>%
+  output <- system_with_dir(cmd, intern = TRUE, input = tempdir()) %>%
     suppressWarnings()
 
   if(length(output) == 0){

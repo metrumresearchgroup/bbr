@@ -25,7 +25,7 @@ model.}
 \item{delete_on_exit}{Logical. If \code{FALSE}, don't delete the temporary folder
 containing the \code{NMTRAN} run.}
 
-\item{...}{additional arguments passed to \code{system()} (\code{shell()} for windows).}
+\item{...}{additional arguments passed to \code{system()}}
 }
 \description{
 Run NMTRAN on a model object
