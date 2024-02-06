@@ -44,8 +44,7 @@ run_nmtran <- function(
   )
 
   # Get command & append the control file name
-  cmd <- stringr::str_glue(nmtran_exe, .envir = list(ctl_name = basename(mod_path)), .na = NULL)
-  cmd <- paste(cmd, "<", basename(mod_path))
+  cmd <- paste(nmtran_exe, "<", basename(mod_path))
 
   # Run NMTRAN
   if(!is.null(nm_ver)){
