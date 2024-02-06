@@ -25,8 +25,18 @@ model.}
 \item{delete_on_exit}{Logical. If \code{FALSE}, don't delete the temporary folder
 containing the \code{NMTRAN} run.}
 
-\item{...}{additional arguments passed to \code{system()}}
+\item{...}{additional arguments passed to \code{system()} (\code{shell()} for windows).}
 }
 \description{
 Run NMTRAN on a model object
+}
+\examples{
+\dontrun{
+mod <- read_model(file.path(MODEL_DIR, 1))
+run_nmtran(mod)
+
+# Set the path to an NMTRAN executable
+run_nmtran(mod, nmtran_exe = "/opt/NONMEM/nm75/tr/NMTRAN.exe")
+}
+
 }

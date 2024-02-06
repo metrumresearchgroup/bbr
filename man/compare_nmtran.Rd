@@ -2,12 +2,13 @@
 % Please edit documentation in R/run-nmtran.R
 \name{compare_nmtran}
 \alias{compare_nmtran}
-\title{Runs \code{run_nmtran} on two models, and compares the output}
+\title{Compare different NONMEM control stream configurations.}
 \usage{
 compare_nmtran(.mod, .mod_compare, .config_path = NULL, nmtran_exe = NULL)
 }
 \description{
-Developer tool for comparing different NONMEM control stream configurations.
+Runs \code{run_nmtran()} on two models and compares the output, denoting whether
+they evaluate to the same model via \code{NMTRAN}.
 }
 \details{
 Say you wanted to test whether diagonal matrices could specify standard
@@ -37,5 +38,24 @@ Running NMTRAN with NONMEM version `nm75`
 No differences found
 character(0)
 }\if{html}{\out{</div>}}
+}
+\examples{
+\dontrun{
+# Starting model - set a reference
+open_model_file(MOD1)
+
+# Make new model
+MOD_COMPARE <- copy_model_from(MOD1)
+
+# Make a change
+open_model_file(MOD_COMPARE)
+
+# Compare NMTRAN evaluation
+compare_nmtran(MOD1, MOD_COMPARE)
+
+# delete new model at the end
+delete_models(MOD_COMPARE, .tags = NULL, .force = TRUE)
+}
+
 }
 \keyword{internal}

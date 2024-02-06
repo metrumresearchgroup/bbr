@@ -9,7 +9,16 @@
 #'   `bbi.yaml` file in the same directory as the model.
 #' @param delete_on_exit Logical. If `FALSE`, don't delete the temporary folder
 #'   containing the `NMTRAN` run.
-#' @param ... additional arguments passed to `system()`
+#' @param ... additional arguments passed to `system()` (`shell()` for windows).
+#'
+#' @examples
+#' \dontrun{
+#' mod <- read_model(file.path(MODEL_DIR, 1))
+#' run_nmtran(mod)
+#'
+#' # Set the path to an NMTRAN executable
+#' run_nmtran(mod, nmtran_exe = "/opt/NONMEM/nm75/tr/NMTRAN.exe")
+#' }
 #'
 #' @export
 run_nmtran <- function(
@@ -19,6 +28,7 @@ run_nmtran <- function(
     delete_on_exit = TRUE,
     ...
 ){
+  check_model_object(.mod, "bbi_nonmem_model")
   nmtran_exe <- locate_nmtran(.mod, .config_path, nmtran_exe)
   nm_ver <- attr(nmtran_exe, "nonmem_version")
 
@@ -47,14 +57,11 @@ run_nmtran <- function(
   cmd <- paste(nmtran_exe, "<", basename(mod_path))
 
   # Run NMTRAN
-  if(!is.null(nm_ver)){
-    message(glue("Running NMTRAN with NONMEM version `{nm_ver}`"))
-  }
+  message(glue("Running NMTRAN with executable: `{nmtran_exe}`"))
+  if(!is.null(nm_ver)) message(glue("NONMEM version: `{nm_ver}`"))
   system_nm(cmd, dir = tempdir0, wait = TRUE, ...)
 
-  if(isFALSE(delete_on_exit)){
-    return(tempdir0)
-  }
+  if(isFALSE(delete_on_exit)) return(tempdir0)
 }
 
 
@@ -66,9 +73,10 @@ run_nmtran <- function(
 #' @inheritParams run_nmtran
 #'
 #' @noRd
-locate_nmtran <- function(.mod, .config_path = NULL, nmtran_exe = NULL){
+locate_nmtran <- function(.mod = NULL, .config_path = NULL, nmtran_exe = NULL){
 
   if(is.null(nmtran_exe)){
+    check_model_object(.mod, "bbi_nonmem_model")
     model_dir <- get_model_working_directory(.mod)
     config_path <- .config_path %||% file.path(model_dir, "bbi.yaml")
 
@@ -174,11 +182,13 @@ system_nm <- function(cmd, dir = NULL, ...) {
 #'
 #' @noRd
 get_data_path_from_ctl <- function(.mod){
+  check_model_object(.mod, "bbi_nonmem_model")
   mod_path <- get_model_path(.mod)
   ctl <- nmrec::read_ctl(mod_path)
+
+  # Get data record
   data_rec <- nmrec::select_records(ctl, "data")[[1]]
   data_path <- nmrec::get_record_option(data_rec, "filename")$value
-
   data_path_norm <- fs::path_norm(file.path(mod_path, data_path))
 
   if(!fs::file_exists(data_path_norm)){
@@ -189,11 +199,14 @@ get_data_path_from_ctl <- function(.mod){
 }
 
 #' Modify the specified data path in a control stream file
+
 #' @param mod_path Path to a control stream file
 #' @param data_path Data path to set in a `$DATA` record.
 #'
 #' @noRd
 modify_data_path_ctl <- function(mod_path, data_path){
+  checkmate::assert_file_exists(mod_path)
+
   # Get data record
   ctl <- nmrec::read_ctl(mod_path)
   data_rec <- nmrec::select_records(ctl, "data")[[1]]
@@ -213,10 +226,10 @@ modify_data_path_ctl <- function(mod_path, data_path){
 }
 
 
-
-#' Runs `run_nmtran` on two models, and compares the output
+#' Compare different NONMEM control stream configurations.
 #'
-#' Developer tool for comparing different NONMEM control stream configurations.
+#' Runs `run_nmtran()` on two models and compares the output, denoting whether
+#' they evaluate to the same model via `NMTRAN`.
 #'
 #' @details
 #' Say you wanted to test whether diagonal matrices could specify standard
@@ -247,6 +260,24 @@ modify_data_path_ctl <- function(mod_path, data_path){
 #' character(0)
 #' ```
 #'
+#' @examples
+#' \dontrun{
+#' # Starting model - set a reference
+#' open_model_file(MOD1)
+#'
+#' # Make new model
+#' MOD_COMPARE <- copy_model_from(MOD1)
+#'
+#' # Make a change
+#' open_model_file(MOD_COMPARE)
+#'
+#' # Compare NMTRAN evaluation
+#' compare_nmtran(MOD1, MOD_COMPARE)
+#'
+#' # delete new model at the end
+#' delete_models(MOD_COMPARE, .tags = NULL, .force = TRUE)
+#' }
+#'
 #' @keywords internal
 compare_nmtran <- function(
     .mod,
@@ -254,8 +285,12 @@ compare_nmtran <- function(
     .config_path = NULL,
     nmtran_exe = NULL
 ){
+  # Set NMTRAN executable
   nmtran_exe <- locate_nmtran(.mod, .config_path, nmtran_exe)
   nmtran_exe2 <- locate_nmtran(.mod_compare, .config_path, nmtran_exe)
+
+  # This would only happen when comparing two models in different working
+  # directories, where the `bbi.yaml` defaults differ.
   if(nmtran_exe != nmtran_exe2){
     rlang::warn(
       c(
@@ -301,11 +336,11 @@ compare_nmtran <- function(
 
   # Run NMTRAN on each model
   nmtran_mod <- run_nmtran(
-    mod_no_prob,
+    mod_no_prob, nmtran_exe = nmtran_exe,
     delete_on_exit = FALSE, intern = TRUE
   )
   nmtran_compare <- run_nmtran(
-    compare_no_prob,
+    compare_no_prob, nmtran_exe = nmtran_exe,
     delete_on_exit = FALSE, intern = TRUE
   ) %>% suppressMessages()
 
