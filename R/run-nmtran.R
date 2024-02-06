@@ -119,6 +119,9 @@ locate_nmtran <- function(.mod, .config_path = NULL, nmtran_exe = NULL){
 #' @param cmd System command
 #' @param ... additional arguments passed to `system()` or `shell()`
 #'
+#' @details
+#' Taken from `NMproject`
+#'
 #' @noRd
 system_nm_default <- function(cmd, ...) {
   if (.Platform$OS.type == "windows") {
@@ -145,6 +148,9 @@ system_nm_default <- function(cmd, ...) {
 }
 
 #' Run a system command in a given directory
+#'
+#' @details
+#' Taken from `NMproject`
 #'
 #' @inheritParams system_nm_default
 #' @param dir Directory in which to execute the command
