@@ -37,31 +37,32 @@ run_nmtran <- function(
 
   # make temporary directory in current directory
   mod_name <- fs::path_ext_remove(basename(mod_path))
-  tempdir0 <- paste0("nmtran_", mod_name, "_", basename(tempdir()))
-  dir.create(tempdir0)
+  temp_folder <- paste0("nmtran_", mod_name, "_", basename(tempdir()))
+  dir.create(temp_folder)
   if(isTRUE(delete_on_exit)){
-    on.exit(unlink(tempdir0, recursive = TRUE, force = TRUE))
+    on.exit(unlink(temp_folder, recursive = TRUE, force = TRUE))
   }
 
   # copy model and dataset
-  file.copy(mod_path, tempdir0)
-  file.copy(data_path, tempdir0)
+  file.copy(mod_path, temp_folder)
+  file.copy(data_path, temp_folder)
 
   # overwrite $DATA of new model
   modify_data_path_ctl(
-    mod_path = file.path(tempdir0, basename(mod_path)),
+    mod_path = file.path(temp_folder, basename(mod_path)),
     data_path = basename(data_path)
   )
 
   # Get command & append the control file name
-  cmd <- paste(nmtran_exe, "<", basename(mod_path))
+  cmd_args <- paste("<", basename(mod_path))
+  cmd <- paste(nmtran_exe, cmd_args)
 
   # Run NMTRAN
   message(glue("Running NMTRAN with executable: `{nmtran_exe}`"))
   if(!is.null(nm_ver)) message(glue("NONMEM version: `{nm_ver}`"))
-  system_with_dir(cmd, dir = tempdir0, wait = TRUE, ...)
+  system_with_dir(cmd, dir = temp_folder, wait = TRUE, ...)
 
-  if(isFALSE(delete_on_exit)) return(tempdir0)
+  if(isFALSE(delete_on_exit)) return(temp_folder)
 }
 
 
@@ -85,7 +86,7 @@ locate_nmtran <- function(.mod = NULL, .config_path = NULL, nmtran_exe = NULL){
                  "Please run `bbi_init()` with the appropriate directory to continue."))
     }
 
-    if (!is.null(.config_path)) {
+    if(!is.null(.config_path)){
       config_path <- normalizePath(.config_path)
     }
 
@@ -107,6 +108,8 @@ locate_nmtran <- function(.mod = NULL, .config_path = NULL, nmtran_exe = NULL){
 
     # Set NMTRAN executable path
     nm_path <- default_nm$home
+    # TODO: should we recursively look for this executable, or assume Metworx?
+    # i.e. can we assume NMTRAN is in a `tr` folder, and is called `NMTRAN.exe`?
     nmtran_exe <- file.path(nm_path, "tr", "NMTRAN.exe")
 
     # If executable found via bbi.yaml, append NONMEM version as attribute
@@ -128,16 +131,13 @@ locate_nmtran <- function(.mod = NULL, .config_path = NULL, nmtran_exe = NULL){
 #' @param ... additional arguments passed to `system()`
 #'
 #' @noRd
-system_with_dir <- function(cmd, dir = NULL, ...) {
-  if (is.null(dir) || !file.exists(dir)) dir <- "."
+system_with_dir <- function(cmd, args = character(), dir = NULL, ...) {
+  if(is.null(dir) || !file.exists(dir)) dir <- "."
+  checkmate::assert_directory_exists(dir)
 
-  if (file.exists(dir)) {
-    wd <- getwd()
-    setwd(dir)
-    on.exit(setwd(wd))
-  } else {
-    stop(glue("Directory `{dir}` doesn't exist."))
-  }
+  wd <- getwd()
+  setwd(dir)
+  on.exit(setwd(wd))
 
   system(cmd, ...)
 }
