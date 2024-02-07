@@ -1,3 +1,25 @@
+# bbr 1.9.0
+
+## New features and changes
+
+* New `initial_estimates()` function for extracting and formatting initial
+  parameter estimates from a `NONMEM` control stream file. (#646)
+  
+* New `tweak_initial_estimates()` function for tweaking or 'jittering' initial
+  parameter estimates. Only `$THETA` records are supported for now. (#646)
+
+## Bugs addressed
+
+* With the latest `data.table` release (1.15.0), `param_estimates_batch()`
+  failed for an edge case due to a change in the header detection heuristics.
+  `param_estimates_batch()` now tells `data.table::fread()` to expect a header.
+  (#648)
+
+* When passed `.recurse = TRUE`, `run_log()`, `config_log()`, and
+  `summary_log()` included nested models, which was not by design. Any models
+  under another model's output directory are considered an implementation
+  detail. (#643, #644, #645)
+
 # bbr 1.8.1
 
 ## Bugs addressed
