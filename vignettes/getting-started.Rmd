@@ -27,9 +27,11 @@ if (interactive()) {
 }
 ```
 ```{r load packages, results = 'hide', message=FALSE, warning=FALSE}
-library(bbr)
-library(dplyr)
-library(purrr)
+suppressPackageStartupMessages({
+  library(bbr)
+  library(dplyr)
+  library(purrr)
+})
 ```
 
 `bbr` is an R interface for running `bbi`. Together they provide a solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. Currently, only NONMEM is supported, so this vignette will only address that. 
@@ -47,12 +49,18 @@ cleanup <- function() {
   if (fs::file_exists(file.path(MODEL_DIR, "2.yaml"))) fs::file_delete(file.path(MODEL_DIR, "2.yaml"))
   if (fs::file_exists(file.path(MODEL_DIR, "3.yaml"))) fs::file_delete(file.path(MODEL_DIR, "3.yaml"))
   if (fs::file_exists(file.path(MODEL_DIR, "4.yaml"))) fs::file_delete(file.path(MODEL_DIR, "4.yaml"))
+  if (fs::file_exists(file.path(MODEL_DIR, "5.yaml"))) fs::file_delete(file.path(MODEL_DIR, "5.yaml"))
+  if (fs::file_exists(file.path(MODEL_DIR, "6.yaml"))) fs::file_delete(file.path(MODEL_DIR, "6.yaml"))
   if (fs::file_exists(file.path(MODEL_DIR, "2.ctl"))) fs::file_delete(file.path(MODEL_DIR, "2.ctl"))
   if (fs::file_exists(file.path(MODEL_DIR, "3.ctl"))) fs::file_delete(file.path(MODEL_DIR, "3.ctl"))
   if (fs::file_exists(file.path(MODEL_DIR, "4.ctl"))) fs::file_delete(file.path(MODEL_DIR, "4.ctl"))
+  if (fs::file_exists(file.path(MODEL_DIR, "5.ctl"))) fs::file_delete(file.path(MODEL_DIR, "5.ctl"))
+  if (fs::file_exists(file.path(MODEL_DIR, "6.ctl"))) fs::file_delete(file.path(MODEL_DIR, "6.ctl"))
   if (fs::dir_exists(file.path(MODEL_DIR, "2"))) fs::dir_delete(file.path(MODEL_DIR, "2"))
   if (fs::dir_exists(file.path(MODEL_DIR, "3"))) fs::dir_delete(file.path(MODEL_DIR, "3"))
   if (fs::dir_exists(file.path(MODEL_DIR, "4"))) fs::dir_delete(file.path(MODEL_DIR, "4"))
+  if (fs::dir_exists(file.path(MODEL_DIR, "5"))) fs::dir_delete(file.path(MODEL_DIR, "5"))
+  if (fs::dir_exists(file.path(MODEL_DIR, "6"))) fs::dir_delete(file.path(MODEL_DIR, "6"))
   if (fs::file_exists(file.path(MODEL_DIR, "bbi.yaml"))) fs::file_delete(file.path(MODEL_DIR, "bbi.yaml"))
 }
 cleanup()
@@ -130,6 +138,20 @@ mod1 <- read_model(file.path(MODEL_DIR, 1))
 This `new_model()` call will also create a `1.yaml` file in that same directory, which stores model metadata like description and tags (discussed below). If you ever need to recreate this model object in memory, just run `mod1 <- read_model(file.path(MODEL_DIR, 1))` to rebuild it from the YAML file on disk. 
 
 The model object you have just created can be passed to various functions which you will see in a minute. Now that we've created a model, the first thing we will do is submit the model to be run.
+
+## Inspect initial estimates
+
+You can view the initial parameter estimates can be extracted and formatted using `initial_estimates()`. Additional columns will indicate any bounds on `$THETA` records, as well as the record number (such as when multiple `$OMEGA` records are used). You can optionally flag which estimates were `FIXED` or not.
+```{r}
+initial_est_df <- initial_estimates(mod1, flag_fixed = TRUE)
+initial_est_df
+```
+
+If stored as an `R` object, you can extract the full `$OMEGA` or `$SIGMA` matrices. This will diagonally concatenate all matrices of the same record type, where `NA` values indicate the value was not specified in the control stream file.
+```{r}
+attr(initial_est_df, "omega_mat") # attr(initial_est_df, "sigma_mat") for SIGMA
+```
+
 
 ## Submit model
 
@@ -297,6 +319,16 @@ This is supported via `inherit_param_estimates()`, which automates the overwriti
 mod4 <- copy_model_from(mod1, "4") %>%
   inherit_param_estimates(bounds = "keep", digits = 3) %>%
   add_notes("Initial estimates inherited from mod1 results")
+```
+
+You can also tweak or 'jitter' the initial parameter estimates using `tweak_initial_estimates()`. This can be used both in conjunction with `inherit_param_estimates()` or as a standalone call:
+```{r tweak_initial_estimates}
+mod5 <- copy_model_from(mod1, "5") %>% 
+  inherit_param_estimates(digits = 3) %>% 
+  tweak_initial_estimates(digits = 3, .p = 0.2)
+
+mod6 <- copy_model_from(mod1, "6") %>% 
+  tweak_initial_estimates(digits = 3, .p = 0.2)
 ```
 
 # Run log
