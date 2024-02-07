@@ -34,8 +34,8 @@ steps:
   image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:latest
   commands:
   - R -s -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
-    # this can be removed once nmrec 0.3.0 is available on MPN
-  - git clone --branch 0.3.0 --depth 1 https://github.com/metrumresearchgroup/nmrec.git /tmp/nmrec
+    # this can be removed once nmrec 0.3.0.8001 is available on MPN
+  - git clone --branch 0.3.0.8001 --depth 1 https://github.com/metrumresearchgroup/nmrec.git /tmp/nmrec
   - R -s -e 'devtools::install("/tmp/nmrec", upgrade = "never")'
   - R -s -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
   environment:
@@ -50,8 +50,8 @@ steps:
   image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.1:latest
   commands:
   - R -s -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
-    # this can be removed once nmrec 0.3.0 is available on MPN
-  - git clone --branch 0.3.0 --depth 1 https://github.com/metrumresearchgroup/nmrec.git /tmp/nmrec
+    # this can be removed once nmrec 0.3.0.8001 is available on MPN
+  - git clone --branch 0.3.0.8001 --depth 1 https://github.com/metrumresearchgroup/nmrec.git /tmp/nmrec
   - R -s -e 'devtools::install("/tmp/nmrec", upgrade = "never")'
   - R -s -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
   environment:
@@ -107,7 +107,7 @@ steps:
   commands:
   - R -s -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
   # nmrec isn't available until the 2023-09-19 snapshot.
-  - git clone --branch 0.3.0 --depth 1 https://github.com/metrumresearchgroup/nmrec.git /tmp/nmrec
+  - git clone --branch 0.3.0.8001 --depth 1 https://github.com/metrumresearchgroup/nmrec.git /tmp/nmrec
   - R -s -e 'devtools::install("/tmp/nmrec", upgrade = "never")'
   - R -s -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
   environment:
