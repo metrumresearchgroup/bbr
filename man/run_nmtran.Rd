@@ -4,13 +4,7 @@
 \alias{run_nmtran}
 \title{Run NMTRAN on a model object}
 \usage{
-run_nmtran(
-  .mod,
-  .config_path = NULL,
-  nmtran_exe = NULL,
-  delete_on_exit = TRUE,
-  ...
-)
+run_nmtran(.mod, .config_path = NULL, nmtran_exe = NULL, delete_on_exit = TRUE)
 }
 \arguments{
 \item{.mod}{a \code{bbr} model object}
@@ -24,8 +18,6 @@ model.}
 
 \item{delete_on_exit}{Logical. If \code{FALSE}, don't delete the temporary folder
 containing the \code{NMTRAN} run.}
-
-\item{...}{additional arguments passed to \code{system()}}
 }
 \description{
 Run NMTRAN on a model object

@@ -281,6 +281,64 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
   if (!is.null(.nrow)) cat_line(glue("... {orig_rows - .nrow} more rows"), col = "grey")
 }
 
+
+#' @describeIn print_bbi Prints the `NMTRAN` evaluation of a `bbi_model` model
+#' @export
+print.nmtran_process <- function(x){
+
+  is_valid_print <- function(.x) {
+    if (!is.null(.x)) {
+      length(.x) != 0
+    } else {
+      FALSE
+    }
+  }
+
+  heading <- cli_h1
+  subheading <- cli_h2
+  bullet_list <- cat_bullet
+
+  status <- x[["status"]]
+  if (x[["status_val"]] == 0) {
+    status <- col_green(status)
+  } else {
+    status <- col_red(status)
+  }
+
+  nm_version <- x[["nonmem_version"]]
+  if(is.null(nm_version)) nm_version <- "unknown"
+
+  heading('Status')
+  subheading(status)
+
+  heading("Absolute Model Path")
+  bullet_list(x[[ABS_MOD_PATH]])
+
+  heading("NMTRAN Specifications")
+  cli::cli_bullets(
+    c(
+      "*" = paste0("NMTRAN Executable:  {.path ", x[["nmtran_exe"]], "}"),
+      "*" = paste0("NONMEM Version: {.val ", nm_version, "}"),
+      "*" = paste0("Run Directory: {.path ", x[["run_dir"]], "}")
+    )
+  )
+
+  if (is_valid_print(x[["output_lines"]])) {
+    heading('Output')
+    cat_line(style_italic(x[["output_lines"]]))
+  }
+
+  if (is_valid_print(x[["error_lines"]])) {
+    heading('Additional Errors')
+    cat_line(style_italic(x[["error_lines"]]))
+  }
+
+  # format and print status string
+  if (is_valid_print(x[["output_lines"]])) {
+    cat_line("Process finished.", col = "green")
+  }
+
+}
 #####################
 # INTERNAL HELPERS
 #####################

@@ -9,7 +9,6 @@
 #'   `bbi.yaml` file in the same directory as the model.
 #' @param delete_on_exit Logical. If `FALSE`, don't delete the temporary folder
 #'   containing the `NMTRAN` run.
-#' @param ... additional arguments passed to `system()`
 #'
 #' @examples
 #' \dontrun{
@@ -25,8 +24,7 @@ run_nmtran <- function(
     .mod,
     .config_path = NULL,
     nmtran_exe = NULL,
-    delete_on_exit = TRUE,
-    ...
+    delete_on_exit = TRUE
 ){
   check_model_object(.mod, "bbi_nonmem_model")
   nmtran_exe <- locate_nmtran(.mod, .config_path, nmtran_exe)
@@ -44,7 +42,7 @@ run_nmtran <- function(
   }
 
   # copy model and dataset
-  file.copy(mod_path, temp_folder)
+  file.copy(mod_path, temp_folder, overwrite = TRUE)
   file.copy(data_path, temp_folder)
 
   # overwrite $DATA of new model
@@ -53,16 +51,19 @@ run_nmtran <- function(
     data_path = basename(data_path)
   )
 
-  # Get command & append the control file name
-  cmd_args <- paste("<", basename(mod_path))
-  cmd <- paste(nmtran_exe, cmd_args)
-
   # Run NMTRAN
-  message(glue("Running NMTRAN with executable: `{nmtran_exe}`"))
-  if(!is.null(nm_ver)) message(glue("NONMEM version: `{nm_ver}`"))
-  system_with_dir(cmd, dir = temp_folder, wait = TRUE, ...)
+  nmtran_results <- c(
+    list(
+      nmtran_exe = as.character(nmtran_exe),
+      nonmem_version = nm_ver,
+      absolute_model_path = mod_path
+    ),
+    execute_nmtran(nmtran_exe, mod_path = basename(mod_path), dir = temp_folder)
+  )
 
-  if(isFALSE(delete_on_exit)) return(temp_folder)
+  # assign class and return
+  class(nmtran_results) <- c(NMTRAN_PROCESS_CLASS, class(nmtran_results))
+  return(nmtran_results)
 }
 
 
@@ -124,22 +125,46 @@ locate_nmtran <- function(.mod = NULL, .config_path = NULL, nmtran_exe = NULL){
 }
 
 
-#' Run a system command in a given directory
+#' Execute NMTRAN in a given directory
 #'
-#' @param cmd System command
-#' @param dir Directory in which to execute the command
-#' @param ... additional arguments passed to `system()`
+#' @param nmtran_exe Path to `NMTRAN` executable.
+#' @param mod_path Path of a model to evaluate. Should be relative to `dir`.
+#' @param dir Directory in which to execute the command.
 #'
-#' @noRd
-system_with_dir <- function(cmd, args = character(), dir = NULL, ...) {
+#' @keywords internal
+execute_nmtran <- function(nmtran_exe, mod_path, dir = NULL) {
   if(is.null(dir) || !file.exists(dir)) dir <- "."
   checkmate::assert_directory_exists(dir)
 
-  wd <- getwd()
-  setwd(dir)
-  on.exit(setwd(wd))
+  nmtran.p <- processx::process$new(
+    command = nmtran_exe, args = mod_path, wd = dir,
+    stdout = "|", stderr="|", stdin = file.path(dir, mod_path)
+  )
 
-  system(cmd, ...)
+  # Wait till finished for status to be reflective of result
+  nmtran.p$wait()
+
+  # Assign status
+  status <- "Not Run"
+  status_val <- nmtran.p$get_exit_status()
+  if(status_val == 0){
+    status <- "NMTRAN successful"
+  }else if(status_val == 4){
+    status <- "NMTRAN failed. See errors."
+  }else{
+    dev_error("NMTRAN exit status other than 0 or 4")
+  }
+
+  # Tabulate NMTRAN results
+  nmtran_results <- list(
+    nmtran_model = nmtran.p$get_input_file(),
+    run_dir = as.character(fs::path_real(dir)),
+    status = status, status_val = status_val,
+    output_lines = nmtran.p$read_all_output_lines(),
+    error_lines = nmtran.p$read_all_error_lines()
+  )
+
+  return(nmtran_results)
 }
 
 #' Get the specified data path from a control stream file
@@ -290,7 +315,9 @@ compare_nmtran <- function(
     return(mod_new)
   }
 
-  # Run NMTRAN on each model (only message once)
+  # Remove problem statements from both models to ensure a fair comparison
+  # If update_model_id was called, this would also change the evaluation,
+  # though we can't really prevent that.
   mod_no_prob <- empty_prob_statement(.mod)
   compare_no_prob <- empty_prob_statement(.mod_compare)
   on.exit(
@@ -303,30 +330,36 @@ compare_nmtran <- function(
   # Run NMTRAN on each model
   nmtran_mod <- run_nmtran(
     mod_no_prob, nmtran_exe = nmtran_exe,
-    delete_on_exit = FALSE, intern = TRUE
+    delete_on_exit = FALSE
   )
   nmtran_compare <- run_nmtran(
     compare_no_prob, nmtran_exe = nmtran_exe,
-    delete_on_exit = FALSE, intern = TRUE
-  ) %>% suppressMessages()
+    delete_on_exit = FALSE
+  )
 
   # Force delete folders at the end
-  on.exit(unlink(nmtran_mod, recursive = TRUE, force = TRUE), add = TRUE)
-  on.exit(unlink(nmtran_compare, recursive = TRUE, force = TRUE), add = TRUE)
+  on.exit(unlink(nmtran_mod$run_dir, recursive = TRUE, force = TRUE), add = TRUE)
+  on.exit(unlink(nmtran_compare$run_dir, recursive = TRUE, force = TRUE), add = TRUE)
 
   # Compare FCON files
-  nmtran_mod_fcon <- file.path(nmtran_mod, "FCON")
-  nmtran_compare_fcon <- file.path(nmtran_compare, "FCON")
+  nmtran_mod_fcon <- file.path(nmtran_mod$run_dir, "FCON")
+  nmtran_compare_fcon <- file.path(nmtran_compare$run_dir, "FCON")
   cmd <- paste("cmp", nmtran_mod_fcon, nmtran_compare_fcon)
 
-  # Warnings occur when files are different
-  output <- system_with_dir(cmd, intern = TRUE, input = tempdir()) %>%
-    suppressWarnings()
+  # Compare FCON files from each NMTRAN run
+  .p <- processx::process$new(
+    command = "cmp", args = c(nmtran_mod_fcon, nmtran_compare_fcon),
+    stdout = "|", stderr = "|"
+  )
 
+  # Format output
+  output <- .p$read_all_output_lines()
   if(length(output) == 0){
-    message("\nNo differences found")
+    cat_line("No differences found", col = "green")
   }else{
-    message("\nModels are not equivalent")
+    cat_line("Models are not equivalent", col = "red")
+    output <- gsub(paste0(nmtran_mod_fcon, "|", nmtran_compare_fcon), "", output) %>%
+      stringr::str_trim()
   }
 
   return(output)
