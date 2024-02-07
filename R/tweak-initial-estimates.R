@@ -54,7 +54,7 @@ tweak_initial_estimates <- function(
 ){
 
   # Assertions
-  test_nmrec_version(.min_version = "0.3.0.8001")
+  test_nmrec_version(.min_version = "0.4.0")
   check_model_object(.mod, "bbi_nonmem_model")
   checkmate::assert_true(all(tweak %in% BBR_ESTIMATES_INHERIT))
 

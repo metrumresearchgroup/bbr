@@ -13,7 +13,7 @@ describe("initial_estimates", {
   })
 
   it("get_theta_inits", {
-    skip_if_old_nmrec("0.3.0.8001")
+    skip_if_old_nmrec("0.4.0")
     ctl <- nmrec::read_ctl(get_model_path(MOD1))
     theta_inits <- get_theta_inits(ctl, mark_flags = "fix")
 
@@ -25,7 +25,7 @@ describe("initial_estimates", {
   })
 
   it("fmt_record_num", {
-    skip_if_old_nmrec("0.3.0.8001")
+    skip_if_old_nmrec("0.4.0")
     ctl <- nmrec::read_ctl(get_model_path(MOD1))
 
     # Test THETA
@@ -61,7 +61,7 @@ describe("initial_estimates", {
   })
 
   it("initial_estimates: integration", {
-    skip_if_old_nmrec("0.3.0.8001")
+    skip_if_old_nmrec("0.4.0")
     mod_c <- read_model(file.path(MODEL_DIR_X, "1001"))
     initial_est_df <- initial_estimates(mod_c, flag_fixed = TRUE)
     initial_est <- get_initial_est(mod_c, flag_fixed = TRUE)
@@ -87,7 +87,7 @@ describe("initial_estimates", {
   })
 
   it("initial_estimates: SAME blocks", {
-    skip_if_old_nmrec("0.3.0.8001")
+    skip_if_old_nmrec("0.4.0")
     mod_c <- read_model(file.path(MODEL_DIR_X, "acop-iov"))
     initial_est_df <- initial_estimates(mod_c, flag_fixed = TRUE)
     initial_est <- get_initial_est(mod_c, flag_fixed = TRUE)
