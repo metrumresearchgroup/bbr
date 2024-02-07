@@ -235,6 +235,9 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/find_nonmem_model_file_path.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/fmt_record_num.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/format_cmd_args.html</loc>
   </url>
   <url>
@@ -268,6 +271,9 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/get_path_from_object.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/get_theta_inits.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/highlight_cell.html</loc>
   </url>
   <url>
@@ -275,6 +281,9 @@
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/inherit_param_estimates.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/initial_estimates.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/install_menu.html</loc>
@@ -302,9 +311,6 @@
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/model_summaries.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/bbr/reference/model_summaries_concurrent.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/model_summary.html</loc>
@@ -406,9 +412,6 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/read_model.html</loc>
   </url>
   <url>
-    <loc>https://metrumresearchgroup.github.io/bbr/reference/read_model_from_config.html</loc>
-  </url>
-  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/register_model_type.html</loc>
   </url>
   <url>
@@ -493,6 +496,12 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/test_threads.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/tweak_initial_estimates.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/tweak_thetas.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/unquote_filename.html</loc>
   </url>
   <url>
@@ -500,6 +509,9 @@
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/use_bbi.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/using_old_priors.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/validate_parent_mod.html</loc>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.8.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.9.0</span>
       </span>
     </div>
 
@@ -69,6 +69,19 @@
       <small>Source: <a href="https://github.com/metrumresearchgroup/bbr/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="1.9.0" id="bbr-190">bbr 1.9.0<a class="anchor" aria-label="anchor" href="#bbr-190"></a></h2>
+<div class="section level3">
+<h3 id="new-features-and-changes-1-9-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-1-9-0"></a></h3>
+<ul><li><p>New <code><a href="../reference/initial_estimates.html">initial_estimates()</a></code> function for extracting and formatting initial parameter estimates from a <code>NONMEM</code> control stream file. (<a href="https://github.com/metrumresearchgroup/bbr/issues/646" class="external-link">#646</a>)</p></li>
+<li><p>New <code><a href="../reference/tweak_initial_estimates.html">tweak_initial_estimates()</a></code> function for tweaking or ‘jittering’ initial parameter estimates. Only <code>$THETA</code> records are supported for now. (<a href="https://github.com/metrumresearchgroup/bbr/issues/646" class="external-link">#646</a>)</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bugs-addressed-1-9-0">Bugs addressed<a class="anchor" aria-label="anchor" href="#bugs-addressed-1-9-0"></a></h3>
+<ul><li><p>With the latest <code>data.table</code> release (1.15.0), <code><a href="../reference/param_estimates_batch.html">param_estimates_batch()</a></code> failed for an edge case due to a change in the header detection heuristics. <code><a href="../reference/param_estimates_batch.html">param_estimates_batch()</a></code> now tells <code><a href="https://rdatatable.gitlab.io/data.table/reference/fread.html" class="external-link">data.table::fread()</a></code> to expect a header. (<a href="https://github.com/metrumresearchgroup/bbr/issues/648" class="external-link">#648</a>)</p></li>
+<li><p>When passed <code>.recurse = TRUE</code>, <code><a href="../reference/run_log.html">run_log()</a></code>, <code><a href="../reference/config_log.html">config_log()</a></code>, and <code><a href="../reference/summary_log.html">summary_log()</a></code> included nested models, which was not by design. Any models under another model’s output directory are considered an implementation detail. (<a href="https://github.com/metrumresearchgroup/bbr/issues/643" class="external-link">#643</a>, <a href="https://github.com/metrumresearchgroup/bbr/issues/644" class="external-link">#644</a>, <a href="https://github.com/metrumresearchgroup/bbr/issues/645" class="external-link">#645</a>)</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="1.8.1" id="bbr-181">bbr 1.8.1<a class="anchor" aria-label="anchor" href="#bbr-181"></a></h2>
 <div class="section level3">

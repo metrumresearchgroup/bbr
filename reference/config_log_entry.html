@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.8.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.9.0</span>
       </span>
     </div>
 
@@ -75,13 +75,17 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">config_log_entry</span><span class="op">(</span><span class="va">path</span>, fields <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">config_log_entry</span><span class="op">(</span><span class="va">cfg_mod</span>, <span class="va">path</span>, fields <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>path</dt>
-<dd><p>A string giving the path to <code>bbi_config.json</code>.</p></dd>
+    <dl><dt>cfg_mod</dt>
+<dd><p>A model object.</p></dd>
+
+
+<dt>path</dt>
+<dd><p>A string giving the path to <code>bbi_config.json</code> for <code>cfg_mod</code>.</p></dd>
 
 
 <dt>fields</dt>
