@@ -284,7 +284,7 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
 
 #' @describeIn print_bbi Prints the `NMTRAN` evaluation of a `bbi_model` model
 #' @export
-print.nmtran_process <- function(x){
+print.nmtran_process <- function(x, ...){
 
   is_valid_print <- function(.x) {
     if (!is.null(.x)) {

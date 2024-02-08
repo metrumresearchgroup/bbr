@@ -14,7 +14,7 @@
 
 \method{print}{bbi_nonmem_summary}(x, .digits = 3, .fixed = FALSE, .off_diag = FALSE, .nrow = NULL, ...)
 
-\method{print}{nmtran_process}(x)
+\method{print}{nmtran_process}(x, ...)
 }
 \arguments{
 \item{x}{Object to format or print.}

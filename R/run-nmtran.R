@@ -180,6 +180,12 @@ get_data_path_from_ctl <- function(.mod){
   # Get data record
   data_rec <- nmrec::select_records(ctl, "data")[[1]]
   data_path <- nmrec::get_record_option(data_rec, "filename")$value
+
+  # Handling for `.mod` extensions
+  if(grepl("(?i)mod", fs::path_ext(mod_path))){
+    data_path <- file.path("..", data_path)
+  }
+
   data_path_norm <- fs::path_norm(file.path(mod_path, data_path))
 
   if(!fs::file_exists(data_path_norm)){
