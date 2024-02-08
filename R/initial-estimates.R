@@ -93,7 +93,6 @@ get_initial_est <- function(.mod, flag_fixed = FALSE){
   test_nmrec_version(.min_version = "0.4.0")
   check_model_object(.mod, "bbi_nonmem_model")
 
-
   ctl <- nmrec::read_ctl(get_model_path(.mod))
 
   if (isTRUE(using_old_priors(ctl))) {
@@ -105,7 +104,6 @@ get_initial_est <- function(.mod, flag_fixed = FALSE){
       ))
   }
 
-
   # Set flags
   mark_flags <- if(isTRUE(flag_fixed)) "fix" else NULL
 
@@ -113,6 +111,11 @@ get_initial_est <- function(.mod, flag_fixed = FALSE){
   theta_inits <- get_theta_inits(ctl, mark_flags = mark_flags)
   omega_inits <- nmrec::extract_omega(ctl, mark_flags = mark_flags)
   sigma_inits <- nmrec::extract_sigma(ctl, mark_flags = mark_flags)
+
+  # Get matrix types and options - assign as attributes
+  mat_opts <- get_matrix_opts(.mod)
+  attr(omega_inits, "mat_opts") <- mat_opts %>% filter(.data$record_type == "omega")
+  attr(sigma_inits, "mat_opts") <- mat_opts %>% filter(.data$record_type == "sigma")
 
   # Format as list
   inits <- list(
