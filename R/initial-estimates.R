@@ -114,8 +114,8 @@ get_initial_est <- function(.mod, flag_fixed = FALSE){
 
   # Get matrix types and options - assign as attributes
   mat_opts <- get_matrix_opts(.mod)
-  attr(omega_inits, "mat_opts") <- mat_opts %>% filter(record_type == "omega")
-  attr(sigma_inits, "mat_opts") <- mat_opts %>% filter(record_type == "sigma")
+  attr(omega_inits, "mat_opts") <- mat_opts %>% filter(.data$record_type == "omega")
+  attr(sigma_inits, "mat_opts") <- mat_opts %>% filter(.data$record_type == "sigma")
 
   # Format as list
   inits <- list(

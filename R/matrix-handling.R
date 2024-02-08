@@ -205,8 +205,18 @@ get_matrix_opts <- function(.mod){
   extract_mat_opts <- function(ctl, type = c("omega", "sigma")){
     type <- match.arg(type)
     recs <- nmrec::select_records(ctl, type)
-    mat_types <- get_matrix_types(recs)
 
+    # Handling if record type doesn't exist
+    if(length(recs) == 0){
+      return(
+        tibble::tibble(
+          record_type = type, record_number = NA, mat_type = NA,
+          "diag" = NA, "off_diag" = NA
+        )
+      )
+    }
+
+    mat_types <- get_matrix_types(recs)
     purrr::imap_dfr(recs, function(rec, rec_num){
       mat_type <- mat_types[rec_num]
       if(mat_type == "block"){
