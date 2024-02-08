@@ -17,6 +17,7 @@ reference:
   - read_model
   - copy_model_from
   - inherit_param_estimates
+  - tweak_initial_estimates
   - update_model_id
   - model_diff
   - tags_diff
@@ -72,6 +73,7 @@ reference:
   - get_yaml_path
   - get_data_path
   - print_bbi
+  - initial_estimates
 
 - title: bbi configuration
   contents:

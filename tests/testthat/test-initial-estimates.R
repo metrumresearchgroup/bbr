@@ -13,7 +13,7 @@ describe("initial_estimates", {
   })
 
   it("get_theta_inits", {
-    skip_if_old_nmrec("0.3.0.8001")
+    skip_if_old_nmrec("0.4.0")
     ctl <- nmrec::read_ctl(get_model_path(MOD1))
     theta_inits <- get_theta_inits(ctl, mark_flags = "fix")
 
@@ -25,7 +25,7 @@ describe("initial_estimates", {
   })
 
   it("fmt_record_num", {
-    skip_if_old_nmrec("0.3.0.8001")
+    skip_if_old_nmrec("0.4.0")
     ctl <- nmrec::read_ctl(get_model_path(MOD1))
 
     # Test THETA
@@ -61,7 +61,7 @@ describe("initial_estimates", {
   })
 
   it("initial_estimates: integration", {
-    skip_if_old_nmrec("0.3.0.8001")
+    skip_if_old_nmrec("0.4.0")
     mod_c <- read_model(file.path(MODEL_DIR_X, "1001"))
     initial_est_df <- initial_estimates(mod_c, flag_fixed = TRUE)
     initial_est <- get_initial_est(mod_c, flag_fixed = TRUE)
@@ -87,7 +87,7 @@ describe("initial_estimates", {
   })
 
   it("initial_estimates: SAME blocks", {
-    skip_if_old_nmrec("0.3.0.8001")
+    skip_if_old_nmrec("0.4.0")
     mod_c <- read_model(file.path(MODEL_DIR_X, "acop-iov"))
     initial_est_df <- initial_estimates(mod_c, flag_fixed = TRUE)
     initial_est <- get_initial_est(mod_c, flag_fixed = TRUE)
@@ -114,8 +114,22 @@ describe("initial_estimates", {
   it("initial_estimates: warns when using old priors", {
     mod_c <- read_model(file.path(MODEL_DIR_X, "example2_saemimp"))
     expect_warning(
-      initial_estimates(mod_c),
+      initial_est_df <- initial_estimates(mod_c),
       "This model appears to be using"
     )
+    # Check for multiple theta and omega records (second ones are priors)
+    thetas_df <- initial_est_df %>% dplyr::filter(record_type == "theta")
+    oemgas_df <- initial_est_df %>% dplyr::filter(record_type == "omega")
+
+    # Here, the second theta record is actually equivalent to `OMEGAPD` (not a theta prior)
+    # i.e. the two theta records are not equal in length, which would be the case if using `THETAP`
+    expect_equal(dplyr::n_distinct(thetas_df$record_number), 2)
+    expect_equal(thetas_df %>% filter(record_number == 1) %>% nrow(), 11)
+    expect_equal(thetas_df %>% filter(record_number == 2) %>% nrow(), 1)
+
+    # Here, the second omega record is a prior, so the lengths should be equivalent
+    expect_equal(dplyr::n_distinct(oemgas_df$record_number), 2)
+    expect_equal(oemgas_df %>% filter(record_number == 1) %>% nrow(), 10)
+    expect_equal(oemgas_df %>% filter(record_number == 2) %>% nrow(), 10)
   })
 })

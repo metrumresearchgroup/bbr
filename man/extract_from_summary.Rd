@@ -20,7 +20,7 @@ extract_ofv(.s)
 extract_condition_number(.s)
 }
 \arguments{
-\item{.s}{The summary object to extract from}
+\item{.s}{A list of \code{bbi_nonmem_summary} objects to extract from.}
 }
 \description{
 These are all helper functions to extract a specific field or sub-field from a \verb{bbi_\{.model_type\}_summary} object.

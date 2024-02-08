@@ -7,7 +7,7 @@
 # of the bounds.
 
 describe("tweak_initial_estimates", {
-  skip_if_old_nmrec("0.3.0.8001")
+  skip_if_old_nmrec("0.4.0")
 
   it("base case - tweaking initial value works", {
     test_case <- list(
@@ -47,8 +47,7 @@ describe("tweak_initial_estimates", {
 
   it("theta bounds - value falls outside one of the bounds", {
 
-    # Note: the comments next to each theta record do not necessarily need to
-    # be true. The purpose of this test is to ensure the tweaked value is always
+    # The purpose of this test is to ensure the tweaked value is always
     # within the bounds, taking rounding into account. If it cannot be placed within
     # the bounds, the original value is used, and no tweaking will be done for that
     # option
@@ -56,9 +55,9 @@ describe("tweak_initial_estimates", {
       case = "theta bounds; tweaked value falls outside",
       input_ctl = "
       $THETA
-      (1.98, 2, 2.02) ; Should be 50% between init and upper bound
-      (1.999, 2, 2.001) ; Should be set to the init value
-      (1.95, 2, 2.05) ; Should be set to 90% between init and upper bound
+      (1.98, 2, 2.02) ;
+      (1.999, 2, 2.001) ;
+      (1.95, 2, 2.05) ;
       (0, 1); lower bound only
       (0, 3, 5); 'regular' bound
       "
@@ -144,7 +143,6 @@ describe("tweak_initial_estimates", {
     est_tweaked <- get_initial_est(mod_tweak_new, flag_fixed = TRUE)
     est_tweaked
 
-    # Expect all values to be tweaked
     ## Check thetas
     expect_true(est_tweaked$thetas$init[2] == initial_est$thetas$init[2]) # Fixed
     expect_true(est_tweaked$thetas$init[1] != initial_est$thetas$init[1]) # Tweaked
