@@ -108,7 +108,7 @@ test_threads <- function(
 #'
 #' # If models have already finished:
 #' check_run_times(mods, .wait = FALSE)
-#' check_run_times(mods, .wait = FALSE, .return_times = "All")
+#' check_run_times(mods, .wait = FALSE, .return_times = "all")
 #' }
 #' @return A tibble with columns `threads` (number of threads) and `time`
 #'   (elapsed estimation time in seconds for test models).
