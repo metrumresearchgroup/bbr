@@ -70,6 +70,7 @@ tail_output <- function(.mod, ...) {
 #' @describeIn check_file Tail the OUTPUT file from a file path to a model.
 #' @export
 tail_output.character <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE, ...) {
+  checkmate::assert_string(.mod)
   # if model path passed, construct path
   if (basename(.mod) != "OUTPUT") {
     .mod = as.character(file.path(.mod, "OUTPUT"))
@@ -117,6 +118,7 @@ tail_lst <- function(.mod, ...) {
 #' @describeIn check_file Tail the .lst file from a file path to a model.
 #' @export
 tail_lst.character <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE, ...) {
+  checkmate::assert_string(.mod)
   # if model path passed, construct path
   if (tools::file_ext(.mod) != "lst") {
     .mod = as.character(file.path(.mod, paste0(get_model_id(.mod), ".lst")))
@@ -245,6 +247,7 @@ check_grd <- function(.mod, .iter_floor = 0) {
 #' @describeIn check_nonmem_table_output Checks .grd file from a file path
 #' @export
 check_grd.character <- function(.mod, .iter_floor = 0) {
+  checkmate::assert_string(.mod)
   # if model path passed, construct path
   if (tools::file_ext(.mod) != "grd") {
     .mod = as.character(file.path(.mod, paste0(get_model_id(.mod), ".grd")))
@@ -286,6 +289,7 @@ check_ext <- function(.mod, .iter_floor = 0) {
 #' @describeIn check_nonmem_table_output Checks .ext file from a file path
 #' @export
 check_ext.character <- function(.mod, .iter_floor = 0) {
+  checkmate::assert_string(.mod)
   # if model path passed, construct path
   if (tools::file_ext(.mod) != "ext") {
     .mod = as.character(file.path(.mod, paste0(get_model_id(.mod), ".ext")))
