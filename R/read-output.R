@@ -71,9 +71,15 @@ tail_output <- function(.mod, ...) {
 #' @export
 tail_output.character <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE, ...) {
   checkmate::assert_string(.mod)
-  # if model path passed, construct path
+  # If model path passed, rely on model method to construct path.
   if (basename(.mod) != "OUTPUT") {
-    .mod = as.character(file.path(.mod, "OUTPUT"))
+    return(
+      tail_output(
+        read_model(.mod),
+        .head = .head, .tail = .tail, .print = .print, .return = .return,
+        ...
+      )
+    )
   }
 
   check_file(.mod, .head, .tail, .print, .return, ...)
@@ -119,9 +125,15 @@ tail_lst <- function(.mod, ...) {
 #' @export
 tail_lst.character <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE, ...) {
   checkmate::assert_string(.mod)
-  # if model path passed, construct path
+  # If model path passed, rely on model method to construct path.
   if (tools::file_ext(.mod) != "lst") {
-    .mod = as.character(file.path(.mod, paste0(get_model_id(.mod), ".lst")))
+    return(
+      tail_lst(
+        read_model(.mod),
+        .head = .head, .tail = .tail, .print = .print, .return = .return,
+        ...
+      )
+    )
   }
 
   check_file(.mod, .head, .tail, .print, .return, ...)
