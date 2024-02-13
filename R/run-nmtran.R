@@ -41,15 +41,19 @@ run_nmtran <- function(
     on.exit(unlink(temp_folder, recursive = TRUE, force = TRUE))
   }
 
-  # copy model and dataset
+  # Copy model
   file.copy(mod_path, temp_folder, overwrite = TRUE)
-  file.copy(data_path, temp_folder)
 
-  # overwrite $DATA of new model
-  modify_data_path_ctl(
-    mod_path = file.path(temp_folder, basename(mod_path)),
-    data_path = basename(data_path)
-  )
+  # Copy dataset & overwrite $DATA record of new model
+  # NMTRAN will error if data cannot be found
+  if(fs::file_exists(data_path)){
+    file.copy(data_path, temp_folder, overwrite = TRUE)
+    # overwrite $DATA record of new model
+    modify_data_path_ctl(
+      mod_path = file.path(temp_folder, basename(mod_path)),
+      data_path = basename(data_path)
+    )
+  }
 
   # Run NMTRAN
   nmtran_results <- c(
@@ -74,17 +78,23 @@ run_nmtran <- function(
 #'
 #' @inheritParams run_nmtran
 #'
-#' @noRd
+#' @keywords internal
 locate_nmtran <- function(.mod = NULL, .config_path = NULL, nmtran_exe = NULL){
 
   if(is.null(nmtran_exe)){
-    check_model_object(.mod, "bbi_nonmem_model")
-    model_dir <- get_model_working_directory(.mod)
+    if(!is.null(.mod)){
+      check_model_object(.mod, "bbi_nonmem_model")
+      model_dir <- get_model_working_directory(.mod)
+    }
     config_path <- .config_path %||% file.path(model_dir, "bbi.yaml")
 
     if(!file_exists(config_path)){
-      stop(paste("No bbi configuration was found in the execution directory.",
-                 "Please run `bbi_init()` with the appropriate directory to continue."))
+      rlang::abort(
+        c(
+          "x" = "No bbi configuration was found in the execution directory.",
+          "i" = "Please run `bbi_init()` with the appropriate directory to continue."
+        )
+      )
     }
 
     if(!is.null(.config_path)){
@@ -189,10 +199,16 @@ get_data_path_from_ctl <- function(.mod){
   data_path_norm <- fs::path_norm(file.path(mod_path, data_path))
 
   if(!fs::file_exists(data_path_norm)){
-    stop(glue("Could not find data at {data_path_norm}"))
+    # The first error message line is what NMTRAN would return in this situation
+    rlang::warn(
+      c(
+        "x" = "Input data file does not exist or cannot be opened",
+        "i" = glue("Referenced input data path: {data_path_norm}")
+      )
+    )
   }
 
-  return(data_path_norm)
+  return(as.character(data_path_norm))
 }
 
 #' Modify the specified data path in a control stream file
