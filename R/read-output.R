@@ -47,7 +47,7 @@ check_file <- function(.file, .head = 3, .tail = 5, .print = TRUE, .return = FAL
 
   # return and/or print
   if (.print) {
-    cat(paste(res_vec, collapse="\n"))
+    cat(paste(res_vec, collapse="\n"), "\n")
   }
   if (.return) {
     return(res_vec)
