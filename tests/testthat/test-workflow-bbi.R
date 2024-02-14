@@ -306,5 +306,62 @@ withr::with_options(list(
     run_times <- model_summaries(mods) %>% check_run_times(.wait = FALSE) %>% suppressWarnings()
     expect_equal(dim(run_times), c(3, 3))
   })
+
+
+  describe("run_nmtran", {
+
+    it("locate_nmtran", {
+      # Using model object, looks for bbi.yaml
+      nmtran_exe <- locate_nmtran(mod1)
+      # Confirm executable
+      expect_equal(as.character(nmtran_exe), "/opt/NONMEM/nm74gf/tr/NMTRAN.exe")
+      # Confirm NONMEM version
+      expect_equal(attr(nmtran_exe, "nonmem_version"), "nm74gf")
+
+      # Passed executable
+      nmtran_exe <- locate_nmtran(mod1, nmtran_exe = "/opt/NONMEM/nm74gf/tr/NMTRAN.exe")
+      # Confirm executable
+      expect_equal(as.character(nmtran_exe), "/opt/NONMEM/nm74gf/tr/NMTRAN.exe")
+      # Confirm NONMEM version
+      expect_true(is.null(attr(nmtran_exe, "nonmem_version")))
+
+      # Passed config_path
+      nmtran_exe <- locate_nmtran(.config_path = file.path(MODEL_DIR_BBI, "bbi.yaml"))
+      # Confirm executable
+      expect_equal(as.character(nmtran_exe), "/opt/NONMEM/nm74gf/tr/NMTRAN.exe")
+      # Confirm NONMEM version
+      expect_equal(attr(nmtran_exe, "nonmem_version"), "nm74gf")
+
+      # Wrong nmtran_exe path passed
+      expect_error(
+        locate_nmtran(mod1, nmtran_exe = "/opt/NONMEM/nm74gf/tr/NMTRAN2.exe"),
+        "Could not find an NMTRAN executable"
+      )
+
+      # no configuration file found
+      expect_error(
+        locate_nmtran(.config_path = file.path(tempdir(), "bbi.yaml")),
+        "No bbi configuration was found"
+      )
+    })
+
+
+    it("base case", {
+      # create model
+      mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
+
+      nmtran_results <- run_nmtran(mod1, delete_on_exit = FALSE)
+      on.exit(fs::dir_delete(nmtran_results$run_dir))
+
+      # Check attributes
+      expect_equal(get_model_path(mod1), nmtran_results$absolute_model_path)
+      expect_equal(
+        file.path(nmtran_results$run_dir, basename(get_model_path(mod1))),
+        nmtran_results$nmtran_model
+      )
+      expect_equal(nmtran_results$nonmem_version, "nm74gf")
+      expect_equal(nmtran_results$status_val, 0)
+      expect_equal(nmtran_results$status, "NMTRAN successful")
+    })
 }) # closing withr::with_options
 
