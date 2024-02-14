@@ -2,12 +2,17 @@
 % Please edit documentation in R/utils.R
 \name{check_nonmem_finished}
 \alias{check_nonmem_finished}
+\alias{check_nonmem_finished.bbi_nonmem_model}
 \title{Checks if NONMEM run is done by looking for "Stop Time" in .lst file}
 \usage{
-check_nonmem_finished(.mod)
+check_nonmem_finished(.mod, ...)
+
+\method{check_nonmem_finished}{bbi_nonmem_model}(.mod, ...)
 }
 \arguments{
 \item{.mod}{A \code{bbi_nonmem_model} object.}
+
+\item{...}{Arguments passed to methods.}
 }
 \description{
 Returns \code{TRUE} if the model appears to be finished running and \code{FALSE} otherwise.
