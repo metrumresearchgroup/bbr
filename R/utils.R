@@ -550,6 +550,7 @@ download_with_retry <- function(...) {
 #' @param .mod either a bbi_nonmem_model object or a path to an .lst file
 #'
 #' @importFrom readr read_lines
+#' @importFrom stringr str_detect
 #'
 #' @export
 check_nonmem_finished <- function(.mod) {
