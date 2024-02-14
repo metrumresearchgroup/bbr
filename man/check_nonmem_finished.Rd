@@ -7,7 +7,7 @@
 check_nonmem_finished(.mod)
 }
 \arguments{
-\item{.mod}{either a bbi_nonmem_model object or a path to an .lst file}
+\item{.mod}{A \code{bbi_nonmem_model} object.}
 }
 \description{
 Returns \code{TRUE} if the model appears to be finished running and \code{FALSE} otherwise.

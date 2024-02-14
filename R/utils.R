@@ -547,7 +547,7 @@ download_with_retry <- function(...) {
 #' Checks if NONMEM run is done by looking for "Stop Time" in .lst file
 #'
 #' Returns `TRUE` if the model appears to be finished running and `FALSE` otherwise.
-#' @param .mod either a bbi_nonmem_model object or a path to an .lst file
+#' @param .mod A `bbi_nonmem_model` object.
 #'
 #' @importFrom readr read_lines
 #' @importFrom stringr str_detect
