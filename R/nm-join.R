@@ -92,6 +92,12 @@ nm_join <- function(
     no_shk_file = TRUE
   )
 ) {
+  if (inherits(.mod, "bbi_nmbayes_model")) {
+    stop(
+      "nm_join() is not supported for nmbayes models; ",
+      "use `bbr.bayes::nm_join_bayes()` instead."
+    )
+  }
 
   if (inherits(.mod, "character")) {
     checkmate::assert_string(.mod)
