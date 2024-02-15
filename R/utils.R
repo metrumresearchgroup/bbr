@@ -547,12 +547,20 @@ download_with_retry <- function(...) {
 #' Checks if NONMEM run is done by looking for "Stop Time" in .lst file
 #'
 #' Returns `TRUE` if the model appears to be finished running and `FALSE` otherwise.
-#' @param .mod either a bbi_nonmem_model object or a path to an .lst file
-#'
-#' @importFrom readr read_lines
+#' @param .mod A `bbi_nonmem_model` object.
+#' @param ... Arguments passed to methods.
 #'
 #' @export
-check_nonmem_finished <- function(.mod) {
+check_nonmem_finished <- function(.mod, ...) {
+  UseMethod("check_nonmem_finished")
+}
+
+#' @rdname check_nonmem_finished
+#' @importFrom readr read_lines
+#' @importFrom stringr str_detect
+#'
+#' @export
+check_nonmem_finished.bbi_nonmem_model <- function(.mod, ...) {
 
   if (!fs::dir_exists(get_output_dir(.mod, .check_exists = FALSE))) {
     return(TRUE) # if missing then this failed right away, likely for some bbi reason
