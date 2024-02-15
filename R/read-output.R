@@ -12,6 +12,7 @@
 #' @importFrom readr read_lines
 #' @export
 check_file <- function(.file, .head = 3, .tail = 5, .print = TRUE, .return = FALSE) {
+  checkmate::assert_string(.file)
   l <- read_lines(.file)
 
   l_len <- length(l)
