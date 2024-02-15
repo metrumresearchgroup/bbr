@@ -37,6 +37,6 @@ check_run_times(mods, .wait = TRUE, .return_times = c("estimation_time", "covari
 
 # If models have already finished:
 check_run_times(mods, .wait = FALSE)
-check_run_times(mods, .wait = FALSE, .return_times = "All")
+check_run_times(mods, .wait = FALSE, .return_times = "all")
 }
 }
