@@ -158,32 +158,188 @@ get_model_id.bbi_model <- function(.mod) {
 
 #' Get path to data file
 #'
-#' Helper to extract the path to the input data from a
-#' `bbi_{.model_type}_summary` or `bbi_{.model_type}_model` object. Note that
-#' **this function only works on models that have been successfully run**
-#' because the path to the data is constructed during model submission.
-#' @param .mod Model to use, either a `bbi_{.model_type}_model` or
-#' `bbi_{.model_type}_summary` object.
+#' Helper to extract the path to the input data from a `NONMEM` control stream file.
+#'
+#' @param .bbi_object The object to query. Could be
+#' a `bbi_{.model_type}_model` object,
+#' `bbi_{.model_type}_summary` object,
+#' or a tibble of class `bbi_log_df`.
+#' @param .check_exists If `TRUE`, the default, will throw an error if the file does not exist
+#' @param pull_from_config If `TRUE`, pull the data path from `bbi.json` created
+#'  during model submission, and compare to the path defined in the control stream.
 #' @param ... Arguments passed through to methods. (Currently none, but may have
 #'   some modifier arguments other model types in the future.)
-#' @importFrom fs path_rel
+#'
+#' @details
+#'
+#' ### Notes on model extensions:
+#' `bbi` has different handling for `.mod` vs `.ctl` extensions for `NONMEM`
+#' models. When a model such as `001.ctl` is targeted with `bbi`, `bbi` will
+#' create a new directory called `001`, copy the model into it (with a `.mod`
+#' extension), and do the execution directory. For more details, see `bbi`'s
+#' [documentation](https://github.com/metrumresearchgroup/bbi/blob/main/integration/markdown/expectations.md?plain=1#L19:L21)
+#'
+#'
 #' @return Absolute path to input data file
 #' @export
-get_data_path <- function(.mod, ...) {
+get_data_path <- function(
+    .bbi_object,
+    .check_exists = TRUE,
+    pull_from_config = FALSE,
+    ...
+){
   UseMethod("get_data_path")
 }
 
-#' @describeIn get_data_path Takes `bbi_{.model_type}_model` or `bbi_{.model_type}_summary` object
+#' @rdname get_data_path
 #' @export
-get_data_path.bbi_model <- function(.mod, ...) {
+get_data_path.bbi_nonmem_model <- function(
+    .bbi_object,
+    .check_exists = TRUE,
+    pull_from_config = FALSE,
+    ...
+){
+  get_data_path_nonmem(.bbi_object, .check_exists, pull_from_config, ...)
+}
+
+#' @rdname get_data_path
+#' @export
+get_data_path.bbi_nonmem_summary <- function(
+    .bbi_object,
+    .check_exists = TRUE,
+    pull_from_config = FALSE,
+    ...
+){
+  get_data_path_nonmem(.bbi_object, .check_exists, pull_from_config, ...)
+}
+
+#' @rdname get_data_path
+#' @export
+get_data_path.bbi_log_df <- function(
+    .bbi_object,
+    .check_exists = TRUE,
+    pull_from_config = FALSE,
+    ...
+){
+  data_paths <- map_chr(.bbi_object[[ABS_MOD_PATH]], function(.path) {
+    .mod <- read_model(.path)
+    get_data_path_nonmem(.mod, .check_exists, pull_from_config, ...)
+  })
+
+  return(data_paths)
+}
+
+
+#' @keywords internal
+get_data_path_nonmem <- function(
+    .bbi_object,
+    .check_exists = TRUE,
+    pull_from_config = FALSE,
+    ...
+){
+
+  if(inherits(.bbi_object, NM_SUM_CLASS)){
+    .bbi_object <- read_model(.bbi_object$absolute_model_path)
+  }
+  check_model_object(.bbi_object, "bbi_nonmem_model")
+  mod_path <- get_model_path(.bbi_object)
+
+  # Get relative data path
+  data_path_rel <- get_data_path_from_ctl(.bbi_object)
+
+  # Handling for `.mod` extensions
+  if(grepl("(?i)ctl", fs::path_ext(mod_path))){
+    path_elements <- unlist(strsplit(data_path_rel, "/"))
+    if (path_elements[1] == "..") {
+      data_path_rel_adj <- paste(path_elements[-1], collapse = "/")
+    }else{
+      data_path_rel_adj <- data_path_rel
+    }
+  }else{
+    data_path_rel_adj <- data_path_rel
+  }
+
+  data_path <- fs::path_norm(file.path(dirname(mod_path), data_path_rel_adj)) %>%
+    as.character()
+
+  if(.check_exists){
+    if(!fs::file_exists(data_path)){
+      msg_extra <- NULL
+      # Check for improper path specification due to extensions
+      if(grepl("(?i)ctl", fs::path_ext(mod_path))){
+        data_path_test <- fs::path_norm(file.path(dirname(mod_path), data_path_rel)) %>%
+          as.character()
+        # If data file exists here, this means the user was missing an extra `../`
+        # for `ctl` extensions. Give informative message in this case.
+        if(fs::file_exists(data_path_test)){
+          msg_extra <- c(
+            "i" = paste(
+              "Your model ends with a `.ctl` extension - make sure",
+              "you include an extra `../` in the relative path.",
+              "See `?get_data_path` for details..."
+            )
+          )
+        }
+      }
+
+      # The first error message line is what NMTRAN would return in this situation
+      rlang::abort(
+        c(
+          "x" = "Input data file does not exist or cannot be opened",
+          "*" = glue("Referenced input data path: {data_path_rel}"),
+          msg_extra
+        )
+      )
+    }
+  }
+
+  if(isTRUE(pull_from_config)){
+    data_path_config <- get_data_path_from_json(.bbi_object)
+    if(data_path != data_path_config){
+      rlang::warn(
+        c(
+          "!" = paste("Data path referenced in `bbi.json` does not match the",
+                      "one defined in the control stream:"),
+          "*" = glue("Data path extracted from {basename(mod_path)}: {data_path}"),
+          "*" = glue("Data path defined in bbi.json: {data_path_config}")
+        )
+      )
+    }
+    return(data_path_config)
+  }
+
+  return(data_path)
+}
+
+
+
+#' Get the relative data path from a control stream file
+#' @noRd
+get_data_path_from_ctl <- function(.mod){
+  check_model_object(.mod, "bbi_nonmem_model")
+  mod_path <- get_model_path(.mod)
+  ctl <- nmrec::read_ctl(mod_path)
+
+  # Get data record
+  data_rec <- nmrec::select_records(ctl, "data")[[1]]
+  data_path <- nmrec::get_record_option(data_rec, "filename")$value
+
+  return(data_path)
+}
+
+
+#' Get data path as defined in bbi.json
+#' @noRd
+get_data_path_from_json <- function(.mod){
   cfg_path <- get_config_path(.mod, .check_exists = FALSE)
 
   if (!fs::file_exists(cfg_path)) {
-    stop(paste(
-      glue("Cannot extract data path because no config file exists as {cfg_path}"),
-      "This likely means the model has not successfully been run yet.",
-      sep = "\n"
-    ))
+    rlang::abort(
+      c(
+        glue("Cannot extract data path because no config file exists at `{cfg_path}`"),
+        "i" = "This likely means the model has not successfully been run yet."
+      )
+    )
   }
 
   cfg <- jsonlite::fromJSON(cfg_path)
@@ -196,6 +352,9 @@ get_data_path.bbi_model <- function(.mod, ...) {
   ) %>%
     as.character()
 }
+
+
+
 
 #' Build path to output file
 #'

@@ -149,6 +149,95 @@ test_that("get_data_path parses summary object [BBR-GPFO-017]", {
   expect_identical(readLines(res_data_path, n = 1), DATA_TEST_FIRST_LINE)
 })
 
+test_that("get_data_path parses bbi_*_log_df object", {
+  clean_test_enviroment(create_rlg_models)
+  log_df <- run_log(MODEL_DIR)
+
+  res_data_path <- get_data_path(log_df)
+  expect_identical(res_data_path, rep(DATA_TEST_FILE, nrow(log_df)))
+  expect_identical(readLines(res_data_path[1], n = 1), DATA_TEST_FIRST_LINE)
+
+  # Errors if no config file found and pull_from_config = TRUE
+  # First one executes properly, expect error on second model
+  expect_error(
+    get_data_path(log_df, pull_from_config = TRUE),
+    "In index: 2"
+  )
+})
+
+test_that("get_data_path parses errors informatively", {
+  clean_test_enviroment(create_rlg_models)
+  mod <- read_model(NEW_MOD3)
+
+  # Change relative data path to be one directory off
+  # This would be the correct relative directory if using a `.mod` extension
+  data_path_rel <- get_data_path_from_ctl(mod)
+  path_elements <- unlist(strsplit(data_path_rel, "/"))
+  data_path_rel <- paste(path_elements[-1], collapse = "/")
+
+  # Set $DATA file path to be correct for a `.mod` extension
+  modify_data_path_ctl(ctl_ext(NEW_MOD3), data_path_rel)
+  expect_error(
+    get_data_path(mod),
+    "Your model ends with a `.ctl` extension"
+  )
+
+  # Change to `.mod` extension and check that it now works
+  fs::file_move(ctl_ext(NEW_MOD3), mod_ext(NEW_MOD3))
+  res_data_path <- get_data_path(mod)
+  expect_identical(res_data_path, DATA_TEST_FILE)
+  expect_identical(readLines(res_data_path, n = 1), DATA_TEST_FIRST_LINE)
+
+  # Change to some other directory to get normal error
+  new_data_path <- "directory/doesnt/exist/acop.csv"
+  modify_data_path_ctl(mod_ext(NEW_MOD3), new_data_path)
+  expect_error(
+    get_data_path(mod),
+    "Input data file does not exist or cannot be opened"
+  )
+  get_data_path(mod, .check_exists = FALSE)
+
+  # Confirm expected data path
+  expect_equal(
+    file.path(MODEL_DIR, new_data_path),
+    as.character(fs::path_rel(get_data_path(mod, .check_exists = FALSE)))
+  )
+})
+
+
+test_that("get_data_path can pull from config file", {
+  on.exit(cleanup())
+
+  withr::with_tempdir({
+    temp_dir <-file.path(tempdir(),"basic")
+    fs::dir_copy(system.file("model","nonmem", "basic", package = "bbr"), temp_dir)
+    on.exit(if( fs::dir_exists(file.path(tempdir(), "basic"))) fs::dir_delete(temp_dir))
+
+    # Move model and run directory to another location
+    # Here, the absolute data path as determined by the control stream file
+    # should match the one created from the `bbi.json` file since the relative
+    # paths remain consistent
+    new_mod_path <- file.path(temp_dir, basename(MOD1_PATH))
+    mod <- read_model(new_mod_path)
+    expect_equal(
+      get_data_path(mod, .check_exists = FALSE),
+      get_data_path(mod, .check_exists = FALSE, pull_from_config = TRUE)
+    )
+
+    # overwrite $DATA record of new model
+    data_path_real <- get_data_path(MOD1)
+    modify_data_path_ctl(
+      mod_path = file.path(temp_dir, ctl_ext(basename(MOD1_ABS_PATH))),
+      data_path = basename(data_path_real)
+    )
+
+    # expect mismatch now that the relative paths are different
+    expect_warning(
+      get_data_path(mod, .check_exists = FALSE, pull_from_config = TRUE),
+      "does not match the one defined in the control stream"
+    )
+  })
+})
 
 .test_cases <- c(
   LST_TEST_FILE,

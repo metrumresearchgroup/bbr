@@ -2,16 +2,29 @@
 % Please edit documentation in R/get-path-from-object.R
 \name{get_data_path}
 \alias{get_data_path}
-\alias{get_data_path.bbi_model}
+\alias{get_data_path.bbi_nonmem_model}
+\alias{get_data_path.bbi_nonmem_summary}
+\alias{get_data_path.bbi_log_df}
 \title{Get path to data file}
 \usage{
-get_data_path(.mod, ...)
+get_data_path(.bbi_object, .check_exists = TRUE, pull_from_config = FALSE, ...)
 
-\method{get_data_path}{bbi_model}(.mod, ...)
+\method{get_data_path}{bbi_nonmem_model}(.bbi_object, .check_exists = TRUE, pull_from_config = FALSE, ...)
+
+\method{get_data_path}{bbi_nonmem_summary}(.bbi_object, .check_exists = TRUE, pull_from_config = FALSE, ...)
+
+\method{get_data_path}{bbi_log_df}(.bbi_object, .check_exists = TRUE, pull_from_config = FALSE, ...)
 }
 \arguments{
-\item{.mod}{Model to use, either a \verb{bbi_\{.model_type\}_model} or
-\verb{bbi_\{.model_type\}_summary} object.}
+\item{.bbi_object}{The object to query. Could be
+a \verb{bbi_\{.model_type\}_model} object,
+\verb{bbi_\{.model_type\}_summary} object,
+or a tibble of class \code{bbi_log_df}.}
+
+\item{.check_exists}{If \code{TRUE}, the default, will throw an error if the file does not exist}
+
+\item{pull_from_config}{If \code{TRUE}, pull the data path from \code{bbi.json} created
+during model submission, and compare to the path defined in the control stream.}
 
 \item{...}{Arguments passed through to methods. (Currently none, but may have
 some modifier arguments other model types in the future.)}
@@ -20,13 +33,15 @@ some modifier arguments other model types in the future.)}
 Absolute path to input data file
 }
 \description{
-Helper to extract the path to the input data from a
-\verb{bbi_\{.model_type\}_summary} or \verb{bbi_\{.model_type\}_model} object. Note that
-\strong{this function only works on models that have been successfully run}
-because the path to the data is constructed during model submission.
+Helper to extract the path to the input data from a \code{NONMEM} control stream file.
 }
-\section{Methods (by class)}{
-\itemize{
-\item \code{get_data_path(bbi_model)}: Takes \verb{bbi_\{.model_type\}_model} or \verb{bbi_\{.model_type\}_summary} object
+\details{
+\subsection{Notes on model extensions:}{
 
-}}
+\code{bbi} has different handling for \code{.mod} vs \code{.ctl} extensions for \code{NONMEM}
+models. When a model such as \verb{001.ctl} is targeted with \code{bbi}, \code{bbi} will
+create a new directory called \code{001}, copy the model into it (with a \code{.mod}
+extension), and do the execution directory. For more details, see \code{bbi}'s
+\href{https://github.com/metrumresearchgroup/bbi/blob/main/integration/markdown/expectations.md?plain=1#L19:L21}{documentation}
+}
+}
