@@ -112,7 +112,7 @@ check_up_to_date_nonmem <- function(.mod) {
 
   # check necessary files for changes
   model_file <- get_model_path(.mod)
-  data_file <- get_data_path(.mod)
+  data_file <- get_data_path(.mod, .check_exists = FALSE)
 
   changed_files <- c(
     config[[CONFIG_MODEL_MD5]] != tools::md5sum(model_file),
