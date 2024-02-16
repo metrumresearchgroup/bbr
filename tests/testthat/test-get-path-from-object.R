@@ -161,7 +161,7 @@ test_that("get_data_path parses bbi_*_log_df object", {
   # First one executes properly, expect error on second model
   expect_error(
     get_data_path(log_df, pull_from_config = TRUE),
-    "In index: 2"
+    "Cannot extract data path from config file"
   )
 })
 

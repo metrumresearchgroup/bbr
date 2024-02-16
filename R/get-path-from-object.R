@@ -286,7 +286,7 @@ get_data_path_nonmem <- function(
       rlang::abort(
         c(
           "x" = "Input data file does not exist or cannot be opened",
-          "*" = glue("Referenced input data path: {data_path_rel}"),
+          "i" = glue("Referenced input data path: {data_path_rel}"),
           msg_extra
         )
       )
@@ -298,14 +298,14 @@ get_data_path_nonmem <- function(
     if(data_path != data_path_config){
       rlang::warn(
         c(
-          "!" = paste("Data path referenced in `bbi.json` does not match the",
+          paste("Data path referenced in `bbi.json` does not match the",
                       "one defined in the control stream:"),
-          "*" = glue("Data path extracted from {basename(mod_path)}: {data_path}"),
-          "*" = glue("Data path defined in bbi.json: {data_path_config}")
+          "i" = glue("Data path extracted from {basename(mod_path)}: {data_path}"),
+          "i" = glue("Data path defined in bbi.json: {data_path_config}")
         )
       )
+      return(data_path_config)
     }
-    return(data_path_config)
   }
 
   return(data_path)
@@ -336,7 +336,7 @@ get_data_path_from_json <- function(.mod){
   if (!fs::file_exists(cfg_path)) {
     rlang::abort(
       c(
-        glue("Cannot extract data path because no config file exists at `{cfg_path}`"),
+        glue("Cannot extract data path from config file because none exist at `{cfg_path}`"),
         "i" = "This likely means the model has not successfully been run yet."
       )
     )
