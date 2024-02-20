@@ -264,18 +264,24 @@ get_matrix_opts <- function(.mod){
       if(length(rec_flag_names) == 0){
         mat_opts <- c("diag" = "variance", "off_diag" = "covariance")
       }else{
-        # Handle diagonal
-        if(any(str_detect(rec_flag_names, "standard"))){
-          mat_opts <- c("diag" = "standard")
-        }else{
-          mat_opts <- c("diag" = "variance")
-        }
 
-        # Handle off-diagonal
-        if(any(str_detect(rec_flag_names, "correlation"))){
-          mat_opts <- c(mat_opts, "off_diag" = "correlation")
+        # cholesky is applied to the full matrix
+        if(any(str_detect(rec_flag_names, "cholesky"))){
+          mat_opts <- c("diag" = "cholesky", "off_diag" = "cholesky")
         }else{
-          mat_opts <- c(mat_opts, "off_diag" = "covariance")
+          # Handle diagonal
+          if(any(str_detect(rec_flag_names, "standard"))){
+            mat_opts <- c("diag" = "standard")
+          }else{
+            mat_opts <- c("diag" = "variance")
+          }
+
+          # Handle off-diagonal
+          if(any(str_detect(rec_flag_names, "correlation"))){
+            mat_opts <- c(mat_opts, "off_diag" = "correlation")
+          }else{
+            mat_opts <- c(mat_opts, "off_diag" = "covariance")
+          }
         }
       }
 

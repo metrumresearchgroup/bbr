@@ -34,16 +34,26 @@ validate_matrix_pd <- function(full_mat, digits){
         glue("Reverting to the original {record_type} record")
       )
     )
+    # Replace NULL elements with original matrices
     sub_mats_chkd <- purrr::map2(sub_mats, sub_mats_chkd, function(mat, mat_chkd){
       if(is.null(mat_chkd)) return(mat) else return(mat_chkd)
     })
   }
 
-  # Check that combined 'variance-covariance' matrix is positive-definite
+  # Check that combined 'variance-covariance' matrix is positive-definite when rounding
+  # We revert individual records that could not be made positive-definite above,
+  # but here we need to check the combined matrix, regardless of what happened to
+  # the sub-matrices. Must be checked in the variance-covariance domain.
   mat_var_cat <- purrr::imap(sub_mats_chkd, function(mat, rec_n){
+    # make sub-matrices variance-covariance
     mod_matrix(mat, mat_opt = mat_opts[rec_n,])
   }) %>% Matrix::bdiag() %>% as.matrix()
-  if(!is_positive_definite(fmt_mat_zeros(mat_var_cat)$mat)){
+  # Round and make symmetric
+  mat_var_cat <- signif(fmt_mat_zeros(mat_var_cat)$mat, digits)
+  # Check that combined 'variance-covariance' matrix is positive-definite
+  if(!is_positive_definite(mat_var_cat)){
+    # If sub-matrices were all positive-definite, but combined matrix is not, we
+    # need to look further into it. Shouldn't be possible.
     if(!any(sub_mat_failed_pd)){
       dev_error("Sub matrices were positive-definite, but the combined matrix was not.")
     }
@@ -51,7 +61,7 @@ validate_matrix_pd <- function(full_mat, digits){
   }
 
   # Diagonally concatenate actual sub matrices
-  mat_cat <- as.matrix(Matrix::bdiag(sub_mats_chkd))
+  mat_cat <- as.matrix(Matrix::bdiag(sub_mats_chkd)) %>% signif(digits = digits)
 
   # Get indices of NAs from original matrix to preserve original NAs
   na_mat <- fmt_mat_zeros(full_mat)$na_indices
@@ -125,6 +135,28 @@ mod_matrix <- function(mat, mat_opt, inverse = FALSE){
     if(mat_opt$diag == "standard") diag(mat) else sqrt(diag(mat))
   }else{
     if(mat_opt$diag == "standard") sqrt(diag(mat)) else diag(mat)
+  }
+
+
+  if(mat_opt$diag == "cholesky"){
+    if(!inverse){
+      mat_zero_spec <- fmt_mat_zeros(mat)
+      # Starting with a cholesky matrix
+      # Set current NA values to 0 (if any)
+      # - these matrices are NOT symmetric. Unspecified values are assumed to be 0
+      mat_mod[is.na(mat_mod)] <- 0
+      # Cholesky decomposition: `t(L) %*% L == mat`, where L is `chol(mat)`
+      # We have lower triangular matrices, so we have to reverse the operation
+      # i.e. transpose the second matrix, and not the first.
+      mat_mod <- mat_mod %*% t(mat_mod)
+      mat_mod[mat_zero_spec$na_indices] <- NA
+    }else{
+      mat_zero_spec <- fmt_mat_zeros(mat)
+      # Starting with a variance-covariance matrix
+      # Cholesky decomposition for -lower- triangular matrix
+      mat_mod <- t(Matrix::chol(mat_zero_spec$mat))
+      mat_mod[mat_zero_spec$na_indices] <- NA
+    }
   }
 
   # Modify off-diagonal values between covariance and correlation
