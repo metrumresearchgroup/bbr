@@ -4,13 +4,13 @@
 \alias{check_and_modify_pd}
 \title{Check and modify a matrix for positive-definiteness}
 \usage{
-check_and_modify_pd(mat, corr = FALSE, digits = 3)
+check_and_modify_pd(mat, mat_opt, digits = 3)
 }
 \arguments{
 \item{mat}{a symmetric matrix, or a matrix with only lower triangular values
 specified (assumed to be symmetric).}
 
-\item{corr}{logical indicating if the matrix should be a correlation matrix.}
+\item{mat_opt}{tibble of matrix options}
 
 \item{digits}{Number of significant digits to round estimates to.}
 }

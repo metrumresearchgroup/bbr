@@ -20,8 +20,8 @@ validate_matrix_pd <- function(full_mat, digits){
 
   # Check for positive-definiteness, and attempt to make it positive-definite
   # if not (accounting for rounding)
-  sub_mats_chkd <- purrr::map(sub_mats, function(mat){
-    check_and_modify_pd(mat, digits = digits)
+  sub_mats_chkd <- purrr::imap(sub_mats, function(mat, rec_n){
+    check_and_modify_pd(mat, mat_opt = mat_opts[rec_n,], digits = digits)
   })
 
   # If any are NULL, a positive-definite matrix could not be found
@@ -39,23 +39,25 @@ validate_matrix_pd <- function(full_mat, digits){
     })
   }
 
-  # Get indices of NAs from original matrix
-  na_mat <- fmt_mat_zeros(full_mat)$na_indices
-
-  # Diagonally concatenate sub matrices
-  mat_cat <- as.matrix(Matrix::bdiag(sub_mats_chkd))
-
-  # Check that combined matrix is positive-definite
-  if(is_positive_definite(fmt_mat_zeros(mat_cat)$mat)){
-    # Preserve original NAs
-    mat_cat[na_mat] <- NA
-    return(mat_cat)
-  }else{
+  # Check that combined 'variance-covariance' matrix is positive-definite
+  mat_var_cat <- purrr::imap(sub_mats_chkd, function(mat, rec_n){
+    mod_matrix(mat, mat_opt = mat_opts[rec_n,])
+  }) %>% Matrix::bdiag() %>% as.matrix()
+  if(!is_positive_definite(fmt_mat_zeros(mat_var_cat)$mat)){
     if(!any(sub_mat_failed_pd)){
-      dev_error("Sub matrices were positive-definite, but the combined matrix is not.")
+      dev_error("Sub matrices were positive-definite, but the combined matrix was not.")
     }
     return(NULL)
   }
+
+  # Diagonally concatenate actual sub matrices
+  mat_cat <- as.matrix(Matrix::bdiag(sub_mats_chkd))
+
+  # Get indices of NAs from original matrix to preserve original NAs
+  na_mat <- fmt_mat_zeros(full_mat)$na_indices
+  mat_cat[na_mat] <- NA
+
+  return(mat_cat)
 }
 
 
@@ -63,34 +65,98 @@ validate_matrix_pd <- function(full_mat, digits){
 #'
 #' @param mat a symmetric matrix, or a matrix with only lower triangular values
 #'  specified (assumed to be symmetric).
-#' @param corr logical indicating if the matrix should be a correlation matrix.
+#' @param mat_opt tibble of matrix options
 #' @inheritParams tweak_initial_estimates
 #'
 #' @keywords internal
-check_and_modify_pd <- function(mat, corr = FALSE, digits = 3) {
+check_and_modify_pd <- function(mat, mat_opt, digits = 3) {
+
+  # Make sure only one record was passed in
+  checkmate::assert_true(nrow(mat_opt) == 1)
+
+  # Change to variance-covariance matrix
+  mat_var <- mod_matrix(mat, mat_opt = mat_opt)
 
   # Coerce NA values to 0 for checking positive-definiteness
   # pass in original matrix to determine placement of NA values
-  mat_zero_spec <- fmt_mat_zeros(mat)
-  mat_init <- mat_zero_spec$mat
+  mat_zero_spec <- fmt_mat_zeros(mat_var)
+  mat_var_init <- mat_zero_spec$mat
 
-  # TODO: check if matrix is correlation or covariance matrix, and pass to nearPD
-  if (!is_positive_definite(signif(mat_init, digits))) {
-    mat_init <- Matrix::nearPD(
-      mat_init, base.matrix = TRUE,
-      corr = corr, ensureSymmetry = TRUE)$mat
+  # Check if variance-covariance sub-matrix is positive-definite
+  # Attempt to make positive-definite if not
+  if (!is_positive_definite(signif(mat_var_init, digits))) {
+    mat_var_init <- Matrix::nearPD(
+      mat_var_init, base.matrix = TRUE,
+      corr = FALSE, ensureSymmetry = TRUE)$mat
 
     # Attempt to round matrix if it can still be positive-definite
-    if(is_positive_definite(round(mat_init, digits))){
-      mat_init <- signif(mat_init, digits)
+    if(is_positive_definite(round(mat_var_init, digits))){
+      mat_var_init <- signif(mat_var_init, digits)
     }else{
       return(NULL)
     }
   }
 
+  # Revert matrix to original form
+  mat_init <- mod_matrix(mat_var_init, mat_opt = mat_opt, inverse = TRUE)
+
   # Reset original NA values
   mat_init[mat_zero_spec$na_indices] <- NA
   return(mat_init)
+}
+
+
+#' Modify a matrix to be a variance-covariance matrix, or the inverse operation
+#'
+#' @param mat a matrix
+#' @param mat_opt tibble of matrix options
+#' @param inverse Logical. If `TRUE`, perform the inverse operation. This assumes
+#'  the matrix is currently a variance-covariance matrix.
+#'
+#' @keywords internal
+mod_matrix <- function(mat, mat_opt, inverse = FALSE){
+  # Make sure only one record was passed in
+  # TODO: should this work with a combined matrix for a final check as well?
+  checkmate::assert_true(nrow(mat_opt) == 1)
+  mat_mod <- mat
+
+  # Get standard deviations of diagonals before any modifications
+  diag_std_devs <- if(!inverse){
+    if(mat_opt$diag == "standard") diag(mat) else sqrt(diag(mat))
+  }else{
+    if(mat_opt$diag == "standard") sqrt(diag(mat)) else diag(mat)
+  }
+
+  # Modify off-diagonal values between covariance and correlation
+  if(mat_opt$off_diag == "correlation"){
+    if(!inverse){
+      # Set diagonals to 1 for correlation matrix. This will overwrite the diagonal,
+      # but that's fine since we already tabulated the standard deviations via
+      # the `diag_std_devs` object.
+      diag(mat_mod) <- 1
+      # convert correlation to covariance
+      mat_zero_spec <- fmt_mat_zeros(mat_mod)
+      mat_mod <- diag(diag_std_devs) %*% mat_zero_spec$mat %*% diag(diag_std_devs)
+      # revert NAs
+      mat_mod[mat_zero_spec$na_indices] <- NA
+    }else{
+      # convert covariance to correlation
+      cov_mat <- stats::cov2cor(mat_mod)
+      # only take the off-diagonals, since diagonals are never specified as correlation
+      mat_mod[lower.tri(mat_mod)] <- cov_mat[lower.tri(cov_mat)]
+    }
+  }
+
+  # Modify diagonal values between standard deviation and variance
+  if(mat_opt$diag == "standard"){
+    if(!inverse){
+      diag(mat_mod) <- diag_std_devs^2
+    }else{
+      diag(mat_mod) <- diag_std_devs
+    }
+  }
+
+  return(mat_mod)
 }
 
 
@@ -144,10 +210,8 @@ is_positive_definite <- function(mat){
 fmt_mat_zeros <- function(mat){
   # Store *original* NA indices
   na_indices <- is.na(mat)
-
   # make matrix symmetric
   mat_sym <- make_mat_symmetric(mat)
-
   # Set current NA values to 0 (if any)
   mat_sym[is.na(mat_sym)] <- 0
 
@@ -179,158 +243,5 @@ make_mat_symmetric <- function(mat){
 mat_is_symmetric <- function(mat){
   Matrix::isSymmetric(mat, checkDN = FALSE, tol = 0)
 }
-
-
-
-get_matrix_opts <- function(.mod){
-
-  check_model_object(.mod, "bbi_nonmem_model")
-  ctl <- nmrec::read_ctl(get_model_path(.mod))
-
-  # Function to grab flags
-  get_flag_opts <- function(rec){
-    purrr::keep(rec$values, function(opt){
-      inherits(opt, "nmrec_option_flag") &&
-        !inherits(opt, "nmrec_option_record_name")
-    })
-  }
-
-  # Handling for nested options (diagonal matrix-type records)
-  get_nested <- function(rec){
-    purrr::keep(rec$values, function(opt){
-      inherits(opt, "nmrec_option_nested")
-    })
-  }
-
-  extract_mat_opts <- function(ctl, type = c("omega", "sigma")){
-    type <- match.arg(type)
-    recs <- nmrec::select_records(ctl, type)
-
-    # Handling if record type doesn't exist
-    if(length(recs) == 0){
-      return(
-        tibble::tibble(
-          record_type = type, record_number = NA, mat_type = NA,
-          "diag" = NA, "off_diag" = NA
-        )
-      )
-    }
-
-    mat_types <- get_matrix_types(recs)
-    purrr::imap_dfr(recs, function(rec, rec_num){
-      mat_type <- mat_types[rec_num]
-      if(mat_type == "block"){
-        rec_flags <- get_flag_opts(rec)
-      }else if(mat_type == "diagonal"){
-        rec$parse()
-        nested_recs <- get_nested(rec)
-        rec_flags <- unlist(purrr::map(nested_recs, get_flag_opts))
-      }
-
-      rec_flag_names <- purrr::map_chr(rec_flags, function(rec_flag){
-        rec_flag$name
-      })
-
-      # If no flags found, return defaults
-      if(length(rec_flag_names) == 0){
-        mat_opts <- c("diag" = "variance", "off_diag" = "covariance")
-      }else{
-        # Handle diagonal
-        if(any(str_detect(rec_flag_names, "standard"))){
-          mat_opts <- c("diag" = "standard")
-        }else{
-          mat_opts <- c("diag" = "variance")
-        }
-
-        # Handle off-diagonal
-        if(any(str_detect(rec_flag_names, "correlation"))){
-          mat_opts <- c(mat_opts, "off_diag" = "correlation")
-        }else{
-          mat_opts <- c(mat_opts, "off_diag" = "covariance")
-        }
-      }
-
-      c(record_type = type, record_number = rec_num, mat_type = mat_type, mat_opts)
-    })
-  }
-
-  bind_rows(
-    extract_mat_opts(ctl, "omega"),
-    extract_mat_opts(ctl, "sigma")
-  )
-}
-
-
-#' Get matrix type for omega and sigma records
-#'
-#' @param records Either a list of records, or a single `nmrec_record` object
-#'
-#' @keywords internal
-get_matrix_types <- function(records){
-  if(!inherits(records, "list")) records <- list(records)
-
-  purrr::map_chr(records, function(rec){
-    rec$parse()
-    rec_label <- purrr::keep(rec$values, function(rec_opt){
-      inherits(rec_opt, "nmrec_option_value")
-    })
-
-    if(rlang::is_empty(rec_label)){
-      return("diagonal")
-    }else{
-      rec_label[[1]]$name
-    }
-  })
-}
-
-
-#' Modify a matrix to be a variance-covariance matrix, or the inverse operation
-#'
-#' @param mat a matrix
-#' @param mat_opts tibble of matrix options
-#' @param inverse Logical. If `TRUE`, perform the inverse operation. This assumes
-#'  the matrix is currently a variance-covariance matrix.
-#'
-#' @keywords internal
-mod_matrix <- function(mat, mat_opts, inverse = FALSE){
-  # Make sure only one record was passed in
-  checkmate::assert_true(nrow(mat_opts) == 1)
-  mat_mod <- mat
-
-  diag_std_devs <- if(!inverse){
-    if(mat_opts$diag == "standard") diag(mat) else sqrt(diag(mat))
-  }else{
-    if(mat_opts$diag == "standard") sqrt(diag(mat)) else diag(mat)
-  }
-
-  # Modify diagonal values between standard deviation and variance
-  if(mat_opts$diag == "standard"){
-    if(!inverse){
-      diag(mat_mod) <- sqrt(diag(mat_mod))
-    }else{
-      diag(mat_mod) <- diag(mat_mod)^2
-    }
-  }
-
-  # Modify off-diagonal values between covariance and correlation
-  if(mat_opts$off_diag == "correlation"){
-    if(!inverse){
-      # convert correlation to covariance
-      mat_zero_spec <- fmt_mat_zeros(mat_mod)
-      # cov_matrix = diag(stdDevs)*corr_matrix*diag(stdDevs)
-      mat_mod <- diag(diag_std_devs) %*% mat_zero_spec$mat %*% diag(diag_std_devs)
-      # revert NAs
-      mat_mod[mat_zero_spec$na_indices] <- NA
-    }else{
-      # convert covariance to correlation
-      cov_mat <- stats::cov2cor(mat_mod)
-      # only take the off-diagonals, since diagonals are never specified as correlation
-      mat_mod[lower.tri(mat_mod)] <- cov_mat[lower.tri(cov_mat)]
-    }
-  }
-
-  return(mat_mod)
-}
-
 
 

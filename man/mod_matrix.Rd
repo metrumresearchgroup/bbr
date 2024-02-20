@@ -4,12 +4,12 @@
 \alias{mod_matrix}
 \title{Modify a matrix to be a variance-covariance matrix, or the inverse operation}
 \usage{
-mod_matrix(mat, mat_opts, inverse = FALSE)
+mod_matrix(mat, mat_opt, inverse = FALSE)
 }
 \arguments{
 \item{mat}{a matrix}
 
-\item{mat_opts}{tibble of matrix options}
+\item{mat_opt}{tibble of matrix options}
 
 \item{inverse}{Logical. If \code{TRUE}, perform the inverse operation. This assumes
 the matrix is currently a variance-covariance matrix.}

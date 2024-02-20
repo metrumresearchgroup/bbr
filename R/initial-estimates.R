@@ -189,6 +189,130 @@ matrix_to_df <- function(mat, type = c("omega","sigma")) {
 }
 
 
+#' Get options for matrix-type records
+#'
+#' @details
+#' Returns a tibble indicating the record type and occurrence (`record_number`),
+#' along with the matrix type (diagonal vs block), and value types for both
+#' diagonal (variance vs standard deviation) and off-diagonal (covariance vs
+#' correlation) options.
+#'
+#' ### Example:
+#' ```
+#' > get_matrix_opts(.mod)
+#' # A tibble: 3 × 5
+#' record_type record_number mat_type diag     off_diag
+#' <chr>       <chr>         <chr>    <chr>    <chr>
+#' 1 omega       1             diagonal variance covariance
+#' 2 omega       2             block    standard correlation
+#' 3 sigma       1             diagonal variance covariance
+#' ```
+#'
+#' @inheritParams initial_estimates
+#'
+#' @keywords internal
+get_matrix_opts <- function(.mod){
+
+  check_model_object(.mod, "bbi_nonmem_model")
+  ctl <- nmrec::read_ctl(get_model_path(.mod))
+
+  # Function to grab flags
+  get_flag_opts <- function(rec){
+    purrr::keep(rec$values, function(opt){
+      inherits(opt, "nmrec_option_flag") &&
+        !inherits(opt, "nmrec_option_record_name")
+    })
+  }
+
+  # Handling for nested options (diagonal matrix-type records)
+  get_nested <- function(rec){
+    purrr::keep(rec$values, function(opt){
+      inherits(opt, "nmrec_option_nested")
+    })
+  }
+
+  extract_mat_opts <- function(ctl, type = c("omega", "sigma")){
+    type <- match.arg(type)
+    recs <- nmrec::select_records(ctl, type)
+
+    # Handling if record type doesn't exist
+    if(length(recs) == 0){
+      return(
+        tibble::tibble(
+          record_type = type, record_number = NA, mat_type = NA,
+          "diag" = NA, "off_diag" = NA
+        )
+      )
+    }
+
+    mat_types <- get_matrix_types(recs)
+    purrr::imap_dfr(recs, function(rec, rec_num){
+      mat_type <- mat_types[rec_num]
+      if(mat_type == "block"){
+        rec_flags <- get_flag_opts(rec)
+      }else if(mat_type == "diagonal"){
+        rec$parse()
+        nested_recs <- get_nested(rec)
+        rec_flags <- unlist(purrr::map(nested_recs, get_flag_opts))
+      }
+
+      rec_flag_names <- purrr::map_chr(rec_flags, function(rec_flag){
+        rec_flag$name
+      })
+
+      # If no flags found, return defaults
+      if(length(rec_flag_names) == 0){
+        mat_opts <- c("diag" = "variance", "off_diag" = "covariance")
+      }else{
+        # Handle diagonal
+        if(any(str_detect(rec_flag_names, "standard"))){
+          mat_opts <- c("diag" = "standard")
+        }else{
+          mat_opts <- c("diag" = "variance")
+        }
+
+        # Handle off-diagonal
+        if(any(str_detect(rec_flag_names, "correlation"))){
+          mat_opts <- c(mat_opts, "off_diag" = "correlation")
+        }else{
+          mat_opts <- c(mat_opts, "off_diag" = "covariance")
+        }
+      }
+
+      c(record_type = type, record_number = rec_num, mat_type = mat_type, mat_opts)
+    })
+  }
+
+  bind_rows(
+    extract_mat_opts(ctl, "omega"),
+    extract_mat_opts(ctl, "sigma")
+  )
+}
+
+
+#' Get matrix type for omega and sigma records
+#'
+#' @param records Either a list of records, or a single `nmrec_record` object
+#'
+#' @keywords internal
+get_matrix_types <- function(records){
+  if(!inherits(records, "list")) records <- list(records)
+
+  purrr::map_chr(records, function(rec){
+    rec$parse()
+    rec_label <- purrr::keep(rec$values, function(rec_opt){
+      inherits(rec_opt, "nmrec_option_value")
+    })
+
+    if(rlang::is_empty(rec_label)){
+      return("diagonal")
+    }else{
+      rec_label[[1]]$name
+    }
+  })
+}
+
+
 #' Get record number of initial estimates
 #'
 #' @param inits initial estimates object as returned by `nmrec::extract_*`

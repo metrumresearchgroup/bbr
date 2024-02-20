@@ -92,7 +92,7 @@ tweak_initial_estimates <- function(
     # Set key attributes
     attr(initial_est$omegas, "record_type") <- "omega"
     # Tweak OMEGA
-    new_omegas <- tweak_matrix(initial_est$omegas, .p, digits)
+    new_omegas <- tweak_matrix(init_mat = initial_est$omegas, .p, digits)
     # Update OMEGA Block
     nmrec::set_omega(
       mod_lines, values = new_omegas, representation = "reset",
@@ -104,7 +104,7 @@ tweak_initial_estimates <- function(
     # Set key attributes
     attr(initial_est$sigmas, "record_type") <- "sigma"
     # Tweak SIGMA
-    new_sigmas <- tweak_matrix(initial_est$sigmas, .p, digits)
+    new_sigmas <- tweak_matrix(init_mat = initial_est$sigmas, .p, digits)
     # Update SIGMA Block
     nmrec::set_sigma(
       mod_lines, values = new_sigmas, representation = "reset",
@@ -231,9 +231,12 @@ tweak_thetas <- function(init_thetas, .p, digits){
 #'
 #' @keywords internal
 tweak_matrix <- function(init_mat, .p, digits){
+  # Determine which values we dont want to change (usually just `FIXED`)
   fixed_mat <- attr(init_mat, "nmrec_flags")$fixed
   fixed_mat[is.na(fixed_mat)] <- TRUE
   new_values <- init_mat[!fixed_mat]
+  # TODO: add support for SAME blocks and other record types
+
   # Tweak values
   new_values <- withr::with_preserve_seed(tweak_values(new_values, .p))
   new_mat <- init_mat
