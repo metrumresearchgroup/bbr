@@ -2,7 +2,7 @@
 % Please edit documentation in R/initial-estimates.R
 \name{get_matrix_opts}
 \alias{get_matrix_opts}
-\title{Get options for matrix-type records}
+\title{Get options for all matrix-type records}
 \usage{
 get_matrix_opts(.mod)
 }
@@ -10,22 +10,37 @@ get_matrix_opts(.mod)
 \item{.mod}{a \code{bbr} model object}
 }
 \description{
-Get options for matrix-type records
+Get options for all matrix-type records
 }
 \details{
-Returns a tibble indicating the record type and occurrence (\code{record_number}),
-along with the matrix type (diagonal vs block), and value types for both
-diagonal (variance vs standard deviation) and off-diagonal (covariance vs
-correlation) options.
+Returns a tibble indicating the value types for both diagonal (variance vs
+standard deviation) and off-diagonal (covariance vs correlation) options. If
+cholesky decomposition was used, it will show up as under both the diagonal
+and off diagonal columns.
+\subsection{Columns}{
+\itemize{
+\item \code{record_type}: Either "sigma" or "omega"
+\item \code{record_number}: Order of occurence in control stream file
+\item \code{same}: Whether 'SAME' was used in the matrix-type record
+\item \code{mat_type}: Either "block" or "diagonal"
+\item \code{diag}: variance vs standard deviation, or cholesky
+\item \code{off_diag}: covariance vs correlation, or cholesky
+}
+}
+
 \subsection{Example:}{
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{> get_matrix_opts(.mod)
-# A tibble: 3 × 5
-record_type record_number mat_type diag     off_diag
-<chr>       <chr>         <chr>    <chr>    <chr>
-1 omega       1             diagonal variance covariance
-2 omega       2             block    standard correlation
-3 sigma       1             diagonal variance covariance
+# A tibble: 6 × 6
+  record_type record_number same  mat_type diag     off_diag
+  <chr>       <chr>         <lgl> <chr>    <chr>    <chr>
+1 omega       1             FALSE block    variance covariance
+2 omega       2             TRUE  block    variance covariance
+3 omega       3             FALSE block    standard covariance
+4 omega       4             FALSE block    standard correlation
+5 omega       5             FALSE block    variance correlation
+6 omega       6             FALSE block    cholesky cholesky
+7 sigma       1             FALSE diagonal variance covariance
 }\if{html}{\out{</div>}}
 }
 }

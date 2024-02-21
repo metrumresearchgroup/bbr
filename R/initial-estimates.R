@@ -189,23 +189,35 @@ matrix_to_df <- function(mat, type = c("omega","sigma")) {
 }
 
 
-#' Get options for matrix-type records
+#' Get options for all matrix-type records
 #'
 #' @details
-#' Returns a tibble indicating the record type and occurrence (`record_number`),
-#' along with the matrix type (diagonal vs block), and value types for both
-#' diagonal (variance vs standard deviation) and off-diagonal (covariance vs
-#' correlation) options.
+#' Returns a tibble indicating the value types for both diagonal (variance vs
+#' standard deviation) and off-diagonal (covariance vs correlation) options. If
+#' cholesky decomposition was used, it will show up as under both the diagonal
+#' and off diagonal columns.
+#'
+#' ### Columns
+#'  - `record_type`: Either "sigma" or "omega"
+#'  - `record_number`: Order of occurence in control stream file
+#'  - `same`: Whether 'SAME' was used in the matrix-type record
+#'  - `mat_type`: Either "block" or "diagonal"
+#'  - `diag`: variance vs standard deviation, or cholesky
+#'  - `off_diag`: covariance vs correlation, or cholesky
 #'
 #' ### Example:
 #' ```
 #' > get_matrix_opts(.mod)
-#' # A tibble: 3 × 5
-#' record_type record_number mat_type diag     off_diag
-#' <chr>       <chr>         <chr>    <chr>    <chr>
-#' 1 omega       1             diagonal variance covariance
-#' 2 omega       2             block    standard correlation
-#' 3 sigma       1             diagonal variance covariance
+#' # A tibble: 6 × 6
+#'   record_type record_number same  mat_type diag     off_diag
+#'   <chr>       <chr>         <lgl> <chr>    <chr>    <chr>
+#' 1 omega       1             FALSE block    variance covariance
+#' 2 omega       2             TRUE  block    variance covariance
+#' 3 omega       3             FALSE block    standard covariance
+#' 4 omega       4             FALSE block    standard correlation
+#' 5 omega       5             FALSE block    variance correlation
+#' 6 omega       6             FALSE block    cholesky cholesky
+#' 7 sigma       1             FALSE diagonal variance covariance
 #' ```
 #'
 #' @inheritParams initial_estimates
@@ -260,6 +272,9 @@ get_matrix_opts <- function(.mod){
         rec_flag$name
       })
 
+      # Record if record contains `SAME`
+      same <- ifelse(any(str_detect(rec_flag_names, "same")), TRUE, FALSE)
+
       # If no flags found, return defaults
       if(length(rec_flag_names) == 0){
         mat_opts <- c("diag" = "variance", "off_diag" = "covariance")
@@ -285,7 +300,10 @@ get_matrix_opts <- function(.mod){
         }
       }
 
-      c(record_type = type, record_number = rec_num, mat_type = mat_type, mat_opts)
+      tibble::tibble(
+        record_type = type, record_number = as.character(rec_num), same = same,
+        mat_type = mat_type, diag = mat_opts["diag"], off_diag = mat_opts["off_diag"]
+      )
     })
   }
 
@@ -298,9 +316,12 @@ get_matrix_opts <- function(.mod){
 
 #' Get matrix type for omega and sigma records
 #'
+#' Returns a vector denoting either "block" or "diagonal" for each record.
+#'
 #' @param records Either a list of records, or a single `nmrec_record` object
 #'
-#' @keywords internal
+#' @return a vector
+#' @noRd
 get_matrix_types <- function(records){
   if(!inherits(records, "list")) records <- list(records)
 

@@ -119,9 +119,43 @@ check_and_modify_pd <- function(mat, mat_opt, digits = 3) {
 #' Modify a matrix to be a variance-covariance matrix, or the inverse operation
 #'
 #' @param mat a matrix
-#' @param mat_opt tibble of matrix options
+#' @param mat_opt tibble of matrix options. Should be a single row returned from
+#'   `get_matrix_opts()`
 #' @param inverse Logical. If `TRUE`, perform the inverse operation. This assumes
 #'  the matrix is currently a variance-covariance matrix.
+#'
+#' @details
+#'
+#' ### Example
+#' **Setup:**
+#' ```
+#' # Get initial estimates
+#' initial_est <- get_initial_est(.mod)
+#'
+#' # Get omega matrices from model (one matrix for each record)
+#' sub_mats <- get_sub_mat(initial_est$omegas)
+#'
+#' # Get matrix options
+#' mat_opts <- attr(initial_est$omegas, "mat_opts")
+#' ```
+#'
+#' **Modify the matrices:**
+#' ```
+#' # Make sub-matrices variance-covariance
+#' sub_mats_var <- purrr::imap(sub_mats, function(mat, rec_n){
+#'   mod_matrix(mat, mat_opt = mat_opts[rec_n,])
+#' })
+#'
+#' # Inverse operation
+#' sub_mats_inv <- purrr::imap(mat_var_cat, function(mat, rec_n){
+#'   mod_matrix(mat, mat_opt = mat_opts[rec_n,], inverse = TRUE)
+#' })
+#'
+#' # Inverse operation returns matrices to original format
+#' purrr::walk2(sub_mats_inv, sub_mats, function(mat, mat_orig){
+#'   all.equal(mat_orig, mat)
+#' })
+#' ```
 #'
 #' @keywords internal
 mod_matrix <- function(mat, mat_opt, inverse = FALSE){
