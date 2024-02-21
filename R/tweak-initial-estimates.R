@@ -235,7 +235,6 @@ tweak_matrix <- function(init_mat, .p, digits){
   fixed_mat <- attr(init_mat, "nmrec_flags")$fixed
   fixed_mat[is.na(fixed_mat)] <- TRUE
   new_values <- init_mat[!fixed_mat]
-  # TODO: add support for SAME blocks and other record types
 
   # Tweak values
   new_values <- withr::with_preserve_seed(tweak_values(new_values, .p))

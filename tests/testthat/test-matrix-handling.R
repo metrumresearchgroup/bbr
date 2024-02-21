@@ -1,9 +1,34 @@
 
 
+parse_case_mats <- function(test_case){
+  # Create fake model
+  mod_tweak <- do.call(make_fake_mod, test_case)
+  on.exit(delete_models(mod_tweak, .tags = NULL, .force = TRUE))
+
+  # Get initial estimates
+  initial_est <- get_initial_est(mod_tweak, flag_fixed = TRUE)
+  mat_opts <- attr(initial_est$omegas, "mat_opts")
+
+  # Separate full matrix into sub-matrices per record
+  sub_mats <- get_sub_mat(initial_est$omegas)
+
+  return(
+    list(
+      init_omegas = initial_est$omegas,
+      sub_mats = sub_mats,
+      mat_opts = mat_opts
+    )
+  )
+}
+
 # Note that most of the example records came from the OMEGA help page in the
 # NONMEM docs: nm-help/nm750/html/$omega.htm
 describe("matrix-handling", {
   skip_if_old_nmrec("0.4.0")
+
+  # This test primarily tests `mod_matrix`, `check_and_modify_pd`, and other
+  # helper functions called by those. Edge cases (such as SAME blocks) are tested
+  # elsewhere.
 
   it("supported matrix options", {
     test_case <- list(
@@ -28,12 +53,12 @@ describe("matrix-handling", {
       "
     )
 
-    # Create fake model
-    mod_tweak <- do.call(make_fake_mod, test_case)
-    on.exit(delete_models(mod_tweak, .tags = NULL, .force = TRUE))
+    # Parse test case
+    test_case_results <- parse_case_mats(test_case)
+    sub_mats <- test_case_results$sub_mats
+    mat_opts <- test_case_results$mat_opts
 
     # Confirm extracted matrix options
-    mat_opts <- get_matrix_opts(mod_tweak) %>% dplyr::filter(record_type == "omega")
     expect_equal(
       mat_opts$diag,
       c("variance", "standard", "standard", "variance", "cholesky")
@@ -42,14 +67,6 @@ describe("matrix-handling", {
       mat_opts$off_diag,
       c("covariance", "covariance", "correlation", "correlation", "cholesky")
     )
-
-    # Get initial estimates
-    initial_est <- get_initial_est(mod_tweak, flag_fixed = FALSE)
-    init_omegas <- initial_est$omegas
-    mat_opts <- attr(init_omegas, "mat_opts")
-
-    # Separate full matrix into sub-matrices per record
-    sub_mats <- get_sub_mat(init_omegas)
 
     # make sub-matrices variance-covariance
     sub_mats_var <- purrr::imap(sub_mats, function(mat, rec_n){
@@ -63,13 +80,21 @@ describe("matrix-handling", {
     })
 
     # Reverse operation
-    sub_mats_inv <- purrr::imap(mat_var_cat, function(mat, rec_n){
-      mod_matrix(mat, mat_opt = mat_opts[rec_n,], inverse = TRUE) %>% signif(3)
+    sub_mats_inv <- purrr::imap(sub_mats_var, function(mat, rec_n){
+      mod_matrix(mat, mat_opt = mat_opts[rec_n,], inverse = TRUE) %>% signif(2)
     })
 
-    # Confirm reverse operation works
-    purrr::walk2(sub_mats_inv, sub_mats, function(mat, mat_orig){
-      expect_true(all.equal(mat_orig, mat))
+    purrr::iwalk(sub_mats_inv, function(mat_inv, rec_n){
+      mat_orig <- sub_mats[[rec_n]]
+      # Confirm reverse operation works
+      expect_true(all.equal(signif(mat_orig, 2), mat_inv))
+      # Confirm `check_and_modify_pd` returns to original format
+      expect_true(
+        all.equal(
+          check_and_modify_pd(mat_orig, mat_opt = mat_opts[rec_n,], digits = 2),
+          mat_inv
+        )
+      )
     })
   })
 
@@ -99,15 +124,43 @@ describe("matrix-handling", {
       "
     )
 
-    # Create fake model for test_case1
-    mod_tweak <- do.call(make_fake_mod, test_case1)
-    on.exit(delete_models(mod_tweak, .tags = NULL, .force = TRUE))
+    # Parse test case 1
+    test_case_results1 <- parse_case_mats(test_case1)
+    sub_mats1 <- test_case_results1$sub_mats
+    mat_opts1 <- test_case_results1$mat_opts
+    init_omegas1 <- test_case_results1$init_omegas
 
-    mat_opts <- get_matrix_opts(mod_tweak) %>%
-      dplyr::filter(record_type == "omega")
+    # Parse test case 2
+    test_case_results2 <- parse_case_mats(test_case2)
+    sub_mats2 <- test_case_results2$sub_mats
+    mat_opts2 <- test_case_results2$mat_opts
+    init_omegas2 <- test_case_results2$init_omegas
 
-    # Get initial estimates
-    initial_est <- get_initial_est(mod_tweak, flag_fixed = FALSE)
+    # Final matrices should be identical
+    expect_true(
+      all.equal(
+        validate_matrix_pd(init_omegas1, digits = 3),
+        validate_matrix_pd(init_omegas2, digits = 3)
+      )
+    )
+
+    # Confirm dimensions
+    expect_true(length(sub_mats1) == 2)
+    expect_true(all(purrr::map_lgl(sub_mats1[2], function(.x) all(is.na(.x)))))
+    expect_true(length(sub_mats2) == 4)
+    expect_true(all(purrr::map_lgl(sub_mats2[2:4], function(.x) all(is.na(.x)))))
+
+    # Confirm SAME identification
+    expect_equal(mat_opts1$same, c(FALSE, TRUE))
+    expect_equal(mat_opts1$same_n, c(NA, 3))
+    expect_equal(mat_opts2$same, c(FALSE, TRUE, TRUE, TRUE))
+    expect_equal(mat_opts2$same_n, c(NA, 1, 1, 1))
+
+    # Diagonally concatenate values, while parsing `same` blocks
+    expect_equal(
+      cat_mat_diag(sub_mats1, mat_opts = mat_opts1),
+      cat_mat_diag(sub_mats2, mat_opts = mat_opts2)
+    )
   })
 
   it("supported matrix-type records: value blocks", {
@@ -132,9 +185,17 @@ describe("matrix-handling", {
       "
     )
 
-    # Create fake model for test_case1
-    mod_tweak <- do.call(make_fake_mod, test_case1)
-    on.exit(delete_models(mod_tweak, .tags = NULL, .force = TRUE))
+    # Parse test case 1
+    test_case_results1 <- parse_case_mats(test_case1)
+    sub_mats1 <- test_case_results1$sub_mats
+    mat_opts1 <- test_case_results1$mat_opts
+    init_omegas1 <- test_case_results1$init_omegas
+
+    # Parse test case 2
+    test_case_results2 <- parse_case_mats(test_case2)
+    sub_mats2 <- test_case_results2$sub_mats
+    mat_opts2 <- test_case_results2$mat_opts
+    init_omegas2 <- test_case_results2$init_omegas
 
   })
 

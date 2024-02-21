@@ -10,7 +10,7 @@ mod_matrix(mat, mat_opt, inverse = FALSE)
 \item{mat}{a matrix}
 
 \item{mat_opt}{tibble of matrix options. Should be a single row returned from
-\code{get_matrix_opts()}}
+\code{get_matrix_opts()}.}
 
 \item{inverse}{Logical. If \code{TRUE}, perform the inverse operation. This assumes
 the matrix is currently a variance-covariance matrix.}

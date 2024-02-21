@@ -19,7 +19,7 @@ validate_matrix_pd <- function(full_mat, digits){
   sub_mats <- get_sub_mat(full_mat)
 
   # Check for positive-definiteness, and attempt to make it positive-definite
-  # if not (accounting for rounding)
+  # if not (accounting for rounding). `SAME` records are skipped here.
   sub_mats_chkd <- purrr::imap(sub_mats, function(mat, rec_n){
     check_and_modify_pd(mat, mat_opt = mat_opts[rec_n,], digits = digits)
   })
@@ -44,10 +44,13 @@ validate_matrix_pd <- function(full_mat, digits){
   # We revert individual records that could not be made positive-definite above,
   # but here we need to check the combined matrix, regardless of what happened to
   # the sub-matrices. Must be checked in the variance-covariance domain.
-  mat_var_cat <- purrr::imap(sub_mats_chkd, function(mat, rec_n){
+  sub_mats_var <- purrr::imap(sub_mats_chkd, function(mat, rec_n){
     # make sub-matrices variance-covariance
     mod_matrix(mat, mat_opt = mat_opts[rec_n,])
-  }) %>% Matrix::bdiag() %>% as.matrix()
+  })
+
+  # Diagonally concatenate values, while parsing `same` blocks
+  mat_var_cat <- cat_mat_diag(sub_mats_var, mat_opts = mat_opts)
   # Round and make symmetric
   mat_var_cat <- signif(fmt_mat_zeros(mat_var_cat)$mat, digits)
   # Check that combined 'variance-covariance' matrix is positive-definite
@@ -61,7 +64,8 @@ validate_matrix_pd <- function(full_mat, digits){
   }
 
   # Diagonally concatenate actual sub matrices
-  mat_cat <- as.matrix(Matrix::bdiag(sub_mats_chkd)) %>% signif(digits = digits)
+  # Dont pass `same` vector here, as we want those indices to remain `NA`
+  mat_cat <- cat_mat_diag(sub_mats_chkd) %>% signif(digits = digits)
 
   # Get indices of NAs from original matrix to preserve original NAs
   na_mat <- fmt_mat_zeros(full_mat)$na_indices
@@ -75,7 +79,8 @@ validate_matrix_pd <- function(full_mat, digits){
 #'
 #' @param mat a symmetric matrix, or a matrix with only lower triangular values
 #'  specified (assumed to be symmetric).
-#' @param mat_opt tibble of matrix options
+#' @param mat_opt tibble of matrix options. Should be a single row returned from
+#'   `get_matrix_opts()`.
 #' @inheritParams tweak_initial_estimates
 #'
 #' @keywords internal
@@ -83,6 +88,9 @@ check_and_modify_pd <- function(mat, mat_opt, digits = 3) {
 
   # Make sure only one record was passed in
   checkmate::assert_true(nrow(mat_opt) == 1)
+
+  # Dont handle SAME records
+  if(mat_opt$same) return(mat)
 
   # Change to variance-covariance matrix
   mat_var <- mod_matrix(mat, mat_opt = mat_opt)
@@ -95,20 +103,21 @@ check_and_modify_pd <- function(mat, mat_opt, digits = 3) {
   # Check if variance-covariance sub-matrix is positive-definite
   # Attempt to make positive-definite if not
   if (!is_positive_definite(signif(mat_var_init, digits))) {
-    mat_var_init <- Matrix::nearPD(
-      mat_var_init, base.matrix = TRUE,
-      corr = FALSE, ensureSymmetry = TRUE)$mat
+    mat_var_init <- tryCatch({
+      Matrix::nearPD(
+        mat_var_init, base.matrix = TRUE,
+        corr = FALSE, ensureSymmetry = TRUE)$mat
+    }, error = function(cond) NULL)
 
-    # Attempt to round matrix if it can still be positive-definite
-    if(is_positive_definite(round(mat_var_init, digits))){
-      mat_var_init <- signif(mat_var_init, digits)
-    }else{
+    # Check for positive-definiteness when rounded
+    if(is.null(mat_var_init) || !is_positive_definite(round(mat_var_init, digits))){
       return(NULL)
     }
   }
 
-  # Revert matrix to original form
-  mat_init <- mod_matrix(mat_var_init, mat_opt = mat_opt, inverse = TRUE)
+  # Revert matrix to original form and round
+  mat_init <- mod_matrix(mat_var_init, mat_opt = mat_opt, inverse = TRUE) %>%
+    signif(digits)
 
   # Reset original NA values
   mat_init[mat_zero_spec$na_indices] <- NA
@@ -119,8 +128,7 @@ check_and_modify_pd <- function(mat, mat_opt, digits = 3) {
 #' Modify a matrix to be a variance-covariance matrix, or the inverse operation
 #'
 #' @param mat a matrix
-#' @param mat_opt tibble of matrix options. Should be a single row returned from
-#'   `get_matrix_opts()`
+#' @inheritParams check_and_modify_pd
 #' @param inverse Logical. If `TRUE`, perform the inverse operation. This assumes
 #'  the matrix is currently a variance-covariance matrix.
 #'
@@ -159,10 +167,12 @@ check_and_modify_pd <- function(mat, mat_opt, digits = 3) {
 #'
 #' @keywords internal
 mod_matrix <- function(mat, mat_opt, inverse = FALSE){
+
   # Make sure only one record was passed in
-  # TODO: should this work with a combined matrix for a final check as well?
   checkmate::assert_true(nrow(mat_opt) == 1)
-  mat_mod <- mat
+
+  # Dont handle SAME records
+  if(mat_opt$same) return(mat)
 
   # Get standard deviations of diagonals before any modifications
   diag_std_devs <- if(!inverse){
@@ -171,6 +181,8 @@ mod_matrix <- function(mat, mat_opt, inverse = FALSE){
     if(mat_opt$diag == "standard") sqrt(diag(mat)) else diag(mat)
   }
 
+  # Dont overwrite original matrix
+  mat_mod <- mat
 
   if(mat_opt$diag == "cholesky"){
     if(!inverse){
@@ -245,6 +257,41 @@ get_sub_mat <- function(full_mat){
   return(sub_matrices)
 }
 
+#' Diagonally concatenate a list of matrices
+#'
+#' @param sub_mats a list of matrices to diagonally concatenate
+#' @param mat_opts tibble of matrix options. Should include all rows from
+#'   `get_matrix_opts()` for a given record type (i.e. have one row per element
+#'   of `sub_mats`). If `NULL`, simply concatenate the matrices.
+#'
+#' @noRd
+cat_mat_diag <- function(sub_mats, mat_opts = NULL){
+  if(is.null(mat_opts)){
+    as.matrix(Matrix::bdiag(sub_mats))
+  }else{
+    checkmate::assert_true(length(sub_mats) == nrow(mat_opts))
+
+    sub_mats_new <- sub_mats
+    for(rec_n in seq_along(sub_mats)){
+      same.i <- mat_opts$same[rec_n]
+      same_n.i <- mat_opts$same_n[rec_n]
+      if(isTRUE(same.i) && rec_n == 1){
+        stop("The first record of a given record type, cannot be a `SAME` block")
+      }else if(isTRUE(same.i)){
+        if(same_n.i == 1){
+          sub_mats_new[[rec_n]] <- sub_mats_new[[rec_n-1]]
+        }else{
+          # Replicate previous matrix `same_n.i` number of times
+          same_mats <- replicate(same_n.i, sub_mats_new[[rec_n-1]], simplify = FALSE)
+          # Create combined `same` matrix
+          sub_mats_new[[rec_n]] <- as.matrix(Matrix::bdiag(same_mats))
+        }
+      }
+    }
+    as.matrix(Matrix::bdiag(sub_mats_new))
+  }
+}
+
 
 #' Check if matrix is positive-definite
 #'
@@ -302,7 +349,7 @@ make_mat_symmetric <- function(mat){
 }
 
 #' Check if matrix is symmetric (with no tolerance)
-#'
+#' NOT USED currently
 #' @param mat a square matrix
 #'
 #' @noRd

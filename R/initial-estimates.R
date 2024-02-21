@@ -257,9 +257,9 @@ get_matrix_opts <- function(.mod){
       )
     }
 
-    mat_types <- get_matrix_types(recs)
+    mat_specs <- get_matrix_types(recs)
     purrr::imap_dfr(recs, function(rec, rec_num){
-      mat_type <- mat_types[rec_num]
+      mat_type <- mat_specs$mat_type[rec_num]
       if(mat_type == "block"){
         rec_flags <- get_flag_opts(rec)
       }else if(mat_type == "diagonal"){
@@ -271,9 +271,6 @@ get_matrix_opts <- function(.mod){
       rec_flag_names <- purrr::map_chr(rec_flags, function(rec_flag){
         rec_flag$name
       })
-
-      # Record if record contains `SAME`
-      same <- ifelse(any(str_detect(rec_flag_names, "same")), TRUE, FALSE)
 
       # If no flags found, return defaults
       if(length(rec_flag_names) == 0){
@@ -301,9 +298,9 @@ get_matrix_opts <- function(.mod){
       }
 
       tibble::tibble(
-        record_type = type, record_number = as.character(rec_num), same = same,
-        mat_type = mat_type, diag = mat_opts["diag"], off_diag = mat_opts["off_diag"]
-      )
+        record_type = type, record_number = as.character(rec_num), mat_type = mat_type,
+        diag = mat_opts[["diag"]], off_diag = mat_opts[["off_diag"]],
+      ) %>% dplyr::left_join(mat_specs[rec_num, ], by = c("record_number", "mat_type"))
     })
   }
 
@@ -325,17 +322,39 @@ get_matrix_opts <- function(.mod){
 get_matrix_types <- function(records){
   if(!inherits(records, "list")) records <- list(records)
 
-  purrr::map_chr(records, function(rec){
+  purrr::imap_dfr(records, function(rec, rec_num){
     rec$parse()
     rec_label <- purrr::keep(rec$values, function(rec_opt){
-      inherits(rec_opt, "nmrec_option_value")
+      inherits(rec_opt, "nmrec_option_value") && !is.null(rec_opt$name)
     })
 
-    if(rlang::is_empty(rec_label)){
-      return("diagonal")
+    # Matrix type
+    mat_type <- if(rlang::is_empty(rec_label)){
+      "diagonal"
     }else{
       rec_label[[1]]$name
     }
+
+    # Parse `SAME` option if any
+    same_lbl <- nmrec::get_record_option(rec, "same")
+    same <- ifelse(is.null(same_lbl), FALSE, TRUE)
+    if(isTRUE(same)){
+      if(inherits(same_lbl, "nmrec_option_value")) {
+        same_n <- readr::parse_number(same_lbl$value)
+        if(is.na(same_n)) {
+          rlang::abort(c("Failed to parse same (n) value.", rec$format()))
+        }
+      }else{
+        same_n <- 1L
+      }
+    }else{
+      same_n <- NA
+    }
+
+    tibble::tibble(
+      record_number = as.character(rec_num), mat_type = mat_type,
+      same = same, same_n = same_n
+    )
   })
 }
 

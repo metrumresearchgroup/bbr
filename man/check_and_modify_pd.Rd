@@ -10,7 +10,8 @@ check_and_modify_pd(mat, mat_opt, digits = 3)
 \item{mat}{a symmetric matrix, or a matrix with only lower triangular values
 specified (assumed to be symmetric).}
 
-\item{mat_opt}{tibble of matrix options}
+\item{mat_opt}{tibble of matrix options. Should be a single row returned from
+\code{get_matrix_opts()}.}
 
 \item{digits}{Number of significant digits to round estimates to.}
 }
