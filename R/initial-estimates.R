@@ -191,33 +191,50 @@ matrix_to_df <- function(mat, type = c("omega","sigma")) {
 
 #' Get options for all matrix-type records
 #'
+#' Returns a tibble indicating various specifications for matrix-type records.
+#'
 #' @details
-#' Returns a tibble indicating the value types for both diagonal (variance vs
+#' This function returns the value types for both diagonal (variance vs
 #' standard deviation) and off-diagonal (covariance vs correlation) options. If
 #' cholesky decomposition was used, it will show up as under both the diagonal
-#' and off diagonal columns.
+#' and off diagonal columns. These options are used with `mod_matrix()` to ensure
+#' the matrices are in the correct form before checking for positive-definiteness.
 #'
-#' ### Columns
-#'  - `record_type`: Either "sigma" or "omega"
-#'  - `record_number`: Order of occurence in control stream file
-#'  - `same`: Whether 'SAME' was used in the matrix-type record
-#'  - `mat_type`: Either "block" or "diagonal"
-#'  - `diag`: variance vs standard deviation, or cholesky
-#'  - `off_diag`: covariance vs correlation, or cholesky
+#' This function also tabulates `SAME` specifications, matrix classes ("block" vs
+#' "diagonal"), and the subtype ('plain', 'vpair', or 'values'). These options
+#' are primarily used in `check_and_modify_pd()`, `expand_value_matrix()`, and
+#' `cat_mat_diag()`. For more information, see the column definitions below.
+#'
+#' ### Column Definitions
+#'  - **`record_type`**: Either "sigma" or "omega".
+#'  - **`record_number`**: Order of occurrence in control stream file.
+#'  - **`mat_class`**: Either "block" or "diagonal".
+#'  - **`record_size`**: Size of the record. Would be `n` for a `n x n` matrix.
+#'  - **`subtype`**: Matrix subtype. Either 'plain', 'vpair', or 'values'.
+#'     - `vpair`: Parameter options represent `VALUES(diag,odiag)` pair.
+#'     - `values`: Parameter options contain the form `(0.01)x2 0.1`.
+#'     - `plain`: Parameter options reflect a typical block or diagonal matrix.
+#'  - **`same`**: Whether `'SAME'` was used in the matrix-type record.
+#'  - **`same_n`**: The number of times to duplicate the previous record.
+#'  - **`param_x`**: Only used when `subtype = 'values'`. Denotes the number of
+#'  duplicates for each specified value.
+#'     - For example, for the record `'(0.01)x2 0.1'`, `param_x` would be the
+#'     vector `c(2, 1)`, since the first value repeats twice.
+#'  - **`diag`**: variance vs standard deviation, or cholesky.
+#'  - **`off_diag`**: covariance vs correlation, or cholesky.
 #'
 #' ### Example:
 #' ```
 #' > get_matrix_opts(.mod)
-#' # A tibble: 6 × 6
-#'   record_type record_number same  mat_type diag     off_diag
-#'   <chr>       <chr>         <lgl> <chr>    <chr>    <chr>
-#' 1 omega       1             FALSE block    variance covariance
-#' 2 omega       2             TRUE  block    variance covariance
-#' 3 omega       3             FALSE block    standard covariance
-#' 4 omega       4             FALSE block    standard correlation
-#' 5 omega       5             FALSE block    variance correlation
-#' 6 omega       6             FALSE block    cholesky cholesky
-#' 7 sigma       1             FALSE diagonal variance covariance
+#' # A tibble: 5 × 10
+#' record_type record_number mat_class record_size subtype same  same_n param_x   diag     off_diag
+#' <chr>       <chr>         <chr>           <int> <chr>   <lgl> <lgl>  <list>    <chr>    <chr>
+#' 1 omega       1             block               2 plain   FALSE NA     <int [3]> variance covariance
+#' 2 omega       2             block               2 plain   FALSE NA     <int [3]> standard covariance
+#' 3 omega       3             block               2 plain   FALSE NA     <int [3]> standard correlation
+#' 4 omega       4             block               2 plain   FALSE NA     <int [3]> variance correlation
+#' 5 omega       5             block               2 plain   FALSE NA     <int [3]> cholesky cholesky
+#' 6 sigma       1             diagonal            1 plain   FALSE NA     <int [1]> variance covariance
 #' ```
 #'
 #' @inheritParams initial_estimates
@@ -245,24 +262,36 @@ get_matrix_opts <- function(.mod){
 
   extract_mat_opts <- function(ctl, type = c("omega", "sigma")){
     type <- match.arg(type)
-    recs <- nmrec::select_records(ctl, type)
+    recs <- nmrec::select_records(records = ctl, name = type)
+
+    # Matrix classes and subtypes
+    mat_specs <- get_matrix_types(recs)
 
     # Handling if record type doesn't exist
-    if(length(recs) == 0){
+    if(!length(recs)){
       return(
         tibble::tibble(
-          record_type = type, record_number = NA, mat_type = NA,
-          "diag" = NA, "off_diag" = NA
-        )
+          record_type = type, record_number = NA, mat_class = NA,
+          record_size = NA, "diag" = NA, "off_diag" = NA) %>%
+          dplyr::left_join(mat_specs, by = c("record_number", "mat_class")) %>%
+          dplyr::relocate(c("diag", "off_diag"), .after = dplyr::everything())
       )
     }
 
-    mat_specs <- get_matrix_types(recs)
+    # Get record sizes
+    if(type == "omega"){
+      inits <- nmrec::extract_omega(ctl)
+    }else{
+      inits <- nmrec::extract_sigma(ctl)
+    }
+    record_sizes <- attr(inits, "nmrec_record_size")
+
+    # Tabulate matrix format (diagonal and off-diagonal options)
     purrr::imap_dfr(recs, function(rec, rec_num){
-      mat_type <- mat_specs$mat_type[rec_num]
-      if(mat_type == "block"){
+      mat_class <- mat_specs$mat_class[rec_num]
+      if(mat_class == "block"){
         rec_flags <- get_flag_opts(rec)
-      }else if(mat_type == "diagonal"){
+      }else if(mat_class == "diagonal"){
         rec$parse()
         nested_recs <- get_nested(rec)
         rec_flags <- unlist(purrr::map(nested_recs, get_flag_opts))
@@ -276,7 +305,6 @@ get_matrix_opts <- function(.mod){
       if(length(rec_flag_names) == 0){
         mat_opts <- c("diag" = "variance", "off_diag" = "covariance")
       }else{
-
         # cholesky is applied to the full matrix
         if(any(str_detect(rec_flag_names, "cholesky"))){
           mat_opts <- c("diag" = "cholesky", "off_diag" = "cholesky")
@@ -298,9 +326,11 @@ get_matrix_opts <- function(.mod){
       }
 
       tibble::tibble(
-        record_type = type, record_number = as.character(rec_num), mat_type = mat_type,
-        diag = mat_opts[["diag"]], off_diag = mat_opts[["off_diag"]],
-      ) %>% dplyr::left_join(mat_specs[rec_num, ], by = c("record_number", "mat_type"))
+        record_type = type, record_number = as.character(rec_num),
+        mat_class = mat_class, record_size = record_sizes[rec_num],
+        diag = mat_opts[["diag"]], off_diag = mat_opts[["off_diag"]]) %>%
+        dplyr::left_join(mat_specs[rec_num, ], by = c("record_number", "mat_class")) %>%
+        dplyr::relocate(c("diag", "off_diag"), .after = dplyr::everything())
     })
   }
 
@@ -322,18 +352,24 @@ get_matrix_opts <- function(.mod){
 get_matrix_types <- function(records){
   if(!inherits(records, "list")) records <- list(records)
 
+  if(!length(records)){
+    return(
+      tibble::tibble(
+        record_number = NA, mat_class = NA,
+        subtype = NA, same = NA, same_n = NA
+      )
+    )
+  }
+
   purrr::imap_dfr(records, function(rec, rec_num){
     rec$parse()
-    rec_label <- purrr::keep(rec$values, function(rec_opt){
-      inherits(rec_opt, "nmrec_option_value") && !is.null(rec_opt$name)
-    })
 
-    # Matrix type
-    mat_type <- if(rlang::is_empty(rec_label)){
-      "diagonal"
-    }else{
-      rec_label[[1]]$name
-    }
+    # Matrix class
+    mat_class <- ifelse(
+      is.null(nmrec::get_record_option(rec, "block")),
+      "diagonal", "block"
+    )
+
 
     # Parse `SAME` option if any
     same_lbl <- nmrec::get_record_option(rec, "same")
@@ -351,9 +387,20 @@ get_matrix_types <- function(records){
       same_n <- NA
     }
 
+    # Tabulate matrix subtypes
+    popts <- param_options(rec)
+    if(matrix_is_vpair(popts)){
+      subtype <- "vpair"
+    }else if(matrix_has_values(popts)){
+      subtype <- "values"
+    }else{
+      subtype <- "plain"
+    }
+
     tibble::tibble(
-      record_number = as.character(rec_num), mat_type = mat_type,
-      same = same, same_n = same_n
+      record_number = as.character(rec_num), mat_class = mat_class,
+      subtype = subtype, same = same, same_n = same_n,
+      param_x = list(purrr::map_int(popts, param_x))
     )
   })
 }
@@ -441,4 +488,54 @@ using_old_priors <- function(ctl) {
   }
 
   return(FALSE)
+}
+
+
+
+## The functions below were either taken directly from `nmrec`, or slightly
+## adjusted (except `matrix_has_values`).
+
+#' Return all options for initial estimates
+#' @noRd
+param_options <- function(record) {
+  name <- record[["name"]]
+  purrr::keep(record$get_options(), function(o) {
+    inherits(o, "nmrec_option_nested") && identical(o[["name"]], name)
+  })
+}
+
+#' Do the parameter options represent VALUES(diag,odiag) pair?
+#' @param popts list of options for initial estimates. Output of `param_options()`.
+#' @noRd
+matrix_is_vpair <- function(popts) {
+  length(popts) == 1 &&
+    purrr::some(popts[[1]]$values, function(v) {
+      inherits(v, "nmrec_option") && v[["name"]] == "values"
+    })
+}
+
+
+#' Do the parameter options contain the form (0.01)x2 0.1?
+#' @param popts list of options for initial estimates. Output of `param_options()`.
+#' @noRd
+matrix_has_values <- function(popts){
+  lengths <- purrr::map_int(popts, param_x)
+  return(any(lengths > 1))
+}
+
+#' Get number of inferred values per option.
+#'
+#' In cases where values are specified like `(0.01)x2 0.1`, we would extract `2`
+#' since the value `0.01` is repeated twice.
+#' @inheritParams matrix_has_values
+#' @noRd
+param_x <- function(popt) {
+  xopt <- purrr::keep(popt$values, function(x) {
+    inherits(x, "nmrec_option") && x[["name"]] == "x"
+  })
+  n_opts <- length(xopt)
+  if(!n_opts) return(1L)
+
+  x <- strtoi(xopt[[1]]$value, base = 10)
+  return(x)
 }

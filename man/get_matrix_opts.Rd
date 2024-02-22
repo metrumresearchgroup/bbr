@@ -10,37 +10,56 @@ get_matrix_opts(.mod)
 \item{.mod}{a \code{bbr} model object}
 }
 \description{
-Get options for all matrix-type records
+Returns a tibble indicating various specifications for matrix-type records.
 }
 \details{
-Returns a tibble indicating the value types for both diagonal (variance vs
+This function returns the value types for both diagonal (variance vs
 standard deviation) and off-diagonal (covariance vs correlation) options. If
 cholesky decomposition was used, it will show up as under both the diagonal
-and off diagonal columns.
-\subsection{Columns}{
+and off diagonal columns. These options are used with \code{mod_matrix()} to ensure
+the matrices are in the correct form before checking for positive-definiteness.
+
+This function also tabulates \code{SAME} specifications, matrix classes ("block" vs
+"diagonal"), and the subtype ('plain', 'vpair', or 'values'). These options
+are primarily used in \code{check_and_modify_pd()}, \code{expand_value_matrix()}, and
+\code{cat_mat_diag()}. For more information, see the column definitions below.
+\subsection{Column Definitions}{
 \itemize{
-\item \code{record_type}: Either "sigma" or "omega"
-\item \code{record_number}: Order of occurence in control stream file
-\item \code{same}: Whether 'SAME' was used in the matrix-type record
-\item \code{mat_type}: Either "block" or "diagonal"
-\item \code{diag}: variance vs standard deviation, or cholesky
-\item \code{off_diag}: covariance vs correlation, or cholesky
+\item \strong{\code{record_type}}: Either "sigma" or "omega".
+\item \strong{\code{record_number}}: Order of occurrence in control stream file.
+\item \strong{\code{mat_class}}: Either "block" or "diagonal".
+\item \strong{\code{record_size}}: Size of the record. Would be \code{n} for a \verb{n x n} matrix.
+\item \strong{\code{subtype}}: Matrix subtype. Either 'plain', 'vpair', or 'values'.
+\itemize{
+\item \code{vpair}: Parameter options represent \code{VALUES(diag,odiag)} pair.
+\item \code{values}: Parameter options contain the form \verb{(0.01)x2 0.1}.
+\item \code{plain}: Parameter options reflect a typical block or diagonal matrix.
+}
+\item \strong{\code{same}}: Whether \code{'SAME'} was used in the matrix-type record.
+\item \strong{\code{same_n}}: The number of times to duplicate the previous record.
+\item \strong{\code{param_x}}: Only used when \code{subtype = 'values'}. Denotes the number of
+duplicates for each specified value.
+\itemize{
+\item For example, for the record \code{'(0.01)x2 0.1'}, \code{param_x} would be the
+vector \code{c(2, 1)}, since the first value repeats twice.
+}
+\item \strong{\code{diag}}: variance vs standard deviation, or cholesky.
+\item \strong{\code{off_diag}}: covariance vs correlation, or cholesky.
 }
 }
 
 \subsection{Example:}{
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{> get_matrix_opts(.mod)
-# A tibble: 6 × 6
-  record_type record_number same  mat_type diag     off_diag
-  <chr>       <chr>         <lgl> <chr>    <chr>    <chr>
-1 omega       1             FALSE block    variance covariance
-2 omega       2             TRUE  block    variance covariance
-3 omega       3             FALSE block    standard covariance
-4 omega       4             FALSE block    standard correlation
-5 omega       5             FALSE block    variance correlation
-6 omega       6             FALSE block    cholesky cholesky
-7 sigma       1             FALSE diagonal variance covariance
+# A tibble: 5 × 10
+record_type record_number mat_class record_size subtype same  same_n param_x   diag     off_diag
+<chr>       <chr>         <chr>           <int> <chr>   <lgl> <lgl>  <list>    <chr>    <chr>
+1 omega       1             block               2 plain   FALSE NA     <int [3]> variance covariance
+2 omega       2             block               2 plain   FALSE NA     <int [3]> standard covariance
+3 omega       3             block               2 plain   FALSE NA     <int [3]> standard correlation
+4 omega       4             block               2 plain   FALSE NA     <int [3]> variance correlation
+5 omega       5             block               2 plain   FALSE NA     <int [3]> cholesky cholesky
+6 sigma       1             diagonal            1 plain   FALSE NA     <int [1]> variance covariance
 }\if{html}{\out{</div>}}
 }
 }

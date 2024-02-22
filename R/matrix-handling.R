@@ -45,6 +45,8 @@ validate_matrix_pd <- function(full_mat, digits){
   # but here we need to check the combined matrix, regardless of what happened to
   # the sub-matrices. Must be checked in the variance-covariance domain.
   sub_mats_var <- purrr::imap(sub_mats_chkd, function(mat, rec_n){
+    # Fill additional values for 'vpair' or 'values' subtypes
+    mat <- expand_value_matrix(mat, mat_opt = mat_opts[rec_n,])
     # make sub-matrices variance-covariance
     mod_matrix(mat, mat_opt = mat_opts[rec_n,])
   })
@@ -64,7 +66,7 @@ validate_matrix_pd <- function(full_mat, digits){
   }
 
   # Diagonally concatenate actual sub matrices
-  # Dont pass `same` vector here, as we want those indices to remain `NA`
+  # Dont pass `mat_opt` object here, as we want those indices to remain `NA`
   mat_cat <- cat_mat_diag(sub_mats_chkd) %>% signif(digits = digits)
 
   # Get indices of NAs from original matrix to preserve original NAs
@@ -92,13 +94,17 @@ check_and_modify_pd <- function(mat, mat_opt, digits = 3) {
   # Dont handle SAME records
   if(mat_opt$same) return(mat)
 
-  # Change to variance-covariance matrix
+  # Get NA indices of original matrix
+  na_indices <- fmt_mat_zeros(mat)$na_indices
+
+  # Fill additional values for 'vpair' or 'values' subtypes - see `get_matrix_types`
+  mat <- expand_value_matrix(mat, mat_opt)
+
+  # Change to variance-covariance (var-cov) matrix
   mat_var <- mod_matrix(mat, mat_opt = mat_opt)
 
-  # Coerce NA values to 0 for checking positive-definiteness
-  # pass in original matrix to determine placement of NA values
-  mat_zero_spec <- fmt_mat_zeros(mat_var)
-  mat_var_init <- mat_zero_spec$mat
+  # Coerce NA values to 0 in var-cov matrix to check for positive-definiteness
+  mat_var_init <- fmt_mat_zeros(mat_var)$mat
 
   # Check if variance-covariance sub-matrix is positive-definite
   # Attempt to make positive-definite if not
@@ -120,7 +126,7 @@ check_and_modify_pd <- function(mat, mat_opt, digits = 3) {
     signif(digits)
 
   # Reset original NA values
-  mat_init[mat_zero_spec$na_indices] <- NA
+  mat_init[na_indices] <- NA
   return(mat_init)
 }
 
@@ -238,10 +244,42 @@ mod_matrix <- function(mat, mat_opt, inverse = FALSE){
 }
 
 
+#' Fill additional values for vpair or values subtypes
+#'
+#' @details
+#' See `get_matrix_types` for more information on subtypes
+#' @noRd
+expand_value_matrix <- function(mat, mat_opt){
+  if(mat_opt$subtype == "values"){
+    # Get lower triangular indices from left to right:
+    # Default matrix indexing goes down rows first. We need to go across columns
+    # first to align with the order of `param_x`
+    low_tri_loc <- which(lower.tri(mat, diag = TRUE), arr.ind = TRUE) %>%
+      as.data.frame() %>% dplyr::arrange(.data$row, .data$col) %>% as.matrix()
+
+    # Repeat values and overwrite matrix
+    lower_tri_vals <- mat[low_tri_loc]
+    param_x <- purrr::pluck(mat_opt, "param_x")[[1]]
+    new_lower_tri_vals <- rep(lower_tri_vals[!is.na(lower_tri_vals)], param_x)
+    mat[low_tri_loc] <- new_lower_tri_vals
+  }else if(mat_opt$subtype == "vpair"){
+    diag_val <- diag(mat)[!is.na(diag(mat))]
+    odiag_val <- mat[lower.tri(mat)][!is.na(mat[lower.tri(mat)])]
+    diag(mat) <- diag_val
+    mat[lower.tri(mat)] <- odiag_val
+  }
+
+  return(mat)
+}
+
+
+
+
 #' Separate a matrix into sub matrices
 #'
 #' @inheritParams validate_matrix_pd
 #'
+#' @noRd
 get_sub_mat <- function(full_mat){
   sizes <- attr(full_mat, "nmrec_record_size")
 
@@ -305,7 +343,7 @@ cat_mat_diag <- function(sub_mats, mat_opts = NULL){
 #'
 #' @param mat a square matrix
 #'
-#' @keywords internal
+#' @noRd
 is_positive_definite <- function(mat){
   eigenvalues <- eigen(mat, only.values = TRUE)$values
   # Matrix::chol(mat) could also be a good check
@@ -319,7 +357,7 @@ is_positive_definite <- function(mat){
 #'
 #' @returns a list containing the formatted matrix, and original `NA` indices
 #'
-#' @keywords internal
+#' @noRd
 fmt_mat_zeros <- function(mat){
   # Store *original* NA indices
   na_indices <- is.na(mat)
@@ -348,13 +386,5 @@ make_mat_symmetric <- function(mat){
   return(mat)
 }
 
-#' Check if matrix is symmetric (with no tolerance)
-#' NOT USED currently
-#' @param mat a square matrix
-#'
-#' @noRd
-mat_is_symmetric <- function(mat){
-  Matrix::isSymmetric(mat, checkDN = FALSE, tol = 0)
-}
 
 

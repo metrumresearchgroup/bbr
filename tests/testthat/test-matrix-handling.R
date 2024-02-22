@@ -54,7 +54,7 @@ describe("matrix-handling", {
     )
 
     # Parse test case
-    test_case_results <- parse_case_mats(test_case)
+    test_case_results <- parse_case_mats(test_case = test_case)
     sub_mats <- test_case_results$sub_mats
     mat_opts <- test_case_results$mat_opts
 
@@ -96,6 +96,16 @@ describe("matrix-handling", {
         )
       )
     })
+
+    # Remove attributes from initial omegas to compare to final matrix
+    init_omegas <- test_case_results$init_omegas
+    attributes(init_omegas)[setdiff(names(attributes(init_omegas)), 'dim')] <- NULL
+
+    # Confirm starting matrix is the same as the final one (since nearPD wasnt called)
+    expect_equal(
+      validate_matrix_pd(test_case_results$init_omegas, digits = 3),
+      init_omegas
+    )
   })
 
   it("supported matrix-type records: same blocks", {
@@ -125,13 +135,13 @@ describe("matrix-handling", {
     )
 
     # Parse test case 1
-    test_case_results1 <- parse_case_mats(test_case1)
+    test_case_results1 <- parse_case_mats(test_case = test_case1)
     sub_mats1 <- test_case_results1$sub_mats
     mat_opts1 <- test_case_results1$mat_opts
     init_omegas1 <- test_case_results1$init_omegas
 
     # Parse test case 2
-    test_case_results2 <- parse_case_mats(test_case2)
+    test_case_results2 <- parse_case_mats(test_case = test_case2)
     sub_mats2 <- test_case_results2$sub_mats
     mat_opts2 <- test_case_results2$mat_opts
     init_omegas2 <- test_case_results2$init_omegas
@@ -165,16 +175,16 @@ describe("matrix-handling", {
 
   it("supported matrix-type records: value blocks", {
     test_case1 <- list(
-      case = "value blocks",
+      case = "vpair subtype",
       input_ctl = "
       $OMEGA BLOCK(6) VALUES(0.1,0.01)
       "
     )
 
     test_case2 <- list(
-      case = "value blocks",
+      case = "values subtype",
       input_ctl = "
-      ; is equivalent to above:
+      ; evaluates to the same as above:
       $OMEGA BLOCK(6)
       0.1
       0.01 0.1
@@ -186,17 +196,42 @@ describe("matrix-handling", {
     )
 
     # Parse test case 1
-    test_case_results1 <- parse_case_mats(test_case1)
+    test_case_results1 <- parse_case_mats(test_case = test_case1)
     sub_mats1 <- test_case_results1$sub_mats
     mat_opts1 <- test_case_results1$mat_opts
     init_omegas1 <- test_case_results1$init_omegas
 
     # Parse test case 2
-    test_case_results2 <- parse_case_mats(test_case2)
+    test_case_results2 <- parse_case_mats(test_case = test_case2)
     sub_mats2 <- test_case_results2$sub_mats
     mat_opts2 <- test_case_results2$mat_opts
     init_omegas2 <- test_case_results2$init_omegas
 
+    # Confirm matrix specifications
+    expect_equal(mat_opts1$subtype, "vpair")
+    expect_equal(mat_opts1$param_x[[1]], 1)
+    expect_equal(mat_opts2$subtype, "values")
+    expect_equal(mat_opts2$param_x[[1]], c(1, 1, 1, 2, 1, 3, 1, 4, 1, 5, 1))
+
+    # Check that expanded matrices are identical
+    expect_equal(
+      expand_value_matrix(sub_mats1[[1]], mat_opts1),
+      expand_value_matrix(sub_mats2[[1]], mat_opts2)
+    )
+
+    # Remove attributes from initial omegas to compare to final matrix
+    attributes(init_omegas1)[setdiff(names(attributes(init_omegas1)), 'dim')] <- NULL
+    attributes(init_omegas2)[setdiff(names(attributes(init_omegas2)), 'dim')] <- NULL
+
+    # Confirm starting matrix is the same as the final one (since nearPD wasnt called)
+    expect_equal(
+      validate_matrix_pd(test_case_results1$init_omegas, digits = 3),
+      init_omegas1
+    )
+    expect_equal(
+      validate_matrix_pd(test_case_results2$init_omegas, digits = 3),
+      init_omegas2
+    )
   })
 
 })
