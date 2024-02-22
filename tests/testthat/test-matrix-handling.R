@@ -21,6 +21,14 @@ parse_case_mats <- function(test_case){
   )
 }
 
+# Remove attributes from initial matrix
+rm_mat_attr <- function(mat){
+  attr(mat,"nmrec_record_size") <- NULL
+  attr(mat,"nmrec_flags") <- NULL
+  attr(mat,"mat_opts") <- NULL
+  return(mat)
+}
+
 # Note that most of the example records came from the OMEGA help page in the
 # NONMEM docs: nm-help/nm750/html/$omega.htm
 describe("matrix-handling", {
@@ -57,6 +65,7 @@ describe("matrix-handling", {
     test_case_results <- parse_case_mats(test_case = test_case)
     sub_mats <- test_case_results$sub_mats
     mat_opts <- test_case_results$mat_opts
+    init_omegas <- test_case_results$init_omegas
 
     # Confirm extracted matrix options
     expect_equal(
@@ -97,14 +106,10 @@ describe("matrix-handling", {
       )
     })
 
-    # Remove attributes from initial omegas to compare to final matrix
-    init_omegas <- test_case_results$init_omegas
-    attributes(init_omegas)[setdiff(names(attributes(init_omegas)), 'dim')] <- NULL
-
     # Confirm starting matrix is the same as the final one (since nearPD wasnt called)
     expect_equal(
-      validate_matrix_pd(test_case_results$init_omegas, digits = 3),
-      init_omegas
+      validate_matrix_pd(init_omegas, digits = 3),
+      rm_mat_attr(init_omegas)
     )
   })
 
@@ -219,19 +224,14 @@ describe("matrix-handling", {
       expand_value_matrix(sub_mats2[[1]], mat_opts2)
     )
 
-    # Remove attributes from initial omegas to compare to final matrix
-    attributes(init_omegas1)[setdiff(names(attributes(init_omegas1)), 'dim')] <- NULL
-    attributes(init_omegas2)[setdiff(names(attributes(init_omegas2)), 'dim')] <- NULL
-
     # Confirm starting matrix is the same as the final one (since nearPD wasnt called)
     expect_equal(
-      validate_matrix_pd(test_case_results1$init_omegas, digits = 3),
-      init_omegas1
+      validate_matrix_pd(init_omegas1, digits = 3),
+      rm_mat_attr(init_omegas1)
     )
     expect_equal(
-      validate_matrix_pd(test_case_results2$init_omegas, digits = 3),
-      init_omegas2
+      validate_matrix_pd(init_omegas2, digits = 3),
+      rm_mat_attr(init_omegas2)
     )
   })
-
 })
