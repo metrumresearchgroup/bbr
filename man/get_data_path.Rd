@@ -21,7 +21,8 @@ a \verb{bbi_\{.model_type\}_model} object,
 \verb{bbi_\{.model_type\}_summary} object,
 or a tibble of class \code{bbi_log_df}.}
 
-\item{.check_exists}{If \code{TRUE}, the default, will throw an error if the file does not exist}
+\item{.check_exists}{If \code{TRUE}, the default, will throw an error if the file
+does not exist}
 
 \item{pull_from_config}{If \code{TRUE}, pull the data path from \code{bbi.json} created
 during model submission, and compare to the path defined in the control stream.}
@@ -33,15 +34,20 @@ some modifier arguments other model types in the future.)}
 Absolute path to input data file
 }
 \description{
-Helper to extract the path to the input data from a \code{NONMEM} control stream file.
+Helper to extract the path to the input data from a bbi object.
 }
 \details{
 \subsection{Notes on model extensions:}{
 
 \code{bbi} has different handling for \code{.mod} vs \code{.ctl} extensions for \code{NONMEM}
-models. When a model such as \verb{001.ctl} is targeted with \code{bbi}, \code{bbi} will
-create a new directory called \code{001}, copy the model into it (with a \code{.mod}
-extension), and do the execution directory. For more details, see \code{bbi}'s
+models. \code{bbi} was designed to mimic \code{PsN} behavior. As such, the control
+stream file is first copied to a subdirectory before executing the model. The
+difference is that on copy \code{bbi} adjusts a relative data path for \code{.mod}
+files, adding on a \code{"../"}. Or, said from the user perspective, writers of
+\code{.ctl} files are expected to specify a relative path for the data file
+\strong{one level deeper} than the control stream they're editing.
+
+For more details, see \code{bbi}'s
 \href{https://github.com/metrumresearchgroup/bbi/blob/main/integration/markdown/expectations.md?plain=1#L19:L21}{documentation}
 }
 }

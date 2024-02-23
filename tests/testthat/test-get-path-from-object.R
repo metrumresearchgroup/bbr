@@ -163,6 +163,14 @@ test_that("get_data_path parses bbi_*_log_df object", {
     get_data_path(log_df, pull_from_config = TRUE),
     "Cannot extract data path from config file"
   )
+
+  # Copy output dirs and re-check
+  copy_output_dir(MOD1, NEW_MOD2)
+  copy_output_dir(MOD1, NEW_MOD3)
+  expect_equal(
+    get_data_path(log_df,  pull_from_config = FALSE),
+    get_data_path(log_df,  pull_from_config = TRUE)
+  )
 })
 
 test_that("get_data_path parses errors informatively", {
@@ -195,7 +203,6 @@ test_that("get_data_path parses errors informatively", {
     get_data_path(mod),
     "Input data file does not exist or cannot be opened"
   )
-  get_data_path(mod, .check_exists = FALSE)
 
   # Confirm expected data path
   expect_equal(
@@ -232,9 +239,35 @@ test_that("get_data_path can pull from config file", {
     )
 
     # expect mismatch now that the relative paths are different
-    expect_warning(
+    expect_equal(
+      get_data_path(mod, .check_exists = FALSE),
+      file.path(temp_dir, basename(data_path_real))
+    )
+    expect_equal(
       get_data_path(mod, .check_exists = FALSE, pull_from_config = TRUE),
-      "does not match the one defined in the control stream"
+      "/extdata/acop.csv"
+    )
+
+    # Copy over MOD1 run files to test with .check_exists (so the json can be found)
+    copy_output_dir(mod, file.path(temp_dir, basename(MOD3_ABS_PATH)))
+    expect_error(
+      get_data_path(mod, pull_from_config = TRUE),
+      "Input data file does not exist or cannot be opened"
+    )
+
+    # Copy over data and modify json
+    fs::file_copy(
+      get_data_path(MOD1),
+      file.path(temp_dir, basename(data_path_real))
+    )
+    json <- jsonlite::read_json(file.path(temp_dir, "1", "bbi_config.json"))
+    json$data_path <- "../acop.csv"
+    jsonlite::write_json(json, file.path(temp_dir, "1", "bbi_config.json"))
+
+    # Data paths are equivalent and valid
+    expect_equal(
+      get_data_path(mod, pull_from_config = FALSE),
+      get_data_path(mod, pull_from_config = TRUE)
     )
   })
 })
