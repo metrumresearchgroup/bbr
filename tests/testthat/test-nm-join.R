@@ -1,4 +1,3 @@
-skip_if_not_drone_or_metworx("test-nm-join")
 
 withr::local_options(list(
   bbr.bbi_exe_path = read_bbi_path(),
@@ -16,6 +15,7 @@ test_that("nm_join() works correctly: defaults and model object [BBR-NMJ-001]", 
 })
 
 test_that("nm_join() works correctly: summary object [BBR-NMJ-001]", {
+  skip_if_not_drone_or_metworx("test-nm-join")
   test_df <- nm_join(SUM1, .files = TAB_FILE)
   expect_equal(nrow(test_df), DATA_TEST_ROWS_IGNORE)
   expect_equal(ncol(test_df), DATA_TEST_COLS + TAB_NEW_COLS)
