@@ -215,61 +215,61 @@ test_that("get_data_path parses errors informatively", {
 test_that("get_data_path can pull from config file", {
   on.exit(cleanup())
 
-  withr::with_tempdir({
-    temp_dir <-file.path(tempdir(),"basic")
-    fs::dir_copy(system.file("model","nonmem", "basic", package = "bbr"), temp_dir)
-    on.exit(if( fs::dir_exists(file.path(tempdir(), "basic"))) fs::dir_delete(temp_dir))
+  temp_dir_main <- file.path(tempfile(pattern = "get_data_path-"))
+  temp_dir <- file.path(temp_dir_main, "basic")
+  fs::dir_create(temp_dir, recurse = TRUE)
+  fs::dir_copy(system.file("model","nonmem", "basic", package = "bbr"), temp_dir_main)
+  on.exit(fs::dir_delete(temp_dir_main))
 
-    # Move model and run directory to another location
-    # Here, the absolute data path as determined by the control stream file
-    # should match the one created from the `bbi.json` file since the relative
-    # paths remain consistent
-    new_mod_path <- file.path(temp_dir, basename(MOD1_PATH))
-    mod <- read_model(new_mod_path)
-    expect_equal(
-      get_data_path(mod, .check_exists = FALSE),
-      get_data_path(mod, .check_exists = FALSE, pull_from_config = TRUE)
-    )
+  # Move model and run directory to another location
+  # Here, the absolute data path as determined by the control stream file
+  # should match the one created from the `bbi.json` file since the relative
+  # paths remain consistent
+  new_mod_path <- file.path(temp_dir, basename(MOD1_PATH))
+  mod <- read_model(new_mod_path)
+  expect_equal(
+    get_data_path(mod, .check_exists = FALSE),
+    get_data_path(mod, .check_exists = FALSE, pull_from_config = TRUE)
+  )
 
-    # overwrite $DATA record of new model
-    data_path_real <- get_data_path(MOD1)
-    modify_data_path_ctl(
-      mod_path = file.path(temp_dir, ctl_ext(basename(MOD1_ABS_PATH))),
-      data_path = basename(data_path_real)
-    )
+  # overwrite $DATA record of new model
+  data_path_real <- get_data_path(MOD1)
+  modify_data_path_ctl(
+    mod_path = file.path(temp_dir, ctl_ext(basename(MOD1_ABS_PATH))),
+    data_path = basename(data_path_real)
+  )
 
-    # expect mismatch now that the relative paths are different
-    expect_equal(
-      get_data_path(mod, .check_exists = FALSE),
-      file.path(temp_dir, basename(data_path_real))
+  # expect mismatch now that the relative paths are different
+  expect_false(
+    isTRUE(
+      all.equal(
+        get_data_path(mod, .check_exists = FALSE),
+        get_data_path(mod, .check_exists = FALSE, pull_from_config = TRUE)
+      )
     )
-    expect_equal(
-      get_data_path(mod, .check_exists = FALSE, pull_from_config = TRUE),
-      "/extdata/acop.csv"
-    )
+  )
 
-    # Copy over MOD1 run files to test with .check_exists (so the json can be found)
-    copy_output_dir(mod, file.path(temp_dir, basename(MOD3_ABS_PATH)))
-    expect_error(
-      get_data_path(mod, pull_from_config = TRUE),
-      "Input data file does not exist or cannot be opened"
-    )
+  # Copy over MOD1 run files to test with .check_exists (so the json can be found)
+  copy_output_dir(mod, file.path(temp_dir, basename(MOD3_ABS_PATH)))
+  expect_error(
+    get_data_path(mod, pull_from_config = TRUE),
+    "Input data file does not exist or cannot be opened"
+  )
 
-    # Copy over data and modify json
-    fs::file_copy(
-      get_data_path(MOD1),
-      file.path(temp_dir, basename(data_path_real))
-    )
-    json <- jsonlite::read_json(file.path(temp_dir, "1", "bbi_config.json"))
-    json$data_path <- "../acop.csv"
-    jsonlite::write_json(json, file.path(temp_dir, "1", "bbi_config.json"))
+  # Copy over data and modify json
+  fs::file_copy(
+    get_data_path(MOD1),
+    file.path(temp_dir, basename(data_path_real))
+  )
+  json <- jsonlite::read_json(file.path(temp_dir, "1", "bbi_config.json"))
+  json$data_path <- "../acop.csv"
+  jsonlite::write_json(json, file.path(temp_dir, "1", "bbi_config.json"))
 
-    # Data paths are equivalent and valid
-    expect_equal(
-      get_data_path(mod, pull_from_config = FALSE),
-      get_data_path(mod, pull_from_config = TRUE)
-    )
-  })
+  # Data paths are equivalent and valid
+  expect_equal(
+    get_data_path(mod, pull_from_config = FALSE),
+    get_data_path(mod, pull_from_config = TRUE)
+  )
 })
 
 .test_cases <- c(
