@@ -19,13 +19,16 @@ test_that("nm_file() works: file path [BBR-NMF-001]", {
 })
 
 test_that("nm_grd() works [BBR-NMF-003]", {
-  .d <- nm_grd(MOD1)
-  expect_equal(ncol(.d), MOD1_PARAM_COUNT_FIXED+1)
-  expect_true(nrow(.d) > 5) # this changes enough, not worth testing exactly
-  expect_true(all(
-    names(.d)[1] == "ITERATION",
-    stringr::str_detect(names(.d)[2:ncol(.d)], "THETA|SIGMA|OMEGA")
-  ))
+  skip_if_not_drone_or_metworx("nm_file() summary object")
+  withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
+    .d <- nm_grd(MOD1)
+    expect_equal(ncol(.d), MOD1_PARAM_COUNT_FIXED+1)
+    expect_true(nrow(.d) > 5) # this changes enough, not worth testing exactly
+    expect_true(all(
+      names(.d)[1] == "ITERATION",
+      stringr::str_detect(names(.d)[2:ncol(.d)], "THETA|SIGMA|OMEGA")
+    ))
+  })
 })
 
 test_that("nm_grd() works: .rename=FALSE [BBR-NMF-003]", {
