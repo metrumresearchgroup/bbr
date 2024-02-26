@@ -166,24 +166,26 @@ get_model_id.bbi_model <- function(.mod) {
 #' or a tibble of class `bbi_log_df`.
 #' @param .check_exists If `TRUE`, the default, will throw an error if the file
 #'  does not exist
-#' @param pull_from_config If `TRUE`, pull the data path from `bbi.json` created
-#'  during model submission, and compare to the path defined in the control stream.
 #' @param ... Arguments passed through to methods. (Currently none, but may have
 #'   some modifier arguments other model types in the future.)
 #'
 #' @details
 #'
-#' ### Notes on model extensions:
-#' `bbi` has different handling for `.mod` vs `.ctl` extensions for `NONMEM`
-#' models. `bbi` was designed to mimic `PsN` behavior. As such, the control
-#' stream file is first copied to a subdirectory before executing the model. The
-#' difference is that on copy `bbi` adjusts a relative data path for `.mod`
-#' files, adding on a `"../"`. Or, said from the user perspective, writers of
-#' `.ctl` files are expected to specify a relative path for the data file
-#' **one level deeper** than the control stream they're editing.
+#' ### Notes on NONMEM model extensions
 #'
-#' For more details, see `bbi`'s
-#' [documentation](https://github.com/metrumresearchgroup/bbi/blob/main/integration/markdown/expectations.md?plain=1#L19:L21)
+#' Before executing the model, `bbi` first copies the control stream file to a
+#' subdirectory. Whether a relative path to the data file in the control stream
+#' is adjusted for this change in directory depends on the control stream's file
+#' extension:
+#'
+#'   * For a model with a `.mod` extension, `bbi` automatically adjusts a
+#'     relative data path to make it relative to the _execution_ directory,
+#'     following the behavior of `PsN`.
+#'
+#'   * For a model with a `.ctl` extension, `bbi` does _not_ adjust the data
+#'     path. A relative data path in the control stream must be specified
+#'     **one level deeper** (i.e. with an additional `../`) to account for the
+#'     model being executed in a subdirectory.
 #'
 #'
 #' @return Absolute path to input data file
@@ -199,13 +201,35 @@ get_data_path <- function(
 
 #' @rdname get_data_path
 #' @export
+get_data_path.bbi_model <- function(
+    .bbi_object,
+    .check_exists = TRUE,
+    ...
+){
+  data_path <- get_data_path_from_json(.bbi_object)
+  if(.check_exists){
+    if(!fs::file_exists(data_path)){
+      rlang::abort(
+        c(
+          "x" = "Input data file does not exist or cannot be opened",
+          "i" = glue("Referenced input data path: {data_path}"),
+          msg_extra
+        )
+      )
+    }
+  }
+
+  return(data_path)
+}
+
+#' @rdname get_data_path
+#' @export
 get_data_path.bbi_nonmem_model <- function(
     .bbi_object,
     .check_exists = TRUE,
-    pull_from_config = FALSE,
     ...
 ){
-  get_data_path_nonmem(.bbi_object, .check_exists, pull_from_config, ...)
+  get_data_path_nonmem(.bbi_object, .check_exists, ...)
 }
 
 #' @rdname get_data_path
@@ -213,11 +237,10 @@ get_data_path.bbi_nonmem_model <- function(
 get_data_path.bbi_nonmem_summary <- function(
     .bbi_object,
     .check_exists = TRUE,
-    pull_from_config = FALSE,
     ...
 ){
   .mod <- read_model(.bbi_object$absolute_model_path)
-  get_data_path(.mod, .check_exists, pull_from_config, ...)
+  get_data_path(.mod, .check_exists, ...)
 }
 
 #' @rdname get_data_path
@@ -225,12 +248,11 @@ get_data_path.bbi_nonmem_summary <- function(
 get_data_path.bbi_log_df <- function(
     .bbi_object,
     .check_exists = TRUE,
-    pull_from_config = FALSE,
     ...
 ){
   data_paths <- map_chr(.bbi_object[[ABS_MOD_PATH]], function(.path) {
     .mod <- read_model(.path)
-    get_data_path(.mod, .check_exists, pull_from_config, ...)
+    get_data_path(.mod, .check_exists, ...)
   })
 
   return(data_paths)
@@ -240,59 +262,47 @@ get_data_path.bbi_log_df <- function(
 get_data_path_nonmem <- function(
     .bbi_object,
     .check_exists = TRUE,
-    pull_from_config = FALSE,
     ...
 ){
+  # Get data path as defined in control stream
+  data_path_ctl <- get_data_path_from_ctl(.bbi_object)
+  # Get data path as defined in bbi_config.json
+  data_path_config <- tryCatch(
+    get_data_path_from_json(.bbi_object),
+    error = function(.e) {
+      if(stringr::str_detect(.e$message, "Cannot extract data path")){
+        return(NULL)
+      }else{stop(.e)}
+    }
+  )
 
-  mod_path <- get_model_path(.bbi_object)
-  norm_dir <- if(pull_from_config == TRUE){
-    # Normalize to output directory
-    get_output_dir(.bbi_object, .check_exists = FALSE)
+  if(is.null(data_path_config)) {
+    data_path <- data_path_ctl
   }else{
-    # Normalize to current model directory
-    dirname(get_model_path(.bbi_object, .check_exists = FALSE))
-  }
-
-  if(isTRUE(pull_from_config)){
-    # Get data path as defined in bbi.json
-    data_path_raw <- get_data_path_from_json(.bbi_object)
-    data_path <- fs::path_norm(file.path(norm_dir, data_path_raw)) %>%
-      as.character()
-  }else{
-    # Get data path as defined in control stream
-    data_path_raw <- get_data_path_from_ctl(.bbi_object)
-    data_path_raw_adj <- adjust_data_path_ext(data_path_raw, mod_path)
-    data_path <- fs::path_norm(file.path(norm_dir, data_path_raw_adj)) %>%
-      as.character()
+    # if they're not the same, warn
+    if(data_path_config != data_path_ctl){
+      mod_path <- get_model_path(.bbi_object)
+      rlang::warn(
+        c(
+          paste("Data path referenced in `bbi_config.json` does not match the",
+                "one defined in the control stream:"),
+          "i" = glue("Data path extracted from {basename(mod_path)}: {data_path_ctl}"),
+          "i" = glue("Data path extracted from bbi_config.json: {data_path_config}"),
+          "Preferring config (`bbi_config.json`) path..."
+        )
+      )
+    }
+    data_path <- data_path_config
   }
 
 
   if(.check_exists){
     if(!fs::file_exists(data_path)){
-      msg_extra <- NULL
-      # Check for improper path specification due to extensions
-      if(grepl("ctl", fs::path_ext(mod_path))){
-        data_path_test <- fs::path_norm(file.path(norm_dir, data_path_raw)) %>%
-          as.character()
-        # If data file exists here, this means the user was missing an extra `../`
-        # for `ctl` extensions. Give informative message in this case.
-        if(fs::file_exists(data_path_test)){
-          msg_extra <- c(
-            "i" = paste(
-              "Your model ends with a `.ctl` extension - make sure",
-              "you include an extra `../` in the relative path.",
-              "See `?get_data_path` for details..."
-            )
-          )
-        }
-      }
-
       # The first error message line is what NMTRAN would return in this situation
       rlang::abort(
         c(
           "x" = "Input data file does not exist or cannot be opened",
-          "i" = glue("Referenced input data path: {data_path_raw}"),
-          msg_extra
+          "i" = glue("Referenced input data path: {data_path}")
         )
       )
     }
@@ -305,7 +315,7 @@ get_data_path_nonmem <- function(
 
 #' Get the data path from a control stream file
 #' @noRd
-get_data_path_from_ctl <- function(.mod){
+get_data_path_from_ctl <- function(.mod, normalize = TRUE){
   check_model_object(.mod, "bbi_nonmem_model")
   mod_path <- get_model_path(.mod)
   ctl <- nmrec::read_ctl(mod_path)
@@ -324,16 +334,27 @@ get_data_path_from_ctl <- function(.mod){
   }
 
   # Get file path and remove quotes
-  data_path <- nmrec::get_record_option(data_recs[[1]], "filename")$value
-  data_path <- unquote_filename(data_path)
+  data_path_ctl <- nmrec::get_record_option(data_recs[[1]], "filename")$value
+  data_path_ctl <- unquote_filename(data_path_ctl)
+
+  if(isTRUE(normalize)){
+    # Normalize to current model directory
+    model_dir <- dirname(get_model_path(.mod, .check_exists = FALSE))
+    # Adjust for model extension
+    data_path_ctl_adj <- adjust_data_path_ext(data_path_ctl, mod_path)
+    data_path <- fs::path_norm(file.path(model_dir, data_path_ctl_adj)) %>%
+      as.character()
+  }else{
+    data_path <- data_path_ctl
+  }
 
   return(data_path)
 }
 
 
-#' Get data path as defined in bbi.json
+#' Get data path as defined in bbi_config.json
 #' @noRd
-get_data_path_from_json <- function(.mod){
+get_data_path_from_json <- function(.mod, normalize = TRUE){
   cfg_path <- get_config_path(.mod, .check_exists = FALSE)
 
   if (!fs::file_exists(cfg_path)) {
@@ -346,8 +367,18 @@ get_data_path_from_json <- function(.mod){
   }
 
   cfg <- jsonlite::fromJSON(cfg_path)
+  data_path_config <- cfg[[CONFIG_DATA_PATH]]
 
-  return(cfg[[CONFIG_DATA_PATH]])
+  if(isTRUE(normalize)){
+    # Normalize to output directory
+    output_dir <- get_output_dir(.mod, .check_exists = FALSE)
+    data_path <- fs::path_norm(file.path(output_dir, data_path_config)) %>%
+      as.character()
+  }else{
+    data_path <- data_path_config
+  }
+
+  return(data_path)
 }
 
 #' Adjust the data path based on the model extension

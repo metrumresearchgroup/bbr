@@ -86,6 +86,18 @@ test_that("nm_data() works [BBR-NMF-005]", {
   expect_equal(nrow(.d), DATA_TEST_ROWS)
 })
 
+test_that("nm_data() works without needing to submit the model", {
+  clean_test_enviroment(create_rlg_models)
+  mod <- read_model(NEW_MOD3)
+
+  expect_message({
+    .d <- nm_data(mod)
+  }, regexp = "Reading.+acop")
+
+  expect_equal(ncol(.d), DATA_TEST_COLS)
+  expect_equal(nrow(.d), DATA_TEST_ROWS)
+})
+
 test_that("nm_tab() works [BBR-NMF-006]", {
   .d <- nm_tab(MOD1)
   expect_equal(ncol(.d), 8)

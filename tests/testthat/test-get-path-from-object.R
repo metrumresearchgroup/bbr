@@ -156,58 +156,41 @@ test_that("get_data_path parses bbi_*_log_df object", {
   res_data_path <- get_data_path(log_df)
   expect_identical(res_data_path, rep(DATA_TEST_FILE, nrow(log_df)))
   expect_identical(readLines(res_data_path[1], n = 1), DATA_TEST_FIRST_LINE)
+})
 
-  # Errors if no config file found and pull_from_config = TRUE
-  # First one executes properly, expect error on second model
+test_that("get_data_path works with both model extensions", {
+  clean_test_enviroment(create_rlg_models)
+  mod <- read_model(NEW_MOD3)
+
+  res_data_path <- get_data_path(mod)
+  expect_identical(res_data_path, DATA_TEST_FILE)
+
+  # Change to `.mod` extension
+  fs::file_move(ctl_ext(NEW_MOD3), mod_ext(NEW_MOD3))
   expect_error(
-    get_data_path(log_df, pull_from_config = TRUE),
-    "Cannot extract data path from config file"
+    get_data_path(mod),
+    "Input data file does not exist or cannot be opened"
   )
 
-  # Copy output dirs and re-check
-  copy_output_dir(MOD1, NEW_MOD2)
-  copy_output_dir(MOD1, NEW_MOD3)
-  expect_equal(
-    get_data_path(log_df,  pull_from_config = FALSE),
-    get_data_path(log_df,  pull_from_config = TRUE)
-  )
+  # Set $DATA file path to be correct for a `.mod` extension
+  data_path_ctl <- get_data_path_from_ctl(mod, normalize = FALSE)
+  data_path_ctl_adj <- adjust_data_path_ext(data_path_ctl, mod_path = ctl_ext(NEW_MOD3))
+  modify_data_path_ctl(mod, data_path_ctl_adj)
+
+  res_data_path <- get_data_path(mod)
+  expect_identical(res_data_path, DATA_TEST_FILE)
 })
 
 test_that("get_data_path parses errors informatively", {
   clean_test_enviroment(create_rlg_models)
   mod <- read_model(NEW_MOD3)
 
-  # Change relative data path to be one directory off
-  # This would be the correct relative directory if using a `.mod` extension
-  data_path_rel <- get_data_path_from_ctl(mod)
-  path_elements <- unlist(strsplit(data_path_rel, "/"))
-  data_path_rel <- paste(path_elements[-1], collapse = "/")
-
-  # Set $DATA file path to be correct for a `.mod` extension
-  modify_data_path_ctl(ctl_ext(NEW_MOD3), data_path_rel)
-  expect_error(
-    get_data_path(mod),
-    "Your model ends with a `.ctl` extension"
-  )
-
-  # Change to `.mod` extension and check that it now works
-  fs::file_move(ctl_ext(NEW_MOD3), mod_ext(NEW_MOD3))
-  res_data_path <- get_data_path(mod)
-  expect_identical(res_data_path, DATA_TEST_FILE)
-  expect_identical(readLines(res_data_path, n = 1), DATA_TEST_FIRST_LINE)
-
   # Change to some other directory to get normal error
-  new_data_path <- "directory/doesnt/exist/acop.csv"
-  modify_data_path_ctl(mod_ext(NEW_MOD3), new_data_path)
+  new_data_path <- "../../../../directory/doesnt/exist/acop.csv"
+  modify_data_path_ctl(mod, new_data_path)
   expect_error(
     get_data_path(mod),
     "Input data file does not exist or cannot be opened"
-  )
-
-  # Confirm expected data path
-  expect_equal(
-    file.path(MODEL_DIR, new_data_path),
-    as.character(fs::path_rel(get_data_path(mod, .check_exists = FALSE)))
   )
 })
 
@@ -227,33 +210,29 @@ test_that("get_data_path can pull from config file", {
   # paths remain consistent
   new_mod_path <- file.path(temp_dir, basename(MOD1_PATH))
   mod <- read_model(new_mod_path)
+  # Absolute paths
+  expect_equal(get_data_path_from_ctl(mod), get_data_path_from_json(mod))
+  # Defined paths (equivalent because of .ctl extension)
   expect_equal(
-    get_data_path(mod, .check_exists = FALSE),
-    get_data_path(mod, .check_exists = FALSE, pull_from_config = TRUE)
+    get_data_path_from_ctl(mod, normalize = FALSE),
+    get_data_path_from_json(mod, normalize = FALSE)
   )
 
-  # overwrite $DATA record of new model
+  # Overwrite $DATA record of new model to cause mismatch
   data_path_real <- get_data_path(MOD1)
-  modify_data_path_ctl(
-    mod_path = file.path(temp_dir, ctl_ext(basename(MOD1_ABS_PATH))),
-    data_path = basename(data_path_real)
-  )
+  modify_data_path_ctl(mod, basename(data_path_real))
+  # Expected path defined in ctl
+  expect_equal(get_data_path_from_ctl(mod, normalize = FALSE), basename(data_path_real))
 
-  # expect mismatch now that the relative paths are different
+  # Expect mismatch now that the relative/defined paths are different
   expect_false(
     isTRUE(
-      all.equal(
-        get_data_path(mod, .check_exists = FALSE),
-        get_data_path(mod, .check_exists = FALSE, pull_from_config = TRUE)
-      )
+      all.equal(get_data_path_from_ctl(mod), get_data_path_from_json(mod))
     )
   )
-
-  # Copy over MOD1 run files to test with .check_exists (so the json can be found)
-  copy_output_dir(mod, file.path(temp_dir, basename(MOD3_ABS_PATH)))
-  expect_error(
-    get_data_path(mod, pull_from_config = TRUE),
-    "Input data file does not exist or cannot be opened"
+  expect_warning(
+    get_data_path(mod, .check_exists = FALSE),
+    "does not match the one defined in the control stream"
   )
 
   # Copy over data and modify json
@@ -264,12 +243,11 @@ test_that("get_data_path can pull from config file", {
   json <- jsonlite::read_json(file.path(temp_dir, "1", "bbi_config.json"))
   json$data_path <- "../acop.csv"
   jsonlite::write_json(json, file.path(temp_dir, "1", "bbi_config.json"))
+  # expected json path
+  expect_equal(get_data_path_from_json(mod, normalize = FALSE), json$data_path)
 
-  # Data paths are equivalent and valid
-  expect_equal(
-    get_data_path(mod, pull_from_config = FALSE),
-    get_data_path(mod, pull_from_config = TRUE)
-  )
+  # Data paths are equivalent and valid again
+  expect_equal(get_data_path_from_ctl(mod), get_data_path_from_json(mod))
 })
 
 .test_cases <- c(

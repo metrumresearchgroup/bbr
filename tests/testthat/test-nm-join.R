@@ -1,4 +1,4 @@
-
+skip_if_not_drone_or_metworx("test-nm-join")
 withr::local_options(list(
   bbr.bbi_exe_path = read_bbi_path(),
   bbr.verbose = FALSE
@@ -15,7 +15,6 @@ test_that("nm_join() works correctly: defaults and model object [BBR-NMJ-001]", 
 })
 
 test_that("nm_join() works correctly: summary object [BBR-NMJ-001]", {
-  skip_if_not_drone_or_metworx("test-nm-join")
   test_df <- nm_join(SUM1, .files = TAB_FILE)
   expect_equal(nrow(test_df), DATA_TEST_ROWS_IGNORE)
   expect_equal(ncol(test_df), DATA_TEST_COLS + TAB_NEW_COLS)
@@ -144,13 +143,11 @@ test_that("nm_join(.join_col) works correctly with duplicate cols  [BBR-NMJ-005]
     full_data_path
   )
 
-  # rewrite ctl to point to fake data
-  path_rel <- get_data_path_from_ctl(new_mod)
+  # Rewrite ctl and json to point to fake data
+  path_rel <- get_data_path_from_ctl(new_mod, normalize = FALSE)
   path_new <- file.path(dirname(path_rel), basename(full_data_path))
-  modify_data_path_ctl(
-    get_model_path(new_mod),
-    path_new
-  )
+  modify_data_path_ctl(new_mod, path_new)
+  modify_data_path_json(new_mod, path_new)
 
   # create fake table
   new_tab <- "fake.tab"
@@ -196,11 +193,10 @@ test_that("Confirming unduplicates rows on .join_col [BBR-NMJ-007]",{
       file.path(new_mod_path, "1.tab") %>% read_lines() %>%
         str_replace("2.0000E","1.0000E") %>% write_lines(file.path(new_mod_path, "1.tab"))
 
-      # Rewrite ctl to point to new data
-      modify_data_path_ctl(
-        ctl_ext(new_mod_path),
-        "acop.csv"
-      )
+      # Rewrite ctl and json to point to new data
+      # Rewriting both to silence the warning that paths are different
+      modify_data_path_json(read_model(new_mod_path), "../acop.csv")
+      modify_data_path_ctl(read_model(new_mod_path), "../acop.csv")
 
       # expect duplicate rows in .tab file
       expect_error(new_mod_path %>% nm_join(.files = "1.tab"), "Duplicate rows")

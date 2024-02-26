@@ -2,6 +2,7 @@
 % Please edit documentation in R/get-path-from-object.R
 \name{get_data_path}
 \alias{get_data_path}
+\alias{get_data_path.bbi_model}
 \alias{get_data_path.bbi_nonmem_model}
 \alias{get_data_path.bbi_nonmem_summary}
 \alias{get_data_path.bbi_log_df}
@@ -9,11 +10,13 @@
 \usage{
 get_data_path(.bbi_object, .check_exists = TRUE, pull_from_config = FALSE, ...)
 
-\method{get_data_path}{bbi_nonmem_model}(.bbi_object, .check_exists = TRUE, pull_from_config = FALSE, ...)
+\method{get_data_path}{bbi_model}(.bbi_object, .check_exists = TRUE, ...)
 
-\method{get_data_path}{bbi_nonmem_summary}(.bbi_object, .check_exists = TRUE, pull_from_config = FALSE, ...)
+\method{get_data_path}{bbi_nonmem_model}(.bbi_object, .check_exists = TRUE, ...)
 
-\method{get_data_path}{bbi_log_df}(.bbi_object, .check_exists = TRUE, pull_from_config = FALSE, ...)
+\method{get_data_path}{bbi_nonmem_summary}(.bbi_object, .check_exists = TRUE, ...)
+
+\method{get_data_path}{bbi_log_df}(.bbi_object, .check_exists = TRUE, ...)
 }
 \arguments{
 \item{.bbi_object}{The object to query. Could be
@@ -23,9 +26,6 @@ or a tibble of class \code{bbi_log_df}.}
 
 \item{.check_exists}{If \code{TRUE}, the default, will throw an error if the file
 does not exist}
-
-\item{pull_from_config}{If \code{TRUE}, pull the data path from \code{bbi.json} created
-during model submission, and compare to the path defined in the control stream.}
 
 \item{...}{Arguments passed through to methods. (Currently none, but may have
 some modifier arguments other model types in the future.)}
@@ -37,17 +37,20 @@ Absolute path to input data file
 Helper to extract the path to the input data from a bbi object.
 }
 \details{
-\subsection{Notes on model extensions:}{
+\subsection{Notes on NONMEM model extensions}{
 
-\code{bbi} has different handling for \code{.mod} vs \code{.ctl} extensions for \code{NONMEM}
-models. \code{bbi} was designed to mimic \code{PsN} behavior. As such, the control
-stream file is first copied to a subdirectory before executing the model. The
-difference is that on copy \code{bbi} adjusts a relative data path for \code{.mod}
-files, adding on a \code{"../"}. Or, said from the user perspective, writers of
-\code{.ctl} files are expected to specify a relative path for the data file
-\strong{one level deeper} than the control stream they're editing.
-
-For more details, see \code{bbi}'s
-\href{https://github.com/metrumresearchgroup/bbi/blob/main/integration/markdown/expectations.md?plain=1#L19:L21}{documentation}
+Before executing the model, \code{bbi} first copies the control stream file to a
+subdirectory. Whether a relative path to the data file in the control stream
+is adjusted for this change in directory depends on the control stream's file
+extension:
+\itemize{
+\item For a model with a \code{.mod} extension, \code{bbi} automatically adjusts a
+relative data path to make it relative to the \emph{execution} directory,
+following the behavior of \code{PsN}.
+\item For a model with a \code{.ctl} extension, \code{bbi} does \emph{not} adjust the data
+path. A relative data path in the control stream must be specified
+\strong{one level deeper} (i.e. with an additional \verb{../}) to account for the
+model being executed in a subdirectory.
+}
 }
 }
