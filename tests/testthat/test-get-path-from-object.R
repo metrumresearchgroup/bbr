@@ -181,6 +181,23 @@ test_that("get_data_path works with both model extensions", {
   expect_identical(res_data_path, DATA_TEST_FILE)
 })
 
+test_that("get_data_path_from_ctl works with absolute paths", {
+  clean_test_enviroment(create_rlg_models)
+  mod <- read_model(NEW_MOD3)
+
+  # Store path as normalized to model directory
+  data_path_res <- get_data_path(mod)
+
+  # Set $DATA file path to be be an absolute path
+  modify_data_path_ctl(mod, DATA_TEST_FILE)
+
+  # Confirm path was not normalized and nothing changed
+  expect_true(
+    data_path_res == get_data_path_from_ctl(mod, normalize = FALSE) &&
+      data_path_res == get_data_path(mod)
+  )
+})
+
 test_that("get_data_path parses errors informatively", {
   clean_test_enviroment(create_rlg_models)
   mod <- read_model(NEW_MOD3)
@@ -193,7 +210,6 @@ test_that("get_data_path parses errors informatively", {
     "Input data file does not exist or cannot be opened"
   )
 })
-
 
 test_that("get_data_path can pull from config file", {
   on.exit(cleanup())
@@ -231,20 +247,23 @@ test_that("get_data_path can pull from config file", {
     )
   )
   expect_warning(
-    get_data_path(mod, .check_exists = FALSE),
+    data_path_res <- get_data_path(mod, .check_exists = FALSE),
     "does not match the one defined in the control stream"
   )
+
+  # Check that json path was the one used
+  expect_equal(data_path_res, get_data_path_from_json(mod))
 
   # Copy over data and modify json
   fs::file_copy(
     get_data_path(MOD1),
     file.path(temp_dir, basename(data_path_real))
   )
-  json <- jsonlite::read_json(file.path(temp_dir, "1", "bbi_config.json"))
-  json$data_path <- "../acop.csv"
-  jsonlite::write_json(json, file.path(temp_dir, "1", "bbi_config.json"))
+  json_data_path <- "../acop.csv"
+  modify_data_path_json(mod, json_data_path)
+
   # expected json path
-  expect_equal(get_data_path_from_json(mod, normalize = FALSE), json$data_path)
+  expect_equal(get_data_path_from_json(mod, normalize = FALSE), json_data_path)
 
   # Data paths are equivalent and valid again
   expect_equal(get_data_path_from_ctl(mod), get_data_path_from_json(mod))

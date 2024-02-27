@@ -58,7 +58,7 @@ model being executed in a subdirectory.
 \code{\link[=get_model_id]{get_model_id()}} \code{\link[=get_path_from_object]{get_path_from_object()}} \code{\link[=build_path_from_model]{build_path_from_model()}}
 
 Other \code{NONMEM} model extensions: 
-\code{\link{submit_models}()},
-\code{\link{submit_model}()}
+\code{\link{submit_model}()},
+\code{\link{submit_models}()}
 }
 \concept{\code{NONMEM} model extensions}

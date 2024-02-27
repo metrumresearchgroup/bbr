@@ -190,7 +190,7 @@ get_data_path.bbi_model <- function(
     ...
 ){
   data_path <- get_data_path_from_json(.bbi_object)
-  if(.check_exists){
+  if(isTRUE(.check_exists)){
     if(!fs::file_exists(data_path)){
       rlang::abort(
         c(
@@ -278,7 +278,7 @@ get_data_path_nonmem <- function(
   }
 
 
-  if(.check_exists){
+  if(isTRUE(.check_exists)){
     if(!fs::file_exists(data_path)){
       # The first error message line is what NMTRAN would return in this situation
       rlang::abort(
@@ -310,7 +310,7 @@ get_data_path_from_ctl <- function(.mod, normalize = TRUE){
     rlang::abort(
       c(
         glue::glue("Expected a single data record, but found {n_data}:\n\n"),
-        glue("{recs_fmt}")
+        recs_fmt
       )
     )
   }
@@ -320,12 +320,16 @@ get_data_path_from_ctl <- function(.mod, normalize = TRUE){
   data_path_ctl <- unquote_filename(data_path_ctl)
 
   if(isTRUE(normalize)){
-    # Normalize to current model directory
-    model_dir <- dirname(get_model_path(.mod, .check_exists = FALSE))
     # Adjust for model extension
     data_path_ctl_adj <- adjust_data_path_ext(data_path_ctl, mod_path)
-    data_path <- fs::path_norm(file.path(model_dir, data_path_ctl_adj)) %>%
-      as.character()
+    # Normalize to current model directory if not an absolute path
+    model_dir <- dirname(get_model_path(.mod, .check_exists = FALSE))
+    if(!fs::is_absolute_path(data_path_ctl_adj)){
+      data_path <- fs::path_norm(file.path(model_dir, data_path_ctl_adj)) %>%
+        as.character()
+    }else{
+      data_path <- data_path_ctl_adj
+    }
   }else{
     data_path <- data_path_ctl
   }
@@ -372,7 +376,7 @@ get_data_path_from_json <- function(.mod, normalize = TRUE){
 adjust_data_path_ext <- function(data_path, mod_path){
   checkmate::assert_true(is_valid_nonmem_extension(mod_path))
 
-  if(grepl("ctl", fs::path_ext(mod_path))){
+  if(identical(fs::path_ext(mod_path), "ctl")){
     path_elements <- fs::path_split(data_path)[[1]]
     if (path_elements[1] == "..") {
       data_path_adj <- fs::path_join(path_elements[-1])
