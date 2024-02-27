@@ -73,6 +73,29 @@ model YAML, or specified globally in \code{bbi.yaml}.
 \item \code{submit_models(list)}: Takes a list of \code{bbi_base_model} objects.
 
 }}
+\section{Notes on \code{NONMEM} model extensions}{
+
+
+Before executing the model, \code{bbi} first copies the control stream file to a
+subdirectory. Whether a relative path to the data file in the control stream
+is adjusted for this change in directory depends on the control stream's file
+extension:
+\itemize{
+\item For a model with a \code{.mod} extension, \code{bbi} automatically adjusts a
+relative data path to make it relative to the \emph{execution} directory,
+following the behavior of \code{PsN}.
+\item For a model with a \code{.ctl} extension, \code{bbi} does \emph{not} adjust the data
+path. A relative data path in the control stream must be specified
+\strong{one level deeper} (i.e. with an additional \verb{../}) to account for the
+model being executed in a subdirectory.
+}
+}
+
 \seealso{
 \code{\link[=submit_model]{submit_model()}}
+
+Other \code{NONMEM} model extensions: 
+\code{\link{get_data_path}()},
+\code{\link{submit_model}()}
 }
+\concept{\code{NONMEM} model extensions}

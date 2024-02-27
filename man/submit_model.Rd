@@ -82,6 +82,29 @@ Submits a model to be run by calling out to \code{bbi}.
 \item \code{submit_model(bbi_nonmem_model)}: Takes a \code{bbi_nonmem_model} object.
 
 }}
+\section{Notes on \code{NONMEM} model extensions}{
+
+
+Before executing the model, \code{bbi} first copies the control stream file to a
+subdirectory. Whether a relative path to the data file in the control stream
+is adjusted for this change in directory depends on the control stream's file
+extension:
+\itemize{
+\item For a model with a \code{.mod} extension, \code{bbi} automatically adjusts a
+relative data path to make it relative to the \emph{execution} directory,
+following the behavior of \code{PsN}.
+\item For a model with a \code{.ctl} extension, \code{bbi} does \emph{not} adjust the data
+path. A relative data path in the control stream must be specified
+\strong{one level deeper} (i.e. with an additional \verb{../}) to account for the
+model being executed in a subdirectory.
+}
+}
+
 \seealso{
 \code{\link[=submit_models]{submit_models()}}
+
+Other \code{NONMEM} model extensions: 
+\code{\link{get_data_path}()},
+\code{\link{submit_models}()}
 }
+\concept{\code{NONMEM} model extensions}

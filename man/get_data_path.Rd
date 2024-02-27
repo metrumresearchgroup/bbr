@@ -3,15 +3,29 @@
 \name{get_data_path}
 \alias{get_data_path}
 \alias{get_data_path.bbi_model}
+\alias{get_data_path.bbi_nonmem_model}
+\alias{get_data_path.bbi_nonmem_summary}
+\alias{get_data_path.bbi_log_df}
 \title{Get path to data file}
 \usage{
-get_data_path(.mod, ...)
+get_data_path(.bbi_object, .check_exists = TRUE, ...)
 
-\method{get_data_path}{bbi_model}(.mod, ...)
+\method{get_data_path}{bbi_model}(.bbi_object, .check_exists = TRUE, ...)
+
+\method{get_data_path}{bbi_nonmem_model}(.bbi_object, .check_exists = TRUE, ...)
+
+\method{get_data_path}{bbi_nonmem_summary}(.bbi_object, .check_exists = TRUE, ...)
+
+\method{get_data_path}{bbi_log_df}(.bbi_object, .check_exists = TRUE, ...)
 }
 \arguments{
-\item{.mod}{Model to use, either a \verb{bbi_\{.model_type\}_model} or
-\verb{bbi_\{.model_type\}_summary} object.}
+\item{.bbi_object}{The object to query. Could be
+a \verb{bbi_\{.model_type\}_model} object,
+\verb{bbi_\{.model_type\}_summary} object,
+or a tibble of class \code{bbi_log_df}.}
+
+\item{.check_exists}{If \code{TRUE}, the default, will throw an error if the file
+does not exist}
 
 \item{...}{Arguments passed through to methods. (Currently none, but may have
 some modifier arguments other model types in the future.)}
@@ -20,13 +34,31 @@ some modifier arguments other model types in the future.)}
 Absolute path to input data file
 }
 \description{
-Helper to extract the path to the input data from a
-\verb{bbi_\{.model_type\}_summary} or \verb{bbi_\{.model_type\}_model} object. Note that
-\strong{this function only works on models that have been successfully run}
-because the path to the data is constructed during model submission.
+Helper to extract the path to the input data from a bbi object.
 }
-\section{Methods (by class)}{
-\itemize{
-\item \code{get_data_path(bbi_model)}: Takes \verb{bbi_\{.model_type\}_model} or \verb{bbi_\{.model_type\}_summary} object
+\section{Notes on \code{NONMEM} model extensions}{
 
-}}
+
+Before executing the model, \code{bbi} first copies the control stream file to a
+subdirectory. Whether a relative path to the data file in the control stream
+is adjusted for this change in directory depends on the control stream's file
+extension:
+\itemize{
+\item For a model with a \code{.mod} extension, \code{bbi} automatically adjusts a
+relative data path to make it relative to the \emph{execution} directory,
+following the behavior of \code{PsN}.
+\item For a model with a \code{.ctl} extension, \code{bbi} does \emph{not} adjust the data
+path. A relative data path in the control stream must be specified
+\strong{one level deeper} (i.e. with an additional \verb{../}) to account for the
+model being executed in a subdirectory.
+}
+}
+
+\seealso{
+\code{\link[=get_model_id]{get_model_id()}} \code{\link[=get_path_from_object]{get_path_from_object()}} \code{\link[=build_path_from_model]{build_path_from_model()}}
+
+Other \code{NONMEM} model extensions: 
+\code{\link{submit_model}()},
+\code{\link{submit_models}()}
+}
+\concept{\code{NONMEM} model extensions}

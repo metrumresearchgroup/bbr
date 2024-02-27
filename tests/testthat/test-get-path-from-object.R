@@ -149,6 +149,125 @@ test_that("get_data_path parses summary object [BBR-GPFO-017]", {
   expect_identical(readLines(res_data_path, n = 1), DATA_TEST_FIRST_LINE)
 })
 
+test_that("get_data_path parses bbi_*_log_df object", {
+  clean_test_enviroment(create_rlg_models)
+  log_df <- run_log(MODEL_DIR)
+
+  res_data_path <- get_data_path(log_df)
+  expect_identical(res_data_path, rep(DATA_TEST_FILE, nrow(log_df)))
+  expect_identical(readLines(res_data_path[1], n = 1), DATA_TEST_FIRST_LINE)
+})
+
+test_that("get_data_path works with both model extensions", {
+  clean_test_enviroment(create_rlg_models)
+  mod <- read_model(NEW_MOD3)
+
+  res_data_path <- get_data_path(mod)
+  expect_identical(res_data_path, DATA_TEST_FILE)
+
+  # Change to `.mod` extension
+  fs::file_move(ctl_ext(NEW_MOD3), mod_ext(NEW_MOD3))
+  expect_error(
+    get_data_path(mod),
+    "Input data file does not exist or cannot be opened"
+  )
+
+  # Set $DATA file path to be correct for a `.mod` extension
+  data_path_ctl <- get_data_path_from_ctl(mod, normalize = FALSE)
+  data_path_ctl_adj <- adjust_data_path_ext(data_path_ctl, mod_path = ctl_ext(NEW_MOD3))
+  modify_data_path_ctl(mod, data_path_ctl_adj)
+
+  res_data_path <- get_data_path(mod)
+  expect_identical(res_data_path, DATA_TEST_FILE)
+})
+
+test_that("get_data_path_from_ctl works with absolute paths", {
+  clean_test_enviroment(create_rlg_models)
+  mod <- read_model(NEW_MOD3)
+
+  # Store path as normalized to model directory
+  data_path_res <- get_data_path(mod)
+
+  # Set $DATA file path to be be an absolute path
+  modify_data_path_ctl(mod, DATA_TEST_FILE)
+
+  # Confirm path was not normalized and nothing changed
+  expect_true(
+    data_path_res == get_data_path_from_ctl(mod, normalize = FALSE) &&
+      data_path_res == get_data_path(mod)
+  )
+})
+
+test_that("get_data_path parses errors informatively", {
+  clean_test_enviroment(create_rlg_models)
+  mod <- read_model(NEW_MOD3)
+
+  # Change to some other directory to get normal error
+  new_data_path <- "../../../../directory/doesnt/exist/acop.csv"
+  modify_data_path_ctl(mod, new_data_path)
+  expect_error(
+    get_data_path(mod),
+    "Input data file does not exist or cannot be opened"
+  )
+})
+
+test_that("get_data_path can pull from config file", {
+  on.exit(cleanup())
+
+  temp_dir_main <- file.path(tempfile(pattern = "get_data_path-"))
+  temp_dir <- file.path(temp_dir_main, "basic")
+  fs::dir_create(temp_dir, recurse = TRUE)
+  fs::dir_copy(system.file("model","nonmem", "basic", package = "bbr"), temp_dir_main)
+  on.exit(fs::dir_delete(temp_dir_main))
+
+  # Move model and run directory to another location
+  # Here, the absolute data path as determined by the control stream file
+  # should match the one created from the `bbi.json` file since the relative
+  # paths remain consistent
+  new_mod_path <- file.path(temp_dir, basename(MOD1_PATH))
+  mod <- read_model(new_mod_path)
+  # Absolute paths
+  expect_equal(get_data_path_from_ctl(mod), get_data_path_from_json(mod))
+  # Defined paths (equivalent because of .ctl extension)
+  expect_equal(
+    get_data_path_from_ctl(mod, normalize = FALSE),
+    get_data_path_from_json(mod, normalize = FALSE)
+  )
+
+  # Overwrite $DATA record of new model to cause mismatch
+  data_path_real <- get_data_path(MOD1)
+  modify_data_path_ctl(mod, basename(data_path_real))
+  # Expected path defined in ctl
+  expect_equal(get_data_path_from_ctl(mod, normalize = FALSE), basename(data_path_real))
+
+  # Expect mismatch now that the relative/defined paths are different
+  expect_false(
+    isTRUE(
+      all.equal(get_data_path_from_ctl(mod), get_data_path_from_json(mod))
+    )
+  )
+  expect_warning(
+    data_path_res <- get_data_path(mod, .check_exists = FALSE),
+    "does not match the one defined in the control stream"
+  )
+
+  # Check that json path was the one used
+  expect_equal(data_path_res, get_data_path_from_json(mod))
+
+  # Copy over data and modify json
+  fs::file_copy(
+    get_data_path(MOD1),
+    file.path(temp_dir, basename(data_path_real))
+  )
+  json_data_path <- "../acop.csv"
+  modify_data_path_json(mod, json_data_path)
+
+  # expected json path
+  expect_equal(get_data_path_from_json(mod, normalize = FALSE), json_data_path)
+
+  # Data paths are equivalent and valid again
+  expect_equal(get_data_path_from_ctl(mod), get_data_path_from_json(mod))
+})
 
 .test_cases <- c(
   LST_TEST_FILE,

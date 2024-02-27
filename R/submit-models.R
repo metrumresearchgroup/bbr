@@ -12,6 +12,9 @@
 #' distinct sets of `bbi` arguments passed to the submission calls, either
 #' explicitly through `.bbi_args`, as specified in the `bbi_args` field of the
 #' model YAML, or specified globally in `bbi.yaml`.
+#'
+#' @template nonmem-mod-ext
+#'
 #' @seealso [submit_model()]
 #' @param .mods The model objects to submit.
 #' @inheritParams submit_model

@@ -19,8 +19,7 @@ test_that("nm_file() works: file path [BBR-NMF-001]", {
 })
 
 test_that("nm_grd() works [BBR-NMF-003]", {
-  skip_if_not_drone_or_metworx("test-model-summary")
-
+  skip_if_not_drone_or_metworx("nm_file() summary object")
   withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     .d <- nm_grd(MOD1)
     expect_equal(ncol(.d), MOD1_PARAM_COUNT_FIXED+1)
@@ -81,6 +80,18 @@ test_that("nm_file() with multiple tables swallows fread cleanup warning [BBR-NM
 test_that("nm_data() works [BBR-NMF-005]", {
   expect_message({
     .d <- nm_data(MOD1)
+  }, regexp = "Reading.+acop")
+
+  expect_equal(ncol(.d), DATA_TEST_COLS)
+  expect_equal(nrow(.d), DATA_TEST_ROWS)
+})
+
+test_that("nm_data() works without needing to submit the model", {
+  clean_test_enviroment(create_rlg_models)
+  mod <- read_model(NEW_MOD3)
+
+  expect_message({
+    .d <- nm_data(mod)
   }, regexp = "Reading.+acop")
 
   expect_equal(ncol(.d), DATA_TEST_COLS)

@@ -1,5 +1,4 @@
 skip_if_not_drone_or_metworx("test-nm-join")
-
 withr::local_options(list(
   bbr.bbi_exe_path = read_bbi_path(),
   bbr.verbose = FALSE
@@ -128,7 +127,7 @@ test_that("nm_join(.join_col) works correctly with duplicate cols  [BBR-NMJ-005]
   copy_output_dir(MOD1, new_mod_out)
 
   data_path <- "fake_data.csv"
-  full_data_path <- file.path(get_model_working_directory(MOD1), data_path)
+  full_data_path <- file.path(dirname(get_data_path(MOD1)), data_path)
 
   withr::defer({
     cleanup()
@@ -144,11 +143,11 @@ test_that("nm_join(.join_col) works correctly with duplicate cols  [BBR-NMJ-005]
     full_data_path
   )
 
-  # rewrite config to point to fake data
-  readr::write_lines(
-    paste0('{"data_path":"../', data_path, '"}'),
-    get_config_path(new_mod)
-  )
+  # Rewrite ctl and json to point to fake data
+  path_rel <- get_data_path_from_ctl(new_mod, normalize = FALSE)
+  path_new <- file.path(dirname(path_rel), basename(full_data_path))
+  modify_data_path_ctl(new_mod, path_new)
+  modify_data_path_json(new_mod, path_new)
 
   # create fake table
   new_tab <- "fake.tab"
@@ -163,7 +162,6 @@ test_that("nm_join(.join_col) works correctly with duplicate cols  [BBR-NMJ-005]
   expect_equal(nrow(test_df), DATA_TEST_ROWS_IGNORE)
   expect_equal(ncol(test_df), DATA_TEST_COLS + 2)
   expect_equal(test_df$NUM, test_df$BUM)
-
 })
 
 ########################
@@ -183,30 +181,35 @@ test_that("nm_join() warns on skipping table with wrong number of rows [BBR-NMJ-
 
 test_that("Confirming unduplicates rows on .join_col [BBR-NMJ-007]",{
   withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
-  withr::with_tempdir({
-    fs::dir_copy(system.file("model","nonmem", "basic",package = "bbr"), file.path(tempdir(),"basic"))
-    on.exit(if( fs::dir_exists(file.path(tempdir(), "basic"))) fs::dir_delete(file.path(tempdir(), "basic")))
-    fs::file_copy(system.file("extdata", "acop.csv", package = "bbr"), file.path(tempdir(), "basic", "1"), overwrite = TRUE)
+    withr::with_tempdir({
+      temp_dir <- file.path(tempdir(), "basic")
+      new_mod_path <- file.path(temp_dir, "1")
+      fs::dir_copy(system.file("model","nonmem", "basic", package = "bbr"), temp_dir)
+      on.exit(if(fs::dir_exists(temp_dir)) fs::dir_delete(temp_dir))
+      fs::file_copy(system.file("extdata", "acop.csv", package = "bbr"), temp_dir, overwrite = TRUE)
 
+      # Test duplicate rows in .tab file
+      # Edit Table File to Create Duplicate NUM Row
+      file.path(new_mod_path, "1.tab") %>% read_lines() %>%
+        str_replace("2.0000E","1.0000E") %>% write_lines(file.path(new_mod_path, "1.tab"))
 
-    #Edit Table File to Create Duplicate NUM Row
-    file.path(tempdir(), "basic", "1", "1.tab") %>% read_lines() %>%
-      str_replace("2.0000E","1.0000E") %>% write_lines(file.path(tempdir(), "basic", "1", "1.tab"))
+      # Rewrite ctl and json to point to new data
+      # Rewriting both to silence the warning that paths are different
+      modify_data_path_json(read_model(new_mod_path), "../acop.csv")
+      modify_data_path_ctl(read_model(new_mod_path), "../acop.csv")
 
-    json <- jsonlite::read_json(file.path(tempdir(), "basic", "1", "bbi_config.json"))
+      # expect duplicate rows in .tab file
+      expect_error(new_mod_path %>% nm_join(.files = "1.tab"), "Duplicate rows")
 
-    json$data_path <- "acop.csv"
+      # Test duplicate rows in input data
+      fs::file_copy(system.file("model","nonmem", "basic","1", "1.tab", package = "bbr"),
+                    file.path(new_mod_path, "1.tab"), overwrite = TRUE)
+      .d <- readr::read_csv(file.path(temp_dir, "acop.csv"))
+      .d$num[2] <- 1
+      readr::write_csv(.d, file.path(temp_dir, "acop.csv"))
 
-    jsonlite::write_json(json,file.path(tempdir(), "basic", "1", "bbi_config.json"))
-
-    expect_error(file.path(tempdir(), "basic", "1") %>% nm_join(.files = "1.tab"), "Duplicate rows")
-
-    fs::file_copy(system.file("model","nonmem", "basic","1", "1.tab",package = "bbr"),
-                  file.path(tempdir(), "basic", "1", "1.tab"), overwrite = TRUE)
-    .d <- readr::read_csv(file.path(tempdir(), "basic", "1", "acop.csv"))
-    .d$num[2] <- 1
-    readr::write_csv(.d, file.path(tempdir(), "basic", "1", "acop.csv"))
-
-    expect_error(file.path(tempdir(), "basic", "1") %>% nm_join(.files = "1.tab"), "Duplicate rows")
-
-  })})})
+      # expect duplicate rows in input data
+      expect_error(new_mod_path %>% nm_join(.files = "1.tab"), "Duplicate rows")
+    })
+  })
+})

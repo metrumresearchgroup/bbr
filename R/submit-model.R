@@ -21,6 +21,8 @@
 #' configuration of the run. See [config_log()] for more details about this
 #' file.
 #'
+#' @template nonmem-mod-ext
+#'
 #' @seealso [submit_models()]
 #' @param .mod The model object to submit.
 #' @param .bbi_args A named list specifying arguments to pass to bbi

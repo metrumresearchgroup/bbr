@@ -28,7 +28,8 @@ test_that("check_up_to_date.bbi_nonmem_model() with mismatched data [BBR-CUTD-00
 })
 
 test_that("check_up_to_date.bbi_nonmem_model() with missing data [BBR-CUTD-004]", {
-  temp_mod_path <- create_temp_model()
+  mod_content <- readLines(ctl_ext(MOD1_PATH)) %>% paste(collapse = "\n")
+  temp_mod_path <- create_temp_model(mod_content = mod_content)
   new_mod <- read_model(temp_mod_path)
   fs::dir_copy(get_output_dir(MOD1), get_output_dir(new_mod, .check_exists = F))
   on.exit(fs::dir_delete(get_output_dir(new_mod)))
