@@ -8,7 +8,7 @@
 \alias{get_data_path.bbi_log_df}
 \title{Get path to data file}
 \usage{
-get_data_path(.bbi_object, .check_exists = TRUE, pull_from_config = FALSE, ...)
+get_data_path(.bbi_object, .check_exists = TRUE, ...)
 
 \method{get_data_path}{bbi_model}(.bbi_object, .check_exists = TRUE, ...)
 
@@ -36,8 +36,8 @@ Absolute path to input data file
 \description{
 Helper to extract the path to the input data from a bbi object.
 }
-\details{
-\subsection{Notes on NONMEM model extensions}{
+\section{Notes on \code{NONMEM} model extensions}{
+
 
 Before executing the model, \code{bbi} first copies the control stream file to a
 subdirectory. Whether a relative path to the data file in the control stream
@@ -53,4 +53,12 @@ path. A relative data path in the control stream must be specified
 model being executed in a subdirectory.
 }
 }
+
+\seealso{
+\code{\link[=get_model_id]{get_model_id()}} \code{\link[=get_path_from_object]{get_path_from_object()}} \code{\link[=build_path_from_model]{build_path_from_model()}}
+
+Other \code{NONMEM} model extensions: 
+\code{\link{submit_models}()},
+\code{\link{submit_model}()}
 }
+\concept{\code{NONMEM} model extensions}

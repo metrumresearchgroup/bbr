@@ -169,31 +169,14 @@ get_model_id.bbi_model <- function(.mod) {
 #' @param ... Arguments passed through to methods. (Currently none, but may have
 #'   some modifier arguments other model types in the future.)
 #'
-#' @details
-#'
-#' ### Notes on NONMEM model extensions
-#'
-#' Before executing the model, `bbi` first copies the control stream file to a
-#' subdirectory. Whether a relative path to the data file in the control stream
-#' is adjusted for this change in directory depends on the control stream's file
-#' extension:
-#'
-#'   * For a model with a `.mod` extension, `bbi` automatically adjusts a
-#'     relative data path to make it relative to the _execution_ directory,
-#'     following the behavior of `PsN`.
-#'
-#'   * For a model with a `.ctl` extension, `bbi` does _not_ adjust the data
-#'     path. A relative data path in the control stream must be specified
-#'     **one level deeper** (i.e. with an additional `../`) to account for the
-#'     model being executed in a subdirectory.
-#'
+#' @template nonmem-mod-ext
+#' @seealso [get_model_id()] [get_path_from_object()] [build_path_from_model()]
 #'
 #' @return Absolute path to input data file
 #' @export
 get_data_path <- function(
     .bbi_object,
     .check_exists = TRUE,
-    pull_from_config = FALSE,
     ...
 ){
   UseMethod("get_data_path")
@@ -212,8 +195,7 @@ get_data_path.bbi_model <- function(
       rlang::abort(
         c(
           "x" = "Input data file does not exist or cannot be opened",
-          "i" = glue("Referenced input data path: {data_path}"),
-          msg_extra
+          "i" = glue("Referenced input data path: {data_path}")
         )
       )
     }
