@@ -16,7 +16,8 @@
   
 * `get_data_path()` can now pull from the control stream file if the model
   has not yet been submitted. This allows functions like `nm_data()` to be used
-  pre-model submission. (#664)
+  pre-model submission. Support for `bbi_log_df` methods and a new 
+  `.check_exists` argument (defaults to `TRUE`) have also been added. (#664)
 
 # bbr 1.9.0
 
