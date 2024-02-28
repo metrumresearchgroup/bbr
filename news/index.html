@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.9.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.10.0</span>
       </span>
     </div>
 
@@ -69,6 +69,16 @@
       <small>Source: <a href="https://github.com/metrumresearchgroup/bbr/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="1.10.0" id="bbr-1100">bbr 1.10.0<a class="anchor" aria-label="anchor" href="#bbr-1100"></a></h2>
+<div class="section level3">
+<h3 id="new-features-and-changes-1-10-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-1-10-0"></a></h3>
+<ul><li><p>When passed an <code>nmbayes</code> model (defined by the <code>bbr.bayes</code> package), <code><a href="../reference/nm_join.html">nm_join()</a></code> now gives a more informative error that points to <code>bbr.bayes::nm_join_bayes()</code>. (<a href="https://github.com/metrumresearchgroup/bbr/issues/662" class="external-link">#662</a>)</p></li>
+<li><p><code><a href="../reference/check_nonmem_finished.html">check_nonmem_finished()</a></code> has been converted to a method so that tailored logic can be implemented for derived model types, such as the <code>nmbayes</code> model type in <code>bbr.bayes</code>. (<a href="https://github.com/metrumresearchgroup/bbr/issues/663" class="external-link">#663</a>)</p></li>
+<li><p>The character methods for <code><a href="../reference/check_file.html">tail_lst()</a></code> and <code><a href="../reference/check_file.html">tail_output()</a></code> have been adjusted to work with custom model types where <code>*.lst</code> and <code>OUTPUT</code> files do not reside in the top-level output directory. (<a href="https://github.com/metrumresearchgroup/bbr/issues/661" class="external-link">#661</a>)</p></li>
+<li><p><code><a href="../reference/get_data_path.html">get_data_path()</a></code> can now pull from the control stream file if the model has not yet been submitted. This allows functions like <code><a href="../reference/nm_file.html">nm_data()</a></code> to be used pre-model submission. Support for <code>bbi_log_df</code> methods and a new <code>.check_exists</code> argument (defaults to <code>TRUE</code>) have also been added. (<a href="https://github.com/metrumresearchgroup/bbr/issues/664" class="external-link">#664</a>)</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="1.9.0" id="bbr-190">bbr 1.9.0<a class="anchor" aria-label="anchor" href="#bbr-190"></a></h2>
 <div class="section level3">

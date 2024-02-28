@@ -18,7 +18,7 @@ few external calls as possible (see "Details").'><meta property="og:image" conte
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.9.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.10.0</span>
       </span>
     </div>
 
@@ -161,9 +161,28 @@ model YAML, or specified globally in <code>bbi.yaml</code>.</p>
     
 <ul><li><p><code>submit_models(list)</code>: Takes a list of <code>bbi_base_model</code> objects.</p></li>
 </ul></div>
+    <div id="notes-on-nonmem-model-extensions">
+    <h2>Notes on <code>NONMEM</code> model extensions</h2>
+    
+
+
+<p>Before executing the model, <code>bbi</code> first copies the control stream file to a
+subdirectory. Whether a relative path to the data file in the control stream
+is adjusted for this change in directory depends on the control stream's file
+extension:</p><ul><li><p>For a model with a <code>.mod</code> extension, <code>bbi</code> automatically adjusts a
+relative data path to make it relative to the <em>execution</em> directory,
+following the behavior of <code>PsN</code>.</p></li>
+<li><p>For a model with a <code>.ctl</code> extension, <code>bbi</code> does <em>not</em> adjust the data
+path. A relative data path in the control stream must be specified
+<strong>one level deeper</strong> (i.e. with an additional <code>../</code>) to account for the
+model being executed in a subdirectory.</p></li>
+</ul></div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p><code><a href="submit_model.html">submit_model()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="submit_model.html">submit_model()</a></code></p>
+<p>Other <code>NONMEM</code> model extensions: 
+<code><a href="get_data_path.html">get_data_path</a>()</code>,
+<code><a href="submit_model.html">submit_model</a>()</code></p></div>
     </div>
 
   </div>
