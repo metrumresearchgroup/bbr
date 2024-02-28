@@ -1,3 +1,23 @@
+# bbr 2.0.0
+
+## New features and changes
+
+* When passed an `nmbayes` model (defined by the `bbr.bayes` package),
+  `nm_join()` now gives a more informative error that points to
+  `bbr.bayes::nm_join_bayes()`. (#662)
+
+* `check_nonmem_finished()` has been converted to a method so that tailored
+  logic can be implemented for derived model types, such as the `nmbayes` model
+  type in `bbr.bayes`. (#663)
+
+* The character methods for `tail_lst()` and `tail_output()` have been adjusted
+  to work with custom model types where `*.lst` and `OUTPUT` files do not reside
+  in the top-level output directory. (#661)
+  
+* `get_data_path()` can now pull from the control stream file if the model
+  has not yet been submitted. This allows functions like `nm_data()` to be used
+  pre-model submission. (#664)
+
 # bbr 1.9.0
 
 ## New features and changes
