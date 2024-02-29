@@ -24,33 +24,6 @@ make_fake_mod <- function(case = NULL, input_ctl = NULL){
 }
 
 
-#' Modify the specified data path in a control stream file
-
-#' @param mod a bbr model object
-#' @param data_path Data path to set in a `$DATA` record.
-#'
-#' @keywords internal
-modify_data_path_ctl <- function(mod, data_path){
-  mod_path <- get_model_path(mod)
-
-  # Get data record
-  ctl <- nmrec::read_ctl(mod_path)
-  data_rec <- nmrec::select_records(ctl, "data")[[1]]
-  data_rec$parse()
-
-  # Overwrite 'filename' option
-  data_rec$values <- purrr::map(data_rec$values, function(data_opt){
-    if(inherits(data_opt, "nmrec_option_pos") && data_opt$name == "filename"){
-      data_opt$value <- data_path
-    }
-    data_opt
-  })
-
-  # Write out modified ctl
-  nmrec::write_ctl(ctl, mod_path)
-}
-
-
 modify_data_path_json <- function(mod, data_path){
   cfg_path <- get_config_path(mod)
 

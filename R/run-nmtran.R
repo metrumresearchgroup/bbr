@@ -26,7 +26,10 @@ run_nmtran <- function(
     nmtran_exe = NULL,
     delete_on_exit = TRUE
 ){
+  test_nmrec_version(.min_version = "0.3.0")
   check_model_object(.mod, "bbi_nonmem_model")
+
+  # Capture NONMEM and NMTRAN options
   nmtran_exe <- locate_nmtran(.mod, .config_path, nmtran_exe)
   nm_ver <- attr(nmtran_exe, "nonmem_version")
 
@@ -43,16 +46,14 @@ run_nmtran <- function(
 
   # Copy model
   file.copy(mod_path, temp_folder, overwrite = TRUE)
+  nmtran_mod <- new_model(file.path(temp_folder, basename(mod_path)), .overwrite = TRUE)
 
   # Copy dataset & overwrite $DATA record of new model
   # NMTRAN will error if data cannot be found
   if(fs::file_exists(data_path)){
     file.copy(data_path, temp_folder, overwrite = TRUE)
     # overwrite $DATA record of new model
-    modify_data_path_ctl(
-      mod_path = file.path(temp_folder, basename(mod_path)),
-      data_path = basename(data_path)
-    )
+    modify_data_path_ctl(nmtran_mod, data_path = basename(data_path))
   }
 
   # Run NMTRAN
@@ -143,7 +144,7 @@ locate_nmtran <- function(.mod = NULL, .config_path = NULL, nmtran_exe = NULL){
 #'
 #' @keywords internal
 execute_nmtran <- function(nmtran_exe, mod_path, dir = NULL) {
-  if(is.null(dir) || !file.exists(dir)) dir <- "."
+  if(is.null(dir)) dir <- "."
   checkmate::assert_directory_exists(dir)
 
   nmtran.p <- processx::process$new(
@@ -175,67 +176,6 @@ execute_nmtran <- function(nmtran_exe, mod_path, dir = NULL) {
   )
 
   return(nmtran_results)
-}
-
-#' Get the specified data path from a control stream file
-#'
-#' @param .mod a `bbr` model object
-#'
-#' @noRd
-get_data_path_from_ctl <- function(.mod){
-  check_model_object(.mod, "bbi_nonmem_model")
-  mod_path <- get_model_path(.mod)
-  ctl <- nmrec::read_ctl(mod_path)
-
-  # Get data record
-  data_rec <- nmrec::select_records(ctl, "data")[[1]]
-  data_path <- nmrec::get_record_option(data_rec, "filename")$value
-
-  # Handling for `.mod` extensions
-  if(grepl("(?i)mod", fs::path_ext(mod_path))){
-    data_path <- file.path("..", data_path)
-  }
-
-  data_path_norm <- fs::path_norm(file.path(mod_path, data_path))
-
-  if(!fs::file_exists(data_path_norm)){
-    # The first error message line is what NMTRAN would return in this situation
-    rlang::warn(
-      c(
-        "x" = "Input data file does not exist or cannot be opened",
-        "i" = glue("Referenced input data path: {data_path_norm}")
-      )
-    )
-  }
-
-  return(as.character(data_path_norm))
-}
-
-#' Modify the specified data path in a control stream file
-
-#' @param mod_path Path to a control stream file
-#' @param data_path Data path to set in a `$DATA` record.
-#'
-#' @noRd
-modify_data_path_ctl <- function(mod_path, data_path){
-  checkmate::assert_file_exists(mod_path)
-
-  # Get data record
-  ctl <- nmrec::read_ctl(mod_path)
-  data_rec <- nmrec::select_records(ctl, "data")[[1]]
-  data_rec$parse()
-
-  # Overwrite 'filename' option
-  # TODO: confirm this works with .mod extensions
-  data_rec$values <- purrr::map(data_rec$values, function(data_opt){
-    if(inherits(data_opt, "nmrec_option_pos") && data_opt$name == "filename"){
-      data_opt$value <- data_path
-    }
-    data_opt
-  })
-
-  # Write out modified ctl
-  nmrec::write_ctl(ctl, mod_path)
 }
 
 
