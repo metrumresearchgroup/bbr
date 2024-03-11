@@ -10,11 +10,11 @@ Status](https://github-drone.metrumrg.com/api/badges/metrumresearchgroup/bbr/sta
 [![codecov](https://codecov.io/gh/metrumresearchgroup/bbr/branch/main/graph/badge.svg)](https://codecov.io/gh/metrumresearchgroup/bbr)
 <!-- badges: end -->
 
-`bbr` is intended to help scientists manage the entire modeling workflow
-from within R. Users can submit models, consume outputs and diagnostics,
-and iterate on models. Furthermore, workflow tools–like simple tagging
-of models and model inheritance trees–make reproducibility and external
-review much more streamlined.
+`bbr` helps manage the entire modeling workflow from within R. Users can
+submit models, consume outputs and diagnostics, and iterate on models.
+Furthermore, workflow tools—such as simple tagging of models and model
+inheritance trees—make reproducibility and external review more
+streamlined.
 
 `bbr` is an R interface for running `bbi`. Together they provide a
 solution for managing projects involving modeling and simulation with a
