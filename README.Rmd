@@ -20,9 +20,9 @@ knitr::opts_chunk$set(
 [![codecov](https://codecov.io/gh/metrumresearchgroup/bbr/branch/main/graph/badge.svg)](https://codecov.io/gh/metrumresearchgroup/bbr)
 <!-- badges: end -->
 
-`bbr` is an R interface for running `bbi`. Together they provide a solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. Currently, only NONMEM modeling is supported, though we are in the process of Stan with plans for other modeling software as well. You can get more detailed information on `bbi` (the underlying CLI tool)  [here](https://github.com/metrumresearchgroup/bbi).
-
 `bbr` is intended to help scientists manage the entire modeling workflow from within R. Users can submit models, consume outputs and diagnostics, and iterate on models. Furthermore, workflow tools--like simple tagging of models and model inheritance trees--make reproducibility and external review much more streamlined.
+
+`bbr` is an R interface for running `bbi`. Together they provide a solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. Currently, only NONMEM modeling is supported, though we are in the process of Stan with plans for other modeling software as well. You can get more detailed information on `bbi` (the underlying CLI tool)  [here](https://github.com/metrumresearchgroup/bbi).
 
 ## Installation
 
