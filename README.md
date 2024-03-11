@@ -16,11 +16,12 @@ Furthermore, workflow tools—such as simple tagging of models and model
 inheritance trees—make reproducibility and external review more
 streamlined.
 
-`bbr` is an R interface for running `bbi`. Currently, only NONMEM
-modeling is supported, though we are in the process of Stan with plans
-for other modeling software as well. You can get more detailed
-information on `bbi` (the underlying CLI tool)
-[here](https://github.com/metrumresearchgroup/bbi).
+`bbr` supports running NONMEM models via the
+[bbi](https://github.com/metrumresearchgroup/bbi) command-line tool,
+with a focus on non-Bayesian methods. The
+[bbr.bayes](https://github.com/metrumresearchgroup/bbr.bayes) package
+extends `bbr` to enable Bayesian estimation through either NONMEM or
+[Stan](https://mc-stan.org/).
 
 ## Installation
 
