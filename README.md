@@ -16,12 +16,10 @@ Furthermore, workflow tools—such as simple tagging of models and model
 inheritance trees—make reproducibility and external review more
 streamlined.
 
-`bbr` is an R interface for running `bbi`. Together they provide a
-solution for managing projects involving modeling and simulation with a
-number of software solutions used in pharmaceutical sciences. Currently,
-only NONMEM modeling is supported, though we are in the process of Stan
-with plans for other modeling software as well. You can get more
-detailed information on `bbi` (the underlying CLI tool)
+`bbr` is an R interface for running `bbi`. Currently, only NONMEM
+modeling is supported, though we are in the process of Stan with plans
+for other modeling software as well. You can get more detailed
+information on `bbi` (the underlying CLI tool)
 [here](https://github.com/metrumresearchgroup/bbi).
 
 ## Installation
