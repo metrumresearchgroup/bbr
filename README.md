@@ -21,7 +21,7 @@ detailed information on `bbi` (the underlying CLI tool)
 `bbr` is intended to help scientists manage the entire modeling workflow
 from within R. Users can submit models, consume outputs and diagnostics,
 and iterate on models. Furthermore, workflow tools–like simple tagging
-of models and model inheritence trees–make reproducibility and external
+of models and model inheritance trees–make reproducibility and external
 review much more streamlined.
 
 ## Installation
