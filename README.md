@@ -11,7 +11,7 @@ Status](https://github-drone.metrumrg.com/api/badges/metrumresearchgroup/bbr/sta
 <!-- badges: end -->
 
 `bbr` helps manage the entire modeling workflow from within R. Users can
-submit models, consume outputs and diagnostics, and iterate on models.
+submit models, inspect output and diagnostics, and iterate on models.
 Furthermore, workflow tools—such as simple tagging of models and model
 inheritance trees—make reproducibility and external review more
 streamlined.

@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 [![codecov](https://codecov.io/gh/metrumresearchgroup/bbr/branch/main/graph/badge.svg)](https://codecov.io/gh/metrumresearchgroup/bbr)
 <!-- badges: end -->
 
-`bbr` helps manage the entire modeling workflow from within R. Users can submit models, consume outputs and diagnostics, and iterate on models. Furthermore, workflow tools---such as simple tagging of models and model inheritance trees---make reproducibility and external review more streamlined.
+`bbr` helps manage the entire modeling workflow from within R. Users can submit models, inspect output and diagnostics, and iterate on models. Furthermore, workflow tools---such as simple tagging of models and model inheritance trees---make reproducibility and external review more streamlined.
 
 `bbr` supports running NONMEM models via the [bbi](https://github.com/metrumresearchgroup/bbi) command-line tool, with a focus on non-Bayesian methods. The [bbr.bayes](https://github.com/metrumresearchgroup/bbr.bayes) package extends `bbr` to enable Bayesian estimation through either NONMEM or [Stan](https://mc-stan.org/).
 
