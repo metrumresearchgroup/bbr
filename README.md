@@ -10,19 +10,18 @@ Status](https://github-drone.metrumrg.com/api/badges/metrumresearchgroup/bbr/sta
 [![codecov](https://codecov.io/gh/metrumresearchgroup/bbr/branch/main/graph/badge.svg)](https://codecov.io/gh/metrumresearchgroup/bbr)
 <!-- badges: end -->
 
-`bbr` is an R interface for running `bbi`. Together they provide a
-solution for managing projects involving modeling and simulation with a
-number of software solutions used in pharmaceutical sciences. Currently,
-only NONMEM modeling is supported, though we are in the process of Stan
-with plans for other modeling software as well. You can get more
-detailed information on `bbi` (the underlying CLI tool)
-[here](https://github.com/metrumresearchgroup/bbi).
+`bbr` helps manage the entire modeling workflow from within R. Users can
+submit models, inspect output and diagnostics, and iterate on models.
+Furthermore, workflow tools—such as simple tagging of models and model
+inheritance trees—make reproducibility and external review more
+streamlined.
 
-`bbr` is intended to help scientists manage the entire modeling workflow
-from within R. Users can submit models, consume outputs and diagnostics,
-and iterate on models. Furthermore, workflow tools–like simple tagging
-of models and model inheritence trees–make reproducibility and external
-review much more streamlined.
+`bbr` supports running NONMEM models via the
+[bbi](https://github.com/metrumresearchgroup/bbi) command-line tool,
+with a focus on non-Bayesian methods. The
+[bbr.bayes](https://github.com/metrumresearchgroup/bbr.bayes) package
+extends `bbr` to enable Bayesian estimation through either NONMEM or
+[Stan](https://mc-stan.org/).
 
 ## Installation
 
