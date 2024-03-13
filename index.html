@@ -103,9 +103,8 @@
 <a class="anchor" aria-label="anchor" href="#bbr-"></a>
 </h1></div>
 <!-- badges: start -->
-
-<p><code>bbr</code> is an R interface for running <code>bbi</code>. Together they provide a solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. Currently, only NONMEM modeling is supported, though we are in the process of Stan with plans for other modeling software as well. You can get more detailed information on <code>bbi</code> (the underlying CLI tool) <a href="https://github.com/metrumresearchgroup/bbi" class="external-link">here</a>.</p>
-<p><code>bbr</code> is intended to help scientists manage the entire modeling workflow from within R. Users can submit models, consume outputs and diagnostics, and iterate on models. Furthermore, workflow tools–like simple tagging of models and model inheritence trees–make reproducibility and external review much more streamlined.</p>
+<p><code>bbr</code> helps manage the entire modeling workflow from within R. Users can submit models, inspect output and diagnostics, and iterate on models. Furthermore, workflow tools—such as simple tagging of models and model inheritance trees—make reproducibility and external review more streamlined.</p>
+<p><code>bbr</code> supports running NONMEM models via the <a href="https://github.com/metrumresearchgroup/bbi" class="external-link">bbi</a> command-line tool, with a focus on non-Bayesian methods. The <a href="https://github.com/metrumresearchgroup/bbr.bayes" class="external-link">bbr.bayes</a> package extends <code>bbr</code> to enable Bayesian estimation through either NONMEM or <a href="https://mc-stan.org/" class="external-link">Stan</a>.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -147,9 +146,7 @@
 <li><p>install pkgr</p></li>
 <li>
 <p>open package in an R session and run <code>renv::init(bare = TRUE)</code></p>
-<ul>
-<li>install <code>renv</code> &gt; 0.8.3-4 into default <code><a href="https://rdrr.io/r/base/libPaths.html" class="external-link">.libPaths()</a></code> if not already installed</li>
-</ul>
+<ul><li>install <code>renv</code> &gt; 0.8.3-4 into default <code><a href="https://rdrr.io/r/base/libPaths.html" class="external-link">.libPaths()</a></code> if not already installed</li></ul>
 </li>
 <li><p>run <code>pkgr install</code> in terminal within package directory</p></li>
 <li><p>restart session</p></li>
