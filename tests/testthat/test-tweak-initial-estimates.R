@@ -41,6 +41,8 @@ describe("tweak_initial_estimates", {
 
     # Expect all values to be tweaked
     expect_true(all(est_tweaked$thetas$init != initial_est$thetas$init))
+    expect_true(all(diag(est_tweaked$omegas) != diag(initial_est$omegas)))
+    expect_true(all(est_tweaked$sigmas != initial_est$sigmas))
   })
 
   it("theta bounds - value falls outside one of the bounds", {
@@ -144,5 +146,15 @@ describe("tweak_initial_estimates", {
     ## Check thetas
     expect_true(est_tweaked$thetas$init[2] == initial_est$thetas$init[2]) # Fixed
     expect_true(est_tweaked$thetas$init[1] != initial_est$thetas$init[1]) # Tweaked
+    ## Check omegas
+    ### Initial estimates
+    init_omegas <- initial_est$omegas[lower.tri(initial_est$omegas, diag = TRUE)]
+    tweaked_omegas <- est_tweaked$omegas[lower.tri(est_tweaked$omegas, diag = TRUE)]
+    ### Filter out unspecified (NA) values
+    init_omegas <- init_omegas[!is.na(init_omegas)]
+    tweaked_omegas <- tweaked_omegas[!is.na(tweaked_omegas)]
+    ### Compare
+    expect_equal(tweaked_omegas[c(2, 4:6)], init_omegas[c(2, 4:6)]) # Fixed
+    expect_true(all(tweaked_omegas[c(1, 3)] != init_omegas[c(1, 3)])) # Tweaked
   })
 })
