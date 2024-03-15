@@ -198,6 +198,16 @@ test_that("get_data_path_from_ctl works with absolute paths", {
   )
 })
 
+test_that("modify_data_path_ctl works", {
+  clean_test_enviroment(create_rlg_models)
+  mod <- read_model(NEW_MOD3)
+
+  data_path <- "test/this/path/data.csv"
+  modify_data_path_ctl(mod, data_path)
+
+  expect_equal(data_path, get_data_path_from_ctl(mod, normalize = FALSE))
+})
+
 test_that("get_data_path parses errors informatively", {
   clean_test_enviroment(create_rlg_models)
   mod <- read_model(NEW_MOD3)
