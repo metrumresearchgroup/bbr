@@ -4,7 +4,8 @@ test_that("model_tree() default behavior", {
   skip_if_tree_missing_deps()
   clean_test_enviroment(create_tree_models)
 
-  pl_tree <- model_tree(MODEL_DIR)
+  run_df <- run_log(MODEL_DIR)
+  pl_tree <- model_tree(run_df)
 
   # Confirm number of expected nodes - doesnt seem to work
   # expect_equal(
@@ -26,6 +27,6 @@ test_that("model_tree() default behavior", {
 test_that("make_tree_tooltip()", {
   skip_if_tree_missing_deps()
   clean_test_enviroment(create_tree_models)
-
+  run_df <- run_log(MODEL_DIR)
 
 })
