@@ -241,6 +241,23 @@ create_rlg_models <- function() {
   return(invisible(NULL))
 }
 
+create_tree_models <- function() {
+  # copy models before creating model tree
+  mod1 <- read_model(MOD1_PATH)
+  mod2 <- copy_model_from(mod1, "2", .add_tags = NEW_TAGS) %>% add_star()
+  mod3 <- copy_model_from(mod2, "3")
+  mod4 <- copy_model_from(mod2, "4")
+  mod5 <- copy_model_from(mod4, "5")
+  # Multiple based_on
+  mod6 <- copy_model_from(mod5, "6", .based_on_additional = c("1", "3"),
+                          .star = TRUE, .description = "final model")
+  mod7 <- copy_model_from(mod6, "7", .based_on_additional = c("2"))
+  # unlinked models
+  mod_other <- copy_model_from(mod1, "1001", .update_model_file = FALSE)
+  mod_other2 <- copy_model_from(mod_other, "1002")
+  return(invisible(NULL))
+}
+
 clean_test_enviroment <- function(.f = NULL , env = parent.frame())
 {
     cleanup(env)

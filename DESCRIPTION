@@ -75,14 +75,19 @@ Imports:
     tidyselect (>= 1.0.0),
     xfun,
     yaml
-Suggests: 
+Suggests:
+    collapsibleTree,
     covr,
     devtools,
     forcats,
     ggplot2,
+    grid,
+    htmlwidgets,
     knitr,
+    png,
     rmarkdown,
     testthat (>= 2.1.0),
+    webshot,
     withr,
     mrgvalidate,
     mrgvalprep (>= 0.0.4)
