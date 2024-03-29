@@ -1,32 +1,104 @@
-context("Constructing model tree")
+context("Model tree diagram")
 
-test_that("model_tree() default behavior", {
-  skip_if_tree_missing_deps()
-  clean_test_enviroment(create_tree_models)
+count_nodes <- function(tree_list) {
+  total_nodes <- 0
+  # Base case: if the list is empty, return 0
+  if (length(tree_list) == 0) return(0)
 
-  run_df <- run_log(MODEL_DIR)
-  pl_tree <- model_tree(run_df)
+  # Iterate through each element in the list
+  for (i in 1:length(tree_list)) {
+    # Increment the count for the current node
+    total_nodes <- total_nodes + 1
+    # If the current node has children, recursively count nodes in children
+    if (length(tree_list[[i]]$children) > 0) {
+      total_nodes <- total_nodes + count_nodes(tree_list[[i]]$children)
+    }
+  }
+  return(total_nodes)
+}
 
-  # Confirm number of expected nodes - doesnt seem to work
-  # expect_equal(
-  #   length(pl_tree$x$options$hierarchy) + 1,
-  #   nrow(run_log(MODEL_DIR))
-  # )
+describe("model_tree() integration", {
 
-  # Confirm hierarchy - doesnt seem reliable
-  # expect_equal(pl_tree$x$options$hierarchy, seq(1,7))
+  it("default behavior", {
+    skip_if_tree_missing_deps()
+    clean_test_enviroment(create_tree_models)
 
-  # Confirm order of nodes (hierarchy doesnt track where child nodes are)
-  # (requires dealing with a nested list)
+    run_df <- run_log(MODEL_DIR)
+    pl_tree <- model_tree(run_df)
 
+    # Confirm number of expected nodes
+    expect_equal(count_nodes(pl_tree$x$data$children), nrow(run_df))
+    # Confirm number of origins
+    expect_equal(length(pl_tree$x$data$children), 1)
+  })
 
-  # withr::deferred_run()
+  it("additional based on", {
+    # Includes models that have multiple based_on attributes
+    skip_if_tree_missing_deps()
+    clean_test_enviroment(create_tree_models(addl_based_on = TRUE))
+    run_df <- run_log(MODEL_DIR)
+    pl_tree <- model_tree(run_df)
+
+    # Confirm number of expected nodes
+    expect_equal(count_nodes(pl_tree$x$data$children), nrow(run_df))
+    # Confirm number of origins
+    expect_equal(length(pl_tree$x$data$children), 1)
+
+  })
+
+  it("multiple origins", {
+    # Multiple starting models (models without a `based_on` attribute)
+    skip_if_tree_missing_deps()
+    clean_test_enviroment(create_tree_models(multiple_origins = TRUE))
+    run_df <- run_log(MODEL_DIR)
+    pl_tree <- model_tree(run_df)
+
+    # Confirm number of expected nodes
+    expect_equal(count_nodes(pl_tree$x$data$children), nrow(run_df))
+    # Confirm number of origins
+    expect_equal(length(pl_tree$x$data$children), 2)
+  })
+
+  it("Broken links", {
+    # A based_on referenced model no longer exists at the expected location
+    skip_if_tree_missing_deps()
+    clean_test_enviroment(create_tree_models(broken_link = TRUE))
+    run_df <- run_log(MODEL_DIR)
+    expect_warning(
+      pl_tree <- model_tree(run_df),
+      "The following models could not be linked properly"
+    )
+
+    # Confirm number of expected nodes
+    # Here an extra node is made for mod 1000. mod 1000 is not present in the
+    # run log (was deleted), but is referenced as based_on in mod 1001.
+    expect_equal(count_nodes(pl_tree$x$data$children), nrow(run_df) + 1)
+    # Confirm number of origins
+    expect_equal(length(pl_tree$x$data$children), 2)
+  })
 })
 
+describe("model_tree() data setup",{
 
-test_that("make_tree_tooltip()", {
-  skip_if_tree_missing_deps()
-  clean_test_enviroment(create_tree_models)
-  run_df <- run_log(MODEL_DIR)
+  it("make_tree_data()", {
 
+  })
+
+  it("make_model_network()", {
+
+  })
+})
+
+describe("model_tree() formatting",{
+
+  it("make_tree_tooltip()", {
+    skip_if_tree_missing_deps()
+    clean_test_enviroment(create_tree_models(broken_link = TRUE))
+    run_df <- run_log(MODEL_DIR)
+    model_tree(run_df)
+  })
+
+  it("color_tree_by()", {
+
+  })
 })
