@@ -121,7 +121,7 @@ make_tree_data <- function(
 
   # Replace NULL based_on elements with NA to preserve rows when unnesting
   full_log <- log_df %>% dplyr::mutate(
-    based_on = purrr::map(.data$based_on, \(.x){if(is.null(.x)) "" else .x}),
+    based_on = purrr::map(.data$based_on, function(.x){if(is.null(.x)) "" else .x}),
   ) %>% tidyr::unnest("based_on")
 
   if("tags" %in% include_info){
@@ -156,7 +156,7 @@ make_tree_data <- function(
       dplyr::select(all_of(c(ABS_MOD_PATH, "based_on"))) %>%
       tidyr::nest("based_on" = "based_on") %>%
       dplyr::mutate(
-        based_on = purrr::map(.data$based_on, \(.x){ paste(.x$based_on, collapse = ", ")})
+        based_on = purrr::map(.data$based_on, function(.x){ paste(.x$based_on, collapse = ", ")})
       ) %>% tidyr::unnest("based_on")
 
     # Remove duplicate rows
@@ -255,7 +255,7 @@ check_model_tree <- function(network_df){
     # Connect other roots to directory. Point all un-networked models to base directory
     start <- network_df$to[is.na(network_df$from)]
     unlinked_roots <- find_roots(network_df)
-    missing_roots <- purrr::map_dfr(unlinked_roots, \(.x){
+    missing_roots <- purrr::map_dfr(unlinked_roots, function(.x){
       data.frame(from = start, to = .x)
     })
     network_df <- rbind(network_df, missing_roots) %>% tibble::as_tibble()
@@ -294,7 +294,7 @@ make_tree_tooltip <- function(tree_data){
   can_include <- function(txt) !is.na(txt) && txt != ""
 
   # Tooltip from run log
-  tooltip <- purrr::imap_chr(tree_data$to, \(.x, .y){
+  tooltip <- purrr::imap_chr(tree_data$to, function(.x, .y){
     mod_name <- ifelse(.x == "Start", .x, paste("Run", .x))
     mod_html <- style_html(
       mod_name, color = "#538b01", "font-size:14px; font-weight:bold", br_after = TRUE
@@ -331,7 +331,7 @@ make_tree_tooltip <- function(tree_data){
   # Tooltip from model summary
   add_summary <- "status" %in% names(tree_data)
   if(isTRUE(add_summary)){
-    sum_tooltip <- purrr::imap_chr(tree_data$status, \(mod_status, .y){
+    sum_tooltip <- purrr::imap_chr(tree_data$status, function(mod_status, .y){
       if(grepl("Finished", mod_status)){
         # Conditional heuristics text
         any_heuristics <- tree_data$any_heuristics[.y]
