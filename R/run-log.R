@@ -33,7 +33,8 @@
 run_log <- function(.base_dir, .recurse = FALSE, .include = NULL) {
   checkmate::assert_string(.base_dir)
 
-  mod_list <- find_models(.base_dir, .recurse, .include)
+  mod_list <- find_models(.base_dir, .recurse, .include) %>%
+    suppressSpecificWarning("incomplete final line")
   if(length(mod_list) == 0) {
     return(tibble())
   }
@@ -199,7 +200,8 @@ add_log_impl <- function(.log_df, .impl_func, ...) {
   check_bbi_run_log_df_object(.log_df)
 
   # get config log
-  mod_list <- map(.log_df[[ABS_MOD_PATH]], read_model)
+  mod_list <- map(.log_df[[ABS_MOD_PATH]], read_model) %>%
+    suppressSpecificWarning("incomplete final line")
   .new_df <- .impl_func(mod_list, ...) %>% select(-{{RUN_ID_COL}})
 
   # join to log df
