@@ -30,6 +30,8 @@ Required packages for running \code{\link[=model_tree]{model_tree()}}
 The packages below are required for both interactive and static viewing:
 \itemize{
 \item \strong{\code{collapsibleTree}} for the core plot
+\item \strong{\code{scales}} for coloring the tree nodes. Should be installed with \code{ggplot2},
+which has been a \code{bbr} suggested package.
 }
 
 The packages below are all used for rendering the model tree as a \strong{static} image:

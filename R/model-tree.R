@@ -145,7 +145,7 @@ make_tree_data <- function(
     ) %>% tidyr::unnest("tags")
 
     # Truncate tags
-    full_log <- full_log %>% dplyr::mutate(tags = stringr::str_trunc(tags, 30))
+    full_log <- full_log %>% dplyr::mutate(tags = stringr::str_trunc(.data$tags, 30))
   }
 
   # Handling for multiple based_on flags
@@ -219,7 +219,9 @@ make_model_network <- function(full_log){
 
   # Adjust status for any unlinked (missing) models
   tree_data <- tree_data %>% dplyr::mutate(
-    status = ifelse(is.na(status) & to != "Start", "Not Found", status)
+    status = ifelse(
+      is.na(.data$status) & .data$to != "Start", "Not Found", .data$status
+    )
   )
 
   # Set status to be modeling directory for start node
@@ -415,6 +417,8 @@ model_tree_png <- function(widget) {
 #' @details
 #' The packages below are required for both interactive and static viewing:
 #'  - **`collapsibleTree`** for the core plot
+#'  - **`scales`** for coloring the tree nodes. Should be installed with `ggplot2`,
+#'  which has been a `bbr` suggested package.
 #'
 #' The packages below are all used for rendering the model tree as a **static** image:
 #'  - **`htmlwidgets`** is a dependency of `collapsibleTree`, so it's a 'free'
@@ -428,11 +432,11 @@ model_tree_png <- function(widget) {
 #'
 #' @keywords internal
 req_tree_pkgs <- function(static = FALSE){
+  req_pkgs <- c("collapsibleTree", "scales")
   if(isTRUE(static)){
-    c("collapsibleTree", "htmlwidgets", "webshot", "png", "grid")
-  }else{
-    "collapsibleTree"
+    req_pkgs <- c(req_pkgs, "htmlwidgets", "webshot", "png", "grid")
   }
+  return(req_pkgs)
 }
 
 #' @describeIn req_tree_pkgs Checks if all packages needed for [model_tree()] are present
