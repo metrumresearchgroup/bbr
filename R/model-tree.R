@@ -464,7 +464,18 @@ color_tree_by <- function(tree_data, color_by = "run"){
   pal_bbr <- scales::pal_gradient_n(bbr_cols)(seq(0, 1, length.out = n_levels))
 
   # Assign colors to new column
-  tree_data$col <- factor(tree_data[[color_by]])
+  tree_data$col <- tree_data[[color_by]]
+  # Set NA values to grey
+  na_vals <- is.na(tree_data$col) & tree_data$to != "Start"
+  if(any(na_vals)){
+    tree_data$col[na_vals] <- "#C0C0C0"
+    pal_bbr <- c("#C0C0C0", pal_bbr)
+  }
+  # Set start node to tan
+  tree_data$col[tree_data$to == "Start"] <- "#007319"
+  pal_bbr <- c("#007319", pal_bbr)
+  # Assign rest of the colors
+  tree_data$col <- factor(tree_data$col)
   levels(tree_data$col) <- pal_bbr
 
   return(tree_data)
