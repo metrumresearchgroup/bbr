@@ -5,15 +5,15 @@
 \title{Construct dataset for use in \code{model_tree}}
 \usage{
 make_tree_data(
-  log_df,
+  .log_df,
   include_info = c("description", "star", "tags"),
   add_summary = TRUE
 )
 }
 \arguments{
-\item{log_df}{a \code{bbr} run log}
+\item{.log_df}{a \code{bbr} run log}
 
-\item{include_info}{vector of \code{\link[=run_log]{run_log()}} columns to include in the tooltip or
+\item{include_info}{vector of columns present in \code{.log_df} to include in the tooltip or
 appended table.}
 
 \item{add_summary}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, include key columns

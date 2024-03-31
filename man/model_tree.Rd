@@ -7,33 +7,37 @@
 \title{Create a tree diagram of a modeling directory}
 \usage{
 model_tree(
-  log_df,
+  .log_df,
   include_info = c("description", "star", "tags"),
   color_by = "run",
   add_summary = TRUE,
+  zoomable = FALSE,
   static = FALSE
 )
 
 \method{model_tree}{character}(
-  log_df,
+  .log_df,
   include_info = c("description", "star", "tags"),
   color_by = "run",
   add_summary = TRUE,
+  zoomable = FALSE,
   static = FALSE
 )
 
 \method{model_tree}{bbi_log_df}(
-  log_df,
+  .log_df,
   include_info = c("description", "star", "tags"),
   color_by = "run",
   add_summary = TRUE,
+  zoomable = FALSE,
   static = FALSE
 )
 }
 \arguments{
-\item{log_df}{a \code{bbr} run log or a base directory to look in for models.}
+\item{.log_df}{a \code{bbi_run_log_df} tibble (the output of \code{run_log()}) \emph{\strong{or}}
+a base directory to look in for models. See details for more options.}
 
-\item{include_info}{vector of \code{\link[=run_log]{run_log()}} columns to include in the tooltip or
+\item{include_info}{vector of columns present in \code{.log_df} to include in the tooltip or
 appended table.}
 
 \item{color_by}{a run log column to color the nodes by. Can be helpful for
@@ -42,6 +46,9 @@ to \code{"run"}.}
 
 \item{add_summary}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, include key columns
 from \code{\link[=model_summary]{model_summary()}} output.}
+
+\item{zoomable}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, allow pan and zoom by
+dragging and scrolling.}
 
 \item{static}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, render the plot as a
 static image. This takes a little longer, as the interactive plot must
@@ -53,7 +60,55 @@ Create a tree diagram of a modeling directory
 \details{
 Uses the \code{based_on} attribute of each model to determine the tree network.
 \itemize{
-\item Additional \code{based_on} flags will be shown in the tooltip, using the first one
-to create the tree network
+\item Additional \code{based_on} flags will be shown in the tooltip, using the first
+one to create the tree network
 }
+
+Any dataframe with the \code{bbi_run_log_df} class and required columns can be used.
+In other words, users can add/modify columns of their \code{run_log()}, and pass these
+additional columns as tooltips.
+
+Certain columns will be formatted \emph{specially} in the tooltip. These include
+\code{'description'}, \code{'tags'}, \code{'star'}, and the summary columns added when
+\code{add_summary = TRUE} (\code{"number_of_subjects"}, \code{"number_of_obs"}, \code{"ofv"}, and
+\code{"any_heuristics"}).
+\itemize{
+\item Note that the summary columns will only receive the special formatting if
+added via \code{add_summary = TRUE}. i.e. if \code{.log_df = run_log() \%>\% add_summary()},
+and \code{include_info = 'ofv'}, it will be formatted as any other additional column.
+}
+}
+\examples{
+\dontrun{
+
+# Basic
+model_tree(MODEL_DIR)
+run_log(MODEL_DIR) \%>\% model_tree()
+
+# Color by a column
+model_tree(MODEL_DIR, color_by = "star")
+
+# Run `add_config()` and/or `add_summary()` beforehand
+run_log(MODEL_DIR) \%>\%
+  add_config() \%>\%
+  model_tree(
+    include_info = c("model_has_changed", "data_has_changed", "nm_version"),
+    color_by = "data_has_changed"
+  )
+
+run_log(MODEL_DIR) \%>\%
+  add_summary() \%>\%
+  model_tree(
+    include_info = c("tags", "param_count", "eta_pval_significant"),
+    color_by = "any_heuristics"
+  )
+
+run_log(MODEL_DIR) \%>\%
+  add_summary() \%>\%
+  add_config() \%>\%
+  model_tree(
+    include_info = c("problem_text", "data_path", "data_has_changed"),
+  )
+}
+
 }

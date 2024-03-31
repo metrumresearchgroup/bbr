@@ -1,4 +1,5 @@
 context("Model tree diagram")
+skip_if_tree_missing_deps()
 
 count_nodes <- function(tree_list) {
   if(length(tree_list) == 0) return(0)
@@ -16,9 +17,7 @@ count_nodes <- function(tree_list) {
 }
 
 describe("model_tree() integration", {
-
   it("default behavior", {
-    skip_if_tree_missing_deps()
     clean_test_enviroment(create_tree_models)
 
     run_df <- run_log(MODEL_DIR)
@@ -32,7 +31,6 @@ describe("model_tree() integration", {
 
   it("additional based on", {
     # Includes models that have multiple based_on attributes
-    skip_if_tree_missing_deps()
     clean_test_enviroment(create_tree_models(addl_based_on = TRUE))
     run_df <- run_log(MODEL_DIR)
     pl_tree <- model_tree(run_df)
@@ -46,7 +44,6 @@ describe("model_tree() integration", {
 
   it("multiple origins", {
     # Multiple starting models (models without a `based_on` attribute)
-    skip_if_tree_missing_deps()
     clean_test_enviroment(create_tree_models(multiple_origins = TRUE))
     run_df <- run_log(MODEL_DIR)
     pl_tree <- model_tree(run_df)
@@ -59,7 +56,6 @@ describe("model_tree() integration", {
 
   it("Broken links", {
     # A based_on referenced model no longer exists at the expected location
-    skip_if_tree_missing_deps()
     clean_test_enviroment(create_tree_models(broken_link = TRUE))
     run_df <- run_log(MODEL_DIR)
     expect_warning(
@@ -77,7 +73,6 @@ describe("model_tree() integration", {
 })
 
 describe("model_tree() data setup",{
-
   it("make_tree_data()", {
 
   })
@@ -88,15 +83,38 @@ describe("model_tree() data setup",{
 })
 
 describe("model_tree() formatting",{
-
   it("make_tree_tooltip()", {
-    skip_if_tree_missing_deps()
-    clean_test_enviroment(create_tree_models(broken_link = TRUE))
-    run_df <- run_log(MODEL_DIR)
-    model_tree(run_df)
+    clean_test_enviroment(create_tree_models)
+    # With summary (default)
+    tree_data <- make_tree_data(run_log(MODEL_DIR), add_summary = TRUE)
+    tree_data <- make_tree_tooltip(tree_data)
+    # Starting node
+    expect_true(grepl(MODEL_DIR, tree_data$tooltip[1]))
+    # Spot check some rendered tooltips
+    expect_true(grepl(paste0(MOD1$tags, collapse = ", "), tree_data$tooltip[2]))
+    expect_true(grepl(MOD1$description, tree_data$tooltip[2]))
+    # only MOD1 can be summarized (second node)
+    expect_equal(grep("OFV", tree_data$tooltip), 2)
+    expect_equal(grep("--Heuristics Found--", tree_data$tooltip), 2)
+    # Without summary
+    tree_data <- make_tree_data(run_log(MODEL_DIR), add_summary = FALSE)
+    tree_data <- make_tree_tooltip(tree_data)
+    expect_false(any(grepl("OFV", tree_data$tooltip)))
   })
 
   it("color_tree_by()", {
+    clean_test_enviroment(create_tree_models)
+    pl_tree <- model_tree(MODEL_DIR)
+    expect_equal(pl_tree$x$options$attribute, "run")
+    pl_tree <- model_tree(MODEL_DIR, color_by = "star")
+    expect_equal(pl_tree$x$options$attribute, "star")
 
+    # Check generated color column
+    tree_data <- make_tree_data(run_log(MODEL_DIR))
+    tree_data <- color_tree_by(tree_data, color_by = "star")
+    expect_equal(
+      as.numeric(as.factor(tree_data$star)),
+      as.numeric(as.factor(tree_data$col))
+    )
   })
 })

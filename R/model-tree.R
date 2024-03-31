@@ -1,29 +1,77 @@
 #' Create a tree diagram of a modeling directory
 #'
-#' @param log_df a `bbr` run log or a base directory to look in for models.
-#' @param include_info vector of [bbr::run_log()] columns to include in the tooltip or
+#' @param .log_df a `bbi_run_log_df` tibble (the output of `run_log()`) ***or***
+#'        a base directory to look in for models. See details for more options.
+#' @param include_info vector of columns present in `.log_df` to include in the tooltip or
 #'        appended table.
 #' @param color_by a run log column to color the nodes by. Can be helpful for
 #'        identifying which models are starred, have heuristics, etc. Defaults
 #'        to `"run"`.
 #' @param add_summary Logical (`TRUE`/`FALSE`). If `TRUE`, include key columns
 #'        from [model_summary()] output.
+#' @param zoomable Logical (`TRUE`/`FALSE`). If `TRUE`, allow pan and zoom by
+#'        dragging and scrolling.
 #' @param static Logical (`TRUE`/`FALSE`). If `TRUE`, render the plot as a
 #'        static image. This takes a little longer, as the interactive plot must
 #'        be saved as a PNG and loaded into the viewer.
 #'
 #' @details
 #' Uses the `based_on` attribute of each model to determine the tree network.
-#'  - Additional `based_on` flags will be shown in the tooltip, using the first one
-#' to create the tree network
+#'  - Additional `based_on` flags will be shown in the tooltip, using the first
+#'  one to create the tree network
 #'
+#' Any dataframe with the `bbi_run_log_df` class and required columns can be used.
+#' In other words, users can add/modify columns of their `run_log()`, and pass these
+#' additional columns as tooltips.
+#'
+#' Certain columns will be formatted *specially* in the tooltip. These include
+#' `'description'`, `'tags'`, `'star'`, and the summary columns added when
+#' `add_summary = TRUE` (`"number_of_subjects"`, `"number_of_obs"`, `"ofv"`, and
+#' `"any_heuristics"`).
+#'  - Note that the summary columns will only receive the special formatting if
+#'  added via `add_summary = TRUE`. i.e. if `.log_df = run_log() %>% add_summary()`,
+#'  and `include_info = 'ofv'`, it will be formatted as any other additional column.
+#'
+#' @examples
+#' \dontrun{
+#'
+#' # Basic
+#' model_tree(MODEL_DIR)
+#' run_log(MODEL_DIR) %>% model_tree()
+#'
+#' # Color by a column
+#' model_tree(MODEL_DIR, color_by = "star")
+#'
+#' # Run `add_config()` and/or `add_summary()` beforehand
+#' run_log(MODEL_DIR) %>%
+#'   add_config() %>%
+#'   model_tree(
+#'     include_info = c("model_has_changed", "data_has_changed", "nm_version"),
+#'     color_by = "data_has_changed"
+#'   )
+#'
+#' run_log(MODEL_DIR) %>%
+#'   add_summary() %>%
+#'   model_tree(
+#'     include_info = c("tags", "param_count", "eta_pval_significant"),
+#'     color_by = "any_heuristics"
+#'   )
+#'
+#' run_log(MODEL_DIR) %>%
+#'   add_summary() %>%
+#'   add_config() %>%
+#'   model_tree(
+#'     include_info = c("problem_text", "data_path", "data_has_changed"),
+#'   )
+#' }
 #'
 #' @export
 model_tree <- function(
-    log_df,
+    .log_df,
     include_info = c("description","star", "tags"),
     color_by = "run",
     add_summary = TRUE,
+    zoomable = FALSE,
     static = FALSE
 ){
   UseMethod("model_tree")
@@ -32,31 +80,33 @@ model_tree <- function(
 #' @rdname model_tree
 #' @export
 model_tree.character <- function(
-    log_df,
+    .log_df,
     include_info = c("description","star", "tags"),
     color_by = "run",
     add_summary = TRUE,
+    zoomable = FALSE,
     static = FALSE
 ){
-  checkmate::assert_directory_exists(log_df)
-  log_df <- run_log(log_df) %>% suppressWarnings()
-  model_tree(log_df, include_info, color_by, add_summary, static)
+  checkmate::assert_directory_exists(.log_df)
+  .log_df <- run_log(.log_df) %>% suppressWarnings()
+  model_tree(.log_df, include_info, color_by, add_summary, zoomable, static)
 }
 
 #' @rdname model_tree
 #' @export
 model_tree.bbi_log_df <- function(
-    log_df,
+    .log_df,
     include_info = c("description","star", "tags"),
     color_by = "run",
     add_summary = TRUE,
+    zoomable = FALSE,
     static = FALSE
 ){
   # Make sure required dependencies are installed
   stop_if_tree_missing_deps(static = static)
 
   # Make tree data
-  tree_data <- make_tree_data(log_df, include_info, add_summary)
+  tree_data <- make_tree_data(.log_df, include_info, add_summary)
 
   # Format coloring
   tree_data <- color_tree_by(tree_data, color_by = color_by)
@@ -66,7 +116,7 @@ model_tree.bbi_log_df <- function(
 
   # Create model tree
   pl_tree <- collapsibleTree::collapsibleTreeNetwork(
-    tree_data, zoomable = FALSE, attribute = color_by,
+    tree_data, zoomable = zoomable, attribute = color_by,
     fill="col", collapsed = FALSE, nodeSize = "leafCount",
     tooltipHtml = "tooltip")
 
@@ -79,8 +129,9 @@ model_tree.bbi_log_df <- function(
 
 
 #' Construct dataset for use in `model_tree`
-#' @param log_df a `bbr` run log
+#' @param .log_df a `bbr` run log
 #' @inheritParams model_tree
+#' @importFrom tidyselect any_of
 #'
 #' @details
 #' This function does the following things:
@@ -96,31 +147,32 @@ model_tree.bbi_log_df <- function(
 #' @returns a dataframe
 #' @keywords internal
 make_tree_data <- function(
-    log_df,
+    .log_df,
     include_info = c("description","star", "tags"),
     add_summary = TRUE
 ){
-  checkmate::assert_true(all(include_info %in% names(log_df)))
+  checkmate::assert_true(all(include_info %in% names(.log_df)))
 
   # Check for required columns and starting format
   req_cols <- c(ABS_MOD_PATH, "run", "based_on")
-  if(!(all(req_cols %in% names(log_df)))){
-    cols_missing <- req_cols[!(req_cols %in% names(log_df))]
+  if(!(all(req_cols %in% names(.log_df)))){
+    cols_missing <- req_cols[!(req_cols %in% names(.log_df))]
     cols_missing <- paste(cols_missing, collapse = ", ")
     rlang::abort(
       glue::glue("The following required columns are missing: {cols_missing}")
     )
   }
-  checkmate::assert_true(inherits(log_df$based_on, "list"))
+  checkmate::assert_true(inherits(.log_df$based_on, "list"))
+
+  # These columns have special handling either here or in the tooltip
+  base_log_cols <- c(req_cols, "description", "star", "tags")
 
   # Starting run log
-  log_df <- log_df %>% dplyr::select(all_of(c(req_cols, include_info)))
-
-  # Tooltip columns (may be appended later)
-  attr_cols <- include_info
+  log_cols <- unique(c(base_log_cols, include_info))
+  .log_df <- .log_df %>% dplyr::select(all_of(log_cols))
 
   # Replace NULL based_on elements with NA to preserve rows when unnesting
-  full_log <- log_df %>% dplyr::mutate(
+  full_log <- .log_df %>% dplyr::mutate(
     based_on = purrr::map(.data$based_on, function(.x){if(is.null(.x)) "" else .x}),
   ) %>% tidyr::unnest("based_on")
 
@@ -166,29 +218,45 @@ make_tree_data <- function(
     has_addl_based_on <- full_log[[ABS_MOD_PATH]] %in% based_on_addl_df[[ABS_MOD_PATH]]
     full_log$addl_based_on[has_addl_based_on] <- based_on_addl_df$based_on
     # Add column to tooltip (we have to display these since we cant draw them)
-    attr_cols <- c(attr_cols, "addl_based_on")
+    base_log_cols <- c(base_log_cols, "addl_based_on")
   }
 
+  # Add run log classes back to full_log to use add_summary().
+  # - run log classes are removed when unnesting columns
+  class(full_log) <- c("bbi_run_log_df", "bbi_log_df", class(full_log))
+
+  # Add model status for tooltip display
+  full_log <- full_log %>% add_model_status()
 
   # Optionally append model summary information
   # This must be done after filtering out any duplicate rows
   if(isTRUE(add_summary)){
-    sum_cols <- c("status", "number_of_subjects", "number_of_obs", "ofv", "any_heuristics")
-    # Add run log classes back to full_log to use add_summary().
-    # - run log classes are removed when unnesting columns
-    class(full_log) <- c("bbi_run_log_df", "bbi_log_df", class(full_log))
-    full_log <- full_log %>% add_summary() %>% add_model_status() %>%
-      dplyr::select(all_of(c(names(full_log), sum_cols)))
-
-    # Add summary columns to tooltip
-    attr_cols <- c(attr_cols, sum_cols)
+    sum_cols <- c("number_of_subjects", "number_of_obs", "ofv", "any_heuristics")
+    # We shouldn't just apply add_summary() to full_log, as this could introduce
+    # column naming issues if users passed a *summary* column to `include_info`
+    # i.e. model_tree(run_log(model_dir) %>% add_summary(), include_info = c("problem_text", "ofv"))
+    #  - Remove any specially handled columns prior to running
+    #  - Only join the _new_ select summary columns back
+    sum_log <- full_log %>% dplyr::select(-any_of(sum_cols)) %>% add_summary() %>%
+      dplyr::select(all_of(c(req_cols, sum_cols)))
+    if(any(sum_cols %in% names(full_log))){
+      existing_sum_cols <- sum_cols[sum_cols %in% names(full_log)]
+      sum_log <- sum_log %>% dplyr::select(-all_of(existing_sum_cols))
+    }
+    full_log <- dplyr::left_join(full_log, sum_log, by = req_cols)
   }
 
   # Create model network and append to full run log
   tree_data <- make_model_network(full_log)
 
-  # Store columns to be used in tooltip
-  attr(tree_data, "tooltip_columns") <- attr_cols
+  # Store columns to be used in tooltip as attributes
+  attr(tree_data, "base_tt_cols") <- base_log_cols[base_log_cols %in% include_info]
+  if(isTRUE(add_summary)){
+    attr(tree_data, "sum_tt_cols") <- sum_cols
+    attr(tree_data, "other_tt_cols") <- setdiff(include_info, c(base_log_cols, sum_cols))
+  }else{
+    attr(tree_data, "other_tt_cols") <- setdiff(include_info, base_log_cols)
+  }
 
   return(tree_data)
 }
@@ -281,9 +349,6 @@ check_model_tree <- function(network_df){
 #' @noRd
 make_tree_tooltip <- function(tree_data){
 
-  # Columns to include in tooltip or table
-  attr_cols <- attr(tree_data, "tooltip_columns")
-
   # Helper for coloring text and applying other styles
   style_html <- function(txt, color = "black", ..., br_before = FALSE, br_after = FALSE){
     txt <- paste0(glue::glue("<span style='color:{color};"), ...,"'>" ,txt,"</span>")
@@ -296,6 +361,7 @@ make_tree_tooltip <- function(tree_data){
   can_include <- function(txt) !is.na(txt) && txt != ""
 
   # Tooltip from run log
+  base_tt_cols <- attr(tree_data, "base_tt_cols")
   tooltip <- purrr::imap_chr(tree_data$to, function(.x, .y){
     mod_name <- ifelse(.x == "Start", .x, paste("Run", .x))
     mod_html <- style_html(
@@ -312,17 +378,17 @@ make_tree_tooltip <- function(tree_data){
       ""
     )
     desc_html <- ifelse(
-      "description" %in% attr_cols && can_include(tree_data$description[.y]),
+      "description" %in% base_tt_cols && can_include(tree_data$description[.y]),
       style_html(tree_data$description[.y], "font-style:italic", br_after = TRUE),
       ""
     )
     tags_html <- ifelse(
-      "tags" %in% attr_cols && can_include(tree_data$tags[.y]),
+      "tags" %in% base_tt_cols && can_include(tree_data$tags[.y]),
       paste0("Tags: ", style_html(tree_data$tags[.y], color = "#297f9c", br_after = TRUE)),
       ""
     )
     star_html <- ifelse(
-      "star" %in% attr_cols && can_include(tree_data$star[.y]) && isTRUE(tree_data$star[.y]),
+      "star" %in% base_tt_cols && can_include(tree_data$star[.y]) && isTRUE(tree_data$star[.y]),
       style_html("Starred", color = "#ffa502", "font-weight:bold", br_after = TRUE),
       ""
     )
@@ -331,30 +397,49 @@ make_tree_tooltip <- function(tree_data){
   })
 
   # Tooltip from model summary
-  add_summary <- "status" %in% names(tree_data)
-  if(isTRUE(add_summary)){
-    sum_tooltip <- purrr::imap_chr(tree_data$status, function(mod_status, .y){
-      if(grepl("Finished", mod_status)){
-        # Conditional heuristics text
-        any_heuristics <- tree_data$any_heuristics[.y]
-        heuristics_txt <- if(!is.na(any_heuristics) && isTRUE(any_heuristics)){
-          paste0("<br><br>", style_html("--Heuristics Found--", color = "#A30000", "font-weight:bold"))
-        }else{
-          ""
-        }
-        # Combined tooltip
-        paste0(
-          style_html(mod_status, color = "#538b01", "font-weight:bold", br_before = TRUE, br_after = TRUE),
-          "OFV: ", style_html(tree_data$ofv[.y], color = "#A30000", br_after = TRUE),
-          "N Subjects: ", style_html(tree_data$number_of_subjects[.y], color = "#A30000", br_after = TRUE),
-          "N Obs: ", style_html(tree_data$number_of_obs[.y], color = "#A30000"),
-          heuristics_txt
-        )
+  sum_cols <- attr(tree_data, "sum_tt_cols")
+  add_summary <- !is.null(sum_cols) && sum_cols %in% names(tree_data)
+  sum_tooltip <- purrr::imap_chr(tree_data$status, function(mod_status, .y){
+    status_col <- ifelse(grepl("Finished", mod_status), "#538b01", "#A30000")
+    if(isTRUE(add_summary) && grepl("Finished|Incomplete", mod_status)){
+      # Conditional heuristics text
+      any_heuristics <- tree_data$any_heuristics[.y]
+      heuristics_txt <- if(!is.na(any_heuristics) && isTRUE(any_heuristics)){
+        paste0("<br><br>", style_html("--Heuristics Found--", color = "#A30000", "font-weight:bold"))
       }else{
-        # If not run, just show the status
-        style_html(mod_status, color = "#A30000", "font-weight:bold", br_before = TRUE)
+        ""
       }
+      # Combined tooltip
+      paste0(
+        style_html(mod_status, color = status_col, "font-weight:bold", br_before = TRUE, br_after = TRUE),
+        "OFV: ", style_html(tree_data$ofv[.y], color = "#A30000", br_after = TRUE),
+        "N Subjects: ", style_html(tree_data$number_of_subjects[.y], color = "#A30000", br_after = TRUE),
+        "N Obs: ", style_html(tree_data$number_of_obs[.y], color = "#A30000"),
+        heuristics_txt
+      )
+    }else{
+      # If not run, just show the status
+      style_html(mod_status, color = status_col, "font-weight:bold", br_before = TRUE)
+    }
+  })
+
+  # The above tooltips have special formatting if included in the run log
+  # Other columns requested will display as text between run_log and summary tooltips
+  other_cols <- attr(tree_data, "other_tt_cols")
+  if(!is.null(other_cols)){
+    other_tooltip <- purrr::imap_chr(tree_data$to, function(.x, .y){
+      other_html <- purrr::map_chr(other_cols, function(col){
+        col_lbl <- paste0(stringr::str_to_title(gsub("_", " ", col)), ":")
+        col_html <- ifelse(
+          can_include(tree_data[[col]][.y]),
+          paste(col_lbl, style_html(tree_data[[col]][.y], color = "#297f9c", br_after = TRUE)),
+          ""
+        )
+      })
+      paste0(other_html, collapse = "")
     })
+    tooltip <- paste0(tooltip, other_tooltip, sum_tooltip)
+  }else{
     tooltip <- paste0(tooltip, sum_tooltip)
   }
 
