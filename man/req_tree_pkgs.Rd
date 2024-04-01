@@ -42,8 +42,8 @@ import. It's used to save the tree diagram out as an \code{HTML} file.
 Rstudio viewer.
 \item \strong{\code{webshot}} is needed for taking a screenshot of the rendered HTML,
 saved out via \code{htmlwidgets::saveWidget()}.
-\item \strong{\code{png}} is needed for reading in a PNG file in order to plot it in the
-Rstudio viewer.
+\item \strong{\code{png}} is needed for reading in a PNG file as an array, in order to plot
+it in the Rstudio viewer.
 }
 }
 \section{Functions}{

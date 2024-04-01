@@ -11,6 +11,7 @@ model_tree(
   include_info = c("description", "star", "tags"),
   color_by = "run",
   add_summary = TRUE,
+  digits = 3,
   zoomable = FALSE,
   static = FALSE
 )
@@ -20,6 +21,7 @@ model_tree(
   include_info = c("description", "star", "tags"),
   color_by = "run",
   add_summary = TRUE,
+  digits = 3,
   zoomable = FALSE,
   static = FALSE
 )
@@ -29,6 +31,7 @@ model_tree(
   include_info = c("description", "star", "tags"),
   color_by = "run",
   add_summary = TRUE,
+  digits = 3,
   zoomable = FALSE,
   static = FALSE
 )
@@ -37,15 +40,18 @@ model_tree(
 \item{.log_df}{a \code{bbi_run_log_df} tibble (the output of \code{run_log()}) \emph{\strong{or}}
 a base directory to look in for models. See details for more options.}
 
-\item{include_info}{vector of columns present in \code{.log_df} to include in the tooltip or
-appended table.}
+\item{include_info}{vector of columns present in \code{.log_df} to include in the
+tooltip.}
 
 \item{color_by}{a run log column to color the nodes by. Can be helpful for
-identifying which models are starred, have heuristics, etc. Defaults
-to \code{"run"}.}
+identifying which models are starred, have heuristics, etc. See details
+for more information.}
 
 \item{add_summary}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, include key columns
 from \code{\link[=model_summary]{model_summary()}} output.}
+
+\item{digits}{Number of digits to round decimal places to for display in
+the tooltip.}
 
 \item{zoomable}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, allow pan and zoom by
 dragging and scrolling.}
@@ -57,43 +63,74 @@ be saved as a PNG and loaded into the viewer.}
 \description{
 Create a tree diagram of a modeling directory
 }
-\details{
-Uses the \code{based_on} attribute of each model to determine the tree network.
+\section{Required Columns}{
+
+
+\code{.log_df} must contain \strong{\code{absolute_model_path}}, \strong{\code{run}}, and \strong{\code{based_on}}
+columns in order to properly link and label each of the models, where the \code{based_on}
+attribute is used to determine the tree network.
 \itemize{
-\item Additional \code{based_on} flags will be shown in the tooltip, using the first
+\item \emph{Additional} \code{based_on} flags will be shown in the tooltip, using the first
 one to create the tree network
 }
 
 Any dataframe with the \code{bbi_run_log_df} class and required columns can be used.
 In other words, users can add/modify columns of their \code{run_log()}, and pass these
-additional columns as tooltips.
+additional columns as tooltips. This is illustrated in the examples via
+\code{add_summary()} and \code{add_config()}.
+}
 
-Certain columns will be formatted \emph{specially} in the tooltip. These include
-\code{'description'}, \code{'tags'}, \code{'star'}, and the summary columns added when
-\code{add_summary = TRUE} (\code{"number_of_subjects"}, \code{"number_of_obs"}, \code{"ofv"}, and
-\code{"any_heuristics"}).
+\section{Tooltip formatting and coloring}{
+
+\strong{Tooltip formatting}
+
+Any column in \code{.log_df} can be chosen to include in the tooltip. However,
+certain columns will be formatted \emph{specially} if specified via \code{include_info}.
+Any other column will be displayed as verbatim text (no special handling), though
+column \emph{names} will be formatted slightly.
+
+Specially formatted columns (\emph{if specified} via \code{include_info}):
 \itemize{
-\item Note that the summary columns will only receive the special formatting if
-added via \code{add_summary = TRUE}. i.e. if \code{.log_df = run_log() \%>\% add_summary()},
-and \code{include_info = 'ofv'}, it will be formatted as any other additional column.
+\item \code{'description'}, \code{'tags'}, and \code{'star'}
+\item When \code{add_summary = TRUE} these specific summary columns are also
+formatted specially:
+\itemize{
+\item \code{'number_of_subjects'}, \code{'number_of_obs'}, \code{'ofv'}, and \code{'any_heuristics'}.
+\item Note that the above summary columns will only receive the special
+formatting if added via \code{add_summary = TRUE}.
+\item i.e. if \code{.log_df = run_log() \%>\% add_summary()} and
+\code{include_info = 'ofv'}, The \code{'OFV'} parameter will be formatted as any
+other additional column.
 }
 }
+
+\strong{Coloring}
+
+Logical columns are handled differently from numeric or character columns.
+Nodes will be colored \code{'white'} for \code{FALSE} and \code{'red'} for \code{TRUE}. All other
+column types will be colored via a gradient between \code{'white'} and \code{'red'},
+where earlier runs are whiter, and later runs appear to be more red. You can
+pass \code{color_by = NULL} to make all model nodes \code{'red'}.
+}
+
 \examples{
 \dontrun{
 
 # Basic
-model_tree(MODEL_DIR)
+MODEL_DIR \%>\% model_tree()
 run_log(MODEL_DIR) \%>\% model_tree()
 
 # Color by a column
 model_tree(MODEL_DIR, color_by = "star")
 
-# Run `add_config()` and/or `add_summary()` beforehand
+
+# Run `add_config()`, `add_summary()`, and/or `mutate()` calls beforehand
 run_log(MODEL_DIR) \%>\%
   add_config() \%>\%
+  dplyr::mutate(out_of_date = model_has_changed | data_has_changed) \%>\%
   model_tree(
     include_info = c("model_has_changed", "data_has_changed", "nm_version"),
-    color_by = "data_has_changed"
+    color_by = "out_of_date"
   )
 
 run_log(MODEL_DIR) \%>\%
@@ -103,12 +140,6 @@ run_log(MODEL_DIR) \%>\%
     color_by = "any_heuristics"
   )
 
-run_log(MODEL_DIR) \%>\%
-  add_summary() \%>\%
-  add_config() \%>\%
-  model_tree(
-    include_info = c("problem_text", "data_path", "data_has_changed"),
-  )
 }
 
 }

@@ -2,52 +2,79 @@
 #'
 #' @param .log_df a `bbi_run_log_df` tibble (the output of `run_log()`) ***or***
 #'        a base directory to look in for models. See details for more options.
-#' @param include_info vector of columns present in `.log_df` to include in the tooltip or
-#'        appended table.
+#' @param include_info vector of columns present in `.log_df` to include in the
+#'        tooltip.
 #' @param color_by a run log column to color the nodes by. Can be helpful for
-#'        identifying which models are starred, have heuristics, etc. Defaults
-#'        to `"run"`.
+#'        identifying which models are starred, have heuristics, etc. See details
+#'        for more information.
 #' @param add_summary Logical (`TRUE`/`FALSE`). If `TRUE`, include key columns
 #'        from [model_summary()] output.
+#' @param digits Number of digits to round decimal places to for display in
+#'        the tooltip.
 #' @param zoomable Logical (`TRUE`/`FALSE`). If `TRUE`, allow pan and zoom by
 #'        dragging and scrolling.
 #' @param static Logical (`TRUE`/`FALSE`). If `TRUE`, render the plot as a
 #'        static image. This takes a little longer, as the interactive plot must
 #'        be saved as a PNG and loaded into the viewer.
 #'
-#' @details
-#' Uses the `based_on` attribute of each model to determine the tree network.
-#'  - Additional `based_on` flags will be shown in the tooltip, using the first
+#' @section Required Columns:
+#'
+#' `.log_df` must contain **`absolute_model_path`**, **`run`**, and **`based_on`**
+#' columns in order to properly link and label each of the models, where the `based_on`
+#' attribute is used to determine the tree network.
+#'  - *Additional* `based_on` flags will be shown in the tooltip, using the first
 #'  one to create the tree network
 #'
 #' Any dataframe with the `bbi_run_log_df` class and required columns can be used.
 #' In other words, users can add/modify columns of their `run_log()`, and pass these
-#' additional columns as tooltips.
+#' additional columns as tooltips. This is illustrated in the examples via
+#' `add_summary()` and `add_config()`.
 #'
-#' Certain columns will be formatted *specially* in the tooltip. These include
-#' `'description'`, `'tags'`, `'star'`, and the summary columns added when
-#' `add_summary = TRUE` (`"number_of_subjects"`, `"number_of_obs"`, `"ofv"`, and
-#' `"any_heuristics"`).
-#'  - Note that the summary columns will only receive the special formatting if
-#'  added via `add_summary = TRUE`. i.e. if `.log_df = run_log() %>% add_summary()`,
-#'  and `include_info = 'ofv'`, it will be formatted as any other additional column.
+#' @section Tooltip formatting and coloring:
+#' **Tooltip formatting**
+#'
+#' Any column in `.log_df` can be chosen to include in the tooltip. However,
+#' certain columns will be formatted *specially* if specified via `include_info`.
+#' Any other column will be displayed as verbatim text (no special handling), though
+#' column *names* will be formatted slightly.
+#'
+#' Specially formatted columns (*if specified* via `include_info`):
+#'  - `'description'`, `'tags'`, and `'star'`
+#'  - When `add_summary = TRUE` these specific summary columns are also
+#'  formatted specially:
+#'     - `'number_of_subjects'`, `'number_of_obs'`, `'ofv'`, and `'any_heuristics'`.
+#'     - Note that the above summary columns will only receive the special
+#'     formatting if added via `add_summary = TRUE`.
+#'     - i.e. if `.log_df = run_log() %>% add_summary()` and
+#'     `include_info = 'ofv'`, The `'OFV'` parameter will be formatted as any
+#'     other additional column.
+#'
+#' **Coloring**
+#'
+#' Logical columns are handled differently from numeric or character columns.
+#' Nodes will be colored `'white'` for `FALSE` and `'red'` for `TRUE`. All other
+#' column types will be colored via a gradient between `'white'` and `'red'`,
+#' where earlier runs are whiter, and later runs appear to be more red. You can
+#' pass `color_by = NULL` to make all model nodes `'red'`.
 #'
 #' @examples
 #' \dontrun{
 #'
 #' # Basic
-#' model_tree(MODEL_DIR)
+#' MODEL_DIR %>% model_tree()
 #' run_log(MODEL_DIR) %>% model_tree()
 #'
 #' # Color by a column
 #' model_tree(MODEL_DIR, color_by = "star")
 #'
-#' # Run `add_config()` and/or `add_summary()` beforehand
+#'
+#' # Run `add_config()`, `add_summary()`, and/or `mutate()` calls beforehand
 #' run_log(MODEL_DIR) %>%
 #'   add_config() %>%
+#'   dplyr::mutate(out_of_date = model_has_changed | data_has_changed) %>%
 #'   model_tree(
 #'     include_info = c("model_has_changed", "data_has_changed", "nm_version"),
-#'     color_by = "data_has_changed"
+#'     color_by = "out_of_date"
 #'   )
 #'
 #' run_log(MODEL_DIR) %>%
@@ -57,12 +84,6 @@
 #'     color_by = "any_heuristics"
 #'   )
 #'
-#' run_log(MODEL_DIR) %>%
-#'   add_summary() %>%
-#'   add_config() %>%
-#'   model_tree(
-#'     include_info = c("problem_text", "data_path", "data_has_changed"),
-#'   )
 #' }
 #'
 #' @export
@@ -71,6 +92,7 @@ model_tree <- function(
     include_info = c("description","star", "tags"),
     color_by = "run",
     add_summary = TRUE,
+    digits = 3,
     zoomable = FALSE,
     static = FALSE
 ){
@@ -84,12 +106,15 @@ model_tree.character <- function(
     include_info = c("description","star", "tags"),
     color_by = "run",
     add_summary = TRUE,
+    digits = 3,
     zoomable = FALSE,
     static = FALSE
 ){
   checkmate::assert_directory_exists(.log_df)
-  .log_df <- run_log(.log_df) %>% suppressWarnings()
-  model_tree(.log_df, include_info, color_by, add_summary, zoomable, static)
+  .log_df <- run_log(.log_df)
+  model_tree(
+    .log_df, include_info, color_by, add_summary, digits, zoomable, static
+  )
 }
 
 #' @rdname model_tree
@@ -99,6 +124,7 @@ model_tree.bbi_log_df <- function(
     include_info = c("description","star", "tags"),
     color_by = "run",
     add_summary = TRUE,
+    digits = 3,
     zoomable = FALSE,
     static = FALSE
 ){
@@ -106,25 +132,26 @@ model_tree.bbi_log_df <- function(
   stop_if_tree_missing_deps(static = static)
 
   # Make tree data
-  tree_data <- make_tree_data(.log_df, include_info, add_summary)
+  tree_data <- make_tree_data(.log_df, include_info, color_by, add_summary)
 
   # Format coloring
   tree_data <- color_tree_by(tree_data, color_by = color_by)
 
   # Compile attributes into tooltip
-  tree_data <- make_tree_tooltip(tree_data)
+  tree_data <- make_tree_tooltip(tree_data, digits = digits)
 
   # Create model tree
+  tree_attr <- ifelse(is.null(color_by), "leafCount", color_by)
   pl_tree <- collapsibleTree::collapsibleTreeNetwork(
-    tree_data, zoomable = zoomable, attribute = color_by,
+    tree_data, zoomable = zoomable, attribute = tree_attr,
     fill="col", collapsed = FALSE, nodeSize = "leafCount",
     tooltipHtml = "tooltip")
 
   if(isTRUE(static)){
-    model_tree_png(pl_tree)
-  }else{
-    return(pl_tree)
+    pl_tree <- model_tree_png(pl_tree)
   }
+
+  return(pl_tree)
 }
 
 
@@ -149,9 +176,11 @@ model_tree.bbi_log_df <- function(
 make_tree_data <- function(
     .log_df,
     include_info = c("description","star", "tags"),
+    color_by = "run",
     add_summary = TRUE
 ){
-  checkmate::assert_true(all(include_info %in% names(.log_df)))
+  cols_keep <- unique(c(include_info, color_by))
+  checkmate::assert_true(all(cols_keep %in% names(.log_df)))
 
   # Check for required columns and starting format
   req_cols <- c(ABS_MOD_PATH, "run", "based_on")
@@ -168,10 +197,10 @@ make_tree_data <- function(
   base_log_cols <- c(req_cols, "description", "star", "tags")
 
   # Starting run log
-  log_cols <- unique(c(base_log_cols, include_info))
+  log_cols <- unique(c(base_log_cols, cols_keep))
   .log_df <- .log_df %>% dplyr::select(all_of(log_cols))
 
-  # Replace NULL based_on elements with NA to preserve rows when unnesting
+  # Replace NULL based_on elements with empty string to preserve rows when unnesting
   full_log <- .log_df %>% dplyr::mutate(
     based_on = purrr::map(.data$based_on, function(.x){if(is.null(.x)) "" else .x}),
   ) %>% tidyr::unnest("based_on")
@@ -266,7 +295,10 @@ make_tree_data <- function(
 #' @param full_log full log including model run and summary information
 #' @noRd
 make_model_network <- function(full_log){
-  model_dir <- unique(dirname(full_log[[ABS_MOD_PATH]]))
+  req_cols <- c(ABS_MOD_PATH, "run", "based_on", "status")
+  checkmate::assert_true(all(req_cols %in% names(full_log)))
+  model_dir <- unique(dirname(full_log[[ABS_MOD_PATH]])) %>% fs::path_rel() %>%
+    stringr::str_trunc(40, side = "left")
 
   # Create Network
   start <- "Start" # TODO: maybe replace directory with dirname?
@@ -293,10 +325,14 @@ make_model_network <- function(full_log){
   )
 
   # Set status to be modeling directory for start node
-  tree_data$status[tree_data$to=="Start"] <-
-    paste0("Model Directory:<br>", fs::path_rel(model_dir))
+  start_txt <- if(length(model_dir) == 1){
+    paste0("Model Directory:<br>", model_dir)
+  }else{
+    paste0("Model Directories:<br>", paste(model_dir, collapse = "<br>"))
+  }
+  tree_data$status[tree_data$to=="Start"] <- start_txt
 
-  return(tree_data)
+  return(tibble::as_tibble(tree_data))
 }
 
 
@@ -346,8 +382,14 @@ check_model_tree <- function(network_df){
 #' Create tooltip for interactive [model_tree()]
 #' @param tree_data a combined dataframe that includes run log columns and
 #'  defines the model network.
+#' @inheritParams model_tree
 #' @noRd
-make_tree_tooltip <- function(tree_data){
+make_tree_tooltip <- function(tree_data, digits = 3){
+
+  round_numeric <- function(x, digits){
+    # Round instead of signif - this can matter for objective functions
+    if(inherits(x, "numeric")) round(x, digits) else x
+  }
 
   # Helper for coloring text and applying other styles
   style_html <- function(txt, color = "black", ..., br_before = FALSE, br_after = FALSE){
@@ -357,7 +399,11 @@ make_tree_tooltip <- function(tree_data){
     return(txt)
   }
 
-  # Discern whether or not to display cell text
+  # Discern whether or not to display cell text for some columns
+  #  - This is only used for run_log columns that we may not want to display
+  #.    (such as an empty description or no tags)
+  #  - The key summary columns will be displayed as long as the model has been
+  #     executed (i.e. NA values will still be displayed for these columns)
   can_include <- function(txt) !is.na(txt) && txt != ""
 
   # Tooltip from run log
@@ -401,6 +447,7 @@ make_tree_tooltip <- function(tree_data){
   add_summary <- !is.null(sum_cols) && sum_cols %in% names(tree_data)
   sum_tooltip <- purrr::imap_chr(tree_data$status, function(mod_status, .y){
     status_col <- ifelse(grepl("Finished", mod_status), "#538b01", "#A30000")
+    # Add key summary columns if the model has been run (even if not successfully)
     if(isTRUE(add_summary) && grepl("Finished|Incomplete", mod_status)){
       # Conditional heuristics text
       any_heuristics <- tree_data$any_heuristics[.y]
@@ -409,12 +456,16 @@ make_tree_tooltip <- function(tree_data){
       }else{
         ""
       }
+      # Numeric values
+      ofv <- round_numeric(tree_data$ofv[.y], digits = digits)
+      n_sub <- round_numeric(tree_data$number_of_subjects[.y], digits = digits)
+      n_obs <- round_numeric(tree_data$number_of_obs[.y], digits = digits)
       # Combined tooltip
       paste0(
         style_html(mod_status, color = status_col, "font-weight:bold", br_before = TRUE, br_after = TRUE),
-        "OFV: ", style_html(tree_data$ofv[.y], color = "#A30000", br_after = TRUE),
-        "N Subjects: ", style_html(tree_data$number_of_subjects[.y], color = "#A30000", br_after = TRUE),
-        "N Obs: ", style_html(tree_data$number_of_obs[.y], color = "#A30000"),
+        "OFV: ", style_html(ofv, color = "#A30000", br_after = TRUE),
+        "N Subjects: ", style_html(n_sub, color = "#A30000", br_after = TRUE),
+        "N Obs: ", style_html(n_obs, color = "#A30000"),
         heuristics_txt
       )
     }else{
@@ -423,18 +474,17 @@ make_tree_tooltip <- function(tree_data){
     }
   })
 
-  # The above tooltips have special formatting if included in the run log
-  # Other columns requested will display as text between run_log and summary tooltips
+  # The above tooltips have special formatting and conditional logic for displaying
+  #  - Other columns requested will display as verbatim text between run_log
+  #     and summary tooltips, and will be included regardless of the value (NA
+  #     values and empty cells will still be displayed).
   other_cols <- attr(tree_data, "other_tt_cols")
   if(!is.null(other_cols)){
     other_tooltip <- purrr::imap_chr(tree_data$to, function(.x, .y){
       other_html <- purrr::map_chr(other_cols, function(col){
+        col_vals <- round_numeric(tree_data[[col]][.y], digits = digits)
         col_lbl <- paste0(stringr::str_to_title(gsub("_", " ", col)), ":")
-        col_html <- ifelse(
-          can_include(tree_data[[col]][.y]),
-          paste(col_lbl, style_html(tree_data[[col]][.y], color = "#297f9c", br_after = TRUE)),
-          ""
-        )
+        col_html <- paste(col_lbl, style_html(col_vals, color = "#297f9c", br_after = TRUE))
       })
       paste0(other_html, collapse = "")
     })
@@ -452,39 +502,51 @@ make_tree_tooltip <- function(tree_data){
 #' @inheritParams model_tree
 #' @noRd
 color_tree_by <- function(tree_data, color_by = "run"){
-  checkmate::assert_true(color_by %in% names(tree_data))
   # white and colors in bbr's logo (red and orange)
   # #f0cfc5 is a gradient color between bbr orange and white
   bbr_cols <- c("#ffffff","#f0cfc5", "#e06a46", "#eb003d")
 
-  # Get colors for unique values (Dont assign one for NA values)
-  # To preview colors: scales::show_col(pal_bbr)
-  vals <- tree_data[[color_by]][!is.na(tree_data[[color_by]])]
-  n_levels <- dplyr::n_distinct(vals)
-  pal_bbr <- scales::pal_gradient_n(bbr_cols)(seq(0, 1, length.out = n_levels))
+  if(!is.null(color_by)){
+    checkmate::assert_true(color_by %in% names(tree_data))
+    # Get non-NA values (NA values are colored separately)
+    vals <- tree_data[[color_by]][!is.na(tree_data[[color_by]])]
+    n_levels <- dplyr::n_distinct(vals)
+    # Get colors for unique values (Dont assign one for NA values)
+    # To preview colors: scales::show_col(pal_bbr)
+    pal_bbr <- scales::pal_gradient_n(bbr_cols)(seq(0, 1, length.out = n_levels))
+    # Initialize new color column using color_by
+    tree_data$col <- tree_data[[color_by]]
 
-  # Assign colors to new column
-  tree_data$col <- tree_data[[color_by]]
-  # Set NA values to grey
-  na_vals <- is.na(tree_data$col) & tree_data$to != "Start"
-  if(any(na_vals)){
-    tree_data$col[na_vals] <- "#C0C0C0"
-    pal_bbr <- c("#C0C0C0", pal_bbr)
+    # Set NA values to grey
+    na_vals <- is.na(tree_data$col) & tree_data$to != "Start"
+    if(any(na_vals)){
+      tree_data$col[na_vals] <- "#C0C0C0"
+      pal_bbr <- c("#C0C0C0", pal_bbr)
+    }
+  }else{
+    pal_bbr <- scales::pal_gradient_n(bbr_cols)(1)
+    # Initialize new color column (all the same color)
+    tree_data$col <- 1
   }
-  # Set start node to tan
+
+  # Set start node color to metrum green
   tree_data$col[tree_data$to == "Start"] <- "#007319"
   pal_bbr <- c("#007319", pal_bbr)
-  # Assign rest of the colors
+  # Assign rest of the colors to new column
   tree_data$col <- factor(tree_data$col)
   levels(tree_data$col) <- pal_bbr
 
   return(tree_data)
 }
 
-#' Save interactive [model_tree()] as PNG and load in Rstudio viewer
+#' Save an interactive [model_tree()] as a PNG and load in Rstudio viewer
 #'
+#' @details
 #' This function first saves and renders widget as HTML. It then screenshots
-#' the webpage and saves the file to a temporary PNG.
+#' the webpage and saves the file to a temporary PNG. The PNG is loaded in as
+#' an array and all data is re-packaged to be print like a `ggplot` object.
+#'
+#' @param widget an `HTML` widget
 #'
 #' @keywords internal
 model_tree_png <- function(widget) {
@@ -500,11 +562,45 @@ model_tree_png <- function(widget) {
     delay = 0.75
   )
   # Load and plot PNG
-  png_file <- png::readPNG(temp_png)
-  grid::grid.newpage()
-  grid::grid.raster(png_file)
+  png_array <- png::readPNG(temp_png)
+
+  p <- structure(list(
+    data = widget$x$data,
+    options = widget$x$options,
+    png_array = png_array
+  ), class = c("model_tree_static", "list"))
+
+  return(p)
 }
 
+#' Draw model tree as a static plot
+#' @param x plot to display
+#' @param newpage Logical (T/F). If `TRUE`, draw new (empty) page first.
+#' @param vp viewport to draw plot in
+#' @param ... other arguments not used by this method
+#'
+#' @examples
+#' \dontrun{
+#' pl_tree <- model_tree(MODEL_DIR, static = TRUE)
+#'
+#' print(pl_tree)
+#' print(pl_tree, vp = grid::viewport(width=0.5, height=0.5))
+#' print(pl_tree, newpage = TRUE, vp = grid::viewport(width=0.5, height=0.5))
+#' }
+#' @export
+print.model_tree_static <- function(x, newpage = is.null(vp), vp = NULL, ...){
+  x_height <- grid::unit(0.85, "npc")
+  x_width <- grid::unit(1, "npc")
+  if(newpage) grid::grid.newpage()
+  if(is.null(vp)){
+    grid::grid.raster(x$png_array, height = x_height, width = x_width)
+  }else{
+    if(is.character(vp)) grid::seekViewport(vp) else grid::pushViewport(vp)
+    grid::grid.raster(x$png_array, height = x_height, width = x_width)
+    grid::upViewport()
+  }
+  return(invisible(x))
+}
 
 #' Required packages for running [model_tree()]
 #'
@@ -523,8 +619,8 @@ model_tree_png <- function(widget) {
 #'  Rstudio viewer.
 #'  - **`webshot`** is needed for taking a screenshot of the rendered HTML,
 #'  saved out via `htmlwidgets::saveWidget()`.
-#'  - **`png`** is needed for reading in a PNG file in order to plot it in the
-#'  Rstudio viewer.
+#'  - **`png`** is needed for reading in a PNG file as an array, in order to plot
+#'   it in the Rstudio viewer.
 #'
 #' @keywords internal
 req_tree_pkgs <- function(static = FALSE){
