@@ -526,7 +526,7 @@ make_tree_tooltip <- function(tree_data, digits = 3){
 
   # Tooltip from model summary
   sum_cols <- attr(tree_data, "sum_tt_cols")
-  add_summary <- !is.null(sum_cols) && sum_cols %in% names(tree_data)
+  add_summary <- !is.null(sum_cols) && all(sum_cols %in% names(tree_data))
   sum_tooltip <- purrr::imap_chr(tree_data$status, function(mod_status, .y){
     status_col <- ifelse(grepl("Finished", mod_status), "#538b01", "#A30000")
     # Add key summary columns if the model has been run (even if not successfully)
