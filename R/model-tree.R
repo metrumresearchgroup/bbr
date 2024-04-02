@@ -199,11 +199,8 @@ make_tree_data <- function(
   # Starting run log
   log_cols <- unique(c(base_log_cols, cols_keep))
   .log_df <- .log_df %>% dplyr::select(all_of(log_cols))
-
-  # Replace NULL based_on elements with empty string to preserve rows when unnesting
-  full_log <- .log_df %>% dplyr::mutate(
-    based_on = purrr::map(.data$based_on, function(.x){if(is.null(.x)) "" else .x}),
-  ) %>% tidyr::unnest("based_on")
+  # unnest based_on column
+  full_log <- unnest_based_on(.log_df)
 
   if("tags" %in% include_info){
     full_log <- full_log %>% dplyr::mutate(
@@ -290,18 +287,48 @@ make_tree_data <- function(
   return(tree_data)
 }
 
+#' Unnest the based_on column from a run_log
+#' @param .log_df a `bbr` run log
+#' @noRd
+unnest_based_on <- function(.log_df){
+  check_bbi_run_log_df_object(.log_df)
+  .log_df %>% dplyr::mutate(
+    # Replace NULL based_on elements with empty string to preserve rows when unnesting
+    based_on = purrr::map(.data$based_on, function(.x){if(is.null(.x)) "" else .x}),
+  ) %>% tidyr::unnest("based_on")
+}
 
 #' Make model network for use in `model_tree`
-#' @param full_log full log including model run and summary information
+#' @param full_log full log including model run and summary information. Assumes
+#'  the `based_on` column is unnested.
 #' @noRd
 make_model_network <- function(full_log){
   req_cols <- c(ABS_MOD_PATH, "run", "based_on", "status")
   checkmate::assert_true(all(req_cols %in% names(full_log)))
-  model_dir <- unique(dirname(full_log[[ABS_MOD_PATH]])) %>% fs::path_rel() %>%
+  checkmate::assert_character(full_log$based_on)
+
+  # Check if log was recursive, and append relevant columns
+  full_log <- add_log_recurse_dirs(full_log)
+  if(any(full_log$is_sub_dir)){
+    full_log2 <- full_log
+    sub_dir_rows <- which(full_log2$is_sub_dir)
+    # Handle recursive run logs
+    for(i in 1:seq_along(sub_dir_rows)){
+      rn <- sub_dir_rows[i]
+      # Make `based_on` path just the model name, and add the relative subdirectory
+      # to the run name. This is necessary for linking nested models.
+      full_log2$run[rn] <- file.path(full_log$sub_dir_name[rn], basename(full_log$based_on[rn]))
+      full_log2$based_on[rn] <- basename(full_log$based_on[rn])
+    }
+    full_log <- full_log2
+  }
+
+  # Truncate model directory(ies) for tooltip display
+  model_dirs <- unique(full_log$model_dir) %>%
     stringr::str_trunc(40, side = "left")
 
   # Create Network
-  start <- "Start" # TODO: maybe replace directory with dirname?
+  start <- "Start"
   noref <- data.frame(from = NA, to = start)
   parent_mods <- data.frame(from = start,
                             to = full_log$run[full_log$based_on==""])
@@ -313,9 +340,11 @@ make_model_network <- function(full_log){
   network_df <- check_model_tree(network_df)
 
   # Join network to run log
+  recurse_cols <- c("par_dir", "is_sub_dir", "sub_dir_name")
   tree_data <- dplyr::left_join(network_df, full_log, by = c("to" = "run")) %>%
     dplyr::mutate(run = ifelse(.data$to == "Start", NA, .data$to)) %>%
-    dplyr::relocate(all_of(c("from", "to", "run")))
+    dplyr::relocate(all_of(c("from", "to", "run"))) %>%
+    dplyr::select(-all_of(recurse_cols))
 
   # Adjust status for any unlinked (missing) models
   tree_data <- tree_data %>% dplyr::mutate(
@@ -325,10 +354,10 @@ make_model_network <- function(full_log){
   )
 
   # Set status to be modeling directory for start node
-  start_txt <- if(length(model_dir) == 1){
-    paste0("Model Directory:<br>", model_dir)
-  }else{
-    paste0("Model Directories:<br>", paste(model_dir, collapse = "<br>"))
+  start_txt <- if(length(model_dirs) == 1){
+    paste0("Model Directory:<br>", model_dirs)
+  }else if(length(model_dirs) > 1){
+    paste0("Model Directories:<br>", paste(model_dirs, collapse = ",<br>"))
   }
   tree_data$status[tree_data$to=="Start"] <- start_txt
 
@@ -336,6 +365,59 @@ make_model_network <- function(full_log){
 }
 
 
+#' Determine if `.recurse` was set to `TRUE` when calling bbr::run_log(), and
+#' append columns linking sub directories to their parent if so.
+#' @param .log_df a `bbr` run log
+#' @noRd
+add_log_recurse_dirs <- function(.log_df){
+  check_bbi_run_log_df_object(.log_df)
+  checkmate::assert_true(all(c(ABS_MOD_PATH, "based_on") %in% names(.log_df)))
+  checkmate::assert_character(.log_df$based_on)
+
+  # Add modeling directory to log for later joining
+  .log_df$model_dir <- dirname(.log_df[[ABS_MOD_PATH]]) %>% fs::path_rel() %>%
+    as.character()
+  model_dirs <- unique(.log_df$model_dir)
+
+  # Set whether .recurse was set when calling bbr::run_log()
+  # This doesn't necessarily guarantee a path is a subdirectory of another
+  # E.g., if data manipulation/filtering was done ahead of time
+  .recurse <- any(grepl("\\Q..\\E", .log_df$based_on))
+
+  is_sub_path <- function(x, dir, n = nchar(dir)){
+    (substr(x, 1, n) == dir) && (x != dir)
+  }
+
+  if(length(model_dirs) > 1){
+    # Check all combinations for subdirectories
+    dir_combs <- expand.grid(dir = model_dirs, test = model_dirs, stringsAsFactors = FALSE)
+    dir_combs$is_sub_dir <- purrr::map2_lgl(dir_combs$dir, dir_combs$test, is_sub_path)
+
+    if(any(dir_combs$is_sub_dir) && .recurse){
+      sub_dir_combs <- dir_combs[dir_combs$is_sub_dir,] %>%
+        dplyr::rename("sub_dir" = "dir", "par_dir" = "test")
+      sub_dir_combs$sub_dir_name <- purrr::map2_chr(
+        sub_dir_combs$sub_dir, sub_dir_combs$par_dir, fs::path_rel
+      ) %>% unique()
+
+      .log_df <- .log_df %>% dplyr::left_join(
+        sub_dir_combs, by = c("model_dir" = "sub_dir")
+      ) %>% dplyr::mutate(
+        is_sub_dir = ifelse(is.na(.data$is_sub_dir), FALSE, .data$is_sub_dir)
+      )
+    }else{
+      .log_df <- .log_df %>% dplyr::mutate(
+        is_sub_dir = FALSE, par_dir = NA_character_, sub_dir_name = NA_character_
+      )
+    }
+  }else{
+    .log_df <- .log_df %>% dplyr::mutate(
+      is_sub_dir = FALSE, par_dir = NA_character_, sub_dir_name = NA_character_
+    )
+  }
+
+  return(.log_df)
+}
 
 #' Perform checks regarding whether a tree can be made. Will set models as
 #' base models if referenced `based_on` model cannot be found

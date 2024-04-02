@@ -88,6 +88,80 @@ describe("model_tree() integration", {
     # Confirm number of origins plotted
     expect_equal(length(pl_tree$x$data$children), 2)
   })
+
+  it("recursive run log", {
+    clean_test_enviroment(create_tree_models)
+    fs::dir_create(LEVEL2_DIR)
+    mod_nest <- copy_model_from(
+      MOD1, file.path(LEVEL2_SUBDIR, MOD_ID), "level 2 copy of 1.yaml",
+      .inherit_tags = TRUE
+    )
+    fs::dir_copy(MOD1_PATH, LEVEL2_MOD)
+    run_df <- run_log(MODEL_DIR, .recurse = TRUE)
+
+    # Check data prep
+    tree_data <- make_tree_data(run_df)
+    # Confirm based_on subdirectories are replaced with just the model id & run
+    # ids now include the subdirectory
+    expect_false(any(grepl("\\Q..\\E", tree_data$based_on)))
+    expect_true(any(grepl("level2/1", tree_data$run)))
+
+    pl_tree <- model_tree(run_df)
+    # Confirm number of expected nodes
+    expect_equal(count_nodes(pl_tree$x$data$children), nrow(run_df))
+    # Confirm number of origins plotted
+    expect_equal(length(pl_tree$x$data$children), 1)
+    # Conirm number of models based on MOD1 (one is nested in LEVEL2_DIR)
+    expect_equal(length(pl_tree$x$data$children[[1]]$children), 2)
+  })
+
+  it("combine cases", {
+    # This combines all the above cases and is meant to ensure there is no
+    # interaction between these cases. It duplicates some of the expectations
+    # in those individual tests just to make sure they are still true.
+    clean_test_enviroment(
+      create_tree_models(
+        addl_based_on = TRUE, multiple_origins = TRUE, broken_link = TRUE
+      )
+    )
+    fs::dir_create(LEVEL2_DIR)
+    mod_nest <- copy_model_from(
+      MOD1, file.path(LEVEL2_SUBDIR, MOD_ID), "level 2 copy of 1.yaml",
+      .inherit_tags = TRUE
+    )
+    fs::dir_copy(MOD1_PATH, LEVEL2_MOD)
+
+    run_df <- run_log(MODEL_DIR, .recurse = TRUE)
+
+    # Check broken links case
+    expect_warning(
+      tree_data <- make_tree_data(run_df),
+      "The following models could not be linked properly"
+    )
+    # Check multiple origins case
+    expect_equal(sum(grepl("Start", tree_data$from)), 2)
+    # Check additional based on case
+    addl_based_on <- tree_data$addl_based_on
+    expect_equal(addl_based_on[!is.na(addl_based_on)], c("1, 3", "2"))
+    expect_equal(sum(is.na(addl_based_on)), 10)
+    # Check recursive case
+    expect_false(any(grepl("\\Q..\\E", tree_data$based_on)))
+    expect_true(any(grepl("level2/1", tree_data$run)))
+
+    # Check plot
+    pl_tree <- model_tree(run_df) %>% suppressWarnings()
+    # Confirm total number of expected nodes (not including start node)
+    # (see broken link test for why 1 is added to the number of rows)
+    expect_equal(count_nodes(pl_tree$x$data$children), nrow(run_df) + 1)
+    # Confirm number of origins plotted
+    expect_equal(length(pl_tree$x$data$children), 2)
+    # Confirm split-off cases (multiple children per node) & number of child nodes
+    expect_equal(length(pl_tree$x$data$children), 2)
+    expect_equal(length(pl_tree$x$data$children[[1]]$children), 2)
+    expect_equal(count_nodes(pl_tree$x$data$children[[1]]$children), 7)
+    expect_equal(length(pl_tree$x$data$children[[1]]$children[[1]]$children), 2)
+    expect_equal(count_nodes(pl_tree$x$data$children[[1]]$children[[1]]$children), 5)
+  })
 })
 
 describe("model_tree() data setup",{
@@ -123,7 +197,8 @@ describe("model_tree() data setup",{
     run_df <- run_df %>% dplyr::mutate(
       based_on = purrr::map(.data$based_on, function(.x){if(is.null(.x)) "" else .x}),
     ) %>% tidyr::unnest("based_on")
-
+    # run log classes are removed when unnesting columns
+    class(run_df) <- c("bbi_run_log_df", "bbi_log_df", class(run_df))
     network_df <- make_model_network(run_df)
 
     # Check expected collapsibleTree attributes
