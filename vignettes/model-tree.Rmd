@@ -23,6 +23,7 @@ knitr::opts_chunk$set(
 if (interactive()) {
   devtools::load_all()
 }
+library(glue)
 ```
 
 ```{r load packages, results = 'hide', message=FALSE, warning=FALSE}
@@ -48,8 +49,8 @@ copy_output_dir <- function(orig_mod, new_mod) {
   orig_mod_id <- get_model_id(orig_mod)
   new_mod_id <- basename(new_dir_path)
   purrr::walk(fs::dir_ls(new_dir_path), ~ {
-    if (stringr::str_detect(basename(.x), glue("^{orig_mod_id}"))) {
-      mod_name <- stringr::str_replace(basename(.x), glue("^{orig_mod_id}"), new_mod_id)
+    if (stringr::str_detect(basename(.x), glue::glue("^{orig_mod_id}"))) {
+      mod_name <- stringr::str_replace(basename(.x), glue::glue("^{orig_mod_id}"), new_mod_id)
       fs::file_move(.x, file.path(dirname(.x), mod_name))
     }
   })
