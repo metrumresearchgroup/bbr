@@ -740,7 +740,7 @@ print.model_tree_static <- function(x, newpage = is.null(vp), vp = NULL, ...){
 #'
 #' @keywords internal
 req_tree_pkgs <- function(static = FALSE){
-  req_pkgs <- c("collapsibleTree", "scales")
+  req_pkgs <- c("collapsibleTree", "1.3.0" = "scales")
   if(isTRUE(static)){
     req_pkgs <- c(req_pkgs, "htmlwidgets", "webshot", "png", "grid")
   }
@@ -752,12 +752,24 @@ req_tree_pkgs <- function(static = FALSE){
 #' present.
 check_for_model_tree_pkgs <- function(static = FALSE) {
   REQUIRED_TREE_PKGS <- req_tree_pkgs(static = static)
-  pkgs_present <- purrr::map_lgl(REQUIRED_TREE_PKGS, function(.pkg) {
-    requireNamespace(.pkg, quietly = TRUE)
-  })
+  pkg_names <- paste(unname(REQUIRED_TREE_PKGS), names(REQUIRED_TREE_PKGS), sep = " ")
+  pkgs_present <- purrr::imap_lgl(REQUIRED_TREE_PKGS, function(.pkg, .ver) {
+    pkg_installed <- requireNamespace(.pkg, quietly = TRUE)
+    # Check required versions
+    ver_installed <- if(isTRUE(pkg_installed)){
+      if(.ver != ""){
+        utils::packageVersion(.pkg) >= package_version(.ver)
+      }else{
+        TRUE
+      }
+    }else{
+      FALSE
+    }
+    return(pkg_installed && ver_installed)
+  }) %>% stats::setNames(pkg_names)
 
   if (any(!pkgs_present)) {
-    return(REQUIRED_TREE_PKGS[!pkgs_present])
+    return(names(pkgs_present)[!pkgs_present])
   } else {
     return(NULL)
   }
