@@ -42,8 +42,8 @@ if (Sys.which("bbi") == "") {
 
 # Create fake runs
 copy_output_dir <- function(orig_mod, new_mod) {
-  new_dir_path <- new_mod[[ABS_MOD_PATH]]
-  fs::dir_copy(orig_mod[[ABS_MOD_PATH]], new_dir_path)
+  new_dir_path <- new_mod[["absolute_model_path"]]
+  fs::dir_copy(orig_mod[["absolute_model_path"]], new_dir_path)
   
   # replace file names with new model ID
   orig_mod_id <- get_model_id(orig_mod)
