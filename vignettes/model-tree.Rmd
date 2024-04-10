@@ -3,7 +3,7 @@ title: "Creating a model tree diagram"
 author: "Kyle Barrett"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{using-based-on}
+  %\VignetteIndexEntry{model-tree}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -33,7 +33,7 @@ suppressPackageStartupMessages({
 ```
 
 ```{r set up and define cleanup, include = FALSE}
-MODEL_DIR <- system.file("model", "nonmem", "basic", package = "bbr")
+MODEL_DIR <- system.file("model", "nonmem", "basic", package = "bbr", mustWork = TRUE)
 
 # set bbi execution path
 if (Sys.which("bbi") == "") {
@@ -135,7 +135,18 @@ run_log(MODEL_DIR) %>%
 ```
 
 The model tree can also be helpful for quickly determine if any heuristics were found during any model submissions, as well as displaying specific model summary output in the tooltip. 
-```{r}
+```{r, echo=FALSE}
+# Since using fake models (all inheriting the same issues), set most to FALSE
+log_df <- run_log(MODEL_DIR) %>% add_summary()
+log_df$any_heuristics[1:(nrow(log_df) - 2)] <- FALSE
+model_tree(
+  log_df,
+  include_info = c("tags", "param_count", "eta_pval_significant"),
+  color_by = "any_heuristics"
+)
+```
+
+```{r, eval=FALSE}
 run_log(MODEL_DIR) %>%
   add_summary() %>%
   model_tree(
