@@ -634,8 +634,8 @@ color_tree_by <- function(tree_data, color_by = "run"){
       # (dont overwrite start node and NA values)
       tree_data <- tree_data %>% dplyr::mutate(
         col = dplyr::case_when(
-          !!sym(color_by) == FALSE ~ pal_bbr[1],
-          !!sym(color_by) == TRUE ~  pal_bbr[2],
+          !!rlang::sym(color_by) == FALSE ~ pal_bbr[1],
+          !!rlang::sym(color_by) == TRUE ~  pal_bbr[2],
           TRUE ~ col
         )
       )

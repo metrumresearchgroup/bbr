@@ -1,4 +1,5 @@
 context("Model tree diagram")
+skip_if_not_drone_or_metworx("test-model-tree")
 skip_if_tree_missing_deps()
 
 count_nodes <- function(tree_list) {
@@ -20,12 +21,12 @@ describe("model_tree() integration", {
   it("default behavior", {
     clean_test_enviroment(create_tree_models)
     run_df <- run_log(MODEL_DIR)
-    tree_data <- make_tree_data(run_df)
+    tree_data <- make_tree_data(run_df, add_summary = FALSE)
 
     # Confirm one origin in data
     expect_equal(sum(grepl("Start", tree_data$from)), 1)
 
-    pl_tree <- model_tree(run_df)
+    pl_tree <- model_tree(run_df, add_summary = FALSE)
     # Confirm number of expected nodes
     expect_equal(count_nodes(pl_tree$x$data$children), nrow(run_df))
     # Confirm number of origins plotted
@@ -36,7 +37,7 @@ describe("model_tree() integration", {
     # Includes models that have multiple based_on attributes
     clean_test_enviroment(create_tree_models(addl_based_on = TRUE))
     run_df <- run_log(MODEL_DIR)
-    tree_data <- make_tree_data(run_df)
+    tree_data <- make_tree_data(run_df, add_summary = FALSE)
     addl_based_on <- tree_data$addl_based_on
 
     # Additional based on attributes are stored as a separate column and
@@ -44,7 +45,7 @@ describe("model_tree() integration", {
     expect_equal(addl_based_on[!is.na(addl_based_on)], c("1, 3", "2"))
     expect_equal(sum(is.na(addl_based_on)), 6)
 
-    pl_tree <- model_tree(run_df)
+    pl_tree <- model_tree(run_df, add_summary = FALSE)
     # Confirm number of expected nodes
     expect_equal(count_nodes(pl_tree$x$data$children), nrow(run_df))
     # Confirm number of origins plotted
@@ -55,12 +56,12 @@ describe("model_tree() integration", {
     # Multiple starting models (models without a `based_on` attribute)
     clean_test_enviroment(create_tree_models(multiple_origins = TRUE))
     run_df <- run_log(MODEL_DIR)
-    tree_data <- make_tree_data(run_df)
+    tree_data <- make_tree_data(run_df, add_summary = FALSE)
 
     # Confirm two origins in data
     expect_equal(sum(grepl("Start", tree_data$from)), 2)
 
-    pl_tree <- model_tree(run_df)
+    pl_tree <- model_tree(run_df, add_summary = FALSE)
     # Confirm number of expected nodes
     expect_equal(count_nodes(pl_tree$x$data$children), nrow(run_df))
     # Confirm number of origins plotted
@@ -74,13 +75,13 @@ describe("model_tree() integration", {
     run_df <- run_log(MODEL_DIR)
 
     expect_warning(
-      tree_data <- make_tree_data(run_df),
+      tree_data <- make_tree_data(run_df, add_summary = FALSE),
       "The following models could not be linked properly"
     )
     # Confirm two origins in data
     expect_equal(sum(grepl("Start", tree_data$from)), 2)
 
-    pl_tree <- model_tree(run_df) %>% suppressWarnings()
+    pl_tree <- model_tree(run_df, add_summary = FALSE) %>% suppressWarnings()
     # Confirm number of expected nodes
     # Here an extra node is made for mod 1000. mod 1000 is not present in the
     # run log (was deleted), but is referenced as based_on in mod 1001.
@@ -100,13 +101,13 @@ describe("model_tree() integration", {
     run_df <- run_log(MODEL_DIR, .recurse = TRUE)
 
     # Check data prep
-    tree_data <- make_tree_data(run_df)
+    tree_data <- make_tree_data(run_df, add_summary = FALSE)
     # Confirm based_on subdirectories are replaced with just the model id & run
     # ids now include the subdirectory
     expect_false(any(grepl("\\Q..\\E", tree_data$based_on)))
     expect_true(any(grepl("level2/1", tree_data$run)))
 
-    pl_tree <- model_tree(run_df)
+    pl_tree <- model_tree(run_df, add_summary = FALSE)
     # Confirm number of expected nodes
     expect_equal(count_nodes(pl_tree$x$data$children), nrow(run_df))
     # Confirm number of origins plotted
@@ -135,7 +136,7 @@ describe("model_tree() integration", {
 
     # Check broken links case
     expect_warning(
-      tree_data <- make_tree_data(run_df),
+      tree_data <- make_tree_data(run_df, add_summary = FALSE),
       "The following models could not be linked properly"
     )
     # Check multiple origins case
@@ -149,7 +150,7 @@ describe("model_tree() integration", {
     expect_true(any(grepl("level2/1", tree_data$run)))
 
     # Check plot
-    pl_tree <- model_tree(run_df) %>% suppressWarnings()
+    pl_tree <- model_tree(run_df, add_summary = FALSE) %>% suppressWarnings()
     # Confirm total number of expected nodes (not including start node)
     # (see broken link test for why 1 is added to the number of rows)
     expect_equal(count_nodes(pl_tree$x$data$children), nrow(run_df) + 1)
@@ -181,6 +182,12 @@ describe("model_tree() data setup",{
     tree_data <- make_tree_data(run_df, include_info = "star")
     # Tags remain unchanged when not part of the tooltip
     expect_true(inherits(tree_data$tags, "list"))
+  })
+
+  it("summary column inclusion", {
+    skip_if_old_bbi("3.2.0") # calls model_summary()
+    clean_test_enviroment(create_tree_models)
+    run_df <- run_log(MODEL_DIR)
 
     # Summary columns are not included if add_summary = FALSE, unless you pass
     # it in via `include_info`
@@ -212,6 +219,7 @@ describe("model_tree() data setup",{
 
 describe("model_tree() formatting",{
   it("make_tree_tooltip()", {
+    skip_if_old_bbi("3.2.0") # calls model_summary()
     clean_test_enviroment(create_tree_models)
     # With summary (default)
     tree_data <- make_tree_data(run_log(MODEL_DIR), add_summary = TRUE)
@@ -234,14 +242,14 @@ describe("model_tree() formatting",{
     clean_test_enviroment(create_tree_models)
 
     # Attribute checks
-    pl_tree <- model_tree(MODEL_DIR)
+    pl_tree <- model_tree(MODEL_DIR, add_summary = FALSE)
     expect_equal(pl_tree$x$options$attribute, "run")
-    pl_tree <- model_tree(MODEL_DIR, color_by = "star")
+    pl_tree <- model_tree(MODEL_DIR, add_summary = FALSE, color_by = "star")
     expect_equal(pl_tree$x$options$attribute, "star")
 
     ### Data checks ###
     # Test logical color_by
-    tree_data <- make_tree_data(run_log(MODEL_DIR))
+    tree_data <- make_tree_data(run_log(MODEL_DIR), add_summary = FALSE)
     tree_data_star <- color_tree_by(tree_data, color_by = "star")
     expect_equal(
       as.character(tree_data_star$col),
@@ -277,7 +285,7 @@ describe("model_tree() formatting",{
     )
 
     # Test numeric/character color_by (gradient coloring)
-    tree_data <- make_tree_data(run_log(MODEL_DIR))
+    tree_data <- make_tree_data(run_log(MODEL_DIR), add_summary = FALSE)
     tree_data_run <- color_tree_by(tree_data, color_by = "run")
     expect_equal(
       as.character(tree_data_run$col),
@@ -290,7 +298,7 @@ describe("model_tree() formatting",{
   it("static plot", {
     skip_if_tree_missing_deps(static = TRUE)
     clean_test_enviroment(create_tree_models)
-    pl_tree <- model_tree(MODEL_DIR, static = TRUE)
+    pl_tree <- model_tree(MODEL_DIR, add_summary = FALSE, static = TRUE)
     # Just check that the class was assigned and the right
     # data is returned
     expect_true(inherits(pl_tree, "model_tree_static"))
