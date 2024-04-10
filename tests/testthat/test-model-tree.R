@@ -232,18 +232,58 @@ describe("model_tree() formatting",{
 
   it("color_tree_by()", {
     clean_test_enviroment(create_tree_models)
+
+    # Attribute checks
     pl_tree <- model_tree(MODEL_DIR)
     expect_equal(pl_tree$x$options$attribute, "run")
     pl_tree <- model_tree(MODEL_DIR, color_by = "star")
     expect_equal(pl_tree$x$options$attribute, "star")
 
-    # Check generated color column
+    ### Data checks ###
+    # Test logical color_by
     tree_data <- make_tree_data(run_log(MODEL_DIR))
-    tree_data <- color_tree_by(tree_data, color_by = "star")
+    tree_data_star <- color_tree_by(tree_data, color_by = "star")
     expect_equal(
-      as.character(tree_data$col),
+      as.character(tree_data_star$col),
       # green (start node), white/FALSE, red/TRUE (starred), white/FALSE x3
       c("#007319", "#FFFFFF", "#EB003D", rep("#FFFFFF", 3))
+    )
+
+    # Check if only FALSE
+    tree_data$star[2:nrow(tree_data)] <- FALSE
+    tree_data_star <- color_tree_by(tree_data, color_by = "star")
+    expect_equal(
+      as.character(tree_data_star$col),
+      # green (start node), white/FALSE x5
+      c("#007319", rep("#FFFFFF", 5))
+    )
+
+    # Check if only TRUE
+    tree_data$star[2:nrow(tree_data)] <- TRUE
+    tree_data_star <- color_tree_by(tree_data, color_by = "star")
+    expect_equal(
+      as.character(tree_data_star$col),
+      # green (start node), red/TRUE (starred) x5
+      c("#007319", rep("#EB003D", 5))
+    )
+
+    # Check NA values
+    tree_data$star[nrow(tree_data)] <- NA
+    tree_data_star <- color_tree_by(tree_data, color_by = "star")
+    expect_equal(
+      as.character(tree_data_star$col),
+      # green (start node), red/TRUE (starred) x4, grey/NA
+      c("#007319", rep("#EB003D", 4), "#C0C0C0")
+    )
+
+    # Test numeric/character color_by (gradient coloring)
+    tree_data <- make_tree_data(run_log(MODEL_DIR))
+    tree_data_run <- color_tree_by(tree_data, color_by = "run")
+    expect_equal(
+      as.character(tree_data_run$col),
+      # green (start node), gradient coloring between white and red
+      # Note: all gradient colors will shift if number of models change
+      c("#007319", "#FFFFFF", "#F4DBD3", "#ED9D84", "#E35B44", "#EB003D")
     )
   })
 

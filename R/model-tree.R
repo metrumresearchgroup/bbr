@@ -588,35 +588,56 @@ color_tree_by <- function(tree_data, color_by = "run"){
   # #f0cfc5 is a gradient color between bbr orange and white
   bbr_cols <- c("#ffffff","#f0cfc5", "#e06a46", "#eb003d")
 
+  # Initialize new color column
   if(!is.null(color_by)){
     checkmate::assert_true(color_by %in% names(tree_data))
-    # Get non-NA values (NA values are colored separately)
-    vals <- tree_data[[color_by]][!is.na(tree_data[[color_by]])]
-    n_levels <- dplyr::n_distinct(vals)
-    # Get colors for unique values (Dont assign one for NA values)
-    # To preview colors: scales::show_col(pal_bbr)
-    pal_bbr <- scales::pal_gradient_n(bbr_cols)(seq(0, 1, length.out = n_levels))
-    # Initialize new color column using color_by
     tree_data$col <- tree_data[[color_by]]
-
-    # Set NA values to grey
-    na_vals <- is.na(tree_data$col) & tree_data$to != "Start"
-    if(any(na_vals)){
-      tree_data$col[na_vals] <- "#C0C0C0"
-      pal_bbr <- c("#C0C0C0", pal_bbr)
-    }
   }else{
-    pal_bbr <- scales::pal_gradient_n(bbr_cols)(1)
-    # Initialize new color column (all the same color)
     tree_data$col <- 1
   }
 
-  # Set start node color to metrum green
+  # Set start node color to green
   tree_data$col[tree_data$to == "Start"] <- "#007319"
-  pal_bbr <- c("#007319", pal_bbr)
-  # Assign rest of the colors to new column
-  tree_data$col <- factor(tree_data$col)
-  levels(tree_data$col) <- pal_bbr
+  # This variable is only used for gradient coloring
+  node_colors <- "#007319"
+
+  # Set NA values to grey if using color_by
+  na_vals <- is.na(tree_data$col) & tree_data$to != "Start"
+  if(any(na_vals)){
+    tree_data$col[na_vals] <- "#C0C0C0"
+    node_colors <- c(node_colors, "#C0C0C0")
+  }
+
+  if(!is.null(color_by)){
+    # Get non-NA values (NA values are colored separately)
+    vals <- tree_data[[color_by]][!is.na(tree_data[[color_by]])]
+    n_levels <- dplyr::n_distinct(vals)
+
+    # To preview color palette: scales::show_col(pal_bbr)
+    if(inherits(vals, "logical")){
+      # Ensure both TRUE and FALSE colors are extracted, even if only one occurs
+      pal_bbr <- scales::pal_gradient_n(bbr_cols)(c(0,1))
+      # Explicitly set FALSE to white and TRUE to red
+      # (dont overwrite start node and NA values)
+      tree_data <- tree_data %>% dplyr::mutate(
+        col = dplyr::case_when(
+          !!sym(color_by) == FALSE ~ pal_bbr[1],
+          !!sym(color_by) == TRUE ~  pal_bbr[2],
+          TRUE ~ col
+        )
+      )
+    }else{
+      # Gradient coloring: get colors for unique values (excluding NA)
+      pal_bbr <- scales::pal_gradient_n(bbr_cols)(seq(0, 1, length.out = n_levels))
+      tree_data$col <- factor(tree_data$col)
+      levels(tree_data$col) <- c(node_colors, pal_bbr)
+    }
+  }else{
+    # all bbr red color
+    pal_bbr <- scales::pal_gradient_n(bbr_cols)(1)
+    tree_data$col <- factor(tree_data$col)
+    levels(tree_data$col) <- c(node_colors, pal_bbr)
+  }
 
   return(tree_data)
 }
