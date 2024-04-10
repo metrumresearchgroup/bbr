@@ -1,0 +1,152 @@
+---
+title: "Creating a model tree diagram"
+author: "Kyle Barrett"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{using-based-on}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+
+```{r setup, include=FALSE}
+# NOTE: if running chunks interactively we need to load the package first
+#   because renv isolation prevents us from finding an bbr installation
+if (interactive()) {
+  devtools::load_all()
+}
+```
+```{r load packages, include=FALSE}
+suppressPackageStartupMessages({
+  library(bbr)
+  library(dplyr)
+  library(purrr)
+})
+```
+
+```{r set up and define cleanup, include = FALSE}
+MODEL_DIR <- system.file("model", "nonmem", "basic", package = "bbr")
+
+# set bbi execution path
+if (Sys.which("bbi") == "") {
+  options('bbr.bbi_exe_path' = read_bbi_path())
+}
+
+# Create fake runs
+copy_output_dir <- function(orig_mod, new_mod) {
+  new_dir_path <- new_mod[[ABS_MOD_PATH]]
+  fs::dir_copy(orig_mod[[ABS_MOD_PATH]], new_dir_path)
+  
+  # replace file names with new model ID
+  orig_mod_id <- get_model_id(orig_mod)
+  new_mod_id <- basename(new_dir_path)
+  purrr::walk(fs::dir_ls(new_dir_path), ~ {
+    if (stringr::str_detect(basename(.x), glue("^{orig_mod_id}"))) {
+      mod_name <- stringr::str_replace(basename(.x), glue("^{orig_mod_id}"), new_mod_id)
+      fs::file_move(.x, file.path(dirname(.x), mod_name))
+    }
+  })
+}
+
+# Create example working directory
+create_tree_models <- function(MODEL_DIR){
+  MOD1_PATH <- file.path(MODEL_DIR, 1)
+  tags <- c("new tag 1", "new tag 2")
+  # copy models before creating model tree
+  mod1 <- read_model(MOD1_PATH)
+  mod2 <- copy_model_from(mod1, "2", .overwrite = TRUE, .add_tags = tags) %>% 
+    add_star()
+  mod3 <- copy_model_from(mod2, "3", .overwrite = TRUE, .add_tags = "DV: nmol")
+  mod4 <- copy_model_from(mod2, "4", .overwrite = TRUE)
+  mod5 <- copy_model_from(mod4, "5", .overwrite = TRUE)
+  
+  # Multiple based_on
+  mod6 <- copy_model_from(
+    mod5, "6", .overwrite = TRUE, .based_on_additional = c("1", "3"),
+    .star = TRUE, .description = "final model")
+  mod7 <- copy_model_from(
+    mod6, "7", .overwrite = TRUE, .based_on_additional = c("2"))
+  
+  # Fake runs
+  copy_output_dir(mod1, mod2)
+  copy_output_dir(mod1, mod3)
+  copy_output_dir(mod1, mod4)
+  copy_output_dir(mod1, mod5)
+  copy_output_dir(mod1, mod6)
+  
+  # Return mods to delete (dont return mod1)
+  return(list(mod2, mod3, mod4, mod5, mod6, mod7))
+}
+
+# delete old files
+cleanup <- function(mods) {
+  delete_models(mods, .tags = NULL, .force = TRUE) %>% 
+    suppressMessages()
+}
+```
+
+
+# Create a model tree diagram
+
+While the `run_log()`, `summary_log()`, and `config_log()` are helpful for summarizing the model development process, `model_tree()` provides a convenient way to visualize and track any of these tabulated parameters. You can create a tree diagram using a modeling directory or run log.
+```{r fake model dir, eval = FALSE}
+MODEL_DIR <- "../nonmem"
+```
+
+```{r, echo=FALSE}
+mods <- create_tree_models(MODEL_DIR)
+```
+
+
+By default, models will be colored by their run number, and basic summary statistics will display as a tooltip when hovered over.
+```{r}
+model_tree(MODEL_DIR)
+```
+
+If coloring by a logical column, `FALSE` and `TRUE` values will correspond to white and red coloring respectively. Numeric or character columns will be colored as a gradient. `NA` values will appear grey regardless of the column type.
+```{r}
+model_tree(MODEL_DIR, color_by = "star")
+```
+
+
+Specific columns can be added to the tooltip via the `include_info` argument. Though you are limited to the default `run_log()` columns when passing a model directory, you can pass any available columns when passing a run log  dataframe (must inherit the class `bbi_log_df`). The examples below to illustrate cases where you may want to do that.
+```{r run_log} 
+log_df <- run_log(MODEL_DIR)
+log_df
+```
+
+In this example we define a new column, `out_of_date`, to denote whether the model or data has changed since the last run. We can color by this new column to determine if any of the models need to be re-run:
+```{r}
+run_log(MODEL_DIR) %>%
+  add_config() %>%
+  dplyr::mutate(out_of_date = model_has_changed | data_has_changed) %>%
+  model_tree(
+    include_info = c("model_has_changed", "data_has_changed", "nm_version"),
+    color_by = "out_of_date"
+  )
+```
+
+The model tree can also be helpful for quickly determine if any heuristics were found during any model submissions, as well as displaying specific model summary output in the tooltip. 
+```{r}
+run_log(MODEL_DIR) %>%
+  add_summary() %>%
+  model_tree(
+    include_info = c("tags", "param_count", "eta_pval_significant"),
+    color_by = "any_heuristics"
+  )
+```
+
+
+```{r cleanup bottom, include=FALSE}
+# delete old files
+cleanup(mods)
+```
+
