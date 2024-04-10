@@ -17,291 +17,295 @@ count_nodes <- function(tree_list) {
   return(total_nodes)
 }
 
-describe("model_tree() integration", {
-  it("default behavior", {
-    clean_test_enviroment(create_tree_models)
-    run_df <- run_log(MODEL_DIR)
-    tree_data <- make_tree_data(run_df, add_summary = FALSE)
+withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
-    # Confirm one origin in data
-    expect_equal(sum(grepl("Start", tree_data$from)), 1)
 
-    pl_tree <- model_tree(run_df, add_summary = FALSE)
-    # Confirm number of expected nodes
-    expect_equal(count_nodes(pl_tree$x$data$children), nrow(run_df))
-    # Confirm number of origins plotted
-    expect_equal(length(pl_tree$x$data$children), 1)
-  })
+  describe("model_tree() integration", {
+    it("default behavior", {
+      clean_test_enviroment(create_tree_models)
+      run_df <- run_log(MODEL_DIR)
+      tree_data <- make_tree_data(run_df, add_summary = FALSE)
 
-  it("additional based on", {
-    # Includes models that have multiple based_on attributes
-    clean_test_enviroment(create_tree_models(addl_based_on = TRUE))
-    run_df <- run_log(MODEL_DIR)
-    tree_data <- make_tree_data(run_df, add_summary = FALSE)
-    addl_based_on <- tree_data$addl_based_on
+      # Confirm one origin in data
+      expect_equal(sum(grepl("Start", tree_data$from)), 1)
 
-    # Additional based on attributes are stored as a separate column and
-    # included in the tooltip. The first one found is used to create the link
-    expect_equal(addl_based_on[!is.na(addl_based_on)], c("1, 3", "2"))
-    expect_equal(sum(is.na(addl_based_on)), 6)
+      pl_tree <- model_tree(run_df, add_summary = FALSE)
+      # Confirm number of expected nodes
+      expect_equal(count_nodes(pl_tree$x$data$children), nrow(run_df))
+      # Confirm number of origins plotted
+      expect_equal(length(pl_tree$x$data$children), 1)
+    })
 
-    pl_tree <- model_tree(run_df, add_summary = FALSE)
-    # Confirm number of expected nodes
-    expect_equal(count_nodes(pl_tree$x$data$children), nrow(run_df))
-    # Confirm number of origins plotted
-    expect_equal(length(pl_tree$x$data$children), 1)
-  })
+    it("additional based on", {
+      # Includes models that have multiple based_on attributes
+      clean_test_enviroment(create_tree_models(addl_based_on = TRUE))
+      run_df <- run_log(MODEL_DIR)
+      tree_data <- make_tree_data(run_df, add_summary = FALSE)
+      addl_based_on <- tree_data$addl_based_on
 
-  it("multiple origins", {
-    # Multiple starting models (models without a `based_on` attribute)
-    clean_test_enviroment(create_tree_models(multiple_origins = TRUE))
-    run_df <- run_log(MODEL_DIR)
-    tree_data <- make_tree_data(run_df, add_summary = FALSE)
+      # Additional based on attributes are stored as a separate column and
+      # included in the tooltip. The first one found is used to create the link
+      expect_equal(addl_based_on[!is.na(addl_based_on)], c("1, 3", "2"))
+      expect_equal(sum(is.na(addl_based_on)), 6)
 
-    # Confirm two origins in data
-    expect_equal(sum(grepl("Start", tree_data$from)), 2)
+      pl_tree <- model_tree(run_df, add_summary = FALSE)
+      # Confirm number of expected nodes
+      expect_equal(count_nodes(pl_tree$x$data$children), nrow(run_df))
+      # Confirm number of origins plotted
+      expect_equal(length(pl_tree$x$data$children), 1)
+    })
 
-    pl_tree <- model_tree(run_df, add_summary = FALSE)
-    # Confirm number of expected nodes
-    expect_equal(count_nodes(pl_tree$x$data$children), nrow(run_df))
-    # Confirm number of origins plotted
-    expect_equal(length(pl_tree$x$data$children), 2)
-  })
+    it("multiple origins", {
+      # Multiple starting models (models without a `based_on` attribute)
+      clean_test_enviroment(create_tree_models(multiple_origins = TRUE))
+      run_df <- run_log(MODEL_DIR)
+      tree_data <- make_tree_data(run_df, add_summary = FALSE)
 
-  it("Broken links", {
-    # A based_on referenced model no longer exists at the expected location
-    # This will introduce another origin node for each missing model.
-    clean_test_enviroment(create_tree_models(broken_link = TRUE))
-    run_df <- run_log(MODEL_DIR)
+      # Confirm two origins in data
+      expect_equal(sum(grepl("Start", tree_data$from)), 2)
 
-    expect_warning(
-      tree_data <- make_tree_data(run_df, add_summary = FALSE),
-      "The following models could not be linked properly"
-    )
-    # Confirm two origins in data
-    expect_equal(sum(grepl("Start", tree_data$from)), 2)
+      pl_tree <- model_tree(run_df, add_summary = FALSE)
+      # Confirm number of expected nodes
+      expect_equal(count_nodes(pl_tree$x$data$children), nrow(run_df))
+      # Confirm number of origins plotted
+      expect_equal(length(pl_tree$x$data$children), 2)
+    })
 
-    pl_tree <- model_tree(run_df, add_summary = FALSE) %>% suppressWarnings()
-    # Confirm number of expected nodes
-    # Here an extra node is made for mod 1000. mod 1000 is not present in the
-    # run log (was deleted), but is referenced as based_on in mod 1001.
-    expect_equal(count_nodes(pl_tree$x$data$children), nrow(run_df) + 1)
-    # Confirm number of origins plotted
-    expect_equal(length(pl_tree$x$data$children), 2)
-  })
+    it("Broken links", {
+      # A based_on referenced model no longer exists at the expected location
+      # This will introduce another origin node for each missing model.
+      clean_test_enviroment(create_tree_models(broken_link = TRUE))
+      run_df <- run_log(MODEL_DIR)
 
-  it("recursive run log", {
-    clean_test_enviroment(create_tree_models)
-    fs::dir_create(LEVEL2_DIR)
-    mod_nest <- copy_model_from(
-      MOD1, file.path(LEVEL2_SUBDIR, MOD_ID), "level 2 copy of 1.yaml",
-      .inherit_tags = TRUE
-    )
-    fs::dir_copy(MOD1_PATH, LEVEL2_MOD)
-    run_df <- run_log(MODEL_DIR, .recurse = TRUE)
-
-    # Check data prep
-    tree_data <- make_tree_data(run_df, add_summary = FALSE)
-    # Confirm based_on subdirectories are replaced with just the model id & run
-    # ids now include the subdirectory
-    expect_false(any(grepl("\\Q..\\E", tree_data$based_on)))
-    expect_true(any(grepl("level2/1", tree_data$run)))
-
-    pl_tree <- model_tree(run_df, add_summary = FALSE)
-    # Confirm number of expected nodes
-    expect_equal(count_nodes(pl_tree$x$data$children), nrow(run_df))
-    # Confirm number of origins plotted
-    expect_equal(length(pl_tree$x$data$children), 1)
-    # Conirm number of models based on MOD1 (one is nested in LEVEL2_DIR)
-    expect_equal(length(pl_tree$x$data$children[[1]]$children), 2)
-  })
-
-  it("combine cases", {
-    # This combines all the above cases and is meant to ensure there is no
-    # interaction between these cases. It duplicates some of the expectations
-    # in those individual tests just to make sure they are still true.
-    clean_test_enviroment(
-      create_tree_models(
-        addl_based_on = TRUE, multiple_origins = TRUE, broken_link = TRUE
+      expect_warning(
+        tree_data <- make_tree_data(run_df, add_summary = FALSE),
+        "The following models could not be linked properly"
       )
-    )
-    fs::dir_create(LEVEL2_DIR)
-    mod_nest <- copy_model_from(
-      MOD1, file.path(LEVEL2_SUBDIR, MOD_ID), "level 2 copy of 1.yaml",
-      .inherit_tags = TRUE
-    )
-    fs::dir_copy(MOD1_PATH, LEVEL2_MOD)
+      # Confirm two origins in data
+      expect_equal(sum(grepl("Start", tree_data$from)), 2)
 
-    run_df <- run_log(MODEL_DIR, .recurse = TRUE)
+      pl_tree <- model_tree(run_df, add_summary = FALSE) %>% suppressWarnings()
+      # Confirm number of expected nodes
+      # Here an extra node is made for mod 1000. mod 1000 is not present in the
+      # run log (was deleted), but is referenced as based_on in mod 1001.
+      expect_equal(count_nodes(pl_tree$x$data$children), nrow(run_df) + 1)
+      # Confirm number of origins plotted
+      expect_equal(length(pl_tree$x$data$children), 2)
+    })
 
-    # Check broken links case
-    expect_warning(
-      tree_data <- make_tree_data(run_df, add_summary = FALSE),
-      "The following models could not be linked properly"
-    )
-    # Check multiple origins case
-    expect_equal(sum(grepl("Start", tree_data$from)), 2)
-    # Check additional based on case
-    addl_based_on <- tree_data$addl_based_on
-    expect_equal(addl_based_on[!is.na(addl_based_on)], c("1, 3", "2"))
-    expect_equal(sum(is.na(addl_based_on)), 10)
-    # Check recursive case
-    expect_false(any(grepl("\\Q..\\E", tree_data$based_on)))
-    expect_true(any(grepl("level2/1", tree_data$run)))
+    it("recursive run log", {
+      clean_test_enviroment(create_tree_models)
+      fs::dir_create(LEVEL2_DIR)
+      mod_nest <- copy_model_from(
+        MOD1, file.path(LEVEL2_SUBDIR, MOD_ID), "level 2 copy of 1.yaml",
+        .inherit_tags = TRUE
+      )
+      fs::dir_copy(MOD1_PATH, LEVEL2_MOD)
+      run_df <- run_log(MODEL_DIR, .recurse = TRUE)
 
-    # Check plot
-    pl_tree <- model_tree(run_df, add_summary = FALSE) %>% suppressWarnings()
-    # Confirm total number of expected nodes (not including start node)
-    # (see broken link test for why 1 is added to the number of rows)
-    expect_equal(count_nodes(pl_tree$x$data$children), nrow(run_df) + 1)
-    # Confirm number of origins plotted
-    expect_equal(length(pl_tree$x$data$children), 2)
-    # Confirm split-off cases (multiple children per node) & number of child nodes
-    expect_equal(length(pl_tree$x$data$children), 2)
-    expect_equal(length(pl_tree$x$data$children[[1]]$children), 2)
-    expect_equal(count_nodes(pl_tree$x$data$children[[1]]$children), 7)
-    expect_equal(length(pl_tree$x$data$children[[1]]$children[[1]]$children), 2)
-    expect_equal(count_nodes(pl_tree$x$data$children[[1]]$children[[1]]$children), 5)
-  })
-})
+      # Check data prep
+      tree_data <- make_tree_data(run_df, add_summary = FALSE)
+      # Confirm based_on subdirectories are replaced with just the model id & run
+      # ids now include the subdirectory
+      expect_false(any(grepl("\\Q..\\E", tree_data$based_on)))
+      expect_true(any(grepl("level2/1", tree_data$run)))
 
-describe("model_tree() data setup",{
-  it("make_tree_data()", {
-    # This function is tested for more unique cases in other tests
-    clean_test_enviroment(create_tree_models)
-    run_df <- run_log(MODEL_DIR)
-    tree_data <- make_tree_data(run_df)
+      pl_tree <- model_tree(run_df, add_summary = FALSE)
+      # Confirm number of expected nodes
+      expect_equal(count_nodes(pl_tree$x$data$children), nrow(run_df))
+      # Confirm number of origins plotted
+      expect_equal(length(pl_tree$x$data$children), 1)
+      # Conirm number of models based on MOD1 (one is nested in LEVEL2_DIR)
+      expect_equal(length(pl_tree$x$data$children[[1]]$children), 2)
+    })
 
-    # Check other model_tree expectations
-    expect_true(inherits(tree_data$based_on, "character"))
+    it("combine cases", {
+      # This combines all the above cases and is meant to ensure there is no
+      # interaction between these cases. It duplicates some of the expectations
+      # in those individual tests just to make sure they are still true.
+      clean_test_enviroment(
+        create_tree_models(
+          addl_based_on = TRUE, multiple_origins = TRUE, broken_link = TRUE
+        )
+      )
+      fs::dir_create(LEVEL2_DIR)
+      mod_nest <- copy_model_from(
+        MOD1, file.path(LEVEL2_SUBDIR, MOD_ID), "level 2 copy of 1.yaml",
+        .inherit_tags = TRUE
+      )
+      fs::dir_copy(MOD1_PATH, LEVEL2_MOD)
 
-    # Tags are unlisted and formatted when included as part of the tooltip
-    expect_true(inherits(tree_data$tags, "character"))
+      run_df <- run_log(MODEL_DIR, .recurse = TRUE)
 
-    # Check columns for various configurations
-    tree_data <- make_tree_data(run_df, include_info = "star")
-    # Tags remain unchanged when not part of the tooltip
-    expect_true(inherits(tree_data$tags, "list"))
-  })
+      # Check broken links case
+      expect_warning(
+        tree_data <- make_tree_data(run_df, add_summary = FALSE),
+        "The following models could not be linked properly"
+      )
+      # Check multiple origins case
+      expect_equal(sum(grepl("Start", tree_data$from)), 2)
+      # Check additional based on case
+      addl_based_on <- tree_data$addl_based_on
+      expect_equal(addl_based_on[!is.na(addl_based_on)], c("1, 3", "2"))
+      expect_equal(sum(is.na(addl_based_on)), 10)
+      # Check recursive case
+      expect_false(any(grepl("\\Q..\\E", tree_data$based_on)))
+      expect_true(any(grepl("level2/1", tree_data$run)))
 
-  it("summary column inclusion", {
-    skip_if_old_bbi("3.2.0") # calls model_summary()
-    clean_test_enviroment(create_tree_models)
-    run_df <- run_log(MODEL_DIR)
-
-    # Summary columns are not included if add_summary = FALSE, unless you pass
-    # it in via `include_info`
-    tree_data <- run_df %>% add_summary() %>%
-      make_tree_data(include_info = "ofv", add_summary = FALSE)
-    expect_true("ofv" %in% names(tree_data))
-    expect_false("any_heuristics" %in% names(tree_data))
-  })
-
-  it("make_model_network()", {
-    clean_test_enviroment(create_tree_models)
-    run_df <- run_log(MODEL_DIR) %>% add_model_status()
-    # Replace NULL based_on elements with empty string to preserve rows when unnesting
-    run_df <- run_df %>% dplyr::mutate(
-      based_on = purrr::map(.data$based_on, function(.x){if(is.null(.x)) "" else .x}),
-    ) %>% tidyr::unnest("based_on")
-    # run log classes are removed when unnesting columns
-    class(run_df) <- c("bbi_run_log_df", "bbi_log_df", class(run_df))
-    network_df <- make_model_network(run_df)
-
-    # Check expected collapsibleTree attributes
-    expect_true(is.na(network_df$from[1]))
-    expect_equal(network_df$to[1], "Start")
-    expect_equal(network_df$from[2],"Start")
-    expect_equal(network_df$to[2], "1")
-    expect_equal(network_df$status[1], paste0("Model Directory:<br>", MODEL_DIR))
-  })
-})
-
-describe("model_tree() formatting",{
-  it("make_tree_tooltip()", {
-    skip_if_old_bbi("3.2.0") # calls model_summary()
-    clean_test_enviroment(create_tree_models)
-    # With summary (default)
-    tree_data <- make_tree_data(run_log(MODEL_DIR), add_summary = TRUE)
-    tree_data <- make_tree_tooltip(tree_data)
-    # Starting node
-    expect_true(grepl(MODEL_DIR, tree_data$tooltip[1]))
-    # Spot check some rendered tooltips
-    expect_true(grepl(paste0(MOD1$tags, collapse = ", "), tree_data$tooltip[2]))
-    expect_true(grepl(MOD1$description, tree_data$tooltip[2]))
-    # only MOD1 can be summarized (second node)
-    expect_equal(grep("OFV", tree_data$tooltip), 2)
-    expect_equal(grep("--Heuristics Found--", tree_data$tooltip), 2)
-    # Without summary
-    tree_data <- make_tree_data(run_log(MODEL_DIR), add_summary = FALSE)
-    tree_data <- make_tree_tooltip(tree_data)
-    expect_false(any(grepl("OFV", tree_data$tooltip)))
+      # Check plot
+      pl_tree <- model_tree(run_df, add_summary = FALSE) %>% suppressWarnings()
+      # Confirm total number of expected nodes (not including start node)
+      # (see broken link test for why 1 is added to the number of rows)
+      expect_equal(count_nodes(pl_tree$x$data$children), nrow(run_df) + 1)
+      # Confirm number of origins plotted
+      expect_equal(length(pl_tree$x$data$children), 2)
+      # Confirm split-off cases (multiple children per node) & number of child nodes
+      expect_equal(length(pl_tree$x$data$children), 2)
+      expect_equal(length(pl_tree$x$data$children[[1]]$children), 2)
+      expect_equal(count_nodes(pl_tree$x$data$children[[1]]$children), 7)
+      expect_equal(length(pl_tree$x$data$children[[1]]$children[[1]]$children), 2)
+      expect_equal(count_nodes(pl_tree$x$data$children[[1]]$children[[1]]$children), 5)
+    })
   })
 
-  it("color_tree_by()", {
-    clean_test_enviroment(create_tree_models)
+  describe("model_tree() data setup",{
+    it("make_tree_data()", {
+      # This function is tested for more unique cases in other tests
+      clean_test_enviroment(create_tree_models)
+      run_df <- run_log(MODEL_DIR)
+      tree_data <- make_tree_data(run_df, add_summary = FALSE)
 
-    # Attribute checks
-    pl_tree <- model_tree(MODEL_DIR, add_summary = FALSE)
-    expect_equal(pl_tree$x$options$attribute, "run")
-    pl_tree <- model_tree(MODEL_DIR, add_summary = FALSE, color_by = "star")
-    expect_equal(pl_tree$x$options$attribute, "star")
+      # Check other model_tree expectations
+      expect_true(inherits(tree_data$based_on, "character"))
 
-    ### Data checks ###
-    # Test logical color_by
-    tree_data <- make_tree_data(run_log(MODEL_DIR), add_summary = FALSE)
-    tree_data_star <- color_tree_by(tree_data, color_by = "star")
-    expect_equal(
-      as.character(tree_data_star$col),
-      # green (start node), white/FALSE, red/TRUE (starred), white/FALSE x3
-      c("#007319", "#FFFFFF", "#EB003D", rep("#FFFFFF", 3))
-    )
+      # Tags are unlisted and formatted when included as part of the tooltip
+      expect_true(inherits(tree_data$tags, "character"))
 
-    # Check if only FALSE
-    tree_data$star[2:nrow(tree_data)] <- FALSE
-    tree_data_star <- color_tree_by(tree_data, color_by = "star")
-    expect_equal(
-      as.character(tree_data_star$col),
-      # green (start node), white/FALSE x5
-      c("#007319", rep("#FFFFFF", 5))
-    )
+      # Check columns for various configurations
+      tree_data <- make_tree_data(run_df, add_summary = FALSE, include_info = "star")
+      # Tags remain unchanged when not part of the tooltip
+      expect_true(inherits(tree_data$tags, "list"))
+    })
 
-    # Check if only TRUE
-    tree_data$star[2:nrow(tree_data)] <- TRUE
-    tree_data_star <- color_tree_by(tree_data, color_by = "star")
-    expect_equal(
-      as.character(tree_data_star$col),
-      # green (start node), red/TRUE (starred) x5
-      c("#007319", rep("#EB003D", 5))
-    )
+    it("summary column inclusion", {
+      skip_if_old_bbi("3.2.0") # calls model_summary()
+      clean_test_enviroment(create_tree_models)
+      run_df <- run_log(MODEL_DIR)
 
-    # Check NA values
-    tree_data$star[nrow(tree_data)] <- NA
-    tree_data_star <- color_tree_by(tree_data, color_by = "star")
-    expect_equal(
-      as.character(tree_data_star$col),
-      # green (start node), red/TRUE (starred) x4, grey/NA
-      c("#007319", rep("#EB003D", 4), "#C0C0C0")
-    )
+      # Summary columns are not included if add_summary = FALSE, unless you pass
+      # it in via `include_info`
+      tree_data <- run_df %>% add_summary() %>%
+        make_tree_data(include_info = "ofv", add_summary = FALSE)
+      expect_true("ofv" %in% names(tree_data))
+      expect_false("any_heuristics" %in% names(tree_data))
+    })
 
-    # Test numeric/character color_by (gradient coloring)
-    tree_data <- make_tree_data(run_log(MODEL_DIR), add_summary = FALSE)
-    tree_data_run <- color_tree_by(tree_data, color_by = "run")
-    expect_equal(
-      as.character(tree_data_run$col),
-      # green (start node), gradient coloring between white and red
-      # Note: all gradient colors will shift if number of models change
-      c("#007319", "#FFFFFF", "#F4DBD3", "#ED9D84", "#E35B44", "#EB003D")
-    )
+    it("make_model_network()", {
+      clean_test_enviroment(create_tree_models)
+      run_df <- run_log(MODEL_DIR) %>% add_model_status()
+      # Replace NULL based_on elements with empty string to preserve rows when unnesting
+      run_df <- run_df %>% dplyr::mutate(
+        based_on = purrr::map(.data$based_on, function(.x){if(is.null(.x)) "" else .x}),
+      ) %>% tidyr::unnest("based_on")
+      # run log classes are removed when unnesting columns
+      class(run_df) <- c("bbi_run_log_df", "bbi_log_df", class(run_df))
+      network_df <- make_model_network(run_df)
+
+      # Check expected collapsibleTree attributes
+      expect_true(is.na(network_df$from[1]))
+      expect_equal(network_df$to[1], "Start")
+      expect_equal(network_df$from[2],"Start")
+      expect_equal(network_df$to[2], "1")
+      expect_equal(network_df$status[1], paste0("Model Directory:<br>", MODEL_DIR))
+    })
   })
 
-  it("static plot", {
-    skip_if_tree_missing_deps(static = TRUE)
-    clean_test_enviroment(create_tree_models)
-    pl_tree <- model_tree(MODEL_DIR, add_summary = FALSE, static = TRUE)
-    # Just check that the class was assigned and the right
-    # data is returned
-    expect_true(inherits(pl_tree, "model_tree_static"))
-    expect_true(inherits(pl_tree$png_array, "array"))
+  describe("model_tree() formatting",{
+    it("make_tree_tooltip()", {
+      skip_if_old_bbi("3.2.0") # calls model_summary()
+      clean_test_enviroment(create_tree_models)
+      # With summary (default)
+      tree_data <- make_tree_data(run_log(MODEL_DIR), add_summary = TRUE)
+      tree_data <- make_tree_tooltip(tree_data)
+      # Starting node
+      expect_true(grepl(MODEL_DIR, tree_data$tooltip[1]))
+      # Spot check some rendered tooltips
+      expect_true(grepl(paste0(MOD1$tags, collapse = ", "), tree_data$tooltip[2]))
+      expect_true(grepl(MOD1$description, tree_data$tooltip[2]))
+      # only MOD1 can be summarized (second node)
+      expect_equal(grep("OFV", tree_data$tooltip), 2)
+      expect_equal(grep("--Heuristics Found--", tree_data$tooltip), 2)
+      # Without summary
+      tree_data <- make_tree_data(run_log(MODEL_DIR), add_summary = FALSE)
+      tree_data <- make_tree_tooltip(tree_data)
+      expect_false(any(grepl("OFV", tree_data$tooltip)))
+    })
+
+    it("color_tree_by()", {
+      clean_test_enviroment(create_tree_models)
+
+      # Attribute checks
+      pl_tree <- model_tree(MODEL_DIR, add_summary = FALSE)
+      expect_equal(pl_tree$x$options$attribute, "run")
+      pl_tree <- model_tree(MODEL_DIR, add_summary = FALSE, color_by = "star")
+      expect_equal(pl_tree$x$options$attribute, "star")
+
+      ### Data checks ###
+      # Test logical color_by
+      tree_data <- make_tree_data(run_log(MODEL_DIR), add_summary = FALSE)
+      tree_data_star <- color_tree_by(tree_data, color_by = "star")
+      expect_equal(
+        as.character(tree_data_star$col),
+        # green (start node), white/FALSE, red/TRUE (starred), white/FALSE x3
+        c("#007319", "#FFFFFF", "#EB003D", rep("#FFFFFF", 3))
+      )
+
+      # Check if only FALSE
+      tree_data$star[2:nrow(tree_data)] <- FALSE
+      tree_data_star <- color_tree_by(tree_data, color_by = "star")
+      expect_equal(
+        as.character(tree_data_star$col),
+        # green (start node), white/FALSE x5
+        c("#007319", rep("#FFFFFF", 5))
+      )
+
+      # Check if only TRUE
+      tree_data$star[2:nrow(tree_data)] <- TRUE
+      tree_data_star <- color_tree_by(tree_data, color_by = "star")
+      expect_equal(
+        as.character(tree_data_star$col),
+        # green (start node), red/TRUE (starred) x5
+        c("#007319", rep("#EB003D", 5))
+      )
+
+      # Check NA values
+      tree_data$star[nrow(tree_data)] <- NA
+      tree_data_star <- color_tree_by(tree_data, color_by = "star")
+      expect_equal(
+        as.character(tree_data_star$col),
+        # green (start node), red/TRUE (starred) x4, grey/NA
+        c("#007319", rep("#EB003D", 4), "#C0C0C0")
+      )
+
+      # Test numeric/character color_by (gradient coloring)
+      tree_data <- make_tree_data(run_log(MODEL_DIR), add_summary = FALSE)
+      tree_data_run <- color_tree_by(tree_data, color_by = "run")
+      expect_equal(
+        as.character(tree_data_run$col),
+        # green (start node), gradient coloring between white and red
+        # Note: all gradient colors will shift if number of models change
+        c("#007319", "#FFFFFF", "#F4DBD3", "#ED9D84", "#E35B44", "#EB003D")
+      )
+    })
+
+    it("static plot", {
+      skip_if_tree_missing_deps(static = TRUE)
+      clean_test_enviroment(create_tree_models)
+      pl_tree <- model_tree(MODEL_DIR, add_summary = FALSE, static = TRUE)
+      # Just check that the class was assigned and the right
+      # data is returned
+      expect_true(inherits(pl_tree, "model_tree_static"))
+      expect_true(inherits(pl_tree$png_array, "array"))
+    })
   })
-})
+}) # closing withr::with_options
