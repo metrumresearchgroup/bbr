@@ -20,6 +20,11 @@ if(isTRUE(is_pdf)){
   library(webshot)
   webshot::install_phantomjs() %>% suppressMessages()
 }
+
+# Get bbi version: we cant build this vignette when bbi is less than 3.2.0
+# since model_summary() is required for the tooltip
+bbi_ver <- bbr::bbi_version()
+eval_model_tree <- test_bbi_version(read_bbi_path(), bbi_ver)
 ```
 
 
@@ -109,7 +114,7 @@ While the `run_log()`, `summary_log()`, and `config_log()` are helpful for summa
 MODEL_DIR <- "../nonmem"
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=eval_model_tree}
 mods <- create_tree_models(MODEL_DIR)
 ```
 
@@ -119,7 +124,7 @@ By default, models will be colored by their run number, and basic summary statis
 model_tree(MODEL_DIR)
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=eval_model_tree}
 # you dont need to specify the width when rendering in Rstudio viewer, but it makes a difference when rendered in Rmarkdown 
 # - relying on auto-sizing leads to a plot with a small width
 model_tree(MODEL_DIR, width = 800)
@@ -130,7 +135,7 @@ If coloring by a logical column, `FALSE` and `TRUE` values will correspond to wh
 model_tree(MODEL_DIR, color_by = "star")
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=eval_model_tree}
 model_tree(MODEL_DIR, color_by = "star", width = 800)
 ```
 
@@ -152,7 +157,7 @@ run_log(MODEL_DIR) %>%
   )
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=eval_model_tree}
 run_log(MODEL_DIR) %>%
   add_config() %>% suppressWarnings() %>%
   dplyr::mutate(out_of_date = model_has_changed | data_has_changed) %>%
@@ -173,7 +178,7 @@ run_log(MODEL_DIR) %>%
   )
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=eval_model_tree}
 # Since using fake models (all inheriting the same issues), set most to FALSE
 log_df <- run_log(MODEL_DIR) %>% add_summary()
 log_df$any_heuristics[1:(nrow(log_df) - 2)] <- FALSE
@@ -181,11 +186,11 @@ model_tree(
   log_df,
   include_info = c("tags", "param_count", "eta_pval_significant"),
   color_by = "any_heuristics",
-    width = 800
+  width = 800
 )
 ```
 
-```{r cleanup bottom, include=FALSE}
+```{r cleanup bottom, include=FALSE, eval=eval_model_tree}
 # delete old files
 cleanup(mods)
 ```
