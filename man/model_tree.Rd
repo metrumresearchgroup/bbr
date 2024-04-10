@@ -13,7 +13,9 @@ model_tree(
   add_summary = TRUE,
   digits = 3,
   zoomable = FALSE,
-  static = FALSE
+  static = FALSE,
+  width = NULL,
+  height = NULL
 )
 
 \method{model_tree}{character}(
@@ -23,7 +25,9 @@ model_tree(
   add_summary = TRUE,
   digits = 3,
   zoomable = FALSE,
-  static = FALSE
+  static = FALSE,
+  width = NULL,
+  height = NULL
 )
 
 \method{model_tree}{bbi_log_df}(
@@ -33,7 +37,9 @@ model_tree(
   add_summary = TRUE,
   digits = 3,
   zoomable = FALSE,
-  static = FALSE
+  static = FALSE,
+  width = NULL,
+  height = NULL
 )
 }
 \arguments{
@@ -59,6 +65,10 @@ dragging and scrolling.}
 \item{static}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, render the plot as a
 static image. This takes a little longer, as the interactive plot must
 be saved as a PNG and loaded into the viewer.}
+
+\item{width}{width in pixels (optional, defaults to automatic sizing)}
+
+\item{height}{height in pixels (optional, defaults to automatic sizing)}
 }
 \description{
 Create a tree diagram of a modeling directory

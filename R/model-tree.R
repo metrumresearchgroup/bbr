@@ -16,6 +16,8 @@
 #' @param static Logical (`TRUE`/`FALSE`). If `TRUE`, render the plot as a
 #'        static image. This takes a little longer, as the interactive plot must
 #'        be saved as a PNG and loaded into the viewer.
+#' @param width width in pixels (optional, defaults to automatic sizing)
+#' @param height height in pixels (optional, defaults to automatic sizing)
 #'
 #' @section Required Columns:
 #'
@@ -94,7 +96,9 @@ model_tree <- function(
     add_summary = TRUE,
     digits = 3,
     zoomable = FALSE,
-    static = FALSE
+    static = FALSE,
+    width = NULL,
+    height = NULL
 ){
   UseMethod("model_tree")
 }
@@ -108,12 +112,18 @@ model_tree.character <- function(
     add_summary = TRUE,
     digits = 3,
     zoomable = FALSE,
-    static = FALSE
+    static = FALSE,
+    width = NULL,
+    height = NULL
 ){
   checkmate::assert_directory_exists(.log_df)
   .log_df <- run_log(.log_df)
   model_tree(
-    .log_df, include_info, color_by, add_summary, digits, zoomable, static
+    .log_df,
+    include_info = include_info, color_by = color_by,
+    add_summary = add_summary, digits = digits,
+    zoomable = zoomable, static = static,
+    width = width, height = height
   )
 }
 
@@ -126,7 +136,9 @@ model_tree.bbi_log_df <- function(
     add_summary = TRUE,
     digits = 3,
     zoomable = FALSE,
-    static = FALSE
+    static = FALSE,
+    width = NULL,
+    height = NULL
 ){
   # Make sure required dependencies are installed
   stop_if_tree_missing_deps(static = static)
@@ -145,7 +157,8 @@ model_tree.bbi_log_df <- function(
   pl_tree <- collapsibleTree::collapsibleTreeNetwork(
     tree_data, zoomable = zoomable, attribute = tree_attr,
     fill="col", collapsed = FALSE, nodeSize = "leafCount",
-    tooltipHtml = "tooltip")
+    tooltipHtml = "tooltip", width = width, height = height
+    )
 
   if(isTRUE(static)){
     pl_tree <- model_tree_png(pl_tree)
