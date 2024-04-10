@@ -20,11 +20,6 @@ if(isTRUE(is_pdf)){
   library(webshot)
   webshot::install_phantomjs() %>% suppressMessages()
 }
-
-# Get bbi version: we cant build this vignette when bbi is less than 3.2.0
-# since model_summary() is required for the tooltip
-bbi_ver <- bbr::bbi_version()
-eval_model_tree <- test_bbi_version(read_bbi_path(), bbi_ver)
 ```
 
 
@@ -52,6 +47,10 @@ MODEL_DIR <- system.file("model", "nonmem", "basic", package = "bbr", mustWork =
 if (Sys.which("bbi") == "") {
   options('bbr.bbi_exe_path' = read_bbi_path())
 }
+
+# Get bbi version: we cant build this vignette when bbi is less than 3.2.0
+# since model_summary() is required for the tooltip
+eval_model_tree <- test_bbi_version(read_bbi_path(), "3.2.0")
 
 # Create fake runs
 copy_output_dir <- function(orig_mod, new_mod) {
