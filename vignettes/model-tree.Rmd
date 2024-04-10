@@ -50,7 +50,7 @@ if (Sys.which("bbi") == "") {
 
 # Get bbi version: we cant build this vignette when bbi is less than 3.2.0
 # since model_summary() is required for the tooltip
-eval_model_tree <- test_bbi_version(read_bbi_path(), "3.2.0")
+eval_model_tree <- bbr:::test_bbi_version(read_bbi_path(), "3.2.0")
 
 # Create fake runs
 copy_output_dir <- function(orig_mod, new_mod) {
