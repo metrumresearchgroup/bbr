@@ -2,9 +2,15 @@
 % Please edit documentation in R/utils.R
 \name{bbi_nonmem_model_status}
 \alias{bbi_nonmem_model_status}
+\alias{bbi_nonmem_model_status.default}
+\alias{bbi_nonmem_model_status.bbi_nmboot_model}
 \title{Return status of a model: "Not Run", "Finished Running", or "Incomplete Run".}
 \usage{
 bbi_nonmem_model_status(.mod)
+
+\method{bbi_nonmem_model_status}{default}(.mod)
+
+\method{bbi_nonmem_model_status}{bbi_nmboot_model}(.mod)
 }
 \arguments{
 \item{.mod}{bbi_nonmem_model object}

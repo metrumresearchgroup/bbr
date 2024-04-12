@@ -448,6 +448,12 @@ check_bbi_run_log_df_object <- function(.df) {
 #' @param .mod bbi_nonmem_model object
 #' @keywords internal
 bbi_nonmem_model_status <- function(.mod) {
+  UseMethod("bbi_nonmem_model_status")
+}
+
+#' @rdname bbi_nonmem_model_status
+#' @keywords internal
+bbi_nonmem_model_status.default <- function(.mod) {
   status <- "Not Run"
   output_dir <- get_output_dir(.mod, .check_exists = FALSE)
   if (dir.exists(output_dir)) {
@@ -456,6 +462,38 @@ bbi_nonmem_model_status <- function(.mod) {
       status <- "Finished Running"
     } else {
       status <- "Incomplete Run"
+    }
+  }
+  return(status)
+}
+
+#' @rdname bbi_nonmem_model_status
+#' @keywords internal
+bbi_nonmem_model_status.bbi_nmboot_model <- function(.mod) {
+  # TODO: revisit this. Currently iterates through all models
+  # and sets the status based on whether all models have finished.
+  # It works well, but this could unncessarily increase the runtime of printing
+  # the model object in the console (for 1000+ runs). We likely want to check
+  # for some other bootstrap-unique file that gets generated after submitting a
+  # bootstrap model object.
+  status <- "Not Run"
+  output_dir <- get_output_dir(.mod, .check_exists = FALSE)
+  boot_spec <- get_boot_model_files(.mod) %>%
+    dplyr::mutate(
+      output_dir = file.path(output_dir, fs::path_ext_remove(.data$model_file))
+    )
+
+  for(output_dir.i in boot_spec$output_dir){
+    if (dir.exists(output_dir.i)) {
+      json_file <- get_config_path(
+        read_model(output_dir.i), .check_exists = FALSE
+      )
+      if (fs::file_exists(json_file)) {
+        status <- "Finished Running"
+      } else {
+        status <- "Incomplete Run"
+        break
+      }
     }
   }
   return(status)

@@ -4,6 +4,7 @@
 \alias{create_model_hook}
 \alias{create_model_hook.default}
 \alias{create_model_hook.bbi_nonmem_model}
+\alias{create_model_hook.bbi_nmboot_model}
 \title{Perform model-type specific setup}
 \usage{
 create_model_hook(.mod, ...)
@@ -11,6 +12,8 @@ create_model_hook(.mod, ...)
 \method{create_model_hook}{default}(.mod, ...)
 
 \method{create_model_hook}{bbi_nonmem_model}(.mod, ...)
+
+\method{create_model_hook}{bbi_nmboot_model}(.mod, ...)
 }
 \arguments{
 \item{.mod}{Model object.}

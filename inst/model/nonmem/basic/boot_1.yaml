@@ -1,0 +1,8 @@
+model_type: nmboot
+description: Bootstrap model 1.ctl
+tags:
+- acop tag
+- other tag
+bbi_args:
+  overwrite: yes
+  threads: 4.0

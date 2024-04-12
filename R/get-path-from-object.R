@@ -43,6 +43,12 @@ get_model_path.bbi_nonmem_model <- function(.bbi_object, .check_exists = TRUE) {
 
 #' @rdname get_path_from_object
 #' @export
+get_model_path.bbi_nmboot_model <- function(.bbi_object, .check_exists = TRUE) {
+  get_model_path_nonmem(.bbi_object, .check_exists)
+}
+
+#' @rdname get_path_from_object
+#' @export
 get_model_path.bbi_nonmem_summary <- function(.bbi_object, .check_exists = TRUE) {
   get_model_path_nonmem(.bbi_object, .check_exists)
 }
@@ -63,6 +69,12 @@ get_output_dir <- function(.bbi_object, .check_exists = TRUE) {
 #' @rdname get_path_from_object
 #' @export
 get_output_dir.bbi_nonmem_model <- function(.bbi_object, .check_exists = TRUE) {
+  get_output_dir_nonmem(.bbi_object, .check_exists)
+}
+
+#' @rdname get_path_from_object
+#' @export
+get_output_dir.bbi_nmboot_model <- function(.bbi_object, .check_exists = TRUE) {
   get_output_dir_nonmem(.bbi_object, .check_exists)
 }
 
@@ -371,21 +383,36 @@ get_data_path_from_json <- function(.mod, normalize = TRUE){
 #'
 #' @param data_path a file path to an input data set
 #' @param mod_path a relative or absolute model path. Must include the extension.
+#' @param reverse logical (T/F). Should be `FALSE` if the `data_path` was **extracted**
+#'  from a control stream file, and `TRUE` if using to **set** the data path in a
+#'  control stream file.
 #'
 #' @noRd
-adjust_data_path_ext <- function(data_path, mod_path){
+adjust_data_path_ext <- function(data_path, mod_path, reverse = FALSE){
   checkmate::assert_true(is_valid_nonmem_extension(mod_path))
 
-  if(identical(fs::path_ext(mod_path), "ctl")){
-    path_elements <- fs::path_split(data_path)[[1]]
-    if (path_elements[1] == "..") {
-      data_path_adj <- fs::path_join(path_elements[-1])
+  if(isFALSE(reverse)){
+    # potentially remove parent directory if extracting from control stream file
+    if(identical(fs::path_ext(mod_path), "ctl")){
+      path_elements <- fs::path_split(data_path)[[1]]
+      if (path_elements[1] == "..") {
+        data_path_adj <- fs::path_join(path_elements[-1])
+      }else{
+        data_path_adj <- data_path
+      }
     }else{
       data_path_adj <- data_path
     }
   }else{
-    data_path_adj <- data_path
+    # potentially add parent directory if using to create a data path for use in
+    # a control stream file
+    if(identical(fs::path_ext(mod_path), "ctl")){
+      data_path_adj <- file.path("..", data_path)
+    }else{
+      data_path_adj <- data_path
+    }
   }
+
   return(as.character(data_path_adj))
 }
 
@@ -589,4 +616,31 @@ find_nonmem_model_file_path <- function(.path, .check_exists = TRUE) {
   res %>%
     fs::path_norm() %>%
     as.character()
+}
+
+
+#' Tabulate all relevant `bbi_nonmem_model` model files from a bootstrap control
+#' stream file.
+#' @param .mod a `bbi_nmboot_model` model object
+#' @keywords internal
+get_boot_model_files <- function(.mod){
+  check_model_object(.mod, .mod_types = NMBOOT_MOD_CLASS)
+  mod_path <- get_model_path(.mod)
+
+  ctl <- nmrec::read_ctl(mod_path)
+  # Technically not how `nmrec` was designed to be used, though it pulls out
+  # and separates each model spec without issue.
+  model_specs <- nmrec::select_records(ctl, "model")
+
+  spec_df <- purrr::imap_dfr(model_specs, function(mod_spec, mod_run){
+    spec_lines <- mod_spec$get_lines()
+    spec_lines <- spec_lines[grepl("CONTEXT|MODEL_FILE|YAML|DATA", spec_lines)]
+
+    # Format model files to table
+    data.frame(spec_lines) %>%
+      tidyr::separate(spec_lines, into = c("key", "value"), sep = ":") %>%
+      dplyr::mutate(key = tolower(trimws(key)), value = trimws(value), run = mod_run)
+  }) %>%
+    tidyr::pivot_wider(names_from = key, values_from = value, id_cols = run)
+  return(spec_df)
 }

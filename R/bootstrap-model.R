@@ -5,61 +5,95 @@
 #' @param strat_cols columns to maintain proportion for stratification
 #' @param replace whether to stratify with replacement
 #' @param seed a seed for sampling the data
-#' @param overwrite Logical to specify whether or not to overwrite existing
+#' @param .overwrite Logical to specify whether or not to overwrite existing
 #'  model output from a previous run.
 #'
 #' @export
-bootstrap_model <- function(
+copy_model_as_bootstrap <- function(
     .mod,
     n = 100,
     strat_cols = NULL,
     replace = TRUE,
     seed = 1234,
-    overwrite = FALSE
+    .overwrite = FALSE
 ){
 
-  # Input data and control stream
-  data <- nm_data(.mod) %>% suppressMessages()
-  orig_mod_path <- get_model_path(.mod)
+  checkmate::assert_class(.mod, NM_MOD_CLASS)
 
-  # Bootstrap Directory
   model_dir <- get_model_working_directory(.mod)
   boot_dir <- file.path(model_dir, glue("boot_{get_model_id(.mod)}"))
   boot_data_dir <- file.path(boot_dir, "data")
-  if(!fs::dir_exists(boot_dir)) fs::dir_create(boot_dir)
-  if(!fs::dir_exists(boot_data_dir)) fs::dir_create(boot_data_dir)
 
   # New model setup
   n_seq <- seq(n)
   mod_names <- purrr::map_chr(n_seq, max_char = nchar(n), pad_left)
   mod_paths <- file.path(boot_dir, mod_names)
-  mod_paths_abs <- paste0(mod_paths, ".", fs::path_ext(orig_mod_path))
-  for(path.i in mod_paths_abs){
-    fs::file_copy(orig_mod_path, path.i)
-  }
 
   boot_args <- list(
-    orig_mod_id = get_model_id(.mod),
-    orig_mod_path = orig_mod_path,
-    orig_data = data,
+    orig_mod = .mod,
+    orig_data = nm_data(.mod) %>% suppressMessages(),
     strat_cols = strat_cols,
     replace = replace,
     seed = seed,
     boot_dir = boot_dir,
     boot_data_dir = boot_data_dir,
-    overwrite = overwrite
+    overwrite = .overwrite
   )
+
+  orig_mod_file <- basename(get_model_path(.mod))
+
+  # Set up new bootstrap model object
+  # Create blank control stream for new_model to work, and update via
+  # make_boot_mod() after bootstrap models have been created
+  if(isTRUE(.overwrite)) writeLines("", ctl_ext(boot_dir))
+  mod_boot <- new_model(
+    boot_dir,
+    .overwrite = .overwrite,
+    .description = glue("Bootstrap model {orig_mod_file}"),
+    .tags = boot_args$orig_mod$tags,
+    .bbi_args = boot_args$orig_mod$bbi_args,
+    .model_type = c("nmboot")
+  )
+
+  # Bootstrap directory setup
+  if(!fs::dir_exists(boot_dir) || .overwrite == TRUE){
+    if(fs::dir_exists(boot_dir)) fs::dir_delete(boot_dir)
+    if(fs::dir_exists(boot_data_dir)) fs::dir_delete(boot_data_dir)
+    fs::dir_create(boot_dir)
+    fs::dir_create(boot_data_dir)
+    # Store data within run folder and gitignore
+    writeLines("/data\n*.ctl\n*.mod\n*.yaml", file.path(boot_dir, ".gitignore"))
+  }
+
+  # Attempt to copy over bbi.yaml if one exists in the modeling directory
+  # TODO: we probably want to find a better approach here - likely handle this during model submission
+  bbi_yaml_path <- file.path(model_dir, "bbi.yaml")
+  if(fs::file_exists(bbi_yaml_path) && !fs::file_exists(file.path(boot_dir, "bbi.yaml"))){
+    fs::file_copy(bbi_yaml_path, file.path(boot_dir, "bbi.yaml"))
+  }
 
   # Create model object per boot run
   boot_runs <- purrr::map(mod_paths, make_boot_run, boot_args)
 
-  gc() # This may help recover some RAM after handling many csvs
+  # Garbage collect - may help after handling many (potentially large) datasets
+  #  - It can be useful to call gc() after a large object has been removed, as
+  #    this may prompt R to return memory to the operating system.
+  # TODO: confirm if this is actually helpful, as this can take a couple seconds
+  # - maybe check object.size of datasets and only perform if `n` is greater than some number
+  gc()
 
-  # TODO: make the list of bootstrap models a new bbr model type object
-  # This will make printing and handling (reading/writing) the object easier
+  # Finalize new bootstrap model object (updates control stream)
+  boot_mod <- make_boot_mod(boot_runs, boot_args)
+  return(boot_mod)
 }
 
 
+#' Set up a single bootstrap model run
+#'
+#' @param mod_path absolute model path (no file extension) of a bootstrap model run.
+#' @param boot_args list of parameters needed to create a bootstrap model run.
+#'
+#' @keywords internal
 make_boot_run <- function(mod_path, boot_args){
 
   # Read in boot run if it already exists
@@ -67,6 +101,28 @@ make_boot_run <- function(mod_path, boot_args){
   if(fs::file_exists(yaml_ext(mod_path)) && !boot_args$overwrite) {
     return(read_model(mod_path))
   }
+
+  # Copy over control stream
+  orig_mod_path <- get_model_path(boot_args$orig_mod)
+  mod_path_ext <- paste0(mod_path, ".", fs::path_ext(orig_mod_path))
+  if(fs::file_exists(mod_path_ext) && !boot_args$overwrite){
+    # Triggers if a control stream file existed here, but not a yaml file
+    # This could only happen if bootstrap folders were manually created/edited.
+    # i.e. if a user made a `boot_1` directory and included a control stream that
+    # matched the model id and path extension of `mod_path_ext`.
+    rlang::abort(
+      c(
+        glue::glue("Found {fs::path_rel(mod_path_ext)}, but no corresponding yaml"),
+        "i" = "This can only happen if manual edits were made in {fs::path_rel(boot_args$boot_dir)}",
+        "Please re-run with `overwrite = TRUE` to regenerate."
+      )
+    )
+  }else{
+    fs::file_copy(
+      orig_mod_path, mod_path_ext, overwrite = boot_args$overwrite
+    )
+  }
+
 
   # Sample data and assign new IDs
   data_new <- resample_df(
@@ -77,16 +133,18 @@ make_boot_run <- function(mod_path, boot_args){
   ) %>% dplyr::rename("OID" = "ID", "ID" = "KEY") %>%
     dplyr::select(all_of(unique(c(names(boot_args$orig_data), "OID"))))
 
+  orig_mod_id <- get_model_id(boot_args$orig_mod)
+
   # Write out new dataset
   mod_name <- basename(mod_path)
-  data_boot_name <- glue("boot_{boot_args$orig_mod_id}_{mod_name}.csv")
+  data_boot_name <- glue("boot_{orig_mod_id}_{mod_name}.csv")
   data_path_boot <- file.path(boot_args$boot_data_dir, data_boot_name)
   data.table::fwrite(data_new, data_path_boot , na = '.', quote = FALSE)
 
   # Set Description
-  desc <- glue("Bootstrap run {mod_name} for model {boot_args$orig_mod_id}")
+  desc <- glue("Bootstrap run {mod_name} for model {orig_mod_id}")
   data_path_rel <- fs::path_rel(data_path_boot, boot_args$boot_dir) %>%
-    adjust_data_path_ext(mod_path = ".mod")
+    adjust_data_path_ext(mod_path = mod_path_ext, reverse = TRUE)
 
   # Create new model object
   mod <- new_model(
@@ -102,6 +160,61 @@ make_boot_run <- function(mod_path, boot_args){
   return(mod)
 }
 
+
+#' Create a bootstrap model object
+#'
+#' @param boot_runs list of boostrap model objects created by `make_boot_run()`.
+#' @inheritParams make_boot_run
+#'
+#' @details
+#' The ctl is mainly meant to ensure traceability and allow for existing `bbr`
+#' functionality. A control file (ctl extension) is not unique to `NONMEM`,
+#' and this one intentionally has no interaction with `NONMEM`/`bbi`.
+#'
+#' `nmrec` is used elsewhere to extract this information to manage model file
+#'  and data path expectations.
+#'
+#' @keywords internal
+make_boot_mod <- function(boot_runs, boot_args){
+  boot_dir <- boot_args$boot_dir
+
+  mod_paths <- purrr::map_chr(boot_runs, get_model_path) %>%
+    fs::path_rel(boot_dir)
+  yaml_paths <- purrr::map_chr(boot_runs, get_yaml_path) %>%
+    fs::path_rel(boot_dir)
+  data_paths <- purrr::map_chr(boot_runs, get_data_path) %>%
+    fs::path_rel(boot_dir)
+  prob_statements <- purrr::map_chr(boot_runs, modify_prob_statement)
+
+  mod_paths_txt <- paste(
+    " $MODEL",
+    paste0("   CONTEXT: ", prob_statements),
+    paste0("   MODEL_FILE: ", mod_paths),
+    paste0("   YAML: ", yaml_paths),
+    paste0("   DATA: ", data_paths),
+    sep = "\n"
+  ) %>% paste(collapse = "\n\n")
+
+  orig_mod_file <- basename(get_model_path(boot_args$orig_mod))
+  overall_prob <- glue("Bootstrap model for {orig_mod_file}")
+
+  # Write Bootstrap model ctl
+  boot_mod_path <- ctl_ext(boot_dir)
+  msg <- paste(
+    "; Note: This is _not_ a NONMEM control stream file",
+    "; Do not delete or modify this file, as it is needed to summarize results",
+    sep = "\n"
+  )
+  writeLines(
+    glue::glue("$PROB {overall_prob}\n{msg}\n\n$DESIGN bbr bootstrap\n{mod_paths_txt}"),
+    boot_mod_path
+  )
+
+  # Return new bootstrap model object
+  mod_boot <- read_model(boot_dir)
+
+  return(mod_boot)
+}
 
 #' Resample data
 #'
