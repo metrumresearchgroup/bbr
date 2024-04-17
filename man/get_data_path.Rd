@@ -4,6 +4,7 @@
 \alias{get_data_path}
 \alias{get_data_path.bbi_model}
 \alias{get_data_path.bbi_nonmem_model}
+\alias{get_data_path.bbi_nmboot_model}
 \alias{get_data_path.bbi_nonmem_summary}
 \alias{get_data_path.bbi_log_df}
 \title{Get path to data file}
@@ -13,6 +14,8 @@ get_data_path(.bbi_object, .check_exists = TRUE, ...)
 \method{get_data_path}{bbi_model}(.bbi_object, .check_exists = TRUE, ...)
 
 \method{get_data_path}{bbi_nonmem_model}(.bbi_object, .check_exists = TRUE, ...)
+
+\method{get_data_path}{bbi_nmboot_model}(.bbi_object, .check_exists = TRUE, ...)
 
 \method{get_data_path}{bbi_nonmem_summary}(.bbi_object, .check_exists = TRUE, ...)
 

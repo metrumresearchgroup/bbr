@@ -2,31 +2,28 @@
 % Please edit documentation in R/utils.R
 \name{wait_for_nonmem}
 \alias{wait_for_nonmem}
-\alias{wait_for_nonmem.bbi_nonmem_model}
-\alias{wait_for_nonmem.list}
-\title{Wait for NONMEM models to finish}
+\alias{wait_for_nonmem.default}
+\title{Wait for \code{NONMEM} models to finish}
 \usage{
 wait_for_nonmem(.mod, .time_limit = 300, .interval = 5)
 
-\method{wait_for_nonmem}{bbi_nonmem_model}(.mod, .time_limit = 300, .interval = 5)
-
-\method{wait_for_nonmem}{list}(.mod, .time_limit = 300, .interval = 5)
+\method{wait_for_nonmem}{default}(.mod, .time_limit = 300, .interval = 5)
 }
 \arguments{
-\item{.mod}{a \code{bbi_nonmem_model} object, or list of \code{bbi_nonmem_model} objects.}
+\item{.mod}{a \code{bbi_nonmem_model}, \code{bbi_nmboot_model}, or list of
+\code{bbi_nonmem_model} objects. Other packages (e.g., \code{bbr.bayes}) may add
+additional methods.}
 
-\item{.time_limit}{integer for maximum number of seconds in total to wait before continuing
-(will exit after this time even if the run does not appear to have finished).}
+\item{.time_limit}{integer for maximum number of seconds in total to wait
+before continuing (will exit after this time even if the run does not appear
+to have finished).}
 
 \item{.interval}{integer for number of seconds to wait between each check.}
 }
 \description{
-Calling \code{wait_for_nonmem()} will freeze the user's console until the model(s) have finished running.
+Calling \code{wait_for_nonmem()} will freeze the user's console until the model(s)
+have finished running.
 }
-\section{Methods (by class)}{
-\itemize{
-\item \code{wait_for_nonmem(bbi_nonmem_model)}: takes a \code{bbi_nonmem_model} object.
-
-\item \code{wait_for_nonmem(list)}: takes a \code{list} of \code{bbi_nonmem_model} objects.
-
-}}
+\seealso{
+check_nonmem_finished get_model_status
+}

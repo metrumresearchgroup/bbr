@@ -3,17 +3,41 @@
 \name{check_nonmem_finished}
 \alias{check_nonmem_finished}
 \alias{check_nonmem_finished.bbi_nonmem_model}
-\title{Checks if NONMEM run is done by looking for "Stop Time" in .lst file}
+\alias{check_nonmem_finished.bbi_nmboot_model}
+\alias{check_nonmem_finished.list}
+\title{Check if \code{NONMEM} run is complete}
 \usage{
 check_nonmem_finished(.mod, ...)
 
 \method{check_nonmem_finished}{bbi_nonmem_model}(.mod, ...)
+
+\method{check_nonmem_finished}{bbi_nmboot_model}(.mod, ...)
+
+\method{check_nonmem_finished}{list}(.mod, ...)
 }
 \arguments{
-\item{.mod}{A \code{bbi_nonmem_model} object.}
+\item{.mod}{a \code{bbi_nonmem_model}, \code{bbi_nmboot_model}, or list of
+\code{bbi_nonmem_model} objects. Other packages (e.g., \code{bbr.bayes}) may add
+additional methods.}
 
 \item{...}{Arguments passed to methods.}
 }
+\value{
+Returns \code{TRUE} if the model appears to be finished running and
+\code{FALSE} otherwise.
+}
 \description{
-Returns \code{TRUE} if the model appears to be finished running and \code{FALSE} otherwise.
+Checks if \code{NONMEM} run is done by looking for \code{"Stop Time"} in \code{.lst} file
+}
+\section{Methods (by class)}{
+\itemize{
+\item \code{check_nonmem_finished(bbi_nonmem_model)}: takes a \code{bbi_nonmem_model} object.
+
+\item \code{check_nonmem_finished(bbi_nmboot_model)}: takes a \code{bbi_nmboot_model} object.
+
+\item \code{check_nonmem_finished(list)}: takes a \code{list} of \code{bbi_nonmem_model} objects.
+
+}}
+\seealso{
+wait_for_nonmem get_model_status
 }

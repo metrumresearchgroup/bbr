@@ -470,29 +470,33 @@ bbi_nonmem_model_status.default <- function(.mod) {
 #' @rdname bbi_nonmem_model_status
 #' @keywords internal
 bbi_nonmem_model_status.bbi_nmboot_model <- function(.mod) {
-  # TODO: revisit this. Currently iterates through all models
-  # and sets the status based on whether all models have finished.
-  # It works well, but this could unncessarily increase the runtime of printing
-  # the model object in the console (for 1000+ runs). We likely want to check
-  # for some other bootstrap-unique file that gets generated after submitting a
-  # bootstrap model object.
   status <- "Not Run"
   output_dir <- get_output_dir(.mod, .check_exists = FALSE)
-  boot_spec <- get_boot_model_files(.mod) %>%
-    dplyr::mutate(
-      output_dir = file.path(output_dir, fs::path_ext_remove(.data$model_file))
-    )
-
-  for(output_dir.i in boot_spec$output_dir){
-    if (dir.exists(output_dir.i)) {
-      json_file <- get_config_path(
-        read_model(output_dir.i), .check_exists = FALSE
-      )
-      if (fs::file_exists(json_file)) {
-        status <- "Finished Running"
-      } else {
-        status <- "Incomplete Run"
-        break
+  if (dir.exists(output_dir)) {
+    json_file <- get_config_path(.mod, .check_exists = FALSE)
+    if (fs::file_exists(json_file)) {
+      status <- "Finished Running"
+    } else {
+      # If config file doesnt exist, check each model individually:
+      #  - Iterates through all models and sets the status based on whether all
+      #    models have finished. This may increase the time required to print an
+      #    nmboot model object to the console.
+      spec_path <- get_boot_spec_path(.mod, .check_exists = FALSE)
+      if (fs::file_exists(spec_path)) {
+        boot_spec <- get_boot_spec(.mod)
+        for(output_dir.i in boot_spec$mod_path_abs){
+          if (dir.exists(output_dir.i)) {
+            json_file <- get_config_path(
+              read_model(output_dir.i), .check_exists = FALSE
+            )
+            if (fs::file_exists(json_file)) {
+              status <- "Finished Running"
+            } else {
+              status <- "Incomplete Run"
+              break
+            }
+          }
+        }
       }
     }
   }
@@ -582,21 +586,27 @@ download_with_retry <- function(...) {
   return(rc)
 }
 
-#' Checks if NONMEM run is done by looking for "Stop Time" in .lst file
+#' Check if `NONMEM` run is complete
 #'
-#' Returns `TRUE` if the model appears to be finished running and `FALSE` otherwise.
-#' @param .mod A `bbi_nonmem_model` object.
+#' Checks if `NONMEM` run is done by looking for `"Stop Time"` in `.lst` file
+#'
+#' @param .mod a `bbi_nonmem_model`, `bbi_nmboot_model`, or list of
+#'  `bbi_nonmem_model` objects. Other packages (e.g., `bbr.bayes`) may add
+#'  additional methods.
 #' @param ... Arguments passed to methods.
 #'
+#' @importFrom readr read_lines
+#' @importFrom stringr str_detect
+#'
+#' @seealso wait_for_nonmem get_model_status
+#' @return Returns `TRUE` if the model appears to be finished running and
+#'  `FALSE` otherwise.
 #' @export
 check_nonmem_finished <- function(.mod, ...) {
   UseMethod("check_nonmem_finished")
 }
 
-#' @rdname check_nonmem_finished
-#' @importFrom readr read_lines
-#' @importFrom stringr str_detect
-#'
+#' @describeIn check_nonmem_finished takes a `bbi_nonmem_model` object.
 #' @export
 check_nonmem_finished.bbi_nonmem_model <- function(.mod, ...) {
 
@@ -618,15 +628,38 @@ check_nonmem_finished.bbi_nonmem_model <- function(.mod, ...) {
   return(isTRUE(model_finished))
 }
 
+#' @describeIn check_nonmem_finished takes a `bbi_nmboot_model` object.
+#' @export
+check_nonmem_finished.bbi_nmboot_model <- function(.mod, ...) {
+  boot_models <- get_boot_models(.mod)
+  models_finished <- map_lgl(boot_models, ~check_nonmem_finished(.x))
 
-#' Wait for NONMEM models to finish
-#' @param .mod a `bbi_nonmem_model` object, or list of `bbi_nonmem_model` objects.
-#' @param .time_limit integer for maximum number of seconds in total to wait before continuing
-#'        (will exit after this time even if the run does not appear to have finished).
+  return(models_finished)
+}
+
+#' @describeIn check_nonmem_finished takes a `list` of `bbi_nonmem_model` objects.
+#' @export
+check_nonmem_finished.list <- function(.mod, ...) {
+  assert_list(.mod)
+  check_model_object_list(.mod, .mod_types = NM_MOD_CLASS)
+  models_finished <- map_lgl(.mod, ~check_nonmem_finished(.x))
+
+  return(models_finished)
+}
+
+#' Wait for `NONMEM` models to finish
+#'
+#' Calling `wait_for_nonmem()` will freeze the user's console until the model(s)
+#' have finished running.
+#'
+#' @inheritParams check_nonmem_finished
+#' @param .time_limit integer for maximum number of seconds in total to wait
+#'  before continuing (will exit after this time even if the run does not appear
+#'  to have finished).
 #' @param .interval integer for number of seconds to wait between each check.
 #'
 #'
-#' @description Calling `wait_for_nonmem()` will freeze the user's console until the model(s) have finished running.
+#' @seealso check_nonmem_finished get_model_status
 #'
 #' @importFrom purrr map_lgl
 #' @importFrom checkmate assert_list
@@ -637,30 +670,23 @@ wait_for_nonmem <- function(.mod, .time_limit = 300, .interval = 5) {
 }
 
 
-#' Wait for NONMEM models to finish  (bbi model)
-#'
-#' @describeIn wait_for_nonmem takes a `bbi_nonmem_model` object.
+#' @rdname wait_for_nonmem
 #' @export
-wait_for_nonmem.bbi_nonmem_model <- function(.mod, .time_limit = 300, .interval = 5) {
-  wait_for_nonmem(list(.mod), .time_limit = .time_limit, .interval = .interval)
-}
+wait_for_nonmem.default <- function(.mod, .time_limit = 300, .interval = 5) {
 
+  if(inherits(.mod, "list") && !inherits(.mod, "bbi_model")){
+    check_model_object_list(.mod, .mod_types = NM_MOD_CLASS)
+  }else{
+    check_model_object(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))
+  }
 
-#' Wait for NONMEM models to finish  (list of bbi models)
-#'
-#' @describeIn wait_for_nonmem takes a `list` of `bbi_nonmem_model` objects.
-#' @export
-wait_for_nonmem.list <- function(.mod, .time_limit = 300, .interval = 5) {
-
-  assert_list(.mod)
-  check_model_object_list(.mod, .mod_types = NM_MOD_CLASS)
   verbose_msg(glue("Waiting for {length(.mod)} model(s) to finish..."))
 
   Sys.sleep(1) # wait for lst file to be created
   expiration <- Sys.time() + .time_limit
   n_interval <- 0
   while ((expiration - Sys.time()) > 0) {
-    res <- map_lgl(.mod, ~check_nonmem_finished(.x))
+    res <- check_nonmem_finished(.mod)
     if (all(res)) {
       break
     }else{
@@ -673,16 +699,83 @@ wait_for_nonmem.list <- function(.mod, .time_limit = 300, .interval = 5) {
     Sys.sleep(.interval)
   }
 
-  if(expiration < Sys.time() && !map_lgl(.mod, ~check_nonmem_finished(.x))){
-    res <- map_lgl(.mod, ~check_nonmem_finished(.x))
+  if(expiration < Sys.time() && !all(check_nonmem_finished(.mod))){
+    res <- check_nonmem_finished(.mod)
     warning(glue("Expiration was reached, but {length(res[!res])} model(s) haven't finished"),
             call. = FALSE, immediate. = TRUE)
   }else{
     verbose_msg(glue("\n{length(.mod)} model(s) have finished"))
   }
-
 }
 
+
+#' Get the model execution status
+#'
+#' Returns messages indicating which model(s) have finished executing and which
+#' are still running.
+#'
+#' @inheritParams check_nonmem_finished
+#' @param max_print max number of models to explicitly print to the console. If
+#' the number of finished or incomplete models are greater than this number,
+#' just print the _number_ of models.
+#'
+#' @details
+#' If the result are saved to an R object, users can inspect the full list of
+#' runs to determine exactly which models are still running vs. have finished
+#' executing:
+#'
+#' ```
+#' res <- get_model_status(mod_list)
+#' res
+#' ```
+#'
+#' @seealso wait_for_nonmem check_nonmem_finished
+#' @returns invisibly returns a tibble of model ids and whether the model has
+#' finished executing
+#' @export
+get_model_status <- function(.mod, max_print = 10, ...){
+  UseMethod("get_model_status")
+}
+
+#' @rdname get_model_status
+#' @export
+get_model_status.default <- function(.mod, max_print = 10, ...){
+  checkmate::assert_number(max_print, lower = 1)
+
+  if(inherits(.mod, "list") && !inherits(.mod, "bbi_model")){
+    check_model_object_list(.mod, .mod_types = NM_MOD_CLASS)
+    mod_ids <- purrr::map_chr(.mod, get_model_id)
+  }else{
+    check_model_object(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))
+    if(inherits(.mod, NM_MOD_CLASS)){
+      mod_ids <- get_model_id(.mod)
+    }else{
+      boot_models <- get_boot_models(.mod)
+      mod_ids <- purrr::map_chr(boot_models, get_model_id)
+    }
+  }
+
+  res <- check_nonmem_finished(.mod) %>% tibble::as_tibble() %>%
+    dplyr::transmute(model_id = mod_ids, finished = value)
+
+  res_fin <- res$model_id[res$finished]
+  if(length(res_fin) > 0 && length(res_fin) <= max_print){
+    mods_fin <- paste(res_fin, collapse = ", ")
+    verbose_msg(glue("\n The following model(s) have finished: `{mods_fin}`"))
+  }else{
+    verbose_msg(glue("\n{length(res_fin)} model(s) have finished"))
+  }
+
+  res_inc <- res$model_id[!res$finished]
+  if(length(res_inc) > 0 && length(res_inc) <= max_print){
+    mods_inc <- paste(res_inc, collapse = ", ")
+    verbose_msg(glue("\n The following model(s) are still running: `{mods_inc}`"))
+  }else{
+    verbose_msg(glue("\n{length(res_inc)} model(s) are still running"))
+  }
+
+  return(invisible(res))
+}
 
 #' Replace BBI_NULL_NUM and BBI_NULL_STR with NA_real_
 #'

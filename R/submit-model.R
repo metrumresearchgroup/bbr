@@ -49,14 +49,14 @@
 #'   tool.
 #' @export
 submit_model <- function(
-  .mod,
-  .bbi_args = NULL,
-  .mode = getOption("bbr.bbi_exe_mode"),
-  ...,
-  .overwrite = NULL,
-  .config_path = NULL,
-  .wait = TRUE,
-  .dry_run=FALSE
+    .mod,
+    .bbi_args = NULL,
+    .mode = getOption("bbr.bbi_exe_mode"),
+    ...,
+    .overwrite = NULL,
+    .config_path = NULL,
+    .wait = TRUE,
+    .dry_run = FALSE
 ) {
   UseMethod("submit_model")
 }
@@ -64,14 +64,14 @@ submit_model <- function(
 #' @describeIn submit_model Takes a `bbi_nonmem_model` object.
 #' @export
 submit_model.bbi_nonmem_model <- function(
-  .mod,
-  .bbi_args = NULL,
-  .mode = getOption("bbr.bbi_exe_mode"),
-  ...,
-  .overwrite = NULL,
-  .config_path = NULL,
-  .wait = TRUE,
-  .dry_run=FALSE
+    .mod,
+    .bbi_args = NULL,
+    .mode = getOption("bbr.bbi_exe_mode"),
+    ...,
+    .overwrite = NULL,
+    .config_path = NULL,
+    .wait = TRUE,
+    .dry_run = FALSE
 ) {
 
   res <- submit_nonmem_model(.mod,
@@ -85,6 +85,47 @@ submit_model.bbi_nonmem_model <- function(
   return(res)
 }
 
+#' @describeIn submit_model Takes a `bbi_nmboot_model` object.
+#' @export
+submit_model.bbi_nmboot_model <- function(
+    .mod,
+    .bbi_args = NULL,
+    .mode = getOption("bbr.bbi_exe_mode"),
+    ...,
+    .overwrite = NULL,
+    .config_path = NULL,
+    .wait = TRUE,
+    .dry_run = FALSE
+){
+  # Ensure bootstrap setup was done
+  spec_path <- get_boot_spec_path(.mod, .check_exists = FALSE)
+  if(!fs::file_exists(spec_path)){
+    rlang::abort(
+      c(
+        glue("No bootstrap specification file was found at {spec_path}"),
+        "i" = "Please run `setup_bootrap_run()` with your bootstrap run model object."
+      )
+    )
+  }
+
+  # If bbi.yaml exists in the current modeling directory, and _not_ the nested
+  # bootstrap directory, copy it to there before running
+  model_dir <- get_model_working_directory(.mod)
+  boot_dir <- .mod[[ABS_MOD_PATH]]
+  bbi_yaml_path <- file.path(model_dir, "bbi.yaml")
+  if(fs::file_exists(bbi_yaml_path) && !fs::file_exists(file.path(boot_dir, "bbi.yaml"))){
+    fs::file_copy(bbi_yaml_path, file.path(boot_dir, "bbi.yaml"))
+    verbose_msg(glue("Inheriting `bbi.yaml` from `{model_dir}`"))
+  }
+
+  boot_models <- get_boot_models(.mod)
+  res <- submit_models(
+    boot_models, .bbi_args, .mode, ...,
+    .overwrite = .overwrite, .config_path = .config_path,
+    .wait = .wait, .dry_run = .dry_run
+  )
+  return(res)
+}
 
 #####################################
 # Private implementation function(s)
