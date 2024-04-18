@@ -29,7 +29,7 @@ initial_estimates <- function(.mod, flag_fixed = FALSE){
 
   # THETA labels
   theta_inits <- initial_est$thetas
-  theta_inits$parameter_names <- sprintf("THETA(%d)", 1:nrow(theta_inits))
+  theta_inits$parameter_names <- sprintf("THETA%d", 1:nrow(theta_inits))
   theta_inits <- theta_inits %>%
     dplyr::rename("lower_bound" = "low", "upper_bound" = "up")
 
