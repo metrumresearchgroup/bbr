@@ -756,7 +756,7 @@ get_model_status.default <- function(.mod, max_print = 10, ...){
   }
 
   res <- check_nonmem_finished(.mod) %>% tibble::as_tibble() %>%
-    dplyr::transmute(model_id = mod_ids, finished = value)
+    dplyr::transmute(model_id = mod_ids, finished = .data$value)
 
   res_fin <- res$model_id[res$finished]
   if(length(res_fin) > 0 && length(res_fin) <= max_print){

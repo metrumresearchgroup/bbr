@@ -24,6 +24,9 @@ setup_bootrap_run(
 \item{replace}{whether to stratify with replacement}
 
 \item{seed}{a seed for sampling the data}
+
+\item{.overwrite}{logical (T/F) indicating whether or not to overwrite existing
+setup for a bootstrap run.}
 }
 \description{
 Set up a bootstrap model run. Creates a new model object per run and generates

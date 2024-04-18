@@ -12,4 +12,3 @@ get_boot_models(.mod)
 \description{
 Read in all bootstrap run model objects
 }
-\keyword{internal}

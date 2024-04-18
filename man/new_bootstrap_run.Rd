@@ -16,8 +16,9 @@ new_bootstrap_run(
 \item{.prefix}{a prefix for the boostrap model directory. Will be appended by
 the boostrap run number for a given model.}
 
-\item{.overwrite}{Logical to specify whether or not to overwrite existing
-model output from a previous run.}
+\item{.inherit_tags}{If \code{FALSE}, the default, new model will only have any
+tags passed to \code{.add_tags} argument. If \code{TRUE} inherit any tags from
+\code{.parent_mod}, with any tags passed to \code{.add_tags} appended.}
 }
 \description{
 Create a boostrap model object from an existing model

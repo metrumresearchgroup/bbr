@@ -3,8 +3,7 @@
 #' @param .mod a `bbr` model object
 #' @param .prefix a prefix for the boostrap model directory. Will be appended by
 #'  the boostrap run number for a given model.
-#' @param .overwrite Logical to specify whether or not to overwrite existing
-#'  model output from a previous run.
+#' @inheritParams copy_model_from
 #'
 #' @export
 new_bootstrap_run <- function(
@@ -68,6 +67,8 @@ get_next_boot_run <- function(model_dir, .prefix){
 #' @param strat_cols columns to maintain proportion for stratification
 #' @param replace whether to stratify with replacement
 #' @param seed a seed for sampling the data
+#' @param .overwrite logical (T/F) indicating whether or not to overwrite existing
+#'  setup for a bootstrap run.
 #'
 #' @details
 #' This setup is automatically done internally as part of submitting a bootstrap
@@ -324,7 +325,7 @@ summarize_bootstrap_run <- function(
     # as `param_estimates_batch`
     based_on_mod_sum <- model_summary(based_on_mod)
     based_on_est <- param_estimates(based_on_mod_sum) %>%
-      dplyr::select(parameter_names, estimate) %>%
+      dplyr::select("parameter_names", "estimate") %>%
       tidyr::pivot_wider(names_from = "parameter_names", values_from = "estimate") %>%
       dplyr::mutate(
         run = "based_on",

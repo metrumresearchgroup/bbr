@@ -679,7 +679,7 @@ get_boot_spec <- function(.mod){
 
 #' Read in all bootstrap run model objects
 #' @param .mod a `bbi_nmboot_model` model object
-#' @keywords internal
+#' @export
 get_boot_models <- function(.mod){
   boot_spec <- get_boot_spec(.mod)
   boot_models <- purrr::map(boot_spec$mod_path_abs, read_model)
