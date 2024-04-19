@@ -5,10 +5,10 @@
 \title{Tabulate all relevant \code{bbi_nonmem_model} model files from a bootstrap control
 stream file.}
 \usage{
-get_boot_spec(.mod)
+get_boot_spec(.boot_run)
 }
 \arguments{
-\item{.mod}{a \code{bbi_nmboot_model} model object}
+\item{.boot_run}{a \code{bbi_nmboot_model} model object}
 }
 \description{
 Tabulate all relevant \code{bbi_nonmem_model} model files from a bootstrap control

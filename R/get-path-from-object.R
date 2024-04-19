@@ -651,12 +651,12 @@ find_nonmem_model_file_path <- function(.path, .check_exists = TRUE) {
 
 #' Tabulate all relevant `bbi_nonmem_model` model files from a bootstrap control
 #' stream file.
-#' @param .mod a `bbi_nmboot_model` model object
+#' @param .boot_run a `bbi_nmboot_model` model object
 #' @keywords internal
-get_boot_spec <- function(.mod){
-  check_model_object(.mod, .mod_types = NMBOOT_MOD_CLASS)
+get_boot_spec <- function(.boot_run){
+  check_model_object(.boot_run, .mod_types = NMBOOT_MOD_CLASS)
 
-  spec_path <- get_boot_spec_path(.mod, .check_exists = FALSE)
+  spec_path <- get_boot_spec_path(.boot_run, .check_exists = FALSE)
   if(!fs::file_exists(spec_path)) return(NULL)
 
   boot_spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
@@ -674,14 +674,15 @@ get_boot_spec <- function(.mod){
     mod_path_abs = file.path(boot_dir, fs::path_ext_remove(.data$mod_path))
   ) %>% dplyr::relocate("run")
 
-  return(spec_df)
+  spec <- c(boot_spec$bootstrap_spec, list(bootstrap_runs = spec_df))
+  return(spec)
 }
 
 #' Read in all bootstrap run model objects
-#' @param .mod a `bbi_nmboot_model` model object
+#' @inheritParams get_boot_spec
 #' @export
-get_boot_models <- function(.mod){
-  boot_spec <- get_boot_spec(.mod)
-  boot_models <- purrr::map(boot_spec$mod_path_abs, read_model)
+get_boot_models <- function(.boot_run){
+  boot_spec <- get_boot_spec(.boot_run)
+  boot_models <- purrr::map(boot_spec$bootstrap_runs$mod_path_abs, read_model)
   return(boot_models)
 }

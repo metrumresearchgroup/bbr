@@ -1,15 +1,20 @@
 #' Create a boostrap model object from an existing model
 #'
 #' @param .mod a `bbr` model object
-#' @param .prefix a prefix for the boostrap model directory. Will be appended by
+#' @param .suffix a prefix for the boostrap model directory. Will be appended by
 #'  the boostrap run number for a given model.
 #' @inheritParams copy_model_from
+#' @param increment Logical (T/F). If `TRUE`, create a new bootstrap model run.
+#'  Will append `_run_[x]` to the provided `.suffix`. `.overwrite` will have no
+#'  impact if incrementing the bootstrap run.
 #'
 #' @export
 new_bootstrap_run <- function(
     .mod,
-    .prefix = glue("{get_model_id(.mod)}_boot"),
-    .inherit_tags = TRUE
+    .suffix = glue("{get_model_id(.mod)}_boot"),
+    .inherit_tags = TRUE,
+    .overwrite = FALSE,
+    increment = FALSE
 ){
 
   checkmate::assert_class(.mod, NM_MOD_CLASS)
@@ -18,8 +23,14 @@ new_bootstrap_run <- function(
 
   # Increments the bootstrap run
   # (i.e. impossible to overwrite an existing run via this function)
-  new_run_id <- get_next_boot_run(model_dir, .prefix)
-  boot_run_id <- paste0(.prefix, "_run_", new_run_id)
+  if(isTRUE(increment)){
+    new_run_id <- get_next_boot_run(model_dir, .suffix)
+    boot_run_id <- paste0(.suffix, "_run_", new_run_id)
+  }else{
+    new_run_id <- 1
+    boot_run_id <- paste0(.suffix)
+  }
+
 
   boot_run <- copy_model_from(
     .parent_mod = .mod,
@@ -27,7 +38,7 @@ new_bootstrap_run <- function(
     .add_tags = "BOOTSTRAP_SUBMISSION",
     .inherit_tags = .inherit_tags,
     .update_model_file = TRUE,
-    .overwrite = TRUE
+    .overwrite = .overwrite
   )
 
   boot_run[[YAML_MOD_TYPE]] <- "nmboot"
@@ -44,13 +55,14 @@ new_bootstrap_run <- function(
 }
 
 
-get_next_boot_run <- function(model_dir, .prefix){
+get_next_boot_run <- function(model_dir, .suffix){
   model_dir_files <- fs::dir_ls(model_dir, glob = "*.yaml")
-  boot_runs <- model_dir_files[grepl(.prefix, model_dir_files)]
+  boot_runs <- model_dir_files[grepl(.suffix, model_dir_files)]
   if(!rlang::is_empty(boot_runs)){
     boot_runs <- fs::path_ext_remove(basename(boot_runs))
-    run_ids <- gsub(.prefix, "", boot_runs)
-    run_ids <- readr::parse_number(run_ids)
+    run_ids <- gsub(.suffix, "", boot_runs)
+    run_ids <- readr::parse_number(run_ids) %>% suppressWarnings()
+    run_ids[is.na(run_ids)] <- 1 # assign 1 if no `_run_[x]` is found
     new_run <- max(run_ids) + 1
   }else{
     new_run <- 1
@@ -257,91 +269,51 @@ make_boot_spec <- function(boot_models, boot_args){
 #' Summarize a bootstrap run
 #'
 #' @inheritParams setup_bootrap_run
-#' @param estimates_only logical (T/F). Set to `TRUE` to only include parameter
-#'  estimates (much faster for a large number of runs). If `FALSE`, appends
-#'  additional model summary information.
-#' @param include_based_on logical (T/F). If `TRUE`, include the model the
-#' bootstrap run was based on. **Only use this** if that model hasn't changed
-#' since the latest bootstrap run.
+#' @param add_summary logical (T/F). Set to `TRUE` to include additional
+#'  model summary parameters. If `FALSE`, only includes the parameter estimates
+#'  (much faster for a large number of runs).
 #'
 #' @export
 summarize_bootstrap_run <- function(
     .boot_run,
-    estimates_only = FALSE,
-    include_based_on = FALSE
+    add_summary = FALSE,
+    force_resummarize = FALSE
 ){
 
-  # use param_estimates_batch for estimates for added speed
-  param_ests <- param_estimates_batch(.boot_run[[ABS_MOD_PATH]])
+  boot_dir <- .boot_run[[ABS_MOD_PATH]]
+  boot_sum_path <- file.path(boot_dir, "boot_summary.RDS")
 
-  # Helper for extracting objective function values from model summaries
-  ofvs_from_sums <- function(model_sums){
-    ofvs <- purrr::map_dfr(model_sums, function(mod_sum){
-      ofvs <- ifelse(
-        inherits(mod_sum, NM_SUM_CLASS),
-        mod_sum$ofv,
-        mod_sum$bbi_summary$ofv
+  if(!fs::file_exists(boot_sum_path) || isTRUE(force_resummarize)){
+    param_ests <- param_estimates_batch(boot_dir)
+
+    if(isTRUE(add_summary)){
+      boot_sum_log <- summary_log(
+        boot_dir, .bbi_args = list(
+          no_grd_file = TRUE, no_ext_file = TRUE, no_shk_file = TRUE
+        )
+      ) %>% dplyr::select(-"error_msg")
+
+      boot_sum <- dplyr::full_join(
+        param_ests, boot_sum_log, by = c(ABS_MOD_PATH, "run")
       )
-      data.frame(
-        matrix(unlist(ofvs), nrow=length(ofvs), byrow = TRUE),
-        stringsAsFactors = FALSE
-      ) %>%
-        stats::setNames(names(unlist(ofvs))) %>% tibble::as_tibble() %>%
-        dplyr::mutate(!!rlang::sym(ABS_MOD_PATH) := mod_sum[[ABS_MOD_PATH]])
-    })
-
-    # method <- unique(ofvs$method) # TODO: maybe include somewhere?
-    ofvs <- ofvs %>% dplyr::select(-"method")
-    return(ofvs)
-  }
-
-  if(isFALSE(estimates_only)){
-    # Extract some information from model summary objects
-    boot_models <- get_boot_models(.boot_run)
-    mod_sums <- model_summaries(boot_models)
-    ofvs <- ofvs_from_sums(mod_sums)
-
-    ofv_cols <- names(ofvs)[-grep(ABS_MOD_PATH, names(ofvs))]
-
-    boot_sum <- dplyr::full_join(param_ests, ofvs, by = ABS_MOD_PATH) %>%
-      dplyr::relocate(all_of(c("run", ABS_MOD_PATH, ofv_cols)))
+    }else{
+      boot_sum <- param_ests
+    }
+    saveRDS(boot_sum, boot_sum_path)
   }else{
-    boot_sum <- dplyr::relocate(param_ests, all_of(c("run", ABS_MOD_PATH)))
-  }
-
-  if(isTRUE(include_based_on)){
-    based_on_mod <- read_model(get_based_on(.boot_run))
-    res <- check_up_to_date(based_on_mod)
-    if(!all(res)){
+    boot_sum <- readRDS(boot_sum_path)
+    if(isFALSE("bbi_summary" %in% names(boot_sum)) && isTRUE(add_summary)){
       rlang::warn(
         c(
-          "The based on model has changed since it's last submission, and should not be included in the summary.",
-          "i" = "Run the following to see what changed: `check_up_to_date(read_model(get_based_on(.boot_run)))`"
+          "A bootstrap summary _without_ summary columns was already saved to:",
+          glue("`{boot_sum_path}`"),
+          "i" = paste(
+            "Re-run the summary call with `force_resummarize = TRUE` to add",
+            "summary columns."
+          )
         )
       )
     }
-
-    # Format estimates and objective function values to be in the same format
-    # as `param_estimates_batch`
-    based_on_mod_sum <- model_summary(based_on_mod)
-    based_on_est <- param_estimates(based_on_mod_sum) %>%
-      dplyr::select("parameter_names", "estimate") %>%
-      tidyr::pivot_wider(names_from = "parameter_names", values_from = "estimate") %>%
-      dplyr::mutate(
-        run = "based_on",
-        !!rlang::sym(ABS_MOD_PATH) := based_on_mod[[ABS_MOD_PATH]]
-      )
-    based_on_ofv <- ofvs_from_sums(list(based_on_mod_sum))
-
-    if(isFALSE(estimates_only)){
-      based_on_sum <- dplyr::full_join(based_on_est, based_on_ofv, by = ABS_MOD_PATH) %>%
-        dplyr::relocate(all_of(c("run", ABS_MOD_PATH, ofv_cols)))
-    }else{
-      based_on_sum <- dplyr::relocate(based_on_est, all_of(c("run", ABS_MOD_PATH)))
-    }
-
-    # Append to bootstrap runs (first row for quick finding)
-    boot_sum <- dplyr::bind_rows(based_on_sum, boot_sum)
   }
   return(boot_sum)
 }

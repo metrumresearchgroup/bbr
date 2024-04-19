@@ -4,10 +4,10 @@
 \alias{get_boot_models}
 \title{Read in all bootstrap run model objects}
 \usage{
-get_boot_models(.mod)
+get_boot_models(.boot_run)
 }
 \arguments{
-\item{.mod}{a \code{bbi_nmboot_model} model object}
+\item{.boot_run}{a \code{bbi_nmboot_model} model object}
 }
 \description{
 Read in all bootstrap run model objects

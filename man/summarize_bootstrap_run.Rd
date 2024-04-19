@@ -6,20 +6,16 @@
 \usage{
 summarize_bootstrap_run(
   .boot_run,
-  estimates_only = FALSE,
-  include_based_on = FALSE
+  add_summary = FALSE,
+  force_resummarize = FALSE
 )
 }
 \arguments{
 \item{.boot_run}{a \code{bbi_nmboot_model} object.}
 
-\item{estimates_only}{logical (T/F). Set to \code{TRUE} to only include parameter
-estimates (much faster for a large number of runs). If \code{FALSE}, appends
-additional model summary information.}
-
-\item{include_based_on}{logical (T/F). If \code{TRUE}, include the model the
-bootstrap run was based on. \strong{Only use this} if that model hasn't changed
-since the latest bootstrap run.}
+\item{add_summary}{logical (T/F). Set to \code{TRUE} to include additional
+model summary parameters. If \code{FALSE}, only includes the parameter estimates
+(much faster for a large number of runs).}
 }
 \description{
 Summarize a bootstrap run

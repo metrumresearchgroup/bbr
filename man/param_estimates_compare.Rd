@@ -14,7 +14,8 @@ param_estimates_compare(
 }
 \arguments{
 \item{.param_df}{A tibble with columns for each parameter and rows for each
-model (like what's returned from \code{\link[=param_estimates_batch]{param_estimates_batch()}})}
+model (like what's returned from \code{\link[=param_estimates_batch]{param_estimates_batch()}} or
+\code{\link[=summarize_bootstrap_run]{summarize_bootstrap_run()}}).}
 
 \item{.orig_mod}{\code{bbi_model} object to compare \code{.param_df} against. If
 \code{NULL}, the default, only returns quantiles from \code{.param_df}. If passed,

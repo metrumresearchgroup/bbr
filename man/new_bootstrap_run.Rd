@@ -6,19 +6,29 @@
 \usage{
 new_bootstrap_run(
   .mod,
-  .prefix = glue("{get_model_id(.mod)}_boot"),
-  .inherit_tags = TRUE
+  .suffix = glue("{get_model_id(.mod)}_boot"),
+  .inherit_tags = TRUE,
+  .overwrite = FALSE,
+  increment = FALSE
 )
 }
 \arguments{
 \item{.mod}{a \code{bbr} model object}
 
-\item{.prefix}{a prefix for the boostrap model directory. Will be appended by
+\item{.suffix}{a prefix for the boostrap model directory. Will be appended by
 the boostrap run number for a given model.}
 
 \item{.inherit_tags}{If \code{FALSE}, the default, new model will only have any
 tags passed to \code{.add_tags} argument. If \code{TRUE} inherit any tags from
 \code{.parent_mod}, with any tags passed to \code{.add_tags} appended.}
+
+\item{.overwrite}{If \code{FALSE}, the default,  function will error if a model
+file already exists at specified \code{.new_model} path. If \code{TRUE} any existing
+file at \code{.new_model} will be overwritten silently.}
+
+\item{increment}{Logical (T/F). If \code{TRUE}, create a new bootstrap model run.
+Will append \verb{_run_[x]} to the provided \code{.suffix}. \code{.overwrite} will have no
+impact if incrementing the bootstrap run.}
 }
 \description{
 Create a boostrap model object from an existing model

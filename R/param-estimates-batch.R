@@ -126,7 +126,8 @@ param_estimates_batch <- function(.path,
 #'
 #'
 #' @param .param_df A tibble with columns for each parameter and rows for each
-#'   model (like what's returned from [param_estimates_batch()])
+#'   model (like what's returned from [param_estimates_batch()] or
+#'   [summarize_bootstrap_run()]).
 #' @param .orig_mod `bbi_model` object to compare `.param_df` against. If
 #'   `NULL`, the default, only returns quantiles from `.param_df`. If passed,
 #'   will display an additional `original_estimate` column.
@@ -191,7 +192,7 @@ param_estimates_compare <- function(
     reframe(across(.cols = everything(), .fns = quantile_fn)) %>%
     t() %>%
     as.data.frame() %>%
-    rownames_to_column()
+    rownames_to_column() %>% tibble::as_tibble()
   colnames(comp_df) <- c("parameter_names", paste0(probs * 100, "%"))
 
   # join quantiles to original

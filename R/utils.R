@@ -484,7 +484,7 @@ bbi_nonmem_model_status.bbi_nmboot_model <- function(.mod) {
       spec_path <- get_boot_spec_path(.mod, .check_exists = FALSE)
       if (fs::file_exists(spec_path)) {
         boot_spec <- get_boot_spec(.mod)
-        for(output_dir.i in boot_spec$mod_path_abs){
+        for(output_dir.i in boot_spec$bootstrap_runs$mod_path_abs){
           if (dir.exists(output_dir.i)) {
             json_file <- get_config_path(
               read_model(output_dir.i), .check_exists = FALSE
