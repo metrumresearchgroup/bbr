@@ -185,7 +185,7 @@ print.bbi_model <- function(x, ...) {
 }
 
 
-#' @describeIn print_bbi Prints a high level summary of a model from a bbi_nonmem_summary object
+#' @describeIn print_bbi Prints a high level summary of a model from a `bbi_nonmem_summary` object
 #' @importFrom purrr map_chr
 #' @importFrom cli cat_line
 #' @importFrom dplyr mutate_if
@@ -281,9 +281,150 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
   if (!is.null(.nrow)) cat_line(glue("... {orig_rows - .nrow} more rows"), col = "grey")
 }
 
+
+#' @describeIn print_bbi Prints a high level summary of a model from a `bbi_nmboot_summary` object
+#' @importFrom purrr map_chr
+#' @importFrom cli cat_line
+#' @importFrom dplyr mutate_if
+#' @importFrom checkmate assert_number
+#'
+#' @param .digits Number of significant digits to use for parameter table. Defaults to 3.
+#' @param .nrow If `NULL`, the default, print all rows of the parameter table.
+#'   Otherwise, prints only `.nrow` rows.
+#' @export
+print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
+
+  # print top line info
+  .d <- x[[SUMMARY_DETAILS]]
+  cat_line(glue("Based on Dataset: {x$based_on_data_set}\n\n"))
+  num_rec <- median(.d$number_of_data_records, na.rm = TRUE)
+  num_obs <- median(.d$number_of_data_records, na.rm = TRUE)
+  num_sub <- median(.d$number_of_data_records, na.rm = TRUE)
+  cat_line(glue("Median values --> Records: {num_rec}\t Observations: {num_obs}\t Subjects: {num_sub}\n\n"))
+
+  only_sim <- isTRUE("only_sim" %in% names(.d))
+  if (only_sim) {
+    cat_line("No Estimation Methods (ONLYSIM)\n")
+  } else {
+    ofvs <- extract_ofv(x$boot_summary$bbi_summary)
+    cat_line("Objective Function Summary (final est. method):\n")
+    ascii_boxplot(ofvs)
+    cat("\n")
+    cli::cat_line("Estimation Method(s):\n")
+    purrr::walk(paste(x$estimation_method, "\n"), cli::cat_bullet, bullet = "en_dash")
+  }
+
+  # check heuristics
+  .h <- x[[SUMMARY_HEURISTICS]]
+  heuristics_cols <- names(.h)[!grepl(ABS_MOD_PATH, names(.h))]
+  heuristics <- purrr::map_dfr(heuristics_cols, function(col){
+    tibble(heuristic = col, any_found = any(.h[[col]]), n_found = sum(.h[[col]]))
+  })
+
+  if (any(heuristics$any_found)) {
+    cli::cat_line("**Heuristic Problem(s) Detected:**\n", col = "red")
+    heuristics_found <- heuristics$heuristic[which(heuristics$any_found)]
+    heuristics_n <- heuristics$n_found[which(heuristics$any_found)]
+    purrr::walk(paste0(heuristics_found, " (N = ", heuristics_n, ")"), cli::cat_bullet, bullet = "en_dash", col = "red")
+    cat("\n")
+  } else {
+    cat_line("No Heuristic Problems Detected\n\n")
+  }
+
+  if (only_sim) {
+    return(invisible(NULL))
+  }
+
+  # build parameter table (catch Bayesian error)
+  param_df <- x$boot_summary %>%
+    select(-c(ABS_MOD_PATH, "bbi_summary", "condition_number")) %>%
+    mutate_if(is.numeric, sig, .digits = .digits)
+
+  if (!is.null(.nrow)) {
+    checkmate::assert_number(.nrow)
+    orig_rows <- nrow(param_df)
+    .nrow <- min(.nrow, nrow(param_df))
+    param_df <- param_df[1:.nrow, ]
+  }
+
+  if (requireNamespace("knitr", quietly = TRUE)) {
+    param_str <- param_df %>%
+      knitr::kable() %>%
+      as.character()
+
+    # add color for shrinkage
+    param_str <- map_chr(param_str, highlight_cell, .i = 5, .threshold = 30)
+  } else {
+    param_str <- param_df %>%
+      print() %>%
+      capture.output()
+  }
+
+  cat_line(param_str)
+  if (!is.null(.nrow)) cat_line(glue("... {orig_rows - .nrow} more rows"), col = "grey")
+}
+
 #####################
 # INTERNAL HELPERS
 #####################
+
+library(cli)
+
+# Function to create ASCII box plot
+ascii_boxplot <- function(data) {
+  q <- quantile(data, c(0, 0.25, 0.5, 0.75, 1), na.rm = TRUE)
+  rel_diffs <- diff(q)/min(diff(q))
+
+  space_unit <- "      "
+  dash_unit <-  "------"
+  bar_unit <-   "──────"
+  dash1 <- paste0("|", paste(rep(dash_unit, rel_diffs[1]), collapse = ""), "|")
+  dash2 <- paste0("|", paste(rep(dash_unit, rel_diffs[4]), collapse = ""), "|")
+  space_pre <- paste(rep(paste0(space_unit, " "), rel_diffs[1]), collapse = "")
+  bar1_lines <- paste(rep(bar_unit, rel_diffs[2]), collapse = "")
+  bar1_top <- paste0("┌", bar1_lines, "|")
+  bar1_space <- paste(rep(space_unit, rel_diffs[2]), collapse = "")
+  bar1_bottom <- paste0("└", bar1_lines, "|")
+
+  bar2_lines <- paste(rep(bar_unit, rel_diffs[3]), collapse = "")
+  bar2_top <- paste0(bar2_lines, "┐")
+  bar2_space <- paste(rep(space_unit, rel_diffs[3]), collapse = "")
+  bar2_bottom <- paste0(bar2_lines, "┘")
+
+  bar_top <- paste0(space_unit, space_pre, bar1_top, bar2_top)
+  lines_middle <- paste0(space_unit, dash1,  bar1_space, "|", bar2_space, dash2)
+  bar_bottom <- paste0(space_unit, space_pre, bar1_bottom, bar2_bottom)
+  pointers <- paste0(
+    space_unit, "↓",
+    paste0(rep(space_unit, rel_diffs[1]), collapse = ""), "↓",
+    paste0(rep(space_unit, rel_diffs[2]), collapse = ""), "↓",
+    paste0(rep(space_unit, rel_diffs[3]), collapse = ""), "↓",
+    paste0(rep(space_unit, rel_diffs[4]), collapse = ""), "↓",
+    collapse = "")
+
+  q_round <- round(q, 2)
+
+  space_values <- function(rel_diff, q_val){
+    start_space <- paste0(rep(space_unit, rel_diff), collapse = "")
+    space_size <- max(abs(nchar(start_space) - nchar(q_val)), 1)
+    paste0(rep(" ", space_size), collapse = "")
+  }
+
+  box_vals <- paste0(
+    space_unit, q_round[1],
+    space_values(rel_diffs[1], q_round[2]), q_round[2],
+    space_values(rel_diffs[2], q_round[3]), q_round[3],
+    space_values(rel_diffs[3], q_round[4]), q_round[4],
+    space_values(rel_diffs[4], q_round[5]), q_round[5],
+    collapse = "")
+
+
+  cat_line(bar_top, col = "blue")
+  cat_line(lines_middle, col = "blue")
+  cat_line(bar_bottom, col = "blue")
+  cat_line(pointers, col = "red")
+  cat_line(box_vals, col = "blue")
+}
 
 #' Format digits
 #'

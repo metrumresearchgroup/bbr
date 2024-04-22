@@ -29,6 +29,11 @@ Returns \code{TRUE} if the model appears to be finished running and
 \description{
 Checks if \code{NONMEM} run is done by looking for \code{"Stop Time"} in \code{.lst} file
 }
+\details{
+Note that this method is intended to be called on models that have been
+submitted. It happens to return \code{TRUE} for un-submitted models, but that
+should be considered undefined behavior.
+}
 \section{Methods (by class)}{
 \itemize{
 \item \code{check_nonmem_finished(bbi_nonmem_model)}: takes a \code{bbi_nonmem_model} object.

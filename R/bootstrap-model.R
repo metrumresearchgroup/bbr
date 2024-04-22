@@ -97,6 +97,7 @@ setup_bootrap_run <- function(
     seed = 1234,
     .overwrite = FALSE
 ){
+  # TODO: make sure all _relevant_ resample_df args are part of this function
   checkmate::assert_class(.boot_run, NMBOOT_MOD_CLASS)
   checkmate::assert_number(n, lower = 1)
   checkmate::assert_number(seed)
@@ -123,6 +124,7 @@ setup_bootrap_run <- function(
 
   boot_args <- list(
     boot_run = .boot_run,
+    all_mod_names = mod_names,
     orig_mod_path = get_model_path(orig_mod),
     orig_mod_id = get_model_id(orig_mod),
     orig_data = nm_data(orig_mod) %>% suppressMessages(),
@@ -141,8 +143,6 @@ setup_bootrap_run <- function(
   # Garbage collect - may help after handling many (potentially large) datasets
   #  - It can be useful to call gc() after a large object has been removed, as
   #    this may prompt R to return memory to the operating system.
-  # TODO: confirm if this is actually helpful, as this can take a couple seconds
-  # - maybe check object.size of datasets and only perform if `n` is greater than some number
   gc()
 
   return(invisible(.boot_run))
@@ -157,6 +157,13 @@ setup_bootrap_run <- function(
 #' @keywords internal
 make_boot_run <- function(mod_path, boot_args){
 
+  # Update the user every 100 runs (plus beginning and end)
+  new_mod_index <- which(basename(mod_path) == boot_args$all_mod_names)
+  if(new_mod_index == 1 || new_mod_index == length(boot_args$all_mod_names) ||
+     new_mod_index %% 100 == 0){
+    verbose_msg(glue("Sampling run {new_mod_index}/{length(boot_args$all_mod_names)}"))
+  }
+
   # Copy over control stream
   #  - Cant use copy_model_from, as we want these individual model runs to be
   #    regular `bbi_base_model` objects
@@ -170,11 +177,11 @@ make_boot_run <- function(mod_path, boot_args){
   # Sample data and assign new IDs
   data_new <- resample_df(
     boot_args$orig_data,
-    key_cols = "ID",
+    key_cols = "ID", # TODO: should this be a user arg?
     strat_cols = boot_args$strat_cols,
     replace = boot_args$replace
-  ) %>% dplyr::rename("OID" = "ID", "ID" = "KEY") %>%
-    dplyr::select(all_of(unique(c(names(boot_args$orig_data), "OID"))))
+  ) %>% dplyr::rename("OID" = "ID", "ID" = "KEY") %>% # TODO: should this be a user arg?
+    dplyr::select(all_of(unique(c(names(boot_args$orig_data), "OID")))) # TODO: should this be a user arg?
 
   mod_name <- basename(mod_path)
   orig_mod_id <- boot_args$orig_mod_id
@@ -199,6 +206,11 @@ make_boot_run <- function(mod_path, boot_args){
   # Overwrite $PROB and $DATA records
   modify_prob_statement(mod, prob)
   modify_data_path_ctl(mod, data_path_rel)
+
+  # Message when done
+  if(new_mod_index == length(boot_args$all_mod_names)){
+    verbose_msg("Done..")
+  }
 
   return(mod)
 }
@@ -266,60 +278,176 @@ make_boot_spec <- function(boot_models, boot_args){
 }
 
 
+bootstrap_is_finished <- function(.boot_run){
+  boot_models <- get_boot_models(.boot_run)
+  models_finished <- map_lgl(boot_models, ~nonmem_finished_impl(.x))
+  return(all(models_finished))
+}
+
 #' Summarize a bootstrap run
 #'
 #' @inheritParams setup_bootrap_run
-#' @param add_summary logical (T/F). Set to `TRUE` to include additional
-#'  model summary parameters. If `FALSE`, only includes the parameter estimates
-#'  (much faster for a large number of runs).
+#' @param force_resummarize logical (T/F). If `TRUE`, force re-summarization.
+#'  See details.
 #'
+#' @details
+#' The first time `summarize_bootstrap_run()` is called, it will save the
+#' results to a `boot_summary.RDS` data file within the bootstrap run directory.
+#' If one already exists, that data set will be read in instead of being
+#' re-summarized. The purpose of this is functionality two fold. For one, it
+#' helps avoid the need of re-executing `model_summary()` calls for a large
+#' number of runs. It also helps to reduce the number of files you need to
+#' commit via version control. This can be overridden by setting
+#' `force_resummarize = TRUE`.
+#'
+#' @name summarize_bootstrap
+NULL
+
+
+#' @describeIn summarize_bootstrap Summarize a bootstrap run and store results
 #' @export
 summarize_bootstrap_run <- function(
     .boot_run,
-    add_summary = FALSE,
     force_resummarize = FALSE
 ){
+  check_model_object(.boot_run, NMBOOT_MOD_CLASS)
+  boot_dir <- .boot_run[[ABS_MOD_PATH]]
+  boot_sum_path <- file.path(boot_dir, "boot_summary.RDS")
+
+  if(!fs::file_exists(boot_sum_path) || isTRUE(force_resummarize)){
+    param_ests <- bootstrap_estimates(
+      .boot_run, force_resummarize = force_resummarize
+    )
+
+    boot_sum_log <- summary_log(
+      boot_dir, .bbi_args = list(
+        no_grd_file = TRUE, no_ext_file = TRUE, no_shk_file = TRUE
+      )
+    ) %>% dplyr::select(-"error_msg") # only join based on model run
+
+    # Tabulate all run details and heuristics
+    run_details <- purrr::map_dfr(boot_sum_log$bbi_summary, function(sum){
+      as_tibble(
+        c(list2(!!ABS_MOD_PATH := sum[[ABS_MOD_PATH]]), sum$run_details)
+      ) %>% tidyr::nest("output_files_used" = "output_files_used")
+    })
+
+    run_heuristics <- purrr::map_dfr(boot_sum_log$bbi_summary, function(sum){
+      as_tibble(
+        c(list2(!!ABS_MOD_PATH := sum[[ABS_MOD_PATH]]), sum[[SUMMARY_HEURISTICS]])
+      )
+    })
+
+    # Run details, heuristics, and other information will be displayed elsewhere
+    run_cols <- c(
+      unique(c(names(run_details), names(run_heuristics))),
+      "estimation_method", "problem_text", "needed_fail_flags", "param_count"
+    )
+    run_cols <- run_cols[-grepl(ABS_MOD_PATH, run_cols)]
+
+    boot_sum_df <- dplyr::full_join(
+      param_ests, boot_sum_log %>% dplyr::select(-any_of(run_cols)),
+      by = c(ABS_MOD_PATH, "run")
+    ) %>% dplyr::relocate(
+      c(ABS_MOD_PATH, "run",
+        starts_with(c("THETA", "SIGMA", "OMEGA", "ofv", "condition_number")))
+    )
+
+    # Long format with objective function
+    boot_sum_df_long <- dplyr::full_join(
+      bootstrap_estimates(.boot_run, format_long = TRUE),
+      boot_sum_df %>% dplyr::select(c(ABS_MOD_PATH, "run", "ofv")),
+      by = c(ABS_MOD_PATH, "run")
+    )
+
+    boot_spec <- get_boot_spec(.boot_run)
+
+    boot_sum <- c(
+      list2(!!ABS_MOD_PATH := boot_dir),
+      list(
+        estimation_method = unique(boot_sum_log$estimation_method),
+        based_on_model_path = boot_spec$based_on_model_path,
+        based_on_data_set = boot_spec$based_on_data_path,
+        strat_cols = boot_spec$strat_cols,
+        replace = boot_spec$replace,
+        seed = boot_spec$seed,
+        run_details = run_details,
+        run_heuristics = run_heuristics
+      ),
+      list(
+        boot_summary = boot_sum_df
+      )
+    )
+
+    # Assign class and save out
+    class(boot_sum) <- c(NMBOOT_SUM_CLASS, class(boot_sum))
+    saveRDS(boot_sum, boot_sum_path)
+  }else{
+    verbose_msg(
+      glue("Reading in bootstrap summary: {fs::path_rel(boot_sum_path, getwd())}\n\n")
+    )
+    boot_sum <- readRDS(boot_sum_path)
+  }
+
+  return(boot_sum)
+}
+
+
+#' @describeIn summarize_bootstrap Tabulate parameter estimates for each model submission in a bootstrap run
+#' @param format_long logical (T/F). If `TRUE`, format data as a long table,
+#'  making the data more portable for plotting.
+#' @export
+bootstrap_estimates <- function(
+    .boot_run,
+    format_long = FALSE,
+    force_resummarize = FALSE
+){
+  check_model_object(.boot_run, NMBOOT_MOD_CLASS)
+
+  if(!bootstrap_is_finished(.boot_run)){
+    rlang::abort(
+      c(
+        "One or more bootstrap runs have not finished executing.",
+        "i" = "Run `get_model_status(.boot_run)` to check the submission status."
+      )
+    )
+  }
 
   boot_dir <- .boot_run[[ABS_MOD_PATH]]
   boot_sum_path <- file.path(boot_dir, "boot_summary.RDS")
 
   if(!fs::file_exists(boot_sum_path) || isTRUE(force_resummarize)){
-    param_ests <- param_estimates_batch(boot_dir)
-
-    if(isTRUE(add_summary)){
-      boot_sum_log <- summary_log(
-        boot_dir, .bbi_args = list(
-          no_grd_file = TRUE, no_ext_file = TRUE, no_shk_file = TRUE
-        )
-      ) %>% dplyr::select(-"error_msg")
-
-      boot_sum <- dplyr::full_join(
-        param_ests, boot_sum_log, by = c(ABS_MOD_PATH, "run")
-      )
-    }else{
-      boot_sum <- param_ests
-    }
-    saveRDS(boot_sum, boot_sum_path)
+    param_ests <- param_estimates_batch(.boot_run[[ABS_MOD_PATH]])
   }else{
+    verbose_msg(
+      glue("Reading in bootstrap summary: {fs::path_rel(boot_sum_path, getwd())}\n\n")
+    )
     boot_sum <- readRDS(boot_sum_path)
-    if(isFALSE("bbi_summary" %in% names(boot_sum)) && isTRUE(add_summary)){
-      rlang::warn(
-        c(
-          "A bootstrap summary _without_ summary columns was already saved to:",
-          glue("`{boot_sum_path}`"),
-          "i" = paste(
-            "Re-run the summary call with `force_resummarize = TRUE` to add",
-            "summary columns."
-          )
-        )
-      )
-    }
+    param_ests <- boot_sum$boot_summary
   }
-  return(boot_sum)
+
+  if(isTRUE(format_long)){
+    # Long format - only keep estimates and error/termination columns for filtering
+    param_ests <- param_ests %>% dplyr::select(
+      all_of(ABS_MOD_PATH), "run", "error_msg", "termination_code",
+      starts_with(c("THETA", "SIGMA", "OMEGA"))
+    ) %>% tidyr::pivot_longer(
+      starts_with(c("THETA", "SIGMA", "OMEGA")),
+      names_to = "parameter_names", values_to = "estimate"
+    ) %>% dplyr::relocate(
+      c("error_msg", "termination_code"), .after = dplyr::everything()
+    )
+  }
+
+  return(param_ests)
 }
 
 
 ### Resampling functions ###
+# TODO: delete these functions at the end before merging
+# TODO: make sure this behaves how we want it to
+# If we make notable edits, update mrgmisc
+
 
 #' Resample data
 #'

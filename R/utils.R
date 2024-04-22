@@ -598,6 +598,11 @@ download_with_retry <- function(...) {
 #' @importFrom readr read_lines
 #' @importFrom stringr str_detect
 #'
+#' @details
+#' Note that this method is intended to be called on models that have been
+#' submitted. It happens to return `TRUE` for un-submitted models, but that
+#' should be considered undefined behavior.
+#'
 #' @seealso wait_for_nonmem get_model_status
 #' @return Returns `TRUE` if the model appears to be finished running and
 #'  `FALSE` otherwise.
@@ -609,32 +614,24 @@ check_nonmem_finished <- function(.mod, ...) {
 #' @describeIn check_nonmem_finished takes a `bbi_nonmem_model` object.
 #' @export
 check_nonmem_finished.bbi_nonmem_model <- function(.mod, ...) {
-
-  if (!fs::dir_exists(get_output_dir(.mod, .check_exists = FALSE))) {
+  output_dir <- get_output_dir(.mod, .check_exists = FALSE)
+  if (!fs::dir_exists(output_dir)) {
     return(TRUE) # if missing then this failed right away, likely for some bbi reason
   }
-
-  mod_path <- build_path_from_model(.mod, ".lst")
-
-  # look for model to be finished and then test output
-  model_finished <- if(file.exists(mod_path)){
-    read_lines(mod_path) %>%
-      str_detect("Stop Time") %>%
-      any()
-  }else{
-    FALSE
-  }
-
-  return(isTRUE(model_finished))
+  model_finished <- nonmem_finished_impl(.mod, ...)
+  return(model_finished)
 }
 
 #' @describeIn check_nonmem_finished takes a `bbi_nmboot_model` object.
 #' @export
 check_nonmem_finished.bbi_nmboot_model <- function(.mod, ...) {
+  output_dir <- get_output_dir(.mod, .check_exists = FALSE)
+  if (!fs::dir_exists(output_dir)) {
+    return(TRUE) # if missing then this failed right away, likely for some bbi reason
+  }
   boot_models <- get_boot_models(.mod)
   models_finished <- map_lgl(boot_models, ~check_nonmem_finished(.x))
-
-  return(models_finished)
+  return(all(models_finished))
 }
 
 #' @describeIn check_nonmem_finished takes a `list` of `bbi_nonmem_model` objects.
@@ -643,9 +640,25 @@ check_nonmem_finished.list <- function(.mod, ...) {
   assert_list(.mod)
   check_model_object_list(.mod, .mod_types = NM_MOD_CLASS)
   models_finished <- map_lgl(.mod, ~check_nonmem_finished(.x))
-
   return(models_finished)
 }
+
+
+nonmem_finished_impl <- function(.mod){
+  check_model_object(.mod, NM_MOD_CLASS)
+  mod_path <- build_path_from_model(.mod, ".lst")
+
+  # look for model to be finished and then test output
+  model_finished <- if(file.exists(mod_path)){
+    read_lines(mod_path) %>% str_detect("Stop Time") %>% any()
+  }else{
+    FALSE
+  }
+
+  return(isTRUE(model_finished))
+}
+
+
 
 #' Wait for `NONMEM` models to finish
 #'
@@ -678,6 +691,10 @@ wait_for_nonmem.default <- function(.mod, .time_limit = 300, .interval = 5) {
     check_model_object_list(.mod, .mod_types = NM_MOD_CLASS)
   }else{
     check_model_object(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))
+    # coerce to list of models for bootstrap model runs to check individually
+    if(inherits(.mod, NMBOOT_MOD_CLASS)){
+      .mod <- get_boot_models(.mod)
+    }
   }
 
   verbose_msg(glue("Waiting for {length(.mod)} model(s) to finish..."))
@@ -748,14 +765,15 @@ get_model_status.default <- function(.mod, max_print = 10, ...){
   }else{
     check_model_object(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))
     if(inherits(.mod, NM_MOD_CLASS)){
-      mod_ids <- get_model_id(.mod)
+      .mod <- list(.mod)
     }else{
-      boot_models <- get_boot_models(.mod)
-      mod_ids <- purrr::map_chr(boot_models, get_model_id)
+      # coerce to list of models for bootstrap model runs to check individually
+      .mod <- get_boot_models(.mod)
     }
+    mod_ids <- purrr::map_chr(.mod, get_model_id)
   }
 
-  res <- check_nonmem_finished(.mod) %>% tibble::as_tibble() %>%
+  res <- purrr::map_lgl(.mod, nonmem_finished_impl) %>% tibble::as_tibble() %>%
     dplyr::transmute(model_id = mod_ids, finished = .data$value)
 
   res_fin <- res$model_id[res$finished]
@@ -769,9 +787,9 @@ get_model_status.default <- function(.mod, max_print = 10, ...){
   res_inc <- res$model_id[!res$finished]
   if(length(res_inc) > 0 && length(res_inc) <= max_print){
     mods_inc <- paste(res_inc, collapse = ", ")
-    verbose_msg(glue("\n The following model(s) are still running: `{mods_inc}`"))
+    verbose_msg(glue("\n The following model(s) are incomplete: `{mods_inc}`"))
   }else{
-    verbose_msg(glue("\n{length(res_inc)} model(s) are still running"))
+    verbose_msg(glue("\n{length(res_inc)} model(s) are incomplete"))
   }
 
   return(invisible(res))
