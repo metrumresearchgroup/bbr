@@ -340,6 +340,7 @@ NULL
 
 
 #' @describeIn summarize_bootstrap Summarize a bootstrap run and store results
+#' @importFrom tidyselect any_of
 #' @export
 summarize_bootstrap_run <- function(
     .boot_run,

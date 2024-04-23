@@ -297,9 +297,9 @@ print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
   # print top line info
   .d <- x[[SUMMARY_DETAILS]]
   cat_line(glue("Based on Dataset: {x$based_on_data_set}\n\n"))
-  num_rec <- median(.d$number_of_data_records, na.rm = TRUE)
-  num_obs <- median(.d$number_of_data_records, na.rm = TRUE)
-  num_sub <- median(.d$number_of_data_records, na.rm = TRUE)
+  num_rec <- stats::median(.d$number_of_data_records, na.rm = TRUE)
+  num_obs <- stats::median(.d$number_of_data_records, na.rm = TRUE)
+  num_sub <- stats::median(.d$number_of_data_records, na.rm = TRUE)
   cat_line(glue("Median values --> Records: {num_rec}\t Observations: {num_obs}\t Subjects: {num_sub}\n\n"))
 
   only_sim <- isTRUE("only_sim" %in% names(.d))
