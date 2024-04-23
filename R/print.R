@@ -399,7 +399,7 @@ ascii_boxplot <- function(data) {
   bar1_bottom <- paste0(box_corner_bottom_left, bar1_lines, "|")
 
   bar2_lines <- paste(rep(bar_unit, rel_diffs[3]), collapse = "")
-  bar2_top <- paste0(bar2_lines, box_corner_bottom_right)
+  bar2_top <- paste0(bar2_lines, box_corner_top_right)
   bar2_space <- paste(rep(space_unit, rel_diffs[3]), collapse = "")
   bar2_bottom <- paste0(bar2_lines, box_corner_bottom_right)
 
