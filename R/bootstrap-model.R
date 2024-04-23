@@ -4,17 +4,25 @@
 #' @param .suffix a prefix for the boostrap model directory. Will be appended by
 #'  the boostrap run number for a given model.
 #' @inheritParams copy_model_from
-#' @param increment Logical (T/F). If `TRUE`, create a new bootstrap model run.
-#'  Will append `_run_[x]` to the provided `.suffix`. `.overwrite` will have no
-#'  impact if incrementing the bootstrap run.
+#' @param increment Logical (T/F). If `TRUE`, create a new bootstrap model run
+#'  from `.mod`. Useful for managing multiple bootstrap runs originating from
+#'  the same starting model. Will append `_run_[x]` to the provided `.suffix`.
+#'  Note that the`.overwrite` arg will have no impact if incrementing the
+#'  bootstrap run.
+#' @param remove_cov,remove_tables Logical (T/F). Optionally remove `$COVARIANCE`
+#' and `$TABLE` records respectively, allowing for notably faster run times.
 #'
+#' @seealso setup_bootstrap_run
+#' @return S3 object of class `bbi_nmboot_model`.
 #' @export
 new_bootstrap_run <- function(
     .mod,
     .suffix = glue("{get_model_id(.mod)}_boot"),
     .inherit_tags = TRUE,
     .overwrite = FALSE,
-    increment = FALSE
+    increment = FALSE,
+    remove_cov = TRUE,
+    remove_tables = TRUE
 ){
 
   checkmate::assert_class(.mod, NM_MOD_CLASS)
@@ -48,7 +56,9 @@ new_bootstrap_run <- function(
   prob <- glue("Bootstrap run {new_run_id} of model {get_model_id(.mod)}")
   modify_prob_statement(boot_run, prob)
 
-  # TODO: remove $TABLE and $COV statements here
+  # Optionally remove $TABLE and $COV statements here
+  if(isTRUE(remove_cov)) remove_records(boot_run, type = "covariance")
+  if(isTRUE(remove_tables)) remove_records(boot_run, type = "table")
 
   # Return read-in model to get the updated class as part of the model object
   return(read_model(file.path(model_dir, boot_run_id)))
@@ -71,8 +81,9 @@ get_next_boot_run <- function(model_dir, .suffix){
 }
 
 
-#' Set up a bootstrap model run. Creates a new model object per run and generates
-#' a new re-sampled dataset per run.
+#' Set up a bootstrap model run.
+#'
+#' Creates a new model object and re-sampled dataset per model run.
 #'
 #' @param .boot_run a `bbi_nmboot_model` object.
 #' @param n number of unique sampled keys, defaults to match dataset
@@ -82,16 +93,25 @@ get_next_boot_run <- function(model_dir, .suffix){
 #' @param .overwrite logical (T/F) indicating whether or not to overwrite existing
 #'  setup for a bootstrap run.
 #'
-#' @details
-#' This setup is automatically done internally as part of submitting a bootstrap
-#' run. However, users can call this function explicitly before submitting a
-#' bootstrap run in order save some initial overhead. This can be useful for
-#' large datasets or a large number of samples `n`.
+#' @seealso new_bootstrap_run
 #'
+#' @examples
+#' \dontrun{
+#'
+#' # Setup
+#' .boot_run <- new_bootstrap_run(.mod)
+#' .boot_run <- setup_bootstrap_run(.boot_run, n = 1000, seed = 1234)
+#'
+#' # Submit
+#' submit_model(.boot_run)
+#'
+#' # Check status of runs during submission
+#' get_model_status(.boot_run)
+#' }
 #' @export
-setup_bootrap_run <- function(
+setup_bootstrap_run <- function(
     .boot_run,
-    n = 10,
+    n = 100,
     strat_cols = NULL,
     replace = TRUE,
     seed = 1234,
@@ -286,19 +306,34 @@ bootstrap_is_finished <- function(.boot_run){
 
 #' Summarize a bootstrap run
 #'
-#' @inheritParams setup_bootrap_run
+#' @inheritParams setup_bootstrap_run
 #' @param force_resummarize logical (T/F). If `TRUE`, force re-summarization.
-#'  See details.
+#'  Will _only_ update the saved out `RDS` file when specified via
+#'  `summarize_bootstrap_run()`. See details for more information.
 #'
 #' @details
-#' The first time `summarize_bootstrap_run()` is called, it will save the
-#' results to a `boot_summary.RDS` data file within the bootstrap run directory.
-#' If one already exists, that data set will be read in instead of being
-#' re-summarized. The purpose of this is functionality two fold. For one, it
-#' helps avoid the need of re-executing `model_summary()` calls for a large
-#' number of runs. It also helps to reduce the number of files you need to
-#' commit via version control. This can be overridden by setting
-#' `force_resummarize = TRUE`.
+#'  - `bootstrap_estimates()` _quickly_ extracts and formats the parameter estimates
+#'  from each model run. If the data was previously summarized, the data will be
+#'  read in instead of re-executing (this can be overridden via
+#'  `force_resummarize = TRUE`).
+#'  - `summarize_bootstrap_run()` does the following things:
+#'     - Tabulates run details and heuristics.
+#'     - Calls `summary_log()` and binds the results to the parameter estimates.
+#'       - `bootstrap_estimates()` will include this appended model summary
+#'       information if a `boot_summary.RDS` data file exists.
+#'     - Either saves this data out to `boot_summary.RDS`, or reads it in if it
+#'     already exists (see section below).
+#'     - Formats the returned object as a `bbi_nmboot_summary` S3 object, and
+#'     displays key summary information when printed to the console.
+#'
+#' ## Saved out data file:
+#' The first time `summarize_bootstrap_run()` is called (or if
+#' `force_resummarize = TRUE`), it will save the results to a `boot_summary.RDS`
+#' data file within the bootstrap run directory. If one already exists, that data
+#' set will be read in by default instead of being re-summarized.
+#'  - The purpose of this is functionality two fold. For one, it helps avoid the
+#'  need of re-executing `model_summary()` calls for a large number of runs. It
+#'  also helps to reduce the number of files you need to commit via version control.
 #'
 #' @name summarize_bootstrap
 NULL

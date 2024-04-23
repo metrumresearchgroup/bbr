@@ -103,7 +103,7 @@ submit_model.bbi_nmboot_model <- function(
     rlang::abort(
       c(
         glue("No bootstrap specification file was found at {spec_path}"),
-        "i" = "Please run `setup_bootrap_run()` with your bootstrap run model object."
+        "i" = "Please run `setup_bootstrap_run()` with your bootstrap run model object."
       )
     )
   }

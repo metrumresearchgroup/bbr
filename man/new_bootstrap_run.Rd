@@ -9,7 +9,9 @@ new_bootstrap_run(
   .suffix = glue("{get_model_id(.mod)}_boot"),
   .inherit_tags = TRUE,
   .overwrite = FALSE,
-  increment = FALSE
+  increment = FALSE,
+  remove_cov = TRUE,
+  remove_tables = TRUE
 )
 }
 \arguments{
@@ -26,10 +28,21 @@ tags passed to \code{.add_tags} argument. If \code{TRUE} inherit any tags from
 file already exists at specified \code{.new_model} path. If \code{TRUE} any existing
 file at \code{.new_model} will be overwritten silently.}
 
-\item{increment}{Logical (T/F). If \code{TRUE}, create a new bootstrap model run.
-Will append \verb{_run_[x]} to the provided \code{.suffix}. \code{.overwrite} will have no
-impact if incrementing the bootstrap run.}
+\item{increment}{Logical (T/F). If \code{TRUE}, create a new bootstrap model run
+from \code{.mod}. Useful for managing multiple bootstrap runs originating from
+the same starting model. Will append \verb{_run_[x]} to the provided \code{.suffix}.
+Note that the\code{.overwrite} arg will have no impact if incrementing the
+bootstrap run.}
+
+\item{remove_cov, remove_tables}{Logical (T/F). Optionally remove \verb{$COVARIANCE}
+and \verb{$TABLE} records respectively, allowing for notably faster run times.}
+}
+\value{
+S3 object of class \code{bbi_nmboot_model}.
 }
 \description{
 Create a boostrap model object from an existing model
+}
+\seealso{
+setup_bootstrap_run
 }

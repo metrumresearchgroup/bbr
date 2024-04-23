@@ -14,7 +14,8 @@ bootstrap_estimates(.boot_run, format_long = FALSE, force_resummarize = FALSE)
 \item{.boot_run}{a \code{bbi_nmboot_model} object.}
 
 \item{force_resummarize}{logical (T/F). If \code{TRUE}, force re-summarization.
-See details.}
+Will \emph{only} update the saved out \code{RDS} file when specified via
+\code{summarize_bootstrap_run()}. See details for more information.}
 
 \item{format_long}{logical (T/F). If \code{TRUE}, format data as a long table,
 making the data more portable for plotting.}
@@ -23,14 +24,37 @@ making the data more portable for plotting.}
 Summarize a bootstrap run
 }
 \details{
-The first time \code{summarize_bootstrap_run()} is called, it will save the
-results to a \code{boot_summary.RDS} data file within the bootstrap run directory.
-If one already exists, that data set will be read in instead of being
-re-summarized. The purpose of this is functionality two fold. For one, it
-helps avoid the need of re-executing \code{model_summary()} calls for a large
-number of runs. It also helps to reduce the number of files you need to
-commit via version control. This can be overridden by setting
-\code{force_resummarize = TRUE}.
+\itemize{
+\item \code{bootstrap_estimates()} \emph{quickly} extracts and formats the parameter estimates
+from each model run. If the data was previously summarized, the data will be
+read in instead of re-executing (this can be overridden via
+\code{force_resummarize = TRUE}).
+\item \code{summarize_bootstrap_run()} does the following things:
+\itemize{
+\item Tabulates run details and heuristics.
+\item Calls \code{summary_log()} and binds the results to the parameter estimates.
+\itemize{
+\item \code{bootstrap_estimates()} will include this appended model summary
+information if a \code{boot_summary.RDS} data file exists.
+}
+\item Either saves this data out to \code{boot_summary.RDS}, or reads it in if it
+already exists (see section below).
+\item Formats the returned object as a \code{bbi_nmboot_summary} S3 object, and
+displays key summary information when printed to the console.
+}
+}
+\subsection{Saved out data file:}{
+
+The first time \code{summarize_bootstrap_run()} is called (or if
+\code{force_resummarize = TRUE}), it will save the results to a \code{boot_summary.RDS}
+data file within the bootstrap run directory. If one already exists, that data
+set will be read in by default instead of being re-summarized.
+\itemize{
+\item The purpose of this is functionality two fold. For one, it helps avoid the
+need of re-executing \code{model_summary()} calls for a large number of runs. It
+also helps to reduce the number of files you need to commit via version control.
+}
+}
 }
 \section{Functions}{
 \itemize{
