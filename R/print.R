@@ -375,31 +375,43 @@ ascii_boxplot <- function(data) {
   q <- quantile(data, c(0, 0.25, 0.5, 0.75, 1), na.rm = TRUE)
   rel_diffs <- diff(q)/min(diff(q))
 
+  # unicode handling
+  down_arrow <- stringi::stri_unescape_unicode("\\u2193")
+  box_border <- stringi::stri_unescape_unicode("\\u2500")
+  box_corner_top_left <- stringi::stri_unescape_unicode("\\u250c")
+  box_corner_bottom_left <- stringi::stri_unescape_unicode("\\u2514")
+  box_corner_top_right <- stringi::stri_unescape_unicode("\\u2510")
+  box_corner_bottom_right <- stringi::stri_unescape_unicode("\\u2518")
+
+  # units - minimum 6 characters when normalized to 1 (see min of `rel_diffs`)
+  # This is mainly to ensure there is enough space to print values underneath
   space_unit <- "      "
   dash_unit <-  "------"
-  bar_unit <-   "──────"
+  bar_unit <- paste(rep(box_border, 6), collapse = "")
+
+
   dash1 <- paste0("|", paste(rep(dash_unit, rel_diffs[1]), collapse = ""), "|")
   dash2 <- paste0("|", paste(rep(dash_unit, rel_diffs[4]), collapse = ""), "|")
   space_pre <- paste(rep(paste0(space_unit, " "), rel_diffs[1]), collapse = "")
   bar1_lines <- paste(rep(bar_unit, rel_diffs[2]), collapse = "")
-  bar1_top <- paste0("┌", bar1_lines, "|")
+  bar1_top <- paste0(box_corner_top_left, bar1_lines, "|")
   bar1_space <- paste(rep(space_unit, rel_diffs[2]), collapse = "")
-  bar1_bottom <- paste0("└", bar1_lines, "|")
+  bar1_bottom <- paste0(box_corner_bottom_left, bar1_lines, "|")
 
   bar2_lines <- paste(rep(bar_unit, rel_diffs[3]), collapse = "")
-  bar2_top <- paste0(bar2_lines, "┐")
+  bar2_top <- paste0(bar2_lines, box_corner_bottom_right)
   bar2_space <- paste(rep(space_unit, rel_diffs[3]), collapse = "")
-  bar2_bottom <- paste0(bar2_lines, "┘")
+  bar2_bottom <- paste0(bar2_lines, box_corner_bottom_right)
 
   bar_top <- paste0(space_unit, space_pre, bar1_top, bar2_top)
   lines_middle <- paste0(space_unit, dash1,  bar1_space, "|", bar2_space, dash2)
   bar_bottom <- paste0(space_unit, space_pre, bar1_bottom, bar2_bottom)
   pointers <- paste0(
-    space_unit, "↓",
-    paste0(rep(space_unit, rel_diffs[1]), collapse = ""), "↓",
-    paste0(rep(space_unit, rel_diffs[2]), collapse = ""), "↓",
-    paste0(rep(space_unit, rel_diffs[3]), collapse = ""), "↓",
-    paste0(rep(space_unit, rel_diffs[4]), collapse = ""), "↓",
+    space_unit, down_arrow,
+    paste0(rep(space_unit, rel_diffs[1]), collapse = ""), down_arrow,
+    paste0(rep(space_unit, rel_diffs[2]), collapse = ""), down_arrow,
+    paste0(rep(space_unit, rel_diffs[3]), collapse = ""), down_arrow,
+    paste0(rep(space_unit, rel_diffs[4]), collapse = ""), down_arrow,
     collapse = "")
 
   q_round <- round(q, 2)
