@@ -769,6 +769,9 @@ get_model_status.default <- function(.mod, max_print = 10, ...){
     }else{
       # coerce to list of models for bootstrap model runs to check individually
       .mod <- get_boot_models(.mod)
+      # Dont print messages for bootstrap model runs that havent been set up
+      # or already have been cleaned up
+      if(is.null(.mod)) return(invisible(NULL))
     }
     mod_ids <- purrr::map_chr(.mod, get_model_id)
   }

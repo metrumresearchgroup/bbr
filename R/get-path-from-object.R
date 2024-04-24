@@ -683,6 +683,24 @@ get_boot_spec <- function(.boot_run){
 #' @export
 get_boot_models <- function(.boot_run){
   boot_spec <- get_boot_spec(.boot_run)
-  boot_models <- purrr::map(boot_spec$bootstrap_runs$mod_path_abs, read_model)
+
+  boot_models <- tryCatch(
+    purrr::map(boot_spec$bootstrap_runs$mod_path_abs, read_model),
+    error = function(cond){
+      if(stringr::str_detect(cond$parent$message, "does not exist")){
+        return(NULL)
+      }
+    }
+  )
+
+  if(is.null(boot_models)){
+    boot_dir <- .boot_run[[ABS_MOD_PATH]]
+    rlang::warn(
+      c(
+        glue("At least one bootstrap run model does not exist in `{boot_dir}`."),
+        "Did you forget to run `setup_bootstrap_run()`, or already run `cleanup_bootstrap_run()`?"
+      )
+    )
+  }
   return(boot_models)
 }

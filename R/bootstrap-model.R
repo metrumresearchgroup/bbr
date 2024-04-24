@@ -291,10 +291,18 @@ make_boot_spec <- function(boot_models, boot_args){
 }
 
 
+# TODO: refactor this after a new config file is made post-submission
+# this will allow this, and other functions to avoid model iteration and speed
+# up execution times for functions that should be close to instantaneous.
 bootstrap_is_finished <- function(.boot_run){
   boot_models <- get_boot_models(.boot_run)
-  models_finished <- map_lgl(boot_models, ~nonmem_finished_impl(.x))
-  return(all(models_finished))
+
+  if(!is.null(boot_models)){
+    models_finished <- map_lgl(boot_models, ~nonmem_finished_impl(.x))
+    return(all(models_finished))
+  }else{
+    return(FALSE)
+  }
 }
 
 #' Summarize a bootstrap run
@@ -345,7 +353,8 @@ summarize_bootstrap_run <- function(
 
   if(!fs::file_exists(boot_sum_path) || isTRUE(force_resummarize)){
     param_ests <- bootstrap_estimates(
-      .boot_run, force_resummarize = force_resummarize
+      .boot_run, force_resummarize = force_resummarize,
+      format_long = TRUE
     )
 
     boot_sum_log <- summary_log(
@@ -377,17 +386,17 @@ summarize_bootstrap_run <- function(
     boot_sum_df <- dplyr::full_join(
       param_ests, boot_sum_log %>% dplyr::select(-any_of(run_cols)),
       by = c(ABS_MOD_PATH, "run")
-    ) %>% dplyr::relocate(
-      c(ABS_MOD_PATH, "run",
-        starts_with(c("THETA", "SIGMA", "OMEGA", "ofv", "condition_number")))
     )
 
-    # Long format with objective function
-    boot_sum_df_long <- dplyr::full_join(
-      bootstrap_estimates(.boot_run, format_long = TRUE),
-      boot_sum_df %>% dplyr::select(c(ABS_MOD_PATH, "run", "ofv")),
-      by = c(ABS_MOD_PATH, "run")
-    )
+    if(any(!is.na(boot_sum_df$error_msg))){
+      err_msgs <- unique(boot_sum_df$error_msg[!is.na(boot_sum_df$error_msg)])
+      rlang::warn(
+        c(
+          "The following error messages occurred for at least one model:",
+          err_msgs
+        )
+      )
+    }
 
     boot_spec <- get_boot_spec(.boot_run)
 
@@ -445,15 +454,20 @@ bootstrap_estimates <- function(
   boot_dir <- .boot_run[[ABS_MOD_PATH]]
   boot_sum_path <- file.path(boot_dir, "boot_summary.RDS")
 
-  if(!fs::file_exists(boot_sum_path) || isTRUE(force_resummarize)){
-    param_ests <- param_estimates_batch(.boot_run[[ABS_MOD_PATH]])
-  }else{
-    verbose_msg(
-      glue("Reading in bootstrap summary: {fs::path_rel(boot_sum_path, getwd())}\n\n")
-    )
-    boot_sum <- readRDS(boot_sum_path)
-    param_ests <- boot_sum$boot_summary
-  }
+  # TODO: change this approach. Reading in takes _longer_ than just calling
+  # param_estimates_batch. We should only read in the data if the individual
+  # model runs have been deleted. `force_resummarize` should force
+  # `summarize_bootstrap_run` to be called again
+  # if(!fs::file_exists(boot_sum_path) || isTRUE(force_resummarize)){
+  #   param_ests <- param_estimates_batch(.boot_run[[ABS_MOD_PATH]])
+  # }else{
+  #   verbose_msg(
+  #     glue("Reading in bootstrap summary: {fs::path_rel(boot_sum_path, getwd())}\n\n")
+  #   )
+  #   boot_sum <- readRDS(boot_sum_path)
+  #   param_ests <- boot_sum$boot_summary
+  # }
+  param_ests <- param_estimates_batch(.boot_run[[ABS_MOD_PATH]])
 
   if(isTRUE(format_long)){
     # Long format - only keep estimates and error/termination columns for filtering
@@ -467,8 +481,44 @@ bootstrap_estimates <- function(
       c("error_msg", "termination_code"), .after = dplyr::everything()
     )
   }
-
   return(param_ests)
+}
+
+
+#' Cleanup bootstrap run directory
+#'
+#' This will delete all child models, and only keep the information
+#' you need to read in estimates or summary information
+#'
+#' @inheritParams setup_bootstrap_run
+#'
+#' @export
+cleanup_bootstrap_run <- function(.boot_run){
+  check_model_object(.boot_run, NMBOOT_MOD_CLASS)
+
+  if(!bootstrap_is_finished(.boot_run)){
+    rlang::abort(
+      c(
+        "One or more bootstrap runs have not finished executing.",
+        "i" = "Run `get_model_status(.boot_run)` to check the submission status."
+      )
+    )
+  }
+
+  boot_dir <- .boot_run[[ABS_MOD_PATH]]
+  boot_sum_path <- file.path(boot_dir, "boot_summary.RDS")
+  if(!fs::file_exists(boot_sum_path)){
+    rlang::abort(
+      c(
+        "Model has not been summarized yet.",
+        "Run `summarize_bootstrap_run() before consolidating summary information."
+      )
+    )
+  }
+
+  # Delete individual model files
+  boot_models <- get_boot_models(.boot_run)
+  delete_models(boot_models, .tags = NULL)
 }
 
 

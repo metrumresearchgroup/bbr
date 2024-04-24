@@ -2,6 +2,8 @@
 % Please edit documentation in R/param-estimates-batch.R
 \name{param_estimates_compare}
 \alias{param_estimates_compare}
+\alias{param_estimates_compare.bbi_nmboot_summary}
+\alias{param_estimates_compare.default}
 \title{Compare parameter estimates}
 \usage{
 param_estimates_compare(
@@ -11,15 +13,32 @@ param_estimates_compare(
   probs = c(0.5, 0.025, 0.975),
   na.rm = FALSE
 )
+
+\method{param_estimates_compare}{bbi_nmboot_summary}(
+  .param_df,
+  .orig_mod = NULL,
+  .compare_cols = starts_with(c("THETA", "SIGMA", "OMEGA")),
+  probs = c(0.5, 0.025, 0.975),
+  na.rm = FALSE
+)
+
+\method{param_estimates_compare}{default}(
+  .param_df,
+  .orig_mod = NULL,
+  .compare_cols = starts_with(c("THETA", "SIGMA", "OMEGA")),
+  probs = c(0.5, 0.025, 0.975),
+  na.rm = FALSE
+)
 }
 \arguments{
-\item{.param_df}{A tibble with columns for each parameter and rows for each
-model (like what's returned from \code{\link[=param_estimates_batch]{param_estimates_batch()}} or
-\code{\link[=summarize_bootstrap_run]{summarize_bootstrap_run()}}).}
+\item{.param_df}{Either a \code{bbi_nmboot_summary} object or a tibble with
+columns for each parameter and rows for each model (like what's returned
+from \code{\link[=param_estimates_batch]{param_estimates_batch()}}).}
 
 \item{.orig_mod}{\code{bbi_model} object to compare \code{.param_df} against. If
 \code{NULL}, the default, only returns quantiles from \code{.param_df}. If passed,
-will display an additional \code{original_estimate} column.}
+will display an additional \code{original_estimate} column. This is automatically
+added for \code{bbi_nmboot_summary} objects.}
 
 \item{.compare_cols}{An expression that can be passed to \code{\link[dplyr:select]{dplyr::select()}} to
 select which columns in \code{.param_df} will be pivoted and summarized.

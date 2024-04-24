@@ -125,12 +125,13 @@ param_estimates_batch <- function(.path,
 #'   and then pivoted.
 #'
 #'
-#' @param .param_df A tibble with columns for each parameter and rows for each
-#'   model (like what's returned from [param_estimates_batch()] or
-#'   [summarize_bootstrap_run()]).
+#' @param .param_df Either a `bbi_nmboot_summary` object or a tibble with
+#'   columns for each parameter and rows for each model (like what's returned
+#'   from [param_estimates_batch()]).
 #' @param .orig_mod `bbi_model` object to compare `.param_df` against. If
 #'   `NULL`, the default, only returns quantiles from `.param_df`. If passed,
-#'   will display an additional `original_estimate` column.
+#'   will display an additional `original_estimate` column. This is automatically
+#'   added for `bbi_nmboot_summary` objects.
 #' @param .compare_cols An expression that can be passed to [dplyr::select()] to
 #'   select which columns in `.param_df` will be pivoted and summarized.
 #'   Defaults to `dplyr::starts_with(c("THETA", "SIGMA", "OMEGA"))` (designed
@@ -148,12 +149,70 @@ param_estimates_batch <- function(.path,
 #' @importFrom stats quantile
 #' @export
 param_estimates_compare <- function(
-  .param_df,
-  .orig_mod = NULL,
-  .compare_cols = starts_with(c("THETA", "SIGMA", "OMEGA")),
-  probs = c(.5, 0.025, 0.975),
-  na.rm = FALSE
-) {
+    .param_df,
+    .orig_mod = NULL,
+    .compare_cols = starts_with(c("THETA", "SIGMA", "OMEGA")),
+    probs = c(.5, 0.025, 0.975),
+    na.rm = FALSE
+){
+  UseMethod("param_estimates_compare")
+}
+
+#' @rdname param_estimates_compare
+#' @export
+param_estimates_compare.bbi_nmboot_summary <- function(
+    .param_df,
+    .orig_mod = NULL,
+    .compare_cols = starts_with(c("THETA", "SIGMA", "OMEGA")),
+    probs = c(.5, 0.025, 0.975),
+    na.rm = FALSE
+){
+  param_df_wide <- .param_df$boot_summary %>%
+    tidyr::pivot_wider(
+      id_cols = c(all_of(ABS_MOD_PATH), "run"),
+      names_from = "parameter_names",
+      values_from = "estimate"
+    )
+
+  if(is.null(.orig_mod)){
+    orig_mod_path <- fs::path_ext_remove(.param_df$based_on_model_path)
+    # make sure based_on model still exists
+    .orig_mod <- tryCatch(
+      read_model(orig_mod_path),
+      error = function(cond) NULL
+    )
+    if(!is.null(.orig_mod)){
+      res <- check_up_to_date(.orig_mod)
+      if(any(res[!res])){
+        rlang::warn("The original model is not up to date")
+      }
+    }else{
+      rlang::warn(
+        c(
+          glue("The original model no longer exists at {orig_mod_path}"),
+          "Cannot compare to original model"
+        )
+      )
+    }
+  }
+
+  # Dont pass .compare_cols here, as we can only use columns in parameter_names,
+  # which could only be the default columns.
+  param_estimates_compare(
+    param_df_wide, .orig_mod = .orig_mod, probs = probs, na.rm = na.rm
+  )
+}
+
+
+#' @rdname param_estimates_compare
+#' @export
+param_estimates_compare.default <- function(
+    .param_df,
+    .orig_mod = NULL,
+    .compare_cols = starts_with(c("THETA", "SIGMA", "OMEGA")),
+    probs = c(.5, 0.025, 0.975),
+    na.rm = FALSE
+){
 
   comp_df <- .param_df %>%
     select({{ .compare_cols }})

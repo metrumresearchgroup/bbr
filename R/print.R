@@ -302,6 +302,7 @@ print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
   num_sub <- stats::median(.d$number_of_data_records, na.rm = TRUE)
   cat_line(glue("Median values --> Records: {num_rec}\t Observations: {num_obs}\t Subjects: {num_sub}\n\n"))
 
+  # TODO: confirm this is appropriate for only_sim (unsure where this comes from)
   only_sim <- isTRUE("only_sim" %in% names(.d))
   if (only_sim) {
     cat_line("No Estimation Methods (ONLYSIM)\n")
@@ -373,9 +374,25 @@ library(cli)
 # Function to create ASCII box plot
 ascii_boxplot <- function(data) {
   q <- quantile(data, c(0, 0.25, 0.5, 0.75, 1), na.rm = TRUE)
+
+  # Overwrite min and max values with non-outliers
+  whisker_len <- 1.5*stats::IQR(data)
+  min_q <- unname(q[2] - whisker_len)
+  max_q <- unname(q[4] + whisker_len)
+  if(min_q > q[1]) q[1] <- min_q
+  if(max_q < q[5]) q[5] <- max_q
+
+
+  # Normalize distances between quartiles to minimum value
   rel_diffs <- diff(q)/min(diff(q))
 
-  # unicode handling
+  # Attempt to normalize relative widths based on sum (min value must be at least 1)
+  # - similar to fitting a plot to screen size
+  if((15/sum(rel_diffs)) >= 1){
+    rel_diffs <- rel_diffs * (15/sum(rel_diffs))
+  }
+
+  # Unicode handling
   down_arrow <- stringi::stri_unescape_unicode("\\u2193")
   box_border <- stringi::stri_unescape_unicode("\\u2500")
   box_corner_top_left <- stringi::stri_unescape_unicode("\\u250c")
@@ -385,27 +402,35 @@ ascii_boxplot <- function(data) {
 
   # units - minimum 6 characters when normalized to 1 (see min of `rel_diffs`)
   # This is mainly to ensure there is enough space to print values underneath
-  space_unit <- "      "
-  dash_unit <-  "------"
-  bar_unit <- paste(rep(box_border, 6), collapse = "")
+  space_unit <- paste0(rep(" ", 6), collapse = "")
+  dash_unit <- paste0(rep("-", 6), collapse = "")
+  bar_unit <- paste0(rep(box_border, 6), collapse = "")
 
+  # whisker lines
+  dash1 <- paste0("|", paste0(rep(dash_unit, rel_diffs[1]), collapse = ""), "|")
+  dash2 <- paste0("|", paste0(rep(dash_unit, rel_diffs[4]), collapse = ""), "|")
 
-  dash1 <- paste0("|", paste(rep(dash_unit, rel_diffs[1]), collapse = ""), "|")
-  dash2 <- paste0("|", paste(rep(dash_unit, rel_diffs[4]), collapse = ""), "|")
-  space_pre <- paste(rep(paste0(space_unit, " "), rel_diffs[1]), collapse = "")
-  bar1_lines <- paste(rep(bar_unit, rel_diffs[2]), collapse = "")
+  # space box by length of left-whisker (space_end is just for consistency in length)
+  # - space_pre gets an extra space to account for the minimum vertical line
+  space_pre <- paste0(c(rep(paste0(space_unit), rel_diffs[1]), " "), collapse = "")
+  space_end <- paste0(rep(paste0(space_unit), rel_diffs[4]), collapse = "")
+
+  # Box for Q2
+  bar1_lines <- paste0(rep(bar_unit, rel_diffs[2]), collapse = "")
   bar1_top <- paste0(box_corner_top_left, bar1_lines, "|")
-  bar1_space <- paste(rep(space_unit, rel_diffs[2]), collapse = "")
+  bar1_space <- paste0(rep(space_unit, rel_diffs[2]), collapse = "")
   bar1_bottom <- paste0(box_corner_bottom_left, bar1_lines, "|")
 
-  bar2_lines <- paste(rep(bar_unit, rel_diffs[3]), collapse = "")
+  # Box for Q3
+  bar2_lines <- paste0(rep(bar_unit, rel_diffs[3]), collapse = "")
   bar2_top <- paste0(bar2_lines, box_corner_top_right)
   bar2_space <- paste(rep(space_unit, rel_diffs[3]), collapse = "")
   bar2_bottom <- paste0(bar2_lines, box_corner_bottom_right)
 
-  bar_top <- paste0(space_unit, space_pre, bar1_top, bar2_top)
+  # Build full box & whisker plot
+  bar_top <- paste0(space_unit, space_pre, bar1_top, bar2_top, space_end)
   lines_middle <- paste0(space_unit, dash1,  bar1_space, "|", bar2_space, dash2)
-  bar_bottom <- paste0(space_unit, space_pre, bar1_bottom, bar2_bottom)
+  bar_bottom <- paste0(space_unit, space_pre, bar1_bottom, bar2_bottom, space_end)
   pointers <- paste0(
     space_unit, down_arrow,
     paste0(rep(space_unit, rel_diffs[1]), collapse = ""), down_arrow,
@@ -414,22 +439,22 @@ ascii_boxplot <- function(data) {
     paste0(rep(space_unit, rel_diffs[4]), collapse = ""), down_arrow,
     collapse = "")
 
+  # Format and space values to align with vertical lines ('|') in `lines_middle`
   q_round <- round(q, 2)
 
-  space_values <- function(rel_diff, q_val){
-    start_space <- paste0(rep(space_unit, rel_diff), collapse = "")
-    space_size <- max(abs(nchar(start_space) - nchar(q_val)), 1)
+  space_values <- function(len_quartile, len_value){
+    start_space <- paste0(rep(space_unit, len_quartile), collapse = "")
+    space_size <- max(nchar(start_space) - len_value, 1)
     paste0(rep(" ", space_size), collapse = "")
   }
 
   box_vals <- paste0(
-    space_unit, q_round[1],
-    space_values(rel_diffs[1], q_round[2]), q_round[2],
-    space_values(rel_diffs[2], q_round[3]), q_round[3],
-    space_values(rel_diffs[3], q_round[4]), q_round[4],
-    space_values(rel_diffs[4], q_round[5]), q_round[5],
+    val_space_unit, q_round[1],
+    space_values(rel_diffs[1], nchar(q_round[2])), q_round[2],
+    space_values(rel_diffs[2], nchar(q_round[3])), q_round[3],
+    space_values(rel_diffs[3], nchar(q_round[4])), q_round[4],
+    space_values(rel_diffs[4], nchar(q_round[5])), q_round[5],
     collapse = "")
-
 
   cat_line(bar_top, col = "blue")
   cat_line(lines_middle, col = "blue")
