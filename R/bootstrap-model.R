@@ -131,40 +131,38 @@ setup_bootstrap_run <- function(
     fs::dir_create(boot_dir)
     fs::dir_create(boot_data_dir)
     # Store data within run folder and gitignore
-    ##### UPDATE TO IGNORE MODEL FILES...
+    ##### TODO: UPDATE TO IGNORE MODEL FILES...
     writeLines("/data\n*.ctl\n*.mod\n*.yaml", file.path(boot_dir, ".gitignore"))
+
+    # New model setup
+    n_seq <- seq(n)
+    mod_names <- purrr::map_chr(n_seq, max_char = nchar(n), pad_left)
+    mod_paths <- file.path(boot_dir, mod_names)
+    orig_mod <- read_model(get_based_on(.boot_run))
+
+    boot_args <- list(
+      boot_run = .boot_run,
+      all_mod_names = mod_names,
+      orig_mod_path = get_model_path(orig_mod),
+      orig_mod_id = get_model_id(orig_mod),
+      orig_data = nm_data(orig_mod) %>% suppressMessages(),
+      strat_cols = strat_cols,
+      replace = replace,
+      seed = seed,
+      boot_dir = boot_dir,
+      boot_data_dir = boot_data_dir,
+      overwrite = .overwrite
+    )
+
+    # Create model object per boot run
+    boot_models <- purrr::map(mod_paths, make_boot_run, boot_args)
+    make_boot_spec(boot_models, boot_args)
+
+    # Garbage collect - may help after handling many (potentially large) datasets
+    #  - It can be useful to call gc() after a large object has been removed, as
+    #    this may prompt R to return memory to the operating system.
+    gc()
   }
-
-
-  # New model setup
-  n_seq <- seq(n)
-  mod_names <- purrr::map_chr(n_seq, max_char = nchar(n), pad_left)
-  mod_paths <- file.path(boot_dir, mod_names)
-  orig_mod <- read_model(get_based_on(.boot_run))
-
-  boot_args <- list(
-    boot_run = .boot_run,
-    all_mod_names = mod_names,
-    orig_mod_path = get_model_path(orig_mod),
-    orig_mod_id = get_model_id(orig_mod),
-    orig_data = nm_data(orig_mod) %>% suppressMessages(),
-    strat_cols = strat_cols,
-    replace = replace,
-    seed = seed,
-    boot_dir = boot_dir,
-    boot_data_dir = boot_data_dir,
-    overwrite = .overwrite
-  )
-
-  # Create model object per boot run
-  boot_models <- purrr::map(mod_paths, make_boot_run, boot_args)
-  make_boot_spec(boot_models, boot_args)
-
-  # Garbage collect - may help after handling many (potentially large) datasets
-  #  - It can be useful to call gc() after a large object has been removed, as
-  #    this may prompt R to return memory to the operating system.
-  gc()
-
   return(invisible(.boot_run))
 }
 
@@ -226,11 +224,6 @@ make_boot_run <- function(mod_path, boot_args){
   # Overwrite $PROB and $DATA records
   modify_prob_statement(mod, prob)
   modify_data_path_ctl(mod, data_path_rel)
-
-  # Message when done
-  if(new_mod_index == length(boot_args$all_mod_names)){
-    verbose_msg("Done..")
-  }
 
   return(mod)
 }
