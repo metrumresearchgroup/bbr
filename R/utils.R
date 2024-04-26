@@ -473,36 +473,72 @@ bbi_nonmem_model_status.bbi_nmboot_model <- function(.mod) {
   status <- "Not Run"
   output_dir <- get_output_dir(.mod, .check_exists = FALSE)
   if (dir.exists(output_dir)) {
-    json_file <- get_config_path(.mod, .check_exists = FALSE)
-    if (fs::file_exists(json_file)) {
+    cleaned_up <- bootstrap_is_cleaned_up(.mod)
+    if (isTRUE(cleaned_up)) {
       status <- "Finished Running"
     } else {
-      # If config file doesnt exist, check each model individually:
-      #  - Iterates through all models and sets the status based on whether all
-      #    models have finished. This may increase the time required to print an
-      #    nmboot model object to the console.
-      spec_path <- get_boot_spec_path(.mod, .check_exists = FALSE)
-      if (fs::file_exists(spec_path)) {
-        boot_spec <- get_boot_spec(.mod)
-        for(output_dir.i in boot_spec$bootstrap_runs$mod_path_abs){
-          if (dir.exists(output_dir.i)) {
-            json_file <- get_config_path(
-              read_model(output_dir.i), .check_exists = FALSE
-            )
-            if (fs::file_exists(json_file)) {
-              status <- "Finished Running"
-            } else {
-              status <- "Incomplete Run"
-              break
-            }
-          }
-        }
+      # Check for models iteratively
+      if(isTRUE(bootstrap_is_finished(.boot_run))){
+        status <- "Finished Running"
+      }else{
+        status <- "Incomplete Run"
       }
     }
   }
   return(status)
 }
 
+
+# Check if bootstrap run has finished
+bootstrap_is_finished <- function(.boot_run){
+  if(bootstrap_is_cleaned_up(.boot_run)){
+    return(TRUE)
+  }else{
+    # If not cleaned up, check each model individually:
+    #  - Iterates through all models and sets the status based on whether all
+    #    models have finished. This may increase the time required to print an
+    #    nmboot model object to the console.
+    spec_path <- get_boot_spec_path(.boot_run, .check_exists = FALSE)
+    if (fs::file_exists(spec_path)) {
+      boot_spec <- get_boot_spec(.boot_run)
+      for(output_dir.i in boot_spec$bootstrap_runs$mod_path_abs){
+        if (dir.exists(output_dir.i)) {
+          json_file <- get_config_path(
+            read_model(output_dir.i), .check_exists = FALSE
+          )
+          if(fs::file_exists(json_file)) {
+            next
+          }else{
+            return(FALSE)
+          }
+        }else{
+          return(FALSE)
+        }
+      }
+      return(TRUE)
+    }else{
+      return(FALSE)
+    }
+  }
+}
+
+# Check if bootstrap run has been cleaned up
+bootstrap_is_cleaned_up <- function(.boot_run){
+  check_model_object(.boot_run, .mod_types = NMBOOT_MOD_CLASS)
+
+  output_dir <- get_output_dir(.boot_run, .check_exists = FALSE)
+  if(!fs::file_exists(output_dir)) return(FALSE)
+  spec_path <- get_boot_spec_path(.boot_run, .check_exists = FALSE)
+  if(!fs::file_exists(spec_path)) return(FALSE)
+
+  boot_spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
+  cleaned_up <- boot_spec$bootstrap_spec$cleaned_up
+  if(!is.null(cleaned_up) && isTRUE(cleaned_up)){
+    return(TRUE)
+  }else{
+    return(FALSE)
+  }
+}
 ############################
 # Error handlers
 ############################
@@ -616,7 +652,8 @@ check_nonmem_finished <- function(.mod, ...) {
 check_nonmem_finished.bbi_nonmem_model <- function(.mod, ...) {
   output_dir <- get_output_dir(.mod, .check_exists = FALSE)
   if (!fs::dir_exists(output_dir)) {
-    return(TRUE) # if missing then this failed right away, likely for some bbi reason
+    message("Model has not been submitted")
+    return(invisible(TRUE)) # if missing then this failed right away, likely for some bbi reason
   }
   model_finished <- nonmem_finished_impl(.mod, ...)
   return(model_finished)
@@ -627,7 +664,8 @@ check_nonmem_finished.bbi_nonmem_model <- function(.mod, ...) {
 check_nonmem_finished.bbi_nmboot_model <- function(.mod, ...) {
   output_dir <- get_output_dir(.mod, .check_exists = FALSE)
   if (!fs::dir_exists(output_dir)) {
-    return(TRUE) # if missing then this failed right away, likely for some bbi reason
+    message("Model has not been submitted")
+    return(invisible(TRUE)) # if missing then this failed right away, likely for some bbi reason
   }
   boot_models <- get_boot_models(.mod)
   models_finished <- map_lgl(boot_models, ~check_nonmem_finished(.x))
@@ -776,6 +814,8 @@ get_model_status.default <- function(.mod, max_print = 10, ...){
     mod_ids <- purrr::map_chr(.mod, get_model_id)
   }
 
+  # Use implementation function to avoid returning TRUE for non-submitted models,
+  # as that is misleading
   res <- purrr::map_lgl(.mod, nonmem_finished_impl) %>% tibble::as_tibble() %>%
     dplyr::transmute(model_id = mod_ids, finished = .data$value)
 

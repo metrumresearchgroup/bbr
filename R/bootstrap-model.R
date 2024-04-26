@@ -4,11 +4,6 @@
 #' @param .suffix a prefix for the boostrap model directory. Will be appended by
 #'  the boostrap run number for a given model.
 #' @inheritParams copy_model_from
-#' @param increment Logical (T/F). If `TRUE`, create a new bootstrap model run
-#'  from `.mod`. Useful for managing multiple bootstrap runs originating from
-#'  the same starting model. Will append `_run_[x]` to the provided `.suffix`.
-#'  Note that the`.overwrite` arg will have no impact if incrementing the
-#'  bootstrap run.
 #' @param remove_cov,remove_tables Logical (T/F). Optionally remove `$COVARIANCE`
 #' and `$TABLE` records respectively, allowing for notably faster run times.
 #'
@@ -17,10 +12,9 @@
 #' @export
 new_bootstrap_run <- function(
     .mod,
-    .suffix = glue("{get_model_id(.mod)}_boot"),
+    .suffix = glue("{get_model_id(.mod)}-boot"),
     .inherit_tags = TRUE,
     .overwrite = FALSE,
-    increment = FALSE,
     remove_cov = TRUE,
     remove_tables = TRUE
 ){
@@ -29,20 +23,9 @@ new_bootstrap_run <- function(
 
   model_dir <- get_model_working_directory(.mod)
 
-  # Increments the bootstrap run
-  # (i.e. impossible to overwrite an existing run via this function)
-  if(isTRUE(increment)){
-    new_run_id <- get_next_boot_run(model_dir, .suffix)
-    boot_run_id <- paste0(.suffix, "_run_", new_run_id)
-  }else{
-    new_run_id <- 1
-    boot_run_id <- paste0(.suffix)
-  }
-
-
   boot_run <- copy_model_from(
     .parent_mod = .mod,
-    .new_model = boot_run_id,
+    .new_model = .suffix,
     .add_tags = "BOOTSTRAP_SUBMISSION",
     .inherit_tags = .inherit_tags,
     .update_model_file = TRUE,
@@ -53,7 +36,7 @@ new_bootstrap_run <- function(
   boot_run <- save_model_yaml(boot_run)
 
   # Change problem statement
-  prob <- glue("Bootstrap run {new_run_id} of model {get_model_id(.mod)}")
+  prob <- glue("Bootstrap run of model {get_model_id(.mod)}")
   modify_prob_statement(boot_run, prob)
 
   # Optionally remove $TABLE and $COV statements here
@@ -61,23 +44,7 @@ new_bootstrap_run <- function(
   if(isTRUE(remove_tables)) remove_records(boot_run, type = "table")
 
   # Return read-in model to get the updated class as part of the model object
-  return(read_model(file.path(model_dir, boot_run_id)))
-}
-
-
-get_next_boot_run <- function(model_dir, .suffix){
-  model_dir_files <- fs::dir_ls(model_dir, glob = "*.yaml")
-  boot_runs <- model_dir_files[grepl(.suffix, model_dir_files)]
-  if(!rlang::is_empty(boot_runs)){
-    boot_runs <- fs::path_ext_remove(basename(boot_runs))
-    run_ids <- gsub(.suffix, "", boot_runs)
-    run_ids <- readr::parse_number(run_ids) %>% suppressWarnings()
-    run_ids[is.na(run_ids)] <- 1 # assign 1 if no `_run_[x]` is found
-    new_run <- max(run_ids) + 1
-  }else{
-    new_run <- 1
-  }
-  return(new_run)
+  return(read_model(file.path(model_dir, .suffix)))
 }
 
 
@@ -86,7 +53,7 @@ get_next_boot_run <- function(model_dir, .suffix){
 #' Creates a new model object and re-sampled dataset per model run.
 #'
 #' @param .boot_run a `bbi_nmboot_model` object.
-#' @param n number of unique sampled keys, defaults to match dataset
+#' @param n number of model runs.
 #' @param strat_cols columns to maintain proportion for stratification
 #' @param replace whether to stratify with replacement
 #' @param seed a seed for sampling the data
@@ -113,7 +80,6 @@ setup_bootstrap_run <- function(
     .boot_run,
     n = 100,
     strat_cols = NULL,
-    replace = TRUE,
     seed = 1234,
     .overwrite = FALSE
 ){
@@ -147,8 +113,8 @@ setup_bootstrap_run <- function(
       orig_mod_id = get_model_id(orig_mod),
       orig_data = nm_data(orig_mod) %>% suppressMessages(),
       strat_cols = strat_cols,
-      replace = replace,
       seed = seed,
+      n_samples = n,
       boot_dir = boot_dir,
       boot_data_dir = boot_data_dir,
       overwrite = .overwrite
@@ -162,6 +128,13 @@ setup_bootstrap_run <- function(
     #  - It can be useful to call gc() after a large object has been removed, as
     #    this may prompt R to return memory to the operating system.
     gc()
+  }else{
+    rlang::abort(
+      c(
+        glue("Bootstrap run has already been set up at `{boot_dir}`"),
+        "pass `.overwrite = TRUE` to overwrite"
+      )
+    )
   }
   return(invisible(.boot_run))
 }
@@ -197,7 +170,7 @@ make_boot_run <- function(mod_path, boot_args){
     boot_args$orig_data,
     key_cols = "ID", # TODO: should this be a user arg?
     strat_cols = boot_args$strat_cols,
-    replace = boot_args$replace
+    replace = TRUE
   ) %>% dplyr::rename("OID" = "ID", "ID" = "KEY") %>% # TODO: should this be a user arg?
     dplyr::select(all_of(unique(c(names(boot_args$orig_data), "OID")))) # TODO: should this be a user arg?
 
@@ -256,8 +229,8 @@ make_boot_spec <- function(boot_models, boot_args){
   overall_boot_spec <- list(
     problem = glue("Bootstrap of {basename(boot_args$orig_mod_path)}"),
     strat_cols = boot_args$strat_cols,
-    replace = boot_args$replace,
     seed = boot_args$seed,
+    n_samples = boot_args$n_samples,
     model_path = get_model_path(boot_args$boot_run),
     based_on_model_path = boot_args$orig_mod_path,
     based_on_data_path = get_data_path(boot_args$boot_run),
@@ -290,20 +263,6 @@ make_boot_spec <- function(boot_models, boot_args){
   return(invisible(json_path))
 }
 
-
-# TODO: refactor this after a new config file is made post-submission
-# this will allow this, and other functions to avoid model iteration and speed
-# up execution times for functions that should be close to instantaneous.
-bootstrap_is_finished <- function(.boot_run){
-  boot_models <- get_boot_models(.boot_run)
-
-  if(!is.null(boot_models)){
-    models_finished <- map_lgl(boot_models, ~nonmem_finished_impl(.x))
-    return(all(models_finished))
-  }else{
-    return(FALSE)
-  }
-}
 
 #' Summarize a bootstrap run
 #'
@@ -352,9 +311,11 @@ summarize_bootstrap_run <- function(
   boot_sum_path <- file.path(boot_dir, "boot_summary.RDS")
 
   if(!fs::file_exists(boot_sum_path) || isTRUE(force_resummarize)){
+    # Check that runs can still be summarized (e.g, after cleanup)
+    bootstrap_can_be_summarized(.boot_run)
+
     param_ests <- bootstrap_estimates(
-      .boot_run, force_resummarize = force_resummarize,
-      format_long = TRUE
+      .boot_run, force_resummarize = force_resummarize
     )
 
     boot_sum_log <- summary_log(
@@ -407,8 +368,8 @@ summarize_bootstrap_run <- function(
         based_on_model_path = boot_spec$based_on_model_path,
         based_on_data_set = boot_spec$based_on_data_path,
         strat_cols = boot_spec$strat_cols,
-        replace = boot_spec$replace,
         seed = boot_spec$seed,
+        n_samples = boot_spec$n_samples,
         run_details = run_details,
         run_heuristics = run_heuristics
       ),
@@ -417,8 +378,15 @@ summarize_bootstrap_run <- function(
       )
     )
 
-    # Assign class and save out
+    # Assign class early for param_estimate_compare method
     class(boot_sum) <- c(NMBOOT_SUM_CLASS, class(boot_sum))
+
+    # This gets done here instead of the print method, because we dont want
+    # the printing of the _saved_ model summary object to be tied to the existence
+    # of the based_on model.
+    boot_compare <- param_estimates_compare(boot_sum)
+    boot_sum$boot_compare <- boot_compare
+
     saveRDS(boot_sum, boot_sum_path)
   }else{
     verbose_msg(
@@ -442,32 +410,20 @@ bootstrap_estimates <- function(
 ){
   check_model_object(.boot_run, NMBOOT_MOD_CLASS)
 
-  if(!bootstrap_is_finished(.boot_run)){
-    rlang::abort(
-      c(
-        "One or more bootstrap runs have not finished executing.",
-        "i" = "Run `get_model_status(.boot_run)` to check the submission status."
-      )
-    )
-  }
 
   boot_dir <- .boot_run[[ABS_MOD_PATH]]
   boot_sum_path <- file.path(boot_dir, "boot_summary.RDS")
 
-  # TODO: change this approach. Reading in takes _longer_ than just calling
-  # param_estimates_batch. We should only read in the data if the individual
-  # model runs have been deleted. `force_resummarize` should force
-  # `summarize_bootstrap_run` to be called again
-  # if(!fs::file_exists(boot_sum_path) || isTRUE(force_resummarize)){
-  #   param_ests <- param_estimates_batch(.boot_run[[ABS_MOD_PATH]])
-  # }else{
-  #   verbose_msg(
-  #     glue("Reading in bootstrap summary: {fs::path_rel(boot_sum_path, getwd())}\n\n")
-  #   )
-  #   boot_sum <- readRDS(boot_sum_path)
-  #   param_ests <- boot_sum$boot_summary
-  # }
-  param_ests <- param_estimates_batch(.boot_run[[ABS_MOD_PATH]])
+  if(!fs::file_exists(boot_sum_path) || isTRUE(force_resummarize)){
+    bootstrap_can_be_summarized(.boot_run)
+    param_ests <- param_estimates_batch(.boot_run[[ABS_MOD_PATH]])
+  }else{
+    verbose_msg(
+      glue("Reading in bootstrap summary: {fs::path_rel(boot_sum_path, getwd())}\n\n")
+    )
+    boot_sum <- readRDS(boot_sum_path)
+    param_ests <- boot_sum$boot_summary
+  }
 
   if(isTRUE(format_long)){
     # Long format - only keep estimates and error/termination columns for filtering
@@ -484,6 +440,28 @@ bootstrap_estimates <- function(
   return(param_ests)
 }
 
+bootstrap_can_be_summarized <- function(.boot_run){
+  # Check that runs can still be summarized (e.g, after cleanup)
+  cleaned_up <- bootstrap_is_cleaned_up(.boot_run)
+  if(isTRUE(cleaned_up)){
+    rlang::abort(
+      paste(
+        "The bootstrap run has been cleaned up, and cannot be summarized again",
+        "without resubmitting"
+      )
+    )
+  }else{
+    if(!bootstrap_is_finished(.boot_run)){
+      rlang::abort(
+        c(
+          "One or more bootstrap runs have not finished executing.",
+          "i" = "Run `get_model_status(.boot_run)` to check the submission status."
+        )
+      )
+    }
+  }
+  return(invisible(TRUE))
+}
 
 #' Cleanup bootstrap run directory
 #'
@@ -495,6 +473,8 @@ bootstrap_estimates <- function(
 #' @export
 cleanup_bootstrap_run <- function(.boot_run){
   check_model_object(.boot_run, NMBOOT_MOD_CLASS)
+  boot_dir <- .boot_run[[ABS_MOD_PATH]]
+  boot_sum_path <- file.path(boot_dir, "boot_summary.RDS")
 
   if(!bootstrap_is_finished(.boot_run)){
     rlang::abort(
@@ -505,21 +485,36 @@ cleanup_bootstrap_run <- function(.boot_run){
     )
   }
 
-  boot_dir <- .boot_run[[ABS_MOD_PATH]]
-  boot_sum_path <- file.path(boot_dir, "boot_summary.RDS")
   if(!fs::file_exists(boot_sum_path)){
     rlang::abort(
       c(
         "Model has not been summarized yet.",
-        "Run `summarize_bootstrap_run() before consolidating summary information."
+        "Run `summarize_bootstrap_run() before cleaning up"
       )
     )
   }
 
+  if(bootstrap_is_cleaned_up(.boot_run)){
+    rlang::abort("Bootstrap run has already been cleaned")
+  }
+
+  # Overwrite spec file
+  spec_path <- get_boot_spec_path(.boot_run)
+  boot_spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
+  boot_spec$bootstrap_spec$cleaned_up <- TRUE
+  spec_lst_json <- jsonlite::toJSON(boot_spec, pretty = TRUE, simplifyVector = TRUE)
+
   # Delete individual model files
   boot_models <- get_boot_models(.boot_run)
-  delete_models(boot_models, .tags = NULL)
+  delete_models(boot_models, .tags = "BOOTSTRAP_RUN")
+
+  # Save out updated spec only if the user says 'yes'
+  if(!bootstrap_is_finished(.boot_run)){
+    writeLines(spec_lst_json, spec_path)
+    message(glue("Bootstrap run `{get_model_id(.boot_run)}` has been cleaned up"))
+  }
 }
+
 
 
 ### Resampling functions ###

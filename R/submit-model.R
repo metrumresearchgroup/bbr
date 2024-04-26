@@ -94,7 +94,7 @@ submit_model.bbi_nmboot_model <- function(
     ...,
     .overwrite = NULL,
     .config_path = NULL,
-    .wait = TRUE,
+    .wait = FALSE,
     .dry_run = FALSE
 ){
   # Ensure bootstrap setup was done

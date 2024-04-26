@@ -6,10 +6,9 @@
 \usage{
 new_bootstrap_run(
   .mod,
-  .suffix = glue("{get_model_id(.mod)}_boot"),
+  .suffix = glue("{get_model_id(.mod)}-boot"),
   .inherit_tags = TRUE,
   .overwrite = FALSE,
-  increment = FALSE,
   remove_cov = TRUE,
   remove_tables = TRUE
 )
@@ -27,12 +26,6 @@ tags passed to \code{.add_tags} argument. If \code{TRUE} inherit any tags from
 \item{.overwrite}{If \code{FALSE}, the default,  function will error if a model
 file already exists at specified \code{.new_model} path. If \code{TRUE} any existing
 file at \code{.new_model} will be overwritten silently.}
-
-\item{increment}{Logical (T/F). If \code{TRUE}, create a new bootstrap model run
-from \code{.mod}. Useful for managing multiple bootstrap runs originating from
-the same starting model. Will append \verb{_run_[x]} to the provided \code{.suffix}.
-Note that the\code{.overwrite} arg will have no impact if incrementing the
-bootstrap run.}
 
 \item{remove_cov, remove_tables}{Logical (T/F). Optionally remove \verb{$COVARIANCE}
 and \verb{$TABLE} records respectively, allowing for notably faster run times.}

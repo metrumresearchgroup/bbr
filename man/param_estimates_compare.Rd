@@ -7,7 +7,7 @@
 \title{Compare parameter estimates}
 \usage{
 param_estimates_compare(
-  .param_df,
+  .boot_sum,
   .orig_mod = NULL,
   .compare_cols = starts_with(c("THETA", "SIGMA", "OMEGA")),
   probs = c(0.5, 0.025, 0.975),
@@ -15,15 +15,15 @@ param_estimates_compare(
 )
 
 \method{param_estimates_compare}{bbi_nmboot_summary}(
-  .param_df,
+  .boot_sum,
   .orig_mod = NULL,
-  .compare_cols = starts_with(c("THETA", "SIGMA", "OMEGA")),
+  .compare_cols = NULL,
   probs = c(0.5, 0.025, 0.975),
   na.rm = FALSE
 )
 
 \method{param_estimates_compare}{default}(
-  .param_df,
+  .boot_sum,
   .orig_mod = NULL,
   .compare_cols = starts_with(c("THETA", "SIGMA", "OMEGA")),
   probs = c(0.5, 0.025, 0.975),
@@ -31,42 +31,44 @@ param_estimates_compare(
 )
 }
 \arguments{
-\item{.param_df}{Either a \code{bbi_nmboot_summary} object or a tibble with
+\item{.boot_sum}{Either a \code{bbi_nmboot_summary} object, or a tibble with
 columns for each parameter and rows for each model (like what's returned
 from \code{\link[=param_estimates_batch]{param_estimates_batch()}}).}
 
-\item{.orig_mod}{\code{bbi_model} object to compare \code{.param_df} against. If
-\code{NULL}, the default, only returns quantiles from \code{.param_df}. If passed,
-will display an additional \code{original_estimate} column. This is automatically
-added for \code{bbi_nmboot_summary} objects.}
+\item{.orig_mod}{\code{bbi_model} object to compare \code{.boot_sum} against. This will
+be automatically set if passing in a \code{bbi_nmboot_summary} object.}
 
 \item{.compare_cols}{An expression that can be passed to \code{\link[dplyr:select]{dplyr::select()}} to
-select which columns in \code{.param_df} will be pivoted and summarized.
-Defaults to \code{dplyr::starts_with(c("THETA", "SIGMA", "OMEGA"))} (designed
-for NONMEM runs), but consider using \code{\link[dplyr:reexports]{dplyr::matches()}} to select columns
-using regex. Also see
+select which columns in \code{.boot_sum} will be pivoted and summarized. See
 \href{https://tidyselect.r-lib.org/reference/language.html}{?tidyselect::language}
-for more details and options.}
+for more details and options. \strong{Only used} if \code{.boot_sum} is a tibble.}
 
 \item{probs}{Numeric vector with values between 0 and 1 to be passed through to
 \code{\link[stats:quantile]{stats::quantile()}}. Represents the quantiles to calculate for parameter
-estimates in \code{.param_df}.}
+estimates in \code{.boot_sum}.}
 
 \item{na.rm}{Logical scalar, passed through to \code{\link[stats:quantile]{stats::quantile()}}.}
 }
 \value{
-A tibble with the first column containing the parameter names (that
-were column names in \code{.param_df}), the second column optionally containing
-original parameter estimates (if \code{.orig_mod} is passed), and subsequent
-columns containing the quantiles specified in \code{probs}. You can think of
-this as essentially \code{.param_df}, summarized by quantiles across all rows,
-and then pivoted.
+A tibble containing quantiles for each parameter estimate, optionally
+compared to the estimates from \code{.orig_mod}.
 }
 \description{
-Summarizes the parameter estimates from tibble like what's returned from
-\code{\link[=param_estimates_batch]{param_estimates_batch()}}, showing you the quantiles passed to \code{probs},
-likely interpreted as confidence intervals for your parameter estimates.
-Optionally takes an "original model" to compare these quantiles against.
-Originally conceived for comparing a model to multiple runs of the "same"
-model, for example in a bootstrap or simulation.
+Summarizes each parameter estimate, showing you the quantiles passed to
+\code{probs}, and optionally the estimates of \code{.orig_mod}.
+}
+\examples{
+\dontrun{
+
+# Via a bootstrap run
+boot_run <- read_model(file.path(MODEL_DIR, "1_boot"))
+boot_sum <- summarize_bootstrap_run(boot_run)
+param_estimates_compare(boot_sum)
+
+# Via a custom table
+orig_mod <- read_model(file.path(MODEL_DIR, "1"))
+param_df <- param_estimates_batch(MODEL_DIR)
+param_estimates_compare(param_df, .orig_mod = orig_mod)
+}
+
 }

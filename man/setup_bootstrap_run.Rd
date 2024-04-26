@@ -8,7 +8,6 @@ setup_bootstrap_run(
   .boot_run,
   n = 100,
   strat_cols = NULL,
-  replace = TRUE,
   seed = 1234,
   .overwrite = FALSE
 )
@@ -16,16 +15,16 @@ setup_bootstrap_run(
 \arguments{
 \item{.boot_run}{a \code{bbi_nmboot_model} object.}
 
-\item{n}{number of unique sampled keys, defaults to match dataset}
+\item{n}{number of model runs.}
 
 \item{strat_cols}{columns to maintain proportion for stratification}
-
-\item{replace}{whether to stratify with replacement}
 
 \item{seed}{a seed for sampling the data}
 
 \item{.overwrite}{logical (T/F) indicating whether or not to overwrite existing
 setup for a bootstrap run.}
+
+\item{replace}{whether to stratify with replacement}
 }
 \description{
 Creates a new model object and re-sampled dataset per model run.

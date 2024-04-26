@@ -296,21 +296,31 @@ print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
 
   # print top line info
   .d <- x[[SUMMARY_DETAILS]]
-  cat_line(glue("Based on Dataset: {x$based_on_data_set}\n\n"))
-  num_rec <- stats::median(.d$number_of_data_records, na.rm = TRUE)
-  num_obs <- stats::median(.d$number_of_data_records, na.rm = TRUE)
-  num_sub <- stats::median(.d$number_of_data_records, na.rm = TRUE)
-  cat_line(glue("Median values --> Records: {num_rec}\t Observations: {num_obs}\t Subjects: {num_sub}\n\n"))
+  cli_h1("Based on")
+  cat_line(paste("Model:", col_blue(x$based_on_model_path)))
+  cat_line(paste("Dataset:", col_blue(x$based_on_data_set)))
+
+  cli_h1("Run Specifications")
+  strat_cols <- if(rlang::is_empty(x$strat_cols)){
+    "None"
+  }else{
+    paste(x$strat_cols, collapse = ", ")
+  }
+  names(strat_cols) <- "Stratification Columns"
+
+  seed <- c("Seed" = x$seed)
+  n_samples <- c("Number of model runs" = x$n_samples)
+
+  iwalk(c(n_samples, strat_cols, seed),
+        ~ cat_bullet(paste0(.y, ": ", col_blue(.x))))
+
+  cli_h1("Run Summary")
 
   # TODO: confirm this is appropriate for only_sim (unsure where this comes from)
   only_sim <- isTRUE("only_sim" %in% names(.d))
   if (only_sim) {
     cat_line("No Estimation Methods (ONLYSIM)\n")
   } else {
-    ofvs <- extract_ofv(x$boot_summary$bbi_summary)
-    cat_line("Objective Function Summary (final est. method):\n")
-    ascii_boxplot(ofvs)
-    cat("\n")
     cli::cat_line("Estimation Method(s):\n")
     purrr::walk(paste(x$estimation_method, "\n"), cli::cat_bullet, bullet = "en_dash")
   }
@@ -326,7 +336,8 @@ print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
     cli::cat_line("**Heuristic Problem(s) Detected:**\n", col = "red")
     heuristics_found <- heuristics$heuristic[which(heuristics$any_found)]
     heuristics_n <- heuristics$n_found[which(heuristics$any_found)]
-    purrr::walk(paste0(heuristics_found, " (N = ", heuristics_n, ")"), cli::cat_bullet, bullet = "en_dash", col = "red")
+    heuristics_perc <- (heuristics_n/n_samples) * 100
+    purrr::walk(paste0(heuristics_found, " (", heuristics_perc, "%)"), cli::cat_bullet, bullet = "en_dash", col = "red")
     cat("\n")
   } else {
     cat_line("No Heuristic Problems Detected\n\n")
@@ -336,47 +347,53 @@ print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
     return(invisible(NULL))
   }
 
-  # build parameter table (catch Bayesian error)
-  param_df <- x$boot_summary %>%
-    select(-c(ABS_MOD_PATH, "bbi_summary", "condition_number")) %>%
-    mutate_if(is.numeric, sig, .digits = .digits)
 
-  if (!is.null(.nrow)) {
-    checkmate::assert_number(.nrow)
-    orig_rows <- nrow(param_df)
-    .nrow <- min(.nrow, nrow(param_df))
-    param_df <- param_df[1:.nrow, ]
+  # Build parameter comparison table if it exists
+  # To avoid printing issues before the comparison is added to the summary object
+  # see summarize_bootstrap_run() for details.
+  if(!is.null(x$boot_compare)){
+
+    param_df <- x$boot_compare %>%
+      mutate_if(is.numeric, sig, .digits = .digits)
+
+    if (!is.null(.nrow)) {
+      checkmate::assert_number(.nrow)
+      orig_rows <- nrow(param_df)
+      .nrow <- min(.nrow, nrow(param_df))
+      param_df <- param_df[1:.nrow, ]
+    }
+
+    if (requireNamespace("knitr", quietly = TRUE)) {
+      param_str <- param_df %>%
+        knitr::kable() %>%
+        as.character()
+
+      # add color for shrinkage
+      param_str <- map_chr(param_str, highlight_cell, .i = 5, .threshold = 30)
+    } else {
+      param_str <- param_df %>%
+        print() %>%
+        capture.output()
+    }
+
+    cat_line(param_str)
+    if (!is.null(.nrow)) cat_line(glue("... {orig_rows - .nrow} more rows"), col = "grey")
   }
 
-  if (requireNamespace("knitr", quietly = TRUE)) {
-    param_str <- param_df %>%
-      knitr::kable() %>%
-      as.character()
 
-    # add color for shrinkage
-    param_str <- map_chr(param_str, highlight_cell, .i = 5, .threshold = 30)
-  } else {
-    param_str <- param_df %>%
-      print() %>%
-      capture.output()
-  }
-
-  cat_line(param_str)
-  if (!is.null(.nrow)) cat_line(glue("... {orig_rows - .nrow} more rows"), col = "grey")
 }
 
 #####################
 # INTERNAL HELPERS
 #####################
 
-library(cli)
 
 # Function to create ASCII box plot
 ascii_boxplot <- function(data) {
   q <- quantile(data, c(0, 0.25, 0.5, 0.75, 1), na.rm = TRUE)
 
   # Overwrite min and max values with non-outliers
-  whisker_len <- 1.5*stats::IQR(data)
+  whisker_len <- 1.5*stats::IQR(data, na.rm = TRUE)
   min_q <- unname(q[2] - whisker_len)
   max_q <- unname(q[4] + whisker_len)
   if(min_q > q[1]) q[1] <- min_q
@@ -385,6 +402,7 @@ ascii_boxplot <- function(data) {
 
   # Normalize distances between quartiles to minimum value
   rel_diffs <- diff(q)/min(diff(q))
+  checkmate::assert_numeric(rel_diffs, lower = 0, finite = TRUE)
 
   # Attempt to normalize relative widths based on sum (min value must be at least 1)
   # - similar to fitting a plot to screen size
@@ -448,8 +466,9 @@ ascii_boxplot <- function(data) {
     paste0(rep(" ", space_size), collapse = "")
   }
 
+
   box_vals <- paste0(
-    val_space_unit, q_round[1],
+    space_unit, q_round[1],
     space_values(rel_diffs[1], nchar(q_round[2])), q_round[2],
     space_values(rel_diffs[2], nchar(q_round[3])), q_round[3],
     space_values(rel_diffs[3], nchar(q_round[4])), q_round[4],

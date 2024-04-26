@@ -35,7 +35,7 @@ submit_model(
   ...,
   .overwrite = NULL,
   .config_path = NULL,
-  .wait = TRUE,
+  .wait = FALSE,
   .dry_run = FALSE
 )
 }
