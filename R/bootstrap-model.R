@@ -106,12 +106,18 @@ setup_bootstrap_run <- function(
     mod_paths <- file.path(boot_dir, mod_names)
     orig_mod <- read_model(get_based_on(.boot_run))
 
+    # TODO: only include subjects that entered the original problem
+    starting_data <- nm_data(orig_mod) %>% suppressMessages()
+    if(!is.null(strat_cols)){
+      checkmate::assert_true(strat_cols %in% names(starting_data))
+    }
+
     boot_args <- list(
       boot_run = .boot_run,
       all_mod_names = mod_names,
       orig_mod_path = get_model_path(orig_mod),
       orig_mod_id = get_model_id(orig_mod),
-      orig_data = nm_data(orig_mod) %>% suppressMessages(),
+      orig_data = starting_data,
       strat_cols = strat_cols,
       seed = seed,
       n_samples = n,
