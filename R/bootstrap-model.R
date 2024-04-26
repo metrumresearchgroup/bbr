@@ -7,7 +7,7 @@
 #' @param remove_cov,remove_tables Logical (T/F). Optionally remove `$COVARIANCE`
 #' and `$TABLE` records respectively, allowing for notably faster run times.
 #'
-#' @seealso setup_bootstrap_run
+#' @seealso setup_bootstrap_run summarize_bootstrap_run
 #' @return S3 object of class `bbi_nmboot_model`.
 #' @export
 new_bootstrap_run <- function(
@@ -55,12 +55,11 @@ new_bootstrap_run <- function(
 #' @param .boot_run a `bbi_nmboot_model` object.
 #' @param n number of model runs.
 #' @param strat_cols columns to maintain proportion for stratification
-#' @param replace whether to stratify with replacement
 #' @param seed a seed for sampling the data
 #' @param .overwrite logical (T/F) indicating whether or not to overwrite existing
 #'  setup for a bootstrap run.
 #'
-#' @seealso new_bootstrap_run
+#' @seealso new_bootstrap_run summarize_bootstrap_run
 #'
 #' @examples
 #' \dontrun{
@@ -299,7 +298,30 @@ make_boot_spec <- function(boot_models, boot_args){
 #' set will be read in by default instead of being re-summarized.
 #'  - The purpose of this is functionality two fold. For one, it helps avoid the
 #'  need of re-executing `model_summary()` calls for a large number of runs. It
-#'  also helps to reduce the number of files you need to commit via version control.
+#'  also helps to reduce the number of files you need to commit via version
+#'  control (see `cleanup_bootstrap_run()`).
+#'
+#' @seealso param_estimates_compare cleanup_bootstrap_run
+#'
+#' @examples
+#' \dontrun{
+#'
+#' .boot_run <- read_model(file.path(MODEL_DIR, "1-boot"))
+#' boot_sum <- summarize_bootstrap_run(.boot_run)
+#'
+#' # Optionally compare to original estimates
+#' param_estimates_compare(boot_sum)
+#'
+#'
+#' # Long format is helpful for plotting estimates:
+#' bootstrap_estimates(.boot_run, format_long = TRUE) %>%
+#' dplyr::filter(grepl("THETA", parameter_names)) %>%
+#'   ggplot(aes(x = estimate)) +
+#'   facet_wrap(~parameter_names, scales = "free") +
+#'   geom_histogram(color = "white", alpha = 0.7) +
+#'   theme_bw()
+#'
+#' }
 #'
 #' @name summarize_bootstrap
 NULL
@@ -474,7 +496,24 @@ bootstrap_can_be_summarized <- function(.boot_run){
 #' This will delete all child models, and only keep the information
 #' you need to read in estimates or summary information
 #'
+#' @details
+#' The intent of this function is to help reduce the number of files you need to
+#' commit via version control. Collaborators will be able to read in the
+#' bootstrap model and summary objects without needing individual run files.
+#'  - Note that this will prevent `force_resummarize = TRUE` from working
+#'
+#' This should only be done if you no longer need to re-summarize, clean up
+#' (delete) the individual bootstrap model files
+#'
+#' @examples
+#' \dontrun{
+#'
+#' .boot_run <- read_model(file.path(MODEL_DIR, "1-boot"))
+#' cleanup_bootstrap_run(.boot_run)
+#' }
+#'
 #' @inheritParams setup_bootstrap_run
+#' @seealso summarize_bootstrap_run
 #'
 #' @export
 cleanup_bootstrap_run <- function(.boot_run){

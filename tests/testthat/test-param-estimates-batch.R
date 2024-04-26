@@ -152,17 +152,17 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
     # quantiles should be less or more than median, respectively
     expect_true(all(
-      (res$`2.5%` < res$`50%`) | res$`50%` == 0
+      (res$p2.5 < res$p50) | res$p50 == 0
     ))
 
     expect_true(all(
-      (res$`97.5%` > res$`50%`) | res$`50%` == 0
+      (res$p97.5 > res$p50) | res$p50 == 0
     ))
 
     # note: this is only true because of the jitter we specify
     expect_equal(
       res$original_estimate,
-      res$`50%`
+      res$p50
     )
   })
 
@@ -220,7 +220,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       param_estimates_batch(MODEL_DIR),
       probs = c(.3, .4, .6)
     )
-    expect_true(all(c("30%", "40%", "60%") %in% names(res)))
+    expect_true(all(c("p30", "p40", "p60") %in% names(res)))
   })
 
   test_that("param_estimates_compare() works: na.rm argument [BBR-PEST-014]", {

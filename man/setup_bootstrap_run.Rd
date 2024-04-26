@@ -23,8 +23,6 @@ setup_bootstrap_run(
 
 \item{.overwrite}{logical (T/F) indicating whether or not to overwrite existing
 setup for a bootstrap run.}
-
-\item{replace}{whether to stratify with replacement}
 }
 \description{
 Creates a new model object and re-sampled dataset per model run.
@@ -44,5 +42,5 @@ get_model_status(.boot_run)
 }
 }
 \seealso{
-new_bootstrap_run
+new_bootstrap_run summarize_bootstrap_run
 }

@@ -52,7 +52,8 @@ set will be read in by default instead of being re-summarized.
 \itemize{
 \item The purpose of this is functionality two fold. For one, it helps avoid the
 need of re-executing \code{model_summary()} calls for a large number of runs. It
-also helps to reduce the number of files you need to commit via version control.
+also helps to reduce the number of files you need to commit via version
+control (see \code{cleanup_bootstrap_run()}).
 }
 }
 }
@@ -63,3 +64,27 @@ also helps to reduce the number of files you need to commit via version control.
 \item \code{bootstrap_estimates()}: Tabulate parameter estimates for each model submission in a bootstrap run
 
 }}
+\examples{
+\dontrun{
+
+.boot_run <- read_model(file.path(MODEL_DIR, "1-boot"))
+boot_sum <- summarize_bootstrap_run(.boot_run)
+
+# Optionally compare to original estimates
+param_estimates_compare(boot_sum)
+
+
+# Long format is helpful for plotting estimates:
+bootstrap_estimates(.boot_run, format_long = TRUE) \%>\%
+dplyr::filter(grepl("THETA", parameter_names)) \%>\%
+  ggplot(aes(x = estimate)) +
+  facet_wrap(~parameter_names, scales = "free") +
+  geom_histogram(color = "white", alpha = 0.7) +
+  theme_bw()
+
+}
+
+}
+\seealso{
+param_estimates_compare cleanup_bootstrap_run
+}

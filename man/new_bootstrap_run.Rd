@@ -37,5 +37,5 @@ S3 object of class \code{bbi_nmboot_model}.
 Create a boostrap model object from an existing model
 }
 \seealso{
-setup_bootstrap_run
+setup_bootstrap_run summarize_bootstrap_run
 }

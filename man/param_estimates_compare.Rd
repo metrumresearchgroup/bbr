@@ -61,7 +61,7 @@ Summarizes each parameter estimate, showing you the quantiles passed to
 \dontrun{
 
 # Via a bootstrap run
-boot_run <- read_model(file.path(MODEL_DIR, "1_boot"))
+boot_run <- read_model(file.path(MODEL_DIR, "1-boot"))
 boot_sum <- summarize_bootstrap_run(boot_run)
 param_estimates_compare(boot_sum)
 
@@ -71,4 +71,7 @@ param_df <- param_estimates_batch(MODEL_DIR)
 param_estimates_compare(param_df, .orig_mod = orig_mod)
 }
 
+}
+\seealso{
+summarize_bootstrap_run
 }

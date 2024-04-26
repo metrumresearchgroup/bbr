@@ -13,3 +13,25 @@ cleanup_bootstrap_run(.boot_run)
 This will delete all child models, and only keep the information
 you need to read in estimates or summary information
 }
+\details{
+The intent of this function is to help reduce the number of files you need to
+commit via version control. Collaborators will be able to read in the
+bootstrap model and summary objects without needing individual run files.
+\itemize{
+\item Note that this will prevent \code{force_resummarize = TRUE} from working
+}
+
+This should only be done if you no longer need to re-summarize, clean up
+(delete) the individual bootstrap model files
+}
+\examples{
+\dontrun{
+
+.boot_run <- read_model(file.path(MODEL_DIR, "1-boot"))
+cleanup_bootstrap_run(.boot_run)
+}
+
+}
+\seealso{
+summarize_bootstrap_run
+}
