@@ -478,7 +478,7 @@ bbi_nonmem_model_status.bbi_nmboot_model <- function(.mod) {
       status <- "Finished Running"
     } else {
       # Check for models iteratively
-      if(isTRUE(bootstrap_is_finished(.boot_run))){
+      if(isTRUE(bootstrap_is_finished(.mod))){
         status <- "Finished Running"
       }else{
         status <- "Incomplete Run"
