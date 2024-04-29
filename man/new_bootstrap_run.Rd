@@ -6,7 +6,7 @@
 \usage{
 new_bootstrap_run(
   .mod,
-  .suffix = glue("{get_model_id(.mod)}-boot"),
+  .suffix = "boot",
   .inherit_tags = TRUE,
   .overwrite = FALSE,
   remove_cov = TRUE,
@@ -16,8 +16,8 @@ new_bootstrap_run(
 \arguments{
 \item{.mod}{a \code{bbr} model object}
 
-\item{.suffix}{a prefix for the boostrap model directory. Will be appended by
-the boostrap run number for a given model.}
+\item{.suffix}{a suffix for the bootstrap run directory. Will be prefixed by
+the model id of \code{.mod}.}
 
 \item{.inherit_tags}{If \code{FALSE}, the default, new model will only have any
 tags passed to \code{.add_tags} argument. If \code{TRUE} inherit any tags from

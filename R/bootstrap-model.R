@@ -1,8 +1,8 @@
 #' Create a boostrap model object from an existing model
 #'
 #' @param .mod a `bbr` model object
-#' @param .suffix a prefix for the boostrap model directory. Will be appended by
-#'  the boostrap run number for a given model.
+#' @param .suffix a suffix for the bootstrap run directory. Will be prefixed by
+#'  the model id of `.mod`.
 #' @inheritParams copy_model_from
 #' @param remove_cov,remove_tables Logical (T/F). Optionally remove `$COVARIANCE`
 #' and `$TABLE` records respectively, allowing for notably faster run times.
@@ -12,7 +12,7 @@
 #' @export
 new_bootstrap_run <- function(
     .mod,
-    .suffix = glue("{get_model_id(.mod)}-boot"),
+    .suffix = "boot",
     .inherit_tags = TRUE,
     .overwrite = FALSE,
     remove_cov = TRUE,
@@ -22,10 +22,11 @@ new_bootstrap_run <- function(
   checkmate::assert_class(.mod, NM_MOD_CLASS)
 
   model_dir <- get_model_working_directory(.mod)
+  boot_dir <- glue("{get_model_id(.mod)}-{.suffix}")
 
   boot_run <- copy_model_from(
     .parent_mod = .mod,
-    .new_model = .suffix,
+    .new_model = boot_dir,
     .add_tags = "BOOTSTRAP_SUBMISSION",
     .inherit_tags = .inherit_tags,
     .update_model_file = TRUE,
@@ -44,7 +45,7 @@ new_bootstrap_run <- function(
   if(isTRUE(remove_tables)) remove_records(boot_run, type = "table")
 
   # Return read-in model to get the updated class as part of the model object
-  return(read_model(file.path(model_dir, .suffix)))
+  return(read_model(file.path(model_dir, boot_dir)))
 }
 
 
@@ -114,6 +115,7 @@ setup_bootstrap_run <- function(
     boot_args <- list(
       boot_run = .boot_run,
       all_mod_names = mod_names,
+      boot_mod_path = get_model_path(.boot_run),
       orig_mod_path = get_model_path(orig_mod),
       orig_mod_id = get_model_id(orig_mod),
       orig_data = starting_data,
@@ -163,10 +165,10 @@ make_boot_run <- function(mod_path, boot_args){
   # Copy over control stream
   #  - Cant use copy_model_from, as we want these individual model runs to be
   #    regular `bbi_base_model` objects
-  orig_mod_path <- boot_args$orig_mod_path
-  mod_path_ext <- paste0(mod_path, ".", fs::path_ext(orig_mod_path))
+  boot_mod_path <- boot_args$boot_mod_path
+  mod_path_ext <- paste0(mod_path, ".", fs::path_ext(boot_mod_path))
   fs::file_copy(
-    orig_mod_path, mod_path_ext, overwrite = boot_args$overwrite
+    boot_mod_path, mod_path_ext, overwrite = boot_args$overwrite
   )
 
 
