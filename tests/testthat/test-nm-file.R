@@ -6,7 +6,7 @@ test_that("nm_file() works: model object [BBR-NMF-001]", {
 })
 
 test_that("nm_file() works: summary object [BBR-NMF-001]", {
-  skip_if_not_drone_or_metworx("nm_file() summary object")
+  skip_if_not_ci_or_metworx("nm_file() summary object")
   .d <- nm_file(SUM1, ".cov")
   expect_equal(ncol(.d), MOD1_PARAM_COUNT+1)
   expect_equal(nrow(.d), MOD1_PARAM_COUNT)
@@ -19,7 +19,7 @@ test_that("nm_file() works: file path [BBR-NMF-001]", {
 })
 
 test_that("nm_grd() works [BBR-NMF-003]", {
-  skip_if_not_drone_or_metworx("nm_file() summary object")
+  skip_if_not_ci_or_metworx("nm_file() summary object")
   withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     .d <- nm_grd(MOD1)
     expect_equal(ncol(.d), MOD1_PARAM_COUNT_FIXED+1)

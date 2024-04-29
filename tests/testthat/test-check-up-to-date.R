@@ -51,7 +51,7 @@ test_that("check_up_to_date.bbi_nonmem_model() with mismatched both [BBR-CUTD-00
 })
 
 test_that("check_up_to_date.bbi_nonmem_summary() with mismatched model [BBR-CUTD-006]", {
-  skip_if_not_drone_or_metworx("check_up_to_date.bbi_nonmem_summary")
+  skip_if_not_ci_or_metworx("check_up_to_date.bbi_nonmem_summary")
   perturb_file(CTL_TEST_FILE)
   expect_message(
     res <- check_up_to_date(SUM1),

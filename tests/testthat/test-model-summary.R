@@ -1,6 +1,6 @@
 context("Test bbi summary functions")
 
-skip_if_not_drone_or_metworx("test-model-summary")
+skip_if_not_ci_or_metworx("test-model-summary")
 
 withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 

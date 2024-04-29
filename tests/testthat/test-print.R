@@ -1,6 +1,6 @@
 context("testing print methods for bbi objects")
 
-skip_if_not_drone_or_metworx("test-print")
+skip_if_not_ci_or_metworx("test-print")
 
 model_dir <- ABS_MODEL_DIR
 mod_ctl_path <- file.path(model_dir, CTL_FILENAME)

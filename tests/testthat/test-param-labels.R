@@ -88,7 +88,7 @@ for (MODEL_PICK in MODEL_PICKS) {
 
 # test param_labels against tidynm reference tibbles (testing bbi_nonmem_model dispatch)
 withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
-  skip_if_not_drone_or_metworx("test-param-labels tidynm tests")
+  skip_if_not_ci_or_metworx("test-param-labels tidynm tests")
 
   for (MODEL_PICK in MODEL_PICKS) {
     .mod_id <- MODEL_PICK$mod_id

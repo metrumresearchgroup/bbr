@@ -1,4 +1,4 @@
-skip_if_not_drone_or_metworx("test-cov-cor")
+skip_if_not_ci_or_metworx("test-cov-cor")
 
 check_mat_dim <- function(.mat, .theta_dim, .dim) {
   expect_equal(length(.mat), 4)

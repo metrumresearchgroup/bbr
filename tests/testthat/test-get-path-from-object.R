@@ -42,22 +42,22 @@ test_that("get_yaml_path() builds the right path [BBR-GPFO-003]", {
 })
 
 test_that("get_model_path() builds the right path from summary object [BBR-GPFO-004]", {
-  skip_if_not_drone_or_metworx("get_model_path.bbi_nonmem_summary")
+  skip_if_not_ci_or_metworx("get_model_path.bbi_nonmem_summary")
   expect_identical(get_model_path(SUM1), normalizePath(CTL_TEST_FILE))
 })
 
 test_that("get_output_dir() builds the right path from summary object [BBR-GPFO-005]", {
-  skip_if_not_drone_or_metworx("get_output_dir.bbi_nonmem_summary")
+  skip_if_not_ci_or_metworx("get_output_dir.bbi_nonmem_summary")
   expect_identical(get_output_dir(SUM1), normalizePath(OUTPUT_DIR))
 })
 
 test_that("get_config_path() builds the right path from summary object [BBR-GPFO-026]", {
-  skip_if_not_drone_or_metworx("get_config_path.bbi_nonmem_summary")
+  skip_if_not_ci_or_metworx("get_config_path.bbi_nonmem_summary")
   expect_identical(get_config_path(SUM1), normalizePath(file.path(OUTPUT_DIR, "bbi_config.json")))
 })
 
 test_that("get_yaml_path() builds the right path from summary object [BBR-GPFO-006]", {
-  skip_if_not_drone_or_metworx("get_yaml_path.bbi_nonmem_summary")
+  skip_if_not_ci_or_metworx("get_yaml_path.bbi_nonmem_summary")
   expect_identical(get_yaml_path(SUM1), normalizePath(YAML_TEST_FILE))
 })
 
@@ -131,7 +131,7 @@ test_that("get_model_id parses model object [BBR-GPFO-014]", {
 })
 
 test_that("get_model_id parses summary object [BBR-GPFO-015]", {
-  skip_if_not_drone_or_metworx("get_model_id.bbi_nonmem_summary")
+  skip_if_not_ci_or_metworx("get_model_id.bbi_nonmem_summary")
   expect_identical(get_model_id(SUM1), MOD_ID)
 })
 
@@ -143,7 +143,7 @@ test_that("get_data_path parses model object [BBR-GPFO-016]", {
 })
 
 test_that("get_data_path parses summary object [BBR-GPFO-017]", {
-  skip_if_not_drone_or_metworx("get_data_path.bbi_nonmem_summary")
+  skip_if_not_ci_or_metworx("get_data_path.bbi_nonmem_summary")
   res_data_path <- get_data_path(SUM1)
   expect_identical(res_data_path, DATA_TEST_FILE)
   expect_identical(readLines(res_data_path, n = 1), DATA_TEST_FIRST_LINE)
@@ -282,7 +282,7 @@ for (.tc in .test_cases) {
   })
 
   test_that(glue::glue("build_path_from_model returns correct file from summary object: {ext} [BBR-GPFO-019]"), {
-    skip_if_not_drone_or_metworx(glue::glue("build_path_from_model.bbi_nonmem_summary {ext}"))
+    skip_if_not_ci_or_metworx(glue::glue("build_path_from_model.bbi_nonmem_summary {ext}"))
     expect_identical(build_path_from_model(SUM1, paste0(".", ext)),
                      normalizePath(.tc))
   })

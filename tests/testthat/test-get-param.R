@@ -1,6 +1,6 @@
 context("Test get_omega, get_sigma, and get_theta functions")
 
-skip_if_not_drone_or_metworx("test-get-param")
+skip_if_not_ci_or_metworx("test-get-param")
 
 mod_complex <- read_model(file.path(MODEL_DIR_X, "example2_saemimp"))
 
