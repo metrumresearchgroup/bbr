@@ -10,7 +10,7 @@ context("testing a composable workflow and running bbi")
 # and therefore must be run in order.
 ####################################################
 
-# can't run on Drone because there's no NONMEM
+# Don't assume NONMEM is available if not on Metworx.
 if (Sys.getenv("METWORX_VERSION") == "" || Sys.getenv("SKIP_BBI_TEST") == "true") {
   skip("test-workflow-bbi only runs on Metworx because it needs NONMEM installed")
 }
