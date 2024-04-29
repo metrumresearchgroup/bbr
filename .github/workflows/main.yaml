@@ -74,11 +74,15 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: |
+            any::pkgdown
             any::rcmdcheck
             ${{ env.MRGMISC_PKG }}
             ${{ env.NMREC_PKG }}
           upgrade: ${{ matrix.config.label == 'oldest' && 'FALSE' || 'TRUE' }}
       - uses: r-lib/actions/check-r-package@v2
+      - name: Check pkgdown
+        shell: Rscript {0}
+        run: pkgdown::check_pkgdown()
   release:
     if: github.ref_type == 'tag'
     name: Upload release
