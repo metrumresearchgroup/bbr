@@ -96,15 +96,21 @@ setup_bootstrap_run <- function(
     if(fs::dir_exists(boot_dir)) fs::dir_delete(boot_dir)
     fs::dir_create(boot_dir)
     fs::dir_create(boot_data_dir)
-    # Store data within run folder and gitignore
-    ##### TODO: UPDATE TO IGNORE MODEL FILES...
-    writeLines("/data\n*.ctl\n*.mod\n*.yaml", file.path(boot_dir, ".gitignore"))
 
     # New model setup
     n_seq <- seq(n)
     mod_names <- purrr::map_chr(n_seq, max_char = nchar(n), pad_left)
     mod_paths <- file.path(boot_dir, mod_names)
     orig_mod <- read_model(get_based_on(.boot_run))
+
+    # Store data within run folder and gitignore & ignore individual model files
+    f_sep <- .Platform$file.sep
+    default_ignore <- paste0(
+      c("*.ctl", "*.mod", "*.yaml", paste0(f_sep, "data")), collapse = "\n"
+    )
+    ignore_models <- paste0(f_sep, mod_names, collapse = "\n")
+    ignore_lines <- paste(default_ignore, ignore_models, sep = "\n\n")
+    writeLines(ignore_lines, file.path(boot_dir, ".gitignore"))
 
     # Only include subjects that entered the original problem by default
     can_be_joined <- can_be_nm_joined(orig_mod)
