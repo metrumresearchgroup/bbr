@@ -222,3 +222,46 @@ drop_dups <- function(.new_table, .dest_table, .join_col, .table_name) {
   }
   return(.new_table[keep])
 }
+
+
+#' Helper to determine if `nm_join()` can be called on a `bbi_nonmem_model`
+#' object
+#' @inheritParams nm_tables
+#' @noRd
+can_be_nm_joined <- function(.mod){
+  check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
+  if(inherits(.mod, NM_SUM_CLASS)){
+    .mod <- read_model(.mod[[ABS_MOD_PATH]])
+  }
+
+  # Model submission status checks
+  is_finished <- model_is_finished(.mod)
+
+  # Check for presence of table records
+  ctl <- safe_read_ctl(.mod)
+  table_recs <- nmrec::select_records(ctl, "table")
+  has_tables <- !rlang::is_empty(table_recs)
+
+  reasons <- c()
+  if(isFALSE(is_finished)){
+    reasons <- c(reasons, "Model has not finished executing")
+  }
+
+  if(isFALSE(has_tables)){
+    reasons <- c(reasons, "Model has no table records. Nothing to join to `nm_data()`")
+  }
+
+  if(isFALSE(is_finished) || isFALSE(has_tables)){
+    reasons_txt <- paste0("- ", reasons, collapse = "\n")
+    rlang::warn(
+      c(
+        "`nm_join()` cannot be used to join model output and input data",
+        "i"="Reasons:",
+        reasons_txt
+      )
+    )
+    return(invisible(FALSE))
+  }else{
+    return(invisible(TRUE))
+  }
+}

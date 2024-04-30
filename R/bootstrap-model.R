@@ -106,8 +106,20 @@ setup_bootstrap_run <- function(
     mod_paths <- file.path(boot_dir, mod_names)
     orig_mod <- read_model(get_based_on(.boot_run))
 
-    # TODO: only include subjects that entered the original problem
-    starting_data <- nm_data(orig_mod) %>% suppressMessages()
+    # Only include subjects that entered the original problem by default
+    can_be_joined <- can_be_nm_joined(orig_mod)
+    if(isTRUE(can_be_joined)){
+      starting_data <- nm_join(orig_mod) %>% suppressMessages()
+    }else{
+      rlang::warn(
+        paste(
+          "Defaulting to input data, which may include data that doesn't enter",
+          "the final problem (i.e. ignored subjects)"
+        )
+      )
+      starting_data <- nm_data(orig_mod) %>% suppressMessages()
+    }
+
     if(!is.null(strat_cols)){
       checkmate::assert_true(strat_cols %in% names(starting_data))
     }

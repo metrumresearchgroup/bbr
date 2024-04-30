@@ -457,8 +457,7 @@ bbi_nonmem_model_status.default <- function(.mod) {
   status <- "Not Run"
   output_dir <- get_output_dir(.mod, .check_exists = FALSE)
   if (dir.exists(output_dir)) {
-    json_file <- get_config_path(.mod, .check_exists = FALSE)
-    if (fs::file_exists(json_file)) {
+    if (isTRUE(model_is_finished(.mod))) {
       status <- "Finished Running"
     } else {
       status <- "Incomplete Run"
@@ -488,6 +487,21 @@ bbi_nonmem_model_status.bbi_nmboot_model <- function(.mod) {
   return(status)
 }
 
+# Check if model run has finished
+model_is_finished <- function(.mod){
+  output_dir <- get_output_dir(.mod, .check_exists = FALSE)
+  if (dir.exists(output_dir)) {
+    json_file <- get_config_path(.mod, .check_exists = FALSE)
+    if (fs::file_exists(json_file)) {
+      status <- TRUE
+    } else {
+      status <- FALSE
+    }
+  }else{
+    status <- FALSE
+  }
+  return(status)
+}
 
 # Check if bootstrap run has finished
 bootstrap_is_finished <- function(.boot_run){
