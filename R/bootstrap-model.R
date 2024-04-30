@@ -127,7 +127,7 @@ setup_bootstrap_run <- function(
     }
 
     if(!is.null(strat_cols)){
-      checkmate::assert_true(strat_cols %in% names(starting_data))
+      checkmate::assert_true(all(strat_cols %in% names(starting_data)))
     }
 
     boot_args <- list(
@@ -203,7 +203,7 @@ make_boot_run <- function(mod_path, boot_args){
   orig_mod_id <- boot_args$orig_mod_id
 
   # Write out new dataset
-  data_boot_name <- glue("boot_{orig_mod_id}_{mod_name}.csv")
+  data_boot_name <- glue("{mod_name}.csv")
   data_path_boot <- file.path(boot_args$boot_data_dir, data_boot_name)
   data.table::fwrite(data_new, data_path_boot , na = '.', quote = FALSE)
 

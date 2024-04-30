@@ -264,7 +264,7 @@ param_estimates_compare.default <- function(
   if (!is.null(.orig_mod)) {
     comp_df <- mod_df %>%
       select("parameter_names", "estimate") %>%
-      rename(original_estimate = "estimate") %>%
+      rename(original = "estimate") %>%
       left_join(comp_df, by = "parameter_names")
   }
 
