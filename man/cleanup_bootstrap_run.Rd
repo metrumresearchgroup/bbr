@@ -21,8 +21,8 @@ bootstrap model and summary objects without needing individual run files.
 \item Note that this will prevent \code{force_resummarize = TRUE} from working
 }
 
-This should only be done if you no longer need to re-summarize, clean up
-(delete) the individual bootstrap model files
+\strong{This should only be done} if you no longer need to re-summarize, as this
+will clean up (delete) the \emph{individual} bootstrap model files
 }
 \examples{
 \dontrun{

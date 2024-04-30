@@ -288,9 +288,6 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
 #' @importFrom dplyr mutate_if
 #' @importFrom checkmate assert_number
 #'
-#' @param .digits Number of significant digits to use for parameter table. Defaults to 3.
-#' @param .nrow If `NULL`, the default, print all rows of the parameter table.
-#'   Otherwise, prints only `.nrow` rows.
 #' @export
 print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
 
@@ -311,8 +308,13 @@ print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
   seed <- c("Seed" = x$seed)
   n_samples <- c("Number of model runs" = x$n_samples)
 
-  iwalk(c(n_samples, strat_cols, seed),
-        ~ cat_bullet(paste0(.y, ": ", col_blue(.x))))
+  if(isTRUE(bootstrap_is_cleaned_up(x))){
+    run_specs <- c(n_samples, strat_cols, seed, c("Cleaned up" = TRUE))
+  }else{
+    run_specs <- c(n_samples, strat_cols, seed)
+  }
+
+  iwalk(run_specs, ~ cat_bullet(paste0(.y, ": ", col_blue(.x))))
 
   cli_h1("Run Summary")
 

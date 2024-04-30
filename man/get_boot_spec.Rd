@@ -8,7 +8,7 @@ stream file.}
 get_boot_spec(.boot_run)
 }
 \arguments{
-\item{.boot_run}{a \code{bbi_nmboot_model} model object}
+\item{.boot_run}{Either a \code{bbi_nmboot_model} or \code{bbi_nmboot_summary} object}
 }
 \description{
 Tabulate all relevant \code{bbi_nonmem_model} model files from a bootstrap control

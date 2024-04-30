@@ -223,6 +223,13 @@ make_boot_run <- function(mod_path, boot_args){
   modify_prob_statement(mod, prob)
   modify_data_path_ctl(mod, data_path_rel)
 
+  # This message is mainly to indicate that the setup is not yet complete
+  #  - The last sample may seem like it takes longer due to the creation
+  # of the spec file (can take 5-10 seconds depending on the number of runs)
+  if(new_mod_index == length(boot_args$all_mod_names)){
+    verbose_msg("Finishing up...")
+  }
+
   return(mod)
 }
 
@@ -511,6 +518,47 @@ bootstrap_can_be_summarized <- function(.boot_run){
   return(invisible(TRUE))
 }
 
+
+
+#' @describeIn summarize_bootstrap Read in all bootstrap run model objects
+#' @inheritParams get_boot_spec
+#' @export
+get_boot_models <- function(.boot_run){
+  check_model_object(.boot_run, c(NMBOOT_MOD_CLASS, NMBOOT_SUM_CLASS))
+  if(inherits(.boot_run, NMBOOT_SUM_CLASS)){
+    .boot_run <- read_model(.boot_run[[ABS_MOD_PATH]])
+  }
+
+  if(bootstrap_is_cleaned_up(.boot_run)){
+    verbose_msg(
+      glue("Bootstrap run `{get_model_id(.boot_run)}` has been cleaned up.")
+    )
+    return(NULL)
+  }
+
+  boot_spec <- get_boot_spec(.boot_run)
+  boot_models <- tryCatch(
+    purrr::map(boot_spec$bootstrap_runs$mod_path_abs, read_model),
+    error = function(cond){
+      if(stringr::str_detect(cond$parent$message, "does not exist")){
+        return(NULL)
+      }
+    }
+  )
+
+  if(is.null(boot_models) || rlang::is_empty(boot_models)){
+    boot_dir <- .boot_run[[ABS_MOD_PATH]]
+    rlang::warn(
+      c(
+        glue("At least one bootstrap run model does not exist in `{boot_dir}`."),
+        "Did you forget to run `setup_bootstrap_run()`?"
+      )
+    )
+  }
+  return(boot_models)
+}
+
+
 #' Cleanup bootstrap run directory
 #'
 #' This will delete all child models, and only keep the information
@@ -522,8 +570,8 @@ bootstrap_can_be_summarized <- function(.boot_run){
 #' bootstrap model and summary objects without needing individual run files.
 #'  - Note that this will prevent `force_resummarize = TRUE` from working
 #'
-#' This should only be done if you no longer need to re-summarize, clean up
-#' (delete) the individual bootstrap model files
+#' **This should only be done** if you no longer need to re-summarize, as this
+#'  will clean up (delete) the *individual* bootstrap model files
 #'
 #' @examples
 #' \dontrun{
@@ -566,7 +614,12 @@ cleanup_bootstrap_run <- function(.boot_run){
   # Overwrite spec file
   spec_path <- get_boot_spec_path(.boot_run)
   boot_spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
+  # Set cleaned up - impacts status checking
   boot_spec$bootstrap_spec$cleaned_up <- TRUE
+  # Delete individual run specs
+  # - dont need to store this information anymore since we wont be reading in
+  #   individual models
+  boot_spec$bootstrap_runs <- NULL
   spec_lst_json <- jsonlite::toJSON(boot_spec, pretty = TRUE, simplifyVector = TRUE)
 
   # Delete individual model files

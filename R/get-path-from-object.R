@@ -651,56 +651,40 @@ find_nonmem_model_file_path <- function(.path, .check_exists = TRUE) {
 
 #' Tabulate all relevant `bbi_nonmem_model` model files from a bootstrap control
 #' stream file.
-#' @param .boot_run a `bbi_nmboot_model` model object
+#' @param .boot_run Either a `bbi_nmboot_model` or `bbi_nmboot_summary` object
 #' @keywords internal
 get_boot_spec <- function(.boot_run){
-  check_model_object(.boot_run, .mod_types = NMBOOT_MOD_CLASS)
+  check_model_object(.boot_run, c(NMBOOT_MOD_CLASS, NMBOOT_SUM_CLASS))
+  if(inherits(.boot_run, NMBOOT_SUM_CLASS)){
+    .boot_run <- read_model(.boot_run[[ABS_MOD_PATH]])
+  }
 
   spec_path <- get_boot_spec_path(.boot_run, .check_exists = FALSE)
   if(!fs::file_exists(spec_path)) return(NULL)
 
   boot_spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
   boot_dir <- boot_spec$bootstrap_spec$output_dir
-  boot_runs <- boot_spec$bootstrap_runs
 
-  boot_mod_files <- data.frame(
-    matrix(unlist(boot_runs), nrow=length(boot_runs), byrow = TRUE),
-    stringsAsFactors = FALSE
-  ) %>% stats::setNames(names(boot_runs[[1]])) %>%
-    tibble::as_tibble()
+  # Format individual bootstrap model runs if not cleaned up
+  if(!is.null(boot_spec$bootstrap_runs)){
+    boot_runs <- boot_spec$bootstrap_runs
 
-  spec_df <- boot_mod_files %>% dplyr::mutate(
-    run = names(boot_runs),
-    mod_path_abs = file.path(boot_dir, fs::path_ext_remove(.data$mod_path))
-  ) %>% dplyr::relocate("run")
+    boot_mod_files <- data.frame(
+      matrix(unlist(boot_runs), nrow=length(boot_runs), byrow = TRUE),
+      stringsAsFactors = FALSE
+    ) %>% stats::setNames(names(boot_runs[[1]])) %>%
+      tibble::as_tibble()
 
-  spec <- c(boot_spec$bootstrap_spec, list(bootstrap_runs = spec_df))
+    spec_df <- boot_mod_files %>% dplyr::mutate(
+      run = names(boot_runs),
+      mod_path_abs = file.path(boot_dir, fs::path_ext_remove(.data$mod_path))
+    ) %>% dplyr::relocate("run")
+
+    spec <- c(boot_spec$bootstrap_spec, list(bootstrap_runs = spec_df))
+  }else{
+    spec <- boot_spec$bootstrap_spec
+  }
+
   return(spec)
 }
 
-#' Read in all bootstrap run model objects
-#' @inheritParams get_boot_spec
-#' @export
-get_boot_models <- function(.boot_run){
-  boot_spec <- get_boot_spec(.boot_run)
-
-  boot_models <- tryCatch(
-    purrr::map(boot_spec$bootstrap_runs$mod_path_abs, read_model),
-    error = function(cond){
-      if(stringr::str_detect(cond$parent$message, "does not exist")){
-        return(NULL)
-      }
-    }
-  )
-
-  if(is.null(boot_models)){
-    boot_dir <- .boot_run[[ABS_MOD_PATH]]
-    rlang::warn(
-      c(
-        glue("At least one bootstrap run model does not exist in `{boot_dir}`."),
-        "Did you forget to run `setup_bootstrap_run()`, or already run `cleanup_bootstrap_run()`?"
-      )
-    )
-  }
-  return(boot_models)
-}

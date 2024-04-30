@@ -503,8 +503,15 @@ model_is_finished <- function(.mod){
   return(status)
 }
 
-# Check if bootstrap run has finished
+#' Check if bootstrap run has finished
+#' @param .boot_run Either a `bbi_nmboot_model` or `bbi_nmboot_summary` object
+#' @noRd
 bootstrap_is_finished <- function(.boot_run){
+  check_model_object(.boot_run, c(NMBOOT_MOD_CLASS, NMBOOT_SUM_CLASS))
+  if(inherits(.boot_run, NMBOOT_SUM_CLASS)){
+    .boot_run <- read_model(.boot_run[[ABS_MOD_PATH]])
+  }
+
   if(bootstrap_is_cleaned_up(.boot_run)){
     return(TRUE)
   }else{
@@ -536,9 +543,14 @@ bootstrap_is_finished <- function(.boot_run){
   }
 }
 
-# Check if bootstrap run has been cleaned up
+#' Check if bootstrap run has been cleaned up
+#' @param .boot_run Either a `bbi_nmboot_model` or `bbi_nmboot_summary` object
+#' @noRd
 bootstrap_is_cleaned_up <- function(.boot_run){
-  check_model_object(.boot_run, .mod_types = NMBOOT_MOD_CLASS)
+  check_model_object(.boot_run, c(NMBOOT_MOD_CLASS, NMBOOT_SUM_CLASS))
+  if(inherits(.boot_run, NMBOOT_SUM_CLASS)){
+    .boot_run <- read_model(.boot_run[[ABS_MOD_PATH]])
+  }
 
   output_dir <- get_output_dir(.boot_run, .check_exists = FALSE)
   if(!fs::file_exists(output_dir)) return(FALSE)
@@ -746,6 +758,7 @@ wait_for_nonmem.default <- function(.mod, .time_limit = 300, .interval = 5) {
     # coerce to list of models for bootstrap model runs to check individually
     if(inherits(.mod, NMBOOT_MOD_CLASS)){
       .mod <- get_boot_models(.mod)
+      if(is.null(.mod)) return(invisible(NULL))
     }
   }
 

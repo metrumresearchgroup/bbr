@@ -4,11 +4,14 @@
 \alias{summarize_bootstrap}
 \alias{summarize_bootstrap_run}
 \alias{bootstrap_estimates}
+\alias{get_boot_models}
 \title{Summarize a bootstrap run}
 \usage{
 summarize_bootstrap_run(.boot_run, force_resummarize = FALSE)
 
 bootstrap_estimates(.boot_run, format_long = FALSE, force_resummarize = FALSE)
+
+get_boot_models(.boot_run)
 }
 \arguments{
 \item{.boot_run}{a \code{bbi_nmboot_model} object.}
@@ -62,6 +65,8 @@ control (see \code{cleanup_bootstrap_run()}).
 \item \code{summarize_bootstrap_run()}: Summarize a bootstrap run and store results
 
 \item \code{bootstrap_estimates()}: Tabulate parameter estimates for each model submission in a bootstrap run
+
+\item \code{get_boot_models()}: Read in all bootstrap run model objects
 
 }}
 \examples{
