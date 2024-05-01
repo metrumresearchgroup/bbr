@@ -297,6 +297,7 @@ print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
   cat_line(paste("Model:", col_blue(x$based_on_model_path)))
   cat_line(paste("Dataset:", col_blue(x$based_on_data_set)))
 
+  # Run specifications (seed, stratification columns, cleaned_up)
   cli_h1("Run Specifications")
   strat_cols <- if(rlang::is_empty(x$strat_cols)){
     "None"
@@ -306,17 +307,17 @@ print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
   names(strat_cols) <- "Stratification Columns"
 
   seed <- c("Seed" = x$seed)
-  n_samples <- c("Number of model runs" = x$n_samples)
 
   if(isTRUE(bootstrap_is_cleaned_up(x))){
-    run_specs <- c(n_samples, strat_cols, seed, c("Cleaned up" = TRUE))
+    run_specs <- c(strat_cols, seed, c("Cleaned up" = TRUE))
   }else{
-    run_specs <- c(n_samples, strat_cols, seed)
+    run_specs <- c(strat_cols, seed)
   }
 
   iwalk(run_specs, ~ cat_bullet(paste0(.y, ": ", col_blue(.x))))
 
-  cli_h1("Run Summary")
+  # Bootstrap run summary (n_samples, any heuristics)
+  cli_h1("Bootstrap Run Summary")
 
   # TODO: confirm this is appropriate for only_sim (unsure where this comes from)
   only_sim <- isTRUE("only_sim" %in% names(.d))
@@ -327,6 +328,10 @@ print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
     purrr::walk(paste(x$estimation_method, "\n"), cli::cat_bullet, bullet = "en_dash")
   }
 
+  cli::cat_line("Run Summary:\n")
+  n_samples <- c("Number of runs" = x$n_samples)
+  cli::cat_bullet(paste("Number of runs:", col_blue(x$n_samples)), bullet = "en_dash")
+
   # check heuristics
   .h <- x[[SUMMARY_HEURISTICS]]
   heuristics_cols <- names(.h)[!grepl(ABS_MOD_PATH, names(.h))]
@@ -335,14 +340,16 @@ print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
   })
 
   if (any(heuristics$any_found)) {
-    cli::cat_line("**Heuristic Problem(s) Detected:**\n", col = "red")
     heuristics_found <- heuristics$heuristic[which(heuristics$any_found)]
     heuristics_n <- heuristics$n_found[which(heuristics$any_found)]
-    heuristics_perc <- (heuristics_n/n_samples) * 100
-    purrr::walk(paste0(heuristics_found, " (", heuristics_perc, "%)"), cli::cat_bullet, bullet = "en_dash", col = "red")
+    heuristics_perc <- round((heuristics_n/n_samples) * 100, 2)
+    purrr::walk(
+      paste0(heuristics_found, ": ", col_red(heuristics_n)," (", col_red(heuristics_perc), " %)"),
+      cli::cat_bullet, bullet = "en_dash"
+    )
     cat("\n")
   } else {
-    cat_line("No Heuristic Problems Detected\n\n")
+    cat_line("\n\n")
   }
 
   if (only_sim) {
@@ -354,9 +361,7 @@ print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
   # To avoid printing issues before the comparison is added to the summary object
   # see summarize_bootstrap_run() for details.
   if(!is.null(x$boot_compare)){
-
-    param_df <- x$boot_compare %>%
-      mutate_if(is.numeric, sig, .digits = .digits)
+    param_df <- x$boot_compare %>% mutate_if(is.numeric, sig, .digits = .digits)
 
     if (!is.null(.nrow)) {
       checkmate::assert_number(.nrow)
