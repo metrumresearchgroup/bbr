@@ -95,7 +95,8 @@ submit_model.bbi_nmboot_model <- function(
     .overwrite = NULL,
     .config_path = NULL,
     .wait = FALSE,
-    .dry_run = FALSE
+    .dry_run = FALSE,
+    .batch_size = 100
 ){
   # Ensure bootstrap setup was done
   spec_path <- get_boot_spec_path(.mod, .check_exists = FALSE)
@@ -119,11 +120,25 @@ submit_model.bbi_nmboot_model <- function(
   }
 
   boot_models <- get_boot_models(.mod)
-  res <- submit_models(
-    boot_models, .bbi_args, .mode, ...,
-    .overwrite = .overwrite, .config_path = .config_path,
-    .wait = .wait, .dry_run = .dry_run
-  )
+  res <- if (!isTRUE(.dry_run) && .batch_size < length(boot_models)) {
+    submit_batch_callr(
+      .mods = boot_models,
+      .batch_size = .batch_size,
+      .bbi_args = .bbi_args,
+      .mode = .mode,
+      .overwrite = .overwrite,
+      .config_path = .config_path,
+      stdout_path = file.path(boot_dir, "OUTPUT")
+    )
+
+  } else {
+    submit_models(
+      boot_models, .bbi_args, .mode, ...,
+      .overwrite = .overwrite, .config_path = .config_path,
+      .wait = .wait, .dry_run = .dry_run
+    )
+  }
+
   return(res)
 }
 
