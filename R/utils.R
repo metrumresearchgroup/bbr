@@ -678,8 +678,10 @@ check_nonmem_finished <- function(.mod, ...) {
 check_nonmem_finished.bbi_nonmem_model <- function(.mod, ...) {
   output_dir <- get_output_dir(.mod, .check_exists = FALSE)
   if (!fs::dir_exists(output_dir)) {
-    message("Model has not been submitted")
-    return(invisible(TRUE)) # if missing then this failed right away, likely for some bbi reason
+    verbose_msg("Model has not been submitted")
+    # if missing then this failed right away, likely for some bbi reason OR
+    # not being submitted yet
+    return(invisible(TRUE))
   }
   model_finished <- nonmem_finished_impl(.mod, ...)
   return(model_finished)
@@ -690,11 +692,16 @@ check_nonmem_finished.bbi_nonmem_model <- function(.mod, ...) {
 check_nonmem_finished.bbi_nmboot_model <- function(.mod, ...) {
   output_dir <- get_output_dir(.mod, .check_exists = FALSE)
   if (!fs::dir_exists(output_dir)) {
-    message("Model has not been submitted")
-    return(invisible(TRUE)) # if missing then this failed right away, likely for some bbi reason
+    verbose_msg("Bootstran run has not been set up")
+    return(invisible(TRUE))
   }
   boot_models <- get_boot_models(.mod)
-  models_finished <- map_lgl(boot_models, ~check_nonmem_finished(.x))
+  output_dirs <- purrr::map_chr(boot_models, get_output_dir, .check_exists = FALSE)
+  if(any(!fs::dir_exists(output_dirs))){
+    verbose_msg("Bootstran run has not been submitted")
+    return(invisible(TRUE))
+  }
+  models_finished <- map_lgl(boot_models, ~nonmem_finished_impl(.x))
   return(all(models_finished))
 }
 
@@ -702,14 +709,13 @@ check_nonmem_finished.bbi_nmboot_model <- function(.mod, ...) {
 #' @export
 check_nonmem_finished.list <- function(.mod, ...) {
   assert_list(.mod)
-  check_model_object_list(.mod, .mod_types = NM_MOD_CLASS)
+  check_model_object_list(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))
   models_finished <- map_lgl(.mod, ~check_nonmem_finished(.x))
   return(models_finished)
 }
 
 
 nonmem_finished_impl <- function(.mod){
-  check_model_object(.mod, NM_MOD_CLASS)
   mod_path <- build_path_from_model(.mod, ".lst")
 
   # look for model to be finished and then test output
