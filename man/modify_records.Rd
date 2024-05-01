@@ -6,20 +6,23 @@
 \alias{modify_prob_statement}
 \alias{modify_data_path_ctl}
 \alias{remove_records}
+\alias{mod_has_record}
 \title{Modify options and records from a \code{NONMEM} control stream file}
 \usage{
-safe_read_ctl(mod)
+safe_read_ctl(.mod)
 
-modify_prob_statement(mod, prob_text = NULL)
+modify_prob_statement(.mod, prob_text = NULL)
 
-modify_data_path_ctl(mod, data_path)
+modify_data_path_ctl(.mod, data_path)
 
-remove_records(mod, type = c("covariance", "table"))
+remove_records(.mod, type = c("covariance", "table"))
+
+mod_has_record(.mod, type = c("covariance", "table"))
 }
 \arguments{
-\item{mod}{a bbr model object}
+\item{.mod}{a bbr model object}
 
-\item{prob_text}{If \code{NULL} return the current \verb{$PROB} statement. If a
+\item{prob_text}{If \code{NULL} return the current \verb{$PROBLEM} statement. If a
 character string, set the problem statement to that value.}
 
 \item{data_path}{Data path to set in a \verb{$DATA} record.}
@@ -32,12 +35,17 @@ Modify options and records from a \code{NONMEM} control stream file
 }
 \details{
 \itemize{
-\item \code{safe_read_ctl()} is called internally within the other functions, though
+\item \strong{\code{safe_read_ctl()}} is called internally within the other functions, though
 it can also be used outside of that context.
-\item The other functions will read in the control stream, make any modifications,
-and then save out the updated control stream. \code{modify_prob_statement()} is
-the only function that can \emph{also} optionally return a record option (see
-\code{prob_text} argument).
+\item \strong{\code{modify_prob_statement()}}, \strong{\code{modify_data_path_ctl()}}, and
+\strong{\code{remove_records()}} read in the control stream, make any modifications,
+and then save out the updated control stream.
+\itemize{
+\item \code{modify_prob_statement()} also returns a character string defining the
+\verb{$PROBLEM} text (see \code{prob_text} argument).
+}
+\item \strong{\code{mod_has_record()}} will return a logical value denoting whether a \code{bbr}
+model has a given record type.
 }
 }
 \section{Functions}{
@@ -53,6 +61,8 @@ control stream file
 
 \item \code{remove_records()}: Remove \emph{all records} of a given type from a \code{NONMEM}
 control stream file
+
+\item \code{mod_has_record()}: Check if a \code{bbr} model has a given record type
 
 }}
 \note{

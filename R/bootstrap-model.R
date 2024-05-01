@@ -42,7 +42,12 @@ new_bootstrap_run <- function(
 
   # Optionally remove $TABLE and $COV statements here
   if(isTRUE(remove_cov)) remove_records(boot_run, type = "covariance")
-  if(isTRUE(remove_tables)) remove_records(boot_run, type = "table")
+  if(isTRUE(remove_tables)){
+    remove_records(boot_run, type = "table")
+  }else{
+    # Update table names if present (not used, but for consistency)
+    boot_run <- update_model_id(boot_run) %>% suppressMessages()
+  }
 
   # Return read-in model to get the updated class as part of the model object
   return(read_model(file.path(model_dir, boot_dir)))
@@ -216,12 +221,18 @@ make_boot_run <- function(mod_path, boot_args){
   mod <- new_model(
     mod_path,
     .overwrite = boot_args$overwrite,
-    .tags = "BOOTSTRAP_RUN"
+    .tags = "BOOTSTRAP_RUN",
+    .based_on = boot_mod_path
   )
 
   # Overwrite $PROB and $DATA records
   modify_prob_statement(mod, prob)
   modify_data_path_ctl(mod, data_path_rel)
+
+  # Update table names if present
+  if(isTRUE(mod_has_record(mod, "table"))){
+    mod <- update_model_id(mod) %>% suppressMessages()
+  }
 
   # This message is mainly to indicate that the setup is not yet complete
   #  - The last sample may seem like it takes longer due to the creation

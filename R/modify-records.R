@@ -1,21 +1,25 @@
 #' Modify options and records from a `NONMEM` control stream file
-#' @param mod a bbr model object
+#' @param .mod a bbr model object
 #' @name modify_records
 #'
 #' @details
-#'  - `safe_read_ctl()` is called internally within the other functions, though
+#'  - **`safe_read_ctl()`** is called internally within the other functions, though
 #'  it can also be used outside of that context.
-#'  - The other functions will read in the control stream, make any modifications,
-#'  and then save out the updated control stream. `modify_prob_statement()` is
-#'  the only function that can _also_ optionally return a record option (see
-#'  `prob_text` argument).
+#'  - **`modify_prob_statement()`**, **`modify_data_path_ctl()`**, and
+#'   **`remove_records()`** read in the control stream, make any modifications,
+#'   and then save out the updated control stream.
+#'     - `modify_prob_statement()` also returns a character string defining the
+#'     `$PROBLEM` text (see `prob_text` argument).
+#' - **`mod_has_record()`** will return a logical value denoting whether a `bbr`
+#'   model has a given record type.
 NULL
 
 #' @describeIn modify_records Safely read in a `NONMEM` control stream file via
 #' `nmrec`
 #' @keywords internal
-safe_read_ctl <- function(mod){
-  mod_path <- get_model_path(mod)
+safe_read_ctl <- function(.mod){
+  check_model_object(.mod, c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))
+  mod_path <- get_model_path(.mod)
   ctl <- tryCatch(nmrec::read_ctl(mod_path), error = identity)
   if(inherits(ctl, "error")){
     warning(
@@ -29,13 +33,12 @@ safe_read_ctl <- function(mod){
 #' @describeIn modify_records Modify or retrieve the `$PROBLEM` statement from
 #' a `NONMEM` control stream file.
 #'
-#' @param prob_text If `NULL` return the current `$PROB` statement. If a
+#' @param prob_text If `NULL` return the current `$PROBLEM` statement. If a
 #'  character string, set the problem statement to that value.
-#'
 #' @keywords internal
-modify_prob_statement <- function(mod, prob_text = NULL){
-  mod_path <- get_model_path(mod)
-  ctl <- safe_read_ctl(mod)
+modify_prob_statement <- function(.mod, prob_text = NULL){
+  mod_path <- get_model_path(.mod)
+  ctl <- safe_read_ctl(.mod)
 
   prob_recs <- nmrec::select_records(ctl, "prob")
   if (length(prob_recs) != 1) {
@@ -79,8 +82,8 @@ modify_prob_statement <- function(mod, prob_text = NULL){
 #' @param data_path Data path to set in a `$DATA` record.
 #'
 #' @keywords internal
-modify_data_path_ctl <- function(mod, data_path){
-  ctl <- safe_read_ctl(mod)
+modify_data_path_ctl <- function(.mod, data_path){
+  ctl <- safe_read_ctl(.mod)
 
   # Get data record
   data_rec <- nmrec::select_records(ctl, "data")[[1]]
@@ -95,8 +98,9 @@ modify_data_path_ctl <- function(mod, data_path){
   })
 
   # Write out modified ctl
-  mod_path <- get_model_path(mod)
+  mod_path <- get_model_path(.mod)
   nmrec::write_ctl(ctl, mod_path)
+  return(invisible(TRUE))
 }
 
 
@@ -114,9 +118,9 @@ modify_data_path_ctl <- function(mod, data_path){
 #'  ```
 #'
 #' @keywords internal
-remove_records <- function(mod, type = c("covariance", "table")){
+remove_records <- function(.mod, type = c("covariance", "table")){
   type <- match.arg(type)
-  ctl <- safe_read_ctl(mod)
+  ctl <- safe_read_ctl(.mod)
 
   rec_indices <- seq_along(ctl$records)
   indices_remove <- purrr::keep(rec_indices, function(index){
@@ -129,7 +133,19 @@ remove_records <- function(mod, type = c("covariance", "table")){
   }
 
   # Write out modified ctl
-  mod_path <- get_model_path(mod)
+  mod_path <- get_model_path(.mod)
   nmrec::write_ctl(ctl, mod_path)
+  return(invisible(TRUE))
 }
 
+
+#' @describeIn modify_records Check if a `bbr` model has a given record type
+#' @keywords internal
+mod_has_record <- function(.mod, type = c("covariance", "table")){
+  type <- match.arg(type)
+  ctl <- safe_read_ctl(.mod)
+  recs <- nmrec::select_records(ctl, type)
+  has_rec <- !rlang::is_empty(recs)
+
+  return(has_rec)
+}
