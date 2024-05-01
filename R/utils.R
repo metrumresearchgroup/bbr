@@ -831,7 +831,8 @@ get_model_status.default <- function(.mod, max_print = 10, ...){
   checkmate::assert_number(max_print, lower = 1)
 
   if(inherits(.mod, "list") && !inherits(.mod, "bbi_model")){
-    check_model_object_list(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))
+    # Dont support mixed model lists (NM_MOD_CLASS & NMBOOT_MOD_CLASS)
+    check_model_object_list(.mod, .mod_types = c(NM_MOD_CLASS))
     mod_ids <- purrr::map_chr(.mod, get_model_id)
   }else{
     check_model_object(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))
@@ -849,7 +850,7 @@ get_model_status.default <- function(.mod, max_print = 10, ...){
 
   # Use implementation function to avoid returning TRUE for non-submitted models,
   # as that is misleading
-  res <- purrr::map_lgl(.mod, check_nonmem_finished) %>% tibble::as_tibble() %>%
+  res <- purrr::map_lgl(.mod, nonmem_finished_impl) %>% tibble::as_tibble() %>%
     dplyr::transmute(model_id = mod_ids, finished = .data$value)
 
   res_fin <- res$model_id[res$finished]

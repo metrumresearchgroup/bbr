@@ -122,7 +122,7 @@ setup_bootstrap_run <- function(
     if(isTRUE(can_be_joined)){
       starting_data <- nm_join(orig_mod) %>% suppressMessages()
     }else{
-      rlang::warn(
+      rlang::inform(
         paste(
           "Defaulting to input data, which may include data that doesn't enter",
           "the final problem (i.e. ignored subjects)"
@@ -456,7 +456,8 @@ summarize_bootstrap_run <- function(
 }
 
 
-#' @describeIn summarize_bootstrap Tabulate parameter estimates for each model submission in a bootstrap run
+#' @describeIn summarize_bootstrap Tabulate parameter estimates for each model
+#'  submission in a bootstrap run
 #' @param format_long logical (T/F). If `TRUE`, format data as a long table,
 #'  making the data more portable for plotting.
 #' @export
@@ -556,12 +557,14 @@ get_boot_models <- function(.boot_run){
     }
   )
 
+  # This shouldnt happen, but could if the directory existed and models
+  # referenced in the spec file aren't found for any reason _other than_
+  # cleaning up the run
   if(is.null(boot_models) || rlang::is_empty(boot_models)){
     boot_dir <- .boot_run[[ABS_MOD_PATH]]
     rlang::warn(
       c(
-        glue("At least one bootstrap run model does not exist in `{boot_dir}`."),
-        "Did you forget to run `setup_bootstrap_run()`?"
+        glue("At least one bootstrap run model does not exist in `{boot_dir}`")
       )
     )
   }

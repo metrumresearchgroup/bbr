@@ -328,7 +328,7 @@ print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
     purrr::walk(paste(x$estimation_method, "\n"), cli::cat_bullet, bullet = "en_dash")
   }
 
-  cli::cat_line("Run Summary:\n")
+  cli::cat_line("Run Status:\n")
   n_samples <- c("Number of runs" = x$n_samples)
   cli::cat_bullet(paste("Number of runs:", col_blue(x$n_samples)), bullet = "en_dash")
 
@@ -349,7 +349,7 @@ print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
     )
     cat("\n")
   } else {
-    cat_line("\n\n")
+    cat_line("\n")
   }
 
   if (only_sim) {
@@ -374,9 +374,6 @@ print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
       param_str <- param_df %>%
         knitr::kable() %>%
         as.character()
-
-      # add color for shrinkage
-      param_str <- map_chr(param_str, highlight_cell, .i = 5, .threshold = 30)
     } else {
       param_str <- param_df %>%
         print() %>%

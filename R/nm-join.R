@@ -252,8 +252,8 @@ can_be_nm_joined <- function(.mod){
   }
 
   if(isFALSE(is_finished) || isFALSE(has_tables)){
-    reasons_txt <- paste0("- ", reasons, collapse = "\n")
-    rlang::warn(
+    reasons_txt <- paste0(" - ", reasons, collapse = "\n")
+    rlang::inform(
       c(
         "`nm_join()` cannot be used to join model output and input data",
         "i"="Reasons:",
