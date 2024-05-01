@@ -43,7 +43,9 @@ submit_batch_callr <- function (
     error = "error",
     stdout = stdout_path,
     stderr = "2>&1",
-    package = "bbr"
+    package = "bbr",
+    supervise = FALSE,
+    cleanup = FALSE
   )
 }
 
