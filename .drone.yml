@@ -352,5 +352,5 @@ trigger:
 
 depends_on:
 - mpn:latest
-- oldest
+# - oldest
 - cran-latest
