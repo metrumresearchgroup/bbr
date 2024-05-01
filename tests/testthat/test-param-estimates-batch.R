@@ -161,7 +161,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
     # note: this is only true because of the jitter we specify
     expect_equal(
-      res$original_estimate,
+      res$original,
       res$p50
     )
   })
