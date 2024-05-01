@@ -234,13 +234,6 @@ make_boot_run <- function(mod_path, boot_args){
     mod <- update_model_id(mod) %>% suppressMessages()
   }
 
-  # This message is mainly to indicate that the setup is not yet complete
-  #  - The last sample may seem like it takes longer due to the creation
-  # of the spec file (can take 5-10 seconds depending on the number of runs)
-  if(new_mod_index == length(boot_args$all_mod_names)){
-    verbose_msg("Finishing up...")
-  }
-
   return(mod)
 }
 
@@ -289,10 +282,8 @@ make_boot_spec <- function(boot_models, boot_args){
 
   boot_run_spec <- purrr::map(boot_models, function(boot_run){
     list(
-      problem = modify_prob_statement(boot_run),
       mod_path = get_model_path(boot_run) %>% fs::path_rel(boot_dir),
-      yaml_path = get_yaml_path(boot_run) %>% fs::path_rel(boot_dir),
-      data_path = get_data_path(boot_run) %>% fs::path_rel(boot_dir)
+      yaml_path = get_yaml_path(boot_run) %>% fs::path_rel(boot_dir)
     )
   }) %>% stats::setNames(boot_run_ids)
 
@@ -540,11 +531,19 @@ get_boot_models <- function(.boot_run){
     .boot_run <- read_model(.boot_run[[ABS_MOD_PATH]])
   }
 
+  output_dir <- get_output_dir(.boot_run, .check_exists = FALSE)
+  if(!fs::file_exists(output_dir)){
+    verbose_msg(
+      glue("Bootstrap run `{get_model_id(.boot_run)}` has not been set up.")
+    )
+    return(invisible(NULL))
+  }
+
   if(bootstrap_is_cleaned_up(.boot_run)){
     verbose_msg(
       glue("Bootstrap run `{get_model_id(.boot_run)}` has been cleaned up.")
     )
-    return(NULL)
+    return(invisible(NULL))
   }
 
   boot_spec <- get_boot_spec(.boot_run)
