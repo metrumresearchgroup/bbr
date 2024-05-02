@@ -121,6 +121,15 @@ setup_bootstrap_run <- function(
     can_be_joined <- can_be_nm_joined(orig_mod)
     if(isTRUE(can_be_joined)){
       starting_data <- nm_join(orig_mod) %>% suppressMessages()
+
+      # select only columns from original data set
+      starting_data <- starting_data %>%
+        dplyr::select(attr(starting_data, "nm_join_origin")$data)
+
+      if ("DV.DATA" %in% names(starting_data)) {
+        starting_data <- dplyr::rename(starting_data, "DV" = "DV.DATA")
+      }
+
     }else{
       rlang::inform(
         paste(
