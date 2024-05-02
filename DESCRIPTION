@@ -52,6 +52,7 @@ BugReports: https://github.com/metrumresearchgroup/bbr/issues
 Depends:
     R (>= 3.5)
 Imports: 
+    callr,
     checkmate,
     cli,
     data.table,

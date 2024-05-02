@@ -7,6 +7,7 @@
 #' accessible in the background process, which is not an issue when the package
 #' is installed.
 #' @inheritParams submit_model
+#' @importFrom callr r_bg
 #' @param stdout_path Path to a write stdout and stderr from the background
 #'   process
 #' @noRd
