@@ -36,7 +36,8 @@ submit_model(
   .overwrite = NULL,
   .config_path = NULL,
   .wait = FALSE,
-  .dry_run = FALSE
+  .dry_run = FALSE,
+  .batch_size = 100
 )
 }
 \arguments{
@@ -69,6 +70,13 @@ bbi process runs in the background.}
 \item{.dry_run}{Returns an object detailing the command that would be run,
 insted of running it. This is primarily for testing but also a debugging
 tool.}
+
+\item{.batch_size}{Number of models to submit to run concurrently as a
+"batch." Passing \code{NULL} (or a number larger than the number of submitted
+models) will bypass this and submit all models concurrently. This will
+launch a background process to manage the batch submission. Details from
+this process are logged in the \code{OUTPUT} file in top-level bootstrap model
+directory.}
 }
 \value{
 While \code{submit_model()} \emph{does} return something, it is primarily
