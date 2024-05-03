@@ -91,10 +91,10 @@ initial_estimates <- function(.mod, flag_fixed = FALSE){
 get_initial_est <- function(.mod, flag_fixed = FALSE){
 
   test_nmrec_version(.min_version = "0.4.0")
-  check_model_object(.mod, "bbi_nonmem_model")
+  check_model_object(.mod, c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))
 
 
-  ctl <- nmrec::read_ctl(get_model_path(.mod))
+  ctl <- safe_read_ctl(.mod)
 
   if (isTRUE(using_old_priors(ctl))) {
     rlang::warn(

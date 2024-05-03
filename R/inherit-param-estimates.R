@@ -62,7 +62,11 @@ inherit_param_estimates <- function(
   check_model_object(.mod, c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))
   checkmate::assert_true(all(inherit %in% BBR_ESTIMATES_INHERIT))
 
-  if(!inherits(.parent_mod, c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))){
+  if(inherits(.parent_mod, c(NMBOOT_MOD_CLASS))){
+    rlang::abort(glue("Cannot inherit estimates from a {NMBOOT_MOD_CLASS} object"))
+  }
+
+  if(!inherits(.parent_mod, c(NM_MOD_CLASS))){
     # Confirm .parent_mod path is valid
     validate_parent_mod(.parent_mod)
     .parent_mod <- read_model(.parent_mod)
