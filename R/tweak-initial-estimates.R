@@ -4,8 +4,8 @@
 #' @param .mod model object to update.
 #' @param .p Percent to tweak the initial parameter estimates by. Represented as
 #'   a decimal.
-#' @param tweak type of estimates to tweak in the model. Only `"theta"` is
-#'   currently supported, though `"omega"` and `"sigma"` will be options at a later date.
+#' @param tweak type of estimates to tweak in the model. Defaults to
+#'   updating all of THETA, SIGMA, and OMEGA records.
 #' @param digits Number of significant digits to round estimates to.
 #'
 #' @details
@@ -13,6 +13,10 @@
 #' In the following cases, the initial estimate will *not* be updated:
 #'  - **Individual** `FIXED` `THETA` parameters
 #'     - e.g., `$THETA 1.2 FIX 1.5 0.2` --> would only skip the first value
+#'  - **Individual** `FIXED` `OMEGA` & `SIGMA` parameters for *diagonal* matrices
+#'     - e.g., `$OMEGA 0 FIX 1` --> would only skip the first value
+#'  - **Full** `FIXED` `OMEGA` & `SIGMA` *block* matrices
+#'     - e.g., `$OMEGA BLOCK(2) 0.1 0.001 0.1 FIX` --> would skip the full `OMEGA` record
 #'  - `THETA` parameters with no initial estimate
 #'     - e.g., `$THETA (0,,1)`
 #'
@@ -49,7 +53,7 @@
 tweak_initial_estimates <- function(
     .mod,
     .p = 0.1,
-    tweak = c("theta"),
+    tweak = c("theta", "omega", "sigma"),
     digits = 3
 ){
 
@@ -84,6 +88,29 @@ tweak_initial_estimates <- function(
     )
   }
 
+  if("omega" %in% tweak && !rlang::is_empty(initial_est$omegas)){
+    # Set key attributes
+    attr(initial_est$omegas, "record_type") <- "omega"
+    # Tweak OMEGA
+    new_omegas <- tweak_matrix(init_mat = initial_est$omegas, .p, digits)
+    # Update OMEGA Block
+    nmrec::set_omega(
+      mod_lines, values = new_omegas, representation = "reset",
+      fmt = fmt_digits
+    )
+  }
+
+  if("sigma" %in% tweak && !rlang::is_empty(initial_est$sigmas)){
+    # Set key attributes
+    attr(initial_est$sigmas, "record_type") <- "sigma"
+    # Tweak SIGMA
+    new_sigmas <- tweak_matrix(init_mat = initial_est$sigmas, .p, digits)
+    # Update SIGMA Block
+    nmrec::set_sigma(
+      mod_lines, values = new_sigmas, representation = "reset",
+      fmt = fmt_digits
+    )
+  }
 
   # Write out mod_lines to model
   nmrec::write_ctl(mod_lines, mod_path)
@@ -194,4 +221,47 @@ tweak_thetas <- function(init_thetas, .p, digits){
   new_thetas <- init_thetas_adj$new %>% signif(digits)
 
   return(new_thetas)
+}
+
+
+#' Tweak an `OMEGA` or `SIGMA` record
+#'
+#' @param init_mat matrix of initial `OMEGA` or `SIGMA` estimates. Should include
+#' several attributes, including `nmrec_flags` and `nmrec_record_size`.
+#'
+#' @keywords internal
+tweak_matrix <- function(init_mat, .p, digits){
+  # Determine which values we dont want to change (usually just `FIXED`)
+  fixed_mat <- attr(init_mat, "nmrec_flags")$fixed
+  fixed_mat[is.na(fixed_mat)] <- TRUE
+  new_values <- init_mat[!fixed_mat]
+
+  # Tweak values
+  new_values <- withr::with_preserve_seed(tweak_values(new_values, .p))
+  new_mat <- init_mat
+  new_mat[!fixed_mat] <- new_values %>% signif(digits)
+
+  # Check for positive-definiteness
+  new_mat <- validate_matrix_pd(new_mat, digits)
+
+  # If matrix cannot be made to be positive-definite with specified digits,
+  # reset to original matrix and warn
+  if(is.null(new_mat)){
+    record_type <- attr(full_mat, "record_type")
+    rlang::warn(
+      c(
+        "!" = paste(
+          glue("Tweaked {record_type} record(s) could not be made positive-definite"),
+          "while respecting the user-specified `digits`."
+        ),
+        "i" = paste(
+          "Resetting to original matrix.",
+          "Consider increasing `digits`, or not tweaking this record type."
+        )
+      )
+    )
+    new_mat <- init_mat
+  }
+
+  return(new_mat)
 }
