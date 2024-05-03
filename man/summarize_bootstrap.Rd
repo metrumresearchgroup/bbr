@@ -64,7 +64,8 @@ control (see \code{cleanup_bootstrap_run()}).
 \itemize{
 \item \code{summarize_bootstrap_run()}: Summarize a bootstrap run and store results
 
-\item \code{bootstrap_estimates()}: Tabulate parameter estimates for each model submission in a bootstrap run
+\item \code{bootstrap_estimates()}: Tabulate parameter estimates for each model
+submission in a bootstrap run
 
 \item \code{get_boot_models()}: Read in all bootstrap run model objects
 

@@ -19,7 +19,7 @@ new_bootstrap_run <- function(
     remove_tables = TRUE
 ){
 
-  checkmate::assert_class(.mod, NM_MOD_CLASS)
+  check_model_object(.mod, NM_MOD_CLASS)
 
   model_dir <- get_model_working_directory(.mod)
   boot_dir <- glue("{get_model_id(.mod)}-{.suffix}")
@@ -89,7 +89,7 @@ setup_bootstrap_run <- function(
     .overwrite = FALSE
 ){
   # TODO: make sure all _relevant_ resample_df args are part of this function
-  checkmate::assert_class(.boot_run, NMBOOT_MOD_CLASS)
+  check_model_object(.boot_run, NMBOOT_MOD_CLASS)
   checkmate::assert_number(n, lower = 1)
   checkmate::assert_number(seed)
 
@@ -563,8 +563,12 @@ get_boot_models <- function(.boot_run){
   boot_models <- tryCatch(
     purrr::map(boot_spec$bootstrap_runs$mod_path_abs, read_model),
     error = function(cond){
+      # Suppress 'does not exist' message - handle separately
       if(stringr::str_detect(cond$parent$message, "does not exist")){
         return(NULL)
+      }else{
+        # Likely would only happen if there was a bbi/submission issue
+        message(cond$parent$message)
       }
     }
   )
