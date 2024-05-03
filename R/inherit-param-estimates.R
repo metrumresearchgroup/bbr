@@ -59,10 +59,10 @@ inherit_param_estimates <- function(
 
   bounds <- match.arg(bounds)
 
-  check_model_object(.mod, "bbi_nonmem_model")
+  check_model_object(.mod, c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))
   checkmate::assert_true(all(inherit %in% BBR_ESTIMATES_INHERIT))
 
-  if(!inherits(.parent_mod, "bbi_nonmem_model")){
+  if(!inherits(.parent_mod, c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))){
     # Confirm .parent_mod path is valid
     validate_parent_mod(.parent_mod)
     .parent_mod <- read_model(.parent_mod)

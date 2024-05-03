@@ -613,6 +613,7 @@ cleanup_bootstrap_run <- function(.boot_run){
   check_model_object(.boot_run, NMBOOT_MOD_CLASS)
   boot_dir <- .boot_run[[ABS_MOD_PATH]]
   boot_sum_path <- file.path(boot_dir, "boot_summary.RDS")
+  boot_data_dir <- file.path(boot_dir, "data")
 
   if(!bootstrap_is_finished(.boot_run)){
     rlang::abort(
@@ -643,7 +644,7 @@ cleanup_bootstrap_run <- function(.boot_run){
   boot_spec$bootstrap_spec$cleaned_up <- TRUE
   # Delete individual run specs
   # - dont need to store this information anymore since we wont be reading in
-  #   individual models
+  #   individual models anymore
   boot_spec$bootstrap_runs <- NULL
   spec_lst_json <- jsonlite::toJSON(boot_spec, pretty = TRUE, simplifyVector = TRUE)
 
@@ -651,9 +652,10 @@ cleanup_bootstrap_run <- function(.boot_run){
   boot_models <- get_boot_models(.boot_run)
   delete_models(boot_models, .tags = "BOOTSTRAP_RUN")
 
-  # Save out updated spec only if the user says 'yes'
+  # Save out updated spec and delete data directory only if the user says 'yes'
   if(!bootstrap_is_finished(.boot_run)){
     writeLines(spec_lst_json, spec_path)
+    if(fs::dir_exists(boot_data_dir)) fs::dir_delete(boot_data_dir)
     message(glue("Bootstrap run `{get_model_id(.boot_run)}` has been cleaned up"))
   }
 }
