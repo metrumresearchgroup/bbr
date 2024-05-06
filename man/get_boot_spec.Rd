@@ -2,16 +2,18 @@
 % Please edit documentation in R/get-path-from-object.R
 \name{get_boot_spec}
 \alias{get_boot_spec}
-\title{Tabulate all relevant \code{bbi_nonmem_model} model files from a bootstrap control
-stream file.}
+\title{Read in and format the bootstrap specification file.}
 \usage{
 get_boot_spec(.boot_run)
 }
 \arguments{
 \item{.boot_run}{Either a \code{bbi_nmboot_model} or \code{bbi_nmboot_summary} object}
 }
+\value{
+a list
+}
 \description{
-Tabulate all relevant \code{bbi_nonmem_model} model files from a bootstrap control
-stream file.
+Tabulates all relevant \code{bbi_nonmem_model} model files from a bootstrap
+specification file.
 }
 \keyword{internal}

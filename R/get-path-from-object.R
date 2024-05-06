@@ -649,9 +649,12 @@ find_nonmem_model_file_path <- function(.path, .check_exists = TRUE) {
 }
 
 
-#' Tabulate all relevant `bbi_nonmem_model` model files from a bootstrap control
-#' stream file.
+#' Read in and format the bootstrap specification file.
+#'
+#' Tabulates all relevant `bbi_nonmem_model` model files from a bootstrap
+#' specification file.
 #' @param .boot_run Either a `bbi_nmboot_model` or `bbi_nmboot_summary` object
+#' @returns a list
 #' @keywords internal
 get_boot_spec <- function(.boot_run){
   check_model_object(.boot_run, c(NMBOOT_MOD_CLASS, NMBOOT_SUM_CLASS))
