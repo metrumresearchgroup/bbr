@@ -143,12 +143,15 @@ withr::with_options(
       ignore_lines <- readLines(file.path(boot_dir, ".gitignore"))
       expect_true(all(c("*.ctl", "*.mod", "*.yaml", "/data") %in% ignore_lines))
       expect_true(all(paste0("/", ignored_mods) %in% ignore_lines))
+    })
 
+    test_that("setup_bootstrap_run works with stratification columns", {
       # Test stratification columns
-      orig_data <- fread(get_data_path(.boot_run), na.strings = ".", verbose = FALSE) %>% as_tibble()
+      orig_data <- fread(get_data_path(.boot_run), na.strings = ".", verbose = FALSE) %>%
+        as_tibble()
       names(orig_data) <- toupper(names(orig_data))
       setup_bootstrap_run(
-        .boot_run, n = 3, strat_cols = c("SEX", "ETN"), .overwrite = TRUE,
+        .boot_run, n = 4, strat_cols = c("SEX", "ETN"), .overwrite = TRUE,
         seed = 1234
       )
       # Pull in one of the sample datasets
@@ -176,14 +179,22 @@ withr::with_options(
     })
 
     test_that("submitting bootstrap model objects works", {
+
       # These calls wont use batch submission since .batch_size < length(boot_models)
-      expect_message(
-        submit_model(.boot_run, .mode = "local", .wait = TRUE),
-        "Inheriting `bbi.yaml`", fixed = TRUE
-      )
-      # Delete bbi.yaml at end to support re-running this test locally
-      bbi_yaml_path <- file.path(boot_dir, "bbi.yaml")
-      on.exit(fs::file_delete(bbi_yaml_path), add = TRUE)
+      # - decrease batch size to test batch submission
+      withr::with_envvar(new = c("BBR_DEV_LOAD_PATH" = getwd()), {
+        expect_message(
+          proc <- submit_model(.boot_run, .mode = "local", .wait = TRUE, .batch_size = 2),
+          "submitting 4 models in batches of 2", fixed = TRUE
+        )
+        wait_for_nonmem(.boot_run)
+        expect_true(
+          any(grepl(
+            "The following model(s) have finished: `1, 2, 3, 4`",
+            readLines(proc$get_output_file()), fixed = TRUE
+          ))
+        )
+      })
 
       # Check helper functions after submission & before summarization
       expect_no_message(boot_models <- get_boot_models(.boot_run))
