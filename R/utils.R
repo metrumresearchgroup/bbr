@@ -697,7 +697,7 @@ check_nonmem_finished.bbi_nmboot_model <- function(.mod, ...) {
   }
   boot_models <- get_boot_models(.mod)
   output_dirs <- purrr::map_chr(boot_models, get_output_dir, .check_exists = FALSE)
-  if(any(!fs::dir_exists(output_dirs))){
+  if(!any(fs::dir_exists(output_dirs))){
     verbose_msg("Bootstran run has not been submitted")
     return(invisible(TRUE))
   }
