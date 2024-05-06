@@ -142,7 +142,7 @@ get_config_path.bbi_log_df <- function(.bbi_object, .check_exists = TRUE) {
 }
 
 
-#' Get the bootsrap specification file
+#' Get the bootstrap specification file path
 #'
 #' @param .mod a `bbi_nmboot_model` model object.
 #' @param .check_exists If `TRUE`, the default, will throw an error if the file
