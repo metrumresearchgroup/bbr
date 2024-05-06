@@ -188,10 +188,12 @@ withr::with_options(
           "submitting 4 models in batches of 2", fixed = TRUE
         )
         wait_for_nonmem(.boot_run)
+        proc_output <- proc$get_output_file()
+        on.exit(fs::file_delete(proc_output), add = TRUE)
         expect_true(
           any(grepl(
             "The following model(s) have finished: `1, 2, 3, 4`",
-            readLines(proc$get_output_file()), fixed = TRUE
+            readLines(proc_output), fixed = TRUE
           ))
         )
       })
@@ -200,7 +202,7 @@ withr::with_options(
       expect_no_message(boot_models <- get_boot_models(.boot_run))
       expect_message(
         get_model_status(.boot_run, max_print = 1),
-        "3 model(s) have finished", fixed = TRUE
+        "4 model(s) have finished", fixed = TRUE
       )
       expect_true(check_nonmem_finished(.boot_run))
       expect_true(all(check_nonmem_finished(boot_models)))
@@ -243,7 +245,7 @@ withr::with_options(
       expect_true(all.equal(boot_sum$run_heuristics, run_heuristics))
 
       # Check run variables
-      expect_equal(boot_sum$n_samples, 3)
+      expect_equal(boot_sum$n_samples, 4)
       expect_equal(boot_sum$seed, 1234)
       expect_equal(boot_sum$strat_cols, c("SEX", "ETN"))
       expect_equal(boot_sum[[ABS_MOD_PATH]], boot_dir)
@@ -288,7 +290,7 @@ withr::with_options(
 
       # Check model/data file existence
       files_kept <- fs::dir_ls(boot_dir, all = TRUE) %>% fs::path_rel(boot_dir)
-      expect_equal(files_kept, c(".gitignore", "bbr_boot_spec.json", "boot_summary.RDS"))
+      expect_equal(files_kept, c(".gitignore", "bbi.yaml", "bbr_boot_spec.json", "boot_summary.RDS"))
 
       # Confirm boot spec alterations
       boot_spec <- get_boot_spec(.boot_run)
