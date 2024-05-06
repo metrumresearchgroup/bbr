@@ -160,6 +160,7 @@ setup_bootstrap_run <- function(
     )
 
     # Create model object per boot run
+    if(!is.null(seed)) withr::local_seed(seed)
     boot_models <- purrr::map(mod_paths, make_boot_run, boot_args)
     make_boot_spec(boot_models, boot_args)
 
@@ -205,7 +206,6 @@ make_boot_run <- function(mod_path, boot_args){
 
 
   # Sample data and assign new IDs
-  if(!is.null(boot_args$seed)) withr::local_seed(boot_args$seed)
   data_new <- mrgmisc::resample_df(
     boot_args$orig_data,
     key_cols = "ID", # TODO: should this be a user arg?
