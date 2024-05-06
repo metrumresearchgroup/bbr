@@ -19,7 +19,7 @@ setup_bootstrap_run(
 
 \item{strat_cols}{columns to maintain proportion for stratification}
 
-\item{seed}{a seed for sampling the data}
+\item{seed}{a seed for sampling the data. Set to \code{NULL} to avoid setting.}
 
 \item{.overwrite}{logical (T/F) indicating whether or not to overwrite existing
 setup for a bootstrap run.}

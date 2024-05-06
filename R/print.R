@@ -299,22 +299,20 @@ print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
 
   # Run specifications (seed, stratification columns, cleaned_up)
   cli_h1("Run Specifications")
-  strat_cols <- if(rlang::is_empty(x$strat_cols)){
-    "None"
-  }else{
-    paste(x$strat_cols, collapse = ", ")
-  }
+
+  strat_cols <- if(is.null(x$strat_cols)) "None" else paste(x$strat_cols, collapse = ", ")
   names(strat_cols) <- "Stratification Columns"
 
-  seed <- c("Seed" = x$seed)
+  seed <- if(is.null(x$seed)) "None" else x$seed
+  names(seed) <- "Seed"
 
-  if(isTRUE(bootstrap_is_cleaned_up(x))){
-    run_specs <- c(strat_cols, seed, c("Cleaned up" = TRUE))
-  }else{
-    run_specs <- c(strat_cols, seed)
-  }
-
+  run_specs <- c(strat_cols, seed)
   iwalk(run_specs, ~ cat_bullet(paste0(.y, ": ", col_blue(.x))))
+
+  # Add bullet if cleaned up
+  if(isTRUE(bootstrap_is_cleaned_up(x))){
+    cli::cat_bullet(paste("Cleaned up:", col_green(TRUE)))
+  }
 
   # Bootstrap run summary (n_samples, any heuristics)
   cli_h1("Bootstrap Run Summary")

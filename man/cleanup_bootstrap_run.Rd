@@ -4,10 +4,12 @@
 \alias{cleanup_bootstrap_run}
 \title{Cleanup bootstrap run directory}
 \usage{
-cleanup_bootstrap_run(.boot_run)
+cleanup_bootstrap_run(.boot_run, .force = FALSE)
 }
 \arguments{
 \item{.boot_run}{a \code{bbi_nmboot_model} object.}
+
+\item{.force}{logical (T/F). If \code{TRUE}, do not prompt the user if they want to delete the models.}
 }
 \description{
 This will delete all child models, and only keep the information

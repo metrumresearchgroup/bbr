@@ -124,7 +124,7 @@ submit_model.bbi_nmboot_model <- function(
   bbi_yaml_path <- file.path(model_dir, "bbi.yaml")
   if(fs::file_exists(bbi_yaml_path) && !fs::file_exists(file.path(boot_dir, "bbi.yaml"))){
     fs::file_copy(bbi_yaml_path, file.path(boot_dir, "bbi.yaml"))
-    verbose_msg(glue("Inheriting `bbi.yaml` from `{model_dir}`"))
+    rlang::inform(glue("Inheriting `bbi.yaml` from `{model_dir}`"))
   }
 
   boot_models <- get_boot_models(.mod)

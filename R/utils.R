@@ -774,7 +774,7 @@ wait_for_nonmem.default <- function(.mod, .time_limit = 300, .interval = 5) {
   expiration <- Sys.time() + .time_limit
   n_interval <- 0
   while ((expiration - Sys.time()) > 0) {
-    res <- check_nonmem_finished(.mod)
+    res <- check_nonmem_finished(.mod) %>% suppressMessages()
     if (all(res)) {
       break
     }else{
@@ -787,8 +787,9 @@ wait_for_nonmem.default <- function(.mod, .time_limit = 300, .interval = 5) {
     Sys.sleep(.interval)
   }
 
-  if(expiration < Sys.time() && !all(check_nonmem_finished(.mod))){
-    res <- check_nonmem_finished(.mod)
+  all_finished <- check_nonmem_finished(.mod) %>% suppressMessages() %>% all()
+  if(expiration < Sys.time() && !all_finished){
+    res <- check_nonmem_finished(.mod) %>% suppressMessages()
     warning(glue("Expiration was reached, but {length(res[!res])} model(s) haven't finished"),
             call. = FALSE, immediate. = TRUE)
   }else{

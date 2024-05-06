@@ -61,7 +61,7 @@ new_bootstrap_run <- function(
 #' @param .boot_run a `bbi_nmboot_model` object.
 #' @param n number of model runs.
 #' @param strat_cols columns to maintain proportion for stratification
-#' @param seed a seed for sampling the data
+#' @param seed a seed for sampling the data. Set to `NULL` to avoid setting.
 #' @param .overwrite logical (T/F) indicating whether or not to overwrite existing
 #'  setup for a bootstrap run.
 #'
@@ -88,10 +88,9 @@ setup_bootstrap_run <- function(
     seed = 1234,
     .overwrite = FALSE
 ){
-  # TODO: make sure all _relevant_ resample_df args are part of this function
   check_model_object(.boot_run, NMBOOT_MOD_CLASS)
   checkmate::assert_number(n, lower = 1)
-  checkmate::assert_number(seed)
+  checkmate::assert_number(seed, null.ok = TRUE)
 
   boot_dir <- get_output_dir(.boot_run, .check_exists = FALSE)
   boot_data_dir <- file.path(boot_dir, "data")
@@ -206,13 +205,14 @@ make_boot_run <- function(mod_path, boot_args){
 
 
   # Sample data and assign new IDs
-  data_new <- resample_df(
+  if(!is.null(boot_args$seed)) withr::local_seed(boot_args$seed)
+  data_new <- mrgmisc::resample_df(
     boot_args$orig_data,
     key_cols = "ID", # TODO: should this be a user arg?
     strat_cols = boot_args$strat_cols,
     replace = TRUE
   ) %>% dplyr::rename("OID" = "ID", "ID" = "KEY") %>% # TODO: should this be a user arg?
-    dplyr::select(all_of(unique(c(names(boot_args$orig_data), "OID")))) # TODO: should this be a user arg?
+    dplyr::select(all_of(unique(c(names(boot_args$orig_data), "OID"))))
 
   mod_name <- basename(mod_path)
   orig_mod_id <- boot_args$orig_mod_id
@@ -304,7 +304,9 @@ make_boot_spec <- function(boot_models, boot_args){
     bootstrap_runs = list(boot_run_spec)
   )
 
-  spec_lst_json <- jsonlite::toJSON(spec_lst, pretty = TRUE, simplifyVector = TRUE)
+  spec_lst_json <- jsonlite::toJSON(
+    spec_lst, pretty = TRUE, simplifyVector = TRUE, null = "null"
+  )
   writeLines(spec_lst_json, json_path)
   return(invisible(json_path))
 }
@@ -396,7 +398,7 @@ summarize_bootstrap_run <- function(
     # Tabulate all run details and heuristics
     run_details <- purrr::map_dfr(boot_sum_log$bbi_summary, function(sum){
       as_tibble(
-        c(list2(!!ABS_MOD_PATH := sum[[ABS_MOD_PATH]]), sum$run_details)
+        c(list2(!!ABS_MOD_PATH := sum[[ABS_MOD_PATH]]), sum[[SUMMARY_DETAILS]])
       ) %>% tidyr::nest("output_files_used" = "output_files_used")
     })
 
@@ -564,12 +566,11 @@ get_boot_models <- function(.boot_run){
     purrr::map(boot_spec$bootstrap_runs$mod_path_abs, read_model),
     error = function(cond){
       # Suppress 'does not exist' message - handle separately
-      if(stringr::str_detect(cond$parent$message, "does not exist")){
-        return(NULL)
-      }else{
+      if(!stringr::str_detect(cond$parent$message, "does not exist")){
         # Likely would only happen if there was a bbi/submission issue
         message(cond$parent$message)
       }
+      return(NULL)
     }
   )
 
@@ -610,10 +611,11 @@ get_boot_models <- function(.boot_run){
 #' }
 #'
 #' @inheritParams setup_bootstrap_run
+#' @inheritParams delete_models
 #' @seealso summarize_bootstrap_run
 #'
 #' @export
-cleanup_bootstrap_run <- function(.boot_run){
+cleanup_bootstrap_run <- function(.boot_run, .force = FALSE){
   check_model_object(.boot_run, NMBOOT_MOD_CLASS)
   boot_dir <- .boot_run[[ABS_MOD_PATH]]
   boot_sum_path <- file.path(boot_dir, "boot_summary.RDS")
@@ -638,7 +640,7 @@ cleanup_bootstrap_run <- function(.boot_run){
   }
 
   if(bootstrap_is_cleaned_up(.boot_run)){
-    rlang::abort("Bootstrap run has already been cleaned")
+    rlang::abort("Bootstrap run has already been cleaned up")
   }
 
   # Overwrite spec file
@@ -654,7 +656,7 @@ cleanup_bootstrap_run <- function(.boot_run){
 
   # Delete individual model files
   boot_models <- get_boot_models(.boot_run)
-  delete_models(boot_models, .tags = "BOOTSTRAP_RUN")
+  delete_models(boot_models, .tags = "BOOTSTRAP_RUN", .force = .force)
 
   # Save out updated spec and delete data directory only if the user says 'yes'
   if(!bootstrap_is_finished(.boot_run)){
@@ -664,99 +666,6 @@ cleanup_bootstrap_run <- function(.boot_run){
   }
 }
 
-
-
-### Resampling functions ###
-# TODO: delete these functions at the end before merging
-# TODO: make sure this behaves how we want it to
-# If we make notable edits, update mrgmisc
-
-
-#' Resample data
-#'
-#' @param df data frame
-#' @param key_cols key columns to resample on
-#' @param strat_cols columns to maintain proportion for stratification
-#' @param n number of unique sampled keys, defaults to match dataset
-#' @param key_col_name name of outputted key column. Default to "KEY"
-#' @param replace whether to stratify with replacement
-#'
-#' @keywords internal
-resample_df <- function(df,
-                        key_cols,
-                        strat_cols = NULL,
-                        n = NULL,
-                        key_col_name = "KEY",
-                        replace = TRUE) {
-
-  names <- c(key_col_name, names(df))
-  key <- get_key(df, key_cols)
-  if(is.null(n)) n <- nrow(key)
-
-  if(is.null(strat_cols)) {
-    sample <- dplyr::sample_n(key, size = n, replace=replace)
-    sample[[key_col_name]] <- 1:n
-  } else {
-    strat_key <- get_key(df, c(key_cols, strat_cols))
-    if(nrow(strat_key) != nrow(key)) {
-      warning(
-        paste("Non-unique keys introduced from stratification. Check that",
-              "all keys only have one stratification variable associated")
-      )
-    }
-    sample <- stratify_df(strat_key, strat_cols, n, replace = replace)
-    # drop strat cols so won't possibly mangle later left join
-    sample <- dplyr::ungroup(sample)
-    sample <- sample[, key_cols, drop=F]
-    sample[[key_col_name]] <- 1:nrow(sample)
-  }
-  resampled_df <- dplyr::left_join(sample, df, by = key_cols)
-
-
-  # reorder columns to match original df with key column appended
-  return(resampled_df[,names, drop=F])
-}
-
-#' Stratify dataframe based on some columns
-#'
-#' @param df dataframe
-#' @param strat_cols columns to stratify on
-#' @param n number of samples
-#' @param replace whether to resample with replacement
-#' @noRd
-stratify_df <- function(df,
-                        strat_cols,
-                        n,
-                        replace = TRUE
-) {
-  frac <- n/nrow(df)
-  sample <- df %>% dplyr::group_by(!!!rlang::syms(strat_cols)) %>%
-    dplyr::sample_frac(frac, replace=replace)
-
-  nsample <- nrow(sample)
-  nleft <- n - nsample
-  if(nleft != 0) {
-    if(nleft > 0){
-      extras <- dplyr::sample_n(df, size = nleft)
-      sample <- dplyr::bind_rows(sample, extras)
-    }else{
-      removals <- sample.int(nsample, abs(nleft))
-      sample <- sample[-removals,]
-    }
-  }
-  return(sample)
-}
-
-#' Find unique values for key
-#' @param df data frame
-#' @param key_cols vector of column names. Defaults to all columns
-#' @noRd
-get_key <- function(df, key_cols = names(df)) {
-  # add check to see if all key_cols available
-  unique_df <- df[, key_cols, drop=F] %>% data.table::as.data.table() %>%
-    unique(by=key_cols)
-  return(tibble::as_tibble(unique_df))
-}
 
 
 pad_left <- function(x, padding = "0", max_char = 4){
