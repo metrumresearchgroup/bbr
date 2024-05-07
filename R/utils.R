@@ -709,8 +709,15 @@ check_nonmem_finished.bbi_nmboot_model <- function(.mod, ...) {
 #' @export
 check_nonmem_finished.list <- function(.mod, ...) {
   assert_list(.mod)
-  check_model_object_list(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))
-  models_finished <- map_lgl(.mod, ~check_nonmem_finished(.x))
+  check_model_object_list(.mod, .mod_types = c(NM_MOD_CLASS))
+  output_dirs <- purrr::map_chr(.mod, get_output_dir, .check_exists = FALSE)
+  if(!any(fs::dir_exists(output_dirs))){
+    verbose_msg("Models have not been submitted")
+    return(invisible(TRUE))
+  }
+  # Return logical values as vector (unique handling)
+  #  - used in `wait_for_nonmem`
+  models_finished <- map_lgl(.mod, ~nonmem_finished_impl(.x))
   return(models_finished)
 }
 
@@ -757,6 +764,7 @@ wait_for_nonmem <- function(.mod, .time_limit = 300, .interval = 5) {
 #' @export
 wait_for_nonmem.default <- function(.mod, .time_limit = 300, .interval = 5) {
 
+  # .mod is a list of models regardless of input after this section
   if(inherits(.mod, "list") && !inherits(.mod, "bbi_model")){
     check_model_object_list(.mod, .mod_types = NM_MOD_CLASS)
   }else{
@@ -765,35 +773,49 @@ wait_for_nonmem.default <- function(.mod, .time_limit = 300, .interval = 5) {
     if(inherits(.mod, NMBOOT_MOD_CLASS)){
       .mod <- get_boot_models(.mod)
       if(is.null(.mod)) return(invisible(NULL))
-    }
-  }
-
-  verbose_msg(glue("Waiting for {length(.mod)} model(s) to finish..."))
-
-  Sys.sleep(1) # wait for lst file to be created
-  expiration <- Sys.time() + .time_limit
-  n_interval <- 0
-  while ((expiration - Sys.time()) > 0) {
-    res <- check_nonmem_finished(.mod) %>% suppressMessages()
-    if (all(res)) {
-      break
     }else{
-      n_interval = n_interval + 1
-      # print message every 10 intervals
-      if(n_interval %% 10 == 0){
-        verbose_msg(glue("Waiting for {length(res[!res])} model(s) to finish..."))
-      }
+      .mod <- list(.mod)
     }
-    Sys.sleep(.interval)
   }
 
-  all_finished <- check_nonmem_finished(.mod) %>% suppressMessages() %>% all()
-  if(expiration < Sys.time() && !all_finished){
-    res <- check_nonmem_finished(.mod) %>% suppressMessages()
-    warning(glue("Expiration was reached, but {length(res[!res])} model(s) haven't finished"),
-            call. = FALSE, immediate. = TRUE)
+  Sys.sleep(1.5) # wait for lst file to be created
+
+  output_dirs <- purrr::map_chr(.mod, get_output_dir, .check_exists = FALSE)
+  if(!any(fs::dir_exists(output_dirs))){
+    verbose_msg("Models have not been submitted")
+    return(invisible(TRUE))
   }else{
-    verbose_msg(glue("\n{length(.mod)} model(s) have finished"))
+    verbose_msg(glue("Waiting for {length(.mod)} model(s) to finish..."))
+    expiration <- Sys.time() + .time_limit
+    n_interval <- 0
+
+    while ((expiration - Sys.time()) > 0) {
+      # Use implementation function:
+      # We dont want to return TRUE for un-submitted models here (handled above)
+      res <- map_lgl(.mod, ~nonmem_finished_impl(.x))
+      if (all(res)) {
+        break
+      }else{
+        n_interval = n_interval + 1
+        # print message every 10 intervals
+        if(n_interval %% 10 == 0){
+          verbose_msg(glue("Waiting for {length(res[!res])} model(s) to finish..."))
+        }
+      }
+      Sys.sleep(.interval)
+    }
+
+    # Check again after expiration is reached or models are finished
+    res <- check_nonmem_finished(.mod)
+    if(expiration < Sys.time() && !all(res)){
+      warning(
+        glue("Expiration was reached, but {length(res[!res])} model(s) haven't finished"),
+        call. = FALSE, immediate. = TRUE)
+      return(invisible(FALSE))
+    }else{
+      verbose_msg(glue("\n{length(.mod)} model(s) have finished"))
+      return(invisible(TRUE))
+    }
   }
 }
 
