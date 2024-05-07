@@ -85,6 +85,7 @@ Suggests:
     ggplot2,
     knitr,
     rmarkdown,
+    rprojroot,
     testthat (>= 2.1.0),
     withr,
     mrgvalidate,
