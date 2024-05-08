@@ -89,6 +89,30 @@ submit_model.bbi_nonmem_model <- function(
   return(res)
 }
 
+#' @describeIn submit_model Takes a `bbi_nmsim_model` object.
+#' @export
+submit_model.bbi_nmsim_model <- function(
+    .mod,
+    .bbi_args = NULL,
+    .mode = getOption("bbr.bbi_exe_mode"),
+    ...,
+    .overwrite = NULL,
+    .config_path = NULL,
+    .wait = TRUE,
+    .dry_run = FALSE
+) {
+
+  res <- submit_nonmem_model(.mod,
+                             .bbi_args = .bbi_args,
+                             .mode = .mode,
+                             ...,
+                             .overwrite = .overwrite,
+                             .config_path = .config_path,
+                             .wait = .wait,
+                             .dry_run = .dry_run)
+  return(res)
+}
+
 #' @describeIn submit_model Takes a `bbi_nmboot_model` object.
 #' @param .batch_size Number of models to submit to run concurrently as a
 #'   "batch." Passing `NULL` (or a number larger than the number of submitted
