@@ -202,6 +202,8 @@ NM_MOD_CLASS <- "bbi_nonmem_model" # SHARED with bbr.bayes
 NM_SUM_CLASS <- "bbi_nonmem_summary" # SHARED with bbr.bayes
 NMBOOT_MOD_CLASS <- "bbi_nmboot_model"
 NMBOOT_SUM_CLASS <- "bbi_nmboot_summary"
+NMVPC_MOD_CLASS <- "bbi_nmvpc_model"
+NMVPC_SUM_CLASS <- "bbi_nmvpc_summary"
 SL_CLASS <- "bbi_summary_list"
 PROC_CLASS <- "bbi_process"
 RUN_LOG_CLASS <- "bbi_run_log_df"

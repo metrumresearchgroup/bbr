@@ -49,6 +49,12 @@ get_model_path.bbi_nmboot_model <- function(.bbi_object, .check_exists = TRUE) {
 
 #' @rdname get_path_from_object
 #' @export
+get_model_path.bbi_nmvpc_model <- function(.bbi_object, .check_exists = TRUE) {
+  get_model_path_nonmem(.bbi_object, .check_exists)
+}
+
+#' @rdname get_path_from_object
+#' @export
 get_model_path.bbi_nonmem_summary <- function(.bbi_object, .check_exists = TRUE) {
   get_model_path_nonmem(.bbi_object, .check_exists)
 }
@@ -75,6 +81,12 @@ get_output_dir.bbi_nonmem_model <- function(.bbi_object, .check_exists = TRUE) {
 #' @rdname get_path_from_object
 #' @export
 get_output_dir.bbi_nmboot_model <- function(.bbi_object, .check_exists = TRUE) {
+  get_output_dir_nonmem(.bbi_object, .check_exists)
+}
+
+#' @rdname get_path_from_object
+#' @export
+get_output_dir.bbi_nmvpc_model <- function(.bbi_object, .check_exists = TRUE) {
   get_output_dir_nonmem(.bbi_object, .check_exists)
 }
 
