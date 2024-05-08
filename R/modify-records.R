@@ -5,14 +5,17 @@
 #' @details
 #'  - **`safe_read_ctl()`** is called internally within the other functions, though
 #'  it can also be used outside of that context.
-#'  - **`modify_prob_statement()`**, **`modify_data_path_ctl()`**, and
-#'   **`remove_records()`** read in the control stream, make any modifications,
-#'   and then save out the updated control stream.
+#'  - **`modify_prob_statement()`**, **`modify_data_path_ctl()`**,
+#'   **`remove_records()`**, and **`add_new_record()`** read in the control stream,
+#'   make any modifications, and then save out the updated control stream.
 #'     - `modify_prob_statement()` also returns a character string defining the
 #'     `$PROBLEM` text (see `prob_text` argument).
 #' - **`mod_has_record()`** will return a logical value denoting whether a `bbr`
 #'   model has a given record type.
+#' - **`get_records()`** extracts all records of a given type. Note that it is
+#'    not meant to be used to modify existing records.
 NULL
+
 
 #' @describeIn modify_records Safely read in a `NONMEM` control stream file via
 #' `nmrec`
@@ -27,6 +30,163 @@ safe_read_ctl <- function(.mod){
     )
   }
   return(ctl)
+}
+
+
+#' @describeIn modify_records Pull all records of a given record type from a
+#' `bbr` model
+#' @keywords internal
+get_records <- function(.mod, type){
+  assert_record_type(.mod, type)
+  ctl <- safe_read_ctl(.mod)
+  recs <- nmrec::select_records(ctl, type)
+  if(rlang::is_empty(recs)){
+    return(NULL)
+  }else{
+    return(recs)
+  }
+}
+
+
+#' @describeIn modify_records Check if a `bbr` model has a given record type
+#' @keywords internal
+mod_has_record <- function(.mod, type){
+  assert_record_type(.mod, type)
+  ctl <- safe_read_ctl(.mod)
+  recs <- nmrec::select_records(ctl, type)
+  has_rec <- !rlang::is_empty(recs)
+
+  return(has_rec)
+}
+
+
+#' @describeIn modify_records Remove _all records_ of a given type from a `NONMEM`
+#'  control stream file
+#' @param type record type. This may be spelled any way that's accepted in a
+#'  `NONMEM` control stream.
+#'
+#' @note
+#' Run the following command To see what record types are available/supported by
+#' `nmrec`:
+#'  ```
+#'  `ls(nmrec:::record_names)`
+#'  ```
+#'
+#' @keywords internal
+remove_records <- function(.mod, type){
+  if(mod_has_record(.mod, type)){
+    ctl <- safe_read_ctl(.mod)
+    type_name <- get_records(.mod, type)[[1]]$name
+    rec_indices <- seq_along(ctl$records)
+    indices_remove <- purrr::keep(rec_indices, function(index){
+      ctl$records[[index]]$name == type_name
+    })
+
+    # Remove records
+    if(length(indices_remove) >= 1){
+      ctl$records[indices_remove] <- NULL
+    }
+
+    # Write out modified ctl
+    mod_path <- get_model_path(.mod)
+    nmrec::write_ctl(ctl, mod_path)
+  }else{
+    verbose_msg(glue("record type {type} not found"))
+  }
+
+  return(invisible(TRUE))
+}
+
+
+#' @describeIn modify_records Add a new record of a given type from a `NONMEM`
+#'  control stream file
+#' @param rec_name a character string defining the record name (e.g., `$THETA`)
+#' @param lines a character string or vector of lines to append to the new
+#'   record. If passing a vector, creates a new line per index. Defaults to `NULL`.
+#' @param after add new record after _this record type_. This may be spelled
+#'   any way that's accepted in a `NONMEM` control stream. If `NULL`, append to
+#'   the end of the control stream. If multiple records are found, uses the last
+#'   index
+#' @param display_type Logical (T/F). If `FALSE`, dont
+#' @keywords internal
+add_new_record <- function(
+    .mod,
+    type,
+    rec_name = paste0("$", toupper(type), " "),
+    lines = NULL,
+    after = NULL
+){
+  checkmate::assert_character(lines, null.ok = TRUE)
+  checkmate::assert_character(rec_name, null.ok = TRUE)
+  assert_record_type(.mod, type)
+
+  if(!is.null(rec_name)){
+    rec_name <- paste0(stringr::str_trim(rec_name), " ")
+  }
+
+  ctl <- safe_read_ctl(.mod)
+
+  # Define new record
+  if(!is.null(lines)){
+    lines_txt <- paste0(lines, collapse = "\n")
+    # Starting on same line as record by default
+    new_rec <- paste0(rec_name, lines_txt, "\n\n")
+  }else{
+    new_rec <- paste0(rec_name, "\n\n")
+  }
+
+  # Determine where to put the new record
+  if(is.null(after)){
+    # If NULL, add record to the end
+    num_recs <- length(ctl$records)
+    ctl$records <- append(ctl$records, new_rec, after = num_recs)
+  }else{
+    assert_record_type(.mod, after)
+    # This is the name encoded in the R6 object. This is needed for matching types
+    # - use the last record
+    after_name <- get_records(.mod, after)[[1]]$name
+
+    rec_indices <- seq_along(ctl$records)
+    indices_after <- purrr::keep(rec_indices, function(index){
+      ctl$records[[index]]$name == after_name
+    })
+
+    # Add to the last discovered record of a given type
+    ctl$records <- append(ctl$records, new_rec, after = max(indices_after))
+  }
+
+  # Write out modified ctl
+  mod_path <- get_model_path(.mod)
+  nmrec::write_ctl(ctl, mod_path)
+  return(invisible(TRUE))
+}
+
+
+#' @describeIn modify_records Modify the specified data path in a `NONMEM`
+#' control stream file
+#'
+#' @param data_path Data path to set in a `$DATA` record.
+#'
+#' @keywords internal
+modify_data_path_ctl <- function(.mod, data_path){
+  ctl <- safe_read_ctl(.mod)
+
+  # Get data record
+  data_rec <- nmrec::select_records(ctl, "data")[[1]]
+  data_rec$parse()
+
+  # Overwrite 'filename' option
+  data_rec$values <- purrr::map(data_rec$values, function(data_opt){
+    if(inherits(data_opt, "nmrec_option_pos") && data_opt$name == "filename"){
+      data_opt$value <- data_path
+    }
+    data_opt
+  })
+
+  # Write out modified ctl
+  mod_path <- get_model_path(.mod)
+  nmrec::write_ctl(ctl, mod_path)
+  return(invisible(TRUE))
 }
 
 
@@ -76,76 +236,31 @@ modify_prob_statement <- function(.mod, prob_text = NULL){
 }
 
 
-#' @describeIn modify_records Modify the specified data path in a `NONMEM`
-#' control stream file
+#' Helper for checking if a specified record type is valid.
 #'
-#' @param data_path Data path to set in a `$DATA` record.
-#'
-#' @keywords internal
-modify_data_path_ctl <- function(.mod, data_path){
+#' @inheritParams remove_records
+#' @details
+#' This function is basically meant to ensure that `type` is an available
+#' record name within `ls(nmrec:::record_names)`. This function should search
+#' there (and no longer require a model object) if those names become exported.
+#' @noRd
+assert_record_type <- function(.mod, type){
+  checkmate::assert_character(type)
   ctl <- safe_read_ctl(.mod)
+  recs <- tryCatch(
+    nmrec::select_records(ctl, type),
+    error = function(cond) return(cond)
+  )
 
-  # Get data record
-  data_rec <- nmrec::select_records(ctl, "data")[[1]]
-  data_rec$parse()
-
-  # Overwrite 'filename' option
-  data_rec$values <- purrr::map(data_rec$values, function(data_opt){
-    if(inherits(data_opt, "nmrec_option_pos") && data_opt$name == "filename"){
-      data_opt$value <- data_path
-    }
-    data_opt
-  })
-
-  # Write out modified ctl
-  mod_path <- get_model_path(.mod)
-  nmrec::write_ctl(ctl, mod_path)
-  return(invisible(TRUE))
-}
-
-
-
-#' @describeIn modify_records Remove _all records_ of a given type from a `NONMEM`
-#' control stream file
-#' @param type type of record to remove. Only `'covariance'` and `'table'` are
-#' currently supported
-#'
-#' @note
-#' To add support for more record types to `remove_records()`, run the following
-#' command to see the record types of a given model supported by `nmrec`:
-#'  ```
-#'  purrr::map_chr(ctl$records, "name")
-#'  ```
-#'
-#' @keywords internal
-remove_records <- function(.mod, type = c("covariance", "table")){
-  type <- match.arg(type)
-  ctl <- safe_read_ctl(.mod)
-
-  rec_indices <- seq_along(ctl$records)
-  indices_remove <- purrr::keep(rec_indices, function(index){
-    ctl$records[[index]]$name == type
-  })
-
-  # Remove records
-  if(length(indices_remove) >= 1){
-    ctl$records[indices_remove] <- NULL
+  if(inherits(recs, "error")){
+    rlang::abort(
+      c(
+        "Issue when looking for record type. Failed with the following message:",
+        recs$message
+      )
+    )
   }
 
-  # Write out modified ctl
-  mod_path <- get_model_path(.mod)
-  nmrec::write_ctl(ctl, mod_path)
   return(invisible(TRUE))
 }
 
-
-#' @describeIn modify_records Check if a `bbr` model has a given record type
-#' @keywords internal
-mod_has_record <- function(.mod, type = c("covariance", "table")){
-  type <- match.arg(type)
-  ctl <- safe_read_ctl(.mod)
-  recs <- nmrec::select_records(ctl, type)
-  has_rec <- !rlang::is_empty(recs)
-
-  return(has_rec)
-}

@@ -3,32 +3,56 @@
 \name{modify_records}
 \alias{modify_records}
 \alias{safe_read_ctl}
-\alias{modify_prob_statement}
-\alias{modify_data_path_ctl}
-\alias{remove_records}
+\alias{get_records}
 \alias{mod_has_record}
+\alias{remove_records}
+\alias{add_new_record}
+\alias{modify_data_path_ctl}
+\alias{modify_prob_statement}
 \title{Modify options and records from a \code{NONMEM} control stream file}
 \usage{
 safe_read_ctl(.mod)
 
-modify_prob_statement(.mod, prob_text = NULL)
+get_records(.mod, type)
+
+mod_has_record(.mod, type)
+
+remove_records(.mod, type)
+
+add_new_record(
+  .mod,
+  type,
+  rec_name = paste0("$", toupper(type), " "),
+  lines = NULL,
+  after = NULL
+)
 
 modify_data_path_ctl(.mod, data_path)
 
-remove_records(.mod, type = c("covariance", "table"))
-
-mod_has_record(.mod, type = c("covariance", "table"))
+modify_prob_statement(.mod, prob_text = NULL)
 }
 \arguments{
 \item{.mod}{a bbr model object}
 
-\item{prob_text}{If \code{NULL} return the current \verb{$PROBLEM} statement. If a
-character string, set the problem statement to that value.}
+\item{type}{record type. This may be spelled any way that's accepted in a
+\code{NONMEM} control stream.}
+
+\item{rec_name}{a character string defining the record name (e.g., \verb{$THETA})}
+
+\item{lines}{a character string or vector of lines to append to the new
+record. If passing a vector, creates a new line per index. Defaults to \code{NULL}.}
+
+\item{after}{add new record after \emph{this record type}. This may be spelled
+any way that's accepted in a \code{NONMEM} control stream. If \code{NULL}, append to
+the end of the control stream. If multiple records are found, uses the last
+index}
 
 \item{data_path}{Data path to set in a \verb{$DATA} record.}
 
-\item{type}{type of record to remove. Only \code{'covariance'} and \code{'table'} are
-currently supported}
+\item{prob_text}{If \code{NULL} return the current \verb{$PROBLEM} statement. If a
+character string, set the problem statement to that value.}
+
+\item{display_type}{Logical (T/F). If \code{FALSE}, dont}
 }
 \description{
 Modify options and records from a \code{NONMEM} control stream file
@@ -37,15 +61,17 @@ Modify options and records from a \code{NONMEM} control stream file
 \itemize{
 \item \strong{\code{safe_read_ctl()}} is called internally within the other functions, though
 it can also be used outside of that context.
-\item \strong{\code{modify_prob_statement()}}, \strong{\code{modify_data_path_ctl()}}, and
-\strong{\code{remove_records()}} read in the control stream, make any modifications,
-and then save out the updated control stream.
+\item \strong{\code{modify_prob_statement()}}, \strong{\code{modify_data_path_ctl()}},
+\strong{\code{remove_records()}}, and \strong{\code{add_new_record()}} read in the control stream,
+make any modifications, and then save out the updated control stream.
 \itemize{
 \item \code{modify_prob_statement()} also returns a character string defining the
 \verb{$PROBLEM} text (see \code{prob_text} argument).
 }
 \item \strong{\code{mod_has_record()}} will return a logical value denoting whether a \code{bbr}
 model has a given record type.
+\item \strong{\code{get_records()}} extracts all records of a given type. Note that it is
+not meant to be used to modify existing records.
 }
 }
 \section{Functions}{
@@ -53,23 +79,29 @@ model has a given record type.
 \item \code{safe_read_ctl()}: Safely read in a \code{NONMEM} control stream file via
 \code{nmrec}
 
-\item \code{modify_prob_statement()}: Modify or retrieve the \verb{$PROBLEM} statement from
-a \code{NONMEM} control stream file.
+\item \code{get_records()}: Pull all records of a given record type from a
+\code{bbr} model
 
-\item \code{modify_data_path_ctl()}: Modify the specified data path in a \code{NONMEM}
-control stream file
+\item \code{mod_has_record()}: Check if a \code{bbr} model has a given record type
 
 \item \code{remove_records()}: Remove \emph{all records} of a given type from a \code{NONMEM}
 control stream file
 
-\item \code{mod_has_record()}: Check if a \code{bbr} model has a given record type
+\item \code{add_new_record()}: Add a new record of a given type from a \code{NONMEM}
+control stream file
+
+\item \code{modify_data_path_ctl()}: Modify the specified data path in a \code{NONMEM}
+control stream file
+
+\item \code{modify_prob_statement()}: Modify or retrieve the \verb{$PROBLEM} statement from
+a \code{NONMEM} control stream file.
 
 }}
 \note{
-To add support for more record types to \code{remove_records()}, run the following
-command to see the record types of a given model supported by \code{nmrec}:
+Run the following command To see what record types are available/supported by
+\code{nmrec}:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{purrr::map_chr(ctl$records, "name")
+\if{html}{\out{<div class="sourceCode">}}\preformatted{`ls(nmrec:::record_names)`
 }\if{html}{\out{</div>}}
 }
 \keyword{internal}

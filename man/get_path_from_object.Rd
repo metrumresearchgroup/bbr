@@ -5,11 +5,13 @@
 \alias{get_model_path}
 \alias{get_model_path.bbi_nonmem_model}
 \alias{get_model_path.bbi_nmboot_model}
+\alias{get_model_path.bbi_nmvpc_model}
 \alias{get_model_path.bbi_nonmem_summary}
 \alias{get_model_path.bbi_log_df}
 \alias{get_output_dir}
 \alias{get_output_dir.bbi_nonmem_model}
 \alias{get_output_dir.bbi_nmboot_model}
+\alias{get_output_dir.bbi_nmvpc_model}
 \alias{get_output_dir.bbi_nonmem_summary}
 \alias{get_output_dir.bbi_log_df}
 \alias{get_yaml_path}
@@ -26,6 +28,8 @@ get_model_path(.bbi_object, .check_exists = TRUE)
 
 \method{get_model_path}{bbi_nmboot_model}(.bbi_object, .check_exists = TRUE)
 
+\method{get_model_path}{bbi_nmvpc_model}(.bbi_object, .check_exists = TRUE)
+
 \method{get_model_path}{bbi_nonmem_summary}(.bbi_object, .check_exists = TRUE)
 
 \method{get_model_path}{bbi_log_df}(.bbi_object, .check_exists = TRUE)
@@ -35,6 +39,8 @@ get_output_dir(.bbi_object, .check_exists = TRUE)
 \method{get_output_dir}{bbi_nonmem_model}(.bbi_object, .check_exists = TRUE)
 
 \method{get_output_dir}{bbi_nmboot_model}(.bbi_object, .check_exists = TRUE)
+
+\method{get_output_dir}{bbi_nmvpc_model}(.bbi_object, .check_exists = TRUE)
 
 \method{get_output_dir}{bbi_nonmem_summary}(.bbi_object, .check_exists = TRUE)
 
