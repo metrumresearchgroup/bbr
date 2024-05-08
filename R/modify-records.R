@@ -21,7 +21,7 @@ NULL
 #' `nmrec`
 #' @keywords internal
 safe_read_ctl <- function(.mod){
-  check_model_object(.mod, c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))
+  check_model_object(.mod, c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMSIM_MOD_CLASS))
   mod_path <- get_model_path(.mod)
   ctl <- tryCatch(nmrec::read_ctl(mod_path), error = identity)
   if(inherits(ctl, "error")){

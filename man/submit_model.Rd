@@ -3,6 +3,7 @@
 \name{submit_model}
 \alias{submit_model}
 \alias{submit_model.bbi_nonmem_model}
+\alias{submit_model.bbi_nmsim_model}
 \alias{submit_model.bbi_nmboot_model}
 \title{Submit a model to be run}
 \usage{
@@ -18,6 +19,17 @@ submit_model(
 )
 
 \method{submit_model}{bbi_nonmem_model}(
+  .mod,
+  .bbi_args = NULL,
+  .mode = getOption("bbr.bbi_exe_mode"),
+  ...,
+  .overwrite = NULL,
+  .config_path = NULL,
+  .wait = TRUE,
+  .dry_run = FALSE
+)
+
+\method{submit_model}{bbi_nmsim_model}(
   .mod,
   .bbi_args = NULL,
   .mode = getOption("bbr.bbi_exe_mode"),
@@ -100,6 +112,8 @@ Submits a model to be run by calling out to \code{bbi}.
 \section{Methods (by class)}{
 \itemize{
 \item \code{submit_model(bbi_nonmem_model)}: Takes a \code{bbi_nonmem_model} object.
+
+\item \code{submit_model(bbi_nmsim_model)}: Takes a \code{bbi_nmsim_model} object.
 
 \item \code{submit_model(bbi_nmboot_model)}: Takes a \code{bbi_nmboot_model} object.
 

@@ -49,7 +49,7 @@ get_model_path.bbi_nmboot_model <- function(.bbi_object, .check_exists = TRUE) {
 
 #' @rdname get_path_from_object
 #' @export
-get_model_path.bbi_nmvpc_model <- function(.bbi_object, .check_exists = TRUE) {
+get_model_path.bbi_nmsim_model <- function(.bbi_object, .check_exists = TRUE) {
   get_model_path_nonmem(.bbi_object, .check_exists)
 }
 
@@ -86,7 +86,7 @@ get_output_dir.bbi_nmboot_model <- function(.bbi_object, .check_exists = TRUE) {
 
 #' @rdname get_path_from_object
 #' @export
-get_output_dir.bbi_nmvpc_model <- function(.bbi_object, .check_exists = TRUE) {
+get_output_dir.bbi_nmsim_model <- function(.bbi_object, .check_exists = TRUE) {
   get_output_dir_nonmem(.bbi_object, .check_exists)
 }
 
@@ -270,6 +270,16 @@ get_data_path.bbi_nmboot_model <- function(
 
 #' @rdname get_data_path
 #' @export
+get_data_path.bbi_nmsim_model <- function(
+    .bbi_object,
+    .check_exists = TRUE,
+    ...
+){
+  get_data_path_nonmem(.bbi_object, .check_exists, ...)
+}
+
+#' @rdname get_data_path
+#' @export
 get_data_path.bbi_nonmem_summary <- function(
     .bbi_object,
     .check_exists = TRUE,
@@ -352,7 +362,7 @@ get_data_path_nonmem <- function(
 #' Get the data path from a control stream file
 #' @noRd
 get_data_path_from_ctl <- function(.mod, normalize = TRUE){
-  check_model_object(.mod, c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))
+  check_model_object(.mod, c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMSIM_MOD_CLASS))
   mod_path <- get_model_path(.mod)
   ctl <- nmrec::read_ctl(mod_path)
 
@@ -703,3 +713,33 @@ get_boot_spec <- function(.boot_run){
   return(spec)
 }
 
+
+#' Get path to `MSF` file path
+#'
+#' Extract `MSF` file path as defined in a `$ESTIMATION` record in a `NONMEM`
+#'  control stream file, and construct absolute file path
+#'
+#' @param .mod a `bbi_model` object
+#' @returns absolute file path to `MSF` file, or `NULL` if one doesnt exist.
+#' @keywords internal
+get_msf_path <- function(.mod){
+  ctl <- safe_read_ctl(.mod)
+  ests <- nmrec::select_records(ctl, "est")
+
+  msf_path <- purrr::map(ests, function(est){
+    opt <- nmrec::get_record_option(est, "msf")
+    if(!is.null(opt)) opt$value else opt
+  }) %>% purrr::list_c()
+
+  if(!is.null(msf_path)){
+    if(length(msf_path) != 1){
+      msf_txt <- paste0(msf_path, collapse = ", ")
+      rlang::abort(
+        c(glue("Multiple MSF files found: {msf_txt}"))
+      )
+    }
+    msf_path <- file.path(.mod[[ABS_MOD_PATH]], msf_path)
+  }
+
+  return(msf_path)
+}

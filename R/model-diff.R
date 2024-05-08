@@ -53,9 +53,9 @@ model_diff.default <- function(
 ) {
   .file <- match.arg(.file)
 
-  check_model_object(.mod, c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMVPC_MOD_CLASS))
+  check_model_object(.mod, c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMSIM_MOD_CLASS))
   if(!is.null(.mod2)){
-    check_model_object(.mod2, c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMVPC_MOD_CLASS))
+    check_model_object(.mod2, c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMSIM_MOD_CLASS))
   }
   .mod2 <- model_diff_get_comp(.mod, .mod2)
 
