@@ -2,16 +2,19 @@
 % Please edit documentation in R/vpc-simulation.R
 \name{setup_sim_run}
 \alias{setup_sim_run}
-\title{Set up VPC simulation}
+\title{Set up \code{NONMEM} simulation}
 \usage{
-setup_sim_run(.sim_run, n = 100, seed = 1234)
+setup_sim_run(.mod, n = 100, seed = 1234, replicate_var = "REPI")
 }
 \arguments{
-\item{.sim_run}{a \code{bbi_nmsim_model} object}
+\item{.mod}{a \code{bbi_nonmem_model} or \code{bbi_nmsim_model} object.}
 
 \item{n}{number of replicates.}
 
-\item{seed}{a seed for sampling the data.}
+\item{seed}{a seed for simulation.}
+
+\item{replicate_var}{a variable name for storing each iteration. Cannot match
+a variable previously defined in \verb{$PRED} or \verb{$ERROR}.}
 }
 \description{
 Creates new \verb{$SIMULATION} and \verb{$MSFI} records, and modifies the \verb{$PRED} or

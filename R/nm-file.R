@@ -112,6 +112,7 @@ nm_data <- function(.mod) {
 #' @importFrom tibble as_tibble
 #' @importFrom data.table fread
 #' @importFrom stringr str_detect
+#' @param .path a path to a table file.
 #' @keywords internal
 nm_file_impl <- function(.path) {
   # read file and find top of table
@@ -159,4 +160,114 @@ nm_file_impl <- function(.path) {
   verbose_msg(glue("  cols: {ncol(.d)}"))
   verbose_msg("") # for newline
   return(.d)
+}
+
+
+#' Read in table file with multiple `NONMEM` tables.
+#' @inheritParams nm_file_impl
+#' @param header Logical (T/F). Does the first data line contain column names?
+#'  Passed to [data.table::fread()].
+#' @param simplify Logical (T/F). If `TRUE`, simplify list of tables into a
+#'  single tibble. Table names will show up as a new `table_id` column.
+#' @param sanitize Logical (T/F). If `TRUE`, sanitize columns to ensure no
+#'  remaining column headers or other text pollution makes it into the data.
+#' @param ... additional arguments passed to [data.table::fread()]
+#' @param table_pattern character string defining the start of a new
+#'  table (regex accepted).
+#'
+#' @note This is modified from pmxTools, which is licensed under GPL-2.
+#' @seealso tab_is_multi_table
+#' @keywords internal
+nm_file_multi_table <- function(
+    .path,
+    header = TRUE,
+    simplify = TRUE,
+    sanitize = TRUE,
+    ...,
+    table_pattern="^TABLE NO"
+) {
+  verbose_msg(glue("Reading {basename(.path)}"))
+  checkmate::assert_file_exists(.path)
+
+  # TODO: do we want this?
+  if(!assert_nm_table_format(.path, table_pattern)){
+    rlang::warn(
+      glue("{.path} cannot be parsed correctly. Consider changing `table_pattern`")
+    )
+  }
+
+  # Determine start of each new table
+  file_data <- readLines(.path)
+  new_tables <- grep(file_data, pattern = table_pattern)
+
+  # make unique for duplicated table names (simulation does)
+  file_data[new_tables] <- make.unique(file_data[new_tables])
+
+  table_list <- list()
+  for(idx in seq_along(new_tables)){
+    # Read in & format each individual table
+    start_line <- new_tables[idx] + 1
+    end_line <-
+      if(idx == length(new_tables)){
+        length(file_data)
+      }else{
+        new_tables[idx + 1] - 1
+      }
+    current_table_name <- file_data[new_tables[idx]]
+
+    table.i <- withr::with_options(list(warn = 1), {
+      data <- data.table::fread(
+        sim_tab_path, header = header, na.strings = ".", verbose = FALSE,
+        skip = (start_line - 1), nrows = (end_line - start_line),
+        ...
+      )
+      data <- remove_dup_cols(data)
+      as_tibble(data)
+    })
+
+    if(isTRUE(sanitize)){
+      # Scan to ensure no remaining column headers or other text pollution
+      pattern <- "^[[:space:]]*([[:alpha:]].*)"
+      indices <- which(!grepl(pattern, table.i[[1]]))
+      table.i <- table.i[indices,]
+    }
+
+    table_list[[current_table_name]] <- as_tibble(table.i)
+  }
+
+  # Format and return
+  if(length(length(table_list)) > 1){
+    verbose_msg(glue("  tables: {length(table_list)}"))
+  }
+
+  if(isTRUE(simplify)){
+    table_list <- purrr::list_rbind(table_list, names_to = "table_id") %>%
+      dplyr::relocate("table_id", .after = dplyr::everything())
+
+    verbose_msg(glue("  rows: {nrow(table_list)}"))
+    verbose_msg(glue("  cols: {ncol(table_list)}"))
+  }
+  verbose_msg("") # for newline
+
+  return(table_list)
+}
+
+
+#' Check if a `NONMEM` table file contains one or more tables in the
+#'  specified format
+#' @inheritParams nm_file_multi_table
+#' @seealso nm_file_multi_table
+#' @return logical
+#' @keywords internal
+assert_nm_table_format <- function(.path, table_pattern="^TABLE NO"){
+  checkmate::assert_file_exists(.path)
+
+  # Determine start of each new table
+  file_data <- readLines(.path)
+
+  if(any(grepl(file_data, pattern = table_pattern))){
+    return(TRUE)
+  }else{
+    return(FALSE)
+  }
 }

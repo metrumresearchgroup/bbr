@@ -2,25 +2,29 @@
 % Please edit documentation in R/vpc-simulation.R
 \name{new_sim_model}
 \alias{new_sim_model}
-\title{Create a VPC model object from an existing model}
+\title{Create a simulation model object from an existing model}
 \usage{
 new_sim_model(
   .mod,
   n = 100,
   seed = 1234,
+  replicate_var = "REPI",
   .suffix = "sim",
   .inherit_tags = TRUE,
   .overwrite = FALSE
 )
 }
 \arguments{
-\item{.mod}{a \code{bbr} model object}
+\item{.mod}{a \code{bbi_nonmem_model} object.}
 
 \item{n}{number of replicates.}
 
-\item{seed}{a seed for sampling the data.}
+\item{seed}{a seed for simulation.}
 
-\item{.suffix}{a suffix for the VPC simulation directory. Will be prefixed by
+\item{replicate_var}{a variable name for storing each iteration. Cannot match
+a variable previously defined in \verb{$PRED} or \verb{$ERROR}.}
+
+\item{.suffix}{a suffix for the simulation directory. Will be prefixed by
 the model id of \code{.mod}.}
 
 \item{.inherit_tags}{If \code{FALSE}, the default, new model will only have any
@@ -35,5 +39,5 @@ file at \code{.new_model} will be overwritten silently.}
 S3 object of class \code{bbi_nmsim_model}.
 }
 \description{
-Create a VPC model object from an existing model
+Create a simulation model object from an existing model
 }

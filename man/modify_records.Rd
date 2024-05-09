@@ -13,7 +13,7 @@
 \usage{
 safe_read_ctl(.mod)
 
-get_records(.mod, type)
+get_records(.mod, type, get_lines = FALSE)
 
 mod_has_record(.mod, type)
 
@@ -36,6 +36,9 @@ modify_prob_statement(.mod, prob_text = NULL)
 
 \item{type}{record type. This may be spelled any way that's accepted in a
 \code{NONMEM} control stream.}
+
+\item{get_lines}{Logical (T/F). If \code{TRUE}, return the lines as character
+vectors (based on how they were defined in the control stream).}
 
 \item{rec_name}{a character string defining the record name (e.g., \verb{$THETA})}
 
