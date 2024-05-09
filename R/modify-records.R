@@ -35,14 +35,21 @@ safe_read_ctl <- function(.mod){
 
 #' @describeIn modify_records Pull all records of a given record type from a
 #' `bbr` model
+#' @param get_lines Logical (T/F). If `TRUE`, return the lines as character
+#'  vectors (based on how they were defined in the control stream).
 #' @keywords internal
-get_records <- function(.mod, type){
+get_records <- function(.mod, type, get_lines = FALSE){
   assert_record_type(.mod, type)
   ctl <- safe_read_ctl(.mod)
   recs <- nmrec::select_records(ctl, type)
   if(rlang::is_empty(recs)){
     return(NULL)
   }else{
+    if(isTRUE(get_lines)){
+      recs <- purrr::map(recs, function(rec){
+        rec$get_lines()
+      })
+    }
     return(recs)
   }
 }
