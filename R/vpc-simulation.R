@@ -102,7 +102,9 @@ setup_sim_run <- function(.mod, n = 100, seed = 1234, replicate_var = "REPI"){
   table_name <- glue("{get_model_id(get_based_on(.mod)[1])}sim.tab")
   # TODO: DV automatically gets added in testing, is this always the case?
   # - i.e. adding DV causes duplicate DV columns
-  table_lines <- glue("ONEHEADER REPI PRED FILE={table_name}")
+  # TODO: We likely want handling for `NUM` column, as this assumes `NUM` is part
+  # of your input data (and we cant rely on that assumption)
+  table_lines <- glue("ONEHEADER {replicate_var} NUM PRED FILE={table_name}")
   add_new_record(.mod, "table", lines = table_lines, after = "simulation")
 
 
@@ -170,7 +172,6 @@ check_model_for_sim <- function(.mod, replicate_var = "REPI"){
       )
     )
   }
-
 
   # TODO: other checks:
   # - check that MSFI and SIM weren't already records?
