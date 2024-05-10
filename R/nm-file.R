@@ -190,9 +190,9 @@ nm_file_multi_table <- function(
   checkmate::assert_file_exists(.path)
 
   # TODO: do we want this?
-  if(!assert_nm_table_format(.path, table_pattern)){
+  if(!assert_nm_table_format(.path, table_pattern, check_multiple = TRUE)){
     rlang::warn(
-      glue("{.path} cannot be parsed correctly. Consider changing `table_pattern`")
+      glue("{.path} may not be parsed correctly. Consider changing `table_pattern`")
     )
   }
 
@@ -256,18 +256,25 @@ nm_file_multi_table <- function(
 #' Check if a `NONMEM` table file contains one or more tables in the
 #'  specified format
 #' @inheritParams nm_file_multi_table
+#' @param check_multiple Logical (T/F). If `TRUE`, check if there are multiple
+#'  tables (most single table files still contain the default `table_pattern`).
 #' @seealso nm_file_multi_table
 #' @return logical
 #' @keywords internal
-assert_nm_table_format <- function(.path, table_pattern="^TABLE NO"){
+assert_nm_table_format <- function(
+    .path,
+    check_multiple = FALSE,
+    table_pattern="^TABLE NO"
+    ){
   checkmate::assert_file_exists(.path)
 
   # Determine start of each new table
   file_data <- readLines(.path)
+  new_table_def <- grepl(file_data, pattern = table_pattern)
 
-  if(any(grepl(file_data, pattern = table_pattern))){
-    return(TRUE)
+  if(isTRUE(check_multiple)){
+    return(sum(new_table_def) > 1)
   }else{
-    return(FALSE)
+    return(any(new_table_def))
   }
 }

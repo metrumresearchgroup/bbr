@@ -80,7 +80,7 @@
 #'
 #' @importFrom dplyr left_join select
 #' @importFrom checkmate assert_string assert_character assert_logical assert_list
-#' @seealso [nm_tables()], [nm_table_files()], [nm_file()]
+#' @seealso [nm_tables()], [nm_table_files()], [nm_file()], [nm_join_sim()]
 #' @export
 nm_join <- function(
   .mod,
@@ -104,6 +104,23 @@ nm_join <- function(
     .mod <- read_model(.mod)
   }
   check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
+  nm_join_impl(.mod, .join_col, .files, .superset, .bbi_args)
+}
+
+
+#' Implementation function for `nm_join()`
+#' @inheritParams nm_join
+#' @keywords internal
+nm_join_impl <- function(
+    .mod,
+    .join_col = "NUM",
+    .files = nm_table_files(.mod),
+    .superset = FALSE,
+    .bbi_args = list(
+      no_grd_file = TRUE,
+      no_shk_file = TRUE
+    )
+) {
   assert_string(.join_col)
   assert_character(.files)
   assert_logical(.superset, len = 1)
@@ -111,7 +128,15 @@ nm_join <- function(
 
   df_list <- nm_tables(.mod, .files = .files)
   .d <- df_list$data
-  .tbls <- df_list[2:length(df_list)]
+
+  # Handling for when input data is the only element
+  # This can happen if no _single table_ files were found
+  .tbls <- if(length(df_list) >= 2){
+    df_list[2:length(df_list)]
+  }else{
+    NULL
+  }
+
   if (
     "DV" %in% names(.d) &&
     "DV" %in% unlist(map(.tbls, names))
@@ -132,8 +157,8 @@ nm_join <- function(
 
   if(anyDuplicated(.d[.join_col]) != 0)
   {
-   dup_row <- .d[.join_col][duplicated( .d[.join_col]) %>% which(),]
-   stop(glue("Duplicate rows were found in {.join_col}. Please see `?nm_join` for more details"))
+    dup_row <- .d[.join_col][duplicated( .d[.join_col]) %>% which(),]
+    stop(glue("Duplicate rows were found in {.join_col}. Please see `?nm_join` for more details"))
   }
 
   if (.superset) {
@@ -156,40 +181,43 @@ nm_join <- function(
   nrec <- .s$run_details$number_of_data_records
 
   # do the join(s)
-  for (.n in names(.tbls)) {
-    tab <- .tbls[[.n]]
-    has_id <- "ID" %in% names(tab)
+  if(!is.null(.tbls)){
+    for (.n in names(.tbls)) {
+      tab <- .tbls[[.n]]
+      has_id <- "ID" %in% names(tab)
 
-    if (!(nrow(tab) %in% c(nrec, nid))) {
-      # skip table if nrow doesn't match number of records or ID's
-      # because if neither is true than this is the wrong kind of file
-      # (or something is wrong with NONMEM output)
-      warning(glue("{.n} skipped because number of rows ({nrow(tab)}) doesn't match number of records ({nrec}) or IDs ({nid})"), call. = FALSE)
-    } else if (nrow(tab) == nid) {
-      # if FIRSTONLY table join on ID
-      verbose_msg(glue("{.n} is FIRSTONLY table"))
+      if (!(nrow(tab) %in% c(nrec, nid))) {
+        # skip table if nrow doesn't match number of records or ID's
+        # because if neither is true than this is the wrong kind of file
+        # (or something is wrong with NONMEM output)
+        warning(glue("{.n} skipped because number of rows ({nrow(tab)}) doesn't match number of records ({nrec}) or IDs ({nid})"), call. = FALSE)
+      } else if (nrow(tab) == nid) {
+        # if FIRSTONLY table join on ID
+        verbose_msg(glue("{.n} is FIRSTONLY table"))
 
-      # if ID is missing, get it from the data by using .join_col
-      if (!has_id) {
-        tab <- tab %>%
-          left_join(select(.d, "ID", !!.join_col), by = .join_col)
+        # if ID is missing, get it from the data by using .join_col
+        if (!has_id) {
+          tab <- tab %>%
+            left_join(select(.d, "ID", !!.join_col), by = .join_col)
+        }
+
+        # toss .join_col, if present, because we're joining on ID
+        tab[[.join_col]] <- NULL
+
+        # do the join
+        tab <- drop_dups(tab, .d, "ID", .n)
+        col_order <- union(col_order, names(tab))
+        .d <- join_first_only_fun(tab, .d, by = "ID")
+      } else if (nrow(tab) == nrec) {
+        # otherwise, join on .join_col
+        tab <- drop_dups(tab, .d, .join_col, .n)
+        col_order <- union(col_order, names(tab))
+        .d <- join_fun(tab, .d, by = .join_col)
       }
-
-      # toss .join_col, if present, because we're joining on ID
-      tab[[.join_col]] <- NULL
-
-      # do the join
-      tab <- drop_dups(tab, .d, "ID", .n)
-      col_order <- union(col_order, names(tab))
-      .d <- join_first_only_fun(tab, .d, by = "ID")
-    } else if (nrow(tab) == nrec) {
-      # otherwise, join on .join_col
-      tab <- drop_dups(tab, .d, .join_col, .n)
-      col_order <- union(col_order, names(tab))
-      .d <- join_fun(tab, .d, by = .join_col)
+      origin[[.n]] <- names(tab)
     }
-    origin[[.n]] <- names(tab)
   }
+
 
   verbose_msg(c(
     glue("\nfinal join stats:"),

@@ -5,10 +5,17 @@
 \title{Check if a \code{NONMEM} table file contains one or more tables in the
 specified format}
 \usage{
-assert_nm_table_format(.path, table_pattern = "^TABLE NO")
+assert_nm_table_format(
+  .path,
+  check_multiple = FALSE,
+  table_pattern = "^TABLE NO"
+)
 }
 \arguments{
 \item{.path}{a path to a table file.}
+
+\item{check_multiple}{Logical (T/F). If \code{TRUE}, check if there are multiple
+tables (most single table files still contain the default \code{table_pattern}).}
 
 \item{table_pattern}{character string defining the start of a new
 table (regex accepted).}

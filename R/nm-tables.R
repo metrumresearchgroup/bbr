@@ -42,7 +42,7 @@ nm_tables <- function(
     checkmate::assert_string(.mod)
     .mod <- read_model(.mod)
   }
-  check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
+  check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS, NMSIM_MOD_CLASS))
   checkmate::assert_character(.files)
 
   # make paths absolute
