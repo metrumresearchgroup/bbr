@@ -99,5 +99,5 @@ with multiple tables written to a single file. See "Details" in \code{\link[=nm_
 for alternatives.
 }
 \seealso{
-\code{\link[=nm_tables]{nm_tables()}}, \code{\link[=nm_table_files]{nm_table_files()}}, \code{\link[=nm_file]{nm_file()}}
+\code{\link[=nm_tables]{nm_tables()}}, \code{\link[=nm_table_files]{nm_table_files()}}, \code{\link[=nm_file]{nm_file()}}, \code{\link[=nm_join_sim]{nm_join_sim()}}
 }

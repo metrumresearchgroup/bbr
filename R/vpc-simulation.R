@@ -211,15 +211,43 @@ get_sim_replicate_record <- function(.mod){
 
 #' Read in simulation data
 #' @inheritParams setup_sim_run
-#' @keywords internal
-read_sim_data <- function(.mod, .suffix = "sim.tab"){
+#' @inheritParams nm_join
+#' @inheritParams build_path_from_model
+#' @export
+nm_join_sim <- function(
+    .mod,
+    .join_col = "NUM",
+    .suffix = "sim.tab"
+){
   check_model_object(.mod, c(NM_MOD_CLASS, NMSIM_MOD_CLASS))
 
-  # Get simulation table path (probably dont want to use based_on for this)
+  # Get list of all tables. Should only be simulation table, but may include
+  # other manually added tables
+  .files <- nm_table_files(.mod)
+
+  # Get simulation tables (probably dont want to use based_on for this)
   sim_tab <- glue("{get_model_id(get_based_on(.mod))}{.suffix}")
   sim_tab_path <- file.path(.mod[[ABS_MOD_PATH]], sim_tab)
-  sim_data <- nm_file_multi_table(sim_tab_path) %>%
-    dplyr::select(-"table_id")
+  sim_data <- nm_file_multi_table(sim_tab_path) %>% dplyr::select(-"table_id")
 
-  return(sim_data)
+  # Gather all tables (except simulation data)
+  non_sim_tabs <- .files[!grepl(sim_tab_path, .files)]
+  # can be just input data, or include other nm_join()'ed tables
+  other_data <- if(!rlang::is_empty(non_sim_tabs)){
+    nm_join_impl(.mod, .files = non_sim_tabs)
+  }else{
+    nm_data(.mod)
+  } %>% suppressMessages()
+
+  if ("DV" %in% names(other_data) && "DV" %in% names(sim_data)) {
+    other_data <- dplyr::rename(other_data, DV.DATA = "DV")
+  }
+
+  # TODO: revisit column order?
+  col_order <- union(names(other_data), names(sim_data))
+
+  res <- dplyr::left_join(sim_data, other_data, by = .join_col) %>%
+    dplyr::select(!!col_order)
+
+  return(res)
 }
