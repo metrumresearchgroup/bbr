@@ -217,7 +217,7 @@ nm_file_multi_table <- function(
 
     table.i <- withr::with_options(list(warn = 1), {
       data <- data.table::fread(
-        sim_tab_path, header = header, na.strings = ".", verbose = FALSE,
+        .path, header = header, na.strings = ".", verbose = FALSE,
         skip = (start_line - 1), nrows = (end_line - start_line),
         ...
       )
