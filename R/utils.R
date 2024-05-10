@@ -903,7 +903,8 @@ get_model_status.default <- function(.mod, max_print = 10, ...){
 #' @keywords internal
 set_bbi_null <- function(.vals){
   map(.vals, function(.val){
-    if(inherits(.val, c("integer", "numeric", "character")) && (.val == BBI_NULL_NUM)){
+    if(inherits(.val, c("integer", "numeric", "character")) &&
+       !is.na(.val) && (.val == BBI_NULL_NUM)){
       return(NA_real_)
     }else{
       return(.val)
