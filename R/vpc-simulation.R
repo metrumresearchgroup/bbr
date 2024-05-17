@@ -2,8 +2,9 @@
 #' Create a simulation model object from an existing model
 #'
 #' @param .mod a `bbi_nonmem_model` object.
-#' @param n number of replicates.
-#' @param seed a seed for simulation.
+#' @param n number of replicates/subproblems. Adds `SUBPROBLEMS=n` to a
+#'  `$SIMULATION` record.
+#' @param seed a seed for simulation. Appended to `$SIMULATION` record.
 #' @param replicate_var a variable name for storing each iteration. Cannot match
 #'  a variable previously defined in `$PRED` or `$ERROR`.
 #' @param .suffix a suffix for the simulation directory. Will be prefixed by
@@ -94,7 +95,7 @@ setup_sim_run <- function(.mod, n = 100, seed = 1234, replicate_var = "REPI"){
 
 
   ## Add new $SIMULATION record (must be _after_ $ERROR or $PRED, but before $TABLE) ##
-  sim_lines <- glue("({seed}) ({seed} NORMAL) SUBPROBLEMS={n} TRUE=FINAL")
+  sim_lines <- glue("({seed}) SUBPROBLEMS={n} TRUE=FINAL")
   add_new_record(.mod, "simulation", lines = sim_lines, after = rep_name)
 
 
@@ -209,45 +210,4 @@ get_sim_replicate_record <- function(.mod){
   return(rep_name)
 }
 
-#' Read in simulation data
-#' @inheritParams setup_sim_run
-#' @inheritParams nm_join
-#' @inheritParams build_path_from_model
-#' @export
-nm_join_sim <- function(
-    .mod,
-    .join_col = "NUM",
-    .suffix = "sim.tab"
-){
-  check_model_object(.mod, c(NM_MOD_CLASS, NMSIM_MOD_CLASS))
 
-  # Get list of all tables. Should only be simulation table, but may include
-  # other manually added tables
-  .files <- nm_table_files(.mod)
-
-  # Get simulation tables (probably dont want to use based_on for this)
-  sim_tab <- glue("{get_model_id(get_based_on(.mod))}{.suffix}")
-  sim_tab_path <- file.path(.mod[[ABS_MOD_PATH]], sim_tab)
-  sim_data <- nm_file_multi_table(sim_tab_path) %>% dplyr::select(-"table_id")
-
-  # Gather all tables (except simulation data)
-  non_sim_tabs <- .files[!grepl(sim_tab_path, .files)]
-  # can be just input data, or include other nm_join()'ed tables
-  other_data <- if(!rlang::is_empty(non_sim_tabs)){
-    nm_join_impl(.mod, .files = non_sim_tabs)
-  }else{
-    nm_data(.mod)
-  } %>% suppressMessages()
-
-  if ("DV" %in% names(other_data) && "DV" %in% names(sim_data)) {
-    other_data <- dplyr::rename(other_data, DV.DATA = "DV")
-  }
-
-  # TODO: revisit column order?
-  col_order <- union(names(other_data), names(sim_data))
-
-  res <- dplyr::left_join(sim_data, other_data, by = .join_col) %>%
-    dplyr::select(!!col_order)
-
-  return(res)
-}

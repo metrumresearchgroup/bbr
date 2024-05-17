@@ -13,7 +13,7 @@
 #' `nm_file()` (and family) are _not_ compatible with files that have multiple
 #' tables, for example an `.ext` file for a model with multiple estimation
 #' methods or a table file from a model using `$SIM`. For these kinds of files,
-#' consider using `data.table::fread()` with the `skip` and `nrows` arguments.
+#' consider using `nm_file_multi_table`.
 #'
 #' @return A tibble with the data from the specified file and estimation method.
 #'
@@ -22,7 +22,7 @@
 #'   will be passed through to [build_path_from_model()].
 #' @inheritParams build_path_from_model
 #' @param ... arguments passed through to methods. (Currently none.)
-#' @seealso [nm_tables()], [nm_table_files()], [nm_join()]
+#' @seealso [nm_tables()], [nm_table_files()], [nm_file_multi_table()], [nm_join()]
 #' @export
 nm_file <- function(.mod, .suffix = NULL, ...) {
   UseMethod("nm_file")
@@ -163,6 +163,8 @@ nm_file_impl <- function(.path) {
 }
 
 
+# The function below is modified from pmxTools, which is licensed under GPL-2.
+
 #' Read in table file with multiple `NONMEM` tables.
 #' @inheritParams nm_file_impl
 #' @param header Logical (T/F). Does the first data line contain column names?
@@ -175,14 +177,12 @@ nm_file_impl <- function(.path) {
 #' @param table_pattern character string defining the start of a new
 #'  table (regex accepted).
 #'
-#' @note This is modified from pmxTools, which is licensed under GPL-2.
-#' @seealso tab_is_multi_table
-#' @keywords internal
+#' @export
 nm_file_multi_table <- function(
     .path,
     header = TRUE,
     simplify = TRUE,
-    sanitize = TRUE,
+    sanitize = FALSE,
     ...,
     table_pattern="^TABLE NO"
 ) {
