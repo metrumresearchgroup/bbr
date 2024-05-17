@@ -3,14 +3,11 @@
 \name{model_summary}
 \alias{model_summary}
 \alias{model_summary.bbi_nonmem_model}
-\alias{model_summary.bbi_nmsim_model}
 \title{Summarize model outputs}
 \usage{
 model_summary(.mod, .bbi_args = NULL, ..., .dry_run = FALSE)
 
 \method{model_summary}{bbi_nonmem_model}(.mod, .bbi_args = NULL, ..., .dry_run = FALSE)
-
-\method{model_summary}{bbi_nmsim_model}(.mod, .bbi_args = NULL, ..., .dry_run = FALSE)
 }
 \arguments{
 \item{.mod}{Model to summarize.}
@@ -155,8 +152,6 @@ Additionally, if you have renamed the \code{.ext} file from its default of \verb
 \section{Methods (by class)}{
 \itemize{
 \item \code{model_summary(bbi_nonmem_model)}: Get model summary from \code{bbi_nonmem_model} object
-
-\item \code{model_summary(bbi_nmsim_model)}: Get model summary from \code{bbi_nmsim_model} object
 
 }}
 \seealso{
