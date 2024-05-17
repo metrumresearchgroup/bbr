@@ -5,7 +5,13 @@
 \alias{nm_table_files}
 \title{Read all tables and input data}
 \usage{
-nm_tables(.mod, .files = nm_table_files(.mod))
+nm_tables(
+  .mod,
+  .files = nm_table_files(.mod),
+  read_multi_tab = TRUE,
+  table_pattern = "^TABLE NO",
+  ...
+)
 
 nm_table_files(.mod, .check_exists = TRUE)
 }
@@ -17,6 +23,15 @@ a NONMEM run.}
 Defaults to calling \code{\link[=nm_table_files]{nm_table_files()}} on \code{.mod}, which will parse all file
 names from \verb{$TABLE} blocks in the control stream. If passing manually,
 paths should be either absolute, or relative to \code{get_output_dir(.mod)}.}
+
+\item{read_multi_tab}{Logical (\code{T}/\code{F}). If \code{TRUE}, also read in files with
+multiple tables per file.}
+
+\item{table_pattern}{character string defining the start of a new table
+(regex accepted). Only used if \code{read_multi_tab = TRUE}. If no matches are
+found, the file will be read in via \code{\link[=nm_file]{nm_file()}}.}
+
+\item{...}{additional arguments passed to \code{\link[=nm_file_multi_table]{nm_file_multi_table()}}}
 
 \item{.check_exists}{If \code{TRUE} check if files exist.}
 }
@@ -41,10 +56,6 @@ setting \code{options(bbr.verbose = FALSE)}.
 As described in Value, \code{nm_tables()} returns a named list of tibble(s). To
 return a single tibble will all of this data joined together, see
 \code{\link[=nm_join]{nm_join()}}.
-
-Because \code{nm_tables()} calls \code{\link[=nm_file]{nm_file()}} internally, it is \emph{not} compatible
-with multiple tables written to a single file. See "Details" in \code{\link[=nm_file]{nm_file()}}
-for alternatives.
 }
 \section{Functions}{
 \itemize{

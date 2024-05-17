@@ -35,6 +35,9 @@ you have in the input data and NONMEM output columns like \code{PRED} and
 extract the number of records and individuals, so those files are
 irrelevant.}
 }
+\value{
+a tibble
+}
 \description{
 For NONMEM models, when a unique row identifier (e.g an integer numbering the
 rows) is included in the input data set (i.e. the file in \verb{$DATA}) and
@@ -47,28 +50,34 @@ the number of rows in the table files (i.e. the number of rows \emph{not} bypass
 columns when each file is loaded, as well as some information about the
 joins. This \strong{printing can be suppressed} by setting \code{options(bbr.verbose = FALSE)}.
 }
-\details{
-\strong{Join column}
+\section{Join column}{
+
 
 The \code{.join_col} is the name of a single column that should appear in both the
 input data set and any tables you want to join. We recommend you make this
 column a simple integer numbering the rows in the input data set (for example
 \code{NUM}). When this column is carried into the output table files, there will
 be unambiguous matching from the table file back to the input data set.
-
-The one exception to this are \code{FIRSTONLY} tables. If a table file has the
+\itemize{
+\item The one exception to this are \code{FIRSTONLY} tables. If a table file has the
 same number of rows as the there are individuals in the input data set
-(accounting for any filtering of data in the NONMEM control stream), it will
-assumed to be a \code{FIRSTONLY} table. In this case, the table will be joined to
-the input data by the \code{ID} column. If \code{ID} is not present in the table, it
-will be using \code{.join_col}. Note that if \emph{neither} \code{ID} or the column passed
-to \code{.join_col} are present in the table, the join will fail.
+(accounting for any filtering of data in the NONMEM control stream), it
+will assumed to be a \code{FIRSTONLY} table. In this case, the table will be
+joined to the input data by the \code{ID} column. If \code{ID} is not present in
+the table, it will be using \code{.join_col}. Note that if \emph{neither} \code{ID} or
+the column passed to \code{.join_col} are present in the table, the join will
+fail.
+}
 
 Note also that, when \code{.join_col} is carried into table outputs, \strong{there is no
 need to table any other columns from the input data} as long as the
 \code{nm_join()} approach is used; any column in the input data set, regardless
 of whether it is listed in \verb{$INPUT} or not, will be carried through from the
 input data and therefore available in the joined result.
+}
+
+\section{Details}{
+
 
 \strong{Duplicate columns are dropped}
 
@@ -88,16 +97,23 @@ The origin of each column is attached to the return value via the
 
 \strong{Duplicate Rows Warning for Join Column}
 
-If there are duplicate rows found in the specified \code{.join_col}, a warning will be raised specifying a subset of the repeated rows.
-Duplicates may be caused by lack of output width. \code{FORMAT} may be need to be stated in control stream to have sufficient
-width to avoid truncating \code{.join_col}.
+If there are duplicate rows found in the specified \code{.join_col}, a warning
+will be raised specifying a subset of the repeated rows. Duplicates may be
+caused by lack of output width. \code{FORMAT} may be need to be stated in control
+stream to have sufficient width to avoid truncating \code{.join_col}.
 
 \strong{Multiple tables per file incompatibility}
 
-Because \code{nm_tables()} calls \code{\link[=nm_file]{nm_file()}} internally, it is \emph{not} compatible
-with multiple tables written to a single file. See "Details" in \code{\link[=nm_file]{nm_file()}}
-for alternatives.
+\code{nm_join()} is currently \emph{not} compatible with multiple tables written to a
+single files. \strong{To handle multiple tables}, consider reading in the tables via
+\code{\link[=nm_tables]{nm_tables()}} (or individually via \code{\link[=nm_file]{nm_file()}} & \code{\link[=nm_file_multi_table]{nm_file_multi_table()}}), and
+joining the data manually.
+\itemize{
+\item Note that \code{nm_join_sim()} \emph{does} support multiple tables for simulations.
 }
+}
+
 \seealso{
-\code{\link[=nm_tables]{nm_tables()}}, \code{\link[=nm_table_files]{nm_table_files()}}, \code{\link[=nm_file]{nm_file()}}, \code{\link[=nm_join_sim]{nm_join_sim()}}
+\code{\link[=nm_join_sim]{nm_join_sim()}}, \code{\link[=nm_tables]{nm_tables()}}, \code{\link[=nm_table_files]{nm_table_files()}}, \code{\link[=nm_file]{nm_file()}},
+\code{\link[=nm_file_multi_table]{nm_file_multi_table()}}
 }

@@ -26,29 +26,8 @@
 #'   extract the number of records and individuals, so those files are
 #'   irrelevant.
 #'
-#' @details
-#'
-#' **Join column**
-#'
-#' The `.join_col` is the name of a single column that should appear in both the
-#' input data set and any tables you want to join. We recommend you make this
-#' column a simple integer numbering the rows in the input data set (for example
-#' `NUM`). When this column is carried into the output table files, there will
-#' be unambiguous matching from the table file back to the input data set.
-#'
-#' The one exception to this are `FIRSTONLY` tables. If a table file has the
-#' same number of rows as the there are individuals in the input data set
-#' (accounting for any filtering of data in the NONMEM control stream), it will
-#' assumed to be a `FIRSTONLY` table. In this case, the table will be joined to
-#' the input data by the `ID` column. If `ID` is not present in the table, it
-#' will be using `.join_col`. Note that if _neither_ `ID` or the column passed
-#' to `.join_col` are present in the table, the join will fail.
-#'
-#' Note also that, when `.join_col` is carried into table outputs, **there is no
-#' need to table any other columns from the input data** as long as the
-#' `nm_join()` approach is used; any column in the input data set, regardless
-#' of whether it is listed in `$INPUT` or not, will be carried through from the
-#' input data and therefore available in the joined result.
+#' @template nm-join-col
+#' @section Details:
 #'
 #' **Duplicate columns are dropped**
 #'
@@ -68,19 +47,24 @@
 #'
 #' **Duplicate Rows Warning for Join Column**
 #'
-#' If there are duplicate rows found in the specified `.join_col`, a warning will be raised specifying a subset of the repeated rows.
-#' Duplicates may be caused by lack of output width. `FORMAT` may be need to be stated in control stream to have sufficient
-#' width to avoid truncating `.join_col`.
+#' If there are duplicate rows found in the specified `.join_col`, a warning
+#' will be raised specifying a subset of the repeated rows. Duplicates may be
+#' caused by lack of output width. `FORMAT` may be need to be stated in control
+#' stream to have sufficient width to avoid truncating `.join_col`.
 #'
 #' **Multiple tables per file incompatibility**
 #'
-#' Because `nm_tables()` calls [nm_file()] internally, it is _not_ compatible
-#' with multiple tables written to a single file. See "Details" in [nm_file()]
-#' for alternatives.
+#' `nm_join()` is currently _not_ compatible with multiple tables written to a
+#' single files. **To handle multiple tables**, consider reading in the tables via
+#' [nm_tables()] (or individually via [nm_file()] & [nm_file_multi_table()]), and
+#' joining the data manually.
+#'  - Note that `nm_join_sim()` _does_ support multiple tables for simulations.
 #'
 #' @importFrom dplyr left_join select
 #' @importFrom checkmate assert_string assert_character assert_logical assert_list
-#' @seealso [nm_tables()], [nm_table_files()], [nm_file()], [nm_join_sim()]
+#' @seealso [nm_join_sim()], [nm_tables()], [nm_table_files()], [nm_file()],
+#' [nm_file_multi_table()]
+#' @return a tibble
 #' @export
 nm_join <- function(
   .mod,
@@ -96,6 +80,13 @@ nm_join <- function(
     stop(
       "nm_join() is not supported for nmbayes models; ",
       "use `bbr.bayes::nm_join_bayes()` instead."
+    )
+  }
+
+  if (inherits(.mod, "bbi_nmsim_model")) {
+    stop(
+      "nm_join() is not supported for nmsim models; ",
+      "use `nm_join_sim()` instead."
     )
   }
 
@@ -126,7 +117,8 @@ nm_join_impl <- function(
   assert_logical(.superset, len = 1)
   assert_list(.bbi_args)
 
-  df_list <- nm_tables(.mod, .files = .files)
+  # Multi-tabled files are not currently supported
+  df_list <- nm_tables(.mod, .files = .files, read_multi_tab = FALSE)
   .d <- df_list$data
 
   # Handling for when input data is the only element
@@ -292,4 +284,73 @@ can_be_nm_joined <- function(.mod){
   }else{
     return(invisible(TRUE))
   }
+}
+
+
+#' Join simulation and input data
+#' @inheritParams setup_sim_run
+#' @inheritParams nm_join
+#' @template nm-join-col
+#' @seealso [nm_file_multi_table()], [nm_join()]
+#' @return a tibble
+#' @export
+nm_join_sim <- function(
+    .mod,
+    .join_col = "NUM",
+    .files = nm_table_files(.mod)
+){
+  checkmate::assert_string(.join_col)
+  checkmate::assert_character(.files)
+  checkmate::assert_true(length(.files) >= 1)
+
+  # Support bbi_nonmem_models as well in the event the model was set up manually
+  check_model_object(.mod, c(NMSIM_MOD_CLASS, NM_MOD_CLASS))
+
+  # Get list of all tables. Likely only one simulation table, but may include
+  # other manually added tables
+  df_list <- nm_tables(.mod, .files = .files, read_multi_tab = TRUE)
+
+  .d <- df_list$data
+  .tbls <- df_list[2:length(df_list)]
+
+  if("DV" %in% names(.d) && "DV" %in% unlist(map(.tbls, names))){
+    .d <- dplyr::rename(.d, DV.DATA = "DV")
+  }
+  col_order <- names(.d)
+
+  # Keep track of where each column came from.
+  origin <- vector(mode = "list", length = length(df_list))
+  names(origin) <- names(df_list)
+  origin$data <- col_order
+
+  .join_col <- toupper(.join_col)
+  if(!(.join_col %in% names(.d))){
+    stop(glue("couldn't find `.join_col` {.join_col} in data with cols: {paste(names(.d), collapse = ', ')}"))
+  }
+
+  if(anyDuplicated(.d[.join_col]) != 0){
+    dup_row <- .d[.join_col][duplicated(.d[.join_col]) %>% which(),]
+    stop(glue("Duplicate rows were found in {.join_col}. Please see `?nm_join` for more details"))
+  }
+
+  for (.n in names(.tbls)) {
+    tab <- .tbls[[.n]]
+    if("table_id" %in% names(tab)) tab <- dplyr::select(tab, -c("table_id"))
+    # Note: we dont drop duplicates here since there will inherently be duplicated
+    # `NUM` (.join_col) values per replicate
+    col_order <- union(col_order, names(tab))
+    .d <- dplyr::left_join(tab, .d, by = .join_col)
+    origin[[.n]] <- names(tab)
+  }
+
+  verbose_msg(c(
+    glue("\nfinal join stats:"),
+    glue("  rows: {nrow(.d)}"),
+    glue("  cols: {ncol(.d)}")
+  ))
+
+  res <- dplyr::select(.d, !!col_order)
+  attr(res, "nm_join_origin") <- origin
+
+  return(res)
 }

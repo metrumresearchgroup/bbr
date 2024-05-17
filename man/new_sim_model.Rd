@@ -17,9 +17,10 @@ new_sim_model(
 \arguments{
 \item{.mod}{a \code{bbi_nonmem_model} object.}
 
-\item{n}{number of replicates.}
+\item{n}{number of replicates/subproblems. Adds \code{SUBPROBLEMS=n} to a
+\verb{$SIMULATION} record.}
 
-\item{seed}{a seed for simulation.}
+\item{seed}{a seed for simulation. Appended to \verb{$SIMULATION} record.}
 
 \item{replicate_var}{a variable name for storing each iteration. Cannot match
 a variable previously defined in \verb{$PRED} or \verb{$ERROR}.}

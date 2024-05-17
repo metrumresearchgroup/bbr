@@ -49,7 +49,7 @@ as well as by \code{\link[=nm_tables]{nm_tables()}} and \code{\link[=nm_join]{nm
 \code{nm_file()} (and family) are \emph{not} compatible with files that have multiple
 tables, for example an \code{.ext} file for a model with multiple estimation
 methods or a table file from a model using \verb{$SIM}. For these kinds of files,
-consider using \code{data.table::fread()} with the \code{skip} and \code{nrows} arguments.
+consider using \code{nm_file_multi_table}.
 }
 \section{Functions}{
 \itemize{
@@ -67,5 +67,5 @@ consider using \code{data.table::fread()} with the \code{skip} and \code{nrows} 
 
 }}
 \seealso{
-\code{\link[=nm_tables]{nm_tables()}}, \code{\link[=nm_table_files]{nm_table_files()}}, \code{\link[=nm_join]{nm_join()}}
+\code{\link[=nm_tables]{nm_tables()}}, \code{\link[=nm_table_files]{nm_table_files()}}, \code{\link[=nm_file_multi_table]{nm_file_multi_table()}}, \code{\link[=nm_join]{nm_join()}}
 }

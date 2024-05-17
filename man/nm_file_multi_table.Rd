@@ -8,7 +8,7 @@ nm_file_multi_table(
   .path,
   header = TRUE,
   simplify = TRUE,
-  sanitize = TRUE,
+  sanitize = FALSE,
   ...,
   table_pattern = "^TABLE NO"
 )
@@ -33,10 +33,3 @@ table (regex accepted).}
 \description{
 Read in table file with multiple \code{NONMEM} tables.
 }
-\note{
-This is modified from pmxTools, which is licensed under GPL-2.
-}
-\seealso{
-tab_is_multi_table
-}
-\keyword{internal}
