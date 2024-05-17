@@ -100,12 +100,12 @@ setup_sim_run <- function(.mod, n = 100, seed = 1234, replicate_var = "REPI"){
 
 
   ## Add new $TABLE record with predefined format and columns (including REPI) ##
-  table_name <- glue("{get_model_id(get_based_on(.mod)[1])}sim.tab")
+  table_name <- glue("{get_model_id(get_based_on(.mod)[1])}-sim.tab")
   # TODO: DV automatically gets added in testing, is this always the case?
   # - i.e. adding DV causes duplicate DV columns
   # TODO: We likely want handling for `NUM` column, as this assumes `NUM` is part
   # of your input data (and we cant rely on that assumption)
-  table_lines <- glue("ONEHEADER {replicate_var} NUM PRED FILE={table_name}")
+  table_lines <- glue("ONEHEADER NOPRINT NOAPPEND {replicate_var} NUM DV PRED FILE={table_name}")
   add_new_record(.mod, "table", lines = table_lines, after = "simulation")
 
 
