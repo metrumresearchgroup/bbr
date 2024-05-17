@@ -4,8 +4,10 @@
 #' @param .suffix a suffix for the bootstrap run directory. Will be prefixed by
 #'  the model id of `.mod`.
 #' @inheritParams copy_model_from
+#' @param .inherit_tags If `TRUE`, the default, inherit any tags from `.mod`.
 #' @param remove_cov,remove_tables Logical (T/F). Optionally remove `$COVARIANCE`
-#' and `$TABLE` records respectively, allowing for notably faster run times.
+#'  and `$TABLE` records respectively, allowing for notably faster run times.
+#'  Both default to `TRUE`.
 #'
 #' @seealso setup_bootstrap_run summarize_bootstrap_run
 #' @return S3 object of class `bbi_nmboot_model`.

@@ -19,16 +19,15 @@ new_bootstrap_run(
 \item{.suffix}{a suffix for the bootstrap run directory. Will be prefixed by
 the model id of \code{.mod}.}
 
-\item{.inherit_tags}{If \code{FALSE}, the default, new model will only have any
-tags passed to \code{.add_tags} argument. If \code{TRUE} inherit any tags from
-\code{.parent_mod}, with any tags passed to \code{.add_tags} appended.}
+\item{.inherit_tags}{If \code{TRUE}, the default, inherit any tags from \code{.mod}.}
 
 \item{.overwrite}{If \code{FALSE}, the default,  function will error if a model
 file already exists at specified \code{.new_model} path. If \code{TRUE} any existing
 file at \code{.new_model} will be overwritten silently.}
 
 \item{remove_cov, remove_tables}{Logical (T/F). Optionally remove \verb{$COVARIANCE}
-and \verb{$TABLE} records respectively, allowing for notably faster run times.}
+and \verb{$TABLE} records respectively, allowing for notably faster run times.
+Both default to \code{TRUE}.}
 }
 \value{
 S3 object of class \code{bbi_nmboot_model}.
