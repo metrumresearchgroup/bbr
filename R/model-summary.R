@@ -164,7 +164,7 @@ model_summary.bbi_nonmem_model <- function(
   return(res_list)
 }
 
-#' @describeIn model_summary Get model summary from `bbi_nmsim_model` object
+
 #' @export
 model_summary.bbi_nmsim_model <- function(
     .mod,
@@ -173,44 +173,12 @@ model_summary.bbi_nmsim_model <- function(
     .dry_run = FALSE
 ) {
 
-  # Summarize the `based_on` model for run detail information
-  #  - bbi does not support summarizing simulation runs, but some information
-  # is portable across both model types (n subjects, etc.)
-  res_list <- nonmem_summary(
-    .mod = read_model(get_based_on(.mod)),
-    .bbi_args = .bbi_args,
-    ...,
-    .dry_run = .dry_run
+  rlang::abort(
+    c(
+      glue("model_summary() is not supported for {NMSIM_MOD_CLASS} objects"),
+      "See `?nm_join_sim` for reading in the simulation data"
+    )
   )
-  class(res_list) <- "list"
-
-  output_dir <- get_output_dir(.mod)
-
-  # Store specific run detail elements, and overwrite data_path (likely the same)
-  run_details_keep <- c(
-    "number_of_subjects", "number_of_obs", "number_of_data_records",
-    "output_files_used"
-  )
-  res_list[[SUMMARY_DETAILS]] <- res_list[[SUMMARY_DETAILS]] %>%
-    purrr::keep_at(run_details_keep)
-  # Update dataset and output_files_used
-  res_list[[SUMMARY_DETAILS]]$data_set <- get_data_path(.mod) %>%
-    fs::path_rel(output_dir)
-  res_list[[SUMMARY_DETAILS]]$output_files_used <- basename(nm_table_files(.mod))
-  # Set only_sim to TRUE
-  res_list[[SUMMARY_DETAILS]]$only_sim <- TRUE
-
-  # Remove all heuristics - none of this is relevant to the simulation
-  res_list$run_heuristics <- FALSE
-
-  # Add variables from config
-  config <- jsonlite::fromJSON(file.path(output_dir, "bbi_config.json"))
-  res_list[[ABS_MOD_PATH]] <- output_dir
-  res_list$error_msg <- config$error
-
-  res_list <- create_summary_object(res_list, "nonmem")
-
-  return(res_list)
 }
 
 ###################################
