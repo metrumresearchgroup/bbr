@@ -13,7 +13,7 @@
 #' `nm_file()` (and family) are _not_ compatible with files that have multiple
 #' tables, for example an `.ext` file for a model with multiple estimation
 #' methods or a table file from a model using `$SIM`. For these kinds of files,
-#' consider using `nm_file_multi_table`.
+#' consider using `nm_file_multi_tab`.
 #'
 #' @return A tibble with the data from the specified file and estimation method.
 #'
@@ -22,7 +22,7 @@
 #'   will be passed through to [build_path_from_model()].
 #' @inheritParams build_path_from_model
 #' @param ... arguments passed through to methods. (Currently none.)
-#' @seealso [nm_tables()], [nm_table_files()], [nm_file_multi_table()], [nm_join()]
+#' @seealso [nm_tables()], [nm_table_files()], [nm_file_multi_tab()], [nm_join()]
 #' @export
 nm_file <- function(.mod, .suffix = NULL, ...) {
   UseMethod("nm_file")
@@ -163,114 +163,130 @@ nm_file_impl <- function(.path) {
 }
 
 
-# The function below is modified from pmxTools, which is licensed under GPL-2.
 
 #' Read in table file with multiple `NONMEM` tables.
 #' @inheritParams nm_file_impl
-#' @param header Logical (T/F). Does the first data line contain column names?
-#'  Passed to [data.table::fread()].
-#' @param simplify Logical (T/F). If `TRUE`, simplify list of tables into a
-#'  single tibble. Table names will show up as a new `table_id` column.
-#' @param sanitize Logical (T/F). If `TRUE`, sanitize columns to ensure no
-#'  remaining column headers or other text pollution makes it into the data.
-#' @param ... additional arguments passed to [data.table::fread()]
+#' @param simplify Logical (T/F). If `TRUE`, attempt to simplify list of tables into a
+#'  single tibble (requires . Table names will show up as a new `table_id` column. This is
+#'  automatically done if simulation data is detected (same rows _and_ columns per
+#'  table).
 #' @param table_pattern character string defining the start of a new
 #'  table (regex accepted).
 #'
+#' @note table headers are expected
 #' @export
-nm_file_multi_table <- function(
+nm_file_multi_tab <- function(
     .path,
-    header = TRUE,
     simplify = TRUE,
-    sanitize = FALSE,
-    ...,
-    table_pattern="^TABLE NO"
-) {
+    table_pattern="TABLE NO"
+){
   verbose_msg(glue("Reading {basename(.path)}"))
   checkmate::assert_file_exists(.path)
 
-  # TODO: do we want this?
-  if(!assert_nm_table_format(.path, table_pattern, check_multiple = TRUE)){
-    rlang::warn(
-      glue("{.path} may not be parsed correctly. Consider changing `table_pattern`")
+  x <- stringfish::sf_readLines(.path)
+
+  # Get new table indices and names
+  tab_rows <- which(stringfish::sf_grepl(x, pattern = table_pattern, fixed = TRUE))
+  table_names <- x[tab_rows]
+  col_names <- x[tab_rows + 1]
+
+  # If each table is the same number of rows and column names, assume simulation
+  # (takes advantage of faster read-in times)
+  nrow_each <- diff(tab_rows) - 2 # for table name and column headers
+  same_rows <- dplyr::n_distinct(nrow_each) == 1
+  same_cols <- dplyr::n_distinct(col_names) == 1
+
+  if(isTRUE(same_rows) && isTRUE(same_cols)){
+    cols <- strsplit(trimws(x[2]), split = "\\s+")[[1]]
+    # Remove table names before reading in
+    x <- x[-c(tab_rows, tab_rows+1)]
+    data <- data.table::fread(
+      text = x,
+      col.names = cols,
+      colClasses = rep("numeric", length(cols)),
+      na.strings = ".",
+      header = FALSE
     )
-  }
 
-  # Determine start of each new table
-  file_data <- readLines(.path)
-  new_tables <- grep(file_data, pattern = table_pattern)
-
-  # make unique for duplicated table names (simulation does)
-  file_data[new_tables] <- make.unique(file_data[new_tables])
-
-  table_list <- list()
-  for(idx in seq_along(new_tables)){
-    # Read in & format each individual table
-    start_line <- new_tables[idx] + 1
-    end_line <-
-      if(idx == length(new_tables)){
-        length(file_data)
-      }else{
-        new_tables[idx + 1] - 1
-      }
-    current_table_name <- file_data[new_tables[idx]]
-
-    table.i <- withr::with_options(list(warn = 1), {
-      data <- data.table::fread(
-        .path, header = header, na.strings = ".", verbose = FALSE,
-        skip = (start_line - 1), nrows = (end_line - start_line),
-        ...
-      )
-      data <- remove_dup_cols(data)
-      as_tibble(data)
-    })
-
-    if(isTRUE(sanitize)){
-      # Scan to ensure no remaining column headers or other text pollution
-      pattern <- "^[[:space:]]*([[:alpha:]].*)"
-      indices <- which(!grepl(pattern, table.i[[1]]))
-      table.i <- table.i[indices,]
+    # Assign table number
+    #  - This is useful for simulation data, where nn would be the replicate
+    #  - This part removes the need to keep track of the replicate within the
+    #    NONMEM model
+    total <- nrow(data) / nrow_each[1]
+    data$nn <- rep(seq(total), each = nrow_each[1])
+    data$table_name <- rep(table_names, each = nrow_each[1])
+    data <- as_tibble(data)
+  }else{
+    # Multi-tabled files that _aren't_ from simulations likely follow this method
+    # - i.e. the number of rows per table can differ
+    table_list <- list()
+    # Read in and format each individual table
+    for(idx in seq_along(tab_rows)){
+      start_line <- tab_rows[idx] + 1
+      end_line <- if(idx == length(tab_rows)) length(x) else tab_rows[idx + 1] - 1
+      table.i <- withr::with_options(list(warn = 1), {
+        data <- data.table::fread(
+          file = .path,
+          skip = (start_line - 1),
+          nrows = (end_line - start_line),
+          na.strings = ".",
+          header = TRUE,
+          verbose = FALSE
+        )
+        data <- remove_dup_cols(data) %>%
+          dplyr::mutate(table_name = table_names[idx])
+        as_tibble(data)
+      })
+      table_list[[idx]] <- table.i
     }
-
-    table_list[[current_table_name]] <- as_tibble(table.i)
+    if(isTRUE(simplify)){
+      if(isTRUE(same_cols)){
+        data <- purrr::list_rbind(table_list, names_to = "nn") %>%
+          dplyr::relocate("nn", .after = dplyr::everything())
+      }else{
+        data <- table_list
+        rlang::warn(
+          c(
+            "Tables cannot be simplified",
+            "Either the headers were in an unexpected format, or the tables did not have the same column names."
+          )
+        )
+      }
+    }else{
+      data <- table_list
+    }
   }
 
-  # Format and return
-  if(length(length(table_list)) > 1){
+  if(inherits(data, "list")){
     verbose_msg(glue("  tables: {length(table_list)}"))
+  }else{
+    data <- data %>% dplyr::relocate("table_name", .after = dplyr::everything())
+    verbose_msg(glue("  rows: {nrow(data)}"))
+    verbose_msg(glue("  cols: {ncol(data)}"))
   }
 
-  if(isTRUE(simplify)){
-    table_list <- purrr::list_rbind(table_list, names_to = "table_id") %>%
-      dplyr::relocate("table_id", .after = dplyr::everything())
-
-    verbose_msg(glue("  rows: {nrow(table_list)}"))
-    verbose_msg(glue("  cols: {ncol(table_list)}"))
-  }
-  verbose_msg("") # for newline
-
-  return(table_list)
+  return(data)
 }
 
 
 #' Check if a `NONMEM` table file contains one or more tables in the
 #'  specified format
-#' @inheritParams nm_file_multi_table
+#' @inheritParams nm_file_multi_tab
 #' @param check_multiple Logical (T/F). If `TRUE`, check if there are multiple
 #'  tables (most single table files still contain the default `table_pattern`).
-#' @seealso nm_file_multi_table
+#' @seealso nm_file_multi_tab
 #' @return logical
 #' @keywords internal
 assert_nm_table_format <- function(
     .path,
     check_multiple = FALSE,
-    table_pattern="^TABLE NO"
-    ){
+    table_pattern="TABLE NO"
+){
   checkmate::assert_file_exists(.path)
 
   # Determine start of each new table
-  file_data <- readLines(.path)
-  new_table_def <- grepl(file_data, pattern = table_pattern)
+  x <- stringfish::sf_readLines(.path)
+  new_table_def <- stringfish::sf_grepl(x, pattern = table_pattern, fixed = TRUE)
 
   if(isTRUE(check_multiple)){
     return(sum(new_table_def) > 1)

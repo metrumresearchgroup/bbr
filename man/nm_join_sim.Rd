@@ -4,24 +4,26 @@
 \alias{nm_join_sim}
 \title{Join simulation and input data}
 \usage{
-nm_join_sim(.mod, .join_col = "NUM", .files = nm_table_files(.mod))
+nm_join_sim(.mod, .join_col = "NUM", .cols_keep = "all")
 }
 \arguments{
 \item{.mod}{a \code{bbi_nonmem_model} or \code{bbi_nmsim_model} object.}
 
-\item{.join_col}{Character column name to use to join table files. Defaults to
-\code{NUM}. See Details.}
+\item{.join_col}{Character column name(s) to use to join table files.
+Defaults to \code{NUM}. See Details.}
 
-\item{.files}{Character vector of file paths to table files to read in.
-Defaults to calling \code{\link[=nm_table_files]{nm_table_files()}} on \code{.mod}, which will parse all file
-names from \verb{$TABLE} blocks in the control stream. If passing manually,
-paths should be either absolute, or relative to \code{get_output_dir(.mod)}.}
+\item{.cols_keep}{Either \code{'all'}, or a vector of column name(s) to retain
+in the final dataset after joining. Defaults to keeping all columns.}
 }
 \value{
 a tibble
 }
 \description{
 Join simulation and input data
+}
+\note{
+The join column name(s) specified should match what you provided to
+\code{\link[=new_sim_model]{new_sim_model()}}.
 }
 \section{Join column}{
 
@@ -31,24 +33,57 @@ input data set and any tables you want to join. We recommend you make this
 column a simple integer numbering the rows in the input data set (for example
 \code{NUM}). When this column is carried into the output table files, there will
 be unambiguous matching from the table file back to the input data set.
-\itemize{
-\item The one exception to this are \code{FIRSTONLY} tables. If a table file has the
-same number of rows as the there are individuals in the input data set
-(accounting for any filtering of data in the NONMEM control stream), it
-will assumed to be a \code{FIRSTONLY} table. In this case, the table will be
-joined to the input data by the \code{ID} column. If \code{ID} is not present in
-the table, it will be using \code{.join_col}. Note that if \emph{neither} \code{ID} or
-the column passed to \code{.join_col} are present in the table, the join will
-fail.
-}
+
+
 
 Note also that, when \code{.join_col} is carried into table outputs, \strong{there is no
 need to table any other columns from the input data} as long as the
 \code{nm_join()} approach is used; any column in the input data set, regardless
 of whether it is listed in \verb{$INPUT} or not, will be carried through from the
 input data and therefore available in the joined result.
+
+\strong{Duplicate Rows Warning for Join Column}
+
+If there are duplicate rows found in the specified \code{.join_col}, a warning
+will be raised specifying a subset of the repeated rows. Duplicates may be
+caused by lack of output width. \code{FORMAT} may be need to be stated in control
+stream to have sufficient width to avoid truncating \code{.join_col}.
+
+
+\subsection{Example: creating a row number \code{.join_col}}{
+
+Take the following \verb{$INPUT} and \verb{$DATA} records:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{$INPUT ID TIME MDV EVID DV AMT SEX WT ETN
+$DATA ../../../../extdata/acop.csv
+}\if{html}{\out{</div>}}
+
+Before submitting a model, read in the data and add a row number column;
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{library(dplyr)
+data <- nm_data(.mod) \%>\% mutate(NUM = 1:n())
+readr::write_csv(data, get_data_path(.mod))
+}\if{html}{\out{</div>}}
+
+Then add \code{'NUM'} to the list of input columns:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{$INPUT ID TIME MDV EVID DV AMT SEX WT ETN *NUM*
+}\if{html}{\out{</div>}}
+}
 }
 
+\examples{
+\dontrun{
+
+.sim_mod <- new_sim_model(.mod, .join_col = c("NUM", "ID"))
+
+submit_model(.sim_mod)
+
+nm_join_sim(.sim_mod, .join_col = c("NUM", "ID"), .cols_keep = "ID")
+}
+
+
+}
 \seealso{
-\code{\link[=nm_file_multi_table]{nm_file_multi_table()}}, \code{\link[=nm_join]{nm_join()}}
+\code{\link[=new_sim_model]{new_sim_model()}}, \code{\link[=nm_file_multi_table]{nm_file_multi_table()}}, \code{\link[=nm_join]{nm_join()}}
 }

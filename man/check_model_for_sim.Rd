@@ -4,13 +4,14 @@
 \alias{check_model_for_sim}
 \title{Check that a \code{bbr} model can be used for simulation}
 \usage{
-check_model_for_sim(.mod, replicate_var = "REPI")
+check_model_for_sim(.mod, .join_col)
 }
 \arguments{
 \item{.mod}{a \code{bbi_nonmem_model} object.}
 
-\item{replicate_var}{a variable name for storing each iteration. Cannot match
-a variable previously defined in \verb{$PRED} or \verb{$ERROR}.}
+\item{.join_col}{Character column name(s) used to join table files post
+execution. Gets appended to the generated \verb{$TABLE} record. See
+\code{\link[=nm_join_sim]{nm_join_sim()}} documentation for details. Defaults to \code{'NUM'}.}
 }
 \value{
 \code{TRUE} invisibly

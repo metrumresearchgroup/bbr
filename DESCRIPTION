@@ -71,6 +71,7 @@ Imports:
     purrr,
     readr,
     rlang,
+    stringfish,
     stringr,
     stringi,
     tibble,

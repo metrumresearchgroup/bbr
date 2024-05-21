@@ -9,7 +9,7 @@ nm_tables(
   .mod,
   .files = nm_table_files(.mod),
   read_multi_tab = TRUE,
-  table_pattern = "^TABLE NO",
+  table_pattern = "TABLE NO",
   ...
 )
 
@@ -27,11 +27,11 @@ paths should be either absolute, or relative to \code{get_output_dir(.mod)}.}
 \item{read_multi_tab}{Logical (\code{T}/\code{F}). If \code{TRUE}, also read in files with
 multiple tables per file.}
 
-\item{table_pattern}{character string defining the start of a new table
-(regex accepted). Only used if \code{read_multi_tab = TRUE}. If no matches are
-found, the file will be read in via \code{\link[=nm_file]{nm_file()}}.}
+\item{table_pattern}{character string (fixed) defining the start of a new
+table. Onlyused if \code{read_multi_tab = TRUE}. If no matches are found, the
+file will be read in via \code{\link[=nm_file]{nm_file()}}.}
 
-\item{...}{additional arguments passed to \code{\link[=nm_file_multi_table]{nm_file_multi_table()}}}
+\item{...}{additional arguments passed to \code{\link[=nm_file_multi_tab]{nm_file_multi_tab()}}}
 
 \item{.check_exists}{If \code{TRUE} check if files exist.}
 }

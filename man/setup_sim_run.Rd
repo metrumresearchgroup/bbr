@@ -4,7 +4,7 @@
 \alias{setup_sim_run}
 \title{Set up \code{NONMEM} simulation}
 \usage{
-setup_sim_run(.mod, n = 100, seed = 1234, replicate_var = "REPI")
+setup_sim_run(.mod, n = 100, seed = 1234, .join_col = c("NUM"))
 }
 \arguments{
 \item{.mod}{a \code{bbi_nonmem_model} or \code{bbi_nmsim_model} object.}
@@ -14,8 +14,9 @@ setup_sim_run(.mod, n = 100, seed = 1234, replicate_var = "REPI")
 
 \item{seed}{a seed for simulation. Appended to \verb{$SIMULATION} record.}
 
-\item{replicate_var}{a variable name for storing each iteration. Cannot match
-a variable previously defined in \verb{$PRED} or \verb{$ERROR}.}
+\item{.join_col}{Character column name(s) used to join table files post
+execution. Gets appended to the generated \verb{$TABLE} record. See
+\code{\link[=nm_join_sim]{nm_join_sim()}} documentation for details. Defaults to \code{'NUM'}.}
 }
 \description{
 Creates new \verb{$SIMULATION} and \verb{$MSFI} records, and modifies the \verb{$PRED} or
