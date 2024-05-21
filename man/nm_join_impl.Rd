@@ -38,4 +38,63 @@ irrelevant.}
 \description{
 Implementation function for \code{nm_join()}
 }
+\section{Join column}{
+
+
+The \code{.join_col} is the name of a single column that should appear in both the
+input data set and any tables you want to join. We recommend you make this
+column a simple integer numbering the rows in the input data set (for example
+\code{NUM}). When this column is carried into the output table files, there will
+be unambiguous matching from the table file back to the input data set.
+
+
+\itemize{
+\item The one exception to this are \code{FIRSTONLY} tables. If a table file has the
+same number of rows as the there are individuals in the input data set
+(accounting for any filtering of data in the NONMEM control stream), it
+will assumed to be a \code{FIRSTONLY} table. In this case, the table will be
+joined to the input data by the \code{ID} column. If \code{ID} is not present in
+the table, it will be using \code{.join_col}. Note that if \emph{neither} \code{ID} or
+the column passed to \code{.join_col} are present in the table, the join will
+fail.
+}
+
+
+
+Note also that, when \code{.join_col} is carried into table outputs, \strong{there is no
+need to table any other columns from the input data} as long as the
+\code{nm_join()} approach is used; any column in the input data set, regardless
+of whether it is listed in \verb{$INPUT} or not, will be carried through from the
+input data and therefore available in the joined result.
+
+\strong{Duplicate Rows Warning for Join Column}
+
+If there are duplicate rows found in the specified \code{.join_col}, a warning
+will be raised specifying a subset of the repeated rows. Duplicates may be
+caused by lack of output width. \code{FORMAT} may be need to be stated in control
+stream to have sufficient width to avoid truncating \code{.join_col}.
+
+
+\subsection{Example: creating a row number \code{.join_col}}{
+
+Take the following \verb{$INPUT} and \verb{$DATA} records:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{$INPUT ID TIME MDV EVID DV AMT SEX WT ETN
+$DATA ../../../../extdata/acop.csv
+}\if{html}{\out{</div>}}
+
+Before submitting a model, read in the data and add a row number column;
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{library(dplyr)
+data <- nm_data(.mod) \%>\% mutate(NUM = 1:n())
+readr::write_csv(data, get_data_path(.mod))
+}\if{html}{\out{</div>}}
+
+Then add \code{'NUM'} to the list of input columns:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{$INPUT ID TIME MDV EVID DV AMT SEX WT ETN *NUM*
+}\if{html}{\out{</div>}}
+}
+}
+
 \keyword{internal}

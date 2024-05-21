@@ -27,6 +27,10 @@
 #'   irrelevant.
 #'
 #' @template nm-join-col
+#' @template nm-join-col-firstonly
+#' @template nm-join-col-tables
+#' @template nm-join-col-eg
+#'
 #' @section Details:
 #'
 #' **Duplicate columns are dropped**
@@ -45,36 +49,30 @@
 #' "nm_join_origin" attribute, a list that maps each source (as named by
 #' [nm_tables()]) to the columns that came from that source.
 #'
-#' **Duplicate Rows Warning for Join Column**
-#'
-#' If there are duplicate rows found in the specified `.join_col`, a warning
-#' will be raised specifying a subset of the repeated rows. Duplicates may be
-#' caused by lack of output width. `FORMAT` may be need to be stated in control
-#' stream to have sufficient width to avoid truncating `.join_col`.
 #'
 #' **Multiple tables per file incompatibility**
 #'
 #' `nm_join()` is currently _not_ compatible with multiple tables written to a
 #' single files. **To handle multiple tables**, consider reading in the tables via
-#' [nm_tables()] (or individually via [nm_file()] & [nm_file_multi_table()]), and
+#' [nm_tables()] (or individually via [nm_file()] & [nm_file_multi_tab()]), and
 #' joining the data manually.
 #'  - Note that `nm_join_sim()` _does_ support multiple tables for simulations.
 #'
 #' @importFrom dplyr left_join select
 #' @importFrom checkmate assert_string assert_character assert_logical assert_list
 #' @seealso [nm_join_sim()], [nm_tables()], [nm_table_files()], [nm_file()],
-#' [nm_file_multi_table()]
+#' [nm_file_multi_tab()]
 #' @return a tibble
 #' @export
 nm_join <- function(
-  .mod,
-  .join_col = "NUM",
-  .files = nm_table_files(.mod),
-  .superset = FALSE,
-  .bbi_args = list(
-    no_grd_file = TRUE,
-    no_shk_file = TRUE
-  )
+    .mod,
+    .join_col = "NUM",
+    .files = nm_table_files(.mod),
+    .superset = FALSE,
+    .bbi_args = list(
+      no_grd_file = TRUE,
+      no_shk_file = TRUE
+    )
 ) {
   if (inherits(.mod, "bbi_nmbayes_model")) {
     stop(
@@ -101,6 +99,10 @@ nm_join <- function(
 
 #' Implementation function for `nm_join()`
 #' @inheritParams nm_join
+#' @template nm-join-col
+#' @template nm-join-col-firstonly
+#' @template nm-join-col-tables
+#' @template nm-join-col-eg
 #' @keywords internal
 nm_join_impl <- function(
     .mod,
@@ -289,34 +291,76 @@ can_be_nm_joined <- function(.mod){
 
 #' Join simulation and input data
 #' @inheritParams setup_sim_run
-#' @inheritParams nm_join
+#' @param .join_col Character column name(s) to use to join table files.
+#'  Defaults to `NUM`. See Details.
+#' @param .cols_keep Either `'all'`, or a vector of column name(s) to retain
+#'  in the final dataset after joining. Defaults to keeping all columns.
+#'
+#' @note The join column name(s) specified should match what you provided to
+#' [new_sim_model()].
+#'
 #' @template nm-join-col
-#' @seealso [nm_file_multi_table()], [nm_join()]
+#' @template nm-join-col-tables
+#' @template nm-join-col-eg
+#'
+#' @seealso [new_sim_model()], [nm_file_multi_tab()], [nm_join()]
+#'
+#' @examples
+#' \dontrun{
+#'
+#' .sim_mod <- new_sim_model(.mod, .join_col = c("NUM", "ID"))
+#'
+#' submit_model(.sim_mod)
+#'
+#' nm_join_sim(.sim_mod, .join_col = c("NUM", "ID"), .cols_keep = "ID")
+#' }
+#'
+#'
 #' @return a tibble
 #' @export
 nm_join_sim <- function(
     .mod,
     .join_col = "NUM",
-    .files = nm_table_files(.mod)
+    .cols_keep = "all"
 ){
   checkmate::assert_string(.join_col)
-  checkmate::assert_character(.files)
-  checkmate::assert_true(length(.files) >= 1)
+  checkmate::assert_string(.cols_keep)
+
+  # Only support joining the table we add so we can make certain assumptions
+  files <- nm_table_files(.mod)
+  if(length(files) > 1){
+    rlang::abort(
+      "`nm_join_sim` only supports joining a single table file (the one bbr adds)",
+      "Try using `nm_tables()` to manually join the tables"
+    )
+  }
 
   # Support bbi_nonmem_models as well in the event the model was set up manually
   check_model_object(.mod, c(NMSIM_MOD_CLASS, NM_MOD_CLASS))
 
   # Get list of all tables. Likely only one simulation table, but may include
   # other manually added tables
-  df_list <- nm_tables(.mod, .files = .files, read_multi_tab = TRUE)
+  df_list <- nm_tables(.mod, .files = files, read_multi_tab = TRUE)
 
   .d <- df_list$data
+  if(.cols_keep != "all" && !all(.cols_keep %in% names(.d))){
+    col_keep_txt <- paste0(.cols_keep, collapse = ", ")
+    .cols_keep <- "all"
+    rlang::warn(
+      c(
+        glue("Cannot find requested columns ({col_keep_txt}) in input data."),
+        "i" = "See `names(nm_data(.mod))` for available `.cols_keep` options.",
+        "Returning all columns..."
+      )
+    )
+  }
+
   .tbls <- df_list[2:length(df_list)]
 
   if("DV" %in% names(.d) && "DV" %in% unlist(map(.tbls, names))){
     .d <- dplyr::rename(.d, DV.DATA = "DV")
   }
-  col_order <- names(.d)
+  col_order <- if(.cols_keep == "all") names(.d) else .cols_keep
 
   # Keep track of where each column came from.
   origin <- vector(mode = "list", length = length(df_list))
@@ -324,18 +368,25 @@ nm_join_sim <- function(
   origin$data <- col_order
 
   .join_col <- toupper(.join_col)
-  if(!(.join_col %in% names(.d))){
-    stop(glue("couldn't find `.join_col` {.join_col} in data with cols: {paste(names(.d), collapse = ', ')}"))
+  if(!all(.join_col %in% names(.d))){
+    join_col_txt <- paste0(.join_col, collapse = ", ")
+    stop(glue("couldn't find `.join_col` {join_col_txt} in data with cols: {paste(names(.d), collapse = ', ')}"))
   }
 
   if(anyDuplicated(.d[.join_col]) != 0){
-    dup_row <- .d[.join_col][duplicated(.d[.join_col]) %>% which(),]
-    stop(glue("Duplicate rows were found in {.join_col}. Please see `?nm_join` for more details"))
+    join_col_txt <- paste0(.join_col, collapse = ", ")
+    stop(glue("Duplicate rows were found in {join_col_txt}. Please see `?nm_join_sim` for more details"))
   }
 
+  # Note: Kept for-loop in case we decide to support multiple table records
+  #  (i.e. additional, manually added ones) at a later time
   for (.n in names(.tbls)) {
     tab <- .tbls[[.n]]
-    if("table_id" %in% names(tab)) tab <- dplyr::select(tab, -c("table_id"))
+    # This assumes the multi-tabled file is a necessarily a simulation dataset
+    if("table_id" %in% names(tab)){
+      tmp <- tab %>% dplyr::group_by(.data$table_id) %>% dplyr::mutate(NN = dplyr::cur_group_id())
+      tab <- dplyr::select(tab, -c("table_id"))
+    }
     # Note: we dont drop duplicates here since there will inherently be duplicated
     # `NUM` (.join_col) values per replicate
     col_order <- union(col_order, names(tab))
@@ -353,4 +404,32 @@ nm_join_sim <- function(
   attr(res, "nm_join_origin") <- origin
 
   return(res)
+}
+
+
+# testing alternatives
+
+
+nm_join_sim_2 <- function(.sim_mod) {
+
+  # Dont think we want to bind to based_on model by default.
+  # I think a default `nm_join` method should just include
+  # table files within that model, and maybe we have an arg to bind to based_on
+  # model tables?
+  based <- read_model(get_based_on(.sim_mod))
+  par <- data.table::as.data.table(nm_join(based))
+  n <- nm_table_files(.sim_mod)
+
+  # doesnt seem to work - only works for first replicate; rest are NAs ('Stopped early on line 782')
+  #  - maybe something changes at a later/earlier version of fread?
+  tab <- data.table::fread(n[[1]], skip = 1)
+
+  first_col <- names(tab)[1]
+  tab[, REP := 1+cumsum(tab[[1]]=="TABLE")]
+  tab <- tab[!(tab[[1]] %in% c(first_col,"TABLE"))]
+  tab[] <- lapply(tab, as.numeric)
+  tab[, NUM := rep(par$NUM, times = nrow(tab) / nrow(par))]
+  tab <- par[tab, on = "NUM"]
+
+  tab
 }

@@ -58,6 +58,8 @@ input data set and any tables you want to join. We recommend you make this
 column a simple integer numbering the rows in the input data set (for example
 \code{NUM}). When this column is carried into the output table files, there will
 be unambiguous matching from the table file back to the input data set.
+
+
 \itemize{
 \item The one exception to this are \code{FIRSTONLY} tables. If a table file has the
 same number of rows as the there are individuals in the input data set
@@ -69,11 +71,42 @@ the column passed to \code{.join_col} are present in the table, the join will
 fail.
 }
 
+
+
 Note also that, when \code{.join_col} is carried into table outputs, \strong{there is no
 need to table any other columns from the input data} as long as the
 \code{nm_join()} approach is used; any column in the input data set, regardless
 of whether it is listed in \verb{$INPUT} or not, will be carried through from the
 input data and therefore available in the joined result.
+
+\strong{Duplicate Rows Warning for Join Column}
+
+If there are duplicate rows found in the specified \code{.join_col}, a warning
+will be raised specifying a subset of the repeated rows. Duplicates may be
+caused by lack of output width. \code{FORMAT} may be need to be stated in control
+stream to have sufficient width to avoid truncating \code{.join_col}.
+
+
+\subsection{Example: creating a row number \code{.join_col}}{
+
+Take the following \verb{$INPUT} and \verb{$DATA} records:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{$INPUT ID TIME MDV EVID DV AMT SEX WT ETN
+$DATA ../../../../extdata/acop.csv
+}\if{html}{\out{</div>}}
+
+Before submitting a model, read in the data and add a row number column;
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{library(dplyr)
+data <- nm_data(.mod) \%>\% mutate(NUM = 1:n())
+readr::write_csv(data, get_data_path(.mod))
+}\if{html}{\out{</div>}}
+
+Then add \code{'NUM'} to the list of input columns:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{$INPUT ID TIME MDV EVID DV AMT SEX WT ETN *NUM*
+}\if{html}{\out{</div>}}
+}
 }
 
 \section{Details}{
@@ -95,18 +128,11 @@ The origin of each column is attached to the return value via the
 "nm_join_origin" attribute, a list that maps each source (as named by
 \code{\link[=nm_tables]{nm_tables()}}) to the columns that came from that source.
 
-\strong{Duplicate Rows Warning for Join Column}
-
-If there are duplicate rows found in the specified \code{.join_col}, a warning
-will be raised specifying a subset of the repeated rows. Duplicates may be
-caused by lack of output width. \code{FORMAT} may be need to be stated in control
-stream to have sufficient width to avoid truncating \code{.join_col}.
-
 \strong{Multiple tables per file incompatibility}
 
 \code{nm_join()} is currently \emph{not} compatible with multiple tables written to a
 single files. \strong{To handle multiple tables}, consider reading in the tables via
-\code{\link[=nm_tables]{nm_tables()}} (or individually via \code{\link[=nm_file]{nm_file()}} & \code{\link[=nm_file_multi_table]{nm_file_multi_table()}}), and
+\code{\link[=nm_tables]{nm_tables()}} (or individually via \code{\link[=nm_file]{nm_file()}} & \code{\link[=nm_file_multi_tab]{nm_file_multi_tab()}}), and
 joining the data manually.
 \itemize{
 \item Note that \code{nm_join_sim()} \emph{does} support multiple tables for simulations.
@@ -115,5 +141,5 @@ joining the data manually.
 
 \seealso{
 \code{\link[=nm_join_sim]{nm_join_sim()}}, \code{\link[=nm_tables]{nm_tables()}}, \code{\link[=nm_table_files]{nm_table_files()}}, \code{\link[=nm_file]{nm_file()}},
-\code{\link[=nm_file_multi_table]{nm_file_multi_table()}}
+\code{\link[=nm_file_multi_tab]{nm_file_multi_tab()}}
 }

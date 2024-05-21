@@ -5,25 +5,59 @@
 #' @param n number of replicates/subproblems. Adds `SUBPROBLEMS=n` to a
 #'  `$SIMULATION` record.
 #' @param seed a seed for simulation. Appended to `$SIMULATION` record.
-#' @param replicate_var a variable name for storing each iteration. Cannot match
-#'  a variable previously defined in `$PRED` or `$ERROR`.
+#' @param .join_col Character column name(s) used to join table files post
+#'  execution. Gets appended to the generated `$TABLE` record. See
+#'  [nm_join_sim()] documentation for details. Defaults to `'NUM'`.
 #' @param .suffix a suffix for the simulation directory. Will be prefixed by
 #'  the model id of `.mod`.
+#' @param .inherit_tags If `TRUE`, the default, inherit any tags from `.mod`.
 #' @inheritParams copy_model_from
+#'
+#' @details
+#' `new_sim_model` does the following things:
+#'  - Checks that `.mod` was previously executed and saved out an `.MSF` file was
+#'  generated (i.e. `$EST MSFO=1.MSF`).
+#'  - Performs various checks to confirm the status of `.mod` and contents of its
+#'  control stream.
+#'  - Creates a new `bbi_nmsim_model` object with the following differences from
+#'  the original control stream:
+#'    - Removes the following record types for simulation: `$EST`, `$COV`,
+#'    `$TABLE`, `$SIMULATION`
+#'    - Removes PK and prior records: `$PRIOR`, `$THETA/$THETAP/$THETAPV`,
+#'    `$OMEGA/$OMEGAP/$OMEGAPD`, `$SIGMA/$SIGMAP/$SIGMAPD`
+#'    - Adds a new custom `$SIMULATION` record using user specified values
+#'    - Adds a new `$TABLE` record tabling out simulated values and `.join_col`
+#'    column(s)
+#'    - Adds a new `$MSFI` record (run with `NOMSFTEST`) pointing to the `.MSF`
+#'    file of `.mod`
+#'
+#' @seealso nm_join_sim
+#' @examples
+#' \dontrun{
+#'
+#' # Create new `nmsim` model object
+#' .sim_mod <- new_sim_model(.mod, n = 500, .join_col = c("NUM", "ID"))
+#'
+#' # Visualize changes
+#' model_diff(.sim_mod)
+#'
+#' # Submit
+#' submit_model(.sim_mod)
+#' }
 #'
 #' @return S3 object of class `bbi_nmsim_model`.
 #' @export
 new_sim_model <- function(
     .mod,
-    n = 100,
+    n = 200,
     seed = 1234,
-    replicate_var = "REPI",
+    .join_col = "NUM",
     .suffix = "sim",
     .inherit_tags = TRUE,
     .overwrite = FALSE
 ){
   check_model_object(.mod, NM_MOD_CLASS)
-  check_model_for_sim(.mod, replicate_var = replicate_var)
+  check_model_for_sim(.mod, .join_col)
 
   # Create new simulation model object
   model_dir <- get_model_working_directory(.mod)
@@ -46,7 +80,7 @@ new_sim_model <- function(
   modify_prob_statement(.sim_mod, prob)
 
   # Set up simulation
-  setup_sim_run(.sim_mod, n = n, seed = seed, replicate_var = replicate_var)
+  setup_sim_run(.sim_mod, n = n, seed = seed, .join_col = .join_col)
 
   # Return read-in model to get the updated class as part of the model object
   return(read_model(file.path(model_dir, sim_dir)))
@@ -60,7 +94,7 @@ new_sim_model <- function(
 #' @param .mod a `bbi_nonmem_model` or `bbi_nmsim_model` object.
 #' @inheritParams new_sim_model
 #' @keywords internal
-setup_sim_run <- function(.mod, n = 100, seed = 1234, replicate_var = "REPI"){
+setup_sim_run <- function(.mod, n = 100, seed = 1234, .join_col = c("NUM")){
   check_model_object(.mod, c(NM_MOD_CLASS, NMSIM_MOD_CLASS))
   checkmate::assert_numeric(n, lower = 1)
   checkmate::assert_numeric(seed)
@@ -80,32 +114,18 @@ setup_sim_run <- function(.mod, n = 100, seed = 1234, replicate_var = "REPI"){
   })
 
 
-  ## Add new variable assignment to $ERROR _or_ $PRED: `REPI=IREP` ##
-  # Store current $error or $pred record
-  rep_name <- get_sim_replicate_record(.mod)
-  rep_lines <- get_records(.mod, rep_name, get_lines = TRUE)[[1]]
-  rep_lines <- rep_lines[rep_lines != ""]
-  rep_lines <- c(rep_lines, glue("{replicate_var}=IREP"), "")
-
-  # Remove old record, and add a new one with the modification
-  #  - Use existing record name, dont overwrite
-  #  - easiest way to amend an existing record
-  remove_records(.mod, rep_name)
-  add_new_record(.mod, rep_name, rec_name = NULL, lines = rep_lines, after = NULL)
-
-
   ## Add new $SIMULATION record (must be _after_ $ERROR or $PRED, but before $TABLE) ##
+  rep_name <- get_sim_replicate_record(.mod)
   sim_lines <- glue("({seed}) SUBPROBLEMS={n} TRUE=FINAL")
   add_new_record(.mod, "simulation", lines = sim_lines, after = rep_name)
 
 
   ## Add new $TABLE record with predefined format and columns (including REPI) ##
   table_name <- glue("{get_model_id(get_based_on(.mod)[1])}-sim.tab")
-  # TODO: DV automatically gets added in testing, is this always the case?
-  # - i.e. adding DV causes duplicate DV columns
-  # TODO: We likely want handling for `NUM` column, as this assumes `NUM` is part
-  # of your input data (and we cant rely on that assumption)
-  table_lines <- glue("ONEHEADER NOPRINT NOAPPEND {replicate_var} NUM DV PRED FILE={table_name}")
+  # TODO: pick either DV or PRED for sim variable (KyleB to look into it)
+  join_col_txt <- paste(.join_col, collapse = " ")
+  fmt_expr <- "FORMAT=s1PE12.5"
+  table_lines <- glue("ONEHEADER NOPRINT NOAPPEND {join_col_txt} DV PRED {fmt_expr} FILE={table_name}")
   add_new_record(.mod, "table", lines = table_lines, after = "simulation")
 
 
@@ -127,7 +147,7 @@ setup_sim_run <- function(.mod, n = 100, seed = 1234, replicate_var = "REPI"){
 #' @inheritParams new_sim_model
 #' @returns `TRUE` invisibly
 #' @keywords internal
-check_model_for_sim <- function(.mod, replicate_var = "REPI"){
+check_model_for_sim <- function(.mod, .join_col){
   # Check submission status
   if(!model_is_finished(.mod)){
     rlang::abort(
@@ -156,20 +176,18 @@ check_model_for_sim <- function(.mod, replicate_var = "REPI"){
     rlang::abort(glue("Could not find referenced MSF path ({msf_path_name}) at `{msf_path}`"))
   }
 
-  # Check that `REPI=IREP` isnt already defined in $ERROR or $PRED
-  rep_name <- get_sim_replicate_record(.mod) # ensures only one record exists
-  rep_lines <- get_records(.mod, rep_name, get_lines = TRUE)[[1]]
+  # ensures only one record ($ERROR or $PRED) exists
+  rep_name <- get_sim_replicate_record(.mod)
 
-  replicate_pattern <- glue("(^|\\s){replicate_var}\\s*=") # e.g.,`REPI=[x]` (w/wo spaces)
-  if(any(grepl(replicate_pattern, rep_lines))){
-    issue_lines <- rep_lines[grepl(replicate_pattern, rep_lines)]
-    issue_lines_txt <- paste(issue_lines, collapse = "\n")
-
+  # Make sure specified join columns are present in input data
+  input_data <- nm_data(.mod) %>% suppressMessages()
+  if(!all(.join_col %in% names(input_data))){
+    missing_cols <- .join_col[!(.join_col %in% names(input_data))]
+    missing_txt <- paste(missing_cols, collapse = ", ")
     rlang::abort(
       c(
-        glue("Issue with {rep_name} record: `{replicate_var}=[x]` already defined."),
-        paste0("Problematic line(s):\n", issue_lines_txt, "\n"),
-        paste0("Problematic record:\n", get_records(.mod, rep_name)[[1]]$format())
+        glue("The following .join_col columns were not found in the input data: {missing_txt}"),
+        "Check `nm_data(.mod)` to see available columns."
       )
     )
   }

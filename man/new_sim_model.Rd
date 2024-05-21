@@ -6,9 +6,9 @@
 \usage{
 new_sim_model(
   .mod,
-  n = 100,
+  n = 200,
   seed = 1234,
-  replicate_var = "REPI",
+  .join_col = "NUM",
   .suffix = "sim",
   .inherit_tags = TRUE,
   .overwrite = FALSE
@@ -22,15 +22,14 @@ new_sim_model(
 
 \item{seed}{a seed for simulation. Appended to \verb{$SIMULATION} record.}
 
-\item{replicate_var}{a variable name for storing each iteration. Cannot match
-a variable previously defined in \verb{$PRED} or \verb{$ERROR}.}
+\item{.join_col}{Character column name(s) used to join table files post
+execution. Gets appended to the generated \verb{$TABLE} record. See
+\code{\link[=nm_join_sim]{nm_join_sim()}} documentation for details. Defaults to \code{'NUM'}.}
 
 \item{.suffix}{a suffix for the simulation directory. Will be prefixed by
 the model id of \code{.mod}.}
 
-\item{.inherit_tags}{If \code{FALSE}, the default, new model will only have any
-tags passed to \code{.add_tags} argument. If \code{TRUE} inherit any tags from
-\code{.parent_mod}, with any tags passed to \code{.add_tags} appended.}
+\item{.inherit_tags}{If \code{TRUE}, the default, inherit any tags from \code{.mod}.}
 
 \item{.overwrite}{If \code{FALSE}, the default,  function will error if a model
 file already exists at specified \code{.new_model} path. If \code{TRUE} any existing
@@ -41,4 +40,43 @@ S3 object of class \code{bbi_nmsim_model}.
 }
 \description{
 Create a simulation model object from an existing model
+}
+\details{
+\code{new_sim_model} does the following things:
+\itemize{
+\item Checks that \code{.mod} was previously executed and saved out an \code{.MSF} file was
+generated (i.e. \verb{$EST MSFO=1.MSF}).
+\item Performs various checks to confirm the status of \code{.mod} and contents of its
+control stream.
+\item Creates a new \code{bbi_nmsim_model} object with the following differences from
+the original control stream:
+\itemize{
+\item Removes the following record types for simulation: \verb{$EST}, \verb{$COV},
+\verb{$TABLE}, \verb{$SIMULATION}
+\item Removes PK and prior records: \verb{$PRIOR}, \verb{$THETA/$THETAP/$THETAPV},
+\verb{$OMEGA/$OMEGAP/$OMEGAPD}, \verb{$SIGMA/$SIGMAP/$SIGMAPD}
+\item Adds a new custom \verb{$SIMULATION} record using user specified values
+\item Adds a new \verb{$TABLE} record tabling out simulated values and \code{.join_col}
+column(s)
+\item Adds a new \verb{$MSFI} record (run with \code{NOMSFTEST}) pointing to the \code{.MSF}
+file of \code{.mod}
+}
+}
+}
+\examples{
+\dontrun{
+
+# Create new `nmsim` model object
+.sim_mod <- new_sim_model(.mod, n = 500, .join_col = c("NUM", "ID"))
+
+# Visualize changes
+model_diff(.sim_mod)
+
+# Submit
+submit_model(.sim_mod)
+}
+
+}
+\seealso{
+nm_join_sim
 }

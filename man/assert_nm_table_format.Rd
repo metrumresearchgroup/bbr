@@ -8,7 +8,7 @@ specified format}
 assert_nm_table_format(
   .path,
   check_multiple = FALSE,
-  table_pattern = "^TABLE NO"
+  table_pattern = "TABLE NO"
 )
 }
 \arguments{
@@ -28,6 +28,6 @@ Check if a \code{NONMEM} table file contains one or more tables in the
 specified format
 }
 \seealso{
-nm_file_multi_table
+nm_file_multi_tab
 }
 \keyword{internal}
