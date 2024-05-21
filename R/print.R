@@ -161,6 +161,12 @@ print.bbi_model <- function(x, ...) {
   bullet_list(get_model_path(x, .check_exists = FALSE))
   print_model_files(x, bullet_list)
 
+  if (is_valid_print(x[[YAML_NMSIM_ARGS]])) {
+    heading('Simulation Args')
+    iwalk(x[[YAML_NMSIM_ARGS]],
+          ~ bullet_list(paste0(.y, ": ", col_blue(.x))))
+  }
+
   if (is_valid_print(x[[YAML_DESCRIPTION]])) {
     heading('Description')
     bullet_list(style_italic(x[[YAML_DESCRIPTION]]))

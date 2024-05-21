@@ -219,7 +219,10 @@ YAML_TAGS <- "tags" # SHARED with bbr.bayes
 YAML_NOTES <- "notes"
 YAML_BBI_ARGS <- "bbi_args"
 YAML_MOD_TYPE <- "model_type" # SHARED with bbr.bayes
-YAML_STAR <- 'star'
+YAML_STAR <- "star"
+YAML_NMSIM_ARGS <- "nmsim_args"
+YAML_NMSIM_SEED <- "seed"
+YAML_NMSIM_NSIM <- "n_sim"
 
 YAML_REQ_INPUT_KEYS <- c(
   YAML_MOD_TYPE
@@ -268,6 +271,12 @@ YAML_SCALAR_TO_LIST_KEYS <- c(
   YAML_TAGS,
   YAML_NOTES,
   YAML_STAR
+)
+
+# Additional keys stored for bbi_nmsim_model objects
+YAML_ADDL_NMSIM_KEYS <- c(
+  YAML_NMSIM_SEED,
+  YAML_NMSIM_NSIM
 )
 
 SUMMARY_DETAILS <- "run_details"
