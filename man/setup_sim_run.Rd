@@ -9,7 +9,7 @@ setup_sim_run(.mod, n = 100, seed = 1234, .join_col = c("NUM"))
 \arguments{
 \item{.mod}{a \code{bbi_nonmem_model} or \code{bbi_nmsim_model} object.}
 
-\item{n}{number of replicates/subproblems. Adds \code{SUBPROBLEMS=n} to a
+\item{n}{number of simulations/subproblems. Adds \code{SUBPROBLEMS=n} to a
 \verb{$SIMULATION} record.}
 
 \item{seed}{a seed for simulation. Appended to \verb{$SIMULATION} record.}

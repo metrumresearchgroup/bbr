@@ -2,7 +2,7 @@
 #' Create a simulation model object from an existing model
 #'
 #' @param .mod a `bbi_nonmem_model` object.
-#' @param n number of replicates/subproblems. Adds `SUBPROBLEMS=n` to a
+#' @param n number of simulations/subproblems. Adds `SUBPROBLEMS=n` to a
 #'  `$SIMULATION` record.
 #' @param seed a seed for simulation. Appended to `$SIMULATION` record.
 #' @param .join_col Character column name(s) used to join table files post
@@ -73,7 +73,9 @@ new_sim_model <- function(
   )
 
   .sim_mod[[YAML_MOD_TYPE]] <- "nmsim"
-  .sim_mod <- save_model_yaml(.sim_mod)
+  .sim_mod[[YAML_NMSIM_SEED]] <- as.character(seed)
+  .sim_mod[[YAML_NMSIM_NSIM]] <- as.character(n)
+  .sim_mod <- save_nsim_yaml(.sim_mod)
 
   # Change problem statement
   prob <- glue("Simulation of model {get_model_id(.mod)}")

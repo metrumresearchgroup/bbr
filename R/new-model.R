@@ -146,6 +146,29 @@ save_model_yaml <- function(.mod) {
   return(.mod)
 }
 
+#' Saves a model object to a yaml file. Intended for the creation of
+#' `bbi_nmsim_model` objects.
+#'
+#' @details
+#' Pulls all `bbi_nmsim_model` specific changes into a separate `nmsim_args` list,
+#' and then calls `save_model_yaml` normally.
+#'
+#' @inheritParams save_model_yaml
+#' @return The input `bbi_{.model_type}_model` object, with its YAML md5 hash updated.
+#' @keywords internal
+save_nsim_yaml <- function(.mod){
+  # create copy to save out
+  .out_mod <- .mod
+
+  # Put all bbi_nmsim_model specific changes into list
+  for (.key in YAML_ADDL_NMSIM_KEYS) {
+    if (length(.out_mod[[.key]]) == 1) {
+      .out_mod[[YAML_NMSIM_ARGS]][[.key]] <- .out_mod[[.key]]
+      .out_mod[[.key]] <- NULL
+    }
+  }
+  save_model_yaml(.out_mod)
+}
 
 #' Private helper to look for existing model and overwrite if necessary
 #' @inheritParams new_model
