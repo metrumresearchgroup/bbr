@@ -4,7 +4,12 @@
 \alias{nm_join_sim}
 \title{Join simulation and input data}
 \usage{
-nm_join_sim(.mod, .join_col = "NUM", .cols_keep = "all")
+nm_join_sim(
+  .mod,
+  .join_col = "NUM",
+  .cols_keep = "all",
+  add_table_names = FALSE
+)
 }
 \arguments{
 \item{.mod}{a \code{bbi_nonmem_model} or \code{bbi_nmsim_model} object.}
@@ -14,6 +19,9 @@ Defaults to \code{NUM}. See Details.}
 
 \item{.cols_keep}{Either \code{'all'}, or a vector of column name(s) to retain
 in the final dataset after joining. Defaults to keeping all columns.}
+
+\item{add_table_names}{Logical (T/F). If \code{TRUE}, include a column denoting
+the table names as specified in the file (e.g., \code{'TABLE NO.  1'}).}
 }
 \value{
 a tibble

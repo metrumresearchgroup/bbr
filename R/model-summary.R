@@ -175,7 +175,7 @@ model_summary.bbi_nmsim_model <- function(
 
   rlang::abort(
     c(
-      glue("model_summary() is not supported for {NMSIM_MOD_CLASS} objects"),
+      glue("model_summary() is not supported for `{NMSIM_MOD_CLASS}` objects"),
       "See `?nm_join_sim` for reading in the simulation data"
     )
   )

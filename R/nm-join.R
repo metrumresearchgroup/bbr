@@ -295,6 +295,7 @@ can_be_nm_joined <- function(.mod){
 #'  Defaults to `NUM`. See Details.
 #' @param .cols_keep Either `'all'`, or a vector of column name(s) to retain
 #'  in the final dataset after joining. Defaults to keeping all columns.
+#' @inheritParams nm_file_multi_tab
 #'
 #' @note The join column name(s) specified should match what you provided to
 #' [new_sim_model()].
@@ -321,10 +322,12 @@ can_be_nm_joined <- function(.mod){
 nm_join_sim <- function(
     .mod,
     .join_col = "NUM",
-    .cols_keep = "all"
+    .cols_keep = "all",
+    add_table_names = FALSE
 ){
   checkmate::assert_string(.join_col)
   checkmate::assert_string(.cols_keep)
+  checkmate::assert_logical(add_table_names)
 
   # Only support joining the table we add so we can make certain assumptions
   files <- nm_table_files(.mod)
@@ -340,7 +343,9 @@ nm_join_sim <- function(
 
   # Get list of all tables. Likely only one simulation table, but may include
   # other manually added tables
-  df_list <- nm_tables(.mod, .files = files, read_multi_tab = TRUE)
+  df_list <- nm_tables(
+    .mod, .files = files, read_multi_tab = TRUE, add_table_names = add_table_names
+  )
 
   .d <- df_list$data
   if(.cols_keep != "all" && !all(.cols_keep %in% names(.d))){

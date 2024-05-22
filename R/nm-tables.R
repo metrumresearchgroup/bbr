@@ -27,15 +27,14 @@
 #'   Defaults to calling [nm_table_files()] on `.mod`, which will parse all file
 #'   names from `$TABLE` blocks in the control stream. If passing manually,
 #'   paths should be either absolute, or relative to `get_output_dir(.mod)`.
-#' @param read_multi_tab Logical (`T`/`F`). If `TRUE`, also read in files with
-#'   multiple tables per file.
+#' @param read_multi_tab Logical (`T`/`F`). If `TRUE`, read in files with
+#'   multiple tables per file. Otherwise they will be skipped.
 #' @param table_pattern character string (fixed) defining the start of a new
-#'   table. Onlyused if `read_multi_tab = TRUE`. If no matches are found, the
-#'   file will be read in via [nm_file()].
-#' @param ... additional arguments passed to [nm_file_multi_tab()]
+#'   table. Only used if `read_multi_tab = TRUE` (passed to [nm_file_multi_tab()]).
+#' @param ... additional arguments passed to [nm_file_multi_tab()].
 #' @importFrom purrr compact map_chr
 #' @importFrom stringr str_replace
-#' @seealso [nm_join()], [nm_file()]
+#' @seealso [nm_join()], [nm_file()], [nm_file_multi_tab()]
 #' @export
 nm_tables <- function(
     .mod,
@@ -82,8 +81,14 @@ nm_tables <- function(
     )
     if(isTRUE(is_multi_tab)){
       if(isTRUE(read_multi_tab)){
+        # May be a single dataframe (if tables have the same columns) or a list
+        # of tables (one of the reasons this cant be added to nm_join as easily).
+        # In the case of a single dataframe, .join_col and/or ID may be duplicated
+        # (e.g., simulation data), which would influence joining as well.
         res[[.n[.i]]] <- nm_file_multi_tab(.files[.i], table_pattern = table_pattern, ...)
       }else{
+        # We still check if files contain multiple tables so we can inform the user
+        # if they have been skipped or not.
         verbose_msg(glue("Skipping multi-tabled data file: {basename(.files[.i])}\n\n"))
         next
       }
