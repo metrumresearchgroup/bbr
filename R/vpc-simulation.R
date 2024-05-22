@@ -15,8 +15,10 @@
 #'
 #' @details
 #' `new_sim_model` does the following things:
-#'  - Checks that `.mod` was previously executed and saved out an `.MSF` file was
-#'  generated (i.e. `$EST MSFO=1.MSF`).
+#'  - Checks that `.mod` was previously executed and tabled out an `.MSF` file
+#'  (i.e. `$EST MSFO=1.MSF`).
+#'     - **Note:** The `.MSF` file must have an upper case extension, otherwise
+#'     it will be cleaned up after submission
 #'  - Performs various checks to confirm the status of `.mod` and contents of its
 #'  control stream.
 #'  - Creates a new `bbi_nmsim_model` object with the following differences from
@@ -25,7 +27,9 @@
 #'    `$TABLE`, `$SIMULATION`
 #'    - Removes PK and prior records: `$PRIOR`, `$THETA/$THETAP/$THETAPV`,
 #'    `$OMEGA/$OMEGAP/$OMEGAPD`, `$SIGMA/$SIGMAP/$SIGMAPD`
-#'    - Adds a new custom `$SIMULATION` record using user specified values
+#'    - Adds a new custom `$SIMULATION` record using user specified values (e.g.
+#'     `seed` and `n`). `TRUE=FINAL` is appended to ensure the final values are
+#'     used rather than the initial estimates.
 #'    - Adds a new `$TABLE` record tabling out simulated values and `.join_col`
 #'    column(s)
 #'    - Adds a new `$MSFI` record (run with `NOMSFTEST`) pointing to the `.MSF`
@@ -150,12 +154,6 @@ setup_sim_run <- function(.mod, n = 100, seed = 1234, .join_col = c("NUM")){
 #' @returns `TRUE` invisibly
 #' @keywords internal
 check_model_for_sim <- function(.mod, .join_col){
-  # Check submission status
-  if(!model_is_finished(.mod)){
-    rlang::abort(
-      glue("`new_sim_model` requires a previously submitted `{NM_MOD_CLASS}` object")
-    )
-  }
 
   # Check the .MSF file in $EST
   msf_path <- get_msf_path(.mod)
@@ -171,11 +169,18 @@ check_model_for_sim <- function(.mod, .join_col){
   }
 
   # Check .MSF file exists
-  # Note: file name must be all caps for now; otherwise it will be git ignored
   msf_path_name <- basename(msf_path)
-  checkmate::assert_true(msf_path_name == toupper(msf_path_name)) # TODO: remove this eventually
   if(!fs::file_exists(msf_path)){
     rlang::abort(glue("Could not find referenced MSF path ({msf_path_name}) at `{msf_path}`"))
+  }
+  # Note: file name must be all caps for now; otherwise it will be git ignored via bbi
+  if(msf_path_name != toupper(msf_path_name)){
+    rlang::abort(
+      c(
+        glue("The msf file (`{msf_path_name}`) must have an upper case extension"),
+        "Otherwise it will be cleaned up after submission"
+      )
+    )
   }
 
   # ensures only one record ($ERROR or $PRED) exists
@@ -191,6 +196,14 @@ check_model_for_sim <- function(.mod, .join_col){
         glue("The following .join_col columns were not found in the input data: {missing_txt}"),
         "Check `nm_data(.mod)` to see available columns."
       )
+    )
+  }
+
+  # Check submission status - this should be done after all control stream inspections
+  # to avoid having to unnecessarily re-run the model with required changes.
+  if(!model_is_finished(.mod)){
+    rlang::abort(
+      glue("`new_sim_model` requires a previously submitted `{NM_MOD_CLASS}` object")
     )
   }
 

@@ -93,5 +93,5 @@ nm_join_sim(.sim_mod, .join_col = c("NUM", "ID"), .cols_keep = "ID")
 
 }
 \seealso{
-\code{\link[=new_sim_model]{new_sim_model()}}, \code{\link[=nm_file_multi_tab]{nm_file_multi_tab()}}, \code{\link[=nm_join]{nm_join()}}
+\code{\link[=new_sim_model]{new_sim_model()}}, \code{\link[=nm_file_multi_tab]{nm_file_multi_tab()}}, \code{\link[=nm_tables]{nm_tables()}}
 }
