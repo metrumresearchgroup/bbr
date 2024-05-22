@@ -4,22 +4,49 @@
 \alias{nm_file_multi_tab}
 \title{Read in table file with multiple \code{NONMEM} tables.}
 \usage{
-nm_file_multi_tab(.path, simplify = TRUE, table_pattern = "TABLE NO")
+nm_file_multi_tab(.path, add_table_names = TRUE, table_pattern = "TABLE NO")
 }
 \arguments{
 \item{.path}{a path to a table file.}
 
-\item{simplify}{Logical (T/F). If \code{TRUE}, attempt to simplify list of tables into a
-single tibble (requires . Table names will show up as a new \code{table_id} column. This is
-automatically done if simulation data is detected (same rows \emph{and} columns per
-table).}
+\item{add_table_names}{Logical (T/F). If \code{TRUE}, include a column denoting
+the table names as specified in the file (e.g., \code{'TABLE NO.  1'}).}
 
 \item{table_pattern}{character string defining the start of a new
 table (regex accepted).}
 }
+\value{
+either a \code{tibble} or list depending on the column names of each table
+}
 \description{
 Read in table file with multiple \code{NONMEM} tables.
 }
-\note{
-table headers are expected
+\details{
+The returned object will change depending on the types of tables contained
+in the file:
+\itemize{
+\item If each table is the same number of rows and column names (e.g., simulation
+data), the file can be read-in all at once (significant performance
+improvements), and the data will be coerced to a single dataframe.
+\item If the number of rows differ across \emph{any} of the tables, they must be read
+in one at a time.
+\item If the column names differ across \emph{any} of the tables, a list of tables is
+returned.
+}
+
+If a single dataframe can be returned, an additional \code{nn} column will be
+appended denoting the table number. This would also be the simulation number
+if running a simulation (removing the need to keep track of iterations within
+the control stream itself).
+
+This function expects that tables are in the following format by default
+(column names can differ as noted above):
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{TABLE NO.  1
+NUM         ID          DV
+1.0000E+00  1.0000E+00  5.45615E+00
+TABLE NO.  2
+NUM         ID          DV
+1.0000E+00  1.0000E+00  6.54565E+00
+}\if{html}{\out{</div>}}
 }

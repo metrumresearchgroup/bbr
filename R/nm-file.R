@@ -166,18 +166,43 @@ nm_file_impl <- function(.path) {
 
 #' Read in table file with multiple `NONMEM` tables.
 #' @inheritParams nm_file_impl
-#' @param simplify Logical (T/F). If `TRUE`, attempt to simplify list of tables into a
-#'  single tibble (requires . Table names will show up as a new `table_id` column. This is
-#'  automatically done if simulation data is detected (same rows _and_ columns per
-#'  table).
+#' @param add_table_names Logical (T/F). If `TRUE`, include a column denoting
+#'  the table names as specified in the file (e.g., `'TABLE NO.  1'`).
 #' @param table_pattern character string defining the start of a new
 #'  table (regex accepted).
 #'
-#' @note table headers are expected
+#' @details
+#' The returned object will change depending on the types of tables contained
+#' in the file:
+#'  - If each table is the same number of rows and column names (e.g., simulation
+#'  data), the file can be read-in all at once (significant performance
+#'  improvements), and the data will be coerced to a single dataframe.
+#'  - If the number of rows differ across _any_ of the tables, they must be read
+#'  in one at a time.
+#'  - If the column names differ across _any_ of the tables, a list of tables is
+#'  returned.
+#'
+#' If a single dataframe can be returned, an additional `nn` column will be
+#' appended denoting the table number. This would also be the simulation number
+#' if running a simulation (removing the need to keep track of iterations within
+#' the control stream itself).
+#'
+#' This function expects that tables are in the following format by default
+#' (column names can differ as noted above):
+#' ```
+#' TABLE NO.  1
+#' NUM         ID          DV
+#' 1.0000E+00  1.0000E+00  5.45615E+00
+#' TABLE NO.  2
+#' NUM         ID          DV
+#' 1.0000E+00  1.0000E+00  6.54565E+00
+#' ```
+#'
+#' @returns either a `tibble` or list depending on the column names of each table
 #' @export
 nm_file_multi_tab <- function(
     .path,
-    simplify = TRUE,
+    add_table_names = TRUE,
     table_pattern="TABLE NO"
 ){
   verbose_msg(glue("Reading {basename(.path)}"))
@@ -214,7 +239,9 @@ nm_file_multi_tab <- function(
     #    NONMEM model
     total <- nrow(data) / nrow_each[1]
     data$nn <- rep(seq(total), each = nrow_each[1])
-    data$table_name <- rep(table_names, each = nrow_each[1])
+    if(isTRUE(add_table_names)){
+      data$table_name <- rep(table_names, each = nrow_each[1])
+    }
     data <- as_tibble(data)
   }else{
     # Multi-tabled files that _aren't_ from simulations likely follow this method
@@ -233,34 +260,28 @@ nm_file_multi_tab <- function(
           header = TRUE,
           verbose = FALSE
         )
-        data <- remove_dup_cols(data) %>%
-          dplyr::mutate(table_name = table_names[idx])
+        data <- remove_dup_cols(data)
+        if(isTRUE(add_table_names)){
+          data <- data %>% dplyr::mutate(table_name = table_names[idx])
+        }
         as_tibble(data)
       })
       table_list[[idx]] <- table.i
     }
-    if(isTRUE(simplify)){
-      if(isTRUE(same_cols)){
-        data <- purrr::list_rbind(table_list, names_to = "nn") %>%
-          dplyr::relocate("nn", .after = dplyr::everything())
-      }else{
-        data <- table_list
-        rlang::warn(
-          c(
-            "Tables cannot be simplified",
-            "Either the headers were in an unexpected format, or the tables did not have the same column names."
-          )
-        )
-      }
+
+    # Attempt to coerce list to dataframe (same columns, different number of rows)
+    if(isTRUE(same_cols)){
+      data <- purrr::list_rbind(table_list, names_to = "nn") %>%
+        dplyr::relocate("nn", .after = dplyr::everything())
     }else{
       data <- table_list
+      verbose_msg(glue("Tables in {basename(.path)} cannot be coerced to a single dataframe"))
     }
   }
 
   if(inherits(data, "list")){
     verbose_msg(glue("  tables: {length(table_list)}"))
   }else{
-    data <- data %>% dplyr::relocate("table_name", .after = dplyr::everything())
     verbose_msg(glue("  rows: {nrow(data)}"))
     verbose_msg(glue("  cols: {ncol(data)}"))
   }
