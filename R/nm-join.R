@@ -410,31 +410,3 @@ nm_join_sim <- function(
 
   return(res)
 }
-
-
-# testing alternatives
-
-
-nm_join_sim_2 <- function(.sim_mod) {
-
-  # Dont think we want to bind to based_on model by default.
-  # I think a default `nm_join` method should just include
-  # table files within that model, and maybe we have an arg to bind to based_on
-  # model tables?
-  based <- read_model(get_based_on(.sim_mod))
-  par <- data.table::as.data.table(nm_join(based))
-  n <- nm_table_files(.sim_mod)
-
-  # doesnt seem to work - only works for first replicate; rest are NAs ('Stopped early on line 782')
-  #  - maybe something changes at a later/earlier version of fread?
-  tab <- data.table::fread(n[[1]], skip = 1)
-
-  first_col <- names(tab)[1]
-  tab[, REP := 1+cumsum(tab[[1]]=="TABLE")]
-  tab <- tab[!(tab[[1]] %in% c(first_col,"TABLE"))]
-  tab[] <- lapply(tab, as.numeric)
-  tab[, NUM := rep(par$NUM, times = nrow(tab) / nrow(par))]
-  tab <- par[tab, on = "NUM"]
-
-  tab
-}
