@@ -44,8 +44,12 @@ Create a simulation model object from an existing model
 \details{
 \code{new_sim_model} does the following things:
 \itemize{
-\item Checks that \code{.mod} was previously executed and saved out an \code{.MSF} file was
-generated (i.e. \verb{$EST MSFO=1.MSF}).
+\item Checks that \code{.mod} was previously executed and tabled out an \code{.MSF} file
+(i.e. \verb{$EST MSFO=1.MSF}).
+\itemize{
+\item \strong{Note:} The \code{.MSF} file must have an upper case extension, otherwise
+it will be cleaned up after submission
+}
 \item Performs various checks to confirm the status of \code{.mod} and contents of its
 control stream.
 \item Creates a new \code{bbi_nmsim_model} object with the following differences from
@@ -55,7 +59,9 @@ the original control stream:
 \verb{$TABLE}, \verb{$SIMULATION}
 \item Removes PK and prior records: \verb{$PRIOR}, \verb{$THETA/$THETAP/$THETAPV},
 \verb{$OMEGA/$OMEGAP/$OMEGAPD}, \verb{$SIGMA/$SIGMAP/$SIGMAPD}
-\item Adds a new custom \verb{$SIMULATION} record using user specified values
+\item Adds a new custom \verb{$SIMULATION} record using user specified values (e.g.
+\code{seed} and \code{n}). \code{TRUE=FINAL} is appended to ensure the final values are
+used rather than the initial estimates.
 \item Adds a new \verb{$TABLE} record tabling out simulated values and \code{.join_col}
 column(s)
 \item Adds a new \verb{$MSFI} record (run with \code{NOMSFTEST}) pointing to the \code{.MSF}

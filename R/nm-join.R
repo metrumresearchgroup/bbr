@@ -304,7 +304,7 @@ can_be_nm_joined <- function(.mod){
 #' @template nm-join-col-tables
 #' @template nm-join-col-eg
 #'
-#' @seealso [new_sim_model()], [nm_file_multi_tab()], [nm_join()]
+#' @seealso [new_sim_model()], [nm_file_multi_tab()], [nm_tables()]
 #'
 #' @examples
 #' \dontrun{
