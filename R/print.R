@@ -219,10 +219,6 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
     purrr::walk(paste(.d$estimation_method, "\n"), cli::cat_bullet, bullet = "en_dash")
   }
 
-  if (only_sim) {
-    return(invisible(NULL))
-  }
-
   # check heuristics
   .h <- unlist(x[[SUMMARY_HEURISTICS]])
   if (any(.h)) {
@@ -233,6 +229,10 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
     purrr::walk(paste(names(which(.h)), "\n"), cli::cat_bullet, bullet = "en_dash", col = "red")
   } else {
     cat_line("No Heuristic Problems Detected\n\n")
+  }
+
+  if (only_sim) {
+    return(invisible(NULL))
   }
 
   # build parameter table (catch Bayesian error)
