@@ -6,7 +6,7 @@
 \usage{
 setup_bootstrap_run(
   .boot_run,
-  n = 100,
+  n = 200,
   strat_cols = NULL,
   seed = 1234,
   .overwrite = FALSE

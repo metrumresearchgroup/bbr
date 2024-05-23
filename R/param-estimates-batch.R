@@ -187,9 +187,9 @@ param_estimates_compare.bbi_nmboot_summary <- function(
           rlang::warn("The original model is not up to date")
         }
       }else{
-        # Set the original model to NULL if the run directory/config file didnt
+        # Set the original model to NULL if the run directory/config file didn't
         # exist
-        rlang::warn("The original model has not been run yet. Cannot compare estiamtes.")
+        rlang::warn("The original model has not been run yet. Cannot compare estimates.")
         .orig_mod <- NULL
       }
     }else{
@@ -219,7 +219,7 @@ param_estimates_compare.default <- function(
     probs = c(.5, 0.025, 0.975),
     na.rm = FALSE
 ){
-
+  checkmate::assert_true(inherits(.boot_sum, "data.frame"))
   comp_df <- .boot_sum %>%
     select({{ .compare_cols }})
 

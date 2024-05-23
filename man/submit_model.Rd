@@ -31,7 +31,7 @@ submit_model(
 \method{submit_model}{bbi_nmboot_model}(
   .mod,
   .bbi_args = NULL,
-  .mode = getOption("bbr.bbi_exe_mode"),
+  .mode = "sge",
   ...,
   .overwrite = NULL,
   .config_path = NULL,

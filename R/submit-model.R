@@ -96,7 +96,7 @@ submit_model.bbi_nonmem_model <- function(
 submit_model.bbi_nmboot_model <- function(
     .mod,
     .bbi_args = NULL,
-    .mode = getOption("bbr.bbi_exe_mode"),
+    .mode = "sge",
     ...,
     .overwrite = NULL,
     .config_path = NULL,

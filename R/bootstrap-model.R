@@ -85,7 +85,7 @@ new_bootstrap_run <- function(
 #' @export
 setup_bootstrap_run <- function(
     .boot_run,
-    n = 100,
+    n = 200,
     strat_cols = NULL,
     seed = 1234,
     .overwrite = FALSE
