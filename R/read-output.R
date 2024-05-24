@@ -86,9 +86,9 @@ tail_output.character <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .re
   check_file(.mod, .head, .tail, .print, .return, ...)
 }
 
-#' @describeIn check_file Tail the OUTPUT file from a `bbi_nonmem_model` object.
+#' @describeIn check_file Tail the OUTPUT file from a `bbi_base_model` object.
 #' @export
-tail_output.bbi_nonmem_model <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE, ...) {
+tail_output.bbi_base_model <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE, ...) {
   .file <- file.path(get_output_dir(.mod), "OUTPUT")
   tryCatch(
     check_file(.file, .head, .tail, .print, .return, ...),
@@ -140,9 +140,9 @@ tail_lst.character <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .retur
   check_file(.mod, .head, .tail, .print, .return, ...)
 }
 
-#' @describeIn check_file Tail the .lst file from a `bbi_nonmem_model` object.
+#' @describeIn check_file Tail the .lst file from a `bbi_base_model` object.
 #' @export
-tail_lst.bbi_nonmem_model <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE, ...) {
+tail_lst.bbi_base_model <- function(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE, ...) {
   .file <- build_path_from_model(.mod, ".lst")
   check_file(.file, .head, .tail, .print, .return, ...)
 }
