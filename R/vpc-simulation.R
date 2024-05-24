@@ -244,3 +244,41 @@ get_sim_replicate_record <- function(.mod){
 }
 
 
+# Store simulation run details before submission
+# TODO: This function doesnt work/isnt hooked up, and is just a placeholder for now
+# @keywords internal
+make_sim_spec <- function(.mod, sim_args, .overwrite = FALSE){
+  checkmate::assert_list(sim_args)
+
+  sim_dir <- .mod[[ABS_MOD_PATH]]
+  json_path <- file.path(sim_dir, "bbr_sim_spec.json")
+
+  if(fs::file_exists(json_path) && isFALSE(.overwrite)){
+    rlang::abort(
+      c(
+        glue("A simulation specification file already exists at `{json_path}`"),
+        "i" = "Pass `.overwrite = TRUE` to overwrite."
+      )
+    )
+  }
+
+  spec_lst <- list(
+    problem = glue("Simulation of {basename(sim_args$orig_mod_path)}"),
+    seed = sim_args$seed,
+    n_samples = sim_args$n_samples,
+    model_path = get_model_path(.mod),
+    based_on_model_path = sim_args$orig_mod_path,
+    based_on_data_path = get_data_path(.mod),
+    model_md5 = tools::md5sum(get_model_path(.mod)),
+    based_on_model_md5 = tools::md5sum(sim_args$orig_mod_path),
+    based_on_msf_md5 = tools::md5sum(get_msf_path(.mod)),
+    output_dir = sim_dir
+  )
+
+  spec_lst_json <- jsonlite::toJSON(
+    spec_lst, pretty = TRUE, simplifyVector = TRUE, null = "null"
+  )
+
+  writeLines(spec_lst_json, json_path)
+  return(invisible(json_path))
+}
