@@ -83,8 +83,8 @@ withr::with_options(
       # Check helper functions before setup
       expect_message(get_boot_models(.boot_run), "has not been set up")
       expect_message(get_model_status(.boot_run), "has not been set up")
-      expect_message(check_nonmem_finished(.boot_run), "has not been set up")
-      expect_false(bootstrap_is_finished(.boot_run))
+      expect_false(check_nonmem_finished(.boot_run))
+      expect_false(model_is_finished(.boot_run))
       expect_false(bootstrap_is_cleaned_up(.boot_run))
       expect_true(is.null(get_boot_spec(.boot_run)))
     })
@@ -120,13 +120,12 @@ withr::with_options(
       # Check helper functions after setup & before submission
       expect_no_message(boot_models <- get_boot_models(.boot_run))
       expect_message(get_model_status(.boot_run), "0 model(s) have finished", fixed = TRUE)
-      # returns single TRUE & message
-      expect_message(check_nonmem_finished(.boot_run), "has not been submitted")
-      # returns TRUE & message for each model (not meant to be called this way by user)
-      expect_message(res <- check_nonmem_finished(boot_models), "have not been submitted")
-      expect_true(all(res))
+      expect_false(check_nonmem_finished(.boot_run))
+      # returns FALSE for each model (not meant to be called this way by user)
+      res <- check_nonmem_finished(boot_models)
+      expect_fase(all(res))
       # Logical and error checks
-      expect_false(bootstrap_is_finished(.boot_run))
+      expect_false(model_is_finished(.boot_run))
       expect_false(bootstrap_is_cleaned_up(.boot_run))
       expect_error(
         bootstrap_can_be_summarized(.boot_run),
@@ -182,22 +181,25 @@ withr::with_options(
 
       # These calls wont use batch submission since .batch_size < length(boot_models)
       with_bg_env({
-        # TODO: run this as a batch submission after wait_for_nonmem refactor
-        # - wait_for_nonmem does not work with local jobs when batch_submit_bg is called
-        # - detect 'submitting 3 models in batches of 2' instead
+        # Run this as a batch submission
+        # - There seems to be about a 3 second delay before an output directory gets created
+        #    - Currently unclear if `wait_for_nonmem` should handle this
+        # - detect 'submitting 3 models in batches of 1' instead
         expect_message(
-          proc <- submit_model(.boot_run, .mode = "local", .wait = TRUE),
-          "Inheriting `bbi.yaml`", fixed = TRUE
+          proc <- submit_model(.boot_run, .mode = "local", .wait = TRUE, .batch_size = 1),
+          "submitting 3 models in batches of 1", fixed = TRUE
         )
-        # wait_for_nonmem(.boot_run)
-        # proc_output <- proc$get_output_file()
-        # on.exit(fs::file_delete(proc_output), add = TRUE)
-        # expect_true(
-        #   any(grepl(
-        #     "The following model(s) have finished: `1, 2, 3`",
-        #     readLines(proc_output), fixed = TRUE
-        #   ))
-        # )
+        Sys.sleep(4) # Shouldnt need this - there is a delay when running batch
+        wait_for_nonmem(.boot_run)
+        Sys.sleep(5) # there is another delay before the final status gets added to OUTPUT
+        proc_output <- proc$get_output_file()
+        on.exit(fs::file_delete(proc_output), add = TRUE)
+        expect_true(
+          any(grepl(
+            "The following model(s) have finished: `1, 2, 3`",
+            readLines(proc_output), fixed = TRUE
+          ))
+        )
       })
 
       # Check helper functions after submission & before summarization
@@ -208,7 +210,7 @@ withr::with_options(
       )
       expect_true(check_nonmem_finished(.boot_run))
       expect_true(all(check_nonmem_finished(boot_models)))
-      expect_true(bootstrap_is_finished(.boot_run))
+      expect_true(model_is_finished(.boot_run))
       expect_false(bootstrap_is_cleaned_up(.boot_run)) # cannot be cleaned up
       expect_true(bootstrap_can_be_summarized(.boot_run)) # can now be summarized
       expect_error(
@@ -260,7 +262,7 @@ withr::with_options(
 
       # Check helper functions after summarization & before cleanup
       expect_true(check_nonmem_finished(.boot_run))
-      expect_true(bootstrap_is_finished(.boot_run))
+      expect_true(model_is_finished(.boot_run))
       expect_false(bootstrap_is_cleaned_up(.boot_run)) # is not cleaned up
       expect_true(bootstrap_can_be_summarized(.boot_run)) # can still be summarized
     })
@@ -269,10 +271,10 @@ withr::with_options(
       cleanup_bootstrap_run(.boot_run, .force = TRUE)
 
       # Check helper functions after cleanup
-      expect_message(check_nonmem_finished(.boot_run), "has been cleaned up")
+      expect_true(check_nonmem_finished(.boot_run))
       expect_message(boot_models <- get_boot_models(.boot_run), "has been cleaned up")
       expect_true(is.null(boot_models))
-      expect_true(bootstrap_is_finished(.boot_run))
+      expect_true(model_is_finished(.boot_run))
       expect_true(bootstrap_is_cleaned_up(.boot_run))
       expect_error(
         bootstrap_can_be_summarized(.boot_run),
@@ -292,7 +294,10 @@ withr::with_options(
 
       # Check model/data file existence
       files_kept <- fs::dir_ls(boot_dir, all = TRUE) %>% fs::path_rel(boot_dir)
-      expect_equal(files_kept, c(".gitignore", "bbi.yaml", "bbr_boot_spec.json", "boot_summary.RDS"))
+      expect_equal(
+        files_kept,
+        c(".gitignore", "OUTPUT", "bbi.yaml", "bbr_boot_spec.json", "boot_summary.RDS")
+      )
 
       # Confirm boot spec alterations
       boot_spec <- get_boot_spec(.boot_run)

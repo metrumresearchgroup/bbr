@@ -2,20 +2,26 @@
 % Please edit documentation in R/utils.R
 \name{bbi_nonmem_model_status}
 \alias{bbi_nonmem_model_status}
-\alias{bbi_nonmem_model_status.default}
+\alias{bbi_nonmem_model_status.bbi_model}
 \alias{bbi_nonmem_model_status.bbi_nmboot_model}
-\title{Return status of a model: "Not Run", "Finished Running", or "Incomplete Run".}
+\title{Return status of a model}
 \usage{
 bbi_nonmem_model_status(.mod)
 
-\method{bbi_nonmem_model_status}{default}(.mod)
+\method{bbi_nonmem_model_status}{bbi_model}(.mod)
 
 \method{bbi_nonmem_model_status}{bbi_nmboot_model}(.mod)
 }
 \arguments{
-\item{.mod}{bbi_nonmem_model object}
+\item{.mod}{a \code{bbi_model} object}
+}
+\value{
+A character string. Either \code{"Not Run"}, \code{"Finished Running"}, or
+\code{"Incomplete Run"}.
 }
 \description{
-Return status of a model: "Not Run", "Finished Running", or "Incomplete Run".
+Checks for the presence of \code{bbi_config.json} file. If one exists, the run
+has \code{"Finished Running"}. If a directory exists, but a config file \emph{has not}
+been generated, the model is \code{"Incomplete"}. If no directory exists, the
+model is \code{"Not Run"}
 }
-\keyword{internal}

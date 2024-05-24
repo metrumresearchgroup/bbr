@@ -225,7 +225,7 @@ withr::with_options(list(
   })
 
 
-  test_that("wait_for_nonmem() correctly reads in stop time [BBR-UTL-012]", {
+  test_that("wait_for_nonmem() correctly freezes the console [BBR-UTL-012]", {
     # create model
     mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
     submit_model(mod1, .mode = "local", .wait = FALSE)
@@ -233,7 +233,7 @@ withr::with_options(list(
     expect_true(suppressMessages(nrow(nm_tab(mod1)) > 1))
   })
 
-  test_that("wait_for_nonmem() doesn't error out if no stop time found [BBR-UTL-013]", {
+  test_that("wait_for_nonmem() doesn't error out if expiration is reached [BBR-UTL-013]", {
     # model setup
     mod_fail <- copy_model_from(
       read_model(file.path(MODEL_DIR_BBI, "1")),

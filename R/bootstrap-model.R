@@ -525,7 +525,7 @@ bootstrap_can_be_summarized <- function(.boot_run){
       )
     )
   }else{
-    if(!bootstrap_is_finished(.boot_run)){
+    if(!model_is_finished(.boot_run)){
       rlang::abort(
         c(
           "One or more bootstrap runs have not finished executing.",
@@ -623,7 +623,7 @@ cleanup_bootstrap_run <- function(.boot_run, .force = FALSE){
   boot_sum_path <- file.path(boot_dir, "boot_summary.RDS")
   boot_data_dir <- file.path(boot_dir, "data")
 
-  if(!bootstrap_is_finished(.boot_run)){
+  if(!model_is_finished(.boot_run)){
     rlang::abort(
       c(
         "One or more bootstrap runs have not finished executing.",
@@ -661,7 +661,7 @@ cleanup_bootstrap_run <- function(.boot_run, .force = FALSE){
   delete_models(boot_models, .tags = "BOOTSTRAP_RUN", .force = .force)
 
   # Save out updated spec and delete data directory only if the user says 'yes'
-  if(!bootstrap_is_finished(.boot_run)){
+  if(!model_is_finished(.boot_run)){
     writeLines(spec_lst_json, spec_path)
     if(fs::dir_exists(boot_data_dir)) fs::dir_delete(boot_data_dir)
     message(glue("Bootstrap run `{get_model_id(.boot_run)}` has been cleaned up"))
