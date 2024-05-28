@@ -195,8 +195,10 @@ submit_nonmem_model <- function(.mod,
   # define working directory
   model_dir <- get_model_working_directory(.mod)
 
-  .path_exists <- file_exists(.config_path %||% file.path(model_dir, "bbi.yaml"))
-  if(!.path_exists){
+  # check for existence of config
+  checkmate::assert_string(.config_path, null.ok = TRUE)
+  cpath <- .config_path %||% file.path(model_dir, "bbi.yaml")
+  if(!file_exists(cpath)){
     stop(paste("No bbi configuration was found in the execution directory.",
                "Please run `bbi_init()` with the appropriate directory to continue."))
   }
@@ -207,6 +209,21 @@ submit_nonmem_model <- function(.mod,
       sprintf("--config=%s", normalizePath(.config_path))
     )
   }
+
+  # check overwrite and delete existing output, if requested
+  overwrite_requested <- if (!is.null(.bbi_args[["overwrite"]])) {
+    # if passed via .overwrite or .bbi_args, return this value
+    .bbi_args[["overwrite"]]
+  } else {
+    # if _not_ passed, check config bbi.yaml
+    # return FALSE if _not_ specified there either
+    isTRUE(yaml::read_yaml(cpath)[["overwrite"]])
+  }
+
+  check_for_existing_output(
+    get_output_dir(.mod, .check_exists = FALSE),
+    overwrite_requested
+  )
 
   if (.dry_run) {
     # construct fake res object
@@ -235,4 +252,25 @@ check_mode_argument <- function(.mode) {
   }
 
   return(invisible(TRUE))
+}
+
+
+#' Private helper to look for existing model output and overwrite if necessary
+#' @param .path Path to output directory that will potentially be overwritten
+#' @param .overwrite Whether user has requested overwrite. This value can come
+#'   from a variety of sources, but these are consolidated by the calling code,
+#'   before being passed to this function.
+#' @importFrom fs dir_exists dir_delete
+#' @keywords internal
+check_for_existing_output <- function(.path, .overwrite) {
+  if (fs::dir_exists(.path)) {
+    if (isTRUE(.overwrite)) {
+      fs::dir_delete(.path)
+    } else {
+      stop(paste(
+        glue("Model output already exists at {.path}."),
+        "Either pass `.overwrite = TRUE` or use `.bbi_args` to overwrite the existing output directory."
+      ))
+    }
+  }
 }
