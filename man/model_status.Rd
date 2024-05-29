@@ -11,7 +11,7 @@ check_nonmem_finished(.mod, ...)
 
 get_model_status(.mod, max_print = 10, ...)
 
-wait_for_nonmem(.mod, .time_limit = 300, .interval = 5)
+wait_for_nonmem(.mod, .time_limit = 300, .interval = 5, .delay = 1.5)
 }
 \arguments{
 \item{.mod}{a \code{bbi_base_model} or list of \code{bbi_base_model} objects. Other
@@ -28,6 +28,11 @@ before continuing (will exit after this time even if the run does not appear
 to have finished).}
 
 \item{.interval}{integer for number of seconds to wait between each check.}
+
+\item{.delay}{integer for number of sections to wait before scanning the output
+directories. This function will exit early if no output directory exists, so
+this argument serves to delay this evaluation (e.g. if calling right after
+\code{\link[=submit_model]{submit_model()}} in an \code{Rmarkdown} file).}
 }
 \description{
 Checks the status of \code{bbi_base_model} object(s) by looking for a
@@ -84,6 +89,10 @@ user's console until the model(s) have finished running.
 #> 25 model(s) have finished
 #> 75 model(s) are incomplete
 
+> get_model_status(list(.mod, .boot_run))
+#> The following model(s) have finished: `1`
+#> The following model(s) are incomplete: `1-boot`
+
 
 # Freeze the `R` console until model(s) or bootstrap run has finished:
 
@@ -91,7 +100,8 @@ user's console until the model(s) have finished running.
 #> Waiting for 1 model(s) to finish...
 #> 1 model(s) have finished
 
-> wait_for_nonmem(.boot_run)
+# Batch submissions take longer to start
+> wait_for_nonmem(.boot_run, .delay = 6)
 #> Waiting for 100 model(s) to finish...
 #> Waiting for 50 model(s) to finish...
 #> 100 model(s) have finished

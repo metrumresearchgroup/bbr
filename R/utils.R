@@ -629,6 +629,10 @@ bootstrap_is_cleaned_up <- function(.boot_run){
 #' #> 25 model(s) have finished
 #' #> 75 model(s) are incomplete
 #'
+#' > get_model_status(list(.mod, .boot_run))
+#' #> The following model(s) have finished: `1`
+#' #> The following model(s) are incomplete: `1-boot`
+#'
 #'
 #' # Freeze the `R` console until model(s) or bootstrap run has finished:
 #'
@@ -636,7 +640,8 @@ bootstrap_is_cleaned_up <- function(.boot_run){
 #' #> Waiting for 1 model(s) to finish...
 #' #> 1 model(s) have finished
 #'
-#' > wait_for_nonmem(.boot_run)
+#' # Batch submissions take longer to start
+#' > wait_for_nonmem(.boot_run, .delay = 6)
 #' #> Waiting for 100 model(s) to finish...
 #' #> Waiting for 50 model(s) to finish...
 #' #> 100 model(s) have finished
@@ -725,21 +730,25 @@ get_model_status.default <- function(.mod, max_print = 10, ...){
 #'  before continuing (will exit after this time even if the run does not appear
 #'  to have finished).
 #' @param .interval integer for number of seconds to wait between each check.
+#' @param .delay integer for number of sections to wait before scanning the output
+#'  directories. This function will exit early if no output directory exists, so
+#'  this argument serves to delay this evaluation (e.g. if calling right after
+#'  [submit_model()] in an `Rmarkdown` file).
 #' @export
-wait_for_nonmem <- function(.mod, .time_limit = 300, .interval = 5) {
+wait_for_nonmem <- function(.mod, .time_limit = 300, .interval = 5, .delay = 1.5) {
   UseMethod("wait_for_nonmem")
 }
 
 
 #' @export
-wait_for_nonmem.default <- function(.mod, .time_limit = 300, .interval = 5) {
+wait_for_nonmem.default <- function(.mod, .time_limit = 300, .interval = 5, .delay = 1.5) {
 
   # Coerce to list of models regardless of input
   mod_list <- mod_list_setup(.mod)
   # Exit for bootstrap runs that haven't been set up or were already cleaned up
   if(is.null(mod_list)) return(invisible(NULL))
 
-  Sys.sleep(1.5) # wait for lst file to be created
+  Sys.sleep(.delay) # wait for lst file to be created
 
   output_dirs <- purrr::map_chr(mod_list, get_output_dir, .check_exists = FALSE)
   if(!any(fs::dir_exists(output_dirs))){

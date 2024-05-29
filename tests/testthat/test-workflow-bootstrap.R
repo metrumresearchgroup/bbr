@@ -182,21 +182,23 @@ withr::with_options(
       # These calls wont use batch submission since .batch_size < length(boot_models)
       with_bg_env({
         # Run this as a batch submission
-        # - There seems to be about a 3 second delay before an output directory gets created
-        #    - Currently unclear if `wait_for_nonmem` should handle this
-        # - detect 'submitting 3 models in batches of 2' instead
+        # - There is ~3 second delay before an output directory gets created during batch submission
+        # - due to this, we need to sleep before calling wait_for_nonmem
         expect_message(
           proc <- submit_model(.boot_run, .mode = "local", .wait = TRUE, .batch_size = 2),
           "submitting 3 models in batches of 2", fixed = TRUE
         )
-        Sys.sleep(4) # Shouldnt need this - there is a delay when running batch
-        wait_for_nonmem(.boot_run)
-        Sys.sleep(8) # there is another delay (longer it seems) before the final status gets added to OUTPUT
+        # There is a delay when running batch (about 4 seconds)
+        wait_for_nonmem(.boot_run, .delay = 6)
+        expect_true(all(check_nonmem_finished(get_boot_models(.boot_run))))
+
+        # There is another delay before the final status gets added to OUTPUT
+        #  - Check for one of the earlier messages
         proc_output <- proc$get_output_file()
         on.exit(fs::file_delete(proc_output), add = TRUE)
         expect_true(
           any(grepl(
-            "The following model(s) have finished: `1, 2, 3`",
+            "Submitting 2 models with 1 unique configurations",
             readLines(proc_output), fixed = TRUE
           ))
         )
