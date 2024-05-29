@@ -464,18 +464,19 @@ check_bbi_run_log_df_object <- function(.df) {
 #' Checks for the presence of `bbi_config.json` file. If one exists, the run
 #' has `"Finished Running"`. If a directory exists, but a config file _has not_
 #' been generated, the model is `"Incomplete"`. If no directory exists, the
-#' model is `"Not Run"`
+#' model is `"Not Run"`. This is 'source of truth' that all other model status
+#' helpers rely on.
 #'
 #' @param .mod a `bbi_model` object
 #' @returns A character string. Either `"Not Run"`, `"Finished Running"`, or
 #'  `"Incomplete Run"`.
-#' @export
+#' @keywords internal
 bbi_nonmem_model_status <- function(.mod) {
   UseMethod("bbi_nonmem_model_status")
 }
 
 #' @rdname bbi_nonmem_model_status
-#' @export
+#' @keywords internal
 bbi_nonmem_model_status.bbi_model <- function(.mod) {
   status <- "Not Run"
   output_dir <- get_output_dir(.mod, .check_exists = FALSE)
@@ -491,7 +492,7 @@ bbi_nonmem_model_status.bbi_model <- function(.mod) {
 }
 
 #' @rdname bbi_nonmem_model_status
-#' @export
+#' @keywords internal
 bbi_nonmem_model_status.bbi_nmboot_model <- function(.mod) {
   status <- "Not Run"
   output_dir <- get_output_dir(.mod, .check_exists = FALSE)
@@ -534,10 +535,13 @@ bbi_nonmem_model_status.bbi_nmboot_model <- function(.mod) {
   return(status)
 }
 
+# Register private S3 methods for development purposes
+.S3method("bbi_nonmem_model_status", "bbi_model", bbi_nonmem_model_status.bbi_model)
+.S3method("bbi_nonmem_model_status", "bbi_nmboot_model", bbi_nonmem_model_status.bbi_nmboot_model)
 
-#' Check if model run has finished
-#'
-#' This function coerces the 3 statuses to a logical value.
+
+#' @describeIn bbi_nonmem_model_status Check if model run has finished (coerces
+#' the one of the three statuses to a logical value)
 #'
 #' @returns Logical (`TRUE`/`FALSE`)
 #' @keywords internal

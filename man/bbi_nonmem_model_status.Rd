@@ -4,6 +4,7 @@
 \alias{bbi_nonmem_model_status}
 \alias{bbi_nonmem_model_status.bbi_model}
 \alias{bbi_nonmem_model_status.bbi_nmboot_model}
+\alias{model_is_finished}
 \title{Return status of a model}
 \usage{
 bbi_nonmem_model_status(.mod)
@@ -11,6 +12,8 @@ bbi_nonmem_model_status(.mod)
 \method{bbi_nonmem_model_status}{bbi_model}(.mod)
 
 \method{bbi_nonmem_model_status}{bbi_nmboot_model}(.mod)
+
+model_is_finished(.mod)
 }
 \arguments{
 \item{.mod}{a \code{bbi_model} object}
@@ -18,10 +21,20 @@ bbi_nonmem_model_status(.mod)
 \value{
 A character string. Either \code{"Not Run"}, \code{"Finished Running"}, or
 \code{"Incomplete Run"}.
+
+Logical (\code{TRUE}/\code{FALSE})
 }
 \description{
 Checks for the presence of \code{bbi_config.json} file. If one exists, the run
 has \code{"Finished Running"}. If a directory exists, but a config file \emph{has not}
 been generated, the model is \code{"Incomplete"}. If no directory exists, the
-model is \code{"Not Run"}
+model is \code{"Not Run"}. This is 'source of truth' that all other model status
+helpers rely on.
 }
+\section{Functions}{
+\itemize{
+\item \code{model_is_finished()}: Check if model run has finished (coerces
+the one of the three statuses to a logical value)
+
+}}
+\keyword{internal}
