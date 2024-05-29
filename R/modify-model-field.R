@@ -479,7 +479,7 @@ safe_based_on <- function(.start, .based_on) {
     return(.p)
   })
 
-  .paths <- file.path(.start, .based_on)
+  .paths <- fs::path_norm(file.path(.start, .based_on))
 
   # check for a .yaml file at each location
   .paths_bool <-
@@ -496,7 +496,13 @@ safe_based_on <- function(.start, .based_on) {
     ))
   }
 
-  return(tools::file_path_sans_ext(.based_on))
+  if(.based_on == "."){
+    # Handling for `nmsim` model types, or otherwise if the model is made within
+    # the output directory of another model.
+    return(file.path("..", basename(.start)))
+  }else{
+    return(tools::file_path_sans_ext(.based_on))
+  }
 }
 
 #' Adds or removes boolean attribute from model object and YAML

@@ -161,9 +161,10 @@ print.bbi_model <- function(x, ...) {
   bullet_list(get_model_path(x, .check_exists = FALSE))
   print_model_files(x, bullet_list)
 
-  if (is_valid_print(x[[YAML_NMSIM_ARGS]])) {
+  # TODO: hook up to read_spec_file once implemented
+  if (is_valid_print(x[[SPEC_NMSIM_ARGS]])) {
     heading('Simulation Args')
-    iwalk(x[[YAML_NMSIM_ARGS]],
+    iwalk(x[[SPEC_NMSIM_ARGS]],
           ~ bullet_list(paste0(.y, ": ", col_blue(.x))))
   }
 

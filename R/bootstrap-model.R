@@ -663,7 +663,7 @@ cleanup_bootstrap_run <- function(.boot_run, .force = FALSE){
   }
 
   # Overwrite spec file
-  spec_path <- get_boot_spec_path(.boot_run)
+  spec_path <- get_spec_path(.boot_run)
   boot_spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
   # Set cleaned up - impacts status checking
   boot_spec$bootstrap_spec$cleaned_up <- TRUE

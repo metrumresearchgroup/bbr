@@ -135,7 +135,7 @@ submit_model.bbi_nmboot_model <- function(
   checkmate::assert_number(.batch_size, null.ok = TRUE, lower = 1)
 
   # Ensure bootstrap setup was done
-  spec_path <- get_boot_spec_path(.mod, .check_exists = FALSE)
+  spec_path <- get_spec_path(.mod, .check_exists = FALSE)
   if(!fs::file_exists(spec_path)){
     rlang::abort(
       c(

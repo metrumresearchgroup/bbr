@@ -444,7 +444,6 @@ check_bbi_run_log_df_object <- function(.df) {
 }
 
 
-
 ############################
 # Error handlers
 ############################

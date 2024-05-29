@@ -220,9 +220,6 @@ YAML_NOTES <- "notes"
 YAML_BBI_ARGS <- "bbi_args"
 YAML_MOD_TYPE <- "model_type" # SHARED with bbr.bayes
 YAML_STAR <- "star"
-YAML_NMSIM_ARGS <- "nmsim_args"
-YAML_NMSIM_SEED <- "seed"
-YAML_NMSIM_NSIM <- "n_sim"
 
 YAML_REQ_INPUT_KEYS <- c(
   YAML_MOD_TYPE
@@ -230,6 +227,10 @@ YAML_REQ_INPUT_KEYS <- c(
 
 ABS_MOD_PATH <- "absolute_model_path" # SHARED with bbr.bayes
 RUN_ID_COL <- "run" # SHARED with bbr.bayes
+
+# SPEC keys that are hard-coded
+SPEC_NMSIM_ARGS <- "nmsim_args"
+
 
 # keys required to create a model object
 MODEL_REQ_INPUT_KEYS <- c(
@@ -273,11 +274,6 @@ YAML_SCALAR_TO_LIST_KEYS <- c(
   YAML_STAR
 )
 
-# Additional keys stored for bbi_nmsim_model objects
-YAML_ADDL_NMSIM_KEYS <- c(
-  YAML_NMSIM_SEED,
-  YAML_NMSIM_NSIM
-)
 
 SUMMARY_DETAILS <- "run_details"
 SUMMARY_HEURISTICS <- "run_heuristics"

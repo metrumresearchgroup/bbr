@@ -1,4 +1,24 @@
 
+add_simulation <- function(
+    .mod,
+    n = 200,
+    seed = 1234,
+    .join_col = "NUM",
+    .sim_cols = "DV",
+    .suffix = "sim",
+    .inherit_tags = TRUE,
+    .overwrite = FALSE,
+    .mode
+){
+  .sim_mod <- new_sim_model(
+    .mod, n = n, seed = seed, .join_col = .join_col, .sim_cols = .sim_cols,
+    .suffix = .suffix, .inherit_tags = .inherit_tags, .overwrite = .overwrite
+  )
+
+  submit_model(.sim_mod, .mode = .mode)
+}
+
+
 #' Create a simulation model object from an existing model
 #'
 #' @param .mod a `bbi_nonmem_model` object.
@@ -8,8 +28,8 @@
 #' @param .join_col Character column name(s) used to join table files post
 #'  execution. Gets appended to the generated `$TABLE` record. See
 #'  [nm_join_sim()] documentation for details. Defaults to `'NUM'`.
-#' @param .suffix a suffix for the simulation directory. Will be prefixed by
-#'  the model id of `.mod`.
+#' @param .sim_dir a directory for holding the new simulation model. Defaults to
+#'  the output directory of `.mod`.
 #' @param .inherit_tags If `TRUE`, the default, inherit any tags from `.mod`.
 #' @inheritParams copy_model_from
 #'
@@ -56,7 +76,7 @@ new_sim_model <- function(
     n = 200,
     seed = 1234,
     .join_col = "NUM",
-    .suffix = "sim",
+    .sim_dir = get_output_dir(.mod),
     .inherit_tags = TRUE,
     .overwrite = FALSE
 ){
@@ -65,11 +85,12 @@ new_sim_model <- function(
 
   # Create new simulation model object
   model_dir <- get_model_working_directory(.mod)
-  sim_dir <- glue("{get_model_id(.mod)}-{.suffix}")
+  sim_dir_rel <- fs::path_rel(.sim_dir, model_dir)
+  output_dir <- file.path(sim_dir_rel, glue("{get_model_id(.mod)}-sim"))
 
   .sim_mod <- copy_model_from(
     .parent_mod = .mod,
-    .new_model = sim_dir,
+    .new_model = output_dir,
     .add_tags = "SIMULATION",
     .inherit_tags = .inherit_tags,
     .update_model_file = TRUE,
@@ -77,9 +98,7 @@ new_sim_model <- function(
   )
 
   .sim_mod[[YAML_MOD_TYPE]] <- "nmsim"
-  .sim_mod[[YAML_NMSIM_SEED]] <- as.character(seed)
-  .sim_mod[[YAML_NMSIM_NSIM]] <- as.character(n)
-  .sim_mod <- save_nsim_yaml(.sim_mod)
+  .sim_mod <- save_model_yaml(.sim_mod)
 
   # Change problem statement
   prob <- glue("Simulation of model {get_model_id(.mod)}")
@@ -89,7 +108,7 @@ new_sim_model <- function(
   setup_sim_run(.sim_mod, n = n, seed = seed, .join_col = .join_col)
 
   # Return read-in model to get the updated class as part of the model object
-  return(read_model(file.path(model_dir, sim_dir)))
+  return(read_model(file.path(model_dir, output_dir)))
 }
 
 

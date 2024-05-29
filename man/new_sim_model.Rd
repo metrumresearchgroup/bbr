@@ -9,7 +9,7 @@ new_sim_model(
   n = 200,
   seed = 1234,
   .join_col = "NUM",
-  .suffix = "sim",
+  .sim_dir = get_output_dir(.mod),
   .inherit_tags = TRUE,
   .overwrite = FALSE
 )
@@ -26,8 +26,8 @@ new_sim_model(
 execution. Gets appended to the generated \verb{$TABLE} record. See
 \code{\link[=nm_join_sim]{nm_join_sim()}} documentation for details. Defaults to \code{'NUM'}.}
 
-\item{.suffix}{a suffix for the simulation directory. Will be prefixed by
-the model id of \code{.mod}.}
+\item{.sim_dir}{a directory for holding the new simulation model. Defaults to
+the output directory of \code{.mod}.}
 
 \item{.inherit_tags}{If \code{TRUE}, the default, inherit any tags from \code{.mod}.}
 

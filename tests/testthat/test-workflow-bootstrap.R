@@ -94,7 +94,7 @@ withr::with_options(
     boot_dir <- .boot_run[[ABS_MOD_PATH]]
 
     test_that("setup_bootstrap_run messages if nm_join cant be used", {
-      boot_spec_path <- get_boot_spec_path(.boot_run, .check_exists = FALSE)
+      boot_spec_path <- get_spec_path(.boot_run, .check_exists = FALSE)
       expect_false(fs::file_exists(boot_spec_path))
       # Set up bootstrap run object using *non-submitted* model
       expect_message(
