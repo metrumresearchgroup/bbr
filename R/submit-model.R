@@ -140,20 +140,23 @@ submit_model.bbi_nmboot_model <- function(
     ))
   }
 
-  outdir <- get_output_dir(.mod, .check_exists = FALSE)
-  if (fs::dir_exists(outdir)) {
-    if (isTRUE(.overwrite)) {
-      rlang::inform(glue("Overwriting existing bootstrap output directory {outdir}"))
-      fs::dir_delete(outdir)
-    } else {
-      stop(paste(
-        glue("Model output already exists at {outdir}."),
-        "Use submit_model(..., .overwrite = TRUE) to overwrite the existing output directory."
-      ))
+  boot_models <- get_boot_models(.mod)
+
+  if (!isTRUE(.dry_run)) {
+    outdirs <- purrr::map_chr(boot_models, ~ get_output_dir(.x, .check_exists = FALSE))
+    if (any(fs::dir_exists(outdirs))) {
+      if (isTRUE(.overwrite)) {
+        rlang::inform(glue("Overwriting existing bootstrap output directories in {get_output_dir(.mod)}"))
+        fs::dir_delete(outdirs)
+      } else {
+        stop(paste(
+          glue("Model output already exists in {get_output_dir(.mod)}."),
+          "Use submit_model(..., .overwrite = TRUE) to overwrite the existing output directories."
+        ))
+      }
     }
   }
 
-  boot_models <- get_boot_models(.mod)
   res <- if (!isTRUE(.dry_run) &&
              !is.null(.batch_size) &&
              .batch_size < length(boot_models)
