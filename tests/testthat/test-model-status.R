@@ -2,7 +2,7 @@ context("Model status functions")
 
 withr::local_options(list(
   bbr.bbi_exe_path = read_bbi_path(),
-  bbr.verbose = FALSE
+  bbr.verbose = TRUE
 ))
 describe("Model status helpers return the correct status", {
 
