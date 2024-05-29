@@ -37,7 +37,11 @@
 #' @param .overwrite Logical to specify whether or not to overwrite existing
 #'   model output from a previous run. If `NULL`, the default, will defer to
 #'   setting in `.bbi_args` or `bbi.yaml`. If _not_ `NULL` will override any
-#'   settings in `.bbi_args` or `bbi.yaml`.
+#'   settings in `.bbi_args` or `bbi.yaml`. **The exception to this are
+#'   bootstrap runs (`bbi_nmboot_model` objects).** For bootstrap runs, this
+#'   defaults to `FALSE` and does _not_ respect any setting passed via
+#'   `.bbi_args` or a `bbi.yaml` config file. To overwrite existing bootstrap
+#'   output, a user must pass `TRUE` through this argument.
 #' @param .config_path Path to a bbi configuration file. If `NULL`, the
 #'   default, will attempt to use a `bbi.yaml` in the same directory as the
 #'   model.
@@ -98,7 +102,7 @@ submit_model.bbi_nmboot_model <- function(
     .bbi_args = NULL,
     .mode = "sge",
     ...,
-    .overwrite = NULL,
+    .overwrite = FALSE,
     .config_path = NULL,
     .wait = FALSE,
     .dry_run = FALSE,
@@ -126,6 +130,27 @@ submit_model.bbi_nmboot_model <- function(
     # Ensure that user-specified values work from the bootstrap
     # subdirectory.
     fs::path_abs(.config_path)
+  }
+
+  # check overwrite and delete existing output, if requested
+  if (!is.null(.bbi_args[["overwrite"]])) {
+    rlang::warn(paste(
+      "submit_model.bbi_nmboot_model does NOT respect setting `overwrite` via .bbi_args or a bbi.yaml config file.",
+      "To overwrite an existing bootstrap run, use submit_model(..., .overwrite = TRUE)."
+    ))
+  }
+
+  outdir <- get_output_dir(.mod, .check_exists = FALSE)
+  if (fs::dir_exists(outdir)) {
+    if (isTRUE(.overwrite)) {
+      rlang::inform(glue("Overwriting existing bootstrap output directory {outdir}"))
+      fs::dir_delete(outdir)
+    } else {
+      stop(paste(
+        glue("Model output already exists at {outdir}."),
+        "Use submit_model(..., .overwrite = TRUE) to overwrite the existing output directory."
+      ))
+    }
   }
 
   boot_models <- get_boot_models(.mod)
