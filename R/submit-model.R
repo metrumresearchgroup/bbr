@@ -236,6 +236,11 @@ submit_nonmem_model <- function(.mod,
     )
   }
 
+  if (.dry_run) {
+    # construct fake res object
+    return(bbi_dry_run(cmd_args, model_dir))
+  }
+
   # check overwrite and delete existing output, if requested
   overwrite_requested <- if (!is.null(.bbi_args[["overwrite"]])) {
     # if passed via .overwrite or .bbi_args, return this value
@@ -256,11 +261,6 @@ submit_nonmem_model <- function(.mod,
         "Either pass `.overwrite = TRUE` or use `.bbi_args` to overwrite the existing output directory."
       ))
     }
-  }
-
-  if (.dry_run) {
-    # construct fake res object
-    return(bbi_dry_run(cmd_args, model_dir))
   }
 
   # launch model
