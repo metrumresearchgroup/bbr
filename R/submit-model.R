@@ -117,14 +117,15 @@ submit_model.bbi_nmboot_model <- function(
     )
   }
 
-  # If bbi.yaml exists in the current modeling directory, and _not_ the nested
-  # bootstrap directory, copy it to there before running
-  model_dir <- get_model_working_directory(.mod)
-  boot_dir <- .mod[[ABS_MOD_PATH]]
-  bbi_yaml_path <- file.path(model_dir, "bbi.yaml")
-  if(fs::file_exists(bbi_yaml_path) && !fs::file_exists(file.path(boot_dir, "bbi.yaml"))){
-    fs::file_copy(bbi_yaml_path, file.path(boot_dir, "bbi.yaml"))
-    rlang::inform(glue("Inheriting `bbi.yaml` from `{model_dir}`"))
+  .config_path <- if (is.null(.config_path)) {
+    # Explicitly pass the default value because it's needed for the
+    # bootstrap runs, which happen one level deeper.
+    file.path(get_model_working_directory(.mod),
+              "bbi.yaml")
+  } else {
+    # Ensure that user-specified values work from the bootstrap
+    # subdirectory.
+    fs::path_abs(.config_path)
   }
 
   boot_models <- get_boot_models(.mod)
