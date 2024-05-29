@@ -246,10 +246,17 @@ submit_nonmem_model <- function(.mod,
     isTRUE(yaml::read_yaml(cpath)[["overwrite"]])
   }
 
-  check_for_existing_output(
-    get_output_dir(.mod, .check_exists = FALSE),
-    overwrite_requested
-  )
+  outdir <- get_output_dir(.mod, .check_exists = FALSE)
+  if (fs::dir_exists(outdir)) {
+    if (isTRUE(overwrite_requested)) {
+      fs::dir_delete(outdir)
+    } else {
+      stop(paste(
+        glue("Model output already exists at {outdir}."),
+        "Either pass `.overwrite = TRUE` or use `.bbi_args` to overwrite the existing output directory."
+      ))
+    }
+  }
 
   if (.dry_run) {
     # construct fake res object
@@ -280,23 +287,3 @@ check_mode_argument <- function(.mode) {
   return(invisible(TRUE))
 }
 
-
-#' Private helper to look for existing model output and overwrite if necessary
-#' @param .path Path to output directory that will potentially be overwritten
-#' @param .overwrite Whether user has requested overwrite. This value can come
-#'   from a variety of sources, but these are consolidated by the calling code,
-#'   before being passed to this function.
-#' @importFrom fs dir_exists dir_delete
-#' @keywords internal
-check_for_existing_output <- function(.path, .overwrite) {
-  if (fs::dir_exists(.path)) {
-    if (isTRUE(.overwrite)) {
-      fs::dir_delete(.path)
-    } else {
-      stop(paste(
-        glue("Model output already exists at {.path}."),
-        "Either pass `.overwrite = TRUE` or use `.bbi_args` to overwrite the existing output directory."
-      ))
-    }
-  }
-}
