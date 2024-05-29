@@ -123,7 +123,7 @@ withr::with_options(
       expect_false(check_nonmem_finished(.boot_run))
       # returns FALSE for each model (not meant to be called this way by user)
       res <- check_nonmem_finished(boot_models)
-      expect_fase(all(res))
+      expect_false(all(res))
       # Logical and error checks
       expect_false(model_is_finished(.boot_run))
       expect_false(bootstrap_is_cleaned_up(.boot_run))
@@ -184,14 +184,14 @@ withr::with_options(
         # Run this as a batch submission
         # - There seems to be about a 3 second delay before an output directory gets created
         #    - Currently unclear if `wait_for_nonmem` should handle this
-        # - detect 'submitting 3 models in batches of 1' instead
+        # - detect 'submitting 3 models in batches of 2' instead
         expect_message(
-          proc <- submit_model(.boot_run, .mode = "local", .wait = TRUE, .batch_size = 1),
-          "submitting 3 models in batches of 1", fixed = TRUE
+          proc <- submit_model(.boot_run, .mode = "local", .wait = TRUE, .batch_size = 2),
+          "submitting 3 models in batches of 2", fixed = TRUE
         )
         Sys.sleep(4) # Shouldnt need this - there is a delay when running batch
         wait_for_nonmem(.boot_run)
-        Sys.sleep(5) # there is another delay before the final status gets added to OUTPUT
+        Sys.sleep(8) # there is another delay (longer it seems) before the final status gets added to OUTPUT
         proc_output <- proc$get_output_file()
         on.exit(fs::file_delete(proc_output), add = TRUE)
         expect_true(
@@ -296,7 +296,7 @@ withr::with_options(
       files_kept <- fs::dir_ls(boot_dir, all = TRUE) %>% fs::path_rel(boot_dir)
       expect_equal(
         files_kept,
-        c(".gitignore", "OUTPUT", "bbi.yaml", "bbr_boot_spec.json", "boot_summary.RDS")
+        c(".gitignore", "bbi.yaml", "bbr_boot_spec.json", "boot_summary.RDS")
       )
 
       # Confirm boot spec alterations
