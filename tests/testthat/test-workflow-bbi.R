@@ -130,16 +130,23 @@ withr::with_options(list(
     # check that overwrite error parses correctly
     expect_error(
       submit_model(mod1, .mode = "local", .wait = TRUE),
-      regexp = "The target output directory already exists"
+      regexp = "Model output already exists"
     )
     expect_error(
-      submit_models(list(mod2, mod3), .mode = "local", .wait = TRUE),
-      regexp = "The target output directory already exists"
+      proc <- submit_models(list(mod2, mod3), .mode = "local", .wait = TRUE),
+      regexp = "Model output already exists"
     )
 
     # check that .overwrite works
-    submit_model(mod1, .mode = "local", .wait = TRUE, .overwrite = TRUE)
-    submit_models(list(mod2, mod3), .mode = "local", .wait = TRUE, .overwrite = TRUE)
+    expect_message(
+      submit_model(mod1, .mode = "local", .wait = TRUE, .overwrite = TRUE),
+      "Overwriting existing output directory in"
+    )
+    expect_message(
+      submit_models(list(mod2, mod3), .mode = "local", .wait = TRUE, .overwrite = TRUE),
+      "Overwriting existing output directories in"
+    )
+
     log_df <- summary_log(MODEL_DIR_BBI)
 
     # check that models finished successfully
@@ -228,7 +235,7 @@ withr::with_options(list(
   test_that("wait_for_nonmem() correctly freezes the console [BBR-UTL-012]", {
     # create model
     mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
-    submit_model(mod1, .mode = "local", .wait = FALSE)
+    submit_model(mod1, .mode = "local", .wait = FALSE, .overwrite = TRUE)
     wait_for_nonmem(mod1, 100, .interval = 5)
     expect_true(suppressMessages(nrow(nm_tab(mod1)) > 1))
   })

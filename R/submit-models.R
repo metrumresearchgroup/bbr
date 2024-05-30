@@ -132,6 +132,24 @@ submit_models.bbi_nonmem_models <- function(.mods,
     return(list(cmd_args = cmd_args, model_dir = model_dir))
   })
 
+  if (!isTRUE(.dry_run)) {
+    outdirs <- purrr::map_chr(.mods, ~ get_output_dir(.x, .check_exists = FALSE))
+    if (any(fs::dir_exists(outdirs))) {
+      outdirs_txt <- paste("\n-", paste(outdirs, collapse = "\n- "))
+      if (isTRUE(.overwrite)) {
+        rlang::inform(glue("Overwriting existing output directories in {outdirs_txt}"))
+        fs::dir_delete(outdirs)
+      } else {
+        rlang::abort(
+          c(
+            glue("Model output already exists in {outdirs_txt}."),
+            "Use submit_models(..., .overwrite = TRUE) to overwrite the existing output directories."
+          )
+        )
+      }
+    }
+  }
+
   message(glue("Submitting {length(.mods)} models with {length(cmd_args_list)} unique configurations."))
 
   if (.dry_run) {

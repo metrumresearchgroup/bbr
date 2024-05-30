@@ -259,12 +259,15 @@ submit_nonmem_model <- function(.mod,
   outdir <- get_output_dir(.mod, .check_exists = FALSE)
   if (fs::dir_exists(outdir)) {
     if (isTRUE(overwrite_requested)) {
+      rlang::inform(glue("Overwriting existing output directory in {outdir}"))
       fs::dir_delete(outdir)
     } else {
-      stop(paste(
-        glue("Model output already exists at {outdir}."),
-        "Either pass `.overwrite = TRUE` or use `.bbi_args` to overwrite the existing output directory."
-      ))
+      rlang::abort(
+        c(
+          glue("Model output already exists in {outdir}."),
+          "Either pass `.overwrite = TRUE` or use `.bbi_args` to overwrite the existing output directory."
+        )
+      )
     }
   }
 
