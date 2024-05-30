@@ -170,7 +170,7 @@ submit_model.bbi_nmboot_model <- function(
       .mode = .mode,
       .overwrite = .overwrite,
       .config_path = .config_path,
-      stdout_path = file.path(boot_dir, "OUTPUT")
+      stdout_path = file.path(.mod[[ABS_MOD_PATH]], "OUTPUT")
     )
 
   } else {
