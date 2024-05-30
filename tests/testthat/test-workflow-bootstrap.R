@@ -220,7 +220,26 @@ withr::with_options(
       )
 
       # Attempt to overwrite
-      expect_error(submit_model(.boot_run), "Model output already exists")
+      expect_error(submit_model(.boot_run, .mode = "local"), "Model output already exists")
+
+      # Check that overwriting works
+      #  - create fake bootstrap run, since we want to clean up the original
+      .boot_fake <- new_bootstrap_run(mod1, .suffix = "fake-boot")
+      .boot_fake <- setup_bootstrap_run(.boot_fake, n = 3)
+      proc <- submit_model(.boot_fake, .overwrite = TRUE, .mode = "local")
+
+      # Immediately kill. Status will be "Not Run", but the the directory will exist,
+      # triggering the .overwrite error
+      Sys.sleep(0.5)
+      proc[[1]]$process$kill()
+      expect_error(submit_model(.boot_fake, .mode = "local"), "Model output already exists")
+
+      # Check that overwriting works
+      expect_message(
+        proc <- submit_model(.boot_fake, .overwrite = TRUE, .mode = "local"),
+        "Overwriting existing bootstrap output directories", fixed = TRUE
+      )
+      proc[[1]]$process$kill()
     })
 
     test_that("summarize_bootstrap_run works as expected", {
