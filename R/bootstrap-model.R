@@ -112,7 +112,8 @@ setup_bootstrap_run <- function(
     # Store data within run folder and gitignore & ignore individual model files
     f_sep <- .Platform$file.sep
     default_ignore <- paste0(
-      c("*.ctl", "*.mod", "*.yaml", paste0(f_sep, "data")), collapse = "\n"
+      c("*.ctl", "*.mod", "*.yaml", paste0(f_sep, "data"), "OUTPUT"),
+      collapse = "\n"
     )
     ignore_models <- paste0(f_sep, mod_names, collapse = "\n")
     ignore_lines <- paste(default_ignore, ignore_models, sep = "\n\n")
