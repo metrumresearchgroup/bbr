@@ -149,10 +149,12 @@ submit_model.bbi_nmboot_model <- function(
         rlang::inform(glue("Overwriting existing bootstrap output directories in {get_output_dir(.mod)}"))
         fs::dir_delete(outdirs)
       } else {
-        stop(paste(
-          glue("Model output already exists in {get_output_dir(.mod)}."),
-          "Use submit_model(..., .overwrite = TRUE) to overwrite the existing output directories."
-        ))
+        rlang::abort(
+          c(
+            glue("Model output already exists in {get_output_dir(.mod)}."),
+            "Use submit_model(..., .overwrite = TRUE) to overwrite the existing output directories."
+          )
+        )
       }
     }
   }
@@ -160,7 +162,7 @@ submit_model.bbi_nmboot_model <- function(
   res <- if (!isTRUE(.dry_run) &&
              !is.null(.batch_size) &&
              .batch_size < length(boot_models)
-             ) {
+  ) {
     submit_batch_callr(
       .mods = boot_models,
       .batch_size = .batch_size,

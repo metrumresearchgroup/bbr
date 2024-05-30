@@ -218,6 +218,9 @@ withr::with_options(
       expect_error(
         cleanup_bootstrap_run(.boot_run), "Model has not been summarized yet"
       )
+
+      # Attempt to overwrite
+      expect_error(submit_model(.boot_run), "Model output already exists")
     })
 
     test_that("summarize_bootstrap_run works as expected", {
