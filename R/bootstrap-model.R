@@ -526,7 +526,7 @@ bootstrap_can_be_summarized <- function(.boot_run){
     )
   }else{
     if(!model_is_finished(.boot_run)){
-      rlang::abort(
+      rlang::warn(
         c(
           "One or more bootstrap runs have not finished executing.",
           "i" = "Run `get_model_status(.boot_run)` to check the submission status."
