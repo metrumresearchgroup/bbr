@@ -30,7 +30,8 @@ describe("Model status helpers return the correct status", {
     expect_false(check_nonmem_finished(mod2))
     expect_message(
       get_model_status(mod2),
-      "The following model(s) are incomplete: `2`", fixed = TRUE
+      "The following model(s) are incomplete or have not yet been run: `2`",
+      fixed = TRUE
     )
 
     # Bootstrap
@@ -49,7 +50,8 @@ describe("Model status helpers return the correct status", {
     expect_false(check_nonmem_finished(.boot_run))
     expect_message(
       get_model_status(.boot_run),
-      "The following model(s) are incomplete: `1, 2`", fixed = TRUE
+      "The following model(s) are incomplete or have not yet been run: `1, 2`",
+      fixed = TRUE
     )
     # Individual bootstrap models
     statuses <- purrr::map_chr(get_boot_models(.boot_run), bbi_nonmem_model_status)
@@ -68,7 +70,8 @@ describe("Model status helpers return the correct status", {
     expect_false(check_nonmem_finished(mod2))
     expect_message(
       get_model_status(mod2),
-      "The following model(s) are incomplete: `2`", fixed = TRUE
+      "The following model(s) are incomplete or have not yet been run: `2`",
+      fixed = TRUE
     )
   })
 
@@ -83,7 +86,8 @@ describe("Model status helpers return the correct status", {
     )
     expect_message(
       get_model_status(mod_list),
-      "The following model(s) are incomplete: `2, 1-boot`", fixed = TRUE
+      "The following model(s) are incomplete or have not yet been run: `2, 1-boot`",
+      fixed = TRUE
     )
   })
 })

@@ -186,7 +186,7 @@ withr::with_options(
         # - due to this, we need to sleep before calling wait_for_nonmem
         expect_message(
           proc <- submit_model(.boot_run, .mode = "local", .wait = TRUE, .batch_size = 2),
-          "submitting 3 models in batches of 2", fixed = TRUE
+          "Submitting 3 models in batches of 2", fixed = TRUE
         )
         # There is a delay when running batch (about 4 seconds)
         wait_for_nonmem(.boot_run, .delay = 6)
