@@ -345,6 +345,13 @@ make_boot_spec <- function(boot_models, boot_args){
 #'  need of re-executing `model_summary()` calls for a large number of runs. It
 #'  also helps to reduce the number of files you need to commit via version
 #'  control (see `cleanup_bootstrap_run()`).
+#'  - The exception to this is when `summarize_bootstrap_run()` is called on an
+#'  _incomplete_ bootstrap run. In this case, the _finished_ models will be
+#'  summarized, but a `boot_summary.RDS` will _not_ be written to disk. This can
+#'  be overriden by passing `force_resummarize = TRUE`. Note that this should be
+#'  used with caution, and generally only when some of the models have failed
+#'  but you don't plan to re-run them (i.e. if you consider the run "finished",
+#'  even though some models did not complete).
 #'
 #' @seealso param_estimates_compare cleanup_bootstrap_run
 #'
@@ -460,7 +467,11 @@ summarize_bootstrap_run <- function(
     boot_compare <- param_estimates_compare(boot_sum)
     boot_sum$boot_compare <- boot_compare
 
-    saveRDS(boot_sum, boot_sum_path)
+    # Only save the summary to disk if all models are finished
+    #  OR force_resummarize = TRUE
+    if(model_is_finished(.boot_run) || isTRUE(force_resummarize)) {
+      saveRDS(boot_sum, boot_sum_path)
+    }
   }else{
     verbose_msg(
       glue("Reading in bootstrap summary: {fs::path_rel(boot_sum_path, getwd())}\n\n")
