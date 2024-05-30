@@ -299,10 +299,8 @@ withr::with_options(
 
       # Check model/data file existence
       files_kept <- fs::dir_ls(boot_dir, all = TRUE) %>% fs::path_rel(boot_dir)
-      expect_equal(
-        files_kept,
-        c(".gitignore", "bbi.yaml", "bbr_boot_spec.json", "boot_summary.RDS")
-      )
+      expect_equal(files_kept, c(".gitignore", "bbr_boot_spec.json", "boot_summary.RDS"))
+
 
       # Confirm boot spec alterations
       boot_spec <- get_boot_spec(.boot_run)
