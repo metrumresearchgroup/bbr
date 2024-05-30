@@ -20,7 +20,7 @@ submit_batch_callr <- function (
     .config_path,
     stdout_path
 ) {
-  verbose_msg(glue("submitting {length(.mods)} models in batches of {.batch_size}"))
+  verbose_msg(glue("Submitting {length(.mods)} models in batches of {.batch_size}"))
 
   # Check for env var in development setting (see @details above)
   env <- callr::rcmd_safe_env()

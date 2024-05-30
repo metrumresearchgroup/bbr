@@ -224,7 +224,7 @@ delete_models <- function(.mods, .tags = "test threads", .force = FALSE){
   if (inherits(.mods, "bbi_model")) {
     .mods <- list(.mods)
   }
-  check_model_object_list(.mods, .mod_types = c(NM_MOD_CLASS, NM_SUM_CLASS))
+  check_model_object_list(.mods, .mod_types = c(NM_MOD_CLASS, NM_SUM_CLASS, NMBOOT_MOD_CLASS))
   assert_logical(.force, len = 1)
 
   mod_info <- map_dfr(.mods, function(mod.x){
