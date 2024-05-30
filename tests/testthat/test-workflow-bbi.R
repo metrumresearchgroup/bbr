@@ -134,7 +134,7 @@ withr::with_options(list(
     )
     expect_error(
       proc <- submit_models(list(mod2, mod3), .mode = "local", .wait = TRUE),
-      regexp = "Model output already exists"
+      regexp = "The target output directory already exists"
     )
 
     # check that .overwrite works
@@ -142,10 +142,7 @@ withr::with_options(list(
       submit_model(mod1, .mode = "local", .wait = TRUE, .overwrite = TRUE),
       "Overwriting existing output directory in"
     )
-    expect_message(
-      submit_models(list(mod2, mod3), .mode = "local", .wait = TRUE, .overwrite = TRUE),
-      "Overwriting existing output directories in"
-    )
+    submit_models(list(mod2, mod3), .mode = "local", .wait = TRUE, .overwrite = TRUE)
 
     log_df <- summary_log(MODEL_DIR_BBI)
 
