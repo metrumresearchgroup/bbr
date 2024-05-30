@@ -37,7 +37,11 @@
 #' @param .overwrite Logical to specify whether or not to overwrite existing
 #'   model output from a previous run. If `NULL`, the default, will defer to
 #'   setting in `.bbi_args` or `bbi.yaml`. If _not_ `NULL` will override any
-#'   settings in `.bbi_args` or `bbi.yaml`.
+#'   settings in `.bbi_args` or `bbi.yaml`. **The exception to this are
+#'   bootstrap runs (`bbi_nmboot_model` objects).** For bootstrap runs, this
+#'   defaults to `FALSE` and does _not_ respect any setting passed via
+#'   `.bbi_args` or a `bbi.yaml` config file. To overwrite existing bootstrap
+#'   output, a user must pass `TRUE` through this argument.
 #' @param .config_path Path to a bbi configuration file. If `NULL`, the
 #'   default, will attempt to use a `bbi.yaml` in the same directory as the
 #'   model.
@@ -98,7 +102,7 @@ submit_model.bbi_nmboot_model <- function(
     .bbi_args = NULL,
     .mode = "sge",
     ...,
-    .overwrite = NULL,
+    .overwrite = FALSE,
     .config_path = NULL,
     .wait = FALSE,
     .dry_run = FALSE,
@@ -117,21 +121,48 @@ submit_model.bbi_nmboot_model <- function(
     )
   }
 
-  # If bbi.yaml exists in the current modeling directory, and _not_ the nested
-  # bootstrap directory, copy it to there before running
-  model_dir <- get_model_working_directory(.mod)
-  boot_dir <- .mod[[ABS_MOD_PATH]]
-  bbi_yaml_path <- file.path(model_dir, "bbi.yaml")
-  if(fs::file_exists(bbi_yaml_path) && !fs::file_exists(file.path(boot_dir, "bbi.yaml"))){
-    fs::file_copy(bbi_yaml_path, file.path(boot_dir, "bbi.yaml"))
-    rlang::inform(glue("Inheriting `bbi.yaml` from `{model_dir}`"))
+  .config_path <- if (is.null(.config_path)) {
+    # Explicitly pass the default value because it's needed for the
+    # bootstrap runs, which happen one level deeper.
+    file.path(get_model_working_directory(.mod),
+              "bbi.yaml")
+  } else {
+    # Ensure that user-specified values work from the bootstrap
+    # subdirectory.
+    fs::path_abs(.config_path)
+  }
+
+  # check overwrite and delete existing output, if requested
+  if (!is.null(.bbi_args[["overwrite"]])) {
+    rlang::warn(paste(
+      "submit_model.bbi_nmboot_model does NOT respect setting `overwrite` via .bbi_args or a bbi.yaml config file.",
+      "To overwrite an existing bootstrap run, use submit_model(..., .overwrite = TRUE)."
+    ))
   }
 
   boot_models <- get_boot_models(.mod)
+
+  if (!isTRUE(.dry_run)) {
+    outdirs <- purrr::map_chr(boot_models, ~ get_output_dir(.x, .check_exists = FALSE))
+    if (any(fs::dir_exists(outdirs))) {
+      if (isTRUE(.overwrite)) {
+        rlang::inform(glue("Overwriting existing bootstrap output directories in {get_output_dir(.mod)}"))
+        fs::dir_delete(outdirs)
+      } else {
+        rlang::abort(
+          c(
+            glue("Model output already exists in {get_output_dir(.mod)}."),
+            "Use submit_model(..., .overwrite = TRUE) to overwrite the existing output directories."
+          )
+        )
+      }
+    }
+  }
+
   res <- if (!isTRUE(.dry_run) &&
              !is.null(.batch_size) &&
              .batch_size < length(boot_models)
-             ) {
+  ) {
     submit_batch_callr(
       .mods = boot_models,
       .batch_size = .batch_size,
@@ -139,7 +170,7 @@ submit_model.bbi_nmboot_model <- function(
       .mode = .mode,
       .overwrite = .overwrite,
       .config_path = .config_path,
-      stdout_path = file.path(boot_dir, "OUTPUT")
+      stdout_path = file.path(.mod[[ABS_MOD_PATH]], "OUTPUT")
     )
 
   } else {
@@ -195,8 +226,10 @@ submit_nonmem_model <- function(.mod,
   # define working directory
   model_dir <- get_model_working_directory(.mod)
 
-  .path_exists <- file_exists(.config_path %||% file.path(model_dir, "bbi.yaml"))
-  if(!.path_exists){
+  # check for existence of config
+  checkmate::assert_string(.config_path, null.ok = TRUE)
+  cpath <- .config_path %||% file.path(model_dir, "bbi.yaml")
+  if(!file_exists(cpath)){
     stop(paste("No bbi configuration was found in the execution directory.",
                "Please run `bbi_init()` with the appropriate directory to continue."))
   }
@@ -211,6 +244,31 @@ submit_nonmem_model <- function(.mod,
   if (.dry_run) {
     # construct fake res object
     return(bbi_dry_run(cmd_args, model_dir))
+  }
+
+  # check overwrite and delete existing output, if requested
+  overwrite_requested <- if (!is.null(.bbi_args[["overwrite"]])) {
+    # if passed via .overwrite or .bbi_args, return this value
+    .bbi_args[["overwrite"]]
+  } else {
+    # if _not_ passed, check config bbi.yaml
+    # return FALSE if _not_ specified there either
+    isTRUE(yaml::read_yaml(cpath)[["overwrite"]])
+  }
+
+  outdir <- get_output_dir(.mod, .check_exists = FALSE)
+  if (fs::dir_exists(outdir)) {
+    if (isTRUE(overwrite_requested)) {
+      rlang::inform(glue("Overwriting existing output directory in {outdir}"))
+      fs::dir_delete(outdir)
+    } else {
+      rlang::abort(
+        c(
+          glue("Model output already exists in {outdir}."),
+          "Either pass `.overwrite = TRUE` or use `.bbi_args` to overwrite the existing output directory."
+        )
+      )
+    }
   }
 
   # launch model
@@ -236,3 +294,4 @@ check_mode_argument <- function(.mode) {
 
   return(invisible(TRUE))
 }
+

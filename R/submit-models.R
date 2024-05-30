@@ -132,6 +132,7 @@ submit_models.bbi_nonmem_models <- function(.mods,
     return(list(cmd_args = cmd_args, model_dir = model_dir))
   })
 
+
   message(glue("Submitting {length(.mods)} models with {length(cmd_args_list)} unique configurations."))
 
   if (.dry_run) {

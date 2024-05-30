@@ -218,6 +218,28 @@ withr::with_options(
       expect_error(
         cleanup_bootstrap_run(.boot_run), "Model has not been summarized yet"
       )
+
+      # Attempt to overwrite
+      expect_error(submit_model(.boot_run, .mode = "local"), "Model output already exists")
+
+      # Check that overwriting works
+      #  - create fake bootstrap run, since we want to clean up the original
+      .boot_fake <- new_bootstrap_run(mod1, .suffix = "fake-boot")
+      .boot_fake <- setup_bootstrap_run(.boot_fake, n = 3)
+      proc <- submit_model(.boot_fake, .overwrite = TRUE, .mode = "local")
+
+      # Immediately kill. Status will be "Not Run", but the the directory will exist,
+      # triggering the .overwrite error
+      Sys.sleep(0.5)
+      proc[[1]]$process$kill()
+      expect_error(submit_model(.boot_fake, .mode = "local"), "Model output already exists")
+
+      # Check that overwriting works
+      expect_message(
+        proc <- submit_model(.boot_fake, .overwrite = TRUE, .mode = "local"),
+        "Overwriting existing bootstrap output directories", fixed = TRUE
+      )
+      proc[[1]]$process$kill()
     })
 
     test_that("summarize_bootstrap_run works as expected", {
@@ -296,10 +318,8 @@ withr::with_options(
 
       # Check model/data file existence
       files_kept <- fs::dir_ls(boot_dir, all = TRUE) %>% fs::path_rel(boot_dir)
-      expect_equal(
-        files_kept,
-        c(".gitignore", "bbi.yaml", "bbr_boot_spec.json", "boot_summary.RDS")
-      )
+      expect_equal(files_kept, c(".gitignore", "bbr_boot_spec.json", "boot_summary.RDS"))
+
 
       # Confirm boot spec alterations
       boot_spec <- get_boot_spec(.boot_run)
