@@ -250,6 +250,7 @@ steps:
   # clone nmrec from main branch for building package
   - git clone --depth 1 https://github.com/metrumresearchgroup/nmrec.git /tmp/nmrec
   - R -s -e 'devtools::install("/tmp/nmrec", upgrade = "never")'
+  - R -s -e 'devtools::install_deps(upgrade = "never")'
   - R -s -e 'pkgpub::create_tagged_repo(.dir = '"'"'/ephemeral'"'"')'
   environment:
     BBI_EXE_PATH: /ephemeral/bbi
