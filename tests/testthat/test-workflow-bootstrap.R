@@ -325,5 +325,11 @@ withr::with_options(
       boot_spec <- get_boot_spec(.boot_run)
       expect_true(boot_spec$cleaned_up)
       expect_true(is.null(boot_spec$bootstrap_runs))
+
+      # Cannot be overwritten
+      expect_error(
+        submit_model(.boot_run, .overwrite = TRUE, .mode = "local"),
+        "Model has been cleaned up"
+      )
     })
   })

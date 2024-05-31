@@ -141,10 +141,11 @@ submit_model.bbi_nmboot_model <- function(
   }
 
   boot_models <- get_boot_models(.mod)
+  cleaned_up <- bootstrap_is_cleaned_up(.mod)
 
   if (!isTRUE(.dry_run)) {
     outdirs <- purrr::map_chr(boot_models, ~ get_output_dir(.x, .check_exists = FALSE))
-    if (any(fs::dir_exists(outdirs))) {
+    if (any(fs::dir_exists(outdirs)) && !isTRUE(cleaned_up)) {
       if (isTRUE(.overwrite)) {
         rlang::inform(glue("Overwriting existing bootstrap output directories in {get_output_dir(.mod)}"))
         fs::dir_delete(outdirs)
@@ -161,6 +162,18 @@ submit_model.bbi_nmboot_model <- function(
           c(
             glue("Model output already exists in {get_output_dir(.mod)}."),
             "Use submit_model(..., .overwrite = TRUE) to overwrite the existing output directories."
+          )
+        )
+      }
+    } else {
+      if (isTRUE(.overwrite) && isTRUE(cleaned_up)) {
+        # We dont want to delete anything if the model has been cleaned up
+        #   - All output files would be deleted via:
+        #     `setup_bootstrap_run(.boot_run, .overwrite = TRUE)`
+        rlang::abort(
+          c(
+            "Model has been cleaned up and cannot be overwritten",
+            "Call `setup_bootstrap_run(.boot_run, .overwrite = TRUE)` before re-submitting"
           )
         )
       }
