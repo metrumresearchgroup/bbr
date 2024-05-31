@@ -166,7 +166,7 @@ submit_model.bbi_nmboot_model <- function(
         )
       }
     } else {
-      if (isTRUE(.overwrite) && isTRUE(cleaned_up)) {
+      if (isTRUE(cleaned_up)) {
         # We dont want to delete anything if the model has been cleaned up
         #   - All output files would be deleted via:
         #     `setup_bootstrap_run(.boot_run, .overwrite = TRUE)`
