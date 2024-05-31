@@ -4,7 +4,13 @@
 \alias{setup_sim_run}
 \title{Set up \code{NONMEM} simulation}
 \usage{
-setup_sim_run(.mod, n = 100, seed = 1234, .join_col = c("NUM"))
+setup_sim_run(
+  .mod,
+  n = 100,
+  seed = 1234,
+  sim_cols = c("DV", "PRED"),
+  .join_col = c("NUM")
+)
 }
 \arguments{
 \item{.mod}{a \code{bbi_nonmem_model} or \code{bbi_nmsim_model} object.}
@@ -13,6 +19,9 @@ setup_sim_run(.mod, n = 100, seed = 1234, .join_col = c("NUM"))
 \verb{$SIMULATION} record.}
 
 \item{seed}{a seed for simulation. Appended to \verb{$SIMULATION} record.}
+
+\item{sim_cols}{Character column name(s) defining the simulated values to
+table out.}
 
 \item{.join_col}{Character column name(s) used to join table files post
 execution. Gets appended to the generated \verb{$TABLE} record. See

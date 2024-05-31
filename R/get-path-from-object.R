@@ -147,6 +147,7 @@ get_spec_path <- function(.mod, .check_exists = TRUE) {
 #' @describeIn get_spec_path Get the bootstrap specification file path
 #' @keywords internal
 get_spec_path.bbi_nmboot_model <- function(.mod, .check_exists = TRUE) {
+  # Spec file saved to modeling directory of bootstrap run
   .path <- file.path(
     get_output_dir(.mod, .check_exists = .check_exists),
     "bbr_boot_spec.json")
@@ -162,9 +163,8 @@ get_spec_path.bbi_nmboot_model <- function(.mod, .check_exists = TRUE) {
 #' @describeIn get_spec_path Get the simulation specification file path
 #' @keywords internal
 get_spec_path.bbi_nmsim_model <- function(.mod, .check_exists = TRUE) {
-  .path <- file.path(
-    get_output_dir(.mod, .check_exists = .check_exists),
-    "bbr_sim_spec.json")
+  # Spec file saved to output directory of based_on model
+  .path <- file.path(get_model_working_directory(.mod), "bbr_sim_spec.json")
 
   if (isTRUE(.check_exists)) {
     checkmate::assert_file_exists(.path)
