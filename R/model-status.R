@@ -264,9 +264,9 @@ get_model_status.default <- function(.mod, max_print = 10, ...){
   res_fin <- res$model_id[res$finished]
   if(length(res_fin) > 0 && length(res_fin) <= max_print){
     mods_fin <- paste(res_fin, collapse = ", ")
-    message(glue("\n The following model(s) have finished: `{mods_fin}`"))
+    message(glue("The following model(s) have finished: `{mods_fin}`"))
   }else{
-    message(glue("\n{length(res_fin)} model(s) have finished"))
+    message(glue("{length(res_fin)} model(s) have finished"))
   }
 
   res_inc <- res$model_id[!res$finished]
@@ -274,12 +274,12 @@ get_model_status.default <- function(.mod, max_print = 10, ...){
     mods_inc <- paste(res_inc, collapse = ", ")
     message(
       paste(
-        "\n The following model(s) are incomplete or have not yet been run:",
+        "The following model(s) are incomplete or have not been run:",
         glue("`{mods_inc}`")
       )
     )
   }else{
-    message(glue("\n{length(res_inc)} model(s) are incomplete"))
+    message(glue("{length(res_inc)} model(s) are incomplete or have not been run"))
   }
 
   return(invisible(res))
