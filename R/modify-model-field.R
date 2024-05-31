@@ -496,13 +496,16 @@ safe_based_on <- function(.start, .based_on) {
     ))
   }
 
-  if(.based_on == "."){
-    # Handling for `nmsim` model types, or otherwise if the model is made within
-    # the output directory of another model.
-    return(file.path("..", basename(.start)))
-  }else{
-    return(tools::file_path_sans_ext(.based_on))
-  }
+  # Handling for `nmsim` model types, or otherwise if the model is made within
+  # the output directory of another model.
+  .based_on <- map_chr(.based_on, function(.p) {
+    if(.p == "."){
+      .p <- file.path("..", basename(.start))
+    }
+    return(.p)
+  })
+
+  return(tools::file_path_sans_ext(.based_on))
 }
 
 #' Adds or removes boolean attribute from model object and YAML
