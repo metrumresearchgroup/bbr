@@ -32,7 +32,7 @@ long option will be truncated.}
 
 \item{.off_diag}{If \code{FALSE}, the default, omits off-diagonals of OMEGA and SIGMA matrices from the parameter table.}
 
-\item{.nrow}{If \code{NULL}, the default, print all rows of the parameter table.
+\item{.nrow}{If \code{NULL}, the default, print all rows of the parameter table. If \code{0}, don't print table at all.
 Otherwise, prints only \code{.nrow} rows.}
 }
 \description{
