@@ -469,6 +469,11 @@ summarize_bootstrap_run <- function(
     boot_sum <- readRDS(boot_sum_path)
   }
 
+  # reset model path to current absolute path on this system (instead of what's pulled from RDS/JSON)
+  boot_sum[[ABS_MOD_PATH]] <- .boot_run[[ABS_MOD_PATH]]
+  # TODO: the based_on_model_path and based_on_data_set also need to be reset
+
+
   return(boot_sum)
 }
 
