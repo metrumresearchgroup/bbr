@@ -471,8 +471,14 @@ summarize_bootstrap_run <- function(
 
   # reset model path to current absolute path on this system (instead of what's pulled from RDS/JSON)
   boot_sum[[ABS_MOD_PATH]] <- .boot_run[[ABS_MOD_PATH]]
-  # TODO: the based_on_model_path and based_on_data_set also need to be reset
 
+  # if parent model is present, reset based on paths as well
+  based_on_path <- get_based_on(.boot_run)[[1]]
+  if (fs::file_exists(paste0(based_on_path, ".yaml"))) {
+    based_on_mod <- read_model(based_on_path)
+    boot_sum$based_on_model_path <- get_model_path(based_on_mod)
+    boot_sum$based_on_data_set <- get_data_path(based_on_mod)
+  }
 
   return(boot_sum)
 }
