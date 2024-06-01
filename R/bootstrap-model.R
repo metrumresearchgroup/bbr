@@ -478,6 +478,11 @@ summarize_bootstrap_run <- function(
     based_on_mod <- read_model(based_on_path)
     boot_sum$based_on_model_path <- get_model_path(based_on_mod)
     boot_sum$based_on_data_set <- get_data_path(based_on_mod)
+  } else {
+    # if not, set to "<not found>" to avoid confusion with stale paths
+    rlang::warn(glue("Bootstrap run {get_model_id(.boot_run)} cannot find parent model. Expected to be found at {based_on_path}"))
+    boot_sum$based_on_model_path <- "<not found>"
+    boot_sum$based_on_data_set <- "<not found>"
   }
 
   return(boot_sum)
