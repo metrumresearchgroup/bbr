@@ -234,9 +234,16 @@ delete_models <- function(.mods, .tags = "test threads", .force = FALSE){
     mod_tags <- mod.x$tags
     mod_tags <- paste(mod_tags, collapse = ", ")
     mod_tags <- ifelse(mod_tags == "", "NA", mod_tags)
+    mod_spec <- if(inherits(mod.x, c(NMSIM_MOD_CLASS, NMBOOT_MOD_CLASS))){
+      get_spec_path(mod.x)
+    }else{
+      NA
+    }
     tibble::tibble(
+      mod_type = mod.x$model_type,
       mod_paths = mod.x$absolute_model_path,
-      mod_tags = mod_tags
+      mod_tags = mod_tags,
+      mod_spec = mod_spec
     )
   })
 
@@ -288,7 +295,7 @@ delete_models <- function(.mods, .tags = "test threads", .force = FALSE){
 
   if (!isTRUE(.force)) {
     msg_prompt <- paste0(
-      paste("Are you sure you want to remove", length(mod_paths), "models with the following tags?: "),
+      paste("Are you sure you want to remove", length(mod_paths), "model(s) with the following tags?: "),
       paste0("`",mods_removed,"`", collapse = ", ")
     )
     delete_prompt <- askYesNo(msg_prompt)
@@ -296,11 +303,11 @@ delete_models <- function(.mods, .tags = "test threads", .force = FALSE){
   }
 
   msg_remove <- if (is.null(.tags)) {
-    paste("Removed", length(mod_paths), "models (ignoring tags)")
+    paste("Removed", length(mod_paths), "model(s) (ignoring tags)")
   } else {
     paste0(
-      paste("Removed", length(mod_paths), "models with the following tags:\n"),
-      paste("-",mods_removed, collapse = "\n")
+      paste("Removed", length(mod_paths), "model(s) with the following tags:\n"),
+      paste("-", mods_removed, collapse = "\n")
     )
   }
 
@@ -308,6 +315,10 @@ delete_models <- function(.mods, .tags = "test threads", .force = FALSE){
     if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
     if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))
     if (fs::dir_exists(m)) fs::dir_delete(m)
+
+    # Handling for simulations: delete specification file in parent directory
+    m_spec <- tag_groups$mod_spec[tag_groups$mod_paths == m]
+    if (!is.na(m_spec) && fs::file_exists(m_spec)) fs::file_delete(m_spec)
   }
   message(msg_remove)
 
