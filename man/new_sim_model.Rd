@@ -2,6 +2,7 @@
 % Please edit documentation in R/vpc-simulation.R
 \name{new_sim_model}
 \alias{new_sim_model}
+\alias{make_sim_spec}
 \title{Create a simulation model object from an existing model}
 \usage{
 new_sim_model(
@@ -14,14 +15,16 @@ new_sim_model(
   .inherit_tags = TRUE,
   .overwrite = FALSE
 )
+
+make_sim_spec(.sim, sim_args, .overwrite = FALSE)
 }
 \arguments{
 \item{.mod}{a \code{bbi_nonmem_model} object.}
 
-\item{n}{number of simulations/subproblems. Adds \code{SUBPROBLEMS=n} to a
+\item{n}{Number of simulations/subproblems. Adds \code{SUBPROBLEMS=n} to a
 \verb{$SIMULATION} record.}
 
-\item{seed}{a seed for simulation. Appended to \verb{$SIMULATION} record.}
+\item{seed}{A seed for simulation. Appended to \verb{$SIMULATION} record.}
 
 \item{sim_cols}{Character column name(s) defining the simulated values to
 table out.}
@@ -30,7 +33,7 @@ table out.}
 execution. Gets appended to the generated \verb{$TABLE} record. See
 \code{\link[=nm_join_sim]{nm_join_sim()}} documentation for details. Defaults to \code{'NUM'}.}
 
-\item{.sim_dir}{a directory for holding the new simulation model. Defaults to
+\item{.sim_dir}{A directory for holding the new simulation model. Defaults to
 the output directory of \code{.mod}.}
 
 \item{.inherit_tags}{If \code{TRUE}, the default, inherit any tags from \code{.mod}.}
@@ -38,6 +41,10 @@ the output directory of \code{.mod}.}
 \item{.overwrite}{If \code{FALSE}, the default,  function will error if a model
 file already exists at specified \code{.new_model} path. If \code{TRUE} any existing
 file at \code{.new_model} will be overwritten silently.}
+
+\item{.sim}{a \code{bbi_nmsim_model} object}
+
+\item{sim_args}{named list defining the \code{seed}, and \code{n} simulations.}
 }
 \value{
 S3 object of class \code{bbi_nmsim_model}.
@@ -73,17 +80,36 @@ file of \code{.mod}
 }
 }
 }
+\section{Functions}{
+\itemize{
+\item \code{make_sim_spec()}: Store simulation run details in a specification
+file before submission, which is stored in the output directory of the parent
+model.
+
+}}
 \examples{
 \dontrun{
 
 # Create new `nmsim` model object
-.sim_mod <- new_sim_model(.mod, n = 500, .join_col = c("NUM", "ID"))
+.sim <- new_sim_model(
+  .mod,
+  n = 500, seed = 1234,
+  .join_col = c("NUM", "ID")
+)
+
+# Store run details in specification file
+#  - this is why these functions aren't exported
+make_sim_spec(
+  .sim,
+  sim_args = list(n = 500, seed = 1234),
+ .join_col = c("NUM", "ID")
+)
 
 # Visualize changes
-model_diff(.sim_mod)
+model_diff(.sim)
 
 # Submit
-submit_model(.sim_mod)
+submit_model(.sim)
 }
 
 }

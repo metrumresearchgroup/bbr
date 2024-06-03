@@ -1,6 +1,7 @@
 
-#' Add a simulation to a `bbi_nonmem_model` object
+#' Simulate a `bbi_nonmem_model` object
 #'
+#' @param .mod A `bbi_nonmem_model` or `bbi_nonmem_summary` object
 #' @inheritParams new_sim_model
 #' @inheritParams submit_model
 #'
@@ -30,6 +31,27 @@
 #'  - Submits the model for execution.
 #'
 #' @seealso nm_join_sim
+#'
+#' @examples
+#' \dontrun{
+#'
+#' # Add a new simulation and submit for execution
+#' add_simulation(
+#'   .mod,
+#'   n = 500,
+#'   .join_col = c("NUM", "ID"),
+#'   .mode = "local"
+#' )
+#'
+#' # Optionally read in simulation model object
+#' if(has_simulation(.mod)){
+#'  .sim <- get_simulation(.mod)
+#' }
+#' }
+#' @name simulate
+NULL
+
+#' @describeIn simulate Add a simulation to a `bbi_nonmem_model` object
 #' @export
 add_simulation <- function(
     .mod,
@@ -37,35 +59,89 @@ add_simulation <- function(
     seed = 1234,
     sim_cols = "DV",
     .join_col = "NUM",
-    .suffix = "sim",
     .inherit_tags = TRUE,
-    .overwrite = FALSE,
-    .mode = getOption("bbr.bbi_exe_mode")
+    .bbi_args = NULL,
+    .mode = getOption("bbr.bbi_exe_mode"),
+    ...,
+    .overwrite = NULL,
+    .config_path = NULL,
+    .wait = TRUE
 ){
+  check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
+  if(inherits(.mod, NM_SUM_CLASS)){
+    .mod <- read_model(.mod[[ABS_MOD_PATH]])
+  }
+
   .sim_mod <- new_sim_model(
-    .mod, n = n, seed = seed, .join_col = .join_col, sim_cols = sim_cols,
-    .suffix = .suffix, .inherit_tags = .inherit_tags, .overwrite = .overwrite
+    .mod, n = n, seed = seed,
+    .join_col = .join_col, sim_cols = sim_cols,
+    .inherit_tags = .inherit_tags, .overwrite = .overwrite
   )
 
   sim_args <- list(n = n, seed = seed)
   make_sim_spec(.sim_mod, sim_args)
 
-  submit_model(.sim_mod, .mode = .mode, .overwrite = .overwrite)
+  # Cannot support dry runs since this this function handles model creation as well
+  # (at least not without deleting the model)
+  submit_model(
+    .sim_mod,
+    .bbi_args = .bbi_args,
+    .mode = .mode,
+    ...,
+    .overwrite = .overwrite,
+    .config_path = .config_path,
+    .wait = .wait,
+    .dry_run = FALSE
+  )
 }
 
+
+#' @describeIn simulate Helper for determining if a `bbi_nonmem_model` has a
+#'  simulation attached to it. Returns `TRUE` if a `bbi_nmsim_model`
+#'  specification file is found within the output directory of `.mod`, and
+#'  `FALSE` otherwise.
+#' @export
+has_simulation <- function(.mod){
+  return(!is.null(get_sim_spec(.mod)))
+}
+
+
+#' @describeIn simulate Read in and return a `bbi_nmsim_model` object stored
+#'  within the output directory of `.mod`.
+#' @export
+get_simulation <- function(.mod){
+  check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
+  if(inherits(.mod, NM_SUM_CLASS)){
+    .mod <- read_model(.mod[[ABS_MOD_PATH]])
+  }
+
+  sim_spec_path <- get_spec_path(.mod)
+  if(!fs::file_exists(sim_spec_path)){
+    rlang::abort(
+      c(
+        glue("Model {get_model_id(.mod)} does not have a simulation"),
+        glue("Expected to find specification file at {sim_spec_path}")
+      )
+    )
+  }
+
+  sim_spec <- get_sim_spec(.mod)
+  sim_path <- fs::path_ext_remove(sim_spec$model_path)
+  return(read_model(sim_path))
+}
 
 #' Create a simulation model object from an existing model
 #'
 #' @param .mod a `bbi_nonmem_model` object.
-#' @param n number of simulations/subproblems. Adds `SUBPROBLEMS=n` to a
+#' @param n Number of simulations/subproblems. Adds `SUBPROBLEMS=n` to a
 #'  `$SIMULATION` record.
-#' @param seed a seed for simulation. Appended to `$SIMULATION` record.
+#' @param seed A seed for simulation. Appended to `$SIMULATION` record.
 #' @param sim_cols Character column name(s) defining the simulated values to
 #'  table out.
 #' @param .join_col Character column name(s) used to join table files post
 #'  execution. Gets appended to the generated `$TABLE` record. See
 #'  [nm_join_sim()] documentation for details. Defaults to `'NUM'`.
-#' @param .sim_dir a directory for holding the new simulation model. Defaults to
+#' @param .sim_dir A directory for holding the new simulation model. Defaults to
 #'  the output directory of `.mod`.
 #' @param .inherit_tags If `TRUE`, the default, inherit any tags from `.mod`.
 #' @inheritParams copy_model_from
@@ -97,13 +173,25 @@ add_simulation <- function(
 #' \dontrun{
 #'
 #' # Create new `nmsim` model object
-#' .sim_mod <- new_sim_model(.mod, n = 500, .join_col = c("NUM", "ID"))
+#' .sim <- new_sim_model(
+#'   .mod,
+#'   n = 500, seed = 1234,
+#'   .join_col = c("NUM", "ID")
+#' )
+#'
+#' # Store run details in specification file
+#' #  - this is why these functions aren't exported
+#' make_sim_spec(
+#'   .sim,
+#'   sim_args = list(n = 500, seed = 1234),
+#'  .join_col = c("NUM", "ID")
+#' )
 #'
 #' # Visualize changes
-#' model_diff(.sim_mod)
+#' model_diff(.sim)
 #'
 #' # Submit
-#' submit_model(.sim_mod)
+#' submit_model(.sim)
 #' }
 #'
 #' @return S3 object of class `bbi_nmsim_model`.
@@ -315,15 +403,20 @@ get_sim_replicate_record <- function(.mod){
 }
 
 
-#' Store simulation run details before submission
+#' @describeIn new_sim_model Store simulation run details in a specification
+#'  file before submission, which is stored in the output directory of the parent
+#'  model.
+#'
+#' @param .sim a `bbi_nmsim_model` object
 #' @inheritParams setup_sim_run
 #' @param sim_args named list defining the `seed`, and `n` simulations.
 #' @keywords internal
-make_sim_spec <- function(.mod, sim_args, .overwrite = FALSE){
+make_sim_spec <- function(.sim, sim_args, .overwrite = FALSE){
+  check_model_object(.sim, NMSIM_MOD_CLASS)
   checkmate::assert_list(sim_args)
 
   # Save spec file to output directory of based_on model
-  sim_dir <- get_model_working_directory(.mod)
+  sim_dir <- get_model_working_directory(.sim)
   json_path <- file.path(sim_dir, "bbr_sim_spec.json")
 
   if(fs::file_exists(json_path) && isFALSE(.overwrite)){
@@ -335,15 +428,18 @@ make_sim_spec <- function(.mod, sim_args, .overwrite = FALSE){
     )
   }
 
-  spec_lst <- list(
-    problem = glue("Simulation of model {basename(get_based_on(.mod))}"),
+  sim_spec <- list(
+    problem = glue("Simulation of model {basename(get_based_on(.sim))}"),
     seed = sim_args$seed,
     n_sim = sim_args$n,
-    model_path = get_model_path(.mod),
-    based_on_model_path = get_based_on(.mod),
-    based_on_data_path = get_data_path(.mod),
-    model_md5 = tools::md5sum(get_model_path(.mod)),
+    model_path = get_model_path(.sim),
+    based_on_model_path = get_based_on(.sim),
+    based_on_data_path = get_data_path(.sim),
+    model_md5 = tools::md5sum(get_model_path(.sim)),
     output_dir = sim_dir
+  )
+  spec_lst <- c(
+    sim_spec = list(sim_spec)
   )
 
   spec_lst_json <- jsonlite::toJSON(
@@ -353,3 +449,6 @@ make_sim_spec <- function(.mod, sim_args, .overwrite = FALSE){
   writeLines(spec_lst_json, json_path)
   return(invisible(json_path))
 }
+
+
+

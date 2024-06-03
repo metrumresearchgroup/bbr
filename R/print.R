@@ -143,12 +143,7 @@ print.bbi_model <- function(x, ...) {
     }
   }
 
-  status <- bbi_nonmem_model_status(x)
-  if (status == "Finished Running") {
-    status <- col_green(status)
-  } else {
-    status <- col_red(status)
-  }
+  status <- color_status(bbi_nonmem_model_status(x))
 
   heading('Status')
   subheading(status)
@@ -161,10 +156,20 @@ print.bbi_model <- function(x, ...) {
   bullet_list(get_model_path(x, .check_exists = FALSE))
   print_model_files(x, bullet_list)
 
-  # TODO: hook up to read_spec_file once implemented
-  if (is_valid_print(x[[SPEC_NMSIM_ARGS]])) {
-    heading('Simulation Args')
-    iwalk(x[[SPEC_NMSIM_ARGS]],
+  # Attach simulation args if any
+  if (has_simulation(x)) {
+    heading('Attached Simulation')
+    # Print simulation model status if printing a NM_MOD_CLASS model object
+    if(inherits(x, NM_MOD_CLASS)){
+      .sim <- get_simulation(x)
+      sim_status <- color_status(bbi_nonmem_model_status(.sim))
+      subheading(paste('Simulation Status:', sim_status))
+    }
+
+    # Print simulation args
+    sim_spec <- get_sim_spec(x)
+    bullet_list(paste('Simulation Path:', col_blue(fs::path_ext_remove(sim_spec$model_path))))
+    iwalk(sim_spec[SPEC_NMSIM_KEYS],
           ~ bullet_list(paste0(.y, ": ", col_blue(.x))))
   }
 
@@ -399,6 +404,18 @@ print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
 # INTERNAL HELPERS
 #####################
 
+#' Function to color the status. Green for finished; red otherwise.
+#' @param status. Character string. Either `'Finished Running'`, `'Incomplete Run'`,
+#'  or `'Not Run'`.
+#' @keywords internal
+color_status <- function(status){
+  if (status == "Finished Running") {
+    status <- cli::col_green(status)
+  } else {
+    status <- cli::col_red(status)
+  }
+  return(status)
+}
 
 
 #' Format digits

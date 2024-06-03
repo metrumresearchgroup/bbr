@@ -203,7 +203,6 @@ NM_SUM_CLASS <- "bbi_nonmem_summary" # SHARED with bbr.bayes
 NMBOOT_MOD_CLASS <- "bbi_nmboot_model"
 NMBOOT_SUM_CLASS <- "bbi_nmboot_summary"
 NMSIM_MOD_CLASS <- "bbi_nmsim_model"
-NMSIM_SUM_CLASS <- "bbi_nmsim_summary"
 SL_CLASS <- "bbi_summary_list"
 PROC_CLASS <- "bbi_process"
 RUN_LOG_CLASS <- "bbi_run_log_df"
@@ -230,6 +229,14 @@ RUN_ID_COL <- "run" # SHARED with bbr.bayes
 
 # SPEC keys that are hard-coded
 SPEC_NMSIM_ARGS <- "nmsim_args"
+SPEC_NMSIM_SEED <- "seed"
+SPEC_NMSIM_NSIM <- "n_sim"
+
+# Additional keys stored for bbi_nmsim_model objects
+SPEC_NMSIM_KEYS <- c(
+  SPEC_NMSIM_SEED,
+  SPEC_NMSIM_NSIM
+)
 
 
 # keys required to create a model object

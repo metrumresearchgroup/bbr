@@ -15,10 +15,10 @@ setup_sim_run(
 \arguments{
 \item{.mod}{a \code{bbi_nonmem_model} or \code{bbi_nmsim_model} object.}
 
-\item{n}{number of simulations/subproblems. Adds \code{SUBPROBLEMS=n} to a
+\item{n}{Number of simulations/subproblems. Adds \code{SUBPROBLEMS=n} to a
 \verb{$SIMULATION} record.}
 
-\item{seed}{a seed for simulation. Appended to \verb{$SIMULATION} record.}
+\item{seed}{A seed for simulation. Appended to \verb{$SIMULATION} record.}
 
 \item{sim_cols}{Character column name(s) defining the simulated values to
 table out.}
