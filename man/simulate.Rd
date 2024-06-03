@@ -19,7 +19,8 @@ add_simulation(
   ...,
   .overwrite = NULL,
   .config_path = NULL,
-  .wait = TRUE
+  .wait = FALSE,
+  .dry_run = FALSE
 )
 
 has_simulation(.mod)
@@ -54,17 +55,22 @@ or set globally with \code{options("bbr.bbi_exe_mode")}.}
 
 \item{...}{args passed through to \code{bbi_exec()}}
 
-\item{.overwrite}{If \code{FALSE}, the default,  function will error if a model
-file already exists at specified \code{.new_model} path. If \code{TRUE} any existing
-file at \code{.new_model} will be overwritten silently.}
+\item{.overwrite}{Logical to specify whether or not to overwrite existing
+model output from a previous run. If \code{NULL}, the default, will defer to
+setting in \code{.bbi_args} or \code{bbi.yaml}. If \emph{not} \code{NULL} will override any
+settings in \code{.bbi_args} or \code{bbi.yaml}.}
 
 \item{.config_path}{Path to a bbi configuration file. If \code{NULL}, the
 default, will attempt to use a \code{bbi.yaml} in the same directory as the
 model.}
 
-\item{.wait}{If \code{TRUE}, the default, wait for the bbi process to return
-before this function call returns. If \code{FALSE} function will return while
-bbi process runs in the background.}
+\item{.wait}{If \code{FALSE}, the default, the function will return while bbi
+process runs in the background. If \code{TRUE}, wait for the bbi process to
+return before this function call returns.}
+
+\item{.dry_run}{Returns an object detailing the command that would be run,
+insted of running it. This is primarily for testing but also a debugging
+tool.}
 }
 \description{
 Simulate a \code{bbi_nonmem_model} object

@@ -3,6 +3,13 @@
 #'
 #' @param .mod A `bbi_nonmem_model` or `bbi_nonmem_summary` object
 #' @inheritParams new_sim_model
+#' @param .overwrite Logical to specify whether or not to overwrite existing
+#'   model output from a previous run. If `NULL`, the default, will defer to
+#'   setting in `.bbi_args` or `bbi.yaml`. If _not_ `NULL` will override any
+#'   settings in `.bbi_args` or `bbi.yaml`.
+#' @param .wait If `FALSE`, the default, the function will return while bbi
+#'   process runs in the background. If `TRUE`, wait for the bbi process to
+#'   return before this function call returns.
 #' @inheritParams submit_model
 #'
 #' @details
@@ -65,34 +72,48 @@ add_simulation <- function(
     ...,
     .overwrite = NULL,
     .config_path = NULL,
-    .wait = TRUE
+    .wait = FALSE,
+    .dry_run = FALSE
 ){
   check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
   if(inherits(.mod, NM_SUM_CLASS)){
     .mod <- read_model(.mod[[ABS_MOD_PATH]])
   }
 
-  .sim_mod <- new_sim_model(
+  # Separate overwrite variable that cannot be `NULL`
+  overwrite_mod <- ifelse(is.null(.overwrite), FALSE, .overwrite)
+
+  .sim <- new_sim_model(
     .mod, n = n, seed = seed,
     .join_col = .join_col, sim_cols = sim_cols,
-    .inherit_tags = .inherit_tags, .overwrite = .overwrite
+    .inherit_tags = .inherit_tags, .overwrite = overwrite_mod
   )
 
   sim_args <- list(n = n, seed = seed)
-  make_sim_spec(.sim_mod, sim_args)
+  make_sim_spec(.sim, sim_args, .overwrite = overwrite_mod)
 
   # Cannot support dry runs since this this function handles model creation as well
   # (at least not without deleting the model)
-  submit_model(
-    .sim_mod,
+  res <- submit_model(
+    .sim,
     .bbi_args = .bbi_args,
     .mode = .mode,
     ...,
     .overwrite = .overwrite,
     .config_path = .config_path,
     .wait = .wait,
-    .dry_run = FALSE
+    .dry_run = .dry_run
   )
+
+  # Delete model and spec at the end for dry runs (to avoid needing to overwrite)
+  if(isTRUE(.dry_run)){
+    spec_path <- get_spec_path(.sim, .check_exists = FALSE)
+    if(fs::file_exists(spec_path)) fs::file_delete(spec_path)
+    delete_models(.sim, .tags = "SIMULATION", .force = TRUE) %>%
+      suppressMessages()
+  }
+
+  return(res)
 }
 
 

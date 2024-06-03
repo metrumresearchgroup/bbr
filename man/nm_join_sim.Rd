@@ -83,11 +83,9 @@ Then add \code{'NUM'} to the list of input columns:
 \examples{
 \dontrun{
 
-.sim_mod <- new_sim_model(.mod, .join_col = c("NUM", "ID"))
+add_simulation(.mod, .join_col = c("NUM", "ID"))
 
-submit_model(.sim_mod)
-
-nm_join_sim(.sim_mod, .join_col = c("NUM", "ID"), .cols_keep = "ID")
+nm_join_sim(.mod, .join_col = c("NUM", "ID"), .cols_keep = "ID")
 }
 
 

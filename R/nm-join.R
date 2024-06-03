@@ -309,11 +309,9 @@ can_be_nm_joined <- function(.mod){
 #' @examples
 #' \dontrun{
 #'
-#' .sim_mod <- new_sim_model(.mod, .join_col = c("NUM", "ID"))
+#' add_simulation(.mod, .join_col = c("NUM", "ID"))
 #'
-#' submit_model(.sim_mod)
-#'
-#' nm_join_sim(.sim_mod, .join_col = c("NUM", "ID"), .cols_keep = "ID")
+#' nm_join_sim(.mod, .join_col = c("NUM", "ID"), .cols_keep = "ID")
 #' }
 #'
 #'
@@ -325,9 +323,21 @@ nm_join_sim <- function(
     .cols_keep = "all",
     add_table_names = FALSE
 ){
-  checkmate::assert_string(.join_col)
-  checkmate::assert_string(.cols_keep)
+  checkmate::assert_character(.join_col)
+  checkmate::assert_character(.cols_keep)
   checkmate::assert_logical(add_table_names)
+
+  # Support bbi_nonmem_models as well for the following cases:
+  #  - more common: a user passes in the model with the attached simulation
+  #  - less common: in the event the model/simulation was set up manually
+  check_model_object(.mod, c(NMSIM_MOD_CLASS, NM_MOD_CLASS))
+
+  # If passing a bbi_nonmem_model with an attached simulation, use the simulation model
+  #  - i.e. this function supports passing in the simulation model directly, or
+  #    the parent model
+  if(inherits(.mod, NM_MOD_CLASS) && has_simulation(.mod)){
+    .mod <- get_simulation(.mod)
+  }
 
   # Only support joining the table we add so we can make certain assumptions
   files <- nm_table_files(.mod)
@@ -337,9 +347,6 @@ nm_join_sim <- function(
       "Try using `nm_tables()` to manually join the tables"
     )
   }
-
-  # Support bbi_nonmem_models as well in the event the model was set up manually
-  check_model_object(.mod, c(NMSIM_MOD_CLASS, NM_MOD_CLASS))
 
   # Get list of all tables. Likely only one simulation table, but may include
   # other manually added tables
@@ -374,8 +381,8 @@ nm_join_sim <- function(
 
   .join_col <- toupper(.join_col)
   if(!all(.join_col %in% names(.d))){
-    join_col_txt <- paste0(.join_col, collapse = ", ")
-    stop(glue("couldn't find `.join_col` {join_col_txt} in data with cols: {paste(names(.d), collapse = ', ')}"))
+    join_col_txt <- paste0(.join_col[!(.join_col %in% names(.d))], collapse = ", ")
+    stop(glue("couldn't find `.join_col` {join_col_txt} columns in input data"))
   }
 
   if(anyDuplicated(.d[.join_col]) != 0){
@@ -387,6 +394,10 @@ nm_join_sim <- function(
   #  (i.e. additional, manually added ones) at a later time
   for (.n in names(.tbls)) {
     tab <- .tbls[[.n]]
+    if(!all(.join_col %in% names(tab))){
+      join_col_txt <- paste0(.join_col[!(.join_col %in% names(tab))], collapse = ", ")
+      stop(glue("couldn't find `.join_col` {join_col_txt} in data with cols: {paste(names(tab), collapse = ', ')}"))
+    }
     # This assumes the multi-tabled file is a necessarily a simulation dataset
     if("table_id" %in% names(tab)){
       tmp <- tab %>% dplyr::group_by(.data$table_id) %>% dplyr::mutate(NN = dplyr::cur_group_id())

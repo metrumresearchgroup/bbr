@@ -52,11 +52,11 @@
 #'
 #' @export
 test_threads <- function(
-  .mod,
-  .threads = c(2,4),
-  .bbi_args = list(),
-  .cap_iterations = 10,
-  ...
+    .mod,
+    .threads = c(2,4),
+    .bbi_args = list(),
+    .cap_iterations = 10,
+    ...
 ) {
 
   check_model_object(.mod)
@@ -119,10 +119,10 @@ test_threads <- function(
 #'
 #' @export
 check_run_times <- function(
-  .mods,
-  .return_times = "estimation_time",
-  .wait = TRUE,
-  ...
+    .mods,
+    .return_times = "estimation_time",
+    .wait = TRUE,
+    ...
 ) {
 
   is_old_bbi <- FALSE
@@ -224,7 +224,10 @@ delete_models <- function(.mods, .tags = "test threads", .force = FALSE){
   if (inherits(.mods, "bbi_model")) {
     .mods <- list(.mods)
   }
-  check_model_object_list(.mods, .mod_types = c(NM_MOD_CLASS, NM_SUM_CLASS, NMBOOT_MOD_CLASS))
+  check_model_object_list(
+    .mods,
+    .mod_types = c(NM_MOD_CLASS, NM_SUM_CLASS, NMBOOT_MOD_CLASS, NMSIM_MOD_CLASS)
+  )
   assert_logical(.force, len = 1)
 
   mod_info <- map_dfr(.mods, function(mod.x){
@@ -293,13 +296,13 @@ delete_models <- function(.mods, .tags = "test threads", .force = FALSE){
   }
 
   msg_remove <- if (is.null(.tags)) {
-      paste("Removed", length(mod_paths), "models (ignoring tags)")
-    } else {
-      paste0(
-        paste("Removed", length(mod_paths), "models with the following tags:\n"),
-        paste("-",mods_removed, collapse = "\n")
-      )
-    }
+    paste("Removed", length(mod_paths), "models (ignoring tags)")
+  } else {
+    paste0(
+      paste("Removed", length(mod_paths), "models with the following tags:\n"),
+      paste("-",mods_removed, collapse = "\n")
+    )
+  }
 
   for (m in mod_paths) {
     if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))

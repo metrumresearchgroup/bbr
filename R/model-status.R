@@ -226,7 +226,7 @@ check_nonmem_finished.bbi_base_model <- function(.mod, ...) {
 
 #' @export
 check_nonmem_finished.list <- function(.mod, ...) {
-  check_model_object_list(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))
+  check_model_object_list(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMSIM_MOD_CLASS))
   # Return logical values as vector (unique handling)
   #  - used in `wait_for_nonmem`
   models_finished <- map_lgl(.mod, ~model_is_finished(.x))
@@ -366,9 +366,9 @@ wait_for_nonmem.default <- function(.mod, .time_limit = 300, .interval = 5, .del
 #' @keywords internal
 mod_list_setup <- function(.mod){
   if(inherits(.mod, "list") && !inherits(.mod, "bbi_base_model")){
-    check_model_object_list(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))
+    check_model_object_list(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMSIM_MOD_CLASS))
   }else{
-    check_model_object(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))
+    check_model_object(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMSIM_MOD_CLASS))
     if(inherits(.mod, NM_MOD_CLASS)){
       .mod <- list(.mod)
     }else{

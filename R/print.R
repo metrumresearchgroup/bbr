@@ -158,17 +158,19 @@ print.bbi_model <- function(x, ...) {
 
   # Attach simulation args if any
   if (has_simulation(x)) {
-    heading('Attached Simulation')
+    sim_spec <- get_sim_spec(x)
     # Print simulation model status if printing a NM_MOD_CLASS model object
     if(inherits(x, NM_MOD_CLASS)){
       .sim <- get_simulation(x)
       sim_status <- color_status(bbi_nonmem_model_status(.sim))
-      subheading(paste('Simulation Status:', sim_status))
+      heading('Attached Simulation')
+      bullet_list(paste('Status:', sim_status))
+      bullet_list(paste('Simulation Path:', fs::path_ext_remove(sim_spec$model_path)))
+    }else{
+      heading('Simulation Args')
     }
 
     # Print simulation args
-    sim_spec <- get_sim_spec(x)
-    bullet_list(paste('Simulation Path:', col_blue(fs::path_ext_remove(sim_spec$model_path))))
     iwalk(sim_spec[SPEC_NMSIM_KEYS],
           ~ bullet_list(paste0(.y, ": ", col_blue(.x))))
   }
