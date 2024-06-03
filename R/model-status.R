@@ -58,7 +58,7 @@ bbi_nonmem_model_status.bbi_nmboot_model <- function(.mod) {
       #  - Iterates through all models and sets the status based on whether all
       #    models have finished. This may increase the time required to print an
       #    nmboot model object to the console until the run has been cleaned up.
-      spec_path <- get_boot_spec_path(.mod, .check_exists = FALSE)
+      spec_path <- get_spec_path(.mod, .check_exists = FALSE)
       if (!fs::file_exists(spec_path)) {
         status <- "Not Run"
       }else{
@@ -121,7 +121,7 @@ bootstrap_is_cleaned_up <- function(.boot_run){
 
   output_dir <- get_output_dir(.boot_run, .check_exists = FALSE)
   if(!fs::file_exists(output_dir)) return(FALSE)
-  spec_path <- get_boot_spec_path(.boot_run, .check_exists = FALSE)
+  spec_path <- get_spec_path(.boot_run, .check_exists = FALSE)
   if(!fs::file_exists(spec_path)) return(FALSE)
 
   boot_spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
