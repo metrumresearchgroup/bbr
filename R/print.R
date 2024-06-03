@@ -194,7 +194,7 @@ print.bbi_model <- function(x, ...) {
 #' @param .digits Number of significant digits to use for parameter table. Defaults to 3.
 #' @param .fixed If `FALSE`, the default, omits fixed parameters from the parameter table.
 #' @param .off_diag If `FALSE`, the default, omits off-diagonals of OMEGA and SIGMA matrices from the parameter table.
-#' @param .nrow If `NULL`, the default, print all rows of the parameter table.
+#' @param .nrow If `NULL`, the default, print all rows of the parameter table. If `0`, don't print table at all.
 #'   Otherwise, prints only `.nrow` rows.
 #' @export
 print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag = FALSE, .nrow = NULL, ...) {
@@ -277,8 +277,11 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
       capture.output()
   }
 
-  cat_line(param_str)
-  if (!is.null(.nrow)) cat_line(glue("... {orig_rows - .nrow} more rows"), col = "grey")
+  if (is.null(.nrow) || .nrow != 0) {
+    cat_line(param_str)
+    if (!is.null(.nrow)) cat_line(glue("... {orig_rows - .nrow} more rows"), col = "grey")
+  }
+
 }
 
 

@@ -469,6 +469,22 @@ summarize_bootstrap_run <- function(
     boot_sum <- readRDS(boot_sum_path)
   }
 
+  # reset model path to current absolute path on this system (instead of what's pulled from RDS/JSON)
+  boot_sum[[ABS_MOD_PATH]] <- .boot_run[[ABS_MOD_PATH]]
+
+  # if parent model is present, reset based on paths as well
+  based_on_path <- get_based_on(.boot_run)[[1]]
+  if (fs::file_exists(paste0(based_on_path, ".yaml"))) {
+    based_on_mod <- read_model(based_on_path)
+    boot_sum$based_on_model_path <- get_model_path(based_on_mod)
+    boot_sum$based_on_data_set <- get_data_path(based_on_mod)
+  } else {
+    # if not, set to "<not found>" to avoid confusion with stale paths
+    rlang::warn(glue("Bootstrap run {get_model_id(.boot_run)} cannot find parent model. Expected to be found at {based_on_path}"))
+    boot_sum$based_on_model_path <- "<not found>"
+    boot_sum$based_on_data_set <- "<not found>"
+  }
+
   return(boot_sum)
 }
 
