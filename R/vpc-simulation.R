@@ -123,7 +123,12 @@ add_simulation <- function(
 #'  `FALSE` otherwise.
 #' @export
 has_simulation <- function(.mod){
-  return(!is.null(get_sim_spec(.mod)))
+  has_sim <- if(inherits(.mod, c(NM_MOD_CLASS, NMSIM_MOD_CLASS, NM_SUM_CLASS))){
+    !is.null(get_sim_spec(.mod))
+  }else{
+    FALSE
+  }
+  return(has_sim)
 }
 
 

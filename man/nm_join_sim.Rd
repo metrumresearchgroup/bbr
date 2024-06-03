@@ -12,7 +12,8 @@ nm_join_sim(
 )
 }
 \arguments{
-\item{.mod}{a \code{bbi_nonmem_model} or \code{bbi_nmsim_model} object.}
+\item{.mod}{A \code{bbi_nonmem_model} with an attached simulation, or a
+\code{bbi_nmsim_model} object.}
 
 \item{.join_col}{Character column name(s) to use to join table files.
 Defaults to \code{NUM}. See Details.}
@@ -27,7 +28,8 @@ the table names as specified in the file (e.g., \code{'TABLE NO.  1'}).}
 a tibble
 }
 \description{
-Join simulation and input data
+Joins the simulation and input data of a \code{bbi_nonmem_model} object with an
+attached simulation.
 }
 \note{
 The join column name(s) specified should match what you provided to
@@ -86,6 +88,10 @@ Then add \code{'NUM'} to the list of input columns:
 add_simulation(.mod, .join_col = c("NUM", "ID"))
 
 nm_join_sim(.mod, .join_col = c("NUM", "ID"), .cols_keep = "ID")
+
+# These return the same thing (simulation model is automatically read-in):
+nm_join_sim(.mod)
+nm_join_sim(get_simulation(.mod))
 }
 
 

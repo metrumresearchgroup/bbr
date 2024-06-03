@@ -302,6 +302,9 @@ CONFIG_MODEL_MD5 <- "model_md5" # SHARED with bbr.bayes
 CONFIG_DATA_PATH <- "data_path" # SHARED with bbr.bayes
 CONFIG_DATA_MD5 <- "data_md5" # SHARED with bbr.bayes
 
+# keys for bootstrap runs
+CONFIG_DATA_BASED_ON_MD5 <- "based_on_data_md5"
+
 # keys required for a summary object to have
 SUMMARY_REQ_KEYS <- c(
   ABS_MOD_PATH,

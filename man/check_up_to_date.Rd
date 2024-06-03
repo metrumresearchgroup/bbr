@@ -2,13 +2,16 @@
 % Please edit documentation in R/check-up-to-date.R
 \name{check_up_to_date}
 \alias{check_up_to_date}
-\alias{check_up_to_date.bbi_nonmem_model}
+\alias{check_up_to_date.bbi_base_model}
+\alias{check_up_to_date.bbi_nmboot_model}
 \alias{check_up_to_date.bbi_nonmem_summary}
 \title{Check model and data up to date with outputs}
 \usage{
 check_up_to_date(.bbi_object, ...)
 
-\method{check_up_to_date}{bbi_nonmem_model}(.bbi_object, ...)
+\method{check_up_to_date}{bbi_base_model}(.bbi_object, ...)
+
+\method{check_up_to_date}{bbi_nmboot_model}(.bbi_object, ...)
 
 \method{check_up_to_date}{bbi_nonmem_summary}(.bbi_object, ...)
 }
@@ -59,5 +62,12 @@ Different files are checked depending on what type of model is being checked.
 \itemize{
 \item The model file (control stream)
 \item The data file (referenced in \verb{$DATA} within the control stream)
+}
+
+\strong{For bootstrap runs}
+\itemize{
+\item The model file (control stream)
+\item The original data file used in the setup of the bootstrap run (referenced
+in \verb{$DATA} within the control stream)
 }
 }

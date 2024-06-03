@@ -290,7 +290,11 @@ can_be_nm_joined <- function(.mod){
 
 
 #' Join simulation and input data
-#' @inheritParams setup_sim_run
+#'
+#' Joins the simulation and input data of a `bbi_nonmem_model` object with an
+#' attached simulation.
+#' @param .mod A `bbi_nonmem_model` with an attached simulation, or a
+#'  `bbi_nmsim_model` object.
 #' @param .join_col Character column name(s) to use to join table files.
 #'  Defaults to `NUM`. See Details.
 #' @param .cols_keep Either `'all'`, or a vector of column name(s) to retain
@@ -312,6 +316,10 @@ can_be_nm_joined <- function(.mod){
 #' add_simulation(.mod, .join_col = c("NUM", "ID"))
 #'
 #' nm_join_sim(.mod, .join_col = c("NUM", "ID"), .cols_keep = "ID")
+#'
+#' # These return the same thing (simulation model is automatically read-in):
+#' nm_join_sim(.mod)
+#' nm_join_sim(get_simulation(.mod))
 #' }
 #'
 #'
