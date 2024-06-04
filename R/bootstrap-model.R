@@ -93,12 +93,13 @@ setup_bootstrap_run <- function(
   check_model_object(.boot_run, NMBOOT_MOD_CLASS)
   checkmate::assert_number(n, lower = 1)
   checkmate::assert_number(seed, null.ok = TRUE)
+  checkmate::assert_logical(.overwrite)
 
   boot_dir <- get_output_dir(.boot_run, .check_exists = FALSE)
   boot_data_dir <- file.path(boot_dir, "data")
 
   # Bootstrap directory setup
-  if(!fs::dir_exists(boot_dir) || .overwrite == TRUE){
+  if(!fs::dir_exists(boot_dir) || isTRUE(.overwrite)){
     if(fs::dir_exists(boot_dir)) fs::dir_delete(boot_dir)
     fs::dir_create(boot_dir)
     fs::dir_create(boot_data_dir)
@@ -143,7 +144,15 @@ setup_bootstrap_run <- function(
     }
 
     if(!is.null(strat_cols)){
-      checkmate::assert_true(all(strat_cols %in% names(starting_data)))
+      if(!all(strat_cols %in% names(starting_data))){
+        strat_cols_miss <- strat_cols[!(strat_cols %in% names(starting_data))]
+        strat_cols_txt <- paste(strat_cols_miss, collapse = ", ")
+        # Clean up files before aborting (leave if .overwrite is TRUE)
+        if(fs::dir_exists(boot_dir)) fs::dir_delete(boot_dir)
+        rlang::abort(
+          glue("The following `strat_cols` are missing from the input data: {strat_cols_txt}")
+        )
+      }
     }
 
     boot_args <- list(
