@@ -11,7 +11,7 @@ add_simulation(
   .mod,
   n = 200,
   seed = 1234,
-  sim_cols = "DV",
+  sim_cols = c("DV", "PRED"),
   .join_col = "NUM",
   .inherit_tags = TRUE,
   .bbi_args = NULL,

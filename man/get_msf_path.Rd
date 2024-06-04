@@ -4,10 +4,12 @@
 \alias{get_msf_path}
 \title{Get path to \code{MSF} file path}
 \usage{
-get_msf_path(.mod)
+get_msf_path(.mod, .check_exists = TRUE)
 }
 \arguments{
 \item{.mod}{a \code{bbi_model} object}
+
+\item{.check_exists}{If \code{TRUE}, the default, will throw an error if the file does not exist}
 }
 \value{
 absolute file path to \code{MSF} file, or \code{NULL} if one doesnt exist.

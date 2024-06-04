@@ -143,9 +143,13 @@ print.bbi_model <- function(x, ...) {
     }
   }
 
-  status <- color_status(bbi_nonmem_model_status(x))
+  model_type <- cli::style_bold(color_model_type(x))
 
+
+
+  status <- color_status(bbi_nonmem_model_status(x))
   heading('Status')
+  cli::cli_alert_info(model_type)
   subheading(status)
 
   heading("Absolute Model Path")
@@ -419,6 +423,22 @@ color_status <- function(status){
   return(status)
 }
 
+#' Function to color the model type.
+#' @param .mod a `bbi_base_model` object
+#' @keywords internal
+color_model_type <- function(.mod){
+  model_type <- .mod[[YAML_MOD_TYPE]]
+  if (model_type == "nonmem") {
+    model_type <- cli::col_cyan("NONMEM Model")
+  } else if(model_type == "nmsim"){
+    model_type <- cli::col_br_magenta("Simulation")
+  } else if (model_type == "nmboot"){
+    model_type <- cli::col_yellow("Bootstrap Run")
+  }else{
+    model_type <- cli::col_black(model_type)
+  }
+  return(model_type)
+}
 
 #' Format digits
 #'

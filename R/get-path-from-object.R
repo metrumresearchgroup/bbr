@@ -742,9 +742,10 @@ get_sim_spec <- function(.mod){
 #'  control stream file, and construct absolute file path
 #'
 #' @param .mod a `bbi_model` object
+#' @param .check_exists If `TRUE`, the default, will throw an error if the file does not exist
 #' @returns absolute file path to `MSF` file, or `NULL` if one doesnt exist.
 #' @keywords internal
-get_msf_path <- function(.mod){
+get_msf_path <- function(.mod, .check_exists = TRUE){
   ctl <- safe_read_ctl(.mod)
   ests <- nmrec::select_records(ctl, "est")
 
@@ -761,6 +762,10 @@ get_msf_path <- function(.mod){
       )
     }
     msf_path <- file.path(.mod[[ABS_MOD_PATH]], msf_path)
+  }
+
+  if(isTRUE(.check_exists)){
+    checkmate::assert_file_exists(msf_path)
   }
 
   return(msf_path)

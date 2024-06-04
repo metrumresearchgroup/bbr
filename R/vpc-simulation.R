@@ -64,7 +64,7 @@ add_simulation <- function(
     .mod,
     n = 200,
     seed = 1234,
-    sim_cols = "DV",
+    sim_cols = c("DV", "PRED"),
     .join_col = "NUM",
     .inherit_tags = TRUE,
     .bbi_args = NULL,
@@ -341,13 +341,13 @@ setup_sim_run <- function(
 check_model_for_sim <- function(.mod, .join_col){
 
   # Check the .MSF file in $EST
-  msf_path <- get_msf_path(.mod)
+  msf_path <- get_msf_path(.mod, .check_exists = FALSE)
   if(is.null(msf_path)){
     # These symbols are not typical in NONMEM control streams
     mod_id_sanit <- gsub("(-|_)", "", get_model_id(.mod))
     rlang::abort(
       c(
-        glue("`new_sim_model` requires an MSF estimation record option."),
+        glue("`add_simulation` requires an MSF estimation record option."),
         glue("e.g., `$EST MSFO={mod_id_sanit}.MSF`")
       )
     )
@@ -388,7 +388,7 @@ check_model_for_sim <- function(.mod, .join_col){
   # to avoid having to unnecessarily re-run the model with required changes.
   if(!model_is_finished(.mod)){
     rlang::abort(
-      glue("`new_sim_model` requires a previously submitted `{NM_MOD_CLASS}` object")
+      glue("`add_simulation` requires a previously submitted `{NM_MOD_CLASS}` object")
     )
   }
 
