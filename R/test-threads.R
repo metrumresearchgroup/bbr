@@ -235,7 +235,7 @@ delete_models <- function(.mods, .tags = "test threads", .force = FALSE){
     mod_tags <- paste(mod_tags, collapse = ", ")
     mod_tags <- ifelse(mod_tags == "", "NA", mod_tags)
     mod_spec <- if(inherits(mod.x, c(NMSIM_MOD_CLASS, NMBOOT_MOD_CLASS))){
-      get_spec_path(mod.x)
+      get_spec_path(mod.x, .check_exists = FALSE)
     }else{
       NA
     }
