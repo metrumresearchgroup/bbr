@@ -196,8 +196,10 @@ withr::with_options(
       expect_false(has_simulation(mod1)) # ensure spec was deleted too
       bullets <- capture.output({
         output_lines <- capture.output(print(mod1)) %>% suppressMessages()
-        expect_message(print(mod1), regexp = "NONMEM Model")
-        expect_no_message(print(mod1), regexp = "Attached Simulation")
+        expect_false(any(grepl(glue("Status: Finished Running"), output_lines)))
+        expect_false(any(grepl(glue("Simulation Path: {sim[[ABS_MOD_PATH]]}"), output_lines)))
+        expect_false(any(grepl(glue("seed: {sim_seed}"), output_lines)))
+        expect_false(any(grepl(glue("n_sim: {sim_n}"), output_lines)))
       })
     })
 
