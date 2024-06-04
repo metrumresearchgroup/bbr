@@ -144,9 +144,6 @@ print.bbi_model <- function(x, ...) {
   }
 
   model_type <- cli::style_bold(color_model_type(x))
-
-
-
   status <- color_status(bbi_nonmem_model_status(x))
   heading('Status')
   cli::cli_alert_info(model_type)
@@ -423,10 +420,27 @@ color_status <- function(status){
   return(status)
 }
 
-#' Function to color the model type.
-#' @param .mod a `bbi_base_model` object
+#' Format and color the model type of a model
+#'
+#' Create colored text denoting the model type for use in print methods.
+#' @param .mod a `bbi_model` object. `bbi_base_model` objects have more specific
+#'  handling
 #' @keywords internal
 color_model_type <- function(.mod){
+  UseMethod("color_model_type")
+}
+
+#' @rdname color_model_type
+#' @keywords internal
+color_model_type.bbi_model <- function(.mod){
+  model_type <- .mod[[YAML_MOD_TYPE]]
+  model_type <- cli::col_black(paste(model_type, "Model"))
+  return(model_type)
+}
+
+#' @rdname color_model_type
+#' @keywords internal
+color_model_type.bbi_base_model <- function(.mod){
   model_type <- .mod[[YAML_MOD_TYPE]]
   if (model_type == "nonmem") {
     model_type <- cli::col_cyan("NONMEM Model")
@@ -434,11 +448,13 @@ color_model_type <- function(.mod){
     model_type <- cli::col_br_magenta("Simulation")
   } else if (model_type == "nmboot"){
     model_type <- cli::col_yellow("Bootstrap Run")
-  }else{
-    model_type <- cli::col_black(model_type)
   }
   return(model_type)
 }
+
+# Register private S3 methods for development purposes
+.S3method("color_model_type", "bbi_model", color_model_type.bbi_model)
+.S3method("color_model_type", "bbi_base_model", color_model_type.bbi_base_model)
 
 #' Format digits
 #'

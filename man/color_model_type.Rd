@@ -2,14 +2,21 @@
 % Please edit documentation in R/print.R
 \name{color_model_type}
 \alias{color_model_type}
-\title{Function to color the model type.}
+\alias{color_model_type.bbi_model}
+\alias{color_model_type.bbi_base_model}
+\title{Format and color the model type of a model}
 \usage{
 color_model_type(.mod)
+
+\method{color_model_type}{bbi_model}(.mod)
+
+\method{color_model_type}{bbi_base_model}(.mod)
 }
 \arguments{
-\item{.mod}{a \code{bbi_base_model} object}
+\item{.mod}{a \code{bbi_model} object. \code{bbi_base_model} objects have more specific
+handling}
 }
 \description{
-Function to color the model type.
+Create colored text denoting the model type for use in print methods.
 }
 \keyword{internal}
