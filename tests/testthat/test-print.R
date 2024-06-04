@@ -101,6 +101,21 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     })
   })
 
+  test_that("print.bbi_nonmem_model return model type properly", {
+    bullets <- capture.output({ # these get thrown away, but we don't want them to print in the test output
+      expect_message(print(model_1), regexp = "NONMEM Model")
+
+      model1_sim <- model_1
+      model1_sim[[YAML_MOD_TYPE]] <- 'nmsim'
+      expect_message(print(model1_sim), regexp = "Simulation")
+
+      model1_boot <- model_1
+      model1_boot[[YAML_MOD_TYPE]] <- 'nmboot'
+      expect_message(print(model1_boot), regexp = "Bootstrap Run")
+    })
+  })
+
+
   test_that("print.bbi_nonmem_summary works basic FOCE model [BBR-PRNT-003]", {
     .s <- file.path(MODEL_DIR, 1) %>%
       read_model() %>%
