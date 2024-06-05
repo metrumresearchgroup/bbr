@@ -151,10 +151,13 @@ print.bbi_model <- function(x, ...) {
   heading("Absolute Model Path")
   bullet_list(x[[ABS_MOD_PATH]])
 
-  heading("YAML & Model Files")
-  bullet_list(get_yaml_path(x, .check_exists = FALSE))
-  bullet_list(get_model_path(x, .check_exists = FALSE))
-  print_model_files(x, bullet_list)
+  # Dont print for simulation models
+  if (!inherits(x, NMSIM_MOD_CLASS)) {
+    heading("YAML & Model Files")
+    bullet_list(get_yaml_path(x, .check_exists = FALSE))
+    bullet_list(get_model_path(x, .check_exists = FALSE))
+    print_model_files(x, bullet_list)
+  }
 
   # Attach select simulation args to bbi_nonmem_model objects, or print all for
   # bbi_nmsim_model objects
