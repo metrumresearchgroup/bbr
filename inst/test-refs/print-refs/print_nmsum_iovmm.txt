@@ -8,6 +8,8 @@ Estimation Method(s):
 
 – First Order Conditional Estimation 
 
+Simulation: No 
+
 **Heuristic Problem(s) Detected:**
 
 – parameter_near_boundary 
