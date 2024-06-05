@@ -228,14 +228,13 @@ ABS_MOD_PATH <- "absolute_model_path" # SHARED with bbr.bayes
 RUN_ID_COL <- "run" # SHARED with bbr.bayes
 
 # SPEC keys that are hard-coded
-SPEC_NMSIM_ARGS <- "nmsim_args"
 SPEC_NMSIM_SEED <- "seed"
 SPEC_NMSIM_NSIM <- "n_sim"
 
-# Additional keys stored for bbi_nmsim_model objects
+# List of keys required to print a bbi_nmsim_model object
 SPEC_NMSIM_KEYS <- c(
-  SPEC_NMSIM_SEED,
-  SPEC_NMSIM_NSIM
+  SPEC_NMSIM_NSIM,
+  SPEC_NMSIM_SEED
 )
 
 

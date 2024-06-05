@@ -6,15 +6,18 @@
 \alias{color_model_type.bbi_base_model}
 \title{Format and color the model type of a model}
 \usage{
-color_model_type(.mod)
+color_model_type(.mod, msg = NULL)
 
-\method{color_model_type}{bbi_model}(.mod)
+\method{color_model_type}{bbi_model}(.mod, msg = NULL)
 
-\method{color_model_type}{bbi_base_model}(.mod)
+\method{color_model_type}{bbi_base_model}(.mod, msg = NULL)
 }
 \arguments{
 \item{.mod}{a \code{bbi_model} object. \code{bbi_base_model} objects have more specific
 handling}
+
+\item{msg}{Character string. Appended to the end of the formatted model type
+if provided.}
 }
 \description{
 Create colored text denoting the model type for use in print methods.

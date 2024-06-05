@@ -143,10 +143,9 @@ print.bbi_model <- function(x, ...) {
     }
   }
 
-  model_type <- cli::style_bold(color_model_type(x))
+  model_type_status <- cli::style_bold(color_model_type(x, msg = "Status"))
   status <- color_status(bbi_nonmem_model_status(x))
-  heading('Status')
-  cli::cli_alert_info(model_type)
+  heading(model_type_status)
   subheading(status)
 
   heading("Absolute Model Path")
@@ -157,22 +156,24 @@ print.bbi_model <- function(x, ...) {
   bullet_list(get_model_path(x, .check_exists = FALSE))
   print_model_files(x, bullet_list)
 
-  # Attach simulation args if any
+  # Attach select simulation args to bbi_nonmem_model objects, or print all for
+  # bbi_nmsim_model objects
   if (has_simulation(x)) {
     sim_spec <- get_sim_spec(x)
     # Print simulation model status if printing a NM_MOD_CLASS model object
     if(inherits(x, NM_MOD_CLASS)){
       .sim <- get_simulation(x)
       sim_status <- color_status(bbi_nonmem_model_status(.sim))
+      spec_keys <- SPEC_NMSIM_NSIM
       heading('Attached Simulation')
       bullet_list(paste('Status:', sim_status))
-      bullet_list(paste('Simulation Path:', fs::path_ext_remove(sim_spec$model_path)))
     }else{
+      spec_keys <- SPEC_NMSIM_KEYS
       heading('Simulation Args')
     }
 
     # Print simulation args
-    iwalk(sim_spec[SPEC_NMSIM_KEYS],
+    iwalk(sim_spec[spec_keys],
           ~ bullet_list(paste0(.y, ": ", col_blue(.x))))
   }
 
@@ -228,6 +229,15 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
     purrr::walk(paste(.d$estimation_method, "\n"), cli::cat_bullet, bullet = "en_dash")
   }
 
+  # Presence of simulation
+  if(isTRUE(has_simulation(x))){
+    sim_spec <- get_sim_spec(x)
+    sim_status <- paste0("Yes (N = ", sim_spec[[SPEC_NMSIM_NSIM]], ")")
+  }else{
+    sim_status <- "No"
+  }
+  cli::cat_line(paste('Simulation:', sim_status, "\n"))
+
   # check heuristics
   .h <- unlist(x[[SUMMARY_HEURISTICS]])
   if (any(.h)) {
@@ -243,6 +253,7 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
   if (only_sim) {
     return(invisible(NULL))
   }
+
 
   # build parameter table (catch Bayesian error)
   param_df <- tryCatch(
@@ -425,29 +436,33 @@ color_status <- function(status){
 #' Create colored text denoting the model type for use in print methods.
 #' @param .mod a `bbi_model` object. `bbi_base_model` objects have more specific
 #'  handling
+#' @param msg Character string. Appended to the end of the formatted model type
+#'  if provided.
 #' @keywords internal
-color_model_type <- function(.mod){
+color_model_type <- function(.mod, msg = NULL){
   UseMethod("color_model_type")
 }
 
 #' @rdname color_model_type
 #' @keywords internal
-color_model_type.bbi_model <- function(.mod){
+color_model_type.bbi_model <- function(.mod, msg = NULL){
+  checkmate::assert_string(msg, null.ok = TRUE)
   model_type <- .mod[[YAML_MOD_TYPE]]
-  model_type <- cli::col_black(paste(model_type, "Model"))
+  model_type <- cli::col_black(paste(model_type, "Model", msg))
   return(model_type)
 }
 
 #' @rdname color_model_type
 #' @keywords internal
-color_model_type.bbi_base_model <- function(.mod){
+color_model_type.bbi_base_model <- function(.mod, msg = NULL){
+  checkmate::assert_string(msg, null.ok = TRUE)
   model_type <- .mod[[YAML_MOD_TYPE]]
   if (model_type == "nonmem") {
-    model_type <- cli::col_cyan("NONMEM Model")
+    model_type <- cli::col_cyan(paste("NONMEM Model", msg))
   } else if(model_type == "nmsim"){
-    model_type <- cli::col_br_magenta("Simulation")
+    model_type <- cli::col_br_magenta(paste("Simulation", msg))
   } else if (model_type == "nmboot"){
-    model_type <- cli::col_yellow("Bootstrap Run")
+    model_type <- cli::col_yellow(paste("Bootstrap Run", msg))
   }
   return(model_type)
 }
