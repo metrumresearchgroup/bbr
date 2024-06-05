@@ -151,8 +151,8 @@ print.bbi_model <- function(x, ...) {
   heading("Absolute Model Path")
   bullet_list(x[[ABS_MOD_PATH]])
 
-  # Dont print for simulation models
-  if (!inherits(x, NMSIM_MOD_CLASS)) {
+  # Dont print for simulations or bootstrap runs
+  if (!inherits(x, c(NMSIM_MOD_CLASS, NMBOOT_MOD_CLASS))) {
     heading("YAML & Model Files")
     bullet_list(get_yaml_path(x, .check_exists = FALSE))
     bullet_list(get_model_path(x, .check_exists = FALSE))
@@ -164,20 +164,30 @@ print.bbi_model <- function(x, ...) {
   if (has_simulation(x)) {
     sim_spec <- get_sim_spec(x)
     # Print simulation model status if printing a NM_MOD_CLASS model object
-    if(inherits(x, NM_MOD_CLASS)){
+    if (inherits(x, NM_MOD_CLASS)) {
       .sim <- get_simulation(x)
       sim_status <- color_status(bbi_nonmem_model_status(.sim))
-      spec_keys <- SPEC_NMSIM_NSIM
       heading('Attached Simulation')
       bullet_list(paste('Status:', sim_status))
-    }else{
-      spec_keys <- SPEC_NMSIM_KEYS
+    } else {
       heading('Simulation Args')
     }
 
     # Print simulation args
-    iwalk(sim_spec[spec_keys],
+    iwalk(sim_spec[SPEC_NMSIM_KEYS],
           ~ bullet_list(paste0(.y, ": ", col_blue(.x))))
+  }
+
+  if (inherits(x, NMBOOT_MOD_CLASS)) {
+    heading('Bootstrap Args')
+    boot_spec <- get_boot_spec(x)
+    # Spec file doesnt exist until bootstrap run is set up via setup_bootstrap_run
+    if(!is.null(boot_spec)){
+      iwalk(boot_spec[SPEC_NMBOOT_KEYS],
+            ~ bullet_list(paste0(.y, ": ", col_blue(paste(.x, collapse = ", ")))))
+    }else{
+      bullet_list(cli::col_red("Not set up"))
+    }
   }
 
   if (is_valid_print(x[[YAML_DESCRIPTION]])) {

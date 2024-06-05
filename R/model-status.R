@@ -369,12 +369,12 @@ mod_list_setup <- function(.mod){
     check_model_object_list(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMSIM_MOD_CLASS))
   }else{
     check_model_object(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMSIM_MOD_CLASS))
-    if(inherits(.mod, NM_MOD_CLASS)){
-      .mod <- list(.mod)
-    }else{
+    if(inherits(.mod, NMBOOT_MOD_CLASS)){
       # Coerce to list of models for bootstrap model runs to check individually
       #  - This only happens if checking a single bootstrap run model object
       .mod <- get_boot_models(.mod)
+    }else{
+      .mod <- list(.mod)
     }
   }
   return(.mod)
