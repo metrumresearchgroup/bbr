@@ -262,12 +262,14 @@ get_input_columns <- function(.mod, from_data = TRUE){
     inputs$parse()
 
     input_col_opts <- purrr::keep(inputs$values, function(val){
-      inherits(val, "nmrec_option_flag") && !inherits(val, "nmrec_option_record_name")
+      inherits(val, c("nmrec_option_flag", "nmrec_option_value")) &&
+        !inherits(val, "nmrec_option_record_name")
     })
 
-    input_cols <- purrr::map_chr(input_col_opts, function(col){
-      col$format()
-    })
+    input_col_names <- purrr::map_chr(input_col_opts, function(val) val$name)
+    input_cols <- purrr::map_chr(input_col_opts, function(val){
+      ifelse(inherits(val, "nmrec_option_flag"), val$name, as.character(val$value))
+    }) %>% stats::setNames(input_col_names)
   }
   return(input_cols)
 }
