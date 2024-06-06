@@ -61,10 +61,10 @@ Create a simulation model object from an existing model
 \details{
 \code{new_sim_model} does the following things:
 \itemize{
-\item Checks that \code{.mod} was previously executed and tabled out an \code{.MSF} file
+\item Checks that \code{.mod} was previously executed and tabled out an \code{MSF} file
 (i.e. \verb{$EST MSFO=1.MSF}).
 \itemize{
-\item \strong{Note:} The \code{.MSF} file must have an upper case extension, otherwise
+\item \strong{Note:} The \code{MSF} file must have an upper case extension, otherwise
 it will be cleaned up after submission
 }
 \item Performs various checks to confirm the status of \code{.mod}, the contents of its
@@ -81,7 +81,7 @@ the original control stream:
 used rather than the initial estimates.
 \item Adds a new \verb{$TABLE} record tabling out simulated values (\code{sim_cols}) and
 \code{.join_col} column(s)
-\item Adds a new \verb{$MSFI} record (run with \code{NOMSFTEST}) pointing to the \code{.MSF}
+\item Adds a new \verb{$MSFI} record (run with \code{NOMSFTEST}) pointing to the \code{MSF}
 file of \code{.mod}
 }
 }

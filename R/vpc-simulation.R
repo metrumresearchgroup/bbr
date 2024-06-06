@@ -14,9 +14,9 @@
 #'
 #' @details
 #' `add_simulation` does the following things:
-#'  - Checks that `.mod` was previously executed and tabled out an `.MSF` file
+#'  - Checks that `.mod` was previously executed and tabled out an `MSF` file
 #'  (i.e. `$EST MSFO=1.MSF`).
-#'     - **Note:** The `.MSF` file must have an upper case extension, otherwise
+#'     - **Note:** The `MSF` file must have an upper case extension, otherwise
 #'     it will be cleaned up after submission
 #'  - Performs various checks to confirm the status of `.mod`, the contents of its
 #'  control stream, and the input data.
@@ -31,7 +31,7 @@
 #'     used rather than the initial estimates.
 #'    - Adds a new `$TABLE` record tabling out simulated values (`sim_cols`) and
 #'    `.join_col` column(s)
-#'    - Adds a new `$MSFI` record (run with `NOMSFTEST`) pointing to the `.MSF`
+#'    - Adds a new `$MSFI` record (run with `NOMSFTEST`) pointing to the `MSF`
 #'    file of `.mod`
 #'  - Creates a specification file, storing `seeds`, `n`, and other various items
 #'  helpful for traceability purposes.
@@ -179,9 +179,9 @@ get_simulation <- function(.mod){
 #'
 #' @details
 #' `new_sim_model` does the following things:
-#'  - Checks that `.mod` was previously executed and tabled out an `.MSF` file
+#'  - Checks that `.mod` was previously executed and tabled out an `MSF` file
 #'  (i.e. `$EST MSFO=1.MSF`).
-#'     - **Note:** The `.MSF` file must have an upper case extension, otherwise
+#'     - **Note:** The `MSF` file must have an upper case extension, otherwise
 #'     it will be cleaned up after submission
 #'  - Performs various checks to confirm the status of `.mod`, the contents of its
 #'  control stream, and the input data.
@@ -196,7 +196,7 @@ get_simulation <- function(.mod){
 #'     used rather than the initial estimates.
 #'    - Adds a new `$TABLE` record tabling out simulated values (`sim_cols`) and
 #'    `.join_col` column(s)
-#'    - Adds a new `$MSFI` record (run with `NOMSFTEST`) pointing to the `.MSF`
+#'    - Adds a new `$MSFI` record (run with `NOMSFTEST`) pointing to the `MSF`
 #'    file of `.mod`
 #'
 #' @seealso nm_join_sim
@@ -380,7 +380,7 @@ setup_sim_run <- function(
 #' @keywords internal
 check_model_for_sim <- function(.mod, .join_col = "NUM"){
 
-  # Check the .MSF file in $EST
+  # Check the MSF file in $EST
   msf_path <- get_msf_path(.mod, .check_exists = FALSE)
   if(is.null(msf_path)){
     # These symbols are not typical in NONMEM control streams
@@ -401,7 +401,7 @@ check_model_for_sim <- function(.mod, .join_col = "NUM"){
     )
   }
 
-  # Check .MSF file exists
+  # Check that MSF file exists
   msf_path_name <- basename(msf_path)
   if(!fs::file_exists(msf_path)){
     # Note: file extension must be all caps for now; otherwise it will be
@@ -413,12 +413,12 @@ check_model_for_sim <- function(.mod, .join_col = "NUM"){
         c(
           paste(
             glue("You're using bbi {bbi_version()}. Earlier versions of bbi (<= 3.3.0)"),
-            "removed `.MSF` files with lower case extensions"
+            "removed MSF files with extension `.msf` (lower case)."
           ),
           # TODO: add message about upgrading bbi after next bbi release
           paste(
-            "If this message is relevant, try re-submitting `.mod` for execution",
-            "with an upper-case extension before simulating"
+            glue("If this message is relevant, try updating `{basename(get_model_path(.mod))}`"),
+            "to use an upper case extension and re-submitting before simulating"
           ),
           "e.g., `$EST MSFO=1.msf` --> `$EST MSFO=1.MSF`"
         )
