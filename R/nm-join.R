@@ -363,7 +363,8 @@ nm_join_sim <- function(
   )
 
   .d <- df_list$data
-  if(.cols_keep != "all" && !all(.cols_keep %in% names(.d))){
+  keep_all_cols <- (length(.cols_keep) == 1 && .cols_keep == "all")
+  if(isFALSE(keep_all_cols) && !all(.cols_keep %in% names(.d))){
     col_keep_txt <- paste0(.cols_keep, collapse = ", ")
     .cols_keep <- "all"
     rlang::warn(
@@ -380,7 +381,7 @@ nm_join_sim <- function(
   if("DV" %in% names(.d) && "DV" %in% unlist(map(.tbls, names))){
     .d <- dplyr::rename(.d, DV.DATA = "DV")
   }
-  col_order <- if(.cols_keep == "all") names(.d) else .cols_keep
+  col_order <- if(isTRUE(keep_all_cols)) names(.d) else .cols_keep
 
   # Keep track of where each column came from.
   origin <- vector(mode = "list", length = length(df_list))

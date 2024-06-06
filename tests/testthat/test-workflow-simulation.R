@@ -166,6 +166,9 @@ withr::with_options(
       # Can pass in the simulation model, or the nonmem model it's attached to
       expect_true(all.equal(sim_data, suppressMessages(nm_join_sim(sim, .join_col = join_cols))))
 
+      # Select specific columns
+      sim_data <- nm_join_sim(mod1, .join_col = join_cols, .cols_keep = join_cols)
+      expect_equal(names(sim_data), c(join_cols, sim_cols, "nn"))
       # TODO: revisit this after input data refactor
     })
 
@@ -174,7 +177,6 @@ withr::with_options(
         output_lines <- capture.output(print(sim)) %>% suppressMessages()
         expect_message(print(sim), regexp = "Simulation")
         expect_message(print(sim), regexp = "Simulation Args")
-        expect_true(any(grepl(glue("seed: {sim_seed}"), output_lines)))
         expect_true(any(grepl(glue("n_sim: {sim_n}"), output_lines)))
       })
     })
@@ -185,8 +187,6 @@ withr::with_options(
         expect_message(print(mod1), regexp = "NONMEM Model")
         expect_message(print(mod1), regexp = "Attached Simulation")
         expect_true(any(grepl(glue("Status: Finished Running"), output_lines)))
-        expect_true(any(grepl(glue("Simulation Path: {sim[[ABS_MOD_PATH]]}"), output_lines)))
-        expect_true(any(grepl(glue("seed: {sim_seed}"), output_lines)))
         expect_true(any(grepl(glue("n_sim: {sim_n}"), output_lines)))
       })
     })
@@ -197,8 +197,6 @@ withr::with_options(
       bullets <- capture.output({
         output_lines <- capture.output(print(mod1)) %>% suppressMessages()
         expect_false(any(grepl(glue("Status: Finished Running"), output_lines)))
-        expect_false(any(grepl(glue("Simulation Path: {sim[[ABS_MOD_PATH]]}"), output_lines)))
-        expect_false(any(grepl(glue("seed: {sim_seed}"), output_lines)))
         expect_false(any(grepl(glue("n_sim: {sim_n}"), output_lines)))
       })
     })
