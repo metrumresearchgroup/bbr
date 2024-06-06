@@ -156,20 +156,51 @@ withr::with_options(
       expect_true(all(check_up_to_date(mod1)))
     })
 
+    test_that("add_simulation works with a dataset", {
+      # improper data specification
+      bad_data <- nm_data(mod1) %>% dplyr::rename("BLWT"="WT")
+      expect_error(
+        add_simulation(
+          mod1, n = sim_n, seed = sim_seed, data = bad_data,
+          .join_col = join_cols, sim_cols = sim_cols,
+          .mode = "local", .wait = TRUE, .overwrite = TRUE
+        ),
+        "The following required input columns were not found"
+      )
+
+      # correct data specification
+      add_simulation(
+        mod1, n = sim_n, seed = sim_seed, data = nm_data(mod1),
+        .join_col = join_cols, sim_cols = sim_cols,
+        .mode = "local", .wait = TRUE, .overwrite = TRUE
+      )
+
+      # Read in simulation model
+      sim <- get_simulation(mod1)
+      expect_equal(get_data_path(sim), file.path(MODEL_DIR_BBI, "1", "sim-data.csv"))
+      expect_true(all(check_up_to_date(sim)))
+      expect_true(all(check_up_to_date(mod1)))
+    })
+
     # Read in model for remainder of tests
     sim <- get_simulation(mod1)
 
     test_that("nm_join_sim works correctly", {
       # .join_col must match to what was used in `add_simulation`
       expect_error(suppressMessages(nm_join_sim(mod1)), "Column `ID` doesn't exist")
-      sim_data <- nm_join_sim(mod1, .join_col = join_cols)
+      sim_data <- nm_join_sim(mod1, .join_col = join_cols) %>% suppressMessages()
+      expect_equal(
+        sort(names(sim_data)),
+        unique(sort(c(names(nm_data(mod1)), join_cols, sim_cols, "nn", "DV.DATA")))
+      )
+
       # Can pass in the simulation model, or the nonmem model it's attached to
       expect_true(all.equal(sim_data, suppressMessages(nm_join_sim(sim, .join_col = join_cols))))
 
       # Select specific columns
-      sim_data <- nm_join_sim(mod1, .join_col = join_cols, .cols_keep = join_cols)
+      sim_data <- nm_join_sim(mod1, .join_col = join_cols, .cols_keep = join_cols) %>%
+        suppressMessages()
       expect_equal(names(sim_data), c(join_cols, sim_cols, "nn"))
-      # TODO: revisit this after input data refactor
     })
 
     test_that("print.bbi_nmsim_model has a custom print method", {
