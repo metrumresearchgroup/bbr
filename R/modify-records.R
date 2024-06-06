@@ -6,14 +6,18 @@
 #'  - **`safe_read_ctl()`** is called internally within the other functions, though
 #'  it can also be used outside of that context.
 #'  - **`modify_prob_statement()`**, **`modify_data_path_ctl()`**,
-#'   **`remove_records()`**, and **`add_new_record()`** read in the control stream,
-#'   make any modifications, and then save out the updated control stream.
-#'     - `modify_prob_statement()` also returns a character string defining the
-#'     `$PROBLEM` text (see `prob_text` argument).
+#'    **`remove_records()`**, and **`add_new_record()`** read in the control stream,
+#'    make any modifications, and then save out the updated control stream.
+#'      - `modify_prob_statement()` also returns a character string defining the
+#'        `$PROBLEM` text (see `prob_text` argument).
 #' - **`mod_has_record()`** will return a logical value denoting whether a `bbr`
 #'   model has a given record type.
 #' - **`get_records()`** extracts all records of a given type. Note that it is
-#'    not meant to be used to modify existing records.
+#'   not meant to be used to modify existing records.
+#' - **get_input_columns()** and **get_table_columns()** extract the column names
+#'   of the input data and all table files respectively. They can either be parsed
+#'   from a `NONMEM` control stream file, or determined from reading in the
+#'   `csvs`/table files. See `from_data` argument for more details.
 NULL
 
 
@@ -243,8 +247,10 @@ modify_prob_statement <- function(.mod, prob_text = NULL){
 
 #' @describeIn modify_records Retrieve input data column names from either the
 #'  `$INPUT` record in a `NONMEM` control stream file or the input dataset.
-#' @param from_data Logical (T/F). If `TRUE`, get the column names from the first
-#' line of the dataset referenced in a `$DATA` record.
+#' @param from_data Logical (T/F). If `TRUE`, the default, get the column names
+#'  from the first line of the referenced dataset (input data or table file). If
+#'  `FALSE`, parse the control stream and retrieve from the relevant record type
+#'  (`$INPUT` or `$TABLE`).
 #' @keywords internal
 get_input_columns <- function(.mod, from_data = TRUE){
   if(isTRUE(from_data)){
@@ -266,22 +272,29 @@ get_input_columns <- function(.mod, from_data = TRUE){
   return(input_cols)
 }
 
-#' @describeIn modify_records Retrieve columns names from `$TABLE` records in a
-#'  `NONMEM` control stream file.
+#' @describeIn modify_records Retrieve table columns names from either `$TABLE`
+#'  record(s) in a `NONMEM` control stream file or the tabled out files
 #' @keywords internal
-get_table_columns <- function(.mod){
-  tables <- get_records(.mod, "table")
-
-  table_cols <- purrr::map(tables, function(table){
-    table$parse()
-    table_col_opts <- purrr::keep(table$values, function(val){
-      inherits(val, "nmrec_option_pos")
+get_table_columns <- function(.mod, from_data = TRUE){
+  if(isTRUE(from_data)){
+    tab_files <- nm_table_files(.mod)
+    table_cols <- purrr::map(tab_files, function(tab_file){
+      tab <- fread(tab_file, na.strings = ".", verbose = FALSE, nrows = 1, skip = 1)
+      table_cols <- toupper(names(tab))
     })
-    table_cols <- purrr::map(table_col_opts, function(col){
-      str_split(col$format(), " ")[[1]]
-    }) %>% purrr::list_c()
-  })
+  }else{
+    tables <- get_records(.mod, "table")
 
+    table_cols <- purrr::map(tables, function(table){
+      table$parse()
+      table_col_opts <- purrr::keep(table$values, function(val){
+        inherits(val, "nmrec_option_pos")
+      })
+      table_cols <- purrr::map(table_col_opts, function(col){
+        str_split(col$format(), " ")[[1]]
+      }) %>% purrr::list_c()
+    })
+  }
   return(table_cols)
 }
 

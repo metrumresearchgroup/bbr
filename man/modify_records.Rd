@@ -35,7 +35,7 @@ modify_prob_statement(.mod, prob_text = NULL)
 
 get_input_columns(.mod, from_data = TRUE)
 
-get_table_columns(.mod)
+get_table_columns(.mod, from_data = TRUE)
 }
 \arguments{
 \item{.mod}{a bbr model object}
@@ -61,8 +61,10 @@ index}
 \item{prob_text}{If \code{NULL} return the current \verb{$PROBLEM} statement. If a
 character string, set the problem statement to that value.}
 
-\item{from_data}{Logical (T/F). If \code{TRUE}, get the column names from the first
-line of the dataset referenced in a \verb{$DATA} record.}
+\item{from_data}{Logical (T/F). If \code{TRUE}, the default, get the column names
+from the first line of the referenced dataset (input data or table file). If
+\code{FALSE}, parse the control stream and retrieve from the relevant record type
+(\verb{$INPUT} or \verb{$TABLE}).}
 }
 \description{
 Modify or retrieve options and records from a \code{NONMEM} control stream file
@@ -82,6 +84,10 @@ make any modifications, and then save out the updated control stream.
 model has a given record type.
 \item \strong{\code{get_records()}} extracts all records of a given type. Note that it is
 not meant to be used to modify existing records.
+\item \strong{get_input_columns()} and \strong{get_table_columns()} extract the column names
+of the input data and all table files respectively. They can either be parsed
+from a \code{NONMEM} control stream file, or determined from reading in the
+\code{csvs}/table files. See \code{from_data} argument for more details.
 }
 }
 \section{Functions}{
@@ -109,8 +115,8 @@ a \code{NONMEM} control stream file.
 \item \code{get_input_columns()}: Retrieve input data column names from either the
 \verb{$INPUT} record in a \code{NONMEM} control stream file or the input dataset.
 
-\item \code{get_table_columns()}: Retrieve columns names from \verb{$TABLE} records in a
-\code{NONMEM} control stream file.
+\item \code{get_table_columns()}: Retrieve table columns names from either \verb{$TABLE}
+record(s) in a \code{NONMEM} control stream file or the tabled out files
 
 }}
 \note{
