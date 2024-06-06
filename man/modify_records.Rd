@@ -33,7 +33,7 @@ modify_data_path_ctl(.mod, data_path)
 
 modify_prob_statement(.mod, prob_text = NULL)
 
-get_input_columns(.mod)
+get_input_columns(.mod, from_data = TRUE)
 
 get_table_columns(.mod)
 }
@@ -60,6 +60,9 @@ index}
 
 \item{prob_text}{If \code{NULL} return the current \verb{$PROBLEM} statement. If a
 character string, set the problem statement to that value.}
+
+\item{from_data}{Logical (T/F). If \code{TRUE}, get the column names from the first
+line of the dataset referenced in a \verb{$DATA} record.}
 }
 \description{
 Modify or retrieve options and records from a \code{NONMEM} control stream file
@@ -103,8 +106,8 @@ control stream file
 \item \code{modify_prob_statement()}: Modify or retrieve the \verb{$PROBLEM} statement from
 a \code{NONMEM} control stream file.
 
-\item \code{get_input_columns()}: Retrieve input data column names from the \verb{$INPUT}
-record in a \code{NONMEM} control stream file.
+\item \code{get_input_columns()}: Retrieve input data column names from either the
+\verb{$INPUT} record in a \code{NONMEM} control stream file or the input dataset.
 
 \item \code{get_table_columns()}: Retrieve columns names from \verb{$TABLE} records in a
 \code{NONMEM} control stream file.

@@ -241,20 +241,28 @@ modify_prob_statement <- function(.mod, prob_text = NULL){
   return(prob_str_return)
 }
 
-#' @describeIn modify_records Retrieve input data column names from the `$INPUT`
-#'  record in a `NONMEM` control stream file.
+#' @describeIn modify_records Retrieve input data column names from either the
+#'  `$INPUT` record in a `NONMEM` control stream file or the input dataset.
+#' @param from_data Logical (T/F). If `TRUE`, get the column names from the first
+#' line of the dataset referenced in a `$DATA` record.
 #' @keywords internal
-get_input_columns <- function(.mod){
-  inputs <- get_records(.mod, "input")[[1]]
-  inputs$parse()
+get_input_columns <- function(.mod, from_data = TRUE){
+  if(isTRUE(from_data)){
+    data_path <- get_data_path(.mod)
+    input_data <- fread(data_path, na.strings = ".", verbose = FALSE, nrows = 1)
+    input_cols <- toupper(names(input_data))
+  }else{
+    inputs <- get_records(.mod, "input")[[1]]
+    inputs$parse()
 
-  input_col_opts <- purrr::keep(inputs$values, function(val){
-    inherits(val, "nmrec_option_flag") && !inherits(val, "nmrec_option_record_name")
-  })
+    input_col_opts <- purrr::keep(inputs$values, function(val){
+      inherits(val, "nmrec_option_flag") && !inherits(val, "nmrec_option_record_name")
+    })
 
-  input_cols <- purrr::map_chr(input_col_opts, function(col){
-    col$format()
-  })
+    input_cols <- purrr::map_chr(input_col_opts, function(col){
+      col$format()
+    })
+  }
   return(input_cols)
 }
 
