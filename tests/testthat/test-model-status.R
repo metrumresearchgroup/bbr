@@ -17,14 +17,27 @@ describe("Model status helpers return the correct status", {
   })
 
   # Test un-submitted model
-  mod2 <- copy_model_from(MOD1)
-  on.exit(delete_models(mod2, .tags = NULL, .force = TRUE))
+  mod2 <- copy_model_from(MOD1, "2")
 
   # Test un-submitted Bootstrap run
   .boot_run <- new_bootstrap_run(MOD1)
-  on.exit(delete_models(.boot_run, .tags = NULL, .force = TRUE), add = TRUE)
+
+  # Test simulation - use fake MSF file for model creation
+  mod3 <- copy_model_from(MOD1, "3") %>% update_model_id() %>% add_msf_opt()
+  copy_output_dir(MOD1, file.path(MODEL_DIR, "3"))
+  msf_path <- get_msf_path(mod3, .check_exists = FALSE)
+  writeLines(readLines(nm_table_files(MOD1)[1]), msf_path)
+  .sim <- new_sim_model(mod3, n = 10)
+
+  on.exit(
+    delete_models(
+      list(mod2, .boot_run, mod3, .sim), .tags = NULL, .force = TRUE
+    ) %>% suppressMessages(),
+    add = TRUE
+  )
 
   it("Not Run - no output directory", {
+    ## NONMEM model
     expect_equal(bbi_nonmem_model_status(mod2), "Not Run")
     expect_false(model_is_finished(mod2))
     expect_false(check_nonmem_finished(mod2))
@@ -34,7 +47,17 @@ describe("Model status helpers return the correct status", {
       fixed = TRUE
     )
 
-    # Bootstrap
+    ## Simulation
+    expect_equal(bbi_nonmem_model_status(.sim), "Not Run")
+    expect_false(model_is_finished(.sim))
+    expect_false(check_nonmem_finished(.sim))
+    expect_message(
+      get_model_status(.sim),
+      "The following model(s) are incomplete or have not been run: `3-sim`",
+      fixed = TRUE
+    )
+
+    ## Bootstrap
     expect_equal(bbi_nonmem_model_status(.boot_run), "Not Run")
     expect_false(model_is_finished(.boot_run))
     expect_false(check_nonmem_finished(.boot_run))
@@ -78,15 +101,15 @@ describe("Model status helpers return the correct status", {
   it("list of models", {
     # Uses a complex list (includes a bootstrap model)
     #  - Bootstrap runs get evaluated as a whole when they are part of a list
-    mod_list <- list(MOD1, mod2, .boot_run)
-    expect_equal(check_nonmem_finished(mod_list), c(TRUE, FALSE, FALSE))
+    mod_list <- list(MOD1, mod2, .boot_run, mod3, .sim)
+    expect_equal(check_nonmem_finished(mod_list), c(TRUE, FALSE, FALSE, TRUE, FALSE))
     expect_message(
       get_model_status(mod_list),
-      "The following model(s) have finished: `1`", fixed = TRUE
+      "The following model(s) have finished: `1, 3`", fixed = TRUE
     )
     expect_message(
       get_model_status(mod_list),
-      "The following model(s) are incomplete or have not been run: `2, 1-boot`",
+      "The following model(s) are incomplete or have not been run: `2, 1-boot, 3-sim`",
       fixed = TRUE
     )
   })

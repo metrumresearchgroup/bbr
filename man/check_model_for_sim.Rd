@@ -4,7 +4,7 @@
 \alias{check_model_for_sim}
 \title{Check that a \code{bbr} model can be used for simulation}
 \usage{
-check_model_for_sim(.mod, .join_col)
+check_model_for_sim(.mod, .join_col = "NUM")
 }
 \arguments{
 \item{.mod}{a \code{bbi_nonmem_model} object.}

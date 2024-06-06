@@ -28,7 +28,7 @@ execution. Gets appended to the generated \verb{$TABLE} record. See
 \code{\link[=nm_join_sim]{nm_join_sim()}} documentation for details. Defaults to \code{'NUM'}.}
 }
 \description{
-Creates new \verb{$SIMULATION} and \verb{$MSFI} records, and modifies the \verb{$PRED} or
-\verb{$ERROR} record (whichever exists) to have the additional line: \code{REPI=IREP}.
+Removes relevant record types, creates new \verb{$SIMULATION} and \verb{$MSFI} records,
+and creates a new \verb{$TABLE} record to save out simulated values (\code{sim_cols}).
 }
 \keyword{internal}

@@ -1,4 +1,4 @@
-#' Modify options and records from a `NONMEM` control stream file
+#' Modify or retrieve options and records from a `NONMEM` control stream file
 #' @param .mod a bbr model object
 #' @name modify_records
 #'
@@ -114,7 +114,6 @@ remove_records <- function(.mod, type){
 #'   any way that's accepted in a `NONMEM` control stream. If `NULL`, append to
 #'   the end of the control stream. If multiple records are found, uses the last
 #'   index
-#' @param display_type Logical (T/F). If `FALSE`, dont
 #' @keywords internal
 add_new_record <- function(
     .mod,
@@ -242,6 +241,41 @@ modify_prob_statement <- function(.mod, prob_text = NULL){
   return(prob_str_return)
 }
 
+#' @describeIn modify_records Retrieve input data column names from the `$INPUT`
+#'  record in a `NONMEM` control stream file.
+#' @keywords internal
+get_input_columns <- function(.mod){
+  inputs <- get_records(.mod, "input")[[1]]
+  inputs$parse()
+
+  input_col_opts <- purrr::keep(inputs$values, function(val){
+    inherits(val, "nmrec_option_flag") && !inherits(val, "nmrec_option_record_name")
+  })
+
+  input_cols <- purrr::map_chr(input_col_opts, function(col){
+    col$format()
+  })
+  return(input_cols)
+}
+
+#' @describeIn modify_records Retrieve columns names from `$TABLE` records in a
+#'  `NONMEM` control stream file.
+#' @keywords internal
+get_table_columns <- function(.mod){
+  tables <- get_records(.mod, "table")
+
+  table_cols <- purrr::map(tables, function(table){
+    table$parse()
+    table_col_opts <- purrr::keep(table$values, function(val){
+      inherits(val, "nmrec_option_pos")
+    })
+    table_cols <- purrr::map(table_col_opts, function(col){
+      str_split(col$format(), " ")[[1]]
+    }) %>% purrr::list_c()
+  })
+
+  return(table_cols)
+}
 
 #' Helper for checking if a specified record type is valid.
 #'

@@ -9,6 +9,7 @@ new_sim_model(
   .mod,
   n = 200,
   seed = 1234,
+  data = NULL,
   sim_cols = c("DV", "PRED"),
   .join_col = "NUM",
   .sim_dir = get_output_dir(.mod),
@@ -25,6 +26,11 @@ make_sim_spec(.sim, sim_args, .overwrite = FALSE)
 \verb{$SIMULATION} record.}
 
 \item{seed}{A seed for simulation. Appended to \verb{$SIMULATION} record.}
+
+\item{data}{A dataset to simulate from. Defaults to \code{NULL}, which will use
+\link{nm_join} to filter to only the data that made it into the original problem
+of \code{.mod} (note that this requires a \verb{$TABLE} record). If supplied, must
+contain the exact column names of \code{nm_data(.mod)}.}
 
 \item{sim_cols}{Character column name(s) defining the simulated values to
 table out.}
@@ -61,8 +67,8 @@ Create a simulation model object from an existing model
 \item \strong{Note:} The \code{.MSF} file must have an upper case extension, otherwise
 it will be cleaned up after submission
 }
-\item Performs various checks to confirm the status of \code{.mod} and contents of its
-control stream.
+\item Performs various checks to confirm the status of \code{.mod}, the contents of its
+control stream, and the input data.
 \item Creates a new \code{bbi_nmsim_model} object with the following differences from
 the original control stream:
 \itemize{
@@ -73,8 +79,8 @@ the original control stream:
 \item Adds a new custom \verb{$SIMULATION} record using user specified values (e.g.
 \code{seed} and \code{n}). \code{TRUE=FINAL} is appended to ensure the final values are
 used rather than the initial estimates.
-\item Adds a new \verb{$TABLE} record tabling out simulated values and \code{.join_col}
-column(s)
+\item Adds a new \verb{$TABLE} record tabling out simulated values (\code{sim_cols}) and
+\code{.join_col} column(s)
 \item Adds a new \verb{$MSFI} record (run with \code{NOMSFTEST}) pointing to the \code{.MSF}
 file of \code{.mod}
 }

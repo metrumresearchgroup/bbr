@@ -18,8 +18,8 @@
 #'  (i.e. `$EST MSFO=1.MSF`).
 #'     - **Note:** The `.MSF` file must have an upper case extension, otherwise
 #'     it will be cleaned up after submission
-#'  - Performs various checks to confirm the status of `.mod` and contents of its
-#'  control stream.
+#'  - Performs various checks to confirm the status of `.mod`, the contents of its
+#'  control stream, and the input data.
 #'  - Creates a new `bbi_nmsim_model` object with the following differences from
 #'  the original control stream:
 #'    - Removes the following record types for simulation: `$EST`, `$COV`,
@@ -29,8 +29,8 @@
 #'    - Adds a new custom `$SIMULATION` record using user specified values (e.g.
 #'     `seed` and `n`). `TRUE=FINAL` is appended to ensure the final values are
 #'     used rather than the initial estimates.
-#'    - Adds a new `$TABLE` record tabling out simulated values and `.join_col`
-#'    column(s)
+#'    - Adds a new `$TABLE` record tabling out simulated values (`sim_cols`) and
+#'    `.join_col` column(s)
 #'    - Adds a new `$MSFI` record (run with `NOMSFTEST`) pointing to the `.MSF`
 #'    file of `.mod`
 #'  - Creates a specification file, storing `seeds`, `n`, and other various items
@@ -64,6 +64,7 @@ add_simulation <- function(
     .mod,
     n = 200,
     seed = 1234,
+    data = NULL,
     sim_cols = c("DV", "PRED"),
     .join_col = "NUM",
     .inherit_tags = TRUE,
@@ -84,7 +85,7 @@ add_simulation <- function(
   overwrite_mod <- ifelse(is.null(.overwrite), FALSE, .overwrite)
 
   .sim <- new_sim_model(
-    .mod, n = n, seed = seed,
+    .mod, n = n, seed = seed, data = data,
     .join_col = .join_col, sim_cols = sim_cols,
     .inherit_tags = .inherit_tags, .overwrite = overwrite_mod
   )
@@ -162,6 +163,10 @@ get_simulation <- function(.mod){
 #' @param n Number of simulations/subproblems. Adds `SUBPROBLEMS=n` to a
 #'  `$SIMULATION` record.
 #' @param seed A seed for simulation. Appended to `$SIMULATION` record.
+#' @param data A dataset to simulate from. Defaults to `NULL`, which will use
+#'  [nm_join] to filter to only the data that made it into the original problem
+#'  of `.mod` (note that this requires a `$TABLE` record). If supplied, must
+#'  contain the exact column names of `nm_data(.mod)`.
 #' @param sim_cols Character column name(s) defining the simulated values to
 #'  table out.
 #' @param .join_col Character column name(s) used to join table files post
@@ -178,8 +183,8 @@ get_simulation <- function(.mod){
 #'  (i.e. `$EST MSFO=1.MSF`).
 #'     - **Note:** The `.MSF` file must have an upper case extension, otherwise
 #'     it will be cleaned up after submission
-#'  - Performs various checks to confirm the status of `.mod` and contents of its
-#'  control stream.
+#'  - Performs various checks to confirm the status of `.mod`, the contents of its
+#'  control stream, and the input data.
 #'  - Creates a new `bbi_nmsim_model` object with the following differences from
 #'  the original control stream:
 #'    - Removes the following record types for simulation: `$EST`, `$COV`,
@@ -189,8 +194,8 @@ get_simulation <- function(.mod){
 #'    - Adds a new custom `$SIMULATION` record using user specified values (e.g.
 #'     `seed` and `n`). `TRUE=FINAL` is appended to ensure the final values are
 #'     used rather than the initial estimates.
-#'    - Adds a new `$TABLE` record tabling out simulated values and `.join_col`
-#'    column(s)
+#'    - Adds a new `$TABLE` record tabling out simulated values (`sim_cols`) and
+#'    `.join_col` column(s)
 #'    - Adds a new `$MSFI` record (run with `NOMSFTEST`) pointing to the `.MSF`
 #'    file of `.mod`
 #'
@@ -226,12 +231,15 @@ new_sim_model <- function(
     .mod,
     n = 200,
     seed = 1234,
+    data = NULL,
     sim_cols = c("DV", "PRED"),
     .join_col = "NUM",
     .sim_dir = get_output_dir(.mod),
     .inherit_tags = TRUE,
     .overwrite = FALSE
 ){
+  checkmate::assert_numeric(n, lower = 1)
+  checkmate::assert_numeric(seed)
   check_model_object(.mod, NM_MOD_CLASS)
   check_model_for_sim(.mod, .join_col)
 
@@ -256,10 +264,42 @@ new_sim_model <- function(
   prob <- glue("Simulation of model {get_model_id(.mod)}")
   modify_prob_statement(.sim_mod, prob)
 
-  # Overwrite $DATA record (one level deeper)
-  based_on_data_path <- get_data_path_from_ctl(.mod, normalize = FALSE)
-  data_path_rel <- file.path("..", based_on_data_path)
-  modify_data_path_ctl(.sim_mod, data_path_rel)
+
+  # Handle input data and adjust $DATA record
+  if(!is.null(data)){
+    checkmate::assert_data_frame(data)
+    input_cols <- get_input_columns(.mod) # Taken from control stream
+    if(!all(input_cols %in% names(data))){
+      missing_cols <- input_cols[!(input_cols %in% names(data))]
+      missing_txt <- paste(missing_cols, collapse = ", ")
+      rlang::abort(
+        c(
+          glue("The following required input columns were not found in the input data: {missing_txt}"),
+          "Check `nm_data(.mod)` to see expected columns."
+        )
+      )
+    }
+
+    # Remove any extra columns
+    data <- dplyr::select(data, all_of(input_cols))
+
+    # Save data to output dir of .mod
+    data_path_new <- file.path(.sim_dir, "sim-data.csv")
+    readr::write_csv(data, data_path_new)
+    verbose_msg(glue("Saving input data to `{data_path_new}`"))
+
+    # Update data path in control stream (adjusting for .mod vs .ctl extension)
+    data_path_rel <- adjust_data_path_ext(
+      basename(data_path_new), get_model_path(.sim_mod), reverse = TRUE
+    )
+    modify_data_path_ctl(.sim_mod, data_path_rel)
+  }else{
+    # Overwrite $DATA record (one level deeper)
+    based_on_data_path <- get_data_path_from_ctl(.mod, normalize = FALSE)
+    data_path_rel <- file.path("..", based_on_data_path)
+    modify_data_path_ctl(.sim_mod, data_path_rel)
+  }
+
 
   # Set up simulation
   setup_sim_run(
@@ -274,8 +314,8 @@ new_sim_model <- function(
 
 #' Set up `NONMEM` simulation
 #'
-#' Creates new `$SIMULATION` and `$MSFI` records, and modifies the `$PRED` or
-#'  `$ERROR` record (whichever exists) to have the additional line: `REPI=IREP`.
+#' Removes relevant record types, creates new `$SIMULATION` and `$MSFI` records,
+#'  and creates a new `$TABLE` record to save out simulated values (`sim_cols`).
 #' @param .mod a `bbi_nonmem_model` or `bbi_nmsim_model` object.
 #' @inheritParams new_sim_model
 #' @keywords internal
@@ -338,7 +378,7 @@ setup_sim_run <- function(
 #' @inheritParams new_sim_model
 #' @returns `TRUE` invisibly
 #' @keywords internal
-check_model_for_sim <- function(.mod, .join_col){
+check_model_for_sim <- function(.mod, .join_col = "NUM"){
 
   # Check the .MSF file in $EST
   msf_path <- get_msf_path(.mod, .check_exists = FALSE)
@@ -353,19 +393,38 @@ check_model_for_sim <- function(.mod, .join_col){
     )
   }
 
+  # Check submission status - this should be done after all control stream inspections
+  # to avoid having to unnecessarily re-run the model with required changes.
+  if(!model_is_finished(.mod)){
+    rlang::abort(
+      glue("`add_simulation` requires a previously submitted `{NM_MOD_CLASS}` object")
+    )
+  }
+
   # Check .MSF file exists
   msf_path_name <- basename(msf_path)
   if(!fs::file_exists(msf_path)){
-    rlang::abort(glue("Could not find referenced MSF path ({msf_path_name}) at `{msf_path}`"))
-  }
-  # Note: file name must be all caps for now; otherwise it will be git ignored via bbi
-  if(msf_path_name != toupper(msf_path_name)){
-    rlang::abort(
-      c(
-        glue("The msf file (`{msf_path_name}`) must have an upper case extension"),
-        "Otherwise it will be cleaned up after submission"
+    # Note: file extension must be all caps for now; otherwise it will be
+    #  git-ignored by bbi, and therefore not discoverable by bbr
+    # TODO: update the minimum version after the next bbi release
+    #  - for now just increase the min version to be 0.0.1 later
+    if (!test_bbi_version(.min_version = "3.3.1")) {
+      rlang::warn(
+        c(
+          paste(
+            glue("You're using bbi {bbi_version()}. Earlier versions of bbi (<= 3.3.0)"),
+            "removed `.MSF` files with lower case extensions"
+          ),
+          # TODO: add message about upgrading bbi after next bbi release
+          paste(
+            "If this message is relevant, try re-submitting `.mod` for execution",
+            "with an upper-case extension before simulating"
+          ),
+          "e.g., `$EST MSFO=1.msf` --> `$EST MSFO=1.MSF`"
+        )
       )
-    )
+    }
+    rlang::abort(glue("Could not find referenced MSF path ({msf_path_name}) at `{msf_path}`"))
   }
 
   # ensures only one record ($ERROR or $PRED) exists
@@ -384,13 +443,7 @@ check_model_for_sim <- function(.mod, .join_col){
     )
   }
 
-  # Check submission status - this should be done after all control stream inspections
-  # to avoid having to unnecessarily re-run the model with required changes.
-  if(!model_is_finished(.mod)){
-    rlang::abort(
-      glue("`add_simulation` requires a previously submitted `{NM_MOD_CLASS}` object")
-    )
-  }
+
 
   # TODO: other checks:
   # - check that MSFI and SIM weren't already records?

@@ -9,7 +9,9 @@
 \alias{add_new_record}
 \alias{modify_data_path_ctl}
 \alias{modify_prob_statement}
-\title{Modify options and records from a \code{NONMEM} control stream file}
+\alias{get_input_columns}
+\alias{get_table_columns}
+\title{Modify or retrieve options and records from a \code{NONMEM} control stream file}
 \usage{
 safe_read_ctl(.mod)
 
@@ -30,6 +32,10 @@ add_new_record(
 modify_data_path_ctl(.mod, data_path)
 
 modify_prob_statement(.mod, prob_text = NULL)
+
+get_input_columns(.mod)
+
+get_table_columns(.mod)
 }
 \arguments{
 \item{.mod}{a bbr model object}
@@ -54,11 +60,9 @@ index}
 
 \item{prob_text}{If \code{NULL} return the current \verb{$PROBLEM} statement. If a
 character string, set the problem statement to that value.}
-
-\item{display_type}{Logical (T/F). If \code{FALSE}, dont}
 }
 \description{
-Modify options and records from a \code{NONMEM} control stream file
+Modify or retrieve options and records from a \code{NONMEM} control stream file
 }
 \details{
 \itemize{
@@ -98,6 +102,12 @@ control stream file
 
 \item \code{modify_prob_statement()}: Modify or retrieve the \verb{$PROBLEM} statement from
 a \code{NONMEM} control stream file.
+
+\item \code{get_input_columns()}: Retrieve input data column names from the \verb{$INPUT}
+record in a \code{NONMEM} control stream file.
+
+\item \code{get_table_columns()}: Retrieve columns names from \verb{$TABLE} records in a
+\code{NONMEM} control stream file.
 
 }}
 \note{
