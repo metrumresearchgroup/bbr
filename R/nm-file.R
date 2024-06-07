@@ -217,7 +217,10 @@ nm_file_multi_tab <- function(
 
   # If each table is the same number of rows and column names, assume simulation
   # (takes advantage of faster read-in times)
-  nrow_each <- diff(tab_rows) - 2 # for table name and column headers
+  #  - subtract 2 for table name and column headers
+  #  - add `(length(x) + 1)` to get the range of the last table, accounting for
+  #    the table header (minus 1)
+  nrow_each <- diff(c(tab_rows, (length(x) + 1))) - 2
   same_rows <- dplyr::n_distinct(nrow_each) == 1
   same_cols <- dplyr::n_distinct(col_names) == 1
 
