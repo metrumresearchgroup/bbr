@@ -347,7 +347,7 @@ setup_sim_run <- function(
 
   ## Add new $SIMULATION record (must be _after_ $ERROR or $PRED, but before $TABLE) ##
   rep_name <- get_sim_replicate_record(.mod)
-  sim_lines <- glue("({seed}) SUBPROBLEMS={n} TRUE=FINAL")
+  sim_lines <- glue("({seed}) SUBPROBLEMS={n} TRUE=FINAL ONLYSIMULATION")
   add_new_record(.mod, "simulation", lines = sim_lines, after = rep_name)
 
 
