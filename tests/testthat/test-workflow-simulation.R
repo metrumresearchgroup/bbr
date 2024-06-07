@@ -80,7 +80,7 @@ withr::with_options(
     join_cols <- c("NUM", "ID")
     sim_cols <- c("DV", "PRED")
     sim_seed <- 4321
-    sim_n <- 50
+    sim_n <- 30
 
     test_that("new_sim_model made the correct adjustments to control stream", {
       # Make an incomplete simulation model for testing the control stream changes
@@ -124,7 +124,7 @@ withr::with_options(
       sims <- get_records(sim_inc, "sim")
       expect_equal(
         sims[[1]]$format(),
-        as.character(glue("$SIMULATION ({sim_seed}) SUBPROBLEMS={sim_n} TRUE=FINAL\n\n\n"))
+        as.character(glue("$SIMULATION ({sim_seed}) SUBPROBLEMS={sim_n} TRUE=FINAL ONLYSIMULATION\n\n\n"))
       )
 
       # New msfi record
@@ -138,6 +138,8 @@ withr::with_options(
 
     test_that("add_simulation works as expected", {
       expect_false(has_simulation(mod1))
+      expect_error(nm_join_sim(mod1), "No attached simulation found")
+
       add_simulation(
         mod1, n = sim_n, seed = sim_seed,
         .join_col = join_cols, sim_cols = sim_cols,

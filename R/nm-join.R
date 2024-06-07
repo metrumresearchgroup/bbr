@@ -335,19 +335,21 @@ nm_join_sim <- function(
   checkmate::assert_character(.cols_keep)
   checkmate::assert_logical(add_table_names)
 
-  # Support bbi_nonmem_models as well for the following cases:
-  #  - more common: a user passes in the model with the attached simulation
-  #  - less common: in the event the model/simulation was set up manually
+  if(!has_simulation(.mod)){
+    rlang::abort("No attached simulation found")
+  }
+  # Support bbi_nonmem_models as well for when a user passes in the model with
+  # the attached simulation
   check_model_object(.mod, c(NMSIM_MOD_CLASS, NM_MOD_CLASS, NM_SUM_CLASS))
 
-  if(inherits(.mod, NM_SUM_CLASS) && has_simulation(.mod)){
-    .mod <- read_model(sum1[[ABS_MOD_PATH]])
+  if(inherits(.mod, NM_SUM_CLASS)){
+    .mod <- read_model(.mod[[ABS_MOD_PATH]])
   }
 
   # If passing a bbi_nonmem_model with an attached simulation, use the simulation model
   #  - i.e. this function supports passing in the simulation model directly, or
   #    the parent model
-  if(inherits(.mod, NM_MOD_CLASS) && has_simulation(.mod)){
+  if(inherits(.mod, NM_MOD_CLASS)){
     .mod <- get_simulation(.mod)
   }
 
