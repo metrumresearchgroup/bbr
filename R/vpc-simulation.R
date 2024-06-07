@@ -95,8 +95,6 @@ add_simulation <- function(
   sim_args <- list(n = n, seed = seed)
   make_sim_spec(.sim, sim_args, .overwrite = overwrite_mod)
 
-  # Cannot support dry runs since this this function handles model creation as well
-  # (at least not without deleting the model)
   res <- submit_model(
     .sim,
     .bbi_args = .bbi_args,
