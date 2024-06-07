@@ -7,9 +7,6 @@
 #'   model output from a previous run. If `NULL`, the default, will defer to
 #'   setting in `.bbi_args` or `bbi.yaml`. If _not_ `NULL` will override any
 #'   settings in `.bbi_args` or `bbi.yaml`.
-#' @param .wait If `FALSE`, the default, the function will return while bbi
-#'   process runs in the background. If `TRUE`, wait for the bbi process to
-#'   return before this function call returns.
 #' @inheritParams submit_model
 #'
 #' @details
@@ -73,7 +70,7 @@ add_simulation <- function(
     ...,
     .overwrite = NULL,
     .config_path = NULL,
-    .wait = FALSE,
+    .wait = TRUE,
     .dry_run = FALSE
 ){
   check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
@@ -142,7 +139,7 @@ get_simulation <- function(.mod){
     .mod <- read_model(.mod[[ABS_MOD_PATH]])
   }
 
-  sim_spec_path <- get_spec_path(.mod)
+  sim_spec_path <- get_spec_path(.mod, .check_exists = FALSE)
   if(!fs::file_exists(sim_spec_path)){
     rlang::abort(
       c(

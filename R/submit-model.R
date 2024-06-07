@@ -89,6 +89,49 @@ submit_model.bbi_base_model <- function(
   return(res)
 }
 
+#' @describeIn submit_model Takes a `bbi_base_model` object.
+#' @export
+submit_model.bbi_nmsim_model <- function(
+    .mod,
+    .bbi_args = NULL,
+    .mode = getOption("bbr.bbi_exe_mode"),
+    ...,
+    .overwrite = NULL,
+    .config_path = NULL,
+    .wait = TRUE,
+    .dry_run = FALSE
+) {
+
+  # Ensure spec file exists
+  spec_path <- get_spec_path(.mod, .check_exists = FALSE)
+  if(!fs::file_exists(spec_path)){
+    rlang::abort(glue("No simulation specification file was found at {spec_path}"))
+  }
+
+  .config_path <- if (is.null(.config_path)) {
+    # Explicitly pass the default value because it's needed for the
+    # simulations, which happens one level deeper (stored in output directory of parent model).
+    #  - We dont want to use the generated yaml stored in the output directory
+    #    of the parent model, as this may have the option `local {create_child_dirs: false}`
+    #    set, which will cause the submission to fail
+    model_dir <- get_model_working_directory(read_model(get_based_on(.mod)))
+    file.path(model_dir, "bbi.yaml")
+  } else {
+    # Ensure that user-specified values work from the simulation directory.
+    # i.e. the output directory of the parent/based_on model
+    fs::path_abs(.config_path)
+  }
+
+  res <- submit_nonmem_model(.mod,
+                             .bbi_args = .bbi_args,
+                             .mode = .mode,
+                             ...,
+                             .overwrite = .overwrite,
+                             .config_path = .config_path,
+                             .wait = .wait,
+                             .dry_run = .dry_run)
+  return(res)
+}
 
 #' @describeIn submit_model Takes a `bbi_nmboot_model` object.
 #' @param .batch_size Number of models to submit to run concurrently as a
@@ -125,8 +168,7 @@ submit_model.bbi_nmboot_model <- function(
   .config_path <- if (is.null(.config_path)) {
     # Explicitly pass the default value because it's needed for the
     # bootstrap runs, which happen one level deeper.
-    file.path(get_model_working_directory(.mod),
-              "bbi.yaml")
+    file.path(get_model_working_directory(.mod), "bbi.yaml")
   } else {
     # Ensure that user-specified values work from the bootstrap
     # subdirectory.

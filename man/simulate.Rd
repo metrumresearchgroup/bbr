@@ -20,7 +20,7 @@ add_simulation(
   ...,
   .overwrite = NULL,
   .config_path = NULL,
-  .wait = FALSE,
+  .wait = TRUE,
   .dry_run = FALSE
 )
 
@@ -70,9 +70,9 @@ settings in \code{.bbi_args} or \code{bbi.yaml}.}
 default, will attempt to use a \code{bbi.yaml} in the same directory as the
 model.}
 
-\item{.wait}{If \code{FALSE}, the default, the function will return while bbi
-process runs in the background. If \code{TRUE}, wait for the bbi process to
-return before this function call returns.}
+\item{.wait}{If \code{TRUE}, the default, wait for the bbi process to return
+before this function call returns. If \code{FALSE} function will return while
+bbi process runs in the background.}
 
 \item{.dry_run}{Returns an object detailing the command that would be run,
 insted of running it. This is primarily for testing but also a debugging
