@@ -154,10 +154,17 @@ withr::with_options(
       sim <- get_simulation(mod1)
       expect_true(all(check_up_to_date(sim)))
       expect_true(all(check_up_to_date(mod1)))
+
+      # Test with model summary object
+      add_simulation(
+        model_summary(mod1), n = sim_n, seed = sim_seed,
+        .join_col = join_cols, sim_cols = sim_cols,
+        .mode = "local", .wait = TRUE, .overwrite = TRUE
+      )
     })
 
     test_that("add_simulation works with a dataset", {
-      # improper data specification
+      # Improper data specification
       bad_data <- nm_data(mod1) %>% dplyr::rename("BLWT"="WT")
       expect_error(
         add_simulation(
@@ -168,7 +175,7 @@ withr::with_options(
         "The following required input columns were not found"
       )
 
-      # correct data specification
+      # Correct data specification
       add_simulation(
         mod1, n = sim_n, seed = sim_seed, data = nm_data(mod1),
         .join_col = join_cols, sim_cols = sim_cols,
@@ -201,6 +208,12 @@ withr::with_options(
       sim_data <- nm_join_sim(mod1, .join_col = join_cols, .cols_keep = join_cols) %>%
         suppressMessages()
       expect_equal(names(sim_data), c(join_cols, sim_cols, "nn"))
+
+      # Test with model summary object
+      sum1 <- model_summary(mod1)
+      sim_data_sum <- nm_join_sim(sum1, .join_col = join_cols, .cols_keep = join_cols) %>%
+        suppressMessages()
+      expect_true(all.equal(sim_data, sim_data_sum))
     })
 
     test_that("print.bbi_nmsim_model has a custom print method", {

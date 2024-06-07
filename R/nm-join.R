@@ -302,13 +302,13 @@ can_be_nm_joined <- function(.mod){
 #' @inheritParams nm_file_multi_tab
 #'
 #' @note The join column name(s) specified should match what you provided to
-#' [new_sim_model()].
+#' [add_simulation()].
 #'
 #' @template nm-join-col
 #' @template nm-join-col-tables
 #' @template nm-join-col-eg
 #'
-#' @seealso [new_sim_model()], [nm_file_multi_tab()], [nm_tables()]
+#' @seealso [add_simulation()], [nm_file_multi_tab()], [nm_tables()]
 #'
 #' @examples
 #' \dontrun{
@@ -338,7 +338,11 @@ nm_join_sim <- function(
   # Support bbi_nonmem_models as well for the following cases:
   #  - more common: a user passes in the model with the attached simulation
   #  - less common: in the event the model/simulation was set up manually
-  check_model_object(.mod, c(NMSIM_MOD_CLASS, NM_MOD_CLASS))
+  check_model_object(.mod, c(NMSIM_MOD_CLASS, NM_MOD_CLASS, NM_SUM_CLASS))
+
+  if(inherits(.mod, NM_SUM_CLASS) && has_simulation(.mod)){
+    .mod <- read_model(sum1[[ABS_MOD_PATH]])
+  }
 
   # If passing a bbi_nonmem_model with an attached simulation, use the simulation model
   #  - i.e. this function supports passing in the simulation model directly, or

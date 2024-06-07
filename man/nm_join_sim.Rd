@@ -33,7 +33,7 @@ attached simulation.
 }
 \note{
 The join column name(s) specified should match what you provided to
-\code{\link[=new_sim_model]{new_sim_model()}}.
+\code{\link[=add_simulation]{add_simulation()}}.
 }
 \section{Join column}{
 
@@ -97,5 +97,5 @@ nm_join_sim(get_simulation(.mod))
 
 }
 \seealso{
-\code{\link[=new_sim_model]{new_sim_model()}}, \code{\link[=nm_file_multi_tab]{nm_file_multi_tab()}}, \code{\link[=nm_tables]{nm_tables()}}
+\code{\link[=add_simulation]{add_simulation()}}, \code{\link[=nm_file_multi_tab]{nm_file_multi_tab()}}, \code{\link[=nm_tables]{nm_tables()}}
 }

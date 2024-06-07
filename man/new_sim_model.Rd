@@ -77,8 +77,12 @@ the original control stream:
 \item Removes PK and prior records: \verb{$PRIOR}, \verb{$THETA/$THETAP/$THETAPV},
 \verb{$OMEGA/$OMEGAP/$OMEGAPD}, \verb{$SIGMA/$SIGMAP/$SIGMAPD}
 \item Adds a new custom \verb{$SIMULATION} record using user specified values (e.g.
-\code{seed} and \code{n}). \code{TRUE=FINAL} is appended to ensure the final values are
-used rather than the initial estimates.
+\code{seed} and \code{n}).
+\itemize{
+\item \code{TRUE=FINAL} is appended to ensure the final values are used rather
+than the initial estimates.
+\item \code{ONLYSIMULATION} flag is appended to reduce run times.
+}
 \item Adds a new \verb{$TABLE} record tabling out simulated values (\code{sim_cols}) and
 \code{.join_col} column(s)
 \item Adds a new \verb{$MSFI} record (run with \code{NOMSFTEST}) pointing to the \code{MSF}

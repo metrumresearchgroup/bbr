@@ -1,6 +1,9 @@
 
 #' Simulate a `bbi_nonmem_model` object
 #'
+#' Create and submit a new `bbi_nmsim_model` object, which is then attached to
+#' the existing `bbi_nonmem_model` object
+#'
 #' @param .mod A `bbi_nonmem_model` or `bbi_nonmem_summary` object
 #' @inheritParams new_sim_model
 #' @param .overwrite Logical to specify whether or not to overwrite existing
@@ -24,8 +27,10 @@
 #'    - Removes PK and prior records: `$PRIOR`, `$THETA/$THETAP/$THETAPV`,
 #'    `$OMEGA/$OMEGAP/$OMEGAPD`, `$SIGMA/$SIGMAP/$SIGMAPD`
 #'    - Adds a new custom `$SIMULATION` record using user specified values (e.g.
-#'     `seed` and `n`). `TRUE=FINAL` is appended to ensure the final values are
-#'     used rather than the initial estimates.
+#'     `seed` and `n`).
+#'      - `TRUE=FINAL` is appended to ensure the final values are used rather
+#'      than the initial estimates.
+#'      - `ONLYSIMULATION` flag is appended to reduce run times.
 #'    - Adds a new `$TABLE` record tabling out simulated values (`sim_cols`) and
 #'    `.join_col` column(s)
 #'    - Adds a new `$MSFI` record (run with `NOMSFTEST`) pointing to the `MSF`
@@ -189,8 +194,10 @@ get_simulation <- function(.mod){
 #'    - Removes PK and prior records: `$PRIOR`, `$THETA/$THETAP/$THETAPV`,
 #'    `$OMEGA/$OMEGAP/$OMEGAPD`, `$SIGMA/$SIGMAP/$SIGMAPD`
 #'    - Adds a new custom `$SIMULATION` record using user specified values (e.g.
-#'     `seed` and `n`). `TRUE=FINAL` is appended to ensure the final values are
-#'     used rather than the initial estimates.
+#'     `seed` and `n`).
+#'      - `TRUE=FINAL` is appended to ensure the final values are used rather
+#'      than the initial estimates.
+#'      - `ONLYSIMULATION` flag is appended to reduce run times.
 #'    - Adds a new `$TABLE` record tabling out simulated values (`sim_cols`) and
 #'    `.join_col` column(s)
 #'    - Adds a new `$MSFI` record (run with `NOMSFTEST`) pointing to the `MSF`
@@ -237,6 +244,8 @@ new_sim_model <- function(
 ){
   checkmate::assert_numeric(n, lower = 1)
   checkmate::assert_numeric(seed)
+  checkmate::assert_character(sim_cols)
+  checkmate::assert_character(.join_col)
   check_model_object(.mod, NM_MOD_CLASS)
   check_model_for_sim(.mod, .join_col)
 
@@ -269,6 +278,8 @@ new_sim_model <- function(
     if(!all(input_cols %in% names(data))){
       missing_cols <- input_cols[!(input_cols %in% names(data))]
       missing_txt <- paste(missing_cols, collapse = ", ")
+      delete_models(.sim_mod, .tags = "SIMULATION", .force = TRUE) %>%
+        suppressMessages()
       rlang::abort(
         c(
           glue("The following required input columns were not found in the input data: {missing_txt}"),
