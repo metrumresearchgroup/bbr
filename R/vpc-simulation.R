@@ -282,7 +282,7 @@ new_sim_model <- function(
 
     # Save data to output dir of .mod
     data_path_new <- file.path(.sim_dir, "sim-data.csv")
-    readr::write_csv(data, data_path_new)
+    readr::write_csv(data, data_path_new, na = ".")
     verbose_msg(glue("Saving input data to `{data_path_new}`"))
 
     # Update data path in control stream (adjusting for .mod vs .ctl extension)
@@ -344,7 +344,7 @@ setup_sim_run <- function(
 
   ## Add new $SIMULATION record (must be _after_ $ERROR or $PRED, but before $TABLE) ##
   rep_name <- get_sim_replicate_record(.mod)
-  sim_lines <- glue("({seed}) SUBPROBLEMS={n} TRUE=FINAL")
+  sim_lines <- glue("({seed}) SUBPROBLEMS={n} TRUE=FINAL ONLYSIMULATION")
   add_new_record(.mod, "simulation", lines = sim_lines, after = rep_name)
 
 
