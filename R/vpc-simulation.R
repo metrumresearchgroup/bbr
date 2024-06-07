@@ -294,7 +294,6 @@ new_sim_model <- function(
     # Save data to output dir of .mod
     data_path_new <- file.path(.sim_dir, "sim-data.csv")
     readr::write_csv(data, data_path_new, na = ".")
-    verbose_msg(glue("Saving input data to `{data_path_new}`"))
 
     # Update data path in control stream (adjusting for .mod vs .ctl extension)
     data_path_rel <- adjust_data_path_ext(
