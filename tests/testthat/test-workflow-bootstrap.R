@@ -60,7 +60,7 @@ withr::with_options(
       file.path(MODEL_DIR_BBI, "1"),
       .description = "original test-bootstrap model",
       .tags = ORIG_TAGS,
-      .bbi_args = list(threads = 4, parallel = TRUE)
+      .bbi_args = list(parallel = FALSE)
     )
 
     test_that("new_bootstrap_run works as expected", {
