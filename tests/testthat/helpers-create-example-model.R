@@ -62,7 +62,7 @@ modify_data_path_json <- function(mod, data_path){
 
 # Add `MSFO=1.MSF` option to an `EST` record
 add_msf_opt <- function(mod, msf_path = paste0(get_model_id(mod), ".MSF")){
-  ctl <- safe_read_ctl(mod)
+  ctl <- get_model_ctl(mod)
   mod_path <- get_model_path(mod)
   est <- nmrec::select_records(ctl, "est")[[1]]
 

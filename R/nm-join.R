@@ -260,7 +260,7 @@ can_be_nm_joined <- function(.mod){
   is_finished <- model_is_finished(.mod)
 
   # Check for presence of table records
-  ctl <- safe_read_ctl(.mod)
+  ctl <- get_model_ctl(.mod)
   table_recs <- nmrec::select_records(ctl, "table")
   has_tables <- !rlang::is_empty(table_recs)
 

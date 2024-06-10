@@ -2,7 +2,7 @@
 % Please edit documentation in R/modify-records.R
 \name{modify_records}
 \alias{modify_records}
-\alias{safe_read_ctl}
+\alias{get_model_ctl}
 \alias{get_records}
 \alias{mod_has_record}
 \alias{remove_records}
@@ -13,7 +13,7 @@
 \alias{get_table_columns}
 \title{Modify or retrieve options and records from a \code{NONMEM} control stream file}
 \usage{
-safe_read_ctl(.mod)
+get_model_ctl(.mod)
 
 get_records(.mod, type, get_lines = FALSE)
 
@@ -71,7 +71,7 @@ Modify or retrieve options and records from a \code{NONMEM} control stream file
 }
 \details{
 \itemize{
-\item \strong{\code{safe_read_ctl()}} is called internally within the other functions, though
+\item \strong{\code{get_model_ctl()}} is called internally within the other functions, though
 it can also be used outside of that context.
 \item \strong{\code{modify_prob_statement()}}, \strong{\code{modify_data_path_ctl()}},
 \strong{\code{remove_records()}}, and \strong{\code{add_new_record()}} read in the control stream,
@@ -92,7 +92,7 @@ from a \code{NONMEM} control stream file, or determined from reading in the
 }
 \section{Functions}{
 \itemize{
-\item \code{safe_read_ctl()}: Safely read in a \code{NONMEM} control stream file via
+\item \code{get_model_ctl()}: Safely read in a \code{NONMEM} control stream file via
 \code{nmrec}
 
 \item \code{get_records()}: Pull all records of a given record type from a

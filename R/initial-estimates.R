@@ -94,7 +94,7 @@ get_initial_est <- function(.mod, flag_fixed = FALSE){
   check_model_object(.mod, c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))
 
 
-  ctl <- safe_read_ctl(.mod)
+  ctl <- get_model_ctl(.mod)
 
   if (isTRUE(using_old_priors(ctl))) {
     rlang::warn(

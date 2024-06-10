@@ -746,7 +746,7 @@ get_sim_spec <- function(.mod){
 #' @returns absolute file path to `MSF` file, or `NULL` if one doesnt exist.
 #' @keywords internal
 get_msf_path <- function(.mod, .check_exists = TRUE){
-  ctl <- safe_read_ctl(.mod)
+  ctl <- get_model_ctl(.mod)
   ests <- nmrec::select_records(ctl, "est")
 
   msf_path <- purrr::map(ests, function(est){

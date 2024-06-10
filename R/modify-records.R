@@ -3,7 +3,7 @@
 #' @name modify_records
 #'
 #' @details
-#'  - **`safe_read_ctl()`** is called internally within the other functions, though
+#'  - **`get_model_ctl()`** is called internally within the other functions, though
 #'  it can also be used outside of that context.
 #'  - **`modify_prob_statement()`**, **`modify_data_path_ctl()`**,
 #'    **`remove_records()`**, and **`add_new_record()`** read in the control stream,
@@ -24,15 +24,10 @@ NULL
 #' @describeIn modify_records Safely read in a `NONMEM` control stream file via
 #' `nmrec`
 #' @keywords internal
-safe_read_ctl <- function(.mod){
+get_model_ctl <- function(.mod){
   check_model_object(.mod, c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMSIM_MOD_CLASS))
   mod_path <- get_model_path(.mod)
-  ctl <- tryCatch(nmrec::read_ctl(mod_path), error = identity)
-  if(inherits(ctl, "error")){
-    warning(
-      glue::glue("Could not read control stream file. Reason: {ctl$message}")
-    )
-  }
+  ctl <- nmrec::read_ctl(mod_path)
   return(ctl)
 }
 
@@ -44,7 +39,7 @@ safe_read_ctl <- function(.mod){
 #' @keywords internal
 get_records <- function(.mod, type, get_lines = FALSE){
   assert_record_type(.mod, type)
-  ctl <- safe_read_ctl(.mod)
+  ctl <- get_model_ctl(.mod)
   recs <- nmrec::select_records(ctl, type)
   if(rlang::is_empty(recs)){
     return(NULL)
@@ -63,7 +58,7 @@ get_records <- function(.mod, type, get_lines = FALSE){
 #' @keywords internal
 mod_has_record <- function(.mod, type){
   assert_record_type(.mod, type)
-  ctl <- safe_read_ctl(.mod)
+  ctl <- get_model_ctl(.mod)
   recs <- nmrec::select_records(ctl, type)
   has_rec <- !rlang::is_empty(recs)
 
@@ -86,7 +81,7 @@ mod_has_record <- function(.mod, type){
 #' @keywords internal
 remove_records <- function(.mod, type){
   if(mod_has_record(.mod, type)){
-    ctl <- safe_read_ctl(.mod)
+    ctl <- get_model_ctl(.mod)
     type_name <- get_records(.mod, type)[[1]]$name
     rec_indices <- seq_along(ctl$records)
     indices_remove <- purrr::keep(rec_indices, function(index){
@@ -134,7 +129,7 @@ add_new_record <- function(
     rec_name <- paste0(stringr::str_trim(rec_name), " ")
   }
 
-  ctl <- safe_read_ctl(.mod)
+  ctl <- get_model_ctl(.mod)
 
   # Define new record
   if(!is.null(lines)){
@@ -179,7 +174,7 @@ add_new_record <- function(
 #'
 #' @keywords internal
 modify_data_path_ctl <- function(.mod, data_path){
-  ctl <- safe_read_ctl(.mod)
+  ctl <- get_model_ctl(.mod)
 
   # Get data record
   data_rec <- nmrec::select_records(ctl, "data")[[1]]
@@ -208,7 +203,7 @@ modify_data_path_ctl <- function(.mod, data_path){
 #' @keywords internal
 modify_prob_statement <- function(.mod, prob_text = NULL){
   mod_path <- get_model_path(.mod)
-  ctl <- safe_read_ctl(.mod)
+  ctl <- get_model_ctl(.mod)
 
   prob_recs <- nmrec::select_records(ctl, "prob")
   if (length(prob_recs) != 1) {
@@ -310,7 +305,7 @@ get_table_columns <- function(.mod, from_data = TRUE){
 #' @noRd
 assert_record_type <- function(.mod, type){
   checkmate::assert_character(type)
-  ctl <- safe_read_ctl(.mod)
+  ctl <- get_model_ctl(.mod)
   recs <- tryCatch(
     nmrec::select_records(ctl, type),
     error = function(cond) return(cond)
