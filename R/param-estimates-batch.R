@@ -110,51 +110,117 @@ param_estimates_batch <- function(.path,
 
 #' Compare parameter estimates
 #'
-#' Summarizes the parameter estimates from tibble like what's returned from
-#' [param_estimates_batch()], showing you the quantiles passed to `probs`,
-#' likely interpreted as confidence intervals for your parameter estimates.
-#' Optionally takes an "original model" to compare these quantiles against.
-#' Originally conceived for comparing a model to multiple runs of the "same"
-#' model, for example in a bootstrap or simulation.
+#' Summarizes each parameter estimate, showing you the quantiles passed to
+#' `probs`, and optionally the estimates of `.orig_mod`.
 #'
-#' @return A tibble with the first column containing the parameter names (that
-#'   were column names in `.param_df`), the second column optionally containing
-#'   original parameter estimates (if `.orig_mod` is passed), and subsequent
-#'   columns containing the quantiles specified in `probs`. You can think of
-#'   this as essentially `.param_df`, summarized by quantiles across all rows,
-#'   and then pivoted.
-#'
-#'
-#' @param .param_df A tibble with columns for each parameter and rows for each
-#'   model (like what's returned from [param_estimates_batch()])
-#' @param .orig_mod `bbi_model` object to compare `.param_df` against. If
-#'   `NULL`, the default, only returns quantiles from `.param_df`. If passed,
-#'   will display an additional `original_estimate` column.
+#' @param .boot_sum Either a `bbi_nmboot_summary` object, or a tibble with
+#'   columns for each parameter and rows for each model (like what's returned
+#'   from [param_estimates_batch()]).
+#' @param .orig_mod `bbi_model` object to compare `.boot_sum` against. This will
+#'   be automatically set if passing in a `bbi_nmboot_summary` object.
 #' @param .compare_cols An expression that can be passed to [dplyr::select()] to
-#'   select which columns in `.param_df` will be pivoted and summarized.
-#'   Defaults to `dplyr::starts_with(c("THETA", "SIGMA", "OMEGA"))` (designed
-#'   for NONMEM runs), but consider using [dplyr::matches()] to select columns
-#'   using regex. Also see
+#'   select which columns in `.boot_sum` will be pivoted and summarized. See
 #'   [?tidyselect::language](https://tidyselect.r-lib.org/reference/language.html)
-#'    for more details and options.
+#'    for more details and options. **Only used** if `.boot_sum` is a tibble.
 #' @param probs Numeric vector with values between 0 and 1 to be passed through to
 #'   [stats::quantile()]. Represents the quantiles to calculate for parameter
-#'   estimates in `.param_df`.
+#'   estimates in `.boot_sum`.
 #' @param na.rm Logical scalar, passed through to [stats::quantile()].
 #'
 #' @importFrom tibble rownames_to_column
 #' @importFrom dplyr summarise across starts_with select rename left_join
 #' @importFrom stats quantile
+#'
+#' @return A tibble containing quantiles for each parameter estimate, optionally
+#' compared to the estimates from `.orig_mod`.
+#' @seealso summarize_bootstrap_run
+#' @examples
+#' \dontrun{
+#'
+#' # Via a bootstrap run
+#' boot_run <- read_model(file.path(MODEL_DIR, "1-boot"))
+#' boot_sum <- summarize_bootstrap_run(boot_run)
+#' param_estimates_compare(boot_sum)
+#'
+#' # Via a custom table
+#' orig_mod <- read_model(file.path(MODEL_DIR, "1"))
+#' param_df <- param_estimates_batch(MODEL_DIR)
+#' param_estimates_compare(param_df, .orig_mod = orig_mod)
+#' }
+#'
 #' @export
 param_estimates_compare <- function(
-  .param_df,
-  .orig_mod = NULL,
-  .compare_cols = starts_with(c("THETA", "SIGMA", "OMEGA")),
-  probs = c(.5, 0.025, 0.975),
-  na.rm = FALSE
-) {
+    .boot_sum,
+    .orig_mod = NULL,
+    .compare_cols = starts_with(c("THETA", "SIGMA", "OMEGA")),
+    probs = c(.5, 0.025, 0.975),
+    na.rm = FALSE
+){
+  UseMethod("param_estimates_compare")
+}
 
-  comp_df <- .param_df %>%
+#' @rdname param_estimates_compare
+#' @export
+param_estimates_compare.bbi_nmboot_summary <- function(
+    .boot_sum,
+    .orig_mod = NULL,
+    .compare_cols = NULL,
+    probs = c(.5, 0.025, 0.975),
+    na.rm = FALSE
+){
+
+  # Attempt to read in based_on model
+  if(is.null(.orig_mod)){
+    orig_mod_path <- fs::path_ext_remove(.boot_sum$based_on_model_path)
+    # make sure based_on model still exists
+    .orig_mod <- tryCatch(
+      read_model(orig_mod_path),
+      error = function(cond) NULL
+    )
+    if(!is.null(.orig_mod)){
+      orig_config_path <- file.path(
+        get_output_dir(.orig_mod, .check_exists = FALSE), "bbi_config.json"
+      )
+      if (fs::file_exists(orig_config_path)) {
+        res <- check_up_to_date(.orig_mod)
+        if(any(res[!res])){
+          rlang::warn("The original model is not up to date")
+        }
+      }else{
+        # Set the original model to NULL if the run directory/config file didn't
+        # exist
+        rlang::warn("The original model has not been run yet. Cannot compare estimates.")
+        .orig_mod <- NULL
+      }
+    }else{
+      rlang::warn(
+        c(
+          glue("The original model no longer exists at {orig_mod_path}"),
+          "Cannot compare to original model"
+        )
+      )
+    }
+  }
+
+  # Dont pass .compare_cols here, as we can only use columns in parameter_names,
+  # which could only be the default columns.
+  param_estimates_compare(
+    .boot_sum$boot_summary, .orig_mod = .orig_mod, probs = probs, na.rm = na.rm
+  )
+}
+
+
+#' @rdname param_estimates_compare
+#' @export
+param_estimates_compare.default <- function(
+    .boot_sum,
+    .orig_mod = NULL,
+    .compare_cols = starts_with(c("THETA", "SIGMA", "OMEGA")),
+    probs = c(.5, 0.025, 0.975),
+    na.rm = FALSE
+){
+  checkmate::assert_true(inherits(.boot_sum, "data.frame"))
+  comp_df <- .boot_sum %>%
     select({{ .compare_cols }})
 
   if (!is.null(.orig_mod)) {
@@ -173,8 +239,8 @@ param_estimates_compare <- function(
     )
     if (!.same) {
       stop(paste(
-        glue("The models passed to `.param_df` and `.orig_mod` do not have the same parameters."),
-        glue("  `.param_df` parameter names: {paste(n2, collapse = ', ')}"),
+        glue("The models passed to `.boot_sum` and `.orig_mod` do not have the same parameters."),
+        glue("  `.boot_sum` parameter names: {paste(n2, collapse = ', ')}"),
         glue("  `.orig_mod` parameter names: {paste(n1, collapse = ', ')}"),
         sep = "\n"
       ))
@@ -191,14 +257,14 @@ param_estimates_compare <- function(
     reframe(across(.cols = everything(), .fns = quantile_fn)) %>%
     t() %>%
     as.data.frame() %>%
-    rownames_to_column()
-  colnames(comp_df) <- c("parameter_names", paste0(probs * 100, "%"))
+    rownames_to_column() %>% tibble::as_tibble()
+  colnames(comp_df) <- c("parameter_names", paste0("p", probs * 100))
 
   # join quantiles to original
   if (!is.null(.orig_mod)) {
     comp_df <- mod_df %>%
       select("parameter_names", "estimate") %>%
-      rename(original_estimate = "estimate") %>%
+      rename(original = "estimate") %>%
       left_join(comp_df, by = "parameter_names")
   }
 

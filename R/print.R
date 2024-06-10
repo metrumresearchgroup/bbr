@@ -185,7 +185,7 @@ print.bbi_model <- function(x, ...) {
 }
 
 
-#' @describeIn print_bbi Prints a high level summary of a model from a bbi_nonmem_summary object
+#' @describeIn print_bbi Prints a high level summary of a model from a `bbi_nonmem_summary` object
 #' @importFrom purrr map_chr
 #' @importFrom cli cat_line
 #' @importFrom dplyr mutate_if
@@ -194,7 +194,7 @@ print.bbi_model <- function(x, ...) {
 #' @param .digits Number of significant digits to use for parameter table. Defaults to 3.
 #' @param .fixed If `FALSE`, the default, omits fixed parameters from the parameter table.
 #' @param .off_diag If `FALSE`, the default, omits off-diagonals of OMEGA and SIGMA matrices from the parameter table.
-#' @param .nrow If `NULL`, the default, print all rows of the parameter table.
+#' @param .nrow If `NULL`, the default, print all rows of the parameter table. If `0`, don't print table at all.
 #'   Otherwise, prints only `.nrow` rows.
 #' @export
 print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag = FALSE, .nrow = NULL, ...) {
@@ -277,13 +277,122 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
       capture.output()
   }
 
-  cat_line(param_str)
-  if (!is.null(.nrow)) cat_line(glue("... {orig_rows - .nrow} more rows"), col = "grey")
+  if (is.null(.nrow) || .nrow != 0) {
+    cat_line(param_str)
+    if (!is.null(.nrow)) cat_line(glue("... {orig_rows - .nrow} more rows"), col = "grey")
+  }
+
+}
+
+
+#' @describeIn print_bbi Prints a high level summary of a model from a `bbi_nmboot_summary` object
+#' @importFrom purrr map_chr
+#' @importFrom cli cat_line
+#' @importFrom dplyr mutate_if
+#' @importFrom checkmate assert_number
+#'
+#' @export
+print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
+
+  # print top line info
+  .d <- x[[SUMMARY_DETAILS]]
+  cli_h1("Based on")
+  cat_line(paste("Model:", col_blue(x$based_on_model_path)))
+  cat_line(paste("Dataset:", col_blue(x$based_on_data_set)))
+
+  # Run specifications (seed, stratification columns, cleaned_up)
+  cli_h1("Run Specifications")
+
+  strat_cols <- if(is.null(x$strat_cols)) "None" else paste(x$strat_cols, collapse = ", ")
+  names(strat_cols) <- "Stratification Columns"
+
+  seed <- if(is.null(x$seed)) "None" else x$seed
+  names(seed) <- "Seed"
+
+  run_specs <- c(strat_cols, seed)
+  iwalk(run_specs, ~ cat_bullet(paste0(.y, ": ", col_blue(.x))))
+
+  # Add bullet if cleaned up
+  if(isTRUE(bootstrap_is_cleaned_up(x))){
+    cli::cat_bullet(paste("Cleaned up:", col_green(TRUE)))
+  }
+
+  # Bootstrap run summary (n_samples, any heuristics)
+  cli_h1("Bootstrap Run Summary")
+
+  # TODO: confirm this is appropriate for only_sim (unsure where this comes from)
+  only_sim <- isTRUE("only_sim" %in% names(.d))
+  if (only_sim) {
+    cat_line("No Estimation Methods (ONLYSIM)\n")
+  } else {
+    cli::cat_line("Estimation Method(s):\n")
+    purrr::walk(paste(x$estimation_method, "\n"), cli::cat_bullet, bullet = "en_dash")
+  }
+
+  cli::cat_line("Run Status:\n")
+  n_samples <- c("Number of runs" = x$n_samples)
+  cli::cat_bullet(paste("Number of runs:", col_blue(x$n_samples)), bullet = "en_dash")
+
+  # check heuristics
+  .h <- x[[SUMMARY_HEURISTICS]]
+  heuristics_cols <- names(.h)[!grepl(ABS_MOD_PATH, names(.h))]
+  heuristics <- purrr::map_dfr(heuristics_cols, function(col){
+    tibble(heuristic = col, any_found = any(.h[[col]]), n_found = sum(.h[[col]]))
+  })
+
+  if (any(heuristics$any_found)) {
+    heuristics_found <- heuristics$heuristic[which(heuristics$any_found)]
+    heuristics_n <- heuristics$n_found[which(heuristics$any_found)]
+    heuristics_perc <- round((heuristics_n/n_samples) * 100, 2)
+    purrr::walk(
+      paste0(heuristics_found, ": ", col_red(heuristics_n)," (", col_red(heuristics_perc), " %)"),
+      cli::cat_bullet, bullet = "en_dash"
+    )
+    cat("\n")
+  } else {
+    cat_line("\n")
+  }
+
+  if (only_sim) {
+    return(invisible(NULL))
+  }
+
+
+  # Build parameter comparison table if it exists
+  # To avoid printing issues before the comparison is added to the summary object
+  # see summarize_bootstrap_run() for details.
+  if(!is.null(x$boot_compare)){
+    param_df <- x$boot_compare %>% mutate_if(is.numeric, sig, .digits = .digits)
+
+    if (!is.null(.nrow)) {
+      checkmate::assert_number(.nrow)
+      orig_rows <- nrow(param_df)
+      .nrow <- min(.nrow, nrow(param_df))
+      param_df <- param_df[1:.nrow, ]
+    }
+
+    if (requireNamespace("knitr", quietly = TRUE)) {
+      param_str <- param_df %>%
+        knitr::kable() %>%
+        as.character()
+    } else {
+      param_str <- param_df %>%
+        print() %>%
+        capture.output()
+    }
+
+    cat_line(param_str)
+    if (!is.null(.nrow)) cat_line(glue("... {orig_rows - .nrow} more rows"), col = "grey")
+  }
+
+
 }
 
 #####################
 # INTERNAL HELPERS
 #####################
+
+
 
 #' Format digits
 #'

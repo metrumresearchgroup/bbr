@@ -2,12 +2,12 @@
 % Please edit documentation in R/model-diff.R
 \name{model_diff}
 \alias{model_diff}
-\alias{model_diff.bbi_nonmem_model}
+\alias{model_diff.default}
 \title{Compare model files between models}
 \usage{
 model_diff(.mod, .mod2 = NULL, .file = "model", ..., .viewer = FALSE)
 
-\method{model_diff}{bbi_nonmem_model}(.mod, .mod2 = NULL, .file = c("model"), ..., .viewer = FALSE)
+\method{model_diff}{default}(.mod, .mod2 = NULL, .file = c("model"), ..., .viewer = FALSE)
 }
 \arguments{
 \item{.mod}{The \verb{bbi_\{.model_type\}_model} to compare.}

@@ -75,63 +75,6 @@ trigger:
 ---
 kind: pipeline
 type: docker
-name: oldest
-
-platform:
-  os: linux
-  arch: amd64
-
-steps:
-- name: pull
-  image: omerxx/drone-ecr-auth
-  commands:
-  - $(aws ecr get-login --no-include-email --region us-east-1)
-  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:2020-06-08
-  volumes:
-  - name: docker.sock
-    path: /var/run/docker.sock
-
-- name: Install bbi
-  pull: never
-  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:2020-06-08
-  commands:
-  - chmod +x install_bbi.sh
-  - ./install_bbi.sh -p /ephemeral/bbi -v 'v3.0.2'
-  volumes:
-  - name: cache
-    path: /ephemeral
-
-- name: "Check package: R 4.0"
-  pull: never
-  image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/r-dev-ci-mpn-4.0:2020-06-08
-  commands:
-  - R -s -e 'devtools::install_deps(upgrade = '"'"'never'"'"')'
-  # nmrec isn't available until the 2023-09-19 snapshot.
-  - git clone --branch 0.4.0 --depth 1 https://github.com/metrumresearchgroup/nmrec.git /tmp/nmrec
-  - R -s -e 'devtools::install("/tmp/nmrec", upgrade = "never")'
-  - R -s -e 'devtools::check(env_vars = c("BBI_EXE_PATH" = "/ephemeral/bbi", "NOT_CRAN" = "true"))'
-  environment:
-    BBI_EXE_PATH: /ephemeral/bbi
-    NOT_CRAN: true
-  volumes:
-  - name: cache
-    path: /ephemeral
-
-volumes:
-- name: docker.sock
-  host:
-    path: /var/run/docker.sock
-- name: cache
-  temp: {}
-
-trigger:
-  event:
-    exclude:
-    - promote
-
----
-kind: pipeline
-type: docker
 name: cran-latest
 
 platform:
@@ -307,6 +250,7 @@ steps:
   # clone nmrec from main branch for building package
   - git clone --depth 1 https://github.com/metrumresearchgroup/nmrec.git /tmp/nmrec
   - R -s -e 'devtools::install("/tmp/nmrec", upgrade = "never")'
+  - R -s -e 'devtools::install_deps(upgrade = "never")'
   - R -s -e 'pkgpub::create_tagged_repo(.dir = '"'"'/ephemeral'"'"')'
   environment:
     BBI_EXE_PATH: /ephemeral/bbi
@@ -352,5 +296,4 @@ trigger:
 
 depends_on:
 - mpn:latest
-- oldest
 - cran-latest

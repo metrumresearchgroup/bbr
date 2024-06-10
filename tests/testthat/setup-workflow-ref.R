@@ -378,3 +378,18 @@ copy_to_batch_params <- function(orig_model_path, new_name) {
     file.path(new_dir, paste0(new_name, ".ext"))
   )
 }
+
+with_bg_env <- function(code){
+  Sys.setenv("BBR_DEV_LOAD_PATH" = "")
+  # Dont run if inside an R CMD Check environment (package is installed)
+  if(!testthat::is_checking()){
+    Sys.setenv("BBR_DEV_LOAD_PATH" = rprojroot::find_rstudio_root_file())
+    on.exit(Sys.setenv("BBR_DEV_LOAD_PATH" = ""))
+  }
+
+  result <- eval(code)
+  return(result)
+}
+
+# Make sure it's not set when tests are run by default
+Sys.setenv("BBR_DEV_LOAD_PATH" = "")

@@ -3,6 +3,7 @@
 \name{submit_model}
 \alias{submit_model}
 \alias{submit_model.bbi_nonmem_model}
+\alias{submit_model.bbi_nmboot_model}
 \title{Submit a model to be run}
 \usage{
 submit_model(
@@ -26,6 +27,18 @@ submit_model(
   .wait = TRUE,
   .dry_run = FALSE
 )
+
+\method{submit_model}{bbi_nmboot_model}(
+  .mod,
+  .bbi_args = NULL,
+  .mode = "sge",
+  ...,
+  .overwrite = FALSE,
+  .config_path = NULL,
+  .wait = FALSE,
+  .dry_run = FALSE,
+  .batch_size = 100
+)
 }
 \arguments{
 \item{.mod}{The model object to submit.}
@@ -44,7 +57,11 @@ or set globally with \code{options("bbr.bbi_exe_mode")}.}
 \item{.overwrite}{Logical to specify whether or not to overwrite existing
 model output from a previous run. If \code{NULL}, the default, will defer to
 setting in \code{.bbi_args} or \code{bbi.yaml}. If \emph{not} \code{NULL} will override any
-settings in \code{.bbi_args} or \code{bbi.yaml}.}
+settings in \code{.bbi_args} or \code{bbi.yaml}. \strong{The exception to this are
+bootstrap runs (\code{bbi_nmboot_model} objects).} For bootstrap runs, this
+defaults to \code{FALSE} and does \emph{not} respect any setting passed via
+\code{.bbi_args} or a \code{bbi.yaml} config file. To overwrite existing bootstrap
+output, a user must pass \code{TRUE} through this argument.}
 
 \item{.config_path}{Path to a bbi configuration file. If \code{NULL}, the
 default, will attempt to use a \code{bbi.yaml} in the same directory as the
@@ -57,6 +74,13 @@ bbi process runs in the background.}
 \item{.dry_run}{Returns an object detailing the command that would be run,
 insted of running it. This is primarily for testing but also a debugging
 tool.}
+
+\item{.batch_size}{Number of models to submit to run concurrently as a
+"batch." Passing \code{NULL} (or a number larger than the number of submitted
+models) will bypass this and submit all models concurrently. This will
+launch a background process to manage the batch submission. Details from
+this process are logged in the \code{OUTPUT} file in top-level bootstrap model
+directory.}
 }
 \value{
 While \code{submit_model()} \emph{does} return something, it is primarily
@@ -80,6 +104,8 @@ Submits a model to be run by calling out to \code{bbi}.
 \section{Methods (by class)}{
 \itemize{
 \item \code{submit_model(bbi_nonmem_model)}: Takes a \code{bbi_nonmem_model} object.
+
+\item \code{submit_model(bbi_nmboot_model)}: Takes a \code{bbi_nmboot_model} object.
 
 }}
 \section{Notes on \code{NONMEM} model extensions}{

@@ -5,6 +5,7 @@
 \alias{print.bbi_process}
 \alias{print.bbi_model}
 \alias{print.bbi_nonmem_summary}
+\alias{print.bbi_nmboot_summary}
 \title{Print methods for bbr objects}
 \usage{
 \method{print}{bbi_process}(x, ..., .call_limit = 250)
@@ -12,6 +13,8 @@
 \method{print}{bbi_model}(x, ...)
 
 \method{print}{bbi_nonmem_summary}(x, .digits = 3, .fixed = FALSE, .off_diag = FALSE, .nrow = NULL, ...)
+
+\method{print}{bbi_nmboot_summary}(x, .digits = 3, .nrow = 10, ...)
 }
 \arguments{
 \item{x}{Object to format or print.}
@@ -29,7 +32,7 @@ long option will be truncated.}
 
 \item{.off_diag}{If \code{FALSE}, the default, omits off-diagonals of OMEGA and SIGMA matrices from the parameter table.}
 
-\item{.nrow}{If \code{NULL}, the default, print all rows of the parameter table.
+\item{.nrow}{If \code{NULL}, the default, print all rows of the parameter table. If \code{0}, don't print table at all.
 Otherwise, prints only \code{.nrow} rows.}
 }
 \description{
@@ -45,6 +48,8 @@ will make for prettier formatting, especially of table outputs.
 
 \item \code{print(bbi_model)}: Prints the information contained in the model object and whether the model has been run
 
-\item \code{print(bbi_nonmem_summary)}: Prints a high level summary of a model from a bbi_nonmem_summary object
+\item \code{print(bbi_nonmem_summary)}: Prints a high level summary of a model from a \code{bbi_nonmem_summary} object
+
+\item \code{print(bbi_nmboot_summary)}: Prints a high level summary of a model from a \code{bbi_nmboot_summary} object
 
 }}

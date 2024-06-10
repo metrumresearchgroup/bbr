@@ -1,7 +1,7 @@
 Type: Package
 Package: bbr
 Title: R package for bbi
-Version: 1.10.0
+Version: 1.10.0.8007
 Authors@R: 
     c(person(given = "Seth",
              family = "Green",
@@ -52,6 +52,7 @@ BugReports: https://github.com/metrumresearchgroup/bbr/issues
 Depends:
     R (>= 3.5)
 Imports: 
+    callr,
     checkmate,
     cli,
     data.table,
@@ -64,12 +65,14 @@ Imports:
     lifecycle,
     magrittr,
     Matrix,
+    mrgmisc,
     nmrec,
     processx,
     purrr,
     readr,
     rlang,
     stringr,
+    stringi,
     tibble,
     tidyr,
     tidyselect (>= 1.0.0),
@@ -82,6 +85,7 @@ Suggests:
     ggplot2,
     knitr,
     rmarkdown,
+    rprojroot,
     testthat (>= 2.1.0),
     withr,
     mrgvalidate,
