@@ -18,10 +18,18 @@
 #'   of the input data and all table files respectively. They can either be parsed
 #'   from a `NONMEM` control stream file, or determined from reading in the
 #'   `csvs`/table files. See `from_data` argument for more details.
+#'
+#' @seealso assert_record_type
+#' @note
+#' Run the following command to see what record types are available/supported by
+#' `nmrec`:
+#'  ```
+#'  `ls(nmrec:::record_names)`
+#'  ```
 NULL
 
 
-#' @describeIn modify_records Safely read in a `NONMEM` control stream file via
+#' @describeIn modify_records Read in a `NONMEM` control stream file, parsed via
 #' `nmrec`
 #' @keywords internal
 get_model_ctl <- function(.mod){
@@ -70,14 +78,6 @@ mod_has_record <- function(.mod, type){
 #'  control stream file
 #' @param type record type. This may be spelled any way that's accepted in a
 #'  `NONMEM` control stream.
-#'
-#' @note
-#' Run the following command To see what record types are available/supported by
-#' `nmrec`:
-#'  ```
-#'  `ls(nmrec:::record_names)`
-#'  ```
-#'
 #' @keywords internal
 remove_records <- function(.mod, type){
   if(mod_has_record(.mod, type)){
@@ -168,9 +168,7 @@ add_new_record <- function(
 
 #' @describeIn modify_records Modify the specified data path in a `NONMEM`
 #' control stream file
-#'
 #' @param data_path Data path to set in a `$DATA` record.
-#'
 #' @keywords internal
 modify_data_path_ctl <- function(.mod, data_path){
   ctl <- get_model_ctl(.mod)
@@ -204,7 +202,6 @@ modify_data_path_ctl <- function(.mod, data_path){
 
 #' @describeIn modify_records Modify or retrieve the `$PROBLEM` statement from
 #' a `NONMEM` control stream file.
-#'
 #' @param prob_text If `NULL` return the current `$PROBLEM` statement. If a
 #'  character string, set the problem statement to that value.
 #' @keywords internal
@@ -307,12 +304,22 @@ get_table_columns <- function(.mod, from_data = TRUE){
 
 #' Helper for checking if a specified record type is valid.
 #'
+#' Checks if the specified record type is valid. Note that this does _not_ check
+#' if the record is present in the control stream, just whether `nmrec` recognizes
+#' the spelling.
+#'
 #' @inheritParams remove_records
 #' @details
 #' This function is basically meant to ensure that `type` is an available
 #' record name within `ls(nmrec:::record_names)`. This function should search
 #' there (and no longer require a model object) if those names become exported.
-#' @noRd
+#'
+#' Run the following command to see what record types are available/supported by
+#' `nmrec`:
+#'  ```
+#'  `ls(nmrec:::record_names)`
+#'  ```
+#' @keywords internal
 assert_record_type <- function(.mod, type){
   checkmate::assert_character(type)
   ctl <- get_model_ctl(.mod)

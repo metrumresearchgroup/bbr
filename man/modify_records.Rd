@@ -92,7 +92,7 @@ from a \code{NONMEM} control stream file, or determined from reading in the
 }
 \section{Functions}{
 \itemize{
-\item \code{get_model_ctl()}: Safely read in a \code{NONMEM} control stream file via
+\item \code{get_model_ctl()}: Read in a \code{NONMEM} control stream file, parsed via
 \code{nmrec}
 
 \item \code{get_records()}: Pull all records of a given record type from a
@@ -120,10 +120,13 @@ record(s) in a \code{NONMEM} control stream file or the tabled out files
 
 }}
 \note{
-Run the following command To see what record types are available/supported by
+Run the following command to see what record types are available/supported by
 \code{nmrec}:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{`ls(nmrec:::record_names)`
 }\if{html}{\out{</div>}}
+}
+\seealso{
+assert_record_type
 }
 \keyword{internal}
