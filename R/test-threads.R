@@ -59,7 +59,7 @@ test_threads <- function(
     ...
 ) {
 
-  check_model_object(.mod)
+  check_model_object(.mod, NM_MOD_CLASS)
   assert_list(.bbi_args)
 
   # Duplicate model for each thread scenario
