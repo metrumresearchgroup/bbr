@@ -236,8 +236,10 @@ modify_prob_statement <- function(.mod, prob_text = NULL){
     prob_str_return <- prob_str$value
   }
 
-  # write control stream and return problem statement
-  nmrec::write_ctl(ctl, mod_path)
+  # Write control stream and return problem statement
+  if(!is.null(prob_text)){
+    nmrec::write_ctl(ctl, mod_path)
+  }
   return(prob_str_return)
 }
 
