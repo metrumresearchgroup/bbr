@@ -117,6 +117,23 @@ describe("Modify record helpers", {
       modify_prob_statement(mod2, prob_text = NULL),
       new_prob
     )
+
+    ## $PROB statement was originally empty ##
+    # Set to NULL prob statement first
+    ctl <- get_model_ctl(mod2)
+    prob_recs <- nmrec::select_records(ctl, "prob")
+    prob_recs[[1]]$parse()
+    prob_recs[[1]]$values[[3]] <- NULL # remove statement
+    prob_recs[[1]]$values[[2]] <- NULL # remove whitespace class
+    nmrec::write_ctl(ctl, get_model_path(mod2))
+
+    # Test that it can be overwritten still
+    new_prob <- "prob statement from empty"
+    modify_prob_statement(mod2, new_prob)
+    expect_equal(
+      modify_prob_statement(mod2, prob_text = NULL),
+      new_prob
+    )
   })
 
   it("get_input_columns works", {

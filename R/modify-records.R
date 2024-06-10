@@ -202,6 +202,7 @@ modify_data_path_ctl <- function(.mod, data_path){
 #'  character string, set the problem statement to that value.
 #' @keywords internal
 modify_prob_statement <- function(.mod, prob_text = NULL){
+  checkmate::assert_character(prob_text, len = 1, null.ok = TRUE)
   mod_path <- get_model_path(.mod)
   ctl <- get_model_ctl(.mod)
 
@@ -224,7 +225,7 @@ modify_prob_statement <- function(.mod, prob_text = NULL){
     }
     if(!is.null(prob_text)){
       prob_rec$values <- append(prob_rec$values, paste0(" ", prob_text), idx)
-      prob_str_return <- prob_rec$values[[idx + 1]]$format()
+      prob_str_return <- prob_text
     }else{
       prob_str_return <- prob_rec$values[[idx]]$format()
     }
