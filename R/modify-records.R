@@ -177,16 +177,24 @@ modify_data_path_ctl <- function(.mod, data_path){
   ctl <- get_model_ctl(.mod)
 
   # Get data record
-  data_rec <- nmrec::select_records(ctl, "data")[[1]]
-  data_rec$parse()
+  data_recs <- nmrec::select_records(ctl, "data")
+  n_data <- length(data_recs)
+  if(n_data !=1){
+    recs_fmt <- purrr::map_chr(data_recs, function(rec) rec$format())
+    rlang::abort(
+      c(
+        glue::glue("Expected a single data record, but found {n_data}:\n\n"),
+        recs_fmt
+      )
+    )
+  }
 
   # Overwrite 'filename' option
-  data_rec$values <- purrr::map(data_rec$values, function(data_opt){
-    if(inherits(data_opt, "nmrec_option_pos") && data_opt$name == "filename"){
-      data_opt$value <- data_path
-    }
-    data_opt
-  })
+  filename_opt <- nmrec::get_record_option(data_recs[[1]], "filename")
+  if (is.null(filename_opt)) {
+    dev_error(glue("No filename option found in `$DATA` record: \n{data_recs[[1]]$format()}"))
+  }
+  filename_opt$value <- data_path
 
   # Write out modified ctl
   mod_path <- get_model_path(.mod)
