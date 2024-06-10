@@ -82,16 +82,15 @@ mod_has_record <- function(.mod, type){
 remove_records <- function(.mod, type){
   if(mod_has_record(.mod, type)){
     ctl <- get_model_ctl(.mod)
+
+    # Get appropriate names and records to remove (if any)
     type_name <- get_records(.mod, type)[[1]]$name
-    rec_indices <- seq_along(ctl$records)
-    indices_remove <- purrr::keep(rec_indices, function(index){
-      ctl$records[[index]]$name == type_name
+    indices_remove <- purrr::map_lgl(ctl$records, function(rec){
+      identical(rec[["name"]], type_name)
     })
 
     # Remove records
-    if(length(indices_remove) >= 1){
-      ctl$records[indices_remove] <- NULL
-    }
+    ctl$records[indices_remove] <- NULL
 
     # Write out modified ctl
     mod_path <- get_model_path(.mod)
