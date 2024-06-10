@@ -164,9 +164,8 @@ get_simulation <- function(.mod){
 #'  `$SIMULATION` record.
 #' @param seed A seed for simulation. Appended to `$SIMULATION` record.
 #' @param data A dataset to simulate from. Defaults to `NULL`, which will use
-#'  [nm_join] to filter to only the data that made it into the original problem
-#'  of `.mod` (note that this requires a `$TABLE` record). If supplied, must
-#'  contain the exact column names of `nm_data(.mod)`.
+#'  use the original data. If provided, must include the same column names as
+#'  what's returned from `nm_data(.mod)`.
 #' @param sim_cols Character column name(s) defining the simulated values to
 #'  table out.
 #' @param .join_col Character column name(s) used to join table files post

@@ -37,9 +37,8 @@ get_simulation(.mod)
 \item{seed}{A seed for simulation. Appended to \verb{$SIMULATION} record.}
 
 \item{data}{A dataset to simulate from. Defaults to \code{NULL}, which will use
-\link{nm_join} to filter to only the data that made it into the original problem
-of \code{.mod} (note that this requires a \verb{$TABLE} record). If supplied, must
-contain the exact column names of \code{nm_data(.mod)}.}
+use the original data. If provided, must include the same column names as
+what's returned from \code{nm_data(.mod)}.}
 
 \item{sim_cols}{Character column name(s) defining the simulated values to
 table out.}
