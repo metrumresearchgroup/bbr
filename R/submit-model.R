@@ -191,7 +191,7 @@ submit_model.bbi_nmboot_model <- function(
     if (any(fs::dir_exists(outdirs)) && !isTRUE(cleaned_up)) {
       if (isTRUE(.overwrite)) {
         rlang::inform(glue("Overwriting existing bootstrap output directories in {get_output_dir(.mod)}"))
-        fs::dir_delete(outdirs)
+        fs::dir_delete(outdirs[fs::dir_exists(outdirs)])
 
         # delete other bootstrap artifacts from previous run
         boot_output_path <- file.path(.mod[[ABS_MOD_PATH]], "OUTPUT")
