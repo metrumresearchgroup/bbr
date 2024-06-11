@@ -44,12 +44,10 @@ new_bootstrap_run <- function(
 
   # Optionally remove $TABLE and $COV statements here
   if(isTRUE(remove_cov)) remove_records(boot_run, type = "covariance")
-  if(isTRUE(remove_tables)){
-    remove_records(boot_run, type = "table")
-  }else{
-    # Update table names if present (not used, but for consistency)
-    boot_run <- update_model_id(boot_run) %>% suppressMessages()
-  }
+  if(isTRUE(remove_tables)) remove_records(boot_run, type = "table")
+
+  # Update table and estimation record file paths
+  boot_run <- update_model_id(boot_run) %>% suppressMessages()
 
   # Return read-in model to get the updated class as part of the model object
   return(read_model(file.path(model_dir, boot_dir)))
