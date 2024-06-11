@@ -563,6 +563,7 @@ get_boot_models <- function(.boot_run){
     .boot_run <- read_model(.boot_run[[ABS_MOD_PATH]])
   }
 
+  boot_dir <- .boot_run[[ABS_MOD_PATH]]
   output_dir <- get_output_dir(.boot_run, .check_exists = FALSE)
   if(!fs::file_exists(output_dir)){
     verbose_msg(
@@ -579,23 +580,31 @@ get_boot_models <- function(.boot_run){
   }
 
   boot_spec <- get_boot_spec(.boot_run)
-  boot_models <- tryCatch(
-    purrr::map(boot_spec$bootstrap_runs$mod_path_abs, read_model),
-    error = function(cond){
-      # Suppress 'does not exist' message - handle separately
-      if(!stringr::str_detect(cond$parent$message, "does not exist")){
-        # Likely would only happen if there was a bbi/submission issue
-        message(cond$parent$message)
-      }
-      return(NULL)
+  boot_model_ids <- fs::path_ext_remove(basename(boot_spec$bootstrap_runs$mod_path_abs))
+
+  boot_models <- tryCatch({
+    find_models(.boot_run[[ABS_MOD_PATH]], .recurse = FALSE, .include = boot_model_ids)
+  }, warning = function(cond){
+    if(!stringr::str_detect(cond$message, "All models excluded|Found no valid model")){
+      warning(cond)
     }
-  )
+    return(NULL)
+  })
+
+  if(length(boot_model_ids) != length(boot_models)){
+    rlang::warn(
+      c(
+        glue("Found an unexpected number of models in {boot_dir}"),
+        glue("Expected number of models: {length(boot_model_ids)}"),
+        glue("Discovered number of models: {length(boot_models)}")
+      )
+    )
+  }
 
   # This shouldnt happen, but could if the directory existed and models
   # referenced in the spec file aren't found for any reason _other than_
   # cleaning up the run
   if(is.null(boot_models) || rlang::is_empty(boot_models)){
-    boot_dir <- .boot_run[[ABS_MOD_PATH]]
     rlang::warn(
       c(
         glue("At least one bootstrap run model does not exist in `{boot_dir}`")
