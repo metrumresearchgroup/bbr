@@ -447,8 +447,7 @@ color_status <- function(status){
 #' Format and color the model type of a model
 #'
 #' Create colored text denoting the model type for use in print methods.
-#' @param .mod a `bbi_model` object. `bbi_base_model` objects have more specific
-#'  handling
+#' @param .mod a `bbi_base_model` object.
 #' @param msg Character string. Appended to the end of the formatted model type
 #'  if provided.
 #' @keywords internal
@@ -456,16 +455,6 @@ color_model_type <- function(.mod, msg = NULL){
   UseMethod("color_model_type")
 }
 
-#' @rdname color_model_type
-#' @keywords internal
-color_model_type.bbi_model <- function(.mod, msg = NULL){
-  checkmate::assert_string(msg, null.ok = TRUE)
-  model_type <- .mod[[YAML_MOD_TYPE]]
-  model_type <- cli::col_black(paste(model_type, "Model", msg))
-  return(model_type)
-}
-
-#' @rdname color_model_type
 #' @keywords internal
 color_model_type.bbi_base_model <- function(.mod, msg = NULL){
   checkmate::assert_string(msg, null.ok = TRUE)
@@ -476,12 +465,16 @@ color_model_type.bbi_base_model <- function(.mod, msg = NULL){
     model_type <- cli::col_br_magenta(paste("Simulation", msg))
   } else if (model_type == "nmboot"){
     model_type <- cli::col_yellow(paste("Bootstrap Run", msg))
+  } else {
+    # For bbr.bayes or other bbi_base_models not defined within bbr
+    #  - Other packages may implement separate methods rather than relying
+    #    on this one
+    model_type <- cli::col_cyan(paste(toupper(model_type), "Model", msg))
   }
   return(model_type)
 }
 
 # Register private S3 methods for development purposes
-.S3method("color_model_type", "bbi_model", color_model_type.bbi_model)
 .S3method("color_model_type", "bbi_base_model", color_model_type.bbi_base_model)
 
 #' Format digits
