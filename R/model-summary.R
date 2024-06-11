@@ -181,6 +181,22 @@ model_summary.bbi_nmsim_model <- function(
   )
 }
 
+#' @export
+model_summary.bbi_nmboot_model <- function(
+    .mod,
+    .bbi_args = NULL,
+    ...,
+    .dry_run = FALSE
+) {
+
+  rlang::abort(
+    c(
+      glue("model_summary() is not supported for `{NMBOOT_MOD_CLASS}` objects"),
+      "See `?summarize_bootstrap_run` to summarize a bootstrap run"
+    )
+  )
+}
+
 ###################################
 # PRIVATE IMPLEMENTATION FUNCTIONS
 ###################################

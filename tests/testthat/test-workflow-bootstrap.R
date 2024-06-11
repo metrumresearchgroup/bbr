@@ -93,6 +93,15 @@ withr::with_options(
     .boot_run <- read_model(file.path(MODEL_DIR_BBI, "1-boot"))
     boot_dir <- .boot_run[[ABS_MOD_PATH]]
 
+    test_that("print.bbi_nmboot_model has a custom print method (before setup)", {
+      bullets <- capture.output({
+        output_lines <- capture.output(print(.boot_run)) %>% suppressMessages()
+        expect_message(print(.boot_run), regexp = "Bootstrap Run")
+        expect_message(print(.boot_run), regexp = "Bootstrap Args")
+        expect_true(any(grepl("Not set up", output_lines)))
+      })
+    })
+
     test_that("setup_bootstrap_run messages if nm_join cant be used", {
       boot_spec_path <- get_spec_path(.boot_run, .check_exists = FALSE)
       expect_false(fs::file_exists(boot_spec_path))
@@ -291,6 +300,16 @@ withr::with_options(
       expect_true(bootstrap_can_be_summarized(.boot_run)) # can still be summarized
     })
 
+    test_that("print.bbi_nmboot_model has a custom print method (after setup)", {
+      bullets <- capture.output({
+        output_lines <- capture.output(print(.boot_run)) %>% suppressMessages()
+        expect_message(print(.boot_run), regexp = "Bootstrap Run")
+        expect_message(print(.boot_run), regexp = "Bootstrap Args")
+        expect_true(any(grepl("Number of runs: 3", output_lines)))
+        expect_true(any(grepl("Stratification Columns: SEX, ETN", output_lines)))
+      })
+    })
+
     test_that("cleanup_bootstrap_run works as expected", {
       cleanup_bootstrap_run(.boot_run, .force = TRUE)
 
@@ -331,5 +350,17 @@ withr::with_options(
         submit_model(.boot_run, .overwrite = TRUE, .mode = "local"),
         "Model has been cleaned up"
       )
+
+      # Check updated prints
+      bullets <- capture.output({
+        # model print
+        output_lines <- capture.output(print(.boot_run)) %>% suppressMessages()
+        expect_true(any(grepl("Number of runs: 3", output_lines)))
+        expect_true(any(grepl("Stratification Columns: SEX, ETN", output_lines)))
+        expect_true(any(grepl("Cleaned up: TRUE", output_lines)))
+        # summary print
+        output_lines_sum <- capture.output(print(boot_sum)) %>% suppressMessages()
+        expect_true(any(grepl("Cleaned up: TRUE", output_lines_sum)))
+      })
     })
   })

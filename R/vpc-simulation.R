@@ -153,8 +153,25 @@ get_simulation <- function(.mod){
   }
 
   sim_spec <- get_sim_spec(.mod)
-  sim_path <- fs::path_ext_remove(sim_spec$model_path)
-  return(read_model(sim_path))
+  sim_id <- fs::path_ext_remove(basename(sim_spec$model_path))
+
+  sim <- tryCatch({
+    find_models(.mod[[ABS_MOD_PATH]], .recurse = FALSE, .include = sim_id)
+  }, warning = function(cond){
+    if(!stringr::str_detect(cond$message, "All models excluded|Found no valid model")){
+      warning(cond)
+    }
+    return(NULL)
+  })
+
+  if(is.null(sim)){
+    sim_path_expected <- file.path(.mod[[ABS_MOD_PATH]], sim_id)
+    rlang::abort(
+      glue("Could not find simulation at the expected file path: `{sim_path_expected}`")
+    )
+  }
+
+  return(sim[[1]])
 }
 
 #' Create a simulation model object from an existing model

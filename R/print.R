@@ -174,7 +174,9 @@ print.bbi_model <- function(x, ...) {
     }
 
     # Print simulation args
-    iwalk(sim_spec[SPEC_NMSIM_KEYS],
+    sim_args <- sim_spec[SPEC_NMSIM_KEYS]
+    names(sim_args) <- c("Number of Simulations")
+    iwalk(sim_args,
           ~ bullet_list(paste0(.y, ": ", col_blue(.x))))
   }
 
@@ -183,8 +185,14 @@ print.bbi_model <- function(x, ...) {
     boot_spec <- get_boot_spec(x)
     # Spec file doesnt exist until bootstrap run is set up via setup_bootstrap_run
     if(!is.null(boot_spec)){
-      iwalk(boot_spec[SPEC_NMBOOT_KEYS],
+      boot_args <- boot_spec[SPEC_NMBOOT_KEYS]
+      names(boot_args) <- c("Number of runs", "Stratification Columns")
+      iwalk(boot_args,
             ~ bullet_list(paste0(.y, ": ", col_blue(paste(.x, collapse = ", ")))))
+      # Add bullet if cleaned up
+      if(isTRUE(bootstrap_is_cleaned_up(x))){
+        cli::cat_bullet(paste("Cleaned up:", col_green(TRUE)))
+      }
     }else{
       bullet_list(cli::col_red("Not set up"))
     }

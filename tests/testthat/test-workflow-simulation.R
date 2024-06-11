@@ -60,7 +60,7 @@ withr::with_options(
       file.path(MODEL_DIR_BBI, "1"),
       .description = "original test-simulate model",
       .tags = ORIG_TAGS,
-      .bbi_args = list(threads = 4, parallel = TRUE)
+      .bbi_args = list(parallel = FALSE)
     )
 
     test_that("MSF file helpers work correctly", {
@@ -165,6 +165,33 @@ withr::with_options(
       )
     })
 
+    test_that("get_simulation works when the model was run in another location", {
+
+      # Copy model files and output directory of simulation
+      new_dir <- tempdir()
+      new_dir_path <- file.path(new_dir, basename(mod1[[ABS_MOD_PATH]]))
+      fs::file_copy(ctl_ext(mod1[[ABS_MOD_PATH]]), ctl_ext(new_dir_path))
+      fs::file_copy(yaml_ext(mod1[[ABS_MOD_PATH]]), yaml_ext(new_dir_path))
+      fs::dir_copy(mod1[[ABS_MOD_PATH]], new_dir_path)
+      fake_mod <- read_model(new_dir_path)
+      on.exit(delete_models(fake_mod, .tags = NULL, .force = TRUE))
+
+      # Delete the original simulation to make sure it's not pointing to that
+      # (regression test). We will make a new simulation in the next test
+      sim <- get_simulation(mod1)
+      delete_models(sim, .tags = NULL, .force = TRUE)
+
+      # Read in the new _fake_ simulation
+      sim_fake <- get_simulation(fake_mod)
+
+      # Expect error if it cant be found for any reason
+      fs::file_delete(yaml_ext(sim_fake[[ABS_MOD_PATH]]))
+      expect_error(
+        get_simulation(fake_mod),
+        "Could not find simulation at the expected file path"
+      )
+    })
+
     test_that("add_simulation works with a dataset", {
       # Improper data specification
       bad_data <- nm_data(mod1) %>% dplyr::rename("BLWT"="WT")
@@ -223,7 +250,7 @@ withr::with_options(
         output_lines <- capture.output(print(sim)) %>% suppressMessages()
         expect_message(print(sim), regexp = "Simulation")
         expect_message(print(sim), regexp = "Simulation Args")
-        expect_true(any(grepl(glue("n_sim: {sim_n}"), output_lines)))
+        expect_true(any(grepl(glue("Number of Simulations: {sim_n}"), output_lines)))
       })
     })
 
@@ -233,7 +260,7 @@ withr::with_options(
         expect_message(print(mod1), regexp = "NONMEM Model")
         expect_message(print(mod1), regexp = "Attached Simulation")
         expect_true(any(grepl(glue("Status: Finished Running"), output_lines)))
-        expect_true(any(grepl(glue("n_sim: {sim_n}"), output_lines)))
+        expect_true(any(grepl(glue("Number of Simulations: {sim_n}"), output_lines)))
       })
     })
 
@@ -243,7 +270,7 @@ withr::with_options(
       bullets <- capture.output({
         output_lines <- capture.output(print(mod1)) %>% suppressMessages()
         expect_false(any(grepl(glue("Status: Finished Running"), output_lines)))
-        expect_false(any(grepl(glue("n_sim: {sim_n}"), output_lines)))
+        expect_false(any(grepl(glue("Number of Simulations: {sim_n}"), output_lines)))
       })
     })
 
