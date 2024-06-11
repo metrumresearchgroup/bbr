@@ -112,6 +112,11 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       model1_boot <- model_1
       model1_boot[[YAML_MOD_TYPE]] <- 'nmboot'
       expect_message(print(model1_boot), regexp = "Bootstrap Run")
+
+      model1_other <- model_1
+      new_mod_type <- 'other_model_type'
+      model1_boot[[YAML_MOD_TYPE]] <- new_mod_type
+      expect_message(print(model1_boot), regexp = glue("{toupper(new_mod_type)} Model Status"))
     })
   })
 
