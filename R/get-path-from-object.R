@@ -29,31 +29,28 @@
 #' @seealso [get_model_id()] [get_data_path()] [build_path_from_model()]
 NULL
 
+
 #' @rdname get_path_from_object
 #' @export
 get_model_path <- function(.bbi_object, .check_exists = TRUE) {
   UseMethod("get_model_path")
 }
 
-#' @rdname get_path_from_object
 #' @export
 get_model_path.bbi_model <- function(.bbi_object, .check_exists = TRUE) {
   get_model_path_nonmem(.bbi_object, .check_exists)
 }
 
-
-#' @rdname get_path_from_object
 #' @export
 get_model_path.bbi_nonmem_summary <- function(.bbi_object, .check_exists = TRUE) {
   get_model_path_nonmem(.bbi_object, .check_exists)
 }
 
-
-#' @rdname get_path_from_object
 #' @export
 get_model_path.bbi_log_df <- function(.bbi_object, .check_exists = TRUE) {
   get_path_from_log_df(.bbi_object, get_model_path, .check_exists = .check_exists)
 }
+
 
 #' @rdname get_path_from_object
 #' @export
@@ -61,20 +58,16 @@ get_output_dir <- function(.bbi_object, .check_exists = TRUE) {
   UseMethod("get_output_dir")
 }
 
-#' @rdname get_path_from_object
 #' @export
 get_output_dir.bbi_model <- function(.bbi_object, .check_exists = TRUE) {
   get_output_dir_nonmem(.bbi_object, .check_exists)
 }
 
-
-#' @rdname get_path_from_object
 #' @export
 get_output_dir.bbi_nonmem_summary <- function(.bbi_object, .check_exists = TRUE) {
   get_output_dir_nonmem(.bbi_object, .check_exists)
 }
 
-#' @rdname get_path_from_object
 #' @export
 get_output_dir.bbi_log_df <- function(.bbi_object, .check_exists = TRUE) {
   get_path_from_log_df(.bbi_object, get_output_dir, .check_exists = .check_exists)
@@ -87,23 +80,21 @@ get_yaml_path <- function(.bbi_object, .check_exists = TRUE) {
   UseMethod("get_yaml_path")
 }
 
-#' @rdname get_path_from_object
 #' @export
 get_yaml_path.bbi_model <- function(.bbi_object, .check_exists = TRUE) {
-  .path <- paste0(.bbi_object[[ABS_MOD_PATH]], ".yaml")
-
-  if (isTRUE(.check_exists)) {
-    checkmate::assert_file_exists(.path)
-  }
-
-  return(.path)
+  get_yaml_path_nonmem(.bbi_object, .check_exists = .check_exists)
 }
 
-#' @rdname get_path_from_object
+#' @export
+get_yaml_path.bbi_nonmem_summary <- function(.bbi_object, .check_exists = TRUE) {
+  get_yaml_path_nonmem(.bbi_object, .check_exists = .check_exists)
+}
+
 #' @export
 get_yaml_path.bbi_log_df <- function(.bbi_object, .check_exists = TRUE) {
   get_path_from_log_df(.bbi_object, get_yaml_path, .check_exists = .check_exists)
 }
+
 
 #' @rdname get_path_from_object
 #' @export
@@ -111,21 +102,16 @@ get_config_path <- function(.bbi_object, .check_exists = TRUE) {
   UseMethod("get_config_path")
 }
 
-#' @rdname get_path_from_object
 #' @export
 get_config_path.bbi_model <- function(.bbi_object, .check_exists = TRUE) {
-  .path <- file.path(
-    get_output_dir(.bbi_object, .check_exists = .check_exists),
-    "bbi_config.json")
-
-  if (isTRUE(.check_exists)) {
-    checkmate::assert_file_exists(.path)
-  }
-
-  return(.path)
+  get_config_path_nonmem(.bbi_object, .check_exists = .check_exists)
 }
 
-#' @rdname get_path_from_object
+#' @export
+get_config_path.bbi_nonmem_summary <- function(.bbi_object, .check_exists = TRUE) {
+  get_config_path_nonmem(.bbi_object, .check_exists = .check_exists)
+}
+
 #' @export
 get_config_path.bbi_log_df <- function(.bbi_object, .check_exists = TRUE) {
   get_path_from_log_df(.bbi_object, get_config_path, .check_exists = .check_exists)
@@ -247,7 +233,7 @@ get_data_path <- function(
   UseMethod("get_data_path")
 }
 
-#' @rdname get_data_path
+
 #' @export
 get_data_path.bbi_model <- function(
     .bbi_object,
@@ -269,9 +255,26 @@ get_data_path.bbi_model <- function(
   return(data_path)
 }
 
-#' @rdname get_data_path
 #' @export
-get_data_path.bbi_base_model <- function(
+get_data_path.bbi_nonmem_model <- function(
+    .bbi_object,
+    .check_exists = TRUE,
+    ...
+){
+  get_data_path_nonmem(.bbi_object, .check_exists, ...)
+}
+
+#' @export
+get_data_path.bbi_nmboot_model <- function(
+    .bbi_object,
+    .check_exists = TRUE,
+    ...
+){
+  get_data_path_nonmem(.bbi_object, .check_exists, ...)
+}
+
+#' @export
+get_data_path.bbi_nmsim_model <- function(
     .bbi_object,
     .check_exists = TRUE,
     ...
@@ -280,7 +283,6 @@ get_data_path.bbi_base_model <- function(
 }
 
 
-#' @rdname get_data_path
 #' @export
 get_data_path.bbi_nonmem_summary <- function(
     .bbi_object,
@@ -291,7 +293,7 @@ get_data_path.bbi_nonmem_summary <- function(
   get_data_path(.mod, .check_exists, ...)
 }
 
-#' @rdname get_data_path
+
 #' @export
 get_data_path.bbi_log_df <- function(
     .bbi_object,
@@ -530,6 +532,29 @@ get_output_dir_nonmem <- function(.bbi_object, .check_exists = TRUE) {
   return(.path)
 }
 
+#' @keywords internal
+get_yaml_path_nonmem <- function(.bbi_object, .check_exists = TRUE) {
+  .path <- paste0(.bbi_object[[ABS_MOD_PATH]], ".yaml")
+
+  if (isTRUE(.check_exists)) {
+    checkmate::assert_file_exists(.path)
+  }
+
+  return(.path)
+}
+
+#' @keywords internal
+get_config_path_nonmem <- function(.bbi_object, .check_exists = TRUE) {
+  .path <- file.path(
+    get_output_dir(.bbi_object, .check_exists = .check_exists),
+    "bbi_config.json")
+
+  if (isTRUE(.check_exists)) {
+    checkmate::assert_file_exists(.path)
+  }
+
+  return(.path)
+}
 
 ###########################
 # Get path private helpers

@@ -3,48 +3,18 @@
 \name{get_path_from_object}
 \alias{get_path_from_object}
 \alias{get_model_path}
-\alias{get_model_path.bbi_model}
-\alias{get_model_path.bbi_nonmem_summary}
-\alias{get_model_path.bbi_log_df}
 \alias{get_output_dir}
-\alias{get_output_dir.bbi_model}
-\alias{get_output_dir.bbi_nonmem_summary}
-\alias{get_output_dir.bbi_log_df}
 \alias{get_yaml_path}
-\alias{get_yaml_path.bbi_model}
-\alias{get_yaml_path.bbi_log_df}
 \alias{get_config_path}
-\alias{get_config_path.bbi_model}
-\alias{get_config_path.bbi_log_df}
 \title{Get path from bbi object}
 \usage{
 get_model_path(.bbi_object, .check_exists = TRUE)
 
-\method{get_model_path}{bbi_model}(.bbi_object, .check_exists = TRUE)
-
-\method{get_model_path}{bbi_nonmem_summary}(.bbi_object, .check_exists = TRUE)
-
-\method{get_model_path}{bbi_log_df}(.bbi_object, .check_exists = TRUE)
-
 get_output_dir(.bbi_object, .check_exists = TRUE)
-
-\method{get_output_dir}{bbi_model}(.bbi_object, .check_exists = TRUE)
-
-\method{get_output_dir}{bbi_nonmem_summary}(.bbi_object, .check_exists = TRUE)
-
-\method{get_output_dir}{bbi_log_df}(.bbi_object, .check_exists = TRUE)
 
 get_yaml_path(.bbi_object, .check_exists = TRUE)
 
-\method{get_yaml_path}{bbi_model}(.bbi_object, .check_exists = TRUE)
-
-\method{get_yaml_path}{bbi_log_df}(.bbi_object, .check_exists = TRUE)
-
 get_config_path(.bbi_object, .check_exists = TRUE)
-
-\method{get_config_path}{bbi_model}(.bbi_object, .check_exists = TRUE)
-
-\method{get_config_path}{bbi_log_df}(.bbi_object, .check_exists = TRUE)
 }
 \arguments{
 \item{.bbi_object}{The object to query. Could be

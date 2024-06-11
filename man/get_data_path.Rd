@@ -2,21 +2,9 @@
 % Please edit documentation in R/get-path-from-object.R
 \name{get_data_path}
 \alias{get_data_path}
-\alias{get_data_path.bbi_model}
-\alias{get_data_path.bbi_base_model}
-\alias{get_data_path.bbi_nonmem_summary}
-\alias{get_data_path.bbi_log_df}
 \title{Get path to data file}
 \usage{
 get_data_path(.bbi_object, .check_exists = TRUE, ...)
-
-\method{get_data_path}{bbi_model}(.bbi_object, .check_exists = TRUE, ...)
-
-\method{get_data_path}{bbi_base_model}(.bbi_object, .check_exists = TRUE, ...)
-
-\method{get_data_path}{bbi_nonmem_summary}(.bbi_object, .check_exists = TRUE, ...)
-
-\method{get_data_path}{bbi_log_df}(.bbi_object, .check_exists = TRUE, ...)
 }
 \arguments{
 \item{.bbi_object}{The object to query. Could be
