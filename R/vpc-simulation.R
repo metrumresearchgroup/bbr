@@ -251,7 +251,7 @@ new_sim_model <- function(
   sim_dir_rel <- fs::path_rel(.sim_dir, model_dir)
   output_dir <- file.path(sim_dir_rel, glue("{get_model_id(.mod)}-sim"))
 
-  .sim_mod <- copy_model_from(
+  .sim <- copy_model_from(
     .parent_mod = .mod,
     .new_model = output_dir,
     .add_tags = "SIMULATION",
@@ -260,12 +260,12 @@ new_sim_model <- function(
     .overwrite = .overwrite
   )
 
-  .sim_mod[[YAML_MOD_TYPE]] <- "nmsim"
-  .sim_mod <- save_model_yaml(.sim_mod)
+  .sim[[YAML_MOD_TYPE]] <- "nmsim"
+  .sim <- save_model_yaml(.sim)
 
   # Overwrite problem statement
   prob <- glue("Simulation of model {get_model_id(.mod)}")
-  modify_prob_statement(.sim_mod, prob)
+  modify_prob_statement(.sim, prob)
 
 
   # Handle input data and adjust $DATA record
@@ -275,7 +275,7 @@ new_sim_model <- function(
     if(!all(input_cols %in% names(data))){
       missing_cols <- input_cols[!(input_cols %in% names(data))]
       missing_txt <- paste(missing_cols, collapse = ", ")
-      delete_models(.sim_mod, .tags = "SIMULATION", .force = TRUE) %>%
+      delete_models(.sim, .tags = "SIMULATION", .force = TRUE) %>%
         suppressMessages()
       rlang::abort(
         c(
@@ -294,20 +294,20 @@ new_sim_model <- function(
 
     # Update data path in control stream (adjusting for .mod vs .ctl extension)
     data_path_rel <- adjust_data_path_ext(
-      basename(data_path_new), get_model_path(.sim_mod), reverse = TRUE
+      basename(data_path_new), get_model_path(.sim), reverse = TRUE
     )
-    modify_data_path_ctl(.sim_mod, data_path_rel)
+    modify_data_path_ctl(.sim, data_path_rel)
   }else{
     # Overwrite $DATA record (one level deeper)
     based_on_data_path <- get_data_path_from_ctl(.mod, normalize = FALSE)
     data_path_rel <- file.path("..", based_on_data_path)
-    modify_data_path_ctl(.sim_mod, data_path_rel)
+    modify_data_path_ctl(.sim, data_path_rel)
   }
 
 
   # Set up simulation
   setup_sim_run(
-    .sim_mod, n = n, seed = seed, sim_cols = sim_cols,
+    .sim, n = n, seed = seed, sim_cols = sim_cols,
     .join_col = .join_col
   )
 
