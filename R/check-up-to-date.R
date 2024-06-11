@@ -80,6 +80,10 @@ check_up_to_date.bbi_nmboot_model <- function(.bbi_object, ...) {
     )
   }
 
+  if(!model_is_finished(.bbi_object)){
+    rlang::abort(paste(glue("Model {get_model_id(.bbi_object)}:"), CHECK_UP_TO_DATE_ERR_MSG))
+  }
+
   boot_spec <- get_boot_spec(.bbi_object)
 
   # check necessary files for changes
@@ -108,6 +112,7 @@ check_up_to_date.bbi_nmboot_model <- function(.bbi_object, ...) {
       sep = "\n"
     ))
   }
+
 
   # build return value
   res <- replace_na(!changed_files, FALSE)
