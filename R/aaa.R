@@ -197,7 +197,7 @@ BBI_ARGS = list(
 # models _and_ summary objects. BBI_BASE_MODEL_CLASS ("bbi_base_model") came
 # later and applies only to regular models, not summary objects.
 BBI_PARENT_CLASS <- "bbi_model" # SHARED with bbr.bayes
-BBI_BASE_MODEL_CLASS <- "bbi_base_model"
+BBI_BASE_MODEL_CLASS <- "bbi_base_model" # SHARED with bbr.bayes
 NM_MOD_CLASS <- "bbi_nonmem_model" # SHARED with bbr.bayes
 NM_SUM_CLASS <- "bbi_nonmem_summary" # SHARED with bbr.bayes
 NMBOOT_MOD_CLASS <- "bbi_nmboot_model"
