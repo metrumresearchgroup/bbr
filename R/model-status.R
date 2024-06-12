@@ -65,9 +65,11 @@ bbi_nonmem_model_status.bbi_nmboot_model <- function(.mod) {
         boot_spec <- get_boot_spec(.mod)
         for(output_dir.i in boot_spec$bootstrap_runs$mod_path_abs){
           if (dir.exists(output_dir.i)) {
-            json_file <- get_config_path(
-              read_model(output_dir.i), .check_exists = FALSE
-            )
+            # Exit early as incomplete if any model cannot be read in for any reason
+            boot_m <- tryCatch({read_model(output_dir.i)}, error = function(e) NULL)
+            if(is.null(boot_m)) return("Incomplete Run")
+            # Otherwise check for presence of config file
+            json_file <- get_config_path(boot_m, .check_exists = FALSE)
             if(fs::file_exists(json_file)) {
               # Set to incomplete if one config file exists. Update at the end
               # if they all exist

@@ -187,6 +187,8 @@ print.bbi_model <- function(x, ...) {
     if(!is.null(boot_spec)){
       boot_args <- boot_spec[SPEC_NMBOOT_KEYS]
       names(boot_args) <- c("Number of runs", "Stratification Columns")
+      # strat_cols can be NULL
+      boot_args[sapply(boot_args, is.null)] <- NA
       iwalk(boot_args,
             ~ bullet_list(paste0(.y, ": ", col_blue(paste(.x, collapse = ", ")))))
       # Add bullet if cleaned up

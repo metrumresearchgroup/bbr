@@ -591,26 +591,28 @@ get_boot_models <- function(.boot_run){
     return(NULL)
   })
 
-  if(length(boot_model_ids) != length(boot_models)){
-    rlang::warn(
-      c(
-        glue("Found an unexpected number of models in {boot_dir}"),
-        glue("Expected number of models: {length(boot_model_ids)}"),
-        glue("Discovered number of models: {length(boot_models)}")
-      )
-    )
-  }
 
   # This shouldnt happen, but could if the directory existed and models
   # referenced in the spec file aren't found for any reason _other than_
   # cleaning up the run
   if(is.null(boot_models) || rlang::is_empty(boot_models)){
-    rlang::warn(
+    rlang::abort(
       c(
         glue("At least one bootstrap run model does not exist in `{boot_dir}`")
       )
     )
+  }else{
+    if(length(boot_model_ids) != length(boot_models)){
+      rlang::warn(
+        c(
+          glue("Found an unexpected number of models in {boot_dir}"),
+          glue("Expected number of models: {length(boot_model_ids)}"),
+          glue("Discovered number of models: {length(boot_models)}")
+        )
+      )
+    }
   }
+
   return(boot_models)
 }
 

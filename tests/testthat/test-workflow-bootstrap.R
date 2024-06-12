@@ -119,6 +119,13 @@ withr::with_options(
     test_that("setup_bootstrap_run works as expected", {
       setup_bootstrap_run(.boot_run, n = 3, .overwrite = TRUE, seed = NULL)
 
+      # Check print method - strat_cols are made to be NA if none provided
+      bullets <- capture.output({
+        output_lines <- capture.output(print(.boot_run)) %>% suppressMessages()
+        expect_true(any(grepl("Number of runs: 3", output_lines)))
+        expect_true(any(grepl("Stratification Columns: NA", output_lines)))
+      })
+
       # Check boot spec
       boot_spec <- get_boot_spec(.boot_run)
       expect_true(is.null(boot_spec$cleaned_up))
@@ -162,6 +169,14 @@ withr::with_options(
         .boot_run, n = 3, strat_cols = c("SEX", "ETN"), .overwrite = TRUE,
         seed = 1234
       )
+
+      # Check print method - strat_cols are now displayed (comma separated)
+      bullets <- capture.output({
+        output_lines <- capture.output(print(.boot_run)) %>% suppressMessages()
+        expect_true(any(grepl("Number of runs: 3", output_lines)))
+        expect_true(any(grepl("Stratification Columns: SEX, ETN", output_lines)))
+      })
+
       # Pull in one of the sample datasets
       data <- nm_data(get_boot_models(.boot_run)[[1]])
 
@@ -310,6 +325,55 @@ withr::with_options(
       })
     })
 
+    test_that("print.bbi_nmboot_summary has a custom print method", {
+      # Check print method of summary object
+      boot_sum <- summarize_bootstrap_run(.boot_run)
+      bullets <- capture.output({
+        output_lines <- capture.output(print(boot_sum)) %>% suppressMessages()
+        expect_message(print(boot_sum), regexp = "Based on")
+        expect_message(print(boot_sum), regexp = "Run Specifications")
+        expect_message(print(boot_sum), regexp = "Bootstrap Run Summary")
+        expect_true(any(grepl("Number of runs: 3", output_lines)))
+        expect_true(any(grepl("Stratification Columns: SEX, ETN", output_lines)))
+        # seed is displayed in summary object only
+        expect_true(any(grepl("Seed: 1234", output_lines)))
+      })
+    })
+
+    test_that("get_boot_models works when the model was run in another location", {
+
+      # Copy model files and output directory of simulation
+      new_dir <- tempdir()
+      new_dir_path <- file.path(new_dir, basename(.boot_run[[ABS_MOD_PATH]]))
+      fs::file_copy(ctl_ext(.boot_run[[ABS_MOD_PATH]]), ctl_ext(new_dir_path))
+      fs::file_copy(yaml_ext(.boot_run[[ABS_MOD_PATH]]), yaml_ext(new_dir_path))
+      fs::dir_copy(.boot_run[[ABS_MOD_PATH]], new_dir_path)
+      fake_boot <- read_model(new_dir_path)
+      on.exit(delete_models(fake_boot, .tags = NULL, .force = TRUE))
+
+      # Read in the new _fake_ simulation and make sure the individual models
+      # point to the correct location
+      boot_models_fake <- get_boot_models(fake_boot)
+      purrr::walk(boot_models_fake, function(boot_m){
+        expect_equal(
+          boot_m[[ABS_MOD_PATH]],
+          file.path(new_dir_path, get_model_id(boot_m))
+        )
+      })
+
+      # Expect error if it cant be found for any reason (i.e. no yaml)
+      # This gives `fake_boot` the "Incomplete Run" status when done this way
+      # - would be "Not Run" if `delete_models()` was used
+      purrr::walk(boot_models_fake, function(boot_m){
+        fs::file_delete(yaml_ext(boot_m[[ABS_MOD_PATH]]))
+      })
+
+      expect_error(
+        get_boot_models(fake_boot),
+        "At least one bootstrap run model does not exist"
+      )
+    })
+
     test_that("cleanup_bootstrap_run works as expected", {
       cleanup_bootstrap_run(.boot_run, .force = TRUE)
 
@@ -355,8 +419,6 @@ withr::with_options(
       bullets <- capture.output({
         # model print
         output_lines <- capture.output(print(.boot_run)) %>% suppressMessages()
-        expect_true(any(grepl("Number of runs: 3", output_lines)))
-        expect_true(any(grepl("Stratification Columns: SEX, ETN", output_lines)))
         expect_true(any(grepl("Cleaned up: TRUE", output_lines)))
         # summary print
         output_lines_sum <- capture.output(print(boot_sum)) %>% suppressMessages()

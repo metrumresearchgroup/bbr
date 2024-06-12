@@ -715,7 +715,7 @@ get_boot_spec <- function(.boot_run){
   if(!fs::file_exists(spec_path)) return(NULL)
 
   boot_spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
-  boot_dir <- boot_spec$bootstrap_spec$output_dir
+  boot_dir <- .boot_run[[ABS_MOD_PATH]]
 
   # Format individual bootstrap model runs if not cleaned up
   if(!is.null(boot_spec$bootstrap_runs)){
