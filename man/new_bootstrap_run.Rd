@@ -35,6 +35,19 @@ S3 object of class \code{bbi_nmboot_model}.
 \description{
 Create a boostrap model object from an existing model
 }
+\examples{
+\dontrun{
+
+# Create new bootstrap object
+.boot_run <- new_bootstrap_run(.mod)
+
+# Optionally inherit final parameter estimates
+.boot_run <- inherit_param_estimates(.boot_run)
+
+# Set up the run
+setup_bootstrap_run(.boot_run)
+}
+}
 \seealso{
 setup_bootstrap_run summarize_bootstrap_run
 }

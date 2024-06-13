@@ -64,3 +64,6 @@ mod2 <- copy_model_from(base_mod, "mod2") \%>\%
 
 }
 }
+\seealso{
+tweak_initial_estimates
+}

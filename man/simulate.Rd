@@ -135,9 +135,9 @@ within the output directory of \code{.mod}.
 # Add a new simulation and submit for execution
 add_simulation(
   .mod,
-  n = 500,
-  .join_col = c("NUM", "ID"),
-  .mode = "local"
+  n = 100,
+  .mode = "local",
+  .wait = FALSE
 )
 
 # Optionally read in simulation model object

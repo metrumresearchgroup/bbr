@@ -10,6 +10,18 @@
 #'  Both default to `TRUE`.
 #'
 #' @seealso setup_bootstrap_run summarize_bootstrap_run
+#' @examples
+#' \dontrun{
+#'
+#' # Create new bootstrap object
+#' .boot_run <- new_bootstrap_run(.mod)
+#'
+#' # Optionally inherit final parameter estimates
+#' .boot_run <- inherit_param_estimates(.boot_run)
+#'
+#' # Set up the run
+#' setup_bootstrap_run(.boot_run)
+#' }
 #' @return S3 object of class `bbi_nmboot_model`.
 #' @export
 new_bootstrap_run <- function(
@@ -72,7 +84,12 @@ new_bootstrap_run <- function(
 #'
 #' # Setup
 #' .boot_run <- new_bootstrap_run(.mod)
-#' .boot_run <- setup_bootstrap_run(.boot_run, n = 1000, seed = 1234)
+#' .boot_run <- setup_bootstrap_run(
+#'   .boot_run,
+#'   n = 1000,
+#'   seed = 1234,
+#'   strat_cols = c("STUDY", "ETN")
+#' )
 #'
 #' # Submit
 #' submit_model(.boot_run)

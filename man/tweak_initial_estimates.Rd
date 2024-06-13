@@ -66,3 +66,6 @@ mod2 <- withr::with_seed(1234, {
 
 }
 }
+\seealso{
+inherit_param_estimates
+}

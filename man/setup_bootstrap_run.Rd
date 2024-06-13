@@ -32,7 +32,12 @@ Creates a new model object and re-sampled dataset per model run.
 
 # Setup
 .boot_run <- new_bootstrap_run(.mod)
-.boot_run <- setup_bootstrap_run(.boot_run, n = 1000, seed = 1234)
+.boot_run <- setup_bootstrap_run(
+  .boot_run,
+  n = 1000,
+  seed = 1234,
+  strat_cols = c("STUDY", "ETN")
+)
 
 # Submit
 submit_model(.boot_run)
