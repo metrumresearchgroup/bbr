@@ -142,7 +142,16 @@ check_run_times <- function(
   }
 
   if (inherits(.mods, "bbi_model")) {
-    .mods <- list(.mods)
+    if(inherits(.mods, NMBOOT_MOD_CLASS)){
+      .mods <- get_boot_models(.mods)
+      # If NULL (cleaned up or not set up) exit early
+      #  - `get_boot_models` will return a relevant message, so no need to add
+      #    an additional one
+      if(is.null(.mods)) return(NULL)
+    }else{
+      .mods <- list(.mods)
+    }
+
     check_model_object_list(.mods, .mod_types = c(NM_MOD_CLASS, NM_SUM_CLASS))
   }else if(inherits(.mods, "bbi_summary_list")){
     check_model_object(.mods, .mod_types = c("bbi_summary_list"))
@@ -191,7 +200,7 @@ check_run_times <- function(
       data <- data.frame(matrix(ncol = length(.return_times) + 2, nrow = 1)) %>% as_tibble
       colnames(data) <- c('run', 'threads', .return_times)
       data$run <- model_run
-      message("Could not access data for ", model_run)
+      message("Could not access data for model ", model_run)
       return(data)
     }, warning = function(cond){
       data <- data.frame(matrix(ncol = length(.return_times) + 2, nrow = 1)) %>% as_tibble
