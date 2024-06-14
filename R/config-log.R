@@ -90,7 +90,7 @@ config_log_impl <- function(.mods) {
   missing <- !fs::file_exists(json_files)
 
   if (all(missing)) {
-    warning(glue("Found no bbi_config.json files for {length(.mods)} models."), call. = FALSE)
+    warning(glue("Found no config files for {length(.mods)} models."), call. = FALSE)
     return(
       c(ABS_MOD_PATH, RUN_ID_COL) %>% map_dfc(~ tibble(!!.x := character()))
     )
@@ -98,13 +98,13 @@ config_log_impl <- function(.mods) {
 
   if (any(missing)) {
     warning(paste(
-      glue("Found only {sum(!missing)} bbi_config.json files for {length(.mods)} models."),
+      glue("Found only {sum(!missing)} config files for {length(.mods)} models."),
       "The following models may have failed or still be in progress:",
       paste(map_chr(.mods[missing], ABS_MOD_PATH), collapse = "\n"),
       sep = "\n"
     ), call. = FALSE)
 
-    # Throw out models that are missing bbi_config.json files.
+    # Throw out models that are missing bbi_config.json or bbr_boot_spec.json files.
     .mods <- .mods[!missing]
     json_files <- json_files[!missing]
   }
@@ -177,6 +177,45 @@ config_log_make_entry.bbi_nonmem_model <- function(.mod, config, fields = NULL) 
   config[["nm_version"]] <- resolve_nonmem_version(config) %||% NA_character_
 
   return(list(config = config, fields = c(fields, "nm_version")))
+}
+
+#' @rdname config_log_make_entry
+#' @export
+config_log_make_entry.bbi_nmboot_model <- function(.mod, config, fields = NULL) {
+  # Make names consistent
+  boot_config <- config$bootstrap_spec
+  boot_config[CONFIG_KEEPERS] <- boot_config[CONFIG_BOOT_KEEPERS]
+  fields <- fields %||% CONFIG_KEEPERS
+
+  if (!all(fields %in% names(boot_config))) {
+    path <- get_config_path(.mod, .check_exists = FALSE)
+    msg <- paste(
+      glue(
+        "{path} is missing the required keys:",
+        "`{paste(fields[!(fields %in% names(boot_config))], collapse = ', ')}`",
+        "and will be skipped.",
+        .sep = " "
+      ),
+      glue(
+        "This is likely because it was run with an old version of bbi.",
+        "Model was run on version {boot_config[['bbi_version']]}",
+        .sep = " "
+      ),
+      glue(
+        "User can call `bbi_current_release()` to see the most recent release",
+        "version, and call `use_bbi(options('bbr.bbi_exe_path'))` to",
+        "upgrade to the version.",
+        .sep = " "
+      ),
+      .sep = "\n"
+    )
+
+    warning(msg)
+    return(NULL)
+  }
+  boot_config[["nm_version"]] <- resolve_nonmem_version(boot_config) %||% NA_character_
+
+  return(list(config = boot_config, fields = c(fields, "nm_version")))
 }
 
 #' Parse a bbi config file

@@ -366,6 +366,14 @@ CONFIG_KEEPERS <- c(
   "bbi_version"
 )
 
+# define json keys to keep as from bbr_boot_spec.json
+CONFIG_BOOT_KEEPERS <- c(
+  "model_md5",
+  "based_on_data_path",
+  "based_on_data_md5",
+  "bbi_version"
+)
+
 CONFIG_LOG_REQ_COLS <- c(
   ABS_MOD_PATH,
   RUN_ID_COL,

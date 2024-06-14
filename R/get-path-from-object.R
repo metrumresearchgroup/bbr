@@ -117,6 +117,11 @@ get_config_path.bbi_log_df <- function(.bbi_object, .check_exists = TRUE) {
   get_path_from_log_df(.bbi_object, get_config_path, .check_exists = .check_exists)
 }
 
+#' @export
+get_config_path.bbi_nmboot_model <- function(.bbi_object, .check_exists = TRUE) {
+  get_spec_path(.bbi_object, .check_exists = .check_exists)
+}
+
 
 #' Get the relevant specification file path
 #'
@@ -167,7 +172,6 @@ get_spec_path.bbi_base_model <- function(.mod, .check_exists = TRUE) {
       glue("Unsupported model type. Expected {NMSIM_MOD_CLASS} or {NM_MOD_CLASS}")
     )
   }
-
 
   if (isTRUE(.check_exists)) {
     checkmate::assert_file_exists(.path)
@@ -270,7 +274,22 @@ get_data_path.bbi_nmboot_model <- function(
     .check_exists = TRUE,
     ...
 ){
-  get_data_path_nonmem(.bbi_object, .check_exists, ...)
+  # nmboot models do not have a config file, so we can only extract from the
+  # $DATA record in a control stream file
+  data_path <- get_data_path_from_ctl(.bbi_object)
+
+  if(isTRUE(.check_exists)){
+    if(!fs::file_exists(data_path)){
+      rlang::abort(
+        c(
+          "x" = "Input data file does not exist or cannot be opened",
+          "i" = glue("Referenced input data path: {data_path}")
+        )
+      )
+    }
+  }
+
+  return(data_path)
 }
 
 #' @export

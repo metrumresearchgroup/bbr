@@ -448,8 +448,33 @@ summarize_bootstrap_run <- function(
       )
     }
 
-    boot_spec <- get_boot_spec(.boot_run)
+    # Update spec to store bbi_version and configuration details
+    #  - so functions like config_log have to do less of a lift
+    boot_models <- get_boot_models(.boot_run)
 
+    # These should be consistent across all models
+    config_lst <- purrr::map(boot_models, function(.m){
+      path <- get_config_path(.m, .check_exists = FALSE)
+      config <- jsonlite::fromJSON(path)
+      # dont store timeout - unique to the individual model
+      config$configuration$parallel_timeout <- NULL
+      list(bbi_version = config$bbi_version, configuration = config$configuration)
+    }) %>% unique()
+
+    if(length(config_lst) != 1){
+      rlang::warn("Multiple NONMEM or bbi configurations detected: storing the first one")
+    }
+    config_lst <- purrr::pluck(config_lst, 1)
+
+    spec_path <- get_spec_path(.boot_run)
+    boot_spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
+    boot_spec$bootstrap_spec$bbi_version <- config_lst$bbi_version
+    boot_spec$bootstrap_spec$configuration <- config_lst$configuration
+    spec_lst_json <- jsonlite::toJSON(boot_spec, pretty = TRUE, simplifyVector = TRUE)
+    writeLines(spec_lst_json, spec_path)
+
+    # Create summary object to save to RDS
+    boot_spec <- get_boot_spec(.boot_run)
     boot_sum <- c(
       list2(!!ABS_MOD_PATH := boot_dir),
       list(
