@@ -217,6 +217,9 @@ config_log_make_entry.bbi_nmboot_model <- function(.mod, config, fields = NULL) 
     warning(msg)
     return(NULL)
   }
+  # bbi and nonmem versions will be NULL until the run has been summarized
+  # - replace with NA to keep the same column order
+  boot_config[["bbi_version"]] <- boot_config[["bbi_version"]] %||% NA_character_
   boot_config[["nm_version"]] <- resolve_nonmem_version(boot_config) %||% NA_character_
 
   return(list(config = boot_config, fields = c(fields, "nm_version")))
