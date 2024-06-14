@@ -299,7 +299,7 @@ make_boot_spec <- function(boot_models, boot_args){
     n_samples = boot_args$n_samples,
     model_path = get_model_path(boot_args$boot_run),
     based_on_model_path = boot_args$orig_mod_path,
-    based_on_data_path = get_data_path(boot_args$boot_run),
+    based_on_data_path = get_data_path_from_ctl(boot_args$boot_run, normalize = FALSE),
     model_md5 = tools::md5sum(get_model_path(boot_args$boot_run)),
     based_on_model_md5 = tools::md5sum(boot_args$orig_mod_path),
     based_on_data_md5 = tools::md5sum(get_data_path(boot_args$boot_run)),

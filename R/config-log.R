@@ -81,32 +81,36 @@ config_log_impl <- function(.mods) {
 
   check_model_object_list(.mods)
 
+  # Filter out unfinished models - this is specifically necessary for bootstrap
+  # runs, which have a config file _before_ submission.
+  mods_finished <- check_nonmem_finished(.mods)
+
   json_files <- map_chr(
     .mods,
     function(m) get_config_path(m, .check_exists = FALSE)
   )
 
   # check for files that don't exist
-  missing <- !fs::file_exists(json_files)
+  missing <- !mods_finished
 
-  if (all(missing)) {
-    warning(glue("Found no config files for {length(.mods)} models."), call. = FALSE)
+  if (all(!mods_finished)) {
+    warning(glue("Found {length(.mods)} model(s), but none have finished executing"), call. = FALSE)
     return(
       c(ABS_MOD_PATH, RUN_ID_COL) %>% map_dfc(~ tibble(!!.x := character()))
     )
   }
 
-  if (any(missing)) {
+  if (any(!mods_finished)) {
     warning(paste(
-      glue("Found only {sum(!missing)} config files for {length(.mods)} models."),
+      glue("Only {sum(mods_finished)} models have finished (out of {length(.mods)})."),
       "The following models may have failed or still be in progress:",
-      paste(map_chr(.mods[missing], ABS_MOD_PATH), collapse = "\n"),
+      paste(map_chr(.mods[!mods_finished], ABS_MOD_PATH), collapse = "\n"),
       sep = "\n"
     ), call. = FALSE)
 
     # Throw out models that are missing bbi_config.json or bbr_boot_spec.json files.
-    .mods <- .mods[!missing]
-    json_files <- json_files[!missing]
+    .mods <- .mods[mods_finished]
+    json_files <- json_files[mods_finished]
   }
 
   res_df <- purrr::map2_dfr(.mods, json_files, config_log_entry)
