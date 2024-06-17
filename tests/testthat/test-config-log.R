@@ -180,6 +180,15 @@ test_that("add_config() works correctly with missing json [BBR-CGLG-010]", {
     log_df[["nm_version"]],
     rep_missing(MOD_NM_VERSION, missing_idx, 4L)
   )
+
+  # Test that this is also true for unfinished bootstrap runs
+  boot_run <- new_bootstrap_run(MOD1)
+  on.exit(delete_models(boot_run, .tags = NULL, .force = TRUE), add = TRUE)
+  log_df <- expect_warning(
+    run_log(MODEL_DIR, .recurse = TRUE) %>% add_config(),
+    regexp = "Only 2 models have finished (out of 5)",
+    fixed = TRUE
+  )
 })
 
 fs::dir_delete(NEW_MOD3)
@@ -195,6 +204,16 @@ test_that("config_log() works with missing output dirs [BBR-CGLG-011]", {
   expect_equal(nrow(log_df), RUN_LOG_ROWS+1-2)
   expect_equal(ncol(log_df), CONFIG_COLS)
   expect_false(any(duplicated(log_df[[ABS_MOD_PATH]])))
+
+  # Test that this is also true for unfinished bootstrap runs
+  boot_run <- new_bootstrap_run(MOD1)
+  on.exit(delete_models(boot_run, .tags = NULL, .force = TRUE), add = TRUE)
+  log_df <- expect_warning(
+    config_log(MODEL_DIR, .recurse = TRUE),
+    regexp = "Only 2 models have finished (out of 5)",
+    fixed = TRUE
+  )
+  expect_equal(nrow(log_df), RUN_LOG_ROWS+1-2)
 })
 
 test_that("config_log() works with no json found [BBR-CGLG-012]", {

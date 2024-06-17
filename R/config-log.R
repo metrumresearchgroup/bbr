@@ -186,9 +186,13 @@ config_log_make_entry.bbi_nonmem_model <- function(.mod, config, fields = NULL) 
 #' @rdname config_log_make_entry
 #' @export
 config_log_make_entry.bbi_nmboot_model <- function(.mod, config, fields = NULL) {
-  # Make names consistent
+  # Make data names consistent with other models in config_log (path and md5)
   boot_config <- config$bootstrap_spec
-  boot_config[CONFIG_KEEPERS] <- boot_config[CONFIG_BOOT_KEEPERS]
+  boot_config[[CONFIG_DATA_PATH]] <- boot_config[["based_on_data_path"]]
+  boot_config[["data_md5"]] <- boot_config[["based_on_data_md5"]]
+  # bbi and nonmem versions will be NULL until the run has been summarized
+  # - replace with NA to keep the same column order
+  boot_config[["bbi_version"]] <- boot_config[["bbi_version"]] %||% NA_character_
   fields <- fields %||% CONFIG_KEEPERS
 
   if (!all(fields %in% names(boot_config))) {
@@ -217,9 +221,6 @@ config_log_make_entry.bbi_nmboot_model <- function(.mod, config, fields = NULL) 
     warning(msg)
     return(NULL)
   }
-  # bbi and nonmem versions will be NULL until the run has been summarized
-  # - replace with NA to keep the same column order
-  boot_config[["bbi_version"]] <- boot_config[["bbi_version"]] %||% NA_character_
   boot_config[["nm_version"]] <- resolve_nonmem_version(boot_config) %||% NA_character_
 
   return(list(config = boot_config, fields = c(fields, "nm_version")))

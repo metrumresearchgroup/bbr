@@ -249,6 +249,7 @@ withr::with_options(
       # Check that overwriting works
       #  - create fake bootstrap run, since we want to clean up the original
       .boot_fake <- new_bootstrap_run(mod1, .suffix = "fake-boot")
+      on.exit(delete_models(.boot_fake, .tags = NULL, .force = TRUE), add = TRUE)
       .boot_fake <- setup_bootstrap_run(.boot_fake, n = 3)
       proc <- submit_model(.boot_fake, .overwrite = TRUE, .mode = "local")
 
@@ -264,6 +265,15 @@ withr::with_options(
         "Overwriting existing bootstrap output directories", fixed = TRUE
       )
       proc[[1]]$process$kill()
+    })
+
+    test_that("bootstrap run inclusion in config_log (before summary)", {
+      config_df <- config_log(MODEL_DIR_BBI)
+      expect_equal(nrow(config_df), 2)
+      expect_equal(config_df$run, c("1-boot", "1"))
+      # bbi and nonmem versions will be NULL until the run has been summarized
+      expect_true(is.na(config_df$bbi_version[config_df$run == "1-boot"]))
+      expect_true(is.na(config_df$nm_version[config_df$run == "1-boot"]))
     })
 
     test_that("summarize_bootstrap_run works as expected", {
@@ -313,6 +323,15 @@ withr::with_options(
       expect_true(model_is_finished(.boot_run))
       expect_false(bootstrap_is_cleaned_up(.boot_run)) # is not cleaned up
       expect_true(bootstrap_can_be_summarized(.boot_run)) # can still be summarized
+    })
+
+    test_that("bootstrap run inclusion in config_log (after summary)", {
+      config_df <- config_log(MODEL_DIR_BBI)
+      expect_equal(nrow(config_df), 2)
+      expect_equal(config_df$run, c("1-boot", "1"))
+      # bbi and nonmem versions are populated after the run has been summarized
+      expect_false(is.na(config_df$bbi_version[config_df$run == "1-boot"]))
+      expect_false(is.na(config_df$nm_version[config_df$run == "1-boot"]))
     })
 
     test_that("print.bbi_nmboot_model has a custom print method (after setup)", {
@@ -424,5 +443,14 @@ withr::with_options(
         output_lines_sum <- capture.output(print(boot_sum)) %>% suppressMessages()
         expect_true(any(grepl("Cleaned up: TRUE", output_lines_sum)))
       })
+    })
+
+    test_that("bootstrap run inclusion in config_log (after cleanup)", {
+      config_df <- config_log(MODEL_DIR_BBI)
+      expect_equal(nrow(config_df), 2)
+      expect_equal(config_df$run, c("1-boot", "1"))
+      # config log remains unchanged after cleanup
+      expect_false(is.na(config_df$bbi_version[config_df$run == "1-boot"]))
+      expect_false(is.na(config_df$nm_version[config_df$run == "1-boot"]))
     })
   })
