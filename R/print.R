@@ -144,9 +144,9 @@ print.bbi_model <- function(x, ...) {
   }
 
   model_type_status <- cli::style_bold(color_model_type(x, msg = "Status"))
-  status <- color_status(bbi_nonmem_model_status(x))
+  status <- bbi_nonmem_model_status(x)
   heading(model_type_status)
-  subheading(status)
+  subheading(color_status(status))
 
   heading("Absolute Model Path")
   bullet_list(x[[ABS_MOD_PATH]])
@@ -166,11 +166,12 @@ print.bbi_model <- function(x, ...) {
     # Print simulation model status if printing a NM_MOD_CLASS model object
     if (inherits(x, NM_MOD_CLASS)) {
       .sim <- get_simulation(x)
-      sim_status <- color_status(bbi_nonmem_model_status(.sim))
+      sim_status <- bbi_nonmem_model_status(.sim)
       heading('Attached Simulation')
-      bullet_list(paste('Status:', sim_status))
+      bullet_list(paste('Status:', color_status(sim_status)))
     } else {
       heading('Simulation Args')
+      sim_status <- status
     }
 
     # Print simulation args
@@ -178,6 +179,12 @@ print.bbi_model <- function(x, ...) {
     names(sim_args) <- c("Number of Simulations")
     iwalk(sim_args,
           ~ bullet_list(paste0(.y, ": ", col_blue(.x))))
+    # If simulation is not run (e.g., the output directory isnt committed by default),
+    # include an additional message pointing to how to re-run the simulation
+    if(sim_status == "Not Run"){
+      msg <- "See 'Re-running existing simulation' section of ?get_simulation"
+      cli::cat_bullet(msg)
+    }
   }
 
   if (inherits(x, NMBOOT_MOD_CLASS)) {

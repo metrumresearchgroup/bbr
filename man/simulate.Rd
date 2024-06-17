@@ -13,6 +13,7 @@ add_simulation(
   seed = 1234,
   data = NULL,
   sim_cols = c("DV", "PRED"),
+  git_ignore = getOption("bbr.gitignore_sim"),
   .join_col = "NUM",
   .inherit_tags = TRUE,
   .bbi_args = NULL,
@@ -42,6 +43,11 @@ what's returned from \code{nm_data(.mod)}.}
 
 \item{sim_cols}{Character column name(s) defining the simulated values to
 table out.}
+
+\item{git_ignore}{If \code{TRUE}, the default, add the simulation output directory
+to a \code{.gitignore} file. The intention here is to avoid committing large files.
+This can be passed directly to this argument or set globally with
+\code{options("bbr.gitignore_sim")}.}
 
 \item{.join_col}{Character column name(s) used to join table files post
 execution. Gets appended to the generated \verb{$TABLE} record. See
@@ -129,6 +135,23 @@ specification file is found within the output directory of \code{.mod}, and
 within the output directory of \code{.mod}.
 
 }}
+\section{Re-running existing simulation}{
+
+By default, the output directory of the simulation is \code{git} ignored (see
+\code{git_ignore} argument). When a collaborator attempts to read in the parent
+model, they would see it has an attached simulation with a status of \code{"Not Run"}.
+
+To re-run this simulation using the specs that were originally used, you can
+simply execute the following commands:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{.sim <- get_simulation(.mod)
+submit_model(.sim)
+}\if{html}{\out{</div>}}
+
+This will execute the simulation using the same \code{n}, \code{seed}, and \code{data} that
+was provided by the collaborator.
+}
+
 \examples{
 \dontrun{
 

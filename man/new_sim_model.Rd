@@ -11,6 +11,7 @@ new_sim_model(
   seed = 1234,
   data = NULL,
   sim_cols = c("DV", "PRED"),
+  git_ignore = getOption("bbr.gitignore_sim"),
   .join_col = "NUM",
   .sim_dir = get_output_dir(.mod),
   .inherit_tags = TRUE,
@@ -33,6 +34,11 @@ what's returned from \code{nm_data(.mod)}.}
 
 \item{sim_cols}{Character column name(s) defining the simulated values to
 table out.}
+
+\item{git_ignore}{If \code{TRUE}, the default, add the simulation output directory
+to a \code{.gitignore} file. The intention here is to avoid committing large files.
+This can be passed directly to this argument or set globally with
+\code{options("bbr.gitignore_sim")}.}
 
 \item{.join_col}{Character column name(s) used to join table files post
 execution. Gets appended to the generated \verb{$TABLE} record. See
