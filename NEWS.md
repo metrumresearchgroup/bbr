@@ -1,3 +1,30 @@
+# bbr 1.11.0
+
+## New features and changes
+
+* New bootstrap feature: `bbr` now supports the creation, management, and summary
+  of bootstrap runs. Runs are initialized and set up using `new_bootstrap_run()`  
+  and `setup_bootstrap_run()` respectively, and are tracked via the new 
+  `bbi_nmboot_model` type object. They can be submitted the same as any other 
+  model, after which they can be summarized via `summarize_bootstrap_run()`, and
+  "cleaned up" via `cleanup_bootstrap_run()`. (#671, #687, #701)
+  
+* New simulation feature: `bbr` now supports simple simulations. `add_simuation()`
+  will create and submit a new `bbi_nmsim_model` object, which is then attached
+  to the existing `bbi_nonmem_model` object. Additional new functions are also 
+  exported, including `nm_join_sim()`, which serves to join the simulation table
+  to the input data. (#687)
+
+* `check_nonmem_finished()` now returns `FALSE` if an output directory does not
+  exist. (#693)
+  
+* New `get_model_status()` helper for returning messages that indicate which
+  model(s) have finished executing and which are incomplete. Also invisibly
+  returns a `data.frame` with a row for each model and a logical `finished`
+  column.  (#671, #693)
+
+* Notable documentation improvements. (#671, #687)
+
 # bbr 1.10.0
 
 ## New features and changes
