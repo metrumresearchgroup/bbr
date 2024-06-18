@@ -16,8 +16,9 @@
 #' `add_simulation` does the following things:
 #'  - Checks that `.mod` was previously executed and tabled out an `MSF` file
 #'  (i.e. `$EST MSFO=1.MSF`).
-#'     - **Note:** The `MSF` file must have an upper case extension, otherwise
-#'     it will be cleaned up after submission
+#'     - **Note:**  If you are using `bbi <= 3.3.0`, the `MSF` file **must have
+#'     an upper case extension**. By default, `bbi <= 3.3.0` will delete `.msf`
+#'     (lower case) files upon model completion.
 #'  - Performs various checks to confirm the status of `.mod`, the contents of its
 #'  control stream, and the input data.
 #'  - Creates a new `bbi_nmsim_model` object with the following differences from

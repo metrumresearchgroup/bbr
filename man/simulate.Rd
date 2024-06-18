@@ -93,8 +93,9 @@ the existing \code{bbi_nonmem_model} object
 \item Checks that \code{.mod} was previously executed and tabled out an \code{MSF} file
 (i.e. \verb{$EST MSFO=1.MSF}).
 \itemize{
-\item \strong{Note:} The \code{MSF} file must have an upper case extension, otherwise
-it will be cleaned up after submission
+\item \strong{Note:}  If you are using \verb{bbi <= 3.3.0}, the \code{MSF} file \strong{must have
+an upper case extension}. By default, \verb{bbi <= 3.3.0} will delete \code{.msf}
+(lower case) files upon model completion.
 }
 \item Performs various checks to confirm the status of \code{.mod}, the contents of its
 control stream, and the input data.
