@@ -83,7 +83,7 @@ config_log_impl <- function(.mods) {
 
   # Filter out unfinished models - this is specifically necessary for bootstrap
   # runs, which have a config file _before_ submission.
-  mods_finished <- check_nonmem_finished(.mods)
+  mods_finished <- map_lgl(.mods, function(.m) model_is_finished(.m))
 
   json_files <- map_chr(
     .mods,
