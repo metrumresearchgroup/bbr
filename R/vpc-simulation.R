@@ -362,11 +362,15 @@ new_sim_model <- function(
   # Append simulation output directory to existing gitignore file
   if(isTRUE(gitignore_sim)){
     ignore_file <- file.path(.sim_dir, ".gitignore")
-    ignore_lines <- readLines(ignore_file) %>%
-      suppressSpecificWarning("incomplete final line")
     new_ignore <- paste0(.Platform$file.sep, basename(output_dir))
-    if(!any(grepl(new_ignore, ignore_lines))){
-      cat(paste0(new_ignore, "\n"), file = ignore_file, append = TRUE)
+    if(fs::file_exists(ignore_file)){
+      ignore_lines <- readLines(ignore_file) %>%
+        suppressSpecificWarning("incomplete final line")
+      if(!any(grepl(new_ignore, ignore_lines))){
+        cat(paste0(new_ignore, "\n"), file = ignore_file, append = TRUE)
+      }
+    }else{
+      writeLines(paste0(new_ignore, "\n"), ignore_file)
     }
   }
 
