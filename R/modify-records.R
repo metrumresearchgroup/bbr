@@ -20,6 +20,27 @@
 #'   `csvs`/table files. See `from_data` argument for more details.
 #'
 #' @seealso [assert_record_type()]
+#'
+#' @examples
+#' \dontrun{
+#'
+#' # Adding a new record
+#' seed <- 1234; n <- 100
+#' sim_lines <- glue("({seed}) SUBPROBLEMS={n} TRUE=FINAL ONLYSIMULATION")
+#' add_new_record(.mod, "simulation", lines = sim_lines, after = "pred")
+#'
+#'
+#' # Remove all records of a given type
+#' if(mod_has_record(.mod, "table")) remove_records(.mod, "table")
+#'
+#'
+#' # Modify or extract a problem statement
+#' > modify_prob_statement(.mod, prob_text = NULL)
+#' #> [1] "PK model 1 cmt base"
+#' > modify_prob_statement(.mod, prob_text = "new problem")
+#' #> [1] "new problem"
+#'
+#' }
 #' @note
 #' Run the following command to see what record types are available/supported by
 #' `nmrec`:
