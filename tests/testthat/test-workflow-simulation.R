@@ -146,6 +146,13 @@ withr::with_options(
         .mode = "local", .wait = TRUE
       )
 
+      # Check for gitignore update
+      sim_dir <- get_output_dir(mod1)
+      ignore_file <- file.path(sim_dir, ".gitignore")
+      ignore_lines <- readLines(ignore_file) %>%
+        suppressSpecificWarning("incomplete final line")
+      expect_true(any(grepl("/1-sim", ignore_lines)))
+
       # Confirms the presence of a spec file
       expect_true(has_simulation(mod1))
       sim_spec <- get_sim_spec(mod1)
