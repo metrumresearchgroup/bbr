@@ -168,7 +168,7 @@ print.bbi_model <- function(x, ...) {
       .sim <- get_simulation(x)
       sim_status <- bbi_nonmem_model_status(.sim)
       heading('Attached Simulation')
-      cli::cli_alert(paste('Status:', color_status(sim_status)))
+      bullet_list(paste('Status:', color_status(sim_status)))
     } else {
       heading('Simulation Args')
       sim_status <- status
