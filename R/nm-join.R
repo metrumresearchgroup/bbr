@@ -347,10 +347,20 @@ nm_join_sim <- function(
   }
 
   # If passing a bbi_nonmem_model with an attached simulation, use the simulation model
-  #  - i.e. this function supports passing in the simulation model directly, or
-  #    the parent model
+  #  - i.e. this function supports passing in the simulation model directly, _or_
+  #    the parent model or parent summary
   if(inherits(.mod, NM_MOD_CLASS)){
     .mod <- get_simulation(.mod)
+  }
+
+  sim_dir <- get_output_dir(.mod, .check_exists = FALSE)
+  if(!fs::dir_exists(sim_dir)){
+    rlang::abort(
+      c(
+        glue("Could not find simulation output directory at `{sim_dir}`."),
+        "i" = "See 'Re-running existing simulation' section of ?get_simulation"
+      )
+    )
   }
 
   # Only support joining the table we add so we can make certain assumptions
