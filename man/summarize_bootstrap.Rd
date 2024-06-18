@@ -94,5 +94,5 @@ dplyr::filter(grepl("THETA", parameter_names)) \%>\%
 
 }
 \seealso{
-\code{\link[=param_estimates_compare]{param_estimates_compare()}} \code{\link[=cleanup_bootstrap_run]{cleanup_bootstrap_run()}}
+\code{\link[=param_estimates_compare]{param_estimates_compare()}} \code{\link[=cleanup_bootstrap_run]{cleanup_bootstrap_run()}} \code{\link[=new_bootstrap_run]{new_bootstrap_run()}} \code{\link[=setup_bootstrap_run]{setup_bootstrap_run()}}
 }

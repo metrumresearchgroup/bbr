@@ -2,7 +2,7 @@
 % Please edit documentation in R/bootstrap-model.R
 \name{setup_bootstrap_run}
 \alias{setup_bootstrap_run}
-\title{Set up a bootstrap model run.}
+\title{Set up a bootstrap model run}
 \usage{
 setup_bootstrap_run(
   .boot_run,
@@ -25,7 +25,18 @@ setup_bootstrap_run(
 setup for a bootstrap run.}
 }
 \description{
-Creates a new model object and re-sampled dataset per model run.
+This function takes a \code{bbi_nmboot_model} (created by a previous
+\code{\link[=new_bootstrap_run]{new_bootstrap_run()}} call) and creates \code{n} new model objects and re-sampled
+datasets in a subdirectory. The control stream found at
+\code{get_model_path(.boot_run)} is used as the "template" for these new model
+objects, and the new datasets are sampled from the dataset defined in its
+\verb{$DATA} record (i.e. \code{get_data_path(.boot_run)}).
+}
+\details{
+Once you have run this function, you can execute your bootstrap with
+\code{\link[=submit_model]{submit_model()}}. You can use \code{\link[=get_model_status]{get_model_status()}} to check on your submitted
+bootstrap run. Once all models have finished, use \code{\link[=summarize_bootstrap_run]{summarize_bootstrap_run()}}
+to view the results. See examples below.
 }
 \examples{
 \dontrun{
@@ -44,8 +55,13 @@ submit_model(.boot_run)
 
 # Check status of runs during submission
 get_model_status(.boot_run)
+
+# Summarize results, once all runs have finished
+if (check_nonmem_finished(.boot_run)) {
+  .boot_sum <- summarize_bootstrap_run(.boot_run)
+}
 }
 }
 \seealso{
-\code{\link[=new_bootstrap_run]{new_bootstrap_run()}} \code{\link[=summarize_bootstrap_run]{summarize_bootstrap_run()}}
+\code{\link[=new_bootstrap_run]{new_bootstrap_run()}} \code{\link[=summarize_bootstrap_run]{summarize_bootstrap_run()}} \code{\link[=submit_model]{submit_model()}}
 }

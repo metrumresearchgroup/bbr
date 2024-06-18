@@ -1,4 +1,10 @@
-#' Create a boostrap model object from an existing model
+#' Create a bootstrap run from an existing model
+#'
+#' Creates a new `bbi_nmboot_model` object, from an existing `bbi_nonmem_model`
+#' object. This function creates a new control stream, that is a copy of `.mod`
+#' with the `$TABLE` and `$COV` records optionally removed (see `remove_cov` and
+#' `remove_tables` arguments). The object returned from this must then be passed
+#' to [setup_bootstrap_run()] before submission (see examples).
 #'
 #' @param .mod a `bbr` model object
 #' @param .suffix a suffix for the bootstrap run directory. Will be prefixed by
@@ -66,9 +72,21 @@ new_bootstrap_run <- function(
 }
 
 
-#' Set up a bootstrap model run.
+#' Set up a bootstrap model run
 #'
-#' Creates a new model object and re-sampled dataset per model run.
+#' This function takes a `bbi_nmboot_model` (created by a previous
+#' [new_bootstrap_run()] call) and creates `n` new model objects and re-sampled
+#' datasets in a subdirectory. The control stream found at
+#' `get_model_path(.boot_run)` is used as the "template" for these new model
+#' objects, and the new datasets are sampled from the dataset defined in its
+#' `$DATA` record (i.e. `get_data_path(.boot_run)`).
+#'
+#' @details
+#'
+#' Once you have run this function, you can execute your bootstrap with
+#' [submit_model()]. You can use [get_model_status()] to check on your submitted
+#' bootstrap run. Once all models have finished, use [summarize_bootstrap_run()]
+#' to view the results. See examples below.
 #'
 #' @param .boot_run a `bbi_nmboot_model` object.
 #' @param n number of model runs.
@@ -77,7 +95,7 @@ new_bootstrap_run <- function(
 #' @param .overwrite logical (T/F) indicating whether or not to overwrite existing
 #'  setup for a bootstrap run.
 #'
-#' @seealso [new_bootstrap_run()] [summarize_bootstrap_run()]
+#' @seealso [new_bootstrap_run()] [summarize_bootstrap_run()] [submit_model()]
 #'
 #' @examples
 #' \dontrun{
@@ -96,6 +114,11 @@ new_bootstrap_run <- function(
 #'
 #' # Check status of runs during submission
 #' get_model_status(.boot_run)
+#'
+#' # Summarize results, once all runs have finished
+#' if (check_nonmem_finished(.boot_run)) {
+#'   .boot_sum <- summarize_bootstrap_run(.boot_run)
+#' }
 #' }
 #' @export
 setup_bootstrap_run <- function(
@@ -366,7 +389,7 @@ make_boot_spec <- function(boot_models, boot_args){
 #'  also helps to reduce the number of files you need to commit via version
 #'  control (see `cleanup_bootstrap_run()`).
 #'
-#' @seealso [param_estimates_compare()] [cleanup_bootstrap_run()]
+#' @seealso [param_estimates_compare()] [cleanup_bootstrap_run()] [new_bootstrap_run()] [setup_bootstrap_run()]
 #'
 #' @examples
 #' \dontrun{

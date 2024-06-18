@@ -2,7 +2,7 @@
 % Please edit documentation in R/bootstrap-model.R
 \name{new_bootstrap_run}
 \alias{new_bootstrap_run}
-\title{Create a boostrap model object from an existing model}
+\title{Create a bootstrap run from an existing model}
 \usage{
 new_bootstrap_run(
   .mod,
@@ -33,7 +33,11 @@ Both default to \code{TRUE}.}
 S3 object of class \code{bbi_nmboot_model}.
 }
 \description{
-Create a boostrap model object from an existing model
+Creates a new \code{bbi_nmboot_model} object, from an existing \code{bbi_nonmem_model}
+object. This function creates a new control stream, that is a copy of \code{.mod}
+with the \verb{$TABLE} and \verb{$COV} records optionally removed (see \code{remove_cov} and
+\code{remove_tables} arguments). The object returned from this must then be passed
+to \code{\link[=setup_bootstrap_run]{setup_bootstrap_run()}} before submission (see examples).
 }
 \examples{
 \dontrun{
