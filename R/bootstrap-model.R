@@ -456,15 +456,13 @@ summarize_bootstrap_run <- function(
     config_lst <- purrr::map(boot_models, function(.m){
       path <- get_config_path(.m, .check_exists = FALSE)
       config <- jsonlite::fromJSON(path)
-      # dont store timeout - unique to the individual model
-      config$configuration$parallel_timeout <- NULL
       list(bbi_version = config$bbi_version, configuration = config$configuration)
     }) %>% unique()
 
     if(length(config_lst) != 1){
       rlang::warn("Multiple NONMEM or bbi configurations detected: storing the first one")
     }
-    config_lst <- purrr::pluck(config_lst, 1)
+    config_lst <- config_lst[[1]]
 
     spec_path <- get_spec_path(.boot_run)
     boot_spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)

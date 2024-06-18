@@ -358,7 +358,7 @@ SUMMARY_LOG_REQ_COLS <- c(
   ANY_HEURISTICS
 )
 
-# define json keys to keep as from bbi_config.json
+# define json keys to keep from bbi_config.json
 CONFIG_KEEPERS <- c(
   "model_md5",
   CONFIG_DATA_PATH,
@@ -366,7 +366,7 @@ CONFIG_KEEPERS <- c(
   "bbi_version"
 )
 
-# define json keys to keep as from bbr_boot_spec.json
+# define json keys to keep from bbr_boot_spec.json
 CONFIG_BOOT_KEEPERS <- c(
   "model_md5",
   "based_on_data_path",

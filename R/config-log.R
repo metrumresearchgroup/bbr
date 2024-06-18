@@ -90,9 +90,6 @@ config_log_impl <- function(.mods) {
     function(m) get_config_path(m, .check_exists = FALSE)
   )
 
-  # check for files that don't exist
-  missing <- !mods_finished
-
   if (all(!mods_finished)) {
     warning(glue("Found {length(.mods)} model(s), but none have finished executing"), call. = FALSE)
     return(
