@@ -219,31 +219,6 @@ get_simulation <- function(.mod){
 #' @param .inherit_tags If `TRUE`, the default, inherit any tags from `.mod`.
 #' @inheritParams copy_model_from
 #'
-#' @details
-#' `new_sim_model` does the following things:
-#'  - Checks that `.mod` was previously executed and tabled out an `MSF` file
-#'  (i.e. `$EST MSFO=1.MSF`).
-#'     - **Note:** The `MSF` file must have an upper case extension, otherwise
-#'     it will be cleaned up after submission
-#'  - Performs various checks to confirm the status of `.mod`, the contents of its
-#'  control stream, and the input data.
-#'  - Creates a new `bbi_nmsim_model` object with the following differences from
-#'  the original control stream:
-#'    - Removes the following record types for simulation: `$EST`, `$COV`,
-#'    `$TABLE`, `$SIMULATION`
-#'    - Removes PK and prior records: `$PRIOR`, `$THETA/$THETAP/$THETAPV`,
-#'    `$OMEGA/$OMEGAP/$OMEGAPD`, `$SIGMA/$SIGMAP/$SIGMAPD`
-#'    - Adds a new custom `$SIMULATION` record using user specified values (e.g.
-#'     `seed` and `n`).
-#'      - `TRUE=FINAL` is appended to ensure the final values are used rather
-#'      than the initial estimates.
-#'      - `ONLYSIMULATION` flag is appended to reduce run times.
-#'    - Adds a new `$TABLE` record tabling out simulated values (`sim_cols`) and
-#'    `.join_col` column(s)
-#'    - Adds a new `$MSFI` record (run with `NOMSFTEST`) pointing to the `MSF`
-#'    file of `.mod`
-#'
-#' @seealso [nm_join_sim()]
 #' @examples
 #' \dontrun{
 #'

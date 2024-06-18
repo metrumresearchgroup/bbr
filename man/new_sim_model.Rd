@@ -63,38 +63,6 @@ S3 object of class \code{bbi_nmsim_model}.
 \description{
 Create a simulation model object from an existing model
 }
-\details{
-\code{new_sim_model} does the following things:
-\itemize{
-\item Checks that \code{.mod} was previously executed and tabled out an \code{MSF} file
-(i.e. \verb{$EST MSFO=1.MSF}).
-\itemize{
-\item \strong{Note:} The \code{MSF} file must have an upper case extension, otherwise
-it will be cleaned up after submission
-}
-\item Performs various checks to confirm the status of \code{.mod}, the contents of its
-control stream, and the input data.
-\item Creates a new \code{bbi_nmsim_model} object with the following differences from
-the original control stream:
-\itemize{
-\item Removes the following record types for simulation: \verb{$EST}, \verb{$COV},
-\verb{$TABLE}, \verb{$SIMULATION}
-\item Removes PK and prior records: \verb{$PRIOR}, \verb{$THETA/$THETAP/$THETAPV},
-\verb{$OMEGA/$OMEGAP/$OMEGAPD}, \verb{$SIGMA/$SIGMAP/$SIGMAPD}
-\item Adds a new custom \verb{$SIMULATION} record using user specified values (e.g.
-\code{seed} and \code{n}).
-\itemize{
-\item \code{TRUE=FINAL} is appended to ensure the final values are used rather
-than the initial estimates.
-\item \code{ONLYSIMULATION} flag is appended to reduce run times.
-}
-\item Adds a new \verb{$TABLE} record tabling out simulated values (\code{sim_cols}) and
-\code{.join_col} column(s)
-\item Adds a new \verb{$MSFI} record (run with \code{NOMSFTEST}) pointing to the \code{MSF}
-file of \code{.mod}
-}
-}
-}
 \section{Functions}{
 \itemize{
 \item \code{make_sim_spec()}: Store simulation run details in a specification
@@ -127,8 +95,5 @@ model_diff(.sim)
 submit_model(.sim)
 }
 
-}
-\seealso{
-\code{\link[=nm_join_sim]{nm_join_sim()}}
 }
 \keyword{internal}
