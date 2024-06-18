@@ -6,6 +6,9 @@
 \usage{
 nm_file_impl(.path)
 }
+\arguments{
+\item{.path}{a path to a table file.}
+}
 \description{
 Implementation function for reading NONMEM files
 }

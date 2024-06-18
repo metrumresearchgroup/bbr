@@ -58,16 +58,18 @@ bbi_nonmem_model_status.bbi_nmboot_model <- function(.mod) {
       #  - Iterates through all models and sets the status based on whether all
       #    models have finished. This may increase the time required to print an
       #    nmboot model object to the console until the run has been cleaned up.
-      spec_path <- get_boot_spec_path(.mod, .check_exists = FALSE)
+      spec_path <- get_spec_path(.mod, .check_exists = FALSE)
       if (!fs::file_exists(spec_path)) {
         status <- "Not Run"
       }else{
         boot_spec <- get_boot_spec(.mod)
         for(output_dir.i in boot_spec$bootstrap_runs$mod_path_abs){
           if (dir.exists(output_dir.i)) {
-            json_file <- get_config_path(
-              read_model(output_dir.i), .check_exists = FALSE
-            )
+            # Exit early as incomplete if any model cannot be read in for any reason
+            boot_m <- tryCatch({read_model(output_dir.i)}, error = function(e) NULL)
+            if(is.null(boot_m)) return("Incomplete Run")
+            # Otherwise check for presence of config file
+            json_file <- get_config_path(boot_m, .check_exists = FALSE)
             if(fs::file_exists(json_file)) {
               # Set to incomplete if one config file exists. Update at the end
               # if they all exist
@@ -121,7 +123,7 @@ bootstrap_is_cleaned_up <- function(.boot_run){
 
   output_dir <- get_output_dir(.boot_run, .check_exists = FALSE)
   if(!fs::file_exists(output_dir)) return(FALSE)
-  spec_path <- get_boot_spec_path(.boot_run, .check_exists = FALSE)
+  spec_path <- get_spec_path(.boot_run, .check_exists = FALSE)
   if(!fs::file_exists(spec_path)) return(FALSE)
 
   boot_spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
@@ -226,7 +228,7 @@ check_nonmem_finished.bbi_base_model <- function(.mod, ...) {
 
 #' @export
 check_nonmem_finished.list <- function(.mod, ...) {
-  check_model_object_list(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))
+  check_model_object_list(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMSIM_MOD_CLASS))
   # Return logical values as vector (unique handling)
   #  - used in `wait_for_nonmem`
   models_finished <- map_lgl(.mod, ~model_is_finished(.x))
@@ -366,15 +368,15 @@ wait_for_nonmem.default <- function(.mod, .time_limit = 300, .interval = 5, .del
 #' @keywords internal
 mod_list_setup <- function(.mod){
   if(inherits(.mod, "list") && !inherits(.mod, "bbi_base_model")){
-    check_model_object_list(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))
+    check_model_object_list(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMSIM_MOD_CLASS))
   }else{
-    check_model_object(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))
-    if(inherits(.mod, NM_MOD_CLASS)){
-      .mod <- list(.mod)
-    }else{
+    check_model_object(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMSIM_MOD_CLASS))
+    if(inherits(.mod, NMBOOT_MOD_CLASS)){
       # Coerce to list of models for bootstrap model runs to check individually
       #  - This only happens if checking a single bootstrap run model object
       .mod <- get_boot_models(.mod)
+    }else{
+      .mod <- list(.mod)
     }
   }
   return(.mod)

@@ -35,5 +35,5 @@ cleanup_bootstrap_run(.boot_run)
 
 }
 \seealso{
-summarize_bootstrap_run
+\code{\link[=summarize_bootstrap_run]{summarize_bootstrap_run()}}
 }

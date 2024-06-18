@@ -143,23 +143,69 @@ print.bbi_model <- function(x, ...) {
     }
   }
 
+  model_type_status <- cli::style_bold(color_model_type(x, msg = "Status"))
   status <- bbi_nonmem_model_status(x)
-  if (status == "Finished Running") {
-    status <- col_green(status)
-  } else {
-    status <- col_red(status)
-  }
-
-  heading('Status')
-  subheading(status)
+  heading(model_type_status)
+  subheading(color_status(status))
 
   heading("Absolute Model Path")
   bullet_list(x[[ABS_MOD_PATH]])
 
-  heading("YAML & Model Files")
-  bullet_list(get_yaml_path(x, .check_exists = FALSE))
-  bullet_list(get_model_path(x, .check_exists = FALSE))
-  print_model_files(x, bullet_list)
+  # Dont print for simulations or bootstrap runs
+  if (!inherits(x, c(NMSIM_MOD_CLASS, NMBOOT_MOD_CLASS))) {
+    heading("YAML & Model Files")
+    bullet_list(get_yaml_path(x, .check_exists = FALSE))
+    bullet_list(get_model_path(x, .check_exists = FALSE))
+    print_model_files(x, bullet_list)
+  }
+
+  # Attach select simulation args to bbi_nonmem_model objects, or print all for
+  # bbi_nmsim_model objects
+  if (has_simulation(x)) {
+    sim_spec <- get_sim_spec(x)
+    # Print simulation model status if printing a NM_MOD_CLASS model object
+    if (inherits(x, NM_MOD_CLASS)) {
+      .sim <- get_simulation(x)
+      sim_status <- bbi_nonmem_model_status(.sim)
+      heading('Attached Simulation')
+      bullet_list(paste('Status:', color_status(sim_status)))
+    } else {
+      heading('Simulation Args')
+      sim_status <- status
+    }
+
+    # Print simulation args
+    sim_args <- sim_spec[SPEC_NMSIM_KEYS]
+    names(sim_args) <- c("Number of Simulations")
+    iwalk(sim_args,
+          ~ bullet_list(paste0(.y, ": ", col_blue(.x))))
+    # If simulation is not run (e.g., the output directory isn't committed by default),
+    # include an additional message pointing to how to re-run the simulation
+    if(sim_status == "Not Run"){
+      msg <- "See 'Re-running existing simulation' section of ?get_simulation"
+      cli::cli_alert_info(cli::col_blue(msg))
+    }
+  }
+
+  if (inherits(x, NMBOOT_MOD_CLASS)) {
+    heading('Bootstrap Args')
+    boot_spec <- get_boot_spec(x)
+    # Spec file doesnt exist until bootstrap run is set up via setup_bootstrap_run
+    if(!is.null(boot_spec)){
+      boot_args <- boot_spec[SPEC_NMBOOT_KEYS]
+      names(boot_args) <- c("Number of runs", "Stratification Columns")
+      # strat_cols can be NULL
+      boot_args[sapply(boot_args, is.null)] <- NA
+      iwalk(boot_args,
+            ~ bullet_list(paste0(.y, ": ", col_blue(paste(.x, collapse = ", ")))))
+      # Add bullet if cleaned up
+      if(isTRUE(bootstrap_is_cleaned_up(x))){
+        cli::cat_bullet(paste("Cleaned up:", col_green(TRUE)))
+      }
+    }else{
+      bullet_list(cli::col_red("Not set up"))
+    }
+  }
 
   if (is_valid_print(x[[YAML_DESCRIPTION]])) {
     heading('Description')
@@ -213,6 +259,15 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
     purrr::walk(paste(.d$estimation_method, "\n"), cli::cat_bullet, bullet = "en_dash")
   }
 
+  # Presence of simulation
+  if(isTRUE(has_simulation(x))){
+    sim_spec <- get_sim_spec(x)
+    sim_status <- paste0("Yes (N = ", sim_spec[[SPEC_NMSIM_NSIM]], ")")
+  }else{
+    sim_status <- "No"
+  }
+  cli::cat_line(paste('Simulation:', sim_status, "\n"))
+
   # check heuristics
   .h <- unlist(x[[SUMMARY_HEURISTICS]])
   if (any(.h)) {
@@ -228,6 +283,7 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
   if (only_sim) {
     return(invisible(NULL))
   }
+
 
   # build parameter table (catch Bayesian error)
   param_df <- tryCatch(
@@ -392,7 +448,51 @@ print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
 # INTERNAL HELPERS
 #####################
 
+#' Function to color the status. Green for finished; red otherwise.
+#' @param status. Character string. Either `'Finished Running'`, `'Incomplete Run'`,
+#'  or `'Not Run'`.
+#' @keywords internal
+color_status <- function(status){
+  if (status == "Finished Running") {
+    status <- cli::col_green(status)
+  } else {
+    status <- cli::col_red(status)
+  }
+  return(status)
+}
 
+#' Format and color the model type of a model
+#'
+#' Create colored text denoting the model type for use in print methods.
+#' @param .mod a `bbi_base_model` object.
+#' @param msg Character string. Appended to the end of the formatted model type
+#'  if provided.
+#' @keywords internal
+color_model_type <- function(.mod, msg = NULL){
+  UseMethod("color_model_type")
+}
+
+#' @keywords internal
+color_model_type.bbi_base_model <- function(.mod, msg = NULL){
+  checkmate::assert_string(msg, null.ok = TRUE)
+  model_type <- .mod[[YAML_MOD_TYPE]]
+  if (model_type == "nonmem") {
+    model_type <- cli::col_cyan(paste("NONMEM Model", msg))
+  } else if(model_type == "nmsim"){
+    model_type <- cli::col_br_magenta(paste("Simulation", msg))
+  } else if (model_type == "nmboot"){
+    model_type <- cli::col_yellow(paste("Bootstrap Run", msg))
+  } else {
+    # For bbr.bayes or other bbi_base_models not defined within bbr
+    #  - Other packages may implement separate methods rather than relying
+    #    on this one
+    model_type <- cli::col_cyan(paste(toupper(model_type), "Model", msg))
+  }
+  return(model_type)
+}
+
+# Register private S3 methods for development purposes
+.S3method("color_model_type", "bbi_base_model", color_model_type.bbi_base_model)
 
 #' Format digits
 #'

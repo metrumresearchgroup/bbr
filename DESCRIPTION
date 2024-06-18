@@ -1,7 +1,7 @@
 Type: Package
 Package: bbr
 Title: R package for bbi
-Version: 1.10.0.8007
+Version: 1.10.0.8010
 Authors@R: 
     c(person(given = "Seth",
              family = "Green",
@@ -66,11 +66,12 @@ Imports:
     magrittr,
     Matrix,
     mrgmisc,
-    nmrec,
+    nmrec (>= 0.3.0),
     processx,
     purrr,
     readr,
     rlang,
+    stringfish,
     stringr,
     stringi,
     tibble,

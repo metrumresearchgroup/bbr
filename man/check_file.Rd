@@ -4,10 +4,10 @@
 \alias{check_file}
 \alias{tail_output}
 \alias{tail_output.character}
-\alias{tail_output.bbi_nonmem_model}
+\alias{tail_output.bbi_base_model}
 \alias{tail_lst}
 \alias{tail_lst.character}
-\alias{tail_lst.bbi_nonmem_model}
+\alias{tail_lst.bbi_base_model}
 \title{Check an output file}
 \usage{
 check_file(.file, .head = 3, .tail = 5, .print = TRUE, .return = FALSE)
@@ -16,13 +16,13 @@ tail_output(.mod, ...)
 
 \method{tail_output}{character}(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE, ...)
 
-\method{tail_output}{bbi_nonmem_model}(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE, ...)
+\method{tail_output}{bbi_base_model}(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE, ...)
 
 tail_lst(.mod, ...)
 
 \method{tail_lst}{character}(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE, ...)
 
-\method{tail_lst}{bbi_nonmem_model}(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE, ...)
+\method{tail_lst}{bbi_base_model}(.mod, .head = 3, .tail = 5, .print = TRUE, .return = FALSE, ...)
 }
 \arguments{
 \item{.file}{Character scalar of path to file to read}
@@ -47,10 +47,10 @@ This is called internally in several S3 methods described below.
 \itemize{
 \item \code{tail_output(character)}: Tail the OUTPUT file from a file path to a model.
 
-\item \code{tail_output(bbi_nonmem_model)}: Tail the OUTPUT file from a \code{bbi_nonmem_model} object.
+\item \code{tail_output(bbi_base_model)}: Tail the OUTPUT file from a \code{bbi_base_model} object.
 
 \item \code{tail_lst(character)}: Tail the .lst file from a file path to a model.
 
-\item \code{tail_lst(bbi_nonmem_model)}: Tail the .lst file from a \code{bbi_nonmem_model} object.
+\item \code{tail_lst(bbi_base_model)}: Tail the .lst file from a \code{bbi_base_model} object.
 
 }}

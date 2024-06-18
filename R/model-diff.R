@@ -44,7 +44,7 @@ model_diff <- function(.mod, .mod2 = NULL, .file = "model", ..., .viewer = FALSE
 
 #' @rdname model_diff
 #' @export
-model_diff.default <- function(
+model_diff.bbi_nonmem_model <- function(
   .mod,
   .mod2 = NULL,
   .file = c("model"),
@@ -52,9 +52,9 @@ model_diff.default <- function(
   .viewer = FALSE
 ) {
   .file <- match.arg(.file)
-
-  check_model_object(.mod, c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))
-  if(!is.null(.mod2)) check_model_object(.mod2, c(NM_MOD_CLASS, NMBOOT_MOD_CLASS))
+  # Cannot have this check since this method is used by the others
+  # Leaving this as more of a reminder as to why this function needs to be revisited.
+  # if(!is.null(.mod2)) check_model_object(.mod2, NM_MOD_CLASS)
   .mod2 <- model_diff_get_comp(.mod, .mod2)
 
   .file1 <- get_model_path(.mod)
@@ -63,6 +63,31 @@ model_diff.default <- function(
   model_diff_impl(.file1, .file2, .viewer = .viewer)
 }
 
+#' @rdname model_diff
+#' @export
+model_diff.bbi_nmboot_model <- function(
+    .mod,
+    .mod2 = NULL,
+    .file = c("model"),
+    ...,
+    .viewer = FALSE
+    ){
+  if(!is.null(.mod2)) check_model_object(.mod2, NMBOOT_MOD_CLASS)
+  model_diff.bbi_nonmem_model(.mod, .mod2, .file, ..., .viewer = .viewer)
+}
+
+#' @rdname model_diff
+#' @export
+model_diff.bbi_nmsim_model <- function(
+    .mod,
+    .mod2 = NULL,
+    .file = c("model"),
+    ...,
+    .viewer = FALSE
+){
+  if(!is.null(.mod2)) check_model_object(.mod2, NMSIM_MOD_CLASS)
+  model_diff.bbi_nonmem_model(.mod, .mod2, .file, ..., .viewer = .viewer)
+}
 
 ###################################
 # PRIVATE IMPLEMENTATION FUNCTIONS

@@ -34,7 +34,7 @@
 #'   * Using additional parameter records for priors is not supported and will
 #'   lead to a size mismatch between the parameter and its records. Instead use
 #'   informative prior record names (such as `THETAP` and `THETAPV`).
-#'
+#' @seealso [tweak_initial_estimates()]
 #' @examples
 #'
 #' \dontrun{

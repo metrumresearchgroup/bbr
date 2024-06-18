@@ -8,6 +8,8 @@ Estimation Method(s):
 
 – MCMC Bayesian Analysis 
 
+Simulation: No 
+
 **Heuristic Problem(s) Detected:**
 
 – large_condition_number 

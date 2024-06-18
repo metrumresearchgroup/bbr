@@ -14,6 +14,13 @@
 #'
 #' * The data file (referenced in `$DATA` within the control stream)
 #'
+#' **For bootstrap runs**
+#'
+#' * The model file (control stream)
+#'
+#' * The original data file used in the setup of the bootstrap run (referenced
+#'  in `$DATA` within the control stream)
+#'
 #' @param .bbi_object the object to check. Could be
 #'   a `bbi_{.model_type}_model` object,
 #'   a `bbi_{.model_type}_summary` object,
@@ -53,8 +60,65 @@ check_up_to_date <- function(.bbi_object, ...) {
 
 #' @rdname check_up_to_date
 #' @export
-check_up_to_date.bbi_nonmem_model <- function(.bbi_object, ...) {
+check_up_to_date.bbi_base_model <- function(.bbi_object, ...) {
   check_up_to_date_nonmem(.bbi_object)
+}
+
+#' @rdname check_up_to_date
+#' @export
+check_up_to_date.bbi_nmboot_model <- function(.bbi_object, ...) {
+  output_dir <- get_output_dir(.bbi_object, .check_exists = FALSE)
+  if (!fs::dir_exists(output_dir)) {
+    rlang::abort(
+      c(
+        paste(
+          glue("Model {get_model_id(.bbi_object)}:"),
+          "Cannot check if up-to-date because bootstrap run has not been set up yet"
+        ),
+        "See `?setup_bootstrap_run` for more details"
+      )
+    )
+  }
+
+  if(!model_is_finished(.bbi_object)){
+    rlang::abort(paste(glue("Model {get_model_id(.bbi_object)}:"), CHECK_UP_TO_DATE_ERR_MSG))
+  }
+
+  boot_spec <- get_boot_spec(.bbi_object)
+
+  # check necessary files for changes
+  model_file <- get_model_path(.bbi_object)
+  based_on_data_file <- get_data_path(.bbi_object, .check_exists = FALSE)
+
+  changed_files <- c(
+    boot_spec[[CONFIG_MODEL_MD5]] != tools::md5sum(model_file),
+    boot_spec[[CONFIG_DATA_BASED_ON_MD5]] != tools::md5sum(based_on_data_file)
+  )
+
+  any_changes <- any(changed_files)
+  if(isTRUE(any_changes)) {
+    message(paste(
+      glue("The following files have changed in {get_model_id(.bbi_object)}"),
+      paste("*", names(which(changed_files)), collapse = "\n"),
+      sep = "\n"
+    ))
+  }
+
+  na_files <- is.na(changed_files)
+  if(isTRUE(any(na_files))) {
+    message(paste(
+      glue("The following files in {get_model_id(.bbi_object)} ARE NO LONGER PRESENT"),
+      paste("*", names(changed_files[na_files]), collapse = "\n"),
+      sep = "\n"
+    ))
+  }
+
+
+  # build return value
+  res <- replace_na(!changed_files, FALSE)
+  names(res) <- c("model", "data")
+
+  return(invisible(res))
 }
 
 #' @rdname check_up_to_date
@@ -106,7 +170,7 @@ check_up_to_date.bbi_log_df <- function(.bbi_object, ...) {
 check_up_to_date_nonmem <- function(.mod) {
   config_path <- file.path(get_output_dir(.mod, .check_exists = FALSE), "bbi_config.json")
   if (!fs::file_exists(config_path)) {
-    stop(paste(glue("Model {get_model_id(.mod)}:"), CHECK_UP_TO_DATE_ERR_MSG))
+    rlang::abort(paste(glue("Model {get_model_id(.mod)}:"), CHECK_UP_TO_DATE_ERR_MSG))
   }
   config <- jsonlite::fromJSON(config_path)
 

@@ -26,29 +26,12 @@
 #'   extract the number of records and individuals, so those files are
 #'   irrelevant.
 #'
-#' @details
+#' @template nm-join-col
+#' @template nm-join-col-firstonly
+#' @template nm-join-col-tables
+#' @template nm-join-col-eg
 #'
-#' **Join column**
-#'
-#' The `.join_col` is the name of a single column that should appear in both the
-#' input data set and any tables you want to join. We recommend you make this
-#' column a simple integer numbering the rows in the input data set (for example
-#' `NUM`). When this column is carried into the output table files, there will
-#' be unambiguous matching from the table file back to the input data set.
-#'
-#' The one exception to this are `FIRSTONLY` tables. If a table file has the
-#' same number of rows as the there are individuals in the input data set
-#' (accounting for any filtering of data in the NONMEM control stream), it will
-#' assumed to be a `FIRSTONLY` table. In this case, the table will be joined to
-#' the input data by the `ID` column. If `ID` is not present in the table, it
-#' will be using `.join_col`. Note that if _neither_ `ID` or the column passed
-#' to `.join_col` are present in the table, the join will fail.
-#'
-#' Note also that, when `.join_col` is carried into table outputs, **there is no
-#' need to table any other columns from the input data** as long as the
-#' `nm_join()` approach is used; any column in the input data set, regardless
-#' of whether it is listed in `$INPUT` or not, will be carried through from the
-#' input data and therefore available in the joined result.
+#' @section Details:
 #'
 #' **Duplicate columns are dropped**
 #'
@@ -66,31 +49,30 @@
 #' "nm_join_origin" attribute, a list that maps each source (as named by
 #' [nm_tables()]) to the columns that came from that source.
 #'
-#' **Duplicate Rows Warning for Join Column**
-#'
-#' If there are duplicate rows found in the specified `.join_col`, a warning will be raised specifying a subset of the repeated rows.
-#' Duplicates may be caused by lack of output width. `FORMAT` may be need to be stated in control stream to have sufficient
-#' width to avoid truncating `.join_col`.
 #'
 #' **Multiple tables per file incompatibility**
 #'
-#' Because `nm_tables()` calls [nm_file()] internally, it is _not_ compatible
-#' with multiple tables written to a single file. See "Details" in [nm_file()]
-#' for alternatives.
+#' `nm_join()` is currently _not_ compatible with multiple tables written to a
+#' single files. **To handle multiple tables**, consider reading in the tables via
+#' [nm_tables()] (or individually via [nm_file()] & [nm_file_multi_tab()]), and
+#' joining the data manually.
+#'  - Note that `nm_join_sim()` _does_ support multiple tables for simulations.
 #'
 #' @importFrom dplyr left_join select
 #' @importFrom checkmate assert_string assert_character assert_logical assert_list
-#' @seealso [nm_tables()], [nm_table_files()], [nm_file()]
+#' @seealso [nm_join_sim()], [nm_tables()], [nm_table_files()], [nm_file()],
+#' [nm_file_multi_tab()]
+#' @return a tibble
 #' @export
 nm_join <- function(
-  .mod,
-  .join_col = "NUM",
-  .files = nm_table_files(.mod),
-  .superset = FALSE,
-  .bbi_args = list(
-    no_grd_file = TRUE,
-    no_shk_file = TRUE
-  )
+    .mod,
+    .join_col = "NUM",
+    .files = nm_table_files(.mod),
+    .superset = FALSE,
+    .bbi_args = list(
+      no_grd_file = TRUE,
+      no_shk_file = TRUE
+    )
 ) {
   if (inherits(.mod, "bbi_nmbayes_model")) {
     stop(
@@ -99,19 +81,56 @@ nm_join <- function(
     )
   }
 
+  if (inherits(.mod, "bbi_nmsim_model")) {
+    stop(
+      "nm_join() is not supported for nmsim models; ",
+      "use `nm_join_sim()` instead."
+    )
+  }
+
   if (inherits(.mod, "character")) {
     checkmate::assert_string(.mod)
     .mod <- read_model(.mod)
   }
   check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
+  nm_join_impl(.mod, .join_col, .files, .superset, .bbi_args)
+}
+
+
+#' Implementation function for `nm_join()`
+#' @inheritParams nm_join
+#' @template nm-join-col
+#' @template nm-join-col-firstonly
+#' @template nm-join-col-tables
+#' @template nm-join-col-eg
+#' @keywords internal
+nm_join_impl <- function(
+    .mod,
+    .join_col = "NUM",
+    .files = nm_table_files(.mod),
+    .superset = FALSE,
+    .bbi_args = list(
+      no_grd_file = TRUE,
+      no_shk_file = TRUE
+    )
+) {
   assert_string(.join_col)
   assert_character(.files)
   assert_logical(.superset, len = 1)
   assert_list(.bbi_args)
 
-  df_list <- nm_tables(.mod, .files = .files)
+  # Multi-tabled files are not currently supported
+  df_list <- nm_tables(.mod, .files = .files, read_multi_tab = FALSE)
   .d <- df_list$data
-  .tbls <- df_list[2:length(df_list)]
+
+  # Handling for when input data is the only element
+  # This can happen if no _single table_ files were found
+  .tbls <- if(length(df_list) >= 2){
+    df_list[2:length(df_list)]
+  }else{
+    NULL
+  }
+
   if (
     "DV" %in% names(.d) &&
     "DV" %in% unlist(map(.tbls, names))
@@ -132,8 +151,8 @@ nm_join <- function(
 
   if(anyDuplicated(.d[.join_col]) != 0)
   {
-   dup_row <- .d[.join_col][duplicated( .d[.join_col]) %>% which(),]
-   stop(glue("Duplicate rows were found in {.join_col}. Please see `?nm_join` for more details"))
+    dup_row <- .d[.join_col][duplicated( .d[.join_col]) %>% which(),]
+    stop(glue("Duplicate rows were found in {.join_col}. Please see `?nm_join` for more details"))
   }
 
   if (.superset) {
@@ -156,40 +175,43 @@ nm_join <- function(
   nrec <- .s$run_details$number_of_data_records
 
   # do the join(s)
-  for (.n in names(.tbls)) {
-    tab <- .tbls[[.n]]
-    has_id <- "ID" %in% names(tab)
+  if(!is.null(.tbls)){
+    for (.n in names(.tbls)) {
+      tab <- .tbls[[.n]]
+      has_id <- "ID" %in% names(tab)
 
-    if (!(nrow(tab) %in% c(nrec, nid))) {
-      # skip table if nrow doesn't match number of records or ID's
-      # because if neither is true than this is the wrong kind of file
-      # (or something is wrong with NONMEM output)
-      warning(glue("{.n} skipped because number of rows ({nrow(tab)}) doesn't match number of records ({nrec}) or IDs ({nid})"), call. = FALSE)
-    } else if (nrow(tab) == nid) {
-      # if FIRSTONLY table join on ID
-      verbose_msg(glue("{.n} is FIRSTONLY table"))
+      if (!(nrow(tab) %in% c(nrec, nid))) {
+        # skip table if nrow doesn't match number of records or ID's
+        # because if neither is true than this is the wrong kind of file
+        # (or something is wrong with NONMEM output)
+        warning(glue("{.n} skipped because number of rows ({nrow(tab)}) doesn't match number of records ({nrec}) or IDs ({nid})"), call. = FALSE)
+      } else if (nrow(tab) == nid) {
+        # if FIRSTONLY table join on ID
+        verbose_msg(glue("{.n} is FIRSTONLY table"))
 
-      # if ID is missing, get it from the data by using .join_col
-      if (!has_id) {
-        tab <- tab %>%
-          left_join(select(.d, "ID", !!.join_col), by = .join_col)
+        # if ID is missing, get it from the data by using .join_col
+        if (!has_id) {
+          tab <- tab %>%
+            left_join(select(.d, "ID", !!.join_col), by = .join_col)
+        }
+
+        # toss .join_col, if present, because we're joining on ID
+        tab[[.join_col]] <- NULL
+
+        # do the join
+        tab <- drop_dups(tab, .d, "ID", .n)
+        col_order <- union(col_order, names(tab))
+        .d <- join_first_only_fun(tab, .d, by = "ID")
+      } else if (nrow(tab) == nrec) {
+        # otherwise, join on .join_col
+        tab <- drop_dups(tab, .d, .join_col, .n)
+        col_order <- union(col_order, names(tab))
+        .d <- join_fun(tab, .d, by = .join_col)
       }
-
-      # toss .join_col, if present, because we're joining on ID
-      tab[[.join_col]] <- NULL
-
-      # do the join
-      tab <- drop_dups(tab, .d, "ID", .n)
-      col_order <- union(col_order, names(tab))
-      .d <- join_first_only_fun(tab, .d, by = "ID")
-    } else if (nrow(tab) == nrec) {
-      # otherwise, join on .join_col
-      tab <- drop_dups(tab, .d, .join_col, .n)
-      col_order <- union(col_order, names(tab))
-      .d <- join_fun(tab, .d, by = .join_col)
+      origin[[.n]] <- names(tab)
     }
-    origin[[.n]] <- names(tab)
   }
+
 
   verbose_msg(c(
     glue("\nfinal join stats:"),
@@ -238,7 +260,7 @@ can_be_nm_joined <- function(.mod){
   is_finished <- model_is_finished(.mod)
 
   # Check for presence of table records
-  ctl <- safe_read_ctl(.mod)
+  ctl <- get_model_ctl(.mod)
   table_recs <- nmrec::select_records(ctl, "table")
   has_tables <- !rlang::is_empty(table_recs)
 
@@ -264,4 +286,163 @@ can_be_nm_joined <- function(.mod){
   }else{
     return(invisible(TRUE))
   }
+}
+
+
+#' Join simulation and input data
+#'
+#' Joins the simulation and input data of a `bbi_nonmem_model` object with an
+#' attached simulation.
+#' @param .mod A `bbi_nonmem_model` with an attached simulation, or a
+#'  `bbi_nmsim_model` object.
+#' @param .join_col Character column name(s) to use to join table files.
+#'  Defaults to `NUM`. See Details.
+#' @param .cols_keep Either `'all'`, or a vector of column name(s) to retain
+#'  in the final dataset after joining. Defaults to keeping all columns.
+#' @inheritParams nm_file_multi_tab
+#'
+#' @note The join column name(s) specified should match what you provided to
+#' [add_simulation()].
+#'
+#' @template nm-join-col
+#' @template nm-join-col-tables
+#' @template nm-join-col-eg
+#'
+#' @seealso [add_simulation()], [nm_file_multi_tab()], [nm_tables()]
+#'
+#' @examples
+#' \dontrun{
+#'
+#' add_simulation(.mod, .join_col = c("NUM", "ID"))
+#'
+#' nm_join_sim(.mod, .join_col = c("NUM", "ID"), .cols_keep = "ID")
+#'
+#' # These return the same thing (simulation model is automatically read-in):
+#' nm_join_sim(.mod)
+#' nm_join_sim(get_simulation(.mod))
+#' }
+#'
+#'
+#' @return a tibble
+#' @export
+nm_join_sim <- function(
+    .mod,
+    .join_col = "NUM",
+    .cols_keep = "all",
+    add_table_names = FALSE
+){
+  checkmate::assert_character(.join_col)
+  checkmate::assert_character(.cols_keep)
+  checkmate::assert_logical(add_table_names)
+
+  if(!has_simulation(.mod)){
+    rlang::abort("No attached simulation found")
+  }
+  # Support bbi_nonmem_models as well for when a user passes in the model with
+  # the attached simulation
+  check_model_object(.mod, c(NMSIM_MOD_CLASS, NM_MOD_CLASS, NM_SUM_CLASS))
+
+  if(inherits(.mod, NM_SUM_CLASS)){
+    .mod <- read_model(.mod[[ABS_MOD_PATH]])
+  }
+
+  # If passing a bbi_nonmem_model with an attached simulation, use the simulation model
+  #  - i.e. this function supports passing in the simulation model directly, _or_
+  #    the parent model or parent summary
+  if(inherits(.mod, NM_MOD_CLASS)){
+    .mod <- get_simulation(.mod)
+  }
+
+  sim_dir <- get_output_dir(.mod, .check_exists = FALSE)
+  if(!fs::dir_exists(sim_dir)){
+    rlang::abort(
+      c(
+        glue("Could not find simulation output directory at `{sim_dir}`."),
+        "i" = "See 'Re-running existing simulation' section of ?get_simulation"
+      )
+    )
+  }
+
+  # Only support joining the table we add so we can make certain assumptions
+  files <- nm_table_files(.mod)
+  if(length(files) > 1){
+    rlang::abort(
+      "`nm_join_sim` only supports joining a single table file (the one bbr adds)",
+      "Try using `nm_tables()` to manually join the tables"
+    )
+  }
+
+  # Get list of all tables. Likely only one simulation table, but may include
+  # other manually added tables
+  df_list <- nm_tables(
+    .mod, .files = files, read_multi_tab = TRUE, add_table_names = add_table_names
+  )
+
+  .d <- df_list$data
+  keep_all_cols <- (length(.cols_keep) == 1 && .cols_keep == "all")
+  if(isFALSE(keep_all_cols) && !all(.cols_keep %in% names(.d))){
+    col_keep_txt <- paste0(.cols_keep, collapse = ", ")
+    .cols_keep <- "all"
+    rlang::warn(
+      c(
+        glue("Cannot find requested columns ({col_keep_txt}) in input data."),
+        "i" = "See `names(nm_data(.mod))` for available `.cols_keep` options.",
+        "Returning all columns..."
+      )
+    )
+  }
+
+  .tbls <- df_list[2:length(df_list)]
+
+  if("DV" %in% names(.d) && "DV" %in% unlist(map(.tbls, names))){
+    .d <- dplyr::rename(.d, DV.DATA = "DV")
+  }
+  col_order <- if(isTRUE(keep_all_cols)) names(.d) else .cols_keep
+
+  # Keep track of where each column came from.
+  origin <- vector(mode = "list", length = length(df_list))
+  names(origin) <- names(df_list)
+  origin$data <- col_order
+
+  .join_col <- toupper(.join_col)
+  if(!all(.join_col %in% names(.d))){
+    join_col_txt <- paste0(.join_col[!(.join_col %in% names(.d))], collapse = ", ")
+    stop(glue("couldn't find `.join_col` {join_col_txt} columns in input data"))
+  }
+
+  if(anyDuplicated(.d[.join_col]) != 0){
+    join_col_txt <- paste0(.join_col, collapse = ", ")
+    stop(glue("Duplicate rows were found in {join_col_txt}. Please see `?nm_join_sim` for more details"))
+  }
+
+  # Note: Kept for-loop in case we decide to support multiple table records
+  #  (i.e. additional, manually added ones) at a later time
+  for (.n in names(.tbls)) {
+    tab <- .tbls[[.n]]
+    if(!all(.join_col %in% names(tab))){
+      join_col_txt <- paste0(.join_col[!(.join_col %in% names(tab))], collapse = ", ")
+      stop(glue("couldn't find `.join_col` {join_col_txt} in data with cols: {paste(names(tab), collapse = ', ')}"))
+    }
+    # This assumes the multi-tabled file is a necessarily a simulation dataset
+    if("table_id" %in% names(tab)){
+      tmp <- tab %>% dplyr::group_by(.data$table_id) %>% dplyr::mutate(NN = dplyr::cur_group_id())
+      tab <- dplyr::select(tab, -c("table_id"))
+    }
+    # Note: we dont drop duplicates here since there will inherently be duplicated
+    # `NUM` (.join_col) values per replicate
+    col_order <- union(col_order, names(tab))
+    .d <- dplyr::left_join(tab, .d, by = .join_col)
+    origin[[.n]] <- names(tab)
+  }
+
+  verbose_msg(c(
+    glue("\nfinal join stats:"),
+    glue("  rows: {nrow(.d)}"),
+    glue("  cols: {ncol(.d)}")
+  ))
+
+  res <- dplyr::select(.d, !!col_order)
+  attr(res, "nm_join_origin") <- origin
+
+  return(res)
 }

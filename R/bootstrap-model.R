@@ -1,4 +1,10 @@
-#' Create a boostrap model object from an existing model
+#' Create a bootstrap run from an existing model
+#'
+#' Creates a new `bbi_nmboot_model` object, from an existing `bbi_nonmem_model`
+#' object. This function creates a new control stream, that is a copy of `.mod`
+#' with the `$TABLE` and `$COV` records optionally removed (see `remove_cov` and
+#' `remove_tables` arguments). The object returned from this must then be passed
+#' to [setup_bootstrap_run()] before submission (see examples).
 #'
 #' @param .mod a `bbr` model object
 #' @param .suffix a suffix for the bootstrap run directory. Will be prefixed by
@@ -9,7 +15,19 @@
 #'  and `$TABLE` records respectively, allowing for notably faster run times.
 #'  Both default to `TRUE`.
 #'
-#' @seealso setup_bootstrap_run summarize_bootstrap_run
+#' @seealso [setup_bootstrap_run()] [summarize_bootstrap_run()]
+#' @examples
+#' \dontrun{
+#'
+#' # Create new bootstrap object
+#' .boot_run <- new_bootstrap_run(.mod)
+#'
+#' # Optionally inherit final parameter estimates
+#' .boot_run <- inherit_param_estimates(.boot_run)
+#'
+#' # Set up the run
+#' setup_bootstrap_run(.boot_run)
+#' }
 #' @return S3 object of class `bbi_nmboot_model`.
 #' @export
 new_bootstrap_run <- function(
@@ -44,21 +62,31 @@ new_bootstrap_run <- function(
 
   # Optionally remove $TABLE and $COV statements here
   if(isTRUE(remove_cov)) remove_records(boot_run, type = "covariance")
-  if(isTRUE(remove_tables)){
-    remove_records(boot_run, type = "table")
-  }else{
-    # Update table names if present (not used, but for consistency)
-    boot_run <- update_model_id(boot_run) %>% suppressMessages()
-  }
+  if(isTRUE(remove_tables)) remove_records(boot_run, type = "table")
+
+  # Update table and estimation record file paths
+  boot_run <- update_model_id(boot_run) %>% suppressMessages()
 
   # Return read-in model to get the updated class as part of the model object
   return(read_model(file.path(model_dir, boot_dir)))
 }
 
 
-#' Set up a bootstrap model run.
+#' Set up a bootstrap model run
 #'
-#' Creates a new model object and re-sampled dataset per model run.
+#' This function takes a `bbi_nmboot_model` (created by a previous
+#' [new_bootstrap_run()] call) and creates `n` new model objects and re-sampled
+#' datasets in a subdirectory. The control stream found at
+#' `get_model_path(.boot_run)` is used as the "template" for these new model
+#' objects, and the new datasets are sampled from the dataset defined in its
+#' `$DATA` record (i.e. `get_data_path(.boot_run)`).
+#'
+#' @details
+#'
+#' Once you have run this function, you can execute your bootstrap with
+#' [submit_model()]. You can use [get_model_status()] to check on your submitted
+#' bootstrap run. Once all models have finished, use [summarize_bootstrap_run()]
+#' to view the results. See examples below.
 #'
 #' @param .boot_run a `bbi_nmboot_model` object.
 #' @param n number of model runs.
@@ -67,20 +95,30 @@ new_bootstrap_run <- function(
 #' @param .overwrite logical (T/F) indicating whether or not to overwrite existing
 #'  setup for a bootstrap run.
 #'
-#' @seealso new_bootstrap_run summarize_bootstrap_run
+#' @seealso [new_bootstrap_run()] [summarize_bootstrap_run()] [submit_model()]
 #'
 #' @examples
 #' \dontrun{
 #'
 #' # Setup
 #' .boot_run <- new_bootstrap_run(.mod)
-#' .boot_run <- setup_bootstrap_run(.boot_run, n = 1000, seed = 1234)
+#' .boot_run <- setup_bootstrap_run(
+#'   .boot_run,
+#'   n = 1000,
+#'   seed = 1234,
+#'   strat_cols = c("STUDY", "ETN")
+#' )
 #'
 #' # Submit
 #' submit_model(.boot_run)
 #'
 #' # Check status of runs during submission
 #' get_model_status(.boot_run)
+#'
+#' # Summarize results, once all runs have finished
+#' if (check_nonmem_finished(.boot_run)) {
+#'   .boot_sum <- summarize_bootstrap_run(.boot_run)
+#' }
 #' }
 #' @export
 setup_bootstrap_run <- function(
@@ -326,6 +364,10 @@ make_boot_spec <- function(boot_models, boot_args){
 
 #' Summarize a bootstrap run
 #'
+#' Summarize the parameter estimates, run details, and any heuristics of a
+#' bootstrap run, saving the results to a `boot_summary.RDS` data file within the
+#' bootstrap run directory.
+#'
 #' @inheritParams setup_bootstrap_run
 #' @param force_resummarize logical (T/F). If `TRUE`, force re-summarization.
 #'  Will _only_ update the saved out `RDS` file when specified via
@@ -356,7 +398,7 @@ make_boot_spec <- function(boot_models, boot_args){
 #'  also helps to reduce the number of files you need to commit via version
 #'  control (see `cleanup_bootstrap_run()`).
 #'
-#' @seealso param_estimates_compare cleanup_bootstrap_run
+#' @seealso [param_estimates_compare()] [cleanup_bootstrap_run()] [new_bootstrap_run()] [setup_bootstrap_run()]
 #'
 #' @examples
 #' \dontrun{
@@ -574,6 +616,7 @@ get_boot_models <- function(.boot_run){
     .boot_run <- read_model(.boot_run[[ABS_MOD_PATH]])
   }
 
+  boot_dir <- .boot_run[[ABS_MOD_PATH]]
   output_dir <- get_output_dir(.boot_run, .check_exists = FALSE)
   if(!fs::file_exists(output_dir)){
     verbose_msg(
@@ -590,29 +633,39 @@ get_boot_models <- function(.boot_run){
   }
 
   boot_spec <- get_boot_spec(.boot_run)
-  boot_models <- tryCatch(
-    purrr::map(boot_spec$bootstrap_runs$mod_path_abs, read_model),
-    error = function(cond){
-      # Suppress 'does not exist' message - handle separately
-      if(!stringr::str_detect(cond$parent$message, "does not exist")){
-        # Likely would only happen if there was a bbi/submission issue
-        message(cond$parent$message)
-      }
-      return(NULL)
+  boot_model_ids <- fs::path_ext_remove(basename(boot_spec$bootstrap_runs$mod_path_abs))
+
+  boot_models <- tryCatch({
+    find_models(.boot_run[[ABS_MOD_PATH]], .recurse = FALSE, .include = boot_model_ids)
+  }, warning = function(cond){
+    if(!stringr::str_detect(cond$message, "All models excluded|Found no valid model")){
+      warning(cond)
     }
-  )
+    return(NULL)
+  })
+
 
   # This shouldnt happen, but could if the directory existed and models
   # referenced in the spec file aren't found for any reason _other than_
   # cleaning up the run
   if(is.null(boot_models) || rlang::is_empty(boot_models)){
-    boot_dir <- .boot_run[[ABS_MOD_PATH]]
-    rlang::warn(
+    rlang::abort(
       c(
         glue("At least one bootstrap run model does not exist in `{boot_dir}`")
       )
     )
+  }else{
+    if(length(boot_model_ids) != length(boot_models)){
+      rlang::warn(
+        c(
+          glue("Found an unexpected number of models in {boot_dir}"),
+          glue("Expected number of models: {length(boot_model_ids)}"),
+          glue("Discovered number of models: {length(boot_models)}")
+        )
+      )
+    }
   }
+
   return(boot_models)
 }
 
@@ -640,7 +693,7 @@ get_boot_models <- function(.boot_run){
 #'
 #' @inheritParams setup_bootstrap_run
 #' @inheritParams delete_models
-#' @seealso summarize_bootstrap_run
+#' @seealso [summarize_bootstrap_run()]
 #'
 #' @export
 cleanup_bootstrap_run <- function(.boot_run, .force = FALSE){
@@ -672,7 +725,7 @@ cleanup_bootstrap_run <- function(.boot_run, .force = FALSE){
   }
 
   # Overwrite spec file
-  spec_path <- get_boot_spec_path(.boot_run)
+  spec_path <- get_spec_path(.boot_run)
   boot_spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
   # Set cleaned up - impacts status checking
   boot_spec$bootstrap_spec$cleaned_up <- TRUE

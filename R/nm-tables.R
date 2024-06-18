@@ -13,9 +13,6 @@
 #' return a single tibble will all of this data joined together, see
 #' [nm_join()].
 #'
-#' Because `nm_tables()` calls [nm_file()] internally, it is _not_ compatible
-#' with multiple tables written to a single file. See "Details" in [nm_file()]
-#' for alternatives.
 #'
 #' @return A named list of tibbles. The first element will always be named
 #'   `data` and will contain the input data set. Subsequent elements will be
@@ -30,19 +27,27 @@
 #'   Defaults to calling [nm_table_files()] on `.mod`, which will parse all file
 #'   names from `$TABLE` blocks in the control stream. If passing manually,
 #'   paths should be either absolute, or relative to `get_output_dir(.mod)`.
+#' @param read_multi_tab Logical (`T`/`F`). If `TRUE`, read in files with
+#'   multiple tables per file. Otherwise they will be skipped.
+#' @param table_pattern character string (fixed) defining the start of a new
+#'   table. Only used if `read_multi_tab = TRUE` (passed to [nm_file_multi_tab()]).
+#' @param ... additional arguments passed to [nm_file_multi_tab()].
 #' @importFrom purrr compact map_chr
 #' @importFrom stringr str_replace
-#' @seealso [nm_join()], [nm_file()]
+#' @seealso [nm_join()], [nm_file()], [nm_file_multi_tab()]
 #' @export
 nm_tables <- function(
-  .mod,
-  .files = nm_table_files(.mod)
+    .mod,
+    .files = nm_table_files(.mod),
+    read_multi_tab = TRUE,
+    table_pattern = "TABLE NO",
+    ...
 ) {
   if (inherits(.mod, "character")) {
     checkmate::assert_string(.mod)
     .mod <- read_model(.mod)
   }
-  check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
+  check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS, NMSIM_MOD_CLASS))
   checkmate::assert_character(.files)
 
   # make paths absolute
@@ -71,7 +76,25 @@ nm_tables <- function(
 
   # read in each table file
   for (.i in 1:length(.files)) {
-    res[[.n[.i]]] <- nm_file(.files[.i])
+    is_multi_tab <- assert_nm_table_format(
+      .files[.i], table_pattern = table_pattern, check_multiple = TRUE
+    )
+    if(isTRUE(is_multi_tab)){
+      if(isTRUE(read_multi_tab)){
+        # May be a single dataframe (if tables have the same columns) or a list
+        # of tables (one of the reasons this cant be added to nm_join as easily).
+        # In the case of a single dataframe, .join_col and/or ID may be duplicated
+        # (e.g., simulation data), which would influence joining as well.
+        res[[.n[.i]]] <- nm_file_multi_tab(.files[.i], table_pattern = table_pattern, ...)
+      }else{
+        # We still check if files contain multiple tables so we can inform the user
+        # if they have been skipped or not.
+        verbose_msg(glue("Skipping multi-tabled data file: {basename(.files[.i])}\n\n"))
+        next
+      }
+    }else{
+      res[[.n[.i]]] <- nm_file(.files[.i])
+    }
   }
   return(compact(res))
 }

@@ -37,6 +37,11 @@
     options("bbr.strict" = TRUE)
   }
 
+  # controls printing extra informative messages in functions
+  if (is.null(getOption("bbr.gitignore_sim"))) {
+    options("bbr.gitignore_sim" = TRUE)
+  }
+
 }
 
 .onAttach <- function(libname, pkgname) {

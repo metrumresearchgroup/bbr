@@ -111,5 +111,49 @@ test_that("nm_table_files() works with quoted file paths [BBR-NMT-003]", {
     basename(new_paths),
     c("\"1fake.tab\"", "'2fake.tab'")
   )
+})
 
+test_that("nm_file_multi_tab() works with multiple tables", {
+  ## same rows and columns - reflects a simulation ##
+  # Duplicate 1.tab multiple times in 2.tab
+  tab1_path <- nm_table_files(MOD1)[1]
+  new_tab_path <- file.path(dirname(tab1_path), "2.tab")
+  on.exit(fs::file_delete(new_tab_path), add = TRUE)
+  fs::file_copy(tab1_path, new_tab_path)
+  base_tab_lines <- readLines(new_tab_path)
+  perturb_file(new_tab_path, txt = rep(base_tab_lines, 5))
+
+  multi_tab <- nm_file_multi_tab(new_tab_path) %>% suppressMessages()
+  expect_equal(dplyr::n_distinct(multi_tab$nn), 6)
+  expect_equal(unique(multi_tab$table_name), "TABLE NO.  1")
+  expect_equal(names(multi_tab), c(names(nm_tab(MOD1)), "nn", "table_name"))
+
+  ## Test when different types of tables are present ##
+
+  # Rows differ - simplifies to dataframe at the end, but each table has to be
+  # read in one at at time
+  perturb_file(new_tab_path, txt = base_tab_lines[1:(length(base_tab_lines) - 1)])
+  multi_tab2 <- nm_file_multi_tab(new_tab_path) %>% suppressMessages()
+  tab_rows <- multi_tab2 %>% dplyr::count(nn) %>% dplyr::pull("n")
+  expect_true(inherits(multi_tab2, "data.frame"))
+  expect_equal(tab_rows[1:6], rep(779, 6))
+  expect_equal(tab_rows[7], 778)
+
+  # Columns differ - returns a list of tables
+  tab2_path <- nm_table_files(MOD1)[2]
+  perturb_file(new_tab_path, txt = readLines(tab2_path))
+  multi_tab3 <- nm_file_multi_tab(new_tab_path) %>% suppressMessages()
+  expect_true(inherits(multi_tab3, "list"))
+  expect_equal(length(multi_tab3), 8)
+
+  # The first 6 tables should be the same as the original 1.tab table (tab1)
+  tab1 <- nm_tab(MOD1) %>% suppressMessages()
+  purrr::walk(multi_tab3[1:6], function(lst_tab){
+    expect_true(all.equal(tab1, lst_tab %>% dplyr::select(-c(table_name))))
+  })
+
+  # 7th table only differs in rows, and doesnt need to be tested again
+  # 8th table is identical to the original 1par.tab table (tab2)
+  tab2 <- nm_par_tab(MOD1) %>% suppressMessages()
+  expect_true(all.equal(tab2, multi_tab3[[8]] %>% dplyr::select(-c(table_name))))
 })

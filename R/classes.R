@@ -45,6 +45,14 @@ create_model_hook.bbi_nmboot_model <- function(.mod, ...) {
   find_nonmem_model_file_path(.mod[[ABS_MOD_PATH]], .check_exists = TRUE)
 }
 
+#' @rdname create_model_hook
+#' @export
+create_model_hook.bbi_nmsim_model <- function(.mod, ...) {
+  # we won't know the model file extension, so we rely on this helper to check
+  # the possible extensions and throw an error if none exists
+  find_nonmem_model_file_path(.mod[[ABS_MOD_PATH]], .check_exists = TRUE)
+}
+
 #' @describeIn create_bbi_object Creates list object of class `bbi_{.model_type}_model` from named list with `MODEL_REQ_INPUT_KEYS`
 #' @param res List to attempt to assign the class to
 #' @param save_yaml Logical scalar for whether to save the newly created model object to its corresponding YAML file and update the md5 hash.

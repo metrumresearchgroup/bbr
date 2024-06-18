@@ -64,3 +64,6 @@ mod2 <- copy_model_from(base_mod, "mod2") \%>\%
 
 }
 }
+\seealso{
+\code{\link[=tweak_initial_estimates]{tweak_initial_estimates()}}
+}

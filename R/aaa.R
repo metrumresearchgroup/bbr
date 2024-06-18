@@ -197,11 +197,12 @@ BBI_ARGS = list(
 # models _and_ summary objects. BBI_BASE_MODEL_CLASS ("bbi_base_model") came
 # later and applies only to regular models, not summary objects.
 BBI_PARENT_CLASS <- "bbi_model" # SHARED with bbr.bayes
-BBI_BASE_MODEL_CLASS <- "bbi_base_model"
+BBI_BASE_MODEL_CLASS <- "bbi_base_model" # SHARED with bbr.bayes
 NM_MOD_CLASS <- "bbi_nonmem_model" # SHARED with bbr.bayes
 NM_SUM_CLASS <- "bbi_nonmem_summary" # SHARED with bbr.bayes
 NMBOOT_MOD_CLASS <- "bbi_nmboot_model"
 NMBOOT_SUM_CLASS <- "bbi_nmboot_summary"
+NMSIM_MOD_CLASS <- "bbi_nmsim_model"
 SL_CLASS <- "bbi_summary_list"
 PROC_CLASS <- "bbi_process"
 RUN_LOG_CLASS <- "bbi_run_log_df"
@@ -217,7 +218,7 @@ YAML_TAGS <- "tags" # SHARED with bbr.bayes
 YAML_NOTES <- "notes"
 YAML_BBI_ARGS <- "bbi_args"
 YAML_MOD_TYPE <- "model_type" # SHARED with bbr.bayes
-YAML_STAR <- 'star'
+YAML_STAR <- "star"
 
 YAML_REQ_INPUT_KEYS <- c(
   YAML_MOD_TYPE
@@ -225,6 +226,24 @@ YAML_REQ_INPUT_KEYS <- c(
 
 ABS_MOD_PATH <- "absolute_model_path" # SHARED with bbr.bayes
 RUN_ID_COL <- "run" # SHARED with bbr.bayes
+
+# SPEC keys that are hard-coded
+SPEC_NMSIM_NSIM <- "n_sim"
+
+SPEC_NMBOOT_NSAMPLE <- "n_samples"
+SPEC_NMBOOT_STRAT <- "strat_cols"
+
+# List of keys required to print a bbi_nmsim_model object
+SPEC_NMSIM_KEYS <- c(
+  SPEC_NMSIM_NSIM
+)
+
+# List of keys required to print a bbi_nmboot_model object
+SPEC_NMBOOT_KEYS <- c(
+  SPEC_NMBOOT_NSAMPLE,
+  SPEC_NMBOOT_STRAT
+)
+
 
 # keys required to create a model object
 MODEL_REQ_INPUT_KEYS <- c(
@@ -268,6 +287,7 @@ YAML_SCALAR_TO_LIST_KEYS <- c(
   YAML_STAR
 )
 
+
 SUMMARY_DETAILS <- "run_details"
 SUMMARY_HEURISTICS <- "run_heuristics"
 SUMMARY_COND_NUM <- "condition_number"
@@ -287,6 +307,9 @@ CONFIG_MODEL_PATH <- "model_path"
 CONFIG_MODEL_MD5 <- "model_md5" # SHARED with bbr.bayes
 CONFIG_DATA_PATH <- "data_path" # SHARED with bbr.bayes
 CONFIG_DATA_MD5 <- "data_md5" # SHARED with bbr.bayes
+
+# keys for bootstrap runs
+CONFIG_DATA_BASED_ON_MD5 <- "based_on_data_md5"
 
 # keys required for a summary object to have
 SUMMARY_REQ_KEYS <- c(

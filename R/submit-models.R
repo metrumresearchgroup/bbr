@@ -73,7 +73,12 @@ submit_models.list <- function(
 
 #' @export
 submit_models.default <- function(.mods, ...) {
-  stop("Unsupported model type: ", class(.mods))
+  rlang::abort(
+    c(
+      paste("Unsupported model type: ", class(.mods)),
+       "Did you mean `submit_model` (no trailing 's')?"
+    )
+  )
 }
 
 #' @importFrom stringr str_detect

@@ -234,7 +234,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     skip_if_old_bbi("3.2.0")
     expect_message(
       check_run_times(mod1, .wait = F),
-      "Could not access data for 1"
+      "Could not access data for model 1"
     )
     run_times <- check_run_times(mod1, .wait = F) %>% suppressMessages()
     expect_equal(run_times$run, "1")
@@ -249,12 +249,12 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     mod_yamls <- lapply(mods, function(mod.x){mod.x$absolute_model_path}) %>% yaml_ext()
 
     msg_remove <- paste0(
-      paste("Removed", length(mods), "models with the following tags:\n"),
+      paste("Removed", length(mods), "model(s) with the following tags:\n"),
       paste("-","test threads", collapse = "\n")
     )
     expect_message(
       delete_models(mods, .force = T),
-      msg_remove
+      msg_remove, fixed = TRUE
     )
     expect_false(any(fs::file_exists(mod_ctls)))
     expect_false(any(fs::file_exists(mod_yamls)))
@@ -300,7 +300,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
     fake_mod_tags <- lapply(mods_fake, function(mod.x){mod.x$tags}) %>% unlist()
     msg_remove <- paste0(
-      paste("Removed", length(mods_fake), "models with the following tags:\n"),
+      paste("Removed", length(mods_fake), "model(s) with the following tags:\n"),
       paste("-",fake_mod_tags, collapse = "\n")
     )
 
@@ -309,7 +309,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
     expect_message(
       delete_models(mods_fake, .tags = fake_mod_tags, .force = T),
-      msg_remove
+      msg_remove, fixed = TRUE
     )
 
     expect_false(any(fs::file_exists(mod_ctls)))
@@ -328,7 +328,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     mod_tags[[2]] <- paste(mod_tags[[2]], collapse = ", ")
     mod_tags <- unlist(mod_tags)
     msg_remove <- paste0(
-      paste("Removed", length(mods), "models with the following tags:\n"),
+      paste("Removed", length(mods), "model(s) with the following tags:\n"),
       paste("-",mod_tags, collapse = "\n")
     )
 
@@ -337,7 +337,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
     expect_message(
       delete_models(mods, .tags = mod_tags, .force = T),
-      msg_remove
+      msg_remove, fixed = TRUE
     )
 
     expect_false(any(fs::file_exists(mod_ctls)))
@@ -356,14 +356,15 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     # When using NULL, models are not necessarily deleted in order
     # Only test that correct number of models are deleted
     msg_remove <- paste0(
-      paste("Removed", length(mods), "models \\(ignoring tags\\)"))
+      paste("Removed", length(mods), "model(s) (ignoring tags)")
+    )
 
     mod_ctls <- lapply(mods, function(mod.x){get_model_path(mod.x)}) %>% unlist()
     mod_yamls <- lapply(mods, function(mod.x){mod.x$absolute_model_path}) %>% yaml_ext()
 
     expect_message(
       delete_models(mods, .tags = NULL, .force = T),
-      msg_remove
+      msg_remove, fixed = TRUE
     )
 
     expect_false(any(fs::file_exists(mod_ctls)))

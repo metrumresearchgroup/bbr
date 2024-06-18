@@ -8,6 +8,8 @@ Estimation Method(s):
 
 – First Order Conditional Estimation with Interaction 
 
+Simulation: No 
+
 **Heuristic Problem(s) Detected:**
 
 – hessian_reset 

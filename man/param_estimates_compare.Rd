@@ -73,5 +73,5 @@ param_estimates_compare(param_df, .orig_mod = orig_mod)
 
 }
 \seealso{
-summarize_bootstrap_run
+\code{\link[=summarize_bootstrap_run]{summarize_bootstrap_run()}}
 }

@@ -59,3 +59,19 @@ modify_data_path_json <- function(mod, data_path){
   jsonlite::write_json(json, cfg_path)
 }
 
+
+# Add `MSFO=1.MSF` option to an `EST` record
+add_msf_opt <- function(mod, msf_path = paste0(get_model_id(mod), ".MSF")){
+  ctl <- get_model_ctl(mod)
+  mod_path <- get_model_path(mod)
+  est <- nmrec::select_records(ctl, "est")[[1]]
+
+  msf_path_ctl <- get_msf_path(mod, .check_exists = FALSE)
+  if(is.null(msf_path_ctl)){
+    nmrec::set_record_option(est, "MSFO", msf_path)
+    nmrec::write_ctl(ctl, mod_path)
+  }else{
+    rlang::inform(glue("MSF option already exists: \n - {est$format()}"))
+  }
+  return(mod)
+}

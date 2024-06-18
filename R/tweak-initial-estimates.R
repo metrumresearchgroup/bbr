@@ -27,7 +27,7 @@
 #'     - e.g., `(0, 0.5, 1)` --> tweak initially, falls outside bound (`(0, 1.2, 1)`)
 #'     --> set to value within bounds (first iteration: `0.5 + (1-0.5)*0.9`:  (`(0, 0.95, 1)`)
 #'
-#'
+#' @seealso [inherit_param_estimates()]
 #' @examples
 #' \dontrun{
 #' base_mod <- read_model(file.path(MODEL_DIR, "1"))
