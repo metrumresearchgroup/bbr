@@ -4,10 +4,10 @@ context("Constructing config log from bbi_config.json")
 # for each of the models any particular test might need
 run_status <- dplyr::tribble(
   ~rel_path, ~model_has_changed, ~data_has_changed,
-        "1",              FALSE,             FALSE,
-        "2",               TRUE,             FALSE,
-        "3",              FALSE,             FALSE,
- "level2/1",               TRUE,             TRUE
+  "1",              FALSE,             FALSE,
+  "2",               TRUE,             FALSE,
+  "3",              FALSE,             FALSE,
+  "level2/1",               TRUE,             TRUE
 )
 
 #' Helper to check config output
@@ -142,7 +142,11 @@ fs::file_delete(file.path(LEVEL2_MOD, "bbi_config.json"))
 missing_idx <- c(3L, 4L)
 
 test_that("add_config() works correctly with missing json [BBR-CGLG-010]", {
-  log_df <- expect_warning(run_log(MODEL_DIR, .recurse = TRUE) %>% add_config(), regexp = "Found only 2 bbi_config.json files for 4 models")
+  log_df <- expect_warning(
+    run_log(MODEL_DIR, .recurse = TRUE) %>% add_config(),
+    regexp = "Only 2 models have finished (out of 4)",
+    fixed = TRUE
+  )
   expect_equal(nrow(log_df), RUN_LOG_ROWS+1)
   expect_equal(ncol(log_df), RUN_LOG_COLS+CONFIG_COLS-2)
   expect_false(any(duplicated(log_df[[ABS_MOD_PATH]])))
@@ -176,6 +180,15 @@ test_that("add_config() works correctly with missing json [BBR-CGLG-010]", {
     log_df[["nm_version"]],
     rep_missing(MOD_NM_VERSION, missing_idx, 4L)
   )
+
+  # Test that this is also true for unfinished bootstrap runs
+  boot_run <- new_bootstrap_run(MOD1)
+  on.exit(delete_models(boot_run, .tags = NULL, .force = TRUE), add = TRUE)
+  log_df <- expect_warning(
+    run_log(MODEL_DIR, .recurse = TRUE) %>% add_config(),
+    regexp = "Only 2 models have finished (out of 5)",
+    fixed = TRUE
+  )
 })
 
 fs::dir_delete(NEW_MOD3)
@@ -184,19 +197,32 @@ fs::dir_delete(LEVEL2_MOD)
 test_that("config_log() works with missing output dirs [BBR-CGLG-011]", {
   log_df <- expect_warning(
     config_log(MODEL_DIR, .recurse = TRUE),
-    regexp = "Found only 2 bbi_config.json files for 4 models"
+    regexp = "Only 2 models have finished (out of 4)",
+    fixed = TRUE
   )
   expect_true(inherits(log_df, CONF_LOG_CLASS))
   expect_equal(nrow(log_df), RUN_LOG_ROWS+1-2)
   expect_equal(ncol(log_df), CONFIG_COLS)
   expect_false(any(duplicated(log_df[[ABS_MOD_PATH]])))
+
+  # Test that this is also true for unfinished bootstrap runs
+  boot_run <- new_bootstrap_run(MOD1)
+  on.exit(delete_models(boot_run, .tags = NULL, .force = TRUE), add = TRUE)
+  log_df <- expect_warning(
+    config_log(MODEL_DIR, .recurse = TRUE),
+    regexp = "Only 2 models have finished (out of 5)",
+    fixed = TRUE
+  )
+  expect_equal(nrow(log_df), RUN_LOG_ROWS+1-2)
 })
 
 test_that("config_log() works with no json found [BBR-CGLG-012]", {
 
-  expect_warning({
-    log_df <- config_log(LEVEL2_DIR)
-  }, regexp = "Found no bbi_config")
+  log_df <- expect_warning(
+    config_log(LEVEL2_DIR),
+    regexp = "Found 1 model(s), but none have finished executing",
+    fixed = TRUE
+  )
 
   expect_equal(nrow(log_df), 0)
   expect_equal(names(log_df), c(ABS_MOD_PATH, RUN_ID_COL))
@@ -204,9 +230,11 @@ test_that("config_log() works with no json found [BBR-CGLG-012]", {
 
 test_that("add_config() works no json found [BBR-CGLG-013]", {
 
-  expect_warning({
-    log_df <- run_log(LEVEL2_DIR) %>% add_config()
-  }, regexp = "Found no bbi_config")
+  log_df <- expect_warning(
+    run_log(LEVEL2_DIR) %>% add_config(),
+    regexp = "Found 1 model(s), but none have finished executing",
+    fixed = TRUE
+  )
 
   expect_equal(nrow(log_df), 1)
   expect_true(all(c(ABS_MOD_PATH, RUN_ID_COL, YAML_TAGS) %in% names(log_df)))
