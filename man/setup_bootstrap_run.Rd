@@ -47,5 +47,5 @@ get_model_status(.boot_run)
 }
 }
 \seealso{
-new_bootstrap_run summarize_bootstrap_run
+\code{\link[=new_bootstrap_run]{new_bootstrap_run()}} \code{\link[=summarize_bootstrap_run]{summarize_bootstrap_run()}}
 }

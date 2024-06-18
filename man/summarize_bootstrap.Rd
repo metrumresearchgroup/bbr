@@ -24,7 +24,9 @@ Will \emph{only} update the saved out \code{RDS} file when specified via
 making the data more portable for plotting.}
 }
 \description{
-Summarize a bootstrap run
+Summarize the parameter estimates, run details, and any heuristics of a
+bootstrap run, saving the results to a \code{boot_summary.RDS} data file within the
+bootstrap run directory.
 }
 \details{
 \itemize{
@@ -92,5 +94,5 @@ dplyr::filter(grepl("THETA", parameter_names)) \%>\%
 
 }
 \seealso{
-param_estimates_compare cleanup_bootstrap_run
+\code{\link[=param_estimates_compare]{param_estimates_compare()}} \code{\link[=cleanup_bootstrap_run]{cleanup_bootstrap_run()}}
 }

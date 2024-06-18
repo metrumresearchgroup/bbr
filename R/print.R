@@ -168,7 +168,7 @@ print.bbi_model <- function(x, ...) {
       .sim <- get_simulation(x)
       sim_status <- bbi_nonmem_model_status(.sim)
       heading('Attached Simulation')
-      bullet_list(paste('Status:', color_status(sim_status)))
+      cli::cli_alert(paste('Status:', color_status(sim_status)))
     } else {
       heading('Simulation Args')
       sim_status <- status
@@ -179,11 +179,11 @@ print.bbi_model <- function(x, ...) {
     names(sim_args) <- c("Number of Simulations")
     iwalk(sim_args,
           ~ bullet_list(paste0(.y, ": ", col_blue(.x))))
-    # If simulation is not run (e.g., the output directory isnt committed by default),
+    # If simulation is not run (e.g., the output directory isn't committed by default),
     # include an additional message pointing to how to re-run the simulation
     if(sim_status == "Not Run"){
       msg <- "See 'Re-running existing simulation' section of ?get_simulation"
-      cli::cat_bullet(msg)
+      cli::cli_alert_info(cli::col_blue(msg))
     }
   }
 

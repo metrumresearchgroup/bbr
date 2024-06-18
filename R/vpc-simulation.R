@@ -40,8 +40,8 @@
 #'  - Submits the model for execution.
 #'
 #' @section Re-running existing simulation:
-#' By default, the output directory of the simulation is `git` ignored (see
-#' `git_ignore` argument). When a collaborator attempts to read in the parent
+#' By default, the output directory of the simulation is `gitignore`'d (see
+#' `gitignore_sim` argument). When a collaborator attempts to read in the parent
 #' model, they would see it has an attached simulation with a status of `"Not Run"`.
 #'
 #' To re-run this simulation using the specs that were originally used, you can
@@ -51,9 +51,9 @@
 #' submit_model(.sim)
 #' ```
 #' This will execute the simulation using the same `n`, `seed`, and `data` that
-#' was provided by the collaborator.
+#' were provided by the collaborator.
 #'
-#' @seealso nm_join_sim
+#' @seealso [nm_join_sim()]
 #'
 #' @examples
 #' \dontrun{
@@ -82,7 +82,7 @@ add_simulation <- function(
     seed = 1234,
     data = NULL,
     sim_cols = c("DV", "PRED"),
-    git_ignore = getOption("bbr.gitignore_sim"),
+    gitignore_sim = getOption("bbr.gitignore_sim"),
     .join_col = "NUM",
     .inherit_tags = TRUE,
     .bbi_args = NULL,
@@ -94,7 +94,7 @@ add_simulation <- function(
     .dry_run = FALSE
 ){
   check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
-  checkmate::assert_logical(git_ignore)
+  checkmate::assert_logical(gitignore_sim)
   if(inherits(.mod, NM_SUM_CLASS)){
     .mod <- read_model(.mod[[ABS_MOD_PATH]])
   }
@@ -108,7 +108,7 @@ add_simulation <- function(
     seed = seed,
     data = data,
     sim_cols = sim_cols,
-    git_ignore = git_ignore,
+    gitignore_sim = gitignore_sim,
     .join_col = .join_col,
     .inherit_tags = .inherit_tags,
     .overwrite = overwrite_mod
@@ -210,10 +210,10 @@ get_simulation <- function(.mod){
 #' @param .join_col Character column name(s) used to join table files post
 #'  execution. Gets appended to the generated `$TABLE` record. See
 #'  [nm_join_sim()] documentation for details. Defaults to `'NUM'`.
-#' @param git_ignore If `TRUE`, the default, add the simulation output directory
-#'  to a `.gitignore` file. The intention here is to avoid committing large files.
-#'  This can be passed directly to this argument or set globally with
-#'  `options("bbr.gitignore_sim")`.
+#' @param gitignore_sim If `TRUE`, the default, add the simulation output directory
+#'  to a `.gitignore` file. The intention here is to avoid committing large files
+#'  (i.e. large simulation tables). This can be passed directly to this argument
+#'  or set globally with `options("bbr.gitignore_sim")`.
 #' @param .sim_dir A directory for holding the new simulation model. Defaults to
 #'  the output directory of `.mod`.
 #' @param .inherit_tags If `TRUE`, the default, inherit any tags from `.mod`.
@@ -243,7 +243,7 @@ get_simulation <- function(.mod){
 #'    - Adds a new `$MSFI` record (run with `NOMSFTEST`) pointing to the `MSF`
 #'    file of `.mod`
 #'
-#' @seealso nm_join_sim
+#' @seealso [nm_join_sim()]
 #' @examples
 #' \dontrun{
 #'
@@ -277,7 +277,7 @@ new_sim_model <- function(
     seed = 1234,
     data = NULL,
     sim_cols = c("DV", "PRED"),
-    git_ignore = getOption("bbr.gitignore_sim"),
+    gitignore_sim = getOption("bbr.gitignore_sim"),
     .join_col = "NUM",
     .sim_dir = get_output_dir(.mod),
     .inherit_tags = TRUE,
@@ -286,7 +286,7 @@ new_sim_model <- function(
   checkmate::assert_numeric(n, lower = 1)
   checkmate::assert_numeric(seed)
   checkmate::assert_character(sim_cols)
-  checkmate::assert_logical(git_ignore)
+  checkmate::assert_logical(gitignore_sim)
   checkmate::assert_character(.join_col)
   check_model_object(.mod, NM_MOD_CLASS)
   check_model_for_sim(.mod, .join_col)
@@ -360,7 +360,7 @@ new_sim_model <- function(
   )
 
   # Append simulation output directory to existing gitignore file
-  if(isTRUE(git_ignore)){
+  if(isTRUE(gitignore_sim)){
     ignore_file <- file.path(.sim_dir, ".gitignore")
     ignore_lines <- readLines(ignore_file) %>%
       suppressSpecificWarning("incomplete final line")

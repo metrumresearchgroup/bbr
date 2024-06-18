@@ -28,6 +28,6 @@ Check if a \code{NONMEM} table file contains one or more tables in the
 specified format
 }
 \seealso{
-nm_file_multi_tab
+\code{\link[=nm_file_multi_tab]{nm_file_multi_tab()}}
 }
 \keyword{internal}

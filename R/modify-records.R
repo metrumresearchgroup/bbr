@@ -19,7 +19,7 @@
 #'   from a `NONMEM` control stream file, or determined from reading in the
 #'   `csvs`/table files. See `from_data` argument for more details.
 #'
-#' @seealso assert_record_type
+#' @seealso [assert_record_type()]
 #' @note
 #' Run the following command to see what record types are available/supported by
 #' `nmrec`:

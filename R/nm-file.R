@@ -298,7 +298,7 @@ nm_file_multi_tab <- function(
 #' @inheritParams nm_file_multi_tab
 #' @param check_multiple Logical (T/F). If `TRUE`, check if there are multiple
 #'  tables (most single table files still contain the default `table_pattern`).
-#' @seealso nm_file_multi_tab
+#' @seealso [nm_file_multi_tab()]
 #' @return logical
 #' @keywords internal
 assert_nm_table_format <- function(

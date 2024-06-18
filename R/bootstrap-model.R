@@ -9,7 +9,7 @@
 #'  and `$TABLE` records respectively, allowing for notably faster run times.
 #'  Both default to `TRUE`.
 #'
-#' @seealso setup_bootstrap_run summarize_bootstrap_run
+#' @seealso [setup_bootstrap_run()] [summarize_bootstrap_run()]
 #' @examples
 #' \dontrun{
 #'
@@ -77,7 +77,7 @@ new_bootstrap_run <- function(
 #' @param .overwrite logical (T/F) indicating whether or not to overwrite existing
 #'  setup for a bootstrap run.
 #'
-#' @seealso new_bootstrap_run summarize_bootstrap_run
+#' @seealso [new_bootstrap_run()] [summarize_bootstrap_run()]
 #'
 #' @examples
 #' \dontrun{
@@ -332,6 +332,10 @@ make_boot_spec <- function(boot_models, boot_args){
 
 #' Summarize a bootstrap run
 #'
+#' Summarize the parameter estimates, run details, and any heuristics of a
+#' bootstrap run, saving the results to a `boot_summary.RDS` data file within the
+#' bootstrap run directory.
+#'
 #' @inheritParams setup_bootstrap_run
 #' @param force_resummarize logical (T/F). If `TRUE`, force re-summarization.
 #'  Will _only_ update the saved out `RDS` file when specified via
@@ -362,7 +366,7 @@ make_boot_spec <- function(boot_models, boot_args){
 #'  also helps to reduce the number of files you need to commit via version
 #'  control (see `cleanup_bootstrap_run()`).
 #'
-#' @seealso param_estimates_compare cleanup_bootstrap_run
+#' @seealso [param_estimates_compare()] [cleanup_bootstrap_run()]
 #'
 #' @examples
 #' \dontrun{
@@ -657,7 +661,7 @@ get_boot_models <- function(.boot_run){
 #'
 #' @inheritParams setup_bootstrap_run
 #' @inheritParams delete_models
-#' @seealso summarize_bootstrap_run
+#' @seealso [summarize_bootstrap_run()]
 #'
 #' @export
 cleanup_bootstrap_run <- function(.boot_run, .force = FALSE){

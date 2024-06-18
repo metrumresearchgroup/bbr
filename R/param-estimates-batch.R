@@ -133,7 +133,7 @@ param_estimates_batch <- function(.path,
 #'
 #' @return A tibble containing quantiles for each parameter estimate, optionally
 #' compared to the estimates from `.orig_mod`.
-#' @seealso summarize_bootstrap_run
+#' @seealso [summarize_bootstrap_run()]
 #' @examples
 #' \dontrun{
 #'

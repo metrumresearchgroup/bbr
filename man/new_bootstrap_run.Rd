@@ -49,5 +49,5 @@ setup_bootstrap_run(.boot_run)
 }
 }
 \seealso{
-setup_bootstrap_run summarize_bootstrap_run
+\code{\link[=setup_bootstrap_run]{setup_bootstrap_run()}} \code{\link[=summarize_bootstrap_run]{summarize_bootstrap_run()}}
 }

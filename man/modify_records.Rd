@@ -127,6 +127,6 @@ Run the following command to see what record types are available/supported by
 }\if{html}{\out{</div>}}
 }
 \seealso{
-assert_record_type
+\code{\link[=assert_record_type]{assert_record_type()}}
 }
 \keyword{internal}
