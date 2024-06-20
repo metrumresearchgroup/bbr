@@ -34,18 +34,32 @@ reference:
   - model_summary
   - model_summaries
   - param_estimates
-  - param_estimates_batch
-  - param_estimates_compare
-  - get_omega
-  - nm_file
   - nm_join
   - nm_tables
+  - nm_file
+  - nm_file_multi_tab
+  - get_omega
   - cov_cor
   - check_cor_threshold
   - as_summary_list
   - param_labels
   - apply_indices
   - block
+
+- title: Bootstrap and Simulation
+  contents:
+  - add_simulation
+  - has_simulation
+  - get_simulation
+  - nm_join_sim
+  - new_bootstrap_run
+  - setup_bootstrap_run
+  - summarize_bootstrap_run
+  - bootstrap_estimates
+  - get_boot_models
+  - cleanup_bootstrap_run
+  - param_estimates_batch
+  - param_estimates_compare
 
 - title: Summary log tables
   contents:
@@ -85,6 +99,12 @@ reference:
 
 - title: Assorted helpers
   contents:
+  - test_threads
+  - check_run_times
+  - delete_models
+  - get_model_status
+  - check_nonmem_finished
+  - wait_for_nonmem
   - check_file
   - collapse_to_string
   - tail_output
@@ -106,8 +126,3 @@ reference:
   - reconcile_yaml
   - check_yaml_in_sync
   - suppressSpecificWarning
-  - test_threads
-  - check_run_times
-  - delete_models
-  - check_nonmem_finished
-  - wait_for_nonmem

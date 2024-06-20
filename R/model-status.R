@@ -171,36 +171,36 @@ bootstrap_is_cleaned_up <- function(.boot_run){
 #'
 #' # Check if model(s) or bootstrap run has finished:
 #'
-#' > check_nonmem_finished(.mod)
+#' check_nonmem_finished(.mod)
 #' #> [1] TRUE
 #'
-#' > check_nonmem_finished(.boot_run)
+#' check_nonmem_finished(.boot_run)
 #' #> [1] FALSE
 #'
 #'
 #' # Inspect progress of model(s) or bootstrap run:
 #'
-#' > get_model_status(.mod)
+#' get_model_status(.mod)
 #' #> The following model(s) have finished: `1`
 #' #> 0 model(s) are incomplete
 #'
-#' > get_model_status(.boot_run)
+#' get_model_status(.boot_run)
 #' #> 25 model(s) have finished
 #' #> 75 model(s) are incomplete
 #'
-#' > get_model_status(list(.mod, .boot_run))
+#' get_model_status(list(.mod, .boot_run))
 #' #> The following model(s) have finished: `1`
 #' #> The following model(s) are incomplete: `1-boot`
 #'
 #'
 #' # Freeze the `R` console until model(s) or bootstrap run has finished:
 #'
-#' > wait_for_nonmem(.mod)
+#' wait_for_nonmem(.mod)
 #' #> Waiting for 1 model(s) to finish...
 #' #> 1 model(s) have finished
 #'
 #' # Batch submissions take longer to start
-#' > wait_for_nonmem(.boot_run, .delay = 6)
+#' wait_for_nonmem(.boot_run, .delay = 6)
 #' #> Waiting for 100 model(s) to finish...
 #' #> Waiting for 50 model(s) to finish...
 #' #> 100 model(s) have finished
