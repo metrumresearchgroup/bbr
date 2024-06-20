@@ -35,9 +35,9 @@
 #'
 #'
 #' # Modify or extract a problem statement
-#' > modify_prob_statement(.mod, prob_text = NULL)
+#' modify_prob_statement(.mod, prob_text = NULL)
 #' #> [1] "PK model 1 cmt base"
-#' > modify_prob_statement(.mod, prob_text = "new problem")
+#' modify_prob_statement(.mod, prob_text = "new problem")
 #' #> [1] "new problem"
 #'
 #' }
