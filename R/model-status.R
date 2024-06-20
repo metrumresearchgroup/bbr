@@ -207,6 +207,7 @@ bootstrap_is_cleaned_up <- function(.boot_run){
 #'
 #' }
 #'
+#' @export
 #' @name model_status
 NULL
 

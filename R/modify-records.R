@@ -20,7 +20,7 @@
 #'   `csvs`/table files. See `from_data` argument for more details.
 #'
 #' @seealso [assert_record_type()]
-#'
+#' @keywords internal
 #' @examples
 #' \dontrun{
 #'
