@@ -64,6 +64,12 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/assert_bbi_version.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/assert_nm_table_format.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/assert_record_type.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/bbi_current_release.html</loc>
   </url>
   <url>
@@ -127,13 +133,13 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/check_mode_argument.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/check_model_for_sim.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/check_model_object.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/check_model_object_list.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/bbr/reference/check_nonmem_finished.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/check_nonmem_table_bbi.html</loc>
@@ -166,7 +172,16 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/clean_ctl.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/cleanup_bootstrap_run.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/collapse_to_string.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/color_model_type.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/color_status.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/combine_list_objects.html</loc>
@@ -247,6 +262,9 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/get_based_on.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/get_boot_spec.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/get_data_path.html</loc>
   </url>
   <url>
@@ -254,6 +272,9 @@
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/get_model_working_directory.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/get_msf_path.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/get_next_integer.html</loc>
@@ -269,6 +290,15 @@
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/get_path_from_object.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/get_sim_replicate_record.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/get_sim_spec.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/get_spec_path.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/get_theta_inits.html</loc>
@@ -298,7 +328,16 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/is_valid_yaml_extension.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/make_boot_run.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/make_boot_spec.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/map_list_recursive.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/mod_list_setup.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/model_diff.html</loc>
@@ -308,6 +347,9 @@
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/model_diff_impl.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/model_status.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/model_summaries.html</loc>
@@ -334,6 +376,9 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/modify_notes.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/modify_records.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/modify_star.html</loc>
   </url>
   <url>
@@ -343,10 +388,16 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/na_to_null.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/new_bootstrap_run.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/new_ext.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/new_model.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/new_sim_model.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/nm_file.html</loc>
@@ -355,7 +406,16 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/nm_file_impl.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/nm_file_multi_tab.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/nm_join.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/nm_join_impl.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/nm_join_sim.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/nm_tables.html</loc>
@@ -442,7 +502,16 @@
     <loc>https://metrumresearchgroup.github.io/bbr/reference/set_bbi_null.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/setup_bootstrap_run.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/setup_sim_run.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/sig.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/simulate.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/skip_if_not_drone_or_metworx.html</loc>
@@ -476,6 +545,9 @@
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/submit_nonmem_model.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/bbr/reference/summarize_bootstrap.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/summary_log.html</loc>
@@ -524,8 +596,5 @@
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/bbr/reference/version_message.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/bbr/reference/wait_for_nonmem.html</loc>
   </url>
 </urlset>

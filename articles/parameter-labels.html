@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.10.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.0</span>
       </span>
     </div>
 
@@ -111,12 +111,20 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>This vignette demonstrates extracting parameter estimates and labels into a table that can be used for diagnostics, or to generate reports. <em>Note, this vignette exclusively deals with NONMEM models.</em></p>
-<p>If you are new to <code>bbr</code>, the <a href="https://metrumresearchgroup.github.io/bbr/articles/getting-started.html">“Getting Started with bbr”</a> vignette will take you through some basic scenarios for modeling with NONMEM using <code>bbr</code>, introducing you to its standard workflow and functionality.</p>
+<p>This vignette demonstrates extracting parameter estimates and labels
+into a table that can be used for diagnostics, or to generate reports.
+<em>Note, this vignette exclusively deals with NONMEM models.</em></p>
+<p>If you are new to <code>bbr</code>, the <a href="https://metrumresearchgroup.github.io/bbr/articles/getting-started.html">“Getting
+Started with bbr”</a> vignette will take you through some basic
+scenarios for modeling with NONMEM using <code>bbr</code>, introducing
+you to its standard workflow and functionality.</p>
 <div class="section level3">
 <h3 id="setup">Setup<a class="anchor" aria-label="anchor" href="#setup"></a>
 </h3>
-<p>There is some initial set up necessary for using <code>bbr</code>. Please refer to the <a href="https://metrumresearchgroup.github.io/bbr/articles/getting-started.html#setup">“Getting Started”</a> vignette, mentioned above, if you have not done this yet. Once this is done, load the library.</p>
+<p>There is some initial set up necessary for using <code>bbr</code>.
+Please refer to the <a href="https://metrumresearchgroup.github.io/bbr/articles/getting-started.html#setup">“Getting
+Started”</a> vignette, mentioned above, if you have not done this yet.
+Once this is done, load the library.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://metrumresearchgroup.github.io/bbr">bbr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
@@ -129,19 +137,23 @@
 <div class="section level3">
 <h3 id="create-model-object">Create Model Object<a class="anchor" aria-label="anchor" href="#create-model-object"></a>
 </h3>
-<p>We have a control stream and output directory, because the model has already been run.</p>
+<p>We have a control stream and output directory, because the model has
+already been run.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">MODEL_DIR</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"test-refs"</span>, <span class="st">"param-labels"</span>, <span class="st">"example-model"</span>, package <span class="op">=</span> <span class="st">"bbr"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">mod1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_model.html">read_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, <span class="st">"510"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">mod1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "bbi_nonmem_model" "bbi_base_model"   "bbi_model"        "list"</span></span></code></pre></div>
-<p>The model object you have just created can now be passed to the post-processing functions to create your tables.</p>
+<p>The model object you have just created can now be passed to the
+post-processing functions to create your tables.</p>
 </div>
 <div class="section level3">
 <h3 id="extract-parameter-labels">Extract Parameter labels<a class="anchor" aria-label="anchor" href="#extract-parameter-labels"></a>
 </h3>
-<p>Currently, the <code><a href="../reference/param_labels.html">param_labels()</a></code> function parses labels from the comments in the control stream. Here is the relevant section of our example control stream.</p>
+<p>Currently, the <code><a href="../reference/param_labels.html">param_labels()</a></code> function parses labels
+from the comments in the control stream. Here is the relevant section of
+our example control stream.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod1</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="../reference/get_path_from_object.html">get_model_path</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>                          <span class="co"># get control stream file path</span></span>
@@ -165,7 +177,9 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $SIGMA</span></span>
 <span><span class="co">#&gt; 0.04 ;[P] Residual</span></span></code></pre></div>
-<p>This control stream is parsed into the tibble below, following the syntax defined in the “Details” section of the <code><a href="../reference/param_labels.html">?param_labels</a></code> documentation.</p>
+<p>This control stream is parsed into the tibble below, following the
+syntax defined in the “Details” section of the
+<code><a href="../reference/param_labels.html">?param_labels</a></code> documentation.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">label_df</span> <span class="op">&lt;-</span> <span class="va">mod1</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="../reference/param_labels.html">param_labels</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
@@ -184,12 +198,15 @@
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> OMEGA(2,1)      CL-V      <span style="color: #949494;">""</span>      <span style="color: #949494;">"</span>[R]<span style="color: #949494;">"</span> OMEGA     </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> OMEGA(2,2)      V         <span style="color: #949494;">""</span>      <span style="color: #949494;">"</span>[P]<span style="color: #949494;">"</span> OMEGA     </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> SIGMA(1,1)      Residual  <span style="color: #949494;">""</span>      <span style="color: #949494;">"</span>[P]<span style="color: #949494;">"</span> SIGMA</span></span></code></pre></div>
-<p>Note, there are some subtleties to the <code><a href="../reference/apply_indices.html">apply_indices()</a></code> function that will be addressed in the next section.</p>
+<p>Note, there are some subtleties to the <code><a href="../reference/apply_indices.html">apply_indices()</a></code>
+function that will be addressed in the next section.</p>
 </div>
 <div class="section level3">
 <h3 id="add-parameter-estimates">Add Parameter Estimates<a class="anchor" aria-label="anchor" href="#add-parameter-estimates"></a>
 </h3>
-<p>The user can also extract parameter estimates using the <code><a href="../reference/model_summary.html">model_summary()</a></code> and <code><a href="../reference/param_estimates.html">param_estimates()</a></code> functions.</p>
+<p>The user can also extract parameter estimates using the
+<code><a href="../reference/model_summary.html">model_summary()</a></code> and <code><a href="../reference/param_estimates.html">param_estimates()</a></code>
+functions.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">param_df</span> <span class="op">&lt;-</span> <span class="va">mod1</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="../reference/model_summary.html">model_summary</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
@@ -209,7 +226,8 @@
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> OMEGA(2,2)       0.053<span style="text-decoration: underline;">8</span>  0.012<span style="text-decoration: underline;">0</span>            0.232             0.025<span style="text-decoration: underline;">9</span>  FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> SIGMA(1,1)       0.045<span style="text-decoration: underline;">0</span>  0.003<span style="text-decoration: underline;">88</span>           0.212             0.009<span style="text-decoration: underline;">14</span> FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: diag &lt;lgl&gt;, shrinkage &lt;dbl&gt;</span></span></span></code></pre></div>
-<p>These two tibbles can be joined together to create a table for including in reports.</p>
+<p>These two tibbles can be joined together to create a table for
+including in reports.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">report_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span></span>
 <span>  <span class="va">label_df</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">param_type</span><span class="op">)</span>,</span>
@@ -235,33 +253,61 @@
 <div class="section level2">
 <h2 id="applying-indices">Applying indices<a class="anchor" aria-label="anchor" href="#applying-indices"></a>
 </h2>
-<p>Because there are numerous ways of specifying the diagonal and off-diagonal elements of an <code>$OMEGA</code> or <code>$SIGMA</code> block in a control stream, automatically parsing the structure of these blocks can be brittle and error prone. For this reason, indices are <em>not</em> automatically added to the output of the <code><a href="../reference/param_labels.html">param_labels()</a></code> function and are instead added with the <code><a href="../reference/apply_indices.html">apply_indices()</a></code> function.</p>
+<p>Because there are numerous ways of specifying the diagonal and
+off-diagonal elements of an <code>$OMEGA</code> or <code>$SIGMA</code>
+block in a control stream, automatically parsing the structure of these
+blocks can be brittle and error prone. For this reason, indices are
+<em>not</em> automatically added to the output of the
+<code><a href="../reference/param_labels.html">param_labels()</a></code> function and are instead added with the
+<code><a href="../reference/apply_indices.html">apply_indices()</a></code> function.</p>
 <div class="section level3">
 <h3 id="default-behavior-all-diagonal">Default behavior: All Diagonal<a class="anchor" aria-label="anchor" href="#default-behavior-all-diagonal"></a>
 </h3>
-<p>By default <code><a href="../reference/apply_indices.html">apply_indices()</a></code> assumes that <em>all</em> <code>$OMEGA</code> and <code>$SIGMA</code> elements are diagonal. If this is the case, you do not need to pass anything to <code>.omega</code> or <code>.sigma</code> arguments described below. However, be careful that you do not accidentally overlook this because your indices will be incorrectly returned as simply <code>(1,1)</code>, <code>(2,2)</code>, <code>(3,3)</code>, etc.</p>
+<p>By default <code><a href="../reference/apply_indices.html">apply_indices()</a></code> assumes that <em>all</em>
+<code>$OMEGA</code> and <code>$SIGMA</code> elements are diagonal. If
+this is the case, you do not need to pass anything to
+<code>.omega</code> or <code>.sigma</code> arguments described below.
+However, be careful that you do not accidentally overlook this because
+your indices will be incorrectly returned as simply <code>(1,1)</code>,
+<code>(2,2)</code>, <code>(3,3)</code>, etc.</p>
 </div>
 <div class="section level3">
 <h3 id="specifying-block-structure">Specifying Block Structure<a class="anchor" aria-label="anchor" href="#specifying-block-structure"></a>
 </h3>
-<p>Block structure is specified with two arguments, <code>.omega</code> and <code>.sigma</code> which each take a logical vector. Each element in this vector corresponds to a parameter specified in the control stream and denotes whether that element is a diagonal in the relevant matrix.</p>
-<p>For example, an <code>$OMEGA BLOCK(3)</code> would be represented with the vector <code>.omega = c(TRUE, FALSE, TRUE, FALSE, FALSE, TRUE)</code> because the first, third, and sixth elements are the diagonals and the others represent the off-diagonals. However, the user doesn’t need to type this explicitly because <code>bbr</code> has a helper function <code><a href="../reference/apply_indices.html">block()</a></code> that generates these vectors.</p>
+<p>Block structure is specified with two arguments, <code>.omega</code>
+and <code>.sigma</code> which each take a logical vector. Each element
+in this vector corresponds to a parameter specified in the control
+stream and denotes whether that element is a diagonal in the relevant
+matrix.</p>
+<p>For example, an <code>$OMEGA BLOCK(3)</code> would be represented
+with the vector
+<code>.omega = c(TRUE, FALSE, TRUE, FALSE, FALSE, TRUE)</code> because
+the first, third, and sixth elements are the diagonals and the others
+represent the off-diagonals. However, the user doesn’t need to type this
+explicitly because <code>bbr</code> has a helper function
+<code><a href="../reference/apply_indices.html">block()</a></code> that generates these vectors.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"block(1): "</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="../reference/apply_indices.html">block</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">", "</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; block(1):  TRUE</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"block(2): "</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="../reference/apply_indices.html">block</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">", "</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; block(2):  TRUE, FALSE, TRUE</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"block(3): "</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="../reference/apply_indices.html">block</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">", "</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; block(3):  TRUE, FALSE, TRUE, FALSE, FALSE, TRUE</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"block(4): "</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="../reference/apply_indices.html">block</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">", "</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; block(1):  TRUE</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"block(2): "</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="../reference/apply_indices.html">block</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">", "</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; block(2):  TRUE, FALSE, TRUE</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"block(3): "</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="../reference/apply_indices.html">block</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">", "</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; block(3):  TRUE, FALSE, TRUE, FALSE, FALSE, TRUE</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"block(4): "</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="../reference/apply_indices.html">block</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">", "</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; block(4):  TRUE, FALSE, TRUE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, TRUE</span></span></code></pre></div>
-<p>Notice the use of <code>.omega = block(2)</code> in the example from the previous section.</p>
+<p>Notice the use of <code>.omega = block(2)</code> in the example from
+the previous section.</p>
 </div>
 <div class="section level3">
 <h3 id="mixed-structure">Mixed structure<a class="anchor" aria-label="anchor" href="#mixed-structure"></a>
 </h3>
-<p>More complicated block structures can be represented by concatenating these logical vectors together. For example, the following omega block:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<p>More complicated block structures can be represented by concatenating
+these logical vectors together. For example, the following omega
+block:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">REF_OMEGA</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;       $OMEGA BLOCK (3)</span></span>
@@ -273,7 +319,7 @@
 <span><span class="co">#&gt;       .01 .1      ;[P] 9 FAKE2</span></span>
 <span><span class="co">#&gt;       $OMEGA BLOCK (1) 0.04 ; [P] IOV_{KA}</span></span>
 <span><span class="co">#&gt;       $OMEGA BLOCK(1) SAME</span></span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">REF_OMEGA</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/param_labels.html">param_labels</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/apply_indices.html">apply_indices</a></span><span class="op">(</span></span>
@@ -293,12 +339,19 @@
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> OMEGA(5,5)      <span style="color: #949494;">"</span>9 FAKE2<span style="color: #949494;">"</span>  [P]   OMEGA     </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> OMEGA(6,6)      <span style="color: #949494;">"</span>IOV_{KA}<span style="color: #949494;">"</span> [P]   OMEGA     </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> OMEGA(7,7)      <span style="color: #949494;">"</span>IOV_{KA}<span style="color: #949494;">"</span> [P]   OMEGA</span></span></code></pre></div>
-<p>It is equally valid to replace any of these with logical vectors as well. For instance, instead of <code>c(..., block(1), block(1))</code> it may be easier to write <code>c(..., rep(TRUE, 2))</code>, especially if there are a number of <code>BLOCK(1)</code> lines in a row in the control stream.</p>
+<p>It is equally valid to replace any of these with logical vectors as
+well. For instance, instead of <code>c(..., block(1), block(1))</code>
+it may be easier to write <code>c(..., rep(TRUE, 2))</code>, especially
+if there are a number of <code>BLOCK(1)</code> lines in a row in the
+control stream.</p>
 </div>
 <div class="section level3">
 <h3 id="same-blocks">SAME blocks<a class="anchor" aria-label="anchor" href="#same-blocks"></a>
 </h3>
-<p>It is also worth noting here that blocks which use <code>SAME</code> (for example, <code>$OMEGA BLOCK(1) SAME</code> above) will inherit the label from the block to which <code>SAME</code> refers. This is true even if there are multiple <code>SAME</code> blocks in a row.</p>
+<p>It is also worth noting here that blocks which use <code>SAME</code>
+(for example, <code>$OMEGA BLOCK(1) SAME</code> above) will inherit the
+label from the block to which <code>SAME</code> refers. This is true
+even if there are multiple <code>SAME</code> blocks in a row.</p>
 </div>
 </div>
   </div>
@@ -320,7 +373,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer>

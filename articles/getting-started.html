@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.10.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.0</span>
       </span>
     </div>
 
@@ -111,14 +111,20 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>This “Getting Started with bbr” vignette takes the user through some basic scenarios for modeling with NONMEM using <code>bbr</code>, introducing you to its standard workflow and functionality.</p>
+<p>This “Getting Started with bbr” vignette takes the user through some
+basic scenarios for modeling with NONMEM using <code>bbr</code>,
+introducing you to its standard workflow and functionality.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://metrumresearchgroup.github.io/bbr">bbr</a></span><span class="op">)</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<p><code>bbr</code> is an R interface for running <code>bbi</code>. Together they provide a solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. Currently, only NONMEM is supported, so this vignette will only address that.</p>
+<p><code>bbr</code> is an R interface for running <code>bbi</code>.
+Together they provide a solution for managing projects involving
+modeling and simulation with a number of software solutions used in
+pharmaceutical sciences. Currently, only NONMEM is supported, so this
+vignette will only address that.</p>
 </div>
 <div class="section level2">
 <h2 id="setup">Setup<a class="anchor" aria-label="anchor" href="#setup"></a>
@@ -126,47 +132,97 @@
 <div class="section level3">
 <h3 id="installing-bbi">Installing bbi<a class="anchor" aria-label="anchor" href="#installing-bbi"></a>
 </h3>
-<p>The <em>first time</em> you use <code>bbr</code> on a system or disk, you must first install <code>bbi</code>.</p>
+<p>The <em>first time</em> you use <code>bbr</code> on a system or disk,
+you must first install <code>bbi</code>.</p>
 <div class="section level4">
 <h4 id="setting-bbi_exe_path">Setting bbi_exe_path<a class="anchor" aria-label="anchor" href="#setting-bbi_exe_path"></a>
 </h4>
-<p>The <code>bbi</code> executable is a single binary file, you just need to tell <code>bbr</code> where to find it. This can be done by setting the <code>bbr.bbi_exe_path</code> option like so:</p>
+<p>The <code>bbi</code> executable is a single binary file, you just
+need to tell <code>bbr</code> where to find it. This can be done by
+setting the <code>bbr.bbi_exe_path</code> option like so:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="st">"bbr.bbi_exe_path"</span> <span class="op">=</span> <span class="st">"/data/apps/bbi"</span><span class="op">)</span></span></code></pre></div>
-<p>Please note that <strong>this must be set for every new R session, so it’s recommended to include the above snippet in your .Rprofile</strong>, replacing the <code>"/data/apps/bbi"</code> with the absolute path from your system/project, if you have installed it somewhere different.</p>
-<p>Also note that this can be pointed to anywhere on your system; installing to <code>/data/apps/bbi</code> is merely a convention used at Metrum Research Group, where <code>bbr</code> was developed.</p>
+<p>Please note that <strong>this must be set for every new R session, so
+it’s recommended to include the above snippet in your
+.Rprofile</strong>, replacing the <code>"/data/apps/bbi"</code> with the
+absolute path from your system/project, if you have installed it
+somewhere different.</p>
+<p>Also note that this can be pointed to anywhere on your system;
+installing to <code>/data/apps/bbi</code> is merely a convention used at
+Metrum Research Group, where <code>bbr</code> was developed.</p>
 </div>
 <div class="section level4">
 <h4 id="installing-with-use_bbi">Installing with <code>use_bbi()</code><a class="anchor" aria-label="anchor" href="#installing-with-use_bbi"></a>
 </h4>
-<p><code>bbr</code> provides an installer function named <code><a href="../reference/use_bbi.html">use_bbi()</a></code> that makes it easy to install <code>bbi</code> from within R.</p>
+<p><code>bbr</code> provides an installer function named
+<code><a href="../reference/use_bbi.html">use_bbi()</a></code> that makes it easy to install <code>bbi</code>
+from within R.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">bbr</span><span class="fu">::</span><span class="fu"><a href="../reference/use_bbi.html">use_bbi</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>With no arguments passed, <code><a href="../reference/use_bbi.html">use_bbi()</a></code> will default to installing <code>bbi</code> at the path you have set in <code>options("bbr.bbi_exe_path")</code>. This is why we recommend setting this first (and putting it in your <code>.Rprofile</code> so that it is sourced for every new R session). If this option is <em>not</em> set, <code><a href="../reference/use_bbi.html">use_bbi()</a></code> will fall back to the <code>bbi</code> in my <code>$PATH</code> (accessed via <code>Sys.which("bbi")</code>) and then an OS-dependent default, in that order. See <code>?use_bbi()</code> if you would like more details.</p>
-<p>The <code><a href="../reference/use_bbi.html">use_bbi()</a></code> function also optionally takes the <em>absolute path</em> where you want to install <code>bbi</code>, though we recommend most users to follow the pattern above: first specifying a path in <code>options("bbr.bbi_exe_path")</code>, and then letting <code><a href="../reference/use_bbi.html">use_bbi()</a></code> install to that path by default.</p>
+<p>With no arguments passed, <code><a href="../reference/use_bbi.html">use_bbi()</a></code> will default to
+installing <code>bbi</code> at the path you have set in
+<code>options("bbr.bbi_exe_path")</code>. This is why we recommend
+setting this first (and putting it in your <code>.Rprofile</code> so
+that it is sourced for every new R session). If this option is
+<em>not</em> set, <code><a href="../reference/use_bbi.html">use_bbi()</a></code> will fall back to the
+<code>bbi</code> in my <code>$PATH</code> (accessed via
+<code>Sys.which("bbi")</code>) and then an OS-dependent default, in that
+order. See <code>?use_bbi()</code> if you would like more details.</p>
+<p>The <code><a href="../reference/use_bbi.html">use_bbi()</a></code> function also optionally takes the
+<em>absolute path</em> where you want to install <code>bbi</code>,
+though we recommend most users to follow the pattern above: first
+specifying a path in <code>options("bbr.bbi_exe_path")</code>, and then
+letting <code><a href="../reference/use_bbi.html">use_bbi()</a></code> install to that path by default.</p>
 </div>
 <div class="section level4">
 <h4 id="updating-bbi-or-checking-if-its-installed">Updating bbi or checking if it’s installed<a class="anchor" aria-label="anchor" href="#updating-bbi-or-checking-if-its-installed"></a>
 </h4>
-<p>If you’re not sure if you have <code>bbi</code> installed, you can use <code><a href="../reference/bbi_version.html">bbi_version()</a></code> to check. This will return the version number of your installation, if one is found, or an empty string if you do <em>not</em> have <code>bbi</code> installed. You can also use <code><a href="../reference/bbi_current_release.html">bbi_current_release()</a></code> to see the most current version available and run <code><a href="../reference/use_bbi.html">use_bbi()</a></code> as specified above if you want to update.</p>
-<p>You can also check the <a href="https://github.com/metrumresearchgroup/bbi" class="external-link">bbi documentation</a> for manual installation instructions from the command line.</p>
+<p>If you’re not sure if you have <code>bbi</code> installed, you can
+use <code><a href="../reference/bbi_version.html">bbi_version()</a></code> to check. This will return the version
+number of your installation, if one is found, or an empty string if you
+do <em>not</em> have <code>bbi</code> installed. You can also use
+<code><a href="../reference/bbi_current_release.html">bbi_current_release()</a></code> to see the most current version
+available and run <code><a href="../reference/use_bbi.html">use_bbi()</a></code> as specified above if you want
+to update.</p>
+<p>You can also check the <a href="https://github.com/metrumresearchgroup/bbi" class="external-link">bbi documentation</a>
+for manual installation instructions from the command line.</p>
 </div>
 </div>
 <div class="section level3">
 <h3 id="bbi-yaml-configuration-file">bbi.yaml configuration file<a class="anchor" aria-label="anchor" href="#bbi-yaml-configuration-file"></a>
 </h3>
-<p>To actually submit models with <code>bbi</code>, you will also need a <code>bbi.yaml</code> configuration file. Think of this as containing “global default settings” for your <code>bbi</code> runs. Those settings will not be discussed here, but know that they can be modified globally by editing that file, or model-by-model as described in the “Passing arguments to bbi” section below.</p>
+<p>To actually submit models with <code>bbi</code>, you will also need a
+<code>bbi.yaml</code> configuration file. Think of this as containing
+“global default settings” for your <code>bbi</code> runs. Those settings
+will not be discussed here, but know that they can be modified globally
+by editing that file, or model-by-model as described in the “Passing
+arguments to bbi” section below.</p>
 <div class="section level4">
 <h4 id="bbi_init">bbi_init()<a class="anchor" aria-label="anchor" href="#bbi_init"></a>
 </h4>
-<p>The <code><a href="../reference/bbi_init.html">bbi_init()</a></code> function will create a <code>bbi.yaml</code>, with the default settings, in the specified directory. Optionally, you can pass the path to a <code>bbi.yaml</code> to the <code>.config_path</code> argument of any <code>bbr</code> function that needs one. However, by default these functions will look for one in the same folder as the model being submitted or manipulated. Therefore, if you will have a number of models in the same folder, it is easiest to put a <code>bbi.yaml</code> that folder.</p>
+<p>The <code><a href="../reference/bbi_init.html">bbi_init()</a></code> function will create a
+<code>bbi.yaml</code>, with the default settings, in the specified
+directory. Optionally, you can pass the path to a <code>bbi.yaml</code>
+to the <code>.config_path</code> argument of any <code>bbr</code>
+function that needs one. However, by default these functions will look
+for one in the same folder as the model being submitted or manipulated.
+Therefore, if you will have a number of models in the same folder, it is
+easiest to put a <code>bbi.yaml</code> that folder.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">MODEL_DIR</span> <span class="op">&lt;-</span> <span class="st">"../model/nonmem/basic"</span>  <span class="co"># this should be relative to your working directory</span></span>
 <span><span class="fu"><a href="../reference/bbi_init.html">bbi_init</a></span><span class="op">(</span>.dir <span class="op">=</span> <span class="va">MODEL_DIR</span>,            <span class="co"># the directory to create the bbi.yaml in</span></span>
 <span>         .nonmem_dir <span class="op">=</span> <span class="st">"/opt/NONMEM"</span>, <span class="co"># location of NONMEM installation</span></span>
 <span>         .nonmem_version <span class="op">=</span> <span class="st">"nm74gf"</span><span class="op">)</span>  <span class="co"># default NONMEM version to use</span></span></code></pre></div>
-<p>Here we define a define variable <code>MODEL_DIR</code> with the path to the directory containing our models. Notice that you must also pass the path to a working installation of NONMEM, and a default NONMEM version to use.</p>
-<p>Note <strong>this only needs to be done once</strong> for each folder you are modeling in. Once the <code>bbi.yaml</code> exists, you will <em>not</em> need to run <code><a href="../reference/bbi_init.html">bbi_init()</a></code> again unless you want to create another one; for example if you move to modeling in a different directory, or if you want a different set of default settings for some specific subset of models.</p>
+<p>Here we define a define variable <code>MODEL_DIR</code> with the path
+to the directory containing our models. Notice that you must also pass
+the path to a working installation of NONMEM, and a default NONMEM
+version to use.</p>
+<p>Note <strong>this only needs to be done once</strong> for each folder
+you are modeling in. Once the <code>bbi.yaml</code> exists, you will
+<em>not</em> need to run <code><a href="../reference/bbi_init.html">bbi_init()</a></code> again unless you want
+to create another one; for example if you move to modeling in a
+different directory, or if you want a different set of default settings
+for some specific subset of models.</p>
 </div>
 </div>
 </div>
@@ -176,32 +232,55 @@
 <div class="section level3">
 <h3 id="create-model-object">Create model object<a class="anchor" aria-label="anchor" href="#create-model-object"></a>
 </h3>
-<p>To begin modeling, first create a model object using <code><a href="../reference/new_model.html">new_model()</a></code>. This is an S3 object which you will pass to all of the other <code>bbr</code> functions that submit, summarize, or manipulate models.</p>
-<p>The first argument (<code>.path</code>) must be the path to your model control stream <em>without file extension</em>. For instance, the call below assumes you have a control stream named <code>1.ctl</code> or <code>1.mod</code> in the directory you just assigned to <code>MODEL_DIR</code> above.</p>
+<p>To begin modeling, first create a model object using
+<code><a href="../reference/new_model.html">new_model()</a></code>. This is an S3 object which you will pass to
+all of the other <code>bbr</code> functions that submit, summarize, or
+manipulate models.</p>
+<p>The first argument (<code>.path</code>) must be the path to your
+model control stream <em>without file extension</em>. For instance, the
+call below assumes you have a control stream named <code>1.ctl</code> or
+<code>1.mod</code> in the directory you just assigned to
+<code>MODEL_DIR</code> above.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_model.html">new_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>This <code><a href="../reference/new_model.html">new_model()</a></code> call will also create a <code>1.yaml</code> file in that same directory, which stores model metadata like description and tags (discussed below). If you ever need to recreate this model object in memory, just run <code>mod1 &lt;- read_model(file.path(MODEL_DIR, 1))</code> to rebuild it from the YAML file on disk.</p>
-<p>The model object you have just created can be passed to various functions which you will see in a minute. Now that we’ve created a model, the first thing we will do is submit the model to be run.</p>
+<p>This <code><a href="../reference/new_model.html">new_model()</a></code> call will also create a
+<code>1.yaml</code> file in that same directory, which stores model
+metadata like description and tags (discussed below). If you ever need
+to recreate this model object in memory, just run
+<code>mod1 &lt;- read_model(file.path(MODEL_DIR, 1))</code> to rebuild
+it from the YAML file on disk.</p>
+<p>The model object you have just created can be passed to various
+functions which you will see in a minute. Now that we’ve created a
+model, the first thing we will do is submit the model to be run.</p>
 </div>
 <div class="section level3">
 <h3 id="inspect-initial-estimates">Inspect initial estimates<a class="anchor" aria-label="anchor" href="#inspect-initial-estimates"></a>
 </h3>
-<p>You can view the initial parameter estimates can be extracted and formatted using <code><a href="../reference/initial_estimates.html">initial_estimates()</a></code>. Additional columns will indicate any bounds on <code>$THETA</code> records, as well as the record number (such as when multiple <code>$OMEGA</code> records are used). You can optionally flag which estimates were <code>FIXED</code> or not.</p>
+<p>You can view the initial parameter estimates can be extracted and
+formatted using <code><a href="../reference/initial_estimates.html">initial_estimates()</a></code>. Additional columns
+will indicate any bounds on <code>$THETA</code> records, as well as the
+record number (such as when multiple <code>$OMEGA</code> records are
+used). You can optionally flag which estimates were <code>FIXED</code>
+or not.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">initial_est_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/initial_estimates.html">initial_estimates</a></span><span class="op">(</span><span class="va">mod1</span>, flag_fixed <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">initial_est_df</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 7</span></span></span>
 <span><span class="co">#&gt;   parameter_names  init lower_bound upper_bound fixed record_type record_number</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> THETA(1)         2              0          <span style="color: #BB0000;">NA</span> FALSE theta                   1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> THETA(2)         3              0          <span style="color: #BB0000;">NA</span> FALSE theta                   1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> THETA(3)        10              0          <span style="color: #BB0000;">NA</span> FALSE theta                   1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> THETA(4)         0.02          <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span> FALSE theta                   1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> THETA(5)         1             <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span> FALSE theta                   1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> THETA1           2              0          <span style="color: #BB0000;">NA</span> FALSE theta                   1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> THETA2           3              0          <span style="color: #BB0000;">NA</span> FALSE theta                   1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> THETA3          10              0          <span style="color: #BB0000;">NA</span> FALSE theta                   1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> THETA4           0.02          <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span> FALSE theta                   1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> THETA5           1             <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span> FALSE theta                   1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> OMEGA(1,1)       0.05          <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span> FALSE omega                   1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> OMEGA(2,2)       0.2           <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span> FALSE omega                   1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> SIGMA(1,1)       1             <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span> TRUE  sigma                   1</span></span></code></pre></div>
-<p>If stored as an <code>R</code> object, you can extract the full <code>$OMEGA</code> or <code>$SIGMA</code> matrices. This will diagonally concatenate all matrices of the same record type, where <code>NA</code> values indicate the value was not specified in the control stream file.</p>
+<p>If stored as an <code>R</code> object, you can extract the full
+<code>$OMEGA</code> or <code>$SIGMA</code> matrices. This will
+diagonally concatenate all matrices of the same record type, where
+<code>NA</code> values indicate the value was not specified in the
+control stream file.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">initial_est_df</span>, <span class="st">"omega_mat"</span><span class="op">)</span> <span class="co"># attr(initial_est_df, "sigma_mat") for SIGMA</span></span>
 <span><span class="co">#&gt;      [,1] [,2]</span></span>
@@ -220,11 +299,18 @@
 </h3>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod1</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/submit_model.html">submit_model</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>This will return a process object. We won’t discuss this object in this vignette, but it contains some information about the submission call. Please note that <strong>checking on a model run in progress is not fully implemented.</strong> For now, users should check on their runs manually (by looking at the output directory) and only proceed to the next steps once it has successfully completed.</p>
+<p>This will return a process object. We won’t discuss this object in
+this vignette, but it contains some information about the submission
+call. Please note that <strong>checking on a model run in progress is
+not fully implemented.</strong> For now, users should check on their
+runs manually (by looking at the output directory) and only proceed to
+the next steps once it has successfully completed.</p>
 <div class="section level4">
 <h4 id="passing-arguments-to-bbi">Passing arguments to bbi<a class="anchor" aria-label="anchor" href="#passing-arguments-to-bbi"></a>
 </h4>
-<p>There are a number of arguments that <code>bbi</code> can take to modify how models are run. You can print a list of available arguments using the <code><a href="../reference/print_bbi_args.html">print_bbi_args()</a></code> helper function.</p>
+<p>There are a number of arguments that <code>bbi</code> can take to
+modify how models are run. You can print a list of available arguments
+using the <code><a href="../reference/print_bbi_args.html">print_bbi_args()</a></code> helper function.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/print_bbi_args.html">print_bbi_args</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB; font-weight: bold;">additional_post_work_envs</span> (character): Any additional values (as ENV KEY=VALUE)</span></span>
@@ -294,11 +380,16 @@
 <span><span class="co">#&gt;   Command-line option: --tprdefault. <span style="color: #BB0000;">Compatibility note</span>: This option isn't</span></span>
 <span><span class="co">#&gt;   available in bbi until v3.2.0.</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB; font-weight: bold;">verbose</span> (logical): verbose output. Command-line option: --verbose</span></span></code></pre></div>
-<p>As discussed in “Setup” above, these can be set globally in the <code>bbi.yaml</code> file, and you can see the default values of them in that file. However, <strong>specific arguments can also be set or changed for each model.</strong> This can be done in two ways:</p>
+<p>As discussed in “Setup” above, these can be set globally in the
+<code>bbi.yaml</code> file, and you can see the default values of them
+in that file. However, <strong>specific arguments can also be set or
+changed for each model.</strong> This can be done in two ways:</p>
 <ul>
-<li>Attaching them to a model object with <code><a href="../reference/modify_bbi_args.html">add_bbi_args()</a></code> or <code>replace_bbi_args()</code>
+<li>Attaching them to a model object with <code><a href="../reference/modify_bbi_args.html">add_bbi_args()</a></code> or
+<code>replace_bbi_args()</code>
 </li>
-<li>Passing them as a named list to the <code>.bbi_args</code> argument of one of the following functions
+<li>Passing them as a named list to the <code>.bbi_args</code> argument
+of one of the following functions
 <ul>
 <li>
 <code><a href="../reference/new_model.html">new_model()</a></code> or <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code>
@@ -312,29 +403,48 @@
 </ul>
 </li>
 </ul>
-<p>Note that any <code>bbi_args</code> attached to a model object will override the relevant settings in <code>bbi.yaml</code>, and that <code>.bbi_args</code> passed into a <code>submit_</code> or <code>_summary</code> call will override the relevant settings in both <code>bbi.yaml</code> <em>and</em> <code>bbi_args</code> attached to the model object.</p>
-<p>See the docs for any of the functions just mentioned for more details on usage and syntax.</p>
+<p>Note that any <code>bbi_args</code> attached to a model object will
+override the relevant settings in <code>bbi.yaml</code>, and that
+<code>.bbi_args</code> passed into a <code>submit_</code> or
+<code>_summary</code> call will override the relevant settings in both
+<code>bbi.yaml</code> <em>and</em> <code>bbi_args</code> attached to the
+model object.</p>
+<p>See the docs for any of the functions just mentioned for more details
+on usage and syntax.</p>
 </div>
 <div class="section level4">
 <h4 id="overwriting-output-from-a-previously-run-model">Overwriting output from a previously run model<a class="anchor" aria-label="anchor" href="#overwriting-output-from-a-previously-run-model"></a>
 </h4>
-<p>It is common to run a model, make some tweaks to it, and then run it again. However, to avoid accidentally deleting model outputs, <code>bbr</code> will error by default if it sees existing output when trying to submit a model. To automatically overwrite any previous model output, just pass <code>.overwrite = TRUE</code> to <code><a href="../reference/submit_model.html">submit_model()</a></code>.</p>
+<p>It is common to run a model, make some tweaks to it, and then run it
+again. However, to avoid accidentally deleting model outputs,
+<code>bbr</code> will error by default if it sees existing output when
+trying to submit a model. To automatically overwrite any previous model
+output, just pass <code>.overwrite = TRUE</code> to
+<code><a href="../reference/submit_model.html">submit_model()</a></code>.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod1</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/submit_model.html">submit_model</a></span><span class="op">(</span>.overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p>You can also inherit this setting, either by attaching <code>overwrite = TRUE</code> to a model with <code><a href="../reference/modify_bbi_args.html">add_bbi_args()</a></code> or by setting it globally with <code>overwrite: true</code> in the <code>bbi.yaml</code> file for your project. However, either of these settings will be overridden by directly passing the argument as shown above.</p>
+<p>You can also inherit this setting, either by attaching
+<code>overwrite = TRUE</code> to a model with
+<code><a href="../reference/modify_bbi_args.html">add_bbi_args()</a></code> or by setting it globally with
+<code>overwrite: true</code> in the <code>bbi.yaml</code> file for your
+project. However, either of these settings will be overridden by
+directly passing the argument as shown above.</p>
 </div>
 </div>
 <div class="section level3">
 <h3 id="summarize-model">Summarize model<a class="anchor" aria-label="anchor" href="#summarize-model"></a>
 </h3>
-<p>Once the model run has completed, users can get a summary object containing much of the commonly used diagnostic information in a named list.</p>
+<p>Once the model run has completed, users can get a summary object
+containing much of the commonly used diagnostic information in a named
+list.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sum1</span> <span class="op">&lt;-</span> <span class="va">mod1</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/model_summary.html">model_summary</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sum1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "absolute_model_path" "run_details"         "run_heuristics"     </span></span>
 <span><span class="co">#&gt; [4] "parameters_data"     "parameter_names"     "ofv"                </span></span>
-<span><span class="co">#&gt; [7] "condition_number"    "shrinkage_details"   "success"</span></span></code></pre></div>
-<p>These elements can be accessed manually or extracted with built-in helper functions like so:</p>
+<span><span class="co">#&gt; [7] "condition_number"    "shrinkage_details"</span></span></code></pre></div>
+<p>These elements can be accessed manually or extracted with built-in
+helper functions like so:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">param_df1</span> <span class="op">&lt;-</span> <span class="va">sum1</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/param_estimates.html">param_estimates</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">param_df1</span></span>
@@ -351,7 +461,9 @@
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> OMEGA(2,2)        0.157  2.72<span style="color: #949494;">e</span><span style="color: #BB0000;">- 2</span>            0.396           3.44<span style="color: #949494;">e</span><span style="color: #BB0000;">- 2</span> FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span> SIGMA(1,1)        1      1   <span style="color: #949494;">e</span>+10            1               1   <span style="color: #949494;">e</span>+10 TRUE </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: diag &lt;lgl&gt;, shrinkage &lt;dbl&gt;</span></span></span></code></pre></div>
-<p>Specific parameter estimates can also be extracted and formatted using the <code><a href="../reference/get_omega.html">get_omega()</a></code>, <code><a href="../reference/get_omega.html">get_theta()</a></code>, and <code><a href="../reference/get_omega.html">get_sigma()</a></code> helpers:</p>
+<p>Specific parameter estimates can also be extracted and formatted
+using the <code><a href="../reference/get_omega.html">get_omega()</a></code>, <code><a href="../reference/get_omega.html">get_theta()</a></code>, and
+<code><a href="../reference/get_omega.html">get_sigma()</a></code> helpers:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sum1</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/get_omega.html">get_theta</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">sum1</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/get_omega.html">get_omega</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -359,19 +471,27 @@
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sum1</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/get_omega.html">get_theta</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      THETA1      THETA2      THETA3      THETA4      THETA5 </span></span>
-<span><span class="co">#&gt;   2.3171600  54.6151000 462.5140000  -0.0820082   4.1795900</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="va">sum1</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/get_omega.html">get_omega</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   2.3171600  54.6151000 462.5140000  -0.0820082   4.1795900</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"\n"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sum1</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/get_omega.html">get_omega</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           OMEGA_1  OMEGA_2</span></span>
 <span><span class="co">#&gt; OMEGA_1 0.0985328 0.000000</span></span>
-<span><span class="co">#&gt; OMEGA_2 0.0000000 0.156825</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="va">sum1</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/get_omega.html">get_sigma</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; OMEGA_2 0.0000000 0.156825</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"\n"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sum1</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/get_omega.html">get_sigma</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;         SIGMA_1</span></span>
 <span><span class="co">#&gt; SIGMA_1       1</span></span></code></pre></div>
-<p>To see how to load summaries of multiple models to an easy-to-read tibble, see the <a href="https://metrumresearchgroup.github.io/bbr/articles/using-summary-log.html">Creating a Model Summary Log</a> vignette.</p>
-<p>You can also use the <a href="https://metrumresearchgroup.github.io/bbr/reference/nm_join.html"><code>nm_join()</code></a> function to load the input data and any output tables from your model into a single tibble.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<p>To see how to load summaries of multiple models to an easy-to-read
+tibble, see the <a href="https://metrumresearchgroup.github.io/bbr/articles/using-summary-log.html">Creating
+a Model Summary Log</a> vignette.</p>
+<p>You can also use the <a href="https://metrumresearchgroup.github.io/bbr/reference/nm_join.html"><code>nm_join()</code></a>
+function to load the input data and any output tables from your model
+into a single tibble.</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">join_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nm_join.html">nm_join</a></span><span class="op">(</span><span class="va">mod1</span><span class="op">)</span> </span>
 <span><span class="va">join_df</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">ID</span>, <span class="va">TIME</span>, <span class="va">DV</span>, <span class="va">CL</span>, <span class="va">V</span>, <span class="va">NPDE</span>, <span class="va">CWRES</span><span class="op">)</span></span>
@@ -394,22 +514,43 @@
 <div class="section level2">
 <h2 id="iteration">Iteration<a class="anchor" aria-label="anchor" href="#iteration"></a>
 </h2>
-<p>Much of the benefit of <code>bbr</code> is leveraged in the model iteration workflow, and the run log summaries that can be created afterwards. For example, imagine you look at these model results and want to begin iterating on them with a new model.</p>
-<p>If you are now in a new R session and no longer have your <code>mod1</code> object in memory, you can easily rebuild it from the YAML file on disk with <code><a href="../reference/read_model.html">read_model()</a></code>:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<p>Much of the benefit of <code>bbr</code> is leveraged in the model
+iteration workflow, and the run log summaries that can be created
+afterwards. For example, imagine you look at these model results and
+want to begin iterating on them with a new model.</p>
+<p>If you are now in a new R session and no longer have your
+<code>mod1</code> object in memory, you can easily rebuild it from the
+YAML file on disk with <code><a href="../reference/read_model.html">read_model()</a></code>:</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_model.html">read_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="copy_model_from">copy_model_from()<a class="anchor" aria-label="anchor" href="#copy_model_from"></a>
 </h3>
-<p>Now you can create a new model object, based on the original, copying and renaming the control stream in the process. By default, the <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> function will increment the name of the new model to the next available integer in your modeling directory, but you can also pass a custom name to the <code>.new_model</code> argument. See <a href="https://metrumresearchgroup.github.io/bbr/reference/copy_model_from.html"><code>?copy_model_from</code></a> for more details and other optional arguments.</p>
-<p>The <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> call below will create both <code>2.ctl</code> and <code>2.yaml</code> files in the same directory as the parent model, and return the model object corresponding to them. (<code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> also stores the model’s “ancestry” which can be useful later in the project, as shown in the <a href="https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html">Using the based_on field</a> vignette.)</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<p>Now you can create a new model object, based on the original, copying
+and renaming the control stream in the process. By default, the
+<code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> function will increment the name of the
+new model to the next available integer in your modeling directory, but
+you can also pass a custom name to the <code>.new_model</code> argument.
+See <a href="https://metrumresearchgroup.github.io/bbr/reference/copy_model_from.html"><code>?copy_model_from</code></a>
+for more details and other optional arguments.</p>
+<p>The <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> call below will create both
+<code>2.ctl</code> and <code>2.yaml</code> files in the same directory
+as the parent model, and return the model object corresponding to them.
+(<code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> also stores the model’s “ancestry” which
+can be useful later in the project, as shown in the <a href="https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html">Using
+the based_on field</a> vignette.)</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span><span class="va">mod1</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/update_model_id.html">update_model_id</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; replacing 1 with 2 in /data/home/kylem/.cache/R/renv/library/bbr-e43ce16f/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/2.ctl</span></span></code></pre></div>
-<p>The new control stream file <code>2.ctl</code> will be identical to its parent model, though you can use <a href="https://metrumresearchgroup.github.io/bbr/reference/update_model_id.html"><code>update_model_id()</code></a> (as above) to update to the new model ID in places like <code>$TABLE</code> statements.</p>
-<p>Your new control stream can now be edited with any desired changes and then submitted and summarized exactly as above. At any time, you can also see the difference between a model and its parent using <a href="https://metrumresearchgroup.github.io/bbr/reference/model_diff.html"><code>model_diff()</code></a>.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt; replacing 1 with 2 in /data/home/barrettk/.cache/R/renv/library/bbr-e68b8766/R-4.1/x86_64-pc-linux-gnu/bbr/model/nonmem/basic/2.ctl</span></span></code></pre></div>
+<p>The new control stream file <code>2.ctl</code> will be identical to
+its parent model, though you can use <a href="https://metrumresearchgroup.github.io/bbr/reference/update_model_id.html"><code>update_model_id()</code></a>
+(as above) to update to the new model ID in places like
+<code>$TABLE</code> statements.</p>
+<p>Your new control stream can now be edited with any desired changes
+and then submitted and summarized exactly as above. At any time, you can
+also see the difference between a model and its parent using <a href="https://metrumresearchgroup.github.io/bbr/reference/model_diff.html"><code>model_diff()</code></a>.</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># manually edit control stream, then...</span></span>
 <span><span class="fu"><a href="../reference/model_diff.html">model_diff</a></span><span class="op">(</span><span class="va">mod2</span><span class="op">)</span></span>
 <span><span class="va">mod2</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/submit_model.html">submit_model</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -418,30 +559,39 @@
 <div class="section level3">
 <h3 id="adding-tags-and-notes">Adding tags and notes<a class="anchor" aria-label="anchor" href="#adding-tags-and-notes"></a>
 </h3>
-<p>After looking at these results, the user can add tags, which can later be used to organize your modeling runs.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<p>After looking at these results, the user can add tags, which can
+later be used to organize your modeling runs.</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod1</span> <span class="op">&lt;-</span> <span class="va">mod1</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/modify_tags.html">add_tags</a></span><span class="op">(</span><span class="st">"orig acop model"</span><span class="op">)</span></span>
 <span><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="va">mod2</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/modify_tags.html">add_tags</a></span><span class="op">(</span><span class="st">"2 compartment"</span><span class="op">)</span></span></code></pre></div>
-<p>Note that using free text for your tags is discouraged, for reasons mentioned in the <code><a href="../reference/modify_tags.html">?modify_tags</a></code> help page. For simplicity’s sake, we ignore that advice here, but please read it before using tags extensively in the wild.</p>
-<p>In addition to tags, the user can add notes that can be referenced later.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<p>Note that using free text for your tags is discouraged, for reasons
+mentioned in the <code><a href="../reference/modify_tags.html">?modify_tags</a></code> help page. For simplicity’s
+sake, we ignore that advice here, but please read it before using tags
+extensively in the wild.</p>
+<p>In addition to tags, the user can add notes that can be referenced
+later.</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="va">mod2</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="../reference/modify_notes.html">add_notes</a></span><span class="op">(</span><span class="st">"2 compartment model more appropriate than 1 compartment"</span><span class="op">)</span></span></code></pre></div>
-<p>The <code><a href="../reference/model_diff.html">model_diff()</a></code> and <code><a href="../reference/tags_diff.html">tags_diff()</a></code> function make it easy to compare models to their parent model. See the <a href="https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html">“Using based_on” vignette</a> for examples.</p>
+<p>The <code><a href="../reference/model_diff.html">model_diff()</a></code> and <code><a href="../reference/tags_diff.html">tags_diff()</a></code> function
+make it easy to compare models to their parent model. See the <a href="https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html">“Using
+based_on” vignette</a> for examples.</p>
 </div>
 <div class="section level3">
 <h3 id="continue-to-iterate">Continue to iterate…<a class="anchor" aria-label="anchor" href="#continue-to-iterate"></a>
 </h3>
-<p>Now the iteration process continues with a third model. Note that you can tell <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> to inherit the tags from the parent model and automatically add them to the new model.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<p>Now the iteration process continues with a third model. Note that you
+can tell <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> to inherit the tags from the
+parent model and automatically add them to the new model.</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span><span class="va">mod2</span>, .inherit_tags <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>Submit and summarize as before.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># manually edit control stream, then...</span></span>
 <span><span class="va">mod3</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/submit_model.html">submit_model</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">mod3</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/model_summary.html">model_summary</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Add tags and notes for filtering in run log, described next.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod3</span> <span class="op">&lt;-</span> <span class="va">mod3</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="../reference/modify_tags.html">add_tags</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"combined RUV"</span>, <span class="st">"iiv CL"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/modify_notes.html">add_notes</a></span><span class="op">(</span><span class="st">"Added combined error structure because it seemed like a good idea"</span><span class="op">)</span></span></code></pre></div>
@@ -449,14 +599,31 @@
 <div class="section level3">
 <h3 id="inheriting-parameter-estimates">Inheriting parameter estimates<a class="anchor" aria-label="anchor" href="#inheriting-parameter-estimates"></a>
 </h3>
-<p>As suggested above, the typical iteration process involves using <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> to create a new model object, followed by <em>manually</em> editing the control stream file. However, in some instances it can be valuable to set the <em>initial</em> parameter estimates of a model using the <em>final</em> estimates of a <strong>previously executed</strong> model. Often this is used to carry forward the final estimates of a “parent” model to be used as the initial estimates of the “child” model; for example a model created with <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code>.</p>
-<p>This is supported via <code><a href="../reference/inherit_param_estimates.html">inherit_param_estimates()</a></code>, which automates the overwriting of the control steam file of your <em>new model</em>, using the final parameter estimates from the previously executed <em>parent</em> model. If no parent model is specified, it will default to using the first entry in <code>get_based_on(.mod)</code>. You also have the option to keep or discard existing bounds when setting the initial estimates for THETA records specifically.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<p>As suggested above, the typical iteration process involves using
+<code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> to create a new model object, followed by
+<em>manually</em> editing the control stream file. However, in some
+instances it can be valuable to set the <em>initial</em> parameter
+estimates of a model using the <em>final</em> estimates of a
+<strong>previously executed</strong> model. Often this is used to carry
+forward the final estimates of a “parent” model to be used as the
+initial estimates of the “child” model; for example a model created with
+<code><a href="../reference/copy_model_from.html">copy_model_from()</a></code>.</p>
+<p>This is supported via <code><a href="../reference/inherit_param_estimates.html">inherit_param_estimates()</a></code>, which
+automates the overwriting of the control steam file of your <em>new
+model</em>, using the final parameter estimates from the previously
+executed <em>parent</em> model. If no parent model is specified, it will
+default to using the first entry in <code>get_based_on(.mod)</code>. You
+also have the option to keep or discard existing bounds when setting the
+initial estimates for THETA records specifically.</p>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span><span class="va">mod1</span>, <span class="st">"4"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/inherit_param_estimates.html">inherit_param_estimates</a></span><span class="op">(</span>bounds <span class="op">=</span> <span class="st">"keep"</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/modify_notes.html">add_notes</a></span><span class="op">(</span><span class="st">"Initial estimates inherited from mod1 results"</span><span class="op">)</span></span></code></pre></div>
-<p>You can also tweak or ‘jitter’ the initial parameter estimates using <code><a href="../reference/tweak_initial_estimates.html">tweak_initial_estimates()</a></code>. This can be used both in conjunction with <code><a href="../reference/inherit_param_estimates.html">inherit_param_estimates()</a></code> or as a standalone call:</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<p>You can also tweak or ‘jitter’ the initial parameter estimates using
+<code><a href="../reference/tweak_initial_estimates.html">tweak_initial_estimates()</a></code>. This can be used both in
+conjunction with <code><a href="../reference/inherit_param_estimates.html">inherit_param_estimates()</a></code> or as a
+standalone call:</p>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span><span class="va">mod1</span>, <span class="st">"5"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="../reference/inherit_param_estimates.html">inherit_param_estimates</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="../reference/tweak_initial_estimates.html">tweak_initial_estimates</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">3</span>, .p <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span>
@@ -468,27 +635,44 @@
 <div class="section level2">
 <h2 id="run-log">Run log<a class="anchor" aria-label="anchor" href="#run-log"></a>
 </h2>
-<p>At any point, the user can easily construct a “run log” tibble to summarize all models run up to this point.</p>
-<p>Before we move on, note that you can get even more information about your models from the <code><a href="../reference/config_log.html">config_log()</a></code> and <code><a href="../reference/summary_log.html">summary_log()</a></code> functions, as well as <code><a href="../reference/config_log.html">add_config()</a></code> and <code><a href="../reference/summary_log.html">add_summary()</a></code> which automatically join the columns output from those functions against the tibble output from <code><a href="../reference/run_log.html">run_log()</a></code>. See the “Further Reading” section below for links to vignettes demonstrating those functions.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<p>At any point, the user can easily construct a “run log” tibble to
+summarize all models run up to this point.</p>
+<p>Before we move on, note that you can get even more information about
+your models from the <code><a href="../reference/config_log.html">config_log()</a></code> and
+<code><a href="../reference/summary_log.html">summary_log()</a></code> functions, as well as
+<code><a href="../reference/config_log.html">add_config()</a></code> and <code><a href="../reference/summary_log.html">add_summary()</a></code> which
+automatically join the columns output from those functions against the
+tibble output from <code><a href="../reference/run_log.html">run_log()</a></code>. See the “Further Reading”
+section below for links to vignettes demonstrating those functions.</p>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">log_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_log.html">run_log</a></span><span class="op">(</span><span class="va">MODEL_DIR</span><span class="op">)</span></span>
 <span><span class="va">log_df</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 10</span></span></span>
 <span><span class="co">#&gt;   absolute_model_path         run   yaml_md5 model_type description bbi_args    </span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> /data/home/kylem/.cache/R/… 1     3ff1756… nonmem     original a… <span style="color: #949494;">&lt;named list&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> /data/home/kylem/.cache/R/… 2     41f8d47… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> /data/home/kylem/.cache/R/… 3     03a1f9d… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> /data/home/kylem/.cache/R/… 4     09bed41… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> /data/home/kylem/.cache/R/… 5     36d4841… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> /data/home/kylem/.cache/R/… 6     36d4841… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> /data/home/barrettk/.cache… 1     3ff1756… nonmem     original a… <span style="color: #949494;">&lt;named list&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> /data/home/barrettk/.cache… 2     41f8d47… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> /data/home/barrettk/.cache… 3     03a1f9d… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> /data/home/barrettk/.cache… 4     09bed41… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> /data/home/barrettk/.cache… 5     36d4841… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> /data/home/barrettk/.cache… 6     36d4841… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 more variables: based_on &lt;list&gt;, tags &lt;list&gt;, notes &lt;list&gt;, star &lt;lgl&gt;</span></span></span></code></pre></div>
-<p>The <code><a href="../reference/run_log.html">run_log()</a></code> returns a tibble which can be manipulated like any other tibble. However, several of the columns (<code>tags</code>, <code>notes</code>, and <code>based_on</code> for example) are list columns, which complicates how you can interact with them. We provide some helper functions to more seamlessly interact with these log tibbles, as well as some sample <code>tidyverse</code> code below.</p>
+<p>The <code><a href="../reference/run_log.html">run_log()</a></code> returns a tibble which can be manipulated
+like any other tibble. However, several of the columns
+(<code>tags</code>, <code>notes</code>, and <code>based_on</code> for
+example) are list columns, which complicates how you can interact with
+them. We provide some helper functions to more seamlessly interact with
+these log tibbles, as well as some sample <code>tidyverse</code> code
+below.</p>
 <div class="section level3">
 <h3 id="viewing-tags-example">Viewing tags example<a class="anchor" aria-label="anchor" href="#viewing-tags-example"></a>
 </h3>
-<p>The <code><a href="../reference/collapse_to_string.html">bbr::collapse_to_string()</a></code> function can collapse any list column into a string representation of its contents. It is specifically designed for collapsing columns like <code>tags</code>, <code>notes</code>, and <code>based_on</code> into a more human-readable format.</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<p>The <code><a href="../reference/collapse_to_string.html">bbr::collapse_to_string()</a></code> function can collapse any
+list column into a string representation of its contents. It is
+specifically designed for collapsing columns like <code>tags</code>,
+<code>notes</code>, and <code>based_on</code> into a more human-readable
+format.</p>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">log_df</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="../reference/collapse_to_string.html">collapse_to_string</a></span><span class="op">(</span><span class="va">tags</span>, <span class="va">notes</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="va">tags</span>, <span class="va">notes</span><span class="op">)</span></span>
@@ -505,8 +689,11 @@
 <div class="section level3">
 <h3 id="filtering-tags-example">Filtering tags example<a class="anchor" aria-label="anchor" href="#filtering-tags-example"></a>
 </h3>
-<p>All <code>*_log()</code> functions have in <code>.include</code> argument that will filter the resulting log. Only models that contain a tag or name (<code>run</code>) that matches an element of the vector passed to <code>.include</code> will be included.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<p>All <code>*_log()</code> functions have in <code>.include</code>
+argument that will filter the resulting log. Only models that contain a
+tag or name (<code>run</code>) that matches an element of the vector
+passed to <code>.include</code> will be included.</p>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/run_log.html">run_log</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, .include <span class="op">=</span> <span class="st">"2 compartment"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/collapse_to_string.html">collapse_to_string</a></span><span class="op">(</span><span class="va">tags</span>, <span class="va">notes</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">run</span>, <span class="va">tags</span>, <span class="va">notes</span><span class="op">)</span></span>
@@ -520,12 +707,23 @@
 <div class="section level2">
 <h2 id="further-reading">Further reading<a class="anchor" aria-label="anchor" href="#further-reading"></a>
 </h2>
-<p>Hopefully this has given you a good start on understanding the capabilities and basic workflow of <code>bbr</code>. Please see the other vignettes for demonstrations of more advanced or specific functionality.</p>
+<p>Hopefully this has given you a good start on understanding the
+capabilities and basic workflow of <code>bbr</code>. Please see the
+other vignettes for demonstrations of more advanced or specific
+functionality.</p>
 <ul>
 <li>
-<a href="https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html">Using the based_on field</a> – How to use the <code>based_on</code> field to track a model’s ancestry through the model development process, as well as using <code><a href="../reference/model_diff.html">model_diff()</a></code> and <code><a href="../reference/tags_diff.html">tags_diff()</a></code> to compare models. Also demonstrates leveraging <code><a href="../reference/config_log.html">config_log()</a></code> to check whether older models are still up-to-date.</li>
+<a href="https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html">Using
+the based_on field</a> – How to use the <code>based_on</code> field to
+track a model’s ancestry through the model development process, as well
+as using <code><a href="../reference/model_diff.html">model_diff()</a></code> and <code><a href="../reference/tags_diff.html">tags_diff()</a></code> to
+compare models. Also demonstrates leveraging <code><a href="../reference/config_log.html">config_log()</a></code>
+to check whether older models are still up-to-date.</li>
 <li>
-<a href="https://metrumresearchgroup.github.io/bbr/articles/using-summary-log.html">Creating a Model Summary Log</a> – How to use <code><a href="../reference/summary_log.html">summary_log()</a></code> to extract model diagnostics like the objective function value, condition number, and parameter counts.</li>
+<a href="https://metrumresearchgroup.github.io/bbr/articles/using-summary-log.html">Creating
+a Model Summary Log</a> – How to use <code><a href="../reference/summary_log.html">summary_log()</a></code> to
+extract model diagnostics like the objective function value, condition
+number, and parameter counts.</li>
 </ul>
 </div>
   </div>
@@ -547,7 +745,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer>
