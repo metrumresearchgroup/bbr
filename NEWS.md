@@ -4,9 +4,9 @@
 
 * New bootstrap feature: `bbr` now supports the creation, management, and summary
   of bootstrap runs. Runs are initialized and set up using `new_bootstrap_run()`  
-  and `setup_bootstrap_run()` respectively, and are tracked via the new 
+  and `setup_bootstrap_run()`, respectively, and are tracked via the new 
   `bbi_nmboot_model` type object. They can be submitted the same as any other 
-  model, after which they can be summarized via `summarize_bootstrap_run()`, and
+  model, after which they can be summarized via `summarize_bootstrap_run()` and
   "cleaned up" via `cleanup_bootstrap_run()`. (#671, #687, #701)
   
 * New simulation feature: `bbr` now supports simple simulations. `add_simuation()`
@@ -19,9 +19,15 @@
   exist. (#693)
   
 * New `get_model_status()` helper for returning messages that indicate which
-  model(s) have finished executing and which are incomplete. Also invisibly
-  returns a `data.frame` with a row for each model and a logical `finished`
-  column.  (#671, #693)
+  model(s) have finished executing and which are incomplete. (#671, #693)
+  
+* Add `.delay` argument to `wait_for_nonmem()` to account for variability in the
+  amount of time required to wait before checking for the presence of an output
+  directory (e.g., batch submissions). (#693)
+
+* Removed parenthesis from `THETA` names in `initial_estimates()`. The intent
+  was to match the output from `param_estimates()` so initial and final estimates
+  could be joined more easily. (#674)
 
 * Notable documentation improvements. (#671, #687)
 
