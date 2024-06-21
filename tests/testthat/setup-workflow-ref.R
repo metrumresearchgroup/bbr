@@ -214,9 +214,9 @@ create_all_models <- function() {
   assign("mod4", mod4, pos = parent.frame())
 
   ALL_MODS_YAML_MD5 <<- c(system.file("model","nonmem", "basic", "1.yaml", package = "bbr") %>% tools::md5sum(),
-                         system.file("model","nonmem", "basic", "2.yaml", package = "bbr") %>% tools::md5sum(),
-                         system.file("model","nonmem", "basic", "3.yaml", package = "bbr") %>% tools::md5sum(),
-                         system.file("model","nonmem", "basic", "level2", "1.yaml", package = "bbr") %>% tools::md5sum()) %>% unname()
+                          system.file("model","nonmem", "basic", "2.yaml", package = "bbr") %>% tools::md5sum(),
+                          system.file("model","nonmem", "basic", "3.yaml", package = "bbr") %>% tools::md5sum(),
+                          system.file("model","nonmem", "basic", "level2", "1.yaml", package = "bbr") %>% tools::md5sum()) %>% unname()
 
 }
 
@@ -243,9 +243,9 @@ create_rlg_models <- function() {
 
 clean_test_enviroment <- function(.f = NULL , env = parent.frame())
 {
-    cleanup(env)
-    if(!is.null(.f)) .f()
-    withr::defer(cleanup(env), envir = env)
+  cleanup(env)
+  if(!is.null(.f)) .f()
+  withr::defer(cleanup(env), envir = env)
 
 }
 
@@ -328,7 +328,7 @@ create_temp_model <- function(path = YAML_TEST_FILE,
                               envir = parent.frame(),
                               delete_yaml = TRUE,
                               delete_mod = TRUE
-                              ) {
+) {
   temp_yaml <- tempfile(fileext = ".yaml")
   fs::file_copy(path, temp_yaml)
   temp_ctl <- fs::path_ext_set(temp_yaml, mod_ext)
@@ -378,6 +378,77 @@ copy_to_batch_params <- function(orig_model_path, new_name) {
     file.path(new_dir, paste0(new_name, ".ext"))
   )
 }
+
+make_fake_boot <- function(mod, n = 100, strat_cols = c("SEX", "ETN")){
+  boot_run <- new_bootstrap_run(mod, .overwrite = TRUE)
+  boot_dir <- boot_run[[ABS_MOD_PATH]]
+  fs::dir_create(boot_dir)
+  # rstudioapi::filesPaneNavigate(boot_dir)
+  model_dir <- get_model_working_directory(boot_run)
+  boot_dir_rel <- fs::path_rel(boot_dir, model_dir)
+
+  mod_names <- purrr::map_chr(seq(n), max_char = nchar(n), pad_left)
+
+  boot_mods <- purrr::map(mod_names, function(id.i){
+    output_dir.i <- file.path(boot_dir_rel, id.i)
+    new_mod <- copy_model_from(
+      .parent_mod = mod,
+      .new_model = output_dir.i,
+      .add_tags = "BOOTSTRAP_RUN",
+      .overwrite = TRUE
+    )
+    new_dir_path <- file.path(boot_dir, id.i)
+    fs::dir_copy(mod[[ABS_MOD_PATH]], new_dir_path)
+    # replace file names with new model ID
+    orig_mod_id <- get_model_id(mod)
+    new_mod_id <- basename(new_dir_path)
+    purrr::walk(fs::dir_ls(new_dir_path), ~ {
+      if (stringr::str_detect(basename(.x), glue("^{orig_mod_id}"))) {
+        new_path.i <- stringr::str_replace(basename(.x), glue("^{orig_mod_id}"), new_mod_id)
+        fs::file_move(.x, file.path(dirname(.x), new_path.i))
+      }
+    })
+    new_mod
+  })
+
+  boot_data_dir <- file.path(boot_dir, "data")
+  boot_args <- list(
+    boot_run = boot_run,
+    all_mod_names = mod_names,
+    boot_mod_path = get_model_path(boot_run),
+    orig_mod_path = get_model_path(mod),
+    orig_mod_id = get_model_id(mod),
+    orig_mod_bbi_args = mod$bbi_args,
+    orig_data = nm_data(mod) %>% suppressMessages(),
+    strat_cols = strat_cols,
+    seed = 1234,
+    n_samples = n,
+    boot_dir = boot_dir,
+    boot_data_dir = boot_data_dir,
+    overwrite = TRUE
+  )
+
+  make_boot_spec(boot_mods, boot_args)
+
+  # Read in summary to adjust estimates to look like real bootstrap
+  boot_sum <- summarize_bootstrap_run(boot_run)
+
+  # Adjust estimates
+  boot_sum$boot_summary <- boot_sum$boot_summary %>% dplyr::mutate(
+    across(starts_with(c("THETA", "OMEGA")), ~ jitter(.x, factor = 10))
+  ) %>% dplyr::mutate(
+    across(starts_with(c("THETA", "OMEGA")), ~ rnorm(n = n, mean = mean(.x), sd = sd(.x)))
+  )
+
+  # Adjust comparison table
+  boot_sum$boot_compare <- param_estimates_compare(boot_sum)
+
+  # Save out
+  boot_sum_path <- file.path(boot_dir, "boot_summary.RDS")
+  saveRDS(boot_sum, boot_sum_path)
+  return(boot_run)
+}
+
 
 with_bg_env <- function(code){
   Sys.setenv("BBR_DEV_LOAD_PATH" = "")
