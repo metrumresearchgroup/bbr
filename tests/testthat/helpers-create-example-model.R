@@ -75,3 +75,77 @@ add_msf_opt <- function(mod, msf_path = paste0(get_model_id(mod), ".MSF")){
   }
   return(mod)
 }
+
+
+make_fake_boot <- function(mod, n = 100, strat_cols = c("SEX", "ETN")){
+  boot_run <- new_bootstrap_run(mod, .overwrite = TRUE)
+  boot_dir <- boot_run$absolute_model_path
+  fs::dir_create(boot_dir)
+
+  model_dir <- dirname(boot_dir)
+  boot_dir_rel <- fs::path_rel(boot_dir, model_dir)
+
+  # Need to explicitly point to internal function for vignette building
+  mod_names <- purrr::map_chr(seq(n), max_char = nchar(n), bbr:::pad_left)
+
+  boot_mods <- purrr::map(mod_names, function(id.i){
+    output_dir.i <- file.path(boot_dir_rel, id.i)
+    new_mod <- copy_model_from(
+      .parent_mod = mod,
+      .new_model = output_dir.i,
+      .add_tags = "BOOTSTRAP_RUN",
+      .overwrite = TRUE
+    )
+    new_dir_path <- file.path(boot_dir, id.i)
+    fs::dir_copy(mod$absolute_model_path, new_dir_path)
+    # replace file names with new model ID (needed for summary call)
+    orig_mod_id <- get_model_id(mod)
+    new_mod_id <- basename(new_dir_path)
+    purrr::walk(fs::dir_ls(new_dir_path), ~ {
+      if (stringr::str_detect(basename(.x), glue::glue("^{orig_mod_id}"))) {
+        new_path.i <- stringr::str_replace(basename(.x), glue::glue("^{orig_mod_id}"), new_mod_id)
+        fs::file_move(.x, file.path(dirname(.x), new_path.i))
+      }
+    })
+    new_mod
+  })
+
+  boot_data_dir <- file.path(boot_dir, "data")
+  boot_args <- list(
+    boot_run = boot_run,
+    all_mod_names = mod_names,
+    boot_mod_path = get_model_path(boot_run),
+    orig_mod_path = get_model_path(mod),
+    orig_mod_id = get_model_id(mod),
+    orig_mod_bbi_args = mod$bbi_args,
+    orig_data = nm_data(mod) %>% suppressMessages(),
+    strat_cols = strat_cols,
+    seed = 1234,
+    n_samples = n,
+    boot_dir = boot_dir,
+    boot_data_dir = boot_data_dir,
+    overwrite = TRUE
+  )
+
+  # Need to explicitly point to internal function for vignette building
+  bbr:::make_boot_spec(boot_mods, boot_args)
+
+  # Read in summary to adjust estimates to look like real bootstrap
+  boot_sum <- summarize_bootstrap_run(boot_run)
+
+  # Adjust estimates to look like real bootstrap
+  #  - jitter and then make normal distribution
+  boot_sum$boot_summary <- boot_sum$boot_summary %>% dplyr::mutate(
+    dplyr::across(starts_with(c("THETA", "OMEGA")), ~ jitter(.x, factor = 10))
+  ) %>% dplyr::mutate(
+    dplyr::across(starts_with(c("THETA", "OMEGA")), ~ rnorm(n = n, mean = mean(.x), sd = sd(.x)))
+  )
+
+  # Adjust comparison table
+  boot_sum$boot_compare <- param_estimates_compare(boot_sum)
+
+  # Save out
+  boot_sum_path <- file.path(boot_dir, "boot_summary.RDS")
+  saveRDS(boot_sum, boot_sum_path)
+  return(boot_run)
+}

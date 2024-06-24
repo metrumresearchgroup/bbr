@@ -90,8 +90,7 @@ Suggests:
     testthat (>= 2.1.0),
     withr,
     mrgvalidate,
-    mrgvalprep (>= 0.0.4),
-    asciicast
+    mrgvalprep (>= 0.0.4)
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
