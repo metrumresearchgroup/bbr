@@ -15,7 +15,8 @@ model_tree(
   zoomable = FALSE,
   static = FALSE,
   width = NULL,
-  height = NULL
+  height = NULL,
+  ...
 )
 
 \method{model_tree}{character}(
@@ -27,7 +28,8 @@ model_tree(
   zoomable = FALSE,
   static = FALSE,
   width = NULL,
-  height = NULL
+  height = NULL,
+  ...
 )
 
 \method{model_tree}{bbi_log_df}(
@@ -39,7 +41,8 @@ model_tree(
   zoomable = FALSE,
   static = FALSE,
   width = NULL,
-  height = NULL
+  height = NULL,
+  ...
 )
 }
 \arguments{
@@ -69,6 +72,9 @@ be saved as a PNG and loaded into the viewer.}
 \item{width}{width in pixels (optional, defaults to automatic sizing)}
 
 \item{height}{height in pixels (optional, defaults to automatic sizing)}
+
+\item{...}{additional arguments passed to \code{\link[=run_log]{run_log()}}. Only used if \code{.log_df}
+is a modeling directory.}
 }
 \description{
 Create a tree diagram of a modeling directory

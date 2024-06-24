@@ -18,6 +18,8 @@
 #'        be saved as a PNG and loaded into the viewer.
 #' @param width width in pixels (optional, defaults to automatic sizing)
 #' @param height height in pixels (optional, defaults to automatic sizing)
+#' @param ... additional arguments passed to [run_log()]. Only used if `.log_df`
+#'        is a modeling directory.
 #'
 #' @section Required Columns:
 #'
@@ -98,7 +100,8 @@ model_tree <- function(
     zoomable = FALSE,
     static = FALSE,
     width = NULL,
-    height = NULL
+    height = NULL,
+    ...
 ){
   UseMethod("model_tree")
 }
@@ -114,10 +117,11 @@ model_tree.character <- function(
     zoomable = FALSE,
     static = FALSE,
     width = NULL,
-    height = NULL
+    height = NULL,
+    ...
 ){
   checkmate::assert_directory_exists(.log_df)
-  .log_df <- run_log(.log_df)
+  .log_df <- run_log(.log_df, ...)
   model_tree(
     .log_df,
     include_info = include_info, color_by = color_by,
@@ -138,7 +142,8 @@ model_tree.bbi_log_df <- function(
     zoomable = FALSE,
     static = FALSE,
     width = NULL,
-    height = NULL
+    height = NULL,
+    ...
 ){
   # Make sure required dependencies are installed
   stop_if_tree_missing_deps(static = static)
@@ -158,7 +163,7 @@ model_tree.bbi_log_df <- function(
     tree_data, zoomable = zoomable, attribute = tree_attr,
     fill="col", collapsed = FALSE, nodeSize = "leafCount",
     tooltipHtml = "tooltip", width = width, height = height
-    )
+  )
 
   if(isTRUE(static)){
     pl_tree <- model_tree_png(pl_tree)
@@ -196,7 +201,7 @@ make_tree_data <- function(
   checkmate::assert_true(all(cols_keep %in% names(.log_df)))
 
   # Check for required columns and starting format
-  req_cols <- c(ABS_MOD_PATH, "run", "based_on")
+  req_cols <- c(ABS_MOD_PATH, "run", "based_on", "model_type")
   if(!(all(req_cols %in% names(.log_df)))){
     cols_missing <- req_cols[!(req_cols %in% names(.log_df))]
     cols_missing <- paste(cols_missing, collapse = ", ")
@@ -486,13 +491,6 @@ make_tree_tooltip <- function(tree_data, digits = 3){
     if(inherits(x, "numeric")) round(x, digits) else x
   }
 
-  # Helper for coloring text and applying other styles
-  style_html <- function(txt, color = "black", ..., br_before = FALSE, br_after = FALSE){
-    txt <- paste0(glue::glue("<span style='color:{color};"), ...,"'>" ,txt,"</span>")
-    if(isTRUE(br_before)) txt <- paste0("<br>", txt)
-    if(isTRUE(br_after)) txt <- paste0(txt, "<br>")
-    return(txt)
-  }
 
   # Discern whether or not to display cell text for some columns
   #  - This is only used for run_log columns that we may not want to display
@@ -509,6 +507,12 @@ make_tree_tooltip <- function(tree_data, digits = 3){
       mod_name, color = "#538b01", "font-size:14px; font-weight:bold", br_after = TRUE
     )
 
+    # Model type
+    mod_type <- ifelse(
+      .x == "Start", .x,
+      format_model_type(tree_data$model_type[.y], fmt_html = TRUE, br_after = TRUE)
+    )
+
     # Additional based_on flags: NA for models with only one based_on flag
     based_on_addl_html <- ifelse(
       can_include(tree_data$addl_based_on[.y]),
@@ -518,6 +522,8 @@ make_tree_tooltip <- function(tree_data, digits = 3){
       ),
       ""
     )
+
+    # Other parameters
     desc_html <- ifelse(
       "description" %in% base_tt_cols && can_include(tree_data$description[.y]),
       style_html(tree_data$description[.y], "font-style:italic", br_after = TRUE),
@@ -534,7 +540,7 @@ make_tree_tooltip <- function(tree_data, digits = 3){
       ""
     )
 
-    paste0(mod_html, based_on_addl_html, desc_html, star_html, tags_html)
+    paste0(mod_html, mod_type, based_on_addl_html, desc_html, star_html, tags_html)
   })
 
   # Tooltip from model summary
@@ -551,17 +557,36 @@ make_tree_tooltip <- function(tree_data, digits = 3){
       }else{
         ""
       }
+      # Conditional simulation text
+      has_sim_txt <- if(has_simulation(read_model(tree_data[[ABS_MOD_PATH]][.y]))){
+        paste0("<br><br>", style_html("--Simulation attached--", color = "#ad7fa8", "font-weight:bold"))
+      }else{
+        ""
+      }
       # Numeric values
       ofv <- round_numeric(tree_data$ofv[.y], digits = digits)
       n_sub <- round_numeric(tree_data$number_of_subjects[.y], digits = digits)
       n_obs <- round_numeric(tree_data$number_of_obs[.y], digits = digits)
+      # Format
+      ofv <- ifelse(
+        can_include(ofv),
+        paste0("OFV: ", style_html(ofv, color = "#A30000", br_after = TRUE)),
+        ""
+      )
+      n_sub <- ifelse(
+        can_include(n_sub),
+        paste0("N Subjects: ", style_html(n_sub, color = "#A30000", br_after = TRUE)),
+        ""
+      )
+      n_obs <- ifelse(
+        can_include(n_obs),
+        paste0("N Obs: ", style_html(n_obs, color = "#A30000")),
+        ""
+      )
       # Combined tooltip
       paste0(
         style_html(mod_status, color = status_col, "font-weight:bold", br_before = TRUE, br_after = TRUE),
-        "OFV: ", style_html(ofv, color = "#A30000", br_after = TRUE),
-        "N Subjects: ", style_html(n_sub, color = "#A30000", br_after = TRUE),
-        "N Obs: ", style_html(n_obs, color = "#A30000"),
-        heuristics_txt
+        ofv, n_sub, n_obs, heuristics_txt, has_sim_txt
       )
     }else{
       # If not run, just show the status
@@ -591,6 +616,7 @@ make_tree_tooltip <- function(tree_data, digits = 3){
   tree_data$tooltip <- tooltip
   return(tree_data)
 }
+
 
 #' Create a color column based on the unique values of another column
 #' @inheritParams make_tree_tooltip
@@ -653,6 +679,54 @@ color_tree_by <- function(tree_data, color_by = "run"){
   }
 
   return(tree_data)
+}
+
+#' Helper for coloring text and applying other styles
+#' @param txt text to format
+#' @param color color added to the text
+#' @param ... Other `HTML` styling to add to the `span` call
+#' @param br_before Logical (`T`/`F`). If `TRUE`, add a new line before the text
+#' @param br_after Logical (`T`/`F`). If `TRUE`, add a new line after the text
+#' @keywords internal
+style_html <- function(txt, color = "black", ..., br_before = FALSE, br_after = FALSE){
+  txt <- paste0(glue::glue("<span style='color:{color};"), ...,"'>" ,txt,"</span>")
+  if(isTRUE(br_before)) txt <- paste0("<br>", txt)
+  if(isTRUE(br_after)) txt <- paste0(txt, "<br>")
+  return(txt)
+}
+
+#' Format the model type for use in [model_tree()]
+#'
+#' @param .mod a `bbi_base_model` object.
+#' @param msg Character string. Appended to the end of the formatted model type
+#'  if provided.
+#' @param fmt_html Logical (`T`/`F`). If `TRUE`, apply coloring and format as `HTML`.
+#' @param ... Additional arguments passed to [style_html()].
+#' @keywords internal
+format_model_type <- function(model_type, fmt_html = FALSE, ...){
+  checkmate::assert_character(model_type, len = 1)
+
+  mod_type_fmt <- dplyr::case_when(
+    model_type == "nonmem" ~ "NONMEM Model",
+    model_type == "nmboot" ~ "Bootstrap Run",
+    model_type == "nmsim" ~ "Simulation",
+    TRUE ~ paste(toupper(model_type), "Model")
+  )
+
+  if(isTRUE(fmt_html)){
+    mod_type_fmt <- dplyr::case_when(
+      model_type == "nonmem" ~
+        style_html(mod_type_fmt, color = "#119a9c", "font-weight:bold", ...),
+      model_type == "nmboot" ~
+        style_html(mod_type_fmt, color = "#c49f02", "font-weight:bold", ...),
+      model_type == "nmsim" ~
+        style_html(mod_type_fmt, color = "#ad7fa8", "font-weight:bold", ...),
+      TRUE ~
+        style_html(mod_type_fmt, color = "black", "font-weight:bold", ...)
+    )
+  }
+
+  return(mod_type_fmt)
 }
 
 #' Save an interactive [model_tree()] as a PNG and load in Rstudio viewer
