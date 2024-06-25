@@ -6,6 +6,7 @@
 \alias{print.bbi_model}
 \alias{print.bbi_nonmem_summary}
 \alias{print.bbi_nmboot_summary}
+\alias{print.nmtran_process}
 \alias{print.model_tree_static}
 \title{Print methods for bbr objects}
 \usage{
@@ -16,6 +17,8 @@
 \method{print}{bbi_nonmem_summary}(x, .digits = 3, .fixed = FALSE, .off_diag = FALSE, .nrow = NULL, ...)
 
 \method{print}{bbi_nmboot_summary}(x, .digits = 3, .nrow = 10, ...)
+
+\method{print}{nmtran_process}(x, ...)
 
 \method{print}{model_tree_static}(x, newpage = is.null(vp), vp = NULL, ...)
 }
@@ -58,6 +61,8 @@ will make for prettier formatting, especially of table outputs.
 \item \code{print(bbi_nonmem_summary)}: Prints a high level summary of a model from a \code{bbi_nonmem_summary} object
 
 \item \code{print(bbi_nmboot_summary)}: Prints a high level summary of a model from a \code{bbi_nmboot_summary} object
+
+\item \code{print(nmtran_process)}: Prints the \code{NMTRAN} evaluation of a \code{bbi_model} model
 
 \item \code{print(model_tree_static)}: Draw model tree as a static plot
 
