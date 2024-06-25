@@ -30,7 +30,6 @@ if(isTRUE(is_pdf)){
 if (interactive()) {
   devtools::load_all()
 }
-devtools::load_all()
 library(glue)
 library(bbr)
 library(dplyr)
