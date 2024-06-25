@@ -192,22 +192,12 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     it("Include a simulation", {
       skip_if_old_bbi("3.2.0") # calls model_summary()
       # Set up fake simulation
-      mod2 <- copy_model_from(MOD1, "2")
-      fs::dir_copy( MOD1[[ABS_MOD_PATH]], file.path(MODEL_DIR, "2"))
-      mod2 <- add_msf_opt(mod2)
-
-      # Duplicate 1.tab multiple times in 1.MSF
-      tab1_path <- nm_table_files(mod2)[1]
-      new_tab_path <- file.path(dirname(tab1_path), "2.MSF")
-      on.exit(fs::file_delete(new_tab_path), add = TRUE)
-      fs::file_copy(tab1_path, new_tab_path)
-      base_tab_lines <- readLines(new_tab_path)
-      perturb_file(new_tab_path, txt = rep(base_tab_lines, 5))
-
-      # Create fake simulation
-      sim_inc <- new_sim_model(mod2, n = 100)
-      make_sim_spec(sim_inc, sim_args = list(n = 100, seed = 1234))
-      on.exit(delete_models(list(mod2, sim_inc), .tags = NULL, .force = TRUE), add = TRUE)
+      mod_sim <- make_fake_sim(MOD1)
+      sim_inc <- get_simulation(mod_sim)
+      on.exit(
+        delete_models(list(mod_sim, sim_inc), .tags = NULL, .force = TRUE),
+        add = TRUE
+      )
 
       run_df <- run_log(MODEL_DIR)
       tree_data <- make_tree_data(run_df, add_summary = TRUE)

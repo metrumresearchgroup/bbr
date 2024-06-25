@@ -62,11 +62,11 @@ modify_data_path_json <- function(mod, data_path){
 
 # Add `MSFO=1.MSF` option to an `EST` record
 add_msf_opt <- function(mod, msf_path = paste0(get_model_id(mod), ".MSF")){
-  ctl <- get_model_ctl(mod)
+  ctl <- bbr:::get_model_ctl(mod)
   mod_path <- get_model_path(mod)
   est <- nmrec::select_records(ctl, "est")[[1]]
 
-  msf_path_ctl <- get_msf_path(mod, .check_exists = FALSE)
+  msf_path_ctl <- bbr:::get_msf_path(mod, .check_exists = FALSE)
   if(is.null(msf_path_ctl)){
     nmrec::set_record_option(est, "MSFO", msf_path)
     nmrec::write_ctl(ctl, mod_path)
@@ -77,6 +77,9 @@ add_msf_opt <- function(mod, msf_path = paste0(get_model_id(mod), ".MSF")){
 }
 
 
+# This function makes a fake bootstrap run that appears to have been run
+# MOD1 results are copied `n` times, and the summary results are jittered
+# to reflect an actual bootstrap run
 make_fake_boot <- function(mod, n = 100, strat_cols = c("SEX", "ETN")){
   boot_run <- new_bootstrap_run(mod, .overwrite = TRUE)
   boot_dir <- boot_run$absolute_model_path
@@ -148,4 +151,39 @@ make_fake_boot <- function(mod, n = 100, strat_cols = c("SEX", "ETN")){
   boot_sum_path <- file.path(boot_dir, "boot_summary.RDS")
   saveRDS(boot_sum, boot_sum_path)
   return(boot_run)
+}
+
+# This function creates a new model, and attaches a simulation to it
+# Unlike make_fake_boot however, the simulation will have a status of "Not Run"
+make_fake_sim <- function(mod, mod_id = "mod-sim", n = 100){
+  mod_sim <- copy_model_from(mod, mod_id) %>% update_model_id()
+  new_dir_path <- file.path(MODEL_DIR, mod_id)
+  fs::dir_copy(mod$absolute_model_path, new_dir_path)
+  mod_sim <- add_msf_opt(mod_sim)
+
+  # Remove all table records, and add one back (for nm_table_files to work)
+  bbr:::remove_records(mod_sim, "table")
+  table_lines <- glue::glue("NUM IPRED NPDE CWRES NOPRINT ONEHEADER FILE={mod_id}.tab")
+  bbr:::add_new_record(mod_sim, "table", lines = table_lines)
+
+  # Replace file names with new model ID (needed for reading in table files)
+  orig_mod_id <- get_model_id(mod)
+  purrr::walk(fs::dir_ls(new_dir_path), ~ {
+    if (stringr::str_detect(basename(.x), glue::glue("^{orig_mod_id}"))) {
+      new_path.i <- stringr::str_replace(basename(.x), glue::glue("^{orig_mod_id}"), mod_id)
+      fs::file_move(.x, file.path(dirname(.x), new_path.i))
+    }
+  })
+
+  # Duplicate 1.tab multiple times in new MSF file
+  tab1_path <- nm_table_files(mod_sim)[1]
+  new_tab_path <- file.path(dirname(tab1_path), glue::glue("{mod_id}.MSF"))
+  fs::file_copy(tab1_path, new_tab_path)
+  base_tab_lines <- readLines(new_tab_path)
+  readr::write_lines(rep(base_tab_lines, 5), new_tab_path, append = TRUE)
+
+  # Create fake simulation (not run)
+  sim_inc <- new_sim_model(mod_sim, n = n, .overwrite = TRUE)
+  make_sim_spec(sim_inc, sim_args = list(n = n, seed = 1234))
+  return(mod_sim)
 }
