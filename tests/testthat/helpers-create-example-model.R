@@ -184,6 +184,6 @@ make_fake_sim <- function(mod, mod_id = "mod-sim", n = 100){
 
   # Create fake simulation (not run)
   sim_inc <- bbr:::new_sim_model(mod_sim, n = n, .overwrite = TRUE)
-  make_sim_spec(sim_inc, sim_args = list(n = n, seed = 1234))
+  bbr:::make_sim_spec(sim_inc, sim_args = list(n = n, seed = 1234))
   return(mod_sim)
 }

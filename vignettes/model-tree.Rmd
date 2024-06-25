@@ -120,7 +120,7 @@ MODEL_DIR <- "../nonmem"
 ```
 
 ```{r, echo=FALSE, eval=eval_model_tree, message=FALSE, warning=FALSE}
-mods <- create_tree_models(MODEL_DIR)
+mods <- create_tree_models(MODEL_DIR) %>% suppressMessages()
 ```
 
 
