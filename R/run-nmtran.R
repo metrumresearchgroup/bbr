@@ -26,7 +26,6 @@ run_nmtran <- function(
     nmtran_exe = NULL,
     delete_on_exit = TRUE
 ){
-  test_nmrec_version(.min_version = "0.3.0")
   check_model_object(.mod, "bbi_nonmem_model")
 
   # Capture NONMEM and NMTRAN options
