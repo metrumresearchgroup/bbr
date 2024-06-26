@@ -81,6 +81,18 @@ new_bootstrap_run <- function(
 #' objects, and the new datasets are sampled from the dataset defined in its
 #' `$DATA` record (i.e. `get_data_path(.boot_run)`).
 #'
+#' @param .boot_run a `bbi_nmboot_model` object.
+#' @param n number of model runs.
+#' @param strat_cols columns to maintain proportion for stratification
+#' @param seed a seed for sampling the data. Set to `NULL` to avoid setting.
+#' @param .overwrite logical (T/F) indicating whether or not to overwrite existing
+#'  setup for a bootstrap run.
+#' @param .join_col Character column name to use to join table files. Passed to
+#' [nm_join()], and used to create the initial dataset that gets re-sampled `n`
+#' times. The purpose of joining the input data to table files is to filter the
+#' population to only the subjects that actually made it into the model. See the
+#' `Details` section in [nm_join()] for more information.
+#'
 #' @details
 #'
 #' Once you have run this function, you can execute your bootstrap with
@@ -88,12 +100,6 @@ new_bootstrap_run <- function(
 #' bootstrap run. Once all models have finished, use [summarize_bootstrap_run()]
 #' to view the results. See examples below.
 #'
-#' @param .boot_run a `bbi_nmboot_model` object.
-#' @param n number of model runs.
-#' @param strat_cols columns to maintain proportion for stratification
-#' @param seed a seed for sampling the data. Set to `NULL` to avoid setting.
-#' @param .overwrite logical (T/F) indicating whether or not to overwrite existing
-#'  setup for a bootstrap run.
 #'
 #' @seealso [new_bootstrap_run()] [summarize_bootstrap_run()] [submit_model()]
 #'
@@ -126,7 +132,8 @@ setup_bootstrap_run <- function(
     n = 200,
     strat_cols = NULL,
     seed = 1234,
-    .overwrite = FALSE
+    .overwrite = FALSE,
+    .join_col = "NUM"
 ){
   check_model_object(.boot_run, NMBOOT_MOD_CLASS)
   checkmate::assert_number(n, lower = 1)
@@ -161,7 +168,8 @@ setup_bootstrap_run <- function(
     # Only include subjects that entered the original problem by default
     can_be_joined <- can_be_nm_joined(orig_mod)
     if(isTRUE(can_be_joined)){
-      starting_data <- nm_join(orig_mod) %>% suppressMessages()
+      starting_data <- nm_join(orig_mod, .join_col = .join_col) %>%
+        suppressMessages()
 
       # select only columns from original data set
       starting_data <- starting_data %>%

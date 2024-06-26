@@ -9,7 +9,8 @@ setup_bootstrap_run(
   n = 200,
   strat_cols = NULL,
   seed = 1234,
-  .overwrite = FALSE
+  .overwrite = FALSE,
+  .join_col = "NUM"
 )
 }
 \arguments{
@@ -23,6 +24,12 @@ setup_bootstrap_run(
 
 \item{.overwrite}{logical (T/F) indicating whether or not to overwrite existing
 setup for a bootstrap run.}
+
+\item{.join_col}{Character column name to use to join table files. Passed to
+\code{\link[=nm_join]{nm_join()}}, and used to create the initial dataset that gets re-sampled \code{n}
+times. The purpose of joining the input data to table files is to filter the
+population to only the subjects that actually made it into the model. See the
+\code{Details} section in \code{\link[=nm_join]{nm_join()}} for more information.}
 }
 \description{
 This function takes a \code{bbi_nmboot_model} (created by a previous
