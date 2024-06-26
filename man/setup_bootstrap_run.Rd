@@ -9,8 +9,9 @@ setup_bootstrap_run(
   n = 200,
   strat_cols = NULL,
   seed = 1234,
-  .overwrite = FALSE,
-  .join_col = "NUM"
+  data = NULL,
+  .join_col = "NUM",
+  .overwrite = FALSE
 )
 }
 \arguments{
@@ -22,14 +23,20 @@ setup_bootstrap_run(
 
 \item{seed}{a seed for sampling the data. Set to \code{NULL} to avoid setting.}
 
-\item{.overwrite}{logical (T/F) indicating whether or not to overwrite existing
-setup for a bootstrap run.}
+\item{data}{A dataset to resample from. Defaults to \code{NULL}, which will use
+the output from \code{nm_join(.mod)}. If provided, must include the same column
+names as what's returned from \code{nm_data(.mod)}. If the default is used, note
+that a suitable \code{.join_col} must be provided.}
 
-\item{.join_col}{Character column name to use to join table files. Passed to
-\code{\link[=nm_join]{nm_join()}}, and used to create the initial dataset that gets re-sampled \code{n}
-times. The purpose of joining the input data to table files is to filter the
-population to only the subjects that actually made it into the model. See the
-\code{Details} section in \code{\link[=nm_join]{nm_join()}} for more information.}
+\item{.join_col}{Character column name to use to join table files. Not used
+if \code{data} is specified. Passed to \code{\link[=nm_join]{nm_join()}}, and used to create the
+initial dataset that gets re-sampled \code{n} times. The purpose of joining the
+input data to table files is to filter the population to only the subjects
+that actually made it into the model. See the \code{Details} section in
+\code{\link[=nm_join]{nm_join()}} for more information.}
+
+\item{.overwrite}{logical (T/F) indicating whether or not to overwrite
+existing setup for a bootstrap run.}
 }
 \description{
 This function takes a \code{bbi_nmboot_model} (created by a previous
