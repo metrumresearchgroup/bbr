@@ -166,7 +166,7 @@ setup_bootstrap_run <- function(
     writeLines(ignore_lines, file.path(boot_dir, ".gitignore"))
 
     # Only include subjects that entered the original problem by default
-    can_be_joined <- can_be_nm_joined(orig_mod)
+    can_be_joined <- can_be_nm_joined(orig_mod, .join_col = .join_col)
     if(isTRUE(can_be_joined)){
       starting_data <- nm_join(orig_mod, .join_col = .join_col) %>%
         suppressMessages()
