@@ -7,7 +7,7 @@
 color_status(status)
 }
 \arguments{
-\item{status.}{Character string. Either \code{'Finished Running'}, \code{'Incomplete Run'},
+\item{status}{Character string. Either \code{'Finished Running'}, \code{'Incomplete Run'},
 or \code{'Not Run'}.}
 }
 \description{
