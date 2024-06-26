@@ -856,6 +856,14 @@ skip_if_tree_missing_deps <- function(static = FALSE) {
     !is.null(missing_pkgs),
     glue::glue("Skipped because the following packages are needed for this test: {paste(missing_pkgs, collapse = ', ')}")
   )
+
+  # phantomjs is needed for webshot
+  if(isTRUE(static) && is.null(missing_pkgs)){
+    testthat::skip_if(
+      isFALSE(webshot::is_phantomjs_installed()),
+      "Skipped because `phantomjs` is needed for this test. Run `webshot::install_phantomjs()` to execute this test"
+    )
+  }
 }
 
 #' @describeIn req_tree_pkgs Error if missing [model_tree()] dependencies. Called internally
