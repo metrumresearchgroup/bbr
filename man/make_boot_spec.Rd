@@ -7,9 +7,9 @@
 make_boot_spec(boot_models, boot_args)
 }
 \arguments{
-\item{boot_args}{list of parameters needed to create a bootstrap model run.}
+\item{boot_models}{list of boostrap model objects created by \code{make_boot_run()}.}
 
-\item{boot_runs}{list of boostrap model objects created by \code{make_boot_run()}.}
+\item{boot_args}{list of parameters needed to create a bootstrap model run.}
 }
 \description{
 Store bootstrap run details before submission
