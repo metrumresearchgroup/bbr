@@ -763,34 +763,7 @@ model_tree_png <- function(widget) {
   return(p)
 }
 
-#' Draw model tree as a static plot
-#' @param x plot to display
-#' @param newpage Logical (T/F). If `TRUE`, draw new (empty) page first.
-#' @param vp viewport to draw plot in
-#' @param ... other arguments not used by this method
-#'
-#' @examples
-#' \dontrun{
-#' pl_tree <- model_tree(MODEL_DIR, static = TRUE)
-#'
-#' print(pl_tree)
-#' print(pl_tree, vp = grid::viewport(width=0.5, height=0.5))
-#' print(pl_tree, newpage = TRUE, vp = grid::viewport(width=0.5, height=0.5))
-#' }
-#' @export
-print.model_tree_static <- function(x, newpage = is.null(vp), vp = NULL, ...){
-  x_height <- grid::unit(0.85, "npc")
-  x_width <- grid::unit(1, "npc")
-  if(newpage) grid::grid.newpage()
-  if(is.null(vp)){
-    grid::grid.raster(x$png_array, height = x_height, width = x_width)
-  }else{
-    if(is.character(vp)) grid::seekViewport(vp) else grid::pushViewport(vp)
-    grid::grid.raster(x$png_array, height = x_height, width = x_width)
-    grid::upViewport()
-  }
-  return(invisible(x))
-}
+
 
 #' Required packages for running [model_tree()]
 #'

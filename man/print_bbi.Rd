@@ -6,6 +6,7 @@
 \alias{print.bbi_model}
 \alias{print.bbi_nonmem_summary}
 \alias{print.bbi_nmboot_summary}
+\alias{print.model_tree_static}
 \title{Print methods for bbr objects}
 \usage{
 \method{print}{bbi_process}(x, ..., .call_limit = 250)
@@ -15,11 +16,13 @@
 \method{print}{bbi_nonmem_summary}(x, .digits = 3, .fixed = FALSE, .off_diag = FALSE, .nrow = NULL, ...)
 
 \method{print}{bbi_nmboot_summary}(x, .digits = 3, .nrow = 10, ...)
+
+\method{print}{model_tree_static}(x, newpage = is.null(vp), vp = NULL, ...)
 }
 \arguments{
-\item{x}{Object to format or print.}
+\item{x}{plot to display}
 
-\item{...}{Other arguments passed on to individual methods.}
+\item{...}{other arguments not used by this method}
 
 \item{.call_limit}{Integer scalar for the max number of characters to print
 before truncating the call string. This is compared with the entire length,
@@ -34,6 +37,10 @@ long option will be truncated.}
 
 \item{.nrow}{If \code{NULL}, the default, print all rows of the parameter table. If \code{0}, don't print table at all.
 Otherwise, prints only \code{.nrow} rows.}
+
+\item{newpage}{Logical (T/F). If \code{TRUE}, draw new (empty) page first.}
+
+\item{vp}{viewport to draw plot in}
 }
 \description{
 The various objects defined by \code{bbr} have their own print methods to
@@ -52,4 +59,15 @@ will make for prettier formatting, especially of table outputs.
 
 \item \code{print(bbi_nmboot_summary)}: Prints a high level summary of a model from a \code{bbi_nmboot_summary} object
 
+\item \code{print(model_tree_static)}: Draw model tree as a static plot
+
 }}
+\examples{
+\dontrun{
+pl_tree <- model_tree(MODEL_DIR, static = TRUE)
+
+print(pl_tree)
+print(pl_tree, vp = grid::viewport(width=0.5, height=0.5))
+print(pl_tree, newpage = TRUE, vp = grid::viewport(width=0.5, height=0.5))
+}
+}
