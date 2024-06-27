@@ -15,7 +15,8 @@ env:
 jobs:
   check:
     runs-on: ${{ matrix.config.os }}
-    name: ${{ matrix.config.os }} R ${{ matrix.config.r }} ${{ matrix.config.label }}
+    name: ${{ matrix.config.os }} R ${{ matrix.config.r }} ${{ matrix
+    .config.label }}
     strategy:
       fail-fast: false
       matrix:
@@ -71,6 +72,15 @@ jobs:
           git clone --branch "$version" --depth 1 \
             https://github.com/metrumresearchgroup/nmrec.git "$tdir"
           echo "NMREC_PKG=local::$tdir" >>$GITHUB_ENV
+      - name: Check out collapsibleTree
+        if: matrix.config.label == 'oldest'
+        shell: bash
+        run: |
+          version=0.1.8
+          tdir=$(mktemp -d)
+          git clone --branch "$version" --depth 1 \
+            https://github.com/cran/collapsibleTree.git "$tdir"
+          echo "COLLAPSIBLETREE_PKG=local::$tdir" >>$GITHUB_ENV
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: |
@@ -78,6 +88,7 @@ jobs:
             any::rcmdcheck
             ${{ env.MRGMISC_PKG }}
             ${{ env.NMREC_PKG }}
+            ${{ env.COLLAPSIBLETREE_PKG }}
           upgrade: ${{ matrix.config.label == 'oldest' && 'FALSE' || 'TRUE' }}
       - uses: r-lib/actions/check-r-package@v2
       - name: Check pkgdown
