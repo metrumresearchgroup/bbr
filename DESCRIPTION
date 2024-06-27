@@ -67,7 +67,7 @@ Imports:
     mrgmisc,
     nmrec (>= 0.3.0),
     processx,
-    purrr,
+    purrr (>= 1.0.0),
     readr,
     rlang,
     stringfish,
