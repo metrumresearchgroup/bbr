@@ -1,5 +1,5 @@
 context("Model tree diagram")
-skip_if_not_drone_or_metworx("test-model-tree")
+skip_if_not_ci_or_metworx("test-model-tree")
 skip_if_tree_missing_deps()
 
 count_nodes <- function(tree_list) {
