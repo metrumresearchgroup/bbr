@@ -449,7 +449,7 @@ print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
 #####################
 
 #' Function to color the status. Green for finished; red otherwise.
-#' @param status. Character string. Either `'Finished Running'`, `'Incomplete Run'`,
+#' @param status Character string. Either `'Finished Running'`, `'Incomplete Run'`,
 #'  or `'Not Run'`.
 #' @keywords internal
 color_status <- function(status){
