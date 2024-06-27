@@ -20,16 +20,16 @@ if(isTRUE(is_pdf)){
   library(webshot)
   webshot::install_phantomjs() %>% suppressMessages()
 }
-```
 
-
-
-```{r load packages, results = 'hide', message=FALSE, warning=FALSE}
 # NOTE: if running chunks interactively we need to load the package first
 #   because renv isolation prevents us from finding an bbr installation
 if (interactive()) {
   devtools::load_all()
 }
+```
+
+
+```{r load packages, results = 'hide', message=FALSE, warning=FALSE}
 library(glue)
 library(bbr)
 library(dplyr)
