@@ -1,4 +1,4 @@
-skip_if_not_drone_or_metworx("test-nm-join")
+skip_if_not_ci_or_metworx("test-nm-join")
 withr::local_options(list(
   bbr.bbi_exe_path = read_bbi_path(),
   bbr.verbose = FALSE

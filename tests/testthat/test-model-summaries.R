@@ -1,6 +1,6 @@
 context("Test bbi summary on multiple models")
 
-skip_if_not_drone_or_metworx("test-model-summaries")
+skip_if_not_ci_or_metworx("test-model-summaries")
 
 # references
 NUM_MODS <- 3

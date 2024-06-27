@@ -10,7 +10,7 @@ test_that("nm_tables() works: model object [BBR-NMT-001]", {
 })
 
 test_that("nm_tables() works: summary object [BBR-NMT-001]", {
-  skip_if_not_drone_or_metworx("nm_tables() summary object")
+  skip_if_not_ci_or_metworx("nm_tables() summary object")
   res <- nm_tables(SUM1, .files = TAB_FILE)
   expect_equal(length(res), 2)
   expect_equal(res$data, nm_data(MOD1))

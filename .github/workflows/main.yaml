@@ -1,0 +1,109 @@
+name: CI
+on:
+  push:
+    branches:
+      - 'main'
+      - 'scratch/**'
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+.[0-9]+'
+  pull_request:
+
+env:
+  BBI_VERSION: v3.3.0
+
+jobs:
+  check:
+    runs-on: ${{ matrix.config.os }}
+    name: ${{ matrix.config.os }} R ${{ matrix.config.r }} ${{ matrix.config.label }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - os: ubuntu-20.04
+            r: 4.2.3
+          - os: ubuntu-20.04
+            r: 4.3.1
+          - os: ubuntu-latest
+            r: release
+          - label: oldest
+            os: ubuntu-20.04
+            r: 4.0.5
+            bbi_version: v3.0.2
+            mpn: 2023-01-25
+            cran_override: 'https://mpn.metworx.com/snapshots/stable/2023-01-25'
+            rspm: 'https://packagemanager.posit.co/cran/__linux__/focal/2023-01-25'
+    env:
+      R_KEEP_PKG_SOURCE: yes
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install bbi
+        uses: metrumresearchgroup/actions/setup-bbi@v1
+        with:
+          version: ${{ matrix.config.bbi_version || env.BBI_VERSION }}
+      - uses: metrumresearchgroup/actions/mpn-latest@v1
+        if: matrix.config.label != 'oldest'
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.config.r }}
+          use-public-rspm: true
+          extra-repositories: 'https://mpn.metworx.com/snapshots/stable/${{ matrix.config.mpn || env.MPN_LATEST }}'
+        env:
+          RSPM: ${{ matrix.config.rspm }}
+          CRAN: ${{ matrix.config.cran_override }}
+      - name: Check out mrgmisc
+        if: matrix.config.label == 'oldest'
+        shell: bash
+        run: |
+          version=0.1.0
+          tdir=$(mktemp -d)
+          git clone --branch "$version" --depth 1 \
+            https://github.com/metrumresearchgroup/mrgmisc.git "$tdir"
+          echo "MRGMISC_PKG=local::$tdir" >>$GITHUB_ENV
+      - name: Check out nmrec
+        if: matrix.config.label == 'oldest'
+        shell: bash
+        run: |
+          # Even on oldest, install new enough nmrec for vignettes to
+          # build.
+          version=0.4.0
+          tdir=$(mktemp -d)
+          git clone --branch "$version" --depth 1 \
+            https://github.com/metrumresearchgroup/nmrec.git "$tdir"
+          echo "NMREC_PKG=local::$tdir" >>$GITHUB_ENV
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::pkgdown
+            any::rcmdcheck
+            ${{ env.MRGMISC_PKG }}
+            ${{ env.NMREC_PKG }}
+          upgrade: ${{ matrix.config.label == 'oldest' && 'FALSE' || 'TRUE' }}
+      - uses: r-lib/actions/check-r-package@v2
+      - name: Check pkgdown
+        shell: Rscript {0}
+        run: pkgdown::check_pkgdown()
+  release:
+    if: github.ref_type == 'tag'
+    name: Upload release
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install bbi
+        uses: metrumresearchgroup/actions/setup-bbi@v1
+        with:
+          version: ${{ env.BBI_VERSION }}
+      - uses: metrumresearchgroup/actions/mpn-latest@v1
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: release
+          use-public-rspm: true
+          extra-repositories: 'https://mpn.metworx.com/snapshots/stable/${{ env.MPN_LATEST }}'
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::pkgpub
+      - uses: metrumresearchgroup/actions/publish-r-release@v1

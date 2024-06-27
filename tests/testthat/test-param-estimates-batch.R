@@ -1,6 +1,6 @@
 context("Test bbi batch parameter estimate functions")
 
-skip_if_not_drone_or_metworx("test-batch-param-estimates")
+skip_if_not_ci_or_metworx("test-batch-param-estimates")
 skip_if_old_bbi("3.1.0")
 
 withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {

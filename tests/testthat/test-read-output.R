@@ -187,7 +187,7 @@ for (.tc in .test_cases) {
 }
 
 test_that("check_ext() summary object [BBR-ROT-010]", {
-  skip_if_not_drone_or_metworx("check_ext() summary object")
+  skip_if_not_ci_or_metworx("check_ext() summary object")
   df <- check_ext(SUM1)
   ref_df <- dget(EXT_REF_FLOOR_0)
 
@@ -240,7 +240,7 @@ for (.tc in .test_cases) {
 }
 
 test_that("check_grd() summary object [BBR-ROT-013]", {
-  skip_if_not_drone_or_metworx("check_grd() summary object")
+  skip_if_not_ci_or_metworx("check_grd() summary object")
   df <- check_grd(SUM1)
   ref_df <- dget(GRD_REF_FLOOR_0)
   expect_equal(df, ref_df)

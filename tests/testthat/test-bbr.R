@@ -31,7 +31,7 @@ test_that("bbi_dry_run() correctly returns object [BBR-BBR-002]", {
 })
 
 
-skip_if_not_drone_or_metworx("bbi_init")
+skip_if_not_ci_or_metworx("bbi_init")
 
 test_that("check_bbi_exe() correctly errors or finds paths [BBR-BBR-003]", {
   FAKE_BBI_PATH <- "/tmp/fake/bbi"

@@ -23,16 +23,16 @@ skip_if_over_rate_limit <- function(by = 5) {
 }
 
 
-#' Skip test if not on Metworx or Drone
+#' Skip test if not on Metworx or in CI
 #'
-#' Checks for Metworx and Drone environment variables and skips the test if neither are found.
+#' Checks for Metworx and CI environment variables and skips the test if neither are found.
 #' This is primarily used for tests that require `bbi` to be installed.
 #' @param .test_name Character scalar to identify the test being potentially skipped.
 #'   This is printed in the skip message
 #' @keywords internal
-skip_if_not_drone_or_metworx <- function(.test_name) {
-  if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("DRONE") != "true") {
-    testthat::skip(paste(.test_name, "only runs on Metworx or Drone"))
+skip_if_not_ci_or_metworx <- function(.test_name) {
+  if (Sys.getenv("METWORX_VERSION") == "" && Sys.getenv("CI") != "true") {
+    testthat::skip(paste(.test_name, "only runs on Metworx or CI"))
   }
 }
 

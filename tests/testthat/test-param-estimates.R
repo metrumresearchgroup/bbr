@@ -1,6 +1,6 @@
 context("Test param_estimates functions")
 
-skip_if_not_drone_or_metworx("test-param-estimates")
+skip_if_not_ci_or_metworx("test-param-estimates")
 
 
 # build reference

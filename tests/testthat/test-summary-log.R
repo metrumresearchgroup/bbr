@@ -1,6 +1,6 @@
 context("Test creating summary logs")
 
-skip_if_not_drone_or_metworx("test-summary-log")
+skip_if_not_ci_or_metworx("test-summary-log")
 
 withr::local_options(list(bbr.bbi_exe_path = read_bbi_path()))
 

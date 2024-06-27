@@ -54,12 +54,12 @@ Depends:
 Imports: 
     callr,
     checkmate,
-    cli,
+    cli (>= 3.1.0),
     data.table,
     digest,
     diffobj,
     dplyr (>= 1.0.0),
-    fs,
+    fs (>= 1.4.2),
     glue,
     jsonlite,
     lifecycle,
@@ -67,7 +67,7 @@ Imports:
     mrgmisc,
     nmrec (>= 0.3.0),
     processx,
-    purrr,
+    purrr (>= 1.0.0),
     readr,
     rlang,
     stringfish,
@@ -86,9 +86,7 @@ Suggests:
     rmarkdown,
     rprojroot,
     testthat (>= 2.1.0),
-    withr,
-    mrgvalidate,
-    mrgvalprep (>= 0.0.4)
+    withr (>= 2.4.0)
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
