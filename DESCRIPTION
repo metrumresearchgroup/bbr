@@ -78,7 +78,7 @@ Imports:
     xfun,
     yaml
 Suggests: 
-    collapsibleTree,
+    collapsibleTree (>= 0.1.7),
     covr,
     devtools,
     forcats,
