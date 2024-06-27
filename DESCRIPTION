@@ -89,7 +89,7 @@ Suggests:
     png,
     rmarkdown,
     rprojroot,
-    scales (>= 1.3.0),
+    scales,
     testthat (>= 2.1.0),
     webshot,
     withr (>= 2.4.0)
