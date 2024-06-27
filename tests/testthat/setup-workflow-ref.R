@@ -241,6 +241,41 @@ create_rlg_models <- function() {
   return(invisible(NULL))
 }
 
+create_tree_models <- function(
+    addl_based_on = FALSE,
+    multiple_origins = FALSE,
+    broken_link = FALSE
+){
+  # copy models before creating model tree
+  mod1 <- read_model(MOD1_PATH)
+  mod2 <- copy_model_from(mod1, "2", .add_tags = NEW_TAGS) %>% add_star()
+  mod3 <- copy_model_from(mod2, "3", .add_tags = "DV: nmol") # test list tag
+  mod4 <- copy_model_from(mod2, "4")
+  mod5 <- copy_model_from(mod4, "5")
+
+  if(isTRUE(addl_based_on)){
+    # Multiple based_on
+    mod6 <- copy_model_from(mod5, "6", .based_on_additional = c("1", "3"),
+                            .star = TRUE, .description = "final model")
+    mod7 <- copy_model_from(mod6, "7", .based_on_additional = c("2"))
+  }
+
+  if(isTRUE(broken_link) || isTRUE(multiple_origins)){
+    # broken link models
+    mod_other <- copy_model_from(mod1, "1000", .overwrite = TRUE)
+    mod_other2 <- copy_model_from(mod_other, "1001")
+    mod_other3 <- copy_model_from(mod_other2, "1002")
+    if(isTRUE(multiple_origins)) remove_based_on(mod_other, "1")
+  }
+
+  if(isTRUE(broken_link)){
+    # remove starting link by deleting starting model
+    delete_models(mod_other, .tags = NULL, .force = TRUE) %>% suppressMessages()
+  }
+
+  return(invisible(NULL))
+}
+
 clean_test_enviroment <- function(.f = NULL , env = parent.frame())
 {
     cleanup(env)
@@ -253,7 +288,7 @@ clean_test_enviroment <- function(.f = NULL , env = parent.frame())
 
 cleanup <- function(env = parent.frame()) {
   # delete tmp files if they are leftover from previous test
-  mods_to_kill <- purrr::map_chr(c(seq(2,7), "Parent", "Child"), ~ file.path(MODEL_DIR, .x))
+  mods_to_kill <- purrr::map_chr(c(seq(2,7), "Parent", "Child", "1000","1001", "1002"), ~ file.path(MODEL_DIR, .x))
   for (m in mods_to_kill) {
     if (fs::file_exists(yaml_ext(m))) fs::file_delete(yaml_ext(m))
     if (fs::file_exists(ctl_ext(m))) fs::file_delete(ctl_ext(m))

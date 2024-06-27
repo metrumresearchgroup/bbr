@@ -441,6 +441,23 @@ check_bbi_run_log_df_object <- function(.df) {
 }
 
 
+#' Add model status to a run log
+#' @param .log_df a `bbi_run_log_df` tibble (the output of [run_log()])
+#' @keywords internal
+add_model_status <- function(.log_df){
+  # check input df
+  check_bbi_run_log_df_object(.log_df)
+  checkmate::assert_true(ABS_MOD_PATH %in% names(.log_df))
+
+  # Read in models to get model status
+  mod_list <- purrr::map(.log_df[[ABS_MOD_PATH]], read_model) %>%
+    suppressSpecificWarning("incomplete final line")
+
+  .log_df %>% dplyr::mutate(
+    status = purrr::map_chr(mod_list, bbi_nonmem_model_status)
+  )
+}
+
 ############################
 # Error handlers
 ############################

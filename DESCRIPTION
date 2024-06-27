@@ -78,14 +78,20 @@ Imports:
     xfun,
     yaml
 Suggests: 
+    collapsibleTree (>= 0.1.7),
     covr,
     devtools,
     forcats,
     ggplot2,
+    grid,
+    htmlwidgets,
     knitr,
+    png,
     rmarkdown,
     rprojroot,
+    scales,
     testthat (>= 2.1.0),
+    webshot,
     withr (>= 2.4.0)
 VignetteBuilder: 
     knitr
