@@ -697,9 +697,8 @@ style_html <- function(txt, color = "black", ..., br_before = FALSE, br_after = 
 
 #' Format the model type for use in [model_tree()]
 #'
-#' @param .mod a `bbi_base_model` object.
-#' @param msg Character string. Appended to the end of the formatted model type
-#'  if provided.
+#' @param model_type one of the `bbr` supported model types (`nonmem`, `nboot`,
+#' `nsim`). Other model types are also acceptable, but won't have custom formatting.
 #' @param fmt_html Logical (`T`/`F`). If `TRUE`, apply coloring and format as `HTML`.
 #' @param ... Additional arguments passed to [style_html()].
 #' @keywords internal
