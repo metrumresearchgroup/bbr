@@ -357,10 +357,7 @@ print_bbi_args <- function() {
     }
 
     out <- glue("{bname} ({v$type}): {desc}. Command-line option: {v$flag}{note}")
-    # ansi_strwrap isn't available until cli v2.3.0. This condition can be
-    # dropped once our minimum supported MPN is 2021-02-01 or later.
-    tryCatch(out <- cli::ansi_strwrap(out, exdent = 2),
-             error = function(e) NULL)
+    out <- cli::ansi_strwrap(out, exdent = 2)
     cli::cat_line(out)
   })
 }

@@ -54,7 +54,7 @@ Depends:
 Imports: 
     callr,
     checkmate,
-    cli,
+    cli (>= 3.1.0),
     data.table,
     digest,
     diffobj,
