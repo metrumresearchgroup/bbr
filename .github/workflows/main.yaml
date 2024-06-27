@@ -30,9 +30,9 @@ jobs:
             os: ubuntu-20.04
             r: 4.0.5
             bbi_version: v3.0.2
-            mpn: 2020-06-08
-            cran_override: 'https://mpn.metworx.com/snapshots/stable/2020-06-08'
-            rspm: 'https://packagemanager.posit.co/cran/__linux__/focal/2020-06-08'
+            mpn: 2023-01-25
+            cran_override: 'https://mpn.metworx.com/snapshots/stable/2023-01-25'
+            rspm: 'https://packagemanager.posit.co/cran/__linux__/focal/2023-01-25'
     env:
       R_KEEP_PKG_SOURCE: yes
     steps:
@@ -70,9 +70,6 @@ jobs:
           tdir=$(mktemp -d)
           git clone --branch "$version" --depth 1 \
             https://github.com/metrumresearchgroup/nmrec.git "$tdir"
-          # Delete testthat version constraint.  It doesn't matter in
-          # this context and causes pak's solver to abort.
-          sed -i 's/testthat (.*/testthat,/' "$tdir/DESCRIPTION"
           echo "NMREC_PKG=local::$tdir" >>$GITHUB_ENV
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
