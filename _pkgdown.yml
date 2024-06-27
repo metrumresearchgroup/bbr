@@ -68,6 +68,7 @@ reference:
   - add_summary
   - config_log
   - add_config
+  - model_tree
 
 - title: Model object interactions
   contents:
