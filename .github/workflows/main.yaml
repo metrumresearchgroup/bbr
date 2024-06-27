@@ -15,8 +15,7 @@ env:
 jobs:
   check:
     runs-on: ${{ matrix.config.os }}
-    name: ${{ matrix.config.os }} R ${{ matrix.config.r }} ${{ matrix
-    .config.label }}
+    name: ${{ matrix.config.os }} R ${{ matrix.config.r }} ${{ matrix.config.label }}
     strategy:
       fail-fast: false
       matrix:
