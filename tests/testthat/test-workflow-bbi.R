@@ -193,11 +193,6 @@ withr::with_options(list(
 
 
   test_that("submit_model() works with non-NULL .config_path [BBR-WRKF-007]", {
-    if (requireNamespace("withr", quietly = TRUE) &&
-        utils::packageVersion("withr") < "2.2.0") {
-      skip("must have withr >= 2.2.0 to run this test")
-    }
-
     test_dir <- getwd()
     withr::with_tempdir({
       # copy model, YAML, and data files to the same location

@@ -86,7 +86,7 @@ Suggests:
     rmarkdown,
     rprojroot,
     testthat (>= 2.1.0),
-    withr
+    withr (>= 2.4.0)
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
