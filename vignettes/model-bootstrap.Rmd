@@ -40,10 +40,15 @@ library(ggplot2)
 ```{r load data and configure bbi, include = FALSE}
 MODEL_DIR <- system.file("model", "nonmem", "basic", package = "bbr")
 source("../tests/testthat/helpers-create-example-model.R")
+
 # set bbi execution path
 if (Sys.which("bbi") == "") {
   options('bbr.bbi_exe_path' = read_bbi_path())
 }
+
+# Get bbi version: we cant build this vignette when bbi is less than 3.1.0
+# since param_estimates_batch() is required for summarization
+eval_vignette <- bbr:::test_bbi_version(read_bbi_path(), "3.1.0")
 
 pl_theme <- theme_bw(base_size = 8) +
   theme(
@@ -64,11 +69,11 @@ mod1 <- read_model(file.path(MODEL_DIR, 1))
 
 
 `new_bootstrap_run` will create a new `bbi_nmboot_model` object from an existing `bbi_nonmem_model`. This function creates a new control stream, that is a copy of `mod1` with the `$TABLE` and `$COV` records optionally removed (the default). 
-```{r new_bootstrap_run}
+```{r new_bootstrap_run, eval = eval_vignette}
 boot_run <- new_bootstrap_run(mod1)
 ```
 
-```{r, results = "asis"}
+```{r, eval = eval_vignette, results = "asis"}
 boot_run
 ```
 
@@ -86,24 +91,24 @@ overwhelming the grid with too many concurrent jobs. As seen below we can contro
 submit_model(boot_run, .batch_size = 100)
 ```
 
-```{r make_fake_boot, include=FALSE}
+```{r make_fake_boot, eval = eval_vignette, include=FALSE}
 # args should match what was specified in setup_bootstrap_run
 make_fake_boot(mod1, n = 100, strat_cols = c("SEX", "ETN"))
 ```
 
 The `get_model_status` helper can be helpful for monitoring the progress of a bootstrap run:
-```{r, results = "asis"}
+```{r, eval = eval_vignette, results = "asis"}
 get_model_status(boot_run)
 ```
 
 Once complete, the run can then be summarized. `summarize_bootstrap_run` will summarize the parameter estimates, run details, and any heuristics of a bootstrap run, saving the results to a `boot_summary.RDS` data file within the bootstrap run directory. Subsequent calls will read these results in rather than re-summarizing by default, though this can be overridden via the `force_resummarize` argument assuming the individual models are still around (i.e. you haven't called `cleanup_bootstrap_run()`).
-```{r, message = FALSE}
+```{r, eval = eval_vignette, message = FALSE}
 boot_sum <- summarize_bootstrap_run(boot_run)
 ```
 
 
 `bootstrap_estimates()` is a helper for reading in the estimates and displaying them in either a wide or long format, facilitating plot generation and other post-hoc analyses.
-```{r, message=FALSE, out.width = "100%", dpi = 200}
+```{r, eval = eval_vignette, message=FALSE, out.width = "100%", dpi = 200}
 ests_df <- bootstrap_estimates(boot_run, format_long = TRUE) %>%
   dplyr::filter(grepl("THETA", parameter_names)) 
 
@@ -116,11 +121,11 @@ ests_df %>% ggplot(aes(x = estimate)) +
 
 Once the run has finished executing _and_ has been summarized, the bootstrap run can optionally be "cleaned up". `cleanup_bootstrap_run()` will delete all the individual model files, while retaining the information you need to read in estimates or summary information. The intention here was to help reduce the number of files you need to commit via version control. Collaborators will be able to read in the bootstrap model and summary objects without needing individual run files.
 
-```{r, results = "asis"}
+```{r, eval = eval_vignette, results = "asis"}
 cleanup_bootstrap_run(boot_run, .force = TRUE)
 ```
 
 
-```{r cleanup, include=FALSE}
+```{r cleanup, eval = eval_vignette, include=FALSE}
 delete_models(boot_run, .tags = NULL, .force = TRUE)
 ```
