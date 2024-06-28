@@ -27,6 +27,7 @@ reference:
   contents:
   - submit_model
   - submit_models
+  - run_nmtran
   - print_bbi_args
 
 - title: Model summary and outputs
