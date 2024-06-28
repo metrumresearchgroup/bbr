@@ -1,0 +1,126 @@
+---
+title: "Bootstrap a model"
+author: "Kyle Barrett"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{model-bootstrap}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+This vignette demonstrates how to bootstrap a model. If you are new to `bbr`, the ["Getting Started with bbr"](https://metrumresearchgroup.github.io/bbr/articles/getting-started.html) vignette will take you through some basic scenarios for modeling with NONMEM using `bbr`, introducing you to its standard workflow and functionality.
+
+## Setup
+
+There is some initial set up necessary for using `bbr`. Please refer to the ["Getting Started"](https://metrumresearchgroup.github.io/bbr/articles/getting-started.html#setup) vignette, mentioned above, if you have not done this yet. Once this is done, load the library.
+
+```{r setup, include=FALSE}
+# NOTE: if running chunks interactively we need to load the package first
+#   because renv isolation prevents us from finding an bbr installation
+if (interactive()) {
+  devtools::load_all()
+}
+```
+```{r load packages, results = 'hide', message=FALSE, warning=FALSE}
+library(bbr)
+library(dplyr)
+library(purrr)
+library(ggplot2)
+```
+
+```{r load data and configure bbi, include = FALSE}
+MODEL_DIR <- system.file("model", "nonmem", "basic", package = "bbr")
+source("../tests/testthat/helpers-create-example-model.R")
+# set bbi execution path
+if (Sys.which("bbi") == "") {
+  options('bbr.bbi_exe_path' = read_bbi_path())
+}
+
+pl_theme <- theme_bw(base_size = 8) +
+  theme(
+    plot.margin = unit(c(1,1,1,1), "cm"), 
+    axis.text.x = element_text(angle = 45, vjust = 0.5)
+  )
+```
+
+# Create a new bootstrap run
+We start by pointing to an initial model, which will be used as a starting point for the bootstrap run
+
+```{r fake model dir, eval = FALSE}
+MODEL_DIR <- "../nonmem"
+```
+```{r first model}
+mod1 <- read_model(file.path(MODEL_DIR, 1))
+```
+
+
+`new_bootstrap_run` will create a new `bbi_nmboot_model` object from an existing `bbi_nonmem_model`. This function creates a new control stream, that is a copy of `mod1` with the `$TABLE` and `$COV` records optionally removed (the default). 
+```{r new_bootstrap_run}
+boot_run <- new_bootstrap_run(mod1)
+```
+
+```{r, results = "asis"}
+boot_run
+```
+
+
+Any manual modifications must be done at this point for the changes to be reflected in the child models created in the next call. `setup_bootstrap_run` will create `n` new model objects and re-sampled datasets in a subdirectory. The control stream found at `get_model_path(boot_run)` is used as the "template" for these new model objects, and the new datasets are sampled from the dataset defined in its `$DATA` record (i.e. `get_data_path(boot_run)`). After setting up the bootstrap run, the model object updates to display the arguments that were passed.
+
+```{r fake boot setup, eval = FALSE}
+setup_bootstrap_run(boot_run, n = 100, strat_cols = c("SEX", "ETN"))
+```
+
+
+Bootstrap runs can be submitted like any other model, though it's worth noting that they are typically submitted in batches to avoid
+overwhelming the grid with too many concurrent jobs. As seen below we can control the `.batch_size`, though here it will have no impact since `n <= .batch_size`.
+```{r, eval=FALSE}
+submit_model(boot_run, .batch_size = 100)
+```
+
+```{r make_fake_boot, include=FALSE}
+# args should match what was specified in setup_bootstrap_run
+make_fake_boot(mod1, n = 100, strat_cols = c("SEX", "ETN"))
+```
+
+The `get_model_status` helper can be helpful for monitoring the progress of a bootstrap run:
+```{r, results = "asis"}
+get_model_status(boot_run)
+```
+
+Once complete, the run can then be summarized. `summarize_bootstrap_run` will summarize the parameter estimates, run details, and any heuristics of a bootstrap run, saving the results to a `boot_summary.RDS` data file within the bootstrap run directory. Subsequent calls will read these results in rather than re-summarizing by default, though this can be overridden via the `force_resummarize` argument assuming the individual models are still around (i.e. you haven't called `cleanup_bootstrap_run()`).
+```{r, message = FALSE}
+boot_sum <- summarize_bootstrap_run(boot_run)
+```
+
+
+`bootstrap_estimates()` is a helper for reading in the estimates and displaying them in either a wide or long format, facilitating plot generation and other post-hoc analyses.
+```{r, message=FALSE, out.width = "100%", dpi = 200}
+ests_df <- bootstrap_estimates(boot_run, format_long = TRUE) %>%
+  dplyr::filter(grepl("THETA", parameter_names)) 
+
+
+ests_df %>% ggplot(aes(x = estimate)) +
+  facet_wrap(~parameter_names, scales = "free") +
+  geom_histogram(color = "white", alpha = 0.7) +
+  pl_theme
+```
+
+Once the run has finished executing _and_ has been summarized, the bootstrap run can optionally be "cleaned up". `cleanup_bootstrap_run()` will delete all the individual model files, while retaining the information you need to read in estimates or summary information. The intention here was to help reduce the number of files you need to commit via version control. Collaborators will be able to read in the bootstrap model and summary objects without needing individual run files.
+
+```{r, results = "asis"}
+cleanup_bootstrap_run(boot_run, .force = TRUE)
+```
+
+
+```{r cleanup, include=FALSE}
+delete_models(boot_run, .tags = NULL, .force = TRUE)
+```
