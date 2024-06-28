@@ -185,7 +185,6 @@ setup_bootstrap_run <- function(
         if ("DV.DATA" %in% names(starting_data)) {
           starting_data <- dplyr::rename(starting_data, "DV" = "DV.DATA")
         }
-
       }else{
         rlang::inform(
           paste(
@@ -195,9 +194,22 @@ setup_bootstrap_run <- function(
         )
         starting_data <- nm_data(orig_mod) %>% suppressMessages()
       }
+
+      # Overwrite data path in control stream
+      #  - This is not necessary in most cases, but is if overwriting a previous
+      #    run where a starting dataset was provided. The data path must then
+      #    be updated to reflect the original control stream
+      data_path <- get_data_path(.boot_run, .check_exists = FALSE)
+      if(!fs::file_exists(data_path)){
+        data_path_rel <- get_data_path_from_ctl(orig_mod, normalize = FALSE)
+        modify_data_path_ctl(.boot_run, data_path_rel)
+      }
     }else{
       checkmate::assert_data_frame(data)
-      input_cols <- get_input_columns(.boot_run) # Taken from control stream
+      # Get input columns from dataset referenced in based_on model
+      #  - must be from based_on model, as the data path of .boot_run may already
+      #    have been adjusted to point to a new dataset (which wont exist if overwriting)
+      input_cols <- get_input_columns(orig_mod)
       if(!all(input_cols %in% names(data))){
         missing_cols <- input_cols[!(input_cols %in% names(data))]
         missing_txt <- paste(missing_cols, collapse = ", ")
