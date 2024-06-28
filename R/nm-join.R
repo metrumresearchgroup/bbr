@@ -249,8 +249,9 @@ drop_dups <- function(.new_table, .dest_table, .join_col, .table_name) {
 #' Helper to determine if `nm_join()` can be called on a `bbi_nonmem_model`
 #' object
 #' @inheritParams nm_tables
+#' @inheritParams nm_join
 #' @noRd
-can_be_nm_joined <- function(.mod){
+can_be_nm_joined <- function(.mod, .join_col = "NUM"){
   check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
   if(inherits(.mod, NM_SUM_CLASS)){
     .mod <- read_model(.mod[[ABS_MOD_PATH]])
@@ -260,9 +261,7 @@ can_be_nm_joined <- function(.mod){
   is_finished <- model_is_finished(.mod)
 
   # Check for presence of table records
-  ctl <- get_model_ctl(.mod)
-  table_recs <- nmrec::select_records(ctl, "table")
-  has_tables <- !rlang::is_empty(table_recs)
+  has_tables <- mod_has_record(.mod, "table")
 
   reasons <- c()
   if(isFALSE(is_finished)){
@@ -273,7 +272,34 @@ can_be_nm_joined <- function(.mod){
     reasons <- c(reasons, "Model has no table records. Nothing to join to `nm_data()`")
   }
 
-  if(isFALSE(is_finished) || isFALSE(has_tables)){
+  # Check for .join_col or "ID" in all tables
+  # - We dont specifically check if the table is FIRSTONLY (n_recs = nrows),
+  #   as that requires reading in the model summary and fully reading in the
+  #   tables, and the goal here is to do a quicker check ahead of time
+  # - A `$TABLE` record must contain either the .join_col and/or "ID" to join
+  #   properly
+  if(isTRUE(is_finished) && isTRUE(has_tables)){
+    all_table_cols <- get_table_columns(.mod, from_data = TRUE)
+    has_join_col_or_id <- purrr::map_lgl(all_table_cols, function(tab_cols){
+      any(c(.join_col, "ID") %in% tab_cols)
+    })
+    bad_join <- !all(has_join_col_or_id)
+
+    if(isTRUE(bad_join)){
+      missing_cols <- which(has_join_col_or_id == FALSE)
+      missing_cols_txt <- glue("Record {missing_cols} --> Names: {all_table_cols[missing_cols]}")
+      msg <- c(
+        paste(
+          glue("`$TABLE` records must include the provided .join_col ('{.join_col}') and/or 'ID' for FIRSTONLY tables."),
+          "The following records do not have either:"
+        ),
+        missing_cols_txt
+      )
+      reasons <- c(reasons, msg)
+    }
+  }
+
+  if(isFALSE(is_finished) || isFALSE(has_tables) || isTRUE(bad_join)){
     reasons_txt <- paste0(" - ", reasons, collapse = "\n")
     rlang::inform(
       c(

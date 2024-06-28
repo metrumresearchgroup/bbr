@@ -102,19 +102,39 @@ withr::with_options(
       })
     })
 
-    test_that("setup_bootstrap_run messages if nm_join cant be used", {
+    test_that("setup_bootstrap_run messages if nm_join cant be used: unfinished model", {
       boot_spec_path <- get_spec_path(.boot_run, .check_exists = FALSE)
       expect_false(fs::file_exists(boot_spec_path))
       # Set up bootstrap run object using *non-submitted* model
       expect_message(
         setup_bootstrap_run(.boot_run, n = 3),
-        "Defaulting to input data"
+        "Model has not finished executing"
       )
       expect_true(fs::file_exists(boot_spec_path))
     })
 
     # Submit based_on model to use for remainder of tests
     proc1 <- submit_model(mod1, .mode = "local", .wait = TRUE)
+
+    test_that("setup_bootstrap_run messages if nm_join cant be used: bad .join_col setup", {
+      # Set up bootstrap run object when .join_col checks fail
+      expect_message(
+        setup_bootstrap_run(.boot_run, n = 3, .join_col = "ID", .overwrite = TRUE),
+        "records must include the provided .join_col"
+      )
+    })
+
+    test_that("setup_bootstrap_run works with user-provided dataset", {
+      starting_data <- nm_join(mod1) %>% suppressMessages()
+      setup_bootstrap_run(.boot_run, n = 1, data = starting_data, .overwrite = TRUE)
+      data_save_path <- file.path(boot_dir, "boot-data.csv")
+      expect_true(fs::file_exists(data_save_path))
+      expect_equal(data_save_path, get_data_path(.boot_run))
+
+      # Test submission to ensure child models are unaffected by the data path adjustment
+      proc <- submit_model(.boot_run, .mode = "local", .wait = TRUE)
+      expect_true(check_nonmem_finished(.boot_run))
+    })
 
     test_that("setup_bootstrap_run works as expected", {
       setup_bootstrap_run(.boot_run, n = 3, .overwrite = TRUE, seed = NULL)

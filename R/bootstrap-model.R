@@ -81,6 +81,23 @@ new_bootstrap_run <- function(
 #' objects, and the new datasets are sampled from the dataset defined in its
 #' `$DATA` record (i.e. `get_data_path(.boot_run)`).
 #'
+#' @param .boot_run a `bbi_nmboot_model` object.
+#' @param n number of model runs.
+#' @param strat_cols columns to maintain proportion for stratification
+#' @param seed a seed for sampling the data. Set to `NULL` to avoid setting.
+#' @param data A dataset to resample from. Defaults to `NULL`, which will use
+#'   the output from `nm_join(.mod)`. If provided, must include the same column
+#'   names as what's returned from `nm_data(.mod)`. If the default is used, note
+#'   that a suitable `.join_col` must be provided.
+#' @param .join_col Character column name to use to join table files. Not used
+#'   if `data` is specified. Passed to [nm_join()], and used to create the
+#'   initial dataset that gets re-sampled `n` times. The purpose of joining the
+#'   input data to table files is to filter the population to only the subjects
+#'   that actually made it into the model. See the `Details` section in
+#'   [nm_join()] for more information.
+#' @param .overwrite logical (T/F) indicating whether or not to overwrite
+#'   existing setup for a bootstrap run.
+#'
 #' @details
 #'
 #' Once you have run this function, you can execute your bootstrap with
@@ -88,12 +105,6 @@ new_bootstrap_run <- function(
 #' bootstrap run. Once all models have finished, use [summarize_bootstrap_run()]
 #' to view the results. See examples below.
 #'
-#' @param .boot_run a `bbi_nmboot_model` object.
-#' @param n number of model runs.
-#' @param strat_cols columns to maintain proportion for stratification
-#' @param seed a seed for sampling the data. Set to `NULL` to avoid setting.
-#' @param .overwrite logical (T/F) indicating whether or not to overwrite existing
-#'  setup for a bootstrap run.
 #'
 #' @seealso [new_bootstrap_run()] [summarize_bootstrap_run()] [submit_model()]
 #'
@@ -126,6 +137,8 @@ setup_bootstrap_run <- function(
     n = 200,
     strat_cols = NULL,
     seed = 1234,
+    data = NULL,
+    .join_col = "NUM",
     .overwrite = FALSE
 ){
   check_model_object(.boot_run, NMBOOT_MOD_CLASS)
@@ -158,27 +171,70 @@ setup_bootstrap_run <- function(
     ignore_lines <- paste(default_ignore, ignore_models, sep = "\n\n")
     writeLines(ignore_lines, file.path(boot_dir, ".gitignore"))
 
-    # Only include subjects that entered the original problem by default
-    can_be_joined <- can_be_nm_joined(orig_mod)
-    if(isTRUE(can_be_joined)){
-      starting_data <- nm_join(orig_mod) %>% suppressMessages()
+    if(is.null(data)){
+      # Only include subjects that entered the original problem by default
+      can_be_joined <- can_be_nm_joined(orig_mod, .join_col = .join_col)
+      if(isTRUE(can_be_joined)){
+        starting_data <- nm_join(orig_mod, .join_col = .join_col) %>%
+          suppressMessages()
 
-      # select only columns from original data set
-      starting_data <- starting_data %>%
-        dplyr::select(attr(starting_data, "nm_join_origin")$data)
+        # select only columns from original data set
+        starting_data <- starting_data %>%
+          dplyr::select(attr(starting_data, "nm_join_origin")$data)
 
-      if ("DV.DATA" %in% names(starting_data)) {
-        starting_data <- dplyr::rename(starting_data, "DV" = "DV.DATA")
+        if ("DV.DATA" %in% names(starting_data)) {
+          starting_data <- dplyr::rename(starting_data, "DV" = "DV.DATA")
+        }
+      }else{
+        rlang::inform(
+          paste(
+            "Defaulting to input data, which may include data that doesn't enter",
+            "the final problem (i.e. ignored subjects)"
+          )
+        )
+        starting_data <- nm_data(orig_mod) %>% suppressMessages()
       }
 
+      # Overwrite data path in control stream
+      #  - This is not necessary in most cases, but is if overwriting a previous
+      #    run where a starting dataset was provided. The data path must then
+      #    be updated to reflect the original control stream
+      data_path <- get_data_path(.boot_run, .check_exists = FALSE)
+      if(!fs::file_exists(data_path)){
+        data_path_rel <- get_data_path_from_ctl(orig_mod, normalize = FALSE)
+        modify_data_path_ctl(.boot_run, data_path_rel)
+      }
     }else{
-      rlang::inform(
-        paste(
-          "Defaulting to input data, which may include data that doesn't enter",
-          "the final problem (i.e. ignored subjects)"
+      checkmate::assert_data_frame(data)
+      # Get input columns from dataset referenced in based_on model
+      #  - must be from based_on model, as the data path of .boot_run may already
+      #    have been adjusted to point to a new dataset (which wont exist if overwriting)
+      input_cols <- get_input_columns(orig_mod)
+      if(!all(input_cols %in% names(data))){
+        missing_cols <- input_cols[!(input_cols %in% names(data))]
+        missing_txt <- paste(missing_cols, collapse = ", ")
+        fs::dir_delete(boot_dir)
+        rlang::abort(
+          c(
+            glue("The following required input columns were not found in the input data: {missing_txt}"),
+            "Check `nm_data(read_model(get_based_on(.boot_run)))` to see expected columns."
+          )
         )
+      }
+
+      # Remove any extra columns
+      starting_data <- dplyr::select(data, all_of(input_cols))
+
+      # Save data to boot_dir
+      data_path_new <- file.path(boot_dir, "boot-data.csv")
+      readr::write_csv(starting_data, data_path_new, na = ".")
+
+      # Update data path in control stream (adjusting for .mod vs .ctl extension)
+      data_path_rel <- adjust_data_path_ext(
+        file.path(basename(boot_dir), basename(data_path_new)),
+        get_model_path(.boot_run), reverse = TRUE
       )
-      starting_data <- nm_data(orig_mod) %>% suppressMessages()
+      modify_data_path_ctl(.boot_run, data_path_rel)
     }
 
     if(!is.null(strat_cols)){
