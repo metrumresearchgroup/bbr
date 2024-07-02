@@ -323,6 +323,131 @@ get_table_columns <- function(.mod, from_data = TRUE){
   return(table_cols)
 }
 
+
+# Function to translate NONMEM operators to R operators
+translate_operator <- function(expr) {
+  expr <- gsub("\\.EQ\\.", "==", expr)
+  expr <- gsub("\\.NE\\.", "!=", expr)
+  expr <- gsub("\\.LT\\.", "<", expr)
+  expr <- gsub("\\.LE\\.", "<=", expr)
+  expr <- gsub("\\.GT\\.", ">", expr)
+  expr <- gsub("\\.GE\\.", ">=", expr)
+  return(expr)
+}
+
+# Function to invert an expression (for ignore statements)
+invert_expression <- function(expr) {
+  expr <- dplyr::case_when(
+    grepl("==", expr) ~ gsub("==", "!=", expr),
+    grepl("!=", expr) ~ gsub("!=", "==", expr),
+    grepl("<=", expr) ~ gsub("<=", ">=", expr),
+    grepl(">=", expr) ~ gsub(">=", "<=", expr),
+    grepl("<", expr) ~ gsub("<", ">", expr),
+    grepl(">", expr) ~ gsub(">", "<", expr),
+    TRUE ~ expr
+  )
+  return(expr)
+}
+
+
+#' Filter `NONMEM` input data based on `IGNORE` and `ACCEPT` record options
+#'
+#' @param .mod a `bbi_nonmem_model` object
+#' @param data a starting dataset
+#' @keywords internal
+filter_nm_data <- function(.mod, data = nm_data(.mod)){
+
+  data_recs <- get_records(.mod, "data")
+  n_data <- length(data_recs)
+  if(n_data !=1){
+    recs_fmt <- purrr::map_chr(data_recs, function(rec) rec$format())
+    rlang::abort(
+      c(
+        glue::glue("Expected a single data record, but found {n_data}:\n\n"),
+        recs_fmt
+      )
+    )
+  }
+  data_recs[[1]]$parse()
+
+  # Extract & format IGNORE options
+  ignore_opts <- purrr::keep(data_recs[[1]]$values, function(val){
+    inherits(val, "nmrec_option_value") && identical(val[["name"]], "ignore")
+  })
+  ignore_vals <- purrr::map_chr(ignore_opts, function(ign_val){
+    gsub("\\(|\\)", "", unquote_filename(ign_val$value))
+  })
+
+  # Extract & format ACCEPT options
+  accept_opts <- purrr::keep(data_recs[[1]]$values, function(val){
+    inherits(val, "nmrec_option_value") && identical(val[["name"]], "accept")
+  })
+  accept_vals <- purrr::map_chr(accept_opts, function(acc_val){
+    gsub("\\(|\\)", "", unquote_filename(acc_val$value))
+  })
+
+
+  # Translate the ignore and accept expressions
+  ignore_exprs <- lapply(ignore_vals, translate_operator) %>% gsub(",", " &", .)
+  accept_exprs <- lapply(accept_vals, translate_operator) %>% gsub(",", " &", .)
+
+  ## Combine the expressions into filter expressions ##
+  data_cols <- get_input_columns(.mod)
+
+  # `IGNORE=#`, `IGNORE=@`, `IGNORE=c1`, `IGNORE=(list)`
+  ignore_filters <- purrr::map_chr(ignore_exprs, function(expr) {
+    if(expr == "#"){
+      # IGNORE=# is the default.  That is, in the absence of IGNORE option, any
+      # record whose first character is '#' is treated as a comment record.
+      col_filters <- purrr::map_chr(data_cols, function(col) {
+        paste0("!grepl('^#', ", col, ")")
+      })
+      return(paste(col_filters, collapse = " & "))
+    }else if(expr == "@"){
+      # IGNORE=@ signifies that any data record having an alphabetic character
+      # or `@` as its first non-blank character (not just in column 1)
+      # should be ignored. This permits a table file having header lines to be
+      # used as an NM-TRAN data set.
+      col_filters <- purrr::map_chr(data_cols, function(col) {
+        paste0("!grepl('^[A-Za-z@]', ", col, ")")
+      })
+      return(paste(col_filters, collapse = " & "))
+    }else if(grepl('^[a-zA-Z0-9]{1,}$', expr)){
+      # This is for `IGNORE=C` columns. Meaning ignore rows if the _first_ column
+      # contains 'C' (this form always points to the _first_ column)
+      # - the above regex looks for characters of length>=1, and no symbols
+      paste0(data_cols[1], "!=", "'", expr, "'")
+    }else{
+      # Invert list form expressions
+      return(invert_expression(expr))
+    }
+  })
+
+  # Only supports `ACCEPT=(list)` form
+  accept_filters <- purrr::map_chr(accept_exprs, function(expr) {
+    return(paste0(expr))
+  })
+
+  # Combine all filter expressions
+  all_filters <- c(ignore_filters, accept_filters)
+
+  # Create the final dplyr::filter expression
+  filter_expression <- paste(all_filters, collapse = " & ")
+
+  # Apply filters
+  tryCatch({
+    data %>% dplyr::filter(eval(parse(text = filter_expression)))
+  }, error = function(cond){
+    rlang::abort(
+      c(
+        "ignore and/or accept statements could not be converted to filters",
+        "The following errors occurred:",
+        cond$parent$message
+      )
+    )
+  })
+}
+
 #' Helper for checking if a specified record type is valid.
 #'
 #' Checks if the specified record type is valid. Note that this does _not_ check
