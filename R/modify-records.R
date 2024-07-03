@@ -195,12 +195,22 @@ modify_data_path_ctl <- function(.mod, data_path){
   ctl <- get_model_ctl(.mod)
 
   # Get data record
-  data_rec <- read_data_record(.mod)
+  data_recs <- nmrec::select_records(ctl, "data")
+  n_data <- length(data_recs)
+  if(n_data !=1){
+    recs_fmt <- purrr::map_chr(data_recs, function(rec) rec$format())
+    rlang::abort(
+      c(
+        glue::glue("Expected a single data record, but found {n_data}:\n\n"),
+        recs_fmt
+      )
+    )
+  }
 
   # Overwrite 'filename' option
-  filename_opt <- nmrec::get_record_option(data_rec, "filename")
+  filename_opt <- nmrec::get_record_option(data_recs[[1]], "filename")
   if (is.null(filename_opt)) {
-    dev_error(glue("No filename option found in `$DATA` record: \n{data_rec$format()}"))
+    dev_error(glue("No filename option found in `$DATA` record: \n{data_recs[[1]]$format()}"))
   }
   filename_opt$value <- data_path
 
@@ -397,10 +407,7 @@ nm_data_filter <- function(.mod, data = nm_data(.mod)){
     if(expr == "#"){
       # IGNORE=# is the default.  That is, in the absence of IGNORE option, any
       # record whose first character is '#' is treated as a comment record.
-      col_filters <- purrr::map_chr(data_cols, function(col) {
-        paste0("!grepl('^#', ", col, ")")
-      })
-      return(paste(col_filters, collapse = " & "))
+      paste0("!grepl('^#', ", data_cols[1], ")")
     }else if(expr == "@"){
       # IGNORE=@ signifies that any data record having an alphabetic character
       # or `@` as its first non-blank character (not just in column 1)
