@@ -488,7 +488,7 @@ nm_data_null_map <- function(.mod, data = nm_data(.mod)){
 #' Drop or skip records based on `$INPUT` record options
 #' @inheritParams nm_data_filter
 #' @keywords internal
-nm_data_drop_skip_records <- function(.mod, data = nm_data(.mod)){
+nm_data_drop_records <- function(.mod, data = nm_data(.mod)){
   # Get INPUT record
   input_records <- get_records(.mod, "input")
   if (length(input_records) != 1) {
@@ -531,7 +531,7 @@ nm_data_as_nmtran <- function(.mod, data = nm_data(.mod)){
   null_mapped_data <- nm_data_null_map(.mod, data = filtered_data)
 
   # DROP/SKIP records
-  final_data <- nm_data_drop_skip_records(.mod, data = null_mapped_data)
+  final_data <- nm_data_drop_records(.mod, data = null_mapped_data)
 
   # Rename columns if data item labels were used
   # TODO: confirm if renaming should happen before/after IGNORE options
