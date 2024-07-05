@@ -273,6 +273,8 @@ nm_data_as_nmtran <- function(.mod, data = nm_data(.mod)){
   dropped_cols <- attributes(final_data)$dropped_cols
   if(!is.null(dropped_cols)){
     cols_rename <- col_names_ctl[!(col_names_ctl %in% dropped_cols)]
+  }else{
+    cols_rename <- col_names_ctl
   }
 
   if(!all(cols_rename %in% names(final_data))){
