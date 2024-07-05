@@ -360,3 +360,4 @@ assert_record_type <- function(.mod, type){
 
   return(invisible(TRUE))
 }
+
