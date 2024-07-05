@@ -1,5 +1,7 @@
 
 #' Helper for reading in and parsing the `$DATA` record.
+#'
+#' Note that this cannot be used for _modifying_ a record.
 #' @noRd
 #' @keywords internal
 read_data_record <- function(.mod){
@@ -53,11 +55,37 @@ invert_operator <- function(expr) {
 
 #' Translate `IGNORE` and `ACCEPT` filter expressions into [dplyr::filter()]
 #'  expressions.
-#' @param nm_expr a `NONMEM` filter expression. e.g., `IGNORE(ID.EQ.2, BLQ=1)`.
+#' @param nm_expr a `NONMEM` filter expression. e.g., `'ID.EQ.2, BLQ=1'`.
 #' @param type Either `'ignore'` or `'accept'`. Denotes which type of `NONMEM`
 #'  filtering the expression corresponds to.
 #' @param data_cols column names associated with the input data. Used for
-#'  `'ignore'` expressions
+#'  `'ignore'` expressions.
+#'
+#' @examples
+#' \dontrun{
+#' test_exprs <- "SEX==1, ID.EQ.2, WT/=70, AGE.NE.30, A=1, WT.GT.40"
+#'
+#' translate_nm_expr(test_exprs, type = 'ignore')
+#' #> [1] "SEX!=1 & ID!=2 & WT==70 & AGE==30 & A!=1 & WT<40"
+#'
+#' translate_nm_expr(test_exprs, type = 'accept')
+#' #> [1] "SEX==1 & ID==2 & WT!=70 & AGE!=30 & A==1 & WT>40"
+#'
+#'
+#' # Use of `@`, `#`, or form `IGNORE=C2` require `data_cols` to be specified
+#' data_cols <- c("C", "ID", "TIME", "EVID", "DV", "BLQ")
+#'
+#' translate_nm_expr("#", data_cols = data_cols)
+#' #> [1] "!grepl('^#', C)"
+#'
+#' translate_nm_expr("c2", data_cols = data_cols)
+#' #> [1] "C!='c2'"
+#'
+#' translate_nm_expr("@", data_cols = data_cols)
+#' #> [1] "!grepl('^[A-Za-z@]', C) & !grepl('^[A-Za-z@]', ID) &
+#' #> !grepl('^[A-Za-z@]', TIME) & !grepl('^[A-Za-z@]', EVID) &
+#' #> !grepl('^[A-Za-z@]', DV) & !grepl('^[A-Za-z@]', BLQ)"
+#' }
 #' @keywords internal
 translate_nm_expr <- function(
     nm_expr,
@@ -65,36 +93,43 @@ translate_nm_expr <- function(
     data_cols = NULL
 ){
   type <- match.arg(type)
+  checkmate::assert_character(data_cols, min.len = 1, null.ok = TRUE)
 
-  expr <- translate_nm_operator(nm_expr) %>% gsub(",", " &", .)
-  r_expr <- if(type == "ignore"){
-    # `IGNORE=#`, `IGNORE=@`, `IGNORE=c1`, `IGNORE=(list)`
-    if(expr == "#"){
-      # IGNORE=# is the default.  That is, in the absence of IGNORE option, any
-      # record whose first character is '#' is treated as a comment record.
-      paste0("!grepl('^#', ", data_cols[1], ")")
-    }else if(expr == "@"){
-      # IGNORE=@ signifies that any data record having an alphabetic character
-      # or `@` as its first non-blank character (not just in column 1)
-      # should be ignored. This permits a table file having header lines to be
-      # used as an NM-TRAN data set.
-      col_filters <- purrr::map_chr(data_cols, function(col) {
-        paste0("!grepl('^[A-Za-z@]', ", col, ")")
-      })
-      paste(col_filters, collapse = " & ")
-    }else if(grepl('^[a-zA-Z0-9]{1,}$', expr)){
-      # This is for `IGNORE=C` columns. Meaning ignore rows if the _first_ column
-      # contains 'C' (this form always points to the _first_ column)
-      # - the above regex looks for characters of length>=1, and no symbols
-      paste0(data_cols[1], "!=", "'", expr, "'")
+  # Translate NM operators and separate any (list) type expressions
+  exprs <- translate_nm_operator(nm_expr)
+  exprs <- stringr::str_split(exprs, ",")[[1]] %>% stringr::str_trim()
+
+  r_exprs <- purrr::map_chr(exprs, function(expr){
+    if(type == "ignore"){
+      # `IGNORE=#`, `IGNORE=@`, `IGNORE=c1`, `IGNORE=(list)`
+      if(expr == "#"){
+        # IGNORE=# is the default.  That is, in the absence of IGNORE option, any
+        # record whose first character is '#' is treated as a comment record.
+        paste0("!grepl('^#', ", data_cols[1], ")")
+      }else if(expr == "@"){
+        # IGNORE=@ signifies that any data record having an alphabetic character
+        # or `@` as its first non-blank character (not just in column 1)
+        # should be ignored. This permits a table file having header lines to be
+        # used as an NM-TRAN data set.
+        col_filters <- purrr::map_chr(data_cols, function(col) {
+          paste0("!grepl('^[A-Za-z@]', ", col, ")")
+        })
+        paste(col_filters, collapse = " & ")
+      }else if(grepl('^[a-zA-Z0-9]{1,}$', expr)){
+        # This is for `IGNORE=C` columns. Meaning ignore rows if the _first_ column
+        # contains 'C' (this form always points to the _first_ column)
+        # - the above regex looks for characters of length>=1, and no symbols
+        paste0(data_cols[1], "!=", "'", expr, "'")
+      }else{
+        # Invert list form expressions
+        invert_operator(expr)
+      }
     }else{
-      # Invert list form expressions
-      invert_operator(expr)
+      # ACCEPT option only supports `ACCEPT=(list)` form --> no formatting needed
+      expr
     }
-  }else{
-    # ACCEPT option only supports `ACCEPT=(list)` form --> no formatting needed
-    expr
-  }
+  })
+  r_expr <- paste(r_exprs, collapse = " & ")
   return(r_expr)
 }
 

@@ -8,16 +8,42 @@ expressions.}
 translate_nm_expr(nm_expr, type = c("ignore", "accept"), data_cols = NULL)
 }
 \arguments{
-\item{nm_expr}{a \code{NONMEM} filter expression. e.g., \code{IGNORE(ID.EQ.2, BLQ=1)}.}
+\item{nm_expr}{a \code{NONMEM} filter expression. e.g., \code{'ID.EQ.2, BLQ=1'}.}
 
 \item{type}{Either \code{'ignore'} or \code{'accept'}. Denotes which type of \code{NONMEM}
 filtering the expression corresponds to.}
 
 \item{data_cols}{column names associated with the input data. Used for
-\code{'ignore'} expressions}
+\code{'ignore'} expressions.}
 }
 \description{
 Translate \code{IGNORE} and \code{ACCEPT} filter expressions into \code{\link[dplyr:filter]{dplyr::filter()}}
 expressions.
+}
+\examples{
+\dontrun{
+test_exprs <- "SEX==1, ID.EQ.2, WT/=70, AGE.NE.30, A=1, WT.GT.40"
+
+translate_nm_expr(test_exprs, type = 'ignore')
+#> [1] "SEX!=1 & ID!=2 & WT==70 & AGE==30 & A!=1 & WT<40"
+
+translate_nm_expr(test_exprs, type = 'accept')
+#> [1] "SEX==1 & ID==2 & WT!=70 & AGE!=30 & A==1 & WT>40"
+
+
+# Use of `@`, `#`, or form `IGNORE=C2` require `data_cols` to be specified
+data_cols <- c("C", "ID", "TIME", "EVID", "DV", "BLQ")
+
+translate_nm_expr("#", data_cols = data_cols)
+#> [1] "!grepl('^#', C)"
+
+translate_nm_expr("c2", data_cols = data_cols)
+#> [1] "C!='c2'"
+
+translate_nm_expr("@", data_cols = data_cols)
+#> [1] "!grepl('^[A-Za-z@]', C) & !grepl('^[A-Za-z@]', ID) &
+#> !grepl('^[A-Za-z@]', TIME) & !grepl('^[A-Za-z@]', EVID) &
+#> !grepl('^[A-Za-z@]', DV) & !grepl('^[A-Za-z@]', BLQ)"
+}
 }
 \keyword{internal}
