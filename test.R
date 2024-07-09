@@ -27,8 +27,17 @@ submit_model(mod, .overwrite=TRUE, .mode = "local")
 
 joined <- nm_join(mod) # 779 rows, 24 cols
 
-dim(joined)
+dim(joined) # 779 24
 
+x <- readLines("inst/model/nonmem/basic/2/2.lst")
+x <- x[grepl("TOT.", x, fixed = TRUE)]
+x
+# " TOT. NO. OF OBS RECS:      741"    " TOT. NO. OF INDIVIDUALS:       39"
+
+dim(filter(joined, EVID==0)) # 741
+length(unique(joined$ID)) # 39
+
+# Now, filter using current implementation
 filtered <- bbr:::nm_data_filter(mod)
 
 dim(filtered) # 0 11
