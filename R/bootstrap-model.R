@@ -86,15 +86,8 @@ new_bootstrap_run <- function(
 #' @param strat_cols columns to maintain proportion for stratification
 #' @param seed a seed for sampling the data. Set to `NULL` to avoid setting.
 #' @param data A dataset to resample from. Defaults to `NULL`, which will use
-#'   the output from `nm_join(.mod)`. If provided, must include the same column
-#'   names as what's returned from `nm_data(.mod)`. If the default is used, note
-#'   that a suitable `.join_col` must be provided.
-#' @param .join_col Character column name to use to join table files. Not used
-#'   if `data` is specified. Passed to [nm_join()], and used to create the
-#'   initial dataset that gets re-sampled `n` times. The purpose of joining the
-#'   input data to table files is to filter the population to only the subjects
-#'   that actually made it into the model. See the `Details` section in
-#'   [nm_join()] for more information.
+#'   the _filtered_ output from `nm_data(.mod)`. If provided, must include the
+#'   same column names as what's returned from `nm_data(.mod)`.
 #' @param .overwrite logical (T/F) indicating whether or not to overwrite
 #'   existing setup for a bootstrap run.
 #'
@@ -138,7 +131,6 @@ setup_bootstrap_run <- function(
     strat_cols = NULL,
     seed = 1234,
     data = NULL,
-    .join_col = "NUM",
     .overwrite = FALSE
 ){
   check_model_object(.boot_run, NMBOOT_MOD_CLASS)
@@ -173,19 +165,11 @@ setup_bootstrap_run <- function(
 
     if(is.null(data)){
       # Only include subjects that entered the original problem by default
-      can_be_joined <- can_be_nm_joined(orig_mod, .join_col = .join_col)
-      if(isTRUE(can_be_joined)){
-        starting_data <- nm_join(orig_mod, .join_col = .join_col) %>%
-          suppressMessages()
+      starting_data <- nm_data(orig_mod) %>% suppressMessages()
+      filtered_data <- filter_nm_data(orig_mod, data = starting_data)
 
-        # select only columns from original data set
-        starting_data <- starting_data %>%
-          dplyr::select(attr(starting_data, "nm_join_origin")$data)
-
-        if ("DV.DATA" %in% names(starting_data)) {
-          starting_data <- dplyr::rename(starting_data, "DV" = "DV.DATA")
-        }
-      }else{
+      # NULL if IGNORE/ACCEPT expressions cant be turned into dplyr expressions
+      if(is.null(filtered_data)){
         rlang::inform(
           paste(
             "Defaulting to input data, which may include data that doesn't enter",
@@ -193,6 +177,17 @@ setup_bootstrap_run <- function(
           )
         )
         starting_data <- nm_data(orig_mod) %>% suppressMessages()
+      }else{
+        n_recs_dropped <- attributes(filtered_data)$n_records_dropped
+        if(n_recs_dropped > 0){
+          rlang::inform(
+            c(
+              glue("Parsed IGNORE/ACCEPT options in {basename(get_model_path(.boot_run))}"),
+              glue("Dropped {n_recs_dropped} records from starting data")
+            )
+          )
+        }
+        starting_data <- filtered_data
       }
 
       # Overwrite data path in control stream

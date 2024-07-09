@@ -1,4 +1,3 @@
-
 #' Helper for reading in and parsing the `$DATA` record.
 #'
 #' Note that this cannot be used for _modifying_ a record.
@@ -138,7 +137,7 @@ translate_nm_expr <- function(
 #' @param .mod a `bbi_nonmem_model` object
 #' @param data a starting dataset
 #' @keywords internal
-nm_data_filter <- function(.mod, data = nm_data(.mod)){
+filter_nm_data <- function(.mod, data = nm_data(.mod)){
 
   data_rec <- read_data_record(.mod)
 
@@ -172,121 +171,19 @@ nm_data_filter <- function(.mod, data = nm_data(.mod)){
   filtered_data <- tryCatch({
     data %>% dplyr::filter(eval(parse(text = filter_expression)))
   }, error = function(cond){
-    rlang::abort(
+    rlang::inform(
       c(
         "ignore and/or accept statements could not be converted to filters",
         "The following errors occurred:",
         cond$parent$message
       )
     )
+    return(NULL)
   })
 
-  attr(filtered_data, "n_records_dropped") <- nrow(data) - nrow(filtered_data)
+  if(!is.null(filtered_data)){
+    attr(filtered_data, "n_records_dropped") <- nrow(data) - nrow(filtered_data)
+  }
+
   return(filtered_data)
-}
-
-
-#' Apply `null` mapping
-#' @inheritParams nm_data_filter
-#' @keywords internal
-nm_data_null_map <- function(.mod, data = nm_data(.mod)){
-  # Get data record
-  data_rec <- read_data_record(.mod)
-
-  # Extract & format NULL options (not used for filtering)
-  null_opts <- purrr::keep(data_rec$values, function(val){
-    inherits(val, "nmrec_option_value") && identical(val[["name"]], "null")
-  })
-  null_val <- purrr::map_chr(null_opts, function(ign_val){
-    unquote_filename(ign_val$value)
-  })
-
-  # Replace null values with `null_val`
-  null_valid <- !rlang::is_empty(null_val) && length(null_val) == 1
-  if (isTRUE(null_valid)) {
-    # Null data items consist of a single dot (.), consecutive commas or
-    # consecutive tab characters
-    is_nm_null <- function(val){
-      val == "." | grepl("^[,]{2,}$", val) | grepl("^[ \t]{2,}$", val)
-    }
-    data <- data %>% dplyr::mutate(
-      across(everything(), ~ ifelse(is_nm_null(.x), null_val, .x))
-    )
-    attr(data, "null_value") <- null_val
-  }
-  return(data)
-}
-
-#' Drop or skip records based on `$INPUT` record options
-#' @inheritParams nm_data_filter
-#' @keywords internal
-nm_data_drop_records <- function(.mod, data = nm_data(.mod)){
-  # Get INPUT record
-  input_records <- get_records(.mod, "input")
-  if (length(input_records) != 1) {
-    rlang::abort("Expected a single $INPUT record.")
-  }
-
-  input_rec <- input_records[[1]]
-  input_rec$parse()
-
-  # Extract columns that should be dropped
-  drop_cols <- purrr::map_chr(input_rec$values, function(val){
-    if(inherits(val, c("nmrec_option_flag", "nmrec_option_value")) &&
-       (identical(val[["name"]], "DROP") | identical(val[["name"]], "SKIP"))){
-      ifelse(isTRUE(val$value), val[["name"]], val[["value"]])
-    }else{
-      return(NA)
-    }
-  })
-
-  cols_to_remove <- drop_cols[!is.na(drop_cols)]
-
-  if (length(cols_to_remove) > 0) {
-    data <- data %>% dplyr::select(-all_of(cols_to_remove))
-    attr(data, "dropped_cols") <- cols_to_remove
-  }
-
-  return(data)
-}
-
-
-#' Format input data as an `NM-TRAN` dataset
-#' @inheritParams nm_data_filter
-#' @keywords internal
-nm_data_as_nmtran <- function(.mod, data = nm_data(.mod)){
-
-  # Filter the data based on IGNORE and ACCEPT statements
-  filtered_data <- nm_data_filter(.mod, data = data)
-
-  # Map null values
-  null_mapped_data <- nm_data_null_map(.mod, data = filtered_data)
-
-  # DROP/SKIP records
-  final_data <- nm_data_drop_records(.mod, data = null_mapped_data)
-
-  # Rename columns if data item labels were used
-  # TODO: confirm if renaming should happen before/after IGNORE options
-  col_names_ctl <- get_input_columns(.mod, from_data = FALSE)
-
-  # Filter out column names that were dropped
-  dropped_cols <- attributes(final_data)$dropped_cols
-  if(!is.null(dropped_cols)){
-    cols_rename <- col_names_ctl[!(col_names_ctl %in% dropped_cols)]
-  }else{
-    cols_rename <- col_names_ctl
-  }
-
-  if(!all(cols_rename %in% names(final_data))){
-    rlang::abort(
-      c(
-        "At least one column specified in the control stream was not found in the data",
-        paste("Diff: ", setdiff(cols_rename, names(final_data)))
-      )
-    )
-  }
-
-  final_data <- final_data %>% setNames(names(cols_rename))
-
-  return(final_data)
 }
