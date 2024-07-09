@@ -1,0 +1,8 @@
+$GENERAL
+NODES=4 PARSE_TYPE=2 TIMEOUTI=100 TIMEOUT=2147483647 PARAPRINT=0 TRANSFER_TYPE=1
+$COMMANDS
+1: /usr/local/mpich3/bin/mpiexec -wdir "$PWD" -n 1 ./nonmem $*
+2:-wdir "$PWD" -n 3 ./nonmem -wnf
+$DIRECTORIES
+1:NONE
+2-[nodes]:worker{#-1}

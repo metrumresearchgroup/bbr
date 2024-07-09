@@ -6,23 +6,36 @@ library(devtools)
 
 data <- read.csv("inst/extdata/acop.csv")
 data$FRUIT <- rep(c("banana", "apple", "pear"), length.out = nrow(data))
-write.csv(data, "inst/extdata/acop2.csv")
+write.csv(
+  data, "inst/extdata/acop2.csv",
+  quote = FALSE,
+  na = '.',
+  row.names = FALSE
+)
 
 devtools::load_all()
 
 mod <- read_model("inst/model/nonmem/basic/2")
 
-bbr:::nm_data_filter(mod)
+bbi_init(
+  "inst/model/nonmem/basic",
+  .nonmem_dir = "/opt/NONMEM",
+  .nonmem_version = "nm75"
+)
 
-# Reading data file: acop2.csv
-# rows: 799
-# cols: 12
+submit_model(mod, .overwrite=TRUE, .mode = "local")
 
-# A tibble: 0 × 12
-# ℹ 12 variables: V1 <int>, ID <int>, TIME <dbl>,
-#   MDV <int>, EVID <int>, DV <dbl>, AMT <int>,
-#   SEX <int>, WT <dbl>, ETN <int>, NUM <int>,
-#   FRUIT <chr>
+joined <- nm_join(mod) # 779 rows, 24 cols
+
+dim(joined)
+
+filtered <- bbr:::nm_data_filter(mod)
+
+dim(filtered) # 0 11
+# > filtered
+# A tibble: 0 × 11
+# ℹ 11 variables: ID <int>, TIME <dbl>, MDV <int>, EVID <int>, DV <dbl>,
+#   AMT <int>, SEX <int>, WT <dbl>, ETN <int>, NUM <int>, FRUIT <chr>
 
 
 mod <- read_model("inst/model/nonmem/basic/1")

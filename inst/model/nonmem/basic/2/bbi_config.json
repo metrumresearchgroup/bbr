@@ -1,20 +1,19 @@
 {
-    "bbi_version": "v3.1.0",
-    "model_name": "1.ctl",
-    "original_model": "1.ctl",
-    "model_path": "/data/home/sethg/bbr/inst/model/nonmem/basic/1.ctl",
+    "bbi_version": "v3.3.0",
+    "model_name": "2.ctl",
+    "original_model": "2.ctl",
+    "model_path": "/data/home/kyleb/git/metrumresearchgroup/bbr/inst/model/nonmem/basic/2.ctl",
     "data_path": "../../../../extdata/acop2.csv",
-    "data_md5": "14e53889c0b1c29db2ba02f2025bb62c",
-    "model_md5": "bf80e40b7db83a3b98383235124e3e28",
-    "model_filename": "1",
+    "data_md5": "626cd08d7c3cdb257798131ea654ccab",
+    "model_md5": "21043bfcbfc0891778c6bd9782f9b1ca",
+    "model_filename": "2",
     "model_extension": "ctl",
-    "original_path": "/data/home/sethg/bbr/inst/model/nonmem/basic",
-    "output_dir": "/data/home/sethg/bbr/inst/model/nonmem/basic/1",
+    "original_path": "/data/home/kyleb/git/metrumresearchgroup/bbr/inst/model/nonmem/basic",
+    "output_dir": "/data/home/kyleb/git/metrumresearchgroup/bbr/inst/model/nonmem/basic/2",
     "configuration": {
         "overwrite": true,
         "clean_lvl": 1,
         "git": true,
-        "bbi_binary": "/data/apps/bbi",
         "save_config": true,
         "output_dir": "{{ .Name }}",
         "threads": 4,
@@ -34,8 +33,7 @@
             "nm74gf": {
                 "home": "/opt/NONMEM/nm74gf",
                 "executable": "nmfe74",
-                "nmqual": true,
-                "default": true
+                "nmqual": true
             },
             "nm74gf_nmfe": {
                 "home": "/opt/NONMEM/nm74gf_nmfe",
@@ -43,12 +41,13 @@
             },
             "nm75": {
                 "home": "/opt/NONMEM/nm75",
-                "executable": "nmfe75"
+                "executable": "nmfe75",
+                "default": true
             }
         },
         "parallel": true,
         "nmfe_options": {
-            "maxlim": 100
+            "maxlim": 2
         },
         "mpi_exec_path": "/usr/local/mpich3/bin/mpiexec",
         "parallel_timeout": 2147483647
