@@ -1,6 +1,6 @@
 #' Helper for reading in and parsing the `$DATA` record.
 #'
-#' Note that this cannot be used for _modifying_ a record.
+#' @note This cannot be used for _modifying_ a `$DATA` record.
 #' @noRd
 #' @keywords internal
 read_data_record <- function(.mod){
@@ -19,6 +19,25 @@ read_data_record <- function(.mod){
   return(data_recs[[1]])
 }
 
+
+#' Extract IGNORE or ACCEPT options from a data record
+#' @param data_rec an `nmrec_record_data` object
+#' @inheritParams translate_nm_expr
+#' @noRd
+get_data_filter_exprs <- function(data_rec, type = c("ignore", "accept")){
+  type <- match.arg(type)
+
+  # Extract & format IGNORE/ACCEPT options
+  opts <- purrr::keep(data_rec$values, function(val){
+    inherits(val, "nmrec_option_value") && identical(val[["name"]], type)
+  })
+
+  exprs <- purrr::map_chr(opts, function(val){
+    gsub("\\(|\\)", "", unquote_filename(val$value))
+  })
+
+  return(exprs)
+}
 
 #' Function to translate NONMEM operators to R operators
 #' @noRd
@@ -54,6 +73,7 @@ invert_operator <- function(expr) {
 
 #' Translate `IGNORE` and `ACCEPT` filter expressions into [dplyr::filter()]
 #'  expressions.
+#'
 #' @param nm_expr a `NONMEM` filter expression. e.g., `'ID.EQ.2, BLQ=1'`.
 #' @param type Either `'ignore'` or `'accept'`. Denotes which type of `NONMEM`
 #'  filtering the expression corresponds to.
@@ -71,7 +91,8 @@ invert_operator <- function(expr) {
 #' #> [1] "SEX==1 & ID==2 & WT!=70 & AGE!=30 & A==1 & WT>40"
 #'
 #'
-#' # Use of `@`, `#`, or form `IGNORE=C2` require `data_cols` to be specified
+#' # Use of `@`, `#`, or form `IGNORE=C2` require `data_cols` to be specified,
+#' # though only the first column is used
 #' data_cols <- c("C", "ID", "TIME", "EVID", "DV", "BLQ")
 #'
 #' translate_nm_expr("#", data_cols = data_cols)
@@ -81,9 +102,7 @@ invert_operator <- function(expr) {
 #' #> [1] "C!='c2'"
 #'
 #' translate_nm_expr("@", data_cols = data_cols)
-#' #> [1] "!grepl('^[A-Za-z@]', C) & !grepl('^[A-Za-z@]', ID) &
-#' #> !grepl('^[A-Za-z@]', TIME) & !grepl('^[A-Za-z@]', EVID) &
-#' #> !grepl('^[A-Za-z@]', DV) & !grepl('^[A-Za-z@]', BLQ)"
+#' #> [1] "!grepl('^[A-Za-z@]', C)"
 #' }
 #' @keywords internal
 translate_nm_expr <- function(
@@ -107,13 +126,10 @@ translate_nm_expr <- function(
         paste0("!grepl('^#', ", data_cols[1], ")")
       }else if(expr == "@"){
         # IGNORE=@ signifies that any data record having an alphabetic character
-        # or `@` as its first non-blank character (not just in column 1)
-        # should be ignored. This permits a table file having header lines to be
-        # used as an NM-TRAN data set.
-        col_filters <- purrr::map_chr(data_cols, function(col) {
-          paste0("!grepl('^[A-Za-z@]', ", col, ")")
-        })
-        paste(col_filters, collapse = " & ")
+        # or `@` as its first non-blank character in column one should be ignored.
+        #  - This permits a table file having header lines to be used as an
+        #    NM-TRAN data set.
+        paste0("!grepl('^[A-Za-z@]', ", data_cols[1], ")")
       }else if(grepl('^[a-zA-Z0-9]{1,}$', expr)){
         # This is for `IGNORE=C` columns. Meaning ignore rows if the _first_ column
         # contains 'C' (this form always points to the _first_ column)
@@ -141,23 +157,11 @@ filter_nm_data <- function(.mod, data = nm_data(.mod)){
 
   data_rec <- read_data_record(.mod)
 
-  # Extract & format IGNORE options
-  ignore_opts <- purrr::keep(data_rec$values, function(val){
-    inherits(val, "nmrec_option_value") && identical(val[["name"]], "ignore")
-  })
-  ignore_exprs <- purrr::map_chr(ignore_opts, function(ign_val){
-    gsub("\\(|\\)", "", unquote_filename(ign_val$value))
-  })
+  # Extract & format IGNORE/ACCEPT options into expressions
+  ignore_exprs <- get_data_filter_exprs(data_rec, type = "ignore")
+  accept_exprs <- get_data_filter_exprs(data_rec, type = "accept")
 
-  # Extract & format ACCEPT options
-  accept_opts <- purrr::keep(data_rec$values, function(val){
-    inherits(val, "nmrec_option_value") && identical(val[["name"]], "accept")
-  })
-  accept_exprs <- purrr::map_chr(accept_opts, function(acc_val){
-    gsub("\\(|\\)", "", unquote_filename(acc_val$value))
-  })
-
-  # Translate the ignore and accept expressions
+  # Translate NONMEM syntax into `dplyr::filter` logic
   ignore_filters <- purrr::map_chr(ignore_exprs, translate_nm_expr, data_cols = names(data))
   accept_filters <- purrr::map_chr(accept_exprs, translate_nm_expr, type = "accept")
 

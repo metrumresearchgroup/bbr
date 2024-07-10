@@ -165,11 +165,10 @@ setup_bootstrap_run <- function(
 
     if(is.null(data)){
       # Only include subjects that entered the original problem by default
-      starting_data <- nm_data(orig_mod) %>% suppressMessages()
-      filtered_data <- filter_nm_data(orig_mod, data = starting_data)
+      starting_data <- nm_data(orig_mod, filter = TRUE) %>% suppressMessages()
 
       # NULL if IGNORE/ACCEPT expressions cant be turned into dplyr expressions
-      if(is.null(filtered_data)){
+      if(is.null(starting_data)){
         rlang::inform(
           paste(
             "Defaulting to input data, which may include data that doesn't enter",
@@ -178,7 +177,7 @@ setup_bootstrap_run <- function(
         )
         starting_data <- nm_data(orig_mod) %>% suppressMessages()
       }else{
-        n_recs_dropped <- attributes(filtered_data)$n_records_dropped
+        n_recs_dropped <- attributes(starting_data)$n_records_dropped
         if(n_recs_dropped > 0){
           rlang::inform(
             c(
@@ -187,7 +186,6 @@ setup_bootstrap_run <- function(
             )
           )
         }
-        starting_data <- filtered_data
       }
 
       # Overwrite data path in control stream

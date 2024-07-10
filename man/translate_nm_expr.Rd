@@ -31,7 +31,8 @@ translate_nm_expr(test_exprs, type = 'accept')
 #> [1] "SEX==1 & ID==2 & WT!=70 & AGE!=30 & A==1 & WT>40"
 
 
-# Use of `@`, `#`, or form `IGNORE=C2` require `data_cols` to be specified
+# Use of `@`, `#`, or form `IGNORE=C2` require `data_cols` to be specified,
+# though only the first column is used
 data_cols <- c("C", "ID", "TIME", "EVID", "DV", "BLQ")
 
 translate_nm_expr("#", data_cols = data_cols)
@@ -41,9 +42,7 @@ translate_nm_expr("c2", data_cols = data_cols)
 #> [1] "C!='c2'"
 
 translate_nm_expr("@", data_cols = data_cols)
-#> [1] "!grepl('^[A-Za-z@]', C) & !grepl('^[A-Za-z@]', ID) &
-#> !grepl('^[A-Za-z@]', TIME) & !grepl('^[A-Za-z@]', EVID) &
-#> !grepl('^[A-Za-z@]', DV) & !grepl('^[A-Za-z@]', BLQ)"
+#> [1] "!grepl('^[A-Za-z@]', C)"
 }
 }
 \keyword{internal}
