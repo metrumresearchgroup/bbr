@@ -1,24 +1,43 @@
-
-#' Run NMTRAN on a model object
+#' Interface for running `NM-TRAN` on model objects
 #'
-#' @param .mod a `bbr` model object
-#' @param .config_path Path to a bbi configuration file. If `NULL`, the
-#'   default, will attempt to use a `bbi.yaml` in the same directory as the
-#'   model.
-#' @param nmtran_exe Path to an `NMTRAN` executable. If `NULL`, will look for a
+#' Provides functions to run `NM-TRAN` on model objects for validation and to
+#' generate `NM-TRAN` datasets (`FDATA`).
+#'
+#' @details
+#' `NM-TRAN` is a preprocessor for `NONMEM` that translates user-specified
+#' control stream data and instructions into a form executable by `NONMEM`.
+#'
+#' `run_nmtran()` allows users to test their models ahead of submission to ensure
+#' correct coding, whereas `nm_fdata()` generates and returns the `NM-TRAN`
+#' dataset (`FDATA`) for further analysis and verification.
+#'
+#' @param .mod A `bbr` model object.
+#' @param .config_path Path to a bbi configuration file. If `NULL`, the default,
+#'   will attempt to use a `bbi.yaml` in the same directory as the model.
+#' @param nmtran_exe Path to an `NM-TRAN` executable. If `NULL`, will look for a
 #'   `bbi.yaml` file in the same directory as the model.
 #' @param delete_on_exit Logical. If `FALSE`, don't delete the temporary folder
-#'   containing the `NMTRAN` run.
+#'   containing the `NM-TRAN` run, which will be stored in the current working
+#'   directory.
 #'
 #' @examples
 #' \dontrun{
 #' mod <- read_model(file.path(MODEL_DIR, 1))
 #' run_nmtran(mod)
 #'
-#' # Set the path to an NMTRAN executable
+#' # Set the path to an NM-TRAN executable
 #' run_nmtran(mod, nmtran_exe = "/opt/NONMEM/nm75/tr/NMTRAN.exe")
-#' }
 #'
+#' # Generate and return `FDATA`
+#' fdata <- nm_fdata(mod)
+#'
+#' }
+#' @name nmtran
+NULL
+
+
+#' @describeIn nmtran Run `NM-TRAN` on a model object to validate its control
+#' stream for correct coding before submission.
 #' @export
 run_nmtran <- function(
     .mod,
@@ -38,7 +57,8 @@ run_nmtran <- function(
   # make temporary directory in current directory
   mod_name <- fs::path_ext_remove(basename(mod_path))
   temp_folder <- paste0("nmtran_", mod_name, "_", basename(tempdir()))
-  dir.create(temp_folder)
+  if(fs::dir_exists(temp_folder)) fs::dir_delete(temp_folder)
+  fs::dir_create(temp_folder)
   if(isTRUE(delete_on_exit)){
     on.exit(unlink(temp_folder, recursive = TRUE, force = TRUE))
   }
@@ -71,7 +91,42 @@ run_nmtran <- function(
 }
 
 
-#' Search for and validate existence of an `NMTRAN` executable
+#' @describeIn nmtran Executes `run_nmtran` on a `bbi_nonmem_model` and
+#'  returns the `NM-TRAN` dataset (`FDATA`)
+#' @export
+nm_fdata <- function(
+    .mod,
+    .config_path = NULL,
+    nmtran_exe = NULL
+){
+  nmtran_p <- run_nmtran(.mod, .config_path, nmtran_exe, delete_on_exit = FALSE)
+  if(nmtran_p$status_val != 0){
+    # trim output
+    output_lines <- nmtran_p$output_lines[!grepl("^\\s+$", nmtran_p$output_lines)]
+    rlang::warn(
+      c(
+        "NM-TRAN was unsuccessful and returned the following messages:",
+        paste(output_lines, collapse = "\n")
+      )
+    )
+  }
+
+  # Attempt to read in FDATA (even if status_val is not 0)
+  #  - FDATA can still be read in in _some scenarios_ where NM-TRAN fails
+  fdata_path <- file.path(nmtran_p$run_dir, "FDATA")
+  if(fs::file_exists(fdata_path)){
+    input_data <- nm_data(.mod) %>% suppressMessages()
+    fdata <- nm_file_impl(fdata_path, skip = 0) %>%
+      stats::setNames(names(input_data))
+    fs::dir_delete(nmtran_p$run_dir)
+    return(fdata)
+  }else{
+    return(invisible(NULL))
+  }
+}
+
+
+#' Search for and validate existence of an `NM-TRAN` executable
 #'
 #' If `nmtran_exe = NULL`, this will look for a `bbi.yaml` file in the same
 #' directory as the model.
@@ -135,9 +190,9 @@ locate_nmtran <- function(.mod = NULL, .config_path = NULL, nmtran_exe = NULL){
 }
 
 
-#' Execute NMTRAN in a given directory
+#' Execute `NM-TRAN` in a given directory
 #'
-#' @param nmtran_exe Path to `NMTRAN` executable.
+#' @param nmtran_exe Path to `NM-TRAN` executable.
 #' @param mod_path Path of a model to evaluate. Should be relative to `dir`.
 #' @param dir Directory in which to execute the command.
 #'

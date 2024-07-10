@@ -2,18 +2,18 @@
 % Please edit documentation in R/run-nmtran.R
 \name{execute_nmtran}
 \alias{execute_nmtran}
-\title{Execute NMTRAN in a given directory}
+\title{Execute \code{NM-TRAN} in a given directory}
 \usage{
 execute_nmtran(nmtran_exe, mod_path, dir = NULL)
 }
 \arguments{
-\item{nmtran_exe}{Path to \code{NMTRAN} executable.}
+\item{nmtran_exe}{Path to \code{NM-TRAN} executable.}
 
 \item{mod_path}{Path of a model to evaluate. Should be relative to \code{dir}.}
 
 \item{dir}{Directory in which to execute the command.}
 }
 \description{
-Execute NMTRAN in a given directory
+Execute \code{NM-TRAN} in a given directory
 }
 \keyword{internal}
