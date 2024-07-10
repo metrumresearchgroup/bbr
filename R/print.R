@@ -443,7 +443,8 @@ print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
 }
 
 
-#' @describeIn print_bbi Prints the `NMTRAN` evaluation of a `bbi_model` model
+#' @describeIn print_bbi Prints the `NM-TRAN` evaluation of a `bbi_nonmem_model`
+#'  object
 #' @export
 print.nmtran_process <- function(x, ...){
 
@@ -500,6 +501,18 @@ print.nmtran_process <- function(x, ...){
   }
 }
 
+
+#' @describeIn print_bbi Prints the `FDATA`, showing key changes from `nm_data`
+#' @export
+print.nmtran_fdata <- function(x, ...){
+  recs_dropped <- attributes(x)$n_records_dropped
+  cli::cat_bullet(
+    paste("Number of records dropped:", col_blue(recs_dropped)),
+    bullet = "en_dash"
+  )
+  cat("\n")
+  NextMethod()
+}
 
 #' @describeIn print_bbi Draw model tree as a static plot
 #' @param x plot to display

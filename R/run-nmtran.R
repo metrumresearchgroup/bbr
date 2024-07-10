@@ -100,6 +100,8 @@ nm_fdata <- function(
     nmtran_exe = NULL
 ){
   nmtran_p <- run_nmtran(.mod, .config_path, nmtran_exe, delete_on_exit = FALSE)
+  on.exit(fs::dir_delete(nmtran_p$run_dir))
+
   if(nmtran_p$status_val != 0){
     # trim output
     output_lines <- nmtran_p$output_lines[!grepl("^\\s+$", nmtran_p$output_lines)]
@@ -116,9 +118,22 @@ nm_fdata <- function(
   fdata_path <- file.path(nmtran_p$run_dir, "FDATA")
   if(fs::file_exists(fdata_path)){
     input_data <- nm_data(.mod) %>% suppressMessages()
-    fdata <- nm_file_impl(fdata_path, skip = 0) %>%
-      stats::setNames(names(input_data))
-    fs::dir_delete(nmtran_p$run_dir)
+    fdata <- tryCatch({
+      nm_file_impl(fdata_path, skip = 0) %>%
+        stats::setNames(names(input_data))
+    }, error = function(cond){
+      rlang::inform(
+        c("FDATA could not be read in:", cond$parent$message)
+      )
+      return(NULL)
+    })
+
+    if(!is.null(fdata)){
+      attr(fdata, "n_records_dropped") <- nrow(input_data) - nrow(fdata)
+    }
+
+    # assign class and return
+    class(fdata) <- c(NMTRAN_FDATA_CLASS, class(fdata))
     return(fdata)
   }else{
     return(invisible(NULL))

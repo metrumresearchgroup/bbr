@@ -384,7 +384,7 @@ withr::with_options(list(
       expect_equal(nmtran_results$status, "NMTRAN failed. See errors.")
     })
 
-    it("run_nmtran", {
+    it("run_nmtran: integration", {
       # create model
       mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
 
@@ -400,6 +400,18 @@ withr::with_options(list(
       expect_equal(nmtran_results$nonmem_version, "nm74gf")
       expect_equal(nmtran_results$status_val, 0)
       expect_equal(nmtran_results$status, "NMTRAN successful")
+    })
+
+    it("nm_fdata: integration", {
+      fdata <- nm_fdata(mod1)
+
+      expect_equal(names(fdata), names(nm_data(mod1)))
+
+      # Test dropped/renamed columns
+
+      # Test failure: incorrect data path
+      data_path <- "test/this/path/data.csv"
+      modify_data_path_ctl(mod1, data_path)
     })
   })
 
