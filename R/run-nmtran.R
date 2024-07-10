@@ -159,10 +159,8 @@ execute_nmtran <- function(nmtran_exe, mod_path, dir = NULL) {
   status_val <- nmtran.p$get_exit_status()
   if(status_val == 0){
     status <- "NMTRAN successful"
-  }else if(status_val == 4){
-    status <- "NMTRAN failed. See errors."
   }else{
-    dev_error("NMTRAN exit status other than 0 or 4")
+    status <- "NMTRAN failed. See errors."
   }
 
   # Tabulate NMTRAN results
