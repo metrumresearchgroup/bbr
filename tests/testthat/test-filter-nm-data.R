@@ -1,3 +1,17 @@
+test_that("translate_nm_operator translates NONMEM operators", {
+  # label.EQN.value and label.NEN.value are supported after NONMEM 7.3
+  nm_r_translations <- list(
+    equal = c("A.EQ.1", "A.EQN.1", "A==1", "A=1"),
+    not_equal = c("B.NE.1", "B.NEN.1", "B/=1"),
+    greater_than = c("C.GE.1", "C.GT.1"),
+    less_than = c("D.LE.1", "D.LT.1")
+  )
+
+  expect_equal(unique(translate_nm_operator(nm_r_translations$equal)), "A==1")
+  expect_equal(unique(translate_nm_operator(nm_r_translations$not_equal)), "B!=1")
+  expect_equal(translate_nm_operator(nm_r_translations$greater_than), c("C>=1", "C>1"))
+  expect_equal(translate_nm_operator(nm_r_translations$less_than), c("D<=1", "D<1"))
+})
 
 test_that("translate_nm_expr() translates NONMEM filter expressions", {
   test_exprs <- "SEX==1, ID.EQ.2, WT/=70, AGE.NE.30, A=1, WT.GT.40, B.LE.20"

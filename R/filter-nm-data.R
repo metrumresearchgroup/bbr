@@ -43,8 +43,8 @@ get_data_filter_exprs <- function(data_rec, type = c("ignore", "accept")){
 #' @noRd
 #' @keywords internal
 translate_nm_operator <- function(expr) {
-  expr <- gsub("\\.EQ\\.", "==", expr)
-  expr <- gsub("\\.NE\\.|/=", "!=", expr)
+  expr <- gsub("\\.EQ\\.|\\.EQN\\.", "==", expr)
+  expr <- gsub("\\.NE\\.|\\.NEN\\.|/=", "!=", expr)
   expr <- gsub("\\.LT\\.", "<", expr)
   expr <- gsub("\\.LE\\.", "<=", expr)
   expr <- gsub("\\.GT\\.", ">", expr)
