@@ -4,12 +4,10 @@
 \alias{nm_file_impl}
 \title{Implementation function for reading NONMEM files}
 \usage{
-nm_file_impl(.path, skip = 1)
+nm_file_impl(.path)
 }
 \arguments{
 \item{.path}{a path to a table file.}
-
-\item{skip}{number of rows to skip when reading in table file. Defaults to \code{1}}
 }
 \description{
 Implementation function for reading NONMEM files
