@@ -3,12 +3,9 @@
 \name{nmtran}
 \alias{nmtran}
 \alias{run_nmtran}
-\alias{nm_fdata}
 \title{Interface for running \code{NM-TRAN} on model objects}
 \usage{
 run_nmtran(.mod, .config_path = NULL, nmtran_exe = NULL, delete_on_exit = TRUE)
-
-nm_fdata(.mod, .config_path = NULL, nmtran_exe = NULL)
 }
 \arguments{
 \item{.mod}{A \code{bbr} model object.}
@@ -32,16 +29,12 @@ generate \code{NM-TRAN} datasets (\code{FDATA}).
 control stream data and instructions into a form executable by \code{NONMEM}.
 
 \code{run_nmtran()} allows users to test their models ahead of submission to ensure
-correct coding, whereas \code{nm_fdata()} generates and returns the \code{NM-TRAN}
-dataset (\code{FDATA}) for further analysis and verification.
+correct coding.
 }
 \section{Functions}{
 \itemize{
 \item \code{run_nmtran()}: Run \code{NM-TRAN} on a model object to validate its control
 stream for correct coding before submission.
-
-\item \code{nm_fdata()}: Executes \code{run_nmtran} on a \code{bbi_nonmem_model} and
-returns the \code{NM-TRAN} dataset (\code{FDATA})
 
 }}
 \examples{
@@ -51,9 +44,6 @@ run_nmtran(mod)
 
 # Set the path to an NM-TRAN executable
 run_nmtran(mod, nmtran_exe = "/opt/NONMEM/nm75/tr/NMTRAN.exe")
-
-# Generate and return `FDATA`
-fdata <- nm_fdata(mod)
 
 }
 }

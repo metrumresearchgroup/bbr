@@ -502,18 +502,6 @@ print.nmtran_process <- function(x, ...){
 }
 
 
-#' @describeIn print_bbi Prints the `FDATA`, showing key changes from `nm_data`
-#' @export
-print.nmtran_fdata <- function(x, ...){
-  recs_dropped <- attributes(x)$n_records_dropped
-  cli::cat_bullet(
-    paste("Number of records dropped:", col_blue(recs_dropped)),
-    bullet = "en_dash"
-  )
-  cat("\n")
-  NextMethod()
-}
-
 #' @describeIn print_bbi Draw model tree as a static plot
 #' @param x plot to display
 #' @param newpage Logical (T/F). If `TRUE`, draw new (empty) page first.

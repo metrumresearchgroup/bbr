@@ -8,8 +8,7 @@
 #' control stream data and instructions into a form executable by `NONMEM`.
 #'
 #' `run_nmtran()` allows users to test their models ahead of submission to ensure
-#' correct coding, whereas `nm_fdata()` generates and returns the `NM-TRAN`
-#' dataset (`FDATA`) for further analysis and verification.
+#' correct coding.
 #'
 #' @param .mod A `bbr` model object.
 #' @param .config_path Path to a bbi configuration file. If `NULL`, the default,
@@ -27,9 +26,6 @@
 #'
 #' # Set the path to an NM-TRAN executable
 #' run_nmtran(mod, nmtran_exe = "/opt/NONMEM/nm75/tr/NMTRAN.exe")
-#'
-#' # Generate and return `FDATA`
-#' fdata <- nm_fdata(mod)
 #'
 #' }
 #' @name nmtran
@@ -88,56 +84,6 @@ run_nmtran <- function(
   # assign class and return
   class(nmtran_results) <- c(NMTRAN_PROCESS_CLASS, class(nmtran_results))
   return(nmtran_results)
-}
-
-
-#' @describeIn nmtran Executes `run_nmtran` on a `bbi_nonmem_model` and
-#'  returns the `NM-TRAN` dataset (`FDATA`)
-#' @export
-nm_fdata <- function(
-    .mod,
-    .config_path = NULL,
-    nmtran_exe = NULL
-){
-  nmtran_p <- run_nmtran(.mod, .config_path, nmtran_exe, delete_on_exit = FALSE)
-  on.exit(fs::dir_delete(nmtran_p$run_dir))
-
-  if(nmtran_p$status_val != 0){
-    # trim output
-    output_lines <- nmtran_p$output_lines[!grepl("^\\s+$", nmtran_p$output_lines)]
-    rlang::warn(
-      c(
-        "NM-TRAN was unsuccessful and returned the following messages:",
-        paste(output_lines, collapse = "\n")
-      )
-    )
-  }
-
-  # Attempt to read in FDATA (even if status_val is not 0)
-  #  - FDATA can still be read in in _some scenarios_ where NM-TRAN fails
-  fdata_path <- file.path(nmtran_p$run_dir, "FDATA")
-  if(fs::file_exists(fdata_path)){
-    input_data <- nm_data(.mod) %>% suppressMessages()
-    fdata <- tryCatch({
-      nm_file_impl(fdata_path, skip = 0) %>%
-        stats::setNames(names(input_data))
-    }, error = function(cond){
-      rlang::inform(
-        c("FDATA could not be read in:", cond$parent$message)
-      )
-      return(NULL)
-    })
-
-    if(!is.null(fdata)){
-      attr(fdata, "n_records_dropped") <- nrow(input_data) - nrow(fdata)
-    }
-
-    # assign class and return
-    class(fdata) <- c(NMTRAN_FDATA_CLASS, class(fdata))
-    return(fdata)
-  }else{
-    return(invisible(NULL))
-  }
 }
 
 
