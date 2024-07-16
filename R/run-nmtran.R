@@ -163,7 +163,7 @@ execute_nmtran <- function(nmtran_exe, mod_path, dir = NULL) {
   checkmate::assert_directory_exists(dir)
 
   nmtran.p <- processx::process$new(
-    command = nmtran_exe, args = mod_path, wd = dir,
+    command = nmtran_exe, wd = dir,
     stdout = "|", stderr="|", stdin = file.path(dir, mod_path)
   )
 
