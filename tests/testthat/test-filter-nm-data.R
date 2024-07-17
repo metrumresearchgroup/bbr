@@ -86,7 +86,7 @@ test_that("filter_nm_data() filters input data using IGNORE/ACCEPT options", {
   )
 
   # Check that relevant rows have been filtered out
-  removed_records <- invert_operator(ignore_filters[2])
+  removed_records <- invert_operator(r_filters[2])
   expect_equal(
     filtered_data %>% dplyr::filter(eval(parse(text = removed_records))) %>% nrow(),
     0
