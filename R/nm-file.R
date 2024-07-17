@@ -88,8 +88,8 @@ nm_par_tab <- function(.mod) {
 
 #' @describeIn nm_file Reads the input data file from a `bbi_nonmem_model` or
 #'   `bbi_nonmem_summary` object
-#' @param filter Logical (`T`/`F`). If `TRUE`, filter data based on `IGNORE` or
-#'  `ACCEPT` options definied in the `$DATA` record.
+#' @param filter Logical (`T`/`F`). If `TRUE`, filter data based on `IGNORE LIST`
+#'  or `ACCEPT LIST` options defined in the `$DATA` record.
 #' @importFrom data.table fread
 #' @importFrom tibble as_tibble
 #' @export

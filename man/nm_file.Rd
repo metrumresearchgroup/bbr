@@ -33,8 +33,8 @@ See examples.}
 columns to the relevant parameter names. Otherwise will leave column names
 as is.}
 
-\item{filter}{Logical (\code{T}/\code{F}). If \code{TRUE}, filter data based on \code{IGNORE} or
-\code{ACCEPT} options definied in the \verb{$DATA} record.}
+\item{filter}{Logical (\code{T}/\code{F}). If \code{TRUE}, filter data based on \verb{IGNORE LIST}
+or \verb{ACCEPT LIST} options defined in the \verb{$DATA} record.}
 }
 \value{
 A tibble with the data from the specified file and estimation method.
