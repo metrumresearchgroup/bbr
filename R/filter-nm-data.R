@@ -156,7 +156,7 @@ translate_nm_expr <- function(
         #  - This permits a table file having header lines to be used as an
         #    NM-TRAN data set.
         paste0("!grepl('^[A-Za-z@]', ", data_cols[1], ")")
-      }else if(grepl('^[a-zA-Z0-9]{1,}$', expr)){
+      }else if(grepl('^[a-zA-Z]$', expr)){
         # This is for `IGNORE=C` columns. Meaning ignore rows if the _first_ column
         # contains 'C' (this form always points to the _first_ column)
         # - the above regex looks for characters of length>=1, and no symbols

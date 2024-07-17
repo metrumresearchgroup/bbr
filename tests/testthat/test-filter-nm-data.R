@@ -36,8 +36,8 @@ test_that("translate_nm_expr() translates NONMEM filter expressions", {
   )
 
   expect_equal(
-    translate_nm_expr("c2", data_cols = data_cols),
-    paste0(data_cols[1], "!='c2'")
+    translate_nm_expr("C", data_cols = data_cols),
+    paste0(data_cols[1], "!='C'")
   )
 
   expect_equal(
