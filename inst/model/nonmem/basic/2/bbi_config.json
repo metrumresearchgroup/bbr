@@ -1,0 +1,56 @@
+{
+    "bbi_version": "v3.3.0",
+    "model_name": "2.ctl",
+    "original_model": "2.ctl",
+    "model_path": "/data/home/kyleb/git/metrumresearchgroup/bbr/inst/model/nonmem/basic/2.ctl",
+    "data_path": "../../../../extdata/acop2.csv",
+    "data_md5": "626cd08d7c3cdb257798131ea654ccab",
+    "model_md5": "21043bfcbfc0891778c6bd9782f9b1ca",
+    "model_filename": "2",
+    "model_extension": "ctl",
+    "original_path": "/data/home/kyleb/git/metrumresearchgroup/bbr/inst/model/nonmem/basic",
+    "output_dir": "/data/home/kyleb/git/metrumresearchgroup/bbr/inst/model/nonmem/basic/2",
+    "configuration": {
+        "overwrite": true,
+        "clean_lvl": 1,
+        "git": true,
+        "save_config": true,
+        "output_dir": "{{ .Name }}",
+        "threads": 4,
+        "local": {
+            "create_child_dirs": true
+        },
+        "nonmem": {
+            "nm73gf": {
+                "home": "/opt/NONMEM/nm73gf",
+                "executable": "nmfe73",
+                "nmqual": true
+            },
+            "nm73gf_nmfe": {
+                "home": "/opt/NONMEM/nm73gf_nmfe",
+                "executable": "nmfe73"
+            },
+            "nm74gf": {
+                "home": "/opt/NONMEM/nm74gf",
+                "executable": "nmfe74",
+                "nmqual": true
+            },
+            "nm74gf_nmfe": {
+                "home": "/opt/NONMEM/nm74gf_nmfe",
+                "executable": "nmfe74"
+            },
+            "nm75": {
+                "home": "/opt/NONMEM/nm75",
+                "executable": "nmfe75",
+                "default": true
+            }
+        },
+        "parallel": true,
+        "nmfe_options": {
+            "maxlim": 2
+        },
+        "mpi_exec_path": "/usr/local/mpich3/bin/mpiexec",
+        "parallel_timeout": 2147483647
+    },
+    "error": null
+}
