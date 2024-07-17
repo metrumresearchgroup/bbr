@@ -21,28 +21,58 @@ read_data_record <- function(.mod){
 
 
 #' Extract IGNORE or ACCEPT options from a data record
-#' @param data_rec an `nmrec_record_data` object
-#' @inheritParams translate_nm_expr
+#' @inheritParams filter_nm_data
 #' @noRd
-get_data_filter_exprs <- function(data_rec, type = c("ignore", "accept")){
-  type <- match.arg(type)
+get_data_filter_exprs <- function(.mod){
+
+  data_rec <- read_data_record(.mod)
 
   # Extract & format IGNORE/ACCEPT options
-  opts <- purrr::keep(data_rec$values, function(val){
-    inherits(val, "nmrec_option_value") && identical(val[["name"]], type)
+  ignore_opts <- purrr::keep(data_rec$values, function(val){
+    inherits(val, "nmrec_option_value") && identical(val[["name"]], "ignore")
   })
 
-  exprs <- purrr::map_chr(opts, function(val){
+  accept_opts <- purrr::keep(data_rec$values, function(val){
+    inherits(val, "nmrec_option_value") && identical(val[["name"]], "accept")
+  })
+
+  has_ignore <- !rlang::is_empty(ignore_opts)
+  has_accept <- !rlang::is_empty(accept_opts)
+
+  if(has_ignore && has_accept){
+    # Identical to NMTRAN error message if both are used
+    rlang::abort("ACCEPT list and IGNORE list may not both be used")
+  }else{
+    type <- dplyr::case_when(
+      has_ignore ~ "ignore",
+      has_accept ~ "accept",
+      # NA type will escape filtering
+      TRUE ~ NA_character_
+    )
+  }
+
+  # Pull out filters (remove parentheses and any quoting)
+  #  - can concatenate options since one or both are assumed to be empty
+  exprs <- purrr::map_chr(c(ignore_opts, accept_opts), function(val){
     gsub("\\(|\\)", "", unquote_filename(val$value))
   })
 
-  return(exprs)
+  # Separate any (list) type expressions
+  exprs <- unlist(stringr::str_split(exprs, ",")) %>% stringr::str_trim()
+
+  return(
+    list(
+      type = type,
+      exprs = exprs
+    )
+  )
 }
 
 #' Function to translate NONMEM operators to R operators
 #' @noRd
 #' @keywords internal
 translate_nm_operator <- function(expr) {
+  # EQN and NEN are available after NONMEM 7.3
   expr <- gsub("\\.EQ\\.|\\.EQN\\.", "==", expr)
   expr <- gsub("\\.NE\\.|\\.NEN\\.|/=", "!=", expr)
   expr <- gsub("\\.LT\\.", "<", expr)
@@ -60,18 +90,18 @@ translate_nm_operator <- function(expr) {
 #' @keywords internal
 invert_operator <- function(expr) {
   expr <- dplyr::case_when(
-    grepl("==", expr) ~ gsub("==", "!=", expr),
-    grepl("!=", expr) ~ gsub("!=", "==", expr),
-    grepl("<=", expr) ~ gsub("<=", ">=", expr),
-    grepl(">=", expr) ~ gsub(">=", "<=", expr),
-    grepl("<", expr) ~ gsub("<", ">", expr),
-    grepl(">", expr) ~ gsub(">", "<", expr),
+    grepl("==", expr) ~ gsub("==", "!=", expr, fixed = TRUE),
+    grepl("!=", expr) ~ gsub("!=", "==", expr, fixed = TRUE),
+    grepl("<=", expr) ~ gsub("<=", ">=", expr, fixed = TRUE),
+    grepl(">=", expr) ~ gsub(">=", "<=", expr, fixed = TRUE),
+    grepl("<", expr) ~ gsub("<", ">", expr, fixed = TRUE),
+    grepl(">", expr) ~ gsub(">", "<", expr, fixed = TRUE),
     TRUE ~ expr
   )
   return(expr)
 }
 
-#' Translate `IGNORE` and `ACCEPT` filter expressions into [dplyr::filter()]
+#' Translate `NONMEM` `IGNORE` and `ACCEPT` expressions into [dplyr::filter()]
 #'  expressions.
 #'
 #' @param nm_expr a `NONMEM` filter expression. e.g., `'ID.EQ.2, BLQ=1'`.
@@ -81,14 +111,11 @@ invert_operator <- function(expr) {
 #'  `'ignore'` expressions.
 #'
 #' @examples
-#' \dontrun{
-#' test_exprs <- "SEX==1, ID.EQ.2, WT/=70, AGE.NE.30, A=1, WT.GT.40"
+#' test_exprs <- c("SEX==1", "ID.EQ.2", "WT/=70", "AGE.NE.30", "A=1", "WT.GT.40")
 #'
 #' translate_nm_expr(test_exprs, type = 'ignore')
-#' #> [1] "SEX!=1 & ID!=2 & WT==70 & AGE==30 & A!=1 & WT<40"
 #'
 #' translate_nm_expr(test_exprs, type = 'accept')
-#' #> [1] "SEX==1 & ID==2 & WT!=70 & AGE!=30 & A==1 & WT>40"
 #'
 #'
 #' # Use of `@`, `#`, or form `IGNORE=C2` require `data_cols` to be specified,
@@ -96,14 +123,11 @@ invert_operator <- function(expr) {
 #' data_cols <- c("C", "ID", "TIME", "EVID", "DV", "BLQ")
 #'
 #' translate_nm_expr("#", data_cols = data_cols)
-#' #> [1] "!grepl('^#', C)"
 #'
 #' translate_nm_expr("c2", data_cols = data_cols)
-#' #> [1] "C!='c2'"
 #'
 #' translate_nm_expr("@", data_cols = data_cols)
-#' #> [1] "!grepl('^[A-Za-z@]', C)"
-#' }
+#'
 #' @keywords internal
 translate_nm_expr <- function(
     nm_expr,
@@ -113,9 +137,8 @@ translate_nm_expr <- function(
   type <- match.arg(type)
   checkmate::assert_character(data_cols, min.len = 1, null.ok = TRUE)
 
-  # Translate NM operators and separate any (list) type expressions
+  # Translate NM operators
   exprs <- translate_nm_operator(nm_expr)
-  exprs <- stringr::str_split(exprs, ",")[[1]] %>% stringr::str_trim()
 
   r_exprs <- purrr::map_chr(exprs, function(expr){
     if(type == "ignore"){
@@ -144,8 +167,8 @@ translate_nm_expr <- function(
       expr
     }
   })
-  r_expr <- paste(r_exprs, collapse = " & ")
-  return(r_expr)
+
+  return(r_exprs)
 }
 
 #' Filter `NONMEM` input data based on `IGNORE` and `ACCEPT` record options
@@ -155,21 +178,22 @@ translate_nm_expr <- function(
 #' @keywords internal
 filter_nm_data <- function(.mod, data = nm_data(.mod)){
 
-  data_rec <- read_data_record(.mod)
-
   # Extract & format IGNORE/ACCEPT options into expressions
-  ignore_exprs <- get_data_filter_exprs(data_rec, type = "ignore")
-  accept_exprs <- get_data_filter_exprs(data_rec, type = "accept")
+  nm_exprs <- get_data_filter_exprs(.mod)
+
+  # Return starting data if no IGNORE/ACCEPT options are found
+  if(is.na(nm_exprs$type)){
+    attr(data, "n_records_dropped") <- 0
+    return(data)
+  }
 
   # Translate NONMEM syntax into `dplyr::filter` logic
-  ignore_filters <- purrr::map_chr(ignore_exprs, translate_nm_expr, data_cols = names(data))
-  accept_filters <- purrr::map_chr(accept_exprs, translate_nm_expr, type = "accept")
-
-  # Combine all filter expressions
-  all_filters <- c(ignore_filters, accept_filters)
+  r_filters <- translate_nm_expr(
+    nm_expr = nm_exprs$exprs, type = nm_exprs$type, data_cols = names(data)
+  )
 
   # Create the final dplyr::filter expression
-  filter_expression <- paste(all_filters, collapse = " & ")
+  filter_expression <- paste(r_filters, collapse = " & ")
 
   # Apply filters
   filtered_data <- tryCatch({

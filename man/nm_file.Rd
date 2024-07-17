@@ -29,10 +29,11 @@ See examples.}
 
 \item{...}{arguments passed through to methods. (Currently none.)}
 
-\item{.rename}{If \code{TRUE}, the default, will rename \code{.grd} columns to the
-relevant parameter names. Otherwise will leave column names as is.}
+\item{.rename}{Logical (\code{T}/\code{F}). If \code{TRUE}, the default, will rename \code{.grd}
+columns to the relevant parameter names. Otherwise will leave column names
+as is.}
 
-\item{filter}{Logical (\code{T}/\code{F}). If \code{TRUE}, filter data based on \code{IGNORE} and
+\item{filter}{Logical (\code{T}/\code{F}). If \code{TRUE}, filter data based on \code{IGNORE} or
 \code{ACCEPT} options definied in the \verb{$DATA} record.}
 }
 \value{

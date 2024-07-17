@@ -2,7 +2,7 @@
 % Please edit documentation in R/filter-nm-data.R
 \name{translate_nm_expr}
 \alias{translate_nm_expr}
-\title{Translate \code{IGNORE} and \code{ACCEPT} filter expressions into \code{\link[dplyr:filter]{dplyr::filter()}}
+\title{Translate \code{NONMEM} \code{IGNORE} and \code{ACCEPT} expressions into \code{\link[dplyr:filter]{dplyr::filter()}}
 expressions.}
 \usage{
 translate_nm_expr(nm_expr, type = c("ignore", "accept"), data_cols = NULL)
@@ -17,18 +17,15 @@ filtering the expression corresponds to.}
 \code{'ignore'} expressions.}
 }
 \description{
-Translate \code{IGNORE} and \code{ACCEPT} filter expressions into \code{\link[dplyr:filter]{dplyr::filter()}}
+Translate \code{NONMEM} \code{IGNORE} and \code{ACCEPT} expressions into \code{\link[dplyr:filter]{dplyr::filter()}}
 expressions.
 }
 \examples{
-\dontrun{
-test_exprs <- "SEX==1, ID.EQ.2, WT/=70, AGE.NE.30, A=1, WT.GT.40"
+test_exprs <- c("SEX==1", "ID.EQ.2", "WT/=70", "AGE.NE.30", "A=1", "WT.GT.40")
 
 translate_nm_expr(test_exprs, type = 'ignore')
-#> [1] "SEX!=1 & ID!=2 & WT==70 & AGE==30 & A!=1 & WT<40"
 
 translate_nm_expr(test_exprs, type = 'accept')
-#> [1] "SEX==1 & ID==2 & WT!=70 & AGE!=30 & A==1 & WT>40"
 
 
 # Use of `@`, `#`, or form `IGNORE=C2` require `data_cols` to be specified,
@@ -36,13 +33,10 @@ translate_nm_expr(test_exprs, type = 'accept')
 data_cols <- c("C", "ID", "TIME", "EVID", "DV", "BLQ")
 
 translate_nm_expr("#", data_cols = data_cols)
-#> [1] "!grepl('^#', C)"
 
 translate_nm_expr("c2", data_cols = data_cols)
-#> [1] "C!='c2'"
 
 translate_nm_expr("@", data_cols = data_cols)
-#> [1] "!grepl('^[A-Za-z@]', C)"
-}
+
 }
 \keyword{internal}

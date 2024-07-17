@@ -49,8 +49,9 @@ nm_file.character <- function(.mod, .suffix = NULL, ...) {
 
 #' @describeIn nm_file Reads `.grd` file from a `bbi_nonmem_model` or
 #'   `bbi_nonmem_summary` object
-#' @param .rename If `TRUE`, the default, will rename `.grd` columns to the
-#'   relevant parameter names. Otherwise will leave column names as is.
+#' @param .rename Logical (`T`/`F`). If `TRUE`, the default, will rename `.grd`
+#'   columns to the relevant parameter names. Otherwise will leave column names
+#'   as is.
 #' @export
 nm_grd <- function(.mod, .rename = TRUE) {
   check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS))
@@ -87,7 +88,7 @@ nm_par_tab <- function(.mod) {
 
 #' @describeIn nm_file Reads the input data file from a `bbi_nonmem_model` or
 #'   `bbi_nonmem_summary` object
-#' @param filter Logical (`T`/`F`). If `TRUE`, filter data based on `IGNORE` and
+#' @param filter Logical (`T`/`F`). If `TRUE`, filter data based on `IGNORE` or
 #'  `ACCEPT` options definied in the `$DATA` record.
 #' @importFrom data.table fread
 #' @importFrom tibble as_tibble
@@ -99,12 +100,19 @@ nm_data <- function(.mod, filter = FALSE) {
   .d <- fread(.path, na.strings = ".", verbose = FALSE)
   .d <- remove_dup_cols(.d)
   .d <- as_tibble(.d)
+
   names(.d) <- toupper(names(.d))
+
+  if(isTRUE(filter)){
+    .d <- filter_nm_data(.mod, data = .d)
+    recs_dropped <- attributes(.d)$n_records_dropped
+    verbose_msg(paste("Number of records dropped:", cli::col_blue(recs_dropped)))
+  }
+
   verbose_msg(glue("  rows: {nrow(.d)}"))
   verbose_msg(glue("  cols: {ncol(.d)}"))
   verbose_msg("") # for newline
 
-  if(isTRUE(filter)) .d <- filter_nm_data(.mod, data = .d)
   return(.d)
 }
 

@@ -14,16 +14,16 @@ test_that("translate_nm_operator translates NONMEM operators", {
 })
 
 test_that("translate_nm_expr() translates NONMEM filter expressions", {
-  test_exprs <- "SEX==1, ID.EQ.2, WT/=70, AGE.NE.30, A=1, WT.GT.40, B.LE.20"
+  test_exprs <- c("SEX==1", "ID.EQ.2", "WT/=70", "AGE.NE.30", "A=1", "WT.GT.40", "B.LE.20")
 
   expect_equal(
     translate_nm_expr(test_exprs, type = 'accept'),
-    "SEX==1 & ID==2 & WT!=70 & AGE!=30 & A==1 & WT>40 & B<=20"
+    c("SEX==1", "ID==2", "WT!=70", "AGE!=30", "A==1", "WT>40", "B<=20")
   )
 
   expect_equal(
     translate_nm_expr(test_exprs, type = 'ignore'),
-    "SEX!=1 & ID!=2 & WT==70 & AGE==30 & A!=1 & WT<40 & B>=20"
+    c("SEX!=1", "ID!=2", "WT==70", "AGE==30", "A!=1", "WT<40", "B>=20")
   )
 
 
@@ -69,10 +69,11 @@ test_that("filter_nm_data() filters input data using IGNORE/ACCEPT options", {
 
   # Check expected expressions
   input_data <- nm_data(mod2) %>% suppressMessages()
-  data_rec <- read_data_record(mod2)
-  ignore_exprs <- get_data_filter_exprs(data_rec, type = "ignore")
-  ignore_filters <- purrr::map_chr(ignore_exprs, translate_nm_expr, data_cols = names(input_data))
-  filter_expression <- paste(ignore_filters, collapse = " & ")
+  nm_exprs <- get_data_filter_exprs(mod2)
+  r_filters <- translate_nm_expr(
+    nm_expr = nm_exprs$exprs, type = nm_exprs$type, data_cols = names(input_data)
+  )
+  filter_expression <- paste(r_filters, collapse = " & ")
   expect_equal(
     filter_expression, "!grepl('^[A-Za-z@]', ID) & ID!=2 & SEX!=1 & WT>=50"
   )
@@ -90,4 +91,43 @@ test_that("filter_nm_data() filters input data using IGNORE/ACCEPT options", {
     filtered_data %>% dplyr::filter(eval(parse(text = removed_records))) %>% nrow(),
     0
   )
+})
+
+test_that("filter_nm_data() errors out when using both IGNORE and ACCEPT options", {
+  mod2 <- copy_model_from(MOD1, "2")
+  on.exit(delete_models(mod2, .force = TRUE, .tags = NULL))
+
+  # Add additional IGNORE expressions and compare to dplyr filters
+  ctl <- get_model_ctl(mod2)
+  data_rec <- nmrec::select_records(ctl, "data")[[1]]
+  data_rec$parse()
+
+  # Create new ACCEPT option
+  nmrec::set_record_option(data_rec, "accept", "(SEX.EQ.1)")
+  nmrec::write_ctl(ctl, get_model_path(mod2))
+
+  expect_error(
+    filter_nm_data(mod2),
+    "ACCEPT list and IGNORE list may not both be used"
+  )
+})
+
+test_that("filter_nm_data() works with no filters", {
+  mod2 <- copy_model_from(MOD1, "2")
+  on.exit(delete_models(mod2, .force = TRUE, .tags = NULL))
+
+  # Add additional IGNORE expressions and compare to dplyr filters
+  ctl <- get_model_ctl(mod2)
+  data_rec <- nmrec::select_records(ctl, "data")[[1]]
+  data_rec$parse()
+
+  # Create new ACCEPT option
+  data_rec$values[[5]]$value <- NULL
+  data_rec$values[[7]]$value <- NULL
+  nmrec::write_ctl(ctl, get_model_path(mod2))
+
+  # Expect identical to `nm_data()` (minus the attribute)
+  filtered_data <- filter_nm_data(mod2)
+  expect_equal(attributes(filtered_data)$n_records_dropped, 0)
+  expect_true(all.equal(nm_data(mod2), filtered_data, check.attributes = FALSE))
 })
