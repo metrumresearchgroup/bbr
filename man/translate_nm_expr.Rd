@@ -21,6 +21,8 @@ Translate \code{NONMEM} \code{IGNORE} and \code{ACCEPT} expressions into \code{\
 expressions.
 }
 \examples{
+\dontrun{
+
 test_exprs <- c("SEX==1", "ID.EQ.2", "WT/=70", "AGE.NE.30", "A=1", "WT.GT.40")
 
 translate_nm_expr(test_exprs, type = 'ignore')
@@ -38,5 +40,6 @@ translate_nm_expr("c2", data_cols = data_cols)
 
 translate_nm_expr("@", data_cols = data_cols)
 
+}
 }
 \keyword{internal}

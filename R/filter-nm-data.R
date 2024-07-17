@@ -111,6 +111,8 @@ invert_operator <- function(expr) {
 #'  `'ignore'` expressions.
 #'
 #' @examples
+#' \dontrun{
+#'
 #' test_exprs <- c("SEX==1", "ID.EQ.2", "WT/=70", "AGE.NE.30", "A=1", "WT.GT.40")
 #'
 #' translate_nm_expr(test_exprs, type = 'ignore')
@@ -128,6 +130,7 @@ invert_operator <- function(expr) {
 #'
 #' translate_nm_expr("@", data_cols = data_cols)
 #'
+#' }
 #' @keywords internal
 translate_nm_expr <- function(
     nm_expr,
