@@ -4,12 +4,15 @@
 \alias{execute_nmtran}
 \title{Execute \code{NM-TRAN} in a given directory}
 \usage{
-execute_nmtran(nmtran_exe, mod_path, dir = NULL)
+execute_nmtran(nmtran_exe, mod_path, cmd_args = NULL, dir = NULL)
 }
 \arguments{
 \item{nmtran_exe}{Path to \code{NM-TRAN} executable.}
 
 \item{mod_path}{Path of a model to evaluate. Should be relative to \code{dir}.}
+
+\item{cmd_args}{A character vector of command line arguments for the \code{NM-TRAN}
+execution call}
 
 \item{dir}{Directory in which to execute the command.}
 }

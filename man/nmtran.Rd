@@ -5,10 +5,20 @@
 \alias{run_nmtran}
 \title{Interface for running \code{NM-TRAN} on model objects}
 \usage{
-run_nmtran(.mod, .config_path = NULL, nmtran_exe = NULL, delete_on_exit = TRUE)
+run_nmtran(
+  .mod,
+  .bbi_args = list(prdefault = TRUE, tprdefault = TRUE, maxlim = 3),
+  .config_path = NULL,
+  nmtran_exe = NULL,
+  delete_on_exit = TRUE
+)
 }
 \arguments{
 \item{.mod}{A \code{bbr} model object.}
+
+\item{.bbi_args}{A named list specifying arguments to pass to \code{NM-TRAN}.
+Similar to the \code{.bbi_args} argument defined in \code{\link[=submit_model]{submit_model()}}, though here
+only \code{prdefault}, \code{tprdefault}, and \code{maxlim} flags are passed to \code{NM-TRAN}.}
 
 \item{.config_path}{Path to a bbi configuration file. If \code{NULL}, the default,
 will attempt to use a \code{bbi.yaml} in the same directory as the model.}

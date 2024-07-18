@@ -11,6 +11,9 @@
 #' correct coding.
 #'
 #' @param .mod A `bbr` model object.
+#' @param .bbi_args A named list specifying arguments to pass to `NM-TRAN`.
+#'   Similar to the `.bbi_args` argument defined in [submit_model()], though here
+#'   only `prdefault`, `tprdefault`, and `maxlim` flags are passed to `NM-TRAN`.
 #' @param .config_path Path to a bbi configuration file. If `NULL`, the default,
 #'   will attempt to use a `bbi.yaml` in the same directory as the model.
 #' @param nmtran_exe Path to an `NM-TRAN` executable. If `NULL`, will look for a
@@ -37,6 +40,7 @@ NULL
 #' @export
 run_nmtran <- function(
     .mod,
+    .bbi_args = list(prdefault = TRUE, tprdefault = TRUE, maxlim = 3),
     .config_path = NULL,
     nmtran_exe = NULL,
     delete_on_exit = TRUE
@@ -46,6 +50,14 @@ run_nmtran <- function(
   # Capture NONMEM and NMTRAN options
   nmtran_exe <- locate_nmtran(.mod, .config_path, nmtran_exe)
   nm_ver <- attr(nmtran_exe, "nonmem_version")
+
+  # Combine NONMEM submission args
+  #  - The main ones of interest are prdefault, tprdefault, and maxlim, which
+  # impact the evaluation of `NM-TRAN`
+  .bbi_args <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])
+  .bbi_args <- Filter(Negate(is.null), .bbi_args[c("prdefault", "tprdefault", "maxlim")])
+  cmd_args <- check_bbi_args(.bbi_args)
+
 
   mod_path <- get_model_path(.mod)
   data_path <- get_data_path_from_ctl(.mod)
@@ -78,7 +90,10 @@ run_nmtran <- function(
       nonmem_version = nm_ver,
       absolute_model_path = mod_path
     ),
-    execute_nmtran(nmtran_exe, mod_path = basename(mod_path), dir = temp_folder)
+    execute_nmtran(
+      nmtran_exe, mod_path = basename(mod_path), cmd_args = cmd_args,
+      dir = temp_folder
+    )
   )
 
   # assign class and return
@@ -155,15 +170,19 @@ locate_nmtran <- function(.mod = NULL, .config_path = NULL, nmtran_exe = NULL){
 #'
 #' @param nmtran_exe Path to `NM-TRAN` executable.
 #' @param mod_path Path of a model to evaluate. Should be relative to `dir`.
+#' @param cmd_args A character vector of command line arguments for the `NM-TRAN`
+#'  execution call
 #' @param dir Directory in which to execute the command.
 #'
 #' @keywords internal
-execute_nmtran <- function(nmtran_exe, mod_path, dir = NULL) {
+execute_nmtran <- function(nmtran_exe, mod_path, cmd_args = NULL, dir = NULL) {
   if(is.null(dir)) dir <- "."
   checkmate::assert_directory_exists(dir)
 
+  cmd_args <- if(is.null(cmd_args)) character() else cmd_args
+
   nmtran.p <- processx::process$new(
-    command = nmtran_exe, wd = dir,
+    command = nmtran_exe, wd = dir, args = cmd_args,
     stdout = "|", stderr="|", stdin = file.path(dir, mod_path)
   )
 
