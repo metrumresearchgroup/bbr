@@ -40,9 +40,10 @@ test_that("translate_nm_expr() translates NONMEM filter expressions", {
     paste0(data_cols[1], "!='C'")
   )
 
+  # Extra `\\` is added for escape purposes when the expression is later parsed
   expect_equal(
     translate_nm_expr("@", data_cols = data_cols),
-    paste0("!grepl('^[A-Za-z@]', ", data_cols[1], ")")
+    paste0("!grepl('^\\\\s*[A-Za-z@]', ", data_cols[1], ")")
   )
 })
 
@@ -75,7 +76,7 @@ test_that("filter_nm_data() filters input data using IGNORE/ACCEPT options", {
   )
   filter_expression <- paste(r_filters, collapse = " & ")
   expect_equal(
-    filter_expression, "!grepl('^[A-Za-z@]', ID) & ID!=2 & SEX!=1 & WT>=50"
+    filter_expression, "!grepl('^\\\\s*[A-Za-z@]', ID) & ID!=2 & SEX!=1 & WT>=50"
   )
 
   # Check that filter expression works correctly
