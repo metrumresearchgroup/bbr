@@ -10,10 +10,22 @@
 #' `run_nmtran()` allows users to test their models ahead of submission to ensure
 #' correct coding.
 #'
+#' @section Supported `bbi_args`:
+#' `run_nmtran()` supports passing the following raw `NMFE` options through to `NM-TRAN`
+#' via the familiar `.bbi_args` argument.
+#'  - **`maxlim`**: Set the maximum values for the buffers used by `NONMEM`
+#'  (if 0, don't pass `-maxlim` to nmfe) (default is 2)
+#'    - If `maxlim = 3`, it is preferred to also set `tprdefault = TRUE`, but
+#'    _not_ `prdefault`, as `NM-TRAN`'s optional resizing of the `PREDPP` size
+#'    parameter `MAXRECID` may conflict with the `-prdefault` option.
+#'  - **`prdefault`**: If `TRUE`, do not recompile any routines other than `FSUBS`
+#'  - **`tprdefault`**: If `TRUE`, test if is okay to do `-prdefault`
+#'
 #' @param .mod A `bbr` model object.
 #' @param .bbi_args A named list specifying arguments to pass to `NM-TRAN`.
 #'   Similar to the `.bbi_args` argument defined in [submit_model()], though here
 #'   only `prdefault`, `tprdefault`, and `maxlim` flags are passed to `NM-TRAN`.
+#'   See details.
 #' @param .config_path Path to a bbi configuration file. If `NULL`, the default,
 #'   will attempt to use a `bbi.yaml` in the same directory as the model.
 #' @param nmtran_exe Path to an `NM-TRAN` executable. If `NULL`, will look for a
@@ -40,7 +52,7 @@ NULL
 #' @export
 run_nmtran <- function(
     .mod,
-    .bbi_args = list(prdefault = TRUE, tprdefault = TRUE, maxlim = 3),
+    .bbi_args = list(prdefault = FALSE, tprdefault = FALSE, maxlim = 2),
     .config_path = NULL,
     nmtran_exe = NULL,
     delete_on_exit = TRUE
