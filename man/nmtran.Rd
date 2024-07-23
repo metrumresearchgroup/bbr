@@ -14,15 +14,16 @@ run_nmtran(
 )
 }
 \arguments{
-\item{.mod}{A \code{bbr} model object.}
+\item{.mod}{A \code{bbi_nonmem_model} object.}
 
 \item{.bbi_args}{A named list specifying arguments to pass to \code{NM-TRAN}.
 Similar to the \code{.bbi_args} argument defined in \code{\link[=submit_model]{submit_model()}}, though here
 only \code{prdefault}, \code{tprdefault}, and \code{maxlim} flags are passed to \code{NM-TRAN}.
-See details.}
+See \code{\link[=print_bbi_args]{print_bbi_args()}} for more details.}
 
-\item{.config_path}{Path to a bbi configuration file. If \code{NULL}, the default,
-will attempt to use a \code{bbi.yaml} in the same directory as the model.}
+\item{.config_path}{Path to a bbi configuration file. If \code{NULL}, the
+default, will attempt to use a \code{bbi.yaml} in the same directory as the
+model.}
 
 \item{nmtran_exe}{Path to an \code{NM-TRAN} executable. If \code{NULL}, will look for a
 \code{bbi.yaml} file in the same directory as the model.}
@@ -32,8 +33,9 @@ containing the \code{NM-TRAN} run, which will be stored in the current working
 directory.}
 }
 \description{
-Provides functions to run \code{NM-TRAN} on model objects for validation and to
-generate \code{NM-TRAN} datasets (\code{FDATA}).
+Function to run \code{NM-TRAN} on model objects for validation. The \code{NM-TRAN}
+dataset (\code{FDATA}) and other \code{NONMEM} artifacts can be further inspected by
+keeping the run directory around.
 }
 \details{
 \code{NM-TRAN} is a preprocessor for \code{NONMEM} that translates user-specified
@@ -48,23 +50,6 @@ correct coding.
 stream for correct coding before submission.
 
 }}
-\section{Supported \code{bbi_args}}{
-
-\code{run_nmtran()} supports passing the following raw \code{NMFE} options through to \code{NM-TRAN}
-via the familiar \code{.bbi_args} argument.
-\itemize{
-\item \strong{\code{maxlim}}: Set the maximum values for the buffers used by \code{NONMEM}
-(if 0, don't pass \code{-maxlim} to nmfe) (default is 2)
-\itemize{
-\item If \code{maxlim = 3}, it is preferred to also set \code{tprdefault = TRUE}, but
-\emph{not} \code{prdefault}, as \code{NM-TRAN}'s optional resizing of the \code{PREDPP} size
-parameter \code{MAXRECID} may conflict with the \code{-prdefault} option.
-}
-\item \strong{\code{prdefault}}: If \code{TRUE}, do not recompile any routines other than \code{FSUBS}
-\item \strong{\code{tprdefault}}: If \code{TRUE}, test if is okay to do \code{-prdefault}
-}
-}
-
 \examples{
 \dontrun{
 mod <- read_model(file.path(MODEL_DIR, 1))

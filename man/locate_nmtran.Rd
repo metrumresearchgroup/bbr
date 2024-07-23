@@ -7,10 +7,11 @@
 locate_nmtran(.mod = NULL, .config_path = NULL, nmtran_exe = NULL)
 }
 \arguments{
-\item{.mod}{A \code{bbr} model object.}
+\item{.mod}{A \code{bbi_nonmem_model} object.}
 
-\item{.config_path}{Path to a bbi configuration file. If \code{NULL}, the default,
-will attempt to use a \code{bbi.yaml} in the same directory as the model.}
+\item{.config_path}{Path to a bbi configuration file. If \code{NULL}, the
+default, will attempt to use a \code{bbi.yaml} in the same directory as the
+model.}
 
 \item{nmtran_exe}{Path to an \code{NM-TRAN} executable. If \code{NULL}, will look for a
 \code{bbi.yaml} file in the same directory as the model.}

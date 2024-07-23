@@ -1,7 +1,8 @@
 #' Interface for running `NM-TRAN` on model objects
 #'
-#' Provides functions to run `NM-TRAN` on model objects for validation and to
-#' generate `NM-TRAN` datasets (`FDATA`).
+#' Function to run `NM-TRAN` on model objects for validation. The `NM-TRAN`
+#'  dataset (`FDATA`) and other `NONMEM` artifacts can be further inspected by
+#'  keeping the run directory around.
 #'
 #' @details
 #' `NM-TRAN` is a preprocessor for `NONMEM` that translates user-specified
@@ -10,24 +11,13 @@
 #' `run_nmtran()` allows users to test their models ahead of submission to ensure
 #' correct coding.
 #'
-#' @section Supported `bbi_args`:
-#' `run_nmtran()` supports passing the following raw `NMFE` options through to `NM-TRAN`
-#' via the familiar `.bbi_args` argument.
-#'  - **`maxlim`**: Set the maximum values for the buffers used by `NONMEM`
-#'  (if 0, don't pass `-maxlim` to nmfe) (default is 2)
-#'    - If `maxlim = 3`, it is preferred to also set `tprdefault = TRUE`, but
-#'    _not_ `prdefault`, as `NM-TRAN`'s optional resizing of the `PREDPP` size
-#'    parameter `MAXRECID` may conflict with the `-prdefault` option.
-#'  - **`prdefault`**: If `TRUE`, do not recompile any routines other than `FSUBS`
-#'  - **`tprdefault`**: If `TRUE`, test if is okay to do `-prdefault`
 #'
-#' @param .mod A `bbr` model object.
+#' @param .mod A `bbi_nonmem_model` object.
 #' @param .bbi_args A named list specifying arguments to pass to `NM-TRAN`.
 #'   Similar to the `.bbi_args` argument defined in [submit_model()], though here
 #'   only `prdefault`, `tprdefault`, and `maxlim` flags are passed to `NM-TRAN`.
-#'   See details.
-#' @param .config_path Path to a bbi configuration file. If `NULL`, the default,
-#'   will attempt to use a `bbi.yaml` in the same directory as the model.
+#'   See [print_bbi_args()] for more details.
+#' @inheritParams submit_model
 #' @param nmtran_exe Path to an `NM-TRAN` executable. If `NULL`, will look for a
 #'   `bbi.yaml` file in the same directory as the model.
 #' @param delete_on_exit Logical. If `FALSE`, don't delete the temporary folder
@@ -66,10 +56,7 @@ run_nmtran <- function(
   # Combine NONMEM submission args
   #  - The main ones of interest are prdefault, tprdefault, and maxlim, which
   # impact the evaluation of `NM-TRAN`
-  .bbi_args <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])
-  .bbi_args <- Filter(Negate(is.null), .bbi_args[c("prdefault", "tprdefault", "maxlim")])
-  cmd_args <- check_bbi_args(.bbi_args)
-
+  cmd_args <- parse_nmtran_args(.mod, .bbi_args = .bbi_args)
 
   mod_path <- get_model_path(.mod)
   data_path <- get_data_path_from_ctl(.mod)
@@ -220,4 +207,33 @@ execute_nmtran <- function(nmtran_exe, mod_path, cmd_args = NULL, dir = NULL) {
   )
 
   return(nmtran_results)
+}
+
+
+#' Parse `.bbi_args` and return the three expected `nmfe_options` for `NM-TRAN`
+#'  in the correct format
+#' @inheritParams run_nmtran
+#' @noRd
+parse_nmtran_args <- function(
+    .mod,
+    .bbi_args = NULL
+){
+
+  nmfe_args_def <- list(prdefault = FALSE, tprdefault = FALSE, maxlim = 2)
+
+  # Combine with any options stored in yaml
+  .nmfe_args <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])
+
+  # Combine with and filter to default nmfe_options
+  check_bbi_args(.nmfe_args)
+  .nmfe_args <- parse_args_list(.nmfe_args, nmfe_args_def)
+  .nmfe_args <- .nmfe_args[names(nmfe_args_def)]
+
+  .nmtran_args <- c(
+    ifelse(isTRUE(.nmfe_args$prdefault), 1, 0),
+    ifelse(isTRUE(.nmfe_args$tprdefault), 1, 0),
+    .nmfe_args$maxlim
+  )
+
+  return(as.character(.nmtran_args))
 }
