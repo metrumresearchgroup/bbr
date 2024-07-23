@@ -339,7 +339,7 @@ withr::with_options(list(
       # no configuration file found
       expect_error(
         locate_nmtran(.config_path = file.path(tempdir(), "bbi.yaml")),
-        "No bbi configuration was found"
+        "No bbi configuration was found at"
       )
     })
 

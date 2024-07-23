@@ -119,16 +119,15 @@ locate_nmtran <- function(.mod = NULL, .config_path = NULL, nmtran_exe = NULL){
     config_path <- .config_path %||% file.path(model_dir, "bbi.yaml")
 
     if(!file_exists(config_path)){
-      rlang::abort(
-        c(
-          "x" = "No bbi configuration was found in the execution directory.",
+      if(is.null(.config_path)){
+        msg <- c(
+          "No bbi configuration was found in the execution directory.",
           "i" = "Please run `bbi_init()` with the appropriate directory to continue."
         )
-      )
-    }
-
-    if(!is.null(.config_path)){
-      config_path <- normalizePath(.config_path)
+      }else{
+        msg <- glue("No bbi configuration was found at {.config_path}")
+      }
+      rlang::abort(msg)
     }
 
     bbi_config <- yaml::read_yaml(config_path)
