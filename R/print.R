@@ -476,28 +476,18 @@ print.nmtran_process <- function(x, ...){
   heading("Absolute Model Path")
   bullet_list(x[[ABS_MOD_PATH]])
 
-  heading("NMTRAN Specifications")
+  heading("NM-TRAN Specifications")
   cli::cli_bullets(
     c(
-      "*" = paste0("NMTRAN Executable:  {.path ", x[["nmtran_exe"]], "}"),
-      "*" = paste0("NONMEM Version: {.val ", nm_version, "}"),
-      "*" = paste0("Run Directory: {.path ", x[["run_dir"]], "}")
+      "*" = "NM-TRAN Executable: {.path {x[['nmtran_exe']]}}",
+      "*" = "NONMEM Version: {.val {nm_version}}",
+      "*" = "Run Directory: {.path {x[['run_dir']]}}"
     )
   )
 
   if (is_valid_print(x[["output_lines"]])) {
-    heading('Output')
-    cat_line(style_italic(x[["output_lines"]]))
-  }
-
-  if (is_valid_print(x[["error_lines"]])) {
-    heading('Additional Errors')
-    cat_line(style_italic(x[["error_lines"]]))
-  }
-
-  # format and print status string
-  if (is_valid_print(x[["output_lines"]])) {
-    cat_line("Process finished.", col = "green")
+    heading('Standard Output')
+    cat_line(x[["output_lines"]])
   }
 }
 

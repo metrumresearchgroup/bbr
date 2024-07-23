@@ -367,7 +367,7 @@ get_data_path_nonmem <- function(
 
   if(isTRUE(.check_exists)){
     if(!fs::file_exists(data_path)){
-      # The first error message line is what NMTRAN would return in this situation
+      # The first error message line is what NM-TRAN would return in this situation
       rlang::abort(
         c(
           "x" = "Input data file does not exist or cannot be opened",

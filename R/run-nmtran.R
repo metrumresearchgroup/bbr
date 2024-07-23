@@ -59,7 +59,7 @@ run_nmtran <- function(
 ){
   check_model_object(.mod, "bbi_nonmem_model")
 
-  # Capture NONMEM and NMTRAN options
+  # Capture NONMEM and NM-TRAN options
   nmtran_exe <- locate_nmtran(.mod, .config_path, nmtran_exe)
   nm_ver <- attr(nmtran_exe, "nonmem_version")
 
@@ -88,14 +88,14 @@ run_nmtran <- function(
   nmtran_mod <- new_model(file.path(temp_folder, basename(mod_path)), .overwrite = TRUE)
 
   # Copy dataset & overwrite $DATA record of new model
-  # NMTRAN will error if data cannot be found
+  # NM-TRAN will error if data cannot be found
   if(fs::file_exists(data_path)){
     file.copy(data_path, temp_folder, overwrite = TRUE)
     # overwrite $DATA record of new model
     modify_data_path_ctl(nmtran_mod, data_path = basename(data_path))
   }
 
-  # Run NMTRAN
+  # Run NM-TRAN
   nmtran_results <- c(
     list(
       nmtran_exe = as.character(nmtran_exe),
@@ -160,10 +160,10 @@ locate_nmtran <- function(.mod = NULL, .config_path = NULL, nmtran_exe = NULL){
       default_nm <- nm_config[[length(nm_config)]]
     }
 
-    # Set NMTRAN executable path
+    # Set NM-TRAN executable path
     nm_path <- default_nm$home
     # TODO: should we recursively look for this executable, or assume Metworx?
-    # i.e. can we assume NMTRAN is in a `tr` folder, and is called `NMTRAN.exe`?
+    # i.e. can we assume NM-TRAN is in a `tr` folder, and is called `NMTRAN.exe`?
     nmtran_exe <- file.path(nm_path, "tr", "NMTRAN.exe")
 
     # If executable found via bbi.yaml, append NONMEM version as attribute
@@ -171,7 +171,7 @@ locate_nmtran <- function(.mod = NULL, .config_path = NULL, nmtran_exe = NULL){
   }
 
   if(!file_exists(nmtran_exe)){
-    stop(glue("Could not find an NMTRAN executable at `{nmtran_exe}`"))
+    stop(glue("Could not find an NM-TRAN executable at `{nmtran_exe}`"))
   }
 
   return(nmtran_exe)
@@ -193,9 +193,10 @@ execute_nmtran <- function(nmtran_exe, mod_path, cmd_args = NULL, dir = NULL) {
 
   cmd_args <- if(is.null(cmd_args)) character() else cmd_args
 
+  # Store standard output and standard error in the same file
   nmtran.p <- processx::process$new(
     command = nmtran_exe, wd = dir, args = cmd_args,
-    stdout = "|", stderr="|", stdin = file.path(dir, mod_path)
+    stdout = "|", stderr="2>&1", stdin = file.path(dir, mod_path)
   )
 
   # Wait till finished for status to be reflective of result
@@ -205,18 +206,17 @@ execute_nmtran <- function(nmtran_exe, mod_path, cmd_args = NULL, dir = NULL) {
   status <- "Not Run"
   status_val <- nmtran.p$get_exit_status()
   if(status_val == 0){
-    status <- "NMTRAN successful"
+    status <- "NM-TRAN successful"
   }else{
-    status <- "NMTRAN failed. See errors."
+    status <- "NM-TRAN failed. See errors."
   }
 
-  # Tabulate NMTRAN results
+  # Tabulate NM-TRAN results
   nmtran_results <- list(
     nmtran_model = nmtran.p$get_input_file(),
     run_dir = as.character(fs::path_real(dir)),
     status = status, status_val = status_val,
-    output_lines = nmtran.p$read_all_output_lines(),
-    error_lines = nmtran.p$read_all_error_lines()
+    output_lines = nmtran.p$read_all_output_lines()
   )
 
   return(nmtran_results)
