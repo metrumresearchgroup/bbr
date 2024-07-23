@@ -149,8 +149,6 @@ locate_nmtran <- function(.mod = NULL, .config_path = NULL, nmtran_exe = NULL){
 
     # Set NM-TRAN executable path
     nm_path <- default_nm$home
-    # TODO: should we recursively look for this executable, or assume Metworx?
-    # i.e. can we assume NM-TRAN is in a `tr` folder, and is called `NMTRAN.exe`?
     nmtran_exe <- file.path(nm_path, "tr", "NMTRAN.exe")
 
     # If executable found via bbi.yaml, append NONMEM version as attribute
@@ -174,25 +172,26 @@ locate_nmtran <- function(.mod = NULL, .config_path = NULL, nmtran_exe = NULL){
 #' @param dir Directory in which to execute the command.
 #'
 #' @keywords internal
-execute_nmtran <- function(nmtran_exe, mod_path, cmd_args = NULL, dir = NULL) {
-  if(is.null(dir)) dir <- "."
+execute_nmtran <- function(nmtran_exe, mod_path, cmd_args = NULL, dir = ".") {
   checkmate::assert_directory_exists(dir)
+  run_dir <- as.character(fs::path_real(dir))
 
   cmd_args <- if(is.null(cmd_args)) character() else cmd_args
 
   # Store standard output and standard error in the same file
   nmtran.p <- processx::process$new(
-    command = nmtran_exe, wd = dir, args = cmd_args,
-    stdout = "|", stderr="2>&1", stdin = file.path(dir, mod_path)
+    command = nmtran_exe, wd = run_dir, args = cmd_args,
+    stdout = "|", stderr="2>&1", stdin = file.path(run_dir, mod_path)
   )
 
   # Wait till finished for status to be reflective of result
   nmtran.p$wait()
 
   # Assign status
-  status <- "Not Run"
   status_val <- nmtran.p$get_exit_status()
-  if(status_val == 0){
+  if(is.na(status_val)){
+    rlang::abort("NM-TRAN terminated")
+  }else if(status_val == 0){
     status <- "NM-TRAN successful"
   }else{
     status <- "NM-TRAN failed. See errors."
@@ -201,8 +200,9 @@ execute_nmtran <- function(nmtran_exe, mod_path, cmd_args = NULL, dir = NULL) {
   # Tabulate NM-TRAN results
   nmtran_results <- list(
     nmtran_model = nmtran.p$get_input_file(),
-    run_dir = as.character(fs::path_real(dir)),
-    status = status, status_val = status_val,
+    run_dir = run_dir,
+    status = status,
+    status_val = status_val,
     output_lines = nmtran.p$read_all_output_lines()
   )
 
