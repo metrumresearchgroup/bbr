@@ -307,40 +307,74 @@ withr::with_options(list(
   })
 
   describe("run_nmtran", {
-    it("locate_nmtran", {
+    it("nmtran_setup: executable and nonmem version", {
       mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
       # Using model object, looks for bbi.yaml
-      nmtran_exe <- locate_nmtran(mod1)
+      nmtran_specs <- nmtran_setup(mod1)
       # Confirm executable
-      expect_equal(as.character(nmtran_exe), "/opt/NONMEM/nm74gf/tr/NMTRAN.exe")
+      expect_equal(nmtran_specs$nmtran_exe, "/opt/NONMEM/nm74gf/tr/NMTRAN.exe")
       # Confirm NONMEM version
-      expect_equal(attr(nmtran_exe, "nonmem_version"), "nm74gf")
+      expect_equal(nmtran_specs$nonmem_version, "nm74gf")
 
-      # Passed executable
-      nmtran_exe <- locate_nmtran(mod1, nmtran_exe = "/opt/NONMEM/nm74gf/tr/NMTRAN.exe")
+      # Passed nonmem version
+      nmtran_specs <- nmtran_setup(mod1, .nonmem_version = "nm75")
       # Confirm executable
-      expect_equal(as.character(nmtran_exe), "/opt/NONMEM/nm74gf/tr/NMTRAN.exe")
+      expect_equal(nmtran_specs$nmtran_exe, "/opt/NONMEM/nm75/tr/NMTRAN.exe")
       # Confirm NONMEM version
-      expect_true(is.null(attr(nmtran_exe, "nonmem_version")))
+      expect_equal(nmtran_specs$nonmem_version, "nm75")
 
       # Passed config_path
-      nmtran_exe <- locate_nmtran(.config_path = file.path(MODEL_DIR_BBI, "bbi.yaml"))
+      nmtran_specs <- nmtran_setup(.config_path = file.path(MODEL_DIR_BBI, "bbi.yaml"))
       # Confirm executable
-      expect_equal(as.character(nmtran_exe), "/opt/NONMEM/nm74gf/tr/NMTRAN.exe")
+      expect_equal(nmtran_specs$nmtran_exe, "/opt/NONMEM/nm74gf/tr/NMTRAN.exe")
       # Confirm NONMEM version
-      expect_equal(attr(nmtran_exe, "nonmem_version"), "nm74gf")
+      expect_equal(nmtran_specs$nonmem_version, "nm74gf")
 
-      # Wrong nmtran_exe path passed
+      # Incorrect nonmem version
       expect_error(
-        locate_nmtran(mod1, nmtran_exe = "/opt/NONMEM/nm74gf/tr/NMTRAN2.exe"),
-        "Could not find an NMTRAN executable"
+        nmtran_setup(mod1, .nonmem_version = "nm74"),
+        "Must specify a valid `.nonmem_version`"
       )
 
       # no configuration file found
       expect_error(
-        locate_nmtran(.config_path = file.path(tempdir(), "bbi.yaml")),
+        nmtran_setup(mod1, .config_path = file.path(tempdir(), "bbi.yaml")),
         "No bbi configuration was found at"
       )
+    })
+
+    it("nmtran_setup: NM-TRAN args", {
+      mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
+
+      # Default nmfe_options passed as .bbi_args
+      nmtran_specs <- nmtran_setup(mod1)
+      expect_equal(nmtran_specs$cmd_args, c("0", "0", "2"))
+
+      # Override with .bbi_args
+      nmtran_specs <- nmtran_setup(mod1, .bbi_args = list(maxlim = 3, prdefault = TRUE))
+      expect_equal(nmtran_specs$cmd_args, c("1", "0", "3"))
+
+      # Override with model yaml
+      current_args <- mod1$bbi_args
+      mod1 <- add_bbi_args(mod1, list(maxlim = 3, tprdefault = TRUE))
+      nmtran_specs <- nmtran_setup(mod1, .bbi_args = NULL)
+      expect_equal(nmtran_specs$cmd_args, c("0", "1", "3"))
+      mod1 <- replace_all_bbi_args(mod1, current_args)
+
+      # Override with bbi.yaml
+      # - note: we only look at the `nmfe_options` in bbi.yaml. If these options
+      #   were passed as regular `.bbi_args` (e.g., in a bbi_init() call), they
+      #   would not be picked up.
+      bbi_yaml_path <- get_bbi_yaml_path(mod1)
+      bbi_yaml <- yaml::read_yaml(bbi_yaml_path)
+      bbi_yaml$nmfe_options$maxlim <- 3
+      yaml::write_yaml(bbi_yaml, bbi_yaml_path)
+      nmtran_specs <- nmtran_setup(mod1, .bbi_args = NULL)
+      expect_equal(nmtran_specs$cmd_args, c("0", "0", "3"))
+
+      # Revert back for any other tests
+      bbi_yaml$nmfe_options$maxlim <- 2
+      yaml::write_yaml(bbi_yaml, bbi_yaml_path)
     })
 
     it("execute_nmtran", {
@@ -350,8 +384,8 @@ withr::with_options(list(
       on.exit(fs::dir_delete(nmtran_dir), add = TRUE)
 
       # Copy model file into new model dir
-      fs::file_copy(CTL_TEST_FILE, nmtran_dir, overwrite = TRUE)
-      mod1 <- new_model(file.path(nmtran_dir, "1"), .overwrite = TRUE)
+      fs::file_copy(CTL_TEST_FILE, nmtran_dir)
+      mod1 <- new_model(file.path(nmtran_dir, "1"))
 
       # create new bbi.yaml
       bbi_init(
@@ -361,34 +395,37 @@ withr::with_options(list(
         .bbi_args = list(mpi_exec_path = get_mpiexec_path())
       )
 
-      nmtran_exe <- locate_nmtran(mod1)
+      nmtran_specs <- nmtran_setup(mod1)
+
       nmtran_results <- execute_nmtran(
-        nmtran_exe, mod_path = basename(get_model_path(mod1)), dir = nmtran_dir
+        nmtran_specs$nmtran_exe, mod_path = basename(get_model_path(mod1)),
+        dir = nmtran_dir
       )
 
       # Check attributes
       expect_equal(nmtran_dir, nmtran_results$run_dir)
       expect_equal(nmtran_results$status_val, 0)
-      expect_equal(nmtran_results$status, "NMTRAN successful")
+      expect_equal(nmtran_results$status, "NM-TRAN successful")
 
       # Test failure
       data_path <- "test/this/path/data.csv"
       modify_data_path_ctl(mod1, data_path)
 
       nmtran_results <- execute_nmtran(
-        nmtran_exe, mod_path = basename(get_model_path(mod1)), dir = nmtran_dir
+        nmtran_specs$nmtran_exe, mod_path = basename(get_model_path(mod1)),
+        dir = nmtran_dir
       )
 
       # Check attributes
       expect_equal(nmtran_results$status_val, 4)
-      expect_equal(nmtran_results$status, "NMTRAN failed. See errors.")
+      expect_equal(nmtran_results$status, "NM-TRAN failed. See errors.")
     })
 
     it("run_nmtran: integration", {
       # create model
       mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
 
-      nmtran_results <- run_nmtran(mod1, delete_on_exit = FALSE)
+      nmtran_results <- run_nmtran(mod1, clean = FALSE)
       on.exit(fs::dir_delete(nmtran_results$run_dir))
 
       # Check attributes
@@ -399,7 +436,7 @@ withr::with_options(list(
       )
       expect_equal(nmtran_results$nonmem_version, "nm74gf")
       expect_equal(nmtran_results$status_val, 0)
-      expect_equal(nmtran_results$status, "NMTRAN successful")
+      expect_equal(nmtran_results$status, "NM-TRAN successful")
     })
 
   })

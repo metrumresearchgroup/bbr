@@ -7,8 +7,8 @@
 run_nmtran(
   .mod,
   .bbi_args = list(prdefault = FALSE, tprdefault = FALSE, maxlim = 2),
+  .nonmem_version = NULL,
   .config_path = NULL,
-  nmtran_exe = NULL,
   clean = TRUE
 )
 }
@@ -24,12 +24,12 @@ See \code{\link[=print_bbi_args]{print_bbi_args()}} for more details.}
 default, will attempt to use a \code{bbi.yaml} in the same directory as the
 model.}
 
-\item{nmtran_exe}{Path to an \code{NM-TRAN} executable. If \code{NULL}, will look for a
-\code{bbi.yaml} file in the same directory as the model.}
-
 \item{clean}{Logical. If \code{FALSE}, don't delete the temporary folder
 containing the \code{NM-TRAN} run, which will be stored in the current working
 directory.}
+
+\item{nmtran_exe}{Path to an \code{NM-TRAN} executable. If \code{NULL}, will look for a
+\code{bbi.yaml} file in the same directory as the model.}
 }
 \description{
 Function to run \code{NM-TRAN} on a model object to validate its control stream

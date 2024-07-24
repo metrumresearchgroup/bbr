@@ -39,25 +39,19 @@
 run_nmtran <- function(
     .mod,
     .bbi_args = list(prdefault = FALSE, tprdefault = FALSE, maxlim = 2),
+    .nonmem_version = NULL,
     .config_path = NULL,
-    nmtran_exe = NULL,
     clean = TRUE
 ){
   check_model_object(.mod, "bbi_nonmem_model")
 
-  # Capture NONMEM and NM-TRAN options
-  nmtran_exe <- locate_nmtran(.mod, .config_path, nmtran_exe)
-  nm_ver <- attr(nmtran_exe, "nonmem_version")
-
-  # Combine NONMEM submission args
-  #  - The main ones of interest are prdefault, tprdefault, and maxlim, which
-  # impact the evaluation of `NM-TRAN`
-  cmd_args <- parse_nmtran_args(.mod, .bbi_args = .bbi_args)
+  # Capture NONMEM/NM-TRAN options and format `NM-TRAN` args
+  nmtran_specs <- nmtran_setup(.mod, .nonmem_version, .bbi_args, .config_path)
 
   mod_path <- get_model_path(.mod)
   data_path <- get_data_path_from_ctl(.mod)
 
-  # make temporary directory in current directory
+  # Make temporary directory in current directory
   mod_name <- fs::path_ext_remove(basename(mod_path))
   temp_folder <- withr::local_tempdir(
     pattern = paste0("nmtran-mod_", mod_name, "-"),
@@ -79,12 +73,14 @@ run_nmtran <- function(
   # Run NM-TRAN
   nmtran_results <- c(
     list(
-      nmtran_exe = as.character(nmtran_exe),
-      nonmem_version = nm_ver,
+      nmtran_exe = nmtran_specs$nmtran_exe,
+      nonmem_version = nmtran_specs$nonmem_version,
       absolute_model_path = mod_path
     ),
     execute_nmtran(
-      nmtran_exe, mod_path = basename(mod_path), cmd_args = cmd_args,
+      nmtran_specs$nmtran_exe,
+      mod_path = basename(mod_path),
+      cmd_args = nmtran_specs$cmd_args,
       dir = temp_folder
     )
   )
@@ -95,44 +91,50 @@ run_nmtran <- function(
 }
 
 
-#' Search for and validate existence of an `NM-TRAN` executable
-#'
-#' If `nmtran_exe = NULL`, this will look for a `bbi.yaml` file in the same
-#' directory as the model.
+#' Sets up `NM-TRAN` to run by identifying an `NM-TRAN` executable for a
+#'  provided `NONMEM` version and formatting arguments based on `.bbi_args`,
+#'  the corresponding `.mod` yaml file, and any `nmfe_options` defined in a
+#'  `bbi.yaml` file
 #'
 #' @inheritParams run_nmtran
-#'
 #' @keywords internal
-locate_nmtran <- function(.mod = NULL, .config_path = NULL, nmtran_exe = NULL){
+nmtran_setup <- function(
+    .mod = NULL,
+    .nonmem_version = NULL,
+    .bbi_args = NULL,
+    .config_path = NULL
+){
+  bbi_yaml_path <- get_bbi_yaml_path(.mod, .config_path = .config_path)
+  bbi_yaml <- yaml::read_yaml(bbi_yaml_path)
 
-  if(is.null(nmtran_exe)){
-    if(!is.null(.mod)){
-      check_model_object(.mod, "bbi_nonmem_model")
-      model_dir <- get_model_working_directory(.mod)
-    }
-    config_path <- .config_path %||% file.path(model_dir, "bbi.yaml")
+  # Combine NONMEM submission args
+  #  - The main ones of interest are prdefault, tprdefault, and maxlim, which
+  #    impact the evaluation of `NM-TRAN`
+  #  - Priority: .bbi_args > model yaml > bbi.yaml
+  cmd_args <- parse_nmtran_args(
+    .mod, .bbi_args = .bbi_args, nmfe_options = bbi_yaml$nmfe_options
+  )
 
-    if(!file_exists(config_path)){
-      if(is.null(.config_path)){
-        msg <- c(
-          "No bbi configuration was found in the execution directory.",
-          "i" = "Please run `bbi_init()` with the appropriate directory to continue."
+  # Check nonmem version
+  nm_config <- bbi_yaml$nonmem
+  if (!is.null(.nonmem_version)) {
+    # check for valid version
+    if (!(.nonmem_version %in% names(nm_config))) {
+      rlang::abort(
+        c(
+          "Must specify a valid `.nonmem_version` for bbi_init().",
+          "i" = glue("{bbi_yaml_path} contains the following options:"),
+          glue("`{paste(names(nm_config), collapse='`, `')}`")
         )
-      }else{
-        msg <- glue("No bbi configuration was found at {.config_path}")
-      }
-      rlang::abort(msg)
+      )
     }
-
-    bbi_config <- yaml::read_yaml(config_path)
-    nm_config <- bbi_config$nonmem
-
-    # look for default nonmem installation
+    default_nm <- nm_config[[.nonmem_version]]
+  }else{
+    # Look for default nonmem installation
     default_nm <- purrr::keep(nm_config, function(nm_ver){
       !is.null(nm_ver$default) & isTRUE(nm_ver$default)
     })
 
-    # Set nonmem path
     if(length(default_nm) > 1){
       nm_vers <- paste(names(default_nm), collapse = ", ")
       rlang::abort(
@@ -147,22 +149,21 @@ locate_nmtran <- function(.mod = NULL, .config_path = NULL, nmtran_exe = NULL){
       # If no default, use the last one (likely higher version)
       default_nm <- nm_config[[length(nm_config)]]
     }
-
-    # Set NM-TRAN executable path
-    nm_path <- default_nm$home
-    nmtran_exe <- file.path(nm_path, "tr", "NMTRAN.exe")
-
-    # If executable found via bbi.yaml, append NONMEM version as attribute
-    attr(nmtran_exe, "nonmem_version") <- basename(default_nm$home)
   }
 
-  if(!file_exists(nmtran_exe)){
-    stop(glue("Could not find an NM-TRAN executable at `{nmtran_exe}`"))
-  }
 
-  return(nmtran_exe)
+  # Set NM-TRAN executable path
+  nm_path <- default_nm$home
+  nmtran_exe <- file.path(nm_path, "tr", "NMTRAN.exe")
+
+  return(
+    list(
+      nmtran_exe = nmtran_exe,
+      nonmem_version = basename(default_nm$home),
+      cmd_args = cmd_args
+    )
+  )
 }
-
 
 #' Execute `NM-TRAN` in a given directory
 #'
@@ -211,22 +212,56 @@ execute_nmtran <- function(nmtran_exe, mod_path, cmd_args = NULL, dir = ".") {
 }
 
 
+#' Helper for finding and reading in a `bbi.yaml` file given a `bbi_nonmem_model`
+#' object or explicit `.config_path`.
+#' @inheritParams run_nmtran
+#' @noRd
+get_bbi_yaml_path <- function(.mod = NULL, .config_path = NULL){
+  if(!is.null(.mod)){
+    check_model_object(.mod, "bbi_nonmem_model")
+    model_dir <- get_model_working_directory(.mod)
+  }
+  bbi_yaml_path <- .config_path %||% file.path(model_dir, "bbi.yaml")
+
+  if(!file_exists(bbi_yaml_path)){
+    if(is.null(.config_path)){
+      msg <- c(
+        "No bbi configuration was found in the execution directory.",
+        "i" = "Please run `bbi_init()` with the appropriate directory to continue."
+      )
+    }else{
+      msg <- glue("No bbi configuration was found at {.config_path}")
+    }
+    rlang::abort(msg)
+  }
+
+  return(bbi_yaml_path)
+}
+
+
 #' Parse `.bbi_args` and return the three expected `nmfe_options` for `NM-TRAN`
 #'  in the correct format
 #' @inheritParams run_nmtran
+#' @param nmfe_options named list of nmfe options defined in a `bbi.yaml` file.
 #' @noRd
 parse_nmtran_args <- function(
     .mod,
-    .bbi_args = NULL
+    .bbi_args = NULL,
+    nmfe_options = NULL
 ){
 
   nmfe_args_def <- list(prdefault = FALSE, tprdefault = FALSE, maxlim = 2)
 
-  # Combine with any options stored in yaml
+  # Combine with any options stored in model yaml, preferring .bbi_args
   .nmfe_args <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])
 
-  # Combine with and filter to default nmfe_options
+  # Combine with nmfe options stored in bbi.yaml, preferring .nmfe_args
+  .nmfe_args <- parse_args_list(.nmfe_args, nmfe_options)
+
+  # Check provided args
   check_bbi_args(.nmfe_args)
+
+  # Combine with and filter to default nmfe_options
   .nmfe_args <- parse_args_list(.nmfe_args, nmfe_args_def)
   .nmfe_args <- .nmfe_args[names(nmfe_args_def)]
 
