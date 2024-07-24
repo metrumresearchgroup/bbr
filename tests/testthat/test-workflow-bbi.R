@@ -425,7 +425,8 @@ withr::with_options(list(
       # create model
       mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
 
-      nmtran_results <- run_nmtran(mod1, clean = FALSE)
+      # Run with no presort
+      nmtran_results <- run_nmtran(mod1, .nonmem_version = "nm73gf", clean = FALSE)
       on.exit(fs::dir_delete(nmtran_results$run_dir))
 
       # Check attributes
@@ -434,7 +435,22 @@ withr::with_options(list(
         file.path(nmtran_results$run_dir, basename(get_model_path(mod1))),
         nmtran_results$nmtran_model
       )
-      expect_equal(nmtran_results$nonmem_version, "nm74gf")
+      expect_equal(nmtran_results$nonmem_version, "nm73gf")
+      expect_equal(nmtran_results$status_val, 0)
+      expect_equal(nmtran_results$status, "NM-TRAN successful")
+
+
+      # Run with presort
+      nmtran_results <- run_nmtran(mod1, .nonmem_version = "nm75", clean = FALSE)
+      on.exit(fs::dir_delete(nmtran_results$run_dir))
+
+      # Check attributes
+      expect_equal(get_model_path(mod1), nmtran_results$absolute_model_path)
+      expect_equal(
+        file.path(nmtran_results$run_dir, "tempzzzz1.ctl"),
+        nmtran_results$nmtran_model
+      )
+      expect_equal(nmtran_results$nonmem_version, "nm75")
       expect_equal(nmtran_results$status_val, 0)
       expect_equal(nmtran_results$status, "NM-TRAN successful")
     })

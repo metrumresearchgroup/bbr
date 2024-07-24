@@ -4,7 +4,7 @@
 \alias{execute_nmtran}
 \title{Execute \code{NM-TRAN} in a given directory}
 \usage{
-execute_nmtran(nmtran_exe, mod_path, cmd_args = NULL, dir = ".")
+execute_nmtran(nmtran_exe, mod_path, cmd_args = c("0", "0", "2"), dir = ".")
 }
 \arguments{
 \item{nmtran_exe}{Path to \code{NM-TRAN} executable.}
@@ -17,6 +17,7 @@ execution call}
 \item{dir}{Directory in which to execute the command.}
 }
 \description{
-Execute \code{NM-TRAN} in a given directory
+Execute \code{NM-TRAN} in a given directory. Also runs \code{nmtran_presort} if an
+executable is found.
 }
 \keyword{internal}

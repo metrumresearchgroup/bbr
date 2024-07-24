@@ -17,6 +17,10 @@ nmtran_setup(
 \arguments{
 \item{.mod}{A \code{bbi_nonmem_model} object.}
 
+\item{.nonmem_version}{Character scalar for default version of NONMEM to use.
+If left \code{NULL}, will look for the default version specified in the provided
+\code{bbi} configuration file.}
+
 \item{.bbi_args}{A named list specifying arguments to pass to \code{NM-TRAN}.
 Similar to the \code{.bbi_args} argument defined in \code{\link[=submit_model]{submit_model()}}, though here
 only \code{prdefault}, \code{tprdefault}, and \code{maxlim} flags are passed to \code{NM-TRAN}.

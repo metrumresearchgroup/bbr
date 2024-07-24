@@ -20,6 +20,10 @@ Similar to the \code{.bbi_args} argument defined in \code{\link[=submit_model]{s
 only \code{prdefault}, \code{tprdefault}, and \code{maxlim} flags are passed to \code{NM-TRAN}.
 See \code{\link[=print_bbi_args]{print_bbi_args()}} for more details.}
 
+\item{.nonmem_version}{Character scalar for default version of NONMEM to use.
+If left \code{NULL}, will look for the default version specified in the provided
+\code{bbi} configuration file.}
+
 \item{.config_path}{Path to a bbi configuration file. If \code{NULL}, the
 default, will attempt to use a \code{bbi.yaml} in the same directory as the
 model.}
@@ -27,9 +31,6 @@ model.}
 \item{clean}{Logical. If \code{FALSE}, don't delete the temporary folder
 containing the \code{NM-TRAN} run, which will be stored in the current working
 directory.}
-
-\item{nmtran_exe}{Path to an \code{NM-TRAN} executable. If \code{NULL}, will look for a
-\code{bbi.yaml} file in the same directory as the model.}
 }
 \description{
 Function to run \code{NM-TRAN} on a model object to validate its control stream

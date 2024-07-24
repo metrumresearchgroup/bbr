@@ -19,8 +19,9 @@
 #'   only `prdefault`, `tprdefault`, and `maxlim` flags are passed to `NM-TRAN`.
 #'   See [print_bbi_args()] for more details.
 #' @inheritParams submit_model
-#' @param nmtran_exe Path to an `NM-TRAN` executable. If `NULL`, will look for a
-#'   `bbi.yaml` file in the same directory as the model.
+#' @param .nonmem_version Character scalar for default version of NONMEM to use.
+#'   If left `NULL`, will look for the default version specified in the provided
+#'   `bbi` configuration file.
 #' @param clean Logical. If `FALSE`, don't delete the temporary folder
 #'   containing the `NM-TRAN` run, which will be stored in the current working
 #'   directory.
@@ -167,6 +168,9 @@ nmtran_setup <- function(
 
 #' Execute `NM-TRAN` in a given directory
 #'
+#' Execute `NM-TRAN` in a given directory. Also runs `nmtran_presort` if an
+#' executable is found.
+#'
 #' @param nmtran_exe Path to `NM-TRAN` executable.
 #' @param mod_path Path of a model to evaluate. Should be relative to `dir`.
 #' @param cmd_args A character vector of command line arguments for the `NM-TRAN`
@@ -174,16 +178,48 @@ nmtran_setup <- function(
 #' @param dir Directory in which to execute the command.
 #'
 #' @keywords internal
-execute_nmtran <- function(nmtran_exe, mod_path, cmd_args = NULL, dir = ".") {
+execute_nmtran <- function(
+    nmtran_exe,
+    mod_path,
+    cmd_args = c("0", "0", "2"),
+    dir = "."
+){
   checkmate::assert_directory_exists(dir)
+  checkmate::assert_character(cmd_args, len = 3)
+
   run_dir <- as.character(fs::path_real(dir))
 
-  cmd_args <- if(is.null(cmd_args)) character() else cmd_args
+  # Check if nmtran_presort exists
+  presort_dir <- file.path(dirname(dirname(nmtran_exe)), "util")
+  nmtran_presort_exe <- file.path(presort_dir, "nmtran_presort")
+  run_presort <- unname(fs::file_exists(nmtran_presort_exe))
 
-  # Store standard output and standard error in the same file
+  # Preprocess with nmtran_presort
+  if(run_presort){
+    presort.p <- processx::process$new(
+      command = nmtran_presort_exe, wd = run_dir, args = character(),
+      stdout = "|", stderr = "2>&1", stdin = file.path(run_dir, mod_path)
+    )
+
+    presort.p$wait()
+    presort_output <- presort.p$read_all_output()
+
+    presort_status_val <- presort.p$get_exit_status()
+    if(is.na(presort_status_val)){
+      rlang::abort("nmtran_presort terminated unexpectedly")
+    } else if(presort_status_val != 0) {
+      rlang::abort("nmtran_presort failed. See errors.")
+    }
+
+    # Write the output to tempzzzz1 control stream
+    writeLines(presort_output, con = file.path(run_dir, "tempzzzz1.ctl"))
+  }
+
+  # Run NM-TRAN
+  stdin_file <- ifelse(run_presort, "tempzzzz1.ctl", mod_path)
   nmtran.p <- processx::process$new(
     command = nmtran_exe, wd = run_dir, args = cmd_args,
-    stdout = "|", stderr="2>&1", stdin = file.path(run_dir, mod_path)
+    stdout = "|", stderr="2>&1", stdin = file.path(run_dir, stdin_file)
   )
 
   # Wait till finished for status to be reflective of result
@@ -192,7 +228,7 @@ execute_nmtran <- function(nmtran_exe, mod_path, cmd_args = NULL, dir = ".") {
   # Assign status
   status_val <- nmtran.p$get_exit_status()
   if(is.na(status_val)){
-    rlang::abort("NM-TRAN terminated")
+    rlang::abort("NM-TRAN terminated unexpectedly")
   }else if(status_val == 0){
     status <- "NM-TRAN successful"
   }else{
