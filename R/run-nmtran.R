@@ -1,8 +1,9 @@
 #' Interface for running `NM-TRAN` on model objects
 #'
-#' Function to run `NM-TRAN` on model objects for validation. The `NM-TRAN`
-#'  dataset (`FDATA`) and other `NONMEM` artifacts can be further inspected by
-#'  keeping the run directory around.
+#' Function to run `NM-TRAN` on a model object to validate its control stream
+#'  for correct coding before submission. The `NM-TRAN` dataset (`FDATA`) and
+#'  other `NONMEM` artifacts can be further inspected by keeping the run directory
+#'  around.
 #'
 #' @details
 #' `NM-TRAN` is a preprocessor for `NONMEM` that translates user-specified
@@ -20,7 +21,7 @@
 #' @inheritParams submit_model
 #' @param nmtran_exe Path to an `NM-TRAN` executable. If `NULL`, will look for a
 #'   `bbi.yaml` file in the same directory as the model.
-#' @param delete_on_exit Logical. If `FALSE`, don't delete the temporary folder
+#' @param clean Logical. If `FALSE`, don't delete the temporary folder
 #'   containing the `NM-TRAN` run, which will be stored in the current working
 #'   directory.
 #'
@@ -33,19 +34,14 @@
 #' run_nmtran(mod, nmtran_exe = "/opt/NONMEM/nm75/tr/NMTRAN.exe")
 #'
 #' }
-#' @name nmtran
-NULL
-
-
-#' @describeIn nmtran Run `NM-TRAN` on a model object to validate its control
-#' stream for correct coding before submission.
+#'
 #' @export
 run_nmtran <- function(
     .mod,
     .bbi_args = list(prdefault = FALSE, tprdefault = FALSE, maxlim = 2),
     .config_path = NULL,
     nmtran_exe = NULL,
-    delete_on_exit = TRUE
+    clean = TRUE
 ){
   check_model_object(.mod, "bbi_nonmem_model")
 
@@ -63,21 +59,19 @@ run_nmtran <- function(
 
   # make temporary directory in current directory
   mod_name <- fs::path_ext_remove(basename(mod_path))
-  temp_folder <- paste0("nmtran_", mod_name, "_", basename(tempdir()))
-  if(fs::dir_exists(temp_folder)) fs::dir_delete(temp_folder)
-  fs::dir_create(temp_folder)
-  if(isTRUE(delete_on_exit)){
-    on.exit(unlink(temp_folder, recursive = TRUE, force = TRUE))
-  }
+  temp_folder <- withr::local_tempdir(
+    pattern = paste0("nmtran-mod_", mod_name, "-"),
+    tmpdir = getwd(), clean = clean
+  )
 
   # Copy model
-  file.copy(mod_path, temp_folder, overwrite = TRUE)
-  nmtran_mod <- new_model(file.path(temp_folder, basename(mod_path)), .overwrite = TRUE)
+  file.copy(mod_path, temp_folder)
+  nmtran_mod <- new_model(file.path(temp_folder, basename(mod_path)))
 
   # Copy dataset & overwrite $DATA record of new model
   # NM-TRAN will error if data cannot be found
   if(fs::file_exists(data_path)){
-    file.copy(data_path, temp_folder, overwrite = TRUE)
+    file.copy(data_path, temp_folder)
     # overwrite $DATA record of new model
     modify_data_path_ctl(nmtran_mod, data_path = basename(data_path))
   }
@@ -135,11 +129,19 @@ locate_nmtran <- function(.mod = NULL, .config_path = NULL, nmtran_exe = NULL){
 
     # look for default nonmem installation
     default_nm <- purrr::keep(nm_config, function(nm_ver){
-      !is.null(nm_ver$default)
+      !is.null(nm_ver$default) & isTRUE(nm_ver$default)
     })
 
     # Set nonmem path
-    if(length(default_nm) > 0){
+    if(length(default_nm) > 1){
+      nm_vers <- paste(names(default_nm), collapse = ", ")
+      rlang::abort(
+        c(
+          glue("Found multiple default NONMEM versions ({nm_vers}) at `{config_path}`"),
+          "i" = "Please ensure only one version is set to the default"
+        )
+      )
+    }else if(length(default_nm) == 1){
       default_nm <- default_nm[[1]]
     }else{
       # If no default, use the last one (likely higher version)
