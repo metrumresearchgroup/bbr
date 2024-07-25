@@ -481,10 +481,14 @@ print.nmtran_process <- function(x, ...){
     c(
       "*" = "NM-TRAN Executable: {.path {x[['nmtran_exe']]}}",
       "*" = "nmtran_presort: {cli::col_cyan(!is.null(x[['nmtran_presort_exe']]))}",
-      "*" = "NONMEM Version: {.val {nm_version}}",
-      "*" = "Run Directory: {.path {x[['run_dir']]}}"
+      "*" = "NONMEM Version: {.val {nm_version}}"
     )
   )
+
+  # Print run directory if it still exists (clean = FALSE)
+  if(fs::dir_exists(x[['run_dir']])){
+    cli::cli_bullets(c("*" = "Run Directory: {.path {x[['run_dir']]}}"))
+  }
 
   if (is_valid_print(x[["output_lines"]])) {
     heading('Standard Output')

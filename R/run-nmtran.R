@@ -211,45 +211,41 @@ execute_nmtran <- function(
 
   # Preprocess with nmtran_presort
   if(run_presort){
-    presort.p <- processx::process$new(
+    presort.p <- processx::run(
       command = nmtran_presort_exe, wd = run_dir, args = character(),
-      stdout = "|", stderr = "2>&1", stdin = file.path(run_dir, mod_path)
+      stdout = "|", stdin = file.path(run_dir, mod_path),
+      stderr_to_stdout = TRUE, error_on_status = FALSE
     )
 
-    presort.p$wait()
-    presort_output <- presort.p$read_all_output()
-
-    presort_status_val <- presort.p$get_exit_status()
+    presort_status_val <- presort.p$status
     if(is.na(presort_status_val)){
       rlang::abort("nmtran_presort terminated unexpectedly")
     }else if(presort_status_val != 0){
       return(
         list(
-          nmtran_model = presort.p$get_input_file(),
+          nmtran_model = file.path(run_dir, mod_path),
           run_dir = run_dir,
           status = "nmtran_presort failed. See errors.",
           status_val = presort_status_val,
-          output_lines = presort_output
+          output_lines = presort.p$stdout
         )
       )
     }
 
     # Write the output to tempzzzz1 control stream
-    writeLines(presort_output, con = file.path(run_dir, "tempzzzz1.ctl"))
+    writeLines(presort.p$stdout, con = file.path(run_dir, "tempzzzz1.ctl"))
   }
 
   # Run NM-TRAN
   stdin_file <- ifelse(run_presort, "tempzzzz1.ctl", mod_path)
-  nmtran.p <- processx::process$new(
+  nmtran.p <- processx::run(
     command = nmtran_exe, wd = run_dir, args = cmd_args,
-    stdout = "|", stderr="2>&1", stdin = file.path(run_dir, stdin_file)
+    stdout = "|", stdin = file.path(run_dir, stdin_file),
+    stderr_to_stdout = TRUE, error_on_status = FALSE
   )
 
-  # Wait till finished for status to be reflective of result
-  nmtran.p$wait()
-
   # Assign status
-  status_val <- nmtran.p$get_exit_status()
+  status_val <- nmtran.p$status
   if(is.na(status_val)){
     rlang::abort("NM-TRAN terminated unexpectedly")
   }else if(status_val == 0){
@@ -260,11 +256,11 @@ execute_nmtran <- function(
 
   # Tabulate NM-TRAN results
   nmtran_results <- list(
-    nmtran_model = nmtran.p$get_input_file(),
+    nmtran_model = stdin_file,
     run_dir = run_dir,
     status = status,
     status_val = status_val,
-    output_lines = nmtran.p$read_all_output_lines()
+    output_lines = nmtran.p$stdout
   )
 
   return(nmtran_results)
