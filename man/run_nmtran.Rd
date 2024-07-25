@@ -9,6 +9,7 @@ run_nmtran(
   .bbi_args = list(prdefault = FALSE, tprdefault = FALSE, maxlim = 2),
   .nonmem_version = NULL,
   .config_path = NULL,
+  run_dir = tempdir(),
   clean = TRUE
 )
 }
@@ -28,7 +29,9 @@ If left \code{NULL}, will look for the default version specified in the provided
 default, will attempt to use a \code{bbi.yaml} in the same directory as the
 model.}
 
-\item{clean}{Logical. If \code{FALSE}, don't delete the temporary folder
+\item{run_dir}{Directory to run \code{NM-TRAN} in. Only relevant if \code{clean = FALSE}.}
+
+\item{clean}{Logical (\code{T}/\code{F}). If \code{FALSE}, don't delete the temporary folder
 containing the \code{NM-TRAN} run, which will be stored in the current working
 directory.}
 }
@@ -42,16 +45,23 @@ around.
 \code{NM-TRAN} is a preprocessor for \code{NONMEM} that translates user-specified
 control stream data and instructions into a form executable by \code{NONMEM}.
 
-\code{run_nmtran()} allows users to test their models ahead of submission to ensure
-correct coding.
+Note that \code{nmtran_presort} is run ahead of \code{NM-TRAN} for \code{NONMEM} versions
+\code{'nm74gf'}, \code{'nm74gf_nmfe'}, and \code{'nm75'}.
+\itemize{
+\item \code{nmtran_presort} is an supplementary utility that preprocesses the control
+stream to ensure it is in the correct format for \code{NM-TRAN}. It is particularly
+relevant for handling specific data manipulations and ensuring compatibility
+with the \code{NM-TRAN} executable.
+}
 }
 \examples{
 \dontrun{
-mod <- read_model(file.path(MODEL_DIR, 1))
-run_nmtran(mod)
 
-# Set the path to an NM-TRAN executable
-run_nmtran(mod, nmtran_exe = "/opt/NONMEM/nm75/tr/NMTRAN.exe")
+mod <- read_model(file.path(MODEL_DIR, 1))
+run_nmtran(mod, .nonmem_version = "nm75")
+
+# Save the run directory for manual inspection
+run_nmtran(mod, clean = FALSE, run_dir = getwd())
 
 }
 

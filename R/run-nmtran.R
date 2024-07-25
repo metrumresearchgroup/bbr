@@ -9,9 +9,12 @@
 #' `NM-TRAN` is a preprocessor for `NONMEM` that translates user-specified
 #' control stream data and instructions into a form executable by `NONMEM`.
 #'
-#' `run_nmtran()` allows users to test their models ahead of submission to ensure
-#' correct coding.
-#'
+#' Note that `nmtran_presort` is run ahead of `NM-TRAN` for `NONMEM` versions
+#' `'nm74gf'`, `'nm74gf_nmfe'`, and `'nm75'`.
+#'  - `nmtran_presort` is an supplementary utility that preprocesses the control
+#'     stream to ensure it is in the correct format for `NM-TRAN`. It is particularly
+#'     relevant for handling specific data manipulations and ensuring compatibility
+#'     with the `NM-TRAN` executable.
 #'
 #' @param .mod A `bbi_nonmem_model` object.
 #' @param .bbi_args A named list specifying arguments to pass to `NM-TRAN`.
@@ -22,17 +25,19 @@
 #' @param .nonmem_version Character scalar for default version of NONMEM to use.
 #'   If left `NULL`, will look for the default version specified in the provided
 #'   `bbi` configuration file.
-#' @param clean Logical. If `FALSE`, don't delete the temporary folder
+#' @param clean Logical (`T`/`F`). If `FALSE`, don't delete the temporary folder
 #'   containing the `NM-TRAN` run, which will be stored in the current working
 #'   directory.
+#' @param run_dir Directory to run `NM-TRAN` in. Only relevant if `clean = FALSE`.
 #'
 #' @examples
 #' \dontrun{
-#' mod <- read_model(file.path(MODEL_DIR, 1))
-#' run_nmtran(mod)
 #'
-#' # Set the path to an NM-TRAN executable
-#' run_nmtran(mod, nmtran_exe = "/opt/NONMEM/nm75/tr/NMTRAN.exe")
+#' mod <- read_model(file.path(MODEL_DIR, 1))
+#' run_nmtran(mod, .nonmem_version = "nm75")
+#'
+#' # Save the run directory for manual inspection
+#' run_nmtran(mod, clean = FALSE, run_dir = getwd())
 #'
 #' }
 #'
@@ -42,6 +47,7 @@ run_nmtran <- function(
     .bbi_args = list(prdefault = FALSE, tprdefault = FALSE, maxlim = 2),
     .nonmem_version = NULL,
     .config_path = NULL,
+    run_dir = tempdir(),
     clean = TRUE
 ){
   check_model_object(.mod, "bbi_nonmem_model")
@@ -56,7 +62,7 @@ run_nmtran <- function(
   mod_name <- fs::path_ext_remove(basename(mod_path))
   temp_folder <- withr::local_tempdir(
     pattern = paste0("nmtran-mod_", mod_name, "-"),
-    tmpdir = getwd(), clean = clean
+    tmpdir = run_dir, clean = clean
   )
 
   # Copy model
@@ -75,6 +81,7 @@ run_nmtran <- function(
   nmtran_results <- c(
     list(
       nmtran_exe = nmtran_specs$nmtran_exe,
+      nmtran_presort_exe = nmtran_specs$nmtran_presort_exe,
       nonmem_version = nmtran_specs$nonmem_version,
       absolute_model_path = mod_path
     ),
@@ -82,6 +89,7 @@ run_nmtran <- function(
       nmtran_specs$nmtran_exe,
       mod_path = basename(mod_path),
       cmd_args = nmtran_specs$cmd_args,
+      nmtran_presort_exe = nmtran_specs$nmtran_presort_exe,
       dir = temp_folder
     )
   )
@@ -123,7 +131,7 @@ nmtran_setup <- function(
     if (!(.nonmem_version %in% names(nm_config))) {
       rlang::abort(
         c(
-          "Must specify a valid `.nonmem_version` for bbi_init().",
+          "Must specify a valid `.nonmem_version` for run_nmtran.",
           "i" = glue("{bbi_yaml_path} contains the following options:"),
           glue("`{paste(names(nm_config), collapse='`, `')}`")
         )
@@ -152,16 +160,21 @@ nmtran_setup <- function(
     }
   }
 
-
   # Set NM-TRAN executable path
   nm_path <- default_nm$home
   nmtran_exe <- file.path(nm_path, "tr", "NMTRAN.exe")
+
+  # Check if nmtran_presort exists
+  presort_dir <- file.path(dirname(dirname(nmtran_exe)), "util")
+  nmtran_presort_exe <- file.path(presort_dir, "nmtran_presort")
+  run_presort <- unname(fs::file_exists(nmtran_presort_exe))
 
   return(
     list(
       nmtran_exe = nmtran_exe,
       nonmem_version = basename(default_nm$home),
-      cmd_args = cmd_args
+      cmd_args = cmd_args,
+      nmtran_presort_exe = if(run_presort) nmtran_presort_exe else NULL
     )
   )
 }
@@ -175,6 +188,9 @@ nmtran_setup <- function(
 #' @param mod_path Path of a model to evaluate. Should be relative to `dir`.
 #' @param cmd_args A character vector of command line arguments for the `NM-TRAN`
 #'  execution call
+#' @param nmtran_presort_exe Path to `nmtran_presort` executable. Only available
+#' for `NONMEM` versions `nm74gf`, `nm74gf_nmfe`, and `nm75`. If provided, will run
+#' `nmtran_presort` before running `NM-TRAN`. Set to `NULL` to skip this step.
 #' @param dir Directory in which to execute the command.
 #'
 #' @keywords internal
@@ -182,6 +198,7 @@ execute_nmtran <- function(
     nmtran_exe,
     mod_path,
     cmd_args = c("0", "0", "2"),
+    nmtran_presort_exe = NULL,
     dir = "."
 ){
   checkmate::assert_directory_exists(dir)
@@ -190,9 +207,7 @@ execute_nmtran <- function(
   run_dir <- as.character(fs::path_real(dir))
 
   # Check if nmtran_presort exists
-  presort_dir <- file.path(dirname(dirname(nmtran_exe)), "util")
-  nmtran_presort_exe <- file.path(presort_dir, "nmtran_presort")
-  run_presort <- unname(fs::file_exists(nmtran_presort_exe))
+  run_presort <- !is.null(nmtran_presort_exe)
 
   # Preprocess with nmtran_presort
   if(run_presort){
@@ -207,8 +222,16 @@ execute_nmtran <- function(
     presort_status_val <- presort.p$get_exit_status()
     if(is.na(presort_status_val)){
       rlang::abort("nmtran_presort terminated unexpectedly")
-    } else if(presort_status_val != 0) {
-      rlang::abort("nmtran_presort failed. See errors.")
+    }else if(presort_status_val != 0){
+      return(
+        list(
+          nmtran_model = presort.p$get_input_file(),
+          run_dir = run_dir,
+          status = "nmtran_presort failed. See errors.",
+          status_val = presort_status_val,
+          output_lines = presort_output
+        )
+      )
     }
 
     # Write the output to tempzzzz1 control stream

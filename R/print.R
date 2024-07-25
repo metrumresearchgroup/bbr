@@ -470,7 +470,7 @@ print.nmtran_process <- function(x, ...){
   nm_version <- x[["nonmem_version"]]
   if(is.null(nm_version)) nm_version <- "unknown"
 
-  heading('Status')
+  heading(cli::col_magenta("NM-TRAN Status"))
   subheading(status)
 
   heading("Absolute Model Path")
@@ -480,6 +480,7 @@ print.nmtran_process <- function(x, ...){
   cli::cli_bullets(
     c(
       "*" = "NM-TRAN Executable: {.path {x[['nmtran_exe']]}}",
+      "*" = "nmtran_presort: {cli::col_cyan(!is.null(x[['nmtran_presort_exe']]))}",
       "*" = "NONMEM Version: {.val {nm_version}}",
       "*" = "Run Directory: {.path {x[['run_dir']]}}"
     )

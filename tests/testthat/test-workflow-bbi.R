@@ -438,6 +438,7 @@ withr::with_options(list(
       expect_equal(nmtran_results$nonmem_version, "nm73gf")
       expect_equal(nmtran_results$status_val, 0)
       expect_equal(nmtran_results$status, "NM-TRAN successful")
+      expect_true(is.null(nmtran_results$nmtran_presort_exe))
 
 
       # Run with presort
@@ -453,6 +454,8 @@ withr::with_options(list(
       expect_equal(nmtran_results$nonmem_version, "nm75")
       expect_equal(nmtran_results$status_val, 0)
       expect_equal(nmtran_results$status, "NM-TRAN successful")
+      expect_false(is.null(nmtran_results$nmtran_presort_exe))
+      expect_true(fs::file_exists(nmtran_results$nmtran_presort_exe))
     })
 
   })

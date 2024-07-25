@@ -4,7 +4,13 @@
 \alias{execute_nmtran}
 \title{Execute \code{NM-TRAN} in a given directory}
 \usage{
-execute_nmtran(nmtran_exe, mod_path, cmd_args = c("0", "0", "2"), dir = ".")
+execute_nmtran(
+  nmtran_exe,
+  mod_path,
+  cmd_args = c("0", "0", "2"),
+  nmtran_presort_exe = NULL,
+  dir = "."
+)
 }
 \arguments{
 \item{nmtran_exe}{Path to \code{NM-TRAN} executable.}
@@ -13,6 +19,10 @@ execute_nmtran(nmtran_exe, mod_path, cmd_args = c("0", "0", "2"), dir = ".")
 
 \item{cmd_args}{A character vector of command line arguments for the \code{NM-TRAN}
 execution call}
+
+\item{nmtran_presort_exe}{Path to \code{nmtran_presort} executable. Only available
+for \code{NONMEM} versions \code{nm74gf}, \code{nm74gf_nmfe}, and \code{nm75}. If provided, will run
+\code{nmtran_presort} before running \code{NM-TRAN}. Set to \code{NULL} to skip this step.}
 
 \item{dir}{Directory in which to execute the command.}
 }
