@@ -8,23 +8,24 @@ the corresponding \code{.mod} yaml file, and any \code{nmfe_options} defined in 
 \code{bbi.yaml} file}
 \usage{
 nmtran_setup(
-  .mod = NULL,
-  .nonmem_version = NULL,
+  .mod,
   .bbi_args = NULL,
+  .nonmem_version = .bbi_args[["nm_version"]],
   .config_path = NULL
 )
 }
 \arguments{
 \item{.mod}{A \code{bbi_nonmem_model} object.}
 
+\item{.bbi_args}{A named list specifying arguments to pass to \code{NM-TRAN}.
+Similar to the \code{.bbi_args} argument defined in \code{\link[=submit_model]{submit_model()}}, though here
+only \code{prdefault}, \code{tprdefault}, and \code{maxlim} arguments are passed to \code{NM-TRAN}.
+\code{nm_version} is also supported and specifies which \code{NM-TRAN} executable to use.
+See \code{\link[=print_bbi_args]{print_bbi_args()}} for more details.}
+
 \item{.nonmem_version}{Character scalar for default version of NONMEM to use.
 If left \code{NULL}, will look for the default version specified in the provided
 \code{bbi} configuration file.}
-
-\item{.bbi_args}{A named list specifying arguments to pass to \code{NM-TRAN}.
-Similar to the \code{.bbi_args} argument defined in \code{\link[=submit_model]{submit_model()}}, though here
-only \code{prdefault}, \code{tprdefault}, and \code{maxlim} flags are passed to \code{NM-TRAN}.
-See \code{\link[=print_bbi_args]{print_bbi_args()}} for more details.}
 
 \item{.config_path}{Path to a bbi configuration file. If \code{NULL}, the
 default, will attempt to use a \code{bbi.yaml} in the same directory as the

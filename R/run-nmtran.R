@@ -9,43 +9,37 @@
 #' `NM-TRAN` is a preprocessor for `NONMEM` that translates user-specified
 #' control stream data and instructions into a form executable by `NONMEM`.
 #'
-#' Note that `nmtran_presort` is run ahead of `NM-TRAN` for `NONMEM` versions
-#' `'nm74gf'`, `'nm74gf_nmfe'`, and `'nm75'`.
-#'  - `nmtran_presort` is an supplementary utility that preprocesses the control
-#'     stream to ensure it is in the correct format for `NM-TRAN`. It is particularly
-#'     relevant for handling specific data manipulations and ensuring compatibility
-#'     with the `NM-TRAN` executable.
+#' Note that `nmtran_presort` is run ahead of `NM-TRAN` for `NONMEM 7.4` and later
+#'  - `nmtran_presort` is a supplementary utility that preprocesses the control
+#'     stream to ensure it is in the correct format for `NM-TRAN`.
 #'
 #' @param .mod A `bbi_nonmem_model` object.
 #' @param .bbi_args A named list specifying arguments to pass to `NM-TRAN`.
 #'   Similar to the `.bbi_args` argument defined in [submit_model()], though here
-#'   only `prdefault`, `tprdefault`, and `maxlim` flags are passed to `NM-TRAN`.
+#'   only `prdefault`, `tprdefault`, and `maxlim` arguments are passed to `NM-TRAN`.
+#'   `nm_version` is also supported and specifies which `NM-TRAN` executable to use.
 #'   See [print_bbi_args()] for more details.
 #' @inheritParams submit_model
-#' @param .nonmem_version Character scalar for default version of NONMEM to use.
-#'   If left `NULL`, will look for the default version specified in the provided
-#'   `bbi` configuration file.
-#' @param clean Logical (`T`/`F`). If `FALSE`, don't delete the temporary folder
-#'   containing the `NM-TRAN` run, which will be stored in the current working
-#'   directory.
+#' @param clean Logical (`T`/`F`). If `FALSE`, don't delete the temporary directory
+#'   containing the `NM-TRAN` run.
 #' @param run_dir Directory to run `NM-TRAN` in. Only relevant if `clean = FALSE`.
 #'
 #' @examples
 #' \dontrun{
 #'
 #' mod <- read_model(file.path(MODEL_DIR, 1))
-#' run_nmtran(mod, .nonmem_version = "nm75")
+#' run_nmtran(mod, .bbi_args = list(nm_version = "nm74gf"))
 #'
 #' # Save the run directory for manual inspection
 #' run_nmtran(mod, clean = FALSE, run_dir = getwd())
 #'
 #' }
 #'
+#' @return An S3 object of class `nmtran_process`
 #' @export
 run_nmtran <- function(
     .mod,
-    .bbi_args = list(prdefault = FALSE, tprdefault = FALSE, maxlim = 2),
-    .nonmem_version = NULL,
+    .bbi_args = NULL,
     .config_path = NULL,
     run_dir = tempdir(),
     clean = TRUE
@@ -53,42 +47,49 @@ run_nmtran <- function(
   check_model_object(.mod, "bbi_nonmem_model")
 
   # Capture NONMEM/NM-TRAN options and format `NM-TRAN` args
-  nmtran_specs <- nmtran_setup(.mod, .nonmem_version, .bbi_args, .config_path)
+  nmtran_specs <- nmtran_setup(
+    .mod, .bbi_args = .bbi_args, .config_path = .config_path
+  )
 
   mod_path <- get_model_path(.mod)
   data_path <- get_data_path_from_ctl(.mod)
 
-  # Make temporary directory in current directory
-  mod_name <- fs::path_ext_remove(basename(mod_path))
+  # NM-TRAN run directory
   temp_folder <- withr::local_tempdir(
-    pattern = paste0("nmtran-mod_", mod_name, "-"),
+    pattern = paste0("nmtran-mod_", get_model_id(.mod), "-"),
     tmpdir = run_dir, clean = clean
   )
 
   # Copy model
-  file.copy(mod_path, temp_folder)
+  fs::file_copy(mod_path, temp_folder)
   nmtran_mod <- new_model(file.path(temp_folder, basename(mod_path)))
 
   # Copy dataset & overwrite $DATA record of new model
   # NM-TRAN will error if data cannot be found
   if(fs::file_exists(data_path)){
-    file.copy(data_path, temp_folder)
+    new_data_path <- file.path(temp_folder, "data.csv")
+    fs::file_copy(data_path, new_data_path)
     # overwrite $DATA record of new model
-    modify_data_path_ctl(nmtran_mod, data_path = basename(data_path))
+    modify_data_path_ctl(nmtran_mod, data_path = basename(new_data_path))
+  }else{
+    rlang::abort(
+      glue("Could not find data at `{data_path}`")
+    )
   }
 
   # Run NM-TRAN
   nmtran_results <- c(
     list(
+      nonmem_version = nmtran_specs$nonmem_version,
       nmtran_exe = nmtran_specs$nmtran_exe,
       nmtran_presort_exe = nmtran_specs$nmtran_presort_exe,
-      nonmem_version = nmtran_specs$nonmem_version,
-      absolute_model_path = mod_path
+      absolute_model_path = mod_path,
+      args = nmtran_specs$cmd_args
     ),
     execute_nmtran(
       nmtran_specs$nmtran_exe,
-      mod_path = basename(mod_path),
-      cmd_args = nmtran_specs$cmd_args,
+      mod_path = mod_path,
+      cmd_args = unname(nmtran_specs$cmd_args),
       nmtran_presort_exe = nmtran_specs$nmtran_presort_exe,
       dir = temp_folder
     )
@@ -106,11 +107,15 @@ run_nmtran <- function(
 #'  `bbi.yaml` file
 #'
 #' @inheritParams run_nmtran
+#' @param .nonmem_version Character scalar for default version of NONMEM to use.
+#'   If left `NULL`, will look for the default version specified in the provided
+#'   `bbi` configuration file.
+#'
 #' @keywords internal
 nmtran_setup <- function(
-    .mod = NULL,
-    .nonmem_version = NULL,
+    .mod,
     .bbi_args = NULL,
+    .nonmem_version = .bbi_args[["nm_version"]],
     .config_path = NULL
 ){
   bbi_yaml_path <- get_bbi_yaml_path(.mod, .config_path = .config_path)
@@ -141,7 +146,7 @@ nmtran_setup <- function(
   }else{
     # Look for default nonmem installation
     default_nm <- purrr::keep(nm_config, function(nm_ver){
-      !is.null(nm_ver$default) & isTRUE(nm_ver$default)
+      !is.null(nm_ver$default) && isTRUE(nm_ver$default)
     })
 
     if(length(default_nm) > 1){
@@ -165,14 +170,13 @@ nmtran_setup <- function(
   nmtran_exe <- file.path(nm_path, "tr", "NMTRAN.exe")
 
   # Check if nmtran_presort exists
-  presort_dir <- file.path(dirname(dirname(nmtran_exe)), "util")
-  nmtran_presort_exe <- file.path(presort_dir, "nmtran_presort")
+  nmtran_presort_exe <- file.path(nm_path, "util", "nmtran_presort")
   run_presort <- unname(fs::file_exists(nmtran_presort_exe))
 
   return(
     list(
       nmtran_exe = nmtran_exe,
-      nonmem_version = basename(default_nm$home),
+      nonmem_version = basename(nm_path),
       cmd_args = cmd_args,
       nmtran_presort_exe = if(run_presort) nmtran_presort_exe else NULL
     )
@@ -185,7 +189,8 @@ nmtran_setup <- function(
 #' executable is found.
 #'
 #' @param nmtran_exe Path to `NM-TRAN` executable.
-#' @param mod_path Path of a model to evaluate. Should be relative to `dir`.
+#' @param mod_path Path of a model to evaluate. Should be relative to `dir`. Nested
+#'  directories not supported.
 #' @param cmd_args A character vector of command line arguments for the `NM-TRAN`
 #'  execution call
 #' @param nmtran_presort_exe Path to `nmtran_presort` executable. Only available
@@ -205,43 +210,33 @@ execute_nmtran <- function(
   checkmate::assert_character(cmd_args, len = 3)
 
   run_dir <- as.character(fs::path_real(dir))
-
-  # Check if nmtran_presort exists
-  run_presort <- !is.null(nmtran_presort_exe)
+  nmtran_input <- mod_path_new <- file.path(run_dir, basename(mod_path))
 
   # Preprocess with nmtran_presort
-  if(run_presort){
-    presort.p <- processx::run(
-      command = nmtran_presort_exe, wd = run_dir, args = character(),
-      stdout = "|", stdin = file.path(run_dir, mod_path),
-      stderr_to_stdout = TRUE, error_on_status = FALSE
+  if(!is.null(nmtran_presort_exe)){
+    # NM-TRAN input is now output from nmtran_presort
+    nmtran_input <- file.path(
+      paste0(fs::path_ext_remove(mod_path_new), "_presort.", fs::path_ext(mod_path_new))
     )
 
-    presort_status_val <- presort.p$status
-    if(is.na(presort_status_val)){
-      rlang::abort("nmtran_presort terminated unexpectedly")
-    }else if(presort_status_val != 0){
-      return(
-        list(
-          nmtran_model = file.path(run_dir, mod_path),
-          run_dir = run_dir,
-          status = "nmtran_presort failed. See errors.",
-          status_val = presort_status_val,
-          output_lines = presort.p$stdout
-        )
-      )
-    }
-
-    # Write the output to tempzzzz1 control stream
-    writeLines(presort.p$stdout, con = file.path(run_dir, "tempzzzz1.ctl"))
+    presort.p <- processx::run(
+      command = nmtran_presort_exe,
+      stdin = mod_path_new,
+      stdout = nmtran_input,
+      wd = run_dir,
+      error_on_status = TRUE
+    )
   }
 
   # Run NM-TRAN
-  stdin_file <- ifelse(run_presort, "tempzzzz1.ctl", mod_path)
   nmtran.p <- processx::run(
-    command = nmtran_exe, wd = run_dir, args = cmd_args,
-    stdout = "|", stdin = file.path(run_dir, stdin_file),
-    stderr_to_stdout = TRUE, error_on_status = FALSE
+    command = nmtran_exe,
+    args = cmd_args,
+    stdin = nmtran_input,
+    stdout = "|",
+    wd = run_dir,
+    stderr_to_stdout = TRUE,
+    error_on_status = FALSE
   )
 
   # Assign status
@@ -249,18 +244,18 @@ execute_nmtran <- function(
   if(is.na(status_val)){
     rlang::abort("NM-TRAN terminated unexpectedly")
   }else if(status_val == 0){
-    status <- "NM-TRAN successful"
+    status <- "Finished Running"
   }else{
-    status <- "NM-TRAN failed. See errors."
+    status <- "Failed. See errors."
   }
 
   # Tabulate NM-TRAN results
   nmtran_results <- list(
-    nmtran_model = stdin_file,
+    nmtran_model = basename(nmtran_input),
     run_dir = run_dir,
     status = status,
     status_val = status_val,
-    output_lines = nmtran.p$stdout
+    output = nmtran.p$stdout
   )
 
   return(nmtran_results)
@@ -305,6 +300,10 @@ parse_nmtran_args <- function(
     nmfe_options = NULL
 ){
 
+  # These are the default NMFE options that are passed to `NM-TRAN`
+  #  - They should always be passed (in the correct order), so set the
+  #    defaults here and merge with other bbi_args to ensure these are passed
+  #    to NM-TRAN
   nmfe_args_def <- list(prdefault = FALSE, tprdefault = FALSE, maxlim = 2)
 
   # Combine with any options stored in model yaml, preferring .bbi_args
@@ -321,10 +320,11 @@ parse_nmtran_args <- function(
   .nmfe_args <- .nmfe_args[names(nmfe_args_def)]
 
   .nmtran_args <- c(
-    ifelse(isTRUE(.nmfe_args$prdefault), 1, 0),
-    ifelse(isTRUE(.nmfe_args$tprdefault), 1, 0),
+    if(isTRUE(.nmfe_args$prdefault)) 1 else 0,
+    if(isTRUE(.nmfe_args$tprdefault)) 1 else 0,
     .nmfe_args$maxlim
-  )
+  ) %>% as.character() %>%
+    stats::setNames(names(nmfe_args_def))
 
-  return(as.character(.nmtran_args))
+  return(.nmtran_args)
 }

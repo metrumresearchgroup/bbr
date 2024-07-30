@@ -15,7 +15,8 @@ execute_nmtran(
 \arguments{
 \item{nmtran_exe}{Path to \code{NM-TRAN} executable.}
 
-\item{mod_path}{Path of a model to evaluate. Should be relative to \code{dir}.}
+\item{mod_path}{Path of a model to evaluate. Should be relative to \code{dir}. Nested
+directories not supported.}
 
 \item{cmd_args}{A character vector of command line arguments for the \code{NM-TRAN}
 execution call}

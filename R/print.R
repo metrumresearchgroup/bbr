@@ -467,9 +467,6 @@ print.nmtran_process <- function(x, ...){
     status <- col_red(status)
   }
 
-  nm_version <- x[["nonmem_version"]]
-  if(is.null(nm_version)) nm_version <- "unknown"
-
   heading(cli::col_magenta("NM-TRAN Status"))
   subheading(status)
 
@@ -479,9 +476,9 @@ print.nmtran_process <- function(x, ...){
   heading("NM-TRAN Specifications")
   cli::cli_bullets(
     c(
+      "*" = "NONMEM Version: {.val {x[['nonmem_version']]}}",
       "*" = "NM-TRAN Executable: {.path {x[['nmtran_exe']]}}",
-      "*" = "nmtran_presort: {cli::col_cyan(!is.null(x[['nmtran_presort_exe']]))}",
-      "*" = "NONMEM Version: {.val {nm_version}}"
+      "*" = "nmtran_presort: {cli::col_cyan(!is.null(x[['nmtran_presort_exe']]))}"
     )
   )
 
@@ -490,9 +487,9 @@ print.nmtran_process <- function(x, ...){
     cli::cli_bullets(c("*" = "Run Directory: {.path {x[['run_dir']]}}"))
   }
 
-  if (is_valid_print(x[["output_lines"]])) {
-    heading('Standard Output')
-    cat_line(x[["output_lines"]])
+  if (is_valid_print(x[["output"]])) {
+    heading('Output')
+    cat_line(x[["output"]])
   }
 }
 
