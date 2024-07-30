@@ -72,9 +72,7 @@ run_nmtran <- function(
     # overwrite $DATA record of new model
     modify_data_path_ctl(nmtran_mod, data_path = basename(new_data_path))
   }else{
-    rlang::abort(
-      glue("Could not find data at `{data_path}`")
-    )
+    cli::cli_abort("Could not find data at `{.file {data_path}}`")
   }
 
   # Run NM-TRAN
@@ -131,14 +129,23 @@ nmtran_setup <- function(
 
   # Check nonmem version
   nm_config <- bbi_yaml$nonmem
+  if(is.null(nm_config)){
+    cli::cli_abort(
+      c(
+        "Did not find required NONMEM information in configuration file: {.path {bbi_yaml_path}}",
+        "i" = "Please see {.fun bbr::bbi_init} for additional details"
+      )
+    )
+  }
   if (!is.null(.nonmem_version)) {
     # check for valid version
     if (!(.nonmem_version %in% names(nm_config))) {
-      rlang::abort(
+      cli::cli_abort(
         c(
-          "Must specify a valid `.nonmem_version` for run_nmtran.",
-          "i" = glue("{bbi_yaml_path} contains the following options:"),
-          glue("`{paste(names(nm_config), collapse='`, `')}`")
+          "Must specify a valid {.var nm_version} for {.fun bbr::run_nmtran}.",
+          "i" = "{.path {bbi_yaml_path}} contains the following options:",
+          "{names(nm_config)}",
+          "*" = "e.g., {.code run_nmtran(mod, .bbi_args = list(nm_version = '{names(nm_config)[1]}'))}"
         )
       )
     }
@@ -151,9 +158,9 @@ nmtran_setup <- function(
 
     if(length(default_nm) > 1){
       nm_vers <- paste(names(default_nm), collapse = ", ")
-      rlang::abort(
+      cli::cli_abort(
         c(
-          glue("Found multiple default NONMEM versions ({nm_vers}) at `{config_path}`"),
+          "Found multiple default NONMEM versions ({nm_vers}) at {.path {bbi_yaml_path}}",
           "i" = "Please ensure only one version is set to the default"
         )
       )
@@ -242,7 +249,7 @@ execute_nmtran <- function(
   # Assign status
   status_val <- nmtran.p$status
   if(is.na(status_val)){
-    rlang::abort("NM-TRAN terminated unexpectedly")
+    cli::cli_abort("NM-TRAN terminated unexpectedly")
   }else if(status_val == 0){
     status <- "Finished Running"
   }else{
@@ -275,14 +282,15 @@ get_bbi_yaml_path <- function(.mod = NULL, .config_path = NULL){
 
   if(!file_exists(bbi_yaml_path)){
     if(is.null(.config_path)){
-      msg <- c(
-        "No bbi configuration was found in the execution directory.",
-        "i" = "Please run `bbi_init()` with the appropriate directory to continue."
+      cli::cli_abort(
+        c(
+          "No bbi configuration was found in the execution directory.",
+          "i" = "Please run {.fun bbr::bbi_init} with the appropriate directory to continue."
+        )
       )
     }else{
-      msg <- glue("No bbi configuration was found at {.config_path}")
+      cli::cli_abort("No bbi configuration was found at {.path {(.config_path)}}")
     }
-    rlang::abort(msg)
   }
 
   return(bbi_yaml_path)
