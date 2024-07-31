@@ -301,7 +301,30 @@ get_bbi_yaml_path <- function(.mod = NULL, .config_path = NULL){
 #'  in the correct format
 #' @inheritParams run_nmtran
 #' @param nmfe_options named list of nmfe options defined in a `bbi.yaml` file.
-#' @noRd
+#'
+#' @details
+#'
+#' Combines NONMEM submission args and consolidates to `NMFE` arguments only
+#'  - The arguments of interest are `prdefault`, `tprdefault`, and `maxlim`,
+#'  which impact the evaluation of `NM-TRAN`
+#'  - Priority: `.bbi_args` > model yaml > `bbi.yaml`
+#'
+#' @examples
+#'
+#' \dontrun{
+#'
+#'  bbi_yaml_path <- get_bbi_yaml_path(.mod)
+#'  bbi_yaml <- yaml::read_yaml(bbi_yaml_path)
+#'
+#'  parse_nmtran_args(
+#'    .mod,
+#'    .bbi_args = list(nm_version = "nm74gf", prdefault = TRUE),
+#'    nmfe_options = bbi_yaml$nmfe_options
+#'  )
+#'
+#' }
+#' @keywords internal
+#' @return a named character vector
 parse_nmtran_args <- function(
     .mod,
     .bbi_args = NULL,
@@ -314,13 +337,27 @@ parse_nmtran_args <- function(
   #    to NM-TRAN
   nmfe_args_def <- list(prdefault = FALSE, tprdefault = FALSE, maxlim = 2)
 
+  # Mimic submit_model behavior: a FALSE value for .bbi_arg has no effect
+  # - Filter these out from .bbi_args
+  if(!is.null(.bbi_args)){
+    check_bbi_args(.bbi_args)
+    req_nmtran_args <- paste(names(nmfe_args_def), collapse = "|")
+    .bbi_args <- purrr::imap(.bbi_args, function(val, bbi_arg){
+      if(str_detect(bbi_arg, req_nmtran_args) && isFALSE(val)){
+        return(NULL)
+      }else{
+        return(val)
+      }
+    }) %>% purrr::compact()
+  }
+
   # Combine with any options stored in model yaml, preferring .bbi_args
   .nmfe_args <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])
 
   # Combine with nmfe options stored in bbi.yaml, preferring .nmfe_args
   .nmfe_args <- parse_args_list(.nmfe_args, nmfe_options)
 
-  # Check provided args
+  # Check all provided args
   check_bbi_args(.nmfe_args)
 
   # Combine with and filter to default nmfe_options
