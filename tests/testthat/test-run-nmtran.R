@@ -119,12 +119,19 @@ withr::with_options(list(
         bbi_yaml_path <- get_bbi_yaml_path(mod1)
         bbi_yaml <- yaml::read_yaml(bbi_yaml_path)
         bbi_yaml$nmfe_options$maxlim <- 3
+        bbi_yaml$nmfe_options$prdefault <- TRUE
         yaml::write_yaml(bbi_yaml, bbi_yaml_path)
         nmtran_specs <- nmtran_setup(mod1, .bbi_args = NULL)
-        expect_equal(unname(nmtran_specs$cmd_args), c("0", "0", "3"))
+        expect_equal(unname(nmtran_specs$cmd_args), c("1", "0", "3"))
+
+        # mimic submit_model: a FALSE value for .bbi_arg has no effect
+        # if a TRUE value is found in the bbi.yaml
+        nmtran_specs <- nmtran_setup(mod1, .bbi_args = list(prdefault = FALSE))
+        expect_equal(unname(nmtran_specs$cmd_args), c("1", "0", "3"))
 
         # Revert back for any other tests
         bbi_yaml$nmfe_options$maxlim <- 2
+        bbi_yaml$nmfe_options$prdefault <- NULL
         yaml::write_yaml(bbi_yaml, bbi_yaml_path)
       })
 
