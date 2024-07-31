@@ -6,8 +6,8 @@
 #' `remove_tables` arguments). The object returned from this must then be passed
 #' to [setup_bootstrap_run()] before submission (see examples).
 #'
-#' @param .mod a `bbr` model object
-#' @param .suffix a suffix for the bootstrap run directory. Will be prefixed by
+#' @param .mod A `bbr` model object
+#' @param .suffix A suffix for the bootstrap run directory. Will be prefixed by
 #'  the model id of `.mod`.
 #' @inheritParams copy_model_from
 #' @param .inherit_tags If `TRUE`, the default, inherit any tags from `.mod`.
@@ -81,14 +81,14 @@ new_bootstrap_run <- function(
 #' objects, and the new datasets are sampled from the dataset defined in its
 #' `$DATA` record (i.e. `get_data_path(.boot_run)`).
 #'
-#' @param .boot_run a `bbi_nmboot_model` object.
-#' @param n number of model runs.
-#' @param strat_cols columns to maintain proportion for stratification
-#' @param seed a seed for sampling the data. Set to `NULL` to avoid setting.
+#' @param .boot_run A `bbi_nmboot_model` object.
+#' @param n Number of model runs.
+#' @param strat_cols Columns to maintain proportion for stratification
+#' @param seed A seed for sampling the data. Set to `NULL` to avoid setting.
 #' @param data A dataset to resample from. Defaults to `NULL`, which will use
-#'   the _filtered_ output from `nm_data(.mod)`. If provided, must include the
-#'   same column names as what's returned from `nm_data(.mod)`.
-#' @param .overwrite logical (T/F) indicating whether or not to overwrite
+#'   the _filtered_ output from `nm_data(.mod, filter = TRUE)`. If provided,
+#'   must include the same column names as what's returned from `nm_data(.mod)`.
+#' @param .overwrite Logical (T/F) indicating whether or not to overwrite
 #'   existing setup for a bootstrap run.
 #'
 #' @details
@@ -169,23 +169,13 @@ setup_bootstrap_run <- function(
 
       # NULL if IGNORE/ACCEPT expressions cant be turned into dplyr expressions
       if(is.null(starting_data)){
-        rlang::inform(
+        cli::cli_inform(
           paste(
             "Defaulting to input data, which may include data that doesn't enter",
             "the final problem (i.e. ignored subjects)"
           )
         )
         starting_data <- nm_data(orig_mod) %>% suppressMessages()
-      }else{
-        n_recs_dropped <- attributes(starting_data)$n_records_dropped
-        if(n_recs_dropped > 0){
-          rlang::inform(
-            c(
-              glue("Parsed IGNORE/ACCEPT options in {basename(get_model_path(.boot_run))}"),
-              glue("Dropped {n_recs_dropped} records from starting data")
-            )
-          )
-        }
       }
 
       # Overwrite data path in control stream
@@ -281,8 +271,8 @@ setup_bootstrap_run <- function(
 
 #' Set up a single bootstrap model run
 #'
-#' @param mod_path absolute model path (no file extension) of a bootstrap model run.
-#' @param boot_args list of parameters needed to create a bootstrap model run.
+#' @param mod_path Absolute model path (no file extension) of a bootstrap model run.
+#' @param boot_args List of parameters needed to create a bootstrap model run.
 #'
 #' @keywords internal
 make_boot_run <- function(mod_path, boot_args){
@@ -351,7 +341,7 @@ make_boot_run <- function(mod_path, boot_args){
 
 #' Store bootstrap run details before submission
 #'
-#' @param boot_models list of boostrap model objects created by `make_boot_run()`.
+#' @param boot_models List of boostrap model objects created by `make_boot_run()`.
 #' @inheritParams make_boot_run
 #'
 #' @details
@@ -418,7 +408,7 @@ make_boot_spec <- function(boot_models, boot_args){
 #' bootstrap run directory.
 #'
 #' @inheritParams setup_bootstrap_run
-#' @param force_resummarize logical (T/F). If `TRUE`, force re-summarization.
+#' @param force_resummarize Logical (T/F). If `TRUE`, force re-summarization.
 #'  Will _only_ update the saved out `RDS` file when specified via
 #'  `summarize_bootstrap_run()`. See details for more information.
 #'
@@ -614,7 +604,7 @@ summarize_bootstrap_run <- function(
 
 #' @describeIn summarize_bootstrap Tabulate parameter estimates for each model
 #'  submission in a bootstrap run
-#' @param format_long logical (T/F). If `TRUE`, format data as a long table,
+#' @param format_long Logical (T/F). If `TRUE`, format data as a long table,
 #'  making the data more portable for plotting.
 #' @export
 bootstrap_estimates <- function(

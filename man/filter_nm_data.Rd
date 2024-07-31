@@ -7,9 +7,9 @@
 filter_nm_data(.mod, data = nm_data(.mod))
 }
 \arguments{
-\item{.mod}{a \code{bbi_nonmem_model} object}
+\item{.mod}{A \code{bbi_nonmem_model} object}
 
-\item{data}{a starting dataset}
+\item{data}{A starting dataset}
 }
 \description{
 Filter \code{NONMEM} input data based on \code{IGNORE} and \code{ACCEPT} record options

@@ -8,12 +8,12 @@ expressions.}
 translate_nm_expr(nm_expr, type = c("ignore", "accept"), data_cols = NULL)
 }
 \arguments{
-\item{nm_expr}{a \code{NONMEM} filter expression. e.g., \code{'ID.EQ.2, BLQ=1'}.}
+\item{nm_expr}{A \code{NONMEM} filter expression. e.g., \code{'ID.EQ.2, BLQ=1'}.}
 
 \item{type}{Either \code{'ignore'} or \code{'accept'}. Denotes which type of \code{NONMEM}
 filtering the expression corresponds to.}
 
-\item{data_cols}{column names associated with the input data. Used for
+\item{data_cols}{Column names associated with the input data. Used for
 \code{'ignore'} expressions.}
 }
 \description{
@@ -41,5 +41,8 @@ translate_nm_expr("c2", data_cols = data_cols)
 translate_nm_expr("@", data_cols = data_cols)
 
 }
+}
+\seealso{
+\code{\link[=translate_nm_operator]{translate_nm_operator()}}, \code{\link[=invert_operator]{invert_operator()}}
 }
 \keyword{internal}

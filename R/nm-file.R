@@ -105,8 +105,9 @@ nm_data <- function(.mod, filter = FALSE) {
 
   if(isTRUE(filter)){
     .d <- filter_nm_data(.mod, data = .d)
-    recs_dropped <- attributes(.d)$n_records_dropped
-    verbose_msg(paste("Number of records dropped:", cli::col_blue(recs_dropped)))
+    perc_retained <- attributes(.d)$perc_retained
+    msg <- paste("  Filtered:", cli::col_blue(perc_retained, "%"), "of records retained")
+    verbose_msg(msg)
   }
 
   verbose_msg(glue("  rows: {nrow(.d)}"))

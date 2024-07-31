@@ -68,34 +68,59 @@ get_data_filter_exprs <- function(.mod){
   )
 }
 
-#' Function to translate NONMEM operators to R operators
-#' @noRd
+#' Function to translate `NONMEM` operators to `R` operators
+#' @param expr String. A `NONMEM` ignore/accept expression
+#' @note `.EQN.` and `.NEN.` are available after `NONMEM 7.3`
+#' @return A [dplyr::filter()] expression
+#'
+#' @examples
+#' \dontrun{
+#'
+#' translate_nm_operator(c("AGE.NE.30", "ID.EQ.2", "WT/=70"))
+#' #> [1] "AGE!=30" "ID==2" "WT!=70"
+#' }
 #' @keywords internal
+#' @seealso [invert_operator()], [translate_nm_expr()]
 translate_nm_operator <- function(expr) {
-  # EQN and NEN are available after NONMEM 7.3
-  expr <- gsub("\\.EQ\\.|\\.EQN\\.", "==", expr)
-  expr <- gsub("\\.NE\\.|\\.NEN\\.|/=", "!=", expr)
-  expr <- gsub("\\.LT\\.", "<", expr)
-  expr <- gsub("\\.LE\\.", "<=", expr)
-  expr <- gsub("\\.GT\\.", ">", expr)
-  expr <- gsub("\\.GE\\.", ">=", expr)
+  # Equal
+  expr <- gsub(".EQ.", "==", expr, fixed = TRUE)
+  expr <- gsub(".EQN.", "==", expr, fixed = TRUE)
+  # Not equal
+  expr <- gsub(".NE.", "!=", expr, fixed = TRUE)
+  expr <- gsub(".NEN.", "!=", expr, fixed = TRUE)
+  expr <- gsub("/=", "!=", expr, fixed = TRUE)
+  # Less than | Less than or equal to
+  expr <- gsub(".LT.", "<", expr, fixed = TRUE)
+  expr <- gsub(".LE.", "<=", expr, fixed = TRUE)
+  # Greater than | Greater than or equal to
+  expr <- gsub(".GT.", ">", expr, fixed = TRUE)
+  expr <- gsub(".GE.", ">=", expr, fixed = TRUE)
 
   # Handle single `=` only when it's not part of `==`, `!=`, `<=`, `>=`
   expr <- gsub("(?<=[^=!<>])=(?=[^=!<>])", "==", expr, perl = TRUE)
   return(expr)
 }
 
-#' Function to invert ignore expressions
-#' @noRd
+#' Function to invert `R` operators in filter expressions
+#' @param expr A [dplyr::filter()] expression
+#' @return the inverted expression
+#'
+#' @examples
+#' \dontrun{
+#'
+#' invert_operator(c('A==2', 'B >= 4'))
+#' #> [1] "A!=2"   "B <= 4"
+#' }
 #' @keywords internal
+#' @seealso [translate_nm_operator()], [translate_nm_expr()]
 invert_operator <- function(expr) {
   expr <- dplyr::case_when(
-    grepl("==", expr) ~ gsub("==", "!=", expr, fixed = TRUE),
-    grepl("!=", expr) ~ gsub("!=", "==", expr, fixed = TRUE),
-    grepl("<=", expr) ~ gsub("<=", ">=", expr, fixed = TRUE),
-    grepl(">=", expr) ~ gsub(">=", "<=", expr, fixed = TRUE),
-    grepl("<", expr) ~ gsub("<", ">", expr, fixed = TRUE),
-    grepl(">", expr) ~ gsub(">", "<", expr, fixed = TRUE),
+    grepl("==", expr, fixed = TRUE) ~ gsub("==", "!=", expr, fixed = TRUE),
+    grepl("!=", expr, fixed = TRUE) ~ gsub("!=", "==", expr, fixed = TRUE),
+    grepl("<=", expr, fixed = TRUE) ~ gsub("<=", ">=", expr, fixed = TRUE),
+    grepl(">=", expr, fixed = TRUE) ~ gsub(">=", "<=", expr, fixed = TRUE),
+    grepl("<", expr, fixed = TRUE) ~ gsub("<", ">", expr, fixed = TRUE),
+    grepl(">", expr, fixed = TRUE) ~ gsub(">", "<", expr, fixed = TRUE),
     TRUE ~ expr
   )
   return(expr)
@@ -104,10 +129,10 @@ invert_operator <- function(expr) {
 #' Translate `NONMEM` `IGNORE` and `ACCEPT` expressions into [dplyr::filter()]
 #'  expressions.
 #'
-#' @param nm_expr a `NONMEM` filter expression. e.g., `'ID.EQ.2, BLQ=1'`.
+#' @param nm_expr A `NONMEM` filter expression. e.g., `'ID.EQ.2, BLQ=1'`.
 #' @param type Either `'ignore'` or `'accept'`. Denotes which type of `NONMEM`
 #'  filtering the expression corresponds to.
-#' @param data_cols column names associated with the input data. Used for
+#' @param data_cols Column names associated with the input data. Used for
 #'  `'ignore'` expressions.
 #'
 #' @examples
@@ -132,6 +157,7 @@ invert_operator <- function(expr) {
 #'
 #' }
 #' @keywords internal
+#' @seealso [translate_nm_operator()], [invert_operator()]
 translate_nm_expr <- function(
     nm_expr,
     type = c("ignore", "accept"),
@@ -177,8 +203,8 @@ translate_nm_expr <- function(
 
 #' Filter `NONMEM` input data based on `IGNORE` and `ACCEPT` record options
 #'
-#' @param .mod a `bbi_nonmem_model` object
-#' @param data a starting dataset
+#' @param .mod A `bbi_nonmem_model` object
+#' @param data A starting dataset
 #' @keywords internal
 filter_nm_data <- function(.mod, data = nm_data(.mod)){
 
@@ -203,9 +229,9 @@ filter_nm_data <- function(.mod, data = nm_data(.mod)){
   filtered_data <- tryCatch({
     data %>% dplyr::filter(eval(parse(text = filter_expression)))
   }, error = function(cond){
-    rlang::inform(
+    cli::cli_inform(
       c(
-        "ignore and/or accept statements could not be converted to filters",
+        "ignore/accept list could not be converted to filters",
         "The following errors occurred:",
         cond$parent$message
       )
@@ -214,6 +240,8 @@ filter_nm_data <- function(.mod, data = nm_data(.mod)){
   })
 
   if(!is.null(filtered_data)){
+    perc_retained <- round(100*(nrow(filtered_data)/nrow(data)), 2)
+    attr(filtered_data, "perc_retained") <- perc_retained
     attr(filtered_data, "n_records_dropped") <- nrow(data) - nrow(filtered_data)
   }
 

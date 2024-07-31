@@ -14,19 +14,19 @@ setup_bootstrap_run(
 )
 }
 \arguments{
-\item{.boot_run}{a \code{bbi_nmboot_model} object.}
+\item{.boot_run}{A \code{bbi_nmboot_model} object.}
 
-\item{n}{number of model runs.}
+\item{n}{Number of model runs.}
 
-\item{strat_cols}{columns to maintain proportion for stratification}
+\item{strat_cols}{Columns to maintain proportion for stratification}
 
-\item{seed}{a seed for sampling the data. Set to \code{NULL} to avoid setting.}
+\item{seed}{A seed for sampling the data. Set to \code{NULL} to avoid setting.}
 
 \item{data}{A dataset to resample from. Defaults to \code{NULL}, which will use
-the \emph{filtered} output from \code{nm_data(.mod)}. If provided, must include the
-same column names as what's returned from \code{nm_data(.mod)}.}
+the \emph{filtered} output from \code{nm_data(.mod, filter = TRUE)}. If provided,
+must include the same column names as what's returned from \code{nm_data(.mod)}.}
 
-\item{.overwrite}{logical (T/F) indicating whether or not to overwrite
+\item{.overwrite}{Logical (T/F) indicating whether or not to overwrite
 existing setup for a bootstrap run.}
 }
 \description{
