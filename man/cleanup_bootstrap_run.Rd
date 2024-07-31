@@ -7,7 +7,7 @@
 cleanup_bootstrap_run(.boot_run, .force = FALSE)
 }
 \arguments{
-\item{.boot_run}{a \code{bbi_nmboot_model} object.}
+\item{.boot_run}{A \code{bbi_nmboot_model} object.}
 
 \item{.force}{logical (T/F). If \code{TRUE}, do not prompt the user if they want to delete the models.}
 }

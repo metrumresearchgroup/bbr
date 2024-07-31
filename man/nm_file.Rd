@@ -16,7 +16,7 @@ nm_tab(.mod)
 
 nm_par_tab(.mod)
 
-nm_data(.mod)
+nm_data(.mod, filter = FALSE)
 }
 \arguments{
 \item{.mod}{Either a \code{bbi_nonmem_model}, \code{bbi_nonmem_summary}, or a path to a
@@ -29,8 +29,12 @@ See examples.}
 
 \item{...}{arguments passed through to methods. (Currently none.)}
 
-\item{.rename}{If \code{TRUE}, the default, will rename \code{.grd} columns to the
-relevant parameter names. Otherwise will leave column names as is.}
+\item{.rename}{Logical (\code{T}/\code{F}). If \code{TRUE}, the default, will rename \code{.grd}
+columns to the relevant parameter names. Otherwise will leave column names
+as is.}
+
+\item{filter}{Logical (\code{T}/\code{F}). If \code{TRUE}, filter data based on \verb{IGNORE LIST}
+or \verb{ACCEPT LIST} options defined in the \verb{$DATA} record.}
 }
 \value{
 A tibble with the data from the specified file and estimation method.

@@ -6,8 +6,8 @@
 #' `remove_tables` arguments). The object returned from this must then be passed
 #' to [setup_bootstrap_run()] before submission (see examples).
 #'
-#' @param .mod a `bbr` model object
-#' @param .suffix a suffix for the bootstrap run directory. Will be prefixed by
+#' @param .mod A `bbr` model object
+#' @param .suffix A suffix for the bootstrap run directory. Will be prefixed by
 #'  the model id of `.mod`.
 #' @inheritParams copy_model_from
 #' @param .inherit_tags If `TRUE`, the default, inherit any tags from `.mod`.
@@ -81,21 +81,14 @@ new_bootstrap_run <- function(
 #' objects, and the new datasets are sampled from the dataset defined in its
 #' `$DATA` record (i.e. `get_data_path(.boot_run)`).
 #'
-#' @param .boot_run a `bbi_nmboot_model` object.
-#' @param n number of model runs.
-#' @param strat_cols columns to maintain proportion for stratification
-#' @param seed a seed for sampling the data. Set to `NULL` to avoid setting.
+#' @param .boot_run A `bbi_nmboot_model` object.
+#' @param n Number of model runs.
+#' @param strat_cols Columns to maintain proportion for stratification
+#' @param seed A seed for sampling the data. Set to `NULL` to avoid setting.
 #' @param data A dataset to resample from. Defaults to `NULL`, which will use
-#'   the output from `nm_join(.mod)`. If provided, must include the same column
-#'   names as what's returned from `nm_data(.mod)`. If the default is used, note
-#'   that a suitable `.join_col` must be provided.
-#' @param .join_col Character column name to use to join table files. Not used
-#'   if `data` is specified. Passed to [nm_join()], and used to create the
-#'   initial dataset that gets re-sampled `n` times. The purpose of joining the
-#'   input data to table files is to filter the population to only the subjects
-#'   that actually made it into the model. See the `Details` section in
-#'   [nm_join()] for more information.
-#' @param .overwrite logical (T/F) indicating whether or not to overwrite
+#'   the _filtered_ output from `nm_data(.mod, filter = TRUE)`. If provided,
+#'   must include the same column names as what's returned from `nm_data(.mod)`.
+#' @param .overwrite Logical (T/F) indicating whether or not to overwrite
 #'   existing setup for a bootstrap run.
 #'
 #' @details
@@ -138,7 +131,6 @@ setup_bootstrap_run <- function(
     strat_cols = NULL,
     seed = 1234,
     data = NULL,
-    .join_col = "NUM",
     .overwrite = FALSE
 ){
   check_model_object(.boot_run, NMBOOT_MOD_CLASS)
@@ -173,20 +165,11 @@ setup_bootstrap_run <- function(
 
     if(is.null(data)){
       # Only include subjects that entered the original problem by default
-      can_be_joined <- can_be_nm_joined(orig_mod, .join_col = .join_col)
-      if(isTRUE(can_be_joined)){
-        starting_data <- nm_join(orig_mod, .join_col = .join_col) %>%
-          suppressMessages()
+      starting_data <- nm_data(orig_mod, filter = TRUE) %>% suppressMessages()
 
-        # select only columns from original data set
-        starting_data <- starting_data %>%
-          dplyr::select(attr(starting_data, "nm_join_origin")$data)
-
-        if ("DV.DATA" %in% names(starting_data)) {
-          starting_data <- dplyr::rename(starting_data, "DV" = "DV.DATA")
-        }
-      }else{
-        rlang::inform(
+      # NULL if IGNORE/ACCEPT expressions cant be turned into dplyr expressions
+      if(is.null(starting_data)){
+        cli::cli_inform(
           paste(
             "Defaulting to input data, which may include data that doesn't enter",
             "the final problem (i.e. ignored subjects)"
@@ -288,8 +271,8 @@ setup_bootstrap_run <- function(
 
 #' Set up a single bootstrap model run
 #'
-#' @param mod_path absolute model path (no file extension) of a bootstrap model run.
-#' @param boot_args list of parameters needed to create a bootstrap model run.
+#' @param mod_path Absolute model path (no file extension) of a bootstrap model run.
+#' @param boot_args List of parameters needed to create a bootstrap model run.
 #'
 #' @keywords internal
 make_boot_run <- function(mod_path, boot_args){
@@ -358,7 +341,7 @@ make_boot_run <- function(mod_path, boot_args){
 
 #' Store bootstrap run details before submission
 #'
-#' @param boot_models list of boostrap model objects created by `make_boot_run()`.
+#' @param boot_models List of boostrap model objects created by `make_boot_run()`.
 #' @inheritParams make_boot_run
 #'
 #' @details
@@ -425,7 +408,7 @@ make_boot_spec <- function(boot_models, boot_args){
 #' bootstrap run directory.
 #'
 #' @inheritParams setup_bootstrap_run
-#' @param force_resummarize logical (T/F). If `TRUE`, force re-summarization.
+#' @param force_resummarize Logical (T/F). If `TRUE`, force re-summarization.
 #'  Will _only_ update the saved out `RDS` file when specified via
 #'  `summarize_bootstrap_run()`. See details for more information.
 #'
@@ -621,7 +604,7 @@ summarize_bootstrap_run <- function(
 
 #' @describeIn summarize_bootstrap Tabulate parameter estimates for each model
 #'  submission in a bootstrap run
-#' @param format_long logical (T/F). If `TRUE`, format data as a long table,
+#' @param format_long Logical (T/F). If `TRUE`, format data as a long table,
 #'  making the data more portable for plotting.
 #' @export
 bootstrap_estimates <- function(
