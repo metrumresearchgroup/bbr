@@ -84,7 +84,7 @@ withr::with_options(list(
         # Incorrect nonmem version
         expect_error(
           nmtran_setup(mod1, .bbi_args = list(nm_version = "nm74")),
-          "Must specify a valid `.nonmem_version`"
+          "Must specify a valid `nm_version`"
         )
 
         # no configuration file found
