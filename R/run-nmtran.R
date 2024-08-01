@@ -193,16 +193,16 @@ nmtran_setup <- function(
 #' Execute `NM-TRAN` in a given directory
 #'
 #' Execute `NM-TRAN` in a given directory. Also runs `nmtran_presort` if an
-#' executable is found.
+#' executable is found. This assumes the model at `mod_path` has already been
+#' copied to the top-level of `dir`.
 #'
 #' @param nmtran_exe Path to `NM-TRAN` executable.
-#' @param mod_path Path of a model to evaluate. Should be relative to `dir`. Nested
-#'  directories not supported.
-#' @param cmd_args A character vector of command line arguments for the `NM-TRAN`
-#'  execution call
-#' @param nmtran_presort_exe Path to `nmtran_presort` executable. Only available
-#' for `NONMEM` versions `nm74gf`, `nm74gf_nmfe`, and `nm75`. If provided, will run
-#' `nmtran_presort` before running `NM-TRAN`. Set to `NULL` to skip this step.
+#' @param mod_path Path of a model to evaluate. Should be relative to `dir`.
+#' @param cmd_args A character vector of command line arguments for the
+#'   `NM-TRAN` execution call
+#' @param nmtran_presort_exe Path to `nmtran_presort` executable. If provided,
+#'   will run `nmtran_presort` ahead of `NM-TRAN` for `NONMEM 7.4` and later.
+#'   Set to `NULL` to skip this step.
 #' @param dir Directory in which to execute the command.
 #'
 #' @keywords internal
@@ -219,6 +219,11 @@ execute_nmtran <- function(
   run_dir <- as.character(fs::path_real(dir))
   nmtran_input <- mod_path_new <- file.path(run_dir, basename(mod_path))
 
+  # This should only be possible via manual intervention
+  if(!fs::file_exists(mod_path_new)){
+    cli::cli_abort("Could not find model at {.path {mod_path_new}}")
+  }
+
   # Preprocess with nmtran_presort
   if(!is.null(nmtran_presort_exe)){
     # NM-TRAN input is now output from nmtran_presort
@@ -226,7 +231,7 @@ execute_nmtran <- function(
       paste0(fs::path_ext_remove(mod_path_new), "_presort.", fs::path_ext(mod_path_new))
     )
 
-    presort.p <- processx::run(
+    processx::run(
       command = nmtran_presort_exe,
       stdin = mod_path_new,
       stdout = nmtran_input,
@@ -309,20 +314,6 @@ get_bbi_yaml_path <- function(.mod = NULL, .config_path = NULL){
 #'  which impact the evaluation of `NM-TRAN`
 #'  - Priority: `.bbi_args` > model yaml > `bbi.yaml`
 #'
-#' @examples
-#'
-#' \dontrun{
-#'
-#'  bbi_yaml_path <- get_bbi_yaml_path(.mod)
-#'  bbi_yaml <- yaml::read_yaml(bbi_yaml_path)
-#'
-#'  parse_nmtran_args(
-#'    .mod,
-#'    .bbi_args = list(nm_version = "nm74gf", prdefault = TRUE),
-#'    nmfe_options = bbi_yaml$nmfe_options
-#'  )
-#'
-#' }
 #' @keywords internal
 #' @return a named character vector
 parse_nmtran_args <- function(
@@ -330,31 +321,25 @@ parse_nmtran_args <- function(
     .bbi_args = NULL,
     nmfe_options = NULL
 ){
+  check_bbi_args(.bbi_args)
 
-  # These are the default NMFE options that are passed to `NM-TRAN`
-  #  - They should always be passed (in the correct order), so set the
-  #    defaults here and merge with other bbi_args to ensure these are passed
-  #    to NM-TRAN
+  # These are the default NMFE options that are passed to NM-TRAN
+  #  - They should always be passed (in the correct order), so set the defaults
+  #    here and merge with other .bbi_args to ensure these are passed to NM-TRAN
   nmfe_args_def <- list(prdefault = FALSE, tprdefault = FALSE, maxlim = 2)
-
-  # Mimic submit_model behavior: a FALSE value for .bbi_arg has no effect
-  # - Filter these out from .bbi_args
-  if(!is.null(.bbi_args)){
-    check_bbi_args(.bbi_args)
-    req_nmtran_args <- paste(names(nmfe_args_def), collapse = "|")
-    .bbi_args <- purrr::imap(.bbi_args, function(val, bbi_arg){
-      if(str_detect(bbi_arg, req_nmtran_args) && isFALSE(val)){
-        return(NULL)
-      }else{
-        return(val)
-      }
-    }) %>% purrr::compact()
-  }
 
   # Combine with any options stored in model yaml, preferring .bbi_args
   .nmfe_args <- parse_args_list(.bbi_args, .mod[[YAML_BBI_ARGS]])
 
-  # Combine with nmfe options stored in bbi.yaml, preferring .nmfe_args
+  # Mimic submit_model behavior: a FALSE value for .bbi_arg has no effect
+  # - Filter these out from .nmfe_args
+  if(!is.null(.nmfe_args)){
+    .nmfe_args <- purrr::imap(.nmfe_args, function(val, nmfe_arg){
+      if(isFALSE(val)) return(NULL) else return(val)
+    }) %>% purrr::compact()
+  }
+
+  # Combine with nmfe options stored in bbi.yaml, preferring .bbi_args
   .nmfe_args <- parse_args_list(.nmfe_args, nmfe_options)
 
   # Check all provided args

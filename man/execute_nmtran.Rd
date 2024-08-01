@@ -15,20 +15,20 @@ execute_nmtran(
 \arguments{
 \item{nmtran_exe}{Path to \code{NM-TRAN} executable.}
 
-\item{mod_path}{Path of a model to evaluate. Should be relative to \code{dir}. Nested
-directories not supported.}
+\item{mod_path}{Path of a model to evaluate. Should be relative to \code{dir}.}
 
-\item{cmd_args}{A character vector of command line arguments for the \code{NM-TRAN}
-execution call}
+\item{cmd_args}{A character vector of command line arguments for the
+\code{NM-TRAN} execution call}
 
-\item{nmtran_presort_exe}{Path to \code{nmtran_presort} executable. Only available
-for \code{NONMEM} versions \code{nm74gf}, \code{nm74gf_nmfe}, and \code{nm75}. If provided, will run
-\code{nmtran_presort} before running \code{NM-TRAN}. Set to \code{NULL} to skip this step.}
+\item{nmtran_presort_exe}{Path to \code{nmtran_presort} executable. If provided,
+will run \code{nmtran_presort} ahead of \code{NM-TRAN} for \verb{NONMEM 7.4} and later.
+Set to \code{NULL} to skip this step.}
 
 \item{dir}{Directory in which to execute the command.}
 }
 \description{
 Execute \code{NM-TRAN} in a given directory. Also runs \code{nmtran_presort} if an
-executable is found.
+executable is found. This assumes the model at \code{mod_path} has already been
+copied to the top-level of \code{dir}.
 }
 \keyword{internal}

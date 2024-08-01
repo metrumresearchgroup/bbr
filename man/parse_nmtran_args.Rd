@@ -33,19 +33,4 @@ which impact the evaluation of \code{NM-TRAN}
 \item Priority: \code{.bbi_args} > model yaml > \code{bbi.yaml}
 }
 }
-\examples{
-
-\dontrun{
-
- bbi_yaml_path <- get_bbi_yaml_path(.mod)
- bbi_yaml <- yaml::read_yaml(bbi_yaml_path)
-
- parse_nmtran_args(
-   .mod,
-   .bbi_args = list(nm_version = "nm74gf", prdefault = TRUE),
-   nmfe_options = bbi_yaml$nmfe_options
- )
-
-}
-}
 \keyword{internal}

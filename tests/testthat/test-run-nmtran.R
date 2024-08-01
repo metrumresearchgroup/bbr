@@ -1,22 +1,19 @@
-context("testing NM-TRAN")
 
 # define constants
 MODEL_DIR_BBI <- file.path(dirname(ABS_MODEL_DIR), "test-nmtran-models")
 NONMEM_DIR <- Sys.getenv("BBR_TESTS_NONMEM_DIR", "/opt/NONMEM")
-REQ_NONMEM_VERSIONS <- c("nm73gf", "nm74gf", "nm75", Sys.getenv("BBR_TESTS_NONMEM_VERSION"))
-REQ_NONMEM_VERSIONS <- unique(REQ_NONMEM_VERSIONS[REQ_NONMEM_VERSIONS != ""])
+REQ_NONMEM_VERSIONS <- c("nm73gf", "nm74gf", "nm75")
 
 # Don't assume NONMEM is available if not on Metworx.
 if (Sys.getenv("METWORX_VERSION") == "" || Sys.getenv("SKIP_BBI_TEST") == "true") {
   skip("test-workflow-bbi only runs on Metworx because it needs NONMEM installed")
 }
-skip_long_tests("skipping long-running bbi workflow tests")
 
 
 # Skip if required NONMEM versions are not installed
 if(!all(REQ_NONMEM_VERSIONS %in% basename(fs::dir_ls(NONMEM_DIR)))){
   req_nm_ver_txt <- paste(REQ_NONMEM_VERSIONS, collapse = ", ")
-  skip(glue("test-run-nmtran-bbi only requires the following NONMEM versions {req_nm_ver_txt}"))
+  skip(glue("test-run-nmtran-bbi requires the following NONMEM versions: {req_nm_ver_txt}"))
 }
 
 
@@ -34,10 +31,7 @@ withr::with_options(list(
   bbr.verbose = FALSE), {
 
     # cleanup when done
-    on.exit({
-      Sys.sleep(3) # wait for some NONMEM mess to delete itself
-      cleanup_bbi()
-    })
+    on.exit({cleanup_bbi()})
 
     # clear old bbi.yaml
     if (fs::file_exists(file.path(MODEL_DIR_BBI, "bbi.yaml"))) fs::file_delete(file.path(MODEL_DIR_BBI, "bbi.yaml"))
@@ -46,7 +40,7 @@ withr::with_options(list(
     bbi_init(
       MODEL_DIR_BBI,
       .nonmem_dir = NONMEM_DIR,
-      .nonmem_version = Sys.getenv("BBR_TESTS_NONMEM_VERSION", "nm74gf"),
+      .nonmem_version = "nm74gf",
       .bbi_args = list(mpi_exec_path = get_mpiexec_path())
     )
 
@@ -135,6 +129,56 @@ withr::with_options(list(
         yaml::write_yaml(bbi_yaml, bbi_yaml_path)
       })
 
+      it("parse_nmtran_args: parses and formats nmfe options correctly", {
+        mod1 <- read_model(file.path(MODEL_DIR_BBI, "1"))
+        bbi_yaml_path <- get_bbi_yaml_path(mod1)
+        bbi_yaml <- yaml::read_yaml(bbi_yaml_path)
+
+        # Only model yaml
+        cmd_args <- parse_nmtran_args(mod1, nmfe_options = bbi_yaml$nmfe_options)
+        expect_equal(unname(cmd_args), c("0", "0", "2"))
+
+        # Override with model yaml
+        current_args <- mod1$bbi_args
+        mod1 <- add_bbi_args(mod1, list(tprdefault = TRUE, maxlim = 3))
+
+        # Test priority of .bbi_args > model yaml > bbi.yaml
+        # - TRUE values overwrite FALSE values if both are present
+
+        # Overwrite .bbi_args --> takes precedence
+        cmd_args <- mod1 %>% parse_nmtran_args(
+          .bbi_args = list(prdefault = TRUE, tprdefault = FALSE, maxlim = 1),
+          nmfe_options = bbi_yaml$nmfe_options
+        )
+
+        expect_equal(unname(cmd_args), c("1", "0", "1"))
+
+        # Overwrite bbi.yaml --> model yaml defaults take precedence
+        cmd_args <- mod1 %>% parse_nmtran_args(
+          nmfe_options = list(prdefault = TRUE, tprdefault = FALSE, maxlim = 1)
+        )
+
+        expect_equal(unname(cmd_args), c("1", "1", "3"))
+
+        # Check with all three sources
+        cmd_args <- mod1 %>% parse_nmtran_args(
+          .bbi_args = list(tprdefault = FALSE, maxlim = 2),
+          nmfe_options = list(tprdefault = FALSE, maxlim = 1)
+        )
+
+        expect_equal(unname(cmd_args), c("0", "0", "2"))
+
+        cmd_args <- mod1 %>% parse_nmtran_args(
+          .bbi_args = list(prdefault = TRUE, tprdefault = FALSE, maxlim = 2),
+          nmfe_options = list(tprdefault = TRUE, maxlim = 1)
+        )
+
+        expect_equal(unname(cmd_args), c("1", "1", "2"))
+
+        # Reset model yaml .bbi_args for other tests
+        mod1 <- replace_all_bbi_args(mod1, current_args)
+      })
+
       it("execute_nmtran", {
         # Execute in subdirectory to avoid messing with other tests
         nmtran_dir <- file.path(MODEL_DIR_BBI, "nmtran")
@@ -149,7 +193,7 @@ withr::with_options(list(
         bbi_init(
           nmtran_dir,
           .nonmem_dir = NONMEM_DIR,
-          .nonmem_version = Sys.getenv("BBR_TESTS_NONMEM_VERSION", "nm74gf"),
+          .nonmem_version = "nm74gf",
           .bbi_args = list(mpi_exec_path = get_mpiexec_path())
         )
 
