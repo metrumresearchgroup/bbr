@@ -178,6 +178,7 @@ nmtran_setup <- function(
 
   # Check if nmtran_presort exists
   nmtran_presort_exe <- file.path(nm_path, "util", "nmtran_presort")
+  if(ON_WINDOWS) nmtran_presort_exe <- paste0(nmtran_presort_exe, ".exe")
   run_presort <- unname(fs::file_exists(nmtran_presort_exe))
 
   return(
@@ -238,6 +239,16 @@ execute_nmtran <- function(
       wd = run_dir,
       error_on_status = TRUE
     )
+
+    # On Windows, nmtran_presort outputs the results to a fort.6 file instead of
+    # the designated stdout location.
+    # - Overwrite stdout with contents of fort.6 if on windows
+    if(ON_WINDOWS){
+      fort6_path <- file.path(run_dir, "fort.6")
+      if(file.exists(fort6_path)){
+        fs::file_copy(fort6_path, nmtran_input, overwrite = TRUE)
+      }
+    }
   }
 
   # Run NM-TRAN
@@ -261,13 +272,20 @@ execute_nmtran <- function(
     status <- "Failed. See errors."
   }
 
+  # Overwrite stdout with contents of fort.6 if on windows
+  if(ON_WINDOWS && file.exists(fort6_path)){
+    output_lines <- readLines(fort6_path)
+  }else{
+    output_lines <- nmtran.p$stdout
+  }
+
   # Tabulate NM-TRAN results
   nmtran_results <- list(
     nmtran_model = basename(nmtran_input),
     run_dir = run_dir,
     status = status,
     status_val = status_val,
-    output = nmtran.p$stdout
+    output = output_lines
   )
 
   return(nmtran_results)
