@@ -6,14 +6,14 @@ REQ_NONMEM_VERSIONS <- c("nm73gf", "nm74gf", "nm75")
 
 # Don't assume NONMEM is available if not on Metworx.
 if (Sys.getenv("METWORX_VERSION") == "" || Sys.getenv("SKIP_BBI_TEST") == "true") {
-  skip("test-workflow-bbi only runs on Metworx because it needs NONMEM installed")
+  skip("test-run-nmtran only runs on Metworx because it needs NONMEM installed")
 }
 
 
 # Skip if required NONMEM versions are not installed
 if(!all(REQ_NONMEM_VERSIONS %in% basename(fs::dir_ls(NONMEM_DIR)))){
   req_nm_ver_txt <- paste(REQ_NONMEM_VERSIONS, collapse = ", ")
-  skip(glue("test-run-nmtran-bbi requires the following NONMEM versions: {req_nm_ver_txt}"))
+  skip(glue("test-run-nmtran requires the following NONMEM versions: {req_nm_ver_txt}"))
 }
 
 
@@ -40,8 +40,7 @@ withr::with_options(list(
     bbi_init(
       MODEL_DIR_BBI,
       .nonmem_dir = NONMEM_DIR,
-      .nonmem_version = "nm74gf",
-      .bbi_args = list(mpi_exec_path = get_mpiexec_path())
+      .nonmem_version = "nm74gf"
     )
 
     # copy model files into new model dir (not run)
@@ -193,8 +192,7 @@ withr::with_options(list(
         bbi_init(
           nmtran_dir,
           .nonmem_dir = NONMEM_DIR,
-          .nonmem_version = "nm74gf",
-          .bbi_args = list(mpi_exec_path = get_mpiexec_path())
+          .nonmem_version = "nm74gf"
         )
 
         nmtran_specs <- nmtran_setup(mod2)
@@ -219,7 +217,7 @@ withr::with_options(list(
         )
 
         # Check attributes
-        expect_equal(nmtran_results$status_val, 4)
+        expect_true(nmtran_results$status_val > 0)
         expect_equal(nmtran_results$status, "Failed. See errors.")
       })
 

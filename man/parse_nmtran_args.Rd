@@ -29,8 +29,22 @@ in the correct format
 Combines NONMEM submission args and consolidates to \code{NMFE} arguments only
 \itemize{
 \item The arguments of interest are \code{prdefault}, \code{tprdefault}, and \code{maxlim},
-which impact the evaluation of \code{NM-TRAN}
-\item Priority: \code{.bbi_args} > model yaml > \code{bbi.yaml}
+which impact the evaluation of \code{NM-TRAN}. Priority is \code{.bbi_args} > model
+yaml > \code{bbi.yaml}
+\item Note: \code{run_nmtran()} considers only the first three \code{NM-TRAN} arguments
+(\code{prdefault}, \code{tprdefault}, and \code{maxlim}), but, starting with \verb{NONMEM 7.5},
+nmfe passes a fourth argument (\code{do2test}) to NM-TRAN.
+\itemize{
+\item \code{bbi} \emph{doesn't} expose nmfe's \code{-do2test} argument, so in the \code{bbi}/\code{bbr}
+context this call always passes \code{"0"} to \code{NM-TRAN} for the \code{do2test}
+value. If that first call exits with a status of \code{9}, nmfe does a follow-up
+call that drops the fourth argument (\code{do2test}).
+\item Given the above, \code{parse_nmtran_args()} does not support the additional
+\code{do2test} argument for \verb{NONMEM 7.5}. This should be revisited if
+\code{run_nmtran()} is called within \code{submit_model()} as a method of validating
+the control stream ahead of model execution. See additional discussion at
+https://github.com/metrumresearchgroup/bbr/pull/705.
+}
 }
 }
 \keyword{internal}

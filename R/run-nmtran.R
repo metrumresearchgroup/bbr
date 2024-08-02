@@ -65,7 +65,7 @@ run_nmtran <- function(
   nmtran_mod <- new_model(file.path(temp_folder, basename(mod_path)))
 
   # Copy dataset & overwrite $DATA record of new model
-  # NM-TRAN will error if data cannot be found
+  #  - New data path is used to avoid any special characters that require quoting
   if(fs::file_exists(data_path)){
     new_data_path <- file.path(temp_folder, "data.csv")
     fs::file_copy(data_path, new_data_path)
@@ -311,8 +311,20 @@ get_bbi_yaml_path <- function(.mod = NULL, .config_path = NULL){
 #'
 #' Combines NONMEM submission args and consolidates to `NMFE` arguments only
 #'  - The arguments of interest are `prdefault`, `tprdefault`, and `maxlim`,
-#'  which impact the evaluation of `NM-TRAN`
-#'  - Priority: `.bbi_args` > model yaml > `bbi.yaml`
+#' which impact the evaluation of `NM-TRAN`. Priority is `.bbi_args` > model
+#' yaml > `bbi.yaml`
+#'  - Note: `run_nmtran()` considers only the first three `NM-TRAN` arguments
+#'  (`prdefault`, `tprdefault`, and `maxlim`), but, starting with `NONMEM 7.5`,
+#'  nmfe passes a fourth argument (`do2test`) to NM-TRAN.
+#'      - `bbi` _doesn't_ expose nmfe's `-do2test` argument, so in the `bbi`/`bbr`
+#'      context this call always passes `"0"` to `NM-TRAN` for the `do2test`
+#'      value. If that first call exits with a status of `9`, nmfe does a follow-up
+#'      call that drops the fourth argument (`do2test`).
+#'      - Given the above, `parse_nmtran_args()` does not support the additional
+#'      `do2test` argument for `NONMEM 7.5`. This should be revisited if
+#'      `run_nmtran()` is called within `submit_model()` as a method of validating
+#'      the control stream ahead of model execution. See additional discussion at
+#'      https://github.com/metrumresearchgroup/bbr/pull/705.
 #'
 #' @keywords internal
 #' @return a named character vector
