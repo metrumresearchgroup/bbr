@@ -240,8 +240,9 @@ execute_nmtran <- function(
       error_on_status = TRUE
     )
 
-    # On Windows, nmtran_presort outputs the results to a fort.6 file instead of
-    # the designated stdout location.
+    # In our Window testing, nmtran_presort and NM-TRAN output write stdout to
+    # fort.6 instead of the locations specified in the processx::run() calls.
+    # See https://github.com/metrumresearchgroup/bbr/pull/705 for more discussion.
     # - Overwrite stdout with contents of fort.6 if on windows
     if(ON_WINDOWS){
       fort6_path <- file.path(run_dir, "fort.6")
