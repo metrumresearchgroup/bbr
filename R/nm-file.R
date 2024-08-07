@@ -113,8 +113,9 @@ nm_data <- function(.mod) {
 #' @importFrom data.table fread
 #' @importFrom stringr str_detect
 #' @param .path a path to a table file.
+#' @param skip number of rows to skip when reading in table file. Defaults to `1`
 #' @keywords internal
-nm_file_impl <- function(.path) {
+nm_file_impl <- function(.path, skip = 1) {
   # read file and find top of table
   verbose_msg(glue("Reading {basename(.path)}"))
 
@@ -128,7 +129,7 @@ nm_file_impl <- function(.path) {
       data <- fread(
         .path,
         na.strings = ".",
-        skip = 1,
+        skip = skip,
         verbose = FALSE
       )
     })
