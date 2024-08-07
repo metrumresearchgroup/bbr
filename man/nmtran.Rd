@@ -55,11 +55,11 @@ stream to ensure it is in the correct format for \code{NM-TRAN}.
 }
 \section{Functions}{
 \itemize{
-\item \code{run_nmtran()}: Function to run \code{NM-TRAN} on a model object to validate
-its control stream for correct coding before submission.
+\item \code{run_nmtran()}: Runs \code{NM-TRAN} on a model object to validate its control
+stream for correct coding before submission.
 
-\item \code{nm_fdata()}: Executes \code{run_nmtran} on a \code{bbi_nonmem_model} and returns
-the \code{NM-TRAN} dataset (\code{FDATA})
+\item \code{nm_fdata()}: Runs \code{NM-TRAN} on a model object and returns the \code{NM-TRAN}
+dataset (\code{FDATA})
 
 }}
 \examples{

@@ -40,8 +40,8 @@
 NULL
 
 
-#' @describeIn nmtran Function to run `NM-TRAN` on a model object to validate
-#' its control stream for correct coding before submission.
+#' @describeIn nmtran Runs `NM-TRAN` on a model object to validate its control
+#' stream for correct coding before submission.
 #' @export
 run_nmtran <- function(
     .mod,
@@ -397,8 +397,8 @@ parse_nmtran_args <- function(
 }
 
 
-#' @describeIn nmtran Executes `run_nmtran` on a `bbi_nonmem_model` and returns
-#' the `NM-TRAN` dataset (`FDATA`)
+#' @describeIn nmtran Runs `NM-TRAN` on a model object and returns the `NM-TRAN`
+#'  dataset (`FDATA`)
 #' @export
 nm_fdata <- function(
     .mod,
