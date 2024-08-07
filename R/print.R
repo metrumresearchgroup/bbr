@@ -442,6 +442,58 @@ print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
   }
 }
 
+
+#' @describeIn print_bbi Prints the `NM-TRAN` evaluation of a `bbi_nonmem_model`
+#'  object
+#' @export
+print.nmtran_process <- function(x, ...){
+
+  is_valid_print <- function(.x) {
+    if (!is.null(.x)) {
+      length(.x) != 0
+    } else {
+      FALSE
+    }
+  }
+
+  heading <- cli_h1
+  subheading <- cli_h2
+  bullet_list <- cat_bullet
+
+  status <- x[["status"]]
+  if (x[["status_val"]] == 0) {
+    status <- col_green(status)
+  } else {
+    status <- col_red(status)
+  }
+
+  heading(cli::col_magenta("NM-TRAN Status"))
+  subheading(status)
+
+  heading("Absolute Model Path")
+  bullet_list(x[[ABS_MOD_PATH]])
+
+  heading("NM-TRAN Specifications")
+  cli::cli_bullets(
+    c(
+      "*" = "NONMEM Version: {.val {x[['nonmem_version']]}}",
+      "*" = "NM-TRAN Executable: {.path {x[['nmtran_exe']]}}",
+      "*" = "nmtran_presort: {cli::col_cyan(!is.null(x[['nmtran_presort_exe']]))}"
+    )
+  )
+
+  # Print run directory if it still exists (clean = FALSE)
+  if(fs::dir_exists(x[['run_dir']])){
+    cli::cli_bullets(c("*" = "Run Directory: {.path {x[['run_dir']]}}"))
+  }
+
+  if (is_valid_print(x[["output"]])) {
+    heading('Output')
+    cat_line(x[["output"]])
+  }
+}
+
+
 #' @describeIn print_bbi Draw model tree as a static plot
 #' @param x plot to display
 #' @param newpage Logical (T/F). If `TRUE`, draw new (empty) page first.
@@ -470,7 +522,6 @@ print.model_tree_static <- function(x, newpage = is.null(vp), vp = NULL, ...){
   }
   return(invisible(x))
 }
-
 
 #####################
 # INTERNAL HELPERS

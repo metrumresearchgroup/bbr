@@ -305,5 +305,6 @@ withr::with_options(list(
     run_times <- model_summaries(mods) %>% check_run_times(.wait = FALSE) %>% suppressWarnings()
     expect_equal(dim(run_times), c(3, 3))
   })
+
 }) # closing withr::with_options
 

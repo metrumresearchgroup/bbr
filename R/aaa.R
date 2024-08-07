@@ -53,7 +53,7 @@ BBI_ARGS = list(
   delay = list(
     type = "numeric",
     flag = "--delay",
-    description = "Selects a random number of seconds between 1 and this value to stagger / jitter job execution. Assists in dealing with large volumes of work dealing with the same data set. May avoid NMTRAN issues about not being able read / close files"
+    description = "Selects a random number of seconds between 1 and this value to stagger / jitter job execution. Assists in dealing with large volumes of work dealing with the same data set. May avoid NM-TRAN issues about not being able read / close files"
   ),
   ext_file = list(
     type = "character",
@@ -209,6 +209,7 @@ RUN_LOG_CLASS <- "bbi_run_log_df"
 CONF_LOG_CLASS <- "bbi_config_log_df"
 SUM_LOG_CLASS <- "bbi_summary_log_df"
 LOG_DF_CLASS <- "bbi_log_df"
+NMTRAN_PROCESS_CLASS <- "nmtran_process"
 
 # YAML keys that are hard-coded
 YAML_YAML_MD5 <- "yaml_md5"
