@@ -16,11 +16,12 @@ setup_bootstrap_run(
 \arguments{
 \item{.boot_run}{A \code{bbi_nmboot_model} object.}
 
-\item{n}{Number of model runs.}
+\item{n}{Number of data sets and model runs to generate.}
 
 \item{strat_cols}{Columns to maintain proportion for stratification}
 
-\item{seed}{A seed for sampling the data. Set to \code{NULL} to avoid setting.}
+\item{seed}{A numeric seed to set prior to resampling the data; use \code{NULL} to
+avoid setting a seed.}
 
 \item{data}{A dataset to resample from. Defaults to \code{NULL}, which will use
 the \emph{filtered} output from \code{nm_data(.mod, filter = TRUE)}. If provided,

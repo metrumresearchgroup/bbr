@@ -6,14 +6,13 @@
 #' `remove_tables` arguments). The object returned from this must then be passed
 #' to [setup_bootstrap_run()] before submission (see examples).
 #'
-#' @param .mod A `bbr` model object
+#' @param .mod A `bbr` model object.
 #' @param .suffix A suffix for the bootstrap run directory. Will be prefixed by
 #'  the model id of `.mod`.
 #' @inheritParams copy_model_from
 #' @param .inherit_tags If `TRUE`, the default, inherit any tags from `.mod`.
-#' @param remove_cov,remove_tables Logical (T/F). Optionally remove `$COVARIANCE`
+#' @param remove_cov,remove_tables If `TRUE`, the default, remove `$COVARIANCE`
 #'  and `$TABLE` records respectively, allowing for notably faster run times.
-#'  Both default to `TRUE`.
 #'
 #' @seealso [setup_bootstrap_run()] [summarize_bootstrap_run()]
 #' @examples
@@ -82,9 +81,10 @@ new_bootstrap_run <- function(
 #' `$DATA` record (i.e. `get_data_path(.boot_run)`).
 #'
 #' @param .boot_run A `bbi_nmboot_model` object.
-#' @param n Number of model runs.
+#' @param n Number of data sets and model runs to generate.
 #' @param strat_cols Columns to maintain proportion for stratification
-#' @param seed A seed for sampling the data. Set to `NULL` to avoid setting.
+#' @param seed A numeric seed to set prior to resampling the data; use `NULL` to
+#'   avoid setting a seed.
 #' @param data A dataset to resample from. Defaults to `NULL`, which will use
 #'   the _filtered_ output from `nm_data(.mod, filter = TRUE)`. If provided,
 #'   must include the same column names as what's returned from `nm_data(.mod)`.

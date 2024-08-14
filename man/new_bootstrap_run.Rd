@@ -14,7 +14,7 @@ new_bootstrap_run(
 )
 }
 \arguments{
-\item{.mod}{A \code{bbr} model object}
+\item{.mod}{A \code{bbr} model object.}
 
 \item{.suffix}{A suffix for the bootstrap run directory. Will be prefixed by
 the model id of \code{.mod}.}
@@ -25,9 +25,8 @@ the model id of \code{.mod}.}
 file already exists at specified \code{.new_model} path. If \code{TRUE} any existing
 file at \code{.new_model} will be overwritten silently.}
 
-\item{remove_cov, remove_tables}{Logical (T/F). Optionally remove \verb{$COVARIANCE}
-and \verb{$TABLE} records respectively, allowing for notably faster run times.
-Both default to \code{TRUE}.}
+\item{remove_cov, remove_tables}{If \code{TRUE}, the default, remove \verb{$COVARIANCE}
+and \verb{$TABLE} records respectively, allowing for notably faster run times.}
 }
 \value{
 S3 object of class \code{bbi_nmboot_model}.
