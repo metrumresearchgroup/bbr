@@ -102,6 +102,26 @@ withr::with_options(
       })
     })
 
+    test_that("setup_bootstrap_run fails if filtering expressions cant be parsed", {
+      mod2 <- copy_model_from(mod1, "2")
+      boot_run2 <- new_bootstrap_run(mod2)
+      on.exit(delete_models(list(mod2, boot_run2), .force = TRUE, .tags = NULL))
+
+      # Add additional IGNORE expressions and compare to dplyr filters
+      ctl <- get_model_ctl(boot_run2)
+      data_rec <- nmrec::select_records(ctl, "data")[[1]]
+      data_rec$parse()
+
+      # Set filter that should error
+      data_rec$values[[7]]$value <- "(ID.EQ.2X)"
+      nmrec::write_ctl(ctl, get_model_path(mod2))
+
+      expect_error(
+        setup_bootstrap_run(boot_run2, n = 3),
+        "ignore/accept list could not be converted to filters"
+      )
+    })
+
     # Submit based_on model to use for remainder of tests
     proc1 <- submit_model(mod1, .mode = "local", .wait = TRUE)
 

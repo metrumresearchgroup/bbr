@@ -122,7 +122,7 @@ test_that("filter_nm_data() works with no filters", {
   data_rec <- nmrec::select_records(ctl, "data")[[1]]
   data_rec$parse()
 
-  # Create new ACCEPT option
+  # Remove filters
   data_rec$values[[5]]$value <- NULL
   data_rec$values[[7]]$value <- NULL
   nmrec::write_ctl(ctl, get_model_path(mod2))
@@ -131,4 +131,24 @@ test_that("filter_nm_data() works with no filters", {
   filtered_data <- filter_nm_data(mod2)
   expect_equal(attributes(filtered_data)$n_records_dropped, 0)
   expect_true(all.equal(nm_data(mod2), filtered_data, check.attributes = FALSE))
+})
+
+
+test_that("filter_nm_data() errors if expressions cant be parsed", {
+  mod2 <- copy_model_from(MOD1, "2")
+  on.exit(delete_models(mod2, .force = TRUE, .tags = NULL))
+
+  # Add additional IGNORE expressions and compare to dplyr filters
+  ctl <- get_model_ctl(mod2)
+  data_rec <- nmrec::select_records(ctl, "data")[[1]]
+  data_rec$parse()
+
+  # Set filter that should error
+  data_rec$values[[7]]$value <- "(ID.EQ.2X)"
+  nmrec::write_ctl(ctl, get_model_path(mod2))
+
+  expect_error(
+    filter_nm_data(mod2),
+    "ignore/accept list could not be converted to filters"
+  )
 })

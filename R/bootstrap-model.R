@@ -165,18 +165,20 @@ setup_bootstrap_run <- function(
 
     if(is.null(data)){
       # Only include subjects that entered the original problem by default
-      starting_data <- nm_data(orig_mod, filter = TRUE) %>% suppressMessages()
-
-      # NULL if IGNORE/ACCEPT expressions cant be turned into dplyr expressions
-      if(is.null(starting_data)){
-        cli::cli_inform(
-          paste(
-            "Defaulting to input data, which may include data that doesn't enter",
-            "the final problem (i.e. ignored subjects)"
+      starting_data <- tryCatch({
+        nm_data(orig_mod, filter = TRUE) %>% suppressMessages()
+      }, error = function(cond){
+        fs::dir_delete(boot_dir)
+        # If IGNORE/ACCEPT expressions cant be turned into dplyr expressions
+        cli::cli_div(theme = list(span.code = list(color = "blue")))
+        cli::cli_abort(
+          c(
+            cond$message,
+            "i" = "Please check your control stream or provide a starting dataset ({.var data} arg)",
+            "i" = "You may try {.code setup_bootstrap_run(mod, data = nm_join(mod))}"
           )
         )
-        starting_data <- nm_data(orig_mod) %>% suppressMessages()
-      }
+      })
 
       # Overwrite data path in control stream
       #  - This is not necessary in most cases, but is if overwriting a previous

@@ -229,21 +229,18 @@ filter_nm_data <- function(.mod, data = nm_data(.mod)){
   filtered_data <- tryCatch({
     data %>% dplyr::filter(eval(parse(text = filter_expression)))
   }, error = function(cond){
-    cli::cli_inform(
+    cli::cli_abort(
       c(
         "ignore/accept list could not be converted to filters",
-        "The following errors occurred:",
-        cond$parent$message
+        "i" = "The following errors occurred:",
+        "x" = cond$parent$message
       )
     )
-    return(NULL)
   })
 
-  if(!is.null(filtered_data)){
-    perc_retained <- round(100*(nrow(filtered_data)/nrow(data)), 2)
-    attr(filtered_data, "perc_retained") <- perc_retained
-    attr(filtered_data, "n_records_dropped") <- nrow(data) - nrow(filtered_data)
-  }
+  perc_retained <- round(100*(nrow(filtered_data)/nrow(data)), 2)
+  attr(filtered_data, "perc_retained") <- perc_retained
+  attr(filtered_data, "n_records_dropped") <- nrow(data) - nrow(filtered_data)
 
   return(filtered_data)
 }
