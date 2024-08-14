@@ -45,6 +45,13 @@ test_that("translate_nm_expr() translates NONMEM filter expressions", {
     translate_nm_expr("@", data_cols = data_cols),
     paste0("!grepl('^\\\\s*[A-Za-z@]', ", data_cols[1], ")")
   )
+
+  # Error out for unsupported logical operators
+  test_exprs_bad <- c(test_exprs, "GEN=1 .AND. AGE > 60")
+  expect_error(
+    translate_nm_expr(test_exprs_bad, type = 'accept'),
+    "The following logical operators are not supported"
+  )
 })
 
 test_that("filter_nm_data() filters input data using IGNORE/ACCEPT options", {
