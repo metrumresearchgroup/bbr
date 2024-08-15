@@ -10,6 +10,7 @@ setup_bootstrap_run(
   strat_cols = NULL,
   seed = 1234,
   data = NULL,
+  .bbi_args = list(no_grd_file = TRUE, no_shk_file = TRUE),
   .overwrite = FALSE
 )
 }
@@ -26,6 +27,11 @@ avoid setting a seed.}
 \item{data}{A dataset to resample from. Defaults to \code{NULL}, which will use
 the \emph{filtered} output from \code{nm_data(.mod, filter = TRUE)}. If provided,
 must include the same column names as what's returned from \code{nm_data(.mod)}.}
+
+\item{.bbi_args}{Named list passed to \code{model_summary(orig_mod, .bbi_args)},
+where \code{orig_mod} is the model \code{.boot_run} is based on. See
+\code{\link[=print_bbi_args]{print_bbi_args()}} for valid options. Defaults to \code{list(no_grd_file = TRUE, no_shk_file = TRUE)} because \code{\link[=model_summary]{model_summary()}} is only called internally to
+extract the number of records, so those files are irrelevant.}
 
 \item{.overwrite}{Logical (T/F) indicating whether or not to overwrite
 existing setup for a bootstrap run.}

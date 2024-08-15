@@ -88,6 +88,11 @@ new_bootstrap_run <- function(
 #' @param data A dataset to resample from. Defaults to `NULL`, which will use
 #'   the _filtered_ output from `nm_data(.mod, filter = TRUE)`. If provided,
 #'   must include the same column names as what's returned from `nm_data(.mod)`.
+#' @param .bbi_args Named list passed to `model_summary(orig_mod, .bbi_args)`,
+#'   where `orig_mod` is the model `.boot_run` is based on. See
+#'   [print_bbi_args()] for valid options. Defaults to `list(no_grd_file = TRUE,
+#'   no_shk_file = TRUE)` because [model_summary()] is only called internally to
+#'   extract the number of records, so those files are irrelevant.
 #' @param .overwrite Logical (T/F) indicating whether or not to overwrite
 #'   existing setup for a bootstrap run.
 #'
@@ -131,6 +136,10 @@ setup_bootstrap_run <- function(
     strat_cols = NULL,
     seed = 1234,
     data = NULL,
+    .bbi_args = list(
+      no_grd_file = TRUE,
+      no_shk_file = TRUE
+    ),
     .overwrite = FALSE
 ){
   check_model_object(.boot_run, NMBOOT_MOD_CLASS)
@@ -179,6 +188,26 @@ setup_bootstrap_run <- function(
           )
         )
       })
+
+      # If model has finished, check the number of records to ensure the filtering
+      # was done correctly
+      if(check_nonmem_finished(orig_mod)){
+        .s <- model_summary(orig_mod, .bbi_args = .bbi_args)
+        nrec <- .s$run_details$number_of_data_records
+        nrec_f <- nrow(starting_data)
+        if(nrec != nrec_f){
+          fs::dir_delete(boot_dir)
+          cli::cli_div(theme = list(.code = list(color = "blue"), .val = list(color = "red3")))
+          cli::cli_abort(
+            c(
+              "!" = "The filtered dataset does not have the same number of records as the original model:",
+              "*" = "{.code nm_data(orig_mod, filter = TRUE)} returned {.val {nrec_f}} records",
+              "*" = "{.code model_summary(orig_mod)} returned {.val {nrec}} records",
+              "i" = "where {.code orig_mod <- read_model(get_based_on(.boot_run))}"
+            )
+          )
+        }
+      }
 
       # Overwrite data path in control stream
       #  - This is not necessary in most cases, but is if overwriting a previous

@@ -125,6 +125,30 @@ withr::with_options(
     # Submit based_on model to use for remainder of tests
     proc1 <- submit_model(mod1, .mode = "local", .wait = TRUE)
 
+    test_that("setup_bootstrap_run fails if n records are different", {
+      # If the based on model has been executed, we check that the number of
+      # records in the model_summary matches the number of rows in the filtered
+      # dataset (`nm_data(mod, filter = TRUE)`).
+      mod2 <- copy_model_from(mod1, "2")
+      copy_output_dir(mod1, file.path(MODEL_DIR_BBI, get_model_id(mod2)))
+      boot_run2 <- new_bootstrap_run(mod2)
+      on.exit(delete_models(list(mod2, boot_run2), .force = TRUE, .tags = NULL))
+
+      # Add additional IGNORE expressions and compare to dplyr filters
+      ctl <- get_model_ctl(boot_run2)
+      data_rec <- nmrec::select_records(ctl, "data")[[1]]
+      data_rec$parse()
+
+      # Set filter that should error
+      data_rec$values[[7]]$value <- "(ID.EQ.2, SEX.EQ.1)"
+      nmrec::write_ctl(ctl, get_model_path(mod2))
+
+      expect_error(
+        setup_bootstrap_run(boot_run2, n = 3),
+        "The filtered dataset does not have the same number of records"
+      )
+    })
+
     test_that("setup_bootstrap_run works with user-provided dataset", {
       starting_data <- nm_join(mod1) %>% suppressMessages()
       setup_bootstrap_run(.boot_run, n = 1, data = starting_data, .overwrite = TRUE)
