@@ -92,7 +92,8 @@ new_bootstrap_run <- function(
 #'   where `orig_mod` is the model `.boot_run` is based on. See
 #'   [print_bbi_args()] for valid options. Defaults to `list(no_grd_file = TRUE,
 #'   no_shk_file = TRUE)` because [model_summary()] is only called internally to
-#'   extract the number of records, so those files are irrelevant.
+#'   extract the number of records, so those files are irrelevant. Only used if
+#'   the based on model (the model being bootstrapped) has been executed.
 #' @param .overwrite Logical (T/F) indicating whether or not to overwrite
 #'   existing setup for a bootstrap run.
 #'
