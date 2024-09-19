@@ -94,7 +94,7 @@ nm_par_tab <- function(.mod) {
 #' @importFrom tibble as_tibble
 #' @export
 nm_data <- function(.mod, filter = FALSE) {
-  check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS, NMSIM_MOD_CLASS))
+  check_model_object(.mod, c(NM_MOD_CLASS, NM_SUM_CLASS, NMSIM_MOD_CLASS, NMBOOT_MOD_CLASS))
   .path <- get_data_path(.mod)
   verbose_msg(glue("Reading data file: {basename(.path)}"))
   .d <- fread(.path, na.strings = ".", verbose = FALSE)
