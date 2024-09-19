@@ -14,13 +14,13 @@ bootstrap_estimates(.boot_run, format_long = FALSE, force_resummarize = FALSE)
 get_boot_models(.boot_run)
 }
 \arguments{
-\item{.boot_run}{a \code{bbi_nmboot_model} object.}
+\item{.boot_run}{A \code{bbi_nmboot_model} object.}
 
-\item{force_resummarize}{logical (T/F). If \code{TRUE}, force re-summarization.
+\item{force_resummarize}{Logical (T/F). If \code{TRUE}, force re-summarization.
 Will \emph{only} update the saved out \code{RDS} file when specified via
 \code{summarize_bootstrap_run()}. See details for more information.}
 
-\item{format_long}{logical (T/F). If \code{TRUE}, format data as a long table,
+\item{format_long}{Logical (T/F). If \code{TRUE}, format data as a long table,
 making the data more portable for plotting.}
 }
 \description{

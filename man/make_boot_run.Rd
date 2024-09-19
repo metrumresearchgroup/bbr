@@ -7,9 +7,9 @@
 make_boot_run(mod_path, boot_args)
 }
 \arguments{
-\item{mod_path}{absolute model path (no file extension) of a bootstrap model run.}
+\item{mod_path}{Absolute model path (no file extension) of a bootstrap model run.}
 
-\item{boot_args}{list of parameters needed to create a bootstrap model run.}
+\item{boot_args}{List of parameters needed to create a bootstrap model run.}
 }
 \description{
 Set up a single bootstrap model run

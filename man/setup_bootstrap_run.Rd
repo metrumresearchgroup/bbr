@@ -9,20 +9,33 @@ setup_bootstrap_run(
   n = 200,
   strat_cols = NULL,
   seed = 1234,
+  data = NULL,
+  .bbi_args = list(no_grd_file = TRUE, no_shk_file = TRUE),
   .overwrite = FALSE
 )
 }
 \arguments{
-\item{.boot_run}{a \code{bbi_nmboot_model} object.}
+\item{.boot_run}{A \code{bbi_nmboot_model} object.}
 
-\item{n}{number of model runs.}
+\item{n}{Number of data sets and model runs to generate.}
 
-\item{strat_cols}{columns to maintain proportion for stratification}
+\item{strat_cols}{Columns to maintain proportion for stratification}
 
-\item{seed}{a seed for sampling the data. Set to \code{NULL} to avoid setting.}
+\item{seed}{A numeric seed to set prior to resampling the data; use \code{NULL} to
+avoid setting a seed.}
 
-\item{.overwrite}{logical (T/F) indicating whether or not to overwrite existing
-setup for a bootstrap run.}
+\item{data}{A dataset to resample from. Defaults to \code{NULL}, which will use
+the \emph{filtered} output from \code{nm_data(.mod, filter = TRUE)}. If provided,
+must include the same column names as what's returned from \code{nm_data(.mod)}.}
+
+\item{.bbi_args}{Named list passed to \code{model_summary(orig_mod, .bbi_args)},
+where \code{orig_mod} is the model \code{.boot_run} is based on. See
+\code{\link[=print_bbi_args]{print_bbi_args()}} for valid options. Defaults to \code{list(no_grd_file = TRUE, no_shk_file = TRUE)} because \code{\link[=model_summary]{model_summary()}} is only called internally to
+extract the number of records, so those files are irrelevant. Only used if
+the based on model (the model being bootstrapped) has been executed.}
+
+\item{.overwrite}{Logical (T/F) indicating whether or not to overwrite
+existing setup for a bootstrap run.}
 }
 \description{
 This function takes a \code{bbi_nmboot_model} (created by a previous

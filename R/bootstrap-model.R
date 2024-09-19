@@ -6,14 +6,13 @@
 #' `remove_tables` arguments). The object returned from this must then be passed
 #' to [setup_bootstrap_run()] before submission (see examples).
 #'
-#' @param .mod a `bbr` model object
-#' @param .suffix a suffix for the bootstrap run directory. Will be prefixed by
+#' @param .mod A `bbr` model object.
+#' @param .suffix A suffix for the bootstrap run directory. Will be prefixed by
 #'  the model id of `.mod`.
 #' @inheritParams copy_model_from
 #' @param .inherit_tags If `TRUE`, the default, inherit any tags from `.mod`.
-#' @param remove_cov,remove_tables Logical (T/F). Optionally remove `$COVARIANCE`
+#' @param remove_cov,remove_tables If `TRUE`, the default, remove `$COVARIANCE`
 #'  and `$TABLE` records respectively, allowing for notably faster run times.
-#'  Both default to `TRUE`.
 #'
 #' @seealso [setup_bootstrap_run()] [summarize_bootstrap_run()]
 #' @examples
@@ -81,6 +80,23 @@ new_bootstrap_run <- function(
 #' objects, and the new datasets are sampled from the dataset defined in its
 #' `$DATA` record (i.e. `get_data_path(.boot_run)`).
 #'
+#' @param .boot_run A `bbi_nmboot_model` object.
+#' @param n Number of data sets and model runs to generate.
+#' @param strat_cols Columns to maintain proportion for stratification
+#' @param seed A numeric seed to set prior to resampling the data; use `NULL` to
+#'   avoid setting a seed.
+#' @param data A dataset to resample from. Defaults to `NULL`, which will use
+#'   the _filtered_ output from `nm_data(.mod, filter = TRUE)`. If provided,
+#'   must include the same column names as what's returned from `nm_data(.mod)`.
+#' @param .bbi_args Named list passed to `model_summary(orig_mod, .bbi_args)`,
+#'   where `orig_mod` is the model `.boot_run` is based on. See
+#'   [print_bbi_args()] for valid options. Defaults to `list(no_grd_file = TRUE,
+#'   no_shk_file = TRUE)` because [model_summary()] is only called internally to
+#'   extract the number of records, so those files are irrelevant. Only used if
+#'   the based on model (the model being bootstrapped) has been executed.
+#' @param .overwrite Logical (T/F) indicating whether or not to overwrite
+#'   existing setup for a bootstrap run.
+#'
 #' @details
 #'
 #' Once you have run this function, you can execute your bootstrap with
@@ -88,12 +104,6 @@ new_bootstrap_run <- function(
 #' bootstrap run. Once all models have finished, use [summarize_bootstrap_run()]
 #' to view the results. See examples below.
 #'
-#' @param .boot_run a `bbi_nmboot_model` object.
-#' @param n number of model runs.
-#' @param strat_cols columns to maintain proportion for stratification
-#' @param seed a seed for sampling the data. Set to `NULL` to avoid setting.
-#' @param .overwrite logical (T/F) indicating whether or not to overwrite existing
-#'  setup for a bootstrap run.
 #'
 #' @seealso [new_bootstrap_run()] [summarize_bootstrap_run()] [submit_model()]
 #'
@@ -126,6 +136,11 @@ setup_bootstrap_run <- function(
     n = 200,
     strat_cols = NULL,
     seed = 1234,
+    data = NULL,
+    .bbi_args = list(
+      no_grd_file = TRUE,
+      no_shk_file = TRUE
+    ),
     .overwrite = FALSE
 ){
   check_model_object(.boot_run, NMBOOT_MOD_CLASS)
@@ -158,27 +173,96 @@ setup_bootstrap_run <- function(
     ignore_lines <- paste(default_ignore, ignore_models, sep = "\n\n")
     writeLines(ignore_lines, file.path(boot_dir, ".gitignore"))
 
-    # Only include subjects that entered the original problem by default
-    can_be_joined <- can_be_nm_joined(orig_mod)
-    if(isTRUE(can_be_joined)){
-      starting_data <- nm_join(orig_mod) %>% suppressMessages()
-
-      # select only columns from original data set
-      starting_data <- starting_data %>%
-        dplyr::select(attr(starting_data, "nm_join_origin")$data)
-
-      if ("DV.DATA" %in% names(starting_data)) {
-        starting_data <- dplyr::rename(starting_data, "DV" = "DV.DATA")
+    if(is.null(data)){
+      # Overwrite data path in control stream
+      #  - This is not necessary in most cases, but is if overwriting a previous
+      #    run where a starting dataset was provided. The data path must then
+      #    be updated to reflect the original control stream
+      data_path <- get_data_path(.boot_run, .check_exists = FALSE)
+      if(!fs::file_exists(data_path)){
+        data_path_rel <- get_data_path_from_ctl(orig_mod, normalize = FALSE)
+        modify_data_path_ctl(.boot_run, data_path_rel)
       }
 
-    }else{
-      rlang::inform(
-        paste(
-          "Defaulting to input data, which may include data that doesn't enter",
-          "the final problem (i.e. ignored subjects)"
+      # Only include subjects that entered the original problem by default
+      starting_data <- tryCatch({
+        nm_data(.boot_run, filter = TRUE) %>% suppressMessages()
+      }, error = function(cond){
+        fs::dir_delete(boot_dir)
+        # If IGNORE/ACCEPT expressions cant be turned into dplyr expressions
+        cli::cli_div(theme = list(span.code = list(color = "blue")))
+        cli::cli_abort(
+          c(
+            cond$message,
+            "i" = "Please check your control stream or provide a starting dataset ({.var data} arg)",
+            "i" = "You may try {.code setup_bootstrap_run(.boot_run, data = nm_join(mod))}"
+          )
         )
+      })
+
+      # If model has finished, check the number of records to ensure the filtering
+      # was done correctly
+      if(check_nonmem_finished(orig_mod)){
+        .s <- model_summary(orig_mod, .bbi_args = .bbi_args)
+        nrec <- .s$run_details$number_of_data_records
+        nrec_f <- nrow(starting_data)
+        if(nrec != nrec_f){
+          fs::dir_delete(boot_dir)
+          cli::cli_div(theme = list(.code = list(color = "blue"), .val = list(color = "red3")))
+          cli::cli_abort(
+            c(
+              "!" = "The filtered dataset does not have the same number of records as the original model:",
+              "*" = "{.code nm_data(orig_mod, filter = TRUE)} returned {.val {nrec_f}} records",
+              "*" = "{.code model_summary(orig_mod)} returned {.val {nrec}} records",
+              "i" = "where {.code orig_mod <- read_model(get_based_on(.boot_run))}",
+              "i" = "Try providing a starting dataset (e.g., {.code setup_bootstrap_run(.boot_run, data = nm_join(orig_mod))})"
+            )
+          )
+        }
+      }else{
+        orig_mod_name <- fs::path_rel(
+          get_model_path(orig_mod),
+          get_model_working_directory(orig_mod)
+        )
+        cli::cli_div(theme = list(.code = list(color = "blue"), .val = list(color = "red3")))
+        cli::cli_warn(
+          c(
+            "The parent model ({.code {orig_mod_name}}) has not been submitted",
+            "i" = "Consider executing {.code {orig_mod_name}} to perform additional checks"
+          )
+        )
+      }
+    }else{
+      checkmate::assert_data_frame(data)
+      # Get input columns from dataset referenced in based_on model
+      #  - must be from based_on model, as the data path of .boot_run may already
+      #    have been adjusted to point to a new dataset (which wont exist if overwriting)
+      input_cols <- get_input_columns(orig_mod)
+      if(!all(input_cols %in% names(data))){
+        missing_cols <- input_cols[!(input_cols %in% names(data))]
+        missing_txt <- paste(missing_cols, collapse = ", ")
+        fs::dir_delete(boot_dir)
+        rlang::abort(
+          c(
+            glue("The following required input columns were not found in the input data: {missing_txt}"),
+            "Check `nm_data(read_model(get_based_on(.boot_run)))` to see expected columns."
+          )
+        )
+      }
+
+      # Remove any extra columns
+      starting_data <- dplyr::select(data, all_of(input_cols))
+
+      # Save data to boot_dir
+      data_path_new <- file.path(boot_dir, "boot-data.csv")
+      readr::write_csv(starting_data, data_path_new, na = ".")
+
+      # Update data path in control stream (adjusting for .mod vs .ctl extension)
+      data_path_rel <- adjust_data_path_ext(
+        file.path(basename(boot_dir), basename(data_path_new)),
+        get_model_path(.boot_run), reverse = TRUE
       )
-      starting_data <- nm_data(orig_mod) %>% suppressMessages()
+      modify_data_path_ctl(.boot_run, data_path_rel)
     }
 
     if(!is.null(strat_cols)){
@@ -232,8 +316,8 @@ setup_bootstrap_run <- function(
 
 #' Set up a single bootstrap model run
 #'
-#' @param mod_path absolute model path (no file extension) of a bootstrap model run.
-#' @param boot_args list of parameters needed to create a bootstrap model run.
+#' @param mod_path Absolute model path (no file extension) of a bootstrap model run.
+#' @param boot_args List of parameters needed to create a bootstrap model run.
 #'
 #' @keywords internal
 make_boot_run <- function(mod_path, boot_args){
@@ -302,7 +386,7 @@ make_boot_run <- function(mod_path, boot_args){
 
 #' Store bootstrap run details before submission
 #'
-#' @param boot_models list of boostrap model objects created by `make_boot_run()`.
+#' @param boot_models List of boostrap model objects created by `make_boot_run()`.
 #' @inheritParams make_boot_run
 #'
 #' @details
@@ -369,7 +453,7 @@ make_boot_spec <- function(boot_models, boot_args){
 #' bootstrap run directory.
 #'
 #' @inheritParams setup_bootstrap_run
-#' @param force_resummarize logical (T/F). If `TRUE`, force re-summarization.
+#' @param force_resummarize Logical (T/F). If `TRUE`, force re-summarization.
 #'  Will _only_ update the saved out `RDS` file when specified via
 #'  `summarize_bootstrap_run()`. See details for more information.
 #'
@@ -565,7 +649,7 @@ summarize_bootstrap_run <- function(
 
 #' @describeIn summarize_bootstrap Tabulate parameter estimates for each model
 #'  submission in a bootstrap run
-#' @param format_long logical (T/F). If `TRUE`, format data as a long table,
+#' @param format_long Logical (T/F). If `TRUE`, format data as a long table,
 #'  making the data more portable for plotting.
 #' @export
 bootstrap_estimates <- function(
