@@ -176,7 +176,7 @@ setup_bootstrap_run <- function(
     if(is.null(data)){
       # Only include subjects that entered the original problem by default
       starting_data <- tryCatch({
-        nm_data(orig_mod, filter = TRUE) %>% suppressMessages()
+        nm_data(.boot_run, filter = TRUE) %>% suppressMessages()
       }, error = function(cond){
         fs::dir_delete(boot_dir)
         # If IGNORE/ACCEPT expressions cant be turned into dplyr expressions
@@ -185,7 +185,7 @@ setup_bootstrap_run <- function(
           c(
             cond$message,
             "i" = "Please check your control stream or provide a starting dataset ({.var data} arg)",
-            "i" = "You may try {.code setup_bootstrap_run(mod, data = nm_join(mod))}"
+            "i" = "You may try {.code setup_bootstrap_run(.boot_run, data = nm_join(mod))}"
           )
         )
       })
@@ -204,10 +204,21 @@ setup_bootstrap_run <- function(
               "!" = "The filtered dataset does not have the same number of records as the original model:",
               "*" = "{.code nm_data(orig_mod, filter = TRUE)} returned {.val {nrec_f}} records",
               "*" = "{.code model_summary(orig_mod)} returned {.val {nrec}} records",
-              "i" = "where {.code orig_mod <- read_model(get_based_on(.boot_run))}"
+              "i" = "where {.code orig_mod <- read_model(get_based_on(.boot_run))}",
+              "i" = "Try providing a starting dataset (e.g., {.code setup_bootstrap_run(.boot_run, data = nm_join(orig_mod))})"
             )
           )
         }
+      }else{
+        orig_mod_name <- fs::path_rel(
+          get_model_path(orig_mod),
+          get_model_working_directory(orig_mod)
+        )
+        cli::cli_div(theme = list(.code = list(color = "blue"), .val = list(color = "red3")))
+        rlang::warn(
+          "The parent model ({.code orig_mod_name}) has not been submitted",
+          "i" = "Consider executing {.code orig_mod_name} to perform additional checks"
+        )
       }
 
       # Overwrite data path in control stream
