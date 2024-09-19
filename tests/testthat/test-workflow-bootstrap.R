@@ -102,25 +102,60 @@ withr::with_options(
       })
     })
 
-    test_that("setup_bootstrap_run messages if nm_join cant be used: unfinished model", {
-      boot_spec_path <- get_spec_path(.boot_run, .check_exists = FALSE)
-      expect_false(fs::file_exists(boot_spec_path))
-      # Set up bootstrap run object using *non-submitted* model
-      expect_message(
-        setup_bootstrap_run(.boot_run, n = 3),
-        "Model has not finished executing"
+    test_that("setup_bootstrap_run fails if filtering expressions cant be parsed", {
+      mod2 <- copy_model_from(mod1, "2")
+      boot_run2 <- new_bootstrap_run(mod2)
+      on.exit(delete_models(list(mod2, boot_run2), .force = TRUE, .tags = NULL))
+
+      # Add additional IGNORE expressions and compare to dplyr filters
+      ctl <- get_model_ctl(boot_run2)
+      data_rec <- nmrec::select_records(ctl, "data")[[1]]
+      data_rec$parse()
+
+      # Set filter that should error
+      current_filter <- data_rec$values[[7]]$value
+      data_rec$values[[7]]$value <- "(ID.EQ.2X)"
+      nmrec::write_ctl(ctl, get_model_path(boot_run2))
+
+      expect_error(
+        setup_bootstrap_run(boot_run2, n = 3),
+        "ignore/accept list could not be converted to filters"
       )
-      expect_true(fs::file_exists(boot_spec_path))
+
+      # Revert filter and check for warning that the model hasnt been run
+      data_rec$values[[7]]$value <- current_filter
+      nmrec::write_ctl(ctl, get_model_path(boot_run2))
+
+      expect_warning(
+        setup_bootstrap_run(boot_run2, n = 3),
+        "has not been submitted"
+      )
     })
 
     # Submit based_on model to use for remainder of tests
     proc1 <- submit_model(mod1, .mode = "local", .wait = TRUE)
 
-    test_that("setup_bootstrap_run messages if nm_join cant be used: bad .join_col setup", {
-      # Set up bootstrap run object when .join_col checks fail
-      expect_message(
-        setup_bootstrap_run(.boot_run, n = 3, .join_col = "ID", .overwrite = TRUE),
-        "records must include the provided .join_col"
+    test_that("setup_bootstrap_run fails if n records are different", {
+      # If the based on model has been executed, we check that the number of
+      # records in the model_summary matches the number of rows in the filtered
+      # dataset (`nm_data(mod, filter = TRUE)`).
+      mod2 <- copy_model_from(mod1, "2")
+      copy_output_dir(mod1, file.path(MODEL_DIR_BBI, get_model_id(mod2)))
+      boot_run2 <- new_bootstrap_run(mod2)
+      on.exit(delete_models(list(mod2, boot_run2), .force = TRUE, .tags = NULL))
+
+      # Add additional IGNORE expressions and compare to dplyr filters
+      ctl <- get_model_ctl(boot_run2)
+      data_rec <- nmrec::select_records(ctl, "data")[[1]]
+      data_rec$parse()
+
+      # Set filter that should error
+      data_rec$values[[7]]$value <- "(ID.EQ.2, SEX.EQ.1)"
+      nmrec::write_ctl(ctl, get_model_path(boot_run2))
+
+      expect_error(
+        setup_bootstrap_run(boot_run2, n = 3),
+        "The filtered dataset does not have the same number of records"
       )
     })
 
@@ -384,9 +419,9 @@ withr::with_options(
       # Copy model files and output directory of simulation
       new_dir <- tempdir()
       new_dir_path <- file.path(new_dir, basename(.boot_run[[ABS_MOD_PATH]]))
-      fs::file_copy(ctl_ext(.boot_run[[ABS_MOD_PATH]]), ctl_ext(new_dir_path))
-      fs::file_copy(yaml_ext(.boot_run[[ABS_MOD_PATH]]), yaml_ext(new_dir_path))
-      fs::dir_copy(.boot_run[[ABS_MOD_PATH]], new_dir_path)
+      fs::file_copy(ctl_ext(.boot_run[[ABS_MOD_PATH]]), ctl_ext(new_dir_path), overwrite = TRUE)
+      fs::file_copy(yaml_ext(.boot_run[[ABS_MOD_PATH]]), yaml_ext(new_dir_path), overwrite = TRUE)
+      fs::dir_copy(.boot_run[[ABS_MOD_PATH]], new_dir_path, overwrite = TRUE)
       fake_boot <- read_model(new_dir_path)
       on.exit(delete_models(fake_boot, .tags = NULL, .force = TRUE))
 
