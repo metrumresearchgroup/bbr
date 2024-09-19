@@ -113,12 +113,22 @@ withr::with_options(
       data_rec$parse()
 
       # Set filter that should error
+      current_filter <- data_rec$values[[7]]$value
       data_rec$values[[7]]$value <- "(ID.EQ.2X)"
-      nmrec::write_ctl(ctl, get_model_path(mod2))
+      nmrec::write_ctl(ctl, get_model_path(boot_run2))
 
       expect_error(
         setup_bootstrap_run(boot_run2, n = 3),
         "ignore/accept list could not be converted to filters"
+      )
+
+      # Revert filter and check for warning that the model hasnt been run
+      data_rec$values[[7]]$value <- current_filter
+      nmrec::write_ctl(ctl, get_model_path(boot_run2))
+
+      expect_warning(
+        setup_bootstrap_run(boot_run2, n = 3),
+        "has not been submitted"
       )
     })
 
