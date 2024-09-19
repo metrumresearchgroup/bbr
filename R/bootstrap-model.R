@@ -174,6 +174,16 @@ setup_bootstrap_run <- function(
     writeLines(ignore_lines, file.path(boot_dir, ".gitignore"))
 
     if(is.null(data)){
+      # Overwrite data path in control stream
+      #  - This is not necessary in most cases, but is if overwriting a previous
+      #    run where a starting dataset was provided. The data path must then
+      #    be updated to reflect the original control stream
+      data_path <- get_data_path(.boot_run, .check_exists = FALSE)
+      if(!fs::file_exists(data_path)){
+        data_path_rel <- get_data_path_from_ctl(orig_mod, normalize = FALSE)
+        modify_data_path_ctl(.boot_run, data_path_rel)
+      }
+
       # Only include subjects that entered the original problem by default
       starting_data <- tryCatch({
         nm_data(.boot_run, filter = TRUE) %>% suppressMessages()
@@ -221,16 +231,6 @@ setup_bootstrap_run <- function(
             "i" = "Consider executing {.code {orig_mod_name}} to perform additional checks"
           )
         )
-      }
-
-      # Overwrite data path in control stream
-      #  - This is not necessary in most cases, but is if overwriting a previous
-      #    run where a starting dataset was provided. The data path must then
-      #    be updated to reflect the original control stream
-      data_path <- get_data_path(.boot_run, .check_exists = FALSE)
-      if(!fs::file_exists(data_path)){
-        data_path_rel <- get_data_path_from_ctl(orig_mod, normalize = FALSE)
-        modify_data_path_ctl(.boot_run, data_path_rel)
       }
     }else{
       checkmate::assert_data_frame(data)

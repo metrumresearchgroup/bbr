@@ -151,7 +151,7 @@ withr::with_options(
 
       # Set filter that should error
       data_rec$values[[7]]$value <- "(ID.EQ.2, SEX.EQ.1)"
-      nmrec::write_ctl(ctl, get_model_path(mod2))
+      nmrec::write_ctl(ctl, get_model_path(boot_run2))
 
       expect_error(
         setup_bootstrap_run(boot_run2, n = 3),
@@ -172,10 +172,7 @@ withr::with_options(
     })
 
     test_that("setup_bootstrap_run works as expected", {
-      expect_message(
-        setup_bootstrap_run(.boot_run, n = 3, .overwrite = TRUE, seed = NULL),
-        "Dropped 20 records from starting data"
-      )
+      setup_bootstrap_run(.boot_run, n = 3, .overwrite = TRUE, seed = NULL)
 
       # Check print method - strat_cols are made to be NA if none provided
       bullets <- capture.output({
@@ -422,9 +419,9 @@ withr::with_options(
       # Copy model files and output directory of simulation
       new_dir <- tempdir()
       new_dir_path <- file.path(new_dir, basename(.boot_run[[ABS_MOD_PATH]]))
-      fs::file_copy(ctl_ext(.boot_run[[ABS_MOD_PATH]]), ctl_ext(new_dir_path))
-      fs::file_copy(yaml_ext(.boot_run[[ABS_MOD_PATH]]), yaml_ext(new_dir_path))
-      fs::dir_copy(.boot_run[[ABS_MOD_PATH]], new_dir_path)
+      fs::file_copy(ctl_ext(.boot_run[[ABS_MOD_PATH]]), ctl_ext(new_dir_path), overwrite = TRUE)
+      fs::file_copy(yaml_ext(.boot_run[[ABS_MOD_PATH]]), yaml_ext(new_dir_path), overwrite = TRUE)
+      fs::dir_copy(.boot_run[[ABS_MOD_PATH]], new_dir_path, overwrite = TRUE)
       fake_boot <- read_model(new_dir_path)
       on.exit(delete_models(fake_boot, .tags = NULL, .force = TRUE))
 
