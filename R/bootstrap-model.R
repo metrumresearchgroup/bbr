@@ -215,9 +215,11 @@ setup_bootstrap_run <- function(
           get_model_working_directory(orig_mod)
         )
         cli::cli_div(theme = list(.code = list(color = "blue"), .val = list(color = "red3")))
-        rlang::warn(
-          "The parent model ({.code orig_mod_name}) has not been submitted",
-          "i" = "Consider executing {.code orig_mod_name} to perform additional checks"
+        cli::cli_warn(
+          c(
+            "The parent model ({.code orig_mod_name}) has not been submitted",
+            "i" = "Consider executing {.code orig_mod_name} to perform additional checks"
+          )
         )
       }
 
