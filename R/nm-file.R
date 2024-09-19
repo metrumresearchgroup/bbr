@@ -104,14 +104,15 @@ nm_data <- function(.mod, filter = FALSE) {
   names(.d) <- toupper(names(.d))
 
   if(isTRUE(filter)){
+    .d_orig <- .d
     .d <- filter_nm_data(.mod, data = .d)
-    perc_retained <- attributes(.d)$perc_retained
-    msg <- paste("  Filtered:", cli::col_blue(perc_retained, "%"), "of records retained")
-    verbose_msg(msg)
+    msg_rows <- paste("  rows:", cli::col_blue(nrow(.d)), "of", cli::col_blue(nrow(.d_orig)))
+  }else{
+    msg_rows <- paste("  rows:", cli::col_blue(nrow(.d)))
   }
 
-  verbose_msg(glue("  rows: {nrow(.d)}"))
-  verbose_msg(glue("  cols: {ncol(.d)}"))
+  verbose_msg(msg_rows)
+  verbose_msg(paste("  cols:", cli::col_blue(ncol(.d))))
   verbose_msg("") # for newline
 
   return(.d)
