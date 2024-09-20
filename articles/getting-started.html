@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.12.0</span>
       </span>
     </div>
 
@@ -58,6 +58,9 @@
   <ul class="dropdown-menu" role="menu">
 <li>
       <a href="../articles/getting-started.html">Getting Started with bbr</a>
+    </li>
+    <li>
+      <a href="../articles/model-tree.html">Creating a model tree diagram</a>
     </li>
     <li>
       <a href="../articles/nonmem-parallel.html">Running NONMEM in Parallel: bbr Tips and Tricks</a>
@@ -327,7 +330,7 @@ using the <code><a href="../reference/print_bbi_args.html">print_bbi_args()</a><
 <span><span class="co">#&gt; <span style="color: #0000BB; font-weight: bold;">debug</span> (logical): debug mode. Command-line option: --debug</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB; font-weight: bold;">delay</span> (numeric): Selects a random number of seconds between 1 and this value to</span></span>
 <span><span class="co">#&gt;   stagger / jitter job execution. Assists in dealing with large volumes of work</span></span>
-<span><span class="co">#&gt;   dealing with the same data set. May avoid NMTRAN issues about not being able</span></span>
+<span><span class="co">#&gt;   dealing with the same data set. May avoid NM-TRAN issues about not being able</span></span>
 <span><span class="co">#&gt;   read / close files. Command-line option: --delay</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB; font-weight: bold;">ext_file</span> (character): name of custom ext-file. Command-line option: --ext-file</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB; font-weight: bold;">git</span> (logical): whether git is used. Command-line option: --git</span></span>
@@ -442,7 +445,7 @@ list.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sum1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "absolute_model_path" "run_details"         "run_heuristics"     </span></span>
 <span><span class="co">#&gt; [4] "parameters_data"     "parameter_names"     "ofv"                </span></span>
-<span><span class="co">#&gt; [7] "condition_number"    "shrinkage_details"</span></span></code></pre></div>
+<span><span class="co">#&gt; [7] "condition_number"    "shrinkage_details"   "success"</span></span></code></pre></div>
 <p>These elements can be accessed manually or extracted with built-in
 helper functions like so:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">

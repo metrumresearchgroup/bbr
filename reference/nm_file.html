@@ -20,7 +20,7 @@ setting options(bbr.verbose = FALSE)."><meta property="og:image" content="https:
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.12.0</span>
       </span>
     </div>
 
@@ -36,6 +36,9 @@ setting options(bbr.verbose = FALSE)."><meta property="og:image" content="https:
   </a>
   <ul class="dropdown-menu" role="menu"><li>
       <a href="../articles/getting-started.html">Getting Started with bbr</a>
+    </li>
+    <li>
+      <a href="../articles/model-tree.html">Creating a model tree diagram</a>
     </li>
     <li>
       <a href="../articles/nonmem-parallel.html">Running NONMEM in Parallel: bbr Tips and Tricks</a>
@@ -89,7 +92,7 @@ setting <code>options(bbr.verbose = FALSE)</code>.</p>
 <span></span>
 <span><span class="fu">nm_par_tab</span><span class="op">(</span><span class="va">.mod</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">nm_data</span><span class="op">(</span><span class="va">.mod</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">nm_data</span><span class="op">(</span><span class="va">.mod</span>, filter <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -111,8 +114,14 @@ See examples.</p></dd>
 
 
 <dt>.rename</dt>
-<dd><p>If <code>TRUE</code>, the default, will rename <code>.grd</code> columns to the
-relevant parameter names. Otherwise will leave column names as is.</p></dd>
+<dd><p>Logical (<code>T</code>/<code>F</code>). If <code>TRUE</code>, the default, will rename <code>.grd</code>
+columns to the relevant parameter names. Otherwise will leave column names
+as is.</p></dd>
+
+
+<dt>filter</dt>
+<dd><p>Logical (<code>T</code>/<code>F</code>). If <code>TRUE</code>, filter data based on <code>IGNORE LIST</code>
+or <code>ACCEPT LIST</code> options defined in the <code>$DATA</code> record.</p></dd>
 
 </dl></div>
     <div id="value">

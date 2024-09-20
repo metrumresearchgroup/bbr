@@ -21,7 +21,7 @@ to setup_bootstrap_run() before submission (see examples)."><meta property="og:i
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.12.0</span>
       </span>
     </div>
 
@@ -37,6 +37,9 @@ to setup_bootstrap_run() before submission (see examples)."><meta property="og:i
   </a>
   <ul class="dropdown-menu" role="menu"><li>
       <a href="../articles/getting-started.html">Getting Started with bbr</a>
+    </li>
+    <li>
+      <a href="../articles/model-tree.html">Creating a model tree diagram</a>
     </li>
     <li>
       <a href="../articles/nonmem-parallel.html">Running NONMEM in Parallel: bbr Tips and Tricks</a>
@@ -96,11 +99,11 @@ to <code><a href="setup_bootstrap_run.html">setup_bootstrap_run()</a></code> bef
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>.mod</dt>
-<dd><p>a <code>bbr</code> model object</p></dd>
+<dd><p>A <code>bbr</code> model object.</p></dd>
 
 
 <dt>.suffix</dt>
-<dd><p>a suffix for the bootstrap run directory. Will be prefixed by
+<dd><p>A suffix for the bootstrap run directory. Will be prefixed by
 the model id of <code>.mod</code>.</p></dd>
 
 
@@ -115,9 +118,8 @@ file at <code>.new_model</code> will be overwritten silently.</p></dd>
 
 
 <dt>remove_cov, remove_tables</dt>
-<dd><p>Logical (T/F). Optionally remove <code>$COVARIANCE</code>
-and <code>$TABLE</code> records respectively, allowing for notably faster run times.
-Both default to <code>TRUE</code>.</p></dd>
+<dd><p>If <code>TRUE</code>, the default, remove <code>$COVARIANCE</code>
+and <code>$TABLE</code> records respectively, allowing for notably faster run times.</p></dd>
 
 </dl></div>
     <div id="value">

@@ -21,7 +21,7 @@ will make for prettier formatting, especially of table outputs."><meta property=
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.12.0</span>
       </span>
     </div>
 
@@ -37,6 +37,9 @@ will make for prettier formatting, especially of table outputs."><meta property=
   </a>
   <ul class="dropdown-menu" role="menu"><li>
       <a href="../articles/getting-started.html">Getting Started with bbr</a>
+    </li>
+    <li>
+      <a href="../articles/model-tree.html">Creating a model tree diagram</a>
     </li>
     <li>
       <a href="../articles/nonmem-parallel.html">Running NONMEM in Parallel: bbr Tips and Tricks</a>
@@ -93,17 +96,23 @@ will make for prettier formatting, especially of table outputs.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, .digits <span class="op">=</span> <span class="fl">3</span>, .fixed <span class="op">=</span> <span class="cn">FALSE</span>, .off_diag <span class="op">=</span> <span class="cn">FALSE</span>, .nrow <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for bbi_nmboot_summary</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, .digits <span class="op">=</span> <span class="fl">3</span>, .nrow <span class="op">=</span> <span class="fl">10</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, .digits <span class="op">=</span> <span class="fl">3</span>, .nrow <span class="op">=</span> <span class="fl">10</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for nmtran_process</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for model_tree_static</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, newpage <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">vp</span><span class="op">)</span>, vp <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>x</dt>
-<dd><p>Object to format or print.</p></dd>
+<dd><p>plot to display</p></dd>
 
 
 <dt>...</dt>
-<dd><p>Other arguments passed on to individual methods.</p></dd>
+<dd><p>other arguments not used by this method</p></dd>
 
 
 <dt>.call_limit</dt>
@@ -129,6 +138,14 @@ long option will be truncated.</p></dd>
 <dd><p>If <code>NULL</code>, the default, print all rows of the parameter table. If <code>0</code>, don't print table at all.
 Otherwise, prints only <code>.nrow</code> rows.</p></dd>
 
+
+<dt>newpage</dt>
+<dd><p>Logical (T/F). If <code>TRUE</code>, draw new (empty) page first.</p></dd>
+
+
+<dt>vp</dt>
+<dd><p>viewport to draw plot in</p></dd>
+
 </dl></div>
     <div id="functions">
     <h2>Functions</h2>
@@ -137,8 +154,22 @@ Otherwise, prints only <code>.nrow</code> rows.</p></dd>
 <li><p><code>print(bbi_model)</code>: Prints the information contained in the model object and whether the model has been run</p></li>
 <li><p><code>print(bbi_nonmem_summary)</code>: Prints a high level summary of a model from a <code>bbi_nonmem_summary</code> object</p></li>
 <li><p><code>print(bbi_nmboot_summary)</code>: Prints a high level summary of a model from a <code>bbi_nmboot_summary</code> object</p></li>
+<li><p><code>print(nmtran_process)</code>: Prints the <code>NM-TRAN</code> evaluation of a <code>bbi_nonmem_model</code>
+object</p></li>
+<li><p><code>print(model_tree_static)</code>: Draw model tree as a static plot</p></li>
 </ul></div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">pl_tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="model_tree.html">model_tree</a></span><span class="op">(</span><span class="va">MODEL_DIR</span>, static <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pl_tree</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pl_tree</span>, vp <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/viewport.html" class="external-link">viewport</a></span><span class="op">(</span>width<span class="op">=</span><span class="fl">0.5</span>, height<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pl_tree</span>, newpage <span class="op">=</span> <span class="cn">TRUE</span>, vp <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/viewport.html" class="external-link">viewport</a></span><span class="op">(</span>width<span class="op">=</span><span class="fl">0.5</span>, height<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>

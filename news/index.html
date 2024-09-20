@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.12.0</span>
       </span>
     </div>
 
@@ -33,6 +33,9 @@
   </a>
   <ul class="dropdown-menu" role="menu"><li>
       <a href="../articles/getting-started.html">Getting Started with bbr</a>
+    </li>
+    <li>
+      <a href="../articles/model-tree.html">Creating a model tree diagram</a>
     </li>
     <li>
       <a href="../articles/nonmem-parallel.html">Running NONMEM in Parallel: bbr Tips and Tricks</a>
@@ -69,6 +72,20 @@
       <small>Source: <a href="https://github.com/metrumresearchgroup/bbr/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="1.12.0" id="bbr-1120">bbr 1.12.0<a class="anchor" aria-label="anchor" href="#bbr-1120"></a></h2>
+<div class="section level3">
+<h3 id="new-features-and-changes-1-12-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-1-12-0"></a></h3>
+<ul><li><p>New model tree feature: <code>bbr</code> now allows you to visualize any <code><a href="../reference/run_log.html">run_log()</a></code> as an interactive model tree diagram via <code><a href="../reference/model_tree.html">model_tree()</a></code>. This function allows users to easily visualize and track the modeling process for a given project and display any information available in a <code><a href="../reference/run_log.html">run_log()</a></code>, such as model summary information, configuration options, and more. See the vignette <a href="https://metrumresearchgroup.github.io/bbr/articles/model-tree.html">here</a> (<a href="https://github.com/metrumresearchgroup/bbr/issues/673" class="external-link">#673</a>).</p></li>
+<li><p>New <code><a href="../reference/run_nmtran.html">run_nmtran()</a></code> function for running <code>NM-TRAN</code> on a model object to validate its control stream for correct coding before submission. The <code>NM-TRAN</code> dataset (<code>FDATA</code>) and other <code>NONMEM</code> artifacts can be further inspected by keeping the run directory around (<a href="https://github.com/metrumresearchgroup/bbr/issues/705" class="external-link">#705</a>).</p></li>
+<li><p><code><a href="../reference/nm_file.html">nm_data()</a></code> now has a <code>filter</code> argument, allowing the user to filter data based on <code>IGNORE LIST</code> or <code>ACCEPT LIST</code> options defined in the <code>$DATA</code> record of a <code>NONMEM</code> control stream file (<a href="https://github.com/metrumresearchgroup/bbr/issues/711" class="external-link">#711</a>).</p></li>
+<li><p><code><a href="../reference/setup_bootstrap_run.html">setup_bootstrap_run()</a></code> now has a <code>data</code> argument, allowing users to provide their own starting dataset to resample from. This defaults to <code>NULL</code>, which will use the output from <code>nm_data(.boot_run, filter = TRUE)</code> (<a href="https://github.com/metrumresearchgroup/bbr/issues/707" class="external-link">#707</a>, <a href="https://github.com/metrumresearchgroup/bbr/issues/711" class="external-link">#711</a>).</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bugs-addressed-1-12-0">Bugs addressed<a class="anchor" aria-label="anchor" href="#bugs-addressed-1-12-0"></a></h3>
+<ul><li>Bootstrap adjustment: previously <code><a href="../reference/setup_bootstrap_run.html">setup_bootstrap_run()</a></code> assumed a <code>NUM</code> column was present in the input dataset (the default <code>.join_col</code> in <code><a href="../reference/nm_join.html">nm_join()</a></code>). <code><a href="../reference/nm_join.html">nm_join()</a></code> was being used in the back-end to create the starting dataset to resample from; the intention being to only include subjects that entered the original problem. Given the <code><a href="../reference/nm_join.html">nm_join()</a></code> use, this also required that the original model had finished executing before bootstrapping. Rather than using <code><a href="../reference/nm_join.html">nm_join()</a></code> by default, we now use <code>nm_data(.boot_run, filter = TRUE)</code>. This both fixes the aforementioned bug and removes the requirement that the base model (model being bootstrapped) has been executed. If the model has been executed, however, we will check the number of records to ensure the filtering was done correctly (<a href="https://github.com/metrumresearchgroup/bbr/issues/707" class="external-link">#707</a>, <a href="https://github.com/metrumresearchgroup/bbr/issues/711" class="external-link">#711</a>).</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="1.11.0" id="bbr-1110">bbr 1.11.0<a class="anchor" aria-label="anchor" href="#bbr-1110"></a></h2>
 <div class="section level3">

@@ -22,7 +22,7 @@ $DATA record (i.e. get_data_path(.boot_run)).'><meta property="og:image" content
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.12.0</span>
       </span>
     </div>
 
@@ -38,6 +38,9 @@ $DATA record (i.e. get_data_path(.boot_run)).'><meta property="og:image" content
   </a>
   <ul class="dropdown-menu" role="menu"><li>
       <a href="../articles/getting-started.html">Getting Started with bbr</a>
+    </li>
+    <li>
+      <a href="../articles/model-tree.html">Creating a model tree diagram</a>
     </li>
     <li>
       <a href="../articles/nonmem-parallel.html">Running NONMEM in Parallel: bbr Tips and Tricks</a>
@@ -90,6 +93,8 @@ objects, and the new datasets are sampled from the dataset defined in its
 <span>  n <span class="op">=</span> <span class="fl">200</span>,</span>
 <span>  strat_cols <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">1234</span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  .bbi_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>no_grd_file <span class="op">=</span> <span class="cn">TRUE</span>, no_shk_file <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>  .overwrite <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -97,24 +102,39 @@ objects, and the new datasets are sampled from the dataset defined in its
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>.boot_run</dt>
-<dd><p>a <code>bbi_nmboot_model</code> object.</p></dd>
+<dd><p>A <code>bbi_nmboot_model</code> object.</p></dd>
 
 
 <dt>n</dt>
-<dd><p>number of model runs.</p></dd>
+<dd><p>Number of data sets and model runs to generate.</p></dd>
 
 
 <dt>strat_cols</dt>
-<dd><p>columns to maintain proportion for stratification</p></dd>
+<dd><p>Columns to maintain proportion for stratification</p></dd>
 
 
 <dt>seed</dt>
-<dd><p>a seed for sampling the data. Set to <code>NULL</code> to avoid setting.</p></dd>
+<dd><p>A numeric seed to set prior to resampling the data; use <code>NULL</code> to
+avoid setting a seed.</p></dd>
+
+
+<dt>data</dt>
+<dd><p>A dataset to resample from. Defaults to <code>NULL</code>, which will use
+the <em>filtered</em> output from <code>nm_data(.boot_run, filter = TRUE)</code>. If provided,
+must include the same column names as what's returned from <code>nm_data(.mod)</code>.</p></dd>
+
+
+<dt>.bbi_args</dt>
+<dd><p>Named list passed to <code>model_summary(orig_mod, .bbi_args)</code>,
+where <code>orig_mod</code> is the model <code>.boot_run</code> is based on. See
+<code><a href="print_bbi_args.html">print_bbi_args()</a></code> for valid options. Defaults to <code>list(no_grd_file = TRUE, no_shk_file = TRUE)</code> because <code><a href="model_summary.html">model_summary()</a></code> is only called internally to
+extract the number of records, so those files are irrelevant. Only used if
+the based on model (the model being bootstrapped) has been executed.</p></dd>
 
 
 <dt>.overwrite</dt>
-<dd><p>logical (T/F) indicating whether or not to overwrite existing
-setup for a bootstrap run.</p></dd>
+<dd><p>Logical (T/F) indicating whether or not to overwrite
+existing setup for a bootstrap run.</p></dd>
 
 </dl></div>
     <div id="details">

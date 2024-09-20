@@ -26,7 +26,7 @@ joins. This printing can be suppressed by setting options(bbr.verbose = FALSE)."
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.12.0</span>
       </span>
     </div>
 
@@ -42,6 +42,9 @@ joins. This printing can be suppressed by setting options(bbr.verbose = FALSE)."
   </a>
   <ul class="dropdown-menu" role="menu"><li>
       <a href="../articles/getting-started.html">Getting Started with bbr</a>
+    </li>
+    <li>
+      <a href="../articles/model-tree.html">Creating a model tree diagram</a>
     </li>
     <li>
       <a href="../articles/nonmem-parallel.html">Running NONMEM in Parallel: bbr Tips and Tricks</a>
@@ -177,14 +180,14 @@ stream to have sufficient width to avoid truncating <code>.join_col</code>.</p>
 
 
 <p>Take the following <code>$INPUT</code> and <code>$DATA</code> records:</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>INPUT ID TIME MDV EVID DV AMT SEX WT ETN</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>DATA ..<span class="sc">/</span>..<span class="sc">/</span>..<span class="sc">/</span>..<span class="sc">/</span>extdata<span class="sc">/</span>acop.csv</span></code></pre><p></p></div>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="sc">$</span>INPUT ID TIME MDV EVID DV AMT SEX WT ETN</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="sc">$</span>DATA ..<span class="sc">/</span>..<span class="sc">/</span>..<span class="sc">/</span>..<span class="sc">/</span>extdata<span class="sc">/</span>acop.csv</span></code></pre><p></p></div>
 <p>Before submitting a model, read in the data and add a row number column;</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">nm_data</span>(.mod) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">NUM =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">n</span>())</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>readr<span class="sc">::</span><span class="fu">write_csv</span>(data, <span class="fu">get_data_path</span>(.mod))</span></code></pre><p></p></div>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">nm_data</span>(.mod) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">NUM =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">n</span>())</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>readr<span class="sc">::</span><span class="fu">write_csv</span>(data, <span class="fu">get_data_path</span>(.mod))</span></code></pre><p></p></div>
 <p>Then add <code>'NUM'</code> to the list of input columns:</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>INPUT ID TIME MDV EVID DV AMT SEX WT ETN <span class="sc">*</span>NUM<span class="sc">*</span></span></code></pre><p></p></div>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="sc">$</span>INPUT ID TIME MDV EVID DV AMT SEX WT ETN <span class="sc">*</span>NUM<span class="sc">*</span></span></code></pre><p></p></div>
 </div>
 
     </div>

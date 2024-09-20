@@ -1,13 +1,14 @@
-pandoc: 2.17.1.1
+pandoc: 3.1.8
 pkgdown: 2.0.9
 pkgdown_sha: ~
 articles:
   getting-started: getting-started.html
+  model-tree: model-tree.html
   nonmem-parallel: nonmem-parallel.html
   parameter-labels: parameter-labels.html
   using-based-on: using-based-on.html
   using-summary-log: using-summary-log.html
-last_built: 2024-06-20T17:20Z
+last_built: 2024-09-20T13:46Z
 urls:
   reference: https://metrumresearchgroup.github.io/bbr/reference
   article: https://metrumresearchgroup.github.io/bbr/articles

@@ -19,7 +19,7 @@ freezing the R console) may be done as a result."><meta property="og:image" cont
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.12.0</span>
       </span>
     </div>
 
@@ -35,6 +35,9 @@ freezing the R console) may be done as a result."><meta property="og:image" cont
   </a>
   <ul class="dropdown-menu" role="menu"><li>
       <a href="../articles/getting-started.html">Getting Started with bbr</a>
+    </li>
+    <li>
+      <a href="../articles/model-tree.html">Creating a model tree diagram</a>
     </li>
     <li>
       <a href="../articles/nonmem-parallel.html">Running NONMEM in Parallel: bbr Tips and Tricks</a>
@@ -125,8 +128,8 @@ this argument serves to delay this evaluation (e.g. if calling right after
     <p>If the result of <code>get_model_status()</code> assigned to a variable, users can
 inspect the full list of runs to determine exactly which models are still
 running vs. have finished executing:</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">get_model_status</span>(mod_list)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>res</span></code></pre><p></p></div><div class="section">
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">get_model_status</span>(mod_list)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>res</span></code></pre><p></p></div><div class="section">
 <h3 id="bootstrap-runs">Bootstrap Runs<a class="anchor" aria-label="anchor" href="#bootstrap-runs"></a></h3>
 
 

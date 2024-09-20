@@ -18,7 +18,7 @@ the existing bbi_nonmem_model object"><meta property="og:image" content="https:/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.12.0</span>
       </span>
     </div>
 
@@ -34,6 +34,9 @@ the existing bbi_nonmem_model object"><meta property="og:image" content="https:/
   </a>
   <ul class="dropdown-menu" role="menu"><li>
       <a href="../articles/getting-started.html">Getting Started with bbr</a>
+    </li>
+    <li>
+      <a href="../articles/model-tree.html">Creating a model tree diagram</a>
     </li>
     <li>
       <a href="../articles/nonmem-parallel.html">Running NONMEM in Parallel: bbr Tips and Tricks</a>
@@ -233,8 +236,8 @@ within the output directory of <code>.mod</code>.</p></li>
 model, they would see it has an attached simulation with a status of <code>"Not Run"</code>.</p>
 <p>To re-run this simulation using the specs that were originally used, you can
 simply execute the following commands:</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>.sim <span class="ot">&lt;-</span> <span class="fu">get_simulation</span>(.mod)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">submit_model</span>(.sim)</span></code></pre><p></p></div>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>.sim <span class="ot">&lt;-</span> <span class="fu">get_simulation</span>(.mod)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">submit_model</span>(.sim)</span></code></pre><p></p></div>
 <p>This will execute the simulation using the same <code>n</code>, <code>seed</code>, and <code>data</code> that
 were provided by the collaborator.</p>
     </div>

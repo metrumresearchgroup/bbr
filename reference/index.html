@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.12.0</span>
       </span>
     </div>
 
@@ -33,6 +33,9 @@
   </a>
   <ul class="dropdown-menu" role="menu"><li>
       <a href="../articles/getting-started.html">Getting Started with bbr</a>
+    </li>
+    <li>
+      <a href="../articles/model-tree.html">Creating a model tree diagram</a>
     </li>
     <li>
       <a href="../articles/nonmem-parallel.html">Running NONMEM in Parallel: bbr Tips and Tricks</a>
@@ -120,6 +123,10 @@
           <p><code><a href="submit_models.html">submit_models()</a></code> </p>
         </td>
         <td><p>Submit models to be run in batch</p></td>
+      </tr><tr><td>
+          <p><code><a href="run_nmtran.html">run_nmtran()</a></code> </p>
+        </td>
+        <td><p>Interface for running <code>NM-TRAN</code> on model objects</p></td>
       </tr><tr><td>
           <p><code><a href="print_bbi_args.html">print_bbi_args()</a></code> </p>
         </td>
@@ -232,6 +239,10 @@
           <p><code><a href="config_log.html">config_log()</a></code> <code><a href="config_log.html">add_config()</a></code> </p>
         </td>
         <td><p>Parse bbi configs to log</p></td>
+      </tr><tr><td>
+          <p><code><a href="model_tree.html">model_tree()</a></code> </p>
+        </td>
+        <td><p>Create a tree diagram of a modeling directory</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
           <h2 id="model-object-interactions">Model object interactions <a href="#model-object-interactions" class="anchor" aria-hidden="true"></a></h2>
           <p class="section-desc"></p>
@@ -285,7 +296,7 @@
         </td>
         <td><p>Get path to data file</p></td>
       </tr><tr><td>
-          <p><code><a href="print_bbi.html">print(<i>&lt;bbi_process&gt;</i>)</a></code> <code><a href="print_bbi.html">print(<i>&lt;bbi_model&gt;</i>)</a></code> <code><a href="print_bbi.html">print(<i>&lt;bbi_nonmem_summary&gt;</i>)</a></code> <code><a href="print_bbi.html">print(<i>&lt;bbi_nmboot_summary&gt;</i>)</a></code> </p>
+          <p><code><a href="print_bbi.html">print(<i>&lt;bbi_process&gt;</i>)</a></code> <code><a href="print_bbi.html">print(<i>&lt;bbi_model&gt;</i>)</a></code> <code><a href="print_bbi.html">print(<i>&lt;bbi_nonmem_summary&gt;</i>)</a></code> <code><a href="print_bbi.html">print(<i>&lt;bbi_nmboot_summary&gt;</i>)</a></code> <code><a href="print_bbi.html">print(<i>&lt;nmtran_process&gt;</i>)</a></code> <code><a href="print_bbi.html">print(<i>&lt;model_tree_static&gt;</i>)</a></code> </p>
         </td>
         <td><p>Print methods for bbr objects</p></td>
       </tr><tr><td>
