@@ -2,7 +2,7 @@
 
 ## New features and changes
 
-* New Model Tree feature: `bbr` now allows you to visualize any `run_log()` as
+* New model tree feature: `bbr` now allows you to visualize any `run_log()` as
   an interactive model tree diagram via `model_tree()`. This function allows 
   users to easily visualize and track the modeling process for a given project 
   and display any information available in a `run_log()`, such as model summary
@@ -31,10 +31,9 @@
   original problem. Given the `nm_join()` use, this also required that the original
   model had finished executing before bootstrapping. Rather than using `nm_join()`
   by default, we now use `nm_data(.boot_run, filter = TRUE)`. This both fixes the
-  aforementioned bug and removes the need for the based on model (the model being
-  bootstrapped) from needing to have been executed. If the model has been executed
-  however, we will check the number of records to ensure the filtering was done
-  correctly (#707, #711).
+  aforementioned bug and removes the requirement that the base model (model being
+  bootstrapped) has been executed. If the model has been executed, however, we will
+  check the number of records to ensure the filtering was done correctly (#707, #711).
 
 # bbr 1.11.0
 
