@@ -1,3 +1,40 @@
+# bbr 1.12.0
+
+## New features and changes
+
+* New model tree feature: `bbr` now allows you to visualize any `run_log()` as
+  an interactive model tree diagram via `model_tree()`. This function allows 
+  users to easily visualize and track the modeling process for a given project 
+  and display any information available in a `run_log()`, such as model summary
+  information, configuration options, and more. See the vignette 
+  [here](https://metrumresearchgroup.github.io/bbr/articles/model-tree.html) (#673).
+  
+* New `run_nmtran()` function for running `NM-TRAN` on a model object to validate
+  its control stream for correct coding before submission. The `NM-TRAN` dataset
+  (`FDATA`) and other `NONMEM` artifacts can be further inspected by keeping the
+  run directory around (#705).
+  
+* `nm_data()` now has a `filter` argument, allowing the user to filter data based
+  on `IGNORE LIST` or `ACCEPT LIST` options defined in the `$DATA` record of a
+  `NONMEM` control stream file (#711).
+   
+* `setup_bootstrap_run()` now has a `data` argument, allowing users to provide
+  their own starting dataset to resample from. This defaults to `NULL`, which
+  will use the output from `nm_data(.boot_run, filter = TRUE)` (#707, #711).
+
+## Bugs addressed
+
+* Bootstrap adjustment: previously `setup_bootstrap_run()` assumed a `NUM` column
+  was present in the input dataset (the default `.join_col` in `nm_join()`). 
+  `nm_join()` was being used in the back-end to create the starting dataset to
+  resample from; the intention being to only include subjects that entered the
+  original problem. Given the `nm_join()` use, this also required that the original
+  model had finished executing before bootstrapping. Rather than using `nm_join()`
+  by default, we now use `nm_data(.boot_run, filter = TRUE)`. This both fixes the
+  aforementioned bug and removes the requirement that the base model (model being
+  bootstrapped) has been executed. If the model has been executed, however, we will
+  check the number of records to ensure the filtering was done correctly (#707, #711).
+
 # bbr 1.11.0
 
 ## New features and changes

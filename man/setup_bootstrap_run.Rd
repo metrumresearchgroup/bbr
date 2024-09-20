@@ -25,7 +25,7 @@ setup_bootstrap_run(
 avoid setting a seed.}
 
 \item{data}{A dataset to resample from. Defaults to \code{NULL}, which will use
-the \emph{filtered} output from \code{nm_data(.mod, filter = TRUE)}. If provided,
+the \emph{filtered} output from \code{nm_data(.boot_run, filter = TRUE)}. If provided,
 must include the same column names as what's returned from \code{nm_data(.mod)}.}
 
 \item{.bbi_args}{Named list passed to \code{model_summary(orig_mod, .bbi_args)},

@@ -86,7 +86,7 @@ new_bootstrap_run <- function(
 #' @param seed A numeric seed to set prior to resampling the data; use `NULL` to
 #'   avoid setting a seed.
 #' @param data A dataset to resample from. Defaults to `NULL`, which will use
-#'   the _filtered_ output from `nm_data(.mod, filter = TRUE)`. If provided,
+#'   the _filtered_ output from `nm_data(.boot_run, filter = TRUE)`. If provided,
 #'   must include the same column names as what's returned from `nm_data(.mod)`.
 #' @param .bbi_args Named list passed to `model_summary(orig_mod, .bbi_args)`,
 #'   where `orig_mod` is the model `.boot_run` is based on. See
@@ -212,7 +212,7 @@ setup_bootstrap_run <- function(
           cli::cli_abort(
             c(
               "!" = "The filtered dataset does not have the same number of records as the original model:",
-              "*" = "{.code nm_data(orig_mod, filter = TRUE)} returned {.val {nrec_f}} records",
+              "*" = "{.code nm_data(.boot_run, filter = TRUE)} returned {.val {nrec_f}} records",
               "*" = "{.code model_summary(orig_mod)} returned {.val {nrec}} records",
               "i" = "where {.code orig_mod <- read_model(get_based_on(.boot_run))}",
               "i" = "Try providing a starting dataset (e.g., {.code setup_bootstrap_run(.boot_run, data = nm_join(orig_mod))})"
