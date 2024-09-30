@@ -1,12 +1,15 @@
 #' Create a tree diagram of a modeling directory
 #'
-#' @param .log_df a `bbi_run_log_df` tibble (the output of `run_log()`) ***or***
+#' @param .log_df A `bbi_run_log_df` tibble (the output of `run_log()`) ***or***
 #'        a base directory to look in for models. See details for more options.
-#' @param include_info vector of columns present in `.log_df` to include in the
+#' @param include_info A vector of columns present in `.log_df` to include in the
 #'        tooltip.
-#' @param color_by a run log column to color the nodes by. Can be helpful for
+#' @param color_by A run log column to color the nodes by. Can be helpful for
 #'        identifying which models are starred, have heuristics, etc. See details
 #'        for more information.
+#' @param size_by A run log column to size the nodes by. Can be helpful for
+#'        sizing nodes by objective function values or otherwise emphasizing
+#'        notable differences in numeric columns. See details for more information.
 #' @param add_summary Logical (`TRUE`/`FALSE`). If `TRUE`, include key columns
 #'        from [model_summary()] output.
 #' @param digits Number of digits to round decimal places to for display in
@@ -16,9 +19,9 @@
 #' @param static Logical (`TRUE`/`FALSE`). If `TRUE`, render the plot as a
 #'        static image. This takes a little longer, as the interactive plot must
 #'        be saved as a PNG and loaded into the viewer.
-#' @param width width in pixels (optional, defaults to automatic sizing)
-#' @param height height in pixels (optional, defaults to automatic sizing)
-#' @param ... additional arguments passed to [run_log()]. Only used if `.log_df`
+#' @param width Width in pixels (optional, defaults to automatic sizing)
+#' @param height Height in pixels (optional, defaults to automatic sizing)
+#' @param ... Additional arguments passed to [run_log()]. Only used if `.log_df`
 #'        is a modeling directory.
 #'
 #' @section Required Columns:
@@ -34,7 +37,7 @@
 #' additional columns as tooltips. This is illustrated in the examples via
 #' `add_summary()` and `add_config()`.
 #'
-#' @section Tooltip formatting and coloring:
+#' @section Tooltip formatting, coloring, and sizing:
 #' **Tooltip formatting**
 #'
 #' Any column in `.log_df` can be chosen to include in the tooltip. However,
@@ -61,6 +64,14 @@
 #' where earlier runs are whiter, and later runs appear to be more red. You can
 #' pass `color_by = NULL` to make all model nodes `'red'`.
 #'
+#'
+#' **Sizing**
+#'
+#' Sizing is intended to be used for numeric columns (such as `'ofv'` when
+#' `.log_df = run_log() %>% add_summary()`). Logical columns are supported, though
+#' you may experience different sizing behavior depending on the occurrence of
+#' `TRUE`/`FALSE` values in the run log.
+#'
 #' @examples
 #' \dontrun{
 #'
@@ -72,19 +83,27 @@
 #' model_tree(MODEL_DIR, color_by = "star")
 #'
 #'
-#' # Run `add_config()`, `add_summary()`, and/or `mutate()` calls beforehand
-#' run_log(MODEL_DIR) %>%
-#'   add_config() %>%
-#'   dplyr::mutate(out_of_date = model_has_changed | data_has_changed) %>%
+#' ## Run `add_config()`, `add_summary()`, and/or `mutate()` calls beforehand
+#'
+#'
+#' # Size nodes by objective function value
+#' run_log(MODEL_DIR) %>% add_summary() %>%
+#'   model_tree(size_by = "ofv")
+#'
+#' # Determine if certain models need to be re-run
+#' run_log(MODEL_DIR) %>% add_config() %>%
+#'   dplyr::mutate(
+#'     out_of_date = model_has_changed | data_has_changed
+#'   ) %>%
 #'   model_tree(
 #'     include_info = c("model_has_changed", "data_has_changed", "nm_version"),
 #'     color_by = "out_of_date"
 #'   )
 #'
-#' run_log(MODEL_DIR) %>%
-#'   add_summary() %>%
+#' # Highlight models with any heuristics
+#' run_log(MODEL_DIR) %>% add_summary() %>%
 #'   model_tree(
-#'     include_info = c("tags", "param_count", "eta_pval_significant"),
+#'     include_info = c("param_count", "eta_pval_significant"),
 #'     color_by = "any_heuristics"
 #'   )
 #'
@@ -95,6 +114,7 @@ model_tree <- function(
     .log_df,
     include_info = c("description","star", "tags"),
     color_by = "run",
+    size_by = NULL,
     add_summary = TRUE,
     digits = 3,
     zoomable = FALSE,
@@ -106,12 +126,13 @@ model_tree <- function(
   UseMethod("model_tree")
 }
 
-#' @rdname model_tree
+
 #' @export
 model_tree.character <- function(
     .log_df,
     include_info = c("description","star", "tags"),
     color_by = "run",
+    size_by = NULL,
     add_summary = TRUE,
     digits = 3,
     zoomable = FALSE,
@@ -124,19 +145,20 @@ model_tree.character <- function(
   .log_df <- run_log(.log_df, ...)
   model_tree(
     .log_df,
-    include_info = include_info, color_by = color_by,
+    include_info = include_info,
+    color_by = color_by, size_by = size_by,
     add_summary = add_summary, digits = digits,
     zoomable = zoomable, static = static,
     width = width, height = height
   )
 }
 
-#' @rdname model_tree
 #' @export
 model_tree.bbi_log_df <- function(
     .log_df,
-    include_info = c("description","star", "tags"),
+    include_info = c("description", "star", "tags"),
     color_by = "run",
+    size_by = NULL,
     add_summary = TRUE,
     digits = 3,
     zoomable = FALSE,
@@ -149,19 +171,23 @@ model_tree.bbi_log_df <- function(
   stop_if_tree_missing_deps(static = static)
 
   # Make tree data
-  tree_data <- make_tree_data(.log_df, include_info, color_by, add_summary)
+  tree_data <- make_tree_data(.log_df, include_info, color_by, size_by, add_summary)
 
   # Format coloring
   tree_data <- color_tree_by(tree_data, color_by = color_by)
+  tree_attr <- ifelse(is.null(color_by), "leafCount", color_by)
+
+  # Format sizing
+  tree_data <- size_tree_by(tree_data, size_by = size_by)
 
   # Compile attributes into tooltip
   tree_data <- make_tree_tooltip(tree_data, digits = digits)
 
   # Create model tree
-  tree_attr <- ifelse(is.null(color_by), "leafCount", color_by)
   pl_tree <- collapsibleTree::collapsibleTreeNetwork(
     tree_data, zoomable = zoomable, attribute = tree_attr,
-    fill="col", collapsed = FALSE, nodeSize = "leafCount",
+    fill="col", collapsed = FALSE, nodeSize = "node_size",
+    aggFun = identity,
     tooltipHtml = "tooltip", width = width, height = height
   )
 
@@ -195,9 +221,10 @@ make_tree_data <- function(
     .log_df,
     include_info = c("description","star", "tags"),
     color_by = "run",
+    size_by = NULL,
     add_summary = TRUE
 ){
-  cols_keep <- unique(c(include_info, color_by))
+  cols_keep <- unique(c(include_info, color_by, size_by))
   checkmate::assert_true(all(cols_keep %in% names(.log_df)))
 
   # Check for required columns and starting format
@@ -676,6 +703,46 @@ color_tree_by <- function(tree_data, color_by = "run"){
     pal_bbr <- scales::pal_gradient_n(bbr_cols)(1)
     tree_data$col <- factor(tree_data$col)
     levels(tree_data$col) <- c(node_colors, pal_bbr)
+  }
+
+  return(tree_data)
+}
+
+#' Create a size column based on the unique values of another column
+#' @inheritParams make_tree_tooltip
+#' @inheritParams model_tree
+#' @noRd
+size_tree_by <- function(tree_data, size_by = NULL){
+  # Initialize new size column
+  if(!is.null(size_by)){
+    checkmate::assert_true(size_by %in% names(tree_data))
+    tree_data$node_size <- tree_data[[size_by]]
+  }else{
+    tree_data$node_size <- 1
+  }
+
+  # Sizing only works for numeric columns, so additional handling is needed for
+  # logical and NA values
+  # - Logical values: TRUE = 5, FALSE = 1, NA = 3
+  # - Numeric values with NA: NA = mean value
+  if(inherits(tree_data$node_size, "logical")){
+    tree_data <- tree_data %>% dplyr::mutate(
+      node_size = dplyr::case_when(
+        node_size == TRUE ~ 5,
+        node_size == FALSE ~ 1,
+        is.na(node_size) ~ 3,
+        TRUE ~ 3
+      )
+    )
+  }else if(inherits(tree_data$node_size, "numeric")){
+    mean_val <- mean(tree_data$node_size, na.rm = TRUE)
+    # Set node sizes with NA values (including start node) to mean value
+    tree_data$node_size[is.na(tree_data$node_size)] <- mean_val
+  }else{
+    tree_data$node_size <- 1
+    cli::cli_warn(
+      "Only numeric and logical columns are supported for {.val size_by}"
+    )
   }
 
   return(tree_data)

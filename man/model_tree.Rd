@@ -2,40 +2,13 @@
 % Please edit documentation in R/model-tree.R
 \name{model_tree}
 \alias{model_tree}
-\alias{model_tree.character}
-\alias{model_tree.bbi_log_df}
 \title{Create a tree diagram of a modeling directory}
 \usage{
 model_tree(
   .log_df,
   include_info = c("description", "star", "tags"),
   color_by = "run",
-  add_summary = TRUE,
-  digits = 3,
-  zoomable = FALSE,
-  static = FALSE,
-  width = NULL,
-  height = NULL,
-  ...
-)
-
-\method{model_tree}{character}(
-  .log_df,
-  include_info = c("description", "star", "tags"),
-  color_by = "run",
-  add_summary = TRUE,
-  digits = 3,
-  zoomable = FALSE,
-  static = FALSE,
-  width = NULL,
-  height = NULL,
-  ...
-)
-
-\method{model_tree}{bbi_log_df}(
-  .log_df,
-  include_info = c("description", "star", "tags"),
-  color_by = "run",
+  size_by = NULL,
   add_summary = TRUE,
   digits = 3,
   zoomable = FALSE,
@@ -46,15 +19,19 @@ model_tree(
 )
 }
 \arguments{
-\item{.log_df}{a \code{bbi_run_log_df} tibble (the output of \code{run_log()}) \emph{\strong{or}}
+\item{.log_df}{A \code{bbi_run_log_df} tibble (the output of \code{run_log()}) \emph{\strong{or}}
 a base directory to look in for models. See details for more options.}
 
-\item{include_info}{vector of columns present in \code{.log_df} to include in the
+\item{include_info}{A vector of columns present in \code{.log_df} to include in the
 tooltip.}
 
-\item{color_by}{a run log column to color the nodes by. Can be helpful for
+\item{color_by}{A run log column to color the nodes by. Can be helpful for
 identifying which models are starred, have heuristics, etc. See details
 for more information.}
+
+\item{size_by}{A run log column to size the nodes by. Can be helpful for
+sizing nodes by objective function values or otherwise emphasizing
+notable differences in numeric columns. See details for more information.}
 
 \item{add_summary}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, include key columns
 from \code{\link[=model_summary]{model_summary()}} output.}
@@ -69,11 +46,11 @@ dragging and scrolling.}
 static image. This takes a little longer, as the interactive plot must
 be saved as a PNG and loaded into the viewer.}
 
-\item{width}{width in pixels (optional, defaults to automatic sizing)}
+\item{width}{Width in pixels (optional, defaults to automatic sizing)}
 
-\item{height}{height in pixels (optional, defaults to automatic sizing)}
+\item{height}{Height in pixels (optional, defaults to automatic sizing)}
 
-\item{...}{additional arguments passed to \code{\link[=run_log]{run_log()}}. Only used if \code{.log_df}
+\item{...}{Additional arguments passed to \code{\link[=run_log]{run_log()}}. Only used if \code{.log_df}
 is a modeling directory.}
 }
 \description{
@@ -96,7 +73,7 @@ additional columns as tooltips. This is illustrated in the examples via
 \code{add_summary()} and \code{add_config()}.
 }
 
-\section{Tooltip formatting and coloring}{
+\section{Tooltip formatting, coloring, and sizing}{
 
 \strong{Tooltip formatting}
 
@@ -127,6 +104,13 @@ Nodes will be colored \code{'white'} for \code{FALSE} and \code{'red'} for \code
 column types will be colored via a gradient between \code{'white'} and \code{'red'},
 where earlier runs are whiter, and later runs appear to be more red. You can
 pass \code{color_by = NULL} to make all model nodes \code{'red'}.
+
+\strong{Sizing}
+
+Sizing is intended to be used for numeric columns (such as \code{'ofv'} when
+\code{.log_df = run_log() \%>\% add_summary()}). Logical columns are supported, though
+you may experience different sizing behavior depending on the occurrence of
+\code{TRUE}/\code{FALSE} values in the run log.
 }
 
 \examples{
@@ -140,19 +124,27 @@ run_log(MODEL_DIR) \%>\% model_tree()
 model_tree(MODEL_DIR, color_by = "star")
 
 
-# Run `add_config()`, `add_summary()`, and/or `mutate()` calls beforehand
-run_log(MODEL_DIR) \%>\%
-  add_config() \%>\%
-  dplyr::mutate(out_of_date = model_has_changed | data_has_changed) \%>\%
+## Run `add_config()`, `add_summary()`, and/or `mutate()` calls beforehand
+
+
+# Size nodes by objective function value
+run_log(MODEL_DIR) \%>\% add_summary() \%>\%
+  model_tree(size_by = "ofv")
+
+# Determine if certain models need to be re-run
+run_log(MODEL_DIR) \%>\% add_config() \%>\%
+  dplyr::mutate(
+    out_of_date = model_has_changed | data_has_changed
+  ) \%>\%
   model_tree(
     include_info = c("model_has_changed", "data_has_changed", "nm_version"),
     color_by = "out_of_date"
   )
 
-run_log(MODEL_DIR) \%>\%
-  add_summary() \%>\%
+# Highlight models with any heuristics
+run_log(MODEL_DIR) \%>\% add_summary() \%>\%
   model_tree(
-    include_info = c("tags", "param_count", "eta_pval_significant"),
+    include_info = c("param_count", "eta_pval_significant"),
     color_by = "any_heuristics"
   )
 
