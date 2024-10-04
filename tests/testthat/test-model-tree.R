@@ -361,7 +361,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
         c("#007319", rep("#EB003D", 4), "#C0C0C0")
       )
 
-      # Test numeric/character color_by (gradient coloring)
+      # Test character color_by (gradient coloring)
       tree_data <- make_tree_data(run_log(MODEL_DIR), add_summary = FALSE)
       tree_data_run <- color_tree_by(tree_data, color_by = "run")
       expect_equal(
@@ -370,6 +370,18 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
         # Note: all gradient colors will shift if number of models change
         c("#007319", "#FFFFFF", "#F4DBD3", "#ED9D84", "#E35B44", "#EB003D")
       )
+
+      # Regression test: numeric color_by is sorted appropriately
+      log_df <- run_log(MODEL_DIR)
+      log_df$numeric_vals <- c(1534, 3892, 731, 2653, 3574)
+      pl_tree <- model_tree(
+        log_df, add_summary = FALSE, color_by = "numeric_vals",
+        include_info = "numeric_vals"
+      )
+      node_colors <- get_node_attribute(pl_tree$x$data$children, attr = "fill")
+      expected_colors <- c("#F4DBD3", "#EB003D", "#FFFFFF", "#ED9D84", "#E35B44")
+      # Can inspect with `scales::show_col(node_colors)`
+      expect_equal(node_colors, expected_colors)
     })
 
     it("size_tree_by()", {
