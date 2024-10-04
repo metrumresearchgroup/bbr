@@ -680,7 +680,19 @@ color_tree_by <- function(tree_data, color_by = "run"){
     n_levels <- dplyr::n_distinct(vals)
 
     # To preview color palette: scales::show_col(pal_bbr)
-    if(inherits(vals, "logical")){
+    if(inherits(vals, "numeric")){
+      # Gradient coloring (sorted): get colors for unique values (excluding NA)
+      sorted_vals <- sort(unique(vals))
+      pal_bbr <- scales::pal_gradient_n(bbr_cols)(seq(0, 1, length.out = n_levels))
+
+      # Assign colors based on sorted values
+      color_mapping <- setNames(pal_bbr, sorted_vals)
+      tree_data$col <- ifelse(
+        tree_data$col %in% sorted_vals,
+        color_mapping[as.character(tree_data$col)],
+        tree_data$col
+      )
+    }else if(inherits(vals, "logical")){
       # Ensure both TRUE and FALSE colors are extracted, even if only one occurs
       pal_bbr <- scales::pal_gradient_n(bbr_cols)(c(0,1))
       # Explicitly set FALSE to white and TRUE to red
@@ -693,7 +705,7 @@ color_tree_by <- function(tree_data, color_by = "run"){
         )
       )
     }else{
-      # Gradient coloring: get colors for unique values (excluding NA)
+      # Gradient coloring; doesn't need to be sorted
       pal_bbr <- scales::pal_gradient_n(bbr_cols)(seq(0, 1, length.out = n_levels))
       tree_data$col <- factor(tree_data$col)
       levels(tree_data$col) <- c(node_colors, pal_bbr)
