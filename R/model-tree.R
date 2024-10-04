@@ -648,6 +648,7 @@ make_tree_tooltip <- function(tree_data, digits = 3, font_size = 10){
       })
       paste0(other_html, collapse = "")
     })
+    other_tooltip[1] <- "" # Skip start node for other tooltips
     tooltip <- paste0(tooltip, other_tooltip, sum_tooltip)
   }else{
     tooltip <- paste0(tooltip, sum_tooltip)
