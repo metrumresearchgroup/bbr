@@ -179,15 +179,17 @@ model_tree.bbi_log_df <- function(
 
   # Format sizing
   tree_data <- size_tree_by(tree_data, size_by = size_by)
+  node_size <- ifelse(is.null(size_by), "leafCount", "node_size")
 
   # Compile attributes into tooltip
   tree_data <- make_tree_tooltip(tree_data, digits = digits)
 
   # Create model tree
   pl_tree <- collapsibleTree::collapsibleTreeNetwork(
-    tree_data, zoomable = zoomable, attribute = tree_attr,
-    fill="col", collapsed = FALSE, nodeSize = "node_size",
-    aggFun = identity,
+    tree_data, zoomable = zoomable, collapsed = FALSE,
+    # Coloring and sizing
+    attribute = tree_attr, fill="col", nodeSize = node_size, aggFun = identity,
+    # Tooltip and display
     tooltipHtml = "tooltip", width = width, height = height
   )
 
