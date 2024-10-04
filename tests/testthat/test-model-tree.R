@@ -23,18 +23,18 @@ count_nodes <- function(tree_list) {
 
 # Get node attribute for each model
 get_node_attribute <- function(tree_list, attr = 'SizeOfNode') {
-  if (length(tree_list) == 0) return(numeric(0))
+  if(length(tree_list) == 0) return(numeric(0))
   # Iterate through each element in the list
   attribute_values <- numeric(0)
-  for (i in seq_along(tree_list)) {
+  for(i in seq_along(tree_list)) {
     # Check if the specified attribute exists in the current node
-    if (!is.null(tree_list[[i]][[attr]])) {
+    if(!is.null(tree_list[[i]][[attr]])){
       attr_value <- tree_list[[i]][[attr]]
       if(is.factor(attr_value)) attr_value <- as.character(attr_value)
       attribute_values <- c(attribute_values, attr_value)
     }
     # If the current node has children, recursively get the attribute from children
-    if (length(tree_list[[i]]$children) > 0) {
+    if(length(tree_list[[i]]$children) > 0){
       attribute_values <- c(attribute_values, get_node_attribute(tree_list[[i]]$children, attr))
     }
   }
@@ -430,6 +430,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
 
       # Test numeric size_by (gradient sizing) - mimics objective function
+      set.seed(1234)
       log_df <- log_df %>% dplyr::mutate(
         size_col = abs(rnorm(nrow(log_df), mean = 1500, sd = 800))
       )

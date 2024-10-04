@@ -132,7 +132,7 @@ model_tree(MODEL_DIR)
 ```{r, echo=FALSE, eval=eval_model_tree}
 # you dont need to specify the width when rendering in Rstudio viewer, but it makes a difference when rendered in Rmarkdown 
 # - relying on auto-sizing leads to a plot with a small width
-model_tree(MODEL_DIR, width = 800)
+model_tree(MODEL_DIR, width = 800, font_size = 12)
 ```
 
 
@@ -144,7 +144,7 @@ model_tree(MODEL_DIR, color_by = "star")
 ```
 
 ```{r, echo=FALSE, eval=eval_model_tree}
-model_tree(MODEL_DIR, color_by = "star", width = 800)
+model_tree(MODEL_DIR, color_by = "star", width = 800, font_size = 12)
 ```
 
 
@@ -158,7 +158,8 @@ log_df
 log_df <- run_log(MODEL_DIR) %>% add_summary() %>% add_config() %>% suppressWarnings()
 ofv_nas <- which(is.na(log_df$ofv))
 # Overwrite ofv to reflect a typical modeling workflow
-log_df$ofv <- sort(abs(rnorm(nrow(log_df), mean = 2600, sd = 900)), decreasing = TRUE)
+set.seed(1234)
+log_df$ofv <- sort(abs(rnorm(nrow(log_df), mean = 2600, sd = 500)), decreasing = TRUE)
 # Make the "final model" the smallest ofv instead of the last one in the run log
 log_df$ofv[log_df$description == "final model"] <- min(log_df$ofv, na.rm = TRUE)
 log_df$ofv[nrow(log_df)] <- min(log_df$ofv, na.rm = TRUE)*1.1
@@ -188,7 +189,8 @@ model_tree(
   log_df2,
   include_info = c("model_has_changed", "data_has_changed", "nm_version"),
   color_by = "out_of_date",
-  width = 800
+  width = 800,
+  font_size = 12
 )
 ```
 
@@ -210,7 +212,8 @@ model_tree(
   log_df2,
   include_info = c("tags", "param_count", "eta_pval_significant"),
   color_by = "any_heuristics",
-  width = 800
+  width = 800,
+  font_size = 12
 )
 ```
 
@@ -231,7 +234,8 @@ model_tree(
   log_df,
   include_info = c("star", "description"),
   color_by = "ofv", size_by = "ofv",
-  width = 800
+  width = 800,
+  font_size = 12
 )
 ```
 
