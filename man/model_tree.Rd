@@ -15,6 +15,7 @@ model_tree(
   static = FALSE,
   width = NULL,
   height = NULL,
+  font_size = 10,
   ...
 )
 }
@@ -49,6 +50,8 @@ be saved as a PNG and loaded into the viewer.}
 \item{width}{Width in pixels (optional, defaults to automatic sizing)}
 
 \item{height}{Height in pixels (optional, defaults to automatic sizing)}
+
+\item{font_size}{Font size of the label text in pixels}
 
 \item{...}{Additional arguments passed to \code{\link[=run_log]{run_log()}}. Only used if \code{.log_df}
 is a modeling directory.}

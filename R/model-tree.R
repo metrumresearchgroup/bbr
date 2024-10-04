@@ -21,6 +21,7 @@
 #'        be saved as a PNG and loaded into the viewer.
 #' @param width Width in pixels (optional, defaults to automatic sizing)
 #' @param height Height in pixels (optional, defaults to automatic sizing)
+#' @param font_size Font size of the label text in pixels
 #' @param ... Additional arguments passed to [run_log()]. Only used if `.log_df`
 #'        is a modeling directory.
 #'
@@ -121,6 +122,7 @@ model_tree <- function(
     static = FALSE,
     width = NULL,
     height = NULL,
+    font_size = 10,
     ...
 ){
   UseMethod("model_tree")
@@ -139,6 +141,7 @@ model_tree.character <- function(
     static = FALSE,
     width = NULL,
     height = NULL,
+    font_size = 10,
     ...
 ){
   checkmate::assert_directory_exists(.log_df)
@@ -149,7 +152,8 @@ model_tree.character <- function(
     color_by = color_by, size_by = size_by,
     add_summary = add_summary, digits = digits,
     zoomable = zoomable, static = static,
-    width = width, height = height
+    width = width, height = height,
+    font_size = font_size
   )
 }
 
@@ -165,6 +169,7 @@ model_tree.bbi_log_df <- function(
     static = FALSE,
     width = NULL,
     height = NULL,
+    font_size = 10,
     ...
 ){
   # Make sure required dependencies are installed
@@ -182,7 +187,7 @@ model_tree.bbi_log_df <- function(
   node_size <- ifelse(is.null(size_by), "leafCount", "node_size")
 
   # Compile attributes into tooltip
-  tree_data <- make_tree_tooltip(tree_data, digits = digits)
+  tree_data <- make_tree_tooltip(tree_data, digits = digits, font_size = font_size)
 
   # Create model tree
   pl_tree <- collapsibleTree::collapsibleTreeNetwork(
@@ -190,7 +195,8 @@ model_tree.bbi_log_df <- function(
     # Coloring and sizing
     attribute = tree_attr, fill="col", nodeSize = node_size, aggFun = identity,
     # Tooltip and display
-    tooltipHtml = "tooltip", width = width, height = height
+    tooltipHtml = "tooltip", fontSize = font_size,
+    width = width, height = height
   )
 
   if(isTRUE(static)){
@@ -513,7 +519,7 @@ check_model_tree <- function(network_df){
 #'  defines the model network.
 #' @inheritParams model_tree
 #' @noRd
-make_tree_tooltip <- function(tree_data, digits = 3){
+make_tree_tooltip <- function(tree_data, digits = 3, font_size = 10){
 
   round_numeric <- function(x, digits){
     # Round instead of signif - this can matter for objective functions
@@ -528,12 +534,17 @@ make_tree_tooltip <- function(tree_data, digits = 3){
   #     executed (i.e. NA values will still be displayed for these columns)
   can_include <- function(txt) !is.na(txt) && txt != ""
 
+  bold_css <- "font-weight:bold;"
+  italics_css <- "font-style:italic;"
+  run_font_size <- font_size + 4
+  run_css <- glue::glue("font-size:{run_font_size}px; {bold_css}")
+
   # Tooltip from run log
   base_tt_cols <- attr(tree_data, "base_tt_cols")
   tooltip <- purrr::imap_chr(tree_data$to, function(.x, .y){
     mod_name <- ifelse(.x == "Start", .x, paste("Run", .x))
     mod_html <- style_html(
-      mod_name, color = "#538b01", "font-size:14px; font-weight:bold", br_after = TRUE
+      mod_name, color = "#538b01", run_css, br_after = TRUE
     )
 
     # Model type
@@ -547,7 +558,7 @@ make_tree_tooltip <- function(tree_data, digits = 3){
       can_include(tree_data$addl_based_on[.y]),
       style_html(
         paste("Additional Based on:", tree_data$addl_based_on[.y]),
-        "font-weight:bold", br_after = TRUE
+        bold_css, br_after = TRUE
       ),
       ""
     )
@@ -555,7 +566,7 @@ make_tree_tooltip <- function(tree_data, digits = 3){
     # Other parameters
     desc_html <- ifelse(
       "description" %in% base_tt_cols && can_include(tree_data$description[.y]),
-      style_html(tree_data$description[.y], "font-style:italic", br_after = TRUE),
+      style_html(tree_data$description[.y], italics_css, br_after = TRUE),
       ""
     )
     tags_html <- ifelse(
@@ -565,7 +576,7 @@ make_tree_tooltip <- function(tree_data, digits = 3){
     )
     star_html <- ifelse(
       "star" %in% base_tt_cols && can_include(tree_data$star[.y]) && isTRUE(tree_data$star[.y]),
-      style_html("Starred", color = "#ffa502", "font-weight:bold", br_after = TRUE),
+      style_html("Starred", color = "#ffa502", bold_css, br_after = TRUE),
       ""
     )
 
@@ -582,13 +593,13 @@ make_tree_tooltip <- function(tree_data, digits = 3){
       # Conditional heuristics text
       any_heuristics <- tree_data$any_heuristics[.y]
       heuristics_txt <- if(!is.na(any_heuristics) && isTRUE(any_heuristics)){
-        paste0("<br><br>", style_html("--Heuristics Found--", color = "#A30000", "font-weight:bold"))
+        paste0("<br><br>", style_html("--Heuristics Found--", color = "#A30000", bold_css))
       }else{
         ""
       }
       # Conditional simulation text
       has_sim_txt <- if(has_simulation(read_model(tree_data[[ABS_MOD_PATH]][.y]))){
-        paste0("<br><br>", style_html("--Simulation attached--", color = "#ad7fa8", "font-weight:bold"))
+        paste0("<br><br>", style_html("--Simulation attached--", color = "#ad7fa8", bold_css))
       }else{
         ""
       }
@@ -614,12 +625,12 @@ make_tree_tooltip <- function(tree_data, digits = 3){
       )
       # Combined tooltip
       paste0(
-        style_html(mod_status, color = status_col, "font-weight:bold", br_before = TRUE, br_after = TRUE),
+        style_html(mod_status, color = status_col, bold_css, br_before = TRUE, br_after = TRUE),
         ofv, n_sub, n_obs, heuristics_txt, has_sim_txt
       )
     }else{
       # If not run, just show the status
-      style_html(mod_status, color = status_col, "font-weight:bold", br_before = TRUE)
+      style_html(mod_status, color = status_col, bold_css, br_before = TRUE)
     }
   })
 
@@ -794,15 +805,16 @@ format_model_type <- function(model_type, fmt_html = FALSE, ...){
   )
 
   if(isTRUE(fmt_html)){
+    bold_css <- "font-weight:bold;"
     mod_type_fmt <- dplyr::case_when(
       model_type == "nonmem" ~
-        style_html(mod_type_fmt, color = "#119a9c", "font-weight:bold", ...),
+        style_html(mod_type_fmt, color = "#119a9c", bold_css, ...),
       model_type == "nmboot" ~
-        style_html(mod_type_fmt, color = "#c49f02", "font-weight:bold", ...),
+        style_html(mod_type_fmt, color = "#c49f02", bold_css, ...),
       model_type == "nmsim" ~
-        style_html(mod_type_fmt, color = "#ad7fa8", "font-weight:bold", ...),
+        style_html(mod_type_fmt, color = "#ad7fa8", bold_css, ...),
       TRUE ~
-        style_html(mod_type_fmt, color = "black", "font-weight:bold", ...)
+        style_html(mod_type_fmt, color = "black", bold_css, ...)
     )
   }
 
