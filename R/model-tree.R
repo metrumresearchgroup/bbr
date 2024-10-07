@@ -169,6 +169,7 @@ model_tree.bbi_log_df <- function(
   stop_if_tree_missing_deps(static = static)
 
   # Make tree data
+  include_info <- unique(c(include_info, color_by, size_by))
   tree_data <- make_tree_data(.log_df, include_info, color_by, size_by, add_summary)
 
   # Format coloring
