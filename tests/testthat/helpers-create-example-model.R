@@ -157,7 +157,8 @@ make_fake_boot <- function(mod, n = 100, strat_cols = c("SEX", "ETN")){
 # Unlike make_fake_boot however, the simulation will have a status of "Not Run"
 make_fake_sim <- function(mod, mod_id = "mod-sim", n = 100){
   mod_sim <- copy_model_from(mod, mod_id) %>% update_model_id()
-  new_dir_path <- file.path(MODEL_DIR, mod_id)
+  model_dir <- get_model_working_directory(MOD1)
+  new_dir_path <- file.path(model_dir, mod_id)
   fs::dir_copy(mod$absolute_model_path, new_dir_path)
   mod_sim <- add_msf_opt(mod_sim)
 

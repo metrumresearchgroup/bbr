@@ -22,9 +22,9 @@ tooltip.}
 identifying which models are starred, have heuristics, etc. See details
 for more information.}
 
-\item{size_by}{A run log column to size the nodes by. Can be helpful for
-sizing nodes by objective function values or otherwise emphasizing
-notable differences in numeric columns. See details for more information.}
+\item{size_by}{A \strong{numeric} (or integer) run log column to size the nodes by.
+Can be helpful for sizing nodes by objective function values or
+otherwise emphasizing notable differences in numeric columns.}
 
 \item{add_summary}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, include key columns
 from \code{\link[=model_summary]{model_summary()}} output.}

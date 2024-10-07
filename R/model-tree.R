@@ -7,9 +7,9 @@
 #' @param color_by A run log column to color the nodes by. Can be helpful for
 #'        identifying which models are starred, have heuristics, etc. See details
 #'        for more information.
-#' @param size_by A run log column to size the nodes by. Can be helpful for
-#'        sizing nodes by objective function values or otherwise emphasizing
-#'        notable differences in numeric columns. See details for more information.
+#' @param size_by A **numeric** (or integer) run log column to size the nodes by.
+#'        Can be helpful for sizing nodes by objective function values or
+#'        otherwise emphasizing notable differences in numeric columns.
 #' @param add_summary Logical (`TRUE`/`FALSE`). If `TRUE`, include key columns
 #'        from [model_summary()] output.
 #' @param digits Number of digits to round decimal places to for display in
@@ -54,8 +54,8 @@
 #'     - Note that the above summary columns will only receive the special
 #'     formatting if added via `add_summary = TRUE`.
 #'     - i.e. if `.log_df = run_log() %>% add_summary()` and
-#'     `include_info = 'ofv'`, The `'OFV'` parameter will be formatted as any
-#'     other additional column.
+#'     `include_info = 'ofv'`, The `'OFV'` parameter will display the same as if
+#'     it was _not_ passed to `include_info`.
 #'
 #' **Coloring**
 #'
@@ -65,13 +65,6 @@
 #' where earlier runs are whiter, and later runs appear to be more red. You can
 #' pass `color_by = NULL` to make all model nodes `'red'`.
 #'
-#'
-#' **Sizing**
-#'
-#' Sizing is intended to be used for numeric columns (such as `'ofv'` when
-#' `.log_df = run_log() %>% add_summary()`). Logical columns are supported, though
-#' you may experience different sizing behavior depending on the occurrence of
-#' `TRUE`/`FALSE` values in the run log.
 #'
 #' @examples
 #' \dontrun{
@@ -89,7 +82,7 @@
 #'
 #' # Size nodes by objective function value
 #' run_log(MODEL_DIR) %>% add_summary() %>%
-#'   model_tree(size_by = "ofv")
+#'   model_tree(size_by = "ofv", color_by = "ofv")
 #'
 #' # Determine if certain models need to be re-run
 #' run_log(MODEL_DIR) %>% add_config() %>%
@@ -232,19 +225,23 @@ make_tree_data <- function(
     size_by = NULL,
     add_summary = TRUE
 ){
-  cols_keep <- unique(c(include_info, color_by, size_by))
-  checkmate::assert_true(all(cols_keep %in% names(.log_df)))
-
   # Check for required columns and starting format
   req_cols <- c(ABS_MOD_PATH, "run", "based_on", "model_type")
   if(!(all(req_cols %in% names(.log_df)))){
-    cols_missing <- req_cols[!(req_cols %in% names(.log_df))]
-    cols_missing <- paste(cols_missing, collapse = ", ")
-    rlang::abort(
-      glue::glue("The following required columns are missing: {cols_missing}")
+    cols_missing <- setdiff(req_cols, names(.log_df))
+    cli::cli_abort(
+      "The following {.emph required} columns are missing from `.log_df`: {.val {cols_missing}}"
     )
   }
   checkmate::assert_true(inherits(.log_df$based_on, "list"))
+
+  cols_keep <- unique(c(include_info, color_by, size_by))
+  if(!all(cols_keep %in% names(.log_df))){
+    cols_missing <- setdiff(cols_keep, names(.log_df))
+    cli::cli_abort(
+      "The following {.emph specified} columns are missing from `.log_df`: {.val {cols_missing}}"
+    )
+  }
 
   # These columns have special handling either here or in the tooltip
   base_log_cols <- c(req_cols, "description", "star", "tags")
@@ -659,7 +656,7 @@ make_tree_tooltip <- function(tree_data, digits = 3, font_size = 10){
 }
 
 
-#' Create a color column based on the unique values of another column
+#' Create a color column based on the unique values of another column.
 #' @inheritParams make_tree_tooltip
 #' @inheritParams model_tree
 #' @noRd
@@ -734,41 +731,32 @@ color_tree_by <- function(tree_data, color_by = "run"){
   return(tree_data)
 }
 
-#' Create a size column based on the unique values of another column
+#' Create a size column based on the unique _numeric_ (or integer) values of
+#' another column.
 #' @inheritParams make_tree_tooltip
 #' @inheritParams model_tree
 #' @noRd
 size_tree_by <- function(tree_data, size_by = NULL){
-  # Initialize new size column
   if(!is.null(size_by)){
     checkmate::assert_true(size_by %in% names(tree_data))
     tree_data$node_size <- tree_data[[size_by]]
-  }else{
-    tree_data$node_size <- 1
-  }
-
-  # Sizing only works for numeric columns, so additional handling is needed for
-  # logical and NA values
-  # - Logical values: TRUE = 5, FALSE = 1, NA = 3
-  # - Numeric values with NA: NA = mean value
-  if(inherits(tree_data$node_size, "logical")){
-    tree_data <- tree_data %>% dplyr::mutate(
-      node_size = dplyr::case_when(
-        node_size == TRUE ~ 5,
-        node_size == FALSE ~ 1,
-        is.na(node_size) ~ 3,
-        TRUE ~ 3
+    # Scale size with numeric value
+    if(inherits(tree_data$node_size, c("numeric", "integer"))){
+      # Set node sizes with NA values (including start node) to mean value
+      mean_val <- mean(tree_data$node_size, na.rm = TRUE)
+      tree_data$node_size[is.na(tree_data$node_size)] <- mean_val
+    }else{
+      col_class <- class(tree_data[[size_by]])
+      cli::cli_warn(
+        c(
+          "Only numeric columns are supported. Column {.val {size_by}} is {.val {col_class}}",
+          "i" = "Setting node size to constant"
+        )
       )
-    )
-  }else if(inherits(tree_data$node_size, "numeric")){
-    mean_val <- mean(tree_data$node_size, na.rm = TRUE)
-    # Set node sizes with NA values (including start node) to mean value
-    tree_data$node_size[is.na(tree_data$node_size)] <- mean_val
+      tree_data$node_size <- 1
+    }
   }else{
     tree_data$node_size <- 1
-    cli::cli_warn(
-      "Only numeric and logical columns are supported for {.val size_by}"
-    )
   }
 
   return(tree_data)

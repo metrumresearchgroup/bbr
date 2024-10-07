@@ -388,7 +388,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       clean_test_enviroment(create_tree_models)
 
       log_df <- run_log(MODEL_DIR) %>% dplyr::mutate(
-        size_col = as.numeric(run)
+        size_col = as.integer(run)
       )
 
       # Checks that the size increases with each node (like size_col, i.e. run number)
@@ -397,37 +397,6 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       expect_true(all(diff(node_sizes) > 0))
 
       ### Data checks ###
-      # Test logical size_by
-      true_indices <- which(log_df$star)
-      false_indices <- which(!log_df$star)
-      pl_tree <- model_tree(log_df, add_summary = FALSE, size_by = "star")
-      node_sizes <- get_node_attribute(pl_tree$x$data$children, attr = "SizeOfNode")
-
-      tree_data <- make_tree_data(log_df, add_summary = FALSE)
-      tree_data_star <- size_tree_by(tree_data, size_by = "star")
-      data_sizes <- tree_data_star$node_size[-1]
-
-      # Checks that the TRUE values are larger than FALSE values
-      # - Checks the underlying data, and rendered node size
-      expect_true(all(node_sizes[true_indices] > node_sizes[false_indices]))
-      expect_true(all(data_sizes[true_indices] > data_sizes[false_indices]))
-
-      # Check if all the same value (works the same if TRUE or NA)
-      log_df2 <- log_df
-      log_df2$star <- FALSE
-      false_indices <- which(!log_df2$star)
-      pl_tree <- model_tree(log_df2, add_summary = FALSE, size_by = "star")
-      node_sizes <- get_node_attribute(pl_tree$x$data$children, attr = "SizeOfNode")
-
-      tree_data <- make_tree_data(log_df2, add_summary = FALSE)
-      tree_data_star <- size_tree_by(tree_data, size_by = "star")
-      data_sizes <- tree_data_star$node_size[-1]
-
-      # Checks that all values are the same size
-      # - Checks the underlying data, and rendered node size
-      expect_true(dplyr::n_distinct(node_sizes[false_indices]) == 1)
-      expect_true(dplyr::n_distinct(data_sizes[false_indices]) == 1)
-
 
       # Test numeric size_by (gradient sizing) - mimics objective function
       set.seed(1234)
@@ -446,6 +415,39 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       # - Checks the underlying data, and rendered node size
       expect_equal(order(size_col_vals), order(node_sizes))
       expect_equal(order(size_col_vals), order(data_sizes))
+
+      # Check if all the same value
+      log_df2 <- log_df
+      log_df2$size_col <- 1
+      size_col_vals <- log_df2$size_col
+      pl_tree <- model_tree(log_df2, add_summary = FALSE, size_by = "size_col")
+      node_sizes <- get_node_attribute(pl_tree$x$data$children, attr = "SizeOfNode")
+
+      tree_data <- make_tree_data(log_df2, add_summary = FALSE, size_by = "size_col")
+      tree_data_size <- size_tree_by(tree_data, size_by = "size_col")
+      data_sizes <- tree_data_size$node_size[-1]
+
+      # Checks that all values are the same size
+      # - Checks the underlying data, and rendered node size
+      expect_true(dplyr::n_distinct(node_sizes) == 1)
+      expect_true(dplyr::n_distinct(data_sizes) == 1)
+
+      ## Warns if non-numeric (or non-integer) column ##
+      log_df2 <- log_df2 %>% dplyr::mutate(run = as.character(run))
+      # Check logical
+      expect_warning(
+        pl_tree <- model_tree(log_df2, add_summary = FALSE, size_by = "star"),
+        'Only numeric columns are supported'
+      )
+      node_sizes <- get_node_attribute(pl_tree$x$data$children, attr = "SizeOfNode")
+      expect_true(dplyr::n_distinct(node_sizes) == 1)
+      # Check character
+      expect_warning(
+        pl_tree <- model_tree(log_df2, add_summary = FALSE, size_by = "star"),
+        'Only numeric columns are supported'
+      )
+      node_sizes <- get_node_attribute(pl_tree$x$data$children, attr = "SizeOfNode")
+      expect_true(dplyr::n_distinct(node_sizes) == 1)
     })
 
     it("static plot", {
@@ -456,6 +458,21 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       # data is returned
       expect_true(inherits(pl_tree, "model_tree_static"))
       expect_true(inherits(pl_tree$png_array, "array"))
+    })
+
+    it("Check for missing columns", {
+      clean_test_enviroment(create_tree_models)
+      # Required columns are missing
+      log_df <- run_log(MODEL_DIR) %>% dplyr::select(-c("run", "based_on", "model_type"))
+      expect_error(
+        model_tree(log_df, add_summary = FALSE),
+        "columns are missing"
+      )
+      # Specified columns are missing
+      expect_error(
+        model_tree(MODEL_DIR, add_summary = FALSE, include_info = c("oops_I", "did_it_again")),
+        "columns are missing"
+      )
     })
   })
 }) # closing withr::with_options

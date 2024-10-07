@@ -30,9 +30,9 @@ tooltip.}
 identifying which models are starred, have heuristics, etc. See details
 for more information.}
 
-\item{size_by}{A run log column to size the nodes by. Can be helpful for
-sizing nodes by objective function values or otherwise emphasizing
-notable differences in numeric columns. See details for more information.}
+\item{size_by}{A \strong{numeric} (or integer) run log column to size the nodes by.
+Can be helpful for sizing nodes by objective function values or
+otherwise emphasizing notable differences in numeric columns.}
 
 \item{add_summary}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, include key columns
 from \code{\link[=model_summary]{model_summary()}} output.}
@@ -95,8 +95,8 @@ formatted specially:
 \item Note that the above summary columns will only receive the special
 formatting if added via \code{add_summary = TRUE}.
 \item i.e. if \code{.log_df = run_log() \%>\% add_summary()} and
-\code{include_info = 'ofv'}, The \code{'OFV'} parameter will be formatted as any
-other additional column.
+\code{include_info = 'ofv'}, The \code{'OFV'} parameter will display the same as if
+it was \emph{not} passed to \code{include_info}.
 }
 }
 
@@ -107,13 +107,6 @@ Nodes will be colored \code{'white'} for \code{FALSE} and \code{'red'} for \code
 column types will be colored via a gradient between \code{'white'} and \code{'red'},
 where earlier runs are whiter, and later runs appear to be more red. You can
 pass \code{color_by = NULL} to make all model nodes \code{'red'}.
-
-\strong{Sizing}
-
-Sizing is intended to be used for numeric columns (such as \code{'ofv'} when
-\code{.log_df = run_log() \%>\% add_summary()}). Logical columns are supported, though
-you may experience different sizing behavior depending on the occurrence of
-\code{TRUE}/\code{FALSE} values in the run log.
 }
 
 \examples{
@@ -132,7 +125,7 @@ model_tree(MODEL_DIR, color_by = "star")
 
 # Size nodes by objective function value
 run_log(MODEL_DIR) \%>\% add_summary() \%>\%
-  model_tree(size_by = "ofv")
+  model_tree(size_by = "ofv", color_by = "ofv")
 
 # Determine if certain models need to be re-run
 run_log(MODEL_DIR) \%>\% add_config() \%>\%
