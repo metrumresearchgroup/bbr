@@ -172,7 +172,7 @@ In this example we define a new column, `out_of_date`, to denote whether the mod
 log_df %>% add_config() %>%
   dplyr::mutate(out_of_date = model_has_changed | data_has_changed) %>%
   model_tree(
-    include_info = c("model_has_changed", "data_has_changed", "nm_version"),
+    include_info = c("model_has_changed", "data_has_changed"),
     color_by = "out_of_date"
   )
 ```
@@ -219,20 +219,18 @@ model_tree(
 
 ## Size the nodes by a particular column
 
-Controlling the node size can be helpful for quickly determining the trend of a particular numeric column, or further emphasizing a logical one (e.g., `'star'`). Here, we use `color_by` and `size_by` to show the objective function value decreasing with each new model.
+Controlling the node size can be helpful for quickly determining the trend of a particular **numeric** column. Here, we use `color_by` and `size_by` to show the objective function value decreasing with each new model.
+
  - **Note:** Like the `color_by` argument, only columns included in `log_df` can be passed. We have to call `add_summary()` to use `"ofv"` even though this is included in the tooltip when `add_summary = TRUE`.
+ - If `size_by` is _not_ specified, the nodes are sized based on how many other models/nodes stem from it (i.e. the "final model" will be smaller than the "base model").
 ```{r, eval=FALSE}
 log_df %>% add_summary() %>%
-  model_tree(
-    include_info = c("star", "description"),
-    color_by = "ofv", size_by = "ofv"
-  )
+  model_tree(color_by = "ofv", size_by = "ofv")
 ```
 
 ```{r, echo=FALSE, eval=eval_model_tree}
 model_tree(
   log_df,
-  include_info = c("star", "description"),
   color_by = "ofv", size_by = "ofv",
   width = 800,
   font_size = 12

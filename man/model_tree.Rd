@@ -31,8 +31,8 @@ identifying which models are starred, have heuristics, etc. See details
 for more information.}
 
 \item{size_by}{A \strong{numeric} (or integer) run log column to size the nodes by.
-Can be helpful for sizing nodes by objective function values or
-otherwise emphasizing notable differences in numeric columns.}
+If not specified, the default sizing is \code{'leafCount'}, which sizes the
+nodes based on how many models are based on it.}
 
 \item{add_summary}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, include key columns
 from \code{\link[=model_summary]{model_summary()}} output.}
