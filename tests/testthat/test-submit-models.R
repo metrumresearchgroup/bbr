@@ -190,10 +190,7 @@ test_that("submit_models() works if .bbi_args is empty", {
 })
 
 test_that("submit_models(.mode) inherits option", {
-  other_mode <- switch(default_mode,
-    sge = "local",
-    "sge"
-  )
+  other_mode <- if (identical(default_mode, "local")) "slurm" else "local"
   withr::with_options(list(bbr.bbi_exe_mode = other_mode), {
     expect_identical(
       submit_models(list(MOD1), .dry_run = TRUE)[[1]][[PROC_CALL]],

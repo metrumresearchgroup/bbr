@@ -87,10 +87,7 @@ test_that("submit_model() throws an error if passed `output_dir` bbi arg", {
 })
 
 test_that("submit_model(.mode) inherits option", {
-  other_mode <- switch(default_mode,
-    sge = "local",
-    "sge"
-  )
+  other_mode <- if (identical(default_mode, "local")) "slurm" else "local"
   withr::with_options(list(bbr.bbi_exe_mode = other_mode), {
     expect_identical(
       submit_model(MOD1, .dry_run = TRUE)[[PROC_CALL]],
