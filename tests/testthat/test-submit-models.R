@@ -139,7 +139,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_identical(
       res[[1L]][[PROC_CALL]],
       as.character(
-        glue::glue(
+        glue(
           "{cmd_prefix} {mod_ctl_path[[1L]]} --overwrite --parallel --threads=4",
           "--config={temp_config}",
           .sep = " "
@@ -159,7 +159,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_identical(
       res[[1L]][[PROC_CALL]],
       as.character(
-        glue::glue("{cmd_prefix} {mod_ctl_path[[1L]]} --parallel")
+        glue("{cmd_prefix} {mod_ctl_path[[1L]]} --parallel")
       )
     )
 
@@ -177,7 +177,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_identical(
       res[[1L]][[PROC_CALL]],
       as.character(
-        glue::glue(
+        glue(
           "cd {dirname(temp_mod_path)} ;",
           "{read_bbi_path()} nonmem run {default_mode} {fs::path_ext_set(temp_mod_path, 'ctl')}",
           .sep = " "

@@ -72,7 +72,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_identical(
       res[[PROC_CALL]],
       as.character(
-        glue::glue(
+        glue(
           "{cmd_prefix} {mod_ctl_path} --overwrite --threads=4 --parallel",
           "--config={temp_config}",
           .sep = " "
