@@ -18,7 +18,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   cmd_prefix <- paste("cd", model_dir, ";",
                       read_bbi_path(), "nonmem", "run",
                       default_mode)
-  test_that("submit_model(.dry_run=TRUE) returns correct command string [BBR-SBMT-001]",
+  test_that("submit_model(.dry_run=TRUE) returns correct command string",
             {
 
               # correctly parsing yaml
@@ -46,7 +46,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
               )
             })
 
-  test_that("submit_model(.dry_run=TRUE) with bbi_nonmem_model object parses correctly [BBR-SBMT-002]",
+  test_that("submit_model(.dry_run=TRUE) with bbi_nonmem_model object parses correctly",
             {
               # correctly parsing yaml
               expect_identical(
@@ -61,7 +61,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
               )
             })
 
-  test_that("submit_model() creates correct call for non-NULL .config_path [BBR-SBMT-003]", {
+  test_that("submit_model() creates correct call for non-NULL .config_path", {
 
     temp_config <- tempfile(fileext = ".yaml")
     readr::write_file("foo", temp_config)
@@ -81,14 +81,14 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     )
   })
 
-  test_that("submit_model() throws an error if passed `output_dir` bbi arg [BBR-SBMT-004]", {
+  test_that("submit_model() throws an error if passed `output_dir` bbi arg", {
     expect_error(
       submit_model(MOD1, .bbi_args = list(output_dir = "foo")),
       "is not a valid argument"
     )
   })
 
-  test_that("submit_model(.mode) inherits option [BBR-SBMT-005]", {
+  test_that("submit_model(.mode) inherits option", {
     other_mode <- switch(default_mode, sge = "local", "sge")
     withr::with_options(list(bbr.bbi_exe_mode = other_mode), {
       expect_identical(
@@ -98,7 +98,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     })
   })
 
-  test_that("submit_model(.mode) errors when NULL [BBR-SBMT-006]", {
+  test_that("submit_model(.mode) errors when NULL", {
     withr::with_options(list(bbr.bbi_exe_mode = NULL), {
       expect_error(
         submit_model(MOD1, .dry_run = TRUE),
@@ -107,7 +107,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     })
   })
 
-  test_that("submit_model(.mode) errors when invalid [BBR-SBMT-007]", {
+  test_that("submit_model(.mode) errors when invalid", {
     expect_error(
       submit_model(MOD1, .dry_run = TRUE, .mode = "naw"),
       regexp = "Invalid value passed.+mode"
