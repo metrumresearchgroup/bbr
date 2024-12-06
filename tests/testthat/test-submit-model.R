@@ -1,4 +1,4 @@
-context("submit_model(.dry_run=T)")
+context("submit_model(.dry_run=TRUE)")
 
 ###################################
 # testing single model submission
@@ -18,18 +18,18 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   cmd_prefix <- paste("cd", model_dir, ";",
                       read_bbi_path(), "nonmem", "run",
                       default_mode)
-  test_that("submit_model(.dry_run=T) returns correct command string [BBR-SBMT-001]",
+  test_that("submit_model(.dry_run=TRUE) returns correct command string [BBR-SBMT-001]",
             {
 
               # correctly parsing yaml
               expect_identical(
-                submit_model(MOD1, .dry_run = T)[[PROC_CALL]],
+                submit_model(MOD1, .dry_run = TRUE)[[PROC_CALL]],
                 as.character(glue("{cmd_prefix} {mod_ctl_path} --overwrite --threads=4 --parallel"))
               )
 
               # switch to local mode
               expect_identical(
-                submit_model(MOD1, .mode = "local", .dry_run = T)[[PROC_CALL]],
+                submit_model(MOD1, .mode = "local", .dry_run = TRUE)[[PROC_CALL]],
                 as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run local {mod_ctl_path} --overwrite --threads=4 --parallel"))
               )
 
@@ -37,26 +37,26 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
               expect_identical(
                 submit_model(MOD1,
                              .bbi_args=list(
-                               "json" = T,
+                               "json" = TRUE,
                                "threads" = 2,
                                "nm_version" = "nm74"
                              ),
-                             .dry_run = T)[[PROC_CALL]],
+                             .dry_run = TRUE)[[PROC_CALL]],
                 as.character(glue("{cmd_prefix} {mod_ctl_path} --overwrite --threads=2 --json --nm_version=nm74 --parallel"))
               )
             })
 
-  test_that("submit_model(.dry_run=T) with bbi_nonmem_model object parses correctly [BBR-SBMT-002]",
+  test_that("submit_model(.dry_run=TRUE) with bbi_nonmem_model object parses correctly [BBR-SBMT-002]",
             {
               # correctly parsing yaml
               expect_identical(
-                submit_model(MOD1, .dry_run = T)[[PROC_CALL]],
+                submit_model(MOD1, .dry_run = TRUE)[[PROC_CALL]],
                 as.character(glue("{cmd_prefix} {mod_ctl_path} --overwrite --threads=4 --parallel"))
               )
 
               # over-riding yaml arg with passed arg
               expect_identical(
-                submit_model(MOD1, list(threads=2), .dry_run = T)[[PROC_CALL]],
+                submit_model(MOD1, list(threads=2), .dry_run = TRUE)[[PROC_CALL]],
                 as.character(glue("{cmd_prefix} {mod_ctl_path} --overwrite --threads=2 --parallel"))
               )
             })
@@ -92,7 +92,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     other_mode <- switch(default_mode, sge = "local", "sge")
     withr::with_options(list(bbr.bbi_exe_mode = other_mode), {
       expect_identical(
-        submit_model(MOD1, .dry_run = T)[[PROC_CALL]],
+        submit_model(MOD1, .dry_run = TRUE)[[PROC_CALL]],
         as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run {other_mode} {mod_ctl_path} --overwrite --threads=4 --parallel"))
       )
     })
@@ -101,7 +101,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   test_that("submit_model(.mode) errors when NULL [BBR-SBMT-006]", {
     withr::with_options(list(bbr.bbi_exe_mode = NULL), {
       expect_error(
-        submit_model(MOD1, .dry_run = T),
+        submit_model(MOD1, .dry_run = TRUE),
         regexp = "Nothing was passed.+mode"
       )
     })
@@ -109,7 +109,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   test_that("submit_model(.mode) errors when invalid [BBR-SBMT-007]", {
     expect_error(
-      submit_model(MOD1, .dry_run = T, .mode = "naw"),
+      submit_model(MOD1, .dry_run = TRUE, .mode = "naw"),
       regexp = "Invalid value passed.+mode"
     )
   })

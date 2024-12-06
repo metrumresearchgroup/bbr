@@ -1,4 +1,4 @@
-context("submit_models(.dry_run=T)")
+context("submit_models(.dry_run=TRUE)")
 
 #####################################
 # testing multiple model submission
@@ -21,7 +21,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
                       read_bbi_path(), "nonmem", "run",
                       default_mode)
 
-  test_that("submit_models(.dry_run=T) with list input simple [BBR-SBMT-008]",
+  test_that("submit_models(.dry_run=TRUE) with list input simple [BBR-SBMT-008]",
             {
               # copy to two new models
               mod2 <- copy_model_from(MOD1, 2)
@@ -31,7 +31,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
               .mods <- list(MOD1, mod2, mod3)
 
               # submit models
-              proc_list <- submit_models(.mods, .dry_run = T)
+              proc_list <- submit_models(.mods, .dry_run = TRUE)
               expect_true(all(purrr::map_lgl(proc_list, function(.proc) { "bbi_process" %in% class(.proc) })))
 
               # check that there is only one distinct arg set
@@ -44,7 +44,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
               )
             })
 
-  test_that("submit_models(.dry_run=T) with list input, 2 arg sets [BBR-SBMT-010]",
+  test_that("submit_models(.dry_run=TRUE) with list input, 2 arg sets [BBR-SBMT-010]",
             {
               # copy to two new models
               mod2 <- copy_model_from(MOD1, 2) %>% add_bbi_args(list(threads = 3))
@@ -54,7 +54,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
               .mods <- list(MOD1, mod2, mod3)
 
               # submit and test that passed .bbi_args override args in object
-              proc_list <- submit_models(.mods, .dry_run = T, .bbi_args = list(threads = 1))
+              proc_list <- submit_models(.mods, .dry_run = TRUE, .bbi_args = list(threads = 1))
               expect_true(all(purrr::map_lgl(proc_list, function(.proc) { "bbi_process" %in% class(.proc) })))
 
               # check that there are two distinct arg sets
@@ -97,7 +97,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_equal(length(proc_list), 2L)
   })
 
-  test_that("submit_models(.dry_run=T) errors with bad input [BBR-SBMT-012]",
+  test_that("submit_models(.dry_run=TRUE) errors with bad input [BBR-SBMT-012]",
             {
               # copy to two new models
               mod2 <- copy_model_from(MOD1, 2)
@@ -109,7 +109,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
               .mods <- list(MOD1, mod2, mod3, fake)
 
               expect_error(
-                submit_models(.mods, .dry_run = T),
+                submit_models(.mods, .dry_run = TRUE),
                 regexp = "must contain only model objects"
               )
 
@@ -119,7 +119,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
               .mods <- list(MOD1, mod2, mod3, fake)
 
               expect_error(
-                submit_models(.mods, .dry_run = T),
+                submit_models(.mods, .dry_run = TRUE),
                 regexp = "must contain all the same type of models"
               )
             })
@@ -190,7 +190,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     other_mode <- switch(default_mode, sge = "local", "sge")
     withr::with_options(list(bbr.bbi_exe_mode = other_mode), {
       expect_identical(
-        submit_models(list(MOD1), .dry_run = T)[[1]][[PROC_CALL]],
+        submit_models(list(MOD1), .dry_run = TRUE)[[1]][[PROC_CALL]],
         as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run {other_mode} {ABS_CTL_PATH} --overwrite --parallel --threads=4"))
       )
     })
