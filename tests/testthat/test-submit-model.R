@@ -12,11 +12,7 @@ readr::write_file("created_by: test-submit-model", file.path(model_dir, "bbi.yam
 on.exit(fs::file_delete(file.path(model_dir, "bbi.yaml")))
 
 default_mode <- getOption("bbr.bbi_exe_mode")
-cmd_prefix <- paste(
-  "cd", model_dir, ";",
-  read_bbi_path(), "nonmem", "run",
-  default_mode
-)
+cmd_prefix <- paste("cd", model_dir, ";", read_bbi_path(), "nonmem", "run")
 
 withr::local_options(list(bbr.bbi_exe_path = read_bbi_path()))
 
@@ -24,13 +20,13 @@ test_that("submit_model(.dry_run=TRUE) returns correct command string", {
   # correctly parsing yaml
   expect_identical(
     submit_model(MOD1, .dry_run = TRUE)[[PROC_CALL]],
-    as.character(glue("{cmd_prefix} {mod_ctl_path} --overwrite --threads=4 --parallel"))
+    as.character(glue("{cmd_prefix} {default_mode} {mod_ctl_path} --overwrite --threads=4 --parallel"))
   )
 
   # switch to local mode
   expect_identical(
     submit_model(MOD1, .mode = "local", .dry_run = TRUE)[[PROC_CALL]],
-    as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run local {mod_ctl_path} --overwrite --threads=4 --parallel"))
+    as.character(glue("{cmd_prefix} local {mod_ctl_path} --overwrite --threads=4 --parallel"))
   )
 
   # over-riding yaml arg with passed args
@@ -43,7 +39,7 @@ test_that("submit_model(.dry_run=TRUE) returns correct command string", {
       ),
       .dry_run = TRUE
     )[[PROC_CALL]],
-    as.character(glue("{cmd_prefix} {mod_ctl_path} --overwrite --threads=2 --json --nm_version=nm74 --parallel"))
+    as.character(glue("{cmd_prefix} {default_mode} {mod_ctl_path} --overwrite --threads=2 --json --nm_version=nm74 --parallel"))
   )
 })
 
@@ -51,13 +47,13 @@ test_that("submit_model(.dry_run=TRUE) with bbi_nonmem_model object parses corre
   # correctly parsing yaml
   expect_identical(
     submit_model(MOD1, .dry_run = TRUE)[[PROC_CALL]],
-    as.character(glue("{cmd_prefix} {mod_ctl_path} --overwrite --threads=4 --parallel"))
+    as.character(glue("{cmd_prefix} {default_mode} {mod_ctl_path} --overwrite --threads=4 --parallel"))
   )
 
   # over-riding yaml arg with passed arg
   expect_identical(
     submit_model(MOD1, list(threads = 2), .dry_run = TRUE)[[PROC_CALL]],
-    as.character(glue("{cmd_prefix} {mod_ctl_path} --overwrite --threads=2 --parallel"))
+    as.character(glue("{cmd_prefix} {default_mode} {mod_ctl_path} --overwrite --threads=2 --parallel"))
   )
 })
 
@@ -72,7 +68,7 @@ test_that("submit_model() creates correct call for non-NULL .config_path", {
     res[[PROC_CALL]],
     as.character(
       glue(
-        "{cmd_prefix} {mod_ctl_path} --overwrite --threads=4 --parallel",
+        "{cmd_prefix} {default_mode} {mod_ctl_path} --overwrite --threads=4 --parallel",
         "--config={temp_config}",
         .sep = " "
       )
@@ -95,7 +91,7 @@ test_that("submit_model(.mode) inherits option", {
   withr::with_options(list(bbr.bbi_exe_mode = other_mode), {
     expect_identical(
       submit_model(MOD1, .dry_run = TRUE)[[PROC_CALL]],
-      as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run {other_mode} {mod_ctl_path} --overwrite --threads=4 --parallel"))
+      as.character(glue("{cmd_prefix} {other_mode} {mod_ctl_path} --overwrite --threads=4 --parallel"))
     )
   })
 })

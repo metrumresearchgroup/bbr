@@ -17,11 +17,7 @@ mod_ctl_path <- purrr::map_chr(
 )
 
 default_mode <- getOption("bbr.bbi_exe_mode")
-cmd_prefix <- paste(
-  "cd", model_dir, ";",
-  read_bbi_path(), "nonmem", "run",
-  default_mode
-)
+cmd_prefix <- paste("cd", model_dir, ";", read_bbi_path(), "nonmem", "run")
 
 test_that("submit_models(.dry_run=TRUE) with list input simple", {
   # copy to two new models
@@ -43,7 +39,7 @@ test_that("submit_models(.dry_run=TRUE) with list input simple", {
   # check call
   expect_identical(
     proc_list[[1]][[PROC_CALL]],
-    as.character(glue("{cmd_prefix} {paste(mod_ctl_path, collapse = ' ')} --overwrite --parallel --threads=4"))
+    as.character(glue("{cmd_prefix} {default_mode} {paste(mod_ctl_path, collapse = ' ')} --overwrite --parallel --threads=4"))
   )
 })
 
@@ -69,14 +65,14 @@ test_that("submit_models(.dry_run=TRUE) with list input, 2 arg sets", {
     proc_list[[1]][[PROC_CALL]],
     as.character(
       glue(
-        "{cmd_prefix} {mod_ctl_path[1]} {mod_ctl_path[2]} --overwrite --threads=1"
+        "{cmd_prefix} {default_mode} {mod_ctl_path[1]} {mod_ctl_path[2]} --overwrite --threads=1"
       )
     )
   )
   expect_identical(
     proc_list[[2]][[PROC_CALL]],
     as.character(
-      glue("{cmd_prefix} {mod_ctl_path[3]} --clean_lvl=2 --overwrite --threads=1")
+      glue("{cmd_prefix} {default_mode} {mod_ctl_path[3]} --clean_lvl=2 --overwrite --threads=1")
     )
   )
 })
@@ -144,7 +140,7 @@ test_that("submit_models() works with non-NULL .config_path", {
     res[[1L]][[PROC_CALL]],
     as.character(
       glue(
-        "{cmd_prefix} {mod_ctl_path[[1L]]} --overwrite --parallel --threads=4",
+        "{cmd_prefix} {default_mode} {mod_ctl_path[[1L]]} --overwrite --parallel --threads=4",
         "--config={temp_config}",
         .sep = " "
       )
@@ -163,7 +159,7 @@ test_that("submit_models() works if .bbi_args is empty", {
   expect_identical(
     res[[1L]][[PROC_CALL]],
     as.character(
-      glue("{cmd_prefix} {mod_ctl_path[[1L]]} --parallel")
+      glue("{cmd_prefix} {default_mode} {mod_ctl_path[[1L]]} --parallel")
     )
   )
 
@@ -198,7 +194,7 @@ test_that("submit_models(.mode) inherits option", {
   withr::with_options(list(bbr.bbi_exe_mode = other_mode), {
     expect_identical(
       submit_models(list(MOD1), .dry_run = TRUE)[[1]][[PROC_CALL]],
-      as.character(glue("cd {model_dir} ; {read_bbi_path()} nonmem run {other_mode} {ABS_CTL_PATH} --overwrite --parallel --threads=4"))
+      as.character(glue("{cmd_prefix} {other_mode} {ABS_CTL_PATH} --overwrite --parallel --threads=4"))
     )
   })
 })
