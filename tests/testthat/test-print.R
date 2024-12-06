@@ -38,6 +38,8 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     fs::dir_create(temp_dir)
     on.exit(fs::dir_delete(temp_dir))
 
+    withr::local_options(list(bbr.DEV_skip_system_mode_checks = TRUE))
+
     readr::write_file("created_by: test-print", file.path(temp_dir, "bbi.yaml"))
 
     mods <- purrr::map(1:50, ~copy_model_from(MOD1, file.path("print-test", .x)))

@@ -5,7 +5,7 @@ BBI_DEFAULT_PATH <- if (ON_WINDOWS) {
   "bbi"
 }
 
-BBI_VALID_MODES <- c("local", "sge")
+BBI_VALID_MODES <- c("local", "sge", "slurm")
 
 CACHE_ENV <- new.env(parent = emptyenv())
 CACHE_ENV$bbi_exe_paths <- list()

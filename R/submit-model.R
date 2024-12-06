@@ -30,9 +30,9 @@
 #'   4)`. Run [print_bbi_args()] to see valid arguments. Note that bbr does
 #'   not support changing the output directory (including through the model or
 #'   global YAML files).
-#' @param .mode Either `"sge"`, the default, to submit model(s) to the grid or
-#'   `"local"` for local execution. This can be passed directly to this argument
-#'   or set globally with `options("bbr.bbi_exe_mode")`.
+#' @param .mode Mode for model submission: "local", "sge", or "slurm". If
+#'   unspecified, the value is set to the value of the `bbr.bbi_exe_mode`
+#'   option. This option defaults to "sge" on Linux and "local" otherwise.
 #' @param ... args passed through to `bbi_exec()`
 #' @param .overwrite Logical to specify whether or not to overwrite existing
 #'   model output from a previous run. If `NULL`, the default, will defer to
@@ -354,6 +354,38 @@ check_mode_argument <- function(.mode) {
 
   if (!(.mode %in% BBI_VALID_MODES)) {
     stop(BBI_EXE_MODE_INVALID_ERR_MSG, call. = FALSE)
+  }
+
+  if (isTRUE(getOption("bbr.DEV_skip_system_mode_checks"))) {
+    # ^ Allow dry-run tests to skip the system mode checks.
+    return(invisible(TRUE))
+  }
+
+  # All of the remaining checks depend on system details.
+
+  if (identical(.mode, "slurm") && !test_bbi_version(.min_version = "3.4.0")) {
+    stop(
+      "Installed bbi version is ", bbi_version(),
+      ", but .mode='slurm' requires at least version 3.4.0"
+    )
+  }
+
+  if (identical(.mode, "sge")) {
+    qsub <- unname(Sys.which("qsub"))
+    if (identical(qsub, "")) {
+      stop(".mode='sge' but qsub is not available on system")
+    }
+
+    # This guard is Metworx (or really ParallelCluster) specific. Slurm ships
+    # with a qsub shim. That leads to a confusing situation where 'bbi nonmem
+    # run sge ...' will not abort upfront, but the execution doesn't entirely
+    # match the expected behavior (especially under --parallel).
+    if (identical(qsub, "/opt/slurm/bin/qsub")) {
+      stop(
+        ".mode is 'sge' but qsub points to Slurm shim.\n",
+        "Instead set .mode to 'slurm' (requires bbi 3.4.0 or later)\n"
+      )
+    }
   }
 
   return(invisible(TRUE))

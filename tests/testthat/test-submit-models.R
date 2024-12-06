@@ -4,7 +4,10 @@ context("submit_models(.dry_run=TRUE)")
 # testing multiple model submission
 #####################################
 
-withr::local_options(list(bbr.bbi_exe_path = read_bbi_path()))
+withr::local_options(list(
+  bbr.bbi_exe_path = read_bbi_path(),
+  bbr.DEV_skip_system_mode_checks = TRUE
+))
 
 # create fake bbi.yaml
 readr::write_file("created_by: test-submit-models", file.path(MODEL_DIR, "bbi.yaml"))
