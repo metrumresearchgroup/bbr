@@ -26,12 +26,6 @@ test_that("submit_model(.dry_run=TRUE) returns correct command string", {
     as.character(glue("{cmd_prefix} {default_mode} {mod_ctl_path} --overwrite --threads=4 --parallel"))
   )
 
-  # switch to local mode
-  expect_identical(
-    submit_model(MOD1, .mode = "local", .dry_run = TRUE)[[PROC_CALL]],
-    as.character(glue("{cmd_prefix} local {mod_ctl_path} --overwrite --threads=4 --parallel"))
-  )
-
   # over-riding yaml arg with passed args
   expect_identical(
     submit_model(MOD1,
@@ -83,6 +77,14 @@ test_that("submit_model() throws an error if passed `output_dir` bbi arg", {
   expect_error(
     submit_model(MOD1, .bbi_args = list(output_dir = "foo")),
     "is not a valid argument"
+  )
+})
+
+test_that("submit_model() .mode argument overrides bbr.bbi_exe_mode default", {
+  other_mode <- if (identical(default_mode, "local")) "slurm" else "local"
+  expect_identical(
+    submit_model(MOD1, .mode = other_mode, .dry_run = TRUE)[[PROC_CALL]],
+    as.character(glue("{cmd_prefix} {other_mode} {mod_ctl_path} --overwrite --threads=4 --parallel"))
   )
 })
 
