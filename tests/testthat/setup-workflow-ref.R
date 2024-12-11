@@ -242,12 +242,12 @@ create_rlg_models <- function() {
 }
 
 create_tree_models <- function(
+    mod1 = read_model(MOD1_PATH),
     addl_based_on = FALSE,
     multiple_origins = FALSE,
     broken_link = FALSE
 ){
   # copy models before creating model tree
-  mod1 <- read_model(MOD1_PATH)
   mod2 <- copy_model_from(mod1, "2", .add_tags = NEW_TAGS) %>% add_star()
   mod3 <- copy_model_from(mod2, "3", .add_tags = "DV: nmol") # test list tag
   mod4 <- copy_model_from(mod2, "4")

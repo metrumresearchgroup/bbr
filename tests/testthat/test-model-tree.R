@@ -117,6 +117,43 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       expect_equal(length(pl_tree$x$data$children), 2)
     })
 
+    it("Broken links - missing origin model", {
+      # This is an unlikely scenario, as the starting/origin model often remains
+      # for traceability purposes.
+      # - However, model_tree should work whenever run_log can
+
+      # New environment so origin model can be deleted
+      MODEL_DIR_BBI <- file.path(dirname(ABS_MODEL_DIR), "test-model-tree")
+      fs::dir_create(MODEL_DIR_BBI)
+      on.exit(fs::dir_delete(MODEL_DIR_BBI))
+
+      # Create origin model
+      fs::file_copy(CTL_TEST_FILE, MODEL_DIR_BBI)
+      mod1 <- new_model(file.path(MODEL_DIR_BBI, "1"))
+      copy_output_dir(MOD1, file.path(MODEL_DIR_BBI, "1"))
+
+      # Create model network with missing origin model
+      #  - broken_link is not necessary, but serves to test that a model tree
+      #    works with multiple broken links (including the origin model)
+      #  - broken_link creates another path from mod1 and deletes the first one
+      create_tree_models(mod1 = mod1, broken_link = TRUE)
+      delete_models(mod1, .tags = NULL, .force = TRUE)
+
+      run_df <- run_log(MODEL_DIR_BBI)
+
+      expect_warning(
+        tree_data <- make_tree_data(run_df, add_summary = FALSE),
+        "The following models could not be linked properly"
+      )
+
+      pl_tree <- model_tree(run_df, add_summary = FALSE) %>% suppressWarnings()
+      # Confirm number of expected nodes
+      # Here extra nodes (+ 2) are made for mod 1000 and mod 1 (both deleted)
+      expect_equal(count_nodes(pl_tree$x$data$children), nrow(run_df) + 2)
+      # Confirm number of origins plotted
+      expect_equal(length(pl_tree$x$data$children), 2)
+    })
+
     it("recursive run log", {
       clean_test_enviroment(create_tree_models)
       fs::dir_create(LEVEL2_DIR)
