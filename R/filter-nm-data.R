@@ -169,7 +169,7 @@ invert_operator <- function(expr) {
 #'
 #' }
 #' @keywords internal
-#' @seealso [translate_nm_operator()], [invert_operator()]
+#' @seealso [translate_nm_operator()], [invert_operator()], [add_na_filter()]
 translate_nm_expr <- function(
     nm_expr,
     type = c("ignore", "accept"),
@@ -181,36 +181,65 @@ translate_nm_expr <- function(
   # Translate NM operators
   exprs <- translate_nm_operator(nm_expr)
 
-  r_exprs <- purrr::map_chr(exprs, function(expr){
+  # Compile list of all R filters.
+  # - A simplified version of the filter (no NA handling) or key symbol (#, @) is
+  #   stored as the name for traceability and testing purposes.
+  r_exprs_list <- purrr::map(exprs, function(expr){
     if(type == "ignore"){
       # `IGNORE=#`, `IGNORE=@`, `IGNORE=c1`, `IGNORE=(list)`
       if(expr == "#"){
         # IGNORE=# is the default.  That is, in the absence of IGNORE option, any
         # record whose first character is '#' is treated as a comment record.
-        paste0("!grepl('^#', ", data_cols[1], ")")
+        paste0("!grepl('^#', ", data_cols[1], ")") %>%
+          stats::setNames(expr)
       }else if(expr == "@"){
         # IGNORE=@ signifies that any data record having an alphabetic character
         # or `@` as its first non-blank character in column one should be ignored.
         #  - This permits a table file having header lines to be used as an
         #    NM-TRAN data set.
         #  - add extra `\\` for later parse()
-        paste0("!grepl('^\\\\s*[A-Za-z@]', ", data_cols[1], ")")
+        paste0("!grepl('^\\\\s*[A-Za-z@]', ", data_cols[1], ")") %>%
+          stats::setNames(expr)
       }else if(grepl('^[a-zA-Z]$', expr)){
         # This is for `IGNORE=C` columns. Meaning ignore rows if the _first_ column
         # contains 'C' (this form always points to the _first_ column)
         # - the above regex looks for characters of length>=1, and no symbols
-        paste0(data_cols[1], "!=", "'", expr, "'")
+        r_expr <- paste0(data_cols[1], "!=", "'", expr, "'")
+        add_na_filter(r_expr) %>% stats::setNames(r_expr)
       }else{
         # Invert list form expressions
-        invert_operator(expr)
+        r_expr <- invert_operator(expr)
+        add_na_filter(r_expr) %>% stats::setNames(r_expr)
       }
     }else{
       # ACCEPT option only supports `ACCEPT=(list)` form --> no formatting needed
-      expr
+      add_na_filter(expr) %>% stats::setNames(expr)
     }
   })
 
+  r_exprs <- purrr::list_c(r_exprs_list)
+
   return(r_exprs)
+}
+
+#' Adjust filters to retain NA values for relevant columns
+#'
+#' This function serves to add a  `| is.na(col)` filter to an `R` filter to
+#' avoid filtering out `NA` rows. It is *not* needed when using `grepl` for
+#' string detection (e.g., `IGNORE=#`, `IGNORE=@`).
+#'
+#' @param r_expr An `R` filter expression. e.g., `'BLQ!=1'`, `C!='C'`.
+#' @keywords internal
+#' @seealso [translate_nm_operator()], [invert_operator()]
+add_na_filter <- function(r_expr){
+  column <- stringr::str_extract(r_expr, "^[^!=><]+") %>%
+    stringr::str_trim()
+
+  if(!is.na(column)){
+    paste0("(", r_expr, " | is.na(", column, "))")
+  }else{
+    r_expr
+  }
 }
 
 #' Filter `NONMEM` input data based on `IGNORE` and `ACCEPT` record options

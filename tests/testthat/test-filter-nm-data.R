@@ -17,12 +17,12 @@ test_that("translate_nm_expr() translates NONMEM filter expressions", {
   test_exprs <- c("SEX==1", "ID.EQ.2", "WT/=70", "AGE.NE.30", "A=1", "WT.GT.40", "B.LE.20")
 
   expect_equal(
-    translate_nm_expr(test_exprs, type = 'accept'),
+    translate_nm_expr(test_exprs, type = 'accept') %>% names(),
     c("SEX==1", "ID==2", "WT!=70", "AGE!=30", "A==1", "WT>40", "B<=20")
   )
 
   expect_equal(
-    translate_nm_expr(test_exprs, type = 'ignore'),
+    translate_nm_expr(test_exprs, type = 'ignore') %>% names(),
     c("SEX!=1", "ID!=2", "WT==70", "AGE==30", "A!=1", "WT<40", "B>=20")
   )
 
@@ -31,18 +31,18 @@ test_that("translate_nm_expr() translates NONMEM filter expressions", {
   # - only `data_cols[1]` is technically needed
   data_cols <- c("C", "ID", "TIME", "EVID", "DV", "BLQ")
   expect_equal(
-    translate_nm_expr("#", data_cols = data_cols),
+    translate_nm_expr("#", data_cols = data_cols) %>% unname(),
     paste0("!grepl('^#', ", data_cols[1], ")")
   )
 
   expect_equal(
-    translate_nm_expr("C", data_cols = data_cols),
+    translate_nm_expr("C", data_cols = data_cols) %>% names(),
     paste0(data_cols[1], "!='C'")
   )
 
   # Extra `\\` is added for escape purposes when the expression is later parsed
   expect_equal(
-    translate_nm_expr("@", data_cols = data_cols),
+    translate_nm_expr("@", data_cols = data_cols) %>% unname(),
     paste0("!grepl('^\\\\s*[A-Za-z@]', ", data_cols[1], ")")
   )
 
@@ -75,18 +75,26 @@ test_that("filter_nm_data() filters input data using IGNORE/ACCEPT options", {
   data_rec$values[[7]]$value <- "(ID.EQ.2, SEX=1, WT.LE.50)"
   nmrec::write_ctl(ctl, get_model_path(mod2))
 
-  # Check expected expressions
+  ## Check expected expressions ##
   input_data <- nm_data(mod2) %>% suppressMessages()
   nm_exprs <- get_data_filter_exprs(mod2)
   r_filters <- translate_nm_expr(
     nm_expr = nm_exprs$exprs, type = nm_exprs$type, data_cols = names(input_data)
   )
-  filter_expression <- paste(r_filters, collapse = " & ")
+
+  # Check filters and names
+  # - names: simplified version of filter (no NA handling) or key symbol (#, @)
+  #   stored as the name for traceability and testing purposes.
+  # - value: the actual filter expression supplied to the final filter
+  expect_equal(names(r_filters), c("@", "ID!=2", "SEX!=1", "WT>=50"))
   expect_equal(
-    filter_expression, "!grepl('^\\\\s*[A-Za-z@]', ID) & ID!=2 & SEX!=1 & WT>=50"
-  )
+    unname(r_filters),
+    c("!grepl('^\\\\s*[A-Za-z@]', ID)", "(ID!=2 | is.na(ID))",
+      "(SEX!=1 | is.na(SEX))", "(WT>=50 | is.na(WT))")
+    )
 
   # Check that filter expression works correctly
+  filter_expression <- paste(r_filters, collapse = " & ")
   filtered_data <- filter_nm_data(mod2)
   expect_equal(
     nrow(filtered_data),
@@ -158,4 +166,42 @@ test_that("filter_nm_data() errors if expressions cant be parsed", {
     filter_nm_data(mod2),
     "ignore/accept list could not be converted to filters"
   )
+})
+
+
+test_that("filter_nm_data() works when NA values are present", {
+  mod2 <- copy_model_from(MOD1, "2")
+  on.exit(delete_models(mod2, .force = TRUE, .tags = NULL))
+
+  # Add additional IGNORE expressions and compare to dplyr filters
+  ctl <- get_model_ctl(mod2)
+  data_rec <- nmrec::select_records(ctl, "data")[[1]]
+  data_rec$parse()
+
+  # Include a filter for a column with NA values
+  data_rec$values[[7]]$value <- "(C='C', BLQ=1)"
+  nmrec::write_ctl(ctl, get_model_path(mod2))
+
+  # Test 1
+  # - C column does *not* lead to loss of subjects due to NA values
+  # - 1 subject lost due to BLQ.
+  data <- nm_data(mod2)
+  data_test1 <- data %>% dplyr::mutate(C = NA, BLQ = 0)
+  data_test1$BLQ[nrow(data_test1)] <- 1
+
+  data_f1 <- filter_nm_data(mod2, data = data_test1)
+  expect_equal(nrow(data) - 1, nrow(data_f1))
+
+  # Test 2
+  # - filter works appropriately when found strings and NA values are present
+  # - 1 subject lost due to BLQ. 1 subject lost due to 'C' filter
+  data_test2 <- data_test1
+  data_test2$C[1] <- "C"
+  data_test2$C[2] <- "."
+  data_test2$BLQ[3] <- NA
+
+  data_f2 <- filter_nm_data(mod2, data = data_test2)
+  expect_equal(nrow(data) - 2, nrow(data_f2))
+  expect_true(is.na(data_f2$BLQ[2]))
+  expect_equal(data_f2$C[1], ".")
 })

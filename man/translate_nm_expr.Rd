@@ -43,6 +43,6 @@ translate_nm_expr("@", data_cols = data_cols)
 }
 }
 \seealso{
-\code{\link[=translate_nm_operator]{translate_nm_operator()}}, \code{\link[=invert_operator]{invert_operator()}}
+\code{\link[=translate_nm_operator]{translate_nm_operator()}}, \code{\link[=invert_operator]{invert_operator()}}, \code{\link[=add_na_filter]{add_na_filter()}}
 }
 \keyword{internal}
