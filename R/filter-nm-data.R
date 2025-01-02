@@ -212,7 +212,27 @@ translate_nm_expr <- function(
         add_na_filter(r_expr) %>% stats::setNames(r_expr)
       }
     }else{
-      # ACCEPT option only supports `ACCEPT=(list)` form --> no formatting needed
+      # ACCEPT option only supports `ACCEPT=(list)` form
+      # - no formatting needed, but check for user error to avoid unintended or
+      #   malformed filter expressions
+      nm_docs_msg <- "See NONMEM documentation for more details"
+      if(expr == "#" || expr == "@"){
+        cli::cli_abort(
+          c(
+            "{.val #} and {.val @} are only supported for IGNORE list expressions",
+            "i" = nm_docs_msg
+          )
+        )
+      }
+      if(grepl('^[a-zA-Z]$', expr)){
+        cli::cli_abort(
+          c(
+            "ACCEPT option only supports `ACCEPT=(list)` form",
+            "i" = nm_docs_msg
+          )
+        )
+      }
+
       add_na_filter(expr) %>% stats::setNames(expr)
     }
   })
