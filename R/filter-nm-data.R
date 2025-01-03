@@ -203,9 +203,9 @@ translate_nm_expr <- function(
       }else if(grepl('^[a-zA-Z]$', expr)){
         # This is for `IGNORE=C` columns. Meaning ignore rows if the _first_ column
         # contains 'C' (this form always points to the _first_ column)
-        # - the above regex looks for characters of length>=1, and no symbols
-        r_expr <- paste0(data_cols[1], "!=", "'", expr, "'")
-        add_na_filter(r_expr) %>% stats::setNames(r_expr)
+        # - the above regex looks for characters of length=1, and no symbols
+        paste0("!grepl('^", expr, "', ", data_cols[1], ")") %>%
+          stats::setNames(expr)
       }else{
         # Invert list form expressions
         r_expr <- invert_operator(expr)
