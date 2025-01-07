@@ -165,6 +165,7 @@ model_tree.bbi_log_df <- function(
     font_size = 10,
     ...
 ){
+  check_bbi_run_log_df_object(.log_df)
   # Make sure required dependencies are installed
   stop_if_tree_missing_deps(static = static)
 
@@ -343,7 +344,6 @@ make_tree_data <- function(
 #' @param .log_df a `bbr` run log
 #' @noRd
 unnest_based_on <- function(.log_df){
-  check_bbi_run_log_df_object(.log_df)
   .log_df %>% dplyr::mutate(
     # Replace NULL based_on elements with empty string to preserve rows when unnesting
     based_on = purrr::map(.data$based_on, function(.x){if(is.null(.x)) "" else .x}),
@@ -433,7 +433,6 @@ make_model_network <- function(full_log){
 #' @param .log_df a `bbr` run log
 #' @noRd
 add_log_recurse_dirs <- function(.log_df){
-  check_bbi_run_log_df_object(.log_df)
   checkmate::assert_true(all(c(ABS_MOD_PATH, "based_on") %in% names(.log_df)))
   checkmate::assert_character(.log_df$based_on)
 
