@@ -55,6 +55,7 @@ test_that("add_summary() works correctly [BBR-SMLG-004]", {
   clean_test_enviroment(create_all_models)
   copy_all_output_dirs()
   sum_df <- run_log(MODEL_DIR, .recurse = TRUE) %>% add_summary()
+  # Subtract 2 columns that overlap (between run_log and add_summary): ABS_MOD_PATH and "run"
   test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3, LEVEL2_MOD), RUN_LOG_COLS+SUM_LOG_COLS-2)
   expect_identical(sum_df$model_type, rep("nonmem", RUN_LOG_ROWS+1))
   expect_identical(sum_df$yaml_md5, ALL_MODS_YAML_MD5)
@@ -71,7 +72,7 @@ test_that("add_summary() has correct columns [BBR-SMLG-005]", {
   expect_identical(names(add_df), c(names(log_df), names(sum_df)[3:length(names(sum_df))]))
 
   # check one col to make sure it matches
-  col_to_check <- names(sum_df)[3]
+  col_to_check <- "bbi_summary"
   expect_identical(sum_df[[col_to_check]], add_df[[col_to_check]])
 })
 
