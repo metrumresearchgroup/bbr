@@ -528,7 +528,9 @@ summarize_bootstrap_run <- function(
     )
 
     boot_sum_log <- summary_log(
-      boot_dir, .bbi_args = list(
+      boot_dir,
+      calc_aic_bic = FALSE, calc_dofv = FALSE,
+      .bbi_args = list(
         no_grd_file = TRUE, no_ext_file = TRUE, no_shk_file = TRUE
       )
     ) %>% dplyr::select(-"error_msg") # only join based on model run
