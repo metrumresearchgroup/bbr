@@ -250,7 +250,7 @@ make_tree_data <- function(
 
   # Starting run log
   log_cols <- unique(c(base_log_cols, cols_keep))
-  .log_df <- .log_df %>% dplyr::select(all_of(log_cols))
+  .log_df <- .log_df %>% dplyr::select(any_of(log_cols))
   # unnest based_on column
   full_log <- unnest_based_on(.log_df)
 
