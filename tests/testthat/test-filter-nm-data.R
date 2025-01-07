@@ -36,8 +36,8 @@ test_that("translate_nm_expr() translates NONMEM filter expressions", {
   )
 
   expect_equal(
-    translate_nm_expr("C", data_cols = data_cols) %>% names(),
-    paste0(data_cols[1], "!='C'")
+    translate_nm_expr("C", data_cols = data_cols) %>% unname(),
+    paste0("!grepl('^", data_cols[1], "', ", data_cols[1], ")")
   )
 
   # Extra `\\` is added for escape purposes when the expression is later parsed
@@ -182,6 +182,33 @@ test_that("filter_nm_data() errors if expressions cant be parsed", {
   )
 })
 
+
+test_that("filter_nm_data() works for IGNORE=C filters", {
+  mod2 <- copy_model_from(MOD1, "2")
+  on.exit(delete_models(mod2, .force = TRUE, .tags = NULL))
+
+  # Add additional IGNORE expressions and compare to dplyr filters
+  ctl <- get_model_ctl(mod2)
+  data_rec <- nmrec::select_records(ctl, "data")[[1]]
+  data_rec$parse()
+
+  # Include a filter for a column with NA values
+  data_rec$values[[7]]$value <- "='C'"
+  nmrec::write_ctl(ctl, get_model_path(mod2))
+
+  # Test
+  # - 2 subjects lost due to 'C' filter
+  data <- nm_data(mod2)
+  data_test <- data %>% dplyr::mutate(C = NA) %>%
+    # 'C' must be the first column for this test
+    dplyr::relocate("C")
+  data_test$C[1] <- "C"
+  data_test$C[2] <- "Comment"
+  data_test$C[3] <- "."
+
+  data_f <- filter_nm_data(mod2, data = data_test)
+  expect_equal(nrow(data) - 2, nrow(data_f))
+})
 
 test_that("filter_nm_data() works when NA values are present", {
   mod2 <- copy_model_from(MOD1, "2")
