@@ -36,7 +36,7 @@
 #' @importFrom glue glue
 #' @importFrom tidyr unnest_wider
 #' @export
-summary_log <- function(.base_dir, .recurse = FALSE, .include = NULL , ...) {
+summary_log <- function(.base_dir, .recurse = FALSE, .include = NULL, ...) {
   checkmate::assert_string(.base_dir)
 
   mod_list <- find_models(.base_dir, .recurse, .include)
@@ -72,9 +72,23 @@ add_summary <- function(
 #' @importFrom tibble tibble
 #' @importFrom tidyselect all_of
 #' @param .mods List of model objects that will be passed to [model_summaries()].
+#' @param calc_aic_bic Logical(T/F). If `TRUE`, calculate the Akaike Information
+#' Criterion (AIC) and Bayesian Information Criterion (BIC)
+#' @param calc_dofv Logical(T/F). If `TRUE`, calculate the difference in
+#'  objective function value between each run and the run it's based on.
 #' @param ... Arguments passed through to [model_summaries()]
+#'
+#' @details
+#' `calc_aic_bic` and `calc_dofv` should be set to `FALSE` for certain model
+#' types, such as bootstrap runs.
+#'
 #' @keywords internal
-summary_log_impl <- function(.mods, ...) {
+summary_log_impl <- function(
+    .mods,
+    calc_aic_bic = TRUE,
+    calc_dofv = TRUE,
+    ...
+) {
 
   if(length(.mods) == 0) {
     return(tibble())
@@ -126,6 +140,19 @@ summary_log_impl <- function(.mods, ...) {
   )
 
   res_df <- res_df %>% unnest_wider("d") %>% unnest_wider("h")
+
+  # Calculate AIC and BIC
+  if(isTRUE(calc_aic_bic)) res_df <- res_df %>% add_aic_bic()
+
+  # Calculate difference in ofv (requires based_on and model_type for linking)
+  if(isTRUE(calc_dofv)){
+    link_cols <- c(YAML_BASED_ON, "model_type")
+    run_df <- map_df(.mods, run_log_entry) %>%
+      dplyr::select(all_of(c(ABS_MOD_PATH, link_cols)))
+    res_df <- res_df %>% dplyr::left_join(run_df, by = ABS_MOD_PATH) %>%
+      dplyr::relocate(all_of(YAML_BASED_ON), .after = "run") %>%
+      add_dofv() %>% dplyr::select(-all_of(link_cols))
+  }
 
   res_df <- create_summary_log_object(res_df)
 
@@ -265,4 +292,64 @@ do_if_bbi_sum <- function(fn, mode) {
     }
     return(res)
   }
+}
+
+#' Calculate Akaike Information Criterion (AIC) and Bayesian Information
+#' Criterion (BIC), and append to summary log
+#' @param .log_df The output of [summary_log()]) or `run_log() %>% add_summary()`
+#' @keywords internal
+add_aic_bic <- function(.log_df){
+  .log_df %>% dplyr::mutate(
+    aic = 2*.data$param_count + .data$ofv,
+    bic = .data$param_count*log(.data$number_of_obs) + .data$ofv
+  )
+}
+
+#' Calculate the difference in objective function value (ofv) between the
+#' current and based_on model.
+#' @inheritParams add_aic_bic
+#' @keywords internal
+add_dofv <- function(.log_df) {
+  # Determine linking of models to handle models in sub-directories
+  #  - We can't just rely on the based_on and run columns for this calculation
+  #    since based_on models in sub-directories will be displayed as '../2',
+  #    which wouldn't show up in the run column. make_tree_data does extra
+  #    computation we don't need, but handles the linking of models well and
+  #    takes in a run log data frame.
+  # TODO: pull the relevant linking code out into a separate function to avoid
+  # unneeded computation
+  link_cols <- c("from", "to")
+  tree_data <-
+    make_tree_data(.log_df, include_info = NULL, add_summary = FALSE) %>%
+    dplyr::select(all_of(c(link_cols, ABS_MOD_PATH, "addl_based_on"))) %>%
+    dplyr::mutate(from = ifelse(.data$from == "Start", NA_character_, .data$from))
+
+  log_df <- dplyr::left_join(.log_df, tree_data, by = ABS_MOD_PATH)
+
+  # Calculate difference in ofv using linking
+  log_df <- log_df %>%
+    dplyr::mutate(based_on_join = .data$from) %>%
+    dplyr::left_join(
+      dplyr::select(log_df, "based_on_join" = "to", "based_on_ofv" = "ofv"),
+      by = c("based_on_join")
+    ) %>%
+    dplyr::mutate(dofv = .data$ofv - .data$based_on_ofv)
+
+  # Denotes which runs were compared for clarity in the event multiple
+  # models were included as based_on
+  if(!all(is.na(log_df$addl_based_on))){
+    log_df <- log_df %>% dplyr::mutate(
+      dofv_run_annot = ifelse(
+        !is.na(.data$from), paste(.data$to, "-", .data$from), NA
+      )
+    )
+  }
+
+  # Prune and organize columns
+  log_df <- log_df %>%
+    dplyr::select(
+      -all_of(c("based_on_ofv", "based_on_join", link_cols, "addl_based_on"))
+    ) %>%
+    dplyr::relocate(any_of(c("dofv", "dofv_run_annot")), .after = "ofv")
+  return(log_df)
 }
