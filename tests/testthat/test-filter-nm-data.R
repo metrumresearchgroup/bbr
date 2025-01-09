@@ -30,20 +30,20 @@ test_that("translate_nm_expr() translates NONMEM filter expressions", {
   # Use of `@`, `#`, or form `IGNORE=C2` require `data_cols` to be specified
   # - only `data_cols[1]` is technically needed
   data_cols <- c("C", "ID", "TIME", "EVID", "DV", "BLQ")
-  expect_equal(
-    translate_nm_expr("#", data_cols = data_cols) %>% unname(),
-    paste0("!grepl('^#', ", data_cols[1], ")")
+  expect_equivalent(
+    translate_nm_expr("#", data_cols = data_cols),
+    "!grepl('^#', C)"
   )
 
-  expect_equal(
-    translate_nm_expr("C", data_cols = data_cols) %>% unname(),
-    paste0("!grepl('^", data_cols[1], "', ", data_cols[1], ")")
+  expect_equivalent(
+    translate_nm_expr("C", data_cols = data_cols),
+    "!grepl('^C', C)"
   )
 
   # Extra `\\` is added for escape purposes when the expression is later parsed
-  expect_equal(
-    translate_nm_expr("@", data_cols = data_cols) %>% unname(),
-    paste0("!grepl('^\\\\s*[A-Za-z@]', ", data_cols[1], ")")
+  expect_equivalent(
+    translate_nm_expr("@", data_cols = data_cols),
+    "!grepl('^\\\\s*[A-Za-z@]', C)"
   )
 
   # Using accept with these filters errors out
@@ -193,7 +193,7 @@ test_that("filter_nm_data() works for IGNORE=C filters", {
   data_rec$parse()
 
   # Include a filter for a column with NA values
-  data_rec$values[[7]]$value <- "='C'"
+  data_rec$values[[7]]$value <- "=C"
   nmrec::write_ctl(ctl, get_model_path(mod2))
 
   # Test
