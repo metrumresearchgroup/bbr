@@ -60,9 +60,9 @@ formatted like \code{list("nm_version" = "nm74gf_nmfe", "json" = T, "threads" = 
 not support changing the output directory (including through the model or
 global YAML files).}
 
-\item{.mode}{Either \code{"sge"}, the default, to submit model(s) to the grid or
-\code{"local"} for local execution. This can be passed directly to this argument
-or set globally with \code{options("bbr.bbi_exe_mode")}.}
+\item{.mode}{Mode for model submission: "local", "sge", or "slurm". If
+unspecified, the value is set to the value of the \code{bbr.bbi_exe_mode}
+option. This option defaults to "sge" on Linux and "local" otherwise.}
 
 \item{...}{args passed through to \code{bbi_exec()}}
 
