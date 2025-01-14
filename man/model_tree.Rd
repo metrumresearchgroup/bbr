@@ -31,8 +31,8 @@ identifying which models are starred, have heuristics, etc. See details
 for more information.}
 
 \item{size_by}{A \strong{numeric} (or integer) run log column to size the nodes by.
-If not specified, the default sizing is \code{'leafCount'}, which sizes the
-nodes based on how many models are based on it.}
+If not specified, the default is to size the nodes based on how many
+models are based on it.}
 
 \item{add_summary}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, include key columns
 from \code{\link[=model_summary]{model_summary()}} output.}
@@ -95,7 +95,7 @@ formatted specially:
 \item Note that the above summary columns will only receive the special
 formatting if added via \code{add_summary = TRUE}.
 \item i.e. if \code{.log_df = run_log() \%>\% add_summary()} and
-\code{include_info = 'ofv'}, The \code{'OFV'} parameter will display the same as if
+\code{include_info = 'ofv'}, the \code{'OFV'} parameter will display the same as if
 it was \emph{not} passed to \code{include_info}.
 }
 }

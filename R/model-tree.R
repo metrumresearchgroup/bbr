@@ -8,8 +8,8 @@
 #'        identifying which models are starred, have heuristics, etc. See details
 #'        for more information.
 #' @param size_by A **numeric** (or integer) run log column to size the nodes by.
-#'        If not specified, the default sizing is `'leafCount'`, which sizes the
-#'        nodes based on how many models are based on it.
+#'        If not specified, the default is to size the nodes based on how many
+#'        models are based on it.
 #' @param add_summary Logical (`TRUE`/`FALSE`). If `TRUE`, include key columns
 #'        from [model_summary()] output.
 #' @param digits Number of digits to round decimal places to for display in
@@ -54,7 +54,7 @@
 #'     - Note that the above summary columns will only receive the special
 #'     formatting if added via `add_summary = TRUE`.
 #'     - i.e. if `.log_df = run_log() %>% add_summary()` and
-#'     `include_info = 'ofv'`, The `'OFV'` parameter will display the same as if
+#'     `include_info = 'ofv'`, the `'OFV'` parameter will display the same as if
 #'     it was _not_ passed to `include_info`.
 #'
 #' **Coloring**
@@ -169,8 +169,6 @@ model_tree.bbi_log_df <- function(
   stop_if_tree_missing_deps(static = static)
 
   # Make tree data
-  # TODO: decide if we want to append color_by and size_by to tooltip automatically
-  # include_info <- unique(c(include_info, color_by, size_by))
   tree_data <- make_tree_data(.log_df, include_info, color_by, size_by, add_summary)
 
   # Format coloring
