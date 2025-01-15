@@ -183,6 +183,14 @@ model_tree.bbi_log_df <- function(
   tree_data <- make_tree_tooltip(tree_data, digits = digits, font_size = font_size)
 
   # Create model tree
+  # - Notes about aggFun:
+  #  - identity is not the same as base::identity. collapsibleTree has specific
+  #  handling for `aggFun = identity`, and it's the only way for sizing to work
+  #  based on a column without aggregating values.
+  #  - Note: The node sizing logic has a known quirk where it appears to scale
+  #  sizes relative to the first "parent" node (i.e., the first row where `from`
+  #  is not NA). This can cause inconsistencies in relative node sizes depending
+  #  on the value of the first parent node.
   pl_tree <- collapsibleTree::collapsibleTreeNetwork(
     tree_data, zoomable = zoomable, collapsed = FALSE,
     # Coloring and sizing
