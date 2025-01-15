@@ -382,6 +382,17 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       expected_colors <- c("#F4DBD3", "#EB003D", "#FFFFFF", "#ED9D84", "#E35B44")
       # Can inspect with `scales::show_col(node_colors)`
       expect_equal(node_colors, expected_colors)
+
+      # Check integer case
+      log_df$numeric_vals <- as.integer(log_df$numeric_vals)
+      pl_tree <- model_tree(
+        log_df, add_summary = FALSE, color_by = "numeric_vals",
+        include_info = "numeric_vals"
+      )
+      node_colors <- get_node_attribute(pl_tree$x$data$children, attr = "fill")
+      expected_colors <- c("#F4DBD3", "#EB003D", "#FFFFFF", "#ED9D84", "#E35B44")
+      # Can inspect with `scales::show_col(node_colors)`
+      expect_equal(node_colors, expected_colors)
     })
 
     it("size_tree_by()", {

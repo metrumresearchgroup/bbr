@@ -691,7 +691,7 @@ color_tree_by <- function(tree_data, color_by = "run"){
     n_levels <- dplyr::n_distinct(vals)
 
     # To preview color palette: scales::show_col(pal_bbr)
-    if(inherits(vals, "numeric")){
+    if(inherits(vals, c("numeric", "integer"))){
       # Gradient coloring (sorted): get colors for unique values (excluding NA)
       sorted_vals <- sort(unique(vals))
       pal_bbr <- scales::pal_gradient_n(bbr_cols)(seq(0, 1, length.out = n_levels))
