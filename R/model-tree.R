@@ -173,7 +173,7 @@ model_tree.bbi_log_df <- function(
 
   # Format coloring
   tree_data <- color_tree_by(tree_data, color_by = color_by)
-  tree_attr <- ifelse(is.null(color_by), "leafCount", color_by)
+  tree_attr <- attributes(tree_data)$color_by
 
   # Format sizing
   tree_data <- size_tree_by(tree_data, size_by = size_by)
@@ -721,11 +721,15 @@ color_tree_by <- function(tree_data, color_by = "run"){
       tree_data$col <- factor(tree_data$col)
       levels(tree_data$col) <- c(node_colors, pal_bbr)
     }
+    # Set color_by attribute to color_by argument
+    attr(tree_data, "color_by") <- color_by
   }else{
     # all bbr red color
     pal_bbr <- scales::pal_gradient_n(bbr_cols)(1)
     tree_data$col <- factor(tree_data$col)
     levels(tree_data$col) <- c(node_colors, pal_bbr)
+    # Set color_by attribute to leafCount (default)
+    attr(tree_data, "color_by") <- "leafCount"
   }
 
   return(tree_data)
@@ -745,6 +749,7 @@ size_tree_by <- function(tree_data, size_by = NULL){
       # Set node sizes with NA values (including start node) to mean value
       mean_val <- mean(tree_data$node_size, na.rm = TRUE)
       tree_data$node_size[is.na(tree_data$node_size)] <- mean_val
+      # Set size_by attribute to node_size column
       attr(tree_data, "size_by") <- "node_size"
     }else{
       col_class <- class(tree_data[[size_by]])
@@ -757,6 +762,7 @@ size_tree_by <- function(tree_data, size_by = NULL){
       attr(tree_data, "size_by") <- "leafCount"
     }
   }else{
+    # Set size_by attribute to leafCount (default)
     attr(tree_data, "size_by") <- "leafCount"
   }
 
