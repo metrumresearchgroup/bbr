@@ -440,14 +440,14 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
         'Only numeric columns are supported'
       )
       node_sizes <- get_node_attribute(pl_tree$x$data$children, attr = "SizeOfNode")
-      expect_true(dplyr::n_distinct(node_sizes) == 1)
+      expect_true(dplyr::n_distinct(node_sizes) == 2) # leafCount sizing
       # Check character
       expect_warning(
         pl_tree <- model_tree(log_df2, add_summary = FALSE, size_by = "star"),
         'Only numeric columns are supported'
       )
       node_sizes <- get_node_attribute(pl_tree$x$data$children, attr = "SizeOfNode")
-      expect_true(dplyr::n_distinct(node_sizes) == 1)
+      expect_true(dplyr::n_distinct(node_sizes) == 2) # leafCount sizing
     })
 
     it("static plot", {

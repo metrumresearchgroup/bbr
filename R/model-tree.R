@@ -177,7 +177,7 @@ model_tree.bbi_log_df <- function(
 
   # Format sizing
   tree_data <- size_tree_by(tree_data, size_by = size_by)
-  node_size <- ifelse(is.null(size_by), "leafCount", "node_size")
+  node_size <- attributes(tree_data)$size_by
 
   # Compile attributes into tooltip
   tree_data <- make_tree_tooltip(tree_data, digits = digits, font_size = font_size)
@@ -745,18 +745,19 @@ size_tree_by <- function(tree_data, size_by = NULL){
       # Set node sizes with NA values (including start node) to mean value
       mean_val <- mean(tree_data$node_size, na.rm = TRUE)
       tree_data$node_size[is.na(tree_data$node_size)] <- mean_val
+      attr(tree_data, "size_by") <- "node_size"
     }else{
       col_class <- class(tree_data[[size_by]])
       cli::cli_warn(
         c(
           "Only numeric columns are supported. Column {.val {size_by}} is {.val {col_class}}",
-          "i" = "Setting node size to constant"
+          "i" = "Setting node size to Default"
         )
       )
-      tree_data$node_size <- 1
+      attr(tree_data, "size_by") <- "leafCount"
     }
   }else{
-    tree_data$node_size <- 1
+    attr(tree_data, "size_by") <- "leafCount"
   }
 
   return(tree_data)
