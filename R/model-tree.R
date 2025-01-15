@@ -1,12 +1,15 @@
 #' Create a tree diagram of a modeling directory
 #'
-#' @param .log_df a `bbi_run_log_df` tibble (the output of `run_log()`) ***or***
+#' @param .log_df A `bbi_run_log_df` tibble (the output of `run_log()`) ***or***
 #'        a base directory to look in for models. See details for more options.
-#' @param include_info vector of columns present in `.log_df` to include in the
+#' @param include_info A vector of columns present in `.log_df` to include in the
 #'        tooltip.
-#' @param color_by a run log column to color the nodes by. Can be helpful for
+#' @param color_by A run log column to color the nodes by. Can be helpful for
 #'        identifying which models are starred, have heuristics, etc. See details
 #'        for more information.
+#' @param size_by A **numeric** (or integer) run log column to size the nodes by.
+#'        If not specified, the default is to size the nodes based on how many
+#'        models are based on it.
 #' @param add_summary Logical (`TRUE`/`FALSE`). If `TRUE`, include key columns
 #'        from [model_summary()] output.
 #' @param digits Number of digits to round decimal places to for display in
@@ -16,9 +19,10 @@
 #' @param static Logical (`TRUE`/`FALSE`). If `TRUE`, render the plot as a
 #'        static image. This takes a little longer, as the interactive plot must
 #'        be saved as a PNG and loaded into the viewer.
-#' @param width width in pixels (optional, defaults to automatic sizing)
-#' @param height height in pixels (optional, defaults to automatic sizing)
-#' @param ... additional arguments passed to [run_log()]. Only used if `.log_df`
+#' @param width Width in pixels (optional, defaults to automatic sizing)
+#' @param height Height in pixels (optional, defaults to automatic sizing)
+#' @param font_size Font size of the label text in pixels
+#' @param ... Additional arguments passed to [run_log()]. Only used if `.log_df`
 #'        is a modeling directory.
 #'
 #' @section Required Columns:
@@ -34,7 +38,7 @@
 #' additional columns as tooltips. This is illustrated in the examples via
 #' `add_summary()` and `add_config()`.
 #'
-#' @section Tooltip formatting and coloring:
+#' @section Tooltip formatting, coloring, and sizing:
 #' **Tooltip formatting**
 #'
 #' Any column in `.log_df` can be chosen to include in the tooltip. However,
@@ -50,8 +54,8 @@
 #'     - Note that the above summary columns will only receive the special
 #'     formatting if added via `add_summary = TRUE`.
 #'     - i.e. if `.log_df = run_log() %>% add_summary()` and
-#'     `include_info = 'ofv'`, The `'OFV'` parameter will be formatted as any
-#'     other additional column.
+#'     `include_info = 'ofv'`, the `'OFV'` parameter will display the same as if
+#'     it was _not_ passed to `include_info`.
 #'
 #' **Coloring**
 #'
@@ -60,6 +64,7 @@
 #' column types will be colored via a gradient between `'white'` and `'red'`,
 #' where earlier runs are whiter, and later runs appear to be more red. You can
 #' pass `color_by = NULL` to make all model nodes `'red'`.
+#'
 #'
 #' @examples
 #' \dontrun{
@@ -72,19 +77,27 @@
 #' model_tree(MODEL_DIR, color_by = "star")
 #'
 #'
-#' # Run `add_config()`, `add_summary()`, and/or `mutate()` calls beforehand
-#' run_log(MODEL_DIR) %>%
-#'   add_config() %>%
-#'   dplyr::mutate(out_of_date = model_has_changed | data_has_changed) %>%
+#' ## Run `add_config()`, `add_summary()`, and/or `mutate()` calls beforehand
+#'
+#'
+#' # Size nodes by objective function value
+#' run_log(MODEL_DIR) %>% add_summary() %>%
+#'   model_tree(size_by = "ofv", color_by = "ofv")
+#'
+#' # Determine if certain models need to be re-run
+#' run_log(MODEL_DIR) %>% add_config() %>%
+#'   dplyr::mutate(
+#'     out_of_date = model_has_changed | data_has_changed
+#'   ) %>%
 #'   model_tree(
 #'     include_info = c("model_has_changed", "data_has_changed", "nm_version"),
 #'     color_by = "out_of_date"
 #'   )
 #'
-#' run_log(MODEL_DIR) %>%
-#'   add_summary() %>%
+#' # Highlight models with any heuristics
+#' run_log(MODEL_DIR) %>% add_summary() %>%
 #'   model_tree(
-#'     include_info = c("tags", "param_count", "eta_pval_significant"),
+#'     include_info = c("param_count", "eta_pval_significant"),
 #'     color_by = "any_heuristics"
 #'   )
 #'
@@ -95,74 +108,96 @@ model_tree <- function(
     .log_df,
     include_info = c("description","star", "tags"),
     color_by = "run",
+    size_by = NULL,
     add_summary = TRUE,
     digits = 3,
     zoomable = FALSE,
     static = FALSE,
     width = NULL,
     height = NULL,
+    font_size = 10,
     ...
 ){
   UseMethod("model_tree")
 }
 
-#' @rdname model_tree
+
 #' @export
 model_tree.character <- function(
     .log_df,
     include_info = c("description","star", "tags"),
     color_by = "run",
+    size_by = NULL,
     add_summary = TRUE,
     digits = 3,
     zoomable = FALSE,
     static = FALSE,
     width = NULL,
     height = NULL,
+    font_size = 10,
     ...
 ){
   checkmate::assert_directory_exists(.log_df)
   .log_df <- run_log(.log_df, ...)
   model_tree(
     .log_df,
-    include_info = include_info, color_by = color_by,
+    include_info = include_info,
+    color_by = color_by, size_by = size_by,
     add_summary = add_summary, digits = digits,
     zoomable = zoomable, static = static,
-    width = width, height = height
+    width = width, height = height,
+    font_size = font_size
   )
 }
 
-#' @rdname model_tree
 #' @export
 model_tree.bbi_log_df <- function(
     .log_df,
-    include_info = c("description","star", "tags"),
+    include_info = c("description", "star", "tags"),
     color_by = "run",
+    size_by = NULL,
     add_summary = TRUE,
     digits = 3,
     zoomable = FALSE,
     static = FALSE,
     width = NULL,
     height = NULL,
+    font_size = 10,
     ...
 ){
   # Make sure required dependencies are installed
   stop_if_tree_missing_deps(static = static)
 
   # Make tree data
-  tree_data <- make_tree_data(.log_df, include_info, color_by, add_summary)
+  tree_data <- make_tree_data(.log_df, include_info, color_by, size_by, add_summary)
 
   # Format coloring
   tree_data <- color_tree_by(tree_data, color_by = color_by)
+  tree_attr <- attributes(tree_data)$color_by
+
+  # Format sizing
+  tree_data <- size_tree_by(tree_data, size_by = size_by)
+  node_size <- attributes(tree_data)$size_by
 
   # Compile attributes into tooltip
-  tree_data <- make_tree_tooltip(tree_data, digits = digits)
+  tree_data <- make_tree_tooltip(tree_data, digits = digits, font_size = font_size)
 
   # Create model tree
-  tree_attr <- ifelse(is.null(color_by), "leafCount", color_by)
+  # - Notes about aggFun:
+  #  - identity is not the same as base::identity. collapsibleTree has specific
+  #  handling for `aggFun = identity`, and it's the only way for sizing to work
+  #  based on a column without aggregating values.
+  #  - Note: The node sizing logic has a known quirk where it appears to scale
+  #  sizes relative to the first "parent" node (i.e., the first row where `from`
+  #  is not NA). This can cause inconsistencies in relative node sizes depending
+  #  on the value of the first parent node.
   pl_tree <- collapsibleTree::collapsibleTreeNetwork(
-    tree_data, zoomable = zoomable, attribute = tree_attr,
-    fill="col", collapsed = FALSE, nodeSize = "leafCount",
-    tooltipHtml = "tooltip", width = width, height = height
+    tree_data, zoomable = zoomable, collapsed = FALSE,
+    # Coloring and sizing
+    attribute = tree_attr, fill="col", nodeSize = node_size, aggFun = identity,
+    # Tooltip and display
+    tooltipHtml = "tooltip", fontSize = font_size,
+    width = width, height = height
   )
 
   if(isTRUE(static)){
@@ -195,21 +230,26 @@ make_tree_data <- function(
     .log_df,
     include_info = c("description","star", "tags"),
     color_by = "run",
+    size_by = NULL,
     add_summary = TRUE
 ){
-  cols_keep <- unique(c(include_info, color_by))
-  checkmate::assert_true(all(cols_keep %in% names(.log_df)))
-
   # Check for required columns and starting format
   req_cols <- c(ABS_MOD_PATH, "run", "based_on", "model_type")
   if(!(all(req_cols %in% names(.log_df)))){
-    cols_missing <- req_cols[!(req_cols %in% names(.log_df))]
-    cols_missing <- paste(cols_missing, collapse = ", ")
-    rlang::abort(
-      glue::glue("The following required columns are missing: {cols_missing}")
+    cols_missing <- setdiff(req_cols, names(.log_df))
+    cli::cli_abort(
+      "The following {.emph required} columns are missing from `.log_df`: {.val {cols_missing}}"
     )
   }
   checkmate::assert_true(inherits(.log_df$based_on, "list"))
+
+  cols_keep <- unique(c(include_info, color_by, size_by))
+  if(!all(cols_keep %in% names(.log_df))){
+    cols_missing <- setdiff(cols_keep, names(.log_df))
+    cli::cli_abort(
+      "The following {.emph specified} columns are missing from `.log_df`: {.val {cols_missing}}"
+    )
+  }
 
   # These columns have special handling either here or in the tooltip
   base_log_cols <- c(req_cols, "description", "star", "tags")
@@ -484,7 +524,7 @@ check_model_tree <- function(network_df){
 #'  defines the model network.
 #' @inheritParams model_tree
 #' @noRd
-make_tree_tooltip <- function(tree_data, digits = 3){
+make_tree_tooltip <- function(tree_data, digits = 3, font_size = 10){
 
   round_numeric <- function(x, digits){
     # Round instead of signif - this can matter for objective functions
@@ -499,12 +539,17 @@ make_tree_tooltip <- function(tree_data, digits = 3){
   #     executed (i.e. NA values will still be displayed for these columns)
   can_include <- function(txt) !is.na(txt) && txt != ""
 
+  bold_css <- "font-weight:bold;"
+  italics_css <- "font-style:italic;"
+  run_font_size <- font_size + 4
+  run_css <- glue::glue("font-size:{run_font_size}px; {bold_css}")
+
   # Tooltip from run log
   base_tt_cols <- attr(tree_data, "base_tt_cols")
   tooltip <- purrr::imap_chr(tree_data$to, function(.x, .y){
     mod_name <- ifelse(.x == "Start", .x, paste("Run", .x))
     mod_html <- style_html(
-      mod_name, color = "#538b01", "font-size:14px; font-weight:bold", br_after = TRUE
+      mod_name, color = "#538b01", run_css, br_after = TRUE
     )
 
     # Model type
@@ -518,7 +563,7 @@ make_tree_tooltip <- function(tree_data, digits = 3){
       can_include(tree_data$addl_based_on[.y]),
       style_html(
         paste("Additional Based on:", tree_data$addl_based_on[.y]),
-        "font-weight:bold", br_after = TRUE
+        bold_css, br_after = TRUE
       ),
       ""
     )
@@ -526,7 +571,7 @@ make_tree_tooltip <- function(tree_data, digits = 3){
     # Other parameters
     desc_html <- ifelse(
       "description" %in% base_tt_cols && can_include(tree_data$description[.y]),
-      style_html(tree_data$description[.y], "font-style:italic", br_after = TRUE),
+      style_html(tree_data$description[.y], italics_css, br_after = TRUE),
       ""
     )
     tags_html <- ifelse(
@@ -536,7 +581,7 @@ make_tree_tooltip <- function(tree_data, digits = 3){
     )
     star_html <- ifelse(
       "star" %in% base_tt_cols && can_include(tree_data$star[.y]) && isTRUE(tree_data$star[.y]),
-      style_html("Starred", color = "#ffa502", "font-weight:bold", br_after = TRUE),
+      style_html("Starred", color = "#ffa502", bold_css, br_after = TRUE),
       ""
     )
 
@@ -553,13 +598,13 @@ make_tree_tooltip <- function(tree_data, digits = 3){
       # Conditional heuristics text
       any_heuristics <- tree_data$any_heuristics[.y]
       heuristics_txt <- if(!is.na(any_heuristics) && isTRUE(any_heuristics)){
-        paste0("<br><br>", style_html("--Heuristics Found--", color = "#A30000", "font-weight:bold"))
+        paste0("<br><br>", style_html("--Heuristics Found--", color = "#A30000", bold_css))
       }else{
         ""
       }
       # Conditional simulation text
       has_sim_txt <- if(has_simulation(read_model(tree_data[[ABS_MOD_PATH]][.y]))){
-        paste0("<br><br>", style_html("--Simulation attached--", color = "#ad7fa8", "font-weight:bold"))
+        paste0("<br><br>", style_html("--Simulation attached--", color = "#ad7fa8", bold_css))
       }else{
         ""
       }
@@ -585,12 +630,12 @@ make_tree_tooltip <- function(tree_data, digits = 3){
       )
       # Combined tooltip
       paste0(
-        style_html(mod_status, color = status_col, "font-weight:bold", br_before = TRUE, br_after = TRUE),
+        style_html(mod_status, color = status_col, bold_css, br_before = TRUE, br_after = TRUE),
         ofv, n_sub, n_obs, heuristics_txt, has_sim_txt
       )
     }else{
       # If not run, just show the status
-      style_html(mod_status, color = status_col, "font-weight:bold", br_before = TRUE)
+      style_html(mod_status, color = status_col, bold_css, br_before = TRUE)
     }
   })
 
@@ -608,6 +653,7 @@ make_tree_tooltip <- function(tree_data, digits = 3){
       })
       paste0(other_html, collapse = "")
     })
+    other_tooltip[1] <- "" # Skip start node for other tooltips
     tooltip <- paste0(tooltip, other_tooltip, sum_tooltip)
   }else{
     tooltip <- paste0(tooltip, sum_tooltip)
@@ -618,7 +664,7 @@ make_tree_tooltip <- function(tree_data, digits = 3){
 }
 
 
-#' Create a color column based on the unique values of another column
+#' Create a color column based on the unique values of another column.
 #' @inheritParams make_tree_tooltip
 #' @inheritParams model_tree
 #' @noRd
@@ -653,7 +699,19 @@ color_tree_by <- function(tree_data, color_by = "run"){
     n_levels <- dplyr::n_distinct(vals)
 
     # To preview color palette: scales::show_col(pal_bbr)
-    if(inherits(vals, "logical")){
+    if(inherits(vals, c("numeric", "integer"))){
+      # Gradient coloring (sorted): get colors for unique values (excluding NA)
+      sorted_vals <- sort(unique(vals))
+      pal_bbr <- scales::pal_gradient_n(bbr_cols)(seq(0, 1, length.out = n_levels))
+
+      # Assign colors based on sorted values
+      color_mapping <- setNames(pal_bbr, sorted_vals)
+      tree_data$col <- ifelse(
+        tree_data$col %in% sorted_vals,
+        color_mapping[as.character(tree_data$col)],
+        tree_data$col
+      )
+    }else if(inherits(vals, "logical")){
       # Ensure both TRUE and FALSE colors are extracted, even if only one occurs
       pal_bbr <- scales::pal_gradient_n(bbr_cols)(c(0,1))
       # Explicitly set FALSE to white and TRUE to red
@@ -666,16 +724,68 @@ color_tree_by <- function(tree_data, color_by = "run"){
         )
       )
     }else{
-      # Gradient coloring: get colors for unique values (excluding NA)
+      # Gradient coloring; doesn't need to be sorted
       pal_bbr <- scales::pal_gradient_n(bbr_cols)(seq(0, 1, length.out = n_levels))
       tree_data$col <- factor(tree_data$col)
       levels(tree_data$col) <- c(node_colors, pal_bbr)
     }
+    # Set color_by attribute to color_by argument
+    attr(tree_data, "color_by") <- color_by
   }else{
     # all bbr red color
     pal_bbr <- scales::pal_gradient_n(bbr_cols)(1)
     tree_data$col <- factor(tree_data$col)
     levels(tree_data$col) <- c(node_colors, pal_bbr)
+    # Set color_by attribute to leafCount (default)
+    attr(tree_data, "color_by") <- "leafCount"
+  }
+
+  return(tree_data)
+}
+
+#' Create a size column based on the unique _numeric_ (or integer) values of
+#' another column.
+#' @inheritParams make_tree_tooltip
+#' @inheritParams model_tree
+#' @param rescale_to A numeric vector of length 2 specifying the range to rescale
+#'  `size_by` values to. Defaults to `c(1, 3)`, where `1` is the smallest node
+#'  size and `3` is the largest.
+#' @noRd
+size_tree_by <- function(tree_data, size_by = NULL, rescale_to = c(1, 3)){
+  if(!is.null(size_by)){
+    checkmate::assert_true(size_by %in% names(tree_data))
+    checkmate::assert_numeric(rescale_to, len = 2, lower = 1)
+
+    tree_data$node_size <- tree_data[[size_by]]
+
+    # Scale size with numeric value
+    if(inherits(tree_data$node_size, c("numeric", "integer"))){
+
+      # Rescale to specified range
+      # - node sizes must be greater than 0 (decimals are fine)
+      # - A large SD can lead to large nodes (max of rescale_to should be small)
+      tree_data <- tree_data %>% dplyr::mutate(
+        node_size = scales::rescale(.data$node_size, to = rescale_to)
+      )
+
+      # Set node sizes with NA values (including start node) to mean rescale_to
+      tree_data$node_size[is.na(tree_data$node_size)] <- mean(rescale_to)
+
+      # Set size_by attribute to node_size column
+      attr(tree_data, "size_by") <- "node_size"
+    }else{
+      col_class <- class(tree_data[[size_by]])
+      cli::cli_warn(
+        c(
+          "Only numeric columns are supported. Column {.val {size_by}} is {.val {col_class}}",
+          "i" = "Setting node size to Default"
+        )
+      )
+      attr(tree_data, "size_by") <- "leafCount"
+    }
+  }else{
+    # Set size_by attribute to leafCount (default)
+    attr(tree_data, "size_by") <- "leafCount"
   }
 
   return(tree_data)
@@ -713,15 +823,16 @@ format_model_type <- function(model_type, fmt_html = FALSE, ...){
   )
 
   if(isTRUE(fmt_html)){
+    bold_css <- "font-weight:bold;"
     mod_type_fmt <- dplyr::case_when(
       model_type == "nonmem" ~
-        style_html(mod_type_fmt, color = "#119a9c", "font-weight:bold", ...),
+        style_html(mod_type_fmt, color = "#119a9c", bold_css, ...),
       model_type == "nmboot" ~
-        style_html(mod_type_fmt, color = "#c49f02", "font-weight:bold", ...),
+        style_html(mod_type_fmt, color = "#c49f02", bold_css, ...),
       model_type == "nmsim" ~
-        style_html(mod_type_fmt, color = "#ad7fa8", "font-weight:bold", ...),
+        style_html(mod_type_fmt, color = "#ad7fa8", bold_css, ...),
       TRUE ~
-        style_html(mod_type_fmt, color = "black", "font-weight:bold", ...)
+        style_html(mod_type_fmt, color = "black", bold_css, ...)
     )
   }
 

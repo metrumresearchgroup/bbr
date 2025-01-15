@@ -8,18 +8,23 @@ make_tree_data(
   .log_df,
   include_info = c("description", "star", "tags"),
   color_by = "run",
+  size_by = NULL,
   add_summary = TRUE
 )
 }
 \arguments{
 \item{.log_df}{a \code{bbr} run log}
 
-\item{include_info}{vector of columns present in \code{.log_df} to include in the
+\item{include_info}{A vector of columns present in \code{.log_df} to include in the
 tooltip.}
 
-\item{color_by}{a run log column to color the nodes by. Can be helpful for
+\item{color_by}{A run log column to color the nodes by. Can be helpful for
 identifying which models are starred, have heuristics, etc. See details
 for more information.}
+
+\item{size_by}{A \strong{numeric} (or integer) run log column to size the nodes by.
+If not specified, the default is to size the nodes based on how many
+models are based on it.}
 
 \item{add_summary}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, include key columns
 from \code{\link[=model_summary]{model_summary()}} output.}
