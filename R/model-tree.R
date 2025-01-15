@@ -739,16 +739,41 @@ color_tree_by <- function(tree_data, color_by = "run"){
 #' another column.
 #' @inheritParams make_tree_tooltip
 #' @inheritParams model_tree
+#' @param rescale_to A numeric vector of length 2 specifying the range to rescale
+#'  `size_by` values to. Defaults to `c(1, 3)`, where `1` is the smallest node
+#'  size and `3` is the largest.
 #' @noRd
-size_tree_by <- function(tree_data, size_by = NULL){
+size_tree_by <- function(tree_data, size_by = NULL, rescale_to = c(1, 3)){
   if(!is.null(size_by)){
     checkmate::assert_true(size_by %in% names(tree_data))
+    checkmate::assert_numeric(rescale_to, len = 2, lower = 1)
+
     tree_data$node_size <- tree_data[[size_by]]
+
     # Scale size with numeric value
     if(inherits(tree_data$node_size, c("numeric", "integer"))){
-      # Set node sizes with NA values (including start node) to mean value
+      # Rescale values based on standard deviation
+      # - a large SD can lead to very large nodes
       mean_val <- mean(tree_data$node_size, na.rm = TRUE)
-      tree_data$node_size[is.na(tree_data$node_size)] <- mean_val
+      sd_val <- sd(tree_data$node_size, na.rm = TRUE)
+
+      if(sd_val != 0){
+        tree_data$node_size <- (tree_data$node_size - mean_val) / sd_val
+      }else{
+        # Would only happen if all values are the same
+        # - avoids dividing by 0
+        tree_data$node_size <- rep(1, length(tree_data$node_size))
+      }
+
+      # Rescale to specified range
+      # Note: node sizes cannot be negative
+      tree_data <- tree_data %>% dplyr::mutate(
+        node_size = scales::rescale(.data$node_size, to = rescale_to)
+      )
+
+      # Set node sizes with NA values (including start node) to mean rescale_to
+      tree_data$node_size[is.na(tree_data$node_size)] <- mean(rescale_to)
+
       # Set size_by attribute to node_size column
       attr(tree_data, "size_by") <- "node_size"
     }else{
