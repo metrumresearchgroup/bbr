@@ -760,21 +760,10 @@ size_tree_by <- function(tree_data, size_by = NULL, rescale_to = c(1, 3)){
 
     # Scale size with numeric value
     if(inherits(tree_data$node_size, c("numeric", "integer"))){
-      # Rescale values based on standard deviation
-      # - a large SD can lead to very large nodes
-      mean_val <- mean(tree_data$node_size, na.rm = TRUE)
-      sd_val <- sd(tree_data$node_size, na.rm = TRUE)
-
-      if(sd_val != 0){
-        tree_data$node_size <- (tree_data$node_size - mean_val) / sd_val
-      }else{
-        # Would only happen if all values are the same
-        # - avoids dividing by 0
-        tree_data$node_size <- rep(1, length(tree_data$node_size))
-      }
 
       # Rescale to specified range
-      # Note: node sizes cannot be negative
+      # - node sizes must be greater than 0 (decimals are fine)
+      # - A large SD can lead to large nodes (max of rescale_to should be small)
       tree_data <- tree_data %>% dplyr::mutate(
         node_size = scales::rescale(.data$node_size, to = rescale_to)
       )
