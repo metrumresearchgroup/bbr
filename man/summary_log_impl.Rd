@@ -4,15 +4,25 @@
 \alias{summary_log_impl}
 \title{Build summary log}
 \usage{
-summary_log_impl(.mods, ...)
+summary_log_impl(.mods, calc_aic_bic = TRUE, calc_dofv = TRUE, ...)
 }
 \arguments{
 \item{.mods}{List of model objects that will be passed to \code{\link[=model_summaries]{model_summaries()}}.}
+
+\item{calc_aic_bic}{Logical(T/F). If \code{TRUE}, calculate the Akaike Information
+Criterion (AIC) and Bayesian Information Criterion (BIC)}
+
+\item{calc_dofv}{Logical(T/F). If \code{TRUE}, calculate the difference in
+objective function value between each run and the run it's based on.}
 
 \item{...}{Arguments passed through to \code{\link[=model_summaries]{model_summaries()}}}
 }
 \description{
 Private implementation function for building the summary log from a list of model objects.
 This is called by both \code{\link[=summary_log]{summary_log()}} and \code{\link[=add_summary]{add_summary()}}.
+}
+\details{
+\code{calc_aic_bic} and \code{calc_dofv} should be set to \code{FALSE} for certain model
+types, such as bootstrap runs.
 }
 \keyword{internal}
