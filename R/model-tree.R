@@ -165,6 +165,7 @@ model_tree.bbi_log_df <- function(
     font_size = 10,
     ...
 ){
+  check_bbi_run_log_df_object(.log_df)
   # Make sure required dependencies are installed
   stop_if_tree_missing_deps(static = static)
 
@@ -256,7 +257,7 @@ make_tree_data <- function(
 
   # Starting run log
   log_cols <- unique(c(base_log_cols, cols_keep))
-  .log_df <- .log_df %>% dplyr::select(all_of(log_cols))
+  .log_df <- .log_df %>% dplyr::select(any_of(log_cols))
   # unnest based_on column
   full_log <- unnest_based_on(.log_df)
 
@@ -349,7 +350,6 @@ make_tree_data <- function(
 #' @param .log_df a `bbr` run log
 #' @noRd
 unnest_based_on <- function(.log_df){
-  check_bbi_run_log_df_object(.log_df)
   .log_df %>% dplyr::mutate(
     # Replace NULL based_on elements with empty string to preserve rows when unnesting
     based_on = purrr::map(.data$based_on, function(.x){if(is.null(.x)) "" else .x}),
@@ -387,14 +387,25 @@ make_model_network <- function(full_log){
 
   # Create Network
   start <- "Start"
-  noref <- data.frame(from = NA, to = start)
-  parent_mods <- data.frame(from = start,
-                            to = full_log$run[full_log$based_on==""])
-  child_mods <- data.frame(from = full_log$based_on[full_log$based_on!=""],
-                           to = full_log$run[full_log$based_on!=""])
-  network_df <- rbind(noref, parent_mods, child_mods)
+  noref_df <- data.frame(from = NA, to = start)
 
-  # Check network links - set unlinked models as starting points
+  child_mods_df <- data.frame(
+    from = full_log$based_on[full_log$based_on!=""],
+    to = full_log$run[full_log$based_on!=""]
+  )
+
+  parent_mods <- full_log$run[full_log$based_on==""]
+  if(!rlang::is_empty(parent_mods)){
+    parent_mods_df <- data.frame(from = start, to = parent_mods)
+    network_df <- rbind(noref_df, parent_mods_df, child_mods_df)
+  }else{
+    # This happens when there is no "starting" or origin model
+    # - i.e. the first referenced based_on model no longer exists
+    network_df <- rbind(noref_df, child_mods_df)
+  }
+
+  # Check network links
+  # - set unlinked models as starting points and warn that they're missing
   network_df <- check_model_tree(network_df)
 
   # Join network to run log
@@ -428,7 +439,6 @@ make_model_network <- function(full_log){
 #' @param .log_df a `bbr` run log
 #' @noRd
 add_log_recurse_dirs <- function(.log_df){
-  check_bbi_run_log_df_object(.log_df)
   checkmate::assert_true(all(c(ABS_MOD_PATH, "based_on") %in% names(.log_df)))
   checkmate::assert_character(.log_df$based_on)
 
@@ -506,13 +516,11 @@ check_model_tree <- function(network_df){
     })
     network_df <- rbind(network_df, missing_roots) %>% tibble::as_tibble()
 
-    unlinked_model_txt <- paste0("`", unlinked_roots, "`", collapse = ", ")
-    msg <- glue::glue("The following models could not be linked properly: {unlinked_model_txt}")
-    rlang::warn(c(
-      "!" = msg,
+    cli::cli_warn(c(
+      "The following models could not be linked properly: {.val {unlinked_roots}}",
       "i" = "Setting these as starting models in tree diagram.",
-      "i" = paste("Check the yaml files or run `bbr::run_log()` to make sure",
-                  "all `based_on` models still exist")
+      "i" = paste("Check the yaml files or run {.func bbr::run_log()} to make sure",
+                  "all {.var based_on} models still exist")
     ))
   }
 
