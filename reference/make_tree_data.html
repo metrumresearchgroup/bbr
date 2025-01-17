@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.12.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.13.0</span>
       </span>
     </div>
 
@@ -82,6 +82,7 @@
 <span>  <span class="va">.log_df</span>,</span>
 <span>  include_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"description"</span>, <span class="st">"star"</span>, <span class="st">"tags"</span><span class="op">)</span>,</span>
 <span>  color_by <span class="op">=</span> <span class="st">"run"</span>,</span>
+<span>  size_by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  add_summary <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -93,14 +94,20 @@
 
 
 <dt>include_info</dt>
-<dd><p>vector of columns present in <code>.log_df</code> to include in the
+<dd><p>A vector of columns present in <code>.log_df</code> to include in the
 tooltip.</p></dd>
 
 
 <dt>color_by</dt>
-<dd><p>a run log column to color the nodes by. Can be helpful for
+<dd><p>A run log column to color the nodes by. Can be helpful for
 identifying which models are starred, have heuristics, etc. See details
 for more information.</p></dd>
+
+
+<dt>size_by</dt>
+<dd><p>A <strong>numeric</strong> (or integer) run log column to size the nodes by.
+If not specified, the default is to size the nodes based on how many
+models are based on it.</p></dd>
 
 
 <dt>add_summary</dt>

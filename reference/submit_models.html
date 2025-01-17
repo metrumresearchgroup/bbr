@@ -18,7 +18,7 @@ few external calls as possible (see "Details").'><meta property="og:image" conte
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.12.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.13.0</span>
       </span>
     </div>
 
@@ -118,9 +118,9 @@ global YAML files).</p></dd>
 
 
 <dt>.mode</dt>
-<dd><p>Either <code>"sge"</code>, the default, to submit model(s) to the grid or
-<code>"local"</code> for local execution. This can be passed directly to this argument
-or set globally with <code>options("bbr.bbi_exe_mode")</code>.</p></dd>
+<dd><p>Mode for model submission: "local", "sge", or "slurm". If
+unspecified, the value is set to the value of the <code>bbr.bbi_exe_mode</code>
+option. This option defaults to "sge" on Linux and "local" otherwise.</p></dd>
 
 
 <dt>...</dt>

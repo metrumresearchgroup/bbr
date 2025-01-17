@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.12.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.13.0</span>
       </span>
     </div>
 
@@ -73,6 +73,20 @@
     </div>
 
     <div class="section level2">
+<h2 class="page-header" data-toc-text="1.13.0" id="bbr-1130">bbr 1.13.0<a class="anchor" aria-label="anchor" href="#bbr-1130"></a></h2>
+<div class="section level3">
+<h3 id="new-features-and-changes-1-13-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-1-13-0"></a></h3>
+<ul><li>Adds submission mode for Slurm (<code>submit_model(.mode = "slurm")</code>). (<a href="https://github.com/metrumresearchgroup/bbr/issues/724" class="external-link">#724</a>)</li>
+<li>
+<code>model_tree</code> now has <code>size_by</code> and <code>font_size</code> arguments. <code>size_by</code> allows users to control the node sizing by passing a particular column present in <code>.log_df</code>. <code>font_size</code> allows users to set the font size of model labels and tooltips. (<a href="https://github.com/metrumresearchgroup/bbr/issues/720" class="external-link">#720</a>)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bugs-addressed-1-13-0">Bugs addressed<a class="anchor" aria-label="anchor" href="#bugs-addressed-1-13-0"></a></h3>
+<ul><li>Fixed a bug with <code>nm_data(filter = TRUE)</code> where NA values would cause translated filters to not function properly. <code>IGNORE=C</code> type filters also did not behave as expected. (<a href="https://github.com/metrumresearchgroup/bbr/issues/729" class="external-link">#729</a>, <a href="https://github.com/metrumresearchgroup/bbr/issues/730" class="external-link">#730</a>)</li>
+<li>Fixed a bug where <code><a href="../reference/model_tree.html">model_tree()</a></code> would fail if no origin model existed in <code>.log_df</code>. (<a href="https://github.com/metrumresearchgroup/bbr/issues/726" class="external-link">#726</a>)</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="page-header" data-toc-text="1.12.0" id="bbr-1120">bbr 1.12.0<a class="anchor" aria-label="anchor" href="#bbr-1120"></a></h2>
 <div class="section level3">
 <h3 id="new-features-and-changes-1-12-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-1-12-0"></a></h3>
@@ -119,7 +133,7 @@ and <code><a href="../reference/setup_bootstrap_run.html">setup_bootstrap_run()<
 </ul></div>
 <div class="section level3">
 <h3 id="bugs-addressed-1-9-0">Bugs addressed<a class="anchor" aria-label="anchor" href="#bugs-addressed-1-9-0"></a></h3>
-<ul><li><p>With the latest <code>data.table</code> release (1.15.0), <code><a href="../reference/param_estimates_batch.html">param_estimates_batch()</a></code> failed for an edge case due to a change in the header detection heuristics. <code><a href="../reference/param_estimates_batch.html">param_estimates_batch()</a></code> now tells <code><a href="https://rdatatable.gitlab.io/data.table/reference/fread.html" class="external-link">data.table::fread()</a></code> to expect a header. (<a href="https://github.com/metrumresearchgroup/bbr/issues/648" class="external-link">#648</a>)</p></li>
+<ul><li><p>With the latest <code>data.table</code> release (1.15.0), <code><a href="../reference/param_estimates_batch.html">param_estimates_batch()</a></code> failed for an edge case due to a change in the header detection heuristics. <code><a href="../reference/param_estimates_batch.html">param_estimates_batch()</a></code> now tells <code><a href="https://rdrr.io/pkg/data.table/man/fread.html" class="external-link">data.table::fread()</a></code> to expect a header. (<a href="https://github.com/metrumresearchgroup/bbr/issues/648" class="external-link">#648</a>)</p></li>
 <li><p>When passed <code>.recurse = TRUE</code>, <code><a href="../reference/run_log.html">run_log()</a></code>, <code><a href="../reference/config_log.html">config_log()</a></code>, and <code><a href="../reference/summary_log.html">summary_log()</a></code> included nested models, which was not by design. Any models under another model’s output directory are considered an implementation detail. (<a href="https://github.com/metrumresearchgroup/bbr/issues/643" class="external-link">#643</a>, <a href="https://github.com/metrumresearchgroup/bbr/issues/644" class="external-link">#644</a>, <a href="https://github.com/metrumresearchgroup/bbr/issues/645" class="external-link">#645</a>)</p></li>
 </ul></div>
 </div>

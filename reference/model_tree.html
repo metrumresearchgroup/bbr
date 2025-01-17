@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.12.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.13.0</span>
       </span>
     </div>
 
@@ -82,40 +82,14 @@
 <span>  <span class="va">.log_df</span>,</span>
 <span>  include_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"description"</span>, <span class="st">"star"</span>, <span class="st">"tags"</span><span class="op">)</span>,</span>
 <span>  color_by <span class="op">=</span> <span class="st">"run"</span>,</span>
+<span>  size_by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  add_summary <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  digits <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  zoomable <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  static <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  width <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  height <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for character</span></span>
-<span><span class="fu">model_tree</span><span class="op">(</span></span>
-<span>  <span class="va">.log_df</span>,</span>
-<span>  include_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"description"</span>, <span class="st">"star"</span>, <span class="st">"tags"</span><span class="op">)</span>,</span>
-<span>  color_by <span class="op">=</span> <span class="st">"run"</span>,</span>
-<span>  add_summary <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  digits <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>  zoomable <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  static <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  width <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  height <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for bbi_log_df</span></span>
-<span><span class="fu">model_tree</span><span class="op">(</span></span>
-<span>  <span class="va">.log_df</span>,</span>
-<span>  include_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"description"</span>, <span class="st">"star"</span>, <span class="st">"tags"</span><span class="op">)</span>,</span>
-<span>  color_by <span class="op">=</span> <span class="st">"run"</span>,</span>
-<span>  add_summary <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  digits <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>  zoomable <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  static <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  width <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  height <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  font_size <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -123,19 +97,25 @@
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>.log_df</dt>
-<dd><p>a <code>bbi_run_log_df</code> tibble (the output of <code><a href="run_log.html">run_log()</a></code>) <em><strong>or</strong></em>
+<dd><p>A <code>bbi_run_log_df</code> tibble (the output of <code><a href="run_log.html">run_log()</a></code>) <em><strong>or</strong></em>
 a base directory to look in for models. See details for more options.</p></dd>
 
 
 <dt>include_info</dt>
-<dd><p>vector of columns present in <code>.log_df</code> to include in the
+<dd><p>A vector of columns present in <code>.log_df</code> to include in the
 tooltip.</p></dd>
 
 
 <dt>color_by</dt>
-<dd><p>a run log column to color the nodes by. Can be helpful for
+<dd><p>A run log column to color the nodes by. Can be helpful for
 identifying which models are starred, have heuristics, etc. See details
 for more information.</p></dd>
+
+
+<dt>size_by</dt>
+<dd><p>A <strong>numeric</strong> (or integer) run log column to size the nodes by.
+If not specified, the default is to size the nodes based on how many
+models are based on it.</p></dd>
 
 
 <dt>add_summary</dt>
@@ -160,15 +140,19 @@ be saved as a PNG and loaded into the viewer.</p></dd>
 
 
 <dt>width</dt>
-<dd><p>width in pixels (optional, defaults to automatic sizing)</p></dd>
+<dd><p>Width in pixels (optional, defaults to automatic sizing)</p></dd>
 
 
 <dt>height</dt>
-<dd><p>height in pixels (optional, defaults to automatic sizing)</p></dd>
+<dd><p>Height in pixels (optional, defaults to automatic sizing)</p></dd>
+
+
+<dt>font_size</dt>
+<dd><p>Font size of the label text in pixels</p></dd>
 
 
 <dt>...</dt>
-<dd><p>additional arguments passed to <code><a href="run_log.html">run_log()</a></code>. Only used if <code>.log_df</code>
+<dd><p>Additional arguments passed to <code><a href="run_log.html">run_log()</a></code>. Only used if <code>.log_df</code>
 is a modeling directory.</p></dd>
 
 </dl></div>
@@ -186,8 +170,8 @@ In other words, users can add/modify columns of their <code><a href="run_log.htm
 additional columns as tooltips. This is illustrated in the examples via
 <code><a href="summary_log.html">add_summary()</a></code> and <code><a href="config_log.html">add_config()</a></code>.</p>
     </div>
-    <div id="tooltip-formatting-and-coloring">
-    <h2>Tooltip formatting and coloring</h2>
+    <div id="tooltip-formatting-coloring-and-sizing">
+    <h2>Tooltip formatting, coloring, and sizing</h2>
     
 
 <p><strong>Tooltip formatting</strong></p>
@@ -201,8 +185,8 @@ formatted specially:</p><ul><li><p><code>'number_of_subjects'</code>, <code>'num
 <li><p>Note that the above summary columns will only receive the special
 formatting if added via <code>add_summary = TRUE</code>.</p></li>
 <li><p>i.e. if <code>.log_df = run_log() %&gt;% add_summary()</code> and
-<code>include_info = 'ofv'</code>, The <code>'OFV'</code> parameter will be formatted as any
-other additional column.</p></li>
+<code>include_info = 'ofv'</code>, the <code>'OFV'</code> parameter will display the same as if
+it was <em>not</em> passed to <code>include_info</code>.</p></li>
 </ul></li>
 </ul><p><strong>Coloring</strong></p>
 <p>Logical columns are handled differently from numeric or character columns.
@@ -224,19 +208,27 @@ pass <code>color_by = NULL</code> to make all model nodes <code>'red'</code>.</p
 <span class="r-in"><span><span class="fu">model_tree</span><span class="op">(</span><span class="va">MODEL_DIR</span>, color_by <span class="op">=</span> <span class="st">"star"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Run `add_config()`, `add_summary()`, and/or `mutate()` calls beforehand</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="run_log.html">run_log</a></span><span class="op">(</span><span class="va">MODEL_DIR</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="config_log.html">add_config</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>out_of_date <span class="op">=</span> <span class="va">model_has_changed</span> <span class="op">|</span> <span class="va">data_has_changed</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span><span class="co">## Run `add_config()`, `add_summary()`, and/or `mutate()` calls beforehand</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Size nodes by objective function value</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="run_log.html">run_log</a></span><span class="op">(</span><span class="va">MODEL_DIR</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu"><a href="summary_log.html">add_summary</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu">model_tree</span><span class="op">(</span>size_by <span class="op">=</span> <span class="st">"ofv"</span>, color_by <span class="op">=</span> <span class="st">"ofv"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Determine if certain models need to be re-run</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="run_log.html">run_log</a></span><span class="op">(</span><span class="va">MODEL_DIR</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu"><a href="config_log.html">add_config</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    out_of_date <span class="op">=</span> <span class="va">model_has_changed</span> <span class="op">|</span> <span class="va">data_has_changed</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">model_tree</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    include_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"model_has_changed"</span>, <span class="st">"data_has_changed"</span>, <span class="st">"nm_version"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    color_by <span class="op">=</span> <span class="st">"out_of_date"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="run_log.html">run_log</a></span><span class="op">(</span><span class="va">MODEL_DIR</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="summary_log.html">add_summary</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span><span class="co"># Highlight models with any heuristics</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="run_log.html">run_log</a></span><span class="op">(</span><span class="va">MODEL_DIR</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu"><a href="summary_log.html">add_summary</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">model_tree</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    include_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tags"</span>, <span class="st">"param_count"</span>, <span class="st">"eta_pval_significant"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    include_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"param_count"</span>, <span class="st">"eta_pval_significant"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    color_by <span class="op">=</span> <span class="st">"any_heuristics"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
