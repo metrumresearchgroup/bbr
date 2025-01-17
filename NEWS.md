@@ -1,3 +1,19 @@
+# bbr 1.13.0
+
+## New features and changes
+ - Adds submission mode for Slurm (`submit_model(.mode = "slurm")`). (#724)
+ - `model_tree` now has `size_by` and `font_size` arguments. `size_by` allows
+   users to control the node sizing by passing a particular column present in
+   `.log_df`. `font_size` allows users to set the font size of model labels and
+   tooltips. (#720)
+
+## Bugs addressed
+ - Fixed a bug with `nm_data(filter = TRUE)` where NA values would cause translated
+   filters to not function properly. `IGNORE=C` type filters also did not behave
+   as expected. (#729, #730)
+ - Fixed a bug where `model_tree()` would fail if no origin model existed in
+   `.log_df`. (#726)
+
 # bbr 1.12.0
 
 ## New features and changes
