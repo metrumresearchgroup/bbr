@@ -47,6 +47,14 @@ create_model_hook.bbi_nmboot_model <- function(.mod, ...) {
 
 #' @rdname create_model_hook
 #' @export
+create_model_hook.bbi_nmsse_model <- function(.mod, ...) {
+  # we won't know the model file extension, so we rely on this helper to check
+  # the possible extensions and throw an error if none exists
+  find_nonmem_model_file_path(.mod[[ABS_MOD_PATH]], .check_exists = TRUE)
+}
+
+#' @rdname create_model_hook
+#' @export
 create_model_hook.bbi_nmsim_model <- function(.mod, ...) {
   # we won't know the model file extension, so we rely on this helper to check
   # the possible extensions and throw an error if none exists

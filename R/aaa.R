@@ -202,6 +202,8 @@ NM_MOD_CLASS <- "bbi_nonmem_model" # SHARED with bbr.bayes
 NM_SUM_CLASS <- "bbi_nonmem_summary" # SHARED with bbr.bayes
 NMBOOT_MOD_CLASS <- "bbi_nmboot_model"
 NMBOOT_SUM_CLASS <- "bbi_nmboot_summary"
+NMSSE_MOD_CLASS <- "bbi_nmsse_model"
+NMSSE_SUM_CLASS <- "bbi_nmsse_summary"
 NMSIM_MOD_CLASS <- "bbi_nmsim_model"
 SL_CLASS <- "bbi_summary_list"
 PROC_CLASS <- "bbi_process"
@@ -234,6 +236,10 @@ SPEC_NMSIM_NSIM <- "n_sim"
 SPEC_NMBOOT_NSAMPLE <- "n_samples"
 SPEC_NMBOOT_STRAT <- "strat_cols"
 
+SPEC_NMSSE_NSAMPLE <- "n_samples"
+SPEC_NMSSE_STRAT <- "strat_cols"
+SPEC_NMSSE_SAMPLE_SIZE <- "sample_size"
+
 # List of keys required to print a bbi_nmsim_model object
 SPEC_NMSIM_KEYS <- c(
   SPEC_NMSIM_NSIM
@@ -245,6 +251,12 @@ SPEC_NMBOOT_KEYS <- c(
   SPEC_NMBOOT_STRAT
 )
 
+# List of keys required to print a bbi_nmsse_model object
+SPEC_NMSSE_KEYS <- c(
+  SPEC_NMSSE_NSAMPLE,
+  SPEC_NMSSE_SAMPLE_SIZE,
+  SPEC_NMSSE_STRAT
+)
 
 # keys required to create a model object
 MODEL_REQ_INPUT_KEYS <- c(
