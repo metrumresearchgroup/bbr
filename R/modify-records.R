@@ -54,7 +54,7 @@ NULL
 #' `nmrec`
 #' @keywords internal
 get_model_ctl <- function(.mod){
-  check_model_object(.mod, c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMSIM_MOD_CLASS))
+  check_model_object(.mod, c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMSSE_MOD_CLASS, NMSIM_MOD_CLASS))
   mod_path <- get_model_path(.mod)
   ctl <- nmrec::read_ctl(mod_path)
   return(ctl)

@@ -184,7 +184,7 @@ config_log_make_entry.bbi_nonmem_model <- function(.mod, config, fields = NULL) 
 #' @export
 config_log_make_entry.bbi_nmboot_model <- function(.mod, config, fields = NULL) {
   # Make data names consistent with other models in config_log (path and md5)
-  boot_config <- config$bootstrap_spec
+  boot_config <- config$analysis_spec
   boot_config[[CONFIG_DATA_PATH]] <- boot_config[["based_on_data_path"]]
   boot_config[["data_md5"]] <- boot_config[["based_on_data_md5"]]
   # bbi and nonmem versions will be NULL until the run has been summarized

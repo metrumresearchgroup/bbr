@@ -122,6 +122,10 @@ get_config_path.bbi_nmboot_model <- function(.bbi_object, .check_exists = TRUE) 
   get_spec_path(.bbi_object, .check_exists = .check_exists)
 }
 
+#' @export
+get_config_path.bbi_nmsse_model <- function(.bbi_object, .check_exists = TRUE) {
+  get_spec_path(.bbi_object, .check_exists = .check_exists)
+}
 
 #' Get the relevant specification file path
 #'
@@ -148,6 +152,22 @@ get_spec_path.bbi_nmboot_model <- function(.mod, .check_exists = TRUE) {
   .path <- file.path(
     get_output_dir(.mod, .check_exists = .check_exists),
     "bbr_boot_spec.json")
+
+  if (isTRUE(.check_exists)) {
+    checkmate::assert_file_exists(.path)
+  }
+
+  return(.path)
+}
+
+#' @describeIn get_spec_path Get the SSE specification file path from a
+#' `bbi_nmsse_model` object
+#' @keywords internal
+get_spec_path.bbi_nmsse_model <- function(.mod, .check_exists = TRUE) {
+  # Spec file saved to modeling directory of sse run
+  .path <- file.path(
+    get_output_dir(.mod, .check_exists = .check_exists),
+    "bbr_sse_spec.json")
 
   if (isTRUE(.check_exists)) {
     checkmate::assert_file_exists(.path)
@@ -183,6 +203,7 @@ get_spec_path.bbi_base_model <- function(.mod, .check_exists = TRUE) {
 
 # Register private S3 methods for development purposes
 .S3method("get_spec_path", "bbi_nmboot_model", get_spec_path.bbi_nmboot_model)
+.S3method("get_spec_path", "bbi_nmsse_model", get_spec_path.bbi_nmsse_model)
 .S3method("get_spec_path", "bbi_base_model", get_spec_path.bbi_base_model)
 
 #' Get model identifier
@@ -293,6 +314,30 @@ get_data_path.bbi_nmboot_model <- function(
 }
 
 #' @export
+get_data_path.bbi_nmsse_model <- function(
+    .bbi_object,
+    .check_exists = TRUE,
+    ...
+){
+  # nmsse models do not have a config file, so we can only extract from the
+  # $DATA record in a control stream file
+  data_path <- get_data_path_from_ctl(.bbi_object)
+
+  if(isTRUE(.check_exists)){
+    if(!fs::file_exists(data_path)){
+      rlang::abort(
+        c(
+          "x" = "Input data file does not exist or cannot be opened",
+          "i" = glue("Referenced input data path: {data_path}")
+        )
+      )
+    }
+  }
+
+  return(data_path)
+}
+
+#' @export
 get_data_path.bbi_nmsim_model <- function(
     .bbi_object,
     .check_exists = TRUE,
@@ -385,7 +430,7 @@ get_data_path_nonmem <- function(
 #' Get the data path from a control stream file
 #' @noRd
 get_data_path_from_ctl <- function(.mod, normalize = TRUE){
-  check_model_object(.mod, c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMSIM_MOD_CLASS))
+  check_model_object(.mod, c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMSSE_MOD_CLASS, NMSIM_MOD_CLASS))
   mod_path <- get_model_path(.mod)
   ctl <- nmrec::read_ctl(mod_path)
 
@@ -717,43 +762,45 @@ find_nonmem_model_file_path <- function(.path, .check_exists = TRUE) {
 }
 
 
-#' Read in and format the bootstrap specification file.
+#' Read in and format an analysis specification file, such as for bootstraps or
+#' SSE.
 #'
-#' Tabulates all relevant `bbi_nonmem_model` model files from a bootstrap
-#' specification file.
-#' @param .boot_run Either a `bbi_nmboot_model` or `bbi_nmboot_summary` object
+#' Tabulates analysis metadata and all relevant `bbi_nonmem_model` model files
+#'  from an analysis specification file.
+#' @param .run An analysis run (`bbi_nmboot_model`, `bbi_nmsse_model`) or
+#'  analysis run summary (`bbi_nmboot_summary`) object.
 #' @returns a list
 #' @keywords internal
-get_boot_spec <- function(.boot_run){
-  check_model_object(.boot_run, c(NMBOOT_MOD_CLASS, NMBOOT_SUM_CLASS))
-  if(inherits(.boot_run, NMBOOT_SUM_CLASS)){
-    .boot_run <- read_model(.boot_run[[ABS_MOD_PATH]])
+get_analysis_spec <- function(.run){
+  check_model_object(.run, c(NMBOOT_MOD_CLASS, NMBOOT_SUM_CLASS, NMSSE_MOD_CLASS))
+  if(inherits(.run, NMBOOT_SUM_CLASS)){
+    .run <- read_model(.run[[ABS_MOD_PATH]])
   }
 
-  spec_path <- get_spec_path(.boot_run, .check_exists = FALSE)
+  spec_path <- get_spec_path(.run, .check_exists = FALSE)
   if(!fs::file_exists(spec_path)) return(NULL)
 
-  boot_spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
-  boot_dir <- .boot_run[[ABS_MOD_PATH]]
+  analysis_spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
+  run_dir <- .run[[ABS_MOD_PATH]]
 
-  # Format individual bootstrap model runs if not cleaned up
-  if(!is.null(boot_spec$bootstrap_runs)){
-    boot_runs <- boot_spec$bootstrap_runs
+  # Format individual analysis model runs if not cleaned up
+  if(!is.null(analysis_spec$analysis_runs)){
+    analysis_runs <- analysis_spec$analysis_runs
 
-    boot_mod_files <- data.frame(
-      matrix(unlist(boot_runs), nrow=length(boot_runs), byrow = TRUE),
+    analysis_mod_files <- data.frame(
+      matrix(unlist(analysis_runs), nrow=length(analysis_runs), byrow = TRUE),
       stringsAsFactors = FALSE
-    ) %>% stats::setNames(names(boot_runs[[1]])) %>%
+    ) %>% stats::setNames(names(analysis_runs[[1]])) %>%
       tibble::as_tibble()
 
-    spec_df <- boot_mod_files %>% dplyr::mutate(
-      run = names(boot_runs),
-      mod_path_abs = file.path(boot_dir, fs::path_ext_remove(.data$mod_path))
+    spec_df <- analysis_mod_files %>% dplyr::mutate(
+      run = names(analysis_runs),
+      mod_path_abs = file.path(run_dir, fs::path_ext_remove(.data$mod_path))
     ) %>% dplyr::relocate("run")
 
-    spec <- c(boot_spec$bootstrap_spec, list(bootstrap_runs = spec_df))
+    spec <- c(analysis_spec$analysis_spec, list(analysis_runs = spec_df))
   }else{
-    spec <- boot_spec$bootstrap_spec
+    spec <- analysis_spec$analysis_spec
   }
 
   return(spec)

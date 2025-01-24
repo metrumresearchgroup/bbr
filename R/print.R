@@ -189,7 +189,7 @@ print.bbi_model <- function(x, ...) {
 
   if (inherits(x, NMBOOT_MOD_CLASS)) {
     heading('Bootstrap Args')
-    boot_spec <- get_boot_spec(x)
+    boot_spec <- get_analysis_spec(x)
     # Spec file doesnt exist until bootstrap run is set up via setup_bootstrap_run
     if(!is.null(boot_spec)){
       boot_args <- boot_spec[SPEC_NMBOOT_KEYS]
@@ -199,7 +199,27 @@ print.bbi_model <- function(x, ...) {
       iwalk(boot_args,
             ~ bullet_list(paste0(.y, ": ", col_blue(paste(.x, collapse = ", ")))))
       # Add bullet if cleaned up
-      if(isTRUE(bootstrap_is_cleaned_up(x))){
+      if(isTRUE(analysis_is_cleaned_up(x))){
+        cli::cat_bullet(paste("Cleaned up:", col_green(TRUE)))
+      }
+    }else{
+      bullet_list(cli::col_red("Not set up"))
+    }
+  }
+
+  if (inherits(x, NMSSE_MOD_CLASS)) {
+    heading('SSE Args')
+    sse_spec <- get_analysis_spec(x)
+    # Spec file doesnt exist until sse run is set up via setup_sse_run
+    if(!is.null(sse_spec)){
+      sse_args <- sse_spec[SPEC_NMSSE_KEYS]
+      names(sse_args) <- c("Number of runs", "Sample Size", "Stratification Columns")
+      # strat_cols can be NULL
+      sse_args[sapply(sse_args, is.null)] <- NA
+      iwalk(sse_args,
+            ~ bullet_list(paste0(.y, ": ", col_blue(paste(.x, collapse = ", ")))))
+      # Add bullet if cleaned up
+      if(isTRUE(analysis_is_cleaned_up(x))){
         cli::cat_bullet(paste("Cleaned up:", col_green(TRUE)))
       }
     }else{
@@ -369,7 +389,7 @@ print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
   iwalk(run_specs, ~ cat_bullet(paste0(.y, ": ", col_blue(.x))))
 
   # Add bullet if cleaned up
-  if(isTRUE(bootstrap_is_cleaned_up(x))){
+  if(isTRUE(analysis_is_cleaned_up(x))){
     cli::cat_bullet(paste("Cleaned up:", col_green(TRUE)))
   }
 
@@ -561,6 +581,8 @@ color_model_type.bbi_base_model <- function(.mod, msg = NULL){
     model_type <- cli::col_br_magenta(paste("Simulation", msg))
   } else if (model_type == "nmboot"){
     model_type <- cli::col_yellow(paste("Bootstrap Run", msg))
+  } else if (model_type == "nmsse"){
+    model_type <- cli::col_yellow(paste("SSE Run", msg))
   } else {
     # For bbr.bayes or other bbi_base_models not defined within bbr
     #  - Other packages may implement separate methods rather than relying

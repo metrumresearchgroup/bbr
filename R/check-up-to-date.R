@@ -84,7 +84,7 @@ check_up_to_date.bbi_nmboot_model <- function(.bbi_object, ...) {
     rlang::abort(paste(glue("Model {get_model_id(.bbi_object)}:"), CHECK_UP_TO_DATE_ERR_MSG))
   }
 
-  boot_spec <- get_boot_spec(.bbi_object)
+  boot_spec <- get_analysis_spec(.bbi_object)
 
   # check necessary files for changes
   model_file <- get_model_path(.bbi_object)

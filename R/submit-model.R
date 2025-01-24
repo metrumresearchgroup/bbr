@@ -184,7 +184,7 @@ submit_model.bbi_nmboot_model <- function(
   }
 
   boot_models <- get_boot_models(.mod)
-  cleaned_up <- bootstrap_is_cleaned_up(.mod)
+  cleaned_up <- analysis_is_cleaned_up(.mod)
 
   if (!isTRUE(.dry_run)) {
     outdirs <- purrr::map_chr(boot_models, ~ get_output_dir(.x, .check_exists = FALSE))

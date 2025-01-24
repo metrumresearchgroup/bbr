@@ -16,7 +16,7 @@ new_bootstrap_run(
 \arguments{
 \item{.mod}{A \code{bbr} model object.}
 
-\item{.suffix}{A suffix for the bootstrap run directory. Will be prefixed by
+\item{.suffix}{A suffix for the new run directory. Will be prefixed by
 the model id of \code{.mod}.}
 
 \item{.inherit_tags}{If \code{TRUE}, the default, inherit any tags from \code{.mod}.}

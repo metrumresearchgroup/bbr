@@ -19,7 +19,7 @@ setup_bootstrap_run(
 
 \item{n}{Number of data sets and model runs to generate.}
 
-\item{strat_cols}{Columns to maintain proportion for stratification}
+\item{strat_cols}{Columns to maintain proportion for stratification.}
 
 \item{seed}{A numeric seed to set prior to resampling the data; use \code{NULL} to
 avoid setting a seed.}
@@ -32,10 +32,11 @@ must include the same column names as what's returned from \code{nm_data(.mod)}.
 where \code{orig_mod} is the model \code{.boot_run} is based on. See
 \code{\link[=print_bbi_args]{print_bbi_args()}} for valid options. Defaults to \code{list(no_grd_file = TRUE, no_shk_file = TRUE)} because \code{\link[=model_summary]{model_summary()}} is only called internally to
 extract the number of records, so those files are irrelevant. Only used if
-the based on model (the model being bootstrapped) has been executed.}
+the based on model (the model the analysis is being performed on) has been
+executed.}
 
 \item{.overwrite}{Logical (T/F) indicating whether or not to overwrite
-existing setup for a bootstrap run.}
+existing setup.}
 }
 \description{
 This function takes a \code{bbi_nmboot_model} (created by a previous

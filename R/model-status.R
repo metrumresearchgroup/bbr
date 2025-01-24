@@ -50,7 +50,7 @@ bbi_nonmem_model_status.bbi_nmboot_model <- function(.mod) {
   status <- "Not Run"
   output_dir <- get_output_dir(.mod, .check_exists = FALSE)
   if (dir.exists(output_dir)) {
-    cleaned_up <- bootstrap_is_cleaned_up(.mod)
+    cleaned_up <- analysis_is_cleaned_up(.mod)
     if (isTRUE(cleaned_up)) {
       status <- "Finished Running"
     } else {
@@ -62,8 +62,8 @@ bbi_nonmem_model_status.bbi_nmboot_model <- function(.mod) {
       if (!fs::file_exists(spec_path)) {
         status <- "Not Run"
       }else{
-        boot_spec <- get_boot_spec(.mod)
-        for(output_dir.i in boot_spec$bootstrap_runs$mod_path_abs){
+        boot_spec <- get_analysis_spec(.mod)
+        for(output_dir.i in boot_spec$analysis_runs$mod_path_abs){
           if (dir.exists(output_dir.i)) {
             # Exit early as incomplete if any model cannot be read in for any reason
             boot_m <- tryCatch({read_model(output_dir.i)}, error = function(e) NULL)
@@ -113,21 +113,25 @@ model_is_finished <- function(.mod){
 
 
 #' Check if bootstrap run has been cleaned up
-#' @param .boot_run Either a `bbi_nmboot_model` or `bbi_nmboot_summary` object
+#' @param .run An analysis run (`bbi_nmboot_model`, `bbi_nmsse_model`) or
+#'  analysis run summary (`bbi_nmboot_summary`, `bbi_nmsse_summary`) object
 #' @noRd
-bootstrap_is_cleaned_up <- function(.boot_run){
-  check_model_object(.boot_run, c(NMBOOT_MOD_CLASS, NMBOOT_SUM_CLASS))
-  if(inherits(.boot_run, NMBOOT_SUM_CLASS)){
-    .boot_run <- read_model(.boot_run[[ABS_MOD_PATH]])
+analysis_is_cleaned_up <- function(.run){
+  check_model_object(
+    .run, c(NMBOOT_MOD_CLASS, NMSSE_MOD_CLASS, NMBOOT_SUM_CLASS, NMSSE_SUM_CLASS)
+  )
+
+  if(inherits(.run, c(NMBOOT_SUM_CLASS, NMSSE_SUM_CLASS))){
+    .run <- read_model(.run[[ABS_MOD_PATH]])
   }
 
-  output_dir <- get_output_dir(.boot_run, .check_exists = FALSE)
+  output_dir <- get_output_dir(.run, .check_exists = FALSE)
   if(!fs::file_exists(output_dir)) return(FALSE)
-  spec_path <- get_spec_path(.boot_run, .check_exists = FALSE)
+  spec_path <- get_spec_path(.run, .check_exists = FALSE)
   if(!fs::file_exists(spec_path)) return(FALSE)
 
-  boot_spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
-  cleaned_up <- boot_spec$bootstrap_spec$cleaned_up
+  spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
+  cleaned_up <- spec$analysis_spec$cleaned_up
   if(!is.null(cleaned_up) && isTRUE(cleaned_up)){
     return(TRUE)
   }else{

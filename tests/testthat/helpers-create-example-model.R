@@ -131,7 +131,7 @@ make_fake_boot <- function(mod, n = 100, strat_cols = c("SEX", "ETN")){
   )
 
   # Need to explicitly point to internal function for vignette building
-  bbr:::make_boot_spec(boot_mods, boot_args)
+  bbr:::make_analysis_spec(boot_mods, boot_args)
 
   # Read in summary to adjust estimates to look like real bootstrap
   boot_sum <- summarize_bootstrap_run(boot_run)
