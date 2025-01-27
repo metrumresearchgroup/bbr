@@ -25,9 +25,9 @@ does not exist.}
 a file path
 }
 \description{
-Get the bootstrap specification path from a \code{bbi_nmboot_model} object or the
-simulation specification path from a \code{bbi_nmsim_model} \emph{or} \code{bbi_nonmem_model}
-object.
+Get the \strong{analysis run specification} path from a \code{bbi_nmboot_model} or
+\code{bbi_nmsse_model} object, or the \strong{simulation specification} path from a
+\code{bbi_nmsim_model} \emph{or} \code{bbi_nonmem_model} object.
 }
 \section{Methods (by class)}{
 \itemize{

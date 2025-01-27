@@ -7,6 +7,8 @@
 #' to [setup_sse_run()] before submission (see examples).
 #'
 #' @inheritParams new_analysis_run
+#' @param remove_msf If `TRUE`, the default, remove any `MSFO` options from
+#'  `$EST` records.
 #'
 #' @examples
 #' \dontrun{
@@ -25,10 +27,11 @@ new_sse_run <- function(
     .inherit_tags = TRUE,
     .overwrite = FALSE,
     remove_cov = TRUE,
-    remove_tables = TRUE
+    remove_tables = TRUE,
+    remove_msf = TRUE
 ){
 
-  new_analysis_run(
+  sse_run <- new_analysis_run(
     .mod,
     .suffix = .suffix,
     .type = "nmsse",
@@ -38,6 +41,27 @@ new_sse_run <- function(
     remove_cov = remove_cov,
     remove_tables = remove_tables
   )
+
+  # Check for MSF path and remove if present
+  # - MSF may have been used if add_simulation was used as the simulation
+  # method for the based on model. We dont want to generate this for each
+  # individual SSE model run
+  if(isTRUE(remove_msf)){
+    msf_path <- get_msf_path(sse_run, .check_exists = FALSE)
+    if(!is.null(msf_path)){
+      ctl <- get_model_ctl(sse_run)
+      ests <- nmrec::select_records(ctl, "est")
+
+      purrr::walk(ests, function(est){
+        opt <- nmrec::get_record_option(est, "msf")
+        if(!is.null(opt)) opt$value <- NULL
+      })
+      mod_path <- get_model_path(sse_run)
+      nmrec::write_ctl(ctl, mod_path)
+    }
+  }
+
+  return(sse_run)
 }
 
 
@@ -113,4 +137,144 @@ setup_sse_run <- function(
     .bbi_args = .bbi_args, .overwrite = .overwrite
   )
   return(invisible(.sse_run))
+}
+
+
+#' Summarize an SSE run
+#'
+#' Summarize the parameter estimates, run details, and any heuristics of a
+#' SSE run, saving the results to a `sse_summary.RDS` data file within the
+#' SSE run directory.
+#'
+#' @inheritParams setup_sse_run
+#' @param force_resummarize Logical (T/F). If `TRUE`, force re-summarization.
+#'  Will _only_ update the saved out `RDS` file when specified via
+#'  `summarize_sse_run()`. See details for more information.
+#'
+#' @details
+#'  - `summarize_sse_run()` does the following things:
+#'     - Tabulates run details and heuristics.
+#'     - Calls `summary_log()` and binds the results to the parameter estimates.
+#'       information if a `sse_summary.RDS` data file exists.
+#'     - Either saves this data out to `sse_summary.RDS`, or reads it in if it
+#'     already exists (see section below).
+#'     - Formats the returned object as a `bbi_nmsse_summary` S3 object, and
+#'     displays key summary information when printed to the console.
+#'
+#' ## Saved out data file:
+#' The first time `summarize_sse_run()` is called (or if
+#' `force_resummarize = TRUE`), it will save the results to a `sse_summary.RDS`
+#' data file within the bootstrap run directory. If one already exists, that data
+#' set will be read in by default instead of being re-summarized.
+#'  - The purpose of this is functionality two fold. For one, it helps avoid the
+#'  need of re-executing `model_summary()` calls for a large number of runs. It
+#'  also helps to reduce the number of files you need to commit via version
+#'  control (see `cleanup_sse_run()`).
+#'
+#' @seealso [cleanup_sse_run()] [new_sse_run()] [setup_sse_run()]
+#'
+#' @examples
+#' \dontrun{
+#'
+#' .sse_run <- read_model(file.path(MODEL_DIR, "1-sse"))
+#' boot_sum <- summarize_sse_run(.sse_run)
+#'
+#'
+#' }
+#'
+#' @name summarize_sse
+NULL
+
+
+#' @describeIn summarize_sse Summarize an SSE run and store results
+#' @importFrom tidyselect any_of
+#' @export
+summarize_sse_run <- function(
+    .sse_run,
+    force_resummarize = FALSE
+){
+  check_model_object(.sse_run, NMSSE_MOD_CLASS)
+  sse_sum_path <- get_analysis_sum_path(.sse_run, .check_exists = FALSE)
+
+  if(!fs::file_exists(sse_sum_path) || isTRUE(force_resummarize)){
+    sse_sum <- summarize_analysis_run(.sse_run)
+
+    saveRDS(sse_sum, sse_sum_path)
+  }else{
+    verbose_msg(
+      glue("Reading in SSE summary: {fs::path_rel(sse_sum_path, getwd())}\n\n")
+    )
+    sse_sum <- readRDS(sse_sum_path)
+  }
+
+  # reset model path to current absolute path on this system (instead of what's pulled from RDS/JSON)
+  sse_sum[[ABS_MOD_PATH]] <- .sse_run[[ABS_MOD_PATH]]
+
+  # if parent model is present, reset based on paths as well
+  based_on_path <- get_based_on(.sse_run)[[1]]
+  if (fs::file_exists(paste0(based_on_path, ".yaml"))) {
+    based_on_mod <- read_model(based_on_path)
+    sse_sum$based_on_model_path <- get_model_path(based_on_mod)
+    sse_sum$based_on_data_set <- get_data_path(based_on_mod)
+  } else {
+    # if not, set to "<not found>" to avoid confusion with stale paths
+    rlang::warn(glue("SSE run {get_model_id(.sse_run)} cannot find parent model. Expected to be found at {based_on_path}"))
+    sse_sum$based_on_model_path <- "<not found>"
+    sse_sum$based_on_data_set <- "<not found>"
+  }
+
+  # Assign class and return
+  class(sse_sum) <- c(NMSSE_SUM_CLASS, class(sse_sum))
+  return(sse_sum)
+}
+
+
+#' @describeIn summarize_sse Tabulate parameter estimates for each model
+#'  submission in an SSE run
+#' @inheritParams analysis_estimates
+#' @export
+sse_estimates <- function(
+    .sse_run,
+    format_long = FALSE,
+    force_resummarize = FALSE
+){
+  param_ests <- analysis_estimates(.sse_run, format_long, force_resummarize)
+  return(param_ests)
+}
+
+#' @describeIn summarize_sse Read in all SSE run model objects
+#' @export
+get_sse_models <- function(.sse_run){
+  get_analysis_models(.sse_run)
+}
+
+
+#' Cleanup SSE run directory
+#'
+#' This will delete all child models, and only keep the information
+#' you need to read in estimates or summary information
+#'
+#' @details
+#' The intent of this function is to help reduce the number of files you need to
+#' commit via version control. Collaborators will be able to read in the
+#' SSE model and summary objects without needing individual run files.
+#'  - Note that this will prevent `force_resummarize = TRUE` from working
+#'
+#' **This should only be done** if you no longer need to re-summarize, as this
+#'  will clean up (delete) the *individual* SSE model files
+#'
+#' @examples
+#' \dontrun{
+#'
+#' .sse_run <- read_model(file.path(MODEL_DIR, "1-sse"))
+#' cleanup_sse_run(.sse_run)
+#' }
+#'
+#' @inheritParams setup_sse_run
+#' @inheritParams delete_models
+#' @seealso [summarize_sse_run()]
+#'
+#' @export
+cleanup_sse_run <- function(.sse_run, .force = FALSE){
+  cleanup_analysis_run(.sse_run, .force = .force)
 }

@@ -305,7 +305,7 @@ make_analysis_model <- function(mod_path, metadata){
   # Filter to simulation rep for SSE runs
   if(metadata$run_type == "sse" && !is.null(metadata$sim_col)){
     sim_col <- metadata$sim_col
-    irep <- unique(data$nn)[new_mod_index]
+    irep <- unique(metadata$orig_data[[sim_col]])[new_mod_index]
     data <- metadata$orig_data %>% dplyr::filter(!!rlang::sym(sim_col) == irep)
   }else{
     data <- metadata$orig_data
@@ -357,68 +357,38 @@ make_analysis_model <- function(mod_path, metadata){
 }
 
 
-#' Read in all analysis run model objects
-#' @inheritParams get_analysis_spec
+#' Check if the analysis run (Bootstrap or SSE) can be summarized
+#' @param .run A `bbi_nmboot_model` or `bbi_nmsse_model` model object
 #' @keywords internal
-get_analysis_models <- function(.run){
-  run_dir <- .run[[ABS_MOD_PATH]]
-  output_dir <- get_output_dir(.run, .check_exists = FALSE)
-
+analysis_can_be_summarized <- function(.run){
   run_type <- dplyr::case_when(
-    .run[[YAML_MOD_TYPE]] == "nmboot" ~ "bootstrap run",
+    .run[[YAML_MOD_TYPE]] == "nmboot" ~ "bootstrap",
     .run[[YAML_MOD_TYPE]] == "nmsse" ~ "SSE"
   )
 
-  if(!fs::file_exists(output_dir)){
-    verbose_msg(
-      glue("{run_type} `{get_model_id(.run)}` has not been set up.")
-    )
-    return(invisible(NULL))
-  }
-
-  if(analysis_is_cleaned_up(.run)){
-    verbose_msg(
-      glue("{run_type} `{get_model_id(.run)}` has been cleaned up.")
-    )
-    return(invisible(NULL))
-  }
-
-  spec <- get_analysis_spec(.run)
-  model_ids <- fs::path_ext_remove(basename(spec$analysis_runs$mod_path_abs))
-
-  mods <- tryCatch({
-    find_models(.run[[ABS_MOD_PATH]], .recurse = FALSE, .include = model_ids)
-  }, warning = function(cond){
-    if(!stringr::str_detect(cond$message, "All models excluded|Found no valid model")){
-      warning(cond)
-    }
-    return(NULL)
-  })
-
-
-  # This shouldnt happen, but could if the directory existed and models
-  # referenced in the spec file aren't found for any reason _other than_
-  # cleaning up the run
-  if(is.null(mods) || rlang::is_empty(mods)){
-    rlang::abort(
-      c(
-        glue("At least one {run_type} model does not exist in `{run_dir}`")
+  # Check that runs can still be summarized (e.g, after cleanup)
+  cleaned_up <- analysis_is_cleaned_up(.run)
+  if(isTRUE(cleaned_up)){
+    cli::cli_abort(
+      paste(
+        "The {run_type} run has been cleaned up, and cannot be summarized again",
+        "without resubmitting"
       )
     )
   }else{
-    if(length(model_ids) != length(mods)){
-      rlang::warn(
+    if(!model_is_finished(.run)){
+      cli::cli_abort(
         c(
-          glue("Found an unexpected number of models in {run_dir}"),
-          glue("Expected number of models: {length(model_ids)}"),
-          glue("Discovered number of models: {length(mods)}")
+          "One or more {run_type} runs have not finished executing.",
+          "i" = "Run `get_model_status()` to check the submission status."
         )
       )
     }
   }
-
-  return(mods)
+  return(invisible(TRUE))
 }
+
+
 
 #' Store bootstrap run details before submission
 #'
@@ -481,6 +451,310 @@ make_analysis_spec <- function(run_models, metadata){
   )
   writeLines(spec_lst_json, json_path)
   return(invisible(json_path))
+}
+
+
+#' Summarize an analysis (bootstrap or SSE) run
+#'
+#' @inheritParams analysis_estimates
+#' @importFrom tidyselect any_of
+#' @keywords internal
+summarize_analysis_run <- function(.run){
+  check_model_object(.run, c(NMBOOT_MOD_CLASS, NMSSE_MOD_CLASS))
+
+  # Check that runs can still be summarized (e.g, after cleanup)
+  analysis_can_be_summarized(.run)
+
+  # Get parameter estimates
+  param_ests <- analysis_estimates(.run, force_resummarize = TRUE)
+
+  # Tabulate all run details and heuristics
+  run_dir <- .run[[ABS_MOD_PATH]]
+  sum_log <- summary_log(
+    run_dir, .bbi_args = list(
+      no_grd_file = TRUE, no_ext_file = TRUE, no_shk_file = TRUE
+    )
+  ) %>% dplyr::select(-"error_msg") # only join based on model run
+
+  run_details <- purrr::map_dfr(sum_log$bbi_summary, function(sum){
+    as_tibble(
+      c(list2(!!ABS_MOD_PATH := sum[[ABS_MOD_PATH]]), sum[[SUMMARY_DETAILS]])
+    ) %>% tidyr::nest("output_files_used" = "output_files_used")
+  })
+
+  run_heuristics <- purrr::map_dfr(sum_log$bbi_summary, function(sum){
+    as_tibble(
+      c(list2(!!ABS_MOD_PATH := sum[[ABS_MOD_PATH]]), sum[[SUMMARY_HEURISTICS]])
+    )
+  })
+
+  # Run details, heuristics, and other information will be displayed elsewhere
+  run_cols <- c(
+    unique(c(names(run_details), names(run_heuristics))),
+    "estimation_method", "problem_text", "needed_fail_flags", "param_count"
+  )
+  run_cols <- run_cols[-grepl(ABS_MOD_PATH, run_cols)]
+
+  analysis_sum_df <- dplyr::full_join(
+    param_ests, sum_log %>% dplyr::select(-any_of(run_cols)),
+    by = c(ABS_MOD_PATH, "run")
+  )
+
+  if(any(!is.na(analysis_sum_df$error_msg))){
+    err_msgs <- unique(analysis_sum_df$error_msg[!is.na(analysis_sum_df$error_msg)])
+    rlang::warn(
+      c(
+        "The following error messages occurred for at least one model:",
+        err_msgs
+      )
+    )
+  }
+
+  # Update spec to store bbi_version and configuration details
+  #  - so functions like config_log have to do less of a lift
+  analysis_models <- get_analysis_models(.run)
+
+  # These should be consistent across all models
+  config_lst <- purrr::map(analysis_models, function(.m){
+    path <- get_config_path(.m, .check_exists = FALSE)
+    config <- jsonlite::fromJSON(path)
+    list(bbi_version = config$bbi_version, configuration = config$configuration)
+  }) %>% unique()
+
+  if(length(config_lst) != 1){
+    rlang::warn("Multiple NONMEM or bbi configurations detected: storing the first one")
+  }
+  config_lst <- config_lst[[1]]
+
+  # Update spec file with bbi config
+  spec_path <- get_spec_path(.run)
+  analysis_spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
+  analysis_spec$analysis_spec$bbi_version <- config_lst$bbi_version
+  analysis_spec$analysis_spec$configuration <- config_lst$configuration
+  spec_lst_json <- jsonlite::toJSON(analysis_spec, pretty = TRUE, simplifyVector = TRUE)
+  writeLines(spec_lst_json, spec_path)
+
+  # Create summary object to save to RDS
+  # - Refresh analysis spec
+  analysis_spec <- get_analysis_spec(.run)
+  analysis_sum <- c(
+    list2(!!ABS_MOD_PATH := run_dir),
+    list(
+      estimation_method = unique(sum_log$estimation_method),
+      based_on_model_path = analysis_spec$based_on_model_path,
+      based_on_data_set = analysis_spec$based_on_data_path,
+      strat_cols = analysis_spec$strat_cols,
+      seed = analysis_spec$seed,
+      n_samples = analysis_spec$n_samples,
+      run_details = run_details,
+      run_heuristics = run_heuristics
+    ),
+    list(
+      analysis_summary = analysis_sum_df
+    )
+  )
+
+  return(analysis_sum)
+}
+
+
+#' Tabulate parameter estimates for each model submission in an analysis run
+#'
+#' @inheritParams setup_analysis_run
+#' @param format_long Logical (T/F). If `TRUE`, format data as a long table,
+#'  making the data more portable for plotting.
+#' @param force_resummarize Logical (T/F). If `TRUE`, force re-summarization.
+#'  Will _only_ update the saved out `RDS` file when specified via
+#'  `summarize_bootstrap_run()`. See details for more information.
+#'
+#' @keywords internal
+analysis_estimates <- function(
+    .run,
+    format_long = FALSE,
+    force_resummarize = FALSE
+){
+  check_model_object(.run, c(NMBOOT_MOD_CLASS, NMSSE_MOD_CLASS))
+
+  run_type <- dplyr::case_when(
+    .run[[YAML_MOD_TYPE]] == "nmboot" ~ "bootstrap",
+    .run[[YAML_MOD_TYPE]] == "nmsse" ~ "SSE"
+  )
+
+  sum_path <- get_analysis_sum_path(.run, .check_exists = FALSE)
+
+  if(!fs::file_exists(sum_path) || isTRUE(force_resummarize)){
+    analysis_can_be_summarized(.run)
+    param_ests <- param_estimates_batch(.run[[ABS_MOD_PATH]])
+  }else{
+    verbose_msg(
+      glue("Reading in {run_type} summary: {fs::path_rel(sum_path, getwd())}\n\n")
+    )
+    analysis_sum <- readRDS(sum_path)
+    param_ests <- analysis_sum$analysis_summary
+  }
+
+  if(isTRUE(format_long)){
+    # Long format - only keep estimates and error/termination columns for filtering
+    param_ests <- param_ests %>% dplyr::select(
+      all_of(ABS_MOD_PATH), "run", "error_msg", "termination_code",
+      starts_with(c("THETA", "SIGMA", "OMEGA"))
+    ) %>% tidyr::pivot_longer(
+      starts_with(c("THETA", "SIGMA", "OMEGA")),
+      names_to = "parameter_names", values_to = "estimate"
+    ) %>% dplyr::relocate(
+      c("error_msg", "termination_code"), .after = dplyr::everything()
+    )
+  }
+
+  return(param_ests)
+}
+
+
+#' Read in all analysis run model objects
+#' @inheritParams get_analysis_spec
+#' @keywords internal
+get_analysis_models <- function(.run){
+
+  check_model_object(
+    .run, c(NMBOOT_MOD_CLASS, NMSSE_MOD_CLASS, NMBOOT_SUM_CLASS, NMSSE_SUM_CLASS)
+  )
+
+  if(inherits(.run, c(NMBOOT_SUM_CLASS, NMSSE_SUM_CLASS))){
+    .run <- read_model(.run[[ABS_MOD_PATH]])
+  }
+
+  run_dir <- .run[[ABS_MOD_PATH]]
+  output_dir <- get_output_dir(.run, .check_exists = FALSE)
+
+  run_type <- dplyr::case_when(
+    .run[[YAML_MOD_TYPE]] == "nmboot" ~ "bootstrap",
+    .run[[YAML_MOD_TYPE]] == "nmsse" ~ "SSE"
+  )
+
+  if(!fs::file_exists(output_dir)){
+    verbose_msg(
+      glue("{run_type} run `{get_model_id(.run)}` has not been set up.")
+    )
+    return(invisible(NULL))
+  }
+
+  if(analysis_is_cleaned_up(.run)){
+    verbose_msg(
+      glue("{run_type} run `{get_model_id(.run)}` has been cleaned up.")
+    )
+    return(invisible(NULL))
+  }
+
+  spec <- get_analysis_spec(.run)
+  model_ids <- fs::path_ext_remove(basename(spec$analysis_runs$mod_path_abs))
+
+  mods <- tryCatch({
+    find_models(.run[[ABS_MOD_PATH]], .recurse = FALSE, .include = model_ids)
+  }, warning = function(cond){
+    if(!stringr::str_detect(cond$message, "All models excluded|Found no valid model")){
+      warning(cond)
+    }
+    return(NULL)
+  })
+
+
+  # This shouldnt happen, but could if the directory existed and models
+  # referenced in the spec file aren't found for any reason _other than_
+  # cleaning up the run
+  if(is.null(mods) || rlang::is_empty(mods)){
+    rlang::abort(
+      c(
+        glue("At least one {run_type} model does not exist in `{run_dir}`")
+      )
+    )
+  }else{
+    if(length(model_ids) != length(mods)){
+      rlang::warn(
+        c(
+          glue("Found an unexpected number of models in {run_dir}"),
+          glue("Expected number of models: {length(model_ids)}"),
+          glue("Discovered number of models: {length(mods)}")
+        )
+      )
+    }
+  }
+
+  return(mods)
+}
+
+
+#' Cleanup analysis run directory
+#'
+#' This will delete all child models, and only keep the information
+#' you need to read in estimates or summary information
+#'
+#' @details
+#' The intent of this function is to help reduce the number of files you need to
+#' commit via version control. Collaborators will be able to read in the
+#' analysis model and summary objects without needing individual run files.
+#'  - Note that this will prevent `force_resummarize = TRUE` from working
+#'
+#' **This should only be done** if you no longer need to re-summarize, as this
+#'  will clean up (delete) the *individual* analysis model files
+#'
+#' @inheritParams setup_analysis_run
+#' @inheritParams delete_models
+#' @keywords internal
+cleanup_analysis_run <- function(.run, .force = FALSE){
+  check_model_object(.run, c(NMBOOT_MOD_CLASS, NMSSE_MOD_CLASS))
+  run_type <- dplyr::case_when(
+    .run[[YAML_MOD_TYPE]] == "nmboot" ~ "bootstrap",
+    .run[[YAML_MOD_TYPE]] == "nmsse" ~ "SSE"
+  )
+
+  run_dir <- .run[[ABS_MOD_PATH]]
+  sum_path <- get_analysis_sum_path(.run, .check_exists = FALSE)
+  data_dir <- file.path(run_dir, "data")
+
+  if(!model_is_finished(.run)){
+    cli::cli_abort(
+      c(
+        "One or more {run_type} runs have not finished executing.",
+        "i" = "Run `get_model_status(.run)` to check the submission status."
+      )
+    )
+  }
+
+  if(!fs::file_exists(sum_path)){
+    cli::cli_abort(
+      c(
+        "Model has not been summarized yet.",
+        "Run `summarize_{run_type}_run() before cleaning up"
+      )
+    )
+  }
+
+  if(analysis_is_cleaned_up(.run)){
+    cli::cli_abort("{run_type} run has already been cleaned up")
+  }
+
+  # Overwrite spec file
+  spec_path <- get_spec_path(.run)
+  analysis_spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
+  # Set cleaned up - impacts status checking
+  analysis_spec$analysis_spec$cleaned_up <- TRUE
+  # Delete individual run specs
+  # - dont need to store this information anymore since we wont be reading in
+  #   individual models anymore
+  analysis_spec$analysis_runs <- NULL
+  spec_lst_json <- jsonlite::toJSON(analysis_spec, pretty = TRUE, simplifyVector = TRUE)
+
+  # Delete individual model files
+  analysis_models <- get_analysis_models(.run)
+  tags_delete <- toupper(paste0(run_type, "_RUN"))
+  delete_models(analysis_models, .tags = tags_delete, .force = .force)
+
+  # Save out updated spec and delete data directory only if the user says 'yes'
+  if(!model_is_finished(.run)){
+    writeLines(spec_lst_json, spec_path)
+    if(fs::dir_exists(data_dir)) fs::dir_delete(data_dir)
+    message(glue("{run_type} run `{get_model_id(.run)}` has been cleaned up"))
+  }
 }
 
 # helpers -----------------------------------------------------------------

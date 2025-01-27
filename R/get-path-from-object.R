@@ -129,9 +129,9 @@ get_config_path.bbi_nmsse_model <- function(.bbi_object, .check_exists = TRUE) {
 
 #' Get the relevant specification file path
 #'
-#' Get the bootstrap specification path from a `bbi_nmboot_model` object or the
-#' simulation specification path from a `bbi_nmsim_model` _or_ `bbi_nonmem_model`
-#' object.
+#' Get the **analysis run specification** path from a `bbi_nmboot_model` or
+#' `bbi_nmsse_model` object, or the **simulation specification** path from a
+#' `bbi_nmsim_model` _or_ `bbi_nonmem_model` object.
 #'
 #' @param .mod a `bbi_{.model_type}_model` object.
 #' @param .check_exists If `TRUE`, the default, will throw an error if the file
@@ -205,6 +205,48 @@ get_spec_path.bbi_base_model <- function(.mod, .check_exists = TRUE) {
 .S3method("get_spec_path", "bbi_nmboot_model", get_spec_path.bbi_nmboot_model)
 .S3method("get_spec_path", "bbi_nmsse_model", get_spec_path.bbi_nmsse_model)
 .S3method("get_spec_path", "bbi_base_model", get_spec_path.bbi_base_model)
+
+
+#' Get the relevant analysis run summary path
+#' @inheritParams get_spec_path
+#' @keywords internal
+get_analysis_sum_path <- function(.mod, .check_exists = TRUE){
+  UseMethod("get_analysis_sum_path")
+}
+
+#' @describeIn get_analysis_sum_path Get the summary RDS file path from a
+#' `bbi_nmboot_model` object
+#' @keywords internal
+get_analysis_sum_path.bbi_nmboot_model <- function(.mod, .check_exists = TRUE){
+  .path <- file.path(
+    get_output_dir(.mod, .check_exists = .check_exists),
+    "boot_summary.RDS")
+
+  if (isTRUE(.check_exists)) {
+    checkmate::assert_file_exists(.path)
+  }
+
+  return(.path)
+}
+
+#' @describeIn get_analysis_sum_path Get the summary RDS file path from a
+#' `bbi_nmsse_model` object
+#' @keywords internal
+get_analysis_sum_path.bbi_nmsse_model <- function(.mod, .check_exists = TRUE){
+  .path <- file.path(
+    get_output_dir(.mod, .check_exists = .check_exists),
+    "sse_summary.RDS")
+
+  if (isTRUE(.check_exists)) {
+    checkmate::assert_file_exists(.path)
+  }
+
+  return(.path)
+}
+
+# Register private S3 methods for development purposes
+.S3method("get_analysis_sum_path", "bbi_nmboot_model", get_analysis_sum_path.bbi_nmboot_model)
+.S3method("get_analysis_sum_path", "bbi_nmsse_model", get_analysis_sum_path.bbi_nmsse_model)
 
 #' Get model identifier
 #'

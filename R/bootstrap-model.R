@@ -189,99 +189,10 @@ summarize_bootstrap_run <- function(
     force_resummarize = FALSE
 ){
   check_model_object(.boot_run, NMBOOT_MOD_CLASS)
-  boot_dir <- .boot_run[[ABS_MOD_PATH]]
-  boot_sum_path <- file.path(boot_dir, "boot_summary.RDS")
+  boot_sum_path <- get_analysis_sum_path(.boot_run, .check_exists = FALSE)
 
   if(!fs::file_exists(boot_sum_path) || isTRUE(force_resummarize)){
-    # Check that runs can still be summarized (e.g, after cleanup)
-    bootstrap_can_be_summarized(.boot_run)
-
-    param_ests <- bootstrap_estimates(
-      .boot_run, force_resummarize = force_resummarize
-    )
-
-    boot_sum_log <- summary_log(
-      boot_dir, .bbi_args = list(
-        no_grd_file = TRUE, no_ext_file = TRUE, no_shk_file = TRUE
-      )
-    ) %>% dplyr::select(-"error_msg") # only join based on model run
-
-    # Tabulate all run details and heuristics
-    run_details <- purrr::map_dfr(boot_sum_log$bbi_summary, function(sum){
-      as_tibble(
-        c(list2(!!ABS_MOD_PATH := sum[[ABS_MOD_PATH]]), sum[[SUMMARY_DETAILS]])
-      ) %>% tidyr::nest("output_files_used" = "output_files_used")
-    })
-
-    run_heuristics <- purrr::map_dfr(boot_sum_log$bbi_summary, function(sum){
-      as_tibble(
-        c(list2(!!ABS_MOD_PATH := sum[[ABS_MOD_PATH]]), sum[[SUMMARY_HEURISTICS]])
-      )
-    })
-
-    # Run details, heuristics, and other information will be displayed elsewhere
-    run_cols <- c(
-      unique(c(names(run_details), names(run_heuristics))),
-      "estimation_method", "problem_text", "needed_fail_flags", "param_count"
-    )
-    run_cols <- run_cols[-grepl(ABS_MOD_PATH, run_cols)]
-
-    boot_sum_df <- dplyr::full_join(
-      param_ests, boot_sum_log %>% dplyr::select(-any_of(run_cols)),
-      by = c(ABS_MOD_PATH, "run")
-    )
-
-    if(any(!is.na(boot_sum_df$error_msg))){
-      err_msgs <- unique(boot_sum_df$error_msg[!is.na(boot_sum_df$error_msg)])
-      rlang::warn(
-        c(
-          "The following error messages occurred for at least one model:",
-          err_msgs
-        )
-      )
-    }
-
-    # Update spec to store bbi_version and configuration details
-    #  - so functions like config_log have to do less of a lift
-    boot_models <- get_boot_models(.boot_run)
-
-    # These should be consistent across all models
-    config_lst <- purrr::map(boot_models, function(.m){
-      path <- get_config_path(.m, .check_exists = FALSE)
-      config <- jsonlite::fromJSON(path)
-      list(bbi_version = config$bbi_version, configuration = config$configuration)
-    }) %>% unique()
-
-    if(length(config_lst) != 1){
-      rlang::warn("Multiple NONMEM or bbi configurations detected: storing the first one")
-    }
-    config_lst <- config_lst[[1]]
-
-    spec_path <- get_spec_path(.boot_run)
-    boot_spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
-    boot_spec$analysis_spec$bbi_version <- config_lst$bbi_version
-    boot_spec$analysis_spec$configuration <- config_lst$configuration
-    spec_lst_json <- jsonlite::toJSON(boot_spec, pretty = TRUE, simplifyVector = TRUE)
-    writeLines(spec_lst_json, spec_path)
-
-    # Create summary object to save to RDS
-    boot_spec <- get_analysis_spec(.boot_run)
-    boot_sum <- c(
-      list2(!!ABS_MOD_PATH := boot_dir),
-      list(
-        estimation_method = unique(boot_sum_log$estimation_method),
-        based_on_model_path = boot_spec$based_on_model_path,
-        based_on_data_set = boot_spec$based_on_data_path,
-        strat_cols = boot_spec$strat_cols,
-        seed = boot_spec$seed,
-        n_samples = boot_spec$n_samples,
-        run_details = run_details,
-        run_heuristics = run_heuristics
-      ),
-      list(
-        boot_summary = boot_sum_df
-      )
-    )
+    boot_sum <- summarize_analysis_run(.boot_run)
 
     # Assign class early for param_estimate_compare method
     class(boot_sum) <- c(NMBOOT_SUM_CLASS, class(boot_sum))
@@ -322,80 +233,22 @@ summarize_bootstrap_run <- function(
 
 #' @describeIn summarize_bootstrap Tabulate parameter estimates for each model
 #'  submission in a bootstrap run
-#' @param format_long Logical (T/F). If `TRUE`, format data as a long table,
-#'  making the data more portable for plotting.
+#' @inheritParams analysis_estimates
 #' @export
 bootstrap_estimates <- function(
     .boot_run,
     format_long = FALSE,
     force_resummarize = FALSE
 ){
-  check_model_object(.boot_run, NMBOOT_MOD_CLASS)
-
-
-  boot_dir <- .boot_run[[ABS_MOD_PATH]]
-  boot_sum_path <- file.path(boot_dir, "boot_summary.RDS")
-
-  if(!fs::file_exists(boot_sum_path) || isTRUE(force_resummarize)){
-    bootstrap_can_be_summarized(.boot_run)
-    param_ests <- param_estimates_batch(.boot_run[[ABS_MOD_PATH]])
-  }else{
-    verbose_msg(
-      glue("Reading in bootstrap summary: {fs::path_rel(boot_sum_path, getwd())}\n\n")
-    )
-    boot_sum <- readRDS(boot_sum_path)
-    param_ests <- boot_sum$boot_summary
-  }
-
-  if(isTRUE(format_long)){
-    # Long format - only keep estimates and error/termination columns for filtering
-    param_ests <- param_ests %>% dplyr::select(
-      all_of(ABS_MOD_PATH), "run", "error_msg", "termination_code",
-      starts_with(c("THETA", "SIGMA", "OMEGA"))
-    ) %>% tidyr::pivot_longer(
-      starts_with(c("THETA", "SIGMA", "OMEGA")),
-      names_to = "parameter_names", values_to = "estimate"
-    ) %>% dplyr::relocate(
-      c("error_msg", "termination_code"), .after = dplyr::everything()
-    )
-  }
+  param_ests <- analysis_estimates(.boot_run, format_long, force_resummarize)
   return(param_ests)
-}
-
-bootstrap_can_be_summarized <- function(.boot_run){
-  # Check that runs can still be summarized (e.g, after cleanup)
-  cleaned_up <- analysis_is_cleaned_up(.boot_run)
-  if(isTRUE(cleaned_up)){
-    rlang::abort(
-      paste(
-        "The bootstrap run has been cleaned up, and cannot be summarized again",
-        "without resubmitting"
-      )
-    )
-  }else{
-    if(!model_is_finished(.boot_run)){
-      rlang::abort(
-        c(
-          "One or more bootstrap runs have not finished executing.",
-          "i" = "Run `get_model_status(.boot_run)` to check the submission status."
-        )
-      )
-    }
-  }
-  return(invisible(TRUE))
 }
 
 
 
 #' @describeIn summarize_bootstrap Read in all bootstrap run model objects
-#' @inheritParams get_analysis_spec
 #' @export
 get_boot_models <- function(.boot_run){
-  check_model_object(.boot_run, c(NMBOOT_MOD_CLASS, NMBOOT_SUM_CLASS))
-  if(inherits(.boot_run, NMBOOT_SUM_CLASS)){
-    .boot_run <- read_model(.boot_run[[ABS_MOD_PATH]])
-  }
-
   get_analysis_models(.boot_run)
 }
 
@@ -427,53 +280,6 @@ get_boot_models <- function(.boot_run){
 #'
 #' @export
 cleanup_bootstrap_run <- function(.boot_run, .force = FALSE){
-  check_model_object(.boot_run, NMBOOT_MOD_CLASS)
-  boot_dir <- .boot_run[[ABS_MOD_PATH]]
-  boot_sum_path <- file.path(boot_dir, "boot_summary.RDS")
-  boot_data_dir <- file.path(boot_dir, "data")
-
-  if(!model_is_finished(.boot_run)){
-    rlang::abort(
-      c(
-        "One or more bootstrap runs have not finished executing.",
-        "i" = "Run `get_model_status(.boot_run)` to check the submission status."
-      )
-    )
-  }
-
-  if(!fs::file_exists(boot_sum_path)){
-    rlang::abort(
-      c(
-        "Model has not been summarized yet.",
-        "Run `summarize_bootstrap_run() before cleaning up"
-      )
-    )
-  }
-
-  if(analysis_is_cleaned_up(.boot_run)){
-    rlang::abort("Bootstrap run has already been cleaned up")
-  }
-
-  # Overwrite spec file
-  spec_path <- get_spec_path(.boot_run)
-  boot_spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
-  # Set cleaned up - impacts status checking
-  boot_spec$analysis_spec$cleaned_up <- TRUE
-  # Delete individual run specs
-  # - dont need to store this information anymore since we wont be reading in
-  #   individual models anymore
-  boot_spec$analysis_runs <- NULL
-  spec_lst_json <- jsonlite::toJSON(boot_spec, pretty = TRUE, simplifyVector = TRUE)
-
-  # Delete individual model files
-  boot_models <- get_boot_models(.boot_run)
-  delete_models(boot_models, .tags = "BOOTSTRAP_RUN", .force = .force)
-
-  # Save out updated spec and delete data directory only if the user says 'yes'
-  if(!model_is_finished(.boot_run)){
-    writeLines(spec_lst_json, spec_path)
-    if(fs::dir_exists(boot_data_dir)) fs::dir_delete(boot_data_dir)
-    message(glue("Bootstrap run `{get_model_id(.boot_run)}` has been cleaned up"))
-  }
+  cleanup_analysis_run(.boot_run, .force = .force)
 }
 
