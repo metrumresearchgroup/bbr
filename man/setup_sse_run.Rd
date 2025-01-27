@@ -64,13 +64,19 @@ to view the results. See examples below.
 \examples{
 \dontrun{
 
+# Simulate data
+N_SIM <- 1000
+add_simulation(.mod, n = N_SIM, .mode = "local")
+sim_data <- nm_join_sim(.mod)
+
 # Setup
 .sse_run <- new_sse_run(.mod)
 .sse_run <- setup_sse_run(
   .sse_run,
-  n = 1000,
+  data = sim_data,
+  sim_col = "nn",
+  n = N_SIM,
   sample_size = 50,
-  seed = 1234,
   strat_cols = c("STUDY", "SEX")
 )
 

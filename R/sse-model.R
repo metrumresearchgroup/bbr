@@ -13,11 +13,24 @@
 #' @examples
 #' \dontrun{
 #'
+#' # Denote N number of simulations
+#' N_SIM <- 20
+#'
+#' # Simulate data
+#' add_simulation(.mod, n = N_SIM, .mode = "local")
+#' sim_data <- nm_join_sim(.mod)
+#'
 #' # Create new bootstrap object
 #' .sse_run <- new_sse_run(.mod)
 #'
 #' # Set up the run
-#' setup_sse_run(.sse_run)
+#' setup_sse_run(
+#'   .sse_run,
+#'   data = sim_data,
+#'   n = N_SIM,
+#'   sample_size = 30,
+#'   sim_col = "nn"
+#' )
 #' }
 #' @return S3 object of class `bbi_nmsse_model`.
 #' @export
@@ -91,13 +104,19 @@ new_sse_run <- function(
 #' @examples
 #' \dontrun{
 #'
+#' # Simulate data
+#' N_SIM <- 1000
+#' add_simulation(.mod, n = N_SIM, .mode = "local")
+#' sim_data <- nm_join_sim(.mod)
+#'
 #' # Setup
 #' .sse_run <- new_sse_run(.mod)
 #' .sse_run <- setup_sse_run(
 #'   .sse_run,
-#'   n = 1000,
+#'   data = sim_data,
+#'   sim_col = "nn",
+#'   n = N_SIM,
 #'   sample_size = 50,
-#'   seed = 1234,
 #'   strat_cols = c("STUDY", "SEX")
 #' )
 #'

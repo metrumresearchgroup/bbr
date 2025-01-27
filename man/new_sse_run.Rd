@@ -10,7 +10,8 @@ new_sse_run(
   .inherit_tags = TRUE,
   .overwrite = FALSE,
   remove_cov = TRUE,
-  remove_tables = TRUE
+  remove_tables = TRUE,
+  remove_msf = TRUE
 )
 }
 \arguments{
@@ -27,6 +28,9 @@ file at \code{.new_model} will be overwritten silently.}
 
 \item{remove_cov, remove_tables}{If \code{TRUE}, the default, remove \verb{$COVARIANCE}
 and \verb{$TABLE} records respectively, allowing for notably faster run times.}
+
+\item{remove_msf}{If \code{TRUE}, the default, remove any \code{MSFO} options from
+\verb{$EST} records.}
 }
 \value{
 S3 object of class \code{bbi_nmsse_model}.
@@ -41,10 +45,23 @@ to \code{\link[=setup_sse_run]{setup_sse_run()}} before submission (see examples
 \examples{
 \dontrun{
 
+# Denote N number of simulations
+N_SIM <- 20
+
+# Simulate data
+add_simulation(.mod, n = N_SIM, .mode = "local")
+sim_data <- nm_join_sim(.mod)
+
 # Create new bootstrap object
 .sse_run <- new_sse_run(.mod)
 
 # Set up the run
-setup_sse_run(.sse_run)
+setup_sse_run(
+  .sse_run,
+  data = sim_data,
+  n = N_SIM,
+  sample_size = 30,
+  sim_col = "nn"
+)
 }
 }

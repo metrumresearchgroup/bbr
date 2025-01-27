@@ -463,6 +463,78 @@ print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
 }
 
 
+#' @describeIn print_bbi Prints a high level summary of a model from a `bbi_nmsse_summary` object
+#' @export
+print.bbi_nmsse_summary <- function(x, .digits = 3, .nrow = 10, ...) {
+
+  # print top line info
+  .d <- x[[SUMMARY_DETAILS]]
+  cli_h1("Based on")
+  cat_line(paste("Model:", col_blue(x$based_on_model_path)))
+  cat_line(paste("Dataset:", col_blue(x$based_on_data_set)))
+
+  # Run specifications (seed, stratification columns, cleaned_up)
+  cli_h1("Run Specifications")
+
+  strat_cols <- if(is.null(x$strat_cols)) "None" else paste(x$strat_cols, collapse = ", ")
+  names(strat_cols) <- "Stratification Columns"
+
+  sample_size <- if(is.null(x$sample_size)) "Full dataset" else x$sample_size
+  names(sample_size) <- "Sample Size"
+
+  seed <- if(is.null(x$seed)) "None" else x$seed
+  names(seed) <- "Seed"
+
+  run_specs <- c(strat_cols, sample_size, seed)
+  iwalk(run_specs, ~ cat_bullet(paste0(.y, ": ", col_blue(.x))))
+
+  # Add bullet if cleaned up
+  if(isTRUE(analysis_is_cleaned_up(x))){
+    cli::cat_bullet(paste("Cleaned up:", col_green(TRUE)))
+  }
+
+  # SSE run summary (n_samples, any heuristics)
+  cli_h1("SSE Run Summary")
+
+  # TODO: confirm this is appropriate for only_sim (unsure where this comes from)
+  only_sim <- isTRUE("only_sim" %in% names(.d))
+  if (only_sim) {
+    cat_line("No Estimation Methods (ONLYSIM)\n")
+  } else {
+    cli::cat_line("Estimation Method(s):\n")
+    purrr::walk(paste(x$estimation_method, "\n"), cli::cat_bullet, bullet = "en_dash")
+  }
+
+  cli::cat_line("Run Status:\n")
+  n_samples <- c("Number of runs" = x$n_samples)
+  cli::cat_bullet(paste("Number of runs:", col_blue(x$n_samples)), bullet = "en_dash")
+
+  # check heuristics
+  .h <- x[[SUMMARY_HEURISTICS]]
+  heuristics_cols <- names(.h)[!grepl(ABS_MOD_PATH, names(.h))]
+  heuristics <- purrr::map_dfr(heuristics_cols, function(col){
+    tibble(heuristic = col, any_found = any(.h[[col]]), n_found = sum(.h[[col]]))
+  })
+
+  if (any(heuristics$any_found)) {
+    heuristics_found <- heuristics$heuristic[which(heuristics$any_found)]
+    heuristics_n <- heuristics$n_found[which(heuristics$any_found)]
+    heuristics_perc <- round((heuristics_n/n_samples) * 100, 2)
+    purrr::walk(
+      paste0(heuristics_found, ": ", col_red(heuristics_n)," (", col_red(heuristics_perc), " %)"),
+      cli::cat_bullet, bullet = "en_dash"
+    )
+    cat("\n")
+  } else {
+    cat_line("\n")
+  }
+
+  if (only_sim) {
+    return(invisible(NULL))
+  }
+
+}
+
 #' @describeIn print_bbi Prints the `NM-TRAN` evaluation of a `bbi_nonmem_model`
 #'  object
 #' @export
