@@ -29,7 +29,7 @@ the \emph{filtered} output from \code{nm_data(.boot_run, filter = TRUE)}. If pro
 must include the same column names as what's returned from \code{nm_data(.mod)}.}
 
 \item{.bbi_args}{Named list passed to \code{model_summary(orig_mod, .bbi_args)},
-where \code{orig_mod} is the model \code{.boot_run} is based on. See
+where \code{orig_mod} is the model the analysis is based on. See
 \code{\link[=print_bbi_args]{print_bbi_args()}} for valid options. Defaults to \code{list(no_grd_file = TRUE, no_shk_file = TRUE)} because \code{\link[=model_summary]{model_summary()}} is only called internally to
 extract the number of records, so those files are irrelevant. Only used if
 the based on model (the model the analysis is being performed on) has been

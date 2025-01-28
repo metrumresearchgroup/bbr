@@ -20,7 +20,7 @@
 #' add_simulation(.mod, n = N_SIM, .mode = "local")
 #' sim_data <- nm_join_sim(.mod)
 #'
-#' # Create new bootstrap object
+#' # Create new SSE object
 #' .sse_run <- new_sse_run(.mod)
 #'
 #' # Set up the run
@@ -79,7 +79,7 @@ new_sse_run <- function(
 
 
 
-#' Set up a bootstrap model run
+#' Set up a SSE model run
 #'
 #' This function takes a `bbi_nmsse_model` (created by a previous
 #' [new_sse_run()] call) and creates `n` new model objects and re-sampled
@@ -95,7 +95,7 @@ new_sse_run <- function(
 #' @details
 #' Once you have run this function, you can execute your SSE with
 #' [submit_model()]. You can use [get_model_status()] to check on your submitted
-#' bootstrap run. Once all models have finished, use [summarize_sse_run()]
+#' SSE run. Once all models have finished, use [summarize_sse_run()]
 #' to view the results. See examples below.
 #'
 #'
@@ -137,7 +137,7 @@ setup_sse_run <- function(
     n = 200,
     sample_size = NULL,
     strat_cols = NULL,
-    replace = FALSE,
+    replace = TRUE,
     seed = 1234,
     data = NULL,
     sim_col = "nn",
@@ -183,7 +183,7 @@ setup_sse_run <- function(
 #' ## Saved out data file:
 #' The first time `summarize_sse_run()` is called (or if
 #' `force_resummarize = TRUE`), it will save the results to a `sse_summary.RDS`
-#' data file within the bootstrap run directory. If one already exists, that data
+#' data file within the SSE run directory. If one already exists, that data
 #' set will be read in by default instead of being re-summarized.
 #'  - The purpose of this is functionality two fold. For one, it helps avoid the
 #'  need of re-executing `model_summary()` calls for a large number of runs. It

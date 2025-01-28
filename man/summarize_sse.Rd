@@ -45,7 +45,7 @@ displays key summary information when printed to the console.
 
 The first time \code{summarize_sse_run()} is called (or if
 \code{force_resummarize = TRUE}), it will save the results to a \code{sse_summary.RDS}
-data file within the bootstrap run directory. If one already exists, that data
+data file within the SSE run directory. If one already exists, that data
 set will be read in by default instead of being re-summarized.
 \itemize{
 \item The purpose of this is functionality two fold. For one, it helps avoid the

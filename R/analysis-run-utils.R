@@ -77,7 +77,7 @@ new_analysis_run <- function(
 #'  if using [bbr::add_simulation()], though `"IREP"` is also common (e.g., when
 #'  using `mrgsolve`).
 #' @param .bbi_args Named list passed to `model_summary(orig_mod, .bbi_args)`,
-#'   where `orig_mod` is the model `.boot_run` is based on. See
+#'   where `orig_mod` is the model the analysis is based on. See
 #'   [print_bbi_args()] for valid options. Defaults to `list(no_grd_file = TRUE,
 #'   no_shk_file = TRUE)` because [model_summary()] is only called internally to
 #'   extract the number of records, so those files are irrelevant. Only used if

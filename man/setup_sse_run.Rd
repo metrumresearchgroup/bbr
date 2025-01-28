@@ -2,14 +2,14 @@
 % Please edit documentation in R/sse-model.R
 \name{setup_sse_run}
 \alias{setup_sse_run}
-\title{Set up a bootstrap model run}
+\title{Set up a SSE model run}
 \usage{
 setup_sse_run(
   .sse_run,
   n = 200,
   sample_size = NULL,
   strat_cols = NULL,
-  replace = FALSE,
+  replace = TRUE,
   seed = 1234,
   data = NULL,
   sim_col = "nn",
@@ -39,7 +39,7 @@ if using \code{\link[=add_simulation]{add_simulation()}}, though \code{"IREP"} i
 using \code{mrgsolve}).}
 
 \item{.bbi_args}{Named list passed to \code{model_summary(orig_mod, .bbi_args)},
-where \code{orig_mod} is the model \code{.boot_run} is based on. See
+where \code{orig_mod} is the model the analysis is based on. See
 \code{\link[=print_bbi_args]{print_bbi_args()}} for valid options. Defaults to \code{list(no_grd_file = TRUE, no_shk_file = TRUE)} because \code{\link[=model_summary]{model_summary()}} is only called internally to
 extract the number of records, so those files are irrelevant. Only used if
 the based on model (the model the analysis is being performed on) has been
@@ -58,7 +58,7 @@ objects, and the new datasets are sampled from the dataset passed to \code{data}
 \details{
 Once you have run this function, you can execute your SSE with
 \code{\link[=submit_model]{submit_model()}}. You can use \code{\link[=get_model_status]{get_model_status()}} to check on your submitted
-bootstrap run. Once all models have finished, use \code{\link[=summarize_sse_run]{summarize_sse_run()}}
+SSE run. Once all models have finished, use \code{\link[=summarize_sse_run]{summarize_sse_run()}}
 to view the results. See examples below.
 }
 \examples{

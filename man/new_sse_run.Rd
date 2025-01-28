@@ -52,7 +52,7 @@ N_SIM <- 20
 add_simulation(.mod, n = N_SIM, .mode = "local")
 sim_data <- nm_join_sim(.mod)
 
-# Create new bootstrap object
+# Create new SSE object
 .sse_run <- new_sse_run(.mod)
 
 # Set up the run
