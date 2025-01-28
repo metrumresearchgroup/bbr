@@ -115,9 +115,10 @@ make_fake_boot <- function(mod, n = 100, strat_cols = c("SEX", "ETN")){
 
   boot_data_dir <- file.path(boot_dir, "data")
   boot_args <- list(
-    boot_run = boot_run,
+    run = boot_run,
+    run_type = "bootstrap",
     all_mod_names = mod_names,
-    boot_mod_path = get_model_path(boot_run),
+    run_mod_path = get_model_path(boot_run),
     orig_mod_path = get_model_path(mod),
     orig_mod_id = get_model_id(mod),
     orig_mod_bbi_args = mod$bbi_args,
@@ -125,8 +126,8 @@ make_fake_boot <- function(mod, n = 100, strat_cols = c("SEX", "ETN")){
     strat_cols = strat_cols,
     seed = 1234,
     n_samples = n,
-    boot_dir = boot_dir,
-    boot_data_dir = boot_data_dir,
+    run_dir = boot_dir,
+    data_dir = boot_data_dir,
     overwrite = TRUE
   )
 
@@ -138,7 +139,7 @@ make_fake_boot <- function(mod, n = 100, strat_cols = c("SEX", "ETN")){
 
   # Adjust estimates to look like real bootstrap
   #  - jitter and then make normal distribution
-  boot_sum$boot_summary <- boot_sum$boot_summary %>% dplyr::mutate(
+  boot_sum$analysis_summary <- boot_sum$analysis_summary %>% dplyr::mutate(
     dplyr::across(starts_with(c("THETA", "OMEGA")), ~ jitter(.x, factor = 10))
   ) %>% dplyr::mutate(
     dplyr::across(starts_with(c("THETA", "OMEGA")), ~ rnorm(n = n, mean = mean(.x), sd = sd(.x)))
