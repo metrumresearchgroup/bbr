@@ -667,7 +667,7 @@ get_analysis_models <- function(.run){
   if(is.null(mods) || rlang::is_empty(mods)){
     rlang::abort(
       c(
-        glue("At least one {run_type} model does not exist in `{run_dir}`")
+        glue("At least one {run_type} run model does not exist in `{run_dir}`")
       )
     )
   }else{
