@@ -149,7 +149,7 @@ make_fake_boot <- function(mod, n = 100, strat_cols = c("SEX", "ETN")){
   boot_sum$boot_compare <- param_estimates_compare(boot_sum)
 
   # Save out
-  boot_sum_path <- get_analysis_sum_path(boot_run, .check_exists = FALSE)
+  boot_sum_path <- bbr:::get_analysis_sum_path(boot_run, .check_exists = FALSE)
   saveRDS(boot_sum, boot_sum_path)
   return(boot_run)
 }
