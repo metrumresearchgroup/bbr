@@ -47,20 +47,29 @@ reference:
   - apply_indices
   - block
 
-- title: Bootstrap and Simulation
+- title: Bootstrap and SSE
+  contents:
+  - new_bootstrap_run
+  - new_sse_run
+  - setup_bootstrap_run
+  - setup_sse_run
+  - summarize_bootstrap_run
+  - summarize_sse_run
+  - bootstrap_estimates
+  - sse_estimates
+  - get_boot_models
+  - get_sse_models
+  - cleanup_bootstrap_run
+  - cleanup_sse_run
+  - param_estimates_batch
+  - param_estimates_compare
+
+- title: Simulation
   contents:
   - add_simulation
   - has_simulation
   - get_simulation
   - nm_join_sim
-  - new_bootstrap_run
-  - setup_bootstrap_run
-  - summarize_bootstrap_run
-  - bootstrap_estimates
-  - get_boot_models
-  - cleanup_bootstrap_run
-  - param_estimates_batch
-  - param_estimates_compare
 
 - title: Summary log tables
   contents:
