@@ -826,6 +826,7 @@ format_model_type <- function(model_type, fmt_html = FALSE, ...){
   mod_type_fmt <- dplyr::case_when(
     model_type == "nonmem" ~ "NONMEM Model",
     model_type == "nmboot" ~ "Bootstrap Run",
+    model_type == "nmsse" ~ "SSE Run",
     model_type == "nmsim" ~ "Simulation",
     TRUE ~ paste(toupper(model_type), "Model")
   )
@@ -836,6 +837,8 @@ format_model_type <- function(model_type, fmt_html = FALSE, ...){
       model_type == "nonmem" ~
         style_html(mod_type_fmt, color = "#119a9c", bold_css, ...),
       model_type == "nmboot" ~
+        style_html(mod_type_fmt, color = "#c49f02", bold_css, ...),
+      model_type == "nmsse" ~
         style_html(mod_type_fmt, color = "#c49f02", bold_css, ...),
       model_type == "nmsim" ~
         style_html(mod_type_fmt, color = "#ad7fa8", bold_css, ...),
