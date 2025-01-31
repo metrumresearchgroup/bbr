@@ -183,27 +183,40 @@ config_log_make_entry.bbi_nonmem_model <- function(.mod, config, fields = NULL) 
 #' @rdname config_log_make_entry
 #' @export
 config_log_make_entry.bbi_nmboot_model <- function(.mod, config, fields = NULL) {
+  config_log_make_entry_analysis(.mod, config, fields)
+}
+
+#' @rdname config_log_make_entry
+#' @export
+config_log_make_entry.bbi_nmsse_model <- function(.mod, config, fields = NULL) {
+  config_log_make_entry_analysis(.mod, config, fields)
+}
+
+#' Prepare a model-specific config log entry for an analysis (bootstrap or SSE)
+#' @inheritParams config_log_make_entry
+#' @noRd
+config_log_make_entry_analysis <- function(.mod, config, fields = NULL) {
   # Make data names consistent with other models in config_log (path and md5)
-  boot_config <- config$analysis_spec
-  boot_config[[CONFIG_DATA_PATH]] <- boot_config[["based_on_data_path"]]
-  boot_config[["data_md5"]] <- boot_config[["based_on_data_md5"]]
+  analysis_config <- config$analysis_spec
+  analysis_config[[CONFIG_DATA_PATH]] <- analysis_config[["based_on_data_path"]]
+  analysis_config[["data_md5"]] <- analysis_config[["based_on_data_md5"]]
   # bbi and nonmem versions will be NULL until the run has been summarized
   # - replace with NA to keep the same column order
-  boot_config[["bbi_version"]] <- boot_config[["bbi_version"]] %||% NA_character_
+  analysis_config[["bbi_version"]] <- analysis_config[["bbi_version"]] %||% NA_character_
   fields <- fields %||% CONFIG_KEEPERS
 
-  if (!all(fields %in% names(boot_config))) {
+  if (!all(fields %in% names(analysis_config))) {
     path <- get_config_path(.mod, .check_exists = FALSE)
     msg <- paste(
       glue(
         "{path} is missing the required keys:",
-        "`{paste(fields[!(fields %in% names(boot_config))], collapse = ', ')}`",
+        "`{paste(fields[!(fields %in% names(analysis_config))], collapse = ', ')}`",
         "and will be skipped.",
         .sep = " "
       ),
       glue(
         "This is likely because it was run with an old version of bbi.",
-        "Model was run on version {boot_config[['bbi_version']]}",
+        "Model was run on version {analysis_config[['bbi_version']]}",
         .sep = " "
       ),
       glue(
@@ -218,9 +231,9 @@ config_log_make_entry.bbi_nmboot_model <- function(.mod, config, fields = NULL) 
     warning(msg)
     return(NULL)
   }
-  boot_config[["nm_version"]] <- resolve_nonmem_version(boot_config) %||% NA_character_
+  analysis_config[["nm_version"]] <- resolve_nonmem_version(analysis_config) %||% NA_character_
 
-  return(list(config = boot_config, fields = c(fields, "nm_version")))
+  return(list(config = analysis_config, fields = c(fields, "nm_version")))
 }
 
 #' Parse a bbi config file
