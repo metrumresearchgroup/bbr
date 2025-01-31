@@ -95,7 +95,7 @@ create_tree_models <- function(MODEL_DIR){
   copy_output_dir(mod1, mod6)
   
   # Fake Bootstrap run
-  boot_run <- make_fake_boot(mod6, n = 10)
+  boot_run <- make_fake_analysis(mod6, run_type = "bootstrap", n = 10)
   
   # Fake simulation (creates a new model)
   mod_sim <- make_fake_sim(mod3, n = 10, mod_id = "8")

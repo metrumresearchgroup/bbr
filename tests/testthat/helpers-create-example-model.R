@@ -80,26 +80,35 @@ add_msf_opt <- function(mod, msf_path = paste0(get_model_id(mod), ".MSF")){
 # This function makes a fake bootstrap run that appears to have been run
 # MOD1 results are copied `n` times, and the summary results are jittered
 # to reflect an actual bootstrap run
-make_fake_boot <- function(mod, n = 100, strat_cols = c("SEX", "ETN")){
-  boot_run <- new_bootstrap_run(mod, .overwrite = TRUE)
-  boot_dir <- boot_run$absolute_model_path
-  fs::dir_create(boot_dir)
+make_fake_analysis <- function(
+    mod,
+    run_type = c("bootstrap", "sse"),
+    n = 100,
+    strat_cols = c("SEX", "ETN")
+    ){
+  run_type <- match.arg(run_type)
+  analysis_fn <- if(run_type == "bootstrap") new_bootstrap_run else new_sse_run
+  analysis_sum_fn <- if(run_type == "bootstrap") summarize_bootstrap_run else summarize_sse_run
 
-  model_dir <- dirname(boot_dir)
-  boot_dir_rel <- fs::path_rel(boot_dir, model_dir)
+  .run <- analysis_fn(mod, .overwrite = TRUE)
+  run_dir <- .run$absolute_model_path
+  fs::dir_create(run_dir)
+
+  model_dir <- dirname(run_dir)
+  run_dir_rel <- fs::path_rel(run_dir, model_dir)
 
   # Need to explicitly point to internal function for vignette building
   mod_names <- purrr::map_chr(seq(n), max_char = nchar(n), bbr:::pad_left)
 
-  boot_mods <- purrr::map(mod_names, function(id.i){
-    output_dir.i <- file.path(boot_dir_rel, id.i)
+  analysis_mods <- purrr::map(mod_names, function(id.i){
+    output_dir.i <- file.path(run_dir_rel, id.i)
     new_mod <- copy_model_from(
       .parent_mod = mod,
       .new_model = output_dir.i,
-      .add_tags = "BOOTSTRAP_RUN",
+      .add_tags = paste0(toupper(run_type), "_RUN"),
       .overwrite = TRUE
     )
-    new_dir_path <- file.path(boot_dir, id.i)
+    new_dir_path <- file.path(run_dir, id.i)
     fs::dir_copy(mod$absolute_model_path, new_dir_path)
     # replace file names with new model ID (needed for summary call)
     orig_mod_id <- get_model_id(mod)
@@ -113,12 +122,12 @@ make_fake_boot <- function(mod, n = 100, strat_cols = c("SEX", "ETN")){
     new_mod
   })
 
-  boot_data_dir <- file.path(boot_dir, "data")
-  boot_args <- list(
-    run = boot_run,
-    run_type = "bootstrap",
+  data_dir <- file.path(run_dir, "data")
+  metadata <- list(
+    run = .run,
+    run_type = run_type,
     all_mod_names = mod_names,
-    run_mod_path = get_model_path(boot_run),
+    run_mod_path = get_model_path(.run),
     orig_mod_path = get_model_path(mod),
     orig_mod_id = get_model_id(mod),
     orig_mod_bbi_args = mod$bbi_args,
@@ -126,36 +135,41 @@ make_fake_boot <- function(mod, n = 100, strat_cols = c("SEX", "ETN")){
     strat_cols = strat_cols,
     seed = 1234,
     n_samples = n,
-    run_dir = boot_dir,
-    data_dir = boot_data_dir,
+    run_dir = run_dir,
+    data_dir = data_dir,
     overwrite = TRUE
   )
 
+  if(run_type == "sse") metadata$sample_size <- 30
+
   # Need to explicitly point to internal function for vignette building
-  bbr:::make_analysis_spec(boot_mods, boot_args)
+  bbr:::make_analysis_spec(analysis_mods, metadata)
 
-  # Read in summary to adjust estimates to look like real bootstrap
-  boot_sum <- summarize_bootstrap_run(boot_run)
+  # Read in summary to adjust estimates to look like real bootstrap/SSE
+  analysis_sum <- analysis_sum_fn(.run)
 
-  # Adjust estimates to look like real bootstrap
+  # Adjust estimates to look like real bootstrap/SSE
   #  - jitter and then make normal distribution
-  boot_sum$analysis_summary <- boot_sum$analysis_summary %>% dplyr::mutate(
+  analysis_sum$analysis_summary <- analysis_sum$analysis_summary %>% dplyr::mutate(
     dplyr::across(starts_with(c("THETA", "OMEGA")), ~ jitter(.x, factor = 10))
   ) %>% dplyr::mutate(
     dplyr::across(starts_with(c("THETA", "OMEGA")), ~ rnorm(n = n, mean = mean(.x), sd = sd(.x)))
   )
 
-  # Adjust comparison table
-  boot_sum$boot_compare <- param_estimates_compare(boot_sum)
+  # Adjust comparison table for bootstrap
+  if(run_type == "bootstrap"){
+    analysis_sum$boot_compare <- param_estimates_compare(analysis_sum)
+  }
+
 
   # Save out
-  boot_sum_path <- bbr:::get_analysis_sum_path(boot_run, .check_exists = FALSE)
-  saveRDS(boot_sum, boot_sum_path)
-  return(boot_run)
+  sum_path <- bbr:::get_analysis_sum_path(.run, .check_exists = FALSE)
+  saveRDS(analysis_sum, sum_path)
+  return(.run)
 }
 
 # This function creates a new model, and attaches a simulation to it
-# Unlike make_fake_boot however, the simulation will have a status of "Not Run"
+# Unlike make_fake_analysis however, the simulation will have a status of "Not Run"
 make_fake_sim <- function(mod, mod_id = "mod-sim", n = 100){
   mod_sim <- copy_model_from(mod, mod_id) %>% update_model_id()
   model_dir <- bbr:::get_model_working_directory(mod)
