@@ -411,7 +411,7 @@ print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
 
   # check heuristics
   .h <- x[[SUMMARY_HEURISTICS]]
-  heuristics_cols <- names(.h)[!grepl(ABS_MOD_PATH, names(.h))]
+  heuristics_cols <- names(.h)[!grepl(paste0(ABS_MOD_PATH, "|", RUN_ID_COL), names(.h))]
   heuristics <- purrr::map_dfr(heuristics_cols, function(col){
     tibble(heuristic = col, any_found = any(.h[[col]]), n_found = sum(.h[[col]]))
   })
@@ -511,7 +511,7 @@ print.bbi_nmsse_summary <- function(x, .digits = 3, .nrow = 10, ...) {
 
   # check heuristics
   .h <- x[[SUMMARY_HEURISTICS]]
-  heuristics_cols <- names(.h)[!grepl(ABS_MOD_PATH, names(.h))]
+  heuristics_cols <- names(.h)[!grepl(paste0(ABS_MOD_PATH, "|", RUN_ID_COL), names(.h))]
   heuristics <- purrr::map_dfr(heuristics_cols, function(col){
     tibble(heuristic = col, any_found = any(.h[[col]]), n_found = sum(.h[[col]]))
   })
