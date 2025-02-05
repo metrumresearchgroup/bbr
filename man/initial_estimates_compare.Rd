@@ -11,6 +11,18 @@ initial_estimates_compare(
   na.rm = FALSE
 )
 }
+\arguments{
+\item{.sse_sum}{A \code{bbi_nmsse_summary} object.}
+
+\item{.orig_mod}{\code{bbi_model} object to compare \code{.sse_sum} against. This will
+be automatically set if passing in a \code{bbi_nmsse_summary} object.}
+
+\item{probs}{Numeric vector with values between 0 and 1 to be passed through to
+\code{\link[stats:quantile]{stats::quantile()}}. Represents the quantiles to calculate for parameter
+estimates in \code{.boot_sum}.}
+
+\item{na.rm}{Logical scalar, passed through to \code{\link[stats:quantile]{stats::quantile()}}.}
+}
 \description{
 Compare SSE results to initial (or "true") estimates.
 }

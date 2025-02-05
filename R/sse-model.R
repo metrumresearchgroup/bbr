@@ -196,8 +196,16 @@ setup_sse_run <- function(
 #' \dontrun{
 #'
 #' .sse_run <- read_model(file.path(MODEL_DIR, "1-sse"))
-#' boot_sum <- summarize_sse_run(.sse_run)
 #'
+#' # Create full summary object and save results
+#' sse_sum <- summarize_sse_run(.sse_run)
+#'
+#' # Read in just the parameter estimates
+#' sse_estimates(.sse_run)
+#'
+#'
+#' # Optionally compare to initial estimates of "based on" model
+#' initial_estimates_compare(sse_sum)
 #'
 #' }
 #'
@@ -323,6 +331,11 @@ cleanup_sse_run <- function(.sse_run, .force = FALSE){
 
 
 #' Compare SSE results to initial (or "true") estimates.
+#'
+#' @param .sse_sum A `bbi_nmsse_summary` object.
+#' @inheritParams param_estimates_compare
+#' @param .orig_mod `bbi_model` object to compare `.sse_sum` against. This will
+#'   be automatically set if passing in a `bbi_nmsse_summary` object.
 #' @export
 initial_estimates_compare <- function(
     .sse_sum,

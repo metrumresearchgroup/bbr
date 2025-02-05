@@ -66,8 +66,16 @@ submission in an SSE run
 \dontrun{
 
 .sse_run <- read_model(file.path(MODEL_DIR, "1-sse"))
-boot_sum <- summarize_sse_run(.sse_run)
 
+# Create full summary object and save results
+sse_sum <- summarize_sse_run(.sse_run)
+
+# Read in just the parameter estimates
+sse_estimates(.sse_run)
+
+
+# Optionally compare to initial estimates of "based on" model
+initial_estimates_compare(sse_sum)
 
 }
 
