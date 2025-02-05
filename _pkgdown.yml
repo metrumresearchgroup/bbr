@@ -63,6 +63,7 @@ reference:
   - cleanup_sse_run
   - param_estimates_batch
   - param_estimates_compare
+  - initial_estimates_compare
 
 - title: Simulation
   contents:
