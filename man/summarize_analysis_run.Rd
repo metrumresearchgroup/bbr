@@ -4,10 +4,14 @@
 \alias{summarize_analysis_run}
 \title{Summarize an analysis (bootstrap or SSE) run}
 \usage{
-summarize_analysis_run(.run)
+summarize_analysis_run(.run, .bbi_args = NULL)
 }
 \arguments{
 \item{.run}{A \code{bbi_nmboot_model} or \code{bbi_nmsse_model} object.}
+
+\item{.bbi_args}{Named list passed to \code{summary_log(run_dir, .bbi_args)},
+where \code{run_dir} is the model directory containing the analysis models. See
+\code{\link[=print_bbi_args]{print_bbi_args()}} for valid options.}
 }
 \description{
 Summarize an analysis (bootstrap or SSE) run

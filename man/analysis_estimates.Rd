@@ -4,17 +4,19 @@
 \alias{analysis_estimates}
 \title{Tabulate parameter estimates for each model submission in an analysis run}
 \usage{
-analysis_estimates(.run, format_long = FALSE, force_resummarize = FALSE)
+analysis_estimates(.run, force_resummarize = FALSE, .bbi_args = NULL)
 }
 \arguments{
 \item{.run}{A \code{bbi_nmboot_model} or \code{bbi_nmsse_model} object.}
 
-\item{format_long}{Logical (T/F). If \code{TRUE}, format data as a long table,
-making the data more portable for plotting.}
+\item{force_resummarize}{Logical (T/F). If \code{TRUE}, force re-summarization.}
 
-\item{force_resummarize}{Logical (T/F). If \code{TRUE}, force re-summarization.
-Will \emph{only} update the saved out \code{RDS} file when specified via
-\code{summarize_bootstrap_run()}. See details for more information.}
+\item{.bbi_args}{Named list passed to \code{model_summary(orig_mod, .bbi_args)},
+where \code{orig_mod} is the model the analysis is based on. See
+\code{\link[=print_bbi_args]{print_bbi_args()}} for valid options. Defaults to \code{list(no_grd_file = TRUE, no_shk_file = TRUE)} because \code{\link[=model_summary]{model_summary()}} is only called internally to
+extract the number of records, so those files are irrelevant. Only used if
+the based on model (the model the analysis is being performed on) has been
+executed.}
 }
 \description{
 Tabulate parameter estimates for each model submission in an analysis run

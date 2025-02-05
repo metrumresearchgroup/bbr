@@ -216,7 +216,29 @@ summarize_sse_run <- function(
   sse_sum_path <- get_analysis_sum_path(.sse_run, .check_exists = FALSE)
 
   if(!fs::file_exists(sse_sum_path) || isTRUE(force_resummarize)){
-    sse_sum <- summarize_analysis_run(.sse_run)
+    sse_sum <- summarize_analysis_run(
+      .sse_run,
+      .bbi_args = list(
+        no_grd_file = TRUE, no_shk_file = TRUE
+      )
+    )
+
+    # Add parameter estimates
+    # - Append standard error
+    #   - Get parameter estimates again from summary log because we need to tabulate
+    #     standard error for SSE runs, which param_estimates_batch doesnt support
+    # - return as long format
+    sum_log <- sse_sum$analysis_summary
+    class(sum_log) <- c(SUM_LOG_CLASS, class(sum_log))
+    param_ests <- get_from_summay_log(sum_log, "parameter_estimates")
+    sse_sum$parameter_estimates <- param_ests
+
+    # Add comparison of sse estimates to initial estimates of based_on model
+    #  - This gets done here instead of the print method, because we dont want
+    #    the printing of the _saved_ model summary object to be tied to the
+    #    existence of the based_on model.
+    sse_compare <- initial_estimates_compare(sse_sum)
+    sse_sum$sse_compare <- sse_compare
 
     saveRDS(sse_sum, sse_sum_path)
   }else{
@@ -250,14 +272,12 @@ summarize_sse_run <- function(
 
 #' @describeIn summarize_sse Tabulate parameter estimates for each model
 #'  submission in an SSE run
-#' @inheritParams analysis_estimates
 #' @export
 sse_estimates <- function(
     .sse_run,
-    format_long = FALSE,
     force_resummarize = FALSE
 ){
-  param_ests <- analysis_estimates(.sse_run, format_long, force_resummarize)
+  param_ests <- analysis_estimates(.sse_run, force_resummarize)
   return(param_ests)
 }
 
@@ -296,4 +316,54 @@ get_sse_models <- function(.sse_run){
 #' @export
 cleanup_sse_run <- function(.sse_run, .force = FALSE){
   cleanup_analysis_run(.sse_run, .force = .force)
+}
+
+
+
+
+
+#' Compare SSE results to initial (or "true") estimates.
+#' @export
+initial_estimates_compare <- function(
+    .sse_sum,
+    .orig_mod = NULL,
+    probs = c(.5, 0.025, 0.975),
+    na.rm = FALSE
+){
+
+  # Attempt to read in based_on model
+  if(is.null(.orig_mod)){
+    orig_mod_path <- fs::path_ext_remove(.sse_sum$based_on_model_path)
+    # make sure based_on model still exists
+    .orig_mod <- tryCatch(
+      read_model(orig_mod_path),
+      error = function(cond) NULL
+    )
+    if(is.null(.orig_mod)){
+      rlang::warn(
+        c(
+          glue("The original model no longer exists at {orig_mod_path}"),
+          "Cannot compare to original model"
+        )
+      )
+    }
+  }
+
+  # Dont pass .compare_cols here, as we can only use columns in parameter_names,
+  # which could only be the default columns.
+  # Dont pass .orig_mod because we want to compare the initial estimates
+  comp_df <- param_estimates_compare.default(
+    .sse_sum$analysis_summary, .orig_mod = NULL, probs = probs, na.rm = na.rm
+  )
+
+  if (!is.null(.orig_mod)) {
+    mod_df <- initial_estimates(.orig_mod)
+
+    comp_df <- mod_df %>%
+      select("parameter_names", "init") %>%
+      rename(initial = "init") %>%
+      left_join(comp_df, by = "parameter_names")
+  }
+
+  return(comp_df)
 }

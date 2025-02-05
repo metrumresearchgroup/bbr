@@ -455,52 +455,63 @@ make_analysis_spec <- function(run_models, metadata){
 }
 
 
-#' Summarize an analysis (bootstrap or SSE) run
-#'
-#' @inheritParams analysis_estimates
-#' @importFrom tidyselect any_of
-#' @keywords internal
-summarize_analysis_run <- function(.run){
+make_analysis_summary <- function(.run, .bbi_args = NULL){
   check_model_object(.run, c(NMBOOT_MOD_CLASS, NMSSE_MOD_CLASS))
-
   # Check that runs can still be summarized (e.g, after cleanup)
   analysis_can_be_summarized(.run)
 
-  # Get parameter estimates
-  param_ests <- analysis_estimates(.run, force_resummarize = TRUE)
+  run_dir <- .run[[ABS_MOD_PATH]]
+
+  # Get parameter estimates in wide format for binding on to summary log
+  param_ests_w <- param_estimates_batch(run_dir)
+
+  sum_log <- summary_log(run_dir, .bbi_args = .bbi_args) %>%
+    dplyr::select(-"error_msg") # only join based on model run
 
   # Tabulate all run details and heuristics
-  run_dir <- .run[[ABS_MOD_PATH]]
-  sum_log <- summary_log(
-    run_dir, .bbi_args = list(
-      no_grd_file = TRUE, no_ext_file = TRUE, no_shk_file = TRUE
-    )
-  ) %>% dplyr::select(-"error_msg") # only join based on model run
-
-  run_details <- purrr::map_dfr(sum_log$bbi_summary, function(sum){
-    as_tibble(
-      c(list2(!!ABS_MOD_PATH := sum[[ABS_MOD_PATH]]), sum[[SUMMARY_DETAILS]])
-    ) %>% tidyr::nest("output_files_used" = "output_files_used")
-  })
-
-  run_heuristics <- purrr::map_dfr(sum_log$bbi_summary, function(sum){
-    as_tibble(
-      c(list2(!!ABS_MOD_PATH := sum[[ABS_MOD_PATH]]), sum[[SUMMARY_HEURISTICS]])
-    )
-  })
+  run_details <- get_from_summay_log(sum_log, SUMMARY_DETAILS)
+  run_heuristics <- get_from_summay_log(sum_log, SUMMARY_HEURISTICS)
 
   # Run details, heuristics, and other information will be displayed elsewhere
   run_cols <- c(
     unique(c(names(run_details), names(run_heuristics))),
     "estimation_method", "problem_text", "needed_fail_flags", "param_count"
   )
-  run_cols <- run_cols[-grepl(ABS_MOD_PATH, run_cols)]
+  run_cols <- run_cols[!grepl(paste0(ABS_MOD_PATH, "|", RUN_ID_COL), run_cols)]
 
+  # Create main summary table
+  # - includes key columns for sorting runs that errored, had heuristics, etc.
+  #   as well as a bbi_summary column
   analysis_sum_df <- dplyr::full_join(
-    param_ests, sum_log %>% dplyr::select(-any_of(run_cols)),
-    by = c(ABS_MOD_PATH, "run")
+    param_ests_w, sum_log %>% dplyr::select(-any_of(run_cols)),
+    by = c(ABS_MOD_PATH, RUN_ID_COL)
   )
 
+  return(
+    list(
+      estimation_method = unique(sum_log$estimation_method),
+      analysis_sum_df = analysis_sum_df,
+      run_details = run_details,
+      run_heuristics = run_heuristics
+    )
+  )
+}
+
+#' Summarize an analysis (bootstrap or SSE) run
+#'
+#' @inheritParams analysis_estimates
+#' @param .bbi_args Named list passed to `summary_log(run_dir, .bbi_args)`,
+#'   where `run_dir` is the model directory containing the analysis models. See
+#'   [print_bbi_args()] for valid options.
+#' @importFrom tidyselect any_of
+#' @keywords internal
+summarize_analysis_run <- function(.run, .bbi_args = NULL){
+
+  # Summarize parameter estimates, run details, and any heuristics
+  analysis_sum <- make_analysis_summary(.run, .bbi_args)
+
+  # Check for error messages across all runs
+  analysis_sum_df <- analysis_sum$analysis_sum_df
   if(any(!is.na(analysis_sum_df$error_msg))){
     err_msgs <- unique(analysis_sum_df$error_msg[!is.na(analysis_sum_df$error_msg)])
     rlang::warn(
@@ -539,9 +550,9 @@ summarize_analysis_run <- function(.run){
   # - Refresh analysis spec
   analysis_spec <- get_analysis_spec(.run)
   analysis_sum <- c(
-    list2(!!ABS_MOD_PATH := run_dir),
+    list2(!!ABS_MOD_PATH := .run[[ABS_MOD_PATH]]),
     list(
-      estimation_method = unique(sum_log$estimation_method),
+      estimation_method = analysis_sum$estimation_method,
       based_on_model_path = analysis_spec$based_on_model_path,
       based_on_data_set = analysis_spec$based_on_data_path,
       strat_cols = analysis_spec$strat_cols,
@@ -549,8 +560,8 @@ summarize_analysis_run <- function(.run){
       sample_with_replacement = analysis_spec$sample_with_replacement,
       seed = analysis_spec$seed,
       n_samples = analysis_spec$n_samples,
-      run_details = run_details,
-      run_heuristics = run_heuristics
+      run_details = analysis_sum$run_details,
+      run_heuristics = analysis_sum$run_heuristics
     ),
     list(
       analysis_summary = analysis_sum_df
@@ -564,53 +575,48 @@ summarize_analysis_run <- function(.run){
 #' Tabulate parameter estimates for each model submission in an analysis run
 #'
 #' @inheritParams setup_analysis_run
-#' @param format_long Logical (T/F). If `TRUE`, format data as a long table,
-#'  making the data more portable for plotting.
 #' @param force_resummarize Logical (T/F). If `TRUE`, force re-summarization.
-#'  Will _only_ update the saved out `RDS` file when specified via
-#'  `summarize_bootstrap_run()`. See details for more information.
 #'
 #' @keywords internal
 analysis_estimates <- function(
     .run,
-    format_long = FALSE,
-    force_resummarize = FALSE
+    force_resummarize = FALSE,
+    .bbi_args = NULL
 ){
   check_model_object(.run, c(NMBOOT_MOD_CLASS, NMSSE_MOD_CLASS))
-
-  run_type <- dplyr::case_when(
-    .run[[YAML_MOD_TYPE]] == "nmboot" ~ "bootstrap",
-    .run[[YAML_MOD_TYPE]] == "nmsse" ~ "SSE"
-  )
+  model_type <- .run[[YAML_MOD_TYPE]]
 
   sum_path <- get_analysis_sum_path(.run, .check_exists = FALSE)
-
   if(!fs::file_exists(sum_path) || isTRUE(force_resummarize)){
     analysis_can_be_summarized(.run)
-    param_ests <- param_estimates_batch(.run[[ABS_MOD_PATH]])
+    if(model_type == "nmboot"){
+      param_ests <- param_estimates_batch(.run[[ABS_MOD_PATH]])
+    }else{
+      sum_log <- make_analysis_summary(.run, .bbi_args)$analysis_sum_df
+      class(sum_log) <- c(SUM_LOG_CLASS, class(sum_log))
+      param_ests <- get_from_summay_log(sum_log, "parameter_estimates")
+    }
   }else{
+    run_type <- dplyr::case_when(
+      model_type == "nmboot" ~ "bootstrap",
+      model_type == "nmsse" ~ "SSE"
+    )
+
     verbose_msg(
       glue("Reading in {run_type} summary: {fs::path_rel(sum_path, getwd())}\n\n")
     )
     analysis_sum <- readRDS(sum_path)
-    param_ests <- analysis_sum$analysis_summary
-  }
+    if(model_type == "nmboot"){
+      param_ests <- analysis_sum$analysis_summary
+    }else{
+      param_ests <- analysis_sum$parameter_estimates
+    }
 
-  if(isTRUE(format_long)){
-    # Long format - only keep estimates and error/termination columns for filtering
-    param_ests <- param_ests %>% dplyr::select(
-      all_of(ABS_MOD_PATH), "run", "error_msg", "termination_code",
-      starts_with(c("THETA", "SIGMA", "OMEGA"))
-    ) %>% tidyr::pivot_longer(
-      starts_with(c("THETA", "SIGMA", "OMEGA")),
-      names_to = "parameter_names", values_to = "estimate"
-    ) %>% dplyr::relocate(
-      c("error_msg", "termination_code"), .after = dplyr::everything()
-    )
   }
 
   return(param_ests)
 }
+
 
 
 #' Read in all analysis run model objects

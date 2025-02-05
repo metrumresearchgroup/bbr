@@ -9,7 +9,7 @@
 \usage{
 summarize_sse_run(.sse_run, force_resummarize = FALSE)
 
-sse_estimates(.sse_run, format_long = FALSE, force_resummarize = FALSE)
+sse_estimates(.sse_run, force_resummarize = FALSE)
 
 get_sse_models(.sse_run)
 }
@@ -19,9 +19,6 @@ get_sse_models(.sse_run)
 \item{force_resummarize}{Logical (T/F). If \code{TRUE}, force re-summarization.
 Will \emph{only} update the saved out \code{RDS} file when specified via
 \code{summarize_sse_run()}. See details for more information.}
-
-\item{format_long}{Logical (T/F). If \code{TRUE}, format data as a long table,
-making the data more portable for plotting.}
 }
 \description{
 Summarize the parameter estimates, run details, and any heuristics of a

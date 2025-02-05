@@ -192,14 +192,19 @@ summarize_bootstrap_run <- function(
   boot_sum_path <- get_analysis_sum_path(.boot_run, .check_exists = FALSE)
 
   if(!fs::file_exists(boot_sum_path) || isTRUE(force_resummarize)){
-    boot_sum <- summarize_analysis_run(.boot_run)
+    boot_sum <- summarize_analysis_run(
+      .boot_run,
+      .bbi_args = list(
+        no_grd_file = TRUE, no_ext_file = TRUE, no_shk_file = TRUE
+      )
+    )
 
-    # Assign class early for param_estimate_compare method
+    # Add comparison of bootstrap estimates to final estimates of based_on model
+    #  - This gets done here instead of the print method, because we dont want
+    #    the printing of the _saved_ model summary object to be tied to the
+    #    existence of the based_on model.
+    #  - Assign class early for param_estimate_compare method
     class(boot_sum) <- c(NMBOOT_SUM_CLASS, class(boot_sum))
-
-    # This gets done here instead of the print method, because we dont want
-    # the printing of the _saved_ model summary object to be tied to the existence
-    # of the based_on model.
     boot_compare <- param_estimates_compare(boot_sum)
     boot_sum$boot_compare <- boot_compare
 
@@ -233,14 +238,28 @@ summarize_bootstrap_run <- function(
 
 #' @describeIn summarize_bootstrap Tabulate parameter estimates for each model
 #'  submission in a bootstrap run
-#' @inheritParams analysis_estimates
+#' @param format_long Logical (T/F). If `TRUE`, format data as a long table,
+#'  making the data more portable for plotting.
 #' @export
 bootstrap_estimates <- function(
     .boot_run,
     format_long = FALSE,
     force_resummarize = FALSE
 ){
-  param_ests <- analysis_estimates(.boot_run, format_long, force_resummarize)
+  param_ests <- analysis_estimates(.boot_run, force_resummarize)
+
+  if(isTRUE(format_long)){
+    # Long format - only keep estimates and error/termination columns for filtering
+    param_ests <- param_ests %>% dplyr::select(
+      all_of(ABS_MOD_PATH), "run", "error_msg", "termination_code",
+      starts_with(c("THETA", "SIGMA", "OMEGA"))
+    ) %>% tidyr::pivot_longer(
+      starts_with(c("THETA", "SIGMA", "OMEGA")),
+      names_to = "parameter_names", values_to = "estimate"
+    ) %>% dplyr::relocate(
+      c("error_msg", "termination_code"), .after = dplyr::everything()
+    )
+  }
   return(param_ests)
 }
 

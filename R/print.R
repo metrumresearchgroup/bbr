@@ -533,6 +533,33 @@ print.bbi_nmsse_summary <- function(x, .digits = 3, .nrow = 10, ...) {
     return(invisible(NULL))
   }
 
+  # Build parameter comparison table if it exists
+  # To avoid printing issues before the comparison is added to the summary object
+  # see summarize_bootstrap_run() for details.
+  if(!is.null(x$sse_compare)){
+    param_df <- x$sse_compare %>% mutate_if(is.numeric, sig, .digits = .digits)
+
+    if (!is.null(.nrow)) {
+      checkmate::assert_number(.nrow)
+      orig_rows <- nrow(param_df)
+      .nrow <- min(.nrow, nrow(param_df))
+      param_df <- param_df[1:.nrow, ]
+    }
+
+    if (requireNamespace("knitr", quietly = TRUE)) {
+      param_str <- param_df %>%
+        knitr::kable() %>%
+        as.character()
+    } else {
+      param_str <- param_df %>%
+        print() %>%
+        capture.output()
+    }
+
+    cat_line(param_str)
+    if (!is.null(.nrow)) cat_line(glue("... {orig_rows - .nrow} more rows"), col = "grey")
+  }
+
 }
 
 #' @describeIn print_bbi Prints the `NM-TRAN` evaluation of a `bbi_nonmem_model`
