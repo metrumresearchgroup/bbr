@@ -47,10 +47,22 @@ bbi_nonmem_model_status.bbi_model <- function(.mod) {
 #' @rdname bbi_nonmem_model_status
 #' @keywords internal
 bbi_nonmem_model_status.bbi_nmboot_model <- function(.mod) {
+  bbi_nonmem_analysis_status(.mod)
+}
+
+#' @rdname bbi_nonmem_model_status
+#' @keywords internal
+bbi_nonmem_model_status.bbi_nmsse_model <- function(.mod){
+  bbi_nonmem_analysis_status(.mod)
+}
+
+#' @param .run A `bbi_nmboot_model` or `bbi_nmsse_model` model object
+#' @noRd
+bbi_nonmem_analysis_status <- function(.run){
   status <- "Not Run"
-  output_dir <- get_output_dir(.mod, .check_exists = FALSE)
+  output_dir <- get_output_dir(.run, .check_exists = FALSE)
   if (dir.exists(output_dir)) {
-    cleaned_up <- bootstrap_is_cleaned_up(.mod)
+    cleaned_up <- analysis_is_cleaned_up(.run)
     if (isTRUE(cleaned_up)) {
       status <- "Finished Running"
     } else {
@@ -58,18 +70,19 @@ bbi_nonmem_model_status.bbi_nmboot_model <- function(.mod) {
       #  - Iterates through all models and sets the status based on whether all
       #    models have finished. This may increase the time required to print an
       #    nmboot model object to the console until the run has been cleaned up.
-      spec_path <- get_spec_path(.mod, .check_exists = FALSE)
+      spec_path <- get_spec_path(.run, .check_exists = FALSE)
       if (!fs::file_exists(spec_path)) {
         status <- "Not Run"
       }else{
-        boot_spec <- get_boot_spec(.mod)
-        for(output_dir.i in boot_spec$bootstrap_runs$mod_path_abs){
+        analysis_spec <- get_analysis_spec(.run)
+        spec_names <- analysis_spec_names(.run)
+        for(output_dir.i in analysis_spec[[spec_names[["runs"]]]]$mod_path_abs){
           if (dir.exists(output_dir.i)) {
             # Exit early as incomplete if any model cannot be read in for any reason
-            boot_m <- tryCatch({read_model(output_dir.i)}, error = function(e) NULL)
-            if(is.null(boot_m)) return("Incomplete Run")
+            .mod <- tryCatch({read_model(output_dir.i)}, error = function(e) NULL)
+            if(is.null(.mod)) return("Incomplete Run")
             # Otherwise check for presence of config file
-            json_file <- get_config_path(boot_m, .check_exists = FALSE)
+            json_file <- get_config_path(.mod, .check_exists = FALSE)
             if(fs::file_exists(json_file)) {
               # Set to incomplete if one config file exists. Update at the end
               # if they all exist
@@ -90,10 +103,11 @@ bbi_nonmem_model_status.bbi_nmboot_model <- function(.mod) {
   return(status)
 }
 
+
 # Register private S3 methods for development purposes
 .S3method("bbi_nonmem_model_status", "bbi_model", bbi_nonmem_model_status.bbi_model)
 .S3method("bbi_nonmem_model_status", "bbi_nmboot_model", bbi_nonmem_model_status.bbi_nmboot_model)
-
+.S3method("bbi_nonmem_model_status", "bbi_nmsse_model", bbi_nonmem_model_status.bbi_nmsse_model)
 
 #' @describeIn bbi_nonmem_model_status Check if model run has finished (coerces
 #' the one of the three statuses to a logical value)
@@ -113,21 +127,26 @@ model_is_finished <- function(.mod){
 
 
 #' Check if bootstrap run has been cleaned up
-#' @param .boot_run Either a `bbi_nmboot_model` or `bbi_nmboot_summary` object
+#' @param .run An analysis run (`bbi_nmboot_model`, `bbi_nmsse_model`) or
+#'  analysis run summary (`bbi_nmboot_summary`, `bbi_nmsse_summary`) object
 #' @noRd
-bootstrap_is_cleaned_up <- function(.boot_run){
-  check_model_object(.boot_run, c(NMBOOT_MOD_CLASS, NMBOOT_SUM_CLASS))
-  if(inherits(.boot_run, NMBOOT_SUM_CLASS)){
-    .boot_run <- read_model(.boot_run[[ABS_MOD_PATH]])
+analysis_is_cleaned_up <- function(.run){
+  check_model_object(
+    .run, c(NMBOOT_MOD_CLASS, NMSSE_MOD_CLASS, NMBOOT_SUM_CLASS, NMSSE_SUM_CLASS)
+  )
+
+  if(inherits(.run, c(NMBOOT_SUM_CLASS, NMSSE_SUM_CLASS))){
+    .run <- read_model(.run[[ABS_MOD_PATH]])
   }
 
-  output_dir <- get_output_dir(.boot_run, .check_exists = FALSE)
+  output_dir <- get_output_dir(.run, .check_exists = FALSE)
   if(!fs::file_exists(output_dir)) return(FALSE)
-  spec_path <- get_spec_path(.boot_run, .check_exists = FALSE)
+  spec_path <- get_spec_path(.run, .check_exists = FALSE)
   if(!fs::file_exists(spec_path)) return(FALSE)
 
-  boot_spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
-  cleaned_up <- boot_spec$bootstrap_spec$cleaned_up
+  spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
+  spec_names <- analysis_spec_names(.run)
+  cleaned_up <- spec[[spec_names[["spec"]]]]$cleaned_up
   if(!is.null(cleaned_up) && isTRUE(cleaned_up)){
     return(TRUE)
   }else{
@@ -228,7 +247,9 @@ check_nonmem_finished.bbi_base_model <- function(.mod, ...) {
 
 #' @export
 check_nonmem_finished.list <- function(.mod, ...) {
-  check_model_object_list(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMSIM_MOD_CLASS))
+  check_model_object_list(
+    .mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMSSE_MOD_CLASS, NMSIM_MOD_CLASS)
+  )
   # Return logical values as vector (unique handling)
   #  - used in `wait_for_nonmem`
   models_finished <- map_lgl(.mod, ~model_is_finished(.x))
@@ -358,23 +379,29 @@ wait_for_nonmem.default <- function(.mod, .time_limit = 300, .interval = 5, .del
 #' `wait_for_nonmem`
 #'
 #' Coerce model object to a list of models (if not one already) for use in
-#' `get_model_status` and `wait_for_nonmem`. For `bbi_nmboot_model` objects, the
-#' list of individual models corresponding to that run will be returned.
+#' `get_model_status` and `wait_for_nonmem`. For `bbi_nmboot_model` and
+#' `bbi_nmsse_model` objects, the list of individual models corresponding to
+#' that run will be returned.
 #' @inheritParams check_nonmem_finished
-#' @details
-#' `.mod` is a list of models regardless of input after this section
-#'  - Support a single bbi_nonmem_model, a single bbi_nmboot_model, or a list
-#'    of bbi_base_models (bbi_nonmem_model or bbi_nmboot_model)
+#' @details `.mod` is a list of models regardless of input after this section
+#'  - Support a single bbi_base_model (bbi_nonmem_model, bbi_nmboot_model,
+#'    bbi_nmsse_model), or a list of bbi_base_models
 #' @keywords internal
 mod_list_setup <- function(.mod){
   if(inherits(.mod, "list") && !inherits(.mod, "bbi_base_model")){
-    check_model_object_list(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMSIM_MOD_CLASS))
+    check_model_object_list(
+      .mod,
+      .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMSSE_MOD_CLASS, NMSIM_MOD_CLASS)
+    )
   }else{
-    check_model_object(.mod, .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMSIM_MOD_CLASS))
-    if(inherits(.mod, NMBOOT_MOD_CLASS)){
-      # Coerce to list of models for bootstrap model runs to check individually
-      #  - This only happens if checking a single bootstrap run model object
-      .mod <- get_boot_models(.mod)
+    check_model_object(
+      .mod,
+      .mod_types = c(NM_MOD_CLASS, NMBOOT_MOD_CLASS, NMSSE_MOD_CLASS, NMSIM_MOD_CLASS)
+    )
+    if(inherits(.mod, c(NMBOOT_MOD_CLASS, NMSSE_MOD_CLASS))){
+      # Coerce to list of models for analysis runs (bootstrap/SSE) to check individually
+      #  - This only happens if checking a single analysis run model object
+      .mod <- get_analysis_models(.mod)
     }else{
       .mod <- list(.mod)
     }

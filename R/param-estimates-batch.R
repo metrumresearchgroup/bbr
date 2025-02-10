@@ -205,7 +205,7 @@ param_estimates_compare.bbi_nmboot_summary <- function(
   # Dont pass .compare_cols here, as we can only use columns in parameter_names,
   # which could only be the default columns.
   param_estimates_compare(
-    .boot_sum$boot_summary, .orig_mod = .orig_mod, probs = probs, na.rm = na.rm
+    .boot_sum$analysis_summary, .orig_mod = .orig_mod, probs = probs, na.rm = na.rm
   )
 }
 

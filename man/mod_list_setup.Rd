@@ -13,14 +13,15 @@ packages (e.g., \code{bbr.bayes}) may add additional methods.}
 }
 \description{
 Coerce model object to a list of models (if not one already) for use in
-\code{get_model_status} and \code{wait_for_nonmem}. For \code{bbi_nmboot_model} objects, the
-list of individual models corresponding to that run will be returned.
+\code{get_model_status} and \code{wait_for_nonmem}. For \code{bbi_nmboot_model} and
+\code{bbi_nmsse_model} objects, the list of individual models corresponding to
+that run will be returned.
 }
 \details{
 \code{.mod} is a list of models regardless of input after this section
 \itemize{
-\item Support a single bbi_nonmem_model, a single bbi_nmboot_model, or a list
-of bbi_base_models (bbi_nonmem_model or bbi_nmboot_model)
+\item Support a single bbi_base_model (bbi_nonmem_model, bbi_nmboot_model,
+bbi_nmsse_model), or a list of bbi_base_models
 }
 }
 \keyword{internal}

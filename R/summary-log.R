@@ -266,3 +266,70 @@ do_if_bbi_sum <- function(fn, mode) {
     return(res)
   }
 }
+
+
+
+#' Extract a elements or format parameter estimates from the `bbi_summary` object
+#' in a summary log
+#'
+#' @param .log_df A `bbi_summary_log_df` object.
+#' @param element Element to extract. `"run_details"` and `"run_heuristics"` are
+#'  extracted directly. Passing `"parameter_estimates"` will force a call to
+#'  [bbr::param_estimates()] using the `bbi_summary` object in each row.
+#'
+#' @keywords internal
+get_from_summay_log <- function(
+    .log_df,
+    element = c(SUMMARY_DETAILS, SUMMARY_HEURISTICS, "parameter_estimates")
+){
+  element <- match.arg(element)
+  check_model_object(.log_df, SUM_LOG_CLASS)
+  checkmate::assert_true(SL_SUMMARY %in% names(.log_df))
+
+  if(element != "parameter_estimates"){
+    log_details <- purrr::map_dfr(.log_df[[SL_SUMMARY]], function(sum){
+      as_tibble(
+        c(list2(!!ABS_MOD_PATH := sum[[ABS_MOD_PATH]]), sum[[element]])
+      ) %>%
+        dplyr::mutate(!!RUN_ID_COL := basename(.data[[ABS_MOD_PATH]])) %>%
+        dplyr::select(all_of(c(ABS_MOD_PATH, RUN_ID_COL)), everything())
+    })
+
+    # One line per run
+    if("output_files_used" %in% names(log_details)){
+      log_details <- log_details %>%
+        tidyr::nest("output_files_used" = "output_files_used")
+    }
+
+  }else{
+    # Can only be run if "no_ext_file" was _not_ part of .bbi_args
+    log_details <- purrr::map_dfr(.log_df[[SL_SUMMARY]], function(sum){
+      param_ests <- tryCatch({
+        sum %>% param_estimates()
+      }, error = function(cond){
+        if(stringr::str_detect(cond$message, "must be vectors")){
+          cli::cli_abort(
+            c(
+              "Failed to extract estimates",
+              "i" = paste(
+                "This may be because `.bbi_args = list(no_ext_file = TRUE)`",
+                "was provided, which stops the retrieval of estimates from EXT files"
+              )
+            )
+          )
+        }else{
+          cli::cli_abort(c(cond$message, cond$body))
+        }
+      })
+
+      param_ests %>% dplyr::mutate(
+        !!ABS_MOD_PATH := sum[[ABS_MOD_PATH]],
+        !!RUN_ID_COL := basename(.data[[ABS_MOD_PATH]])
+      ) %>% dplyr::select(
+        all_of(c(ABS_MOD_PATH, RUN_ID_COL)), everything()
+      )
+    })
+  }
+
+  return(log_details)
+}

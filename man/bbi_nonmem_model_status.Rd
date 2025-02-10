@@ -4,6 +4,7 @@
 \alias{bbi_nonmem_model_status}
 \alias{bbi_nonmem_model_status.bbi_model}
 \alias{bbi_nonmem_model_status.bbi_nmboot_model}
+\alias{bbi_nonmem_model_status.bbi_nmsse_model}
 \alias{model_is_finished}
 \title{Return status of a model}
 \usage{
@@ -12,6 +13,8 @@ bbi_nonmem_model_status(.mod)
 \method{bbi_nonmem_model_status}{bbi_model}(.mod)
 
 \method{bbi_nonmem_model_status}{bbi_nmboot_model}(.mod)
+
+\method{bbi_nonmem_model_status}{bbi_nmsse_model}(.mod)
 
 model_is_finished(.mod)
 }

@@ -4,6 +4,7 @@
 \alias{check_up_to_date}
 \alias{check_up_to_date.bbi_base_model}
 \alias{check_up_to_date.bbi_nmboot_model}
+\alias{check_up_to_date.bbi_nmsse_model}
 \alias{check_up_to_date.bbi_nonmem_summary}
 \title{Check model and data up to date with outputs}
 \usage{
@@ -12,6 +13,8 @@ check_up_to_date(.bbi_object, ...)
 \method{check_up_to_date}{bbi_base_model}(.bbi_object, ...)
 
 \method{check_up_to_date}{bbi_nmboot_model}(.bbi_object, ...)
+
+\method{check_up_to_date}{bbi_nmsse_model}(.bbi_object, ...)
 
 \method{check_up_to_date}{bbi_nonmem_summary}(.bbi_object, ...)
 }
