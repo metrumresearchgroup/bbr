@@ -825,9 +825,12 @@ get_analysis_spec <- function(.run){
   analysis_spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
   run_dir <- .run[[ABS_MOD_PATH]]
 
+  spec_names <- analysis_spec_names(.run)
+  overall_spec <- analysis_spec[[spec_names[["spec"]]]]
+
   # Format individual analysis model runs if not cleaned up
-  if(!is.null(analysis_spec$analysis_runs)){
-    analysis_runs <- analysis_spec$analysis_runs
+  if(!is.null(analysis_spec[[spec_names[["runs"]]]])){
+    analysis_runs <- analysis_spec[[spec_names[["runs"]]]]
 
     analysis_mod_files <- data.frame(
       matrix(unlist(analysis_runs), nrow=length(analysis_runs), byrow = TRUE),
@@ -840,12 +843,23 @@ get_analysis_spec <- function(.run){
       mod_path_abs = file.path(run_dir, fs::path_ext_remove(.data$mod_path))
     ) %>% dplyr::relocate("run")
 
-    spec <- c(analysis_spec$analysis_spec, list(analysis_runs = spec_df))
+    spec_runs <- list(spec_df) %>% stats::setNames(spec_names[["runs"]])
+    spec <- c(overall_spec, spec_runs)
   }else{
-    spec <- analysis_spec$analysis_spec
+    spec <- overall_spec
   }
 
   return(spec)
+}
+
+
+analysis_spec_names <- function(.run){
+  run_type <- analysis_run_type(.run)
+
+  c(
+    "spec" = glue("{run_type}_spec"),
+    "runs" = glue("{run_type}_runs")
+  )
 }
 
 

@@ -214,11 +214,7 @@ submit_nonmem_analysis <- function(
   ){
   checkmate::assert_number(.batch_size, null.ok = TRUE, lower = 1)
 
-  mod_type <- .mod[[YAML_MOD_TYPE]]
-  run_type <- dplyr::case_when(
-    mod_type == "nmboot" ~ "bootstrap",
-    mod_type == "nmsse" ~ "SSE"
-  )
+  run_type <- analysis_run_type(.mod, fmt = TRUE)
 
   # Ensure bootstrap setup was done
   spec_path <- get_spec_path(.mod, .check_exists = FALSE)
@@ -243,6 +239,7 @@ submit_nonmem_analysis <- function(
 
   # check overwrite and delete existing output, if requested
   if (!is.null(.bbi_args[["overwrite"]])) {
+    mod_type <- .mod[[YAML_MOD_TYPE]]
     cli::cli_warn(paste(
       "submit_model.bbi_{mod_type}_model does NOT respect setting `overwrite` via .bbi_args or a bbi.yaml config file.",
       "To overwrite an existing {run_type} run, use submit_model(..., .overwrite = TRUE)."

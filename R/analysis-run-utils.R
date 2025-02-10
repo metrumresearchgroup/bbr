@@ -361,10 +361,7 @@ make_analysis_model <- function(mod_path, metadata){
 #' @param .run A `bbi_nmboot_model` or `bbi_nmsse_model` model object
 #' @keywords internal
 analysis_can_be_summarized <- function(.run){
-  run_type <- dplyr::case_when(
-    .run[[YAML_MOD_TYPE]] == "nmboot" ~ "bootstrap",
-    .run[[YAML_MOD_TYPE]] == "nmsse" ~ "SSE"
-  )
+  run_type <- analysis_run_type(.run, fmt = TRUE)
 
   # Check that runs can still be summarized (e.g, after cleanup)
   cleaned_up <- analysis_is_cleaned_up(.run)
@@ -445,7 +442,7 @@ make_analysis_spec <- function(run_models, metadata){
   spec_lst <- c(
     analysis_spec = list(analysis_spec),
     analysis_runs = list(analysis_runs)
-  )
+  ) %>% stats::setNames(analysis_spec_names(metadata$run))
 
   spec_lst_json <- jsonlite::toJSON(
     spec_lst, pretty = TRUE, simplifyVector = TRUE, null = "null"
@@ -539,10 +536,11 @@ summarize_analysis_run <- function(.run, .bbi_args = NULL){
   config_lst <- config_lst[[1]]
 
   # Update spec file with bbi config
+  spec_names <- analysis_spec_names(.run)
   spec_path <- get_spec_path(.run)
   analysis_spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
-  analysis_spec$analysis_spec$bbi_version <- config_lst$bbi_version
-  analysis_spec$analysis_spec$configuration <- config_lst$configuration
+  analysis_spec[[spec_names[["spec"]]]]$bbi_version <- config_lst$bbi_version
+  analysis_spec[[spec_names[["spec"]]]]$configuration <- config_lst$configuration
   spec_lst_json <- jsonlite::toJSON(analysis_spec, pretty = TRUE, simplifyVector = TRUE)
   writeLines(spec_lst_json, spec_path)
 
@@ -597,10 +595,7 @@ analysis_estimates <- function(
       param_ests <- get_from_summay_log(sum_log, "parameter_estimates")
     }
   }else{
-    run_type <- dplyr::case_when(
-      model_type == "nmboot" ~ "bootstrap",
-      model_type == "nmsse" ~ "SSE"
-    )
+    run_type <- analysis_run_type(.run, fmt = TRUE)
 
     verbose_msg(
       glue("Reading in {run_type} summary: {fs::path_rel(sum_path, getwd())}\n\n")
@@ -635,10 +630,7 @@ get_analysis_models <- function(.run){
   run_dir <- .run[[ABS_MOD_PATH]]
   output_dir <- get_output_dir(.run, .check_exists = FALSE)
 
-  run_type <- dplyr::case_when(
-    .run[[YAML_MOD_TYPE]] == "nmboot" ~ "bootstrap",
-    .run[[YAML_MOD_TYPE]] == "nmsse" ~ "SSE"
-  )
+  run_type <- analysis_run_type(.run, fmt = TRUE)
 
   if(!fs::file_exists(output_dir)){
     verbose_msg(
@@ -655,7 +647,8 @@ get_analysis_models <- function(.run){
   }
 
   spec <- get_analysis_spec(.run)
-  model_ids <- fs::path_ext_remove(basename(spec$analysis_runs$mod_path_abs))
+  spec_names <- analysis_spec_names(.run)
+  model_ids <- fs::path_ext_remove(basename(spec[[spec_names[["runs"]]]]$mod_path_abs))
 
   mods <- tryCatch({
     find_models(.run[[ABS_MOD_PATH]], .recurse = FALSE, .include = model_ids)
@@ -711,10 +704,7 @@ get_analysis_models <- function(.run){
 #' @keywords internal
 cleanup_analysis_run <- function(.run, .force = FALSE){
   check_model_object(.run, c(NMBOOT_MOD_CLASS, NMSSE_MOD_CLASS))
-  run_type <- dplyr::case_when(
-    .run[[YAML_MOD_TYPE]] == "nmboot" ~ "bootstrap",
-    .run[[YAML_MOD_TYPE]] == "nmsse" ~ "SSE"
-  )
+  run_type <- analysis_run_type(.run, fmt = TRUE)
 
   run_dir <- .run[[ABS_MOD_PATH]]
   sum_path <- get_analysis_sum_path(.run, .check_exists = FALSE)
@@ -746,11 +736,13 @@ cleanup_analysis_run <- function(.run, .force = FALSE){
   spec_path <- get_spec_path(.run)
   analysis_spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
   # Set cleaned up - impacts status checking
-  analysis_spec$analysis_spec$cleaned_up <- TRUE
+  spec_names <- analysis_spec_names(.run)
+  spec_names[["spec"]]
+  analysis_spec[[spec_names[["spec"]]]]$cleaned_up <- TRUE
   # Delete individual run specs
   # - dont need to store this information anymore since we wont be reading in
   #   individual models anymore
-  analysis_spec$analysis_runs <- NULL
+  analysis_spec[[spec_names[["runs"]]]] <- NULL
   spec_lst_json <- jsonlite::toJSON(analysis_spec, pretty = TRUE, simplifyVector = TRUE)
 
   # Delete individual model files
@@ -810,6 +802,17 @@ check_nm_data_filter <- function(.run, data, .bbi_args = NULL){
       )
     )
   }
+}
+
+
+analysis_run_type <- function(.run, fmt = FALSE){
+  run_type <- dplyr::case_when(
+    .run[[YAML_MOD_TYPE]] == "nmboot" ~ "Bootstrap",
+    .run[[YAML_MOD_TYPE]] == "nmsse" ~ "SSE",
+  )
+
+  if(isFALSE(fmt)) run_type <- tolower(run_type)
+  return(run_type)
 }
 
 

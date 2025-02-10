@@ -186,7 +186,7 @@ withr::with_options(
       expect_true(is.null(boot_spec$cleaned_up))
       expect_true(is.null(boot_spec$seed))
       expect_true(is.null(boot_spec$strat_cols))
-      expect_true(tibble::is_tibble(boot_spec$analysis_runs))
+      expect_true(tibble::is_tibble(boot_spec$bootstrap_runs))
 
       # Check helper functions after setup & before submission
       expect_no_message(boot_models <- get_boot_models(.boot_run))
@@ -481,7 +481,7 @@ withr::with_options(
       # Confirm boot spec alterations
       boot_spec <- get_analysis_spec(.boot_run)
       expect_true(boot_spec$cleaned_up)
-      expect_true(is.null(boot_spec$analysis_runs))
+      expect_true(is.null(boot_spec$bootstrap_runs))
 
       # Cannot be overwritten
       expect_error(

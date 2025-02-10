@@ -168,10 +168,7 @@ check_up_to_date_nonmem <- function(.mod) {
 #' @inheritParams check_up_to_date
 #' @keywords internal
 check_up_to_date_analysis <- function(.bbi_object){
-  run_type <- dplyr::case_when(
-    .bbi_object[[YAML_MOD_TYPE]] == "nmboot" ~ "bootstrap",
-    .bbi_object[[YAML_MOD_TYPE]] == "nmsse" ~ "SSE"
-  )
+  run_type <- analysis_run_type(.bbi_object, fmt = TRUE)
 
   output_dir <- get_output_dir(.bbi_object, .check_exists = FALSE)
   if (!fs::dir_exists(output_dir)) {

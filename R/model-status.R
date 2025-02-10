@@ -75,7 +75,8 @@ bbi_nonmem_analysis_status <- function(.run){
         status <- "Not Run"
       }else{
         analysis_spec <- get_analysis_spec(.run)
-        for(output_dir.i in analysis_spec$analysis_runs$mod_path_abs){
+        spec_names <- analysis_spec_names(.run)
+        for(output_dir.i in analysis_spec[[spec_names[["runs"]]]]$mod_path_abs){
           if (dir.exists(output_dir.i)) {
             # Exit early as incomplete if any model cannot be read in for any reason
             .mod <- tryCatch({read_model(output_dir.i)}, error = function(e) NULL)
@@ -144,7 +145,8 @@ analysis_is_cleaned_up <- function(.run){
   if(!fs::file_exists(spec_path)) return(FALSE)
 
   spec <- jsonlite::read_json(spec_path, simplifyVector = TRUE)
-  cleaned_up <- spec$analysis_spec$cleaned_up
+  spec_names <- analysis_spec_names(.run)
+  cleaned_up <- spec[[spec_names[["spec"]]]]$cleaned_up
   if(!is.null(cleaned_up) && isTRUE(cleaned_up)){
     return(TRUE)
   }else{
