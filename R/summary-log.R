@@ -340,7 +340,8 @@ add_dofv <- function(.log_df) {
   if(!all(is.na(log_df$addl_based_on))){
     log_df <- log_df %>% dplyr::mutate(
       dofv_run_annot = ifelse(
-        !is.na(.data$from), paste(.data$to, "-", .data$from), NA
+        !is.na(.data$from) & !is.na(.data$dofv),
+        paste(.data$to, "-", .data$from), NA
       )
     )
   }
