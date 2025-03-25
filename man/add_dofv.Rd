@@ -16,7 +16,7 @@ and \code{.mod2}. If \code{.mod2 = NULL}, the default, calculate the difference
 between each model in \code{.bbi_object} and the model at \code{get_based_on(.bbi_object)}.}
 }
 \value{
-If \code{.bbi_object} is a \code{tibble}, \code{add_dofv()} adds appends a \code{dofv} column.
+If \code{.bbi_object} is a \code{tibble}, \code{add_dofv()} appends a \code{dofv} column.
 
 If \code{.bbi_object} is a \code{bbi_nonmem_model} object, \code{add_dofv()} returns a numeric value.
 }

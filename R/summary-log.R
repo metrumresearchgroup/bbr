@@ -331,7 +331,7 @@ add_aic_bic <- function(.log_df){
 #'
 #' @seealso [add_summary()]
 #' @return
-#' If `.bbi_object` is a `tibble`, `add_dofv()` adds appends a `dofv` column.
+#' If `.bbi_object` is a `tibble`, `add_dofv()` appends a `dofv` column.
 #'
 #' If `.bbi_object` is a `bbi_nonmem_model` object, `add_dofv()` returns a numeric value.
 #' @export
