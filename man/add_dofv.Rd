@@ -2,16 +2,51 @@
 % Please edit documentation in R/summary-log.R
 \name{add_dofv}
 \alias{add_dofv}
-\title{Calculate the difference in objective function value (ofv) between the
-current and based_on model.}
+\title{Calculate the difference in objective function value}
 \usage{
-add_dofv(.log_df)
+add_dofv(.bbi_object, .mod2 = NULL)
 }
 \arguments{
-\item{.log_df}{The output of \code{\link[=summary_log]{summary_log()}}) or \code{run_log() \%>\% add_summary()}}
+\item{.bbi_object}{The object to compare. Can be a \code{bbi_nonmem_model} object
+or a tibble of class \code{bbi_log_df}.}
+
+\item{.mod2}{If a \code{bbi_nonmem_model} object is passed, calculate the
+difference in objective function value between each model in \code{.bbi_object}
+and \code{.mod2}. If \code{.mod2 = NULL}, the default, calculate the difference
+between each model in \code{.bbi_object} and the model at \code{get_based_on(.bbi_object)}.}
+}
+\value{
+If \code{.bbi_object} is a \code{tibble}, \code{add_dofv()} adds appends a \code{dofv} column.
+
+If \code{.bbi_object} is a \code{bbi_nonmem_model} object, \code{add_dofv()} returns a numeric value.
 }
 \description{
-Calculate the difference in objective function value (ofv) between the
-current and based_on model.
+Calculate the difference in objective function value (\code{ofv}) between the
+\code{.bbi_object} and a reference model.
 }
-\keyword{internal}
+\details{
+If \code{.bbi_object} is a \code{tibble} of class \code{bbi_log_df}, \code{"absolute_model_path"}
+is the only required column. If the \code{tibble} is the output of \code{\link[=run_log]{run_log()}}
+(i.e. no summary information is appended), the \code{"ofv"} column will appended
+as well for added context.
+}
+\examples{
+\dontrun{
+
+# Calculate for individual model
+add_dofv(mod3, .mod2 = NULL) # uses based_on model
+add_dofv(mod3, .mod2 = mod2) # provide reference model
+
+# Append to run logs:
+run_log(MODEL_DIR) \%>\% add_summary() \%>\% add_dofv()
+summary_log(MODEL_DIR) \%>\% add_dofv()
+
+# Automatically adds `ofv` column in absence of `add_summary()` call:
+run_log(MODEL_DIR) \%>\% add_dofv()
+}
+
+
+}
+\seealso{
+\code{\link[=add_summary]{add_summary()}}
+}

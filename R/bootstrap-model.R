@@ -529,7 +529,7 @@ summarize_bootstrap_run <- function(
 
     boot_sum_log <- summary_log(
       boot_dir,
-      calc_aic_bic = FALSE, calc_dofv = FALSE,
+      calc_aic_bic = FALSE,
       .bbi_args = list(
         no_grd_file = TRUE, no_ext_file = TRUE, no_shk_file = TRUE
       )
