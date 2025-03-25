@@ -55,7 +55,7 @@ test_that("add_summary() works correctly [BBR-SMLG-004]", {
   clean_test_enviroment(create_all_models)
   copy_all_output_dirs()
   sum_df <- run_log(MODEL_DIR, .recurse = TRUE) %>% add_summary()
-  # Subtract 2 columns that overlap: ABS_MOD_PATH and "run"
+  # Subtract 2 columns that overlap (between run_log and add_summary): ABS_MOD_PATH and "run"
   test_sum_df(sum_df, c(MOD1_PATH, NEW_MOD2, NEW_MOD3, LEVEL2_MOD), RUN_LOG_COLS+SUM_LOG_COLS-2)
   expect_identical(sum_df$model_type, rep("nonmem", RUN_LOG_ROWS+1))
   expect_identical(sum_df$yaml_md5, ALL_MODS_YAML_MD5)
@@ -218,3 +218,47 @@ test_that("summary_log() works with filtering parameter string [BBR-SMLG-011]",
             expect_equal(summary_log(MODEL_DIR, .include = c(1:2, "Parent")) %>% nrow(), 3)
 
           })
+
+test_that("summary_log() and add_summary() calculate aic and bic by default", {
+  clean_test_enviroment(create_all_models)
+  copy_all_output_dirs()
+  sum_df <- summary_log(MODEL_DIR)
+  expect_true(all(c(AIC_COL, BIC_COL) %in% names(sum_df)))
+
+  # Can be turned off (e.g., for bootstrap runs)
+  sum_df <- summary_log(MODEL_DIR, calc_aic_bic = FALSE)
+  expect_false(all(c(AIC_COL, BIC_COL) %in% names(sum_df)))
+
+  # add_aic_bic appends AIC and BIC columns
+  sum_df <- sum_df %>% add_aic_bic()
+  expect_true(all(c(AIC_COL, BIC_COL) %in% names(sum_df)))
+
+  # Same behavior with add_summary
+  log_df <- run_log(MODEL_DIR) %>% add_summary()
+  expect_true(all(c(AIC_COL, BIC_COL) %in% names(log_df)))
+
+  log_df <- run_log(MODEL_DIR) %>% add_summary(calc_aic_bic = FALSE)
+  expect_false(all(c(AIC_COL, BIC_COL) %in% names(log_df)))
+})
+
+test_that("add_dofv() works correctly", {
+  # Test with recurse to ensure nested directories are supported for this function
+  clean_test_enviroment(create_all_models)
+  copy_all_output_dirs()
+
+  # Test with summary_log
+  sum_df <- summary_log(MODEL_DIR, .recurse = TRUE) %>% add_dofv()
+  expect_true(DOFV_COL %in% names(sum_df))
+
+  # Test with run_log (dont need to call add_summary())
+  log_df <- run_log(MODEL_DIR, .recurse = TRUE) %>% add_dofv()
+  expect_true(DOFV_COL %in% names(log_df))
+
+  # Test with model
+  mod2 <- read_model(MOD2_ABS_PATH)
+  expect_equal(add_dofv(mod2), 0)
+
+  # Test with other reference model
+  mod3 <- read_model(MOD3_ABS_PATH)
+  expect_equal(add_dofv(mod2, .mod2 = mod3), 0)
+})
