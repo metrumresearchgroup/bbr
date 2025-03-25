@@ -290,7 +290,7 @@ add_aic_bic <- function(.log_df){
   .log_df %>% dplyr::mutate(
     !!rlang::sym(AIC_COL) := 2*.data[[PARAM_COUNT_COL]] + .data[[OFV_COL]],
     !!rlang::sym(BIC_COL) := .data[[PARAM_COUNT_COL]]*log(.data$number_of_obs) + .data[[OFV_COL]]
-  ) %>% dplyr::relocate(all_of(c(AIC_COL, BIC_COL)), .after = OFV_COL)
+  ) %>% dplyr::relocate(all_of(c(AIC_COL, BIC_COL)), .after = all_of(OFV_COL))
 }
 
 
@@ -366,7 +366,7 @@ add_dofv.bbi_log_df <- function(.bbi_object, .mod2 = NULL){
   # If OFV column exists, (summary_log or add_summary was called), relocate to after
   if(OFV_COL %in% names(.bbi_object)){
     log_dofv <- dplyr::left_join(.bbi_object, dofv_df, by = c(ABS_MOD_PATH, OFV_COL))
-    log_dofv <- log_dofv %>% dplyr::relocate(all_of(DOFV_COL), .after = OFV_COL)
+    log_dofv <- log_dofv %>% dplyr::relocate(all_of(DOFV_COL), .after = all_of(OFV_COL))
   }else{
     log_dofv <- dplyr::left_join(.bbi_object, dofv_df, by = ABS_MOD_PATH)
   }
