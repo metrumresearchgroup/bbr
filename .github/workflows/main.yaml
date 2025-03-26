@@ -20,19 +20,19 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             r: 4.2.3
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             r: 4.3.1
           - os: ubuntu-latest
             r: release
           - label: oldest
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             r: 4.0.5
             bbi_version: v3.0.2
             mpn: 2023-01-25
             cran_override: 'https://mpn.metworx.com/snapshots/stable/2023-01-25'
-            rspm: 'https://packagemanager.posit.co/cran/__linux__/focal/2023-01-25'
+            rspm: 'https://packagemanager.posit.co/cran/__linux__/jammy/2023-01-25'
     env:
       R_KEEP_PKG_SOURCE: yes
     steps:
