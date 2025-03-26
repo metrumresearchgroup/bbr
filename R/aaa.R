@@ -320,6 +320,9 @@ SUMMARY_REQ_KEYS <- c(
 )
 
 OFV_COL <- "ofv"
+AIC_COL <- "aic"
+BIC_COL <- "bic"
+DOFV_COL <- "dofv"
 PARAM_COUNT_COL <- "param_count"
 
 DETAILS_ELEMENTS <- c(

@@ -36,7 +36,7 @@
 #' @importFrom glue glue
 #' @importFrom tidyr unnest_wider
 #' @export
-summary_log <- function(.base_dir, .recurse = FALSE, .include = NULL , ...) {
+summary_log <- function(.base_dir, .recurse = FALSE, .include = NULL, ...) {
   checkmate::assert_string(.base_dir)
 
   mod_list <- find_models(.base_dir, .recurse, .include)
@@ -50,6 +50,7 @@ summary_log <- function(.base_dir, .recurse = FALSE, .include = NULL , ...) {
 #' @rdname summary_log
 #' @param .log_df a `bbi_run_log_df` tibble (the output of [run_log()])
 #' @param ... Arguments passed through to [model_summaries()]
+#' @seealso [add_dofv()]
 #' @export
 add_summary <- function(
   .log_df,
@@ -72,9 +73,20 @@ add_summary <- function(
 #' @importFrom tibble tibble
 #' @importFrom tidyselect all_of
 #' @param .mods List of model objects that will be passed to [model_summaries()].
+#' @param calc_aic_bic Logical(T/F). If `TRUE`, calculate the Akaike Information
+#' Criterion (AIC) and Bayesian Information Criterion (BIC)
 #' @param ... Arguments passed through to [model_summaries()]
+#'
+#' @details
+#' `calc_aic_bic` should be set to `FALSE` for certain model types, such as
+#'  bootstrap runs.
+#'
 #' @keywords internal
-summary_log_impl <- function(.mods, ...) {
+summary_log_impl <- function(
+    .mods,
+    calc_aic_bic = TRUE,
+    ...
+) {
 
   if(length(.mods) == 0) {
     return(tibble())
@@ -126,6 +138,9 @@ summary_log_impl <- function(.mods, ...) {
   )
 
   res_df <- res_df %>% unnest_wider("d") %>% unnest_wider("h")
+
+  # Calculate AIC and BIC
+  if(isTRUE(calc_aic_bic)) res_df <- res_df %>% add_aic_bic()
 
   res_df <- create_summary_log_object(res_df)
 
@@ -266,3 +281,153 @@ do_if_bbi_sum <- function(fn, mode) {
     return(res)
   }
 }
+
+#' Calculate Akaike Information Criterion (AIC) and Bayesian Information
+#' Criterion (BIC), and append to summary log
+#' @param .log_df The output of [summary_log()]) or `run_log() %>% add_summary()`
+#' @keywords internal
+add_aic_bic <- function(.log_df){
+  .log_df %>% dplyr::mutate(
+    !!rlang::sym(AIC_COL) := 2*.data[[PARAM_COUNT_COL]] + .data[[OFV_COL]],
+    !!rlang::sym(BIC_COL) := .data[[PARAM_COUNT_COL]]*log(.data$number_of_obs) + .data[[OFV_COL]]
+  ) %>% dplyr::relocate(all_of(c(AIC_COL, BIC_COL)), .after = all_of(OFV_COL))
+}
+
+
+#' Calculate the difference in objective function value
+#'
+#' Calculate the difference in objective function value (`ofv`) between the
+#' `.bbi_object` and a reference model.
+#'
+#' @details
+#' If `.bbi_object` is a `tibble` of class `bbi_log_df`, `"absolute_model_path"`
+#' is the only required column. If the `tibble` is the output of [bbr::run_log()]
+#' (i.e. no summary information is appended), the `"ofv"` column will appended
+#' as well for added context.
+#'
+#'
+#' @param .bbi_object The object to compare. Can be a `bbi_nonmem_model` object
+#'  or a tibble of class `bbi_log_df`.
+#' @param .mod2 If a `bbi_nonmem_model` object is passed, calculate the
+#'  difference in objective function value between each model in `.bbi_object`
+#'  and `.mod2`. If `.mod2 = NULL`, the default, calculate the difference
+#'  between each model in `.bbi_object` and the model at `get_based_on(.bbi_object)`.
+#'
+#' @examples
+#' \dontrun{
+#'
+#' # Calculate for individual model
+#' add_dofv(mod3, .mod2 = NULL) # uses based_on model
+#' add_dofv(mod3, .mod2 = mod2) # provide reference model
+#'
+#' # Append to run logs:
+#' run_log(MODEL_DIR) %>% add_summary() %>% add_dofv()
+#' summary_log(MODEL_DIR) %>% add_dofv()
+#'
+#' # Automatically adds `ofv` column in absence of `add_summary()` call:
+#' run_log(MODEL_DIR) %>% add_dofv()
+#' }
+#'
+#'
+#' @seealso [add_summary()]
+#' @return
+#' If `.bbi_object` is a `tibble`, `add_dofv()` appends a `dofv` column.
+#'
+#' If `.bbi_object` is a `bbi_nonmem_model` object, `add_dofv()` returns a numeric value.
+#' @export
+add_dofv <- function(.bbi_object, .mod2 = NULL){
+  UseMethod("add_dofv")
+}
+
+#' @export
+add_dofv.bbi_nonmem_model <- function(.bbi_object, .mod2 = NULL){
+  if(!check_nonmem_finished(.bbi_object)){
+    cli::cli_abort("Model {get_model_id(.bbi_object)} has not finished running")
+  }
+  dofv_df <- calc_dofv_impl(.bbi_object, .mod2 = .mod2)
+  return(dofv_df$dofv)
+}
+
+#' @export
+add_dofv.bbi_log_df <- function(.bbi_object, .mod2 = NULL){
+  # Check for required columns and starting format
+  req_cols <- c(ABS_MOD_PATH, RUN_ID_COL)
+  if(!(all(req_cols %in% names(.bbi_object)))){
+    cols_missing <- setdiff(req_cols, names(.bbi_object))
+    cli::cli_abort(
+      "The following {.emph required} columns are missing: {.val {cols_missing}}"
+    )
+  }
+
+  mods <- purrr::map(.bbi_object[[ABS_MOD_PATH]], ~ read_model(.x))
+  dofv_df <- purrr::map_dfr(mods, calc_dofv_impl, .mod2 = .mod2)
+
+  # Bind to existing log
+  # If OFV column exists, (summary_log or add_summary was called), relocate to after
+  if(OFV_COL %in% names(.bbi_object)){
+    log_dofv <- dplyr::left_join(.bbi_object, dofv_df, by = c(ABS_MOD_PATH, OFV_COL))
+    log_dofv <- log_dofv %>% dplyr::relocate(all_of(DOFV_COL), .after = all_of(OFV_COL))
+  }else{
+    log_dofv <- dplyr::left_join(.bbi_object, dofv_df, by = ABS_MOD_PATH)
+  }
+
+  return(log_dofv)
+}
+
+# Register private S3 methods for development purposes
+.S3method("add_dofv", "bbi_nonmem_model", add_dofv.bbi_nonmem_model)
+.S3method("add_dofv", "bbi_log_df", add_dofv.bbi_log_df)
+
+#' Implementation function for calculating the difference in objective function
+#' value (OFV).
+#'
+#' @param .mod The `bbi_nonmem_model` to calculate `dofv` for.
+#' @param .mod2 If a `bbi_nonmem_model` object is passed, calculate the
+#'   difference in objective function value (`dofv`) between `.mod` and `.mod2`.
+#'   If `.mod2 = NULL`, the default, calculate the difference between `.mod` and
+#'   the model at `get_based_on(.mod)`.
+#'
+#' @keywords internal
+calc_dofv_impl <- function(.mod, .mod2 = NULL){
+  no_diff_df <- tibble::tibble(
+    !!rlang::sym(ABS_MOD_PATH) := .mod[[ABS_MOD_PATH]],
+    !!rlang::sym(OFV_COL) := NA_real_,
+    !!rlang::sym(DOFV_COL) := NA_real_
+  )
+
+  # Check that first model has finished
+  if(!check_nonmem_finished(.mod) || .mod[[YAML_MOD_TYPE]] != "nonmem"){
+    return(no_diff_df)
+  }else{
+    main_ofv <- list(model_summary(.mod)) %>% extract_ofv()
+    no_diff_df[[OFV_COL]] <- main_ofv
+  }
+
+  # If mod2 is not provided, use the first based_on model
+  if(is.null(.mod2)){
+    based_on_path <- get_based_on(.mod, .check_exists = FALSE)[1]
+    if(is.null(based_on_path)) return(no_diff_df)
+    .mod2 <- read_model(based_on_path)
+  }
+
+  # Check that reference has finished
+  if(!check_nonmem_finished(.mod2) || .mod2[[YAML_MOD_TYPE]] != "nonmem"){
+    return(no_diff_df)
+  }
+
+  # Extract objective function values and calculate difference
+
+  bo_ofv <- list(model_summary(.mod2)) %>% extract_ofv()
+  dofvs <- main_ofv - bo_ofv
+
+  # Format as tibble and return
+  dofv_df <- tibble::tibble(
+    !!rlang::sym(ABS_MOD_PATH) := .mod[[ABS_MOD_PATH]],
+    !!rlang::sym(OFV_COL) := main_ofv,
+    !!rlang::sym(DOFV_COL) := dofvs
+  )
+
+  return(dofv_df)
+}
+
+

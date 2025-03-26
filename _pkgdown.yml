@@ -69,6 +69,7 @@ reference:
   - add_summary
   - config_log
   - add_config
+  - add_dofv
   - model_tree
 
 - title: Model object interactions
