@@ -32,7 +32,7 @@ jobs:
             bbi_version: v3.0.2
             mpn: 2023-01-25
             cran_override: 'https://mpn.metworx.com/snapshots/stable/2023-01-25'
-            rspm: 'https://packagemanager.posit.co/cran/__linux__/focal/2023-01-25'
+            rspm: 'https://packagemanager.posit.co/cran/__linux__/jammy/2023-01-25'
     env:
       R_KEEP_PKG_SOURCE: yes
     steps:
