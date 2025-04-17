@@ -241,16 +241,116 @@ test_that("summary_log() and add_summary() calculate aic and bic by default", {
   expect_false(all(c(AIC_COL, BIC_COL) %in% names(log_df)))
 })
 
+read_objv <- function(mod) {
+  lines <- readr::read_lines(build_path_from_model(mod, ".lst"))
+  line <- grep("OBJV", lines, value = TRUE)
+  if (!length(line)) {
+    stop("expected one OBJV line got ", length(line))
+  }
+
+  v <- as.numeric(sub(" *#OBJV:\\*+ +([0-9.]+) +\\*+", "\\1", line))
+  if (length(v) != 1 || is.na(v)) {
+    stop("failed to extract OBJV from line ", line)
+  }
+
+  return(v)
+}
+
+write_objv <- function(mod, value) {
+  fname <- build_path_from_model(mod, ".lst")
+  lines <- readr::read_lines(fname)
+  idx <- grep("OBJV", lines)
+  if (!length(idx)) {
+    stop("expected one OBJV line got ", length(idx))
+  }
+
+  lines[idx] <- paste0(
+    "#OBJV:********************************************     ",
+    value,
+    "       **************************************************"
+  )
+  readr::write_lines(lines, fname)
+}
+
 test_that("add_dofv() works correctly", {
   # Test with recurse to ensure nested directories are supported for this function
   clean_test_enviroment(create_all_models)
   copy_all_output_dirs()
 
-  # Test with summary_log
-  sum_df <- summary_log(MODEL_DIR, .recurse = TRUE) %>% add_dofv()
-  expect_true(DOFV_COL %in% names(sum_df))
+  # Modify the objective function values for the models set up by
+  # create_all_models so that the expected value for dofv isn't always 0.
+  objv <- read_objv(MOD1)
+  objv2 <- objv - 1000
+  objv3 <- objv + 500
+  objv_level2 <- objv + 3
 
-  # Test with run_log (dont need to call add_summary())
-  log_df <- run_log(MODEL_DIR, .recurse = TRUE) %>% add_dofv()
-  expect_true(DOFV_COL %in% names(log_df))
+  mod2 <- read_model(NEW_MOD2)
+  mod3 <- read_model(NEW_MOD3)
+  mod_level2 <- read_model(LEVEL2_MOD)
+
+  write_objv(mod2, objv2)
+  write_objv(mod3, objv3)
+  write_objv(mod_level2, objv_level2)
+
+  # Run log input
+
+  rlog <- run_log(MODEL_DIR, .recurse = TRUE) %>%
+    # Sort so that these tests don't assume run_log's output order.
+    dplyr::arrange(.data$absolute_model_path)
+
+  res_rlog <- add_dofv(rlog)
+  expect_equal(
+    res_rlog[[OFV_COL]],
+    c(objv, objv2, objv3, objv_level2)
+  )
+  expect_equal(
+    res_rlog[[DOFV_COL]],
+    c(NA, objv2 - objv, objv3 - objv, objv_level2 - objv2)
+  )
+
+  # Summary log input
+
+  slog <- add_summary(rlog)
+
+  res_slog <- add_dofv(slog)
+  cols <- c(ABS_MOD_PATH, OFV_COL, DOFV_COL)
+  for (col in cols) {
+    expect_equal(res_rlog[[!!col]], res_slog[[!!col]])
+  }
+
+  # Reference model
+
+  res_rlog <- add_dofv(rlog, mod3)
+  expect_equal(
+    res_rlog[[OFV_COL]],
+    c(objv, objv2, objv3, objv_level2)
+  )
+  expect_equal(
+    res_rlog[[DOFV_COL]],
+    c(objv - objv3, objv2 - objv3, 0, objv_level2 - objv3)
+  )
+
+  res_slog <- add_dofv(slog, mod3)
+  for (col in cols) {
+    expect_equal(res_rlog[[!!col]], res_slog[[!!col]])
+  }
+
+  # Filtered log
+
+  rlog_filtered <- dplyr::filter(rlog, .data$run != 1)
+
+  res_rlog <- add_dofv(rlog_filtered)
+  expect_equal(
+    res_rlog[[OFV_COL]],
+    c(objv2, objv3)
+  )
+  expect_equal(
+    res_rlog[[DOFV_COL]],
+    c(objv2 - objv, objv3 - objv)
+  )
+
+  res_slog <- add_dofv(add_summary(rlog_filtered))
+  for (col in cols) {
+    expect_equal(res_rlog[[!!col]], res_slog[[!!col]])
+  }
 })
