@@ -371,7 +371,7 @@ check_mode_argument <- function(.mode) {
   }
 
   if (identical(.mode, "sge")) {
-    qsub <- unname(Sys.which("qsub"))
+    qsub <- normalizePath(unname(Sys.which("qsub")), mustWork = FALSE)
     if (identical(qsub, "")) {
       stop(".mode='sge' but qsub is not available on system")
     }
