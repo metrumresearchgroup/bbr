@@ -294,31 +294,23 @@ add_aic_bic <- function(.log_df){
 }
 
 
-#' Calculate the difference in objective function value
+#' Calculate the change objective function value models in a run log
 #'
-#' Calculate the difference in objective function value (`ofv`) between the
-#' `.bbi_object` and a reference model.
+#' Extend a run log with a "dofv" column that reports the difference in
+#' objective function value between row's model and a reference model.
 #'
-#' @details
-#' If `.bbi_object` is a `tibble` of class `bbi_log_df`, `"absolute_model_path"`
-#' is the only required column. If the `tibble` is the output of [bbr::run_log()]
-#' (i.e. no summary information is appended), the `"ofv"` column will appended
-#' as well for added context.
-#'
-#'
-#' @param .bbi_object The object to compare. Can be a `bbi_nonmem_model` object
-#'  or a tibble of class `bbi_log_df`.
-#' @param .mod2 If a `bbi_nonmem_model` object is passed, calculate the
-#'  difference in objective function value between each model in `.bbi_object`
-#'  and `.mod2`. If `.mod2 = NULL`, the default, calculate the difference
-#'  between each model in `.bbi_object` and the model at `get_based_on(.bbi_object)`.
+#' @param .log_df A `bbi_run_log_df` tibble (as output by [run_log()] or
+#'   [summary_log()]).
+#' @param .mod_ref The reference model to use when calculating the change in
+#'   objective function value for each model in the run log. By default, the
+#'   reference model is each model's parent (as identified by the first value
+#'   returned by [get_based_on()]). Pass a `bbi_nonmem_model` object to use its
+#'   objective function value as the reference value for all calculations.
+#' @return The `.log_df` data frame with a new "dofv" column. If `.log_df` is
+#'   not a summary log, a "ofv" column is also added for context.
 #'
 #' @examples
 #' \dontrun{
-#'
-#' # Calculate for individual model
-#' add_dofv(mod3, .mod2 = NULL) # uses based_on model
-#' add_dofv(mod3, .mod2 = mod2) # provide reference model
 #'
 #' # Append to run logs:
 #' run_log(MODEL_DIR) %>% add_summary() %>% add_dofv()
@@ -330,53 +322,31 @@ add_aic_bic <- function(.log_df){
 #'
 #'
 #' @seealso [add_summary()]
-#' @return
-#' If `.bbi_object` is a `tibble`, `add_dofv()` appends a `dofv` column.
-#'
-#' If `.bbi_object` is a `bbi_nonmem_model` object, `add_dofv()` returns a numeric value.
 #' @export
-add_dofv <- function(.bbi_object, .mod2 = NULL){
-  UseMethod("add_dofv")
-}
-
-#' @export
-add_dofv.bbi_nonmem_model <- function(.bbi_object, .mod2 = NULL){
-  if(!check_nonmem_finished(.bbi_object)){
-    cli::cli_abort("Model {get_model_id(.bbi_object)} has not finished running")
-  }
-  dofv_df <- calc_dofv_impl(.bbi_object, .mod2 = .mod2)
-  return(dofv_df$dofv)
-}
-
-#' @export
-add_dofv.bbi_log_df <- function(.bbi_object, .mod2 = NULL){
+add_dofv <- function(.log_df, .mod_ref = NULL) {
   # Check for required columns and starting format
   req_cols <- c(ABS_MOD_PATH, RUN_ID_COL)
-  if(!(all(req_cols %in% names(.bbi_object)))){
-    cols_missing <- setdiff(req_cols, names(.bbi_object))
+  if(!(all(req_cols %in% names(.log_df)))){
+    cols_missing <- setdiff(req_cols, names(.log_df))
     cli::cli_abort(
       "The following {.emph required} columns are missing: {.val {cols_missing}}"
     )
   }
 
-  mods <- purrr::map(.bbi_object[[ABS_MOD_PATH]], ~ read_model(.x))
-  dofv_df <- purrr::map_dfr(mods, calc_dofv_impl, .mod2 = .mod2)
+  mods <- purrr::map(.log_df[[ABS_MOD_PATH]], ~ read_model(.x))
+  dofv_df <- purrr::map_dfr(mods, calc_dofv_impl, .mod2 = .mod_ref)
 
   # Bind to existing log
   # If OFV column exists, (summary_log or add_summary was called), relocate to after
-  if(OFV_COL %in% names(.bbi_object)){
-    log_dofv <- dplyr::left_join(.bbi_object, dofv_df, by = c(ABS_MOD_PATH, OFV_COL))
+  if(OFV_COL %in% names(.log_df)){
+    log_dofv <- dplyr::left_join(.log_df, dofv_df, by = c(ABS_MOD_PATH, OFV_COL))
     log_dofv <- log_dofv %>% dplyr::relocate(all_of(DOFV_COL), .after = all_of(OFV_COL))
   }else{
-    log_dofv <- dplyr::left_join(.bbi_object, dofv_df, by = ABS_MOD_PATH)
+    log_dofv <- dplyr::left_join(.log_df, dofv_df, by = ABS_MOD_PATH)
   }
 
   return(log_dofv)
 }
-
-# Register private S3 methods for development purposes
-.S3method("add_dofv", "bbi_nonmem_model", add_dofv.bbi_nonmem_model)
-.S3method("add_dofv", "bbi_log_df", add_dofv.bbi_log_df)
 
 #' Implementation function for calculating the difference in objective function
 #' value (OFV).

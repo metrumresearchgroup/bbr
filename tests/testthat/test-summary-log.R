@@ -253,12 +253,4 @@ test_that("add_dofv() works correctly", {
   # Test with run_log (dont need to call add_summary())
   log_df <- run_log(MODEL_DIR, .recurse = TRUE) %>% add_dofv()
   expect_true(DOFV_COL %in% names(log_df))
-
-  # Test with model
-  mod2 <- read_model(MOD2_ABS_PATH)
-  expect_equal(add_dofv(mod2), 0)
-
-  # Test with other reference model
-  mod3 <- read_model(MOD3_ABS_PATH)
-  expect_equal(add_dofv(mod2, .mod2 = mod3), 0)
 })

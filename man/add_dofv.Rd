@@ -2,40 +2,30 @@
 % Please edit documentation in R/summary-log.R
 \name{add_dofv}
 \alias{add_dofv}
-\title{Calculate the difference in objective function value}
+\title{Calculate the change objective function value models in a run log}
 \usage{
-add_dofv(.bbi_object, .mod2 = NULL)
+add_dofv(.log_df, .mod_ref = NULL)
 }
 \arguments{
-\item{.bbi_object}{The object to compare. Can be a \code{bbi_nonmem_model} object
-or a tibble of class \code{bbi_log_df}.}
+\item{.log_df}{A \code{bbi_run_log_df} tibble (as output by \code{\link[=run_log]{run_log()}} or
+\code{\link[=summary_log]{summary_log()}}).}
 
-\item{.mod2}{If a \code{bbi_nonmem_model} object is passed, calculate the
-difference in objective function value between each model in \code{.bbi_object}
-and \code{.mod2}. If \code{.mod2 = NULL}, the default, calculate the difference
-between each model in \code{.bbi_object} and the model at \code{get_based_on(.bbi_object)}.}
+\item{.mod_ref}{The reference model to use when calculating the change in
+objective function value for each model in the run log. By default, the
+reference model is each model's parent (as identified by the first value
+returned by \code{\link[=get_based_on]{get_based_on()}}). Pass a \code{bbi_nonmem_model} object to use its
+objective function value as the reference value for all calculations.}
 }
 \value{
-If \code{.bbi_object} is a \code{tibble}, \code{add_dofv()} appends a \code{dofv} column.
-
-If \code{.bbi_object} is a \code{bbi_nonmem_model} object, \code{add_dofv()} returns a numeric value.
+The \code{.log_df} data frame with a new "dofv" column. If \code{.log_df} is
+not a summary log, a "ofv" column is also added for context.
 }
 \description{
-Calculate the difference in objective function value (\code{ofv}) between the
-\code{.bbi_object} and a reference model.
-}
-\details{
-If \code{.bbi_object} is a \code{tibble} of class \code{bbi_log_df}, \code{"absolute_model_path"}
-is the only required column. If the \code{tibble} is the output of \code{\link[=run_log]{run_log()}}
-(i.e. no summary information is appended), the \code{"ofv"} column will appended
-as well for added context.
+Extend a run log with a "dofv" column that reports the difference in
+objective function value between row's model and a reference model.
 }
 \examples{
 \dontrun{
-
-# Calculate for individual model
-add_dofv(mod3, .mod2 = NULL) # uses based_on model
-add_dofv(mod3, .mod2 = mod2) # provide reference model
 
 # Append to run logs:
 run_log(MODEL_DIR) \%>\% add_summary() \%>\% add_dofv()
