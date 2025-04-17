@@ -328,71 +328,77 @@ add_dofv <- function(.log_df, .mod_ref = NULL) {
     cli::cli_abort("{.var .log_df} must include {.val {ABS_MOD_PATH}} column.")
   }
 
-  mods <- purrr::map(.log_df[[ABS_MOD_PATH]], ~ read_model(.x))
-  dofv_df <- purrr::map_dfr(mods, calc_dofv_impl, .mod2 = .mod_ref)
+  res <- make_ofv_pairs(.log_df, .mod_ref)
 
-  # Bind to existing log
-  # If OFV column exists, (summary_log or add_summary was called), relocate to after
-  if(OFV_COL %in% names(.log_df)){
-    log_dofv <- dplyr::left_join(.log_df, dofv_df, by = c(ABS_MOD_PATH, OFV_COL))
-    log_dofv <- log_dofv %>% dplyr::relocate(all_of(DOFV_COL), .after = all_of(OFV_COL))
-  }else{
-    log_dofv <- dplyr::left_join(.log_df, dofv_df, by = ABS_MOD_PATH)
+  if (!OFV_COL %in% names(.log_df)) {
+    .log_df[OFV_COL] <- res[["ofv_mod"]]
   }
 
-  return(log_dofv)
+  tibble::add_column(
+    .log_df,
+    !!DOFV_COL := res[["ofv_mod"]] - res[["ofv_ref"]],
+    .after = OFV_COL
+  )
 }
 
-#' Implementation function for calculating the difference in objective function
-#' value (OFV).
+#' Pair each model OFV with a reference OFV
 #'
-#' @param .mod The `bbi_nonmem_model` to calculate `dofv` for.
-#' @param .mod2 If a `bbi_nonmem_model` object is passed, calculate the
-#'   difference in objective function value (`dofv`) between `.mod` and `.mod2`.
-#'   If `.mod2 = NULL`, the default, calculate the difference between `.mod` and
-#'   the model at `get_based_on(.mod)`.
+#' If mod_ref is passed, it is used as the reference model. Otherwise, the first
+#' parent of each model is taken as the reference model.
 #'
-#' @keywords internal
-calc_dofv_impl <- function(.mod, .mod2 = NULL){
-  no_diff_df <- tibble::tibble(
-    !!rlang::sym(ABS_MOD_PATH) := .mod[[ABS_MOD_PATH]],
-    !!rlang::sym(OFV_COL) := NA_real_,
-    !!rlang::sym(DOFV_COL) := NA_real_
-  )
-
-  # Check that first model has finished
-  if(!check_nonmem_finished(.mod) || .mod[[YAML_MOD_TYPE]] != "nonmem"){
-    return(no_diff_df)
-  }else{
-    main_ofv <- list(model_summary(.mod)) %>% extract_ofv()
-    no_diff_df[[OFV_COL]] <- main_ofv
+#' Return a data frame with the following columns:
+#'
+#'  * path_mod, path_ref: The absolute paths of the main model and the reference
+#'    model. path_mod matches the absolute_model_path column from the input run
+#'    log.
+#'
+#'  * ofv_mod, ofv_ref: The objective function values for the main model and the
+#'    reference model.
+#'
+#' @noRd
+make_ofv_pairs <- function(log_df, mod_ref) {
+  if (OFV_COL %in% names(log_df)) {
+    ofv <- log_df[c(ABS_MOD_PATH, OFV_COL)]
+  } else {
+    ofv <- tibble::tibble(!!ABS_MOD_PATH := character(), !!OFV_COL := double())
   }
 
-  # If mod2 is not provided, use the first based_on model
-  if(is.null(.mod2)){
-    based_on_path <- get_based_on(.mod, .check_exists = FALSE)[1]
-    if(is.null(based_on_path)) return(no_diff_df)
-    .mod2 <- read_model(based_on_path)
+  mpaths_log <- log_df[[ABS_MOD_PATH]]
+
+  if (is.null(mod_ref)) {
+    mods <- purrr::map(mpaths_log, read_model)
+    mpaths_ref <- purrr::map_chr(mods, function(m) {
+      get_based_on(m, .check_exists = FALSE)[1] %||% NA_character_
+    })
+  } else {
+    mods <- NULL
+    mpaths_ref <- mod_ref[[ABS_MOD_PATH]]
   }
 
-  # Check that reference has finished
-  if(!check_nonmem_finished(.mod2) || .mod2[[YAML_MOD_TYPE]] != "nonmem"){
-    return(no_diff_df)
+  if (any(!is.na(mpaths_ref) & !mpaths_ref %in% ofv[[ABS_MOD_PATH]])) {
+    mods <- mods %||% purrr::map(mpaths_log, read_model)
+    mpaths_extra <- setdiff(mpaths_ref, mpaths_log)
+    mods_extra <- purrr::map(mpaths_extra[!is.na(mpaths_extra)], read_model)
+    mods_all <- c(mods, mods_extra)
+    mpaths_all <- purrr::map_chr(mods_all, ABS_MOD_PATH)
+    mods_need <- mods_all[!mpaths_all %in% ofv[[ABS_MOD_PATH]]]
+    if (!length(mods_need)) {
+      dev_error("mods_need should never come up empty")
+    }
+    # To extract OFV, call summary_log_impl rather than model_summaries directly
+    # to reuse its logic for reshaping the result.
+    slog <- summary_log_impl(mods_need, calc_aic_bic = FALSE)
+    slog <- slog[!slog[[ABS_MOD_PATH]] %in% ofv[[ABS_MOD_PATH]], ]
+    ofv <- dplyr::bind_rows(ofv, slog[c(ABS_MOD_PATH, OFV_COL)])
   }
 
-  # Extract objective function values and calculate difference
-
-  bo_ofv <- list(model_summary(.mod2)) %>% extract_ofv()
-  dofvs <- main_ofv - bo_ofv
-
-  # Format as tibble and return
-  dofv_df <- tibble::tibble(
-    !!rlang::sym(ABS_MOD_PATH) := .mod[[ABS_MOD_PATH]],
-    !!rlang::sym(OFV_COL) := main_ofv,
-    !!rlang::sym(DOFV_COL) := dofvs
-  )
-
-  return(dofv_df)
+  tibble::tibble(path_mod = mpaths_log, path_ref = mpaths_ref) %>%
+    dplyr::left_join(
+      dplyr::rename(ofv, "ofv_mod" = all_of(OFV_COL)),
+      by = c("path_mod" = ABS_MOD_PATH)
+    ) %>%
+    dplyr::left_join(
+      dplyr::rename(ofv, "ofv_ref" = all_of(OFV_COL)),
+      by = c("path_ref" = ABS_MOD_PATH)
+    )
 }
-
-
