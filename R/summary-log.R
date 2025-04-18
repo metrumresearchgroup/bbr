@@ -324,13 +324,8 @@ add_aic_bic <- function(.log_df){
 #' @seealso [add_summary()]
 #' @export
 add_dofv <- function(.log_df, .mod_ref = NULL) {
-  # Check for required columns and starting format
-  req_cols <- c(ABS_MOD_PATH, RUN_ID_COL)
-  if(!(all(req_cols %in% names(.log_df)))){
-    cols_missing <- setdiff(req_cols, names(.log_df))
-    cli::cli_abort(
-      "The following {.emph required} columns are missing: {.val {cols_missing}}"
-    )
+  if (!ABS_MOD_PATH %in% names(.log_df)) {
+    cli::cli_abort("{.var .log_df} must include {.val {ABS_MOD_PATH}} column.")
   }
 
   mods <- purrr::map(.log_df[[ABS_MOD_PATH]], ~ read_model(.x))
