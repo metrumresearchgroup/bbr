@@ -4,6 +4,7 @@
 \alias{extract_from_summary}
 \alias{extract_param_count}
 \alias{extract_details}
+\alias{extract_data_set}
 \alias{extract_heuristics}
 \alias{extract_ofv}
 \alias{extract_condition_number}
@@ -12,6 +13,8 @@
 extract_param_count(.s)
 
 extract_details(.s)
+
+extract_data_set(.s)
 
 extract_heuristics(.s)
 
@@ -33,6 +36,8 @@ These are all helper functions to extract a specific field or sub-field from a \
 \item \code{extract_param_count()}: Extract count of non-fixed parameters
 
 \item \code{extract_details()}: Extract \code{run_details} field
+
+\item \code{extract_data_set()}: Extract \code{data_set} field from \code{run_details}.
 
 \item \code{extract_heuristics()}: Extract \code{run_heuristics} field
 

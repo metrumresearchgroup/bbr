@@ -241,6 +241,12 @@ extract_details <- function(.s) {
   return(.out)
 }
 
+#' @describeIn extract_from_summary Extract `data_set` field from `run_details`.
+#' @keywords internal
+extract_data_set <- function(.s) {
+  purrr::map_chr(.s, c(SUMMARY_DETAILS, "data_set"), .default = NA)
+}
+
 #' @describeIn extract_from_summary Extract `run_heuristics` field
 #' @importFrom purrr map
 #' @keywords internal
