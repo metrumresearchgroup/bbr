@@ -15,12 +15,15 @@ extract_details(.s)
 
 extract_heuristics(.s)
 
-extract_ofv(.s)
+extract_ofv(.s, with_constant = FALSE)
 
 extract_condition_number(.s)
 }
 \arguments{
 \item{.s}{A list of \code{bbi_nonmem_summary} objects to extract from.}
+
+\item{with_constant}{Whether to extract the objective function value with or
+without constant.}
 }
 \description{
 These are all helper functions to extract a specific field or sub-field from a \verb{bbi_\{.model_type\}_summary} object.
@@ -33,7 +36,8 @@ These are all helper functions to extract a specific field or sub-field from a \
 
 \item \code{extract_heuristics()}: Extract \code{run_heuristics} field
 
-\item \code{extract_ofv()}: Extract objective function value (without constant) for the final estimation method
+\item \code{extract_ofv()}: Extract objective function value for the
+final estimation method.
 
 \item \code{extract_condition_number()}: Extract condition number for the final estimation method
 

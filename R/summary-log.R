@@ -240,10 +240,14 @@ extract_heuristics <- function(.s) {
   return(.out)
 }
 
-#' @describeIn extract_from_summary Extract objective function value (without constant) for the final estimation method
+#' @describeIn extract_from_summary Extract objective function value for the
+#'   final estimation method.
+#' @param with_constant Whether to extract the objective function value with or
+#'   without constant.
 #' @importFrom purrr map map_dbl
 #' @keywords internal
-extract_ofv <- function(.s) {
+extract_ofv <- function(.s, with_constant = FALSE) {
+  name <- if (with_constant) "ofv_with_constant" else "ofv_no_constant"
   .ofv <- map(.s, function(.x) {
     .x <- .x[["ofv"]]
     if (!is.null(.x)) {
@@ -251,7 +255,7 @@ extract_ofv <- function(.s) {
     }
     return(.x)
   })
-  .out <- map_dbl(.ofv, "ofv_no_constant", .default = NA_real_)
+  .out <- map_dbl(.ofv, name, .default = NA_real_)
   return(.out)
 }
 
