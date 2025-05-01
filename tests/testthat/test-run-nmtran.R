@@ -92,7 +92,13 @@ withr::with_options(list(
 
         # Default nmfe_options passed as .bbi_args
         nmtran_specs <- nmtran_setup(mod1)
-        expect_equal(unname(nmtran_specs$cmd_args), c("0", "0", "2"))
+        # bbi 3.2.0 changed the maxlim default from 100 (mapped to 0) to 2.
+        if (test_bbi_version(read_bbi_path(), .min_version = "3.2.0")) {
+          maxlim_default <- "2"
+        } else {
+          maxlim_default <- "0"
+        }
+        expect_equal(unname(nmtran_specs$cmd_args), c("0", "0", maxlim_default))
 
         # Override with .bbi_args
         nmtran_specs <- nmtran_setup(mod1, .bbi_args = list(maxlim = 3, prdefault = TRUE))
