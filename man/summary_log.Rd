@@ -81,4 +81,6 @@ from \verb{$run_heuristics}. These are named and described in the
 }
 \seealso{
 \code{\link[=run_log]{run_log()}}, \code{\link[=config_log]{config_log()}}, \code{\link[=model_summary]{model_summary()}}, \code{\link[=model_summaries]{model_summaries()}}
+
+\code{\link[=add_dofv]{add_dofv()}}
 }

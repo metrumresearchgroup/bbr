@@ -92,6 +92,7 @@ summary_log <- function(.base_dir, .recurse = FALSE, .include = NULL , ...) {
 #' @rdname summary_log
 #' @param .log_df a `bbi_run_log_df` tibble (the output of [run_log()])
 #' @param ... Arguments passed through to [model_summaries()]
+#' @seealso [add_dofv()]
 #' @export
 add_summary <- function(
   .log_df,
@@ -417,4 +418,198 @@ add_aic_bic <- function(log_df) {
     !!BIC_COL := bic,
     .after = OFV_COL
   )
+}
+
+#' Calculate change in objective function value of models in a run log
+#'
+#' Extend a run log with a "dofv" column that reports the difference in
+#' objective function value between the row's model and a reference model.
+#'
+#' @param .log_df A `bbi_run_log_df` tibble (as output by [run_log()] or
+#'   [summary_log()]).
+#' @param .mod_ref The reference model to use when calculating the change in
+#'   objective function value for each model in the run log. By default, the
+#'   reference model is each model's parent (as identified by the first item
+#'   returned by [get_based_on()]). Pass a `bbi_nonmem_model` object to use its
+#'   objective function value as the reference value for all calculations.
+#' @return The `.log_df` data frame with a new "dofv" column. If `.log_df` is
+#'   not a summary log, an "ofv" column is also added for context.
+#'
+#' @details
+#'
+#' To help the caller avoid making comparisons that are not meaningful, the
+#' "dofv" value is reported as NA if any of the following is true:
+#'
+#'   * the final estimation methods (as reported in the final "#METH:" line of
+#'     the `.lst` file) of the model and reference model are not identical .
+#'
+#'   * the final estimation method is one for which the objective function value
+#'     is not meaningful for model comparison (e.g., SAEM or Bayesian methods).
+#'
+#'   * the input data sets of the two models differs, as indicated by a
+#'     different file path or different number of observations recorded in the
+#'     `.lst` files.
+#'
+#'     The above criteria serve to flag the common cases where the models use
+#'     different input data. Note, however, that models may have used different
+#'     data despite having a matching data path and number of observations.
+#'
+#' @seealso [add_summary()]
+#' @export
+add_dofv <- function(.log_df, .mod_ref = NULL) {
+  cols <- names(.log_df)
+  is_slog <- OFV_COL %in% cols
+  req_cols <- ABS_MOD_PATH
+  if (is_slog) {
+    # If "ofv" column is found, the downstream code treats .log_df as a summary
+    # log and requires additional columns to be present.
+    req_cols <- c(req_cols, SL_SUMMARY, SUMMARY_EST_METHOD, SUMMARY_NOBS)
+  }
+  missing <- setdiff(req_cols, cols)
+  if (length(missing)) {
+    rlang::abort(c("`.log_df` is missing required columns:", missing))
+  }
+
+  res <- make_ofv_pairs(.log_df, .mod_ref)
+  off <- !allow_ofv_calc(res[["method_mod"]]) |
+    res[["method_mod"]] != res[["method_ref"]] |
+    res[["nobs_mod"]] != res[["nobs_ref"]] |
+    res[["dataset_mod"]] != res[["dataset_ref"]]
+  res[["ofv_ref"]][off] <- NA_real_
+
+  if (!is_slog) {
+    .log_df[[OFV_COL]] <- res[["ofv_mod"]]
+  }
+
+  tibble::add_column(
+    .log_df,
+    !!DOFV_COL := res[["ofv_mod"]] - res[["ofv_ref"]],
+    .after = OFV_COL
+  )
+}
+
+#' For each row of summary log `slog`, extract the data file path from summary
+#' object and expand it to an absolute path.
+#' @noRd
+summary_expand_data_path <- function(slog) {
+  fn <- do_if_bbi_sum(extract_data_set, "character")
+  paths <- fn(slog[[SL_SUMMARY]])
+  paths[!fs::is_absolute_path(paths)] <- fs::path(
+    slog[[ABS_MOD_PATH]],
+    paths
+  )
+  # Note: path_norm is a pure path computation and doesn't resolve symbolic
+  # links. In the context of restricting the dOFV calculation to models with the
+  # same path, this means that comparing the result may indicate
+  #
+  #  * paths are different despite resolving to the same path on disk
+  #
+  #  * paths are the same despite resolving to different paths on disk. This is
+  #    because path_norm may change the meaning of a path with a symlink (e.g.,
+  #    it simplifies /a/b/../c to /a/c, but that could resolve to something
+  #    other than /a/c if b/ is a symlink).
+  #
+  # To avoid the above scenarios, we could require that the path exist on disk
+  # and resolve it (e.g., with path_real). However, stick with path_norm because
+  #
+  #  1) other places in bbr already use path_norm, including get_based_on
+  #
+  #  2) symlinks in ABS_MOD_PATH are already resolved by read_model, which makes
+  #     hitting into the above scenarios even less likely
+  #
+  #  3) this information is used only to decide whether to set dofv to NA
+  return(as.character(fs::path_norm(paths)))
+}
+
+#' Pair each model OFV with a reference OFV
+#'
+#' If mod_ref is passed, use it as the reference model. Otherwise, take the
+#' first parent of each model as the reference model.
+#'
+#' Return a data frame with the following columns:
+#'
+#'  * path_mod, path_ref: The absolute paths of the main model and the reference
+#'    model. path_mod matches the absolute_model_path column from the input run
+#'    log.
+#'
+#'  * ofv_mod, ofv_ref: The objective function values for the main model and the
+#'    reference model.
+#'
+#'  * nobs_mod, nobs_ref: The number of observations for the main model and the
+#'    reference model.
+#'
+#'  * dataset_mod, dataset_ref: Paths to the data sets of the main model and the
+#'    reference model.
+#'
+#'  * method_mod, method_ref: The final estimation method for the main model and
+#'    the reference model.
+#' @noRd
+make_ofv_pairs <- function(log_df, mod_ref) {
+  if (OFV_COL %in% names(log_df)) {
+    info <- log_df[c(ABS_MOD_PATH, OFV_COL, SUMMARY_NOBS)]
+    info[["dataset"]] <- summary_expand_data_path(log_df)
+    info[["method"]] <- get_final_est_method(log_df)
+  } else {
+    info <- tibble::tibble(
+      !!ABS_MOD_PATH := character(),
+      !!OFV_COL := double(),
+      !!SUMMARY_NOBS := integer(),
+      "dataset" = character(),
+      "method" = character()
+    )
+  }
+
+  mpaths_log <- log_df[[ABS_MOD_PATH]]
+
+  if (is.null(mod_ref)) {
+    mods <- purrr::map(mpaths_log, read_model)
+    mpaths_ref <- purrr::map_chr(mods, function(m) {
+      get_based_on(m, .check_exists = FALSE)[1] %||% NA_character_
+    })
+  } else {
+    mods <- NULL
+    mpaths_ref <- mod_ref[[ABS_MOD_PATH]]
+  }
+
+  if (any(!is.na(mpaths_ref) & !mpaths_ref %in% info[[ABS_MOD_PATH]])) {
+    # ^ Summary information is missing for some models either because 1) log_df
+    # was not a summary log or 2) some reference models are not included in
+    # log_df.
+    mods <- mods %||% purrr::map(mpaths_log, read_model)
+    mpaths_extra <- setdiff(mpaths_ref, mpaths_log)
+    mods_extra <- purrr::map(mpaths_extra[!is.na(mpaths_extra)], read_model)
+    mods_all <- c(mods, mods_extra)
+    mpaths_all <- purrr::map_chr(mods_all, ABS_MOD_PATH)
+    mods_need <- mods_all[!mpaths_all %in% info[[ABS_MOD_PATH]]]
+    if (!length(mods_need)) {
+      dev_error("mods_need should never come up empty")
+    }
+
+    # Call summary_log_impl rather than model_summaries to reuse its logic for
+    # reshaping the result.
+    slog <- summary_log_impl(mods_need, calc_aic_bic = FALSE)
+    slog <- slog[!slog[[ABS_MOD_PATH]] %in% info[[ABS_MOD_PATH]], ]
+    slog[["dataset"]] <- summary_expand_data_path(slog)
+    slog[["method"]] <- get_final_est_method(slog)
+
+    info <- dplyr::bind_rows(info, slog[names(info)])
+  }
+
+  info_mod <- dplyr::rename(
+    info,
+    "ofv_mod" = all_of(OFV_COL),
+    "nobs_mod" = all_of(SUMMARY_NOBS),
+    "dataset_mod" = "dataset",
+    "method_mod" = "method"
+  )
+  info_ref <- dplyr::rename(
+    info,
+    "ofv_ref" = all_of(OFV_COL),
+    "nobs_ref" = all_of(SUMMARY_NOBS),
+    "dataset_ref" = "dataset",
+    "method_ref" = "method"
+  )
+  tibble::tibble(path_mod = mpaths_log, path_ref = mpaths_ref) %>%
+    dplyr::left_join(info_mod, by = c("path_mod" = ABS_MOD_PATH)) %>%
+    dplyr::left_join(info_ref, by = c("path_ref" = ABS_MOD_PATH))
 }
