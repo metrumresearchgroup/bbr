@@ -32,6 +32,15 @@
 #'    estimation method. The constant, and the value _with_ the constant can be
 #'    found in `$ofv`.
 #'
+#'  * `aic`, `bic` -- Akaike information criterion and Bayesian information
+#'    criterion. These are calculated using NONMEM's objective function value
+#'    with constant (available as of NONMEM 7.4) as approximations of the -2
+#'    log-likelihood.
+#'
+#'    NA is reported for models where the final estimation method is one for
+#'    which these derived quantities are not meaningful for model comparison
+#'    (e.g., SAEM or Bayesian methods).
+#'
 #'  * `param_count` -- Count of (non-fixed) parameters estimated in final
 #'    estimation method.
 #'
@@ -72,7 +81,9 @@ summary_log <- function(.base_dir, .recurse = FALSE, .include = NULL , ...) {
 
   mod_list <- find_models(.base_dir, .recurse, .include)
 
-  res_df <- summary_log_impl(mod_list, ...)
+  # NB: Pass calc_aic_bic so that it's not exposed it to summary_log callers via
+  # '...'.
+  res_df <- summary_log_impl(mod_list, calc_aic_bic = TRUE, ...)
 
   return(res_df)
 }
@@ -86,7 +97,9 @@ add_summary <- function(
   .log_df,
   ...
 ) {
-  df <- add_log_impl(.log_df, summary_log_impl, ...)
+  # NB: Pass calc_aic_bic so that it's not exposed it to add_summary callers via
+  # '...'.
+  df <- add_log_impl(.log_df, summary_log_impl, calc_aic_bic = TRUE, ...)
   return(df)
 }
 
@@ -103,10 +116,14 @@ add_summary <- function(
 #' @importFrom tibble tibble
 #' @importFrom tidyselect all_of
 #' @param .mods List of model objects that will be passed to [model_summaries()].
+#' @param calc_aic_bic Whether to add columns for AIC and BIC.
 #' @param ... Arguments passed through to [model_summaries()]
 #' @keywords internal
-summary_log_impl <- function(.mods, ...) {
-
+summary_log_impl <- function(
+  .mods,
+  calc_aic_bic = TRUE,
+  ...
+) {
   if(length(.mods) == 0) {
     return(tibble())
   }
@@ -157,6 +174,10 @@ summary_log_impl <- function(.mods, ...) {
   )
 
   res_df <- res_df %>% unnest_wider("d") %>% unnest_wider("h")
+
+  if (isTRUE(calc_aic_bic)) {
+    res_df <- add_aic_bic(res_df)
+  }
 
   res_df <- create_summary_log_object(res_df)
 
@@ -300,4 +321,94 @@ do_if_bbi_sum <- function(fn, mode) {
     }
     return(res)
   }
+}
+
+get_final_est_method <- function(log_df) {
+  purrr::map_chr(
+    log_df[[SUMMARY_EST_METHOD]],
+    function(xs) {
+      n <- length(xs)
+      if (n) xs[[n]] else NA_character_
+    }
+  )
+}
+
+#' Are OFV-based calculations enabled for the specified method?
+#'
+#' @param method Character vector of methods, as reported by NONMEM on its
+#'   "#METH:" line.
+#' @noRd
+allow_ofv_calc <- function(method) {
+  !is.na(method) &
+    # Select methods for which it is meaningful (based on SME input) to
+    # calculate AIC, BIC, and (subject to more conditions) dOFV.
+    stringr::str_starts(
+      method,
+      stringr::regex(
+        paste0(
+          "\\s*",
+          c(
+            # Examples:
+            #  * First Order (Evaluation)
+            #  * First Order Conditional Estimation with Interaction (No Prior) (Evaluation)
+            "first order",
+            # Examples:
+            #  * Importance Sampling
+            #  * Importance Sampling assisted by MAP Estimation
+            "importance sampling",
+            # Examples:
+            #  * Iterative Two Stage
+            #  * Iterative Two Stage (No Prior)
+            "iterative two stage",
+            # Examples:
+            #  * Laplacian Conditional Estimation
+            #  * Laplacian Conditional Estimation (Centered)
+            "laplacian conditional estimation",
+            # Examples:
+            #  * Objective Function Evaluation by Importance Sampling (No Prior)
+            #  * Objective Function Evaluation by Importance/MAP Sampling
+            "objective function evaluation by importance"
+          ),
+          collapse = "|"
+        ),
+        ignore_case = TRUE
+      )
+    ) &
+    !stringr::str_detect(
+      method,
+      # Examples:
+      #  * First Order: BAYESIAN-OPTIMALITY
+      #  * First Order: D-OPTIMALITY DIM SCALED
+      stringr::fixed("optimality", ignore_case = TRUE)
+    ) &
+    !stringr::str_detect(
+      method,
+      stringr::fixed(
+        "importance sampling of variance-covariance (sir)",
+        ignore_case = TRUE
+      )
+    )
+}
+
+add_aic_bic <- function(log_df) {
+  fn <- do_if_bbi_sum(
+    function(x) extract_ofv(x, with_constant = TRUE),
+    "numeric"
+  )
+  ofv <- fn(log_df[[SL_SUMMARY]])
+
+  nparams <- log_df[[PARAM_COUNT_COL]]
+  aic <- 2 * nparams + ofv
+  bic <- nparams * log(log_df[[SUMMARY_NOBS]]) + ofv
+
+  off <- !allow_ofv_calc(get_final_est_method(log_df))
+  aic[off] <- NA_real_
+  bic[off] <- NA_real_
+
+  tibble::add_column(
+    log_df,
+    !!AIC_COL := aic,
+    !!BIC_COL := bic,
+    .after = OFV_COL
+  )
 }

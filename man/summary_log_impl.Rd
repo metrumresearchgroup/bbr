@@ -4,10 +4,12 @@
 \alias{summary_log_impl}
 \title{Build summary log}
 \usage{
-summary_log_impl(.mods, ...)
+summary_log_impl(.mods, calc_aic_bic = TRUE, ...)
 }
 \arguments{
 \item{.mods}{List of model objects that will be passed to \code{\link[=model_summaries]{model_summaries()}}.}
+
+\item{calc_aic_bic}{Whether to add columns for AIC and BIC.}
 
 \item{...}{Arguments passed through to \code{\link[=model_summaries]{model_summaries()}}}
 }

@@ -51,6 +51,14 @@ can be queried further by extracting it as a list, or by using
 \item \code{ofv} -- Objective function value \emph{with no constant} from the final
 estimation method. The constant, and the value \emph{with} the constant can be
 found in \verb{$ofv}.
+\item \code{aic}, \code{bic} -- Akaike information criterion and Bayesian information
+criterion. These are calculated using NONMEM's objective function value
+with constant (available as of NONMEM 7.4) as approximations of the -2
+log-likelihood.
+
+NA is reported for models where the final estimation method is one for
+which these derived quantities are not meaningful for model comparison
+(e.g., SAEM or Bayesian methods).
 \item \code{param_count} -- Count of (non-fixed) parameters estimated in final
 estimation method.
 \item \code{estimation_method} -- Character vector of estimation method(s) used.
