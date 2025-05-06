@@ -380,10 +380,17 @@ parse_nmtran_args <- function(
   .nmfe_args <- parse_args_list(.nmfe_args, nmfe_args_def)
   .nmfe_args <- .nmfe_args[names(nmfe_args_def)]
 
+  maxlim <- as.character(.nmfe_args[["maxlim"]])
+  if (identical(maxlim, "100")) {
+    # For compatibility reasons, bbi treats --maxlim=100 as "don't pass -maxlim
+    # to nmfe", leading to nmfe calling NMTRAN.exe with "0" for maxlim.
+    maxlim <- "0"
+  }
+
   .nmtran_args <- c(
     if(isTRUE(.nmfe_args$prdefault)) 1 else 0,
     if(isTRUE(.nmfe_args$tprdefault)) 1 else 0,
-    .nmfe_args$maxlim
+    maxlim
   ) %>% as.character() %>%
     stats::setNames(names(nmfe_args_def))
 
