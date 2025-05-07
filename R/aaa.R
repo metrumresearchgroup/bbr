@@ -303,6 +303,7 @@ SUMMARY_SHRINKAGE_SIGMA <- "eps_sd"
 SUMMARY_PARAM_PVAL <- "pval"
 SUMMARY_SHRINKAGE_PVAL <- "pval"
 SUMMARY_PARAM_ETASIG <- "ETASIG"
+SUMMARY_NOBS <- "number_of_obs"
 
 CONFIG_MODEL_PATH <- "model_path"
 CONFIG_MODEL_MD5 <- "model_md5" # SHARED with bbr.bayes
@@ -320,13 +321,16 @@ SUMMARY_REQ_KEYS <- c(
 )
 
 OFV_COL <- "ofv"
+AIC_COL <- "aic"
+BIC_COL <- "bic"
+DOFV_COL <- "dofv"
 PARAM_COUNT_COL <- "param_count"
 
 DETAILS_ELEMENTS <- c(
   "estimation_method",
   "problem_text",
   "number_of_subjects",
-  "number_of_obs"
+  SUMMARY_NOBS
 )
 
 

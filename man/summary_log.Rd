@@ -35,23 +35,52 @@ found in \code{.base_dir} (and subdirectories, if \code{.recurse = TRUE}).
 Runs \code{\link[=model_summaries]{model_summaries()}} on all models in the input and returns a subset of the each resulting summary as a tibble.
 }
 \details{
-The following fields from \code{bbi_nonmem_summary} (the output of \code{model_summary()}) are extracted and included by default.
-If you would like more fields from the summary object, you can extract them manually from the \code{bbi_summary} list column.
+The following fields from \code{bbi_nonmem_summary} (the output of
+\code{model_summary()}) are extracted and included by default. If you would like
+more fields from the summary object, you can extract them manually from the
+\code{bbi_summary} list column.
 \itemize{
-\item \code{error_msg} -- Error message from \code{\link[=model_summary]{model_summary()}}. If \code{NULL} the call succeeded. If not \code{NULL}, the rest of the fields will be \code{NULL}.
-\item \code{needed_fail_flags} -- Logical for whether the call initially failed, but passed with the inclusion of \code{.fail_flags}. See \code{\link[=model_summaries]{model_summaries()}} docs for more details.
-\item \code{bbi_summary} -- The full \code{bbi_nonmem_summary} object for each row. This can be queried further by extracting it as a list, or by using \code{dplyr::mutate()} etc.
-\item \code{ofv} -- Objective function value \emph{with no constant} from the final estimation method. The constant, and the value \emph{with} the constant can be found in \verb{$ofv}.
-\item \code{param_count} -- Count of (non-fixed) parameters estimated in final estimation method.
-\item \code{estimation_method} -- Character vector of estimation method(s) used. Extracted from \verb{$run_details}.
-\item \code{problem_text} -- Character vector of text from \verb{$PROB}. Extracted from \verb{$run_details}.
-\item \code{number_of_subjects} -- Count of unique subjects in the input data set, extracted from \verb{$run_details}.
-\item \code{number_of_obs} -- Total count of observations in the input data set, extracted from \verb{$run_details}.
-\item \code{condition_number} -- The condition number for the final estimation method, if present.
-\item \code{any_heuristics} -- Logical indicating whether \emph{any} of the columns extracted from \verb{$run_heuristics} are \code{TRUE}. Duplicative information, but helpful for filtering.
-\item \verb{$run_heuristics} columns -- One logical column for each element extracted from \verb{$run_heuristics}. These are named and described in the \code{\link[=model_summary]{model_summary()}} docs.
+\item \code{error_msg} -- Error message from \code{\link[=model_summary]{model_summary()}}. If \code{NULL} the call
+succeeded. If not \code{NULL}, the rest of the fields will be \code{NULL}.
+\item \code{needed_fail_flags} -- Logical for whether the call initially failed, but
+passed with the inclusion of \code{.fail_flags}. See \code{\link[=model_summaries]{model_summaries()}} docs
+for more details.
+\item \code{bbi_summary} -- The full \code{bbi_nonmem_summary} object for each row. This
+can be queried further by extracting it as a list, or by using
+\code{dplyr::mutate()} etc.
+\item \code{ofv} -- Objective function value \emph{with no constant} from the final
+estimation method. The constant, and the value \emph{with} the constant can be
+found in \verb{$ofv}.
+\item \code{aic}, \code{bic} -- Akaike information criterion and Bayesian information
+criterion. These are calculated using NONMEM's objective function value
+with constant (available as of NONMEM 7.4) as approximations of the -2
+log-likelihood.
+
+NA is reported for models where the final estimation method is one for
+which these derived quantities are not meaningful for model comparison
+(e.g., SAEM or Bayesian methods).
+\item \code{param_count} -- Count of (non-fixed) parameters estimated in final
+estimation method.
+\item \code{estimation_method} -- Character vector of estimation method(s) used.
+Extracted from \verb{$run_details}.
+\item \code{problem_text} -- Character vector of text from \verb{$PROB}. Extracted from
+\verb{$run_details}.
+\item \code{number_of_subjects} -- Count of unique subjects in the input data set,
+extracted from \verb{$run_details}.
+\item \code{number_of_obs} -- Total count of observations in the input data set,
+extracted from \verb{$run_details}.
+\item \code{condition_number} -- The condition number for the final estimation
+method, if present.
+\item \code{any_heuristics} -- Logical indicating whether \emph{any} of the columns
+extracted from \verb{$run_heuristics} are \code{TRUE}. Duplicative information, but
+helpful for filtering.
+\item \verb{$run_heuristics} columns -- One logical column for each element extracted
+from \verb{$run_heuristics}. These are named and described in the
+\code{\link[=model_summary]{model_summary()}} docs.
 }
 }
 \seealso{
 \code{\link[=run_log]{run_log()}}, \code{\link[=config_log]{config_log()}}, \code{\link[=model_summary]{model_summary()}}, \code{\link[=model_summaries]{model_summaries()}}
+
+\code{\link[=add_dofv]{add_dofv()}}
 }
