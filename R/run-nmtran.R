@@ -1,6 +1,6 @@
 #' Interface for running `NM-TRAN` on model objects
 #'
-#' Function to run `NM-TRAN` on a model object to validate its control stream
+#' Functions to run `NM-TRAN` on a model object to validate its control stream
 #'  for correct coding before submission. The `NM-TRAN` dataset (`FDATA`) and
 #'  other `NONMEM` artifacts can be further inspected by keeping the run directory
 #'  around.
@@ -36,6 +36,12 @@
 #' }
 #'
 #' @return An S3 object of class `nmtran_process`
+#' @name nmtran
+NULL
+
+
+#' @describeIn nmtran Runs `NM-TRAN` on a model object to validate its control
+#' stream for correct coding before submission.
 #' @export
 run_nmtran <- function(
     .mod,
@@ -395,4 +401,55 @@ parse_nmtran_args <- function(
     stats::setNames(names(nmfe_args_def))
 
   return(.nmtran_args)
+}
+
+
+#' @describeIn nmtran Runs `NM-TRAN` on a model object and returns the `NM-TRAN`
+#'  dataset (`FDATA`)
+#' @export
+nm_fdata <- function(
+    .mod,
+    .bbi_args = NULL,
+    .config_path = NULL
+){
+  nmtran_p <- run_nmtran(.mod, .bbi_args, .config_path, clean = FALSE)
+  on.exit(fs::dir_delete(nmtran_p$run_dir))
+
+  if(nmtran_p$status_val != 0){
+    # trim output
+    output_lines <- nmtran_p$output_lines[!grepl("^\\s+$", nmtran_p$output_lines)]
+    rlang::warn(
+      c(
+        "NM-TRAN was unsuccessful and returned the following messages:",
+        paste(output_lines, collapse = "\n")
+      )
+    )
+  }
+
+  # Attempt to read in FDATA (even if status_val is not 0)
+  #  - FDATA can still be read in in _some scenarios_ where NM-TRAN fails
+  fdata_path <- file.path(nmtran_p$run_dir, "FDATA")
+  if(fs::file_exists(fdata_path)){
+    input_cols <- get_input_columns(.mod, from_data = FALSE, filter_drop = TRUE)
+
+    fdata <- tryCatch({
+      nm_file_impl(fdata_path, skip = 0) %>%
+        stats::setNames(input_cols)
+    }, error = function(cond){
+      rlang::inform(
+        c("FDATA could not be read in:", cond$parent$message)
+      )
+      return(NULL)
+    })
+
+    if(!is.null(fdata)){
+      attr(fdata, "n_records_dropped") <- nrow(input_data) - nrow(fdata)
+    }
+
+    # assign class and return
+    class(fdata) <- c(NMTRAN_FDATA_CLASS, class(fdata))
+    return(fdata)
+  }else{
+    return(invisible(NULL))
+  }
 }
