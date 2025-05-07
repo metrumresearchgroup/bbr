@@ -5,6 +5,7 @@
 \alias{config_log_make_entry.default}
 \alias{config_log_make_entry.bbi_nonmem_model}
 \alias{config_log_make_entry.bbi_nmboot_model}
+\alias{config_log_make_entry.bbi_nmsse_model}
 \title{Prepare a model-specific config log entry}
 \usage{
 config_log_make_entry(.mod, config, fields = NULL)
@@ -14,6 +15,8 @@ config_log_make_entry(.mod, config, fields = NULL)
 \method{config_log_make_entry}{bbi_nonmem_model}(.mod, config, fields = NULL)
 
 \method{config_log_make_entry}{bbi_nmboot_model}(.mod, config, fields = NULL)
+
+\method{config_log_make_entry}{bbi_nmsse_model}(.mod, config, fields = NULL)
 }
 \arguments{
 \item{.mod}{A model object.}

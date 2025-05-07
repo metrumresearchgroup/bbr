@@ -231,7 +231,7 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     it("Include bootstrap model", {
       skip_if_old_bbi("3.2.0") # calls model_summary()
       clean_test_enviroment(create_tree_models)
-      boot_run <- make_fake_boot(MOD1, n = 3)
+      boot_run <- make_fake_analysis(MOD1, run_type = "bootstrap", n = 3)
       on.exit(delete_models(boot_run, .tags = NULL, .force = TRUE), add = TRUE)
       run_df <- run_log(MODEL_DIR)
       tree_data <- make_tree_data(run_df, add_summary = TRUE)

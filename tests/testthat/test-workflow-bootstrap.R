@@ -85,8 +85,8 @@ withr::with_options(
       expect_message(get_model_status(.boot_run), "has not been set up")
       expect_false(check_nonmem_finished(.boot_run))
       expect_false(model_is_finished(.boot_run))
-      expect_false(bootstrap_is_cleaned_up(.boot_run))
-      expect_true(is.null(get_boot_spec(.boot_run)))
+      expect_false(analysis_is_cleaned_up(.boot_run))
+      expect_true(is.null(get_analysis_spec(.boot_run)))
     })
 
     # Read in model for remainder of tests
@@ -182,7 +182,7 @@ withr::with_options(
       })
 
       # Check boot spec
-      boot_spec <- get_boot_spec(.boot_run)
+      boot_spec <- get_analysis_spec(.boot_run)
       expect_true(is.null(boot_spec$cleaned_up))
       expect_true(is.null(boot_spec$seed))
       expect_true(is.null(boot_spec$strat_cols))
@@ -197,9 +197,9 @@ withr::with_options(
       expect_false(all(res))
       # Logical and error checks
       expect_false(model_is_finished(.boot_run))
-      expect_false(bootstrap_is_cleaned_up(.boot_run))
+      expect_false(analysis_is_cleaned_up(.boot_run))
       expect_error(
-        bootstrap_can_be_summarized(.boot_run),
+        analysis_can_be_summarized(.boot_run),
         "One or more bootstrap runs have not finished executing"
       )
       expect_error(
@@ -251,7 +251,7 @@ withr::with_options(
       expect_equal(as.vector(table(data$ETN)), c(340, 140, 300))
 
       # Check boot spec
-      boot_spec <- get_boot_spec(.boot_run)
+      boot_spec <- get_analysis_spec(.boot_run)
       expect_equal(boot_spec$seed, 1234)
       expect_equal(boot_spec$strat_cols, c("SEX", "ETN"))
     })
@@ -292,8 +292,8 @@ withr::with_options(
       expect_true(check_nonmem_finished(.boot_run))
       expect_true(all(check_nonmem_finished(boot_models)))
       expect_true(model_is_finished(.boot_run))
-      expect_false(bootstrap_is_cleaned_up(.boot_run)) # cannot be cleaned up
-      expect_true(bootstrap_can_be_summarized(.boot_run)) # can now be summarized
+      expect_false(analysis_is_cleaned_up(.boot_run)) # cannot be cleaned up
+      expect_true(analysis_can_be_summarized(.boot_run)) # can now be summarized
       expect_error(
         cleanup_bootstrap_run(.boot_run), "Model has not been summarized yet"
       )
@@ -332,7 +332,7 @@ withr::with_options(
     })
 
     test_that("summarize_bootstrap_run works as expected", {
-      boot_sum_path <- file.path(boot_dir, "boot_summary.RDS")
+      boot_sum_path <- get_analysis_sum_path(.boot_run, .check_exists = FALSE)
       expect_false(fs::file_exists(boot_sum_path))
       expect_no_message(summarize_bootstrap_run(.boot_run))
       expect_true(fs::file_exists(boot_sum_path))
@@ -376,8 +376,8 @@ withr::with_options(
       # Check helper functions after summarization & before cleanup
       expect_true(check_nonmem_finished(.boot_run))
       expect_true(model_is_finished(.boot_run))
-      expect_false(bootstrap_is_cleaned_up(.boot_run)) # is not cleaned up
-      expect_true(bootstrap_can_be_summarized(.boot_run)) # can still be summarized
+      expect_false(analysis_is_cleaned_up(.boot_run)) # is not cleaned up
+      expect_true(analysis_can_be_summarized(.boot_run)) # can still be summarized
     })
 
     test_that("bootstrap run inclusion in config_log (after summary)", {
@@ -456,14 +456,14 @@ withr::with_options(
       expect_message(boot_models <- get_boot_models(.boot_run), "has been cleaned up")
       expect_true(is.null(boot_models))
       expect_true(model_is_finished(.boot_run))
-      expect_true(bootstrap_is_cleaned_up(.boot_run))
+      expect_true(analysis_is_cleaned_up(.boot_run))
       expect_error(
-        bootstrap_can_be_summarized(.boot_run),
+        analysis_can_be_summarized(.boot_run),
         "The bootstrap run has been cleaned up"
       )
       expect_error(
         cleanup_bootstrap_run(.boot_run),
-        "Bootstrap run has already been cleaned"
+        "bootstrap run has already been cleaned"
       )
 
       # Make sure the model object and summary can still be read in
@@ -479,7 +479,7 @@ withr::with_options(
 
 
       # Confirm boot spec alterations
-      boot_spec <- get_boot_spec(.boot_run)
+      boot_spec <- get_analysis_spec(.boot_run)
       expect_true(boot_spec$cleaned_up)
       expect_true(is.null(boot_spec$bootstrap_runs))
 

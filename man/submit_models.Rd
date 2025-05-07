@@ -44,11 +44,12 @@ option. This option defaults to "sge" on Linux and "local" otherwise.}
 \item{.overwrite}{Logical to specify whether or not to overwrite existing
 model output from a previous run. If \code{NULL}, the default, will defer to
 setting in \code{.bbi_args} or \code{bbi.yaml}. If \emph{not} \code{NULL} will override any
-settings in \code{.bbi_args} or \code{bbi.yaml}. \strong{The exception to this are
-bootstrap runs (\code{bbi_nmboot_model} objects).} For bootstrap runs, this
-defaults to \code{FALSE} and does \emph{not} respect any setting passed via
-\code{.bbi_args} or a \code{bbi.yaml} config file. To overwrite existing bootstrap
-output, a user must pass \code{TRUE} through this argument.}
+settings in \code{.bbi_args} or \code{bbi.yaml}. \strong{The exception to this are analysis
+runs (\code{bbi_nmboot_model} and \code{bbi_nmsse_model} objects).} For analysis
+runs (bootstrap and SSE), this defaults to \code{FALSE} and does \emph{not} respect
+any setting passed via \code{.bbi_args} or a \code{bbi.yaml} config file. To
+overwrite an existing analysis output, a user must pass \code{TRUE} through this
+argument.}
 
 \item{.config_path}{Path to a bbi configuration file. If \code{NULL}, the
 default, will attempt to use a \code{bbi.yaml} in the same directory as the

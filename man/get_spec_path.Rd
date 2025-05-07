@@ -3,12 +3,15 @@
 \name{get_spec_path}
 \alias{get_spec_path}
 \alias{get_spec_path.bbi_nmboot_model}
+\alias{get_spec_path.bbi_nmsse_model}
 \alias{get_spec_path.bbi_base_model}
 \title{Get the relevant specification file path}
 \usage{
 get_spec_path(.mod, .check_exists = TRUE)
 
 \method{get_spec_path}{bbi_nmboot_model}(.mod, .check_exists = TRUE)
+
+\method{get_spec_path}{bbi_nmsse_model}(.mod, .check_exists = TRUE)
 
 \method{get_spec_path}{bbi_base_model}(.mod, .check_exists = TRUE)
 }
@@ -22,14 +25,17 @@ does not exist.}
 a file path
 }
 \description{
-Get the bootstrap specification path from a \code{bbi_nmboot_model} object or the
-simulation specification path from a \code{bbi_nmsim_model} \emph{or} \code{bbi_nonmem_model}
-object.
+Get the \strong{analysis run specification} path from a \code{bbi_nmboot_model} or
+\code{bbi_nmsse_model} object, or the \strong{simulation specification} path from a
+\code{bbi_nmsim_model} \emph{or} \code{bbi_nonmem_model} object.
 }
 \section{Methods (by class)}{
 \itemize{
 \item \code{get_spec_path(bbi_nmboot_model)}: Get the bootstrap specification file path from a
 \code{bbi_nmboot_model} object
+
+\item \code{get_spec_path(bbi_nmsse_model)}: Get the SSE specification file path from a
+\code{bbi_nmsse_model} object
 
 \item \code{get_spec_path(bbi_base_model)}: Get the simulation specification file path from a
 \code{bbi_nmsim_model} or \code{bbi_nonmem_model} object

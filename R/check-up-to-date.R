@@ -67,58 +67,13 @@ check_up_to_date.bbi_base_model <- function(.bbi_object, ...) {
 #' @rdname check_up_to_date
 #' @export
 check_up_to_date.bbi_nmboot_model <- function(.bbi_object, ...) {
-  output_dir <- get_output_dir(.bbi_object, .check_exists = FALSE)
-  if (!fs::dir_exists(output_dir)) {
-    rlang::abort(
-      c(
-        paste(
-          glue("Model {get_model_id(.bbi_object)}:"),
-          "Cannot check if up-to-date because bootstrap run has not been set up yet"
-        ),
-        "See `?setup_bootstrap_run` for more details"
-      )
-    )
-  }
+  check_up_to_date_analysis(.bbi_object)
+}
 
-  if(!model_is_finished(.bbi_object)){
-    rlang::abort(paste(glue("Model {get_model_id(.bbi_object)}:"), CHECK_UP_TO_DATE_ERR_MSG))
-  }
-
-  boot_spec <- get_boot_spec(.bbi_object)
-
-  # check necessary files for changes
-  model_file <- get_model_path(.bbi_object)
-  based_on_data_file <- get_data_path(.bbi_object, .check_exists = FALSE)
-
-  changed_files <- c(
-    boot_spec[[CONFIG_MODEL_MD5]] != tools::md5sum(model_file),
-    boot_spec[[CONFIG_DATA_BASED_ON_MD5]] != tools::md5sum(based_on_data_file)
-  )
-
-  any_changes <- any(changed_files)
-  if(isTRUE(any_changes)) {
-    message(paste(
-      glue("The following files have changed in {get_model_id(.bbi_object)}"),
-      paste("*", names(which(changed_files)), collapse = "\n"),
-      sep = "\n"
-    ))
-  }
-
-  na_files <- is.na(changed_files)
-  if(isTRUE(any(na_files))) {
-    message(paste(
-      glue("The following files in {get_model_id(.bbi_object)} ARE NO LONGER PRESENT"),
-      paste("*", names(changed_files[na_files]), collapse = "\n"),
-      sep = "\n"
-    ))
-  }
-
-
-  # build return value
-  res <- replace_na(!changed_files, FALSE)
-  names(res) <- c("model", "data")
-
-  return(invisible(res))
+#' @rdname check_up_to_date
+#' @export
+check_up_to_date.bbi_nmsse_model <- function(.bbi_object, ...) {
+  check_up_to_date_analysis(.bbi_object)
 }
 
 #' @rdname check_up_to_date
@@ -200,6 +155,67 @@ check_up_to_date_nonmem <- function(.mod) {
       sep = "\n"
     ))
   }
+
+  # build return value
+  res <- replace_na(!changed_files, FALSE)
+  names(res) <- c("model", "data")
+
+  return(invisible(res))
+}
+
+#' Private implementation to check that NONMEM analysis (bootstrap or SSE) is
+#' up-to-date
+#' @inheritParams check_up_to_date
+#' @keywords internal
+check_up_to_date_analysis <- function(.bbi_object){
+  run_type <- analysis_run_type(.bbi_object, fmt = TRUE)
+
+  output_dir <- get_output_dir(.bbi_object, .check_exists = FALSE)
+  if (!fs::dir_exists(output_dir)) {
+    cli::cli_abort(
+      c(
+        paste(
+          "Model {get_model_id(.bbi_object)}:",
+          "Cannot check if up-to-date because {run_type} run has not been set up yet"
+        ),
+        "i" = "See `?setup_{tolower(run_type)}_run` for more details"
+      )
+    )
+  }
+
+  if(!model_is_finished(.bbi_object)){
+    rlang::abort(paste(glue("Model {get_model_id(.bbi_object)}:"), CHECK_UP_TO_DATE_ERR_MSG))
+  }
+
+  analysis_spec <- get_analysis_spec(.bbi_object)
+
+  # check necessary files for changes
+  model_file <- get_model_path(.bbi_object)
+  based_on_data_file <- get_data_path(.bbi_object, .check_exists = FALSE)
+
+  changed_files <- c(
+    analysis_spec[[CONFIG_MODEL_MD5]] != tools::md5sum(model_file),
+    analysis_spec[[CONFIG_DATA_BASED_ON_MD5]] != tools::md5sum(based_on_data_file)
+  )
+
+  any_changes <- any(changed_files)
+  if(isTRUE(any_changes)) {
+    message(paste(
+      glue("The following files have changed in {get_model_id(.bbi_object)}"),
+      paste("*", names(which(changed_files)), collapse = "\n"),
+      sep = "\n"
+    ))
+  }
+
+  na_files <- is.na(changed_files)
+  if(isTRUE(any(na_files))) {
+    message(paste(
+      glue("The following files in {get_model_id(.bbi_object)} ARE NO LONGER PRESENT"),
+      paste("*", names(changed_files[na_files]), collapse = "\n"),
+      sep = "\n"
+    ))
+  }
+
 
   # build return value
   res <- replace_na(!changed_files, FALSE)

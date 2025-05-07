@@ -63,7 +63,7 @@ describe("Model status helpers return the correct status", {
     expect_false(check_nonmem_finished(.boot_run))
     expect_message(
       get_model_status(.boot_run),
-      "Bootstrap run `1-boot` has not been set up", fixed = TRUE
+      "bootstrap run `1-boot` has not been set up", fixed = TRUE
     )
 
     # After setup (only get_model_status changes)
