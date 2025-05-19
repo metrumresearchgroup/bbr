@@ -21,9 +21,9 @@ jobs:
       matrix:
         config:
           - os: ubuntu-22.04
-            r: 4.2.3
+            r: 4.3.3
           - os: ubuntu-22.04
-            r: 4.3.1
+            r: 4.4.2
           - os: ubuntu-latest
             r: release
           - label: oldest
