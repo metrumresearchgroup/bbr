@@ -1,3 +1,21 @@
+# bbr 1.14.0
+
+## New features and changes
+
+- `summary_log()` and `add_summary()` now report the Akaike information
+  criterion (as the "aic" column) and Bayesian information criterion (as the
+  "bic" column). (#743)
+
+- The new function `add_dofv()` extends a log with the change in objection
+  function value between each row's model and a reference model. (#743)
+
+- `submit_model()` has a guard to prevent Metworx users from accidentally
+  submitting models with Slurm's `qsub` shim.  This guard has been updated for a
+  Metworx-side change. (#742)
+
+- `run_nmtran()` learned to handle a `maxlim` value of 100 for compatibility
+  with older bbi versions. (#744)
+
 # bbr 1.13.0
 
 ## New features and changes
