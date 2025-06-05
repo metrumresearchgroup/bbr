@@ -91,7 +91,6 @@ use_bbi <- function(.path = NULL, .version = "latest", .force = FALSE, .quiet = 
 }
 
 #' Private helper function to most recent release version from repo
-#' @importFrom utils download.file
 #' @param owner Repository owner/organization
 #' @param repo Repository name
 #' @keywords internal
@@ -104,7 +103,7 @@ current_release_url <- function(owner = 'metrumresearchgroup', repo = 'bbi'){
   on.exit(unlink(tmp),add = TRUE)
 
   res <- tryCatch(
-    download.file(
+    download_with_retry(
       glue('https://api.github.com/repos/{owner}/{repo}/releases/latest'),
       destfile = tmp,
       quiet = TRUE
