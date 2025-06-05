@@ -90,11 +90,12 @@ use_bbi <- function(.path = NULL, .version = "latest", .force = FALSE, .quiet = 
 
 }
 
-#' Private helper function to most recent release version from repo
-#' @param owner Repository owner/organization
-#' @param repo Repository name
+#' Return URL for the tar.gz of the latest bbi release
+#'
+#' The URL is specific for the current operating system. At the moment, only
+#' amd64 architectures are supported.
 #' @noRd
-current_release_url <- function(owner = 'metrumresearchgroup', repo = 'bbi'){
+current_bbi_release_url <- function() {
 
   os <- check_os()
 
@@ -104,7 +105,7 @@ current_release_url <- function(owner = 'metrumresearchgroup', repo = 'bbi'){
 
   res <- tryCatch(
     download_with_retry(
-      glue('https://api.github.com/repos/{owner}/{repo}/releases/latest'),
+      "https://metrumresearchgroup.github.io/bbi/latest.json",
       destfile = tmp,
       quiet = TRUE
     ),
@@ -112,16 +113,19 @@ current_release_url <- function(owner = 'metrumresearchgroup', repo = 'bbi'){
   )
 
   if (!identical(res, 0L)) {
-    stop(glue('`current_release_url({owner}, {repo})` failed, possibly because this IP is over the public Github rate limit of 60/hour.'))
+    stop("Retrieving latest bbi version failed:\n", res)
   }
   release_info <- jsonlite::fromJSON(tmp, simplifyDataFrame = FALSE)
+  version <- release_info[["version"]]
+  if (is.null(version)) {
+    dev_error(paste0(
+      "bbi version downloaded from bbi site is unexpectedly empty. ",
+      "JSON data:\n",
+      readChar(tmp, file.size(tmp))
+    ))
+  }
 
-  uris <- grep('gz$',sapply(release_info$assets,function(x) x$browser_download_url),value = TRUE)
-  uris <- uris[grepl(x = uris, pattern = "amd64", fixed = TRUE)]
-  names(uris) <- sapply(strsplit(gsub('_amd64.tar.gz$','',basename(uris)),'_'),'[[',2)
-
-  uris[os]
-
+  return(make_bbi_download_url(version, os))
 }
 
 
@@ -134,7 +138,7 @@ current_release_url <- function(owner = 'metrumresearchgroup', repo = 'bbi'){
 bbi_current_release <- function(.bbi_url = NULL){
   checkmate::assert_string(.bbi_url, null.ok = TRUE)
   if (is.null(.bbi_url)) {
-    .bbi_url <- current_release_url(owner = 'metrumresearchgroup', repo = 'bbi')
+    .bbi_url <- current_bbi_release_url()
   }
   str_replace(basename(dirname(.bbi_url)), '^v', '')
 }
@@ -146,7 +150,7 @@ install_menu <- function(.path, .version, .force, .quiet){
   .dest_bbi_path <- fs::path_abs(.path)
   local_v <- bbi_version(.dest_bbi_path)
 
-  current_bbi_url <- current_release_url(owner = 'metrumresearchgroup', repo = 'bbi')
+  current_bbi_url <- current_bbi_release_url()
   current_v <- bbi_current_release(current_bbi_url)
   aborted <- FALSE
 

@@ -44,7 +44,6 @@ test_that("check_bbi_exe() correctly errors or finds paths [BBR-BBR-003]", {
 })
 
 test_that("check_bbi_exe() errors on too low version [BBR-BBR-004]", {
-  skip_if_over_rate_limit()
   skip_if(getOption("bbr.DEV_no_min_version"))
 
   withr::with_options(list("bbr.bbi_min_version" = package_version("100.0.0")), {
