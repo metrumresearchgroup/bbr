@@ -80,6 +80,8 @@ jobs:
             ${{ env.NMREC_PKG }}
           upgrade: ${{ matrix.config.label == 'oldest' && 'FALSE' || 'TRUE' }}
       - uses: r-lib/actions/check-r-package@v2
+        with:
+          error-on: ${{ matrix.config.r == 'release' && '"note"' || '"warning"' }}
       - name: Check pkgdown
         shell: Rscript {0}
         run: pkgdown::check_pkgdown()
