@@ -155,7 +155,7 @@ install_menu <- function(.path, .version, .force, .quiet){
     .bbi_url <- current_bbi_url
     requested_v <- current_v
   } else {
-    .bbi_url <- as.character(glue("https://github.com/metrumresearchgroup/bbi/releases/download/{.version}/bbi_{check_os()}_amd64.tar.gz"))
+    .bbi_url <- make_bbi_download_url(.version, check_os())
     requested_v <- .version
   }
 
@@ -188,6 +188,10 @@ install_menu <- function(.path, .version, .force, .quiet){
   }
 }
 
+make_bbi_download_url <- function(version, os) {
+  base_url <- "https://github.com/metrumresearchgroup/bbi/releases/download"
+  return(as.character(glue("{base_url}/{version}/bbi_{os}_amd64.tar.gz")))
+}
 
 #' Build default path to install bbi to
 #' @keywords internal
