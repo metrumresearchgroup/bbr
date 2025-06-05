@@ -91,7 +91,6 @@ use_bbi <- function(.path = NULL, .version = "latest", .force = FALSE, .quiet = 
 }
 
 #' Private helper function to most recent release version from repo
-#' @importFrom stringr str_detect
 #' @importFrom utils download.file
 #' @param owner Repository owner/organization
 #' @param repo Repository name
@@ -104,17 +103,18 @@ current_release_url <- function(owner = 'metrumresearchgroup', repo = 'bbi'){
 
   on.exit(unlink(tmp),add = TRUE)
 
-  tryCatch(
-    {
-      download.file(glue('https://api.github.com/repos/{owner}/{repo}/releases/latest'), destfile = tmp, quiet = TRUE)
-    },
-    error = function(e) {
-      if (str_detect(e$message, "HTTP error 403")) {
-        stop(glue('`current_release_url({owner}, {repo})` failed, possibly because this IP is over the public Github rate limit of 60/hour.'))
-      }
-    }
+  res <- tryCatch(
+    download.file(
+      glue('https://api.github.com/repos/{owner}/{repo}/releases/latest'),
+      destfile = tmp,
+      quiet = TRUE
+    ),
+    error = identity
   )
 
+  if (!identical(res, 0L)) {
+    stop(glue('`current_release_url({owner}, {repo})` failed, possibly because this IP is over the public Github rate limit of 60/hour.'))
+  }
   release_info <- jsonlite::fromJSON(tmp, simplifyDataFrame = FALSE)
 
   uris <- grep('gz$',sapply(release_info$assets,function(x) x$browser_download_url),value = TRUE)
