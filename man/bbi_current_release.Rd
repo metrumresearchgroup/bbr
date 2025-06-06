@@ -8,8 +8,7 @@ bbi_current_release(.bbi_url = NULL)
 }
 \arguments{
 \item{.bbi_url}{(Optional) URL for a bbi release artifact to strip version
-number out of. If \code{NULL}, the default, will fetch the URL with
-\code{current_release_url()}.}
+number out of. If \code{NULL}, the default, use the URL for the latest release.}
 }
 \description{
 Helper function to get version number of most recent release of bbi from GitHub.

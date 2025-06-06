@@ -93,7 +93,7 @@ use_bbi <- function(.path = NULL, .version = "latest", .force = FALSE, .quiet = 
 #' Private helper function to most recent release version from repo
 #' @param owner Repository owner/organization
 #' @param repo Repository name
-#' @keywords internal
+#' @noRd
 current_release_url <- function(owner = 'metrumresearchgroup', repo = 'bbi'){
 
   os <- check_os()
@@ -128,8 +128,7 @@ current_release_url <- function(owner = 'metrumresearchgroup', repo = 'bbi'){
 #' @title Get version number of bbi current release
 #' @description Helper function to get version number of most recent release of bbi from GitHub.
 #' @param .bbi_url (Optional) URL for a bbi release artifact to strip version
-#'   number out of. If `NULL`, the default, will fetch the URL with
-#'   `current_release_url()`.
+#'   number out of. If `NULL`, the default, use the URL for the latest release.
 #' @importFrom stringr str_replace
 #' @export
 bbi_current_release <- function(.bbi_url = NULL){
