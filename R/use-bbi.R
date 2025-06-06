@@ -92,8 +92,6 @@ use_bbi <- function(.path = NULL, .version = "latest", .force = FALSE, .quiet = 
 
 #' Private helper function to most recent release version from repo
 #' @importFrom stringr str_detect
-#' @importFrom jsonlite fromJSON
-#' @importFrom glue glue
 #' @importFrom utils download.file
 #' @param owner Repository owner/organization
 #' @param repo Repository name
