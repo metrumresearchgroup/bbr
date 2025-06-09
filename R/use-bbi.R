@@ -90,15 +90,12 @@ use_bbi <- function(.path = NULL, .version = "latest", .force = FALSE, .quiet = 
 
 }
 
-#' Private helper function to most recent release version from repo
-#' @importFrom stringr str_detect
-#' @importFrom jsonlite fromJSON
-#' @importFrom glue glue
-#' @importFrom utils download.file
-#' @param owner Repository owner/organization
-#' @param repo Repository name
-#' @keywords internal
-current_release_url <- function(owner = 'metrumresearchgroup', repo = 'bbi'){
+#' Return URL for the tar.gz of the latest bbi release
+#'
+#' The URL is specific for the current operating system. At the moment, only
+#' amd64 architectures are supported.
+#' @noRd
+current_bbi_release_url <- function() {
 
   os <- check_os()
 
@@ -106,39 +103,42 @@ current_release_url <- function(owner = 'metrumresearchgroup', repo = 'bbi'){
 
   on.exit(unlink(tmp),add = TRUE)
 
-  tryCatch(
-    {
-      download.file(glue('https://api.github.com/repos/{owner}/{repo}/releases/latest'), destfile = tmp, quiet = TRUE)
-    },
-    error = function(e) {
-      if (str_detect(e$message, "HTTP error 403")) {
-        stop(glue('`current_release_url({owner}, {repo})` failed, possibly because this IP is over the public Github rate limit of 60/hour.'))
-      }
-    }
+  res <- tryCatch(
+    download_with_retry(
+      "https://metrumresearchgroup.github.io/bbi/latest.json",
+      destfile = tmp,
+      quiet = TRUE
+    ),
+    error = identity
   )
 
+  if (!identical(res, 0L)) {
+    stop("Retrieving latest bbi version failed:\n", res)
+  }
   release_info <- jsonlite::fromJSON(tmp, simplifyDataFrame = FALSE)
+  version <- release_info[["version"]]
+  if (is.null(version)) {
+    dev_error(paste0(
+      "bbi version downloaded from bbi site is unexpectedly empty. ",
+      "JSON data:\n",
+      readChar(tmp, file.size(tmp))
+    ))
+  }
 
-  uris <- grep('gz$',sapply(release_info$assets,function(x) x$browser_download_url),value = TRUE)
-  uris <- uris[grepl(x = uris, pattern = "amd64", fixed = TRUE)]
-  names(uris) <- sapply(strsplit(gsub('_amd64.tar.gz$','',basename(uris)),'_'),'[[',2)
-
-  uris[os]
-
+  return(make_bbi_download_url(version, os))
 }
 
 
 #' @title Get version number of bbi current release
 #' @description Helper function to get version number of most recent release of bbi from GitHub.
 #' @param .bbi_url (Optional) URL for a bbi release artifact to strip version
-#'   number out of. If `NULL`, the default, will fetch the URL with
-#'   `current_release_url()`.
+#'   number out of. If `NULL`, the default, use the URL for the latest release.
 #' @importFrom stringr str_replace
 #' @export
 bbi_current_release <- function(.bbi_url = NULL){
   checkmate::assert_string(.bbi_url, null.ok = TRUE)
   if (is.null(.bbi_url)) {
-    .bbi_url <- current_release_url(owner = 'metrumresearchgroup', repo = 'bbi')
+    .bbi_url <- current_bbi_release_url()
   }
   str_replace(basename(dirname(.bbi_url)), '^v', '')
 }
@@ -150,7 +150,7 @@ install_menu <- function(.path, .version, .force, .quiet){
   .dest_bbi_path <- fs::path_abs(.path)
   local_v <- bbi_version(.dest_bbi_path)
 
-  current_bbi_url <- current_release_url(owner = 'metrumresearchgroup', repo = 'bbi')
+  current_bbi_url <- current_bbi_release_url()
   current_v <- bbi_current_release(current_bbi_url)
   aborted <- FALSE
 
@@ -158,7 +158,7 @@ install_menu <- function(.path, .version, .force, .quiet){
     .bbi_url <- current_bbi_url
     requested_v <- current_v
   } else {
-    .bbi_url <- as.character(glue("https://github.com/metrumresearchgroup/bbi/releases/download/{.version}/bbi_{check_os()}_amd64.tar.gz"))
+    .bbi_url <- make_bbi_download_url(.version, check_os())
     requested_v <- .version
   }
 
@@ -191,6 +191,10 @@ install_menu <- function(.path, .version, .force, .quiet){
   }
 }
 
+make_bbi_download_url <- function(version, os) {
+  base_url <- "https://github.com/metrumresearchgroup/bbi/releases/download"
+  return(as.character(glue("{base_url}/{version}/bbi_{os}_amd64.tar.gz")))
+}
 
 #' Build default path to install bbi to
 #' @keywords internal

@@ -13,7 +13,6 @@ tdir <- normalizePath(tempdir())
 test_that("use-bbi works on linux pulling from options [BBR-UBI-001]", {
   bbi_tmp_path <- file.path(tdir, "bbi1")
   on.exit(unlink(bbi_tmp_path))
-  skip_if_over_rate_limit()
 
   withr::with_options(
     list('bbr.bbi_exe_path' = bbi_tmp_path),
@@ -26,7 +25,6 @@ test_that("use-bbi works on linux pulling from options [BBR-UBI-001]", {
 test_that("use-bbi works on linux with path specified [BBR-UBI-002]", {
   bbi_tmp_path <- file.path(tdir, "to_be_created","bbi2")
   on.exit(unlink(bbi_tmp_path))
-  skip_if_over_rate_limit()
 
   use_bbi(.path = bbi_tmp_path, .force = TRUE)
   f_info <- file.info(bbi_tmp_path)
@@ -50,7 +48,6 @@ test_that("bbi_version returns nothing with fake bbi [BBR-UBI-003]", {
 
 test_that("use_bbi .version argument works [BBR-UBI-004]", {
 
-  skip_if_over_rate_limit()
   bbi_tmp_path <- file.path(tdir, "bbi3")
   on.exit(unlink(bbi_tmp_path))
 
@@ -65,7 +62,6 @@ test_that("use_bbi .version argument works [BBR-UBI-004]", {
 })
 
 test_that("use-bbi and bbi_version handle path with spaces [BBR-UBI-005]", {
-  skip_if_over_rate_limit()
 
   dir_with_space <- tempfile(pattern = "foo bar")
   dir.create(dir_with_space, recursive = TRUE)

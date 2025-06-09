@@ -8,7 +8,7 @@
 #' @param by if less than this number of requests are left before hitting the rate limit, skip the test
 #' @keywords internal
 skip_if_over_rate_limit <- function(by = 5) {
-
+  # ^ SHARED with bbr.bayes
   tmp <- tempfile(fileext = '.json')
 
   on.exit(unlink(tmp),add = TRUE)
