@@ -1,3 +1,10 @@
+# bbr 1.14.1
+
+## Changes
+
+- `use_bbi()` now retrieves the latest bbi version from bbi's site instead of
+  `api.github.com` to avoid errors due to rate limiting. (#748)
+
 # bbr 1.14.0
 
 ## New features and changes
