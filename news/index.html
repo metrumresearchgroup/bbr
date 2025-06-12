@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.14.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.14.1</span>
       </span>
     </div>
 
@@ -72,6 +72,14 @@
       <small>Source: <a href="https://github.com/metrumresearchgroup/bbr/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="1.14.1" id="bbr-1141">bbr 1.14.1<a class="anchor" aria-label="anchor" href="#bbr-1141"></a></h2>
+<div class="section level3">
+<h3 id="changes-1-14-1">Changes<a class="anchor" aria-label="anchor" href="#changes-1-14-1"></a></h3>
+<ul><li>
+<code><a href="../reference/use_bbi.html">use_bbi()</a></code> now retrieves the latest bbi version from bbi’s site instead of <code>api.github.com</code> to avoid errors due to rate limiting. (<a href="https://github.com/metrumresearchgroup/bbr/issues/748" class="external-link">#748</a>)</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="1.14.0" id="bbr-1140">bbr 1.14.0<a class="anchor" aria-label="anchor" href="#bbr-1140"></a></h2>
 <div class="section level3">
@@ -143,7 +151,7 @@ and <code><a href="../reference/setup_bootstrap_run.html">setup_bootstrap_run()<
 </ul></div>
 <div class="section level3">
 <h3 id="bugs-addressed-1-9-0">Bugs addressed<a class="anchor" aria-label="anchor" href="#bugs-addressed-1-9-0"></a></h3>
-<ul><li><p>With the latest <code>data.table</code> release (1.15.0), <code><a href="../reference/param_estimates_batch.html">param_estimates_batch()</a></code> failed for an edge case due to a change in the header detection heuristics. <code><a href="../reference/param_estimates_batch.html">param_estimates_batch()</a></code> now tells <code><a href="https://rdatatable.gitlab.io/data.table/reference/fread.html" class="external-link">data.table::fread()</a></code> to expect a header. (<a href="https://github.com/metrumresearchgroup/bbr/issues/648" class="external-link">#648</a>)</p></li>
+<ul><li><p>With the latest <code>data.table</code> release (1.15.0), <code><a href="../reference/param_estimates_batch.html">param_estimates_batch()</a></code> failed for an edge case due to a change in the header detection heuristics. <code><a href="../reference/param_estimates_batch.html">param_estimates_batch()</a></code> now tells <code><a href="https://rdrr.io/pkg/data.table/man/fread.html" class="external-link">data.table::fread()</a></code> to expect a header. (<a href="https://github.com/metrumresearchgroup/bbr/issues/648" class="external-link">#648</a>)</p></li>
 <li><p>When passed <code>.recurse = TRUE</code>, <code><a href="../reference/run_log.html">run_log()</a></code>, <code><a href="../reference/config_log.html">config_log()</a></code>, and <code><a href="../reference/summary_log.html">summary_log()</a></code> included nested models, which was not by design. Any models under another model’s output directory are considered an implementation detail. (<a href="https://github.com/metrumresearchgroup/bbr/issues/643" class="external-link">#643</a>, <a href="https://github.com/metrumresearchgroup/bbr/issues/644" class="external-link">#644</a>, <a href="https://github.com/metrumresearchgroup/bbr/issues/645" class="external-link">#645</a>)</p></li>
 </ul></div>
 </div>
@@ -398,7 +406,7 @@ and <code><a href="../reference/setup_bootstrap_run.html">setup_bootstrap_run()<
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
       </footer></div>
