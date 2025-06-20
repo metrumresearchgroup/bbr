@@ -579,20 +579,7 @@ make_ofv_pairs <- function(log_df, mod_ref) {
     mpaths_extra <- setdiff(mpaths_ref, mpaths_log)
     mods_extra <- purrr::map(mpaths_extra[!is.na(mpaths_extra)], read_model)
     mods_all <- c(mods, mods_extra)
-    mpaths_all <- purrr::map_chr(mods_all, ABS_MOD_PATH)
-    mods_need <- mods_all[!mpaths_all %in% info[[ABS_MOD_PATH]]]
-    if (!length(mods_need)) {
-      dev_error("mods_need should never come up empty")
-    }
-
-    # Call summary_log_impl rather than model_summaries to reuse its logic for
-    # reshaping the result.
-    slog <- summary_log_impl(mods_need, calc_aic_bic = FALSE)
-    slog <- slog[!slog[[ABS_MOD_PATH]] %in% info[[ABS_MOD_PATH]], ]
-    slog[["dataset"]] <- summary_expand_data_path(slog)
-    slog[["method"]] <- get_final_est_method(slog)
-
-    info <- dplyr::bind_rows(info, slog[names(info)])
+    info <- extend_ofv_info(info, mods_all)
   }
 
   info_mod <- dplyr::rename(
@@ -612,4 +599,25 @@ make_ofv_pairs <- function(log_df, mod_ref) {
   tibble::tibble(path_mod = mpaths_log, path_ref = mpaths_ref) %>%
     dplyr::left_join(info_mod, by = c("path_mod" = ABS_MOD_PATH)) %>%
     dplyr::left_join(info_ref, by = c("path_ref" = ABS_MOD_PATH))
+}
+
+extend_ofv_info <- function(info, mods) {
+  if (!length(mods)) {
+    return(info)
+  }
+
+  paths <- purrr::map_chr(mods, ABS_MOD_PATH)
+  mods_need <- mods[!paths %in% info[[ABS_MOD_PATH]]]
+  if (!length(mods_need)) {
+    dev_error("mods_need should never come up empty")
+  }
+
+  # Call summary_log_impl rather than model_summaries to reuse its logic for
+  # reshaping the result.
+  slog <- summary_log_impl(mods_need, calc_aic_bic = FALSE)
+  slog <- slog[!slog[[ABS_MOD_PATH]] %in% info[[ABS_MOD_PATH]], ]
+  slog[["dataset"]] <- summary_expand_data_path(slog)
+  slog[["method"]] <- get_final_est_method(slog)
+
+  dplyr::bind_rows(info, slog[names(info)])
 }
