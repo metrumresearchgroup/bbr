@@ -562,8 +562,11 @@ make_ofv_pairs <- function(log_df, mod_ref) {
   mpaths_log <- log_df[[ABS_MOD_PATH]]
 
   if (is.null(mod_ref)) {
-    mods <- purrr::map(mpaths_log, read_model)
+    mods <- purrr::map(mpaths_log, try_read_model)
     mpaths_ref <- purrr::map_chr(mods, function(m) {
+      if (is.null(m)) {
+        return(NA_character_)
+      }
       get_based_on(m, .check_exists = FALSE)[1] %||% NA_character_
     })
   } else {
@@ -575,10 +578,10 @@ make_ofv_pairs <- function(log_df, mod_ref) {
     # ^ Summary information is missing for some models either because 1) log_df
     # was not a summary log or 2) some reference models are not included in
     # log_df.
-    mods <- mods %||% purrr::map(mpaths_log, read_model)
+    mods <- mods %||% purrr::map(mpaths_log, try_read_model)
     mpaths_extra <- setdiff(mpaths_ref, mpaths_log)
-    mods_extra <- purrr::map(mpaths_extra[!is.na(mpaths_extra)], read_model)
-    mods_all <- c(mods, mods_extra)
+    mods_extra <- purrr::map(mpaths_extra[!is.na(mpaths_extra)], try_read_model)
+    mods_all <- purrr::discard(c(mods, mods_extra), is.null)
     info <- extend_ofv_info(info, mods_all)
   }
 
@@ -609,7 +612,7 @@ extend_ofv_info <- function(info, mods) {
   paths <- purrr::map_chr(mods, ABS_MOD_PATH)
   mods_need <- mods[!paths %in% info[[ABS_MOD_PATH]]]
   if (!length(mods_need)) {
-    dev_error("mods_need should never come up empty")
+    return(info)
   }
 
   # Call summary_log_impl rather than model_summaries to reuse its logic for
