@@ -562,8 +562,11 @@ make_ofv_pairs <- function(log_df, mod_ref) {
   mpaths_log <- log_df[[ABS_MOD_PATH]]
 
   if (is.null(mod_ref)) {
-    mods <- purrr::map(mpaths_log, read_model)
+    mods <- purrr::map(mpaths_log, try_read_model)
     mpaths_ref <- purrr::map_chr(mods, function(m) {
+      if (is.null(m)) {
+        return(NA_character_)
+      }
       get_based_on(m, .check_exists = FALSE)[1] %||% NA_character_
     })
   } else {
@@ -575,24 +578,11 @@ make_ofv_pairs <- function(log_df, mod_ref) {
     # ^ Summary information is missing for some models either because 1) log_df
     # was not a summary log or 2) some reference models are not included in
     # log_df.
-    mods <- mods %||% purrr::map(mpaths_log, read_model)
+    mods <- mods %||% purrr::map(mpaths_log, try_read_model)
     mpaths_extra <- setdiff(mpaths_ref, mpaths_log)
-    mods_extra <- purrr::map(mpaths_extra[!is.na(mpaths_extra)], read_model)
-    mods_all <- c(mods, mods_extra)
-    mpaths_all <- purrr::map_chr(mods_all, ABS_MOD_PATH)
-    mods_need <- mods_all[!mpaths_all %in% info[[ABS_MOD_PATH]]]
-    if (!length(mods_need)) {
-      dev_error("mods_need should never come up empty")
-    }
-
-    # Call summary_log_impl rather than model_summaries to reuse its logic for
-    # reshaping the result.
-    slog <- summary_log_impl(mods_need, calc_aic_bic = FALSE)
-    slog <- slog[!slog[[ABS_MOD_PATH]] %in% info[[ABS_MOD_PATH]], ]
-    slog[["dataset"]] <- summary_expand_data_path(slog)
-    slog[["method"]] <- get_final_est_method(slog)
-
-    info <- dplyr::bind_rows(info, slog[names(info)])
+    mods_extra <- purrr::map(mpaths_extra[!is.na(mpaths_extra)], try_read_model)
+    mods_all <- purrr::discard(c(mods, mods_extra), is.null)
+    info <- extend_ofv_info(info, mods_all)
   }
 
   info_mod <- dplyr::rename(
@@ -612,4 +602,25 @@ make_ofv_pairs <- function(log_df, mod_ref) {
   tibble::tibble(path_mod = mpaths_log, path_ref = mpaths_ref) %>%
     dplyr::left_join(info_mod, by = c("path_mod" = ABS_MOD_PATH)) %>%
     dplyr::left_join(info_ref, by = c("path_ref" = ABS_MOD_PATH))
+}
+
+extend_ofv_info <- function(info, mods) {
+  if (!length(mods)) {
+    return(info)
+  }
+
+  paths <- purrr::map_chr(mods, ABS_MOD_PATH)
+  mods_need <- mods[!paths %in% info[[ABS_MOD_PATH]]]
+  if (!length(mods_need)) {
+    return(info)
+  }
+
+  # Call summary_log_impl rather than model_summaries to reuse its logic for
+  # reshaping the result.
+  slog <- summary_log_impl(mods_need, calc_aic_bic = FALSE)
+  slog <- slog[!slog[[ABS_MOD_PATH]] %in% info[[ABS_MOD_PATH]], ]
+  slog[["dataset"]] <- summary_expand_data_path(slog)
+  slog[["method"]] <- get_final_est_method(slog)
+
+  dplyr::bind_rows(info, slog[names(info)])
 }

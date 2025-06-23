@@ -230,3 +230,82 @@ test_that("add_dofv: single reference model", {
     )
   )
 })
+
+test_that("add_dofv supports missing models", {
+  ofvs <- c(10.0, 20.0, 30.0, 40.0, 50.0)
+  tdir <- local_model_dir_nonmem_dummies(
+    list(
+      list(
+        subpath = "01",
+        data_set = "../data.csv",
+        ofv_no_constant = ofvs[1]
+      ),
+      list(
+        subpath = "02",
+        based_on = "01",
+        data_set = "../data.csv",
+        ofv_no_constant = ofvs[2]
+      ),
+      list(
+        subpath = "03",
+        based_on = "02",
+        data_set = "../data.csv",
+        ofv_no_constant = ofvs[3]
+      ),
+      list(
+        subpath = "04",
+        based_on = "03",
+        data_set = "../data.csv",
+        ofv_no_constant = ofvs[4]
+      ),
+      list(
+        subpath = "05",
+        based_on = "04",
+        data_set = "../data.csv",
+        ofv_no_constant = ofvs[5]
+      )
+    )
+  )
+
+  # Delete everything for model 01.
+  fs::dir_delete(file.path(tdir, "01"))
+  fs::file_delete(file.path(tdir, paste0("01.", c("ctl", "yaml"))))
+
+  # Delete output directory for model 02.
+  fs::dir_delete(file.path(tdir, "02"))
+
+  rlog <- run_log(tdir, .recurse = TRUE)
+  # Sort so that these tests don't assume run_log's output order.
+  rlog <- dplyr::arrange(rlog, .data[[RUN_ID_COL]])
+
+  slog <- add_summary(rlog)
+
+  # Delete everything for model 03 _after_ the run log and summary log have
+  # already been generated.
+  fs::dir_delete(file.path(tdir, "03"))
+  fs::file_delete(file.path(tdir, paste0("03.", c("ctl", "yaml"))))
+
+  expect_warning(
+    res_rlog <- add_dofv(rlog),
+    "failed to read model",
+    ignore.case = TRUE
+  )
+  expect_equal(res_rlog[[OFV_COL]], c(NA, NA, ofvs[4], ofvs[5]))
+  expect_equal(
+    res_rlog[[DOFV_COL]],
+    c(NA, NA, NA, ofvs[5] - ofvs[4])
+  )
+
+  expect_warning(
+    res_slog <- add_dofv(slog),
+    "failed to read model",
+    ignore.case = TRUE
+  )
+  # Model 03's ofv is available through the summary log generated before the
+  # model was deleted.
+  expect_equal(res_slog[[OFV_COL]], c(NA, ofvs[3], ofvs[4], ofvs[5]))
+  expect_equal(
+    res_slog[[DOFV_COL]],
+    c(NA, NA, ofvs[4] - ofvs[3], ofvs[5] - ofvs[4])
+  )
+})

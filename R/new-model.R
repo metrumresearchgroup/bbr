@@ -102,6 +102,17 @@ read_model <- function(.path) {
   create_model_object(yaml_list, save_yaml = FALSE)
 }
 
+# Call read_model, demoting any error to a warning.
+# @noRd
+try_read_model <- function(path) {
+  res <- tryCatch(read_model(path), error = identity)
+  if (inherits(res, "error")) {
+    cli::cli_warn("Failed to read model {.file {path}}: {res}")
+    return(NULL)
+  }
+  return(res)
+}
+
 # SHARED: save_model_yaml() is used by bbr.bayes, so any changes here should be
 # compatible with its use there.
 
