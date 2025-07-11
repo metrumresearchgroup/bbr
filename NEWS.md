@@ -1,3 +1,10 @@
+# bbr 1.14.2
+
+## Bug fixes
+
+- `add_dofv()` has been updated to warn instead of error when a model no longer
+  exists on disk. (#750)
+
 # bbr 1.14.1
 
 ## Changes
