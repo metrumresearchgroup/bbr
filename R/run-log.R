@@ -69,7 +69,7 @@ run_log <- function(.base_dir, .recurse = FALSE, .include = NULL) {
 find_models <- function(.base_dir, .recurse , .include) {
 
   # get yaml files
-  yaml_files <- dir_ls(.base_dir, recurse = .recurse)
+  yaml_files <- as.character(dir_ls(.base_dir, recurse = .recurse))
   yaml_files <- str_subset(yaml_files, "\\.ya?ml$")
   yaml_files <- str_subset(yaml_files, "bbi\\.ya?ml$", negate = TRUE)
   yaml_files <- prune_nested_models(yaml_files)
