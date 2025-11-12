@@ -260,3 +260,14 @@ test_that("run_log() ignores nested models", {
     expect_identical(res[["run"]], c("a", "b"))
   })
 })
+
+test_that("find_models does not warn about filter when no models are found", {
+  withr::with_tempdir({
+    expect_warning(
+      find_models(".", .recurse = TRUE, .include = NULL),
+      "no valid model yaml files",
+      ignore.case = TRUE,
+      all = TRUE
+    )
+  })
+})

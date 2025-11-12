@@ -91,6 +91,7 @@ find_models <- function(.base_dir, .recurse , .include) {
   # warn if no valid model YAML found
   if (length(mod_list) == 0) {
     warning(glue("Found no valid model YAML files in {.base_dir}"))
+    return(mod_list)
   }
 
   #If models are not specified to be kept, it keeps all models
