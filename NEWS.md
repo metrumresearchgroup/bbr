@@ -1,3 +1,17 @@
+# bbr 1.14.3
+
+## Changes
+
+- An internal function for finding models has been adjusted for compatibility
+  with stringr 1.6.0.  The main user-visible consequence is that
+  `get_boot_models()` still returns an unnamed list when stringr 1.6.0 or later
+  is installed. (#753)
+
+- `config_log()`, `run_log()`, and `summary_log()` no longer emit the "All
+  models excluded by filter" warning when no models are discovered under a
+  directory. (#753)
+
+
 # bbr 1.14.2
 
 ## Bug fixes
