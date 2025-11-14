@@ -260,3 +260,36 @@ test_that("run_log() ignores nested models", {
     expect_identical(res[["run"]], c("a", "b"))
   })
 })
+
+test_that("find_models does not warn about filter when no models are found", {
+  withr::with_tempdir({
+    expect_warning(
+      find_models(".", .recurse = TRUE, .include = NULL),
+      "no valid model yaml files",
+      ignore.case = TRUE,
+      all = TRUE
+    )
+  })
+})
+
+test_that("find_models returns unnamed list", {
+  ctl_file <- fs::path_abs(CTL_TEST_FILE)
+  withr::with_tempdir({
+    expect_warning(
+      res <- find_models(".", .recurse = TRUE, .include = NULL),
+      "no valid model yaml files",
+      ignore.case = TRUE,
+      all = TRUE
+    )
+    expect_identical(res, list())
+
+    fs::file_copy(ctl_file, "a.ctl")
+    new_model("a")
+    fs::file_copy(ctl_file, "b.ctl")
+    new_model("b")
+
+    res <- find_models(".", .recurse = TRUE, .include = NULL)
+    expect_length(res, 2)
+    expect_null(names(res))
+  })
+})
