@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.14.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.14.3</span>
       </span>
     </div>
 
@@ -538,7 +538,7 @@ the based_on field</a> vignette.)</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span><span class="va">mod1</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/update_model_id.html">update_model_id</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; replacing 1 with 2 in /tmp/RtmpBFC8RE/temp_libpath322f861338b52/bbr/model/nonmem/basic/2.ctl</span></span></code></pre></div>
+<span><span class="co">#&gt; replacing 1 with 2 in /tmp/RtmpCjIAsi/temp_libpath28310502504aa/bbr/model/nonmem/basic/2.ctl</span></span></code></pre></div>
 <p>The new control stream file <code>2.ctl</code> will be identical to
 its parent model, though you can use <a href="https://metrumresearchgroup.github.io/bbr/reference/update_model_id.html"><code>update_model_id()</code></a>
 (as above) to update to the new model ID in places like
@@ -646,12 +646,12 @@ section below for links to vignettes demonstrating those functions.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 10</span></span></span>
 <span><span class="co">#&gt;   absolute_model_path         run   yaml_md5 model_type description bbi_args    </span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> /tmp/RtmpBFC8RE/temp_libpa… 1     3ff1756… nonmem     original a… <span style="color: #949494;">&lt;named list&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> /tmp/RtmpBFC8RE/temp_libpa… 2     41f8d47… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> /tmp/RtmpBFC8RE/temp_libpa… 3     03a1f9d… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> /tmp/RtmpBFC8RE/temp_libpa… 4     09bed41… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> /tmp/RtmpBFC8RE/temp_libpa… 5     36d4841… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> /tmp/RtmpBFC8RE/temp_libpa… 6     36d4841… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> /tmp/RtmpCjIAsi/temp_libpa… 1     3ff1756… nonmem     original a… <span style="color: #949494;">&lt;named list&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> /tmp/RtmpCjIAsi/temp_libpa… 2     41f8d47… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> /tmp/RtmpCjIAsi/temp_libpa… 3     03a1f9d… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> /tmp/RtmpCjIAsi/temp_libpa… 4     09bed41… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> /tmp/RtmpCjIAsi/temp_libpa… 5     36d4841… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> /tmp/RtmpCjIAsi/temp_libpa… 6     36d4841… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 more variables: based_on &lt;list&gt;, tags &lt;list&gt;, notes &lt;list&gt;, star &lt;lgl&gt;</span></span></span></code></pre></div>
 <p>The <code><a href="../reference/run_log.html">run_log()</a></code> returns a tibble which can be manipulated
 like any other tibble. However, several of the columns
@@ -739,7 +739,7 @@ number, and parameter counts.</li>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>
