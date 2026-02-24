@@ -183,7 +183,7 @@ check_output_dir.bbi_model <- function(.mod, ...) {
 #' @param .path Character scalar path to the file
 #' @param .x_var name of variable to filter with `.x_floor`
 #' @param .x_floor Filters file to only rows with `.x_var` GREATER THAN this value.
-#' @importFrom readr read_table2 cols
+#' @importFrom readr read_table cols
 #' @importFrom dplyr filter
 #' @export
 check_nonmem_table_output <- function(
@@ -199,7 +199,7 @@ check_nonmem_table_output <- function(
   )
 
   # read file
-  df <- read_table2(.path, skip=1, col_types = cols())
+  df <- read_table(.path, skip=1, col_types = cols())
 
   # filter out early iterations (and final)
   if(!is.null(.x_var) && !is.null(.x_floor)) {
