@@ -68,7 +68,7 @@ Imports:
     nmrec (>= 0.3.0),
     processx,
     purrr (>= 1.0.0),
-    readr,
+    readr (>= 2.0.0),
     rlang,
     stringfish,
     stringr,
