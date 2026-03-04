@@ -18,7 +18,11 @@ copy_control_stream(
 
 \item{.overwrite}{If \code{TRUE}, overwrite existing file at \code{.new_model_path}. If \code{FALSE} and file exists at \code{.new_model_path} error.}
 
-\item{.update_model_file}{If \code{TRUE}, the default, update the \verb{$PROBLEM} line in the new control stream. If \code{FALSE}, \verb{\{.new_model\}.[mod|ctl]} will be an exact copy of its parent control stream.}
+\item{.update_model_file}{\strong{Only relevant to NONMEM models.} If \code{TRUE}, the
+default, update the newly created model file. If \code{FALSE}, new model file
+will be an exact copy of its parent. For a NONMEM model, this currently
+means only the \verb{$PROBLEM} line in the new control stream will be updated to
+read \verb{See \{.new_model\}.yaml. Created by bbr.}.}
 }
 \description{
 Helper function to copy a NONMEM control stream file and optionally update the new file.

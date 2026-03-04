@@ -130,10 +130,6 @@ copy_model_from.bbi_nonmem_model <- function(
 #' Used for iterating on model development. Also fills in necessary YAML fields
 #' for using `run_log()` later.
 #' @param .parent_mod S3 object of class `bbi_{.model_type}_model` to be used as the basis for copy.
-#' @param .update_model_file **Only relevant for NONMEM models.** If `TRUE`, the
-#'   default, update the `$PROBLEM` line in the new control stream. If `FALSE`,
-#'   `{.new_model}.[mod|ctl]` will be an exact copy of its parent control
-#'   stream.
 #' @param setup_fn A function to call (with no arguments) before creating the
 #'   model with [new_model()].
 #' @inheritParams copy_model_from
@@ -204,7 +200,7 @@ copy_model_from_impl <- function(
 #' @param .parent_model_path Path to the control stream to copy
 #' @param .new_model_path Path to copy the new control stream to
 #' @param .overwrite If `TRUE`, overwrite existing file at `.new_model_path`. If `FALSE` and file exists at `.new_model_path` error.
-#' @param .update_model_file If `TRUE`, the default, update the `$PROBLEM` line in the new control stream. If `FALSE`, `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.
+#' @inheritParams copy_model_from
 #' @keywords internal
 copy_control_stream <- function(.parent_model_path, .new_model_path, .overwrite, .update_model_file = FALSE) {
 
