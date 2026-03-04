@@ -29,10 +29,8 @@
 #'   tags passed to `.add_tags` argument. If `TRUE` inherit any tags from
 #'   `.parent_mod`, with any tags passed to `.add_tags` appended.
 #' @param .update_model_file **Only relevant to NONMEM models.** If `TRUE`, the
-#'   default, update the newly created model file. If `FALSE`, new model file
-#'   will be an exact copy of its parent. For a NONMEM model, this currently
-#'   means only the `$PROBLEM` line in the new control stream will be updated to
-#'   read `See {.new_model}.yaml. Created by bbr.`.
+#'   default, update the newly created model file by setting the `$PROBLEM` line
+#'   in the new control stream to read `See {.new_model}.yaml. Created by bbr.`.
 #' @param .overwrite If `FALSE`, the default,  function will error if a model
 #'   file already exists at specified `.new_model` path. If `TRUE` any existing
 #'   file at `.new_model` will be overwritten silently.
