@@ -67,11 +67,11 @@ update_model_id <- function(
   modelfile <- get_model_path(.mod)
   based_on <- get_based_on(.mod)
 
-  if (is.null(based_on)) {
+  if (!length(based_on)) {
     stop(glue("Cannot call update_model_id() because .mod$based_on is empty for model {mod_id}"))
-  }else{
-    based_on_id <- get_model_id(based_on)[1]
   }
+  based_on_id <- get_model_id(based_on)[1]
+
   message(glue("replacing {based_on_id} with {mod_id} in {modelfile}"))
 
   ## construct suffixes regex string
