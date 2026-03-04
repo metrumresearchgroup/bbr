@@ -29,13 +29,12 @@
 #'   tags passed to `.add_tags` argument. If `TRUE` inherit any tags from
 #'   `.parent_mod`, with any tags passed to `.add_tags` appended.
 #' @param .update_model_file **Only relevant to NONMEM models.** If `TRUE`, the
-#'   default, update the newly created model file. If `FALSE`, new model file
-#'   will be an exact copy of its parent. For a NONMEM model, this currently
-#'   means only the `$PROBLEM` line in the new control stream will be updated to
-#'   read `See {.new_model}.yaml. Created by bbr.`.
+#'   default, update the newly created model file by setting the `$PROBLEM` line
+#'   in the new control stream to read `See {.new_model}.yaml. Created by bbr.`.
 #' @param .overwrite If `FALSE`, the default,  function will error if a model
 #'   file already exists at specified `.new_model` path. If `TRUE` any existing
 #'   file at `.new_model` will be overwritten silently.
+#' @param ... Arguments passed on to methods.
 #' @examples
 #' \dontrun{
 #' parent <- read_model("/foo/parent")
@@ -68,12 +67,17 @@ copy_model_from <- function(
     .star = NULL,
     .inherit_tags = FALSE,
     .update_model_file = TRUE,
-    .overwrite = FALSE
+    .overwrite = FALSE,
+    ...
 ) {
   UseMethod("copy_model_from")
 }
 
 #' @describeIn copy_model_from `.parent_mod` takes a `bbi_nonmem_model` object to use as a basis for the copy.
+#' @param .update_id Whether to call [update_model_id()] to replace occurrences
+#'   of `{parent_mod}.{suffix}` with the ID of the new model. To override or
+#'   extend the default suffixes, set this argument to `FALSE` and follow up
+#'   with a direct call to [update_model_id()].
 #' @export
 copy_model_from.bbi_nonmem_model <- function(
     .parent_mod,
@@ -84,7 +88,9 @@ copy_model_from.bbi_nonmem_model <- function(
     .star = NULL,
     .inherit_tags = FALSE,
     .update_model_file = TRUE,
-    .overwrite = FALSE
+    .overwrite = FALSE,
+    ...,
+    .update_id = TRUE
 ) {
 
   .new_model <- build_new_model_path(.parent_mod, .new_model)
@@ -107,6 +113,7 @@ copy_model_from.bbi_nonmem_model <- function(
     .inherit_tags = .inherit_tags,
     .update_model_file = .update_model_file,
     .overwrite = .overwrite,
+    .update_id = .update_id,
     setup_fn = copy_ctl
   )
 
@@ -127,10 +134,6 @@ copy_model_from.bbi_nonmem_model <- function(
 #' Used for iterating on model development. Also fills in necessary YAML fields
 #' for using `run_log()` later.
 #' @param .parent_mod S3 object of class `bbi_{.model_type}_model` to be used as the basis for copy.
-#' @param .update_model_file **Only relevant for NONMEM models.** If `TRUE`, the
-#'   default, update the `$PROBLEM` line in the new control stream. If `FALSE`,
-#'   `{.new_model}.[mod|ctl]` will be an exact copy of its parent control
-#'   stream.
 #' @param setup_fn A function to call (with no arguments) before creating the
 #'   model with [new_model()].
 #' @inheritParams copy_model_from
@@ -152,6 +155,7 @@ copy_model_from_impl <- function(
     .inherit_tags = FALSE,
     .update_model_file = TRUE,
     .overwrite = FALSE,
+    .update_id = TRUE,
     setup_fn = NULL
 ) {
   check_for_existing_model(.new_model, .overwrite)
@@ -190,6 +194,10 @@ copy_model_from_impl <- function(
     .model_type = mtype
   )
 
+  if (isTRUE(.update_id)) {
+    .new_mod <- update_model_id(.new_mod)
+  }
+
   return(.new_mod)
 }
 
@@ -201,7 +209,7 @@ copy_model_from_impl <- function(
 #' @param .parent_model_path Path to the control stream to copy
 #' @param .new_model_path Path to copy the new control stream to
 #' @param .overwrite If `TRUE`, overwrite existing file at `.new_model_path`. If `FALSE` and file exists at `.new_model_path` error.
-#' @param .update_model_file If `TRUE`, the default, update the `$PROBLEM` line in the new control stream. If `FALSE`, `{.new_model}.[mod|ctl]` will be an exact copy of its parent control stream.
+#' @inheritParams copy_model_from
 #' @keywords internal
 copy_control_stream <- function(.parent_model_path, .new_model_path, .overwrite, .update_model_file = FALSE) {
 

@@ -63,14 +63,23 @@ test_threads <- function(
   assert_list(.bbi_args)
 
   # Duplicate model for each thread scenario
-  .mods <- map(.threads, ~ copy_model_from(.mod,
-                                           paste0(get_model_id(.mod), "_", .x, "_threads"),
-                                           .overwrite = TRUE) %>%
-                 add_bbi_args(.bbi_args = c(threads = .x,
-                                            .bbi_args,
-                                            parallel = TRUE,
-                                            overwrite = TRUE)) %>%
-                 add_tags(paste("test threads")))
+  .mods <- map(.threads, function(.x) {
+    copy_model_from(
+      .mod,
+      paste0(get_model_id(.mod), "_", .x, "_threads"),
+      .overwrite = TRUE,
+      .update_id = FALSE
+    ) %>%
+      add_bbi_args(
+        .bbi_args = c(
+          threads = .x,
+          .bbi_args,
+          parallel = TRUE,
+          overwrite = TRUE
+        )
+      ) %>%
+      add_tags(paste("test threads"))
+  })
 
   # Modify Estimation Options
   adjust_estimation_options(.mods, .cap_iterations)

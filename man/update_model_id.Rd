@@ -60,4 +60,9 @@ All matches are \emph{not} case sensitive but replacements \emph{are}. For examp
 \code{.msf} is passed as a suffix, \verb{\{parent_mod\}.MSF} and \verb{\{parent_mod\}.msf} would
 \emph{both} be replaced, but the case of the suffix in the control stream will be
 maintained as is.
+
+As of bbr 1.15.0, \code{\link[=copy_model_from]{copy_model_from()}} by default calls \code{update_model_id()}
+internally before returning the model. You do not need to call
+\code{update_model_id()} directly unless you want to override or extend the
+default suffixes.
 }

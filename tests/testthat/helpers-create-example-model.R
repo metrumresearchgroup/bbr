@@ -156,7 +156,7 @@ make_fake_boot <- function(mod, n = 100, strat_cols = c("SEX", "ETN")){
 # This function creates a new model, and attaches a simulation to it
 # Unlike make_fake_boot however, the simulation will have a status of "Not Run"
 make_fake_sim <- function(mod, mod_id = "mod-sim", n = 100){
-  mod_sim <- copy_model_from(mod, mod_id) %>% update_model_id()
+  mod_sim <- copy_model_from(mod, mod_id, .update_id = TRUE)
   model_dir <- bbr:::get_model_working_directory(mod)
   new_dir_path <- file.path(model_dir, mod_id)
   fs::dir_copy(mod$absolute_model_path, new_dir_path)

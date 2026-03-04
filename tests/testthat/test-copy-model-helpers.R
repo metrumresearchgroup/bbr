@@ -11,7 +11,7 @@ test_that("update_model_id() works with run number [BBR-CMH-001]", {
   on.exit({ cleanup() })
 
   # copy model and write strings with parent id to control stream
-  new_mod <- copy_model_from(MOD1, basename(NEW_MOD2))
+  new_mod <- copy_model_from(MOD1, basename(NEW_MOD2), .update_id = FALSE)
   readr::write_lines(
     paste0(get_model_id(MOD1), DEFAULT_SUFFIXES),
     get_model_path(new_mod)
@@ -28,8 +28,8 @@ test_that("update_model_id() works with character ID [BBR-CMH-002]", {
   on.exit({ cleanup() })
 
   # copy model and write strings with parent id to control stream
-  parent_mod <- copy_model_from(MOD1, "Parent")
-  new_mod <- copy_model_from(parent_mod, "Child")
+  parent_mod <- copy_model_from(MOD1, "Parent", .update_id = FALSE)
+  new_mod <- copy_model_from(parent_mod, "Child", .update_id = FALSE)
   readr::write_lines(
     paste0(get_model_id(parent_mod), DEFAULT_SUFFIXES),
     get_model_path(new_mod)
@@ -47,7 +47,7 @@ test_that("update_model_id() is case-sensitive [BBR-CMH-003]", {
   suff_all_case <- c(toupper(DEFAULT_SUFFIXES), tolower(DEFAULT_SUFFIXES))
 
   # copy model and write strings with parent id to control stream
-  new_mod <- copy_model_from(MOD1, basename(NEW_MOD2))
+  new_mod <- copy_model_from(MOD1, basename(NEW_MOD2), .update_id = FALSE)
   readr::write_lines(
     paste0(get_model_id(MOD1), suff_all_case),
     get_model_path(new_mod)
@@ -64,7 +64,7 @@ test_that("update_model_id() .suffixes works [BBR-CMH-004]", {
   on.exit({ cleanup() })
 
   # copy model and write strings with parent id to control stream
-  new_mod <- copy_model_from(MOD1, basename(NEW_MOD2))
+  new_mod <- copy_model_from(MOD1, basename(NEW_MOD2), .update_id = FALSE)
   orig_suff <- paste0(get_model_id(MOD1), DEFAULT_SUFFIXES)
 
   readr::write_lines(
@@ -87,7 +87,7 @@ test_that("update_model_id() .additional_suffixes works [BBR-CMH-005]", {
   on.exit({ cleanup() })
 
   # copy model and write strings with parent id to control stream
-  new_mod <- copy_model_from(MOD1, basename(NEW_MOD2))
+  new_mod <- copy_model_from(MOD1, basename(NEW_MOD2), .update_id = FALSE)
   new_suff <- ".naw"
 
   readr::write_lines(
@@ -120,7 +120,8 @@ test_that("update_model_id() works with models in different directories", {
   # copy model and write strings with parent id to control stream
   new_mod <- copy_model_from(
     MOD1,
-    file.path(basename(child_dir), basename(NEW_MOD2))
+    file.path(basename(child_dir), basename(NEW_MOD2)),
+    .update_id = FALSE
   )
   new_suff <- "-1.msf"
 
@@ -139,8 +140,8 @@ test_that("update_model_id() works with models in different directories", {
 
 test_that("update_model_id() protects regex characters in parent model ID", {
   withr::with_tempdir({
-    mod1a <- copy_model_from(MOD1, file.path(getwd(), "1+"))
-    mod2 <- copy_model_from(mod1a, 2)
+    mod1a <- copy_model_from(MOD1, file.path(getwd(), "1+"), .update_id = FALSE)
+    mod2 <- copy_model_from(mod1a, 2, .update_id = FALSE)
 
     mod2_path <- get_model_path(mod2)
     readr::write_lines(c("1+.tab", "11.tab"), mod2_path)
@@ -149,6 +150,45 @@ test_that("update_model_id() protects regex characters in parent model ID", {
     expect_identical(
       readr::read_lines(mod2_path),
       c("2.tab", "11.tab")
+    )
+  })
+})
+
+test_that("update_model_id() anchors start of regexp", {
+  withr::with_tempdir({
+    mod1 <- copy_model_from(MOD1, file.path(getwd(), "1"), .update_id = FALSE)
+    mod2 <- copy_model_from(mod1, 2, .update_id = FALSE)
+    mod2_path <- get_model_path(mod2)
+
+    readr::write_lines(c("11.tab", "1.tab"), mod2_path)
+
+    update_model_id(mod2)
+    expect_identical(
+      readr::read_lines(mod2_path),
+      c("11.tab", "2.tab")
+    )
+  })
+})
+
+test_that("update_model_id() handles multiple based_on values", {
+  withr::with_tempdir({
+    mod1 <- copy_model_from(MOD1, file.path(getwd(), "1"), .update_id = FALSE)
+    mod2 <- copy_model_from(mod1, 2, .update_id = FALSE)
+    mod3 <- copy_model_from(
+      mod2,
+      3,
+      .based_on_additional = get_model_id(mod1),
+      .update_id = FALSE
+    )
+
+    mod3_path <- get_model_path(mod3)
+
+    readr::write_lines(c("1.tab", "2.tab"), mod3_path)
+
+    update_model_id(mod3)
+    expect_identical(
+      readr::read_lines(mod3_path),
+      c("1.tab", "3.tab")
     )
   })
 })
