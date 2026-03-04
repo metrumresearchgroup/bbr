@@ -28,7 +28,8 @@ copy_model_from(
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE,
-  ...
+  ...,
+  .update_id = TRUE
 )
 }
 \arguments{
@@ -68,6 +69,11 @@ file already exists at specified \code{.new_model} path. If \code{TRUE} any exis
 file at \code{.new_model} will be overwritten silently.}
 
 \item{...}{Arguments passed on to methods.}
+
+\item{.update_id}{Whether to call \code{\link[=update_model_id]{update_model_id()}} to replace occurrences
+of \verb{\{parent_mod\}.\{suffix\}} with the ID of the new model. To override or
+extend the default suffixes, set this argument to \code{FALSE} and follow up
+with a direct call to \code{\link[=update_model_id]{update_model_id()}}.}
 }
 \description{
 Create new model by copying existing model. Useful for iterating during model

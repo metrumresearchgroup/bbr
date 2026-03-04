@@ -278,6 +278,7 @@ new_sim_model <- function(
     .add_tags = "SIMULATION",
     .inherit_tags = .inherit_tags,
     .update_model_file = TRUE,
+    .update_id = FALSE,
     .overwrite = .overwrite
   )
 

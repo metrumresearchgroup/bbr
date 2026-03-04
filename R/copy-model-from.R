@@ -74,6 +74,10 @@ copy_model_from <- function(
 }
 
 #' @describeIn copy_model_from `.parent_mod` takes a `bbi_nonmem_model` object to use as a basis for the copy.
+#' @param .update_id Whether to call [update_model_id()] to replace occurrences
+#'   of `{parent_mod}.{suffix}` with the ID of the new model. To override or
+#'   extend the default suffixes, set this argument to `FALSE` and follow up
+#'   with a direct call to [update_model_id()].
 #' @export
 copy_model_from.bbi_nonmem_model <- function(
     .parent_mod,
@@ -85,7 +89,8 @@ copy_model_from.bbi_nonmem_model <- function(
     .inherit_tags = FALSE,
     .update_model_file = TRUE,
     .overwrite = FALSE,
-    ...
+    ...,
+    .update_id = TRUE
 ) {
 
   .new_model <- build_new_model_path(.parent_mod, .new_model)
@@ -108,6 +113,7 @@ copy_model_from.bbi_nonmem_model <- function(
     .inherit_tags = .inherit_tags,
     .update_model_file = .update_model_file,
     .overwrite = .overwrite,
+    .update_id = .update_id,
     setup_fn = copy_ctl
   )
 
@@ -149,6 +155,7 @@ copy_model_from_impl <- function(
     .inherit_tags = FALSE,
     .update_model_file = TRUE,
     .overwrite = FALSE,
+    .update_id = TRUE,
     setup_fn = NULL
 ) {
   check_for_existing_model(.new_model, .overwrite)
@@ -186,6 +193,10 @@ copy_model_from_impl <- function(
     .overwrite = FALSE, # will have already overwritten if necessary
     .model_type = mtype
   )
+
+  if (isTRUE(.update_id)) {
+    .new_mod <- update_model_id(.new_mod)
+  }
 
   return(.new_mod)
 }

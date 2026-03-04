@@ -67,7 +67,8 @@ test_threads <- function(
     copy_model_from(
       .mod,
       paste0(get_model_id(.mod), "_", .x, "_threads"),
-      .overwrite = TRUE
+      .overwrite = TRUE,
+      .update_id = FALSE
     ) %>%
       add_bbi_args(
         .bbi_args = c(

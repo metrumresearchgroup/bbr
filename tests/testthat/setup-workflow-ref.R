@@ -230,13 +230,19 @@ copy_all_output_dirs <- function() {
 create_rlg_models <- function() {
   # copy models before creating run log
   mod1 <- read_model(MOD1_PATH)
-  copy_model_from(mod1, basename(NEW_MOD2), .add_tags = NEW_TAGS)
+  copy_model_from(
+    mod1,
+    basename(NEW_MOD2),
+    .add_tags = NEW_TAGS,
+    .update_id = FALSE
+  )
   copy_model_from(
     mod1,
     basename(NEW_MOD3),
     .based_on_additional = get_model_id(NEW_MOD2),
     .inherit_tags = TRUE,
-    .update_model_file = FALSE
+    .update_model_file = FALSE,
+    .update_id = FALSE
   )
   return(invisible(NULL))
 }

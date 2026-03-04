@@ -30,6 +30,11 @@
 #' _both_ be replaced, but the case of the suffix in the control stream will be
 #' maintained as is.
 #'
+#' As of bbr 1.15.0, [copy_model_from()] by default calls `update_model_id()`
+#' internally before returning the model. You do not need to call
+#' `update_model_id()` directly unless you want to override or extend the
+#' default suffixes.
+#'
 #' @return Invisibly returns `.mod`, to enable piping (i.e. from
 #'   `copy_model_from()`)
 #'
