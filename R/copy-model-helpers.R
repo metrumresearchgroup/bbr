@@ -90,7 +90,7 @@ update_model_id <- function(
   )
 
   txt <- gsub(
-    paste0("\\Q",based_on_id,"\\E", .suffixes),
+    paste0("\\b\\Q",based_on_id,"\\E", .suffixes),
     paste0(mod_id, "\\1"),
     txt,
     ignore.case = TRUE

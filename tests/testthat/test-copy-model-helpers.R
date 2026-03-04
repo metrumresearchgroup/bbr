@@ -152,3 +152,19 @@ test_that("update_model_id() protects regex characters in parent model ID", {
     )
   })
 })
+
+test_that("update_model_id() anchors start of regexp", {
+  withr::with_tempdir({
+    mod1 <- copy_model_from(MOD1, file.path(getwd(), "1"))
+    mod2 <- copy_model_from(mod1, 2)
+    mod2_path <- get_model_path(mod2)
+
+    readr::write_lines(c("11.tab", "1.tab"), mod2_path)
+
+    update_model_id(mod2)
+    expect_identical(
+      readr::read_lines(mod2_path),
+      c("11.tab", "2.tab")
+    )
+  })
+})
