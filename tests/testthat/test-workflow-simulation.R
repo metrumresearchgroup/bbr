@@ -86,7 +86,7 @@ withr::with_options(
       # Make an incomplete simulation model for testing the control stream changes
       # - no spec file is generated, so the parent model (mod2) is unaware of its
       #   presence
-      mod2 <- copy_model_from(mod1, "2") %>% update_model_id()
+      mod2 <- copy_model_from(mod1, "2", .update_id = TRUE)
       copy_output_dir(mod1, file.path(MODEL_DIR_BBI, "2"))
       sim_inc <- new_sim_model(
         mod2, n = sim_n, seed = sim_seed,
