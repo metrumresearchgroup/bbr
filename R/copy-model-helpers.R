@@ -70,7 +70,7 @@ update_model_id <- function(
   if (is.null(based_on)) {
     stop(glue("Cannot call update_model_id() because .mod$based_on is empty for model {mod_id}"))
   }else{
-    based_on_id <- get_model_id(based_on)
+    based_on_id <- get_model_id(based_on)[1]
   }
   message(glue("replacing {based_on_id} with {mod_id} in {modelfile}"))
 

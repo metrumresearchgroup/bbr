@@ -168,3 +168,21 @@ test_that("update_model_id() anchors start of regexp", {
     )
   })
 })
+
+test_that("update_model_id() handles multiple based_on values", {
+  withr::with_tempdir({
+    mod1 <- copy_model_from(MOD1, file.path(getwd(), "1"))
+    mod2 <- copy_model_from(mod1, 2)
+    mod3 <- copy_model_from(mod2, 3, .based_on_additional = get_model_id(mod1))
+
+    mod3_path <- get_model_path(mod3)
+
+    readr::write_lines(c("1.tab", "2.tab"), mod3_path)
+
+    update_model_id(mod3)
+    expect_identical(
+      readr::read_lines(mod3_path),
+      c("1.tab", "3.tab")
+    )
+  })
+})
