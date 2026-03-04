@@ -250,11 +250,10 @@ Now you can create a new model object, based on the original, copying and renami
 The `copy_model_from()` call below will create both `2.ctl` and `2.yaml` files in the same directory as the parent model, and return the model object corresponding to them. (`copy_model_from()` also stores the model's "ancestry" which can be useful later in the project, as shown in the [Using the based_on field](https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html) vignette.)
 
 ```{r copy_model 2}
-mod2 <- copy_model_from(mod1) %>%
-  update_model_id()
+mod2 <- copy_model_from(mod1)
 ```
 
-The new control stream file `2.ctl` will be identical to its parent model, though you can use [`update_model_id()`](https://metrumresearchgroup.github.io/bbr/reference/update_model_id.html) (as above) to update to the new model ID in places like `$TABLE` statements. 
+The new control stream file `2.ctl` will be derived from the parent model's, with occurrences of the old model ID will be updated with the new model ID unless the `.update_id` argument is set to `FALSE`.  (For bbr versions before 1.15.0, a follow-up call to [`update_model_id()`](https://metrumresearchgroup.github.io/bbr/reference/update_model_id.html) was required to update the model ID.)
 
 Your new control stream can now be edited with any desired changes and then submitted and summarized exactly as above. At any time, you can also see the difference between a model and its parent using [`model_diff()`](https://metrumresearchgroup.github.io/bbr/reference/model_diff.html).
 
