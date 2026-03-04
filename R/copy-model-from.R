@@ -36,6 +36,7 @@
 #' @param .overwrite If `FALSE`, the default,  function will error if a model
 #'   file already exists at specified `.new_model` path. If `TRUE` any existing
 #'   file at `.new_model` will be overwritten silently.
+#' @param ... Arguments passed on to methods.
 #' @examples
 #' \dontrun{
 #' parent <- read_model("/foo/parent")
@@ -68,7 +69,8 @@ copy_model_from <- function(
     .star = NULL,
     .inherit_tags = FALSE,
     .update_model_file = TRUE,
-    .overwrite = FALSE
+    .overwrite = FALSE,
+    ...
 ) {
   UseMethod("copy_model_from")
 }
@@ -84,7 +86,8 @@ copy_model_from.bbi_nonmem_model <- function(
     .star = NULL,
     .inherit_tags = FALSE,
     .update_model_file = TRUE,
-    .overwrite = FALSE
+    .overwrite = FALSE,
+    ...
 ) {
 
   .new_model <- build_new_model_path(.parent_mod, .new_model)

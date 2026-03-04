@@ -14,7 +14,8 @@ copy_model_from(
   .star = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
-  .overwrite = FALSE
+  .overwrite = FALSE,
+  ...
 )
 
 \method{copy_model_from}{bbi_nonmem_model}(
@@ -26,7 +27,8 @@ copy_model_from(
   .star = NULL,
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
-  .overwrite = FALSE
+  .overwrite = FALSE,
+  ...
 )
 }
 \arguments{
@@ -66,6 +68,8 @@ read \verb{See \{.new_model\}.yaml. Created by bbr.}.}
 \item{.overwrite}{If \code{FALSE}, the default,  function will error if a model
 file already exists at specified \code{.new_model} path. If \code{TRUE} any existing
 file at \code{.new_model} will be overwritten silently.}
+
+\item{...}{Arguments passed on to methods.}
 }
 \description{
 Create new model by copying existing model. Useful for iterating during model
