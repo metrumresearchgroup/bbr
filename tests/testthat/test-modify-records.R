@@ -151,7 +151,7 @@ describe("Modify record helpers", {
   })
 
   it("get_table_columns works", {
-    mod2 <- copy_model_from(MOD1, "2")
+    mod2 <- copy_model_from(MOD1, "2", .update_id = FALSE)
     fs::dir_copy(MOD1[[ABS_MOD_PATH]], file.path(MODEL_DIR, "2"))
     on.exit(delete_models(mod2, .tags = NULL, .force = TRUE))
 

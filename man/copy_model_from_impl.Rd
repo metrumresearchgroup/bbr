@@ -14,6 +14,7 @@ copy_model_from_impl(
   .inherit_tags = FALSE,
   .update_model_file = TRUE,
   .overwrite = FALSE,
+  .update_id = TRUE,
   setup_fn = NULL
 )
 }
@@ -45,14 +46,18 @@ no need to include that here.}
 tags passed to \code{.add_tags} argument. If \code{TRUE} inherit any tags from
 \code{.parent_mod}, with any tags passed to \code{.add_tags} appended.}
 
-\item{.update_model_file}{\strong{Only relevant for NONMEM models.} If \code{TRUE}, the
-default, update the \verb{$PROBLEM} line in the new control stream. If \code{FALSE},
-\verb{\{.new_model\}.[mod|ctl]} will be an exact copy of its parent control
-stream.}
+\item{.update_model_file}{\strong{Only relevant to NONMEM models.} If \code{TRUE}, the
+default, update the newly created model file by setting the \verb{$PROBLEM} line
+in the new control stream to read \verb{See \{.new_model\}.yaml. Created by bbr.}.}
 
 \item{.overwrite}{If \code{FALSE}, the default,  function will error if a model
 file already exists at specified \code{.new_model} path. If \code{TRUE} any existing
 file at \code{.new_model} will be overwritten silently.}
+
+\item{.update_id}{Whether to call \code{\link[=update_model_id]{update_model_id()}} to replace occurrences
+of \verb{\{parent_mod\}.\{suffix\}} with the ID of the new model. To override or
+extend the default suffixes, set this argument to \code{FALSE} and follow up
+with a direct call to \code{\link[=update_model_id]{update_model_id()}}.}
 
 \item{setup_fn}{A function to call (with no arguments) before creating the
 model with \code{\link[=new_model]{new_model()}}.}

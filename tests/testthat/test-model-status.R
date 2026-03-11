@@ -23,7 +23,7 @@ describe("Model status helpers return the correct status", {
   .boot_run <- new_bootstrap_run(MOD1)
 
   # Test simulation - use fake MSF file for model creation
-  mod3 <- copy_model_from(MOD1, "3") %>% update_model_id() %>% add_msf_opt()
+  mod3 <- copy_model_from(MOD1, "3", .update_id = TRUE) %>% add_msf_opt()
   copy_output_dir(MOD1, file.path(MODEL_DIR, "3"))
   msf_path <- get_msf_path(mod3, .check_exists = FALSE)
   writeLines(readLines(nm_table_files(MOD1)[1]), msf_path)

@@ -49,6 +49,7 @@ new_bootstrap_run <- function(
     .add_tags = "BOOTSTRAP_SUBMISSION",
     .inherit_tags = .inherit_tags,
     .update_model_file = TRUE,
+    .update_id = FALSE,
     .overwrite = .overwrite
   )
 
