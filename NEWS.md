@@ -1,3 +1,20 @@
+# bbr 1.15.0
+
+## New features and changes
+
+- `copy_model_from()` now calls `update_model_id()` underneath by default.  To
+  restore the previous behavior, set the new `.update_id` argument to
+  `FALSE`. (#761)
+
+- `bbr` has been updated for compatibility with readr 2.0.0, which is now the
+  minimum required version. (#759)
+
+## Bug fixes
+
+- `update_model_id()` no longer updates occurrences of the parent ID that are
+  embedded in a larger "word". (#761)
+
+
 # bbr 1.14.3
 
 ## Changes
