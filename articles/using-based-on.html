@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.14.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.15.0</span>
       </span>
     </div>
 
@@ -151,9 +151,10 @@ metadata. Notably, it will also add the model that you copied
 model.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span>.parent_mod <span class="op">=</span> <span class="va">mod1</span>, .new_model <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; replacing 1 with 2 in /tmp/RtmpuJMjZV/temp_libpath3f5151349edf0/bbr/model/nonmem/basic/2.ctl</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/get_based_on.html">get_based_on</a></span><span class="op">(</span><span class="va">mod2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpCjIAsi/temp_libpath28310502504aa/bbr/model/nonmem/basic/1"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "/tmp/RtmpuJMjZV/temp_libpath3f5151349edf0/bbr/model/nonmem/basic/1"</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="diff-helpers">diff helpers<a class="anchor" aria-label="anchor" href="#diff-helpers"></a>
 </h3>
@@ -412,6 +413,123 @@ DIV.diffobj-container.light.yb DIV.diffobj-line {
 <span class="diffobj-trim"></span>$INPUT ID TIME MDV EVID DV AMT  SEX WT ETN NUM<span class="diffobj-trim"></span>
 </div></div>
 </div></div>
+</div><div class="diffobj-row">
+<div class="diffobj-line"><div class="diffobj-header">@@ 40,6 @@</div></div>
+<div class="diffobj-line"><div class="diffobj-header">@@ 40,6 @@</div></div>
+</div><div class="diffobj-row">
+<div class="diffobj-line"><div class="diffobj-match">
+<div class="diffobj-gutter">
+<div class="diffobj-match"> </div>
+<div class="pad"> </div>
+</div>
+<div class="diffobj-text"><div class="diffobj-match">
+<span class="diffobj-trim"></span>$EST METHOD=1 INTERACTION MAXEVAL=9999 SIG=3 PRINT=5 NOABORT POSTHOC<span class="diffobj-trim"></span>
+</div></div>
+</div></div>
+<div class="diffobj-line"><div class="diffobj-match">
+<div class="diffobj-gutter">
+<div class="diffobj-match"> </div>
+<div class="pad"> </div>
+</div>
+<div class="diffobj-text"><div class="diffobj-match">
+<span class="diffobj-trim"></span>$EST METHOD=1 INTERACTION MAXEVAL=9999 SIG=3 PRINT=5 NOABORT POSTHOC<span class="diffobj-trim"></span>
+</div></div>
+</div></div>
+</div><div class="diffobj-row">
+<div class="diffobj-line"><div class="diffobj-match">
+<div class="diffobj-gutter">
+<div class="diffobj-match"> </div>
+<div class="pad"> </div>
+</div>
+<div class="diffobj-text"><div class="diffobj-match">
+<span class="diffobj-trim"></span>$COV<span class="diffobj-trim"></span>
+</div></div>
+</div></div>
+<div class="diffobj-line"><div class="diffobj-match">
+<div class="diffobj-gutter">
+<div class="diffobj-match"> </div>
+<div class="pad"> </div>
+</div>
+<div class="diffobj-text"><div class="diffobj-match">
+<span class="diffobj-trim"></span>$COV<span class="diffobj-trim"></span>
+</div></div>
+</div></div>
+</div><div class="diffobj-row">
+<div class="diffobj-line"><div class="delete">
+<div class="diffobj-gutter">
+<div class="delete">&lt;</div>
+<div class="pad"> </div>
+</div>
+<div class="diffobj-text"><div class="delete">
+<span class="diffobj-trim"></span>$TABLE NUM IPRED NPDE CWRES NOPRINT ONEHEADER FILE<span class="diffobj-word delete">=2.tab</span><span class="diffobj-trim"></span>
+</div></div>
+</div></div>
+<div class="diffobj-line"><div class="insert">
+<div class="diffobj-gutter">
+<div class="insert">&gt;</div>
+<div class="pad"> </div>
+</div>
+<div class="diffobj-text"><div class="insert">
+<span class="diffobj-trim"></span>$TABLE NUM IPRED NPDE CWRES NOPRINT ONEHEADER FILE<span class="diffobj-word insert">=1.tab</span><span class="diffobj-trim"></span>
+</div></div>
+</div></div>
+</div><div class="diffobj-row">
+<div class="diffobj-line"><div class="delete">
+<div class="diffobj-gutter">
+<div class="delete">&lt;</div>
+<div class="pad"> </div>
+</div>
+<div class="diffobj-text"><div class="delete">
+<span class="diffobj-trim"></span>$TABLE NUM CL V KA ETAS(1:LAST) NOAPPEND NOPRINT ONEHEADER FILE<span class="diffobj-word delete">=2par.tab</span><span class="diffobj-trim"></span>
+</div></div>
+</div></div>
+<div class="diffobj-line"><div class="insert">
+<div class="diffobj-gutter">
+<div class="insert">&gt;</div>
+<div class="pad"> </div>
+</div>
+<div class="diffobj-text"><div class="insert">
+<span class="diffobj-trim"></span>$TABLE NUM CL V KA ETAS(1:LAST) NOAPPEND NOPRINT ONEHEADER FILE<span class="diffobj-word insert">=1par.tab</span><span class="diffobj-trim"></span>
+</div></div>
+</div></div>
+</div><div class="diffobj-row">
+<div class="diffobj-line"><div class="diffobj-match">
+<div class="diffobj-gutter">
+<div class="diffobj-match"> </div>
+<div class="pad"> </div>
+</div>
+<div class="diffobj-text"><div class="diffobj-match">
+<span class="diffobj-trim"></span>$TABLE ID CL NOAPPEND NOPRINT ONEHEADER FIRSTONLY FILE=1first1.tab ; for testing firstonly<span class="diffobj-trim"></span>
+</div></div>
+</div></div>
+<div class="diffobj-line"><div class="diffobj-match">
+<div class="diffobj-gutter">
+<div class="diffobj-match"> </div>
+<div class="pad"> </div>
+</div>
+<div class="diffobj-text"><div class="diffobj-match">
+<span class="diffobj-trim"></span>$TABLE ID CL NOAPPEND NOPRINT ONEHEADER FIRSTONLY FILE=1first1.tab ; for testing firstonly<span class="diffobj-trim"></span>
+</div></div>
+</div></div>
+</div><div class="diffobj-row">
+<div class="diffobj-line"><div class="diffobj-match">
+<div class="diffobj-gutter">
+<div class="diffobj-match"> </div>
+<div class="pad"> </div>
+</div>
+<div class="diffobj-text"><div class="diffobj-match">
+<span class="diffobj-trim"></span>$TABLE NUM CL NOAPPEND NOPRINT ONEHEADER FIRSTONLY FILE=1first2.tab ; for testing firstonly<span class="diffobj-trim"></span>
+</div></div>
+</div></div>
+<div class="diffobj-line"><div class="diffobj-match">
+<div class="diffobj-gutter">
+<div class="diffobj-match"> </div>
+<div class="pad"> </div>
+</div>
+<div class="diffobj-text"><div class="diffobj-match">
+<span class="diffobj-trim"></span>$TABLE NUM CL NOAPPEND NOPRINT ONEHEADER FIRSTONLY FILE=1first2.tab ; for testing firstonly<span class="diffobj-trim"></span>
+</div></div>
+</div></div>
 </div></pre>
 </div>
 <p>By default both functions compare the model to whatever model is
@@ -434,18 +552,22 @@ you would be doing all of the normal iterative modeling work.</p>
 <code class="sourceCode R"><span><span class="co"># ...submit mod2...look at diagnostics...decide on changes for next iteration...</span></span>
 <span></span>
 <span><span class="va">mod3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span><span class="va">mod2</span>, <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="co">#&gt; replacing 2 with 3 in /tmp/RtmpuJMjZV/temp_libpath3f5151349edf0/bbr/model/nonmem/basic/3.ctl</span></span>
 <span></span>
 <span><span class="co"># ...submit mod3...look at diagnostics...decide on changes for next iteration...</span></span>
 <span></span>
 <span><span class="va">mod4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span><span class="va">mod3</span>, <span class="fl">4</span><span class="op">)</span></span>
+<span><span class="co">#&gt; replacing 3 with 4 in /tmp/RtmpuJMjZV/temp_libpath3f5151349edf0/bbr/model/nonmem/basic/4.ctl</span></span>
 <span></span>
 <span><span class="co"># ...submit mod4...look at diagnostics...decide to go back to mod2 as basis for next iteration...</span></span>
 <span></span>
 <span><span class="va">mod5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span><span class="va">mod2</span>, <span class="fl">5</span><span class="op">)</span></span>
+<span><span class="co">#&gt; replacing 2 with 5 in /tmp/RtmpuJMjZV/temp_libpath3f5151349edf0/bbr/model/nonmem/basic/5.ctl</span></span>
 <span></span>
 <span><span class="co"># ...submit mod5...look at diagnostics...decide on changes for next iteration...</span></span>
 <span></span>
 <span><span class="va">mod6</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span><span class="va">mod5</span>, <span class="fl">6</span><span class="op">)</span></span>
+<span><span class="co">#&gt; replacing 5 with 6 in /tmp/RtmpuJMjZV/temp_libpath3f5151349edf0/bbr/model/nonmem/basic/6.ctl</span></span>
 <span></span>
 <span><span class="co"># ...submit mod6...look at diagnostics...decide you're done!</span></span></code></pre></div>
 <p>Now that you have arrived at your final model, you can add a
@@ -469,7 +591,7 @@ know.</p>
 absolute path to all models in the <code>based_on</code> field.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod6</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/get_based_on.html">get_based_on</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpCjIAsi/temp_libpath28310502504aa/bbr/model/nonmem/basic/5"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "/tmp/RtmpuJMjZV/temp_libpath3f5151349edf0/bbr/model/nonmem/basic/5"</span></span></code></pre></div>
 <p>This is useful because the path(s) retrieved will unambiguously
 identify the parent model(s) and can therefore be passed to things like
 <code><a href="../reference/read_model.html">read_model()</a></code> or <code><a href="../reference/model_summary.html">model_summary()</a></code> like so:</p>
@@ -479,7 +601,7 @@ identify the parent model(s) and can therefore be passed to things like
 <span><span class="co">#&gt; List of 4</span></span>
 <span><span class="co">#&gt;  $ model_type         : chr "nonmem"</span></span>
 <span><span class="co">#&gt;  $ based_on           : chr "2"</span></span>
-<span><span class="co">#&gt;  $ absolute_model_path: chr "/tmp/RtmpCjIAsi/temp_libpath28310502504aa/bbr/model/nonmem/basic/5"</span></span>
+<span><span class="co">#&gt;  $ absolute_model_path: chr "/tmp/RtmpuJMjZV/temp_libpath3f5151349edf0/bbr/model/nonmem/basic/5"</span></span>
 <span><span class="co">#&gt;  $ yaml_md5           : chr "ac0ba292b017a72bb316359f0df09bb2"</span></span>
 <span><span class="co">#&gt;  - attr(*, "class")= chr [1:4] "bbi_nonmem_model" "bbi_base_model" "bbi_model" "list"</span></span></code></pre></div>
 </div>
@@ -491,9 +613,9 @@ iteratively calling <code><a href="../reference/get_based_on.html">get_based_on(
 determine the full set of models that led up to the current model.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod6</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/get_based_on.html">get_model_ancestry</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpCjIAsi/temp_libpath28310502504aa/bbr/model/nonmem/basic/1"</span></span>
-<span><span class="co">#&gt; [2] "/tmp/RtmpCjIAsi/temp_libpath28310502504aa/bbr/model/nonmem/basic/2"</span></span>
-<span><span class="co">#&gt; [3] "/tmp/RtmpCjIAsi/temp_libpath28310502504aa/bbr/model/nonmem/basic/5"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "/tmp/RtmpuJMjZV/temp_libpath3f5151349edf0/bbr/model/nonmem/basic/1"</span></span>
+<span><span class="co">#&gt; [2] "/tmp/RtmpuJMjZV/temp_libpath3f5151349edf0/bbr/model/nonmem/basic/2"</span></span>
+<span><span class="co">#&gt; [3] "/tmp/RtmpuJMjZV/temp_libpath3f5151349edf0/bbr/model/nonmem/basic/5"</span></span></code></pre></div>
 <p>In this case, model <code>6</code> was based on <code>5</code>, which
 was based on <code>2</code>, which in turn was based on <code>1</code>.
 You will see one example of how this can be useful in the “Final model
@@ -515,12 +637,12 @@ each model.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 10</span></span></span>
 <span><span class="co">#&gt;   absolute_model_path    run   yaml_md5 model_type description bbi_args based_on</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> /tmp/RtmpCjIAsi/temp_… 1     5ec8e22… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;NULL&gt;</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> /tmp/RtmpCjIAsi/temp_… 2     9adbb90… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;chr&gt;</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> /tmp/RtmpCjIAsi/temp_… 3     ac0ba29… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;chr&gt;</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> /tmp/RtmpCjIAsi/temp_… 4     6818db1… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;chr&gt;</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> /tmp/RtmpCjIAsi/temp_… 5     ac0ba29… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;chr&gt;</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> /tmp/RtmpCjIAsi/temp_… 6     feb9bf3… nonmem     Final model <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;chr&gt;</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> /tmp/RtmpuJMjZV/temp_… 1     5ec8e22… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;NULL&gt;</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> /tmp/RtmpuJMjZV/temp_… 2     9adbb90… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;chr&gt;</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> /tmp/RtmpuJMjZV/temp_… 3     ac0ba29… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;chr&gt;</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> /tmp/RtmpuJMjZV/temp_… 4     6818db1… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;chr&gt;</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> /tmp/RtmpuJMjZV/temp_… 5     ac0ba29… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;chr&gt;</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> /tmp/RtmpuJMjZV/temp_… 6     feb9bf3… nonmem     Final model <span style="color: #949494;">&lt;NULL&gt;</span>   <span style="color: #949494;">&lt;chr&gt;</span>   </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 3 more variables: tags &lt;list&gt;, notes &lt;list&gt;, star &lt;lgl&gt;</span></span></span></code></pre></div>
 <p>Among other things, the run log contains any descriptions that have
 been assigned to each model. Here we use <code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">dplyr::filter()</a></code>
@@ -532,7 +654,7 @@ and <code><a href="https://dplyr.tidyverse.org/reference/pull.html" class="exter
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">absolute_model_path</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">final_model_path</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpCjIAsi/temp_libpath28310502504aa/bbr/model/nonmem/basic/6"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "/tmp/RtmpuJMjZV/temp_libpath3f5151349edf0/bbr/model/nonmem/basic/6"</span></span></code></pre></div>
 <p>Next we can use the <code><a href="../reference/get_based_on.html">get_model_ancestry()</a></code> function to
 filter the tibble to only the models that led up to the final model.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">

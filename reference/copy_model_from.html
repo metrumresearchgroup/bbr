@@ -19,7 +19,7 @@ ancestry. See "Using based_on field" vignette for details.'><meta property="og:i
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.14.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.15.0</span>
       </span>
     </div>
 
@@ -91,7 +91,8 @@ ancestry. See <a href="../articles/using-based-on.html">"Using based_on field" v
 <span>  .star <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  .inherit_tags <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  .update_model_file <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  .overwrite <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  .overwrite <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'bbi_nonmem_model'</span></span>
@@ -104,7 +105,9 @@ ancestry. See <a href="../articles/using-based-on.html">"Using based_on field" v
 <span>  .star <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  .inherit_tags <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  .update_model_file <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  .overwrite <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  .overwrite <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  .update_id <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -155,16 +158,25 @@ tags passed to <code>.add_tags</code> argument. If <code>TRUE</code> inherit any
 
 <dt id="arg--update-model-file">.update_model_file<a class="anchor" aria-label="anchor" href="#arg--update-model-file"></a></dt>
 <dd><p><strong>Only relevant to NONMEM models.</strong> If <code>TRUE</code>, the
-default, update the newly created model file. If <code>FALSE</code>, new model file
-will be an exact copy of its parent. For a NONMEM model, this currently
-means only the <code>$PROBLEM</code> line in the new control stream will be updated to
-read <code>See {.new_model}.yaml. Created by bbr.</code>.</p></dd>
+default, update the newly created model file by setting the <code>$PROBLEM</code> line
+in the new control stream to read <code>See {.new_model}.yaml. Created by bbr.</code>.</p></dd>
 
 
 <dt id="arg--overwrite">.overwrite<a class="anchor" aria-label="anchor" href="#arg--overwrite"></a></dt>
 <dd><p>If <code>FALSE</code>, the default,  function will error if a model
 file already exists at specified <code>.new_model</code> path. If <code>TRUE</code> any existing
 file at <code>.new_model</code> will be overwritten silently.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Arguments passed on to methods.</p></dd>
+
+
+<dt id="arg--update-id">.update_id<a class="anchor" aria-label="anchor" href="#arg--update-id"></a></dt>
+<dd><p>Whether to call <code><a href="update_model_id.html">update_model_id()</a></code> to replace occurrences
+of <code>{parent_mod}.{suffix}</code> with the ID of the new model. To override or
+extend the default suffixes, set this argument to <code>FALSE</code> and follow up
+with a direct call to <code><a href="update_model_id.html">update_model_id()</a></code>.</p></dd>
 
 </dl></div>
     <div id="methods-by-class-">

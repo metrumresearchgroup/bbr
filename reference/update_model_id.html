@@ -19,7 +19,7 @@ copy_model_from(). See Details section.'><meta property="og:image" content="http
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.14.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.15.0</span>
       </span>
     </div>
 
@@ -139,6 +139,10 @@ replace it with <code>get_model_id(.mod)</code> wherever found.</p>
 <code>.msf</code> is passed as a suffix, <code>{parent_mod}.MSF</code> and <code>{parent_mod}.msf</code> would
 <em>both</em> be replaced, but the case of the suffix in the control stream will be
 maintained as is.</p>
+<p>As of bbr 1.15.0, <code><a href="copy_model_from.html">copy_model_from()</a></code> by default calls <code>update_model_id()</code>
+internally before returning the model. You do not need to call
+<code>update_model_id()</code> directly unless you want to override or extend the
+default suffixes.</p>
     </div>
 
   </div>

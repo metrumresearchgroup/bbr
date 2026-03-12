@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.14.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.15.0</span>
       </span>
     </div>
 
@@ -72,6 +72,19 @@
       <small>Source: <a href="https://github.com/metrumresearchgroup/bbr/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="1.15.0" id="bbr-1150">bbr 1.15.0<a class="anchor" aria-label="anchor" href="#bbr-1150"></a></h2>
+<div class="section level3">
+<h3 id="new-features-and-changes-1-15-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-1-15-0"></a></h3>
+<ul><li><p><code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> now calls <code><a href="../reference/update_model_id.html">update_model_id()</a></code> underneath by default. To restore the previous behavior, set the new <code>.update_id</code> argument to <code>FALSE</code>. (<a href="https://github.com/metrumresearchgroup/bbr/issues/761" class="external-link">#761</a>)</p></li>
+<li><p><code>bbr</code> has been updated for compatibility with readr 2.0.0, which is now the minimum required version. (<a href="https://github.com/metrumresearchgroup/bbr/issues/759" class="external-link">#759</a>)</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-1-15-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-15-0"></a></h3>
+<ul><li>
+<code><a href="../reference/update_model_id.html">update_model_id()</a></code> no longer updates occurrences of the parent ID that are embedded in a larger “word”. (<a href="https://github.com/metrumresearchgroup/bbr/issues/761" class="external-link">#761</a>)</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="1.14.3" id="bbr-1143">bbr 1.14.3<a class="anchor" aria-label="anchor" href="#bbr-1143"></a></h2>
 <div class="section level3">
@@ -152,7 +165,7 @@ and <code><a href="../reference/setup_bootstrap_run.html">setup_bootstrap_run()<
 <h2 class="page-header" data-toc-text="1.10.0" id="bbr-1100">bbr 1.10.0<a class="anchor" aria-label="anchor" href="#bbr-1100"></a></h2>
 <div class="section level3">
 <h3 id="new-features-and-changes-1-10-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-1-10-0"></a></h3>
-<ul><li><p>When passed an <code>nmbayes</code> model (defined by the <code>bbr.bayes</code> package), <code><a href="../reference/nm_join.html">nm_join()</a></code> now gives a more informative error that points to <code><a href="https://metrumresearchgroup.github.io/bbr.bayes/reference/nm_join_bayes.html">bbr.bayes::nm_join_bayes()</a></code>. (<a href="https://github.com/metrumresearchgroup/bbr/issues/662" class="external-link">#662</a>)</p></li>
+<ul><li><p>When passed an <code>nmbayes</code> model (defined by the <code>bbr.bayes</code> package), <code><a href="../reference/nm_join.html">nm_join()</a></code> now gives a more informative error that points to <code>bbr.bayes::nm_join_bayes()</code>. (<a href="https://github.com/metrumresearchgroup/bbr/issues/662" class="external-link">#662</a>)</p></li>
 <li><p><code><a href="../reference/model_status.html">check_nonmem_finished()</a></code> has been converted to a method so that tailored logic can be implemented for derived model types, such as the <code>nmbayes</code> model type in <code>bbr.bayes</code>. (<a href="https://github.com/metrumresearchgroup/bbr/issues/663" class="external-link">#663</a>)</p></li>
 <li><p>The character methods for <code><a href="../reference/check_file.html">tail_lst()</a></code> and <code><a href="../reference/check_file.html">tail_output()</a></code> have been adjusted to work with custom model types where <code>*.lst</code> and <code>OUTPUT</code> files do not reside in the top-level output directory. (<a href="https://github.com/metrumresearchgroup/bbr/issues/661" class="external-link">#661</a>)</p></li>
 <li><p><code><a href="../reference/get_data_path.html">get_data_path()</a></code> can now pull from the control stream file if the model has not yet been submitted. This allows functions like <code><a href="../reference/nm_file.html">nm_data()</a></code> to be used pre-model submission. Support for <code>bbi_log_df</code> methods and a new <code>.check_exists</code> argument (defaults to <code>TRUE</code>) have also been added. (<a href="https://github.com/metrumresearchgroup/bbr/issues/664" class="external-link">#664</a>)</p></li>
@@ -167,7 +180,7 @@ and <code><a href="../reference/setup_bootstrap_run.html">setup_bootstrap_run()<
 </ul></div>
 <div class="section level3">
 <h3 id="bugs-addressed-1-9-0">Bugs addressed<a class="anchor" aria-label="anchor" href="#bugs-addressed-1-9-0"></a></h3>
-<ul><li><p>With the latest <code>data.table</code> release (1.15.0), <code><a href="../reference/param_estimates_batch.html">param_estimates_batch()</a></code> failed for an edge case due to a change in the header detection heuristics. <code><a href="../reference/param_estimates_batch.html">param_estimates_batch()</a></code> now tells <code><a href="https://rdatatable.gitlab.io/data.table/reference/fread.html" class="external-link">data.table::fread()</a></code> to expect a header. (<a href="https://github.com/metrumresearchgroup/bbr/issues/648" class="external-link">#648</a>)</p></li>
+<ul><li><p>With the latest <code>data.table</code> release (1.15.0), <code><a href="../reference/param_estimates_batch.html">param_estimates_batch()</a></code> failed for an edge case due to a change in the header detection heuristics. <code><a href="../reference/param_estimates_batch.html">param_estimates_batch()</a></code> now tells <code><a href="https://rdrr.io/pkg/data.table/man/fread.html" class="external-link">data.table::fread()</a></code> to expect a header. (<a href="https://github.com/metrumresearchgroup/bbr/issues/648" class="external-link">#648</a>)</p></li>
 <li><p>When passed <code>.recurse = TRUE</code>, <code><a href="../reference/run_log.html">run_log()</a></code>, <code><a href="../reference/config_log.html">config_log()</a></code>, and <code><a href="../reference/summary_log.html">summary_log()</a></code> included nested models, which was not by design. Any models under another model’s output directory are considered an implementation detail. (<a href="https://github.com/metrumresearchgroup/bbr/issues/643" class="external-link">#643</a>, <a href="https://github.com/metrumresearchgroup/bbr/issues/644" class="external-link">#644</a>, <a href="https://github.com/metrumresearchgroup/bbr/issues/645" class="external-link">#645</a>)</p></li>
 </ul></div>
 </div>

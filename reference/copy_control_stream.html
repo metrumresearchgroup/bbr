@@ -18,7 +18,7 @@ Note that any file existing at .new_model_path will be overwritten."><meta prope
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.14.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.15.0</span>
       </span>
     </div>
 
@@ -105,7 +105,9 @@ Note that any file existing at <code>.new_model_path</code> will be overwritten.
 
 
 <dt id="arg--update-model-file">.update_model_file<a class="anchor" aria-label="anchor" href="#arg--update-model-file"></a></dt>
-<dd><p>If <code>TRUE</code>, the default, update the <code>$PROBLEM</code> line in the new control stream. If <code>FALSE</code>, <code>{.new_model}.[mod|ctl]</code> will be an exact copy of its parent control stream.</p></dd>
+<dd><p><strong>Only relevant to NONMEM models.</strong> If <code>TRUE</code>, the
+default, update the newly created model file by setting the <code>$PROBLEM</code> line
+in the new control stream to read <code>See {.new_model}.yaml. Created by bbr.</code>.</p></dd>
 
 </dl></div>
 

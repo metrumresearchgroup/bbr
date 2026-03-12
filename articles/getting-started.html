@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.14.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.15.0</span>
       </span>
     </div>
 
@@ -536,13 +536,14 @@ as the parent model, and return the model object corresponding to them.
 can be useful later in the project, as shown in the <a href="https://metrumresearchgroup.github.io/bbr/articles/using-based-on.html">Using
 the based_on field</a> vignette.)</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span><span class="va">mod1</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/update_model_id.html">update_model_id</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; replacing 1 with 2 in /tmp/RtmpCjIAsi/temp_libpath28310502504aa/bbr/model/nonmem/basic/2.ctl</span></span></code></pre></div>
-<p>The new control stream file <code>2.ctl</code> will be identical to
-its parent model, though you can use <a href="https://metrumresearchgroup.github.io/bbr/reference/update_model_id.html"><code>update_model_id()</code></a>
-(as above) to update to the new model ID in places like
-<code>$TABLE</code> statements.</p>
+<code class="sourceCode R"><span><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span><span class="va">mod1</span><span class="op">)</span></span>
+<span><span class="co">#&gt; replacing 1 with 2 in /tmp/RtmpuJMjZV/temp_libpath3f5151349edf0/bbr/model/nonmem/basic/2.ctl</span></span></code></pre></div>
+<p>The new control stream file <code>2.ctl</code> will be derived from
+the parent model’s, with occurrences of the old model ID will be updated
+with the new model ID unless the <code>.update_id</code> argument is set
+to <code>FALSE</code>. (For bbr versions before 1.15.0, a follow-up call
+to <a href="https://metrumresearchgroup.github.io/bbr/reference/update_model_id.html"><code>update_model_id()</code></a>
+was required to update the model ID.)</p>
 <p>Your new control stream can now be edited with any desired changes
 and then submitted and summarized exactly as above. At any time, you can
 also see the difference between a model and its parent using <a href="https://metrumresearchgroup.github.io/bbr/reference/model_diff.html"><code>model_diff()</code></a>.</p>
@@ -580,7 +581,8 @@ based_on” vignette</a> for examples.</p>
 can tell <code><a href="../reference/copy_model_from.html">copy_model_from()</a></code> to inherit the tags from the
 parent model and automatically add them to the new model.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mod3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span><span class="va">mod2</span>, .inherit_tags <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">mod3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span><span class="va">mod2</span>, .inherit_tags <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; replacing 2 with 3 in /tmp/RtmpuJMjZV/temp_libpath3f5151349edf0/bbr/model/nonmem/basic/3.ctl</span></span></code></pre></div>
 <p>Submit and summarize as before.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># manually edit control stream, then...</span></span>
@@ -614,7 +616,8 @@ initial estimates for THETA records specifically.</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span><span class="va">mod1</span>, <span class="st">"4"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/inherit_param_estimates.html">inherit_param_estimates</a></span><span class="op">(</span>bounds <span class="op">=</span> <span class="st">"keep"</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/modify_notes.html">add_notes</a></span><span class="op">(</span><span class="st">"Initial estimates inherited from mod1 results"</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/modify_notes.html">add_notes</a></span><span class="op">(</span><span class="st">"Initial estimates inherited from mod1 results"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; replacing 1 with 4 in /tmp/RtmpuJMjZV/temp_libpath3f5151349edf0/bbr/model/nonmem/basic/4.ctl</span></span></code></pre></div>
 <p>You can also tweak or ‘jitter’ the initial parameter estimates using
 <code><a href="../reference/tweak_initial_estimates.html">tweak_initial_estimates()</a></code>. This can be used both in
 conjunction with <code><a href="../reference/inherit_param_estimates.html">inherit_param_estimates()</a></code> or as a
@@ -623,9 +626,11 @@ standalone call:</p>
 <code class="sourceCode R"><span><span class="va">mod5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span><span class="va">mod1</span>, <span class="st">"5"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="../reference/inherit_param_estimates.html">inherit_param_estimates</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="../reference/tweak_initial_estimates.html">tweak_initial_estimates</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">3</span>, .p <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; replacing 1 with 5 in /tmp/RtmpuJMjZV/temp_libpath3f5151349edf0/bbr/model/nonmem/basic/5.ctl</span></span>
 <span></span>
 <span><span class="va">mod6</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/copy_model_from.html">copy_model_from</a></span><span class="op">(</span><span class="va">mod1</span>, <span class="st">"6"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/tweak_initial_estimates.html">tweak_initial_estimates</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">3</span>, .p <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/tweak_initial_estimates.html">tweak_initial_estimates</a></span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">3</span>, .p <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; replacing 1 with 6 in /tmp/RtmpuJMjZV/temp_libpath3f5151349edf0/bbr/model/nonmem/basic/6.ctl</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -646,12 +651,12 @@ section below for links to vignettes demonstrating those functions.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 10</span></span></span>
 <span><span class="co">#&gt;   absolute_model_path         run   yaml_md5 model_type description bbi_args    </span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> /tmp/RtmpCjIAsi/temp_libpa… 1     3ff1756… nonmem     original a… <span style="color: #949494;">&lt;named list&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> /tmp/RtmpCjIAsi/temp_libpa… 2     41f8d47… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> /tmp/RtmpCjIAsi/temp_libpa… 3     03a1f9d… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> /tmp/RtmpCjIAsi/temp_libpa… 4     09bed41… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> /tmp/RtmpCjIAsi/temp_libpa… 5     36d4841… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> /tmp/RtmpCjIAsi/temp_libpa… 6     36d4841… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> /tmp/RtmpuJMjZV/temp_libpa… 1     3ff1756… nonmem     original a… <span style="color: #949494;">&lt;named list&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> /tmp/RtmpuJMjZV/temp_libpa… 2     41f8d47… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> /tmp/RtmpuJMjZV/temp_libpa… 3     03a1f9d… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> /tmp/RtmpuJMjZV/temp_libpa… 4     09bed41… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> /tmp/RtmpuJMjZV/temp_libpa… 5     36d4841… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> /tmp/RtmpuJMjZV/temp_libpa… 6     36d4841… nonmem     <span style="color: #BB0000;">NA</span>          <span style="color: #949494;">&lt;named list&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 more variables: based_on &lt;list&gt;, tags &lt;list&gt;, notes &lt;list&gt;, star &lt;lgl&gt;</span></span></span></code></pre></div>
 <p>The <code><a href="../reference/run_log.html">run_log()</a></code> returns a tibble which can be manipulated
 like any other tibble. However, several of the columns
