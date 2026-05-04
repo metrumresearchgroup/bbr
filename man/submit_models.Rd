@@ -98,8 +98,8 @@ model being executed in a subdirectory.
 \seealso{
 \code{\link[=submit_model]{submit_model()}}
 
-Other \code{NONMEM} model extensions: 
-\code{\link{get_data_path}()},
-\code{\link{submit_model}()}
+Other \code{NONMEM} model extensions:
+\code{\link[=get_data_path]{get_data_path()}},
+\code{\link[=submit_model]{submit_model()}}
 }
 \concept{\code{NONMEM} model extensions}
