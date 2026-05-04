@@ -552,6 +552,7 @@ color_model_type <- function(.mod, msg = NULL){
 }
 
 #' @keywords internal
+#' @export
 color_model_type.bbi_base_model <- function(.mod, msg = NULL){
   checkmate::assert_string(msg, null.ok = TRUE)
   model_type <- .mod[[YAML_MOD_TYPE]]

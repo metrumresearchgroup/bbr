@@ -143,6 +143,7 @@ get_spec_path <- function(.mod, .check_exists = TRUE) {
 #' @describeIn get_spec_path Get the bootstrap specification file path from a
 #' `bbi_nmboot_model` object
 #' @keywords internal
+#' @export
 get_spec_path.bbi_nmboot_model <- function(.mod, .check_exists = TRUE) {
   # Spec file saved to modeling directory of bootstrap run
   .path <- file.path(
@@ -160,6 +161,7 @@ get_spec_path.bbi_nmboot_model <- function(.mod, .check_exists = TRUE) {
 #' @describeIn get_spec_path Get the simulation specification file path from a
 #' `bbi_nmsim_model` or `bbi_nonmem_model` object
 #' @keywords internal
+#' @export
 get_spec_path.bbi_base_model <- function(.mod, .check_exists = TRUE) {
   # Spec file saved to output directory of based_on model
   if(inherits(.mod, NMSIM_MOD_CLASS)){
