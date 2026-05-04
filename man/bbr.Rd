@@ -34,6 +34,20 @@ metadata, information, and diagnostics about the models. See the following
 help pages for more information: \code{\link[=run_log]{run_log()}} \code{\link[=summary_log]{summary_log()}} \code{\link[=config_log]{config_log()}}
 }
 }
+\section{Package options}{
+
+\itemize{
+\item \code{bbr.bbi_exe_mode} -- default \code{.mode} value to pass to \code{\link[=submit_model]{submit_model()}}
+\item \code{bbr.bbi_exe_path} -- the location of the bbi executable
+\item \code{bbr.gitignore_sim} -- default \code{gitignore_sim} value passed to
+\code{\link[=add_simulation]{add_simulation()}}
+\item \code{bbr.strict} -- set to \code{FALSE} to demote certain issues, such as the model
+YAML file missing required keys, from errors to warnings
+\item \code{bbr.verbose} -- set to \code{FALSE} to limit informational messages output by
+some functions
+}
+}
+
 \seealso{
 Useful links:
 \itemize{
