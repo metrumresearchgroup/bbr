@@ -42,6 +42,9 @@
 #' * `bbr.verbose` -- set to `FALSE` to limit informational messages output by
 #'   some functions
 #'
+#' * `mrg.id_col` -- the default column name to take as the subject identifier
+#'    (see [nm_join()])
+#'
 #' * `mrg.num_col` -- the default column name to use when joining table files
 #'    (see [nm_join()])
 #'

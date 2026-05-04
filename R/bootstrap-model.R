@@ -105,6 +105,8 @@ new_bootstrap_run <- function(
 #' bootstrap run. Once all models have finished, use [summarize_bootstrap_run()]
 #' to view the results. See examples below.
 #'
+#' By default, this function looks for the subject identifier in the "ID"
+#' column. Set the `mrg.id_col` option to use a different column.
 #'
 #' @seealso [new_bootstrap_run()] [summarize_bootstrap_run()] [submit_model()]
 #'
@@ -340,13 +342,15 @@ make_boot_run <- function(mod_path, boot_args){
   )
 
 
+  # TODO: should this be a user arg?
+  id_col <- getOption("mrg.id_col")
   # Sample data and assign new IDs
   data_new <- mrgmisc::resample_df(
     boot_args$orig_data,
-    key_cols = "ID", # TODO: should this be a user arg?
+    key_cols = id_col,
     strat_cols = boot_args$strat_cols,
     replace = TRUE
-  ) %>% dplyr::rename("OID" = "ID", "ID" = "KEY") %>% # TODO: should this be a user arg?
+  ) %>% dplyr::rename("OID" = all_of(id_col), !!id_col := "KEY") %>%
     dplyr::select(all_of(unique(c(names(boot_args$orig_data), "OID"))))
 
   mod_name <- basename(mod_path)

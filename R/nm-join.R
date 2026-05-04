@@ -175,11 +175,13 @@ nm_join_impl <- function(
   nid <-  .s$run_details$number_of_subjects
   nrec <- .s$run_details$number_of_data_records
 
+  id_col <- getOption("mrg.id_col")
+
   # do the join(s)
   if(!is.null(.tbls)){
     for (.n in names(.tbls)) {
       tab <- .tbls[[.n]]
-      has_id <- "ID" %in% names(tab)
+      has_id <- id_col %in% names(tab)
 
       if (!(nrow(tab) %in% c(nrec, nid))) {
         # skip table if nrow doesn't match number of records or ID's
@@ -193,16 +195,16 @@ nm_join_impl <- function(
         # if ID is missing, get it from the data by using .join_col
         if (!has_id) {
           tab <- tab %>%
-            left_join(select(.d, "ID", !!.join_col), by = .join_col)
+            left_join(select(.d, all_of(id_col), !!.join_col), by = .join_col)
         }
 
         # toss .join_col, if present, because we're joining on ID
         tab[[.join_col]] <- NULL
 
         # do the join
-        tab <- drop_dups(tab, .d, "ID", .n)
+        tab <- drop_dups(tab, .d, id_col, .n)
         col_order <- union(col_order, names(tab))
-        .d <- join_first_only_fun(tab, .d, by = "ID")
+        .d <- join_first_only_fun(tab, .d, by = id_col)
       } else if (nrow(tab) == nrec) {
         # otherwise, join on .join_col
         tab <- drop_dups(tab, .d, .join_col, .n)

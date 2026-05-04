@@ -66,9 +66,10 @@ be unambiguous matching from the table file back to the input data set.
 same number of rows as the there are individuals in the input data set
 (accounting for any filtering of data in the NONMEM control stream), it
 will assumed to be a \code{FIRSTONLY} table. In this case, the table will be
-joined to the input data by the \code{ID} column. If \code{ID} is not present in
-the table, it will be using \code{.join_col}. Note that if \emph{neither} \code{ID} or
-the column passed to \code{.join_col} are present in the table, the join will
+joined to the input data by the name given by the \code{mrg.id_col} option
+("ID" by default). If that column is not present in the table, it will be
+using \code{.join_col}. Note that if \emph{neither} the \code{mrg.id_col} column or the
+column passed to \code{.join_col} are present in the table, the join will
 fail.
 }
 

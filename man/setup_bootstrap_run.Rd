@@ -50,6 +50,9 @@ Once you have run this function, you can execute your bootstrap with
 \code{\link[=submit_model]{submit_model()}}. You can use \code{\link[=get_model_status]{get_model_status()}} to check on your submitted
 bootstrap run. Once all models have finished, use \code{\link[=summarize_bootstrap_run]{summarize_bootstrap_run()}}
 to view the results. See examples below.
+
+By default, this function looks for the subject identifier in the "ID"
+column. Set the \code{mrg.id_col} option to use a different column.
 }
 \examples{
 \dontrun{

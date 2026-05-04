@@ -45,6 +45,8 @@ help pages for more information: \code{\link[=run_log]{run_log()}} \code{\link[=
 YAML file missing required keys, from errors to warnings
 \item \code{bbr.verbose} -- set to \code{FALSE} to limit informational messages output by
 some functions
+\item \code{mrg.id_col} -- the default column name to take as the subject identifier
+(see \code{\link[=nm_join]{nm_join()}})
 \item \code{mrg.num_col} -- the default column name to use when joining table files
 (see \code{\link[=nm_join]{nm_join()}})
 }
