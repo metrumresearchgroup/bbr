@@ -13,8 +13,9 @@
 #' FALSE)`.
 #'
 #' @inheritParams nm_tables
-#' @param .join_col Character column name to use to join table files. Defaults to
-#'   `NUM`. See Details.
+#' @param .join_col Character column name to use to join table files. Defaults
+#'   to "NUM", unless the `mrg.num_col` option is set to another value. See
+#'   Details.
 #' @param .superset If `FALSE`, the default, the data will be joined to the
 #'   NONMEM output and if `TRUE`, the NONMEM output will be joined to the data;
 #'   that is, if you use `.superset`, you will get the same number of rows as
@@ -66,7 +67,7 @@
 #' @export
 nm_join <- function(
     .mod,
-    .join_col = "NUM",
+    .join_col = getOption("mrg.num_col"),
     .files = nm_table_files(.mod),
     .superset = FALSE,
     .bbi_args = list(
@@ -106,7 +107,7 @@ nm_join <- function(
 #' @keywords internal
 nm_join_impl <- function(
     .mod,
-    .join_col = "NUM",
+    .join_col = getOption("mrg.num_col"),
     .files = nm_table_files(.mod),
     .superset = FALSE,
     .bbi_args = list(
@@ -253,7 +254,8 @@ drop_dups <- function(.new_table, .dest_table, .join_col, .table_name) {
 #' @param .mod A `bbi_nonmem_model` with an attached simulation, or a
 #'  `bbi_nmsim_model` object.
 #' @param .join_col Character column name(s) to use to join table files.
-#'  Defaults to `NUM`. See Details.
+#'  Defaults to "NUM", unless the `mrg.num_col` option is set to another value.
+#'  See Details.
 #' @param .cols_keep Either `'all'`, or a vector of column name(s) to retain
 #'  in the final dataset after joining. Defaults to keeping all columns.
 #' @inheritParams nm_file_multi_tab
@@ -284,7 +286,7 @@ drop_dups <- function(.new_table, .dest_table, .join_col, .table_name) {
 #' @export
 nm_join_sim <- function(
     .mod,
-    .join_col = "NUM",
+    .join_col = getOption("mrg.num_col"),
     .cols_keep = "all",
     add_table_names = FALSE
 ){

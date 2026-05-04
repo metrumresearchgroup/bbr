@@ -42,6 +42,9 @@
 #' * `bbr.verbose` -- set to `FALSE` to limit informational messages output by
 #'   some functions
 #'
+#' * `mrg.num_col` -- the default column name to use when joining table files
+#'    (see [nm_join()])
+#'
 #' @importFrom glue glue
 #' @importFrom rlang .data :=
 #' @importFrom lifecycle deprecated deprecate_warn deprecate_stop

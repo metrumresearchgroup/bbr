@@ -4,14 +4,15 @@
 \alias{check_model_for_sim}
 \title{Check that a \code{bbr} model can be used for simulation}
 \usage{
-check_model_for_sim(.mod, .join_col = "NUM")
+check_model_for_sim(.mod, .join_col = getOption("mrg.num_col"))
 }
 \arguments{
 \item{.mod}{a \code{bbi_nonmem_model} object.}
 
 \item{.join_col}{Character column name(s) used to join table files post
 execution. Gets appended to the generated \verb{$TABLE} record. See
-\code{\link[=nm_join_sim]{nm_join_sim()}} documentation for details. Defaults to \code{'NUM'}.}
+\code{\link[=nm_join_sim]{nm_join_sim()}} documentation for details. Defaults to the "NUM", unless the
+\code{mrg.num_col} option is set to another value.}
 }
 \value{
 \code{TRUE} invisibly

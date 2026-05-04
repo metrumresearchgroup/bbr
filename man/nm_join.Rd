@@ -6,7 +6,7 @@
 \usage{
 nm_join(
   .mod,
-  .join_col = "NUM",
+  .join_col = getOption("mrg.num_col"),
   .files = nm_table_files(.mod),
   .superset = FALSE,
   .bbi_args = list(no_grd_file = TRUE, no_shk_file = TRUE)
@@ -16,8 +16,9 @@ nm_join(
 \item{.mod}{A \code{bbi_nonmem_model} or \code{bbi_nonmem_summary} object, or a path to
 a NONMEM run.}
 
-\item{.join_col}{Character column name to use to join table files. Defaults to
-\code{NUM}. See Details.}
+\item{.join_col}{Character column name to use to join table files. Defaults
+to "NUM", unless the \code{mrg.num_col} option is set to another value. See
+Details.}
 
 \item{.files}{Character vector of file paths to table files to read in.
 Defaults to calling \code{\link[=nm_table_files]{nm_table_files()}} on \code{.mod}, which will parse all file

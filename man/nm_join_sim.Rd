@@ -6,7 +6,7 @@
 \usage{
 nm_join_sim(
   .mod,
-  .join_col = "NUM",
+  .join_col = getOption("mrg.num_col"),
   .cols_keep = "all",
   add_table_names = FALSE
 )
@@ -16,7 +16,8 @@ nm_join_sim(
 \code{bbi_nmsim_model} object.}
 
 \item{.join_col}{Character column name(s) to use to join table files.
-Defaults to \code{NUM}. See Details.}
+Defaults to "NUM", unless the \code{mrg.num_col} option is set to another value.
+See Details.}
 
 \item{.cols_keep}{Either \code{'all'}, or a vector of column name(s) to retain
 in the final dataset after joining. Defaults to keeping all columns.}
