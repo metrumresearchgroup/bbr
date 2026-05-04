@@ -32,8 +32,7 @@
 #' @importFrom lifecycle deprecated deprecate_warn deprecate_stop
 #' @import fs
 #' @keywords internal
-NULL
-
+"_PACKAGE"
 
 #' Execute call to bbi
 #'
