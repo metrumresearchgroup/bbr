@@ -164,6 +164,60 @@ test_that("nm_join(.join_col) works correctly with duplicate cols  [BBR-NMJ-005]
   expect_equal(test_df$NUM, test_df$BUM)
 })
 
+test_that("nm_join works with custom ID and NUM columns", {
+  tdir <- withr::local_tempdir(pattern = "bbr-tests-")
+  withr::local_dir(tdir)
+
+  fs::dir_copy(
+    system.file("extdata", package = "bbr", mustWork = TRUE),
+    "."
+  )
+
+  mdir <- file.path("model", "nonmem", "basic")
+  fs::dir_create(mdir)
+
+  src_path <- system.file(mdir, "1", package = "bbr", mustWork = TRUE)
+  fs::dir_copy(src_path, mdir)
+  fs::file_copy(paste0(src_path, c(".yaml", ".ctl")), mdir)
+
+  edit_file <- function(f, pat, repl) {
+    data <- readChar(f, file.size(f))
+    new <- sub(pat, repl, data, fixed = TRUE)
+    cat(new, file = f)
+  }
+
+  edit_file(file.path("extdata", "acop.csv"), "id", "altid")
+  edit_file(file.path("extdata", "acop.csv"), "num", "altnum")
+
+  for (f in c("1first1.tab", "1first3.tab")) {
+    edit_file(
+      file.path("model", "nonmem", "basic", "1", f),
+      "ID",
+      "ALTID"
+    )
+  }
+
+  for (f in c("1first2.tab", "1par.tab", "1first3.tab", "1.tab", "1dups.tab")) {
+    edit_file(
+      file.path("model", "nonmem", "basic", "1", f),
+      "NUM",
+      "ALTNUM"
+    )
+  }
+
+  mod <- bbr::read_model(file.path(mdir, "1"))
+
+  expect_error(nm_join(mod), "couldn't find")
+
+  withr::local_options(list(
+    "mrg.id_col" = "ALTID",
+    "mrg.num_col" = "ALTNUM"
+  ))
+
+  res <- nm_join(mod)
+  expect_equal(nrow(res), DATA_TEST_ROWS_IGNORE)
+})
+
 ########################
 # warnings and messages
 
