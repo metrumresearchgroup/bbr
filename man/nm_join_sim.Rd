@@ -6,7 +6,7 @@
 \usage{
 nm_join_sim(
   .mod,
-  .join_col = getOption("mrg.num_col"),
+  .join_col = getOption("mrg.num_col", "NUM"),
   .cols_keep = "all",
   add_table_names = FALSE
 )

@@ -343,7 +343,7 @@ make_boot_run <- function(mod_path, boot_args){
 
 
   # TODO: should this be a user arg?
-  id_col <- getOption("mrg.id_col")
+  id_col <- getOption("mrg.id_col", "ID")
   # Sample data and assign new IDs
   data_new <- mrgmisc::resample_df(
     boot_args$orig_data,

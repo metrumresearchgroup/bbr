@@ -12,7 +12,7 @@ new_sim_model(
   data = NULL,
   sim_cols = c("DV", "PRED"),
   gitignore_sim = getOption("bbr.gitignore_sim"),
-  .join_col = getOption("mrg.num_col"),
+  .join_col = getOption("mrg.num_col", "NUM"),
   .sim_dir = get_output_dir(.mod),
   .inherit_tags = TRUE,
   .overwrite = FALSE

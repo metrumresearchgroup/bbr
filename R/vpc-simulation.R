@@ -84,7 +84,7 @@ add_simulation <- function(
     data = NULL,
     sim_cols = c("DV", "PRED"),
     gitignore_sim = getOption("bbr.gitignore_sim"),
-    .join_col = getOption("mrg.num_col"),
+    .join_col = getOption("mrg.num_col", "NUM"),
     .inherit_tags = TRUE,
     .bbi_args = NULL,
     .mode = getOption("bbr.bbi_exe_mode"),
@@ -255,7 +255,7 @@ new_sim_model <- function(
     data = NULL,
     sim_cols = c("DV", "PRED"),
     gitignore_sim = getOption("bbr.gitignore_sim"),
-    .join_col = getOption("mrg.num_col"),
+    .join_col = getOption("mrg.num_col", "NUM"),
     .sim_dir = get_output_dir(.mod),
     .inherit_tags = TRUE,
     .overwrite = FALSE
@@ -369,7 +369,7 @@ setup_sim_run <- function(
     n = 100,
     seed = 1234,
     sim_cols = c("DV", "PRED"),
-    .join_col = getOption("mrg.num_col")
+    .join_col = getOption("mrg.num_col", "NUM")
 ){
   check_model_object(.mod, c(NM_MOD_CLASS, NMSIM_MOD_CLASS))
   checkmate::assert_numeric(n, lower = 1)
@@ -425,7 +425,7 @@ setup_sim_run <- function(
 #' @inheritParams new_sim_model
 #' @returns `TRUE` invisibly
 #' @keywords internal
-check_model_for_sim <- function(.mod, .join_col = getOption("mrg.num_col")){
+check_model_for_sim <- function(.mod, .join_col = getOption("mrg.num_col", "NUM")){
 
   # Check the MSF file in $EST
   msf_path <- get_msf_path(.mod, .check_exists = FALSE)

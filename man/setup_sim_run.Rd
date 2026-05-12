@@ -9,7 +9,7 @@ setup_sim_run(
   n = 100,
   seed = 1234,
   sim_cols = c("DV", "PRED"),
-  .join_col = getOption("mrg.num_col")
+  .join_col = getOption("mrg.num_col", "NUM")
 )
 }
 \arguments{
