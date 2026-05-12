@@ -27,6 +27,27 @@
 #'   metadata, information, and diagnostics about the models. See the following
 #'   help pages for more information: [run_log()] [summary_log()] [config_log()]
 #'
+#' @section Package options:
+#'
+#' * `bbr.bbi_exe_mode` -- default `.mode` value to pass to [submit_model()]
+#'
+#' * `bbr.bbi_exe_path` -- the location of the bbi executable
+#'
+#' * `bbr.gitignore_sim` -- default `gitignore_sim` value passed to
+#'   [add_simulation()]
+#'
+#' * `bbr.strict` -- set to `FALSE` to demote certain issues, such as the model
+#'   YAML file missing required keys, from errors to warnings
+#'
+#' * `bbr.verbose` -- set to `FALSE` to limit informational messages output by
+#'   some functions
+#'
+#' * `mrg.id_col` -- the default column name to take as the subject identifier
+#'    (see [nm_join()])
+#'
+#' * `mrg.num_col` -- the default column name to use when joining table files
+#'    (see [nm_join()])
+#'
 #' @importFrom glue glue
 #' @importFrom rlang .data :=
 #' @importFrom lifecycle deprecated deprecate_warn deprecate_stop

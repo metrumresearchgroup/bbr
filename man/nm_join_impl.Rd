@@ -6,7 +6,7 @@
 \usage{
 nm_join_impl(
   .mod,
-  .join_col = "NUM",
+  .join_col = getOption("mrg.num_col"),
   .files = nm_table_files(.mod),
   .superset = FALSE,
   .bbi_args = list(no_grd_file = TRUE, no_shk_file = TRUE)
@@ -16,8 +16,9 @@ nm_join_impl(
 \item{.mod}{A \code{bbi_nonmem_model} or \code{bbi_nonmem_summary} object, or a path to
 a NONMEM run.}
 
-\item{.join_col}{Character column name to use to join table files. Defaults to
-\code{NUM}. See Details.}
+\item{.join_col}{Character column name to use to join table files. Defaults
+to "NUM", unless the \code{mrg.num_col} option is set to another value. See
+Details.}
 
 \item{.files}{Character vector of file paths to table files to read in.
 Defaults to calling \code{\link[=nm_table_files]{nm_table_files()}} on \code{.mod}, which will parse all file
@@ -53,9 +54,10 @@ be unambiguous matching from the table file back to the input data set.
 same number of rows as the there are individuals in the input data set
 (accounting for any filtering of data in the NONMEM control stream), it
 will assumed to be a \code{FIRSTONLY} table. In this case, the table will be
-joined to the input data by the \code{ID} column. If \code{ID} is not present in
-the table, it will be using \code{.join_col}. Note that if \emph{neither} \code{ID} or
-the column passed to \code{.join_col} are present in the table, the join will
+joined to the input data by the name given by the \code{mrg.id_col} option
+("ID" by default). If that column is not present in the table, it will be
+using \code{.join_col}. Note that if \emph{neither} the \code{mrg.id_col} column or the
+column passed to \code{.join_col} are present in the table, the join will
 fail.
 }
 

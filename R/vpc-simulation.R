@@ -84,7 +84,7 @@ add_simulation <- function(
     data = NULL,
     sim_cols = c("DV", "PRED"),
     gitignore_sim = getOption("bbr.gitignore_sim"),
-    .join_col = "NUM",
+    .join_col = getOption("mrg.num_col"),
     .inherit_tags = TRUE,
     .bbi_args = NULL,
     .mode = getOption("bbr.bbi_exe_mode"),
@@ -210,7 +210,8 @@ get_simulation <- function(.mod){
 #'  table out.
 #' @param .join_col Character column name(s) used to join table files post
 #'  execution. Gets appended to the generated `$TABLE` record. See
-#'  [nm_join_sim()] documentation for details. Defaults to `'NUM'`.
+#'  [nm_join_sim()] documentation for details. Defaults to the "NUM", unless the
+#'  `mrg.num_col` option is set to another value.
 #' @param gitignore_sim If `TRUE`, the default, add the simulation output directory
 #'  to a `.gitignore` file. The intention here is to avoid committing large files
 #'  (i.e. large simulation tables). This can be passed directly to this argument
@@ -254,7 +255,7 @@ new_sim_model <- function(
     data = NULL,
     sim_cols = c("DV", "PRED"),
     gitignore_sim = getOption("bbr.gitignore_sim"),
-    .join_col = "NUM",
+    .join_col = getOption("mrg.num_col"),
     .sim_dir = get_output_dir(.mod),
     .inherit_tags = TRUE,
     .overwrite = FALSE
@@ -368,7 +369,7 @@ setup_sim_run <- function(
     n = 100,
     seed = 1234,
     sim_cols = c("DV", "PRED"),
-    .join_col = c("NUM")
+    .join_col = getOption("mrg.num_col")
 ){
   check_model_object(.mod, c(NM_MOD_CLASS, NMSIM_MOD_CLASS))
   checkmate::assert_numeric(n, lower = 1)
@@ -424,7 +425,7 @@ setup_sim_run <- function(
 #' @inheritParams new_sim_model
 #' @returns `TRUE` invisibly
 #' @keywords internal
-check_model_for_sim <- function(.mod, .join_col = "NUM"){
+check_model_for_sim <- function(.mod, .join_col = getOption("mrg.num_col")){
 
   # Check the MSF file in $EST
   msf_path <- get_msf_path(.mod, .check_exists = FALSE)

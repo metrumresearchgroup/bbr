@@ -12,7 +12,7 @@ new_sim_model(
   data = NULL,
   sim_cols = c("DV", "PRED"),
   gitignore_sim = getOption("bbr.gitignore_sim"),
-  .join_col = "NUM",
+  .join_col = getOption("mrg.num_col"),
   .sim_dir = get_output_dir(.mod),
   .inherit_tags = TRUE,
   .overwrite = FALSE
@@ -42,7 +42,8 @@ or set globally with \code{options("bbr.gitignore_sim")}.}
 
 \item{.join_col}{Character column name(s) used to join table files post
 execution. Gets appended to the generated \verb{$TABLE} record. See
-\code{\link[=nm_join_sim]{nm_join_sim()}} documentation for details. Defaults to \code{'NUM'}.}
+\code{\link[=nm_join_sim]{nm_join_sim()}} documentation for details. Defaults to the "NUM", unless the
+\code{mrg.num_col} option is set to another value.}
 
 \item{.sim_dir}{A directory for holding the new simulation model. Defaults to
 the output directory of \code{.mod}.}

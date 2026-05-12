@@ -9,7 +9,7 @@ setup_sim_run(
   n = 100,
   seed = 1234,
   sim_cols = c("DV", "PRED"),
-  .join_col = c("NUM")
+  .join_col = getOption("mrg.num_col")
 )
 }
 \arguments{
@@ -25,7 +25,8 @@ table out.}
 
 \item{.join_col}{Character column name(s) used to join table files post
 execution. Gets appended to the generated \verb{$TABLE} record. See
-\code{\link[=nm_join_sim]{nm_join_sim()}} documentation for details. Defaults to \code{'NUM'}.}
+\code{\link[=nm_join_sim]{nm_join_sim()}} documentation for details. Defaults to the "NUM", unless the
+\code{mrg.num_col} option is set to another value.}
 }
 \description{
 Removes relevant record types, creates new \verb{$SIMULATION} and \verb{$MSFI} records,
