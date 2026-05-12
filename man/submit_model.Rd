@@ -143,8 +143,8 @@ model being executed in a subdirectory.
 \seealso{
 \code{\link[=submit_models]{submit_models()}}
 
-Other \code{NONMEM} model extensions: 
-\code{\link{get_data_path}()},
-\code{\link{submit_models}()}
+Other \code{NONMEM} model extensions:
+\code{\link[=get_data_path]{get_data_path()}},
+\code{\link[=submit_models]{submit_models()}}
 }
 \concept{\code{NONMEM} model extensions}

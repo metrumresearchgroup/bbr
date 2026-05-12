@@ -30,6 +30,7 @@ bbi_nonmem_model_status <- function(.mod) {
 
 #' @rdname bbi_nonmem_model_status
 #' @keywords internal
+#' @export
 bbi_nonmem_model_status.bbi_model <- function(.mod) {
   status <- "Not Run"
   output_dir <- get_output_dir(.mod, .check_exists = FALSE)
@@ -46,6 +47,7 @@ bbi_nonmem_model_status.bbi_model <- function(.mod) {
 
 #' @rdname bbi_nonmem_model_status
 #' @keywords internal
+#' @export
 bbi_nonmem_model_status.bbi_nmboot_model <- function(.mod) {
   status <- "Not Run"
   output_dir <- get_output_dir(.mod, .check_exists = FALSE)
