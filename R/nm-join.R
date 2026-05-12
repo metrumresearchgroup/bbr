@@ -67,7 +67,7 @@
 #' @export
 nm_join <- function(
     .mod,
-    .join_col = getOption("mrg.num_col"),
+    .join_col = getOption("mrg.num_col", "NUM"),
     .files = nm_table_files(.mod),
     .superset = FALSE,
     .bbi_args = list(
@@ -107,7 +107,7 @@ nm_join <- function(
 #' @keywords internal
 nm_join_impl <- function(
     .mod,
-    .join_col = getOption("mrg.num_col"),
+    .join_col = getOption("mrg.num_col", "NUM"),
     .files = nm_table_files(.mod),
     .superset = FALSE,
     .bbi_args = list(
@@ -175,7 +175,7 @@ nm_join_impl <- function(
   nid <-  .s$run_details$number_of_subjects
   nrec <- .s$run_details$number_of_data_records
 
-  id_col <- getOption("mrg.id_col")
+  id_col <- getOption("mrg.id_col", "ID")
 
   # do the join(s)
   if(!is.null(.tbls)){
@@ -288,7 +288,7 @@ drop_dups <- function(.new_table, .dest_table, .join_col, .table_name) {
 #' @export
 nm_join_sim <- function(
     .mod,
-    .join_col = getOption("mrg.num_col"),
+    .join_col = getOption("mrg.num_col", "NUM"),
     .cols_keep = "all",
     add_table_names = FALSE
 ){

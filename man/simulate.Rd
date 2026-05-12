@@ -14,7 +14,7 @@ add_simulation(
   data = NULL,
   sim_cols = c("DV", "PRED"),
   gitignore_sim = getOption("bbr.gitignore_sim"),
-  .join_col = getOption("mrg.num_col"),
+  .join_col = getOption("mrg.num_col", "NUM"),
   .inherit_tags = TRUE,
   .bbi_args = NULL,
   .mode = getOption("bbr.bbi_exe_mode"),

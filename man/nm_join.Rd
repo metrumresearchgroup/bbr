@@ -6,7 +6,7 @@
 \usage{
 nm_join(
   .mod,
-  .join_col = getOption("mrg.num_col"),
+  .join_col = getOption("mrg.num_col", "NUM"),
   .files = nm_table_files(.mod),
   .superset = FALSE,
   .bbi_args = list(no_grd_file = TRUE, no_shk_file = TRUE)

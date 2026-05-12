@@ -41,14 +41,6 @@
   if (is.null(getOption("bbr.gitignore_sim"))) {
     options("bbr.gitignore_sim" = TRUE)
   }
-
-  if (is.null(getOption("mrg.id_col"))) {
-    options("mrg.id_col" = "ID")
-  }
-
-  if (is.null(getOption("mrg.num_col"))) {
-    options("mrg.num_col" = "NUM")
-  }
 }
 
 .onAttach <- function(libname, pkgname) {
