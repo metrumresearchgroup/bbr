@@ -1,3 +1,15 @@
+# bbr 1.16.0
+
+## New features
+
+- The `.join_col` default value ("NUM") for `nm_join()`, `nm_join_sim()`, and
+  `add_simulation()` can now be overridden by setting the `mrg.num_col` option.
+  (#764, #765)
+
+- The default column name that `nm_join()` uses for the subject identifier
+  ("ID") can now be overridden by setting the `mrg.id_col` option. (#764, #765)
+
+
 # bbr 1.15.0
 
 ## New features and changes
