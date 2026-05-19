@@ -22,7 +22,7 @@ $DATA record (i.e. get_data_path(.boot_run)).'><meta property="og:image" content
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.15.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.16.0</span>
       </span>
     </div>
 
@@ -145,6 +145,8 @@ existing setup for a bootstrap run.</p></dd>
 <code><a href="submit_model.html">submit_model()</a></code>. You can use <code><a href="model_status.html">get_model_status()</a></code> to check on your submitted
 bootstrap run. Once all models have finished, use <code><a href="summarize_bootstrap.html">summarize_bootstrap_run()</a></code>
 to view the results. See examples below.</p>
+<p>By default, this function looks for the subject identifier in the "ID"
+column. Set the <code>mrg.id_col</code> option to use a different column.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>

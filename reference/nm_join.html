@@ -26,7 +26,7 @@ joins. This printing can be suppressed by setting options(bbr.verbose = FALSE)."
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.15.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.16.0</span>
       </span>
     </div>
 
@@ -98,7 +98,7 @@ joins. This <strong>printing can be suppressed</strong> by setting <code>options
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">nm_join</span><span class="op">(</span></span>
 <span>  <span class="va">.mod</span>,</span>
-<span>  .join_col <span class="op">=</span> <span class="st">"NUM"</span>,</span>
+<span>  .join_col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"mrg.num_col"</span>, <span class="st">"NUM"</span><span class="op">)</span>,</span>
 <span>  .files <span class="op">=</span> <span class="fu"><a href="nm_tables.html">nm_table_files</a></span><span class="op">(</span><span class="va">.mod</span><span class="op">)</span>,</span>
 <span>  .superset <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  .bbi_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>no_grd_file <span class="op">=</span> <span class="cn">TRUE</span>, no_shk_file <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -115,8 +115,9 @@ a NONMEM run.</p></dd>
 
 
 <dt id="arg--join-col">.join_col<a class="anchor" aria-label="anchor" href="#arg--join-col"></a></dt>
-<dd><p>Character column name to use to join table files. Defaults to
-<code>NUM</code>. See Details.</p></dd>
+<dd><p>Character column name to use to join table files. Defaults
+to "NUM", unless the <code>mrg.num_col</code> option is set to another value. See
+Details.</p></dd>
 
 
 <dt id="arg--files">.files<a class="anchor" aria-label="anchor" href="#arg--files"></a></dt>
@@ -160,9 +161,10 @@ be unambiguous matching from the table file back to the input data set.</p>
 same number of rows as the there are individuals in the input data set
 (accounting for any filtering of data in the NONMEM control stream), it
 will assumed to be a <code>FIRSTONLY</code> table. In this case, the table will be
-joined to the input data by the <code>ID</code> column. If <code>ID</code> is not present in
-the table, it will be using <code>.join_col</code>. Note that if <em>neither</em> <code>ID</code> or
-the column passed to <code>.join_col</code> are present in the table, the join will
+joined to the input data by the name given by the <code>mrg.id_col</code> option
+("ID" by default). If that column is not present in the table, it will be
+using <code>.join_col</code>. Note that if <em>neither</em> the <code>mrg.id_col</code> column or the
+column passed to <code>.join_col</code> are present in the table, the join will
 fail.</p></li>
 </ul><p>Note also that, when <code>.join_col</code> is carried into table outputs, <strong>there is no
 need to table any other columns from the input data</strong> as long as the

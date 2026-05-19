@@ -24,7 +24,7 @@ designed in a way to be flexible to handle other software."><meta property="og:i
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.15.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.16.0</span>
       </span>
     </div>
 
@@ -108,6 +108,44 @@ contents and usage.</p></li>
 There are several sub-classes of <code>bbi_log_df</code> tibbles, variously containing
 metadata, information, and diagnostics about the models. See the following
 help pages for more information: <code><a href="run_log.html">run_log()</a></code> <code><a href="summary_log.html">summary_log()</a></code> <code><a href="config_log.html">config_log()</a></code></p></li>
+</ul></div>
+    <div id="package-options">
+    <h2>Package options</h2>
+
+
+<ul><li><p><code>bbr.bbi_exe_mode</code> – default <code>.mode</code> value to pass to <code><a href="submit_model.html">submit_model()</a></code></p></li>
+<li><p><code>bbr.bbi_exe_path</code> – the location of the bbi executable</p></li>
+<li><p><code>bbr.gitignore_sim</code> – default <code>gitignore_sim</code> value passed to
+<code><a href="simulate.html">add_simulation()</a></code></p></li>
+<li><p><code>bbr.strict</code> – set to <code>FALSE</code> to demote certain issues, such as the model
+YAML file missing required keys, from errors to warnings</p></li>
+<li><p><code>bbr.verbose</code> – set to <code>FALSE</code> to limit informational messages output by
+some functions</p></li>
+<li><p><code>mrg.id_col</code> – the default column name to take as the subject identifier
+(see <code><a href="nm_join.html">nm_join()</a></code>)</p></li>
+<li><p><code>mrg.num_col</code> – the default column name to use when joining table files
+(see <code><a href="nm_join.html">nm_join()</a></code>)</p></li>
+</ul></div>
+    <div id="see-also">
+    <h2>See also</h2>
+    <div class="dont-index"><p>Useful links:</p><ul><li><p><a href="https://metrumresearchgroup.github.io/bbr">https://metrumresearchgroup.github.io/bbr</a></p></li>
+<li><p><a href="https://github.com/metrumresearchgroup/bbr" class="external-link">https://github.com/metrumresearchgroup/bbr</a></p></li>
+<li><p>Report bugs at <a href="https://github.com/metrumresearchgroup/bbr/issues" class="external-link">https://github.com/metrumresearchgroup/bbr/issues</a></p></li>
+</ul></div>
+    </div>
+    <div id="author">
+    <h2>Author</h2>
+    <p><strong>Maintainer</strong>: Seth Green <a href="mailto:sethg@metrumrg.com">sethg@metrumrg.com</a></p>
+<p>Authors:</p><ul><li><p>Seth Green <a href="mailto:sethg@metrumrg.com">sethg@metrumrg.com</a></p></li>
+<li><p>Kyle Barrett <a href="mailto:barrettk@metrumrg.com">barrettk@metrumrg.com</a></p></li>
+<li><p>Ryan Marinelli <a href="mailto:ram478@drexel.edu">ram478@drexel.edu</a></p></li>
+<li><p>Kyle Meyer <a href="mailto:kylem@metrumrg.com">kylem@metrumrg.com</a></p></li>
+<li><p>Devin Pastoor <a href="mailto:devin.pastoor@gmail.com">devin.pastoor@gmail.com</a></p></li>
+<li><p>Anna-Christina Nevison <a href="mailto:annanev@umich.edu">annanev@umich.edu</a></p></li>
+<li><p>Sean Wilson <a href="mailto:copernican@gmail.com">copernican@gmail.com</a></p></li>
+<li><p>Samuel Callisto <a href="mailto:samc@metrumrg.com">samc@metrumrg.com</a></p></li>
+<li><p>Tim Waterhouse <a href="mailto:timw@metrumrg.com">timw@metrumrg.com</a></p></li>
+<li><p>Kyle T Baron <a href="mailto:kyleb@metrumrg.com">kyleb@metrumrg.com</a></p></li>
 </ul></div>
 
   </div>

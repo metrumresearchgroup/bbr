@@ -18,7 +18,7 @@ attached simulation."><meta property="og:image" content="https://metrumresearchg
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.15.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.16.0</span>
       </span>
     </div>
 
@@ -82,7 +82,7 @@ attached simulation.</p>
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">nm_join_sim</span><span class="op">(</span></span>
 <span>  <span class="va">.mod</span>,</span>
-<span>  .join_col <span class="op">=</span> <span class="st">"NUM"</span>,</span>
+<span>  .join_col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"mrg.num_col"</span>, <span class="st">"NUM"</span><span class="op">)</span>,</span>
 <span>  .cols_keep <span class="op">=</span> <span class="st">"all"</span>,</span>
 <span>  add_table_names <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -99,7 +99,8 @@ attached simulation.</p>
 
 <dt id="arg--join-col">.join_col<a class="anchor" aria-label="anchor" href="#arg--join-col"></a></dt>
 <dd><p>Character column name(s) to use to join table files.
-Defaults to <code>NUM</code>. See Details.</p></dd>
+Defaults to "NUM", unless the <code>mrg.num_col</code> option is set to another value.
+See Details.</p></dd>
 
 
 <dt id="arg--cols-keep">.cols_keep<a class="anchor" aria-label="anchor" href="#arg--cols-keep"></a></dt>

@@ -18,7 +18,7 @@ the existing bbi_nonmem_model object"><meta property="og:image" content="https:/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.15.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.16.0</span>
       </span>
     </div>
 
@@ -87,7 +87,7 @@ the existing <code>bbi_nonmem_model</code> object</p>
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sim_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DV"</span>, <span class="st">"PRED"</span><span class="op">)</span>,</span>
 <span>  gitignore_sim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"bbr.gitignore_sim"</span><span class="op">)</span>,</span>
-<span>  .join_col <span class="op">=</span> <span class="st">"NUM"</span>,</span>
+<span>  .join_col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"mrg.num_col"</span>, <span class="st">"NUM"</span><span class="op">)</span>,</span>
 <span>  .inherit_tags <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  .bbi_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  .mode <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"bbr.bbi_exe_mode"</span><span class="op">)</span>,</span>
@@ -141,7 +141,8 @@ or set globally with <code>options("bbr.gitignore_sim")</code>.</p></dd>
 <dt id="arg--join-col">.join_col<a class="anchor" aria-label="anchor" href="#arg--join-col"></a></dt>
 <dd><p>Character column name(s) used to join table files post
 execution. Gets appended to the generated <code>$TABLE</code> record. See
-<code><a href="nm_join_sim.html">nm_join_sim()</a></code> documentation for details. Defaults to <code>'NUM'</code>.</p></dd>
+<code><a href="nm_join_sim.html">nm_join_sim()</a></code> documentation for details. Defaults to the "NUM", unless the
+<code>mrg.num_col</code> option is set to another value.</p></dd>
 
 
 <dt id="arg--inherit-tags">.inherit_tags<a class="anchor" aria-label="anchor" href="#arg--inherit-tags"></a></dt>
