@@ -117,9 +117,13 @@ test_that("submit_model(.mode) errors when invalid", {
 test_that("submit_model aborts if .mode='sge' is used with Slurm's qsub", {
   skip_if_old_bbi("3.4.0")
 
-  sbatch <- unname(Sys.which("sbatch"))
-  if (identical(sbatch, "") || identical(Sys.getenv("METWORX_VERSION"), "")) {
-    skip("not on Metworx with Slurm")
+  if (identical(Sys.getenv("METWORX_VERSION"), "")) {
+    skip("not on Metworx")
+  }
+
+  qsub <- normalizePath(unname(Sys.which("qsub")), mustWork = FALSE)
+  if (!identical(qsub, "/opt/slurm/bin/qsub")) {
+    skip("workflow does not have Slurm's qsub shim")
   }
 
   withr::local_options(list(bbr.DEV_skip_system_mode_checks = FALSE))
