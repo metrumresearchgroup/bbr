@@ -147,6 +147,21 @@ test_that("submit_model aborts if .mode='sge' and qsub is not available", {
   )
 })
 
+test_that("submit_model aborts if .mode='slurm' and sbatch is not available", {
+  skip_if_old_bbi("3.4.0")
+
+  if (!identical(unname(Sys.which("sbatch")), "")) {
+    skip("sbatch is available")
+  }
+
+  withr::local_options(list(bbr.DEV_skip_system_mode_checks = FALSE))
+
+  expect_error(
+    submit_model(MOD1, .dry_run = TRUE, .mode = "slurm"),
+    regexp = "sbatch is not available"
+  )
+})
+
 test_that("submit_model aborts if .mode='slurm' is used with incompatible bbi", {
   if (test_bbi_version(read_bbi_path(), "3.4.0")) {
     skip("installed bbi version is compatible with Slurm")

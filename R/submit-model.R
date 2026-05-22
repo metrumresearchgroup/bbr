@@ -391,6 +391,16 @@ check_mode_argument <- function(.mode) {
     }
   }
 
+  if (identical(.mode, "slurm")) {
+    sbatch <- normalizePath(unname(Sys.which("sbatch")), mustWork = FALSE)
+    if (identical(sbatch, "")) {
+      stop(
+        ".mode='slurm' but sbatch is not available",
+        "; use .mode='local' on system without grid scheduler"
+      )
+    }
+  }
+
   return(invisible(TRUE))
 }
 
