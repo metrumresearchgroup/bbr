@@ -373,7 +373,10 @@ check_mode_argument <- function(.mode) {
   if (identical(.mode, "sge")) {
     qsub <- normalizePath(unname(Sys.which("qsub")), mustWork = FALSE)
     if (identical(qsub, "")) {
-      stop(".mode='sge' but qsub is not available on system")
+      stop(
+        ".mode='sge' but qsub is not available",
+        "; use .mode='local' on system without grid scheduler"
+      )
     }
 
     # This guard is Metworx (or really ParallelCluster) specific. Slurm ships
