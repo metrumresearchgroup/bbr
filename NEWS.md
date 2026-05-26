@@ -1,3 +1,15 @@
+# bbr 1.16.1
+
+## Changes
+
+- `submit_model()` aborts when `.mode = "sge"` is specified on a system without
+  `qsub`. That message has been updated to suggest `.mode = "local"`. (#767)
+
+- When `.model = "slurm"` is specified on a system without `sbatch`,
+  `submit_model()` now aborts upfront rather than falling through to bbi's error
+  handling. (#767)
+
+
 # bbr 1.16.0
 
 ## New features
