@@ -117,9 +117,13 @@ test_that("submit_model(.mode) errors when invalid", {
 test_that("submit_model aborts if .mode='sge' is used with Slurm's qsub", {
   skip_if_old_bbi("3.4.0")
 
-  sbatch <- unname(Sys.which("sbatch"))
-  if (identical(sbatch, "") || identical(Sys.getenv("METWORX_VERSION"), "")) {
-    skip("not on Metworx with Slurm")
+  if (identical(Sys.getenv("METWORX_VERSION"), "")) {
+    skip("not on Metworx")
+  }
+
+  qsub <- normalizePath(unname(Sys.which("qsub")), mustWork = FALSE)
+  if (!identical(qsub, "/opt/slurm/bin/qsub")) {
+    skip("workflow does not have Slurm's qsub shim")
   }
 
   withr::local_options(list(bbr.DEV_skip_system_mode_checks = FALSE))
@@ -140,6 +144,21 @@ test_that("submit_model aborts if .mode='sge' and qsub is not available", {
   expect_error(
     submit_model(MOD1, .dry_run = TRUE, .mode = "sge"),
     regexp = "qsub is not available"
+  )
+})
+
+test_that("submit_model aborts if .mode='slurm' and sbatch is not available", {
+  skip_if_old_bbi("3.4.0")
+
+  if (!identical(unname(Sys.which("sbatch")), "")) {
+    skip("sbatch is available")
+  }
+
+  withr::local_options(list(bbr.DEV_skip_system_mode_checks = FALSE))
+
+  expect_error(
+    submit_model(MOD1, .dry_run = TRUE, .mode = "slurm"),
+    regexp = "sbatch is not available"
   )
 })
 

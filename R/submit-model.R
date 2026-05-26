@@ -373,7 +373,10 @@ check_mode_argument <- function(.mode) {
   if (identical(.mode, "sge")) {
     qsub <- normalizePath(unname(Sys.which("qsub")), mustWork = FALSE)
     if (identical(qsub, "")) {
-      stop(".mode='sge' but qsub is not available on system")
+      stop(
+        ".mode='sge' but qsub is not available",
+        "; use .mode='local' on system without grid scheduler"
+      )
     }
 
     # This guard is Metworx (or really ParallelCluster) specific. Slurm ships
@@ -384,6 +387,16 @@ check_mode_argument <- function(.mode) {
       stop(
         ".mode is 'sge' but qsub points to Slurm shim.\n",
         "Instead set .mode to 'slurm' (requires bbi 3.4.0 or later)\n"
+      )
+    }
+  }
+
+  if (identical(.mode, "slurm")) {
+    sbatch <- normalizePath(unname(Sys.which("sbatch")), mustWork = FALSE)
+    if (identical(sbatch, "")) {
+      stop(
+        ".mode='slurm' but sbatch is not available",
+        "; use .mode='local' on system without grid scheduler"
       )
     }
   }
