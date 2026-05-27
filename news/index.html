@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.16.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.16.1</span>
       </span>
     </div>
 
@@ -72,6 +72,14 @@
       <small>Source: <a href="https://github.com/metrumresearchgroup/bbr/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="1.16.1" id="bbr-1161">bbr 1.16.1<a class="anchor" aria-label="anchor" href="#bbr-1161"></a></h2>
+<div class="section level3">
+<h3 id="changes-1-16-1">Changes<a class="anchor" aria-label="anchor" href="#changes-1-16-1"></a></h3>
+<ul><li><p><code><a href="../reference/submit_model.html">submit_model()</a></code> aborts when <code>.mode = "sge"</code> is specified on a system without <code>qsub</code>. That message has been updated to suggest <code>.mode = "local"</code>. (<a href="https://github.com/metrumresearchgroup/bbr/issues/767" class="external-link">#767</a>)</p></li>
+<li><p>When <code>.model = "slurm"</code> is specified on a system without <code>sbatch</code>, <code><a href="../reference/submit_model.html">submit_model()</a></code> now aborts upfront rather than falling through to bbi’s error handling. (<a href="https://github.com/metrumresearchgroup/bbr/issues/767" class="external-link">#767</a>)</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="1.16.0" id="bbr-1160">bbr 1.16.0<a class="anchor" aria-label="anchor" href="#bbr-1160"></a></h2>
 <div class="section level3">
