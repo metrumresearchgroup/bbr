@@ -274,8 +274,15 @@ modify_prob_statement <- function(.mod, prob_text = NULL){
 #'  from the first line of the referenced dataset (input data or table file). If
 #'  `FALSE`, parse the control stream and retrieve from the relevant record type
 #'  (`$INPUT` or `$TABLE`).
+#' @param filter_drop Logical (T/F). If `TRUE`, remove columns set to `DROP`
+#'  or `SKIP` in the control stream's `$INPUT` record. Only used if
+#'  `from_data = FALSE`.
 #' @keywords internal
-get_input_columns <- function(.mod, from_data = TRUE){
+get_input_columns <- function(
+    .mod,
+    from_data = TRUE,
+    filter_drop = FALSE
+){
   if(isTRUE(from_data)){
     data_path <- get_data_path(.mod)
     input_data <- fread(data_path, na.strings = ".", verbose = FALSE, nrows = 1)
@@ -293,6 +300,11 @@ get_input_columns <- function(.mod, from_data = TRUE){
     input_cols <- purrr::map_chr(input_col_opts, function(val){
       ifelse(inherits(val, "nmrec_option_flag"), val$name, as.character(val$value))
     }) %>% stats::setNames(input_col_names)
+  }
+
+  if(isTRUE(filter_drop)){
+    # Filter out columns that are marked as DROP or SKIP
+    input_cols <- input_cols[!grepl("^(?i)drop$|^(?i)skip$", input_cols)]
   }
   return(input_cols)
 }
