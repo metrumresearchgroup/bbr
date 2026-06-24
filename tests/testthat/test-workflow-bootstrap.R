@@ -256,6 +256,26 @@ withr::with_options(
       expect_equal(boot_spec$strat_cols, c("SEX", "ETN"))
     })
 
+    test_that("setup_bootstrap_run respects bbi_args set on the boot run", {
+      # Override bbi_args on the bootstrap model (not the parent)
+      boot_run_custom <- new_bootstrap_run(mod1, .suffix = "boot-args", .overwrite = TRUE)
+      boot_run_custom <- add_bbi_args(boot_run_custom, list(threads = 2))
+
+      # Parent model has parallel = FALSE but no threads arg
+      expect_equal(mod1$bbi_args, list(parallel = FALSE))
+      # Boot run should now have the overridden threads value
+      expect_equal(boot_run_custom$bbi_args$threads, 2)
+
+      setup_bootstrap_run(boot_run_custom, n = 3, seed = 1234, .overwrite = TRUE)
+      boot_models_custom <- get_boot_models(boot_run_custom)
+
+      # Each child model should have the boot run's bbi_args, not the original model's
+      child_args <- boot_models_custom[[1]]$bbi_args
+      expect_equal(child_args$threads, 2)
+
+      delete_models(list(boot_run_custom), .force = TRUE, .tags = NULL)
+    })
+
     test_that("submitting bootstrap model objects works", {
 
       # These calls wont use batch submission since .batch_size < length(boot_models)
