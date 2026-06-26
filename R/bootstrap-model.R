@@ -286,7 +286,7 @@ setup_bootstrap_run <- function(
       boot_mod_path = get_model_path(.boot_run),
       orig_mod_path = get_model_path(orig_mod),
       orig_mod_id = get_model_id(orig_mod),
-      orig_mod_bbi_args = orig_mod$bbi_args,
+      orig_mod_bbi_args = .boot_run$bbi_args,
       orig_data = starting_data,
       strat_cols = strat_cols,
       seed = seed,
@@ -373,7 +373,6 @@ make_boot_run <- function(mod_path, boot_args){
     .tags = "BOOTSTRAP_RUN",
     .based_on = boot_mod_path,
     .bbi_args = boot_args$orig_mod_bbi_args
-
   )
 
   # Overwrite $PROB and $DATA records
