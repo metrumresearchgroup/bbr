@@ -33,7 +33,7 @@ modify_data_path_ctl(.mod, data_path)
 
 modify_prob_statement(.mod, prob_text = NULL)
 
-get_input_columns(.mod, from_data = TRUE)
+get_input_columns(.mod, from_data = TRUE, filter_drop = FALSE)
 
 get_table_columns(.mod, from_data = TRUE)
 }
@@ -65,6 +65,10 @@ character string, set the problem statement to that value.}
 from the first line of the referenced dataset (input data or table file). If
 \code{FALSE}, parse the control stream and retrieve from the relevant record type
 (\verb{$INPUT} or \verb{$TABLE}).}
+
+\item{filter_drop}{Logical (T/F). If \code{TRUE}, remove columns set to \code{DROP}
+or \code{SKIP} in the control stream's \verb{$INPUT} record. Only used if
+\code{from_data = FALSE}.}
 }
 \description{
 Modify or retrieve options and records from a \code{NONMEM} control stream file
