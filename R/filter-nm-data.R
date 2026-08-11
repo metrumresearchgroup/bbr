@@ -69,7 +69,7 @@ get_data_filter_exprs <- function(.mod){
 }
 
 #' Function to translate `NONMEM` operators to `R` operators
-#' @param expr String. A `NONMEM` ignore/accept expression
+#' @param expr Character vector of `NONMEM` ignore/accept expressions.
 #' @note `.EQN.` and `.NEN.` are available after `NONMEM 7.3`
 #' @return A [dplyr::filter()] expression
 #'
