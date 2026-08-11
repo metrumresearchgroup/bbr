@@ -83,15 +83,16 @@ get_data_filter_exprs <- function(.mod){
 #' @seealso [invert_operator()], [translate_nm_expr()]
 translate_nm_operator <- function(expr) {
   # Check for unsupported operators
-  bad_ops <- c(".OR.",".AND", ".NOT.")
-  bad_ops_pat <- paste(bad_ops, collapse = "|")
-  if(any(grepl(bad_ops_pat, expr))){
-    cli::cli_abort(
-      c(
-        "The following logical operators are not supported {.var {bad_ops}}",
-        "i" = "See NONMEM documentation for more details"
+  for (op in c(".OR.", ".AND", ".NOT.")) {
+    bad <- grep(op, expr, fixed = TRUE, value = TRUE)
+    if (length(bad)) {
+      cli::cli_abort(
+        c(
+          "Unsupported logical operator ({.var {op}}): {.val {bad}}",
+          "i" = "See NONMEM documentation for more details"
+        )
       )
-    )
+    }
   }
 
   # Equal
