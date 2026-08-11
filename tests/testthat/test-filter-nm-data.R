@@ -18,6 +18,20 @@ test_that("translate_nm_operator translates NONMEM operators", {
   )
 })
 
+test_that("translate_nm_operator: unsupported operators", {
+  cases <- list(
+    "GEN=1 .AND. AGE > 60",
+    c("SEX==1", "ID.EQ.2", "WT/=70", "GEN=1 .OR. AGE > 60"),
+    "GEN=1.NOT.AGE > 60"
+  )
+  for (case in cases) {
+    expect_error(
+      translate_nm_operator(!!case),
+      "Unsupported logical operator"
+    )
+  }
+})
+
 test_that("translate_nm_expr() translates NONMEM filter expressions", {
   test_exprs <- c("SEX==1", "ID.EQ.2", "WT/=70", "AGE.NE.30", "A=1", "WT.GT.40", "B.LE.20")
 
