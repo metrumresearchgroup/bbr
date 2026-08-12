@@ -4,13 +4,32 @@ test_that("translate_nm_operator translates NONMEM operators", {
     equal = c("A.EQ.1", "A.EQN.1", "A==1", "A=1"),
     not_equal = c("B.NE.1", "B.NEN.1", "B/=1"),
     greater_than = c("C.GE.1", "C.GT.1"),
-    less_than = c("D.LE.1", "D.LT.1")
+    less_than = c("D.LE.1", "D.LT.1"),
+    or_within = "COHORT.EQ.2"
   )
 
   expect_equal(unique(translate_nm_operator(nm_r_translations$equal)), "A==1")
   expect_equal(unique(translate_nm_operator(nm_r_translations$not_equal)), "B!=1")
   expect_equal(translate_nm_operator(nm_r_translations$greater_than), c("C>=1", "C>1"))
   expect_equal(translate_nm_operator(nm_r_translations$less_than), c("D<=1", "D<1"))
+  expect_equal(
+    translate_nm_operator(nm_r_translations$or_within),
+    "COHORT==2"
+  )
+})
+
+test_that("translate_nm_operator: unsupported operators", {
+  cases <- list(
+    "GEN=1 .AND. AGE > 60",
+    c("SEX==1", "ID.EQ.2", "WT/=70", "GEN=1 .OR. AGE > 60"),
+    "GEN=1.NOT.AGE > 60"
+  )
+  for (case in cases) {
+    expect_error(
+      translate_nm_operator(!!case),
+      "Unsupported logical operator"
+    )
+  }
 })
 
 test_that("translate_nm_expr() translates NONMEM filter expressions", {
@@ -64,7 +83,7 @@ test_that("translate_nm_expr() translates NONMEM filter expressions", {
   test_exprs_bad <- c(test_exprs, "GEN=1 .AND. AGE > 60")
   expect_error(
     translate_nm_expr(test_exprs_bad, type = 'accept'),
-    "The following logical operators are not supported"
+    "Unsupported logical operator"
   )
 })
 

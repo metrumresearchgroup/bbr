@@ -7,7 +7,7 @@
 translate_nm_operator(expr)
 }
 \arguments{
-\item{expr}{String. A \code{NONMEM} ignore/accept expression}
+\item{expr}{Character vector of \code{NONMEM} ignore/accept expressions.}
 }
 \value{
 A \code{\link[dplyr:filter]{dplyr::filter()}} expression
