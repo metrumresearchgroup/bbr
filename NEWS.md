@@ -1,3 +1,17 @@
+# bbr 1.16.2
+
+## Bug fixes
+
+- `setup_bootstrap_run()` now inherits `bbi_args` from the bootstrap run
+  returned by `new_bootstrap_run()` rather than the original model. (#772)
+
+- When `filter = TRUE` is specified, `nm_data()` filters the data by the
+  `IGNORE`/`ACCEPT` value from the `$DATA` record.  It aborts if the value
+  contains an unsupported operator (`.OR.`, `.AND`, or `.NOT.`).  This guard
+  incorrectly flagged some values due to treating periods in the operators as
+  wildcards. (#777)
+
+
 # bbr 1.16.1
 
 ## Changes
