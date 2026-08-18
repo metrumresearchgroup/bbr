@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bbr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.16.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.16.2</span>
       </span>
     </div>
 
@@ -72,6 +72,14 @@
       <small>Source: <a href="https://github.com/metrumresearchgroup/bbr/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="1.16.2" id="bbr-1162">bbr 1.16.2<a class="anchor" aria-label="anchor" href="#bbr-1162"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-1-16-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-16-2"></a></h3>
+<ul><li><p><code><a href="../reference/setup_bootstrap_run.html">setup_bootstrap_run()</a></code> now inherits <code>bbi_args</code> from the bootstrap run returned by <code><a href="../reference/new_bootstrap_run.html">new_bootstrap_run()</a></code> rather than the original model. (<a href="https://github.com/metrumresearchgroup/bbr/issues/772" class="external-link">#772</a>)</p></li>
+<li><p>When <code>filter = TRUE</code> is specified, <code><a href="../reference/nm_file.html">nm_data()</a></code> filters the data by the <code>IGNORE</code>/<code>ACCEPT</code> value from the <code>$DATA</code> record. It aborts if the value contains an unsupported operator (<code>.OR.</code>, <code>.AND</code>, or <code>.NOT.</code>). This guard incorrectly flagged some values due to treating periods in the operators as wildcards. (<a href="https://github.com/metrumresearchgroup/bbr/issues/777" class="external-link">#777</a>)</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="1.16.1" id="bbr-1161">bbr 1.16.1<a class="anchor" aria-label="anchor" href="#bbr-1161"></a></h2>
 <div class="section level3">
@@ -451,7 +459,7 @@ and <code><a href="../reference/setup_bootstrap_run.html">setup_bootstrap_run()<
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
       </footer></div>
