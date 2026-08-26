@@ -210,6 +210,7 @@ CONF_LOG_CLASS <- "bbi_config_log_df"
 SUM_LOG_CLASS <- "bbi_summary_log_df"
 LOG_DF_CLASS <- "bbi_log_df"
 NMTRAN_PROCESS_CLASS <- "nmtran_process"
+NMTRAN_FDATA_CLASS <- "nmtran_fdata"
 
 # YAML keys that are hard-coded
 YAML_YAML_MD5 <- "yaml_md5"
