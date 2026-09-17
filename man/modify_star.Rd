@@ -18,7 +18,7 @@ The modified \verb{bbi_\{.model_type\}_model} object
 }
 \description{
 Add, or remove a "star" to a model to indicate special interest level for this model.
-This is typically used for highlighting models that are of some importance to the final analyis.
+This is typically used for highlighting models that are of some importance to the final analysis.
 }
 \section{Functions}{
 \itemize{

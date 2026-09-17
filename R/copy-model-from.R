@@ -18,7 +18,7 @@
 #' @param .description Character scalar description of new model run. This will
 #'   be stored in the yaml (and can be viewed later in `run_log()`).
 #' @param .based_on_additional Character vector of path(s) to other models that
-#'   this model was "based on." These are used to reconstuct model developement
+#'   this model was "based on." These are used to reconstruct model development
 #'   and ancestry. **Paths must be relative to `.new_model` path.** Note that
 #'   the `.parent_model` will automatically be added to the `based_on` field, so
 #'   no need to include that here.

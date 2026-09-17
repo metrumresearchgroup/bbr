@@ -15,7 +15,7 @@
 #' @param .description Character scalar description of new model run. This will
 #'   be stored in the yaml (and can be viewed later in `run_log()`).
 #' @param .based_on Character scalar or vector of paths to other models that
-#'   this model was "based on." These are used to reconstuct model developement
+#'   this model was "based on." These are used to reconstruct model development
 #'   and ancestry. \strong{Paths must be relative to `.yaml_path`.}
 #' @param .tags A character scalar or vector with any user tags to be added to
 #'   the YAML file

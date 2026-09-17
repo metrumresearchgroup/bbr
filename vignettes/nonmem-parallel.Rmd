@@ -136,7 +136,7 @@ Note that anything passed to `submit_model(.bbi_args)` will override any attache
 
 The `bbi.yaml` file is created when `bbi_init()` is originally called. It usually lives in the same folder as your control streams. This file contains "global" settings for running `bbi`.
 
-* You can set a default number of `threads` (the number of cores `bbi` will use for each model) in this file. This will be used whenever you call `submit_model()`, but can be overriden by passing `submit_model(..., .bbi_args = list(threads = SOME_INTEGER))`.
+* You can set a default number of `threads` (the number of cores `bbi` will use for each model) in this file. This will be used whenever you call `submit_model()`, but can be overridden by passing `submit_model(..., .bbi_args = list(threads = SOME_INTEGER))`.
 
 * It defaults to `parallel: false` so **you need to change to `parallel: true`** or you will need to pass `.bbi_args = list(parallel=TRUE)` to each of your `submit_model()` calls to make them respect the `threads` argument.
 

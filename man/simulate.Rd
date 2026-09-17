@@ -81,7 +81,7 @@ before this function call returns. If \code{FALSE} function will return while
 bbi process runs in the background.}
 
 \item{.dry_run}{Returns an object detailing the command that would be run,
-insted of running it. This is primarily for testing but also a debugging
+instead of running it. This is primarily for testing but also a debugging
 tool.}
 }
 \description{

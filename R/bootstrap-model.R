@@ -390,7 +390,7 @@ make_boot_run <- function(mod_path, boot_args){
 
 #' Store bootstrap run details before submission
 #'
-#' @param boot_models List of boostrap model objects created by `make_boot_run()`.
+#' @param boot_models List of bootstrap model objects created by `make_boot_run()`.
 #' @inheritParams make_boot_run
 #'
 #' @details

@@ -145,7 +145,7 @@ str(parent_mod)
 
 ## get_model_ancestry
 
-The second helper function walks up the tree of inheritence by iteratively calling `get_based_on()` on each parent model to determine the full set of models that led up to the current model.
+The second helper function walks up the tree of inheritance by iteratively calling `get_based_on()` on each parent model to determine the full set of models that led up to the current model.
 
 ```{r mod object demo 3}
 mod6 %>% get_model_ancestry()
