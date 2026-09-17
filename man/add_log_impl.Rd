@@ -17,6 +17,6 @@ add_log_impl(.log_df, .impl_func, ...)
 The input \code{bbi_run_log_df} tibble, with any columns from the tibble output by \code{.impl_func} left joined onto it.
 }
 \description{
-Private helper to extact columns from another log tibble and join them onto a \code{bbi_run_log_df}
+Private helper to extract columns from another log tibble and join them onto a \code{bbi_run_log_df}
 }
 \keyword{internal}

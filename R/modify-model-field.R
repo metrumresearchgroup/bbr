@@ -110,7 +110,7 @@ replace_model_field <- function(.mod, .field, .old_val, .new_val) {
 #' @details
 #' The `tags` fields on a `bbi_{.model_type}_model` object contains a character
 #' vector of brief descriptors about the model. Often this is used to keep track
-#' of the model structure, such as the covariates or error stucture that was
+#' of the model structure, such as the covariates or error structure that was
 #' used.
 #'
 #' One of the more useful things to do with tags is to use them for filtering a
@@ -125,7 +125,7 @@ replace_model_field <- function(.mod, .field, .old_val, .new_val) {
 #' covariate.
 #'
 #' Tags can also be collapsed using [collapse_to_string()] to create a compact description of the
-#' model stucture. See the ["Getting Started" vignette](https://metrumresearchgroup.github.io/bbr/articles/getting-started.html#viewing-tags-example)
+#' model structure. See the ["Getting Started" vignette](https://metrumresearchgroup.github.io/bbr/articles/getting-started.html#viewing-tags-example)
 #' for an example of this.
 #'
 #' @return The modified `bbi_{.model_type}_model` object
@@ -319,7 +319,7 @@ remove_based_on <- function(.mod, .based_on) {
 #' @title Modify star attribute on a model object
 #'
 #' @description Add, or remove a "star" to a model to indicate special interest level for this model.
-#' This is typically used for highlighting models that are of some importance to the final analyis.
+#' This is typically used for highlighting models that are of some importance to the final analysis.
 #'
 #' @return The modified `bbi_{.model_type}_model` object
 #'

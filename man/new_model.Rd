@@ -24,7 +24,7 @@ directory.}
 be stored in the yaml (and can be viewed later in \code{run_log()}).}
 
 \item{.based_on}{Character scalar or vector of paths to other models that
-this model was "based on." These are used to reconstuct model developement
+this model was "based on." These are used to reconstruct model development
 and ancestry. \strong{Paths must be relative to \code{.yaml_path}.}}
 
 \item{.tags}{A character scalar or vector with any user tags to be added to

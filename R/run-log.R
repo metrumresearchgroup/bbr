@@ -188,7 +188,7 @@ safe_read_model <- function(.path) {
 
 #' Add columns to log df
 #'
-#' Private helper to extact columns from another log tibble and join them onto a `bbi_run_log_df`
+#' Private helper to extract columns from another log tibble and join them onto a `bbi_run_log_df`
 #' @importFrom dplyr left_join
 #' @importFrom purrr map
 #' @param .log_df a `bbi_run_log_df` tibble (the output of [run_log()])

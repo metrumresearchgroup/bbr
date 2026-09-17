@@ -35,7 +35,7 @@ Tags can be modified at any time (i.e. before \emph{or} after a model is submitt
 \details{
 The \code{tags} fields on a \verb{bbi_\{.model_type\}_model} object contains a character
 vector of brief descriptors about the model. Often this is used to keep track
-of the model structure, such as the covariates or error stucture that was
+of the model structure, such as the covariates or error structure that was
 used.
 
 One of the more useful things to do with tags is to use them for filtering a
@@ -50,7 +50,7 @@ those tags later, for instance when you want to filter to models with that
 covariate.
 
 Tags can also be collapsed using \code{\link[=collapse_to_string]{collapse_to_string()}} to create a compact description of the
-model stucture. See the \href{https://metrumresearchgroup.github.io/bbr/articles/getting-started.html#viewing-tags-example}{"Getting Started" vignette}
+model structure. See the \href{https://metrumresearchgroup.github.io/bbr/articles/getting-started.html#viewing-tags-example}{"Getting Started" vignette}
 for an example of this.
 }
 \section{Functions}{

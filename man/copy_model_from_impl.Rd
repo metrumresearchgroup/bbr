@@ -32,7 +32,7 @@ in the destination directory. See examples for usage.}
 be stored in the yaml (and can be viewed later in \code{run_log()}).}
 
 \item{.based_on_additional}{Character vector of path(s) to other models that
-this model was "based on." These are used to reconstuct model developement
+this model was "based on." These are used to reconstruct model development
 and ancestry. \strong{Paths must be relative to \code{.new_model} path.} Note that
 the \code{.parent_model} will automatically be added to the \code{based_on} field, so
 no need to include that here.}
