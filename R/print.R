@@ -303,7 +303,14 @@ print.bbi_nonmem_summary <- function(x, .digits = 3, .fixed = FALSE, .off_diag =
   }
 
   if (isFALSE(.fixed)) {
-    param_df <- filter(param_df, !.data$fixed)
+    if (all(is.na(param_df[["fixed"]]))) {
+      cat_line(
+        "Information on which parameters are fixed is not available.\n",
+        col = "red"
+      )
+    } else {
+      param_df <- filter(param_df, !.data$fixed)
+    }
   }
 
   if (isFALSE(.off_diag)) {

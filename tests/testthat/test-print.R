@@ -132,6 +132,14 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_equal(res_str, ref_str)
   })
 
+  test_that("print.bbi_nonmem_summary: no_ext_file=TRUE", {
+    sum <- model_summary(MOD1, .bbi_args = list(no_ext_file = TRUE))
+    out <- capture.output(print(sum))
+    expect_match(out, "fixed is not available", all = FALSE, fixed = TRUE)
+    # If fixed params can't be determined, all parameters are included.
+    expect_match(out, "SIGMA", all = FALSE, fixed = TRUE)
+  })
+
   test_that("print.bbi_nonmem_summary works mixture model [BBR-PRNT-003]", {
     .s <- file.path(MODEL_DIR_X, "iovmm") %>%
         read_model() %>%
