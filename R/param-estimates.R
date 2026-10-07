@@ -87,7 +87,7 @@ param_estimates.bbi_nonmem_summary <- function(.summary, .alpha = NULL) {
     all_vars %>%
     purrr::map_depth(.depth = 1, unlist, use.names = FALSE) %>%
     purrr::map_at(
-      .at = c("stderr", "random_effect_sd", "random_effect_sdse"),
+      .at = c("stderr", "random_effect_sd", "random_effect_sdse", "fixed"),
       ~ . %||% NA_real_
     ) %>%
     tibble::as_tibble()
