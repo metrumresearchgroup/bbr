@@ -83,5 +83,16 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     expect_true(all(is.na(par_df_rest[["ETASIG"]])))
   })
 
+  test_that("param_estimates: no_ext_file=TRUE", {
+    clean_test_enviroment()
 
+    sum1 <- model_summary(MOD1, .bbi_args = list(no_ext_file = TRUE))
+    par_df <- param_estimates(sum1)
+
+    expect_true(all(is.na(par_df[["fixed"]])))
+    # par_df will not exactly match ref_df1 because par_df's values do not come
+    # from the ext.
+    expect_identical(dim(par_df), dim(ref_df1))
+    expect_identical(names(par_df), names(ref_df1))
+  })
 }) # closing withr::with_options
