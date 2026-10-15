@@ -39,6 +39,7 @@ reference:
   - nm_tables
   - nm_file
   - nm_file_multi_tab
+  - nm_fdata
   - get_omega
   - cov_cor
   - check_cor_threshold
