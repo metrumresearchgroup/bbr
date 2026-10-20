@@ -11,6 +11,7 @@ bbi_exec(
   .wait = FALSE,
   .bbi_exe_path = getOption("bbr.bbi_exe_path"),
   .check_status = TRUE,
+  stderr = "2>&1",
   ...
 )
 }
@@ -28,6 +29,11 @@ bbi_exec(
 \item{.check_status}{Whether to signal an error if the command has a non-zero
 exit code.}
 
+\item{stderr}{Passed to \code{processx::process$new()}. By default, standard error
+is redirected to the same connection as standard output. Note that, if you
+send standard error somewhere else, it won't be included in the error
+message shown under \code{.check_status = TRUE}.}
+
 \item{...}{arguments to pass to processx::process$new()}
 }
 \value{
@@ -35,9 +41,12 @@ An S3 object of class \code{bbi_process} with the following elements
 \itemize{
 \item process -- The process object (see ?processx::process$new for more
 details on what you can do with this).
-\item stdout -- the stdout and stderr from the process, if \code{.wait = TRUE}. If
-\code{.wait = FALSE} this contain a message with the tempfile path where stdout
-and stderr have been redirected.
+\item stdout -- the output from the process, if \code{.wait = TRUE}. In addition to
+standard output, the output includes standard error unless the \code{.stderr}
+value redirects it elsewhere.
+
+If \code{.wait = FALSE}, this contains a message with the tempfile path where
+the output has been redirected.
 \item bbi -- character scalar with the execution path used for bbi.
 \item cmd_args -- character vector of all command arguments passed to the
 process.
