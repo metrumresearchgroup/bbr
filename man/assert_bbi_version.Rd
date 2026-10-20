@@ -7,20 +7,19 @@
 \usage{
 assert_bbi_version(
   .bbi_exe_path = getOption("bbr.bbi_exe_path"),
-  .min_version = getOption("bbr.bbi_min_version"),
+  .min_version = BBI_MIN_VERSION,
   .function = NULL
 )
 
 test_bbi_version(
   .bbi_exe_path = getOption("bbr.bbi_exe_path"),
-  .min_version = getOption("bbr.bbi_min_version")
+  .min_version = BBI_MIN_VERSION
 )
 }
 \arguments{
 \item{.bbi_exe_path}{Path to bbi executable}
 
-\item{.min_version}{The minimum allowed version. Defaults to
-\code{getOption("bbr.bbi_min_version")}.}
+\item{.min_version}{The minimum allowed version.}
 
 \item{.function}{The relevant function that is version-constrained. If not
 \code{NULL}, notifies user in error message.}

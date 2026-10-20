@@ -195,7 +195,7 @@ bbi_dry_run <- function(.cmd_args, .dir) {
 #' @inheritParams bbi_version
 #' @return `NULL`, invisibly
 #' @keywords internal
-check_bbi_exe <- function(.bbi_exe_path) {
+check_bbi_exe <- function(.bbi_exe_path, .min_version = BBI_MIN_VERSION) {
   # check if this path is not in the already checked paths
   if (is.null(CACHE_ENV$bbi_exe_paths[[.bbi_exe_path]])) {
     which_path <- Sys.which(.bbi_exe_path)
@@ -206,7 +206,7 @@ check_bbi_exe <- function(.bbi_exe_path) {
     }
 
     # if version too low, reject it
-    assert_bbi_version(.bbi_exe_path)
+    assert_bbi_version(.bbi_exe_path, .min_version = .min_version)
 
     # if found, and passes version constraint, add it to cache
     CACHE_ENV$bbi_exe_paths[[.bbi_exe_path]] <- TRUE
@@ -256,8 +256,7 @@ compare_bbi_version <- function(.bbi_exe_path, .min_version,
 #'
 #' @importFrom stringr str_replace_all
 #' @inheritParams bbi_version
-#' @param .min_version The minimum allowed version. Defaults to
-#'   `getOption("bbr.bbi_min_version")`.
+#' @param .min_version The minimum allowed version.
 #' @param .function The relevant function that is version-constrained. If not
 #'   `NULL`, notifies user in error message.
 #' @return
@@ -268,7 +267,7 @@ compare_bbi_version <- function(.bbi_exe_path, .min_version,
 #' @keywords internal
 assert_bbi_version <- function(
   .bbi_exe_path = getOption('bbr.bbi_exe_path'),
-  .min_version = getOption("bbr.bbi_min_version"),
+  .min_version = BBI_MIN_VERSION,
   .function = NULL
 ) {
   compare_bbi_version(.bbi_exe_path, .min_version, .function = .function)
@@ -277,7 +276,7 @@ assert_bbi_version <- function(
 
 #' @rdname assert_bbi_version
 test_bbi_version <- function(.bbi_exe_path = getOption("bbr.bbi_exe_path"),
-                             .min_version = getOption("bbr.bbi_min_version")) {
+                             .min_version = BBI_MIN_VERSION) {
   compare_bbi_version(.bbi_exe_path, .min_version, fail = FALSE)
 }
 
