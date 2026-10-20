@@ -41,10 +41,10 @@ model_summaries <- function(
 
 bbi_exec_model_summaries <- function(args, paths) {
   args <- c(args %||% list(), json = TRUE)
-  cmd <- bbi_exec(c("nonmem", "summary", check_bbi_args(args), paths),
-                  .wait = TRUE, .check_status = FALSE)
-  res <- jsonlite::fromJSON(paste(cmd[["stdout"]], collapse = ""),
-                            simplifyDataFrame = FALSE)
+  res <- bbi_exec_json(
+    c("nonmem", "summary", check_bbi_args(args), paths),
+    .check_status = FALSE
+  )
   if (length(paths) == 1) {
     # If passed a single model, bbi will output a single object rather than a
     # list of objects. Reshape it into the same form for downstream code.

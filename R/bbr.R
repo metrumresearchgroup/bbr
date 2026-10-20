@@ -167,6 +167,54 @@ bbi_exec <- function(.cmd_args,
   return(res)
 }
 
+#' Call `bbi_exec` and return standard output parsed as JSON.
+#' @noRd
+bbi_exec_json <- function(.cmd_args, ..., .check_status = FALSE) {
+  res <- bbi_exec(
+    .cmd_args,
+    .wait = TRUE,
+    # Always pass FALSE, leaving it to bbi_exec_json to check the status when
+    # .check_status=TRUE.
+    .check_status = FALSE,
+    stderr = "|",
+    ...
+  )
+  stdout <- paste(res[[PROC_STDOUT]], collapse = "\n")
+  proc <- res[[PROC_PROCESS]]
+
+  if (.check_status && proc$get_exit_status() != 0) {
+    stop(format_bbi_json_err_msg(.cmd_args, stdout, proc))
+  }
+
+  data <- tryCatch(
+    jsonlite::fromJSON(stdout, simplifyDataFrame = FALSE),
+    error = identity
+  )
+  if (inherits(data, "error")) {
+    stop(
+      paste0(
+        sprintf("Failed to parse JSON: %s\n", data),
+        format_bbi_json_err_msg(.cmd_args, stdout, proc)
+      )
+    )
+  }
+
+  return(data)
+}
+
+format_bbi_json_err_msg <- function(args, stdout, proc) {
+  paste0(
+    "`bbi ",
+    paste(args, collapse = " "),
+    "` exited with status ",
+    proc$get_exit_status(),
+    "\n\n-- STDOUT:\n",
+    stdout,
+    "\n\n-- STDERR:\n",
+    paste(proc$read_all_error_lines(), collapse = "\n")
+  )
+}
+
 #' Creates a `bbi_process` object with all the required keys, without actually running the command
 #'
 #' Returns an S3 object of class `bbi_process` but the `process` and `stdout` elements containing only the string "DRY_RUN".

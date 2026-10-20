@@ -13,6 +13,14 @@ test_that("check_status_code works as expected [BBR-BBR-001]", {
   expect_error(check_status_code(225, "stdout...", c("arg1", "arg2")))
 })
 
+test_that("bbi_exec_json parse error", {
+  withr::local_options(list(bbr.bbi_exe_path = read_bbi_path()))
+  expect_error(
+    bbi_exec_json("version"),
+    "Failed to parse JSON.*STDOUT:\nv.*STDERR:"
+  )
+})
+
 test_that("bbi_dry_run() correctly returns object [BBR-BBR-002]", {
   PROC_CLASS_LIST <- c("bbi_process", "list")
   cmd_args <- c("naw", "dawg")
