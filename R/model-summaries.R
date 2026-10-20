@@ -39,43 +39,6 @@ model_summaries <- function(
   UseMethod("model_summaries")
 }
 
-# model_summaries_bbi_serial() can go away once bbr.bbi_min_version is 3.2.0 or
-# later.
-
-#' @importFrom purrr map
-model_summaries_bbi_serial <- function(.mods, .bbi_args, .fail_flags) {
-  map(.mods, function(.m) {
-    .s <- tryCatch(
-      {
-        model_summary(.m, .bbi_args = .bbi_args)
-      },
-      error = function(.e) {
-        if (is.null(.fail_flags)) {
-          return(format_model_summary_error(.e))
-        }
-        # if fails, try again with flags
-        tryCatch({
-          if (!is.null(.bbi_args)) {
-            .fail_flags <- combine_list_objects(.fail_flags, .bbi_args)
-          }
-          .retry <- bbr::model_summary(.m, .bbi_args = .fail_flags)
-          .retry$needed_fail_flags <- TRUE
-          return(.retry)
-        },
-        error = format_model_summary_error)
-      }
-    )
-
-    res <- list()
-    res[[ABS_MOD_PATH]] = tools::file_path_sans_ext(get_model_path(.m))
-    res[[SL_SUMMARY]] = .s
-    res[[SL_ERROR]] = .s$error_msg %||% NA_character_
-    res[[SL_FAIL_FLAGS]] = .s$needed_fail_flags %||% FALSE
-
-    return(res)
-  })
-}
-
 bbi_exec_model_summaries <- function(args, paths) {
   args <- c(args %||% list(), json = TRUE)
   cmd <- bbi_exec(c("nonmem", "summary", check_bbi_args(args), paths),
@@ -161,10 +124,9 @@ model_summaries_bbi_concurrent <- function(.mods, .bbi_args, .fail_flags) {
 
 #' Map `model_summary()` over models, without retry on failure
 #'
-#' Like `model_summaries_bbi_serial()`, this calls `model_summary` on a set of
-#' models. However, it's intended for models that are _not_ being passed to `bbi
-#' nonmem summary`. As such, it does not have the `.bbi_args` and does not retry
-#' the call with `.fail_flags` on failures.
+#' This is intended for models that are _not_ being passed to `bbi nonmem
+#' summary`. As such, it does not have the `.bbi_args` and does not retry the
+#' call with `.fail_flags` on failures.
 #'
 #' @noRd
 model_summaries_onetry <- function(.mods) {
@@ -201,11 +163,6 @@ model_summaries.list <- function(
   # check that each element is a model object
   check_model_object_list(.mods)
 
-  bbi_summary_fn <- if (test_bbi_version(.min_version = "3.2.0")) {
-    model_summaries_bbi_concurrent
-  } else {
-    model_summaries_bbi_serial
-  }
   for_bbi <- purrr::map_lgl(
     .mods,
     # Note: Avoid inherit() here because for derived classes need to have the
@@ -215,7 +172,7 @@ model_summaries.list <- function(
   )
 
   res_list <- vector("list", length = length(.mods))
-  res_list[for_bbi] <- bbi_summary_fn(.mods[for_bbi], .bbi_args, .fail_flags)
+  res_list[for_bbi] <- model_summaries_bbi_concurrent(.mods[for_bbi], .bbi_args, .fail_flags)
   res_list[!for_bbi] <- model_summaries_onetry(.mods[!for_bbi])
 
   return(create_summary_list(res_list))

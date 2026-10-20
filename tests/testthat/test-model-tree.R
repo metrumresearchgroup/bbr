@@ -229,7 +229,6 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     })
 
     it("Include bootstrap model", {
-      skip_if_old_bbi("3.2.0") # calls model_summary()
       clean_test_enviroment(create_tree_models)
       boot_run <- make_fake_boot(MOD1, n = 3)
       on.exit(delete_models(boot_run, .tags = NULL, .force = TRUE), add = TRUE)
@@ -251,7 +250,6 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     })
 
     it("Include a simulation", {
-      skip_if_old_bbi("3.2.0") # calls model_summary()
       # Set up fake simulation
       mod_sim <- make_fake_sim(MOD1)
       sim_inc <- get_simulation(mod_sim)
@@ -298,7 +296,6 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
     })
 
     it("summary column inclusion", {
-      skip_if_old_bbi("3.2.0") # calls model_summary()
       clean_test_enviroment(create_tree_models)
       run_df <- run_log(MODEL_DIR)
 
@@ -332,7 +329,6 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
   describe("model_tree() formatting",{
     it("make_tree_tooltip()", {
-      skip_if_old_bbi("3.2.0") # calls model_summary()
       clean_test_enviroment(create_tree_models)
       # With summary (default)
       tree_data <- make_tree_data(run_log(MODEL_DIR), add_summary = TRUE)

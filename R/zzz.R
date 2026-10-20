@@ -24,7 +24,7 @@
   # Note: If you're updating this value, also update the version installed in
   # the "oldest" build of the CI.
   if (is.null(getOption("bbr.bbi_min_version"))) {
-    options("bbr.bbi_min_version" = package_version("3.0.2"))
+    options("bbr.bbi_min_version" = package_version("3.3.0"))
   }
 
   # controls printing extra informative messages in functions
