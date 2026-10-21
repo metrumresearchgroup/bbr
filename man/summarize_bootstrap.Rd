@@ -7,7 +7,12 @@
 \alias{get_boot_models}
 \title{Summarize a bootstrap run}
 \usage{
-summarize_bootstrap_run(.boot_run, force_resummarize = FALSE)
+summarize_bootstrap_run(
+  .boot_run,
+  force_resummarize = FALSE,
+  .exclude_heuristics = NULL,
+  .exclude_runs = NULL
+)
 
 bootstrap_estimates(.boot_run, format_long = FALSE, force_resummarize = FALSE)
 
@@ -19,6 +24,17 @@ get_boot_models(.boot_run)
 \item{force_resummarize}{Logical (T/F). If \code{TRUE}, force re-summarization.
 Will \emph{only} update the saved out \code{RDS} file when specified via
 \code{summarize_bootstrap_run()}. See details for more information.}
+
+\item{.exclude_heuristics}{Character vector of run heuristics (e.g.,
+\code{"prderr"}). Runs where \emph{any} of these are \code{TRUE} are excluded from the
+returned summary. Valid names are the heuristic columns of
+\verb{$run_heuristics} (see the \code{run_heuristics} section of \code{\link[=model_summary]{model_summary()}}).
+Runs with a missing (\code{NA}) heuristic, such as those whose summary failed,
+are \emph{not} excluded.}
+
+\item{.exclude_runs}{Run IDs to exclude from the returned summary. Either a
+character vector (e.g., \code{c("0042", "0187")}) or whole numbers (e.g.,
+\code{c(42, 187)}), which are zero-padded to match the run IDs.}
 
 \item{format_long}{Logical (T/F). If \code{TRUE}, format data as a long table,
 making the data more portable for plotting.}
@@ -47,6 +63,15 @@ already exists (see section below).
 \item Formats the returned object as a \code{bbi_nmboot_summary} S3 object, and
 displays key summary information when printed to the console.
 }
+\item \code{.exclude_heuristics} and \code{.exclude_runs} filter the \emph{returned} object
+(\verb{$boot_summary}, \verb{$run_details}, \verb{$run_heuristics}, and \verb{$boot_compare}),
+so \code{\link[=param_estimates_compare]{param_estimates_compare()}} only uses the remaining runs. The saved
+\code{boot_summary.RDS} file is never filtered, so calling
+\code{summarize_bootstrap_run()} again without these arguments returns the full
+summary (the bootstrap run model object is unaffected). Excluded runs and
+the reason for exclusion are stored in \verb{$excluded}, and reported when printed.
+\code{bootstrap_estimates()} is not filtered; use \verb{$excluded} to mimic the
+filtering (see examples).
 }
 \subsection{Saved out data file:}{
 
@@ -80,6 +105,10 @@ boot_sum <- summarize_bootstrap_run(.boot_run)
 
 # Optionally compare to original estimates
 param_estimates_compare(boot_sum)
+
+# Filter runs
+boot_sum <- summarize_bootstrap_run(.boot_run, .exclude_heuristics = "prderr")
+dplyr::filter(bootstrap_estimates(.boot_run), !run \%in\% boot_sum$excluded$run)
 
 
 # Long format is helpful for plotting estimates:

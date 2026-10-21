@@ -460,6 +460,15 @@ make_boot_spec <- function(boot_models, boot_args){
 #' @param force_resummarize Logical (T/F). If `TRUE`, force re-summarization.
 #'  Will _only_ update the saved out `RDS` file when specified via
 #'  `summarize_bootstrap_run()`. See details for more information.
+#' @param .exclude_heuristics Character vector of run heuristics (e.g.,
+#'  `"prderr"`). Runs where _any_ of these are `TRUE` are excluded from the
+#'  returned summary. Valid names are the heuristic columns of
+#'  `$run_heuristics` (see the `run_heuristics` section of [model_summary()]).
+#'  Runs with a missing (`NA`) heuristic, such as those whose summary failed,
+#'  are _not_ excluded.
+#' @param .exclude_runs Run IDs to exclude from the returned summary. Either a
+#'  character vector (e.g., `c("0042", "0187")`) or whole numbers (e.g.,
+#'  `c(42, 187)`), which are zero-padded to match the run IDs.
 #'
 #' @details
 #'  - `bootstrap_estimates()` _quickly_ extracts and formats the parameter estimates
@@ -475,6 +484,15 @@ make_boot_spec <- function(boot_models, boot_args){
 #'     already exists (see section below).
 #'     - Formats the returned object as a `bbi_nmboot_summary` S3 object, and
 #'     displays key summary information when printed to the console.
+#'  - `.exclude_heuristics` and `.exclude_runs` filter the _returned_ object
+#'  (`$boot_summary`, `$run_details`, `$run_heuristics`, and `$boot_compare`),
+#'  so [param_estimates_compare()] only uses the remaining runs. The saved
+#'  `boot_summary.RDS` file is never filtered, so calling
+#'  `summarize_bootstrap_run()` again without these arguments returns the full
+#'  summary (the bootstrap run model object is unaffected). Excluded runs and
+#'  the reason for exclusion are stored in `$excluded`, and reported when printed.
+#'  `bootstrap_estimates()` is not filtered; use `$excluded` to mimic the
+#'  filtering (see examples).
 #'
 #' ## Saved out data file:
 #' The first time `summarize_bootstrap_run()` is called (or if
@@ -497,6 +515,10 @@ make_boot_spec <- function(boot_models, boot_args){
 #' # Optionally compare to original estimates
 #' param_estimates_compare(boot_sum)
 #'
+#' # Filter runs
+#' boot_sum <- summarize_bootstrap_run(.boot_run, .exclude_heuristics = "prderr")
+#' dplyr::filter(bootstrap_estimates(.boot_run), !run %in% boot_sum$excluded$run)
+#'
 #'
 #' # Long format is helpful for plotting estimates:
 #' bootstrap_estimates(.boot_run, format_long = TRUE) %>%
@@ -517,9 +539,17 @@ NULL
 #' @export
 summarize_bootstrap_run <- function(
     .boot_run,
-    force_resummarize = FALSE
+    force_resummarize = FALSE,
+    .exclude_heuristics = NULL,
+    .exclude_runs = NULL
 ){
   check_model_object(.boot_run, NMBOOT_MOD_CLASS)
+  checkmate::assert_character(
+    .exclude_heuristics, any.missing = FALSE, min.len = 1, null.ok = TRUE
+  )
+  if(!is.null(.exclude_runs)){
+    checkmate::assert_atomic_vector(.exclude_runs, any.missing = FALSE, min.len = 1)
+  }
   boot_dir <- .boot_run[[ABS_MOD_PATH]]
   boot_sum_path <- file.path(boot_dir, "boot_summary.RDS")
 
@@ -651,6 +681,95 @@ summarize_bootstrap_run <- function(
     boot_sum$based_on_model_path <- "<not found>"
     boot_sum$based_on_data_set <- "<not found>"
   }
+
+  # Filter the returned object only (the saved RDS is always complete)
+  if(!is.null(.exclude_heuristics) || !is.null(.exclude_runs)){
+    boot_sum <- filter_bootstrap_summary(
+      boot_sum,
+      exclude_heuristics = .exclude_heuristics,
+      exclude_runs = .exclude_runs
+    )
+  }
+
+  return(boot_sum)
+}
+
+
+#' Exclude runs from a bootstrap summary object
+#'
+#' @param boot_sum A `bbi_nmboot_summary` object
+#' @param exclude_heuristics,exclude_runs See `.exclude_heuristics` and
+#'  `.exclude_runs` in [summarize_bootstrap_run()]
+#'
+#' @returns `boot_sum`, with excluded runs removed, `$boot_compare` recomputed,
+#'  and a new `$excluded` tibble (columns `run` and `reason`).
+#' @noRd
+filter_bootstrap_summary <- function(
+    boot_sum,
+    exclude_heuristics = NULL,
+    exclude_runs = NULL
+){
+  boot_df <- boot_sum$boot_summary
+  heur_df <- boot_sum[[SUMMARY_HEURISTICS]]
+  det_df <- boot_sum[[SUMMARY_DETAILS]]
+  valid_runs <- boot_df$run
+  heur_runs <- basename(heur_df[[ABS_MOD_PATH]])
+
+  valid_heur <- setdiff(names(heur_df), ABS_MOD_PATH)
+  bad_heur <- setdiff(exclude_heuristics, valid_heur)
+  if(length(bad_heur) > 0){
+    rlang::abort(
+      c(
+        paste0("Unknown heuristic(s): ", toString(bad_heur)),
+        "i" = paste0("Valid options: ", toString(valid_heur))
+      )
+    )
+  }
+
+  # Run IDs are zero-padded strings (e.g., "0042"), so allow numeric input
+  user_runs <- unique(str_pad(
+    as.character(exclude_runs), max(nchar(valid_runs)), pad = "0"
+  ))
+  bad_runs <- setdiff(user_runs, valid_runs)
+  if(length(bad_runs) > 0){
+    rlang::abort(
+      c(
+        paste0("Run(s) not found in bootstrap run: ", toString(bad_runs)),
+        "i" = paste0("Run IDs look like: ", toString(utils::head(valid_runs, 3)))
+      )
+    )
+  }
+
+  # One row per run, with all reasons combined. Only flagged (TRUE) heuristics
+  # are excluded; NA is kept
+  excluded <- dplyr::bind_rows(
+    purrr::map(exclude_heuristics, function(.h){
+      tibble(run = heur_runs[heur_df[[.h]] %in% TRUE], reason = .h)
+    }),
+    tibble(run = user_runs, reason = rep("user-specified", length(user_runs)))
+  ) %>%
+    dplyr::group_by(across(all_of("run"))) %>%
+    dplyr::summarise(reason = toString(.data$reason))
+
+  keep_run <- function(runs) !(runs %in% excluded$run)
+
+  if(!any(keep_run(valid_runs))){
+    rlang::abort(
+      "All bootstrap runs were excluded. Adjust `.exclude_heuristics` or `.exclude_runs`."
+    )
+  }
+
+  boot_sum$boot_summary <- boot_df[keep_run(boot_df$run), ]
+  boot_sum[[SUMMARY_HEURISTICS]] <- heur_df[keep_run(heur_runs), ]
+  boot_sum[[SUMMARY_DETAILS]] <- det_df[keep_run(basename(det_df[[ABS_MOD_PATH]])), ]
+  boot_sum$excluded <- excluded
+
+  verbose_msg(
+    glue("Excluded {nrow(excluded)} of {length(valid_runs)} bootstrap runs")
+  )
+
+  # Recompute from the remaining runs
+  boot_sum$boot_compare <- param_estimates_compare(boot_sum)
 
   return(boot_sum)
 }

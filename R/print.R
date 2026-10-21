@@ -386,8 +386,24 @@ print.bbi_nmboot_summary <- function(x, .digits = 3, .nrow = 10, ...) {
   }
 
   cli::cat_line("Run Status:\n")
-  n_samples <- c("Number of runs" = x$n_samples)
-  cli::cat_bullet(paste("Number of runs:", col_blue(x$n_samples)), bullet = "en_dash")
+  n_excluded <- if(is.null(x$excluded)) 0 else nrow(x$excluded)
+  n_samples <- c("Number of runs" = x$n_samples - n_excluded)
+  if(n_excluded > 0){
+    cli::cat_bullet(
+      paste0(
+        "Number of runs: ", col_blue(n_samples), " of ", x$n_samples,
+        " (", col_red(n_excluded), " excluded)"
+      ),
+      bullet = "en_dash"
+    )
+    purrr::iwalk(table(x$excluded$reason), function(n, reason){
+      cli::cat_bullet(
+        paste0("Excluded (", reason, "): ", col_red(n)), bullet = "en_dash"
+      )
+    })
+  }else{
+    cli::cat_bullet(paste("Number of runs:", col_blue(x$n_samples)), bullet = "en_dash")
+  }
 
   # check heuristics
   .h <- x[[SUMMARY_HEURISTICS]]
