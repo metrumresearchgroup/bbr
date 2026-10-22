@@ -133,19 +133,8 @@ check_run_times <- function(
     .wait = TRUE,
     ...
 ) {
-
-  is_old_bbi <- FALSE
-  if (!test_bbi_version(.min_version = "3.2.0")) {
-    is_old_bbi <- TRUE
-    warning("This function is only compatible with bbi 3.2.0 or later")
-  }
-
   if("all" %in% .return_times){
     .return_times <- c("estimation_time", "covariance_time", "postprocess_time", "cpu_time")
-    if(is_old_bbi){
-      # This allows the function to work with lower versions of bbi (despite covariance_time being incorrect)
-      .return_times <- c("estimation_time", "covariance_time", "cpu_time")
-    }
   }else{
     assert_true(all(.return_times %in% c("estimation_time", "covariance_time", "postprocess_time", "cpu_time")))
   }

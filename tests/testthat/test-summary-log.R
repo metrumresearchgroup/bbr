@@ -87,7 +87,6 @@ test_that("summary_log() parses heuristics correctly [BBR-SMLG-006]", {
   expect_true(run1001$prderr)
   expect_true(run1001[[ANY_HEURISTICS]])
   expect_true(filter(sum_df2, run == "iovmm")$has_final_zero_gradient)
-  skip_if_old_bbi("3.0.3")
   expect_true(filter(sum_df2, run == "acop-fake-bayes")$eigenvalue_issues)
 })
 

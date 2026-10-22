@@ -98,5 +98,5 @@ VignetteBuilder:
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-SystemRequirements: bbi (>= 3.0.2)
+SystemRequirements: bbi (>= 3.3.0)
 Config/roxygen2/version: 8.0.0

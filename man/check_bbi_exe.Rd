@@ -4,7 +4,7 @@
 \alias{check_bbi_exe}
 \title{Check that bbi is installed}
 \usage{
-check_bbi_exe(.bbi_exe_path)
+check_bbi_exe(.bbi_exe_path, .min_version = BBI_MIN_VERSION)
 }
 \arguments{
 \item{.bbi_exe_path}{Path to bbi executable}

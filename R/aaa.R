@@ -5,6 +5,10 @@ BBI_DEFAULT_PATH <- if (ON_WINDOWS) {
   "bbi"
 }
 
+# Note: If you're updating this value, also update the version installed in the
+# "oldest" build of the CI.
+BBI_MIN_VERSION <- package_version("3.3.0")
+
 BBI_VALID_MODES <- c("local", "sge", "slurm")
 
 CACHE_ENV <- new.env(parent = emptyenv())

@@ -9,7 +9,6 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   #########################################
 
   test_that("model_summary.bbi_nonmem_model produces expected output [BBR-SUM-001]", {
-    skip_if_old_bbi("3.2.0")
     # get summary
     sum1 <- MOD1 %>% model_summary()
 
@@ -50,7 +49,6 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
 
     # some things will be a little different, most will be the same
     ref_sum <- dget(SUMMARY_REF_FILE)
-    skip_if_old_bbi("3.2.0")
     for (.d in names(ref_sum$run_details)) {
       if (.d == "output_files_used") {
         expect_false(all(sum2$run_details$output_files_used == ref_sum$run_details$output_files_used))
@@ -97,7 +95,6 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
       args_list[[as.character(glue::glue("no_{.tc$ext}_file"))]] <- TRUE
       sum2 <- model_summary(mod2, .bbi_args = args_list)
 
-      skip_if_old_bbi("3.2.0")
       # some things will be a little different, most will be the same
       ref_sum <- dget(SUMMARY_REF_FILE)
 
@@ -175,7 +172,6 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   })
 
   test_that("model_summary works with multiple estimation methods [BBR-SUM-010]", {
-    skip_if_old_bbi("3.2.0")
     mod_complex <- read_model(file.path(MODEL_DIR_X, "acop-fake-bayes"))
     mod_sum <- mod_complex %>% model_summary()
     expect_equal(length(mod_sum$run_details$estimation_time), 3)
@@ -183,7 +179,6 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   })
 
   test_that("model_summary() maps objective function fallback to NA [BBR-SUM-011]", {
-    skip_if_old_bbi("3.2.0")
     withr::with_tempdir({
       new_mod_path <- file.path(getwd(), "tmpmod")
       mod <- copy_model_from(MOD1, new_mod_path)

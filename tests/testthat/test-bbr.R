@@ -46,12 +46,13 @@ test_that("check_bbi_exe() correctly errors or finds paths [BBR-BBR-003]", {
 test_that("check_bbi_exe() errors on too low version [BBR-BBR-004]", {
   skip_if(getOption("bbr.DEV_no_min_version"))
 
-  withr::with_options(list("bbr.bbi_min_version" = package_version("100.0.0")), {
-    # should fail because version number is less than 100.0.0
-    CACHE_ENV$bbi_exe_paths[[BBI_EXE_PATH]] <- NULL
-    expect_error(check_bbi_exe(BBI_EXE_PATH), regexp = "minimum supported version of bbi is 100\\.0\\.0")
-    expect_null(CACHE_ENV$bbi_exe_paths[[BBI_EXE_PATH]])
-  })
+  # should fail because version number is less than 100.0.0
+  CACHE_ENV$bbi_exe_paths[[BBI_EXE_PATH]] <- NULL
+  expect_error(
+    check_bbi_exe(BBI_EXE_PATH, package_version("100.0.0")),
+    regexp = "minimum supported version of bbi is 100\\.0\\.0"
+  )
+  expect_null(CACHE_ENV$bbi_exe_paths[[BBI_EXE_PATH]])
 })
 
 test_that("bbi_init creates bbi.yaml [BBR-BBR-005]", {

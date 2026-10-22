@@ -29,7 +29,7 @@ jobs:
           - label: oldest
             os: ubuntu-22.04
             r: 4.0.5
-            bbi_version: v3.0.2
+            bbi_version: v3.3.0
             mpn: 2023-01-25
             cran_override: 'https://mpn.metworx.com/snapshots/stable/2023-01-25'
             rspm: 'https://packagemanager.posit.co/cran/__linux__/jammy/2023-01-25'

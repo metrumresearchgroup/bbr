@@ -217,8 +217,6 @@ withr::with_options(list(bbr.bbi_exe_path = read_bbi_path()), {
   })
 
   test_that("print.bbi_nonmem_summary ONLYSIM [BBR-PRNT-003]", {
-    skip_if_old_bbi("3.1.1")
-
     .s <- file.path(MODEL_DIR_X, "acop-onlysim") %>%
       read_model() %>%
       model_summary()
