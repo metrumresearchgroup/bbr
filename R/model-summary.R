@@ -240,14 +240,11 @@ nonmem_summary <- function(
   }
 
   # otherwise, execute
-  res <- bbi_exec(cmd_args, .dir = .path, ..., .wait = TRUE, .check_status = FALSE)
+  bbi_list <- bbi_exec_json(cmd_args, .dir = .path, ..., .check_status = FALSE)
+
   res_list <- list2(
     !!ABS_MOD_PATH := tools::file_path_sans_ext(get_model_path(.mod))
   )
-
-  bbi_list <- res$stdout %>%
-    paste(collapse="") %>%
-    jsonlite::fromJSON(simplifyDataFrame = FALSE)
 
   if (!is.null(bbi_list$error_msg)) {
     err_msg <- glue("model_summary({get_model_id(.mod)}) failed with the following error. This may be because the modeling run has not finished successfully.\n\nERROR: \n{bbi_list$error_msg}")

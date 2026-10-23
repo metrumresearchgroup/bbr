@@ -67,6 +67,10 @@
 #' @param .wait If true, don't return until process has exited.
 #' @param .check_status Whether to signal an error if the command has a non-zero
 #'   exit code.
+#' @param stderr Passed to `processx::process$new()`. By default, standard error
+#'   is redirected to the same connection as standard output. Note that, if you
+#'   send standard error somewhere else, it won't be included in the error
+#'   message shown under `.check_status = TRUE`.
 #' @param ... arguments to pass to processx::process$new()
 #'
 #' @return An S3 object of class `bbi_process` with the following elements
@@ -74,9 +78,12 @@
 #'   * process -- The process object (see ?processx::process$new for more
 #'   details on what you can do with this).
 #'
-#'   * stdout -- the stdout and stderr from the process, if `.wait = TRUE`. If
-#'   `.wait = FALSE` this contain a message with the tempfile path where stdout
-#'   and stderr have been redirected.
+#'   * stdout -- the output from the process, if `.wait = TRUE`. In addition to
+#'     standard output, the output includes standard error unless the `.stderr`
+#'     value redirects it elsewhere.
+#'
+#'     If `.wait = FALSE`, this contains a message with the tempfile path where
+#'     the output has been redirected.
 #'
 #'   * bbi -- character scalar with the execution path used for bbi.
 #'
@@ -95,6 +102,7 @@ bbi_exec <- function(.cmd_args,
                      .wait = FALSE,
                      .bbi_exe_path = getOption("bbr.bbi_exe_path"),
                      .check_status = TRUE,
+                     stderr = "2>&1",
                      ...) {
   check_bbi_exe(.bbi_exe_path)
 
@@ -106,7 +114,7 @@ bbi_exec <- function(.cmd_args,
     ...,
     wd = .dir,
     stdout = stdout_file,
-    stderr = "2>&1",
+    stderr = stderr,
     cleanup = .wait,
     cleanup_tree = FALSE
   )
@@ -144,7 +152,7 @@ bbi_exec <- function(.cmd_args,
     }
 
   } else {
-    output <- paste("NO STDOUT BECAUSE `.wait = FALSE`. stdout and stderr redirected to", stdout_file)
+    output <- paste("Due to `.wait = FALSE`, output redirected to", stdout_file)
   }
   # build result object
   res <- list()
@@ -157,6 +165,54 @@ bbi_exec <- function(.cmd_args,
   # assign class and return
   res <- create_process_object(res)
   return(res)
+}
+
+#' Call `bbi_exec` and return standard output parsed as JSON.
+#' @noRd
+bbi_exec_json <- function(.cmd_args, ..., .check_status = FALSE) {
+  res <- bbi_exec(
+    .cmd_args,
+    .wait = TRUE,
+    # Always pass FALSE, leaving it to bbi_exec_json to check the status when
+    # .check_status=TRUE.
+    .check_status = FALSE,
+    stderr = "|",
+    ...
+  )
+  stdout <- paste(res[[PROC_STDOUT]], collapse = "\n")
+  proc <- res[[PROC_PROCESS]]
+
+  if (.check_status && proc$get_exit_status() != 0) {
+    stop(format_bbi_json_err_msg(.cmd_args, stdout, proc))
+  }
+
+  data <- tryCatch(
+    jsonlite::fromJSON(stdout, simplifyDataFrame = FALSE),
+    error = identity
+  )
+  if (inherits(data, "error")) {
+    stop(
+      paste0(
+        sprintf("Failed to parse JSON: %s\n", data),
+        format_bbi_json_err_msg(.cmd_args, stdout, proc)
+      )
+    )
+  }
+
+  return(data)
+}
+
+format_bbi_json_err_msg <- function(args, stdout, proc) {
+  paste0(
+    "`bbi ",
+    paste(args, collapse = " "),
+    "` exited with status ",
+    proc$get_exit_status(),
+    "\n\n-- STDOUT:\n",
+    stdout,
+    "\n\n-- STDERR:\n",
+    paste(proc$read_all_error_lines(), collapse = "\n")
+  )
 }
 
 #' Creates a `bbi_process` object with all the required keys, without actually running the command

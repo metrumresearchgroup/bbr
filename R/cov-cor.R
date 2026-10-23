@@ -47,17 +47,7 @@ cov_cor.bbi_nonmem_model <- function(
   }
 
   # parse thetas with bbi
-  res <- tryCatch(
-    bbi_exec(cmd_args, .dir = .path, ..., .wait = TRUE),
-    error = function(e) {
-      err_msg <- glue("cov_cor('{get_model_id(.mod)}') failed with the following error. \n\nERROR: \n{e}")
-      stop(err_msg, call. = FALSE)
-    }
-  )
-
-  res_list <- res$stdout %>%
-    paste(collapse="") %>%
-    jsonlite::fromJSON(simplifyDataFrame = FALSE)
+  res_list <- bbi_exec_json(cmd_args, .dir = .path, ..., .check_status = TRUE)
 
   num_est <- length(res_list$covariance_theta)
 
