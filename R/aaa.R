@@ -171,11 +171,6 @@ BBI_ARGS = list(
     flag = "--preview",
     description = "preview action, but don't actually run command"
   ),
-  save_config = list(
-    type = "logical",
-    flag = "--save_config",
-    description = "Whether or not to save the existing configuration to a file with the model (default true)"
-  ),
   threads = list(
     type = "numeric",
     flag = "--threads",
